@@ -1,6 +1,6 @@
 import { useRef, useState } from "react"
 import { useAsyncList } from "../hooks/async"
-import { defaultNormalizer, Normalizer } from "../utils/normalize"
+import { defaultNormalizer, Normalizer, Sorter } from "../utils/normalize"
 import Dropdown, { Trigger } from "./dropdown"
 import { ChevronDown } from "./icons"
 import { Control, Input } from "./input"
@@ -16,6 +16,7 @@ export interface MultiSelectProps<T, V> extends Control, Trigger {
   getOptions?: () => Promise<T[]>
   onChange?: (value: V[] | undefined) => void
   normalize?: Normalizer<T, V>
+  sort?: Sorter<T, V>
 }
 
 export function MultiSelect<T, V>({
@@ -31,6 +32,7 @@ export function MultiSelect<T, V>({
   onClose,
   anchor,
   normalize = defaultNormalizer,
+  sort,
   ...props
 }: MultiSelectProps<T, V>) {
   const triggerRef = useRef<HTMLInputElement>(null)
@@ -79,6 +81,7 @@ export function MultiSelect<T, V>({
           selectedValues={value}
           onSelectValues={onChange}
           normalize={normalize}
+          sort={sort}
         >
           {({ selected, label }) => (
             <Checkbox readOnly value={selected}>

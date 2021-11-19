@@ -4,6 +4,7 @@ import {
   denormalizeItems,
   normalizeItems,
   Normalizer,
+  Sorter,
 } from "../utils/normalize"
 import Checkbox from "./checkbox"
 import Dropdown, { Trigger } from "./dropdown"
@@ -18,6 +19,7 @@ export interface TagAutocompleteProps<T, V> extends Control, Trigger {
   onQuery?: (query: string) => Promise<T[] | void> | T[] | void
   normalize?: Normalizer<T, V>
   children?: Renderer<T, V>
+  sort?: Sorter<T, V>
 }
 
 function TagAutocomplete<T, V>({

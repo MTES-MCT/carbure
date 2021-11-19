@@ -4,5 +4,14 @@ export function uniqueBy<T, V>(list: T[], by: (value: T) => V) {
 }
 
 export function sortBy<T, V>(list: T[], by: (value: T) => V) {
-  return list.sort((a, b) => String(by(a)).localeCompare(String(by(b)), "fr"))
+  return list.sort((a, b) => {
+    const byA = by(a)
+    const byB = by(b)
+
+    if (typeof byA === "number" && typeof byB === "number") {
+      return byA - byB
+    } else {
+      return String(by(a)).localeCompare(String(by(b)), "fr")
+    }
+  })
 }

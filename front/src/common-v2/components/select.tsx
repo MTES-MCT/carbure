@@ -1,6 +1,6 @@
 import { useRef, useState } from "react"
 import { useAsyncList } from "../hooks/async"
-import { defaultNormalizer, Normalizer } from "../utils/normalize"
+import { defaultNormalizer, Normalizer, Sorter } from "../utils/normalize"
 import Dropdown, { Trigger } from "./dropdown"
 import { ChevronDown } from "./icons"
 import { Control, Input } from "./input"
@@ -15,6 +15,7 @@ export interface SelectProps<T, V> extends Control, Trigger {
   getOptions?: () => Promise<T[]>
   onChange?: (value: V | undefined) => void
   normalize?: Normalizer<T, V>
+  sort?: Sorter<T, V>
 }
 
 export function Select<T, V>({
@@ -29,6 +30,7 @@ export function Select<T, V>({
   onClose,
   anchor,
   normalize = defaultNormalizer,
+  sort,
   ...props
 }: SelectProps<T, V>) {
   const triggerRef = useRef<HTMLInputElement>(null)
@@ -74,6 +76,7 @@ export function Select<T, V>({
           search={search}
           items={asyncOptions.items}
           selectedValue={value}
+          sort={sort}
           normalize={normalize}
           onFocus={onChange}
           onSelectValue={(value) => {

@@ -5,24 +5,26 @@ import {
   Normalizer,
   normalizeItems,
   denormalizeItems,
+  Sorter,
 } from "../utils/normalize"
 import Dropdown, { Trigger } from "./dropdown"
 import { Control, TextInput } from "./input"
 import List, { createQueryFilter, defaultRenderer, Renderer } from "./list"
 
-export interface AutocompleteProps<T, K> extends Control, Trigger {
-  value?: K | undefined
+export interface AutocompleteProps<T, V> extends Control, Trigger {
+  value?: V | undefined
   options?: T[]
   defaultOptions?: T[]
   getOptions?: (query: string) => Promise<T[]>
-  onChange?: (value: K | undefined) => void
+  onChange?: (value: V | undefined) => void
   onQuery?: (query: string) => void
-  create?: (value: string) => K
-  normalize?: Normalizer<T, K>
-  children?: Renderer<T, K>
+  create?: (value: string) => V
+  normalize?: Normalizer<T, V>
+  children?: Renderer<T, V>
+  sort?: Sorter<T, V>
 }
 
-function Autocomplete<T, K>({
+function Autocomplete<T, V>({
   loading,
   value,
   options,
@@ -34,8 +36,9 @@ function Autocomplete<T, K>({
   anchor,
   normalize = defaultNormalizer,
   children = defaultRenderer,
+  sort,
   ...props
-}: AutocompleteProps<T, K>) {
+}: AutocompleteProps<T, V>) {
   const triggerRef = useRef<HTMLInputElement>(null)
 
   const autocomplete = useAutocomplete({
@@ -74,21 +77,22 @@ function Autocomplete<T, K>({
           normalize={normalize}
           onFocus={onChange}
           onSelectValue={autocomplete.onSelect}
+          sort={sort}
         />
       </Dropdown>
     </>
   )
 }
 
-interface AutocompleteConfig<T, K> {
-  value?: K | undefined
+interface AutocompleteConfig<T, V> {
+  value?: V | undefined
   options?: T[]
   defaultOptions?: T[]
   getOptions?: (query: string) => Promise<T[]>
-  onChange?: (value: K | undefined) => void
+  onChange?: (value: V | undefined) => void
   onQuery?: (query: string) => void
-  create?: (value: string) => K
-  normalize?: Normalizer<T, K>
+  create?: (value: string) => V
+  normalize?: Normalizer<T, V>
 }
 
 export function useAutocomplete<T, V>({
@@ -137,8 +141,7 @@ export function useAutocomplete<T, V>({
 
     if (match && JSON.stringify(match.value) !== JSON.stringify(value)) {
       onChange?.(match.value)
-    }
-    else if (create) {
+    } else if (create) {
       onChange?.(create(query))
     }
   }

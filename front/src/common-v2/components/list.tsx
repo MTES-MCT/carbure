@@ -11,6 +11,7 @@ import {
   Normalized,
   Normalizer,
   normalizeItems,
+  Sorter,
 } from "../utils/normalize"
 import { SearchInput } from "./input"
 import css from "./list.module.css"
@@ -30,6 +31,7 @@ export interface ListProps<T, V> {
   onSelectValues?: (keys: V[]) => void
   normalize?: Normalizer<T, V>
   filter?: Filter<T, V>
+  sort?: Sorter<T, V>
   children?: Renderer<T, V>
 }
 
@@ -49,6 +51,7 @@ export function List<T, V>({
   filter = defaultFilter,
   normalize = defaultNormalizer,
   children: render = defaultRenderer,
+  sort,
 }: ListProps<T, V>) {
   const listRef = useRef<HTMLUListElement>(null)
   const [query, setQuery] = useState<string | undefined>()
@@ -58,7 +61,7 @@ export function List<T, V>({
     return filter(item) && queryFilter(item)
   }
 
-  const normItems = normalizeItems(items, normalize, filterItem)
+  const normItems = normalizeItems(items, normalize, filterItem, sort)
 
   const selection = useSelection({
     items: normItems,
@@ -193,6 +196,7 @@ export function List<T, V>({
           variant="inline"
           value={query}
           onChange={setQuery}
+          className={css.search}
         />
       )}
       {renderItems(normItems)}
