@@ -12,7 +12,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 
 from core.ign_distance import get_distance
-from core.models import Biocarburant, CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, CarbureStockTransformation, Depot, MatierePremiere, Pays, TransactionDistance, UserRights
+from core.models import Biocarburant, CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, MatierePremiere, Pays, TransactionDistance, UserRights
 from core.models import GenericError
 from core.serializers import CarbureLotCommentSerializer, CarbureLotEventSerializer, CarbureLotPublicSerializer, CarbureStockPublicSerializer, GenericErrorSerializer
 from core.xlsx_v3 import export_carbure_lots, export_carbure_stock
@@ -719,8 +719,8 @@ def handle_eth_to_etbe_transformation(user, stock, transformation):
     new_stock.save()
 
     # create events
-    e = CarbureLotEvent()
+    e = CarbureStockEvent()
     e.event_type = CarbureLotEvent.TRANSFORMED
-    e.lot = stock.parent_lot
+    e.stock = stock
     e.user = user
     e.save()
