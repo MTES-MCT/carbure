@@ -62,6 +62,7 @@ export const Transactions = () => {
               value={year}
               onChange={setYear}
               options={yearData}
+              sort={(year) => -year.value}
             />
 
             <DeclarationButton year={year} />

@@ -142,6 +142,7 @@ export const FilterSelect = ({
     value={value}
     onChange={onChange}
     normalize={filterNormalizers[field]}
+    sort={(item) => item.label}
   />
 )
 

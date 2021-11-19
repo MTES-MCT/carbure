@@ -42,3 +42,7 @@
 .list li[data-selected][data-focused] {
   background-color: var(--gray-medium);
 }
+
+.search {
+  max-width: unset;
+}
