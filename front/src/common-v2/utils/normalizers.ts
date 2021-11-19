@@ -1,5 +1,5 @@
 import i18next from "i18next"
-import { Normalizer } from "./normalize"
+import { Normalizer, Option } from "./normalize"
 import { Entity } from "carbure/types"
 import {
   Biofuel,
@@ -8,6 +8,7 @@ import {
   Feedstock,
   ProductionSite,
 } from "common/types"
+import { Filter } from "transactions-v2/types"
 
 export const normalizeBiofuel: Normalizer<Biofuel> = (biofuel) => ({
   value: biofuel,
@@ -38,6 +39,24 @@ export const normalizeProductionSite: Normalizer<ProductionSite | string> = (ps)
 export const normalizeDepot: Normalizer<Depot | string> = (depot) => ({
   value: depot,
   label: isString(depot) ? depot : depot.name,
+})
+
+// prettier-ignore
+export const normalizeFeedstockFilter: Normalizer<Option, string> = (feedstock) => ({
+  value: feedstock.value,
+  label: i18next.t(feedstock.value, { ns: "feedstocks" }),
+})
+
+// prettier-ignore
+export const normalizeBiofuelFilter: Normalizer<Option, string> = (biofuel) => ({
+  value: biofuel.value,
+  label: i18next.t(biofuel.value, { ns: "biofuels" }),
+})
+
+// prettier-ignore
+export const normalizeCountryFilter: Normalizer<Option, string> = (country) => ({
+  value: country.value,
+  label: i18next.t(country.value, { ns: "countries" }),
 })
 
 export function identity<T>(value: T) {
