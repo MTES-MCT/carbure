@@ -118,7 +118,7 @@ export const DeclarationDialog = ({
         {declaration && <LotSummary pending query={query} />}
       </main>
       <footer>
-        {declaration?.declaration.declared ? (
+        {declaration?.declaration?.declared ? (
           <Button
             disabled
             icon={Check}
