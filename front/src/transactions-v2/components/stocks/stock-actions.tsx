@@ -1,4 +1,4 @@
-import { StockQuery } from "../hooks/stock-query"
+import { StockQuery } from "../../types"
 import Button from "common-v2/components/button"
 import { ActionBar } from "common-v2/components/scaffold"
 import { Flask } from "common-v2/components/icons"

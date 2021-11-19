@@ -1,21 +1,21 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
-import * as api from "../api"
+import * as api from "../../api"
 import { Entity } from "carbure/types"
-import { Lot, Snapshot } from "../types"
+import { Lot, Snapshot, FilterSelection, Status, LotQuery } from "../../types"
+import { PaginationManager } from "common-v2/components/pagination"
 import { useQuery } from "common-v2/hooks/async"
-import useLotQuery from "../hooks/lot-query"
-import useStatus from "../hooks/status"
+import { useStatus } from "../status"
 import { Order } from "common-v2/components/table"
 import { Bar } from "common-v2/components/scaffold"
 import Pagination, { usePagination } from "common-v2/components/pagination"
-import Filters, { useFilters } from "../components/filters"
-import { LotTable } from "../components/lot-table"
-import NoResult from "../components/no-result"
-import { LotActions } from "../components/lot-actions"
-import { DeadlineSwitch, InvalidSwitch } from "../components/switches"
+import Filters, { useFilters } from "../filters"
+import { LotTable } from "./lot-table"
+import NoResult from "../no-result"
+import { LotActions } from "./lot-actions"
+import { DeadlineSwitch, InvalidSwitch } from "../switches"
 import { LotSummaryBar } from "./lot-summary"
-import SearchBar from "./search-bar"
+import SearchBar from "../search-bar"
 
 export interface LotsProps {
   entity: Entity
@@ -146,6 +146,65 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
         )}
       </section>
     </>
+  )
+}
+
+export interface LotQueryParams {
+  entity: Entity
+  status: Status
+  category: string
+  year: number
+  search: string | undefined
+  invalid: boolean
+  deadline: boolean
+  pagination: PaginationManager
+  order: Order | undefined
+  filters: FilterSelection
+}
+
+export function useLotQuery({
+  entity,
+  status,
+  category,
+  year,
+  search,
+  invalid,
+  deadline,
+  pagination,
+  order,
+  filters,
+}: LotQueryParams) {
+  const { page = 0, limit } = pagination
+
+  return useMemo<LotQuery>(
+    () => ({
+      entity_id: entity.id,
+      year,
+      status: status.toUpperCase(),
+      query: search ? search : undefined,
+      history: category === "history" ? true : undefined,
+      correction: category === "correction" ? true : undefined,
+      invalid: invalid ? true : undefined,
+      deadline: deadline ? true : undefined,
+      from_idx: page * (limit ?? 0),
+      limit: limit || undefined,
+      sort_by: order?.column,
+      order: order?.direction,
+      ...filters,
+    }),
+    [
+      entity.id,
+      year,
+      status,
+      category,
+      search,
+      invalid,
+      deadline,
+      page,
+      limit,
+      order,
+      filters,
+    ]
   )
 }
 

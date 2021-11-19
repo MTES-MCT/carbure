@@ -1,6 +1,6 @@
+import { useTranslation } from "react-i18next"
 import Alert from "common-v2/components/alert"
 import { AlertCircle } from "common-v2/components/icons"
-import { useTranslation } from "react-i18next"
 import { FilterManager, ResetButton } from "./filters"
 
 interface NoResultProps {
@@ -13,7 +13,7 @@ export const NoResult = ({ loading, filters }: NoResultProps) => {
 
   return (
     <Alert loading={loading} variant="warning" icon={AlertCircle}>
-      <p>{t("Aucune transaction trouvée pour cette recherche")}</p>
+      <p>{t("Aucun résultat trouvé pour cette recherche")}</p>
       {filters && <ResetButton filters={filters} />}
     </Alert>
   )

@@ -1,9 +1,9 @@
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
-import { Stock } from "../types"
+import { Stock } from "../../types"
 import { formatNumber, formatDate } from "common-v2/utils/formatters"
-import StockTag from "./stock-tag"
 import Table, { Cell, Order, selectionColumn } from "common-v2/components/table"
+import StockTag from "./stock-tag"
 
 export interface StockTableProps {
   loading: boolean

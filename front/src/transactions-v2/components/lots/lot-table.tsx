@@ -1,6 +1,6 @@
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
-import { Lot } from "../types"
+import { Lot } from "../../types"
 import {
   formatDate,
   formatNumber,

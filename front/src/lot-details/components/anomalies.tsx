@@ -7,26 +7,6 @@ export interface AnomaliesProps {
   anomalies: LotAnomaly[]
 }
 
-export const Anomalies = ({ anomalies }: AnomaliesProps) => {
-  const blocking = anomalies.filter((anomaly) => anomaly.is_blocking)
-  const nonBlocking = anomalies.filter((anomaly) => !anomaly.is_blocking)
-
-  return (
-    <>
-      {blocking.length > 0 && (
-        <section>
-          <BlockingAnomalies anomalies={blocking} />
-        </section>
-      )}
-      {nonBlocking.length > 0 && (
-        <section>
-          <WarningAnomalies anomalies={nonBlocking} />
-        </section>
-      )}
-    </>
-  )
-}
-
 export const BlockingAnomalies = ({ anomalies }: AnomaliesProps) => {
   const { t } = useTranslation()
   return (
@@ -89,4 +69,9 @@ export const Anomaly = ({ anomaly }: { anomaly: LotAnomaly }) => {
   )
 }
 
-export default Anomalies
+export function separateAnomalies(anomalies: LotAnomaly[]) {
+  return [
+    anomalies.filter((anomaly) => anomaly.is_blocking),
+    anomalies.filter((anomaly) => !anomaly.is_blocking),
+  ]
+}

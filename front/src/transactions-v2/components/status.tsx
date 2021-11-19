@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next"
+import { useMatch } from "react-router-dom"
+import { Snapshot, Status } from "../types"
 import Tabs from "common-v2/components/tabs"
-import { Snapshot } from "transactions-v2/types"
 import { Loader } from "common-v2/components/icons"
 
 const defaultCount: Snapshot["lots"] = {
@@ -109,6 +110,11 @@ const StatusRecap = ({
       <strong>{label}</strong>
     </>
   )
+}
+
+export function useStatus() {
+  const match = useMatch<"status">("/org/:entity/transactions-v2/:status/*")
+  return (match?.params.status ?? "unknown") as Status
 }
 
 export default StatusTabs

@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next"
 import { Tag, TagProps, TagVariant } from "common-v2/components/tag"
-import { CorrectionStatus, Lot, LotStatus } from "../types"
+import { CorrectionStatus, Lot, LotStatus } from "../../types"
 
 export interface LotTagProps extends TagProps {
   lot: Lot

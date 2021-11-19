@@ -2,16 +2,20 @@ import { useNavigate, useLocation, useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import * as api from "./api"
 import { useQuery } from "common-v2/hooks/async"
-import useStatus from "transactions-v2/hooks/status"
+import { useStatus } from "transactions-v2/components/status"
 import useEntity from "carbure/hooks/entity"
 import { LoaderOverlay } from "common-v2/components/scaffold"
 import Dialog from "common-v2/components/dialog"
 import Button from "common-v2/components/button"
 import { Return, Save } from "common-v2/components/icons"
 import LotForm from "lot-add/components/lot-form"
-import LotTag from "transactions-v2/components/lot-tag"
+import LotTag from "transactions-v2/components/lots/lot-tag"
 import Comments from "./components/comments"
-import Anomalies from "./components/anomalies"
+import {
+  BlockingAnomalies,
+  separateAnomalies,
+  WarningAnomalies,
+} from "./components/anomalies"
 
 export const LotDetails = () => {
   const { t } = useTranslation()
@@ -29,6 +33,8 @@ export const LotDetails = () => {
   })
 
   const lotData = lot.result?.data.data
+  const comments = lotData?.comments ?? []
+  const [errors, warnings] = separateAnomalies(lotData?.errors ?? [])
 
   const closeDialog = () =>
     navigate({
@@ -50,11 +56,21 @@ export const LotDetails = () => {
           <LotForm lot={lotData?.lot} onSubmit={(form) => console.log(form)} />
         </section>
 
-        {lotData?.errors && <Anomalies anomalies={lotData.errors} />}
-
-        {lotData?.comments && lotData.comments.length > 0 && (
+        {errors.length > 0 && (
           <section>
-            <Comments comments={lotData.comments} />
+            <BlockingAnomalies anomalies={errors} />
+          </section>
+        )}
+
+        {warnings.length > 0 && (
+          <section>
+            <WarningAnomalies anomalies={warnings} />
+          </section>
+        )}
+
+        {comments.length > 0 && (
+          <section>
+            <Comments comments={comments} />
           </section>
         )}
       </main>

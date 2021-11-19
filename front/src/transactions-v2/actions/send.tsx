@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { Lot } from "../types"
-import { LotQuery } from "../hooks/lot-query"
+import { Lot, LotQuery } from "../types"
 import * as api from "../api"
 import useEntity from "carbure/hooks/entity"
 import { useMutation } from "common-v2/hooks/async"
@@ -12,7 +11,7 @@ import Checkbox from "common-v2/components/checkbox"
 import Dialog from "common-v2/components/dialog"
 import { Check, Return } from "common-v2/components/icons"
 import { usePortal } from "common-v2/components/portal"
-import { LotSummary } from "../components/lot-summary"
+import { LotSummary } from "../components/lots/lot-summary"
 
 export interface SendButtonProps {
   disabled?: boolean

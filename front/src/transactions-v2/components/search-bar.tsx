@@ -1,11 +1,11 @@
+import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { Snapshot } from "../types"
-import useStatus from "../hooks/status"
+import { formatNumber } from "common-v2/utils/formatters"
+import { useStatus } from "./status"
 import { SearchInput } from "common-v2/components/input"
 import { ActionBar } from "common-v2/components/scaffold"
 import Tabs from "common-v2/components/tabs"
-import { useEffect } from "react"
-import { formatNumber } from "common-v2/utils/formatters"
 
 export interface SearchBarProps {
   category: string
