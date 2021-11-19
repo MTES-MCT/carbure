@@ -36,6 +36,11 @@ class CarbureLotEventSerializer(serializers.ModelSerializer):
         model = CarbureLotEvent
         fields = ['user', 'event_type', 'event_dt', 'metadata']
 
+class CarbureStockEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CarbureLotEvent
+        fields = ['user', 'event_type', 'event_dt', 'metadata']
+
 class CarbureLotCommentSerializer(serializers.ModelSerializer):
     entity=EntitySerializer(read_only=True)
     class Meta:
