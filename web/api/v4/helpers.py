@@ -12,7 +12,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 
 from core.ign_distance import get_distance
-from core.models import Biocarburant, CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, Depot, MatierePremiere, Pays, TransactionDistance, UserRights
+from core.models import Biocarburant, CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, CarbureStockTransformation, Depot, MatierePremiere, Pays, TransactionDistance, UserRights
 from core.models import GenericError
 from core.serializers import CarbureLotCommentSerializer, CarbureLotEventSerializer, CarbureLotPublicSerializer, CarbureStockPublicSerializer, GenericErrorSerializer
 from core.xlsx_v3 import export_carbure_lots, export_carbure_stock
@@ -660,3 +660,67 @@ def get_stocks_summary_data(stocks, entity_id, short=False):
     # data['total_volume'] = stocks.aggregate(Sum('parent_lot__volume'))['parent_lot__volume__sum'] or 0,
     data['stock'] = list(stock_summary)
     return data
+
+
+def handle_eth_to_etbe_transformation(user, stock, transformation):
+    required_fields = ['volume_ethanol', 'volume_etbe', 'volume_denaturant', 'volume_etbe_eligible']
+    for f in required_fields:
+        if f not in transformation:
+            return JsonResponse({'status': 'error', 'message': 'Could not find field %s' % (f)}, status=400)
+
+    volume_ethanol = transformation['volume_ethanol']
+    volume_etbe = transformation['volume_etbe']
+    volume_denaturant = transformation['volume_denaturant']
+    volume_etbe_eligible = transformation['volume_etbe_eligible']
+    etbe = Biocarburant.objects.get(code='ETBE')
+
+    # check if source stock is Ethanol
+    if stock.biofuel.code != 'ETH':
+        return JsonResponse({'status': 'error', 'message': 'Source stock is not Ethanol'}, status=400)
+
+    volume_ethanol = round(float(volume_ethanol), 2)
+    volume_etbe = round(float(volume_etbe), 2)
+    volume_etbe_eligible = round(float(volume_etbe_eligible), 2)
+    volume_denaturant = round(float(volume_denaturant), 2)
+
+
+    # check available volume
+    if stock.remaining_volume < volume_ethanol:
+        return JsonResponse({'status': 'error', 'message': 'Volume Ethanol is higher than available volume'}, status=400)
+
+
+    new_stock = stock.parent_lot
+    new_stock.pk = None
+    new_stock.biofuel = etbe
+    new_stock.volume = volume_etbe
+    new_stock.weight = new_stock.get_weight()
+    new_stock.lhv_amount = new_stock.get_lhv_amount()
+    new_stock.parent_lot = None
+    new_stock.save()
+
+    stock.remaining_volume = round(stock.remaining_volume - volume_ethanol)
+    stock.remaining_weight = stock.get_weight()
+    stock.remaining_lhv_amount = stock.get_lhv_amount()
+    stock.save()
+
+    cst = CarbureStockTransformation()
+    cst.transformation_type = CarbureStockTransformation.ETH_ETBE
+    cst.source_stock = stock
+    cst.dest_stock = new_stock
+    cst.volume_deducted_from_source = volume_ethanol
+    cst.volume_destination = volume_etbe
+    cst.transformed_by = user
+    cst.entity = stock.carbure_client
+    cst.metadata = {'volume_denaturant': volume_denaturant, 'volume_etbe_eligible': volume_etbe_eligible}
+    cst.save()
+
+    new_stock.parent_transformation = cst
+    new_stock.carbure_id = '%sT%d' % (stock.carbure_id, new_stock.id)
+    new_stock.save()
+
+    # create events
+    e = CarbureLotEvent()
+    e.event_type = CarbureLotEvent.TRANSFORMED
+    e.lot = stock.parent_lot
+    e.user = user
+    e.save()

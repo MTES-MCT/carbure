@@ -7,8 +7,8 @@ from django.db.models.aggregates import Count
 from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
 from core.decorators import check_user_rights
-from api.v4.helpers import filter_lots, filter_stock, get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock, get_stock_with_metadata, get_stock_filters_data, get_stocks_summary_data, get_transaction_distance, send_email_declaration_invalidated, send_email_declaration_validated
-from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, Entity, SustainabilityDeclaration
+from api.v4.helpers import filter_lots, filter_stock, get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock, get_stock_with_metadata, get_stock_filters_data, get_stocks_summary_data, get_transaction_distance, handle_eth_to_etbe_transformation, send_email_declaration_invalidated, send_email_declaration_validated
+from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockTransformation, Entity, SustainabilityDeclaration, UserRights
 from core.serializers import CarbureLotPublicSerializer, CarbureStockPublicSerializer
 
 
@@ -343,6 +343,46 @@ def stock_split(request, *args, **kwargs):
         e.pk = None
         e.event_type = CarbureLotEvent.ACCEPTED
         e.save()
+    return JsonResponse({'status': 'success'})
+
+
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
+def stock_transform(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    payload = request.POST.getlist('payload', False)
+    if not payload:
+        return JsonResponse({'status': 'error', 'message': 'Missing payload'}, status=400)
+
+    try:
+        unserialized = json.loads(payload)
+        # expected format: [{stock_id: 12344, transformation_type: 'ETBE', otherfields}]
+    except:
+        return JsonResponse({'status': 'error', 'message': 'Cannot parse payload into JSON'}, status=400)
+
+    if not isinstance(unserialized, list):
+        return JsonResponse({'status': 'error', 'message': 'Parsed JSON is not a list'}, status=400)
+
+    for entry in unserialized:
+        # check minimum fields
+        required_fields = ['stock_id', 'transformation_type']
+        for field in required_fields:
+            if field not in entry:
+                return JsonResponse({'status': 'error', 'message': 'Missing field %s in json object'}, status=400)
+
+        try:
+            stock = CarbureStock.objects.filter(pk=entry['stock_id'])
+        except:
+            return JsonResponse({'status': 'error', 'message': 'Could not find stock'}, status=400)
+
+        if stock.carbure_client_id != entity_id:
+            return JsonResponse({'status': 'forbidden', 'message': 'Stock does not belong to you'}, status=403)
+
+        ttype = entry['transformation_type']
+        if ttype == CarbureStockTransformation.ETH_ETBE:
+            error = handle_eth_to_etbe_transformation(request.user, stock, entry)
+            if error:
+                return error
     return JsonResponse({'status': 'success'})
 
 
