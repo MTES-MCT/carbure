@@ -129,7 +129,7 @@ def get_stock_details(request, *args, **kwargs):
     data['comments'] = get_lot_comments(stock.parent_lot, entity_id)
     return JsonResponse({'status': 'success', 'data': data})
 
-@check_user_rights()
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def stock_cancel_transformation(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
@@ -159,7 +159,7 @@ def stock_cancel_transformation(request, *args, **kwargs):
         stock.parent_transformation.delete()
     return JsonResponse({'status': 'success'})
 
-@check_user_rights()
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def stock_flush(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
@@ -243,7 +243,7 @@ def stock_flush(request, *args, **kwargs):
         e.save()
     return JsonResponse({'status': 'success'})
 
-@check_user_rights()
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def stock_split(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
@@ -468,9 +468,9 @@ def lots_send(request, *args, **kwargs):
             continue
 
         # sanity check !!!
-        # if not sanity_check(lot):
-        #   nb_rejected += 1
-        #   continue
+        if not sanity_check(lot):
+          nb_rejected += 1
+          continue
         nb_sent += 1
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.VALIDATED
@@ -579,7 +579,7 @@ def get_declarations(request, *args, **kwargs):
     return JsonResponse({'status': 'success', 'data': data})
 
 
-@check_user_rights()
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def add_comment(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
@@ -621,7 +621,7 @@ def add_comment(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_user_rights()
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def request_fix(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
@@ -647,7 +647,7 @@ def request_fix(request, *args, **kwargs):
         event.save()
     return JsonResponse({'status': 'success'})
 
-@check_user_rights()
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def mark_as_fixed(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
@@ -673,7 +673,7 @@ def mark_as_fixed(request, *args, **kwargs):
         event.save()
     return JsonResponse({'status': 'success'})
 
-@check_user_rights()
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def approve_fix(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
@@ -699,7 +699,7 @@ def approve_fix(request, *args, **kwargs):
         event.save()
     return JsonResponse({'status': 'success'})
 
-@check_user_rights()
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def reject_lot(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
@@ -748,7 +748,7 @@ def reject_lot(request, *args, **kwargs):
                 n.save()
     return JsonResponse({'status': 'success'})
 
-@check_user_rights()
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def recall_lot(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
@@ -799,7 +799,7 @@ def recall_lot(request, *args, **kwargs):
 
 
 
-@check_user_rights()
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def accept_rfc(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
@@ -842,7 +842,7 @@ def accept_rfc(request, *args, **kwargs):
         event.save()
     return JsonResponse({'status': 'success'})
 
-@check_user_rights()
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def accept_in_stock(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
@@ -911,7 +911,7 @@ def accept_in_stock(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_user_rights()
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def accept_blending(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
@@ -954,7 +954,7 @@ def accept_blending(request, *args, **kwargs):
         event.save()
     return JsonResponse({'status': 'success'})
 
-@check_user_rights()
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def accept_export(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
@@ -997,7 +997,7 @@ def accept_export(request, *args, **kwargs):
         event.save()
     return JsonResponse({'status': 'success'})
 
-@check_user_rights()
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def accept_processing(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
@@ -1067,7 +1067,7 @@ def accept_processing(request, *args, **kwargs):
         event.save()
     return JsonResponse({'status': 'success'})
 
-@check_user_rights()
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def accept_trading(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
@@ -1154,7 +1154,7 @@ def accept_trading(request, *args, **kwargs):
         event.save()
     return JsonResponse({'status': 'success'})
 
-@check_user_rights()
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def validate_declaration(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
@@ -1201,7 +1201,7 @@ def validate_declaration(request, *args, **kwargs):
 
 
 
-@check_user_rights()
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def invalidate_declaration(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
