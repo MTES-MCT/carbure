@@ -441,6 +441,90 @@ def get_lots_filters(request, *args, **kwargs):
         return JsonResponse({'status': 'success', 'data': data})
 
 
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
+def lots_send(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    lot_ids = request.POST.getlist('lot_ids', False)
+    if not lot_ids:
+        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
+    nb_lots = len(lot_ids)
+    nb_sent = 0
+    nb_rejected = 0   
+    nb_ignored = 0
+    nb_auto_accepted = 0
+    for lot_id in lot_ids:
+        try:
+            lot = CarbureLot.objects.get(pk=lot_id)
+        except:
+            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
+
+        if lot.carbure_supplier_id != entity_id:
+            return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to send this lot'}, status=403)
+
+        if lot.lot_status in [CarbureLot.ACCEPTED, CarbureLot.FROZEN]:
+            # ignore, lot already accepted
+            nb_ignored += 1
+            continue
+
+        # sanity check !!!
+        # if not sanity_check(lot):
+        #   nb_rejected += 1
+        #   continue
+        nb_sent += 1
+        event = CarbureLotEvent()
+        event.event_type = CarbureLotEvent.VALIDATED
+        event.lot = lot
+        event.user = request.user
+        event.save()
+        
+        lot.lot_status = CarbureLot.PENDING
+        # I AM THE CLIENT
+        if lot.carbure_client_id == entity_id:
+            nb_auto_accepted += 1
+            lot.lot_status = CarbureLot.ACCEPTED
+            event = CarbureLotEvent()
+            event.event_type = CarbureLotEvent.ACCEPTED
+            event.lot = lot
+            event.user = request.user
+            event.save()
+            if lot.delivery_type == CarbureLot.STOCK:
+                # create stock
+                stock = CarbureStock()
+                stock.parent_lot = lot
+                stock.carbure_id = lot.carbure_id
+                stock.depot = lot.carbure_delivery_site
+                stock.carbure_client = lot.carbure_client
+                stock.remaining_volume = lot.volume
+                stock.remaining_weight = lot.weight
+                stock.remaining_lhv_amount = lot.lhv_amount
+                stock.feedstock = lot.feedstock
+                stock.biofuel = lot.biofuel
+                stock.country_of_origin = lot.country_of_origin
+                stock.carbure_production_site = lot.carbure_production_site
+                stock.unknown_production_site = lot.unknown_production_site
+                stock.production_country = lot.production_country
+                stock.carbure_supplier = lot.carbure_supplier
+                stock.unknown_supplier = lot.unknown_supplier
+                stock.ghg_reduction = lot.ghg_reduction
+                stock.ghg_reduction_red_ii = lot.ghg_reduction_red_ii
+                stock.save()
+                e = CarbureStockEvent()
+                e.event_type = CarbureStockEvent.CREATED
+                e.stock = stock
+                e.user = request.user
+                e.save()
+        if lot.carbure_client_id is None:
+            # RFC or EXPORT
+            nb_auto_accepted += 1
+            lot.lot_status = CarbureLot.ACCEPTED
+            event = CarbureLotEvent()
+            event.event_type = CarbureLotEvent.ACCEPTED
+            event.lot = lot
+            event.user = request.user
+            event.save()            
+    return JsonResponse({'status': 'success', 'data': {'submitted': nb_lots, 'sent': nb_sent, 'auto-accepted': nb_auto_accepted, 'ignored': nb_ignored, 'rejected': nb_rejected}}, status=400)
+
 @check_user_rights()
 def get_stock_filters(request, *args, **kwargs):
     context = kwargs['context']
