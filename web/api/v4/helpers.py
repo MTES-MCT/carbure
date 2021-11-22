@@ -10,12 +10,14 @@ from django.db.models.query_utils import Q
 from django.http.response import HttpResponse, JsonResponse
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
+from certificates.models import DoubleCountingRegistration, EntityISCCTradingCertificate
 
 from core.ign_distance import get_distance
-from core.models import Biocarburant, CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, MatierePremiere, Pays, TransactionDistance, UserRights
+from core.models import Biocarburant, CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, Entity, EntityDepot, MatierePremiere, Pays, TransactionDistance, UserRights
 from core.models import GenericError
 from core.serializers import CarbureLotCommentSerializer, CarbureLotEventSerializer, CarbureLotPublicSerializer, CarbureStockEventSerializer, CarbureStockPublicSerializer, GenericErrorSerializer
 from core.xlsx_v3 import export_carbure_lots, export_carbure_stock
+from producers.models import ProductionSite
 
 
 sort_key_to_django_field = {'period': 'delivery_date',
@@ -727,3 +729,28 @@ def handle_eth_to_etbe_transformation(user, stock, transformation):
     e.stock = stock
     e.user = user
     e.save()
+
+def get_prefetched_data(entity=None):
+    lastyear = datetime.date.today() - datetime.timedelta(days=365)
+    d = {}
+    d['producers'] = {p.name: p for p in Entity.objects.filter(entity_type='Producteur')}
+    d['countries'] = {p.code_pays: p for p in Pays.objects.all()}
+    d['biocarburants'] = {b.code: b for b in Biocarburant.objects.all()}
+    d['matieres_premieres'] = {m.code: m for m in MatierePremiere.objects.all()}
+    if entity:
+        # get only my production sites
+        d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').filter(producer=entity)}
+        # get all my linked certificates
+        d['my_vendor_certificates'] = [c.certificate.certificate_id for c in EntityISCCTradingCertificate.objects.filter(entity=entity)]
+    else:
+        d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').all()}
+    d['depots'] = {d.depot_id.lstrip('0').upper(): d for d in Depot.objects.all()}
+    d['depotsbyname'] = {d.name.upper(): d for d in Depot.objects.all()}
+    entitydepots = dict()
+    for obj in EntityDepot.objects.all():
+        entitydepots.setdefault(obj.entity.id, []).append(obj.depot.id)
+    d['depotsbyentity'] = entitydepots
+    d['clients'] = {c.name.upper(): c for c in Entity.objects.filter(entity_type__in=['Producteur', 'Opérateur', 'Trader'])}
+    d['certificates'] = {c.certificate_id.upper(): c for c in GenericCertificate.objects.filter(valid_until__gte=lastyear)}
+    d['double_counting_certificates'] = {c.certificate_id: c for c in DoubleCountingRegistration.objects.all()}
+    return d

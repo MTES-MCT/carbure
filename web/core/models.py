@@ -1078,3 +1078,42 @@ class CarbureStockEvent(models.Model):
         ]
         verbose_name = 'CarbureStockEvent'
         verbose_name_plural = 'CarbureStockEvents'
+
+class GenericCertificate(models.Model):
+    SYSTEME_NATIONAL = "SYSTEME_NATIONAL"
+    ISCC = "ISCC"
+    REDCERT = "REDCERT"
+    DBS = "2BS"
+    CERTIFICATE_TYPES = ((SYSTEME_NATIONAL, SYSTEME_NATIONAL), (ISCC, ISCC), (REDCERT, REDCERT), (DBS, DBS))
+    
+    certificate_id = models.CharField(max_length=64, blank=False, null=False)
+    certificate_type = models.CharField(max_length=32, null=False, blank=False, choices=CERTIFICATE_TYPES)
+    certificate_holder = models.CharField(max_length=512, null=False, blank=False)
+    certificate_issuer = models.CharField(max_length=256, null=True, blank=True)
+    address = models.CharField(max_length=512, null=True, blank=True)
+    valid_from = models.DateField(null=False, blank=False)
+    valid_until = models.DateField(null=False, blank=False)
+    download_link = models.CharField(max_length=512, default=None, null=True)
+    scope = models.JSONField(null=True)
+    input = models.JSONField(null=True)
+    output = models.JSONField(null=True)
+
+    class Meta:
+        db_table = 'carbure_certificates'
+        indexes = [
+            models.Index(fields=['certificate_type']),
+        ]
+        verbose_name = 'CarbureCertificates'
+        verbose_name_plural = 'CarbureCertificates'    
+
+class EntityCertificate(models.Model):
+    certificate = models.ForeignKey(GenericCertificate, blank=False, null=False, on_delete=models.CASCADE)
+    entity = models.ForeignKey(Entity, blank=False, null=False, on_delete=models.CASCADE)
+    
+    class Meta:
+        db_table = 'carbure_entity_certificates'
+        indexes = [
+            models.Index(fields=['entity']),
+        ]
+        verbose_name = 'CarbureEntityCertificates'
+        verbose_name_plural = 'CarbureEntityCertificates'
