@@ -47,6 +47,7 @@ def get_entity_lots_by_status(entity_id, status):
         'carbure_delivery_site', 'carbure_delivery_site__country', 'delivery_site_country',
         'feedstock', 'biofuel', 'country_of_origin',
         'parent_lot', 'parent_stock', 'parent_stock__carbure_client', 'parent_stock__carbure_supplier',
+        'parent_stock__feedstock', 'parent_stock__biofuel', 'parent_stock__depot', 'parent_stock__country_of_origin', 'parent_stock__production_country'
     ).prefetch_related('genericerror_set', 'carbure_production_site__productionsitecertificate_set')
     if status == 'DRAFTS':
         lots = lots.filter(carbure_supplier_id=entity_id, lot_status=CarbureLot.DRAFT)
@@ -67,7 +68,7 @@ def get_lots_with_metadata(lots, entity_id, querySet, is_admin=False):
     from_idx = querySet.get('from_idx', "0")
 
     # filtering
-    lots, total_errors, total_deadline, deadline_str, tx_with_errors = filter_lots(lots, querySet, entity_id)
+    lots = filter_lots(lots, querySet, entity_id)
     # sorting
     lots = sort_lots(lots, querySet)
 
@@ -78,16 +79,18 @@ def get_lots_with_metadata(lots, entity_id, querySet, is_admin=False):
         limit = int(limit)
         returned = returned[:limit]
 
+    total_errors, total_deadline = count_lots_of_interest(lots, entity_id)
+
     # enrich dataset with additional metadata
     serializer = CarbureLotPublicSerializer(returned, many=True)
     data = {}
     data['lots'] = serializer.data
+    data['from'] = from_idx
+    data['returned'] = returned.count()
     data['total'] = lots.count()
     data['total_errors'] = total_errors
-    data['returned'] = returned.count()
-    data['from'] = from_idx
-    data['errors'] = {lot.id: lot.errors for lot in tx_with_errors}
-    data['deadlines'] = {'date': deadline_str, 'total': total_deadline}
+    data['total_deadline'] = total_deadline
+    data['errors'] = get_lots_errors(returned, entity_id)
 
     if not export:
         return JsonResponse({'status': 'success', 'data': data})
@@ -133,29 +136,34 @@ def get_history(tx):
 
 def get_stock_with_errors(stock, entity_id=None):
     if entity_id is None:
-        filter = Q(tx=OuterRef('pk'))
+        filter = Q(lot=OuterRef('pk'))
     else:
-        filter = Q(tx=OuterRef('pk')) & (Q(parent_lot__added_by_id=entity_id, display_to_creator=True) | Q(parent_lot__carbure_client_id=entity_id, display_to_recipient=True))
+        filter = Q(lot=OuterRef('pk')) & (Q(parent_lot__added_by_id=entity_id, display_to_creator=True) | Q(parent_lot__carbure_client_id=entity_id, display_to_recipient=True))
     tx_errors = GenericError.objects.filter(filter).values('lot').annotate(errors=Count('id')).values('errors')
     return stock.annotate(errors=Subquery(tx_errors)).filter(errors__gt=0)
 
 
-def get_lots_with_errors(lots, entity_id=None):
-    if entity_id is None:
-        filter = Q(tx=OuterRef('pk'))
+def get_lots_with_errors(lots, entity_id, will_aggregate=False):
+    if will_aggregate:
+        # use a subquery so we can later do aggregations on this queryset without wrecking the results
+        if entity_id is not None:
+            filter = Q(lot__added_by_id=entity_id, display_to_creator=True) | Q(lot__carbure_client_id=entity_id, display_to_recipient=True)
+        tx_errors = GenericError.objects.filter(lot=OuterRef('pk')).filter(filter).values('lot').annotate(errors=Count('id')).values('errors')
+        return lots.annotate(errors=Subquery(tx_errors)).filter(errors__gt=0)
     else:
-        filter = Q(tx=OuterRef('pk')) & (Q(lot__added_by_id=entity_id, display_to_creator=True) | Q(lot__carbure_client_id=entity_id, display_to_recipient=True))
-    tx_errors = GenericError.objects.filter(filter).values('lot').annotate(errors=Count('id')).values('errors')
-    return lots.annotate(errors=Subquery(tx_errors)).filter(errors__gt=0)
+        if entity_id is not None:
+            filter = Q(added_by_id=entity_id, genericerror__display_to_creator=True) | Q(carbure_client_id=entity_id, genericerror__display_to_recipient=True)
+        return lots.annotate(errors=Count('genericerror', filter=filter)).filter(errors__gt=0)
 
 
-def get_lots_with_deadline(lots, deadline):
+def get_lots_with_deadline(lots, deadline=get_current_deadline()):
     affected_date = deadline - relativedelta(months=1)
-    lots_with_deadline = lots.filter(lot_status=CarbureLot.DRAFT, delivery_date__year=affected_date.year, delivery_date__month=affected_date.month)
+    period = affected_date.year * 100 + affected_date.month
+    lots_with_deadline = lots.filter(lot_status=CarbureLot.DRAFT, period=period)
     return lots_with_deadline
 
 
-def filter_lots(lots, querySet, entity_id=None, blacklist=[]):
+def filter_lots(lots, querySet, entity_id=None, will_aggregate=False, blacklist=[]):
     year = querySet.get('year', False)
     periods = querySet.getlist('periods')
     production_sites = querySet.getlist('production_sites')
@@ -238,20 +246,18 @@ def filter_lots(lots, querySet, entity_id=None, blacklist=[]):
     invalid = querySet.get('invalid', False)
     deadline = querySet.get('deadline', False)
 
-    deadline_date = get_current_deadline()
-    deadline_str = deadline_date.strftime("%Y-%m-%d")
-
-    tx_with_errors = get_lots_with_errors(lots, entity_id)
-    tx_with_deadline = get_lots_with_deadline(lots, deadline_date)
-
-    total_errors = tx_with_errors.count()
-    total_deadline = tx_with_deadline.count()
-
     if invalid == 'true':
-        lots = tx_with_errors
-    elif deadline == 'true' and 'deadline' not in blacklist:
-        lots = tx_with_deadline
-    return lots, total_errors, total_deadline, deadline_str, tx_with_errors
+        lots = get_lots_with_errors(lots, entity_id, will_aggregate)
+    if deadline == 'true':
+        lots = get_lots_with_deadline(lots)
+
+    return lots
+
+
+def count_lots_of_interest(lots, entity_id):
+    error_lots = get_lots_with_errors(lots, entity_id)
+    deadline_lots = get_lots_with_deadline(lots)
+    return error_lots.count(), deadline_lots.count()
 
 
 def sort_lots(lots, querySet):
@@ -296,7 +302,7 @@ def normalize_filter(list, value=None, label=None):
 
 
 def get_lots_filters_data(lots, querySet, entity_id, field):
-    lots = filter_lots(lots, querySet, entity_id=entity_id, blacklist=[field])[0]
+    lots = filter_lots(lots, querySet, entity_id=entity_id, blacklist=[field])
 
     if field == 'feedstocks':
         feedstocks = MatierePremiere.objects.filter(id__in=lots.values('feedstock__id').distinct()).values('code', 'name')
@@ -505,15 +511,27 @@ def sort_stock(stock, querySet):
             stock = stock.order_by('vendor')
     return stock
 
-def get_lot_errors(lot, entity_id, is_admin=False):
-    if is_admin:
-        return GenericErrorSerializer(lot.genericerror_set.all(), many=True).data
-    elif entity_id == lot.carbure_supplier:
-        return GenericErrorSerializer(lot.genericerror_set.filter(display_to_creator=True), many=True).data
-    elif entity_id == lot.carbure_client:
-        return  GenericErrorSerializer(lot.genericerror_set.filter(display_to_recipient=True), many=True).data
+def get_lot_errors(lot, entity_id):
+    errors = []
+    if entity_id == str(lot.carbure_supplier_id):
+        errors = lot.genericerror_set.filter(display_to_creator=True)
+    elif entity_id == str(lot.carbure_client_id):
+        errors = lot.genericerror_set.filter(display_to_recipient=True)
     else:
-        return GenericErrorSerializer(lot.genericerror_set.filter(display_to_creator=True), many=True).data
+        errors = lot.genericerror_set.all()
+    return GenericErrorSerializer(errors, many=True, read_only=True).data
+
+def get_lots_errors(lots, entity_id):
+    lot_ids = list(lots.values_list('id', flat=True))
+    errors = GenericError.objects.filter(lot_id__in=lot_ids)
+    if entity_id is not None:
+        errors = errors.filter(Q(lot__added_by_id=entity_id, display_to_creator=True) | Q(lot__carbure_client_id=entity_id, display_to_recipient=True))
+    data = {}
+    for error in errors.values('lot_id', 'error', 'is_blocking', 'field', 'value', 'extra', 'fields').iterator():
+        if error['lot_id'] not in data:
+            data[error['lot_id']] = []
+        data[error['lot_id']].append(GenericErrorSerializer(error).data)
+    return data
 
 def get_lot_updates(lot, entity_id):
     return CarbureLotEventSerializer(lot.carburelotevent_set.all(), many=True).data

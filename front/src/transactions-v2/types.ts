@@ -62,16 +62,16 @@ export interface Lot {
   free_field: string
   parent_lot: number
   parent_stock: number
-  errors: LotError[]
 }
 
 export interface LotList {
   lots: Lot[]
-  total: number
-  returned: number
   from: number
+  returned: number
+  total: number
   total_errors: number
-  deadlines: { date: string; total: number }
+  total_deadline: number
+  errors: Record<number, LotError[]>
 }
 
 export interface Stock {

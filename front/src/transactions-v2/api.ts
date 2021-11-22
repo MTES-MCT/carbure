@@ -1,4 +1,3 @@
-import i18next from "i18next"
 import { api, Api } from "common-v2/services/api"
 import { Option } from "common-v2/utils/normalize"
 import {
