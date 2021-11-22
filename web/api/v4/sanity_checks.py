@@ -72,7 +72,7 @@ def bulk_sanity_checks(lots, prefetched_data, background=True):
         try:
             is_sane, sanity_errors = sanity_check(lot, prefetched_data)
             errors += sanity_errors
-            results.append(is_sane))
+            results.append(is_sane)
         except:
             traceback.print_exc()
     GenericError.objects.bulk_create(errors, batch_size=1000)
@@ -172,7 +172,7 @@ def sanity_check(lot, prefetched_data):
         errors.append(generic_error(error='GHG_EP_0', lot=lot, is_blocking=True, field='ep'))
     if lot.el < 0:
         errors.append(generic_error(error='GHG_EL_NEG', lot=lot, field='el'))
-        
+
     commissioning_date = lot.production_site_commissioning_date
     if commissioning_date and isinstance(commissioning_date, datetime.datetime) or isinstance(commissioning_date, datetime.date):
         if commissioning_date > oct2015 and lot.ghg_reduction < 60:
