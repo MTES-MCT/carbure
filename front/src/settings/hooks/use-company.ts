@@ -1,4 +1,4 @@
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { EntityManager } from "carbure/hooks/entity"
 import { SettingsGetter } from "./use-get-settings"
 
 import * as api from "../api"
@@ -6,6 +6,7 @@ import useAPI from "common/hooks/use-api"
 import { Option, SelectValue } from "common/components/select"
 import { useEffect } from "react"
 import { ProductionCertificate } from "common/types"
+import { reloadUserSettings } from "carbure/hooks/user"
 
 export function toggleMAC(toggle: boolean, entityID: number) {
   return toggle ? api.enableMAC(entityID) : api.disableMAC(entityID)
@@ -28,11 +29,11 @@ export interface CompanySettingsHook {
 }
 
 export default function useCompany(
-  entity: EntitySelection,
+  entity: EntityManager,
   settings: SettingsGetter
 ): CompanySettingsHook {
-  const hasMAC: boolean = entity?.has_mac ?? false
-  const hasTrading: boolean = entity?.has_trading ?? false
+  const hasMAC: boolean = entity.has_mac ?? false
+  const hasTrading: boolean = entity.has_trading ?? false
 
   const [requestMAC, resolveToggleMAC] = useAPI(toggleMAC)
   const [requestTrading, resolveToggleTrading] = useAPI(toggleTrading)
@@ -40,7 +41,7 @@ export default function useCompany(
   const [requestDefaultCert, setDefaultCertificate] = useAPI(api.setDefaultCertificate) // prettier-ignore
   const [certificates, findCertificates] = useAPI(api.findCertificates)
 
-  const entityID = entity?.id ?? -1
+  const entityID = entity.id ?? -1
 
   useEffect(() => {
     if (entityID >= 0) {
@@ -57,7 +58,7 @@ export default function useCompany(
 
   const defaultCertificate =
     certificates.data?.find(
-      (c) => c.certificate_id === entity?.default_certificate
+      (c) => c.certificate_id === entity.default_certificate
     ) ?? null
 
   const certificateOptions = certificates.data?.map((c) => ({
@@ -73,13 +74,15 @@ export default function useCompany(
 
   function onChangeMAC(checked: boolean): void {
     if (entity !== null) {
-      resolveToggleMAC(checked, entityID).then(settings.resolve)
+      resolveToggleMAC(checked, entityID)
+      reloadUserSettings()
     }
   }
 
   function onChangeTrading(checked: boolean): void {
     if (entity !== null) {
-      resolveToggleTrading(checked, entityID).then(settings.resolve)
+      resolveToggleTrading(checked, entityID)
+      reloadUserSettings()
     }
   }
 
@@ -95,7 +98,7 @@ export default function useCompany(
         certificate.type.toUpperCase()
       )
 
-      settings.resolve()
+      reloadUserSettings()
     }
   }
 

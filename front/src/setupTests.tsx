@@ -6,7 +6,7 @@ import { configure } from "@testing-library/dom"
 import { initReactI18next } from "react-i18next"
 import { LoaderOverlay } from "common/components"
 import { AppHook, useApp } from "carbure/hooks/use-app"
-import { MemoryRouter, Route, Routes } from "react-router"
+import { MemoryRouter, Routes } from "react-router"
 import { UserRightProvider } from "carbure/hooks/use-rights"
 
 import translation from "../public/locales/fr/translation.json"
@@ -15,6 +15,7 @@ import fields from "../public/locales/fr/fields.json"
 import feedstocks from "../public/locales/fr/feedstocks.json"
 import biofuels from "../public/locales/fr/biofuels.json"
 import countries from "../public/locales/fr/countries.json"
+import useUser, { UserContext, UserManager } from "carbure/hooks/user"
 
 configure({
   getElementError(message) {
@@ -72,21 +73,25 @@ i18n.use(initReactI18next).init({
 
 type TestRootProps = {
   url: string
-  children: React.ReactNode | ((app: AppHook) => React.ReactNode)
+  children:
+    | React.ReactNode
+    | ((app: AppHook, user?: UserManager) => React.ReactNode)
 }
 
 export const TestRoot = ({ url, children }: TestRootProps) => {
   const app = useApp()
-  const element = typeof children === "function" ? children(app) : children
+  const user = useUser()
+  const element =
+    typeof children === "function" ? children(app, user) : children
 
   return (
     <MemoryRouter initialEntries={[url]}>
       <Suspense fallback={<LoaderOverlay />}>
-        <UserRightProvider app={app}>
-          <Routes>
-            {element}
-          </Routes>
-        </UserRightProvider>
+        <UserContext.Provider value={user}>
+          <UserRightProvider app={app}>
+            <Routes>{element}</Routes>
+          </UserRightProvider>
+        </UserContext.Provider>
       </Suspense>
     </MemoryRouter>
   )
