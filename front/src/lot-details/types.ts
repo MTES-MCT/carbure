@@ -6,7 +6,6 @@ export interface LotDetails {
   children: Lot[]
   distance: Distance
   deadline: string
-  errors: LotAnomaly[]
   updates: LotUpdate<any>[]
   comments: LotComment[]
 }
@@ -16,15 +15,6 @@ export interface Distance {
   link?: string
   error?: string
   source?: string
-}
-
-export interface LotAnomaly {
-  error: string
-  is_blocking: boolean
-  field: string
-  fields: string[]
-  value: string
-  extra: string
 }
 
 export interface LotUpdate<T = any> {

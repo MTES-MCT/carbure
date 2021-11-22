@@ -62,6 +62,7 @@ export interface Lot {
   free_field: string
   parent_lot: number
   parent_stock: number
+  errors: LotError[]
 }
 
 export interface LotList {
@@ -69,7 +70,7 @@ export interface LotList {
   total: number
   returned: number
   from: number
-  errors: Record<string, number>
+  total_errors: number
   deadlines: { date: string; total: number }
 }
 
@@ -146,6 +147,15 @@ export interface SummaryItem {
   total: number
   pending: number
   remaining_volume_sum: number
+}
+
+export interface LotError {
+  error: string
+  is_blocking: boolean
+  field: string
+  fields: string[]
+  value: string
+  extra: string
 }
 
 export enum LotStatus {

@@ -136,7 +136,13 @@ export const LotTable = memo(
 )
 
 const getLotMarker: Marker<Lot> = (lot) => {
-  return undefined
+  if (lot.errors.some((err) => err.is_blocking)) {
+    return "danger"
+  } else if (lot.errors.some((err) => !err.is_blocking)) {
+    return "warning"
+  } else {
+    return undefined
+  }
 }
 
 export default LotTable
