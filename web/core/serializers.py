@@ -181,6 +181,7 @@ class CarbureLotPublicSerializer(serializers.ModelSerializer):
     country_of_origin = CountrySerializer(read_only=True)
     parent_stock = CarbureStockPublicSerializer(read_only=True)
     added_by = EntitySerializer(read_only=True)
+    errors = GenericErrorSerializer(read_only=True, many=True, source='genericerror_set')
 
     class Meta:
         model = CarbureLot
@@ -194,7 +195,7 @@ class CarbureLotPublicSerializer(serializers.ModelSerializer):
                   'lot_status', 'correction_status', 'parent_stock',
                   'volume', 'weight', 'lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
                   'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ghg_reference_red_ii', 'ghg_reduction_red_ii',
-                  'free_field', 'added_by',
+                  'free_field', 'added_by', 'errors'
                   ]
 
 CarbureStockPublicSerializer.parent_lot = CarbureLotPublicSerializer(read_only=True)
