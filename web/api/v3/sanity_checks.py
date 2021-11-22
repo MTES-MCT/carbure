@@ -314,12 +314,12 @@ def sanity_check(tx, prefetched_data):
             if lot.biocarburant not in bcs:
                 errors.append(generic_error(error='BC_NOT_CONFIGURED', tx=tx, display_to_recipient=False, field='biocarburant_code'))
     if tx.carbure_client:
-        if tx.carbure_client not in prefetched_data['depotsbyentity']:
+        if tx.carbure_client.id not in prefetched_data['depotsbyentity']:
             # not a single delivery sites linked to entity
             errors.append(generic_error(error='DEPOT_NOT_CONFIGURED', tx=tx, display_to_recipient=True, display_to_creator=False, field='delivery_site'))
         else:
             # some delivery sites linked to entity
-            if tx.carbure_delivery_site not in prefetched_data['depotsbyentity'][tx.carbure_client]:
+            if tx.carbure_delivery_site.id not in prefetched_data['depotsbyentity'][tx.carbure_client.id]:
                 # this specific delivery site is not linked
                 errors.append(generic_error(error='DEPOT_NOT_CONFIGURED', tx=tx, display_to_recipient=True, display_to_creator=False, field='delivery_site'))
 
