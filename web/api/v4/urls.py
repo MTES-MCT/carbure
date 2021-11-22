@@ -11,7 +11,7 @@ urlpatterns = [
     path('lots/filters', views.get_lots_filters, name='api-v4-get-lots-filters'),
     # POST
     ### Lot initial life
-    path('lots/add', views.get_snapshot, name='api-v4-add-lots'),
+    path('lots/add', views.add_lot, name='api-v4-add-lots'),
     path('lots/add-excel', views.get_snapshot, name='api-v4-add-excel'),
     path('lots/update', views.get_snapshot, name='api-v4-update-lots'),
     path('lots/send', views.lots_send, name='api-v4-send-lots'),

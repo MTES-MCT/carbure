@@ -7,9 +7,10 @@ from django.db.models.aggregates import Count
 from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
 from core.decorators import check_user_rights
-from api.v4.helpers import filter_lots, filter_stock, get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock, 
+from api.v4.helpers import filter_lots, filter_stock, get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock
 from api.v4.helpers import get_prefetched_data, get_stock_events, get_stock_with_metadata, get_stock_filters_data, get_stocks_summary_data, get_transaction_distance, handle_eth_to_etbe_transformation
 from api.v4.helpers import send_email_declaration_invalidated, send_email_declaration_validated
+from api.v4.lots import construct_carbure_lot, bulk_insert_lots
 from api.v4.sanity_checks import sanity_check
 
 from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Entity, SustainabilityDeclaration, UserRights
@@ -444,6 +445,34 @@ def get_lots_filters(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Could not find specified filter"}, status=400)
     else:
         return JsonResponse({'status': 'success', 'data': data})
+
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
+def add_lot(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    # prefetch some data
+    entity = Entity.objects.get(pk=entity_id)
+    d = get_prefetched_data(entity)
+    lot_obj, errors = construct_carbure_lot(d, entity_id, request.POST.dict())
+    if not lot_obj:
+        return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=400)
+
+    # run sanity checks, insert lot and errors
+    lots_created = bulk_insert_lots(entity, [lot_obj], [errors], d)
+    if len(lots_created) == 0:
+        print(request.POST)
+        return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=500)
+
+    e = CarbureLotEvent()
+    e.event_type = CarbureLotEvent.CREATED
+    e.lot = lots_created[0]
+    e.user = request.user
+    e.metadata = {'source': 'MANUAL'}
+    e.save()
+
+    data = CarbureLotPublicSerializer(e.lot).data
+    return JsonResponse({'status': 'success', 'data': data})
+
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])

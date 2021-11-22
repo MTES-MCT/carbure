@@ -72,7 +72,7 @@ def bulk_sanity_checks(lots, prefetched_data, background=True):
         try:
             is_sane, sanity_errors = sanity_check(lot, prefetched_data)
             errors += sanity_errors
-            results.append(is_sane))
+            results.append(is_sane)
         except:
             traceback.print_exc()
     GenericError.objects.bulk_create(errors, batch_size=1000)
