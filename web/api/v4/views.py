@@ -91,7 +91,7 @@ def get_lots_summary(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
     try:
         lots = get_entity_lots_by_status(entity_id, status)
-        lots = filter_lots(lots, request.GET, entity_id)[0]
+        lots = filter_lots(lots, request.GET, entity_id, will_aggregate=True)
         summary = get_lots_summary_data(lots, entity_id, short == 'true')
         return JsonResponse({'status': 'success', 'data': summary})
     except Exception:
@@ -332,7 +332,7 @@ def stock_split(request, *args, **kwargs):
             required_fields = ['transport_document_type', 'transport_document_reference', 'carbure_delivery_site_id', 'carbure_client_id']
             for field in required_fields:
                 if field not in entry:
-                    return JsonResponse({'status': 'error', 'message': 'Missing field %s in json object'}, status=400)            
+                    return JsonResponse({'status': 'error', 'message': 'Missing field %s in json object'}, status=400)
             lot.transport_document_type = entry['transport_document_type']
             lot.transport_document_reference = entry['transport_document_reference']
             lot.carbure_delivery_site_id = entry['carbure_delivery_site_id']
@@ -413,17 +413,12 @@ def get_lot_details(request, *args, **kwargs):
     if str(lot.carbure_client_id) != entity_id and str(lot.carbure_supplier_id) != entity_id:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    now = datetime.datetime.now()
-    (_, last_day) = calendar.monthrange(now.year, now.month)
-    deadline_date = now.replace(day=last_day)
-
     data = {}
     data['lot'] = CarbureLotPublicSerializer(lot).data
     data['children'] = CarbureLotPublicSerializer(CarbureLot.objects.filter(parent_lot=lot), many=True).data
     data['stock'] = CarbureStockPublicSerializer(CarbureLot.objects.filter(parent_lot=lot), many=True).data
     data['distance'] = get_transaction_distance(lot)
     data['errors'] = get_lot_errors(lot, entity_id)
-    data['deadline'] = deadline_date.strftime("%Y-%m-%d")
     #data['certificates'] = check_certificates(tx)
     data['updates'] = get_lot_updates(lot, entity_id)
     data['comments'] = get_lot_comments(lot, entity_id)
@@ -455,7 +450,7 @@ def lots_send(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
     nb_lots = len(lot_ids)
     nb_sent = 0
-    nb_rejected = 0   
+    nb_rejected = 0
     nb_ignored = 0
     nb_auto_accepted = 0
     prefetched_data = get_prefetched_data()
@@ -483,7 +478,7 @@ def lots_send(request, *args, **kwargs):
         event.lot = lot
         event.user = request.user
         event.save()
-        
+
         lot.lot_status = CarbureLot.PENDING
         # I AM THE CLIENT
         if lot.carbure_client_id == entity_id:
@@ -528,7 +523,7 @@ def lots_send(request, *args, **kwargs):
             event.event_type = CarbureLotEvent.ACCEPTED
             event.lot = lot
             event.user = request.user
-            event.save()            
+            event.save()
     return JsonResponse({'status': 'success', 'data': {'submitted': nb_lots, 'sent': nb_sent, 'auto-accepted': nb_auto_accepted, 'ignored': nb_ignored, 'rejected': nb_rejected}}, status=400)
 
 @check_user_rights()
