@@ -18,7 +18,11 @@ export const api = axios.create({
 export function filterParams(params: any) {
   const okParams: any = {}
   for (const key in params) {
-    if (params[key] !== null && params[key] !== undefined) {
+    const isNull = params[key] === null
+    const isUndefined = params[key] === undefined
+    const isEmpty = Array.isArray(params[key]) && params[key].length === 0
+
+    if (!isNull && !isUndefined && !isEmpty) {
       okParams[key] = params[key]
     }
   }

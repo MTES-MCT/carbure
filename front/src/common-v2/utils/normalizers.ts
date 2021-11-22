@@ -8,7 +8,6 @@ import {
   Feedstock,
   ProductionSite,
 } from "common/types"
-import { Filter } from "transactions-v2/types"
 
 export const normalizeBiofuel: Normalizer<Biofuel> = (biofuel) => ({
   value: biofuel,

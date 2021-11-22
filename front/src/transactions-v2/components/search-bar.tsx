@@ -17,12 +17,6 @@ export interface SearchBarProps {
 
 export const SearchBar = ({ search, onSearch, ...props }: SearchBarProps) => {
   const status = useStatus()
-  const { onSwitch } = props
-
-  useEffect(() => {
-    onSwitch("pending")
-  }, [status, onSwitch])
-
   return (
     <ActionBar>
       {status === "drafts" && <DraftsSwitcher {...props} />}

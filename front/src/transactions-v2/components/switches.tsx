@@ -1,4 +1,6 @@
 import { Trans } from "react-i18next"
+import endOfMonth from "date-fns/endOfMonth"
+import { formatDeadline } from "common-v2/utils/formatters"
 import { AlertCircle, Alarm } from "common-v2/components/icons"
 import Switch, { SwitchProps } from "common-v2/components/switch"
 
@@ -29,29 +31,37 @@ export const InvalidSwitch = ({
 
 export interface DeadlineSwitchProps {
   count: number
-  date: string
   active: boolean
   onSwitch: (active: boolean) => void
 }
 
 export const DeadlineSwitch = ({
   count,
-  date,
   active,
   onSwitch,
-}: DeadlineSwitchProps) => (
-  <Switch
-    dismissable
-    variant="warning"
-    icon={Alarm}
-    active={active}
-    onSwitch={onSwitch}
-  >
-    <p>
-      {!active && <Trans>Parmi ces résultats, </Trans>}
-      <Trans count={count}>
-        <b>{{ count }} lots</b> doivent être déclarés avant le <b>{{ date }}</b>
-      </Trans>
-    </p>
-  </Switch>
-)
+}: DeadlineSwitchProps) => {
+  const deadline = getCurrentDeadline()
+  const date = formatDeadline(deadline)
+
+  return (
+    <Switch
+      dismissable
+      variant="warning"
+      icon={Alarm}
+      active={active}
+      onSwitch={onSwitch}
+    >
+      <p>
+        {!active && <Trans>Parmi ces résultats, </Trans>}
+        <Trans count={count}>
+          <b>{{ count }} lots</b> doivent être déclarés avant le{" "}
+          <b>{{ date }}</b>
+        </Trans>
+      </p>
+    </Switch>
+  )
+}
+
+export function getCurrentDeadline() {
+  return endOfMonth(new Date())
+}
