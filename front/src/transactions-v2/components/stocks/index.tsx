@@ -20,6 +20,8 @@ export interface StocksProps {
   snapshot: Snapshot | undefined
 }
 
+const EMPTY: number[] = []
+
 export const Stocks = ({ entity, snapshot }: StocksProps) => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -29,19 +31,19 @@ export const Stocks = ({ entity, snapshot }: StocksProps) => {
 
   const [category, setCategory] = useState("pending")
   const [search, setSearch] = useState<string | undefined>()
-  const [selection, setSelection] = useState<number[]>([])
+  const [selection, setSelection] = useState<number[]>(EMPTY)
   const [order, setOrder] = useState<Order | undefined>()
 
   // go back to the first page and empty selection when the query changes
-  const { resetPage } = pagination
+  const { limit, setPage } = pagination
   useEffect(() => {
-    resetPage()
-    setSelection([])
-  }, [filters.selected, category, search, resetPage])
+    setPage(0)
+    setSelection(EMPTY)
+  }, [filters.selected, category, search, limit, setPage])
 
   const query = useStockQuery({
     entity,
-    category: category,
+    category,
     search,
     pagination,
     order,

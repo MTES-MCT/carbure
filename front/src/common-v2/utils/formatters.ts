@@ -19,7 +19,7 @@ export function formatGHG(num: number) {
 }
 
 export function formatDate(
-  date: string | null,
+  date: Date | string | null,
   options: Parameters<typeof format>[1] = {}
 ) {
   if (date === null) {
@@ -44,11 +44,15 @@ export function formatDate(
   }
 }
 
-export function formatDateTime(date: string | null) {
+export function formatDateTime(date: Date | string | null) {
   return formatDate(date, {
     hour: "2-digit",
     minute: "2-digit",
   })
+}
+
+export function formatDeadline(deadline: Date | string | null) {
+  return formatDate(deadline, { month: "long", year: undefined })
 }
 
 // prepare string for comparison by putting it to lowercase and removing accents

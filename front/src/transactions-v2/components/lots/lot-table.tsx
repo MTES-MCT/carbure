@@ -1,17 +1,16 @@
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
-import { Lot } from "../../types"
+import { Lot, LotError } from "../../types"
 import {
   formatDate,
   formatNumber,
   formatPeriod,
 } from "common-v2/utils/formatters"
 import Table, {
-  actionColumn,
   Cell,
-  Marker,
-  markerColumn,
   Order,
+  actionColumn,
+  markerColumn,
   selectionColumn,
 } from "common-v2/components/table"
 import { SendOneButton } from "transactions-v2/actions/send"
@@ -20,6 +19,7 @@ import LotTag from "./lot-tag"
 export interface LotTableProps {
   loading: boolean
   lots: Lot[]
+  errors: Record<number, LotError[]>
   order: Order | undefined
   selected: number[]
   onSelect: (selected: number[]) => void
@@ -31,6 +31,7 @@ export const LotTable = memo(
   ({
     loading,
     lots,
+    errors,
     order,
     selected,
     onSelect,
@@ -46,7 +47,7 @@ export const LotTable = memo(
         onOrder={onOrder}
         rows={lots}
         columns={[
-          markerColumn(getLotMarker),
+          markerColumn<Lot>((lot) => getLotMarker(lot, errors)),
           selectionColumn(lots, selected, onSelect, (lot) => lot.id),
           {
             header: t("Statut"),
@@ -135,13 +136,13 @@ export const LotTable = memo(
   }
 )
 
-const getLotMarker: Marker<Lot> = (lot) => {
-  if (lot.errors.some((err) => err.is_blocking)) {
-    return "danger"
-  } else if (lot.errors.some((err) => !err.is_blocking)) {
-    return "warning"
-  } else {
+const getLotMarker = (lot: Lot, errors: Record<number, LotError[]>) => {
+  if (!errors[lot.id]) {
     return undefined
+  } else if (errors[lot.id].some((err) => err.is_blocking)) {
+    return "danger"
+  } else if (errors[lot.id].some((err) => !err.is_blocking)) {
+    return "warning"
   }
 }
 
