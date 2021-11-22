@@ -23,6 +23,8 @@ export interface LotsProps {
   snapshot: Snapshot | undefined
 }
 
+const EMPTY: number[] = []
+
 export const Lots = ({ entity, year, snapshot }: LotsProps) => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -35,15 +37,35 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
   const [invalid, showInvalid] = useState(false)
   const [deadline, showDeadline] = useState(false)
   const [search, setSearch] = useState<string | undefined>()
-  const [selection, setSelection] = useState<number[]>([])
+  const [selection, setSelection] = useState<number[]>(EMPTY)
   const [order, setOrder] = useState<Order | undefined>()
 
   // go back to the first page and empty selection when the query changes
-  const { resetPage } = pagination
+  const { limit, setPage } = pagination
   useEffect(() => {
-    resetPage()
-    setSelection([])
-  }, [status, filters.selected, category, invalid, deadline, search, resetPage])
+    setPage(0)
+    setSelection(EMPTY)
+  }, [
+    status,
+    filters.selected,
+    category,
+    invalid,
+    deadline,
+    search,
+    limit,
+    setPage,
+  ])
+
+  // reset invalid/deadline filters when changing status/category
+  useEffect(() => {
+    showDeadline(false)
+    showInvalid(false)
+  }, [status, category])
+
+  // reset category when changing status
+  useEffect(() => {
+    setCategory("pending")
+  }, [status])
 
   const query = useLotQuery({
     entity,
@@ -65,10 +87,11 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
 
   const lotsData = lots.result?.data.data
   const lotList = lotsData?.lots ?? []
+  const lotErrors = lotsData?.errors ?? {}
   const count = lotsData?.returned ?? 0
   const total = lotsData?.total ?? 0
-  const errors = lotsData?.total_errors ?? 0
-  const expiring = lotsData?.deadlines ?? { total: 0, date: "" }
+  const totalErrors = lotsData?.total_errors ?? 0
+  const totalDeadline = lotsData?.total_deadline ?? 0
 
   const showLotDetails = (lot: Lot) =>
     navigate({
@@ -98,18 +121,17 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
 
         <LotActions count={count} query={query} selection={selection} />
 
-        {errors > 0 && (
+        {totalErrors > 0 && (
           <InvalidSwitch
-            count={errors}
+            count={totalErrors}
             active={invalid}
             onSwitch={showInvalid}
           />
         )}
 
-        {expiring.total > 0 && (
+        {totalDeadline > 0 && (
           <DeadlineSwitch
-            count={expiring.total}
-            date={expiring.date}
+            count={totalDeadline}
             active={deadline}
             onSwitch={showDeadline}
           />
@@ -129,6 +151,7 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
               loading={lots.loading}
               order={order}
               lots={lotList}
+              errors={lotErrors}
               selected={selection}
               onSelect={setSelection}
               onAction={showLotDetails}
