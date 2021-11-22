@@ -34,7 +34,7 @@ export const LotDetails = () => {
 
   const lotData = lot.result?.data.data
   const comments = lotData?.comments ?? []
-  const [errors, warnings] = separateAnomalies(lotData?.errors ?? [])
+  const [errors, warnings] = separateAnomalies(lotData?.lot?.errors ?? [])
 
   const closeDialog = () =>
     navigate({

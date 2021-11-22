@@ -67,8 +67,8 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
   const lotList = lotsData?.lots ?? []
   const count = lotsData?.returned ?? 0
   const total = lotsData?.total ?? 0
+  const errors = lotsData?.total_errors ?? 0
   const expiring = lotsData?.deadlines ?? { total: 0, date: "" }
-  const errors = Object.keys(lotsData?.errors ?? {})
 
   const showLotDetails = (lot: Lot) =>
     navigate({
@@ -98,9 +98,9 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
 
         <LotActions count={count} query={query} selection={selection} />
 
-        {errors.length > 0 && (
+        {errors > 0 && (
           <InvalidSwitch
-            count={errors.length}
+            count={errors}
             active={invalid}
             onSwitch={showInvalid}
           />

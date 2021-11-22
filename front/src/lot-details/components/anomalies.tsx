@@ -1,10 +1,10 @@
 import { useTranslation } from "react-i18next"
-import { LotAnomaly } from "lot-details/types"
+import { LotError } from "transactions-v2/types"
 import Collapse from "common-v2/components/collapse"
 import { AlertOctagon, AlertTriangle } from "common-v2/components/icons"
 
 export interface AnomaliesProps {
-  anomalies: LotAnomaly[]
+  anomalies: LotError[]
 }
 
 export const BlockingAnomalies = ({ anomalies }: AnomaliesProps) => {
@@ -57,7 +57,7 @@ export const WarningAnomalies = ({ anomalies }: AnomaliesProps) => {
   )
 }
 
-export const Anomaly = ({ anomaly }: { anomaly: LotAnomaly }) => {
+export const Anomaly = ({ anomaly }: { anomaly: LotError }) => {
   const { t } = useTranslation()
   return (
     <li>
@@ -69,7 +69,7 @@ export const Anomaly = ({ anomaly }: { anomaly: LotAnomaly }) => {
   )
 }
 
-export function separateAnomalies(anomalies: LotAnomaly[]) {
+export function separateAnomalies(anomalies: LotError[]) {
   return [
     anomalies.filter((anomaly) => anomaly.is_blocking),
     anomalies.filter((anomaly) => !anomaly.is_blocking),
