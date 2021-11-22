@@ -7,7 +7,11 @@ from django.db.models.aggregates import Count
 from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
 from core.decorators import check_user_rights
-from api.v4.helpers import filter_lots, filter_stock, get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock, get_stock_events, get_stock_with_metadata, get_stock_filters_data, get_stocks_summary_data, get_transaction_distance, handle_eth_to_etbe_transformation, send_email_declaration_invalidated, send_email_declaration_validated
+from api.v4.helpers import filter_lots, filter_stock, get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock, 
+from api.v4.helpers import get_prefetched_data, get_stock_events, get_stock_with_metadata, get_stock_filters_data, get_stocks_summary_data, get_transaction_distance, handle_eth_to_etbe_transformation
+from api.v4.helpers import send_email_declaration_invalidated, send_email_declaration_validated
+from api.v4.sanity_checks import sanity_check
+
 from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Entity, SustainabilityDeclaration, UserRights
 from core.serializers import CarbureLotPublicSerializer, CarbureStockPublicSerializer
 
@@ -454,6 +458,7 @@ def lots_send(request, *args, **kwargs):
     nb_rejected = 0   
     nb_ignored = 0
     nb_auto_accepted = 0
+    prefetched_data = get_prefetched_data()
     for lot_id in lot_ids:
         try:
             lot = CarbureLot.objects.get(pk=lot_id)
@@ -469,7 +474,7 @@ def lots_send(request, *args, **kwargs):
             continue
 
         # sanity check !!!
-        if not sanity_check(lot):
+        if not sanity_check(lot, prefetched_data):
           nb_rejected += 1
           continue
         nb_sent += 1
