@@ -64,6 +64,7 @@ export const LotDetails = () => {
           <LotForm
             readOnly={!editable}
             lot={lotData?.lot}
+            errors={errors}
             onSubmit={(form) => console.log(form)}
           />
         </section>
