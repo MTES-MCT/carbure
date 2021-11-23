@@ -159,8 +159,7 @@ def get_lots_with_errors(lots, entity_id, will_aggregate=False):
 def get_lots_with_deadline(lots, deadline=get_current_deadline()):
     affected_date = deadline - relativedelta(months=1)
     period = affected_date.year * 100 + affected_date.month
-    lots_with_deadline = lots.filter(lot_status=CarbureLot.DRAFT, period=period)
-    return lots_with_deadline
+    return lots.filter(period=period, lot_status__in=[CarbureLot.DRAFT, CarbureLot.REJECTED, CarbureLot.PENDING])
 
 
 def filter_lots(lots, querySet, entity_id=None, will_aggregate=False, blacklist=[]):

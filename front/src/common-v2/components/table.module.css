@@ -61,7 +61,18 @@
 }
 
 .cell strong {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
   font-weight: 600;
+}
+
+.cell strong [data-icon] {
+  width: 20px;
+}
+
+.cell .warning strong {
+  color: var(--orange-dark);
 }
 
 .cell small {
