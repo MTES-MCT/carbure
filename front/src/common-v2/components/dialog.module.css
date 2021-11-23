@@ -77,7 +77,7 @@
   margin-bottom: calc(-1 * var(--spacing-m));
 }
 
-.dialog > main [data-list]:last-child {
+.dialog > main > [data-list]:last-child {
   margin-bottom: calc(-1 * var(--spacing-l));
 }
 

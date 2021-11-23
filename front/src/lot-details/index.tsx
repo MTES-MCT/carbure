@@ -17,6 +17,7 @@ import {
   separateAnomalies,
   WarningAnomalies,
 } from "./components/anomalies"
+import { getLotUpdates, History } from "./components/history"
 
 export const LotDetails = () => {
   const { t } = useTranslation()
@@ -34,9 +35,9 @@ export const LotDetails = () => {
   })
 
   const lotData = lot.result?.data.data
-  const comments = lotData?.comments ?? []
   const editable = isEditable(lotData?.lot)
-
+  const comments = lotData?.comments ?? []
+  const updates = getLotUpdates(lotData?.updates)
   const [errors, warnings] = separateAnomalies(lotData?.errors ?? [])
 
   const closeDialog = () =>
@@ -78,6 +79,12 @@ export const LotDetails = () => {
         {comments.length > 0 && (
           <section>
             <Comments comments={comments} />
+          </section>
+        )}
+
+        {updates.length > 0 && (
+          <section>
+            <History updates={updates} />
           </section>
         )}
       </main>
