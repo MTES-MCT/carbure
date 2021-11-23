@@ -62,24 +62,26 @@ function Autocomplete<T, V>({
         onChange={autocomplete.onQuery}
       />
 
-      <Dropdown
-        open={autocomplete.open && autocomplete.suggestions.length > 0}
-        triggerRef={triggerRef}
-        onOpen={autocomplete.execute}
-        onToggle={autocomplete.setOpen}
-        anchor={anchor}
-      >
-        <List
-          controlRef={triggerRef}
-          items={autocomplete.suggestions}
-          selectedValue={value}
-          children={children}
-          normalize={normalize}
-          onFocus={onChange}
-          onSelectValue={autocomplete.onSelect}
-          sort={sort}
-        />
-      </Dropdown>
+      {!props.disabled && !props.readOnly && (
+        <Dropdown
+          open={autocomplete.open && autocomplete.suggestions.length > 0}
+          triggerRef={triggerRef}
+          onOpen={autocomplete.execute}
+          onToggle={autocomplete.setOpen}
+          anchor={anchor}
+        >
+          <List
+            controlRef={triggerRef}
+            items={autocomplete.suggestions}
+            selectedValue={value}
+            children={children}
+            normalize={normalize}
+            onFocus={onChange}
+            onSelectValue={autocomplete.onSelect}
+            sort={sort}
+          />
+        </Dropdown>
+      )}
     </>
   )
 }

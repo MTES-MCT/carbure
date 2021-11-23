@@ -63,28 +63,30 @@ function TagAutocomplete<T, V>({
         </TagGroup>
       </Field>
 
-      <Dropdown
-        open={autocomplete.open && options.length > 0}
-        triggerRef={triggerRef}
-        onOpen={() => autocomplete.onQuery(autocomplete.query)}
-        onToggle={autocomplete.setOpen}
-        anchor={anchor}
-      >
-        <List
-          multiple
-          controlRef={triggerRef}
-          items={autocomplete.suggestions}
-          selectedValues={value}
-          onSelectValues={autocomplete.onSelect}
-          normalize={normalize}
+      {!props.disabled && !props.readOnly && (
+        <Dropdown
+          open={autocomplete.open && options.length > 0}
+          triggerRef={triggerRef}
+          onOpen={() => autocomplete.onQuery(autocomplete.query)}
+          onToggle={autocomplete.setOpen}
+          anchor={anchor}
         >
-          {({ selected, label }) => (
-            <Checkbox readOnly value={selected}>
-              {label}
-            </Checkbox>
-          )}
-        </List>
-      </Dropdown>
+          <List
+            multiple
+            controlRef={triggerRef}
+            items={autocomplete.suggestions}
+            selectedValues={value}
+            onSelectValues={autocomplete.onSelect}
+            normalize={normalize}
+          >
+            {({ selected, label }) => (
+              <Checkbox readOnly value={selected}>
+                {label}
+              </Checkbox>
+            )}
+          </List>
+        </Dropdown>
+      )}
     </>
   )
 }
