@@ -62,34 +62,36 @@ export function MultiSelect<T, V>({
         onClear={clear && value && value.length > 0 ? onClear : undefined}
       />
 
-      <Dropdown
-        open={open && asyncOptions.items.length > 0}
-        triggerRef={triggerRef}
-        onClose={onClose}
-        onToggle={setOpen}
-        anchor={anchor}
-        onOpen={() => {
-          onOpen?.()
-          asyncOptions.execute()
-        }}
-      >
-        <List
-          multiple
-          search={search}
-          controlRef={triggerRef}
-          items={asyncOptions.items}
-          selectedValues={value}
-          onSelectValues={onChange}
-          normalize={normalize}
-          sort={sort}
+      {!props.disabled && !props.readOnly && (
+        <Dropdown
+          open={open && asyncOptions.items.length > 0}
+          triggerRef={triggerRef}
+          onClose={onClose}
+          onToggle={setOpen}
+          anchor={anchor}
+          onOpen={() => {
+            onOpen?.()
+            asyncOptions.execute()
+          }}
         >
-          {({ selected, label }) => (
-            <Checkbox readOnly value={selected}>
-              {label}
-            </Checkbox>
-          )}
-        </List>
-      </Dropdown>
+          <List
+            multiple
+            search={search}
+            controlRef={triggerRef}
+            items={asyncOptions.items}
+            selectedValues={value}
+            onSelectValues={onChange}
+            normalize={normalize}
+            sort={sort}
+          >
+            {({ selected, label }) => (
+              <Checkbox readOnly value={selected}>
+                {label}
+              </Checkbox>
+            )}
+          </List>
+        </Dropdown>
+      )}
     </>
   )
 }
