@@ -28,7 +28,7 @@ export const StockDetails = () => {
 
   const closeDialog = () =>
     navigate({
-      pathname: `../stocks`,
+      pathname: `..`,
       search: location.search,
     })
 

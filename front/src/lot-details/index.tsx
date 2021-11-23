@@ -20,8 +20,13 @@ import {
 import { getLotUpdates, History } from "./components/history"
 import { isExpiring } from "common-v2/utils/deadline"
 import Alert from "common-v2/components/alert"
+import NavigationButtons from "./components/navigation"
 
-export const LotDetails = () => {
+export interface LotDetailsProps {
+  neighbors: number[]
+}
+
+export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const { t } = useTranslation()
 
   const navigate = useNavigate()
@@ -110,7 +115,9 @@ export const LotDetails = () => {
             label={t("À valider avant la fin du mois")}
           />
         )}
-        <Button asideX icon={Return} label={t("Retour")} action={closeDialog} />
+
+        <NavigationButtons neighbors={neighbors} />
+        <Button icon={Return} label={t("Retour")} action={closeDialog} />
       </footer>
 
       {lot.loading && <LoaderOverlay />}

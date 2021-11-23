@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom"
 import { Entity } from "carbure/types"
 import { Snapshot, Stock, FilterSelection, StockQuery } from "../../types"
 import { Order } from "common-v2/components/table"
@@ -14,6 +14,7 @@ import NoResult from "../no-result"
 import StockActions from "./stock-actions"
 import { SearchBar } from "../search-bar"
 import { StockSummaryBar } from "./stock-summary"
+import StockDetails from "stock-details"
 
 export interface StocksProps {
   entity: Entity
@@ -118,6 +119,10 @@ export const Stocks = ({ entity, snapshot }: StocksProps) => {
           </>
         )}
       </section>
+
+      <Routes>
+        <Route path=":id" element={<StockDetails />} />
+      </Routes>
     </>
   )
 }
