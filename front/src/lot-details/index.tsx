@@ -116,7 +116,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
           />
         )}
 
-        <NavigationButtons neighbors={neighbors} />
+        <NavigationButtons neighbors={neighbors} root={`../${status}`} />
         <Button icon={Return} label={t("Retour")} action={closeDialog} />
       </footer>
 

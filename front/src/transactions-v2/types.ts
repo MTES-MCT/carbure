@@ -103,6 +103,7 @@ export interface StockList {
   total: number
   returned: number
   from: number
+  ids: number[]
 }
 
 export interface Snapshot {
