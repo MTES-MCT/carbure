@@ -1,6 +1,7 @@
 import { useNavigate, useLocation, useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import * as api from "./api"
+import { CorrectionStatus, Lot, LotStatus } from "transactions-v2/types"
 import { useQuery } from "common-v2/hooks/async"
 import { useStatus } from "transactions-v2/components/status"
 import useEntity from "carbure/hooks/entity"
@@ -53,7 +54,11 @@ export const LotDetails = () => {
 
       <main>
         <section>
-          <LotForm lot={lotData?.lot} onSubmit={(form) => console.log(form)} />
+          <LotForm
+            readOnly={!isEditable(lotData?.lot)}
+            lot={lotData?.lot}
+            onSubmit={(form) => console.log(form)}
+          />
         </section>
 
         {errors.length > 0 && (
@@ -87,6 +92,15 @@ export const LotDetails = () => {
 
       {lot.loading && <LoaderOverlay />}
     </Dialog>
+  )
+}
+
+function isEditable(lot: Lot | undefined) {
+  if (lot === undefined) return false
+
+  return (
+    [LotStatus.Draft, LotStatus.Rejected].includes(lot.lot_status) ||
+    lot.correction_status === CorrectionStatus.InCorrection
   )
 }
 

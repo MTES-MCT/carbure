@@ -16,25 +16,26 @@ import {
 
 export interface LotFormProps {
   lot?: Lot
+  readOnly?: boolean
   onSubmit?: (value?: LotFormValue) => void
 }
 
-export const LotForm = ({ lot, onSubmit }: LotFormProps) => {
+export const LotForm = ({ lot, onSubmit, ...props }: LotFormProps) => {
   const value = useMemo(() => lotToFormValue(lot), [lot])
   const form = useLotForm(value)
 
-  const setValue = form.setValue
+  const { setValue } = form
   useEffect(() => {
     setValue(value)
   }, [value, setValue])
 
   return (
     <Form id="lot-form" variant="columns" form={form} onSubmit={onSubmit}>
-      <LotFields />
-      <ProductionFields />
-      <DeliveryFields />
-      <EmissionFields />
-      <ReductionFields />
+      <LotFields {...props} />
+      <ProductionFields {...props} />
+      <DeliveryFields {...props} />
+      <EmissionFields {...props} />
+      <ReductionFields {...props} />
     </Form>
   )
 }
