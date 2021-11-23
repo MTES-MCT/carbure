@@ -9,8 +9,13 @@ import { Return, Save } from "common-v2/components/icons"
 import StockForm from "./components/stock-form"
 import StockTag from "transactions-v2/components/stocks/stock-tag"
 import { LoaderOverlay } from "common-v2/components/scaffold"
+import NavigationButtons from "lot-details/components/navigation"
 
-export const StockDetails = () => {
+interface StockDetailsProps {
+  neighbors: number[]
+}
+
+export const StockDetails = ({ neighbors }: StockDetailsProps) => {
   const { t } = useTranslation()
 
   const navigate = useNavigate()
@@ -57,7 +62,8 @@ export const StockDetails = () => {
           submit="stock-form"
           label={t("Sauvegarder")}
         />
-        <Button asideX icon={Return} label={t("Retour")} action={closeDialog} />
+        <NavigationButtons neighbors={neighbors} root=".." />
+        <Button icon={Return} label={t("Retour")} action={closeDialog} />
       </footer>
 
       {stock.loading && <LoaderOverlay />}

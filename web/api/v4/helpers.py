@@ -430,6 +430,7 @@ def get_stock_with_metadata(stock, entity_id, querySet, is_admin=False):
     data['total'] = stock.count()
     data['returned'] = returned.count()
     data['from'] = from_idx
+    data['ids'] = list(stock.values_list('id', flat=True))
 
     if not export:
         return JsonResponse({'status': 'success', 'data': data})

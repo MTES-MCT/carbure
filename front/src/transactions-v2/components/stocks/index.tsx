@@ -58,6 +58,7 @@ export const Stocks = ({ entity, snapshot }: StocksProps) => {
 
   const stocksData = stocks.result?.data.data
   const stockList = stocksData?.stocks ?? []
+  const ids = stocksData?.ids ?? EMPTY
   const count = stocksData?.returned ?? 0
   const total = stocksData?.total ?? 0
 
@@ -121,7 +122,7 @@ export const Stocks = ({ entity, snapshot }: StocksProps) => {
       </section>
 
       <Routes>
-        <Route path=":id" element={<StockDetails />} />
+        <Route path=":id" element={<StockDetails neighbors={ids} />} />
       </Routes>
     </>
   )
