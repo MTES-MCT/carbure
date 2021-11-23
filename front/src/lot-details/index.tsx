@@ -35,6 +35,8 @@ export const LotDetails = () => {
 
   const lotData = lot.result?.data.data
   const comments = lotData?.comments ?? []
+  const editable = isEditable(lotData?.lot)
+
   const [errors, warnings] = separateAnomalies(lotData?.errors ?? [])
 
   const closeDialog = () =>
@@ -55,7 +57,7 @@ export const LotDetails = () => {
       <main>
         <section>
           <LotForm
-            readOnly={!isEditable(lotData?.lot)}
+            readOnly={!editable}
             lot={lotData?.lot}
             onSubmit={(form) => console.log(form)}
           />
@@ -81,12 +83,14 @@ export const LotDetails = () => {
       </main>
 
       <footer>
-        <Button
-          variant="primary"
-          icon={Save}
-          submit="lot-form"
-          label={t("Sauvegarder")}
-        />
+        {editable && (
+          <Button
+            variant="primary"
+            icon={Save}
+            submit="lot-form"
+            label={t("Sauvegarder")}
+          />
+        )}
         <Button asideX icon={Return} label={t("Retour")} action={closeDialog} />
       </footer>
 
