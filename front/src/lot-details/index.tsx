@@ -8,7 +8,7 @@ import useEntity from "carbure/hooks/entity"
 import { LoaderOverlay } from "common-v2/components/scaffold"
 import Dialog from "common-v2/components/dialog"
 import Button from "common-v2/components/button"
-import { Return, Save } from "common-v2/components/icons"
+import { Alarm, Return, Save } from "common-v2/components/icons"
 import LotForm from "lot-add/components/lot-form"
 import LotTag from "transactions-v2/components/lots/lot-tag"
 import Comments from "./components/comments"
@@ -18,6 +18,8 @@ import {
   WarningAnomalies,
 } from "./components/anomalies"
 import { getLotUpdates, History } from "./components/history"
+import { isExpiring } from "common-v2/utils/deadline"
+import Alert from "common-v2/components/alert"
 
 export const LotDetails = () => {
   const { t } = useTranslation()
@@ -39,6 +41,8 @@ export const LotDetails = () => {
   const comments = lotData?.comments ?? []
   const updates = getLotUpdates(lotData?.updates)
   const [errors, warnings] = separateAnomalies(lotData?.errors ?? [])
+
+  const expiring = isExpiring(lotData?.lot)
 
   const closeDialog = () =>
     navigate({
@@ -96,6 +100,13 @@ export const LotDetails = () => {
             icon={Save}
             submit="lot-form"
             label={t("Sauvegarder")}
+          />
+        )}
+        {expiring && (
+          <Alert
+            icon={Alarm}
+            variant="warning"
+            label={t("À valider avant la fin du mois")}
           />
         )}
         <Button asideX icon={Return} label={t("Retour")} action={closeDialog} />
