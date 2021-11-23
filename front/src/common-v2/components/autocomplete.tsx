@@ -11,7 +11,7 @@ import Dropdown, { Trigger } from "./dropdown"
 import { Control, TextInput } from "./input"
 import List, { createQueryFilter, defaultRenderer, Renderer } from "./list"
 
-export interface AutocompleteProps<T, V> extends Control, Trigger {
+export interface AutocompleteProps<T, V = T> extends Control, Trigger {
   value?: V | undefined
   options?: T[]
   defaultOptions?: T[]
