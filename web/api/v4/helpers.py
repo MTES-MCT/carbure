@@ -91,6 +91,7 @@ def get_lots_with_metadata(lots, entity_id, querySet, is_admin=False):
     data['total_errors'] = total_errors
     data['total_deadline'] = total_deadline
     data['errors'] = get_lots_errors(returned, entity_id)
+    data['ids'] = list(lots.values_list('id', flat=True))
 
     if not export:
         return JsonResponse({'status': 'success', 'data': data})
