@@ -1,14 +1,15 @@
+/* COMMON */
+
 .home {
   background-color: var(--white);
   font-size: 18px;
 }
 
 .home h1,
-.home h2 {
+.home h2,
+.home ul {
   margin-bottom: 16px;
 }
-
-/* COMMON */
 
 .homeTitle,
 .homeContext,
