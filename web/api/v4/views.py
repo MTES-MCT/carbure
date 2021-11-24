@@ -14,7 +14,7 @@ from api.v4.lots import construct_carbure_lot, bulk_insert_lots
 from api.v4.sanity_checks import sanity_check
 
 from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Entity, SustainabilityDeclaration, UserRights
-from core.serializers import CarbureLotPublicSerializer, CarbureStockPublicSerializer
+from core.serializers import CarbureLotPublicSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
 
 
 @check_user_rights()
@@ -129,7 +129,10 @@ def get_stock_details(request, *args, **kwargs):
 
     data = {}
     data['stock'] = CarbureStockPublicSerializer(stock).data
-    data['children'] = CarbureLotPublicSerializer(CarbureLot.objects.filter(parent_stock=stock), many=True).data
+    data['parent_lot'] = CarbureLotPublicSerializer(stock.parent_lot).data if stock.parent_lot else None
+    data['parent_transformation'] = CarbureStockTransformationPublicSerializer(stock.parent_transformation).data if stock.parent_transformation else None
+    data['children_lot'] = CarbureLotPublicSerializer(CarbureLot.objects.filter(parent_stock=stock), many=True).data
+    data['children_transformation'] = CarbureStockTransformationPublicSerializer(CarbureStockTransformation.objects.filter(source_stock=stock), many=True).data
     data['events'] = get_stock_events(stock.parent_lot, entity_id)
     data['updates'] = get_lot_updates(stock.parent_lot, entity_id)
     data['comments'] = get_lot_comments(stock.parent_lot, entity_id)
@@ -734,7 +737,7 @@ def approve_fix(request, *args, **kwargs):
                 event.lot = lot
                 event.user = request.user
                 event.metadata = {'comment': 'Cascading update of sustainability data'}
-                event.save()                  
+                event.save()
             transformations = CarbureStockTransformation.objects.filter(source_stock=stock)
             for t in transformations:
                 new_stock = t.dest_stock
