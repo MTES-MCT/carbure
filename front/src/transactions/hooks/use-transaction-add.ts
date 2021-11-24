@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { useNavigate } from "react-router-dom"
 
 import useTransactionForm, {
@@ -11,10 +11,7 @@ import useClose from "common/hooks/use-close"
 import { addLot } from "../api"
 import { useNotificationContext } from "common/components/notifications"
 
-export default function useTransactionAdd(
-  entity: EntitySelection,
-  refresh: () => void
-) {
+export default function useTransactionAdd(entity: Entity, refresh: () => void) {
   const { t } = useTranslation()
   const notifications = useNotificationContext()
 

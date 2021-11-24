@@ -1,7 +1,7 @@
 import React from "react"
 
 import { FormChangeHandler } from "common/hooks/use-form"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { TransactionFormState } from "../hooks/use-transaction-form"
 
 import styles from "./form.module.css"
@@ -19,7 +19,7 @@ import OriginFields from "./form/origin-fields"
 
 type TransactionFormProps = {
   id?: string
-  entity: EntitySelection
+  entity: Entity
   readOnly?: boolean
   transaction: TransactionFormState
   error: string | null

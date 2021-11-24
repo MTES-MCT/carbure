@@ -1,7 +1,7 @@
 import cl from "clsx"
 import { Trans, useTranslation } from "react-i18next"
 
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { SpecialSelection } from "transactions/hooks/query/use-special"
 import { Alert, AlertFilter } from "common/components/alert"
 import { Alarm, AlertCircle, Filter, Loader } from "common/components/icons"
@@ -47,7 +47,7 @@ type DeadlineFilterProps = {
   deadlineCount: number
   deadlineDate: string | null
   special: SpecialSelection
-  entity: EntitySelection
+  entity: Entity
 }
 
 export const DeadlineFilter = ({
@@ -84,7 +84,7 @@ type SummaryFilterProps = {
   query: TransactionQuery
   hideRecap?: boolean
   selection: number[]
-  entity: EntitySelection
+  entity: Entity
   stock?: boolean
   onReset: () => void
 }
@@ -127,22 +127,22 @@ export const SummaryFilter = ({
       icon={loading ? Loader : Filter}
       className={cl(styles.alertFilter, loading && styles.alertLoading)}
     >
-      {stock && 
-          <span>
-            <Trans count={count}>
-              <b>{{ count }} lots</b> pour un total de{" "}
-              <b>{{ volume: prettyVolume(totalRemainingVolume) }} litres</b>
-            </Trans>
-          </span>
-      }
-      {!stock && 
+      {stock && (
+        <span>
+          <Trans count={count}>
+            <b>{{ count }} lots</b> pour un total de{" "}
+            <b>{{ volume: prettyVolume(totalRemainingVolume) }} litres</b>
+          </Trans>
+        </span>
+      )}
+      {!stock && (
         <span>
           <Trans count={count}>
             <b>{{ count }} lots</b> pour un total de{" "}
             <b>{{ volume: prettyVolume(totalVolume) }} litres</b>
           </Trans>
         </span>
-      }
+      )}
 
       {!hideRecap && (
         <span className={styles.alertLink} onClick={showSummary}>

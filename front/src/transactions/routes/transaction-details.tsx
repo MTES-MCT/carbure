@@ -2,7 +2,7 @@ import React from "react"
 import { Trans, useTranslation } from "react-i18next"
 
 import { LotStatus, EntityType, UserRole, Transaction } from "common/types"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { LotDeleter } from "transactions/hooks/actions/use-delete-lots"
 import { LotAcceptor } from "transactions/hooks/actions/use-accept-lots"
 import { LotRejector } from "transactions/hooks/actions/use-reject-lots"
@@ -44,7 +44,7 @@ const EDITABLE = [LotStatus.Draft, LotStatus.ToFix]
 const COMMENTABLE = [LotStatus.ToFix, LotStatus.Inbox]
 
 type TransactionDetailsProps = {
-  entity: EntitySelection
+  entity: Entity
   deleter: LotDeleter
   validator: LotValidator
   acceptor: LotAcceptor

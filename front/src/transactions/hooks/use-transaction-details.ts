@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 
 import { EntityType, GenericError, LotStatus } from "common/types"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 
 import useTransactionForm, {
   toTransactionFormState,
@@ -37,7 +37,7 @@ export function useFieldErrors(errors: GenericError[]) {
   return fieldErrors
 }
 
-function detailsGetter(entity: EntitySelection) {
+function detailsGetter(entity: Entity) {
   switch (entity?.entity_type) {
     case EntityType.Administration:
       return api.getAdminDetails
@@ -48,19 +48,19 @@ function detailsGetter(entity: EntitySelection) {
   }
 }
 
-function notePoster(entity: EntitySelection) {
+function notePoster(entity: Entity) {
   switch (entity?.entity_type) {
     case EntityType.Administration:
       return api.addAdminComment
     case EntityType.Auditor:
       return api.addAuditorComment
     default:
-      return async () => { }
+      return async () => {}
   }
 }
 
 export default function useTransactionDetails(
-  entity: EntitySelection,
+  entity: Entity,
   refresh: () => void
 ) {
   const { t } = useTranslation()
@@ -78,7 +78,7 @@ export default function useTransactionDetails(
   const fieldErrors = useFieldErrors(details.data?.errors ?? [])
 
   const entityID = entity?.id
-  const txID = parseInt(params.id ?? '', 10)
+  const txID = parseInt(params.id ?? "", 10)
   const tx = details.data?.transaction
 
   const validationErrors = details.data?.errors ?? []

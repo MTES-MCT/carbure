@@ -6,7 +6,7 @@ import Select, { SelectValue } from "common/components/select"
 import styles from "./list-filters.module.css"
 import { getFilters, getAdminFilters, getAuditorFilters } from "../api"
 import { getStockFilters } from "stocks/api"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 
 const FILTER_ORDER = [
   Filters.DeliveryStatus,
@@ -25,7 +25,7 @@ const FILTER_ORDER = [
   Filters.HiddenByAdmin,
   Filters.HiddenByAuditor,
   Filters.ClientTypes,
-  Filters.ShowEmpty
+  Filters.ShowEmpty,
 ]
 
 export function mapFilters(
@@ -68,7 +68,7 @@ export function mapFilters(
   })
 }
 
-function filterGetter(entity?: EntitySelection, stock?: boolean) {
+function filterGetter(entity?: Entity, stock?: boolean) {
   if (stock) return getStockFilters
 
   switch (entity?.entity_type) {
@@ -86,7 +86,7 @@ type TransactionFiltersProps = {
   filters: Snapshot["filters"] | undefined
   query: TransactionQuery
   placeholder: Filters[]
-  entity: EntitySelection
+  entity: Entity
   stock?: boolean
 }
 

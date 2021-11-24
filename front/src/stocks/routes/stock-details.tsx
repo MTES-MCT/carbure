@@ -1,8 +1,8 @@
 import React from "react"
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from "react-i18next"
 
 import { LotStatus, Transaction, UserRole } from "common/types"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { LotDeleter } from "transactions/hooks/actions/use-delete-lots"
 import { LotAcceptor } from "transactions/hooks/actions/use-accept-lots"
 import { LotRejector } from "transactions/hooks/actions/use-reject-lots"
@@ -35,7 +35,7 @@ import useNavigation from "transactions/hooks/query/use-navigate"
 const EDITABLE = [LotStatus.ToSend]
 
 type StockDetailsProps = {
-  entity: EntitySelection
+  entity: Entity
   deleter: LotDeleter
   validator: LotValidator
   acceptor: LotAcceptor

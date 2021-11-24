@@ -10,13 +10,13 @@ import { AlertCircle } from "common/components/icons"
 import { formatDate, YEAR_ONLY } from "settings/components/common"
 import { DoubleCountingPrompt } from "./agreement-details"
 import { prompt } from "common/components/dialog"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import useAPI from "common/hooks/use-api"
 import DoubleCountingStatus from "./dc-status"
 import * as api from "../api"
 
 type AgreementListProps = {
-  entity: EntitySelection
+  entity: Entity
   year: number
 }
 

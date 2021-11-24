@@ -1,6 +1,6 @@
 import { Route, Routes, Navigate } from "react-router-dom"
 
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { EntityType, Filters, LotStatus, UserRole } from "common/types"
 
 import { usePageSelection } from "common/components/pagination"
@@ -93,7 +93,7 @@ const ADMIN_FILTERS = [
   Filters.ClientTypes,
 ]
 
-export function useTransactions(entity: EntitySelection) {
+export function useTransactions(entity: Entity) {
   const pagination = usePageSelection()
 
   const special = useSpecialSelection(pagination)
@@ -168,7 +168,7 @@ export function useTransactions(entity: EntitySelection) {
   }
 }
 
-export const Transactions = ({ entity }: { entity: EntitySelection }) => {
+export const Transactions = ({ entity }: { entity: Entity }) => {
   const {
     status,
     filters,
@@ -280,21 +280,27 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
       />
 
       <Routes>
-        <Route path="add" element={<TransactionAdd entity={entity} refresh={refresh} />} />
+        <Route
+          path="add"
+          element={<TransactionAdd entity={entity} refresh={refresh} />}
+        />
 
-        <Route path=":id" element={
-          <TransactionDetails
-            entity={entity}
-            refresh={refresh}
-            deleter={deleter}
-            validator={validator}
-            acceptor={acceptor}
-            rejector={rejector}
-            administrator={administrator}
-            auditor={auditor}
-            transactions={summary.data?.tx_ids ?? []}
-          />
-        } />
+        <Route
+          path=":id"
+          element={
+            <TransactionDetails
+              entity={entity}
+              refresh={refresh}
+              deleter={deleter}
+              validator={validator}
+              acceptor={acceptor}
+              rejector={rejector}
+              administrator={administrator}
+              auditor={auditor}
+              transactions={summary.data?.tx_ids ?? []}
+            />
+          }
+        />
       </Routes>
     </Main>
   )

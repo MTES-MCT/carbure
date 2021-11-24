@@ -16,7 +16,6 @@ import {
 } from "common/components/dialog"
 import * as Fields from "transactions/components/form/fields"
 import { FormGroup } from "common/components/form"
-import { EntitySelection } from "carbure/hooks/use-entity"
 import { Trans, useTranslation } from "react-i18next"
 
 export interface StockSendDetails {
@@ -28,11 +27,11 @@ export interface StockSendDetails {
   delivery_site_country: Country | null
   mac: boolean
   carbure_vendor_certificate: string
-  carbure_vendor: EntitySelection
+  carbure_vendor: Entity
 }
 
 type StockSendLotPromptProps = {
-  entity: EntitySelection
+  entity: Entity
 } & PromptProps<StockSendDetails>
 
 export const StockSendLotPrompt = ({

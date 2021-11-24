@@ -11,7 +11,7 @@ import {
 } from "common/types"
 
 import { ProductionSiteSettingsHook } from "../hooks/use-production-sites"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 
 import styles from "./settings.module.css"
 
@@ -80,7 +80,7 @@ export type ProductionSiteState = {
 type ProductionSitePromptProps = PromptProps<ProductionSiteState> & {
   title: string
   description?: string
-  entity: EntitySelection
+  entity: Entity | null
   productionSite?: ProductionSiteDetails
   readOnly?: boolean
 }

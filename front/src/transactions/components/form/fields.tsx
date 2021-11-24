@@ -1,6 +1,5 @@
 import { TFunction, Trans, useTranslation } from "react-i18next"
 import cl from "clsx"
-import { EntitySelection } from "carbure/hooks/use-entity"
 import { TransactionFormState } from "transactions/hooks/use-transaction-form"
 import * as api from "common/api"
 import {
@@ -69,7 +68,7 @@ export type FieldsProps = {
   editable?: boolean
   data: TransactionFormState
   errors: Record<string, string>
-  entity?: EntitySelection
+  entity?: Entity
   onChange: FormChangeHandler<TransactionFormState>
 }
 

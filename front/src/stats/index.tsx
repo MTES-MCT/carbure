@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { Trans, useTranslation } from "react-i18next"
 import { Main } from "common/components"
 import { Section } from "common/components/section"
@@ -14,7 +14,7 @@ function getHash(entityId: number) {
 }
 
 type StatsProps = {
-  entity: EntitySelection
+  entity: Entity
 }
 
 const Stats = ({ entity }: StatsProps) => {
@@ -277,24 +277,27 @@ const StatsRoutes = ({ entity }: StatsProps) => {
   const path = window.location.pathname
   const period = path.substring(32, 39)
   const iframeShadow = "1px 1px 6px grey"
-  
+
   return (
     <Routes>
       <Route path="" element={<Stats entity={entity} />} />
 
-      <Route path="period_details" element={
-        <Main style={{ padding: "32px 160px" }}>
-          <h1>{period}</h1>
-          <Section style={{ boxShadow: iframeShadow }}>
-            <IframeResizer
-              title="period_details"
-              src={`https://metabase.carbure.beta.gouv.fr/public/dashboard/8d158d55-0adf-41e2-b711-6f8e0419b824?hash=${entityHash.data?.hash},period=${period}#hide_parameters=hash,period`}
-              frameBorder="0"
-              allowTransparency
-            />
-          </Section>
-        </Main>
-      } />
+      <Route
+        path="period_details"
+        element={
+          <Main style={{ padding: "32px 160px" }}>
+            <h1>{period}</h1>
+            <Section style={{ boxShadow: iframeShadow }}>
+              <IframeResizer
+                title="period_details"
+                src={`https://metabase.carbure.beta.gouv.fr/public/dashboard/8d158d55-0adf-41e2-b711-6f8e0419b824?hash=${entityHash.data?.hash},period=${period}#hide_parameters=hash,period`}
+                frameBorder="0"
+                allowTransparency
+              />
+            </Section>
+          </Main>
+        }
+      />
     </Routes>
   )
 }

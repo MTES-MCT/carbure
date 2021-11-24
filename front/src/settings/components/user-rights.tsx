@@ -14,7 +14,7 @@ import { formatDate } from "settings/components/common"
 import { padding } from "transactions/components/list-columns"
 import * as api from "../api"
 import styles from "entities/components/user-rights.module.css"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 
 const RIGHTS_ORDER = {
   [UserRightStatus.Pending]: 0,
@@ -23,7 +23,7 @@ const RIGHTS_ORDER = {
   [UserRightStatus.Rejected]: 3,
 }
 
-const UserRights = ({ entity }: { entity: EntitySelection }) => {
+const UserRights = ({ entity }: { entity: Entity }) => {
   const { t } = useTranslation()
 
   const [rights, getRights] = useAPI(api.getEntityRights)
