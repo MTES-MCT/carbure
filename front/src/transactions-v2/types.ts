@@ -92,6 +92,7 @@ export interface Stock {
   carbure_client: Entity | null
   depot: Depot | null
   delivery_date: string | null
+  period: number
   ghg_reduction: number
   ghg_reduction_red_ii: number
   parent_lot: number

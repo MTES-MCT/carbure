@@ -1,7 +1,11 @@
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import { Stock } from "../../types"
-import { formatNumber, formatDate } from "common-v2/utils/formatters"
+import {
+  formatNumber,
+  formatDate,
+  formatPeriod,
+} from "common-v2/utils/formatters"
 import Table, { Cell, Order, selectionColumn } from "common-v2/components/table"
 import StockTag from "./stock-tag"
 
@@ -41,9 +45,12 @@ export const StockTable = memo(
             cell: (stock) => <StockTag stock={stock} />,
           },
           {
-            header: t("Date de livraison"),
+            header: t("Période"),
             cell: (stock) => (
-              <Cell text={`${formatDate(stock.delivery_date)}`} />
+              <Cell
+                text={formatPeriod(stock.period)}
+                sub={formatDate(stock.delivery_date)}
+              />
             ),
           },
           {
@@ -52,7 +59,7 @@ export const StockTable = memo(
             cell: (stock) => (
               <Cell
                 text={t(stock.biofuel?.name ?? "", { ns: "biofuels" })}
-                sub={`${formatNumber(stock.remaining_volume)} / ${formatNumber(stock.initial_volume)} L`} // prettier-ignore
+                sub={`${formatNumber(stock.remaining_volume)} L`} // prettier-ignore
               />
             ),
           },
