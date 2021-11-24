@@ -1,6 +1,5 @@
 import { Trans } from "react-i18next"
 import { EntityManager } from "carbure/hooks/entity"
-import { SettingsGetter } from "./hooks/use-get-settings"
 
 import use2BSCertificates from "./hooks/use-2bs-certificates"
 import useCompany from "./hooks/use-company"

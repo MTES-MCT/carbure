@@ -147,3 +147,13 @@
   background-color: transparent;
   color: var(--blue-dark);
 }
+
+.external {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-s);
+}
+
+.external:hover {
+  text-decoration: underline;
+}
