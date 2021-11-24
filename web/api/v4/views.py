@@ -722,6 +722,32 @@ def approve_fix(request, *args, **kwargs):
             return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to change this lot'}, status=403)
         lot.correction_status = CarbureLot.NO_PROBLEMO
         lot.save()
+        # CASCADING CORRECTIONS
+        if lot.delivery_type == CarbureLot.STOCK:
+            stock = CarbureStock.objects.get(parent_lot=lot)
+            child = CarbureLot.objects.filter(parent_stock=stock)
+            for c in child:
+                c.update_sustainability_data(lot)
+                c.save()
+                event = CarbureLotEvent()
+                event.event_type = CarbureLotEvent.UPDATED
+                event.lot = lot
+                event.user = request.user
+                event.metadata = {'comment': 'Cascading update of sustainability data'}
+                event.save()                  
+            transformations = CarbureStockTransformation.objects.filter(source_stock=stock)
+            for t in transformations:
+                new_stock = t.dest_stock
+                child = CarbureLot.objects.filter(parent_stock=new_stock)
+                for c in child:
+                    c.update_sustainability_data(lot)
+                    c.save()
+                    event = CarbureLotEvent()
+                    event.event_type = CarbureLotEvent.UPDATED
+                    event.lot = lot
+                    event.user = request.user
+                    event.metadata = {'comment': 'Cascading update of sustainability data'}
+                    event.save()
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.FIX_ACCEPTED
         event.lot = lot

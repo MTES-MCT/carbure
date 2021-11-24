@@ -751,8 +751,8 @@ def handle_eth_to_etbe_transformation(user, stock, transformation):
 def get_prefetched_data(entity=None):
     lastyear = datetime.date.today() - datetime.timedelta(days=365)
     d = {}
-    d['producers'] = {p.name: p for p in Entity.objects.filter(entity_type=Entity.PRODUCER)}
-    d['countries'] = {p.code_pays: p for p in Pays.objects.all()}
+    d['producers'] = {p.id: p for p in Entity.objects.filter(entity_type=Entity.PRODUCER)}
+    d['countries'] = {p.id: p for p in Pays.objects.all()}
     d['biocarburants'] = {b.code: b for b in Biocarburant.objects.all()}
     d['matieres_premieres'] = {m.code: m for m in MatierePremiere.objects.all()}
     if entity:
@@ -762,15 +762,13 @@ def get_prefetched_data(entity=None):
         d['my_vendor_certificates'] = [c.certificate.certificate_id for c in EntityCertificate.objects.filter(entity=entity)]
     else:
         d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').all()}
-    d['depots'] = {d.depot_id.lstrip('0').upper(): d for d in Depot.objects.all()}
+    d['depots'] = {d.depot_id: d for d in Depot.objects.all()}
     d['depotsbyname'] = {d.name.upper(): d for d in Depot.objects.all()}
     entitydepots = dict()
     for obj in EntityDepot.objects.all():
         entitydepots.setdefault(obj.entity.id, []).append(obj.depot.id)
     d['depotsbyentity'] = entitydepots
-    d['clients'] = {c.name.upper(): c for c in Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.OPERATOR, Entity.TRADER])}
+    d['clients'] = {c.id: c for c in Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.OPERATOR, Entity.TRADER])}
     d['certificates'] = {c.certificate_id.upper(): c for c in GenericCertificate.objects.filter(valid_until__gte=lastyear)}
     d['double_counting_certificates'] = {c.certificate_id: c for c in DoubleCountingRegistration.objects.all()}
     return d
-
-
