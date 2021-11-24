@@ -1,6 +1,6 @@
 import { Route, Routes, Navigate } from "react-router-dom"
 
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { EntityType, Filters } from "common/types"
 
 import { usePageSelection } from "common/components/pagination"
@@ -42,7 +42,7 @@ const FILTERS = [
   Filters.ShowEmpty,
 ]
 
-function useStocks(entity: EntitySelection) {
+function useStocks(entity: Entity) {
   const pagination = usePageSelection()
   const sorting = useSortingSelection(pagination)
   const status = useStockStatusSelection(pagination)
@@ -109,7 +109,7 @@ function useStocks(entity: EntitySelection) {
   }
 }
 
-export const Stocks = ({ entity }: { entity: EntitySelection }) => {
+export const Stocks = ({ entity }: { entity: Entity }) => {
   const {
     filters,
     pagination,
@@ -176,20 +176,26 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
       />
 
       <Routes>
-        <Route path="send-complex" element={<StockSendComplex entity={entity} />} />
+        <Route
+          path="send-complex"
+          element={<StockSendComplex entity={entity} />}
+        />
 
-        <Route path=":id" element={
-          <StockDetails
-            entity={entity}
-            deleter={deleter}
-            validator={validator}
-            acceptor={acceptor}
-            rejector={rejector}
-            sender={sender}
-            refresh={refresh}
-            transactions={summary.data?.tx_ids ?? []}
-          />
-        } />
+        <Route
+          path=":id"
+          element={
+            <StockDetails
+              entity={entity}
+              deleter={deleter}
+              validator={validator}
+              acceptor={acceptor}
+              rejector={rejector}
+              sender={sender}
+              refresh={refresh}
+              transactions={summary.data?.tx_ids ?? []}
+            />
+          }
+        />
       </Routes>
     </Main>
   )

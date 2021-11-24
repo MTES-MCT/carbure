@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { Certificate } from "common/types"
 
 import { confirm, prompt } from "common/components/dialog"
@@ -23,7 +23,7 @@ export interface ISCCCertificateSettingsHook {
 }
 
 export default function useISCCCertificates(
-  entity: EntitySelection,
+  entity: Entity,
   productionSites: ProductionSiteSettingsHook,
   company: CompanySettingsHook
 ): ISCCCertificateSettingsHook {

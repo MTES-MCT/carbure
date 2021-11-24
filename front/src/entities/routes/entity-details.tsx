@@ -30,7 +30,7 @@ import Certificates from "entities/components/certificates"
 
 const EntityDetails = () => {
   const close = useClose("..")
-  const { id = '' } = useParams<"id">()
+  const { id = "" } = useParams<"id">()
   const [entity, getEntity] = useAPI(api.getEntityDetails)
   const [depots, getDepots] = useAPI(api.getEntityDepots)
   const [productionSites, getProductionSites] = useAPI(api.getEntityProductionSites) // prettier-ignore

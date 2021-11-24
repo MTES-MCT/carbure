@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 
 import * as api from "transactions/api"
 import useAPI from "common/hooks/use-api"
@@ -19,7 +19,7 @@ export interface LotAuditor {
 }
 
 export default function useAuditLots(
-  entity: EntitySelection,
+  entity: Entity,
   selection: TransactionSelection,
   refresh: () => void
 ): LotAuditor {

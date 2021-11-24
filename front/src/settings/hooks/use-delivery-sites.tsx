@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { DeliverySite, OwnershipType } from "common/types"
 
 import useAPI from "common/hooks/use-api"
@@ -17,7 +17,7 @@ export interface EntityDeliverySite {
   depot: DeliverySite | null
   ownership_type: OwnershipType
   blending_is_outsourced: boolean
-  blender: EntitySelection
+  blender: Entity | null
 }
 
 export interface DeliverySiteSettingsHook {
@@ -30,7 +30,7 @@ export interface DeliverySiteSettingsHook {
 }
 
 export default function useDeliverySites(
-  entity: EntitySelection
+  entity: Entity
 ): DeliverySiteSettingsHook {
   const { t } = useTranslation()
   const notifications = useNotificationContext()

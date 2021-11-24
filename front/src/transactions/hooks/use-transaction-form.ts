@@ -12,7 +12,6 @@ import {
   Lot,
   LotDetails,
 } from "common/types"
-import { EntitySelection } from "carbure/hooks/use-entity"
 import useForm, { FormHook } from "common/hooks/use-form"
 
 export interface TransactionFormState {
@@ -349,7 +348,7 @@ function fixedValues(
 export type TransactionFields = Record<string, boolean>
 
 export default function useTransactionForm(
-  entity: EntitySelection,
+  entity: Entity,
   isStock: boolean = false
 ): FormHook<TransactionFormState> {
   const onChange = useCallback(

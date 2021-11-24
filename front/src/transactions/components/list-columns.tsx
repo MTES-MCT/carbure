@@ -8,7 +8,7 @@ import { Box } from "common/components"
 import Status from "./status"
 
 import styles from "./list-columns.module.css"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { hasDeadline, prettyVolume } from "transactions/helpers"
 import { Alarm } from "common/components/icons"
 import { Checkbox } from "common/components/input"
@@ -25,12 +25,14 @@ export const padding: Column<any> = {
   render: () => null,
 }
 
-export const status: (e: EntitySelection, t: TFunction) => Column<Transaction> =
-  (entity, t) => ({
-    header: t("Statut"),
-    className: styles.statusColumn,
-    render: (tx) => <Status small transaction={tx} entity={entity} />,
-  })
+export const status: (e: Entity, t: TFunction) => Column<Transaction> = (
+  entity,
+  t
+) => ({
+  header: t("Statut"),
+  className: styles.statusColumn,
+  render: (tx) => <Status small transaction={tx} entity={entity} />,
+})
 
 export const carbureID: TxCol = (t) => ({
   header: t("ID"),

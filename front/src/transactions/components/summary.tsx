@@ -19,7 +19,7 @@ import useAPI from "common/hooks/use-api"
 import { Button } from "common/components/button"
 import { prettyVolume } from "transactions/helpers"
 import { Alert } from "common/components/alert"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { getStocksSummary } from "stocks/api"
 import {
   getLotsSummary,
@@ -168,7 +168,7 @@ const TransactionSummary = (props: TransactionSummaryProps) => {
   )
 }
 
-function summaryGetter(entity?: EntitySelection, isStock?: boolean) {
+function summaryGetter(entity?: Entity, isStock?: boolean) {
   if (isStock) return getStocksSummary
 
   switch (entity?.entity_type) {
@@ -182,7 +182,7 @@ function summaryGetter(entity?: EntitySelection, isStock?: boolean) {
 }
 
 interface SummaryOptions {
-  entity?: EntitySelection
+  entity?: Entity
   stock?: boolean
   short?: boolean
 }
@@ -210,7 +210,7 @@ type SummaryPromptProps = PromptProps<number[]> & {
   stock?: boolean
   entityID?: number
   selection?: number[]
-  entity?: EntitySelection
+  entity?: Entity
   query: TransactionQuery
 }
 

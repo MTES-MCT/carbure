@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import styles from "./settings.module.css"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { CompanySettingsHook as DoubleContingSettingsHook } from "../hooks/use-company"
 import { ProductionSite, UserRole } from "common/types"
 import {
@@ -63,7 +63,7 @@ import { SourcingAggregationTable } from "doublecount/components/dc-tables"
 import { prettyVolume } from "transactions/helpers"
 
 type DoubleCountingUploadPromptProps = PromptProps<void> & {
-  entity: EntitySelection
+  entity: Entity
 }
 
 const DoubleCountingUploadPrompt = ({
@@ -203,7 +203,7 @@ type DoubleCountingSourcingPromptProps = PromptProps<true | void> & {
   add?: boolean
   dcaID: number
   sourcing?: DoubleCountingSourcing
-  entity: EntitySelection
+  entity: Entity
 }
 
 const DoubleCountingSourcingPrompt = ({
@@ -354,7 +354,7 @@ type DoubleCountingProductionPromptProps = PromptProps<true | void> & {
   add?: boolean
   dcaID: number
   production?: DoubleCountingProduction
-  entity: EntitySelection
+  entity: Entity
 }
 
 const DoubleCountingProductionPrompt = ({
@@ -505,7 +505,7 @@ const DoubleCountingProductionPrompt = ({
 }
 
 type QuotasTableProps = {
-  entity: EntitySelection
+  entity: Entity
   agreement: DoubleCounting | null
 }
 
@@ -567,7 +567,7 @@ const QuotasTable = ({ entity, agreement }: QuotasTableProps) => {
 }
 
 type DoubleCountingPromptProps = PromptProps<any> & {
-  entity: EntitySelection
+  entity: Entity
   agreementID: number
 }
 
@@ -941,7 +941,7 @@ const DoubleCountingPrompt = ({
 }
 
 type DoubleCountingSettingsProps = {
-  entity: EntitySelection
+  entity: Entity
   settings: DoubleContingSettingsHook
 }
 

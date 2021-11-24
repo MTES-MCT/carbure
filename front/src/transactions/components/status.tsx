@@ -14,7 +14,7 @@ import { Box, Title } from "common/components"
 import { hasDeadline } from "../helpers"
 
 import styles from "./status.module.css"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { formatDate } from "settings/components/common"
 
 // extract the status name from the lot details
@@ -57,7 +57,7 @@ export function getStatus(
 function getStatusText(
   t: TFunction<"translation">,
   tx: Transaction | undefined,
-  entity?: EntitySelection,
+  entity?: Entity,
   isStock: boolean = false
 ): string {
   if (!tx || tx.lot.status === "Draft") {
@@ -95,7 +95,7 @@ function getStatusText(
 
 function getStatusClass(
   tx: Transaction | undefined,
-  entity?: EntitySelection,
+  entity?: Entity,
   isStock: boolean = false
 ): string {
   if (!tx || tx.lot.status === "Draft") {
@@ -123,7 +123,7 @@ function getStatusClass(
 type StatusProps = {
   stock?: boolean
   small?: boolean
-  entity?: EntitySelection
+  entity?: Entity
   transaction: Transaction | undefined
 }
 
@@ -146,7 +146,7 @@ type StatusTitleProps = {
   stock?: boolean
   editable?: boolean
   details?: LotDetails | null
-  entity?: EntitySelection
+  entity?: Entity
   children: React.ReactNode
 }
 

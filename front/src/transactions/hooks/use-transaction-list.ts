@@ -1,14 +1,14 @@
 import { useEffect } from "react"
 
 import { EntityType, Lots, TransactionQuery } from "common/types"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { YearSelection } from "transactions/hooks/query/use-year"
 
 import * as api from "../api"
 import useAPI from "common/hooks/use-api"
 import { useTranslation } from "react-i18next"
 
-function snapshotGetter(entity: EntitySelection) {
+function snapshotGetter(entity: Entity) {
   switch (entity?.entity_type) {
     case EntityType.Administration:
       return api.getAdminSnapshot
@@ -20,7 +20,7 @@ function snapshotGetter(entity: EntitySelection) {
 }
 
 // fetches current snapshot when parameters change
-export function useGetSnapshot(entity: EntitySelection, year: YearSelection) {
+export function useGetSnapshot(entity: Entity, year: YearSelection) {
   const { t } = useTranslation()
   const [snapshot, resolveSnapshot] = useAPI(snapshotGetter(entity))
 
@@ -44,7 +44,7 @@ export function useGetSnapshot(entity: EntitySelection, year: YearSelection) {
   return { ...snapshot, getSnapshot }
 }
 
-function lotsGetter(entity: EntitySelection) {
+function lotsGetter(entity: Entity) {
   switch (entity?.entity_type) {
     case EntityType.Administration:
       return api.getAdminLots
@@ -65,7 +65,7 @@ export interface LotGetter {
 
 // fetches current transaction list when parameters change
 export function useGetLots(
-  entity: EntitySelection,
+  entity: Entity,
   filters: TransactionQuery
 ): LotGetter {
   const [transactions, resolveLots] = useAPI(lotsGetter(entity))

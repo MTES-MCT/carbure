@@ -6,7 +6,7 @@ import { useNotificationContext } from "common/components/notifications"
 import * as api from "../api"
 import { Certificate } from "common/types"
 import useAPI from "common/hooks/use-api"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { ProductionSiteSettingsHook } from "./use-production-sites"
 import { find2BSCertificates } from "common/api"
 import { CompanySettingsHook } from "./use-company"
@@ -21,7 +21,7 @@ export interface DBSCertificateSettingsHook {
 }
 
 export default function use2BSCertificates(
-  entity: EntitySelection,
+  entity: Entity,
   productionSites: ProductionSiteSettingsHook,
   company: CompanySettingsHook
 ): DBSCertificateSettingsHook {
