@@ -543,12 +543,18 @@ def get_lots_errors(lots, entity_id):
     return data
 
 def get_lot_updates(lot, entity_id):
+    if lot is None:
+        return []
     return CarbureLotEventSerializer(lot.carburelotevent_set.all(), many=True).data
 
 def get_stock_events(lot, entity_id):
+    if lot is None:
+        return []
     return CarbureStockEventSerializer(lot.carburelotevent_set.all(), many=True).data
 
 def get_lot_comments(lot, entity_id):
+    if lot is None:
+        return []
     return CarbureLotCommentSerializer(lot.carburelotcomment_set.all(), many=True).data
 
 def get_transaction_distance(lot):

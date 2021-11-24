@@ -152,12 +152,10 @@ class CarbureStockPublicSerializer(serializers.ModelSerializer):
     initial_volume = serializers.SerializerMethodField()
     delivery_date = serializers.SerializerMethodField()
     period = serializers.SerializerMethodField()
-    #parent_lot = CarbureLotPublicSerializer(read_only=True)
-    parent_lot = None # defined later
 
     class Meta:
         model = CarbureStock
-        fields = ['id', 'parent_lot', 'parent_transformation', 'carbure_id', 'depot', 'carbure_client',
+        fields = ['id', 'carbure_id', 'depot', 'carbure_client',
                   'remaining_volume', 'remaining_weight', 'remaining_lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
                   'carbure_production_site', 'unknown_production_site', 'production_country', 'carbure_supplier', 'unknown_supplier',
                   'ghg_reduction', 'ghg_reduction_red_ii', 'initial_volume', 'delivery_date', 'period']
@@ -170,7 +168,24 @@ class CarbureStockPublicSerializer(serializers.ModelSerializer):
         return date.year * 100 + date.month
 
     def get_delivery_date(self, obj):
-        return obj.parent_lot.delivery_date if obj.parent_lot else obj.parent_transformation.transformation_dt
+        return obj.parent_lot.delivery_date if obj.parent_lot else obj.parent_transformation.transformation_dt.strftime('%Y-%m-%d')
+
+
+class CarbureStockTransformationPublicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CarbureStockTransformation
+        fields = [
+            'transformation_type',
+            'source_stock',
+            'dest_stock',
+            'volume_deducted_from_source',
+            'volume_destination',
+            'metadata',
+            'transformed_by',
+            'entity',
+            'transformation_dt',
+        ]
+
 
 class CarbureLotPublicSerializer(serializers.ModelSerializer):
     carbure_producer = EntitySerializer(read_only=True)
@@ -185,7 +200,6 @@ class CarbureLotPublicSerializer(serializers.ModelSerializer):
     feedstock = FeedStockSerializer(read_only=True)
     biofuel = BiofuelSerializer(read_only=True)
     country_of_origin = CountrySerializer(read_only=True)
-    parent_stock = CarbureStockPublicSerializer(read_only=True)
     added_by = EntitySerializer(read_only=True)
 
     class Meta:
@@ -197,13 +211,12 @@ class CarbureLotPublicSerializer(serializers.ModelSerializer):
                   'transport_document_type', 'transport_document_reference', 'carbure_client', 'unknown_client',
                   'dispatch_date', 'carbure_dispatch_site', 'unknown_dispatch_site', 'dispatch_site_country',
                   'delivery_date', 'carbure_delivery_site', 'unknown_delivery_site', 'delivery_site_country', 'delivery_type',
-                  'lot_status', 'correction_status', 'parent_stock',
+                  'lot_status', 'correction_status',
                   'volume', 'weight', 'lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
                   'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ghg_reference_red_ii', 'ghg_reduction_red_ii',
                   'free_field', 'added_by'
                   ]
 
-CarbureStockPublicSerializer.parent_lot = CarbureLotPublicSerializer(read_only=True)
 
 class CarbureLotAdminSerializer(CarbureLotPublicSerializer):
     class Meta:
@@ -215,7 +228,7 @@ class CarbureLotAdminSerializer(CarbureLotPublicSerializer):
                   'transport_document_type', 'transport_document_reference', 'carbure_client', 'unknown_client',
                   'dispatch_date', 'carbure_dispatch_site', 'unknown_dispatch_site', 'dispatch_site_country',
                   'delivery_date', 'carbure_delivery_site', 'unknown_delivery_site', 'delivery_site_country', 'delivery_type',
-                  'lot_status', 'correction_status', 'parent_stock',
+                  'lot_status', 'correction_status',
                   'volume', 'weight', 'lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
                   'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ghg_reference_red_ii', 'ghg_reduction_red_ii',
                   'free_field', 'added_by', 'highlighted_by_auditor', 'highlighted_by_admin'
