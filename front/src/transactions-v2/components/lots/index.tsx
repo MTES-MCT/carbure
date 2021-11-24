@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
+import { Route, Routes, useNavigate, useLocation } from "react-router-dom"
 import * as api from "../../api"
 import { Entity } from "carbure/types"
 import { Lot, Snapshot, FilterSelection, Status, LotQuery } from "../../types"
@@ -16,6 +16,8 @@ import { LotActions } from "./lot-actions"
 import { DeadlineSwitch, InvalidSwitch } from "../switches"
 import { LotSummaryBar } from "./lot-summary"
 import SearchBar from "../search-bar"
+import LotAdd from "lot-add"
+import LotDetails from "lot-details"
 
 export interface LotsProps {
   entity: Entity
@@ -87,6 +89,7 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
 
   const lotsData = lots.result?.data.data
   const lotList = lotsData?.lots ?? []
+  const ids = lotsData?.ids ?? EMPTY
   const lotErrors = lotsData?.errors ?? {}
   const count = lotsData?.returned ?? 0
   const total = lotsData?.total ?? 0
@@ -168,6 +171,11 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
           </>
         )}
       </section>
+
+      <Routes>
+        <Route path="drafts/add" element={<LotAdd />} />
+        <Route path=":status/:id" element={<LotDetails neighbors={ids} />} />
+      </Routes>
     </>
   )
 }

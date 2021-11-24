@@ -1,13 +1,14 @@
 import { useNavigate, useLocation, useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import * as api from "./api"
+import { CorrectionStatus, Lot, LotStatus } from "transactions-v2/types"
 import { useQuery } from "common-v2/hooks/async"
 import { useStatus } from "transactions-v2/components/status"
 import useEntity from "carbure/hooks/entity"
 import { LoaderOverlay } from "common-v2/components/scaffold"
 import Dialog from "common-v2/components/dialog"
 import Button from "common-v2/components/button"
-import { Return, Save } from "common-v2/components/icons"
+import { Alarm, Return, Save } from "common-v2/components/icons"
 import LotForm from "lot-add/components/lot-form"
 import LotTag from "transactions-v2/components/lots/lot-tag"
 import Comments from "./components/comments"
@@ -16,8 +17,16 @@ import {
   separateAnomalies,
   WarningAnomalies,
 } from "./components/anomalies"
+import { getLotUpdates, History } from "./components/history"
+import { isExpiring } from "common-v2/utils/deadline"
+import Alert from "common-v2/components/alert"
+import NavigationButtons from "./components/navigation"
 
-export const LotDetails = () => {
+export interface LotDetailsProps {
+  neighbors: number[]
+}
+
+export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const { t } = useTranslation()
 
   const navigate = useNavigate()
@@ -33,8 +42,12 @@ export const LotDetails = () => {
   })
 
   const lotData = lot.result?.data.data
+  const editable = isEditable(lotData?.lot)
   const comments = lotData?.comments ?? []
+  const updates = getLotUpdates(lotData?.updates)
   const [errors, warnings] = separateAnomalies(lotData?.errors ?? [])
+
+  const expiring = isExpiring(lotData?.lot)
 
   const closeDialog = () =>
     navigate({
@@ -53,7 +66,12 @@ export const LotDetails = () => {
 
       <main>
         <section>
-          <LotForm lot={lotData?.lot} onSubmit={(form) => console.log(form)} />
+          <LotForm
+            readOnly={!editable}
+            lot={lotData?.lot}
+            errors={errors}
+            onSubmit={(form) => console.log(form)}
+          />
         </section>
 
         {errors.length > 0 && (
@@ -73,20 +91,46 @@ export const LotDetails = () => {
             <Comments comments={comments} />
           </section>
         )}
+
+        {updates.length > 0 && (
+          <section>
+            <History updates={updates} />
+          </section>
+        )}
       </main>
 
       <footer>
-        <Button
-          variant="primary"
-          icon={Save}
-          submit="lot-form"
-          label={t("Sauvegarder")}
-        />
-        <Button asideX icon={Return} label={t("Retour")} action={closeDialog} />
+        {editable && (
+          <Button
+            variant="primary"
+            icon={Save}
+            submit="lot-form"
+            label={t("Sauvegarder")}
+          />
+        )}
+        {expiring && (
+          <Alert
+            icon={Alarm}
+            variant="warning"
+            label={t("À valider avant la fin du mois")}
+          />
+        )}
+
+        <NavigationButtons neighbors={neighbors} root={`../${status}`} />
+        <Button icon={Return} label={t("Retour")} action={closeDialog} />
       </footer>
 
       {lot.loading && <LoaderOverlay />}
     </Dialog>
+  )
+}
+
+function isEditable(lot: Lot | undefined) {
+  if (lot === undefined) return false
+
+  return (
+    [LotStatus.Draft, LotStatus.Rejected].includes(lot.lot_status) ||
+    lot.correction_status === CorrectionStatus.InCorrection
   )
 }
 

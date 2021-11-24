@@ -72,6 +72,7 @@ export interface LotList {
   total_errors: number
   total_deadline: number
   errors: Record<number, LotError[]>
+  ids: number[]
 }
 
 export interface Stock {
@@ -102,6 +103,7 @@ export interface StockList {
   total: number
   returned: number
   from: number
+  ids: number[]
 }
 
 export interface Snapshot {

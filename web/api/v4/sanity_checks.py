@@ -172,7 +172,7 @@ def sanity_check(lot, prefetched_data):
         errors.append(generic_error(error='GHG_EP_0', lot=lot, is_blocking=True, field='ep'))
     if lot.el < 0:
         errors.append(generic_error(error='GHG_EL_NEG', lot=lot, field='el'))
-        
+
     commissioning_date = lot.production_site_commissioning_date
     if commissioning_date and isinstance(commissioning_date, datetime.datetime) or isinstance(commissioning_date, datetime.date):
         if commissioning_date > oct2015 and lot.ghg_reduction < 60:

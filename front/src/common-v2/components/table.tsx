@@ -187,16 +187,25 @@ export interface Column<T> {
 
 export type OrderBy<T> = (value: T) => string | number
 
+export type CellVariant = "warning"
 export interface CellProps {
-  text: string | number
-  sub?: string | number
+  variant?: CellVariant
+  icon?: React.FunctionComponent | React.ReactNode
+  text?: any
+  sub?: any
 }
 
-export const Cell = ({ text, sub }: any) => (
-  <Col>
-    <strong title={text}>{text || sub}</strong>
-    {text && sub !== undefined && <small title={sub}>{sub}</small>}
-  </Col>
-)
+export const Cell = ({ variant, icon: Icon, text, sub }: CellProps) => {
+  const icon = typeof Icon === "function" ? <Icon /> : Icon
+
+  return (
+    <Col className={cl(variant && css[variant])}>
+      <strong title={`${text}`}>
+        {text || sub} {icon}
+      </strong>
+      {text && sub !== undefined && <small title={`${sub}`}>{sub}</small>}
+    </Col>
+  )
+}
 
 export default Table

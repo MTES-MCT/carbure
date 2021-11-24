@@ -32,9 +32,14 @@ stock_sort_key_to_django_field = {'feedstock': 'feedstock__name',
                                   'volume': 'remaining_volume',
                                   'country_of_origin': 'country_of_origin__name'}
 
+
 def get_entity_stock(entity_id):
-    stock = CarbureStock.objects.filter(carbure_client_id=entity_id)
-    return stock
+    return CarbureStock.objects.filter(carbure_client_id=entity_id) \
+        .select_related('parent_lot', 'parent_transformation',
+                        'biofuel', 'feedstock', 'country_of_origin',
+                        'depot', 'depot__country',
+                        'carbure_production_site', 'carbure_production_site__country', 'production_country',
+                        'carbure_client', 'carbure_supplier')
 
 
 def get_entity_lots_by_status(entity_id, status):
@@ -91,6 +96,7 @@ def get_lots_with_metadata(lots, entity_id, querySet, is_admin=False):
     data['total_errors'] = total_errors
     data['total_deadline'] = total_deadline
     data['errors'] = get_lots_errors(returned, entity_id)
+    data['ids'] = list(lots.values_list('id', flat=True))
 
     if not export:
         return JsonResponse({'status': 'success', 'data': data})
@@ -159,8 +165,7 @@ def get_lots_with_errors(lots, entity_id, will_aggregate=False):
 def get_lots_with_deadline(lots, deadline=get_current_deadline()):
     affected_date = deadline - relativedelta(months=1)
     period = affected_date.year * 100 + affected_date.month
-    lots_with_deadline = lots.filter(lot_status=CarbureLot.DRAFT, period=period)
-    return lots_with_deadline
+    return lots.filter(period=period, lot_status__in=[CarbureLot.DRAFT, CarbureLot.REJECTED, CarbureLot.PENDING])
 
 
 def filter_lots(lots, querySet, entity_id=None, will_aggregate=False, blacklist=[]):
@@ -385,7 +390,7 @@ def get_stock_filters_data(stock, querySet, entity_id, field):
 
     if field == 'depots':
         depots = Depot.objects.filter(id__in=stock.values('depot__id').distinct()).values('name', 'depot_id')
-        return normalize_filter(depots, 'depot_id', 'name')
+        return normalize_filter(depots, 'name')
 
     if field == 'suppliers':
         suppliers = []
@@ -430,6 +435,7 @@ def get_stock_with_metadata(stock, entity_id, querySet, is_admin=False):
     data['total'] = stock.count()
     data['returned'] = returned.count()
     data['from'] = from_idx
+    data['ids'] = list(stock.values_list('id', flat=True))
 
     if not export:
         return JsonResponse({'status': 'success', 'data': data})
@@ -451,6 +457,7 @@ def filter_stock(stock, querySet, entity_id=None, blacklist=[]):
     countries_of_origin = querySet.getlist('countries_of_origin')
     biofuels = querySet.getlist('biofuels')
     suppliers = querySet.getlist('suppliers')
+    production_sites = querySet.getlist('production_sites')
     query = querySet.get('query', False)
     selection = querySet.getlist('selection')
     history = querySet.get('history', False)
@@ -470,9 +477,11 @@ def filter_stock(stock, querySet, entity_id=None, blacklist=[]):
     if len(countries_of_origin) > 0 and 'countries_of_origin' not in blacklist:
         stock = stock.filter(country_of_origin__code_pays__in=countries_of_origin)
     if len(depots) > 0 and 'depots' not in blacklist:
-        stock = stock.filter(depot__in=depots)
+        stock = stock.filter(depot__name__in=depots)
     if len(suppliers) > 0 and 'suppliers' not in blacklist:
         stock = stock.filter(Q(carbure_supplier__name__in=suppliers) | Q(unknown_supplier__in=suppliers))
+    if len(production_sites) > 0 and 'production_sites' not in blacklist:
+        stock = stock.filter(Q(carbure_production_site__name__in=production_sites) | Q(unknown_production_site__in=production_sites))
     if query and 'query' not in blacklist:
         stock = stock.filter(
             Q(feedstock__name__icontains=query) |
