@@ -1,5 +1,4 @@
 import { EntityManager } from "carbure/hooks/entity"
-import { SettingsGetter } from "./use-get-settings"
 
 import * as api from "../api"
 import useAPI from "common/hooks/use-api"
@@ -28,10 +27,7 @@ export interface CompanySettingsHook {
   refresh: () => void
 }
 
-export default function useCompany(
-  entity: EntityManager,
-  settings: SettingsGetter
-): CompanySettingsHook {
+export default function useCompany(entity: EntityManager): CompanySettingsHook {
   const hasMAC: boolean = entity.has_mac ?? false
   const hasTrading: boolean = entity.has_trading ?? false
 
@@ -47,10 +43,9 @@ export default function useCompany(
     if (entityID >= 0) {
       findCertificates("", entityID)
     }
-  }, [findCertificates, entityID, settings])
+  }, [findCertificates, entityID])
 
   const isLoading =
-    settings.loading ||
     certificates.loading ||
     requestMAC.loading ||
     requestTrading.loading ||

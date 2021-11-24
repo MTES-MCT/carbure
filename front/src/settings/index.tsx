@@ -27,31 +27,7 @@ import { UserRole } from "common/types"
 import DoubleCountingSettings from "./components/double-counting"
 import useEntity from "carbure/hooks/entity"
 
-function useSettings(entity: EntityManager, settings: SettingsGetter) {
-  const company = useCompany(entity, settings)
-  const productionSites = useProductionSites(entity)
-  const deliverySites = useDeliverySites(entity)
-  const dbsCertificates = use2BSCertificates(entity, productionSites, company)
-  const isccCertificates = useISCCCertificates(entity, productionSites, company)
-  const redcertCertificates = useREDCertCertificates(entity, productionSites, company) // prettier-ignore
-  const nationalSystemCertificates = useNationalSystemCertificates(entity, productionSites, company) // prettier-ignore
-
-  return {
-    productionSites,
-    deliverySites,
-    dbsCertificates,
-    isccCertificates,
-    redcertCertificates,
-    nationalSystemCertificates,
-    company,
-  }
-}
-
-type SettingsProps = {
-  settings: SettingsGetter
-}
-
-const Settings = ({ settings }: SettingsProps) => {
+const Settings = () => {
   const entity = useEntity()
 
   const {
@@ -62,7 +38,7 @@ const Settings = ({ settings }: SettingsProps) => {
     isccCertificates,
     redcertCertificates,
     nationalSystemCertificates,
-  } = useSettings(entity, settings)
+  } = useSettings(entity)
 
   const { isProducer, isTrader, isOperator } = entity
 
@@ -151,11 +127,30 @@ const Settings = ({ settings }: SettingsProps) => {
           <SNCertificateSettings settings={nationalSystemCertificates} />
         )}
 
-        {entity.hasRights(UserRole.Admin) && (
-          <UserRights entity={entity} settings={settings} />
-        )}
+        {entity.hasRights(UserRole.Admin) && <UserRights entity={entity} />}
       </SettingsBody>
     </Main>
   )
 }
+
+function useSettings(entity: EntityManager) {
+  const company = useCompany(entity)
+  const productionSites = useProductionSites(entity)
+  const deliverySites = useDeliverySites(entity)
+  const dbsCertificates = use2BSCertificates(entity, productionSites, company)
+  const isccCertificates = useISCCCertificates(entity, productionSites, company)
+  const redcertCertificates = useREDCertCertificates(entity, productionSites, company) // prettier-ignore
+  const nationalSystemCertificates = useNationalSystemCertificates(entity, productionSites, company) // prettier-ignore
+
+  return {
+    productionSites,
+    deliverySites,
+    dbsCertificates,
+    isccCertificates,
+    redcertCertificates,
+    nationalSystemCertificates,
+    company,
+  }
+}
+
 export default Settings
