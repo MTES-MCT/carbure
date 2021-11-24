@@ -36,7 +36,7 @@ import { StatusTitle } from "../components/status"
 import Comments from "../components/form-comments"
 import ValidationErrors from "../components/form-errors"
 import TransactionHistory from "../components/history"
-import { useRights } from "carbure/hooks/use-rights"
+import { useRights } from "carbure/hooks/entity"
 import { LotAuditor } from "transactions/hooks/actions/use-audits"
 import { useMatomo } from "matomo"
 

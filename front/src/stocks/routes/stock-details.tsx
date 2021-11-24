@@ -28,7 +28,7 @@ import TransactionForm from "transactions/components/form"
 import ValidationErrors from "transactions/components/form-errors"
 import { StatusTitle } from "transactions/components/status"
 import Comments from "transactions/components/form-comments"
-import { useRights } from "carbure/hooks/use-rights"
+import { useRights } from "carbure/hooks/entity"
 import { Trans } from "react-i18next"
 import useNavigation from "transactions/hooks/query/use-navigate"
 

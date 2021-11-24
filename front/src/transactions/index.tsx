@@ -31,7 +31,7 @@ import TransactionAdd from "./routes/transaction-add"
 import TransactionDetails from "./routes/transaction-details"
 import useForwardLots from "./hooks/actions/use-forward-lots"
 import useTransactionQuery from "./hooks/query/use-transaction-query"
-import { useRights } from "carbure/hooks/use-rights"
+import { useRights } from "carbure/hooks/entity"
 import useAdministrateLots from "./hooks/actions/use-admin-lots"
 
 const OPERATOR_STATUSES = [

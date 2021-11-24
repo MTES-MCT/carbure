@@ -6,7 +6,6 @@ import { configure } from "@testing-library/dom"
 import { initReactI18next } from "react-i18next"
 import { LoaderOverlay } from "common/components"
 import { MemoryRouter, Routes } from "react-router"
-import { UserRightProvider } from "carbure/hooks/use-rights"
 
 import translation from "../public/locales/fr/translation.json"
 import errors from "../public/locales/fr/errors.json"
@@ -83,9 +82,7 @@ export const TestRoot = ({ url, children }: TestRootProps) => {
     <MemoryRouter initialEntries={[url]}>
       <Suspense fallback={<LoaderOverlay />}>
         <UserContext.Provider value={user}>
-          <UserRightProvider user={user}>
-            <Routes>{element}</Routes>
-          </UserRightProvider>
+          <Routes>{element}</Routes>
         </UserContext.Provider>
       </Suspense>
     </MemoryRouter>

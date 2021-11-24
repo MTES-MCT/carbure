@@ -1,4 +1,3 @@
-import { createContext } from "react"
 import { useMatch } from "react-router-dom"
 import { Entity, EntityType, ExternalAdminPages, UserRole } from "../types"
 import { useUserContext } from "./user"
@@ -45,10 +44,18 @@ export function useEntity(): EntityManager {
       entity?.ext_admin_pages?.includes(page) ?? false,
 
     hasRights: (...roles: UserRole[]) =>
-      Boolean(entityRights) && roles.includes(entityRights!.role),
+      (entityRights && roles.includes(entityRights.role)) ?? false,
   }
 }
 
-export const EntityContext = createContext<Entity | undefined>(undefined)
+export function useRights() {
+  const entity = useEntity()
+
+  function is(...roles: UserRole[]) {
+    return entity.hasRights(...roles)
+  }
+
+  return { is }
+}
 
 export default useEntity

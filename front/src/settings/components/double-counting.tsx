@@ -13,7 +13,7 @@ import {
 } from "doublecount/types"
 import { Title, LoaderOverlay, Box } from "common/components"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
-import { useRights } from "carbure/hooks/use-rights"
+import { useRights } from "carbure/hooks/entity"
 import Table, {
   Line,
   TwoLines,

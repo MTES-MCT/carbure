@@ -6,12 +6,11 @@ import { SortingSelection } from "transactions/hooks/query/use-sort-by" // prett
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { StatusSelection } from "transactions/hooks/query/use-status"
 
-
 import Table, { Actions, arrow, Row } from "common/components/table"
 import * as C from "transactions/components/list-columns"
 import { Edit } from "common/components/icons"
 import { LotSender } from "stocks/hooks/use-send-lots"
-import { useRights } from "carbure/hooks/use-rights"
+import { useRights } from "carbure/hooks/entity"
 
 type StockTableProps = {
   stock: Lots | null
