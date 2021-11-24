@@ -151,6 +151,7 @@ class CarbureStockPublicSerializer(serializers.ModelSerializer):
     carbure_supplier = EntitySerializer(read_only=True)
     initial_volume = serializers.SerializerMethodField()
     delivery_date = serializers.SerializerMethodField()
+    period = serializers.SerializerMethodField()
     #parent_lot = CarbureLotPublicSerializer(read_only=True)
     parent_lot = None # defined later
 
@@ -159,10 +160,14 @@ class CarbureStockPublicSerializer(serializers.ModelSerializer):
         fields = ['id', 'parent_lot', 'parent_transformation', 'carbure_id', 'depot', 'carbure_client',
                   'remaining_volume', 'remaining_weight', 'remaining_lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
                   'carbure_production_site', 'unknown_production_site', 'production_country', 'carbure_supplier', 'unknown_supplier',
-                  'ghg_reduction', 'ghg_reduction_red_ii', 'initial_volume', 'delivery_date']
+                  'ghg_reduction', 'ghg_reduction_red_ii', 'initial_volume', 'delivery_date', 'period']
 
     def get_initial_volume(self, obj):
         return obj.parent_lot.volume if obj.parent_lot else obj.parent_transformation.volume_destination
+
+    def get_period(self, obj):
+        date = obj.parent_lot.delivery_date if obj.parent_lot else obj.parent_transformation.transformation_dt
+        return date.year * 100 + date.month
 
     def get_delivery_date(self, obj):
         return obj.parent_lot.delivery_date if obj.parent_lot else obj.parent_transformation.transformation_dt

@@ -56,12 +56,6 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
       </main>
 
       <footer>
-        <Button
-          variant="primary"
-          icon={Save}
-          submit="stock-form"
-          label={t("Sauvegarder")}
-        />
         <NavigationButtons neighbors={neighbors} root=".." />
         <Button icon={Return} label={t("Retour")} action={closeDialog} />
       </footer>
