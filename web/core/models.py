@@ -892,6 +892,45 @@ class CarbureLot(models.Model):
     def get_lhv_amount(self):
         return self.volume * self.biofuel.pci_litre
 
+    def generate_carbure_id(self):
+        pass
+
+    def copy_production_details(self, other):
+        self.carbure_producer = other.carbure_producer
+        self.unknown_producer = other.unknown_producer
+        self.carbure_production_site = other.carbure_production_site
+        self.unknown_production_site = other.unknown_production_site
+        self.production_country = other.production_country
+        self.production_site_commissioning_date = other.production_site_commissioning_date
+        self.production_site_certificate = other.production_site_certificate
+        self.production_site_certificate_type = other.production_site_certificate_type
+        self.production_site_double_counting_certificate = other.production_site_double_counting_certificate
+
+    def update_ghg(self):
+        self.ghg_total = round(self.eec + self.el + self.ep + self.etd + self.eu - self.esca - self.eccs - self.eccr - self.eee, 2)
+        self.ghg_reference = 83.8
+        self.ghg_reduction = round((1.0 - (self.ghg_total / self.ghg_reference)) * 100.0, 2)
+        self.ghg_reference_red_ii = 94.0
+        self.ghg_reduction_red_ii = round((1.0 - (self.ghg_total / self.ghg_reference_red_ii)) * 100.0, 2)
+
+    def update_sustainability_data(self, other):
+        self.biofuel = other.biofuel
+        self.country_of_origin = other.country_of_origin
+        self.eec = other.eec
+        self.el = other.el
+        self.ep = other.ep
+        self.etd = other.etd
+        self.eu = other.eu
+        self.esca = other.esca
+        self.eccs = other.eccs
+        self.eccr = other.eccr
+        self.eee = other.eee
+        self.ghg_total = other.ghg_total
+        self.ghg_reference = other.ghg_reference
+        self.ghg_reduction = other.ghg_reduction
+        self.ghg_reference_red_ii = other.ghg_reference_red_ii
+        self.ghg_reduction_red_ii = other.ghg_reduction_red_ii
+
 class CarbureStockTransformation(models.Model):
     UNKNOWN = "UNKNOWN"
     ETH_ETBE = "ETH_ETBE"
@@ -981,6 +1020,12 @@ class CarbureStock(models.Model):
 
     def get_lhv_amount(self):
         return self.remaining_volume * self.biofuel.pci_litre
+
+    def get_parent_lot(self):
+        if self.parent_transformation:
+            return self.parent_transformation.source_stock.get_parent_lot()
+        else:
+            return self.parent_lot
 
 
 class CarbureLotEvent(models.Model):
