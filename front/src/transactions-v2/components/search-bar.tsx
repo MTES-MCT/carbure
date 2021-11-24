@@ -1,4 +1,3 @@
-import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { Snapshot } from "../types"
 import { formatNumber } from "common-v2/utils/formatters"

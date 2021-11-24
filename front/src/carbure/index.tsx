@@ -48,10 +48,6 @@ const Org = ({ app }: { app: AppHook }) => {
     return <Exit to="/accounts/login" />
   }
 
-  if (user.loading) {
-    return <LoaderOverlay />
-  }
-
   const { isAdmin } = entity
 
   return (
@@ -72,6 +68,8 @@ const Org = ({ app }: { app: AppHook }) => {
 
         <Route path="*" element={<Navigate to="transactions-v2" />} />
       </Routes>
+
+      {user.loading && <LoaderOverlay />}
     </UserRightProvider>
   )
 }

@@ -1,5 +1,5 @@
 import { Trans } from "react-i18next"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { EntityManager } from "carbure/hooks/entity"
 import { SettingsGetter } from "./hooks/use-get-settings"
 
 import use2BSCertificates from "./hooks/use-2bs-certificates"
@@ -23,12 +23,11 @@ import CompanySettings from "./components/company"
 import Sticky from "common/components/sticky"
 import useREDCertCertificates from "./hooks/use-redcert-certificates"
 import UserRights from "./components/user-rights"
-import { useRights } from "carbure/hooks/use-rights"
-import { EntityType, UserRole } from "common/types"
+import { UserRole } from "common/types"
 import DoubleCountingSettings from "./components/double-counting"
 import useEntity from "carbure/hooks/entity"
 
-function useSettings(entity: EntitySelection, settings: SettingsGetter) {
+function useSettings(entity: EntityManager, settings: SettingsGetter) {
   const company = useCompany(entity, settings)
   const productionSites = useProductionSites(entity)
   const deliverySites = useDeliverySites(entity)
@@ -65,11 +64,7 @@ const Settings = ({ settings }: SettingsProps) => {
     nationalSystemCertificates,
   } = useSettings(entity, settings)
 
-  const rights = useRights()
-
-  const isProducer = entity?.entity_type === EntityType.Producer
-  const isTrader = entity?.entity_type === EntityType.Trader
-  const isOperator = entity?.entity_type === EntityType.Operator
+  const { isProducer, isTrader, isOperator } = entity
 
   const hasCertificates = isProducer || isTrader
   const hasCSN = isProducer || isOperator
@@ -123,7 +118,7 @@ const Settings = ({ settings }: SettingsProps) => {
             <Trans>Système National</Trans>
           </a>
         )}
-        {rights.is(UserRole.Admin) && (
+        {entity.hasRights(UserRole.Admin) && (
           <a href="#users">
             <Trans>Utilisateurs</Trans>
           </a>
@@ -156,7 +151,7 @@ const Settings = ({ settings }: SettingsProps) => {
           <SNCertificateSettings settings={nationalSystemCertificates} />
         )}
 
-        {rights.is(UserRole.Admin) && (
+        {entity.hasRights(UserRole.Admin) && (
           <UserRights entity={entity} settings={settings} />
         )}
       </SettingsBody>

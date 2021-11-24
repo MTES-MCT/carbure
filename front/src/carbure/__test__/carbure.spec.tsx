@@ -8,6 +8,7 @@ import server from "./api"
 import { MemoryRouter } from "react-router"
 import { Suspense } from "react"
 import { LoaderOverlay } from "common/components"
+import { waitWhileLoading } from "common/__test__/helpers"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 afterEach(() => {
@@ -29,6 +30,8 @@ test("display alert message when connected without access rights", async () => {
   server.use(okEmptySettings)
 
   render(<CarbureWithRouter />)
+
+  await waitWhileLoading()
 
   const link = screen.getAllByText("Lier le compte à des sociétés")
   userEvent.click(link[0].closest("a")!)
@@ -55,14 +58,15 @@ test("display alert message when connected without access rights", async () => {
 test("pick an entity from the menu", async () => {
   render(<CarbureWithRouter />)
 
-  const menu = await screen.findByText("Menu")
+  await waitWhileLoading()
+
+  const menu = screen.getByText("Menu")
 
   userEvent.click(menu)
 
   const producer = await screen.findByText("Producteur Test")
   userEvent.click(producer)
 
-  screen.getByText("Stocks", { selector: "a" })
   screen.getByText("Transactions", { selector: "a" })
   screen.getByText("Société", { selector: "a" })
 
@@ -71,7 +75,7 @@ test("pick an entity from the menu", async () => {
   const operator = await screen.findByText("Opérateur Test")
   userEvent.click(operator)
 
-  // await screen.findByTitle("Chargement...")
+  await waitWhileLoading()
 
   expect(menu.textContent).toBe("Opérateur Test")
 

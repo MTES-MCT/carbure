@@ -6,6 +6,7 @@ import {
   formatNumber,
   formatPeriod,
 } from "common-v2/utils/formatters"
+import { isExpiring } from "common-v2/utils/deadline"
 import Table, {
   Cell,
   Order,
@@ -13,6 +14,7 @@ import Table, {
   markerColumn,
   selectionColumn,
 } from "common-v2/components/table"
+import { Alarm } from "common-v2/components/icons"
 import { SendOneButton } from "transactions-v2/actions/send"
 import LotTag from "./lot-tag"
 
@@ -56,12 +58,7 @@ export const LotTable = memo(
           {
             key: "period",
             header: t("Période"),
-            cell: (lot) => (
-              <Cell
-                text={formatPeriod(lot.period)}
-                sub={formatDate(lot.delivery_date)}
-              />
-            ),
+            cell: (lot) => <PeriodCell lot={lot} />,
           },
           {
             header: t("N° Document"),
@@ -135,6 +132,22 @@ export const LotTable = memo(
     )
   }
 )
+
+interface PeriodCellProps {
+  lot: Lot
+}
+
+export const PeriodCell = ({ lot }: PeriodCellProps) => {
+  const expiring = isExpiring(lot)
+  return (
+    <Cell
+      icon={expiring ? Alarm : undefined}
+      variant={expiring ? "warning" : undefined}
+      text={formatPeriod(lot.period)}
+      sub={formatDate(lot.delivery_date)}
+    />
+  )
+}
 
 const getLotMarker = (lot: Lot, errors: Record<number, LotError[]>) => {
   if (!errors[lot.id]) {

@@ -32,6 +32,7 @@ class GenericErrorSerializer(serializers.ModelSerializer):
         fields = ['error', 'is_blocking', 'field', 'value', 'extra', 'fields']
 
 class CarbureLotEventSerializer(serializers.ModelSerializer):
+    user = serializers.SlugRelatedField(read_only=True, slug_field='email')
     class Meta:
         model = CarbureLotEvent
         fields = ['user', 'event_type', 'event_dt', 'metadata']

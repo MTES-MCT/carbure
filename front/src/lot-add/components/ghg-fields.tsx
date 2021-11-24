@@ -5,7 +5,11 @@ import { NumberInput, TextInput } from "common-v2/components/input"
 import { LotFormValue } from "./lot-form"
 import { formatPercentage, formatGHG } from "common-v2/utils/formatters"
 
-export const EmissionFields = () => {
+interface GHGFieldsProps {
+  readOnly?: boolean
+}
+
+export const EmissionFields = (props: GHGFieldsProps) => {
   const { t } = useTranslation()
   const { bind, value } = useFormContext<LotFormValue>()
 
@@ -15,26 +19,31 @@ export const EmissionFields = () => {
         label="EEC"
         title={t("Émissions résultant de l'extraction ou de la culture des matières premières")} // prettier-ignore
         {...bind("eec")}
+        {...props}
       />
       <NumberInput
         label="EL"
         title={t("Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l'affectation des sols")} // prettier-ignore
         {...bind("el")}
+        {...props}
       />
       <NumberInput
         label="EP"
         title={t("Émissions résultant dela transformation")}
         {...bind("ep")}
+        {...props}
       />
       <NumberInput
         label="ETD"
         title={t("Émissions résultant du transport et de la distribution")}
         {...bind("etd")}
+        {...props}
       />
       <NumberInput
         label="EU"
         title={t("Émissions résultant du carburant à l'usage")}
         {...bind("eu")}
+        {...props}
       />
 
       <TextInput
@@ -49,7 +58,7 @@ export const EmissionFields = () => {
 // date where RED II took effect
 const JULY_FIRST_21 = new Date("2021-07-01")
 
-export const ReductionFields = () => {
+export const ReductionFields = (props: GHGFieldsProps) => {
   const { t } = useTranslation()
   const { bind, value } = useFormContext<LotFormValue>()
 
@@ -62,21 +71,25 @@ export const ReductionFields = () => {
         label="ESCA"
         title={t("Réductions d'émissions dues à l'accumulation du carbone dans les sols grâce à une meilleure gestion agricole")} // prettier-ignore
         {...bind("esca")}
+        {...props}
       />
       <NumberInput
         label="EL"
         title={t("Réductions d'émissions dues au piégeage et au stockage géologique du carbone")} // prettier-ignore
         {...bind("eccs")}
+        {...props}
       />
       <NumberInput
         label="EP"
         title={t("Réductions d'émissions dues au piégeage et à la substitution du carbone")} // prettier-ignore
         {...bind("eccr")}
+        {...props}
       />
       <NumberInput
         label="EEE"
         title={t("Réductions d'émissions dues à la production excédentaire d'électricité dans le cadre de la cogénération")} // prettier-ignore
         {...bind("eee")}
+        {...props}
       />
 
       <TextInput

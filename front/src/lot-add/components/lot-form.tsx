@@ -1,5 +1,5 @@
-import { Lot } from "transactions-v2/types"
-import Form, { useForm } from "common-v2/components/form"
+import { Lot, LotError } from "transactions-v2/types"
+import Form, { FormErrors, useForm } from "common-v2/components/form"
 import LotFields from "./lot-fields"
 import ProductionFields from "./production-fields"
 import DeliveryFields from "./delivery-fields"
@@ -13,38 +13,61 @@ import {
   Feedstock,
   ProductionSite,
 } from "common/types"
+import { useTranslation } from "react-i18next"
 
 export interface LotFormProps {
   lot?: Lot
+  errors?: LotError[]
+  readOnly?: boolean
   onSubmit?: (value?: LotFormValue) => void
 }
 
-export const LotForm = ({ lot, onSubmit }: LotFormProps) => {
+export const LotForm = ({ lot, errors, onSubmit, ...props }: LotFormProps) => {
   const value = useMemo(() => lotToFormValue(lot), [lot])
-  const form = useLotForm(value)
+  const form = useLotForm(value, errors)
 
-  const setValue = form.setValue
+  const { setValue } = form
   useEffect(() => {
     setValue(value)
   }, [value, setValue])
 
   return (
     <Form id="lot-form" variant="columns" form={form} onSubmit={onSubmit}>
-      <LotFields />
-      <ProductionFields />
-      <DeliveryFields />
-      <EmissionFields />
-      <ReductionFields />
+      <LotFields {...props} />
+      <ProductionFields {...props} />
+      <DeliveryFields {...props} />
+      <EmissionFields {...props} />
+      <ReductionFields {...props} />
     </Form>
   )
 }
 
-export function useLotForm(initialValue: LotFormValue = defaultLot) {
-  return useForm(initialValue)
+export function useLotForm(
+  initialValue: LotFormValue = defaultLot,
+  lotErrors: LotError[] = []
+) {
+  const errors = useLotFieldErrors(lotErrors)
+  return useForm(initialValue, { errors })
+}
+
+export function useLotFieldErrors(
+  errors: LotError[]
+): FormErrors<LotFormValue> {
+  const { t } = useTranslation()
+  const fieldErrors: { [k: string]: string } = {}
+
+  errors.forEach((err) =>
+    (errorsToFields[err.error] ?? []).forEach((field) => {
+      const all = [fieldErrors[field], t(err.error, { ns: "errors" })]
+      fieldErrors[field] = all.filter(Boolean).join(", ")
+    })
+  )
+
+  return fieldErrors
 }
 
 export const defaultLot = {
-  // save the whole Lot data so we can access it in the form fields
+  // save the whole Lot data so we can access it in the form (errorsToFields[err.error] ?? [])
   lot: undefined as Lot | undefined,
 
   transport_document_reference: undefined as string | undefined,
@@ -126,5 +149,67 @@ export const lotToFormValue: (lot: Lot | undefined) => LotFormValue = (lot) => (
   ghg_reduction: lot?.ghg_reduction ?? undefined,
   ghg_reduction_red_ii: lot?.ghg_reduction_red_ii ?? undefined,
 })
+
+// prettier-ignore
+const errorsToFields: Record<string, (keyof LotFormValue)[]> = {
+  BC_NOT_CONFIGURED: ["biofuel"],
+  DEPRECATED_MP: ["feedstock"],
+  GHG_EEC_0: ["eec"],
+  GHG_EP_0: ["ep"],
+  GHG_ETD_0: ["etd"],
+  GHG_REDUC_INF_50: ["ghg_reduction", "ghg_reduction_red_ii"],
+  GHG_REDUC_INF_60: ["ghg_reduction", "ghg_reduction_red_ii"],
+  GHG_REDUC_INF_65: ["ghg_reduction", "ghg_reduction_red_ii"],
+  GHG_REDUC_SUP_100: ["ghg_reduction", "ghg_reduction_red_ii"],
+  GHG_REDUC_SUP_99: ["ghg_reduction", "ghg_reduction_red_ii"],
+  INCORRECT_DELIVERY_DATE: ["delivery_date"],
+  INCORRECT_DELIVERY_SITE_COUNTRY: ["delivery_site_country"],
+  INCORRECT_FORMAT_DELIVERY_DATE: ['delivery_date'],
+  MAC_BC_WRONG: ['biofuel'],
+  MISSING_BIOFUEL: ['biofuel'],
+  MISSING_CARBURE_CLIENT: ['client'],
+  MISSING_CARBURE_DELIVERY_SITE: ['delivery_site'],
+  MISSING_COUNTRY: ['delivery_site_country'],
+  MISSING_DAE: ['transport_document_reference'],
+  MISSING_DELIVERY_DATE: ['delivery_date'],
+  MISSING_DELIVERY_SITE: ['delivery_site'],
+  MISSING_FEEDSTOCK: ['feedstock'],
+  MISSING_FEEDSTOCK_COUNTRY_OF_ORIGIN: ['country_of_origin'],
+  MISSING_PRODSITE_CERTIFICATE: ['production_site_certificate'],
+  MISSING_PRODUCTION_SITE_COMDATE: ['production_site_commissioning_date'],
+  MISSING_REF_DBL_COUNTING: ['production_site_double_counting_certificate'],
+  MISSING_SUPPLIER_CERTIFICATE: ['supplier_certificate'],
+  MISSING_UNKNOWN_CLIENT: ['client'],
+  MISSING_UNKNOWN_DELIVERY_SITE: ['delivery_site'],
+  MISSING_UNKNOWN_DELIVERY_SITE_COUNTRY: ['delivery_site_country'],
+  MISSING_VOLUME: ['volume'],
+  MP_BC_INCOHERENT: ['feedstock', 'biofuel'],
+  MP_NOT_CONFIGURED: ['feedstock'],
+  DEPOT_NOT_CONFIGURED: ['delivery_site'],
+  PRODUCTION_SITE_COMDATE_FORMAT_INCORRECT: ['production_site_commissioning_date'],
+  PROVENANCE_MP: ['country_of_origin'],
+  UNKNOWN_BIOFUEL: ['biofuel'],
+  UNKNOWN_CLIENT: ['client'],
+  UNKNOWN_COUNTRY: ['delivery_site_country'],
+  UNKNOWN_FEEDSTOCK: ['feedstock'],
+  UNKNOWN_PRODUCTION_SITE: ['production_site'],
+  VOLUME_FAIBLE: ['volume'],
+  VOLUME_FORMAT_INCORRECT: ['volume'],
+  VOLUME_LTE_0: ['volume'],
+  WRONG_DELIVERY_DATE: ['delivery_date'],
+  WRONG_PRODUCTION_SITE_COUNTRY: ['production_country'],
+  NO_PRODSITE_CERT: ['production_site_certificate'],
+  NO_SUPPLIER_CERT: ['supplier_certificate'],
+  NO_VENDOR_CERT: ['supplier_certificate'],
+  UNKNOWN_PRODSITE_CERT: ['production_site_certificate'],
+  UNKNOWN_SUPPLIER_CERT: ['supplier_certificate'],
+  UNKNOWN_VENDOR_CERT: ['supplier_certificate'],
+  EXPIRED_PRODSITE_CERT: ['production_site_certificate'],
+  EXPIRED_SUPPLIER_CERT: ['supplier_certificate'],
+  EXPIRED_VENDOR_CERT: ['supplier_certificate'],
+  UNKNOWN_DAE_FORMAT: ['transport_document_reference'],
+  UNKNOWN_DOUBLE_COUNTING_CERTIFICATE: ['production_site_double_counting_certificate'],
+  EXPIRED_DOUBLE_COUNTING_CERTIFICATE: ['production_site_double_counting_certificate'],
+}
 
 export default LotForm

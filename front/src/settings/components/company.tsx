@@ -1,31 +1,24 @@
 import { Trans, useTranslation } from "react-i18next"
 
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { EntityManager } from "carbure/hooks/entity"
 import { CompanySettingsHook } from "../hooks/use-company"
-import { EntityType, UserRole } from "common/types"
+import { UserRole } from "common/types"
 import { Title, LoaderOverlay } from "common/components"
 import { Label, LabelCheckbox } from "common/components/input"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
-import { useRights } from "carbure/hooks/use-rights"
 import Select from "common/components/select"
 import styles from "./settings.module.css"
 
 type CompanySettingsProps = {
-  entity: EntitySelection
+  entity: EntityManager
   settings: CompanySettingsHook
 }
 
 const CompanySettings = ({ entity, settings }: CompanySettingsProps) => {
   const { t } = useTranslation()
-  const rights = useRights()
 
-  if (entity === null) {
-    return null
-  }
-
-  const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
-  const isProducer = entity.entity_type === EntityType.Producer
-  const isTrader = entity.entity_type === EntityType.Trader
+  const canModify = entity.hasRights(UserRole.Admin, UserRole.ReadWrite)
+  const { isProducer, isTrader } = entity
 
   return (
     <Section id="options">

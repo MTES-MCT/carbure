@@ -60,31 +60,33 @@ export function Select<T, V>({
         loading={asyncOptions.loading}
       />
 
-      <Dropdown
-        open={open && asyncOptions.items.length > 0}
-        triggerRef={triggerRef}
-        anchor={anchor}
-        onClose={onClose}
-        onToggle={setOpen}
-        onOpen={() => {
-          onOpen?.()
-          asyncOptions.execute()
-        }}
-      >
-        <List
-          controlRef={triggerRef}
-          search={search}
-          items={asyncOptions.items}
-          selectedValue={value}
-          sort={sort}
-          normalize={normalize}
-          onFocus={onChange}
-          onSelectValue={(value) => {
-            onChange?.(value)
-            setOpen(false)
+      {!props.disabled && !props.readOnly && (
+        <Dropdown
+          open={open && asyncOptions.items.length > 0}
+          triggerRef={triggerRef}
+          anchor={anchor}
+          onClose={onClose}
+          onToggle={setOpen}
+          onOpen={() => {
+            onOpen?.()
+            asyncOptions.execute()
           }}
-        />
-      </Dropdown>
+        >
+          <List
+            controlRef={triggerRef}
+            search={search}
+            items={asyncOptions.items}
+            selectedValue={value}
+            sort={sort}
+            normalize={normalize}
+            onFocus={onChange}
+            onSelectValue={(value) => {
+              onChange?.(value)
+              setOpen(false)
+            }}
+          />
+        </Dropdown>
+      )}
     </>
   )
 }

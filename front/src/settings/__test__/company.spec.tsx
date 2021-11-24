@@ -1,23 +1,20 @@
 import { render, TestRoot } from "setupTests"
 import { waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { Route } from 'react-router-dom'
+import { Route } from "react-router-dom"
 
 import { admin, operator, producer, trader } from "common/__test__/data"
-import { waitWhileLoading } from "common/__test__/helpers"
 import Settings from "../index"
 import server, { okDynamicSettings, setEntity } from "./api"
 
-const SettingsWithHooks = () => {
+const SettingsWithHooks = ({ entityID }: { entityID?: number }) => {
   return (
-    <TestRoot url="/org/0/settings">
+    <TestRoot url={`/org/${entityID}/settings`}>
       {(app) => (
-        <Route path="/org/0/settings" element={
-          <Settings 
-            entity={app.settings.data?.rights[0].entity ?? null}
-            settings={app.settings}
-          />
-        } />
+        <Route
+          path="/org/:entity/settings"
+          element={<Settings settings={app.settings} />}
+        />
       )}
     </TestRoot>
   )
@@ -32,11 +29,9 @@ afterAll(() => server.close())
 test("check the company section of the settings for a producer", async () => {
   setEntity(producer)
 
-  render(<SettingsWithHooks />)
+  render(<SettingsWithHooks entityID={producer.id} />)
 
-  await waitWhileLoading()
-
-  expect(screen.getAllByText("Options")).toHaveLength(2)
+  expect(await screen.findAllByText("Options")).toHaveLength(2)
 
   const mac = screen.getByLabelText("Ma société effectue des Mises à Consommation") // prettier-ignore
   const trading = screen.getByLabelText("Ma société a une activité de négoce")
@@ -47,15 +42,11 @@ test("check the company section of the settings for a producer", async () => {
   userEvent.click(mac)
   userEvent.click(trading)
 
-  await waitWhileLoading()
-
   await waitFor(() => expect(mac).not.toBeChecked())
   expect(trading).not.toBeChecked()
 
   userEvent.click(mac)
   userEvent.click(trading)
-
-  await waitWhileLoading()
 
   await waitFor(() => expect(mac).toBeChecked())
   expect(trading).toBeChecked()
@@ -64,11 +55,9 @@ test("check the company section of the settings for a producer", async () => {
 test("check the company section of the settings for a trader", async () => {
   setEntity(trader)
 
-  render(<SettingsWithHooks />)
+  render(<SettingsWithHooks entityID={trader.id} />)
 
-  await waitWhileLoading()
-
-  expect(screen.getAllByText("Options")).toHaveLength(2)
+  expect(await screen.findAllByText("Options")).toHaveLength(2)
 
   const mac = screen.getByLabelText("Ma société effectue des Mises à Consommation") // prettier-ignore
 
@@ -76,26 +65,21 @@ test("check the company section of the settings for a trader", async () => {
 
   userEvent.click(mac)
 
-  await waitWhileLoading()
   await waitFor(() => expect(mac).not.toBeChecked())
 })
 
 test("check the company section of the settings for an operator", async () => {
   setEntity(operator)
 
-  render(<SettingsWithHooks />)
+  render(<SettingsWithHooks entityID={operator.id} />)
 
-  await waitWhileLoading()
-
-  expect(screen.getAllByText("Options")).toHaveLength(2)
+  expect(await screen.findAllByText("Options")).toHaveLength(2)
 
   const mac = screen.getByLabelText("Ma société effectue des Mises à Consommation") // prettier-ignore
 
   expect(mac).toBeChecked()
 
   userEvent.click(mac)
-
-  await waitWhileLoading()
 
   await waitFor(() => {
     expect(mac).not.toBeChecked()
@@ -104,7 +88,7 @@ test("check the company section of the settings for an operator", async () => {
 
 test("check the company section of the settings for an admin", async () => {
   setEntity(admin)
-  render(<SettingsWithHooks />)
+  render(<SettingsWithHooks entityID={admin.id} />)
   expect(
     screen.queryByText("Options", { selector: ":not(a)" })
   ).not.toBeInTheDocument()

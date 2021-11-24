@@ -70,12 +70,17 @@ export const Fieldset = ({
 
 export interface FormManager<T> {
   value: T
+  errors: FormErrors<T>
   bind: Bind<T>
   setField: FieldSetter<T>
   setValue: React.Dispatch<React.SetStateAction<T>>
 }
 
+export type FormErrors<T> = Partial<Record<keyof T, string>>
+const EMPTY_ERRORS: FormErrors<any> = {}
+
 export interface FormOptions<T> {
+  errors?: FormErrors<T>
   setValue?: (nextState: T, prevState?: T) => T
 }
 
@@ -84,6 +89,7 @@ export function useForm<T>(
   options?: FormOptions<T>
 ): FormManager<T> {
   const [value, setValue] = useState(initialState)
+  const errors = options?.errors ?? EMPTY_ERRORS
   const mutate = options?.setValue ?? identity
 
   const setField = useCallback(
@@ -93,18 +99,19 @@ export function useForm<T>(
     [mutate]
   )
 
-  const bind = useBindCallback(value, setField)
+  const bind = useBindCallback(value, errors, setField)
 
-  return { value, bind, setField, setValue }
+  return { value, errors, bind, setField, setValue }
 }
 
 export function useBind<T>() {
   const form = useFormContext<T>()
-  return useBindCallback<T>(form.value, form.setField)
+  return useBindCallback<T>(form.value, form.errors, form.setField)
 }
 
 export function useBindCallback<T>(
   value: T,
+  errors: FormErrors<T>,
   setField: (name: keyof T, value: T[keyof T]) => void
 ): Bind<T> {
   return useCallback(
@@ -112,9 +119,10 @@ export function useBindCallback<T>(
       name,
       value: option ?? value[name],
       checked: option ? option === value[name] : undefined,
+      error: errors[name],
       onChange: (value) => setField(name, value),
     }),
-    [value, setField]
+    [value, errors, setField]
   )
 }
 
@@ -136,8 +144,9 @@ export type Bind<T> = <N extends keyof T>(
 export interface BindProps<T, N extends keyof T> {
   name: N
   value: T[N]
+  error: string | undefined
+  checked: boolean | undefined
   onChange: (value: T[N]) => void
-  checked?: boolean
 }
 
 export type FieldSetter<T> = (name: keyof T, value: T[keyof T]) => void
