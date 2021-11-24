@@ -26,7 +26,7 @@ import { DBSCertificateSettingsHook } from "settings/hooks/use-2bs-certificates"
 import { ISCCCertificateSettingsHook } from "settings/hooks/use-iscc-certificates"
 import { REDCertCertificateSettingsHook } from "settings/hooks/use-redcert-certificates"
 import { SNCertificateSettingsHook } from "settings/hooks/use-national-system-certificates"
-import { useRights } from "carbure/hooks/use-rights"
+import { useRights } from "carbure/hooks/entity"
 
 type CertificatePromptProps = PromptProps<Certificate> & {
   type: "2BS" | "ISCC" | "REDcert" | "SN"

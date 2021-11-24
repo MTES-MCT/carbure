@@ -12,7 +12,7 @@ import {
 } from "../components/production-site"
 import { confirm, prompt } from "common/components/dialog"
 import { useNotificationContext } from "common/components/notifications"
-import { useRights } from "carbure/hooks/use-rights"
+import { useRights } from "carbure/hooks/entity"
 
 export interface ProductionSiteSettingsHook {
   isEmpty: boolean

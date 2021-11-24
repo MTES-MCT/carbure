@@ -43,7 +43,7 @@ import { StockTable } from "./list-table"
 
 import styles from "./list.module.css"
 import { SearchSelection } from "transactions/hooks/query/use-search"
-import { useRights } from "carbure/hooks/use-rights"
+import { useRights } from "carbure/hooks/entity"
 import { Entity } from "carbure/types"
 import { ApiState } from "common/hooks/use-api"
 import { FilterSelection } from "transactions/hooks/query/use-filters"

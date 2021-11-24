@@ -32,7 +32,7 @@ import * as C from "./list-columns"
 
 import styles from "./list-table.module.css"
 import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
-import { useRights } from "carbure/hooks/use-rights"
+import { useRights } from "carbure/hooks/entity"
 
 type TxActions = Record<string, (tx: Transaction) => void> & {
   t: TFunction<"translation">

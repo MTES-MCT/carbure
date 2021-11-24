@@ -42,7 +42,7 @@ import RadioGroup from "common/components/radio-group"
 import { SettingsForm } from "./common"
 import useForm from "common/hooks/use-form"
 import { Entity } from "carbure/types"
-import { useRights } from "carbure/hooks/use-rights"
+import { useRights } from "carbure/hooks/entity"
 
 type DeliverySiteFinderPromptProps = PromptProps<EntityDeliverySite> & {
   entity: Entity

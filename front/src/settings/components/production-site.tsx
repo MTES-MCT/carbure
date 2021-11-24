@@ -46,7 +46,7 @@ import RadioGroup from "common/components/radio-group"
 import { formatDate, SettingsForm } from "./common"
 import { padding } from "transactions/components/list-columns"
 import { findCertificates } from "../api"
-import { useRights } from "carbure/hooks/use-rights"
+import { useRights } from "carbure/hooks/entity"
 
 export type ProductionSiteState = {
   // site

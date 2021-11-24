@@ -4,7 +4,6 @@ import { Navigate, Route, Routes } from "react-router-dom"
 import { ExternalAdminPages } from "common/types"
 import useUser, { useUserContext, UserContext } from "./hooks/user"
 import useEntity from "./hooks/entity"
-import { UserRightProvider } from "./hooks/use-rights"
 
 import { LoaderOverlay } from "common/components"
 import Topbar from "./components/top-bar"
@@ -62,7 +61,7 @@ const Org = () => {
   const { isAdmin } = entity
 
   return (
-    <UserRightProvider user={user}>
+    <>
       <Routes>
         <Route path="transactions-v2/*" element={<TransactionsV2 />} />
 
@@ -81,7 +80,7 @@ const Org = () => {
       </Routes>
 
       {user.loading && <LoaderOverlay />}
-    </UserRightProvider>
+    </>
   )
 }
 
