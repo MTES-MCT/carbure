@@ -9,6 +9,8 @@ import {
   Feedstock,
   ProductionSite,
 } from "common/types"
+import LotFields from "./lot-fields"
+import RouteFields from "./route-fields"
 
 export interface StockFormProps {
   stock?: Stock
@@ -26,7 +28,8 @@ export const StockForm = ({ stock, onSubmit }: StockFormProps) => {
 
   return (
     <Form id="stock-form" variant="columns" form={form} onSubmit={onSubmit}>
-      <h1>TODO</h1>
+      <LotFields />
+      <RouteFields />
     </Form>
   )
 }
@@ -42,6 +45,7 @@ export const defaultStock = {
   biofuel: undefined as Biofuel | undefined,
   feedstock: undefined as Feedstock | undefined,
   country_of_origin: undefined as Country | undefined,
+  volume: 0 as number | undefined,
 
   production_site: undefined as ProductionSite | string | undefined,
   production_country: undefined as Country | undefined,
@@ -62,8 +66,7 @@ export const stockToFormValue: (stock: Stock | undefined) => StockFormValue = (
 ) => ({
   stock,
 
-  volumne: stock?.initial_volume,
-  remaining_volume: stock?.remaining_volume,
+  volume: stock?.initial_volume,
   biofuel: stock?.biofuel ?? undefined,
   feedstock: stock?.feedstock ?? undefined,
   country_of_origin: stock?.country_of_origin ?? undefined,
