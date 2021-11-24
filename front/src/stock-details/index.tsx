@@ -1,15 +1,17 @@
 import { useNavigate, useLocation, useParams } from "react-router-dom"
-import { useTranslation } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import * as api from "./api"
 import { useQuery } from "common-v2/hooks/async"
 import useEntity from "carbure/hooks/entity"
 import Dialog from "common-v2/components/dialog"
 import Button from "common-v2/components/button"
-import { Return, Save } from "common-v2/components/icons"
+import { AlertCircle, Return } from "common-v2/components/icons"
 import StockForm from "./components/stock-form"
 import StockTag from "transactions-v2/components/stocks/stock-tag"
 import { LoaderOverlay } from "common-v2/components/scaffold"
 import NavigationButtons from "lot-details/components/navigation"
+import Alert from "common-v2/components/alert"
+import { formatNumber, formatPercentage } from "common-v2/utils/formatters"
 
 interface StockDetailsProps {
   neighbors: number[]
@@ -30,6 +32,9 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
   })
 
   const stockData = stock.result?.data.data
+  const remaining = stockData?.stock.remaining_volume ?? 0
+  const volume = stockData?.stock.initial_volume ?? 0
+  const percent = (100 * remaining) / (volume || 1)
 
   const closeDialog = () =>
     navigate({
@@ -42,20 +47,25 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
       <header>
         {stockData && <StockTag big stock={stockData.stock} />}
         <h1>
-          {t("Détails du stock")} #{stockData?.stock.id}
+          {t("Détails du stock")} #{stockData?.stock.carbure_id}
         </h1>
       </header>
 
       <main>
         <section>
-          <StockForm
-            stock={stockData?.stock}
-            onSubmit={(form) => console.log(form)}
-          />
+          <StockForm stock={stockData?.stock} />
         </section>
       </main>
 
       <footer>
+        <Alert icon={AlertCircle} variant="info">
+          <p>
+            <Trans>
+              <b>{{ remaining: formatNumber(remaining) }} litres restants</b> (
+              {{ percent: formatPercentage(percent) }})
+            </Trans>
+          </p>
+        </Alert>
         <NavigationButtons neighbors={neighbors} root=".." />
         <Button icon={Return} label={t("Retour")} action={closeDialog} />
       </footer>

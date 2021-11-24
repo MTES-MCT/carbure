@@ -55,15 +55,9 @@ export const EmissionFields = (props: GHGFieldsProps) => {
   )
 }
 
-// date where RED II took effect
-const JULY_FIRST_21 = new Date("2021-07-01")
-
 export const ReductionFields = (props: GHGFieldsProps) => {
   const { t } = useTranslation()
   const { bind, value } = useFormContext<LotFormValue>()
-
-  const date = new Date(value.delivery_date ?? "")
-  const isRedII = isAfter(date, JULY_FIRST_21)
 
   return (
     <Fieldset small label={t("Réductions")}>
@@ -98,7 +92,7 @@ export const ReductionFields = (props: GHGFieldsProps) => {
         label={t("Réd. RED I")}
         value={formatPercentage(value.ghg_reduction ?? 0)}
       />
-      {isRedII && (
+      {isRedII(value.delivery_date) && (
         <TextInput
           readOnly
           label={t("Réd. RED II")}
@@ -108,3 +102,11 @@ export const ReductionFields = (props: GHGFieldsProps) => {
     </Fieldset>
   )
 }
+
+export function isRedII(deliveryDate: string = "") {
+  const date = new Date(deliveryDate)
+  return isAfter(date, JULY_FIRST_21)
+}
+
+// date where RED II took effect
+const JULY_FIRST_21 = new Date("2021-07-01")

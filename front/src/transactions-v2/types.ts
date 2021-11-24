@@ -77,6 +77,7 @@ export interface LotList {
 
 export interface Stock {
   id: number
+  carbure_id: string
   feedstock: Feedstock | null
   biofuel: Biofuel | null
   country_of_origin: Country | null
