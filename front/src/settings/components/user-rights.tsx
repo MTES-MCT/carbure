@@ -15,7 +15,6 @@ import { padding } from "transactions/components/list-columns"
 import * as api from "../api"
 import styles from "entities/components/user-rights.module.css"
 import { EntitySelection } from "carbure/hooks/use-entity"
-import { SettingsGetter } from "settings/hooks/use-get-settings"
 
 const RIGHTS_ORDER = {
   [UserRightStatus.Pending]: 0,
@@ -24,13 +23,7 @@ const RIGHTS_ORDER = {
   [UserRightStatus.Rejected]: 3,
 }
 
-const UserRights = ({
-  entity,
-  settings,
-}: {
-  entity: EntitySelection
-  settings: SettingsGetter
-}) => {
+const UserRights = ({ entity }: { entity: EntitySelection }) => {
   const { t } = useTranslation()
 
   const [rights, getRights] = useAPI(api.getEntityRights)

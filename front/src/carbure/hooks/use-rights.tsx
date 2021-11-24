@@ -2,7 +2,7 @@ import React, { useContext } from "react"
 import { useMatch } from "react-router-dom"
 
 import { UserRight, UserRole } from "common/types"
-import { AppHook } from "./use-app"
+import { UserManager } from "./user"
 
 export type UserRightsSelection = UserRight | null
 
@@ -18,23 +18,22 @@ export function useRights() {
   return { selected, is }
 }
 
-export function useRightSelection(app: AppHook): UserRightsSelection {
-  const match = useMatch<"entity">('/org/:entity/*')
-  const entityID = parseInt(match?.params.entity ?? '', 10)
-
-  return isNaN(entityID) ? null : app.getRights(entityID)
+export function useRightSelection(user: UserManager): UserRightsSelection {
+  const match = useMatch<"entity">("/org/:entity/*")
+  const entityID = parseInt(match?.params.entity ?? "", 10)
+  return isNaN(entityID) ? null : user.getRights(entityID)
 }
 
 type UserRightProviderProps = {
-  app: AppHook
+  user: UserManager
   children: React.ReactNode
 }
 
 export const UserRightProvider = ({
-  app,
+  user,
   children,
 }: UserRightProviderProps) => {
-  const rights = useRightSelection(app)
+  const rights = useRightSelection(user)
 
   return (
     <UserRightContext.Provider value={rights}>

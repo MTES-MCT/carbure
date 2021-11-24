@@ -8,15 +8,9 @@ import {
   UserRightStatus,
   UserRole,
 } from "common/types"
-import { SettingsGetter } from "settings/hooks/use-get-settings"
-import { AccountHook } from "../index"
-
 import statusStyles from "transactions/components/status.module.css"
 import colStyles from "transactions/components/list-columns.module.css"
 import pendingStyles from "carbure/components/pending.module.css"
-
-import * as common from "common/api"
-
 import { LoaderOverlay, Title } from "common/components"
 import { Button } from "common/components/button"
 import { AlertTriangle, Cross, Plus } from "common/components/icons"
@@ -32,14 +26,134 @@ import {
   DialogButtons,
   DialogText,
   DialogTitle,
+  prompt,
   PromptProps,
 } from "common/components/dialog"
 import { Label } from "common/components/input"
 import RadioGroup from "common/components/radio-group"
 import * as api from "../api"
+import * as common from "common/api"
 import useAPI from "common/hooks/use-api"
 import { Trans, useTranslation } from "react-i18next"
-import { reloadUserSettings } from "carbure/hooks/user"
+import { reloadUserSettings, useUserContext } from "carbure/hooks/user"
+
+export const AccountAccesRights = () => {
+  const { t } = useTranslation()
+
+  const user = useUserContext()
+
+  const [revoking, revokeMyself] = useAPI(api.revokeMyself)
+  const [requesting, resolveAccess] = useAPI(api.requestAccess)
+
+  async function askEntityAccess() {
+    const res = await prompt<AccessRequest>((resolve) => (
+      <EntityPrompt onResolve={resolve} />
+    ))
+
+    if (res) {
+      const { entity, role } = res
+      await resolveAccess(entity.id, "", role)
+      reloadUserSettings()
+    }
+  }
+
+  const loading = user.loading || requesting.loading || revoking.loading
+
+  const entityTypes = {
+    [EntityType.Administration]: t("Administration"),
+    [EntityType.Operator]: t("Opérateur"),
+    [EntityType.Producer]: t("Producteur"),
+    [EntityType.Auditor]: t("Auditeur"),
+    [EntityType.Trader]: t("Trader"),
+    [EntityType.ExternalAdmin]: t("Administration Externe"),
+  }
+
+  const roleLabels = {
+    [UserRole.ReadOnly]: t("Lecture seule"),
+    [UserRole.ReadWrite]: t("Lecture/écriture"),
+    [UserRole.Admin]: t("Administration"),
+    [UserRole.Auditor]: t("Audit"),
+  }
+
+  const columns: Column<UserRightRequest>[] = [
+    padding,
+    statusColumn,
+    {
+      header: t("Organisation"),
+      render: (r) => <Line text={r.entity.name} />,
+    },
+    {
+      header: t("Type"),
+      render: (r) => <Line text={entityTypes[r.entity.entity_type]} />,
+    },
+    {
+      header: t("Droits"),
+      render: (r) => <Line text={roleLabels[r.role]} />,
+    },
+    {
+      header: t("Date"),
+      render: (r) => {
+        const dateRequested = formatDate(r.date_requested)
+        const dateExpired = r.expiration_date ? formatDate(r.expiration_date) : null // prettier-ignore
+
+        return dateExpired
+          ? t(`{{dateRequested}} (expire le {{dateExpired}})`, { dateRequested, dateExpired }) // prettier-ignore
+          : dateRequested
+      },
+    },
+    padding,
+  ]
+
+  const actions = Actions<UserRightRequest>([
+    {
+      title: t("Annuler"),
+      icon: Cross,
+      action: async (r) => {
+        const shouldRevoke = await confirm(
+          t("Annuler mes accès"),
+          t(`Voulez vous annuler votre accès à {{entity}} ?`, { entity: r.entity.name }) // prettier-ignore
+        )
+
+        if (shouldRevoke) {
+          await revokeMyself(r.entity.id)
+          reloadUserSettings()
+        }
+      },
+    },
+  ])
+
+  const rows: Row<UserRightRequest>[] = user.requests.map((r) => ({ value: r }))
+
+  return (
+    <Section>
+      <SectionHeader>
+        <Title>
+          <Trans>Demandes d'accès aux sociétés</Trans>
+        </Title>
+        <Button level="primary" icon={Plus} onClick={askEntityAccess}>
+          <Trans>Ajouter une organisation</Trans>
+        </Button>
+      </SectionHeader>
+
+      {user.requests.length === 0 && (
+        <SectionBody>
+          <Alert level="warning" icon={AlertTriangle}>
+            <Trans>
+              Aucune autorisation pour ce compte, ajoutez une organisation pour
+              continuer.
+            </Trans>
+          </Alert>
+        </SectionBody>
+      )}
+
+      {user.requests.length > 0 && (
+        <Table columns={[...columns, actions]} rows={rows} />
+      )}
+
+      {loading && <LoaderOverlay />}
+    </Section>
+  )
+}
 
 export type AccessRequest = {
   entity: Entity
@@ -143,115 +257,4 @@ export const statusColumn = {
   header: "Statut",
   className: colStyles.narrowColumn,
   render: (r: UserRightRequest) => <RightStatus status={r.status} />,
-}
-
-type AccountAccesRightsProps = {
-  settings: SettingsGetter
-  account: AccountHook
-}
-
-export const AccountAccesRights = ({
-  settings,
-  account,
-}: AccountAccesRightsProps) => {
-  const { t } = useTranslation()
-
-  const requests = settings.data?.requests ?? []
-  const [, revokeMyself] = useAPI(api.revokeMyself)
-
-  const entityTypes = {
-    [EntityType.Administration]: t("Administration"),
-    [EntityType.Operator]: t("Opérateur"),
-    [EntityType.Producer]: t("Producteur"),
-    [EntityType.Auditor]: t("Auditeur"),
-    [EntityType.Trader]: t("Trader"),
-    [EntityType.ExternalAdmin]: t("Administration Externe"),
-  }
-
-  const roleLabels = {
-    [UserRole.ReadOnly]: t("Lecture seule"),
-    [UserRole.ReadWrite]: t("Lecture/écriture"),
-    [UserRole.Admin]: t("Administration"),
-    [UserRole.Auditor]: t("Audit"),
-  }
-
-  const columns: Column<UserRightRequest>[] = [
-    padding,
-    statusColumn,
-    {
-      header: t("Organisation"),
-      render: (r) => <Line text={r.entity.name} />,
-    },
-    {
-      header: t("Type"),
-      render: (r) => <Line text={entityTypes[r.entity.entity_type]} />,
-    },
-    {
-      header: t("Droits"),
-      render: (r) => <Line text={roleLabels[r.role]} />,
-    },
-    {
-      header: t("Date"),
-      render: (r) => {
-        const dateRequested = formatDate(r.date_requested)
-        const dateExpired = r.expiration_date ? formatDate(r.expiration_date) : null // prettier-ignore
-
-        return dateExpired
-          ? t(`{{dateRequested}} (expire le {{dateExpired}})`, { dateRequested, dateExpired }) // prettier-ignore
-          : dateRequested
-      },
-    },
-    padding,
-  ]
-
-  const actions = Actions<UserRightRequest>([
-    {
-      title: t("Annuler"),
-      icon: Cross,
-      action: async (r) => {
-        const shouldRevoke = await confirm(
-          t("Annuler mes accès"),
-          t(`Voulez vous annuler votre accès à {{entity}} ?`, { entity: r.entity.name }) // prettier-ignore
-        )
-
-        if (shouldRevoke) {
-          await revokeMyself(r.entity.id)
-          settings.resolve()
-          reloadUserSettings()
-        }
-      },
-    },
-  ])
-
-  const rows: Row<UserRightRequest>[] = requests.map((r) => ({ value: r }))
-
-  return (
-    <Section>
-      <SectionHeader>
-        <Title>
-          <Trans>Demandes d'accès aux sociétés</Trans>
-        </Title>
-        <Button level="primary" icon={Plus} onClick={account.askEntityAccess}>
-          <Trans>Ajouter une organisation</Trans>
-        </Button>
-      </SectionHeader>
-
-      {requests.length === 0 && (
-        <SectionBody>
-          <Alert level="warning" icon={AlertTriangle}>
-            <Trans>
-              Aucune autorisation pour ce compte, ajoutez une organisation pour
-              continuer.
-            </Trans>
-          </Alert>
-        </SectionBody>
-      )}
-
-      {requests.length > 0 && (
-        <Table columns={[...columns, actions]} rows={rows} />
-      )}
-
-      {account.isLoading && <LoaderOverlay />}
-    </Section>
-  )
 }

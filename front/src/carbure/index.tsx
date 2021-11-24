@@ -1,7 +1,6 @@
 import { Trans, useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 
-import { AppHook, useApp } from "./hooks/use-app"
 import { ExternalAdminPages } from "common/types"
 import useUser, { useUserContext, UserContext } from "./hooks/user"
 import useEntity from "./hooks/entity"
@@ -24,23 +23,35 @@ import Dashboard from "dashboard"
 import PublicStats from "./components/public-stats"
 import Home from "./components/home"
 
-const DevBanner = () => (
-  <div
-    style={{
-      backgroundColor: "var(--orange-medium)",
-      padding: "8px var(--main-spacing)",
-    }}
-  >
-    <Trans>
-      <b>Version de développement de CarbuRe :</b> les manipulations effectuées
-      ici n'ont pas de répercussion et les déclarations ne sont pas prises en
-      compte.
-    </Trans>
-  </div>
-)
+const Carbure = () => {
+  useTranslation()
+
+  const user = useUser()
+
+  return (
+    <UserContext.Provider value={user}>
+      <div id="app">
+        <DevBanner />
+
+        <Topbar />
+
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/pending" element={<Pending />} />
+          <Route path="/logout" element={<Exit to="/accounts/logout" />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/org/:entity/*" element={<Org />} />
+          <Route path="/public_stats" element={<PublicStats />} />
+        </Routes>
+
+        <Footer />
+      </div>
+    </UserContext.Provider>
+  )
+}
 
 // has to be nested in a route so we can get data from useParams()
-const Org = ({ app }: { app: AppHook }) => {
+const Org = () => {
   const entity = useEntity()
   const user = useUserContext()
 
@@ -51,11 +62,11 @@ const Org = ({ app }: { app: AppHook }) => {
   const { isAdmin } = entity
 
   return (
-    <UserRightProvider app={app}>
+    <UserRightProvider user={user}>
       <Routes>
         <Route path="transactions-v2/*" element={<TransactionsV2 />} />
 
-        <Route path="settings" element={<Settings settings={app.settings} />} />
+        <Route path="settings" element={<Settings />} />
         <Route path="registry" element={<Registry />} />
 
         {isAdmin && <Route path="dashboard" element={<Dashboard />} />}
@@ -74,31 +85,22 @@ const Org = ({ app }: { app: AppHook }) => {
   )
 }
 
-const Carbure = () => {
-  useTranslation()
-
-  const app = useApp()
-  const user = useUser()
+const DevBanner = () => {
+  if (window.location.hostname === "carbure.beta.gouv.fr") return null
 
   return (
-    <UserContext.Provider value={user}>
-      <div id="app">
-        {!app.isProduction() && <DevBanner />}
-
-        <Topbar />
-
-        <Routes>
-          <Route path="/" element={<Home app={app} />} />
-          <Route path="/pending" element={<Pending />} />
-          <Route path="/logout" element={<Exit to="/accounts/logout" />} />
-          <Route path="/account" element={<Account app={app} />} />
-          <Route path="/org/:entity/*" element={<Org app={app} />} />
-          <Route path="/public_stats" element={<PublicStats />} />
-        </Routes>
-
-        <Footer />
-      </div>
-    </UserContext.Provider>
+    <div
+      style={{
+        backgroundColor: "var(--orange-medium)",
+        padding: "8px var(--main-spacing)",
+      }}
+    >
+      <Trans>
+        <b>Version de développement de CarbuRe :</b> les manipulations
+        effectuées ici n'ont pas de répercussion et les déclarations ne sont pas
+        prises en compte.
+      </Trans>
+    </div>
   )
 }
 
