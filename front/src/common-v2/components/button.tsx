@@ -2,7 +2,8 @@ import cl from "clsx"
 import { Loader } from "./icons"
 import css from "./button.module.css"
 import { Layout, layout } from "./scaffold"
-import { Link } from "react-router-dom"
+import { Link, LinkProps } from "react-router-dom"
+import { ExternalLink as ExternalLinkIcon } from "./icons"
 
 export type ButtonVariant =
   | "primary"
@@ -109,6 +110,15 @@ const LinkWrapper = ({ href, to, children }: LinkWrapperProps) => {
   } else {
     return <>{children}</>
   }
+}
+
+export const ExternalLink = ({ className, children, ...props }: LinkProps) => {
+  return (
+    <Link {...props} className={cl(css.external, className)}>
+      {children}
+      <ExternalLinkIcon size={20} />
+    </Link>
+  )
 }
 
 export default Button

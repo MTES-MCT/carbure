@@ -12,6 +12,7 @@ import { LoaderOverlay } from "common-v2/components/scaffold"
 import NavigationButtons from "lot-details/components/navigation"
 import Alert from "common-v2/components/alert"
 import { formatNumber, formatPercentage } from "common-v2/utils/formatters"
+import StockTraceability from "./components/stock-traceability"
 
 interface StockDetailsProps {
   neighbors: number[]
@@ -54,6 +55,10 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
       <main>
         <section>
           <StockForm stock={stockData?.stock} />
+        </section>
+
+        <section>
+          <StockTraceability details={stockData} />
         </section>
       </main>
 
