@@ -369,13 +369,10 @@ def add_delivery_site(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Could not find delivery site",
                             }, status=400)
 
-    if entity.entity_type != 'Opérateur' and ds.depot_type == 'EFS':
-        return JsonResponse({'status': 'error', 'message': "Only operators can register an EFS site"}, status=400)
-
     blender = None
     if blending_is_outsourced:
         try:
-            blender = Entity.objects.get(id=blending_entity_id, entity_type='Opérateur')
+            blender = Entity.objects.get(id=blending_entity_id, entity_type=Entity.OPERATOR)
         except:
             return JsonResponse({'status': 'error', 'message': "Could not find outsourcing blender"}, status=400)
 
@@ -384,7 +381,6 @@ def add_delivery_site(request, *args, **kwargs):
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not link entity to delivery site",
                             }, status=400)
-
     return JsonResponse({'status': 'success'})
 
 

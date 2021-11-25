@@ -13,6 +13,7 @@ urlpatterns = [
     ### Lot initial life
     path('lots/add', views.add_lot, name='api-v4-add-lots'),
     path('lots/add-excel', views.get_snapshot, name='api-v4-add-excel'),
+    path('lots/duplicate', views.duplicate_lot, name='api-v4-duplicate-lot'),
     path('lots/update', views.get_snapshot, name='api-v4-update-lots'),
     path('lots/send', views.lots_send, name='api-v4-send-lots'),
     ### Corrections
@@ -50,7 +51,6 @@ urlpatterns = [
     #path('declaration-summary', views.get_declaration_summary, name='api-v3-lots-get-declaration-summary'),
     #path('summary', views.get_lots_summary, name='api-v3-lots-get-lots-summary'),
     # POST
-    #path('duplicate', views.duplicate_lot, name='api-v3-duplicate-lot'),
     # IMPORT/FILES
     #path('upload', views.upload, name='api-v3-upload'),
     #path('upload-blend', views.upload_blend, name='api-v3-upload-blend'),
