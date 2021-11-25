@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState } from "react"
 import cl from "clsx"
 import Button from "./button"
 import { AlertTriangle, Cross, Loader, Search, Placeholder } from "./icons"
-import { layout, Layout } from "./scaffold"
+import { Col, layout, Layout, Overlay } from "./scaffold"
+import { isInside } from "./dropdown"
 import css from "./input.module.css"
 
 export type FieldVariant = "outline" | "solid" | "inline" | "text"
@@ -126,6 +127,59 @@ export const FileInput = ({
     </label>
   </Field>
 )
+
+export interface FileAreaProps {
+  className?: string
+  style?: React.CSSProperties
+  children?: React.ReactNode
+  label?: string
+  icon?: React.FunctionComponent | React.ReactNode
+  value?: File | undefined
+  onChange?: (value: File | undefined) => void
+}
+
+export const FileArea = ({
+  children,
+  icon: Icon,
+  label,
+  onChange,
+  ...props
+}: FileAreaProps) => {
+  const [active, setActive] = useState(false)
+  const icon = typeof Icon === "function" ? <Icon /> : Icon
+
+  return (
+    <div
+      {...props}
+      data-active={active ? true : undefined}
+      onDragOver={(e) => {
+        e.preventDefault()
+        !active && setActive(true)
+      }}
+      onDragLeave={(e) => {
+        e.preventDefault()
+        if (!isInside(e.currentTarget, e.relatedTarget)) {
+          setActive(false)
+        }
+      }}
+      onDrop={(e) => {
+        e.preventDefault()
+        onChange?.(e.dataTransfer.files[0])
+        setActive(false)
+      }}
+    >
+      {children}
+      {active && (
+        <Overlay>
+          <Col className={css.fileplaceholder}>
+            {icon}
+            {label}
+          </Col>
+        </Overlay>
+      )}
+    </div>
+  )
+}
 
 export interface InputProps extends Control {
   min?: number
