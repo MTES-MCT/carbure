@@ -6,6 +6,8 @@ import { useQuery } from "common-v2/hooks/async"
 import * as api from "./api"
 import { Main } from "common-v2/components/scaffold"
 import Select from "common-v2/components/select"
+import { FileArea } from "common-v2/components/input"
+import { Upload } from "common-v2/components/icons"
 import { PortalProvider } from "common-v2/components/portal"
 import { StatusTabs, useStatus } from "./components/status"
 import { DeclarationButton } from "./actions/declaration"
@@ -48,39 +50,48 @@ export const Transactions = () => {
 
   return (
     <PortalProvider>
-      <Main>
-        <header>
-          <section>
-            <h1>{t("Transactions")}</h1>
+      <FileArea
+        icon={Upload}
+        label={t("Importer le fichier\nsur la plateforme")}
+        onChange={(file) => {}}
+      >
+        <Main>
+          <header>
+            <section>
+              <h1>{t("Transactions")}</h1>
 
-            <Select
-              variant="inline"
-              placeholder={t("Choisir une année")}
-              value={year}
-              onChange={setYear}
-              options={yearData}
-              sort={(year) => -year.value}
+              <Select
+                variant="inline"
+                placeholder={t("Choisir une année")}
+                value={year}
+                onChange={setYear}
+                options={yearData}
+                sort={(year) => -year.value}
+              />
+
+              <DeclarationButton year={year} />
+            </section>
+
+            <section>
+              <StatusTabs
+                loading={snapshot.loading}
+                count={snapshotData?.lots}
+              />
+            </section>
+          </header>
+
+          <Routes>
+            <Route
+              path="stocks/*"
+              element={<Stocks entity={entity} snapshot={snapshotData} />}
             />
-
-            <DeclarationButton year={year} />
-          </section>
-
-          <section>
-            <StatusTabs loading={snapshot.loading} count={snapshotData?.lots} />
-          </section>
-        </header>
-
-        <Routes>
-          <Route
-            path="stocks/*"
-            element={<Stocks entity={entity} snapshot={snapshotData} />}
-          />
-          <Route
-            path="*"
-            element={<Lots entity={entity} year={year} snapshot={snapshotData} />} // prettier-ignore
-          />
-        </Routes>
-      </Main>
+            <Route
+              path="*"
+              element={<Lots entity={entity} year={year} snapshot={snapshotData} />} // prettier-ignore
+            />
+          </Routes>
+        </Main>
+      </FileArea>
     </PortalProvider>
   )
 }
