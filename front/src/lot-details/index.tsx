@@ -20,6 +20,8 @@ import {
 import { getLotUpdates, History } from "./components/history"
 import { isExpiring } from "common-v2/utils/deadline"
 import Alert from "common-v2/components/alert"
+import { SendOneButton } from "transactions-v2/actions/send"
+import { DeleteOneButton } from "transactions-v2/actions/delete"
 import NavigationButtons from "./components/navigation"
 
 export interface LotDetailsProps {
@@ -108,6 +110,10 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
             label={t("Sauvegarder")}
           />
         )}
+        
+        {lotData && <SendOneButton lot={lotData.lot} />}
+        {lotData && <DeleteOneButton lot={lotData.lot} />}
+        
         {expiring && (
           <Alert
             icon={Alarm}

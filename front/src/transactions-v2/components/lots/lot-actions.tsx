@@ -7,6 +7,7 @@ import { Cross, Wrench } from "common-v2/components/icons"
 import { CreateButton, ExportButton } from "../../actions"
 import { AcceptButton } from "../../actions/accept"
 import { SendManyButton } from "../../actions/send"
+import { DeleteManyButton } from "../../actions/delete"
 
 export interface ActionBarProps {
   count: number
@@ -17,29 +18,23 @@ export interface ActionBarProps {
 export const LotActions = ({ count, ...props }: ActionBarProps) => {
   const status = useStatus()
   const { selection } = props
+  const empty = count === 0
 
   return (
     <ActionBar>
       {status === "drafts" && (
         <Fragment>
           <CreateButton />
-          <SendManyButton {...props} disabled={count === 0} />
-          <Button
-            disabled={count === 0}
-            variant="danger"
-            icon={Cross}
-            label={
-              selection.length > 0 ? "Supprimer la sélection" : "Supprimer tout"
-            }
-          />
+          <SendManyButton {...props} disabled={empty} />
+          <DeleteManyButton {...props} disabled={empty} />
         </Fragment>
       )}
 
       {status === "in" && (
         <Fragment>
-          <AcceptButton {...props} disabled={count === 0} />
+          <AcceptButton {...props} disabled={empty} />
           <Button
-            disabled={count === 0}
+            disabled={empty}
             variant="danger"
             icon={Cross}
             label={
@@ -47,7 +42,7 @@ export const LotActions = ({ count, ...props }: ActionBarProps) => {
             }
           />
           <Button
-            disabled={count === 0 || selection.length === 0}
+            disabled={empty || selection.length === 0}
             variant="warning"
             icon={Wrench}
             label={"Demander une correction"}
@@ -58,7 +53,7 @@ export const LotActions = ({ count, ...props }: ActionBarProps) => {
       {status === "out" && (
         <Fragment>
           <Button
-            disabled={count === 0 || selection.length === 0}
+            disabled={empty || selection.length === 0}
             variant="warning"
             icon={Wrench}
             label={"Corriger la sélection"}

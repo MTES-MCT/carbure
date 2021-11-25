@@ -42,9 +42,7 @@ def get_entity_stock(entity_id):
                         'carbure_client', 'carbure_supplier')
 
 
-def get_entity_lots_by_status(entity_id, status):
-    if status not in ['DRAFTS', 'IN', 'OUT', 'DECLARATION']:
-        raise Exception('Unknown status %s' % (status))
+def get_entity_lots_by_status(entity_id, status=None):
     lots = CarbureLot.objects.select_related(
         'carbure_producer', 'carbure_supplier', 'carbure_client', 'added_by',
         'carbure_production_site', 'carbure_production_site__producer', 'carbure_production_site__country', 'production_country',
@@ -63,19 +61,19 @@ def get_entity_lots_by_status(entity_id, status):
     elif status == 'DECLARATION':
         lots = lots.filter(Q(carbure_supplier_id=entity_id) | Q(carbure_client_id=entity_id)).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
     else:
-        raise Exception('Unknown status')
+        lots = lots.filter(Q(added_by_id=entity_id) | Q(carbure_supplier_id=entity_id) | Q(carbure_client_id=entity_id))
     return lots
 
 
-def get_lots_with_metadata(lots, entity_id, querySet, is_admin=False):
-    export = querySet.get('export', False)
-    limit = querySet.get('limit', None)
-    from_idx = querySet.get('from_idx', "0")
+def get_lots_with_metadata(lots, entity_id, query, is_admin=False):
+    export = query.get('export', False)
+    limit = query.get('limit', None)
+    from_idx = query.get('from_idx', "0")
 
     # filtering
-    lots = filter_lots(lots, querySet, entity_id)
+    lots = filter_lots(lots, query, entity_id)
     # sorting
-    lots = sort_lots(lots, querySet)
+    lots = sort_lots(lots, query)
 
     # pagination
     from_idx = int(from_idx)
@@ -168,30 +166,30 @@ def get_lots_with_deadline(lots, deadline=get_current_deadline()):
     return lots.filter(period=period, lot_status__in=[CarbureLot.DRAFT, CarbureLot.REJECTED, CarbureLot.PENDING])
 
 
-def filter_lots(lots, querySet, entity_id=None, will_aggregate=False, blacklist=[]):
-    year = querySet.get('year', False)
-    periods = querySet.getlist('periods')
-    production_sites = querySet.getlist('production_sites')
-    delivery_sites = querySet.getlist('delivery_sites')
-    feedstocks = querySet.getlist('feedstocks')
-    countries_of_origin = querySet.getlist('countries_of_origin')
-    biofuels = querySet.getlist('biofuels')
-    clients = querySet.getlist('clients')
-    suppliers = querySet.getlist('suppliers')
-    correction_statuses = querySet.getlist('correction_statuses')
-    delivery_types = querySet.getlist('delivery_types')
-    errors = querySet.getlist('errors')
-    query = querySet.get('query', False)
-    is_highlighted_by_admin = querySet.get('is_highlighted_by_admin', None)
-    is_highlighted_by_auditor = querySet.get('is_highlighted_by_auditor', None)
-    selection = querySet.getlist('selection')
-    history = querySet.get('history', False)
-    correction = querySet.get('correction', False)
+def filter_lots(lots, query, entity_id=None, will_aggregate=False, blacklist=[]):
+    year = query.get('year', False)
+    periods = query.getlist('periods', [])
+    production_sites = query.getlist('production_sites', [])
+    delivery_sites = query.getlist('delivery_sites', [])
+    feedstocks = query.getlist('feedstocks', [])
+    countries_of_origin = query.getlist('countries_of_origin', [])
+    biofuels = query.getlist('biofuels', [])
+    clients = query.getlist('clients', [])
+    suppliers = query.getlist('suppliers', [])
+    correction_statuses = query.getlist('correction_statuses', [])
+    delivery_types = query.getlist('delivery_types', [])
+    errors = query.getlist('errors', [])
+    search = query.get('query', False)
+    is_highlighted_by_admin = query.get('is_highlighted_by_admin', None)
+    is_highlighted_by_auditor = query.get('is_highlighted_by_auditor', None)
+    selection = query.getlist('selection', [])
+    history = query.get('history', False)
+    correction = query.get('correction', False)
 
     if history != 'true':
         lots = lots.exclude(lot_status__in=[CarbureLot.FROZEN, CarbureLot.ACCEPTED])
     if correction == 'true':
-        lots = lots.filter(correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED])
+        lots = lots.filter(Q(correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED]) | Q(lot_status=CarbureLot.REJECTED))
     if year and 'year' not in blacklist:
         lots = lots.filter(year=year)
     if len(selection) > 0:
@@ -231,31 +229,30 @@ def filter_lots(lots, querySet, entity_id=None, will_aggregate=False, blacklist=
     if len(errors) > 0 and 'errors' not in blacklist:
         lots = lots.filter(genericerror__error__in=errors)
 
-    if query and 'query' not in blacklist:
+    if search and 'query' not in blacklist:
         lots = lots.filter(
-            Q(feedstock__name__icontains=query) |
-            Q(biofuel__name__icontains=query) |
-            Q(carbure_producer__name__icontains=query) |
-            Q(unknown_producer__icontains=query) |
-            Q(carbure_id__icontains=query) |
-            Q(country_of_origin__name__icontains=query) |
-            Q(carbure_client__name__icontains=query) |
-            Q(unknown_client__icontains=query) |
-            Q(carbure_delivery_site__name__icontains=query) |
-            Q(unknown_delivery_site__icontains=query) |
-            Q(free_field__icontains=query) |
-            Q(transport_document_reference__icontains=query) |
-            Q(production_site_double_counting_certificate__icontains=query)
+            Q(feedstock__name__icontains=search) |
+            Q(biofuel__name__icontains=search) |
+            Q(carbure_producer__name__icontains=search) |
+            Q(unknown_producer__icontains=search) |
+            Q(carbure_id__icontains=search) |
+            Q(country_of_origin__name__icontains=search) |
+            Q(carbure_client__name__icontains=search) |
+            Q(unknown_client__icontains=search) |
+            Q(carbure_delivery_site__name__icontains=search) |
+            Q(unknown_delivery_site__icontains=search) |
+            Q(free_field__icontains=search) |
+            Q(transport_document_reference__icontains=search) |
+            Q(production_site_double_counting_certificate__icontains=search)
         )
 
-    invalid = querySet.get('invalid', False)
-    deadline = querySet.get('deadline', False)
+    invalid = query.get('invalid', False)
+    deadline = query.get('deadline', False)
 
     if invalid == 'true':
         lots = get_lots_with_errors(lots, entity_id, will_aggregate)
     if deadline == 'true':
         lots = get_lots_with_deadline(lots)
-
     return lots
 
 
@@ -265,9 +262,9 @@ def count_lots_of_interest(lots, entity_id):
     return error_lots.count(), deadline_lots.count()
 
 
-def sort_lots(lots, querySet):
-    sort_by = querySet.get('sort_by', False)
-    order = querySet.get('order', False)
+def sort_lots(lots, query):
+    sort_by = query.get('sort_by', False)
+    order = query.get('order', False)
 
     if not sort_by:
         lots = lots.order_by('-id')
@@ -306,8 +303,8 @@ def normalize_filter(list, value=None, label=None):
         return [{'value': item[value], 'label': item[label]} for item in list if item]
 
 
-def get_lots_filters_data(lots, querySet, entity_id, field):
-    lots = filter_lots(lots, querySet, entity_id=entity_id, blacklist=[field])
+def get_lots_filters_data(lots, query, entity_id, field):
+    lots = filter_lots(lots, query, entity_id=entity_id, blacklist=[field])
 
     if field == 'feedstocks':
         feedstocks = MatierePremiere.objects.filter(id__in=lots.values('feedstock__id').distinct()).values('code', 'name')
@@ -369,8 +366,8 @@ def get_lots_filters_data(lots, querySet, entity_id, field):
         added_by = lots.values('added_by__name').distinct()
         return normalize_filter(added_by, 'added_by__name')
 
-def get_stock_filters_data(stock, querySet, entity_id, field):
-    stock = filter_stock(stock, querySet, entity_id=entity_id, blacklist=[field])
+def get_stock_filters_data(stock, query, entity_id, field):
+    stock = filter_stock(stock, query, entity_id=entity_id, blacklist=[field])
 
     if field == 'feedstocks':
         feedstocks = MatierePremiere.objects.filter(id__in=stock.values('feedstock__id').distinct()).values('code', 'name')
@@ -411,15 +408,15 @@ def get_stock_filters_data(stock, querySet, entity_id, field):
         return normalize_filter(set(production_sites))
 
 
-def get_stock_with_metadata(stock, entity_id, querySet, is_admin=False):
-    export = querySet.get('export', False)
-    limit = querySet.get('limit', None)
-    from_idx = querySet.get('from_idx', "0")
+def get_stock_with_metadata(stock, entity_id, query, is_admin=False):
+    export = query.get('export', False)
+    limit = query.get('limit', None)
+    from_idx = query.get('from_idx', "0")
 
     # filtering
-    stock = filter_stock(stock, querySet, entity_id)
+    stock = filter_stock(stock, query, entity_id)
     # sorting
-    stock = sort_stock(stock, querySet)
+    stock = sort_stock(stock, query)
 
     # pagination
     from_idx = int(from_idx)
@@ -449,18 +446,18 @@ def get_stock_with_metadata(stock, entity_id, querySet, is_admin=False):
         return response
 
 
-def filter_stock(stock, querySet, entity_id=None, blacklist=[]):
-    year = querySet.get('year', False)
-    periods = querySet.getlist('periods')
-    depots = querySet.getlist('depots')
-    feedstocks = querySet.getlist('feedstocks')
-    countries_of_origin = querySet.getlist('countries_of_origin')
-    biofuels = querySet.getlist('biofuels')
-    suppliers = querySet.getlist('suppliers')
-    production_sites = querySet.getlist('production_sites')
-    query = querySet.get('query', False)
-    selection = querySet.getlist('selection')
-    history = querySet.get('history', False)
+def filter_stock(stock, query, entity_id=None, blacklist=[]):
+    year = query.get('year', False)
+    periods = query.getlist('periods', [])
+    depots = query.getlist('depots', [])
+    feedstocks = query.getlist('feedstocks', [])
+    countries_of_origin = query.getlist('countries_of_origin', [])
+    biofuels = query.getlist('biofuels', [])
+    suppliers = query.getlist('suppliers', [])
+    production_sites = query.getlist('production_sites', [])
+    search = query.get('query', False)
+    selection = query.getlist('selection', [])
+    history = query.get('history', False)
 
     if history != 'true':
         stock = stock.filter(remaining_volume__gt=0)
@@ -482,22 +479,22 @@ def filter_stock(stock, querySet, entity_id=None, blacklist=[]):
         stock = stock.filter(Q(carbure_supplier__name__in=suppliers) | Q(unknown_supplier__in=suppliers))
     if len(production_sites) > 0 and 'production_sites' not in blacklist:
         stock = stock.filter(Q(carbure_production_site__name__in=production_sites) | Q(unknown_production_site__in=production_sites))
-    if query and 'query' not in blacklist:
+    if search and 'query' not in blacklist:
         stock = stock.filter(
-            Q(feedstock__name__icontains=query) |
-            Q(biofuel__name__icontains=query) |
-            Q(carbure_id__icontains=query) |
-            Q(country_of_origin__name__icontains=query) |
-            Q(depot__name__icontains=query) |
-            Q(parent_lot__free_field__icontains=query) |
-            Q(parent_lot__transport_document_reference__icontains=query)
+            Q(feedstock__name__icontains=search) |
+            Q(biofuel__name__icontains=search) |
+            Q(carbure_id__icontains=search) |
+            Q(country_of_origin__name__icontains=search) |
+            Q(depot__name__icontains=search) |
+            Q(parent_lot__free_field__icontains=search) |
+            Q(parent_lot__transport_document_reference__icontains=search)
         )
     return stock
 
 
-def sort_stock(stock, querySet):
-    sort_by = querySet.get('sort_by', False)
-    order = querySet.get('order', False)
+def sort_stock(stock, query):
+    sort_by = query.get('sort_by', False)
+    order = query.get('order', False)
 
     if not sort_by:
         stock = stock.order_by('-id')
