@@ -16,6 +16,7 @@ import Table, {
 } from "common-v2/components/table"
 import { Alarm } from "common-v2/components/icons"
 import { SendOneButton } from "transactions-v2/actions/send"
+import { DeleteOneButton } from "transactions-v2/actions/delete"
 import LotTag from "./lot-tag"
 
 export interface LotTableProps {
@@ -126,7 +127,10 @@ export const LotTable = memo(
             header: t("Réd. GES"),
             cell: (lot) => <Cell text={`${lot.ghg_reduction.toFixed(2)}%`} />,
           },
-          actionColumn((lot: Lot) => [<SendOneButton icon lot={lot} />]),
+          actionColumn((lot: Lot) => [
+            <SendOneButton icon lot={lot} />,
+            <DeleteOneButton icon lot={lot} />,
+          ]),
         ]}
       />
     )

@@ -4,18 +4,6 @@ import { Snapshot, Status } from "../types"
 import Tabs from "common-v2/components/tabs"
 import { Loader } from "common-v2/components/icons"
 
-const defaultCount: Snapshot["lots"] = {
-  draft: 0,
-  in_pending: 0,
-  in_tofix: 0,
-  in_total: 0,
-  stock: 0,
-  stock_total: 0,
-  out_pending: 0,
-  out_tofix: 0,
-  out_total: 0,
-}
-
 export interface StatusTabsProps {
   loading: boolean
   count: Snapshot["lots"] | undefined
@@ -81,6 +69,20 @@ export const StatusTabs = ({
     />
   )
 }
+
+
+const defaultCount: Snapshot["lots"] = {
+  draft: 0,
+  in_pending: 0,
+  in_tofix: 0,
+  in_total: 0,
+  stock: 0,
+  stock_total: 0,
+  out_pending: 0,
+  out_tofix: 0,
+  out_total: 0,
+}
+
 
 interface StatusRecapProps {
   loading: boolean

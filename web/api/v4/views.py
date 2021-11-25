@@ -452,8 +452,7 @@ def add_lot(request, *args, **kwargs):
     # prefetch some data
     entity = Entity.objects.get(pk=entity_id)
     d = get_prefetched_data(entity)
-    payload = json.loads(request.body.decode('utf-8'))
-    lot_obj, errors = construct_carbure_lot(d, entity, payload)
+    lot_obj, errors = construct_carbure_lot(d, entity, request.POST.dict())
     if not lot_obj:
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=400)
 
@@ -505,24 +504,21 @@ def duplicate_lot(request, *args, **kwargs):
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def lots_send(request, *args, **kwargs):
     context = kwargs['context']
-    entity_id = context['entity_id']
-    lot_ids = request.POST.getlist('lot_ids', False)
-    if not lot_ids:
-        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
-    nb_lots = len(lot_ids)
+    entity_id = int(context['entity_id'])
+    status = request.GET.get('status', None)
+    lots = get_entity_lots_by_status(entity_id, status)
+    filtered_lots = filter_lots(lots, request.POST, entity_id)
+    nb_lots = len(filtered_lots)
     nb_sent = 0
     nb_rejected = 0
     nb_ignored = 0
     nb_auto_accepted = 0
     prefetched_data = get_prefetched_data()
-    for lot_id in lot_ids:
-        try:
-            lot = CarbureLot.objects.get(pk=lot_id)
-        except:
-            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
-
-        if lot.carbure_supplier_id != entity_id:
+    for lot in filtered_lots:
+        if lot.added_by_id != entity_id:
             return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to send this lot'}, status=403)
+        if lot.lot_status != CarbureLot.DRAFT:
+            return JsonResponse({'status': 'error', 'message': 'Lot is not a draft'}, status=400)
 
         if lot.lot_status in [CarbureLot.ACCEPTED, CarbureLot.FROZEN]:
             # ignore, lot already accepted
@@ -531,8 +527,8 @@ def lots_send(request, *args, **kwargs):
 
         # sanity check !!!
         if not sanity_check(lot, prefetched_data):
-          nb_rejected += 1
-          continue
+            nb_rejected += 1
+            continue
         nb_sent += 1
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.VALIDATED
@@ -585,7 +581,37 @@ def lots_send(request, *args, **kwargs):
             event.lot = lot
             event.user = request.user
             event.save()
-    return JsonResponse({'status': 'success', 'data': {'submitted': nb_lots, 'sent': nb_sent, 'auto-accepted': nb_auto_accepted, 'ignored': nb_ignored, 'rejected': nb_rejected}}, status=400)
+        lot.save()
+    return JsonResponse({'status': 'success', 'data': {'submitted': nb_lots, 'sent': nb_sent, 'auto-accepted': nb_auto_accepted, 'ignored': nb_ignored, 'rejected': nb_rejected}})
+
+
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
+def lots_delete(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    status = request.GET.get('status', None)
+    lots = get_entity_lots_by_status(entity_id, status)
+    filtered_lots = filter_lots(lots, request.POST, entity_id)
+    if filtered_lots.count() == 0:
+        return JsonResponse({'status': 'error', 'message': 'Could not find lots to delete'}, status=400)
+    for lot in filtered_lots:
+        if lot.added_by_id != int(entity_id):
+            return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to delete this lot'}, status=403)
+
+        if lot.lot_status not in [CarbureLot.DRAFT, CarbureLot.PENDING, CarbureLot.REJECTED]:
+            # cannot delete lot accepted / frozen or already deleted
+            return JsonResponse({'status': 'error', 'message': 'Cannot delete lot'}, status=400)
+
+        event = CarbureLotEvent()
+        event.event_type = CarbureLotEvent.DELETED
+        event.lot = lot
+        event.user = request.user
+        event.save()
+        lot.lot_status = CarbureLot.DELETED
+        lot.save()
+    return JsonResponse({'status': 'success'})
+
+
 
 @check_user_rights()
 def get_stock_filters(request, *args, **kwargs):
@@ -822,6 +848,7 @@ def reject_lot(request, *args, **kwargs):
             return JsonResponse({'status': 'error', 'message': 'Lot is deleted. Cannot reject'}, status=400)
 
         lot.lot_status = CarbureLot.REJECTED
+        lot.correction_status = CarbureLot.IN_CORRECTION
         lot.save()
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.REJECTED

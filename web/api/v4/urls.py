@@ -16,6 +16,7 @@ urlpatterns = [
     path('lots/duplicate', views.duplicate_lot, name='api-v4-duplicate-lot'),
     path('lots/update', views.get_snapshot, name='api-v4-update-lots'),
     path('lots/send', views.lots_send, name='api-v4-send-lots'),
+    path('lots/delete', views.lots_delete, name='api-v4-delete-lots'),
     ### Corrections
     path('lots/comment', views.add_comment, name='api-v4-comment-lots'),
     path('lots/request-fix', views.request_fix, name='api-v4-request-fix'),

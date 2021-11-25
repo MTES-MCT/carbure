@@ -62,13 +62,17 @@ export function getLotFilters(field: Filter, query: LotQuery) {
     .then((res) => res.data.data ?? [])
 }
 
-export function sendLots(query: LotQuery, selection: number[]) {
-  // prettier-ignore
-  const params = selection.length > 0
-    ? { entity_id: query.entity_id, selection }
-    : query
+export function sendLots(query: LotQuery, selection?: number[]) {
+  return api.post<Api<void>>("/lots/send", getParams(query, selection))
+}
 
-  return api.post<Api<void>>("/lots/send", params)
+export function deleteLots(query: LotQuery, selection?: number[]) {
+  return api.post<Api<void>>("/lots/delete", getParams(query, selection))
+}
+
+export function getParams(query: LotQuery, selection?: number[]) {
+  if (!selection || selection.length === 0) return query
+  else return { entity_id: query.entity_id, selection }
 }
 
 // ENDPOINTS FOR STOCKS

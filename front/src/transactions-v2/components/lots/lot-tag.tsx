@@ -32,6 +32,9 @@ export const LotTag = ({ lot, ...props }: LotTagProps) => {
   } else if (lot.lot_status === LotStatus.Frozen) {
     label = t("Déclaré")
     variant = "success"
+  } else if (lot.lot_status === LotStatus.Deleted) {
+    label = t("Supprimé")
+    variant = "danger"
   }
 
   return <Tag {...props} variant={variant} label={label} />

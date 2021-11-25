@@ -175,22 +175,9 @@ def check_user_rights(role=None):
         def wrap(request, *args, **kwargs):
             if not request.user.is_verified():
                 return JsonResponse({'status': 'forbidden', 'message': "User not OTP verified"}, status=403)
-            if request.method == "GET":
-                entity_id = request.GET.get('entity_id', False)
-            elif request.method == "POST":
-                entity_id = request.POST.get('entity_id', False)
-                if not entity_id:
-                    # try to find it from the payload
-                    try:
-                        entity_id = json.loads(request.body.decode('utf-8'))['entity_id']
-                    except:
-                        pass
-            else:
-                entity_id = None
+            entity_id = request.POST.get('entity_id', request.GET.get('entity_id', False))
             if not entity_id:       
                 return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
-
-            entity_id = str(entity_id)
             # check if we have data in the SESSION
             rights = request.session.get('rights', False)
             if not rights:

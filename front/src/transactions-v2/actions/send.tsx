@@ -63,6 +63,7 @@ export const SendOneButton = ({ icon, lot }: SendIconButtonProps) => {
       variant={icon ? "icon" : "success"}
       icon={Check}
       title={t("Envoyer le lot")}
+      label={t("Envoyer le lot")}
       action={() =>
         portal((close) => (
           <SendDialog
