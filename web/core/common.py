@@ -685,7 +685,7 @@ def fill_delivery_date(lot_row, lot, transaction):
         try:
             dd = try_get_date(lot_row['delivery_date'])
             diff = today - dd
-            if diff > datetime.timedelta(days=365):
+            if diff > datetime.timedelta(days=365) or diff < datetime.timedelta(days=-365):
                 msg = "Date trop éloignée (%s)" % (lot_row['delivery_date'])
                 tx_errors.append(GenericError(tx=transaction, field='delivery_date', error="INCORRECT_DELIVERY_DATE", extra=msg, value=lot_row['delivery_date'], display_to_creator=True, is_blocking=True))
                 lot.period = today.strftime('%Y-%m')
@@ -694,7 +694,7 @@ def fill_delivery_date(lot_row, lot, transaction):
                 transaction.delivery_date = dd
                 lot.period = dd.strftime('%Y-%m')
         except Exception:
-            transaction.delivery_date = today
+            transaction.delivery_date = None
             lot.period = today.strftime('%Y-%m')
             msg = "Format de date incorrect: veuillez entrer une date au format JJ/MM/AAAA (%s)" % (lot_row['delivery_date'])
             tx_errors.append(GenericError(tx=transaction, field='delivery_date', error="INCORRECT_FORMAT_DELIVERY_DATE", extra=msg, value=lot_row['delivery_date'], display_to_creator=True, is_blocking=True))
