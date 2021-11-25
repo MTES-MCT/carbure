@@ -931,6 +931,12 @@ class CarbureLot(models.Model):
         self.ghg_reference_red_ii = other.ghg_reference_red_ii
         self.ghg_reduction_red_ii = other.ghg_reduction_red_ii
 
+    def copy_basic_info(self, other):
+        self.biofuel = other.biofuel
+        self.feedstock = other.feedstock
+        self.country_of_origin = other.country_of_origin
+        
+
 class CarbureStockTransformation(models.Model):
     UNKNOWN = "UNKNOWN"
     ETH_ETBE = "ETH_ETBE"

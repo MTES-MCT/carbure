@@ -55,7 +55,7 @@ def get_entity_lots_by_status(entity_id, status):
         'parent_stock__feedstock', 'parent_stock__biofuel', 'parent_stock__depot', 'parent_stock__country_of_origin', 'parent_stock__production_country'
     ).prefetch_related('genericerror_set', 'carbure_production_site__productionsitecertificate_set')
     if status == 'DRAFTS':
-        lots = lots.filter(carbure_supplier_id=entity_id, lot_status=CarbureLot.DRAFT)
+        lots = lots.filter(added_by_id=entity_id, lot_status=CarbureLot.DRAFT)
     elif status == 'IN':
         lots = lots.filter(carbure_client_id=entity_id, lot_status__in=[CarbureLot.PENDING, CarbureLot.ACCEPTED, CarbureLot.FROZEN])
     elif status == 'OUT':
@@ -767,12 +767,12 @@ def get_prefetched_data(entity=None):
     lastyear = datetime.date.today() - datetime.timedelta(days=365)
     d = {}
     d['producers'] = {p.id: p for p in Entity.objects.filter(entity_type=Entity.PRODUCER)}
-    d['countries'] = {p.id: p for p in Pays.objects.all()}
-    d['biocarburants'] = {b.code: b for b in Biocarburant.objects.all()}
-    d['matieres_premieres'] = {m.code: m for m in MatierePremiere.objects.all()}
+    d['countries'] = {p.code_pays: p for p in Pays.objects.all()}
+    d['biofuels'] = {b.code: b for b in Biocarburant.objects.all()}
+    d['feedstocks'] = {m.code: m for m in MatierePremiere.objects.all()}
     if entity:
         # get only my production sites
-        d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').filter(producer=entity)}
+        d['my_production_sites'] = {ps.name.upper(): ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').filter(producer=entity)}
         # get all my linked certificates
         d['my_vendor_certificates'] = [c.certificate.certificate_id for c in EntityCertificate.objects.filter(entity=entity)]
     else:

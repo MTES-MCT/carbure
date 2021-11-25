@@ -67,7 +67,8 @@ def bulk_sanity_checks(lots, prefetched_data, background=True):
     if background == True:
         db.connections.close_all()
     # cleanup previous errors
-    GenericError.objects.filter(lot__in=lots).delete()
+    lot_ids = [l.id for l in lots]
+    GenericError.objects.filter(lot_id__in=lot_ids).delete()
     for lot in lots:
         try:
             is_sane, sanity_errors = sanity_check(lot, prefetched_data)
@@ -126,17 +127,17 @@ def sanity_check(lot, prefetched_data):
     errors = []
 
     # make sure all mandatory fields are set
-    valid, req_fields_errors = sanity_check_mandatory_fields(lot)
+    valid, reqfielderrors = sanity_check_mandatory_fields(lot)
     if not valid:
         is_sane = False
-        errors.append(req_fields_errors)
+        errors += reqfielderrors
         return is_sane, errors
 
     if lot.delivery_type == CarbureLot.RFC and lot.biofuel.code not in ['ED95', 'B100', 'ETH', 'EMHV', 'EMHU']:
         errors.append(generic_error(error='MAC_BC_WRONG', lot=lot, is_blocking=True, fields=['biofuel', 'delivery_type']))
 
     # check volume
-    if lot.volume < 2000 and lot.delivery_type not in [CarbureLot.RFC, CarbureLot.FLUSH]:
+    if lot.volume < 2000 and lot.delivery_type not in [CarbureLot.RFC, CarbureLot.FLUSHED]:
         errors.append(generic_error(error='VOLUME_FAIBLE', lot=lot, field='volume'))
 
     # réduction de GES
@@ -303,7 +304,7 @@ def sanity_check_mandatory_fields(lot):
         errors.append(generic_error(error='MISSING_PRODUCTION_SITE_COMDATE', lot=lot, field='production_site_commissioning_date', is_blocking=True))
         is_valid = False
 
-    if lot.delivery_type not in [CarbureLot.RFC, CarbureLot.FLUSH] and lot.transport_document_reference is None:
+    if lot.delivery_type not in [CarbureLot.RFC, CarbureLot.FLUSHED] and lot.transport_document_reference is None:
         errors.append(generic_error(error='MISSING TRANSPORT DOCUMENT REFERENCE', lot=lot, field='transport_document_reference', is_blocking=True))
         is_valid = False
     if lot.delivery_type in [CarbureLot.BLENDING, CarbureLot.TRADING, CarbureLot.STOCK, CarbureLot.DIRECT]:
@@ -337,5 +338,5 @@ def sanity_check_mandatory_fields(lot):
             is_valid = False
     if len(errors):
         GenericError.objects.bulk_create(errors)
-    return is_valid
+    return is_valid, errors
 

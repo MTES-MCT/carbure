@@ -85,10 +85,6 @@ def get_delivery_sites(request):
         dsites = Depot.objects.all().order_by('name')
         if q:
             dsites = dsites.filter(Q(name__icontains=q) | Q(depot_id__icontains=q) | Q(city__icontains=q))
-        if entity_id:
-            entity = Entity.objects.get(pk=entity_id)
-            if entity.entity_type in ['Producteur', 'Trader']:
-                dsites = dsites.filter(Q(depot_type__in=[Depot.EFPE, Depot.OTHER, Depot.OILDEPOT, Depot.BIOFUELDEPOT]))
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not find delivery sites"}, status=400)
 
