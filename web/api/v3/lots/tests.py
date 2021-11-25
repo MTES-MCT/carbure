@@ -110,7 +110,7 @@ class LotsAPITest(TransactionTestCase):
 
     def test_lot_actions(self):
         # as producer / trader
-        dae = 'TEST2020FR00923-094-32094'
+        dae = 'TEST2021FR00923-094-32094'
         lot = {
             'production_site': self.production_site.name,
             'production_site_commissioning_date': '01/12/2002',
@@ -125,7 +125,7 @@ class LotsAPITest(TransactionTestCase):
             'ep': 5,
             'etd': 12,
             'dae': dae,
-            'delivery_date': '2020-12-31',
+            'delivery_date': '2021-10-30',
             'client': self.test_operator.name,
             'delivery_site': '1',
             'entity_id': self.test_producer.id,
@@ -162,7 +162,7 @@ class LotsAPITest(TransactionTestCase):
         response = self.client.post(reverse('api-v3-delete-lot'), {'entity_id': self.test_producer.id, 'tx_ids':  [last.id]})
         self.assertEqual(response.status_code, 200)        
         # get drafts, make sure we have 3
-        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2020'})
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2021'})
         self.assertEqual(response.status_code, 200)        
         lots = response.json()['data']['lots']
         self.assertEqual(len(lots), 3)
@@ -180,7 +180,7 @@ class LotsAPITest(TransactionTestCase):
                     'ep': 5,
                     'etd': 12,
                     'dae': 'DAEUPDATED%d' % (i),
-                    'delivery_date': '2020-12-31',
+                    'delivery_date': '2021-10-30',
                     'client': self.test_operator.name,
                     'delivery_site': '01',
                     'entity_id': self.test_producer.id,
@@ -188,7 +188,7 @@ class LotsAPITest(TransactionTestCase):
                 response = self.client.post(reverse('api-v3-update-lot'), postdata)
                 self.assertEqual(response.status_code, 200)        
         # get drafts, make sure we still have 3
-        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2020'})
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2021'})
         self.assertEqual(response.status_code, 200)        
         lots = response.json()['data']['lots']
         self.assertEqual(len(lots), 3)
@@ -197,10 +197,11 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(response.status_code, 200)
         res = response.json()['data']
         self.assertEqual(res['submitted'], 1)
+        debug_errors()
         self.assertEqual(res['valid'], 1)
         self.assertEqual(res['invalid'], 0)
         # check that we have only two drafts remaining
-        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2020'})
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2021'})
         self.assertEqual(response.status_code, 200)        
         lots = response.json()['data']['lots']
         self.assertEqual(len(lots), 2)
@@ -213,7 +214,7 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(res['valid'], 2)
         self.assertEqual(res['invalid'], 0)
         # get drafts, make sure we have 0 - all sent
-        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2020'})
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2021'})
         self.assertEqual(response.status_code, 200)        
         data = response.json()['data']
         lots = data['lots']
@@ -221,7 +222,7 @@ class LotsAPITest(TransactionTestCase):
 
         # as operator
         # make sure we received 3
-        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_operator.id, 'status': 'in', 'year': '2020'})
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_operator.id, 'status': 'in', 'year': '2021'})
         self.assertEqual(response.status_code, 200)
         lots = response.json()['data']['lots']
         self.assertEqual(len(lots), 3)    
@@ -261,7 +262,7 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(lots.count(), nb_lots) # they are still all with status draft
 
         # get drafts via api - same result expected
-        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2020'})
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2021'})
         self.assertEqual(response.status_code, 200)        
         data = response.json()['data']
         lots = data['lots']
@@ -304,7 +305,7 @@ class LotsAPITest(TransactionTestCase):
         lots = LotV2.objects.filter(added_by_user=self.user1, status='Draft')
         self.assertEqual(lots.count(), 0) # no more drafts, all validated
         # check api
-        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2020'})
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2021'})
         self.assertEqual(response.status_code, 200)        
         data = response.json()['data']
         lots = data['lots']
@@ -318,12 +319,12 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(txs.count(), nb_lots)
 
         # check api
-        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'validated', 'year': '2020'})
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'validated', 'year': '2021'})
         self.assertEqual(response.status_code, 200)        
         lots = response.json()['data']['lots']
         self.assertEqual(len(lots), 0) # client is not in carbure, transactions are accepted automatically
 
-        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'accepted', 'year': '2020'})
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'accepted', 'year': '2021'})
         self.assertEqual(response.status_code, 200)        
         data = response.json()['data']
         lots = data['lots']
@@ -336,40 +337,24 @@ class LotsAPITest(TransactionTestCase):
         jsoned = self.upload_file('carbure_template_simple_missing_data_but_valid.xlsx', self.test_producer)
         nb_lots = jsoned['data']['total']
         self.assertEqual(jsoned['data']['loaded'], nb_lots)
-        # validate all 2020 lots (6). two wrong dates set to current year, everything else in 2020
-        lots_2020 = nb_lots - 2
-        txs = LotTransaction.objects.filter(lot__status='Draft', lot__period__startswith='2020')
+        # validate all 2021 lots. two wrong dates accounted for current period but with date == None
+        txs = LotTransaction.objects.filter(lot__status='Draft', lot__period__startswith='2021')
         response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx.id for tx in txs]})          
         self.assertEqual(response.status_code, 200)
-        debug_errors(is_blocking=True)
         res = response.json()['data']
-        self.assertEqual(res['submitted'], lots_2020)
-        self.assertEqual(res['valid'], lots_2020)
+        self.assertEqual(res['submitted'], nb_lots)
+        self.assertEqual(res['valid'], nb_lots)
 
         # get drafts
         txs = LotTransaction.objects.filter(lot__added_by_user=self.user1, lot__status='Draft')
-        self.assertEqual(txs.count(), 2) # two drafts left (line without delivery_date and line with far away date)
-
-        # validate them manually
-        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx.id for tx in txs]})          
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(txs.count(), 0)
 
         # check api
-        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2020'})
-        self.assertEqual(response.status_code, 200)        
-        data = response.json()['data']
-        lots = data['lots']
-        self.assertEqual(len(lots), 0)
-
-        tx = LotTransaction.objects.filter(lot__added_by_user=self.user1, lot__status='Draft')
-        self.assertEqual(tx.count(), 0) # no more drafts, everything has been validated
-
-        # check api
-        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'validated', 'year': '2020'})
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'validated', 'year': '2021'})
         self.assertEqual(response.status_code, 200)        
         lots = response.json()['data']['lots']
-        self.assertEqual(len(lots), lots_2020 - 1) # 1 tx has an empty client (producer himself - automatically accepted). For other, client is in carbure so transactions are pending acceptation
-        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'accepted', 'year': '2020'})
+        self.assertEqual(len(lots), nb_lots - 1) # 1 tx has an empty client (producer himself - automatically accepted). For other, client is in carbure so transactions are pending acceptation
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'accepted', 'year': '2021'})
         self.assertEqual(response.status_code, 200)
         data = response.json()['data']
         lots = data['lots']
@@ -395,10 +380,9 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(response.status_code, 200)
         # get drafts
         lots = LotV2.objects.filter(added_by_user=self.user1, status='Draft')
-        debug_transactions()
         self.assertEqual(lots.count(), nb_lots) # they are still all with status draft
         # get drafts via api - same result expected
-        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2020'})
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2021'})
         self.assertEqual(response.status_code, 200)        
         data = response.json()['data']
         lots = data['lots']
@@ -447,11 +431,11 @@ class LotsAPITest(TransactionTestCase):
         lots = LotV2.objects.filter(added_by_user=self.user1, status='Draft')
         self.assertEqual(lots.count(), nb_lots) # they are still all with status draft
         # get drafts via api - same result expected
-        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2020'})
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2021'})
         self.assertEqual(response.status_code, 200)        
         data = response.json()['data']
         lots = data['lots']
-        self.assertEqual(len(lots), nb_lots - 2) # 3 lots have a stupid date that won't be counted in 2020
+        self.assertEqual(len(lots), nb_lots) # 2 lots have a stupid date (2042 and 1942) but automatically moved to current period
 
         # make sure they all have an error
         for lot in lots:
@@ -470,7 +454,7 @@ class LotsAPITest(TransactionTestCase):
         LotTransaction.objects.all().delete()
         LotV2.objects.all().delete()
         # as producer, create lot
-        dae = 'TEST2020FR00923-DUP-32094'
+        dae = 'TEST2021FR00923-DUP-32094'
         lot = {
             'production_site': self.production_site.name,
             'biocarburant_code': 'ETH',
@@ -482,7 +466,7 @@ class LotsAPITest(TransactionTestCase):
             'ep': 5,
             'etd': 12,
             'dae': dae,
-            'delivery_date': '2020-12-31',
+            'delivery_date': '2021-10-30',
             'client': self.test_operator.name,
             'delivery_site': '001',
             'entity_id': self.test_producer.id,
@@ -493,7 +477,8 @@ class LotsAPITest(TransactionTestCase):
         tx = LotTransaction.objects.get(dae=dae)
         response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id], 'entity_id': self.test_producer.id})
         self.assertEqual(response.status_code, 200)
-
+        j = response.json()
+        self.assertEqual(j['data']['valid'], 1)
         # create same lot
         response = self.client.post(reverse('api-v3-add-lot'), lot)
         self.assertEqual(response.status_code, 200)
@@ -520,7 +505,7 @@ class LotsAPITest(TransactionTestCase):
         LotTransaction.objects.all().delete()
         LotV2.objects.all().delete()
         # as producer, create lot
-        dae = 'TEST2020FR00923-DUP-32094'
+        dae = 'TEST2021FR00923-DUP-32094'
         lot = {
             'production_site': "unknown production site",
             'production_site_commissioning_date': '2001-12-01',
@@ -532,7 +517,7 @@ class LotsAPITest(TransactionTestCase):
             'ep': 5,
             'etd': 12,
             'dae': dae,
-            'delivery_date': '2020-12-01',
+            'delivery_date': '2021-12-01',
             'client': self.test_operator.name,
             'delivery_site': '001',
             'entity_id': self.test_producer.id,
@@ -542,14 +527,14 @@ class LotsAPITest(TransactionTestCase):
         # check
         tx = LotTransaction.objects.get(dae=dae)
         dt1 = datetime.date(2001, 12, 1)
-        dt2 = datetime.date(2020, 12, 1)
+        dt2 = datetime.date(2021, 12, 1)
         self.assertEqual(tx.lot.unknown_production_site_com_date, dt1)
         self.assertEqual(tx.delivery_date, dt2)
 
         LotTransaction.objects.all().delete()
         LotV2.objects.all().delete()
         # as producer, create lot
-        dae = 'TEST2020FR00923-DUP-32094'
+        dae = 'TEST2021FR00923-DUP-32094'
         lot = {
             'production_site': "unknown production site",
             'production_site_commissioning_date': '01/12/2001',
@@ -561,7 +546,7 @@ class LotsAPITest(TransactionTestCase):
             'ep': 5,
             'etd': 12,
             'dae': dae,
-            'delivery_date': '01/12/2020',
+            'delivery_date': '01/12/2021',
             'client': self.test_operator.name,
             'delivery_site': '001',
             'entity_id': self.test_producer.id,
@@ -571,7 +556,7 @@ class LotsAPITest(TransactionTestCase):
         # check
         tx = LotTransaction.objects.get(dae=dae)
         dt1 = datetime.date(2001, 12, 1)
-        dt2 = datetime.date(2020, 12, 1)
+        dt2 = datetime.date(2021, 12, 1)
         self.assertEqual(tx.lot.unknown_production_site_com_date, dt1)
         self.assertEqual(tx.delivery_date, dt2)
 
@@ -590,7 +575,7 @@ class LotsAPITest(TransactionTestCase):
             'ep': 5,
             'etd': 12,
             'dae': get_random_dae(),
-            'delivery_date': '2020-12-31',
+            'delivery_date': '2021-12-31',
             'client': self.test_operator.name,
             'delivery_site': '001',
             'entity_id': self.test_producer.id,
@@ -649,7 +634,7 @@ class LotsAPITest(TransactionTestCase):
 
     def test_client_case_sensitiveness(self):
         # as producer / trader
-        dae = 'TEST2020FR00923-094-32094'
+        dae = 'TEST2021FR00923-094-32094'
         lot = {
             'production_site': self.production_site.name,
             'production_site_commissioning_date': '01/12/2002',
@@ -662,7 +647,7 @@ class LotsAPITest(TransactionTestCase):
             'ep': 5,
             'etd': 12,
             'dae': dae,
-            'delivery_date': '2020-12-31',
+            'delivery_date': '2021-12-31',
             'client': self.test_operator.name.lower(),
             'delivery_site': '1',
             'entity_id': self.test_producer.id,
@@ -766,7 +751,7 @@ class DeclarationTests(TransactionTestCase):
             'ep': 5,
             'etd': 12,
             'dae': get_random_dae(),
-            'delivery_date': '2020-12-31',
+            'delivery_date': '2021-12-31',
             'client': self.test_operator.name,
             'delivery_site': '001',
             'entity_id': self.test_producer.id,
@@ -862,7 +847,7 @@ class CorrectionTests(TransactionTestCase):
             'ep': 5,
             'etd': 12,
             'dae': get_random_dae(),
-            'delivery_date': '2020-12-31',
+            'delivery_date': '2021-12-31',
             'client': self.test_trader.name,
             'delivery_site': '001',
             'entity_id': self.test_producer.id,
