@@ -172,6 +172,9 @@ class CarbureStockPublicSerializer(serializers.ModelSerializer):
 
 
 class CarbureStockTransformationPublicSerializer(serializers.ModelSerializer):
+    source_stock = CarbureStockPublicSerializer(read_only=True)
+    dest_stock = CarbureStockPublicSerializer(read_only=True)
+
     class Meta:
         model = CarbureStockTransformation
         fields = [

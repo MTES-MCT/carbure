@@ -13,8 +13,8 @@ export interface StockDetails {
 
 export interface StockTransformation<T = any> {
   transformation_type: "ETH_ETBE" | string
-  source_stock: number
-  dest_stock: number
+  source_stock: Stock
+  dest_stock: Stock
   volume_deducted_from_source: number
   volume_destination: number
   metadata: T
