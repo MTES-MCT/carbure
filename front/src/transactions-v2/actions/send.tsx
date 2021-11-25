@@ -99,7 +99,6 @@ const SendDialog = ({
 
   const sendLots = useMutation(api.sendLots, {
     invalidates: ["lots", "snapshot"],
-    params: [query, selection],
 
     onSuccess: () => {
       const text = v({
@@ -173,7 +172,7 @@ const SendDialog = ({
           variant="primary"
           icon={Check}
           label={t("Envoyer")}
-          action={sendLots.execute}
+          action={() => sendLots.execute(query, selection)}
         />
       </footer>
     </Dialog>
