@@ -8,7 +8,7 @@ import { useStatus } from "../status"
 import { Order } from "common-v2/components/table"
 import { Bar } from "common-v2/components/scaffold"
 import Pagination from "common-v2/components/pagination"
-import Filters from "../filters"
+import Filters, { useFilterParams } from "../filters"
 import { LotTable } from "./lot-table"
 import NoResult from "../no-result"
 import { LotActions } from "./lot-actions"
@@ -159,13 +159,15 @@ export interface LotQueryState {
 }
 
 function useLotQueryStore(entity: Entity, year: number, status: Status) {
+  const [filtersParams, setFiltersParams] = useFilterParams()
+
   const [state, actions] = useStore(
     {
       entity,
       year,
       status,
       category: "pending",
-      filters: {},
+      filters: filtersParams,
       search: undefined,
       invalid: false,
       deadline: false,
@@ -218,12 +220,15 @@ function useLotQueryStore(entity: Entity, year: number, status: Status) {
         page: 0,
       }),
 
-      setFilters: (filters: FilterSelection) => ({
-        filters,
-        search: "",
-        selection: [],
-        page: 0,
-      }),
+      setFilters: (filters: FilterSelection) => {
+        setFiltersParams(filters)
+        return {
+          filters,
+          search: "",
+          selection: [],
+          page: 0,
+        }
+      },
 
       setSearch: (search: string | undefined) => ({
         search,
@@ -244,37 +249,37 @@ function useLotQueryStore(entity: Entity, year: number, status: Status) {
       }),
 
       setOrder: (order: Order | undefined) => ({
-        order, //
+        order,
       }),
 
       setSelection: (selection: number[]) => ({
-        selection, //
+        selection,
       }),
 
       setPage: (page?: number) => ({
         page,
-        selection: [], //
+        selection: [],
       }),
 
       setLimit: (limit?: number) => ({
         limit,
         selection: [],
-        page: 0, //
+        page: 0,
       }),
     }
   )
 
-  // source of truth for entity comes from above, so we force it in the state
+  // sync store state with entity set from above
   if (state.entity.id !== entity.id) {
     actions.setEntity(entity)
   }
 
-  // source of truth for year comes from above, so we force it in the state
+  // sync store state with year set from above
   if (state.year !== year) {
     actions.setYear(year)
   }
 
-  // source of truth for status is the url, so we force it in the state
+  // sync store state with status set in the route
   if (state.status !== status) {
     actions.setStatus(status)
   }
