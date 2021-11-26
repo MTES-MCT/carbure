@@ -33,13 +33,13 @@ export function useQuery<R, A extends any[]>(
   return query
 }
 
-export type MutationOptions<R, A extends any[]> = UseAsyncCallbackOptions<R> & {
+export type MutationOptions<R> = UseAsyncCallbackOptions<R> & {
   invalidates: string[]
 }
 
 export function useMutation<R, A extends any[]>(
   asyncFunction: (...args: A) => Promise<R>,
-  { invalidates, ...options }: MutationOptions<R, A>
+  { invalidates, ...options }: MutationOptions<R>
 ) {
   return useAsyncCallback(asyncFunction, {
     ...options,

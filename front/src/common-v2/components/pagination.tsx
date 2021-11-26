@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next"
 import css from "./pagination.module.css"
-import useLocalStorage from "common-v2/hooks/storage"
 import { Row } from "./scaffold"
 import Button from "./button"
 import { ChevronLeft, ChevronRight } from "./icons"

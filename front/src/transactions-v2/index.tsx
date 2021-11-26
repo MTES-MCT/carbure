@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 import useEntity from "carbure/hooks/entity"
@@ -32,7 +32,7 @@ export const Transactions = () => {
     onSuccess: (res) => {
       const years = res.data.data ?? []
       if (!years.includes(year)) {
-        setYear(years[0])
+        setYear(Math.max(...years))
       }
     },
   })
