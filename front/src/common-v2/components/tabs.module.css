@@ -2,32 +2,34 @@
   display: flex;
 }
 
-.tabs a {
-  min-width: 0;
+.tab {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  font-size: 1em;
   cursor: pointer;
   color: var(--black);
+  border: none;
+  background-color: transparent;
 }
 
-.header {
-  margin: 0 var(--spacing-l);
-}
-
-.header a {
+.header .tab {
+  align-items: center;
+  justify-content: center;
   padding: var(--spacing-m);
   font-size: 1.1em;
   text-decoration: none;
   white-space: pre-wrap;
 }
 
-.header a:hover {
+.header .tab:hover {
   color: var(--blue-dark);
 }
 
-.header a.active {
+.header .tab.active {
   font-weight: 600;
-  border-bottom: 4px solid var(--blue-dark);
+  border-bottom: 4px solid var(--blue-medium);
+  padding-bottom: calc(var(--spacing-m) - 4px);
 }
 
 .main {
@@ -35,7 +37,7 @@
   gap: var(--spacing-l);
 }
 
-.main a {
+.main .tab {
   flex: 1;
   justify-content: center;
   border: 1px solid var(--gray-medium);
@@ -46,20 +48,15 @@
   gap: var(--spacing-xs);
 }
 
-.main a:hover {
+.main .tab:hover {
   background-color: var(--gray-highlight);
   border-color: var(--blue-medium);
   color: var(--blue-medium);
 }
 
-.main a.active {
+.main .tab.active {
   border-bottom: 4px solid var(--blue-medium);
   padding-bottom: calc(var(--spacing-l) - 3px);
-}
-
-.main a small {
-  font-size: 0.75em;
-  font-weight: normal;
 }
 
 .sticky {
@@ -76,18 +73,18 @@
   gap: var(--spacing-m);
 }
 
-.section a,
-.sticky a {
+.section .tab,
+.sticky .tab {
   font-size: 1.1em;
 }
 
-.section a:hover,
-.sticky a:hover {
+.section .tab:hover,
+.sticky .tab:hover {
   text-decoration: underline;
 }
 
-.section a.active,
-.sticky a.active {
+.section .tab.active,
+.sticky .tab.active {
   font-weight: bold;
   text-decoration: underline;
 }
@@ -101,7 +98,7 @@
   align-self: flex-start;
 }
 
-.switcher a {
+.switcher .tab {
   padding: var(--spacing-s) var(--spacing-xl);
   background-color: var(--white);
   align-items: center;
@@ -109,15 +106,15 @@
   justify-content: center;
 }
 
-.switcher a:hover {
+.switcher .tab:hover {
   background-color: var(--gray-highlight);
 }
 
-.switcher a.active {
+.switcher .tab.active {
   background-color: var(--blue-medium);
   color: var(--white);
 }
 
-.switcher a.active:hover {
+.switcher .tab.active:hover {
   background-color: var(--blue-dark);
 }
