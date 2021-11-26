@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { DeclarationSummary, LotQuery } from "../types"
 import { Normalizer } from "common-v2/utils/normalize"
@@ -18,6 +18,7 @@ import {
   Check,
   Return,
 } from "common-v2/components/icons"
+import { Entity } from "carbure/types"
 
 export interface DeclarationButtonProps {
   year: number
@@ -54,36 +55,26 @@ export const DeclarationDialog = ({
   const { t } = useTranslation()
   const entity = useEntity()
 
-  const [declaration, setDeclaration] = useState<
-    DeclarationSummary | undefined
-  >()
+  const [declaration, setDeclaration] = useState<DeclarationSummary | undefined>() // prettier-ignore
 
   const declarations = useQuery(api.getDeclarations, {
     key: "declarations",
     params: [entity.id, year],
+
+    // select the current period by default
+    onSuccess: (res) => {
+      const declarations = res.data.data ?? []
+      if (declaration === undefined) {
+        setDeclaration(declarations.find((d) => d.period === currentPeriod))
+      }
+    },
   })
 
   const declarationsData = declarations.result?.data.data
   const period = declaration?.period ?? currentPeriod
 
-  // select the current period by default
-  useEffect(() => {
-    if (declaration === undefined && declarationsData !== undefined) {
-      setDeclaration(declarationsData.find((d) => d.period === currentPeriod))
-    }
-  }, [declaration, declarationsData])
-
   // generate a special query to get the summary for this declaration
-  const query = useMemo<LotQuery>(
-    () => ({
-      year,
-      entity_id: entity.id,
-      periods: [period],
-      status: "DECLARATION",
-      history: true,
-    }),
-    [entity.id, period, year]
-  )
+  const query = useDeclarationQuery({ entity, year, period })
 
   return (
     <Dialog limit onClose={onClose}>
@@ -146,6 +137,25 @@ export const DeclarationDialog = ({
         <Button asideX icon={Return} label={t("Retour")} action={onClose} />
       </footer>
     </Dialog>
+  )
+}
+
+interface DeclarationQueryState {
+  entity: Entity
+  year: number
+  period: string
+}
+
+function useDeclarationQuery({ entity, year, period }: DeclarationQueryState) {
+  return useMemo<LotQuery>(
+    () => ({
+      year,
+      entity_id: entity.id,
+      periods: [period],
+      status: "DECLARATION",
+      history: true,
+    }),
+    [entity.id, period, year]
   )
 }
 

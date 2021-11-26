@@ -1,5 +1,3 @@
-import { useCallback, useEffect, useState } from "react"
-import { useSearchParams, createSearchParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { Filter, FilterSelection, LotQuery, Status } from "../types"
 import * as api from "../api"
@@ -16,16 +14,11 @@ import {
 export interface FiltersProps {
   status: Status
   query: LotQuery
-  selected: FilterSelection
-  onSelect: (field: Filter, value: string[]) => void
+  filters: FilterSelection
+  onFilter: (filters: FilterSelection) => void
 }
 
-export const Filters = ({
-  status,
-  query,
-  selected,
-  onSelect,
-}: FiltersProps) => {
+export const Filters = ({ status, query, filters, onFilter }: FiltersProps) => {
   const { t } = useTranslation()
 
   // prettier-ignore
@@ -62,8 +55,8 @@ export const Filters = ({
           field={field}
           query={query}
           placeholder={filterLabels[field]}
-          value={selected[field]}
-          onChange={(value) => onSelect(field, value ?? [])}
+          value={filters[field]}
+          onChange={(value) => onFilter({ ...filters, [field]: value ?? [] })}
           getOptions={() => getFilters(field, query)}
         />
       ))}
@@ -71,55 +64,23 @@ export const Filters = ({
   )
 }
 
-interface ResetButtonProps {
-  filters: FilterManager
+export interface FilterManager {
+  filters: FilterSelection
+  onFilter: (filters: FilterSelection) => void
 }
 
-export const ResetButton = ({ filters }: ResetButtonProps) => {
+export const ResetButton = ({ filters, onFilter }: FilterManager) => {
   const { t } = useTranslation()
   return (
     <Row asideX>
       <Button
         variant="link"
-        action={filters.resetFilters}
+        action={() => onFilter({})}
         label={t("Réinitialiser les filtres")}
       />
-      <span> ({filters.count})</span>
+      <span> ({countFilters(filters)})</span>
     </Row>
   )
-}
-
-export interface FilterManager {
-  count: number
-  selected: FilterSelection
-  onFilter: (filter: Filter, value: string[]) => void
-  resetFilters: () => void
-}
-
-export function useFilters(): FilterManager {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const [selected, setFilters] = useState<FilterSelection>({})
-
-  useEffect(() => {
-    const normalizedFilters = createSearchParams(selected)
-    if (normalizedFilters.toString() !== searchParams.toString()) {
-      setFilters(searchToFilters(searchParams))
-    }
-  }, [selected, searchParams])
-
-  const onFilter = useCallback(
-    (filter: Filter, value: string[]) => {
-      setFilters((filters) => ({ ...filters, [filter]: value }))
-      setSearchParams({ ...selected, [filter]: value })
-    },
-    [selected, setSearchParams]
-  )
-
-  const resetFilters = () => setSearchParams({})
-
-  const count = Object.values(selected).filter((list) => list.length > 0).length
-
-  return { count, selected, onFilter, resetFilters }
 }
 
 export type FilterSelectProps = { field: Filter; query: LotQuery } & Omit<
@@ -160,6 +121,11 @@ export function searchToFilters(search: URLSearchParams) {
     filters[fkey]!.push(value)
   })
   return filters
+}
+
+export function countFilters(filters: FilterSelection | undefined) {
+  if (filters === undefined) return 0
+  return Object.values(filters).filter((list) => list.length > 0).length
 }
 
 const DRAFT_FILTERS = [

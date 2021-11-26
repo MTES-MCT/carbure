@@ -13,16 +13,16 @@ import { Filter, Return } from "common-v2/components/icons"
 import { FilterManager, ResetButton } from "../filters"
 import NoResult from "../no-result"
 
-export interface LotSummaryBarProps {
+export interface LotSummaryBarProps extends Partial<FilterManager> {
   query: LotQuery
   selection: number[]
-  filters: FilterManager
 }
 
 export const LotSummaryBar = ({
   query,
   selection,
   filters,
+  onFilter,
 }: LotSummaryBarProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
@@ -57,7 +57,9 @@ export const LotSummaryBar = ({
         }
       />
 
-      <ResetButton filters={filters} />
+      {filters && onFilter && (
+        <ResetButton filters={filters} onFilter={onFilter} />
+      )}
     </Alert>
   )
 }
