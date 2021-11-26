@@ -1,26 +1,21 @@
 import { Trans, useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
-
-import { ExternalAdminPages } from "common/types"
 import useUser, { useUserContext, UserContext } from "./hooks/user"
 import useEntity from "./hooks/entity"
-
 import { LoaderOverlay } from "common/components"
 import Topbar from "./components/top-bar"
 import Footer from "./components/footer"
 import Pending from "./components/pending"
 import Exit from "./components/exit"
 import Registry from "./components/registry"
-
-import TransactionsV2 from "transactions-v2"
+import PublicStats from "./components/public-stats"
+import Home from "./components/home"
+import Transactions from "transactions-v2"
 import Settings from "settings"
 import Account from "account"
 import DoubleCounting from "doublecount"
-import Entities from "../entities" // not using  path prevents import
-import EntityDetails from "../entities/routes/entity-details"
 import Dashboard from "dashboard"
-import PublicStats from "./components/public-stats"
-import Home from "./components/home"
+import Entities from "../entities" // not using  path prevents import
 
 const Carbure = () => {
   useTranslation()
@@ -58,25 +53,28 @@ const Org = () => {
     return <Exit to="/accounts/login" />
   }
 
-  const { isAdmin } = entity
+  const { isAdmin, isAuditor, isExternal, isIndustry } = entity
+  const hasDCA = isExternal && entity.hasPage("DCA")
 
+  // prettier-ignore
   return (
     <>
       <Routes>
-        <Route path="transactions-v2/*" element={<TransactionsV2 />} />
-
         <Route path="settings" element={<Settings />} />
-        <Route path="registry" element={<Registry />} />
+
+        {isIndustry && <Route path="transactions/*" element={<Transactions />} />}
+        {isIndustry && <Route path="registry" element={<Registry />} />}
 
         {isAdmin && <Route path="dashboard" element={<Dashboard />} />}
-        {isAdmin && <Route path="entities" element={<Entities />} />}
-        {isAdmin && <Route path="entities/:id" element={<EntityDetails />} />}
+        {isAdmin && <Route path="entities/*" element={<Entities />} />}
 
-        {(isAdmin || entity.hasPage(ExternalAdminPages.DoubleCounting)) && (
-          <Route path="double-counting/*" element={<DoubleCounting />} />
-        )}
+        {(isAdmin || isAuditor) && <Route path="controls/*" element={<h1>TODO</h1>} />}
+        {(isAdmin || hasDCA) && <Route path="double-counting/*" element={<DoubleCounting />} />}
 
-        <Route path="*" element={<Navigate to="transactions-v2" />} />
+        {isIndustry && <Route path="*" element={<Navigate to="transactions" />} />}
+        {isAdmin && <Route path="*" element={<Navigate to="dashboard" />} />}
+        {isAuditor && <Route path="*" element={<Navigate to="controls" />} />}
+        {hasDCA && <Route path="*" element={<Navigate to="double-counting" />} />}
       </Routes>
 
       {user.loading && <LoaderOverlay />}
