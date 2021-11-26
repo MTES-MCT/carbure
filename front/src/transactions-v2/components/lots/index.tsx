@@ -7,7 +7,7 @@ import { useQuery } from "common-v2/hooks/async"
 import { useStatus } from "../status"
 import { Order } from "common-v2/components/table"
 import { Bar } from "common-v2/components/scaffold"
-import Pagination from "common-v2/components/pagination"
+import Pagination, { useLimit } from "common-v2/components/pagination"
 import Filters, { useFilterParams } from "../filters"
 import { LotTable } from "./lot-table"
 import NoResult from "../no-result"
@@ -153,12 +153,13 @@ export interface LotQueryState {
   invalid: boolean
   deadline: boolean
   selection: number[]
-  page: number | undefined
+  page: number
   limit: number | undefined
   order: Order | undefined
 }
 
 function useLotQueryStore(entity: Entity, year: number, status: Status) {
+  const [limit, saveLimit] = useLimit()
   const [filtersParams, setFiltersParams] = useFilterParams()
 
   const [state, actions] = useStore(
@@ -174,7 +175,7 @@ function useLotQueryStore(entity: Entity, year: number, status: Status) {
       order: undefined,
       selection: [],
       page: 0,
-      limit: 10,
+      limit,
     } as LotQueryState,
     {
       setEntity: (entity: Entity) => ({
@@ -261,11 +262,14 @@ function useLotQueryStore(entity: Entity, year: number, status: Status) {
         selection: [],
       }),
 
-      setLimit: (limit?: number) => ({
-        limit,
-        selection: [],
-        page: 0,
-      }),
+      setLimit: (limit?: number) => {
+        saveLimit(limit)
+        return {
+          limit,
+          selection: [],
+          page: 0,
+        }
+      },
     }
   )
 

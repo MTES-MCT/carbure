@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next"
 import css from "./pagination.module.css"
+import useLocalStorage from "../hooks/storage"
 import { Row } from "./scaffold"
 import Button from "./button"
 import { ChevronLeft, ChevronRight } from "./icons"
@@ -8,9 +9,9 @@ import { Anchors } from "./dropdown"
 
 export interface PaginationProps {
   total: number
-  page: number | undefined
+  page: number
   limit: number | undefined
-  onPage: (page: number | undefined) => void
+  onPage: (page: number) => void
   onLimit: (limit: number | undefined) => void
 }
 
@@ -41,7 +42,7 @@ export const Pagination = ({
           anchor={Anchors.topLeft}
           placeholder={t("Choisir une page")}
           value={page}
-          onChange={onPage}
+          onChange={(page) => page !== undefined && onPage(page)}
           options={listPages(pageCount)}
         />
 
@@ -73,6 +74,10 @@ export const Pagination = ({
       />
     </Row>
   )
+}
+
+export function useLimit() {
+  return useLocalStorage<number | undefined>("carbure:limit", 10)
 }
 
 // generate a list of numbers from 0 to size-1
