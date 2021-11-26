@@ -137,7 +137,7 @@ export const LotSummary = ({
       small: true,
       key: "lots",
       header: pending ? t("Lots validés") : t("Lots"),
-      orderBy: (item) => item.total,
+      orderBy: (item) => (pending ? item.total - item.pending : item.total),
       cell: (item) => <LotCell pending={pending} item={item} />,
     },
     {
