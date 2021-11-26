@@ -27,6 +27,14 @@ export const Transactions = () => {
   const years = useQuery(api.getYears, {
     key: "years",
     params: [entity.id],
+
+    // select the latest year if the selected one isn't available anymore
+    onSuccess: (res) => {
+      const years = res.data.data ?? []
+      if (!years.includes(year)) {
+        setYear(years[0])
+      }
+    },
   })
 
   const snapshot = useQuery(api.getSnapshot, {
@@ -34,19 +42,15 @@ export const Transactions = () => {
     params: [entity.id, year],
   })
 
-  const yearData = years.result?.data.data
-  const snapshotData = snapshot.result?.data.data
-
-  // select first available year if previous selection did not match
-  useEffect(() => {
-    if (yearData && !yearData.includes(year)) {
-      setYear(yearData[0])
-    }
-  }, [year, yearData])
-
   if (status === "unknown") {
     return <Navigate to="drafts" />
   }
+
+  const yearData = years.result?.data.data
+  const snapshotData = snapshot.result?.data.data
+
+  // common props for subroutes
+  const props = { entity, year, snapshot: snapshotData }
 
   return (
     <PortalProvider>
@@ -81,14 +85,8 @@ export const Transactions = () => {
           </header>
 
           <Routes>
-            <Route
-              path="stocks/*"
-              element={<Stocks entity={entity} snapshot={snapshotData} />}
-            />
-            <Route
-              path="*"
-              element={<Lots entity={entity} year={year} snapshot={snapshotData} />} // prettier-ignore
-            />
+            <Route path="stocks/*" element={<Stocks {...props} />} />
+            <Route path="*" element={<Lots {...props} />} />
           </Routes>
         </Main>
       </FileArea>

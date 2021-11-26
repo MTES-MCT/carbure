@@ -1,15 +1,14 @@
-import { useEffect, useMemo, useState } from "react"
+import { useMemo } from "react"
 import { Route, Routes, useNavigate, useLocation } from "react-router-dom"
 import * as api from "../../api"
 import { Entity } from "carbure/types"
 import { Lot, Snapshot, FilterSelection, Status, LotQuery } from "../../types"
-import { PaginationManager } from "common-v2/components/pagination"
 import { useQuery } from "common-v2/hooks/async"
 import { useStatus } from "../status"
 import { Order } from "common-v2/components/table"
 import { Bar } from "common-v2/components/scaffold"
-import Pagination, { usePagination } from "common-v2/components/pagination"
-import Filters, { useFilters } from "../filters"
+import Pagination from "common-v2/components/pagination"
+import Filters from "../filters"
 import { LotTable } from "./lot-table"
 import NoResult from "../no-result"
 import { LotActions } from "./lot-actions"
@@ -18,6 +17,7 @@ import { LotSummaryBar } from "./lot-summary"
 import SearchBar from "../search-bar"
 import LotAdd from "lot-add"
 import LotDetails from "lot-details"
+import useStore from "common-v2/hooks/store"
 
 export interface LotsProps {
   entity: Entity
@@ -25,62 +25,14 @@ export interface LotsProps {
   snapshot: Snapshot | undefined
 }
 
-const EMPTY: number[] = []
-
 export const Lots = ({ entity, year, snapshot }: LotsProps) => {
   const navigate = useNavigate()
   const location = useLocation()
 
   const status = useStatus()
-  const filters = useFilters()
-  const pagination = usePagination()
 
-  const [category, setCategory] = useState("pending")
-  const [invalid, showInvalid] = useState(false)
-  const [deadline, showDeadline] = useState(false)
-  const [search, setSearch] = useState<string | undefined>()
-  const [selection, setSelection] = useState<number[]>(EMPTY)
-  const [order, setOrder] = useState<Order | undefined>()
-
-  // go back to the first page and empty selection when the query changes
-  const { limit, setPage } = pagination
-  useEffect(() => {
-    setPage(0)
-    setSelection(EMPTY)
-  }, [
-    status,
-    filters.selected,
-    category,
-    invalid,
-    deadline,
-    search,
-    limit,
-    setPage,
-  ])
-
-  // reset invalid/deadline filters when changing status/category
-  useEffect(() => {
-    showDeadline(false)
-    showInvalid(false)
-  }, [status, category])
-
-  // reset category when changing status
-  useEffect(() => {
-    setCategory("pending")
-  }, [status])
-
-  const query = useLotQuery({
-    entity,
-    status,
-    category,
-    year,
-    search,
-    invalid,
-    deadline,
-    pagination,
-    order,
-    filters: filters.selected,
-  })
+  const [state, actions] = useLotQueryStore(entity, year, status)
+  const query = useLotQuery(state)
 
   const lots = useQuery(api.getLots, {
     key: "lots",
@@ -89,7 +41,7 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
 
   const lotsData = lots.result?.data.data
   const lotList = lotsData?.lots ?? []
-  const ids = lotsData?.ids ?? EMPTY
+  const ids = lotsData?.ids ?? []
   const lotErrors = lotsData?.errors ?? {}
   const count = lotsData?.returned ?? 0
   const total = lotsData?.total ?? 0
@@ -108,65 +60,76 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
         <Filters
           status={status}
           query={query}
-          selected={filters.selected}
-          onSelect={filters.onFilter}
+          filters={state.filters}
+          onFilter={actions.setFilters}
         />
       </Bar>
 
       <section>
         <SearchBar
           count={snapshot?.lots}
-          search={search}
-          category={category}
-          onSearch={setSearch}
-          onSwitch={setCategory}
+          search={state.search}
+          category={state.category}
+          onSearch={actions.setSearch}
+          onSwitch={actions.setCategory}
         />
 
-        <LotActions count={count} query={query} selection={selection} />
+        <LotActions
+          count={count}
+          query={query}
+          selection={state.selection} //
+        />
 
         {totalErrors > 0 && (
           <InvalidSwitch
             count={totalErrors}
-            active={invalid}
-            onSwitch={showInvalid}
+            active={state.invalid}
+            onSwitch={actions.setInvalid}
           />
         )}
 
         {totalDeadline > 0 && (
           <DeadlineSwitch
             count={totalDeadline}
-            active={deadline}
-            onSwitch={showDeadline}
+            active={state.deadline}
+            onSwitch={actions.setDeadline}
           />
         )}
 
-        {count === 0 && <NoResult loading={lots.loading} filters={filters} />}
+        {count === 0 && (
+          <NoResult
+            loading={lots.loading}
+            filters={state.filters}
+            onFilter={actions.setFilters}
+          />
+        )}
 
         {count > 0 && (
           <>
             <LotSummaryBar
               query={query}
-              selection={selection}
-              filters={filters}
+              selection={state.selection}
+              filters={state.filters}
+              onFilter={actions.setFilters}
             />
 
             <LotTable
               loading={lots.loading}
-              order={order}
+              order={state.order}
               lots={lotList}
               errors={lotErrors}
-              selected={selection}
-              onSelect={setSelection}
+              selected={state.selection}
+              onSelect={actions.setSelection}
               onAction={showLotDetails}
-              onOrder={setOrder}
+              onOrder={actions.setOrder}
             />
 
             <Pagination
-              page={pagination.page}
-              limit={pagination.limit}
+              page={state.page}
+              limit={state.limit}
               total={total}
-              onPage={pagination.setPage}
-              onLimit={pagination.setLimit}
+              onPage={actions.setPage}
+              onLimit={actions.setLimit}
             />
           </>
         )}
@@ -180,17 +143,143 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
   )
 }
 
-export interface LotQueryParams {
+export interface LotQueryState {
   entity: Entity
+  year: number
   status: Status
   category: string
-  year: number
+  filters: FilterSelection
   search: string | undefined
   invalid: boolean
   deadline: boolean
-  pagination: PaginationManager
+  selection: number[]
+  page: number | undefined
+  limit: number | undefined
   order: Order | undefined
-  filters: FilterSelection
+}
+
+function useLotQueryStore(entity: Entity, year: number, status: Status) {
+  const [state, actions] = useStore(
+    {
+      entity,
+      year,
+      status,
+      category: "pending",
+      filters: {},
+      search: undefined,
+      invalid: false,
+      deadline: false,
+      order: undefined,
+      selection: [],
+      page: 0,
+      limit: 10,
+    } as LotQueryState,
+    {
+      setEntity: (entity: Entity) => ({
+        entity,
+        category: "pending",
+        filters: {},
+        search: "",
+        invalid: false,
+        deadline: false,
+        selection: [],
+        page: 0,
+      }),
+
+      setYear: (year: number) => ({
+        year,
+        category: "pending",
+        filters: {},
+        search: "",
+        invalid: false,
+        deadline: false,
+        selection: [],
+        page: 0,
+      }),
+
+      setStatus: (status: Status) => ({
+        status,
+        category: "pending",
+        filters: {},
+        search: "",
+        invalid: false,
+        deadline: false,
+        selection: [],
+        page: 0,
+      }),
+
+      setCategory: (category: string) => ({
+        category,
+        filters: {},
+        search: "",
+        invalid: false,
+        deadline: false,
+        selection: [],
+        page: 0,
+      }),
+
+      setFilters: (filters: FilterSelection) => ({
+        filters,
+        search: "",
+        selection: [],
+        page: 0,
+      }),
+
+      setSearch: (search: string | undefined) => ({
+        search,
+        selection: [],
+        page: 0,
+      }),
+
+      setInvalid: (invalid: boolean) => ({
+        invalid,
+        selection: [],
+        page: 0,
+      }),
+
+      setDeadline: (deadline: boolean) => ({
+        deadline,
+        selection: [],
+        page: 0,
+      }),
+
+      setOrder: (order: Order | undefined) => ({
+        order, //
+      }),
+
+      setSelection: (selection: number[]) => ({
+        selection, //
+      }),
+
+      setPage: (page?: number) => ({
+        page,
+        selection: [], //
+      }),
+
+      setLimit: (limit?: number) => ({
+        limit,
+        selection: [],
+        page: 0, //
+      }),
+    }
+  )
+
+  // source of truth for entity comes from above, so we force it in the state
+  if (state.entity.id !== entity.id) {
+    actions.setEntity(entity)
+  }
+
+  // source of truth for year comes from above, so we force it in the state
+  if (state.year !== year) {
+    actions.setYear(year)
+  }
+
+  // source of truth for status is the url, so we force it in the state
+  if (state.status !== status) {
+    actions.setStatus(status)
+  }
+
+  return [state, actions] as [typeof state, typeof actions]
 }
 
 export function useLotQuery({
@@ -201,12 +290,11 @@ export function useLotQuery({
   search,
   invalid,
   deadline,
-  pagination,
+  page = 0,
+  limit,
   order,
   filters,
-}: LotQueryParams) {
-  const { page = 0, limit } = pagination
-
+}: LotQueryState) {
   return useMemo<LotQuery>(
     () => ({
       entity_id: entity.id,

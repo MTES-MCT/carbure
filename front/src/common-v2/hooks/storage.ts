@@ -1,19 +1,5 @@
 import { useCallback, useState } from "react"
 
-function getKey<T>(key: string): T | undefined {
-  const value = localStorage.getItem(key)
-  return value && JSON.parse(value)
-}
-
-function setKey<T>(key: string, value: T) {
-  if (value !== undefined) {
-    const string = JSON.stringify(value)
-    localStorage.setItem(key, string)
-  } else {
-    localStorage.removeItem(key)
-  }
-}
-
 export function useLocalStorage<T>(
   key: string,
   defaultValue: T
@@ -34,6 +20,20 @@ export function useLocalStorage<T>(
   }, [key, defaultValue])
 
   return [state, setStateAndStorage, emptyStateAndStorage]
+}
+
+function getKey<T>(key: string): T | undefined {
+  const value = localStorage.getItem(key)
+  return value && JSON.parse(value)
+}
+
+function setKey<T>(key: string, value: T) {
+  if (value !== undefined) {
+    const string = JSON.stringify(value)
+    localStorage.setItem(key, string)
+  } else {
+    localStorage.removeItem(key)
+  }
 }
 
 export default useLocalStorage

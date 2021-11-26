@@ -110,10 +110,10 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
             label={t("Sauvegarder")}
           />
         )}
-        
+
         {lotData && <SendOneButton lot={lotData.lot} />}
         {lotData && <DeleteOneButton lot={lotData.lot} />}
-        
+
         {expiring && (
           <Alert
             icon={Alarm}

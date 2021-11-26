@@ -1,55 +1,35 @@
-import { useEffect, useMemo, useState } from "react"
+import { useMemo } from "react"
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom"
 import { Entity } from "carbure/types"
 import { Snapshot, Stock, FilterSelection, StockQuery } from "../../types"
 import { Order } from "common-v2/components/table"
-import { PaginationManager } from "common-v2/components/pagination"
 import { useQuery } from "common-v2/hooks/async"
 import * as api from "../../api"
 import { Bar } from "common-v2/components/scaffold"
-import Pagination, { usePagination } from "common-v2/components/pagination"
-import Filters, { useFilters } from "../filters"
+import Pagination from "common-v2/components/pagination"
+import Filters from "../filters"
 import StockTable from "./stock-table"
 import NoResult from "../no-result"
 import StockActions from "./stock-actions"
 import { SearchBar } from "../search-bar"
 import { StockSummaryBar } from "./stock-summary"
 import StockDetails from "stock-details"
+import useStore from "common-v2/hooks/store"
 
 export interface StocksProps {
   entity: Entity
+  year: number
   snapshot: Snapshot | undefined
 }
 
 const EMPTY: number[] = []
 
-export const Stocks = ({ entity, snapshot }: StocksProps) => {
+export const Stocks = ({ entity, year, snapshot }: StocksProps) => {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const filters = useFilters()
-  const pagination = usePagination()
-
-  const [category, setCategory] = useState("pending")
-  const [search, setSearch] = useState<string | undefined>()
-  const [selection, setSelection] = useState<number[]>(EMPTY)
-  const [order, setOrder] = useState<Order | undefined>()
-
-  // go back to the first page and empty selection when the query changes
-  const { limit, setPage } = pagination
-  useEffect(() => {
-    setPage(0)
-    setSelection(EMPTY)
-  }, [filters.selected, category, search, limit, setPage])
-
-  const query = useStockQuery({
-    entity,
-    category,
-    search,
-    pagination,
-    order,
-    filters: filters.selected,
-  })
+  const [state, actions] = useStockQueryStore(entity, year)
+  const query = useStockQuery(state)
 
   const stocks = useQuery(api.getStocks, {
     key: "stocks",
@@ -74,48 +54,59 @@ export const Stocks = ({ entity, snapshot }: StocksProps) => {
         <Filters
           status="stocks"
           query={query}
-          selected={filters.selected}
-          onSelect={filters.onFilter}
+          filters={state.filters}
+          onFilter={actions.setFilters}
         />
       </Bar>
 
       <section>
         <SearchBar
           count={snapshot?.lots}
-          search={search}
-          category={category}
-          onSearch={setSearch}
-          onSwitch={setCategory}
+          search={state.search}
+          category={state.category}
+          onSearch={actions.setSearch}
+          onSwitch={actions.setCategory}
         />
 
-        <StockActions count={count} query={query} selection={selection} />
+        <StockActions
+          count={count}
+          query={query}
+          selection={state.selection} //
+        />
 
-        {count === 0 && <NoResult loading={stocks.loading} filters={filters} />}
+        {count === 0 && (
+          <NoResult
+            loading={stocks.loading}
+            filters={state.filters}
+            onFilter={actions.setFilters}
+          />
+        )}
 
         {count > 0 && (
           <>
             <StockSummaryBar
               query={query}
-              selection={selection}
-              filters={filters}
+              selection={state.selection}
+              filters={state.filters}
+              onFilter={actions.setFilters}
             />
 
             <StockTable
               loading={stocks.loading}
               stocks={stockList}
-              order={order}
-              selected={selection}
-              onSelect={setSelection}
+              order={state.order}
+              selected={state.selection}
+              onSelect={actions.setSelection}
+              onOrder={actions.setOrder}
               onAction={showStockDetails}
-              onOrder={setOrder}
             />
 
             <Pagination
-              page={pagination.page}
-              limit={pagination.limit}
+              page={state.page}
+              limit={state.limit}
               total={total}
-              onPage={pagination.setPage}
-              onLimit={pagination.setLimit}
+              onPage={actions.setPage}
+              onLimit={actions.setLimit}
             />
           </>
         )}
@@ -128,37 +119,109 @@ export const Stocks = ({ entity, snapshot }: StocksProps) => {
   )
 }
 
-export interface StockQueryParams {
+export interface StockQueryState {
   entity: Entity
+  year: number
   category: string
-  search: string | undefined
-  pagination: PaginationManager
-  order: Order | undefined
   filters: FilterSelection
+  search: string | undefined
+  selection: number[]
+  page: number | undefined
+  limit: number | undefined
+  order: Order | undefined
+}
+
+function useStockQueryStore(entity: Entity, year: number) {
+  const [state, actions] = useStore(
+    {
+      entity,
+      year,
+      category: "pending",
+      filters: {},
+      search: undefined,
+      order: undefined,
+      selection: [],
+      page: 0,
+      limit: 10,
+    } as StockQueryState,
+    {
+      setEntity: (entity: Entity) => ({
+        entity,
+        category: "pending",
+        filters: {},
+        search: "",
+        selection: [],
+        page: 0,
+      }),
+      setYear: (year: number) => ({
+        year,
+        category: "pending",
+        filters: {},
+        search: "",
+        selection: [],
+        page: 0,
+      }),
+      setCategory: (category: string) => ({
+        category,
+        filters: {},
+        search: "",
+        selection: [],
+        page: 0,
+      }),
+      setFilters: (filters: FilterSelection) => ({
+        filters,
+        search: "",
+        selection: [],
+        page: 0,
+      }),
+      setSearch: (search: string | undefined) => ({
+        search,
+        selection: [],
+        page: 0,
+      }),
+      setOrder: (order: Order | undefined) => ({ order }),
+      setSelection: (selection: number[]) => ({ selection }),
+      setPage: (page?: number) => ({ page, selection: [] }),
+      setLimit: (limit?: number) => ({ limit, selection: [], page: 0 }),
+    }
+  )
+
+  // source of truth for entity comes from above, so we force it in the state
+  if (state.entity.id !== entity.id) {
+    actions.setEntity(entity)
+  }
+
+  // source of truth for year comes from above, so we force it in the state
+  if (state.year !== year) {
+    actions.setYear(year)
+  }
+
+  return [state, actions] as [typeof state, typeof actions]
 }
 
 export function useStockQuery({
   entity,
+  year,
   category,
-  search,
-  pagination,
-  order,
   filters,
-}: StockQueryParams) {
-  const { page = 0, limit } = pagination
-
+  search,
+  order,
+  page = 0,
+  limit,
+}: StockQueryState) {
   return useMemo<StockQuery>(
     () => ({
       entity_id: entity.id,
+      year,
       history: category === "history" ? true : undefined,
       query: search ? search : undefined,
-      from_idx: page * (limit ?? 0),
-      limit: limit || undefined,
       sort_by: order?.column,
       order: order?.direction,
+      from_idx: page * (limit ?? 0),
+      limit: limit || undefined,
       ...filters,
     }),
-    [entity.id, category, search, page, limit, order, filters]
+    [entity.id, year, category, filters, search, order, page, limit]
   )
 }
 

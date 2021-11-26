@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import css from "./pagination.module.css"
 import useLocalStorage from "common-v2/hooks/storage"
@@ -75,20 +74,6 @@ export const Pagination = ({
       />
     </Row>
   )
-}
-
-export interface PaginationManager {
-  page: number | undefined
-  limit: number | undefined
-  setPage: (page: number | undefined) => void
-  setLimit: (limit: number | undefined) => void
-}
-
-export function usePagination() {
-  const [page, setPage] = useState<number | undefined>(0)
-  const [limit, setLimit] = useLocalStorage<number | undefined>("carbure:limit", 10) // prettier-ignore
-
-  return { page, limit, setPage, setLimit }
 }
 
 // generate a list of numbers from 0 to size-1

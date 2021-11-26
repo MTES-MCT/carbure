@@ -3,18 +3,19 @@ import Alert from "common-v2/components/alert"
 import { AlertCircle } from "common-v2/components/icons"
 import { FilterManager, ResetButton } from "./filters"
 
-interface NoResultProps {
+interface NoResultProps extends Partial<FilterManager> {
   loading?: boolean
-  filters?: FilterManager
 }
 
-export const NoResult = ({ loading, filters }: NoResultProps) => {
+export const NoResult = ({ loading, filters, onFilter }: NoResultProps) => {
   const { t } = useTranslation()
 
   return (
     <Alert loading={loading} variant="warning" icon={AlertCircle}>
       <p>{t("Aucun résultat trouvé pour cette recherche")}</p>
-      {filters && <ResetButton filters={filters} />}
+      {filters && onFilter && (
+        <ResetButton filters={filters} onFilter={onFilter} />
+      )}
     </Alert>
   )
 }
