@@ -17,10 +17,7 @@ export enum EntityType {
   ExternalAdmin = "Administration Externe",
 }
 
-export enum ExternalAdminPages {
-  DoubleCounting = "DCA",
-  Tirib = "TIRIB",
-}
+export type ExternalAdminPages = "DCA" | "TIRIB"
 
 export interface User {
   email: string

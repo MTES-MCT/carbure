@@ -70,7 +70,6 @@ export const StatusTabs = ({
   )
 }
 
-
 const defaultCount: Snapshot["lots"] = {
   draft: 0,
   in_pending: 0,
@@ -82,7 +81,6 @@ const defaultCount: Snapshot["lots"] = {
   out_tofix: 0,
   out_total: 0,
 }
-
 
 interface StatusRecapProps {
   loading: boolean
@@ -115,7 +113,7 @@ const StatusRecap = ({
 }
 
 export function useStatus() {
-  const match = useMatch<"status">("/org/:entity/transactions-v2/:status/*")
+  const match = useMatch<"status">("/org/:entity/transactions/:status/*")
   return (match?.params.status ?? "unknown") as Status
 }
 

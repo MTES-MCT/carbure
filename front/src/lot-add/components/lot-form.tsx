@@ -56,9 +56,9 @@ export function useLotFieldErrors(
   const { t } = useTranslation()
   const fieldErrors: { [k: string]: string } = {}
 
-  errors.forEach((err) =>
-    (errorsToFields[err.error] ?? []).forEach((field) => {
-      const all = [fieldErrors[field], t(err.error, { ns: "errors" })]
+  errors.forEach(({ error }) =>
+    (errorsToFields[error] ?? []).forEach((field) => {
+      const all = [fieldErrors[field], t(error, { ns: "errors" })]
       fieldErrors[field] = all.filter(Boolean).join(", ")
     })
   )

@@ -10,6 +10,7 @@ export interface EntityManager extends Entity {
   isProducer: boolean
   isOperator: boolean
   isTrader: boolean
+  isIndustry: boolean
   hasPage: (page: ExternalAdminPages) => boolean
   hasRights: (...roles: UserRole[]) => boolean
 }
@@ -39,6 +40,7 @@ export function useEntity(): EntityManager {
     isProducer: type === EntityType.Producer,
     isOperator: type === EntityType.Operator,
     isTrader: type === EntityType.Trader,
+    isIndustry: isIndustry(type),
 
     hasPage: (page: ExternalAdminPages) =>
       entity?.ext_admin_pages?.includes(page) ?? false,
@@ -46,6 +48,12 @@ export function useEntity(): EntityManager {
     hasRights: (...roles: UserRole[]) =>
       (entityRights && roles.includes(entityRights.role)) ?? false,
   }
+}
+
+const INDUSTRY = [EntityType.Producer, EntityType.Operator, EntityType.Trader]
+export function isIndustry(type: EntityType | undefined) {
+  if (type === undefined) return false
+  else return INDUSTRY.includes(type)
 }
 
 export function useRights() {

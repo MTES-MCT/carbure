@@ -1,5 +1,6 @@
 import { Option } from "./components/select"
 import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
+import { ExternalAdminPages } from "carbure/types"
 
 export type Pagination = {
   from?: number
@@ -33,12 +34,7 @@ export enum EntityType {
   Trader = "Trader",
   Administration = "Administration",
   Auditor = "Auditor",
-  ExternalAdmin = "Administration Externe"
-}
-
-export enum ExternalAdminPages {
-  DoubleCounting = 'DCA',
-  Tirib = 'TIRIB'
+  ExternalAdmin = "Administration Externe",
 }
 
 export interface Entity {
@@ -108,7 +104,6 @@ export interface DeliverySite {
   postal_code: string
   address: string
 }
-
 
 export interface ProductionSite {
   id: number
@@ -553,7 +548,6 @@ export interface ConvertETBE {
   volume_etbe_eligible: number
   volume_denaturant: number
 }
-
 
 export interface Depot {
   name: string
