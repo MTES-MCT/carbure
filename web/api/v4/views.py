@@ -44,7 +44,7 @@ def get_snapshot(request, *args, **kwargs):
     lots_in = lots.filter(carbure_client_id=entity_id)
     lots_in_pending = lots_in.filter(lot_status=CarbureLot.PENDING)
     lots_in_tofix = lots_in.exclude(correction_status=CarbureLot.NO_PROBLEMO)
-    stock = CarbureStock.objects.filter(carbure_client_id=entity_id)
+    stock = CarbureStock.objects.filter(carbure_client_id=entity_id).filter(Q(parent_lot__year=year) | Q(parent_transformation__transformation_dt__year=year))
     stock_not_empty = stock.filter(remaining_volume__gt=0)
     lots_out = lots.filter(carbure_supplier_id=entity_id)
     lots_out_pending = lots_out.filter(lot_status=CarbureLot.PENDING)
