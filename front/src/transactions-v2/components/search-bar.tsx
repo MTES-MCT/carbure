@@ -26,7 +26,7 @@ export const SearchBar = ({ search, onSearch, ...props }: SearchBarProps) => {
       <SearchInput
         asideX
         clear
-        debounce={240}
+        debounce={250}
         value={search}
         onChange={onSearch}
       />

@@ -144,18 +144,9 @@
   height: 20px;
 }
 
-.search {
-  flex: 1 1;
-  max-width: 256px;
-  background-color: var(--white);
-}
-
 .search .control {
   padding: var(--spacing-s);
-}
-
-.search input {
-  width: 0;
+  background-color: var(--white);
 }
 
 .search .icon:first-child {
