@@ -85,6 +85,10 @@
   color: var(--red-dark);
 }
 
+.control[data-interactive] {
+  cursor: pointer;
+}
+
 .control input,
 .control textarea,
 .control .file {

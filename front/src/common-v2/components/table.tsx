@@ -60,7 +60,11 @@ export function Table<T>({
 
       <ul className={css.rows}>
         {[...rows].sort(compare).map((row, i) => (
-          <li key={i} onClick={onAction ? () => onAction(row) : undefined}>
+          <li
+            key={i}
+            data-interactive={onAction ? true : undefined}
+            onClick={onAction ? () => onAction(row) : undefined}
+          >
             {columns.map((column, i) => (
               <div
                 key={column.key ?? i}

@@ -191,7 +191,6 @@ export interface InputProps extends Control {
 }
 
 export const Input = ({
-  type,
   name,
   placeholder,
   min,
@@ -208,7 +207,7 @@ export const Input = ({
       disabled={props.disabled}
       readOnly={props.readOnly}
       required={props.required}
-      type={type}
+      type={props.type}
       name={name}
       placeholder={placeholder}
       min={min}
@@ -374,6 +373,7 @@ export const Field = ({
   readOnly,
   loading,
   required,
+  type,
   error,
   label,
   icon: Icon,
@@ -404,6 +404,7 @@ export const Field = ({
 
     <div
       tabIndex={-1}
+      data-interactive={type === "button" ? true : undefined}
       ref={domRef as React.RefObject<HTMLDivElement>}
       className={css.control}
     >
