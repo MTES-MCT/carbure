@@ -7,7 +7,7 @@ import { useQuery } from "common-v2/hooks/async"
 import * as api from "../../api"
 import { Bar } from "common-v2/components/scaffold"
 import Pagination from "common-v2/components/pagination"
-import Filters from "../filters"
+import Filters, { useFilterParams } from "../filters"
 import StockTable from "./stock-table"
 import NoResult from "../no-result"
 import StockActions from "./stock-actions"
@@ -132,12 +132,14 @@ export interface StockQueryState {
 }
 
 function useStockQueryStore(entity: Entity, year: number) {
+  const [filtersParams, setFiltersParams] = useFilterParams()
+
   const [state, actions] = useStore(
     {
       entity,
       year,
       category: "pending",
-      filters: {},
+      filters: filtersParams,
       search: undefined,
       order: undefined,
       selection: [],
@@ -153,6 +155,7 @@ function useStockQueryStore(entity: Entity, year: number) {
         selection: [],
         page: 0,
       }),
+
       setYear: (year: number) => ({
         year,
         category: "pending",
@@ -161,6 +164,7 @@ function useStockQueryStore(entity: Entity, year: number) {
         selection: [],
         page: 0,
       }),
+
       setCategory: (category: string) => ({
         category,
         filters: {},
@@ -168,30 +172,50 @@ function useStockQueryStore(entity: Entity, year: number) {
         selection: [],
         page: 0,
       }),
-      setFilters: (filters: FilterSelection) => ({
-        filters,
-        search: "",
-        selection: [],
-        page: 0,
-      }),
+
+      setFilters: (filters: FilterSelection) => {
+        setFiltersParams(filters)
+        return {
+          filters,
+          search: "",
+          selection: [],
+          page: 0,
+        }
+      },
+
       setSearch: (search: string | undefined) => ({
         search,
         selection: [],
         page: 0,
       }),
-      setOrder: (order: Order | undefined) => ({ order }),
-      setSelection: (selection: number[]) => ({ selection }),
-      setPage: (page?: number) => ({ page, selection: [] }),
-      setLimit: (limit?: number) => ({ limit, selection: [], page: 0 }),
+
+      setOrder: (order: Order | undefined) => ({
+        order,
+      }),
+
+      setSelection: (selection: number[]) => ({
+        selection,
+      }),
+
+      setPage: (page?: number) => ({
+        page,
+        selection: [],
+      }),
+
+      setLimit: (limit?: number) => ({
+        limit,
+        selection: [],
+        page: 0,
+      }),
     }
   )
 
-  // source of truth for entity comes from above, so we force it in the state
+  // sync state with entity defined above
   if (state.entity.id !== entity.id) {
     actions.setEntity(entity)
   }
 
-  // source of truth for year comes from above, so we force it in the state
+  // sync state with year defined above
   if (state.year !== year) {
     actions.setYear(year)
   }

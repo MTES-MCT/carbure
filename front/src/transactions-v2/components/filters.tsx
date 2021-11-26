@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next"
+import { useSearchParams } from "react-router-dom"
 import { Filter, FilterSelection, LotQuery, Status } from "../types"
 import * as api from "../api"
 import { Normalizer, Option } from "common-v2/utils/normalize"
@@ -111,6 +112,12 @@ const filterNormalizers: Partial<Record<Filter, Normalizer<Option, string>>> = {
   [Filter.Feedstocks]: normalizeFeedstockFilter,
   [Filter.Biofuels]: normalizeBiofuelFilter,
   [Filter.CountriesOfOrigin]: normalizeCountryFilter,
+}
+
+export function useFilterParams() {
+  const [filtersParams, setFiltersParams] = useSearchParams()
+  const filters = searchToFilters(filtersParams)
+  return [filters, setFiltersParams] as [typeof filters, typeof setFiltersParams] // prettier-ignore
 }
 
 export function searchToFilters(search: URLSearchParams) {
