@@ -6,7 +6,7 @@ import { Order } from "common-v2/components/table"
 import { useQuery } from "common-v2/hooks/async"
 import * as api from "../../api"
 import { Bar } from "common-v2/components/scaffold"
-import Pagination from "common-v2/components/pagination"
+import Pagination, { useLimit } from "common-v2/components/pagination"
 import Filters, { useFilterParams } from "../filters"
 import StockTable from "./stock-table"
 import NoResult from "../no-result"
@@ -126,12 +126,13 @@ export interface StockQueryState {
   filters: FilterSelection
   search: string | undefined
   selection: number[]
-  page: number | undefined
+  page: number
   limit: number | undefined
   order: Order | undefined
 }
 
 function useStockQueryStore(entity: Entity, year: number) {
+  const [limit, saveLimit] = useLimit()
   const [filtersParams, setFiltersParams] = useFilterParams()
 
   const [state, actions] = useStore(
@@ -144,7 +145,7 @@ function useStockQueryStore(entity: Entity, year: number) {
       order: undefined,
       selection: [],
       page: 0,
-      limit: 10,
+      limit,
     } as StockQueryState,
     {
       setEntity: (entity: Entity) => ({
@@ -197,16 +198,19 @@ function useStockQueryStore(entity: Entity, year: number) {
         selection,
       }),
 
-      setPage: (page?: number) => ({
+      setPage: (page: number) => ({
         page,
         selection: [],
       }),
 
-      setLimit: (limit?: number) => ({
-        limit,
-        selection: [],
-        page: 0,
-      }),
+      setLimit: (limit: number | undefined) => {
+        saveLimit(limit)
+        return {
+          limit,
+          selection: [],
+          page: 0,
+        }
+      },
     }
   )
 
@@ -230,7 +234,7 @@ export function useStockQuery({
   filters,
   search,
   order,
-  page = 0,
+  page,
   limit,
 }: StockQueryState) {
   return useMemo<StockQuery>(
@@ -242,7 +246,7 @@ export function useStockQuery({
       sort_by: order?.column,
       order: order?.direction,
       from_idx: page * (limit ?? 0),
-      limit: limit || undefined,
+      limit,
       ...filters,
     }),
     [entity.id, year, category, filters, search, order, page, limit]
