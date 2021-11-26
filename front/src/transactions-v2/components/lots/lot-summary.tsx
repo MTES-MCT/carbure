@@ -124,7 +124,7 @@ export const LotSummary = ({
     {
       key: "biofuel",
       header: t("Biocarburant"),
-      orderBy: (item) => item.biofuel_code,
+      orderBy: (item) => t(item.biofuel_code, { ns: "biofuels" }) as string,
       cell: (item) => <Cell text={t(item.biofuel_code, { ns: "biofuels" })} />,
     },
     {
