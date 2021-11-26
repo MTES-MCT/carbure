@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Lot, LotQuery } from "../types"
 import * as api from "../api"
