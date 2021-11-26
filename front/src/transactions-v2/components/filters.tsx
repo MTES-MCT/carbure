@@ -132,7 +132,7 @@ export function searchToFilters(search: URLSearchParams) {
 
 export function countFilters(filters: FilterSelection | undefined) {
   if (filters === undefined) return 0
-  return Object.values(filters).filter((list) => list.length > 0).length
+  return Object.values(filters).reduce((total, list) => total + list.length, 0)
 }
 
 const DRAFT_FILTERS = [
