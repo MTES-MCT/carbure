@@ -67,16 +67,16 @@ export default function useCompany(entity: EntityManager): CompanySettingsHook {
     }
   }
 
-  function onChangeMAC(checked: boolean): void {
+  async function onChangeMAC(checked: boolean) {
     if (entity !== null) {
-      resolveToggleMAC(checked, entityID)
+      await resolveToggleMAC(checked, entityID)
       reloadUserSettings()
     }
   }
 
-  function onChangeTrading(checked: boolean): void {
+  async function onChangeTrading(checked: boolean) {
     if (entity !== null) {
-      resolveToggleTrading(checked, entityID)
+      await resolveToggleTrading(checked, entityID)
       reloadUserSettings()
     }
   }

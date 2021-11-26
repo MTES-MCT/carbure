@@ -75,9 +75,7 @@ test("pick an entity from the menu", async () => {
   const operator = await screen.findByText("Opérateur Test")
   userEvent.click(operator)
 
-  await waitWhileLoading()
-
   expect(menu.textContent).toBe("Opérateur Test")
 
-  expect(screen.queryByText("Stocks")).toBeNull()
+  await screen.findAllByTestId("loader")
 })
