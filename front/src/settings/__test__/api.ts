@@ -107,7 +107,7 @@ export const okDynamicSettings = rest.get(
         status: "success",
         data: {
           email: "producer@test.com",
-          rights: [{ entity, rights: "rw" }],
+          rights: [{ ...entityRight, entity }],
           requests: [],
         },
       })
@@ -122,7 +122,6 @@ export const okEnableMac = rest.post(
       ...entity,
       has_mac: true,
     })
-
     return res(ctx.json({ status: "success" }))
   }
 )
@@ -134,7 +133,6 @@ export const okDisableMac = rest.post(
       ...entity,
       has_mac: false,
     })
-
     return res(ctx.json({ status: "success" }))
   }
 )
