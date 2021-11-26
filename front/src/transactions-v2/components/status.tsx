@@ -100,7 +100,7 @@ const StatusRecap = ({
   return (
     <>
       <p>
-        {loading ? <Loader size={16} /> : count}{" "}
+        {loading ? <Loader size={20} /> : count}{" "}
         {tofix > 0 && (
           <small>
             ({tofix} {t("corrections")})
