@@ -1,8 +1,7 @@
-import { CSSProperties, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import cl from "clsx"
 import {
-  Link,
-  matchPath,
+  NavLink,
   resolvePath,
   useLocation,
   useResolvedPath,
@@ -20,7 +19,7 @@ export interface Tab {
 
 export interface TabsProps extends Layout {
   className?: string
-  style?: CSSProperties
+  style?: React.CSSProperties
   tabs: (Tab | false)[]
   variant?: TabVariant
   focus?: string
@@ -32,16 +31,15 @@ export const Tabs = ({
   className,
   style,
   variant = "section",
-  tabs,
+  tabs: tabsConfig,
   focus: controlledFocus,
   onFocus,
   children,
   ...props
 }: TabsProps) => {
   const matcher = useMatcher()
-  const okTabs = tabs.filter(Boolean) as Tab[]
-  const match = okTabs.find((tab) => matcher(tab.path)) ?? okTabs[0]
-
+  const tabs = tabsConfig.filter(Boolean) as Tab[]
+  const match = tabs.find((tab) => matcher(tab.path)) ?? tabs[0]
   const [focus, setFocus] = useState(controlledFocus ?? match.key)
 
   useEffect(() => {
@@ -55,22 +53,25 @@ export const Tabs = ({
         className={cl(css.tabs, css[variant], className)}
         style={style}
       >
-        {okTabs.map((tab) => {
+        {tabs.map((tab) => {
           const props = {
             key: tab.key,
-            className: cl(tab.key === focus && css.active),
+            className: cl(css.tab, tab.key === focus && css.active),
             onClick: () => {
               setFocus(tab.key)
               onFocus?.(tab.key)
             },
           }
 
-          return tab.path ? (
-            <Link {...props} to={tab.path}>
+          // basic tab that doesn't deal with router
+          if (!tab.path) {
+            return <button {...props}>{tab.label}</button>
+          }
+
+          return (
+            <NavLink {...props} to={tab.path}>
               {tab.label}
-            </Link>
-          ) : (
-            <a {...props}>{tab.label}</a>
+            </NavLink>
           )
         })}
       </nav>
@@ -84,8 +85,15 @@ export function useMatcher() {
   const parentPath = useResolvedPath(".").pathname
   const currentPath = useLocation().pathname
 
-  return (path: string | undefined = "") =>
-    matchPath(currentPath, resolvePath(path, parentPath).pathname)
+  return (path: string | undefined) => {
+    if (path === undefined) return null
+    const tabPath = resolvePath(path, parentPath).pathname
+    const isSamePath = currentPath === tabPath
+    const startsWithPath =
+      currentPath.startsWith(tabPath) &&
+      currentPath.charAt(tabPath.length) === "/"
+    return isSamePath || startsWithPath
+  }
 }
 
 export default Tabs
