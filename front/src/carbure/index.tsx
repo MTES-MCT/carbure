@@ -1,8 +1,8 @@
-import { Trans } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
+import { LoaderOverlay } from "common-v2/components/scaffold"
 import useUser, { UserContext } from "./hooks/user"
 import useEntity from "./hooks/entity"
-import { LoaderOverlay } from "common/components"
+import DevBanner from "./components/dev-banner"
 import Topbar from "./components/top-bar"
 import Footer from "./components/footer"
 import Pending from "./components/pending"
@@ -48,7 +48,6 @@ const Carbure = () => {
   )
 }
 
-// has to be nested in a route so we can get data from useParams()
 const Org = () => {
   const entity = useEntity()
 
@@ -75,25 +74,6 @@ const Org = () => {
       {hasDCA && <Route path="*" element={<Navigate to="double-counting" />} />}
     </Routes>
 
-  )
-}
-
-const DevBanner = () => {
-  if (window.location.hostname === "carbure.beta.gouv.fr") return null
-
-  return (
-    <div
-      style={{
-        backgroundColor: "var(--orange-medium)",
-        padding: "8px var(--main-spacing)",
-      }}
-    >
-      <Trans>
-        <b>Version de développement de CarbuRe :</b> les manipulations
-        effectuées ici n'ont pas de répercussion et les déclarations ne sont pas
-        prises en compte.
-      </Trans>
-    </div>
   )
 }
 
