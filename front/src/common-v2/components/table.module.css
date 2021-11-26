@@ -40,6 +40,9 @@
   position: relative;
   padding: 0 var(--spacing-l);
   gap: var(--spacing-m);
+}
+
+.rows > li[data-interactive] {
   cursor: pointer;
 }
 
