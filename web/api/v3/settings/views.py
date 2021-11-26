@@ -27,19 +27,19 @@ from api.v3.sanity_checks import bulk_sanity_checks
 @otp_or_403
 def get_settings(request):
     # user-rights
-    rights = UserRights.objects.filter(user=request.user)
+    rights = UserRights.objects.filter(user=request.user).select_related('user', 'entity')
     request.session['rights'] = {ur.entity.id: ur.role for ur in rights}
     rights_sez = [r.natural_key() for r in rights]
     # requests
-    requests = UserRightsRequests.objects.filter(user=request.user)
+    requests = UserRightsRequests.objects.filter(user=request.user).select_related('user', 'entity')
     requests_sez = [r.natural_key() for r in requests]
 
-    depots = {}
-    for ur in rights:
-        d = EntityDepot.objects.filter(entity=ur.entity)
-        serializer = EntityDepotSerializer(d, many=True)
-        depots[ur.entity.id] = serializer.data
-    return JsonResponse({'status': 'success', 'data': {'rights': rights_sez, 'email': request.user.email, 'requests': requests_sez, 'depots': depots}})
+    # depots = {}
+    # for ur in rights:
+    #     d = EntityDepot.objects.filter(entity=ur.entity).select_related('depot', 'depot__country', 'entity', 'blender')
+    #     serializer = EntityDepotSerializer(d, many=True)
+    #     depots[ur.entity.id] = serializer.data
+    return JsonResponse({'status': 'success', 'data': {'rights': rights_sez, 'email': request.user.email, 'requests': requests_sez}})
 
 
 @check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
