@@ -1,5 +1,5 @@
-import calendar
 import datetime
+import dictdiffer
 import json
 import traceback
 from django.db.models.aggregates import Count
@@ -7,6 +7,7 @@ from django.db.models.fields import NOT_PROVIDED
 
 from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
+from api.v3.sanity_checks import bulk_sanity_checks
 from core.decorators import check_user_rights
 from api.v4.helpers import filter_lots, filter_stock, get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock
 from api.v4.helpers import get_prefetched_data, get_stock_events, get_stock_with_metadata, get_stock_filters_data, get_stocks_summary_data, get_transaction_distance, handle_eth_to_etbe_transformation
@@ -14,7 +15,7 @@ from api.v4.helpers import send_email_declaration_invalidated, send_email_declar
 from api.v4.lots import construct_carbure_lot, bulk_insert_lots
 from api.v4.sanity_checks import sanity_check
 
-from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Entity, SustainabilityDeclaration, UserRights
+from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Entity, GenericError, SustainabilityDeclaration, UserRights
 from core.serializers import CarbureLotPublicSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
 
 
@@ -469,6 +470,68 @@ def add_lot(request, *args, **kwargs):
     e.save()
 
     data = CarbureLotPublicSerializer(e.lot).data
+    return JsonResponse({'status': 'success', 'data': data})
+
+
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
+def update_lot(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    lot_id = request.POST.get('lot_id', None)
+    if not lot_id:
+        return JsonResponse({'status': 'error', 'message': 'Missing lot_id'}, status=400)
+    entity = Entity.objects.get(pk=entity_id)
+
+    try:
+        existing_lot = CarbureLot.objects.get(id=lot_id, added_by=entity)
+    except:
+        return JsonResponse({'status': 'error', 'message': 'Could not find lot'}, status=400)
+
+    previous = CarbureLotPublicSerializer(existing_lot).data
+    # prefetch some data
+    d = get_prefetched_data(entity)
+    updated_lot, errors = construct_carbure_lot(d, entity, request.POST.dict(), existing_lot)
+    if not updated_lot:
+        return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=400)
+    # run sanity checks, insert lot and errors
+    updated_lot.save()
+    for lot_errors in errors:
+        for e in lot_errors:
+            e.lot = updated_lot
+    GenericError.objects.bulk_create(errors[0], batch_size=100)
+    bulk_sanity_checks([updated_lot], d, background=False)
+    data = CarbureLotPublicSerializer(updated_lot).data
+    diff = dictdiffer.diff(previous, data)
+    added = []
+    removed = []
+    changed = []
+    for d in diff:
+        action, field, data = d
+        if action == 'change':
+            if isinstance(data, tuple):
+                changed.append((field, data[0], data[1]))
+        if action == 'add':
+            if isinstance(data, list):
+                for (subfield, value) in data:
+                    if field != '':
+                        full_field_name = '%s.%s' % (field, subfield)
+                    else:
+                        full_field_name = subfield
+                    added.append((full_field_name, value))
+        if action == 'remove':
+            if isinstance(data, list):
+                for (subfield, value) in data:
+                    if field != '':
+                        full_field_name = '%s.%s' % (field, subfield)
+                    else:
+                        full_field_name = subfield
+                    removed.append((full_field_name, value))
+    e = CarbureLotEvent()
+    e.event_type = CarbureLotEvent.UPDATED
+    e.lot = updated_lot
+    e.user = request.user
+    e.metadata = {'added': added, 'removed': removed, 'changed': changed}
+    e.save()    
     return JsonResponse({'status': 'success', 'data': data})
 
 

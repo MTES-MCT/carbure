@@ -149,17 +149,25 @@ def fill_basic_info(lot, data, prefetched_data):
                 # all good
                 lot.country_of_origin = countries[country_code]
     ### VOLUME
-    volume = data.get('volume', None)
-    if not volume:
-        errors.append(GenericError(lot=lot, field='volume', error=MISSING_VOLUME, display_to_creator=True, is_blocking=True))
-    else:
-        try:
-            lot.volume = abs(float(volume))
-        except Exception:
-            lot.volume = 0
-            errors.append(GenericError(lot=lot, field='volume', error=VOLUME_FORMAT_INCORRECT, display_to_creator=True, is_blocking=True))
-    lot.weight = lot.get_weight()
-    lot.lhv_amount = lot.get_lhv_amount()
+    if lot.parent_lot is None:
+        volume = data.get('volume', None)
+        if not volume:
+            errors.append(GenericError(lot=lot, field='volume', error=MISSING_VOLUME, display_to_creator=True, is_blocking=True))
+        else:
+            try:
+                volume = round(abs(float(volume)), 2)
+                if lot.volume != 0 and volume != lot.volume:
+                    if lot.parent_stock is not None:
+                        # we are updating the volume of a lot from stock
+                        lot.parent_stock.update_remaining_volume(lot.volume, volume)
+                else:
+                    # initial volume setting
+                    lot.volume = volume
+            except Exception:
+                lot.volume = 0
+                errors.append(GenericError(lot=lot, field='volume', error=VOLUME_FORMAT_INCORRECT, display_to_creator=True, is_blocking=True))
+        lot.weight = lot.get_weight()
+        lot.lhv_amount = lot.get_lhv_amount()
     return errors
 
 def fill_supplier_info(lot, data, entity):
@@ -261,10 +269,13 @@ def fill_client_data(lot, data, entity, prefetched_data):
     lot.unknown_client = data.get('unknown_client', None)
     return errors
 
-def construct_carbure_lot(prefetched_data, entity, data):
+def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
     errors = []
 
-    lot = CarbureLot()
+    if existing_lot:
+        lot = existing_lot
+    else:
+        lot = CarbureLot()
     errors += fill_delivery_date(lot, data)
     errors += fill_production_info(lot, data, entity, prefetched_data)
     errors += fill_basic_info(lot, data, prefetched_data)
