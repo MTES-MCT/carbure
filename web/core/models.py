@@ -965,13 +965,14 @@ def delete_stock_transformation(sender, instance, using, **kwargs):
     instance.source_stock.remaining_volume = round(instance.source_stock.remaining_volume + instance.volume_deducted_from_source, 2)
     instance.source_stock.save()
     # delete dest_stock
-    instance.dest_stock.delete()
+    instance.dest_stock.parent_transformation = None
+    instance.dest_stock.parent_lot = None # redundant
     # save event
-    event = CarbureLotEvent()
-    event.event_type = CarbureLotEvent.UNCONVERT
-    event.lot = instance.source_stock.parent_lot
+    event = CarbureStockEvent()
+    event.event_type = CarbureStockEvent.UNTRANSFORMED
+    event.stock = instance.source_stock
     event.user = None
-    event.metadata = models.JSONField({'message': 'delete stock transformation. recredit volume.', 'volume_to_credit': instance.volume_deduced_from_source})
+    event.metadata = {'message': 'delete stock transformation. recredit volume.', 'volume_to_credit': instance.volume_deducted_from_source}
     event.save()
 
 
@@ -979,18 +980,16 @@ def delete_stock_transformation(sender, instance, using, **kwargs):
 def delete_lot(sender, instance, using, **kwargs):
     # if we come from stock, recredit
     if instance.parent_stock:
-        if instance.parent_stock.parent_lot:
-            # this lot was a split from a stock
-            instance.parent_stock.remaining_volume = round(instance.parent_stock.remaining_volume + instance.volume, 2)
-            instance.parent_stock.save()
-
-            # save event
-            event = CarbureLotEvent()
-            event.event_type = CarbureLotEvent.UNSPLIT
-            event.lot = instance.parent_stock.parent_lot
-            event.user = None
-            event.metadata = models.JSONField({'message': 'delete lot with parent stock. recredit volume.', 'volume_to_credit': instance.volume})
-            event.save()
+        # this lot was a split from a stock
+        instance.parent_stock.remaining_volume = round(instance.parent_stock.remaining_volume + instance.volume, 2)
+        instance.parent_stock.save()
+        # save event
+        event = CarbureStockEvent()
+        event.event_type = CarbureStockEvent.UNSPLIT
+        event.stock = instance.parent_stock
+        event.user = None
+        event.metadata = {'message': 'child lot deleted. recredit volume.', 'volume_to_credit': instance.volume}
+        event.save()
 
 class CarbureStock(models.Model):
     parent_lot = models.ForeignKey(CarbureLot, null=True, blank=True, on_delete=models.CASCADE)
