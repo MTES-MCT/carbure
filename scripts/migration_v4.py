@@ -217,7 +217,7 @@ def create_new_tx_and_child(tx):
                     etbe_stock.save()
                     TX_ID_MIGRATED[child.id] = None
                     # migrate child transactions
-                    etbe_child = LotTransaction.objects.filter(parent_tx=trans.new_stock)
+                    etbe_child = LotTransaction.objects.filter(parent_tx=trans.new_stock).exclude(carbure_client=trans.new_stock.carbure_client)
                     for c in etbe_child:
                         lot.pk = None
                         lot.carbure_supplier = stock.carbure_client
@@ -276,7 +276,7 @@ def create_new_tx_and_child(tx):
         remaining = stock.remaining_volume
         diff = remaining - theo_remaining
         if abs(diff) > 0.1:
-            print('VOLUME DISCREPANCY!!! Theo remaining [%f] remaining [%f]' % (theo_remaining, remaining))
+            print('VOLUME DISCREPANCY!!! Theo remaining [%f] remaining [%f]. %s %s %s %s %s' % (theo_remaining, remaining, lot.carbure_supplier, lot.carbure_client, lot.period, lot.feedstock.name, lot.biofuel.name))
 
     # if is_forwarded, check Child TX (Processing / Trading without storage) and create them
     if tx.is_forwarded:
@@ -302,8 +302,12 @@ def create_new_tx_and_child(tx):
     return lot
 
 
-def migrate_old_data():
-    all_transactions = LotTransaction.objects.all()
+def migrate_old_data(quick=False):
+    CarbureLot.objects.all().delete()
+    if quick:
+        all_transactions = LotTransaction.objects.filter(lot__period__in=['2021-09', '2021-10', '2021-11'])
+    else:
+        all_transactions = LotTransaction.objects.all()
     for tx in all_transactions:
         # create the new transaction
         new_tx = create_new_tx_and_child(tx)
@@ -457,5 +461,5 @@ def migrate_old_certificates():
     
 
 if __name__ == '__main__':
-    migrate_old_data()
-    migrate_old_certificates()
+    migrate_old_data(quick=True)
+    #migrate_old_certificates()
