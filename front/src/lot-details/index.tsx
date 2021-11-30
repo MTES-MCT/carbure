@@ -2,7 +2,8 @@ import { useNavigate, useLocation, useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import * as api from "./api"
 import { CorrectionStatus, Lot, LotStatus } from "transactions-v2/types"
-import { useQuery } from "common-v2/hooks/async"
+import { useQuery, useMutation } from "common-v2/hooks/async"
+import { useNotify } from 'common-v2/components/notifications'
 import { useStatus } from "transactions-v2/components/status"
 import useEntity from "carbure/hooks/entity"
 import { LoaderOverlay } from "common-v2/components/scaffold"
@@ -30,6 +31,7 @@ export interface LotDetailsProps {
 
 export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const { t } = useTranslation()
+  const notify = useNotify()
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -41,6 +43,18 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const lot = useQuery(api.getLotDetails, {
     key: "lot-details",
     params: [entity.id, parseInt(params.id!)],
+  })
+
+  const updateLot = useMutation(api.updateLot, {
+    invalidates: ['lots', 'lot-details'],
+
+    onSuccess: () => {
+      notify(t("Le lot a bien été mis à jour"), { variant: 'success' })
+    },
+
+    onError: () => {
+      notify(t("La mise à jour du lot a échoué"), { variant: 'danger' })
+    }
   })
 
   const lotData = lot.result?.data.data
@@ -72,7 +86,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
             readOnly={!editable}
             lot={lotData?.lot}
             errors={errors}
-            onSubmit={(form) => console.log(form)}
+            onSubmit={(form) => updateLot.execute(entity.id, form!)}
           />
         </section>
 
@@ -104,6 +118,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
       <footer>
         {editable && (
           <Button
+            loading={updateLot.loading}
             variant="primary"
             icon={Save}
             submit="lot-form"

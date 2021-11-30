@@ -41,6 +41,10 @@
   color: var(--gray-dark);
 }
 
+.input[type="date"] {
+  white-space: normal;
+}
+
 /* LABEL TEXT FIELD COMPONENT */
 
 .labelWrapper {

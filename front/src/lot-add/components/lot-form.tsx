@@ -1,11 +1,7 @@
-import { Lot, LotError } from "transactions-v2/types"
-import Form, { FormErrors, useForm } from "common-v2/components/form"
-import LotFields from "./lot-fields"
-import ProductionFields from "./production-fields"
-import DeliveryFields from "./delivery-fields"
-import { EmissionFields, ReductionFields } from "./ghg-fields"
 import { useEffect, useMemo } from "react"
-import { Entity } from "carbure/types"
+import { useTranslation } from "react-i18next"
+import useEntity from 'carbure/hooks/entity'
+import { Lot, LotError } from "transactions-v2/types"
 import {
   Biofuel,
   Country,
@@ -13,7 +9,13 @@ import {
   Feedstock,
   ProductionSite,
 } from "common/types"
-import { useTranslation } from "react-i18next"
+import { LotStatus } from 'transactions-v2/types'
+import Form, { FormErrors, useForm } from "common-v2/components/form"
+import LotFields from "./lot-fields"
+import ProductionFields from "./production-fields"
+import DeliveryFields from "./delivery-fields"
+import { EmissionFields, ReductionFields } from "./ghg-fields"
+import { Entity } from "carbure/types"
 
 export interface LotFormProps {
   lot?: Lot
@@ -46,8 +48,84 @@ export function useLotForm(
   initialValue: LotFormValue = defaultLot,
   lotErrors: LotError[] = []
 ) {
+  const entity = useEntity()
   const errors = useLotFieldErrors(lotErrors)
-  return useForm(initialValue, { errors })
+
+  function setValue(value: LotFormValue): LotFormValue {
+    if (value.lot && value.lot.lot_status !== LotStatus.Draft) return value
+
+    // for producers
+    if (entity.isProducer) {
+      if (value.supplier === undefined) {
+        value.supplier = entity
+      }
+
+      if (!entity.has_trading) {
+        value.producer = entity
+      }
+    }
+
+    // for traders
+    if (entity.isTrader) {
+      if (value.supplier === undefined) {
+        value.supplier = entity
+      }
+    }
+
+    // for operators
+    if (entity.isOperator) {
+      if (value.client === undefined) {
+        value.client = entity
+      }
+    }
+
+    // automatically set the default certificate of the supplier
+    const supplier = value.supplier instanceof Object ? value.supplier : undefined
+    if (supplier?.id === entity.id && value.supplier_certificate === undefined) {
+      value.supplier_certificate = entity.default_certificate
+    }
+
+    // autofill production fields
+    if (value.production_site instanceof Object) {
+      value.production_country = value.production_site.country
+      value.production_site_commissioning_date = value.production_site.date_mise_en_service
+
+      value.production_site_double_counting_certificate = value.feedstock?.is_double_compte
+        ? value.production_site.dc_reference
+        : undefined
+    }
+
+    // autofill delivery site fields
+    if (value.delivery_site instanceof Object) {
+      value.delivery_site_country = value.delivery_site.country
+    }
+
+    // update GES summary
+    const reference = value.lot?.ghg_reference ?? 83.8
+    const referenceRedII = value.lot?.ghg_reference_red_ii ?? 94.0
+
+    const total = computeGHGTotal(value)
+    const reduction = computeGHGReduction(total, reference)
+    const reductionRedII = computeGHGReduction(total, referenceRedII)
+
+    value.ghg_total = total
+    value.ghg_reduction = reduction
+    value.ghg_reduction_red_ii = reductionRedII
+
+    return value
+  }
+
+
+  return useForm(setValue(initialValue), { errors, setValue })
+}
+
+function computeGHGTotal(value: LotFormValue) {
+  const { eec = 0, el = 0, ep = 0, etd = 0, eu = 0, esca = 0, eccs = 0, eccr = 0, eee = 0 } = value
+  return eec + el + ep + etd + eu - esca - eccs - eccr - eee
+}
+
+function computeGHGReduction(total: number, reference: number) {
+  return (1.0 - total / reference) * 100.0
 }
 
 export function useLotFieldErrors(
@@ -104,7 +182,7 @@ export const defaultLot = {
 
   ghg_total: 0 as number | undefined,
   ghg_reduction: 0 as number | undefined,
-  ghg_reduction_red_ii: 0 as number | undefined,
+  ghg_reduction_red_ii: 0 as number | undefined
 }
 
 export type LotFormValue = typeof defaultLot
@@ -134,21 +212,70 @@ export const lotToFormValue: (lot: Lot | undefined) => LotFormValue = (lot) => (
   delivery_site_country: lot?.delivery_site_country ?? undefined,
   delivery_date: lot?.delivery_date ?? undefined,
 
-  eec: lot?.eec ?? undefined,
-  el: lot?.el ?? undefined,
-  ep: lot?.ep ?? undefined,
-  etd: lot?.etd ?? undefined,
-  eu: lot?.eu ?? undefined,
+  eec: lot?.eec ?? 0,
+  el: lot?.el ?? 0,
+  ep: lot?.ep ?? 0,
+  etd: lot?.etd ?? 0,
+  eu: lot?.eu ?? 0,
 
-  esca: lot?.esca ?? undefined,
-  eccs: lot?.eccs ?? undefined,
-  eccr: lot?.eccr ?? undefined,
-  eee: lot?.eee ?? undefined,
+  esca: lot?.esca ?? 0,
+  eccs: lot?.eccs ?? 0,
+  eccr: lot?.eccr ?? 0,
+  eee: lot?.eee ?? 0,
 
-  ghg_total: lot?.ghg_total ?? undefined,
-  ghg_reduction: lot?.ghg_reduction ?? undefined,
-  ghg_reduction_red_ii: lot?.ghg_reduction_red_ii ?? undefined,
+  ghg_total: lot?.ghg_total ?? 0,
+  ghg_reduction: lot?.ghg_reduction ?? 0,
+  ghg_reduction_red_ii: lot?.ghg_reduction_red_ii ?? 0,
 })
+
+
+export function lotFormToPayload(lot: LotFormValue) {
+  return {
+    transport_document_type: undefined,
+    transport_document_reference: lot.transport_document_reference,
+    volume: lot.volume,
+    biofuel_code: lot.biofuel?.code,
+    feedstock_code: lot.feedstock?.code,
+    country_code: lot.country_of_origin?.code_pays,
+    free_field: lot.free_field,
+
+    eec: lot.eec,
+    el: lot.el,
+    ep: lot.ep,
+    etd: lot.etd,
+    eu: lot.eu,
+    esca: lot.esca,
+    eccs: lot.eccs,
+    eccr: lot.eccr,
+    eee: lot.eee,
+
+    // production
+    carbure_producer_id: lot.producer instanceof Object ? lot.producer.id : undefined,
+    unknown_producer: typeof lot.producer === 'string' ? lot.producer : undefined,
+    carbure_production_site: lot.production_site instanceof Object ? lot.production_site.name : undefined,
+    unknown_production_site: typeof lot.production_site === 'string' ? lot.production_site : undefined,
+    production_site_certificate: lot.production_site_certificate,
+    production_site_certificate_type: undefined,
+    production_country_code: lot.production_country?.code_pays,
+    production_site_commissioning_date: lot.production_site_commissioning_date,
+    production_site_double_counting_certificate: lot.production_site_double_counting_certificate,
+
+    // supplier
+    carbure_supplier_id: lot.supplier instanceof Object ? lot.supplier.id : undefined,
+    unknown_supplier: typeof lot.supplier === 'string' ? lot.supplier : undefined,
+    supplier_certificate: lot.supplier_certificate,
+    supplier_certificate_type: undefined,
+
+    // delivery
+    delivery_date: lot.delivery_date,
+    carbure_client_id: lot.client instanceof Object ? lot.client.id : undefined,
+    unknown_client: typeof lot.client === 'string' ? lot.client : undefined,
+    carbure_delivery_site_depot_id: lot.delivery_site instanceof Object ? lot.delivery_site.depot_id : undefined,
+    unknown_delivery_site: typeof lot.delivery_site === 'string' ? lot.delivery_site : undefined,
+    delivery_site_country_code: lot.delivery_site_country?.code_pays
+  }
+}
+
 
 // prettier-ignore
 const errorsToFields: Record<string, (keyof LotFormValue)[]> = {
