@@ -608,8 +608,41 @@ class CarbureLotAdmin(admin.ModelAdmin):
 
 @admin.register(CarbureStock)
 class CarbureStockAdmin(admin.ModelAdmin):
-    list_display = []
-    
+    list_display = ['carbure_id', 'get_client', 'get_depot',  'get_biofuel', 'get_feedstock', 'get_orig_volume', 'remaining_volume', 'get_supplier']
+    raw_id_fields = ['parent_lot', 'parent_transformation']
+    list_filter = (('parent_lot__period', DropdownFilter), ('biofuel', NameSortedRelatedOnlyDropdownFilter), ('feedstock', NameSortedRelatedOnlyDropdownFilter), 
+                  ('carbure_supplier', NameSortedRelatedOnlyDropdownFilter), ('carbure_client', NameSortedRelatedOnlyDropdownFilter),  
+                  ('depot', NameSortedRelatedOnlyDropdownFilter),)
+
+    def get_supplier(self, obj):
+        return obj.carbure_supplier.name if obj.carbure_supplier else 'U - %s' % (obj.unknown_supplier)
+    get_supplier.admin_order_field  = 'carbure_supplier__name'
+    get_supplier.short_description = 'Supplier'
+
+    def get_client(self, obj):
+        return obj.carbure_client.name if obj.carbure_client else 'U - %s' % (obj.unknown_client)
+    get_client.admin_order_field  = 'carbure_client__name'
+    get_client.short_description = 'Client'
+
+    def get_depot(self, obj):
+        return obj.depot.name if obj.depot else 'UNKNOWN'
+    get_depot.admin_order_field  = 'depot__name'
+    get_depot.short_description = 'Delivery Site'
+
+    def get_biofuel(self, obj):
+        return obj.biofuel.code
+    get_biofuel.admin_order_field  = 'biofuel__code'
+    get_biofuel.short_description = 'Biofuel'
+
+    def get_feedstock(self, obj):
+        return obj.feedstock.code
+    get_feedstock.admin_order_field  = 'feedstock__code'
+    get_feedstock.short_description = 'Feedstock'
+
+    def get_orig_volume(self, obj):
+        return obj.parent_lot.volume if obj.parent_lot else obj.parent_transformation.volume_destination
+    get_orig_volume.admin_order_field  = 'parent_lot__volume'
+    get_orig_volume.short_description = 'Initial Volume'
 
 @admin.register(CarbureLotEvent)
 class CarbureLotEventAdmin(admin.ModelAdmin):
