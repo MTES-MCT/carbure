@@ -83,12 +83,14 @@ def create_new_tx_and_child(tx):
             lot.delivery_type = CarbureLot.PROCESSING
         else:
             lot.delivery_type = CarbureLot.TRADING
-    if tx.is_mac:
+    elif tx.is_mac:
         lot.delivery_type = CarbureLot.RFC
-    if tx.is_stock:
+    elif tx.is_stock:
         lot.delivery_type = CarbureLot.STOCK
-    if tx.carbure_client and tx.carbure_client.entity_type in [Entity.TRADER, Entity.PRODUCER]:
+    elif tx.carbure_client and tx.carbure_client.entity_type in [Entity.TRADER, Entity.PRODUCER]:
         lot.delivery_type = CarbureLot.STOCK
+    else:
+        pass # default to blending
     print('ADD %s %s %f to %s' % (tx.lot.matiere_premiere.name, tx.lot.biocarburant.name, tx.lot.volume, lot.delivery_type))
     lot.declared_by_supplier = False
     lot.declared_by_client = False
@@ -172,6 +174,7 @@ def create_new_tx_and_child(tx):
         stock.ghg_reduction = lot.ghg_reduction
         stock.ghg_reduction_red_ii = lot.ghg_reduction_red_ii
         stock.save()
+        stock_initial_volume = lot.volume
 
         if tx.lot.biocarburant.code == 'ETH':
             # check if I have been transformed into ETBE
@@ -244,13 +247,26 @@ def create_new_tx_and_child(tx):
                         lot.save()
                         TX_ID_MIGRATED[c.id] = lot.id
 
+
+        # adjust accounting for ETBE
+        stock_transformations = ETBETransformation.objects.filter(previous_stock=tx)
+        print('Stock transaction %d %s %d is transformed? %s' % (tx.id, tx.lot.biocarburant.name, tx.lot.volume, stock_transformations))
+        print(stock_transformations)
+        if stock_transformations.count() == 1:
+            print('This stock has been transformed. Initial volume [%d] adjusted to post-transformation volume [%d]' % (stock_initial_volume, stock_transformations[0].volume_etbe))
+            stock_initial_volume -= stock_transformations[0].volume_ethanol
+            stock_initial_volume += stock_transformations[0].volume_etbe
+        else:
+            pass
+
         child = LotTransaction.objects.filter(parent_tx=tx)
         child_sum_volume = 0
         for c in child:
+            child_sum_volume += c.lot.volume
             if c.id in TX_ID_MIGRATED:
                 print('Ignoring txid %d - already migrated' % (c.id))
                 continue
-            lot.pk = None
+            lot.pk = None # breaks the link with stock.parent_lot
             lot.carbure_supplier = stock.carbure_client
             lot.carbure_client = c.carbure_client
             lot.unknown_client = c.unknown_client
@@ -269,7 +285,7 @@ def create_new_tx_and_child(tx):
             lot.unknown_delivery_site = c.unknown_delivery_site
             lot.delivery_site_country = c.carbure_delivery_site.country if c.carbure_delivery_site else c.unknown_delivery_site_country
             lot.volume = c.lot.volume
-            print('CHILD ADD [tx id %d] %s %s %f to %s' % (c.id, lot.feedstock.name, lot.biofuel.name, lot.volume, lot.delivery_type))            
+            print('CHILD ADD [tx id %d] %s %s %f to %s. Parent stock initial volume %d - remaining %d' % (c.id, lot.feedstock.name, lot.biofuel.name, lot.volume, lot.delivery_type, stock.parent_lot.volume if stock.parent_lot else stock.parent_transformation.volume_destination, stock.remaining_volume))
             lot.save()
             creation_event = CarbureLotEvent()
             creation_event.event_type = CarbureLotEvent.CREATED
@@ -277,13 +293,15 @@ def create_new_tx_and_child(tx):
             creation_event.user = c.lot.added_by_user
             creation_event.lot_id = lot.id
             TX_ID_MIGRATED[c.id] = lot.id
-            child_sum_volume += c.lot.volume
 
-        theo_remaining = stock.parent_lot.volume - child_sum_volume
+        theo_remaining = stock_initial_volume - child_sum_volume
+        #theo_remaining = stock.parent_lot.volume - child_sum_volume
         remaining = stock.remaining_volume
         diff = remaining - theo_remaining
         if abs(diff) > 0.1:
-            print('VOLUME DISCREPANCY!!! Theo remaining [%f] remaining [%f]. %s %s %s %s %s' % (theo_remaining, remaining, lot.carbure_supplier, lot.carbure_client, lot.period, lot.feedstock.name, lot.biofuel.name))
+            print('%s - %d VOLUME DISCREPANCY!!! Initial stock [%d] Child Sum Volume [%d] Theo remaining [%f] remaining [%f]. %s %s %s %s %s' % (stock.carbure_client.name, stock.id, stock_initial_volume, child_sum_volume, theo_remaining, remaining, lot.carbure_supplier, lot.carbure_client, lot.period, lot.feedstock.name, lot.biofuel.name))
+            #print('%s - %d VOLUME DISCREPANCY!!! Initial stock [%d] Child Sum Volume [%d] Theo remaining [%f] remaining [%f]. %s %s %s %s %s' % (stock.carbure_client.name, stock.id, stock.parent_lot.volume, child_sum_volume, theo_remaining, remaining, lot.carbure_supplier, lot.carbure_client, lot.period, lot.feedstock.name, lot.biofuel.name))
+            assert(False)
 
     # if is_forwarded, check Child TX (Processing / Trading without storage) and create them
     if tx.is_forwarded:
@@ -296,7 +314,7 @@ def create_new_tx_and_child(tx):
             lot.unknown_client = child.unknown_client
             lot.delivery_type = CarbureLot.BLENDING
             lot.parent_lot_id = parent_id
-            print('FORWARD ADD %s %s %f to %s' % (lot.feedstock.name, lot.biofuel.name, lot.volume, lot.delivery_type))            
+            #print('FORWARD ADD %s %s %f to %s' % (lot.feedstock.name, lot.biofuel.name, lot.volume, lot.delivery_type))            
             lot.save()
             creation_event = CarbureLotEvent()
             creation_event.event_type = CarbureLotEvent.CREATED
