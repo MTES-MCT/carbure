@@ -184,6 +184,10 @@ def create_new_tx_and_child(tx):
                     print('This ETH stock was converted to ETBE!')
                     # create new stock
                     child = trans.new_stock
+                    if trans.new_stock.parent_tx is None:
+                        print('LINKING CONVERSION WITH PARENT ETH TX')
+                        trans.new_stock.parent_tx = tx
+                        trans.new_stock.save()
                     etbe_stock = CarbureStock()
                     etbe_stock.parent_lot = None
                     etbe_stock.parent_transformation = None
@@ -470,5 +474,5 @@ def migrate_old_certificates():
     
 
 if __name__ == '__main__':
-    migrate_old_data(quick=True)
+    migrate_old_data()
     #migrate_old_certificates()
