@@ -89,6 +89,7 @@ def create_new_tx_and_child(tx):
         lot.delivery_type = CarbureLot.STOCK
     if tx.carbure_client and tx.carbure_client.entity_type in [Entity.TRADER, Entity.PRODUCER]:
         lot.delivery_type = CarbureLot.STOCK
+    print('ADD %s %s %f to %s' % (tx.lot.matiere_premiere.name, tx.lot.biocarburant.name, tx.lot.volume, lot.delivery_type))
     lot.declared_by_supplier = False
     lot.declared_by_client = False
     lot.feedstock = tx.lot.matiere_premiere
@@ -216,6 +217,7 @@ def create_new_tx_and_child(tx):
                     etbe_stock.parent_transformation = transformation
                     etbe_stock.save()
                     TX_ID_MIGRATED[child.id] = None
+                    TX_ID_MIGRATED[trans.previous_stock.id] = None
                     # migrate child transactions
                     etbe_child = LotTransaction.objects.filter(parent_tx=trans.new_stock).exclude(carbure_client=trans.new_stock.carbure_client)
                     for c in etbe_child:
@@ -238,12 +240,16 @@ def create_new_tx_and_child(tx):
                         lot.unknown_delivery_site = c.unknown_delivery_site
                         lot.delivery_site_country = c.carbure_delivery_site.country if c.carbure_delivery_site else c.unknown_delivery_site_country
                         lot.volume = c.lot.volume
+                        print('CHILD ETBE ADD %s %s %f to %s' % (lot.feedstock.name, lot.biofuel.name, lot.volume, lot.delivery_type))
                         lot.save()
                         TX_ID_MIGRATED[c.id] = lot.id
 
         child = LotTransaction.objects.filter(parent_tx=tx)
         child_sum_volume = 0
         for c in child:
+            if c.id in TX_ID_MIGRATED:
+                print('Ignoring txid %d - already migrated' % (c.id))
+                continue
             lot.pk = None
             lot.carbure_supplier = stock.carbure_client
             lot.carbure_client = c.carbure_client
@@ -263,6 +269,7 @@ def create_new_tx_and_child(tx):
             lot.unknown_delivery_site = c.unknown_delivery_site
             lot.delivery_site_country = c.carbure_delivery_site.country if c.carbure_delivery_site else c.unknown_delivery_site_country
             lot.volume = c.lot.volume
+            print('CHILD ADD [tx id %d] %s %s %f to %s' % (c.id, lot.feedstock.name, lot.biofuel.name, lot.volume, lot.delivery_type))            
             lot.save()
             creation_event = CarbureLotEvent()
             creation_event.event_type = CarbureLotEvent.CREATED
@@ -289,6 +296,7 @@ def create_new_tx_and_child(tx):
             lot.unknown_client = child.unknown_client
             lot.delivery_type = CarbureLot.BLENDING
             lot.parent_lot_id = parent_id
+            print('FORWARD ADD %s %s %f to %s' % (lot.feedstock.name, lot.biofuel.name, lot.volume, lot.delivery_type))            
             lot.save()
             creation_event = CarbureLotEvent()
             creation_event.event_type = CarbureLotEvent.CREATED
@@ -354,23 +362,6 @@ def migrate_old_data(quick=False):
             event.save()
         # errors
         errors = GenericError.objects.filter(tx=tx).update(lot=new_tx)
-
-def ensure_data_consistency(apps, schema_editor):
-    # the goal is to ensure that Volume IN equals Volume Stock + Volume Out for every single entity
-    entities = Entity.objects.all()
-    for entity in entities:
-        tx_in = CarbureLot.objects.filter(carbure_client=entity).aggregate(volume_in=Sum('volume'))
-        tx_out = CarbureLot.objects.filter(carbure_supplier=entity).aggregate(volume_out=Sum('remaining_volume'))
-        stock = CarbureStock.objects.filter(carbure_client=entity).aggregate(volume_stock=Sum('volume'))
-
-        diff = tx_in['volume_in'] - (tx_out['volume_out'] + stock['volume_stock'])
-        if abs(diff) > 0.1:
-            print('%s - Volumes inconsistent: in [%.2f] out + stock [%.2f]' % (entity.name, tx_in['volume_in'], (tx_out['volume_out'] + stock['volume_stock'])))
-            return 1
-        else:
-            print('Volumes OK for %s' % (entity.name))
-
-
 
 def migrate_old_certificates():
     # alter column character set
