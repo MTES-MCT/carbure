@@ -1,19 +1,19 @@
 import datetime
 import dictdiffer
 import json
+import time
 import traceback
 from django.db.models.aggregates import Count
 from django.db.models.fields import NOT_PROVIDED
 
 from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
-from api.v3.sanity_checks import bulk_sanity_checks
 from core.decorators import check_user_rights
 from api.v4.helpers import filter_lots, filter_stock, get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock
 from api.v4.helpers import get_prefetched_data, get_stock_events, get_stock_with_metadata, get_stock_filters_data, get_stocks_summary_data, get_transaction_distance, handle_eth_to_etbe_transformation
 from api.v4.helpers import send_email_declaration_invalidated, send_email_declaration_validated
 from api.v4.lots import construct_carbure_lot, bulk_insert_lots
-from api.v4.sanity_checks import sanity_check
+from api.v4.sanity_checks import bulk_sanity_checks, sanity_check
 
 from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Entity, GenericError, SustainabilityDeclaration, UserRights
 from core.serializers import CarbureLotPublicSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
@@ -410,13 +410,13 @@ def stock_transform(request, *args, **kwargs):
 @check_user_rights()
 def get_lot_details(request, *args, **kwargs):
     context = kwargs['context']
-    entity_id = context['entity_id']
+    entity_id = int(context['entity_id'])
     lot_id = request.GET.get('lot_id', False)
     if not lot_id:
         return JsonResponse({'status': 'error', 'message': 'Missing lot_id'}, status=400)
 
     lot = CarbureLot.objects.get(pk=lot_id)
-    if str(lot.carbure_client_id) != entity_id and str(lot.carbure_supplier_id) != entity_id:
+    if lot.carbure_client_id != entity_id and lot.carbure_supplier_id != entity_id and lot.added_by_id != entity_id:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     data = {}
@@ -451,14 +451,18 @@ def add_lot(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
     # prefetch some data
+    start = time.time()
     entity = Entity.objects.get(pk=entity_id)
     d = get_prefetched_data(entity)
+    p1 = time.time()
     lot_obj, errors = construct_carbure_lot(d, entity, request.POST.dict())
+    p2 = time.time()
     if not lot_obj:
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=400)
 
     # run sanity checks, insert lot and errors
     lots_created = bulk_insert_lots(entity, [lot_obj], [errors], d)
+    p3 = time.time()
     if len(lots_created) == 0:
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=500)
 
@@ -468,8 +472,14 @@ def add_lot(request, *args, **kwargs):
     e.user = request.user
     e.metadata = {'source': 'MANUAL'}
     e.save()
-
+    p4 = time.time()
     data = CarbureLotPublicSerializer(e.lot).data
+    p5 = time.time()
+    print(p1-start)
+    print(p2-p1)
+    print(p3-p2)
+    print(p4-p3)
+    print(p5-p4)
     return JsonResponse({'status': 'success', 'data': data})
 
 
@@ -495,43 +505,62 @@ def update_lot(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=400)
     # run sanity checks, insert lot and errors
     updated_lot.save()
-    for lot_errors in errors:
-        for e in lot_errors:
-            e.lot = updated_lot
-    GenericError.objects.bulk_create(errors[0], batch_size=100)
+    for e in errors:
+        e.lot = updated_lot
+    GenericError.objects.bulk_create(errors, batch_size=100)
     bulk_sanity_checks([updated_lot], d, background=False)
     data = CarbureLotPublicSerializer(updated_lot).data
     diff = dictdiffer.diff(previous, data)
     added = []
     removed = []
     changed = []
+    foreign_key_to_field_mapping = {'carbure_production_site': 'name', 'carbure_delivery_site': 'depot_id', 'carbure_client': 'name', 'delivery_site_country': 'code_pays', 'country_of_origin': 'code_pays', 'biofuel': 'code', 'feedstock': 'code'}
+    fields_to_ignore = ['lhv_amount', 'weight']
     for d in diff:
         action, field, data = d
+        if field in fields_to_ignore:
+            continue
+        print(action, field, data)
         if action == 'change':
-            if isinstance(data, tuple):
-                changed.append((field, data[0], data[1]))
+            if '.' in field:
+                s = field.split('.')
+                mainfield = s[0]
+                subfield = s[1]
+                if mainfield in foreign_key_to_field_mapping:
+                    subfield_to_record = foreign_key_to_field_mapping[mainfield]
+                if subfield != subfield_to_record:
+                    continue
+                field = mainfield
+            changed.append((field, data[0], data[1]))
         if action == 'add':
+            if isinstance(data, tuple):
+                added.append((field, data))
             if isinstance(data, list):
-                for (subfield, value) in data:
-                    if field != '':
-                        full_field_name = '%s.%s' % (field, subfield)
-                    else:
-                        full_field_name = subfield
-                    added.append((full_field_name, value))
+                if field in foreign_key_to_field_mapping:
+                    subfield_to_record = foreign_key_to_field_mapping[field]
+                    for (subfield, value) in data:
+                        if subfield != subfield_to_record:
+                            continue
+                        added.append((field, value))
         if action == 'remove':
+            if isinstance(data, tuple):
+                removed.append((field, data))
             if isinstance(data, list):
-                for (subfield, value) in data:
-                    if field != '':
-                        full_field_name = '%s.%s' % (field, subfield)
-                    else:
-                        full_field_name = subfield
-                    removed.append((full_field_name, value))
+                if field in foreign_key_to_field_mapping:
+                    subfield_to_record = foreign_key_to_field_mapping[field]
+                    for (subfield, value) in data:
+                        if subfield != subfield_to_record:
+                            continue
+                        removed.append((field, value))
+    print(changed)
+    print(added)
+    print(removed)
     e = CarbureLotEvent()
     e.event_type = CarbureLotEvent.UPDATED
     e.lot = updated_lot
     e.user = request.user
     e.metadata = {'added': added, 'removed': removed, 'changed': changed}
-    e.save()    
+    e.save()
     return JsonResponse({'status': 'success', 'data': data})
 
 

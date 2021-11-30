@@ -110,13 +110,14 @@ export interface ProductionSite {
   name: string
   country: Country
   date_mise_en_service: string
+  dc_reference: string | undefined
 }
 
 export interface ProductionSiteDetails extends ProductionSite {
   date_mise_en_service: string
   ges_option: GESOption
   eligible_dc: boolean
-  dc_reference: string | null
+  dc_reference: string | undefined
   inputs: MatierePremiere[]
   outputs: Biocarburant[]
   site_id: string

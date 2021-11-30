@@ -1,6 +1,7 @@
 import datetime
-from re import L
 import dateutil
+from typing import Generic, List
+from django.db.models.query import QuerySet
 from numpy.lib.function_base import insert
 from api.v4.sanity_checks import bulk_sanity_checks
 from core.models import CarbureLot, CarbureLotEvent, CarbureStock, Entity, GenericError, LotTransaction
@@ -82,11 +83,11 @@ def fill_production_info(lot, data, entity, prefetched_data):
                 lot.carbure_production_site = prefetched_data['my_production_sites'][carbure_production_site]
             else:
                 lot.carbure_production_site = None
-                errors.append(GenericError(lot=lot, field='carbure_production_site_id', error=COULD_NOT_FIND_PRODUCTION_SITE, value=carbure_production_site, display_to_creator=True, is_blocking=True))
+                errors.append(GenericError(lot=lot, field='carbure_production_site', error=COULD_NOT_FIND_PRODUCTION_SITE, value=carbure_production_site, display_to_creator=True, is_blocking=True))
             lot.unknown_production_site = None
-            lot.production_country = lot.carbure_production_site.country
-            lot.production_site_commissioning_date = lot.carbure_production_site.date_mise_en_service
-            lot.production_site_double_counting_certificate = lot.carbure_production_site.dc_reference
+            lot.production_country = lot.carbure_production_site.country if lot.carbure_production_site else None
+            lot.production_site_commissioning_date = lot.carbure_production_site.date_mise_en_service if lot.carbure_production_site else None
+            lot.production_site_double_counting_certificate = lot.carbure_production_site.dc_reference if lot.carbure_production_site else None
         # CASE 3
         else:
             lot.carbure_producer = None
@@ -160,8 +161,10 @@ def fill_basic_info(lot, data, prefetched_data):
                     if lot.parent_stock is not None:
                         # we are updating the volume of a lot from stock
                         lot.parent_stock.update_remaining_volume(lot.volume, volume)
+                    else:
+                        lot.volume = volume
                 else:
-                    # initial volume setting
+                    # initial volume setting or override
                     lot.volume = volume
             except Exception:
                 lot.volume = 0
@@ -308,14 +311,14 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
 
     return lot, errors
 
-def bulk_insert_lots(entity, lots, errors, prefetched_data):
+def bulk_insert_lots(entity: Entity, lots: List[CarbureLot], errors: List[GenericError], prefetched_data: dict) -> QuerySet:
     CarbureLot.objects.bulk_create(lots, batch_size=100)
     inserted_lots = CarbureLot.objects.filter(added_by=entity).order_by('-id')[0:len(lots)]
     for lot, errors in zip(inserted_lots, errors):
         for e in errors:
             e.lot_id = lot.id
-    flat_generic_errors = [item for sublist in errors for item in sublist]
+    #flat_generic_errors = [item for sublist in errors for item in sublist]
     bulk_sanity_checks(inserted_lots, prefetched_data, background=False)
-    GenericError.objects.bulk_create(flat_generic_errors, batch_size=100)
+    GenericError.objects.bulk_create(errors, batch_size=100)
     #check_duplicates(new_txs, background=False)
     return inserted_lots
