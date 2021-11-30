@@ -450,36 +450,22 @@ def get_lots_filters(request, *args, **kwargs):
 def add_lot(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
-    # prefetch some data
-    start = time.time()
     entity = Entity.objects.get(pk=entity_id)
     d = get_prefetched_data(entity)
-    p1 = time.time()
     lot_obj, errors = construct_carbure_lot(d, entity, request.POST.dict())
-    p2 = time.time()
     if not lot_obj:
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=400)
-
     # run sanity checks, insert lot and errors
     lots_created = bulk_insert_lots(entity, [lot_obj], [errors], d)
-    p3 = time.time()
     if len(lots_created) == 0:
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=500)
-
     e = CarbureLotEvent()
     e.event_type = CarbureLotEvent.CREATED
     e.lot_id = lots_created[0].id
     e.user = request.user
     e.metadata = {'source': 'MANUAL'}
     e.save()
-    p4 = time.time()
     data = CarbureLotPublicSerializer(e.lot).data
-    p5 = time.time()
-    print(p1-start)
-    print(p2-p1)
-    print(p3-p2)
-    print(p4-p3)
-    print(p5-p4)
     return JsonResponse({'status': 'success', 'data': data})
 
 
@@ -520,7 +506,6 @@ def update_lot(request, *args, **kwargs):
         action, field, data = d
         if field in fields_to_ignore:
             continue
-        print(action, field, data)
         if action == 'change':
             if '.' in field:
                 s = field.split('.')
@@ -552,9 +537,6 @@ def update_lot(request, *args, **kwargs):
                         if subfield != subfield_to_record:
                             continue
                         removed.append((field, value))
-    print(changed)
-    print(added)
-    print(removed)
     e = CarbureLotEvent()
     e.event_type = CarbureLotEvent.UPDATED
     e.lot = updated_lot
