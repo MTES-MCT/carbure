@@ -10,12 +10,7 @@ import server, { okDynamicSettings, setEntity } from "./api"
 const SettingsWithHooks = ({ entityID }: { entityID?: number }) => {
   return (
     <TestRoot url={`/org/${entityID}/settings`}>
-      {(app) => (
-        <Route
-          path="/org/:entity/settings"
-          element={<Settings settings={app.settings} />}
-        />
-      )}
+      <Route path="/org/:entity/settings" element={<Settings />} />
     </TestRoot>
   )
 }
@@ -40,16 +35,24 @@ test("check the company section of the settings for a producer", async () => {
   expect(trading).toBeChecked()
 
   userEvent.click(mac)
-  userEvent.click(trading)
+  await waitFor(() => {
+    expect(mac).not.toBeChecked()
+  })
 
-  await waitFor(() => expect(mac).not.toBeChecked())
-  expect(trading).not.toBeChecked()
+  userEvent.click(trading)
+  await waitFor(() => {
+    expect(trading).not.toBeChecked()
+  })
 
   userEvent.click(mac)
-  userEvent.click(trading)
+  await waitFor(() => {
+    expect(mac).toBeChecked()
+  })
 
-  await waitFor(() => expect(mac).toBeChecked())
-  expect(trading).toBeChecked()
+  userEvent.click(trading)
+  await waitFor(() => {
+    expect(trading).toBeChecked()
+  })
 })
 
 test("check the company section of the settings for a trader", async () => {

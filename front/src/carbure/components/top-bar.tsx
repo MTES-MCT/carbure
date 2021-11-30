@@ -86,7 +86,7 @@ interface NavigationProps {
 
 const Navigation = ({ entity }: NavigationProps) => {
   const { t } = useTranslation()
-  const { isAdmin, isExternal } = entity
+  const { isAdmin, isAuditor, isIndustry } = entity
   return (
     <Routes>
       <Route
@@ -101,9 +101,15 @@ const Navigation = ({ entity }: NavigationProps) => {
                 label: t("Accueil"),
               },
 
-              !isExternal && {
+              (isAdmin || isAuditor) && {
+                key: "controls",
+                path: "controls",
+                label: t("Contrôles"),
+              },
+
+              isIndustry && {
                 key: "transactions",
-                path: "transactions-v2",
+                path: "transactions",
                 label: t("Transactions"),
               },
 
@@ -113,13 +119,19 @@ const Navigation = ({ entity }: NavigationProps) => {
                 label: t("Sociétés"),
               },
 
+              (isAdmin || entity.hasPage("DCA")) && {
+                key: "double-counting",
+                path: "double-counting",
+                label: t("Double comptage"),
+              },
+
               {
                 key: "settings",
                 path: "settings",
-                label: isAdmin || isExternal ? t("Options") : t("Société"),
+                label: isIndustry ? t("Société") : t("Options"),
               },
 
-              !(isAdmin || isExternal) && {
+              isIndustry && {
                 key: "registry",
                 path: "registry",
                 label: t("Annuaire"),

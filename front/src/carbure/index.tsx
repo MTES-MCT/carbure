@@ -1,31 +1,28 @@
-import { Trans, useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
-
-import { ExternalAdminPages } from "common/types"
-import useUser, { useUserContext, UserContext } from "./hooks/user"
+import { LoaderOverlay } from "common-v2/components/scaffold"
+import useUser, { UserContext } from "./hooks/user"
 import useEntity from "./hooks/entity"
-
-import { LoaderOverlay } from "common/components"
+import DevBanner from "./components/dev-banner"
 import Topbar from "./components/top-bar"
 import Footer from "./components/footer"
 import Pending from "./components/pending"
 import Exit from "./components/exit"
 import Registry from "./components/registry"
-
-import TransactionsV2 from "transactions-v2"
+import PublicStats from "./components/public-stats"
+import Home from "./components/home"
+import Transactions from "transactions-v2"
 import Settings from "settings"
 import Account from "account"
 import DoubleCounting from "doublecount"
-import Entities from "../entities" // not using  path prevents import
-import EntityDetails from "../entities/routes/entity-details"
 import Dashboard from "dashboard"
-import PublicStats from "./components/public-stats"
-import Home from "./components/home"
+import Entities from "../entities" // not using  path prevents import
 
 const Carbure = () => {
-  useTranslation()
-
   const user = useUser()
+
+  if (!user.isAuthenticated()) {
+    return <Exit to="/accounts/login" />
+  }
 
   return (
     <UserContext.Provider value={user}>
@@ -37,69 +34,46 @@ const Carbure = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/pending" element={<Pending />} />
-          <Route path="/logout" element={<Exit to="/accounts/logout" />} />
           <Route path="/account" element={<Account />} />
           <Route path="/org/:entity/*" element={<Org />} />
           <Route path="/public_stats" element={<PublicStats />} />
+          <Route path="/logout" element={<Exit to="/accounts/logout" />} />
         </Routes>
 
         <Footer />
+
+        {user.loading && <LoaderOverlay />}
       </div>
     </UserContext.Provider>
   )
 }
 
-// has to be nested in a route so we can get data from useParams()
 const Org = () => {
   const entity = useEntity()
-  const user = useUserContext()
 
-  if (!user.isAuthenticated()) {
-    return <Exit to="/accounts/login" />
-  }
+  const { isAdmin, isAuditor, isExternal, isIndustry } = entity
+  const hasDCA = isExternal && entity.hasPage("DCA")
 
-  const { isAdmin } = entity
-
+  // prettier-ignore
   return (
-    <>
-      <Routes>
-        <Route path="transactions-v2/*" element={<TransactionsV2 />} />
+    <Routes>
+      <Route path="settings" element={<Settings />} />
 
-        <Route path="settings" element={<Settings />} />
-        <Route path="registry" element={<Registry />} />
+      {isIndustry && <Route path="transactions/*" element={<Transactions />} />}
+      {isIndustry && <Route path="registry" element={<Registry />} />}
 
-        {isAdmin && <Route path="dashboard" element={<Dashboard />} />}
-        {isAdmin && <Route path="entities" element={<Entities />} />}
-        {isAdmin && <Route path="entities/:id" element={<EntityDetails />} />}
+      {isAdmin && <Route path="dashboard" element={<Dashboard />} />}
+      {isAdmin && <Route path="entities/*" element={<Entities />} />}
 
-        {(isAdmin || entity.hasPage(ExternalAdminPages.DoubleCounting)) && (
-          <Route path="double-counting/*" element={<DoubleCounting />} />
-        )}
+      {(isAdmin || isAuditor) && <Route path="controls/*" element={<h1>TODO</h1>} />}
+      {(isAdmin || hasDCA) && <Route path="double-counting/*" element={<DoubleCounting />} />}
 
-        <Route path="*" element={<Navigate to="transactions-v2" />} />
-      </Routes>
+      {isIndustry && <Route path="*" element={<Navigate to="transactions" />} />}
+      {isAdmin && <Route path="*" element={<Navigate to="dashboard" />} />}
+      {isAuditor && <Route path="*" element={<Navigate to="controls" />} />}
+      {hasDCA && <Route path="*" element={<Navigate to="double-counting" />} />}
+    </Routes>
 
-      {user.loading && <LoaderOverlay />}
-    </>
-  )
-}
-
-const DevBanner = () => {
-  if (window.location.hostname === "carbure.beta.gouv.fr") return null
-
-  return (
-    <div
-      style={{
-        backgroundColor: "var(--orange-medium)",
-        padding: "8px var(--main-spacing)",
-      }}
-    >
-      <Trans>
-        <b>Version de développement de CarbuRe :</b> les manipulations
-        effectuées ici n'ont pas de répercussion et les déclarations ne sont pas
-        prises en compte.
-      </Trans>
-    </div>
   )
 }
 

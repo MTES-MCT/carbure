@@ -85,7 +85,7 @@ def check_certificates(prefetched_data, lot, errors):
     if not lot.production_site_certificate:
         errors.append(generic_error(error='NO_PRODSITE_CERT', lot=lot, field='production_site_certificate'))
     else:
-        cert = lot.carbure_production_site_reference
+        cert = lot.production_site_certificate
         if cert not in prefetched_data['certificates']:
             errors.append(generic_error(error='UNKNOWN_PRODSITE_CERT', lot=lot, field='production_site_certificate'))
         else:
@@ -223,8 +223,8 @@ def sanity_check(lot, prefetched_data):
 
         # double comptage, cas specifiques
         if lot.feedstock.is_double_compte:
-            in_carbure_without_dc = lot.production_site_is_in_carbure and lot.carbure_production_site and not lot.carbure_production_site.dc_reference
-            not_in_carbure_without_dc = not lot.production_site_is_in_carbure and not lot.unknown_production_site_dbl_counting
+            in_carbure_without_dc = lot.carbure_production_site and not lot.carbure_production_site.dc_reference
+            not_in_carbure_without_dc = lot.unknown_production_site and not lot.unknown_production_site_dbl_counting
             if in_carbure_without_dc or not_in_carbure_without_dc:
                 is_sane = False
                 errors.append(generic_error(error='MISSING_REF_DBL_COUNTING', lot=lot, is_blocking=True, extra="%s de %s" % (lot.biofuel.name, lot.feedstock.name), field='production_site_dbl_counting'))
