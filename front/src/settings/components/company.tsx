@@ -4,10 +4,11 @@ import { EntityManager } from "carbure/hooks/entity"
 import { CompanySettingsHook } from "../hooks/use-company"
 import { UserRole } from "common/types"
 import { Title, LoaderOverlay } from "common/components"
-import { Label, LabelCheckbox } from "common/components/input"
+import { Label } from "common/components/input"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
 import Select from "common/components/select"
 import styles from "./settings.module.css"
+import Checkbox from "common-v2/components/checkbox"
 
 type CompanySettingsProps = {
   entity: EntityManager
@@ -29,20 +30,20 @@ const CompanySettings = ({ entity, settings }: CompanySettingsProps) => {
       </SectionHeader>
 
       <SectionBody>
-        <LabelCheckbox
+        <Checkbox
           disabled={!canModify}
           label={t("Ma société effectue des Mises à Consommation")}
-          checked={settings.hasMAC}
-          onChange={(e) => settings.onChangeMAC(e.target.checked)}
+          value={settings.hasMAC}
+          onChange={settings.onChangeMAC}
           className={styles.settingsCheckbox}
         />
 
         {isProducer && (
-          <LabelCheckbox
+          <Checkbox
             disabled={!canModify}
             label={t("Ma société a une activité de négoce")}
-            checked={settings.hasTrading || isTrader}
-            onChange={(e) => settings.onChangeTrading(e.target.checked)}
+            value={settings.hasTrading || isTrader}
+            onChange={settings.onChangeTrading}
             className={styles.settingsCheckbox}
           />
         )}

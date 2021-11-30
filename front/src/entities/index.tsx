@@ -1,11 +1,11 @@
+import { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
+import { Routes, Route } from "react-router-dom"
 import { LoaderOverlay, Main, Title } from "common/components"
 import { LabelInput } from "common/components/input"
 import Tabs from "common/components/tabs"
 import useAPI from "common/hooks/use-api"
-import { useEffect, useState } from "react"
-import { useTranslation } from "react-i18next"
 import { SettingsBody, SettingsHeader } from "settings/components/common"
-
 import * as api from "./api"
 import {
   EntityCertificatesList,
@@ -13,8 +13,18 @@ import {
   EntityFactoriesList,
   EntityUsersList,
 } from "./components/entity-list"
+import EntityDetails from "./routes/entity-details"
 
 const Entities = () => {
+  return (
+    <Routes>
+      <Route path=":id" element={<EntityDetails />} />
+      <Route path="*" element={<EntityList />} />
+    </Routes>
+  )
+}
+
+const EntityList = () => {
   const { t } = useTranslation()
   const [query, setQuery] = useState("")
   const [entities, getEntities] = useAPI(api.getEntities)

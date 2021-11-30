@@ -65,6 +65,7 @@ export const Transactions = () => {
               <h1>{t("Transactions")}</h1>
 
               <Select
+                loading={years.loading}
                 variant="inline"
                 placeholder={t("Choisir une année")}
                 value={year}
