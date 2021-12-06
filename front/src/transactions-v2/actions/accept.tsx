@@ -1,24 +1,20 @@
 import { useTranslation } from "react-i18next"
-import { LotQuery } from "../types"
-import { usePortal } from "common-v2/components/portal"
+import { Lot, LotQuery } from "transactions-v2/types"
 import Menu from "common-v2/components/menu"
-import Dialog from "common-v2/components/dialog"
-import Button from "common-v2/components/button"
 import { Check } from "common-v2/components/icons"
 
-export interface AcceptButtonProps {
+export interface AcceptManyButtonProps {
   disabled?: boolean
   query: LotQuery
   selection: number[]
 }
 
-export const AcceptButton = ({
+export const AcceptManyButton = ({
   disabled,
   query,
   selection,
-}: AcceptButtonProps) => {
+}: AcceptManyButtonProps) => {
   const { t } = useTranslation()
-  const portal = usePortal()
 
   return (
     <Menu
@@ -31,23 +27,30 @@ export const AcceptButton = ({
       items={[
         { label: t("Incorporation") },
         { label: t("Mise à consommation") },
-        {
-          label: t("Livraison directe"),
-          action: () =>
-            portal((close) => (
-              <Dialog onClose={close}>
-                <header>
-                  <h1>Livraison directe</h1>
-                </header>
-                <main>
-                  <section>Description</section>
-                </main>
-                <footer>
-                  <Button asideX label="Annuler" action={close} />
-                </footer>
-              </Dialog>
-            )),
-        },
+        { label: t("Livraison directe") },
+      ]}
+    />
+  )
+}
+
+export interface AcceptOneButtonProps {
+  icon?: boolean
+  lot: Lot
+}
+
+export const AcceptOneButton = ({ icon, lot }: AcceptOneButtonProps) => {
+  const { t } = useTranslation()
+
+  return (
+    <Menu
+      captive
+      variant={icon ? "icon" : "success"}
+      icon={Check}
+      label={t("Accepter le lot")}
+      items={[
+        { label: t("Incorporation") },
+        { label: t("Mise à consommation") },
+        { label: t("Livraison directe") },
       ]}
     />
   )
