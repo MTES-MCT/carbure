@@ -112,13 +112,39 @@ const LinkWrapper = ({ href, to, children }: LinkWrapperProps) => {
   }
 }
 
-export const ExternalLink = ({ className, children, ...props }: LinkProps) => {
-  return (
-    <Link {...props} className={cl(css.external, className)}>
-      {children}
-      <ExternalLinkIcon size={20} />
-    </Link>
-  )
+interface ExternalLinkProps {
+  to?: string
+  href?: string
+  className?: string
+  children?: React.ReactNode
+}
+
+export const ExternalLink = ({
+  className,
+  children,
+  to,
+  href,
+}: ExternalLinkProps) => {
+  const props = {
+    target: "_blank",
+    rel: "noreferrer",
+    className: cl(css.external, className),
+    children: (
+      <>
+        {children}
+        <ExternalLinkIcon size={20} />
+      </>
+    ),
+  }
+
+  if (to !== undefined) {
+    return <Link {...props} to={to} />
+  } else if (href !== undefined) {
+    // eslint-disable-next-line
+    return <a {...props} href={href} />
+  } else {
+    throw new Error("Missing url in external link")
+  }
 }
 
 export default Button

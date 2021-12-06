@@ -111,6 +111,7 @@ export const FileInput = ({
 }: FileInputProps) => (
   <Field
     {...props}
+    type="file"
     onClear={clear && value && onChange ? () => onChange(undefined) : undefined}
   >
     <label tabIndex={0} className={css.file}>
@@ -404,7 +405,7 @@ export const Field = ({
 
     <div
       tabIndex={-1}
-      data-interactive={type === "button" ? true : undefined}
+      data-interactive={isInteractive(type) ? true : undefined}
       ref={domRef as React.RefObject<HTMLDivElement>}
       className={css.control}
     >
@@ -437,3 +438,7 @@ export const Field = ({
     </div>
   </div>
 )
+
+function isInteractive(type: string | undefined) {
+  return type === "button" || type === "file"
+}

@@ -115,7 +115,8 @@
   min-height: 96px;
 }
 
-.control input[type="button"] {
+.control input[type="button"],
+.control .file {
   cursor: pointer;
 }
 
