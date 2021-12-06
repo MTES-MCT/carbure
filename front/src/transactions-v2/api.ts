@@ -35,6 +35,10 @@ export function getLots(query: LotQuery) {
   return api.get<Api<LotList>>("/lots", { params: query })
 }
 
+export function importLots(entity_id: number, file: File) {
+  return api.post<Api<void>>("/lots/add-excel", { entity_id, file })
+}
+
 export function downloadLots(query: LotQuery, selection: number[]) {
   return null
 }

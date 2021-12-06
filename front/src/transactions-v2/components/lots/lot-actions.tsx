@@ -9,6 +9,7 @@ import { AcceptManyButton } from "transactions-v2/actions/accept"
 import { SendManyButton } from "transactions-v2/actions/send"
 import { DeleteManyButton } from "transactions-v2/actions/delete"
 import { RejectManyButton } from "transactions-v2/actions/reject"
+import { ImportButton } from "transactions-v2/actions/import"
 
 export interface ActionBarProps {
   count: number
@@ -26,6 +27,7 @@ export const LotActions = ({ count, ...props }: ActionBarProps) => {
       {status === "drafts" && (
         <Fragment>
           <CreateButton />
+          <ImportButton />
           <SendManyButton {...props} disabled={empty} />
           <DeleteManyButton {...props} disabled={empty} />
         </Fragment>
