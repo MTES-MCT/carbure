@@ -96,7 +96,7 @@ const DeleteDialog = ({
   const v = variations(selection.length)
 
   const deleteLots = useMutation(api.deleteLots, {
-    invalidates: ["lots", "snapshot"],
+    invalidates: ["lots", "snapshot", "lot-details"],
 
     onSuccess: () => {
       const text = v({

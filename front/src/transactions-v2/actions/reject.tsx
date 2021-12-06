@@ -96,7 +96,7 @@ const RejectDialog = ({
   const v = variations(selection.length)
 
   const rejectLots = useMutation(api.rejectLots, {
-    invalidates: ["lots", "snapshot"],
+    invalidates: ["lots", "snapshot", "lot-details"],
 
     onSuccess: () => {
       const text = v({
