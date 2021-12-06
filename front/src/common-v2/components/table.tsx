@@ -174,9 +174,14 @@ export function useCompare<T>(columns: Column<T>[], order: Order | undefined) {
     if (!order || !column || !column.orderBy) return 0
 
     const direction = order.direction === "asc" ? 1 : -1
-    const referenceA = column.orderBy(a).toString()
-    const referenceB = column.orderBy(b).toString()
-    return direction * collator.compare(referenceA, referenceB)
+    const referenceA = column.orderBy(a)
+    const referenceB = column.orderBy(b)
+
+    if (typeof referenceA === 'number' && typeof referenceB === 'number') {
+      return direction * (referenceA - referenceB);
+    } else {
+      return direction * collator.compare(referenceA.toString(), referenceB.toString())
+    }
   }
 }
 
