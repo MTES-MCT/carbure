@@ -23,11 +23,15 @@ export const History = ({ changes }: HistoryProps) => {
         rows={changes}
         columns={[
           {
+            key: "date",
             header: t("Date"),
+            orderBy: (c) => c.date,
             cell: (c) => <Cell text={formatDateTime(c.date)} />,
           },
           {
+            key: "label",
             header: t("Champ modifié"),
+            orderBy: (c) => c.label,
             cell: (c) => <Cell text={c.label} />,
           },
           {
@@ -35,7 +39,9 @@ export const History = ({ changes }: HistoryProps) => {
             cell: (c) => <FieldChange change={c} />,
           },
           {
+            key: "user",
             header: t("Modifié par"),
+            orderBy: (c) => c.user,
             cell: (c) => c.user,
           },
         ]}
@@ -75,8 +81,20 @@ export function getLotChanges(updates: LotUpdate<any>[] = []): LotChange[] {
       // only show updates for the moment
       .filter((u) => u.event_type === "UPDATED")
       // flatten the updates so we have one row per change
-      .flatMap((u) =>
-        (u.metadata as LotFieldUpdate).changed.map(
+      .flatMap((u) => {
+        // backwards compatilibilty (maybe remove it later)
+        if ("field" in u.metadata) {
+          return {
+            field: u.metadata.field,
+            label: i18next.t(u.metadata.field, { ns: "fields" }),
+            valueBefore: u.metadata.value_before,
+            valueAfter: u.metadata.value_after,
+            user: u.user,
+            date: u.event_dt,
+          }
+        }
+
+        return (u.metadata as LotFieldUpdate).changed.map(
           ([field, valueBefore, valueAfter]) => ({
             field,
             label: i18next.t(field, { ns: "fields" }),
@@ -86,7 +104,7 @@ export function getLotChanges(updates: LotUpdate<any>[] = []): LotChange[] {
             date: u.event_dt,
           })
         )
-      )
+      })
       // remove updates with fields that are not translated
       .filter((u) => u.label !== u.field)
   )
