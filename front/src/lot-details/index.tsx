@@ -18,7 +18,7 @@ import {
   separateAnomalies,
   WarningAnomalies,
 } from "./components/anomalies"
-import { getLotUpdates, History } from "./components/history"
+import { getLotChanges, History } from "./components/history"
 import { isExpiring } from "common-v2/utils/deadline"
 import Alert from "common-v2/components/alert"
 import { SendOneButton } from "transactions-v2/actions/send"
@@ -60,7 +60,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const lotData = lot.result?.data.data
   const editable = isEditable(lotData?.lot)
   const comments = lotData?.comments ?? []
-  const updates = getLotUpdates(lotData?.updates)
+  const changes = getLotChanges(lotData?.updates)
   const [errors, warnings] = separateAnomalies(lotData?.errors ?? [])
 
   const expiring = isExpiring(lotData?.lot)
@@ -108,9 +108,9 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
           </section>
         )}
 
-        {updates.length > 0 && (
+        {changes.length > 0 && (
           <section>
-            <History updates={updates} />
+            <History changes={changes} />
           </section>
         )}
       </main>
