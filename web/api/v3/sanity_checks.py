@@ -319,7 +319,7 @@ def sanity_check(tx, prefetched_data):
             errors.append(generic_error(error='DEPOT_NOT_CONFIGURED', tx=tx, display_to_recipient=True, display_to_creator=False, field='delivery_site'))
         else:
             # some delivery sites linked to entity
-            if tx.carbure_delivery_site.id not in prefetched_data['depotsbyentity'][tx.carbure_client.id]:
+            if tx.carbure_delivery_site and tx.carbure_delivery_site.id not in prefetched_data['depotsbyentity'][tx.carbure_client.id]:
                 # this specific delivery site is not linked
                 errors.append(generic_error(error='DEPOT_NOT_CONFIGURED', tx=tx, display_to_recipient=True, display_to_creator=False, field='delivery_site'))
 
