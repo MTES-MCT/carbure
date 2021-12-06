@@ -254,9 +254,12 @@ def get_prefetched_data(entity=None):
         d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').all()}
     d['depots'] = {d.depot_id.lstrip('0').upper(): d for d in Depot.objects.all()}
     d['depotsbyname'] = {d.name.upper(): d for d in Depot.objects.all()}
-    entitydepots = dict()
-    for obj in EntityDepot.objects.all():
-        entitydepots.setdefault(obj.entity.id, []).append(obj.depot.id)
+    entitydepots = {}
+    ed = EntityDepot.objects.all()
+    for e in ed:
+        if e.entity.id not in entitydepots:
+            entitydepots[e.entity.id] = []
+        entitydepots[e.entity.id].append(obj.depot.id) 
     d['depotsbyentity'] = entitydepots
     d['clients'] = {c.name.upper(): c for c in Entity.objects.filter(entity_type__in=['Producteur', 'Opérateur', 'Trader'])}
     d['certificates'] = {c.certificate_id.upper(): c for c in ISCCCertificate.objects.filter(valid_until__gte=lastyear)}
