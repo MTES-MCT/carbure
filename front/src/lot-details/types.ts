@@ -17,7 +17,7 @@ export interface Distance {
   source?: string
 }
 
-export interface LotUpdate<T = LotFieldUpdate> {
+export interface LotUpdate<T> {
   user: string
   event_type: string
   event_dt: string
@@ -26,9 +26,9 @@ export interface LotUpdate<T = LotFieldUpdate> {
 }
 
 export interface LotFieldUpdate {
-  field: string
-  value_before: string | number | null
-  value_after: string | number | null
+  added: any[]
+  removed: []
+  changed: [string, any, any][] // [field, value_before, value_after]
 }
 
 export interface LotComment {
