@@ -619,10 +619,11 @@ def approve_dca(request, *args, **kwargs):
         dca.status = DoubleCountingAgreement.INPROGRESS
     else:
         return JsonResponse({'status': "error", 'message': "Unknown entity"}, status=400)
+    dca.save()
     if dca.dgpe_validated and dca.dgddi_validated and dca.dgec_validated:
         dca.status = DoubleCountingAgreement.ACCEPTED
+        dca.save() # save before sending email, just in case
         send_dca_status_email(dca)
-    dca.save()
     return JsonResponse({'status': 'success'})
 
 @check_rights('validator_entity_id', role=[UserRights.ADMIN, UserRights.RW])
