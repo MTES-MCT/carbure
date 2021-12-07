@@ -4,9 +4,10 @@ import { AcceptOneButton } from "transactions-v2/actions/accept"
 import { SendOneButton } from "transactions-v2/actions/send"
 import { DeleteOneButton } from "transactions-v2/actions/delete"
 import { RejectOneButton } from "transactions-v2/actions/reject"
-import { RequestFixOneButton } from "transactions-v2/actions/request-fix"
-import { MarkAsFixedOneButton } from "transactions-v2/actions/mark-as-fixed"
+import { RequestOneFixButton } from "transactions-v2/actions/request-fix"
+import { MarkOneAsFixedButton } from "transactions-v2/actions/mark-as-fixed"
 import useEntity from "carbure/hooks/entity"
+import { RecallOneButton } from "transactions-v2/actions/recall"
 
 export interface ActionBarProps {
   icon?: boolean
@@ -35,14 +36,14 @@ export const LotActions = ({ lot }: ActionBarProps) => {
         <Fragment>
           <AcceptOneButton lot={lot} />
           <RejectOneButton lot={lot} />
-          <RequestFixOneButton lot={lot} />
+          <RequestOneFixButton lot={lot} />
         </Fragment>
       )}
 
       {status === "PENDING" && isSupplier && (
         <Fragment>
-          {/* {correction === "NO_PROBLEMO" && <MarkAsFixedOneButton lot={lot} />} */}
-          {correction === "IN_CORRECTION" && <MarkAsFixedOneButton lot={lot} />}
+          {correction === "NO_PROBLEMO" && <RecallOneButton lot={lot} />}
+          {correction === "IN_CORRECTION" && <MarkOneAsFixedButton lot={lot} />}
         </Fragment>
       )}
     </Fragment>
