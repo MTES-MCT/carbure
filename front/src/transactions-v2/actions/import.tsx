@@ -1,4 +1,4 @@
-import { useState } from "react"
+import React, { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api"
 import useEntity from "carbure/hooks/entity"
@@ -8,7 +8,8 @@ import Button, { ExternalLink as Ext } from "common-v2/components/button"
 import Dialog from "common-v2/components/dialog"
 import { Check, Return, Upload } from "common-v2/components/icons"
 import { usePortal } from "common-v2/components/portal"
-import { FileInput } from "common-v2/components/input"
+import { FileArea, FileInput } from "common-v2/components/input"
+import { LoaderOverlay } from "common-v2/components/scaffold"
 
 const FAQ_URL = "https://carbure-1.gitbook.io/faq/"
 const TEMPLATE_URL = ""
@@ -26,30 +27,34 @@ export const ImportButton = () => {
   )
 }
 
+export const ImportArea = ({ children }: { children: React.ReactNode }) => {
+  const { t } = useTranslation()
+  const entity = useEntity()
+  const importLots = useImportLots()
+
+  return (
+    <FileArea
+      icon={Upload}
+      label={t("Importer le fichier\nsur la plateforme")}
+      onChange={(file) => importLots.execute(entity.id, file!)}
+    >
+      {children}
+      {importLots.loading && <LoaderOverlay />}
+    </FileArea>
+  )
+}
+
 interface ImportDialogProps {
   onClose: () => void
 }
 
 const ImportDialog = ({ onClose }: ImportDialogProps) => {
   const { t } = useTranslation()
-  const notify = useNotify()
   const entity = useEntity()
 
+  const importLots = useImportLots(onClose)
+
   const [file, setFile] = useState<File | undefined>()
-
-  const importLots = useMutation(api.importLots, {
-    invalidates: ["lots", "snapshot"],
-
-    onSuccess: () => {
-      notify(t("Les lots ont bien été importés"), { variant: "success" })
-      onClose()
-    },
-
-    onError: () => {
-      notify(t("Les lots n'ont pas pu être importés"), { variant: "danger" })
-      onClose()
-    },
-  })
 
   return (
     <Dialog limit onClose={onClose}>
@@ -115,4 +120,23 @@ const ImportDialog = ({ onClose }: ImportDialogProps) => {
       </footer>
     </Dialog>
   )
+}
+
+function useImportLots(onClose?: () => void) {
+  const { t } = useTranslation()
+  const notify = useNotify()
+
+  return useMutation(api.importLots, {
+    invalidates: ["lots", "snapshot"],
+
+    onSuccess: () => {
+      notify(t("Les lots ont bien été importés"), { variant: "success" })
+      onClose?.()
+    },
+
+    onError: () => {
+      notify(t("Les lots n'ont pas pu être importés"), { variant: "danger" })
+      onClose?.()
+    },
+  })
 }

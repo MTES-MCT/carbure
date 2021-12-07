@@ -6,11 +6,10 @@ import { useQuery } from "common-v2/hooks/async"
 import * as api from "./api"
 import { Main } from "common-v2/components/scaffold"
 import Select from "common-v2/components/select"
-import { FileArea } from "common-v2/components/input"
-import { Upload } from "common-v2/components/icons"
 import { PortalProvider } from "common-v2/components/portal"
 import { StatusTabs, useStatus } from "./components/status"
 import { DeclarationButton } from "./actions/declaration"
+import { ImportArea } from "./actions/import"
 import Lots from "./components/lots"
 import Stocks from "./components/stocks"
 
@@ -54,11 +53,7 @@ export const Transactions = () => {
 
   return (
     <PortalProvider>
-      <FileArea
-        icon={Upload}
-        label={t("Importer le fichier\nsur la plateforme")}
-        onChange={(file) => {}}
-      >
+      <ImportArea>
         <Main>
           <header>
             <section>
@@ -90,7 +85,7 @@ export const Transactions = () => {
             <Route path="*" element={<Lots {...props} />} />
           </Routes>
         </Main>
-      </FileArea>
+      </ImportArea>
     </PortalProvider>
   )
 }
