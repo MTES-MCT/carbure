@@ -80,6 +80,13 @@ export function acceptReleaseForConsumption(
   )
 }
 
+export function acceptInStock(query: LotQuery, selection?: number[]) {
+  return api.post<Api<void>>(
+    "/lots/accept-in-stock",
+    getParams(query, selection)
+  )
+}
+
 export function deleteLots(query: LotQuery, selection?: number[]) {
   return api.post<Api<void>>("/lots/delete", getParams(query, selection))
 }

@@ -42,7 +42,6 @@ export const AcceptManyButton = ({
         selection.length > 0 ? t("Accepter la sélection") : t("Accepter tout")
       }
       items={[
-        { label: t("Incorporation") },
         {
           label: t("Mise à consommation"),
           action: () =>
@@ -50,7 +49,11 @@ export const AcceptManyButton = ({
               <ReleaseForConsumptionDialog {...props} onClose={close} />
             )),
         },
-        { label: t("Livraison directe") },
+        {
+          label: t("Mise en stock"),
+          action: () =>
+            portal((close) => <InStockDialog {...props} onClose={close} />),
+        },
       ]}
     />
   )
@@ -78,7 +81,6 @@ export const AcceptOneButton = ({ icon, lot }: AcceptOneButtonProps) => {
       anchor={Anchors.topLeft}
       label={t("Accepter le lot")}
       items={[
-        { label: t("Incorporation") },
         {
           label: t("Mise à consommation"),
           action: () =>
@@ -86,7 +88,11 @@ export const AcceptOneButton = ({ icon, lot }: AcceptOneButtonProps) => {
               <ReleaseForConsumptionDialog {...props} onClose={close} />
             )),
         },
-        { label: t("Livraison directe") },
+        {
+          label: t("Mise en stock"),
+          action: () =>
+            portal((close) => <InStockDialog {...props} onClose={close} />),
+        },
       ]}
     />
   )
@@ -170,7 +176,86 @@ const ReleaseForConsumptionDialog = ({
           loading={acceptLots.loading}
           variant="success"
           icon={Check}
-          label={t("Accepter")}
+          label={t("Mise à consommation")}
+          action={() => acceptLots.execute(query, selection)}
+        />
+      </footer>
+    </Dialog>
+  )
+}
+
+const InStockDialog = ({
+  summary,
+  query,
+  selection,
+  onClose,
+}: AcceptDialogProps) => {
+  const { t } = useTranslation()
+  const notify = useNotify()
+
+  const v = variations(selection.length)
+
+  const acceptLots = useMutation(api.acceptInStock, {
+    invalidates: ["lots", "snapshot", "lot-details"],
+
+    onSuccess: () => {
+      const text = v({
+        zero: t("Les lots ont été placés dans votre stock !"),
+        one: t("Le lot a été placé dans votre stock !"),
+        many: t("Les lots sélectionnés ont été placés dans votre stock !"),
+      })
+
+      notify(text, { variant: "success" })
+      onClose()
+    },
+
+    onError: () => {
+      const text = v({
+        zero: t("Les lots n'ont pas pu être acceptés !"),
+        one: t("Le lot n'a pas pu être accepté !"),
+        many: t("Les lots sélectionnés n'ont pas pu être acceptés !"),
+      })
+
+      notify(text, { variant: "danger" })
+      onClose()
+    },
+  })
+
+  return (
+    <Dialog onClose={onClose}>
+      <header>
+        <h1>
+          {v({
+            zero: t("Accepter les lots"),
+            one: t("Accepter le lot"),
+            many: t("Accepter les lots"),
+          })}
+        </h1>
+      </header>
+      <main>
+        <section>
+          {v({
+            zero: t("Voulez-vous accepter ces lots dans votre stock ?"),
+            one: t("Voulez-vous accepter ce lot dans votre stock ?"),
+            many: t("Voulez-vous accepter les lots sélectionnés dans votre stock ?"), // prettier-ignore
+          })}
+        </section>
+        {summary && <LotSummary query={query} selection={selection} />}
+      </main>
+      <footer>
+        <Button
+          asideX
+          disabled={acceptLots.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
+        />
+        <Button
+          submit
+          loading={acceptLots.loading}
+          variant="success"
+          icon={Check}
+          label={t("Mise en stock")}
           action={() => acceptLots.execute(query, selection)}
         />
       </footer>
