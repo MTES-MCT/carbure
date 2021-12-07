@@ -16,9 +16,12 @@ import {
   AlertCircle,
   Certificate,
   Check,
+  ChevronLeft,
+  ChevronRight,
   Return,
 } from "common-v2/components/icons"
 import { Entity } from "carbure/types"
+import { Row } from "common-v2/components/scaffold"
 
 export interface DeclarationButtonProps {
   year: number
@@ -70,11 +73,21 @@ export const DeclarationDialog = ({
     },
   })
 
-  const declarationsData = declarations.result?.data.data
+  const declarationsData = declarations.result?.data.data ?? []
   const period = declaration?.period ?? currentPeriod
 
   // generate a special query to get the summary for this declaration
   const query = useDeclarationQuery({ entity, year, period })
+
+  function prev() {
+    const index = declarationsData.indexOf(declaration!)
+    setDeclaration(declarationsData[Math.max(0, index - 1)])
+  }
+
+  function next() {
+    const index = declarationsData.indexOf(declaration!)
+    setDeclaration(declarationsData[Math.min(index + 1, 11)])
+  }
 
   return (
     <Dialog limit onClose={onClose}>
@@ -96,15 +109,19 @@ export const DeclarationDialog = ({
           </p>
         </section>
         <section>
-          <Select
-            loading={declarations.loading}
-            label={t("Période de déclaration")}
-            placeholder={t("Choisissez une période")}
-            value={declaration}
-            onChange={setDeclaration}
-            options={declarationsData}
-            normalize={normalizeDeclaration}
-          />
+          <Row>
+            <Button icon={ChevronLeft} action={prev} />
+            <Select
+              loading={declarations.loading}
+              placeholder={t("Choisissez une période")}
+              value={declaration}
+              onChange={setDeclaration}
+              options={declarationsData}
+              normalize={normalizeDeclaration}
+              style={{ flex: 1, margin: "0 var(--spacing-s)" }}
+            />
+            <Button icon={ChevronRight} action={next} />
+          </Row>
         </section>
         {declaration && <LotSummary pending query={query} />}
       </main>
