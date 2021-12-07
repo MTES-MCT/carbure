@@ -86,6 +86,10 @@ export function markAsFixed(entity_id: number, lot_ids: number[]) {
   return api.post<Api<void>>("/lots/mark-as-fixed", { entity_id, lot_ids })
 }
 
+export function recallLots(entity_id: number, lot_ids: number[]) {
+  return api.post<Api<void>>("/lots/recall", { entity_id, lot_ids })
+}
+
 export function getParams(query: LotQuery, selection?: number[]) {
   if (!selection || selection.length === 0) return query
   else return { entity_id: query.entity_id, selection }
