@@ -11,7 +11,7 @@ import { Cross, Return } from "common-v2/components/icons"
 import { usePortal } from "common-v2/components/portal"
 import { LotSummary } from "../components/lots/lot-summary"
 
-export interface DeleteButtonProps {
+export interface DeleteManyButtonProps {
   disabled?: boolean
   query: LotQuery
   selection: number[]
@@ -21,7 +21,7 @@ export const DeleteManyButton = ({
   disabled,
   query,
   selection,
-}: DeleteButtonProps) => {
+}: DeleteManyButtonProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
@@ -47,12 +47,12 @@ export const DeleteManyButton = ({
   )
 }
 
-export interface DeleteIconButtonProps {
+export interface DeleteOneButtonProps {
   icon?: boolean
   lot: Lot
 }
 
-export const DeleteOneButton = ({ icon, lot }: DeleteIconButtonProps) => {
+export const DeleteOneButton = ({ icon, lot }: DeleteOneButtonProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const portal = usePortal()

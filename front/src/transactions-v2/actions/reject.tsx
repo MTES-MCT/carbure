@@ -3,15 +3,15 @@ import { Lot, LotQuery } from "../types"
 import * as api from "../api"
 import useEntity from "carbure/hooks/entity"
 import { useMutation } from "common-v2/hooks/async"
+import { usePortal } from "common-v2/components/portal"
 import { useNotify } from "common-v2/components/notifications"
 import { variations } from "common-v2/utils/formatters"
 import Button from "common-v2/components/button"
 import Dialog from "common-v2/components/dialog"
 import { Cross, Return } from "common-v2/components/icons"
-import { usePortal } from "common-v2/components/portal"
 import { LotSummary } from "../components/lots/lot-summary"
 
-export interface RejectButtonProps {
+export interface RejectManyButtonProps {
   disabled?: boolean
   query: LotQuery
   selection: number[]
@@ -21,7 +21,7 @@ export const RejectManyButton = ({
   disabled,
   query,
   selection,
-}: RejectButtonProps) => {
+}: RejectManyButtonProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
@@ -47,12 +47,12 @@ export const RejectManyButton = ({
   )
 }
 
-export interface RejectIconButtonProps {
+export interface RejectOneButtonProps {
   icon?: boolean
   lot: Lot
 }
 
-export const RejectOneButton = ({ icon, lot }: RejectIconButtonProps) => {
+export const RejectOneButton = ({ icon, lot }: RejectOneButtonProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const portal = usePortal()
