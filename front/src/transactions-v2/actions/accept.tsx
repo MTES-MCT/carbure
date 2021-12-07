@@ -79,6 +79,16 @@ function getAcceptOptions(
 ) {
   return [
     {
+      label: i18next.t("Incorporation"),
+      action: () =>
+        portal((close) => <BlendingDialog {...props} onClose={close} />),
+    },
+    {
+      label: i18next.t("Incorporation par un tiers"),
+      action: () =>
+        portal((close) => <ProcessingDialog {...props} onClose={close} />),
+    },
+    {
       label: i18next.t("Mise à consommation"),
       action: () =>
         portal((close) => (
@@ -91,19 +101,14 @@ function getAcceptOptions(
         portal((close) => <InStockDialog {...props} onClose={close} />),
     },
     {
-      label: i18next.t("Transfert"),
+      label: i18next.t("Transfert sans stockage"),
       action: () =>
         portal((close) => <TradingDialog {...props} onClose={close} />),
     },
     {
-      label: i18next.t("Processing"),
+      label: i18next.t("Livraison directe"),
       action: () =>
-        portal((close) => <ProcessingDialog {...props} onClose={close} />),
-    },
-    {
-      label: i18next.t("Incorporation"),
-      action: () =>
-        portal((close) => <BlendingDialog {...props} onClose={close} />),
+        portal((close) => <ExportDialog {...props} onClose={close} />),
     },
   ]
 }
@@ -529,6 +534,86 @@ const BlendingDialog = ({
           variant="success"
           icon={Check}
           label={t("Incorporer")}
+          action={() => acceptLots.execute(query, selection)}
+        />
+      </footer>
+    </Dialog>
+  )
+}
+
+const ExportDialog = ({
+  summary,
+  query,
+  selection,
+  onClose,
+}: AcceptDialogProps) => {
+  const { t } = useTranslation()
+  const notify = useNotify()
+
+  const v = variations(selection.length)
+
+  const acceptLots = useMutation(api.acceptForExport, {
+    invalidates: ["lots", "snapshot", "lot-details"],
+
+    onSuccess: () => {
+      const text = v({
+        zero: t("Les lots ont été marqués comme livraison directe !"),
+        one: t("Le lot a été marqué comme livraison directe !"),
+        many: t("Les lots sélectionnés ont été marqués comme livraison directe !"), // prettier-ignore
+      })
+
+      notify(text, { variant: "success" })
+      onClose()
+    },
+
+    onError: () => {
+      const text = v({
+        zero: t("Les lots n'ont pas pu être acceptés !"),
+        one: t("Le lot n'a pas pu être accepté !"),
+        many: t("Les lots sélectionnés n'ont pas pu être acceptés !"),
+      })
+
+      notify(text, { variant: "danger" })
+      onClose()
+    },
+  })
+
+  return (
+    <Dialog onClose={onClose}>
+      <header>
+        <h1>
+          {v({
+            zero: t("Accepter les lots"),
+            one: t("Accepter le lot"),
+            many: t("Accepter les lots"),
+          })}
+        </h1>
+      </header>
+      <main>
+        <section>
+          {v({
+            zero: t("Voulez-vous accepter les lots pour livraison directe ?"),
+            one: t("Voulez-vous accepter le lot pour livraison directe ?"),
+            many: t("Voulez-vous accepter les lots sélectionnés pour livraison directe ?"), // prettier-ignore
+          })}
+        </section>
+
+        {summary && <LotSummary query={query} selection={selection} />}
+      </main>
+      <footer>
+        <Button
+          asideX
+          disabled={acceptLots.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
+        />
+        <Button
+          submit
+          loading={acceptLots.loading}
+          variant="success"
+          icon={Check}
+          label={t("Livrer")}
           action={() => acceptLots.execute(query, selection)}
         />
       </footer>
