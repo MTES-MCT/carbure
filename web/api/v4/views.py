@@ -717,12 +717,20 @@ def get_declarations(request, *args, **kwargs):
 
     period_lots = CarbureLot.objects.filter(period__in=periods) \
         .filter(Q(carbure_client_id=entity_id) | Q(carbure_supplier_id=entity_id)) \
-        .filter(Q(lot_status__in=[CarbureLot.PENDING, CarbureLot.REJECTED]) | Q(correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED])) \
         .values('period') \
         .annotate(count=Count('id', distinct=True))
     lots_by_period = {}
     for period_lot in period_lots:
         lots_by_period[str(period_lot['period'])] = period_lot['count']
+
+    pending_period_lots = CarbureLot.objects.filter(period__in=periods) \
+        .filter(Q(carbure_client_id=entity_id) | Q(carbure_supplier_id=entity_id)) \
+        .filter(Q(lot_status__in=[CarbureLot.PENDING, CarbureLot.REJECTED]) | Q(correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED])) \
+        .values('period') \
+        .annotate(count=Count('id', distinct=True))
+    pending_by_period = {}
+    for period_lot in pending_period_lots:
+        pending_by_period[str(period_lot['period'])] = period_lot['count']
 
     declarations = SustainabilityDeclaration.objects.filter(entity_id=entity_id, period__in=period_dates)
     declarations_by_period = {}
@@ -734,7 +742,8 @@ def get_declarations(request, *args, **kwargs):
     for period in periods:
         data.append({
             'period': period,
-            'pending': lots_by_period[period] if period in lots_by_period else 0,
+            'lots': lots_by_period[period] if period in lots_by_period else 0,
+            'pending': pending_by_period[period] if period in pending_by_period else 0,
             'declaration': declarations_by_period[period] if period in declarations_by_period else None
         })
 

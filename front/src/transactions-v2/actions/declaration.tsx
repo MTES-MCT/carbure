@@ -89,6 +89,9 @@ export const DeclarationDialog = ({
     setDeclaration(declarationsData[Math.min(index + 1, 11)])
   }
 
+  const hasLots = Boolean(declaration?.lots)
+  const hasPending = Boolean(declaration?.pending)
+
   return (
     <Dialog limit onClose={onClose}>
       <header>
@@ -135,7 +138,7 @@ export const DeclarationDialog = ({
           />
         ) : (
           <Button
-            disabled={Boolean(declaration?.pending)}
+            disabled={!hasLots || hasPending}
             variant="primary"
             icon={Check}
             label={t("Valider la déclaration")}
