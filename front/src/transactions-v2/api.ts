@@ -124,6 +124,12 @@ export function acceptForBlending(
     getParams(query, selection)
   )
 }
+export function acceptForExport(
+  query: LotQuery,
+  selection: number[] | undefined
+) {
+  return api.post<Api<void>>("/lots/accept-export", getParams(query, selection))
+}
 
 export function deleteLots(query: LotQuery, selection?: number[]) {
   return api.post<Api<void>>("/lots/delete", getParams(query, selection))
