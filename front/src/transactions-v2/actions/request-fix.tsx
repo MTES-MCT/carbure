@@ -12,15 +12,15 @@ import { usePortal } from "common-v2/components/portal"
 import { LotSummary } from "../components/lots/lot-summary"
 import { useStatus } from "transactions-v2/components/status"
 
-export interface RequestFixManyButtonProps {
+export interface RequestManyFixesButtonProps {
   disabled?: boolean
   selection: number[]
 }
 
-export const RequestFixManyButton = ({
+export const RequestManyFixesButton = ({
   disabled,
   selection,
-}: RequestFixManyButtonProps) => {
+}: RequestManyFixesButtonProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
@@ -29,7 +29,7 @@ export const RequestFixManyButton = ({
       disabled={disabled || selection.length === 0}
       variant="warning"
       icon={Wrench}
-      label={t("Demander une correction")}
+      label={t("Demander des corrections")}
       action={() =>
         portal((close) => (
           <RequestFixDialog summary selection={selection} onClose={close} />
@@ -39,15 +39,15 @@ export const RequestFixManyButton = ({
   )
 }
 
-export interface RequestFixOneButtonProps {
+export interface RequestOneFixButtonProps {
   icon?: boolean
   lot: Lot
 }
 
-export const RequestFixOneButton = ({
+export const RequestOneFixButton = ({
   icon,
   lot,
-}: RequestFixOneButtonProps) => {
+}: RequestOneFixButtonProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
