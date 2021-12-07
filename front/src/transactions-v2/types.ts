@@ -125,6 +125,7 @@ export interface Snapshot {
 export interface DeclarationSummary {
   period: string
   pending: number
+  lots: number
   declaration: Declaration | null
 }
 
