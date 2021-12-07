@@ -16,7 +16,8 @@ import { useState } from "react"
 import { Entity } from "carbure/types"
 import Autocomplete from "common-v2/components/autocomplete"
 import { findEntities } from "common-v2/api"
-import { identity, normalizeEntity } from "common-v2/utils/normalizers"
+import * as norm from "common-v2/utils/normalizers"
+import i18next from "i18next"
 
 export interface AcceptManyButtonProps {
   disabled?: boolean
@@ -31,40 +32,19 @@ export const AcceptManyButton = ({
 }: AcceptManyButtonProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
-
-  const props = {
-    query,
-    selection,
-    summary: true,
-  }
+  const hasSelection = selection.length > 0
 
   return (
     <Menu
       disabled={disabled}
       variant="success"
       icon={Check}
-      label={
-        selection.length > 0 ? t("Accepter la sélection") : t("Accepter tout")
-      }
-      items={[
-        {
-          label: t("Mise à consommation"),
-          action: () =>
-            portal((close) => (
-              <ReleaseForConsumptionDialog {...props} onClose={close} />
-            )),
-        },
-        {
-          label: t("Mise en stock"),
-          action: () =>
-            portal((close) => <InStockDialog {...props} onClose={close} />),
-        },
-        {
-          label: t("Trading sans stockage"),
-          action: () =>
-            portal((close) => <TradingDialog {...props} onClose={close} />),
-        },
-      ]}
+      label={hasSelection ? t("Accepter la sélection") : t("Accepter tout")}
+      items={getAcceptOptions(portal, {
+        query,
+        selection,
+        summary: true,
+      })}
     />
   )
 }
@@ -79,38 +59,48 @@ export const AcceptOneButton = ({ icon, lot }: AcceptOneButtonProps) => {
   const entity = useEntity()
   const portal = usePortal()
 
-  const props = {
-    query: { entity_id: entity.id },
-    selection: [lot.id],
-  }
-
   return (
     <Menu
       variant={icon ? "icon" : "success"}
       icon={Check}
       anchor={Anchors.topLeft}
       label={t("Accepter le lot")}
-      items={[
-        {
-          label: t("Mise à consommation"),
-          action: () =>
-            portal((close) => (
-              <ReleaseForConsumptionDialog {...props} onClose={close} />
-            )),
-        },
-        {
-          label: t("Mise en stock"),
-          action: () =>
-            portal((close) => <InStockDialog {...props} onClose={close} />),
-        },
-        {
-          label: t("Trading sans stockage"),
-          action: () =>
-            portal((close) => <TradingDialog {...props} onClose={close} />),
-        },
-      ]}
+      items={getAcceptOptions(portal, {
+        query: { entity_id: entity.id },
+        selection: [lot.id],
+      })}
     />
   )
+}
+
+function getAcceptOptions(
+  portal: ReturnType<typeof usePortal>,
+  props: { query: LotQuery; selection: number[]; summary?: boolean }
+) {
+  return [
+    {
+      label: i18next.t("Mise à consommation"),
+      action: () =>
+        portal((close) => (
+          <ReleaseForConsumptionDialog {...props} onClose={close} />
+        )),
+    },
+    {
+      label: i18next.t("Mise en stock"),
+      action: () =>
+        portal((close) => <InStockDialog {...props} onClose={close} />),
+    },
+    {
+      label: i18next.t("Trading sans stockage"),
+      action: () =>
+        portal((close) => <TradingDialog {...props} onClose={close} />),
+    },
+    {
+      label: i18next.t("Processing"),
+      action: () =>
+        portal((close) => <ProcessingDialog {...props} onClose={close} />),
+    },
+  ]
 }
 
 interface AcceptDialogProps {
@@ -342,8 +332,8 @@ const TradingDialog = ({
             value={client}
             onChange={setClient}
             getOptions={findEntities}
-            normalize={normalizeEntity}
-            create={identity}
+            normalize={norm.normalizeEntity}
+            create={norm.identity}
           />
         </section>
         {summary && <LotSummary query={query} selection={selection} />}
@@ -364,6 +354,97 @@ const TradingDialog = ({
           icon={Check}
           label={t("Transférer")}
           action={() => acceptLots.execute(query, selection, client!)}
+        />
+      </footer>
+    </Dialog>
+  )
+}
+
+const ProcessingDialog = ({
+  summary,
+  query,
+  selection,
+  onClose,
+}: AcceptDialogProps) => {
+  const { t } = useTranslation()
+  const notify = useNotify()
+
+  const v = variations(selection.length)
+
+  const [processor, setProcessor] = useState<Entity | undefined>()
+
+  const acceptLots = useMutation(api.acceptForProcessing, {
+    invalidates: ["lots", "snapshot", "lot-details"],
+
+    onSuccess: () => {
+      const text = v({
+        zero: t("Les lots ont été placés dans votre stock !"),
+        one: t("Le lot a été placé dans votre stock !"),
+        many: t("Les lots sélectionnés ont été placés dans votre stock !"),
+      })
+
+      notify(text, { variant: "success" })
+      onClose()
+    },
+
+    onError: () => {
+      const text = v({
+        zero: t("Les lots n'ont pas pu être acceptés !"),
+        one: t("Le lot n'a pas pu être accepté !"),
+        many: t("Les lots sélectionnés n'ont pas pu être acceptés !"),
+      })
+
+      notify(text, { variant: "danger" })
+      onClose()
+    },
+  })
+
+  return (
+    <Dialog onClose={onClose}>
+      <header>
+        <h1>
+          {v({
+            zero: t("Transférer les lots"),
+            one: t("Transférer le lot"),
+            many: t("Transférer les lots"),
+          })}
+        </h1>
+      </header>
+      <main>
+        <section>
+          {t(
+            "Vous pouvez transférer vos lots reçus dans un dépôt pour lequel l'incorporation peut être effectuée par une société tierce."
+          )}
+        </section>
+        <section>
+          {/* @TODO instead of this allow picking a depot with processing enabled */}
+          {/* then filter lots from this depot in summary */}
+          <Autocomplete
+            label={t("Société tierce")}
+            value={processor}
+            onChange={setProcessor}
+            getOptions={findEntities}
+            normalize={norm.normalizePureEntity}
+          />
+        </section>
+        {summary && <LotSummary query={query} selection={selection} />}
+      </main>
+      <footer>
+        <Button
+          asideX
+          disabled={acceptLots.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
+        />
+        <Button
+          submit
+          loading={acceptLots.loading}
+          disabled={!processor}
+          variant="success"
+          icon={Check}
+          label={t("Transférer")}
+          action={() => acceptLots.execute(query, selection, processor!.id)}
         />
       </footer>
     </Dialog>
