@@ -115,6 +115,16 @@ export function acceptForProcessing(
   })
 }
 
+export function acceptForBlending(
+  query: LotQuery,
+  selection: number[] | undefined
+) {
+  return api.post<Api<void>>(
+    "/lots/accept-blending",
+    getParams(query, selection)
+  )
+}
+
 export function deleteLots(query: LotQuery, selection?: number[]) {
   return api.post<Api<void>>("/lots/delete", getParams(query, selection))
 }

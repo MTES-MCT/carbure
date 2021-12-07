@@ -91,7 +91,7 @@ function getAcceptOptions(
         portal((close) => <InStockDialog {...props} onClose={close} />),
     },
     {
-      label: i18next.t("Trading sans stockage"),
+      label: i18next.t("Transfert"),
       action: () =>
         portal((close) => <TradingDialog {...props} onClose={close} />),
     },
@@ -99,6 +99,11 @@ function getAcceptOptions(
       label: i18next.t("Processing"),
       action: () =>
         portal((close) => <ProcessingDialog {...props} onClose={close} />),
+    },
+    {
+      label: i18next.t("Incorporation"),
+      action: () =>
+        portal((close) => <BlendingDialog {...props} onClose={close} />),
     },
   ]
 }
@@ -445,6 +450,86 @@ const ProcessingDialog = ({
           icon={Check}
           label={t("Transférer")}
           action={() => acceptLots.execute(query, selection, processor!.id)}
+        />
+      </footer>
+    </Dialog>
+  )
+}
+
+const BlendingDialog = ({
+  summary,
+  query,
+  selection,
+  onClose,
+}: AcceptDialogProps) => {
+  const { t } = useTranslation()
+  const notify = useNotify()
+
+  const v = variations(selection.length)
+
+  const acceptLots = useMutation(api.acceptForBlending, {
+    invalidates: ["lots", "snapshot", "lot-details"],
+
+    onSuccess: () => {
+      const text = v({
+        zero: t("Les lots ont été marqués pour incorporation !"),
+        one: t("Le lot a été marqué pour incorporation !"),
+        many: t("Les lots sélectionnés ont été marqués pour incorporation !"),
+      })
+
+      notify(text, { variant: "success" })
+      onClose()
+    },
+
+    onError: () => {
+      const text = v({
+        zero: t("Les lots n'ont pas pu être acceptés !"),
+        one: t("Le lot n'a pas pu être accepté !"),
+        many: t("Les lots sélectionnés n'ont pas pu être acceptés !"),
+      })
+
+      notify(text, { variant: "danger" })
+      onClose()
+    },
+  })
+
+  return (
+    <Dialog onClose={onClose}>
+      <header>
+        <h1>
+          {v({
+            zero: t("Accepter les lots"),
+            one: t("Accepter le lot"),
+            many: t("Accepter les lots"),
+          })}
+        </h1>
+      </header>
+      <main>
+        <section>
+          {v({
+            zero: t("Voulez-vous accepter les lots pour incorporation ?"),
+            one: t("Voulez-vous accepter le lot pour incorporation ?"),
+            many: t("Voulez-vous accepter les lots sélectionnés pour incorporation ?"), // prettier-ignore
+          })}
+        </section>
+
+        {summary && <LotSummary query={query} selection={selection} />}
+      </main>
+      <footer>
+        <Button
+          asideX
+          disabled={acceptLots.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
+        />
+        <Button
+          submit
+          loading={acceptLots.loading}
+          variant="success"
+          icon={Check}
+          label={t("Incorporer")}
+          action={() => acceptLots.execute(query, selection)}
         />
       </footer>
     </Dialog>
