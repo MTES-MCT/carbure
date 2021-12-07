@@ -104,6 +104,17 @@ export function acceptForTrading(
   })
 }
 
+export function acceptForProcessing(
+  query: LotQuery,
+  selection: number[] | undefined,
+  processing_entity_id: number
+) {
+  return api.post<Api<void>>("/lots/accept-processing", {
+    ...getParams(query, selection),
+    processing_entity_id,
+  })
+}
+
 export function deleteLots(query: LotQuery, selection?: number[]) {
   return api.post<Api<void>>("/lots/delete", getParams(query, selection))
 }
