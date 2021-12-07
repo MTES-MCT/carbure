@@ -4,6 +4,7 @@ import { AcceptOneButton } from "transactions-v2/actions/accept"
 import { SendOneButton } from "transactions-v2/actions/send"
 import { DeleteOneButton } from "transactions-v2/actions/delete"
 import { RejectOneButton } from "transactions-v2/actions/reject"
+import { RequestFixOneButton } from "transactions-v2/actions/request-fix"
 
 export interface ActionBarProps {
   icon?: boolean
@@ -26,6 +27,7 @@ export const LotActions = (props: ActionBarProps) => {
         <Fragment>
           <AcceptOneButton {...props} />
           <RejectOneButton {...props} />
+          <RequestFixOneButton {...props} />
         </Fragment>
       )}
     </Fragment>

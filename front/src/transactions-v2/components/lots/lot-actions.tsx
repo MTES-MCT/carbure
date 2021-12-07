@@ -10,6 +10,7 @@ import { SendManyButton } from "transactions-v2/actions/send"
 import { DeleteManyButton } from "transactions-v2/actions/delete"
 import { RejectManyButton } from "transactions-v2/actions/reject"
 import { ImportButton } from "transactions-v2/actions/import"
+import { RequestFixManyButton } from "transactions-v2/actions/request-fix"
 
 export interface ActionBarProps {
   count: number
@@ -37,12 +38,7 @@ export const LotActions = ({ count, ...props }: ActionBarProps) => {
         <Fragment>
           <AcceptManyButton {...props} disabled={empty} />
           <RejectManyButton {...props} disabled={empty} />
-          <Button
-            disabled={empty || selection.length === 0}
-            variant="warning"
-            icon={Wrench}
-            label={"Demander une correction"}
-          />
+          <RequestFixManyButton {...props} disabled={empty} />
         </Fragment>
       )}
 

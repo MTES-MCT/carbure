@@ -2,7 +2,7 @@ import cl from "clsx"
 import { Loader } from "./icons"
 import css from "./button.module.css"
 import { Layout, layout } from "./scaffold"
-import { Link, LinkProps } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { ExternalLink as ExternalLinkIcon } from "./icons"
 
 export type ButtonVariant =
