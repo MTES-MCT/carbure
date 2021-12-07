@@ -78,6 +78,10 @@ export function rejectLots(query: LotQuery, selection?: number[]) {
   return api.post<Api<void>>("/lots/reject", getParams(query, selection))
 }
 
+export function requestFix(entity_id: number, lot_ids: number[]) {
+  return api.post<Api<void>>("/lots/request-fix", { entity_id, lot_ids })
+}
+
 export function getParams(query: LotQuery, selection?: number[]) {
   if (!selection || selection.length === 0) return query
   else return { entity_id: query.entity_id, selection }
