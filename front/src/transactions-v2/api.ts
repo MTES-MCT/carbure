@@ -1,4 +1,4 @@
-import { api, Api } from "common-v2/services/api"
+import { api, Api, download } from "common-v2/services/api"
 import { Option } from "common-v2/utils/normalize"
 import {
   LotList,
@@ -40,7 +40,7 @@ export function importLots(entity_id: number, file: File) {
 }
 
 export function downloadLots(query: LotQuery, selection: number[]) {
-  return null
+  return download("/lots", { ...getParams(query, selection), export: true })
 }
 
 export function getLotsSummary(
