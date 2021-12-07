@@ -70,6 +70,16 @@ export function sendLots(query: LotQuery, selection?: number[]) {
   return api.post<Api<void>>("/lots/send", getParams(query, selection))
 }
 
+export function acceptReleaseForConsumption(
+  query: LotQuery,
+  selection?: number[]
+) {
+  return api.post<Api<void>>(
+    "/lots/accept-release-for-consumption",
+    getParams(query, selection)
+  )
+}
+
 export function deleteLots(query: LotQuery, selection?: number[]) {
   return api.post<Api<void>>("/lots/delete", getParams(query, selection))
 }
