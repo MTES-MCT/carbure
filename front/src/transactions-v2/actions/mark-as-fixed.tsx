@@ -12,15 +12,15 @@ import { usePortal } from "common-v2/components/portal"
 import { LotSummary } from "../components/lots/lot-summary"
 import { useStatus } from "transactions-v2/components/status"
 
-export interface MarkAsFixedManyButtonProps {
+export interface MarkManyAsFixedButtonProps {
   disabled?: boolean
   selection: number[]
 }
 
-export const MarkAsFixedManyButton = ({
+export const MarkManyAsFixedButton = ({
   disabled,
   selection,
-}: MarkAsFixedManyButtonProps) => {
+}: MarkManyAsFixedButtonProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
@@ -39,15 +39,15 @@ export const MarkAsFixedManyButton = ({
   )
 }
 
-export interface MarkAsFixedOneButtonProps {
+export interface MarkOneAsFixedButtonProps {
   icon?: boolean
   lot: Lot
 }
 
-export const MarkAsFixedOneButton = ({
+export const MarkOneAsFixedButton = ({
   icon,
   lot,
-}: MarkAsFixedOneButtonProps) => {
+}: MarkOneAsFixedButtonProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
