@@ -11,6 +11,7 @@ import { DeleteManyButton } from "transactions-v2/actions/delete"
 import { RejectManyButton } from "transactions-v2/actions/reject"
 import { ImportButton } from "transactions-v2/actions/import"
 import { RequestFixManyButton } from "transactions-v2/actions/request-fix"
+import { MarkAsFixedManyButton } from "transactions-v2/actions/mark-as-fixed"
 
 export interface ActionBarProps {
   count: number
@@ -50,6 +51,7 @@ export const LotActions = ({ count, ...props }: ActionBarProps) => {
             icon={Wrench}
             label={"Corriger la sélection"}
           />
+          <MarkAsFixedManyButton {...props} />
         </Fragment>
       )}
 
