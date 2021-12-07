@@ -259,7 +259,7 @@ def get_prefetched_data(entity=None):
     for e in ed:
         if e.entity.id not in entitydepots:
             entitydepots[e.entity.id] = []
-        entitydepots[e.entity.id].append(obj.depot.id) 
+        entitydepots[e.entity.id].append(e.depot.id) 
     d['depotsbyentity'] = entitydepots
     d['clients'] = {c.name.upper(): c for c in Entity.objects.filter(entity_type__in=['Producteur', 'Opérateur', 'Trader'])}
     d['certificates'] = {c.certificate_id.upper(): c for c in ISCCCertificate.objects.filter(valid_until__gte=lastyear)}
