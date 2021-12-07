@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Lot } from "../types"
 import * as api from "../api"
@@ -11,6 +12,7 @@ import { Return, Wrench } from "common-v2/components/icons"
 import { usePortal } from "common-v2/components/portal"
 import { LotSummary } from "../components/lots/lot-summary"
 import { useStatus } from "transactions-v2/components/status"
+import { TextInput } from "common-v2/components/input"
 
 export interface RecallManyButtonProps {
   disabled?: boolean
@@ -76,7 +78,9 @@ const RecallDialog = ({ summary, selection, onClose }: RecallDialogProps) => {
 
   const v = variations(selection.length)
 
-  const recallLots = useMutation(api.recallLots, {
+  const [comment = "", setComment] = useState<string | undefined>("")
+
+  const recallLots = useMutation(recallAndCommentLots, {
     invalidates: ["lots", "snapshot", "lot-details"],
 
     onSuccess: () => {
@@ -119,6 +123,14 @@ const RecallDialog = ({ summary, selection, onClose }: RecallDialogProps) => {
             many: t("Voulez-vous corriger les lots sélectionnés ?"),
           })}
         </section>
+        <section>
+          <TextInput
+            required
+            label={t("Commentaire")}
+            value={comment}
+            onChange={setComment}
+          />
+        </section>
         {summary && <LotSummary query={query} selection={selection} />}
       </main>
       <footer>
@@ -135,9 +147,18 @@ const RecallDialog = ({ summary, selection, onClose }: RecallDialogProps) => {
           variant="warning"
           icon={Wrench}
           label={t("Corriger")}
-          action={() => recallLots.execute(entity.id, selection)}
+          action={() => recallLots.execute(entity.id, selection, comment)}
         />
       </footer>
     </Dialog>
   )
+}
+
+async function recallAndCommentLots(
+  entity_id: number,
+  selection: number[],
+  comment: string
+) {
+  await api.recallLots(entity_id, selection)
+  await api.commentLots({ entity_id }, selection, comment)
 }
