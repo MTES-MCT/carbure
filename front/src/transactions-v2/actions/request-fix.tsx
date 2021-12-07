@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Lot } from "../types"
 import * as api from "../api"
@@ -9,8 +10,9 @@ import Button from "common-v2/components/button"
 import Dialog from "common-v2/components/dialog"
 import { Return, Wrench } from "common-v2/components/icons"
 import { usePortal } from "common-v2/components/portal"
-import { LotSummary } from "../components/lots/lot-summary"
 import { useStatus } from "transactions-v2/components/status"
+import { TextInput } from "common-v2/components/input"
+import { LotSummary } from "../components/lots/lot-summary"
 
 export interface RequestManyFixesButtonProps {
   disabled?: boolean
@@ -85,7 +87,9 @@ const RequestFixDialog = ({
 
   const v = variations(selection.length)
 
-  const requestFix = useMutation(api.requestFix, {
+  const [comment = "", setComment] = useState<string | undefined>("")
+
+  const requestFix = useMutation(requestFixAndCommentLots, {
     invalidates: ["lots", "snapshot", "lot-details"],
 
     onSuccess: () => {
@@ -128,6 +132,14 @@ const RequestFixDialog = ({
             many: t("Voulez-vous demander des corrections pour les lots sélectionnés ?"), // prettier-ignore
           })}
         </section>
+        <section>
+          <TextInput
+            required
+            label={t("Commentaire")}
+            value={comment}
+            onChange={setComment}
+          />
+        </section>
         {summary && <LotSummary query={query} selection={selection} />}
       </main>
       <footer>
@@ -144,9 +156,18 @@ const RequestFixDialog = ({
           variant="warning"
           icon={Wrench}
           label={t("Demander correction")}
-          action={() => requestFix.execute(entity.id, selection)}
+          action={() => requestFix.execute(entity.id, selection, comment)}
         />
       </footer>
     </Dialog>
   )
+}
+
+async function requestFixAndCommentLots(
+  entity_id: number,
+  selection: number[],
+  comment: string
+) {
+  await api.requestFix(entity_id, selection)
+  await api.commentLots({ entity_id }, selection, comment)
 }

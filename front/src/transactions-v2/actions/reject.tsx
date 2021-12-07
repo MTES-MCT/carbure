@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Lot, LotQuery } from "../types"
 import * as api from "../api"
@@ -9,6 +10,7 @@ import { variations } from "common-v2/utils/formatters"
 import Button from "common-v2/components/button"
 import Dialog from "common-v2/components/dialog"
 import { Cross, Return } from "common-v2/components/icons"
+import { TextInput } from "common-v2/components/input"
 import { LotSummary } from "../components/lots/lot-summary"
 
 export interface RejectManyButtonProps {
@@ -95,7 +97,9 @@ const RejectDialog = ({
 
   const v = variations(selection.length)
 
-  const rejectLots = useMutation(api.rejectLots, {
+  const [comment = "", setComment] = useState<string | undefined>("")
+
+  const rejectLots = useMutation(rejectAndCommentLots, {
     invalidates: ["lots", "snapshot", "lot-details"],
 
     onSuccess: () => {
@@ -140,6 +144,14 @@ const RejectDialog = ({
             many: t("Voulez-vous refuser les lots sélectionnés ?"),
           })}
         </section>
+        <section>
+          <TextInput
+            required
+            label={t("Commentaire")}
+            value={comment}
+            onChange={setComment}
+          />
+        </section>
         {summary && <LotSummary query={query} selection={selection} />}
       </main>
       <footer>
@@ -156,9 +168,18 @@ const RejectDialog = ({
           variant="danger"
           icon={Cross}
           label={t("Refuser")}
-          action={() => rejectLots.execute(query, selection)}
+          action={() => rejectLots.execute(query, selection, comment)}
         />
       </footer>
     </Dialog>
   )
+}
+
+async function rejectAndCommentLots(
+  query: LotQuery,
+  selection: number[] | undefined,
+  comment: string
+) {
+  await api.rejectLots(query, selection)
+  await api.commentLots(query, selection, comment)
 }
