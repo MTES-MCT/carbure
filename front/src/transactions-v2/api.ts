@@ -1,3 +1,4 @@
+import { Entity } from "carbure/types"
 import { api, Api, download } from "common-v2/services/api"
 import { Option } from "common-v2/utils/normalize"
 import {
@@ -85,6 +86,22 @@ export function acceptInStock(query: LotQuery, selection?: number[]) {
     "/lots/accept-in-stock",
     getParams(query, selection)
   )
+}
+
+export function acceptForTrading(
+  query: LotQuery,
+  selection: number[] | undefined,
+  client: Entity | string
+) {
+  const params =
+    client instanceof Object
+      ? { carbure_client_id: client.id }
+      : { unknown_client: client }
+
+  return api.post<Api<void>>("/lots/accept-trading", {
+    ...getParams(query, selection),
+    ...params,
+  })
 }
 
 export function deleteLots(query: LotQuery, selection?: number[]) {

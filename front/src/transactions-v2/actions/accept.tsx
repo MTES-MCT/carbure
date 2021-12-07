@@ -12,6 +12,11 @@ import Button from "common-v2/components/button"
 import { usePortal } from "common-v2/components/portal"
 import useEntity from "carbure/hooks/entity"
 import { Anchors } from "common-v2/components/dropdown"
+import { useState } from "react"
+import { Entity } from "carbure/types"
+import Autocomplete from "common-v2/components/autocomplete"
+import { findEntities } from "common-v2/api"
+import { identity, normalizeEntity } from "common-v2/utils/normalizers"
 
 export interface AcceptManyButtonProps {
   disabled?: boolean
@@ -54,6 +59,11 @@ export const AcceptManyButton = ({
           action: () =>
             portal((close) => <InStockDialog {...props} onClose={close} />),
         },
+        {
+          label: t("Trading sans stockage"),
+          action: () =>
+            portal((close) => <TradingDialog {...props} onClose={close} />),
+        },
       ]}
     />
   )
@@ -92,6 +102,11 @@ export const AcceptOneButton = ({ icon, lot }: AcceptOneButtonProps) => {
           label: t("Mise en stock"),
           action: () =>
             portal((close) => <InStockDialog {...props} onClose={close} />),
+        },
+        {
+          label: t("Trading sans stockage"),
+          action: () =>
+            portal((close) => <TradingDialog {...props} onClose={close} />),
         },
       ]}
     />
@@ -257,6 +272,98 @@ const InStockDialog = ({
           icon={Check}
           label={t("Mise en stock")}
           action={() => acceptLots.execute(query, selection)}
+        />
+      </footer>
+    </Dialog>
+  )
+}
+
+const TradingDialog = ({
+  summary,
+  query,
+  selection,
+  onClose,
+}: AcceptDialogProps) => {
+  const { t } = useTranslation()
+  const notify = useNotify()
+
+  const v = variations(selection.length)
+
+  const [client, setClient] = useState<Entity | string | undefined>()
+
+  const acceptLots = useMutation(api.acceptForTrading, {
+    invalidates: ["lots", "snapshot", "lot-details"],
+
+    onSuccess: () => {
+      const text = v({
+        zero: t("Les lots ont été placés dans votre stock !"),
+        one: t("Le lot a été placé dans votre stock !"),
+        many: t("Les lots sélectionnés ont été placés dans votre stock !"),
+      })
+
+      notify(text, { variant: "success" })
+      onClose()
+    },
+
+    onError: () => {
+      const text = v({
+        zero: t("Les lots n'ont pas pu être acceptés !"),
+        one: t("Le lot n'a pas pu être accepté !"),
+        many: t("Les lots sélectionnés n'ont pas pu être acceptés !"),
+      })
+
+      notify(text, { variant: "danger" })
+      onClose()
+    },
+  })
+
+  return (
+    <Dialog onClose={onClose}>
+      <header>
+        <h1>
+          {v({
+            zero: t("Transférer les lots"),
+            one: t("Transférer le lot"),
+            many: t("Transférer les lots"),
+          })}
+        </h1>
+      </header>
+      <main>
+        <section>
+          {v({
+            zero: t("Voulez-vous transférer ces lots ?"),
+            one: t("Voulez-vous transférer ce lot ?"),
+            many: t("Voulez-vous transférer les lots sélectionnés ?"),
+          })}
+        </section>
+        <section>
+          <Autocomplete
+            label={t("Destinataire")}
+            value={client}
+            onChange={setClient}
+            getOptions={findEntities}
+            normalize={normalizeEntity}
+            create={identity}
+          />
+        </section>
+        {summary && <LotSummary query={query} selection={selection} />}
+      </main>
+      <footer>
+        <Button
+          asideX
+          disabled={acceptLots.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
+        />
+        <Button
+          submit
+          loading={acceptLots.loading}
+          disabled={!client}
+          variant="success"
+          icon={Check}
+          label={t("Transférer")}
+          action={() => acceptLots.execute(query, selection, client!)}
         />
       </footer>
     </Dialog>
