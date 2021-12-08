@@ -588,7 +588,7 @@ def get_transaction_distance(lot):
 
 def send_email_declaration_validated(declaration):
     email_subject = "Carbure - Votre Déclaration de Durabilité a été validée"
-    cc = "carbure@beta.gouv.fr"
+    cc = ["carbure@beta.gouv.fr"]
     text_message = """
     Bonjour,
 
@@ -610,7 +610,7 @@ def send_email_declaration_validated(declaration):
 
 def send_email_declaration_invalidated(declaration):
     email_subject = "Carbure - Votre Déclaration de Durabilité a été annulée"
-    cc = "carbure@beta.gouv.fr"
+    cc = ["carbure@beta.gouv.fr"]
     text_message = """
     Bonjour,
 

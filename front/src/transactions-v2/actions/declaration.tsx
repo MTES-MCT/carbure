@@ -3,7 +3,8 @@ import { Trans, useTranslation } from "react-i18next"
 import { DeclarationSummary, LotQuery } from "../types"
 import { Normalizer } from "common-v2/utils/normalize"
 import useEntity from "carbure/hooks/entity"
-import { useQuery } from "common-v2/hooks/async"
+import { useNotify } from "common-v2/components/notifications"
+import { useMutation, useQuery } from "common-v2/hooks/async"
 import { usePortal } from "common-v2/components/portal"
 import * as api from "../api"
 import Button from "common-v2/components/button"
@@ -18,6 +19,7 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
+  Cross,
   Return,
 } from "common-v2/components/icons"
 import { Entity } from "carbure/types"
@@ -49,13 +51,14 @@ export interface DeclarationDialogProps {
 }
 
 const now = new Date()
-const currentPeriod = `${now.getFullYear() * 100 + now.getMonth()}`
+const currentPeriod = now.getFullYear() * 100 + now.getMonth()
 
 export const DeclarationDialog = ({
   year,
   onClose,
 }: DeclarationDialogProps) => {
   const { t } = useTranslation()
+  const notify = useNotify()
   const entity = useEntity()
 
   const [declaration, setDeclaration] = useState<DeclarationSummary | undefined>() // prettier-ignore
@@ -69,7 +72,37 @@ export const DeclarationDialog = ({
       const declarations = res.data.data ?? []
       if (declaration === undefined) {
         setDeclaration(declarations.find((d) => d.period === currentPeriod))
+      } else {
+        setDeclaration(declarations.find((d) => d.period === declaration.period)) // prettier-ignore
       }
+    },
+  })
+
+  const validateDeclaration = useMutation(api.validateDeclaration, {
+    invalidates: ["declarations"],
+
+    onSuccess: () => {
+      notify(t("La déclaration a bien été validée !"), { variant: "success" })
+    },
+
+    onError: () => {
+      notify(t("La déclaration n'a pas pu être validée !"), {
+        variant: "danger",
+      })
+    },
+  })
+
+  const invalidateDeclaration = useMutation(api.invalidateDeclaration, {
+    invalidates: ["declarations"],
+
+    onSuccess: () => {
+      notify(t("La déclaration a bien été annulée !"), { variant: "success" })
+    },
+
+    onError: () => {
+      notify(t("La déclaration n'a pas pu être annulée !"), {
+        variant: "danger",
+      })
     },
   })
 
@@ -95,7 +128,7 @@ export const DeclarationDialog = ({
   return (
     <Dialog limit onClose={onClose}>
       <header>
-        <h1>{t("Gestion des déclarations")}</h1>
+        <h1>{t("Déclaration de durabilité")}</h1>
       </header>
 
       <main>
@@ -107,7 +140,7 @@ export const DeclarationDialog = ({
           </p>
           <p>
             {t(
-              "Afin d'être comptabilisés, les brouillons que vous avez créé pour cette période devront être envoyés avant la fin du mois suivant ladite période. Une fois la totalité de ces lots validés, vous pourrez vérifier ici l'état global de vos transactions et finalement procéder à la déclaration."
+              "Afin d'être comptabilisés, les brouillons que vous avez créé pour cette période devront être envoyés avant la fin du mois suivant ladite période. Une fois la totalité de ces lots validée, vous pourrez vérifier ici l'état global de vos transactions et finalement procéder à la déclaration."
             )}
           </p>
         </section>
@@ -131,17 +164,20 @@ export const DeclarationDialog = ({
       <footer>
         {declaration?.declaration?.declared ? (
           <Button
-            disabled
-            icon={Check}
-            variant="success"
-            label={t("Déclaration validée")}
+            icon={Cross}
+            loading={invalidateDeclaration.loading}
+            variant="warning"
+            label={t("Annuler la déclaration")}
+            action={() => invalidateDeclaration.execute(entity.id, period)}
           />
         ) : (
           <Button
             disabled={!hasLots || hasPending}
+            loading={validateDeclaration.loading}
             variant="primary"
             icon={Check}
             label={t("Valider la déclaration")}
+            action={() => validateDeclaration.execute(entity.id, period)}
           />
         )}
         {declaration && declaration.pending > 0 && (
@@ -163,7 +199,7 @@ export const DeclarationDialog = ({
 interface DeclarationQueryState {
   entity: Entity
   year: number
-  period: string
+  period: number
 }
 
 function useDeclarationQuery({ entity, year, period }: DeclarationQueryState) {
@@ -171,7 +207,7 @@ function useDeclarationQuery({ entity, year, period }: DeclarationQueryState) {
     () => ({
       year,
       entity_id: entity.id,
-      periods: [period],
+      periods: [`${period}`],
       status: "DECLARATION",
       history: true,
     }),

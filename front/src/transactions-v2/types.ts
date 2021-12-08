@@ -123,7 +123,7 @@ export interface Snapshot {
 }
 
 export interface DeclarationSummary {
-  period: string
+  period: number
   pending: number
   lots: number
   declaration: Declaration | null

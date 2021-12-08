@@ -741,7 +741,7 @@ def get_declarations(request, *args, **kwargs):
     data = []
     for period in periods:
         data.append({
-            'period': period,
+            'period': int(period),
             'lots': lots_by_period[period] if period in lots_by_period else 0,
             'pending': pending_by_period[period] if period in pending_by_period else 0,
             'declaration': declarations_by_period[period] if period in declarations_by_period else None
@@ -1359,13 +1359,14 @@ def validate_declaration(request, *args, **kwargs):
     period = request.POST.get('period', False)
 
     try:
-        [year, month] = period.split('-')
-        period_d = datetime.date(year=int(year), month=int(month), day=1)
-        declaration = SustainabilityDeclaration.objects.get_or_create(entity_id=entity_id, period=period_d)
+        period_int = int(period)
+        year = int(period_int / 100)
+        month = period_int % 100
+        period_d = datetime.date(year=year, month=month, day=1)
+        declaration, _ = SustainabilityDeclaration.objects.get_or_create(entity_id=entity_id, period=period_d)
     except:
         return JsonResponse({'status': 'error', 'message': 'Could not parse period.'}, status=400)
 
-    period_int = period.year * 100 + period.month
     # ensure everything is in order
     pending_reception = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, lot_status__in=[CarbureLot.DRAFT, CarbureLot.PENDING]).count()
     if pending_reception > 0:
@@ -1379,8 +1380,10 @@ def validate_declaration(request, *args, **kwargs):
     lots_sent_to_fix = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, lot_status__in=[CarbureLot.ACCEPTED], correction_status__in=[CarbureLot.IN_CORRECTION]).count()
     if lots_sent_to_fix > 0:
         return JsonResponse({'status': 'error', 'message': 'Cannot validate declaration. Some outgoing lots need correction.'}, status=400)
-    lots_received = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int).update(declared_by_client=True)
-    lots_sent = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int).update(declared_by_supplier=True)
+    lots_received = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int)
+    lots_received.update(declared_by_client=True)
+    lots_sent = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int)
+    lots_sent.update(declared_by_supplier=True)
     bulk_events = []
     for lot in lots_received:
         bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLARED, lot=lot, user=request.user))
@@ -1398,7 +1401,6 @@ def validate_declaration(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def invalidate_declaration(request, *args, **kwargs):
     context = kwargs['context']
@@ -1406,18 +1408,21 @@ def invalidate_declaration(request, *args, **kwargs):
     period = request.POST.get('period', False)
 
     try:
-        [year, month] = period.split('-')
-        period_d = datetime.date(year=int(year), month=int(month), day=1)
-        declaration = SustainabilityDeclaration.objects.get_or_create(entity_id=entity_id, period=period_d)
+        period_int = int(period)
+        year = int(period_int / 100)
+        month = period_int % 100
+        period_d = datetime.date(year=year, month=month, day=1)
+        declaration, _ = SustainabilityDeclaration.objects.get_or_create(entity_id=entity_id, period=period_d)
         declaration.declared = False
         declaration.checked = False
         declaration.save()
     except:
         return JsonResponse({'status': 'error', 'message': 'Could not parse period.'}, status=400)
 
-    period_int = period.year * 100 + period.month
-    lots_received = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int).update(declared_by_client=False)
-    lots_sent = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int).update(declared_by_supplier=False)
+    lots_received = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int)
+    lots_received.update(declared_by_client=False)
+    lots_sent = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int)
+    lots_sent.update(declared_by_supplier=False)
     bulk_events = []
     for lot in lots_received:
         bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLCANCEL, lot=lot, user=request.user))
