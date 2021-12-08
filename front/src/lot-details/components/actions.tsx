@@ -32,7 +32,7 @@ export const LotActions = ({ lot }: ActionBarProps) => {
         </Fragment>
       )}
 
-      {status === "PENDING" && isClient && (
+      {status === "PENDING" && correction === "NO_PROBLEMO" && isClient && (
         <Fragment>
           <AcceptOneButton lot={lot} />
           <RejectOneButton lot={lot} />
