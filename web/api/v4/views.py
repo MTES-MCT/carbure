@@ -830,8 +830,14 @@ def mark_as_fixed(request, *args, **kwargs):
 
         if lot.carbure_supplier != entity and lot.carbure_client != entity:
             return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to change this lot'}, status=403)
-        lot.correction_status = CarbureLot.FIXED
+
+        if lot.lot_status == CarbureLot.REJECTED:
+            lot.lot_status = CarbureLot.PENDING
+            lot.correction_status = CarbureLot.NO_PROBLEMO
+        else:
+            lot.correction_status = CarbureLot.FIXED
         lot.save()
+
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.MARKED_AS_FIXED
         event.lot = lot
@@ -895,19 +901,15 @@ def approve_fix(request, *args, **kwargs):
 def reject_lot(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
-    lot_ids = request.POST.getlist('lot_ids', False)
-    if not lot_ids:
-        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
+    status = request.POST.get('status', False)
 
-    entity = Entity.objects.get(pk=entity_id)
-    for lot_id in lot_ids:
+    lots = get_entity_lots_by_status(entity_id, status)
+    lots = filter_lots(lots, request.GET, entity_id, will_aggregate=True)
+
+    for lot in lots.iterator():
         notify_sender = False
-        try:
-            lot = CarbureLot.objects.get(pk=lot_id)
-        except:
-            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
 
-        if entity != lot.carbure_client:
+        if int(entity_id) != lot.carbure_client_id:
             return JsonResponse({'status': 'forbidden', 'message': 'Only the client can reject this lot'}, status=403)
 
         if lot.lot_status == CarbureLot.DRAFT:
@@ -927,6 +929,7 @@ def reject_lot(request, *args, **kwargs):
 
         lot.lot_status = CarbureLot.REJECTED
         lot.correction_status = CarbureLot.IN_CORRECTION
+        lot.carbure_client = None
         lot.save()
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.REJECTED
