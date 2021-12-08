@@ -12,7 +12,9 @@ export const LotTag = ({ lot, ...props }: LotTagProps) => {
   let label = t("N/A")
   let variant: TagVariant | undefined = undefined
 
-  if (lot.lot_status === LotStatus.Rejected) {
+  if (lot.lot_status === LotStatus.Draft) {
+    label = t("Brouillon")
+  } else if (lot.lot_status === LotStatus.Rejected) {
     label = t("Refusé")
     variant = "danger"
   } else if (lot.correction_status === CorrectionStatus.InCorrection) {
@@ -21,8 +23,6 @@ export const LotTag = ({ lot, ...props }: LotTagProps) => {
   } else if (lot.correction_status === CorrectionStatus.Fixed) {
     label = t("Corrigé")
     variant = "success"
-  } else if (lot.lot_status === LotStatus.Draft) {
-    label = t("Brouillon")
   } else if (lot.lot_status === LotStatus.Pending) {
     label = t("En attente")
     variant = "info"
