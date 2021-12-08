@@ -754,41 +754,36 @@ def get_declarations(request, *args, **kwargs):
 def add_comment(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
-    lot_ids = request.POST.getlist('lot_ids', False)
-    if not lot_ids:
-        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
+    status = request.POST.getlist('status', False)
     comment = request.POST.get('comment', False)
     if not comment:
         return JsonResponse({'status': 'error', 'message': 'Missing comment'}, status=400)
     is_visible_by_admin = request.POST.get('is_visible_by_admin', False)
     is_visible_by_auditor = request.POST.get('is_visible_by_auditor', False)
-
+    lots = get_entity_lots_by_status(entity_id, status)
+    lots = filter_lots(lots, request.POST, entity_id)
 
     entity = Entity.objects.get(pk=entity_id)
-    for lot_id in lot_ids:
-        try:
-            lot = CarbureLot.objects.get(pk=lot_id)
-        except:
-            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
-
+    for lot in lots.iterator():
         if lot.carbure_supplier != entity and lot.carbure_client != entity and entity.entity_type not in [Entity.AUDITOR, Entity.ADMIN]:
             return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to comment on this lot'}, status=403)
 
-        comment = CarbureLotComment()
-        comment.entity = entity
-        comment.user = request.user
+        lot_comment = CarbureLotComment()
+        lot_comment.entity = entity
+        lot_comment.user = request.user
+        lot_comment.lot = lot
         if entity.entity_type == Entity.AUDITOR:
-            comment.comment_type = CarbureLotComment.AUDITOR
+            lot_comment.comment_type = CarbureLotComment.AUDITOR
             if is_visible_by_admin == 'true':
-                comment.is_visible_by_admin = True
+                lot_comment.is_visible_by_admin = True
         elif entity.entity_type == Entity.ADMIN:
-            comment.comment_type = CarbureLotComment.ADMIN
+            lot_comment.comment_type = CarbureLotComment.ADMIN
             if is_visible_by_auditor == 'true':
-                comment.is_visible_by_auditor = True
+                lot_comment.is_visible_by_auditor = True
         else:
-            comment.comment_type = CarbureLotComment.REGULAR
-        comment.comment = comment
-        comment.save()
+            lot_comment.comment_type = CarbureLotComment.REGULAR
+        lot_comment.comment = comment
+        lot_comment.save()
     return JsonResponse({'status': 'success'})
 
 
