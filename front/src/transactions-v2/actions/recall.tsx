@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Lot } from "../types"
 import * as api from "../api"
@@ -104,7 +104,10 @@ const RecallDialog = ({ summary, selection, onClose }: RecallDialogProps) => {
     },
   })
 
-  const query = { status, entity_id: entity.id }
+  const query = useMemo(
+    () => ({ status, entity_id: entity.id }),
+    [status, entity.id]
+  )
 
   return (
     <Dialog onClose={onClose}>

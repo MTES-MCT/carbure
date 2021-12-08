@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Lot } from "../types"
 import * as api from "../api"
@@ -113,7 +113,10 @@ const MarkAsFixedDialog = ({
     },
   })
 
-  const query = { status, entity_id: entity.id }
+  const query = useMemo(
+    () => ({ status, entity_id: entity.id }),
+    [status, entity.id]
+  )
 
   return (
     <Dialog onClose={onClose}>
@@ -156,7 +159,9 @@ const MarkAsFixedDialog = ({
           variant="success"
           icon={Check}
           label={t("Valider correction")}
-          action={() => markAsFixed.execute(entity.id, selection, comment)}
+          action={() =>
+            markAsFixed.execute(entity.id, selection, status, comment)
+          }
         />
       </footer>
     </Dialog>
@@ -166,8 +171,9 @@ const MarkAsFixedDialog = ({
 async function markAsFixedAndCommentLots(
   entity_id: number,
   selection: number[],
+  status: string,
   comment: string
 ) {
   await api.markAsFixed(entity_id, selection)
-  await api.commentLots({ entity_id }, selection, comment)
+  await api.commentLots({ entity_id, status }, selection, comment)
 }
