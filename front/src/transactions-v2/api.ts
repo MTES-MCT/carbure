@@ -103,7 +103,7 @@ export function acceptForTrading(
 ) {
   const params =
     client instanceof Object
-      ? { carbure_client_id: client.id }
+      ? { client_entity_id: client.id }
       : { unknown_client: client }
 
   return api.post<Api<void>>("/lots/accept-trading", {

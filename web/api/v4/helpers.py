@@ -191,10 +191,11 @@ def filter_lots(lots, query, entity_id=None, will_aggregate=False, blacklist=[])
     if len(selection) > 0:
         return lots.filter(pk__in=selection)
 
-    if history != 'true':
-        lots = lots.exclude(lot_status__in=[CarbureLot.FROZEN, CarbureLot.ACCEPTED])
     if correction == 'true':
         lots = lots.filter(Q(correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED]) | Q(lot_status=CarbureLot.REJECTED))
+    elif history != 'true':
+        lots = lots.exclude(lot_status__in=[CarbureLot.FROZEN, CarbureLot.ACCEPTED])
+
     if year and 'year' not in blacklist:
         lots = lots.filter(year=year)
     if len(periods) > 0 and 'periods' not in blacklist:
