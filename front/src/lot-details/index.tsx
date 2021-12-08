@@ -23,6 +23,7 @@ import { isExpiring } from "common-v2/utils/deadline"
 import Alert from "common-v2/components/alert"
 import NavigationButtons from "./components/navigation"
 import LotActions from "./components/actions"
+import { Entity } from "carbure/types"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -45,7 +46,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   })
 
   const updateLot = useMutation(api.updateLot, {
-    invalidates: ["lots", "lot-details"],
+    invalidates: ["lots", "lot-details", "snapshot"],
 
     onSuccess: () => {
       notify(t("Le lot a bien été mis à jour"), { variant: "success" })
@@ -57,11 +58,11 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   })
 
   const lotData = lot.result?.data.data
-  const editable = isEditable(lotData?.lot)
   const comments = lotData?.comments ?? []
   const changes = getLotChanges(lotData?.updates)
   const [errors, warnings] = separateAnomalies(lotData?.errors ?? [])
 
+  const editable = isEditable(lotData?.lot, entity)
   const expiring = isExpiring(lotData?.lot)
 
   const closeDialog = () =>
@@ -101,9 +102,9 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
           </section>
         )}
 
-        {comments.length > 0 && (
+        {lotData && comments.length > 0 && (
           <section>
-            <Comments comments={comments} />
+            <Comments lot={lotData?.lot} comments={comments} />
           </section>
         )}
 
@@ -144,12 +145,14 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   )
 }
 
-function isEditable(lot: Lot | undefined) {
+function isEditable(lot: Lot | undefined, entity: Entity) {
   if (lot === undefined) return false
+
+  const isSupplier = lot.carbure_supplier?.id === entity.id
 
   return (
     [LotStatus.Draft, LotStatus.Rejected].includes(lot.lot_status) ||
-    lot.correction_status === CorrectionStatus.InCorrection
+    (isSupplier && lot.correction_status === CorrectionStatus.InCorrection)
   )
 }
 

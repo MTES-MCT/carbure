@@ -159,11 +159,13 @@ export function recallLots(entity_id: number, lot_ids: number[]) {
   return api.post<Api<void>>("/lots/recall", { entity_id, lot_ids })
 }
 
-export function commentLots(
+export async function commentLots(
   query: LotQuery,
   selection: number[] | undefined,
   comment: string
 ) {
+  if (!comment) return
+
   return api.post<Api<void>>("/lots/comment", {
     ...getParams(query, selection),
     comment,
