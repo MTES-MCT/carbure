@@ -126,8 +126,6 @@ export const ExternalLink = ({
   href,
 }: ExternalLinkProps) => {
   const props = {
-    target: "_blank",
-    rel: "noreferrer",
     className: cl(css.external, className),
     children: (
       <>
@@ -141,7 +139,7 @@ export const ExternalLink = ({
     return <Link {...props} to={to} />
   } else if (href !== undefined) {
     // eslint-disable-next-line
-    return <a {...props} href={href} />
+    return <a {...props} href={href} target="_blank" rel="noreferrer" />
   } else {
     throw new Error("Missing url in external link")
   }

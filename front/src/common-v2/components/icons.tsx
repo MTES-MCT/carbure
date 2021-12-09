@@ -392,3 +392,12 @@ export const Wrench = ({ className, ...props }: IconProps) => (
     <path d="M7 10h3v-3l-3.5 -3.5a6 6 0 0 1 8 8l6 6a2 2 0 0 1 -3 3l-6 -6a6 6 0 0 1 -8 -8l3.5 3.5" />
   </Icon>
 )
+
+export const Split = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("split", className)}>
+    <path d="M21 17h-8l-3.5 -5h-6.5" />
+    <path d="M21 7h-8l-3.495 5" />
+    <path d="M18 10l3 -3l-3 -3" />
+    <path d="M18 20l3 -3l-3 -3" />
+  </Icon>
+)
