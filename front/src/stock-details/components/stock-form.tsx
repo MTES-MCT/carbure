@@ -10,7 +10,7 @@ import {
   ProductionSite,
 } from "common/types"
 import LotFields from "./lot-fields"
-import RouteFields from "./route-fields"
+import JourneyFields from "./journey-fields"
 
 export interface StockFormProps {
   stock?: Stock
@@ -29,7 +29,7 @@ export const StockForm = ({ stock, onSubmit }: StockFormProps) => {
   return (
     <Form id="stock-form" variant="columns" form={form} onSubmit={onSubmit}>
       <LotFields />
-      <RouteFields />
+      <JourneyFields />
     </Form>
   )
 }
