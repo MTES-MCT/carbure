@@ -45,7 +45,7 @@ server {
 
     proxy_read_timeout 300;
     proxy_connect_timeout 300;
-    proxy_send_timeout 300; 
+    proxy_send_timeout 300;
 
     root /var/www/html;
     # serve static files
@@ -53,9 +53,9 @@ server {
         alias /var/www/html;
     }
     # serve v2 static files
-    location /v2 {
+    location /app {
         alias /var/www/html_v2;
-        try_files $uri $uri/ /v2/index.html;
+        try_files $uri $uri/ /app/index.html;
     }
 
     # serve uploaded files to administrators
@@ -65,19 +65,19 @@ server {
         autoindex_format html;
         autoindex_localtime on;
         auth_basic "Administrator Login";
-        auth_basic_user_file /etc/nginx/conf.d/.htaccess_uploaded_files;	
+        auth_basic_user_file /etc/nginx/conf.d/.htaccess_uploaded_files;
     }
 
     # uwsgi
     location / {
         uwsgi_pass  django;
         include     /etc/nginx/conf.d/uwsgi_params;
-    }  
+    }
 }
 
 server {
     listen 443 ssl default_server;
-    server_name _;    
+    server_name _;
     charset     utf-8;
     client_max_body_size 5M;
 

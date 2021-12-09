@@ -25,7 +25,7 @@ i18n
       useSuspense: true,
     },
     backend: {
-      loadPath: "/v2/locales/{{lng}}/{{ns}}.json",
+      loadPath: "/app/locales/{{lng}}/{{ns}}.json",
     },
   })
 
