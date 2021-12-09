@@ -100,7 +100,7 @@ const RejectDialog = ({
   const [comment = "", setComment] = useState<string | undefined>("")
 
   const rejectLots = useMutation(rejectAndCommentLots, {
-    invalidates: ["lots", "snapshot", "lot-details"],
+    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
 
     onSuccess: () => {
       const text = v({

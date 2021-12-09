@@ -81,7 +81,7 @@ const RecallDialog = ({ summary, selection, onClose }: RecallDialogProps) => {
   const [comment = "", setComment] = useState<string | undefined>("")
 
   const recallLots = useMutation(recallAndCommentLots, {
-    invalidates: ["lots", "snapshot", "lot-details"],
+    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
 
     onSuccess: () => {
       const text = v({
