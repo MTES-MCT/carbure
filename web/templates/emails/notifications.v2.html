@@ -308,33 +308,33 @@
                         <p>
                           Nombre de lots reçus: {{lots_in|length}}<br />
                           Fournisseurs {{lots_in_suppliers}}
-                          
+
                           {% if entity.entity_type == 'Producteur' or entity.entity_type == 'Trader' %}
-                          <a href="https://{{ domain }}/v2/org/{{entity.id}}/stocks/in">https://{{ domain }}/v2/org/{{entity.id}}/stocks/in</a>
+                          <a href="https://{{ domain }}/app/org/{{entity.id}}/stocks/in">https://{{ domain }}/app/org/{{entity.id}}/stocks/in</a>
                           {% else %}
-                          <a href="https://{{ domain }}/v2/org/{{entity.id}}/transactions/in">https://{{ domain }}/v2/org/{{entity.id}}/transactions/in</a>
+                          <a href="https://{{ domain }}/app/org/{{entity.id}}/transactions/in">https://{{ domain }}/app/org/{{entity.id}}/transactions/in</a>
                           {% endif %}
                         </p>
                         {% endif %}
-                        
+
                         {% if lots_fixed %}
                         <p>
                           Nombre de lots corrigés par vos fournisseurs: {{lots_fixed|length}}<br />
                           Fournisseurs {{lots_fixed_suppliers}}
-                          
+
                           {% if entity.entity_type == 'Producteur' or entity.entity_type == 'Trader' %}
-                          <a href="https://{{ domain }}/v2/org/{{entity.id}}/stocks/in">https://{{ domain }}/v2/org/{{entity.id}}/stocks/in</a>
+                          <a href="https://{{ domain }}/app/org/{{entity.id}}/stocks/in">https://{{ domain }}/app/org/{{entity.id}}/stocks/in</a>
                           {% else %}
-                          <a href="https://{{ domain }}/v2/org/{{entity.id}}/transactions/in">https://{{ domain }}/v2/org/{{entity.id}}/transactions/in</a>
+                          <a href="https://{{ domain }}/app/org/{{entity.id}}/transactions/in">https://{{ domain }}/app/org/{{entity.id}}/transactions/in</a>
                           {% endif %}
                         </p>
                         {% endif %}
-                        
+
                         {% if lots_tofix %}
                         <p>
                           Nombre de lots à corriger: {{lots_tofix|length}}<br />
                           Clients {{lots_tofix_clients}}
-                          <a href="https://{{ domain }}/v2/org/{{entity.id}}/transactions/tofix">https://{{ domain }}/v2/org/{{entity.id}}/transactions/tofix</a>
+                          <a href="https://{{ domain }}/app/org/{{entity.id}}/transactions/tofix">https://{{ domain }}/app/org/{{entity.id}}/transactions/tofix</a>
                         </p>
                         {% endif %}
                         <p>Bonne journée,</p>

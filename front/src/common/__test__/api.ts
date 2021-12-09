@@ -129,21 +129,21 @@ export const okRedcertSearch = rest.get(
 )
 
 export const okTranslations = rest.get(
-  "/v2/locales/fr/translations.json",
+  "/app/locales/fr/translations.json",
   (req, res, ctx) => {
     return res(ctx.json(translations))
   }
 )
 
 export const okErrorsTranslations = rest.get(
-  "/v2/locales/fr/errors.json",
+  "/app/locales/fr/errors.json",
   (req, res, ctx) => {
     return res(ctx.json(errors))
   }
 )
 
 export const okFieldsTranslations = rest.get(
-  "/v2/locales/fr/fields.json",
+  "/app/locales/fr/fields.json",
   (req, res, ctx) => {
     return res(ctx.json(fields))
   }

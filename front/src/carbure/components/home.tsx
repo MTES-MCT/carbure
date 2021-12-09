@@ -117,7 +117,7 @@ const Home = () => {
             icon={ExternalLink}
             as="a"
             level="primary"
-            href={`/v2/org/${firstEntity.id}`}
+            href={`/app/org/${firstEntity.id}`}
             className={styles.homeButton}
           >
             <Trans>Aller sur {{ entity: firstEntity.name }}</Trans>
@@ -127,7 +127,7 @@ const Home = () => {
             icon={Plus}
             as="a"
             level="primary"
-            href="/v2/pending"
+            href="/app/pending"
             className={styles.homeButton}
           >
             <Trans>Lier le compte à des sociétés</Trans>
@@ -195,7 +195,7 @@ const Home = () => {
         <Button
           icon={ExternalLink}
           as="a"
-          href="/v2/public_stats"
+          href="/app/public_stats"
           className={styles.homeButton}
           rel="noreferrer"
           target="_blank"
