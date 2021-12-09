@@ -69,7 +69,7 @@ export const MarkOneAsFixedButton = ({
   )
 }
 
-interface RequestFixDialogProps {
+interface MarkAsFixedDialogProps {
   summary?: boolean
   selection: number[]
   onClose: () => void
@@ -79,7 +79,7 @@ const MarkAsFixedDialog = ({
   summary,
   selection,
   onClose,
-}: RequestFixDialogProps) => {
+}: MarkAsFixedDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
   const status = useStatus()
@@ -90,7 +90,7 @@ const MarkAsFixedDialog = ({
   const [comment = "", setComment] = useState<string | undefined>("")
 
   const markAsFixed = useMutation(markAsFixedAndCommentLots, {
-    invalidates: ["lots", "snapshot", "lot-details"],
+    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
 
     onSuccess: () => {
       const text = v({

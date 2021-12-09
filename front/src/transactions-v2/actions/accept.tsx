@@ -132,7 +132,7 @@ const ReleaseForConsumptionDialog = ({
   const v = variations(selection.length)
 
   const acceptLots = useMutation(api.acceptReleaseForConsumption, {
-    invalidates: ["lots", "snapshot", "lot-details"],
+    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
 
     onSuccess: () => {
       const text = v({
@@ -211,7 +211,7 @@ const InStockDialog = ({
   const v = variations(selection.length)
 
   const acceptLots = useMutation(api.acceptInStock, {
-    invalidates: ["lots", "snapshot", "lot-details"],
+    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
 
     onSuccess: () => {
       const text = v({
@@ -292,7 +292,7 @@ const TradingDialog = ({
   const [client, setClient] = useState<Entity | string | undefined>()
 
   const acceptLots = useMutation(api.acceptForTrading, {
-    invalidates: ["lots", "snapshot", "lot-details"],
+    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
 
     onSuccess: () => {
       const text = v({
@@ -384,7 +384,7 @@ const ProcessingDialog = ({
   const [processor, setProcessor] = useState<Entity | undefined>()
 
   const acceptLots = useMutation(api.acceptForProcessing, {
-    invalidates: ["lots", "snapshot", "lot-details"],
+    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
 
     onSuccess: () => {
       const text = v({
@@ -473,7 +473,7 @@ const BlendingDialog = ({
   const v = variations(selection.length)
 
   const acceptLots = useMutation(api.acceptForBlending, {
-    invalidates: ["lots", "snapshot", "lot-details"],
+    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
 
     onSuccess: () => {
       const text = v({
@@ -553,7 +553,7 @@ const ExportDialog = ({
   const v = variations(selection.length)
 
   const acceptLots = useMutation(api.acceptForExport, {
-    invalidates: ["lots", "snapshot", "lot-details"],
+    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
 
     onSuccess: () => {
       const text = v({

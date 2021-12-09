@@ -127,7 +127,7 @@ function useImportLots(onClose?: () => void) {
   const notify = useNotify()
 
   return useMutation(api.importLots, {
-    invalidates: ["lots", "snapshot"],
+    invalidates: ["lots", "snapshot", "lot-summary"],
 
     onSuccess: () => {
       notify(t("Les lots ont bien été importés"), { variant: "success" })
