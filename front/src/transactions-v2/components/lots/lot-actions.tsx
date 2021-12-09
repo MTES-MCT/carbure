@@ -11,6 +11,7 @@ import { ImportButton } from "transactions-v2/actions/import"
 import { RequestManyFixesButton } from "transactions-v2/actions/request-fix"
 import { MarkManyAsFixedButton } from "transactions-v2/actions/mark-as-fixed"
 import { RecallManyButton } from "transactions-v2/actions/recall"
+import { ApproveManyFixesButton } from "transactions-v2/actions/approve-fix"
 
 export interface ActionBarProps {
   count: number
@@ -38,6 +39,7 @@ export const LotActions = ({ count, ...props }: ActionBarProps) => {
           <AcceptManyButton {...props} disabled={empty} />
           <RejectManyButton {...props} disabled={empty} />
           <RequestManyFixesButton {...props} />
+          <ApproveManyFixesButton {...props} />
         </Fragment>
       )}
 
