@@ -867,9 +867,9 @@ def approve_fix(request, *args, **kwargs):
         lot.save()
         # CASCADING CORRECTIONS
         if lot.delivery_type == CarbureLot.STOCK:
-            stock = CarbureStock.objects.get(parent_lot=lot)
-            child = CarbureLot.objects.filter(parent_stock=stock)
-            for c in child:
+            stocks = CarbureStock.objects.filter(parent_lot=lot)
+            children = CarbureLot.objects.filter(parent_stock__in=stocks)
+            for c in children:
                 c.update_sustainability_data(lot)
                 c.save()
                 event = CarbureLotEvent()
@@ -878,7 +878,7 @@ def approve_fix(request, *args, **kwargs):
                 event.user = request.user
                 event.metadata = {'comment': 'Cascading update of sustainability data'}
                 event.save()
-            transformations = CarbureStockTransformation.objects.filter(source_stock=stock)
+            transformations = CarbureStockTransformation.objects.filter(source_stock__in=stocks)
             for t in transformations:
                 new_stock = t.dest_stock
                 child = CarbureLot.objects.filter(parent_stock=new_stock)

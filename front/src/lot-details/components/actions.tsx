@@ -8,6 +8,7 @@ import { RequestOneFixButton } from "transactions-v2/actions/request-fix"
 import { MarkOneAsFixedButton } from "transactions-v2/actions/mark-as-fixed"
 import useEntity from "carbure/hooks/entity"
 import { RecallOneButton } from "transactions-v2/actions/recall"
+import { ApproveOneFixButton } from "transactions-v2/actions/approve-fix"
 
 export interface ActionBarProps {
   icon?: boolean
@@ -39,6 +40,8 @@ export const LotActions = ({ lot }: ActionBarProps) => {
           <RequestOneFixButton lot={lot} />
         </Fragment>
       )}
+
+      {correction === "FIXED" && <ApproveOneFixButton lot={lot} />}
 
       {status === "PENDING" && isSupplier && (
         <Fragment>
