@@ -37,6 +37,7 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
   const lots = useQuery(api.getLots, {
     key: "lots",
     params: [query],
+    onSuccess: () => actions.setSelection([]),
   })
 
   const lotsData = lots.result?.data.data
