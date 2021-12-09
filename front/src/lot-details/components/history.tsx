@@ -1,7 +1,7 @@
 import i18next from "i18next"
 import { useTranslation } from "react-i18next"
 import Collapse from "common-v2/components/collapse"
-import { Edit } from "common-v2/components/icons"
+import { History } from "common-v2/components/icons"
 import { Row } from "common-v2/components/scaffold"
 import Table, { Cell } from "common-v2/components/table"
 import { formatDateTime } from "common-v2/utils/formatters"
@@ -11,12 +11,12 @@ export interface HistoryProps {
   changes: LotChange[]
 }
 
-export const History = ({ changes }: HistoryProps) => {
+export const LotHistory = ({ changes }: HistoryProps) => {
   const { t } = useTranslation()
 
   return (
     <Collapse
-      icon={Edit}
+      icon={History}
       label={t("Historique des modifications ({{amount}})", { amount: changes.length })} // prettier-ignore
     >
       <Table

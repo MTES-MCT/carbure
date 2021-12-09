@@ -1,9 +1,12 @@
 import { Entity } from "carbure/types"
-import { Lot, LotError } from "transactions-v2/types"
+import { Lot, LotError, Stock } from "transactions-v2/types"
 
 export interface LotDetails {
   lot: Lot
-  children: Lot[]
+  parent_lot: Lot
+  parent_stock: Stock
+  children_lot: Lot[]
+  children_stock: Stock[]
   distance: Distance
   updates: LotUpdate<any>[]
   comments: LotComment[]

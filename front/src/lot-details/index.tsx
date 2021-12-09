@@ -18,12 +18,13 @@ import {
   separateAnomalies,
   WarningAnomalies,
 } from "./components/anomalies"
-import { getLotChanges, History } from "./components/history"
+import { getLotChanges, LotHistory } from "./components/history"
 import { isExpiring } from "common-v2/utils/deadline"
 import Alert from "common-v2/components/alert"
 import NavigationButtons from "./components/navigation"
 import LotActions from "./components/actions"
 import { Entity } from "carbure/types"
+import LotTraceability, { hasTraceability } from "./components/lot-traceability"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -108,9 +109,15 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
           </section>
         )}
 
+        {hasTraceability(lotData) && (
+          <section>
+            <LotTraceability details={lotData} />
+          </section>
+        )}
+
         {changes.length > 0 && (
           <section>
-            <History changes={changes} />
+            <LotHistory changes={changes} />
           </section>
         )}
       </main>

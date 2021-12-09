@@ -421,8 +421,10 @@ def get_lot_details(request, *args, **kwargs):
 
     data = {}
     data['lot'] = CarbureLotPublicSerializer(lot).data
-    data['children'] = CarbureLotPublicSerializer(CarbureLot.objects.filter(parent_lot=lot), many=True).data
-    data['stock'] = CarbureStockPublicSerializer(CarbureLot.objects.filter(parent_lot=lot), many=True).data
+    data['parent_lot'] = CarbureLotPublicSerializer(lot.parent_lot).data if lot.parent_lot else None
+    data['parent_stock'] = CarbureStockPublicSerializer(lot.parent_stock).data if lot.parent_stock else None
+    data['children_lot'] = CarbureLotPublicSerializer(CarbureLot.objects.filter(parent_lot=lot), many=True).data
+    data['children_stock'] = CarbureStockPublicSerializer(CarbureStock.objects.filter(parent_lot=lot), many=True).data
     data['distance'] = get_transaction_distance(lot)
     data['errors'] = get_lot_errors(lot, entity_id)
     #data['certificates'] = check_certificates(tx)
