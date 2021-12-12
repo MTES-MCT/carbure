@@ -55,9 +55,7 @@ urlpatterns = [
     # IMPORT/FILES
     #path('upload', views.upload, name='api-v3-upload'),
     #path('upload-blend', views.upload_blend, name='api-v3-upload-blend'),
-    #path('download-template-simple', views.get_template_producers_simple, name='api-v3-template-simple'),
-    #path('download-template-advanced', views.get_template_producers_advanced, name='api-v3-template-advanced'),
-    #path('download-template-advanced-10k', views.get_template_producers_advanced_10k, name='api-v3-template-advanced-10k'),
+    path('download-template', views.get_template, name='api-v4-get-template'),
     #path('download-template-blend', views.get_template_blend, name='api-v3-template-blend'),
     #path('download-template-trader', views.get_template_trader, name='api-v3-template-trader'),
 ]
