@@ -421,8 +421,10 @@ def get_lot_details(request, *args, **kwargs):
 
     data = {}
     data['lot'] = CarbureLotPublicSerializer(lot).data
-    data['children'] = CarbureLotPublicSerializer(CarbureLot.objects.filter(parent_lot=lot), many=True).data
-    data['stock'] = CarbureStockPublicSerializer(CarbureLot.objects.filter(parent_lot=lot), many=True).data
+    data['parent_lot'] = CarbureLotPublicSerializer(lot.parent_lot).data if lot.parent_lot else None
+    data['parent_stock'] = CarbureStockPublicSerializer(lot.parent_stock).data if lot.parent_stock else None
+    data['children_lot'] = CarbureLotPublicSerializer(CarbureLot.objects.filter(parent_lot=lot), many=True).data
+    data['children_stock'] = CarbureStockPublicSerializer(CarbureStock.objects.filter(parent_lot=lot), many=True).data
     data['distance'] = get_transaction_distance(lot)
     data['errors'] = get_lot_errors(lot, entity_id)
     #data['certificates'] = check_certificates(tx)
@@ -579,7 +581,7 @@ def duplicate_lot(request, *args, **kwargs):
 def lots_send(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = int(context['entity_id'])
-    status = request.GET.get('status', None)
+    status = request.POST.get('status', None)
     lots = get_entity_lots_by_status(entity_id, status)
     filtered_lots = filter_lots(lots, request.POST, entity_id)
     nb_lots = len(filtered_lots)
@@ -587,7 +589,8 @@ def lots_send(request, *args, **kwargs):
     nb_rejected = 0
     nb_ignored = 0
     nb_auto_accepted = 0
-    prefetched_data = get_prefetched_data()
+    entity = Entity.objects.get(pk=entity_id)
+    prefetched_data = get_prefetched_data(entity)
     for lot in filtered_lots:
         if lot.added_by_id != entity_id:
             return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to send this lot'}, status=403)
@@ -663,7 +666,7 @@ def lots_send(request, *args, **kwargs):
 def lots_delete(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
-    status = request.GET.get('status', None)
+    status = request.POST.get('status', None)
     lots = get_entity_lots_by_status(entity_id, status)
     filtered_lots = filter_lots(lots, request.POST, entity_id)
     if filtered_lots.count() == 0:
@@ -717,12 +720,20 @@ def get_declarations(request, *args, **kwargs):
 
     period_lots = CarbureLot.objects.filter(period__in=periods) \
         .filter(Q(carbure_client_id=entity_id) | Q(carbure_supplier_id=entity_id)) \
-        .filter(Q(lot_status__in=[CarbureLot.PENDING, CarbureLot.REJECTED]) | Q(correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED])) \
         .values('period') \
         .annotate(count=Count('id', distinct=True))
     lots_by_period = {}
     for period_lot in period_lots:
         lots_by_period[str(period_lot['period'])] = period_lot['count']
+
+    pending_period_lots = CarbureLot.objects.filter(period__in=periods) \
+        .filter(Q(carbure_client_id=entity_id) | Q(carbure_supplier_id=entity_id)) \
+        .filter(Q(lot_status__in=[CarbureLot.PENDING, CarbureLot.REJECTED]) | Q(correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED])) \
+        .values('period') \
+        .annotate(count=Count('id', distinct=True))
+    pending_by_period = {}
+    for period_lot in pending_period_lots:
+        pending_by_period[str(period_lot['period'])] = period_lot['count']
 
     declarations = SustainabilityDeclaration.objects.filter(entity_id=entity_id, period__in=period_dates)
     declarations_by_period = {}
@@ -733,8 +744,9 @@ def get_declarations(request, *args, **kwargs):
     data = []
     for period in periods:
         data.append({
-            'period': period,
-            'pending': lots_by_period[period] if period in lots_by_period else 0,
+            'period': int(period),
+            'lots': lots_by_period[period] if period in lots_by_period else 0,
+            'pending': pending_by_period[period] if period in pending_by_period else 0,
             'declaration': declarations_by_period[period] if period in declarations_by_period else None
         })
 
@@ -745,41 +757,36 @@ def get_declarations(request, *args, **kwargs):
 def add_comment(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
-    lot_ids = request.POST.getlist('lot_ids', False)
-    if not lot_ids:
-        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
+    status = request.POST.get('status', False)
     comment = request.POST.get('comment', False)
     if not comment:
         return JsonResponse({'status': 'error', 'message': 'Missing comment'}, status=400)
     is_visible_by_admin = request.POST.get('is_visible_by_admin', False)
     is_visible_by_auditor = request.POST.get('is_visible_by_auditor', False)
-
+    lots = get_entity_lots_by_status(entity_id, status)
+    lots = filter_lots(lots, request.POST, entity_id)
 
     entity = Entity.objects.get(pk=entity_id)
-    for lot_id in lot_ids:
-        try:
-            lot = CarbureLot.objects.get(pk=lot_id)
-        except:
-            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
-
+    for lot in lots.iterator():
         if lot.carbure_supplier != entity and lot.carbure_client != entity and entity.entity_type not in [Entity.AUDITOR, Entity.ADMIN]:
             return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to comment on this lot'}, status=403)
 
-        comment = CarbureLotComment()
-        comment.entity = entity
-        comment.user = request.user
+        lot_comment = CarbureLotComment()
+        lot_comment.entity = entity
+        lot_comment.user = request.user
+        lot_comment.lot = lot
         if entity.entity_type == Entity.AUDITOR:
-            comment.comment_type = CarbureLotComment.AUDITOR
+            lot_comment.comment_type = CarbureLotComment.AUDITOR
             if is_visible_by_admin == 'true':
-                comment.is_visible_by_admin = True
+                lot_comment.is_visible_by_admin = True
         elif entity.entity_type == Entity.ADMIN:
-            comment.comment_type = CarbureLotComment.ADMIN
+            lot_comment.comment_type = CarbureLotComment.ADMIN
             if is_visible_by_auditor == 'true':
-                comment.is_visible_by_auditor = True
+                lot_comment.is_visible_by_auditor = True
         else:
-            comment.comment_type = CarbureLotComment.REGULAR
-        comment.comment = comment
-        comment.save()
+            lot_comment.comment_type = CarbureLotComment.REGULAR
+        lot_comment.comment = comment
+        lot_comment.save()
     return JsonResponse({'status': 'success'})
 
 
@@ -826,8 +833,14 @@ def mark_as_fixed(request, *args, **kwargs):
 
         if lot.carbure_supplier != entity and lot.carbure_client != entity:
             return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to change this lot'}, status=403)
-        lot.correction_status = CarbureLot.FIXED
+
+        if lot.lot_status == CarbureLot.REJECTED:
+            lot.lot_status = CarbureLot.PENDING
+            lot.correction_status = CarbureLot.NO_PROBLEMO
+        else:
+            lot.correction_status = CarbureLot.FIXED
         lot.save()
+
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.MARKED_AS_FIXED
         event.lot = lot
@@ -856,9 +869,9 @@ def approve_fix(request, *args, **kwargs):
         lot.save()
         # CASCADING CORRECTIONS
         if lot.delivery_type == CarbureLot.STOCK:
-            stock = CarbureStock.objects.get(parent_lot=lot)
-            child = CarbureLot.objects.filter(parent_stock=stock)
-            for c in child:
+            stocks = CarbureStock.objects.filter(parent_lot=lot)
+            children = CarbureLot.objects.filter(parent_stock__in=stocks)
+            for c in children:
                 c.update_sustainability_data(lot)
                 c.save()
                 event = CarbureLotEvent()
@@ -867,7 +880,7 @@ def approve_fix(request, *args, **kwargs):
                 event.user = request.user
                 event.metadata = {'comment': 'Cascading update of sustainability data'}
                 event.save()
-            transformations = CarbureStockTransformation.objects.filter(source_stock=stock)
+            transformations = CarbureStockTransformation.objects.filter(source_stock__in=stocks)
             for t in transformations:
                 new_stock = t.dest_stock
                 child = CarbureLot.objects.filter(parent_stock=new_stock)
@@ -891,19 +904,15 @@ def approve_fix(request, *args, **kwargs):
 def reject_lot(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
-    lot_ids = request.POST.getlist('lot_ids', False)
-    if not lot_ids:
-        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
+    status = request.POST.get('status', False)
 
-    entity = Entity.objects.get(pk=entity_id)
-    for lot_id in lot_ids:
+    lots = get_entity_lots_by_status(entity_id, status)
+    lots = filter_lots(lots, request.POST, entity_id, will_aggregate=True)
+
+    for lot in lots.iterator():
         notify_sender = False
-        try:
-            lot = CarbureLot.objects.get(pk=lot_id)
-        except:
-            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
 
-        if entity != lot.carbure_client:
+        if int(entity_id) != lot.carbure_client_id:
             return JsonResponse({'status': 'forbidden', 'message': 'Only the client can reject this lot'}, status=403)
 
         if lot.lot_status == CarbureLot.DRAFT:
@@ -923,6 +932,7 @@ def reject_lot(request, *args, **kwargs):
 
         lot.lot_status = CarbureLot.REJECTED
         lot.correction_status = CarbureLot.IN_CORRECTION
+        lot.carbure_client = None
         lot.save()
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.REJECTED
@@ -987,23 +997,17 @@ def recall_lot(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def accept_rfc(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
-    lot_ids = request.POST.getlist('lot_ids', False)
-    if not lot_ids:
-        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
+    status = request.POST.get('status', False)
 
-    entity = Entity.objects.get(pk=entity_id)
-    for lot_id in lot_ids:
-        try:
-            lot = CarbureLot.objects.get(pk=lot_id)
-        except:
-            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
+    lots = get_entity_lots_by_status(entity_id, status)
+    lots = filter_lots(lots, request.POST, entity_id, will_aggregate=True)
 
-        if entity != lot.carbure_client:
+    for lot in lots.iterator():
+        if int(entity_id) != lot.carbure_client_id:
             return JsonResponse({'status': 'forbidden', 'message': 'Only the client can accept the lot'}, status=403)
 
         if lot.lot_status == CarbureLot.DRAFT:
@@ -1035,20 +1039,16 @@ def accept_rfc(request, *args, **kwargs):
 def accept_in_stock(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
-    lot_ids = request.POST.getlist('lot_ids', False)
-    if not lot_ids:
-        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
+    status = request.POST.get('status', False)
+
+    lots = get_entity_lots_by_status(entity_id, status)
+    lots = filter_lots(lots, request.POST, entity_id, will_aggregate=True)
 
     entity = Entity.objects.get(pk=entity_id)
     if entity.entity_type == Entity.OPERATOR:
         return JsonResponse({'status': 'error', 'message': 'Stock unavailable for Operators'}, status=400)
 
-    for lot_id in lot_ids:
-        try:
-            lot = CarbureLot.objects.get(pk=lot_id)
-        except:
-            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
-
+    for lot in lots.iterator():
         if entity != lot.carbure_client:
             return JsonResponse({'status': 'forbidden', 'message': 'Only the client can accept the lot'}, status=403)
 
@@ -1104,18 +1104,14 @@ def accept_in_stock(request, *args, **kwargs):
 def accept_blending(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
-    lot_ids = request.POST.getlist('lot_ids', False)
-    if not lot_ids:
-        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
+    status = request.POST.get('status', False)
 
-    entity = Entity.objects.get(pk=entity_id)
-    for lot_id in lot_ids:
-        try:
-            lot = CarbureLot.objects.get(pk=lot_id)
-        except:
-            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
+    lots = get_entity_lots_by_status(entity_id, status)
+    lots = filter_lots(lots, request.POST, entity_id, will_aggregate=True)
 
-        if entity != lot.carbure_client:
+    for lot in lots.iterator():
+        print(lot.id)
+        if int(entity_id) != lot.carbure_client_id:
             return JsonResponse({'status': 'forbidden', 'message': 'Only the client can accept the lot'}, status=403)
 
         if lot.lot_status == CarbureLot.DRAFT:
@@ -1147,18 +1143,13 @@ def accept_blending(request, *args, **kwargs):
 def accept_export(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
-    lot_ids = request.POST.getlist('lot_ids', False)
-    if not lot_ids:
-        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
+    status = request.POST.get('status', False)
 
-    entity = Entity.objects.get(pk=entity_id)
-    for lot_id in lot_ids:
-        try:
-            lot = CarbureLot.objects.get(pk=lot_id)
-        except:
-            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
+    lots = get_entity_lots_by_status(entity_id, status)
+    lots = filter_lots(lots, request.POST, entity_id, will_aggregate=True)
 
-        if entity != lot.carbure_client:
+    for lot in lots.iterator():
+        if int(entity_id) != lot.carbure_client_id:
             return JsonResponse({'status': 'forbidden', 'message': 'Only the client can accept the lot'}, status=403)
 
         if lot.lot_status == CarbureLot.DRAFT:
@@ -1190,24 +1181,17 @@ def accept_export(request, *args, **kwargs):
 def accept_processing(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
-    lot_ids = request.POST.getlist('lot_ids', False)
+    status = request.POST.get('status', False)
     processing_entity_id = request.POST.get('processing_entity_id', False)
-    if not lot_ids:
-        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
 
     entity = Entity.objects.get(pk=entity_id)
-    try:
-        processing_entity = Entity.objects.get(pk=processing_entity_id)
-    except:
-        return JsonResponse({'status': 'error', 'message': 'Could not find processing entity'}, status=400)
+    processing_entity = Entity.objects.get(pk=processing_entity_id)
 
-    for lot_id in lot_ids:
-        try:
-            lot = CarbureLot.objects.get(pk=lot_id)
-        except:
-            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
+    lots = get_entity_lots_by_status(entity_id, status)
+    lots = filter_lots(lots, request.POST, entity_id, will_aggregate=True)
 
-        if entity != lot.carbure_client:
+    for lot in lots.iterator():
+        if int(entity_id) != lot.carbure_client_id:
             return JsonResponse({'status': 'forbidden', 'message': 'Only the client can accept the lot'}, status=403)
 
         if lot.lot_status == CarbureLot.DRAFT:
@@ -1260,13 +1244,15 @@ def accept_processing(request, *args, **kwargs):
 def accept_trading(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
-    lot_ids = request.POST.getlist('lot_ids', False)
     client_entity_id = request.POST.get('client_entity_id', False)
     unknown_client = request.POST.get('unknown_client', False)
-    if not lot_ids:
-        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
+    status = request.POST.get('status', False)
+
     if not client_entity_id and not unknown_client:
         return JsonResponse({'status': 'error', 'message': 'Please specify either client_entity_id or unknown_client'}, status=400)
+
+    lots = get_entity_lots_by_status(entity_id, status)
+    lots = filter_lots(lots, request.POST, entity_id, will_aggregate=True)
 
     entity = Entity.objects.get(pk=entity_id)
     if client_entity_id:
@@ -1277,13 +1263,8 @@ def accept_trading(request, *args, **kwargs):
     else:
         client_entity = None
 
-    for lot_id in lot_ids:
-        try:
-            lot = CarbureLot.objects.get(pk=lot_id)
-        except:
-            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
-
-        if entity != lot.carbure_client:
+    for lot in lots.iterator():
+        if int(entity_id) != lot.carbure_client_id:
             return JsonResponse({'status': 'forbidden', 'message': 'Only the client can accept the lot'}, status=403)
 
         if lot.lot_status == CarbureLot.DRAFT:
@@ -1350,13 +1331,14 @@ def validate_declaration(request, *args, **kwargs):
     period = request.POST.get('period', False)
 
     try:
-        [year, month] = period.split('-')
-        period_d = datetime.date(year=int(year), month=int(month), day=1)
-        declaration = SustainabilityDeclaration.objects.get_or_create(entity_id=entity_id, period=period_d)
+        period_int = int(period)
+        year = int(period_int / 100)
+        month = period_int % 100
+        period_d = datetime.date(year=year, month=month, day=1)
+        declaration, _ = SustainabilityDeclaration.objects.get_or_create(entity_id=entity_id, period=period_d)
     except:
         return JsonResponse({'status': 'error', 'message': 'Could not parse period.'}, status=400)
 
-    period_int = period.year * 100 + period.month
     # ensure everything is in order
     pending_reception = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, lot_status__in=[CarbureLot.DRAFT, CarbureLot.PENDING]).count()
     if pending_reception > 0:
@@ -1370,8 +1352,10 @@ def validate_declaration(request, *args, **kwargs):
     lots_sent_to_fix = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, lot_status__in=[CarbureLot.ACCEPTED], correction_status__in=[CarbureLot.IN_CORRECTION]).count()
     if lots_sent_to_fix > 0:
         return JsonResponse({'status': 'error', 'message': 'Cannot validate declaration. Some outgoing lots need correction.'}, status=400)
-    lots_received = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int).update(declared_by_client=True)
-    lots_sent = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int).update(declared_by_supplier=True)
+    lots_received = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int)
+    lots_received.update(declared_by_client=True)
+    lots_sent = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int)
+    lots_sent.update(declared_by_supplier=True)
     bulk_events = []
     for lot in lots_received:
         bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLARED, lot=lot, user=request.user))
@@ -1389,7 +1373,6 @@ def validate_declaration(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def invalidate_declaration(request, *args, **kwargs):
     context = kwargs['context']
@@ -1397,18 +1380,21 @@ def invalidate_declaration(request, *args, **kwargs):
     period = request.POST.get('period', False)
 
     try:
-        [year, month] = period.split('-')
-        period_d = datetime.date(year=int(year), month=int(month), day=1)
-        declaration = SustainabilityDeclaration.objects.get_or_create(entity_id=entity_id, period=period_d)
+        period_int = int(period)
+        year = int(period_int / 100)
+        month = period_int % 100
+        period_d = datetime.date(year=year, month=month, day=1)
+        declaration, _ = SustainabilityDeclaration.objects.get_or_create(entity_id=entity_id, period=period_d)
         declaration.declared = False
         declaration.checked = False
         declaration.save()
     except:
         return JsonResponse({'status': 'error', 'message': 'Could not parse period.'}, status=400)
 
-    period_int = period.year * 100 + period.month
-    lots_received = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int).update(declared_by_client=False)
-    lots_sent = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int).update(declared_by_supplier=False)
+    lots_received = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int)
+    lots_received.update(declared_by_client=False)
+    lots_sent = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int)
+    lots_sent.update(declared_by_supplier=False)
     bulk_events = []
     for lot in lots_received:
         bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLCANCEL, lot=lot, user=request.user))

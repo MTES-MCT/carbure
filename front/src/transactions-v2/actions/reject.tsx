@@ -1,27 +1,29 @@
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Lot, LotQuery } from "../types"
 import * as api from "../api"
 import useEntity from "carbure/hooks/entity"
 import { useMutation } from "common-v2/hooks/async"
+import { usePortal } from "common-v2/components/portal"
 import { useNotify } from "common-v2/components/notifications"
 import { variations } from "common-v2/utils/formatters"
 import Button from "common-v2/components/button"
 import Dialog from "common-v2/components/dialog"
 import { Cross, Return } from "common-v2/components/icons"
-import { usePortal } from "common-v2/components/portal"
+import { TextInput } from "common-v2/components/input"
 import { LotSummary } from "../components/lots/lot-summary"
 
-export interface DeleteManyButtonProps {
+export interface RejectManyButtonProps {
   disabled?: boolean
   query: LotQuery
   selection: number[]
 }
 
-export const DeleteManyButton = ({
+export const RejectManyButton = ({
   disabled,
   query,
   selection,
-}: DeleteManyButtonProps) => {
+}: RejectManyButtonProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
@@ -31,11 +33,11 @@ export const DeleteManyButton = ({
       variant="danger"
       icon={Cross}
       label={
-        selection.length > 0 ? t("Supprimer la sélection") : t("Supprimer tout")
+        selection.length > 0 ? t("Refuser la sélection") : t("Refuser tout")
       }
       action={() =>
         portal((close) => (
-          <DeleteDialog
+          <RejectDialog
             summary
             query={query}
             selection={selection}
@@ -47,12 +49,12 @@ export const DeleteManyButton = ({
   )
 }
 
-export interface DeleteOneButtonProps {
+export interface RejectOneButtonProps {
   icon?: boolean
   lot: Lot
 }
 
-export const DeleteOneButton = ({ icon, lot }: DeleteOneButtonProps) => {
+export const RejectOneButton = ({ icon, lot }: RejectOneButtonProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const portal = usePortal()
@@ -62,11 +64,11 @@ export const DeleteOneButton = ({ icon, lot }: DeleteOneButtonProps) => {
       captive
       variant={icon ? "icon" : "danger"}
       icon={Cross}
-      title={t("Supprimer le lot")}
-      label={t("Supprimer le lot")}
+      title={t("Refuser le lot")}
+      label={t("Refuser le lot")}
       action={() =>
         portal((close) => (
-          <DeleteDialog
+          <RejectDialog
             query={{ entity_id: entity.id }}
             selection={[lot.id]}
             onClose={close}
@@ -77,32 +79,34 @@ export const DeleteOneButton = ({ icon, lot }: DeleteOneButtonProps) => {
   )
 }
 
-interface DeleteDialogProps {
+interface RejectDialogProps {
   summary?: boolean
   query: LotQuery
   selection: number[]
   onClose: () => void
 }
 
-const DeleteDialog = ({
+const RejectDialog = ({
   summary,
   query,
   selection,
   onClose,
-}: DeleteDialogProps) => {
+}: RejectDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
 
   const v = variations(selection.length)
 
-  const deleteLots = useMutation(api.deleteLots, {
+  const [comment = "", setComment] = useState<string | undefined>("")
+
+  const rejectLots = useMutation(rejectAndCommentLots, {
     invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
 
     onSuccess: () => {
       const text = v({
-        zero: t("Les lots ont bien été supprimés !"),
-        one: t("Le lot a bien été supprimé !"),
-        many: t("Les lots sélectionnés ont bien été supprimés !"),
+        zero: t("Les lots ont bien été refusés !"),
+        one: t("Le lot a bien été refusé !"),
+        many: t("Les lots sélectionnés ont bien été refusés !"),
       })
 
       notify(text, { variant: "success" })
@@ -111,9 +115,9 @@ const DeleteDialog = ({
 
     onError: () => {
       const text = v({
-        zero: t("Les lots n'ont pas pu être supprimés !"),
-        one: t("Le lot n'a pas pu être supprimé !"),
-        many: t("Les lots sélectionnés n'ont pas pu être supprimés !"),
+        zero: t("Les lots n'ont pas pu être refusés !"),
+        one: t("Le lot n'a pas pu être refusé !"),
+        many: t("Les lots sélectionnés n'ont pas pu être refusés !"),
       })
 
       notify(text, { variant: "danger" })
@@ -126,39 +130,56 @@ const DeleteDialog = ({
       <header>
         <h1>
           {v({
-            zero: t("Supprimer tous les lots"),
-            one: t("Supprimer ce lot"),
-            many: t("Supprimer les lots sélectionnés"),
+            zero: t("Refuser tous les lots"),
+            one: t("Refuser ce lot"),
+            many: t("Refuser les lots sélectionnés"),
           })}
         </h1>
       </header>
       <main>
         <section>
           {v({
-            zero: t("Voulez-vous supprimer ces lots ?"),
-            one: t("Voulez-vous supprimer ce lot ?"),
-            many: t("Voulez-vous supprimer les lots sélectionnés ?"),
+            zero: t("Voulez-vous refuser ces lots ?"),
+            one: t("Voulez-vous refuser ce lot ?"),
+            many: t("Voulez-vous refuser les lots sélectionnés ?"),
           })}
+        </section>
+        <section>
+          <TextInput
+            required
+            label={t("Commentaire")}
+            value={comment}
+            onChange={setComment}
+          />
         </section>
         {summary && <LotSummary query={query} selection={selection} />}
       </main>
       <footer>
         <Button
           asideX
-          disabled={deleteLots.loading}
+          disabled={rejectLots.loading}
           icon={Return}
           label={t("Annuler")}
           action={onClose}
         />
         <Button
           submit
-          loading={deleteLots.loading}
+          loading={rejectLots.loading}
           variant="danger"
           icon={Cross}
-          label={t("Supprimer")}
-          action={() => deleteLots.execute(query, selection)}
+          label={t("Refuser")}
+          action={() => rejectLots.execute(query, selection, comment)}
         />
       </footer>
     </Dialog>
   )
+}
+
+async function rejectAndCommentLots(
+  query: LotQuery,
+  selection: number[] | undefined,
+  comment: string
+) {
+  await api.rejectLots(query, selection)
+  await api.commentLots(query, selection, comment)
 }

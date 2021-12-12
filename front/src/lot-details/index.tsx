@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import * as api from "./api"
 import { CorrectionStatus, Lot, LotStatus } from "transactions-v2/types"
 import { useQuery, useMutation } from "common-v2/hooks/async"
-import { useNotify } from 'common-v2/components/notifications'
+import { useNotify } from "common-v2/components/notifications"
 import { useStatus } from "transactions-v2/components/status"
 import useEntity from "carbure/hooks/entity"
 import { LoaderOverlay } from "common-v2/components/scaffold"
@@ -18,12 +18,13 @@ import {
   separateAnomalies,
   WarningAnomalies,
 } from "./components/anomalies"
-import { getLotUpdates, History } from "./components/history"
+import { getLotChanges, LotHistory } from "./components/history"
 import { isExpiring } from "common-v2/utils/deadline"
 import Alert from "common-v2/components/alert"
-import { SendOneButton } from "transactions-v2/actions/send"
-import { DeleteOneButton } from "transactions-v2/actions/delete"
 import NavigationButtons from "./components/navigation"
+import LotActions from "./components/actions"
+import { Entity } from "carbure/types"
+import LotTraceability, { hasTraceability } from "./components/lot-traceability"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -46,23 +47,23 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   })
 
   const updateLot = useMutation(api.updateLot, {
-    invalidates: ['lots', 'lot-details'],
+    invalidates: ["lots", "lot-details", "snapshot"],
 
     onSuccess: () => {
-      notify(t("Le lot a bien été mis à jour"), { variant: 'success' })
+      notify(t("Le lot a bien été mis à jour"), { variant: "success" })
     },
 
     onError: () => {
-      notify(t("La mise à jour du lot a échoué"), { variant: 'danger' })
-    }
+      notify(t("La mise à jour du lot a échoué"), { variant: "danger" })
+    },
   })
 
   const lotData = lot.result?.data.data
-  const editable = isEditable(lotData?.lot)
   const comments = lotData?.comments ?? []
-  const updates = getLotUpdates(lotData?.updates)
+  const changes = getLotChanges(lotData?.updates)
   const [errors, warnings] = separateAnomalies(lotData?.errors ?? [])
 
+  const editable = isEditable(lotData?.lot, entity)
   const expiring = isExpiring(lotData?.lot)
 
   const closeDialog = () =>
@@ -102,15 +103,21 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
           </section>
         )}
 
-        {comments.length > 0 && (
+        {lotData && comments.length > 0 && (
           <section>
-            <Comments comments={comments} />
+            <Comments lot={lotData?.lot} comments={comments} />
           </section>
         )}
 
-        {updates.length > 0 && (
+        {hasTraceability(lotData) && (
           <section>
-            <History updates={updates} />
+            <LotTraceability details={lotData} />
+          </section>
+        )}
+
+        {changes.length > 0 && (
+          <section>
+            <LotHistory changes={changes} />
           </section>
         )}
       </main>
@@ -126,8 +133,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
           />
         )}
 
-        {lotData && <SendOneButton lot={lotData.lot} />}
-        {lotData && <DeleteOneButton lot={lotData.lot} />}
+        {lotData && <LotActions lot={lotData.lot} />}
 
         {expiring && (
           <Alert
@@ -146,12 +152,14 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   )
 }
 
-function isEditable(lot: Lot | undefined) {
+function isEditable(lot: Lot | undefined, entity: Entity) {
   if (lot === undefined) return false
+
+  const isSupplier = lot.carbure_supplier?.id === entity.id
 
   return (
     [LotStatus.Draft, LotStatus.Rejected].includes(lot.lot_status) ||
-    lot.correction_status === CorrectionStatus.InCorrection
+    (isSupplier && lot.correction_status === CorrectionStatus.InCorrection)
   )
 }
 

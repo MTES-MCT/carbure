@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
-import useEntity from 'carbure/hooks/entity'
+import useEntity from "carbure/hooks/entity"
 import { Lot, LotError } from "transactions-v2/types"
 import {
   Biofuel,
@@ -9,7 +9,6 @@ import {
   Feedstock,
   ProductionSite,
 } from "common/types"
-import { LotStatus } from 'transactions-v2/types'
 import Form, { FormErrors, useForm } from "common-v2/components/form"
 import LotFields from "./lot-fields"
 import ProductionFields from "./production-fields"
@@ -44,6 +43,9 @@ export const LotForm = ({ lot, errors, onSubmit, ...props }: LotFormProps) => {
   )
 }
 
+const GHG_REFERENCE = 83.8
+const GHG_REFERENCE_RED_II = 94.0
+
 export function useLotForm(
   initialValue: LotFormValue = defaultLot,
   lotErrors: LotError[] = []
@@ -52,7 +54,7 @@ export function useLotForm(
   const errors = useLotFieldErrors(lotErrors)
 
   function setValue(value: LotFormValue): LotFormValue {
-    if (value.lot && value.lot.lot_status !== LotStatus.Draft) return value
+    if (value.lot) return value
 
     // for producers
     if (entity.isProducer) {
@@ -80,17 +82,22 @@ export function useLotForm(
     }
 
     // automatically set the default certificate of the supplier
-    const supplier = value.supplier instanceof Object ? value.supplier : undefined
-    if (supplier?.id === entity.id && value.supplier_certificate === undefined) {
+    const supplier = value.supplier instanceof Object ? value.supplier : undefined // prettier-ignore
+    if (
+      supplier?.id === entity.id &&
+      value.supplier_certificate === undefined
+    ) {
       value.supplier_certificate = entity.default_certificate
     }
 
     // autofill production fields
     if (value.production_site instanceof Object) {
       value.production_country = value.production_site.country
-      value.production_site_commissioning_date = value.production_site.date_mise_en_service
+      value.production_site_commissioning_date =
+        value.production_site.date_mise_en_service
 
-      value.production_site_double_counting_certificate = value.feedstock?.is_double_compte
+      value.production_site_double_counting_certificate = value.feedstock
+        ?.is_double_compte
         ? value.production_site.dc_reference
         : undefined
     }
@@ -101,12 +108,9 @@ export function useLotForm(
     }
 
     // update GES summary
-    const reference = value.lot?.ghg_reference ?? 83.8
-    const referenceRedII = value.lot?.ghg_reference_red_ii ?? 94.0
-
     const total = computeGHGTotal(value)
-    const reduction = computeGHGReduction(total, reference)
-    const reductionRedII = computeGHGReduction(total, referenceRedII)
+    const reduction = computeGHGReduction(total, GHG_REFERENCE)
+    const reductionRedII = computeGHGReduction(total, GHG_REFERENCE_RED_II)
 
     value.ghg_total = total
     value.ghg_reduction = reduction
@@ -115,12 +119,21 @@ export function useLotForm(
     return value
   }
 
-
   return useForm(setValue(initialValue), { errors, setValue })
 }
 
 function computeGHGTotal(value: LotFormValue) {
-  const { eec = 0, el = 0, ep = 0, etd = 0, eu = 0, esca = 0, eccs = 0, eccr = 0, eee = 0 } = value
+  const {
+    eec = 0,
+    el = 0,
+    ep = 0,
+    etd = 0,
+    eu = 0,
+    esca = 0,
+    eccs = 0,
+    eccr = 0,
+    eee = 0,
+  } = value
   return eec + el + ep + etd + eu - esca - eccs - eccr - eee
 }
 
@@ -182,7 +195,7 @@ export const defaultLot = {
 
   ghg_total: 0 as number | undefined,
   ghg_reduction: 0 as number | undefined,
-  ghg_reduction_red_ii: 0 as number | undefined
+  ghg_reduction_red_ii: 0 as number | undefined,
 }
 
 export type LotFormValue = typeof defaultLot
@@ -228,7 +241,6 @@ export const lotToFormValue: (lot: Lot | undefined) => LotFormValue = (lot) => (
   ghg_reduction_red_ii: lot?.ghg_reduction_red_ii ?? 0,
 })
 
-
 export function lotFormToPayload(lot: LotFormValue) {
   return {
     transport_document_type: undefined,
@@ -250,32 +262,44 @@ export function lotFormToPayload(lot: LotFormValue) {
     eee: lot.eee,
 
     // production
-    carbure_producer_id: lot.producer instanceof Object ? lot.producer.id : undefined,
-    unknown_producer: typeof lot.producer === 'string' ? lot.producer : undefined,
-    carbure_production_site: lot.production_site instanceof Object ? lot.production_site.name : undefined,
-    unknown_production_site: typeof lot.production_site === 'string' ? lot.production_site : undefined,
+    carbure_producer_id:
+      lot.producer instanceof Object ? lot.producer.id : undefined,
+    unknown_producer:
+      typeof lot.producer === "string" ? lot.producer : undefined,
+    carbure_production_site:
+      lot.production_site instanceof Object
+        ? lot.production_site.name
+        : undefined,
+    unknown_production_site:
+      typeof lot.production_site === "string" ? lot.production_site : undefined,
     production_site_certificate: lot.production_site_certificate,
     production_site_certificate_type: undefined,
     production_country_code: lot.production_country?.code_pays,
     production_site_commissioning_date: lot.production_site_commissioning_date,
-    production_site_double_counting_certificate: lot.production_site_double_counting_certificate,
+    production_site_double_counting_certificate:
+      lot.production_site_double_counting_certificate,
 
     // supplier
-    carbure_supplier_id: lot.supplier instanceof Object ? lot.supplier.id : undefined,
-    unknown_supplier: typeof lot.supplier === 'string' ? lot.supplier : undefined,
+    carbure_supplier_id:
+      lot.supplier instanceof Object ? lot.supplier.id : undefined,
+    unknown_supplier:
+      typeof lot.supplier === "string" ? lot.supplier : undefined,
     supplier_certificate: lot.supplier_certificate,
     supplier_certificate_type: undefined,
 
     // delivery
     delivery_date: lot.delivery_date,
     carbure_client_id: lot.client instanceof Object ? lot.client.id : undefined,
-    unknown_client: typeof lot.client === 'string' ? lot.client : undefined,
-    carbure_delivery_site_depot_id: lot.delivery_site instanceof Object ? lot.delivery_site.depot_id : undefined,
-    unknown_delivery_site: typeof lot.delivery_site === 'string' ? lot.delivery_site : undefined,
-    delivery_site_country_code: lot.delivery_site_country?.code_pays
+    unknown_client: typeof lot.client === "string" ? lot.client : undefined,
+    carbure_delivery_site_depot_id:
+      lot.delivery_site instanceof Object
+        ? lot.delivery_site.depot_id
+        : undefined,
+    unknown_delivery_site:
+      typeof lot.delivery_site === "string" ? lot.delivery_site : undefined,
+    delivery_site_country_code: lot.delivery_site_country?.code_pays,
   }
 }
-
 
 // prettier-ignore
 const errorsToFields: Record<string, (keyof LotFormValue)[]> = {

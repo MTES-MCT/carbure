@@ -2,7 +2,7 @@
   "name": "carbure-frontend",
   "version": "0.1.0",
   "private": true,
-  "homepage": "/v2",
+  "homepage": "/app",
   "dependencies": {
     "@testing-library/jest-dom": "^5.15.0",
     "@testing-library/react": "^12.1.2",

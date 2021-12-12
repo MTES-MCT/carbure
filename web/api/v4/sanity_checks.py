@@ -258,12 +258,12 @@ def sanity_check(lot, prefetched_data):
     # configuration
     if lot.feedstock and lot.carbure_production_site:
         if lot.carbure_production_site.name in prefetched_data['my_production_sites']:
-            mps = [psi.feedstock for psi in prefetched_data['my_production_sites'][lot.carbure_production_site.name].productionsiteinput_set.all()]
+            mps = [psi.matiere_premiere for psi in prefetched_data['my_production_sites'][lot.carbure_production_site.name].productionsiteinput_set.all()]
             if lot.feedstock not in mps:
                 errors.append(generic_error(error='MP_NOT_CONFIGURED', lot=lot, display_to_recipient=False, field='feedstock_code'))
     if lot.biofuel and lot.carbure_production_site:
         if lot.carbure_production_site.name in prefetched_data['my_production_sites']:
-            bcs = [pso.biofuel for pso in prefetched_data['my_production_sites'][lot.carbure_production_site.name].productionsiteoutput_set.all()]
+            bcs = [pso.biocarburant for pso in prefetched_data['my_production_sites'][lot.carbure_production_site.name].productionsiteoutput_set.all()]
             if lot.biofuel not in bcs:
                 errors.append(generic_error(error='BC_NOT_CONFIGURED', lot=lot, display_to_recipient=False, field='biofuel_code'))
     if lot.carbure_client:

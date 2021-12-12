@@ -1,10 +1,10 @@
 import { useTranslation } from "react-i18next"
-import useEntity from 'carbure/hooks/entity'
+import useEntity from "carbure/hooks/entity"
 import { Fieldset, useBind, useFormContext } from "common-v2/components/form"
 import Autocomplete, {
   AutocompleteProps,
 } from "common-v2/components/autocomplete"
-import { TextInput, DateInput, TextInputProps, DateInputProps } from "common-v2/components/input"
+import { DateInput, DateInputProps } from "common-v2/components/input"
 import { UserCheck } from "common-v2/components/icons"
 import * as api from "common-v2/api"
 import * as norm from "common-v2/utils/normalizers"
@@ -58,17 +58,16 @@ export const SupplierCertificateField = (props: AutocompleteProps<string>) => {
   const { value, bind } = useFormContext<LotFormValue>()
   const bound = bind("supplier_certificate")
 
-  const supplier =
-    value.supplier instanceof Object
-      ? value.supplier
-      : undefined
+  const supplier = value.supplier instanceof Object ? value.supplier : undefined
 
   return (
     <Autocomplete
       label={t("Certificat du fournisseur")}
       placeholder={supplier?.default_certificate}
       defaultOptions={bound.value ? [bound.value] : undefined}
-      getOptions={(query) => api.findCertificates(query, { entity_id: supplier?.id })}
+      getOptions={(query) =>
+        api.findCertificates(query, { entity_id: supplier?.id })
+      }
       {...bound}
       {...props}
     />

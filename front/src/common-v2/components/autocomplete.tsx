@@ -123,6 +123,10 @@ export function useAutocomplete<T, V>({
     if (asyncOptions.label) setQuery(asyncOptions.label)
   }, [asyncOptions.label])
 
+  useEffect(() => {
+    if (value === undefined) setQuery("")
+  }, [value])
+
   const [suggestions, setSuggestions] = useState(options ?? [])
   useEffect(() => setSuggestions(asyncOptions.items), [asyncOptions.items])
 

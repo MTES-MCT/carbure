@@ -69,6 +69,11 @@
   padding: 0 var(--spacing-l);
 }
 
+.dialog > main > section a {
+  color: var(--blue-medium);
+  text-decoration: underline;
+}
+
 .dialog > main > h2 {
   font-size: 1.2em;
   padding: 0 var(--spacing-l);

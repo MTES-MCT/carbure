@@ -2,7 +2,7 @@ import cl from "clsx"
 import { Loader } from "./icons"
 import css from "./button.module.css"
 import { Layout, layout } from "./scaffold"
-import { Link, LinkProps } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { ExternalLink as ExternalLinkIcon } from "./icons"
 
 export type ButtonVariant =
@@ -112,13 +112,37 @@ const LinkWrapper = ({ href, to, children }: LinkWrapperProps) => {
   }
 }
 
-export const ExternalLink = ({ className, children, ...props }: LinkProps) => {
-  return (
-    <Link {...props} className={cl(css.external, className)}>
-      {children}
-      <ExternalLinkIcon size={20} />
-    </Link>
-  )
+interface ExternalLinkProps {
+  to?: string
+  href?: string
+  className?: string
+  children?: React.ReactNode
+}
+
+export const ExternalLink = ({
+  className,
+  children,
+  to,
+  href,
+}: ExternalLinkProps) => {
+  const props = {
+    className: cl(css.external, className),
+    children: (
+      <>
+        {children}
+        <ExternalLinkIcon size={20} />
+      </>
+    ),
+  }
+
+  if (to !== undefined) {
+    return <Link {...props} to={to} />
+  } else if (href !== undefined) {
+    // eslint-disable-next-line
+    return <a {...props} href={href} target="_blank" rel="noreferrer" />
+  } else {
+    throw new Error("Missing url in external link")
+  }
 }
 
 export default Button

@@ -99,7 +99,7 @@ const SendDialog = ({
   const v = variations(selection.length)
 
   const sendLots = useMutation(api.sendLots, {
-    invalidates: ["lots", "snapshot"],
+    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
 
     onSuccess: () => {
       const text = v({
