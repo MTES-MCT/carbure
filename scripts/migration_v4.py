@@ -23,7 +23,7 @@ TX_ID_MIGRATED = {}
 def create_new_tx_and_child(tx):
     if tx.id in TX_ID_MIGRATED:
         # ignore, this is a child tx already migrated
-        print('Ignoring txid %d - already migrated' % (tx.id))
+        print('[Initial] Ignoring txid %d - already migrated' % (tx.id))
         new_id = TX_ID_MIGRATED[tx.id]
         if new_id:
             return CarbureLot.objects.get(id=TX_ID_MIGRATED[tx.id])
@@ -180,8 +180,9 @@ def create_new_tx_and_child(tx):
             # check if I have been transformed into ETBE
             if ETBETransformation.objects.filter(previous_stock=tx.id).exists():
                 transformations = ETBETransformation.objects.filter(previous_stock=tx.id)
+                print('This ETH Stock was converted to %d lines of ETBE' % (transformations.count()))
                 for trans in transformations:
-                    print('This ETH stock was converted to ETBE!')
+                    print('This ETH stock was converted to ETBE! Vol ETHANOL %d ETBE %d' % (trans.volume_ethanol, trans.volume_etbe))
                     # create new stock
                     child = trans.new_stock
                     if trans.new_stock.parent_tx is None:
@@ -247,29 +248,44 @@ def create_new_tx_and_child(tx):
                         lot.unknown_delivery_site = c.unknown_delivery_site
                         lot.delivery_site_country = c.carbure_delivery_site.country if c.carbure_delivery_site else c.unknown_delivery_site_country
                         lot.volume = c.lot.volume
-                        print('CHILD ETBE ADD %s %s %f to %s' % (lot.feedstock.name, lot.biofuel.name, lot.volume, lot.delivery_type))
+                        lot.biofuel = c.lot.biocarburant
+                        print('CHILD ETBE %d ADD %s %s %f to %s' % (c.id, lot.feedstock.name, lot.biofuel.name, lot.volume, lot.delivery_type))
                         lot.save()
                         TX_ID_MIGRATED[c.id] = lot.id
 
 
-        # adjust accounting for ETBE
+        # convert initial stock to ETBE
         stock_transformations = ETBETransformation.objects.filter(previous_stock=tx)
         print('Stock transaction %d %s %d is transformed? %s' % (tx.id, tx.lot.biocarburant.name, tx.lot.volume, stock_transformations))
-        print(stock_transformations)
-        if stock_transformations.count() == 1:
-            print('This stock has been transformed. Initial volume [%d] adjusted to post-transformation volume [%d]' % (stock_initial_volume, stock_transformations[0].volume_etbe))
-            stock_initial_volume -= stock_transformations[0].volume_ethanol
-            stock_initial_volume += stock_transformations[0].volume_etbe
-        else:
-            pass
+        print('This stock has been transformed %d times' % (stock_transformations.count()))
+        for t in stock_transformations:
+            print('Adjusting volume: remove ethanol %d, add etbe [%d]' % (t.volume_ethanol, t.volume_etbe))
+            stock_initial_volume -= t.volume_ethanol
+            stock_initial_volume += t.volume_etbe
+            #TX_ID_MIGRATED[stock_transformations[0].previous_stock.id] = 0
+            #TX_ID_MIGRATED[stock_transformations[0].new_stock.id] = 0
 
+        #child = LotTransaction.objects.filter(parent_tx=tx, lot__biocarburant=tx.lot.biocarburant)
         child = LotTransaction.objects.filter(parent_tx=tx)
         child_sum_volume = 0
         for c in child:
             child_sum_volume += c.lot.volume
             if c.id in TX_ID_MIGRATED:
-                print('Ignoring txid %d - already migrated' % (c.id))
+                print('[Child] Ignoring txid %d - already migrated' % (c.id))
                 continue
+            if c.lot.biocarburant.code == 'ETBE':
+                print('child is ETBE, use ethanol volume to ensure stock is correct')
+                transformation = ETBETransformation.objects.get(new_stock=c)
+                child_sum_volume -= c.lot.volume
+                child_sum_volume += transformation.volume_ethanol
+                print('parent: %d %s %f child %d %s %f of which ethanol %f' % (tx.id, tx.lot.biocarburant.name, tx.lot.volume, c.id, c.lot.biocarburant.name, c.lot.volume, transformation.volume_ethanol))
+            print('Child total accumulated sum %d' % (child_sum_volume))
+            #child_tx_transformations = ETBETransformation.objects.filter(new_stock=c)
+            #if child_tx_transformations.count() > 0:
+            #    for ct in child_tx_transformations:
+            #        print('subtransaction converted to ETBE: initial volume: %d used ethanol %d new ETBE volume %d' % (c.lot.volume, ct.volume_ethanol, ct.volume_etbe))
+            #        child_sum_volume -= ct.volume_etbe
+            #        child_sum_volume += ct.volume_ethanol
             lot.pk = None # breaks the link with stock.parent_lot
             lot.carbure_supplier = stock.carbure_client
             lot.carbure_client = c.carbure_client
@@ -289,6 +305,7 @@ def create_new_tx_and_child(tx):
             lot.unknown_delivery_site = c.unknown_delivery_site
             lot.delivery_site_country = c.carbure_delivery_site.country if c.carbure_delivery_site else c.unknown_delivery_site_country
             lot.volume = c.lot.volume
+            lot.biofuel = c.lot.biocarburant
             print('CHILD ADD [tx id %d] %s %s %f to %s. Parent stock initial volume %d - remaining %d' % (c.id, lot.feedstock.name, lot.biofuel.name, lot.volume, lot.delivery_type, stock.parent_lot.volume if stock.parent_lot else stock.parent_transformation.volume_destination, stock.remaining_volume))
             lot.save()
             creation_event = CarbureLotEvent()
@@ -299,12 +316,10 @@ def create_new_tx_and_child(tx):
             TX_ID_MIGRATED[c.id] = lot.id
 
         theo_remaining = stock_initial_volume - child_sum_volume
-        #theo_remaining = stock.parent_lot.volume - child_sum_volume
         remaining = stock.remaining_volume
         diff = remaining - theo_remaining
         if abs(diff) > 0.1:
             print('%s - %d VOLUME DISCREPANCY!!! Initial stock [%d] Child Sum Volume [%d] Theo remaining [%f] remaining [%f]. %s %s %s %s %s' % (stock.carbure_client.name, stock.id, stock_initial_volume, child_sum_volume, theo_remaining, remaining, lot.carbure_supplier, lot.carbure_client, lot.period, lot.feedstock.name, lot.biofuel.name))
-            #print('%s - %d VOLUME DISCREPANCY!!! Initial stock [%d] Child Sum Volume [%d] Theo remaining [%f] remaining [%f]. %s %s %s %s %s' % (stock.carbure_client.name, stock.id, stock.parent_lot.volume, child_sum_volume, theo_remaining, remaining, lot.carbure_supplier, lot.carbure_client, lot.period, lot.feedstock.name, lot.biofuel.name))
             assert(False)
 
     # if is_forwarded, check Child TX (Processing / Trading without storage) and create them
@@ -335,7 +350,7 @@ def create_new_tx_and_child(tx):
 def migrate_old_data(quick=False):
     CarbureLot.objects.all().delete()
     if quick:
-        all_transactions = LotTransaction.objects.filter(lot__period__in=['2021-09', '2021-10', '2021-11'])
+        all_transactions = LotTransaction.objects.filter(lot__period__startswith='2021', lot__biocarburant__code='ETH')
     else:
         all_transactions = LotTransaction.objects.all()
     for tx in all_transactions:
@@ -474,5 +489,55 @@ def migrate_old_certificates():
     
 
 if __name__ == '__main__':
-    migrate_old_data()
+    # ensure transformation transactions have the right parent_tx
+    transformations = ETBETransformation.objects.all()
+    for t in transformations:
+        if t.new_stock.parent_tx != t.previous_stock:
+            print('Updating ETBE Transformation %d. For dest tx %d Previous parent_tx %d new %d ' % (t.id, t.new_stock.id, t.new_stock.parent_tx.id if t.new_stock.parent_tx else 0, t.previous_stock.id))
+            t.new_stock.parent_tx = t.previous_stock
+            t.new_stock.save()
+        else:
+            print('All good')
+    LotTransaction.objects.filter(id=144653).update(parent_tx_id=144535)
+
+    # ensure forwarded lots are marked as such
+    lots_with_parent = LotV2.objects.filter(parent_lot__isnull=False)
+    for l in lots_with_parent:
+        print('Analyzing lot %d' % (l.id))
+        tx = LotTransaction.objects.filter(lot=l)
+        parent_tx = LotTransaction.objects.filter(lot=l.parent_lot)
+        if tx.count() > 1 or parent_tx.count() > 1:
+            print('DEBUG NEEDED')
+            parent = parent_tx[0]
+            for t in parent_tx:
+                print('PARENT', t.id, t.lot_id, t.lot.biocarburant.name, t.lot.volume, t.carbure_client, t.delivery_date)
+            for t in tx:
+                print(t.id, t.lot_id, t.lot.biocarburant.name, t.lot.volume, t.carbure_client, t.delivery_date, t.parent_tx)                
+                if t.parent_tx is None:
+                    print('Parent tx should be %d' % (parent.id))
+                    x = input('Continue')
+                    if x == 'y':
+                        t.parent_tx_id = parent.id
+                        t.save()
+                    else:
+                        print('You said NO')
+                        assert(False)
+                parent = t
+        if tx.count() == 1 and parent_tx.count() == 1:
+            # pretty sure this is a forward
+            ptx = parent_tx[0]
+            ctx = tx[0]
+            if ptx.lot.volume != ctx.lot.volume:
+                continue
+            #if not ptx.is_forwarded:
+            #    print('Update tx id %d. Set is forwarded = True. Child tx %d' % (ptx.id, ctx.id))
+            #    ptx.is_forwarded = True
+            #    ptx.save()
+            if not ctx.parent_tx:
+                print('Update tx id %d. Set parent_tx %d. Client 1 %s Client 2 %s' % (ctx.id, ptx.id, ptx.carbure_client.name, ctx.carbure_client.name if ctx.carbure_client else ctx.unknown_client))
+                ctx.parent_tx = ptx
+                ctx.save()
+
+
+    migrate_old_data(quick=True)
     #migrate_old_certificates()

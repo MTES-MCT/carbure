@@ -6,7 +6,7 @@ import traceback
 from django.db.models.aggregates import Count
 from django.db.models.fields import NOT_PROVIDED
 
-from django.http.response import JsonResponse
+from django.http.response import HttpResponse, JsonResponse
 from django.db.models.query_utils import Q
 from core.decorators import check_user_rights
 from api.v4.helpers import filter_lots, filter_stock, get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock
@@ -1421,3 +1421,19 @@ def invalidate_declaration(request, *args, **kwargs):
     # send email
     send_email_declaration_invalidated(declaration)
     return JsonResponse({'status': 'success'})
+
+@check_user_rights()
+def get_template(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+
+    file_location = template_v4(entity)
+    try:
+        with open(file_location, 'rb') as f:
+            file_data = f.read()
+            # sending response
+            response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
+            response['Content-Disposition'] = 'attachment; filename="carbure_template_simple.xlsx"'
+            return response
+    except Exception:
+        return JsonResponse({'status': "error", 'message': "Error creating template file"}, status=500)
