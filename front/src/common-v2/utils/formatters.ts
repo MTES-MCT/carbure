@@ -64,8 +64,8 @@ export function standardize(str: string) {
 }
 
 export function variations(count: number) {
-  return (labels: { zero: string; one: string; many: string }) => {
-    if (count === 0) return labels.zero
+  return (labels: { zero?: string; one: string; many: string }) => {
+    if (count === 0) return labels.zero ?? "N/A"
     if (count === 1) return labels.one
     if (count > 1) return labels.many
   }

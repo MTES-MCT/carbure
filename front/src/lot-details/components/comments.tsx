@@ -1,20 +1,31 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { LotComment } from "../types"
+import { useMutation } from "common-v2/hooks/async"
 import { formatDateTime } from "common-v2/utils/formatters"
 import Collapse from "common-v2/components/collapse"
 import Form from "common-v2/components/form"
 import { TextInput } from "common-v2/components/input"
 import Button from "common-v2/components/button"
 import { Message } from "common-v2/components/icons"
-
+import * as api from "transactions-v2/api"
+import useEntity from "carbure/hooks/entity"
+import { Lot } from "transactions-v2/types"
 export interface CommentsProps {
+  lot: Lot
   comments: LotComment[]
 }
 
-export const Comments = ({ comments }: CommentsProps) => {
+export const Comments = ({ lot, comments }: CommentsProps) => {
   const { t } = useTranslation()
-  const [comment, setComment] = useState<string | undefined>()
+  const entity = useEntity()
+
+  const [comment = "", setComment] = useState<string | undefined>()
+
+  const addComment = useMutation(api.commentLots, {
+    invalidates: ["lot-details"],
+    onSuccess: () => setComment(""),
+  })
 
   return (
     <Collapse
@@ -34,13 +45,24 @@ export const Comments = ({ comments }: CommentsProps) => {
       </section>
 
       <footer>
-        <Form variant="inline">
+        <Form
+          variant="inline"
+          onSubmit={() =>
+            addComment.execute({ entity_id: entity.id }, [lot.id], comment)
+          }
+        >
           <TextInput
+            clear
             value={comment}
             placeholder={t("Entrez un commentaire...")}
             onChange={setComment}
           />
-          <Button submit variant="primary" label={t("Envoyer")} />
+          <Button
+            submit
+            disabled={addComment.loading}
+            variant="primary"
+            label={t("Envoyer")}
+          />
         </Form>
       </footer>
     </Collapse>

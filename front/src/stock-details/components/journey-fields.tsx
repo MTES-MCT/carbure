@@ -10,11 +10,7 @@ import { StockFormValue } from "./stock-form"
 import { Entity } from "carbure/types"
 import { Country, Depot, ProductionSite } from "common/types"
 
-interface RouteFieldsProps {
-  readOnly?: boolean
-}
-
-export const RouteFields = (props: RouteFieldsProps) => {
+export const JourneyFields = () => {
   const { t } = useTranslation()
   return (
     <Fieldset label={t("Parcours")}>
@@ -136,4 +132,4 @@ export const DeliveryDateField = (props: DateInputProps) => {
   )
 }
 
-export default RouteFields
+export default JourneyFields

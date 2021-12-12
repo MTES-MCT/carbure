@@ -56,9 +56,9 @@ def get_entity_lots_by_status(entity_id, status=None):
     if status == 'DRAFTS':
         lots = lots.filter(added_by_id=entity_id, lot_status=CarbureLot.DRAFT)
     elif status == 'IN':
-        lots = lots.filter(carbure_client_id=entity_id, lot_status__in=[CarbureLot.PENDING, CarbureLot.ACCEPTED, CarbureLot.FROZEN])
+        lots = lots.filter(carbure_client_id=entity_id).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
     elif status == 'OUT':
-        lots = lots.filter(carbure_supplier_id=entity_id, lot_status__in=[CarbureLot.PENDING, CarbureLot.ACCEPTED, CarbureLot.FROZEN])
+        lots = lots.filter(carbure_supplier_id=entity_id).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
     elif status == 'DECLARATION':
         lots = lots.filter(Q(carbure_supplier_id=entity_id) | Q(carbure_client_id=entity_id)).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
     else:
@@ -187,14 +187,17 @@ def filter_lots(lots, query, entity_id=None, will_aggregate=False, blacklist=[])
     history = query.get('history', False)
     correction = query.get('correction', False)
 
-    if history != 'true':
-        lots = lots.exclude(lot_status__in=[CarbureLot.FROZEN, CarbureLot.ACCEPTED])
+    # selection overrides all other filters
+    if len(selection) > 0:
+        return lots.filter(pk__in=selection)
+
     if correction == 'true':
         lots = lots.filter(Q(correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED]) | Q(lot_status=CarbureLot.REJECTED))
+    elif history != 'true':
+        lots = lots.exclude(lot_status__in=[CarbureLot.FROZEN, CarbureLot.ACCEPTED])
+
     if year and 'year' not in blacklist:
         lots = lots.filter(year=year)
-    if len(selection) > 0:
-        lots = lots.filter(pk__in=selection)
     if len(periods) > 0 and 'periods' not in blacklist:
         lots = lots.filter(period__in=periods)
     if len(production_sites) > 0 and 'production_sites' not in blacklist:
@@ -588,7 +591,7 @@ def get_transaction_distance(lot):
 
 def send_email_declaration_validated(declaration):
     email_subject = "Carbure - Votre Déclaration de Durabilité a été validée"
-    cc = "carbure@beta.gouv.fr"
+    cc = ["carbure@beta.gouv.fr"]
     text_message = """
     Bonjour,
 
@@ -610,7 +613,7 @@ def send_email_declaration_validated(declaration):
 
 def send_email_declaration_invalidated(declaration):
     email_subject = "Carbure - Votre Déclaration de Durabilité a été annulée"
-    cc = "carbure@beta.gouv.fr"
+    cc = ["carbure@beta.gouv.fr"]
     text_message = """
     Bonjour,
 

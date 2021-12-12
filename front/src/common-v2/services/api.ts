@@ -1,6 +1,8 @@
 import axios from "axios"
 import { stringify } from "querystring"
 
+const API_ROOT = `${window.location.origin}/api`
+
 export interface Api<T> {
   status: "success" | "error"
   data?: T
@@ -8,12 +10,17 @@ export interface Api<T> {
 }
 
 export const api = axios.create({
-  baseURL: `${window.location.origin}/api`,
+  baseURL: API_ROOT,
   xsrfCookieName: "csrftoken",
   xsrfHeaderName: "X-CSRFTOKEN",
   paramsSerializer: (params) => stringify(filterParams(params)),
-  transformRequest: (data) => toFormData(data)
+  transformRequest: (data) => toFormData(data),
 })
+
+export function download(endpoint: string, params: any) {
+  const query = params ? "?" + stringify(filterParams(params)) : ""
+  return window.open(API_ROOT + endpoint + query)
+}
 
 // keep only parameters that are defined
 export function filterParams(params: any) {

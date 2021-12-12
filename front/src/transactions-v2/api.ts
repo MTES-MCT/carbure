@@ -1,4 +1,5 @@
-import { api, Api } from "common-v2/services/api"
+import { Entity } from "carbure/types"
+import { api, Api, download } from "common-v2/services/api"
 import { Option } from "common-v2/utils/normalize"
 import {
   LotList,
@@ -35,8 +36,12 @@ export function getLots(query: LotQuery) {
   return api.get<Api<LotList>>("/lots", { params: query })
 }
 
+export function importLots(entity_id: number, file: File) {
+  return api.post<Api<void>>("/lots/add-excel", { entity_id, file })
+}
+
 export function downloadLots(query: LotQuery, selection: number[]) {
-  return null
+  return download("/lots", { ...getParams(query, selection), export: true })
 }
 
 export function getLotsSummary(
@@ -55,6 +60,14 @@ export function getDeclarations(entity_id: number, year: number) {
   })
 }
 
+export function validateDeclaration(entity_id: number, period: number) {
+  return api.post<Api<void>>("/declarations/validate", { entity_id, period })
+}
+
+export function invalidateDeclaration(entity_id: number, period: number) {
+  return api.post<Api<void>>("/declarations/invalidate", { entity_id, period })
+}
+
 export function getLotFilters(field: Filter, query: LotQuery) {
   const params = { field, ...query, ...QUERY_RESET }
   return api
@@ -66,8 +79,101 @@ export function sendLots(query: LotQuery, selection?: number[]) {
   return api.post<Api<void>>("/lots/send", getParams(query, selection))
 }
 
+export function acceptReleaseForConsumption(
+  query: LotQuery,
+  selection?: number[]
+) {
+  return api.post<Api<void>>(
+    "/lots/accept-release-for-consumption",
+    getParams(query, selection)
+  )
+}
+
+export function acceptInStock(query: LotQuery, selection?: number[]) {
+  return api.post<Api<void>>(
+    "/lots/accept-in-stock",
+    getParams(query, selection)
+  )
+}
+
+export function acceptForTrading(
+  query: LotQuery,
+  selection: number[] | undefined,
+  client: Entity | string
+) {
+  const params =
+    client instanceof Object
+      ? { client_entity_id: client.id }
+      : { unknown_client: client }
+
+  return api.post<Api<void>>("/lots/accept-trading", {
+    ...getParams(query, selection),
+    ...params,
+  })
+}
+
+export function acceptForProcessing(
+  query: LotQuery,
+  selection: number[] | undefined,
+  processing_entity_id: number
+) {
+  return api.post<Api<void>>("/lots/accept-processing", {
+    ...getParams(query, selection),
+    processing_entity_id,
+  })
+}
+
+export function acceptForBlending(
+  query: LotQuery,
+  selection: number[] | undefined
+) {
+  return api.post<Api<void>>(
+    "/lots/accept-blending",
+    getParams(query, selection)
+  )
+}
+export function acceptForExport(
+  query: LotQuery,
+  selection: number[] | undefined
+) {
+  return api.post<Api<void>>("/lots/accept-export", getParams(query, selection))
+}
+
 export function deleteLots(query: LotQuery, selection?: number[]) {
   return api.post<Api<void>>("/lots/delete", getParams(query, selection))
+}
+
+export function rejectLots(query: LotQuery, selection?: number[]) {
+  return api.post<Api<void>>("/lots/reject", getParams(query, selection))
+}
+
+export function requestFix(entity_id: number, lot_ids: number[]) {
+  return api.post<Api<void>>("/lots/request-fix", { entity_id, lot_ids })
+}
+
+export function markAsFixed(entity_id: number, lot_ids: number[]) {
+  return api.post<Api<void>>("/lots/mark-as-fixed", { entity_id, lot_ids })
+}
+
+export function approveFix(entity_id: number, lot_ids: number[]) {
+  return api.post<Api<void>>("/lots/approve-fix", { entity_id, lot_ids })
+}
+
+export function recallLots(entity_id: number, lot_ids: number[]) {
+  return api.post<Api<void>>("/lots/recall", { entity_id, lot_ids })
+}
+
+export async function commentLots(
+  query: LotQuery,
+  selection: number[] | undefined,
+  comment: string
+) {
+  if (!comment) return
+
+  return api.post<Api<void>>("/lots/comment", {
+    ...getParams(query, selection),
+    comment,
+  })
 }
 
 export function getParams(query: LotQuery, selection?: number[]) {

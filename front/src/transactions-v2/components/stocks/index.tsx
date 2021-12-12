@@ -34,6 +34,12 @@ export const Stocks = ({ entity, year, snapshot }: StocksProps) => {
   const stocks = useQuery(api.getStocks, {
     key: "stocks",
     params: [query],
+
+    onSuccess: () => {
+      if (state.selection.length > 0) {
+        actions.setSelection([])
+      }
+    },
   })
 
   const stocksData = stocks.result?.data.data

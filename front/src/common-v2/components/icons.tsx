@@ -273,7 +273,6 @@ export const Flask = ({ className, ...props }: IconProps) => (
 
 export const Forward = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("forward", className)}>
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M12 18h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v7.5" />
     <path d="M3 6l9 6l9 -6" />
     <path d="M15 18h6" />
@@ -391,5 +390,14 @@ export const History = ({ className, ...props }: IconProps) => (
 export const Wrench = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("wrench", className)}>
     <path d="M7 10h3v-3l-3.5 -3.5a6 6 0 0 1 8 8l6 6a2 2 0 0 1 -3 3l-6 -6a6 6 0 0 1 -8 -8l3.5 3.5" />
+  </Icon>
+)
+
+export const Split = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("split", className)}>
+    <path d="M21 17h-8l-3.5 -5h-6.5" />
+    <path d="M21 7h-8l-3.495 5" />
+    <path d="M18 10l3 -3l-3 -3" />
+    <path d="M18 20l3 -3l-3 -3" />
   </Icon>
 )

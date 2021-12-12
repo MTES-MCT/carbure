@@ -29,6 +29,11 @@ export const normalizeEntity: Normalizer<Entity | string> = (entity) => ({
   label: isString(entity) ? entity : entity.name,
 })
 
+export const normalizePureEntity: Normalizer<Entity> = (entity) => ({
+  value: entity,
+  label: entity.name,
+})
+
 // prettier-ignore
 export const normalizeProductionSite: Normalizer<ProductionSite | string> = (ps) => ({
   value: ps,
