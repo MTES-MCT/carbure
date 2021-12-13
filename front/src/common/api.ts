@@ -90,8 +90,8 @@ export function findSNCertificates(query: string): Promise<SNCertificate[]> {
 
 export function findCertificates(
   query: string,
-  entity_id: number | null,
-  production_site: number | null | undefined
+  entity_id?: number | null,
+  production_site?: number | null
 ): Promise<string[]> {
   return api.get("/common/certificates", { query, entity_id, production_site })
 }
