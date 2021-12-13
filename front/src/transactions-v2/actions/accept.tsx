@@ -1,8 +1,10 @@
+import { useMemo, useState } from "react"
+import i18next from "i18next"
 import { useTranslation } from "react-i18next"
 import { Lot, LotQuery } from "transactions-v2/types"
 import Menu from "common-v2/components/menu"
 import { Check, Return } from "common-v2/components/icons"
-import { useMutation } from "common-v2/hooks/async"
+import { useQuery, useMutation } from "common-v2/hooks/async"
 import * as api from "../api"
 import { useNotify } from "common-v2/components/notifications"
 import { variations } from "common-v2/utils/formatters"
@@ -12,12 +14,15 @@ import Button from "common-v2/components/button"
 import { usePortal } from "common-v2/components/portal"
 import useEntity from "carbure/hooks/entity"
 import { Anchors } from "common-v2/components/dropdown"
-import { useState } from "react"
 import { Entity } from "carbure/types"
 import Autocomplete from "common-v2/components/autocomplete"
 import { findEntities } from "common-v2/api"
+import { getDeliverySites } from "settings/api"
 import * as norm from "common-v2/utils/normalizers"
-import i18next from "i18next"
+import Select from "common-v2/components/select"
+import { Normalizer } from "common-v2/utils/normalize"
+import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
+import { findCertificates } from "common/api"
 
 export interface AcceptManyButtonProps {
   disabled?: boolean
@@ -378,10 +383,16 @@ const ProcessingDialog = ({
 }: AcceptDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const entity = useEntity()
 
   const v = variations(selection.length)
 
-  const [processor, setProcessor] = useState<Entity | undefined>()
+  const [depot, setDepot] = useState<EntityDeliverySite | undefined>()
+
+  const depots = useQuery(getDeliverySites, {
+    key: "depots",
+    params: [entity.id],
+  })
 
   const acceptLots = useMutation(api.acceptForProcessing, {
     invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
@@ -409,6 +420,18 @@ const ProcessingDialog = ({
     },
   })
 
+  const subquery = useMemo(
+    () => ({
+      ...query,
+      delivery_sites: depot ? [depot.depot!.depot_id] : [],
+    }),
+    [query, depot]
+  )
+
+  const processingDepots = (depots.result ?? []).filter(
+    (depot) => depot.blending_is_outsourced
+  )
+
   return (
     <Dialog onClose={onClose}>
       <header>
@@ -427,17 +450,16 @@ const ProcessingDialog = ({
           )}
         </section>
         <section>
-          {/* @TODO instead of this allow picking a depot with processing enabled */}
-          {/* then filter lots from this depot in summary */}
-          <Autocomplete
+          <Select
             label={t("Société tierce")}
-            value={processor}
-            onChange={setProcessor}
-            getOptions={findEntities}
-            normalize={norm.normalizePureEntity}
+            placeholder={t("Choisir une société")}
+            value={depot}
+            onChange={setDepot}
+            options={processingDepots}
+            normalize={normalizeEntityDepot}
           />
         </section>
-        {summary && <LotSummary query={query} selection={selection} />}
+        {summary && <LotSummary query={subquery} selection={selection} />}
       </main>
       <footer>
         <Button
@@ -450,16 +472,24 @@ const ProcessingDialog = ({
         <Button
           submit
           loading={acceptLots.loading}
-          disabled={!processor}
+          disabled={!depot}
           variant="success"
           icon={Check}
           label={t("Transférer")}
-          action={() => acceptLots.execute(query, selection, processor!.id)}
+          action={() =>
+            acceptLots.execute(subquery, selection, depot!.blender!.id)
+          }
         />
       </footer>
     </Dialog>
   )
 }
+
+// prettier-ignore
+const normalizeEntityDepot: Normalizer<EntityDeliverySite> = (depot) => ({
+  label: `${depot.blender!.name} - ${depot.depot!.name}`,
+  value: depot
+})
 
 const BlendingDialog = ({
   summary,
