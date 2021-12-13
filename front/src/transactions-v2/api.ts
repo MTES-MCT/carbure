@@ -99,7 +99,8 @@ export function acceptInStock(query: LotQuery, selection?: number[]) {
 export function acceptForTrading(
   query: LotQuery,
   selection: number[] | undefined,
-  client: Entity | string
+  client: Entity | string,
+  certificate: string
 ) {
   const params =
     client instanceof Object
@@ -109,6 +110,7 @@ export function acceptForTrading(
   return api.post<Api<void>>("/lots/accept-trading", {
     ...getParams(query, selection),
     ...params,
+    certificate,
   })
 }
 

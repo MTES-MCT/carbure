@@ -1246,10 +1246,14 @@ def accept_trading(request, *args, **kwargs):
     entity_id = context['entity_id']
     client_entity_id = request.POST.get('client_entity_id', False)
     unknown_client = request.POST.get('unknown_client', False)
+    certificate = request.POST.get('certificate', False)
     status = request.POST.get('status', False)
 
     if not client_entity_id and not unknown_client:
         return JsonResponse({'status': 'error', 'message': 'Please specify either client_entity_id or unknown_client'}, status=400)
+
+    if not certificate:
+        return JsonResponse({'status': 'error', 'message': 'Please specify a certificate'}, status=400)
 
     lots = get_entity_lots_by_status(entity_id, status)
     lots = filter_lots(lots, request.POST, entity_id, will_aggregate=True)
@@ -1309,6 +1313,7 @@ def accept_trading(request, *args, **kwargs):
         child_lot.declared_by_supplier = False
         child_lot.added_by = entity
         child_lot.carbure_supplier = entity
+        child_lot.supplier_certificate = certificate
         child_lot.unknown_supplier = None
         child_lot.parent_lot_id = parent_lot_id
         child_lot.save()

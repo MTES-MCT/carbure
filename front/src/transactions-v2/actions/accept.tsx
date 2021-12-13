@@ -291,10 +291,12 @@ const TradingDialog = ({
 }: AcceptDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const entity = useEntity()
 
   const v = variations(selection.length)
 
   const [client, setClient] = useState<Entity | string | undefined>()
+  const [certificate, setCertificate] = useState<string | undefined>()
 
   const acceptLots = useMutation(api.acceptForTrading, {
     invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
@@ -350,6 +352,12 @@ const TradingDialog = ({
             normalize={norm.normalizeEntity}
             create={norm.identity}
           />
+          <Autocomplete
+            label={t("Certificat")}
+            value={certificate}
+            onChange={setCertificate}
+            getOptions={(query) => findCertificates(query, entity.id)}
+          />
         </section>
         {summary && <LotSummary query={query} selection={selection} />}
       </main>
@@ -364,11 +372,13 @@ const TradingDialog = ({
         <Button
           submit
           loading={acceptLots.loading}
-          disabled={!client}
+          disabled={!client || !certificate}
           variant="success"
           icon={Check}
           label={t("Transférer")}
-          action={() => acceptLots.execute(query, selection, client!)}
+          action={() =>
+            acceptLots.execute(query, selection, client!, certificate!)
+          }
         />
       </footer>
     </Dialog>
