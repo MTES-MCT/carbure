@@ -18,6 +18,7 @@ import {
   QuotaDetails,
 } from "doublecount/types"
 import { Entity } from "carbure/types"
+import { EntityDeliverySite } from "./hooks/use-delivery-sites"
 
 export function getSettings(): Promise<Settings> {
   return api.get("/settings/")
@@ -178,7 +179,7 @@ export function setProductionSiteCertificates(
 }
 
 export function getDeliverySites(entity_id: number) {
-  return api.get("/settings/get-delivery-sites", {
+  return api.get<EntityDeliverySite[]>("/settings/get-delivery-sites", {
     entity_id,
   })
 }
