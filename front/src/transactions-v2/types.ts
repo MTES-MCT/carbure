@@ -279,3 +279,17 @@ export interface StockQuery {
   [Filter.ProductionSites]?: string[]
   [Filter.DeliverySites]?: string[]
 }
+
+export interface StockPayload {
+  stock_id: number | undefined
+  volume: number | undefined
+  transport_document_type: string | undefined
+  transport_document_reference: string | undefined
+  delivery_date: string | undefined
+  carbure_delivery_site_id: string | undefined
+  unknown_delivery_site: string | undefined
+  delivery_site_country_id: string | undefined
+  delivery_type: string | undefined
+  carbure_client_id: number | undefined
+  unknown_client: string | undefined
+}

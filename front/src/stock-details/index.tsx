@@ -13,6 +13,7 @@ import NavigationButtons from "lot-details/components/navigation"
 import Alert from "common-v2/components/alert"
 import { formatNumber, formatPercentage } from "common-v2/utils/formatters"
 import StockTraceability from "./components/stock-traceability"
+import { SplitOneButton } from "transactions-v2/actions/split"
 
 interface StockDetailsProps {
   neighbors: number[]
@@ -63,6 +64,7 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
       </main>
 
       <footer>
+        {stockData && <SplitOneButton stock={stockData?.stock} />}
         <Alert icon={AlertCircle} variant="info">
           <p>
             <Trans>
