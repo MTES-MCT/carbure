@@ -26,11 +26,10 @@ export const LotActions = ({ lot }: ActionBarProps) => {
 
   return (
     <Fragment>
-      {status === "DRAFT" && (
-        <Fragment>
-          <SendOneButton lot={lot} />
-          <DeleteOneButton lot={lot} />
-        </Fragment>
+      {status === "DRAFT" && <SendOneButton lot={lot} />}
+
+      {(status === "DRAFT" || status === "REJECTED") && (
+        <DeleteOneButton lot={lot} />
       )}
 
       {status === "PENDING" && correction === "NO_PROBLEMO" && isClient && (
