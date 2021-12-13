@@ -11,6 +11,7 @@ import {
   LotSummary,
   DeclarationSummary,
   StockSummary,
+  StockPayload,
 } from "./types"
 
 const QUERY_RESET: Partial<LotQuery> = {
@@ -204,4 +205,11 @@ export function getStockFilters(field: Filter, query: LotQuery) {
   return api
     .get<Api<Option[]>>("/stocks/filters", { params })
     .then((res) => res.data.data ?? [])
+}
+
+export function splitStock(entity_id: number, payload: StockPayload[]) {
+  return api.post("/stocks/split", {
+    entity_id,
+    payload: JSON.stringify(payload),
+  })
 }
