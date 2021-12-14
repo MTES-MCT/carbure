@@ -6,7 +6,6 @@ from django.contrib.auth import get_user_model
 import hashlib
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
-from core.serializers import CarbureLotPublicSerializer
 
 usermodel = get_user_model()
 
