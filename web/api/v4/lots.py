@@ -1,4 +1,5 @@
 import datetime
+import unicodedata
 import dateutil
 from typing import Generic, List
 from django.db.models.query import QuerySet
@@ -41,14 +42,15 @@ def fill_delivery_date(lot, data):
     # default: today
     lot.delivery_date = today
     try:
-        dd = try_get_date(data['delivery_date'])
+        delivery_date = data['delivery_date']
+        dd = try_get_date(delivery_date)
         diff = today - dd
         if diff > datetime.timedelta(days=365):
-            errors.append(GenericError(lot=lot, field='delivery_date', error=INCORRECT_DELIVERY_DATE, value=data['delivery_date'], display_to_creator=True, is_blocking=True))
+            errors.append(GenericError(lot=lot, field='delivery_date', error=INCORRECT_DELIVERY_DATE, value=delivery_date, display_to_creator=True, is_blocking=True))
         else:
             lot.delivery_date = dd
     except Exception:
-        errors.append(GenericError(lot=lot, field='delivery_date', error=INCORRECT_FORMAT_DELIVERY_DATE, value=data['delivery_date'], display_to_creator=True, is_blocking=True))
+        errors.append(GenericError(lot=lot, field='delivery_date', error=INCORRECT_FORMAT_DELIVERY_DATE, value=delivery_date, display_to_creator=True, is_blocking=True))
     lot.period = lot.delivery_date.year * 100 + lot.delivery_date.month
     lot.year = lot.delivery_date.year
     return errors
@@ -99,7 +101,7 @@ def fill_production_info(lot, data, entity, prefetched_data):
                 lot.production_country = None
             else:
                 lot.production_country = prefetched_data['countries'][pcc]
-            lot.production_site_commissioning_date = data.get('production_site_commissioning_date', None)
+            lot.production_site_commissioning_date = try_get_date(data.get('production_site_commissioning_date', None))
             lot.production_site_double_counting_certificate = data.get('production_site_double_counting_certificate', None)
     return errors
 
@@ -241,16 +243,16 @@ def fill_delivery_data(lot, data, entity, prefetched_data):
     dest = data.get('carbure_delivery_site_depot_id', None)
     if dest in prefetched_data['depots']:
         lot.carbure_delivery_site = prefetched_data['depots'][dest]
+        lot.delivery_site_country = lot.carbure_delivery_site.country
     else:
         lot.carbure_delivery_site = None
         errors.append(GenericError(lot=lot, field='carbure_delivery_site_depot_id', error=UNKNOWN_DELIVERY_SITE, display_to_creator=True, is_blocking=True))
-    lot.unknown_delivery_site = data.get('unknown_delivery_site', None)
-    delivery_country_code = data.get('delivery_site_country_code', None)
-    if delivery_country_code in prefetched_data['countries']:
-        lot.delivery_site_country = prefetched_data['countries'][delivery_country_code]
-    else:
-        lot.delivery_site_country = None
-        errors.append(GenericError(lot=lot, field='delivery_site_country_code', error=UNKNOWN_DELIVERY_COUNTRY, display_to_creator=True, is_blocking=True))
+
+    if not lot.carbure_delivery_site:
+        lot.unknown_delivery_site = data.get('unknown_delivery_site', None)
+        delivery_country_code = data.get('delivery_site_country_code', None)
+        if delivery_country_code in prefetched_data['countries']:
+            lot.delivery_site_country = prefetched_data['countries'][delivery_country_code]
     return errors
 
 

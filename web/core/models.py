@@ -887,9 +887,13 @@ class CarbureLot(models.Model):
 
 
     def get_weight(self):
+        if not self.biofuel:
+            return 0
         return self.volume * self.biofuel.masse_volumique
 
     def get_lhv_amount(self):
+        if not self.biofuel:
+            return 0
         return self.volume * self.biofuel.pci_litre
 
     def generate_carbure_id(self):
