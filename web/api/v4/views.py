@@ -17,7 +17,7 @@ from api.v4.helpers import send_email_declaration_invalidated, send_email_declar
 from api.v4.lots import construct_carbure_lot, bulk_insert_lots
 from api.v4.sanity_checks import bulk_sanity_checks, sanity_check
 
-from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Entity, GenericError, SustainabilityDeclaration, UserRights
+from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Entity, GenericError, Pays, SustainabilityDeclaration, UserRights
 from core.serializers import CarbureLotPublicSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
 from core.xlsx_v3 import template_v4
 
@@ -45,12 +45,12 @@ def get_snapshot(request, *args, **kwargs):
     lots = CarbureLot.objects.filter(year=year)
     data = {}
     drafts = lots.filter(added_by_id=entity_id, lot_status=CarbureLot.DRAFT)
-    lots_in = lots.filter(carbure_client_id=entity_id)
+    lots_in = lots.filter(carbure_client_id=entity_id).exclude(lot_status__in=[CarbureLot.DELETED, CarbureLot.DRAFT])
     lots_in_pending = lots_in.filter(lot_status=CarbureLot.PENDING)
     lots_in_tofix = lots_in.exclude(correction_status=CarbureLot.NO_PROBLEMO)
     stock = CarbureStock.objects.filter(carbure_client_id=entity_id).filter(Q(parent_lot__year=year) | Q(parent_transformation__transformation_dt__year=year))
     stock_not_empty = stock.filter(remaining_volume__gt=0)
-    lots_out = lots.filter(carbure_supplier_id=entity_id)
+    lots_out = lots.filter(carbure_supplier_id=entity_id).exclude(lot_status__in=[CarbureLot.DELETED, CarbureLot.DRAFT])
     lots_out_pending = lots_out.filter(lot_status=CarbureLot.PENDING)
     lots_out_tofix = lots_out.exclude(correction_status=CarbureLot.NO_PROBLEMO)
     data['lots'] = {'draft': drafts.count(),
@@ -261,7 +261,7 @@ def stock_flush(request, *args, **kwargs):
 def stock_split(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
-    payload = request.POST.getlist('payload', False)
+    payload = request.POST.get('payload', False)
     if not payload:
         return JsonResponse({'status': 'error', 'message': 'Missing payload'}, status=400)
 
@@ -278,17 +278,17 @@ def stock_split(request, *args, **kwargs):
 
     for entry in unserialized:
         # check minimum fields
-        required_fields = ['stock_id', 'volume', 'delivery_date', 'delivery_type', 'delivery_site_country_id']
+        required_fields = ['stock_id', 'volume', 'delivery_date', 'delivery_site_country_id'] # 'delivery_type'
         for field in required_fields:
             if field not in entry:
-                return JsonResponse({'status': 'error', 'message': 'Missing field %s in json object'}, status=400)
+                return JsonResponse({'status': 'error', 'message': 'Missing field %s in json object' % (field)}, status=400)
 
         try:
-            stock = CarbureStock.objects.filter(pk=entry['stock_id'])
+            stock = CarbureStock.objects.get(pk=entry['stock_id'])
         except:
             return JsonResponse({'status': 'error', 'message': 'Could not find stock'}, status=400)
 
-        if stock.carbure_client_id != entity_id:
+        if stock.carbure_client_id != int(entity_id):
             return JsonResponse({'status': 'forbidden', 'message': 'Stock does not belong to you'}, status=403)
 
         try:
@@ -296,56 +296,65 @@ def stock_split(request, *args, **kwargs):
         except:
             return JsonResponse({'status': 'error', 'message': 'Could not parse volume'}, status=400)
 
-        delivery_type = entry['delivery_type']
-        if delivery_type not in [CarbureLot.BLENDING, CarbureLot.EXPORT, CarbureLot.DIRECT, CarbureLot.PROCESSING, CarbureLot.RFC]:
-            return JsonResponse({'status': 'error', 'message': 'Cannot split stock for this type of delivery'}, status=400)
-
+        # delivery_type = entry['delivery_type']
+        # if delivery_type not in [CarbureLot.BLENDING, CarbureLot.EXPORT, CarbureLot.DIRECT, CarbureLot.PROCESSING, CarbureLot.RFC]:
+        #     return JsonResponse({'status': 'error', 'message': 'Cannot split stock for this type of delivery'}, status=400)
 
         # create child lot
         rounded_volume = round(volume, 2)
         lot = stock.parent_lot
         lot.pk = None
+        lot.lot_status = CarbureLot.DRAFT
         lot.volume = rounded_volume
         lot.weight = lot.get_weight()
         lot.lhv_amount = lot.get_lhv_amount()
         lot.parent_stock = stock
         # common, mandatory data
-        lot.delivery_site_country_id = entry['delivery_site_country_id']
+        lot.delivery_site_country = Pays.objects.get(code_pays=entry['delivery_site_country_id'])
+        lot.transport_document_reference = entry['transport_document_reference']
         lot.delivery_date = entry['delivery_date']
+        lot.period = lot.delivery_date.year * 100 + lot.delivery_date.month
         if 'dispatch_date' in entry:
             lot.dispatch_date = entry['dispatch_date']
-        lot.carbure_dispatch_site = stock.carbure_delivery_site
+        lot.carbure_dispatch_site = stock.depot
         lot.dispatch_site_country = lot.carbure_dispatch_site.country
-        lot.delivery_type = delivery_type
-        # delivery type specific data
-        if delivery_type in [CarbureLot.RFC, CarbureLot.EXPORT]:
-            # carbure_client, carbure_delivery_site, transport_document_type and transport_document_reference are optional
-            lot.lot_status = CarbureLot.ACCEPTED
-            if 'transport_document_type' in entry:
-                lot.transport_document_type = entry['transport_document_type']
-            else:
-                lot.transport_document_type = CarbureLot.OTHER
-            if 'transport_document_reference' in entry:
-                lot.transport_document_reference = entry['transport_document_reference']
-            else:
-                lot.transport_document_reference = lot.delivery_type
-            if 'carbure_client_id' in entry:
-                lot.carbure_client_id = entry['carbure_client_id']
-            if 'carbure_delivery_site_id' in entry:
-                lot.carbure_delivery_site_id = entry['carbure_delivery_site_id']
-            if 'unknown_client' in entry:
-                lot.unknown_client = entry['unknown_client']
-            if 'unknown_delivery_site' in entry:
-                lot.unknown_delivery_site = entry['unknown_delivery_site']
-        else: # BLENDING, DIRECT, PROCESSING
-            required_fields = ['transport_document_type', 'transport_document_reference', 'carbure_delivery_site_id', 'carbure_client_id']
-            for field in required_fields:
-                if field not in entry:
-                    return JsonResponse({'status': 'error', 'message': 'Missing field %s in json object'}, status=400)
-            lot.transport_document_type = entry['transport_document_type']
-            lot.transport_document_reference = entry['transport_document_reference']
-            lot.carbure_delivery_site_id = entry['carbure_delivery_site_id']
+        lot.carbure_supplier_id = entity_id
+        lot.added_bt_id = entity_id
+        if 'carbure_client_id' in entry:
             lot.carbure_client_id = entry['carbure_client_id']
+        elif 'unknown_client' in entry:
+            lot.unknown_client = entry['unknown_client']
+
+        # lot.delivery_type = delivery_type
+        # delivery type specific data
+        # if delivery_type in [CarbureLot.RFC, CarbureLot.EXPORT]:
+        #     # carbure_client, carbure_delivery_site, transport_document_type and transport_document_reference are optional
+        #     lot.lot_status = CarbureLot.ACCEPTED
+        #     if 'transport_document_type' in entry:
+        #         lot.transport_document_type = entry['transport_document_type']
+        #     else:
+        #         lot.transport_document_type = CarbureLot.OTHER
+        #     if 'transport_document_reference' in entry:
+        #         lot.transport_document_reference = entry['transport_document_reference']
+        #     else:
+        #         lot.transport_document_reference = lot.delivery_type
+        #     if 'carbure_client_id' in entry:
+        #         lot.carbure_client_id = entry['carbure_client_id']
+        #     if 'carbure_delivery_site_id' in entry:
+        #         lot.carbure_delivery_site_id = entry['carbure_delivery_site_id']
+        #     if 'unknown_client' in entry:
+        #         lot.unknown_client = entry['unknown_client']
+        #     if 'unknown_delivery_site' in entry:
+        #         lot.unknown_delivery_site = entry['unknown_delivery_site']
+        # else: # BLENDING, DIRECT, PROCESSING
+        #     required_fields = ['transport_document_type', 'transport_document_reference', 'carbure_delivery_site_id', 'carbure_client_id']
+        #     for field in required_fields:
+        #         if field not in entry:
+        #             return JsonResponse({'status': 'error', 'message': 'Missing field %s in json object'}, status=400)
+        #     lot.transport_document_type = entry['transport_document_type']
+        #     lot.transport_document_reference = entry['transport_document_reference']
+        #     lot.carbure_delivery_site_id = entry['carbure_delivery_site_id']
+        #     lot.carbure_client_id = entry['carbure_client_id']
         lot.save()
         # update stock
         if rounded_volume >= stock.remaining_volume:
@@ -1296,10 +1305,14 @@ def accept_trading(request, *args, **kwargs):
     entity_id = context['entity_id']
     client_entity_id = request.POST.get('client_entity_id', False)
     unknown_client = request.POST.get('unknown_client', False)
+    certificate = request.POST.get('certificate', False)
     status = request.POST.get('status', False)
 
     if not client_entity_id and not unknown_client:
         return JsonResponse({'status': 'error', 'message': 'Please specify either client_entity_id or unknown_client'}, status=400)
+
+    if not certificate:
+        return JsonResponse({'status': 'error', 'message': 'Please specify a certificate'}, status=400)
 
     lots = get_entity_lots_by_status(entity_id, status)
     lots = filter_lots(lots, request.POST, entity_id, will_aggregate=True)
@@ -1359,6 +1372,7 @@ def accept_trading(request, *args, **kwargs):
         child_lot.declared_by_supplier = False
         child_lot.added_by = entity
         child_lot.carbure_supplier = entity
+        child_lot.supplier_certificate = certificate
         child_lot.unknown_supplier = None
         child_lot.parent_lot_id = parent_lot_id
         child_lot.save()
