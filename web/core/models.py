@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 import hashlib
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
+from core.serializers import CarbureLotPublicSerializer
 
 usermodel = get_user_model()
 
@@ -994,6 +995,19 @@ def delete_lot(sender, instance, using, **kwargs):
         event.user = None
         event.metadata = {'message': 'child lot deleted. recredit volume.', 'volume_to_credit': instance.volume}
         event.save()
+    # if there is a parent_lot tagged as processing or trading, restore them to their "inbox" status
+    if instance.parent_tx:
+        if instance.parent_tx.delivery_type in [CarbureLot.PROCESSING, CarbureLot.TRADING]:
+            instance.parent_tx.lot_status = CarbureLot.PENDING
+            instance.parent_tx.delivery_type = CarbureLot.OTHER
+            instance.parent_tx.save()
+            # save event
+            event = CarbureLotEvent()
+            event.event_type = CarbureLotEvent.RECALLED
+            event.lot = instance.parent_tx
+            event.user = None
+            event.metadata = {'message': 'child lot deleted. back to inbox.'}
+            event.save()
 
 class CarbureStock(models.Model):
     parent_lot = models.ForeignKey(CarbureLot, null=True, blank=True, on_delete=models.CASCADE)
