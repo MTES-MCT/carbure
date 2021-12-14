@@ -8,6 +8,7 @@ COPY front/package.json /app/
 COPY front/package-lock.json /app/
 
 ENV PATH /app/node_modules/.bin:$PATH
+ENV NODE_OPTIONS --openssl-legacy-provider
 
 RUN npm install
 

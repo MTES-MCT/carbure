@@ -1,4 +1,5 @@
 import datetime
+import unicodedata
 import dictdiffer
 import json
 import time
@@ -8,6 +9,7 @@ from django.db.models.fields import NOT_PROVIDED
 
 from django.http.response import HttpResponse, JsonResponse
 from django.db.models.query_utils import Q
+from core.common import convert_template_row_to_formdata, get_uploaded_files_directory
 from core.decorators import check_user_rights
 from api.v4.helpers import filter_lots, filter_stock, get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock
 from api.v4.helpers import get_prefetched_data, get_stock_events, get_stock_with_metadata, get_stock_filters_data, get_stocks_summary_data, get_transaction_distance, handle_eth_to_etbe_transformation
@@ -17,6 +19,7 @@ from api.v4.sanity_checks import bulk_sanity_checks, sanity_check
 
 from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Entity, GenericError, SustainabilityDeclaration, UserRights
 from core.serializers import CarbureLotPublicSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
+from core.xlsx_v3 import template_v4
 
 
 @check_user_rights()
@@ -469,6 +472,53 @@ def add_lot(request, *args, **kwargs):
     e.save()
     data = CarbureLotPublicSerializer(e.lot).data
     return JsonResponse({'status': 'success', 'data': data})
+
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
+def add_excel(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    entity = Entity.objects.get(pk=entity_id)
+    d = get_prefetched_data(entity)
+
+    f = request.FILES.get('file')
+    if f is None:
+        return JsonResponse({'status': "error", 'message': "Missing File"}, status=400)
+
+    # save file
+    directory = get_uploaded_files_directory()
+    now = datetime.datetime.now()
+    filename = '%s_%s.xlsx' % (now.strftime('%Y%m%d.%H%M%S'), entity.name.upper())
+    filename = ''.join((c for c in unicodedata.normalize('NFD', filename) if unicodedata.category(c) != 'Mn'))
+    filepath = '%s/%s' % (directory, filename)
+    with open(filepath, 'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
+    data = convert_template_row_to_formdata(entity, d, filepath)
+    nb_total = 0
+    nb_valid = 0
+    nb_invalid = 0
+    lots = []
+    lots_errors = []
+    for row in data:
+        lot_obj, errors = construct_carbure_lot(d, entity, row)
+        if not lot_obj:
+            nb_invalid += 1
+        else:
+            nb_valid += 1
+        nb_total += 1
+        lots.append(lot_obj)
+        lots_errors.append(errors)
+    lots_created = bulk_insert_lots(entity, lots, lots_errors, d)
+    if len(lots_created) == 0:
+        return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=500)
+    for lot in lots_created:
+        e = CarbureLotEvent()
+        e.event_type = CarbureLotEvent.CREATED
+        e.lot_id = lot.id
+        e.user = request.user
+        e.metadata = {'source': 'EXCEL'}
+        e.save()
+    return JsonResponse({'status': 'success', 'data': {'lots': nb_total, 'valid': nb_valid, 'invalid': nb_invalid}})
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
@@ -1411,15 +1461,15 @@ def invalidate_declaration(request, *args, **kwargs):
 @check_user_rights()
 def get_template(request, *args, **kwargs):
     context = kwargs['context']
-    entity = context['entity']
-
+    entity_id = context['entity_id']
+    entity = Entity.objects.get(id=entity_id)
     file_location = template_v4(entity)
     try:
         with open(file_location, 'rb') as f:
             file_data = f.read()
             # sending response
             response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = 'attachment; filename="carbure_template_simple.xlsx"'
+            response['Content-Disposition'] = 'attachment; filename="carbure_template.xlsx"'
             return response
     except Exception:
         return JsonResponse({'status': "error", 'message': "Error creating template file"}, status=500)

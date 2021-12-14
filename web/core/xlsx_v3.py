@@ -795,96 +795,44 @@ def export_carbure_stock(entity, transactions):
 #### NEW MODEL
 
 
-def make_template_carbure_lots_sheet(workbook, entity, nb_lots):
+def make_template_carbure_lots_sheet(workbook, entity):
     worksheet_lots = workbook.add_worksheet("lots")
     psites = ProductionSite.objects.filter(producer=entity)
     clients = Entity.objects.filter(entity_type__in=[Entity.OPERATOR, Entity.TRADER]).exclude(id=entity.id)
-    mps = MatierePremiere.objects.all()
-    bcs = Biocarburant.objects.all()
     delivery_sites = Depot.objects.all()
-    countries = Pays.objects.all()
     my_vendor_certificates = get_my_certificates(entity=entity)
 
     # header
     bold = workbook.add_format({'bold': True})
-    columns = ['producer', 'production_site', 'production_site_country', 'production_site_reference',
-               'production_site_commissioning_date', 'double_counting_registration',
-               'supplier', 'supplier_certificate', 'vendor_certificate',
-               'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
-               'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee',
-               'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
-    if entity.has_mac:
-        columns.append('mac')
+    columns = ['champ_libre', 
+    'producer', 'production_site', 'production_site_reference', 'production_site_country', 'production_site_commissioning_date', 'double_counting_registration',
+    'supplier', 'supplier_certificate', 'vendor_certificate',
+    'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
+    'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee',
+    'dae', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country', 'delivery_type']
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
 
-    # rows
-    clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
     today = datetime.date.today().strftime('%d/%m/%Y')
-    for i in range(nb_lots):
-        client = random.choice(clients)
-        bc = random.choice(bcs)
-        my_vendor_certificate = random.choice(my_vendor_certificates)
-        if bc.is_alcool:
-            mp = random.choice([mp for mp in mps if mp.compatible_alcool])
-        elif bc.is_graisse:
-            mp = random.choice([mp for mp in mps if mp.compatible_graisse])
-        else:
-            mp = random.choice(mps)
+    rows = []
+    # CASE 1 my production - simple way
+    rows.append(['ajout simple', '', random.choice(psites).name, '', '', '', '', '', '', '', 35400, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), random.choice(clients).name, today, random.choice(delivery_sites).name, '', ''])
+    # CASE 2 my production - export to unknown client/site
+    rows.append(['ajout pour client hors-carbure', '', random.choice(psites).name, '', '', '', '', '', '', '', 36000, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), 'UNKNOWN CLIENT GmbH', today, 'UNKNOWN DEPOT', 'DE', ''])
+    # CASE 3 my production - custom certificate
+    rows.append(['ajout simple et choix du certificat', '', random.choice(psites).name, '', '', '', '', '', '', 'ISCC-XXXX-XXXX', 36500, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), random.choice(clients).name, today, random.choice(delivery_sites).name, '', ''])
+    # CASE 4 not my production
+    rows.append(['fournisseur hors-carbure', 'BioFuel GmbH', 'BioFuel Berlin', 'ISCC-DE-XXXX-XXX', 'DE', '22/11/2001', '', 'BioFuel Trader GmbH', 'TRADER-CERTIFICATE', '', 32300, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), 'UNKNOWN CLIENT GmbH', today, 'UNKNOWN DEPOT', 'DE', ''])
+    # CASE 5 
+    rows.append(['ajout en stock', '', random.choice(psites).name, '', '', '', '', '', '', '', 35400, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), entity.name, today, random.choice(delivery_sites).name, '', ''])
 
-        country = random.choice(countries)
-        site = random.choice(delivery_sites)
-        volume = random.randint(34000, 36000)
-
-        is_imported = random.random() < 0.3
-        if not is_producer:
-            is_imported = True
-        supplier_is_not_the_producer = random.random() < 0.5
-        destination = random.choice([1, 0, -1])
-
-        row = []
-        # production site
-        if is_imported:
-            p = random.choice(UNKNOWN_PRODUCERS)
-            row += [p['name'], p['production_site'], p['country'], p['ref'], p['date'], p['dc'] if mp.is_double_compte else '']
-            if supplier_is_not_the_producer:
-                supplier = random.choice(SUPPLIERS)
-                row += [supplier['name'], supplier['sref']]
-            else:
-                row += [p['name'], p['ref']]
-        else:
-            if not len(psites):
-                continue
-            p = random.choice(psites)
-            production_certifs = p.productionsitecertificate_set.all()
-            if production_certifs.count() > 0:
-                production_certif = production_certifs[0].natural_key()['certificate_id']
-            else:
-                production_certif = ''
-            row += [p.producer.name, p.name, p.country.code_pays, production_certif, '', '', '', '']
-
-        # vendor (me)
-        row += [my_vendor_certificate]
-        # lot details
-        row += [volume, bc.code, mp.code, country.code_pays, random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), clientid]
-        if destination == 1:
-            # client is not in carbure
-            c = random.choice(FOREIGN_CLIENTS)
-            row += [c['name'], today, c['delivery_site'], c['country']]
-        elif destination == -1:
-            # into mass balance (i am the client)
-            row += ['', today, site.depot_id, 'FR']
-        else:
-            # regular transaction. sell to someone else
-            row += [client.name, today, site.depot_id, 'FR']
-
-        if entity.has_mac:
-            row += [0]
-
+    rowid = 0
+    for row in rows:
         colid = 0
         for elem in row:
-            worksheet_lots.write(i+1, colid, elem)
+            worksheet_lots.write(rowid+1, colid, elem)
             colid += 1
+        rowid += 1
 
 def template_v4(entity):
     # Create an new Excel file and add a worksheet.
