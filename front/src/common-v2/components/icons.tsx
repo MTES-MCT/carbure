@@ -401,3 +401,12 @@ export const Split = ({ className, ...props }: IconProps) => (
     <path d="M18 20l3 -3l-3 -3" />
   </Icon>
 )
+
+export const Drop = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("drop", className)}>
+    <path d="M6.8 11a6 6 0 1 0 10.396 0l-5.197 -8l-5.2 8z" />
+    <path d="M6 14h12" />
+    <path d="M7.305 17.695l3.695 -3.695" />
+    <path d="M10.26 19.74l5.74 -5.74l-5.74 5.74z" />
+  </Icon>
+)
