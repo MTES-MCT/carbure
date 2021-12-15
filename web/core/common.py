@@ -1192,10 +1192,9 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         production_site = lot_row.get('production_site', '')
         if producer is None or producer == '' or producer.upper() == entity.name.upper():
             # I am the producer
-            if production_site in prefetched_data['my_production_sites']:
-                lot['carbure_production_site_id'] = prefetched_data['my_production_sites'][production_site]
+            if production_site.upper() in prefetched_data['my_production_sites']:
+                lot['carbure_production_site'] = production_site
             # carbure_supplier and carbure_producer will be set to entity in construct_carbure_lot
-
         else:
             # I am not the producer
             lot['unknown_producer'] = producer
@@ -1211,7 +1210,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         lot['volume'] = lot_row.get('volume', 0)
         lot['feedstock_code'] = lot_row.get('matiere_premiere_code', '')
         lot['biofuel_code'] = lot_row.get('biocarburant_code', '')
-        lot['country_of_origin_code'] = lot_row.get('pays_origine_code', '')
+        lot['country_code'] = lot_row.get('pays_origine_code', '')
 
         for key in ['el']: # negative value allowed
             try:
@@ -1227,12 +1226,13 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         lot['delivery_date'] = lot_row.get('delivery_date', '')
         delivery_site = lot_row.get('delivery_site', '')
         if delivery_site.upper() in prefetched_data['depots']:
-            lot['carbure_delivery_site'] = prefetched_data['depots'][delivery_site.upper()]
+            lot['carbure_delivery_site_depot_id'] = prefetched_data['depots'][delivery_site.upper()].depot_id
+        elif delivery_site.upper() in prefetched_data['depotsbyname']:
+            lot['carbure_delivery_site_depot_id'] = prefetched_data['depotsbyname'][delivery_site.upper()].depot_id
         else:
             lot['unknown_delivery_site'] = delivery_site
             delivery_site_country = lot_row.get('delivery_site_country', '')
             lot['delivery_site_country'] = prefetched_data['countries'].get(delivery_site_country, None)
-
         client = lot_row.get('client', '')
         if client in prefetched_data['clients']:
             lot['carbure_client'] = prefetched_data['clients'][client]

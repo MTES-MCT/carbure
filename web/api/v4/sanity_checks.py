@@ -50,6 +50,8 @@ rules['UNKNOWN_DOUBLE_COUNTING_CERTIFICATE'] = "Le certificat double compte est 
 rules['EXPIRED_DOUBLE_COUNTING_CERTIFICATE'] = "Le certificat double n'est plus valide"
 rules['POTENTIAL_DUPLICATE'] = "Doublon potentiel détecté. Un autre lot avec le même numéro douanier, biocarburant, matière première, volume et caractéristiques GES existe."
 
+rules['NOT_CLIENT_NOR_PRODUCER'] = "Vous devez être le producteur ou le client de la transaction ajoutée"
+
 
 def generic_error(error, **kwargs):
     d = {
@@ -131,7 +133,14 @@ def sanity_check(lot, prefetched_data):
     if not valid:
         is_sane = False
         errors += reqfielderrors
+        print('not valid, return early')
         return is_sane, errors
+
+    if lot.carbure_producer is None and lot.carbure_client is None:
+        print('NOT ALL GOOD')
+        errors.append(generic_error(error='NOT_CLIENT_NOR_PRODUCER', lot=lot, is_blocking=True, fields=['carbure_producer', 'carbure_client']))
+    else:
+        print('ALL GOOD')
 
     if lot.delivery_type == CarbureLot.RFC and lot.biofuel.code not in ['ED95', 'B100', 'ETH', 'EMHV', 'EMHU']:
         errors.append(generic_error(error='MAC_BC_WRONG', lot=lot, is_blocking=True, fields=['biofuel', 'delivery_type']))
@@ -326,7 +335,7 @@ def sanity_check_mandatory_fields(lot):
     if not lot.delivery_site_country:
         errors.append(generic_error(error='MISSING_DELIVERY_SITE_COUNTRY', lot=lot, field='delivery_site_country', is_blocking=True))
         is_valid = False
-    if lot.delivery_site_country.is_in_europe and not lot.country_of_origin:
+    if lot.delivery_site_country and lot.delivery_site_country.is_in_europe and not lot.country_of_origin:
         errors.append(generic_error(error='MISSING_FEEDSTOCK_COUNTRY_OF_ORIGIN', lot=lot, field='country_of_origin', is_blocking=True))
         is_valid = False
 
@@ -336,7 +345,5 @@ def sanity_check_mandatory_fields(lot):
         if not lot.supplier_certificate:
             errors.append(generic_error(error='MISSING_SUPPLIER_CERTIFICATE', lot=lot, field='supplier_certificate', is_blocking=True))
             is_valid = False
-    if len(errors):
-        GenericError.objects.bulk_create(errors)
     return is_valid, errors
 
