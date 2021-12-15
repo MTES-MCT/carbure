@@ -20,4 +20,4 @@ HVP,Huile végétale pure,37,34,0.919,0,1,0,0,0
 HCU,Huile provenant d'huiles de cuisson usagées,0,0,0,0,1,0,0,0
 EMAG,EMAG,0,0,0,0,1,1,0,1
 ED95,Éthanol pour ED95,0,0,0,1,0,1,1,0
-B100,B100,0,0,0,0,1,0,0,1
+B100,B100,0,0,0,0,1,1,0,1
