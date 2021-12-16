@@ -75,7 +75,7 @@ def handle_complex_stock(tx, child_tx):
         print('New remaining volume: [%f]' % (tx.lot.remaining_volume))
             
 def fix_other_stock():
-    stocks = LotTransaction.objects.filter(lot__year=2021, lot__status='Validated', is_stock=True, is_forwarded=False, lot__is_transformed=False)
+    stocks = LotTransaction.objects.filter(lot__status='Validated', is_stock=True, is_forwarded=False, lot__is_transformed=False)
     for l in stocks:
         child_txs = LotTransaction.objects.filter(parent_tx=l, lot__status='Validated')
         if l.carbure_client and l.carbure_client.entity_type == Entity.OPERATOR:
