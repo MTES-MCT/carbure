@@ -1,5 +1,6 @@
 import { Option } from "./components/select"
 import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
+import { ExternalAdminPages } from "carbure/types"
 
 export type Pagination = {
   from?: number
@@ -33,12 +34,7 @@ export enum EntityType {
   Trader = "Trader",
   Administration = "Administration",
   Auditor = "Auditor",
-  ExternalAdmin = "Administration Externe"
-}
-
-export enum ExternalAdminPages {
-  DoubleCounting = 'DCA',
-  Tirib = 'TIRIB'
+  ExternalAdmin = "Administration Externe",
 }
 
 export interface Entity {
@@ -114,13 +110,14 @@ export interface ProductionSite {
   name: string
   country: Country
   date_mise_en_service: string
+  dc_reference: string | undefined
 }
 
 export interface ProductionSiteDetails extends ProductionSite {
   date_mise_en_service: string
   ges_option: GESOption
   eligible_dc: boolean
-  dc_reference: string | null
+  dc_reference: string | undefined
   inputs: MatierePremiere[]
   outputs: Biocarburant[]
   site_id: string
@@ -551,4 +548,26 @@ export interface ConvertETBE {
   volume_etbe: number
   volume_etbe_eligible: number
   volume_denaturant: number
+}
+
+export interface Depot {
+  name: string
+  city: string
+  depot_id: string
+  country: Country
+  depot_type: DepotType
+  postal_code: string
+  address: string
+}
+
+export interface Feedstock {
+  code: string
+  name: string
+  is_double_compte?: boolean
+  category: string
+}
+
+export interface Biofuel {
+  code: string
+  name: string
 }

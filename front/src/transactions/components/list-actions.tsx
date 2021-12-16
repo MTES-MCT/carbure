@@ -1,5 +1,6 @@
 import React from "react"
 import cl from "clsx"
+import { Link } from "react-router-dom"
 import { Trans, useTranslation } from "react-i18next"
 
 import { LotDeleter } from "transactions/hooks/actions/use-delete-lots"
@@ -8,7 +9,6 @@ import { LotValidator } from "transactions/hooks/actions/use-validate-lots"
 import { LotAcceptor } from "transactions/hooks/actions/use-accept-lots"
 import { LotRejector } from "transactions/hooks/actions/use-reject-lots"
 
-import { Link } from "common/components/relative-route"
 import { Box } from "common/components"
 import { AsyncButton, Button } from "common/components/button"
 import {
@@ -122,7 +122,7 @@ export const OperatorImportActions = ({ uploader }: ImportActionsProps) => {
 }
 
 export const CreateActions = () => (
-  <Link relative to="add">
+  <Link to="add">
     <Button icon={Plus} level="primary">
       <Trans>Créer lot</Trans>
     </Button>

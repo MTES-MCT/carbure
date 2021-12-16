@@ -5,9 +5,7 @@ import { render as baseRender } from "@testing-library/react"
 import { configure } from "@testing-library/dom"
 import { initReactI18next } from "react-i18next"
 import { LoaderOverlay } from "common/components"
-import { AppHook, useApp } from "carbure/hooks/use-app"
-import { MemoryRouter, Route } from "react-router"
-import { UserRightProvider } from "carbure/hooks/use-rights"
+import { MemoryRouter, Routes } from "react-router"
 
 import translation from "../public/locales/fr/translation.json"
 import errors from "../public/locales/fr/errors.json"
@@ -15,6 +13,7 @@ import fields from "../public/locales/fr/fields.json"
 import feedstocks from "../public/locales/fr/feedstocks.json"
 import biofuels from "../public/locales/fr/biofuels.json"
 import countries from "../public/locales/fr/countries.json"
+import useUser, { UserContext, UserManager } from "carbure/hooks/user"
 
 configure({
   getElementError(message) {
@@ -71,20 +70,20 @@ i18n.use(initReactI18next).init({
 })
 
 type TestRootProps = {
-  url?: string
-  children: React.ReactNode | ((app: AppHook) => React.ReactNode)
+  url: string
+  children: React.ReactNode | ((user: UserManager) => React.ReactNode)
 }
 
-export const TestRoot = ({ url = "/org/0", children }: TestRootProps) => {
-  const app = useApp()
-  const element = typeof children === "function" ? children(app) : children
+export const TestRoot = ({ url, children }: TestRootProps) => {
+  const user = useUser()
+  const element = typeof children === "function" ? children(user) : children
 
   return (
     <MemoryRouter initialEntries={[url]}>
       <Suspense fallback={<LoaderOverlay />}>
-        <Route path="/org/:entity">
-          <UserRightProvider app={app}>{element}</UserRightProvider>
-        </Route>
+        <UserContext.Provider value={user}>
+          <Routes>{element}</Routes>
+        </UserContext.Provider>
       </Suspense>
     </MemoryRouter>
   )

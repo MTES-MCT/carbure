@@ -1,8 +1,7 @@
 import { render, TestRoot } from "setupTests"
 import { waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-
-import { Entity } from "common/types"
+import { Route } from "react-router-dom"
 import { deliverySite, producer } from "common/__test__/data"
 import { waitWhileLoading } from "common/__test__/helpers"
 import Settings from "../index"
@@ -11,11 +10,11 @@ import server, { setDeliverySites, setEntity } from "./api"
 
 const SettingsWithHooks = () => {
   return (
-    <TestRoot>
+    <TestRoot url="/org/0/settings">
       {(app) => (
-        <Settings
-          entity={app.settings.data?.rights[0].entity ?? null}
-          settings={app.settings}
+        <Route
+          path="/org/0/settings"
+          element={<Settings settings={app.settings} />}
         />
       )}
     </TestRoot>

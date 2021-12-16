@@ -1,9 +1,15 @@
+/* COMMON */
+
 .home {
   background-color: var(--white);
   font-size: 18px;
 }
 
-/* COMMON */
+.home h1,
+.home h2,
+.home ul {
+  margin-bottom: 16px;
+}
 
 .homeTitle,
 .homeContext,
@@ -18,7 +24,7 @@
   padding: 32px;
 }
 
-.homeButton {
+a.homeButton {
   font-size: 1.4em;
   line-height: normal;
   padding: 12px 24px;

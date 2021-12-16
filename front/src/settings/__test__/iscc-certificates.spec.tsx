@@ -1,7 +1,7 @@
 import { render, TestRoot } from "setupTests"
 import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-
+import { Route } from "react-router-dom"
 import { Entity } from "common/types"
 import {
   isccCertificate,
@@ -15,8 +15,13 @@ import server, { setISCCCertificates } from "./api"
 
 const SettingsWithHooks = ({ entity }: { entity: Entity }) => {
   return (
-    <TestRoot>
-      {(app) => <Settings entity={entity} settings={app.settings} />}
+    <TestRoot url="/org/0/settings">
+      {(app) => (
+        <Route
+          path="/org/0/settings"
+          element={<Settings settings={app.settings} />}
+        />
+      )}
     </TestRoot>
   )
 }

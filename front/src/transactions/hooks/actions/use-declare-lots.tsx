@@ -1,4 +1,4 @@
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { prompt } from "common/components/dialog"
 import { DeclarationSummaryPrompt } from "../../components/declaration-summary"
 
@@ -6,7 +6,7 @@ export interface LotDeclarator {
   confirmDeclaration: () => Promise<any>
 }
 
-export default function useDeclareLots(entity: EntitySelection): LotDeclarator {
+export default function useDeclareLots(entity: Entity): LotDeclarator {
   async function confirmDeclaration() {
     if (!entity) return
 

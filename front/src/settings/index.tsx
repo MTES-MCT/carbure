@@ -1,6 +1,5 @@
 import { Trans } from "react-i18next"
-import { EntitySelection } from "carbure/hooks/use-entity"
-import { SettingsGetter } from "./hooks/use-get-settings"
+import { EntityManager } from "carbure/hooks/entity"
 
 import use2BSCertificates from "./hooks/use-2bs-certificates"
 import useCompany from "./hooks/use-company"
@@ -23,36 +22,13 @@ import CompanySettings from "./components/company"
 import Sticky from "common/components/sticky"
 import useREDCertCertificates from "./hooks/use-redcert-certificates"
 import UserRights from "./components/user-rights"
-import { useRights } from "carbure/hooks/use-rights"
-import { EntityType, UserRole } from "common/types"
+import { UserRole } from "common/types"
 import DoubleCountingSettings from "./components/double-counting"
+import useEntity from "carbure/hooks/entity"
 
-function useSettings(entity: EntitySelection, settings: SettingsGetter) {
-  const company = useCompany(entity, settings)
-  const productionSites = useProductionSites(entity)
-  const deliverySites = useDeliverySites(entity)
-  const dbsCertificates = use2BSCertificates(entity, productionSites, company)
-  const isccCertificates = useISCCCertificates(entity, productionSites, company)
-  const redcertCertificates = useREDCertCertificates(entity, productionSites, company) // prettier-ignore
-  const nationalSystemCertificates = useNationalSystemCertificates(entity, productionSites, company) // prettier-ignore
+const Settings = () => {
+  const entity = useEntity()
 
-  return {
-    productionSites,
-    deliverySites,
-    dbsCertificates,
-    isccCertificates,
-    redcertCertificates,
-    nationalSystemCertificates,
-    company,
-  }
-}
-
-type SettingsProps = {
-  entity: EntitySelection
-  settings: SettingsGetter
-}
-
-const Settings = ({ entity, settings }: SettingsProps) => {
   const {
     company,
     productionSites,
@@ -61,13 +37,9 @@ const Settings = ({ entity, settings }: SettingsProps) => {
     isccCertificates,
     redcertCertificates,
     nationalSystemCertificates,
-  } = useSettings(entity, settings)
+  } = useSettings(entity)
 
-  const rights = useRights()
-
-  const isProducer = entity?.entity_type === EntityType.Producer
-  const isTrader = entity?.entity_type === EntityType.Trader
-  const isOperator = entity?.entity_type === EntityType.Operator
+  const { isProducer, isTrader, isOperator } = entity
 
   const hasCertificates = isProducer || isTrader
   const hasCSN = isProducer || isOperator
@@ -121,7 +93,7 @@ const Settings = ({ entity, settings }: SettingsProps) => {
             <Trans>Système National</Trans>
           </a>
         )}
-        {rights.is(UserRole.Admin) && (
+        {entity.hasRights(UserRole.Admin) && (
           <a href="#users">
             <Trans>Utilisateurs</Trans>
           </a>
@@ -154,11 +126,30 @@ const Settings = ({ entity, settings }: SettingsProps) => {
           <SNCertificateSettings settings={nationalSystemCertificates} />
         )}
 
-        {rights.is(UserRole.Admin) && (
-          <UserRights entity={entity} settings={settings} />
-        )}
+        {entity.hasRights(UserRole.Admin) && <UserRights entity={entity} />}
       </SettingsBody>
     </Main>
   )
 }
+
+function useSettings(entity: EntityManager) {
+  const company = useCompany(entity)
+  const productionSites = useProductionSites(entity)
+  const deliverySites = useDeliverySites(entity)
+  const dbsCertificates = use2BSCertificates(entity, productionSites, company)
+  const isccCertificates = useISCCCertificates(entity, productionSites, company)
+  const redcertCertificates = useREDCertCertificates(entity, productionSites, company) // prettier-ignore
+  const nationalSystemCertificates = useNationalSystemCertificates(entity, productionSites, company) // prettier-ignore
+
+  return {
+    productionSites,
+    deliverySites,
+    dbsCertificates,
+    isccCertificates,
+    redcertCertificates,
+    nationalSystemCertificates,
+    company,
+  }
+}
+
 export default Settings

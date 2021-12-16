@@ -1,23 +1,19 @@
 import { Fragment, useState, useEffect } from "react"
+import { Route, Routes, Navigate } from "react-router-dom"
 import { Trans } from "react-i18next"
+import useEntity from "carbure/hooks/entity"
 import useAPI from "common/hooks/use-api"
-import { Route, Switch, Redirect } from "common/components/relative-route"
 import { Header, Main, Title, Box } from "common/components"
 import { TabButton } from "common/components/button"
 import { Select } from "common/components/select"
-import { EntitySelection } from "carbure/hooks/use-entity"
 import AgreementList from "./components/agreement-list"
 import QuotasList from "./components/dc-quotas"
-
 import * as api from "./api"
-
 import styles from "./index.module.css"
 
-type DoubleCountingProps = {
-  entity: EntitySelection
-}
+const DoubleCounting = () => {
+  const entity = useEntity()
 
-const DoubleCounting = ({ entity }: DoubleCountingProps) => {
   const [year, setYear] = useState(new Date().getFullYear())
   const [snapshot, getSnapshot] = useAPI(api.getDoubleCountingSnapshot)
 
@@ -54,27 +50,22 @@ const DoubleCounting = ({ entity }: DoubleCountingProps) => {
         </Box>
 
         <Box row className={styles.doublecountTabs}>
-          <TabButton relative to="./agreements">
+          <TabButton to="agreements">
             <Trans>Dossiers</Trans>
           </TabButton>
-          <TabButton relative to="./quotas">
+          <TabButton to="quotas">
             <Trans>Quotas</Trans>
           </TabButton>
         </Box>
       </Header>
 
+      {/* prettier-ignore */}
       <Main className={styles.doublecountMain}>
-        <Switch>
-          <Route relative path="agreements">
-            <AgreementList entity={entity} year={year} />
-          </Route>
-
-          <Route relative path="quotas">
-            <QuotasList year={year} />
-          </Route>
-
-          <Redirect relative to="agreements" />
-        </Switch>
+        <Routes>
+          <Route path="agreements" element={<AgreementList entity={entity} year={year} />} />
+          <Route path="quotas" element={<QuotasList year={year} />} />
+          <Route path="*" element={<Navigate to="agreements" />} />
+        </Routes>
       </Main>
     </Fragment>
   )

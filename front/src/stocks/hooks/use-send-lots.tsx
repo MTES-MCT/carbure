@@ -1,4 +1,4 @@
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 
 import * as api from "stocks/api"
 
@@ -38,7 +38,7 @@ export interface LotSender {
 }
 
 export default function useSendLot(
-  entity: EntitySelection,
+  entity: Entity,
   selection: TransactionSelection,
   query: TransactionQuery,
   refresh: () => void

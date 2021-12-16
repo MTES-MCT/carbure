@@ -1,47 +1,22 @@
-import { findEntities } from "common/api"
-import { LoaderOverlay, Title } from "common/components"
-import { Alert } from "common/components/alert"
-import { AlertCircle } from "common/components/icons"
-import { LabelInput } from "common/components/input"
-import Table, { Column } from "common/components/table"
-import useAPI from "common/hooks/use-api"
-import { Entity, EntityType } from "common/types"
-import { Fragment, useEffect, useState } from "react"
-import { SettingsBody, SettingsHeader } from "settings/components/common"
-import { padding } from "transactions/components/list-columns"
-import useSortingSelection, {
-  SortingSelection,
-} from "transactions/hooks/query/use-sort-by"
+import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
-
-function sortEntities(entities: Entity[], sorter: SortingSelection) {
-  const column = (sorter.column || "name") as "name" | "entity_type"
-
-  entities.sort((a, b) => {
-    const columnA = a[column].toLowerCase()
-    const columnB = b[column].toLowerCase()
-
-    if (sorter.order === "asc") {
-      return columnA < columnB ? -1 : 1
-    } else {
-      return columnA > columnB ? -1 : 1
-    }
-  })
-}
+import { EntityType } from "carbure/types"
+import { useQuery } from "common-v2/hooks/async"
+import { findEntities } from "common-v2/api"
+import { Main } from "common-v2/components/scaffold"
+import { SearchInput } from "common-v2/components/input"
+import { Alert } from "common-v2/components/alert"
+import { AlertCircle } from "common-v2/components/icons"
+import Table from "common-v2/components/table"
 
 const Registry = () => {
-  const sorter = useSortingSelection()
   const { t } = useTranslation()
-  const [query, setQuery] = useState("")
-  const [entities, getEntities] = useAPI(findEntities)
+  const [query, setQuery] = useState<string | undefined>("")
 
-  useEffect(() => {
-    getEntities(query)
-  }, [getEntities, query])
-
-  if (entities.data) {
-    sortEntities(entities.data, sorter)
-  }
+  const entities = useQuery(findEntities, {
+    key: "entities",
+    params: [query],
+  })
 
   const entityTypes = {
     [EntityType.Administration]: t("Administration"),
@@ -52,58 +27,58 @@ const Registry = () => {
     [EntityType.ExternalAdmin]: t("Administration Externe"),
   }
 
-  const columns: Column<Entity>[] = [
-    padding,
-    {
-      header: t("Société"),
-      sortBy: "name",
-      render: (e) => e.name,
-    },
-    {
-      header: t("Activité"),
-      sortBy: "entity_type",
-      render: (e) => entityTypes[e.entity_type],
-    },
-    padding,
-  ]
-
-  const isEmpty = !Boolean(entities.data?.length)
-  const rows = (entities.data ?? []).map((e) => ({ value: e }))
+  const entitiesData = entities.result ?? []
+  const isEmpty = entitiesData.length === 0
 
   return (
-    <Fragment>
-      <SettingsHeader>
-        <Title>
+    <Main>
+      <header>
+        <h1>
           <Trans>Annuaire des sociétés enregistrées sur CarbuRe</Trans>
-        </Title>
-      </SettingsHeader>
+        </h1>
+      </header>
 
-      <SettingsBody>
-        <LabelInput
+      <section>
+        <SearchInput
+          clear
+          debounce={250}
           label={t("Rechercher une société")}
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={setQuery}
         />
 
         {isEmpty && (
-          <Alert icon={AlertCircle} level="warning">
+          <Alert
+            loading={entities.loading}
+            icon={AlertCircle}
+            variant="warning"
+          >
             <Trans>Aucune société trouvée pour cette recherche</Trans>
           </Alert>
         )}
 
         {!isEmpty && (
           <Table
-            rows={rows}
-            columns={columns}
-            sortBy={sorter.column}
-            order={sorter.order}
-            onSort={sorter.sortBy}
+            loading={entities.loading}
+            rows={entitiesData}
+            columns={[
+              {
+                key: "name",
+                header: t("Société"),
+                cell: (e) => e.name,
+                orderBy: (e) => e.name,
+              },
+              {
+                key: "entity_type",
+                header: t("Activité"),
+                cell: (e) => entityTypes[e.entity_type],
+                orderBy: (e) => entityTypes[e.entity_type],
+              },
+            ]}
           />
         )}
-      </SettingsBody>
-
-      {entities.loading && <LoaderOverlay />}
-    </Fragment>
+      </section>
+    </Main>
   )
 }
 

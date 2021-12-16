@@ -1,12 +1,12 @@
 import { useTranslation } from "react-i18next"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { FormGroup } from "common/components/form"
 import { EntityType } from "common/types"
 import { TransactionFormState } from "transactions/hooks/use-transaction-form"
 import * as Fields from "./fields"
 import { FieldsProps, isKnown } from "./fields"
 
-function showMAC(data: TransactionFormState, entity?: EntitySelection) {
+function showMAC(data: TransactionFormState, entity?: Entity) {
   return (data.status === "Draft" && entity?.has_mac) || data.mac
 }
 

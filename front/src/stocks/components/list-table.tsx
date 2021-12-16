@@ -1,17 +1,16 @@
 import { useTranslation } from "react-i18next"
+import { useNavigate } from "react-router-dom"
 
 import { Lots, LotStatus, Transaction, UserRole } from "common/types"
 import { SortingSelection } from "transactions/hooks/query/use-sort-by" // prettier-ignore
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { StatusSelection } from "transactions/hooks/query/use-status"
 
-import { useRelativePush } from "common/components/relative-route"
-
 import Table, { Actions, arrow, Row } from "common/components/table"
 import * as C from "transactions/components/list-columns"
 import { Edit } from "common/components/icons"
 import { LotSender } from "stocks/hooks/use-send-lots"
-import { useRights } from "carbure/hooks/use-rights"
+import { useRights } from "carbure/hooks/entity"
 
 type StockTableProps = {
   stock: Lots | null
@@ -29,8 +28,8 @@ export const StockTable = ({
   sender,
 }: StockTableProps) => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const rights = useRights()
-  const relativePush = useRelativePush()
   const createDrafts = sender.createDrafts
 
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
@@ -96,7 +95,7 @@ export const StockTable = ({
 
   const rows: Row<Transaction>[] = stock.lots.map((tx) => ({
     value: tx,
-    onClick: () => relativePush(`${tx.id}`),
+    onClick: () => navigate(`${tx.id}`),
   }))
 
   return (

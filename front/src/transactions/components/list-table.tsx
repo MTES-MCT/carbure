@@ -1,5 +1,6 @@
 import cl from "clsx"
 import { TFunction, useTranslation } from "react-i18next"
+import { useNavigate } from "react-router-dom"
 
 import {
   Entity,
@@ -14,7 +15,6 @@ import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { StatusSelection } from "transactions/hooks/query/use-status"
 
 import { hasDeadline, hasErrors, hasWarnings } from "../helpers"
-import { useRelativePush } from "common/components/relative-route"
 
 import {
   AlertTriangle,
@@ -25,14 +25,14 @@ import {
   EyeOff,
   Pin,
   PinOff,
-  ChevronRight
+  ChevronRight,
 } from "common/components/icons"
 import Table, { Actions, arrow, Column, Row } from "common/components/table"
 import * as C from "./list-columns"
 
 import styles from "./list-table.module.css"
 import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
-import { useRights } from "carbure/hooks/use-rights"
+import { useRights } from "carbure/hooks/entity"
 
 type TxActions = Record<string, (tx: Transaction) => void> & {
   t: TFunction<"translation">
@@ -51,19 +51,24 @@ const getDraftActions = ({
     { icon: Cross, title: t("Supprimer le lot"), action: onDelete },
   ])
 
-const getToFixActions = ({ onCorrect, onDelete, t }: TxActions, entity: Entity): TxColumn => 
+const getToFixActions = (
+  { onCorrect, onDelete, t }: TxActions,
+  entity: Entity
+): TxColumn =>
   Actions((tx) => {
     // no actions if the entity does not own the tx
-    if (tx.carbure_vendor?.id !== entity.id && tx.lot.added_by?.id !== entity.id) {
-      return [{ icon: ChevronRight, title: '', action: () => {} }]
+    if (
+      tx.carbure_vendor?.id !== entity.id &&
+      tx.lot.added_by?.id !== entity.id
+    ) {
+      return [{ icon: ChevronRight, title: "", action: () => {} }]
     }
-    
+
     return [
       { icon: Check, title: t("Renvoyer le lot"), action: onCorrect },
       { icon: Cross, title: t("Supprimer le lot"), action: onDelete },
     ]
-})
-
+  })
 
 const getInboxActions = ({
   onAccept,
@@ -161,7 +166,7 @@ export const TransactionTable = ({
   const { t } = useTranslation()
 
   const rights = useRights()
-  const relativePush = useRelativePush()
+  const navigate = useNavigate()
   const deadline = transactions.deadlines.date
 
   const isProducer = entity.entity_type === EntityType.Producer
@@ -242,7 +247,7 @@ export const TransactionTable = ({
 
   const rows: Row<Transaction>[] = transactions.lots.map((tx) => ({
     value: tx,
-    onClick: () => relativePush(`${tx.id}`),
+    onClick: () => navigate(`${tx.id}`),
     className: cl({
       [styles.transactionRowError]: hasErrors(tx, transactions.errors),
       [styles.transactionRowWarning]: hasWarnings(tx, transactions.errors),

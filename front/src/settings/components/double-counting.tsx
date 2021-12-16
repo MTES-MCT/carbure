@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import styles from "./settings.module.css"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { CompanySettingsHook as DoubleContingSettingsHook } from "../hooks/use-company"
 import { ProductionSite, UserRole } from "common/types"
 import {
@@ -13,7 +13,7 @@ import {
 } from "doublecount/types"
 import { Title, LoaderOverlay, Box } from "common/components"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
-import { useRights } from "carbure/hooks/use-rights"
+import { useRights } from "carbure/hooks/entity"
 import Table, {
   Line,
   TwoLines,
@@ -63,7 +63,7 @@ import { SourcingAggregationTable } from "doublecount/components/dc-tables"
 import { prettyVolume } from "transactions/helpers"
 
 type DoubleCountingUploadPromptProps = PromptProps<void> & {
-  entity: EntitySelection
+  entity: Entity
 }
 
 const DoubleCountingUploadPrompt = ({
@@ -203,7 +203,7 @@ type DoubleCountingSourcingPromptProps = PromptProps<true | void> & {
   add?: boolean
   dcaID: number
   sourcing?: DoubleCountingSourcing
-  entity: EntitySelection
+  entity: Entity
 }
 
 const DoubleCountingSourcingPrompt = ({
@@ -354,7 +354,7 @@ type DoubleCountingProductionPromptProps = PromptProps<true | void> & {
   add?: boolean
   dcaID: number
   production?: DoubleCountingProduction
-  entity: EntitySelection
+  entity: Entity
 }
 
 const DoubleCountingProductionPrompt = ({
@@ -505,7 +505,7 @@ const DoubleCountingProductionPrompt = ({
 }
 
 type QuotasTableProps = {
-  entity: EntitySelection
+  entity: Entity
   agreement: DoubleCounting | null
 }
 
@@ -567,7 +567,7 @@ const QuotasTable = ({ entity, agreement }: QuotasTableProps) => {
 }
 
 type DoubleCountingPromptProps = PromptProps<any> & {
-  entity: EntitySelection
+  entity: Entity
   agreementID: number
 }
 
@@ -584,11 +584,13 @@ const DoubleCountingPrompt = ({
   const [, deleteSourcing] = useAPI(api.deleteDoubleCountingSourcing)
   const [, deleteProduction] = useAPI(api.deleteDoubleCountingProduction)
 
+  const entityID = entity?.id
+
   useEffect(() => {
-    if (entity) {
-      getAgreement(entity.id, agreementID)
+    if (entityID !== undefined) {
+      getAgreement(entityID, agreementID)
     }
-  }, [entity, agreementID, getAgreement])
+  }, [entityID, agreementID, getAgreement])
 
   const dcaID = agreement.data?.id ?? -1
   const dcaStatus = agreement.data?.status ?? DCStatus.Pending
@@ -939,7 +941,7 @@ const DoubleCountingPrompt = ({
 }
 
 type DoubleCountingSettingsProps = {
-  entity: EntitySelection
+  entity: Entity
   settings: DoubleContingSettingsHook
 }
 
@@ -952,11 +954,13 @@ const DoubleCountingSettings = ({
 
   const [agreements, getAgreements] = useAPI(api.getDoubleCountingAgreements)
 
+  const entityID = entity?.id
+
   useEffect(() => {
-    if (entity) {
-      getAgreements(entity.id)
+    if (entityID !== undefined) {
+      getAgreements(entityID)
     }
-  }, [entity, getAgreements])
+  }, [entityID, getAgreements])
 
   const isEmpty = !agreements.data || agreements.data.length === 0
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)

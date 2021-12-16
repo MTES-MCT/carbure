@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 
 import { LotStatus } from "common/types"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 
 import useTransactionForm, {
   toTransactionFormState,
@@ -17,12 +17,9 @@ import { useNotificationContext } from "common/components/notifications"
 import { useFieldErrors } from "transactions/hooks/use-transaction-details"
 import { getStockStatus } from "../api"
 
-export default function useStockDetails(
-  entity: EntitySelection,
-  refresh: () => void
-) {
+export default function useStockDetails(entity: Entity, refresh: () => void) {
   const { t } = useTranslation()
-  const params: { id: string } = useParams()
+  const params = useParams<"id">()
   const notifications = useNotificationContext()
 
   const close = useClose("../")
@@ -33,7 +30,7 @@ export default function useStockDetails(
   const fieldErrors = useFieldErrors(details.data?.errors ?? [])
 
   const entityID = entity?.id
-  const txID = parseInt(params.id, 10)
+  const txID = parseInt(params.id ?? "", 10)
   const tx = details.data?.transaction
 
   const validationErrors = details.data?.errors ?? []

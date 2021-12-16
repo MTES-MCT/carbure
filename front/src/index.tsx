@@ -10,14 +10,17 @@ import Carbure from "./carbure"
 import NotificationsProvider from "common/components/notifications"
 import { MatomoProvider } from "./matomo"
 import { LoaderOverlay } from "common/components"
+import { PortalProvider } from "common-v2/components/portal"
 
 ReactDOM.render(
   <React.StrictMode>
-    <BrowserRouter basename="/v2">
+    <BrowserRouter basename="/app">
       <MatomoProvider>
         <Suspense fallback={<LoaderOverlay />}>
           <NotificationsProvider>
-            <Carbure />
+            <PortalProvider>
+              <Carbure />
+            </PortalProvider>
           </NotificationsProvider>
         </Suspense>
       </MatomoProvider>

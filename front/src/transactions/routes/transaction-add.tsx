@@ -1,6 +1,6 @@
 import { Trans } from "react-i18next"
 
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 
 import styles from "../components/form.module.css"
 
@@ -13,7 +13,7 @@ import TransactionForm from "../components/form"
 import { useMatomo } from "matomo"
 
 type TransactionAddProps = {
-  entity: EntitySelection
+  entity: Entity
   refresh: () => void
 }
 

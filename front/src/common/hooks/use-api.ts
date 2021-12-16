@@ -74,7 +74,7 @@ function useAPI<T extends any[], U>(
         } catch (err) {
           // otherwise save the error
           if (!cancelled) {
-            dispatch({ type: ApiStatus.Error, payload: err.message })
+            dispatch({ type: ApiStatus.Error, payload: (err as Error).message })
           }
         }
       }

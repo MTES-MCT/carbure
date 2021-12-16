@@ -13,10 +13,9 @@ import {
   DialogTitle,
   DialogText,
   confirm,
-  prompt,
   PromptProps,
 } from "common/components/dialog"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import styles from "settings/components/settings.module.css"
 import {
   Return,
@@ -41,7 +40,7 @@ import { FileInput } from "common/components/input"
 
 export type DoubleCountingPromptProps = PromptProps<any> & {
   agreementID: number
-  entity: EntitySelection
+  entity: Entity
 }
 
 export const DoubleCountingPrompt = ({

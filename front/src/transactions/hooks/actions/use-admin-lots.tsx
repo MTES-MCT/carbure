@@ -5,7 +5,7 @@ import useAPI from "../../../common/hooks/use-api"
 
 import { useNotificationContext } from "../../../common/components/notifications"
 import { Transaction } from "common/types"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { useTranslation } from "react-i18next"
 import { confirm, prompt } from "common/components/dialog"
 import { PinPrompt, PinConfig } from "transactions/components/pin"
@@ -23,7 +23,7 @@ export interface LotAdministrator {
 }
 
 export default function useAdministrateLots(
-  entity: EntitySelection,
+  entity: Entity,
   selection: TransactionSelection,
   refresh: () => void
 ): LotAdministrator {

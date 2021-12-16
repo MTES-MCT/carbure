@@ -10,7 +10,7 @@ import {
 import Table, { Column, Line, Row } from "common/components/table"
 import { Input } from "common/components/input"
 import { padding } from "transactions/components/list-columns"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { formatDate } from "settings/components/common"
 import YearTable from "./year-table"
 import { prettyVolume } from "transactions/helpers"
@@ -101,7 +101,7 @@ export const SourcingAggregationTable = ({
 
 type ProductionTableProps = {
   done?: boolean
-  entity: EntitySelection
+  entity: Entity
   quotas: Record<string, string>
   production: DoubleCountingProduction[]
   setQuotas: (quotas: Record<string, string>) => void

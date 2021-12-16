@@ -10,6 +10,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from core.models import Entity, GenericError, LotTransaction, UserRights, LotV2, Pays, MatierePremiere, Biocarburant, Depot, EntityDepot
+from core.serializers import EntityDepotSerializer
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
 from core.decorators import check_rights, otp_or_403
 
@@ -26,13 +27,18 @@ from api.v3.sanity_checks import bulk_sanity_checks
 @otp_or_403
 def get_settings(request):
     # user-rights
-    rights = UserRights.objects.filter(user=request.user)
-    # rights_sez = [{'entity': r.entity.natural_key(), 'rights': 'rw'} for r in rights]
+    rights = UserRights.objects.filter(user=request.user).select_related('user', 'entity')
+    request.session['rights'] = {ur.entity.id: ur.role for ur in rights}
     rights_sez = [r.natural_key() for r in rights]
     # requests
-    requests = UserRightsRequests.objects.filter(user=request.user)
+    requests = UserRightsRequests.objects.filter(user=request.user).select_related('user', 'entity')
     requests_sez = [r.natural_key() for r in requests]
-    # requests_sez = [{'entity': r.entity.natural_key(), 'date': r.date_requested, 'status': r.status} for r in requests]
+
+    # depots = {}
+    # for ur in rights:
+    #     d = EntityDepot.objects.filter(entity=ur.entity).select_related('depot', 'depot__country', 'entity', 'blender')
+    #     serializer = EntityDepotSerializer(d, many=True)
+    #     depots[ur.entity.id] = serializer.data
     return JsonResponse({'status': 'success', 'data': {'rights': rights_sez, 'email': request.user.email, 'requests': requests_sez}})
 
 
@@ -363,13 +369,10 @@ def add_delivery_site(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Could not find delivery site",
                             }, status=400)
 
-    if entity.entity_type != 'Opérateur' and ds.depot_type == 'EFS':
-        return JsonResponse({'status': 'error', 'message': "Only operators can register an EFS site"}, status=400)
-
     blender = None
     if blending_is_outsourced:
         try:
-            blender = Entity.objects.get(id=blending_entity_id, entity_type='Opérateur')
+            blender = Entity.objects.get(id=blending_entity_id, entity_type=Entity.OPERATOR)
         except:
             return JsonResponse({'status': 'error', 'message': "Could not find outsourcing blender"}, status=400)
 
@@ -378,7 +381,6 @@ def add_delivery_site(request, *args, **kwargs):
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not link entity to delivery site",
                             }, status=400)
-
     return JsonResponse({'status': 'success'})
 
 

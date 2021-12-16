@@ -4,7 +4,7 @@ import { Lots, TransactionQuery } from "common/types"
 import * as api from "../api"
 import useAPI from "common/hooks/use-api"
 import { getStocks, getStockSnapshot } from "../api"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 
 export interface StockHook {
   loading: boolean
@@ -14,7 +14,7 @@ export interface StockHook {
   exportAllTransactions: () => void
 }
 
-export function useGetStockSnapshot(entity: EntitySelection) {
+export function useGetStockSnapshot(entity: Entity) {
   const { t } = useTranslation()
   const [snapshot, resolveStockSnapshot] = useAPI(getStockSnapshot)
 

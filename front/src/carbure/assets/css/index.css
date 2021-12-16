@@ -1,5 +1,7 @@
+@import "./reset.css";
 @import "./fonts.css";
 @import "./theme.css";
+@import "./theme-v2.css";
 
 * {
   box-sizing: border-box;

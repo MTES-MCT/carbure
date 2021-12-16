@@ -1,6 +1,6 @@
-import React from "react"
+import { Route, Routes, Navigate } from "react-router-dom"
 
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { EntityType, Filters } from "common/types"
 
 import { usePageSelection } from "common/components/pagination"
@@ -22,7 +22,6 @@ import { useGetStocks, useGetStockSnapshot } from "./hooks/use-stock-list"
 
 import { Main } from "common/components"
 
-import { Redirect, Route, Switch } from "common/components/relative-route"
 import { StocksSnapshot } from "./components/list-snapshot"
 import { StockList } from "./components/list"
 import TransactionFilters from "transactions/components/list-filters"
@@ -43,7 +42,7 @@ const FILTERS = [
   Filters.ShowEmpty,
 ]
 
-function useStocks(entity: EntitySelection) {
+function useStocks(entity: Entity) {
   const pagination = usePageSelection()
   const sorting = useSortingSelection(pagination)
   const status = useStockStatusSelection(pagination)
@@ -110,7 +109,7 @@ function useStocks(entity: EntitySelection) {
   }
 }
 
-export const Stocks = ({ entity }: { entity: EntitySelection }) => {
+export const Stocks = ({ entity }: { entity: Entity }) => {
   const {
     filters,
     pagination,
@@ -140,7 +139,7 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
     entity.entity_type === EntityType.Trader || entity.has_trading
 
   if (!hasTrading) {
-    return <Redirect to={`/org/${entity.id}`} />
+    return <Navigate to={`/org/${entity.id}`} />
   }
 
   return (
@@ -176,24 +175,28 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
         entity={entity}
       />
 
-      <Switch>
-        <Route relative path="send-complex">
-          <StockSendComplex entity={entity} />
-        </Route>
+      <Routes>
+        <Route
+          path="send-complex"
+          element={<StockSendComplex entity={entity} />}
+        />
 
-        <Route relative path=":id">
-          <StockDetails
-            entity={entity}
-            deleter={deleter}
-            validator={validator}
-            acceptor={acceptor}
-            rejector={rejector}
-            sender={sender}
-            refresh={refresh}
-            transactions={summary.data?.tx_ids ?? []}
-          />
-        </Route>
-      </Switch>
+        <Route
+          path=":id"
+          element={
+            <StockDetails
+              entity={entity}
+              deleter={deleter}
+              validator={validator}
+              acceptor={acceptor}
+              rejector={rejector}
+              sender={sender}
+              refresh={refresh}
+              transactions={summary.data?.tx_ids ?? []}
+            />
+          }
+        />
+      </Routes>
     </Main>
   )
 }

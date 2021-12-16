@@ -1,7 +1,7 @@
 import { render, TestRoot } from "setupTests"
 import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { Route } from "common/components/relative-route"
+import { Route, Routes } from "react-router-dom"
 import { Entity } from "common/types"
 
 import { operator, producer, trader } from "common/__test__/data"
@@ -25,9 +25,7 @@ const TransactionAddWithRouter = ({
   refresh?: () => void
 }) => (
   <TestRoot url={"/org/0/transactions/draft/add"}>
-    <Route path="/org/0/transactions/draft/add">
-      <TransactionAdd entity={entity} refresh={refresh} />
-    </Route>
+    <Route path="/org/:entity/transactions/draft/add" element={<TransactionAdd entity={entity} refresh={refresh} />} />
     {children}
   </TestRoot>
 )
@@ -150,9 +148,7 @@ test("check the form fields are working", async () => {
 
   render(
     <TransactionAddWithRouter entity={producer} refresh={refresh}>
-      <Route path="/org/0/transactions/draft/0">
-        <span>LOT CREATED</span>
-      </Route>
+      <Route path="0" element={<span>LOT CREATED</span>} />
     </TransactionAddWithRouter>
   )
 

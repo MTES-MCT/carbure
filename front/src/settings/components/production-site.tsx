@@ -11,7 +11,7 @@ import {
 } from "common/types"
 
 import { ProductionSiteSettingsHook } from "../hooks/use-production-sites"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 
 import styles from "./settings.module.css"
 
@@ -46,7 +46,7 @@ import RadioGroup from "common/components/radio-group"
 import { formatDate, SettingsForm } from "./common"
 import { padding } from "transactions/components/list-columns"
 import { findCertificates } from "../api"
-import { useRights } from "carbure/hooks/use-rights"
+import { useRights } from "carbure/hooks/entity"
 
 export type ProductionSiteState = {
   // site
@@ -80,7 +80,7 @@ export type ProductionSiteState = {
 type ProductionSitePromptProps = PromptProps<ProductionSiteState> & {
   title: string
   description?: string
-  entity: EntitySelection
+  entity: Entity | null
   productionSite?: ProductionSiteDetails
   readOnly?: boolean
 }
