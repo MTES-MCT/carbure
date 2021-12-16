@@ -1006,7 +1006,7 @@ def delete_lot(sender, instance, using, **kwargs):
             event.lot = instance.parent_lot
             event.user = None
             event.metadata = {'message': 'child lot deleted. back to inbox.'}
-            event.save()
+            #event.save()
 
 class CarbureStock(models.Model):
     parent_lot = models.ForeignKey(CarbureLot, null=True, blank=True, on_delete=models.CASCADE)
