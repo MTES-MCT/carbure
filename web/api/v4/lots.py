@@ -186,6 +186,8 @@ def fill_supplier_info(lot, data, entity):
         lot.unknown_supplier = data.get('unknown_supplier', None)
     lot.supplier_certificate = data.get('supplier_certificate', None)
     lot.supplier_certificate_type = data.get('supplier_certificate_type', None)
+    if lot.supplier_certificate is None:
+        lot.supplier_certificate = entity.default_certificate
     return errors
 
 def fill_ghg_info(lot, data):
@@ -242,11 +244,9 @@ def fill_delivery_data(lot, data, entity, prefetched_data):
         lot.delivery_type = data.get('delivery_type', None)
     dest = data.get('carbure_delivery_site_depot_id', None)
     if dest in prefetched_data['depots']:
-        print('%s is known' % (dest))
         lot.carbure_delivery_site = prefetched_data['depots'][dest]
         lot.delivery_site_country = lot.carbure_delivery_site.country
     else:
-        print('%s is unknown' % (dest))
         lot.carbure_delivery_site = None
         errors.append(GenericError(lot=lot, field='carbure_delivery_site_depot_id', error=UNKNOWN_DELIVERY_SITE, display_to_creator=True, is_blocking=True))
 
