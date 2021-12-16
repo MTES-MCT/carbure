@@ -995,15 +995,15 @@ def delete_lot(sender, instance, using, **kwargs):
         event.metadata = {'message': 'child lot deleted. recredit volume.', 'volume_to_credit': instance.volume}
         event.save()
     # if there is a parent_lot tagged as processing or trading, restore them to their "inbox" status
-    if instance.parent_tx:
-        if instance.parent_tx.delivery_type in [CarbureLot.PROCESSING, CarbureLot.TRADING]:
-            instance.parent_tx.lot_status = CarbureLot.PENDING
-            instance.parent_tx.delivery_type = CarbureLot.OTHER
-            instance.parent_tx.save()
+    if instance.parent_lot:
+        if instance.parent_lot.delivery_type in [CarbureLot.PROCESSING, CarbureLot.TRADING]:
+            instance.parent_lot.lot_status = CarbureLot.PENDING
+            instance.parent_lot.delivery_type = CarbureLot.OTHER
+            instance.parent_lot.save()
             # save event
             event = CarbureLotEvent()
             event.event_type = CarbureLotEvent.RECALLED
-            event.lot = instance.parent_tx
+            event.lot = instance.parent_lot
             event.user = None
             event.metadata = {'message': 'child lot deleted. back to inbox.'}
             event.save()
