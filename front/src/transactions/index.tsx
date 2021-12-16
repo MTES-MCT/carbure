@@ -1,4 +1,6 @@
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Route, Routes, Navigate } from "react-router-dom"
+
+import { Entity } from "carbure/types"
 import { EntityType, Filters, LotStatus, UserRole } from "common/types"
 
 import { usePageSelection } from "common/components/pagination"
@@ -21,7 +23,6 @@ import { useGetLots, useGetSnapshot } from "./hooks/use-transaction-list"
 import { useSummary } from "./components/summary"
 
 import { Main } from "common/components"
-import { Redirect, Route, Switch } from "common/components/relative-route"
 import { TransactionSnapshot } from "./components/list-snapshot"
 import { TransactionList } from "./components/list"
 import TransactionFilters from "./components/list-filters"
@@ -30,7 +31,7 @@ import TransactionAdd from "./routes/transaction-add"
 import TransactionDetails from "./routes/transaction-details"
 import useForwardLots from "./hooks/actions/use-forward-lots"
 import useTransactionQuery from "./hooks/query/use-transaction-query"
-import { useRights } from "carbure/hooks/use-rights"
+import { useRights } from "carbure/hooks/entity"
 import useAdministrateLots from "./hooks/actions/use-admin-lots"
 
 const OPERATOR_STATUSES = [
@@ -92,7 +93,7 @@ const ADMIN_FILTERS = [
   Filters.ClientTypes,
 ]
 
-export function useTransactions(entity: EntitySelection) {
+export function useTransactions(entity: Entity) {
   const pagination = usePageSelection()
 
   const special = useSpecialSelection(pagination)
@@ -167,7 +168,7 @@ export function useTransactions(entity: EntitySelection) {
   }
 }
 
-export const Transactions = ({ entity }: { entity: EntitySelection }) => {
+export const Transactions = ({ entity }: { entity: Entity }) => {
   const {
     status,
     filters,
@@ -207,18 +208,18 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
   const isAuditor = entity.entity_type === EntityType.Auditor
 
   if ((isAdmin || isAuditor) && !ADMIN_STATUSES.includes(status.active)) {
-    return <Redirect relative to=".." />
+    return <Navigate to=".." />
   }
 
   if (isOperator && !OPERATOR_STATUSES.includes(status.active)) {
-    return <Redirect relative to=".." />
+    return <Navigate to=".." />
   }
 
   if (
     (isProducer || isTrader) &&
     !PRODUCER_TRADER_STATUSES.includes(status.active)
   ) {
-    return <Redirect relative to=".." />
+    return <Navigate to=".." />
   }
 
   const canDeclare =
@@ -278,25 +279,29 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
         administrator={administrator}
       />
 
-      <Switch>
-        <Route relative path="add">
-          <TransactionAdd entity={entity} refresh={refresh} />
-        </Route>
+      <Routes>
+        <Route
+          path="add"
+          element={<TransactionAdd entity={entity} refresh={refresh} />}
+        />
 
-        <Route relative path=":id">
-          <TransactionDetails
-            entity={entity}
-            refresh={refresh}
-            deleter={deleter}
-            validator={validator}
-            acceptor={acceptor}
-            rejector={rejector}
-            administrator={administrator}
-            auditor={auditor}
-            transactions={summary.data?.tx_ids ?? []}
-          />
-        </Route>
-      </Switch>
+        <Route
+          path=":id"
+          element={
+            <TransactionDetails
+              entity={entity}
+              refresh={refresh}
+              deleter={deleter}
+              validator={validator}
+              acceptor={acceptor}
+              rejector={rejector}
+              administrator={administrator}
+              auditor={auditor}
+              transactions={summary.data?.tx_ids ?? []}
+            />
+          }
+        />
+      </Routes>
     </Main>
   )
 }

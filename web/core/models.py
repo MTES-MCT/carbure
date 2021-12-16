@@ -4,6 +4,8 @@ from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 import hashlib
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 
 usermodel = get_user_model()
 
@@ -152,6 +154,7 @@ class Biocarburant(models.Model):
 
     compatible_essence = models.BooleanField(default=False)
     compatible_diesel = models.BooleanField(default=False)
+    dgddi_category = models.CharField(max_length=8, blank=True, null=True, default=None)
 
     def __str__(self):
         return self.name
@@ -191,6 +194,7 @@ class MatierePremiere(models.Model):
     is_huile_vegetale = models.BooleanField(default=False)
     is_displayed = models.BooleanField(default=True)
     category = models.CharField(max_length=32, choices=MP_CATEGORIES, default='CONV')
+    dgddi_category = models.CharField(max_length=32, blank=True, null=True, default=None)
 
     def __str__(self):
         return self.name
@@ -241,6 +245,7 @@ class Depot(models.Model):
     postal_code = models.CharField(max_length=32, blank=True)
 
     gps_coordinates = models.CharField(max_length=64, blank=True, null=True, default=None)
+    accise = models.CharField(max_length=32, blank=True, null=True, default=None)
 
     def __str__(self):
         return self.name
@@ -653,7 +658,8 @@ class GenericError(models.Model):
 
     is_blocking = models.BooleanField(default=False)
 
-    tx = models.ForeignKey(LotTransaction, null=False, blank=False, on_delete=models.CASCADE)
+    tx = models.ForeignKey(LotTransaction, null=True, blank=True, on_delete=models.SET_NULL)
+    lot = models.ForeignKey('CarbureLot', null=True, blank=True, on_delete=models.SET_NULL)
 
     field = models.CharField(max_length=64, null=True, blank=True)
     fields = models.JSONField(null=True, blank=True)
@@ -751,3 +757,436 @@ class ExternalAdminRights(models.Model):
         db_table = 'ext_admin_rights'
         verbose_name = 'External Admin Right'
         verbose_name_plural = 'External Admin Rights'
+
+
+from django.db import models
+from django.contrib.auth import get_user_model
+
+from core.models import Entity, Depot, ProductionSite, MatierePremiere, Pays, Biocarburant
+
+usermodel = get_user_model()
+
+class CarbureLot(models.Model):
+    period = models.IntegerField(blank=False, null=False) # index
+    year = models.IntegerField(blank=False, null=False) # index
+    carbure_id = models.CharField(max_length=64, blank=True, default='')
+
+    # production data
+    carbure_producer = models.ForeignKey(Entity, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name='carbure_producer')
+    unknown_producer = models.CharField(max_length=64, blank=True, null=True, default=None)
+    carbure_production_site = models.ForeignKey(ProductionSite, null=True, blank=True, default=None, on_delete=models.SET_NULL)
+    unknown_production_site = models.CharField(max_length=64, blank=True, null=True, default=None)
+    production_country = models.ForeignKey(Pays, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name='production_country')
+    production_site_commissioning_date = models.DateField(blank=True, null=True)
+    production_site_certificate = models.CharField(max_length=64, blank=True, null=True, default=None)
+    production_site_certificate_type = models.CharField(max_length=64, blank=True, null=True, default=None)
+    production_site_double_counting_certificate = models.CharField(max_length=64, blank=True, null=True, default=None)
+    # supplier data
+    carbure_supplier = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='carbure_supplier')
+    unknown_supplier = models.CharField(max_length=64, blank=True, null=True, default=None)
+    supplier_certificate = models.CharField(max_length=64, blank=True, null=True, default=None)
+    supplier_certificate_type = models.CharField(max_length=64, blank=True, null=True, default=None)
+
+    # delivery
+    DAU = "DAU"
+    DAE = "DAE"
+    DSA = "DSA"
+    DSAC = "DSAC"
+    DSP = "DSP"
+    OTHER = "OTHER"
+    TRANSPORT_DOCUMENT_TYPES = ((DAU, DAU), (DAE, DAE), (DSA, DSA), (DSAC, DSAC), (DSP, DSP), (OTHER, OTHER),)
+    transport_document_type = models.CharField(max_length=12, blank=False, null=False, choices=TRANSPORT_DOCUMENT_TYPES, default=DAE)
+    transport_document_reference = models.CharField(max_length=128, blank=True, null=True, default=None)
+    carbure_client = models.ForeignKey(Entity, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name='carbure_client')
+    unknown_client = models.CharField(max_length=64, blank=True, null=True, default=None)
+    dispatch_date = models.DateField(blank=True, null=True)
+    carbure_dispatch_site = models.ForeignKey(Depot, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name='carbure_dispatch_site')
+    unknown_dispatch_site = models.CharField(max_length=64, blank=True, null=True, default=None)
+    dispatch_site_country = models.ForeignKey(Pays, null=True, blank=True, on_delete=models.SET_NULL, related_name='dispatch_site_country')
+    delivery_date = models.DateField(blank=True, null=True)
+    carbure_delivery_site = models.ForeignKey(Depot, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name='carbure_delivery_site')
+    unknown_delivery_site = models.CharField(max_length=64, blank=True, null=True, default=None)
+    delivery_site_country = models.ForeignKey(Pays, null=True, blank=True, on_delete=models.SET_NULL, related_name='delivery_site_country')
+
+    DRAFT = "DRAFT"
+    PENDING = "PENDING"
+    ACCEPTED = "ACCEPTED"
+    REJECTED = "REJECTED"
+    FROZEN = "FROZEN"
+    DELETED = "DELETED"
+    LOT_STATUSES = ((DRAFT, DRAFT), (PENDING, PENDING), (ACCEPTED, ACCEPTED), (REJECTED, REJECTED), (FROZEN, FROZEN), (DELETED, DELETED),)
+    lot_status = models.CharField(max_length=24, choices=LOT_STATUSES, default=DRAFT)
+    
+    NO_PROBLEMO = "NO_PROBLEMO"
+    IN_CORRECTION = "IN_CORRECTION"
+    FIXED = "FIXED"
+    CORRECTION_STATUSES = ((NO_PROBLEMO, NO_PROBLEMO), (IN_CORRECTION, IN_CORRECTION), (FIXED, FIXED))
+    correction_status = models.CharField(max_length=64, choices=CORRECTION_STATUSES, default=NO_PROBLEMO)
+
+    UNKNOWN = "UNKNOWN"
+    RFC = "RFC" # release for consumption / mise a consommation
+    STOCK = "STOCK"
+    BLENDING = "BLENDING" # incorporation
+    EXPORT = "EXPORT"
+    TRADING = "TRADING"
+    PROCESSING = "PROCESSING"
+    DIRECT = "DIRECT" # livraison directe
+    FLUSHED = "FLUSHED" # emptying stock for accounting or rounding purpuse
+    DELIVERY_TYPES = ((UNKNOWN, UNKNOWN), (RFC, RFC), (STOCK, STOCK), (BLENDING, BLENDING), (EXPORT, EXPORT), 
+                      (TRADING, TRADING), (PROCESSING, PROCESSING), (DIRECT, DIRECT), (FLUSHED, FLUSHED), )
+    delivery_type = models.CharField(max_length=64, choices=DELIVERY_TYPES, blank=False, null=False, default=UNKNOWN)
+    declared_by_supplier = models.BooleanField(default=False)
+    declared_by_client = models.BooleanField(default=False)
+
+
+    # lot details
+    volume = models.FloatField(default=0.0)
+    weight = models.FloatField(default=0.0)
+    lhv_amount = models.FloatField(default=0.0)
+    feedstock = models.ForeignKey(MatierePremiere, null=True, on_delete=models.SET_NULL)
+    biofuel = models.ForeignKey(Biocarburant, null=True, on_delete=models.SET_NULL)
+    country_of_origin = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL, related_name='country_of_origin')
+
+    # GHG values
+    eec = models.FloatField(default=0.0)
+    el = models.FloatField(default=0.0)
+    ep = models.FloatField(default=0.0)
+    etd = models.FloatField(default=0.0)
+    eu = models.FloatField(default=0.0)
+    esca = models.FloatField(default=0.0)
+    eccs = models.FloatField(default=0.0)
+    eccr = models.FloatField(default=0.0)
+    eee = models.FloatField(default=0.0)
+    ghg_total = models.FloatField(default=0.0)
+    ghg_reference = models.FloatField(default=0.0)
+    ghg_reduction = models.FloatField(default=0.0)
+    ghg_reference_red_ii = models.FloatField(default=0.0)
+    ghg_reduction_red_ii = models.FloatField(default=0.0)
+
+    added_by = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
+    parent_lot = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
+    parent_stock = models.ForeignKey('CarbureStock', null=True, blank=True, on_delete=models.CASCADE)
+
+    free_field = models.TextField(blank=True, null=True, default=None)
+
+    # admin / auditor checks & filters
+    highlighted_by_admin = models.BooleanField(default=False)
+    highlighted_by_auditor = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'carbure_lots'
+        indexes = [models.Index(fields=['year']),
+                   models.Index(fields=['year', 'carbure_client']),
+                   models.Index(fields=['year', 'carbure_supplier']),
+                   models.Index(fields=['year', 'period']),
+                   models.Index(fields=['year', 'period', 'carbure_client']),
+                   models.Index(fields=['year', 'period', 'carbure_supplier']),
+                  ]
+        verbose_name = 'CarbureLot'
+        verbose_name_plural = 'CarbureLots'
+
+
+    def get_weight(self):
+        if not self.biofuel:
+            return 0
+        return self.volume * self.biofuel.masse_volumique
+
+    def get_lhv_amount(self):
+        if not self.biofuel:
+            return 0
+        return self.volume * self.biofuel.pci_litre
+
+    def generate_carbure_id(self):
+        pass
+
+    def copy_production_details(self, other):
+        self.carbure_producer = other.carbure_producer
+        self.unknown_producer = other.unknown_producer
+        self.carbure_production_site = other.carbure_production_site
+        self.unknown_production_site = other.unknown_production_site
+        self.production_country = other.production_country
+        self.production_site_commissioning_date = other.production_site_commissioning_date
+        self.production_site_certificate = other.production_site_certificate
+        self.production_site_certificate_type = other.production_site_certificate_type
+        self.production_site_double_counting_certificate = other.production_site_double_counting_certificate
+
+    def update_ghg(self):
+        self.ghg_total = round(self.eec + self.el + self.ep + self.etd + self.eu - self.esca - self.eccs - self.eccr - self.eee, 2)
+        self.ghg_reference = 83.8
+        self.ghg_reduction = round((1.0 - (self.ghg_total / self.ghg_reference)) * 100.0, 2)
+        self.ghg_reference_red_ii = 94.0
+        self.ghg_reduction_red_ii = round((1.0 - (self.ghg_total / self.ghg_reference_red_ii)) * 100.0, 2)
+
+    def update_sustainability_data(self, other):
+        self.biofuel = other.biofuel
+        self.country_of_origin = other.country_of_origin
+        self.eec = other.eec
+        self.el = other.el
+        self.ep = other.ep
+        self.etd = other.etd
+        self.eu = other.eu
+        self.esca = other.esca
+        self.eccs = other.eccs
+        self.eccr = other.eccr
+        self.eee = other.eee
+        self.ghg_total = other.ghg_total
+        self.ghg_reference = other.ghg_reference
+        self.ghg_reduction = other.ghg_reduction
+        self.ghg_reference_red_ii = other.ghg_reference_red_ii
+        self.ghg_reduction_red_ii = other.ghg_reduction_red_ii
+
+    def copy_basic_info(self, other):
+        self.biofuel = other.biofuel
+        self.feedstock = other.feedstock
+        self.country_of_origin = other.country_of_origin
+        
+
+class CarbureStockTransformation(models.Model):
+    UNKNOWN = "UNKNOWN"
+    ETH_ETBE = "ETH_ETBE"
+    TRANSFORMATION_TYPES = ((UNKNOWN, UNKNOWN), (ETH_ETBE, ETH_ETBE), )
+    transformation_type = models.CharField(max_length=32, choices=TRANSFORMATION_TYPES, null=False, blank=False, default=UNKNOWN)
+    source_stock = models.ForeignKey('CarbureStock', null=False, blank=False, on_delete=models.CASCADE, related_name='source_stock')
+    dest_stock = models.ForeignKey('CarbureStock', null=False, blank=False, on_delete=models.CASCADE, related_name='dest_stock')
+    volume_deducted_from_source = models.FloatField(null=False, blank=False, default=0.0)
+    volume_destination = models.FloatField(null=False, blank=False, default=0.0)
+    metadata = models.JSONField() # ex: {‘volume_denaturant’: 1000, ‘volume_etbe_eligible’: 420000}
+    transformed_by = models.ForeignKey(usermodel, null=True, blank=True, on_delete=models.SET_NULL)
+    entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
+    transformation_dt = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'carbure_stock_transformations'
+        indexes = [models.Index(fields=['entity']),]
+        verbose_name = 'CarbureStockTransformation'
+        verbose_name_plural = 'CarbureStockTransformation'
+
+
+
+@receiver(pre_delete, sender=CarbureStockTransformation, dispatch_uid='stock_transformation_delete_signal')
+def delete_stock_transformation(sender, instance, using, **kwargs):
+    # recredit volume to source stock
+    instance.source_stock.remaining_volume = round(instance.source_stock.remaining_volume + instance.volume_deducted_from_source, 2)
+    instance.source_stock.save()
+    # delete dest_stock
+    instance.dest_stock.parent_transformation = None
+    instance.dest_stock.parent_lot = None # redundant
+    # save event
+    event = CarbureStockEvent()
+    event.event_type = CarbureStockEvent.UNTRANSFORMED
+    event.stock = instance.source_stock
+    event.user = None
+    event.metadata = {'message': 'delete stock transformation. recredit volume.', 'volume_to_credit': instance.volume_deducted_from_source}
+    event.save()
+
+
+@receiver(pre_delete, sender=CarbureLot, dispatch_uid='lot_delete_signal')
+def delete_lot(sender, instance, using, **kwargs):
+    # if we come from stock, recredit
+    if instance.parent_stock:
+        # this lot was a split from a stock
+        instance.parent_stock.remaining_volume = round(instance.parent_stock.remaining_volume + instance.volume, 2)
+        instance.parent_stock.save()
+        # save event
+        event = CarbureStockEvent()
+        event.event_type = CarbureStockEvent.UNSPLIT
+        event.stock = instance.parent_stock
+        event.user = None
+        event.metadata = {'message': 'child lot deleted. recredit volume.', 'volume_to_credit': instance.volume}
+        event.save()
+    # if there is a parent_lot tagged as processing or trading, restore them to their "inbox" status
+    if instance.parent_lot:
+        if instance.parent_lot.delivery_type in [CarbureLot.PROCESSING, CarbureLot.TRADING]:
+            instance.parent_lot.lot_status = CarbureLot.PENDING
+            instance.parent_lot.delivery_type = CarbureLot.OTHER
+            instance.parent_lot.save()
+            # save event
+            event = CarbureLotEvent()
+            event.event_type = CarbureLotEvent.RECALLED
+            event.lot = instance.parent_lot
+            event.user = None
+            event.metadata = {'message': 'child lot deleted. back to inbox.'}
+            #event.save()
+
+class CarbureStock(models.Model):
+    parent_lot = models.ForeignKey(CarbureLot, null=True, blank=True, on_delete=models.CASCADE)
+    parent_transformation = models.ForeignKey(CarbureStockTransformation, null=True, blank=True, on_delete=models.CASCADE)
+    carbure_id = models.CharField(max_length=64, blank=False, null=False, default='')
+    depot = models.ForeignKey(Depot, null=True, blank=True, on_delete=models.SET_NULL)
+    carbure_client = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='stock_carbure_client')
+    remaining_volume = models.FloatField(default=0.0)
+    remaining_weight = models.FloatField(default=0.0)
+    remaining_lhv_amount = models.FloatField(default=0.0)
+    feedstock = models.ForeignKey(MatierePremiere, null=True, on_delete=models.SET_NULL)
+    biofuel = models.ForeignKey(Biocarburant, null=True, on_delete=models.SET_NULL)
+    country_of_origin = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL, related_name='stock_country_of_origin')
+    carbure_production_site = models.ForeignKey(ProductionSite, null=True, blank=True, on_delete=models.SET_NULL)
+    unknown_production_site = models.CharField(max_length=64, blank=True, null=True, default=None)
+    production_country = models.ForeignKey(Pays, null=True, blank=True, on_delete=models.SET_NULL, related_name='stock_production_country')
+    carbure_supplier = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='stock_carbure_supplier')
+    unknown_supplier = models.CharField(max_length=64, blank=True, null=True, default=None)
+    ghg_reduction = models.FloatField(default=0.0)
+    ghg_reduction_red_ii = models.FloatField(default=0.0)
+
+    class Meta:
+        db_table = 'carbure_stock'
+        indexes = [
+            models.Index(fields=['carbure_client']),
+            models.Index(fields=['carbure_client', 'depot']),
+        ]
+        verbose_name = 'CarbureStock'
+        verbose_name_plural = 'CarbureStocks'
+
+    def get_weight(self):
+        return self.remaining_volume * self.biofuel.masse_volumique
+
+    def get_lhv_amount(self):
+        return self.remaining_volume * self.biofuel.pci_litre
+
+    def get_parent_lot(self):
+        if self.parent_transformation:
+            return self.parent_transformation.source_stock.get_parent_lot()
+        else:
+            return self.parent_lot
+
+    def update_remaining_volume(self, volume_to_recredit, volume_to_debit):
+        self.remaining_volume = round(self.remaining_volume + volume_to_recredit, 2)
+        self.remaining_volume = round(self.remaining_volume - volume_to_debit, 2)
+        self.remaining_lhv_amount = self.get_lhv_amount()
+        self.remaining_weight = self.get_weight()
+        self.save()
+
+class CarbureLotEvent(models.Model):
+    CREATED = "CREATED"
+    UPDATED = "UPDATED"
+    VALIDATED = "VALIDATED"
+    FIX_REQUESTED = "FIX_REQUESTED"
+    MARKED_AS_FIXED = "MARKED_AS_FIXED"
+    FIX_ACCEPTED = "FIX_ACCEPTED"
+    ACCEPTED = "ACCEPTED"
+    REJECTED = "REJECTED"
+    RECALLED = "RECALLED"
+    DECLARED = "DECLARED"
+    DECLCANCEL = "DECLCANCEL"
+    DELETED = "DELETED"
+    RESTORED = "RESTORED"
+    EVENT_TYPES = ((CREATED, CREATED), (UPDATED, UPDATED), (VALIDATED, VALIDATED), (FIX_REQUESTED, FIX_REQUESTED), (MARKED_AS_FIXED, MARKED_AS_FIXED), 
+                    (FIX_ACCEPTED, FIX_ACCEPTED), (ACCEPTED, ACCEPTED), (REJECTED, REJECTED), (RECALLED, RECALLED), (DECLARED, DECLARED), (DELETED, DELETED), (DECLCANCEL, DECLCANCEL), 
+                    (RESTORED, RESTORED),)
+    event_type = models.CharField(max_length=32, null=False, blank=False, choices=EVENT_TYPES)
+    event_dt = models.DateTimeField(auto_now_add=True, null=False, blank=False)
+    lot = models.ForeignKey(CarbureLot, null=False, blank=False, on_delete=models.CASCADE)
+    user = models.ForeignKey(usermodel, null=True, blank=True, on_delete=models.SET_NULL)
+    metadata = models.JSONField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'carbure_lots_events'
+        indexes = [
+            models.Index(fields=['lot']),
+        ]
+        verbose_name = 'CarbureLotEvent'
+        verbose_name_plural = 'CarbureLotEvents'
+
+
+class CarbureLotComment(models.Model):
+    REGULAR = "REGULAR"
+    AUDITOR = "AUDITOR"
+    ADMIN = "ADMIN"
+    COMMENT_TYPES = ((REGULAR, REGULAR), (AUDITOR, AUDITOR), (ADMIN, ADMIN))
+
+    entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey(usermodel, null=True, blank=True, on_delete=models.SET_NULL)
+    lot = models.ForeignKey(CarbureLot, on_delete=models.CASCADE)
+    comment_type = models.CharField(max_length=16, choices=COMMENT_TYPES, default=REGULAR)
+    comment_dt = models.DateTimeField(auto_now_add=True)
+    comment = models.TextField()
+    is_visible_by_admin = models.BooleanField(default=False) # AUDITOR comment must be explicitly shared with admin
+    is_visible_by_auditor = models.BooleanField(default=False) # ADMIN comment must be explicitly shared with auditor
+
+    class Meta:
+        db_table = 'carbure_lots_comments'
+        indexes = [
+            models.Index(fields=['lot']),
+        ]        
+        verbose_name = 'CarbureLotComment'
+        verbose_name_plural = 'CarbureLotComments'
+
+
+class CarbureNotification(models.Model):
+    event = models.ForeignKey(CarbureLotEvent, null=False, blank=False, on_delete=models.CASCADE)
+    notif_dt = models.DateTimeField(auto_now_add=True)
+    recipient = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.CASCADE)
+    send_copy_to_admin = models.BooleanField(default=False)
+    is_sent = models.BooleanField(default=False)
+    sent_dt = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'carbure_notifications'
+        verbose_name = 'Carbure Email Notification'
+        verbose_name_plural = 'Cabure Email Notifications'
+        indexes = [
+            models.Index(fields=['is_sent']),
+        ]
+
+class CarbureStockEvent(models.Model):
+    CREATED = "CREATED"
+    UPDATED = "UPDATED"
+    FLUSHED = "FLUSHED"
+    SPLIT = "SPLIT"
+    UNSPLIT = "UNSPLIT"
+    TRANSFORMED = "TRANSFORMED"
+    UNTRANSFORMED = "UNTRANSFORMED"
+    EVENT_TYPES = ((CREATED, CREATED), (UPDATED, UPDATED), (SPLIT, SPLIT), (UNSPLIT, UNSPLIT),
+                  (FLUSHED, FLUSHED), (TRANSFORMED, TRANSFORMED), (UNTRANSFORMED, UNTRANSFORMED))
+    event_type = models.CharField(max_length=32, null=False, blank=False, choices=EVENT_TYPES)
+    event_dt = models.DateTimeField(auto_now_add=True, null=False, blank=False)
+    stock = models.ForeignKey(CarbureStock, null=False, blank=False, on_delete=models.CASCADE)
+    user = models.ForeignKey(usermodel, null=True, blank=True, on_delete=models.SET_NULL)
+    metadata = models.JSONField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'carbure_stock_events'
+        indexes = [
+            models.Index(fields=['stock']),
+        ]
+        verbose_name = 'CarbureStockEvent'
+        verbose_name_plural = 'CarbureStockEvents'
+
+class GenericCertificate(models.Model):
+    SYSTEME_NATIONAL = "SYSTEME_NATIONAL"
+    ISCC = "ISCC"
+    REDCERT = "REDCERT"
+    DBS = "2BS"
+    CERTIFICATE_TYPES = ((SYSTEME_NATIONAL, SYSTEME_NATIONAL), (ISCC, ISCC), (REDCERT, REDCERT), (DBS, DBS))
+    
+    certificate_id = models.CharField(max_length=64, blank=False, null=False)
+    certificate_type = models.CharField(max_length=32, null=False, blank=False, choices=CERTIFICATE_TYPES)
+    certificate_holder = models.CharField(max_length=512, null=False, blank=False)
+    certificate_issuer = models.CharField(max_length=256, null=True, blank=True)
+    address = models.CharField(max_length=512, null=True, blank=True)
+    valid_from = models.DateField(null=False, blank=False)
+    valid_until = models.DateField(null=False, blank=False)
+    download_link = models.CharField(max_length=512, default=None, null=True)
+    scope = models.JSONField(null=True)
+    input = models.JSONField(null=True)
+    output = models.JSONField(null=True)
+
+    class Meta:
+        db_table = 'carbure_certificates'
+        indexes = [
+            models.Index(fields=['certificate_type']),
+        ]
+        verbose_name = 'CarbureCertificates'
+        verbose_name_plural = 'CarbureCertificates'    
+
+class EntityCertificate(models.Model):
+    certificate = models.ForeignKey(GenericCertificate, blank=False, null=False, on_delete=models.CASCADE)
+    entity = models.ForeignKey(Entity, blank=False, null=False, on_delete=models.CASCADE)
+    
+    class Meta:
+        db_table = 'carbure_entity_certificates'
+        indexes = [
+            models.Index(fields=['entity']),
+        ]
+        verbose_name = 'CarbureEntityCertificates'
+        verbose_name_plural = 'CarbureEntityCertificates'

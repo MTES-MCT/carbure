@@ -85,10 +85,6 @@ def get_delivery_sites(request):
         dsites = Depot.objects.all().order_by('name')
         if q:
             dsites = dsites.filter(Q(name__icontains=q) | Q(depot_id__icontains=q) | Q(city__icontains=q))
-        if entity_id:
-            entity = Entity.objects.get(pk=entity_id)
-            if entity.entity_type in ['Producteur', 'Trader']:
-                dsites = dsites.filter(Q(depot_type__in=[Depot.EFPE, Depot.OTHER, Depot.OILDEPOT, Depot.BIOFUELDEPOT]))
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not find delivery sites"}, status=400)
 
@@ -99,7 +95,7 @@ def get_delivery_sites(request):
 def get_production_sites(request):
     q = request.GET.get('query', False)
     pid = request.GET.get('producer_id', False)
-    psites = ProductionSite.objects.all().order_by('name')
+    psites = ProductionSite.objects.select_related('country', 'producer').prefetch_related('productionsiteinput_set', 'productionsiteoutput_set').all().order_by('name')
     if q:
         psites = psites.filter(name__icontains=q)
     if pid:
@@ -110,11 +106,11 @@ def get_production_sites(request):
         v.inputs = []
         v.outputs = []
 
-    inputs = ProductionSiteInput.objects.filter(production_site__in=psites)
+    inputs = ProductionSiteInput.objects.select_related('matiere_premiere').filter(production_site__in=psites)
     for i in inputs:
         psitesbyid[i.production_site.id].inputs.append(i.matiere_premiere.natural_key())
 
-    outputs = ProductionSiteOutput.objects.filter(production_site__in=psites)
+    outputs = ProductionSiteOutput.objects.select_related('biocarburant').filter(production_site__in=psites)
     for o in outputs:
         psitesbyid[o.production_site.id].outputs.append(o.biocarburant.natural_key())
     sez = [{'name': p.name, 'id': p.id, 'country': p.country.natural_key(),

@@ -2,7 +2,7 @@ import React from "react"
 import { Trans, useTranslation } from "react-i18next"
 
 import { LotStatus, EntityType, UserRole, Transaction } from "common/types"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { LotDeleter } from "transactions/hooks/actions/use-delete-lots"
 import { LotAcceptor } from "transactions/hooks/actions/use-accept-lots"
 import { LotRejector } from "transactions/hooks/actions/use-reject-lots"
@@ -12,7 +12,7 @@ import { LotAdministrator } from "transactions/hooks/actions/use-admin-lots"
 import styles from "../components/form.module.css"
 
 import useTransactionDetails from "../hooks/use-transaction-details"
-import useNavigate from "../hooks/query/use-navigate"
+import useNavigation from "../hooks/query/use-navigate"
 
 import {
   AlertTriangle,
@@ -36,7 +36,7 @@ import { StatusTitle } from "../components/status"
 import Comments from "../components/form-comments"
 import ValidationErrors from "../components/form-errors"
 import TransactionHistory from "../components/history"
-import { useRights } from "carbure/hooks/use-rights"
+import { useRights } from "carbure/hooks/entity"
 import { LotAuditor } from "transactions/hooks/actions/use-audits"
 import { useMatomo } from "matomo"
 
@@ -44,7 +44,7 @@ const EDITABLE = [LotStatus.Draft, LotStatus.ToFix]
 const COMMENTABLE = [LotStatus.ToFix, LotStatus.Inbox]
 
 type TransactionDetailsProps = {
-  entity: EntitySelection
+  entity: Entity
   deleter: LotDeleter
   validator: LotValidator
   acceptor: LotAcceptor
@@ -88,7 +88,7 @@ const TransactionDetails = ({
   const matomo = useMatomo()
 
   const rights = useRights()
-  const navigator = useNavigate(transactions)
+  const navigator = useNavigation(transactions)
 
   const history = details.data?.updates?.filter(
     (h) => t(h.field, { ns: "fields" }) !== h.field

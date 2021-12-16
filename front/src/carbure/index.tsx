@@ -1,182 +1,79 @@
-import { Trans, useTranslation } from "react-i18next"
-
-import { AppHook, useApp } from "./hooks/use-app"
-import { EntityType, LotStatus, ExternalAdminPages } from "common/types"
-import useEntity, { EntityContext, hasPage } from "./hooks/use-entity"
-import { UserRightProvider } from "./hooks/use-rights"
-
-import { Redirect, Route, Switch } from "common/components/relative-route"
-
-import { LoaderOverlay } from "common/components"
+import { Navigate, Route, Routes } from "react-router-dom"
+import { LoaderOverlay } from "common-v2/components/scaffold"
+import useUser, { UserContext } from "./hooks/user"
+import useEntity from "./hooks/entity"
+import DevBanner from "./components/dev-banner"
 import Topbar from "./components/top-bar"
 import Footer from "./components/footer"
 import Pending from "./components/pending"
 import Exit from "./components/exit"
 import Registry from "./components/registry"
-
-import Transactions from "transactions"
-import Stocks from "stocks"
+import PublicStats from "./components/public-stats"
+import Home from "./components/home"
+import Transactions from "transactions-v2"
 import Settings from "settings"
 import Account from "account"
 import DoubleCounting from "doublecount"
-import Entities from "../entities" // not using relative path prevents import
-import EntityDetails from "../entities/routes/entity-details"
 import Dashboard from "dashboard"
-import PublicStats from "./components/public-stats"
-import Home from "./components/home"
+import Entities from "../entities" // not using  path prevents import
 
-const DevBanner = () => (
-  <div
-    style={{
-      backgroundColor: "var(--orange-medium)",
-      padding: "8px var(--main-spacing)",
-    }}
-  >
-    <Trans>
-      <b>Version de développement de CarbuRe :</b> les manipulations effectuées
-      ici n'ont pas de répercussion et les déclarations ne sont pas prises en
-      compte.
-    </Trans>
-  </div>
-)
+const Carbure = () => {
+  const user = useUser()
 
-// has to be nested in a route so we can get data from useParams()
-const Org = ({ app }: { app: AppHook }) => {
-  const entity = useEntity(app)
-
-  if (!app.isAuthenticated()) {
+  if (!user.isAuthenticated()) {
     return <Exit to="/accounts/login" />
   }
 
-  if (app.settings.loading || app.settings.data === null) {
-    return <LoaderOverlay />
-  }
-
-  // a user with entities tries to access the pending or another entity's page
-  if (app.hasEntities() && !entity) {
-    return <Redirect to="/" />
-  }
-
-  // a user with no entities tries to access an entity page
-  if (!app.hasEntities()) {
-    return <Redirect to="/pending" />
-  }
-
-  const isAdmin = entity?.entity_type === EntityType.Administration
-  const isExternalAdmin = entity?.entity_type === EntityType.ExternalAdmin
-  const isAuditor = entity?.entity_type === EntityType.Auditor
-
   return (
-    <UserRightProvider app={app}>
-      <EntityContext.Provider value={entity}>
-        <Switch>
-          <Route relative exact path="stocks">
-            <Redirect relative to="in" />
-          </Route>
+    <UserContext.Provider value={user}>
+      <div id="app">
+        <DevBanner />
 
-          <Route relative path="stocks/:status">
-            <Stocks entity={entity} />
-          </Route>
+        <Topbar />
 
-          <Route relative exact path="transactions">
-            <Redirect
-              relative
-              to={isAdmin || isAuditor ? LotStatus.Alert : LotStatus.Draft}
-            />
-          </Route>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/pending" element={<Pending />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/org/:entity/*" element={<Org />} />
+          <Route path="/public_stats" element={<PublicStats />} />
+          <Route path="/logout" element={<Exit to="/accounts/logout" />} />
+        </Routes>
 
-          <Route relative path="transactions/:status">
-            <Transactions entity={entity} />
-          </Route>
+        <Footer />
 
-          <Route relative path="settings">
-            <Settings entity={entity} settings={app.settings} />
-          </Route>
-
-          <Route relative path="registry">
-            <Registry />
-          </Route>
-
-          {isAdmin && (
-            <Route relative path="dashboard">
-              <Dashboard />
-            </Route>
-          )}
-
-          {isAdmin && (
-            <Route relative path="entities/:id">
-              <EntityDetails />
-            </Route>
-          )}
-
-          {isAdmin && (
-            <Route relative path="entities">
-              <Entities />
-            </Route>
-          )}
-
-          {(isAdmin || hasPage(entity, ExternalAdminPages.DoubleCounting)) && (
-            <Route relative path="double-counting">
-              <DoubleCounting entity={entity} />
-            </Route>
-          )}
-
-          <Redirect
-            relative
-            to={
-              isAdmin
-                ? "dashboard"
-                : isExternalAdmin
-                ? "double-counting"
-                : "transactions"
-            }
-          />
-        </Switch>
-      </EntityContext.Provider>
-    </UserRightProvider>
+        {user.loading && <LoaderOverlay />}
+      </div>
+    </UserContext.Provider>
   )
 }
 
-const Carbure = () => {
-  useTranslation()
-  const app = useApp()
+const Org = () => {
+  const entity = useEntity()
 
+  const { isAdmin, isAuditor, isExternal, isIndustry } = entity
+  const hasDCA = isExternal && entity.hasPage("DCA")
+
+  // prettier-ignore
   return (
-    <div id="app">
-      {!app.isProduction() && <DevBanner />}
+    <Routes>
+      <Route path="settings" element={<Settings />} />
 
-      <Topbar app={app} />
+      {isIndustry && <Route path="transactions/*" element={<Transactions />} />}
+      {isIndustry && <Route path="registry" element={<Registry />} />}
 
-      <Switch>
-        <Route exact path="/logout">
-          <Exit to="/accounts/logout" />
-        </Route>
+      {isAdmin && <Route path="dashboard" element={<Dashboard />} />}
+      {isAdmin && <Route path="entities/*" element={<Entities />} />}
 
-        <Route exact path="/account">
-          <Account app={app} />
-        </Route>
+      {(isAdmin || isAuditor) && <Route path="controls/*" element={<h1>TODO</h1>} />}
+      {(isAdmin || hasDCA) && <Route path="double-counting/*" element={<DoubleCounting />} />}
 
-        <Route exact path="/pending">
-          <Pending app={app} />
-        </Route>
+      {isIndustry && <Route path="*" element={<Navigate to="transactions" />} />}
+      {isAdmin && <Route path="*" element={<Navigate to="dashboard" />} />}
+      {isAuditor && <Route path="*" element={<Navigate to="controls" />} />}
+      {hasDCA && <Route path="*" element={<Navigate to="double-counting" />} />}
+    </Routes>
 
-        <Route path="/org/:entity">
-          <Org app={app} />
-        </Route>
-
-        <Route path="/public_stats">
-          <PublicStats />
-        </Route>
-
-        <Route exact path="/">
-          <Home app={app} />
-        </Route>
-
-        <Redirect to="/" />
-      </Switch>
-
-      <Footer />
-    </div>
   )
 }
 

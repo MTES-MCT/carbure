@@ -1,27 +1,24 @@
 import styles from "./pending.module.css"
-
-import { Link, Redirect } from "common/components/relative-route"
+import { Link, Navigate } from "react-router-dom"
 import { Box, LoaderOverlay, Main, Title } from "common/components"
 import { Alert } from "common/components/alert"
 import { AlertTriangle, Question } from "common/components/icons"
 import { Trans } from "react-i18next"
-import { AppHook } from "carbure/hooks/use-app"
+import { useUserContext } from "carbure/hooks/user"
 
-type PendingProps = {
-  app: AppHook
-}
+const Pending = () => {
+  const user = useUserContext()
 
-const Pending = ({ app }: PendingProps) => {
-  if (!app.isAuthenticated()) {
-    return <Redirect to="/" />
+  if (!user.isAuthenticated()) {
+    return <Navigate to="/" />
   }
 
-  if (app.hasEntities()) {
-    const firstEntity = app.getFirstEntity()!
-    return <Redirect to={`/org/${firstEntity.id}`} />
+  if (user.hasEntities()) {
+    const firstEntity = user.getFirstEntity()!
+    return <Navigate to={`/org/${firstEntity.id}`} />
   }
 
-  if (app.settings.loading || app.settings.data === null) {
+  if (user.loading) {
     return <LoaderOverlay />
   }
 

@@ -12,8 +12,13 @@ import {
   SNCertificate,
   EntityRights,
 } from "common/types"
-import { DoubleCounting, DoubleCountingDetails, QuotaDetails } from 'doublecount/types'
-import { EntitySelection } from "carbure/hooks/use-entity"
+import {
+  DoubleCounting,
+  DoubleCountingDetails,
+  QuotaDetails,
+} from "doublecount/types"
+import { Entity } from "carbure/types"
+import { EntityDeliverySite } from "./hooks/use-delivery-sites"
 
 export function getSettings(): Promise<Settings> {
   return api.get("/settings/")
@@ -174,7 +179,7 @@ export function setProductionSiteCertificates(
 }
 
 export function getDeliverySites(entity_id: number) {
-  return api.get("/settings/get-delivery-sites", {
+  return api.get<EntityDeliverySite[]>("/settings/get-delivery-sites", {
     entity_id,
   })
 }
@@ -184,14 +189,14 @@ export function addDeliverySite(
   delivery_site_id: string,
   ownership_type: OwnershipType,
   blending_outsourced: boolean,
-  blending_entity_id: EntitySelection
+  blending_entity: Entity | null
 ) {
   return api.post("/settings/add-delivery-site", {
     entity_id,
     delivery_site_id,
     ownership_type,
     blending_outsourced,
-    blending_entity_id: blending_entity_id?.id ?? null,
+    blending_entity_id: blending_entity?.id ?? null,
   })
 }
 
@@ -550,5 +555,5 @@ export function deleteDoubleCountingProduction(
 }
 
 export function getQuotaDetails(entity_id: number, dca_id: number) {
-  return api.get<QuotaDetails[]>('/doublecount/quotas', { entity_id, dca_id })
+  return api.get<QuotaDetails[]>("/doublecount/quotas", { entity_id, dca_id })
 }

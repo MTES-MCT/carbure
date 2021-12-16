@@ -18,7 +18,7 @@ import { EntityType } from "common/types"
 import api from "common/services/api"
 import useAPI from "common/hooks/use-api"
 import { Fragment, useEffect } from "react"
-import { AppHook } from "carbure/hooks/use-app"
+import { useUserContext } from "carbure/hooks/user"
 
 interface HomeStats {
   total_volume: number
@@ -33,18 +33,15 @@ function fetchHomeStats() {
   return api.get<HomeStats>("/common/stats")
 }
 
-type HomeProps = {
-  app: AppHook
-}
-
-const Home = ({ app }: HomeProps) => {
+const Home = () => {
+  const user = useUserContext()
   const [stats, getStats] = useAPI(fetchHomeStats)
 
   useEffect(() => {
     getStats()
   }, [getStats])
 
-  const firstEntity = app.getFirstEntity()
+  const firstEntity = user.getFirstEntity()
 
   return (
     <main className={styles.home}>
@@ -95,7 +92,7 @@ const Home = ({ app }: HomeProps) => {
       </section>
 
       <section className={styles.homeAuthentication}>
-        {!app.isAuthenticated() ? (
+        {!user.isAuthenticated() ? (
           <Fragment>
             <Button
               icon={UserAdd}
@@ -120,7 +117,7 @@ const Home = ({ app }: HomeProps) => {
             icon={ExternalLink}
             as="a"
             level="primary"
-            href={`/v2/org/${firstEntity.id}`}
+            href={`/app/org/${firstEntity.id}`}
             className={styles.homeButton}
           >
             <Trans>Aller sur {{ entity: firstEntity.name }}</Trans>
@@ -130,7 +127,7 @@ const Home = ({ app }: HomeProps) => {
             icon={Plus}
             as="a"
             level="primary"
-            href="/v2/account"
+            href="/app/pending"
             className={styles.homeButton}
           >
             <Trans>Lier le compte à des sociétés</Trans>
@@ -198,7 +195,7 @@ const Home = ({ app }: HomeProps) => {
         <Button
           icon={ExternalLink}
           as="a"
-          href="/v2/public_stats"
+          href="/app/public_stats"
           className={styles.homeButton}
           rel="noreferrer"
           target="_blank"

@@ -1,8 +1,12 @@
 import os
 import django
+from rest_framework import serializers
 import xlsxwriter
 import datetime
 import random
+import pandas as pd
+
+from core.serializers import CarbureLotCSVSerializer, CarbureStockCSVSerializer
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
@@ -729,3 +733,116 @@ def make_dc_mps_sheet(workbook):
         worksheet_mps.write(row, 1, m.name)
         worksheet_mps.write(row, 2, m.category)
         row += 1
+
+def make_carbure_lots_sheet(workbook, entity, lots):
+    worksheet_lots = workbook.add_worksheet("lots")
+    serializer = CarbureLotCSVSerializer(lots, many=True)
+    df = pd.DataFrame(serializer.data)
+    # header
+    bold = workbook.add_format({'bold': True})
+    for i, c in enumerate(df.columns):
+        worksheet_lots.write(0, i, c, bold)
+    # content
+    for index, row in df.iterrows():
+        colid = 0
+        for elem in row:
+            worksheet_lots.write(index+1, colid, elem)
+            colid += 1
+
+def make_carbure_stock_sheet(workbook, lots,):
+    worksheet_lots = workbook.add_worksheet("lots")
+    serializer = CarbureStockCSVSerializer(lots, many=True)
+    df = pd.DataFrame(serializer.data)
+    # header
+    bold = workbook.add_format({'bold': True})
+    for i, c in enumerate(df.columns):
+        worksheet_lots.write(0, i, c, bold)
+    # content
+    for index, row in df.iterrows():
+        colid = 0
+        for elem in row:
+            worksheet_lots.write(index+1, colid, elem)
+            colid += 1
+
+def export_carbure_lots(entity, transactions):
+    today = datetime.date.today()
+    location = '/tmp/carbure_lots_%s.xlsx' % (today.strftime('%Y%m%d_%H%M'))
+    workbook = xlsxwriter.Workbook(location)
+    make_carbure_lots_sheet(workbook, entity, transactions)
+    make_countries_sheet(workbook)
+    make_mps_sheet(workbook)
+    make_biofuels_sheet(workbook)
+    make_clients_sheet(workbook)
+    make_deliverysites_sheet(workbook)
+    workbook.close()
+    return location
+
+def export_carbure_stock(entity, transactions):
+    today = datetime.date.today()
+    location = '/tmp/carbure_stock_%s.xlsx' % (today.strftime('%Y%m%d_%H%M'))
+    workbook = xlsxwriter.Workbook(location)
+    make_carbure_stock_sheet(workbook, entity, transactions)
+    make_countries_sheet(workbook)
+    make_mps_sheet(workbook)
+    make_biofuels_sheet(workbook)
+    make_clients_sheet(workbook)
+    make_deliverysites_sheet(workbook)
+    workbook.close()
+    return location   
+
+
+
+#### NEW MODEL
+
+
+def make_template_carbure_lots_sheet(workbook, entity):
+    worksheet_lots = workbook.add_worksheet("lots")
+    psites = ProductionSite.objects.filter(producer=entity)
+    clients = Entity.objects.filter(entity_type__in=[Entity.OPERATOR, Entity.TRADER]).exclude(id=entity.id)
+    delivery_sites = Depot.objects.all()
+    my_vendor_certificates = get_my_certificates(entity=entity)
+
+    # header
+    bold = workbook.add_format({'bold': True})
+    columns = ['champ_libre', 
+    'producer', 'production_site', 'production_site_reference', 'production_site_country', 'production_site_commissioning_date', 'double_counting_registration',
+    'supplier', 'supplier_certificate', 'vendor_certificate',
+    'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
+    'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee',
+    'dae', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country', 'delivery_type']
+    for i, c in enumerate(columns):
+        worksheet_lots.write(0, i, c, bold)
+
+    today = datetime.date.today().strftime('%d/%m/%Y')
+    rows = []
+    # CASE 1 my production - simple way
+    rows.append(['ajout simple', '', random.choice(psites).name, '', '', '', '', '', '', '', 35400, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), random.choice(clients).name, today, random.choice(delivery_sites).name, '', ''])
+    # CASE 2 my production - export to unknown client/site
+    rows.append(['ajout pour client hors-carbure', '', random.choice(psites).name, '', '', '', '', '', '', '', 36000, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), 'UNKNOWN CLIENT GmbH', today, 'UNKNOWN DEPOT', 'DE', ''])
+    # CASE 3 my production - custom certificate
+    rows.append(['ajout simple et choix du certificat', '', random.choice(psites).name, '', '', '', '', '', '', 'ISCC-XXXX-XXXX', 36500, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), random.choice(clients).name, today, random.choice(delivery_sites).name, '', ''])
+    # CASE 4 not my production
+    rows.append(['fournisseur hors-carbure', 'BioFuel GmbH', 'BioFuel Berlin', 'ISCC-DE-XXXX-XXX', 'DE', '22/11/2001', '', 'BioFuel Trader GmbH', 'TRADER-CERTIFICATE', '', 32300, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), 'UNKNOWN CLIENT GmbH', today, 'UNKNOWN DEPOT', 'DE', ''])
+    # CASE 5 
+    rows.append(['ajout en stock', '', random.choice(psites).name, '', '', '', '', '', '', '', 35400, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), entity.name, today, random.choice(delivery_sites).name, '', ''])
+
+    rowid = 0
+    for row in rows:
+        colid = 0
+        for elem in row:
+            worksheet_lots.write(rowid+1, colid, elem)
+            colid += 1
+        rowid += 1
+
+def template_v4(entity):
+    # Create an new Excel file and add a worksheet.
+    location = '/tmp/carbure_template.xlsx'
+    workbook = xlsxwriter.Workbook(location)
+    make_template_carbure_lots_sheet(workbook, entity)
+    make_mps_sheet(workbook)
+    make_biofuels_sheet(workbook)
+    make_countries_sheet(workbook)
+    make_clients_sheet(workbook)
+    make_deliverysites_sheet(workbook)
+    workbook.close()
+    return location

@@ -1,8 +1,8 @@
 import React from "react"
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from "react-i18next"
 
 import { LotStatus, Transaction, UserRole } from "common/types"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { LotDeleter } from "transactions/hooks/actions/use-delete-lots"
 import { LotAcceptor } from "transactions/hooks/actions/use-accept-lots"
 import { LotRejector } from "transactions/hooks/actions/use-reject-lots"
@@ -28,14 +28,14 @@ import TransactionForm from "transactions/components/form"
 import ValidationErrors from "transactions/components/form-errors"
 import { StatusTitle } from "transactions/components/status"
 import Comments from "transactions/components/form-comments"
-import { useRights } from "carbure/hooks/use-rights"
+import { useRights } from "carbure/hooks/entity"
 import { Trans } from "react-i18next"
-import useNavigate from "transactions/hooks/query/use-navigate"
+import useNavigation from "transactions/hooks/query/use-navigate"
 
 const EDITABLE = [LotStatus.ToSend]
 
 type StockDetailsProps = {
-  entity: EntitySelection
+  entity: Entity
   deleter: LotDeleter
   validator: LotValidator
   acceptor: LotAcceptor
@@ -70,7 +70,7 @@ const StockDetails = ({
 
   const { t } = useTranslation()
   const rights = useRights()
-  const navigator = useNavigate(transactions)
+  const navigator = useNavigation(transactions)
 
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
   const isEditable = EDITABLE.includes(status)

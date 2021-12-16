@@ -1,25 +1,22 @@
 import { useTranslation } from "react-i18next"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
+import { useNavigate } from "react-router-dom"
 
 import useTransactionForm, {
   toTransactionPostData,
 } from "transactions/hooks/use-transaction-form"
 
-import { useRelativePush } from "common/components/relative-route"
 import useAPI from "common/hooks/use-api"
 import useClose from "common/hooks/use-close"
 import { addLot } from "../api"
 import { useNotificationContext } from "common/components/notifications"
 
-export default function useTransactionAdd(
-  entity: EntitySelection,
-  refresh: () => void
-) {
+export default function useTransactionAdd(entity: Entity, refresh: () => void) {
   const { t } = useTranslation()
   const notifications = useNotificationContext()
 
   const close = useClose("../")
-  const relativePush = useRelativePush()
+  const relativePush = useNavigate()
   const { data, hasChange, onChange } = useTransactionForm(entity)
   const [request, resolveAddLot] = useAPI(addLot)
 

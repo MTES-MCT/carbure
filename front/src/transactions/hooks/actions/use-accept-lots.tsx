@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { TransactionSelection } from "../query/use-selection"
 
 import * as api from "transactions/api"
@@ -27,7 +27,7 @@ export interface LotAcceptor {
 }
 
 export default function useAcceptLots(
-  entity: EntitySelection,
+  entity: Entity,
   selection: TransactionSelection,
   query: TransactionQuery,
   refresh: () => void,
@@ -204,23 +204,30 @@ export default function useAcceptLots(
         selection={selection.selected}
         onResolve={resolve}
       />
-    )) 
+    ))
 
     if (allTxids !== undefined) {
-      await notifyCorrection(resolveRequestCorrection(entity.id, allTxids), true)
+      await notifyCorrection(
+        resolveRequestCorrection(entity.id, allTxids),
+        true
+      )
     }
 
     return Boolean(allTxids)
   }
 
   return {
-    loading: request.loading || requestComment.loading || requestAmend.loading || requestCorrection.loading,
+    loading:
+      request.loading ||
+      requestComment.loading ||
+      requestAmend.loading ||
+      requestCorrection.loading,
     acceptLot,
     acceptAndCommentLot,
     acceptSelection,
     acceptAllInbox,
     amendLot,
     askForCorrection,
-    requestCorrections
+    requestCorrections,
   }
 }

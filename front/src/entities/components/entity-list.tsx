@@ -1,10 +1,10 @@
 import { Fragment, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import cl from "clsx"
 import * as api from "../api"
 import styles from "./entity-list.module.css"
 import { padding } from "transactions/components/list-columns"
 import Table, { Column } from "common/components/table"
-import { useRelativePush } from "common/components/relative-route"
 import { Alert, AlertFilter } from "common/components/alert"
 import { AlertTriangle, AlertCircle } from "common/components/icons"
 
@@ -22,7 +22,7 @@ type EntityListProps = {
 }
 
 export const EntityFactoriesList = ({ entities }: EntityListProps) => {
-  const push = useRelativePush()
+  const navigate = useNavigate()
 
   const columns: Column<api.EntityDetails>[] = [
     ...COLUMNS,
@@ -40,7 +40,7 @@ export const EntityFactoriesList = ({ entities }: EntityListProps) => {
     .filter((e) => e.depots + e.production_sites > 0)
     .map((e) => ({
       value: e,
-      onClick: () => push(`${e.entity.id}`),
+      onClick: () => navigate(`${e.entity.id}`),
     }))
 
 
@@ -56,7 +56,7 @@ export const EntityFactoriesList = ({ entities }: EntityListProps) => {
 }
 
 export const EntityDoubleCountingList = ({ entities }: EntityListProps) => {
-  const push = useRelativePush()
+  const navigate = useNavigate()
   const [requestOnly, setRequestOnly] = useState(false)
 
   const requestCount =
@@ -89,7 +89,7 @@ export const EntityDoubleCountingList = ({ entities }: EntityListProps) => {
     )
     .map((e) => ({
       value: e,
-      onClick: () => push(`${e.entity.id}`),
+      onClick: () => navigate(`${e.entity.id}`),
       className: cl(e.double_counting_requests > 0 && styles.entityRequests),
     }))
 
@@ -119,12 +119,13 @@ export const EntityDoubleCountingList = ({ entities }: EntityListProps) => {
       )}
 
       <Table columns={columns} rows={rows} />
+      const navigate = useNavigate()
     </Fragment>
   )
 }
 
 export const EntityCertificatesList = ({ entities }: EntityListProps) => {
-  const push = useRelativePush()
+  const navigate = useNavigate()
 
   const columns: Column<api.EntityDetails>[] = [
     ...COLUMNS,
@@ -150,7 +151,7 @@ export const EntityCertificatesList = ({ entities }: EntityListProps) => {
     .filter((e) => e.iscc + e.dbs + e.redcert + e.sn > 0)
     .map((e) => ({
       value: e,
-      onClick: () => push(`${e.entity.id}`),
+      onClick: () => navigate(`${e.entity.id}`),
     }))
 
   if (rows.length === 0) {
@@ -165,7 +166,7 @@ export const EntityCertificatesList = ({ entities }: EntityListProps) => {
 }
 
 export const EntityUsersList = ({ entities }: EntityListProps) => {
-  const push = useRelativePush()
+  const navigate = useNavigate()
   const [requestOnly, setRequestOnly] = useState(false)
 
   const requestCount = entities.filter((e) => e.requests > 0).length ?? 0
@@ -191,7 +192,7 @@ export const EntityUsersList = ({ entities }: EntityListProps) => {
     .filter((e) => (requestOnly ? e.requests > 0 : e.users + e.requests > 0))
     .map((e) => ({
       value: e,
-      onClick: () => push(`${e.entity.id}`),
+      onClick: () => navigate(`${e.entity.id}`),
       className: cl(e.requests > 0 && styles.entityRequests),
     }))
 

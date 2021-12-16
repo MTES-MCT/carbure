@@ -1,11 +1,11 @@
 import { useParams } from "react-router"
-import { useRelativePush } from "common/components/relative-route"
+import { useNavigate } from "react-router-dom"
 import { useCallback, useEffect } from "react"
 
-export default function useNavigate(transactions: number[]) {
-  const push = useRelativePush()
-  const params: { id: string } = useParams()
-  const current = parseInt(params.id)
+export default function useNavigation(transactions: number[]) {
+  const push = useNavigate()
+  const params = useParams<"id">()
+  const current = parseInt(params.id ?? '')
 
   const index = transactions.indexOf(current)
   const total = transactions.length

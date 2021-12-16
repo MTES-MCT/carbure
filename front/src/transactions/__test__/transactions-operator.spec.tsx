@@ -1,7 +1,7 @@
 import { render, TestRoot } from "setupTests"
 import { waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { Route } from "common/components/relative-route"
+import { Route } from "react-router-dom"
 import { Entity, LotStatus } from "common/types"
 
 import { operator } from "common/__test__/data"
@@ -25,9 +25,7 @@ const TransactionsWithRouter = ({
   status: LotStatus
 }) => (
   <TestRoot url={`/org/0/transactions/${status}`}>
-    <Route path="/org/0/transactions/:status">
-      <Transactions entity={entity} />
-    </Route>
+    <Route path="/org/0/transactions/:status/*" element={<Transactions entity={entity} />} />
   </TestRoot>
 )
 
@@ -87,7 +85,7 @@ test("operator: display a list of 1 transaction", async () => {
   screen.getByText("Réd. GES")
 
   // check lot columns
-  screen.getByText("Brouillon")
+  screen.getAllByText("Brouillon")
   screen.getByText("2020-01")
   screen.getByText("EMHV")
   screen.getByText("12 345")
@@ -165,7 +163,7 @@ test("operator: duplicate draft lot", async () => {
   await screen.findByText("31")
 
   // new line was added
-  await waitFor(() => expect(screen.getAllByText("Brouillon").length).toBe(2))
+  await waitFor(() => expect(screen.getAllByText("Brouillon").length).toBe(3))
   expect(screen.getAllByText("2020-01").length).toBe(2)
   expect(screen.getAllByText("EMHV").length).toBe(2)
   expect(screen.getAllByText("12 345").length).toBe(2)

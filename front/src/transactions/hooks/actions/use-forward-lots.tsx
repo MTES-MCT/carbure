@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next"
 import { Transaction } from "common/types"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { TransactionSelection } from "../query/use-selection"
 
 import * as api from "transactions/api"
@@ -20,7 +20,7 @@ export interface LotForwarder {
 }
 
 export default function useForwardLots(
-  entity: EntitySelection,
+  entity: Entity,
   selection: TransactionSelection,
   refresh: () => void
 ): LotForwarder {

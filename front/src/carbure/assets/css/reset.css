@@ -1,0 +1,11 @@
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+ul {
+  padding-left: var(--spacing-l);
+  margin: 0;
+}

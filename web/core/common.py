@@ -1,4 +1,5 @@
 import datetime
+import unicodedata
 import openpyxl
 from django import db
 from django.db.models import Q, Count
@@ -1160,3 +1161,85 @@ def get_transaction_distance(tx):
         p.start()
         res['error'] = 'DISTANCE_NOT_IN_CACHE'
         return res
+
+
+def convert_template_row_to_formdata(entity, prefetched_data, filepath):
+    wb = openpyxl.load_workbook(filepath, data_only=True)
+    sheet = wb.worksheets[0]
+    data = get_sheet_data(sheet, convert_float=True)
+    column_names = data[0]
+    data = data[1:]
+    df = pd.DataFrame(data, columns=column_names)
+    df.fillna('', inplace=True)
+    lots_data = []
+    for row in df.iterrows():
+        lot_row = row[1]
+        lot = {}
+        # TEMPLATE COLUMNS
+        # 'champ_libre', 
+        # 'producer', 'production_site', 'production_site_reference', 'production_site_country', 'production_site_commissioning_date', 'double_counting_registration',
+        # 'supplier', 'supplier_certificate', ('vendor_certificate') removed,
+        # 'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
+        # 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee',
+        # 'dae', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country',]
+
+        # TARGET COLUMNS
+        # free_field, carbure_producer, unknown_producer, carbure_production_site, unknown_production_site
+        # production_country, production_site, commissioning_date, production_site_certificate, production_site_double_counting_certificate
+        # carbure_supplier, unknown_supplier, supplier_certificate
+        # transport_document, carbure_client, unknown_client, delivery_date, carbure_delivery_site, unknown_delivery_site, delivery_site_country
+        # biofuel, feedstock, country_of_origin
+
+        lot['free_field'] = lot_row.get('champ_libre', '')
+        producer = lot_row.get('producer', '')
+        production_site = lot_row.get('production_site', '')
+        if producer is None or producer == '' or producer.upper() == entity.name.upper():
+            # I am the producer
+            if production_site.upper() in prefetched_data['my_production_sites']:
+                lot['carbure_production_site'] = production_site
+            # carbure_supplier and carbure_producer will be set to entity in construct_carbure_lot
+        else:
+            # I am not the producer
+            lot['unknown_producer'] = producer
+            lot['unknown_production_site'] = production_site
+            
+            lot['production_country_code'] = lot_row.get('production_site_country', None)
+            lot['production_site_commissioning_date'] = lot_row.get('production_site_commissioning_date', '')
+            lot['production_site_certificate'] = lot_row.get('production_site_certificate', '')
+            lot['production_site_double_counting_certificate'] = lot_row.get('production_site_double_counting_certificate', '')
+            lot['unknown_supplier'] = lot_row.get('supplier', '')
+            lot['supplier_certificate'] = lot_row.get('supplier_certificate', '')
+
+        lot['volume'] = lot_row.get('volume', 0)
+        lot['feedstock_code'] = lot_row.get('matiere_premiere_code', '')
+        lot['biofuel_code'] = lot_row.get('biocarburant_code', '')
+        lot['country_code'] = lot_row.get('pays_origine_code', '')
+
+        for key in ['el']: # negative value allowed
+            try:
+                lot[key] = float(lot_row.get(key, 0))
+            except:
+                lot[key] = 0
+        for key in ['eec', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee']: # positive value only
+            try:
+                lot[key] = abs(float(lot_row.get(key, 0)))
+            except:
+                lot[key] = 0
+        lot['transport_document_reference'] = lot_row.get('dae', '')
+        lot['delivery_date'] = lot_row.get('delivery_date', '')
+        delivery_site = lot_row.get('delivery_site', '')
+        if delivery_site.upper() in prefetched_data['depots']:
+            lot['carbure_delivery_site_depot_id'] = prefetched_data['depots'][delivery_site.upper()].depot_id
+        elif delivery_site.upper() in prefetched_data['depotsbyname']:
+            lot['carbure_delivery_site_depot_id'] = prefetched_data['depotsbyname'][delivery_site.upper()].depot_id
+        else:
+            lot['unknown_delivery_site'] = delivery_site
+            delivery_site_country = lot_row.get('delivery_site_country', '')
+            lot['delivery_site_country'] = prefetched_data['countries'].get(delivery_site_country, None)
+        client = lot_row.get('client', '')
+        if client in prefetched_data['clients']:
+            lot['carbure_client'] = prefetched_data['clients'][client]
+        else:
+            lot['unknown_client'] = client
+        lots_data.append(lot)
+    return lots_data

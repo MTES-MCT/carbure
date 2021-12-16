@@ -20,7 +20,7 @@ from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
-from core.models import Entity, ExternalAdminRights, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, UserRightsRequests
+from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockTransformation, Entity, ExternalAdminRights, GenericCertificate, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, UserRightsRequests
 from core.models import Depot, LotV2, LotTransaction, TransactionComment, GenericError
 from core.models import SustainabilityDeclaration, EntityDepot
 from core.models import TransactionUpdateHistory, TransactionDistance
@@ -560,3 +560,111 @@ class ETBETransformation(admin.ModelAdmin):
 class ExtAdminRightsAdmin(admin.ModelAdmin):
     list_display = ('entity', 'right',)
 
+@admin.register(CarbureLot)
+class CarbureLotAdmin(admin.ModelAdmin):
+    list_display = ['year', 'period', 'transport_document_reference', 'get_producer', 'get_production_site', 'get_supplier', 'get_client', 
+    'delivery_date', 'get_delivery_site', 'get_biofuel', 'get_feedstock', 'volume', 'lot_status', 'correction_status', 'delivery_type',
+    ]
+    raw_id_fields = ['parent_lot', 'parent_stock']
+    list_filter = ('year', ('period', DropdownFilter), 'lot_status', 'correction_status', ('biofuel', NameSortedRelatedOnlyDropdownFilter), ('feedstock', NameSortedRelatedOnlyDropdownFilter), 
+                  ('carbure_supplier', NameSortedRelatedOnlyDropdownFilter), ('carbure_client', NameSortedRelatedOnlyDropdownFilter),  
+                  'delivery_type', ('carbure_delivery_site', NameSortedRelatedOnlyDropdownFilter),
+                  ('carbure_production_site', NameSortedRelatedOnlyDropdownFilter),)
+
+    def get_producer(self, obj):
+        return obj.carbure_producer.name if obj.carbure_producer else 'U - ' + obj.unknown_producer
+    get_producer.admin_order_field  = 'carbure_producer__name'
+    get_producer.short_description = 'Producer'
+
+    def get_production_site(self, obj):
+        return obj.carbure_production_site.name if obj.carbure_production_site else 'U - %s' % (obj.unknown_production_site)
+    get_production_site.admin_order_field  = 'carbure_production_site__name'
+    get_production_site.short_description = 'Production Site'
+
+    def get_supplier(self, obj):
+        return obj.carbure_supplier.name if obj.carbure_supplier else 'U - %s' % (obj.unknown_supplier)
+    get_supplier.admin_order_field  = 'carbure_supplier__name'
+    get_supplier.short_description = 'Supplier'
+
+    def get_client(self, obj):
+        return obj.carbure_client.name if obj.carbure_client else 'U - %s' % (obj.unknown_client)
+    get_client.admin_order_field  = 'carbure_client__name'
+    get_client.short_description = 'Client'
+
+    def get_delivery_site(self, obj):
+        return obj.carbure_delivery_site.name if obj.carbure_delivery_site else 'U - %s' % (obj.unknown_delivery_site)
+    get_delivery_site.admin_order_field  = 'carbure_delivery_site__name'
+    get_delivery_site.short_description = 'Delivery Site'
+
+    def get_biofuel(self, obj):
+        return obj.biofuel.code
+    get_biofuel.admin_order_field  = 'biofuel__code'
+    get_biofuel.short_description = 'Biofuel'
+
+    def get_feedstock(self, obj):
+        return obj.feedstock.code
+    get_feedstock.admin_order_field  = 'feedstock__code'
+    get_feedstock.short_description = 'Feedstock'
+
+@admin.register(CarbureStock)
+class CarbureStockAdmin(admin.ModelAdmin):
+    list_display = ['carbure_id', 'get_client', 'get_depot',  'get_biofuel', 'get_feedstock', 'get_orig_volume', 'remaining_volume', 'get_supplier']
+    raw_id_fields = ['parent_lot', 'parent_transformation']
+    list_filter = (('parent_lot__period', DropdownFilter), ('biofuel', NameSortedRelatedOnlyDropdownFilter), ('feedstock', NameSortedRelatedOnlyDropdownFilter), 
+                  ('carbure_supplier', NameSortedRelatedOnlyDropdownFilter), ('carbure_client', NameSortedRelatedOnlyDropdownFilter),  
+                  ('depot', NameSortedRelatedOnlyDropdownFilter),)
+
+    def get_supplier(self, obj):
+        return obj.carbure_supplier.name if obj.carbure_supplier else 'U - %s' % (obj.unknown_supplier)
+    get_supplier.admin_order_field  = 'carbure_supplier__name'
+    get_supplier.short_description = 'Supplier'
+
+    def get_client(self, obj):
+        return obj.carbure_client.name if obj.carbure_client else 'U - %s' % (obj.unknown_client)
+    get_client.admin_order_field  = 'carbure_client__name'
+    get_client.short_description = 'Client'
+
+    def get_depot(self, obj):
+        return obj.depot.name if obj.depot else 'UNKNOWN'
+    get_depot.admin_order_field  = 'depot__name'
+    get_depot.short_description = 'Delivery Site'
+
+    def get_biofuel(self, obj):
+        return obj.biofuel.code
+    get_biofuel.admin_order_field  = 'biofuel__code'
+    get_biofuel.short_description = 'Biofuel'
+
+    def get_feedstock(self, obj):
+        return obj.feedstock.code
+    get_feedstock.admin_order_field  = 'feedstock__code'
+    get_feedstock.short_description = 'Feedstock'
+
+    def get_orig_volume(self, obj):
+        return obj.parent_lot.volume if obj.parent_lot else obj.parent_transformation.volume_destination
+    get_orig_volume.admin_order_field  = 'parent_lot__volume'
+    get_orig_volume.short_description = 'Initial Volume'
+
+@admin.register(CarbureLotEvent)
+class CarbureLotEventAdmin(admin.ModelAdmin):
+    list_display = []
+    
+
+@admin.register(CarbureLotComment)
+class CarbureLotCommentAdmin(admin.ModelAdmin):
+    list_display = []
+
+
+@admin.register(CarbureStockTransformation)
+class CarbureStockTransformationAdmin(admin.ModelAdmin):
+    list_display = []
+
+@admin.register(CarbureNotification)
+class CarbureNotificationAdmin(admin.ModelAdmin):
+    list_display = []
+    list_filter = ['is_sent', 'send_copy_to_admin']
+
+@admin.register(GenericCertificate)
+class GenericCertificateAdmin(admin.ModelAdmin):
+    list_display = ['certificate_id', 'certificate_type', 'certificate_holder', 'valid_from', 'valid_until']
+    list_filter = ['certificate_type']
+    search_fields = ('certificate_holder', 'certificate_id')

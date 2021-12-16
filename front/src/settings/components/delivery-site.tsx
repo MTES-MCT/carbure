@@ -41,11 +41,11 @@ import { padding } from "transactions/components/list-columns"
 import RadioGroup from "common/components/radio-group"
 import { SettingsForm } from "./common"
 import useForm from "common/hooks/use-form"
-import { EntitySelection } from "carbure/hooks/use-entity"
-import { useRights } from "carbure/hooks/use-rights"
+import { Entity } from "carbure/types"
+import { useRights } from "carbure/hooks/entity"
 
 type DeliverySiteFinderPromptProps = PromptProps<EntityDeliverySite> & {
-  entity: EntitySelection
+  entity: Entity
 }
 
 export const DeliverySiteFinderPrompt = ({

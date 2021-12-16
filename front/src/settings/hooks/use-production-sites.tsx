@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { ProductionSiteDetails, UserRole } from "common/types"
 
 import useAPI from "common/hooks/use-api"
@@ -12,7 +12,7 @@ import {
 } from "../components/production-site"
 import { confirm, prompt } from "common/components/dialog"
 import { useNotificationContext } from "common/components/notifications"
-import { useRights } from "carbure/hooks/use-rights"
+import { useRights } from "carbure/hooks/entity"
 
 export interface ProductionSiteSettingsHook {
   isEmpty: boolean
@@ -25,7 +25,7 @@ export interface ProductionSiteSettingsHook {
 }
 
 export default function useProductionSites(
-  entity: EntitySelection
+  entity: Entity
 ): ProductionSiteSettingsHook {
   const { t } = useTranslation()
   const rights = useRights()

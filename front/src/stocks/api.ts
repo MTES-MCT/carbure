@@ -17,15 +17,12 @@ import {
   toOption,
   normalizeFilter,
 } from "transactions/helpers"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import { Entity } from "carbure/types"
 import { TFunction } from "react-i18next"
 import { Option } from "common/components/select"
 
 // extract the status name from the lot details
-export function getStockStatus(
-  tx: Transaction,
-  entity: EntitySelection
-): LotStatus {
+export function getStockStatus(tx: Transaction, entity: Entity): LotStatus {
   const status = tx.lot.status.toLowerCase()
   const delivery = tx.delivery_status
 
