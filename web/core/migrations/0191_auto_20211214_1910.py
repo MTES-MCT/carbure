@@ -4,11 +4,12 @@ from django.db import migrations
 from django.db import connection
 
 def certificate_charset(apps, schema_editor):
-    cursor = connection.cursor()
-    sql = "ALTER TABLE carbure_certificates CHANGE certificate_holder certificate_holder VARCHAR(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-    cursor.execute(sql)
-    sql = "ALTER TABLE carbure_certificates CHANGE address address VARCHAR(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-    cursor.execute(sql)
+    if 'TEST' not in os.environ or os.environ['TEST'] != '1':
+        cursor = connection.cursor()
+        sql = "ALTER TABLE carbure_certificates CHANGE certificate_holder certificate_holder VARCHAR(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+        cursor.execute(sql)
+        sql = "ALTER TABLE carbure_certificates CHANGE address address VARCHAR(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+        cursor.execute(sql)
 
 
 class Migration(migrations.Migration):
