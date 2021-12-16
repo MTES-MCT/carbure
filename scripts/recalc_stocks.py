@@ -9,6 +9,26 @@ django.setup()
 
 from core.models import *
 
+# # MANUAL FIXES
+# tx = LotTransaction.objects.get(id=144736)
+# tx.parent_tx_id = 144710
+# tx.save()
+
+# tx = LotTransaction.objects.get(id=144991)
+# tx.parent_tx_id = 144732
+# tx.save()
+
+# tx = LotTransaction.objects.get(id=156120)
+# tx.parent_tx_id = 149470
+# tx.save()
+# ETBETransformation.objects.update_or_create(previous_stock_id=149470, new_stock_id=156120, defaults={'volume_ethanol':75487.0, 'volume_etbe':173504.71})
+
+# tx = LotTransaction.objects.get(id=156108)
+# tx.parent_tx_id = 150014
+# tx.save()
+# ETBETransformation.objects.update_or_create(previous_stock_id=150014, new_stock_id=156108, defaults={'volume_ethanol':231213.0, 'volume_etbe':532539.14})    
+
+# good to go
 transformations = ETBETransformation.objects.all()
 transformed_in = [e.previous_stock_id for e in transformations]
 
@@ -49,13 +69,15 @@ def handle_complex_stock(tx, child_tx):
             print('Child txid %d Lot Period [%s] Volume [%f] BC [%s] MP [%s] Client [%s]' % (c.id, c.lot.period, c.lot.volume, c.lot.biocarburant.code, c.lot.matiere_premiere.code, c.carbure_client.name if c.carbure_client else c.unknown_client))
         print('Readjusting remaining volume to %f' % (tx.lot.volume - sum_volume))
         tx.lot.remaining_volume = tx.lot.volume - sum_volume
-        #tx.lot.save()
+        if input('Save?') == 'y':
+            print('Saving')
+            tx.lot.save()
         print('New remaining volume: [%f]' % (tx.lot.remaining_volume))
             
 def fix_other_stock():
     stocks = LotTransaction.objects.filter(lot__year=2021, lot__status='Validated', is_stock=True, is_forwarded=False, lot__is_transformed=False)
     for l in stocks:
-        child_txs = LotTransaction.objects.filter(parent_tx=l)
+        child_txs = LotTransaction.objects.filter(parent_tx=l, lot__status='Validated')
         if l.carbure_client and l.carbure_client.entity_type == Entity.OPERATOR:
             print('Client is an operator. Should not happen')
             if child_txs.count() == 0:
