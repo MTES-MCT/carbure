@@ -273,19 +273,13 @@ def create_new_tx_and_child(tx):
             if c.id in TX_ID_MIGRATED:
                 print('[Child] Ignoring txid %d - already migrated' % (c.id))
                 continue
-            if c.lot.biocarburant.code == 'ETBE':
+            if c.lot.biocarburant.code == 'ETBE' and c.lot.parent_lot.biocarburant.code == 'ETH':
                 print('child is ETBE, use ethanol volume to ensure stock is correct')
                 transformation = ETBETransformation.objects.get(new_stock=c)
                 child_sum_volume -= c.lot.volume
                 child_sum_volume += transformation.volume_ethanol
                 print('parent: %d %s %f child %d %s %f of which ethanol %f' % (tx.id, tx.lot.biocarburant.name, tx.lot.volume, c.id, c.lot.biocarburant.name, c.lot.volume, transformation.volume_ethanol))
             print('Child total accumulated sum %d' % (child_sum_volume))
-            #child_tx_transformations = ETBETransformation.objects.filter(new_stock=c)
-            #if child_tx_transformations.count() > 0:
-            #    for ct in child_tx_transformations:
-            #        print('subtransaction converted to ETBE: initial volume: %d used ethanol %d new ETBE volume %d' % (c.lot.volume, ct.volume_ethanol, ct.volume_etbe))
-            #        child_sum_volume -= ct.volume_etbe
-            #        child_sum_volume += ct.volume_ethanol
             lot.pk = None # breaks the link with stock.parent_lot
             lot.carbure_supplier = stock.carbure_client
             lot.carbure_client = c.carbure_client
@@ -402,15 +396,6 @@ def migrate_old_data(quick=False):
 
 
 if __name__ == '__main__':
-    # fix links between sublots and lots
-    txs = LotTransaction.objects.filter(lot__parent_lot__isnull=False)
-    for tx in txs:
-        if tx.parent_tx is None:
-            potential_parents = LotTransaction.objects.filter(lot_id=tx.lot.parent_lot.id)
-            if potential_parents.count() == 1:
-                tx.parent_tx = potential_parents[0]
-                tx.save()
-                print('Fix link between parent %s and child %s' % (potential_parents[0].id, tx.id))
 
     #LotTransaction.objects.filter(id=144653).update(parent_tx_id=144535)
 
