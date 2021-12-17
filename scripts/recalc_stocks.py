@@ -9,28 +9,14 @@ django.setup()
 
 from core.models import *
 
-# # MANUAL FIXES
-# tx = LotTransaction.objects.get(id=144736)
-# tx.parent_tx_id = 144710
-# tx.save()
-
-# tx = LotTransaction.objects.get(id=144991)
-# tx.parent_tx_id = 144732
-# tx.save()
-
-# tx = LotTransaction.objects.get(id=156120)
-# tx.parent_tx_id = 149470
-# tx.save()
-# ETBETransformation.objects.update_or_create(previous_stock_id=149470, new_stock_id=156120, defaults={'volume_ethanol':75487.0, 'volume_etbe':173504.71})
-
-# tx = LotTransaction.objects.get(id=156108)
-# tx.parent_tx_id = 150014
-# tx.save()
-# ETBETransformation.objects.update_or_create(previous_stock_id=150014, new_stock_id=156108, defaults={'volume_ethanol':231213.0, 'volume_etbe':532539.14})    
-
-# good to go
 transformations = ETBETransformation.objects.all()
 transformed_in = [e.previous_stock_id for e in transformations]
+
+def pretty_print(tx):
+    print('Tx [%d] Parent Tx [%s] Lot [%d] Parent Lot [%s] %s %s %d (remaining %d) From %s To %s [Period %s - %s] Forwarded: %s Stock: %s' % (tx.id, tx.parent_tx_id, tx.lot.id, tx.lot.parent_lot_id, tx.lot.biocarburant.name, tx.lot.matiere_premiere.name, tx.lot.volume, tx.lot.remaining_volume,
+                                                                                       tx.lot.carbure_producer.name if tx.lot.carbure_producer else tx.lot.unknown_producer, tx.carbure_client.name if tx.carbure_client else tx.unknown_client,
+                                                                                                                               tx.lot.period, tx.delivery_date, tx.is_forwarded, tx.is_stock))
+
 
 def reset_remaining_volume(tx):
     if tx.id in transformed_in:
@@ -55,11 +41,17 @@ def handle_complex_stock(tx, child_tx):
         tx.lot.is_transformed = True
         tx.lot.save()
         return
-        
-    sum_child = child_tx.filter(is_forwarded=False).aggregate(Sum('lot__volume'))
-    sum_volume = sum_child['lot__volume__sum']
-    if not sum_volume:
-        sum_volume = 0
+
+    if tx.id == 160516:
+        print('Recalc stock of tx id %d' % (tx.id))
+
+    sum_volume = 0
+    for c in child_tx:
+        #pretty_print(c)
+        if c.is_forwarded:
+            continue
+        sum_volume += c.lot.volume
+    print('Parent volume [%d] remaining [%d] theo remaining [%d] diff [%d] child volume [%d]' % (tx.lot.volume, tx.lot.remaining_volume, tx.lot.volume - sum_volume, tx.lot.remaining_volume - (tx.lot.volume - sum_volume), sum_volume))    
     diff = round(tx.lot.volume - sum_volume, 2) - round(tx.lot.remaining_volume, 2)
     if abs(diff) > 0.1:
         print('Tx id [%d] Lot Id [%d]' % (tx.id, tx.lot.id))
@@ -89,7 +81,6 @@ def fix_other_stock():
     
     stocks = LotTransaction.objects.filter(lot__status='Validated', is_stock=True, is_forwarded=False, lot__is_transformed=False)
     for l in stocks:
-        print('Recalc stock of tx id %d' % (l.id))
         child_txs = LotTransaction.objects.filter(parent_tx=l, lot__status='Validated')
         if l.carbure_client and l.carbure_client.entity_type == Entity.OPERATOR:
             print('Client is an operator. Should not happen')
