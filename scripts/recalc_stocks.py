@@ -75,8 +75,21 @@ def handle_complex_stock(tx, child_tx):
         print('New remaining volume: [%f]' % (tx.lot.remaining_volume))
             
 def fix_other_stock():
+    # fix links between sublots and lots
+    txs = LotTransaction.objects.filter(lot__parent_lot__isnull=False)
+    for tx in txs:
+        if tx.parent_tx is None:
+            potential_parents = LotTransaction.objects.filter(lot_id=tx.lot.parent_lot.id)
+            if potential_parents.count() == 1:
+                tx.parent_tx = potential_parents[0]
+                tx.save()
+                print('Fix link between parent %s and child %s' % (potential_parents[0].id, tx.id))
+
+
+    
     stocks = LotTransaction.objects.filter(lot__status='Validated', is_stock=True, is_forwarded=False, lot__is_transformed=False)
     for l in stocks:
+        print('Recalc stock of tx id %d' % (l.id))
         child_txs = LotTransaction.objects.filter(parent_tx=l, lot__status='Validated')
         if l.carbure_client and l.carbure_client.entity_type == Entity.OPERATOR:
             print('Client is an operator. Should not happen')
