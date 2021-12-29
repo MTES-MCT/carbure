@@ -321,8 +321,6 @@ def bulk_insert_lots(entity: Entity, lots: List[CarbureLot], errors: List[Generi
     for lot, errors in zip(inserted_lots, errors):
         for e in errors:
             e.lot_id = lot.id
-    #flat_generic_errors = [item for sublist in errors for item in sublist]
     bulk_sanity_checks(inserted_lots, prefetched_data, background=False)
     GenericError.objects.bulk_create(errors, batch_size=100)
-    #check_duplicates(new_txs, background=False)
     return inserted_lots
