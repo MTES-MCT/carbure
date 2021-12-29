@@ -523,9 +523,9 @@ def sort_stock(stock, query):
 
 def get_lot_errors(lot, entity_id):
     errors = []
-    if entity_id == str(lot.carbure_supplier_id):
+    if entity_id == lot.added_by_id:
         errors = lot.genericerror_set.filter(display_to_creator=True)
-    elif entity_id == str(lot.carbure_client_id):
+    elif entity_id == lot.carbure_client_id:
         errors = lot.genericerror_set.filter(display_to_recipient=True)
     else:
         errors = lot.genericerror_set.all()
