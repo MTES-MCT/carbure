@@ -398,7 +398,7 @@ def migrate_old_data(quick=False):
         all_transactions = LotTransaction.objects.filter(lot__period__startswith='2021', lot__biocarburant__code='ETH')
     else:
         all_transactions = LotTransaction.objects.all()
-        paginator = Paginator(LotTransaction.objects.all(), 1000)
+        paginator = Paginator(LotTransaction.objects.filter(lot__status='Validated'), 1000)
     for page in range(1, paginator.num_pages + 1):
         for tx in paginator.page(page).object_list:
             migrate_tx(tx)
