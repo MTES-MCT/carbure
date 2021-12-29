@@ -133,14 +133,10 @@ def sanity_check(lot, prefetched_data):
     if not valid:
         is_sane = False
         errors += reqfielderrors
-        print('not valid, return early')
         return is_sane, errors
 
     if lot.carbure_producer is None and lot.carbure_client is None:
-        print('NOT ALL GOOD')
         errors.append(generic_error(error='NOT_CLIENT_NOR_PRODUCER', lot=lot, is_blocking=True, fields=['carbure_producer', 'carbure_client']))
-    else:
-        print('ALL GOOD')
 
     if lot.delivery_type == CarbureLot.RFC and lot.biofuel.code not in ['ED95', 'B100', 'ETH', 'EMHV', 'EMHU']:
         errors.append(generic_error(error='MAC_BC_WRONG', lot=lot, is_blocking=True, fields=['biofuel', 'delivery_type']))
