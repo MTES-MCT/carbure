@@ -12,7 +12,7 @@ import { FileArea, FileInput } from "common-v2/components/input"
 import { LoaderOverlay } from "common-v2/components/scaffold"
 
 const FAQ_URL = "https://carbure-1.gitbook.io/faq/"
-const TEMPLATE_URL = ""
+const TEMPLATE_URL = "/api/download-template"
 
 export const ImportButton = () => {
   const { t } = useTranslation()
@@ -87,7 +87,7 @@ const ImportDialog = ({ onClose }: ImportDialogProps) => {
           <p>
             <Trans>
               Avant de commencer, veillez à télécharger le modèle disponible{" "}
-              <Ext href={TEMPLATE_URL}>sur ce lien</Ext>.
+              <Ext href={TEMPLATE_URL + `?entity_id=${entity.id}`}>sur ce lien</Ext>.
             </Trans>
           </p>
         </section>
