@@ -50,13 +50,14 @@ def get_snapshot(request, *args, **kwargs):
     lots_in_tofix = lots_in.exclude(correction_status=CarbureLot.NO_PROBLEMO)
     stock = CarbureStock.objects.filter(carbure_client_id=entity_id).filter(Q(parent_lot__year=year) | Q(parent_transformation__transformation_dt__year=year))
     stock_not_empty = stock.filter(remaining_volume__gt=0)
-    lots_out = lots.filter(carbure_supplier_id=entity_id).exclude(lot_status__in=[CarbureLot.DELETED, CarbureLot.DRAFT])
-    lots_out_pending = lots_out.filter(lot_status=CarbureLot.PENDING)
-    lots_out_tofix = lots_out.exclude(correction_status=CarbureLot.NO_PROBLEMO)
+    out = lots.filter(added_by__id=entity_id)
+    history = out.exclude(lot_status__in=[CarbureLot.DELETED, CarbureLot.DRAFT, CarbureLot.PENDING])
+    lots_out_pending = out.filter(lot_status=CarbureLot.PENDING)
+    lots_out_tofix = out.exclude(correction_status=CarbureLot.NO_PROBLEMO)
     data['lots'] = {'draft': drafts.count(),
                     'in_total': lots_in.count(), 'in_pending': lots_in_pending.count(), 'in_tofix': lots_in_tofix.count(),
                     'stock': stock_not_empty.count(), 'stock_total': stock.count(),
-                    'out_total': lots_out.count(), 'out_pending': lots_out_pending.count(), 'out_tofix': lots_out_tofix.count()}
+                    'out_total': history.count(), 'out_pending': lots_out_pending.count(), 'out_tofix': lots_out_tofix.count()}
     return JsonResponse({'status': 'success', 'data': data})
 
 
@@ -673,6 +674,14 @@ def lots_send(request, *args, **kwargs):
         event.save()
 
         lot.lot_status = CarbureLot.PENDING
+
+
+        # I AM NEITHER THE PRODUCER NOR THE CLIENT
+        # create two transactions. unknown producer -> supplier and supplier -> unknown client
+        if lot.carbure_producer is None and lot.carbure_client is None:
+            pass
+
+
         # I AM THE CLIENT
         if lot.carbure_client_id == entity_id:
             nb_auto_accepted += 1
