@@ -11,8 +11,7 @@ from core.serializers import CarbureLotCSVSerializer, CarbureStockCSVSerializer
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import MatierePremiere, Biocarburant, Pays, Depot, Entity, ProductionSite, LotTransaction
-from certificates.models import EntityISCCTradingCertificate, EntityDBSTradingCertificate, EntityREDCertTradingCertificate, EntitySNTradingCertificate
+from core.models import GenericCertificate, MatierePremiere, Biocarburant, Pays, Depot, Entity, ProductionSite, LotTransaction
 
 
 UNKNOWN_PRODUCERS = [{'name': 'ITANOL', 'country': 'IT', 'production_site': 'BERGAMO', 'ref': 'ISCC-IT-100001010', 'date':'2017-12-01', 'dc':'IT_001_2020'},
@@ -62,21 +61,10 @@ def get_random_dae():
 
 def get_my_certificates(entity=None):
     # certificates
-    iscc_certificates = EntityISCCTradingCertificate.objects.all()
-    dbs_certificates = EntityDBSTradingCertificate.objects.all()
-    redcert_certificates = EntityREDCertTradingCertificate.objects.all()
-    sn_certificates = EntitySNTradingCertificate.objects.all()
-
+    certs = GenericCertificate.objects.all()
     if entity is not None:
-        iscc_certificates = iscc_certificates.filter(entity=entity)[0:10]
-        dbs_certificates = dbs_certificates.filter(entity=entity)[0:10]
-        redcert_certificates = redcert_certificates.filter(entity=entity)[0:10]
-        sn_certificates = sn_certificates.filter(entity=entity)[0:10]
-    certs = [c.certificate.certificate_id for c in iscc_certificates]
-    certs += [c.certificate.certificate_id for c in dbs_certificates]
-    certs += [c.certificate.certificate_id for c in redcert_certificates]
-    certs += [c.certificate.certificate_id for c in sn_certificates]
-
+        certs = certs.filter(entity=entity)
+    certs = [c.certificate_id for c in certs]
     if len(certs) == 0:
         certs.append('No certificates found')
     return certs

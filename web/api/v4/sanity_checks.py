@@ -50,9 +50,6 @@ rules['UNKNOWN_DOUBLE_COUNTING_CERTIFICATE'] = "Le certificat double compte est 
 rules['EXPIRED_DOUBLE_COUNTING_CERTIFICATE'] = "Le certificat double n'est plus valide"
 rules['POTENTIAL_DUPLICATE'] = "Doublon potentiel détecté. Un autre lot avec le même numéro douanier, biocarburant, matière première, volume et caractéristiques GES existe."
 
-rules['NOT_CLIENT_NOR_PRODUCER'] = "Vous devez être le producteur ou le client de la transaction ajoutée"
-
-
 def generic_error(error, **kwargs):
     d = {
         'display_to_creator': True,
@@ -134,9 +131,6 @@ def sanity_check(lot, prefetched_data):
         is_sane = False
         errors += reqfielderrors
         return is_sane, errors
-
-    if lot.carbure_producer is None and lot.carbure_client is None:
-        errors.append(generic_error(error='NOT_CLIENT_NOR_PRODUCER', lot=lot, is_blocking=True, fields=['carbure_producer', 'carbure_client']))
 
     if lot.delivery_type == CarbureLot.RFC and lot.biofuel.code not in ['ED95', 'B100', 'ETH', 'EMHV', 'EMHU']:
         errors.append(generic_error(error='MAC_BC_WRONG', lot=lot, is_blocking=True, fields=['biofuel', 'delivery_type']))
