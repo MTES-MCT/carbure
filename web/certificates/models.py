@@ -1,5 +1,5 @@
 from django.db import models
-from core.models import Biocarburant, Entity, MatierePremiere, Pays
+from core.models import Biocarburant, Entity, EntityCertificate, MatierePremiere, Pays
 from producers.models import ProductionSite
 
 class SNCategory(models.Model):
@@ -371,15 +371,16 @@ class EntityREDCertTradingCertificate(models.Model):
 
 
 class ProductionSiteCertificate(models.Model):
-    CERTIFICATE_TYPE = [("ISCC", "ISCC"), ("2BS", "2BS"), ('REDCERT', 'REDCERT'), ('SN', 'SN')]
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     production_site = models.ForeignKey(ProductionSite, null=True, on_delete=models.CASCADE)
-    type = models.CharField(max_length=32, choices=CERTIFICATE_TYPE, default="Pending")
-
-    certificate_iscc = models.ForeignKey(EntityISCCTradingCertificate, null=True, blank=True, on_delete=models.CASCADE)
-    certificate_2bs = models.ForeignKey(EntityDBSTradingCertificate, null=True, blank=True, on_delete=models.CASCADE)
-    certificate_redcert = models.ForeignKey(EntityREDCertTradingCertificate, null=True, blank=True, on_delete=models.CASCADE)
-    certificate_sn = models.ForeignKey("certificates.EntitySNTradingCertificate", null=True, blank=True, on_delete=models.CASCADE)
+    certificate = models.ForeignKey(EntityCertificate, null=True, blank=True, on_delete=models.CASCADE)
+    
+    CERTIFICATE_TYPE = [("ISCC", "ISCC"), ("2BS", "2BS"), ('REDCERT', 'REDCERT'), ('SN', 'SN')] # deprecated
+    type = models.CharField(max_length=32, choices=CERTIFICATE_TYPE, default="Pending") # deprecated
+    certificate_iscc = models.ForeignKey(EntityISCCTradingCertificate, null=True, blank=True, on_delete=models.CASCADE) # deprecated
+    certificate_2bs = models.ForeignKey(EntityDBSTradingCertificate, null=True, blank=True, on_delete=models.CASCADE) # deprecated
+    certificate_redcert = models.ForeignKey(EntityREDCertTradingCertificate, null=True, blank=True, on_delete=models.CASCADE) # deprecated
+    certificate_sn = models.ForeignKey("certificates.EntitySNTradingCertificate", null=True, blank=True, on_delete=models.CASCADE) # deprecated
 
     def natural_key(self):
         if self.type == 'ISCC':
