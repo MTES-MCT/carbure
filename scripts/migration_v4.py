@@ -341,6 +341,8 @@ def create_new_tx_and_child(tx):
 
     return lot
 
+BULK_COMMENTS = []
+BULK_EVENTS = []
 
 def migrate_tx(tx):
     # create the new transaction
@@ -360,7 +362,8 @@ def migrate_tx(tx):
         new.comment = c.comment
         new.is_visible_by_admin = True
         new.is_visible_by_auditor = True
-        new.save()
+        #new.save()
+        BULK_COMMENTS.append(new)
     comments = AdminTransactionComment.objects.filter(tx=tx)
     for c in comments:
         new = CarbureLotComment()
@@ -375,7 +378,8 @@ def migrate_tx(tx):
         new.comment = c.comment
         new.is_visible_by_admin = c.is_visible_by_admin
         new.is_visible_by_auditor = c.is_visible_by_auditor
-        new.save()
+        #new.save()
+        BULK_COMMENTS.append(new)
     # events/history migration
     events = TransactionUpdateHistory.objects.filter(tx=tx)
     for e in events:
@@ -385,7 +389,8 @@ def migrate_tx(tx):
         event.lot = new_tx
         event.user = e.modified_by
         event.metadata = {'field': e.field, 'value_before': e.value_before, 'value_after': e.value_after}
-        event.save()
+        #event.save()
+        BULK_EVENTS.append(event)
     # errors
     errors = GenericError.objects.filter(tx=tx).update(lot=new_tx)
     del tx
@@ -402,49 +407,14 @@ def migrate_old_data(quick=False):
     for page in range(1, paginator.num_pages + 1):
         for tx in paginator.page(page).object_list:
             migrate_tx(tx)
-
+            if len(BULK_COMMENTS) > 1000:
+                CarbureLotComment.objects.bulk_create(BULK_COMMENTS)
+                BULK_COMMENTS = []
+            if len(BULK_EVENTS) > 1000:
+                CarbureLotEvent.objects.bulk_create(BULK_EVENTS)
+                BULK_EVENTS = []
+    CarbureLotComment.objects.bulk_create(BULK_COMMENTS)
+    CarbureLotEvent.objects.bulk_create(BULK_EVENTS)
 
 if __name__ == '__main__':
-    # ensure forwarded lots are marked as such
-    lots_with_parent = LotV2.objects.filter(parent_lot__isnull=False)
-    for l in lots_with_parent:
-        print('Analyzing lot %d' % (l.id))
-        tx = LotTransaction.objects.filter(lot=l)
-        parent_tx = LotTransaction.objects.filter(lot=l.parent_lot)
-        if tx.count() > 1 or parent_tx.count() > 1:
-            print('DEBUG NEEDED')
-            parent = parent_tx[0]
-            for t in parent_tx:
-                print('PARENT', t.id, t.lot_id, t.lot.biocarburant.name, t.lot.volume, t.carbure_client, t.delivery_date)
-            for t in tx:
-                print(t.id, t.lot_id, t.lot.biocarburant.name, t.lot.volume, t.carbure_client, t.delivery_date, t.parent_tx)                
-                if t.parent_tx is None:
-                    print('Parent tx should be %d' % (parent.id))
-                    x = input('Continue')
-                    if x == 'y':
-                        t.parent_tx_id = parent.id
-                        t.save()
-                        transformed = input('mark parent lot as transformed ?')
-                        if transformed == 'y':
-                            parent.lot.is_transformed = True
-                            parent.lot.save()
-                    else:
-                        print('You said NO')
-                        assert(False)
-                parent = t
-        if tx.count() == 1 and parent_tx.count() == 1:
-            # pretty sure this is a forward
-            ptx = parent_tx[0]
-            ctx = tx[0]
-            if ptx.lot.volume != ctx.lot.volume:
-                continue
-            #if not ptx.is_forwarded:
-            #    print('Update tx id %d. Set is forwarded = True. Child tx %d' % (ptx.id, ctx.id))
-            #    ptx.is_forwarded = True
-            #    ptx.save()
-            if not ctx.parent_tx:
-                print('Update tx id %d. Set parent_tx %d. Client 1 %s Client 2 %s' % (ctx.id, ptx.id, ptx.carbure_client.name, ctx.carbure_client.name if ctx.carbure_client else ctx.unknown_client))
-                ctx.parent_tx = ptx
-                ctx.save()
-    del lots_with_parent
     migrate_old_data()

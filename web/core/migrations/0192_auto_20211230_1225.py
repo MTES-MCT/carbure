@@ -2,12 +2,12 @@
 
 from django.db import migrations
 import datetime
-from certificates.models import ProductionSiteCertificate
 from core.models import EntityCertificate, GenericCertificate
 
 def migrate_certificates(apps, schema_editor):
     # ISCC
     EntityISCCTradingCertificate = apps.get_model('certificates', 'EntityISCCTradingCertificate')
+    ProductionSiteCertificate = apps.get_model('certificates', 'ProductionSiteCertificate')
     iscc_links = EntityISCCTradingCertificate.objects.all()
     for link in iscc_links:
         # recreate certificate in new tables
@@ -15,7 +15,7 @@ def migrate_certificates(apps, schema_editor):
         'address': link.certificate.location, 'valid_from': link.certificate.valid_from, 'valid_until': link.certificate.valid_until,
         'download_link': link.certificate.download_link}
         obj, created = GenericCertificate.objects.update_or_create(certificate_type=GenericCertificate.ISCC, certificate_id=link.certificate.certificate_id, defaults=d)
-        new_link, created = EntityCertificate.objects.update_or_create(entity=link.entity, certificate=obj)
+        new_link, created = EntityCertificate.objects.update_or_create(entity_id=link.entity_id, certificate=obj)
         ProductionSiteCertificate.objects.filter(certificate_iscc=link).update(certificate=new_link)
     # REDCERT
     EntityREDCertTradingCertificate = apps.get_model('certificates', 'EntityREDCertTradingCertificate')
@@ -26,7 +26,7 @@ def migrate_certificates(apps, schema_editor):
         'address': link.certificate.city, 'valid_from': link.certificate.valid_from, 'valid_until': link.certificate.valid_until,
         'download_link': None}
         obj, created = GenericCertificate.objects.update_or_create(certificate_type=GenericCertificate.REDCERT, certificate_id=link.certificate.certificate_id, defaults=d)
-        new_link, created = EntityCertificate.objects.update_or_create(entity=link.entity, certificate=obj)
+        new_link, created = EntityCertificate.objects.update_or_create(entity_id=link.entity_id, certificate=obj)
         ProductionSiteCertificate.objects.filter(certificate_redcert=link).update(certificate=new_link)
 
     # 2BS
@@ -38,7 +38,7 @@ def migrate_certificates(apps, schema_editor):
         'address': link.certificate.holder_address, 'valid_from': link.certificate.valid_from, 'valid_until': link.certificate.valid_until,
         'download_link': link.certificate.download_link}
         obj, created = GenericCertificate.objects.update_or_create(certificate_type=GenericCertificate.DBS, certificate_id=link.certificate.certificate_id, defaults=d)
-        new_link, created = EntityCertificate.objects.update_or_create(entity=link.entity, certificate=obj)
+        new_link, created = EntityCertificate.objects.update_or_create(entity_id=link.entity_id, certificate=obj)
         ProductionSiteCertificate.objects.filter(certificate_2bs=link).update(certificate=new_link)
     # SN
     EntitySNTradingCertificate = apps.get_model('certificates', 'EntitySNTradingCertificate')
@@ -49,7 +49,7 @@ def migrate_certificates(apps, schema_editor):
         'address': '', 'valid_from': link.certificate.valid_from if link.certificate.valid_from else link.certificate.valid_until.replace(year=link.certificate.valid_until.year - 2, month=1, day=1), 'valid_until': link.certificate.valid_until,
         'download_link': link.certificate.download_link}
         obj, created = GenericCertificate.objects.update_or_create(certificate_type=GenericCertificate.SYSTEME_NATIONAL, certificate_id=link.certificate.certificate_id, defaults=d)
-        new_link, created = EntityCertificate.objects.update_or_create(entity=link.entity, certificate=obj)
+        new_link, created = EntityCertificate.objects.update_or_create(entity_id=link.entity_id, certificate=obj)
         ProductionSiteCertificate.objects.filter(certificate_sn=link).update(certificate=new_link)
 
 
@@ -57,6 +57,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('core', '0191_auto_20211214_1910'),
+        ('certificates', '0013_productionsitecertificate_certificate'),
     ]
 
     operations = [
