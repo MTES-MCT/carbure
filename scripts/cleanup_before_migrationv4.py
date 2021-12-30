@@ -25,7 +25,7 @@ def cleanup_tables():
     sql3 = "SET FOREIGN_KEY_CHECKS = 1;"
     cursor.execute(sql3)
     
-    
+   
 
 if __name__ == '__main__':
     cleanup_tables()
