@@ -12,12 +12,6 @@ urlpatterns = [
     path('traders', views.get_traders, name='api-v3-public-get-traders'),
     path('delivery-sites', views.get_delivery_sites, name='api-v3-public-get-delivery-sites'),
     path('production-sites', views.get_production_sites, name='api-v3-public-get-production-sites'),
-    path('iscc-certificates', views.get_iscc_certificates, name='api-v3-public-search-iscc-certificates'),
-    path('2bs-certificates', views.get_2bs_certificates, name='api-v3-public-search-2bs-certificates'),
-    path('redcert-certificates', views.get_redcert_certificates, name='api-v3-public-search-redcert-certificates'),
-    path('sn-certificates', views.get_sn_certificates, name='api-v3-public-search-sn-certificates'),
-    path('certificates', views.get_certificates, name='api-v3-public-search-certificates'),
-    path('certificate', views.get_certificate, name='api-v3-public-get-certificate'),
 
     # POST
     path('create-delivery-site', views.create_delivery_site, name='api-v3-public-create-delivery-site'),

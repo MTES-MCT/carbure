@@ -58,7 +58,7 @@ def get_entity_lots_by_status(entity_id, status=None):
     elif status == 'IN':
         lots = lots.filter(carbure_client_id=entity_id).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
     elif status == 'OUT':
-        lots = lots.filter(carbure_supplier_id=entity_id).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
+        lots = lots.filter(added_by__id=entity_id).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
     elif status == 'DECLARATION':
         lots = lots.filter(Q(carbure_supplier_id=entity_id) | Q(carbure_client_id=entity_id)).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
     else:

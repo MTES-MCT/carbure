@@ -9,21 +9,18 @@ import os
 from multiprocessing import Process
 
 import pandas as pd
-from typing import FrozenSet, TYPE_CHECKING, List
+from typing import FrozenSet, TYPE_CHECKING, Generic, List
 from pandas._typing import FilePathOrBuffer, Scalar
 from django.db import transaction
 
 
-from core.models import LotV2, LotTransaction, GenericError, TransactionUpdateHistory
+from core.models import GenericCertificate, LotV2, LotTransaction, GenericError, TransactionUpdateHistory
 from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
 from core.models import TransactionDistance, EntityDepot
 from core.notifications import notify_pending_lot, notify_lot_fixed
 from core.ign_distance import get_distance
 
-from certificates.models import DoubleCountingRegistration, ISCCCertificate, EntityISCCTradingCertificate
-from certificates.models import DBSCertificate, EntityDBSTradingCertificate
-from certificates.models import REDCertCertificate, EntityREDCertTradingCertificate
-from certificates.models import EntitySNTradingCertificate, SNCertificate
+from certificates.models import DoubleCountingRegistration
 from certificates.models import DoubleCountingRegistration
 
 import dateutil.parser
@@ -41,11 +38,8 @@ def try_get_certificate(certificate):
          'certificate_id': certificate,
          'certificate_type': '',
          }
-    iscc = ISCCCertificate.objects.filter(certificate_id=certificate)
-    dbs = DBSCertificate.objects.filter(certificate_id=certificate)
-    red = REDCertCertificate.objects.filter(certificate_id=certificate)
-    sn = SNCertificate.objects.filter(certificate_id=certificate)
-    count = iscc.count() + dbs.count() + red.count() + sn.count()
+    matches = GenericCertificate.objects.filter(certificate_id=certificate)
+    count = matches.count()
     if count == 0:
         return d
     if count > 1:
@@ -53,30 +47,12 @@ def try_get_certificate(certificate):
         return d
     d['matches'] = 1
     d['found'] = True
-    if iscc.count() == 1:
-        d['holder'] = iscc[0].certificate_holder
-        d['valid_until'] = iscc[0].valid_until
-        d['valid_from'] = iscc[0].valid_from
-        d['scope'] = [c.scope.scope for c in iscc[0].iscccertificatescope_set.all()]
-        d['certificate_type'] = 'ISCC'
-    if dbs.count() == 1:
-        d['holder'] = dbs[0].certificate_holder
-        d['valid_until'] = dbs[0].valid_until
-        d['valid_from'] = dbs[0].valid_from
-        d['scope'] = [c.scope.certification_type for c in dbs[0].dbscertificatescope_set.all()]
-        d['certificate_type'] = '2BS'
-    if red.count() == 1:
-        d['holder'] = red[0].certificate_holder
-        d['valid_until'] = red[0].valid_until
-        d['valid_from'] = red[0].valid_from
-        d['scope'] = [c.scope.scope for c in red[0].redcertcertificatescope_set.all()]
-        d['certificate_type'] = 'REDCERT'
-    if sn.count() == 1:
-        d['holder'] = sn[0].certificate_holder
-        d['valid_until'] = sn[0].valid_until
-        d['valid_from'] = sn[0].valid_from
-        d['scope'] = [c.scope.category_id for c in sn[0].sncertificatescope_set.all()]
-        d['certificate_type'] = 'SN'
+    if count == 1:
+        c = matches[0]
+        d['holder'] = c.certificate_holder
+        d['valid_until'] = c.valid_until
+        d['valid_from'] = c.valid_from
+        d['certificate_type'] = c.certificate_type
     return d
 
 def try_get_double_counting_certificate(cert):
