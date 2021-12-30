@@ -1,5 +1,5 @@
 from django.urls import path, include
-from api.v4 import views
+from api.v4 import views, certificates
 
 urlpatterns = [
     # GET
@@ -58,4 +58,14 @@ urlpatterns = [
     path('download-template', views.get_template, name='api-v4-get-template'),
     #path('download-template-blend', views.get_template_blend, name='api-v3-template-blend'),
     #path('download-template-trader', views.get_template_trader, name='api-v3-template-trader'),
+
+
+    # SETTINGS
+    path('get-certificates', certificates.get_certificates, name='api-v4-settings-get-certificates'),
+    path('add-certificate', certificates.add_certificate, name='api-v4-settings-add-certificate'),
+    path('delete-certificate', certificates.delete_certificate, name='api-v4-settings-delete-certificate'),
+    path('update-certificate', certificates.update_certificate, name='api-v4-settings-update-certificate'),
+    path('get-my-certificates', certificates.get_my_certificates, name='api-v4-settings-get-my-certificates'),
+    path('set-production-site-certificates', certificates.set_production_site_certificates, name='api-v4-settings-set-production-site-certificates'),
+    path('set-default-certificate', certificates.set_default_certificate, name='api-v4-settings-set-default-certificate'),
 ]

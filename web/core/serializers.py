@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import CarbureLot, CarbureLotEvent, CarbureLotComment, CarbureStock, CarbureStockTransformation, Depot, Entity, EntityDepot, GenericError
+from core.models import CarbureLot, CarbureLotEvent, CarbureLotComment, CarbureStock, CarbureStockTransformation, Depot, Entity, EntityDepot, GenericCertificate, GenericError
 from doublecount.serializers import BiofuelSerializer, CountrySerializer, EntitySerializer, FeedStockSerializer
 from producers.models import ProductionSite
 
@@ -236,3 +236,10 @@ class CarbureLotAdminSerializer(CarbureLotPublicSerializer):
                   'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ghg_reference_red_ii', 'ghg_reduction_red_ii',
                   'free_field', 'added_by', 'highlighted_by_auditor', 'highlighted_by_admin'
                   ]
+
+
+
+class GenericCertificateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GenericCertificate
+        fields = ['certificate_id', 'certificate_type', 'certificate_holder', 'certificate_issuer', 'address', 'valid_from', 'valid_until', 'download_link', 'scope', 'input', 'output']
