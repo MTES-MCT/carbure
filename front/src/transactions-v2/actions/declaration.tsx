@@ -71,7 +71,7 @@ export const DeclarationDialog = ({
     onSuccess: (res) => {
       const declarations = res.data.data ?? []
       if (declaration === undefined) {
-        setDeclaration(declarations.find((d) => d.period === currentPeriod))
+        setDeclaration(declarations.find((d) => d.period === currentPeriod) ?? declarations[0])
       } else {
         setDeclaration(declarations.find((d) => d.period === declaration.period)) // prettier-ignore
       }

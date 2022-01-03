@@ -7,6 +7,7 @@ import {
   Depot,
   Feedstock,
   ProductionSite,
+  CertificateData
 } from "common/types"
 
 export const normalizeBiofuel: Normalizer<Biofuel> = (biofuel) => ({
@@ -57,6 +58,13 @@ export const normalizeCountryFilter: Normalizer<Option, string> = (country) => (
   value: country.value,
   label: i18next.t(country.value, { ns: "countries" }),
 })
+
+// prettier-ignore
+export const normalizeCertificate: Normalizer<CertificateData, string> = (certificate) => ({
+  value: certificate.certificate_id,
+  label: `${certificate.certificate_id} - ${certificate.certificate_holder}`,
+})
+
 
 export function identity<T>(value: T) {
   return value

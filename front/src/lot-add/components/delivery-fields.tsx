@@ -9,8 +9,8 @@ import { UserCheck } from "common-v2/components/icons"
 import * as api from "common-v2/api"
 import * as norm from "common-v2/utils/normalizers"
 import { LotFormValue } from "./lot-form"
-import { Entity } from "carbure/types"
-import { Country, Depot } from "common/types"
+import { Entity, } from "carbure/types"
+import { Country, Depot, CertificateData } from "common/types"
 
 interface DeliveryFieldsProps {
   readOnly?: boolean
@@ -20,6 +20,7 @@ export const DeliveryFields = (props: DeliveryFieldsProps) => {
   const { t } = useTranslation()
   return (
     <Fieldset label={t("Livraison")}>
+      <MyCertificateField {...props} />
       <SupplierField {...props} />
       <SupplierCertificateField {...props} />
       <ClientField {...props} />
@@ -55,10 +56,13 @@ export const SupplierField = (props: AutocompleteProps<Entity | string>) => {
 
 export const SupplierCertificateField = (props: AutocompleteProps<string>) => {
   const { t } = useTranslation()
+  const entity = useEntity()
   const { value, bind } = useFormContext<LotFormValue>()
   const bound = bind("supplier_certificate")
 
   const supplier = value.supplier instanceof Object ? value.supplier : undefined
+  const isSupplier = entity.id === supplier?.id
+
 
   return (
     <Autocomplete
@@ -66,7 +70,36 @@ export const SupplierCertificateField = (props: AutocompleteProps<string>) => {
       placeholder={supplier?.default_certificate}
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={(query) =>
-        api.findCertificates(query, { entity_id: supplier?.id })
+        isSupplier
+          ? api.findMyCertificates(query, { entity_id: entity.id })
+          : api.findCertificates(query)
+      }
+      {...bound}
+      {...props}
+    />
+  )
+}
+
+export const MyCertificateField = (props: AutocompleteProps<string>) => {
+  const { t } = useTranslation()
+  const entity = useEntity()
+  const { value, bind } = useFormContext<LotFormValue>()
+  const bound = bind("vendor_certificate")
+
+
+  const supplier = value.supplier instanceof Object ? value.supplier : undefined
+  const client = value.client instanceof Object ? value.client : undefined
+
+  // hide this field if this entity is NOT an intermediary
+  if (supplier?.id === entity.id || client?.id === entity.id) return null
+
+  return (
+    <Autocomplete
+      label={t("Votre certificat")}
+      placeholder={entity?.default_certificate}
+      defaultOptions={bound.value ? [bound.value] : undefined}
+      getOptions={(query) =>
+        api.findMyCertificates(query, { entity_id: entity.id })
       }
       {...bound}
       {...props}

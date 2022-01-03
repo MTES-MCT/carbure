@@ -15,7 +15,7 @@ import * as norm from "common-v2/utils/normalizers"
 import { LotFormValue } from "./lot-form"
 import { UserCheck } from "common-v2/components/icons"
 import { Entity } from "carbure/types"
-import { Country, ProductionSite } from "common/types"
+import { Country, ProductionSite, CertificateData } from "common/types"
 
 interface ProductionFieldsProps {
   readOnly?: boolean
@@ -115,10 +115,11 @@ export const ProductionSiteCertificateField = (
   props: AutocompleteProps<string>
 ) => {
   const { t } = useTranslation()
+  const entity = useEntity()
   const { value, bind } = useFormContext<LotFormValue>()
   const bound = bind("production_site_certificate")
 
-  const production_site =
+  const production_site_id =
     value.production_site instanceof Object
       ? value.production_site.id
       : undefined
@@ -127,7 +128,11 @@ export const ProductionSiteCertificateField = (
     <Autocomplete
       label={t("Certificat du site de production")}
       defaultOptions={bound.value ? [bound.value] : undefined}
-      getOptions={(query) => api.findCertificates(query, { production_site })} // prettier-ignore
+      getOptions={(query) =>
+        production_site_id !== undefined
+          ? api.findMyCertificates(query, { entity_id: entity.id, production_site_id })
+          : api.findCertificates(query)
+      }
       {...bound}
       {...props}
     />

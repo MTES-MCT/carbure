@@ -25,6 +25,8 @@ export interface Lot {
   unknown_supplier: string | null
   supplier_certificate: string | null
   supplier_certificate_type: string | null
+  vendor_certificate: string | null
+  vendor_certificate_type: string | null
   transport_document_type: TransportDocumentType
   transport_document_reference: string | null
   carbure_client: Entity | null
