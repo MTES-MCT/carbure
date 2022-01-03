@@ -58,10 +58,6 @@ export function useLotForm(
 
     // for producers
     if (entity.isProducer) {
-      if (value.supplier === undefined) {
-        value.supplier = entity
-      }
-
       if (!entity.has_trading) {
         value.producer = entity
       }
@@ -69,9 +65,7 @@ export function useLotForm(
 
     // for traders
     if (entity.isTrader) {
-      if (value.supplier === undefined) {
-        value.supplier = entity
-      }
+      //
     }
 
     // for operators

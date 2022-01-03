@@ -44,7 +44,7 @@ export const SupplierField = (props: AutocompleteProps<Entity | string>) => {
       value={supplier}
       icon={isKnown ? UserCheck : undefined}
       create={norm.identity}
-      defaultOptions={isKnown ? [supplier] : [entity]}
+      defaultOptions={supplier ? [supplier] : [entity]}
       getOptions={async () => [entity]}
       normalize={norm.normalizeEntity}
       {...bound}
