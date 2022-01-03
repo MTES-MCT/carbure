@@ -787,6 +787,12 @@ class CarbureLot(models.Model):
     supplier_certificate = models.CharField(max_length=64, blank=True, null=True, default=None)
     supplier_certificate_type = models.CharField(max_length=64, blank=True, null=True, default=None)
 
+    # ONLY SET FOR SPECIFIC TRADING TRANSACTIONS
+    carbure_vendor = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='carbure_vendor')
+    vendor_certificate = models.CharField(max_length=64, blank=True, null=True, default=None)
+    vendor_certificate_type = models.CharField(max_length=64, blank=True, null=True, default=None)
+
+
     # delivery
     DAU = "DAU"
     DAE = "DAE"

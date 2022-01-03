@@ -185,9 +185,12 @@ def fill_supplier_info(lot, data, entity):
         lot.carbure_supplier = None
         lot.unknown_supplier = data.get('unknown_supplier', None)
     lot.supplier_certificate = data.get('supplier_certificate', None)
-    lot.supplier_certificate_type = data.get('supplier_certificate_type', None)
     if lot.supplier_certificate is None:
         lot.supplier_certificate = entity.default_certificate
+    # I AM NEITHER THE PRODUCER NOR THE CLIENT
+    if entity != lot.carbure_supplier and entity != lot.carbure_client:
+        lot.carbure_vendor = entity # this will flag the transaction when it is validated
+        lot.vendor_certificate = data.get('vendor_certificate', '')
     return errors
 
 def fill_ghg_info(lot, data):
