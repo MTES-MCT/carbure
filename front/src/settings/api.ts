@@ -11,6 +11,8 @@ import {
   REDCertCertificate,
   SNCertificate,
   EntityRights,
+  CertificateType,
+  CertificateData
 } from "common/types"
 import {
   DoubleCounting,

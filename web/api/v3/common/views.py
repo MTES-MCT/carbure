@@ -213,8 +213,10 @@ def get_stats(request):
         entities = {}
         for r in entity_count:
             entities[r['entity_type']] = r['count']
-        return JsonResponse({'status': 'success', 'data': {'total_volume': total_volume['lot__volume__sum'] / 1000, 'entities': entities}})
+        total = total_volume['lot__volume__sum']
+        if total is None:
+            total = 1000
+        return JsonResponse({'status': 'success', 'data': {'total_volume': total / 1000, 'entities': entities}})
     except Exception as e:
-        print(e)
         return JsonResponse({'status': 'error', 'message': 'Could not compute statistics'})
 

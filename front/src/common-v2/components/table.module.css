@@ -152,7 +152,8 @@
   display: flex;
   flex: 0.33;
   min-width: min-content;
-  justify-content: flex-end;
+  justify-content: center;
+  /* justify-content: flex-end; */
   gap: var(--spacing-s);
 }
 
