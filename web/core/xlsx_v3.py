@@ -788,7 +788,7 @@ def make_template_carbure_lots_sheet(workbook, entity):
     psites = ProductionSite.objects.filter(producer=entity)
     clients = Entity.objects.filter(entity_type__in=[Entity.OPERATOR, Entity.TRADER]).exclude(id=entity.id)
     delivery_sites = Depot.objects.all()
-    my_vendor_certificates = get_my_certificates(entity=entity)
+    #my_vendor_certificates = get_my_certificates(entity=entity)
 
     # header
     bold = workbook.add_format({'bold': True})

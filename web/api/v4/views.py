@@ -675,15 +675,38 @@ def lots_send(request, *args, **kwargs):
 
         lot.lot_status = CarbureLot.PENDING
 
-
         # I AM NEITHER THE PRODUCER NOR THE CLIENT
-        # create two transactions. unknown producer -> supplier and supplier -> unknown client
-        if lot.carbure_producer is None and lot.carbure_client is None:
-            pass
-
-
+        # create two transactions. unknown producer/supplier -> me and me -> client
+        if lot.carbure_producer != entity and lot.carbure_client != entity:
+            # AUTO ACCEPT FIRST TRANSACTION
+            final_client = lot.carbure_client
+            nb_auto_accepted += 1
+            lot.lot_status = CarbureLot.ACCEPTED
+            lot.carbure_client = entity
+            lot.save()
+            first_tx_id = lot.id
+            event = CarbureLotEvent()
+            event.event_type = CarbureLotEvent.ACCEPTED
+            event.lot = lot
+            event.user = request.user
+            event.save()            
+            lot.pk = None
+            lot.parent_tx_id = first_tx_id
+            lot.carbure_client = final_client
+            lot.carbure_supplier = lot.carbure_vendor
+            lot.vendor_certificate = lot.supplier_certificate
+            lot.vendor_certificate_type = lot.supplier_certificate_type
+            lot.carbure_vendor = None
+            lot.vendor_certificate = ''
+            lot.vendor_certificate_type = ''
+            lot.save()
+            event = CarbureLotEvent()
+            event.event_type = CarbureLotEvent.ACCEPTED
+            event.lot = lot
+            event.user = request.user
+            event.save()            
         # I AM THE CLIENT
-        if lot.carbure_client_id == entity_id:
+        elif lot.carbure_client_id == entity_id:
             nb_auto_accepted += 1
             lot.lot_status = CarbureLot.ACCEPTED
             event = CarbureLotEvent()
@@ -717,7 +740,7 @@ def lots_send(request, *args, **kwargs):
                 e.stock = stock
                 e.user = request.user
                 e.save()
-        if lot.carbure_client_id is None:
+        elif lot.carbure_client_id is None:
             # RFC or EXPORT
             nb_auto_accepted += 1
             lot.lot_status = CarbureLot.ACCEPTED
@@ -726,6 +749,9 @@ def lots_send(request, *args, **kwargs):
             event.lot = lot
             event.user = request.user
             event.save()
+        else:
+            print('SHOULD NOT HAPPEN')
+            return JsonResponse({'status': 'error'}, status=500)
         lot.save()
     return JsonResponse({'status': 'success', 'data': {'submitted': nb_lots, 'sent': nb_sent, 'auto-accepted': nb_auto_accepted, 'ignored': nb_ignored, 'rejected': nb_rejected}})
 

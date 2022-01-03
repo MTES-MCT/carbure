@@ -1186,6 +1186,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
             lot['unknown_supplier'] = lot_row.get('supplier', '')
             lot['supplier_certificate'] = lot_row.get('supplier_certificate', '')
 
+        lot['vendor_certificate'] = lot_row.get('vendor_certificate', '')
         lot['volume'] = lot_row.get('volume', 0)
         lot['feedstock_code'] = lot_row.get('matiere_premiere_code', '')
         lot['biofuel_code'] = lot_row.get('biocarburant_code', '')
@@ -1213,9 +1214,11 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
             delivery_site_country = lot_row.get('delivery_site_country', '')
             lot['delivery_site_country_code'] = delivery_site_country
         client = lot_row.get('client', '')
-        if client in prefetched_data['clients']:
-            lot['carbure_client'] = prefetched_data['clients'][client]
+        if client in prefetched_data['clientsbyname']:
+            print('KNOWN CLIENT %s' % (client))
+            lot['carbure_client_id'] = prefetched_data['clientsbyname'][client].id
         else:
+            print('UNKNOWN CLIENT %s' % (client))
             lot['unknown_client'] = client
         lots_data.append(lot)
     return lots_data
