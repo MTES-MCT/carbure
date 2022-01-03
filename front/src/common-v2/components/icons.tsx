@@ -4,17 +4,14 @@ import css from "./icons.module.css"
 
 // icons were adapted from https://github.com/tabler/tabler-icons
 
-export interface IconProps {
+export interface IconProps
+  extends Omit<React.SVGProps<SVGSVGElement>, "stroke"> {
   passthrough?: boolean
-  className?: string
-  style?: React.CSSProperties
   size?: number
   color?: string
   fill?: string
   stroke?: number
   title?: string
-  children?: React.ReactNode
-  onClick?: React.MouseEventHandler<SVGSVGElement>
 }
 
 const Icon = ({

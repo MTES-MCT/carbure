@@ -178,7 +178,10 @@ def fill_basic_info(lot, data, prefetched_data):
 def fill_supplier_info(lot, data, entity):
     errors = []
     # I am a producer, this is my own production
-    if lot.carbure_producer == entity:
+    if lot.carbure_producer and lot.carbure_producer.id == entity.id:
+        lot.carbure_supplier = entity
+        lot.unknown_supplier = None
+    elif data.get('carbure_supplier_id') == str(entity.id):
         lot.carbure_supplier = entity
         lot.unknown_supplier = None
     else:
@@ -210,7 +213,7 @@ def fill_ghg_info(lot, data):
     try:
         lot.etd = abs(float(data.get('etd', 0)))
     except:
-        errors.append(GenericError(lot=lot, field='etd', error=WRONG_FLOAT_FORMAT, display_to_creator=True))                
+        errors.append(GenericError(lot=lot, field='etd', error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.eu = abs(float(data.get('eu', 0)))
     except:
@@ -218,19 +221,19 @@ def fill_ghg_info(lot, data):
     try:
         lot.esca = abs(float(data.get('esca', 0)))
     except:
-        errors.append(GenericError(lot=lot, field='esca', error=WRONG_FLOAT_FORMAT, display_to_creator=True))         
+        errors.append(GenericError(lot=lot, field='esca', error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.eccs = abs(float(data.get('eccs', 0)))
     except:
-        errors.append(GenericError(lot=lot, field='eccs', error=WRONG_FLOAT_FORMAT, display_to_creator=True))         
+        errors.append(GenericError(lot=lot, field='eccs', error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.eccr = abs(float(data.get('eccr', 0)))
     except:
-        errors.append(GenericError(lot=lot, field='eccr', error=WRONG_FLOAT_FORMAT, display_to_creator=True))         
+        errors.append(GenericError(lot=lot, field='eccr', error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.eee = abs(float(data.get('eee', 0)))
     except:
-        errors.append(GenericError(lot=lot, field='eee', error=WRONG_FLOAT_FORMAT, display_to_creator=True))         
+        errors.append(GenericError(lot=lot, field='eee', error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     lot.update_ghg()
     return errors
 
@@ -305,7 +308,7 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
         fill_production_info_from_stock(lot, parent_stock)
         lot.parent_stock = parent_stock
         lot.carbure_dispatch_site = parent_stock.depot
-        lot.carbure_supplier = parent_stock.carbure_client 
+        lot.carbure_supplier = parent_stock.carbure_client
         lot.feedstock = parent_stock.feedstock
         lot.biofuel = parent_stock.biofuel
         lot.country_of_origin = parent_stock.country_of_origin
