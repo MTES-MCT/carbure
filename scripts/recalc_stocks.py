@@ -28,7 +28,7 @@ def reset_remaining_volume(tx):
     if tx.lot.volume != tx.lot.remaining_volume:
         print('Reset %s remaining volume from %f to %f. Tx id [%d] Lot id [%d] client %s' % (tx.lot.biocarburant.code, tx.lot.remaining_volume, tx.lot.volume, tx.id, tx.lot.id, tx.carbure_client.name if tx.carbure_client else tx.unknown_client))
         tx.lot.remaining_volume = tx.lot.volume
-        #tx.lot.save()
+        tx.lot.save()
         
 def handle_complex_stock(tx, child_tx):
     if tx.lot.is_transformed:
@@ -40,18 +40,15 @@ def handle_complex_stock(tx, child_tx):
         tx.lot.save()
         return
 
-    if tx.id == 160516:
-        print('Recalc stock of tx id %d' % (tx.id))
-
     sum_volume = 0
     for c in child_tx:
         #pretty_print(c)
         #if c.is_forwarded:
         #    continue
         sum_volume += c.lot.volume
-    print('Parent volume [%d] remaining [%d] theo remaining [%d] diff [%d] child volume [%d]' % (tx.lot.volume, tx.lot.remaining_volume, tx.lot.volume - sum_volume, tx.lot.remaining_volume - (tx.lot.volume - sum_volume), sum_volume))    
     diff = round(tx.lot.volume - sum_volume, 2) - round(tx.lot.remaining_volume, 2)
     if abs(diff) > 0.1:
+        print('Parent volume [%d] remaining [%d] theo remaining [%d] diff [%d] child volume [%d]' % (tx.lot.volume, tx.lot.remaining_volume, tx.lot.volume - sum_volume, tx.lot.remaining_volume - (tx.lot.volume - sum_volume), sum_volume))    
         print('Tx id [%d] Lot Id [%d]' % (tx.id, tx.lot.id))
         print('Parent remaining_volume != initial volume - child volume: Lot initial volume [%f] Sum of child [%f] Remaining [%f] Theo Remaining [%f] Diff [%f]' % (tx.lot.volume, sum_volume, tx.lot.remaining_volume, tx.lot.volume - sum_volume, diff))
         print('Original Lot Period [%s] Volume [%f] BC [%s] MP [%s] Client [%s]' % (tx.lot.period, tx.lot.volume, tx.lot.biocarburant.code, tx.lot.matiere_premiere.code, tx.carbure_client.name if tx.carbure_client else tx.unknown_client))
@@ -71,12 +68,11 @@ def fix_other_stock():
         tx = LotTransaction.objects.filter(lot=l)
         parent_tx = LotTransaction.objects.filter(lot=l.parent_lot)
         if tx.count() > 1 or parent_tx.count() > 1:
-            print('DEBUG NEEDED')
             parent = parent_tx[0]
-            for t in parent_tx:
-                print('PARENT', t.id, t.lot_id, t.lot.biocarburant.name, t.lot.volume, t.carbure_client, t.delivery_date)
+            #for t in parent_tx:
+            #    print('PARENT', t.id, t.lot_id, t.lot.biocarburant.name, t.lot.volume, t.carbure_client, t.delivery_date)
             for t in tx:
-                print(t.id, t.lot_id, t.lot.biocarburant.name, t.lot.volume, t.carbure_client, t.delivery_date, t.parent_tx)                
+                #print(t.id, t.lot_id, t.lot.biocarburant.name, t.lot.volume, t.carbure_client, t.delivery_date, t.parent_tx)                
                 if t.parent_tx is None:
                     if tx.count() == 1:
                         print('Marking Parent tx as %d' % (parent.id))                        
@@ -117,17 +113,17 @@ def fix_other_stock():
     del lots_with_parent
 
 
-    
     # fix links between sublots and lots
-    txs = LotTransaction.objects.filter(lot__parent_lot__isnull=False)
+    txs = LotTransaction.objects.filter(lot__parent_lot__isnull=False, parent_tx__isnull=True)
     for tx in txs:
-        if tx.parent_tx is None:
-            potential_parents = LotTransaction.objects.filter(lot_id=tx.lot.parent_lot.id)
-            if potential_parents.count() == 1:
-                tx.parent_tx = potential_parents[0]
-                tx.save()
-                print('Fix link between parent %s and child %s' % (potential_parents[0].id, tx.id))
-
+        print('Tx %d Lot %d has parent lot %d but not parent tx' % (tx.id, tx.lot.id, tx.lot.parent_lot_id))
+        potential_parents = LotTransaction.objects.filter(lot_id=tx.lot.parent_lot.id)
+        if potential_parents.count() == 1:
+            tx.parent_tx = potential_parents[0]
+            tx.save()
+            print('Fix link between parent %s and child %s' % (potential_parents[0].id, tx.id))
+        else:
+            print('Could not find parent for tx id %d lot id %d parent lot id %d' % (tx.id, tx.lot.id, tx.lot.parent_lot_id))
 
     
     stocks = LotTransaction.objects.filter(lot__status='Validated', is_stock=True, is_forwarded=False, lot__is_transformed=False)
