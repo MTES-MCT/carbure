@@ -171,6 +171,7 @@ export const defaultLot = {
 
   supplier: undefined as Entity | string | undefined,
   supplier_certificate: undefined as string | undefined,
+  vendor_certificate: undefined as string | undefined,
   client: undefined as Entity | string | undefined,
   delivery_site: undefined as Depot | string | undefined,
   delivery_site_country: undefined as Country | undefined,
@@ -214,6 +215,7 @@ export const lotToFormValue: (lot: Lot | undefined) => LotFormValue = (lot) => (
 
   supplier: lot?.carbure_supplier ?? lot?.unknown_supplier ?? undefined,
   supplier_certificate: lot?.supplier_certificate ?? undefined,
+  vendor_certificate: lot?.vendor_certificate ?? undefined,
   client: lot?.carbure_client ?? lot?.unknown_client ?? undefined,
   delivery_site: lot?.carbure_delivery_site ?? lot?.unknown_delivery_site ?? undefined,
   delivery_site_country: lot?.delivery_site_country ?? undefined,
@@ -280,6 +282,8 @@ export function lotFormToPayload(lot: LotFormValue) {
       typeof lot.supplier === "string" ? lot.supplier : undefined,
     supplier_certificate: lot.supplier_certificate,
     supplier_certificate_type: undefined,
+    vendor_certificate: lot.vendor_certificate,
+    vendor_certificate_type: undefined,
 
     // delivery
     delivery_date: lot.delivery_date,

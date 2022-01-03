@@ -656,7 +656,7 @@ def get_lots_summary_data(lots, entity_id, short=False):
         pending=Count('id', filter=pending_filter)
     ).order_by()
 
-    lots_out = lots.filter(carbure_supplier=entity_id).exclude(carbure_client_id=entity_id).annotate(
+    lots_out = lots.filter(Q(carbure_supplier=entity_id) | Q(carbure_vendor=entity_id)).exclude(carbure_client_id=entity_id).annotate(
         client=Coalesce('carbure_client__name', 'unknown_client'),
         biofuel_code=F('biofuel__code')
     ).values(

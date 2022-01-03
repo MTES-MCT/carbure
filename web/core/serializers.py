@@ -204,6 +204,7 @@ class CarbureLotPublicSerializer(serializers.ModelSerializer):
     biofuel = BiofuelSerializer(read_only=True)
     country_of_origin = CountrySerializer(read_only=True)
     added_by = EntitySerializer(read_only=True)
+    carbure_vendor = EntitySerializer(read_only=True)
 
     class Meta:
         model = CarbureLot
@@ -217,7 +218,7 @@ class CarbureLotPublicSerializer(serializers.ModelSerializer):
                   'lot_status', 'correction_status',
                   'volume', 'weight', 'lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
                   'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ghg_reference_red_ii', 'ghg_reduction_red_ii',
-                  'free_field', 'added_by'
+                  'free_field', 'added_by', 'carbure_vendor', 'vendor_certificate', 'vendor_certificate_type',
                   ]
 
 
@@ -234,7 +235,7 @@ class CarbureLotAdminSerializer(CarbureLotPublicSerializer):
                   'lot_status', 'correction_status',
                   'volume', 'weight', 'lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
                   'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ghg_reference_red_ii', 'ghg_reduction_red_ii',
-                  'free_field', 'added_by', 'highlighted_by_auditor', 'highlighted_by_admin'
+                  'free_field', 'added_by', 'highlighted_by_auditor', 'highlighted_by_admin', 'carbure_vendor', 'vendor_certificate', 'vendor_certificate_type',
                   ]
 
 

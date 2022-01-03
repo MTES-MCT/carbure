@@ -434,8 +434,13 @@ def get_lot_details(request, *args, **kwargs):
 
     data = {}
     data['lot'] = CarbureLotPublicSerializer(lot).data
-    data['parent_lot'] = CarbureLotPublicSerializer(lot.parent_lot).data if lot.parent_lot else None
-    data['parent_stock'] = CarbureStockPublicSerializer(lot.parent_stock).data if lot.parent_stock else None
+    entity = Entity.objects.get(id=entity_id)
+    if entity.entity_type == Entity.ADMIN or lot.added_by == entity:
+        data['parent_lot'] = CarbureLotPublicSerializer(lot.parent_lot).data if lot.parent_lot else None
+        data['parent_stock'] = CarbureStockPublicSerializer(lot.parent_stock).data if lot.parent_stock else None
+    else:
+        data['parent_lot'] = None
+        data['parent_stock'] = None
     data['children_lot'] = CarbureLotPublicSerializer(CarbureLot.objects.filter(parent_lot=lot), many=True).data
     data['children_stock'] = CarbureStockPublicSerializer(CarbureStock.objects.filter(parent_lot=lot), many=True).data
     data['distance'] = get_transaction_distance(lot)
@@ -684,21 +689,24 @@ def lots_send(request, *args, **kwargs):
             lot.lot_status = CarbureLot.ACCEPTED
             lot.carbure_client = entity
             lot.save()
-            first_tx_id = lot.id
+            first_lot_id = lot.id
             event = CarbureLotEvent()
             event.event_type = CarbureLotEvent.ACCEPTED
             event.lot = lot
             event.user = request.user
-            event.save()            
+            event.save()        
+            # SECOND TRANSACTION    
             lot.pk = None
-            lot.parent_tx_id = first_tx_id
+            lot.parent_lot_id = first_lot_id
             lot.carbure_client = final_client
+            lot.unknown_supplier = ''
             lot.carbure_supplier = lot.carbure_vendor
-            lot.vendor_certificate = lot.supplier_certificate
-            lot.vendor_certificate_type = lot.supplier_certificate_type
+            lot.supplier_certificate = lot.vendor_certificate
+            lot.supplier_certificate_type = lot.vendor_certificate_type
             lot.carbure_vendor = None
             lot.vendor_certificate = ''
             lot.vendor_certificate_type = ''
+            lot.lot_status = CarbureLot.PENDING
             lot.save()
             event = CarbureLotEvent()
             event.event_type = CarbureLotEvent.ACCEPTED

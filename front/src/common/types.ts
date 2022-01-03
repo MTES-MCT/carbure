@@ -571,3 +571,17 @@ export interface Biofuel {
   code: string
   name: string
 }
+
+export interface CertificateData {
+  certificate_id: string
+  certificate_type: string
+  certificate_holder: string
+  certificate_issuer: string
+  address: string
+  valid_from: string
+  valid_until: string
+  download_link: string
+  scope: string
+  input: string
+  output: string
+}
