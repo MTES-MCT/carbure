@@ -4,7 +4,7 @@ import { Suspense } from "react"
 import { render as baseRender } from "@testing-library/react"
 import { configure } from "@testing-library/dom"
 import { initReactI18next } from "react-i18next"
-import { LoaderOverlay } from "common/components"
+import { LoaderOverlay } from "common-v2/components/scaffold"
 import { MemoryRouter, Routes } from "react-router"
 
 import translation from "../public/locales/fr/translation.json"
@@ -83,6 +83,7 @@ export const TestRoot = ({ url, children }: TestRootProps) => {
       <Suspense fallback={<LoaderOverlay />}>
         <UserContext.Provider value={user}>
           <Routes>{element}</Routes>
+          {user.loading && <LoaderOverlay />}
         </UserContext.Provider>
       </Suspense>
     </MemoryRouter>
