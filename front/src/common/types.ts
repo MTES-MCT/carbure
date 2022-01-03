@@ -37,6 +37,13 @@ export enum EntityType {
   ExternalAdmin = "Administration Externe",
 }
 
+export enum CertificateType {
+  ISCC = "ISCC",
+  REDCERT = "REDCERT",
+  SYSTEME_NATIONAL = "SYSTEME_NATIONAL",
+  TWOBS = "2BS",
+}
+
 export interface Entity {
   id: number
   name: string
@@ -574,7 +581,7 @@ export interface Biofuel {
 
 export interface CertificateData {
   certificate_id: string
-  certificate_type: string
+  certificate_type: CertificateType
   certificate_holder: string
   certificate_issuer: string
   address: string
@@ -584,4 +591,10 @@ export interface CertificateData {
   scope: string
   input: string
   output: string
+}
+
+export interface EntityCertificate {
+  certificate: CertificateData
+  entity: Entity
+  has_been_updated: boolean
 }

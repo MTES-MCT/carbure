@@ -1,9 +1,11 @@
 import React from "react"
+import { useTranslation } from "react-i18next"
 import cl from "clsx"
 import { Cross } from "./icons"
 import css from "./dialog.module.css"
 import Portal from "./portal"
-import Button from "./button"
+import Button, { ButtonVariant } from "./button"
+import { Check, Return } from './icons'
 import { Overlay } from "./scaffold"
 
 export interface DialogProps {
@@ -40,5 +42,32 @@ export const Dialog = ({
     </div>
   </Portal>
 )
+
+export interface ConfirmProps {
+  title: string
+  description: string
+  confirm: string
+  variant: ButtonVariant
+  onConfirm: () => Promise<any>
+  onClose: () => void
+}
+
+export const Confirm = ({ title, description, confirm, variant, onConfirm, onClose }: ConfirmProps) => {
+  const { t } = useTranslation()
+  return (
+    <Dialog onClose={onClose} >
+      <header>
+        <h1>{title}</h1>
+      </header>
+      <main>
+        <section>{description}</section>
+      </main>
+      <footer>
+        <Button asideX icon={Return} label={t("Retour")} action={onClose} />
+        <Button icon={Check} variant={variant} label={confirm} action={() => onConfirm().then(onClose)} />
+      </footer>
+    </Dialog>
+  )
+}
 
 export default Dialog

@@ -1188,6 +1188,7 @@ class GenericCertificate(models.Model):
 class EntityCertificate(models.Model):
     certificate = models.ForeignKey(GenericCertificate, blank=False, null=False, on_delete=models.CASCADE)
     entity = models.ForeignKey(Entity, blank=False, null=False, on_delete=models.CASCADE)
+    has_been_updated = models.BooleanField(default=False)
     
     class Meta:
         db_table = 'carbure_entity_certificates'

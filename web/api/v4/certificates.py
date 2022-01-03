@@ -7,7 +7,7 @@ from rest_framework import serializers
 from certificates.models import ProductionSiteCertificate
 from core.decorators import check_user_rights
 from core.models import Entity, EntityCertificate, GenericCertificate, UserRights
-from core.serializers import GenericCertificateSerializer
+from core.serializers import EntityCertificateSerializer, GenericCertificateSerializer
 from producers.models import ProductionSite
 
 def get_certificates(request, *args, **kwargs):
@@ -73,12 +73,13 @@ def update_certificate(request, *args, **kwargs):
     except:
         return JsonResponse({'status': 'error', 'message': "Could not find new certificate"}, status=400)
     try:
-        old_certificate = GenericCertificate.objects.get(certificate_type=old_certificate_type, certificate_id=old_certificate_id)
+        old_certificate = EntityCertificate.objects.get(entity=entity, certificate__certificate_id=old_certificate_id)
     except:
         return JsonResponse({'status': 'error', 'message': "Could not find old certificate"}, status=400)
-
-    EntityCertificate.objects.update_or_create(entity=entity, certificate=new_certificate)
-    ProductionSiteCertificate.objects.filter(entity=entity, certificate=old_certificate).update(certificate=new_certificate)
+    obj, created = EntityCertificate.objects.update_or_create(entity=entity, certificate=new_certificate)
+    ProductionSiteCertificate.objects.filter(entity=entity, certificate=old_certificate).update(certificate=obj)
+    old_certificate.has_been_updated = True
+    old_certificate.save()
     return JsonResponse({'status': "success"})
 
 
@@ -89,11 +90,11 @@ def get_my_certificates(request, *args, **kwargs):
     production_site_id = request.GET.get('production_site_id', False)
     entity = Entity.objects.get(id=entity_id)
     links = EntityCertificate.objects.filter(entity=entity)
-    certificates = [l.certificate for l in links]
+    certificates = [l for l in links]
     if production_site_id:
         links = ProductionSiteCertificate.objects.filter(entity=entity, production_site_id=production_site_id)
-        certificates = [l.certificate.certificate for l in links]
-    serializer = GenericCertificateSerializer(certificates, many=True)
+        certificates = [l.certificate for l in links]
+    serializer = EntityCertificateSerializer(certificates, many=True)
     return JsonResponse({'status': "success", 'data': serializer.data})
 
 @check_user_rights()

@@ -60,11 +60,10 @@ export const normalizeCountryFilter: Normalizer<Option, string> = (country) => (
 })
 
 // prettier-ignore
-export const normalizeCertificate: Normalizer<CertificateData, string> = (certificate) => ({
-  value: certificate.certificate_id,
+export const normalizeCertificate: Normalizer<CertificateData> = (certificate) => ({
+  value: certificate,
   label: `${certificate.certificate_id} - ${certificate.certificate_holder}`,
 })
-
 
 export function identity<T>(value: T) {
   return value
