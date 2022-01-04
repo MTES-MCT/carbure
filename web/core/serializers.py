@@ -161,14 +161,20 @@ class CarbureStockPublicSerializer(serializers.ModelSerializer):
                   'ghg_reduction', 'ghg_reduction_red_ii', 'initial_volume', 'delivery_date', 'period']
 
     def get_initial_volume(self, obj):
-        return obj.parent_lot.volume if obj.parent_lot else obj.parent_transformation.volume_destination
+        if obj.parent_lot:
+            return obj.parent_lot.volume
+        elif obj.parent_transformation:
+            return obj.parent_transformation.volume_destination
+        else:
+            return 0
+        # return obj.parent_lot.volume if obj.parent_lot else obj.parent_transformation.volume_destination
+    
+    def get_delivery_date(self, obj):
+        return obj.get_delivery_date().strftime('%Y-%m-%d')
 
     def get_period(self, obj):
-        date = obj.parent_lot.delivery_date if obj.parent_lot else obj.parent_transformation.transformation_dt
+        date = obj.get_delivery_date()
         return date.year * 100 + date.month
-
-    def get_delivery_date(self, obj):
-        return obj.parent_lot.delivery_date if obj.parent_lot else obj.parent_transformation.transformation_dt.strftime('%Y-%m-%d')
 
 
 class CarbureStockTransformationPublicSerializer(serializers.ModelSerializer):

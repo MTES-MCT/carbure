@@ -655,7 +655,8 @@ class CarbureLotCommentAdmin(admin.ModelAdmin):
 
 @admin.register(CarbureStockTransformation)
 class CarbureStockTransformationAdmin(admin.ModelAdmin):
-    list_display = []
+    list_display = ['transformation_type', 'source_stock_id', 'dest_stock_id', 'entity', 'transformation_dt']
+    list_filter = ['transformation_type', 'entity']
 
 @admin.register(CarbureNotification)
 class CarbureNotificationAdmin(admin.ModelAdmin):

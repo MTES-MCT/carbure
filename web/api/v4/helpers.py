@@ -726,25 +726,25 @@ def handle_eth_to_etbe_transformation(user, stock, transformation):
     # check available volume
     if stock.remaining_volume < volume_ethanol:
         return JsonResponse({'status': 'error', 'message': 'Volume Ethanol is higher than available volume'}, status=400)
-
-
-    new_stock = stock.parent_lot
-    new_stock.pk = None
-    new_stock.biofuel = etbe
-    new_stock.volume = volume_etbe
-    new_stock.weight = new_stock.get_weight()
-    new_stock.lhv_amount = new_stock.get_lhv_amount()
-    new_stock.parent_lot = None
-    new_stock.save()
-
+    
     stock.remaining_volume = round(stock.remaining_volume - volume_ethanol)
     stock.remaining_weight = stock.get_weight()
     stock.remaining_lhv_amount = stock.get_lhv_amount()
     stock.save()
 
+    old_stock_id = stock.id
+    new_stock = stock
+    new_stock.pk = None
+    new_stock.biofuel = etbe
+    new_stock.remaining_volume = volume_etbe
+    new_stock.remaining_weight = new_stock.get_weight()
+    new_stock.remaining_lhv_amount = new_stock.get_lhv_amount()
+    new_stock.parent_lot = None
+    new_stock.save()
+
     cst = CarbureStockTransformation()
     cst.transformation_type = CarbureStockTransformation.ETH_ETBE
-    cst.source_stock = stock
+    cst.source_stock_id = old_stock_id
     cst.dest_stock = new_stock
     cst.volume_deducted_from_source = volume_ethanol
     cst.volume_destination = volume_etbe
@@ -759,7 +759,7 @@ def handle_eth_to_etbe_transformation(user, stock, transformation):
 
     # create events
     e = CarbureStockEvent()
-    e.event_type = CarbureLotEvent.TRANSFORMED
+    e.event_type = CarbureStockEvent.TRANSFORMED
     e.stock = stock
     e.user = user
     e.save()

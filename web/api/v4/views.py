@@ -1,4 +1,5 @@
 import datetime
+from json.encoder import py_encode_basestring_ascii
 import unicodedata
 import dictdiffer
 import json
@@ -25,7 +26,9 @@ from core.xlsx_v3 import template_v4
 @check_user_rights()
 def get_years(request, *args, **kwargs):
     entity_id = int(kwargs['context']['entity_id'])
-    data = CarbureLot.objects.filter(Q(carbure_client_id=entity_id) | Q(carbure_supplier_id=entity_id)).values_list('year', flat=True).distinct()
+    data_lots = CarbureLot.objects.filter(Q(carbure_client_id=entity_id) | Q(carbure_supplier_id=entity_id)).values_list('year', flat=True).distinct()
+    data_transforms = CarbureStockTransformation.objects.filter(entity_id=entity_id).values_list('transformation_dt__year', flat=True).distinct()
+    data = set(list(data_transforms) + list(data_lots))
     return JsonResponse({'status': 'success', 'data': list(data)})
 
 
@@ -384,7 +387,8 @@ def stock_split(request, *args, **kwargs):
 def stock_transform(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
-    payload = request.POST.getlist('payload', False)
+    entity = Entity.objects.get(pk=entity_id)
+    payload = request.POST.get('payload', False)
     if not payload:
         return JsonResponse({'status': 'error', 'message': 'Missing payload'}, status=400)
 
@@ -405,11 +409,11 @@ def stock_transform(request, *args, **kwargs):
                 return JsonResponse({'status': 'error', 'message': 'Missing field %s in json object'}, status=400)
 
         try:
-            stock = CarbureStock.objects.filter(pk=entry['stock_id'])
+            stock = CarbureStock.objects.get(pk=entry['stock_id'])
         except:
             return JsonResponse({'status': 'error', 'message': 'Could not find stock'}, status=400)
 
-        if stock.carbure_client_id != entity_id:
+        if stock.carbure_client != entity:
             return JsonResponse({'status': 'forbidden', 'message': 'Stock does not belong to you'}, status=403)
 
         ttype = entry['transformation_type']
@@ -680,6 +684,7 @@ def lots_send(request, *args, **kwargs):
 
         lot.lot_status = CarbureLot.PENDING
 
+        #### SPECIFIC CASES
         # I AM NEITHER THE PRODUCER NOR THE CLIENT
         # create two transactions. unknown producer/supplier -> me and me -> client
         if lot.carbure_producer != entity and lot.carbure_client != entity:
@@ -713,41 +718,6 @@ def lots_send(request, *args, **kwargs):
             event.lot = lot
             event.user = request.user
             event.save()            
-        # I AM THE CLIENT
-        elif lot.carbure_client_id == entity_id:
-            nb_auto_accepted += 1
-            lot.lot_status = CarbureLot.ACCEPTED
-            event = CarbureLotEvent()
-            event.event_type = CarbureLotEvent.ACCEPTED
-            event.lot = lot
-            event.user = request.user
-            event.save()
-            if lot.delivery_type == CarbureLot.STOCK:
-                # create stock
-                stock = CarbureStock()
-                stock.parent_lot = lot
-                stock.carbure_id = lot.carbure_id
-                stock.depot = lot.carbure_delivery_site
-                stock.carbure_client = lot.carbure_client
-                stock.remaining_volume = lot.volume
-                stock.remaining_weight = lot.weight
-                stock.remaining_lhv_amount = lot.lhv_amount
-                stock.feedstock = lot.feedstock
-                stock.biofuel = lot.biofuel
-                stock.country_of_origin = lot.country_of_origin
-                stock.carbure_production_site = lot.carbure_production_site
-                stock.unknown_production_site = lot.unknown_production_site
-                stock.production_country = lot.production_country
-                stock.carbure_supplier = lot.carbure_supplier
-                stock.unknown_supplier = lot.unknown_supplier
-                stock.ghg_reduction = lot.ghg_reduction
-                stock.ghg_reduction_red_ii = lot.ghg_reduction_red_ii
-                stock.save()
-                e = CarbureStockEvent()
-                e.event_type = CarbureStockEvent.CREATED
-                e.stock = stock
-                e.user = request.user
-                e.save()
         elif lot.carbure_client_id is None:
             # RFC or EXPORT
             nb_auto_accepted += 1
@@ -758,8 +728,7 @@ def lots_send(request, *args, **kwargs):
             event.user = request.user
             event.save()
         else:
-            print('SHOULD NOT HAPPEN')
-            return JsonResponse({'status': 'error'}, status=500)
+            pass
         lot.save()
     return JsonResponse({'status': 'success', 'data': {'submitted': nb_lots, 'sent': nb_sent, 'auto-accepted': nb_auto_accepted, 'ignored': nb_ignored, 'rejected': nb_rejected}})
 
@@ -1180,7 +1149,6 @@ def accept_in_stock(request, *args, **kwargs):
         event.save()
         stock = CarbureStock()
         stock.parent_lot = lot
-        stock.carbure_id = lot.carbure_id
         if lot.carbure_delivery_site is None:
             return JsonResponse({'status': 'error', 'message': 'Cannot add stock for unknown Depot'}, status=400)
         stock.depot = lot.carbure_delivery_site
@@ -1198,6 +1166,8 @@ def accept_in_stock(request, *args, **kwargs):
         stock.unknown_supplier = lot.unknown_supplier
         stock.ghg_reduction = lot.ghg_reduction
         stock.ghg_reduction_red_ii = lot.ghg_reduction_red_ii
+        stock.save()
+        stock.carbure_id = '%sS%d' % (lot.carbure_id, stock.id)
         stock.save()
     return JsonResponse({'status': 'success'})
 
