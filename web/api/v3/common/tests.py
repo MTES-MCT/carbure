@@ -4,7 +4,6 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 
 from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
-from certificates.models import ISCCCertificate, DBSCertificate
 from api.v3.common.urls import urlpatterns
 from django_otp.plugins.otp_email.models import EmailDevice
 
@@ -217,49 +216,6 @@ class CommonAPITest(TestCase):
         # and returns filtered data
         data = response.json()['data']
         self.assertEqual(len(data), 1)    
-
-    def test_get_iscc_certificates(self):
-        # create iscc certificates
-        today = datetime.date.today()
-        ISCCCertificate.objects.update_or_create(certificate_id='ISCC-TEST-01', valid_from=today, valid_until=today)
-        ISCCCertificate.objects.update_or_create(certificate_id='ISCC-TEST-02', valid_from=today, valid_until=today)
-        ISCCCertificate.objects.update_or_create(certificate_id='ISCC-TEST-03', valid_from=today, valid_until=today)
-        ISCCCertificate.objects.update_or_create(certificate_id='ISCC-TST-04', valid_from=today, valid_until=today)
-
-        url = 'api-v3-public-search-iscc-certificates'
-        response = self.client.get(reverse(url))
-        # api works
-        self.assertEqual(response.status_code, 200)
-        # and returns 4 entries
-        self.assertGreaterEqual(len(response.json()['data']), 2)
-        # check if querying works
-        response = self.client.get(reverse(url) + '?query=tst')
-        self.assertEqual(response.status_code, 200)
-        # and returns filtered data
-        data = response.json()['data']
-        self.assertEqual(len(data), 1)            
-
-    def test_get_2bs_certificates(self):
-        # create 2bs certificates
-        today = datetime.date.today()
-        DBSCertificate.objects.update_or_create(certificate_id='DBS-TEST-01', valid_from=today, valid_until=today)
-        DBSCertificate.objects.update_or_create(certificate_id='DBS-TEST-02', valid_from=today, valid_until=today)
-        DBSCertificate.objects.update_or_create(certificate_id='DBS-TEST-03', valid_from=today, valid_until=today)
-        DBSCertificate.objects.update_or_create(certificate_id='DBS-TST-04', valid_from=today, valid_until=today)
-
-        url = 'api-v3-public-search-2bs-certificates'
-        response = self.client.get(reverse(url))
-        # api works
-        self.assertEqual(response.status_code, 200)
-        # and returns 4 entries
-        self.assertGreaterEqual(len(response.json()['data']), 2)
-        # check if querying works
-        response = self.client.get(reverse(url) + '?query=tst')
-        self.assertEqual(response.status_code, 200)
-        # and returns filtered data
-        data = response.json()['data']
-        self.assertEqual(len(data), 1)         
-
 
     def test_create_delivery_site(self):
         # check how many sites exist

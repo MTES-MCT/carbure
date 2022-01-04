@@ -210,41 +210,41 @@ def check_duplicates(new_txs, background=True):
     else:
         return 0
 
-def get_prefetched_data(entity=None):
-    lastyear = datetime.date.today() - datetime.timedelta(days=365)
-    d = {}
-    d['producers'] = {p.name: p for p in Entity.objects.filter(entity_type='Producteur')}
-    d['countries'] = {p.code_pays: p for p in Pays.objects.all()}
-    d['biocarburants'] = {b.code: b for b in Biocarburant.objects.all()}
-    d['matieres_premieres'] = {m.code: m for m in MatierePremiere.objects.all()}
-    if entity:
-        # get only my production sites
-        d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').filter(producer=entity)}
-        # get all my linked certificates
-        my_vendor_certificates = []
-        my_vendor_certificates += [c.certificate.certificate_id for c in EntityISCCTradingCertificate.objects.filter(entity=entity)]
-        my_vendor_certificates += [c.certificate.certificate_id for c in EntityDBSTradingCertificate.objects.filter(entity=entity)]
-        my_vendor_certificates += [c.certificate.certificate_id for c in EntityREDCertTradingCertificate.objects.filter(entity=entity)]
-        my_vendor_certificates += [c.certificate.certificate_id for c in EntitySNTradingCertificate.objects.filter(entity=entity)]
-        d['my_vendor_certificates'] = my_vendor_certificates
-    else:
-        d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').all()}
-    d['depots'] = {d.depot_id.lstrip('0').upper(): d for d in Depot.objects.all()}
-    d['depotsbyname'] = {d.name.upper(): d for d in Depot.objects.all()}
-    entitydepots = {}
-    ed = EntityDepot.objects.all()
-    for e in ed:
-        if e.entity.id not in entitydepots:
-            entitydepots[e.entity.id] = []
-        entitydepots[e.entity.id].append(e.depot.id) 
-    d['depotsbyentity'] = entitydepots
-    d['clients'] = {c.name.upper(): c for c in Entity.objects.filter(entity_type__in=['Producteur', 'Opérateur', 'Trader'])}
-    d['certificates'] = {c.certificate_id.upper(): c for c in ISCCCertificate.objects.filter(valid_until__gte=lastyear)}
-    d['certificates'].update({c.certificate_id.upper(): c for c in DBSCertificate.objects.filter(valid_until__gte=lastyear)})
-    d['certificates'].update({c.certificate_id.upper(): c for c in REDCertCertificate.objects.filter(valid_until__gte=lastyear)})
-    d['certificates'].update({c.certificate_id.upper(): c for c in SNCertificate.objects.filter(valid_until__gte=lastyear)})
-    d['double_counting_certificates'] = {c.certificate_id: c for c in DoubleCountingRegistration.objects.all()}
-    return d
+# def get_prefetched_data(entity=None):
+#     lastyear = datetime.date.today() - datetime.timedelta(days=365)
+#     d = {}
+#     d['producers'] = {p.name: p for p in Entity.objects.filter(entity_type='Producteur')}
+#     d['countries'] = {p.code_pays: p for p in Pays.objects.all()}
+#     d['biocarburants'] = {b.code: b for b in Biocarburant.objects.all()}
+#     d['matieres_premieres'] = {m.code: m for m in MatierePremiere.objects.all()}
+#     if entity:
+#         # get only my production sites
+#         d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').filter(producer=entity)}
+#         # get all my linked certificates
+#         my_vendor_certificates = []
+#         my_vendor_certificates += [c.certificate.certificate_id for c in EntityISCCTradingCertificate.objects.filter(entity=entity)]
+#         my_vendor_certificates += [c.certificate.certificate_id for c in EntityDBSTradingCertificate.objects.filter(entity=entity)]
+#         my_vendor_certificates += [c.certificate.certificate_id for c in EntityREDCertTradingCertificate.objects.filter(entity=entity)]
+#         my_vendor_certificates += [c.certificate.certificate_id for c in EntitySNTradingCertificate.objects.filter(entity=entity)]
+#         d['my_vendor_certificates'] = my_vendor_certificates
+#     else:
+#         d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').all()}
+#     d['depots'] = {d.depot_id.lstrip('0').upper(): d for d in Depot.objects.all()}
+#     d['depotsbyname'] = {d.name.upper(): d for d in Depot.objects.all()}
+#     entitydepots = {}
+#     ed = EntityDepot.objects.all()
+#     for e in ed:
+#         if e.entity.id not in entitydepots:
+#             entitydepots[e.entity.id] = []
+#         entitydepots[e.entity.id].append(e.depot.id) 
+#     d['depotsbyentity'] = entitydepots
+#     d['clients'] = {c.name.upper(): c for c in Entity.objects.filter(entity_type__in=['Producteur', 'Opérateur', 'Trader'])}
+#     d['certificates'] = {c.certificate_id.upper(): c for c in ISCCCertificate.objects.filter(valid_until__gte=lastyear)}
+#     d['certificates'].update({c.certificate_id.upper(): c for c in DBSCertificate.objects.filter(valid_until__gte=lastyear)})
+#     d['certificates'].update({c.certificate_id.upper(): c for c in REDCertCertificate.objects.filter(valid_until__gte=lastyear)})
+#     d['certificates'].update({c.certificate_id.upper(): c for c in SNCertificate.objects.filter(valid_until__gte=lastyear)})
+#     d['double_counting_certificates'] = {c.certificate_id: c for c in DoubleCountingRegistration.objects.all()}
+#     return d
 
 
 def generate_carbure_id(lot):

@@ -17,7 +17,6 @@ from certificates.models import ProductionSiteCertificate
 
 from core.models import UserRightsRequests, UserRights
 from api.v3.lots.views import get_entity_lots_by_status
-from core.common import get_prefetched_data
 from api.v3.sanity_checks import bulk_sanity_checks
 
 @otp_or_403
