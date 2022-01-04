@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next"
 import useEntity from "carbure/hooks/entity"
 import { useQuery, useMutation } from "common-v2/hooks/async"
 import { usePortal } from "common-v2/components/portal"
+import { useNotify } from "common-v2/components/notifications"
 import Form, { Fieldset, useForm } from "common-v2/components/form"
 import Alert from "common-v2/components/alert"
 import Button from "common-v2/components/button"
@@ -47,12 +48,17 @@ interface ETBEDialogProps {
 export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
+  const notify = useNotify()
 
-  const subQuery = useMemo(() => ({ ...query, biofuels: ['ETH'] }), [query])
+  const subQuery = useMemo(() => 
+    selection?.length
+      ? { entity_id: entity.id, biofuels: ['ETH'], selection }
+      : { ...query, biofuels: ['ETH'] }
+  , [query])
 
   const stocks = useQuery(api.getStocks, {
     key: 'ethanol-stocks',
-    params: [subQuery, selection]
+    params: [subQuery]
   })
 
   const [attributions, setAttributions] = useState<Record<number, number>>({})
@@ -66,11 +72,11 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
   const transformETBE = useMutation(api.transformETBE, {
     invalidates: ['snapshot', 'stocks'],
     onSuccess: () => {
-      alert("SUCCESS")
+      notify(t("Les lots d'ETBE ont bien été créés !"), { variant: 'success' })
       onClose()
     },
     onError: () => {
-      alert("ERROR")
+      notify(t("Les lots d'ETBE n'ont pas pu être créés !"), { variant: 'danger' })
     },
   })
 
