@@ -8,6 +8,7 @@ import {
   MatierePremiere,
   ProductionSiteDetails,
   UserRole,
+  CertificateData
 } from "common/types"
 
 import { ProductionSiteSettingsHook } from "../hooks/use-production-sites"
@@ -45,7 +46,7 @@ import {
 import RadioGroup from "common/components/radio-group"
 import { formatDate, SettingsForm } from "./common"
 import { padding } from "transactions/components/list-columns"
-import { findCertificates } from "../api"
+import { getMyCertificates } from "../api-v2"
 import { useRights } from "carbure/hooks/entity"
 
 export type ProductionSiteState = {
@@ -74,7 +75,7 @@ export type ProductionSiteState = {
   biocarburants: Biocarburant[]
 
   // certificates
-  certificates: ProductionCertificate[]
+  certificates: CertificateData[]
 }
 
 type ProductionSitePromptProps = PromptProps<ProductionSiteState> & {
@@ -289,9 +290,9 @@ export const ProductionSitePrompt = ({
             placeholder={t("Rechercher des certificats...")}
             value={data.certificates}
             getValue={(c) => c.certificate_id}
-            getLabel={(c) => c.certificate_id + " - " + c.holder}
+            getLabel={(c) => c.certificate_id + " - " + c.certificate_holder}
             minLength={0}
-            getQuery={findCertificates}
+            getQuery={() => getMyCertificates(entity!.id).then(res => res.data.data?.map(e => e.certificate) ?? [])}
             queryArgs={[entity?.id]}
             onChange={onChange}
           />
@@ -334,12 +335,12 @@ const ProductionSitesSettings = ({
   const actions =
     canModify && settings.removeProductionSite
       ? Actions([
-          {
-            icon: Cross,
-            title: t("Supprimer le site de production"),
-            action: settings.removeProductionSite,
-          },
-        ])
+        {
+          icon: Cross,
+          title: t("Supprimer le site de production"),
+          action: settings.removeProductionSite,
+        },
+      ])
       : arrow
 
   const columns: Column<ProductionSiteDetails>[] = [
