@@ -265,6 +265,7 @@ export interface LotQuery {
 
 export interface StockQuery {
   entity_id: number
+  year?: number
   query?: string
   order_by?: string
   direction?: string
@@ -273,6 +274,7 @@ export interface StockQuery {
   history?: boolean
   sort_by?: string
   order?: string
+  selection?: number[]
   [Filter.Feedstocks]?: string[]
   [Filter.Biofuels]?: string[]
   [Filter.Periods]?: string[]
@@ -294,4 +296,13 @@ export interface StockPayload {
   delivery_type: string | undefined
   carbure_client_id: number | undefined
   unknown_client: string | undefined
+}
+
+export interface TransformETBEPayload {
+  stock_id: number
+  transformation_type: "ETH_ETBE",
+  volume_ethanol: number
+  volume_etbe: number
+  volume_denaturant: number
+  volume_etbe_eligible: number
 }

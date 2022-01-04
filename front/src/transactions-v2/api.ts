@@ -12,7 +12,9 @@ import {
   DeclarationSummary,
   StockSummary,
   StockPayload,
+  TransformETBEPayload
 } from "./types"
+
 
 const QUERY_RESET: Partial<LotQuery> = {
   limit: undefined,
@@ -186,8 +188,9 @@ export function getParams(query: LotQuery, selection?: number[]) {
 
 // ENDPOINTS FOR STOCKS
 
-export function getStocks(query: StockQuery) {
-  return api.get<Api<StockList>>("/stocks", { params: query })
+export function getStocks(query: StockQuery, selection?: number[]) {
+  const params = selection?.length ? { entity_id: query.entity_id, selection } : query
+  return api.get<Api<StockList>>("/stocks", { params })
 }
 
 export function getStockSummary(
@@ -211,5 +214,11 @@ export function splitStock(entity_id: number, payload: StockPayload[]) {
   return api.post("/stocks/split", {
     entity_id,
     payload: JSON.stringify(payload),
+  })
+}
+
+export function transformETBE(entity_id: number, payload: TransformETBEPayload[]) {
+  return api.post("/stocks/transform", {
+    entity_id, payload: JSON.stringify(payload)
   })
 }

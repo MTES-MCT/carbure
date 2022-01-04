@@ -3,6 +3,7 @@ import Button from "common-v2/components/button"
 import { ActionBar } from "common-v2/components/scaffold"
 import { Flask } from "common-v2/components/icons"
 import { ExportButton } from "transactions-v2/actions"
+import { TransformManyButton } from "transactions-v2/actions/transform"
 
 export interface StockActionsProps {
   count: number
@@ -13,7 +14,7 @@ export interface StockActionsProps {
 export const StockActions = ({ count, ...props }: StockActionsProps) => {
   return (
     <ActionBar>
-      <Button icon={Flask} variant="primary" label={"Transformer"} />
+      <TransformManyButton {...props} />
       <ExportButton {...props} />
     </ActionBar>
   )
