@@ -2,25 +2,17 @@ import { Trans } from "react-i18next"
 import { EntityManager } from "carbure/hooks/entity"
 
 import { PortalProvider } from "common-v2/components/portal"
-import use2BSCertificates from "./hooks/use-2bs-certificates"
 import useCompany from "./hooks/use-company"
 import useDeliverySites from "./hooks/use-delivery-sites"
-import useISCCCertificates from "./hooks/use-iscc-certificates"
-import useNationalSystemCertificates from "./hooks/use-national-system-certificates"
 import useProductionSites from "./hooks/use-production-sites"
 
 import { Main, Title } from "common/components"
 import { SettingsHeader, SettingsBody } from "./components/common"
 import DeliverySitesSettings from "./components/delivery-site"
 import ProductionSitesSettings from "./components/production-site"
-import {
-  DBSCertificateSettings,
-  ISCCCertificateSettings,
-  REDCertCertificateSettings,
-  SNCertificateSettings,
-} from "./components/certificates"
+
 import CompanySettings from "./components/company"
-import Certificates from './components/certificates-v2'
+import Certificates from './components/certificates'
 import Sticky from "common/components/sticky"
 import UserRights from "./components/user-rights"
 import { UserRole } from "common/types"

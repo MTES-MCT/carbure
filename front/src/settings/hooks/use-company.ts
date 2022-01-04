@@ -1,10 +1,12 @@
 import { EntityManager } from "carbure/hooks/entity"
 
 import * as api from "../api"
+import * as api2 from "../api-v2"
 import useAPI from "common/hooks/use-api"
+import { useQuery, useMutation } from "common-v2/hooks/async"
 import { Option, SelectValue } from "common/components/select"
 import { useEffect } from "react"
-import { ProductionCertificate } from "common/types"
+import { EntityCertificate } from "common/types"
 import { reloadUserSettings } from "carbure/hooks/user"
 
 export function toggleMAC(toggle: boolean, entityID: number) {
@@ -20,11 +22,10 @@ export interface CompanySettingsHook {
   hasMAC: boolean
   hasTrading: boolean
   certificates: Option[]
-  defaultCertificate: ProductionCertificate | null
+  defaultCertificate: EntityCertificate | null
   onChangeMAC: (checked: boolean) => void
   onChangeTrading: (checked: boolean) => void
   onChangeDefaultCertificate: (certificate: SelectValue) => void
-  refresh: () => void
 }
 
 export default function useCompany(entity: EntityManager): CompanySettingsHook {
@@ -34,38 +35,35 @@ export default function useCompany(entity: EntityManager): CompanySettingsHook {
   const [requestMAC, resolveToggleMAC] = useAPI(toggleMAC)
   const [requestTrading, resolveToggleTrading] = useAPI(toggleTrading)
 
-  const [requestDefaultCert, setDefaultCertificate] = useAPI(api.setDefaultCertificate) // prettier-ignore
-  const [certificates, findCertificates] = useAPI(api.findCertificates)
+  const certificates = useQuery(api2.getMyCertificates, {
+    key: 'entity-certificates',
+    params: [entity!.id],
+  })
+
+  const setDefaultCertificate = useMutation(api2.setDefaultCertificate, {
+    invalidates: ['user-settings'],
+  })
 
   const entityID = entity.id ?? -1
-
-  useEffect(() => {
-    if (entityID >= 0) {
-      findCertificates("", entityID)
-    }
-  }, [findCertificates, entityID])
 
   const isLoading =
     certificates.loading ||
     requestMAC.loading ||
     requestTrading.loading ||
-    requestDefaultCert.loading
+    setDefaultCertificate.loading
+
+  const entityCertificates = certificates.result?.data?.data ?? []
 
   const defaultCertificate =
-    certificates.data?.find(
-      (c) => c.certificate_id === entity.default_certificate
+    entityCertificates.find(
+      (c) => c.certificate.certificate_id === entity.default_certificate
     ) ?? null
 
-  const certificateOptions = certificates.data?.map((c) => ({
-    value: c.certificate_id,
-    label: `${c.certificate_id} - ${c.holder}`,
+  const certificateOptions = entityCertificates.map((c) => ({
+    value: c.certificate.certificate_id,
+    label: `${c.certificate.certificate_id} - ${c.certificate.certificate_holder}`,
   }))
 
-  function refresh() {
-    if (entity) {
-      findCertificates("", entityID)
-    }
-  }
 
   async function onChangeMAC(checked: boolean) {
     if (entity !== null) {
@@ -82,18 +80,15 @@ export default function useCompany(entity: EntityManager): CompanySettingsHook {
   }
 
   async function onChangeDefaultCertificate(certificateID: SelectValue) {
-    const certificate = certificates.data?.find(
-      (c) => c.certificate_id === certificateID
+    const certificate = entityCertificates.find(
+      (c) => c.certificate.certificate_id === certificateID
     )
 
     if (entity && certificate) {
-      await setDefaultCertificate(
+      setDefaultCertificate.execute(
         entityID,
-        certificate.certificate_id,
-        certificate.type.toUpperCase()
+        certificate.certificate.certificate_id
       )
-
-      reloadUserSettings()
     }
   }
 
@@ -106,6 +101,5 @@ export default function useCompany(entity: EntityManager): CompanySettingsHook {
     onChangeMAC,
     onChangeTrading,
     onChangeDefaultCertificate,
-    refresh,
   }
 }
