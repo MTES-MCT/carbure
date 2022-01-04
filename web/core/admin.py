@@ -25,7 +25,7 @@ from core.models import SustainabilityDeclaration, EntityDepot
 from core.models import TransactionUpdateHistory, TransactionDistance
 from core.models import EmailNotification, ETBETransformation
 from api.v3.sanity_checks import bulk_sanity_checks
-from core.common import get_prefetched_data, calculate_ghg
+from core.common import calculate_ghg
 
 class EntityAdmin(admin.ModelAdmin):
     list_display = ('entity_type', 'name', 'parent_entity')
@@ -261,6 +261,7 @@ class TransactionAdmin(admin.ModelAdmin):
 
 
     def rerun_sanity_checks(self, request, queryset):
+        from api.v4.helpers import get_prefetched_data
         d = get_prefetched_data()
         bulk_sanity_checks(queryset, d, background=False)
     rerun_sanity_checks.short_description = "Moulinette Règles Métiers"

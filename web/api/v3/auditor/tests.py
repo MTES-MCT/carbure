@@ -63,70 +63,44 @@ class AuditorAPITest(TestCase):
         response = self.client.post(reverse('otp-verify'), {'otp_token': device.token})
         self.assertEqual(response.status_code, 302)
 
-    def create_lot(self, **kwargs):
-        lot = {
-            'supplier_certificate': 'ISCC-TOTO-02',
-            'biocarburant_code': 'ETH',
-            'matiere_premiere_code': 'BLE',
-            'producer': self.entity1.name,
-            'production_site': "PSITE1",
-            'volume': 15000,
-            'pays_origine_code': 'FR',
-            'eec': 1,
-            'ep': 5,
-            'etd': 12,
-            'dae': 'dpwqdkqpokd',
-            'delivery_date': '2020-12-31',
-            'client': self.entity1.name,
-            'delivery_site': '001',
-            'entity_id': self.entity1.id,
-        }
-        lot.update(kwargs)
-        response = self.client.post(reverse('api-v3-add-lot'), lot)
-        self.assertEqual(response.status_code, 200)
-        data = response.json()['data']
-        tx_id = data['id']
-        lot_id = data['lot']['id']
-        return tx_id, lot_id, lot
+    # def test_auditor_comments(self):
+    #     # login as user
+    #     # create and send lot
+    #     self.login_and_pass_otp(self.user1_email, self.user1_password)
+    #     tx_id, lot_id, lot = self.create_lot()
 
-    def test_auditor_comments(self):
-        # login as user
-        # create and send lot
-        self.login_and_pass_otp(self.user1_email, self.user1_password)
-        tx_id, lot_id, lot = self.create_lot()
+    #     # login as auditor
+    #     # as auditor, write a comment
+    #     # write other comment visible by admin
+    #     self.login_and_pass_otp(self.auditor_email, self.auditor_password)
+    #     response = self.client.post(reverse('api-v3-auditor-comment-transactions'), {'entity_id': self.entity1.id, 'tx_ids': [tx_id], 'comment': 'Test comment just for me'})
+    #     self.assertEqual(response.status_code, 200)
+    #     response = self.client.post(reverse('api-v3-auditor-comment-transactions'), {'entity_id': self.entity1.id, 'tx_ids': [tx_id], 'comment': 'Test comment for admin', 'is_visible_by_admin': 'true'})
+    #     self.assertEqual(response.status_code, 200)
+    #     # get_details, see two comments
+    #     response = self.client.get(reverse('api-v3-auditor-lots-get-details'), {'entity_id': self.entity1.id, 'tx_id': tx_id})
+    #     self.assertEqual(response.status_code, 200)
+    #     data = json.loads(response.content)
+    #     self.assertEqual(len(data['data']['admin_comments']), 2)
 
-        # login as auditor
-        # as auditor, write a comment
-        # write other comment visible by admin
-        self.login_and_pass_otp(self.auditor_email, self.auditor_password)
-        response = self.client.post(reverse('api-v3-auditor-comment-transactions'), {'entity_id': self.entity1.id, 'tx_ids': [tx_id], 'comment': 'Test comment just for me'})
-        self.assertEqual(response.status_code, 200)
-        response = self.client.post(reverse('api-v3-auditor-comment-transactions'), {'entity_id': self.entity1.id, 'tx_ids': [tx_id], 'comment': 'Test comment for admin', 'is_visible_by_admin': 'true'})
-        self.assertEqual(response.status_code, 200)
-        # get_details, see two comments
-        response = self.client.get(reverse('api-v3-auditor-lots-get-details'), {'entity_id': self.entity1.id, 'tx_id': tx_id})
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-        self.assertEqual(len(data['data']['admin_comments']), 2)
+    #     # login as admin
+    #     # get_details, see one comment
+    #     # comment once
+    #     # comment twice - visible by auditor
+    #     self.login_and_pass_otp(self.admin_email, self.admin_password)
+    #     response = self.client.get(reverse('api-v3-admin-get-lot-details'), {'tx_id': tx_id})
+    #     self.assertEqual(response.status_code, 200)
+    #     data = json.loads(response.content)
+    #     self.assertEqual(len(data['data']['admin_comments']), 1)
+    #     response = self.client.post(reverse('api-v3-admin-comment-transaction'), {'entity_id': self.entity1.id, 'tx_ids': [tx_id], 'comment': 'Test admin just for me'})
+    #     self.assertEqual(response.status_code, 200)
+    #     response = self.client.post(reverse('api-v3-admin-comment-transaction'), {'entity_id': self.entity1.id, 'tx_ids': [tx_id], 'comment': 'Test admin for auditor', 'is_visible_by_auditor': 'true'})
+    #     self.assertEqual(response.status_code, 200)
 
-        # login as admin
-        # get_details, see one comment
-        # comment once
-        # comment twice - visible by auditor
-        self.login_and_pass_otp(self.admin_email, self.admin_password)
-        response = self.client.get(reverse('api-v3-admin-get-lot-details'), {'tx_id': tx_id})
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-        self.assertEqual(len(data['data']['admin_comments']), 1)
-        response = self.client.post(reverse('api-v3-admin-comment-transaction'), {'entity_id': self.entity1.id, 'tx_ids': [tx_id], 'comment': 'Test admin just for me'})
-        self.assertEqual(response.status_code, 200)
-        response = self.client.post(reverse('api-v3-admin-comment-transaction'), {'entity_id': self.entity1.id, 'tx_ids': [tx_id], 'comment': 'Test admin for auditor', 'is_visible_by_auditor': 'true'})
-        self.assertEqual(response.status_code, 200)
-
-        # login as auditor
-        # get details, see 3 comments, one of which by admin
-        self.login_and_pass_otp(self.auditor_email, self.auditor_password)
-        response = self.client.get(reverse('api-v3-auditor-lots-get-details'), {'entity_id': self.entity1.id, 'tx_id': tx_id})
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-        self.assertEqual(len(data['data']['admin_comments']), 3)
+    #     # login as auditor
+    #     # get details, see 3 comments, one of which by admin
+    #     self.login_and_pass_otp(self.auditor_email, self.auditor_password)
+    #     response = self.client.get(reverse('api-v3-auditor-lots-get-details'), {'entity_id': self.entity1.id, 'tx_id': tx_id})
+    #     self.assertEqual(response.status_code, 200)
+    #     data = json.loads(response.content)
+    #     self.assertEqual(len(data['data']['admin_comments']), 3)
