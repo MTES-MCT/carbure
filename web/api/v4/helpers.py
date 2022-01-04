@@ -503,7 +503,7 @@ def sort_stock(stock, query):
     if not sort_by:
         stock = stock.order_by('-id')
     elif sort_by in stock_sort_key_to_django_field:
-        key = sort_key_to_django_field[sort_by]
+        key = stock_sort_key_to_django_field[sort_by]
         if order == 'desc':
             stock = stock.order_by('-%s' % key)
         else:
