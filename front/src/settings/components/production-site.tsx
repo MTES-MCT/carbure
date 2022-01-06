@@ -2,13 +2,12 @@ import { Trans, useTranslation } from "react-i18next"
 
 import {
   Biocarburant,
-  ProductionCertificate,
   Country,
   GESOption,
   MatierePremiere,
   ProductionSiteDetails,
   UserRole,
-  CertificateData
+  CertificateData,
 } from "common/types"
 
 import { ProductionSiteSettingsHook } from "../hooks/use-production-sites"
@@ -292,7 +291,11 @@ export const ProductionSitePrompt = ({
             getValue={(c) => c.certificate_id}
             getLabel={(c) => c.certificate_id + " - " + c.certificate_holder}
             minLength={0}
-            getQuery={() => getMyCertificates(entity!.id).then(res => res.data.data?.map(e => e.certificate) ?? [])}
+            getQuery={() =>
+              getMyCertificates(entity!.id).then(
+                (res) => res.data.data?.map((e) => e.certificate) ?? []
+              )
+            }
             queryArgs={[entity?.id]}
             onChange={onChange}
           />
@@ -335,12 +338,12 @@ const ProductionSitesSettings = ({
   const actions =
     canModify && settings.removeProductionSite
       ? Actions([
-        {
-          icon: Cross,
-          title: t("Supprimer le site de production"),
-          action: settings.removeProductionSite,
-        },
-      ])
+          {
+            icon: Cross,
+            title: t("Supprimer le site de production"),
+            action: settings.removeProductionSite,
+          },
+        ])
       : arrow
 
   const columns: Column<ProductionSiteDetails>[] = [

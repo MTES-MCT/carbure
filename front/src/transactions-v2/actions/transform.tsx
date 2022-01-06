@@ -14,8 +14,7 @@ import { NumberInput } from "common-v2/components/input"
 import { Flask, Return, AlertCircle } from "common-v2/components/icons"
 import { StockQuery, TransformETBEPayload } from "../types"
 import { formatPercentage, formatNumber } from "common-v2/utils/formatters"
-import * as api from '../api'
-
+import * as api from "../api"
 
 const PART_ETH_IN_ETBE = 0.47
 const CONVERT_20_TO_15 = 0.995
@@ -25,18 +24,30 @@ interface TransformManyButtonProps {
   selection: number[]
 }
 
-export const TransformManyButton = ({ query, selection }: TransformManyButtonProps) => {
+export const TransformManyButton = ({
+  query,
+  selection,
+}: TransformManyButtonProps) => {
   const { t } = useTranslation()
 
   const portal = usePortal()
 
-  return <Menu icon={Flask} variant="primary" label={"Transformer"} items={[
-    {
-      label: t("ETBE"),
-      action: () =>
-        portal((close) => <ETBEDialog query={query} selection={selection} onClose={close} />),
-    },
-  ]} />
+  return (
+    <Menu
+      icon={Flask}
+      variant="primary"
+      label={"Transformer"}
+      items={[
+        {
+          label: t("ETBE"),
+          action: () =>
+            portal((close) => (
+              <ETBEDialog query={query} selection={selection} onClose={close} />
+            )),
+        },
+      ]}
+    />
+  )
 }
 
 interface ETBEDialogProps {
@@ -50,15 +61,17 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
   const entity = useEntity()
   const notify = useNotify()
 
-  const subQuery = useMemo(() => 
-    selection?.length
-      ? { entity_id: entity.id, biofuels: ['ETH'], selection }
-      : { ...query, biofuels: ['ETH'] }
-  , [query])
+  const subQuery = useMemo(
+    () =>
+      selection?.length
+        ? { entity_id: entity.id, biofuels: ["ETH"], selection }
+        : { ...query, biofuels: ["ETH"] },
+    [query, entity.id, selection]
+  )
 
   const stocks = useQuery(api.getStocks, {
-    key: 'ethanol-stocks',
-    params: [subQuery]
+    key: "ethanol-stocks",
+    params: [subQuery],
   })
 
   const [attributions, setAttributions] = useState<Record<number, number>>({})
@@ -70,13 +83,15 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
   })
 
   const transformETBE = useMutation(api.transformETBE, {
-    invalidates: ['snapshot', 'stocks'],
+    invalidates: ["snapshot", "stocks"],
     onSuccess: () => {
-      notify(t("Les lots d'ETBE ont bien été créés !"), { variant: 'success' })
+      notify(t("Les lots d'ETBE ont bien été créés !"), { variant: "success" })
       onClose()
     },
     onError: () => {
-      notify(t("Les lots d'ETBE n'ont pas pu être créés !"), { variant: 'danger' })
+      notify(t("Les lots d'ETBE n'ont pas pu être créés !"), {
+        variant: "danger",
+      })
     },
   })
 
@@ -86,7 +101,7 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
         const {
           volume_denaturant = 0,
           volume_etbe = 0,
-          volume_ethanol = 0
+          volume_ethanol = 0,
         } = value
 
         const ratio = volume / volume_ethanol
@@ -96,7 +111,7 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
           volume_etbe_eligible: ratio * volEligibleETBE,
           volume_denaturant: ratio * volume_denaturant,
           stock_id: parseInt(stockID, 10),
-          transformation_type: 'ETH_ETBE'
+          transformation_type: "ETH_ETBE",
         }
       })
       .filter((d) => d.volume_ethanol > 0)
@@ -106,27 +121,32 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
 
   const volumeDiff = compareVolumes(value.volume_ethanol!, attributions)
 
-  const usedVolume = value.volume_ethanol! * CONVERT_20_TO_15 + value.volume_denaturant!
+  const usedVolume =
+    value.volume_ethanol! * CONVERT_20_TO_15 + value.volume_denaturant!
   const ratio = usedVolume / value.volume_etbe!
 
   const volEligibleETBE = value.volume_etbe! * (ratio / PART_ETH_IN_ETBE)
 
-  const ratioEthToETBE = (value.volume_ethanol! / value.volume_etbe!) * 100.0
-  const ratioEthToETBEWithDenaturant = ((value.volume_ethanol! + value.volume_denaturant!) / value.volume_etbe!) * 100.0
+  // const ratioEthToETBE = (value.volume_ethanol! / value.volume_etbe!) * 100.0
+  // const ratioEthToETBEWithDenaturant = ((value.volume_ethanol! + value.volume_denaturant!) / value.volume_etbe!) * 100.0
 
   const stockRows = stocks.result?.data.data?.stocks ?? []
 
   return (
     <Dialog limit onClose={onClose}>
       <header>
-        <h1>
-          {t("Transformation en ETBE")}
-        </h1>
+        <h1>{t("Transformation en ETBE")}</h1>
       </header>
       <main>
         {stockRows.length === 0 && (
           <section>
-            <Alert icon={AlertCircle} variant="warning" label={t("Aucun lot d'éthanol trouvé dans les stocks sélectionnés")} />
+            <Alert
+              icon={AlertCircle}
+              variant="warning"
+              label={t(
+                "Aucun lot d'éthanol trouvé dans les stocks sélectionnés"
+              )}
+            />
           </section>
         )}
 
@@ -147,7 +167,9 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
                 <NumberInput
                   disabled
                   label={t("Volume d'ETBE éligible (à titre informatif)")}
-                  value={isNaN(volEligibleETBE) ? 0 : Math.round(volEligibleETBE)}
+                  value={
+                    isNaN(volEligibleETBE) ? 0 : Math.round(volEligibleETBE)
+                  }
                 />
                 <NumberInput
                   label={t("Volume total de dénaturant")}
@@ -164,31 +186,45 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
             columns={[
               {
                 header: t("Dépôt"),
-                orderBy: (stock) => stock.depot?.name ?? '',
-                cell: (stock) => <Cell text={stock.depot?.name} />
+                orderBy: (stock) => stock.depot?.name ?? "",
+                cell: (stock) => <Cell text={stock.depot?.name} />,
               },
               {
                 header: t("Biocarburant"),
-                cell: (stock) => <Cell text={t(stock.biofuel!.code, { ns: 'biofuels' })} sub={stock.remaining_volume} />
+                cell: (stock) => (
+                  <Cell
+                    text={t(stock.biofuel!.code, { ns: "biofuels" })}
+                    sub={stock.remaining_volume}
+                  />
+                ),
               },
               {
                 header: t("Matière première"),
-                cell: (stock) => <Cell text={t(stock.feedstock!.code, { ns: 'feedstocks' })} />
+                cell: (stock) => (
+                  <Cell text={t(stock.feedstock!.code, { ns: "feedstocks" })} />
+                ),
               },
               {
                 small: true,
                 header: t("Réd. GES"),
-                cell: (stock) => <Cell text={formatPercentage(stock.ghg_reduction)} />,
+                cell: (stock) => (
+                  <Cell text={formatPercentage(stock.ghg_reduction)} />
+                ),
               },
               {
                 header: t("Volume à prélever (litres)"),
                 cell: (stock) => (
                   <NumberInput
                     value={attributions[stock.id]}
-                    onChange={volume => setAttributions({ ...attributions, [stock.id]: volume ?? 0 })}
+                    onChange={(volume) =>
+                      setAttributions({
+                        ...attributions,
+                        [stock.id]: volume ?? 0,
+                      })
+                    }
                   />
                 ),
-              }
+              },
             ]}
           />
         )}
@@ -196,16 +232,14 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
       <footer>
         {!isNaN(volumeDiff) && volumeDiff !== 0 && (
           <Alert variant="danger" icon={AlertCircle}>
-            {t("Les volumes attribués ne correspondent pas ({{ diff }} litres)", { diff: formatNumber(volumeDiff) })}
+            {t(
+              "Les volumes attribués ne correspondent pas ({{ diff }} litres)",
+              { diff: formatNumber(volumeDiff) }
+            )}
           </Alert>
         )}
 
-        <Button
-          asideX
-          icon={Return}
-          label={t("Retour")}
-          action={onClose}
-        />
+        <Button asideX icon={Return} label={t("Retour")} action={onClose} />
         <Button
           disabled={volumeDiff !== 0}
           loading={transformETBE.loading}
@@ -216,10 +250,9 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
           action={onTransform}
         />
       </footer>
-    </Dialog >
+    </Dialog>
   )
 }
-
 
 function compareVolumes(volume: number, attributions: Record<number, number>) {
   let total_attributions = Object.values(attributions).reduce(

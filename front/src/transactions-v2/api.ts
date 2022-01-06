@@ -188,9 +188,8 @@ export function getParams(query: LotQuery, selection?: number[]) {
 
 // ENDPOINTS FOR STOCKS
 
-export function getStocks(query: StockQuery, selection?: number[]) {
-  const params = selection?.length ? { entity_id: query.entity_id, selection } : query
-  return api.get<Api<StockList>>("/stocks", { params })
+export function getStocks(query: StockQuery) {
+  return api.get<Api<StockList>>("/stocks", { params: query })
 }
 
 export function getStockSummary(
