@@ -112,15 +112,10 @@ export interface StockList {
 
 export interface Snapshot {
   lots: {
-    draft: number
-    in_total: number
-    in_pending: number
-    in_tofix: number
-    stock: number
-    stock_total: number
-    out_total: number
-    out_pending: number
-    out_tofix: number
+    alerts: number
+    corrections: number
+    declarations: number
+    pinned: number
   }
 }
 
@@ -134,8 +129,7 @@ export interface DeclarationSummary {
 export interface LotSummary {
   count: number
   total_volume: number
-  in?: SummaryItem[]
-  out?: SummaryItem[]
+  lots: SummaryItem[]
 }
 
 export interface StockSummary {
@@ -146,8 +140,8 @@ export interface StockSummary {
 }
 
 export interface SummaryItem {
-  client?: string
-  supplier?: string
+  client: string
+  supplier: string
   biofuel_code: string
   volume_sum: number
   avg_ghg_reduction: number
@@ -224,12 +218,10 @@ export enum Filter {
 export type FilterSelection = Partial<Record<Filter, string[]>>
 
 export type Status =
-  | "drafts"
-  | "in"
-  | "stocks"
-  | "out"
-  | "declaration"
-  // | "admin"
+  | "alerts"
+  | "corrections"
+  | "declarations"
+  | "pinned"
   | "unknown"
 
 export interface LotQuery {

@@ -22,10 +22,7 @@ export interface FiltersProps {
 export const Filters = ({ status, query, filters, onFilter }: FiltersProps) => {
   const { t } = useTranslation()
 
-  // prettier-ignore
-  const getFilters = status === 'stocks'
-    ? api.getStockFilters
-    : api.getLotFilters
+  const getFilters = api.getLotFilters
 
   const filterLabels = {
     [Filter.DeliveryStatus]: t("Livraison"),
@@ -135,7 +132,9 @@ export function countFilters(filters: FilterSelection | undefined) {
   return Object.values(filters).reduce((total, list) => total + list.length, 0)
 }
 
-const DRAFT_FILTERS = [
+const ADMIN_FILTERS = [
+  Filter.Mac,
+  Filter.DeliveryStatus,
   Filter.Periods,
   Filter.Biofuels,
   Filter.Feedstocks,
@@ -144,44 +143,18 @@ const DRAFT_FILTERS = [
   Filter.Clients,
   Filter.ProductionSites,
   Filter.DeliverySites,
-]
-
-const IN_FILTERS = [
-  Filter.Periods,
-  Filter.Biofuels,
-  Filter.Feedstocks,
-  Filter.CountriesOfOrigin,
-  Filter.Suppliers,
-  Filter.ProductionSites,
-  Filter.DeliverySites,
-]
-
-const STOCK_FILTERS = [
-  Filter.Periods,
-  Filter.Biofuels,
-  Filter.Feedstocks,
-  Filter.CountriesOfOrigin,
-  Filter.Suppliers,
-  Filter.ProductionSites,
-  Filter.Depots,
-]
-
-const OUT_FILTERS = [
-  Filter.Periods,
-  Filter.Biofuels,
-  Filter.Feedstocks,
-  Filter.CountriesOfOrigin,
-  Filter.Clients,
-  Filter.ProductionSites,
-  Filter.DeliverySites,
+  Filter.AddedBy,
+  Filter.Forwarded,
+  Filter.Errors,
+  Filter.HiddenByAdmin,
+  Filter.ClientTypes,
 ]
 
 const filtersByStatus: Record<Status, Filter[]> = {
-  drafts: DRAFT_FILTERS,
-  in: IN_FILTERS,
-  stocks: STOCK_FILTERS,
-  out: OUT_FILTERS,
-  declaration: [],
+  alerts: ADMIN_FILTERS,
+  corrections: ADMIN_FILTERS,
+  declarations: ADMIN_FILTERS,
+  pinned: ADMIN_FILTERS,
   unknown: [],
 }
 

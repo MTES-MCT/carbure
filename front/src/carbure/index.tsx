@@ -15,6 +15,7 @@ import Settings from "settings"
 import Account from "account"
 import DoubleCounting from "doublecount"
 import Dashboard from "dashboard"
+import Controls from "controls"
 import Entities from "../entities" // not using  path prevents import
 
 const Carbure = () => {
@@ -65,7 +66,7 @@ const Org = () => {
       {isAdmin && <Route path="dashboard" element={<Dashboard />} />}
       {isAdmin && <Route path="entities/*" element={<Entities />} />}
 
-      {(isAdmin || isAuditor) && <Route path="controls/*" element={<h1>TODO</h1>} />}
+      {(isAdmin || isAuditor) && <Route path="controls/*" element={<Controls />} />}
       {(isAdmin || hasDCA) && <Route path="double-counting/*" element={<DoubleCounting />} />}
 
       {isIndustry && <Route path="*" element={<Navigate to="transactions" />} />}
