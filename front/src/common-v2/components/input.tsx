@@ -155,7 +155,9 @@ export const FileArea = ({
       data-active={active ? true : undefined}
       onDragOver={(e) => {
         e.preventDefault()
-        !active && setActive(true)
+        if (!active && e.dataTransfer.types.includes("Files")) {
+          setActive(true)
+        }
       }}
       onDragLeave={(e) => {
         e.preventDefault()
@@ -165,8 +167,10 @@ export const FileArea = ({
       }}
       onDrop={(e) => {
         e.preventDefault()
-        onChange?.(e.dataTransfer.files[0])
-        setActive(false)
+        if (e.dataTransfer.files.length > 0) {
+          onChange?.(e.dataTransfer.files[0])
+          setActive(false)
+        }
       }}
     >
       {children}
