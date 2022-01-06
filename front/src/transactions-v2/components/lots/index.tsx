@@ -86,7 +86,7 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
           selection={state.selection} //
         />
 
-        {totalErrors > 0 && (
+        {(state.invalid || totalErrors > 0) && (
           <InvalidSwitch
             count={totalErrors}
             active={state.invalid}
@@ -94,7 +94,7 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
           />
         )}
 
-        {totalDeadline > 0 && (
+        {(state.deadline || totalDeadline > 0) && (
           <DeadlineSwitch
             count={totalDeadline}
             active={state.deadline}
