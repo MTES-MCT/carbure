@@ -185,6 +185,7 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
             rows={stockRows}
             columns={[
               {
+                key: "depot",
                 header: t("Dépôt"),
                 orderBy: (stock) => stock.depot?.name ?? "",
                 cell: (stock) => <Cell text={stock.depot?.name} />,
@@ -205,8 +206,10 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
                 ),
               },
               {
+                key: "ghg",
                 small: true,
                 header: t("Réd. GES"),
+                orderBy: (stock) => stock.ghg_reduction,
                 cell: (stock) => (
                   <Cell text={formatPercentage(stock.ghg_reduction)} />
                 ),
