@@ -47,7 +47,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   })
 
   const updateLot = useMutation(api.updateLot, {
-    invalidates: ["lots", "lot-details", "snapshot"],
+    invalidates: ["lots", "lot-details", "snapshot", "year", "lot-summary"],
 
     onSuccess: () => {
       notify(t("Le lot a bien été mis à jour"), { variant: "success" })
@@ -79,6 +79,14 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
         <h1>
           {t("Détails du lot")} #{lotData?.lot.carbure_id || lotData?.lot.id}
         </h1>
+
+        {expiring && (
+          <Alert
+            icon={Alarm}
+            variant="warning"
+            label={t("À valider avant la fin du mois")}
+          />
+        )}
       </header>
 
       <main>
@@ -134,14 +142,6 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
         )}
 
         {lotData && <LotActions lot={lotData.lot} />}
-
-        {expiring && (
-          <Alert
-            icon={Alarm}
-            variant="warning"
-            label={t("À valider avant la fin du mois")}
-          />
-        )}
 
         <NavigationButtons neighbors={neighbors} root={`../${status}`} />
         <Button icon={Return} label={t("Retour")} action={closeDialog} />

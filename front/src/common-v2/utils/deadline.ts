@@ -1,4 +1,5 @@
 import endOfMonth from "date-fns/endOfMonth"
+import subMonths from "date-fns/subMonths"
 import { Lot, LotStatus } from "transactions-v2/types"
 
 export function getCurrentDeadline() {
@@ -7,7 +8,8 @@ export function getCurrentDeadline() {
 
 export function isExpiring(lot: Lot | undefined) {
   const deadline = getCurrentDeadline()
-  const deadlinePeriod = deadline.getFullYear() * 100 + deadline.getMonth()
+  const monthBefore = subMonths(deadline, 1)
+  const deadlinePeriod = monthBefore.getFullYear() * 100 + (monthBefore.getMonth() + 1)
   return deadlinePeriod === lot?.period && UNVALIDATED.includes(lot.lot_status)
 }
 
