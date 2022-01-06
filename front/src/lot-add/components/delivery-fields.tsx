@@ -9,8 +9,8 @@ import { UserCheck } from "common-v2/components/icons"
 import * as api from "common-v2/api"
 import * as norm from "common-v2/utils/normalizers"
 import { LotFormValue } from "./lot-form"
-import { Entity, } from "carbure/types"
-import { Country, Depot, CertificateData } from "common/types"
+import { Entity } from "carbure/types"
+import { Country, Depot } from "common/types"
 
 interface DeliveryFieldsProps {
   readOnly?: boolean
@@ -63,7 +63,6 @@ export const SupplierCertificateField = (props: AutocompleteProps<string>) => {
   const supplier = value.supplier instanceof Object ? value.supplier : undefined
   const isSupplier = entity.id === supplier?.id
 
-
   return (
     <Autocomplete
       label={t("Certificat du fournisseur")}
@@ -86,12 +85,19 @@ export const MyCertificateField = (props: AutocompleteProps<string>) => {
   const { value, bind } = useFormContext<LotFormValue>()
   const bound = bind("vendor_certificate")
 
-
   const supplier = value.supplier instanceof Object ? value.supplier : undefined
   const client = value.client instanceof Object ? value.client : undefined
 
   // hide this field if this entity is NOT an intermediary
-  if (supplier?.id === entity.id || client?.id === entity.id) return null
+  // or if the supplier and client are not defined
+  if (
+    supplier?.id === entity.id ||
+    client?.id === entity.id ||
+    !value.supplier ||
+    !value.client
+  ) {
+    return null
+  }
 
   return (
     <Autocomplete
