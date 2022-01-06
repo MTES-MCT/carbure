@@ -58,7 +58,7 @@ def get_entity_lots_by_status(entity_id, status=None):
     elif status == 'IN':
         lots = lots.filter(carbure_client_id=entity_id).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
     elif status == 'OUT':
-        lots = lots.filter(added_by__id=entity_id).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
+        lots = lots.filter(carbure_supplier_id=entity_id).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
     elif status == 'DECLARATION':
         lots = lots.filter(Q(carbure_supplier_id=entity_id) | Q(carbure_client_id=entity_id)).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
     else:
@@ -726,7 +726,7 @@ def handle_eth_to_etbe_transformation(user, stock, transformation):
     # check available volume
     if stock.remaining_volume < volume_ethanol:
         return JsonResponse({'status': 'error', 'message': 'Volume Ethanol is higher than available volume'}, status=400)
-    
+
     stock.remaining_volume = round(stock.remaining_volume - volume_ethanol)
     stock.remaining_weight = stock.get_weight()
     stock.remaining_lhv_amount = stock.get_lhv_amount()
