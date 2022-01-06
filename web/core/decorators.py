@@ -1,10 +1,9 @@
-from core.models import UserRights, UserPreferences, LotV2, LotTransaction, TransactionComment, Entity
+from core.models import UserRights, LotV2, LotTransaction, TransactionComment, Entity
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render
 from django.http import JsonResponse
 from functools import wraps
 from itertools import chain
-import json
+
 
 # not an http endpoint
 def get_producer_corrections(entity):
@@ -176,7 +175,7 @@ def check_user_rights(role=None):
             if not request.user.is_verified():
                 return JsonResponse({'status': 'forbidden', 'message': "User not OTP verified"}, status=403)
             entity_id = request.POST.get('entity_id', request.GET.get('entity_id', False))
-            if not entity_id:       
+            if not entity_id:
                 return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
             # check if we have data in the SESSION
             rights = request.session.get('rights', False)

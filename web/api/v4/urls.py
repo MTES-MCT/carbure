@@ -1,5 +1,5 @@
 from django.urls import path, include
-from api.v4 import views, certificates
+from api.v4 import views, certificates, admin
 
 urlpatterns = [
     # GET
@@ -68,4 +68,13 @@ urlpatterns = [
     path('get-my-certificates', certificates.get_my_certificates, name='api-v4-settings-get-my-certificates'),
     path('set-production-site-certificates', certificates.set_production_site_certificates, name='api-v4-settings-set-production-site-certificates'),
     path('set-default-certificate', certificates.set_default_certificate, name='api-v4-settings-set-default-certificate'),
+
+
+    # ADMIN
+    path('admin/years', admin.get_years, name='api-v4-admin-get-years'),
+    path('admin/snapshot', admin.get_snapshot, name='api-v4-admin-get-snapshot'),
+    path('admin/lots', admin.get_lots, name='api-v4-admin-get-lots'),
+    path('admin/lots/summary', admin.get_lots_summary, name='api-v4-admin-get-lots-summary'),
+    path('admin/lots/details', admin.get_lot_details, name='api-v4-admin-get-lot-details'),
+    path('admin/lots/filters', admin.get_lots_filters, name='api-v4-admin-get-lots-filters'),
 ]

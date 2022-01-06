@@ -151,14 +151,19 @@ def get_stock_with_errors(stock, entity_id=None):
 def get_lots_with_errors(lots, entity_id, will_aggregate=False):
     if will_aggregate:
         # use a subquery so we can later do aggregations on this queryset without wrecking the results
+        tx_errors = GenericError.objects.filter(lot=OuterRef('pk'))
         if entity_id is not None:
             filter = Q(lot__added_by_id=entity_id, display_to_creator=True) | Q(lot__carbure_client_id=entity_id, display_to_recipient=True)
-        tx_errors = GenericError.objects.filter(lot=OuterRef('pk')).filter(filter).values('lot').annotate(errors=Count('id')).values('errors')
+            tx_errors = tx_errors.filter(filter)
+        tx_errors = tx_errors.values('lot').annotate(errors=Count('id')).values('errors')
         return lots.annotate(errors=Subquery(tx_errors)).filter(errors__gt=0)
     else:
         if entity_id is not None:
             filter = Q(added_by_id=entity_id, genericerror__display_to_creator=True) | Q(carbure_client_id=entity_id, genericerror__display_to_recipient=True)
-        return lots.annotate(errors=Count('genericerror', filter=filter)).filter(errors__gt=0)
+            counter = Count('genericerror', filter=filter)
+        else:
+            counter = Count('genericerror')
+        return lots.annotate(errors=counter).filter(errors__gt=0)
 
 
 def get_lots_with_deadline(lots, deadline=get_current_deadline()):
@@ -193,7 +198,7 @@ def filter_lots(lots, query, entity_id=None, will_aggregate=False, blacklist=[])
 
     if correction == 'true':
         lots = lots.filter(Q(correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED]) | Q(lot_status=CarbureLot.REJECTED))
-    elif history != 'true':
+    elif history != 'true' and entity_id is not None:
         lots = lots.exclude(lot_status__in=[CarbureLot.FROZEN, CarbureLot.ACCEPTED])
 
     if year and 'year' not in blacklist:
