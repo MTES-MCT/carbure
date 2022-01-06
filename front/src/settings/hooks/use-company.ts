@@ -5,7 +5,6 @@ import * as api2 from "../api-v2"
 import useAPI from "common/hooks/use-api"
 import { useQuery, useMutation } from "common-v2/hooks/async"
 import { Option, SelectValue } from "common/components/select"
-import { useEffect } from "react"
 import { EntityCertificate } from "common/types"
 import { reloadUserSettings } from "carbure/hooks/user"
 

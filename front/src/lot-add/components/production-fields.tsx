@@ -15,7 +15,7 @@ import * as norm from "common-v2/utils/normalizers"
 import { LotFormValue } from "./lot-form"
 import { UserCheck } from "common-v2/components/icons"
 import { Entity } from "carbure/types"
-import { Country, ProductionSite, CertificateData } from "common/types"
+import { Country, ProductionSite } from "common/types"
 
 interface ProductionFieldsProps {
   readOnly?: boolean
@@ -130,7 +130,10 @@ export const ProductionSiteCertificateField = (
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={(query) =>
         production_site_id !== undefined
-          ? api.findMyCertificates(query, { entity_id: entity.id, production_site_id })
+          ? api.findMyCertificates(query, {
+              entity_id: entity.id,
+              production_site_id,
+            })
           : api.findCertificates(query)
       }
       {...bound}
