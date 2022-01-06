@@ -45,22 +45,26 @@ def get_snapshot(request, *args, **kwargs):
     else:
         return JsonResponse({'status': 'error', 'message': 'Missing year'}, status=400)
 
-    lots = CarbureLot.objects.filter(year=year)
     data = {}
+    lots = CarbureLot.objects.filter(year=year)
+
     drafts = lots.filter(added_by_id=entity_id, lot_status=CarbureLot.DRAFT)
+
     lots_in = lots.filter(carbure_client_id=entity_id).exclude(lot_status__in=[CarbureLot.DELETED, CarbureLot.DRAFT])
     lots_in_pending = lots_in.filter(lot_status=CarbureLot.PENDING)
     lots_in_tofix = lots_in.exclude(correction_status=CarbureLot.NO_PROBLEMO)
+
     stock = CarbureStock.objects.filter(carbure_client_id=entity_id).filter(Q(parent_lot__year=year) | Q(parent_transformation__transformation_dt__year=year))
     stock_not_empty = stock.filter(remaining_volume__gt=0)
-    out = lots.filter(added_by__id=entity_id)
-    history = out.exclude(lot_status__in=[CarbureLot.DELETED, CarbureLot.DRAFT, CarbureLot.PENDING])
-    lots_out_pending = out.filter(lot_status=CarbureLot.PENDING)
-    lots_out_tofix = out.exclude(correction_status=CarbureLot.NO_PROBLEMO)
+
+    lots_out = lots.filter(carbure_supplier_id=entity_id).exclude(lot_status__in=[CarbureLot.DELETED, CarbureLot.DRAFT])
+    lots_out_pending = lots_out.filter(lot_status=CarbureLot.PENDING)
+    lots_out_tofix = lots_out.exclude(correction_status=CarbureLot.NO_PROBLEMO)
+
     data['lots'] = {'draft': drafts.count(),
                     'in_total': lots_in.count(), 'in_pending': lots_in_pending.count(), 'in_tofix': lots_in_tofix.count(),
                     'stock': stock_not_empty.count(), 'stock_total': stock.count(),
-                    'out_total': history.count(), 'out_pending': lots_out_pending.count(), 'out_tofix': lots_out_tofix.count()}
+                    'out_total': lots_out.count(), 'out_pending': lots_out_pending.count(), 'out_tofix': lots_out_tofix.count()}
     return JsonResponse({'status': 'success', 'data': data})
 
 
