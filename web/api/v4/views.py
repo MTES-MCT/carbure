@@ -69,7 +69,8 @@ def get_lots(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
     status = request.GET.get('status', False)
-    if not status:
+    selection = request.GET.get('selection', False)
+    if not status and not selection:
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
     try:
         lots = get_entity_lots_by_status(entity_id, status)
@@ -699,8 +700,8 @@ def lots_send(request, *args, **kwargs):
             event.event_type = CarbureLotEvent.ACCEPTED
             event.lot = lot
             event.user = request.user
-            event.save()        
-            # SECOND TRANSACTION    
+            event.save()
+            # SECOND TRANSACTION
             lot.pk = None
             lot.parent_lot_id = first_lot_id
             lot.carbure_client = final_client
@@ -717,7 +718,7 @@ def lots_send(request, *args, **kwargs):
             event.event_type = CarbureLotEvent.ACCEPTED
             event.lot = lot
             event.user = request.user
-            event.save()            
+            event.save()
         elif lot.carbure_client_id is None:
             # RFC or EXPORT
             nb_auto_accepted += 1
