@@ -48,7 +48,7 @@ const CompanySettings = ({ entity, settings }: CompanySettingsProps) => {
           />
         )}
 
-        {settings.certificates.length > 0 && (
+        {(isTrader || isProducer) && settings.certificates.length > 0 && (
           <Label
             label={t("Certificat par défaut")}
             className={styles.settingsSelect}
