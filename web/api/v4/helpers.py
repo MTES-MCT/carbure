@@ -523,10 +523,9 @@ def sort_stock(stock, query):
 
 def get_lot_errors(lot, entity_id):
     errors = []
-    if entity_id == lot.added_by_id:
-        errors = lot.genericerror_set.filter(display_to_creator=True)
-    elif entity_id == lot.carbure_client_id:
-        errors = lot.genericerror_set.filter(display_to_recipient=True)
+    if entity_id is not None:
+        errors = GenericError.objects.filter(lot_id=lot.id)
+        errors = errors.filter(Q(lot__added_by_id=entity_id, display_to_creator=True) | Q(lot__carbure_client_id=entity_id, display_to_recipient=True))
     else:
         errors = lot.genericerror_set.all()
     return GenericErrorSerializer(errors, many=True, read_only=True).data
@@ -779,14 +778,14 @@ def get_prefetched_data(entity=None):
         d['my_vendor_certificates'] = [c.certificate.certificate_id for c in EntityCertificate.objects.filter(entity=entity)]
     else:
         d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').all()}
-    entitydepots = dict()
+    depotsbyentities = dict()
     associated_depots = EntityDepot.objects.all()
-    for obj in associated_depots:
-        if obj.id in entitydepots:
-            entitydepots[obj.id].append(obj.id)
+    for entitydepot in associated_depots.iterator():
+        if entitydepot.entity_id in depotsbyentities:
+            depotsbyentities[entitydepot.entity_id].append(entitydepot.depot_id)
         else:
-            entitydepots[obj.id] = [obj.id]
-    d['depotsbyentity'] = entitydepots
+            depotsbyentities[entitydepot.entity_id] = [entitydepot.depot_id]
+    d['depotsbyentity'] = depotsbyentities
     d['clients'] = {c.id: c for c in Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.OPERATOR, Entity.TRADER])}
     d['clientsbyname'] = {c.name.upper(): c for c in Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.OPERATOR, Entity.TRADER])}
     d['certificates'] = {c.certificate_id.upper(): c for c in GenericCertificate.objects.filter(valid_until__gte=lastyear)}
