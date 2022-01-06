@@ -49,6 +49,18 @@ class CarbureLotCommentSerializer(serializers.ModelSerializer):
         fields = ['entity', 'user', 'comment_type', 'comment_dt', 'comment']
 
 class CarbureLotCSVSerializer(serializers.ModelSerializer):
+    producer = serializers.SerializerMethodField()
+    production_site = serializers.SerializerMethodField()
+    production_country = serializers.SerializerMethodField()
+    supplier = serializers.SerializerMethodField()
+    client = serializers.SerializerMethodField()
+    delivery_date = serializers.SerializerMethodField()
+    delivery_site = serializers.SerializerMethodField()
+    delivery_site_country = serializers.SerializerMethodField()
+    country_of_origin = serializers.SerializerMethodField()
+    biofuel = serializers.SerializerMethodField()
+    feedstock = serializers.SerializerMethodField()
+
     class Meta:
         model = CarbureLot
         fields = ['year', 'period', 'carbure_id', 'producer', 'production_site',
@@ -95,19 +107,23 @@ class CarbureLotCSVSerializer(serializers.ModelSerializer):
 
 
 class CarbureStockCSVSerializer(serializers.ModelSerializer):
+    production_site = serializers.SerializerMethodField()
+    production_country = serializers.SerializerMethodField()
+    supplier = serializers.SerializerMethodField()
+    delivery_date = serializers.SerializerMethodField()
+    country_of_origin = serializers.SerializerMethodField()
+    biofuel = serializers.SerializerMethodField()
+    feedstock = serializers.SerializerMethodField()
+
     class Meta:
         model = CarbureStock
-        fields = ['year', 'period', 'carbure_id', 'producer', 'production_site',
-                  'production_country', 'production_site_commissioning_date', 'production_site_certificate', 'production_site_double_counting_certificate',
-                  'supplier', 'supplier_certificate',
-                  'transport_document_reference', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country', 'delivery_type',
-                  'volume', 'weight', 'lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
-                  'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ghg_reference_red_ii', 'ghg_reduction_red_ii',
-                  'free_field'
+        fields = ['carbure_id',
+                  'production_site', 'production_country',
+                  'supplier', 'delivery_date', 'depot',
+                  'remaining_volume', 'remaining_weight', 'remaining_lhv_amount',
+                  'feedstock', 'biofuel', 'country_of_origin',
+                  'ghg_reduction', 'ghg_reduction_red_ii',
                   ]
-
-    def get_producer(self, obj):
-        return obj.carbure_producer.name if obj.carbure_producer else obj.unknown_producer
 
     def get_production_site(self, obj):
         return obj.carbure_production_site.name if obj.carbure_production_site else obj.unknown_production_site
@@ -122,7 +138,8 @@ class CarbureStockCSVSerializer(serializers.ModelSerializer):
         return obj.carbure_client.name if obj.carbure_client else obj.unknown_client
 
     def get_delivery_date(self, obj):
-        return obj.delivery_date.strftime('%d/%m/%Y') if obj.delivery_date else ''
+        date = obj.get_delivery_date()
+        return date.strftime('%d/%m/%Y') if date else ''
 
     def get_delivery_site(self, obj):
         return obj.carbure_delivery_site.depot_id if obj.carbure_delivery_site else obj.unknown_delivery_site
@@ -168,7 +185,7 @@ class CarbureStockPublicSerializer(serializers.ModelSerializer):
         else:
             return 0
         # return obj.parent_lot.volume if obj.parent_lot else obj.parent_transformation.volume_destination
-    
+
     def get_delivery_date(self, obj):
         return obj.get_delivery_date().strftime('%Y-%m-%d')
 
@@ -255,7 +272,7 @@ class GenericCertificateSerializer(serializers.ModelSerializer):
 class EntityCertificateSerializer(serializers.ModelSerializer):
     entity = EntitySerializer()
     certificate = GenericCertificateSerializer()
-    
+
     class Meta:
         model = EntityCertificate
         fields = ['entity', 'certificate', 'has_been_updated']

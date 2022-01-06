@@ -192,6 +192,10 @@ export function getStocks(query: StockQuery) {
   return api.get<Api<StockList>>("/stocks", { params: query })
 }
 
+export function downloadStocks(query: StockQuery, selection: number[]) {
+  return download("/stocks", { ...getParams(query, selection), export: true })
+}
+
 export function getStockSummary(
   query: StockQuery,
   selection: number[],

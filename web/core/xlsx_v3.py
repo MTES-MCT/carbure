@@ -44,7 +44,7 @@ FOREIGN_CLIENTS = [{'name': 'BP', 'country': 'GB', 'delivery_site': 'DOVER'},
                     ]
 
 
-SUPPLIERS = [{'name': 'LUR BERRI', 'sref': 'ISCC-FR-200000042'}, 
+SUPPLIERS = [{'name': 'LUR BERRI', 'sref': 'ISCC-FR-200000042'},
     {'name': 'ITANOL', 'sref': 'ISCC-IT-200000014'},
     {'name': 'FINNHUB', 'sref': 'ISCC-FI-200000078'},
     {'name': 'DEUTSCHE BIOFUELS GMBH', 'sref': 'ISCC-DE-200000001'},
@@ -229,8 +229,8 @@ def make_mb_extract_sheet_bcghg(workbook, entity):
         lot_source = random.choice(mb_lots)
         my_vendor_certificate = random.choice(my_vendor_certificates)
 
-        row = [lot_source.lot.biocarburant.code, lot_source.lot.matiere_premiere.code, lot_source.lot.ghg_total, 
-               lot_source.carbure_delivery_site.depot_id if lot_source.delivery_site_is_in_carbure else lot_source.unknown_delivery_site, 
+        row = [lot_source.lot.biocarburant.code, lot_source.lot.matiere_premiere.code, lot_source.lot.ghg_total,
+               lot_source.carbure_delivery_site.depot_id if lot_source.delivery_site_is_in_carbure else lot_source.unknown_delivery_site,
                int(lot_source.lot.volume / 2), get_random_dae(), clientid, my_vendor_certificate]
         if exported == 1:
             # client is not in carbure
@@ -265,7 +265,7 @@ def make_producers_lots_sheet_simple(workbook, entity):
                'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee',
                'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site']
     if entity.has_mac:
-        columns.append('mac')               
+        columns.append('mac')
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
 
@@ -514,7 +514,7 @@ def template_stock_bcghg(entity):
     # but instead of using carbure_id as a key, we'll use the biofuel and its sustainability characteristics (ghg)
     # why ?
     # because users are more likely to know the details of what they're sending than the carbure id
-    # Knowing CarbureID forces them to download their stock from carbure  
+    # Knowing CarbureID forces them to download their stock from carbure
     location = '/tmp/carbure_template_mb.xlsx'
     workbook = xlsxwriter.Workbook(location)
     make_mb_extract_sheet_bcghg(workbook, entity)
@@ -547,7 +547,7 @@ def make_dump_lots_sheet(workbook, entity, transactions, stocks=False):
         lot = tx.lot
         com_date = ''
         if lot.carbure_production_site:
-            com_date = lot.carbure_production_site.date_mise_en_service.strftime('%d/%m/%Y') 
+            com_date = lot.carbure_production_site.date_mise_en_service.strftime('%d/%m/%Y')
         elif lot.unknown_production_site_com_date:
             com_date = lot.unknown_production_site_com_date.strftime('%d/%m/%Y')
         else:
@@ -556,7 +556,7 @@ def make_dump_lots_sheet(workbook, entity, transactions, stocks=False):
                lot.carbure_producer.name if lot.carbure_producer else lot.unknown_producer,
                lot.carbure_production_site.name if lot.carbure_production_site else lot.unknown_production_site,
                lot.carbure_production_site.country.code_pays if lot.carbure_production_site and lot.carbure_production_site.country else lot.unknown_production_country.code_pays if lot.unknown_production_country else '',
-               lot.carbure_production_site_reference if lot.carbure_production_site else lot.unknown_production_site_reference, 
+               lot.carbure_production_site_reference if lot.carbure_production_site else lot.unknown_production_site_reference,
                com_date,
                lot.carbure_production_site.dc_reference if lot.carbure_production_site and lot.matiere_premiere.is_double_compte else lot.unknown_production_site_dbl_counting,
                tx.carbure_vendor.name if tx.carbure_vendor else tx.lot.unknown_supplier,
@@ -569,7 +569,7 @@ def make_dump_lots_sheet(workbook, entity, transactions, stocks=False):
                lot.matiere_premiere.category if lot.matiere_premiere else '',
                lot.pays_origine.code_pays if lot.pays_origine else '',
                lot.eec, lot.el, lot.ep, lot.etd, lot.eu, lot.esca, lot.eccs, lot.eccr, lot.eee, lot.ghg_total, lot.ghg_reduction, lot.ghg_reduction_red_ii,
-               tx.dae, tx.champ_libre, tx.carbure_client.name if tx.client_is_in_carbure and tx.carbure_client else tx.unknown_client, 
+               tx.dae, tx.champ_libre, tx.carbure_client.name if tx.client_is_in_carbure and tx.carbure_client else tx.unknown_client,
                tx.delivery_date.strftime('%d/%m/%Y') if tx.delivery_date else '',
                tx.carbure_delivery_site.depot_id if tx.delivery_site_is_in_carbure else tx.unknown_delivery_site,
                tx.carbure_delivery_site.country.code_pays if tx.delivery_site_is_in_carbure else tx.unknown_delivery_site_country.code_pays if tx.unknown_delivery_site_country else '',
@@ -602,14 +602,14 @@ def make_dump_stocks_sheet(workbook, entity, transactions):
                lot.carbure_producer.name if lot.carbure_producer else lot.unknown_producer,
                lot.carbure_production_site.name if lot.carbure_production_site else lot.unknown_production_site,
                lot.carbure_production_site.country.code_pays if lot.carbure_production_site and lot.carbure_production_site.country else lot.unknown_production_country.code_pays if lot.unknown_production_country else '',
-               lot.unknown_production_site_reference, 
+               lot.unknown_production_site_reference,
                lot.unknown_production_site_com_date.strftime('%d/%m/%Y') if lot.unknown_production_site_com_date else '',
                lot.unknown_production_site_dbl_counting,
                lot.volume, lot.biocarburant.code if lot.biocarburant else '',
                lot.matiere_premiere.code if lot.matiere_premiere else '',
                lot.pays_origine.code_pays if lot.pays_origine else '',
                lot.eec, lot.el, lot.ep, lot.etd, lot.eu, lot.esca, lot.eccs, lot.eccr, lot.eee, lot.ghg_total,
-               tx.dae, tx.champ_libre, 
+               tx.dae, tx.champ_libre,
                tx.delivery_date.strftime('%d/%m/%Y') if tx.delivery_date else '',
                tx.carbure_delivery_site.depot_id if tx.delivery_site_is_in_carbure else tx.unknown_delivery_site,
                tx.carbure_delivery_site.country.code_pays if tx.delivery_site_is_in_carbure else tx.unknown_delivery_site_country.code_pays if tx.unknown_delivery_site_country else ''
@@ -655,7 +655,7 @@ def export_dca(dca):
     bold = workbook.add_format({'bold': True})
     columns = ['year', 'feedstock', 'biofuel', 'max_production_capacity', 'estimated_production', 'requested_quota', 'approved_quota']
     for i, c in enumerate(columns):
-        production_worksheet.write(0, i, c, bold)    
+        production_worksheet.write(0, i, c, bold)
     for rowid, entry in enumerate(dca.production.all()):
         row = [entry.year, entry.biofuel.code, entry.feedstock.code, entry.max_production_capacity, entry.estimated_production, entry.requested_quota, entry.approved_quota]
         for colid, elem in enumerate(row):
@@ -671,7 +671,7 @@ def export_dca(dca):
     row = [dca.producer.legal_name, dca.production_site.name, dca.production_site.address, dca.production_site.city, dca.production_site.postal_code, dca.production_site.country.name]
     for colid, elem in enumerate(row):
         entity_details_worksheet.write(1, colid, elem)
-    
+
     workbook.close()
     return location
 
@@ -737,7 +737,7 @@ def make_carbure_lots_sheet(workbook, entity, lots):
             worksheet_lots.write(index+1, colid, elem)
             colid += 1
 
-def make_carbure_stock_sheet(workbook, lots,):
+def make_carbure_stock_sheet(workbook, lots):
     worksheet_lots = workbook.add_worksheet("lots")
     serializer = CarbureStockCSVSerializer(lots, many=True)
     df = pd.DataFrame(serializer.data)
@@ -765,18 +765,18 @@ def export_carbure_lots(entity, transactions):
     workbook.close()
     return location
 
-def export_carbure_stock(entity, transactions):
+def export_carbure_stock(entity, stocks):
     today = datetime.date.today()
     location = '/tmp/carbure_stock_%s.xlsx' % (today.strftime('%Y%m%d_%H%M'))
     workbook = xlsxwriter.Workbook(location)
-    make_carbure_stock_sheet(workbook, entity, transactions)
+    make_carbure_stock_sheet(workbook, stocks)
     make_countries_sheet(workbook)
     make_mps_sheet(workbook)
     make_biofuels_sheet(workbook)
     make_clients_sheet(workbook)
     make_deliverysites_sheet(workbook)
     workbook.close()
-    return location   
+    return location
 
 
 
@@ -792,7 +792,7 @@ def make_template_carbure_lots_sheet(workbook, entity):
 
     # header
     bold = workbook.add_format({'bold': True})
-    columns = ['champ_libre', 
+    columns = ['champ_libre',
     'producer', 'production_site', 'production_site_reference', 'production_site_country', 'production_site_commissioning_date', 'double_counting_registration',
     'supplier', 'supplier_certificate', 'vendor_certificate',
     'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
@@ -811,7 +811,7 @@ def make_template_carbure_lots_sheet(workbook, entity):
     rows.append(['ajout simple et choix du certificat', '', random.choice(psites).name, '', '', '', '', '', 'ISCC-XXXX-XXXX', '', 36500, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), random.choice(clients).name, today, random.choice(delivery_sites).name, '', ''])
     # CASE 4 not my production
     rows.append(['fournisseur hors-carbure', 'BioFuel GmbH', 'BioFuel Berlin', 'ISCC-DE-XXXX-XXX', 'DE', '22/11/2001', '', 'BioFuel Trader GmbH', 'TRADER-CERTIFICATE', '', 32300, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), 'TMF', today, 'EPHS Melun', '', ''])
-    # CASE 5 
+    # CASE 5
     rows.append(['ajout en stock', '', random.choice(psites).name, '', '', '', '', '', '', '', 35400, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), entity.name, today, random.choice(delivery_sites).name, '', ''])
 
     rowid = 0
