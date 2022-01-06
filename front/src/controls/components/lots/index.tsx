@@ -8,13 +8,12 @@ import { useStatus } from "../status"
 import { Order } from "common-v2/components/table"
 import { Bar } from "common-v2/components/scaffold"
 import Pagination, { useLimit } from "common-v2/components/pagination"
+import NoResult from "transactions-v2/components/no-result"
 import Filters, { useFilterParams } from "../filters"
 import { LotTable } from "./lot-table"
-import NoResult from "../no-result"
 import { LotActions } from "./lot-actions"
 import { DeadlineSwitch, InvalidSwitch } from "../switches"
 import { LotSummaryBar } from "./lot-summary"
-import SearchBar from "../search-bar"
 import LotAdd from "lot-add"
 import LotDetails from "lot-details"
 import useStore from "common-v2/hooks/store"
@@ -72,18 +71,13 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
       </Bar>
 
       <section>
-        <SearchBar
-          count={snapshot?.lots}
-          search={state.search}
-          category={state.category}
-          onSearch={actions.setSearch}
-          onSwitch={actions.setCategory}
-        />
-
         <LotActions
           count={count}
           query={query}
-          selection={state.selection} //
+          selection={state.selection}
+          search={state.search}
+          onSearch={actions.setSearch}
+          onSwitch={actions.setCategory}
         />
 
         {(state.invalid || totalErrors > 0) && (
@@ -164,7 +158,7 @@ export interface LotQueryState {
   order: Order | undefined
 }
 
-export function useLotQueryStore(entity: Entity, year: number, status: Status) {
+function useLotQueryStore(entity: Entity, year: number, status: Status) {
   const [limit, saveLimit] = useLimit()
   const [filtersParams, setFiltersParams] = useFilterParams()
 
