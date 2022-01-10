@@ -153,3 +153,8 @@ export default function Table<T>({
     </Box>
   )
 }
+
+export const padding: Column<any> = {
+  className: styles.paddingColumn,
+  render: () => null,
+}

@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom"
 import cl from "clsx"
 import * as api from "../api"
 import styles from "./entity-list.module.css"
-import { padding } from "transactions/components/list-columns"
-import Table, { Column } from "common/components/table"
+import Table, { Column, padding } from "common/components/table"
 import { Alert, AlertFilter } from "common/components/alert"
 import { AlertTriangle, AlertCircle } from "common/components/icons"
 
@@ -42,7 +41,6 @@ export const EntityFactoriesList = ({ entities }: EntityListProps) => {
       value: e,
       onClick: () => navigate(`${e.entity.id}`),
     }))
-
 
   if (rows.length === 0) {
     return (
@@ -117,7 +115,6 @@ export const EntityDoubleCountingList = ({ entities }: EntityListProps) => {
           </span>
         </AlertFilter>
       )}
-
       <Table columns={columns} rows={rows} />
       const navigate = useNavigate()
     </Fragment>

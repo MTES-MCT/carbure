@@ -4,9 +4,8 @@ import cl from "clsx"
 
 import { Declaration, Entity, EntityType } from "common/types"
 import { Box, LoaderOverlay, Title } from "common/components"
-import Table, { Row } from "common/components/table"
+import Table, { Row, padding } from "common/components/table"
 import { Section, SectionHeader } from "common/components/section"
-import { padding } from "transactions/components/list-columns"
 import styles from "./declarations.module.css"
 import useAPI from "common/hooks/use-api"
 import {

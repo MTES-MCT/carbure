@@ -52,7 +52,7 @@ import {
 import { LabelAutoComplete } from "common/components/autocomplete"
 import * as api from "../api"
 import useAPI from "common/hooks/use-api"
-import { padding } from "transactions/components/list-columns"
+import { padding } from "common/components/table"
 import Tabs from "common/components/tabs"
 import { Form } from "common/components/form"
 import { LabelInput } from "common/components/input"
@@ -60,7 +60,7 @@ import useForm from "common/hooks/use-form"
 import YearTable from "doublecount/components/year-table"
 import DoubleCountingStatus from "doublecount/components/dc-status"
 import { SourcingAggregationTable } from "doublecount/components/dc-tables"
-import { prettyVolume } from "transactions/helpers"
+import { formatNumber } from "common-v2/utils/formatters"
 
 type DoubleCountingUploadPromptProps = PromptProps<void> & {
   entity: Entity
@@ -535,14 +535,14 @@ const QuotasTable = ({ entity, agreement }: QuotasTableProps) => {
       header: t("Volume produit"),
       render: (d) => (
         <TwoLines
-          text={`${prettyVolume(d.volume)} L`}
+          text={`${formatNumber(d.volume)} L`}
           sub={`${d.current_production_weight_sum_tonnes} t`}
         />
       ),
     },
     {
       header: t("Quota approuvé"),
-      render: (d) => <Line text={prettyVolume(d.approved_quota)} />,
+      render: (d) => <Line text={formatNumber(d.approved_quota)} />,
     },
     {
       header: t("Progression des quotas"),
@@ -639,7 +639,7 @@ const DoubleCountingPrompt = ({
     },
     {
       header: t("Poids en tonnes"),
-      render: (s) => <Line text={prettyVolume(s.metric_tonnes)} />,
+      render: (s) => <Line text={formatNumber(s.metric_tonnes)} />,
     },
     {
       header: t("Origine"),
@@ -711,16 +711,16 @@ const DoubleCountingPrompt = ({
     {
       header: t("Prod. max"),
       render: (p) => (
-        <Line text={prettyVolume(p.max_production_capacity ?? 0)} />
+        <Line text={formatNumber(p.max_production_capacity ?? 0)} />
       ),
     },
     {
       header: t("Prod. estimée"),
-      render: (p) => <Line text={prettyVolume(p.estimated_production)} />,
+      render: (p) => <Line text={formatNumber(p.estimated_production)} />,
     },
     {
       header: t("Quota demandé"),
-      render: (p) => <Line text={prettyVolume(p.requested_quota)} />,
+      render: (p) => <Line text={formatNumber(p.requested_quota)} />,
     },
     {
       header: t("Quota approuvé"),
@@ -728,7 +728,7 @@ const DoubleCountingPrompt = ({
         p.approved_quota === -1 ? (
           t("En attente")
         ) : (
-          <Line text={prettyVolume(p.approved_quota)} />
+          <Line text={formatNumber(p.approved_quota)} />
         ),
     },
     padding,
