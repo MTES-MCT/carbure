@@ -29,6 +29,7 @@ import Table, {
   Column,
   Line,
   Row,
+  padding,
 } from "common/components/table"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
 import {
@@ -44,7 +45,6 @@ import {
 } from "common/components/autocomplete"
 import RadioGroup from "common/components/radio-group"
 import { formatDate, SettingsForm } from "./common"
-import { padding } from "transactions/components/list-columns"
 import { getMyCertificates } from "../api-v2"
 import { useRights } from "carbure/hooks/entity"
 

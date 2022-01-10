@@ -27,6 +27,7 @@ import Table, {
   Column,
   Line,
   Row,
+  padding,
 } from "common/components/table"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
 import {
@@ -37,7 +38,6 @@ import {
   PromptProps,
 } from "common/components/dialog"
 import { LabelAutoComplete } from "common/components/autocomplete"
-import { padding } from "transactions/components/list-columns"
 import RadioGroup from "common/components/radio-group"
 import { SettingsForm } from "./common"
 import useForm from "common/hooks/use-form"

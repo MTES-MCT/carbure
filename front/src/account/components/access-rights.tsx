@@ -1,6 +1,4 @@
 import { useState } from "react"
-import cl from "clsx"
-
 import {
   Entity,
   EntityType,
@@ -8,8 +6,7 @@ import {
   UserRightStatus,
   UserRole,
 } from "common/types"
-import statusStyles from "transactions/components/status.module.css"
-import colStyles from "transactions/components/list-columns.module.css"
+import colStyles from "common/components/table.module.css"
 import pendingStyles from "carbure/components/pending.module.css"
 import { LoaderOverlay, Title } from "common/components"
 import { Button } from "common/components/button"
@@ -17,8 +14,13 @@ import { AlertTriangle, Cross, Plus } from "common/components/icons"
 import { formatDate, SettingsForm } from "settings/components/common"
 import { LabelAutoComplete } from "common/components/autocomplete"
 import { Alert } from "common/components/alert"
-import Table, { Actions, Column, Line, Row } from "common/components/table"
-import { padding } from "transactions/components/list-columns"
+import Table, {
+  Actions,
+  Column,
+  Line,
+  Row,
+  padding,
+} from "common/components/table"
 import { Section, SectionBody, SectionHeader } from "common/components/section"
 import {
   confirm,
@@ -36,6 +38,7 @@ import * as common from "common/api"
 import useAPI from "common/hooks/use-api"
 import { Trans, useTranslation } from "react-i18next"
 import { reloadUserSettings, useUserContext } from "carbure/hooks/user"
+import Badge, { Variant } from "common/components/badge"
 
 export const AccountAccesRights = () => {
   const { t } = useTranslation()
@@ -237,20 +240,14 @@ export const RightStatus = ({ status }: { status: UserRightStatus }) => {
     [UserRightStatus.Revoked]: t("Révoqué"),
   }
 
-  return (
-    <span
-      className={cl(
-        statusStyles.status,
-        statusStyles.smallStatus,
-        status === UserRightStatus.Accepted && statusStyles.statusAccepted,
-        status === UserRightStatus.Pending && statusStyles.statusWaiting,
-        status === UserRightStatus.Rejected && statusStyles.statusRejected,
-        status === UserRightStatus.Revoked && statusStyles.statusToFix
-      )}
-    >
-      {statusLabels[status]}
-    </span>
-  )
+  const statusVariant: Record<UserRightStatus, Variant> = {
+    [UserRightStatus.Accepted]: "success",
+    [UserRightStatus.Pending]: "info",
+    [UserRightStatus.Rejected]: "danger",
+    [UserRightStatus.Revoked]: "warning",
+  }
+
+  return <Badge variant={statusVariant[status]}>{statusLabels[status]}</Badge>
 }
 
 export const statusColumn = {
