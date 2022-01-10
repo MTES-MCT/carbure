@@ -3,6 +3,7 @@
 from django.db import migrations
 import datetime
 from core.models import EntityCertificate, GenericCertificate
+from django.db import migrations, models
 
 def migrate_certificates(apps, schema_editor):
     # ISCC
@@ -61,5 +62,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.AddField(
+            model_name='entitycertificate',
+            name='has_been_updated',
+            field=models.BooleanField(default=False),
+        ),
         migrations.RunPython(migrate_certificates)
     ]
