@@ -1,5 +1,5 @@
-import { rest } from "msw"
-import { setupServer } from "msw/node"
+import { rest } from "msw";
+import { setupServer } from "msw/node";
 
 export const okSnapshot = rest.get("/api/snapshot", (req, res, ctx) => {
   return res(
@@ -18,9 +18,9 @@ export const okSnapshot = rest.get("/api/snapshot", (req, res, ctx) => {
           out_tofix: 0,
         },
       },
-    })
-  )
-})
+    }),
+  );
+});
 
 export const okLots = rest.get("/api/lots", (req, res, ctx) => {
   return res(
@@ -37,17 +37,17 @@ export const okLots = rest.get("/api/lots", (req, res, ctx) => {
           errors: {},
         },
       },
-    })
-  )
-})
+    }),
+  );
+});
 
 export const okYears = rest.get("/api/years", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
       data: [],
-    })
-  )
-})
+    }),
+  );
+});
 
-export default setupServer(okSnapshot, okLots, okYears)
+export default setupServer(okSnapshot, okLots, okYears);
