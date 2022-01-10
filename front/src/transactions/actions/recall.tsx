@@ -10,19 +10,19 @@ import Button from "common-v2/components/button"
 import Dialog from "common-v2/components/dialog"
 import { Return, Wrench } from "common-v2/components/icons"
 import { usePortal } from "common-v2/components/portal"
-import { useStatus } from "transactions-v2/components/status"
-import { TextInput } from "common-v2/components/input"
 import { LotSummary } from "../components/lots/lot-summary"
+import { useStatus } from "transactions/components/status"
+import { TextInput } from "common-v2/components/input"
 
-export interface RequestManyFixesButtonProps {
+export interface RecallManyButtonProps {
   disabled?: boolean
   selection: number[]
 }
 
-export const RequestManyFixesButton = ({
+export const RecallManyButton = ({
   disabled,
   selection,
-}: RequestManyFixesButtonProps) => {
+}: RecallManyButtonProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
@@ -31,25 +31,22 @@ export const RequestManyFixesButton = ({
       disabled={disabled || selection.length === 0}
       variant="warning"
       icon={Wrench}
-      label={t("Demander des corrections")}
+      label={t("Corriger la sélection")}
       action={() =>
         portal((close) => (
-          <RequestFixDialog summary selection={selection} onClose={close} />
+          <RecallDialog summary selection={selection} onClose={close} />
         ))
       }
     />
   )
 }
 
-export interface RequestOneFixButtonProps {
+export interface RecallOneButtonProps {
   icon?: boolean
   lot: Lot
 }
 
-export const RequestOneFixButton = ({
-  icon,
-  lot,
-}: RequestOneFixButtonProps) => {
+export const RecallOneButton = ({ icon, lot }: RecallOneButtonProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
@@ -58,28 +55,22 @@ export const RequestOneFixButton = ({
       captive
       variant={icon ? "icon" : "warning"}
       icon={Wrench}
-      title={t("Demander une correction")}
-      label={t("Demander une correction")}
+      title={t("Corriger le lot")}
+      label={t("Corriger le lot")}
       action={() =>
-        portal((close) => (
-          <RequestFixDialog selection={[lot.id]} onClose={close} />
-        ))
+        portal((close) => <RecallDialog selection={[lot.id]} onClose={close} />)
       }
     />
   )
 }
 
-interface RequestFixDialogProps {
+interface RecallDialogProps {
   summary?: boolean
   selection: number[]
   onClose: () => void
 }
 
-const RequestFixDialog = ({
-  summary,
-  selection,
-  onClose,
-}: RequestFixDialogProps) => {
+const RecallDialog = ({ summary, selection, onClose }: RecallDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
   const status = useStatus()
@@ -89,13 +80,13 @@ const RequestFixDialog = ({
 
   const [comment = "", setComment] = useState<string | undefined>("")
 
-  const requestFix = useMutation(requestFixAndCommentLots, {
+  const recallLots = useMutation(recallAndCommentLots, {
     invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
 
     onSuccess: () => {
       const text = v({
-        one: t("La correction a bien été demandée !"),
-        many: t("Les corrections ont bien été demandées !"),
+        one: t("Vous pouvez maintenant corriger le lot !"),
+        many: t("Vous pouvez maintenant corriger ces lots !"),
       })
 
       notify(text, { variant: "success" })
@@ -123,16 +114,16 @@ const RequestFixDialog = ({
       <header>
         <h1>
           {v({
-            one: t("Demander une correction"),
-            many: t("Demander des corrections"),
+            one: t("Corriger le lot"),
+            many: t("Corriger les lots"),
           })}
         </h1>
       </header>
       <main>
         <section>
           {v({
-            one: t("Voulez-vous demander une correction ?"),
-            many: t("Voulez-vous demander des corrections pour les lots sélectionnés ?"), // prettier-ignore
+            one: t("Voulez-vous corriger ce lot ?"),
+            many: t("Voulez-vous corriger les lots sélectionnés ?"),
           })}
         </section>
         <section>
@@ -148,29 +139,29 @@ const RequestFixDialog = ({
       <footer>
         <Button
           asideX
-          disabled={requestFix.loading}
+          disabled={recallLots.loading}
           icon={Return}
           label={t("Annuler")}
           action={onClose}
         />
         <Button
           submit
-          loading={requestFix.loading}
+          loading={recallLots.loading}
           variant="warning"
           icon={Wrench}
-          label={t("Demander correction")}
-          action={() => requestFix.execute(entity.id, selection, comment)}
+          label={t("Corriger")}
+          action={() => recallLots.execute(entity.id, selection, comment)}
         />
       </footer>
     </Dialog>
   )
 }
 
-async function requestFixAndCommentLots(
+async function recallAndCommentLots(
   entity_id: number,
   selection: number[],
   comment: string
 ) {
-  await api.requestFix(entity_id, selection)
+  await api.recallLots(entity_id, selection)
   await api.commentLots({ entity_id }, selection, comment)
 }

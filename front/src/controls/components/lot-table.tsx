@@ -1,6 +1,6 @@
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
-import { Lot, LotError } from "transactions-v2/types"
+import { Lot, LotError } from "transactions/types"
 import { formatNumber } from "common-v2/utils/formatters"
 import Table, {
   Cell,
@@ -11,8 +11,8 @@ import Table, {
 import {
   getLotMarker,
   PeriodCell,
-} from "transactions-v2/components/lots/lot-table"
-import LotTag from "transactions-v2/components/lots/lot-tag"
+} from "transactions/components/lots/lot-table"
+import LotTag from "transactions/components/lots/lot-tag"
 
 export interface LotTableProps {
   loading: boolean

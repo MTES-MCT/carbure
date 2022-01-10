@@ -9,7 +9,7 @@ import Dialog from "common-v2/components/dialog"
 import Button from "common-v2/components/button"
 import { Alarm, Return } from "common-v2/components/icons"
 import LotForm from "lot-add/components/lot-form"
-import LotTag from "transactions-v2/components/lots/lot-tag"
+import LotTag from "transactions/components/lots/lot-tag"
 import Comments from "lot-details/components/comments"
 import {
   BlockingAnomalies,

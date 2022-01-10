@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next"
 import { Download } from "common/components/icons"
 import Button from "common-v2/components/button"
-import { LotQuery } from "transactions-v2/types"
+import { LotQuery } from "transactions/types"
 import * as api from "../api"
 
 export interface ExportLotsButtonProps {

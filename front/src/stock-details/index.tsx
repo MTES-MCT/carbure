@@ -7,13 +7,13 @@ import Dialog from "common-v2/components/dialog"
 import Button from "common-v2/components/button"
 import { AlertCircle, Return } from "common-v2/components/icons"
 import StockForm from "./components/stock-form"
-import StockTag from "transactions-v2/components/stocks/stock-tag"
+import StockTag from "transactions/components/stocks/stock-tag"
 import { LoaderOverlay } from "common-v2/components/scaffold"
 import NavigationButtons from "lot-details/components/navigation"
 import Alert from "common-v2/components/alert"
 import { formatNumber, formatPercentage } from "common-v2/utils/formatters"
 import StockTraceability from "./components/stock-traceability"
-import { SplitOneButton } from "transactions-v2/actions/split"
+import { SplitOneButton } from "transactions/actions/split"
 
 interface StockDetailsProps {
   neighbors: number[]
