@@ -1,0 +1,163 @@
+import { Route, Routes, useNavigate, useLocation } from "react-router-dom"
+import * as api from "../api"
+import { Entity } from "carbure/types"
+import { useQuery } from "common-v2/hooks/async"
+import { useStatus } from "./status"
+import { Bar } from "common-v2/components/scaffold"
+import Pagination from "common-v2/components/pagination"
+import NoResult from "transactions-v2/components/no-result"
+import Filters from "transactions-v2/components/filters"
+import { LotTable } from "./lot-table"
+import { LotActions } from "./lot-actions"
+import {
+  DeadlineSwitch,
+  InvalidSwitch,
+} from "transactions-v2/components/switches"
+import { LotSummaryBar } from "./lot-summary"
+import LotDetails from "lot-details"
+import { useLotQuery, useLotQueryStore } from "transactions-v2/components/lots"
+import { Filter, Lot } from "transactions-v2/types"
+
+export interface LotsProps {
+  entity: Entity
+  year: number
+}
+
+export const Lots = ({ entity, year }: LotsProps) => {
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  const status = useStatus()
+
+  const [state, actions] = useLotQueryStore(entity, year, status)
+  const query = useLotQuery(state)
+
+  const lots = useQuery(api.getLots, {
+    key: "lots",
+    params: [query],
+
+    onSuccess: () => {
+      if (state.selection.length > 0) {
+        actions.setSelection([])
+      }
+    },
+  })
+
+  const lotsData = lots.result?.data.data
+  const lotList = lotsData?.lots ?? []
+  const ids = lotsData?.ids ?? []
+  const lotErrors = lotsData?.errors ?? {}
+  const count = lotsData?.returned ?? 0
+  const total = lotsData?.total ?? 0
+  const totalErrors = lotsData?.total_errors ?? 0
+  const totalDeadline = lotsData?.total_deadline ?? 0
+
+  const showLotDetails = (lot: Lot) =>
+    navigate({
+      pathname: `${status}/${lot.id}`,
+      search: location.search,
+    })
+
+  return (
+    <>
+      <Bar>
+        <Filters
+          query={query}
+          filters={ADMIN_FILTERS}
+          selected={state.filters}
+          onSelect={actions.setFilters}
+          getFilters={api.getLotFilters}
+        />
+      </Bar>
+
+      <section>
+        <LotActions
+          count={count}
+          query={query}
+          selection={state.selection}
+          search={state.search}
+          onSearch={actions.setSearch}
+          onSwitch={actions.setCategory}
+        />
+
+        {(state.invalid || totalErrors > 0) && (
+          <InvalidSwitch
+            count={totalErrors}
+            active={state.invalid}
+            onSwitch={actions.setInvalid}
+          />
+        )}
+
+        {(state.deadline || totalDeadline > 0) && (
+          <DeadlineSwitch
+            count={totalDeadline}
+            active={state.deadline}
+            onSwitch={actions.setDeadline}
+          />
+        )}
+
+        {count === 0 && (
+          <NoResult
+            loading={lots.loading}
+            filters={state.filters}
+            onFilter={actions.setFilters}
+          />
+        )}
+
+        {count > 0 && (
+          <>
+            <LotSummaryBar
+              query={query}
+              selection={state.selection}
+              filters={state.filters}
+              onFilter={actions.setFilters}
+            />
+
+            <LotTable
+              loading={lots.loading}
+              order={state.order}
+              lots={lotList}
+              errors={lotErrors}
+              selected={state.selection}
+              onSelect={actions.setSelection}
+              onAction={showLotDetails}
+              onOrder={actions.setOrder}
+            />
+
+            <Pagination
+              page={state.page}
+              limit={state.limit}
+              total={total}
+              onPage={actions.setPage}
+              onLimit={actions.setLimit}
+            />
+          </>
+        )}
+      </section>
+
+      <Routes>
+        <Route path=":status/:id" element={<LotDetails neighbors={ids} />} />
+      </Routes>
+    </>
+  )
+}
+
+const ADMIN_FILTERS = [
+  Filter.Mac,
+  Filter.DeliveryStatus,
+  Filter.Periods,
+  Filter.Biofuels,
+  Filter.Feedstocks,
+  Filter.CountriesOfOrigin,
+  Filter.Suppliers,
+  Filter.Clients,
+  Filter.ProductionSites,
+  Filter.DeliverySites,
+  Filter.AddedBy,
+  Filter.Forwarded,
+  Filter.Errors,
+  Filter.HiddenByAdmin,
+  Filter.ClientTypes,
+]
+
+export default Lots

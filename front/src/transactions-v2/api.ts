@@ -206,7 +206,7 @@ export function getStockSummary(
   })
 }
 
-export function getStockFilters(field: Filter, query: LotQuery) {
+export function getStockFilters(field: Filter, query: StockQuery) {
   const params = { field, ...query, ...QUERY_RESET }
   return api
     .get<Api<Option[]>>("/stocks/filters", { params })

@@ -1,7 +1,13 @@
 import { useMemo } from "react"
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom"
 import { Entity } from "carbure/types"
-import { Snapshot, Stock, FilterSelection, StockQuery } from "../../types"
+import {
+  Snapshot,
+  Stock,
+  FilterSelection,
+  StockQuery,
+  Filter,
+} from "../../types"
 import { Order } from "common-v2/components/table"
 import { useQuery } from "common-v2/hooks/async"
 import * as api from "../../api"
@@ -58,10 +64,11 @@ export const Stocks = ({ entity, year, snapshot }: StocksProps) => {
     <>
       <Bar>
         <Filters
-          status="stocks"
           query={query}
-          filters={state.filters}
-          onFilter={actions.setFilters}
+          filters={STOCK_FILTERS}
+          selected={state.filters}
+          onSelect={actions.setFilters}
+          getFilters={api.getStockFilters}
         />
       </Bar>
 
@@ -124,6 +131,16 @@ export const Stocks = ({ entity, year, snapshot }: StocksProps) => {
     </>
   )
 }
+
+const STOCK_FILTERS = [
+  Filter.Periods,
+  Filter.Biofuels,
+  Filter.Feedstocks,
+  Filter.CountriesOfOrigin,
+  Filter.Suppliers,
+  Filter.ProductionSites,
+  Filter.Depots,
+]
 
 export interface StockQueryState {
   entity: Entity

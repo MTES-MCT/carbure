@@ -2,9 +2,16 @@ import { useMemo } from "react"
 import { Route, Routes, useNavigate, useLocation } from "react-router-dom"
 import * as api from "../../api"
 import { Entity } from "carbure/types"
-import { Lot, Snapshot, FilterSelection, Status, LotQuery } from "../../types"
-import { useQuery } from "common-v2/hooks/async"
+import {
+  Lot,
+  Snapshot,
+  FilterSelection,
+  Status,
+  LotQuery,
+  Filter,
+} from "../../types"
 import { useStatus } from "../status"
+import { useQuery } from "common-v2/hooks/async"
 import { Order } from "common-v2/components/table"
 import { Bar } from "common-v2/components/scaffold"
 import Pagination, { useLimit } from "common-v2/components/pagination"
@@ -64,10 +71,11 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
     <>
       <Bar>
         <Filters
-          status={status}
           query={query}
-          filters={state.filters}
-          onFilter={actions.setFilters}
+          filters={filtersByStatus[status]}
+          selected={state.filters}
+          onSelect={actions.setFilters}
+          getFilters={api.getLotFilters}
         />
       </Bar>
 
@@ -149,6 +157,46 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
   )
 }
 
+const DRAFT_FILTERS = [
+  Filter.Periods,
+  Filter.Biofuels,
+  Filter.Feedstocks,
+  Filter.CountriesOfOrigin,
+  Filter.Suppliers,
+  Filter.Clients,
+  Filter.ProductionSites,
+  Filter.DeliverySites,
+]
+
+const IN_FILTERS = [
+  Filter.Periods,
+  Filter.Biofuels,
+  Filter.Feedstocks,
+  Filter.CountriesOfOrigin,
+  Filter.Suppliers,
+  Filter.ProductionSites,
+  Filter.DeliverySites,
+]
+
+const OUT_FILTERS = [
+  Filter.Periods,
+  Filter.Biofuels,
+  Filter.Feedstocks,
+  Filter.CountriesOfOrigin,
+  Filter.Clients,
+  Filter.ProductionSites,
+  Filter.DeliverySites,
+]
+
+const filtersByStatus: Record<Status, Filter[]> = {
+  drafts: DRAFT_FILTERS,
+  in: IN_FILTERS,
+  out: OUT_FILTERS,
+  stocks: [],
+  declaration: [],
+  unknown: [],
+}
+
 export interface LotQueryState {
   entity: Entity
   year: number
@@ -164,7 +212,7 @@ export interface LotQueryState {
   order: Order | undefined
 }
 
-export function useLotQueryStore(entity: Entity, year: number, status: Status) {
+export function useLotQueryStore(entity: Entity, year: number, status: string) {
   const [limit, saveLimit] = useLimit()
   const [filtersParams, setFiltersParams] = useFilterParams()
 
@@ -291,7 +339,7 @@ export function useLotQueryStore(entity: Entity, year: number, status: Status) {
 
   // sync store state with status set in the route
   if (state.status !== status) {
-    actions.setStatus(status)
+    actions.setStatus(status as Status)
   }
 
   return [state, actions] as [typeof state, typeof actions]

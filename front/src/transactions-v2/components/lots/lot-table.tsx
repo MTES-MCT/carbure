@@ -146,7 +146,7 @@ export const PeriodCell = ({ lot }: PeriodCellProps) => {
   )
 }
 
-const getLotMarker = (lot: Lot, errors: Record<number, LotError[]>) => {
+export const getLotMarker = (lot: Lot, errors: Record<number, LotError[]>) => {
   if (!errors[lot.id]) {
     return undefined
   } else if (errors[lot.id].some((err) => err.is_blocking)) {
