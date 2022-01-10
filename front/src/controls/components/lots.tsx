@@ -14,9 +14,9 @@ import {
   InvalidSwitch,
 } from "transactions-v2/components/switches"
 import { LotSummaryBar } from "./lot-summary"
-import LotDetails from "lot-details"
 import { useLotQuery, useLotQueryStore } from "transactions-v2/components/lots"
 import { Filter, Lot } from "transactions-v2/types"
+import ControlDetails from "control-details"
 
 export interface LotsProps {
   entity: Entity
@@ -136,7 +136,10 @@ export const Lots = ({ entity, year }: LotsProps) => {
       </section>
 
       <Routes>
-        <Route path=":status/:id" element={<LotDetails neighbors={ids} />} />
+        <Route
+          path=":status/:id"
+          element={<ControlDetails neighbors={ids} />}
+        />
       </Routes>
     </>
   )
