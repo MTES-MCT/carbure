@@ -229,7 +229,6 @@ export type Status =
   | "stocks"
   | "out"
   | "declaration"
-  // | "admin"
   | "unknown"
 
 export interface LotQuery {

@@ -1,20 +1,18 @@
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import { Lot, LotError } from "transactions-v2/types"
-import {
-  formatDate,
-  formatNumber,
-  formatPeriod,
-} from "common-v2/utils/formatters"
-import { isExpiring } from "common-v2/utils/deadline"
+import { formatNumber } from "common-v2/utils/formatters"
 import Table, {
   Cell,
   Order,
   markerColumn,
   selectionColumn,
 } from "common-v2/components/table"
-import { Alarm } from "common-v2/components/icons"
-import LotTag from "./lot-tag"
+import {
+  getLotMarker,
+  PeriodCell,
+} from "transactions-v2/components/lots/lot-table"
+import LotTag from "transactions-v2/components/lots/lot-tag"
 
 export interface LotTableProps {
   loading: boolean
@@ -129,31 +127,5 @@ export const LotTable = memo(
     )
   }
 )
-
-interface PeriodCellProps {
-  lot: Lot
-}
-
-export const PeriodCell = ({ lot }: PeriodCellProps) => {
-  const expiring = isExpiring(lot)
-  return (
-    <Cell
-      icon={expiring ? Alarm : undefined}
-      variant={expiring ? "warning" : undefined}
-      text={formatPeriod(lot.period)}
-      sub={formatDate(lot.delivery_date)}
-    />
-  )
-}
-
-const getLotMarker = (lot: Lot, errors: Record<number, LotError[]>) => {
-  if (!errors[lot.id]) {
-    return undefined
-  } else if (errors[lot.id].some((err) => err.is_blocking)) {
-    return "danger"
-  } else if (errors[lot.id].some((err) => !err.is_blocking)) {
-    return "warning"
-  }
-}
 
 export default LotTable

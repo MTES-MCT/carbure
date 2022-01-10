@@ -1,7 +1,7 @@
 import { ActionBar } from "common-v2/components/scaffold"
 import { SearchInput } from "common-v2/components/input"
-import { LotQuery } from "../../types"
-import { ExportLotsButton } from "../../actions/export"
+import { ExportLotsButton } from "../actions/export"
+import { LotQuery } from "transactions-v2/types"
 
 export interface ActionBarProps {
   count: number

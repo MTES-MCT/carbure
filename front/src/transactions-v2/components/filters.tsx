@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next"
 import { useSearchParams } from "react-router-dom"
-import { Filter, FilterSelection, LotQuery, Status } from "../types"
-import * as api from "../api"
+import { Filter, FilterSelection } from "../types"
 import { Normalizer, Option } from "common-v2/utils/normalize"
 import { Grid, Row } from "common-v2/components/scaffold"
 import { MultiSelect, MultiSelectProps } from "common-v2/components/multi-select" // prettier-ignore
@@ -12,20 +11,22 @@ import {
   normalizeFeedstockFilter,
 } from "common-v2/utils/normalizers"
 
-export interface FiltersProps {
-  status: Status
-  query: LotQuery
-  filters: FilterSelection
-  onFilter: (filters: FilterSelection) => void
+export interface FiltersProps<Q> {
+  query: Q
+  filters: Filter[]
+  selected: FilterSelection
+  onSelect: (filters: FilterSelection) => void
+  getFilters: (field: Filter, query: Q) => Promise<Option[]>
 }
 
-export const Filters = ({ status, query, filters, onFilter }: FiltersProps) => {
+export function Filters<T>({
+  query,
+  filters,
+  selected,
+  onSelect,
+  getFilters,
+}: FiltersProps<T>) {
   const { t } = useTranslation()
-
-  // prettier-ignore
-  const getFilters = status === 'stocks'
-    ? api.getStockFilters
-    : api.getLotFilters
 
   const filterLabels = {
     [Filter.DeliveryStatus]: t("Livraison"),
@@ -50,14 +51,13 @@ export const Filters = ({ status, query, filters, onFilter }: FiltersProps) => {
 
   return (
     <Grid>
-      {filtersByStatus[status].map((field) => (
+      {filters.map((field) => (
         <FilterSelect
           key={field}
           field={field}
-          query={query}
           placeholder={filterLabels[field]}
-          value={filters[field]}
-          onChange={(value) => onFilter({ ...filters, [field]: value ?? [] })}
+          value={selected[field]}
+          onChange={(value) => onSelect({ ...selected, [field]: value ?? [] })}
           getOptions={() => getFilters(field, query)}
         />
       ))}
@@ -84,14 +84,13 @@ export const ResetButton = ({ filters, onFilter }: FilterManager) => {
   )
 }
 
-export type FilterSelectProps = { field: Filter; query: LotQuery } & Omit<
+export type FilterSelectProps = { field: Filter } & Omit<
   MultiSelectProps<Option, string>,
   "options"
 >
 
 export const FilterSelect = ({
   field,
-  query,
   value = [],
   onChange,
   ...props
@@ -133,56 +132,6 @@ export function searchToFilters(search: URLSearchParams) {
 export function countFilters(filters: FilterSelection | undefined) {
   if (filters === undefined) return 0
   return Object.values(filters).reduce((total, list) => total + list.length, 0)
-}
-
-const DRAFT_FILTERS = [
-  Filter.Periods,
-  Filter.Biofuels,
-  Filter.Feedstocks,
-  Filter.CountriesOfOrigin,
-  Filter.Suppliers,
-  Filter.Clients,
-  Filter.ProductionSites,
-  Filter.DeliverySites,
-]
-
-const IN_FILTERS = [
-  Filter.Periods,
-  Filter.Biofuels,
-  Filter.Feedstocks,
-  Filter.CountriesOfOrigin,
-  Filter.Suppliers,
-  Filter.ProductionSites,
-  Filter.DeliverySites,
-]
-
-const STOCK_FILTERS = [
-  Filter.Periods,
-  Filter.Biofuels,
-  Filter.Feedstocks,
-  Filter.CountriesOfOrigin,
-  Filter.Suppliers,
-  Filter.ProductionSites,
-  Filter.Depots,
-]
-
-const OUT_FILTERS = [
-  Filter.Periods,
-  Filter.Biofuels,
-  Filter.Feedstocks,
-  Filter.CountriesOfOrigin,
-  Filter.Clients,
-  Filter.ProductionSites,
-  Filter.DeliverySites,
-]
-
-const filtersByStatus: Record<Status, Filter[]> = {
-  drafts: DRAFT_FILTERS,
-  in: IN_FILTERS,
-  stocks: STOCK_FILTERS,
-  out: OUT_FILTERS,
-  declaration: [],
-  unknown: [],
 }
 
 export default Filters
