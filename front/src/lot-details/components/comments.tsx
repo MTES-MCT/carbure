@@ -12,11 +12,12 @@ import * as api from "transactions-v2/api"
 import useEntity from "carbure/hooks/entity"
 import { Lot } from "transactions-v2/types"
 export interface CommentsProps {
+  readOnly?: boolean
   lot: Lot
   comments: LotComment[]
 }
 
-export const Comments = ({ lot, comments }: CommentsProps) => {
+export const Comments = ({ readOnly, lot, comments }: CommentsProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
 
@@ -45,25 +46,27 @@ export const Comments = ({ lot, comments }: CommentsProps) => {
       </section>
 
       <footer>
-        <Form
-          variant="inline"
-          onSubmit={() =>
-            addComment.execute({ entity_id: entity.id }, [lot.id], comment)
-          }
-        >
-          <TextInput
-            clear
-            value={comment}
-            placeholder={t("Entrez un commentaire...")}
-            onChange={setComment}
-          />
-          <Button
-            submit
-            disabled={addComment.loading}
-            variant="primary"
-            label={t("Envoyer")}
-          />
-        </Form>
+        {!readOnly && (
+          <Form
+            variant="inline"
+            onSubmit={() =>
+              addComment.execute({ entity_id: entity.id }, [lot.id], comment)
+            }
+          >
+            <TextInput
+              clear
+              value={comment}
+              placeholder={t("Entrez un commentaire...")}
+              onChange={setComment}
+            />
+            <Button
+              submit
+              disabled={addComment.loading}
+              variant="primary"
+              label={t("Envoyer")}
+            />
+          </Form>
+        )}
       </footer>
     </Collapse>
   )
