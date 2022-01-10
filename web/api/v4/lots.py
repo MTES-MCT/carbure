@@ -282,10 +282,13 @@ def fill_client_data(lot, data, entity, prefetched_data):
     lot.unknown_client = data.get('unknown_client', None)
     return errors
 
-def construct_carbure_lot(prefetched_data, entity, data):
+def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
     errors = []
 
-    lot = CarbureLot()
+    if existing_lot:
+        lot = existing_lot
+    else:
+        lot = CarbureLot()   
     errors += fill_delivery_date(lot, data)
     errors += fill_production_info(lot, data, entity, prefetched_data)
     errors += fill_basic_info(lot, data, prefetched_data)
@@ -298,23 +301,16 @@ def construct_carbure_lot(prefetched_data, entity, data):
 
     if 'carbure_stock_id' in data:
         try:
-            parent_stock = CarbureStock.objects.get(id=data['carbure_id'])
+            parent_stock = CarbureStock.objects.get(carbure_id=data['carbure_stock_id'])
             assert(parent_stock.carbure_client == entity)
         except:
             return False
-        fill_production_info_from_stock(lot, parent_stock)
+        original_lot = parent_stock.get_parent_lot()
         lot.parent_stock = parent_stock
+        lot.copy_production_details(original_lot)
+        lot.copy_sustainability_data(original_lot)
         lot.carbure_dispatch_site = parent_stock.depot
         lot.carbure_supplier = parent_stock.carbure_client
-        lot.feedstock = parent_stock.feedstock
-        lot.biofuel = parent_stock.biofuel
-        lot.country_of_origin = parent_stock.country_of_origin
-        fill_ghg_values_from_stock(lot, parent_stock)
-        remaining_volume = models.FloatField(default=0.0)
-        remaining_weight = models.FloatField(default=0.0)
-        remaining_lhv_amount = models.FloatField(default=0.0)
-        ghg_reduction = models.FloatField(default=0.0)
-        ghg_reduction_red_ii = models.FloatField(default=0.0)
 
     return lot, errors
 

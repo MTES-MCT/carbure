@@ -311,7 +311,7 @@ def stock_split(request, *args, **kwargs):
 
         # create child lot
         rounded_volume = round(volume, 2)
-        lot = stock.parent_lot
+        lot = stock.get_parent_lot()
         lot.pk = None
         lot.lot_status = CarbureLot.DRAFT
         lot.volume = rounded_volume
