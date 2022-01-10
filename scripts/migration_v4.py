@@ -132,14 +132,14 @@ def create_new_tx_and_child(tx, parent_stock_id=None):
     lot.carbure_supplier = tx.carbure_vendor
     lot.supplier_certificate = tx.carbure_vendor_certificate
     lot.supplier_certificate_type = None
-    if lot.parent_stock_id is not None:
-        # debit stock
-        stock = CarbureStock.objects.get(id=lot.parent_stock_id)
-        print("Debiting stock %d - volume %f" % (stock.id, lot.volume))
-        stock.remaining_volume -= lot.volume
-        stock.remaining_weight = stock.get_weight()
-        stock.remaining_lhv_amount = stock.get_lhv_amount()
-        stock.save()
+    #if lot.parent_stock_id is not None:
+    #    # debit stock
+    #    stock = CarbureStock.objects.get(id=lot.parent_stock_id)
+    #    print("Debiting stock %d - volume %f" % (stock.id, lot.volume))
+    #    stock.remaining_volume -= lot.volume
+    #    stock.remaining_weight = stock.get_weight()
+    #    stock.remaining_lhv_amount = stock.get_lhv_amount()
+    #    stock.save()
     lot.save()
     TX_ID_MIGRATED[tx.id] = lot.id
 
@@ -244,6 +244,8 @@ def create_new_tx_and_child(tx, parent_stock_id=None):
                         lot.biofuel = c.lot.biocarburant
                         #print('CHILD ETBE %d ADD %s %s %f to %s' % (c.id, lot.feedstock.name, lot.biofuel.name, lot.volume, lot.delivery_type))
                         lot.save()
+                        #print("Debiting stock %d - volume %f" % (etbe_stock.id, lot.volume))
+                        #print("Previous stock %f - New stock %f" % (etbe_stock.remaining_volume, round(etbe_stock.remaining_volume - lot.volume)))
                         etbe_stock.remaining_volume = round(etbe_stock.remaining_volume - lot.volume)
                         etbe_stock.remaining_weight = etbe_stock.get_weight()
                         etbe_stock.remaining_lhv_amount = etbe_stock.get_lhv_amount()
@@ -401,4 +403,4 @@ def migrate_old_data(quick=False):
     CarbureLotEvent.objects.bulk_create(BULK_EVENTS)
 
 if __name__ == '__main__':
-    migrate_old_data(quick=True)
+    migrate_old_data()

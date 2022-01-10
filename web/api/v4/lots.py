@@ -282,13 +282,10 @@ def fill_client_data(lot, data, entity, prefetched_data):
     lot.unknown_client = data.get('unknown_client', None)
     return errors
 
-def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
+def construct_carbure_lot(prefetched_data, entity, data):
     errors = []
 
-    if existing_lot:
-        lot = existing_lot
-    else:
-        lot = CarbureLot()
+    lot = CarbureLot()
     errors += fill_delivery_date(lot, data)
     errors += fill_production_info(lot, data, entity, prefetched_data)
     errors += fill_basic_info(lot, data, prefetched_data)
@@ -299,9 +296,9 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
     lot.free_field = data.get('free_field', None)
     lot.added_by = entity
 
-    if 'parent_stock_id' in data:
+    if 'carbure_stock_id' in data:
         try:
-            parent_stock = CarbureStock.objects.get(id=data['parent_stock_id'])
+            parent_stock = CarbureStock.objects.get(id=data['carbure_id'])
             assert(parent_stock.carbure_client == entity)
         except:
             return False
