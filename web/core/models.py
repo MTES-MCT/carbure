@@ -4,7 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 import hashlib
-from django.db.models.signals import pre_delete
+from django.db.models.signals import pre_delete, pre_save
 from django.dispatch import receiver
 
 usermodel = get_user_model()
@@ -903,7 +903,13 @@ class CarbureLot(models.Model):
         return self.volume * self.biofuel.pci_litre
 
     def generate_carbure_id(self):
-        pass
+        country_of_production = '00'
+        if self.production_country:
+            country_of_production = self.production_country.code_pays
+        delivery_site_id = '00'
+        if self.carbure_delivery_site:
+            delivery_site_id = self.carbure_delivery_site.depot_id
+        self.carbure_id = 'L{period}-{country_of_production}-{delivery_site_id}-{id}'.format(period=self.period, country_of_production=country_of_production, delivery_site_id=delivery_site_id, id=self.id)
 
     def copy_production_details(self, other):
         self.carbure_producer = other.carbure_producer
@@ -923,8 +929,9 @@ class CarbureLot(models.Model):
         self.ghg_reference_red_ii = 94.0
         self.ghg_reduction_red_ii = round((1.0 - (self.ghg_total / self.ghg_reference_red_ii)) * 100.0, 2)
 
-    def update_sustainability_data(self, other):
+    def copy_sustainability_data(self, other):
         self.biofuel = other.biofuel
+        self.feedstock = other.feedstock
         self.country_of_origin = other.country_of_origin
         self.eec = other.eec
         self.el = other.el
@@ -940,12 +947,7 @@ class CarbureLot(models.Model):
         self.ghg_reduction = other.ghg_reduction
         self.ghg_reference_red_ii = other.ghg_reference_red_ii
         self.ghg_reduction_red_ii = other.ghg_reduction_red_ii
-
-    def copy_basic_info(self, other):
-        self.biofuel = other.biofuel
-        self.feedstock = other.feedstock
-        self.country_of_origin = other.country_of_origin
-        
+        self.update_ghg()
 
 class CarbureStockTransformation(models.Model):
     UNKNOWN = "UNKNOWN"
@@ -967,7 +969,9 @@ class CarbureStockTransformation(models.Model):
         verbose_name = 'CarbureStockTransformation'
         verbose_name_plural = 'CarbureStockTransformation'
 
-
+@receiver(pre_save, sender=CarbureLot)
+def lot_pre_save_gen_carbure_id(sender, instance, *args, **kwargs):
+    instance.generate_carbure_id()
 
 @receiver(pre_delete, sender=CarbureStockTransformation, dispatch_uid='stock_transformation_delete_signal')
 def delete_stock_transformation(sender, instance, using, **kwargs):
@@ -1070,6 +1074,19 @@ class CarbureStock(models.Model):
         self.remaining_lhv_amount = self.get_lhv_amount()
         self.remaining_weight = self.get_weight()
         self.save()
+
+    def generate_carbure_id(self):
+        country_of_production = '00'
+        if self.production_country:
+            country_of_production = self.production_country.code_pays
+        delivery_site_id = '00'
+        if self.depot:
+            delivery_site_id = self.depot.depot_id
+        self.carbure_id = 'S{period}-{country_of_production}-{delivery_site_id}-{id}'.format(period=self.period, country_of_production=country_of_production, delivery_site_id=delivery_site_id, id=self.id)
+
+@receiver(pre_save, sender=CarbureStock)
+def stock_pre_save_gen_carbure_id(sender, instance, *args, **kwargs):
+    instance.generate_carbure_id()
 
 class CarbureLotEvent(models.Model):
     CREATED = "CREATED"
