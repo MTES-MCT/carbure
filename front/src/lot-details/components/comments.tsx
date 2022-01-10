@@ -8,9 +8,9 @@ import Form from "common-v2/components/form"
 import { TextInput } from "common-v2/components/input"
 import Button from "common-v2/components/button"
 import { Message } from "common-v2/components/icons"
-import * as api from "transactions-v2/api"
+import * as api from "transactions/api"
 import useEntity from "carbure/hooks/entity"
-import { Lot } from "transactions-v2/types"
+import { Lot } from "transactions/types"
 export interface CommentsProps {
   readOnly?: boolean
   lot: Lot

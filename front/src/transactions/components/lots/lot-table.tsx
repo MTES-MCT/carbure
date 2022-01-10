@@ -1,6 +1,6 @@
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
-import { Lot, LotError } from "transactions-v2/types"
+import { Lot, LotError } from "transactions/types"
 import {
   formatDate,
   formatNumber,

@@ -5,17 +5,14 @@ import { useQuery } from "common-v2/hooks/async"
 import { useStatus } from "./status"
 import { Bar } from "common-v2/components/scaffold"
 import Pagination from "common-v2/components/pagination"
-import NoResult from "transactions-v2/components/no-result"
-import Filters from "transactions-v2/components/filters"
+import NoResult from "transactions/components/no-result"
+import Filters from "transactions/components/filters"
 import { LotTable } from "./lot-table"
 import { LotActions } from "./lot-actions"
-import {
-  DeadlineSwitch,
-  InvalidSwitch,
-} from "transactions-v2/components/switches"
+import { DeadlineSwitch, InvalidSwitch } from "transactions/components/switches"
 import { LotSummaryBar } from "./lot-summary"
-import { useLotQuery, useLotQueryStore } from "transactions-v2/components/lots"
-import { Filter, Lot } from "transactions-v2/types"
+import { useLotQuery, useLotQueryStore } from "transactions/components/lots"
+import { Filter, Lot } from "transactions/types"
 import ControlDetails from "control-details"
 
 export interface LotsProps {

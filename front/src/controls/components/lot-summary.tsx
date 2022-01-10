@@ -1,7 +1,7 @@
 import { Trans, useTranslation } from "react-i18next"
 import { useQuery } from "common-v2/hooks/async"
 import * as api from "../api"
-import { LotQuery, SummaryItem } from "transactions-v2/types"
+import { LotQuery, SummaryItem } from "transactions/types"
 import { formatNumber, formatPercentage } from "common-v2/utils/formatters"
 import { usePortal } from "common-v2/components/portal"
 import { LoaderOverlay } from "common-v2/components/scaffold"
@@ -10,9 +10,9 @@ import Button from "common-v2/components/button"
 import Dialog from "common-v2/components/dialog"
 import Table, { Cell, Column } from "common-v2/components/table"
 import { Filter, Return } from "common-v2/components/icons"
-import { FilterManager, ResetButton } from "transactions-v2/components/filters"
-import NoResult from "transactions-v2/components/no-result"
-import { LotCell } from "transactions-v2/components/lots/lot-summary"
+import { FilterManager, ResetButton } from "transactions/components/filters"
+import NoResult from "transactions/components/no-result"
+import { LotCell } from "transactions/components/lots/lot-summary"
 
 export interface LotSummaryBarProps extends Partial<FilterManager> {
   query: LotQuery
