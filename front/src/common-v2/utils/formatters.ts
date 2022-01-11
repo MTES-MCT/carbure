@@ -57,6 +57,7 @@ export function formatDeadline(deadline: Date | string | null) {
 
 // prepare string for comparison by putting it to lowercase and removing accents
 export function standardize(str: string) {
+  if (!str) return ""
   return str
     .toLowerCase()
     .normalize("NFD")

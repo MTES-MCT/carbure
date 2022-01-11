@@ -1,9 +1,10 @@
 {
   "BC_NOT_CONFIGURED": "Biofuel is not specified in production site configuration",
   "DEPRECATED_MP": "Wine residues will disappear in favor of two new raw materials: Grape Marc and Wine Lies. Please update your declarations accordingly.",
-  "GHG_EEC_0": "Emissions from cultivation are zero",
-  "GHG_EP_0": "Emissions from processing are zero",
-  "GHG_ETD_0": "Emissions from transport are zero",
+  "GHG_EEC_0": "Emissions from cultivation are zero (EEC)",
+  "GHG_EP_0": "Emissions from processing are zero (EP)",
+  "GHG_ETD_0": "Emissions from transport are zero (ETD)",
+  "GHG_EL_NEG": "Reductions from land use change are below zero (EL)",
   "GHG_REDUC_INF_50": "GHG reduction smaller than 50%",
   "GHG_REDUC_INF_60": "GHG reduction smaller than 60%",
   "GHG_REDUC_INF_65": "GHG reduction smaller than 65%",
