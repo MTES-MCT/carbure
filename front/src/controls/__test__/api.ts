@@ -1,86 +1,32 @@
-import { producer } from "common/__test__/data"
+import { admin, entityRight } from "common/__test__/data"
 import { rest } from "msw"
 import { setupServer } from "msw/node"
 
 import {
-  okBiocarburantsSearch,
-  okCountrySearch,
-  okDeliverySitesSearch,
-  okEntitySearch,
-  okMatierePremiereSearch,
-  okProductionSitesSearch,
   okTranslations,
   okFieldsTranslations,
   okErrorsTranslations,
 } from "common/__test__/api"
 
-import { clone } from "common/__test__/helpers"
 import * as data from "transactions/__test__/data"
 
-let snapshot: any
-let lots: any
-let adminLots: any
-let adminSnapshot: any
-let details: any
-
-export function setSnapshot(nextSnapshot: any) {
-  snapshot = clone(nextSnapshot)
-}
-
-export function setLots(nextLots: any) {
-  lots = clone(nextLots)
-}
-
-export function setAdminSnapshot(nextSnapshot: any) {
-  adminSnapshot = clone(nextSnapshot)
-}
-
-export function setAdminLots(nextLots: any) {
-  adminLots = clone(nextLots)
-}
-
-export function setDetails(nextDetails: any) {
-  details = clone(nextDetails)
-}
-
-// init data
-setSnapshot(data.snapshot)
-setLots(data.lots)
-setDetails(data.lotDetails)
-setAdminSnapshot(data.adminSnapshot)
-setAdminLots(data.lots)
+export const okAdminSettings = rest.get("/api/v3/settings", (req, res, ctx) => {
+  return res(
+    ctx.json({
+      status: "success",
+      data: {
+        email: "admin@test.com",
+        rights: [{ ...entityRight, entity: admin }],
+        requests: [{ ...entityRight, entity: admin }],
+      },
+    })
+  )
+})
 
 export const okLotsSummary = rest.get(
   "/api/admin/lots/summary",
   (req, res, ctx) => {
     return res(ctx.json({ status: "success", data: data.lotsSummary }))
-  }
-)
-
-export const okComment = rest.post(
-  "/api/admin/lots/comment",
-  (req, res, ctx) => {
-    details.comments.push({
-      entity: producer,
-      topic: "both",
-      comment: (req.body as FormData).get("comment"),
-    })
-
-    return res(ctx.json({ status: "success" }))
-  }
-)
-
-export const okLotDetails = rest.get(
-  "/api/admin/lots/details",
-  (req, res, ctx) => {
-    if (details === null) {
-      return res(
-        ctx.status(404),
-        ctx.json({ status: "error", message: "not found" })
-      )
-    }
-
-    return res(ctx.json({ status: "success", data: details }))
   }
 )
 
@@ -148,17 +94,12 @@ export const okYears = rest.get("/api/admin/years", (req, res, ctx) => {
 export default setupServer(
   okSnapshot,
   okLots,
-  okComment,
-  okBiocarburantsSearch,
-  okCountrySearch,
-  okDeliverySitesSearch,
-  okEntitySearch,
-  okMatierePremiereSearch,
-  okProductionSitesSearch,
-  okLotDetails,
   okLotsSummary,
   okTranslations,
   okErrorsTranslations,
   okFieldsTranslations,
-  okFilters
+  okFilters,
+  okYears,
+  okSnapshot,
+  okAdminSettings
 )
