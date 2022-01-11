@@ -9,7 +9,7 @@
   "GHG_REDUC_INF_65": "GHG reduction smaller than 65%",
   "GHG_REDUC_SUP_100": "GHG reduction greater than 100%",
   "GHG_REDUC_SUP_99": "GHG reduction greater than 99%",
-  "INCORRECT_DELIVERY_DATE": "Date de livraison incorrecte",
+  "INCORRECT_DELIVERY_DATE": "Delivery date is incorrect",
   "INCORRECT_DELIVERY_SITE_COUNTRY": "Delivery site is incorrect",
   "INCORRECT_FORMAT_DELIVERY_DATE": "Delivery date format is incorrect",
   "MAC_BC_WRONG": "Biofuel incompatible with release for consumption (only ED95 or B100 are allowed)",
@@ -47,7 +47,6 @@
   "WRONG_DELIVERY_DATE": "Delivery date is incorrect",
   "WRONG_FORMAT": "Format is incorrect",
   "WRONG_PRODUCTION_SITE_COUNTRY": "Production site country is incorrect",
-
   "NO_PRODSITE_CERT": "Missing production site certificate",
   "NO_SUPPLIER_CERT": "Missing supplier certificate",
   "NO_VENDOR_CERT": "Missing supplier certificate",
@@ -57,7 +56,6 @@
   "EXPIRED_PRODSITE_CERT": "Production site certificate expired",
   "EXPIRED_SUPPLIER_CERT": "Supplier certificate expired",
   "EXPIRED_VENDOR_CERT": "Supplier certificate expired",
-
   "UNKNOWN_DAE_FORMAT": "Customs ID format incorrect",
   "UNKNOWN_DOUBLE_COUNTING_CERTIFICATE": "Unknown double counting certificate",
   "EXPIRED_DOUBLE_COUNTING_CERTIFICATE": "Double counting certificate expired",
