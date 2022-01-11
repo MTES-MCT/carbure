@@ -1,17 +1,21 @@
 import { render, TestRoot } from "setupTests"
 import { screen } from "@testing-library/react"
-import { Route } from 'react-router-dom'
-import { Entity } from "common/types"
-import { producer } from "common/__test__/data"
+import { Route } from "react-router-dom"
 import { waitWhileLoading } from "common/__test__/helpers"
-import { DeclarationSummaryPrompt } from "../components/declaration-summary"
+import { DeclarationDialog } from "../actions/declaration"
 
 import server from "./api"
+import { PortalProvider } from "common-v2/components/portal"
 
-const DeclarationSummary = ({ entity }: { entity: Entity }) => (
-  <TestRoot url="/">
-    <Route path="/" element={<DeclarationSummaryPrompt entityID={entity.id} onResolve={() => {}} />} />
-  </TestRoot>
+const DeclarationSummary = () => (
+  <PortalProvider>
+    <TestRoot url="/">
+      <Route
+        path="/"
+        element={<DeclarationDialog year={2021} onClose={() => {}} />}
+      />
+    </TestRoot>
+  </PortalProvider>
 )
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
@@ -19,28 +23,24 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 test("display transaction details", async () => {
-  render(<DeclarationSummary entity={producer} />)
+  render(<DeclarationSummary />)
 
   await waitWhileLoading()
 
-  screen.getByText("Déclaration de durabilité")
-  screen.getByText("Pour la période")
+  screen.getByText("Déclaration de durabilité 2021")
 
-  await screen.findByText("Sorties")
-  await screen.findByText("Entrées")
+  screen.getByText(
+    (_, node) => node?.textContent === "Entrées ▸ 1 lots ▸ 12 345 litres"
+  )
 
-  expect(
-    screen.getAllByText(
-      (_, node) => node?.textContent === `▸ 1 lot ▸ 12 345 litres`
-    )
-  ).toHaveLength(2)
+  screen.getByText(
+    (_, node) => node?.textContent === "Sorties ▸ 1 lots ▸ 12 345 litres"
+  )
 
-  // screen.getByText(
-  //   (_, node) =>
-  //     node?.textContent ===
-  //     "Encore 2 lots en attente de validation pour cette période"
-  // )
-  
-  const button = screen.getByText("Valider ma déclaration").closest("button")
+  screen.getAllByText(
+    (_, node) => node?.textContent === "Encore 1 lot en attente de validation"
+  )
+
+  const button = screen.getByText("Valider la déclaration").closest("button")
   expect(button).toBeDisabled()
 })

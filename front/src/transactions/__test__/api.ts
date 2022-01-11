@@ -72,22 +72,6 @@ export const okAuditorSummary = rest.get(
   }
 )
 
-export const okDeclarationSummary = rest.post(
-  "/api/v3/lots/declaration-summary",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: {
-          ...data.lotsSummary,
-          declaration: data.declaration,
-          remaining: 2,
-        },
-      })
-    )
-  }
-)
-
 export const okDuplicateLot = rest.post(
   "/api/v3/lots/duplicate",
   (req, res, ctx) => {
@@ -295,6 +279,63 @@ export const okYears = rest.get("/api/years", (req, res, ctx) => {
     })
   )
 })
+export const okDeclarations = rest.get("/api/declarations", (req, res, ctx) => {
+  return res(
+    ctx.json({
+      status: "success",
+      data: [
+        {
+          period: 202101,
+          lots: 2,
+          pending: 1,
+          declaration: {
+            id: 1638,
+            entity: producer,
+            declared: false,
+            period: "2021-01-01",
+            deadline: "2021-02-28",
+            checked: false,
+            month: 1,
+            year: 2021,
+            reminder_count: 0,
+          },
+        },
+      ],
+    })
+  )
+})
+
+export const okSummary = rest.get("/api/lots/summary", (req, res, ctx) => {
+  return res(
+    ctx.json({
+      status: "success",
+      data: {
+        count: 2,
+        total_volume: 24690,
+        in: [
+          {
+            supplier: "ROQUETTE",
+            biofuel_code: "ETH",
+            volume_sum: 12345,
+            avg_ghg_reduction: 76.15,
+            total: 1,
+            pending: 1,
+          },
+        ],
+        out: [
+          {
+            client: "TERF",
+            biofuel_code: "ETH",
+            volume_sum: 12345,
+            avg_ghg_reduction: 78.57,
+            total: 1,
+            pending: 0,
+          },
+        ],
+      },
+    })
+  )
+})
 
 export default setupServer(
   okSettings,
@@ -319,13 +360,14 @@ export default setupServer(
   okAdminLots,
   okAdminSnapshot,
   okLotsSummary,
-  okAdminSummary,
   okAuditorSummary,
-  okDeclarationSummary,
+  okDeclarations,
   okTranslations,
   okErrorsTranslations,
   okFieldsTranslations,
   okFilters,
   okAdminFilters,
-  okAuditorFilters
+  okAuditorFilters,
+  okAdminSummary,
+  okSummary
 )
