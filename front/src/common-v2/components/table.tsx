@@ -177,10 +177,13 @@ export function useCompare<T>(columns: Column<T>[], order: Order | undefined) {
     const referenceA = column.orderBy(a)
     const referenceB = column.orderBy(b)
 
-    if (typeof referenceA === 'number' && typeof referenceB === 'number') {
-      return direction * (referenceA - referenceB);
+    if (typeof referenceA === "number" && typeof referenceB === "number") {
+      return direction * (referenceA - referenceB)
     } else {
-      return direction * collator.compare(referenceA.toString(), referenceB.toString())
+      return (
+        direction *
+        collator.compare(referenceA.toString(), referenceB.toString())
+      )
     }
   }
 }
@@ -208,7 +211,7 @@ export const Cell = ({ variant, icon: Icon, text, sub }: CellProps) => {
   const icon = typeof Icon === "function" ? <Icon /> : Icon
 
   return (
-    <Col className={cl(variant && css[variant])}>
+    <Col className={cl(css.multiline, variant && css[variant])}>
       <strong title={`${text}`}>
         {text || sub} {icon}
       </strong>
