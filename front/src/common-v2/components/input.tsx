@@ -5,6 +5,7 @@ import { AlertTriangle, Cross, Loader, Search, Placeholder } from "./icons"
 import { Col, layout, Layout, Overlay } from "./scaffold"
 import { isInside } from "./dropdown"
 import css from "./input.module.css"
+import { useTranslation } from "react-i18next"
 
 export type FieldVariant = "outline" | "solid" | "inline" | "text"
 
@@ -274,6 +275,8 @@ export const SearchInput = ({
   onChange,
   ...props
 }: SearchInputProps) => {
+  const { t } = useTranslation()
+
   const timeoutRef = useRef<number>()
   const [search, setSearch] = useState(value ?? "")
 
@@ -307,7 +310,7 @@ export const SearchInput = ({
         readOnly={props.readOnly}
         required={props.required}
         name={name}
-        placeholder={placeholder ?? "Rechercher..."}
+        placeholder={placeholder ?? t("Rechercher...")}
         value={search ?? ""}
         onChange={(e) => debouncedSearch(e.target.value)}
       />
