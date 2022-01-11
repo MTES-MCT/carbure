@@ -24,16 +24,16 @@ export interface Lot {
   carbure_supplier: Entity | null
   unknown_supplier: string | null
   supplier_certificate: string | null
-  supplier_certificate_type: string | null
-  vendor_certificate: string | null
-  vendor_certificate_type: string | null
-  transport_document_type: TransportDocumentType
+  supplier_certificate_type?: string | null
+  vendor_certificate?: string | null
+  vendor_certificate_type?: string | null
+  transport_document_type?: TransportDocumentType
   transport_document_reference: string | null
   carbure_client: Entity | null
   unknown_client: string | null
-  dispatch_date: string | null
-  carbure_dispatch_site: Depot | null
-  unknown_dispatch_site: string | null
+  dispatch_date?: string | null
+  carbure_dispatch_site?: Depot | null
+  unknown_dispatch_site?: string | null
   delivery_date: string | null
   carbure_delivery_site: Depot | null
   unknown_delivery_site: string | null
@@ -62,8 +62,7 @@ export interface Lot {
   ghg_reference_red_ii: number
   ghg_reduction_red_ii: number
   free_field: string
-  parent_lot: number
-  parent_stock: number
+  added_by: Entity
 }
 
 export interface LotList {
@@ -299,7 +298,7 @@ export interface StockPayload {
 
 export interface TransformETBEPayload {
   stock_id: number
-  transformation_type: "ETH_ETBE",
+  transformation_type: "ETH_ETBE"
   volume_ethanol: number
   volume_etbe: number
   volume_denaturant: number
