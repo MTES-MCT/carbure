@@ -28,7 +28,7 @@ const TransactionsWithRouter = ({
   status: LotStatus
 }) => (
   <TestRoot url={`/org/0/transactions/${status}`}>
-    <Route path="/org/0/transactions/:status/*" element={<Transactions entity={entity} />} />
+    <Route path="/org/0/transactions/:status/*" element={<Transactions />} />
   </TestRoot>
 )
 
@@ -557,7 +557,7 @@ test("producer/trader: resend fixed lot", async () => {
   userEvent.click(send)
 
   // confirm the fix by adding a comment
-  const title = screen.getByText("Renvoyer le lot", { selector: 'h1' })
+  const title = screen.getByText("Renvoyer le lot", { selector: "h1" })
   userEvent.click(screen.getByText("Confirmer"))
 
   expect(title).not.toBeInTheDocument()

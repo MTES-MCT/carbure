@@ -5,20 +5,20 @@ import { Entity, LotStatus } from "common/types"
 
 import { admin } from "common/__test__/data"
 import { waitWhileLoading } from "common/__test__/helpers"
-import Transactions from "../index"
+import Controls from "../index"
 
-import server, { setAdminLots } from "./api"
-import { emptyLots } from "./data"
+import server, { setAdminLots } from "transactions/__test__/api"
+import { emptyLots } from "transactions/__test__/data"
 
-const TransactionsWithRouter = ({
+const ControlsWithRouter = ({
   entity,
   status,
 }: {
   entity: Entity
   status: LotStatus
 }) => (
-  <TestRoot url={`/org/0/transactions/${status}`}>
-    <Route path="/org/0/transactions/:status/*" element={<Transactions entity={entity} />} />
+  <TestRoot url={`/org/0/controls/${status}`}>
+    <Route path="/org/0/controls/:status/*" element={<Controls />} />
   </TestRoot>
 )
 
@@ -33,7 +33,7 @@ afterAll(() => server.close())
 test("admin: display an empty list of transactions", async () => {
   setAdminLots(emptyLots)
 
-  render(<TransactionsWithRouter status={LotStatus.Alert} entity={admin} />)
+  render(<ControlsWithRouter status={LotStatus.Alert} entity={admin} />)
 
   await waitWhileLoading()
 
