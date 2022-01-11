@@ -1,14 +1,9 @@
-import React from "react"
-import cl from "clsx"
 import format from "date-fns/intlFormat"
 import isBefore from "date-fns/isBefore"
-import { Trans } from "react-i18next"
 import i18n from "i18n"
 
 import styles from "./settings.module.css"
 import { Box, BoxProps } from "common/components"
-import { Button } from "common/components/button"
-import { Refresh } from "common/components/icons"
 
 type FormatOptions = Parameters<typeof format>[1]
 
