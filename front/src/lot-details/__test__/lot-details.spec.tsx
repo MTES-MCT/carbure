@@ -6,10 +6,9 @@ import userEvent from "@testing-library/user-event"
 import { Entity } from "common/types"
 
 import { operator, producer } from "common/__test__/data"
-import { useTransactions } from "../index"
-import TransactionDetails from "../routes/transaction-details"
+import LotDetails from "../index"
 
-import server, { setDetails } from "./api"
+import server, { setDetails } from "../../transactions/__test__/api"
 import {
   lotDetails,
   errorDetails,
@@ -21,9 +20,9 @@ import {
   operatorAuthorPartial,
   traderVendorPartial,
   stockPartial,
-} from "./data"
+} from "../../transactions/__test__/data"
 import { waitWhileLoading } from "common/__test__/helpers"
-import { clickOnCheckboxesAndConfirm } from "./helpers"
+import { clickOnCheckboxesAndConfirm } from "../../transactions/__test__/helpers"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 beforeEach(() => {
@@ -32,42 +31,20 @@ beforeEach(() => {
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
-const TransactionWithHook = ({ entity }: { entity: Entity }) => {
-  const {
-    transactions,
-    deleter,
-    validator,
-    acceptor,
-    rejector,
-    refresh,
-    administrator,
-    auditor,
-  } = useTransactions(entity)
-
+const TransactionWithHook = () => {
   return (
     <Routes>
-      <Route path=":id" element={
-        <TransactionDetails
-          entity={entity}
-          refresh={refresh}
-          deleter={deleter}
-          validator={validator}
-          acceptor={acceptor}
-          rejector={rejector}
-          administrator={administrator}
-          auditor={auditor}
-          transactions={transactions?.data?.lots.map((l) => l.id) ?? []}
-        />
-      } />
+      <Route path=":id" element={<LotDetails neighbors={[]} />} />
     </Routes>
   )
 }
 
 const TransactionWithRouter = ({ entity }: { entity: Entity }) => (
   <TestRoot url={`/org/${entity.id}/transactions/draft/0`}>
-    <Route path="/org/:entity/transactions/:status/*" element={
-      <TransactionWithHook entity={entity} />
-    } />
+    <Route
+      path="/org/:entity/transactions/:status/*"
+      element={<TransactionWithHook />}
+    />
   </TestRoot>
 )
 

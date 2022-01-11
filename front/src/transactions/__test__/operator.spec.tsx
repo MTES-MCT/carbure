@@ -25,7 +25,7 @@ const TransactionsWithRouter = ({
   status: LotStatus
 }) => (
   <TestRoot url={`/org/0/transactions/${status}`}>
-    <Route path="/org/0/transactions/:status/*" element={<Transactions entity={entity} />} />
+    <Route path="/org/0/transactions/:status/*" element={<Transactions />} />
   </TestRoot>
 )
 

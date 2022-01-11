@@ -1,14 +1,13 @@
 import { render, TestRoot } from "setupTests"
 import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { Route, Routes } from "react-router-dom"
-import { Entity } from "common/types"
+import { Route } from "react-router-dom"
 
-import { operator, producer, trader } from "common/__test__/data"
+import { operator, producer } from "common/__test__/data"
 import { waitWhileLoading } from "common/__test__/helpers"
-import TransactionAdd from "../routes/transaction-add"
+import LotAdd from "../index"
 
-import server from "./api-old"
+import server from "transactions/__test__/api"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 
@@ -16,19 +15,12 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 const TransactionAddWithRouter = ({
-  entity,
   children,
-  refresh = () => {},
 }: {
-  entity: Entity
   children?: React.ReactNode
-  refresh?: () => void
 }) => (
   <TestRoot url={"/org/0/transactions/draft/add"}>
-    <Route
-      path="/org/:entity/transactions/draft/add"
-      element={<TransactionAdd entity={entity} refresh={refresh} />}
-    />
+    <Route path="/org/:entity/transactions/draft/add" element={<LotAdd />} />
     {children}
   </TestRoot>
 )
@@ -82,7 +74,7 @@ function checkGESFields() {
 }
 
 test("display the transaction form - producer with trading and mac", async () => {
-  render(<TransactionAddWithRouter entity={producer} />)
+  render(<TransactionAddWithRouter />)
 
   await screen.findByText("Créer une nouvelle transaction")
   screen.getByText("Brouillon")
@@ -102,7 +94,7 @@ test("display the transaction form - producer with trading and mac", async () =>
 
 test("display the transaction form - pure producer", async () => {
   const entity = { ...producer, has_trading: false, has_mac: false }
-  render(<TransactionAddWithRouter entity={entity} />)
+  render(<TransactionAddWithRouter />)
 
   await screen.findByText("Créer une nouvelle transaction")
 
@@ -120,7 +112,7 @@ test("display the transaction form - pure producer", async () => {
 })
 
 test("display the transaction form - operator", async () => {
-  render(<TransactionAddWithRouter entity={operator} />)
+  render(<TransactionAddWithRouter />)
 
   checkLotFields()
   checkOriginFields()
@@ -134,7 +126,7 @@ test("display the transaction form - operator", async () => {
 })
 
 test("display the transaction form - trader", async () => {
-  render(<TransactionAddWithRouter entity={trader} />)
+  render(<TransactionAddWithRouter />)
 
   checkLotFields()
   checkOriginFields()
@@ -147,10 +139,8 @@ test("display the transaction form - trader", async () => {
 })
 
 test("check the form fields are working", async () => {
-  const refresh = jest.fn()
-
   render(
-    <TransactionAddWithRouter entity={producer} refresh={refresh}>
+    <TransactionAddWithRouter>
       <Route path="0" element={<span>LOT CREATED</span>} />
     </TransactionAddWithRouter>
   )
@@ -230,6 +220,4 @@ test("check the form fields are working", async () => {
 
   // page for the newly created lot appears
   await screen.findByText("LOT CREATED")
-
-  expect(refresh).toHaveBeenCalledTimes(1)
 })
