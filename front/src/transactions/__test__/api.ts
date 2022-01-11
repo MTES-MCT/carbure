@@ -163,10 +163,6 @@ export const okRejectLot = rest.post("/api/v3/lots/reject", (req, res, ctx) => {
   return res(ctx.json({ status: "success" }))
 })
 
-export const okAddLot = rest.post("/api/v3/lots/add", (req, res, ctx) => {
-  return res(ctx.json({ status: "success", data: lot }))
-})
-
 export const okLotDetails = rest.get(
   "/api/v3/lots/details",
   (req, res, ctx) => {
@@ -348,7 +344,6 @@ export default setupServer(
   okAcceptLot,
   okAcceptWithReserve,
   okRejectLot,
-  okAddLot,
   okBiocarburantsSearch,
   okCountrySearch,
   okDeliverySitesSearch,

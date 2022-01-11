@@ -3,11 +3,16 @@ import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Route } from "react-router-dom"
 
-import { operator, producer } from "common/__test__/data"
+import { operator, producer, trader } from "common/__test__/data"
 import { waitWhileLoading } from "common/__test__/helpers"
 import LotAdd from "../index"
 
 import server from "transactions/__test__/api"
+import { PortalProvider } from "common-v2/components/portal"
+import { okDynamicSettings, setEntity } from "settings/__test__/api"
+import { okAddLot } from "./api"
+
+server.use(okDynamicSettings, okAddLot)
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 
@@ -15,68 +20,78 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 const TransactionAddWithRouter = ({
+  entityID = 0,
   children,
 }: {
+  entityID?: number
   children?: React.ReactNode
 }) => (
-  <TestRoot url={"/org/0/transactions/draft/add"}>
-    <Route path="/org/:entity/transactions/draft/add" element={<LotAdd />} />
-    {children}
-  </TestRoot>
+  <PortalProvider>
+    <TestRoot url={`/org/${entityID}/transactions/draft/add`}>
+      <Route path="/org/:entity/transactions/draft/add" element={<LotAdd />} />
+      {children}
+    </TestRoot>
+  </PortalProvider>
 )
 
+function getField(label: any) {
+  const field = screen.getByText(label).parentElement?.querySelector("input")
+  if (!field) throw new Error(`Cannot find field with label like ${label}`)
+  return field
+}
+
 function checkLotFields() {
-  screen.getByLabelText("Numéro douanier (DAE, DAA...) *")
-  screen.getByLabelText("Volume en litres (Ethanol à 20°, autres à 15°) *")
-  screen.getByLabelText("Biocarburant *")
-  screen.getByLabelText(/^Matière première */)
-  screen.getByLabelText("Pays d'origine de la matière première *")
+  getField("N° document d'accompagnement *")
+  getField("Volume en litres (Ethanol à 20°, autres à 15°) *")
+  getField("Biocarburant *")
+  getField(/^Matière première */)
+  getField("Pays d'origine de la matière première *")
 }
 
 function checkProductionFields() {
-  screen.getByLabelText(/^Site de production/)
-  screen.getByLabelText("Certificat du site de production")
-  screen.getByLabelText("Pays de production")
-  screen.getByLabelText("Date de mise en service *")
-  screen.getByLabelText("N° d'enregistrement double-compte")
+  getField(/^Site de production/)
+  getField("Certificat du site de production")
+  getField("Pays de production")
+  getField("Date de mise en service")
+  getField("Certificat double-comptage")
 }
 
 function checkOriginFields() {
-  screen.getByLabelText("Producteur")
-  screen.getByLabelText("Fournisseur")
-  screen.getByLabelText("Certificat du fournisseur")
-  screen.getByLabelText("Champ libre")
+  getField("Producteur")
+  getField("Fournisseur")
+  getField("Certificat du fournisseur")
+  getField("Champ libre")
 }
 
 function checkDeliveryFields() {
-  screen.getByLabelText(/^Client/)
-  screen.getByLabelText(/^Site de livraison \*/)
-  screen.getByLabelText("Pays de livraison *")
-  screen.getByLabelText("Date de livraison")
+  getField(/^Client/)
+  getField(/^Site de livraison/)
+  getField("Pays de livraison")
+  getField("Date de livraison *")
 }
 
 function checkGESFields() {
-  screen.getByText("Émissions")
-  screen.getByLabelText("EEC")
-  screen.getByLabelText("EL")
-  screen.getByLabelText("EP *")
-  screen.getByLabelText("ETD *")
-  screen.getByLabelText("EU")
+  getField("Émissions")
+  getField("EEC")
+  getField("EL")
+  getField("EP *")
+  getField("ETD *")
+  getField("EU")
 
-  screen.getByText("Réductions")
-  screen.getByLabelText("ESCA")
-  screen.getByLabelText("ECCS")
-  screen.getByLabelText("ECCR")
-  screen.getByLabelText("EEE")
+  getField("Réductions")
+  getField("ESCA")
+  getField("ECCS")
+  getField("ECCR")
+  getField("EEE")
 
-  screen.getByLabelText("Total")
-  screen.getByLabelText("Réd. RED I")
+  getField("Total")
+  getField("Réd. RED I")
 }
 
 test("display the transaction form - producer with trading and mac", async () => {
   render(<TransactionAddWithRouter />)
 
-  await screen.findByText("Créer une nouvelle transaction")
+  await screen.findByText("Créer un nouveau lot")
   screen.getByText("Brouillon")
 
   checkLotFields()
@@ -85,34 +100,33 @@ test("display the transaction form - producer with trading and mac", async () =>
   checkDeliveryFields()
   checkGESFields()
 
-  screen.getByText("Il s'agit d'une mise à consommation ?")
-  screen.getByLabelText("Votre certificat *")
-
   screen.getByText("Créer lot")
   screen.getByText("Retour")
 })
 
 test("display the transaction form - pure producer", async () => {
-  const entity = { ...producer, has_trading: false, has_mac: false }
+  setEntity({ ...producer, has_trading: false, has_mac: false })
   render(<TransactionAddWithRouter />)
 
-  await screen.findByText("Créer une nouvelle transaction")
+  await waitWhileLoading()
+
+  await screen.findByText("Créer un nouveau lot")
 
   checkLotFields()
   checkProductionFields()
   checkDeliveryFields()
   checkGESFields()
 
-  const prodField = screen.getByLabelText(/^Producteur/)
+  const prodField = await screen.findByDisplayValue(/^Producteur/)
   expect(prodField).toBeDisabled()
-  expect(prodField).toHaveValue(entity.name)
-
-  expect(screen.getByLabelText(/^Fournisseur/)).toBeDisabled()
-  expect(screen.getByLabelText("Certificat du fournisseur")).toBeDisabled()
+  expect(prodField).toHaveValue(producer.name)
 })
 
 test("display the transaction form - operator", async () => {
-  render(<TransactionAddWithRouter />)
+  setEntity(operator)
+  render(<TransactionAddWithRouter entityID={operator.id} />)
+
+  await waitWhileLoading()
 
   checkLotFields()
   checkOriginFields()
@@ -120,59 +134,58 @@ test("display the transaction form - operator", async () => {
   checkDeliveryFields()
   checkGESFields()
 
-  const client = screen.getByLabelText(/^Client/)
-  expect(client).toBeDisabled()
-  expect(client).toHaveValue(operator.name)
+  await screen.findByDisplayValue(operator.name)
 })
 
 test("display the transaction form - trader", async () => {
-  render(<TransactionAddWithRouter />)
+  setEntity(trader)
+  render(<TransactionAddWithRouter entityID={trader.id} />)
+
+  await waitWhileLoading()
 
   checkLotFields()
   checkOriginFields()
   checkProductionFields()
   checkDeliveryFields()
   checkGESFields()
-
-  screen.getByText("Il s'agit d'une mise à consommation ?")
-  screen.getByLabelText("Votre certificat *")
 })
 
-test("check the form fields are working", async () => {
+test.only("check the form fields are working", async () => {
   render(
     <TransactionAddWithRouter>
-      <Route path="0" element={<span>LOT CREATED</span>} />
+      <Route path="/drafts/0" element={<span>LOT CREATED</span>} />
     </TransactionAddWithRouter>
   )
 
-  userEvent.type(screen.getByLabelText("Numéro douanier (DAE, DAA...) *"), "DAETEST") // prettier-ignore
-  userEvent.type(screen.getByLabelText("Volume en litres (Ethanol à 20°, autres à 15°) *"), "10000") // prettier-ignore
+  await waitWhileLoading()
 
-  userEvent.type(screen.getByLabelText("Biocarburant *"), "EM")
+  userEvent.type(getField("N° document d'accompagnement *"), "DAETEST") // prettier-ignore
+  userEvent.type(getField("Volume en litres (Ethanol à 20°, autres à 15°) *"), "10000") // prettier-ignore
+
+  userEvent.type(getField("Biocarburant *"), "EM")
   userEvent.click(await screen.findByText("EMHV"))
+  await screen.findByDisplayValue("EMHV")
 
-  userEvent.type(screen.getByLabelText("Matière première *"), "Co")
+  userEvent.type(getField("Matière première *"), "Co")
   userEvent.click(await screen.findByText("Colza"))
+  await screen.findByDisplayValue("Colza")
 
-  userEvent.type(
-    screen.getByLabelText("Pays d'origine de la matière première *"),
-    "France"
-  )
+  userEvent.type(getField("Pays d'origine de la matière première *"), "France")
+  await waitWhileLoading()
 
-  userEvent.type(screen.getByLabelText("Date de livraison"), "2020-31-12")
+  userEvent.type(getField("Date de livraison *"), "2020-31-12")
 
-  userEvent.type(screen.getByLabelText("Producteur"), "Pr")
+  userEvent.type(getField("Producteur"), "Pr")
   userEvent.click(await screen.findByText("Producteur Test"))
+  await screen.findByDisplayValue("Producteur Test")
 
-  expect(screen.getByLabelText("Fournisseur")).toBeDisabled()
-  expect(screen.getByLabelText("Certificat du fournisseur")).toBeDisabled()
-
-  userEvent.type(screen.getByLabelText(/^Site de production/), "Test") // prettier-ignore
+  userEvent.type(getField(/^Site de production/), "Test") // prettier-ignore
   userEvent.click(await screen.findByText("Test Production Site"))
+  await screen.findByDisplayValue("Test Production Site")
 
-  const psiteCountry = screen.getByLabelText("Pays de production")
-  const psiteComDate = screen.getByLabelText("Date de mise en service *")
-  const psiteDC = screen.getByLabelText("N° d'enregistrement double-compte")
+  const psiteCountry = getField("Pays de production")
+  const psiteComDate = getField("Date de mise en service")
+  const psiteDC = getField("Certificat double-comptage")
 
   expect(psiteCountry).toBeDisabled()
   expect(psiteCountry).toHaveValue("France")
@@ -180,34 +193,33 @@ test("check the form fields are working", async () => {
   expect(psiteComDate).toBeDisabled()
   expect(psiteComDate).toHaveValue("2000-01-31")
 
-  userEvent.type(screen.getByLabelText(/^Client/), "Test")
+  userEvent.type(getField(/^Client/), "Test")
   userEvent.click(await screen.findByText("Opérateur Test"))
+  await screen.findByDisplayValue("Opérateur Test")
 
-  const dsite = screen.getByLabelText(/^Site de livraison \*/)
-  const dsiteCountry = screen.getByLabelText("Pays de livraison *")
+  const dsite = getField(/^Site de livraison/)
+  const dsiteCountry = getField("Pays de livraison")
 
   expect(dsiteCountry).not.toBeDisabled()
 
   userEvent.type(dsite, "Test") // prettier-ignore
   userEvent.click(await screen.findByText("Test Delivery Site"))
+  await screen.findByDisplayValue("Test Delivery Site")
 
   expect(dsiteCountry).toBeDisabled()
 
-  userEvent.type(screen.getByLabelText("Champ libre"), "blabla")
+  userEvent.type(getField("Champ libre"), "blabla")
 
-  userEvent.click(screen.getByText("Oui"))
-  expect(dsite).toBeDisabled()
+  userEvent.type(getField("EEC"), "10")
+  userEvent.type(getField("EL"), "1.1")
+  userEvent.type(getField("EP *"), "1.2")
+  userEvent.type(getField("ETD *"), "1.3")
+  userEvent.type(getField("EU"), "1.4")
 
-  userEvent.type(screen.getByLabelText("EEC"), "10")
-  userEvent.type(screen.getByLabelText("EL"), "1.1")
-  userEvent.type(screen.getByLabelText("EP *"), "1.2")
-  userEvent.type(screen.getByLabelText("ETD *"), "1.3")
-  userEvent.type(screen.getByLabelText("EU"), "1.4")
-
-  userEvent.type(screen.getByLabelText("ESCA"), "1.1")
-  userEvent.type(screen.getByLabelText("ECCS"), "1.2")
-  userEvent.type(screen.getByLabelText("ECCR"), "1.3")
-  userEvent.type(screen.getByLabelText("EEE"), "1.4")
+  userEvent.type(getField("ESCA"), "1.1")
+  userEvent.type(getField("ECCS"), "1.2")
+  userEvent.type(getField("ECCR"), "1.3")
+  userEvent.type(getField("EEE"), "1.4")
 
   userEvent.click(screen.getByText("Créer lot"))
 
