@@ -28,12 +28,14 @@ export const EmissionFields = (props: GHGFieldsProps) => {
         {...props}
       />
       <NumberInput
+        required
         label="EP"
         title={t("Émissions résultant dela transformation")}
         {...bind("ep")}
         {...props}
       />
       <NumberInput
+        required
         label="ETD"
         title={t("Émissions résultant du transport et de la distribution")}
         {...bind("etd")}
