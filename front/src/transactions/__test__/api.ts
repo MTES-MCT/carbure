@@ -16,7 +16,7 @@ import {
 
 import { Data } from "common/__test__/helpers"
 import * as data from "./data"
-import { okSettings } from "settings/__test__/api"
+import { okDynamicSettings, okSettings } from "settings/__test__/api"
 import { Snapshot, LotList } from "transactions/types"
 
 // init data
@@ -115,8 +115,9 @@ export default setupServer(
   okSummary,
   okDeclarations,
   okYears,
-
   okSendLot,
+
+  okDynamicSettings,
 
   okBiocarburantsSearch,
   okCountrySearch,

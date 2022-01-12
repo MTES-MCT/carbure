@@ -7,15 +7,11 @@ import { operator, producer, trader } from "common/__test__/data"
 import { waitWhileLoading } from "common/__test__/helpers"
 import LotAdd from "../index"
 
-import server from "transactions/__test__/api"
 import { PortalProvider } from "common-v2/components/portal"
-import { okDynamicSettings, setEntity } from "settings/__test__/api"
-import { okAddLot } from "./api"
-
-server.use(okDynamicSettings, okAddLot)
+import { setEntity } from "settings/__test__/api"
+import server from "./api"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
-
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
@@ -108,7 +104,7 @@ test("display the transaction form - pure producer", async () => {
   setEntity({ ...producer, has_trading: false, has_mac: false })
   render(<TransactionAddWithRouter />)
 
-  await waitWhileLoading()
+  // await waitWhileLoading()
 
   await screen.findByText("Créer un nouveau lot")
 
@@ -126,7 +122,8 @@ test("display the transaction form - operator", async () => {
   setEntity(operator)
   render(<TransactionAddWithRouter entityID={operator.id} />)
 
-  await waitWhileLoading()
+  // await waitWhileLoading()
+  await screen.findByText("Créer un nouveau lot")
 
   checkLotFields()
   checkOriginFields()
@@ -141,7 +138,8 @@ test("display the transaction form - trader", async () => {
   setEntity(trader)
   render(<TransactionAddWithRouter entityID={trader.id} />)
 
-  await waitWhileLoading()
+  // await waitWhileLoading()
+  await screen.findByText("Créer un nouveau lot")
 
   checkLotFields()
   checkOriginFields()
@@ -150,14 +148,16 @@ test("display the transaction form - trader", async () => {
   checkGESFields()
 })
 
-test.only("check the form fields are working", async () => {
+test("check the form fields are working", async () => {
+  setEntity(producer)
   render(
-    <TransactionAddWithRouter>
+    <TransactionAddWithRouter entityID={producer.id}>
       <Route path="/drafts/0" element={<span>LOT CREATED</span>} />
     </TransactionAddWithRouter>
   )
 
-  await waitWhileLoading()
+  // await waitWhileLoading()
+  await screen.findByText("Créer un nouveau lot")
 
   userEvent.type(getField("N° document d'accompagnement *"), "DAETEST") // prettier-ignore
   userEvent.type(getField("Volume en litres (Ethanol à 20°, autres à 15°) *"), "10000") // prettier-ignore
@@ -179,7 +179,7 @@ test.only("check the form fields are working", async () => {
   userEvent.click(await screen.findByText("Producteur Test"))
   await screen.findByDisplayValue("Producteur Test")
 
-  userEvent.type(getField(/^Site de production/), "Test") // prettier-ignore
+  userEvent.type(getField(/^Site de production/), "Test")
   userEvent.click(await screen.findByText("Test Production Site"))
   await screen.findByDisplayValue("Test Production Site")
 
@@ -223,13 +223,13 @@ test.only("check the form fields are working", async () => {
 
   userEvent.click(screen.getByText("Créer lot"))
 
-  await waitWhileLoading()
+  // await waitWhileLoading()
+
+  // page for the newly created lot appears
+  await screen.findByText("LOT CREATED")
 
   // creation form disappears
   expect(
     screen.queryByText("Créer une nouvelle transaction")
   ).not.toBeInTheDocument()
-
-  // page for the newly created lot appears
-  await screen.findByText("LOT CREATED")
-})
+}, 30000)
