@@ -1082,7 +1082,11 @@ class CarbureStock(models.Model):
         delivery_site_id = '00'
         if self.depot:
             delivery_site_id = self.depot.depot_id
-        self.carbure_id = 'S{period}-{country_of_production}-{delivery_site_id}-{id}'.format(period=self.period, country_of_production=country_of_production, delivery_site_id=delivery_site_id, id=self.id)
+        period = '000000'
+        parent_lot = self.get_parent_lot()
+        if parent_lot:
+            period = parent_lot.period
+        self.carbure_id = 'S{period}-{country_of_production}-{delivery_site_id}-{id}'.format(period=period, country_of_production=country_of_production, delivery_site_id=delivery_site_id, id=self.id)
 
 @receiver(pre_save, sender=CarbureStock)
 def stock_pre_save_gen_carbure_id(sender, instance, *args, **kwargs):
