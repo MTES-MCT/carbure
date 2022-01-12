@@ -7,16 +7,21 @@ import {
   producer,
   productionSite,
 } from "common/__test__/data"
+import { clone } from "common/__test__/helpers"
 import { LotDetails } from "lot-details/types"
 import {
   CorrectionStatus,
   DeliveryType,
   Lot,
+  LotError,
   LotStatus,
 } from "transactions/types"
 
 export const lot: Lot = {
   id: 0,
+  lot_status: LotStatus.Draft,
+  correction_status: CorrectionStatus.NoProblem,
+  delivery_type: DeliveryType.Unknown,
   year: 2020,
   period: 202001,
   carbure_id: "TEST01",
@@ -51,7 +56,7 @@ export const lot: Lot = {
   added_by: producer,
   carbure_supplier: producer,
   unknown_supplier: null,
-  supplier_certificate: "ISCC1000 - Vendor",
+  supplier_certificate: "ISCC2000 - Supplier",
   transport_document_reference: "DAETEST",
   carbure_client: operator,
   unknown_client: "",
@@ -59,20 +64,94 @@ export const lot: Lot = {
   carbure_delivery_site: deliverySite,
   unknown_delivery_site: "",
   delivery_site_country: country,
-  delivery_type: DeliveryType.Unknown,
-  lot_status: LotStatus.Draft,
-  correction_status: CorrectionStatus.NoProblem,
   free_field: "",
 }
 
 export const lotDetails: LotDetails = {
   lot: lot,
-  children_lot: [],
-  children_stock: [],
   comments: [],
   errors: [],
   updates: [],
   distance: null,
   parent_lot: null,
   parent_stock: null,
+  children_lot: [],
+  children_stock: [],
+}
+
+export const errors: LotError[] = [
+  {
+    error: "UNKNOWN_PRODUCTION_SITE",
+    is_blocking: true,
+    field: "carbure_production_site",
+    value: null,
+    extra: null,
+    fields: null,
+  },
+  {
+    error: "MISSING_PRODUCTION_SITE_COMDATE",
+    is_blocking: true,
+    field: "production_site_commissioning_date",
+    value: null,
+    extra: null,
+    fields: null,
+  },
+  {
+    error: "NO_PRODSITE_CERT",
+    is_blocking: false,
+    field: "production_site_certificate",
+    value: null,
+    extra: null,
+    fields: null,
+  },
+]
+
+export const errorDetails: LotDetails = {
+  ...clone(lotDetails),
+  errors: errors,
+}
+
+export const tofixDetails: LotDetails = {
+  ...clone(lotDetails),
+  lot: {
+    ...lot,
+    lot_status: LotStatus.Pending,
+    correction_status: CorrectionStatus.InCorrection,
+  },
+  comments: [
+    {
+      entity: operator,
+      user: "operator@test.com",
+      comment_type: "REGULAR",
+      comment_dt: "2021-11-30T14:02:45.832791+01:00",
+      comment: "Ces lots ont été affectés par erreur",
+    },
+  ],
+}
+
+export const rejectedDetails: LotDetails = {
+  ...clone(lotDetails),
+  lot: {
+    ...lot,
+    lot_status: LotStatus.Rejected,
+    correction_status: CorrectionStatus.NoProblem,
+  },
+  comments: [
+    {
+      entity: operator,
+      user: "operator@test.com",
+      comment_type: "REGULAR",
+      comment_dt: "2021-11-30T14:02:45.832791+01:00",
+      comment: "Ces lots ont été affectés par erreur",
+    },
+  ],
+}
+
+export const sentDetails: LotDetails = {
+  ...clone(lotDetails),
+  lot: {
+    ...lot,
+    lot_status: LotStatus.Pending,
+    correction_status: CorrectionStatus.NoProblem,
+  },
 }

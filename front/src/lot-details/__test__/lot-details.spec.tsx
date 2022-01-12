@@ -1,60 +1,59 @@
-import merge from "merge"
 import { Route, Routes } from "react-router-dom"
 import { render, TestRoot } from "setupTests"
 import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Entity } from "common/types"
 
-import { operator, producer } from "common/__test__/data"
+import { operator, producer, trader } from "common/__test__/data"
 import LotDetails from "../index"
+import { LotDetails as LotDetailsData } from "lot-details/types"
 
-import server, { setDetails } from "../../transactions/__test__/api"
+import server from "./api"
+
+import { Data, waitWhileLoading } from "common/__test__/helpers"
+import { PortalProvider } from "common-v2/components/portal"
+import { clickOnCheckboxesAndConfirm } from "../../transactions/__test__/helpers"
+import { setEntity } from "settings/__test__/api"
 import {
   lotDetails,
   errorDetails,
-  sentDetails,
   tofixDetails,
-  unknownProducerPartial,
-  unknownProdSitePartial,
-  noVendorPartial,
-  operatorAuthorPartial,
-  traderVendorPartial,
+  rejectedDetails,
+  sentDetails,
+  lot,
+} from "./data"
+import {
   stockPartial,
-} from "../../transactions/__test__/data"
-import { waitWhileLoading } from "common/__test__/helpers"
-import { clickOnCheckboxesAndConfirm } from "../../transactions/__test__/helpers"
-import { okDynamicSettings, setEntity } from "settings/__test__/api"
-import { PortalProvider } from "common-v2/components/portal"
-import { okLotDetails, okUpdateLot } from "./api"
+  traderVendorPartial,
+  unknownProdSitePartial,
+  unknownProducerPartial,
+} from "transactions/__test__/data"
 
-server.use(okDynamicSettings, okLotDetails, okUpdateLot)
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
-beforeEach(() => {
-  setDetails(lotDetails)
-})
+beforeEach(() => Data.set("lot-details", lotDetails))
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 const LotDetailsRoute = () => {
   return (
-    <Routes>
-      <Route path=":id" element={<LotDetails neighbors={[]} />} />
-      <Route path="*" element={<h1>NOTHING</h1>} />
-    </Routes>
+    <PortalProvider>
+      <Routes>
+        <Route path=":id" element={<LotDetails neighbors={[]} />} />
+        <Route path="*" element={<h1>NOTHING</h1>} />
+      </Routes>
+    </PortalProvider>
   )
 }
 
 const LotDetailsWithRouter = ({ entity }: { entity: Entity }) => {
   setEntity(entity)
   return (
-    <PortalProvider>
-      <TestRoot url={`/org/${entity.id}/transactions/draft/0`}>
-        <Route
-          path="/org/:entity/transactions/:status/*"
-          element={<LotDetailsRoute />}
-        />
-      </TestRoot>
-    </PortalProvider>
+    <TestRoot url={`/org/${entity.id}/transactions/draft/0`}>
+      <Route
+        path="/org/:entity/transactions/:status/*"
+        element={<LotDetailsRoute />}
+      />
+    </TestRoot>
   )
 }
 
@@ -115,9 +114,7 @@ function checkGESFields() {
 test("display transaction details", async () => {
   render(<LotDetailsWithRouter entity={producer} />)
 
-  await waitWhileLoading()
-
-  screen.getByText("Détails du lot #TEST01")
+  await screen.findByText("Détails du lot #TEST01")
 
   screen.getByDisplayValue("DAETEST")
 
@@ -145,15 +142,13 @@ test("display transaction details", async () => {
 test("edit transaction details", async () => {
   render(<LotDetailsWithRouter entity={producer} />)
 
-  await waitWhileLoading()
+  const save: any = await screen.findByText("Sauvegarder")
 
   screen.getByText(/^Détails du lot/)
 
-  const save: any = screen.getByText("Sauvegarder")
-
   const dae = getField("N° document d'accompagnement *")
   userEvent.clear(dae)
-  userEvent.type(dae, "DAETESTUPDATE")
+  userEvent.type(dae, "DAETEST")
 
   const vol = getField("Volume en litres (Ethanol à 20°, autres à 15°) *")
   userEvent.clear(vol)
@@ -247,57 +242,54 @@ test("edit transaction details", async () => {
 
   await waitWhileLoading()
 
-  userEvent.click(screen.getByText("Retour"))
+  screen.getByDisplayValue("DAETEST UPDATED")
 }, 30000)
 
-test.only("check transaction errors", async () => {
-  setDetails(errorDetails)
-
+test("check transaction errors", async () => {
+  Data.set("lot-details", errorDetails)
   render(<LotDetailsWithRouter entity={producer} />)
 
-  await waitWhileLoading()
+  await screen.findByText("Brouillon")
 
-  await screen.findByText(
-    (content, node) =>
-      node?.textContent === "À valider avant le 29 février 2020"
+  const psite = screen.getByTitle("Le site de production n'est pas reconnu")
+  expect(psite.closest("svg")).toBeInTheDocument()
+  expect(psite.closest("[data-field]")).toHaveAttribute("data-error")
+
+  const comdate = screen.getByTitle(
+    "La date de mise en service du site de production est manquante"
   )
-
-  const dae = screen.getByTitle("Le DAE (ou équivalent) est manquant")
-  expect(dae).toHaveClass("errorLabel")
-
-  const mp = screen.getByTitle("La matière première est manquante")
-  expect(mp).toHaveClass("errorLabel")
+  expect(comdate.closest("[data-field]")).toHaveAttribute("data-error")
 
   const errors = screen.getByText("Erreurs (2)")
   userEvent.click(errors)
 
-  screen.getByText("Le DAE (ou équivalent) est manquant")
-  screen.getByText("La matière première est manquante")
+  screen.getByText("Le site de production n'est pas reconnu", {
+    selector: "li",
+  })
+  screen.getByText(
+    "La date de mise en service du site de production est manquante",
+    { selector: "li" }
+  )
 
   const warnings = screen.getByText("Remarques (1)")
   userEvent.click(warnings)
 
-  screen.getByText(
-    "La matière première est incohérente avec le biocarburant - Biogaz de blé"
-  )
+  screen.getByText("Certificat du site de production absent")
 
   userEvent.click(screen.getByText("Retour"))
 })
 
 test("check transaction comments", async () => {
-  setDetails(tofixDetails)
-
+  Data.set("lot-details", tofixDetails)
   render(<LotDetailsWithRouter entity={producer} />)
 
-  await waitWhileLoading()
-
-  await screen.findByText("À corriger")
+  await screen.findByText("En correction")
 
   const comments = screen.getByText("Commentaires (1)")
   userEvent.click(comments)
 
-  screen.getByText("Opérateur Test:")
-  screen.getByText("not ok")
+  screen.getByText("[30/11/2021, 14:02] Opérateur Test:")
+  screen.getByText("Ces lots ont été affectés par erreur")
 
   userEvent.type(
     screen.getByPlaceholderText("Entrez un commentaire..."),
@@ -309,7 +301,7 @@ test("check transaction comments", async () => {
   await waitWhileLoading()
 
   await screen.findByText("Commentaires (2)")
-  screen.getByText("Producteur Test:")
+  screen.getByText("[30/11/2021, 16:02] Producteur Test:")
   screen.getByText("test ok")
 
   userEvent.click(screen.getByText("Retour"))
@@ -318,21 +310,16 @@ test("check transaction comments", async () => {
 test("send draft lot from details", async () => {
   render(<LotDetailsWithRouter entity={producer} />)
 
-  await waitWhileLoading()
-
   // click on the send action
-  const send = await screen.findByText("Envoyer")
+  const send = await screen.findByText("Envoyer le lot")
   userEvent.click(send)
 
-  // confirm the sending
-  const title = screen.getByText("Envoyer lot")
+  // dialog to confirm the sending
+  const title = screen.getByText("Envoyer ce brouillon")
   clickOnCheckboxesAndConfirm()
 
-  expect(title).not.toBeInTheDocument()
-
-  await waitWhileLoading()
-
   await screen.findByText("En attente")
+  expect(title).not.toBeInTheDocument()
 
   userEvent.click(screen.getByText("Retour"))
 })
@@ -340,39 +327,33 @@ test("send draft lot from details", async () => {
 test("delete draft lot from details", async () => {
   render(<LotDetailsWithRouter entity={producer} />)
 
-  await waitWhileLoading()
-
   // click on the send action
-  const send = await screen.findByText("Supprimer")
+  const send = await screen.findByText("Supprimer le lot")
   userEvent.click(send)
 
-  // confirm the sending
-  const title = screen.getByText("Supprimer lot")
-  userEvent.click(screen.getByText("Confirmer"))
-
-  expect(title).not.toBeInTheDocument()
+  // dialog to confirm the sending
+  const title = screen.getByText("Supprimer ce lot")
+  userEvent.click(screen.getByText("Supprimer"))
 
   await waitWhileLoading()
+
+  expect(title).not.toBeInTheDocument()
 })
 
 test("resend tofix lot from details", async () => {
-  setDetails(tofixDetails)
-
+  Data.set("lot-details", tofixDetails)
   render(<LotDetailsWithRouter entity={producer} />)
 
-  await waitWhileLoading()
-
   // click on the send action
-  const send = await screen.findByText("Renvoyer")
+  const send = await screen.findByText("Valider la correction")
   userEvent.click(send)
 
   // confirm the sending
-  const title = screen.getByText("Renvoyer le lot")
-  userEvent.click(screen.getByText("Confirmer"))
-
-  expect(title).not.toBeInTheDocument()
+  const title = screen.getByText("Valider la correction", { selector: "h1" })
+  userEvent.click(screen.getByText("Valider correction"))
 
   await waitWhileLoading()
+  expect(title).not.toBeInTheDocument()
 
   await screen.findByText("Corrigé")
 
@@ -383,72 +364,58 @@ test("resend tofix lot from details", async () => {
 })
 
 test("delete tofix lot from details", async () => {
-  setDetails(tofixDetails)
-
+  Data.set("lot-details", rejectedDetails)
   render(<LotDetailsWithRouter entity={producer} />)
 
-  await waitWhileLoading()
-
   // click on the send action
-  const send = await screen.findByText("Supprimer")
+  const send = await screen.findByText("Supprimer le lot")
   userEvent.click(send)
 
   // confirm the sending
-  screen.getByText("Supprimer lot")
-  userEvent.click(screen.getByText("Confirmer"))
+  screen.getByText("Supprimer ce lot")
+  userEvent.click(screen.getByText("Supprimer"))
 
   await waitWhileLoading()
 })
 
 test("accept inbox lot from details", async () => {
-  setDetails(sentDetails)
-
+  Data.set("lot-details", sentDetails)
   render(<LotDetailsWithRouter entity={operator} />)
-
-  await waitWhileLoading()
 
   await screen.findByText("En attente")
 
-  userEvent.click(await screen.findByText("Accepter"))
+  userEvent.click(await screen.findByText("Accepter le lot"))
+  userEvent.click(await screen.findByText("Incorporation"))
 
   // confirm the transaction
-  screen.getByText("Accepter lot")
-  userEvent.click(screen.getByText("Confirmer"))
+  screen.getByText("Accepter le lot", { selector: "h1" })
+  userEvent.click(screen.getByText("Incorporer"))
 
   await waitWhileLoading()
 
   await screen.findByText("Accepté")
-
-  userEvent.click(screen.getByText("Retour"))
-
-  expect(screen.queryByText(/^Détails du lot/)).not.toBeInTheDocument()
 })
 
 test("accept sous reserve inbox lot from details", async () => {
-  setDetails(sentDetails)
+  Data.set("lot-details", sentDetails)
 
   render(<LotDetailsWithRouter entity={operator} />)
 
-  await waitWhileLoading()
+  await screen.findByText("En attente")
 
-  const status = await screen.findByText("En attente")
+  userEvent.click(await screen.findByText("Demander une correction"))
 
-  userEvent.click(await screen.findByText("Accepter sous réserve"))
-
-  screen.getByText("Accepter lot")
-  userEvent.click(screen.getByText("Les deux"))
-  userEvent.type(getField("Commentaire (obligatoire)"), "test is incorrect") // prettier-ignore
-  userEvent.click(screen.getByText("Confirmer"))
+  screen.getByText("Demander une correction", { selector: "h1" })
+  userEvent.type(getField("Commentaire *"), "test is incorrect") // prettier-ignore
+  userEvent.click(screen.getByText("Demander correction"))
 
   await waitWhileLoading()
 
-  userEvent.click(screen.getByText("Retour"))
-
-  expect(status).not.toBeInTheDocument()
+  await screen.findByText("En correction")
 })
 
 test("reject inbox lot from details", async () => {
-  setDetails(sentDetails)
+  Data.set("lot-details", sentDetails)
 
   render(<LotDetailsWithRouter entity={operator} />)
 
@@ -456,29 +423,32 @@ test("reject inbox lot from details", async () => {
 
   await screen.findByText("En attente")
 
-  userEvent.click(await screen.findByText("Refuser"))
+  userEvent.click(await screen.findByText("Refuser le lot"))
 
   // confirm the transaction
-  screen.getByText("Refuser lot")
-  userEvent.type(getField("Commentaire (obligatoire)"), "not for me") // prettier-ignore
-  userEvent.click(screen.getByText("Confirmer"))
+  screen.getByText("Refuser ce lot", { selector: "h1" })
+  userEvent.type(getField("Commentaire *"), "not for me") // prettier-ignore
+  userEvent.click(screen.getByText("Refuser"))
 
   await waitWhileLoading()
+
+  await screen.findByText("Refusé")
 })
 
 test("transaction details form as producer - producer trades unknown producer lot to operator", async () => {
-  setDetails(
-    merge.recursive(
-      true,
-      sentDetails,
-      unknownProducerPartial,
-      unknownProdSitePartial
-    )
-  )
+  Data.set("lot-details", sentDetails)
+  Data.set("lot-details", (details: LotDetailsData) => {
+    details.lot.carbure_producer = null
+    details.lot.unknown_producer = "Unknown Producer"
+    details.lot.carbure_supplier = null
+    details.lot.unknown_supplier = "Unknown Supplier"
+    details.lot.vendor_certificate = "ISCC1000 - Vendor"
+    details.lot.carbure_production_site = null
+    details.lot.unknown_production_site = "Unknown Production Site"
+  })
 
   render(<LotDetailsWithRouter entity={producer} />)
 
-  await waitWhileLoading()
   await screen.findByDisplayValue("DAETEST")
 
   checkLotFields()
@@ -487,7 +457,7 @@ test("transaction details form as producer - producer trades unknown producer lo
   checkDeliveryFields()
   checkGESFields()
 
-  expect(getField(/^Producteur/)).toHaveValue("Unknown Producer")
+  await screen.findByDisplayValue("Unknown Producer")
 
   const supplier = getField(/^Fournisseur/)
   expect(supplier).toHaveValue("Unknown Supplier")
@@ -498,7 +468,7 @@ test("transaction details form as producer - producer trades unknown producer lo
   expect(getField(/^Site de production/)).toHaveValue("Unknown Production Site")
 
   const certif = getField("Certificat du site de production")
-  expect(certif).toHaveValue("2BS - PSITE")
+  expect(certif).toHaveValue("2BS - KNOWN PSITE")
 
   const psiteCountry = getField("Pays de production")
   expect(psiteCountry).toHaveValue("France")
@@ -507,14 +477,14 @@ test("transaction details form as producer - producer trades unknown producer lo
 })
 
 test("transaction details form as operator - producer trades unknown producer lot to operator", async () => {
-  setDetails(
-    merge.recursive(
-      true,
-      sentDetails,
-      unknownProducerPartial,
-      unknownProdSitePartial
-    )
-  )
+  Data.set("lot-details", sentDetails)
+  Data.set("lot-details", (details: LotDetailsData) => {
+    details.lot.carbure_producer = null
+    details.lot.unknown_producer = "Unknown Producer"
+    details.lot.supplier_certificate = "ISCC1000 - Vendor"
+    details.lot.carbure_production_site = null
+    details.lot.unknown_production_site = "Unknown Production Site"
+  })
 
   render(<LotDetailsWithRouter entity={operator} />)
 
@@ -527,27 +497,27 @@ test("transaction details form as operator - producer trades unknown producer lo
   checkDeliveryFields()
   checkGESFields()
 
-  expect(getField(/^Producteur/)).toHaveValue("Unknown Producer")
+  await screen.findByDisplayValue("Unknown Producer")
   expect(getField(/^Fournisseur/)).toHaveValue("Producteur Test")
   expect(getField("Certificat du fournisseur")).toHaveValue("ISCC1000 - Vendor")
   expect(getField(/^Site de production/)).toHaveValue("Unknown Production Site")
   expect(getField("Certificat du site de production")).toHaveValue(
-    "2BS - PSITE"
+    "2BS - KNOWN PSITE"
   )
   expect(getField("Pays de production")).toHaveValue("France")
 })
 
 test("transaction details form as operator - operator self accepts lot", async () => {
-  setDetails(
-    merge.recursive(
-      true,
-      sentDetails,
-      unknownProducerPartial,
-      unknownProdSitePartial,
-      noVendorPartial,
-      operatorAuthorPartial
-    )
-  )
+  Data.set("lot-details", sentDetails)
+  Data.set("lot-details", (details: LotDetailsData) => {
+    details.lot.carbure_producer = null
+    details.lot.unknown_producer = "Unknown Producer"
+    details.lot.carbure_supplier = null
+    details.lot.unknown_supplier = "Unknown Supplier"
+    details.lot.vendor_certificate = "ISCC1000 - Vendor"
+    details.lot.carbure_production_site = null
+    details.lot.unknown_production_site = "Unknown Production Site"
+  })
 
   render(<LotDetailsWithRouter entity={operator} />)
 
@@ -560,43 +530,12 @@ test("transaction details form as operator - operator self accepts lot", async (
   checkDeliveryFields()
   checkGESFields()
 
-  expect(getField(/^Producteur/)).toHaveValue("Unknown Producer")
+  await screen.findByDisplayValue("Unknown Producer")
   expect(getField(/^Fournisseur/)).toHaveValue("Unknown Supplier")
   expect(getField("Certificat du fournisseur")).toHaveValue(
     "ISCC2000 - Supplier"
   )
   expect(getField(/^Site de production/)).toHaveValue("Unknown Production Site")
-  expect(getField("Certificat du site de production")).toHaveValue(
-    "2BS - PSITE"
-  )
-  expect(getField("Pays de production")).toHaveValue("France")
-})
-
-test("transaction details form as producer - lot coming back for correction after being sold by trader after buying from producer", async () => {
-  setDetails(
-    merge.recursive(true, sentDetails, traderVendorPartial, stockPartial)
-  )
-
-  render(<LotDetailsWithRouter entity={producer} />)
-
-  await waitWhileLoading()
-  await screen.findByDisplayValue("DAETEST")
-
-  checkLotFields()
-  checkOriginFields()
-  checkProductionFields()
-  checkDeliveryFields()
-  checkGESFields()
-
-  expect(getField(/^Producteur/)).toHaveValue("Producteur Test")
-
-  const vendor = getField(/Fournisseur/)
-  expect(vendor).toHaveValue("Unknown Supplier")
-
-  const certificate = getField(/Certificat du fournisseur/)
-  expect(certificate).toHaveValue("ISCC2000 - Supplier")
-
-  expect(getField(/^Site de production/)).toHaveValue("Test Production Site")
   expect(getField("Certificat du site de production")).toHaveValue(
     "2BS - KNOWN PSITE"
   )
