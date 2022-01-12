@@ -20,7 +20,7 @@ from api.v4.sanity_checks import bulk_sanity_checks, sanity_check
 
 from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Entity, GenericError, Pays, SustainabilityDeclaration, UserRights
 from core.serializers import CarbureLotPublicSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
-from core.xlsx_v3 import template_v4
+from core.xlsx_v3 import template_v4, template_v4_stocks
 
 
 @check_user_rights()
@@ -687,6 +687,21 @@ def lots_send(request, *args, **kwargs):
         event.user = request.user
         event.save()
 
+        if lot.parent_stock:
+            stock = lot.parent_stock
+            if stock.remaining_volume >= lot.volume:
+                stock.remaining_volume = round(stock.remaining_volume - lot.volume, 2)
+                stock.remaining_weight = stock.get_weight()
+                stock.remaining_lhv_amount = stock.get_lhv_amount()
+                stock.save()
+                event = CarbureStockEvent()
+                event.event_type = CarbureStockEvent.SPLIT
+                event.stock = stock
+                event.user = request.user
+                event.metadata = {'message': 'Envoi lot.', 'volume_to_deduct': lot.volume}
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Available volume lower than lot volume'}, status=400)
+
         lot.lot_status = CarbureLot.PENDING
 
         #### SPECIFIC CASES
@@ -1187,7 +1202,6 @@ def accept_blending(request, *args, **kwargs):
     lots = filter_lots(lots, request.POST, entity_id, will_aggregate=True)
 
     for lot in lots.iterator():
-        print(lot.id)
         if int(entity_id) != lot.carbure_client_id:
             return JsonResponse({'status': 'forbidden', 'message': 'Only the client can accept the lot'}, status=403)
 

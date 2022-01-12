@@ -113,7 +113,8 @@ def fill_basic_info(lot, data, prefetched_data):
             parent_lot = lot.parent_stock.get_parent_lot()
         else:
             parent_lot = lot.parent_lot
-        lot.copy_basic_info(parent_lot)
+        lot.copy_production_details(parent_lot)
+        lot.copy_sustainability_data(parent_lot)
     else:
         ### BIOFUEL
         biofuels = prefetched_data['biofuels']
@@ -151,6 +152,10 @@ def fill_basic_info(lot, data, prefetched_data):
             else:
                 # all good
                 lot.country_of_origin = countries[country_code]
+    return errors
+
+def fill_volume_info(lot, data):
+    errors = []
     ### VOLUME
     if lot.parent_lot is None:
         volume = data.get('volume', None)
@@ -172,7 +177,7 @@ def fill_basic_info(lot, data, prefetched_data):
                 lot.volume = 0
                 errors.append(GenericError(lot=lot, field='volume', error=VOLUME_FORMAT_INCORRECT, display_to_creator=True, is_blocking=True))
         lot.weight = lot.get_weight()
-        lot.lhv_amount = lot.get_lhv_amount()
+        lot.lhv_amount = lot.get_lhv_amount()    
     return errors
 
 def fill_supplier_info(lot, data, entity):
@@ -255,7 +260,6 @@ def fill_delivery_data(lot, data, entity, prefetched_data):
     else:
         lot.carbure_delivery_site = None
         errors.append(GenericError(lot=lot, field='carbure_delivery_site_depot_id', error=UNKNOWN_DELIVERY_SITE, display_to_creator=True, is_blocking=True))
-
     if not lot.carbure_delivery_site:
         lot.unknown_delivery_site = data.get('unknown_delivery_site', None)
         delivery_country_code = data.get('delivery_site_country_code', None)
@@ -289,17 +293,11 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
         lot = existing_lot
     else:
         lot = CarbureLot()   
-    errors += fill_delivery_date(lot, data)
-    errors += fill_production_info(lot, data, entity, prefetched_data)
-    errors += fill_basic_info(lot, data, prefetched_data)
-    errors += fill_supplier_info(lot, data, entity)
-    errors += fill_ghg_info(lot, data)
-    errors += fill_delivery_data(lot, data, entity, prefetched_data)
-    errors += fill_client_data(lot, data, entity, prefetched_data)
     lot.free_field = data.get('free_field', None)
     lot.added_by = entity
 
     if 'carbure_stock_id' in data:
+        # FILL sustainability data from parent_stock
         try:
             parent_stock = CarbureStock.objects.get(carbure_id=data['carbure_stock_id'])
             assert(parent_stock.carbure_client == entity)
@@ -311,15 +309,30 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
         lot.copy_sustainability_data(original_lot)
         lot.carbure_dispatch_site = parent_stock.depot
         lot.carbure_supplier = parent_stock.carbure_client
+    else:
+        # FILL sustainability data from excel file
+        errors += fill_production_info(lot, data, entity, prefetched_data)
+        errors += fill_basic_info(lot, data, prefetched_data)
+        errors += fill_ghg_info(lot, data)
+
+    # common data
+    errors += fill_volume_info(lot, data)
+    errors += fill_delivery_date(lot, data)
+    errors += fill_supplier_info(lot, data, entity)
+    errors += fill_delivery_data(lot, data, entity, prefetched_data)
+    errors += fill_client_data(lot, data, entity, prefetched_data)
 
     return lot, errors
 
 def bulk_insert_lots(entity: Entity, lots: List[CarbureLot], errors: List[GenericError], prefetched_data: dict) -> QuerySet:
-    CarbureLot.objects.bulk_create(lots, batch_size=100)
+    created = CarbureLot.objects.bulk_create(lots, batch_size=100)
     inserted_lots = CarbureLot.objects.filter(added_by=entity).order_by('-id')[0:len(lots)]
-    for lot, errors in zip(inserted_lots, errors):
-        for e in errors:
+    print(errors)
+    errors = reversed(errors) # lots are fetched by DESC ID
+    print(errors)
+    for lot, lot_errors in zip(inserted_lots, errors):
+        for e in lot_errors:
             e.lot_id = lot.id
     bulk_sanity_checks(inserted_lots, prefetched_data, background=False)
-    GenericError.objects.bulk_create(errors, batch_size=100)
+    GenericError.objects.bulk_create([error for lot_errors in errors for error in lot_errors], batch_size=100)
     return inserted_lots
