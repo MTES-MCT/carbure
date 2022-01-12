@@ -53,11 +53,8 @@ urlpatterns = [
     #path('summary', views.get_lots_summary, name='api-v3-lots-get-lots-summary'),
     # POST
     # IMPORT/FILES
-    #path('upload', views.upload, name='api-v3-upload'),
-    #path('upload-blend', views.upload_blend, name='api-v3-upload-blend'),
     path('download-template', views.get_template, name='api-v4-get-template'),
-    #path('download-template-blend', views.get_template_blend, name='api-v3-template-blend'),
-    #path('download-template-trader', views.get_template_trader, name='api-v3-template-trader'),
+    path('download-template-stock', views.get_template_stock, name='api-v4-get-template-stock'),
 
 
     # SETTINGS

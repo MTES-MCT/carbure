@@ -11,7 +11,7 @@ from core.serializers import CarbureLotCSVSerializer, CarbureStockCSVSerializer
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import GenericCertificate, MatierePremiere, Biocarburant, Pays, Depot, Entity, ProductionSite, LotTransaction
+from core.models import CarbureStock, GenericCertificate, MatierePremiere, Biocarburant, Pays, Depot, Entity, ProductionSite, LotTransaction
 
 
 UNKNOWN_PRODUCERS = [{'name': 'ITANOL', 'country': 'IT', 'production_site': 'BERGAMO', 'ref': 'ISCC-IT-100001010', 'date':'2017-12-01', 'dc':'IT_001_2020'},
@@ -822,11 +822,54 @@ def make_template_carbure_lots_sheet(workbook, entity):
             colid += 1
         rowid += 1
 
+def make_template_carbure_stocks_sheet(workbook, entity):
+    worksheet_lots = workbook.add_worksheet("lots")
+    clients = Entity.objects.filter(entity_type__in=[Entity.OPERATOR, Entity.TRADER]).exclude(id=entity.id)
+    delivery_sites = Depot.objects.all()
+    stock = CarbureStock.objects.filter(carbure_client=entity, remaining_volume__gt=0)
+
+    # header
+    bold = workbook.add_format({'bold': True})
+    columns = ['champ_libre', 'carbure_stock_id', 'volume', 'dae', 'vendor_certificate', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country', 'delivery_type']
+    for i, c in enumerate(columns):
+        worksheet_lots.write(0, i, c, bold)
+
+    today = datetime.date.today().strftime('%d/%m/%Y')
+    rows = []
+    get_carbure_stock = lambda: random.choice(stock) if stock.count() > 0 else None
+    get_carbure_stock_id = lambda x: x.carbure_id if x else 'CARBURE_STOCK_ID'
+    get_carbure_stock_volume_to_send = lambda x: round(x.remaining_volume / 2, 2) if x else 34588
+
+    stock = get_carbure_stock()
+    rows.append(['extraction depuis mon stock - client français', get_carbure_stock_id(stock), get_carbure_stock_volume_to_send(stock), get_random_dae(), '', random.choice(clients).name, today, random.choice(delivery_sites).name, '', ''])
+    rows.append(['extraction depuis mon stock - client étranger', get_carbure_stock_id(stock), get_carbure_stock_volume_to_send(stock), get_random_dae(), '', random.choice(clients).name, today, '', 'DE', ''])
+
+    rowid = 0
+    for row in rows:
+        colid = 0
+        for elem in row:
+            worksheet_lots.write(rowid+1, colid, elem)
+            colid += 1
+        rowid += 1
+
 def template_v4(entity):
     # Create an new Excel file and add a worksheet.
     location = '/tmp/carbure_template.xlsx'
     workbook = xlsxwriter.Workbook(location)
     make_template_carbure_lots_sheet(workbook, entity)
+    make_mps_sheet(workbook)
+    make_biofuels_sheet(workbook)
+    make_countries_sheet(workbook)
+    make_clients_sheet(workbook)
+    make_deliverysites_sheet(workbook)
+    workbook.close()
+    return location
+
+def template_v4_stocks(entity):
+    # Create an new Excel file and add a worksheet.
+    location = '/tmp/carbure_template.xlsx'
+    workbook = xlsxwriter.Workbook(location)
+    make_template_carbure_stocks_sheet(workbook, entity)
     make_mps_sheet(workbook)
     make_biofuels_sheet(workbook)
     make_countries_sheet(workbook)
