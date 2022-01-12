@@ -766,7 +766,7 @@ def lots_delete(request, *args, **kwargs):
         if lot.added_by_id != int(entity_id):
             return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to delete this lot'}, status=403)
 
-        if lot.lot_status not in [CarbureLot.DRAFT, CarbureLot.PENDING, CarbureLot.REJECTED]:
+        if lot.lot_status not in [CarbureLot.DRAFT, CarbureLot.REJECTED]:
             # cannot delete lot accepted / frozen or already deleted
             return JsonResponse({'status': 'error', 'message': 'Cannot delete lot'}, status=400)
 
