@@ -27,9 +27,9 @@ test("admin: display an empty list of transactions", async () => {
 
   await waitWhileLoading()
 
-  await screen.findByText("Alertes")
-  screen.getByText("Corrections")
-  screen.getByText("Déclarations")
+  await screen.findByText("Alerte")
+  screen.getByText("Correction")
+  screen.getByText("Déclaration")
 
   screen.getByText("Périodes")
   screen.getByText("Biocarburants")

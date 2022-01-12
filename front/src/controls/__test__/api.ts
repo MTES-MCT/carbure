@@ -8,7 +8,8 @@ import {
   okErrorsTranslations,
 } from "common/__test__/api"
 
-import * as data from "transactions/__test__/data"
+import { getFilter } from "transactions/__test__/data"
+import { lotSummary } from "./data"
 
 export const okAdminSettings = rest.get("/api/v3/settings", (req, res, ctx) => {
   return res(
@@ -26,7 +27,7 @@ export const okAdminSettings = rest.get("/api/v3/settings", (req, res, ctx) => {
 export const okLotsSummary = rest.get(
   "/api/admin/lots/summary",
   (req, res, ctx) => {
-    return res(ctx.json({ status: "success", data: data.lotsSummary }))
+    return res(ctx.json({ status: "success", data: lotSummary }))
   }
 )
 
@@ -36,7 +37,7 @@ export const okFilters = rest.get(
     return res(
       ctx.json({
         status: "success",
-        data: data.getFilter(req.url.searchParams.get("field") ?? ""),
+        data: getFilter(req.url.searchParams.get("field") ?? ""),
       })
     )
   }
@@ -48,15 +49,10 @@ export const okSnapshot = rest.get("/api/admin/snapshot", (req, res, ctx) => {
       status: "success",
       data: {
         lots: {
-          draft: 0,
-          in_total: 0,
-          in_pending: 0,
-          in_tofix: 0,
-          stock: 0,
-          stock_total: 0,
-          out_total: 0,
-          out_pending: 0,
-          out_tofix: 0,
+          alerts: 0,
+          corrections: 0,
+          declarations: 0,
+          pinned: 0,
         },
       },
     })
@@ -68,15 +64,13 @@ export const okLots = rest.get("/api/admin/lots", (req, res, ctx) => {
     ctx.json({
       status: "success",
       data: {
-        data: {
-          lots: [],
-          from: 0,
-          returned: 0,
-          total: 0,
-          total_errors: 0,
-          total_deadline: 0,
-          errors: {},
-        },
+        lots: [],
+        from: 0,
+        returned: 0,
+        total: 0,
+        total_errors: 0,
+        total_deadline: 0,
+        errors: {},
       },
     })
   )
