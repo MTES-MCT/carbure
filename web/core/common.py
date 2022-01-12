@@ -1166,6 +1166,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         # transport_document, carbure_client, unknown_client, delivery_date, carbure_delivery_site, unknown_delivery_site, delivery_site_country
         # biofuel, feedstock, country_of_origin
 
+        lot['carbure_stock_id'] = lot_row.get('carbure_stock_id', '')
         lot['free_field'] = lot_row.get('champ_libre', '')
         producer = lot_row.get('producer', '')
         production_site = lot_row.get('production_site', '')

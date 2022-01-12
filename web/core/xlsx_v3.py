@@ -842,7 +842,7 @@ def make_template_carbure_stocks_sheet(workbook, entity):
 
     stock = get_carbure_stock()
     rows.append(['extraction depuis mon stock - client français', get_carbure_stock_id(stock), get_carbure_stock_volume_to_send(stock), get_random_dae(), '', random.choice(clients).name, today, random.choice(delivery_sites).name, '', ''])
-    rows.append(['extraction depuis mon stock - client étranger', get_carbure_stock_id(stock), get_carbure_stock_volume_to_send(stock), get_random_dae(), '', random.choice(clients).name, today, '', 'DE', ''])
+    rows.append(['extraction depuis mon stock - client étranger', get_carbure_stock_id(stock), get_carbure_stock_volume_to_send(stock), get_random_dae(), '', 'Unknown Client GmbH', today, '', 'DE', ''])
 
     rowid = 0
     for row in rows:
@@ -867,7 +867,7 @@ def template_v4(entity):
 
 def template_v4_stocks(entity):
     # Create an new Excel file and add a worksheet.
-    location = '/tmp/carbure_template.xlsx'
+    location = '/tmp/carbure_template_stocks.xlsx'
     workbook = xlsxwriter.Workbook(location)
     make_template_carbure_stocks_sheet(workbook, entity)
     make_mps_sheet(workbook)
