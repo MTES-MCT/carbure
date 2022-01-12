@@ -281,7 +281,7 @@ test("check transaction comments", async () => {
   const comments = screen.getByText("Commentaires (1)")
   userEvent.click(comments)
 
-  screen.getByText("[30/11/2021, 14:02] Opérateur Test:")
+  screen.getByText(/Opérateur Test:/)
   screen.getByText("Ces lots ont été affectés par erreur")
 
   userEvent.type(
@@ -294,7 +294,7 @@ test("check transaction comments", async () => {
   // await waitWhileLoading()
 
   await screen.findByText("Commentaires (2)")
-  screen.getByText("[30/11/2021, 16:02] Producteur Test:")
+  screen.getByText(/Producteur Test:/)
   screen.getByText("test ok")
 
   userEvent.click(screen.getByText("Retour"))
