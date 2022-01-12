@@ -40,14 +40,9 @@ export function setAdminLots(nextLots: any) {
   adminLots = clone(nextLots)
 }
 
-export function setDetails(nextDetails: any) {
-  details = clone(nextDetails)
-}
-
 // init data
 setSnapshot(data.snapshot)
 setLots(data.lots)
-setDetails(data.lotDetails)
 setAdminSnapshot(data.adminSnapshot)
 setAdminLots(data.lots)
 
@@ -176,12 +171,6 @@ export const okLotDetails = rest.get(
     return res(ctx.json({ status: "success", data: details }))
   }
 )
-
-export const okLotUpdate = rest.post("/api/v3/lots/update", (req, res, ctx) => {
-  setDetails(data.lotDetails)
-  details.transaction.dae = "DAETESTUPDATE Confirmer"
-  return res(ctx.json({ status: "success" }))
-})
 
 export const okAdminLots = rest.get("/api/v3/admin/lots", (req, res, ctx) => {
   return res(ctx.json({ status: "success", data: adminLots }))
@@ -351,7 +340,6 @@ export default setupServer(
   okMatierePremiereSearch,
   okProductionSitesSearch,
   okLotDetails,
-  okLotUpdate,
   okAdminLots,
   okAdminSnapshot,
   okLotsSummary,

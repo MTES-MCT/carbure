@@ -13,6 +13,7 @@ import { MarkManyAsFixedButton } from "transactions/actions/mark-as-fixed"
 import { RecallManyButton } from "transactions/actions/recall"
 import { ApproveManyFixesButton } from "transactions/actions/approve-fix"
 import { ExportLotsButton } from "transactions/actions/export"
+import { selectionColumn } from "common-v2/components/table"
 
 export interface ActionBarProps {
   count: number
@@ -23,6 +24,7 @@ export interface ActionBarProps {
 export const LotActions = ({ count, ...props }: ActionBarProps) => {
   const status = useStatus()
   const empty = count === 0
+  const noSelection = props.selection.length === 0
 
   return (
     <ActionBar>
@@ -48,6 +50,7 @@ export const LotActions = ({ count, ...props }: ActionBarProps) => {
         <Fragment>
           <RecallManyButton {...props} />
           <MarkManyAsFixedButton {...props} />
+          <DeleteManyButton {...props} disabled={noSelection} />
         </Fragment>
       )}
 

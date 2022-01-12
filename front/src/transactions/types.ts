@@ -158,10 +158,10 @@ export interface SummaryItem {
 export interface LotError {
   error: string
   is_blocking: boolean
-  field: string
-  fields: string[]
-  value: string
-  extra: string
+  field: string | null
+  fields: string[] | null
+  value: string | null
+  extra: string | null
 }
 
 export enum LotStatus {
