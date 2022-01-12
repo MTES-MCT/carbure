@@ -183,7 +183,6 @@ def create_new_tx_and_child(tx, parent_stock_id=None):
                     etbe_stock = CarbureStock()
                     etbe_stock.parent_lot = None
                     etbe_stock.parent_transformation = None
-                    etbe_stock.carbure_id = lot.carbure_id
                     etbe_stock.depot = lot.carbure_delivery_site
                     etbe_stock.carbure_client = stock.carbure_client
                     etbe_stock.remaining_volume = trans.volume_etbe
