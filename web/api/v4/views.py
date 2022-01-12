@@ -705,9 +705,9 @@ def lots_send(request, *args, **kwargs):
         lot.lot_status = CarbureLot.PENDING
 
         #### SPECIFIC CASES
-        # I AM NEITHER THE PRODUCER NOR THE CLIENT
+        # I AM NEITHER THE SUPPLIER NOR THE CLIENT
         # create two transactions. unknown producer/supplier -> me and me -> client
-        if lot.carbure_producer != entity and lot.carbure_client != entity:
+        if lot.carbure_supplier != entity and lot.carbure_client != entity:
             # AUTO ACCEPT FIRST TRANSACTION
             final_client = lot.carbure_client
             nb_auto_accepted += 1
@@ -1073,6 +1073,7 @@ def recall_lot(request, *args, **kwargs):
             return JsonResponse({'status': 'error', 'message': 'Lot is deleted. Cannot recall'}, status=400)
 
         lot.lot_status = CarbureLot.DRAFT
+        lot.correction_status = CarbureLot.NO_PROBLEMO
         lot.save()
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.RECALLED
