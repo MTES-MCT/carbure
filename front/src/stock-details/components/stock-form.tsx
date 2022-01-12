@@ -1,4 +1,4 @@
-import { Stock } from "transactions-v2/types"
+import { Stock } from "transactions/types"
 import Form, { useForm } from "common-v2/components/form"
 import { useEffect, useMemo } from "react"
 import { Entity } from "carbure/types"

@@ -105,3 +105,11 @@
 .actionCell :global(.icon):not(:last-child) {
   margin-right: 4px;
 }
+
+div.paddingColumn {
+  flex: 0 0 24px;
+}
+
+div.narrowColumn {
+  flex: 0.4;
+}

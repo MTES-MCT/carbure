@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next"
 import { useMatch } from "react-router-dom"
-import { Snapshot, Status } from "../types"
+import { Snapshot, AdminStatus } from "../types"
 import Tabs from "common-v2/components/tabs"
 import { Loader } from "common-v2/components/icons"
 
@@ -107,7 +107,7 @@ const StatusRecap = ({
 
 export function useStatus() {
   const match = useMatch<"status">("/org/:entity/controls/:status/*")
-  return (match?.params.status ?? "unknown") as Status
+  return (match?.params.status ?? "unknown") as AdminStatus
 }
 
 export default StatusTabs

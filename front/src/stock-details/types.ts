@@ -1,5 +1,5 @@
 import { LotComment, LotUpdate } from "lot-details/types"
-import { Lot, Stock } from "transactions-v2/types"
+import { Lot, Stock } from "transactions/types"
 
 export interface StockDetails {
   stock: Stock

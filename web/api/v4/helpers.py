@@ -526,7 +526,7 @@ def sort_stock(stock, query):
             stock = stock.order_by('vendor')
     return stock
 
-def get_lot_errors(lot, entity_id):
+def get_lot_errors(lot, entity_id=None):
     errors = []
     if entity_id is not None:
         errors = GenericError.objects.filter(lot_id=lot.id)
@@ -535,7 +535,7 @@ def get_lot_errors(lot, entity_id):
         errors = lot.genericerror_set.all()
     return GenericErrorSerializer(errors, many=True, read_only=True).data
 
-def get_lots_errors(lots, entity_id):
+def get_lots_errors(lots, entity_id=None):
     lot_ids = list(lots.values_list('id', flat=True))
     errors = GenericError.objects.filter(lot_id__in=lot_ids)
     if entity_id is not None:
@@ -547,17 +547,17 @@ def get_lots_errors(lots, entity_id):
         data[error['lot_id']].append(GenericErrorSerializer(error).data)
     return data
 
-def get_lot_updates(lot, entity_id):
+def get_lot_updates(lot, entity_id=None):
     if lot is None:
         return []
     return CarbureLotEventSerializer(lot.carburelotevent_set.all(), many=True).data
 
-def get_stock_events(lot, entity_id):
+def get_stock_events(lot, entity_id=None):
     if lot is None:
         return []
     return CarbureStockEventSerializer(lot.carburelotevent_set.all(), many=True).data
 
-def get_lot_comments(lot, entity_id):
+def get_lot_comments(lot, entity_id=None):
     if lot is None:
         return []
     return CarbureLotCommentSerializer(lot.carburelotcomment_set.all(), many=True).data
