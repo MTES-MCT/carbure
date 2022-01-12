@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { LotError } from "transactions-v2/types"
+import { LotError } from "transactions/types"
 import Collapse from "common-v2/components/collapse"
 import { AlertOctagon, AlertTriangle } from "common-v2/components/icons"
 

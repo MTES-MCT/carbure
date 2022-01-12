@@ -8,7 +8,7 @@ import { operator, producer, trader } from "common/__test__/data"
 import { waitWhileLoading } from "common/__test__/helpers"
 import TransactionAdd from "../routes/transaction-add"
 
-import server from "./api"
+import server from "./api-old"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 
@@ -25,7 +25,10 @@ const TransactionAddWithRouter = ({
   refresh?: () => void
 }) => (
   <TestRoot url={"/org/0/transactions/draft/add"}>
-    <Route path="/org/:entity/transactions/draft/add" element={<TransactionAdd entity={entity} refresh={refresh} />} />
+    <Route
+      path="/org/:entity/transactions/draft/add"
+      element={<TransactionAdd entity={entity} refresh={refresh} />}
+    />
     {children}
   </TestRoot>
 )

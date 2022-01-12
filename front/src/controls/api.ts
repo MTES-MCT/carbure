@@ -1,16 +1,7 @@
-import { api, Api, download } from "common-v2/services/api"
+import { Api, api, download } from "common-v2/services/api"
 import { Option } from "common-v2/utils/normalize"
-import {
-  LotList,
-  LotQuery,
-  StockQuery,
-  Snapshot,
-  Filter,
-  StockList,
-  LotSummary,
-  StockSummary,
-} from "./types"
-
+import { LotSummary, Snapshot } from "./types"
+import { Filter, LotList, LotQuery } from "transactions/types"
 
 const QUERY_RESET: Partial<LotQuery> = {
   limit: undefined,
@@ -36,7 +27,10 @@ export function getLots(query: LotQuery) {
 }
 
 export function downloadLots(query: LotQuery, selection: number[]) {
-  return download("/admin/lots", { ...getParams(query, selection), export: true })
+  return download("/admin/lots", {
+    ...getParams(query, selection),
+    export: true,
+  })
 }
 
 export function getLotsSummary(
@@ -72,31 +66,4 @@ export async function commentLots(
 export function getParams(query: LotQuery, selection?: number[]) {
   if (!selection || selection.length === 0) return query
   else return { entity_id: query.entity_id, selection }
-}
-
-// ENDPOINTS FOR STOCKS
-
-export function getStocks(query: StockQuery) {
-  return api.get<Api<StockList>>("/admin/stocks", { params: query })
-}
-
-export function downloadStocks(query: StockQuery, selection: number[]) {
-  return download("/admin/stocks", { ...getParams(query, selection), export: true })
-}
-
-export function getStockSummary(
-  query: StockQuery,
-  selection: number[],
-  short?: boolean
-) {
-  return api.get<Api<StockSummary>>("/admin/stocks/summary", {
-    params: { ...query, selection, ...QUERY_RESET, short },
-  })
-}
-
-export function getStockFilters(field: Filter, query: LotQuery) {
-  const params = { field, ...query, ...QUERY_RESET }
-  return api
-    .get<Api<Option[]>>("/admin/stocks/filters", { params })
-    .then((res) => res.data.data ?? [])
 }

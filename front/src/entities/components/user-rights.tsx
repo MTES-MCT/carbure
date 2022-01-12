@@ -5,13 +5,12 @@ import { confirm } from "common/components/dialog"
 import { AlertCircle, Check, Cross } from "common/components/icons"
 import { Input } from "common/components/input"
 import { Section, SectionBody, SectionHeader } from "common/components/section"
-import Table, { Actions, Column } from "common/components/table"
+import Table, { Actions, Column, padding } from "common/components/table"
 import useAPI from "common/hooks/use-api"
 import { UserRightRequest, UserRightStatus, UserRole } from "common/types"
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import { formatDate } from "settings/components/common"
-import { padding } from "transactions/components/list-columns"
 import * as api from "../api"
 import styles from "./user-rights.module.css"
 
@@ -58,7 +57,7 @@ const UserRights = () => {
   const [query, setQuery] = useState("")
   const [rights, getRights] = useAPI(api.getUsersRightRequests)
 
-  const entityID = parseInt(id ?? '', 10)
+  const entityID = parseInt(id ?? "", 10)
   const [, updateRight] = useAPI(api.updateUsersRights)
 
   async function updateRightRequest(user: number, status: UserRightStatus) {

@@ -1,14 +1,14 @@
 import { Fragment } from "react"
-import { Lot } from "transactions-v2/types"
-import { AcceptOneButton } from "transactions-v2/actions/accept"
-import { SendOneButton } from "transactions-v2/actions/send"
-import { DeleteOneButton } from "transactions-v2/actions/delete"
-import { RejectOneButton } from "transactions-v2/actions/reject"
-import { RequestOneFixButton } from "transactions-v2/actions/request-fix"
-import { MarkOneAsFixedButton } from "transactions-v2/actions/mark-as-fixed"
+import { Lot } from "transactions/types"
+import { AcceptOneButton } from "transactions/actions/accept"
+import { SendOneButton } from "transactions/actions/send"
+import { DeleteOneButton } from "transactions/actions/delete"
+import { RejectOneButton } from "transactions/actions/reject"
+import { RequestOneFixButton } from "transactions/actions/request-fix"
+import { MarkOneAsFixedButton } from "transactions/actions/mark-as-fixed"
 import useEntity from "carbure/hooks/entity"
-import { RecallOneButton } from "transactions-v2/actions/recall"
-import { ApproveOneFixButton } from "transactions-v2/actions/approve-fix"
+import { RecallOneButton } from "transactions/actions/recall"
+import { ApproveOneFixButton } from "transactions/actions/approve-fix"
 
 export interface ActionBarProps {
   icon?: boolean
