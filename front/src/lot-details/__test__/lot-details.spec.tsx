@@ -4,7 +4,7 @@ import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Entity } from "common/types"
 
-import { operator, producer, trader } from "common/__test__/data"
+import { operator, producer } from "common/__test__/data"
 import LotDetails from "../index"
 import { LotDetails as LotDetailsData } from "lot-details/types"
 
@@ -20,14 +20,7 @@ import {
   tofixDetails,
   rejectedDetails,
   sentDetails,
-  lot,
 } from "./data"
-import {
-  stockPartial,
-  traderVendorPartial,
-  unknownProdSitePartial,
-  unknownProducerPartial,
-} from "transactions/__test__/data"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 beforeEach(() => Data.set("lot-details", lotDetails))
@@ -488,7 +481,6 @@ test("transaction details form as operator - producer trades unknown producer lo
 
   render(<LotDetailsWithRouter entity={operator} />)
 
-  await waitWhileLoading()
   await screen.findByDisplayValue("DAETEST")
 
   checkLotFields()
@@ -521,7 +513,6 @@ test("transaction details form as operator - operator self accepts lot", async (
 
   render(<LotDetailsWithRouter entity={operator} />)
 
-  await waitWhileLoading()
   await screen.findByDisplayValue("DAETEST")
 
   checkLotFields()

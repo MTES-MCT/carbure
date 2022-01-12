@@ -8,10 +8,10 @@ import { rest } from "msw"
 import { setupServer } from "msw/node"
 import { okSettings } from "settings/__test__/api"
 import {
-  okLotsSummary,
   okLots,
   okSnapshot,
   okYears,
+  okSummary,
 } from "transactions/__test__/api"
 
 export const okStats = rest.get("/api/v3/common/stats", (req, res, ctx) => {
@@ -35,7 +35,7 @@ export default setupServer(
   okSnapshot,
   okYears,
   okLots,
-  okLotsSummary,
+  okSummary,
   okTranslations,
   okErrorsTranslations,
   okFieldsTranslations,

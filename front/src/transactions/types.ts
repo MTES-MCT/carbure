@@ -152,7 +152,7 @@ export interface SummaryItem {
   avg_ghg_reduction: number
   total: number
   pending: number
-  remaining_volume_sum: number
+  remaining_volume_sum?: number
 }
 
 export interface LotError {

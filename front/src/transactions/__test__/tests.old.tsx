@@ -1,3 +1,5 @@
+// LIST OF OLD BROKEN TESTS TO TAKE INSPIRATION FROM
+
 import { render, TestRoot } from "setupTests"
 import { waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
@@ -9,14 +11,18 @@ import { waitWhileLoading } from "common/__test__/helpers"
 import Transactions from "../index"
 import { clickOnCheckboxesAndConfirm } from "./helpers"
 
-import server, { setLots, setSnapshot } from "./api"
+import { operator } from "common/__test__/data"
+
+import { setEntity } from "settings/__test__/api"
+
+import server from "./api"
 import {
-  deadlineLots,
+  // deadlineLots,
   emptyLots,
   emptySnapshot,
-  errorLots,
+  // errorLots,
   lots,
-  manyLots,
+  // manyLots,
   snapshot,
 } from "./data"
 
@@ -624,5 +630,357 @@ test("producer/trader: delete selected tofix lot", async () => {
   await screen.findByText("19")
 
   // no more tofix lots
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// OPERATOR TESTS
+//////////////////////////////////////////////////////////////////////////////////////////
+
+const TransactionsWithRouter = ({
+  entity,
+  status,
+}: {
+  entity: Entity
+  status: LotStatus
+}) => {
+  setEntity(entity)
+  return (
+    <TestRoot url={`/org/${entity.id}/transactions/${status}`}>
+      <Route
+        path={`/org/${entity.id}/transactions/:status/*`}
+        element={<Transactions />}
+      />
+    </TestRoot>
+  )
+}
+
+beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
+
+test("operator: duplicate draft lot", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={operator} />)
+
+  await waitWhileLoading()
+
+  // click on the duplicate action
+  const duplicate = await screen.findByTitle("Dupliquer le lot")
+  userEvent.click(duplicate)
+
+  // confirm the duplication
+  const title = await screen.findByText("Dupliquer lot")
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // number in snapshot was incremented
+  await screen.findByText("31")
+
+  // new line was added
+  await waitFor(() => expect(screen.getAllByText("Brouillon").length).toBe(3))
+  expect(screen.getAllByText("2020-01").length).toBe(2)
+  expect(screen.getAllByText("EMHV").length).toBe(2)
+  expect(screen.getAllByText("12 345").length).toBe(2)
+  expect(screen.getAllByText("Colza").length).toBe(2)
+  expect(screen.getAllByText("Producteur Test").length).toBe(2)
+  expect(screen.getAllByText("Test Production Site").length).toBe(2)
+  expect(screen.getAllByText("Test Delivery Site").length).toBe(2)
+  expect(screen.getAllByText("France, Test City").length).toBe(2)
+  expect(screen.getAllByText("France").length).toBe(4)
+})
+
+// DELETE DRAFT
+
+test("operator: delete draft lot", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={operator} />)
+
+  await waitWhileLoading()
+
+  // click on the send action
+  const send = await screen.findByTitle("Supprimer le lot")
+  userEvent.click(send)
+
+  // confirm the sending
+  const title = screen.getByText("Supprimer lot")
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of draft lots
+  await screen.findByText("29")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+test("operator: delete all draft lot", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={operator} />)
+
+  await waitWhileLoading()
+
+  const button = screen.getByText("Supprimer tout").closest("button")!
+
+  // wait for the lot to be loaded
+  await screen.findByText("DAETEST")
+
+  expect(button).not.toBeDisabled()
+
+  // click on the send all button
+  userEvent.click(button)
+
+  // confirm the sending
+  const title = await screen.findByText("Supprimer tous ces brouillons")
+  await waitWhileLoading()
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of draft lots
+  await screen.findByText("29")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+test("operator: delete selected draft lot", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={operator} />)
+
+  await waitWhileLoading()
+
+  // wait for the lot to be loaded
+  await screen.findByText("DAETEST")
+
+  // select the first lot
+  userEvent.click(screen.getByTitle("Sélectionner le lot"))
+
+  // click on the send selection button
+  userEvent.click(screen.getByText("Supprimer sélection"))
+
+  // confirm the sending
+  const title = screen.getByText("Supprimer lot")
+  await waitWhileLoading()
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of draft lots
+  await screen.findByText("29")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+// ACCEPT INBOX
+
+test("operator: accept inbox lot", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Inbox} entity={operator} />)
+
+  await waitWhileLoading()
+
+  // click on the send action
+  const send = await screen.findByTitle("Accepter le lot")
+  userEvent.click(send)
+
+  // confirm the sending
+  const title = screen.getByText("Accepter lot")
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of inbox lots
+  await screen.findByText("19")
+  // increased amount of accepted lots
+  screen.getByText("11")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+test("operator: accept inbox lot (sous réserve)", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Inbox} entity={operator} />)
+
+  await waitWhileLoading()
+
+  // click on the send action
+  const send = await screen.findByTitle("Accepter sous réserve")
+  userEvent.click(send)
+
+  // confirm the sending
+  const title = screen.getByText("Accepter lot")
+  userEvent.click(screen.getByLabelText("Les deux"))
+  userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "not ok")
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // lot status has changed
+  await screen.findByText("En correction")
+})
+
+test("operator: accept all inbox lots", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Inbox} entity={operator} />)
+
+  await waitWhileLoading()
+
+  const button = screen.getByText("Accepter tout").closest("button")!
+
+  // wait for the lot to be loaded
+  await screen.findByText("DAETEST")
+
+  expect(button).not.toBeDisabled()
+
+  // click on the send all button
+  userEvent.click(button)
+
+  await waitWhileLoading()
+
+  // confirm the sending
+  screen.getByText("Accepter tout", { selector: "h1" })
+  const okButton = await screen.findByText("Confirmer")
+  userEvent.click(okButton)
+
+  expect(okButton).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of draft lots
+  await screen.findByText("19")
+  // increased amount of received lots
+  screen.getByText("11")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+test("operator: accept selected inbox lots", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Inbox} entity={operator} />)
+
+  await waitWhileLoading()
+
+  // wait for the lot to be loaded
+  await screen.findByText("DAETEST")
+
+  // select the first lot
+  userEvent.click(screen.getByTitle("Sélectionner le lot"))
+
+  // click on the send selection button
+  userEvent.click(screen.getByText("Accepter sélection"))
+
+  // confirm the sending
+  const title = screen.getByText("Accepter lot")
+  await waitWhileLoading()
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of draft lots
+  await screen.findByText("19")
+  // increased amount of sent lots
+  screen.getByText("11")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+// REJECT INBOX
+
+test("operator: reject inbox lot", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Inbox} entity={operator} />)
+
+  await waitWhileLoading()
+
+  // click on the send action
+  const reject = await screen.findByTitle("Refuser le lot")
+  userEvent.click(reject)
+
+  // confirm the sending
+  const title = screen.getByText("Refuser lot")
+  userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "not ok")
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of inbox lots
+  await screen.findByText("19")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+test("operator: reject all inbox lots", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Inbox} entity={operator} />)
+
+  await waitWhileLoading()
+
+  const button = screen.getByText("Refuser tout").closest("button")!
+
+  // wait for the lot to be loaded
+  await screen.findByText("DAETEST")
+
+  expect(button).not.toBeDisabled()
+
+  // click on the reject all button
+  userEvent.click(button)
+
+  // confirm the sending
+  const okButton = await screen.findByText("Confirmer")
+  userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "not ok")
+  userEvent.click(okButton)
+
+  expect(okButton).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of draft lots
+  await screen.findByText("19")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+test("operator: reject selected inbox lots", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Inbox} entity={operator} />)
+
+  await waitWhileLoading()
+
+  // wait for the lot to be loaded
+  await screen.findByText("DAETEST")
+
+  // select the first lot
+  userEvent.click(screen.getByTitle("Sélectionner le lot"))
+
+  // click on the send selection button
+  userEvent.click(screen.getByText("Refuser sélection"))
+
+  // confirm the sending
+  const title = await screen.findByText("Refuser lot")
+  userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "not ok")
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of draft lots
+  await screen.findByText("19")
+
+  // no more drafts
   await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
