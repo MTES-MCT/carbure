@@ -111,18 +111,20 @@ class CarbureStockCSVSerializer(serializers.ModelSerializer):
     production_country = serializers.SerializerMethodField()
     supplier = serializers.SerializerMethodField()
     delivery_date = serializers.SerializerMethodField()
-    country_of_origin = serializers.SerializerMethodField()
-    biofuel = serializers.SerializerMethodField()
+    depot = serializers.SerializerMethodField()
+    depot_name = serializers.SerializerMethodField()
     feedstock = serializers.SerializerMethodField()
+    biofuel = serializers.SerializerMethodField()
+    country_of_origin = serializers.SerializerMethodField()
 
     class Meta:
         model = CarbureStock
         fields = ['carbure_id',
                   'production_site', 'production_country',
-                  'supplier', 'delivery_date', 'depot',
-                  'remaining_volume', 'remaining_weight', 'remaining_lhv_amount',
+                  'supplier', 'delivery_date', 'depot', 'depot_name',
+                  'remaining_volume', 'remaining_weight',
                   'feedstock', 'biofuel', 'country_of_origin',
-                  'ghg_reduction', 'ghg_reduction_red_ii',
+                  'ghg_reduction_red_ii',
                   ]
 
     def get_production_site(self, obj):
@@ -134,18 +136,15 @@ class CarbureStockCSVSerializer(serializers.ModelSerializer):
     def get_supplier(self, obj):
         return obj.carbure_supplier.name if obj.carbure_supplier else obj.unknown_supplier
 
-    def get_client(self, obj):
-        return obj.carbure_client.name if obj.carbure_client else obj.unknown_client
-
     def get_delivery_date(self, obj):
         date = obj.get_delivery_date()
         return date.strftime('%d/%m/%Y') if date else ''
 
-    def get_delivery_site(self, obj):
-        return obj.carbure_delivery_site.depot_id if obj.carbure_delivery_site else obj.unknown_delivery_site
+    def get_depot(self, obj):
+        return obj.depot.depot_id if obj.depot else ''
 
-    def get_delivery_site_country(self, obj):
-        return obj.delivery_site_country.code_pays if obj.delivery_site_country else ''
+    def get_depot_name(self, obj):
+        return obj.depot.name if obj.depot else ''
 
     def get_feedstock(self, obj):
         return obj.feedstock.code if obj.feedstock else ''
