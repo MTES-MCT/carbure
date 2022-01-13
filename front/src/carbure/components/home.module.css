@@ -24,7 +24,7 @@
   padding: 32px;
 }
 
-a.homeButton {
+button.homeButton {
   font-size: 1.4em;
   line-height: normal;
   padding: 12px 24px;

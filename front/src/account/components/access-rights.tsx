@@ -25,6 +25,8 @@ import Autocomplete from "common-v2/components/autocomplete"
 import { RadioGroup } from "common-v2/components/radio"
 import Tag, { TagVariant } from "common-v2/components/tag"
 import Form from "common-v2/components/form"
+import { useMatomo } from "matomo"
+import { useNotify } from "common-v2/components/notifications"
 
 export const AccountAccesRights = () => {
   const { t } = useTranslation()
@@ -150,12 +152,18 @@ export interface EntityDialogProps {
 
 export const EntityDialog = ({ onClose }: EntityDialogProps) => {
   const { t } = useTranslation()
+  const matomo = useMatomo()
+  const notify = useNotify()
 
   const [entity, setEntity] = useState<Entity | undefined>(undefined)
   const [role, setRole] = useState<UserRole | undefined>(UserRole.ReadOnly)
 
   const requestAccess = useMutation(api.requestAccess, {
     invalidates: ["user-settings"],
+    onSuccess: () =>
+      notify(t("La société a été ajoutée !"), { variant: "success" }),
+    onError: () =>
+      notify(t("La société n'a pas pu être ajoutée !"), { variant: "success" }),
   })
 
   return (
@@ -170,7 +178,14 @@ export const EntityDialog = ({ onClose }: EntityDialogProps) => {
           )}
         </section>
         <section>
-          <Form>
+          <Form
+            id="access-right"
+            onSubmit={async () => {
+              matomo.push(["trackEvent", "account", "add-access-right"])
+              await requestAccess.execute(entity!.id, role!)
+              setEntity(undefined)
+            }}
+          >
             <Autocomplete
               label={t("Organisation")}
               placeholder={t("Rechercher une société...")}
@@ -220,9 +235,9 @@ export const EntityDialog = ({ onClose }: EntityDialogProps) => {
           icon={Plus}
           label={t("Demander l'accès")}
           disabled={!entity || !role}
-          action={() => requestAccess.execute(entity!.id, role!)}
+          submit="access-right"
         />
-        <Button icon={Return} action={onClose} label={t("Retour")} />
+        <Button asideX icon={Return} action={onClose} label={t("Retour")} />
       </footer>
     </Dialog>
   )

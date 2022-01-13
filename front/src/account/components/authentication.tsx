@@ -16,6 +16,7 @@ export const AccountAuthentication = () => {
           <Trans>Identifiants</Trans>
         </h1>
         <Button
+          asideX
           disabled
           variant="primary"
           icon={Edit}

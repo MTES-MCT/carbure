@@ -3,6 +3,8 @@ import { Link, Route, Routes, useLocation, useNavigate } from "react-router-dom"
 import { Trans, useTranslation } from "react-i18next"
 import useEntity, { EntityManager } from "carbure/hooks/entity"
 import { UserManager, useUser } from "carbure/hooks/user"
+import useLocalStorage from "common-v2/hooks/storage"
+import { useMatomo } from "matomo"
 import Menu from "common-v2/components/menu"
 import { Anchors } from "common-v2/components/dropdown"
 import { Header } from "common-v2/components/scaffold"
@@ -13,8 +15,6 @@ import { ChevronRight, Question } from "common-v2/components/icons"
 import republique from "../assets/images/republique.svg"
 import marianne from "../assets/images/Marianne.svg"
 import css from "./top-bar.module.css"
-import useLocalStorage from "common-v2/hooks/storage"
-import { useMatomo } from "matomo"
 
 const Topbar = () => {
   const entity = useEntity()

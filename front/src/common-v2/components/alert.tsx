@@ -11,6 +11,8 @@ export interface AlertProps {
   icon?: React.FunctionComponent | React.ReactNode
   label?: string
   children?: React.ReactNode | CustomRenderer
+  style?: React.CSSProperties
+  className?: string
 }
 
 export const Alert = ({
@@ -19,6 +21,8 @@ export const Alert = ({
   icon: Icon,
   label,
   children,
+  className,
+  style,
 }: AlertProps) => {
   const [open, setOpen] = useState(true)
 
@@ -33,7 +37,13 @@ export const Alert = ({
 
   return (
     <div
-      className={cl(css.alert, loading && css.loading, variant && css[variant])}
+      style={style}
+      className={cl(
+        css.alert,
+        className,
+        loading && css.loading,
+        variant && css[variant]
+      )}
     >
       {loading ? <Loader /> : icon}
       {label ?? child}
