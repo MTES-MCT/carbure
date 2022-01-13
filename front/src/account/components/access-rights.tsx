@@ -1,66 +1,40 @@
 import { useState } from "react"
+import { Trans, useTranslation } from "react-i18next"
 import {
   Entity,
   EntityType,
   UserRightRequest,
   UserRightStatus,
   UserRole,
-} from "common/types"
-import colStyles from "common/components/table.module.css"
-import pendingStyles from "carbure/components/pending.module.css"
-import { LoaderOverlay, Title } from "common/components"
-import { Button } from "common/components/button"
-import { AlertTriangle, Cross, Plus } from "common-v2/components/icons"
-import { formatDate, SettingsForm } from "settings/components/common"
-import { LabelAutoComplete } from "common/components/autocomplete"
-import { Alert } from "common/components/alert"
-import Table, {
-  Actions,
-  Column,
-  Line,
-  Row,
-  padding,
-} from "common/components/table"
-import { Section, SectionBody, SectionHeader } from "common/components/section"
-import {
-  confirm,
-  Dialog,
-  DialogButtons,
-  DialogText,
-  DialogTitle,
-  prompt,
-  PromptProps,
-} from "common/components/dialog"
-import { Label } from "common/components/input"
-import RadioGroup from "common/components/radio-group"
+} from "carbure/types"
+import { useUser } from "carbure/hooks/user"
+
 import * as api from "../api"
-import * as common from "common/api"
-import useAPI from "common/hooks/use-api"
-import { Trans, useTranslation } from "react-i18next"
-import { reloadUserSettings, useUserContext } from "carbure/hooks/user"
-import Badge, { Variant } from "common/components/badge"
+import * as common from "common-v2/api"
+import { useMutation } from "common-v2/hooks/async"
+import { usePortal } from "common-v2/components/portal"
+import { formatDate } from "common-v2/utils/formatters"
+import { normalizeEntity } from "common-v2/utils/normalizers"
+import { Button, ExternalLink } from "common-v2/components/button"
+import { LoaderOverlay, Panel } from "common-v2/components/scaffold"
+import { Alert } from "common-v2/components/alert"
+import { AlertTriangle, Cross, Plus, Return } from "common-v2/components/icons"
+import Table, { actionColumn, Cell } from "common-v2/components/table"
+import Dialog, { Confirm } from "common-v2/components/dialog"
+import Autocomplete from "common-v2/components/autocomplete"
+import { RadioGroup } from "common-v2/components/radio"
+import Tag, { TagVariant } from "common-v2/components/tag"
+import Form from "common-v2/components/form"
 
 export const AccountAccesRights = () => {
   const { t } = useTranslation()
+  const portal = usePortal()
 
-  const user = useUserContext()
+  const user = useUser()
 
-  const [revoking, revokeMyself] = useAPI(api.revokeMyself)
-  const [requesting, resolveAccess] = useAPI(api.requestAccess)
-
-  async function askEntityAccess() {
-    const res = await prompt<AccessRequest>((resolve) => (
-      <EntityPrompt onResolve={resolve} />
-    ))
-
-    if (res) {
-      const { entity, role } = res
-      await resolveAccess(entity.id, "", role)
-      reloadUserSettings()
-    }
-  }
-
-  const loading = user.loading || requesting.loading || revoking.loading
+  const revokeMyself = useMutation(api.revokeMyself, {
+    invalidates: ["user-settings"],
+  })
 
   const entityTypes = {
     [EntityType.Administration]: t("Administration"),
@@ -78,83 +52,90 @@ export const AccountAccesRights = () => {
     [UserRole.Auditor]: t("Audit"),
   }
 
-  const columns: Column<UserRightRequest>[] = [
-    padding,
-    statusColumn,
-    {
-      header: t("Organisation"),
-      render: (r) => <Line text={r.entity.name} />,
-    },
-    {
-      header: t("Type"),
-      render: (r) => <Line text={entityTypes[r.entity.entity_type]} />,
-    },
-    {
-      header: t("Droits"),
-      render: (r) => <Line text={roleLabels[r.role]} />,
-    },
-    {
-      header: t("Date"),
-      render: (r) => {
-        const dateRequested = formatDate(r.date_requested)
-        const dateExpired = r.expiration_date ? formatDate(r.expiration_date) : null // prettier-ignore
-
-        return dateExpired
-          ? t(`{{dateRequested}} (expire le {{dateExpired}})`, { dateRequested, dateExpired }) // prettier-ignore
-          : dateRequested
-      },
-    },
-    padding,
-  ]
-
-  const actions = Actions<UserRightRequest>([
-    {
-      title: t("Annuler"),
-      icon: Cross,
-      action: async (r) => {
-        const shouldRevoke = await confirm(
-          t("Annuler mes accès"),
-          t(`Voulez vous annuler votre accès à {{entity}} ?`, { entity: r.entity.name }) // prettier-ignore
-        )
-
-        if (shouldRevoke) {
-          await revokeMyself(r.entity.id)
-          reloadUserSettings()
-        }
-      },
-    },
-  ])
-
-  const rows: Row<UserRightRequest>[] = user.requests.map((r) => ({ value: r }))
+  const loading = user.loading || revokeMyself.loading
 
   return (
-    <Section>
-      <SectionHeader>
-        <Title>
+    <Panel>
+      <header>
+        <h1>
           <Trans>Demandes d'accès aux sociétés</Trans>
-        </Title>
-        <Button level="primary" icon={Plus} onClick={askEntityAccess}>
-          <Trans>Ajouter une organisation</Trans>
-        </Button>
-      </SectionHeader>
+        </h1>
+        <Button
+          asideX
+          variant="primary"
+          icon={Plus}
+          label={t("Ajouter une organisation")}
+          action={() => portal((close) => <EntityDialog onClose={close} />)}
+        />
+      </header>
 
       {user.requests.length === 0 && (
-        <SectionBody>
-          <Alert level="warning" icon={AlertTriangle}>
+        <section style={{ paddingBottom: "var(--spacing-l)" }}>
+          <Alert variant="warning" icon={AlertTriangle}>
             <Trans>
               Aucune autorisation pour ce compte, ajoutez une organisation pour
               continuer.
             </Trans>
           </Alert>
-        </SectionBody>
+        </section>
       )}
 
       {user.requests.length > 0 && (
-        <Table columns={[...columns, actions]} rows={rows} />
+        <Table
+          rows={user.requests}
+          columns={[
+            {
+              small: true,
+              header: "Statut",
+              cell: (r: UserRightRequest) => <RightStatus status={r.status} />,
+            },
+            {
+              header: t("Organisation"),
+              cell: (r) => <Cell text={r.entity.name} />,
+            },
+            {
+              header: t("Type"),
+              cell: (r) => <Cell text={entityTypes[r.entity.entity_type]} />,
+            },
+            {
+              header: t("Droits"),
+              cell: (r) => <Cell text={roleLabels[r.role]} />,
+            },
+            {
+              header: t("Date"),
+              cell: (r) => {
+                const dateRequested = formatDate(r.date_requested)
+                const dateExpired = r.expiration_date ? formatDate(r.expiration_date) : null // prettier-ignore
+                return dateExpired
+                  ? t(`{{dateRequested}} (expire le {{dateExpired}})`, { dateRequested, dateExpired }) // prettier-ignore
+                  : dateRequested
+              },
+            },
+            actionColumn<UserRightRequest>((right) => [
+              <Button
+                variant="icon"
+                icon={Cross}
+                title={t("Annuler")}
+                action={() =>
+                  portal((close) => (
+                    <Confirm
+                      variant="danger"
+                      title={t("Annuler mes accès")}
+                      description={t(`Voulez vous annuler votre accès à {{entity}} ?`, { entity: right.entity.name })} // prettier-ignore
+                      confirm={t("Révoquer")}
+                      onConfirm={() => revokeMyself.execute(right.entity.id)}
+                      onClose={close}
+                    />
+                  ))
+                }
+              />,
+            ]),
+          ]}
+        />
       )}
 
       {loading && <LoaderOverlay />}
-    </Section>
+    </Panel>
   )
 }
 
@@ -163,75 +144,99 @@ export type AccessRequest = {
   role: UserRole
 }
 
-export const EntityPrompt = ({ onResolve }: PromptProps<AccessRequest>) => {
+export interface EntityDialogProps {
+  onClose: () => void
+}
+
+export const EntityDialog = ({ onClose }: EntityDialogProps) => {
   const { t } = useTranslation()
 
-  const [entity, setEntity] = useState<Entity | null>(null)
-  const [role, setRole] = useState<UserRole>(UserRole.ReadOnly)
+  const [entity, setEntity] = useState<Entity | undefined>(undefined)
+  const [role, setRole] = useState<UserRole | undefined>(UserRole.ReadOnly)
 
-  const roleDetails = {
-    [UserRole.ReadOnly]: t("Lecture seule (consultation des lots uniquement)"),
-    [UserRole.ReadWrite]: t("Lecture/écriture (création et gestion des lots)"),
-    [UserRole.Admin]: t("Administration (contrôle complet de la société sur CarbuRe)"), // prettier-ignore
-    [UserRole.Auditor]: t("Audit (accès spécial pour auditeurs)"),
-  }
+  const requestAccess = useMutation(api.requestAccess, {
+    invalidates: ["user-settings"],
+  })
 
   return (
-    <Dialog onResolve={onResolve}>
-      <SettingsForm>
-        <DialogTitle text={t("Ajout organisation")} />
-        <DialogText
-          text={t("Recherchez la société qui vous emploie pour pouvoir accéder à ses données.")} // prettier-ignore
+    <Dialog onClose={onClose}>
+      <header>
+        <h1>{t("Ajout organisation")}</h1>
+      </header>
+      <main>
+        <section>
+          {t(
+            "Recherchez la société qui vous emploie pour pouvoir accéder à ses données."
+          )}
+        </section>
+        <section>
+          <Form>
+            <Autocomplete
+              label={t("Organisation")}
+              placeholder={t("Rechercher une société...")}
+              name="entity"
+              value={entity}
+              getOptions={common.findEntities}
+              onChange={setEntity}
+              normalize={normalizeEntity}
+            />
+
+            <RadioGroup
+              label={t("Rôle")}
+              name="role"
+              value={role}
+              onChange={setRole}
+              options={[
+                {
+                  value: UserRole.ReadOnly,
+                  label: t("Lecture seule (consultation des lots uniquement)"),
+                },
+                {
+                  value: UserRole.ReadWrite,
+                  label: t("Lecture/écriture (création et gestion des lots)"),
+                },
+                {
+                  value: UserRole.Admin,
+                  label: t("Administration (contrôle complet de la société sur CarbuRe)"), // prettier-ignore
+                },
+                {
+                  value: UserRole.Auditor,
+                  label: t("Audit (accès spécial pour auditeurs)"),
+                },
+              ]}
+            />
+          </Form>
+        </section>
+        <section>
+          <ExternalLink href="mailto:carbure@beta.gouv.fr">
+            <Trans>Ma société n'est pas enregistrée sur CarbuRe.</Trans>
+          </ExternalLink>
+        </section>
+      </main>
+      <footer>
+        <Button
+          variant="primary"
+          loading={requestAccess.loading}
+          icon={Plus}
+          label={t("Demander l'accès")}
+          disabled={!entity || !role}
+          action={() => requestAccess.execute(entity!.id, role!)}
         />
-        <LabelAutoComplete
-          label={t("Organisation")}
-          placeholder={t("Rechercher une société...")}
-          name="entity"
-          value={entity}
-          getQuery={common.findEntities}
-          onChange={(e: any) => setEntity(e.target.value)}
-          getValue={(e) => `${e.id}`}
-          getLabel={(e) => e.name}
-        />
-        <Label label={t("Rôle")}>
-          <RadioGroup
-            name="role"
-            options={Object.entries(roleDetails).map(([v, l]) => ({
-              value: v,
-              label: l,
-            }))}
-            value={role}
-            onChange={(e) => setRole(e.target.value as UserRole)}
-          />
-        </Label>
-        <a
-          href="mailto:carbure@beta.gouv.fr"
-          target="_blank"
-          rel="noreferrer"
-          className={pendingStyles.link}
-        >
-          <Trans>Ma société n'est pas enregistrée sur CarbuRe.</Trans>
-        </a>
-        <DialogButtons>
-          <Button
-            level="primary"
-            icon={Plus}
-            disabled={!entity}
-            onClick={() => entity && onResolve({ entity, role })}
-          >
-            <Trans>Demander l'accès</Trans>
-          </Button>
-          <Button onClick={() => onResolve()}>
-            <Trans>Annuler</Trans>
-          </Button>
-        </DialogButtons>
-      </SettingsForm>
+        <Button icon={Return} action={onClose} label={t("Retour")} />
+      </footer>
     </Dialog>
   )
 }
 
 export const RightStatus = ({ status }: { status: UserRightStatus }) => {
   const { t } = useTranslation()
+
+  const statusVariant: Record<UserRightStatus, TagVariant> = {
+    [UserRightStatus.Accepted]: "success",
+    [UserRightStatus.Pending]: "info",
+    [UserRightStatus.Rejected]: "danger",
+    [UserRightStatus.Revoked]: "warning",
+  }
 
   const statusLabels = {
     [UserRightStatus.Pending]: t("En attente"),
@@ -240,18 +245,5 @@ export const RightStatus = ({ status }: { status: UserRightStatus }) => {
     [UserRightStatus.Revoked]: t("Révoqué"),
   }
 
-  const statusVariant: Record<UserRightStatus, Variant> = {
-    [UserRightStatus.Accepted]: "success",
-    [UserRightStatus.Pending]: "info",
-    [UserRightStatus.Rejected]: "danger",
-    [UserRightStatus.Revoked]: "warning",
-  }
-
-  return <Badge variant={statusVariant[status]}>{statusLabels[status]}</Badge>
-}
-
-export const statusColumn = {
-  header: "Statut",
-  className: colStyles.narrowColumn,
-  render: (r: UserRightRequest) => <RightStatus status={r.status} />,
+  return <Tag variant={statusVariant[status]} label={statusLabels[status]} />
 }

@@ -1,4 +1,4 @@
-import { statusColumn } from "account/components/access-rights"
+import { RightStatus } from "account/components/access-rights"
 import { Title } from "common/components"
 import { Alert } from "common/components/alert"
 import { confirm } from "common/components/dialog"
@@ -12,6 +12,7 @@ import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import { formatDate } from "settings/components/common"
 import * as api from "../api"
+import colStyles from "common/components/table.module.css"
 import styles from "./user-rights.module.css"
 
 const ROLE_LABELS = {
@@ -30,7 +31,11 @@ const RIGHTS_ORDER = {
 
 const RIGHTS_COLUMNS: Column<UserRightRequest>[] = [
   padding,
-  statusColumn,
+  {
+    header: "Statut",
+    className: colStyles.narrowColumn,
+    render: (r: UserRightRequest) => <RightStatus status={r.status} />,
+  },
   {
     header: "Utilisateur",
     render: (r) => r.user[0] ?? "",

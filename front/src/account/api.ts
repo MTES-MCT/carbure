@@ -3,8 +3,8 @@ import { UserRole } from "common/types"
 
 export function requestAccess(
   entity_id: number,
-  comment: string,
-  role: UserRole
+  role: UserRole,
+  comment: string = ""
 ) {
   return api.post("/settings/request-entity-access", {
     entity_id,

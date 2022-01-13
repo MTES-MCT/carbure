@@ -33,3 +33,9 @@ export const Data = {
     sessionStorage.setItem(key, json)
   },
 }
+
+export function getField(label: any) {
+  const field = screen.getByText(label).parentElement?.querySelector("input")
+  if (!field) throw new Error(`Cannot find field with label like ${label}`)
+  return field
+}
