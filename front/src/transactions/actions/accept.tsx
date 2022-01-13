@@ -369,7 +369,7 @@ const TradingDialog = ({
             value={client}
             onChange={setClient}
             getOptions={findEntities}
-            normalize={norm.normalizeEntity}
+            normalize={norm.normalizeEntityOrUnknown}
             create={norm.identity}
           />
           <Autocomplete

@@ -47,7 +47,7 @@ export const SupplierField = (props: AutocompleteProps<Entity | string>) => {
       create={norm.identity}
       defaultOptions={supplier ? [supplier] : [entity]}
       getOptions={async () => [entity]}
-      normalize={norm.normalizeEntity}
+      normalize={norm.normalizeEntityOrUnknown}
       {...bound}
       {...props}
     />
@@ -129,7 +129,7 @@ export const ClientField = (props: AutocompleteProps<Entity | string>) => {
       create={norm.identity}
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={api.findEntities}
-      normalize={norm.normalizeEntity}
+      normalize={norm.normalizeEntityOrUnknown}
       {...bound}
       {...props}
     />

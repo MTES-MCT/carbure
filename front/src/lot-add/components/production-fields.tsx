@@ -64,7 +64,7 @@ export const ProducerField = (props: AutocompleteProps<Entity | string>) => {
       icon={isKnown ? UserCheck : undefined}
       create={norm.identity}
       defaultOptions={value ? [value] : [entity]}
-      normalize={norm.normalizeEntity}
+      normalize={norm.normalizeEntityOrUnknown}
       {...bound}
       {...props}
     />

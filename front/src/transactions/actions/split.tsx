@@ -89,7 +89,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
             <Autocomplete
               label={t("Client")}
               getOptions={findEntities}
-              normalize={norm.normalizeEntity}
+              normalize={norm.normalizeEntityOrUnknown}
               create={norm.identity}
               {...bind("client")}
             />

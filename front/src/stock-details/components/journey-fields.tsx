@@ -74,7 +74,7 @@ export const SupplierField = (props: AutocompleteProps<Entity | string>) => {
       label={t("Fournisseur")}
       icon={isKnown ? UserCheck : undefined}
       defaultOptions={bound.value ? [bound.value] : undefined}
-      normalize={norm.normalizeEntity}
+      normalize={norm.normalizeEntityOrUnknown}
       {...bound}
       {...props}
     />
@@ -93,7 +93,7 @@ export const ClientField = (props: AutocompleteProps<Entity | string>) => {
       label={t("Client")}
       icon={isKnown ? UserCheck : undefined}
       defaultOptions={bound.value ? [bound.value] : undefined}
-      normalize={norm.normalizeEntity}
+      normalize={norm.normalizeEntityOrUnknown}
       {...bound}
       {...props}
     />
