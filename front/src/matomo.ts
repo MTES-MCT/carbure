@@ -15,12 +15,18 @@ export const useMatomo = () => useContext(MatomoContext)()
 export const MatomoProvider = (props: any) => {
   const location = useLocation()
 
-  const value = () => window._paq ?? []
+  const value = () => {
+    const matomo = window._paq ?? []
+    const push = (args: [string, ...any[]]) => {
+      // only track production
+      if (window.location.hostname === "carbure.beta.gouv.fr") {
+        matomo.push(args)
+      }
+    }
+    return { push } as Matomo
+  }
 
   useLayoutEffect(() => {
-    // only track production
-    if (window.location.hostname !== "carbure.beta.gouv.fr") return
-
     const matomo = value()
     matomo.push(["setCustomUrl", window.location.href])
     matomo.push(["trackPageView"])
