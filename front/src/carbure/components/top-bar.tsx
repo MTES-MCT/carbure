@@ -2,7 +2,7 @@ import { useEffect } from "react"
 import { Link, Route, Routes, useLocation, useNavigate } from "react-router-dom"
 import { Trans, useTranslation } from "react-i18next"
 import useEntity, { EntityManager } from "carbure/hooks/entity"
-import { UserManager, useUserContext } from "carbure/hooks/user"
+import { UserManager, useUser } from "carbure/hooks/user"
 import Menu from "common-v2/components/menu"
 import { Anchors } from "common-v2/components/dropdown"
 import { Header } from "common-v2/components/scaffold"
@@ -18,7 +18,7 @@ import { useMatomo } from "matomo"
 
 const Topbar = () => {
   const entity = useEntity()
-  const user = useUserContext()
+  const user = useUser()
 
   if (!user.isAuthenticated()) {
     return <PublicTopbar />

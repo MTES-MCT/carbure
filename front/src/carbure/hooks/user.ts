@@ -17,7 +17,7 @@ export interface UserManager {
   getFirstEntity: () => Entity | null
 }
 
-export function useUser(): UserManager {
+export function useLoadUser(): UserManager {
   const settings = useQuery(api.getUserSettings, {
     key: "user-settings",
     params: [],
@@ -64,7 +64,7 @@ export function useUser(): UserManager {
 
 export const UserContext = createContext<UserManager | undefined>(undefined)
 
-export function useUserContext() {
+export function useUser() {
   const user = useContext(UserContext)
   if (user === undefined) throw new Error("User context is not defined")
   return user
@@ -74,4 +74,4 @@ export function reloadUserSettings() {
   invalidate("user-settings")
 }
 
-export default useUser
+export default useLoadUser

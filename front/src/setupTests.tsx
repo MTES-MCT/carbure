@@ -13,7 +13,7 @@ import fields from "../public/locales/fr/fields.json"
 import feedstocks from "../public/locales/fr/feedstocks.json"
 import biofuels from "../public/locales/fr/biofuels.json"
 import countries from "../public/locales/fr/countries.json"
-import useUser, { UserContext, UserManager } from "carbure/hooks/user"
+import useLoadUser, { UserContext, UserManager } from "carbure/hooks/user"
 
 configure({
   getElementError(message) {
@@ -75,7 +75,7 @@ type TestRootProps = {
 }
 
 export const TestRoot = ({ url, children }: TestRootProps) => {
-  const user = useUser()
+  const user = useLoadUser()
   const element = typeof children === "function" ? children(user) : children
 
   return (
