@@ -5,7 +5,7 @@ import useAPI from "common/hooks/use-api"
 import useClose from "common/hooks/use-close"
 
 import { Main, Title } from "common/components"
-import { Return } from "common/components/icons"
+import { Return } from "common-v2/components/icons"
 import Sticky from "common/components/sticky"
 import { Button } from "common/components/button"
 import { SettingsBody, SettingsHeader } from "settings/components/common"

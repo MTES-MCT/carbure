@@ -6,7 +6,7 @@ import styles from "./autocomplete.module.css"
 import useAPI from "../hooks/use-api"
 import { Input, InputProps, Label, LabelProps } from "./input"
 import { DropdownItem, DropdownOptions, useDropdown } from "./dropdown"
-import { Cross } from "./icons"
+import { Cross } from "common-v2/components/icons"
 
 const rawGetLabel = (v: any) => `${v}`
 const rawGetValue = (v: any) => `${v}`
@@ -55,8 +55,8 @@ function useAutoComplete<T>(
 
     if (queryLabel.length === 0) {
       onChange({ target: { name, value: null } })
-    } 
-    
+    }
+
     if (queryLabel.length < minLength) {
       dd.toggle(false)
     } else {

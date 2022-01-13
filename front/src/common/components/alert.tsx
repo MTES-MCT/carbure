@@ -2,8 +2,8 @@ import React, { useState } from "react"
 import cl from "clsx"
 
 import styles from "./alert.module.css"
-import { Box, SystemProps, Title } from "./index"
-import { ChevronDown, Loader } from "./icons"
+import { SystemProps } from "./index"
+import { Loader } from "common-v2/components/icons"
 import { Trans } from "react-i18next"
 
 export const AlertLink = ({
@@ -95,40 +95,6 @@ export const AlertFilter = ({
       >
         <Trans>Masquer ce message</Trans>
       </span>
-    </Alert>
-  )
-}
-
-type CollapsibleProps = AlertProps & {
-  title: string
-  open?: boolean
-}
-
-export const Collapsible = ({
-  title,
-  icon: CollapsibleIcon,
-  children,
-  className,
-  open = false,
-  ...props
-}: CollapsibleProps) => {
-  const [collasped, setCollapsed] = useState(!open)
-
-  return (
-    <Alert {...props} className={cl(styles.collapsibleAlert, className)}>
-      <Box
-        row
-        onClick={() => setCollapsed(!collasped)}
-        className={styles.collapsibleBar}
-      >
-        {CollapsibleIcon && <CollapsibleIcon />}
-        <Title className={styles.collapsibleTitle}>{title}</Title>
-        <ChevronDown className={styles.collapsibleArrow} />
-      </Box>
-
-      {!collasped && (
-        <Box className={styles.collapsibleDetails}>{children}</Box>
-      )}
     </Alert>
   )
 }

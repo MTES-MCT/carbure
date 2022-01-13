@@ -8,7 +8,7 @@ import logoFabNum from "../assets/images/logo-fabriquenumerique.svg"
 import logoBetaGouv from "../assets/images/betagouvfr.svg"
 import logoFranceRelance from "../assets/images/france-relance.png"
 import logoEuropeanUnion from "../assets/images/union-europeenne.png"
-import { ExternalLink, LinkedIn, Slack } from "common/components/icons"
+import { ExternalLink, LinkedIn, Slack } from "common-v2/components/icons"
 
 const Footer = () => {
   useTranslation()

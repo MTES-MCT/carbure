@@ -2,7 +2,7 @@ import styles from "./pending.module.css"
 import { Link, Navigate } from "react-router-dom"
 import { Box, LoaderOverlay, Main, Title } from "common/components"
 import { Alert } from "common/components/alert"
-import { AlertTriangle, Question } from "common/components/icons"
+import { AlertTriangle, Question } from "common-v2/components/icons"
 import { Trans } from "react-i18next"
 import { useUserContext } from "carbure/hooks/user"
 

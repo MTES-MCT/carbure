@@ -2,7 +2,7 @@ import React from "react"
 import cl from "clsx"
 import { NavLink, NavLinkProps } from "react-router-dom"
 import styles from "./button.module.css"
-import { Loader } from "./icons"
+import { Loader } from "common-v2/components/icons"
 import { SystemProps, AsProp } from "./index"
 
 // BUTTON COMPONENT
@@ -63,45 +63,17 @@ export const AsyncButton = ({
   />
 )
 
-// STATUS BUTTON COMPONENT
-type StatusButtonProps = ButtonProps & {
-  active: boolean
-  loading: boolean
-  amount: number
-  label: string
-}
-
-export const StatusButton = ({
-  active,
-  loading,
-  amount,
-  label,
-  className,
-  ...props
-}: StatusButtonProps) => (
-  <Button
-    {...props}
-    className={cl(
-      styles.statusButton,
-      active && styles.activeStatusButton,
-      className
-    )}
-  >
-    <span className={styles.statusButtonAmount}>
-      {loading ? <Loader /> : amount}
-    </span>
-    <span className={styles.statusButtonLabel}>{label}</span>
-  </Button>
-)
-
-export const TabButton = ({
-  children,
-  className,
-  ...props
-}: NavLinkProps) => (
+export const TabButton = ({ children, className, ...props }: NavLinkProps) => (
   <NavLink
     {...props}
-    className={({ isActive }) => cl(styles.button, styles.statusButton, isActive && styles.activeStatusButton, className)}
+    className={({ isActive }) =>
+      cl(
+        styles.button,
+        styles.statusButton,
+        isActive && styles.activeStatusButton,
+        className
+      )
+    }
   >
     <span className={styles.statusButtonLabel}>{children}</span>
   </NavLink>

@@ -1,7 +1,13 @@
 import React, { useEffect, useRef, useState } from "react"
 import cl from "clsx"
 import Button from "./button"
-import { AlertTriangle, Cross, Loader, Search, Placeholder } from "./icons"
+import {
+  AlertTriangle,
+  Cross,
+  Loader,
+  Search,
+  Placeholder,
+} from "common-v2/components/icons"
 import { Col, layout, Layout, Overlay } from "./scaffold"
 import { isInside } from "./dropdown"
 import css from "./input.module.css"

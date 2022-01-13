@@ -15,7 +15,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Cross,
-} from "common/components/icons"
+} from "common-v2/components/icons"
 import { confirm } from "common/components/dialog"
 import { Button } from "common/components/button"
 import usePeriod, {

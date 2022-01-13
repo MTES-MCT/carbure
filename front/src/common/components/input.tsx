@@ -1,7 +1,12 @@
 import React, { useRef } from "react"
 import cl from "clsx"
 import styles from "./input.module.css"
-import { AlertTriangle, Check, IconProps, Upload } from "./icons"
+import {
+  AlertTriangle,
+  Check,
+  IconProps,
+  Upload,
+} from "common-v2/components/icons"
 import { Box, SystemProps } from "./index"
 import { AsyncButton, AsyncButtonProps } from "./button"
 import { FormChangeHandler } from "common/hooks/use-form"
@@ -102,31 +107,6 @@ export const LabelInput = ({
   </Label>
 )
 
-// TEXT AREA COMPONENT
-export type LabelTextAreaProps = SystemProps &
-  React.HTMLProps<HTMLTextAreaElement> & {
-    label?: string
-    error?: string
-  }
-
-export const LabelTextArea = ({
-  label,
-  className,
-  ...props
-}: LabelTextAreaProps) => (
-  <Label
-    label={label}
-    readOnly={props.readOnly}
-    className={cl(styles.labelTextArea, className)}
-  >
-    <textarea
-      {...props}
-      className={styles.textarea}
-      placeholder={props.readOnly ? "N/A" : props.placeholder}
-    />
-  </Label>
-)
-
 // CHECKBOX COMPONENT
 
 type CheckboxProps = Omit<React.HTMLProps<HTMLDivElement>, "onChange"> & {
@@ -213,10 +193,6 @@ export const LabelCheckbox = ({
     </label>
   )
 }
-
-export const Placeholder = (props: SystemProps) => (
-  <div {...props} className={cl(styles.inputPlaceholder, props.className)} />
-)
 
 type FileInputProps = Omit<AsyncButtonProps, "value" | "onChange"> & {
   placeholder?: string

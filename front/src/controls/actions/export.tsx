@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { Download } from "common/components/icons"
+import { Download } from "common-v2/components/icons"
 import Button from "common-v2/components/button"
 import { LotQuery } from "transactions/types"
 import * as api from "../api"

@@ -15,7 +15,7 @@ import {
 } from "common/components/dialog"
 import * as api from "../api"
 import { Button } from "common/components/button"
-import { Return } from "common/components/icons"
+import { Return } from "common-v2/components/icons"
 import { QuotaOverview, QuotaDetails } from "../types"
 import { formatNumber } from "common-v2/utils/formatters"
 

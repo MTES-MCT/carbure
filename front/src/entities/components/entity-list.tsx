@@ -5,7 +5,7 @@ import * as api from "../api"
 import styles from "./entity-list.module.css"
 import Table, { Column, padding } from "common/components/table"
 import { Alert, AlertFilter } from "common/components/alert"
-import { AlertTriangle, AlertCircle } from "common/components/icons"
+import { AlertTriangle, AlertCircle } from "common-v2/components/icons"
 
 const COLUMNS: Column<api.EntityDetails>[] = [
   padding,

@@ -7,7 +7,7 @@ import {
   Depot,
   Feedstock,
   ProductionSite,
-  CertificateData,
+  Certificate,
 } from "common/types"
 
 export const normalizeBiofuel: Normalizer<Biofuel> = (biofuel) => ({
@@ -66,7 +66,7 @@ export const normalizeAnomalyFilter: Normalizer<Option, string> = (anomaly) => (
 })
 
 // prettier-ignore
-export const normalizeCertificate: Normalizer<CertificateData> = (certificate) => ({
+export const normalizeCertificate: Normalizer<Certificate> = (certificate) => ({
   value: certificate,
   label: `${certificate.certificate_id} - ${certificate.certificate_holder}`,
 })

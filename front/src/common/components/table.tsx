@@ -3,7 +3,7 @@ import cl from "clsx"
 
 import { Box, SystemProps } from "."
 import styles from "./table.module.css"
-import { ChevronRight, IconProps } from "./icons"
+import { ChevronRight, IconProps } from "common-v2/components/icons"
 import { TFunctionResult } from "i18next"
 
 type LineProps = {
