@@ -12,6 +12,7 @@ import Dialog from "common-v2/components/dialog"
 import { Cross, Return } from "common-v2/components/icons"
 import { TextInput } from "common-v2/components/input"
 import { LotSummary } from "../components/lots/lot-summary"
+import { useMatomo } from "matomo"
 
 export interface RejectManyButtonProps {
   disabled?: boolean
@@ -94,6 +95,7 @@ const RejectDialog = ({
 }: RejectDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const matomo = useMatomo()
 
   const v = variations(selection.length)
 
@@ -168,7 +170,15 @@ const RejectDialog = ({
           variant="danger"
           icon={Cross}
           label={t("Refuser")}
-          action={() => rejectLots.execute(query, selection, comment)}
+          action={() => {
+            matomo.push([
+              "trackEvent",
+              "lot-corrections",
+              "client-reject-lot",
+              selection.length,
+            ])
+            rejectLots.execute(query, selection, comment)
+          }}
         />
       </footer>
     </Dialog>

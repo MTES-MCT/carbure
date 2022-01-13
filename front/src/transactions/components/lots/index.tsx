@@ -25,6 +25,7 @@ import SearchBar from "../search-bar"
 import LotAdd from "lot-add"
 import LotDetails from "lot-details"
 import useStore from "common-v2/hooks/store"
+import { useMatomo } from "matomo"
 
 export interface LotsProps {
   entity: Entity
@@ -35,6 +36,7 @@ export interface LotsProps {
 export const Lots = ({ entity, year, snapshot }: LotsProps) => {
   const navigate = useNavigate()
   const location = useLocation()
+  const matomo = useMatomo()
 
   const status = useStatus()
 
@@ -61,12 +63,14 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
   const totalErrors = lotsData?.total_errors ?? 0
   const totalDeadline = lotsData?.total_deadline ?? 0
 
-  const showLotDetails = (lot: Lot) =>
+  const showLotDetails = (lot: Lot) => {
+    matomo.push(["trackEvent", "lots-details", "show-lot-details"])
+
     navigate({
       pathname: `${status}/${lot.id}`,
       search: location.search,
     })
-
+  }
   return (
     <>
       <Bar>

@@ -10,6 +10,7 @@ import Dialog from "common-v2/components/dialog"
 import { Cross, Return } from "common-v2/components/icons"
 import { usePortal } from "common-v2/components/portal"
 import { LotSummary } from "../components/lots/lot-summary"
+import { useMatomo } from "matomo"
 
 export interface DeleteManyButtonProps {
   disabled?: boolean
@@ -92,6 +93,7 @@ const DeleteDialog = ({
 }: DeleteDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const matomo = useMatomo()
 
   const v = variations(selection.length)
 
@@ -156,7 +158,10 @@ const DeleteDialog = ({
           variant="danger"
           icon={Cross}
           label={t("Supprimer")}
-          action={() => deleteLots.execute(query, selection)}
+          action={() => {
+            matomo.push(["trackEvent", "lots", "delete-lot", selection.length])
+            deleteLots.execute(query, selection)
+          }}
         />
       </footer>
     </Dialog>

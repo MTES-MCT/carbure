@@ -9,10 +9,12 @@ import Button from "common-v2/components/button"
 import { Plus, Return } from "common-v2/components/icons"
 import LotForm from "./components/lot-form"
 import * as api from "./api"
+import { useMatomo } from "matomo"
 
 export const LotAdd = () => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const matomo = useMatomo()
 
   const entity = useEntity()
 
@@ -43,7 +45,12 @@ export const LotAdd = () => {
 
       <main>
         <section>
-          <LotForm onSubmit={(lot) => addLot.execute(entity.id, lot!)} />
+          <LotForm
+            onSubmit={(lot) => {
+              matomo.push(["trackEvent", "lots-create", "create-lot-with-form"])
+              addLot.execute(entity.id, lot!)
+            }}
+          />
         </section>
       </main>
 

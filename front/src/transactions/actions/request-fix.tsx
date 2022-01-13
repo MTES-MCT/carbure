@@ -13,6 +13,7 @@ import { usePortal } from "common-v2/components/portal"
 import { useStatus } from "transactions/components/status"
 import { TextInput } from "common-v2/components/input"
 import { LotSummary } from "../components/lots/lot-summary"
+import { useMatomo } from "matomo"
 
 export interface RequestManyFixesButtonProps {
   disabled?: boolean
@@ -82,6 +83,7 @@ const RequestFixDialog = ({
 }: RequestFixDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const matomo = useMatomo()
   const status = useStatus()
   const entity = useEntity()
 
@@ -159,7 +161,15 @@ const RequestFixDialog = ({
           variant="warning"
           icon={Wrench}
           label={t("Demander correction")}
-          action={() => requestFix.execute(entity.id, selection, comment)}
+          action={() => {
+            matomo.push([
+              "trackEvent",
+              "lot-corrections",
+              "client-request-fix",
+              selection.length,
+            ])
+            requestFix.execute(entity.id, selection, comment)
+          }}
         />
       </footer>
     </Dialog>

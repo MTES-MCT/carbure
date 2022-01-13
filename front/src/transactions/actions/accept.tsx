@@ -23,6 +23,7 @@ import Select from "common-v2/components/select"
 import { Normalizer } from "common-v2/utils/normalize"
 import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
 import { findCertificates } from "common/api"
+import { useMatomo } from "matomo"
 
 export interface AcceptManyButtonProps {
   disabled?: boolean
@@ -133,6 +134,7 @@ const ReleaseForConsumptionDialog = ({
 }: AcceptDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const matomo = useMatomo()
 
   const v = variations(selection.length)
 
@@ -197,7 +199,15 @@ const ReleaseForConsumptionDialog = ({
           variant="success"
           icon={Check}
           label={t("Mise à consommation")}
-          action={() => acceptLots.execute(query, selection)}
+          action={() => {
+            matomo.push([
+              "trackEvent",
+              "lots-accept",
+              "release-for-consumption",
+              selection.length,
+            ])
+            acceptLots.execute(query, selection)
+          }}
         />
       </footer>
     </Dialog>
@@ -212,6 +222,7 @@ const InStockDialog = ({
 }: AcceptDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const matomo = useMatomo()
 
   const v = variations(selection.length)
 
@@ -276,7 +287,15 @@ const InStockDialog = ({
           variant="success"
           icon={Check}
           label={t("Mise en stock")}
-          action={() => acceptLots.execute(query, selection)}
+          action={() => {
+            matomo.push([
+              "trackEvent",
+              "lots-accept",
+              "to-stock",
+              selection.length,
+            ])
+            acceptLots.execute(query, selection)
+          }}
         />
       </footer>
     </Dialog>
@@ -292,6 +311,7 @@ const TradingDialog = ({
   const { t } = useTranslation()
   const notify = useNotify()
   const entity = useEntity()
+  const matomo = useMatomo()
 
   const v = variations(selection.length)
 
@@ -376,9 +396,15 @@ const TradingDialog = ({
           variant="success"
           icon={Check}
           label={t("Transférer")}
-          action={() =>
+          action={() => {
+            matomo.push([
+              "trackEvent",
+              "lots-accept",
+              "transfer-without-stock",
+              selection.length,
+            ])
             acceptLots.execute(query, selection, client!, certificate!)
-          }
+          }}
         />
       </footer>
     </Dialog>
@@ -394,6 +420,7 @@ const ProcessingDialog = ({
   const { t } = useTranslation()
   const notify = useNotify()
   const entity = useEntity()
+  const matomo = useMatomo()
 
   const v = variations(selection.length)
 
@@ -486,9 +513,15 @@ const ProcessingDialog = ({
           variant="success"
           icon={Check}
           label={t("Transférer")}
-          action={() =>
+          action={() => {
+            matomo.push([
+              "trackEvent",
+              "lots-accept",
+              "processing",
+              selection.length,
+            ])
             acceptLots.execute(subquery, selection, depot!.blender!.id)
-          }
+          }}
         />
       </footer>
     </Dialog>
@@ -509,6 +542,7 @@ const BlendingDialog = ({
 }: AcceptDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const matomo = useMatomo()
 
   const v = variations(selection.length)
 
@@ -574,7 +608,15 @@ const BlendingDialog = ({
           variant="success"
           icon={Check}
           label={t("Incorporer")}
-          action={() => acceptLots.execute(query, selection)}
+          action={() => {
+            matomo.push([
+              "trackEvent",
+              "lots-accept",
+              "blending",
+              selection.length,
+            ])
+            acceptLots.execute(query, selection)
+          }}
         />
       </footer>
     </Dialog>
@@ -589,6 +631,7 @@ const ExportDialog = ({
 }: AcceptDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const matomo = useMatomo()
 
   const v = variations(selection.length)
 
@@ -654,7 +697,15 @@ const ExportDialog = ({
           variant="success"
           icon={Check}
           label={t("Livrer")}
-          action={() => acceptLots.execute(query, selection)}
+          action={() => {
+            matomo.push([
+              "trackEvent",
+              "lots-accept",
+              "direct-delivery",
+              selection.length,
+            ])
+            acceptLots.execute(query, selection)
+          }}
         />
       </footer>
     </Dialog>
