@@ -1,17 +1,17 @@
 import api from "common/services/api"
+import { Entity } from "carbure/types"
 import {
-  GESOption,
   ProductionSite,
-  ProductionSiteDetails,
   OwnershipType,
-  EntityRights,
+  GESOption,
+  ProductionSiteDetails,
 } from "common/types"
 import {
   DoubleCounting,
   DoubleCountingDetails,
   QuotaDetails,
 } from "doublecount/types"
-import { Entity } from "carbure/types"
+import { EntityRights } from "./types"
 import { EntityDeliverySite } from "./hooks/use-delivery-sites"
 
 export function getProductionSites(

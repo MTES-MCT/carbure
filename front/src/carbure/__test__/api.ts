@@ -1,4 +1,4 @@
-import { EntityType } from "common/types"
+import { EntityType } from "carbure/types"
 import {
   okErrorsTranslations,
   okFieldsTranslations,

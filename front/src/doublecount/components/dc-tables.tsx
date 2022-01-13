@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { EntityType } from "common/types"
+import { EntityType } from "carbure/types"
 import {
   Admin,
   DoubleCountingSourcing,

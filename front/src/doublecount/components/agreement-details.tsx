@@ -1,6 +1,6 @@
 import { Fragment, useState, useEffect } from "react"
 import { useTranslation, Trans } from "react-i18next"
-import { EntityType } from "common/types"
+import { EntityType } from "carbure/types"
 import { Admin, DoubleCountingStatus as DCStatus } from "../types"
 import useAPI from "common/hooks/use-api"
 import { LoaderOverlay, Box } from "common/components"

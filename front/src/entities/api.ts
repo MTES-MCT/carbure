@@ -1,10 +1,6 @@
 import api from "common/services/api"
-import {
-  Entity,
-  ProductionSiteDetails,
-  UserRightRequest,
-  UserRightStatus,
-} from "common/types"
+import { Entity, UserRightRequest, UserRightStatus } from "carbure/types"
+import { ProductionSiteDetails } from "common/types"
 import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
 
 export interface EntityDetails {

@@ -1,17 +1,15 @@
 import { Trans, useTranslation } from "react-i18next"
 
+import { Entity, UserRole } from "carbure/types"
 import {
-  Biocarburant,
+  Biofuel,
   Country,
-  GESOption,
-  MatierePremiere,
-  ProductionSiteDetails,
-  UserRole,
+  Feedstock,
   Certificate,
+  GESOption,
+  ProductionSiteDetails,
 } from "common/types"
-
 import { ProductionSiteSettingsHook } from "../hooks/use-production-sites"
-import { Entity } from "carbure/types"
 
 import styles from "./settings.module.css"
 
@@ -76,8 +74,8 @@ export type ProductionSiteState = {
   manager_email: string
 
   // input/output
-  matieres_premieres: MatierePremiere[]
-  biocarburants: Biocarburant[]
+  matieres_premieres: Feedstock[]
+  biocarburants: Biofuel[]
 
   // certificates
   certificates: Certificate[]

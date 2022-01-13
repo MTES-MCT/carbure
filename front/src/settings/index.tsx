@@ -12,21 +12,17 @@ import DeliverySitesSettings from "./components/delivery-site"
 import ProductionSitesSettings from "./components/production-site"
 
 import CompanySettings from "./components/company"
-import Certificates from './components/certificates'
+import Certificates from "./components/certificates"
 import Sticky from "common/components/sticky"
-import UserRights from "./components/user-rights"
-import { UserRole } from "common/types"
+import EntityUserRights from "./components/user-rights"
+import { UserRole } from "carbure/types"
 import DoubleCountingSettings from "./components/double-counting"
 import useEntity from "carbure/hooks/entity"
 
 const Settings = () => {
   const entity = useEntity()
 
-  const {
-    company,
-    productionSites,
-    deliverySites,
-  } = useSettings(entity)
+  const { company, productionSites, deliverySites } = useSettings(entity)
 
   const { isProducer, isTrader, isOperator } = entity
 
@@ -86,7 +82,9 @@ const Settings = () => {
 
           {hasCertificates && <Certificates />}
 
-          {entity.hasRights(UserRole.Admin) && <UserRights entity={entity} />}
+          {entity.hasRights(UserRole.Admin) && (
+            <EntityUserRights entity={entity} />
+          )}
         </SettingsBody>
       </Main>
     </PortalProvider>

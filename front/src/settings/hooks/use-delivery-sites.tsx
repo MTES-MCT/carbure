@@ -2,7 +2,7 @@ import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Entity } from "carbure/types"
-import { DeliverySite, OwnershipType } from "common/types"
+import { Depot, OwnershipType } from "common/types"
 
 import useAPI from "common/hooks/use-api"
 import * as api from "../api"
@@ -14,7 +14,7 @@ import {
 import { useNotificationContext } from "common/components/notifications"
 
 export interface EntityDeliverySite {
-  depot: DeliverySite | null
+  depot: Depot | null
   ownership_type: OwnershipType
   blending_is_outsourced: boolean
   blender: Entity | null

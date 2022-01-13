@@ -1,9 +1,8 @@
+import { Entity } from "carbure/types"
 import {
   Biofuel,
   Country,
-  Declaration,
   Depot,
-  Entity,
   Feedstock,
   ProductionSite,
 } from "common/types"
@@ -120,6 +119,22 @@ export interface Snapshot {
     out_total: number
     out_pending: number
     out_tofix: number
+  }
+}
+
+export interface Declaration {
+  id: number
+  entity: Entity
+  year: number
+  month: number
+  declared: false
+  checked: false
+  reminder_count: number
+  lots: {
+    drafts: number
+    output: number
+    input: number
+    corrections: number
   }
 }
 
@@ -303,4 +318,11 @@ export interface TransformETBEPayload {
   volume_etbe: number
   volume_denaturant: number
   volume_etbe_eligible: number
+}
+
+export interface Distance {
+  distance: number
+  link: string
+  error: string // PRODUCTION_SITE_NOT_IN_CARBURE, DELIVERY_SITE_NOT_IN_CARBURE, PRODUCTION_SITE_COORDINATES_NOT_IN_CARBURE, DELIVERY_SITE_COORDINATES_NOT_IN_CARBURE, API_ERROR
+  source: null | "DB" | "API"
 }

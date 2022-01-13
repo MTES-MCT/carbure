@@ -1,14 +1,15 @@
 import { AxiosResponse } from "axios"
+import { Entity } from "carbure/types"
 import {
   Biofuel,
   Feedstock,
   Country,
-  DeliverySite,
-  Entity,
-  ProductionSiteDetails,
+  Depot,
   Certificate,
+  ProductionSiteDetails,
   EntityCertificate,
 } from "common/types"
+
 import api, { Api } from "./services/api"
 
 export function extract<T>(res: AxiosResponse<Api<T[]>>) {
@@ -51,7 +52,7 @@ export function findProductionSites(query?: string, producer_id?: number) {
 
 export function findDepots(query: string, entity_id?: number) {
   return api
-    .get<Api<DeliverySite[]>>("/v3/common/delivery-sites", {
+    .get<Api<Depot[]>>("/v3/common/delivery-sites", {
       params: { query, entity_id },
     })
     .then(extract)
