@@ -159,9 +159,9 @@ export const StockSummary = ({
               {
                 key: "biofuel",
                 header: t("Biocarburant"),
-                orderBy: (item) => item.biofuel_code,
+                orderBy: (item) => item.biofuel_code ?? "",
                 cell: (item) => (
-                  <Cell text={t(item.biofuel_code, { ns: "biofuels" })} />
+                  <Cell text={t(item.biofuel_code ?? "", { ns: "biofuels" })} />
                 ),
               },
               {
@@ -185,7 +185,7 @@ export const StockSummary = ({
                 header: t("Réd. GES"),
                 orderBy: (item) => item.avg_ghg_reduction || 0,
                 cell: (item) => (
-                  <Cell text={formatPercentage(item.avg_ghg_reduction)} />
+                  <Cell text={formatPercentage(item.avg_ghg_reduction || 0)} />
                 ),
               },
             ]}
