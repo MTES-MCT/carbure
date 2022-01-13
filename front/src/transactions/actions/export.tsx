@@ -3,6 +3,7 @@ import { LotQuery, StockQuery } from "../types"
 import { Download } from "common/components/icons"
 import Button from "common-v2/components/button"
 import * as api from "../api"
+import { useMatomo } from "matomo"
 
 export interface ExportLotsButtonProps {
   query: LotQuery
@@ -13,13 +14,22 @@ export const ExportLotsButton = ({
   query,
   selection,
 }: ExportLotsButtonProps) => {
+  const matomo = useMatomo()
   const { t } = useTranslation()
   return (
     <Button
       asideX
       icon={Download}
       label={t("Exporter vers Excel")}
-      action={() => api.downloadLots(query, selection)}
+      action={() => {
+        matomo.push([
+          "trackEvent",
+          "lots",
+          "export-lots-excel",
+          selection.length,
+        ])
+        api.downloadLots(query, selection)
+      }}
     />
   )
 }
@@ -33,13 +43,22 @@ export const ExportStocksButton = ({
   query,
   selection,
 }: ExportStockButtonProps) => {
+  const matomo = useMatomo()
   const { t } = useTranslation()
   return (
     <Button
       asideX
       icon={Download}
       label={t("Exporter vers Excel")}
-      action={() => api.downloadStocks(query, selection)}
+      action={() => {
+        matomo.push([
+          "trackEvent",
+          "lots",
+          "export-stocks-excel",
+          selection.length,
+        ])
+        api.downloadStocks(query, selection)
+      }}
     />
   )
 }

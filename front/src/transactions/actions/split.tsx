@@ -15,6 +15,7 @@ import { DateInput, NumberInput, TextInput } from "common-v2/components/input"
 import Autocomplete from "common-v2/components/autocomplete"
 import { findCountries, findDepots, findEntities } from "common-v2/api"
 import * as norm from "common-v2/utils/normalizers"
+import { useMatomo } from "matomo"
 
 export interface SplitOneButtonProps {
   disabled?: boolean
@@ -46,6 +47,7 @@ interface ApproveFixDialogProps {
 const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const matomo = useMatomo()
   const entity = useEntity()
 
   const splitStock = useMutation(api.splitStock, {
@@ -124,9 +126,10 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
           variant="primary"
           icon={Drop}
           label={t("Extraire lot")}
-          action={() =>
+          action={() => {
+            matomo.push(["trackEvent", "stocks", "split-stock"])
             splitStock.execute(entity.id, [formToStockPayload(stock.id, value)])
-          }
+          }}
         />
       </footer>
     </Dialog>

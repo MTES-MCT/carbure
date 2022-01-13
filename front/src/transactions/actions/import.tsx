@@ -10,6 +10,7 @@ import { Check, Return, Upload } from "common-v2/components/icons"
 import { usePortal } from "common-v2/components/portal"
 import { FileArea, FileInput } from "common-v2/components/input"
 import { LoaderOverlay } from "common-v2/components/scaffold"
+import { useMatomo } from "matomo"
 
 const FAQ_URL = "https://carbure-1.gitbook.io/faq/"
 const TEMPLATE_URL = "/api/download-template"
@@ -29,6 +30,7 @@ export const ImportButton = () => {
 
 export const ImportArea = ({ children }: { children: React.ReactNode }) => {
   const { t } = useTranslation()
+  const matomo = useMatomo()
   const entity = useEntity()
   const importLots = useImportLots()
 
@@ -36,7 +38,10 @@ export const ImportArea = ({ children }: { children: React.ReactNode }) => {
     <FileArea
       icon={Upload}
       label={t("Importer le fichier\nsur la plateforme")}
-      onChange={(file) => importLots.execute(entity.id, file!)}
+      onChange={(file) => {
+        matomo.push(["trackEvent", "lots-create", "drag-and-drop-lots-excel"])
+        importLots.execute(entity.id, file!)
+      }}
     >
       {children}
       {importLots.loading && <LoaderOverlay />}
@@ -50,6 +55,7 @@ interface ImportDialogProps {
 
 const ImportDialog = ({ onClose }: ImportDialogProps) => {
   const { t } = useTranslation()
+  const matomo = useMatomo()
   const entity = useEntity()
 
   const importLots = useImportLots(onClose)
@@ -87,7 +93,10 @@ const ImportDialog = ({ onClose }: ImportDialogProps) => {
           <p>
             <Trans>
               Avant de commencer, veillez à télécharger le modèle disponible{" "}
-              <Ext href={TEMPLATE_URL + `?entity_id=${entity.id}`}>sur ce lien</Ext>.
+              <Ext href={TEMPLATE_URL + `?entity_id=${entity.id}`}>
+                sur ce lien
+              </Ext>
+              .
             </Trans>
           </p>
         </section>
@@ -115,7 +124,10 @@ const ImportDialog = ({ onClose }: ImportDialogProps) => {
           variant="primary"
           icon={Upload}
           label={t("Importer")}
-          action={() => importLots.execute(entity.id, file!)}
+          action={() => {
+            matomo.push(["trackEvent", "lots-create", "import-lots-excel"])
+            importLots.execute(entity.id, file!)
+          }}
         />
       </footer>
     </Dialog>

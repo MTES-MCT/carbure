@@ -24,6 +24,7 @@ import {
 } from "common-v2/components/icons"
 import { Entity } from "carbure/types"
 import { Row } from "common-v2/components/scaffold"
+import { useMatomo } from "matomo"
 
 export interface DeclarationButtonProps {
   year: number
@@ -59,6 +60,7 @@ export const DeclarationDialog = ({
 }: DeclarationDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const matomo = useMatomo()
   const entity = useEntity()
 
   const [declaration, setDeclaration] = useState<DeclarationSummary | undefined>() // prettier-ignore
@@ -173,7 +175,15 @@ export const DeclarationDialog = ({
             loading={invalidateDeclaration.loading}
             variant="warning"
             label={t("Annuler la déclaration")}
-            action={() => invalidateDeclaration.execute(entity.id, period)}
+            action={() => {
+              matomo.push([
+                "trackEvent",
+                "declarations",
+                "invalidate-declaration",
+                declaration?.period,
+              ])
+              invalidateDeclaration.execute(entity.id, period)
+            }}
           />
         ) : (
           <Button
@@ -182,7 +192,15 @@ export const DeclarationDialog = ({
             variant="primary"
             icon={Check}
             label={t("Valider la déclaration")}
-            action={() => validateDeclaration.execute(entity.id, period)}
+            action={() => {
+              matomo.push([
+                "trackEvent",
+                "declarations",
+                "validate-declaration",
+                declaration?.period,
+              ])
+              validateDeclaration.execute(entity.id, period)
+            }}
           />
         )}
         {declaration && declaration.pending > 0 && (

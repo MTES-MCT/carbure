@@ -13,6 +13,7 @@ import { usePortal } from "common-v2/components/portal"
 import { LotSummary } from "../components/lots/lot-summary"
 import { useStatus } from "transactions/components/status"
 import { TextInput } from "common-v2/components/input"
+import { useMatomo } from "matomo"
 
 export interface RecallManyButtonProps {
   disabled?: boolean
@@ -73,6 +74,7 @@ interface RecallDialogProps {
 const RecallDialog = ({ summary, selection, onClose }: RecallDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const matomo = useMatomo()
   const status = useStatus()
   const entity = useEntity()
 
@@ -150,7 +152,15 @@ const RecallDialog = ({ summary, selection, onClose }: RecallDialogProps) => {
           variant="warning"
           icon={Wrench}
           label={t("Corriger")}
-          action={() => recallLots.execute(entity.id, selection, comment)}
+          action={() => {
+            matomo.push([
+              "trackEvent",
+              "lot-corrections",
+              "supplier-recall-lot",
+              selection.length,
+            ])
+            recallLots.execute(entity.id, selection, comment)
+          }}
         />
       </footer>
     </Dialog>

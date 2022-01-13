@@ -12,6 +12,7 @@ import { Check, Return } from "common-v2/components/icons"
 import { usePortal } from "common-v2/components/portal"
 import { useStatus } from "transactions/components/status"
 import { LotSummary } from "../components/lots/lot-summary"
+import { useMatomo } from "matomo"
 
 export interface ApproveManyFixesButtonProps {
   disabled?: boolean
@@ -81,6 +82,7 @@ const ApproveFixDialog = ({
 }: ApproveFixDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const matomo = useMatomo()
   const status = useStatus()
   const entity = useEntity()
 
@@ -148,7 +150,15 @@ const ApproveFixDialog = ({
           variant="primary"
           icon={Check}
           label={t("Accepter correction")}
-          action={() => approveFix.execute(entity.id, selection)}
+          action={() => {
+            matomo.push([
+              "trackEvent",
+              "lot-corrections",
+              "client-approve-fix",
+              selection.length,
+            ])
+            approveFix.execute(entity.id, selection)
+          }}
         />
       </footer>
     </Dialog>

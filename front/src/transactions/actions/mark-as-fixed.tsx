@@ -13,6 +13,7 @@ import { usePortal } from "common-v2/components/portal"
 import { TextInput } from "common-v2/components/input"
 import { useStatus } from "transactions/components/status"
 import { LotSummary } from "../components/lots/lot-summary"
+import { useMatomo } from "matomo"
 
 export interface MarkManyAsFixedButtonProps {
   disabled?: boolean
@@ -82,6 +83,7 @@ const MarkAsFixedDialog = ({
 }: MarkAsFixedDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const matomo = useMatomo()
   const status = useStatus()
   const entity = useEntity()
 
@@ -159,9 +161,15 @@ const MarkAsFixedDialog = ({
           variant="success"
           icon={Check}
           label={t("Valider correction")}
-          action={() =>
+          action={() => {
+            matomo.push([
+              "trackEvent",
+              "lot-corrections",
+              "supplier-mark-as-fixed",
+              selection.length,
+            ])
             markAsFixed.execute(entity.id, selection, status, comment)
-          }
+          }}
         />
       </footer>
     </Dialog>

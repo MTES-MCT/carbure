@@ -25,6 +25,7 @@ import NavigationButtons from "./components/navigation"
 import LotActions from "./components/actions"
 import { Entity } from "carbure/types"
 import LotTraceability, { hasTraceability } from "./components/lot-traceability"
+import { useMatomo } from "matomo"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -33,6 +34,7 @@ export interface LotDetailsProps {
 export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const matomo = useMatomo()
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -95,7 +97,10 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
             readOnly={!editable}
             lot={lotData?.lot}
             errors={errors}
-            onSubmit={(form) => updateLot.execute(entity.id, form!)}
+            onSubmit={(form) => {
+              matomo.push(["trackEvent", "lots-details", "save-lot-changes"])
+              updateLot.execute(entity.id, form!)
+            }}
           />
         </section>
 

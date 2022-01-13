@@ -12,6 +12,7 @@ import Dialog from "common-v2/components/dialog"
 import { Check, Return } from "common-v2/components/icons"
 import { usePortal } from "common-v2/components/portal"
 import { LotSummary } from "../components/lots/lot-summary"
+import { useMatomo } from "matomo"
 
 export interface SendButtonProps {
   disabled?: boolean
@@ -92,6 +93,7 @@ const SendDialog = ({
 }: SendDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const matomo = useMatomo()
 
   const [durability, setDurability] = useState(false)
   const [validity, setValidity] = useState(false)
@@ -173,7 +175,10 @@ const SendDialog = ({
           variant="primary"
           icon={Check}
           label={t("Envoyer")}
-          action={() => sendLots.execute(query, selection)}
+          action={() => {
+            matomo.push(["trackEvent", "lots", "send-lot", selection.length])
+            sendLots.execute(query, selection)
+          }}
         />
       </footer>
     </Dialog>
