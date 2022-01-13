@@ -4,10 +4,10 @@ import { Box, LoaderOverlay, Main, Title } from "common/components"
 import { Alert } from "common/components/alert"
 import { AlertTriangle, Question } from "common-v2/components/icons"
 import { Trans } from "react-i18next"
-import { useUserContext } from "carbure/hooks/user"
+import { useUser } from "carbure/hooks/user"
 
 const Pending = () => {
-  const user = useUserContext()
+  const user = useUser()
 
   if (!user.isAuthenticated()) {
     return <Navigate to="/" />

@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom"
 import { LoaderOverlay } from "common-v2/components/scaffold"
-import useUser, { UserContext } from "./hooks/user"
+import useLoadUser, { UserContext } from "./hooks/user"
 import useEntity from "./hooks/entity"
 import DevBanner from "./components/dev-banner"
 import Topbar from "./components/top-bar"
@@ -19,7 +19,7 @@ import Controls from "controls"
 import Entities from "../entities" // not using  path prevents import
 
 const Carbure = () => {
-  const user = useUser()
+  const user = useLoadUser()
 
   if (!user.isAuthenticated()) {
     return <Exit to="/accounts/login" />

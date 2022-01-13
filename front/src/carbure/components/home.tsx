@@ -18,7 +18,7 @@ import { EntityType } from "common/types"
 import api from "common/services/api"
 import useAPI from "common/hooks/use-api"
 import { Fragment, useEffect } from "react"
-import { useUserContext } from "carbure/hooks/user"
+import { useUser } from "carbure/hooks/user"
 
 interface HomeStats {
   total_volume: number
@@ -34,7 +34,7 @@ function fetchHomeStats() {
 }
 
 const Home = () => {
-  const user = useUserContext()
+  const user = useUser()
   const [stats, getStats] = useAPI(fetchHomeStats)
 
   useEffect(() => {
