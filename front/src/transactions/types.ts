@@ -162,9 +162,9 @@ export interface StockSummary {
 export interface SummaryItem {
   client?: string
   supplier?: string
-  biofuel_code: string
+  biofuel_code: string | null
   volume_sum: number
-  avg_ghg_reduction: number
+  avg_ghg_reduction: number | null
   total: number
   pending: number
   remaining_volume_sum?: number

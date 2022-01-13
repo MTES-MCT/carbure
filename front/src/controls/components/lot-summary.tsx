@@ -132,8 +132,11 @@ export const LotSummary = ({
     {
       key: "biofuel",
       header: t("Biocarburant"),
-      orderBy: (item) => t(item.biofuel_code, { ns: "biofuels" }) as string,
-      cell: (item) => <Cell text={t(item.biofuel_code, { ns: "biofuels" })} />,
+      orderBy: (item) =>
+        t(item.biofuel_code ?? "", { ns: "biofuels" }) as string,
+      cell: (item) => (
+        <Cell text={t(item.biofuel_code ?? "", { ns: "biofuels" })} />
+      ),
     },
     {
       key: "volume",
@@ -152,8 +155,10 @@ export const LotSummary = ({
       small: true,
       key: "ghg",
       header: t("Réd. GES"),
-      orderBy: (item) => item.avg_ghg_reduction,
-      cell: (item) => <Cell text={formatPercentage(item.avg_ghg_reduction)} />,
+      orderBy: (item) => item.avg_ghg_reduction || 0,
+      cell: (item) => (
+        <Cell text={formatPercentage(item.avg_ghg_reduction || 0)} />
+      ),
     },
   ]
 
