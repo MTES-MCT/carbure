@@ -787,8 +787,14 @@ def export_carbure_stock(entity, stocks):
 def make_template_carbure_lots_sheet(workbook, entity):
     worksheet_lots = workbook.add_worksheet("lots")
     psites = ProductionSite.objects.filter(producer=entity)
+    if psites.count() == 0:
+        psites = [ProductionSite(name="")]
     clients = Entity.objects.filter(entity_type__in=[Entity.OPERATOR, Entity.TRADER]).exclude(id=entity.id)
+    if clients.count() == 0:
+        clients = [Entity(name="")]
     delivery_sites = Depot.objects.all()
+    if delivery_sites.count() == 0:
+        delivery_sites = [Depot(name="")]
     #my_vendor_certificates = get_my_certificates(entity=entity)
 
     # header
@@ -826,7 +832,11 @@ def make_template_carbure_lots_sheet(workbook, entity):
 def make_template_carbure_stocks_sheet(workbook, entity):
     worksheet_lots = workbook.add_worksheet("lots")
     clients = Entity.objects.filter(entity_type__in=[Entity.OPERATOR, Entity.TRADER]).exclude(id=entity.id)
+    if clients.count() == 0:
+        clients = [Entity(name="")]
     delivery_sites = Depot.objects.all()
+    if delivery_sites.count() == 0:
+        delivery_sites = [Depot(name="")]
     stock = CarbureStock.objects.filter(carbure_client=entity, remaining_volume__gt=0)
 
     # header
