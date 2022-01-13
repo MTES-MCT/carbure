@@ -1,4 +1,4 @@
-import { useAsyncList } from "common-v2/hooks/async"
+import { useAsyncList } from "common-v2/hooks/async-list"
 import { useEffect, useRef, useState } from "react"
 import {
   defaultNormalizer,
