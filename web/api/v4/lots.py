@@ -165,11 +165,7 @@ def fill_volume_info(lot, data):
             try:
                 volume = round(abs(float(volume)), 2)
                 if lot.volume != 0 and volume != lot.volume:
-                    if lot.parent_stock is not None:
-                        # we are updating the volume of a lot from stock
-                        lot.parent_stock.update_remaining_volume(lot.volume, volume)
-                    else:
-                        lot.volume = volume
+                    lot.volume = volume
                 else:
                     # initial volume setting or override
                     lot.volume = volume
@@ -250,7 +246,7 @@ def fill_delivery_data(lot, data, entity, prefetched_data):
     lot.transport_document_reference = data.get('transport_document_reference', None)
     delivery_type = data.get('delivery_type', None)
     if delivery_type is None:
-        lot.delivery_type = CarbureLot.OTHER
+        lot.delivery_type = CarbureLot.UNKNOWN
     else:
         lot.delivery_type = data.get('delivery_type', None)
     dest = data.get('carbure_delivery_site_depot_id', None)
@@ -295,14 +291,14 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
         lot = CarbureLot()   
     lot.free_field = data.get('free_field', None)
     lot.added_by = entity
-
-    if 'carbure_stock_id' in data:
+    carbure_stock_id = data.get('carbure_stock_id', False)
+    if carbure_stock_id:
+        # Lot is extracted from STOCK.
         # FILL sustainability data from parent_stock
         try:
-            parent_stock = CarbureStock.objects.get(carbure_id=data['carbure_stock_id'])
-            assert(parent_stock.carbure_client == entity)
+            parent_stock = CarbureStock.objects.get(carbure_id=carbure_stock_id)
         except:
-            return False
+            return None, []
         original_lot = parent_stock.get_parent_lot()
         lot.parent_stock = parent_stock
         lot.copy_production_details(original_lot)
@@ -327,9 +323,7 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
 def bulk_insert_lots(entity: Entity, lots: List[CarbureLot], errors: List[GenericError], prefetched_data: dict) -> QuerySet:
     created = CarbureLot.objects.bulk_create(lots, batch_size=100)
     inserted_lots = CarbureLot.objects.filter(added_by=entity).order_by('-id')[0:len(lots)]
-    print(errors)
     errors = reversed(errors) # lots are fetched by DESC ID
-    print(errors)
     for lot, lot_errors in zip(inserted_lots, errors):
         for e in lot_errors:
             e.lot_id = lot.id
