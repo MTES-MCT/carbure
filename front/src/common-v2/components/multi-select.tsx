@@ -1,5 +1,5 @@
 import { useRef, useState } from "react"
-import { useAsyncList } from "../hooks/async"
+import { useAsyncList } from "../hooks/async-list"
 import { defaultNormalizer, Normalizer, Sorter } from "../utils/normalize"
 import Dropdown, { Trigger } from "./dropdown"
 import { ChevronDown } from "common-v2/components/icons"
