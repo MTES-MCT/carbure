@@ -407,3 +407,11 @@ export const Drop = ({ className, ...props }: IconProps) => (
     <path d="M10.26 19.74l5.74 -5.74l-5.74 5.74z" />
   </Icon>
 )
+
+export const InfoCircle = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("info-circle", className)}>
+    <circle cx="12" cy="12" r="9" />
+    <line x1="12" y1="8" x2="12.01" y2="8" />
+    <polyline points="11 12 12 12 12 16 13 16" />
+  </Icon>
+)

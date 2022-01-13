@@ -1,60 +1,40 @@
-.container {
-  flex: 1;
-  justify-content: center;
+header.header {
   align-items: center;
-  padding: 64px var(--main-spacing);
+  padding-top: var(--spacing-xl);
+  padding-bottom: var(--spacing-xl);
 }
 
-h1.welcome {
+header.header > h1 {
   font-size: 3em;
 }
 
-p.subtitle {
+header.header > p {
   font-size: 1.5em;
   color: var(--gray-dark);
-  margin-top: 24px;
-  margin-bottom: 0;
 }
 
-div.accountMessage {
+section.information {
   align-items: center;
-  margin-top: 48px;
+  gap: var(--spacing-xl);
+  padding-top: var(--spacing-xl);
+  padding-bottom: var(--spacing-xl);
 }
 
-div.accountMessage span,
-div.pendingAlert span {
-  display: inline-flex;
-  white-space: pre;
-  align-items: center;
-  font-size: 1.1em;
-  margin-bottom: 8px;
-  text-align: center;
-}
-
-div.pendingAlert span:last-child {
-  margin-bottom: 0;
-}
-
-div.pendingAlert {
+section.information > div {
   flex-direction: column;
-  padding: 24px 32px;
-  width: 864px;
-  margin-bottom: 48px;
+  align-items: center;
+  padding: var(--spacing-m) var(--spacing-xl);
+  width: 900px;
+  max-width: 100%;
 }
 
-.alertIcon,
-.faqIcon {
-  color: var(--gray-dark);
-  margin-right: 12px;
-}
-
-.faqIcon {
-  border: 2px solid var(--blue-dark);
-  border-radius: 50%;
+section.information > div > p {
+  display: flex;
+  white-space: pre-wrap;
 }
 
 .link {
   color: var(--blue-medium);
+  cursor: pointer;
   text-decoration: underline;
-  flex-shrink: 0;
 }

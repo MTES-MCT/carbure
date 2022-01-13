@@ -1,10 +1,15 @@
+import { Fragment } from "react"
 import cl from "clsx"
+import { Trans, useTranslation } from "react-i18next"
 import styles from "./home.module.css"
 import banner from "../assets/images/banner.png"
 import traders from "../assets/images/traders.svg"
 import operators from "../assets/images/operators.svg"
 import schema from "../assets/images/schema.svg"
-import { Trans } from "react-i18next"
+import { EntityType } from "carbure/types"
+import { useUser } from "carbure/hooks/user"
+import api, { Api } from "common-v2/services/api"
+import { useQuery } from "common-v2/hooks/async"
 import {
   ChevronRight,
   ExternalLink,
@@ -13,12 +18,7 @@ import {
   UserAdd,
   UserCheck,
 } from "common-v2/components/icons"
-import { Button } from "common/components/button"
-import { EntityType } from "common/types"
-import api from "common/services/api"
-import useAPI from "common/hooks/use-api"
-import { Fragment, useEffect } from "react"
-import { useUser } from "carbure/hooks/user"
+import { Button } from "common-v2/components/button"
 
 interface HomeStats {
   total_volume: number
@@ -29,18 +29,16 @@ interface HomeStats {
   }
 }
 
-function fetchHomeStats() {
-  return api.get<HomeStats>("/common/stats")
-}
-
 const Home = () => {
+  useTranslation()
   const user = useUser()
-  const [stats, getStats] = useAPI(fetchHomeStats)
 
-  useEffect(() => {
-    getStats()
-  }, [getStats])
+  const stats = useQuery(() => api.get<Api<HomeStats>>("/v3/common/stats"), {
+    key: "stats",
+    params: [],
+  })
 
+  const statsData = stats.result?.data.data
   const firstEntity = user.getFirstEntity()
 
   return (
@@ -96,7 +94,6 @@ const Home = () => {
           <Fragment>
             <Button
               icon={UserAdd}
-              as="a"
               href="/accounts/register"
               className={styles.homeButton}
             >
@@ -104,8 +101,7 @@ const Home = () => {
             </Button>
             <Button
               icon={UserCheck}
-              as="a"
-              level="primary"
+              variant="primary"
               href="/accounts/login"
               className={styles.homeButton}
             >
@@ -115,8 +111,7 @@ const Home = () => {
         ) : firstEntity ? (
           <Button
             icon={ExternalLink}
-            as="a"
-            level="primary"
+            variant="primary"
             href={`/app/org/${firstEntity.id}`}
             className={styles.homeButton}
           >
@@ -125,8 +120,7 @@ const Home = () => {
         ) : (
           <Button
             icon={Plus}
-            as="a"
-            level="primary"
+            variant="primary"
             href="/app/pending"
             className={styles.homeButton}
           >
@@ -141,7 +135,7 @@ const Home = () => {
             {stats.loading ? (
               <Loader />
             ) : (
-              Math.round(stats.data?.total_volume ?? 0).toLocaleString("fr")
+              Math.round(statsData?.total_volume ?? 0).toLocaleString("fr")
             )}
             {" m³"}
           </h1>
@@ -159,7 +153,7 @@ const Home = () => {
               {stats.loading ? (
                 <Loader />
               ) : (
-                stats.data?.entities[EntityType.Operator]
+                statsData?.entities[EntityType.Operator]
               )}
             </h1>
             <p>
@@ -171,7 +165,7 @@ const Home = () => {
               {stats.loading ? (
                 <Loader />
               ) : (
-                stats.data?.entities[EntityType.Producer]
+                statsData?.entities[EntityType.Producer]
               )}
             </h1>
             <p>
@@ -183,7 +177,7 @@ const Home = () => {
               {stats.loading ? (
                 <Loader />
               ) : (
-                stats.data?.entities[EntityType.Trader]
+                statsData?.entities[EntityType.Trader]
               )}
             </h1>
             <p>
@@ -194,11 +188,8 @@ const Home = () => {
 
         <Button
           icon={ExternalLink}
-          as="a"
           href="/app/public_stats"
           className={styles.homeButton}
-          rel="noreferrer"
-          target="_blank"
         >
           <Trans>Voir les statistiques</Trans>
         </Button>
