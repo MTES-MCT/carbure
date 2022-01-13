@@ -1,0 +1,9 @@
+.statusTabs a .verso {
+  display: none;
+}
+.statusTabs a:hover .recto {
+  display: none;
+}
+.statusTabs a:hover .verso {
+  display: flex;
+}

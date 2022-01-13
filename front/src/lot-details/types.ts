@@ -3,11 +3,11 @@ import { Lot, LotError, Stock } from "transactions/types"
 
 export interface LotDetails {
   lot: Lot
-  parent_lot: Lot
-  parent_stock: Stock
+  parent_lot: Lot | null
+  parent_stock: Stock | null
   children_lot: Lot[]
   children_stock: Stock[]
-  distance: Distance
+  distance: Distance | null
   updates: LotUpdate<any>[]
   comments: LotComment[]
   errors: LotError[]

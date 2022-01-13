@@ -1,9 +1,11 @@
+import cl from "clsx"
 import { useTranslation } from "react-i18next"
 import { useMatch } from "react-router-dom"
 import { Snapshot, Status } from "../types"
 import Tabs from "common-v2/components/tabs"
-import { Loader } from "common-v2/components/icons"
-
+import { AlertCircle, Loader } from "common-v2/components/icons"
+import { Col, Row } from "common-v2/components/scaffold"
+import css from "./status.module.css"
 export interface StatusTabsProps {
   loading: boolean
   count: Snapshot["lots"] | undefined
@@ -18,6 +20,7 @@ export const StatusTabs = ({
   return (
     <Tabs
       variant="main"
+      className={css.statusTabs}
       tabs={[
         {
           key: "draft",
@@ -36,7 +39,8 @@ export const StatusTabs = ({
           label: (
             <StatusRecap
               loading={loading}
-              count={count.in_pending}
+              count={count.in_total}
+              pending={count.in_pending}
               tofix={count.in_tofix}
               label={t("Lots reçus", { count: count.in_pending })}
             />
@@ -59,7 +63,8 @@ export const StatusTabs = ({
           label: (
             <StatusRecap
               loading={loading}
-              count={count.out_pending}
+              count={count.out_total}
+              pending={count.out_pending}
               tofix={count.out_tofix}
               label={t("Lots envoyés", { count: count.out_pending })}
             />
@@ -86,34 +91,61 @@ interface StatusRecapProps {
   loading: boolean
   count: number
   label: string
+  pending?: number
   tofix?: number
 }
 
 const StatusRecap = ({
   loading,
   count = 0,
+  pending = 0,
   tofix = 0,
   label,
 }: StatusRecapProps) => {
   const { t } = useTranslation()
+  const hasAlert = pending > 0 || tofix > 0
 
   return (
     <>
-      <p>
-        {loading ? <Loader size={20} /> : count}{" "}
-        {tofix > 0 && (
-          <small>
-            ({tofix} {t("corrections")})
-          </small>
+      <Row className={cl(hasAlert && css.recto)}>
+        <Col>
+          <p>{loading ? <Loader size={20} /> : count}</p>
+          <strong>{label}</strong>
+        </Col>
+
+        {hasAlert && (
+          <Col
+            style={{
+              marginLeft: "auto",
+              alignItems: "flex-end",
+              justifyContent: "center",
+            }}
+          >
+            <AlertCircle size={32} color="var(--orange-dark)" />
+          </Col>
         )}
-      </p>
-      <strong>{label}</strong>
+      </Row>
+
+      {hasAlert && (
+        <Col className={css.verso}>
+          {pending > 0 && (
+            <p>
+              <strong>{pending}</strong> {t("lots en attente")}
+            </p>
+          )}
+          {tofix > 0 && (
+            <p>
+              <strong>{tofix}</strong> {t("lots à corriger")}
+            </p>
+          )}
+        </Col>
+      )}
     </>
   )
 }
 
 export function useStatus() {
-  const match = useMatch<"status">("/org/:entity/transactions/:status/*")
+  const match = useMatch<"status", string>("/org/:entity/transactions/:status/*") // prettier-ignore
   return (match?.params.status ?? "unknown") as Status
 }
 

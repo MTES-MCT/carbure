@@ -38,7 +38,7 @@ export const LotTable = memo(
     onAction,
     onOrder,
   }: LotTableProps) => {
-    const { t } = useTranslation()
+    const columns = useLotColumns()
     return (
       <Table
         loading={loading}
@@ -49,87 +49,114 @@ export const LotTable = memo(
         columns={[
           markerColumn<Lot>((lot) => getLotMarker(lot, errors)),
           selectionColumn(lots, selected, onSelect, (lot) => lot.id),
-          {
-            header: t("Statut"),
-            cell: (lot) => <LotTag lot={lot} />,
-          },
-          {
-            key: "period",
-            header: t("Période"),
-            cell: (lot) => <PeriodCell lot={lot} />,
-          },
-          {
-            header: t("N° Document"),
-            cell: (lot) => (
-              <Cell
-                text={lot.transport_document_reference?.toUpperCase()}
-                sub={lot.transport_document_type}
-              />
-            ),
-          },
-          {
-            key: "volume",
-            header: t("Biocarburant"),
-            cell: (lot) => (
-              <Cell
-                text={t(lot.biofuel?.name ?? "", { ns: "biofuels" })}
-                sub={`${formatNumber(lot.volume)} L`}
-              />
-            ),
-          },
-          {
-            key: "feedstock",
-            header: t("Matière première"),
-            cell: (lot) => (
-              <Cell
-                text={t(lot.feedstock?.name ?? "", { ns: "feedstocks" })}
-                sub={t(lot.country_of_origin?.name ?? "", { ns: "countries" })}
-              />
-            ),
-          },
-          {
-            header: t("Fournisseur"),
-            cell: (lot) => (
-              <Cell text={lot.carbure_supplier?.name ?? lot.unknown_supplier} />
-            ),
-          },
-          {
-            header: t("Client"),
-            cell: (lot) => (
-              <Cell text={lot.carbure_client?.name ?? lot.unknown_client} />
-            ),
-          },
-          {
-            header: t("Site de production"),
-            cell: (lot) => (
-              <Cell
-                // prettier-ignore
-                text={lot.carbure_production_site?.name ?? lot.unknown_production_site}
-                sub={t(lot.production_country?.name ?? "", { ns: "countries" })}
-              />
-            ),
-          },
-          {
-            header: t("Site de livraison"),
-            cell: (lot) => (
-              <Cell
-                text={lot.carbure_delivery_site?.name ?? lot.unknown_delivery_site} // prettier-ignore
-                sub={t(lot.delivery_site_country?.name ?? "", { ns: "countries" })} // prettier-ignore
-              />
-            ),
-          },
-          {
-            small: true,
-            key: "ghg_reduction",
-            header: t("Réd. GES"),
-            cell: (lot) => <Cell text={`${lot.ghg_reduction.toFixed(2)}%`} />,
-          },
+          columns.status,
+          columns.period,
+          columns.document,
+          columns.volume,
+          columns.feedstock,
+          columns.supplier,
+          columns.client,
+          columns.productionSite,
+          columns.depot,
+          columns.ghgReduction,
         ]}
       />
     )
   }
 )
 
+export function useLotColumns() {
+  const { t } = useTranslation()
+
+  return {
+    status: {
+      header: t("Statut"),
+      cell: (lot: Lot) => <LotTag lot={lot} />,
+    },
+
+    period: {
+      key: "period",
+      header: t("Période"),
+      cell: (lot: Lot) => <PeriodCell lot={lot} />,
+    },
+
+    document: {
+      header: t("N° Document"),
+      cell: (lot: Lot) => (
+        <Cell
+          text={lot.transport_document_reference?.toUpperCase()}
+          sub={lot.transport_document_type}
+        />
+      ),
+    },
+
+    volume: {
+      key: "volume",
+      header: t("Biocarburant"),
+      cell: (lot: Lot) => (
+        <Cell
+          text={t(lot.biofuel?.code ?? "", { ns: "biofuels" })}
+          sub={`${formatNumber(lot.volume)} L`}
+        />
+      ),
+    },
+
+    feedstock: {
+      key: "feedstock",
+      header: t("Matière première"),
+      cell: (lot: Lot) => (
+        <Cell
+          text={t(lot.feedstock?.code ?? "", { ns: "feedstocks" })}
+          sub={t(lot.country_of_origin?.code_pays ?? "", { ns: "countries" })} // prettier-ignore
+        />
+      ),
+    },
+
+    supplier: {
+      header: t("Fournisseur"),
+      cell: (lot: Lot) => (
+        <Cell text={lot.carbure_supplier?.name ?? lot.unknown_supplier} />
+      ),
+    },
+
+    client: {
+      header: t("Client"),
+      cell: (lot: Lot) => (
+        <Cell text={lot.carbure_client?.name ?? lot.unknown_client} />
+      ),
+    },
+
+    productionSite: {
+      header: t("Site de production"),
+      cell: (lot: Lot) => (
+        <Cell
+          // prettier-ignore
+          text={lot.carbure_production_site?.name ?? lot.unknown_production_site}
+          sub={t(lot.production_country?.code_pays ?? "", {
+            ns: "countries",
+          })}
+        />
+      ),
+    },
+
+    depot: {
+      header: t("Site de livraison"),
+      cell: (lot: Lot) => (
+        <Cell
+          text={lot.carbure_delivery_site?.name ?? lot.unknown_delivery_site} // prettier-ignore
+          sub={t(lot.delivery_site_country?.code_pays ?? "", { ns: "countries" })} // prettier-ignore
+        />
+      ),
+    },
+
+    ghgReduction: {
+      small: true,
+      key: "ghg_reduction",
+      header: t("Réd. GES"),
+      cell: (lot: Lot) => <Cell text={`${lot.ghg_reduction.toFixed(2)}%`} />,
+    },
+  }
+}
 interface PeriodCellProps {
   lot: Lot
 }

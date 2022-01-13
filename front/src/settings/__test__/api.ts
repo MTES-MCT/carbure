@@ -19,15 +19,15 @@ import {
   okErrorsTranslations,
   okFieldsTranslations,
 } from "common/__test__/api"
-import { clone } from "common/__test__/helpers"
+import { clone, Data } from "common/__test__/helpers"
 
-let entity = producer
 let deliverySites: any[] = []
 let productionSites: any[] = []
 
 export function setEntity(nextEntity: any) {
-  entity = clone(nextEntity)
+  Data.set("entity", nextEntity)
 }
+setEntity(producer)
 
 export function setDeliverySites(nextDeliverySites: any[]) {
   deliverySites = nextDeliverySites.map((ds) => ({
@@ -41,6 +41,7 @@ export function setProductionSites(nextProductionSites: any[]) {
 }
 
 export const okSettings = rest.get("/api/v3/settings", (req, res, ctx) => {
+  const entity = Data.get("entity")
   return res(
     ctx.json({
       status: "success",
@@ -75,6 +76,8 @@ export const okEmptySettings = rest.get("/api/v3/settings", (req, res, ctx) => {
 export const okDynamicSettings = rest.get(
   "/api/v3/settings",
   (req, res, ctx) => {
+    const entity = Data.get("entity")
+
     return res(
       ctx.json({
         status: "success",
@@ -91,6 +94,7 @@ export const okDynamicSettings = rest.get(
 export const okEnableMac = rest.post(
   "/api/v3/settings/enable-mac",
   (req, res, ctx) => {
+    const entity = Data.get("entity")
     setEntity({
       ...entity,
       has_mac: true,
@@ -102,6 +106,7 @@ export const okEnableMac = rest.post(
 export const okDisableMac = rest.post(
   "/api/v3/settings/disable-mac",
   (req, res, ctx) => {
+    const entity = Data.get("entity")
     setEntity({
       ...entity,
       has_mac: false,
@@ -113,11 +118,11 @@ export const okDisableMac = rest.post(
 export const okEnableTrading = rest.post(
   "/api/v3/settings/enable-trading",
   (req, res, ctx) => {
+    const entity = Data.get("entity")
     setEntity({
       ...entity,
       has_trading: true,
     })
-
     return res(ctx.json({ status: "success" }))
   }
 )
@@ -125,11 +130,11 @@ export const okEnableTrading = rest.post(
 export const okDisableTrading = rest.post(
   "/api/v3/settings/disable-trading",
   (req, res, ctx) => {
+    const entity = Data.get("entity")
     setEntity({
       ...entity,
       has_trading: false,
     })
-
     return res(ctx.json({ status: "success" }))
   }
 )

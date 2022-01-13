@@ -196,7 +196,7 @@ export const ExpirationDate = ({ link }: ExpirationDateProps) => {
     <span className={cl(css.expirationDate, expired && css.expired)}>
       {expired && !updated && (
         <React.Fragment>
-          <Trans>Expiré ({{ formatted }})</Trans>
+          {formatted}
           <Button
             captive
             icon={Refresh}
