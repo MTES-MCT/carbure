@@ -741,6 +741,7 @@ def make_carbure_stock_sheet(workbook, lots):
     worksheet_lots = workbook.add_worksheet("lots")
     serializer = CarbureStockCSVSerializer(lots, many=True)
     df = pd.DataFrame(serializer.data)
+    df.rename(columns={'carbure_id': 'carbure_stock_id'}, inplace=True)
     # header
     bold = workbook.add_format({'bold': True})
     for i, c in enumerate(df.columns):
