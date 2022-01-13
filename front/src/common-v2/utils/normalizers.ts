@@ -7,7 +7,7 @@ import {
   Depot,
   Feedstock,
   ProductionSite,
-  CertificateData
+  CertificateData,
 } from "common/types"
 
 export const normalizeBiofuel: Normalizer<Biofuel> = (biofuel) => ({
@@ -57,6 +57,12 @@ export const normalizeBiofuelFilter: Normalizer<Option, string> = (biofuel) => (
 export const normalizeCountryFilter: Normalizer<Option, string> = (country) => ({
   value: country.value,
   label: i18next.t(country.value, { ns: "countries" }),
+})
+
+// prettier-ignore
+export const normalizeAnomalyFilter: Normalizer<Option, string> = (anomaly) => ({
+  value: anomaly.value,
+  label: i18next.t(anomaly.value, { ns: 'errors'})
 })
 
 // prettier-ignore

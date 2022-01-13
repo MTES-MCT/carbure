@@ -1,24 +1,16 @@
 import { render, TestRoot } from "setupTests"
 import { screen } from "@testing-library/react"
 import { Route } from "react-router-dom"
-import { Entity, LotStatus } from "common/types"
+import { AdminStatus } from "controls/types"
 
-import { admin } from "common/__test__/data"
 import { waitWhileLoading } from "common/__test__/helpers"
-import Transactions from "../index"
+import Controls from "../index"
 
-import server, { setAdminLots } from "./api"
-import { emptyLots } from "./data"
+import server from "./api"
 
-const TransactionsWithRouter = ({
-  entity,
-  status,
-}: {
-  entity: Entity
-  status: LotStatus
-}) => (
-  <TestRoot url={`/org/0/transactions/${status}`}>
-    <Route path="/org/0/transactions/:status/*" element={<Transactions entity={entity} />} />
+const ControlsWithRouter = ({ status }: { status: AdminStatus }) => (
+  <TestRoot url={`/org/0/controls/${status}`}>
+    <Route path="/org/0/controls/:status/*" element={<Controls />} />
   </TestRoot>
 )
 
@@ -31,15 +23,13 @@ afterEach(() => {
 afterAll(() => server.close())
 
 test("admin: display an empty list of transactions", async () => {
-  setAdminLots(emptyLots)
-
-  render(<TransactionsWithRouter status={LotStatus.Alert} entity={admin} />)
+  render(<ControlsWithRouter status="alerts" />)
 
   await waitWhileLoading()
 
-  screen.getByText("Alerte")
+  await screen.findByText("Alerte")
   screen.getByText("Correction")
-  screen.getByText("Lot déclaré")
+  screen.getByText("Déclaration")
 
   screen.getByText("Périodes")
   screen.getByText("Biocarburants")
@@ -50,7 +40,7 @@ test("admin: display an empty list of transactions", async () => {
   screen.getByText("Sites de production")
   screen.getByText("Sites de livraison")
 
-  screen.getByPlaceholderText("Rechercher des lots...")
+  screen.getByPlaceholderText("Rechercher...")
 
-  screen.getByText("Aucune transaction trouvée pour cette recherche")
+  screen.getByText("Aucun résultat trouvé pour cette recherche")
 })

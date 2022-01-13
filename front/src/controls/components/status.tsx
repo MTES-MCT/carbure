@@ -106,7 +106,7 @@ const StatusRecap = ({
 }
 
 export function useStatus() {
-  const match = useMatch<"status">("/org/:entity/controls/:status/*")
+  const match = useMatch<"status", string>("/org/:entity/controls/:status/*")
   return (match?.params.status ?? "unknown") as AdminStatus
 }
 

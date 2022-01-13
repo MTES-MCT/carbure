@@ -6,6 +6,7 @@ import { Grid, Row } from "common-v2/components/scaffold"
 import { MultiSelect, MultiSelectProps } from "common-v2/components/multi-select" // prettier-ignore
 import Button from "common-v2/components/button"
 import {
+  normalizeAnomalyFilter,
   normalizeBiofuelFilter,
   normalizeCountryFilter,
   normalizeFeedstockFilter,
@@ -111,6 +112,7 @@ const filterNormalizers: Partial<Record<Filter, Normalizer<Option, string>>> = {
   [Filter.Feedstocks]: normalizeFeedstockFilter,
   [Filter.Biofuels]: normalizeBiofuelFilter,
   [Filter.CountriesOfOrigin]: normalizeCountryFilter,
+  [Filter.Errors]: normalizeAnomalyFilter,
 }
 
 export function useFilterParams() {

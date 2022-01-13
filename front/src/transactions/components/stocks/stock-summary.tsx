@@ -129,7 +129,7 @@ export const StockSummary = ({
 
   const stock = summaryData?.stock ?? []
   const stockLots = stock.reduce((count, item) => count + item.total, 0)
-  const stockVolume = stock.reduce((volume, item) => volume + item.remaining_volume_sum, 0) // prettier-ignore
+  const stockVolume = stock.reduce((volume, item) => volume + (item.remaining_volume_sum ?? 0), 0) // prettier-ignore
 
   return (
     <>
@@ -167,9 +167,9 @@ export const StockSummary = ({
               {
                 key: "volume",
                 header: t("Volume restant (litres)"),
-                orderBy: (item) => item.remaining_volume_sum,
+                orderBy: (item) => item.remaining_volume_sum ?? 0,
                 cell: (item) => (
-                  <Cell text={formatNumber(item.remaining_volume_sum)} />
+                  <Cell text={formatNumber(item.remaining_volume_sum ?? 0)} />
                 ),
               },
               {

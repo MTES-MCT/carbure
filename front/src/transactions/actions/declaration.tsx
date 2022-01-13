@@ -71,7 +71,10 @@ export const DeclarationDialog = ({
     onSuccess: (res) => {
       const declarations = res.data.data ?? []
       if (declaration === undefined) {
-        setDeclaration(declarations.find((d) => d.period === currentPeriod) ?? declarations[0])
+        setDeclaration(
+          declarations.find((d) => d.period === currentPeriod) ??
+            declarations[0]
+        )
       } else {
         setDeclaration(declarations.find((d) => d.period === declaration.period)) // prettier-ignore
       }
@@ -128,7 +131,9 @@ export const DeclarationDialog = ({
   return (
     <Dialog limit onClose={onClose}>
       <header>
-        <h1>{t("Déclaration de durabilité")}</h1>
+        <h1>
+          {t("Déclaration de durabilité")} {year}
+        </h1>
       </header>
 
       <main>

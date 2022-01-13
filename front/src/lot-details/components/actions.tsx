@@ -32,17 +32,23 @@ export const LotActions = ({ lot }: ActionBarProps) => {
         <DeleteOneButton lot={lot} />
       )}
 
-      {status === "PENDING" && correction === "NO_PROBLEMO" && isClient && (
+      {isClient && status === "PENDING" && correction === "NO_PROBLEMO" && (
         <Fragment>
           <AcceptOneButton lot={lot} />
           <RejectOneButton lot={lot} />
-          <RequestOneFixButton lot={lot} />
         </Fragment>
       )}
 
-      {correction === "FIXED" && <ApproveOneFixButton lot={lot} />}
+      {isClient && !isSupplier && status !== "DRAFT" && (
+        <Fragment>
+          {correction === "FIXED" && <ApproveOneFixButton lot={lot} />}
+          {["NO_PROBLEMO", "FIXED"].includes(correction) && (
+            <RequestOneFixButton lot={lot} />
+          )}
+        </Fragment>
+      )}
 
-      {status === "PENDING" && isSupplier && (
+      {isSupplier && status !== "DRAFT" && (
         <Fragment>
           {correction === "NO_PROBLEMO" && <RecallOneButton lot={lot} />}
           {correction === "IN_CORRECTION" && <MarkOneAsFixedButton lot={lot} />}

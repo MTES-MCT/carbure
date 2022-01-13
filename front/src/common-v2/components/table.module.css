@@ -87,9 +87,13 @@
 }
 
 .cell,
+.header {
+  min-width: 0;
+}
+
 .header,
-.cell *,
-.header * {
+.cell .multiline > * {
+  display: block;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;

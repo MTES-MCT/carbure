@@ -708,7 +708,7 @@ def lots_send(request, *args, **kwargs):
         #### SPECIFIC CASES
         # I AM NEITHER THE PRODUCER NOR THE CLIENT (Trading)
         # create two transactions. unknown producer/supplier -> me and me -> client
-        if lot.carbure_producer != entity and lot.carbure_client != entity:
+        if lot.carbure_supplier != entity and lot.carbure_client != entity:
             # AUTO ACCEPT FIRST TRANSACTION
             final_client = lot.carbure_client
             nb_auto_accepted += 1
@@ -767,7 +767,7 @@ def lots_delete(request, *args, **kwargs):
         if lot.added_by_id != int(entity_id):
             return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to delete this lot'}, status=403)
 
-        if lot.lot_status not in [CarbureLot.DRAFT, CarbureLot.PENDING, CarbureLot.REJECTED]:
+        if lot.lot_status not in [CarbureLot.DRAFT, CarbureLot.REJECTED]:
             # cannot delete lot accepted / frozen or already deleted
             return JsonResponse({'status': 'error', 'message': 'Cannot delete lot'}, status=400)
 
@@ -1074,6 +1074,7 @@ def recall_lot(request, *args, **kwargs):
             return JsonResponse({'status': 'error', 'message': 'Lot is deleted. Cannot recall'}, status=400)
 
         lot.lot_status = CarbureLot.DRAFT
+        lot.correction_status = CarbureLot.NO_PROBLEMO
         lot.save()
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.RECALLED

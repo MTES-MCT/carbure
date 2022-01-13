@@ -173,7 +173,7 @@ def fill_volume_info(lot, data):
                 lot.volume = 0
                 errors.append(GenericError(lot=lot, field='volume', error=VOLUME_FORMAT_INCORRECT, display_to_creator=True, is_blocking=True))
         lot.weight = lot.get_weight()
-        lot.lhv_amount = lot.get_lhv_amount()    
+        lot.lhv_amount = lot.get_lhv_amount()
     return errors
 
 def fill_supplier_info(lot, data, entity):
@@ -288,7 +288,7 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
     if existing_lot:
         lot = existing_lot
     else:
-        lot = CarbureLot()   
+        lot = CarbureLot()
     lot.free_field = data.get('free_field', None)
     lot.added_by = entity
     carbure_stock_id = data.get('carbure_stock_id', False)

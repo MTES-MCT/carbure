@@ -28,12 +28,14 @@ export const EmissionFields = (props: GHGFieldsProps) => {
         {...props}
       />
       <NumberInput
+        required
         label="EP"
         title={t("Émissions résultant dela transformation")}
         {...bind("ep")}
         {...props}
       />
       <NumberInput
+        required
         label="ETD"
         title={t("Émissions résultant du transport et de la distribution")}
         {...bind("etd")}
@@ -69,13 +71,13 @@ export const ReductionFields = (props: GHGFieldsProps) => {
         {...props}
       />
       <NumberInput
-        label="EL"
+        label="ECCS"
         title={t("Réductions d'émissions dues au piégeage et au stockage géologique du carbone")} // prettier-ignore
         {...bind("eccs")}
         {...props}
       />
       <NumberInput
-        label="EP"
+        label="ECCR"
         title={t("Réductions d'émissions dues au piégeage et à la substitution du carbone")} // prettier-ignore
         {...bind("eccr")}
         {...props}
