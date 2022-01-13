@@ -13,10 +13,17 @@ import Button from "common-v2/components/button"
 import Dialog, { Confirm } from "common-v2/components/dialog"
 import Table, { Cell, actionColumn } from "common-v2/components/table"
 import Autocomplete from "common-v2/components/autocomplete"
-import { Cross, Plus, Return, Refresh } from "common-v2/components/icons"
+import {
+  Cross,
+  Plus,
+  Return,
+  Refresh,
+  AlertCircle,
+} from "common-v2/components/icons"
 import { normalizeCertificate } from "common-v2/utils/normalizers"
 import { Certificate, EntityCertificate } from "common/types"
 import { isExpired } from "./common"
+import Alert from "common-v2/components/alert"
 
 const Certificates = () => {
   const { t } = useTranslation()
@@ -41,6 +48,8 @@ const Certificates = () => {
     },
   })
 
+  const certificateData = certificates.result?.data.data ?? []
+
   return (
     <Panel style={{ marginBottom: "var(--spacing-l)" }}>
       <header>
@@ -56,59 +65,70 @@ const Certificates = () => {
           style={{ fontSize: "0.87em" }}
         />
       </header>
-      <Table
-        rows={certificates.result?.data.data ?? []}
-        columns={[
-          {
-            key: "id",
-            header: t("ID"),
-            orderBy: (c) => c.certificate.certificate_id,
-            cell: (c) => <Cell text={c.certificate.certificate_id} />,
-          },
-          {
-            key: "type",
-            header: t("Type"),
-            orderBy: (c) => c.certificate.certificate_type,
-            cell: (c) => <Cell text={c.certificate.certificate_type} />,
-          },
-          {
-            key: "holder",
-            header: t("Détenteur"),
-            orderBy: (c) => c.certificate.certificate_holder,
-            cell: (c) => <Cell text={c.certificate.certificate_holder} />,
-          },
-          {
-            key: "validity",
-            header: t("Validité"),
-            orderBy: (c) => c.certificate.valid_until,
-            cell: (c) => <ExpirationDate link={c} />,
-          },
-          actionColumn<EntityCertificate>((c) => [
-            <Button
-              variant="icon"
-              icon={Cross}
-              action={() =>
-                portal((close) => (
-                  <Confirm
-                    title={t("Suppression certificat")}
-                    description={t("Voulez-vous supprimer ce certificat ?")}
-                    confirm={t("Supprimer")}
-                    variant="danger"
-                    onConfirm={() =>
-                      deleteCertificate.execute(
-                        entity.id,
-                        c.certificate.certificate_id,
-                        c.certificate.certificate_type
-                      )
-                    }
-                    onClose={close}
-                  />
-                ))
-              }
-            />,
-          ]),
-        ]}
-      />
+      {certificateData.length === 0 && (
+        <section style={{ paddingBottom: "var(--spacing-l)" }}>
+          <Alert
+            variant="warning"
+            icon={AlertCircle}
+            label={t("Aucun certificat associé à cette société")}
+          />
+        </section>
+      )}
+      {certificateData.length > 0 && (
+        <Table
+          rows={certificateData}
+          columns={[
+            {
+              key: "id",
+              header: t("ID"),
+              orderBy: (c) => c.certificate.certificate_id,
+              cell: (c) => <Cell text={c.certificate.certificate_id} />,
+            },
+            {
+              key: "type",
+              header: t("Type"),
+              orderBy: (c) => c.certificate.certificate_type,
+              cell: (c) => <Cell text={c.certificate.certificate_type} />,
+            },
+            {
+              key: "holder",
+              header: t("Détenteur"),
+              orderBy: (c) => c.certificate.certificate_holder,
+              cell: (c) => <Cell text={c.certificate.certificate_holder} />,
+            },
+            {
+              key: "validity",
+              header: t("Validité"),
+              orderBy: (c) => c.certificate.valid_until,
+              cell: (c) => <ExpirationDate link={c} />,
+            },
+            actionColumn<EntityCertificate>((c) => [
+              <Button
+                variant="icon"
+                icon={Cross}
+                action={() =>
+                  portal((close) => (
+                    <Confirm
+                      title={t("Suppression certificat")}
+                      description={t("Voulez-vous supprimer ce certificat ?")}
+                      confirm={t("Supprimer")}
+                      variant="danger"
+                      onConfirm={() =>
+                        deleteCertificate.execute(
+                          entity.id,
+                          c.certificate.certificate_id,
+                          c.certificate.certificate_type
+                        )
+                      }
+                      onClose={close}
+                    />
+                  ))
+                }
+              />,
+            ]),
+          ]}
+        />
+      )}
     </Panel>
   )
 }
