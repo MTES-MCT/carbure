@@ -1,12 +1,7 @@
 import { Trans, useTranslation } from "react-i18next"
 
-import {
-  Country,
-  DepotType,
-  OwnershipType,
-  EntityType,
-  UserRole,
-} from "common/types"
+import { Country, DepotType, OwnershipType } from "common/types"
+import { EntityType, UserRole } from "carbure/types"
 import {
   DeliverySiteSettingsHook,
   EntityDeliverySite,

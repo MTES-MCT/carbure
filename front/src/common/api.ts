@@ -1,9 +1,9 @@
+import { Entity } from "carbure/types"
 import {
-  Biocarburant,
+  Biofuel,
   Country,
-  DeliverySite,
-  Entity,
-  MatierePremiere,
+  Depot,
+  Feedstock,
   ProductionSiteDetails,
 } from "./types"
 
@@ -12,11 +12,11 @@ import api from "./services/api"
 export function findMatieresPremieres(
   query: string,
   double_count_only?: boolean
-): Promise<MatierePremiere[]> {
+): Promise<Feedstock[]> {
   return api.get("/common/matieres-premieres", { query, double_count_only })
 }
 
-export function findBiocarburants(query: string): Promise<Biocarburant[]> {
+export function findBiocarburants(query: string): Promise<Biofuel[]> {
   return api.get("/common/biocarburants", { query })
 }
 
@@ -42,7 +42,7 @@ export function findProductionSites(
 export function findDeliverySites(
   query: string,
   entity_id?: number
-): Promise<DeliverySite[]> {
+): Promise<Depot[]> {
   return api.get("/common/delivery-sites", { query, entity_id })
 }
 

@@ -21,7 +21,8 @@ import {
 import { ProductionSiteSettingsHook } from "settings/hooks/use-production-sites"
 import ProductionSitesSettings from "settings/components/production-site"
 import { prompt } from "common/components/dialog"
-import { EntityType, ProductionSiteDetails } from "common/types"
+import { EntityType } from "carbure/types"
+import { ProductionSiteDetails } from "common/types"
 import {
   ProductionSitePrompt,
   ProductionSiteState,

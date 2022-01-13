@@ -1,9 +1,9 @@
 import { Fragment, useEffect, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import styles from "./settings.module.css"
-import { Entity } from "carbure/types"
+import { Entity, UserRole } from "carbure/types"
 import { CompanySettingsHook as DoubleContingSettingsHook } from "../hooks/use-company"
-import { ProductionSite, UserRole } from "common/types"
+import { ProductionSite } from "common/types"
 import {
   DoubleCounting,
   DoubleCountingStatus as DCStatus,

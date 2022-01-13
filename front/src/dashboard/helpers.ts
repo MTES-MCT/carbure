@@ -1,5 +1,6 @@
 import { comparePeriod, prettyPeriod, Period } from "common/hooks/use-period"
-import { Declaration, Entity, EntityType } from "common/types"
+import { Entity, EntityType } from "carbure/types"
+import { Declaration } from "transactions/types"
 
 export type Entities = Record<number, Entity>
 export type DeclarationsByMonth = { [k: string]: Declaration }

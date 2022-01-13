@@ -1,5 +1,5 @@
 import api from "common/services/api"
-import { Entity } from "common/types"
+import { Entity } from "carbure/types"
 import {
   DeclarationsByEntityType,
   groupDeclarationsByEntities,

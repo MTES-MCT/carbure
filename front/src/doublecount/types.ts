@@ -1,4 +1,5 @@
-import { Entity, ProductionSite, MatierePremiere, Biocarburant, Country } from "common/types";
+import { Entity } from "carbure/types"
+import { ProductionSite, Feedstock, Biofuel, Country } from "common/types"
 
 export enum Admin {
   DGEC = "MTE - DGEC",
@@ -13,7 +14,6 @@ export enum DoubleCountingStatus {
   Accepted = "ACCEPTED",
   Lapsed = "LAPSED",
 }
-
 
 export interface DoubleCounting {
   id: number
@@ -30,14 +30,14 @@ export interface DoubleCountingSourcingAggregation {
   year: number
   sum: number
   count: number
-  feedstock: MatierePremiere
+  feedstock: Feedstock
 }
 
 export interface DoubleCountingSourcing {
   id: number
   year: number
   metric_tonnes: number
-  feedstock: MatierePremiere
+  feedstock: Feedstock
   origin_country: Country
   transit_country?: Country
   supply_country?: Country
@@ -46,8 +46,8 @@ export interface DoubleCountingSourcing {
 export interface DoubleCountingProduction {
   id: number
   year: number
-  feedstock: MatierePremiere
-  biofuel: Biocarburant
+  feedstock: Feedstock
+  biofuel: Biofuel
   max_production_capacity?: number
   estimated_production: number
   requested_quota: number
@@ -58,7 +58,7 @@ export interface DoubleCountingDetails extends DoubleCounting {
   sourcing: DoubleCountingSourcing[]
   production: DoubleCountingProduction[]
   aggregated_sourcing: DoubleCountingSourcingAggregation[]
-  documents: { id: number, url: string, file_type: "DECISION" | "SOURCING" }[]
+  documents: { id: number; url: string; file_type: "DECISION" | "SOURCING" }[]
   dgec_validated: boolean
   dgec_validator: string | null
   dgec_validated_dt: string | null
@@ -70,17 +70,16 @@ export interface DoubleCountingDetails extends DoubleCounting {
   dgpe_validated_dt: string | null
 }
 
-
 export interface AgreementSnapshot {
   years: number[]
 }
 
 export interface AgreementsOverview {
-  accepted: { count: number, agreements: DoubleCounting[] },
-  rejected: { count: number, agreements: DoubleCounting[] },
-  expired: { count: number, agreements: DoubleCounting[] },
-  pending: { count: number, agreements: DoubleCounting[] },
-  progress: { count: number, agreements: DoubleCounting[] },
+  accepted: { count: number; agreements: DoubleCounting[] }
+  rejected: { count: number; agreements: DoubleCounting[] }
+  expired: { count: number; agreements: DoubleCounting[] }
+  pending: { count: number; agreements: DoubleCounting[] }
+  progress: { count: number; agreements: DoubleCounting[] }
 }
 
 export interface QuotaOverview {
@@ -94,10 +93,10 @@ export interface QuotaOverview {
 }
 
 export interface QuotaDetails {
-  volume: number,
-  approved_quota: number,
-  current_production_weight_sum_tonnes: number,
-  feedstock: MatierePremiere,
-  biofuel: Biocarburant,
+  volume: number
+  approved_quota: number
+  current_production_weight_sum_tonnes: number
+  feedstock: Feedstock
+  biofuel: Biofuel
   nb_lots: number
 }

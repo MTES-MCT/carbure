@@ -8,7 +8,7 @@ import { AlertCircle, Check, Cross } from "common-v2/components/icons"
 import { Section, SectionBody, SectionHeader } from "common/components/section"
 import Table, { Actions, Column, padding } from "common/components/table"
 import useAPI from "common/hooks/use-api"
-import { UserRightRequest, UserRightStatus, UserRole } from "common/types"
+import { UserRightRequest, UserRightStatus, UserRole } from "carbure/types"
 import { useEffect } from "react"
 import { formatDate } from "settings/components/common"
 import * as api from "../api"
@@ -23,7 +23,7 @@ const RIGHTS_ORDER = {
   [UserRightStatus.Rejected]: 3,
 }
 
-const UserRights = ({ entity }: { entity: Entity }) => {
+const EntityUserRights = ({ entity }: { entity: Entity }) => {
   const { t } = useTranslation()
 
   const [rights, getRights] = useAPI(api.getEntityRights)
@@ -164,4 +164,4 @@ const UserRights = ({ entity }: { entity: Entity }) => {
   )
 }
 
-export default UserRights
+export default EntityUserRights

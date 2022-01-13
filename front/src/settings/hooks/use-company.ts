@@ -35,12 +35,12 @@ export default function useCompany(entity: EntityManager): CompanySettingsHook {
   const [requestTrading, resolveToggleTrading] = useAPI(toggleTrading)
 
   const certificates = useQuery(api2.getMyCertificates, {
-    key: 'entity-certificates',
+    key: "entity-certificates",
     params: [entity!.id],
   })
 
   const setDefaultCertificate = useMutation(api2.setDefaultCertificate, {
-    invalidates: ['user-settings'],
+    invalidates: ["user-settings"],
   })
 
   const entityID = entity.id ?? -1
@@ -62,7 +62,6 @@ export default function useCompany(entity: EntityManager): CompanySettingsHook {
     value: c.certificate.certificate_id,
     label: `${c.certificate.certificate_id} - ${c.certificate.certificate_holder}`,
   }))
-
 
   async function onChangeMAC(checked: boolean) {
     if (entity !== null) {

@@ -1,6 +1,6 @@
+import { useTranslation } from "react-i18next"
 import { ApiState } from "common/hooks/use-api"
 import { Certificate } from "common/types"
-import { useTranslation } from "react-i18next"
 import { Panel } from "common-v2/components/scaffold"
 import Table, { Cell } from "common-v2/components/table"
 

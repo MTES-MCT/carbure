@@ -1,5 +1,5 @@
 import { api, Api } from "common-v2/services/api"
-import { EntityCertificate, Certificate, CertificateType } from "common/types"
+import { Certificate, CertificateType, EntityCertificate } from "common/types"
 
 export function getCertificates(query: string) {
   return api.get<Api<Certificate[]>>("/get-certificates", {

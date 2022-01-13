@@ -1,8 +1,8 @@
 import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 
-import { Entity } from "carbure/types"
-import { ProductionSiteDetails, UserRole } from "common/types"
+import { Entity, UserRole } from "carbure/types"
+import { ProductionSiteDetails } from "common/types"
 
 import useAPI from "common/hooks/use-api"
 import * as api from "../api"

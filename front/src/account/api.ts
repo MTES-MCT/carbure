@@ -1,5 +1,5 @@
 import api from "common/services/api"
-import { UserRole } from "common/types"
+import { UserRole } from "carbure/types"
 
 export function requestAccess(
   entity_id: number,
