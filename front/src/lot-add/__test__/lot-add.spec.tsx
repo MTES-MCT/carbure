@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event"
 import { Route } from "react-router-dom"
 
 import { operator, producer, trader } from "common/__test__/data"
-import { waitWhileLoading } from "common/__test__/helpers"
+import { getField, waitWhileLoading } from "common/__test__/helpers"
 import LotAdd from "../index"
 
 import { PortalProvider } from "common-v2/components/portal"
@@ -29,12 +29,6 @@ const TransactionAddWithRouter = ({
     </TestRoot>
   </PortalProvider>
 )
-
-function getField(label: any) {
-  const field = screen.getByText(label).parentElement?.querySelector("input")
-  if (!field) throw new Error(`Cannot find field with label like ${label}`)
-  return field
-}
 
 function checkLotFields() {
   getField("N° document d'accompagnement *")

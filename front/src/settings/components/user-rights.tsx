@@ -1,6 +1,6 @@
 import { Trans, useTranslation } from "react-i18next"
 
-import { statusColumn } from "account/components/access-rights"
+import { RightStatus } from "account/components/access-rights"
 import { Title } from "common/components"
 import { Alert } from "common/components/alert"
 import { confirm } from "common/components/dialog"
@@ -13,6 +13,7 @@ import { useEffect } from "react"
 import { formatDate } from "settings/components/common"
 import * as api from "../api"
 import styles from "entities/components/user-rights.module.css"
+import colStyles from "common/components/table.module.css"
 import { Entity } from "carbure/types"
 
 const RIGHTS_ORDER = {
@@ -111,7 +112,11 @@ const UserRights = ({ entity }: { entity: Entity }) => {
 
   const columns: Column<UserRightRequest>[] = [
     padding,
-    statusColumn,
+    {
+      header: "Statut",
+      className: colStyles.narrowColumn,
+      render: (r: UserRightRequest) => <RightStatus status={r.status} />,
+    },
     {
       header: t("Utilisateur"),
       render: (r) => r.user[0] ?? "",

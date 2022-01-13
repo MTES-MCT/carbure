@@ -10,7 +10,7 @@ import { LotDetails as LotDetailsData } from "lot-details/types"
 
 import server from "./api"
 
-import { Data } from "common/__test__/helpers"
+import { Data, getField } from "common/__test__/helpers"
 import { PortalProvider } from "common-v2/components/portal"
 import { clickOnCheckboxesAndConfirm } from "../../transactions/__test__/helpers"
 import { setEntity } from "settings/__test__/api"
@@ -48,12 +48,6 @@ const LotDetailsWithRouter = ({ entity }: { entity: Entity }) => {
       />
     </TestRoot>
   )
-}
-
-function getField(label: any) {
-  const field = screen.getByText(label).parentElement?.querySelector("input")
-  if (!field) throw new Error(`Cannot find field with label like ${label}`)
-  return field
 }
 
 function checkLotFields() {
