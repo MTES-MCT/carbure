@@ -7,7 +7,7 @@ import {
   MatierePremiere,
   ProductionSiteDetails,
   UserRole,
-  CertificateData,
+  Certificate,
 } from "common/types"
 
 import { ProductionSiteSettingsHook } from "../hooks/use-production-sites"
@@ -21,7 +21,13 @@ import useForm from "common/hooks/use-form"
 import { Title, Box, LoaderOverlay } from "common/components"
 import { LabelInput, Label, LabelCheckbox } from "common/components/input"
 import { Button } from "common/components/button"
-import { AlertCircle, Cross, Plus, Return, Save } from "common/components/icons"
+import {
+  AlertCircle,
+  Cross,
+  Plus,
+  Return,
+  Save,
+} from "common-v2/components/icons"
 import { Alert } from "common/components/alert"
 import Table, {
   Actions,
@@ -74,7 +80,7 @@ export type ProductionSiteState = {
   biocarburants: Biocarburant[]
 
   // certificates
-  certificates: CertificateData[]
+  certificates: Certificate[]
 }
 
 type ProductionSitePromptProps = PromptProps<ProductionSiteState> & {

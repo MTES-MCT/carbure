@@ -6,8 +6,8 @@ import {
   DeliverySite,
   Entity,
   ProductionSiteDetails,
-  CertificateData,
-  EntityCertificate
+  Certificate,
+  EntityCertificate,
 } from "common/types"
 import api, { Api } from "./services/api"
 
@@ -57,13 +57,11 @@ export function findDepots(query: string, entity_id?: number) {
     .then(extract)
 }
 
-export function findCertificates(
-  query: string,
-) {
+export function findCertificates(query: string) {
   return api
-    .get<Api<CertificateData[]>>("/get-certificates", { params: { query } })
+    .get<Api<Certificate[]>>("/get-certificates", { params: { query } })
     .then(extract)
-    .then(certificates => certificates.map(c => c.certificate_id))
+    .then((certificates) => certificates.map((c) => c.certificate_id))
 }
 
 export function findMyCertificates(
@@ -78,5 +76,7 @@ export function findMyCertificates(
       params: { query, ...options },
     })
     .then(extract)
-    .then(certificates => certificates.map(c => c.certificate.certificate_id))
+    .then((certificates) =>
+      certificates.map((c) => c.certificate.certificate_id)
+    )
 }

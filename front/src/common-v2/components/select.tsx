@@ -2,7 +2,7 @@ import { useRef, useState } from "react"
 import { useAsyncList } from "../hooks/async"
 import { defaultNormalizer, Normalizer, Sorter } from "../utils/normalize"
 import Dropdown, { Trigger } from "./dropdown"
-import { ChevronDown } from "./icons"
+import { ChevronDown } from "common-v2/components/icons"
 import { Control, Input } from "./input"
 import List from "./list"
 

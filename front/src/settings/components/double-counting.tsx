@@ -31,7 +31,7 @@ import {
   Return,
   Save,
   Upload,
-} from "common/components/icons"
+} from "common-v2/components/icons"
 import { Alert } from "common/components/alert"
 import {
   confirm,

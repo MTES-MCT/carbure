@@ -25,7 +25,7 @@ import {
   Cross,
   Save,
   AlertCircle,
-} from "common/components/icons"
+} from "common-v2/components/icons"
 import { formatDate } from "settings/components/common"
 import { Alert } from "common/components/alert"
 import { useNotificationContext } from "common/components/notifications"

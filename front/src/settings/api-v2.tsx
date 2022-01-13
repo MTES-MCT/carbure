@@ -1,9 +1,8 @@
 import { api, Api } from "common-v2/services/api"
-import { EntityCertificate, CertificateData, CertificateType } from "common/types"
-
+import { EntityCertificate, Certificate, CertificateType } from "common/types"
 
 export function getCertificates(query: string) {
-  return api.get<Api<CertificateData[]>>("/get-certificates", {
+  return api.get<Api<Certificate[]>>("/get-certificates", {
     params: { query },
   })
 }
@@ -15,8 +14,8 @@ export function getMyCertificates(
   return api.get<Api<EntityCertificate[]>>("/get-my-certificates", {
     params: {
       entity_id,
-      production_site_id
-    }
+      production_site_id,
+    },
   })
 }
 
@@ -49,7 +48,7 @@ export function updateCertificate(
   old_certificate_id: string,
   old_certificate_type: CertificateType,
   new_certificate_id: string,
-  new_certificate_type: CertificateType,
+  new_certificate_type: CertificateType
 ) {
   return api.post("/update-certificate", {
     entity_id,
@@ -59,7 +58,6 @@ export function updateCertificate(
     new_certificate_type,
   })
 }
-
 
 export function setProductionSiteCertificates(
   entity_id: number,
@@ -75,7 +73,7 @@ export function setProductionSiteCertificates(
 
 export function setDefaultCertificate(
   entity_id: number,
-  certificate_id: string,
+  certificate_id: string
 ) {
   return api.post("/set-default-certificate", {
     entity_id,

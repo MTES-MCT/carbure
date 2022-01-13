@@ -3,7 +3,7 @@ import css from "./pagination.module.css"
 import useLocalStorage from "../hooks/storage"
 import { Row } from "./scaffold"
 import Button from "./button"
-import { ChevronLeft, ChevronRight } from "./icons"
+import { ChevronLeft, ChevronRight } from "common-v2/components/icons"
 import Select from "./select"
 import { Anchors } from "./dropdown"
 

@@ -1,15 +1,10 @@
 import {
   Biocarburant,
   Country,
-  DBSCertificate,
   DeliverySite,
   Entity,
-  ISCCCertificate,
   MatierePremiere,
-  OwnershipType,
   ProductionSiteDetails,
-  REDCertCertificate,
-  SNCertificate,
 } from "./types"
 
 import api from "./services/api"
@@ -33,16 +28,8 @@ export function findEntities(query?: string): Promise<Entity[]> {
   return api.get("/common/entities", { query })
 }
 
-export function findProducers(query: string): Promise<Entity[]> {
-  return api.get("/common/producers", { query })
-}
-
 export function findOperators(query: string): Promise<Entity[]> {
   return api.get("/common/operators", { query })
-}
-
-export function findTraders(query: string): Promise<Entity[]> {
-  return api.get("/common/traders", { query })
 }
 
 export function findProductionSites(
@@ -59,61 +46,10 @@ export function findDeliverySites(
   return api.get("/common/delivery-sites", { query, entity_id })
 }
 
-export function findGHG(
-  biocarburant_code: string,
-  matiere_premiere_code: string
-): Promise<any[]> {
-  return api.get("/common/ghg", { biocarburant_code, matiere_premiere_code })
-}
-
-export function findISCCCertificates(
-  query: string
-): Promise<ISCCCertificate[]> {
-  return api.get("/common/iscc-certificates", {
-    query: query,
-  })
-}
-
-export function find2BSCertificates(query: string): Promise<DBSCertificate[]> {
-  return api.get("/common/2bs-certificates", { query })
-}
-
-export function findREDCertCertificates(
-  query: string
-): Promise<REDCertCertificate[]> {
-  return api.get("/common/redcert-certificates", { query })
-}
-
-export function findSNCertificates(query: string): Promise<SNCertificate[]> {
-  return api.get("/common/sn-certificates", { query })
-}
-
 export function findCertificates(
   query: string,
   entity_id?: number | null,
   production_site?: number | null
 ): Promise<string[]> {
   return api.get("/common/certificates", { query, entity_id, production_site })
-}
-
-export function addDeliverySite(
-  name: string,
-  city: string,
-  country_code: string,
-  depot_id: string,
-  depot_type: string,
-  address: string,
-  postal_code: string,
-  ownership_type: OwnershipType
-): Promise<any> {
-  return api.post("/common/create-delivery-site", {
-    name,
-    city,
-    country_code,
-    depot_id,
-    depot_type,
-    address,
-    postal_code,
-    ownership_type,
-  })
 }

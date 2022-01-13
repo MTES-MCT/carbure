@@ -20,7 +20,3 @@ export const SectionHeader = (props: BoxProps) => (
 export const SectionBody = (props: BoxProps) => (
   <Box {...props} className={styles.sectionBody} />
 )
-
-export const SectionForm = (props: BoxProps) => (
-  <Box {...props} as="form" className={styles.sectionForm} />
-)

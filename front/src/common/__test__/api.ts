@@ -6,19 +6,13 @@ import fields from "../../../public/locales/fr/fields.json"
 import {
   country,
   deliverySite,
-  isccCertificate,
-  expiredISCCCertificate,
-  dbsCertificate,
-  expired2BSCertificate,
   producer,
   trader,
   operator,
   matierePremiere,
   biocarburant,
   productionSite,
-  redcertCertificate,
-  expiredRedcertCertificate,
-} from "common/__test__/data"
+} from "./data"
 
 export const okEntitySearch = rest.get(
   "/api/v3/common/entities",
@@ -87,42 +81,6 @@ export const okDeliverySitesSearch = rest.get(
       ctx.json({
         status: "success",
         data: [deliverySite],
-      })
-    )
-  }
-)
-
-export const okISCCSearch = rest.get(
-  "/api/v3/common/iscc-certificates",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: [isccCertificate, expiredISCCCertificate],
-      })
-    )
-  }
-)
-
-export const ok2BSSearch = rest.get(
-  "/api/v3/common/2bs-certificates",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: [dbsCertificate, expired2BSCertificate],
-      })
-    )
-  }
-)
-
-export const okRedcertSearch = rest.get(
-  "/api/v3/common/redcert-certificates",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: [redcertCertificate, expiredRedcertCertificate],
       })
     )
   }

@@ -1,9 +1,9 @@
 import cl from "clsx"
-import { Loader } from "./icons"
+import { Loader } from "common-v2/components/icons"
 import css from "./button.module.css"
 import { Layout, layout } from "./scaffold"
 import { Link } from "react-router-dom"
-import { ExternalLink as ExternalLinkIcon } from "./icons"
+import { ExternalLink as ExternalLinkIcon } from "common-v2/components/icons"
 
 export type ButtonVariant =
   | "primary"

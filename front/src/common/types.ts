@@ -1,26 +1,4 @@
-import { Option } from "./components/select"
-import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
 import { ExternalAdminPages } from "carbure/types"
-
-export type Pagination = {
-  from?: number
-  limit?: number
-}
-
-export enum LotStatus {
-  Draft = "draft",
-  Validated = "validated",
-  ToFix = "tofix",
-  Accepted = "accepted",
-  Weird = "weird",
-  Stock = "stock",
-  Inbox = "in",
-  ToSend = "tosend",
-  Alert = "alert",
-  Correction = "correction",
-  Declaration = "declaration",
-  Highlight = "highlight",
-}
 
 export enum GESOption {
   Default = "Default",
@@ -68,24 +46,9 @@ export interface MatierePremiere {
   category: string
 }
 
-export interface MatierePremiereDetails extends MatierePremiere {
-  description: string
-  compatible_alcool: boolean
-  compatible_graisse: boolean
-}
-
 export interface Biocarburant {
   code: string
   name: string
-}
-
-export interface BiocarburantDetails extends Biocarburant {
-  description: string
-  pci_kg: number
-  pci_litre: number
-  masse_volumique: number
-  is_alcool: boolean
-  is_graisse: boolean
 }
 
 export enum DepotType {
@@ -133,7 +96,7 @@ export interface ProductionSiteDetails extends ProductionSite {
   manager_name: string
   manager_phone: string
   manager_email: string
-  certificates: CertificateData[]
+  certificates: Certificate[]
 }
 
 export interface Distance {
@@ -203,175 +166,6 @@ export enum DeliveryStatus {
   Frozen = "F",
 }
 
-export interface Transaction {
-  id: number
-  lot: Lot
-  dae: string
-  delivery_status: DeliveryStatus
-  delivery_date: string | null
-  champ_libre: string
-  is_mac: boolean
-  is_forwarded: boolean
-  parent_tx: number | null
-  child_tx: Object | null
-
-  carbure_vendor: Entity | null
-  carbure_vendor_certificate: string
-
-  client_is_in_carbure: boolean
-  carbure_client: Entity | null
-  unknown_client: string
-
-  delivery_site_is_in_carbure: boolean
-  carbure_delivery_site: DeliverySite | null
-  unknown_delivery_site: string
-  unknown_delivery_site_country: Country | null
-
-  hidden_by_admin: boolean
-  hidden_by_auditor: boolean
-  highlighted_by_admin: boolean
-  highlighted_by_auditor: boolean
-}
-
-export interface GenericError {
-  error: string
-
-  display_to_creator: boolean
-  display_to_recipient: boolean
-  display_to_admin: boolean
-  display_to_auditor: boolean
-
-  acked_by_creator: boolean
-  acked_by_recipient: boolean
-  acked_by_admin: boolean
-  acked_by_auditor: boolean
-
-  highlighted_by_admin: boolean
-  highlighted_by_auditor: boolean
-
-  is_blocking: boolean
-
-  tx: number
-
-  field: string | null
-  fields: string[] | null
-  value: string
-  extra: string
-}
-
-export interface Lots {
-  from: number
-  returned: number
-  total: number
-  total_errors: number
-
-  lots: Transaction[]
-
-  deadlines: {
-    date: string
-    total: number
-  }
-
-  errors: {
-    [id: string]: GenericError[]
-  }
-}
-
-export interface Comment {
-  entity?: Entity
-  topic?: string
-  comment: string
-}
-
-export interface LotUpdate {
-  tx_id: number
-  update_type: "ADD" | "UPDATE" | "REMOVE"
-  datetime: string
-  field: string
-  label?: string
-  value_before: string | null
-  value_after: string | null
-  modified_by: string
-}
-
-export interface LotDetails {
-  transaction: Transaction
-  comments: Comment[]
-  admin_comments?: Comment[]
-  deadline: string
-  errors: GenericError[]
-  updates?: LotUpdate[]
-  distance?: Distance
-  certificates: {
-    production_site_certificate: CertificateInfo | null
-    supplier_certificate: CertificateInfo | null
-    vendor_certificate: CertificateInfo | null
-    double_counting_reference: DoubleCountingCertificateInfo | null
-    unknown_production_site_dbl_counting: DoubleCountingCertificateInfo | null
-  }
-}
-
-export enum Filters {
-  DeliveryStatus = "delivery_status",
-  MatieresPremieres = "matieres_premieres",
-  Biocarburants = "biocarburants",
-  Periods = "periods",
-  CountriesOfOrigin = "countries_of_origin",
-  Vendors = "vendors",
-  Clients = "clients",
-  ProductionSites = "production_sites",
-  DeliverySites = "delivery_sites",
-  AddedBy = "added_by",
-  Errors = "errors",
-  Forwarded = "is_forwarded",
-  Mac = "is_mac",
-  HiddenByAdmin = "is_hidden_by_admin",
-  HiddenByAuditor = "is_hidden_by_auditor",
-  ClientTypes = "client_types",
-  ShowEmpty = "show_empty",
-}
-
-export interface TransactionQuery {
-  entity_id: number
-  status: LotStatus
-  from_idx?: number
-  sort_by?: string
-  year?: number
-  limit?: number | null
-  query?: string
-  order?: string
-  invalid?: boolean
-  deadline?: boolean
-  [Filters.DeliveryStatus]?: any
-  [Filters.MatieresPremieres]?: any
-  [Filters.Biocarburants]?: any
-  [Filters.Periods]?: any
-  [Filters.CountriesOfOrigin]?: any
-  [Filters.Vendors]?: any
-  [Filters.Clients]?: any
-  [Filters.ProductionSites]?: any
-  [Filters.DeliverySites]?: any
-  [Filters.AddedBy]?: any
-  [Filters.Errors]?: any
-  [Filters.Forwarded]?: any
-  [Filters.Mac]?: any
-  [Filters.HiddenByAdmin]?: any
-  [Filters.HiddenByAuditor]?: any
-  [Filters.ClientTypes]?: any
-  // [Filters.HighlightedByAdmin]?: any
-  // [Filters.HighlightedByAuditor]?: any
-}
-
-export interface Snapshot {
-  lots: {
-    [key in LotStatus]?: number
-  }
-
-  filters: Filters[]
-  years: Option[]
-  depots: EntityDeliverySite[]
-}
-
 export interface Settings {
   email: string
   rights: UserRight[]
@@ -415,102 +209,10 @@ export interface UserRightRequest {
   role: UserRole
 }
 
-export type DBSCertificate = {
-  type: string
-  certificate_id: string
-  certificate_holder: string
-  holder_address: string
-  valid_from: string
-  valid_until: string
-  certification_type: string
-  scope: string[]
-  has_been_updated: boolean
-  download_link: string
-}
-
-export type ISCCCertificate = {
-  type: string
-  certificate_id: string
-  certificate_holder: string
-  location: string
-  valid_from: string
-  valid_until: string
-  issuing_cb: string
-  scope: string[]
-  has_been_updated: boolean
-  download_link: string
-}
-
-export type REDCertCertificate = {
-  type: string
-  certificate_id: string
-  certificate_holder: string
-  city: string
-  zip_code: string
-  country_raw: string
-  valid_from: string
-  valid_until: string
-  certificator: string
-  certificate_type: string
-  status: string
-  scope: string[]
-  has_been_updated: boolean
-  download_link: string
-}
-
-export type SNCertificate = {
-  type: string
-  certificate_id: string
-  certificate_holder: string
-  valid_from: string
-  valid_until: string
-  scope: string[]
-  has_been_updated: boolean
-  download_link: string
-}
-
-export type Certificate =
-  | ISCCCertificate
-  | DBSCertificate
-  | REDCertCertificate
-  | SNCertificate
-
-export interface CertificateInfo {
-  certificate_id: string
-  certificate_type: "2BS" | "ISCC" | "REDCERT" | "SN"
-  holder: string
-  valid_from: string
-  valid_until: string
-  matches: number
-  found: boolean
-  scope: string[]
-}
-
-export interface DoubleCountingCertificateInfo {
-  certificate_id: string
-  holder: string
-  valid_from: string
-  valid_until: string
-  matches: number
-  found: boolean
-}
-
 export type ProductionCertificate = {
   certificate_id: string
   holder: string
   type: "2BS" | "ISCC" | "REDCERT" | "SN"
-}
-
-export type StockDraft = {
-  tx_id: number
-  volume: number
-  dae: string
-  delivery_date: string
-  client: string
-  delivery_site: string
-  delivery_site_country?: string
-  mac: boolean
-  vendor_certificate: string
 }
 
 export interface Declaration {
@@ -527,34 +229,6 @@ export interface Declaration {
     input: number
     corrections: number
   }
-}
-
-export interface SummaryItem {
-  entity?: string
-  vendor?: string
-  client?: string
-  depot: string
-  biocarburant: string
-  lots: number
-  volume: number
-  avg_ghg_reduction: number
-}
-
-export interface TransactionSummary {
-  in?: SummaryItem[]
-  out?: SummaryItem[]
-  transactions?: SummaryItem[]
-  tx_ids: number[]
-  total_volume: number
-  total_remaining_volume: number
-}
-
-export interface ConvertETBE {
-  previous_stock_tx_id?: number
-  volume_ethanol: number
-  volume_etbe: number
-  volume_etbe_eligible: number
-  volume_denaturant: number
 }
 
 export interface Depot {
@@ -579,7 +253,7 @@ export interface Biofuel {
   name: string
 }
 
-export interface CertificateData {
+export interface Certificate {
   certificate_id: string
   certificate_type: CertificateType
   certificate_holder: string
@@ -594,7 +268,7 @@ export interface CertificateData {
 }
 
 export interface EntityCertificate {
-  certificate: CertificateData
+  certificate: Certificate
   entity: Entity
   has_been_updated: boolean
 }

@@ -12,7 +12,7 @@ import {
   Plus,
   UserAdd,
   UserCheck,
-} from "common/components/icons"
+} from "common-v2/components/icons"
 import { Button } from "common/components/button"
 import { EntityType } from "common/types"
 import api from "common/services/api"

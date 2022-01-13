@@ -15,7 +15,7 @@ import Table, { Cell, actionColumn } from "common-v2/components/table"
 import Autocomplete from "common-v2/components/autocomplete"
 import { Cross, Plus, Return, Refresh } from "common-v2/components/icons"
 import { normalizeCertificate } from "common-v2/utils/normalizers"
-import { CertificateData, EntityCertificate } from "common/types"
+import { Certificate, EntityCertificate } from "common/types"
 import { isExpired } from "./common"
 
 const Certificates = () => {
@@ -122,7 +122,7 @@ const CertificateAddDialog = ({ onClose }: CertificateAddDialogProps) => {
   const notify = useNotify()
   const entity = useEntity()
 
-  const [certificate, setCertificate] = useState<CertificateData | undefined>(
+  const [certificate, setCertificate] = useState<Certificate | undefined>(
     undefined
   )
 
@@ -221,7 +221,7 @@ export const ExpirationDate = ({ link }: ExpirationDateProps) => {
 }
 
 interface CertificateUpdateDialogProps {
-  oldCertificate: CertificateData
+  oldCertificate: Certificate
   onClose: () => void
 }
 
@@ -233,7 +233,7 @@ const CertificateUpdateDialog = ({
   const notify = useNotify()
   const entity = useEntity()
 
-  const [certificate, setCertificate] = useState<CertificateData | undefined>(
+  const [certificate, setCertificate] = useState<Certificate | undefined>(
     undefined
   )
 

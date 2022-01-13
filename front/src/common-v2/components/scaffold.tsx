@@ -1,5 +1,5 @@
 import cl from "clsx"
-import { Loader } from "./icons"
+import { Loader } from "common-v2/components/icons"
 import css from "./scaffold.module.css"
 
 // top bar for the whole website, horizontal flow

@@ -19,7 +19,7 @@ import * as common from "common/api"
 import { Title, Box, LoaderOverlay } from "common/components"
 import { LabelInput, Label, LabelCheckbox } from "common/components/input"
 import { Button } from "common/components/button"
-import { AlertCircle, Cross, Plus, Return } from "common/components/icons"
+import { AlertCircle, Cross, Plus, Return } from "common-v2/components/icons"
 import { Alert } from "common/components/alert"
 import Table, {
   Actions,
