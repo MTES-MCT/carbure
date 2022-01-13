@@ -271,7 +271,7 @@ def sanity_check(lot, prefetched_data):
             errors.append(generic_error(error='DEPOT_NOT_CONFIGURED', lot=lot, display_to_recipient=True, display_to_creator=False, field='delivery_site'))
         else:
             # some delivery sites linked to entity
-            if lot.carbure_delivery_site.id not in prefetched_data['depotsbyentity'][lot.carbure_client.id]:
+            if lot.carbure_delivery_site and lot.carbure_delivery_site.id not in prefetched_data['depotsbyentity'][lot.carbure_client.id]:
                 # this specific delivery site is not linked
                 errors.append(generic_error(error='DEPOT_NOT_CONFIGURED', lot=lot, display_to_recipient=True, display_to_creator=False, field='delivery_site'))
     # CERTIFICATES CHECK
@@ -306,15 +306,16 @@ def sanity_check_mandatory_fields(lot):
     if lot.delivery_type not in [CarbureLot.RFC, CarbureLot.FLUSHED] and lot.transport_document_reference is None:
         errors.append(generic_error(error='MISSING TRANSPORT DOCUMENT REFERENCE', lot=lot, field='transport_document_reference', is_blocking=True))
         is_valid = False
-    if lot.delivery_type in [CarbureLot.BLENDING, CarbureLot.TRADING, CarbureLot.STOCK, CarbureLot.DIRECT]:
-        # we need to know the Depot
-        if not lot.carbure_delivery_site:
-            errors.append(generic_error(error='MISSING_CARBURE_DELIVERY_SITE', lot=lot, field='carbure_delivery_site', is_blocking=True))
-            is_valid = False
-        # and we need to know the client
-        if not lot.carbure_client:
-            errors.append(generic_error(error='MISSING_CARBURE_CLIENT', lot=lot, field='carbure_client', is_blocking=True))
-            is_valid = False
+    if lot.delivery_type in [CarbureLot.BLENDING, CarbureLot.TRADING, CarbureLot.STOCK, CarbureLot.DIRECT, CarbureLot.UNKNOWN]:
+        if lot.delivery_site_country and lot.delivery_site_country.code_pays == "FR":
+            # we need to know the Depot
+            if not lot.carbure_delivery_site:
+                errors.append(generic_error(error='MISSING_CARBURE_DELIVERY_SITE', lot=lot, field='carbure_delivery_site', is_blocking=True))
+                is_valid = False
+            # and we need to know the client
+            if not lot.carbure_client:
+                errors.append(generic_error(error='MISSING_CARBURE_CLIENT', lot=lot, field='carbure_client', is_blocking=True))
+                is_valid = False
     if not lot.delivery_date:
         errors.append(generic_error(error='MISSING_DELIVERY_DATE', lot=lot, field='delivery_date', is_blocking=True))
         is_valid = False
