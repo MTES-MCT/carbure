@@ -460,7 +460,7 @@ const ProcessingDialog = ({
   const subquery = useMemo(
     () => ({
       ...query,
-      delivery_sites: depot ? [depot.depot!.depot_id] : [],
+      delivery_sites: depot ? [depot.depot!.name] : query.delivery_sites,
     }),
     [query, depot]
   )
@@ -496,7 +496,9 @@ const ProcessingDialog = ({
             normalize={normalizeEntityDepot}
           />
         </section>
-        {summary && <LotSummary query={subquery} selection={selection} />}
+        {depot && summary && (
+          <LotSummary query={subquery} selection={selection} />
+        )}
       </main>
       <footer>
         <Button
