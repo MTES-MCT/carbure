@@ -1,3 +1,4 @@
+import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useSearchParams } from "react-router-dom"
 import { Filter, FilterSelection } from "../types"
@@ -117,7 +118,7 @@ const filterNormalizers: Partial<Record<Filter, Normalizer<Option, string>>> = {
 
 export function useFilterParams() {
   const [filtersParams, setFiltersParams] = useSearchParams()
-  const filters = searchToFilters(filtersParams)
+  const filters = useMemo(() => searchToFilters(filtersParams), [filtersParams])
   return [filters, setFiltersParams] as [typeof filters, typeof setFiltersParams] // prettier-ignore
 }
 

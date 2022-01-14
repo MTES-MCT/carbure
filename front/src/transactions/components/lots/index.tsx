@@ -34,13 +34,13 @@ export interface LotsProps {
 }
 
 export const Lots = ({ entity, year, snapshot }: LotsProps) => {
-  const navigate = useNavigate()
-  const location = useLocation()
   const matomo = useMatomo()
+  const location = useLocation()
+  const navigate = useNavigate()
 
   const status = useStatus()
 
-  const [state, actions] = useLotQueryStore(entity, year, status, snapshot)
+  const [state, actions] = useQueryParamsStore(entity, year, status, snapshot)
   const query = useLotQuery(state)
 
   const lots = useQuery(api.getLots, {
@@ -65,12 +65,12 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
 
   const showLotDetails = (lot: Lot) => {
     matomo.push(["trackEvent", "lots-details", "show-lot-details"])
-
     navigate({
       pathname: `${status}/${lot.id}`,
       search: location.search,
     })
   }
+
   return (
     <>
       <Bar>
@@ -201,7 +201,7 @@ const filtersByStatus: Record<Status, Filter[]> = {
   unknown: [],
 }
 
-export interface LotQueryState {
+export interface QueryParams {
   entity: Entity
   year: number
   status: Status
@@ -217,7 +217,7 @@ export interface LotQueryState {
   snapshot: Snapshot | undefined
 }
 
-export function useLotQueryStore(
+export function useQueryParamsStore(
   entity: Entity,
   year: number,
   status: string,
@@ -241,13 +241,13 @@ export function useLotQueryStore(
       selection: [],
       page: 0,
       limit,
-    } as LotQueryState,
+    } as QueryParams,
     {
       setEntity: (entity: Entity) => (state) => ({
         entity,
         category: getDefaultCategory(state.status, state.snapshot),
-        filters: {},
-        search: "",
+        filters: filtersParams,
+        search: undefined,
         invalid: false,
         deadline: false,
         selection: [],
@@ -257,8 +257,8 @@ export function useLotQueryStore(
       setYear: (year: number) => (state) => ({
         year,
         category: getDefaultCategory(state.status, state.snapshot),
-        filters: {},
-        search: "",
+        filters: filtersParams,
+        search: undefined,
         invalid: false,
         deadline: false,
         selection: [],
@@ -269,8 +269,8 @@ export function useLotQueryStore(
         return {
           snapshot,
           category: getDefaultCategory(state.status, snapshot),
-          filters: {},
-          search: "",
+          filters: filtersParams,
+          search: undefined,
           invalid: false,
           deadline: false,
           selection: [],
@@ -281,8 +281,8 @@ export function useLotQueryStore(
       setStatus: (status: Status) => (state) => ({
         status,
         category: getDefaultCategory(status, state.snapshot),
-        filters: {},
-        search: "",
+        filters: filtersParams,
+        search: undefined,
         invalid: false,
         deadline: false,
         selection: [],
@@ -291,8 +291,8 @@ export function useLotQueryStore(
 
       setCategory: (category: string) => ({
         category,
-        filters: {},
-        search: "",
+        filters: filtersParams,
+        search: undefined,
         invalid: false,
         deadline: false,
         selection: [],
@@ -300,10 +300,12 @@ export function useLotQueryStore(
       }),
 
       setFilters: (filters: FilterSelection) => {
-        setFiltersParams(filters)
+        setImmediate(() => {
+          setFiltersParams(filters)
+        })
         return {
           filters,
-          search: "",
+          search: undefined,
           selection: [],
           page: 0,
         }
@@ -391,6 +393,9 @@ function getDefaultCategory(status: string, snapshot: Snapshot | undefined) {
     pending = count.out_pending
     tofix = count.out_tofix
     total = count.out_total
+  } else if (status === "stocks") {
+    pending = count.stock
+    total = count.stock_total
   }
 
   if (pending > 0) return "pending"
@@ -411,7 +416,7 @@ export function useLotQuery({
   limit,
   order,
   filters,
-}: LotQueryState) {
+}: QueryParams) {
   return useMemo<LotQuery>(
     () => ({
       entity_id: entity.id,
