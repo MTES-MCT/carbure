@@ -34,7 +34,7 @@ export const Stocks = ({ entity, year, snapshot }: StocksProps) => {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const [state, actions] = useStockQueryStore(entity, year)
+  const [state, actions] = useStockQueryStore(entity, year, snapshot)
   const query = useStockQuery(state)
 
   const stocks = useQuery(api.getStocks, {
@@ -152,9 +152,14 @@ export interface StockQueryState {
   page: number
   limit: number | undefined
   order: Order | undefined
+  snapshot: Snapshot | undefined
 }
 
-function useStockQueryStore(entity: Entity, year: number) {
+function useStockQueryStore(
+  entity: Entity,
+  year: number,
+  snapshot: Snapshot | undefined
+) {
   const [limit, saveLimit] = useLimit()
   const [filtersParams, setFiltersParams] = useFilterParams()
 
@@ -162,7 +167,8 @@ function useStockQueryStore(entity: Entity, year: number) {
     {
       entity,
       year,
-      category: "pending",
+      snapshot,
+      category: getDefaultCategory(snapshot),
       filters: filtersParams,
       search: undefined,
       order: undefined,
@@ -171,18 +177,27 @@ function useStockQueryStore(entity: Entity, year: number) {
       limit,
     } as StockQueryState,
     {
-      setEntity: (entity: Entity) => ({
+      setEntity: (entity: Entity) => (state) => ({
         entity,
-        category: "pending",
+        category: getDefaultCategory(state.snapshot),
         filters: {},
         search: "",
         selection: [],
         page: 0,
       }),
 
-      setYear: (year: number) => ({
+      setYear: (year: number) => (state) => ({
         year,
-        category: "pending",
+        category: getDefaultCategory(state.snapshot),
+        filters: {},
+        search: "",
+        selection: [],
+        page: 0,
+      }),
+
+      setSnapshot: (snapshot: Snapshot | undefined) => ({
+        snapshot,
+        category: getDefaultCategory(snapshot),
         filters: {},
         search: "",
         selection: [],
@@ -247,7 +262,18 @@ function useStockQueryStore(entity: Entity, year: number) {
     actions.setYear(year)
   }
 
+  if (state.snapshot !== snapshot) {
+    actions.setSnapshot(snapshot)
+  }
+
   return [state, actions] as [typeof state, typeof actions]
+}
+
+function getDefaultCategory(snapshot: Snapshot | undefined) {
+  if (snapshot === undefined) return "pending"
+  else if (snapshot.lots.stock > 0) return "pending"
+  else if (snapshot.lots.stock_total > 0) return "history"
+  else return "pending"
 }
 
 export function useStockQuery({
