@@ -115,8 +115,13 @@ test("check draft actions", async () => {
 test("check inbox actions", async () => {
   render(<TransactionsWithRouter status="in" entity={operator} />)
 
+  await waitWhileLoading()
+
+  userEvent.click(screen.getByText("En attente (0)"))
+  await waitWhileLoading()
+
   // check global actions
-  await screen.findByText("Accepter tout")
+  screen.getByText("Accepter tout")
   screen.getByText("Refuser tout")
   screen.getByText("Exporter vers Excel")
 
@@ -126,10 +131,19 @@ test("check inbox actions", async () => {
 test("check outbox actions", async () => {
   render(<TransactionsWithRouter status="out" entity={operator} />)
 
-  await screen.findByText("Corriger la sélection")
-  screen.getByText("Valider les corrections")
-  screen.getByText("Supprimer tout")
+  await waitWhileLoading()
   screen.getByText("Exporter vers Excel")
+
+  userEvent.click(screen.getByText("En attente (0)"))
+  await waitWhileLoading()
+
+  screen.getByText("Corriger la sélection")
+
+  userEvent.click(screen.getByText("Corrections (0)"))
+  await waitWhileLoading()
+
+  screen.getByText("Confirmer les corrections")
+  screen.getByText("Supprimer la sélection")
 
   await screen.findByText("2021")
 })
