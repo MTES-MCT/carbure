@@ -14,12 +14,14 @@ import { useMatomo } from "matomo"
 
 export interface DeleteManyButtonProps {
   disabled?: boolean
+  all?: boolean
   query: LotQuery
   selection: number[]
 }
 
 export const DeleteManyButton = ({
   disabled,
+  all,
   query,
   selection,
 }: DeleteManyButtonProps) => {
@@ -28,11 +30,13 @@ export const DeleteManyButton = ({
 
   return (
     <Button
-      disabled={disabled}
+      disabled={disabled || (!all && selection.length === 0)}
       variant="danger"
       icon={Cross}
       label={
-        selection.length > 0 ? t("Supprimer la sélection") : t("Supprimer tout")
+        !all || selection.length > 0
+          ? t("Supprimer la sélection")
+          : t("Supprimer tout")
       }
       action={() =>
         portal((close) => (
