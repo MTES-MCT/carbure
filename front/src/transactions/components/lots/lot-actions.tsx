@@ -16,11 +16,12 @@ import { ExportLotsButton } from "transactions/actions/export"
 
 export interface ActionBarProps {
   count: number
+  category: string
   query: LotQuery
   selection: number[]
 }
 
-export const LotActions = ({ count, ...props }: ActionBarProps) => {
+export const LotActions = ({ count, category, ...props }: ActionBarProps) => {
   const status = useStatus()
   const empty = count === 0
   const noSelection = props.selection.length === 0
@@ -38,18 +39,26 @@ export const LotActions = ({ count, ...props }: ActionBarProps) => {
 
       {status === "in" && (
         <Fragment>
-          <AcceptManyButton {...props} disabled={empty} />
-          <RejectManyButton {...props} disabled={empty} />
-          <RequestManyFixesButton {...props} />
-          <ApproveManyFixesButton {...props} />
+          {category === "pending" && (
+            <Fragment>
+              <AcceptManyButton {...props} disabled={empty} />
+              <RejectManyButton {...props} disabled={empty} />
+            </Fragment>
+          )}
+          {category !== "correction" && <RequestManyFixesButton {...props} />}
+          {category === "correction" && <ApproveManyFixesButton {...props} />}
         </Fragment>
       )}
 
       {status === "out" && (
         <Fragment>
-          <RecallManyButton {...props} />
-          <MarkManyAsFixedButton {...props} />
-          <DeleteManyButton {...props} disabled={noSelection} />
+          {category !== "correction" && <RecallManyButton {...props} />}
+          {category === "correction" && (
+            <Fragment>
+              <MarkManyAsFixedButton {...props} />
+              <DeleteManyButton {...props} disabled={noSelection} />
+            </Fragment>
+          )}
         </Fragment>
       )}
 
