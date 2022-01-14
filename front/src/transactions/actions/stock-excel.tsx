@@ -29,27 +29,6 @@ export const StockExcelButton = () => {
   )
 }
 
-export const StockExcelArea = ({ children }: { children: React.ReactNode }) => {
-  const { t } = useTranslation()
-  const matomo = useMatomo()
-  const entity = useEntity()
-  const importLots = useExtractStock()
-
-  return (
-    <FileArea
-      icon={Upload}
-      label={t("Extraire du lots du stock\nen important ce fichier")}
-      onChange={(file) => {
-        matomo.push(["trackEvent", "lots-create", "drag-and-drop-stock-excel"])
-        importLots.execute(entity.id, file!)
-      }}
-    >
-      {children}
-      {importLots.loading && <LoaderOverlay />}
-    </FileArea>
-  )
-}
-
 interface StockExcelDialogProps {
   onClose: () => void
 }

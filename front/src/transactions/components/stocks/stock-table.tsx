@@ -40,7 +40,6 @@ export const StockTable = memo(
         columns={[
           selectionColumn(stocks, selected, onSelect, (stock) => stock.id),
           {
-            small: true,
             header: t("Statut"),
             cell: (stock) => <StockTag stock={stock} />,
           },

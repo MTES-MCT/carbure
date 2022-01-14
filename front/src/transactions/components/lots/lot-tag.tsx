@@ -36,17 +36,19 @@ export const LotTag = ({ lot, ...props }: LotTagProps) => {
   } else {
     variant = "success"
     if (delivery === DeliveryType.Blending) {
-      label = t("Incorporation")
+      label = t("Incorporé")
     } else if (delivery === DeliveryType.Direct) {
       label = t("Livraison directe")
     } else if (delivery === DeliveryType.Export) {
-      label = t("Exportation")
+      label = t("Exporté")
     } else if (delivery === DeliveryType.Processing) {
       label = t("Processing")
     } else if (delivery === DeliveryType.RFC) {
       label = t("Mise à conso.")
     } else if (delivery === DeliveryType.Stock) {
       label = t("Stocké")
+    } else if (delivery === DeliveryType.Trading) {
+      label = t("Transféré")
     } else if (status === LotStatus.Accepted) {
       label = t("Accepté")
     } else if (status === LotStatus.Frozen) {

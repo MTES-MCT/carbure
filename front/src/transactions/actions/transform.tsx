@@ -36,7 +36,7 @@ export const TransformManyButton = ({
     <Menu
       icon={Flask}
       variant="success"
-      label={"Transformer"}
+      label={t("Transformer")}
       items={[
         {
           label: t("ETBE"),
