@@ -1,6 +1,13 @@
-import { useState } from "react"
+import { useCallback } from "react"
 import { useTranslation } from "react-i18next"
-import { Navigate, Route, Routes } from "react-router-dom"
+import {
+  Navigate,
+  Route,
+  Routes,
+  useNavigate,
+  useParams,
+  useLocation,
+} from "react-router-dom"
 import useEntity from "carbure/hooks/entity"
 import { useQuery } from "common-v2/hooks/async"
 import * as api from "./api"
@@ -13,15 +20,13 @@ import { ImportArea } from "./actions/import"
 import Lots from "./components/lots"
 import Stocks from "./components/stocks"
 
-const currentYear = new Date().getFullYear()
-
 export const Transactions = () => {
   const { t } = useTranslation()
 
   const entity = useEntity()
   const status = useStatus()
 
-  const [year = currentYear, setYear] = useState<number | undefined>(currentYear) // prettier-ignore
+  const [year, setYear] = useYear("transactions")
 
   const years = useQuery(api.getYears, {
     key: "years",
@@ -88,6 +93,28 @@ export const Transactions = () => {
       </ImportArea>
     </PortalProvider>
   )
+}
+
+const currentYear = new Date().getFullYear()
+
+export function useYear(root: string) {
+  const location = useLocation()
+  const params = useParams<"year">()
+  const navigate = useNavigate()
+
+  const year = parseInt(params.year ?? "") || currentYear
+
+  const setYear = useCallback(
+    (year: number | undefined) => {
+      const rx = new RegExp(`${root}/[0-9]+`)
+      const replacement = `${root}/${year}`
+      const pathname = location.pathname.replace(rx, replacement)
+      navigate(pathname)
+    },
+    [root, location, navigate]
+  )
+
+  return [year, setYear] as [typeof year, typeof setYear]
 }
 
 export default Transactions

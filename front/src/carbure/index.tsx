@@ -49,6 +49,8 @@ const Carbure = () => {
   )
 }
 
+const currentYear = new Date().getFullYear()
+
 const Org = () => {
   const entity = useEntity()
 
@@ -60,18 +62,22 @@ const Org = () => {
     <Routes>
       <Route path="settings" element={<Settings />} />
 
-      {isIndustry && <Route path="transactions/*" element={<Transactions />} />}
+      {isIndustry && <Route path="transactions/:year/*" element={<Transactions />} />}
       {isIndustry && <Route path="registry" element={<Registry />} />}
 
       {isAdmin && <Route path="dashboard" element={<Dashboard />} />}
       {isAdmin && <Route path="entities/*" element={<Entities />} />}
 
-      {(isAdmin || isAuditor) && <Route path="controls/*" element={<Controls />} />}
+      {(isAdmin || isAuditor) && <Route path="controls/:year/*" element={<Controls />} />}
       {(isAdmin || hasDCA) && <Route path="double-counting/*" element={<DoubleCounting />} />}
 
       {isIndustry && <Route path="*" element={<Navigate to="transactions" />} />}
+      {isIndustry && <Route path="transactions" element={<Navigate to={`${currentYear}`} />} />}
+
+      {(isAuditor) && <Route path="*" element={<Navigate to="controls" />} />}
+      {(isAdmin || isAuditor) && <Route path="controls" element={<Navigate to={`${currentYear}`} />} />}
+
       {isAdmin && <Route path="*" element={<Navigate to="dashboard" />} />}
-      {isAuditor && <Route path="*" element={<Navigate to="controls" />} />}
       {hasDCA && <Route path="*" element={<Navigate to="double-counting" />} />}
     </Routes>
 

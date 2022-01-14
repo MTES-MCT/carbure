@@ -236,7 +236,7 @@
   "Créer lot": "Create batch",
   "Erreurs": "Errors",
   "Vous ne pouvez pas valider ce lot tant que les problèmes suivants n'ont pas été adressés :": "You cannot release this batch until the following issues have been addressed:",
-  "Remarques": "Notes",
+  "Remarques": "Warnings",
   "Des incohérences potentielles ont été détectées, elles n'empêchent pas la validation du lot mais peuvent donner lieu à un contrôle :": "Potential inconsistencies have been detected, they do not prevent the validation of the batch but may lead to a control:",
   "Erreur de validation": "Validation error",
   "Commentaires": "Comments",

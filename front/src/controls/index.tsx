@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 import useEntity from "carbure/hooks/entity"
@@ -9,8 +8,7 @@ import Select from "common-v2/components/select"
 import { PortalProvider } from "common-v2/components/portal"
 import { StatusTabs, useStatus } from "./components/status"
 import Lots from "./components/lots"
-
-const currentYear = new Date().getFullYear()
+import { useYear } from "transactions"
 
 export const Controls = () => {
   const { t } = useTranslation()
@@ -18,7 +16,7 @@ export const Controls = () => {
   const entity = useEntity()
   const status = useStatus()
 
-  const [year = currentYear, setYear] = useState<number | undefined>(currentYear) // prettier-ignore
+  const [year, setYear] = useYear("controls")
 
   const years = useQuery(api.getYears, {
     key: "years",
