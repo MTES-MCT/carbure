@@ -145,7 +145,7 @@ const StatusRecap = ({
 }
 
 export function useStatus() {
-  const match = useMatch<"status", string>("/org/:entity/transactions/:status/*") // prettier-ignore
+  const match = useMatch<"status", string>("/org/:entity/transactions/:year/:status/*") // prettier-ignore
   return (match?.params.status ?? "unknown") as Status
 }
 
