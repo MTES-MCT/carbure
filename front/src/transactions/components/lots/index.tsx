@@ -40,7 +40,7 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
 
   const status = useStatus()
 
-  const [state, actions] = useLotQueryStore(entity, year, status)
+  const [state, actions] = useLotQueryStore(entity, year, status, snapshot)
   const query = useLotQuery(state)
 
   const lots = useQuery(api.getLots, {
@@ -214,9 +214,15 @@ export interface LotQueryState {
   page: number
   limit: number | undefined
   order: Order | undefined
+  snapshot: Snapshot | undefined
 }
 
-export function useLotQueryStore(entity: Entity, year: number, status: string) {
+export function useLotQueryStore(
+  entity: Entity,
+  year: number,
+  status: string,
+  snapshot?: Snapshot | undefined
+) {
   const [limit, saveLimit] = useLimit()
   const [filtersParams, setFiltersParams] = useFilterParams()
 
@@ -224,8 +230,9 @@ export function useLotQueryStore(entity: Entity, year: number, status: string) {
     {
       entity,
       year,
+      snapshot,
       status,
-      category: "pending",
+      category: getDefaultCategory(status, snapshot),
       filters: filtersParams,
       search: undefined,
       invalid: false,
@@ -236,9 +243,9 @@ export function useLotQueryStore(entity: Entity, year: number, status: string) {
       limit,
     } as LotQueryState,
     {
-      setEntity: (entity: Entity) => ({
+      setEntity: (entity: Entity) => (state) => ({
         entity,
-        category: "pending",
+        category: getDefaultCategory(state.status, state.snapshot),
         filters: {},
         search: "",
         invalid: false,
@@ -247,9 +254,9 @@ export function useLotQueryStore(entity: Entity, year: number, status: string) {
         page: 0,
       }),
 
-      setYear: (year: number) => ({
+      setYear: (year: number) => (state) => ({
         year,
-        category: "pending",
+        category: getDefaultCategory(state.status, state.snapshot),
         filters: {},
         search: "",
         invalid: false,
@@ -258,9 +265,22 @@ export function useLotQueryStore(entity: Entity, year: number, status: string) {
         page: 0,
       }),
 
-      setStatus: (status: Status) => ({
+      setSnapshot: (snapshot: Snapshot | undefined) => (state) => {
+        return {
+          snapshot,
+          category: getDefaultCategory(state.status, snapshot),
+          filters: {},
+          search: "",
+          invalid: false,
+          deadline: false,
+          selection: [],
+          page: 0,
+        }
+      },
+
+      setStatus: (status: Status) => (state) => ({
         status,
-        category: "pending",
+        category: getDefaultCategory(state.status, state.snapshot),
         filters: {},
         search: "",
         invalid: false,
@@ -346,7 +366,37 @@ export function useLotQueryStore(entity: Entity, year: number, status: string) {
     actions.setStatus(status as Status)
   }
 
+  if (state.snapshot !== snapshot) {
+    actions.setSnapshot(snapshot)
+  }
+
   return [state, actions] as [typeof state, typeof actions]
+}
+
+function getDefaultCategory(status: string, snapshot: Snapshot | undefined) {
+  if (snapshot === undefined) return "pending"
+  if (status === "drafts") return "pending"
+
+  const count = snapshot.lots
+
+  let pending = 0
+  let tofix = 0
+  let total = 0
+
+  if (status === "in") {
+    pending = count.in_pending
+    tofix = count.in_tofix
+    total = count.in_total
+  } else if (status === "out") {
+    pending = count.out_pending
+    tofix = count.out_tofix
+    total = count.out_total
+  }
+
+  if (pending > 0) return "pending"
+  else if (tofix > 0) return "correction"
+  else if (total > 0) return "history"
+  else return "pending"
 }
 
 export function useLotQuery({
