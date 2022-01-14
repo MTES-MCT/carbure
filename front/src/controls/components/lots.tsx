@@ -11,7 +11,7 @@ import { LotTable } from "./lot-table"
 import { LotActions } from "./lot-actions"
 import { DeadlineSwitch, InvalidSwitch } from "transactions/components/switches"
 import { LotSummaryBar } from "./lot-summary"
-import { useLotQuery, useLotQueryStore } from "transactions/components/lots"
+import { useLotQuery, useQueryParamsStore } from "transactions/components/lots"
 import { Filter, Lot } from "transactions/types"
 import ControlDetails from "control-details"
 
@@ -26,7 +26,7 @@ export const Lots = ({ entity, year }: LotsProps) => {
 
   const status = useStatus()
 
-  const [state, actions] = useLotQueryStore(entity, year, status)
+  const [state, actions] = useQueryParamsStore(entity, year, status)
   const query = useLotQuery(state)
 
   const lots = useQuery(api.getLots, {

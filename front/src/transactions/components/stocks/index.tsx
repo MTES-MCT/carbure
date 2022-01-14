@@ -1,26 +1,19 @@
 import { useMemo } from "react"
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom"
 import { Entity } from "carbure/types"
-import {
-  Snapshot,
-  Stock,
-  FilterSelection,
-  StockQuery,
-  Filter,
-} from "../../types"
-import { Order } from "common-v2/components/table"
+import { Snapshot, Stock, StockQuery, Filter } from "../../types"
 import { useQuery } from "common-v2/hooks/async"
 import * as api from "../../api"
 import { Bar } from "common-v2/components/scaffold"
-import Pagination, { useLimit } from "common-v2/components/pagination"
-import Filters, { useFilterParams } from "../filters"
+import Pagination from "common-v2/components/pagination"
+import Filters from "../filters"
 import StockTable from "./stock-table"
 import NoResult from "../no-result"
 import StockActions from "./stock-actions"
 import { SearchBar } from "../search-bar"
 import { StockSummaryBar } from "./stock-summary"
 import StockDetails from "stock-details"
-import useStore from "common-v2/hooks/store"
+import { QueryParams, useQueryParamsStore } from "../lots"
 
 export interface StocksProps {
   entity: Entity
@@ -34,7 +27,7 @@ export const Stocks = ({ entity, year, snapshot }: StocksProps) => {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const [state, actions] = useStockQueryStore(entity, year, snapshot)
+  const [state, actions] = useQueryParamsStore(entity, year, "stocks", snapshot)
   const query = useStockQuery(state)
 
   const stocks = useQuery(api.getStocks, {
@@ -142,140 +135,6 @@ const STOCK_FILTERS = [
   Filter.Depots,
 ]
 
-export interface StockQueryState {
-  entity: Entity
-  year: number
-  category: string
-  filters: FilterSelection
-  search: string | undefined
-  selection: number[]
-  page: number
-  limit: number | undefined
-  order: Order | undefined
-  snapshot: Snapshot | undefined
-}
-
-function useStockQueryStore(
-  entity: Entity,
-  year: number,
-  snapshot: Snapshot | undefined
-) {
-  const [limit, saveLimit] = useLimit()
-  const [filtersParams, setFiltersParams] = useFilterParams()
-
-  const [state, actions] = useStore(
-    {
-      entity,
-      year,
-      snapshot,
-      category: getDefaultCategory(snapshot),
-      filters: filtersParams,
-      search: undefined,
-      order: undefined,
-      selection: [],
-      page: 0,
-      limit,
-    } as StockQueryState,
-    {
-      setEntity: (entity: Entity) => (state) => ({
-        entity,
-        category: getDefaultCategory(state.snapshot),
-        filters: {},
-        search: "",
-        selection: [],
-        page: 0,
-      }),
-
-      setYear: (year: number) => (state) => ({
-        year,
-        category: getDefaultCategory(state.snapshot),
-        filters: {},
-        search: "",
-        selection: [],
-        page: 0,
-      }),
-
-      setSnapshot: (snapshot: Snapshot | undefined) => ({
-        snapshot,
-        category: getDefaultCategory(snapshot),
-        filters: {},
-        search: "",
-        selection: [],
-        page: 0,
-      }),
-
-      setCategory: (category: string) => ({
-        category,
-        filters: {},
-        search: "",
-        selection: [],
-        page: 0,
-      }),
-
-      setFilters: (filters: FilterSelection) => {
-        setFiltersParams(filters)
-        return {
-          filters,
-          search: "",
-          selection: [],
-          page: 0,
-        }
-      },
-
-      setSearch: (search: string | undefined) => ({
-        search,
-        selection: [],
-        page: 0,
-      }),
-
-      setOrder: (order: Order | undefined) => ({
-        order,
-      }),
-
-      setSelection: (selection: number[]) => ({
-        selection,
-      }),
-
-      setPage: (page: number) => ({
-        page,
-        selection: [],
-      }),
-
-      setLimit: (limit: number | undefined) => {
-        saveLimit(limit)
-        return {
-          limit,
-          selection: [],
-          page: 0,
-        }
-      },
-    }
-  )
-
-  // sync state with entity defined above
-  if (state.entity.id !== entity.id) {
-    actions.setEntity(entity)
-  }
-
-  // sync state with year defined above
-  if (state.year !== year) {
-    actions.setYear(year)
-  }
-
-  if (state.snapshot !== snapshot) {
-    actions.setSnapshot(snapshot)
-  }
-
-  return [state, actions] as [typeof state, typeof actions]
-}
-
-function getDefaultCategory(snapshot: Snapshot | undefined) {
-  if (snapshot === undefined) return "pending"
-  else if (snapshot.lots.stock > 0) return "pending"
-  else if (snapshot.lots.stock_total > 0) return "history"
-  else return "pending"
-}
-
 export function useStockQuery({
   entity,
   year,
@@ -285,7 +144,7 @@ export function useStockQuery({
   order,
   page,
   limit,
-}: StockQueryState) {
+}: QueryParams) {
   return useMemo<StockQuery>(
     () => ({
       entity_id: entity.id,
