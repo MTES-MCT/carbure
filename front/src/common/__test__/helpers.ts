@@ -4,9 +4,8 @@ export async function waitWhileLoading() {
   try {
     await screen.findAllByTestId("loader")
     await waitForElementToBeRemoved(() => screen.queryAllByTestId("loader"), { timeout: 60000 }) // prettier-ignore
-  } catch (error) {
+  } catch {
     console.log("Loader timing based error, completely flaked, can (mostly) safely be ignored.") // prettier-ignore
-    // console.log(error)
   }
 }
 
