@@ -130,12 +130,13 @@ const StatusRecap = ({
         <Col className={css.verso}>
           {pending > 0 && (
             <p>
-              <strong>{pending}</strong> {t("lots en attente")}
+              <strong>{pending}</strong>{" "}
+              {t("lots en attente", { count: pending })}
             </p>
           )}
           {tofix > 0 && (
             <p>
-              <strong>{tofix}</strong> {t("lots à corriger")}
+              <strong>{tofix}</strong> {t("lots à corriger", { count: tofix })}
             </p>
           )}
         </Col>
