@@ -233,6 +233,16 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
         )}
       </main>
       <footer>
+        <Button
+          disabled={volumeDiff !== 0}
+          loading={transformETBE.loading}
+          submit="etbe"
+          variant="primary"
+          icon={Flask}
+          label={t("Créer ETBE")}
+          action={onTransform}
+        />
+
         {!isNaN(volumeDiff) && volumeDiff !== 0 && (
           <Alert variant="danger" icon={AlertCircle}>
             {t(
@@ -243,15 +253,6 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
         )}
 
         <Button asideX icon={Return} label={t("Retour")} action={onClose} />
-        <Button
-          disabled={volumeDiff !== 0}
-          loading={transformETBE.loading}
-          submit="etbe"
-          variant="primary"
-          icon={Flask}
-          label={t("Créer ETBE")}
-          action={onTransform}
-        />
       </footer>
     </Dialog>
   )

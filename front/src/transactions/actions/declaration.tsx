@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react"
+import i18next from "i18next"
 import { Trans, useTranslation } from "react-i18next"
 import { DeclarationSummary, LotQuery } from "../types"
 import { Normalizer } from "common-v2/utils/normalize"
@@ -25,7 +26,6 @@ import {
 import { Entity } from "carbure/types"
 import { Row } from "common-v2/components/scaffold"
 import { useMatomo } from "matomo"
-
 export interface DeclarationButtonProps {
   year: number
 }
@@ -238,7 +238,8 @@ function useDeclarationQuery({ entity, year, period }: DeclarationQueryState) {
   )
 }
 
-const normalizeDeclaration: Normalizer<DeclarationSummary> = (declaration) => ({
-  value: declaration,
-  label: formatPeriod(declaration.period),
-})
+const normalizeDeclaration: Normalizer<DeclarationSummary> = (declaration) => {
+  const period = formatPeriod(declaration.period)
+  const extra = i18next.t("{{count}} lots", { count: declaration.lots })
+  return { value: declaration, label: `${period} → ${extra}` }
+}
