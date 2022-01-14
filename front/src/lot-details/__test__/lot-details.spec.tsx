@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router-dom"
 import { render, TestRoot } from "setupTests"
 import { screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { Entity } from "common/types"
+import { Entity } from "carbure/types"
 
 import { operator, producer } from "common/__test__/data"
 import LotDetails from "../index"
@@ -27,25 +27,19 @@ beforeEach(() => Data.set("lot-details", lotDetails))
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
-const LotDetailsRoute = () => {
-  return (
-    <PortalProvider>
-      <Routes>
-        <Route path=":id" element={<LotDetails neighbors={[]} />} />
-        <Route path="*" element={<h1>NOTHING</h1>} />
-      </Routes>
-    </PortalProvider>
-  )
-}
-
 const LotDetailsWithRouter = ({ entity }: { entity: Entity }) => {
   setEntity(entity)
   return (
-    <TestRoot url={`/org/${entity.id}/transactions/draft/0`}>
+    <TestRoot url={`/org/${entity.id}/transactions/2021/draft/0`}>
       <Route
-        path="/org/:entity/transactions/:status/*"
-        element={<LotDetailsRoute />}
+        path="/org/:entity/transactions/:year/:status/*"
+        element={
+          <PortalProvider>
+            <LotDetails neighbors={[]} />
+          </PortalProvider>
+        }
       />
+      <Route path="/draft" element={<p>EMPTY</p>} />
     </TestRoot>
   )
 }
@@ -227,8 +221,6 @@ test("edit transaction details", async () => {
 
   userEvent.click(save)
 
-  // await waitWhileLoading()
-
   await screen.findByDisplayValue("DAETEST UPDATED")
 }, 30000)
 
@@ -285,8 +277,6 @@ test("check transaction comments", async () => {
 
   userEvent.click(screen.getByText("Envoyer"))
 
-  // await waitWhileLoading()
-
   await screen.findByText("Commentaires (2)")
   screen.getByText(/Producteur Test:/)
   screen.getByText("test ok")
@@ -321,8 +311,6 @@ test("delete draft lot from details", async () => {
   // dialog to confirm the sending
   const title = screen.getByText("Supprimer ce lot")
   userEvent.click(screen.getByText("Supprimer"))
-
-  // await waitWhileLoading()
 
   await waitFor(() => expect(title).not.toBeInTheDocument())
 })
@@ -360,8 +348,6 @@ test("delete tofix lot from details", async () => {
   const title = screen.getByText("Supprimer ce lot")
   userEvent.click(screen.getByText("Supprimer"))
 
-  // await waitWhileLoading()
-
   await waitFor(() => expect(title).not.toBeInTheDocument())
 })
 
@@ -378,9 +364,7 @@ test("accept inbox lot from details", async () => {
   screen.getByText("Accepter le lot", { selector: "h1" })
   userEvent.click(screen.getByText("Incorporer"))
 
-  // await waitWhileLoading()
-
-  await screen.findByText("Accepté")
+  await screen.findByText("Incorporé")
 })
 
 test("accept sous reserve inbox lot from details", async () => {
@@ -396,8 +380,6 @@ test("accept sous reserve inbox lot from details", async () => {
   userEvent.type(getField("Commentaire *"), "test is incorrect") // prettier-ignore
   userEvent.click(screen.getByText("Demander correction"))
 
-  // await waitWhileLoading()
-
   await screen.findByText("En correction")
 })
 
@@ -405,8 +387,6 @@ test("reject inbox lot from details", async () => {
   Data.set("lot-details", sentDetails)
 
   render(<LotDetailsWithRouter entity={operator} />)
-
-  // await waitWhileLoading()
 
   await screen.findByText("En attente")
 
@@ -416,8 +396,6 @@ test("reject inbox lot from details", async () => {
   screen.getByText("Refuser ce lot", { selector: "h1" })
   userEvent.type(getField("Commentaire *"), "not for me") // prettier-ignore
   userEvent.click(screen.getByText("Refuser"))
-
-  // await waitWhileLoading()
 
   await screen.findByText("Refusé")
 })

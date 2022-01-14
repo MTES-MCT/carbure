@@ -9,8 +9,8 @@ import Controls from "../index"
 import server from "./api"
 
 const ControlsWithRouter = ({ status }: { status: AdminStatus }) => (
-  <TestRoot url={`/org/0/controls/${status}`}>
-    <Route path="/org/0/controls/:status/*" element={<Controls />} />
+  <TestRoot url={`/org/0/controls/2021/${status}`}>
+    <Route path="/org/0/controls/:year/:status/*" element={<Controls />} />
   </TestRoot>
 )
 
