@@ -94,6 +94,7 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
 
         <LotActions
           count={count}
+          category={state.category}
           query={query}
           selection={state.selection} //
         />
