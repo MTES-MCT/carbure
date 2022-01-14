@@ -320,12 +320,12 @@ test("resend tofix lot from details", async () => {
   render(<LotDetailsWithRouter entity={producer} />)
 
   // click on the send action
-  const send = await screen.findByText("Valider la correction")
+  const send = await screen.findByText("Confirmer la correction")
   userEvent.click(send)
 
   // confirm the sending
-  const title = screen.getByText("Valider la correction", { selector: "h1" })
-  userEvent.click(screen.getByText("Valider correction"))
+  const title = screen.getByText("Confirmer la correction", { selector: "h1" })
+  userEvent.click(screen.getByText("Confirmer correction"))
 
   await screen.findByText("Corrigé")
   expect(title).not.toBeInTheDocument()
