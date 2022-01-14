@@ -280,7 +280,7 @@ export function useLotQueryStore(
 
       setStatus: (status: Status) => (state) => ({
         status,
-        category: getDefaultCategory(state.status, state.snapshot),
+        category: getDefaultCategory(status, state.snapshot),
         filters: {},
         search: "",
         invalid: false,

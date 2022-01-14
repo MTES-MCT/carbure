@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api"
 import useEntity from "carbure/hooks/entity"
@@ -8,8 +8,7 @@ import Button, { ExternalLink as Ext } from "common-v2/components/button"
 import Dialog from "common-v2/components/dialog"
 import { Check, Drop, Return, Upload } from "common-v2/components/icons"
 import { usePortal } from "common-v2/components/portal"
-import { FileArea, FileInput } from "common-v2/components/input"
-import { LoaderOverlay } from "common-v2/components/scaffold"
+import { FileInput } from "common-v2/components/input"
 import { useMatomo } from "matomo"
 
 const FAQ_URL = "https://carbure-1.gitbook.io/faq/gerer-mes-lots-1/producteur-trader-ajouter-des-lots/ajout-de-lot-via-fichier-excel" // prettier-ignore
