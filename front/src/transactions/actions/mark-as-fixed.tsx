@@ -32,7 +32,7 @@ export const MarkManyAsFixedButton = ({
       disabled={disabled || selection.length === 0}
       variant="success"
       icon={Check}
-      label={t("Valider les corrections")}
+      label={t("Confirmer les corrections")}
       action={() =>
         portal((close) => (
           <MarkAsFixedDialog summary selection={selection} onClose={close} />
@@ -59,8 +59,8 @@ export const MarkOneAsFixedButton = ({
       captive
       variant={icon ? "icon" : "success"}
       icon={Check}
-      title={t("Valider la correction")}
-      label={t("Valider la correction")}
+      title={t("Confirmer la correction")}
+      label={t("Confirmer la correction")}
       action={() =>
         portal((close) => (
           <MarkAsFixedDialog selection={[lot.id]} onClose={close} />
@@ -96,8 +96,8 @@ const MarkAsFixedDialog = ({
 
     onSuccess: () => {
       const text = v({
-        one: t("La correction a bien été validée !"),
-        many: t("Les corrections ont bien été validées !"),
+        one: t("La correction a bien été confirmée !"),
+        many: t("Les corrections ont bien été confirmées !"),
       })
 
       notify(text, { variant: "success" })
@@ -106,8 +106,8 @@ const MarkAsFixedDialog = ({
 
     onError: () => {
       const text = v({
-        one: t("La validation de la correction a échoué !"),
-        many: t("Les validations des corrections ont échoué !"),
+        one: t("La confirmation de la correction a échoué !"),
+        many: t("Les confirmations des corrections ont échoué !"),
       })
 
       notify(text, { variant: "danger" })
@@ -125,16 +125,16 @@ const MarkAsFixedDialog = ({
       <header>
         <h1>
           {v({
-            one: t("Valider la correction"),
-            many: t("Valider les corrections"),
+            one: t("Confirmer la correction"),
+            many: t("Confirmer les corrections"),
           })}
         </h1>
       </header>
       <main>
         <section>
           {v({
-            one: t("Voulez-vous valider cette correction ?"),
-            many: t("Voulez-vous valider les corrections des lots sélectionnés ?"), // prettier-ignore
+            one: t("Voulez-vous confirmer cette correction ?"),
+            many: t("Voulez-vous confirmer les corrections des lots sélectionnés ?"), // prettier-ignore
           })}
         </section>
         <section>
@@ -160,7 +160,7 @@ const MarkAsFixedDialog = ({
           loading={markAsFixed.loading}
           variant="success"
           icon={Check}
-          label={t("Valider correction")}
+          label={t("Confirmer correction")}
           action={() => {
             matomo.push([
               "trackEvent",

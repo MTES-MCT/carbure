@@ -29,7 +29,7 @@ export const ApproveManyFixesButton = ({
   return (
     <Button
       disabled={disabled || selection.length === 0}
-      variant="primary"
+      variant="success"
       icon={Check}
       label={t("Accepter les corrections")}
       action={() =>
@@ -56,7 +56,7 @@ export const ApproveOneFixButton = ({
   return (
     <Button
       captive
-      variant={icon ? "icon" : "primary"}
+      variant={icon ? "icon" : "success"}
       icon={Check}
       title={t("Accepter la correction")}
       label={t("Accepter la correction")}

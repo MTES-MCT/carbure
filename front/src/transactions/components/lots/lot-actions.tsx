@@ -24,7 +24,6 @@ export interface ActionBarProps {
 export const LotActions = ({ count, category, ...props }: ActionBarProps) => {
   const status = useStatus()
   const empty = count === 0
-  const noSelection = props.selection.length === 0
 
   return (
     <ActionBar>
@@ -33,7 +32,7 @@ export const LotActions = ({ count, category, ...props }: ActionBarProps) => {
           <CreateButton />
           <ImportButton />
           <SendManyButton {...props} disabled={empty} />
-          <DeleteManyButton {...props} disabled={empty} />
+          <DeleteManyButton all {...props} disabled={empty} />
         </Fragment>
       )}
 
@@ -56,7 +55,7 @@ export const LotActions = ({ count, category, ...props }: ActionBarProps) => {
           {category === "correction" && (
             <Fragment>
               <MarkManyAsFixedButton {...props} />
-              <DeleteManyButton {...props} disabled={noSelection} />
+              <DeleteManyButton {...props} />
             </Fragment>
           )}
         </Fragment>
