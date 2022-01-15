@@ -14,7 +14,6 @@ import Comments from "lot-details/components/comments"
 import {
   BlockingAnomalies,
   separateAnomalies,
-  WarningAnomalies,
 } from "lot-details/components/anomalies"
 import { getLotChanges, LotHistory } from "lot-details/components/history"
 import { isExpiring } from "common-v2/utils/deadline"
@@ -23,6 +22,7 @@ import NavigationButtons from "lot-details/components/navigation"
 import LotTraceability, {
   hasTraceability,
 } from "lot-details/components/lot-traceability"
+import { WarningAnomalies } from "./components/warnings"
 
 export interface LotDetailsProps {
   neighbors: number[]
