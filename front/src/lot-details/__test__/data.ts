@@ -87,6 +87,8 @@ export const errors: LotError[] = [
     value: null,
     extra: null,
     fields: null,
+    acked_by_creator: false,
+    acked_by_recipient: false,
   },
   {
     error: "MISSING_PRODUCTION_SITE_COMDATE",
@@ -95,6 +97,8 @@ export const errors: LotError[] = [
     value: null,
     extra: null,
     fields: null,
+    acked_by_creator: false,
+    acked_by_recipient: false,
   },
   {
     error: "NO_PRODSITE_CERT",
@@ -103,6 +107,8 @@ export const errors: LotError[] = [
     value: null,
     extra: null,
     fields: null,
+    acked_by_creator: false,
+    acked_by_recipient: false,
   },
 ]
 

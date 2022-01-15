@@ -177,6 +177,8 @@ export interface LotError {
   fields: string[] | null
   value: string | null
   extra: string | null
+  acked_by_creator: boolean
+  acked_by_recipient: boolean
 }
 
 export enum LotStatus {

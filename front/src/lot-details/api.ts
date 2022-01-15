@@ -1,11 +1,11 @@
-import api, { Api } from "common-v2/services/api";
-import { lotFormToPayload, LotFormValue } from "lot-add/components/lot-form";
-import { LotDetails } from "./types";
+import api, { Api } from "common-v2/services/api"
+import { lotFormToPayload, LotFormValue } from "lot-add/components/lot-form"
+import { LotDetails } from "./types"
 
 export function getLotDetails(entity_id: number, lot_id: number) {
   return api.get<Api<LotDetails>>("/lots/details", {
     params: { entity_id, lot_id },
-  });
+  })
 }
 
 export function updateLot(entity_id: number, form: LotFormValue) {
@@ -13,5 +13,9 @@ export function updateLot(entity_id: number, form: LotFormValue) {
     entity_id,
     lot_id: form.lot?.id,
     ...lotFormToPayload(form),
-  });
+  })
+}
+
+export function ackWarning(entity_id: number, lot_id: number, error: string) {
+  return api.post("/lots/toggle-warning", { entity_id, lot_id, error })
 }
