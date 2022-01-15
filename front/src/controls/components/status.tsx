@@ -84,8 +84,6 @@ interface StatusRecapProps {
 }
 
 const StatusRecap = ({ loading, count = 0, label }: StatusRecapProps) => {
-  const { t } = useTranslation()
-
   return (
     <>
       <p>{loading ? <Loader size={20} /> : formatNumber(count)} </p>
