@@ -13,7 +13,11 @@ import Dialog from "common-v2/components/dialog"
 import { LotSummary } from "../components/lots/lot-summary"
 import Select from "common-v2/components/select"
 import Alert from "common-v2/components/alert"
-import { formatPeriod } from "common-v2/utils/formatters"
+import {
+  capitalize,
+  formatDate,
+  formatPeriod,
+} from "common-v2/utils/formatters"
 import {
   AlertCircle,
   Certificate,
@@ -26,11 +30,13 @@ import {
 import { Entity } from "carbure/types"
 import { Row } from "common-v2/components/scaffold"
 import { useMatomo } from "matomo"
+
 export interface DeclarationButtonProps {
   year: number
+  years: number[]
 }
 
-export const DeclarationButton = ({ year }: DeclarationButtonProps) => {
+export const DeclarationButton = ({ year, years }: DeclarationButtonProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
   return (
@@ -40,7 +46,9 @@ export const DeclarationButton = ({ year }: DeclarationButtonProps) => {
       icon={Certificate}
       label={t("Valider ma déclaration")}
       action={() =>
-        portal((close) => <DeclarationDialog year={year} onClose={close} />)
+        portal((close) => (
+          <DeclarationDialog year={year} years={years} onClose={close} />
+        ))
       }
     />
   )
@@ -48,14 +56,17 @@ export const DeclarationButton = ({ year }: DeclarationButtonProps) => {
 
 export interface DeclarationDialogProps {
   year: number
+  years: number[]
   onClose: () => void
 }
 
 const now = new Date()
-const currentPeriod = now.getFullYear() * 100 + now.getMonth()
+const currentMonth = now.getMonth()
+const currentYear = now.getFullYear()
 
 export const DeclarationDialog = ({
-  year,
+  year: initialYear,
+  years,
   onClose,
 }: DeclarationDialogProps) => {
   const { t } = useTranslation()
@@ -63,24 +74,15 @@ export const DeclarationDialog = ({
   const matomo = useMatomo()
   const entity = useEntity()
 
-  const [declaration, setDeclaration] = useState<DeclarationSummary | undefined>() // prettier-ignore
+  const [timeline, setTimeline] = useState({
+    month: currentMonth,
+    year: initialYear,
+  })
 
   const declarations = useQuery(api.getDeclarations, {
     key: "declarations",
-    params: [entity.id, year],
-
-    // select the current period by default
-    onSuccess: (res) => {
-      const declarations = res.data.data ?? []
-      if (declaration === undefined) {
-        setDeclaration(
-          declarations.find((d) => d.period === currentPeriod) ??
-            declarations[0]
-        )
-      } else {
-        setDeclaration(declarations.find((d) => d.period === declaration.period)) // prettier-ignore
-      }
-    },
+    params: [entity.id, timeline.year],
+    onSuccess: () => setTimeline(timeline),
   })
 
   const validateDeclaration = useMutation(api.validateDeclaration, {
@@ -112,19 +114,30 @@ export const DeclarationDialog = ({
   })
 
   const declarationsData = declarations.result?.data.data ?? []
-  const period = declaration?.period ?? currentPeriod
+  const declaration = declarationsData[timeline.month]
+  const period = timeline.year * 100 + timeline.month + 1
 
   // generate a special query to get the summary for this declaration
-  const query = useDeclarationQuery({ entity, year, period })
+  const query = useDeclarationQuery({
+    entity,
+    year: timeline.year,
+    period: period,
+  })
 
   function prev() {
-    const index = declarationsData.indexOf(declaration!)
-    setDeclaration(declarationsData[Math.max(0, index - 1)])
+    if (timeline.month === 0) {
+      setTimeline({ year: timeline.year - 1, month: 11 })
+    } else {
+      setTimeline({ ...timeline, month: timeline.month - 1 })
+    }
   }
 
   function next() {
-    const index = declarationsData.indexOf(declaration!)
-    setDeclaration(declarationsData[Math.min(index + 1, 11)])
+    if (timeline.month === 11) {
+      setTimeline({ year: timeline.year + 1, month: 0 })
+    } else {
+      setTimeline({ ...timeline, month: timeline.month + 1 })
+    }
   }
 
   const hasLots = Boolean(declaration?.lots)
@@ -133,9 +146,7 @@ export const DeclarationDialog = ({
   return (
     <Dialog limit onClose={onClose}>
       <header>
-        <h1>
-          {t("Déclaration de durabilité")} {year}
-        </h1>
+        <h1>{t("Déclaration de durabilité")}</h1>
       </header>
 
       <main>
@@ -152,16 +163,23 @@ export const DeclarationDialog = ({
           </p>
         </section>
         <section>
-          <Row>
+          <Row style={{ gap: "var(--spacing-s)" }}>
             <Button icon={ChevronLeft} action={prev} />
             <Select
+              placeholder={t("Choisissez une année")}
+              value={timeline.year}
+              onChange={(year = currentYear) => setTimeline({ ...timeline, year })} // prettier-ignore
+              options={years}
+              style={{ flex: 1 }}
+            />
+            <Select
               loading={declarations.loading}
-              placeholder={t("Choisissez une période")}
-              value={declaration}
-              onChange={setDeclaration}
+              placeholder={t("Choisissez une année")}
+              value={timeline.month}
+              onChange={(month = currentMonth) => setTimeline({ ...timeline, month })} // prettier-ignore
               options={declarationsData}
               normalize={normalizeDeclaration}
-              style={{ flex: 1, margin: "0 var(--spacing-s)" }}
+              style={{ flex: 2 }}
             />
             <Button icon={ChevronRight} action={next} />
           </Row>
@@ -238,8 +256,13 @@ function useDeclarationQuery({ entity, year, period }: DeclarationQueryState) {
   )
 }
 
-const normalizeDeclaration: Normalizer<DeclarationSummary> = (declaration) => {
-  const period = formatPeriod(declaration.period)
+const normalizeDeclaration: Normalizer<DeclarationSummary, number> = (
+  declaration
+) => {
+  const month = (declaration.period % 100) - 1
+  const date = formatPeriod(declaration.period) + "-01"
+  const localized = formatDate(date, { day: undefined, year: undefined, month: 'long' }) // prettier-ignore
   const extra = i18next.t("{{count}} lots", { count: declaration.lots })
-  return { value: declaration, label: `${period} → ${extra}` }
+  const ok = declaration.declaration?.declared ? " ✔" : ""
+  return { value: month, label: `${capitalize(localized)} : ${extra}${ok}` }
 }

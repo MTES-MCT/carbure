@@ -50,7 +50,7 @@ export const Transactions = () => {
     return <Navigate to="drafts" />
   }
 
-  const yearData = years.result?.data.data
+  const yearData = years.result?.data.data ?? []
   const snapshotData = snapshot.result?.data.data
 
   // common props for subroutes
@@ -74,7 +74,7 @@ export const Transactions = () => {
                 sort={(year) => -year.value}
               />
 
-              <DeclarationButton year={year} />
+              <DeclarationButton year={year} years={yearData} />
             </section>
 
             <section>

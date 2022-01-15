@@ -64,6 +64,10 @@ export function standardize(str: string) {
     .replace(/[\u0300-\u036f]/g, "")
 }
 
+export function capitalize(str: string) {
+  return str[0].toUpperCase() + str.slice(1)
+}
+
 export function variations(count: number) {
   return (labels: { zero?: string; one: string; many: string }) => {
     if (count === 0) return labels.zero ?? "N/A"
