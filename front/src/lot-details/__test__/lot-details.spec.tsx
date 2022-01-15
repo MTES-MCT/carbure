@@ -95,7 +95,7 @@ function checkGESFields() {
 test("display transaction details", async () => {
   render(<LotDetailsWithRouter entity={producer} />)
 
-  await screen.findByText("Détails du lot #TEST01")
+  await screen.findByText(/Détails du lot #TEST01/)
 
   screen.getByDisplayValue("DAETEST")
 
