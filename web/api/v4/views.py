@@ -1537,3 +1537,31 @@ def get_template_stock(request, *args, **kwargs):
             return response
     except Exception:
         return JsonResponse({'status': "error", 'message': "Error creating template file"}, status=500)
+
+
+@check_user_rights()
+def toggle_warning(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    lot_id = request.POST.get('lot_id')
+    error = request.POST.get('error')
+
+    try:
+        lot = CarbureLot.objects.get(id=lot_id)
+        lot_error = GenericError.objects.get(lot_id=lot_id, error=error)
+    except:
+        traceback.print_exc()
+        return JsonResponse({'status': "error", 'message': "Could not locate wanted lot or error"}, status=404)
+
+    try:
+        # is client
+        if lot.added_by_id == int(entity_id):
+            lot_error.acked_by_creator = not lot_error.acked_by_creator
+        # is recipient
+        if lot.carbure_client_id == int(entity_id):
+            lot_error.acked_by_recipient = not lot_error.acked_by_recipient
+        lot_error.save()
+        return JsonResponse({'status': "success"})
+    except:
+        traceback.print_exc()
+        return JsonResponse({'status': "error", 'message': "Could not update warning"}, status=500)

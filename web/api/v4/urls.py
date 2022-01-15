@@ -31,6 +31,8 @@ urlpatterns = [
     path('lots/accept-processing', views.accept_processing, name='api-v4-accept-processing'),
     path('lots/accept-blending', views.accept_blending, name='api-v4-accept-blending'),
     path('lots/accept-export', views.accept_export, name='api-v4-accept-export'),
+    ### Warnings
+    path('lots/toggle-warning', views.toggle_warning, name='api-v4-toggle-warning'),
 
     # STOCKS
     path('stocks', views.get_stock, name='api-v4-get-stock'),
