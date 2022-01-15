@@ -162,11 +162,11 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
 function isEditable(lot: Lot | undefined, entity: Entity) {
   if (lot === undefined) return false
 
-  const isSupplier = lot.carbure_supplier?.id === entity.id
+  const isCreator = lot.added_by?.id === entity.id
 
   return (
     [LotStatus.Draft, LotStatus.Rejected].includes(lot.lot_status) ||
-    (isSupplier && lot.correction_status === CorrectionStatus.InCorrection)
+    (isCreator && lot.correction_status === CorrectionStatus.InCorrection)
   )
 }
 
