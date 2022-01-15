@@ -77,8 +77,9 @@ def get_lots(request, *args, **kwargs):
     if not status and not selection:
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
     try:
-        lots = get_entity_lots_by_status(entity_id, status)
-        return get_lots_with_metadata(lots, entity_id, request.GET)
+        entity = Entity.objects.get(id=entity_id)
+        lots = get_entity_lots_by_status(entity, status)
+        return get_lots_with_metadata(lots, entity, request.GET)
     except Exception:
         traceback.print_exc()
         return JsonResponse({'status': 'error', 'message': "Could not get lots"}, status=400)
@@ -101,13 +102,14 @@ def get_lots_summary(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
     status = request.GET.get('status', False)
-    short = request.GET.get('short', False)
+    short = request.GET.get('short', False) == 'true'
     if not status:
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
     try:
-        lots = get_entity_lots_by_status(entity_id, status)
-        lots = filter_lots(lots, request.GET, entity_id, will_aggregate=True)
-        summary = get_lots_summary_data(lots, entity_id, short == 'true')
+        entity = Entity.objects.get(id=entity_id)
+        lots = get_entity_lots_by_status(entity, status)
+        lots = filter_lots(lots, request.GET, entity, will_aggregate=True)
+        summary = get_lots_summary_data(lots, entity, short)
         return JsonResponse({'status': 'success', 'data': summary})
     except Exception:
         traceback.print_exc()
@@ -453,10 +455,10 @@ def get_lot_details(request, *args, **kwargs):
     data['children_lot'] = CarbureLotPublicSerializer(CarbureLot.objects.filter(parent_lot=lot), many=True).data
     data['children_stock'] = CarbureStockPublicSerializer(CarbureStock.objects.filter(parent_lot=lot), many=True).data
     data['distance'] = get_transaction_distance(lot)
-    data['errors'] = get_lot_errors(lot, entity_id)
+    data['errors'] = get_lot_errors(lot, entity)
     #data['certificates'] = check_certificates(tx)
-    data['updates'] = get_lot_updates(lot, entity_id)
-    data['comments'] = get_lot_comments(lot, entity_id)
+    data['updates'] = get_lot_updates(lot, entity)
+    data['comments'] = get_lot_comments(lot, entity)
     return JsonResponse({'status': 'success', 'data': data})
 
 
@@ -468,8 +470,9 @@ def get_lots_filters(request, *args, **kwargs):
     field = request.GET.get('field', False)
     if not field:
         return JsonResponse({'status': 'error', 'message': 'Please specify the field for which you want the filters'}, status=400)
-    txs = get_entity_lots_by_status(entity_id, status)
-    data = get_lots_filters_data(txs, request.GET, entity_id, field)
+    entity = Entity.objects.get(id=entity_id)
+    txs = get_entity_lots_by_status(entity, status)
+    data = get_lots_filters_data(txs, request.GET, entity, field)
     if data is None:
         return JsonResponse({'status': 'error', 'message': "Could not find specified filter"}, status=400)
     else:
@@ -654,19 +657,19 @@ def duplicate_lot(request, *args, **kwargs):
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def lots_send(request, *args, **kwargs):
     context = kwargs['context']
-    entity_id = int(context['entity_id'])
+    entity_id = context['entity_id']
     status = request.POST.get('status', None)
-    lots = get_entity_lots_by_status(entity_id, status)
-    filtered_lots = filter_lots(lots, request.POST, entity_id)
+    entity = Entity.objects.get(id=entity_id)
+    lots = get_entity_lots_by_status(entity, status)
+    filtered_lots = filter_lots(lots, request.POST, entity)
     nb_lots = len(filtered_lots)
     nb_sent = 0
     nb_rejected = 0
     nb_ignored = 0
     nb_auto_accepted = 0
-    entity = Entity.objects.get(pk=entity_id)
     prefetched_data = get_prefetched_data(entity)
     for lot in filtered_lots:
-        if lot.added_by_id != entity_id:
+        if lot.added_by != entity:
             return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to send this lot'}, status=403)
         if lot.lot_status != CarbureLot.DRAFT:
             return JsonResponse({'status': 'error', 'message': 'Lot is not a draft'}, status=400)
@@ -759,12 +762,13 @@ def lots_delete(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
     status = request.POST.get('status', None)
-    lots = get_entity_lots_by_status(entity_id, status)
-    filtered_lots = filter_lots(lots, request.POST, entity_id)
+    entity = Entity.objects.get(id=entity_id)
+    lots = get_entity_lots_by_status(entity, status)
+    filtered_lots = filter_lots(lots, request.POST, entity)
     if filtered_lots.count() == 0:
         return JsonResponse({'status': 'error', 'message': 'Could not find lots to delete'}, status=400)
     for lot in filtered_lots:
-        if lot.added_by_id != int(entity_id):
+        if lot.added_by != entity:
             return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to delete this lot'}, status=403)
 
         if lot.lot_status not in [CarbureLot.DRAFT, CarbureLot.REJECTED]:
@@ -855,10 +859,10 @@ def add_comment(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Missing comment'}, status=400)
     is_visible_by_admin = request.POST.get('is_visible_by_admin', False)
     is_visible_by_auditor = request.POST.get('is_visible_by_auditor', False)
-    lots = get_entity_lots_by_status(entity_id, status)
-    lots = filter_lots(lots, request.POST, entity_id)
+    entity = Entity.objects.get(id=entity_id)
+    lots = get_entity_lots_by_status(entity, status)
+    lots = filter_lots(lots, request.POST, entity)
 
-    entity = Entity.objects.get(pk=entity_id)
     for lot in lots.iterator():
         if lot.carbure_supplier != entity and lot.carbure_client != entity and entity.entity_type not in [Entity.AUDITOR, Entity.ADMIN]:
             return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to comment on this lot'}, status=403)
@@ -998,13 +1002,14 @@ def reject_lot(request, *args, **kwargs):
     entity_id = context['entity_id']
     status = request.POST.get('status', False)
 
-    lots = get_entity_lots_by_status(entity_id, status)
-    lots = filter_lots(lots, request.POST, entity_id, will_aggregate=True)
+    entity = Entity.objects.get(id=entity_id)
+    lots = get_entity_lots_by_status(entity, status)
+    lots = filter_lots(lots, request.POST, entity, will_aggregate=True)
 
     for lot in lots.iterator():
         notify_sender = False
 
-        if int(entity_id) != lot.carbure_client_id:
+        if lot.carbure_client != entity:
             return JsonResponse({'status': 'forbidden', 'message': 'Only the client can reject this lot'}, status=403)
 
         if lot.lot_status == CarbureLot.DRAFT:
@@ -1096,8 +1101,9 @@ def accept_rfc(request, *args, **kwargs):
     entity_id = context['entity_id']
     status = request.POST.get('status', False)
 
-    lots = get_entity_lots_by_status(entity_id, status)
-    lots = filter_lots(lots, request.POST, entity_id, will_aggregate=True)
+    entity = Entity.objects.get(id=entity_id)
+    lots = get_entity_lots_by_status(entity, status)
+    lots = filter_lots(lots, request.POST, entity, will_aggregate=True)
 
     for lot in lots.iterator():
         if int(entity_id) != lot.carbure_client_id:
@@ -1134,10 +1140,10 @@ def accept_in_stock(request, *args, **kwargs):
     entity_id = context['entity_id']
     status = request.POST.get('status', False)
 
-    lots = get_entity_lots_by_status(entity_id, status)
-    lots = filter_lots(lots, request.POST, entity_id, will_aggregate=True)
+    entity = Entity.objects.get(id=entity_id)
+    lots = get_entity_lots_by_status(entity, status)
+    lots = filter_lots(lots, request.POST, entity, will_aggregate=True)
 
-    entity = Entity.objects.get(pk=entity_id)
     if entity.entity_type == Entity.OPERATOR:
         return JsonResponse({'status': 'error', 'message': 'Stock unavailable for Operators'}, status=400)
 
@@ -1200,8 +1206,9 @@ def accept_blending(request, *args, **kwargs):
     entity_id = context['entity_id']
     status = request.POST.get('status', False)
 
-    lots = get_entity_lots_by_status(entity_id, status)
-    lots = filter_lots(lots, request.POST, entity_id, will_aggregate=True)
+    entity = Entity.objects.get(id=entity_id)
+    lots = get_entity_lots_by_status(entity, status)
+    lots = filter_lots(lots, request.POST, entity, will_aggregate=True)
 
     for lot in lots.iterator():
         if int(entity_id) != lot.carbure_client_id:
@@ -1238,8 +1245,9 @@ def accept_export(request, *args, **kwargs):
     entity_id = context['entity_id']
     status = request.POST.get('status', False)
 
-    lots = get_entity_lots_by_status(entity_id, status)
-    lots = filter_lots(lots, request.POST, entity_id, will_aggregate=True)
+    entity = Entity.objects.get(id=entity_id)
+    lots = get_entity_lots_by_status(entity, status)
+    lots = filter_lots(lots, request.POST, entity, will_aggregate=True)
 
     for lot in lots.iterator():
         if int(entity_id) != lot.carbure_client_id:
@@ -1280,8 +1288,8 @@ def accept_processing(request, *args, **kwargs):
     entity = Entity.objects.get(pk=entity_id)
     processing_entity = Entity.objects.get(pk=processing_entity_id)
 
-    lots = get_entity_lots_by_status(entity_id, status)
-    lots = filter_lots(lots, request.POST, entity_id, will_aggregate=True)
+    lots = get_entity_lots_by_status(entity, status)
+    lots = filter_lots(lots, request.POST, entity, will_aggregate=True)
 
     for lot in lots.iterator():
         if int(entity_id) != lot.carbure_client_id:
@@ -1348,10 +1356,10 @@ def accept_trading(request, *args, **kwargs):
     if not certificate:
         return JsonResponse({'status': 'error', 'message': 'Please specify a certificate'}, status=400)
 
-    lots = get_entity_lots_by_status(entity_id, status)
-    lots = filter_lots(lots, request.POST, entity_id, will_aggregate=True)
+    entity = Entity.objects.get(id=entity_id)
+    lots = get_entity_lots_by_status(entity, status)
+    lots = filter_lots(lots, request.POST, entity, will_aggregate=True)
 
-    entity = Entity.objects.get(pk=entity_id)
     if client_entity_id:
         try:
             client_entity = Entity.objects.get(pk=client_entity_id)
@@ -1554,7 +1562,7 @@ def toggle_warning(request, *args, **kwargs):
         return JsonResponse({'status': "error", 'message': "Could not locate wanted lot or error"}, status=404)
 
     try:
-        # is client
+        # is creator
         if lot.added_by_id == int(entity_id):
             lot_error.acked_by_creator = not lot_error.acked_by_creator
         # is recipient
