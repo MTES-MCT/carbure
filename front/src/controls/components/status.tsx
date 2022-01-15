@@ -3,6 +3,7 @@ import { useMatch } from "react-router-dom"
 import { Snapshot, AdminStatus } from "../types"
 import Tabs from "common-v2/components/tabs"
 import { Loader } from "common-v2/components/icons"
+import { formatNumber } from "common-v2/utils/formatters"
 
 export interface StatusTabsProps {
   loading: boolean
@@ -82,24 +83,12 @@ interface StatusRecapProps {
   tofix?: number
 }
 
-const StatusRecap = ({
-  loading,
-  count = 0,
-  tofix = 0,
-  label,
-}: StatusRecapProps) => {
+const StatusRecap = ({ loading, count = 0, label }: StatusRecapProps) => {
   const { t } = useTranslation()
 
   return (
     <>
-      <p>
-        {loading ? <Loader size={20} /> : count}{" "}
-        {tofix > 0 && (
-          <small>
-            ({tofix} {t("corrections")})
-          </small>
-        )}
-      </p>
+      <p>{loading ? <Loader size={20} /> : formatNumber(count)} </p>
       <strong>{label}</strong>
     </>
   )

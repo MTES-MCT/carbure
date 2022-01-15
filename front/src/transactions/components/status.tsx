@@ -6,6 +6,8 @@ import Tabs from "common-v2/components/tabs"
 import { AlertCircle, Loader } from "common-v2/components/icons"
 import { Col, Row } from "common-v2/components/scaffold"
 import css from "./status.module.css"
+import { formatNumber } from "common-v2/utils/formatters"
+
 export interface StatusTabsProps {
   loading: boolean
   count: Snapshot["lots"] | undefined
@@ -109,7 +111,7 @@ const StatusRecap = ({
     <>
       <Row className={cl(hasAlert && css.recto)}>
         <Col>
-          <p>{loading ? <Loader size={20} /> : count}</p>
+          <p>{loading ? <Loader size={20} /> : formatNumber(count)}</p>
           <strong>{label}</strong>
         </Col>
 
@@ -130,13 +132,14 @@ const StatusRecap = ({
         <Col className={css.verso}>
           {pending > 0 && (
             <p>
-              <strong>{pending}</strong>{" "}
+              <strong>{formatNumber(pending)}</strong>{" "}
               {t("lots en attente", { count: pending })}
             </p>
           )}
           {tofix > 0 && (
             <p>
-              <strong>{tofix}</strong> {t("lots à corriger", { count: tofix })}
+              <strong>{formatNumber(tofix)}</strong>{" "}
+              {t("lots à corriger", { count: tofix })}
             </p>
           )}
         </Col>
