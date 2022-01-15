@@ -29,7 +29,7 @@ class ProductionSiteSerializer(serializers.ModelSerializer):
 class GenericErrorSerializer(serializers.ModelSerializer):
     class Meta:
         model = GenericError
-        fields = ['error', 'is_blocking', 'field', 'value', 'extra', 'fields']
+        fields = ['error', 'is_blocking', 'field', 'value', 'extra', 'fields', 'acked_by_creator', 'acked_by_recipient']
 
 class CarbureLotEventSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(read_only=True, slug_field='email')

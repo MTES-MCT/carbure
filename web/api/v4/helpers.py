@@ -153,13 +153,13 @@ def get_lots_with_errors(lots, entity_id, will_aggregate=False):
         # use a subquery so we can later do aggregations on this queryset without wrecking the results
         tx_errors = GenericError.objects.filter(lot=OuterRef('pk'))
         if entity_id is not None:
-            filter = Q(lot__added_by_id=entity_id, display_to_creator=True) | Q(lot__carbure_client_id=entity_id, display_to_recipient=True)
+            filter = Q(lot__added_by_id=entity_id, display_to_creator=True, acked_by_creator=False) | Q(lot__carbure_client_id=entity_id, display_to_recipient=True, acked_by_recipient=False)
             tx_errors = tx_errors.filter(filter)
         tx_errors = tx_errors.values('lot').annotate(errors=Count('id')).values('errors')
         return lots.annotate(errors=Subquery(tx_errors)).filter(errors__gt=0)
     else:
         if entity_id is not None:
-            filter = Q(added_by_id=entity_id, genericerror__display_to_creator=True) | Q(carbure_client_id=entity_id, genericerror__display_to_recipient=True)
+            filter = Q(added_by_id=entity_id, genericerror__display_to_creator=True, genericerror__acked_by_creator=False) | Q(carbure_client_id=entity_id, genericerror__display_to_recipient=True, genericerror__acked_by_recipient=False)
             counter = Count('genericerror', filter=filter)
         else:
             counter = Count('genericerror')
@@ -539,7 +539,7 @@ def get_lots_errors(lots, entity_id=None):
     lot_ids = list(lots.values_list('id', flat=True))
     errors = GenericError.objects.filter(lot_id__in=lot_ids)
     if entity_id is not None:
-        errors = errors.filter(Q(lot__added_by_id=entity_id, display_to_creator=True) | Q(lot__carbure_client_id=entity_id, display_to_recipient=True))
+        errors = errors.filter(Q(lot__added_by_id=entity_id, display_to_creator=True, acked_by_creator=False) | Q(lot__carbure_client_id=entity_id, display_to_recipient=True, acked_by_recipient=False))
     data = {}
     for error in errors.values('lot_id', 'error', 'is_blocking', 'field', 'value', 'extra', 'fields').iterator():
         if error['lot_id'] not in data:
