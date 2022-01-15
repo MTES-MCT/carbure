@@ -51,7 +51,7 @@ export const WarningAnomalies = ({ lot, anomalies }: WarningAnomaliesProps) => {
   const isRecipient = lot.carbure_client?.id === entity.id
 
   const ackWarning = useMutation(
-    (anomaly: LotError) => api.ackWarning(entity.id, lot.id, anomaly.error),
+    (anomaly: LotError) => api.toggleWarning(entity.id, lot.id, anomaly.error),
     { invalidates: ["lot-details"] }
   )
 
@@ -106,7 +106,7 @@ export const WarningAnomalies = ({ lot, anomalies }: WarningAnomaliesProps) => {
   )
 }
 
-function getAnomalyText(anomaly: LotError) {
+export function getAnomalyText(anomaly: LotError) {
   const error = i18next.t(anomaly.error, { ns: "errors" }) || i18next.t("Erreur de validation") // prettier-ignore
   const extra = anomaly.extra && anomaly.extra !==  i18next.t(anomaly.error, { ns: "errors" }) ? ` - ${anomaly.extra}` : '' // prettier-ignore
   return error + extra
