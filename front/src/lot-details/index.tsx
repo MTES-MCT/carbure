@@ -80,6 +80,8 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
         {lotData && <LotTag big lot={lotData.lot} />}
         <h1>
           {t("Détails du lot")} #{lotData?.lot.carbure_id || lotData?.lot.id}
+          {" · "}
+          {entity.name}
         </h1>
 
         {expiring && (
@@ -112,7 +114,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
 
         {warnings.length > 0 && (
           <section>
-            <WarningAnomalies anomalies={warnings} />
+            <WarningAnomalies lot={lotData!.lot} anomalies={warnings} />
           </section>
         )}
 
