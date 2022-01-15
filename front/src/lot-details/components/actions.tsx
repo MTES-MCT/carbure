@@ -18,6 +18,7 @@ export interface ActionBarProps {
 export const LotActions = ({ lot }: ActionBarProps) => {
   const entity = useEntity()
 
+  const isCreator = lot.added_by?.id === entity.id
   const isSupplier = lot.carbure_supplier?.id === entity.id
   const isClient = lot.carbure_client?.id === entity.id
 
@@ -39,7 +40,7 @@ export const LotActions = ({ lot }: ActionBarProps) => {
         </Fragment>
       )}
 
-      {isClient && !isSupplier && status !== "DRAFT" && (
+      {isClient && !(isCreator || isSupplier) && status !== "DRAFT" && (
         <Fragment>
           {correction === "FIXED" && <ApproveOneFixButton lot={lot} />}
           {["NO_PROBLEMO", "FIXED"].includes(correction) && (
@@ -48,7 +49,7 @@ export const LotActions = ({ lot }: ActionBarProps) => {
         </Fragment>
       )}
 
-      {isSupplier && status !== "DRAFT" && (
+      {(isCreator || isSupplier) && status !== "DRAFT" && (
         <Fragment>
           {correction === "NO_PROBLEMO" && <RecallOneButton lot={lot} />}
           {correction === "IN_CORRECTION" && <MarkOneAsFixedButton lot={lot} />}
