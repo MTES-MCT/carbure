@@ -2,12 +2,13 @@ import { useTranslation } from "react-i18next"
 import { Lot, LotError } from "transactions/types"
 import Collapse from "common-v2/components/collapse"
 import { AlertOctagon, AlertTriangle } from "common-v2/components/icons"
-import Checkbox from "common-v2/components/checkbox"
+import { CheckboxGroup } from "common-v2/components/checkbox"
 import i18next from "i18next"
 import useEntity from "carbure/hooks/entity"
 import { useMutation } from "common-v2/hooks/async"
-import { LoaderOverlay } from "common-v2/components/scaffold"
 import * as api from "../api"
+import { Normalizer } from "common-v2/utils/normalize"
+import { useState } from "react"
 
 export interface BlockingAnomaliesProps {
   anomalies: LotError[]
@@ -49,17 +50,20 @@ export const WarningAnomalies = ({ lot, anomalies }: WarningAnomaliesProps) => {
 
   const isCreator = lot.added_by?.id === entity.id
   const isRecipient = lot.carbure_client?.id === entity.id
-
-  const ackWarning = useMutation(
-    (anomaly: LotError) => api.toggleWarning(entity.id, lot.id, anomaly.error),
-    { invalidates: ["lot-details"] }
-  )
-
   function isAcked(anomaly: LotError) {
     if (isCreator) return anomaly.acked_by_creator
     else if (isRecipient) return anomaly.acked_by_recipient
     else return false
   }
+
+  const [checked, setChecked] = useState<string[] | undefined>(
+    anomalies.filter(isAcked).map((a) => a.error)
+  )
+
+  const ackWarning = useMutation(
+    (error: string) => api.toggleWarning(entity.id, lot.id, error),
+    { invalidates: [] }
+  )
 
   return (
     <Collapse
@@ -79,32 +83,23 @@ export const WarningAnomalies = ({ lot, anomalies }: WarningAnomaliesProps) => {
       </section>
 
       <footer>
-        <ul
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 8,
-            paddingLeft: 8,
-            listStyle: "none",
-          }}
-        >
-          {anomalies.map((anomaly, i) => (
-            <li key={i}>
-              <Checkbox
-                label={getAnomalyText(anomaly)}
-                value={isAcked(anomaly)}
-                onChange={() => ackWarning.execute(anomaly)}
-                style={{ opacity: isAcked(anomaly) ? 0.5 : 1 }}
-              />
-            </li>
-          ))}
-        </ul>
+        <CheckboxGroup
+          variant="opacity"
+          value={checked}
+          options={anomalies}
+          onChange={setChecked}
+          onToggle={(error) => ackWarning.execute(error)}
+          normalize={normalizeAnomaly}
+        />
       </footer>
-
-      {ackWarning.loading && <LoaderOverlay />}
     </Collapse>
   )
 }
+
+export const normalizeAnomaly: Normalizer<LotError, string> = (anomaly) => ({
+  value: anomaly.error,
+  label: getAnomalyText(anomaly),
+})
 
 export function getAnomalyText(anomaly: LotError) {
   const error = i18next.t(anomaly.error, { ns: "errors" }) || i18next.t("Erreur de validation") // prettier-ignore
