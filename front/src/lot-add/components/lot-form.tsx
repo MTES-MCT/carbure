@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import useEntity from "carbure/hooks/entity"
-import { Lot, LotError } from "transactions/types"
+import { DeliveryType, Lot, LotError } from "transactions/types"
 import {
   Biofuel,
   Country,
@@ -173,6 +173,7 @@ export const defaultLot = {
   supplier_certificate: undefined as string | undefined,
   vendor_certificate: undefined as string | undefined,
   client: undefined as Entity | string | undefined,
+  delivery_type: undefined as DeliveryType | undefined,
   delivery_site: undefined as Depot | string | undefined,
   delivery_site_country: undefined as Country | undefined,
   delivery_date: undefined as string | undefined,
@@ -217,6 +218,7 @@ export const lotToFormValue: (lot: Lot | undefined) => LotFormValue = (lot) => (
   supplier_certificate: lot?.supplier_certificate ?? undefined,
   vendor_certificate: lot?.vendor_certificate ?? undefined,
   client: lot?.carbure_client ?? lot?.unknown_client ?? undefined,
+  delivery_type: lot?.delivery_type,
   delivery_site: lot?.carbure_delivery_site ?? lot?.unknown_delivery_site ?? undefined,
   delivery_site_country: lot?.delivery_site_country ?? undefined,
   delivery_date: lot?.delivery_date ?? undefined,
@@ -286,6 +288,7 @@ export function lotFormToPayload(lot: LotFormValue) {
     vendor_certificate_type: undefined,
 
     // delivery
+    delivery_type: lot.delivery_type,
     delivery_date: lot.delivery_date,
     carbure_client_id: lot.client instanceof Object ? lot.client.id : undefined,
     unknown_client: typeof lot.client === "string" ? lot.client : undefined,
