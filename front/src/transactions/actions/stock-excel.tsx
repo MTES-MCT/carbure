@@ -6,7 +6,7 @@ import { useMutation } from "common-v2/hooks/async"
 import { useNotify } from "common-v2/components/notifications"
 import Button, { ExternalLink as Ext } from "common-v2/components/button"
 import Dialog from "common-v2/components/dialog"
-import { Check, Drop, Return, Upload } from "common-v2/components/icons"
+import { Check, Return, Upload } from "common-v2/components/icons"
 import { usePortal } from "common-v2/components/portal"
 import { FileInput } from "common-v2/components/input"
 import { useMatomo } from "matomo"
@@ -20,9 +20,8 @@ export const StockExcelButton = () => {
 
   return (
     <Button
-      icon={Drop}
-      variant="primary"
-      label={t("Extraire des lots")}
+      icon={Upload}
+      label={t("Extraire avec excel")}
       action={() => portal((close) => <StockExcelDialog onClose={close} />)}
     />
   )
@@ -79,6 +78,14 @@ const StockExcelDialog = ({ onClose }: StockExcelDialogProps) => {
               .
             </Trans>
           </p>
+          {/* <p>
+            <Trans>
+              Son contenu dépend des filtres ou de la sélection que vous avez
+              appliqué à la page Stock avant d'ouvrir cette fenêtre : pour
+              chaque stock trouvé, vous trouverez une ligne préremplie dans le
+              fichier.
+            </Trans>
+          </p> */}
         </section>
         <section>
           <FileInput
