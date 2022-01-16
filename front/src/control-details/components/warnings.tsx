@@ -1,13 +1,13 @@
 import { useTranslation } from "react-i18next"
 import useEntity from "carbure/hooks/entity"
-import Checkbox from "common-v2/components/checkbox"
+import { CheckboxGroup } from "common-v2/components/checkbox"
 import Collapse from "common-v2/components/collapse"
 import { AlertTriangle } from "common-v2/components/icons"
-import { LoaderOverlay } from "common-v2/components/scaffold"
 import { useMutation } from "common-v2/hooks/async"
-import { getAnomalyText } from "lot-details/components/anomalies"
+import { normalizeAnomaly } from "lot-details/components/anomalies"
 import { Lot, LotError } from "transactions/types"
 import * as api from "../api"
+import { useState } from "react"
 
 export interface WarningAnomaliesProps {
   lot: Lot
@@ -18,9 +18,12 @@ export const WarningAnomalies = ({ lot, anomalies }: WarningAnomaliesProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
 
-  const ackWarning = useMutation(
-    (anomaly: LotError) => api.toggleWarning(entity.id, lot.id, anomaly.error),
-    { invalidates: ["control-details"] }
+  const ackWarning = useMutation((error: string) =>
+    api.toggleWarning(entity.id, lot.id, error)
+  )
+
+  const [checked, setChecked] = useState<string[] | undefined>(
+    anomalies.filter((a) => a.acked_by_admin).map((a) => a.error)
   )
 
   return (
@@ -36,29 +39,15 @@ export const WarningAnomalies = ({ lot, anomalies }: WarningAnomaliesProps) => {
       </section>
 
       <footer>
-        <ul
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 8,
-            paddingLeft: 8,
-            listStyle: "none",
-          }}
-        >
-          {anomalies.map((anomaly, i) => (
-            <li key={i}>
-              <Checkbox
-                label={getAnomalyText(anomaly)}
-                value={anomaly.acked_by_admin}
-                onChange={() => ackWarning.execute(anomaly)}
-                style={{ opacity: anomaly.acked_by_admin ? 0.5 : 1 }}
-              />
-            </li>
-          ))}
-        </ul>
+        <CheckboxGroup
+          variant="opacity"
+          value={checked}
+          options={anomalies}
+          onChange={setChecked}
+          onToggle={(error) => ackWarning.execute(error)}
+          normalize={normalizeAnomaly}
+        />
       </footer>
-
-      {ackWarning.loading && <LoaderOverlay />}
     </Collapse>
   )
 }

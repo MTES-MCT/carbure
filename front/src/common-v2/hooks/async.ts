@@ -26,19 +26,19 @@ export function useQuery<R, A extends any[]>(
 }
 
 export type MutationOptions<R> = UseAsyncCallbackOptions<R> & {
-  invalidates: string[]
+  invalidates?: string[]
 }
 
 export function useMutation<R, A extends any[]>(
   asyncFunction: (...args: A) => Promise<R>,
-  { invalidates, ...options }: MutationOptions<R>
+  { invalidates, ...options }: MutationOptions<R> = {}
 ) {
   return useAsyncCallback(asyncFunction, {
     ...options,
     ...staleWhileLoading,
     onSuccess: (res, opts) => {
       // invalidate linked queries if mutation is successful
-      invalidate(...invalidates)
+      invalidates && invalidate(...invalidates)
       options.onSuccess?.(res, opts)
     },
   })

@@ -43,3 +43,7 @@
   background-color: var(--gray-dark);
   border-color: var(--gray-dark);
 }
+
+.opacity .checkbox[data-checked] {
+  opacity: 0.5;
+}
