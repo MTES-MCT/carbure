@@ -143,6 +143,9 @@ export const DeclarationDialog = ({
   const hasLots = Boolean(declaration?.lots)
   const hasPending = Boolean(declaration?.pending)
 
+  const hasPrev = timeline.month > 0 || years.includes(timeline.year - 1)
+  const hasNext = timeline.month < 11 || years.includes(timeline.year + 1)
+
   return (
     <Dialog limit onClose={onClose}>
       <header>
@@ -164,7 +167,7 @@ export const DeclarationDialog = ({
         </section>
         <section>
           <Row style={{ gap: "var(--spacing-s)" }}>
-            <Button icon={ChevronLeft} action={prev} />
+            <Button disabled={!hasPrev} icon={ChevronLeft} action={prev} />
             <Select
               placeholder={t("Choisissez une année")}
               value={timeline.year}
@@ -181,7 +184,7 @@ export const DeclarationDialog = ({
               normalize={normalizeDeclaration}
               style={{ flex: 2 }}
             />
-            <Button icon={ChevronRight} action={next} />
+            <Button disabled={!hasNext} icon={ChevronRight} action={next} />
           </Row>
         </section>
         {declaration && <LotSummary pending query={query} />}
