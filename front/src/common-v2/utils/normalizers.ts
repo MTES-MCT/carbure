@@ -9,6 +9,7 @@ import {
   ProductionSite,
   Certificate,
 } from "common/types"
+import { DeliveryType } from "transactions/types"
 
 export const normalizeBiofuel: Normalizer<Biofuel> = (biofuel) => ({
   value: biofuel,
@@ -77,6 +78,33 @@ export const normalizeCertificate: Normalizer<Certificate> = (certificate) => ({
   value: certificate,
   label: `${certificate.certificate_id} - ${certificate.certificate_holder}`,
 })
+
+export const normalizeDeliveryType: Normalizer<DeliveryType> = (type) => ({
+  value: type,
+  label: getDeliveryTypeLabel(type),
+})
+
+export function getDeliveryTypeLabel(type: DeliveryType) {
+  switch (type) {
+    case DeliveryType.Blending:
+      return i18next.t("Incorporation")
+    case DeliveryType.Direct:
+      return i18next.t("Livraison directe")
+    case DeliveryType.Export:
+      return i18next.t("Export")
+    case DeliveryType.Processing:
+      return i18next.t("Processing")
+    case DeliveryType.RFC:
+      return i18next.t("Mise à consommation")
+    case DeliveryType.Stock:
+      return i18next.t("Mise en stock")
+    case DeliveryType.Trading:
+      return i18next.t("Trading sans stockage")
+    case DeliveryType.Unknown:
+    default:
+      return i18next.t("Inconnu")
+  }
+}
 
 export function identity<T>(value: T) {
   return value

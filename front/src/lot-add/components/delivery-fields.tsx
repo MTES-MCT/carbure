@@ -11,6 +11,8 @@ import * as norm from "common-v2/utils/normalizers"
 import { LotFormValue } from "./lot-form"
 import { Entity } from "carbure/types"
 import { Country, Depot } from "common/types"
+import Select, { SelectProps } from "common-v2/components/select"
+import { DeliveryType } from "transactions/types"
 
 interface DeliveryFieldsProps {
   readOnly?: boolean
@@ -24,6 +26,7 @@ export const DeliveryFields = (props: DeliveryFieldsProps) => {
       <SupplierField {...props} />
       <SupplierCertificateField {...props} />
       <ClientField {...props} />
+      <DeliveryTypeField {...props} />
       <DeliverySiteField {...props} />
       <DeliverySiteCountryField {...props} />
       <DeliveryDateField {...props} />
@@ -132,6 +135,44 @@ export const ClientField = (props: AutocompleteProps<Entity | string>) => {
       normalize={norm.normalizeEntityOrUnknown}
       {...bound}
       {...props}
+    />
+  )
+}
+
+export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
+  const { t } = useTranslation()
+  const entity = useEntity()
+  const { value, bind } = useFormContext<LotFormValue>()
+
+  const isCreator =
+    value.lot?.added_by instanceof Object
+      ? value.lot.added_by.id === entity.id
+      : false
+
+  const isClient =
+    value.client instanceof Object
+      ? value.client.id === entity.id //
+      : false
+
+  if (!isCreator || !isClient) {
+    return null
+  }
+
+  return (
+    <Select
+      clear
+      label={t("Type de livraison")}
+      normalize={norm.normalizeDeliveryType}
+      {...bind("delivery_type")}
+      options={[
+        DeliveryType.Blending,
+        DeliveryType.Processing,
+        DeliveryType.Trading,
+        DeliveryType.Stock,
+        DeliveryType.RFC,
+        DeliveryType.Direct,
+        DeliveryType.Export,
+      ]}
     />
   )
 }
