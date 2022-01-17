@@ -301,7 +301,7 @@ export function useQueryParamsStore(
       }),
 
       setFilters: (filters: FilterSelection) => {
-        setImmediate(() => {
+        setTimeout(() => {
           setFiltersParams(filters)
         })
         return {

@@ -11,12 +11,7 @@ import server, { setDeliverySites, setEntity } from "./api"
 const SettingsWithHooks = () => {
   return (
     <TestRoot url="/org/0/settings">
-      {(app) => (
-        <Route
-          path="/org/0/settings"
-          element={<Settings settings={app.settings} />}
-        />
-      )}
+      {(app) => <Route path="/org/0/settings" element={<Settings />} />}
     </TestRoot>
   )
 }

@@ -177,7 +177,7 @@ export const DeclarationDialog = ({
             />
             <Select
               loading={declarations.loading}
-              placeholder={t("Choisissez une année")}
+              placeholder={t("Choisissez un mois")}
               value={timeline.month}
               onChange={(month = currentMonth) => setTimeline({ ...timeline, month })} // prettier-ignore
               options={declarationsData}
