@@ -179,10 +179,14 @@ export const LotSummary = ({
       {lots.length > 0 && (
         <>
           <h2>
-            <Trans>
-              Transactions ▸ {{ lots: formatNumber(lotsAmount) }} lots ▸{" "}
-              {{ volume: formatNumber(lotsVolume) }} litres
-            </Trans>
+            {t("Transactions")}
+            {" ▸ "}
+            {t("{{count}} lots", { count: lotsAmount })}
+            {" ▸ "}
+            {t("{{volume}} litres", {
+              count: lotsVolume,
+              volume: formatNumber(lotsVolume),
+            })}
           </h2>
           <Table rows={lots} columns={[...columns]} />
         </>

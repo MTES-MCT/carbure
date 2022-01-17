@@ -38,3 +38,7 @@ export function getField(label: any) {
   if (!field) throw new Error(`Cannot find field with label like ${label}`)
   return field
 }
+
+export function getByTextContent(textContent: string) {
+  return screen.getAllByText((_, node) => node?.textContent === textContent)
+}

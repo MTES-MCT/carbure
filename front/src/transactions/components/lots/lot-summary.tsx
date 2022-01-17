@@ -175,10 +175,14 @@ export const LotSummary = ({
       {input.length > 0 && (
         <>
           <h2>
-            <Trans>
-              Entrées ▸ {{ lots: formatNumber(inputLots) }} lots ▸{" "}
-              {{ volume: formatNumber(inputVolume) }} litres
-            </Trans>
+            {t("Lots reçus")}
+            {" ▸ "}
+            {t("{{count}} lots", { count: inputLots })}
+            {" ▸ "}
+            {t("{{volume}} litres", {
+              count: inputVolume,
+              volume: formatNumber(inputVolume),
+            })}
           </h2>
           <Table
             rows={input}
@@ -198,10 +202,14 @@ export const LotSummary = ({
       {output.length > 0 && (
         <>
           <h2>
-            <Trans>
-              Sorties ▸ {{ lots: formatNumber(outputLots) }} lots ▸{" "}
-              {{ volume: formatNumber(outputVolume) }} litres
-            </Trans>
+            {t("Lots envoyés")}
+            {" ▸ "}
+            {t("{{count}} lots", { count: outputLots })}
+            {" ▸ "}
+            {t("{{volume}} litres", {
+              count: outputVolume,
+              volume: formatNumber(outputVolume),
+            })}
           </h2>
           <Table
             rows={output}

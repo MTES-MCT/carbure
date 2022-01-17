@@ -1,7 +1,7 @@
 import { render, TestRoot } from "setupTests"
 import { screen } from "@testing-library/react"
 import { Route } from "react-router-dom"
-import { waitWhileLoading } from "common/__test__/helpers"
+import { getByTextContent, waitWhileLoading } from "common/__test__/helpers"
 import { DeclarationDialog } from "../actions/declaration"
 
 import server from "./api"
@@ -31,17 +31,12 @@ test("display transaction details", async () => {
 
   screen.getByText("Déclaration de durabilité")
 
-  screen.getByText(
-    (_, node) => node?.textContent === "Entrées ▸ 1 lots ▸ 12 345 litres"
-  )
+  screen.getByText(/Lots reçus/)
+  screen.getByText(/Lots envoyés/)
+  screen.getAllByText(/1 lot/)
+  screen.getAllByText(/12 345 litres/)
 
-  screen.getByText(
-    (_, node) => node?.textContent === "Sorties ▸ 1 lots ▸ 12 345 litres"
-  )
-
-  screen.getAllByText(
-    (_, node) => node?.textContent === "Encore 1 lot en attente de validation"
-  )
+  getByTextContent("Encore 1 lot en attente de validation")
 
   const button = screen.getByText("Valider la déclaration").closest("button")
   expect(button).toBeDisabled()

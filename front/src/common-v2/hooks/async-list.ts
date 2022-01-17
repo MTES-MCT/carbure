@@ -51,9 +51,10 @@ export function useAsyncList<T, V>({
 
       const cachedItems = uniqueBy(
         [
-          ...(defaultItems ?? []),
           ...(asyncSelectedItems.result ?? []),
           ...(asyncItems.result ?? []),
+          ...(defaultItems ?? []),
+          ...(items ?? []),
         ],
         (item) => JSON.stringify(normalize(item).value)
       )
