@@ -66,7 +66,7 @@ async function checkResponse<T>(res: Response): Promise<T> {
 }
 
 function download(endpoint: string, params: Params) {
-  return window.open(API_ROOT + endpoint + queryParams(params))
+  return window.open(API_ROOT + endpoint + "?" + queryParams(params))
 }
 
 async function get<T = any>(
@@ -75,7 +75,7 @@ async function get<T = any>(
   options?: Options
 ): Promise<T> {
   const opts: Options = { credentials: "same-origin", ...options }
-  const res = await fetch(API_ROOT + endpoint + queryParams(params), opts)
+  const res = await fetch(API_ROOT + endpoint + "?" + queryParams(params), opts)
   return checkResponse<T>(res)
 }
 
