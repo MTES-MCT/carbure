@@ -751,6 +751,13 @@ def lots_send(request, *args, **kwargs):
             event.lot = lot
             event.user = request.user
             event.save()
+        elif lot.carbure_client == entity and lot.delivery_type not in (CarbureLot.UNKNOWN, None):
+            lot.lot_status = CarbureLot.ACCEPTED
+            event = CarbureLotEvent()
+            event.event_type = CarbureLotEvent.ACCEPTED
+            event.lot = lot
+            event.user = request.user
+            event.save()
         else:
             pass
         lot.save()
