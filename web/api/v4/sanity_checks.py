@@ -223,7 +223,7 @@ def sanity_check(lot, prefetched_data):
         # double comptage, cas specifiques
         if lot.feedstock.is_double_compte:
             in_carbure_without_dc = lot.carbure_production_site and not lot.carbure_production_site.dc_reference
-            not_in_carbure_without_dc = lot.unknown_production_site and not lot.unknown_production_site_dbl_counting
+            not_in_carbure_without_dc = lot.unknown_production_site and not lot.production_site_double_counting_certificate
             if in_carbure_without_dc or not_in_carbure_without_dc:
                 is_sane = False
                 errors.append(generic_error(error='MISSING_REF_DBL_COUNTING', lot=lot, is_blocking=True, extra="%s de %s" % (lot.biofuel.name, lot.feedstock.name), field='production_site_dbl_counting'))
