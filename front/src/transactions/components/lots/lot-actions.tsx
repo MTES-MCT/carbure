@@ -29,8 +29,8 @@ export const LotActions = ({ count, category, ...props }: ActionBarProps) => {
     <ActionBar>
       {status === "drafts" && (
         <Fragment>
-          <CreateButton />
           <ImportButton />
+          <CreateButton />
           <SendManyButton {...props} disabled={empty} />
           <DeleteManyButton all {...props} disabled={empty} />
         </Fragment>
