@@ -1,5 +1,4 @@
 import Cookies from "js-cookie"
-import { stringify } from "querystring"
 
 export const API_ROOT = `${window.location.origin}/api/v3`
 
@@ -67,8 +66,7 @@ async function checkResponse<T>(res: Response): Promise<T> {
 }
 
 function download(endpoint: string, params: Params) {
-  let query = params ? "?" + stringify(filterParams(params)) : ""
-  return window.open(API_ROOT + endpoint + query)
+  return window.open(API_ROOT + endpoint + queryParams(params))
 }
 
 async function get<T = any>(
@@ -76,9 +74,8 @@ async function get<T = any>(
   params?: Params,
   options?: Options
 ): Promise<T> {
-  let opts: Options = { credentials: "same-origin", ...options }
-  let query = params ? "?" + stringify(filterParams(params)) : ""
-  const res = await fetch(API_ROOT + endpoint + query, opts)
+  const opts: Options = { credentials: "same-origin", ...options }
+  const res = await fetch(API_ROOT + endpoint + queryParams(params), opts)
   return checkResponse<T>(res)
 }
 
@@ -97,6 +94,20 @@ async function post<T = any>(
 
   const res = await fetch(API_ROOT + endpoint, fetchOptions)
   return checkResponse<T>(res)
+}
+
+function queryParams(params: any) {
+  const okParams = filterParams(params ?? {})
+  const urlParams = new URLSearchParams()
+  for (const key in okParams) {
+    const param = okParams[key]
+    if (Array.isArray(param)) {
+      param.forEach((value) => urlParams.append(key, value))
+    } else {
+      urlParams.append(key, param)
+    }
+  }
+  return urlParams.toString()
 }
 
 const api = { download, get, post }
