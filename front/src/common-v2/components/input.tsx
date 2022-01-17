@@ -424,7 +424,7 @@ export const Field = ({
     >
       {children}
 
-      {onClear && (
+      {!disabled && !readOnly && onClear && (
         <Button
           captive
           variant="icon"
