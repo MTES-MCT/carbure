@@ -12,7 +12,9 @@ const DeclarationSummary = () => (
     <TestRoot url="/">
       <Route
         path="/"
-        element={<DeclarationDialog year={2021} onClose={() => {}} />}
+        element={
+          <DeclarationDialog year={2021} years={[2021]} onClose={() => {}} />
+        }
       />
     </TestRoot>
   </PortalProvider>
@@ -27,7 +29,7 @@ test("display transaction details", async () => {
 
   await waitWhileLoading()
 
-  screen.getByText("Déclaration de durabilité 2021")
+  screen.getByText("Déclaration de durabilité")
 
   screen.getByText(
     (_, node) => node?.textContent === "Entrées ▸ 1 lots ▸ 12 345 litres"
