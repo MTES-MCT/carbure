@@ -43,7 +43,7 @@ const StockExcelDialog = ({ onClose }: StockExcelDialogProps) => {
   return (
     <Dialog limit onClose={onClose}>
       <header>
-        <h1>{t("Extraire des lots du stocks avec Excel")}</h1>
+        <h1>{t("Extraire des lots des stocks avec Excel")}</h1>
       </header>
       <main>
         <section>

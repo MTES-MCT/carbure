@@ -142,10 +142,14 @@ export const StockSummary = ({
       {stock.length > 0 && (
         <>
           <h2>
-            <Trans>
-              Entrées ▸ {{ lots: formatNumber(stockLots) }} lots ▸{" "}
-              {{ volume: formatNumber(stockVolume) }} litres
-            </Trans>
+            {t("Stocks")}
+            {" ▸ "}
+            {t("{{count}} lots", { count: stockLots })}
+            {" ▸ "}
+            {t("{{volume}} litres", {
+              count: stockVolume,
+              volume: formatNumber(stockVolume),
+            })}
           </h2>
           <Table
             rows={stock}
