@@ -3,12 +3,23 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
-from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
+from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot, UserRights
 from api.v3.common.urls import urlpatterns
 from django_otp.plugins.otp_email.models import EmailDevice
+from api.v4.tests_utils import get_lot
 
 
 class LotsFlowTest(TestCase):
+    fixtures = [
+        'json/biofuels.json',
+        'json/feedstock.json',
+        'json/countries.json',
+        'json/depots.json',
+        'json/entities.json',
+        'json/productionsites.json',
+    ]
+
+
     def setUp(self):
         user_model = get_user_model()
         # let's create a user
@@ -16,16 +27,26 @@ class LotsFlowTest(TestCase):
         self.user1 = user_model.objects.create_user(email='testuser1@toto.com', name='Le Super Testeur 1', password=self.password)
         loggedin = self.client.login(username=self.user1.email, password=self.password)
         self.assertTrue(loggedin)
+
+        self.producer = Entity.objects.filter(entity_type=Entity.PRODUCER)[0]
+        self.trader = Entity.objects.filter(entity_type=Entity.TRADER)[0]
+        self.operator = Entity.objects.filter(entity_type=Entity.OPERATOR)[0]
+        UserRights.objects.update_or_create(entity=self.producer, user=self.user1, role=UserRights.RW)
+        UserRights.objects.update_or_create(entity=self.trader, user=self.user1, role=UserRights.RW)
+        UserRights.objects.update_or_create(entity=self.operator, user=self.user1, role=UserRights.RW)
+
         # pass otp verification
         response = self.client.get(reverse('otp-verify'))
         self.assertEqual(response.status_code, 200)
         device = EmailDevice.objects.get(user=self.user1)
         response = self.client.post(reverse('otp-verify'), {'otp_token': device.token})
         self.assertEqual(response.status_code, 302)
-       
 
     def test_create_draft(self):
-        pass
+        lot = get_lot(self.producer)
+        response = self.client.post(reverse('api-v4-add-lots'), lot)
+        self.assertEqual(response.status_code, 200)
+
 
     def test_send(self):
         pass
