@@ -69,7 +69,7 @@ export const TransferOneButton = ({ icon, lot }: TransferOneButtonProps) => {
       variant={icon ? "icon" : "primary"}
       icon={Check}
       anchor={Anchors.topLeft}
-      label={t("Transférer le lot")}
+      label={t("Transférer")}
       items={getTransferOptions(portal, {
         query: { entity_id: entity.id },
         selection: [lot.id],
