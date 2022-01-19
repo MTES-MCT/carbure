@@ -16,13 +16,12 @@ import useEntity from "carbure/hooks/entity"
 import { Anchors } from "common-v2/components/dropdown"
 import { Entity } from "carbure/types"
 import Autocomplete from "common-v2/components/autocomplete"
-import { findEntities } from "common-v2/api"
+import { findEntities, findMyCertificates } from "common-v2/api"
 import { getDeliverySites } from "settings/api"
 import * as norm from "common-v2/utils/normalizers"
 import Select from "common-v2/components/select"
 import { Normalizer } from "common-v2/utils/normalize"
 import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
-import { findCertificates } from "common/api"
 import { useMatomo } from "matomo"
 
 export interface TransferManyButtonProps {
@@ -178,7 +177,9 @@ const TradingDialog = ({
             label={t("Certificat")}
             value={certificate}
             onChange={setCertificate}
-            getOptions={(query) => findCertificates(query, entity.id)}
+            getOptions={(query) =>
+              findMyCertificates(query, { entity_id: entity.id })
+            }
           />
         </section>
         {summary && <LotSummary query={query} selection={selection} />}
