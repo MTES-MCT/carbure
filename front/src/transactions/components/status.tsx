@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import { useMatch } from "react-router-dom"
 import { Snapshot, Status } from "../types"
 import Tabs from "common-v2/components/tabs"
-import { AlertCircle, Loader } from "common-v2/components/icons"
+import { Bell, Loader } from "common-v2/components/icons"
 import { Col, Row } from "common-v2/components/scaffold"
 import css from "./status.module.css"
 import { formatNumber } from "common-v2/utils/formatters"
@@ -123,7 +123,11 @@ const StatusRecap = ({
               justifyContent: "center",
             }}
           >
-            <AlertCircle size={32} color="var(--orange-dark)" />
+            <Bell
+              size={32}
+              color="var(--orange-dark)"
+              style={{ transform: "rotate(45deg)" }}
+            />
           </Col>
         )}
       </Row>
