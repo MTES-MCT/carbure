@@ -12,9 +12,8 @@ import {
   DeclarationSummary,
   StockSummary,
   StockPayload,
-  TransformETBEPayload
+  TransformETBEPayload,
 } from "./types"
-
 
 const QUERY_RESET: Partial<LotQuery> = {
   limit: undefined,
@@ -137,6 +136,17 @@ export function acceptForBlending(
     getParams(query, selection)
   )
 }
+
+export function acceptForDirectDelivery(
+  query: LotQuery,
+  selection: number[] | undefined
+) {
+  return api.post<Api<void>>(
+    "/lots/accept-direct-delivery",
+    getParams(query, selection)
+  )
+}
+
 export function acceptForExport(
   query: LotQuery,
   selection: number[] | undefined
@@ -220,8 +230,12 @@ export function splitStock(entity_id: number, payload: StockPayload[]) {
   })
 }
 
-export function transformETBE(entity_id: number, payload: TransformETBEPayload[]) {
+export function transformETBE(
+  entity_id: number,
+  payload: TransformETBEPayload[]
+) {
   return api.post("/stocks/transform", {
-    entity_id, payload: JSON.stringify(payload)
+    entity_id,
+    payload: JSON.stringify(payload),
   })
 }

@@ -13,6 +13,7 @@ import { MarkManyAsFixedButton } from "transactions/actions/mark-as-fixed"
 import { RecallManyButton } from "transactions/actions/recall"
 import { ApproveManyFixesButton } from "transactions/actions/approve-fix"
 import { ExportLotsButton } from "transactions/actions/export"
+import { TransferManyButton } from "transactions/actions/transfer"
 
 export interface ActionBarProps {
   count: number
@@ -44,7 +45,13 @@ export const LotActions = ({ count, category, ...props }: ActionBarProps) => {
               <RejectManyButton {...props} disabled={empty} />
             </Fragment>
           )}
-          {category === "correction" && <ApproveManyFixesButton {...props} />}
+          {category === "correction" && (
+            <Fragment>
+              <ApproveManyFixesButton {...props} />
+              <DeleteManyButton {...props} />
+            </Fragment>
+          )}
+          {category !== "correction" && <TransferManyButton {...props} />}
           <RequestManyFixesButton {...props} />
         </Fragment>
       )}
