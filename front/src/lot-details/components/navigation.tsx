@@ -19,13 +19,13 @@ export const NavigationButtons = ({ neighbors, root }: NavigationProps) => {
         asideX
         disabled={!nav.hasPrev}
         icon={ChevronLeft}
-        label={t("Lot précédent")}
+        label={t("Précédent")}
         action={nav.prev}
       />
       <Button
         disabled={!nav.hasNext}
         icon={ChevronRight}
-        label={t("Lot suivant")}
+        label={t("Suivant")}
         action={nav.next}
       />
     </>

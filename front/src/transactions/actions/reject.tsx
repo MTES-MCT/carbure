@@ -65,8 +65,8 @@ export const RejectOneButton = ({ icon, lot }: RejectOneButtonProps) => {
       captive
       variant={icon ? "icon" : "danger"}
       icon={Cross}
-      title={t("Refuser le lot")}
-      label={t("Refuser le lot")}
+      title={t("Refuser")}
+      label={t("Refuser")}
       action={() =>
         portal((close) => (
           <RejectDialog
