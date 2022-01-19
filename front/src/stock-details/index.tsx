@@ -34,6 +34,7 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
   })
 
   const stockData = stock.result?.data.data
+  const owner = stockData?.stock.carbure_client
   const remaining = stockData?.stock.remaining_volume ?? 0
   const volume = stockData?.stock.initial_volume ?? 0
   const percent = (100 * remaining) / (volume || 1)
@@ -50,6 +51,8 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
         {stockData && <StockTag big stock={stockData.stock} />}
         <h1>
           {t("Détails du stock")} #{stockData?.stock.carbure_id}
+          {" · "}
+          {owner?.name ?? "N/A"}
         </h1>
       </header>
 
