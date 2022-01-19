@@ -787,15 +787,8 @@ def export_carbure_stock(entity, stocks):
 def make_template_carbure_lots_sheet(workbook, entity):
     worksheet_lots = workbook.add_worksheet("lots")
     psites = ProductionSite.objects.filter(producer=entity)
-    if psites.count() == 0:
-        psites = [ProductionSite(name="")]
     clients = Entity.objects.filter(entity_type__in=[Entity.OPERATOR, Entity.TRADER]).exclude(id=entity.id)
-    if clients.count() == 0:
-        clients = [Entity(name="")]
     delivery_sites = Depot.objects.all()
-    if delivery_sites.count() == 0:
-        delivery_sites = [Depot(name="")]
-    #my_vendor_certificates = get_my_certificates(entity=entity)
 
     # header
     bold = workbook.add_format({'bold': True})
@@ -810,16 +803,21 @@ def make_template_carbure_lots_sheet(workbook, entity):
 
     today = datetime.date.today().strftime('%d/%m/%Y')
     rows = []
-    # CASE 1 my production - simple way
-    rows.append(['ajout simple', '', random.choice(psites).name, '', '', '', '', '', '', '', 35400, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), random.choice(clients).name, today, random.choice(delivery_sites).name, '', ''])
-    # CASE 2 my production - export to unknown client/site
-    rows.append(['ajout pour client hors-carbure', '', random.choice(psites).name, '', '', '', '', '', '', '', 36000, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), 'UNKNOWN CLIENT GmbH', today, 'UNKNOWN DEPOT', 'DE', ''])
-    # CASE 3 my production - custom certificate
-    rows.append(['ajout simple et choix du certificat', '', random.choice(psites).name, '', '', '', '', '', 'ISCC-XXXX-XXXX', '', 36500, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), random.choice(clients).name, today, random.choice(delivery_sites).name, '', ''])
-    # CASE 4 not my production
-    rows.append(['fournisseur hors-carbure', 'BioFuel GmbH', 'BioFuel Berlin', 'ISCC-DE-XXXX-XXX', 'DE', '22/11/2001', '', 'BioFuel Trader GmbH', 'TRADER-CERTIFICATE', '', 32300, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), 'TMF', today, 'EPHS Melun', '', ''])
+    if entity.entity_type == Entity.PRODUCER:
+        if psites.count() > 0:
+            # CASE 1 my production - simple way
+            rows.append(['ajout simple', '', random.choice(psites).name, '', '', '', '', '', '', '', 35400, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), random.choice(clients).name, today, random.choice(delivery_sites).name, '', ''])
+    
+        # CASE 2 my production - export to unknown client/site
+        rows.append(['ajout pour client hors-carbure', '', random.choice(psites).name, '', '', '', '', '', '', '', 36000, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), 'UNKNOWN CLIENT GmbH', today, 'UNKNOWN DEPOT', 'DE', ''])
+        
+        # CASE 3 my production - custom certificate
+        rows.append(['ajout simple et choix du certificat', '', random.choice(psites).name, '', '', '', '', '', 'ISCC-XXXX-XXXX', '', 36500, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), random.choice(clients).name, today, random.choice(delivery_sites).name, '', ''])
+
+    # CASE 4 not my production - TRADING
+    rows.append(['fournisseur hors-carbure', 'BioFuel GmbH', 'BioFuel Berlin', 'ISCC-DE-XXXX-XXX', 'DE', '22/11/2001', '', 'BioFuel Trader GmbH', 'ISCC-DE-XXXX-XXX', 'TRADER-CERTIFICATE', 32300, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), 'TMF', today, 'EPHS Melun', '', ''])
     # CASE 5
-    rows.append(['ajout en stock', '', random.choice(psites).name, '', '', '', '', '', '', '', 35400, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), entity.name, today, random.choice(delivery_sites).name, '', ''])
+    rows.append(['ajout en stock', 'BioFuel GmbH', 'BioFuel Berlin', 'ISCC-DE-XXXX-XXX', 'DE', '22/11/2001', '', 'BioFuel Trader GmbH', 'ISCC-DE-XXXX-XXX', 'TRADER-CERTIFICATE', 35400, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), entity.name, today, random.choice(delivery_sites).name, '', ''])
 
     rowid = 0
     for row in rows:
