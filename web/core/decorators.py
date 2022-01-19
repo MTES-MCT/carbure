@@ -182,8 +182,8 @@ def check_user_rights(role=None):
             if not rights:
                 rights = {ur.entity.id: ur.role for ur in UserRights.objects.filter(user=request.user)}
                 request.session['rights'] = rights
-            
-            entity_id = int(entity_id)
+
+            # entity_id = int(entity_id)
             if entity_id not in rights:
                 return JsonResponse({'status': 'forbidden', 'message': "User has no rights to the requested entity"}, status=403)
 
