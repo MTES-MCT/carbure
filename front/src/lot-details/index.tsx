@@ -26,6 +26,7 @@ import LotActions from "./components/actions"
 import { Entity } from "carbure/types"
 import LotTraceability, { hasTraceability } from "./components/lot-traceability"
 import { useMatomo } from "matomo"
+import { invalidate } from "common-v2/hooks/invalidate"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -69,11 +70,13 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const editable = isEditable(lotData?.lot, entity)
   const expiring = isExpiring(lotData?.lot)
 
-  const closeDialog = () =>
+  const closeDialog = () => {
+    invalidate("lots")
     navigate({
       pathname: `../${status}`,
       search: location.search,
     })
+  }
 
   return (
     <Dialog onClose={closeDialog}>
