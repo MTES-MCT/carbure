@@ -61,6 +61,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   })
 
   const lotData = lot.result?.data.data
+  const creator = lotData?.lot.added_by
   const comments = lotData?.comments ?? []
   const changes = getLotChanges(lotData?.updates)
   const [errors, warnings] = separateAnomalies(lotData?.errors ?? [])
@@ -81,7 +82,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
         <h1>
           {t("Détails du lot")} #{lotData?.lot.carbure_id || lotData?.lot.id}
           {" · "}
-          {entity.name}
+          {creator?.name ?? "N/A"}
         </h1>
 
         {expiring && (

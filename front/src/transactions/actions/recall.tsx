@@ -56,8 +56,8 @@ export const RecallOneButton = ({ icon, lot }: RecallOneButtonProps) => {
       captive
       variant={icon ? "icon" : "warning"}
       icon={Wrench}
-      title={t("Corriger le lot")}
-      label={t("Corriger le lot")}
+      title={t("Corriger")}
+      label={t("Corriger")}
       action={() =>
         portal((close) => <RecallDialog selection={[lot.id]} onClose={close} />)
       }

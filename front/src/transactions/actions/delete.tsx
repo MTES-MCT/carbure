@@ -67,8 +67,8 @@ export const DeleteOneButton = ({ icon, lot }: DeleteOneButtonProps) => {
       captive
       variant={icon ? "icon" : "danger"}
       icon={Cross}
-      title={t("Supprimer le lot")}
-      label={t("Supprimer le lot")}
+      title={t("Supprimer")}
+      label={t("Supprimer")}
       action={() =>
         portal((close) => (
           <DeleteDialog
