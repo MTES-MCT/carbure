@@ -41,9 +41,9 @@ export const LotActions = ({ lot }: ActionBarProps) => {
         </Fragment>
       )}
 
-      {isClient && status !== "DRAFT" && correction === "NO_PROBLEMO" && (
+      {/* {isClient && status !== "DRAFT" && correction === "NO_PROBLEMO" && (
         <TransferOneButton lot={lot} />
-      )}
+      )} */}
 
       {(isCreator || isSupplier) && status !== "DRAFT" && (
         <Fragment>

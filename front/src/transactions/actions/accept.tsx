@@ -14,6 +14,7 @@ import { usePortal } from "common-v2/components/portal"
 import useEntity from "carbure/hooks/entity"
 import { Anchors } from "common-v2/components/dropdown"
 import { useMatomo } from "matomo"
+import { getTransferOptions } from "./transfer"
 
 export interface AcceptManyButtonProps {
   disabled?: boolean
@@ -101,6 +102,7 @@ function getAcceptOptions(
       action: () =>
         portal((close) => <InStockDialog {...props} onClose={close} />),
     },
+    ...getTransferOptions(portal, props),
   ]
 }
 
