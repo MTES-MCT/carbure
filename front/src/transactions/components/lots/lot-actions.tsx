@@ -51,7 +51,7 @@ export const LotActions = ({ count, category, ...props }: ActionBarProps) => {
               <DeleteManyButton {...props} />
             </Fragment>
           )}
-          {category !== "correction" && <TransferManyButton {...props} />}
+          {/* {category !== "correction" && <TransferManyButton {...props} />} */}
           <RequestManyFixesButton {...props} />
         </Fragment>
       )}

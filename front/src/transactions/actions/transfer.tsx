@@ -77,7 +77,7 @@ export const TransferOneButton = ({ icon, lot }: TransferOneButtonProps) => {
   )
 }
 
-function getTransferOptions(
+export function getTransferOptions(
   portal: ReturnType<typeof usePortal>,
   props: { query: LotQuery; selection: number[]; summary?: boolean }
 ) {
