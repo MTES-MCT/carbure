@@ -7,7 +7,7 @@ import Dialog from "common-v2/components/dialog"
 import Tag from "common-v2/components/tag"
 import Button from "common-v2/components/button"
 import { Plus, Return } from "common-v2/components/icons"
-import LotForm from "./components/lot-form"
+import LotForm, { useLotForm } from "./components/lot-form"
 import * as api from "./api"
 import { useMatomo } from "matomo"
 
@@ -15,11 +15,11 @@ export const LotAdd = () => {
   const { t } = useTranslation()
   const notify = useNotify()
   const matomo = useMatomo()
-
-  const entity = useEntity()
-
   const navigate = useNavigate()
   const { search } = useLocation()
+
+  const entity = useEntity()
+  const form = useLotForm()
 
   const addLot = useMutation(api.addLot, {
     invalidates: ["lots", "snapshot", "year", "lot-summary"],
@@ -46,6 +46,7 @@ export const LotAdd = () => {
       <main>
         <section>
           <LotForm
+            form={form}
             onSubmit={(lot) => {
               matomo.push(["trackEvent", "lots-create", "create-lot-with-form"])
               addLot.execute(entity.id, lot!)
