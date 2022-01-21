@@ -9,7 +9,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
-from core.models import Entity, GenericError, LotTransaction, UserRights, LotV2, Pays, MatierePremiere, Biocarburant, Depot, EntityDepot
+from core.models import CarbureStock, Entity, GenericError, LotTransaction, UserRights, LotV2, Pays, MatierePremiere, Biocarburant, Depot, EntityDepot
 from core.serializers import EntityCertificateSerializer, GenericCertificateSerializer
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
 from core.decorators import check_rights, otp_or_403
@@ -400,23 +400,45 @@ def disable_mac(request, *args, **kwargs):
 @check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def enable_trading(request, *args, **kwargs):
     entity = kwargs['context']['entity']
-
-    if entity.entity_type not in ['Producteur', 'Trader']:
-        return JsonResponse({'status': 'error', 'message': "This entity cannot have a trading activity"}, status=400)
-
     entity.has_trading = True
     entity.save()
     return JsonResponse({'status': 'success'})
 
-
 @check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def disable_trading(request, *args, **kwargs):
     entity = kwargs['context']['entity']
-
-    if entity.entity_type not in ['Producteur', 'Trader']:
-        return JsonResponse({'status': 'error', 'message': "This entity cannot have a trading activity"}, status=400)
-
     entity.has_trading = False
+    entity.save()
+    return JsonResponse({'status': 'success'})
+
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
+def enable_stocks(request, *args, **kwargs):
+    entity = kwargs['context']['entity']
+    entity.has_stocks = True
+    entity.save()
+    return JsonResponse({'status': 'success'})
+
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
+def disable_stocks(request, *args, **kwargs):
+    entity = kwargs['context']['entity']
+    stocks = CarbureStock.objects.filter(carbure_client=entity).count()
+    if stocks.count() > 0:
+        return JsonResponse({'status': 'error', 'message': "Cannot disable stocks if you have stocks"}, status=400)
+    entity.has_stocks = False
+    entity.save()
+    return JsonResponse({'status': 'success'})
+
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
+def enable_direct_deliveries(request, *args, **kwargs):
+    entity = kwargs['context']['entity']
+    entity.has_direct_deliveries = True
+    entity.save()
+    return JsonResponse({'status': 'success'})
+
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
+def disable_direct_deliveries(request, *args, **kwargs):
+    entity = kwargs['context']['entity']
+    entity.has_direct_deliveries = False
     entity.save()
     return JsonResponse({'status': 'success'})
 
