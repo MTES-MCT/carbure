@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
-from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot, UserRights
+from core.models import CarbureLot, CarbureStock, MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot, UserRights
 from api.v3.common.urls import urlpatterns
 from django_otp.plugins.otp_email.models import EmailDevice
 from api.v4.tests_utils import get_lot
@@ -30,6 +30,8 @@ class LotsFlowTest(TestCase):
 
         self.producer = Entity.objects.filter(entity_type=Entity.PRODUCER)[0]
         self.trader = Entity.objects.filter(entity_type=Entity.TRADER)[0]
+        self.trader.default_certificate = "TRADER_CERTIFICATE"
+        self.trader.save()
         self.operator = Entity.objects.filter(entity_type=Entity.OPERATOR)[0]
         UserRights.objects.update_or_create(entity=self.producer, user=self.user1, role=UserRights.RW)
         UserRights.objects.update_or_create(entity=self.trader, user=self.user1, role=UserRights.RW)
@@ -42,28 +44,136 @@ class LotsFlowTest(TestCase):
         response = self.client.post(reverse('otp-verify'), {'otp_token': device.token})
         self.assertEqual(response.status_code, 302)
 
-    def test_create_draft(self):
+    def create_draft(self, **kwargs):
         lot = get_lot(self.producer)
+        lot.update(kwargs)
         response = self.client.post(reverse('api-v4-add-lots'), lot)
         self.assertEqual(response.status_code, 200)
+        data = response.json()['data']
+        lot_id = data['id']        
+        lot = CarbureLot.objects.get(id=lot_id)
+        return lot
 
+    def send_lot(self, lot):
+        response = self.client.post(reverse('api-v4-send-lots'), {'entity_id': self.producer.id, 'selection': [lot.id]})
+        self.assertEqual(response.status_code, 200)
+        lot = CarbureLot.objects.get(id=lot.id)
+        return lot
+
+    def test_create_draft(self, **kwargs):
+        lot = self.create_draft(**kwargs)
+        self.assertEqual(lot.lot_status, CarbureLot.DRAFT)
+        
 
     def test_send(self):
-        pass
+        lot = self.create_draft()
+        lot = self.send_lot(lot)
+        self.assertEqual(lot.lot_status, CarbureLot.PENDING)
+        
+    def test_accept_in_stock(self):
+        lot = self.create_draft(carbure_client_id=self.trader.id)
+        lot = self.send_lot(lot)
 
-    def test_send_in_my_stock(self):
-        pass
+        response = self.client.post(reverse('api-v4-accept-in-stock'), {'entity_id': self.trader.id, 'selection': [lot.id]})
+        self.assertEqual(response.status_code, 200)
+        lot = CarbureLot.objects.get(id=lot.id)
+        self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)
+        self.assertEqual(lot.delivery_type, CarbureLot.STOCK)
+        stock = CarbureStock.objects.filter(parent_lot=lot).count()
+        self.assertEqual(stock, 1)
+        
 
-    def test_send_in_client_stock(self):
-        pass
+    def test_accept_rfc(self):
+        lot = self.create_draft(carbure_client_id=self.operator.id)
+        lot = self.send_lot(lot)
+        self.assertEqual(lot.lot_status, CarbureLot.PENDING)
+        self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)    
+        response = self.client.post(reverse('api-v4-accept-rfc'), {'entity_id': self.operator.id, 'selection': [lot.id]})
+        self.assertEqual(response.status_code, 200)
+        lot = CarbureLot.objects.get(id=lot.id)
+        self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)
+        self.assertEqual(lot.delivery_type, CarbureLot.RFC)
 
-    def test_send_to_trader(self):
-        pass
+    def test_send_rfc(self):
+        lot = self.create_draft(unknown_client="CLIENT MAC", delivery_type='RFC', carbure_client_id='')
+        lot = self.send_lot(lot)
+        self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)
+        self.assertEqual(lot.delivery_type, CarbureLot.RFC)    
+        
+    def test_accept_trading_to_carbure_client(self):
+        lot = self.create_draft(carbure_client_id=self.trader.id)
+        lot = self.send_lot(lot)
+        self.assertEqual(lot.lot_status, CarbureLot.PENDING)
+        self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
 
-    def test_send_to_producer(self):
-        pass
+        response = self.client.post(reverse('api-v4-accept-trading'), {'entity_id': self.trader.id, 'selection': [lot.id], 'client_entity_id': self.operator.id})
+        self.assertEqual(response.status_code, 200)
+        lot = CarbureLot.objects.get(id=lot.id)
+        self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)
+        self.assertEqual(lot.delivery_type, CarbureLot.TRADING)
+        child = CarbureLot.objects.get(parent_lot=lot)
+        self.assertEqual(child.lot_status, CarbureLot.PENDING)
+        self.assertEqual(child.delivery_type, CarbureLot.UNKNOWN)
 
-    def test_send_to_operator(self):
-        pass
+    def test_accept_trading_to_unknown_client(self):
+        lot = self.create_draft(carbure_client_id=self.trader.id)
+        lot = self.send_lot(lot)
+        self.assertEqual(lot.lot_status, CarbureLot.PENDING)
+        self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
 
-    
+        response = self.client.post(reverse('api-v4-accept-trading'), {'entity_id': self.trader.id, 'selection': [lot.id], 'unknown_client': "TRADER CLIENT"})
+        self.assertEqual(response.status_code, 200)
+        lot = CarbureLot.objects.get(id=lot.id)
+        self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)
+        self.assertEqual(lot.delivery_type, CarbureLot.TRADING)
+        child = CarbureLot.objects.get(parent_lot=lot)
+        self.assertEqual(child.lot_status, CarbureLot.ACCEPTED)
+        self.assertEqual(child.delivery_type, CarbureLot.UNKNOWN)
+
+    def test_accept_processing(self):
+        lot = self.create_draft(carbure_client_id=self.trader.id)
+        lot = self.send_lot(lot)
+        self.assertEqual(lot.lot_status, CarbureLot.PENDING)
+        self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
+
+        response = self.client.post(reverse('api-v4-accept-processing'), {'entity_id': self.trader.id, 'selection': [lot.id], 'processing_entity_id': self.operator.id})
+        self.assertEqual(response.status_code, 200)
+        lot = CarbureLot.objects.get(id=lot.id)
+        self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)
+        self.assertEqual(lot.delivery_type, CarbureLot.PROCESSING)
+        child = CarbureLot.objects.get(parent_lot=lot)
+        self.assertEqual(child.lot_status, CarbureLot.PENDING)
+        self.assertEqual(child.delivery_type, CarbureLot.UNKNOWN)
+
+    def test_accept_blending(self):
+        lot = self.create_draft(carbure_client_id=self.operator.id)
+        lot = self.send_lot(lot)
+        self.assertEqual(lot.lot_status, CarbureLot.PENDING)
+        self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
+        response = self.client.post(reverse('api-v4-accept-blending'), {'entity_id': self.operator.id, 'selection': [lot.id]})
+        self.assertEqual(response.status_code, 200)
+        lot = CarbureLot.objects.get(id=lot.id)
+        self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)
+        self.assertEqual(lot.delivery_type, CarbureLot.BLENDING)
+
+    def test_accept_export(self):
+        lot = self.create_draft(carbure_client_id=self.operator.id)
+        lot = self.send_lot(lot)
+        self.assertEqual(lot.lot_status, CarbureLot.PENDING)
+        self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
+        response = self.client.post(reverse('api-v4-accept-export'), {'entity_id': self.operator.id, 'selection': [lot.id]})
+        self.assertEqual(response.status_code, 200)
+        lot = CarbureLot.objects.get(id=lot.id)
+        self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)
+        self.assertEqual(lot.delivery_type, CarbureLot.EXPORT)
+
+    def test_accept_direct_delivery(self):
+        lot = self.create_draft(carbure_client_id=self.operator.id)
+        lot = self.send_lot(lot)
+        self.assertEqual(lot.lot_status, CarbureLot.PENDING)
+        self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
+        response = self.client.post(reverse('api-v4-accept-direct-delivery'), {'entity_id': self.operator.id, 'selection': [lot.id]})
+        self.assertEqual(response.status_code, 200)
+        lot = CarbureLot.objects.get(id=lot.id)
+        self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)
+        self.assertEqual(lot.delivery_type, CarbureLot.DIRECT)

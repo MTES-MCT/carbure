@@ -25,7 +25,7 @@ urlpatterns = [
     path('lots/reject', views.reject_lot, name='api-v4-reject-lots'),
     path('lots/recall', views.recall_lot, name='api-v4-recall-lot'),
     ### Approval
-    path('lots/accept-release-for-consumption', views.accept_rfc, name='api-v4-accept-rfc'),
+    path('lots/accept-release-for-consumption', views.accept_rfc, name='api-v4-accept-rfc'), ### is this necessary? MAC are tagged when they are sent usually
     path('lots/accept-in-stock', views.accept_in_stock, name='api-v4-accept-in-stock'),
     path('lots/accept-trading', views.accept_trading, name='api-v4-accept-trading'),
     path('lots/accept-processing', views.accept_processing, name='api-v4-accept-processing'),
