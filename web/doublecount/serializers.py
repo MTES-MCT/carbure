@@ -10,7 +10,7 @@ from core.models import Entity, MatierePremiere, Biocarburant, Pays
 class EntitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Entity
-        fields = ['id', 'name', 'entity_type']
+        fields = ['id', 'name', 'entity_type', 'has_mac', 'has_trading', 'has_direct_deliveries', 'has_stocks']
 
 class FeedStockSerializer(serializers.ModelSerializer):
     class Meta:
