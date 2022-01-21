@@ -1,6 +1,7 @@
 import { useNavigate, useLocation, useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import * as api from "./api"
+import { useMatomo } from "matomo"
 import { CorrectionStatus, Lot, LotStatus } from "transactions/types"
 import { useQuery, useMutation } from "common-v2/hooks/async"
 import { useNotify } from "common-v2/components/notifications"
@@ -10,7 +11,7 @@ import { LoaderOverlay } from "common-v2/components/scaffold"
 import Dialog from "common-v2/components/dialog"
 import Button from "common-v2/components/button"
 import { Alarm, Return, Save } from "common-v2/components/icons"
-import LotForm from "lot-add/components/lot-form"
+import LotForm, { hasChange, useLotForm } from "lot-add/components/lot-form"
 import LotTag from "transactions/components/lots/lot-tag"
 import Comments from "./components/comments"
 import {
@@ -25,7 +26,8 @@ import NavigationButtons from "./components/navigation"
 import LotActions from "./components/actions"
 import { Entity } from "carbure/types"
 import LotTraceability, { hasTraceability } from "./components/lot-traceability"
-import { useMatomo } from "matomo"
+import { invalidate } from "common-v2/hooks/invalidate"
+import { useMemo } from "react"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -66,14 +68,23 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const changes = getLotChanges(lotData?.updates)
   const [errors, warnings] = separateAnomalies(lotData?.errors ?? [])
 
+  const form = useLotForm(lotData?.lot, errors)
+
   const editable = isEditable(lotData?.lot, entity)
   const expiring = isExpiring(lotData?.lot)
 
-  const closeDialog = () =>
+  const canSave = useMemo(
+    () => hasChange(form.value, lotData?.lot),
+    [form.value, lotData?.lot]
+  )
+
+  const closeDialog = () => {
+    invalidate("lots")
     navigate({
       pathname: `../${status}`,
       search: location.search,
     })
+  }
 
   return (
     <Dialog onClose={closeDialog}>
@@ -97,9 +108,8 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
       <main>
         <section>
           <LotForm
+            form={form}
             readOnly={!editable}
-            lot={lotData?.lot}
-            errors={errors}
             onSubmit={(form) => {
               matomo.push(["trackEvent", "lots-details", "save-lot-changes"])
               updateLot.execute(entity.id, form!)
@@ -142,10 +152,12 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
         {editable && (
           <Button
             loading={updateLot.loading}
+            disabled={canSave}
             variant="primary"
             icon={Save}
             submit="lot-form"
             label={t("Sauvegarder")}
+            action={() => matomo.push(["trackEvent", "lots", "save-changes"])}
           />
         )}
 
