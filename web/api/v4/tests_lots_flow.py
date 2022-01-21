@@ -44,8 +44,9 @@ class LotsFlowTest(TestCase):
         response = self.client.post(reverse('otp-verify'), {'otp_token': device.token})
         self.assertEqual(response.status_code, 302)
 
-    def create_draft(self, **kwargs):
-        lot = get_lot(self.producer)
+    def create_draft(self, lot=None, **kwargs):
+        if lot is None:
+            lot = get_lot(self.producer)
         lot.update(kwargs)
         response = self.client.post(reverse('api-v4-add-lots'), lot)
         self.assertEqual(response.status_code, 200)
@@ -63,7 +64,38 @@ class LotsFlowTest(TestCase):
     def test_create_draft(self, **kwargs):
         lot = self.create_draft(**kwargs)
         self.assertEqual(lot.lot_status, CarbureLot.DRAFT)
-        
+
+    def test_update_lot(self):
+        lotdata = get_lot(entity=self.producer)
+        lot = self.create_draft(lot=lotdata)
+        lotdata['lot_id'] = lot.id
+        lotdata['volume'] = 42000
+        response = self.client.post(reverse('api-v4-update-lot'), lotdata)
+        self.assertEqual(response.status_code, 200)
+        lot = CarbureLot.objects.get(id=lot.id)
+        self.assertEqual(lot.volume, 42000)
+
+    def test_delete_lot(self):
+        lot = self.create_draft()
+        response = self.client.post(reverse('api-v4-delete-lots'), {'entity_id': self.producer.id, 'selection': [lot.id]})
+        self.assertEqual(response.status_code, 200)
+        lot = CarbureLot.objects.get(id=lot.id)
+        self.assertEqual(lot.lot_status, CarbureLot.DELETED)
+
+        lot = self.send_lot(self.create_draft())
+        response = self.client.post(reverse('api-v4-delete-lots'), {'entity_id': self.producer.id, 'selection': [lot.id]}) # cannot delete a lot not in draft
+        self.assertEqual(response.status_code, 400)
+
+        lot = self.create_draft()
+        response = self.client.post(reverse('api-v4-delete-lots'), {'entity_id': self.trader.id, 'selection': [lot.id]}) # cannot delete someone else's lot
+        self.assertEqual(response.status_code, 400)
+
+    def test_duplicate_lot(self):
+        lot = self.create_draft()
+        response = self.client.post(reverse('api-v4-duplicate-lot'), {'entity_id': self.producer.id, 'lot_id': lot.id})
+        self.assertEqual(response.status_code, 200)
+        response = self.client.post(reverse('api-v4-duplicate-lot'), {'entity_id': self.trader.id, 'lot_id': lot.id})
+        self.assertEqual(response.status_code, 403)
 
     def test_send(self):
         lot = self.create_draft()
