@@ -746,6 +746,7 @@ def lots_send(request, *args, **kwargs):
             # RFC or EXPORT
             nb_auto_accepted += 1
             lot.lot_status = CarbureLot.ACCEPTED
+            lot.save()
             event = CarbureLotEvent()
             event.event_type = CarbureLotEvent.ACCEPTED
             event.lot = lot
@@ -753,6 +754,7 @@ def lots_send(request, *args, **kwargs):
             event.save()
         elif lot.carbure_client == entity and lot.delivery_type not in (CarbureLot.UNKNOWN, None):
             lot.lot_status = CarbureLot.ACCEPTED
+            lot.save()
             event = CarbureLotEvent()
             event.event_type = CarbureLotEvent.ACCEPTED
             event.lot = lot
@@ -1398,14 +1400,14 @@ def accept_trading(request, *args, **kwargs):
     unknown_client = request.POST.get('unknown_client', False)
     certificate = request.POST.get('certificate', False)
     status = request.POST.get('status', False)
+    entity = Entity.objects.get(id=entity_id)
 
     if not client_entity_id and not unknown_client:
         return JsonResponse({'status': 'error', 'message': 'Please specify either client_entity_id or unknown_client'}, status=400)
 
-    if not certificate:
+    if not certificate and entity.default_certificate == "":
         return JsonResponse({'status': 'error', 'message': 'Please specify a certificate'}, status=400)
 
-    entity = Entity.objects.get(id=entity_id)
     lots = get_entity_lots_by_status(entity, status)
     lots = filter_lots(lots, request.POST, entity, will_aggregate=True)
 
