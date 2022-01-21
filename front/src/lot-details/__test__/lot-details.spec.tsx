@@ -288,7 +288,7 @@ test("send draft lot from details", async () => {
   render(<LotDetailsWithRouter entity={producer} />)
 
   // click on the send action
-  const send = await screen.findByText("Envoyer le lot")
+  const send = await screen.findByText("Envoyer")
   userEvent.click(send)
 
   // dialog to confirm the sending
@@ -305,12 +305,12 @@ test("delete draft lot from details", async () => {
   render(<LotDetailsWithRouter entity={producer} />)
 
   // click on the send action
-  const send = await screen.findByText("Supprimer le lot")
+  const send = await screen.findByText("Supprimer")
   userEvent.click(send)
 
   // dialog to confirm the sending
   const title = screen.getByText("Supprimer ce lot")
-  userEvent.click(screen.getByText("Supprimer"))
+  userEvent.click(screen.getAllByText("Supprimer")[1])
 
   await waitFor(() => expect(title).not.toBeInTheDocument())
 })
@@ -341,12 +341,12 @@ test("delete tofix lot from details", async () => {
   render(<LotDetailsWithRouter entity={producer} />)
 
   // click on the send action
-  const send = await screen.findByText("Supprimer le lot")
+  const send = await screen.findByText("Supprimer")
   userEvent.click(send)
 
   // confirm the sending
   const title = screen.getByText("Supprimer ce lot")
-  userEvent.click(screen.getByText("Supprimer"))
+  userEvent.click(screen.getAllByText("Supprimer")[1])
 
   await waitFor(() => expect(title).not.toBeInTheDocument())
 })
@@ -357,11 +357,11 @@ test("accept inbox lot from details", async () => {
 
   await screen.findByText("En attente")
 
-  userEvent.click(await screen.findByText("Accepter le lot"))
+  userEvent.click(await screen.findByText("Accepter"))
   userEvent.click(await screen.findByText("Incorporation"))
 
   // confirm the transaction
-  screen.getByText("Accepter le lot", { selector: "h1" })
+  screen.getByText("Incorporer le lot", { selector: "h1" })
   userEvent.click(screen.getByText("Incorporer"))
 
   await screen.findByText("Incorporé")
@@ -390,12 +390,12 @@ test("reject inbox lot from details", async () => {
 
   await screen.findByText("En attente")
 
-  userEvent.click(await screen.findByText("Refuser le lot"))
+  userEvent.click(await screen.findByText("Refuser"))
 
   // confirm the transaction
   screen.getByText("Refuser ce lot", { selector: "h1" })
   userEvent.type(getField("Commentaire *"), "not for me") // prettier-ignore
-  userEvent.click(screen.getByText("Refuser"))
+  userEvent.click(screen.getAllByText("Refuser")[1])
 
   await screen.findByText("Refusé")
 })

@@ -44,7 +44,7 @@ export const StatusTabs = ({
               count={count.in_total}
               pending={count.in_pending}
               tofix={count.in_tofix}
-              label={t("Lots reçus", { count: count.in_pending })}
+              label={t("Lots reçus", { count: count.in_total })}
             />
           ),
         },
@@ -68,7 +68,7 @@ export const StatusTabs = ({
               count={count.out_total}
               pending={count.out_pending}
               tofix={count.out_tofix}
-              label={t("Lots envoyés", { count: count.out_pending })}
+              label={t("Lots envoyés", { count: count.out_total })}
             />
           ),
         },

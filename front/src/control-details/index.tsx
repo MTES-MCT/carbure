@@ -8,7 +8,7 @@ import { LoaderOverlay } from "common-v2/components/scaffold"
 import Dialog from "common-v2/components/dialog"
 import Button from "common-v2/components/button"
 import { Alarm, Return } from "common-v2/components/icons"
-import LotForm from "lot-add/components/lot-form"
+import LotForm, { useLotForm } from "lot-add/components/lot-form"
 import LotTag from "transactions/components/lots/lot-tag"
 import Comments from "lot-details/components/comments"
 import {
@@ -49,6 +49,8 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const changes = getLotChanges(lotData?.updates)
   const [errors, warnings] = separateAnomalies(lotData?.errors ?? [])
 
+  const form = useLotForm(lotData?.lot, errors)
+
   const expiring = isExpiring(lotData?.lot)
 
   const closeDialog = () =>
@@ -78,7 +80,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
 
       <main>
         <section>
-          <LotForm readOnly lot={lotData?.lot} errors={errors} />
+          <LotForm readOnly form={form} />
         </section>
 
         {errors.length > 0 && (

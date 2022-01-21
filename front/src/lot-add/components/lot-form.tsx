@@ -9,7 +9,11 @@ import {
   Feedstock,
   ProductionSite,
 } from "common/types"
-import Form, { FormErrors, useForm } from "common-v2/components/form"
+import Form, {
+  FormErrors,
+  FormManager,
+  useForm,
+} from "common-v2/components/form"
 import LotFields from "./lot-fields"
 import ProductionFields from "./production-fields"
 import DeliveryFields from "./delivery-fields"
@@ -17,40 +21,27 @@ import { EmissionFields, ReductionFields } from "./ghg-fields"
 import { Entity } from "carbure/types"
 
 export interface LotFormProps {
-  lot?: Lot
-  errors?: LotError[]
   readOnly?: boolean
+  form: FormManager<LotFormValue>
   onSubmit?: (value?: LotFormValue) => void
 }
 
-export const LotForm = ({ lot, errors, onSubmit, ...props }: LotFormProps) => {
-  const value = useMemo(() => lotToFormValue(lot), [lot])
-  const form = useLotForm(value, errors)
-
-  const { setValue } = form
-  useEffect(() => {
-    setValue(value)
-  }, [value, setValue])
-
-  return (
-    <Form id="lot-form" variant="columns" form={form} onSubmit={onSubmit}>
-      <LotFields {...props} />
-      <ProductionFields {...props} />
-      <DeliveryFields {...props} />
-      <EmissionFields {...props} />
-      <ReductionFields {...props} />
-    </Form>
-  )
-}
+export const LotForm = ({ form, onSubmit, ...props }: LotFormProps) => (
+  <Form id="lot-form" variant="columns" form={form} onSubmit={onSubmit}>
+    <LotFields {...props} />
+    <ProductionFields {...props} />
+    <DeliveryFields {...props} />
+    <EmissionFields {...props} />
+    <ReductionFields {...props} />
+  </Form>
+)
 
 const GHG_REFERENCE = 83.8
 const GHG_REFERENCE_RED_II = 94.0
 
-export function useLotForm(
-  initialValue: LotFormValue = defaultLot,
-  lotErrors: LotError[] = []
-) {
+export function useLotForm(lot?: Lot | undefined, lotErrors: LotError[] = []) {
   const entity = useEntity()
+  const value = useMemo(() => lotToFormValue(lot), [lot])
   const errors = useLotFieldErrors(lotErrors)
 
   function setValue(value: LotFormValue): LotFormValue {
@@ -113,7 +104,13 @@ export function useLotForm(
     return value
   }
 
-  return useForm(setValue(initialValue), { errors, setValue })
+  const form = useForm(setValue(value), { errors, setValue })
+
+  // update the form when the loaded lot changes
+  const updateForm = form.setValue
+  useEffect(() => updateForm(value), [value, updateForm])
+
+  return form
 }
 
 function computeGHGTotal(value: LotFormValue) {
@@ -239,7 +236,8 @@ export const lotToFormValue: (lot: Lot | undefined) => LotFormValue = (lot) => (
   ghg_reduction_red_ii: lot?.ghg_reduction_red_ii ?? 0,
 })
 
-export function lotFormToPayload(lot: LotFormValue) {
+export function lotFormToPayload(lot: LotFormValue | undefined) {
+  if (lot === undefined) return {}
   return {
     transport_document_type: undefined,
     transport_document_reference: lot.transport_document_reference,
@@ -300,6 +298,16 @@ export function lotFormToPayload(lot: LotFormValue) {
       typeof lot.delivery_site === "string" ? lot.delivery_site : undefined,
     delivery_site_country_code: lot.delivery_site_country?.code_pays,
   }
+}
+
+// check if the content of the form has changed compared to the data loaded from the api
+export function hasChange(
+  form: LotFormValue | undefined,
+  lot: Lot | undefined
+) {
+  const formPayload = lotFormToPayload(form)
+  const lotPayload = lotFormToPayload(lotToFormValue(lot))
+  return JSON.stringify(formPayload) === JSON.stringify(lotPayload)
 }
 
 // prettier-ignore
