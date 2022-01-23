@@ -136,9 +136,9 @@ class SettingsAPITest(TestCase):
         self.assertEqual(entity.has_trading, True)
 
         # should not work on Operator
-        # because operators cannot trade
-        response = self.client.post(reverse(url_enable), {'entity_id': self.entity2.id})
-        self.assertEqual(response.status_code, 400)        
+        # because operators cannot trade # deprecated as of 2022
+        #response = self.client.post(reverse(url_enable), {'entity_id': self.entity2.id})
+        #self.assertEqual(response.status_code, 400)        
 
 
     def test_production_sites_settings(self):
