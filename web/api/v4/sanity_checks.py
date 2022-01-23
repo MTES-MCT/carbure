@@ -50,7 +50,6 @@ rules['UNKNOWN_DOUBLE_COUNTING_CERTIFICATE'] = "Le certificat double compte est 
 rules['EXPIRED_DOUBLE_COUNTING_CERTIFICATE'] = "Le certificat double n'est plus valide"
 rules['POTENTIAL_DUPLICATE'] = "Doublon potentiel détecté. Un autre lot avec le même numéro douanier, biocarburant, matière première, volume et caractéristiques GES existe."
 
-
 def generic_error(error, **kwargs):
     d = {
         'display_to_creator': True,
@@ -224,7 +223,7 @@ def sanity_check(lot, prefetched_data):
         # double comptage, cas specifiques
         if lot.feedstock.is_double_compte:
             in_carbure_without_dc = lot.carbure_production_site and not lot.carbure_production_site.dc_reference
-            not_in_carbure_without_dc = lot.unknown_production_site and not lot.unknown_production_site_dbl_counting
+            not_in_carbure_without_dc = lot.unknown_production_site and not lot.production_site_double_counting_certificate
             if in_carbure_without_dc or not_in_carbure_without_dc:
                 is_sane = False
                 errors.append(generic_error(error='MISSING_REF_DBL_COUNTING', lot=lot, is_blocking=True, extra="%s de %s" % (lot.biofuel.name, lot.feedstock.name), field='production_site_dbl_counting'))
@@ -258,12 +257,12 @@ def sanity_check(lot, prefetched_data):
     # configuration
     if lot.feedstock and lot.carbure_production_site:
         if lot.carbure_production_site.name in prefetched_data['my_production_sites']:
-            mps = [psi.feedstock for psi in prefetched_data['my_production_sites'][lot.carbure_production_site.name].productionsiteinput_set.all()]
+            mps = [psi.matiere_premiere for psi in prefetched_data['my_production_sites'][lot.carbure_production_site.name].productionsiteinput_set.all()]
             if lot.feedstock not in mps:
                 errors.append(generic_error(error='MP_NOT_CONFIGURED', lot=lot, display_to_recipient=False, field='feedstock_code'))
     if lot.biofuel and lot.carbure_production_site:
         if lot.carbure_production_site.name in prefetched_data['my_production_sites']:
-            bcs = [pso.biofuel for pso in prefetched_data['my_production_sites'][lot.carbure_production_site.name].productionsiteoutput_set.all()]
+            bcs = [pso.biocarburant for pso in prefetched_data['my_production_sites'][lot.carbure_production_site.name].productionsiteoutput_set.all()]
             if lot.biofuel not in bcs:
                 errors.append(generic_error(error='BC_NOT_CONFIGURED', lot=lot, display_to_recipient=False, field='biofuel_code'))
     if lot.carbure_client:
@@ -272,7 +271,7 @@ def sanity_check(lot, prefetched_data):
             errors.append(generic_error(error='DEPOT_NOT_CONFIGURED', lot=lot, display_to_recipient=True, display_to_creator=False, field='delivery_site'))
         else:
             # some delivery sites linked to entity
-            if lot.carbure_delivery_site.id not in prefetched_data['depotsbyentity'][lot.carbure_client.id]:
+            if lot.carbure_delivery_site and lot.carbure_delivery_site.id not in prefetched_data['depotsbyentity'][lot.carbure_client.id]:
                 # this specific delivery site is not linked
                 errors.append(generic_error(error='DEPOT_NOT_CONFIGURED', lot=lot, display_to_recipient=True, display_to_creator=False, field='delivery_site'))
     # CERTIFICATES CHECK
@@ -307,15 +306,16 @@ def sanity_check_mandatory_fields(lot):
     if lot.delivery_type not in [CarbureLot.RFC, CarbureLot.FLUSHED] and lot.transport_document_reference is None:
         errors.append(generic_error(error='MISSING TRANSPORT DOCUMENT REFERENCE', lot=lot, field='transport_document_reference', is_blocking=True))
         is_valid = False
-    if lot.delivery_type in [CarbureLot.BLENDING, CarbureLot.TRADING, CarbureLot.STOCK, CarbureLot.DIRECT]:
-        # we need to know the Depot
-        if not lot.carbure_delivery_site:
-            errors.append(generic_error(error='MISSING_CARBURE_DELIVERY_SITE', lot=lot, field='carbure_delivery_site', is_blocking=True))
-            is_valid = False
-        # and we need to know the client
-        if not lot.carbure_client:
-            errors.append(generic_error(error='MISSING_CARBURE_CLIENT', lot=lot, field='carbure_client', is_blocking=True))
-            is_valid = False
+    if lot.delivery_type in [CarbureLot.BLENDING, CarbureLot.TRADING, CarbureLot.STOCK, CarbureLot.DIRECT, CarbureLot.UNKNOWN]:
+        if lot.delivery_site_country and lot.delivery_site_country.code_pays == "FR":
+            # we need to know the Depot
+            if not lot.carbure_delivery_site:
+                errors.append(generic_error(error='MISSING_CARBURE_DELIVERY_SITE', lot=lot, field='carbure_delivery_site', is_blocking=True))
+                is_valid = False
+            # and we need to know the client
+            if not lot.carbure_client:
+                errors.append(generic_error(error='MISSING_CARBURE_CLIENT', lot=lot, field='carbure_client', is_blocking=True))
+                is_valid = False
     if not lot.delivery_date:
         errors.append(generic_error(error='MISSING_DELIVERY_DATE', lot=lot, field='delivery_date', is_blocking=True))
         is_valid = False
@@ -326,7 +326,7 @@ def sanity_check_mandatory_fields(lot):
     if not lot.delivery_site_country:
         errors.append(generic_error(error='MISSING_DELIVERY_SITE_COUNTRY', lot=lot, field='delivery_site_country', is_blocking=True))
         is_valid = False
-    if lot.delivery_site_country.is_in_europe and not lot.country_of_origin:
+    if lot.delivery_site_country and lot.delivery_site_country.is_in_europe and not lot.country_of_origin:
         errors.append(generic_error(error='MISSING_FEEDSTOCK_COUNTRY_OF_ORIGIN', lot=lot, field='country_of_origin', is_blocking=True))
         is_valid = False
 
@@ -336,7 +336,5 @@ def sanity_check_mandatory_fields(lot):
         if not lot.supplier_certificate:
             errors.append(generic_error(error='MISSING_SUPPLIER_CERTIFICATE', lot=lot, field='supplier_certificate', is_blocking=True))
             is_valid = False
-    if len(errors):
-        GenericError.objects.bulk_create(errors)
     return is_valid, errors
 

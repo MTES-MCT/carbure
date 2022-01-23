@@ -1,13 +1,12 @@
 import { Trans } from "react-i18next"
-import { Main, Title } from "common/components"
-import { SettingsHeader, SettingsBody } from "settings/components/common"
+import { Main } from "common-v2/components/scaffold"
 import { AccountAccesRights } from "./components/access-rights"
 import { AccountAuthentication } from "./components/authentication"
 import Exit from "carbure/components/exit"
-import { useUserContext } from "carbure/hooks/user"
+import { useUser } from "carbure/hooks/user"
 
 const Account = () => {
-  const user = useUserContext()
+  const user = useUser()
 
   if (!user.isAuthenticated()) {
     return <Exit to="/accounts/login" />
@@ -15,16 +14,19 @@ const Account = () => {
 
   return (
     <Main>
-      <SettingsHeader>
-        <Title>
+      <header>
+        <h1>
           <Trans>Mon compte</Trans>
-        </Title>
-      </SettingsHeader>
+        </h1>
+      </header>
 
-      <SettingsBody>
+      <section>
         <AccountAccesRights />
+      </section>
+
+      <section>
         <AccountAuthentication />
-      </SettingsBody>
+      </section>
     </Main>
   )
 }

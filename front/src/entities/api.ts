@@ -1,13 +1,6 @@
 import api from "common/services/api"
-import {
-  DBSCertificate,
-  Entity,
-  ISCCCertificate,
-  ProductionSiteDetails,
-  UserRightRequest,
-  UserRightStatus,
-  REDCertCertificate,
-} from "common/types"
+import { Entity, UserRightRequest, UserRightStatus } from "carbure/types"
+import { ProductionSiteDetails } from "common/types"
 import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
 
 export interface EntityDetails {
@@ -47,9 +40,7 @@ export function getEntityProductionSites(
   return api.get("/admin/entities/production_sites", { entity_id })
 }
 
-export function getEntityCertificates(
-  entity_id: number
-): Promise<(ISCCCertificate | DBSCertificate | REDCertCertificate)[]> {
+export function getEntityCertificates(entity_id: number): Promise<any[]> {
   return api.get("/admin/entities/certificates", { entity_id })
 }
 

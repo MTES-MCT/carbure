@@ -1,5 +1,6 @@
 import { ExternalLink } from "common-v2/components/button"
 import Collapse from "common-v2/components/collapse"
+import { Split } from "common-v2/components/icons"
 import { formatNumber } from "common-v2/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { StockDetails } from "stock-details/types"
@@ -30,7 +31,7 @@ export const StockTraceability = ({ details }: TraceabilityProps) => {
   )
 
   return (
-    <Collapse variant="info" label={t("Traçabilité")}>
+    <Collapse icon={Split} variant="info" label={t("Traçabilité")}>
       <section>
         <b>{t("Parent")}</b>
         <ul>
@@ -58,6 +59,10 @@ export const StockTraceability = ({ details }: TraceabilityProps) => {
                 </b>
               </ExternalLink>
             </li>
+          )}
+
+          {!parentLot && !parentTransform && (
+            <li>{t("Aucun parent trouvé")}</li>
           )}
         </ul>
       </section>

@@ -1,13 +1,20 @@
 import { useTranslation } from "react-i18next"
-import { LotError } from "transactions-v2/types"
+import { Lot, LotError } from "transactions/types"
 import Collapse from "common-v2/components/collapse"
 import { AlertOctagon, AlertTriangle } from "common-v2/components/icons"
+import { CheckboxGroup } from "common-v2/components/checkbox"
+import i18next from "i18next"
+import useEntity from "carbure/hooks/entity"
+import { useMutation } from "common-v2/hooks/async"
+import * as api from "../api"
+import { Normalizer } from "common-v2/utils/normalize"
+import { useState } from "react"
 
-export interface AnomaliesProps {
+export interface BlockingAnomaliesProps {
   anomalies: LotError[]
 }
 
-export const BlockingAnomalies = ({ anomalies }: AnomaliesProps) => {
+export const BlockingAnomalies = ({ anomalies }: BlockingAnomaliesProps) => {
   const { t } = useTranslation()
   return (
     <Collapse
@@ -24,7 +31,7 @@ export const BlockingAnomalies = ({ anomalies }: AnomaliesProps) => {
       <footer>
         <ul>
           {anomalies.map((anomaly, i) => (
-            <Anomaly key={i} anomaly={anomaly} />
+            <li key={i}>{getAnomalyText(anomaly)}</li>
           ))}
         </ul>
       </footer>
@@ -32,8 +39,32 @@ export const BlockingAnomalies = ({ anomalies }: AnomaliesProps) => {
   )
 }
 
-export const WarningAnomalies = ({ anomalies }: AnomaliesProps) => {
+export interface WarningAnomaliesProps {
+  lot: Lot
+  anomalies: LotError[]
+}
+
+export const WarningAnomalies = ({ lot, anomalies }: WarningAnomaliesProps) => {
   const { t } = useTranslation()
+  const entity = useEntity()
+
+  const isCreator = lot.added_by?.id === entity.id
+  const isRecipient = lot.carbure_client?.id === entity.id
+  function isAcked(anomaly: LotError) {
+    if (isCreator) return anomaly.acked_by_creator
+    else if (isRecipient) return anomaly.acked_by_recipient
+    else return false
+  }
+
+  const [checked, setChecked] = useState<string[] | undefined>(
+    anomalies.filter(isAcked).map((a) => a.error)
+  )
+
+  const ackWarning = useMutation(
+    (error: string) => api.toggleWarning(entity.id, lot.id, error),
+    { invalidates: [] }
+  )
+
   return (
     <Collapse
       variant="warning"
@@ -42,31 +73,38 @@ export const WarningAnomalies = ({ anomalies }: AnomaliesProps) => {
     >
       <section>
         {t(
-          "Des incohérences potentielles ont été détectées, elles n'empêchent pas la validation du lot mais peuvent donner lieu à un contrôle :"
+          "Des incohérences potentielles ont été détectées, elles n'empêchent pas la validation du lot mais peuvent donner lieu à un contrôle."
+        )}
+      </section>
+      <section>
+        {t(
+          "Si vous souhaitez ignorer certaines de ces remarques, vous pouvez cocher la case correspondante. Lorsque toutes les cases sont cochées, le lot n'apparait plus comme incohérent sur CarbuRe."
         )}
       </section>
 
       <footer>
-        <ul>
-          {anomalies.map((anomaly, i) => (
-            <Anomaly key={i} anomaly={anomaly} />
-          ))}
-        </ul>
+        <CheckboxGroup
+          variant="opacity"
+          value={checked}
+          options={anomalies}
+          onChange={setChecked}
+          onToggle={(error) => ackWarning.execute(error)}
+          normalize={normalizeAnomaly}
+        />
       </footer>
     </Collapse>
   )
 }
 
-export const Anomaly = ({ anomaly }: { anomaly: LotError }) => {
-  const { t } = useTranslation()
-  return (
-    <li>
-      {t(anomaly.error, { ns: "errors" }) || t("Erreur de validation")}{" "}
-      {anomaly.extra &&
-        anomaly.extra !== t(anomaly.error, { ns: "errors" }) &&
-        ` - ${anomaly.extra}`}
-    </li>
-  )
+export const normalizeAnomaly: Normalizer<LotError, string> = (anomaly) => ({
+  value: anomaly.error,
+  label: getAnomalyText(anomaly),
+})
+
+export function getAnomalyText(anomaly: LotError) {
+  const error = i18next.t(anomaly.error, { ns: "errors" }) || i18next.t("Erreur de validation") // prettier-ignore
+  const extra = anomaly.extra && anomaly.extra !==  i18next.t(anomaly.error, { ns: "errors" }) ? ` - ${anomaly.extra}` : '' // prettier-ignore
+  return error + extra
 }
 
 export function separateAnomalies(anomalies: LotError[]) {

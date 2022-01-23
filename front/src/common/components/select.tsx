@@ -5,7 +5,7 @@ import styles from "./select.module.css"
 
 import { SystemProps } from "."
 import { Checkbox, Input } from "./input"
-import { Cross } from "./icons"
+import { Cross } from "common-v2/components/icons"
 import { LoaderOverlay } from "common/components"
 import {
   DropdownItem,

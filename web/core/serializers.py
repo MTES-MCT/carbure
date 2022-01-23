@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import CarbureLot, CarbureLotEvent, CarbureLotComment, CarbureStock, CarbureStockTransformation, Depot, Entity, EntityDepot, GenericError
+from core.models import CarbureLot, CarbureLotEvent, CarbureLotComment, CarbureStock, CarbureStockTransformation, Depot, Entity, EntityCertificate, EntityDepot, GenericCertificate, GenericError
 from doublecount.serializers import BiofuelSerializer, CountrySerializer, EntitySerializer, FeedStockSerializer
 from producers.models import ProductionSite
 
@@ -29,7 +29,12 @@ class ProductionSiteSerializer(serializers.ModelSerializer):
 class GenericErrorSerializer(serializers.ModelSerializer):
     class Meta:
         model = GenericError
-        fields = ['error', 'is_blocking', 'field', 'value', 'extra', 'fields']
+        fields = ['error', 'is_blocking', 'field', 'value', 'extra', 'fields', 'acked_by_creator', 'acked_by_recipient']
+
+class GenericErrorAdminSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GenericError
+        fields = ['error', 'is_blocking', 'field', 'value', 'extra', 'fields', 'acked_by_admin']
 
 class CarbureLotEventSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(read_only=True, slug_field='email')
@@ -49,6 +54,18 @@ class CarbureLotCommentSerializer(serializers.ModelSerializer):
         fields = ['entity', 'user', 'comment_type', 'comment_dt', 'comment']
 
 class CarbureLotCSVSerializer(serializers.ModelSerializer):
+    producer = serializers.SerializerMethodField()
+    production_site = serializers.SerializerMethodField()
+    production_country = serializers.SerializerMethodField()
+    supplier = serializers.SerializerMethodField()
+    client = serializers.SerializerMethodField()
+    delivery_date = serializers.SerializerMethodField()
+    delivery_site = serializers.SerializerMethodField()
+    delivery_site_country = serializers.SerializerMethodField()
+    country_of_origin = serializers.SerializerMethodField()
+    biofuel = serializers.SerializerMethodField()
+    feedstock = serializers.SerializerMethodField()
+
     class Meta:
         model = CarbureLot
         fields = ['year', 'period', 'carbure_id', 'producer', 'production_site',
@@ -95,19 +112,25 @@ class CarbureLotCSVSerializer(serializers.ModelSerializer):
 
 
 class CarbureStockCSVSerializer(serializers.ModelSerializer):
+    production_site = serializers.SerializerMethodField()
+    production_country = serializers.SerializerMethodField()
+    supplier = serializers.SerializerMethodField()
+    delivery_date = serializers.SerializerMethodField()
+    depot = serializers.SerializerMethodField()
+    depot_name = serializers.SerializerMethodField()
+    feedstock = serializers.SerializerMethodField()
+    biofuel = serializers.SerializerMethodField()
+    country_of_origin = serializers.SerializerMethodField()
+
     class Meta:
         model = CarbureStock
-        fields = ['year', 'period', 'carbure_id', 'producer', 'production_site',
-                  'production_country', 'production_site_commissioning_date', 'production_site_certificate', 'production_site_double_counting_certificate',
-                  'supplier', 'supplier_certificate',
-                  'transport_document_reference', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country', 'delivery_type',
-                  'volume', 'weight', 'lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
-                  'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ghg_reference_red_ii', 'ghg_reduction_red_ii',
-                  'free_field'
+        fields = ['carbure_id',
+                  'production_site', 'production_country',
+                  'supplier', 'delivery_date', 'depot', 'depot_name',
+                  'remaining_volume', 'remaining_weight',
+                  'feedstock', 'biofuel', 'country_of_origin',
+                  'ghg_reduction_red_ii',
                   ]
-
-    def get_producer(self, obj):
-        return obj.carbure_producer.name if obj.carbure_producer else obj.unknown_producer
 
     def get_production_site(self, obj):
         return obj.carbure_production_site.name if obj.carbure_production_site else obj.unknown_production_site
@@ -118,17 +141,15 @@ class CarbureStockCSVSerializer(serializers.ModelSerializer):
     def get_supplier(self, obj):
         return obj.carbure_supplier.name if obj.carbure_supplier else obj.unknown_supplier
 
-    def get_client(self, obj):
-        return obj.carbure_client.name if obj.carbure_client else obj.unknown_client
-
     def get_delivery_date(self, obj):
-        return obj.delivery_date.strftime('%d/%m/%Y') if obj.delivery_date else ''
+        date = obj.get_delivery_date()
+        return date.strftime('%d/%m/%Y') if date else ''
 
-    def get_delivery_site(self, obj):
-        return obj.carbure_delivery_site.depot_id if obj.carbure_delivery_site else obj.unknown_delivery_site
+    def get_depot(self, obj):
+        return obj.depot.depot_id if obj.depot else ''
 
-    def get_delivery_site_country(self, obj):
-        return obj.delivery_site_country.code_pays if obj.delivery_site_country else ''
+    def get_depot_name(self, obj):
+        return obj.depot.name if obj.depot else ''
 
     def get_feedstock(self, obj):
         return obj.feedstock.code if obj.feedstock else ''
@@ -161,14 +182,20 @@ class CarbureStockPublicSerializer(serializers.ModelSerializer):
                   'ghg_reduction', 'ghg_reduction_red_ii', 'initial_volume', 'delivery_date', 'period']
 
     def get_initial_volume(self, obj):
-        return obj.parent_lot.volume if obj.parent_lot else obj.parent_transformation.volume_destination
-
-    def get_period(self, obj):
-        date = obj.parent_lot.delivery_date if obj.parent_lot else obj.parent_transformation.transformation_dt
-        return date.year * 100 + date.month
+        if obj.parent_lot:
+            return obj.parent_lot.volume
+        elif obj.parent_transformation:
+            return obj.parent_transformation.volume_destination
+        else:
+            return 0
+        # return obj.parent_lot.volume if obj.parent_lot else obj.parent_transformation.volume_destination
 
     def get_delivery_date(self, obj):
-        return obj.parent_lot.delivery_date if obj.parent_lot else obj.parent_transformation.transformation_dt.strftime('%Y-%m-%d')
+        return obj.get_delivery_date().strftime('%Y-%m-%d')
+
+    def get_period(self, obj):
+        date = obj.get_delivery_date()
+        return date.year * 100 + date.month
 
 
 class CarbureStockTransformationPublicSerializer(serializers.ModelSerializer):
@@ -204,6 +231,7 @@ class CarbureLotPublicSerializer(serializers.ModelSerializer):
     biofuel = BiofuelSerializer(read_only=True)
     country_of_origin = CountrySerializer(read_only=True)
     added_by = EntitySerializer(read_only=True)
+    carbure_vendor = EntitySerializer(read_only=True)
 
     class Meta:
         model = CarbureLot
@@ -217,7 +245,7 @@ class CarbureLotPublicSerializer(serializers.ModelSerializer):
                   'lot_status', 'correction_status',
                   'volume', 'weight', 'lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
                   'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ghg_reference_red_ii', 'ghg_reduction_red_ii',
-                  'free_field', 'added_by'
+                  'free_field', 'added_by', 'carbure_vendor', 'vendor_certificate', 'vendor_certificate_type',
                   ]
 
 
@@ -234,5 +262,21 @@ class CarbureLotAdminSerializer(CarbureLotPublicSerializer):
                   'lot_status', 'correction_status',
                   'volume', 'weight', 'lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
                   'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ghg_reference_red_ii', 'ghg_reduction_red_ii',
-                  'free_field', 'added_by', 'highlighted_by_auditor', 'highlighted_by_admin'
+                  'free_field', 'added_by', 'highlighted_by_auditor', 'highlighted_by_admin', 'carbure_vendor', 'vendor_certificate', 'vendor_certificate_type',
                   ]
+
+
+
+class GenericCertificateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GenericCertificate
+        fields = ['certificate_id', 'certificate_type', 'certificate_holder', 'certificate_issuer', 'address', 'valid_from', 'valid_until', 'download_link', 'scope', 'input', 'output']
+
+
+class EntityCertificateSerializer(serializers.ModelSerializer):
+    entity = EntitySerializer()
+    certificate = GenericCertificateSerializer()
+
+    class Meta:
+        model = EntityCertificate
+        fields = ['entity', 'certificate', 'has_been_updated']

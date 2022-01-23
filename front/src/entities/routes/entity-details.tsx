@@ -5,7 +5,7 @@ import useAPI from "common/hooks/use-api"
 import useClose from "common/hooks/use-close"
 
 import { Main, Title } from "common/components"
-import { Return } from "common/components/icons"
+import { Return } from "common-v2/components/icons"
 import Sticky from "common/components/sticky"
 import { Button } from "common/components/button"
 import { SettingsBody, SettingsHeader } from "settings/components/common"
@@ -21,7 +21,8 @@ import {
 import { ProductionSiteSettingsHook } from "settings/hooks/use-production-sites"
 import ProductionSitesSettings from "settings/components/production-site"
 import { prompt } from "common/components/dialog"
-import { EntityType, ProductionSiteDetails } from "common/types"
+import { EntityType } from "carbure/types"
+import { ProductionSiteDetails } from "common/types"
 import {
   ProductionSitePrompt,
   ProductionSiteState,

@@ -1,12 +1,12 @@
 import { useRef, useState } from "react"
-import { useAsyncList } from "../hooks/async"
+import { useAsyncList } from "../hooks/async-list"
 import { defaultNormalizer, Normalizer, Sorter } from "../utils/normalize"
 import Dropdown, { Trigger } from "./dropdown"
-import { ChevronDown } from "./icons"
+import { ChevronDown } from "common-v2/components/icons"
 import { Control, Input } from "./input"
 import List from "./list"
 
-export interface SelectProps<T, V> extends Control, Trigger {
+export interface SelectProps<T, V = T> extends Control, Trigger {
   clear?: boolean
   search?: boolean
   value?: V | undefined

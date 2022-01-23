@@ -1,9 +1,9 @@
-FROM node:alpine AS node
+FROM node:16-alpine AS node
 
 WORKDIR /app
 
 COPY front/package.json front/package-lock.json /app/
-ENV NODE_OPTIONS=--openssl-legacy-provider
+
 RUN npm install
 
 COPY front /app

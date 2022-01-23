@@ -16,7 +16,7 @@ from certificates.models import DoubleCountingRegistration
 from core.ign_distance import get_distance
 from core.models import Biocarburant, CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, Entity, EntityCertificate, EntityDepot, GenericCertificate, MatierePremiere, Pays, TransactionDistance, UserRights
 from core.models import GenericError
-from core.serializers import CarbureLotCommentSerializer, CarbureLotEventSerializer, CarbureLotPublicSerializer, CarbureStockEventSerializer, CarbureStockPublicSerializer, GenericErrorSerializer
+from core.serializers import CarbureLotCommentSerializer, CarbureLotEventSerializer, CarbureLotPublicSerializer, CarbureStockEventSerializer, CarbureStockPublicSerializer, GenericErrorAdminSerializer, GenericErrorSerializer
 from core.xlsx_v3 import export_carbure_lots, export_carbure_stock
 from producers.models import ProductionSite
 
@@ -43,7 +43,7 @@ def get_entity_stock(entity_id):
                         'carbure_client', 'carbure_supplier')
 
 
-def get_entity_lots_by_status(entity_id, status=None):
+def get_entity_lots_by_status(entity, status=None):
     lots = CarbureLot.objects.select_related(
         'carbure_producer', 'carbure_supplier', 'carbure_client', 'added_by',
         'carbure_production_site', 'carbure_production_site__producer', 'carbure_production_site__country', 'production_country',
@@ -54,25 +54,25 @@ def get_entity_lots_by_status(entity_id, status=None):
         'parent_stock__feedstock', 'parent_stock__biofuel', 'parent_stock__depot', 'parent_stock__country_of_origin', 'parent_stock__production_country'
     ).prefetch_related('genericerror_set', 'carbure_production_site__productionsitecertificate_set')
     if status == 'DRAFTS':
-        lots = lots.filter(added_by_id=entity_id, lot_status=CarbureLot.DRAFT)
+        lots = lots.filter(added_by=entity, lot_status=CarbureLot.DRAFT)
     elif status == 'IN':
-        lots = lots.filter(carbure_client_id=entity_id, lot_status__in=[CarbureLot.PENDING, CarbureLot.ACCEPTED, CarbureLot.FROZEN])
+        lots = lots.filter(carbure_client=entity).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
     elif status == 'OUT':
-        lots = lots.filter(carbure_supplier_id=entity_id, lot_status__in=[CarbureLot.PENDING, CarbureLot.ACCEPTED, CarbureLot.FROZEN])
+        lots = lots.filter(carbure_supplier=entity).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
     elif status == 'DECLARATION':
-        lots = lots.filter(Q(carbure_supplier_id=entity_id) | Q(carbure_client_id=entity_id)).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
+        lots = lots.filter(Q(carbure_supplier=entity) | Q(carbure_client=entity)).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
     else:
-        lots = lots.filter(Q(added_by_id=entity_id) | Q(carbure_supplier_id=entity_id) | Q(carbure_client_id=entity_id))
+        lots = lots.filter(Q(added_by=entity) | Q(carbure_supplier=entity) | Q(carbure_client=entity))
     return lots
 
 
-def get_lots_with_metadata(lots, entity_id, query, is_admin=False):
+def get_lots_with_metadata(lots, entity, query):
     export = query.get('export', False)
     limit = query.get('limit', None)
     from_idx = query.get('from_idx', "0")
 
     # filtering
-    lots = filter_lots(lots, query, entity_id)
+    lots = filter_lots(lots, query, entity)
     # sorting
     lots = sort_lots(lots, query)
 
@@ -83,7 +83,7 @@ def get_lots_with_metadata(lots, entity_id, query, is_admin=False):
         limit = int(limit)
         returned = returned[:limit]
 
-    total_errors, total_deadline = count_lots_of_interest(lots, entity_id)
+    total_errors, total_deadline = count_lots_of_interest(lots, entity)
 
     # enrich dataset with additional metadata
     serializer = CarbureLotPublicSerializer(returned, many=True)
@@ -94,30 +94,19 @@ def get_lots_with_metadata(lots, entity_id, query, is_admin=False):
     data['total'] = lots.count()
     data['total_errors'] = total_errors
     data['total_deadline'] = total_deadline
-    data['errors'] = get_lots_errors(returned, entity_id)
+    data['errors'] = get_lots_errors(returned, entity)
     data['ids'] = list(lots.values_list('id', flat=True))
 
     if not export:
         return JsonResponse({'status': 'success', 'data': data})
     else:
-        file_location = export_carbure_lots(entity_id, returned)
+        file_location = export_carbure_lots(entity, returned)
         with open(file_location, "rb") as excel:
             data = excel.read()
             ctype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             response = HttpResponse(content=data, content_type=ctype)
             response['Content-Disposition'] = 'attachment; filename="%s"' % (file_location)
         return response
-
-
-def get_errors(lot, entity_id=None, is_admin=False):
-    if is_admin:
-        return [e.natural_key() for e in lot.genericerror_set.all()]
-    elif entity_id == lot.added_by_id:
-        return [e.natural_key() for e in lot.genericerror_set.filter(display_to_creator=True)]
-    elif entity_id == lot.carbure_client_id:
-        return [e.natural_key() for e in lot.genericerror_set.filter(display_to_recipient=True)]
-    else:
-        return [e.natural_key() for e in lot.genericerror_set.filter(display_to_creator=True)]
 
 
 def get_current_deadline():
@@ -148,17 +137,25 @@ def get_stock_with_errors(stock, entity_id=None):
     return stock.annotate(errors=Subquery(tx_errors)).filter(errors__gt=0)
 
 
-def get_lots_with_errors(lots, entity_id, will_aggregate=False):
+def get_lots_with_errors(lots, entity, will_aggregate=False):
     if will_aggregate:
         # use a subquery so we can later do aggregations on this queryset without wrecking the results
-        if entity_id is not None:
-            filter = Q(lot__added_by_id=entity_id, display_to_creator=True) | Q(lot__carbure_client_id=entity_id, display_to_recipient=True)
-        tx_errors = GenericError.objects.filter(lot=OuterRef('pk')).filter(filter).values('lot').annotate(errors=Count('id')).values('errors')
+        tx_errors = GenericError.objects.filter(lot=OuterRef('pk'))
+        if entity.entity_type == Entity.ADMIN:
+            filter = Q(display_to_admin=True, acked_by_admin=False)
+        else:
+            filter = Q(lot__added_by=entity, display_to_creator=True, acked_by_creator=False) | Q(lot__carbure_client=entity, display_to_recipient=True, acked_by_recipient=False)
+        tx_errors = tx_errors.filter(filter)
+        tx_errors = tx_errors.values('lot').annotate(errors=Count('id')).values('errors')
         return lots.annotate(errors=Subquery(tx_errors)).filter(errors__gt=0)
     else:
-        if entity_id is not None:
-            filter = Q(added_by_id=entity_id, genericerror__display_to_creator=True) | Q(carbure_client_id=entity_id, genericerror__display_to_recipient=True)
-        return lots.annotate(errors=Count('genericerror', filter=filter)).filter(errors__gt=0)
+        if entity.entity_type == Entity.ADMIN:
+            filter = Q(genericerror__display_to_admin=True, genericerror__acked_by_admin=False)
+            counter = Count('genericerror', filter=filter)
+        else:
+            filter = Q(added_by=entity, genericerror__display_to_creator=True, genericerror__acked_by_creator=False) | Q(carbure_client=entity, genericerror__display_to_recipient=True, genericerror__acked_by_recipient=False)
+            counter = Count('genericerror', filter=filter)
+        return lots.annotate(errors=counter).filter(errors__gt=0)
 
 
 def get_lots_with_deadline(lots, deadline=get_current_deadline()):
@@ -167,7 +164,7 @@ def get_lots_with_deadline(lots, deadline=get_current_deadline()):
     return lots.filter(period=period, lot_status__in=[CarbureLot.DRAFT, CarbureLot.REJECTED, CarbureLot.PENDING])
 
 
-def filter_lots(lots, query, entity_id=None, will_aggregate=False, blacklist=[]):
+def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
     year = query.get('year', False)
     periods = query.getlist('periods', [])
     production_sites = query.getlist('production_sites', [])
@@ -187,14 +184,17 @@ def filter_lots(lots, query, entity_id=None, will_aggregate=False, blacklist=[])
     history = query.get('history', False)
     correction = query.get('correction', False)
 
-    if history != 'true':
-        lots = lots.exclude(lot_status__in=[CarbureLot.FROZEN, CarbureLot.ACCEPTED])
+    # selection overrides all other filters
+    if len(selection) > 0:
+        return lots.filter(pk__in=selection)
+
     if correction == 'true':
         lots = lots.filter(Q(correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED]) | Q(lot_status=CarbureLot.REJECTED))
+    elif history != 'true' and entity.entity_type not in (Entity.ADMIN):
+        lots = lots.exclude(lot_status__in=[CarbureLot.FROZEN, CarbureLot.ACCEPTED])
+
     if year and 'year' not in blacklist:
         lots = lots.filter(year=year)
-    if len(selection) > 0:
-        lots = lots.filter(pk__in=selection)
     if len(periods) > 0 and 'periods' not in blacklist:
         lots = lots.filter(period__in=periods)
     if len(production_sites) > 0 and 'production_sites' not in blacklist:
@@ -251,14 +251,14 @@ def filter_lots(lots, query, entity_id=None, will_aggregate=False, blacklist=[])
     deadline = query.get('deadline', False)
 
     if invalid == 'true':
-        lots = get_lots_with_errors(lots, entity_id, will_aggregate)
+        lots = get_lots_with_errors(lots, entity, will_aggregate)
     if deadline == 'true':
         lots = get_lots_with_deadline(lots)
     return lots
 
 
-def count_lots_of_interest(lots, entity_id):
-    error_lots = get_lots_with_errors(lots, entity_id)
+def count_lots_of_interest(lots, entity):
+    error_lots = get_lots_with_errors(lots, entity)
     deadline_lots = get_lots_with_deadline(lots)
     return error_lots.count(), deadline_lots.count()
 
@@ -304,8 +304,8 @@ def normalize_filter(list, value=None, label=None):
         return [{'value': item[value], 'label': item[label]} for item in list if item]
 
 
-def get_lots_filters_data(lots, query, entity_id, field):
-    lots = filter_lots(lots, query, entity_id=entity_id, blacklist=[field])
+def get_lots_filters_data(lots, query, entity, field):
+    lots = filter_lots(lots, query, entity, blacklist=[field])
 
     if field == 'feedstocks':
         feedstocks = MatierePremiere.objects.filter(id__in=lots.values('feedstock__id').distinct()).values('code', 'name')
@@ -500,7 +500,7 @@ def sort_stock(stock, query):
     if not sort_by:
         stock = stock.order_by('-id')
     elif sort_by in stock_sort_key_to_django_field:
-        key = sort_key_to_django_field[sort_by]
+        key = stock_sort_key_to_django_field[sort_by]
         if order == 'desc':
             stock = stock.order_by('-%s' % key)
         else:
@@ -518,21 +518,23 @@ def sort_stock(stock, query):
             stock = stock.order_by('vendor')
     return stock
 
-def get_lot_errors(lot, entity_id):
+def get_lot_errors(lot, entity=None):
     errors = []
-    if entity_id == str(lot.carbure_supplier_id):
-        errors = lot.genericerror_set.filter(display_to_creator=True)
-    elif entity_id == str(lot.carbure_client_id):
-        errors = lot.genericerror_set.filter(display_to_recipient=True)
+    if entity.entity_type == Entity.ADMIN:
+        errors = lot.genericerror_set.filter(display_to_admin=True)
+        return GenericErrorAdminSerializer(errors, many=True, read_only=True).data
     else:
-        errors = lot.genericerror_set.all()
-    return GenericErrorSerializer(errors, many=True, read_only=True).data
+        errors = GenericError.objects.filter(lot_id=lot.id)
+        errors = errors.filter(Q(lot__added_by=entity, display_to_creator=True) | Q(lot__carbure_client=entity, display_to_recipient=True))
+        return GenericErrorSerializer(errors, many=True, read_only=True).data
 
-def get_lots_errors(lots, entity_id):
+def get_lots_errors(lots, entity):
     lot_ids = list(lots.values_list('id', flat=True))
     errors = GenericError.objects.filter(lot_id__in=lot_ids)
-    if entity_id is not None:
-        errors = errors.filter(Q(lot__added_by_id=entity_id, display_to_creator=True) | Q(lot__carbure_client_id=entity_id, display_to_recipient=True))
+    if entity.entity_type == Entity.ADMIN:
+        errors = errors.filter(display_to_admin=True, acked_by_admin=False)
+    else:
+        errors = errors.filter(Q(lot__added_by=entity, display_to_creator=True, acked_by_creator=False) | Q(lot__carbure_client=entity, display_to_recipient=True, acked_by_recipient=False))
     data = {}
     for error in errors.values('lot_id', 'error', 'is_blocking', 'field', 'value', 'extra', 'fields').iterator():
         if error['lot_id'] not in data:
@@ -540,17 +542,17 @@ def get_lots_errors(lots, entity_id):
         data[error['lot_id']].append(GenericErrorSerializer(error).data)
     return data
 
-def get_lot_updates(lot, entity_id):
+def get_lot_updates(lot, entity=None):
     if lot is None:
         return []
     return CarbureLotEventSerializer(lot.carburelotevent_set.all(), many=True).data
 
-def get_stock_events(lot, entity_id):
+def get_stock_events(lot, entity=None):
     if lot is None:
         return []
     return CarbureStockEventSerializer(lot.carburelotevent_set.all(), many=True).data
 
-def get_lot_comments(lot, entity_id):
+def get_lot_comments(lot, entity=None):
     if lot is None:
         return []
     return CarbureLotCommentSerializer(lot.carburelotcomment_set.all(), many=True).data
@@ -588,7 +590,7 @@ def get_transaction_distance(lot):
 
 def send_email_declaration_validated(declaration):
     email_subject = "Carbure - Votre Déclaration de Durabilité a été validée"
-    cc = "carbure@beta.gouv.fr"
+    cc = ["carbure@beta.gouv.fr"]
     text_message = """
     Bonjour,
 
@@ -610,7 +612,7 @@ def send_email_declaration_validated(declaration):
 
 def send_email_declaration_invalidated(declaration):
     email_subject = "Carbure - Votre Déclaration de Durabilité a été annulée"
-    cc = "carbure@beta.gouv.fr"
+    cc = ["carbure@beta.gouv.fr"]
     text_message = """
     Bonjour,
 
@@ -632,7 +634,7 @@ def send_email_declaration_invalidated(declaration):
     msg.send()
 
 
-def get_lots_summary_data(lots, entity_id, short=False):
+def get_lots_summary_data(lots, entity, short=False):
     data = {'count': lots.count(), 'total_volume': lots.aggregate(Sum('volume'))['volume__sum'] or 0}
 
     if short:
@@ -640,7 +642,7 @@ def get_lots_summary_data(lots, entity_id, short=False):
 
     pending_filter = Q(lot_status__in=[CarbureLot.PENDING, CarbureLot.REJECTED]) | Q(correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED])
 
-    lots_in = lots.filter(carbure_client_id=entity_id).annotate(
+    lots_in = lots.filter(carbure_client=entity).annotate(
         supplier=Coalesce('carbure_supplier__name', 'unknown_supplier'),
         biofuel_code=F('biofuel__code')
     ).values(
@@ -653,7 +655,7 @@ def get_lots_summary_data(lots, entity_id, short=False):
         pending=Count('id', filter=pending_filter)
     ).order_by()
 
-    lots_out = lots.filter(carbure_supplier=entity_id).exclude(carbure_client_id=entity_id).annotate(
+    lots_out = lots.filter(Q(carbure_supplier=entity) | Q(carbure_vendor=entity)).exclude(carbure_client=entity).annotate(
         client=Coalesce('carbure_client__name', 'unknown_client'),
         biofuel_code=F('biofuel__code')
     ).values(
@@ -724,24 +726,24 @@ def handle_eth_to_etbe_transformation(user, stock, transformation):
     if stock.remaining_volume < volume_ethanol:
         return JsonResponse({'status': 'error', 'message': 'Volume Ethanol is higher than available volume'}, status=400)
 
-
-    new_stock = stock.parent_lot
-    new_stock.pk = None
-    new_stock.biofuel = etbe
-    new_stock.volume = volume_etbe
-    new_stock.weight = new_stock.get_weight()
-    new_stock.lhv_amount = new_stock.get_lhv_amount()
-    new_stock.parent_lot = None
-    new_stock.save()
-
     stock.remaining_volume = round(stock.remaining_volume - volume_ethanol)
     stock.remaining_weight = stock.get_weight()
     stock.remaining_lhv_amount = stock.get_lhv_amount()
     stock.save()
 
+    old_stock_id = stock.id
+    new_stock = stock
+    new_stock.pk = None
+    new_stock.biofuel = etbe
+    new_stock.remaining_volume = volume_etbe
+    new_stock.remaining_weight = new_stock.get_weight()
+    new_stock.remaining_lhv_amount = new_stock.get_lhv_amount()
+    new_stock.parent_lot = None
+    new_stock.save()
+
     cst = CarbureStockTransformation()
     cst.transformation_type = CarbureStockTransformation.ETH_ETBE
-    cst.source_stock = stock
+    cst.source_stock_id = old_stock_id
     cst.dest_stock = new_stock
     cst.volume_deducted_from_source = volume_ethanol
     cst.volume_destination = volume_etbe
@@ -756,7 +758,7 @@ def handle_eth_to_etbe_transformation(user, stock, transformation):
 
     # create events
     e = CarbureStockEvent()
-    e.event_type = CarbureLotEvent.TRANSFORMED
+    e.event_type = CarbureStockEvent.TRANSFORMED
     e.stock = stock
     e.user = user
     e.save()
@@ -776,15 +778,16 @@ def get_prefetched_data(entity=None):
         d['my_vendor_certificates'] = [c.certificate.certificate_id for c in EntityCertificate.objects.filter(entity=entity)]
     else:
         d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').all()}
-    entitydepots = dict()
+    depotsbyentities = dict()
     associated_depots = EntityDepot.objects.all()
-    for obj in associated_depots:
-        if obj.id in entitydepots:
-            entitydepots[obj.id].append(obj.id)
+    for entitydepot in associated_depots.iterator():
+        if entitydepot.entity_id in depotsbyentities:
+            depotsbyentities[entitydepot.entity_id].append(entitydepot.depot_id)
         else:
-            entitydepots[obj.id] = [obj.id]
-    d['depotsbyentity'] = entitydepots
+            depotsbyentities[entitydepot.entity_id] = [entitydepot.depot_id]
+    d['depotsbyentity'] = depotsbyentities
     d['clients'] = {c.id: c for c in Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.OPERATOR, Entity.TRADER])}
+    d['clientsbyname'] = {c.name.upper(): c for c in Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.OPERATOR, Entity.TRADER])}
     d['certificates'] = {c.certificate_id.upper(): c for c in GenericCertificate.objects.filter(valid_until__gte=lastyear)}
     d['double_counting_certificates'] = {c.certificate_id: c for c in DoubleCountingRegistration.objects.all()}
     return d

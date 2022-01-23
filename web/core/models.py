@@ -4,7 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 import hashlib
-from django.db.models.signals import pre_delete
+from django.db.models.signals import pre_delete, pre_save
 from django.dispatch import receiver
 
 usermodel = get_user_model()
@@ -29,6 +29,8 @@ class Entity(models.Model):
 
     has_mac = models.BooleanField(default=False)
     has_trading = models.BooleanField(default=False)
+    has_stocks = models.BooleanField(default=False)
+    has_direct_deliveries = models.BooleanField(default=False)
 
     legal_name = models.CharField(max_length=128, blank=True, default='')
     registration_id = models.CharField(max_length=64, blank=True, default='')
@@ -787,6 +789,12 @@ class CarbureLot(models.Model):
     supplier_certificate = models.CharField(max_length=64, blank=True, null=True, default=None)
     supplier_certificate_type = models.CharField(max_length=64, blank=True, null=True, default=None)
 
+    # ONLY SET FOR SPECIFIC TRADING TRANSACTIONS
+    carbure_vendor = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='carbure_vendor')
+    vendor_certificate = models.CharField(max_length=64, blank=True, null=True, default=None)
+    vendor_certificate_type = models.CharField(max_length=64, blank=True, null=True, default=None)
+
+
     # delivery
     DAU = "DAU"
     DAE = "DAE"
@@ -887,13 +895,23 @@ class CarbureLot(models.Model):
 
 
     def get_weight(self):
+        if not self.biofuel:
+            return 0
         return self.volume * self.biofuel.masse_volumique
 
     def get_lhv_amount(self):
+        if not self.biofuel:
+            return 0
         return self.volume * self.biofuel.pci_litre
 
     def generate_carbure_id(self):
-        pass
+        country_of_production = '00'
+        if self.production_country:
+            country_of_production = self.production_country.code_pays
+        delivery_site_id = '00'
+        if self.carbure_delivery_site:
+            delivery_site_id = self.carbure_delivery_site.depot_id
+        self.carbure_id = 'L{period}-{country_of_production}-{delivery_site_id}-{id}'.format(period=self.period, country_of_production=country_of_production, delivery_site_id=delivery_site_id, id=self.id)
 
     def copy_production_details(self, other):
         self.carbure_producer = other.carbure_producer
@@ -913,8 +931,9 @@ class CarbureLot(models.Model):
         self.ghg_reference_red_ii = 94.0
         self.ghg_reduction_red_ii = round((1.0 - (self.ghg_total / self.ghg_reference_red_ii)) * 100.0, 2)
 
-    def update_sustainability_data(self, other):
+    def copy_sustainability_data(self, other):
         self.biofuel = other.biofuel
+        self.feedstock = other.feedstock
         self.country_of_origin = other.country_of_origin
         self.eec = other.eec
         self.el = other.el
@@ -930,12 +949,7 @@ class CarbureLot(models.Model):
         self.ghg_reduction = other.ghg_reduction
         self.ghg_reference_red_ii = other.ghg_reference_red_ii
         self.ghg_reduction_red_ii = other.ghg_reduction_red_ii
-
-    def copy_basic_info(self, other):
-        self.biofuel = other.biofuel
-        self.feedstock = other.feedstock
-        self.country_of_origin = other.country_of_origin
-        
+        self.update_ghg()
 
 class CarbureStockTransformation(models.Model):
     UNKNOWN = "UNKNOWN"
@@ -957,7 +971,9 @@ class CarbureStockTransformation(models.Model):
         verbose_name = 'CarbureStockTransformation'
         verbose_name_plural = 'CarbureStockTransformation'
 
-
+@receiver(pre_save, sender=CarbureLot)
+def lot_pre_save_gen_carbure_id(sender, instance, *args, **kwargs):
+    instance.generate_carbure_id()
 
 @receiver(pre_delete, sender=CarbureStockTransformation, dispatch_uid='stock_transformation_delete_signal')
 def delete_stock_transformation(sender, instance, using, **kwargs):
@@ -990,6 +1006,19 @@ def delete_lot(sender, instance, using, **kwargs):
         event.user = None
         event.metadata = {'message': 'child lot deleted. recredit volume.', 'volume_to_credit': instance.volume}
         event.save()
+    # if there is a parent_lot tagged as processing or trading, restore them to their "inbox" status
+    if instance.parent_lot:
+        if instance.parent_lot.delivery_type in [CarbureLot.PROCESSING, CarbureLot.TRADING]:
+            instance.parent_lot.lot_status = CarbureLot.PENDING
+            instance.parent_lot.delivery_type = CarbureLot.OTHER
+            instance.parent_lot.save()
+            # save event
+            event = CarbureLotEvent()
+            event.event_type = CarbureLotEvent.RECALLED
+            event.lot = instance.parent_lot
+            event.user = None
+            event.metadata = {'message': 'child lot deleted. back to inbox.'}
+            #event.save()
 
 class CarbureStock(models.Model):
     parent_lot = models.ForeignKey(CarbureLot, null=True, blank=True, on_delete=models.CASCADE)
@@ -1032,12 +1061,38 @@ class CarbureStock(models.Model):
         else:
             return self.parent_lot
 
+    def get_delivery_date(self):
+        if self.parent_lot:
+            return self.parent_lot.delivery_date
+        elif self.parent_transformation:
+            return self.parent_transformation.transformation_dt
+        else:
+            return datetime.datetime.now()
+        # return self.parent_lot.delivery_date if self.parent_lot else self.parent_transformation.transformation_dt
+
     def update_remaining_volume(self, volume_to_recredit, volume_to_debit):
         self.remaining_volume = round(self.remaining_volume + volume_to_recredit, 2)
         self.remaining_volume = round(self.remaining_volume - volume_to_debit, 2)
         self.remaining_lhv_amount = self.get_lhv_amount()
         self.remaining_weight = self.get_weight()
         self.save()
+
+    def generate_carbure_id(self):
+        country_of_production = '00'
+        if self.production_country:
+            country_of_production = self.production_country.code_pays
+        delivery_site_id = '00'
+        if self.depot:
+            delivery_site_id = self.depot.depot_id
+        period = '000000'
+        parent_lot = self.get_parent_lot()
+        if parent_lot:
+            period = parent_lot.period
+        self.carbure_id = 'S{period}-{country_of_production}-{delivery_site_id}-{id}'.format(period=period, country_of_production=country_of_production, delivery_site_id=delivery_site_id, id=self.id)
+
+@receiver(pre_save, sender=CarbureStock)
+def stock_pre_save_gen_carbure_id(sender, instance, *args, **kwargs):
+    instance.generate_carbure_id()
 
 class CarbureLotEvent(models.Model):
     CREATED = "CREATED"
@@ -1165,6 +1220,7 @@ class GenericCertificate(models.Model):
 class EntityCertificate(models.Model):
     certificate = models.ForeignKey(GenericCertificate, blank=False, null=False, on_delete=models.CASCADE)
     entity = models.ForeignKey(Entity, blank=False, null=False, on_delete=models.CASCADE)
+    has_been_updated = models.BooleanField(default=False)
     
     class Meta:
         db_table = 'carbure_entity_certificates'

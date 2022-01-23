@@ -1,29 +1,33 @@
 import { useNavigate, useLocation, useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import * as api from "./api"
-import { CorrectionStatus, Lot, LotStatus } from "transactions-v2/types"
+import { useMatomo } from "matomo"
+import { CorrectionStatus, Lot, LotStatus } from "transactions/types"
 import { useQuery, useMutation } from "common-v2/hooks/async"
-import { useNotify } from 'common-v2/components/notifications'
-import { useStatus } from "transactions-v2/components/status"
+import { useNotify } from "common-v2/components/notifications"
+import { useStatus } from "transactions/components/status"
 import useEntity from "carbure/hooks/entity"
 import { LoaderOverlay } from "common-v2/components/scaffold"
 import Dialog from "common-v2/components/dialog"
 import Button from "common-v2/components/button"
 import { Alarm, Return, Save } from "common-v2/components/icons"
-import LotForm from "lot-add/components/lot-form"
-import LotTag from "transactions-v2/components/lots/lot-tag"
+import LotForm, { hasChange, useLotForm } from "lot-add/components/lot-form"
+import LotTag from "transactions/components/lots/lot-tag"
 import Comments from "./components/comments"
 import {
   BlockingAnomalies,
   separateAnomalies,
   WarningAnomalies,
 } from "./components/anomalies"
-import { getLotUpdates, History } from "./components/history"
+import { getLotChanges, LotHistory } from "./components/history"
 import { isExpiring } from "common-v2/utils/deadline"
 import Alert from "common-v2/components/alert"
-import { SendOneButton } from "transactions-v2/actions/send"
-import { DeleteOneButton } from "transactions-v2/actions/delete"
 import NavigationButtons from "./components/navigation"
+import LotActions from "./components/actions"
+import { Entity } from "carbure/types"
+import LotTraceability, { hasTraceability } from "./components/lot-traceability"
+import { invalidate } from "common-v2/hooks/invalidate"
+import { useMemo } from "react"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -32,6 +36,7 @@ export interface LotDetailsProps {
 export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const matomo = useMatomo()
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -46,30 +51,40 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   })
 
   const updateLot = useMutation(api.updateLot, {
-    invalidates: ['lots', 'lot-details'],
+    invalidates: ["lots", "lot-details", "snapshot", "year", "lot-summary"],
 
     onSuccess: () => {
-      notify(t("Le lot a bien été mis à jour"), { variant: 'success' })
+      notify(t("Le lot a bien été mis à jour"), { variant: "success" })
     },
 
     onError: () => {
-      notify(t("La mise à jour du lot a échoué"), { variant: 'danger' })
-    }
+      notify(t("La mise à jour du lot a échoué"), { variant: "danger" })
+    },
   })
 
   const lotData = lot.result?.data.data
-  const editable = isEditable(lotData?.lot)
+  const creator = lotData?.lot.added_by
   const comments = lotData?.comments ?? []
-  const updates = getLotUpdates(lotData?.updates)
+  const changes = getLotChanges(lotData?.updates)
   const [errors, warnings] = separateAnomalies(lotData?.errors ?? [])
 
+  const form = useLotForm(lotData?.lot, errors)
+
+  const editable = isEditable(lotData?.lot, entity)
   const expiring = isExpiring(lotData?.lot)
 
-  const closeDialog = () =>
+  const canSave = useMemo(
+    () => hasChange(form.value, lotData?.lot),
+    [form.value, lotData?.lot]
+  )
+
+  const closeDialog = () => {
+    invalidate("lots")
     navigate({
       pathname: `../${status}`,
       search: location.search,
     })
+  }
 
   return (
     <Dialog onClose={closeDialog}>
@@ -77,16 +92,28 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
         {lotData && <LotTag big lot={lotData.lot} />}
         <h1>
           {t("Détails du lot")} #{lotData?.lot.carbure_id || lotData?.lot.id}
+          {" · "}
+          {creator?.name ?? "N/A"}
         </h1>
+
+        {expiring && (
+          <Alert
+            icon={Alarm}
+            variant="warning"
+            label={t("À valider avant la fin du mois")}
+          />
+        )}
       </header>
 
       <main>
         <section>
           <LotForm
+            form={form}
             readOnly={!editable}
-            lot={lotData?.lot}
-            errors={errors}
-            onSubmit={(form) => updateLot.execute(entity.id, form!)}
+            onSubmit={(form) => {
+              matomo.push(["trackEvent", "lots-details", "save-lot-changes"])
+              updateLot.execute(entity.id, form!)
+            }}
           />
         </section>
 
@@ -98,19 +125,25 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
 
         {warnings.length > 0 && (
           <section>
-            <WarningAnomalies anomalies={warnings} />
+            <WarningAnomalies lot={lotData!.lot} anomalies={warnings} />
           </section>
         )}
 
-        {comments.length > 0 && (
+        {lotData && comments.length > 0 && (
           <section>
-            <Comments comments={comments} />
+            <Comments lot={lotData?.lot} comments={comments} />
           </section>
         )}
 
-        {updates.length > 0 && (
+        {hasTraceability(lotData) && (
           <section>
-            <History updates={updates} />
+            <LotTraceability details={lotData} />
+          </section>
+        )}
+
+        {changes.length > 0 && (
+          <section>
+            <LotHistory changes={changes} />
           </section>
         )}
       </main>
@@ -119,23 +152,16 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
         {editable && (
           <Button
             loading={updateLot.loading}
+            disabled={canSave}
             variant="primary"
             icon={Save}
             submit="lot-form"
             label={t("Sauvegarder")}
+            action={() => matomo.push(["trackEvent", "lots", "save-changes"])}
           />
         )}
 
-        {lotData && <SendOneButton lot={lotData.lot} />}
-        {lotData && <DeleteOneButton lot={lotData.lot} />}
-
-        {expiring && (
-          <Alert
-            icon={Alarm}
-            variant="warning"
-            label={t("À valider avant la fin du mois")}
-          />
-        )}
+        {lotData && <LotActions lot={lotData.lot} />}
 
         <NavigationButtons neighbors={neighbors} root={`../${status}`} />
         <Button icon={Return} label={t("Retour")} action={closeDialog} />
@@ -146,12 +172,14 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   )
 }
 
-function isEditable(lot: Lot | undefined) {
+function isEditable(lot: Lot | undefined, entity: Entity) {
   if (lot === undefined) return false
+
+  const isCreator = lot.added_by?.id === entity.id
 
   return (
     [LotStatus.Draft, LotStatus.Rejected].includes(lot.lot_status) ||
-    lot.correction_status === CorrectionStatus.InCorrection
+    (isCreator && lot.correction_status === CorrectionStatus.InCorrection)
   )
 }
 

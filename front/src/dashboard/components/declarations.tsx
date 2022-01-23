@@ -2,11 +2,11 @@ import { Fragment, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import cl from "clsx"
 
-import { Declaration, Entity, EntityType } from "common/types"
+import { Entity, EntityType } from "carbure/types"
+import { Declaration } from "transactions/types"
 import { Box, LoaderOverlay, Title } from "common/components"
-import Table, { Row } from "common/components/table"
+import Table, { Row, padding } from "common/components/table"
 import { Section, SectionHeader } from "common/components/section"
-import { padding } from "transactions/components/list-columns"
 import styles from "./declarations.module.css"
 import useAPI from "common/hooks/use-api"
 import {
@@ -16,7 +16,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Cross,
-} from "common/components/icons"
+} from "common-v2/components/icons"
 import { confirm } from "common/components/dialog"
 import { Button } from "common/components/button"
 import usePeriod, {

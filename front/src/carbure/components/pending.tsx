@@ -1,13 +1,14 @@
-import styles from "./pending.module.css"
 import { Link, Navigate } from "react-router-dom"
-import { Box, LoaderOverlay, Main, Title } from "common/components"
-import { Alert } from "common/components/alert"
-import { AlertTriangle, Question } from "common/components/icons"
-import { Trans } from "react-i18next"
-import { useUserContext } from "carbure/hooks/user"
+import { Trans, useTranslation } from "react-i18next"
+import { useUser } from "carbure/hooks/user"
+import css from "./pending.module.css"
+import { LoaderOverlay, Main } from "common-v2/components/scaffold"
+import Alert from "common-v2/components/alert"
+import { AlertTriangle, InfoCircle } from "common-v2/components/icons"
 
 const Pending = () => {
-  const user = useUserContext()
+  useTranslation()
+  const user = useUser()
 
   if (!user.isAuthenticated()) {
     return <Navigate to="/" />
@@ -23,66 +24,68 @@ const Pending = () => {
   }
 
   return (
-    <Main className={styles.container}>
-      <Title className={styles.welcome}>
-        <Trans>🌻 Bienvenue sur CarbuRe</Trans>
-      </Title>
-      <p className={styles.subtitle}>
-        <Trans>La plateforme de gestion des flux de biocarburants</Trans>
-      </p>
+    <Main className={css.container}>
+      <header className={css.header}>
+        <h1>
+          <Trans>🌻 Bienvenue sur CarbuRe</Trans>
+        </h1>
+        <p>
+          <Trans>La plateforme de gestion des flux de biocarburants</Trans>
+        </p>
+      </header>
 
-      <Box className={styles.accountMessage}>
-        <Alert level="warning" className={styles.pendingAlert}>
-          <span>
-            <AlertTriangle className={styles.alertIcon} />
+      <section className={css.information}>
+        <Alert variant="warning" className={css.pendingAlert}>
+          <p>
+            <AlertTriangle className={css.alertIcon} />{" "}
             <Trans>
               Il semblerait que votre compte ne soit lié à aucune entité
               enregistrée sur CarbuRe.
             </Trans>
-          </span>
+          </p>
 
-          <span>
+          <p>
             <Trans>
               Veuillez vous rendre sur la page{" "}
-              <Link to="/account" className={styles.link}>
+              <Link to="/account" className={css.link}>
                 Mon Compte
               </Link>{" "}
               du menu pour effectuer une demande d'accès.
             </Trans>
-          </span>
+          </p>
         </Alert>
 
-        <Alert level="info" className={styles.pendingAlert}>
-          <span>
-            <Question className={styles.faqIcon} />
+        <Alert variant="info" className={css.pendingAlert}>
+          <p>
+            <InfoCircle className={css.faqIcon} />{" "}
             <Trans>
               Vous avez des questions concernant le fonctionnement de CarbuRe ?
             </Trans>
-          </span>
-          <span>
+          </p>
+          <p>
             <Trans>
               <a
                 href="https://carbure-1.gitbook.io/faq/"
                 target="_blank"
                 rel="noreferrer"
-                className={styles.link}
+                className={css.link}
               >
                 Notre FAQ
               </a>{" "}
               contient de nombreuses ressources pouvant vous aider dans votre
               utilisation du produit.
             </Trans>
-          </span>
+          </p>
         </Alert>
 
-        <span className={styles.info}>
+        <p className={css.info}>
           <Trans>
             Pour plus d'informations contactez nous sur{" "}
             <a
               href="https://carbure-beta-gouv.slack.com/"
               target="_blank"
               rel="noreferrer"
-              className={styles.link}
+              className={css.link}
             >
               le Slack de CarbuRe
             </a>{" "}
@@ -91,14 +94,14 @@ const Pending = () => {
               href="mailto:carbure@beta.gouv.fr"
               target="_blank"
               rel="noreferrer"
-              className={styles.link}
+              className={css.link}
             >
               carbure@beta.gouv.fr
             </a>
             .
           </Trans>
-        </span>
-      </Box>
+        </p>
+      </section>
     </Main>
   )
 }

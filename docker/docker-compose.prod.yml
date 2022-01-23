@@ -103,18 +103,27 @@ services:
     depends_on:
       - fluentd
 
-  carbure-metabase:
-    restart: always
-    container_name: carbure_metabase
-    image: metabase/metabase
-    depends_on:
-      - carbure-mariadb
-    networks:
-      - carbure
+#  carbure-metabase:
+#    restart: always
+#    container_name: carbure_metabase
+#    image: metabase/metabase
+#    depends_on:
+#      - carbure-mariadb
+#    networks:
+#      - carbure
+#    volumes:
+#      - ./metabase:/metabase-data
+#    environment:
+#      MB_DB_FILE: "/metabase-data/metabase.db"
+
+  fluentd:
+    image: fluent/fluentd
     volumes:
-      - ./metabase:/metabase-data
-    environment:
-      MB_DB_FILE: "/metabase-data/metabase.db"
+      - /home/deploy/log:/fluentd/log
+    ports:
+      - "127.0.0.1:24224:24224"
+      - "127.0.0.1:24224:24224/udp"
+
 
 
   fluentd:

@@ -117,10 +117,7 @@ def get_entities(request):
         requests=Count('userrightsrequests', filter=Q(userrightsrequests__status='PENDING'), distinct=True),
         depots=Count('entitydepot', distinct=True),
         production_sites=Count('productionsite', distinct=True),
-        iscc=Count('entityiscctradingcertificate', distinct=True),
-        dbs=Count('entitydbstradingcertificate', distinct=True),
-        redcert=Count('entityredcerttradingcertificate', distinct=True),
-        sn=Count('entitysntradingcertificate', distinct=True),
+        certificates=Count('entitycertificate', distinct=True),
         double_counting=Count('doublecountingagreement', filter=Q(doublecountingagreement__status=DoubleCountingAgreement.ACCEPTED), distinct=True),
         double_counting_requests=Count('doublecountingagreement', filter=Q(doublecountingagreement__status=DoubleCountingAgreement.PENDING), distinct=True),
     )
@@ -138,14 +135,10 @@ def get_entities(request):
             'requests': e.requests,
             'depots': e.depots,
             'production_sites': e.production_sites,
-            'iscc': e.iscc,
-            'dbs': e.dbs,
-            'sn': e.sn,
-            'redcert': e.redcert,
+            'certificates': e.certificates,
             'double_counting': e.double_counting,
             'double_counting_requests': e.double_counting_requests
         })
-
     return JsonResponse({"status": "success", "data": entities_sez})
 
 

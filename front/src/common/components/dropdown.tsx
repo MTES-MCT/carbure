@@ -5,7 +5,7 @@ import cl from "clsx"
 import styles from "./dropdown.module.css"
 
 import { SystemProps } from "."
-import { ChevronDown } from "./icons"
+import { ChevronDown } from "common-v2/components/icons"
 
 // scroll to the specific dropdown option when the focus changes
 function scrollToIndex(list: Element | null, focused: number) {

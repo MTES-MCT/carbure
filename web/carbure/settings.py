@@ -28,6 +28,7 @@ DEBUG = env('DEBUG')
 SECRET_KEY = env('SECRET_KEY')
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+FIXTURE_DIRS = (os.path.join(BASE_DIR, 'fixtures'),)
 
 if env('TEST') is False:
     sentry_sdk.init(

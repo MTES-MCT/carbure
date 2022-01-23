@@ -7,7 +7,9 @@ import {
   Depot,
   Feedstock,
   ProductionSite,
+  Certificate,
 } from "common/types"
+import { DeliveryType } from "transactions/types"
 
 export const normalizeBiofuel: Normalizer<Biofuel> = (biofuel) => ({
   value: biofuel,
@@ -24,9 +26,16 @@ export const normalizeCountry: Normalizer<Country> = (country) => ({
   label: i18next.t(country.code_pays, { ns: "countries" }),
 })
 
-export const normalizeEntity: Normalizer<Entity | string> = (entity) => ({
+export const normalizeEntityOrUnknown: Normalizer<Entity | string> = (
+  entity
+) => ({
   value: entity,
   label: isString(entity) ? entity : entity.name,
+})
+
+export const normalizeEntity: Normalizer<Entity> = (entity) => ({
+  value: entity,
+  label: entity.name,
 })
 
 // prettier-ignore
@@ -57,6 +66,45 @@ export const normalizeCountryFilter: Normalizer<Option, string> = (country) => (
   value: country.value,
   label: i18next.t(country.value, { ns: "countries" }),
 })
+
+// prettier-ignore
+export const normalizeAnomalyFilter: Normalizer<Option, string> = (anomaly) => ({
+  value: anomaly.value,
+  label: i18next.t(anomaly.value, { ns: 'errors'})
+})
+
+// prettier-ignore
+export const normalizeCertificate: Normalizer<Certificate> = (certificate) => ({
+  value: certificate,
+  label: `${certificate.certificate_id} - ${certificate.certificate_holder}`,
+})
+
+export const normalizeDeliveryType: Normalizer<DeliveryType> = (type) => ({
+  value: type,
+  label: getDeliveryTypeLabel(type),
+})
+
+export function getDeliveryTypeLabel(type: DeliveryType) {
+  switch (type) {
+    case DeliveryType.Blending:
+      return i18next.t("Incorporation")
+    case DeliveryType.Direct:
+      return i18next.t("Livraison directe")
+    case DeliveryType.Export:
+      return i18next.t("Export")
+    case DeliveryType.Processing:
+      return i18next.t("Processing")
+    case DeliveryType.RFC:
+      return i18next.t("Mise à consommation")
+    case DeliveryType.Stock:
+      return i18next.t("Mise en stock")
+    case DeliveryType.Trading:
+      return i18next.t("Trading sans stockage")
+    case DeliveryType.Unknown:
+    default:
+      return i18next.t("Inconnu")
+  }
+}
 
 export function identity<T>(value: T) {
   return value

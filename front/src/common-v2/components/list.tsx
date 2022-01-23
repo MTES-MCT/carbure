@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
+import i18next from "i18next"
 import cl from "clsx"
 import { isInside } from "./dropdown"
 import { multipleSelection, singleSelection } from "../utils/selection"
@@ -119,7 +120,7 @@ export function List<T, V>({
 
   function renderItems(items: Normalized<T, V>[], level: number = 0) {
     if (items.length === 0) {
-      return <li>Aucune entrée trouvée</li>
+      return <li>{i18next.t("Aucune entrée trouvée")}</li>
     }
 
     return items.map(({ key, value, label, children, disabled, data }) => {

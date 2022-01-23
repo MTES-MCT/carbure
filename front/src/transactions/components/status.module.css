@@ -1,59 +1,9 @@
-.status {
-  color: var(--gray-dark);
-  background-color: var(--gray-light);
-  border-radius: 50px;
-  box-shadow: 1px 1px 2px var(--gray-medium);
-  font-weight: 600;
-  font-size: var(--font-size);
-  padding: 4px 16px;
+.statusTabs a .verso {
+  display: none;
 }
-
-.smallStatus {
-  font-size: 0.68em;
-  padding: 4px 8px;
+.statusTabs a:hover .recto {
+  display: none;
 }
-
-.statusWaiting {
-  color: var(--blue-dark);
-  background-color: var(--blue-light);
-}
-
-.statusToFix {
-  color: var(--orange-dark);
-  background-color: var(--orange-light);
-}
-
-.statusAccepted {
-  color: var(--green-dark);
-  background-color: var(--green-light);
-}
-
-.statusRejected {
-  color: var(--red-dark);
-  background-color: var(--red-light);
-}
-
-.statusTitle {
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.statusTitle .status {
-  margin-right: 16px;
-}
-
-.statusTitle .transactionEditable {
-  margin-left: 16px;
-  font-size: var(--font-size);
-  color: var(--gray-dark);
-}
-
-.transactionDeadline {
-  color: var(--orange-dark);
-  margin-left: 16px;
-}
-
-.addedBy {
-  font-size: 1.1em;
-  margin-left: 8px;
+.statusTabs a:hover .verso {
+  display: flex;
 }

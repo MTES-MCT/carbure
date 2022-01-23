@@ -1,4 +1,5 @@
 import datetime
+import unicodedata
 import openpyxl
 from django import db
 from django.db.models import Q, Count
@@ -8,21 +9,18 @@ import os
 from multiprocessing import Process
 
 import pandas as pd
-from typing import FrozenSet, TYPE_CHECKING, List
+from typing import FrozenSet, TYPE_CHECKING, Generic, List
 from pandas._typing import FilePathOrBuffer, Scalar
 from django.db import transaction
 
 
-from core.models import LotV2, LotTransaction, GenericError, TransactionUpdateHistory
+from core.models import GenericCertificate, LotV2, LotTransaction, GenericError, TransactionUpdateHistory
 from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
 from core.models import TransactionDistance, EntityDepot
 from core.notifications import notify_pending_lot, notify_lot_fixed
 from core.ign_distance import get_distance
 
-from certificates.models import DoubleCountingRegistration, ISCCCertificate, EntityISCCTradingCertificate
-from certificates.models import DBSCertificate, EntityDBSTradingCertificate
-from certificates.models import REDCertCertificate, EntityREDCertTradingCertificate
-from certificates.models import EntitySNTradingCertificate, SNCertificate
+from certificates.models import DoubleCountingRegistration
 from certificates.models import DoubleCountingRegistration
 
 import dateutil.parser
@@ -40,11 +38,8 @@ def try_get_certificate(certificate):
          'certificate_id': certificate,
          'certificate_type': '',
          }
-    iscc = ISCCCertificate.objects.filter(certificate_id=certificate)
-    dbs = DBSCertificate.objects.filter(certificate_id=certificate)
-    red = REDCertCertificate.objects.filter(certificate_id=certificate)
-    sn = SNCertificate.objects.filter(certificate_id=certificate)
-    count = iscc.count() + dbs.count() + red.count() + sn.count()
+    matches = GenericCertificate.objects.filter(certificate_id=certificate)
+    count = matches.count()
     if count == 0:
         return d
     if count > 1:
@@ -52,30 +47,12 @@ def try_get_certificate(certificate):
         return d
     d['matches'] = 1
     d['found'] = True
-    if iscc.count() == 1:
-        d['holder'] = iscc[0].certificate_holder
-        d['valid_until'] = iscc[0].valid_until
-        d['valid_from'] = iscc[0].valid_from
-        d['scope'] = [c.scope.scope for c in iscc[0].iscccertificatescope_set.all()]
-        d['certificate_type'] = 'ISCC'
-    if dbs.count() == 1:
-        d['holder'] = dbs[0].certificate_holder
-        d['valid_until'] = dbs[0].valid_until
-        d['valid_from'] = dbs[0].valid_from
-        d['scope'] = [c.scope.certification_type for c in dbs[0].dbscertificatescope_set.all()]
-        d['certificate_type'] = '2BS'
-    if red.count() == 1:
-        d['holder'] = red[0].certificate_holder
-        d['valid_until'] = red[0].valid_until
-        d['valid_from'] = red[0].valid_from
-        d['scope'] = [c.scope.scope for c in red[0].redcertcertificatescope_set.all()]
-        d['certificate_type'] = 'REDCERT'
-    if sn.count() == 1:
-        d['holder'] = sn[0].certificate_holder
-        d['valid_until'] = sn[0].valid_until
-        d['valid_from'] = sn[0].valid_from
-        d['scope'] = [c.scope.category_id for c in sn[0].sncertificatescope_set.all()]
-        d['certificate_type'] = 'SN'
+    if count == 1:
+        c = matches[0]
+        d['holder'] = c.certificate_holder
+        d['valid_until'] = c.valid_until
+        d['valid_from'] = c.valid_from
+        d['certificate_type'] = c.certificate_type
     return d
 
 def try_get_double_counting_certificate(cert):
@@ -233,38 +210,41 @@ def check_duplicates(new_txs, background=True):
     else:
         return 0
 
-def get_prefetched_data(entity=None):
-    lastyear = datetime.date.today() - datetime.timedelta(days=365)
-    d = {}
-    d['producers'] = {p.name: p for p in Entity.objects.filter(entity_type='Producteur')}
-    d['countries'] = {p.code_pays: p for p in Pays.objects.all()}
-    d['biocarburants'] = {b.code: b for b in Biocarburant.objects.all()}
-    d['matieres_premieres'] = {m.code: m for m in MatierePremiere.objects.all()}
-    if entity:
-        # get only my production sites
-        d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').filter(producer=entity)}
-        # get all my linked certificates
-        my_vendor_certificates = []
-        my_vendor_certificates += [c.certificate.certificate_id for c in EntityISCCTradingCertificate.objects.filter(entity=entity)]
-        my_vendor_certificates += [c.certificate.certificate_id for c in EntityDBSTradingCertificate.objects.filter(entity=entity)]
-        my_vendor_certificates += [c.certificate.certificate_id for c in EntityREDCertTradingCertificate.objects.filter(entity=entity)]
-        my_vendor_certificates += [c.certificate.certificate_id for c in EntitySNTradingCertificate.objects.filter(entity=entity)]
-        d['my_vendor_certificates'] = my_vendor_certificates
-    else:
-        d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').all()}
-    d['depots'] = {d.depot_id.lstrip('0').upper(): d for d in Depot.objects.all()}
-    d['depotsbyname'] = {d.name.upper(): d for d in Depot.objects.all()}
-    entitydepots = dict()
-    for obj in EntityDepot.objects.all():
-        entitydepots.setdefault(obj.entity.id, []).append(obj.depot.id)
-    d['depotsbyentity'] = entitydepots
-    d['clients'] = {c.name.upper(): c for c in Entity.objects.filter(entity_type__in=['Producteur', 'Opérateur', 'Trader'])}
-    d['certificates'] = {c.certificate_id.upper(): c for c in ISCCCertificate.objects.filter(valid_until__gte=lastyear)}
-    d['certificates'].update({c.certificate_id.upper(): c for c in DBSCertificate.objects.filter(valid_until__gte=lastyear)})
-    d['certificates'].update({c.certificate_id.upper(): c for c in REDCertCertificate.objects.filter(valid_until__gte=lastyear)})
-    d['certificates'].update({c.certificate_id.upper(): c for c in SNCertificate.objects.filter(valid_until__gte=lastyear)})
-    d['double_counting_certificates'] = {c.certificate_id: c for c in DoubleCountingRegistration.objects.all()}
-    return d
+# def get_prefetched_data(entity=None):
+#     lastyear = datetime.date.today() - datetime.timedelta(days=365)
+#     d = {}
+#     d['producers'] = {p.name: p for p in Entity.objects.filter(entity_type='Producteur')}
+#     d['countries'] = {p.code_pays: p for p in Pays.objects.all()}
+#     d['biocarburants'] = {b.code: b for b in Biocarburant.objects.all()}
+#     d['matieres_premieres'] = {m.code: m for m in MatierePremiere.objects.all()}
+#     if entity:
+#         # get only my production sites
+#         d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').filter(producer=entity)}
+#         # get all my linked certificates
+#         my_vendor_certificates = []
+#         my_vendor_certificates += [c.certificate.certificate_id for c in EntityISCCTradingCertificate.objects.filter(entity=entity)]
+#         my_vendor_certificates += [c.certificate.certificate_id for c in EntityDBSTradingCertificate.objects.filter(entity=entity)]
+#         my_vendor_certificates += [c.certificate.certificate_id for c in EntityREDCertTradingCertificate.objects.filter(entity=entity)]
+#         my_vendor_certificates += [c.certificate.certificate_id for c in EntitySNTradingCertificate.objects.filter(entity=entity)]
+#         d['my_vendor_certificates'] = my_vendor_certificates
+#     else:
+#         d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').all()}
+#     d['depots'] = {d.depot_id.lstrip('0').upper(): d for d in Depot.objects.all()}
+#     d['depotsbyname'] = {d.name.upper(): d for d in Depot.objects.all()}
+#     entitydepots = {}
+#     ed = EntityDepot.objects.all()
+#     for e in ed:
+#         if e.entity.id not in entitydepots:
+#             entitydepots[e.entity.id] = []
+#         entitydepots[e.entity.id].append(e.depot.id) 
+#     d['depotsbyentity'] = entitydepots
+#     d['clients'] = {c.name.upper(): c for c in Entity.objects.filter(entity_type__in=['Producteur', 'Opérateur', 'Trader'])}
+#     d['certificates'] = {c.certificate_id.upper(): c for c in ISCCCertificate.objects.filter(valid_until__gte=lastyear)}
+#     d['certificates'].update({c.certificate_id.upper(): c for c in DBSCertificate.objects.filter(valid_until__gte=lastyear)})
+#     d['certificates'].update({c.certificate_id.upper(): c for c in REDCertCertificate.objects.filter(valid_until__gte=lastyear)})
+#     d['certificates'].update({c.certificate_id.upper(): c for c in SNCertificate.objects.filter(valid_until__gte=lastyear)})
+#     d['double_counting_certificates'] = {c.certificate_id: c for c in DoubleCountingRegistration.objects.all()}
+#     return d
 
 
 def generate_carbure_id(lot):
@@ -685,7 +665,7 @@ def fill_delivery_date(lot_row, lot, transaction):
         try:
             dd = try_get_date(lot_row['delivery_date'])
             diff = today - dd
-            if diff > datetime.timedelta(days=365):
+            if diff > datetime.timedelta(days=365) or diff < datetime.timedelta(days=-365):
                 msg = "Date trop éloignée (%s)" % (lot_row['delivery_date'])
                 tx_errors.append(GenericError(tx=transaction, field='delivery_date', error="INCORRECT_DELIVERY_DATE", extra=msg, value=lot_row['delivery_date'], display_to_creator=True, is_blocking=True))
                 lot.period = today.strftime('%Y-%m')
@@ -694,7 +674,7 @@ def fill_delivery_date(lot_row, lot, transaction):
                 transaction.delivery_date = dd
                 lot.period = dd.strftime('%Y-%m')
         except Exception:
-            transaction.delivery_date = today
+            transaction.delivery_date = None
             lot.period = today.strftime('%Y-%m')
             msg = "Format de date incorrect: veuillez entrer une date au format JJ/MM/AAAA (%s)" % (lot_row['delivery_date'])
             tx_errors.append(GenericError(tx=transaction, field='delivery_date', error="INCORRECT_FORMAT_DELIVERY_DATE", extra=msg, value=lot_row['delivery_date'], display_to_creator=True, is_blocking=True))
@@ -1157,3 +1137,87 @@ def get_transaction_distance(tx):
         p.start()
         res['error'] = 'DISTANCE_NOT_IN_CACHE'
         return res
+
+
+def convert_template_row_to_formdata(entity, prefetched_data, filepath):
+    wb = openpyxl.load_workbook(filepath, data_only=True)
+    sheet = wb.worksheets[0]
+    data = get_sheet_data(sheet, convert_float=True)
+    column_names = data[0]
+    data = data[1:]
+    df = pd.DataFrame(data, columns=column_names)
+    df.fillna('', inplace=True)
+    lots_data = []
+    for row in df.iterrows():
+        lot_row = row[1]
+        lot = {}
+        # TEMPLATE COLUMNS
+        # 'champ_libre', 
+        # 'producer', 'production_site', 'production_site_reference', 'production_site_country', 'production_site_commissioning_date', 'double_counting_registration',
+        # 'supplier', 'supplier_certificate', ('vendor_certificate') removed,
+        # 'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
+        # 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee',
+        # 'dae', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country',]
+
+        # TARGET COLUMNS
+        # free_field, carbure_producer, unknown_producer, carbure_production_site, unknown_production_site
+        # production_country, production_site, commissioning_date, production_site_certificate, production_site_double_counting_certificate
+        # carbure_supplier, unknown_supplier, supplier_certificate
+        # transport_document, carbure_client, unknown_client, delivery_date, carbure_delivery_site, unknown_delivery_site, delivery_site_country
+        # biofuel, feedstock, country_of_origin
+
+        lot['carbure_stock_id'] = lot_row.get('carbure_stock_id', '')
+        lot['free_field'] = lot_row.get('champ_libre', '')
+        producer = lot_row.get('producer', '')
+        production_site = lot_row.get('production_site', '')
+        if producer is None or producer == '' or producer.upper() == entity.name.upper():
+            # I am the producer
+            if production_site.upper() in prefetched_data['my_production_sites']:
+                lot['carbure_production_site'] = production_site
+            # carbure_supplier and carbure_producer will be set to entity in construct_carbure_lot
+        else:
+            # I am not the producer
+            lot['unknown_producer'] = producer
+            lot['unknown_production_site'] = production_site
+            
+            lot['production_country_code'] = lot_row.get('production_site_country', None)
+            lot['production_site_commissioning_date'] = lot_row.get('production_site_commissioning_date', '')
+            lot['production_site_certificate'] = lot_row.get('production_site_certificate', '')
+            lot['production_site_double_counting_certificate'] = lot_row.get('production_site_double_counting_certificate', '')
+            lot['unknown_supplier'] = lot_row.get('supplier', '')
+            lot['supplier_certificate'] = lot_row.get('supplier_certificate', '')
+
+        lot['vendor_certificate'] = lot_row.get('vendor_certificate', '')
+        lot['volume'] = lot_row.get('volume', 0)
+        lot['feedstock_code'] = lot_row.get('matiere_premiere_code', '')
+        lot['biofuel_code'] = lot_row.get('biocarburant_code', '')
+        lot['country_code'] = lot_row.get('pays_origine_code', '')
+
+        for key in ['el']: # negative value allowed
+            try:
+                lot[key] = float(lot_row.get(key, 0))
+            except:
+                lot[key] = 0
+        for key in ['eec', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee']: # positive value only
+            try:
+                lot[key] = abs(float(lot_row.get(key, 0)))
+            except:
+                lot[key] = 0
+        lot['transport_document_reference'] = lot_row.get('dae', '')
+        lot['delivery_date'] = lot_row.get('delivery_date', '')
+        delivery_site = lot_row.get('delivery_site', '')
+        if delivery_site.upper() in prefetched_data['depots']:
+            lot['carbure_delivery_site_depot_id'] = prefetched_data['depots'][delivery_site.upper()].depot_id
+        elif delivery_site.upper() in prefetched_data['depotsbyname']:
+            lot['carbure_delivery_site_depot_id'] = prefetched_data['depotsbyname'][delivery_site.upper()].depot_id
+        else:
+            lot['unknown_delivery_site'] = delivery_site
+            delivery_site_country = lot_row.get('delivery_site_country', '')
+            lot['delivery_site_country_code'] = delivery_site_country
+        client = lot_row.get('client', '').upper()
+        if client in prefetched_data['clientsbyname']:
+            lot['carbure_client_id'] = prefetched_data['clientsbyname'][client].id
+        else:
+            lot['unknown_client'] = client
+        lots_data.append(lot)
+    return lots_data

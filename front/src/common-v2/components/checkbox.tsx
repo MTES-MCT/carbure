@@ -1,5 +1,5 @@
 import cl from "clsx"
-import { Check } from "./icons"
+import { Check } from "common-v2/components/icons"
 import css from "./checkbox.module.css"
 import { GroupField } from "./input"
 import { multipleSelection } from "../utils/selection"
@@ -69,18 +69,22 @@ export const Checkbox = ({
 export interface CheckboxGroupProps<T, V> extends CheckboxControl {
   options: T[]
   value: V[] | undefined
+  variant?: "default" | "opacity"
   onChange: (value: V[] | undefined) => void
+  onToggle?: (value: V) => void
   normalize?: Normalizer<T, V>
 }
 
 export function CheckboxGroup<T, V extends string | number>({
   className,
+  variant = "default",
   options,
   disabled,
   readOnly,
   required,
   value,
   onChange,
+  onToggle,
   normalize = defaultNormalizer,
   ...props
 }: CheckboxGroupProps<T, V>) {
@@ -88,7 +92,7 @@ export function CheckboxGroup<T, V extends string | number>({
   const normOptions = normalizeItems(options, normalize)
 
   return (
-    <GroupField {...props}>
+    <GroupField {...props} className={cl(className, variant && css[variant])}>
       {normOptions.map(({ value, label }) => (
         <Checkbox
           key={String(value)}
@@ -98,7 +102,10 @@ export function CheckboxGroup<T, V extends string | number>({
           readOnly={readOnly}
           required={required}
           value={selection.isSelected(value)}
-          onChange={() => selection.onSelect(value)}
+          onChange={() => {
+            selection.onSelect(value)
+            onToggle?.(value)
+          }}
         />
       ))}
     </GroupField>

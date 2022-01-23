@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom"
 import { LoaderOverlay } from "common-v2/components/scaffold"
-import useUser, { UserContext } from "./hooks/user"
+import useLoadUser, { UserContext } from "./hooks/user"
 import useEntity from "./hooks/entity"
 import DevBanner from "./components/dev-banner"
 import Topbar from "./components/top-bar"
@@ -10,15 +10,16 @@ import Exit from "./components/exit"
 import Registry from "./components/registry"
 import PublicStats from "./components/public-stats"
 import Home from "./components/home"
-import Transactions from "transactions-v2"
+import Transactions from "transactions"
 import Settings from "settings"
 import Account from "account"
 import DoubleCounting from "doublecount"
 import Dashboard from "dashboard"
+import Controls from "controls"
 import Entities from "../entities" // not using  path prevents import
 
 const Carbure = () => {
-  const user = useUser()
+  const user = useLoadUser()
 
   if (!user.isAuthenticated()) {
     return <Exit to="/accounts/login" />
@@ -48,6 +49,8 @@ const Carbure = () => {
   )
 }
 
+const currentYear = new Date().getFullYear()
+
 const Org = () => {
   const entity = useEntity()
 
@@ -59,18 +62,22 @@ const Org = () => {
     <Routes>
       <Route path="settings" element={<Settings />} />
 
-      {isIndustry && <Route path="transactions/*" element={<Transactions />} />}
+      {isIndustry && <Route path="transactions/:year/*" element={<Transactions />} />}
       {isIndustry && <Route path="registry" element={<Registry />} />}
 
       {isAdmin && <Route path="dashboard" element={<Dashboard />} />}
       {isAdmin && <Route path="entities/*" element={<Entities />} />}
 
-      {(isAdmin || isAuditor) && <Route path="controls/*" element={<h1>TODO</h1>} />}
+      {(isAdmin || isAuditor) && <Route path="controls/:year/*" element={<Controls />} />}
       {(isAdmin || hasDCA) && <Route path="double-counting/*" element={<DoubleCounting />} />}
 
       {isIndustry && <Route path="*" element={<Navigate to="transactions" />} />}
+      {isIndustry && <Route path="transactions" element={<Navigate to={`${currentYear}`} />} />}
+
+      {(isAuditor) && <Route path="*" element={<Navigate to="controls" />} />}
+      {(isAdmin || isAuditor) && <Route path="controls" element={<Navigate to={`${currentYear}`} />} />}
+
       {isAdmin && <Route path="*" element={<Navigate to="dashboard" />} />}
-      {isAuditor && <Route path="*" element={<Navigate to="controls" />} />}
       {hasDCA && <Route path="*" element={<Navigate to="double-counting" />} />}
     </Routes>
 

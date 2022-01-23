@@ -24,8 +24,9 @@ def cleanup_tables():
     cursor.execute(sql2)
     sql3 = "SET FOREIGN_KEY_CHECKS = 1;"
     cursor.execute(sql3)
-    
-    
+    # delete ghost lots
+    cursor.execute("delete from lots_v2 where id in (select id from lots_v2 where id not in (select lot_id from transactions))")
+   
 
 if __name__ == '__main__':
     cleanup_tables()

@@ -4,7 +4,7 @@ import cl from "clsx"
 
 import styles from "./modal.module.css"
 
-import { Cross } from "./icons"
+import { Cross } from "common-v2/components/icons"
 import { SystemProps } from "."
 
 type ModalProps = SystemProps & {

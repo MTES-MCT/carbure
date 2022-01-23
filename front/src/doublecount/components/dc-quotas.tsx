@@ -15,9 +15,9 @@ import {
 } from "common/components/dialog"
 import * as api from "../api"
 import { Button } from "common/components/button"
-import { Return } from "common/components/icons"
+import { Return } from "common-v2/components/icons"
 import { QuotaOverview, QuotaDetails } from "../types"
-import { prettyVolume } from "transactions/helpers"
+import { formatNumber } from "common-v2/utils/formatters"
 
 type QuotasDetailsPromptProps = PromptProps<void> & {
   year: number
@@ -50,14 +50,14 @@ const QuotasDetailsPrompt = ({
       header: t("Volume produit"),
       render: (d) => (
         <TwoLines
-          text={`${prettyVolume(d.volume)} L`}
+          text={`${formatNumber(d.volume)} L`}
           sub={`${d.current_production_weight_sum_tonnes} t`}
         />
       ),
     },
     {
       header: t("Quota approuvé"),
-      render: (d) => <Line text={prettyVolume(d.approved_quota)} />,
+      render: (d) => <Line text={formatNumber(d.approved_quota)} />,
     },
     {
       header: t("Progression des quotas"),

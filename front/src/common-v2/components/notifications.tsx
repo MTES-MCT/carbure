@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef } from "react"
 import ReactDOM from "react-dom"
 import cl from "clsx"
-import { Cross } from "./icons"
+import { Cross } from "common-v2/components/icons"
 import Button from "./button"
 import { PortalContext } from "./portal"
 import css from "./notifications.module.css"

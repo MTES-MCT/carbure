@@ -1,18 +1,18 @@
-import { statusColumn } from "account/components/access-rights"
+import { RightStatus } from "account/components/access-rights"
 import { Title } from "common/components"
 import { Alert } from "common/components/alert"
 import { confirm } from "common/components/dialog"
-import { AlertCircle, Check, Cross } from "common/components/icons"
+import { AlertCircle, Check, Cross } from "common-v2/components/icons"
 import { Input } from "common/components/input"
 import { Section, SectionBody, SectionHeader } from "common/components/section"
-import Table, { Actions, Column } from "common/components/table"
+import Table, { Actions, Column, padding } from "common/components/table"
 import useAPI from "common/hooks/use-api"
-import { UserRightRequest, UserRightStatus, UserRole } from "common/types"
+import { UserRightRequest, UserRightStatus, UserRole } from "carbure/types"
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import { formatDate } from "settings/components/common"
-import { padding } from "transactions/components/list-columns"
 import * as api from "../api"
+import colStyles from "common/components/table.module.css"
 import styles from "./user-rights.module.css"
 
 const ROLE_LABELS = {
@@ -31,7 +31,11 @@ const RIGHTS_ORDER = {
 
 const RIGHTS_COLUMNS: Column<UserRightRequest>[] = [
   padding,
-  statusColumn,
+  {
+    header: "Statut",
+    className: colStyles.narrowColumn,
+    render: (r: UserRightRequest) => <RightStatus status={r.status} />,
+  },
   {
     header: "Utilisateur",
     render: (r) => r.user[0] ?? "",
@@ -58,7 +62,7 @@ const UserRights = () => {
   const [query, setQuery] = useState("")
   const [rights, getRights] = useAPI(api.getUsersRightRequests)
 
-  const entityID = parseInt(id ?? '', 10)
+  const entityID = parseInt(id ?? "", 10)
   const [, updateRight] = useAPI(api.updateUsersRights)
 
   async function updateRightRequest(user: number, status: UserRightStatus) {

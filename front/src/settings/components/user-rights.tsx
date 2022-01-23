@@ -1,19 +1,19 @@
 import { Trans, useTranslation } from "react-i18next"
 
-import { statusColumn } from "account/components/access-rights"
+import { RightStatus } from "account/components/access-rights"
 import { Title } from "common/components"
 import { Alert } from "common/components/alert"
 import { confirm } from "common/components/dialog"
-import { AlertCircle, Check, Cross } from "common/components/icons"
+import { AlertCircle, Check, Cross } from "common-v2/components/icons"
 import { Section, SectionBody, SectionHeader } from "common/components/section"
-import Table, { Actions, Column } from "common/components/table"
+import Table, { Actions, Column, padding } from "common/components/table"
 import useAPI from "common/hooks/use-api"
-import { UserRightRequest, UserRightStatus, UserRole } from "common/types"
+import { UserRightRequest, UserRightStatus, UserRole } from "carbure/types"
 import { useEffect } from "react"
 import { formatDate } from "settings/components/common"
-import { padding } from "transactions/components/list-columns"
 import * as api from "../api"
 import styles from "entities/components/user-rights.module.css"
+import colStyles from "common/components/table.module.css"
 import { Entity } from "carbure/types"
 
 const RIGHTS_ORDER = {
@@ -23,7 +23,7 @@ const RIGHTS_ORDER = {
   [UserRightStatus.Rejected]: 3,
 }
 
-const UserRights = ({ entity }: { entity: Entity }) => {
+const EntityUserRights = ({ entity }: { entity: Entity }) => {
   const { t } = useTranslation()
 
   const [rights, getRights] = useAPI(api.getEntityRights)
@@ -112,7 +112,11 @@ const UserRights = ({ entity }: { entity: Entity }) => {
 
   const columns: Column<UserRightRequest>[] = [
     padding,
-    statusColumn,
+    {
+      header: "Statut",
+      className: colStyles.narrowColumn,
+      render: (r: UserRightRequest) => <RightStatus status={r.status} />,
+    },
     {
       header: t("Utilisateur"),
       render: (r) => r.user[0] ?? "",
@@ -160,4 +164,4 @@ const UserRights = ({ entity }: { entity: Entity }) => {
   )
 }
 
-export default UserRights
+export default EntityUserRights

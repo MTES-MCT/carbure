@@ -1,11 +1,12 @@
 import { render, TestRoot } from "setupTests"
-import { waitFor, screen } from "@testing-library/react"
+import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { Route } from 'react-router-dom'
+import { Route } from "react-router-dom"
 import Account from "../index"
 import server, { setAccessRequests } from "./api"
 import { producer } from "common/__test__/data"
-import { waitWhileLoading } from "common/__test__/helpers"
+import { getField, waitWhileLoading } from "common/__test__/helpers"
+import { PortalProvider } from "common-v2/components/portal"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 
@@ -19,7 +20,18 @@ afterAll(() => server.close())
 // this component is only here for testing as otherwise we can't use the useGetSettingsHook
 // because hooks can only work inside components
 const AccountWithHooks = () => {
-  return <TestRoot url="/">{(app) => <Route path="/" element={<Account app={app} />} />}</TestRoot>
+  return (
+    <TestRoot url="/">
+      <Route
+        path="/"
+        element={
+          <PortalProvider>
+            <Account />
+          </PortalProvider>
+        }
+      />
+    </TestRoot>
+  )
 }
 
 test("empty acces rights in account page", async () => {
@@ -55,9 +67,7 @@ test("use the access request menu", async () => {
   const button = screen.getByText("Ajouter une organisation")
   userEvent.click(button)
 
-  const input = await waitFor(() =>
-    screen.getByLabelText("Organisation", { selector: "input" })
-  )
+  const input = getField("Organisation")
 
   userEvent.type(input, "Test")
 

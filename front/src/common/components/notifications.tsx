@@ -5,7 +5,7 @@ import ReactDOM from "react-dom"
 import styles from "./notifications.module.css"
 
 import { Box } from "."
-import { Cross } from "./icons"
+import { Cross } from "common-v2/components/icons"
 import { useTranslation } from "react-i18next"
 
 const DEFAULT_TIMEOUT = 10000

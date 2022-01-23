@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { EntityType } from "common/types"
+import { EntityType } from "carbure/types"
 import {
   Admin,
   DoubleCountingSourcing,
@@ -7,13 +7,12 @@ import {
   DoubleCountingDetails,
   DoubleCountingSourcingAggregation,
 } from "../types"
-import Table, { Column, Line, Row } from "common/components/table"
+import Table, { Column, Line, Row, padding } from "common/components/table"
 import { Input } from "common/components/input"
-import { padding } from "transactions/components/list-columns"
 import { Entity } from "carbure/types"
 import { formatDate } from "settings/components/common"
 import YearTable from "./year-table"
-import { prettyVolume } from "transactions/helpers"
+import { formatNumber } from "common-v2/utils/formatters"
 
 type ValidationStatus = {
   approved: boolean
@@ -38,7 +37,7 @@ export const SourcingTable = ({ sourcing }: SourcingTableProps) => {
     },
     {
       header: t("Poids en tonnes"),
-      render: (s) => <Line text={prettyVolume(s.metric_tonnes)} />,
+      render: (s) => <Line text={formatNumber(s.metric_tonnes)} />,
     },
     {
       header: t("Origine"),
@@ -85,7 +84,7 @@ export const SourcingAggregationTable = ({
     },
     {
       header: t("Poids total en tonnes"),
-      render: (s) => <Line text={prettyVolume(s.sum)} />,
+      render: (s) => <Line text={formatNumber(s.sum)} />,
     },
     {
       header: t("Pays d'origine"),
@@ -129,16 +128,16 @@ export const ProductionTable = ({
     {
       header: t("Prod. max"),
       render: (p) => (
-        <Line text={prettyVolume(p.max_production_capacity ?? 0)} />
+        <Line text={formatNumber(p.max_production_capacity ?? 0)} />
       ),
     },
     {
       header: t("Prod. estimée"),
-      render: (p) => <Line text={prettyVolume(p.estimated_production ?? 0)} />,
+      render: (p) => <Line text={formatNumber(p.estimated_production ?? 0)} />,
     },
     {
       header: t("Quota demandé"),
-      render: (p) => <Line text={prettyVolume(p.requested_quota)} />,
+      render: (p) => <Line text={formatNumber(p.requested_quota)} />,
     },
     {
       header: t("Quota approuvé"),

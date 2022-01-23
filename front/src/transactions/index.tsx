@@ -1,309 +1,120 @@
-import { Route, Routes, Navigate } from "react-router-dom"
+import { useCallback } from "react"
+import { useTranslation } from "react-i18next"
+import {
+  Navigate,
+  Route,
+  Routes,
+  useNavigate,
+  useParams,
+  useLocation,
+} from "react-router-dom"
+import useEntity from "carbure/hooks/entity"
+import { useQuery } from "common-v2/hooks/async"
+import * as api from "./api"
+import { Main } from "common-v2/components/scaffold"
+import Select from "common-v2/components/select"
+import { PortalProvider } from "common-v2/components/portal"
+import { StatusTabs, useStatus } from "./components/status"
+import { DeclarationButton } from "./actions/declaration"
+import { ImportArea } from "./actions/import"
+import Lots from "./components/lots"
+import Stocks from "./components/stocks"
 
-import { Entity } from "carbure/types"
-import { EntityType, Filters, LotStatus, UserRole } from "common/types"
+export const Transactions = () => {
+  const { t } = useTranslation()
 
-import { usePageSelection } from "common/components/pagination"
-import useSpecialSelection from "./hooks/query/use-special"
-import useSortingSelection from "./hooks/query/use-sort-by"
-import useSearchSelection from "./hooks/query/use-search"
-import useFilterSelection from "./hooks/query/use-filters"
-import useStatusSelection from "./hooks/query/use-status"
-import useYearSelection from "./hooks/query/use-year"
-import useTransactionSelection from "./hooks/query/use-selection"
-import useUploadLotFile from "./hooks/actions/use-upload-file"
-import useDuplicateLot from "./hooks/actions/use-duplicate-lots"
-import useDeleteLots from "./hooks/actions/use-delete-lots"
-import useValidateLots from "./hooks/actions/use-validate-lots"
-import useAcceptLots from "./hooks/actions/use-accept-lots"
-import useRejectLots from "./hooks/actions/use-reject-lots"
-import useDeclareLots from "./hooks/actions/use-declare-lots"
-import useAuditLots from "./hooks/actions/use-audits"
-import { useGetLots, useGetSnapshot } from "./hooks/use-transaction-list"
-import { useSummary } from "./components/summary"
+  const entity = useEntity()
+  const status = useStatus()
 
-import { Main } from "common/components"
-import { TransactionSnapshot } from "./components/list-snapshot"
-import { TransactionList } from "./components/list"
-import TransactionFilters from "./components/list-filters"
+  const [year, setYear] = useYear("transactions")
 
-import TransactionAdd from "./routes/transaction-add"
-import TransactionDetails from "./routes/transaction-details"
-import useForwardLots from "./hooks/actions/use-forward-lots"
-import useTransactionQuery from "./hooks/query/use-transaction-query"
-import { useRights } from "carbure/hooks/entity"
-import useAdministrateLots from "./hooks/actions/use-admin-lots"
+  const years = useQuery(api.getYears, {
+    key: "years",
+    params: [entity.id],
 
-const OPERATOR_STATUSES = [
-  LotStatus.Draft,
-  LotStatus.Inbox,
-  LotStatus.ToFix,
-  LotStatus.Accepted,
-]
+    // select the latest year if the selected one isn't available anymore
+    onSuccess: (res) => {
+      const years = res.data.data ?? []
+      if (!years.includes(year)) {
+        setYear(Math.max(...years))
+      }
+    },
+  })
 
-const PRODUCER_TRADER_STATUSES = [
-  LotStatus.Draft,
-  LotStatus.Validated,
-  LotStatus.ToFix,
-  LotStatus.Accepted,
-]
+  const snapshot = useQuery(api.getSnapshot, {
+    key: "snapshot",
+    params: [entity.id, year],
+  })
 
-const ADMIN_STATUSES = [
-  LotStatus.Alert,
-  LotStatus.Correction,
-  LotStatus.Declaration,
-  LotStatus.Highlight,
-]
-
-const OPERATOR_FILTERS = [
-  Filters.Periods,
-  Filters.Biocarburants,
-  Filters.MatieresPremieres,
-  Filters.CountriesOfOrigin,
-  Filters.Vendors,
-  Filters.ProductionSites,
-  Filters.DeliverySites,
-]
-
-const PRODUCER_TRADER_FILTERS = [
-  Filters.Periods,
-  Filters.Biocarburants,
-  Filters.MatieresPremieres,
-  Filters.CountriesOfOrigin,
-  Filters.Clients,
-  Filters.ProductionSites,
-  Filters.DeliverySites,
-]
-
-const ADMIN_FILTERS = [
-  Filters.Mac,
-  Filters.DeliveryStatus,
-  Filters.Periods,
-  Filters.Biocarburants,
-  Filters.MatieresPremieres,
-  Filters.CountriesOfOrigin,
-  Filters.Vendors,
-  Filters.Clients,
-  Filters.ProductionSites,
-  Filters.DeliverySites,
-  Filters.AddedBy,
-  Filters.Forwarded,
-  Filters.Errors,
-  Filters.HiddenByAdmin,
-  Filters.ClientTypes,
-]
-
-export function useTransactions(entity: Entity) {
-  const pagination = usePageSelection()
-
-  const special = useSpecialSelection(pagination)
-  const sorting = useSortingSelection(pagination)
-  const search = useSearchSelection(pagination)
-  const filters = useFilterSelection(pagination)
-  const status = useStatusSelection(pagination, special)
-  const year = useYearSelection(pagination, filters, special)
-
-  const query = useTransactionQuery(
-    status.active,
-    entity?.id ?? -1,
-    filters.selected,
-    year.selected,
-    pagination.page,
-    pagination.limit,
-    search.query,
-    sorting.column,
-    sorting.order,
-    special.invalid,
-    special.deadline
-  )
-
-  const snapshot = useGetSnapshot(entity, year)
-  const transactions = useGetLots(entity, query)
-
-  function refresh() {
-    snapshot.getSnapshot()
-    transactions.getTransactions()
+  if (status === "unknown") {
+    return <Navigate to="drafts" />
   }
 
-  const selection = useTransactionSelection(transactions.data?.lots)
+  const yearData = years.result?.data.data ?? []
+  const snapshotData = snapshot.result?.data.data
 
-  const uploader = useUploadLotFile(entity, refresh)
-  const duplicator = useDuplicateLot(entity, refresh)
-  const deleter = useDeleteLots(entity, selection, query, refresh)
-  const validator = useValidateLots(entity, selection, query, refresh)
-  const acceptor = useAcceptLots(entity, selection, query, refresh)
-  const rejector = useRejectLots(entity, selection, query, refresh)
-  const declarator = useDeclareLots(entity)
-  const forwarder = useForwardLots(entity, selection, refresh)
-  const administrator = useAdministrateLots(entity, selection, refresh)
-  const auditor = useAuditLots(entity, selection, refresh)
-
-  const summary = useSummary(query, selection.selected, { entity, short: true })
-
-  return {
-    entity,
-    status,
-    filters,
-    year,
-    pagination,
-    snapshot,
-    transactions,
-    selection,
-    search,
-    special,
-    sorting,
-    deleter,
-    uploader,
-    duplicator,
-    validator,
-    acceptor,
-    rejector,
-    declarator,
-    forwarder,
-    administrator,
-    query,
-    summary,
-    auditor,
-    refresh,
-  }
-}
-
-export const Transactions = ({ entity }: { entity: Entity }) => {
-  const {
-    status,
-    filters,
-    year,
-    special,
-    pagination,
-    snapshot,
-    transactions,
-    selection,
-    search,
-    query,
-    sorting,
-    deleter,
-    duplicator,
-    validator,
-    uploader,
-    acceptor,
-    rejector,
-    declarator,
-    forwarder,
-    administrator,
-    summary,
-    auditor,
-    refresh,
-  } = useTransactions(entity)
-
-  const rights = useRights()
-
-  if (entity === null) {
-    return null
-  }
-
-  const isTrader = entity.entity_type === EntityType.Trader
-  const isOperator = entity.entity_type === EntityType.Operator
-  const isProducer = entity.entity_type === EntityType.Producer
-  const isAdmin = entity.entity_type === EntityType.Administration
-  const isAuditor = entity.entity_type === EntityType.Auditor
-
-  if ((isAdmin || isAuditor) && !ADMIN_STATUSES.includes(status.active)) {
-    return <Navigate to=".." />
-  }
-
-  if (isOperator && !OPERATOR_STATUSES.includes(status.active)) {
-    return <Navigate to=".." />
-  }
-
-  if (
-    (isProducer || isTrader) &&
-    !PRODUCER_TRADER_STATUSES.includes(status.active)
-  ) {
-    return <Navigate to=".." />
-  }
-
-  const canDeclare =
-    rights.is(UserRole.Admin, UserRole.ReadWrite) && !isAdmin && !isAuditor
-
-  const statusPlaceholder = isOperator
-    ? OPERATOR_STATUSES
-    : isAdmin || isAuditor
-    ? ADMIN_STATUSES
-    : PRODUCER_TRADER_STATUSES
-
-  const filtersPlaceholder = isOperator
-    ? OPERATOR_FILTERS
-    : isAdmin || isAuditor
-    ? ADMIN_FILTERS
-    : PRODUCER_TRADER_FILTERS
+  // common props for subroutes
+  const props = { entity, year, snapshot: snapshotData }
 
   return (
-    <Main>
-      <TransactionSnapshot
-        snapshot={snapshot}
-        status={status}
-        year={year}
-        placeholder={statusPlaceholder}
-        declarator={canDeclare ? declarator : null}
-      />
+    <PortalProvider>
+      <ImportArea>
+        <Main>
+          <header>
+            <section>
+              <h1>{t("Transactions")}</h1>
 
-      <TransactionFilters
-        query={query}
-        selection={filters}
-        filters={snapshot.data?.filters}
-        placeholder={filtersPlaceholder}
-        entity={entity}
-      />
+              <Select
+                loading={years.loading}
+                variant="inline"
+                placeholder={t("Choisir une année")}
+                value={year}
+                onChange={setYear}
+                options={yearData}
+                sort={(year) => -year.value}
+              />
 
-      <TransactionList
-        entity={entity}
-        transactions={transactions}
-        filters={filters}
-        status={status}
-        sorting={sorting}
-        selection={selection}
-        pagination={pagination}
-        search={search}
-        query={query}
-        special={special}
-        uploader={uploader}
-        deleter={deleter}
-        validator={validator}
-        duplicator={duplicator}
-        acceptor={acceptor}
-        rejector={rejector}
-        outsourceddepots={snapshot.data?.depots}
-        forwarder={forwarder}
-        summary={summary}
-        auditor={auditor}
-        administrator={administrator}
-      />
+              <DeclarationButton year={year} years={yearData} />
+            </section>
 
-      <Routes>
-        <Route
-          path="add"
-          element={<TransactionAdd entity={entity} refresh={refresh} />}
-        />
+            <section>
+              <StatusTabs
+                loading={snapshot.loading}
+                count={snapshotData?.lots}
+              />
+            </section>
+          </header>
 
-        <Route
-          path=":id"
-          element={
-            <TransactionDetails
-              entity={entity}
-              refresh={refresh}
-              deleter={deleter}
-              validator={validator}
-              acceptor={acceptor}
-              rejector={rejector}
-              administrator={administrator}
-              auditor={auditor}
-              transactions={summary.data?.tx_ids ?? []}
-            />
-          }
-        />
-      </Routes>
-    </Main>
+          <Routes>
+            <Route path="stocks/*" element={<Stocks {...props} />} />
+            <Route path="*" element={<Lots {...props} />} />
+          </Routes>
+        </Main>
+      </ImportArea>
+    </PortalProvider>
   )
+}
+
+const currentYear = new Date().getFullYear()
+
+export function useYear(root: string) {
+  const location = useLocation()
+  const params = useParams<"year">()
+  const navigate = useNavigate()
+
+  const year = parseInt(params.year ?? "") || currentYear
+
+  const setYear = useCallback(
+    (year: number | undefined) => {
+      const rx = new RegExp(`${root}/[0-9]+`)
+      const replacement = `${root}/${year}`
+      const pathname = location.pathname.replace(rx, replacement)
+      navigate(pathname)
+    },
+    [root, location, navigate]
+  )
+
+  return [year, setYear] as [typeof year, typeof setYear]
 }
 
 export default Transactions

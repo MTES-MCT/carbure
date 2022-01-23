@@ -16,11 +16,11 @@ server {
 
     proxy_read_timeout 300;
     proxy_connect_timeout 300;
-    proxy_send_timeout 300; 
+    proxy_send_timeout 300;
 
 
     #add_header Content-Security-Policy "connect-src 'self'; default-src 'self'; img-src 'self'; manifest-src 'self'; script-src-elem 'self'; style-src-elem 'self';";
-    add_header Strict-Transport-Security "max-age=300; includeSubDomains; preload; always;"; 
+    add_header Strict-Transport-Security "max-age=300; includeSubDomains; preload; always;";
     add_header X-XSS-Protection "1; mode=block";
 
 
@@ -35,12 +35,12 @@ server {
     location / {
         proxy_pass  http://carbure-django:8001;
         proxy_set_header Host            $host;
-        proxy_set_header X-Forwarded-For $remote_addr;	
+        proxy_set_header X-Forwarded-For $remote_addr;
     }
 
     # frontend dev server proxy pass
-    location /v2 {
-        proxy_pass  http://carbure-frontend:3000/v2/;
+    location /app {
+        proxy_pass  http://carbure-frontend:3000/app/;
     }
 
     # serve uploaded files to administrators
@@ -50,17 +50,17 @@ server {
         autoindex_format html;
         autoindex_localtime on;
         auth_basic "Administrator Login";
-        auth_basic_user_file /etc/nginx/conf.d/.htaccess_uploaded_files;	
+        auth_basic_user_file /etc/nginx/conf.d/.htaccess_uploaded_files;
     }
 
 
     # frontend hot reloading websocket proxy pass
-    location /sockjs-node {
+    location /ws {
         proxy_set_header X-Real-IP  $remote_addr;
         proxy_set_header X-Forwarded-For $remote_addr;
         proxy_set_header Host $host;
 
-        proxy_pass  http://carbure-frontend:3000/sockjs-node;
+        proxy_pass  http://carbure-frontend:3000/ws;
 
         proxy_redirect off;
 

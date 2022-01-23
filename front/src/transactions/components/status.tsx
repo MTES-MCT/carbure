@@ -1,212 +1,160 @@
-import React from "react"
 import cl from "clsx"
-import format from "date-fns/format"
-import fr from "date-fns/locale/fr"
-import { TFunction, Trans, useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next"
+import { useMatch } from "react-router-dom"
+import { Snapshot, Status } from "../types"
+import Tabs from "common-v2/components/tabs"
+import { Bell, Loader } from "common-v2/components/icons"
+import { Col, Row } from "common-v2/components/scaffold"
+import css from "./status.module.css"
+import { formatNumber } from "common-v2/utils/formatters"
 
-import {
-  LotDetails,
-  Transaction,
-  DeliveryStatus,
-  LotStatus,
-} from "common/types"
-import { Box, Title } from "common/components"
-import { hasDeadline } from "../helpers"
-
-import styles from "./status.module.css"
-import { Entity } from "carbure/types"
-import { formatDate } from "settings/components/common"
-
-// extract the status name from the lot details
-export function getStatus(
-  transaction: Transaction,
-  entityID: number
-): LotStatus {
-  const status = transaction.lot.status.toLowerCase()
-  const delivery = transaction.delivery_status
-
-  const isAuthor = transaction.lot.added_by?.id === entityID
-  const isVendor = transaction.carbure_vendor?.id === entityID
-  const isClient = transaction.carbure_client?.id === entityID
-
-  if (status === "draft") {
-    return LotStatus.Draft
-  } else if (status === "validated") {
-    if (delivery === "F") {
-      return LotStatus.Declaration
-    } else if (delivery === "A") {
-      return LotStatus.Accepted
-    }
-    // PRODUCTEUR
-    else if (isVendor || isAuthor) {
-      if (["N", "AA"].includes(delivery)) {
-        return LotStatus.Validated
-      } else if (["AC", "R"].includes(delivery)) {
-        return LotStatus.ToFix
-      }
-    }
-    // OPERATEUR
-    else if (isClient && ["N", "AA", "AC"].includes(delivery)) {
-      return LotStatus.Inbox
-    }
-  }
-
-  return LotStatus.Weird
+export interface StatusTabsProps {
+  loading: boolean
+  count: Snapshot["lots"] | undefined
 }
 
-function getStatusText(
-  t: TFunction<"translation">,
-  tx: Transaction | undefined,
-  entity?: Entity,
-  isStock: boolean = false
-): string {
-  if (!tx || tx.lot.status === "Draft") {
-    return isStock ? t("À envoyer") : t("Brouillon")
-  }
-
-  if (tx.is_forwarded) {
-    if (tx.child_tx !== null) {
-      let child_tx = tx.child_tx as Transaction
-      return t("Transféré") + " - " + child_tx.carbure_client?.name
-    } else {
-      return t("Transféré")
-    }
-  }
-
-  const isVendor = tx.carbure_vendor?.id === entity?.id
-  const isOwner =
-    tx.carbure_vendor === null && tx.lot.added_by?.id === entity?.id
-
-  switch (tx.delivery_status) {
-    case DeliveryStatus.Pending:
-      return t("En attente")
-    case DeliveryStatus.Accepted:
-      return isStock ? t("En stock") : t("Accepté")
-    case DeliveryStatus.Rejected:
-      return t("Refusé")
-    case DeliveryStatus.ToFix:
-      return isVendor || isOwner ? t("À corriger") : t("En correction")
-    case DeliveryStatus.Fixed:
-      return t("Corrigé")
-    case DeliveryStatus.Frozen:
-      return t("Déclaré")
-  }
-}
-
-function getStatusClass(
-  tx: Transaction | undefined,
-  entity?: Entity,
-  isStock: boolean = false
-): string {
-  if (!tx || tx.lot.status === "Draft") {
-    return isStock ? styles.statusWaiting : ""
-  }
-
-  if (tx.is_forwarded) {
-    return styles.statusWaiting
-  }
-
-  switch (tx.delivery_status) {
-    case DeliveryStatus.Pending:
-      return styles.statusWaiting
-    case DeliveryStatus.Rejected:
-      return styles.statusRejected
-    case DeliveryStatus.ToFix:
-      return styles.statusToFix
-    case DeliveryStatus.Fixed:
-    case DeliveryStatus.Accepted:
-    case DeliveryStatus.Frozen:
-      return styles.statusAccepted
-  }
-}
-
-type StatusProps = {
-  stock?: boolean
-  small?: boolean
-  entity?: Entity
-  transaction: Transaction | undefined
-}
-
-const Status = ({ stock, small, transaction, entity }: StatusProps) => {
+export const StatusTabs = ({
+  loading,
+  count = defaultCount,
+}: StatusTabsProps) => {
   const { t } = useTranslation()
 
   return (
-    <span
-      className={cl(
-        styles.status,
-        small && styles.smallStatus,
-        getStatusClass(transaction, entity, stock)
-      )}
-    >
-      {getStatusText(t, transaction, entity, stock)}
-    </span>
+    <Tabs
+      variant="main"
+      className={css.statusTabs}
+      tabs={[
+        {
+          key: "draft",
+          path: "drafts",
+          label: (
+            <StatusRecap
+              loading={loading}
+              count={count.draft}
+              label={t("Brouillon", { count: count.draft })}
+            />
+          ),
+        },
+        {
+          key: "in",
+          path: "in",
+          label: (
+            <StatusRecap
+              loading={loading}
+              count={count.in_total}
+              pending={count.in_pending}
+              tofix={count.in_tofix}
+              label={t("Lots reçus", { count: count.in_total })}
+            />
+          ),
+        },
+        {
+          key: "stock",
+          path: "stocks",
+          label: (
+            <StatusRecap
+              loading={loading}
+              count={count.stock}
+              label={t("Lots en stock", { count: count.stock })}
+            />
+          ),
+        },
+        {
+          key: "out",
+          path: "out",
+          label: (
+            <StatusRecap
+              loading={loading}
+              count={count.out_total}
+              pending={count.out_pending}
+              tofix={count.out_tofix}
+              label={t("Lots envoyés", { count: count.out_total })}
+            />
+          ),
+        },
+      ]}
+    />
   )
 }
-type StatusTitleProps = {
-  stock?: boolean
-  editable?: boolean
-  details?: LotDetails | null
-  entity?: Entity
-  children: React.ReactNode
+
+const defaultCount: Snapshot["lots"] = {
+  draft: 0,
+  in_pending: 0,
+  in_tofix: 0,
+  in_total: 0,
+  stock: 0,
+  stock_total: 0,
+  out_pending: 0,
+  out_tofix: 0,
+  out_total: 0,
 }
 
-export const StatusTitle = ({
-  stock,
-  editable,
-  details,
-  entity,
-  children,
-}: StatusTitleProps) => {
-  const deadlineDate = details
-    ? format(new Date(details.deadline), "d MMMM Y", { locale: fr })
-    : null
+interface StatusRecapProps {
+  loading: boolean
+  count: number
+  label: string
+  pending?: number
+  tofix?: number
+}
+
+const StatusRecap = ({
+  loading,
+  count = 0,
+  pending = 0,
+  tofix = 0,
+  label,
+}: StatusRecapProps) => {
+  const { t } = useTranslation()
+  const hasAlert = pending > 0 || tofix > 0
 
   return (
-    <Box row className={styles.statusTitle}>
-      <Status
-        stock={stock}
-        transaction={details?.transaction}
-        entity={entity}
-      />
+    <>
+      <Row className={cl(hasAlert && css.recto)}>
+        <Col>
+          <p>{loading ? <Loader size={20} /> : formatNumber(count)}</p>
+          <strong>{label}</strong>
+        </Col>
 
-      <Title>{children}</Title>
+        {hasAlert && (
+          <Col
+            style={{
+              marginLeft: "auto",
+              alignItems: "flex-end",
+              justifyContent: "center",
+            }}
+          >
+            <Bell
+              size={32}
+              color="var(--orange-dark)"
+              style={{ transform: "rotate(45deg)" }}
+            />
+          </Col>
+        )}
+      </Row>
 
-      <AddedBy transaction={details?.transaction} />
-
-      {details && hasDeadline(details.transaction, details.deadline) && (
-        <span className={styles.transactionDeadline}>
-          <Trans>
-            À valider avant le <b>{{ deadlineDate }}</b>
-          </Trans>
-        </span>
+      {hasAlert && (
+        <Col className={css.verso}>
+          {pending > 0 && (
+            <p>
+              <strong>{formatNumber(pending)}</strong>{" "}
+              {t("lots en attente", { count: pending })}
+            </p>
+          )}
+          {tofix > 0 && (
+            <p>
+              <strong>{formatNumber(tofix)}</strong>{" "}
+              {t("lots à corriger", { count: tofix })}
+            </p>
+          )}
+        </Col>
       )}
-
-      {editable && (
-        <span className={styles.transactionEditable}>
-          <Trans>* Les champs marqués d'une étoile sont obligatoires</Trans>
-        </span>
-      )}
-    </Box>
+    </>
   )
 }
 
-const AddedBy = ({
-  transaction: tx,
-}: {
-  transaction: Transaction | undefined
-}) => {
-  const entity = tx?.lot.added_by?.name
-  const date = tx?.lot.added_time && formatDate(tx.lot.added_time)
-
-  if (!entity || !date) return null
-
-  return (
-    <span className={styles.addedBy}>
-      <Trans>
-        par <b>{{ entity }}</b> le {{ date }}
-      </Trans>
-    </span>
-  )
+export function useStatus() {
+  const match = useMatch<"status", string>("/org/:entity/transactions/:year/:status/*") // prettier-ignore
+  return (match?.params.status ?? "unknown") as Status
 }
 
-export default Status
+export default StatusTabs
