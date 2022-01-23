@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { Route, Routes } from "react-router-dom"
 import { Entity } from "carbure/types"
 import { Trans, useTranslation } from "react-i18next"
@@ -6,8 +7,7 @@ import { Section } from "common/components/section"
 import IframeResizer from "iframe-resizer-react"
 import useAPI from "common/hooks/use-api"
 import api from "common/services/api"
-import { useEffect } from "react"
-import { EntityType } from "common/types"
+import { EntityType } from "carbure/types"
 
 function getHash(entityId: number) {
   return api.get("/settings/entity-hash", { entity_id: entityId })

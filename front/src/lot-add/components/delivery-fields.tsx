@@ -1,16 +1,18 @@
 import { useTranslation } from "react-i18next"
-import useEntity from 'carbure/hooks/entity'
+import useEntity from "carbure/hooks/entity"
 import { Fieldset, useBind, useFormContext } from "common-v2/components/form"
 import Autocomplete, {
   AutocompleteProps,
 } from "common-v2/components/autocomplete"
-import { TextInput, DateInput, TextInputProps, DateInputProps } from "common-v2/components/input"
+import { DateInput, DateInputProps } from "common-v2/components/input"
 import { UserCheck } from "common-v2/components/icons"
 import * as api from "common-v2/api"
 import * as norm from "common-v2/utils/normalizers"
 import { LotFormValue } from "./lot-form"
 import { Entity } from "carbure/types"
 import { Country, Depot } from "common/types"
+import Select, { SelectProps } from "common-v2/components/select"
+import { DeliveryType } from "transactions/types"
 
 interface DeliveryFieldsProps {
   readOnly?: boolean
@@ -20,9 +22,11 @@ export const DeliveryFields = (props: DeliveryFieldsProps) => {
   const { t } = useTranslation()
   return (
     <Fieldset label={t("Livraison")}>
+      <MyCertificateField {...props} />
       <SupplierField {...props} />
       <SupplierCertificateField {...props} />
       <ClientField {...props} />
+      <DeliveryTypeField {...props} />
       <DeliverySiteField {...props} />
       <DeliverySiteCountryField {...props} />
       <DeliveryDateField {...props} />
@@ -44,9 +48,9 @@ export const SupplierField = (props: AutocompleteProps<Entity | string>) => {
       value={supplier}
       icon={isKnown ? UserCheck : undefined}
       create={norm.identity}
-      defaultOptions={isKnown ? [supplier] : [entity]}
+      defaultOptions={supplier ? [supplier] : [entity]}
       getOptions={async () => [entity]}
-      normalize={norm.normalizeEntity}
+      normalize={norm.normalizeEntityOrUnknown}
       {...bound}
       {...props}
     />
@@ -55,20 +59,57 @@ export const SupplierField = (props: AutocompleteProps<Entity | string>) => {
 
 export const SupplierCertificateField = (props: AutocompleteProps<string>) => {
   const { t } = useTranslation()
+  const entity = useEntity()
   const { value, bind } = useFormContext<LotFormValue>()
   const bound = bind("supplier_certificate")
 
-  const supplier =
-    value.supplier instanceof Object
-      ? value.supplier
-      : undefined
+  const supplier = value.supplier instanceof Object ? value.supplier : undefined
+  const isSupplier = entity.id === supplier?.id
 
   return (
     <Autocomplete
       label={t("Certificat du fournisseur")}
       placeholder={supplier?.default_certificate}
       defaultOptions={bound.value ? [bound.value] : undefined}
-      getOptions={(query) => api.findCertificates(query, { entity_id: supplier?.id })}
+      getOptions={(query) =>
+        isSupplier
+          ? api.findMyCertificates(query, { entity_id: entity.id })
+          : api.findCertificates(query)
+      }
+      {...bound}
+      {...props}
+    />
+  )
+}
+
+export const MyCertificateField = (props: AutocompleteProps<string>) => {
+  const { t } = useTranslation()
+  const entity = useEntity()
+  const { value, bind } = useFormContext<LotFormValue>()
+  const bound = bind("vendor_certificate")
+
+  const supplier = value.supplier instanceof Object ? value.supplier : undefined
+  const client = value.client instanceof Object ? value.client : undefined
+
+  // hide this field if this entity is NOT an intermediary
+  // or if the supplier and client are not defined
+  if (
+    supplier?.id === entity.id ||
+    client?.id === entity.id ||
+    !value.supplier ||
+    !value.client
+  ) {
+    return null
+  }
+
+  return (
+    <Autocomplete
+      label={t("Votre certificat")}
+      placeholder={entity?.default_certificate}
+      defaultOptions={bound.value ? [bound.value] : undefined}
+      getOptions={(query) =>
+        api.findMyCertificates(query, { entity_id: entity.id })
+      }
       {...bound}
       {...props}
     />
@@ -91,9 +132,49 @@ export const ClientField = (props: AutocompleteProps<Entity | string>) => {
       create={norm.identity}
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={api.findEntities}
-      normalize={norm.normalizeEntity}
+      normalize={norm.normalizeEntityOrUnknown}
       {...bound}
       {...props}
+    />
+  )
+}
+
+export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
+  const { t } = useTranslation()
+  const entity = useEntity()
+  const { value, bind } = useFormContext<LotFormValue>()
+
+  const isDraft = value.lot === undefined || value.lot.lot_status === "DRAFT"
+
+  const isCreator =
+    value.lot?.added_by instanceof Object
+      ? value.lot.added_by.id === entity.id
+      : value.lot === undefined
+
+  const isClient =
+    value.client instanceof Object
+      ? value.client.id === entity.id //
+      : false
+
+  if (!isDraft || !isCreator || !isClient) {
+    return null
+  }
+
+  return (
+    <Select
+      clear
+      label={t("Type de livraison")}
+      placeholder={t("Choisissez un type")}
+      normalize={norm.normalizeDeliveryType}
+      {...bind("delivery_type")}
+      {...props}
+      options={[
+        DeliveryType.Blending,
+        DeliveryType.Stock,
+        DeliveryType.RFC,
+        DeliveryType.Direct,
+        DeliveryType.Export,
+      ]}
     />
   )
 }

@@ -1,12 +1,15 @@
 import { AxiosResponse } from "axios"
+import { Entity } from "carbure/types"
 import {
   Biofuel,
   Feedstock,
   Country,
-  DeliverySite,
-  Entity,
+  Depot,
+  Certificate,
   ProductionSiteDetails,
+  EntityCertificate,
 } from "common/types"
+
 import api, { Api } from "./services/api"
 
 export function extract<T>(res: AxiosResponse<Api<T[]>>) {
@@ -49,22 +52,32 @@ export function findProductionSites(query?: string, producer_id?: number) {
 
 export function findDepots(query: string, entity_id?: number) {
   return api
-    .get<Api<DeliverySite[]>>("/v3/common/delivery-sites", {
+    .get<Api<Depot[]>>("/v3/common/delivery-sites", {
       params: { query, entity_id },
     })
     .then(extract)
 }
 
-export function findCertificates(
+export function findCertificates(query: string) {
+  return api
+    .get<Api<Certificate[]>>("/get-certificates", { params: { query } })
+    .then(extract)
+    .then((certificates) => certificates.map((c) => c.certificate_id))
+}
+
+export function findMyCertificates(
   query: string,
   options: {
     entity_id?: number | null
-    production_site?: number | null | undefined
+    production_site_id?: number | null | undefined
   }
 ) {
   return api
-    .get<Api<string[]>>("/v3/common/certificates", {
+    .get<Api<EntityCertificate[]>>("/get-my-certificates", {
       params: { query, ...options },
     })
     .then(extract)
+    .then((certificates) =>
+      certificates.map((c) => c.certificate.certificate_id)
+    )
 }

@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import useEntity from 'carbure/hooks/entity'
+import useEntity from "carbure/hooks/entity"
 import Autocomplete, {
   AutocompleteProps,
 } from "common-v2/components/autocomplete"
@@ -49,9 +49,9 @@ export const ProducerField = (props: AutocompleteProps<Entity | string>) => {
       <TextInput
         label={t("Producteur")}
         icon={isKnown ? UserCheck : undefined}
-        value={(isKnown ? value.name : value)}
+        value={isKnown ? value.name : value}
         {...bound}
-        {...props as TextInputProps}
+        {...(props as TextInputProps)}
       />
     )
   }
@@ -64,7 +64,7 @@ export const ProducerField = (props: AutocompleteProps<Entity | string>) => {
       icon={isKnown ? UserCheck : undefined}
       create={norm.identity}
       defaultOptions={value ? [value] : [entity]}
-      normalize={norm.normalizeEntity}
+      normalize={norm.normalizeEntityOrUnknown}
       {...bound}
       {...props}
     />
@@ -81,7 +81,8 @@ export const ProductionSiteField = (
   const isKnown = productionSite instanceof Object
 
   const isKnownProducer = value.producer instanceof Object
-  const producer = value.producer instanceof Object ? value.producer.id : undefined
+  const producer =
+    value.producer instanceof Object ? value.producer.id : undefined
 
   if (!isKnownProducer) {
     return (
@@ -90,7 +91,7 @@ export const ProductionSiteField = (
         icon={isKnown ? UserCheck : undefined}
         value={isKnown ? productionSite.name : productionSite}
         {...bound}
-        {...props as TextInputProps}
+        {...(props as TextInputProps)}
       />
     )
   }
@@ -114,10 +115,11 @@ export const ProductionSiteCertificateField = (
   props: AutocompleteProps<string>
 ) => {
   const { t } = useTranslation()
+  const entity = useEntity()
   const { value, bind } = useFormContext<LotFormValue>()
   const bound = bind("production_site_certificate")
 
-  const production_site =
+  const production_site_id =
     value.production_site instanceof Object
       ? value.production_site.id
       : undefined
@@ -126,7 +128,14 @@ export const ProductionSiteCertificateField = (
     <Autocomplete
       label={t("Certificat du site de production")}
       defaultOptions={bound.value ? [bound.value] : undefined}
-      getOptions={(query) => api.findCertificates(query, { production_site })} // prettier-ignore
+      getOptions={(query) =>
+        production_site_id !== undefined
+          ? api.findMyCertificates(query, {
+              entity_id: entity.id,
+              production_site_id,
+            })
+          : api.findCertificates(query)
+      }
       {...bound}
       {...props}
     />

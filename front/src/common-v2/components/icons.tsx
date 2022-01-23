@@ -4,17 +4,14 @@ import css from "./icons.module.css"
 
 // icons were adapted from https://github.com/tabler/tabler-icons
 
-export interface IconProps {
+export interface IconProps
+  extends Omit<React.SVGProps<SVGSVGElement>, "stroke"> {
   passthrough?: boolean
-  className?: string
-  style?: React.CSSProperties
   size?: number
   color?: string
   fill?: string
   stroke?: number
   title?: string
-  children?: React.ReactNode
-  onClick?: React.MouseEventHandler<SVGSVGElement>
 }
 
 const Icon = ({
@@ -273,7 +270,6 @@ export const Flask = ({ className, ...props }: IconProps) => (
 
 export const Forward = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("forward", className)}>
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M12 18h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v7.5" />
     <path d="M3 6l9 6l9 -6" />
     <path d="M15 18h6" />
@@ -391,5 +387,31 @@ export const History = ({ className, ...props }: IconProps) => (
 export const Wrench = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("wrench", className)}>
     <path d="M7 10h3v-3l-3.5 -3.5a6 6 0 0 1 8 8l6 6a2 2 0 0 1 -3 3l-6 -6a6 6 0 0 1 -8 -8l3.5 3.5" />
+  </Icon>
+)
+
+export const Split = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("split", className)}>
+    <path d="M21 17h-8l-3.5 -5h-6.5" />
+    <path d="M21 7h-8l-3.495 5" />
+    <path d="M18 10l3 -3l-3 -3" />
+    <path d="M18 20l3 -3l-3 -3" />
+  </Icon>
+)
+
+export const Drop = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("drop", className)}>
+    <path d="M6.8 11a6 6 0 1 0 10.396 0l-5.197 -8l-5.2 8z" />
+    <path d="M6 14h12" />
+    <path d="M7.305 17.695l3.695 -3.695" />
+    <path d="M10.26 19.74l5.74 -5.74l-5.74 5.74z" />
+  </Icon>
+)
+
+export const InfoCircle = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("info-circle", className)}>
+    <circle cx="12" cy="12" r="9" />
+    <line x1="12" y1="8" x2="12.01" y2="8" />
+    <polyline points="11 12 12 12 12 16 13 16" />
   </Icon>
 )

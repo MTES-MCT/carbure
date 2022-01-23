@@ -1,4 +1,4 @@
-FROM node:alpine
+FROM node:16-alpine
 
 WORKDIR /app
 
@@ -8,6 +8,7 @@ COPY front/package.json /app/
 COPY front/package-lock.json /app/
 
 ENV PATH /app/node_modules/.bin:$PATH
+ENV WDS_SOCKET_PORT 0
 
 RUN npm install
 

@@ -3,7 +3,7 @@ import cl from "clsx"
 
 import { Box, SystemProps } from "."
 import styles from "./table.module.css"
-import { ChevronRight, IconProps } from "./icons"
+import { ChevronRight, IconProps } from "common-v2/components/icons"
 import { TFunctionResult } from "i18next"
 
 type LineProps = {
@@ -152,4 +152,9 @@ export default function Table<T>({
       ))}
     </Box>
   )
+}
+
+export const padding: Column<any> = {
+  className: styles.paddingColumn,
+  render: () => null,
 }

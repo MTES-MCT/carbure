@@ -1,5 +1,6 @@
 import axios from "axios"
-import { stringify } from "querystring"
+
+const API_ROOT = `${window.location.origin}/api`
 
 export interface Api<T> {
   status: "success" | "error"
@@ -8,28 +9,20 @@ export interface Api<T> {
 }
 
 export const api = axios.create({
-  baseURL: `${window.location.origin}/api`,
+  baseURL: API_ROOT,
   xsrfCookieName: "csrftoken",
   xsrfHeaderName: "X-CSRFTOKEN",
-  paramsSerializer: (params) => stringify(filterParams(params)),
-  transformRequest: (data) => toFormData(data)
+  paramsSerializer: (params) => toSearchParams(params).toString(),
+  transformRequest: (data) => toFormData(data),
 })
 
-// keep only parameters that are defined
-export function filterParams(params: any) {
-  const okParams: any = {}
-  for (const key in params) {
-    if (!isEmpty(params[key])) {
-      okParams[key] = params[key]
-    }
-  }
-  return okParams
+export function download(endpoint: string, params: any) {
+  return window.open(API_ROOT + endpoint + "?" + toSearchParams(params))
 }
 
 // converts an javascript object into FormData
 function toFormData(obj: any): FormData {
   const formData = new FormData()
-
   for (const key in obj) {
     if (Array.isArray(obj[key])) {
       obj[key].forEach((value: any) => formData.append(key, value.toString()))
@@ -37,8 +30,20 @@ function toFormData(obj: any): FormData {
       formData.append(key, obj[key])
     }
   }
-
   return formData
+}
+
+function toSearchParams(params: any) {
+  const urlParams = new URLSearchParams()
+  for (const key in params) {
+    const param = params[key]
+    if (Array.isArray(param)) {
+      param.forEach((value) => urlParams.append(key, value))
+    } else if (!isEmpty(param)) {
+      urlParams.append(key, param)
+    }
+  }
+  return urlParams
 }
 
 function isEmpty(value: any) {

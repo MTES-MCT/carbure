@@ -1,11 +1,12 @@
 import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 
-import { Entity } from "carbure/types"
-import { ProductionSiteDetails, UserRole } from "common/types"
+import { Entity, UserRole } from "carbure/types"
+import { ProductionSiteDetails } from "common/types"
 
 import useAPI from "common/hooks/use-api"
 import * as api from "../api"
+import * as api2 from "../api-v2"
 import {
   ProductionSitePrompt,
   ProductionSiteState,
@@ -40,7 +41,7 @@ export default function useProductionSites(
 
   const [requestSetProductionSiteMP, resolveSetProductionSiteMP] = useAPI(api.setProductionSiteMP) // prettier-ignore
   const [requestSetProductionSiteBC, resolveSetProductionSiteBC] = useAPI(api.setProductionSiteBC) // prettier-ignore
-  const [requestSetProductionSiteCertificates, resolveSetProductionSiteCertificates] = useAPI(api.setProductionSiteCertificates) // prettier-ignore
+  const [requestSetProductionSiteCertificates, resolveSetProductionSiteCertificates] = useAPI(api2.setProductionSiteCertificates) // prettier-ignore
 
   const entityID = entity?.id
   const productionSites = requestGetProductionSites.data ?? []

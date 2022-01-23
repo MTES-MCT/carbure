@@ -1,4 +1,4 @@
-import { useAsyncList } from "common-v2/hooks/async"
+import { useAsyncList } from "common-v2/hooks/async-list"
 import { useEffect, useRef, useState } from "react"
 import {
   defaultNormalizer,
@@ -122,6 +122,10 @@ export function useAutocomplete<T, V>({
   useEffect(() => {
     if (asyncOptions.label) setQuery(asyncOptions.label)
   }, [asyncOptions.label])
+
+  useEffect(() => {
+    if (value === undefined) setQuery("")
+  }, [value])
 
   const [suggestions, setSuggestions] = useState(options ?? [])
   useEffect(() => setSuggestions(asyncOptions.items), [asyncOptions.items])

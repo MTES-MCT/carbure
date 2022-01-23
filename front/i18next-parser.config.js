@@ -3,7 +3,7 @@ module.exports = {
   output: "public/locales/$LOCALE/$NAMESPACE.json",
   locales: ["fr", "en"],
   keySeparator: false,
-  nsSeparator: false,
+  namespaceSeparator: false,
   verbose: true,
   useKeysAsDefaultValue: true,
 }

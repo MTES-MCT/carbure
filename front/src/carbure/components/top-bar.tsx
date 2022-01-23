@@ -2,7 +2,9 @@ import { useEffect } from "react"
 import { Link, Route, Routes, useLocation, useNavigate } from "react-router-dom"
 import { Trans, useTranslation } from "react-i18next"
 import useEntity, { EntityManager } from "carbure/hooks/entity"
-import { UserManager, useUserContext } from "carbure/hooks/user"
+import { UserManager, useUser } from "carbure/hooks/user"
+import useLocalStorage from "common-v2/hooks/storage"
+import { useMatomo } from "matomo"
 import Menu from "common-v2/components/menu"
 import { Anchors } from "common-v2/components/dropdown"
 import { Header } from "common-v2/components/scaffold"
@@ -13,11 +15,10 @@ import { ChevronRight, Question } from "common-v2/components/icons"
 import republique from "../assets/images/republique.svg"
 import marianne from "../assets/images/Marianne.svg"
 import css from "./top-bar.module.css"
-import useLocalStorage from "common-v2/hooks/storage"
 
 const Topbar = () => {
   const entity = useEntity()
-  const user = useUserContext()
+  const user = useUser()
 
   if (!user.isAuthenticated()) {
     return <PublicTopbar />
@@ -152,6 +153,7 @@ const languages = [
 
 const LanguageSelection = () => {
   const { i18n } = useTranslation()
+  const matomo = useMatomo()
 
   const [lang, setLang] = useLocalStorage<Lang | undefined>(
     "carbure:language",
@@ -167,7 +169,10 @@ const LanguageSelection = () => {
       asideX
       variant="text"
       value={lang}
-      onChange={setLang}
+      onChange={(lang) => {
+        matomo.push(["trackEvent", "menu", "change-language", lang])
+        setLang(lang)
+      }}
       options={languages}
     />
   )
@@ -180,13 +185,19 @@ interface UserMenuProps {
 
 const UserMenu = ({ user, entity }: UserMenuProps) => {
   const { t } = useTranslation()
+  const matomo = useMatomo()
   const location = useLocation()
   const navigate = useNavigate()
 
   return (
     <Menu
       variant="text"
-      onAction={(path) => navigate(path)}
+      onAction={(path) => {
+        if (path.includes("/org")) {
+          matomo.push(["trackEvent", "menu", "change-entity", path])
+        }
+        navigate(path)
+      }}
       label={entity.isBlank ? t("Menu") : entity.name}
       anchor={Anchors.bottomRight}
       items={[

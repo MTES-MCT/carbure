@@ -1,5 +1,5 @@
 from django.urls import path, include
-from api.v4 import views
+from api.v4 import views, certificates, admin
 
 urlpatterns = [
     # GET
@@ -12,7 +12,7 @@ urlpatterns = [
     # POST
     ### Lot initial life
     path('lots/add', views.add_lot, name='api-v4-add-lots'),
-    path('lots/add-excel', views.get_snapshot, name='api-v4-add-excel'),
+    path('lots/add-excel', views.add_excel, name='api-v4-add-excel'),
     path('lots/duplicate', views.duplicate_lot, name='api-v4-duplicate-lot'),
     path('lots/update', views.update_lot, name='api-v4-update-lot'),
     path('lots/send', views.lots_send, name='api-v4-send-lots'),
@@ -25,12 +25,15 @@ urlpatterns = [
     path('lots/reject', views.reject_lot, name='api-v4-reject-lots'),
     path('lots/recall', views.recall_lot, name='api-v4-recall-lot'),
     ### Approval
-    path('lots/accept-release-for-consumption', views.accept_rfc, name='api-v4-accept-rfc'),
+    path('lots/accept-release-for-consumption', views.accept_rfc, name='api-v4-accept-rfc'), ### is this necessary? MAC are tagged when they are sent usually
     path('lots/accept-in-stock', views.accept_in_stock, name='api-v4-accept-in-stock'),
     path('lots/accept-trading', views.accept_trading, name='api-v4-accept-trading'),
     path('lots/accept-processing', views.accept_processing, name='api-v4-accept-processing'),
     path('lots/accept-blending', views.accept_blending, name='api-v4-accept-blending'),
     path('lots/accept-export', views.accept_export, name='api-v4-accept-export'),
+    path('lots/accept-direct-delivery', views.accept_direct_delivery, name='api-v4-accept-direct-delivery'),
+    ### Warnings
+    path('lots/toggle-warning', views.toggle_warning, name='api-v4-toggle-warning'),
 
     # STOCKS
     path('stocks', views.get_stock, name='api-v4-get-stock'),
@@ -53,11 +56,26 @@ urlpatterns = [
     #path('summary', views.get_lots_summary, name='api-v3-lots-get-lots-summary'),
     # POST
     # IMPORT/FILES
-    #path('upload', views.upload, name='api-v3-upload'),
-    #path('upload-blend', views.upload_blend, name='api-v3-upload-blend'),
-    #path('download-template-simple', views.get_template_producers_simple, name='api-v3-template-simple'),
-    #path('download-template-advanced', views.get_template_producers_advanced, name='api-v3-template-advanced'),
-    #path('download-template-advanced-10k', views.get_template_producers_advanced_10k, name='api-v3-template-advanced-10k'),
-    #path('download-template-blend', views.get_template_blend, name='api-v3-template-blend'),
-    #path('download-template-trader', views.get_template_trader, name='api-v3-template-trader'),
+    path('download-template', views.get_template, name='api-v4-get-template'),
+    path('download-template-stock', views.get_template_stock, name='api-v4-get-template-stock'),
+
+
+    # SETTINGS
+    path('get-certificates', certificates.get_certificates, name='api-v4-settings-get-certificates'),
+    path('add-certificate', certificates.add_certificate, name='api-v4-settings-add-certificate'),
+    path('delete-certificate', certificates.delete_certificate, name='api-v4-settings-delete-certificate'),
+    path('update-certificate', certificates.update_certificate, name='api-v4-settings-update-certificate'),
+    path('get-my-certificates', certificates.get_my_certificates, name='api-v4-settings-get-my-certificates'),
+    path('set-production-site-certificates', certificates.set_production_site_certificates, name='api-v4-settings-set-production-site-certificates'),
+    path('set-default-certificate', certificates.set_default_certificate, name='api-v4-settings-set-default-certificate'),
+
+
+    # ADMIN
+    path('admin/years', admin.get_years, name='api-v4-admin-get-years'),
+    path('admin/snapshot', admin.get_snapshot, name='api-v4-admin-get-snapshot'),
+    path('admin/lots', admin.get_lots, name='api-v4-admin-get-lots'),
+    path('admin/lots/toggle-warning', admin.toggle_warning, name='api-v4-admin-toggle-warning'),
+    path('admin/lots/summary', admin.get_lots_summary, name='api-v4-admin-get-lots-summary'),
+    path('admin/lots/details', admin.get_lot_details, name='api-v4-admin-get-lot-details'),
+    path('admin/lots/filters', admin.get_lots_filters, name='api-v4-admin-get-lots-filters'),
 ]

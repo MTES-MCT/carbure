@@ -1,10 +1,13 @@
 import { Entity } from "carbure/types"
-import { Lot, LotError } from "transactions-v2/types"
+import { Lot, LotError, Stock } from "transactions/types"
 
 export interface LotDetails {
   lot: Lot
-  children: Lot[]
-  distance: Distance
+  parent_lot: Lot | null
+  parent_stock: Stock | null
+  children_lot: Lot[]
+  children_stock: Stock[]
+  distance: Distance | null
   updates: LotUpdate<any>[]
   comments: LotComment[]
   errors: LotError[]
@@ -17,7 +20,7 @@ export interface Distance {
   source?: string
 }
 
-export interface LotUpdate<T = LotFieldUpdate> {
+export interface LotUpdate<T> {
   user: string
   event_type: string
   event_dt: string
@@ -26,9 +29,9 @@ export interface LotUpdate<T = LotFieldUpdate> {
 }
 
 export interface LotFieldUpdate {
-  field: string
-  value_before: string | number | null
-  value_after: string | number | null
+  added: any[]
+  removed: []
+  changed: [string, any, any][] // [field, value_before, value_after]
 }
 
 export interface LotComment {

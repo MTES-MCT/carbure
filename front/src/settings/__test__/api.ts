@@ -4,14 +4,10 @@ import { setupServer } from "msw/node"
 import { OwnershipType } from "common/types"
 
 import {
-  dbsCertificate,
   deliverySite,
-  isccCertificate,
   operator,
   producer,
   productionSite,
-  redcertCertificate,
-  snCertificate,
   entityRights,
   entityRight,
   entityRequest,
@@ -19,26 +15,19 @@ import {
 import {
   okCountrySearch,
   okDeliverySitesSearch,
-  okISCCSearch,
-  ok2BSSearch,
-  okRedcertSearch,
   okTranslations,
   okErrorsTranslations,
   okFieldsTranslations,
 } from "common/__test__/api"
-import { clone } from "common/__test__/helpers"
+import { clone, Data } from "common/__test__/helpers"
 
-let entity = producer
 let deliverySites: any[] = []
 let productionSites: any[] = []
-let isccCertificates: any[] = []
-let dbsCertificates: any[] = []
-let redcertCertificates: any[] = []
-let snCertificates: any[] = []
 
 export function setEntity(nextEntity: any) {
-  entity = clone(nextEntity)
+  Data.set("entity", nextEntity)
 }
+setEntity(producer)
 
 export function setDeliverySites(nextDeliverySites: any[]) {
   deliverySites = nextDeliverySites.map((ds) => ({
@@ -51,23 +40,8 @@ export function setProductionSites(nextProductionSites: any[]) {
   productionSites = clone(nextProductionSites)
 }
 
-export function setISCCCertificates(nextISCCCertificates: any[]) {
-  isccCertificates = clone(nextISCCCertificates)
-}
-
-export function set2BSCertificates(next2BSCertificates: any[]) {
-  dbsCertificates = clone(next2BSCertificates)
-}
-
-export function setRedcertCertificates(nextRedcertCertificates: any[]) {
-  redcertCertificates = clone(nextRedcertCertificates)
-}
-
-export function setSNCertificates(nextSNCertificates: any[]) {
-  snCertificates = clone(nextSNCertificates)
-}
-
 export const okSettings = rest.get("/api/v3/settings", (req, res, ctx) => {
+  const entity = Data.get("entity")
   return res(
     ctx.json({
       status: "success",
@@ -102,6 +76,8 @@ export const okEmptySettings = rest.get("/api/v3/settings", (req, res, ctx) => {
 export const okDynamicSettings = rest.get(
   "/api/v3/settings",
   (req, res, ctx) => {
+    const entity = Data.get("entity")
+
     return res(
       ctx.json({
         status: "success",
@@ -118,6 +94,7 @@ export const okDynamicSettings = rest.get(
 export const okEnableMac = rest.post(
   "/api/v3/settings/enable-mac",
   (req, res, ctx) => {
+    const entity = Data.get("entity")
     setEntity({
       ...entity,
       has_mac: true,
@@ -129,6 +106,7 @@ export const okEnableMac = rest.post(
 export const okDisableMac = rest.post(
   "/api/v3/settings/disable-mac",
   (req, res, ctx) => {
+    const entity = Data.get("entity")
     setEntity({
       ...entity,
       has_mac: false,
@@ -140,11 +118,11 @@ export const okDisableMac = rest.post(
 export const okEnableTrading = rest.post(
   "/api/v3/settings/enable-trading",
   (req, res, ctx) => {
+    const entity = Data.get("entity")
     setEntity({
       ...entity,
       has_trading: true,
     })
-
     return res(ctx.json({ status: "success" }))
   }
 )
@@ -152,11 +130,11 @@ export const okEnableTrading = rest.post(
 export const okDisableTrading = rest.post(
   "/api/v3/settings/disable-trading",
   (req, res, ctx) => {
+    const entity = Data.get("entity")
     setEntity({
       ...entity,
       has_trading: false,
     })
-
     return res(ctx.json({ status: "success" }))
   }
 )
@@ -254,152 +232,8 @@ export const okSetMatierePremiere = rest.post(
 )
 
 export const okSetCertificates = rest.post(
-  "/api/v3/settings/set-production-site-certificates",
+  "/api/set-production-site-certificates",
   (req, res, ctx) => res(ctx.json({ status: "success" }))
-)
-
-export const okISCC = rest.get(
-  "/api/v3/settings/get-iscc-certificates",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: isccCertificates,
-      })
-    )
-  }
-)
-
-export const okAddISCC = rest.post(
-  "/api/v3/settings/add-iscc-certificate",
-  (req, res, ctx) => {
-    setISCCCertificates([isccCertificate])
-    return res(ctx.json({ status: "success" }))
-  }
-)
-
-export const okDeleteISCC = rest.post(
-  "/api/v3/settings/delete-iscc-certificate",
-  (req, res, ctx) => {
-    setISCCCertificates([])
-    return res(ctx.json({ status: "success" }))
-  }
-)
-
-export const okUpdateISCC = rest.post(
-  "/api/v3/settings/update-iscc-certificate",
-  (req, res, ctx) => {
-    setISCCCertificates([isccCertificate])
-    return res(ctx.json({ status: "success" }))
-  }
-)
-
-export const ok2BS = rest.get(
-  "/api/v3/settings/get-2bs-certificates",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: dbsCertificates,
-      })
-    )
-  }
-)
-
-export const okAdd2BS = rest.post(
-  "/api/v3/settings/add-2bs-certificate",
-  (req, res, ctx) => {
-    set2BSCertificates([dbsCertificate])
-    return res(ctx.json({ status: "success" }))
-  }
-)
-
-export const okDelete2BS = rest.post(
-  "/api/v3/settings/delete-2bs-certificate",
-  (req, res, ctx) => {
-    set2BSCertificates([])
-    return res(ctx.json({ status: "success" }))
-  }
-)
-
-export const okUpdate2BS = rest.post(
-  "/api/v3/settings/update-2bs-certificate",
-  (req, res, ctx) => {
-    set2BSCertificates([dbsCertificate])
-    return res(ctx.json({ status: "success" }))
-  }
-)
-
-export const okRedcert = rest.get(
-  "/api/v3/settings/get-redcert-certificates",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: redcertCertificates,
-      })
-    )
-  }
-)
-
-export const okAddRedcert = rest.post(
-  "/api/v3/settings/add-redcert-certificate",
-  (req, res, ctx) => {
-    setRedcertCertificates([redcertCertificate])
-    return res(ctx.json({ status: "success" }))
-  }
-)
-
-export const okDeleteRedcert = rest.post(
-  "/api/v3/settings/delete-redcert-certificate",
-  (req, res, ctx) => {
-    setRedcertCertificates([])
-    return res(ctx.json({ status: "success" }))
-  }
-)
-
-export const okUpdateRedcert = rest.post(
-  "/api/v3/settings/update-redcert-certificate",
-  (req, res, ctx) => {
-    setRedcertCertificates([redcertCertificate])
-    return res(ctx.json({ status: "success" }))
-  }
-)
-
-export const okSN = rest.get(
-  "/api/v3/settings/get-sn-certificates",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: snCertificates,
-      })
-    )
-  }
-)
-
-export const okAddSN = rest.post(
-  "/api/v3/settings/add-sn-certificate",
-  (req, res, ctx) => {
-    setSNCertificates([snCertificate])
-    return res(ctx.json({ status: "success" }))
-  }
-)
-
-export const okDeleteSN = rest.post(
-  "/api/v3/settings/delete-sn-certificate",
-  (req, res, ctx) => {
-    setSNCertificates([])
-    return res(ctx.json({ status: "success" }))
-  }
-)
-
-export const okUpdateSN = rest.post(
-  "/api/v3/settings/update-sn-certificate",
-  (req, res, ctx) => {
-    setSNCertificates([snCertificate])
-    return res(ctx.json({ status: "success" }))
-  }
 )
 
 export const okEntityRights = rest.get(
@@ -410,7 +244,7 @@ export const okEntityRights = rest.get(
 )
 
 export const okSelfCertificates = rest.get(
-  "http://localhost/api/v3/settings/get-my-certificates",
+  "http://localhost/api/get-my-certificates",
   (req, res, ctx) => {
     return res(ctx.json({ status: "success", data: [] }))
   }
@@ -439,27 +273,8 @@ export default setupServer(
   okSetBiocarburant,
   okSetMatierePremiere,
   okSetCertificates,
-  okISCC,
-  okAddISCC,
-  okDeleteISCC,
-  okUpdateISCC,
-  ok2BS,
-  okAdd2BS,
-  okDelete2BS,
-  okUpdate2BS,
   okDeliverySitesSearch,
   okCountrySearch,
-  okISCCSearch,
-  ok2BSSearch,
-  okRedcertSearch,
-  okRedcert,
-  okAddRedcert,
-  okDeleteRedcert,
-  okUpdateRedcert,
-  okSN,
-  okAddSN,
-  okDeleteSN,
-  okUpdateSN,
   okEntityRights,
   okTranslations,
   okErrorsTranslations,

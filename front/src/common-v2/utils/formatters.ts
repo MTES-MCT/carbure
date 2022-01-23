@@ -57,15 +57,20 @@ export function formatDeadline(deadline: Date | string | null) {
 
 // prepare string for comparison by putting it to lowercase and removing accents
 export function standardize(str: string) {
+  if (!str) return ""
   return str
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
 }
 
+export function capitalize(str: string) {
+  return str[0].toUpperCase() + str.slice(1)
+}
+
 export function variations(count: number) {
-  return (labels: { zero: string; one: string; many: string }) => {
-    if (count === 0) return labels.zero
+  return (labels: { zero?: string; one: string; many: string }) => {
+    if (count === 0) return labels.zero ?? "N/A"
     if (count === 1) return labels.one
     if (count > 1) return labels.many
   }

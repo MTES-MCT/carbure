@@ -5,7 +5,7 @@ from django.http import JsonResponse, HttpResponse
 from core.models import LotV2, LotTransaction, ETBETransformation, TransactionUpdateHistory
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, LotV2, Depot
 from core.decorators import check_rights
-from core.common import calculate_ghg, get_prefetched_data, load_mb_lot, bulk_insert
+from core.common import calculate_ghg, load_mb_lot, bulk_insert
 from core.common import load_excel_file, send_lot_from_stock, generate_carbure_id
 from core.xlsx_v3 import template_stock, template_stock_bcghg
 from django_otp.decorators import otp_required
@@ -146,65 +146,65 @@ def get_depots(request, *args, **kwargs):
     return JsonResponse({'status': 'success', 'data': depots})
 
 
-@check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
-def create_drafts(request, *args, **kwargs):
-    context = kwargs['context']
-    entity_id = request.POST.get('entity_id', False)
-    drafts = request.POST.get('drafts', False)
-    if not entity_id:
-        return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
-    if not drafts:
-        return JsonResponse({'status': 'error', 'message': "Missing drafts"}, status=400)
+# @check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
+# def create_drafts(request, *args, **kwargs):
+#     context = kwargs['context']
+#     entity_id = request.POST.get('entity_id', False)
+#     drafts = request.POST.get('drafts', False)
+#     if not entity_id:
+#         return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
+#     if not drafts:
+#         return JsonResponse({'status': 'error', 'message': "Missing drafts"}, status=400)
 
-    # prefetch some data
-    d = get_prefetched_data(context['entity'])
-    lots = []
-    txs = []
-    all_errors = []
-    try:
-        drafts = json.loads(drafts)
-    except Exception:
-        return JsonResponse({'status': 'error', 'message': "Drafts is invalid json"}, status=400)
+#     # prefetch some data
+#     d = get_prefetched_data(context['entity'])
+#     lots = []
+#     txs = []
+#     all_errors = []
+#     try:
+#         drafts = json.loads(drafts)
+#     except Exception:
+#         return JsonResponse({'status': 'error', 'message': "Drafts is invalid json"}, status=400)
 
-    for i, draft in enumerate(drafts):
-        lot_dict = {}
-        if not 'volume' in draft:
-            return JsonResponse({'status': 'error', 'message': "Missing volume in draft %d" % (i)}, status=400)
-        lot_dict['volume'] = draft['volume']
-        if 'client' not in draft:
-            return JsonResponse({'status': 'error', 'message': "Missing client in draft %d" % (i)}, status=400)
-        lot_dict['client'] = draft['client']
-        if 'delivery_site' not in draft:
-            return JsonResponse({'status': 'error', 'message': "Missing delivery_site in draft %d" % (i)}, status=400)
-        lot_dict['delivery_site'] = draft['delivery_site']
-        if 'delivery_date' not in draft:
-            return JsonResponse({'status': 'error', 'message': "Missing delivery_date in draft %d" % (i)}, status=400)
-        lot_dict['delivery_date'] = draft['delivery_date']
-        if 'dae' not in draft:
-            return JsonResponse({'status': 'error', 'message': "Missing dae in draft %d" % (i)}, status=400)
-        lot_dict['dae'] = draft['dae']
-        if 'mac' in draft:
-            lot_dict['mac'] = draft['mac']
-        if 'delivery_site_country' in draft:
-            lot_dict['delivery_site_country'] = draft['delivery_site_country']
-        if 'vendor_certificate' in draft:
-            lot_dict['vendor_certificate'] = draft['vendor_certificate']
+#     for i, draft in enumerate(drafts):
+#         lot_dict = {}
+#         if not 'volume' in draft:
+#             return JsonResponse({'status': 'error', 'message': "Missing volume in draft %d" % (i)}, status=400)
+#         lot_dict['volume'] = draft['volume']
+#         if 'client' not in draft:
+#             return JsonResponse({'status': 'error', 'message': "Missing client in draft %d" % (i)}, status=400)
+#         lot_dict['client'] = draft['client']
+#         if 'delivery_site' not in draft:
+#             return JsonResponse({'status': 'error', 'message': "Missing delivery_site in draft %d" % (i)}, status=400)
+#         lot_dict['delivery_site'] = draft['delivery_site']
+#         if 'delivery_date' not in draft:
+#             return JsonResponse({'status': 'error', 'message': "Missing delivery_date in draft %d" % (i)}, status=400)
+#         lot_dict['delivery_date'] = draft['delivery_date']
+#         if 'dae' not in draft:
+#             return JsonResponse({'status': 'error', 'message': "Missing dae in draft %d" % (i)}, status=400)
+#         lot_dict['dae'] = draft['dae']
+#         if 'mac' in draft:
+#             lot_dict['mac'] = draft['mac']
+#         if 'delivery_site_country' in draft:
+#             lot_dict['delivery_site_country'] = draft['delivery_site_country']
+#         if 'vendor_certificate' in draft:
+#             lot_dict['vendor_certificate'] = draft['vendor_certificate']
 
 
-        # matching engine keys
-        for key in ['tx_id', 'biocarburant_code', 'matiere_premiere_code', 'depot', 'pays_origine_code', 'ghg_total']:
-            if key in draft:
-                lot_dict[key] = draft[key]
-        # create sub-transaction
-        lot, tx, errors = load_mb_lot(d, context['entity'], request.user, lot_dict, 'MANUAL')
-        calculate_ghg(lot)
-        if tx is None or not tx:
-            return JsonResponse({'status': 'error', 'message': 'Could not add lot %d to database: %s' % (i, errors)}, status=400)
-        lots.append(lot)
-        txs.append(tx)
-        all_errors.append(errors)
-    new_lots, new_txs = bulk_insert(context['entity'], lots, txs, all_errors, d)
-    return JsonResponse({'status': 'success', 'data': {'tx_ids': [tx.id for tx in new_txs]}})
+#         # matching engine keys
+#         for key in ['tx_id', 'biocarburant_code', 'matiere_premiere_code', 'depot', 'pays_origine_code', 'ghg_total']:
+#             if key in draft:
+#                 lot_dict[key] = draft[key]
+#         # create sub-transaction
+#         lot, tx, errors = load_mb_lot(d, context['entity'], request.user, lot_dict, 'MANUAL')
+#         calculate_ghg(lot)
+#         if tx is None or not tx:
+#             return JsonResponse({'status': 'error', 'message': 'Could not add lot %d to database: %s' % (i, errors)}, status=400)
+#         lots.append(lot)
+#         txs.append(tx)
+#         all_errors.append(errors)
+#     new_lots, new_txs = bulk_insert(context['entity'], lots, txs, all_errors, d)
+#     return JsonResponse({'status': 'success', 'data': {'tx_ids': [tx.id for tx in new_txs]}})
 
 
 @check_rights('entity_id')
@@ -309,40 +309,40 @@ def generate_batch(request, *args, **kwargs):
 
     return JsonResponse({'status': 'success', 'data': []})
 
-@check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
-def send_drafts(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
-    tx_ids = request.POST.getlist('tx_ids', False)
-    if not tx_ids:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
+# @check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
+# def send_drafts(request, *args, **kwargs):
+#     context = kwargs['context']
+#     entity = context['entity']
+#     tx_ids = request.POST.getlist('tx_ids', False)
+#     if not tx_ids:
+#         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
 
-    prefetched_data = get_prefetched_data(entity)
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    valid_counter = 0
-    invalid_counter = 0
-    send_errors = []
-    for tx_id in tx_ids:
-        try:
-            tx = LotTransaction.objects.get(id=tx_id)
-            prev_remaining_volume = tx.lot.parent_lot.remaining_volume
-        except Exception:
-            return JsonResponse({'status': 'error', 'message': "Unknown Transaction %s" % (tx_id)},
-                                status=400)
-        sent, errors = send_lot_from_stock(rights, tx, prefetched_data)
-        if sent:
-            valid_counter += 1
-            parent_tx = LotTransaction.objects.filter(lot=tx.lot.parent_lot).last()
-            TransactionUpdateHistory.objects.create(tx=parent_tx, update_type=TransactionUpdateHistory.UPDATE, field='remaining_volume', value_before=prev_remaining_volume, value_after=parent_tx.lot.remaining_volume, modified_by=request.user, modified_by_entity=entity)
-        else:
-            invalid_counter += 1
-            send_errors.append(errors)
+#     prefetched_data = get_prefetched_data(entity)
+#     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+#     valid_counter = 0
+#     invalid_counter = 0
+#     send_errors = []
+#     for tx_id in tx_ids:
+#         try:
+#             tx = LotTransaction.objects.get(id=tx_id)
+#             prev_remaining_volume = tx.lot.parent_lot.remaining_volume
+#         except Exception:
+#             return JsonResponse({'status': 'error', 'message': "Unknown Transaction %s" % (tx_id)},
+#                                 status=400)
+#         sent, errors = send_lot_from_stock(rights, tx, prefetched_data)
+#         if sent:
+#             valid_counter += 1
+#             parent_tx = LotTransaction.objects.filter(lot=tx.lot.parent_lot).last()
+#             TransactionUpdateHistory.objects.create(tx=parent_tx, update_type=TransactionUpdateHistory.UPDATE, field='remaining_volume', value_before=prev_remaining_volume, value_after=parent_tx.lot.remaining_volume, modified_by=request.user, modified_by_entity=entity)
+#         else:
+#             invalid_counter += 1
+#             send_errors.append(errors)
 
-    status_code = 200 if valid_counter > 0 else 400
-    status = 'success' if valid_counter > 0 else 'error'
-    total = valid_counter + invalid_counter
-    data = { 'valid': valid_counter, 'invalid': invalid_counter, 'total': total, 'errors': send_errors }
-    return JsonResponse({'status': status, 'data': data}, status=status_code)
+#     status_code = 200 if valid_counter > 0 else 400
+#     status = 'success' if valid_counter > 0 else 'error'
+#     total = valid_counter + invalid_counter
+#     data = { 'valid': valid_counter, 'invalid': invalid_counter, 'total': total, 'errors': send_errors }
+#     return JsonResponse({'status': status, 'data': data}, status=status_code)
 
 
 def convert_eth_stock_to_etbe(request, entity, c):
@@ -445,56 +445,56 @@ def convert_to_etbe(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
-def forward(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
-    tx_ids = request.POST.getlist('tx_ids', None)
-    recipient = request.POST.get('recipient', None)
-    certificate_id = request.POST.get('certificate_id', None)
+# @check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
+# def forward(request, *args, **kwargs):
+#     context = kwargs['context']
+#     entity = context['entity']
+#     tx_ids = request.POST.getlist('tx_ids', None)
+#     recipient = request.POST.get('recipient', None)
+#     certificate_id = request.POST.get('certificate_id', None)
 
-    prefetched_data = get_prefetched_data(entity)
-    if not tx_ids:
-        return JsonResponse({'status': 'error', 'message': "Missing tx_ids"}, status=400)
-    if not recipient:
-        return JsonResponse({'status': 'error', 'message': "Missing recipient"}, status=400)
+#     prefetched_data = get_prefetched_data(entity)
+#     if not tx_ids:
+#         return JsonResponse({'status': 'error', 'message': "Missing tx_ids"}, status=400)
+#     if not recipient:
+#         return JsonResponse({'status': 'error', 'message': "Missing recipient"}, status=400)
 
-    if certificate_id not in prefetched_data['my_vendor_certificates']:
-        return JsonResponse({'status': 'error', 'message': "Unknown certificate"}, status=400)
+#     if certificate_id not in prefetched_data['my_vendor_certificates']:
+#         return JsonResponse({'status': 'error', 'message': "Unknown certificate"}, status=400)
 
-    # make some checks on the client
-    try:
-        client = Entity.objects.get(id=recipient)
-    except:
-        return JsonResponse({'status': 'error', 'message': "Unknown recipient"}, status=400)
+#     # make some checks on the client
+#     try:
+#         client = Entity.objects.get(id=recipient)
+#     except:
+#         return JsonResponse({'status': 'error', 'message': "Unknown recipient"}, status=400)
 
-    nbforwarded = 0
-    for tx_id in tx_ids:
-        # for each tx, make sure we are the client, status accepted, and it has not been already forwarded
-        try:
-            tx = LotTransaction.objects.get(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN, LotTransaction.PENDING], id=tx_id, carbure_client=entity, is_forwarded=False)
-            parent_tx_id = tx.id
-        except Exception:
-            return JsonResponse({'status': 'error', 'message': "Transaction already forwarded"}, status=400)
+#     nbforwarded = 0
+#     for tx_id in tx_ids:
+#         # for each tx, make sure we are the client, status accepted, and it has not been already forwarded
+#         try:
+#             tx = LotTransaction.objects.get(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN, LotTransaction.PENDING], id=tx_id, carbure_client=entity, is_forwarded=False)
+#             parent_tx_id = tx.id
+#         except Exception:
+#             return JsonResponse({'status': 'error', 'message': "Transaction already forwarded"}, status=400)
 
-        # all good
-        # make current tx as "is_forwarded" and create the next tx
-        if tx.delivery_status == LotTransaction.PENDING:
-            tx.delivery_status = LotTransaction.ACCEPTED
-        tx.is_forwarded = True
-        tx.save()
+#         # all good
+#         # make current tx as "is_forwarded" and create the next tx
+#         if tx.delivery_status == LotTransaction.PENDING:
+#             tx.delivery_status = LotTransaction.ACCEPTED
+#         tx.is_forwarded = True
+#         tx.save()
 
-        new_tx = tx
-        new_tx.pk = None
-        new_tx.parent_tx = LotTransaction.objects.get(id=parent_tx_id)
-        new_tx.is_forwarded = False
-        new_tx.carbure_vendor = entity
-        new_tx.carbure_vendor_certificate = certificate_id
-        new_tx.client_is_in_carbure = True
-        new_tx.carbure_client = client
-        new_tx.unknown_client = ''
-        new_tx.delivery_status = LotTransaction.PENDING
-        new_tx.save()
-        nbforwarded += 1
+#         new_tx = tx
+#         new_tx.pk = None
+#         new_tx.parent_tx = LotTransaction.objects.get(id=parent_tx_id)
+#         new_tx.is_forwarded = False
+#         new_tx.carbure_vendor = entity
+#         new_tx.carbure_vendor_certificate = certificate_id
+#         new_tx.client_is_in_carbure = True
+#         new_tx.carbure_client = client
+#         new_tx.unknown_client = ''
+#         new_tx.delivery_status = LotTransaction.PENDING
+#         new_tx.save()
+#         nbforwarded += 1
 
-    return JsonResponse({'status': 'success', 'data': {'forwarded': nbforwarded}})
+#     return JsonResponse({'status': 'success', 'data': {'forwarded': nbforwarded}})

@@ -3,7 +3,7 @@ import cl from "clsx"
 
 import styles from "./index.module.css"
 
-import { Loader } from "./icons"
+import { Loader } from "common-v2/components/icons"
 
 export type SystemProps = {
   className?: string
@@ -38,7 +38,9 @@ export const Box = ({
 
 export const Main = (props: BoxProps) => <Box {...props} as="main" />
 
-export const Header = (props: BoxProps) => <Box {...props} as="header" className={cl(styles.header, props.className)} />
+export const Header = (props: BoxProps) => (
+  <Box {...props} as="header" className={cl(styles.header, props.className)} />
+)
 
 // TITLE COMPONENT
 

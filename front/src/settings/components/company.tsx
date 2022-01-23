@@ -2,7 +2,7 @@ import { Trans, useTranslation } from "react-i18next"
 
 import { EntityManager } from "carbure/hooks/entity"
 import { CompanySettingsHook } from "../hooks/use-company"
-import { UserRole } from "common/types"
+import { UserRole } from "carbure/types"
 import { Title, LoaderOverlay } from "common/components"
 import { Label } from "common/components/input"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
@@ -48,7 +48,7 @@ const CompanySettings = ({ entity, settings }: CompanySettingsProps) => {
           />
         )}
 
-        {settings.certificates.length > 0 && (
+        {(isTrader || isProducer) && settings.certificates.length > 0 && (
           <Label
             label={t("Certificat par défaut")}
             className={styles.settingsSelect}

@@ -91,6 +91,7 @@ div > .settingsSelect {
   font-size: 0.87em;
   margin-left: 12px;
   padding: 4px 8px;
+  flex-shrink: 0;
 }
 
 .expirationDate.expired button :global(.icon) {

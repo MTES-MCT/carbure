@@ -1,0 +1,986 @@
+// LIST OF OLD BROKEN TESTS TO TAKE INSPIRATION FROM
+
+import { render, TestRoot } from "setupTests"
+import { waitFor, screen } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
+import { Route } from "react-router-dom"
+import { Entity, LotStatus } from "common/types"
+
+import { producer } from "common/__test__/data"
+import { waitWhileLoading } from "common/__test__/helpers"
+import Transactions from "../index"
+import { clickOnCheckboxesAndConfirm } from "./helpers"
+
+import { operator } from "common/__test__/data"
+
+import { setEntity } from "settings/__test__/api"
+
+import server from "./api"
+import {
+  // deadlineLots,
+  emptyLots,
+  emptySnapshot,
+  // errorLots,
+  lots,
+  // manyLots,
+  snapshot,
+} from "./data"
+
+const TransactionsWithRouter = ({
+  entity,
+  status,
+}: {
+  entity: Entity
+  status: LotStatus
+}) => (
+  <TestRoot url={`/org/0/transactions/${status}`}>
+    <Route path="/org/0/transactions/:status/*" element={<Transactions />} />
+  </TestRoot>
+)
+
+beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
+
+afterEach(() => {
+  server.resetHandlers()
+  setSnapshot(snapshot)
+  setLots(lots)
+})
+
+afterAll(() => server.close())
+
+test("producer/trader: display an empty list of transactions", async () => {
+  setSnapshot(emptySnapshot)
+  setLots(emptyLots)
+
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
+
+  await waitWhileLoading()
+
+  await screen.findByText("Brouillon")
+  screen.getByText("Lot envoyé")
+  screen.getByText("Lot en correction")
+  screen.getByText("Lot accepté")
+
+  const quantities = await screen.findAllByText("0")
+  expect(quantities.length).toBe(4)
+
+  screen.getByText("Périodes")
+  screen.getByText("Biocarburants")
+  screen.getByText("Matières Premières")
+  screen.getByText("Clients")
+  screen.getByText("Pays d'origine")
+  screen.getByText("Sites de production")
+  screen.getByText("Sites de livraison")
+
+  screen.getByPlaceholderText("Rechercher des lots...")
+
+  screen.getByText("Aucune transaction trouvée pour cette recherche")
+})
+
+test("producer/trader: display a list of 1 transaction", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
+
+  await waitWhileLoading()
+
+  await screen.findByText("40")
+  screen.getByText("30")
+  screen.getByText("20")
+  screen.getAllByText("10")
+
+  // check column headers
+  screen.getByText("Statut")
+  screen.getByText("Période")
+  screen.getByText("N° Douane")
+  screen.getByText("Biocarburant (litres)")
+  screen.getByText("Matière première")
+  screen.getByText("Client")
+  screen.getByText("Site de production")
+  screen.getByText("Site de livraison")
+  screen.getByText("Réd. GES")
+
+  // check lot columns
+  screen.getAllByText("Brouillon")
+  screen.getByText("2020-01")
+  screen.getByText("EMHV")
+  screen.getByText("12 345")
+  screen.getByText("Colza")
+  screen.getByText("Opérateur Test")
+  screen.getByText("Test Production Site")
+  screen.getByText("Test Delivery Site")
+  screen.getByText("France, Test City")
+  const countries = screen.getAllByText("France")
+  expect(countries).toHaveLength(2)
+})
+
+test("producer/trader: check filters", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
+
+  const filters = [
+    { name: "Périodes", value: "2020-01" },
+    { name: "Biocarburants", value: "EMHV" },
+    { name: "Matières Premières", value: "Colza" },
+    { name: "Clients", value: "Opérateur Test" },
+    { name: "Pays d'origine", value: "France" },
+    { name: "Sites de production", value: "Test Production Site" },
+    { name: "Sites de livraison", value: "Test Delivery Site" },
+  ]
+
+  for (let i = 0; i < filters.length; i++) {
+    const { name, value } = filters[i]
+
+    // locate the wanted filter
+    const filter = await screen.findByText(name)
+
+    // open the filter list
+    userEvent.click(filter)
+
+    await waitWhileLoading()
+
+    // select a value from the list
+    const selection = screen.getByText(value, { selector: "li span" }) // prettier-ignore
+    userEvent.click(selection)
+
+    userEvent.type(filter, "{esc}")
+
+    // close the dropdown
+    expect(selection).not.toBeInTheDocument()
+
+    // check that the right selection is displayed
+    await screen.findByText(value, { selector: ".selectValue" })
+  }
+})
+
+test("check search filter", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
+
+  await waitWhileLoading()
+
+  await screen.findByText("DAETEST")
+
+  userEvent.type(screen.getByPlaceholderText("Rechercher des lots..."), "test")
+
+  await waitWhileLoading()
+})
+
+test("check year filter", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
+
+  await waitWhileLoading()
+
+  await screen.findByText("DAETEST")
+
+  userEvent.click(screen.getByText("2020"))
+  userEvent.click(screen.getByText("2019"))
+
+  await screen.findByTitle("Chargement...")
+})
+
+test("check pagination", async () => {
+  setLots(manyLots)
+
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
+
+  await waitWhileLoading()
+
+  await screen.findAllByText("DAETEST")
+
+  const select = screen.getByText("1", { selector: ".selectValue" })
+  const prev = screen.getByTitle("Page précédente")
+  const next = screen.getByTitle("Page suivante")
+
+  screen.getByText("sur 20,")
+
+  expect(prev).toBeDisabled()
+
+  // select a page from the dropdown
+  userEvent.click(select)
+  userEvent.click(screen.getByText("19"))
+
+  await waitWhileLoading()
+
+  expect(select).toHaveTextContent("19")
+  expect(prev).not.toBeDisabled()
+
+  // click on the next button
+  userEvent.click(next)
+
+  await waitWhileLoading()
+
+  await screen.findByText("20", { selector: ".selectValue" })
+  expect(next).toBeDisabled()
+
+  // click on the prev button
+  userEvent.click(prev)
+
+  await waitWhileLoading()
+
+  await screen.findByText("19", { selector: ".selectValue" })
+  expect(next).not.toBeDisabled()
+})
+
+test("check error filter", async () => {
+  setLots(errorLots)
+
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
+
+  await waitWhileLoading()
+
+  const dae = await screen.findByText("DAETEST")
+
+  expect(dae.closest(".tableRow")).toHaveClass("transactionRowError")
+
+  await screen.findByText(
+    (content, node) =>
+      node?.textContent ===
+      "Parmi ces résultats, 1 lot présente des incohérences"
+  )
+
+  userEvent.click(screen.getByText("Voir la liste"))
+
+  await waitWhileLoading()
+
+  await screen.findByText(
+    (content, node) => node?.textContent === "1 lot présente des incohérences"
+  )
+
+  userEvent.click(screen.getByText("Revenir à la liste complète"))
+
+  await waitWhileLoading()
+
+  await screen.findByText("Voir la liste")
+})
+
+test("check deadline filter", async () => {
+  setLots(deadlineLots)
+
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
+
+  await waitWhileLoading()
+
+  const dae = await screen.findByText("DAETEST")
+
+  expect(dae.closest(".tableRow")).toHaveClass("transactionRowDeadline")
+
+  await screen.findByText(
+    (content, node) =>
+      node?.textContent ===
+      "Parmi ces résultats, 1 lot doit être déclaré avant le 29 février"
+  )
+
+  userEvent.click(screen.getByText("Voir la liste"))
+
+  await waitWhileLoading()
+
+  await screen.findByText(
+    (content, node) =>
+      node?.textContent === "1 lot doit être déclaré avant le 29 février"
+  )
+
+  userEvent.click(screen.getByText("Revenir à la liste complète"))
+
+  await waitWhileLoading()
+
+  await screen.findByText("Voir la liste")
+})
+
+test("producer/trader: check draft actions", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
+
+  await waitWhileLoading()
+
+  // check global actions
+  await screen.findByText("Exporter")
+  screen.getByText("Importer lots")
+  screen.getByText("Créer lot")
+  screen.getByText("Envoyer tout")
+  screen.getByText("Supprimer tout")
+
+  // check row actions
+  screen.getByTitle("Envoyer le lot")
+  screen.getByTitle("Dupliquer le lot")
+  screen.getByTitle("Supprimer le lot")
+})
+
+test("producer/trader: check sent actions", async () => {
+  render(
+    <TransactionsWithRouter status={LotStatus.Validated} entity={producer} />
+  )
+
+  await waitWhileLoading()
+
+  // check global actions
+  await screen.findByText("Exporter")
+
+  // check row actions
+  screen.getByTitle("Dupliquer le lot")
+})
+
+test("producer/trader: check tofix actions", async () => {
+  render(<TransactionsWithRouter status={LotStatus.ToFix} entity={producer} />)
+
+  await waitWhileLoading()
+
+  // check global actions
+  await screen.findByText("Exporter")
+  screen.getByText("Supprimer sélection")
+
+  // check row actions
+  screen.getByTitle("Renvoyer le lot")
+  screen.getByTitle("Supprimer le lot")
+})
+
+test("producer/trader: check accepted actions", async () => {
+  render(
+    <TransactionsWithRouter status={LotStatus.Accepted} entity={producer} />
+  )
+
+  await waitWhileLoading()
+
+  // check global actions
+  await screen.findByText("Exporter")
+
+  // check row actions
+  screen.getByTitle("Dupliquer le lot")
+})
+
+test("producer/trader: duplicate draft lot", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
+
+  await waitWhileLoading()
+
+  // click on the duplicate action
+  const duplicate = await screen.findByTitle("Dupliquer le lot")
+  userEvent.click(duplicate)
+
+  // confirm the duplication
+  const title = screen.getByText("Dupliquer lot")
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // number in snapshot was incremented
+  await screen.findByText("41")
+
+  // new line was added
+  await waitFor(() => expect(screen.getAllByText("Brouillon")).toHaveLength(3))
+  expect(screen.getAllByText("2020-01")).toHaveLength(2)
+  expect(screen.getAllByText("EMHV")).toHaveLength(2)
+  expect(screen.getAllByText("12 345")).toHaveLength(2)
+  expect(screen.getAllByText("Colza")).toHaveLength(2)
+  expect(screen.getAllByText("Opérateur Test")).toHaveLength(2)
+  expect(screen.getAllByText("Test Production Site")).toHaveLength(2)
+  expect(screen.getAllByText("Test Delivery Site")).toHaveLength(2)
+  expect(screen.getAllByText("France, Test City")).toHaveLength(2)
+  expect(screen.getAllByText("France")).toHaveLength(4)
+})
+
+// SEND DRAFT
+
+test("producer/trader: sent draft lot", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
+
+  await waitWhileLoading()
+
+  // click on the send action
+  const send = await screen.findByTitle("Envoyer le lot")
+  userEvent.click(send)
+
+  // confirm the sending
+  const title = screen.getByText("Envoyer lot")
+  clickOnCheckboxesAndConfirm()
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of draft lots
+  await screen.findByText("39")
+  // increased amount of sent lots
+  screen.getByText("31")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+test("producer/trader: send all draft lots", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
+
+  await waitWhileLoading()
+
+  const button = screen.getByText("Envoyer tout").closest("button")!
+  expect(button).not.toBeDisabled()
+
+  // wait for the lot to be loaded
+  await screen.findByText("DAETEST")
+
+  // click on the send all button
+  userEvent.click(button)
+
+  // confirm the sending
+  const title = await screen.findByText("Envoyer tous ces brouillons")
+  await waitWhileLoading()
+  clickOnCheckboxesAndConfirm()
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of draft lots
+  await screen.findByText("39")
+  // increased amount of sent lots
+  screen.getByText("31")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+test("producer/trader: sent selected draft lots", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
+
+  await waitWhileLoading()
+
+  // wait for the lot to be loaded
+  await screen.findByText("DAETEST")
+
+  // select the first lot
+  userEvent.click(screen.getByTitle("Sélectionner le lot"))
+
+  // click on the send selection button
+  userEvent.click(screen.getByText("Envoyer sélection"))
+
+  // confirm the sending
+  const title = screen.getByText("Envoyer la sélection")
+  await waitWhileLoading()
+  clickOnCheckboxesAndConfirm()
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of draft lots
+  await screen.findByText("39")
+  // increased amount of sent lots
+  screen.getByText("31")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+// DELETE DRAFT
+
+test("producer/trader: delete draft lot", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
+
+  await waitWhileLoading()
+
+  // click on the send action
+  const send = await screen.findByTitle("Supprimer le lot")
+  userEvent.click(send)
+
+  // confirm the sending
+  const title = screen.getByText("Supprimer lot")
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of draft lots
+  await screen.findByText("39")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+test("producer/trader: delete all draft lot", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
+
+  await waitWhileLoading()
+
+  const button = screen.getByText("Supprimer tout").closest("button")!
+
+  // wait for the lot to be loaded
+  await screen.findByText("DAETEST")
+
+  // click on the send all button
+  userEvent.click(button)
+
+  // confirm the sending
+  const title = await screen.findByText("Supprimer tous ces brouillons")
+  await waitWhileLoading()
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  await screen.findByText("39")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+test("producer/trader: delete selected draft lot", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
+
+  await waitWhileLoading()
+
+  // wait for the lot to be loaded
+  await screen.findByText("DAETEST")
+
+  // select the first lot
+  userEvent.click(screen.getByTitle("Sélectionner le lot"))
+
+  // click on the send selection button
+  userEvent.click(screen.getByText("Supprimer sélection"))
+
+  // confirm the sending
+  const title = screen.getByText("Supprimer lot")
+  await waitWhileLoading()
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  await screen.findByText("39")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+// RESEND TOFIX
+
+test("producer/trader: resend fixed lot", async () => {
+  render(<TransactionsWithRouter status={LotStatus.ToFix} entity={producer} />)
+
+  await waitWhileLoading()
+
+  // click on the send action
+  const send = await screen.findByTitle("Renvoyer le lot")
+  userEvent.click(send)
+
+  // confirm the fix by adding a comment
+  const title = screen.getByText("Renvoyer le lot", { selector: "h1" })
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of lots to fix
+  await screen.findByText("19")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+// DELETE TOFIX
+
+test("producer/trader: delete tofix lot", async () => {
+  render(<TransactionsWithRouter status={LotStatus.ToFix} entity={producer} />)
+
+  await waitWhileLoading()
+
+  // click on the send action
+  const send = await screen.findByTitle("Supprimer le lot")
+  userEvent.click(send)
+
+  // confirm the removal
+  const title = screen.getByText("Supprimer lot")
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of lots to fix
+  await screen.findByText("19")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+test("producer/trader: delete selected tofix lot", async () => {
+  render(<TransactionsWithRouter status={LotStatus.ToFix} entity={producer} />)
+
+  await waitWhileLoading()
+
+  // wait for the lot to be loaded
+  await screen.findByText("DAETEST")
+
+  // select the first lot
+  userEvent.click(screen.getByTitle("Sélectionner le lot"))
+
+  // click on the send selection button
+  userEvent.click(screen.getByText("Supprimer sélection"))
+
+  // confirm the sending
+  const title = screen.getByText("Supprimer lot")
+  await waitWhileLoading()
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of tofix lots
+  await screen.findByText("19")
+
+  // no more tofix lots
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// OPERATOR TESTS
+//////////////////////////////////////////////////////////////////////////////////////////
+
+const TransactionsWithRouter = ({
+  entity,
+  status,
+}: {
+  entity: Entity
+  status: LotStatus
+}) => {
+  setEntity(entity)
+  return (
+    <TestRoot url={`/org/${entity.id}/transactions/${status}`}>
+      <Route
+        path={`/org/${entity.id}/transactions/:status/*`}
+        element={<Transactions />}
+      />
+    </TestRoot>
+  )
+}
+
+beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
+
+test("operator: duplicate draft lot", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={operator} />)
+
+  await waitWhileLoading()
+
+  // click on the duplicate action
+  const duplicate = await screen.findByTitle("Dupliquer le lot")
+  userEvent.click(duplicate)
+
+  // confirm the duplication
+  const title = await screen.findByText("Dupliquer lot")
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // number in snapshot was incremented
+  await screen.findByText("31")
+
+  // new line was added
+  await waitFor(() => expect(screen.getAllByText("Brouillon").length).toBe(3))
+  expect(screen.getAllByText("2020-01").length).toBe(2)
+  expect(screen.getAllByText("EMHV").length).toBe(2)
+  expect(screen.getAllByText("12 345").length).toBe(2)
+  expect(screen.getAllByText("Colza").length).toBe(2)
+  expect(screen.getAllByText("Producteur Test").length).toBe(2)
+  expect(screen.getAllByText("Test Production Site").length).toBe(2)
+  expect(screen.getAllByText("Test Delivery Site").length).toBe(2)
+  expect(screen.getAllByText("France, Test City").length).toBe(2)
+  expect(screen.getAllByText("France").length).toBe(4)
+})
+
+// DELETE DRAFT
+
+test("operator: delete draft lot", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={operator} />)
+
+  await waitWhileLoading()
+
+  // click on the send action
+  const send = await screen.findByTitle("Supprimer le lot")
+  userEvent.click(send)
+
+  // confirm the sending
+  const title = screen.getByText("Supprimer lot")
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of draft lots
+  await screen.findByText("29")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+test("operator: delete all draft lot", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={operator} />)
+
+  await waitWhileLoading()
+
+  const button = screen.getByText("Supprimer tout").closest("button")!
+
+  // wait for the lot to be loaded
+  await screen.findByText("DAETEST")
+
+  expect(button).not.toBeDisabled()
+
+  // click on the send all button
+  userEvent.click(button)
+
+  // confirm the sending
+  const title = await screen.findByText("Supprimer tous ces brouillons")
+  await waitWhileLoading()
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of draft lots
+  await screen.findByText("29")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+test("operator: delete selected draft lot", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={operator} />)
+
+  await waitWhileLoading()
+
+  // wait for the lot to be loaded
+  await screen.findByText("DAETEST")
+
+  // select the first lot
+  userEvent.click(screen.getByTitle("Sélectionner le lot"))
+
+  // click on the send selection button
+  userEvent.click(screen.getByText("Supprimer sélection"))
+
+  // confirm the sending
+  const title = screen.getByText("Supprimer lot")
+  await waitWhileLoading()
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of draft lots
+  await screen.findByText("29")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+// ACCEPT INBOX
+
+test("operator: accept inbox lot", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Inbox} entity={operator} />)
+
+  await waitWhileLoading()
+
+  // click on the send action
+  const send = await screen.findByTitle("Accepter le lot")
+  userEvent.click(send)
+
+  // confirm the sending
+  const title = screen.getByText("Accepter lot")
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of inbox lots
+  await screen.findByText("19")
+  // increased amount of accepted lots
+  screen.getByText("11")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+test("operator: accept inbox lot (sous réserve)", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Inbox} entity={operator} />)
+
+  await waitWhileLoading()
+
+  // click on the send action
+  const send = await screen.findByTitle("Accepter sous réserve")
+  userEvent.click(send)
+
+  // confirm the sending
+  const title = screen.getByText("Accepter lot")
+  userEvent.click(screen.getByLabelText("Les deux"))
+  userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "not ok")
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // lot status has changed
+  await screen.findByText("En correction")
+})
+
+test("operator: accept all inbox lots", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Inbox} entity={operator} />)
+
+  await waitWhileLoading()
+
+  const button = screen.getByText("Accepter tout").closest("button")!
+
+  // wait for the lot to be loaded
+  await screen.findByText("DAETEST")
+
+  expect(button).not.toBeDisabled()
+
+  // click on the send all button
+  userEvent.click(button)
+
+  await waitWhileLoading()
+
+  // confirm the sending
+  screen.getByText("Accepter tout", { selector: "h1" })
+  const okButton = await screen.findByText("Confirmer")
+  userEvent.click(okButton)
+
+  expect(okButton).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of draft lots
+  await screen.findByText("19")
+  // increased amount of received lots
+  screen.getByText("11")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+test("operator: accept selected inbox lots", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Inbox} entity={operator} />)
+
+  await waitWhileLoading()
+
+  // wait for the lot to be loaded
+  await screen.findByText("DAETEST")
+
+  // select the first lot
+  userEvent.click(screen.getByTitle("Sélectionner le lot"))
+
+  // click on the send selection button
+  userEvent.click(screen.getByText("Accepter sélection"))
+
+  // confirm the sending
+  const title = screen.getByText("Accepter lot")
+  await waitWhileLoading()
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of draft lots
+  await screen.findByText("19")
+  // increased amount of sent lots
+  screen.getByText("11")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+// REJECT INBOX
+
+test("operator: reject inbox lot", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Inbox} entity={operator} />)
+
+  await waitWhileLoading()
+
+  // click on the send action
+  const reject = await screen.findByTitle("Refuser le lot")
+  userEvent.click(reject)
+
+  // confirm the sending
+  const title = screen.getByText("Refuser lot")
+  userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "not ok")
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of inbox lots
+  await screen.findByText("19")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+test("operator: reject all inbox lots", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Inbox} entity={operator} />)
+
+  await waitWhileLoading()
+
+  const button = screen.getByText("Refuser tout").closest("button")!
+
+  // wait for the lot to be loaded
+  await screen.findByText("DAETEST")
+
+  expect(button).not.toBeDisabled()
+
+  // click on the reject all button
+  userEvent.click(button)
+
+  // confirm the sending
+  const okButton = await screen.findByText("Confirmer")
+  userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "not ok")
+  userEvent.click(okButton)
+
+  expect(okButton).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of draft lots
+  await screen.findByText("19")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})
+
+test("operator: reject selected inbox lots", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Inbox} entity={operator} />)
+
+  await waitWhileLoading()
+
+  // wait for the lot to be loaded
+  await screen.findByText("DAETEST")
+
+  // select the first lot
+  userEvent.click(screen.getByTitle("Sélectionner le lot"))
+
+  // click on the send selection button
+  userEvent.click(screen.getByText("Refuser sélection"))
+
+  // confirm the sending
+  const title = await screen.findByText("Refuser lot")
+  userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "not ok")
+  userEvent.click(screen.getByText("Confirmer"))
+
+  expect(title).not.toBeInTheDocument()
+
+  await waitWhileLoading()
+
+  // decreased amount of draft lots
+  await screen.findByText("19")
+
+  // no more drafts
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
+})

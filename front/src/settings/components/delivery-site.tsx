@@ -1,12 +1,7 @@
 import { Trans, useTranslation } from "react-i18next"
 
-import {
-  Country,
-  DepotType,
-  OwnershipType,
-  EntityType,
-  UserRole,
-} from "common/types"
+import { Country, DepotType, OwnershipType } from "common/types"
+import { EntityType, UserRole } from "carbure/types"
 import {
   DeliverySiteSettingsHook,
   EntityDeliverySite,
@@ -19,7 +14,7 @@ import * as common from "common/api"
 import { Title, Box, LoaderOverlay } from "common/components"
 import { LabelInput, Label, LabelCheckbox } from "common/components/input"
 import { Button } from "common/components/button"
-import { AlertCircle, Cross, Plus, Return } from "common/components/icons"
+import { AlertCircle, Cross, Plus, Return } from "common-v2/components/icons"
 import { Alert } from "common/components/alert"
 import Table, {
   Actions,
@@ -27,6 +22,7 @@ import Table, {
   Column,
   Line,
   Row,
+  padding,
 } from "common/components/table"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
 import {
@@ -37,7 +33,6 @@ import {
   PromptProps,
 } from "common/components/dialog"
 import { LabelAutoComplete } from "common/components/autocomplete"
-import { padding } from "transactions/components/list-columns"
 import RadioGroup from "common/components/radio-group"
 import { SettingsForm } from "./common"
 import useForm from "common/hooks/use-form"

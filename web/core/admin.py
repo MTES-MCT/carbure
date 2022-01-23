@@ -4,7 +4,6 @@
 import datetime
 from django.contrib import admin
 from django.contrib import messages
-from django.contrib.admin.filters import DateFieldListFilter
 from django.db.models import Q
 from django import forms
 from django.contrib.auth import get_user_model
@@ -20,14 +19,13 @@ from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
-from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockTransformation, Entity, ExternalAdminRights, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, UserRightsRequests
+from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockTransformation, Entity, EntityCertificate, ExternalAdminRights, GenericCertificate, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, UserRightsRequests
 from core.models import Depot, LotV2, LotTransaction, TransactionComment, GenericError
 from core.models import SustainabilityDeclaration, EntityDepot
 from core.models import TransactionUpdateHistory, TransactionDistance
 from core.models import EmailNotification, ETBETransformation
-from certificates.models import EntitySNTradingCertificate, EntityISCCTradingCertificate, EntityDBSTradingCertificate, EntityREDCertTradingCertificate
 from api.v3.sanity_checks import bulk_sanity_checks
-from core.common import get_prefetched_data, calculate_ghg
+from core.common import calculate_ghg
 
 class EntityAdmin(admin.ModelAdmin):
     list_display = ('entity_type', 'name', 'parent_entity')
@@ -263,6 +261,7 @@ class TransactionAdmin(admin.ModelAdmin):
 
 
     def rerun_sanity_checks(self, request, queryset):
+        from api.v4.helpers import get_prefetched_data
         d = get_prefetched_data()
         bulk_sanity_checks(queryset, d, background=False)
     rerun_sanity_checks.short_description = "Moulinette Règles Métiers"
@@ -656,9 +655,44 @@ class CarbureLotCommentAdmin(admin.ModelAdmin):
 
 @admin.register(CarbureStockTransformation)
 class CarbureStockTransformationAdmin(admin.ModelAdmin):
-    list_display = []
+    list_display = ['transformation_type', 'source_stock_id', 'dest_stock_id', 'entity', 'transformation_dt']
+    list_filter = ['transformation_type', 'entity']
 
 @admin.register(CarbureNotification)
 class CarbureNotificationAdmin(admin.ModelAdmin):
     list_display = []
     list_filter = ['is_sent', 'send_copy_to_admin']
+
+@admin.register(GenericCertificate)
+class GenericCertificateAdmin(admin.ModelAdmin):
+    list_display = ['certificate_id', 'certificate_type', 'certificate_holder', 'valid_from', 'valid_until']
+    list_filter = ['certificate_type']
+    search_fields = ('certificate_holder', 'certificate_id')
+
+
+@admin.register(EntityCertificate)
+class EntityCertificateAdmin(admin.ModelAdmin):
+    list_display = ['entity', 'get_certificate_id', 'get_certificate_type', 'get_certificate_holder', 'get_valid_from', 'get_valid_until']
+    list_filter = ['certificate__certificate_type']
+    search_fields = ('entity__name', 'certificate__certificate_holder', 'certificate__certificate_id')
+
+    def get_certificate_id(self, obj):
+        return obj.certificate.certificate_id
+    get_certificate_id.admin_order_field  = 'certificate__certificate_id'
+    get_certificate_id.short_description = 'Certificate ID'
+    def get_certificate_type(self, obj):
+        return obj.certificate.certificate_type
+    get_certificate_type.admin_order_field  = 'certificate__certificate_type'
+    get_certificate_type.short_description = 'Certificate Type'
+    def get_certificate_holder(self, obj):
+        return obj.certificate.certificate_holder
+    get_certificate_holder.admin_order_field  = 'certificate__certificate_holder'
+    get_certificate_holder.short_description = 'Certificate Holder'
+    def get_valid_from(self, obj):
+        return obj.certificate.valid_from
+    get_valid_from.admin_order_field  = 'certificate__valid_from'
+    get_valid_from.short_description = 'Valid From'
+    def get_valid_until(self, obj):
+        return obj.certificate.valid_until
+    get_valid_until.admin_order_field  = 'certificate__valid_until'
+    get_valid_until.short_description = 'Valid Until'

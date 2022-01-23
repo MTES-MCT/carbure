@@ -1,10 +1,17 @@
 import React, { useEffect, useRef, useState } from "react"
 import cl from "clsx"
 import Button from "./button"
-import { AlertTriangle, Cross, Loader, Search, Placeholder } from "./icons"
+import {
+  AlertTriangle,
+  Cross,
+  Loader,
+  Search,
+  Placeholder,
+} from "common-v2/components/icons"
 import { Col, layout, Layout, Overlay } from "./scaffold"
 import { isInside } from "./dropdown"
 import css from "./input.module.css"
+import { useTranslation } from "react-i18next"
 
 export type FieldVariant = "outline" | "solid" | "inline" | "text"
 
@@ -111,6 +118,7 @@ export const FileInput = ({
 }: FileInputProps) => (
   <Field
     {...props}
+    type="file"
     onClear={clear && value && onChange ? () => onChange(undefined) : undefined}
   >
     <label tabIndex={0} className={css.file}>
@@ -154,7 +162,9 @@ export const FileArea = ({
       data-active={active ? true : undefined}
       onDragOver={(e) => {
         e.preventDefault()
-        !active && setActive(true)
+        if (!active && e.dataTransfer.types.includes("Files")) {
+          setActive(true)
+        }
       }}
       onDragLeave={(e) => {
         e.preventDefault()
@@ -164,8 +174,10 @@ export const FileArea = ({
       }}
       onDrop={(e) => {
         e.preventDefault()
-        onChange?.(e.dataTransfer.files[0])
-        setActive(false)
+        if (e.dataTransfer.files.length > 0) {
+          onChange?.(e.dataTransfer.files[0])
+          setActive(false)
+        }
       }}
     >
       {children}
@@ -269,6 +281,8 @@ export const SearchInput = ({
   onChange,
   ...props
 }: SearchInputProps) => {
+  const { t } = useTranslation()
+
   const timeoutRef = useRef<number>()
   const [search, setSearch] = useState(value ?? "")
 
@@ -302,7 +316,7 @@ export const SearchInput = ({
         readOnly={props.readOnly}
         required={props.required}
         name={name}
-        placeholder={placeholder ?? "Rechercher..."}
+        placeholder={placeholder ?? t("Rechercher...")}
         value={search ?? ""}
         onChange={(e) => debouncedSearch(e.target.value)}
       />
@@ -404,13 +418,13 @@ export const Field = ({
 
     <div
       tabIndex={-1}
-      data-interactive={type === "button" ? true : undefined}
+      data-interactive={isInteractive(type) ? true : undefined}
       ref={domRef as React.RefObject<HTMLDivElement>}
       className={css.control}
     >
       {children}
 
-      {onClear && (
+      {!disabled && !readOnly && onClear && (
         <Button
           captive
           variant="icon"
@@ -437,3 +451,7 @@ export const Field = ({
     </div>
   </div>
 )
+
+function isInteractive(type: string | undefined) {
+  return type === "button" || type === "file"
+}

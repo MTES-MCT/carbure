@@ -1,5 +1,6 @@
 .collapse {
   display: flex;
+  position: relative;
   flex-direction: column;
   gap: var(--spacing-m);
   background-color: var(--gray-light);
@@ -8,7 +9,7 @@
   overflow: hidden;
 }
 
-.collapse header {
+.collapse > header {
   display: flex;
   gap: var(--spacing-m);
   cursor: pointer;

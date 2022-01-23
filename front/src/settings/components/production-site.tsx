@@ -1,17 +1,15 @@
 import { Trans, useTranslation } from "react-i18next"
 
+import { Entity, UserRole } from "carbure/types"
 import {
-  Biocarburant,
-  ProductionCertificate,
+  Biofuel,
   Country,
+  Feedstock,
+  Certificate,
   GESOption,
-  MatierePremiere,
   ProductionSiteDetails,
-  UserRole,
 } from "common/types"
-
 import { ProductionSiteSettingsHook } from "../hooks/use-production-sites"
-import { Entity } from "carbure/types"
 
 import styles from "./settings.module.css"
 
@@ -21,7 +19,13 @@ import useForm from "common/hooks/use-form"
 import { Title, Box, LoaderOverlay } from "common/components"
 import { LabelInput, Label, LabelCheckbox } from "common/components/input"
 import { Button } from "common/components/button"
-import { AlertCircle, Cross, Plus, Return, Save } from "common/components/icons"
+import {
+  AlertCircle,
+  Cross,
+  Plus,
+  Return,
+  Save,
+} from "common-v2/components/icons"
 import { Alert } from "common/components/alert"
 import Table, {
   Actions,
@@ -29,6 +33,7 @@ import Table, {
   Column,
   Line,
   Row,
+  padding,
 } from "common/components/table"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
 import {
@@ -44,8 +49,7 @@ import {
 } from "common/components/autocomplete"
 import RadioGroup from "common/components/radio-group"
 import { formatDate, SettingsForm } from "./common"
-import { padding } from "transactions/components/list-columns"
-import { findCertificates } from "../api"
+import { getMyCertificates } from "../api-v2"
 import { useRights } from "carbure/hooks/entity"
 
 export type ProductionSiteState = {
@@ -70,11 +74,11 @@ export type ProductionSiteState = {
   manager_email: string
 
   // input/output
-  matieres_premieres: MatierePremiere[]
-  biocarburants: Biocarburant[]
+  matieres_premieres: Feedstock[]
+  biocarburants: Biofuel[]
 
   // certificates
-  certificates: ProductionCertificate[]
+  certificates: Certificate[]
 }
 
 type ProductionSitePromptProps = PromptProps<ProductionSiteState> & {
@@ -289,9 +293,13 @@ export const ProductionSitePrompt = ({
             placeholder={t("Rechercher des certificats...")}
             value={data.certificates}
             getValue={(c) => c.certificate_id}
-            getLabel={(c) => c.certificate_id + " - " + c.holder}
+            getLabel={(c) => c.certificate_id + " - " + c.certificate_holder}
             minLength={0}
-            getQuery={findCertificates}
+            getQuery={() =>
+              getMyCertificates(entity!.id).then(
+                (res) => res.data.data?.map((e) => e.certificate) ?? []
+              )
+            }
             queryArgs={[entity?.id]}
             onChange={onChange}
           />

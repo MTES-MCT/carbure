@@ -20,7 +20,7 @@ from core.models import LotV2, LotTransaction, EntityDepot, GenericError
 from core.models import TransactionUpdateHistory
 
 from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_operators, template_traders
-from core.common import validate_lots, load_excel_file, load_lot, bulk_insert, get_prefetched_data, check_duplicates, get_uploaded_files_directory
+from core.common import validate_lots, load_excel_file, load_lot, bulk_insert, check_duplicates, get_uploaded_files_directory
 from core.common import check_certificates, get_transaction_distance
 from core.decorators import check_rights
 from core.notifications import notify_lots_rejected, notify_declaration_invalidated, notify_lot_in_correction, notify_pending_lot
@@ -205,98 +205,98 @@ def get_declaration_summary(request, *args, **kwargs):
     return JsonResponse({'status': 'success', 'data': data})
 
 
-@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
-def add_lot(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
+# @check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
+# def add_lot(request, *args, **kwargs):
+#     context = kwargs['context']
+#     entity = context['entity']
 
-    # prefetch some data
-    d = get_prefetched_data(entity)
-    lot, tx, errors = load_lot(d, entity, request.user, request.POST.dict(), 'MANUAL')
-    if not tx:
-        return JsonResponse({'status': 'error', 'message': 'Could not add lot to database'}, status=400)
-    new_lots, new_txs = bulk_insert(entity, [lot], [tx], [errors], d)
-    if len(new_txs) == 0:
-        print(request.POST)
-        return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=500)
-    lot_data = new_txs[0].natural_key()
-    return JsonResponse({'status': 'success', 'data': lot_data})
+#     # prefetch some data
+#     d = get_prefetched_data(entity)
+#     lot, tx, errors = load_lot(d, entity, request.user, request.POST.dict(), 'MANUAL')
+#     if not tx:
+#         return JsonResponse({'status': 'error', 'message': 'Could not add lot to database'}, status=400)
+#     new_lots, new_txs = bulk_insert(entity, [lot], [tx], [errors], d)
+#     if len(new_txs) == 0:
+#         print(request.POST)
+#         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=500)
+#     lot_data = new_txs[0].natural_key()
+#     return JsonResponse({'status': 'success', 'data': lot_data})
 
 
-@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
-def update_lot(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
+# @check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
+# def update_lot(request, *args, **kwargs):
+#     context = kwargs['context']
+#     entity = context['entity']
 
-    tx_id = request.POST.get('tx_id', False)
-    if not tx_id:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_id"}, status=400)
+#     tx_id = request.POST.get('tx_id', False)
+#     if not tx_id:
+#         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_id"}, status=400)
 
-    try:
-        tx = LotTransaction.objects.get(id=tx_id)
-        before_update = tx.natural_key()
-    except Exception:
-        return JsonResponse({'status': 'error', 'message': "Unknown transaction %s" % (tx_id)}, status=400)
+#     try:
+#         tx = LotTransaction.objects.get(id=tx_id)
+#         before_update = tx.natural_key()
+#     except Exception:
+#         return JsonResponse({'status': 'error', 'message': "Unknown transaction %s" % (tx_id)}, status=400)
 
-    # am I allowed to update lot?
-    # you can update data if you are data_origin_entity or carbure_vendor
-    if entity != tx.carbure_vendor and entity != tx.lot.data_origin_entity:
-        return JsonResponse({'status': 'forbidden', 'message': "Not allowed. You are not the lot creator nor intermediary"}, status=403)
+#     # am I allowed to update lot?
+#     # you can update data if you are data_origin_entity or carbure_vendor
+#     if entity != tx.carbure_vendor and entity != tx.lot.data_origin_entity:
+#         return JsonResponse({'status': 'forbidden', 'message': "Not allowed. You are not the lot creator nor intermediary"}, status=403)
 
-    if tx.lot.status == LotV2.VALIDATED and tx.delivery_status not in (LotTransaction.TOFIX, LotTransaction.REJECTED):
-        return JsonResponse({'status': 'forbidden', 'message': "Cannot update lot - please request a correction first"}, status=400)
+#     if tx.lot.status == LotV2.VALIDATED and tx.delivery_status not in (LotTransaction.TOFIX, LotTransaction.REJECTED):
+#         return JsonResponse({'status': 'forbidden', 'message': "Cannot update lot - please request a correction first"}, status=400)
 
-    if tx.delivery_status == LotTransaction.FROZEN:
-        return JsonResponse({'status': 'forbidden', 'message': "Tx already declared - please amend the declaration to unlock this line"}, status=400)
+#     if tx.delivery_status == LotTransaction.FROZEN:
+#         return JsonResponse({'status': 'forbidden', 'message': "Tx already declared - please amend the declaration to unlock this line"}, status=400)
 
-    GenericError.objects.filter(tx=tx).delete()
-    d = get_prefetched_data(entity)
-    lot, tx, errors = load_lot(d, entity, request.user, request.POST.dict(), 'MANUAL', tx)
-    if not lot:
-        return JsonResponse({'status': 'error', 'message': 'Could not save lot: %s' % (errors)}, status=400)
-    lot.save()
-    tx.save()
-    GenericError.objects.bulk_create(errors)
-    bulk_sanity_checks([tx], d, background=False)
-    check_duplicates([tx], background=False)
-    if lot.status != LotV2.DRAFT:
-        # save the changes
-        after_update = tx.natural_key()
-        for key in before_update.keys():
-            if before_update[key] is None and isinstance(after_update[key], dict):
-                before_update[key] = {}
-            if after_update[key] is None and isinstance(before_update[key], dict):
-                after_update[key] = {}
-        diff = dictdiffer.diff(before_update, after_update)
-        with transaction.atomic():
-            for d in diff:
-                action, field, data = d
-                if action == 'change':
-                    if isinstance(data, tuple):
-                        TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.UPDATE, field=field, value_before=data[0], value_after=data[1], modified_by=request.user, modified_by_entity=entity)
-                    else:
-                        print('change not tuple %s' % (d))
-                if action == 'add':
-                    if isinstance(data, list):
-                        for (subfield, value) in data:
-                            if field != '':
-                                full_field_name = '%s.%s' % (field, subfield)
-                            else:
-                                full_field_name = subfield
-                            TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.ADD, field=full_field_name, value_before='', value_after=value, modified_by=request.user, modified_by_entity=entity)
-                    else:
-                        print('add not list %s' % (d))
-                if action == 'remove':
-                    if isinstance(data, list):
-                        for (subfield, value) in data:
-                            if field != '':
-                                full_field_name = '%s.%s' % (field, subfield)
-                            else:
-                                full_field_name = subfield
-                            TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.REMOVE, field=full_field_name, value_before=value, value_after='', modified_by=request.user, modified_by_entity=entity)
-                    else:
-                        print('remove not list %s' % (d))
-    return JsonResponse({'status': 'success'})
+#     GenericError.objects.filter(tx=tx).delete()
+#     d = get_prefetched_data(entity)
+#     lot, tx, errors = load_lot(d, entity, request.user, request.POST.dict(), 'MANUAL', tx)
+#     if not lot:
+#         return JsonResponse({'status': 'error', 'message': 'Could not save lot: %s' % (errors)}, status=400)
+#     lot.save()
+#     tx.save()
+#     GenericError.objects.bulk_create(errors)
+#     bulk_sanity_checks([tx], d, background=False)
+#     check_duplicates([tx], background=False)
+#     if lot.status != LotV2.DRAFT:
+#         # save the changes
+#         after_update = tx.natural_key()
+#         for key in before_update.keys():
+#             if before_update[key] is None and isinstance(after_update[key], dict):
+#                 before_update[key] = {}
+#             if after_update[key] is None and isinstance(before_update[key], dict):
+#                 after_update[key] = {}
+#         diff = dictdiffer.diff(before_update, after_update)
+#         with transaction.atomic():
+#             for d in diff:
+#                 action, field, data = d
+#                 if action == 'change':
+#                     if isinstance(data, tuple):
+#                         TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.UPDATE, field=field, value_before=data[0], value_after=data[1], modified_by=request.user, modified_by_entity=entity)
+#                     else:
+#                         print('change not tuple %s' % (d))
+#                 if action == 'add':
+#                     if isinstance(data, list):
+#                         for (subfield, value) in data:
+#                             if field != '':
+#                                 full_field_name = '%s.%s' % (field, subfield)
+#                             else:
+#                                 full_field_name = subfield
+#                             TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.ADD, field=full_field_name, value_before='', value_after=value, modified_by=request.user, modified_by_entity=entity)
+#                     else:
+#                         print('add not list %s' % (d))
+#                 if action == 'remove':
+#                     if isinstance(data, list):
+#                         for (subfield, value) in data:
+#                             if field != '':
+#                                 full_field_name = '%s.%s' % (field, subfield)
+#                             else:
+#                                 full_field_name = subfield
+#                             TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.REMOVE, field=full_field_name, value_before=value, value_after='', modified_by=request.user, modified_by_entity=entity)
+#                     else:
+#                         print('remove not list %s' % (d))
+#     return JsonResponse({'status': 'success'})
 
 @check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def duplicate_lot(request, *args, **kwargs):

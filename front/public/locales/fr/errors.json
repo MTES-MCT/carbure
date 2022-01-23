@@ -1,9 +1,10 @@
 {
   "BC_NOT_CONFIGURED": "Le biocarburant n'est pas enregistré sur le site de production",
   "DEPRECATED_MP": "Les résidus viniques vont disparaître au profit de deux nouvelles matières premières: Marc de raisin et Lies de vin. Merci de mettre à jour vos déclarations en conséquence.",
-  "GHG_EEC_0": "Les émissions résultant de la culture sont nulles",
-  "GHG_EP_0": "Les émissions résultant de la transformation sont nulles",
-  "GHG_ETD_0": "Les émissions résultant du transport sont nulles",
+  "GHG_EEC_0": "Les émissions résultant de la culture sont nulles (EEC)",
+  "GHG_EP_0": "Les émissions résultant de la transformation sont nulles (EP)",
+  "GHG_ETD_0": "Les émissions résultant du transport sont nulles (ETD)",
+  "GHG_EL_NEG": "Les réductions résultant des changements de sols sont négatives (EL)",
   "GHG_REDUC_INF_50": "Réduction de GES inférieure à 50%",
   "GHG_REDUC_INF_60": "Réduction de GES inférieure à 60%",
   "GHG_REDUC_INF_65": "Réduction de GES inférieure à 65%",
@@ -47,8 +48,6 @@
   "WRONG_DELIVERY_DATE": "La date de livraison est incorrecte",
   "WRONG_FORMAT": "Le format est incorrect",
   "WRONG_PRODUCTION_SITE_COUNTRY": "Le site de production est incorrect",
-
-
   "NO_PRODSITE_CERT": "Certificat du site de production absent",
   "NO_SUPPLIER_CERT": "Certificat du fournisseur original absent",
   "NO_VENDOR_CERT": "Certificat du fournisseur absent",

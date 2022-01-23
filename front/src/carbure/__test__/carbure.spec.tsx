@@ -1,19 +1,18 @@
 import { render } from "setupTests"
 import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { okEmptySettings } from "settings/__test__/api"
+import { okEmptySettings, setEntity } from "settings/__test__/api"
 import Carbure from "../index"
 
 import server from "./api"
 import { MemoryRouter } from "react-router"
 import { Suspense } from "react"
 import { LoaderOverlay } from "common/components"
-import { waitWhileLoading } from "common/__test__/helpers"
+import { producer } from "common/__test__/data"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
-afterEach(() => {
-  server.resetHandlers()
-})
+beforeEach(() => setEntity(producer))
+afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 const CarbureWithRouter = () => {
@@ -28,12 +27,9 @@ const CarbureWithRouter = () => {
 
 test("display alert message when connected without access rights", async () => {
   server.use(okEmptySettings)
-
   render(<CarbureWithRouter />)
 
-  await waitWhileLoading()
-
-  const link = screen.getAllByText("Lier le compte à des sociétés")
+  const link = await screen.findAllByText("Lier le compte à des sociétés")
   userEvent.click(link[0].closest("a")!)
 
   await screen.findByText("🌻 Bienvenue sur CarbuRe")
@@ -58,9 +54,7 @@ test("display alert message when connected without access rights", async () => {
 test("pick an entity from the menu", async () => {
   render(<CarbureWithRouter />)
 
-  await waitWhileLoading()
-
-  const menu = screen.getByText("Menu")
+  const menu = await screen.findByText("Menu")
 
   userEvent.click(menu)
 

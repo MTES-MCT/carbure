@@ -8,13 +8,14 @@ import logoFabNum from "../assets/images/logo-fabriquenumerique.svg"
 import logoBetaGouv from "../assets/images/betagouvfr.svg"
 import logoFranceRelance from "../assets/images/france-relance.png"
 import logoEuropeanUnion from "../assets/images/union-europeenne.png"
-import { ExternalLink, LinkedIn, Slack } from "common/components/icons"
+import { ExternalLink, LinkedIn, Slack } from "common-v2/components/icons"
+import { Footer } from "common-v2/components/scaffold"
 
-const Footer = () => {
+const CarbureFooter = () => {
   useTranslation()
 
   return (
-    <footer className={styles.footer}>
+    <Footer className={styles.footer}>
       <div className={styles.footerUpper}>
         <ul className={styles.footerCarbureLinks}>
           <li>
@@ -134,8 +135,8 @@ const Footer = () => {
           </li>
         </ul>
       </div>
-    </footer>
+    </Footer>
   )
 }
 
-export default Footer
+export default CarbureFooter

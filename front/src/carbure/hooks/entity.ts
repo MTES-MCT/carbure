@@ -1,6 +1,6 @@
 import { useMatch } from "react-router-dom"
 import { Entity, EntityType, ExternalAdminPages, UserRole } from "../types"
-import { useUserContext } from "./user"
+import { useUser } from "./user"
 
 export interface EntityManager extends Entity {
   isBlank: boolean
@@ -16,7 +16,7 @@ export interface EntityManager extends Entity {
 }
 
 export function useEntity(): EntityManager {
-  const user = useUserContext()
+  const user = useUser()
   const match = useMatch("/org/:entity/*")
 
   const entityID = parseInt(match?.params.entity ?? "-1", 10)
