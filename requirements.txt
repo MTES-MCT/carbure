@@ -73,7 +73,7 @@ moz-sql-parser==3.32.20026
 msgpack==1.0.2
 multidict==4.7.5
 mysqlclient==1.4.6
-numpy==1.19.2
+numpy==1.21.0
 nvidia-ml-py3==7.352.0
 opencensus==0.7.11
 opencensus-context==0.1.2
