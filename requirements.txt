@@ -28,7 +28,7 @@ cryptography==3.4.7
 dictdiffer==0.8.1
 distlib==0.3.0
 distro==1.4.0
-Django==3.2.10
+Django==3.2.11
 django-admin-list-filter-dropdown==1.0.3
 django-authtools @ git+git://github.com/mplanes/django-authtools@72b456b75bc11772284663a71544f96747ab3f6a
 django-debug-toolbar==3.2.1
