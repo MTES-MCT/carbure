@@ -45,7 +45,7 @@ export const Controls = () => {
               placeholder={t("Choisir une année")}
               value={years.selected}
               onChange={years.setYear}
-              options={years.data}
+              options={years.options}
               sort={(year) => -year.value}
             />
           </section>

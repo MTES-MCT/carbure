@@ -56,11 +56,11 @@ export const Transactions = () => {
                 placeholder={t("Choisir une année")}
                 value={years.selected}
                 onChange={years.setYear}
-                options={years.data}
+                options={years.options}
                 sort={(year) => -year.value}
               />
 
-              <DeclarationButton year={years.selected} years={years.data} />
+              <DeclarationButton year={years.selected} years={years.options} />
             </section>
 
             <section>
@@ -108,22 +108,24 @@ export function useYears(root: string, getYears: typeof api.getYears) {
 
     // select the latest year if the selected one isn't available anymore
     onSuccess: (res) => {
-      const years = res.data.data ?? []
-      const year = years.length > 0 ? Math.max(...years) : currentYear
-      if (!years.includes(selected)) setYear(year)
+      const years = listYears(res.data.data)
+      if (!years.includes(selected)) {
+        setYear(Math.max(...years))
+      }
     },
   })
 
-  const yearData = years.result?.data.data?.length
-    ? years.result?.data.data
-    : [currentYear]
-
   return {
     loading: years.loading,
-    data: yearData,
+    options: listYears(years.result?.data.data),
     selected,
     setYear,
   }
+}
+
+function listYears(years: number[] | undefined) {
+  if (years?.length) return years
+  else return [currentYear]
 }
 
 export default Transactions
