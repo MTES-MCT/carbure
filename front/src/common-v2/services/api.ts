@@ -21,7 +21,7 @@ export function download(endpoint: string, params: any) {
 }
 
 // converts an javascript object into FormData
-function toFormData(obj: any): FormData {
+export function toFormData(obj: any): FormData {
   const formData = new FormData()
   for (const key in obj) {
     if (Array.isArray(obj[key])) {
@@ -33,7 +33,7 @@ function toFormData(obj: any): FormData {
   return formData
 }
 
-function toSearchParams(params: any) {
+export function toSearchParams(params: any) {
   const urlParams = new URLSearchParams()
   for (const key in params) {
     const param = params[key]
