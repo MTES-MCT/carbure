@@ -49,6 +49,7 @@ rules['UNKNOWN_DAE_FORMAT'] = "Le format du numéro douanier semble incorrect"
 rules['UNKNOWN_DOUBLE_COUNTING_CERTIFICATE'] = "Le certificat double compte est inconnu"
 rules['EXPIRED_DOUBLE_COUNTING_CERTIFICATE'] = "Le certificat double n'est plus valide"
 rules['POTENTIAL_DUPLICATE'] = "Doublon potentiel détecté. Un autre lot avec le même numéro douanier, biocarburant, matière première, volume et caractéristiques GES existe."
+rules['EEC_WITH_RESIDUE'] = "Émissions GES liées à l'Extraction et la Culture non nulles sur Feedstock non-conventionnel"
 
 def generic_error(error, **kwargs):
     d = {
@@ -184,6 +185,9 @@ def sanity_check(lot, prefetched_data):
 
     # provenance des matieres premieres
     if lot.feedstock and lot.country_of_origin:
+        if lot.feedstock.category != 'CONV' and lot.eec != 0:
+            errors.append(generic_error(error='EEC_WITH_RESIDUE', lot=lot, field='eec'))
+
         if lot.feedstock.code == "RESIDUS_VINIQUES":
             errors.append(generic_error(error='DEPRECATED_MP', lot=lot, field='feedstock'))
 
