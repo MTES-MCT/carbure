@@ -131,8 +131,12 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  overflow: hidden;
   color: var(--gray-dark);
+}
+
+.icon button {
+  margin: calc(-1 * var(--spacing-s));
+  margin-left: var(--spacing-s);
 }
 
 .control textarea + .icon {
