@@ -14,6 +14,8 @@ services:
       - carburedb:/var/lib/mysql
     networks:
       - carbure
+    depends_on:
+      - fluentd
 
   carbure-django-uwsgi:
     command: bash /app/web/run.sh
@@ -88,6 +90,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: carbure_web carbure_app --interval 30
+    depends_on:
+      - fluentd
 
   certbot:
     restart: always
@@ -96,6 +100,8 @@ services:
     volumes:
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
+    depends_on:
+      - fluentd
 
 #  carbure-metabase:
 #    restart: always
@@ -109,6 +115,16 @@ services:
 #      - ./metabase:/metabase-data
 #    environment:
 #      MB_DB_FILE: "/metabase-data/metabase.db"
+
+  fluentd:
+    image: fluent/fluentd
+    volumes:
+      - /home/deploy/log:/fluentd/log
+    ports:
+      - "127.0.0.1:24224:24224"
+      - "127.0.0.1:24224:24224/udp"
+
+
 
   fluentd:
     image: fluent/fluentd
