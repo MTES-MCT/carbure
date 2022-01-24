@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { Stock, StockPayload } from "../types"
+import { DeliveryType, Stock, StockPayload } from "../types"
 import * as api from "../api"
 import useEntity from "carbure/hooks/entity"
 import { useMutation } from "common-v2/hooks/async"
@@ -16,6 +16,8 @@ import Autocomplete from "common-v2/components/autocomplete"
 import { findCountries, findDepots, findEntities } from "common-v2/api"
 import * as norm from "common-v2/utils/normalizers"
 import { useMatomo } from "matomo"
+import Select from "common-v2/components/select"
+import { formatNumber } from "common-v2/utils/formatters"
 
 export interface SplitOneButtonProps {
   disabled?: boolean
@@ -50,23 +52,23 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
   const matomo = useMatomo()
   const entity = useEntity()
 
+  const { value, bind, setValue, setField } = useForm(defaultSplit)
+
   const splitStock = useMutation(api.splitStock, {
     invalidates: ["snapshot"],
 
     onSuccess: () => {
-      notify(t("Le lot a bien été ajouté à vos brouillons !"), {
-        variant: "success",
-      })
-      onClose()
+      notify(t("Le lot a bien été ajouté à vos brouillons !"), { variant: "success" }) // prettier-ignore
+      setValue(defaultSplit)
     },
 
     onError: () => {
       notify(t("Le lot n'a pas pu être créé"), { variant: "danger" })
-      onClose()
     },
   })
 
-  const { value, bind } = useForm(defaultSplit)
+  const clientIsEntity =
+    value.client instanceof Object && value.client.id === entity.id
 
   return (
     <Dialog onClose={onClose}>
@@ -76,12 +78,26 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
       <main>
         <section>
           {t(
-            "Veuillez remplir le formulaire ci-dessous afin de créer un nouveau lot basé sur le stock sélectionné"
+            "Veuillez remplir le formulaire ci-dessous afin de créer un nouveau lot \nbasé sur le stock sélectionné :"
           )}
         </section>
         <section>
           <Form id="split-stock">
-            <NumberInput label={t("Volume")} {...bind("volume")} />
+            <NumberInput
+              required
+              {...bind("volume")}
+              label={t("Volume ({{volume}} litres disponibles)", {
+                count: stock.remaining_volume,
+                volume: formatNumber(stock.remaining_volume),
+              })}
+              icon={() => (
+                <Button
+                  variant="primary"
+                  label={t("Tout mettre")}
+                  action={() => setField("volume", stock.remaining_volume ?? 0)}
+                />
+              )}
+            />
             <TextInput
               label={t("N° Document d'accompagnement")}
               {...bind("transport_document_reference")}
@@ -93,6 +109,22 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
               create={norm.identity}
               {...bind("client")}
             />
+            {clientIsEntity && (
+              <Select
+                clear
+                label={t("Type de livraison")}
+                placeholder={t("Choisissez un type")}
+                normalize={norm.normalizeDeliveryType}
+                {...bind("delivery_type")}
+                options={[
+                  // DeliveryType.Blending,
+                  // DeliveryType.Stock,
+                  DeliveryType.RFC,
+                  DeliveryType.Direct,
+                  DeliveryType.Export,
+                ]}
+              />
+            )}
             <Autocomplete
               label={t("Site de livraison")}
               getOptions={findDepots}
@@ -100,12 +132,14 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
               {...bind("delivery_site")}
             />
             <Autocomplete
+              required
               label={t("Pays de livraison")}
               getOptions={findCountries}
               normalize={norm.normalizeCountry}
               {...bind("delivery_site_country")}
             />
             <DateInput
+              required
               label={t("Date de livraison")}
               {...bind("delivery_date")}
             />
@@ -145,7 +179,7 @@ function formToStockPayload(
     volume: form.volume,
     transport_document_reference: form.transport_document_reference,
     transport_document_type: undefined,
-    delivery_type: undefined,
+    delivery_type: form.delivery_type,
     delivery_date: form.delivery_date,
     carbure_delivery_site_id:
       form.delivery_site instanceof Object
@@ -161,6 +195,7 @@ function formToStockPayload(
 }
 
 const defaultSplit = {
+  delivery_type: undefined as string | undefined,
   volume: 0 as number | undefined,
   transport_document_reference: undefined as string | undefined,
   client: undefined as Entity | string | undefined,
