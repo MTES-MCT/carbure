@@ -29,12 +29,6 @@ def get_settings(request):
     # requests
     requests = UserRightsRequests.objects.filter(user=request.user).select_related('user', 'entity')
     requests_sez = [r.natural_key() for r in requests]
-
-    # depots = {}
-    # for ur in rights:
-    #     d = EntityDepot.objects.filter(entity=ur.entity).select_related('depot', 'depot__country', 'entity', 'blender')
-    #     serializer = EntityDepotSerializer(d, many=True)
-    #     depots[ur.entity.id] = serializer.data
     return JsonResponse({'status': 'success', 'data': {'rights': rights_sez, 'email': request.user.email, 'requests': requests_sez}})
 
 
@@ -421,7 +415,7 @@ def enable_stocks(request, *args, **kwargs):
 @check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def disable_stocks(request, *args, **kwargs):
     entity = kwargs['context']['entity']
-    stocks = CarbureStock.objects.filter(carbure_client=entity).count()
+    stocks = CarbureStock.objects.filter(carbure_client=entity)
     if stocks.count() > 0:
         return JsonResponse({'status': 'error', 'message': "Cannot disable stocks if you have stocks"}, status=400)
     entity.has_stocks = False

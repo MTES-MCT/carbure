@@ -45,7 +45,8 @@ class Entity(models.Model):
         return self.name
 
     def natural_key(self):
-        d = {'name': self.name, 'id': self.id, 'entity_type': self.entity_type, 'has_mac': self.has_mac, 'has_trading': self.has_trading,
+        d = {'name': self.name, 'id': self.id, 'entity_type': self.entity_type,
+            'has_mac': self.has_mac, 'has_trading': self.has_trading, 'has_direct_deliveries': self.has_direct_deliveries, 'has_stocks': self.has_stocks,
             'legal_name': self.legal_name, 'registration_id': self.registration_id,
             'sustainability_officer': self.sustainability_officer, 'sustainability_officer_phone_number': self.sustainability_officer_phone_number,
             'registered_address': self.registered_address, 'default_certificate': self.default_certificate}
@@ -824,7 +825,7 @@ class CarbureLot(models.Model):
     DELETED = "DELETED"
     LOT_STATUSES = ((DRAFT, DRAFT), (PENDING, PENDING), (ACCEPTED, ACCEPTED), (REJECTED, REJECTED), (FROZEN, FROZEN), (DELETED, DELETED),)
     lot_status = models.CharField(max_length=24, choices=LOT_STATUSES, default=DRAFT)
-    
+
     NO_PROBLEMO = "NO_PROBLEMO"
     IN_CORRECTION = "IN_CORRECTION"
     FIXED = "FIXED"
@@ -840,7 +841,7 @@ class CarbureLot(models.Model):
     PROCESSING = "PROCESSING"
     DIRECT = "DIRECT" # livraison directe
     FLUSHED = "FLUSHED" # emptying stock for accounting or rounding purpuse
-    DELIVERY_TYPES = ((UNKNOWN, UNKNOWN), (RFC, RFC), (STOCK, STOCK), (BLENDING, BLENDING), (EXPORT, EXPORT), 
+    DELIVERY_TYPES = ((UNKNOWN, UNKNOWN), (RFC, RFC), (STOCK, STOCK), (BLENDING, BLENDING), (EXPORT, EXPORT),
                       (TRADING, TRADING), (PROCESSING, PROCESSING), (DIRECT, DIRECT), (FLUSHED, FLUSHED), )
     delivery_type = models.CharField(max_length=64, choices=DELIVERY_TYPES, blank=False, null=False, default=UNKNOWN)
     declared_by_supplier = models.BooleanField(default=False)
@@ -1108,8 +1109,8 @@ class CarbureLotEvent(models.Model):
     DECLCANCEL = "DECLCANCEL"
     DELETED = "DELETED"
     RESTORED = "RESTORED"
-    EVENT_TYPES = ((CREATED, CREATED), (UPDATED, UPDATED), (VALIDATED, VALIDATED), (FIX_REQUESTED, FIX_REQUESTED), (MARKED_AS_FIXED, MARKED_AS_FIXED), 
-                    (FIX_ACCEPTED, FIX_ACCEPTED), (ACCEPTED, ACCEPTED), (REJECTED, REJECTED), (RECALLED, RECALLED), (DECLARED, DECLARED), (DELETED, DELETED), (DECLCANCEL, DECLCANCEL), 
+    EVENT_TYPES = ((CREATED, CREATED), (UPDATED, UPDATED), (VALIDATED, VALIDATED), (FIX_REQUESTED, FIX_REQUESTED), (MARKED_AS_FIXED, MARKED_AS_FIXED),
+                    (FIX_ACCEPTED, FIX_ACCEPTED), (ACCEPTED, ACCEPTED), (REJECTED, REJECTED), (RECALLED, RECALLED), (DECLARED, DECLARED), (DELETED, DELETED), (DECLCANCEL, DECLCANCEL),
                     (RESTORED, RESTORED),)
     event_type = models.CharField(max_length=32, null=False, blank=False, choices=EVENT_TYPES)
     event_dt = models.DateTimeField(auto_now_add=True, null=False, blank=False)
@@ -1145,7 +1146,7 @@ class CarbureLotComment(models.Model):
         db_table = 'carbure_lots_comments'
         indexes = [
             models.Index(fields=['lot']),
-        ]        
+        ]
         verbose_name = 'CarbureLotComment'
         verbose_name_plural = 'CarbureLotComments'
 
@@ -1196,7 +1197,7 @@ class GenericCertificate(models.Model):
     REDCERT = "REDCERT"
     DBS = "2BS"
     CERTIFICATE_TYPES = ((SYSTEME_NATIONAL, SYSTEME_NATIONAL), (ISCC, ISCC), (REDCERT, REDCERT), (DBS, DBS))
-    
+
     certificate_id = models.CharField(max_length=64, blank=False, null=False)
     certificate_type = models.CharField(max_length=32, null=False, blank=False, choices=CERTIFICATE_TYPES)
     certificate_holder = models.CharField(max_length=512, null=False, blank=False)
@@ -1215,13 +1216,13 @@ class GenericCertificate(models.Model):
             models.Index(fields=['certificate_type']),
         ]
         verbose_name = 'CarbureCertificates'
-        verbose_name_plural = 'CarbureCertificates'    
+        verbose_name_plural = 'CarbureCertificates'
 
 class EntityCertificate(models.Model):
     certificate = models.ForeignKey(GenericCertificate, blank=False, null=False, on_delete=models.CASCADE)
     entity = models.ForeignKey(Entity, blank=False, null=False, on_delete=models.CASCADE)
     has_been_updated = models.BooleanField(default=False)
-    
+
     class Meta:
         db_table = 'carbure_entity_certificates'
         indexes = [

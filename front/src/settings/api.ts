@@ -154,30 +154,6 @@ export function deleteDeliverySite(
   })
 }
 
-export function enableMAC(entityID: number) {
-  return api.post("/settings/enable-mac", {
-    entity_id: entityID,
-  })
-}
-
-export function disableMAC(entityID: number) {
-  return api.post("/settings/disable-mac", {
-    entity_id: entityID,
-  })
-}
-
-export function enableTrading(entityID: number) {
-  return api.post("/settings/enable-trading", {
-    entity_id: entityID,
-  })
-}
-
-export function disableTrading(entityID: number) {
-  return api.post("/settings/disable-trading", {
-    entity_id: entityID,
-  })
-}
-
 export function getEntityRights(entity_id: number): Promise<EntityRights> {
   return api.get("/settings/get-entity-rights", { entity_id })
 }
