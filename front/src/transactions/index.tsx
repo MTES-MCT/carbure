@@ -26,35 +26,21 @@ export const Transactions = () => {
   const entity = useEntity()
   const status = useStatus()
 
-  const [year, setYear] = useYear("transactions")
-
-  const years = useQuery(api.getYears, {
-    key: "years",
-    params: [entity.id],
-
-    // select the latest year if the selected one isn't available anymore
-    onSuccess: (res) => {
-      const years = res.data.data ?? []
-      if (!years.includes(year)) {
-        setYear(Math.max(...years))
-      }
-    },
-  })
+  const years = useYears("transactions", api.getYears)
 
   const snapshot = useQuery(api.getSnapshot, {
     key: "snapshot",
-    params: [entity.id, year],
+    params: [entity.id, years.selected],
   })
 
   if (status === "unknown") {
     return <Navigate to="drafts" />
   }
 
-  const yearData = years.result?.data.data ?? []
   const snapshotData = snapshot.result?.data.data
 
   // common props for subroutes
-  const props = { entity, year, snapshot: snapshotData }
+  const props = { entity, year: years.selected, snapshot: snapshotData }
 
   return (
     <PortalProvider>
@@ -68,13 +54,13 @@ export const Transactions = () => {
                 loading={years.loading}
                 variant="inline"
                 placeholder={t("Choisir une année")}
-                value={year}
-                onChange={setYear}
-                options={yearData}
+                value={years.selected}
+                onChange={years.setYear}
+                options={years.options}
                 sort={(year) => -year.value}
               />
 
-              <DeclarationButton year={year} years={yearData} />
+              <DeclarationButton year={years.selected} years={years.options} />
             </section>
 
             <section>
@@ -97,12 +83,14 @@ export const Transactions = () => {
 
 const currentYear = new Date().getFullYear()
 
-export function useYear(root: string) {
+export function useYears(root: string, getYears: typeof api.getYears) {
   const location = useLocation()
   const params = useParams<"year">()
   const navigate = useNavigate()
 
-  const year = parseInt(params.year ?? "") || currentYear
+  const entity = useEntity()
+
+  const selected = parseInt(params.year ?? "") || currentYear
 
   const setYear = useCallback(
     (year: number | undefined) => {
@@ -114,7 +102,30 @@ export function useYear(root: string) {
     [root, location, navigate]
   )
 
-  return [year, setYear] as [typeof year, typeof setYear]
+  const years = useQuery(getYears, {
+    key: "years",
+    params: [entity.id],
+
+    // select the latest year if the selected one isn't available anymore
+    onSuccess: (res) => {
+      const years = listYears(res.data.data)
+      if (!years.includes(selected)) {
+        setYear(Math.max(...years))
+      }
+    },
+  })
+
+  return {
+    loading: years.loading,
+    options: listYears(years.result?.data.data),
+    selected,
+    setYear,
+  }
+}
+
+function listYears(years: number[] | undefined) {
+  if (years?.length) return years
+  else return [currentYear]
 }
 
 export default Transactions

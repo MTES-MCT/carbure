@@ -8,7 +8,7 @@ import Select from "common-v2/components/select"
 import { PortalProvider } from "common-v2/components/portal"
 import { StatusTabs, useStatus } from "./components/status"
 import Lots from "./components/lots"
-import { useYear } from "transactions"
+import { useYears } from "transactions"
 
 export const Controls = () => {
   const { t } = useTranslation()
@@ -16,35 +16,21 @@ export const Controls = () => {
   const entity = useEntity()
   const status = useStatus()
 
-  const [year, setYear] = useYear("controls")
-
-  const years = useQuery(api.getYears, {
-    key: "years",
-    params: [entity.id],
-
-    // select the latest year if the selected one isn't available anymore
-    onSuccess: (res) => {
-      const years = res.data.data ?? []
-      if (!years.includes(year)) {
-        setYear(Math.max(...years))
-      }
-    },
-  })
+  const years = useYears("controls", api.getYears)
 
   const snapshot = useQuery(api.getSnapshot, {
     key: "snapshot",
-    params: [entity.id, year],
+    params: [entity.id, years.selected],
   })
 
   if (status === "unknown") {
     return <Navigate to="alerts" />
   }
 
-  const yearData = years.result?.data.data
   const snapshotData = snapshot.result?.data.data
 
   // common props for subroutes
-  const props = { entity, year, snapshot: snapshotData }
+  const props = { entity, year: years.selected, snapshot: snapshotData }
 
   return (
     <PortalProvider>
@@ -57,9 +43,9 @@ export const Controls = () => {
               loading={years.loading}
               variant="inline"
               placeholder={t("Choisir une année")}
-              value={year}
-              onChange={setYear}
-              options={yearData}
+              value={years.selected}
+              onChange={years.setYear}
+              options={years.options}
               sort={(year) => -year.value}
             />
           </section>
