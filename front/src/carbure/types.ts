@@ -4,6 +4,8 @@ export interface Entity {
   entity_type: EntityType
   has_mac: boolean
   has_trading: boolean
+  has_stocks: boolean
+  has_direct_deliveries: boolean
   default_certificate: string
   ext_admin_pages?: ExternalAdminPages[]
 }
