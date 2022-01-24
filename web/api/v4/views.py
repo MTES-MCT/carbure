@@ -289,7 +289,7 @@ def stock_split(request, *args, **kwargs):
 
     for entry in unserialized:
         # check minimum fields
-        required_fields = ['stock_id', 'volume', 'delivery_date', 'delivery_site_country_id'] # 'delivery_type'
+        required_fields = ['stock_id', 'volume', 'delivery_date', 'delivery_site_country_id'] 
         for field in required_fields:
             if field not in entry:
                 return JsonResponse({'status': 'error', 'message': 'Missing field %s in json object' % (field)}, status=400)
@@ -336,36 +336,34 @@ def stock_split(request, *args, **kwargs):
         elif 'unknown_client' in entry:
             lot.unknown_client = entry['unknown_client']
 
-        # lot.delivery_type = delivery_type
-        # delivery type specific data
-        # if delivery_type in [CarbureLot.RFC, CarbureLot.EXPORT]:
-        #     # carbure_client, carbure_delivery_site, transport_document_type and transport_document_reference are optional
-        #     lot.lot_status = CarbureLot.ACCEPTED
-        #     if 'transport_document_type' in entry:
-        #         lot.transport_document_type = entry['transport_document_type']
-        #     else:
-        #         lot.transport_document_type = CarbureLot.OTHER
-        #     if 'transport_document_reference' in entry:
-        #         lot.transport_document_reference = entry['transport_document_reference']
-        #     else:
-        #         lot.transport_document_reference = lot.delivery_type
-        #     if 'carbure_client_id' in entry:
-        #         lot.carbure_client_id = entry['carbure_client_id']
-        #     if 'carbure_delivery_site_id' in entry:
-        #         lot.carbure_delivery_site_id = entry['carbure_delivery_site_id']
-        #     if 'unknown_client' in entry:
-        #         lot.unknown_client = entry['unknown_client']
-        #     if 'unknown_delivery_site' in entry:
-        #         lot.unknown_delivery_site = entry['unknown_delivery_site']
-        # else: # BLENDING, DIRECT, PROCESSING
-        #     required_fields = ['transport_document_type', 'transport_document_reference', 'carbure_delivery_site_id', 'carbure_client_id']
-        #     for field in required_fields:
-        #         if field not in entry:
-        #             return JsonResponse({'status': 'error', 'message': 'Missing field %s in json object'}, status=400)
-        #     lot.transport_document_type = entry['transport_document_type']
-        #     lot.transport_document_reference = entry['transport_document_reference']
-        #     lot.carbure_delivery_site_id = entry['carbure_delivery_site_id']
-        #     lot.carbure_client_id = entry['carbure_client_id']
+        delivery_type = entry.get('delivery_type', CarbureLot.UNKNOWN)
+        if delivery_type in [CarbureLot.RFC, CarbureLot.EXPORT]:
+            # carbure_client, carbure_delivery_site, transport_document_type and transport_document_reference are optional
+            if 'transport_document_type' in entry:
+                lot.transport_document_type = entry['transport_document_type']
+            else:
+                lot.transport_document_type = CarbureLot.OTHER
+            if 'transport_document_reference' in entry:
+                lot.transport_document_reference = entry['transport_document_reference']
+            else:
+                lot.transport_document_reference = lot.delivery_type
+            if 'carbure_client_id' in entry:
+                lot.carbure_client_id = entry['carbure_client_id']
+            if 'carbure_delivery_site_id' in entry:
+                 lot.carbure_delivery_site_id = entry['carbure_delivery_site_id']
+            if 'unknown_client' in entry:
+                lot.unknown_client = entry['unknown_client']
+            if 'unknown_delivery_site' in entry:
+                lot.unknown_delivery_site = entry['unknown_delivery_site']
+        else: # BLENDING, DIRECT, PROCESSING, UNKNOWN
+            required_fields = ['transport_document_reference', 'carbure_delivery_site_id', 'carbure_client_id']
+            for field in required_fields:
+                if field not in entry:
+                    return JsonResponse({'status': 'error', 'message': 'Missing field %s in json object'}, status=400)
+            lot.transport_document_type = entry.get('transport_document_type', CarbureLot.OTHER)
+            lot.transport_document_reference = entry['transport_document_reference']
+            lot.carbure_delivery_site_id = entry['carbure_delivery_site_id']
+            lot.carbure_client_id = entry['carbure_client_id']
         lot.save()
         # update stock
         if rounded_volume >= stock.remaining_volume:
