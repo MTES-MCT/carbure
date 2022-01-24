@@ -596,12 +596,12 @@ class CarbureLotAdmin(admin.ModelAdmin):
     get_delivery_site.short_description = 'Delivery Site'
 
     def get_biofuel(self, obj):
-        return obj.biofuel.code
+        return obj.biofuel.code if obj.biofuel else ''
     get_biofuel.admin_order_field  = 'biofuel__code'
     get_biofuel.short_description = 'Biofuel'
 
     def get_feedstock(self, obj):
-        return obj.feedstock.code
+        return obj.feedstock.code if obj.feedstock else ''
     get_feedstock.admin_order_field  = 'feedstock__code'
     get_feedstock.short_description = 'Feedstock'
 
@@ -629,12 +629,12 @@ class CarbureStockAdmin(admin.ModelAdmin):
     get_depot.short_description = 'Delivery Site'
 
     def get_biofuel(self, obj):
-        return obj.biofuel.code
+        return obj.biofuel.code if obj.biofuel else ''
     get_biofuel.admin_order_field  = 'biofuel__code'
     get_biofuel.short_description = 'Biofuel'
 
     def get_feedstock(self, obj):
-        return obj.feedstock.code
+        return obj.feedstock.code if obj.feedstock else ''
     get_feedstock.admin_order_field  = 'feedstock__code'
     get_feedstock.short_description = 'Feedstock'
 
