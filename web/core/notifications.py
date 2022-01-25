@@ -1,3 +1,4 @@
+from calendar import calendar
 from core.models import LotTransaction, EmailNotification, UserRights, SustainabilityDeclaration
 import datetime
 
@@ -44,7 +45,10 @@ def notify_declaration_invalidated(tx, entity):
         sd.save()
     except:
         # declaration doesn't exist ?
-        sd = SustainabilityDeclaration.objects.create(entity=entity, period=period)
+        nextmonth = period + datetime.timedelta(days=31)
+        (weekday, lastday) = calendar.monthrange(nextmonth.year, nextmonth.month)
+        deadline = datetime.date(year=nextmonth.year, month=nextmonth.month, day=lastday)   
+        sd = SustainabilityDeclaration.objects.create(entity=entity, period=period, deadline=deadline)
     n = EmailNotification()
     n.linked_declaration = sd
     n.notif_type = EmailNotification.DECLARATION_INVALIDATED

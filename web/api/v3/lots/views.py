@@ -199,7 +199,10 @@ def get_declaration_summary(request, *args, **kwargs):
         .count()
 
     # get associated declaration
-    declaration, created = SustainabilityDeclaration.objects.get_or_create(entity=entity, period=period_date)
+    nextmonth = period_date + datetime.timedelta(days=31)
+    (weekday, lastday) = calendar.monthrange(nextmonth.year, nextmonth.month)
+    deadline = datetime.date(year=nextmonth.year, month=nextmonth.month, day=lastday)
+    declaration, created = SustainabilityDeclaration.objects.get_or_create(entity=entity, period=period_date, deadline=deadline)
     data['declaration'] = declaration.natural_key()
     data['remaining'] = remaining
     return JsonResponse({'status': 'success', 'data': data})
@@ -756,7 +759,10 @@ def validate_declaration(request, *args, **kwargs):
         .exclude(delivery_status=LotTransaction.REJECTED, carbure_client=entity)
         if txs.count() > 0:
             return JsonResponse({'status': "error", 'message': "PENDING_TRANSACTIONS_CANNOT_DECLARE", 'data': {'pending_txs': txs.count(), 'ids': [t.id for t in txs]}}, status=400)
-        declaration, created = SustainabilityDeclaration.objects.update_or_create(entity=entity, period=period, defaults={'declared': True})
+        nextmonth = period + datetime.timedelta(days=31)
+        (weekday, lastday) = calendar.monthrange(nextmonth.year, nextmonth.month)
+        deadline = datetime.date(year=nextmonth.year, month=nextmonth.month, day=lastday)            
+        declaration, created = SustainabilityDeclaration.objects.update_or_create(entity=entity, period=period, deadline=deadline, defaults={'declared': True})
         # freeze transactions
         LotTransaction.objects.filter(lot__period=period.strftime('%Y-%m')).filter(Q(carbure_client=entity) | Q(carbure_vendor=entity)).exclude(delivery_status__in=[LotTransaction.FROZEN]).exclude(lot__status=LotV2.DRAFT).update(delivery_status=LotTransaction.FROZEN)
     except Exception:
