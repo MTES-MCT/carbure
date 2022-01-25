@@ -3,10 +3,11 @@ import { useQuery } from "common-v2/hooks/async"
 import * as api from "../../api"
 import { LotQuery, SummaryItem } from "../../types"
 import { formatNumber, formatPercentage } from "common-v2/utils/formatters"
+import { toSearchParams } from "common-v2/services/api"
 import { usePortal } from "common-v2/components/portal"
 import { LoaderOverlay } from "common-v2/components/scaffold"
 import Alert from "common-v2/components/alert"
-import Button from "common-v2/components/button"
+import Button, { ExternalLink } from "common-v2/components/button"
 import Dialog from "common-v2/components/dialog"
 import Table, { Cell, Column } from "common-v2/components/table"
 import { Filter, Return } from "common-v2/components/icons"
@@ -194,6 +195,14 @@ export const LotSummary = ({
                 cell: (item) => <Cell text={item.supplier ?? t("Inconnu")} />,
               },
               ...columns,
+              {
+                small: true,
+                hidden: !pending,
+                header: t("Aperçu"),
+                cell: (item) => (
+                  <PreviewCell status="in" item={item} query={query} />
+                ),
+              },
             ]}
           />
         </>
@@ -221,6 +230,14 @@ export const LotSummary = ({
                 cell: (item) => <Cell text={item.client ?? t("Inconnu")} />,
               },
               ...columns,
+              {
+                small: true,
+                hidden: !pending,
+                header: t("Aperçu"),
+                cell: (item) => (
+                  <PreviewCell status="out" item={item} query={query} />
+                ),
+              },
             ]}
           />
         </>
@@ -248,5 +265,30 @@ export const LotCell = ({ pending, item }: LotCellProps) => {
       <strong>{item.total - item.pending}</strong>
       <small> / {item.total}</small>
     </p>
+  )
+}
+
+interface PreviewCellProps {
+  status: "in" | "out"
+  item: SummaryItem
+  query: LotQuery
+}
+
+export const PreviewCell = ({ status, item, query }: PreviewCellProps) => {
+  const { t } = useTranslation()
+
+  const filters: Record<string, any> = { periods: query.periods }
+  if (status === "in") {
+    filters.suppliers = [item.supplier]
+  } else {
+    filters.clients = [item.client]
+  }
+
+  return (
+    <ExternalLink
+      href={`../${query.year}/${status}?${toSearchParams(filters)}`}
+    >
+      {t("Voir")}
+    </ExternalLink>
   )
 }

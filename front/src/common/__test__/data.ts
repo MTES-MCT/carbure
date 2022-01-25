@@ -9,6 +9,8 @@ export const producer: Entity = {
   entity_type: EntityType.Producer,
   has_mac: true,
   has_trading: true,
+  has_stocks: false,
+  has_direct_deliveries: false,
   default_certificate: "",
 }
 
@@ -18,6 +20,8 @@ export const trader: Entity = {
   entity_type: EntityType.Trader,
   has_mac: true,
   has_trading: true,
+  has_stocks: false,
+  has_direct_deliveries: false,
   default_certificate: "",
 }
 
@@ -27,6 +31,8 @@ export const operator: Entity = {
   entity_type: EntityType.Operator,
   has_mac: true,
   has_trading: false,
+  has_stocks: false,
+  has_direct_deliveries: false,
   default_certificate: "",
 }
 
@@ -36,6 +42,8 @@ export const admin: Entity = {
   entity_type: EntityType.Administration,
   has_mac: false,
   has_trading: false,
+  has_stocks: false,
+  has_direct_deliveries: false,
   default_certificate: "",
 }
 

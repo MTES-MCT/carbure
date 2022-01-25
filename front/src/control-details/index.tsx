@@ -23,6 +23,7 @@ import LotTraceability, {
   hasTraceability,
 } from "lot-details/components/lot-traceability"
 import { WarningAnomalies } from "./components/warnings"
+import { invalidate } from "common-v2/hooks/invalidate"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -53,11 +54,13 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
 
   const expiring = isExpiring(lotData?.lot)
 
-  const closeDialog = () =>
+  const closeDialog = () => {
+    invalidate("controls")
     navigate({
       pathname: `../${status}`,
       search: location.search,
     })
+  }
 
   return (
     <Dialog onClose={closeDialog}>

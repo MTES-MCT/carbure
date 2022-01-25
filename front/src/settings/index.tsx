@@ -2,7 +2,6 @@ import { Trans } from "react-i18next"
 import { EntityManager } from "carbure/hooks/entity"
 
 import { PortalProvider } from "common-v2/components/portal"
-import useCompany from "./hooks/use-company"
 import useDeliverySites from "./hooks/use-delivery-sites"
 import useProductionSites from "./hooks/use-production-sites"
 
@@ -22,7 +21,7 @@ import useEntity from "carbure/hooks/entity"
 const Settings = () => {
   const entity = useEntity()
 
-  const { company, productionSites, deliverySites } = useSettings(entity)
+  const { productionSites, deliverySites } = useSettings(entity)
 
   const { isProducer, isTrader, isOperator } = entity
 
@@ -71,17 +70,11 @@ const Settings = () => {
         </Sticky>
 
         <SettingsBody>
-          {hasOptions && <CompanySettings entity={entity} settings={company} />}
+          {hasOptions && <CompanySettings />}
           {hasDepot && <DeliverySitesSettings settings={deliverySites} />}
-
           {isProducer && <ProductionSitesSettings settings={productionSites} />}
-
-          {isProducer && (
-            <DoubleCountingSettings entity={entity} settings={company} />
-          )}
-
+          {isProducer && <DoubleCountingSettings />}
           {hasCertificates && <Certificates />}
-
           {entity.hasRights(UserRole.Admin) && (
             <EntityUserRights entity={entity} />
           )}
@@ -92,14 +85,12 @@ const Settings = () => {
 }
 
 function useSettings(entity: EntityManager) {
-  const company = useCompany(entity)
   const productionSites = useProductionSites(entity)
   const deliverySites = useDeliverySites(entity)
 
   return {
     productionSites,
     deliverySites,
-    company,
   }
 }
 

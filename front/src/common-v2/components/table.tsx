@@ -35,7 +35,7 @@ export function Table<T>({
     <div data-list className={cl(css.table, className)} style={style}>
       {!headless && (
         <header className={css.columns}>
-          {columns.map((column, i) => (
+          {columns.filter(isVisible).map((column, i) => (
             <div
               key={column.key ?? i}
               data-sortable={column.key ? true : undefined}
@@ -65,7 +65,7 @@ export function Table<T>({
             data-interactive={onAction ? true : undefined}
             onClick={onAction ? () => onAction(row) : undefined}
           >
-            {columns.map((column, i) => (
+            {columns.filter(isVisible).map((column, i) => (
               <div
                 key={column.key ?? i}
                 className={cl(
@@ -84,6 +84,10 @@ export function Table<T>({
       {loading && <LoaderOverlay />}
     </div>
   )
+}
+
+function isVisible(column: Column<any>) {
+  return !column.hidden
 }
 
 export function selectionColumn<T, V>(
@@ -194,6 +198,7 @@ export interface Column<T> {
   key?: string
   className?: string
   small?: boolean
+  hidden?: boolean
   orderBy?: OrderBy<T>
 }
 
