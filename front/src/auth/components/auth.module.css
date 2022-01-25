@@ -1,0 +1,73 @@
+.auth {
+  background-color: var(--body);
+  opacity: 1;
+}
+
+.auth .panel {
+  background-color: var(--white);
+  gap: 48px;
+}
+
+.auth .panel > header {
+  display: flex;
+  border: none;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  padding: 64px;
+  padding-bottom: 0;
+}
+
+.auth .panel > section {
+  display: flex;
+  flex-direction: column;
+  padding: 0 64px;
+}
+
+.auth .panel > section form {
+  min-width: 360px;
+  gap: var(--spacing-s);
+}
+
+.auth .panel > footer {
+  flex-direction: column;
+  align-items: stretch;
+  border: none;
+  gap: var(--spacing-s);
+  padding: 64px;
+  padding-top: 0;
+}
+
+.logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  gap: var(--spacing-m);
+}
+
+.logo img {
+  width: 128px;
+}
+
+.logo h1 {
+  font-size: 2.5em;
+}
+
+.switcher {
+  display: flex;
+  margin: auto;
+  gap: var(--spacing-l);
+  font-size: 1.33em;
+  font-weight: bold;
+}
+
+.switcher a.active {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.formLink {
+  height: 66px;
+  align-self: center;
+}

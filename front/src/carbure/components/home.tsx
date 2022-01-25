@@ -94,7 +94,7 @@ const Home = () => {
           <Fragment>
             <Button
               icon={UserAdd}
-              href="/accounts/register"
+              to="/auth/register"
               className={styles.homeButton}
             >
               <Trans>S'inscrire</Trans>
@@ -102,7 +102,7 @@ const Home = () => {
             <Button
               icon={UserCheck}
               variant="primary"
-              href="/accounts/login"
+              to="/auth/login"
               className={styles.homeButton}
             >
               <Trans>Se connecter</Trans>

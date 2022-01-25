@@ -45,8 +45,7 @@ export function useLoadUser(): UserManager {
   }
 
   function isAuthenticated() {
-    const error = settings.error as AxiosError | undefined
-    return error?.response?.data.message !== "User not verified"
+    return settings.result !== undefined && settings.error === undefined
   }
 
   return {
