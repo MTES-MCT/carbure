@@ -82,17 +82,21 @@ export const Tabs = ({
 }
 
 export function useMatcher() {
-  const parentPath = useResolvedPath(".").pathname
-  const currentPath = useLocation().pathname
+  const parentPath = useResolvedPath(".")
+  const currentPath = useLocation()
 
   return (path: string | undefined) => {
-    if (path === undefined) return null
-    const tabPath = resolvePath(path, parentPath).pathname
-    const isSamePath = currentPath === tabPath
-    const startsWithPath =
-      currentPath.startsWith(tabPath) &&
-      currentPath.charAt(tabPath.length) === "/"
-    return isSamePath || startsWithPath
+    if (path === undefined) {
+      return null
+    } else if (path.charAt(0) === "#") {
+      return currentPath.hash === path
+    } else {
+      const tabPath = resolvePath(path, parentPath.pathname)
+      const startsWithPath =
+        currentPath.pathname.startsWith(tabPath.pathname) &&
+        currentPath.pathname.charAt(tabPath.pathname.length) === "/"
+      return currentPath === tabPath || startsWithPath
+    }
   }
 }
 

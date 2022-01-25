@@ -33,16 +33,8 @@ const PublicTopbar = () => {
     <Header>
       <Logo />
       <LanguageSelection />
-      <Button
-        asideX
-        href="/accounts/login"
-        label={t("S'inscrire")} // prettier-ignore
-      />
-      <Button
-        variant="primary"
-        href="/accounts/login"
-        label={t("Se connecter")}
-      />
+      <Button asideX to="/auth/register" label={t("S'inscrire")} />
+      <Button variant="primary" to="/auth/login" label={t("Se connecter")} />
       <Faq />
     </Header>
   )

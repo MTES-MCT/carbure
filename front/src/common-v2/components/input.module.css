@@ -35,6 +35,12 @@
   font-weight: 600;
 }
 
+.solid .label {
+  font-size: 1em;
+  font-weight: 600;
+  color: var(--black);
+}
+
 .solid .control {
   background-color: var(--gray-light);
   font-weight: 600;

@@ -157,3 +157,8 @@
 .external:hover {
   text-decoration: underline;
 }
+
+.center span {
+  flex: 1;
+  text-align: center;
+}

@@ -23,6 +23,7 @@ export interface ButtonProps<T = void> extends Layout {
   disabled?: boolean
   loading?: boolean
   captive?: boolean
+  center?: boolean
   variant?: ButtonVariant
   label?: string
   title?: string
@@ -53,6 +54,7 @@ export function Button<T>({
   tabIndex,
   href,
   to,
+  center,
   action,
 }: ButtonProps<T>) {
   const icon = typeof Icon === "function" ? <Icon /> : Icon
@@ -73,6 +75,7 @@ export function Button<T>({
         className={cl(
           css.button,
           variant && css[variant],
+          center && css.center,
           hasIconAndText && css.composite,
           className
         )}
@@ -82,7 +85,7 @@ export function Button<T>({
         }}
       >
         {loading ? <Loader /> : icon}
-        {variant !== "icon" && (label ?? children)}
+        {variant !== "icon" && <span>{label ?? children}</span>}
       </button>
     </LinkWrapper>
   )
