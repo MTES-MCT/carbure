@@ -6,7 +6,6 @@ import DevBanner from "./components/dev-banner"
 import Topbar from "./components/top-bar"
 import Footer from "./components/footer"
 import Pending from "./components/pending"
-import Exit from "./components/exit"
 import Registry from "./components/registry"
 import PublicStats from "./components/public-stats"
 import Home from "./components/home"
@@ -17,13 +16,11 @@ import DoubleCounting from "doublecount"
 import Dashboard from "dashboard"
 import Controls from "controls"
 import Entities from "../entities" // not using  path prevents import
+import Auth from "auth"
 
 const Carbure = () => {
   const user = useLoadUser()
-
-  if (!user.isAuthenticated()) {
-    return <Exit to="/accounts/login" />
-  }
+  const hasAuth = user.isAuthenticated()
 
   return (
     <UserContext.Provider value={user}>
@@ -34,11 +31,15 @@ const Carbure = () => {
 
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/pending" element={<Pending />} />
-          <Route path="/account" element={<Account />} />
-          <Route path="/org/:entity/*" element={<Org />} />
           <Route path="/public_stats" element={<PublicStats />} />
-          <Route path="/logout" element={<Exit to="/accounts/logout" />} />
+
+          {!hasAuth && <Route path="/auth/*" element={<Auth />} />}
+
+          {hasAuth && <Route path="/pending" element={<Pending />} />}
+          {hasAuth && <Route path="/account" element={<Account />} />}
+          {hasAuth && <Route path="/org/:entity/*" element={<Org />} />}
+
+          {!user.loading && <Route path="*" element={<Navigate to="/" />} />}
         </Routes>
 
         <Footer />

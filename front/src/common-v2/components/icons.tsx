@@ -415,3 +415,18 @@ export const InfoCircle = ({ className, ...props }: IconProps) => (
     <polyline points="11 12 12 12 12 16 13 16" />
   </Icon>
 )
+
+export const Mail = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("mail", className)}>
+    <rect x="3" y="5" width="18" height="14" rx="2" />
+    <polyline points="3 7 12 13 21 7" />
+  </Icon>
+)
+
+export const Lock = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("lock", className)}>
+    <rect x="5" y="11" width="14" height="10" rx="2" />
+    <circle cx="12" cy="16" r="1" />
+    <path d="M8 11v-4a4 4 0 0 1 8 0v4" />
+  </Icon>
+)
