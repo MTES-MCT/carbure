@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next"
 import { Tag, TagProps, TagVariant } from "common-v2/components/tag"
 import { Lot, LotStatus, CorrectionStatus, DeliveryType } from "../../types"
+import useEntity from "carbure/hooks/entity"
 
 export interface LotTagProps extends TagProps {
   lot: Lot
@@ -8,9 +9,12 @@ export interface LotTagProps extends TagProps {
 
 export const LotTag = ({ lot, ...props }: LotTagProps) => {
   const { t } = useTranslation()
+  const entity = useEntity()
 
   let label = t("N/A")
   let variant: TagVariant | undefined = undefined
+
+  const isClient = lot.carbure_client?.id === entity.id
 
   const status = lot.lot_status
   const correction = lot.correction_status
@@ -33,7 +37,7 @@ export const LotTag = ({ lot, ...props }: LotTagProps) => {
   } else if (status === LotStatus.Deleted) {
     label = t("Supprimé")
     variant = "danger"
-  } else {
+  } else if (isClient && delivery !== DeliveryType.Unknown) {
     variant = "success"
     if (delivery === DeliveryType.Blending) {
       label = t("Incorporé")
@@ -49,11 +53,13 @@ export const LotTag = ({ lot, ...props }: LotTagProps) => {
       label = t("Stocké")
     } else if (delivery === DeliveryType.Trading) {
       label = t("Transféré")
-    } else if (status === LotStatus.Accepted) {
-      label = t("Accepté")
-    } else if (status === LotStatus.Frozen) {
-      label = t("Déclaré")
     }
+  } else if (status === LotStatus.Accepted) {
+    variant = "success"
+    label = t("Accepté")
+  } else if (status === LotStatus.Frozen) {
+    variant = "success"
+    label = t("Déclaré")
   }
 
   return <Tag {...props} variant={variant} label={label} />

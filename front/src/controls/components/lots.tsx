@@ -30,7 +30,7 @@ export const Lots = ({ entity, year }: LotsProps) => {
   const query = useLotQuery(state)
 
   const lots = useQuery(api.getLots, {
-    key: "lots",
+    key: "controls",
     params: [query],
 
     onSuccess: () => {

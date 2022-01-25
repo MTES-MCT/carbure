@@ -30,6 +30,8 @@ export function useEntity(): EntityManager {
     entity_type: entity?.entity_type ?? EntityType.Operator,
     has_mac: entity?.has_mac ?? false,
     has_trading: entity?.has_trading ?? false,
+    has_stocks: entity?.has_stocks ?? false,
+    has_direct_deliveries: entity?.has_direct_deliveries ?? false,
     default_certificate: entity?.default_certificate ?? "",
     ext_admin_pages: entity?.ext_admin_pages ?? [],
 
