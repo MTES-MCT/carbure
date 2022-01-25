@@ -1,3 +1,4 @@
+from calendar import calendar
 import datetime
 from json.encoder import py_encode_basestring_ascii
 import unicodedata
@@ -1490,7 +1491,10 @@ def validate_declaration(request, *args, **kwargs):
         year = int(period_int / 100)
         month = period_int % 100
         period_d = datetime.date(year=year, month=month, day=1)
-        declaration, _ = SustainabilityDeclaration.objects.get_or_create(entity_id=entity_id, period=period_d)
+        nextmonth = period_d + datetime.timedelta(days=31)
+        (weekday, lastday) = calendar.monthrange(nextmonth.year, nextmonth.month)
+        deadline = datetime.date(year=nextmonth.year, month=nextmonth.month, day=lastday)           
+        declaration, _ = SustainabilityDeclaration.objects.get_or_create(entity_id=entity_id, period=period_d, deadline=deadline)
     except:
         return JsonResponse({'status': 'error', 'message': 'Could not parse period.'}, status=400)
 
@@ -1539,7 +1543,10 @@ def invalidate_declaration(request, *args, **kwargs):
         year = int(period_int / 100)
         month = period_int % 100
         period_d = datetime.date(year=year, month=month, day=1)
-        declaration, _ = SustainabilityDeclaration.objects.get_or_create(entity_id=entity_id, period=period_d)
+        nextmonth = period_d + datetime.timedelta(days=31)
+        (weekday, lastday) = calendar.monthrange(nextmonth.year, nextmonth.month)
+        deadline = datetime.date(year=nextmonth.year, month=nextmonth.month, day=lastday)           
+        declaration, _ = SustainabilityDeclaration.objects.get_or_create(entity_id=entity_id, period=period_d, deadline=deadline)
         declaration.declared = False
         declaration.checked = False
         declaration.save()
