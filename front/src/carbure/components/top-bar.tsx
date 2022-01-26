@@ -204,7 +204,7 @@ const UserMenu = ({ user, entity }: UserMenuProps) => {
           label: user.email,
           children: [
             { label: t("Mon compte"), path: "/account" },
-            { label: t("Se déconnecter"), path: "/logout" },
+            { label: t("Se déconnecter"), path: "/auth/logout" },
           ],
         },
       ]}
