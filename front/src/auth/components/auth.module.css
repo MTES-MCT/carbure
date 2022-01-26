@@ -6,13 +6,14 @@
 .auth .panel {
   background-color: var(--white);
   gap: 48px;
+  width: min-content;
+  min-width: 490px;
 }
 
 .auth .panel > header {
   display: flex;
   border: none;
   justify-content: center;
-  padding: var(--spacing-xl);
   padding: 64px;
   padding-bottom: 0;
 }
@@ -23,8 +24,11 @@
   padding: 0 64px;
 }
 
+.auth .panel > section p {
+  text-align: justify;
+}
+
 .auth .panel > section form {
-  min-width: 360px;
   gap: var(--spacing-s);
 }
 
