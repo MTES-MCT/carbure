@@ -93,7 +93,7 @@ const StatusRecap = ({ loading, count = 0, label }: StatusRecapProps) => {
 }
 
 export function useStatus() {
-  const match = useMatch<"status", string>("/org/:entity/controls/:year/:status/*") // prettier-ignore
+  const match = useMatch("/org/:entity/controls/:year/:status/*") // prettier-ignore
   return (match?.params.status ?? "unknown") as AdminStatus
 }
 
