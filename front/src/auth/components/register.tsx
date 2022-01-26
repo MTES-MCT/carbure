@@ -5,15 +5,30 @@ import Form, { useForm } from "common-v2/components/form"
 import { Mail, Lock, Return, UserAdd } from "common-v2/components/icons"
 import { TextInput } from "common-v2/components/input"
 import { Container, Logo, Switcher } from "./login"
+import { useNotify } from "common-v2/components/notifications"
+import { useMutation } from "common-v2/hooks/async"
+import * as api from "../api"
 
 const Register = () => {
   const { t } = useTranslation()
+  const notify = useNotify()
   const navigate = useNavigate()
 
   const { value, bind } = useForm({
     email: "" as string | undefined,
     password: "" as string | undefined,
     repeatPassword: "" as string | undefined,
+  })
+
+  const register = useMutation(api.register, {
+    onSuccess: () => {
+      notify(t("Le compte a bien été créé !"), { variant: "success" })
+      navigate("../registered")
+    },
+
+    onError: () => {
+      notify(t("Le compte n'a pas pu être créé !"), { variant: "danger" })
+    },
   })
 
   const isPassOk = value.password === value.repeatPassword
@@ -29,7 +44,16 @@ const Register = () => {
       </section>
 
       <section>
-        <Form id="register">
+        <Form
+          id="register"
+          onSubmit={() =>
+            register.execute(
+              value.email!,
+              value.password!,
+              value.repeatPassword!
+            )
+          }
+        >
           <TextInput
             variant="solid"
             icon={Mail}
@@ -58,6 +82,7 @@ const Register = () => {
       <footer>
         <Button
           center
+          loading={register.loading}
           disabled={
             !isPassOk ||
             !value.email ||
