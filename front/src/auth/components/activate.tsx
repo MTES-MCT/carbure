@@ -93,7 +93,7 @@ export const ActivateRequest = () => {
     },
 
     onError: () => {
-      notify(t("Lle lien n'a pas pu être envoyé !"), {
+      notify(t("Le lien n'a pas pu être envoyé !"), {
         variant: "danger",
       })
     },
