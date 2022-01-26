@@ -11,14 +11,28 @@ import { Link } from "react-router-dom"
 import { Overlay, Panel } from "common-v2/components/scaffold"
 import marianne from "carbure/assets/images/Marianne.svg"
 import css from "./auth.module.css"
+import { useNotify } from "common-v2/components/notifications"
+import { useMutation } from "common-v2/hooks/async"
+import * as api from "../api"
 
 const Login = () => {
   const { t } = useTranslation()
+  const notify = useNotify()
   const navigate = useNavigate()
 
   const { value, bind } = useForm({
     email: "" as string | undefined,
     password: "" as string | undefined,
+  })
+
+  const login = useMutation(api.login, {
+    onSuccess: () => {
+      notify(t("Un code vient de vous être envoyé"), { variant: "success" })
+      navigate("otp")
+    },
+    onError: () => {
+      notify(t("La connexion a échoué"), { variant: "danger" })
+    },
   })
 
   return (
@@ -32,7 +46,10 @@ const Login = () => {
       </section>
 
       <section>
-        <Form id="login">
+        <Form
+          id="login"
+          onSubmit={() => login.execute(value.email!, value.password!)}
+        >
           <TextInput
             variant="solid"
             icon={Mail}
@@ -50,6 +67,7 @@ const Login = () => {
           <Button
             variant="link"
             label={t("J'ai oublié mon mot de passe")}
+            to="../reset-password-request"
             className={css.formLink}
           />
         </Form>
@@ -58,6 +76,7 @@ const Login = () => {
       <footer>
         <Button
           center
+          loading={login.loading}
           disabled={!value.email || !value.password}
           variant="primary"
           icon={UserCheck}
