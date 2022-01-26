@@ -16,7 +16,7 @@ from core.decorators import check_user_rights
 from api.v4.helpers import filter_lots, filter_stock, get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock
 from api.v4.helpers import get_prefetched_data, get_stock_events, get_stock_with_metadata, get_stock_filters_data, get_stocks_summary_data, get_transaction_distance, handle_eth_to_etbe_transformation
 from api.v4.helpers import send_email_declaration_invalidated, send_email_declaration_validated
-from api.v4.lots import construct_carbure_lot, bulk_insert_lots
+from api.v4.lots import construct_carbure_lot, bulk_insert_lots, try_get_date
 from api.v4.sanity_checks import bulk_sanity_checks, sanity_check
 
 from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Entity, GenericError, Pays, SustainabilityDeclaration, UserRights
@@ -323,7 +323,7 @@ def stock_split(request, *args, **kwargs):
         lot.parent_stock = stock
         # common, mandatory data
         lot.delivery_site_country = Pays.objects.get(code_pays=entry['delivery_site_country_id'])
-        lot.delivery_date = entry['delivery_date']
+        lot.delivery_date = try_get_date(entry['delivery_date'])
         lot.period = lot.delivery_date.year * 100 + lot.delivery_date.month
         if 'dispatch_date' in entry:
             lot.dispatch_date = entry['dispatch_date']
