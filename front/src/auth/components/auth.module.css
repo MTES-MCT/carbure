@@ -1,27 +1,34 @@
 .auth {
   background-color: var(--body);
   opacity: 1;
+  --gap: 40px;
+  --padding: 48px;
 }
 
 .auth .panel {
   background-color: var(--white);
-  gap: 48px;
+  gap: var(--gap);
   width: min-content;
   min-width: 490px;
+}
+
+.auth .panel .loader {
+  align-self: center;
+  opacity: 0.5;
 }
 
 .auth .panel > header {
   display: flex;
   border: none;
   justify-content: center;
-  padding: 64px;
+  padding: var(--padding);
   padding-bottom: 0;
 }
 
 .auth .panel > section {
   display: flex;
   flex-direction: column;
-  padding: 0 64px;
+  padding: 0 var(--padding);
 }
 
 .auth .panel > section p {
@@ -32,12 +39,17 @@
   gap: var(--spacing-s);
 }
 
+.auth .panel > section button {
+  height: 66px;
+  align-self: center;
+}
+
 .auth .panel > footer {
   flex-direction: column;
   align-items: stretch;
   border: none;
   gap: var(--spacing-s);
-  padding: 64px;
+  padding: var(--padding);
   padding-top: 0;
 }
 
@@ -69,9 +81,4 @@
 .switcher a.active {
   font-weight: bold;
   text-decoration: underline;
-}
-
-.formLink {
-  height: 66px;
-  align-self: center;
 }

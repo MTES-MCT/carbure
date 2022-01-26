@@ -6,20 +6,24 @@ import {
   ResetPasswordPending,
   ResetPassword,
 } from "./components/password"
-import Register from "./components/register"
+import { Register, RegisterPending } from "./components/register"
+import { Activate, ActivateRequest } from "./components/activate"
+import { Logout } from "./components/logout"
 
-const Auth = () => {
-  return (
-    <Routes>
-      <Route path="login" element={<Login />} />
-      <Route path="register" element={<Register />} />
-      <Route path="otp" element={<OTP />} />
-      <Route path="reset-password-request" element={<ResetPasswordRequest />} />
-      <Route path="reset-password-pending" element={<ResetPasswordPending />} />
-      <Route path="reset-password" element={<ResetPassword />} />
-      <Route path="*" element={<Navigate to="login" />} />
-    </Routes>
-  )
-}
+const Auth = () => (
+  <Routes>
+    <Route path="login" element={<Login />} />
+    <Route path="otp" element={<OTP />} />
+    <Route path="logout" element={<Logout />} />
+    <Route path="register" element={<Register />} />
+    <Route path="register-pending" element={<RegisterPending />} />
+    <Route path="activate" element={<Activate />} />
+    <Route path="activate-request" element={<ActivateRequest />} />
+    <Route path="reset-password-request" element={<ResetPasswordRequest />} />
+    <Route path="reset-password-pending" element={<ResetPasswordPending />} />
+    <Route path="reset-password" element={<ResetPassword />} />
+    <Route path="*" element={<Navigate to="login" />} />
+  </Routes>
+)
 
 export default Auth
