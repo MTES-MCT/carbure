@@ -20,7 +20,7 @@ import Auth from "auth"
 
 const Carbure = () => {
   const user = useLoadUser()
-  const hasAuth = user.isAuthenticated()
+  const isAuth = user.isAuthenticated()
 
   return (
     <UserContext.Provider value={user}>
@@ -33,11 +33,11 @@ const Carbure = () => {
           <Route path="/" element={<Home />} />
           <Route path="/public_stats" element={<PublicStats />} />
 
-          {!hasAuth && <Route path="/auth/*" element={<Auth />} />}
+          {!isAuth && <Route path="/auth/*" element={<Auth />} />}
 
-          {hasAuth && <Route path="/pending" element={<Pending />} />}
-          {hasAuth && <Route path="/account" element={<Account />} />}
-          {hasAuth && <Route path="/org/:entity/*" element={<Org />} />}
+          {isAuth && <Route path="/pending" element={<Pending />} />}
+          {isAuth && <Route path="/account" element={<Account />} />}
+          {isAuth && <Route path="/org/:entity/*" element={<Org />} />}
 
           {!user.loading && <Route path="*" element={<Navigate to="/" />} />}
         </Routes>

@@ -37,10 +37,6 @@ const Login = () => {
 
   return (
     <Container>
-      <header>
-        <Logo />
-      </header>
-
       <section>
         <Switcher />
       </section>
@@ -68,7 +64,6 @@ const Login = () => {
             variant="link"
             label={t("J'ai oublié mon mot de passe")}
             to="../reset-password-request"
-            className={css.formLink}
           />
         </Form>
       </section>
@@ -97,7 +92,12 @@ const Login = () => {
 
 export const Container = ({ children }: { children: React.ReactNode }) => (
   <Overlay className={css.auth}>
-    <Panel className={css.panel}>{children}</Panel>
+    <Panel className={css.panel}>
+      <header>
+        <Logo />
+      </header>
+      {children}
+    </Panel>
   </Overlay>
 )
 
@@ -105,13 +105,14 @@ export const Switcher = () => {
   const { t } = useTranslation()
   const match = useMatch("auth/:focus")
   const isLogin = match?.params.focus === "login"
+  const isRegister = match?.params.focus === "register"
   return (
     <div className={css.switcher}>
       <Link to="../login" className={cl(isLogin && css.active)}>
         {"→ "}
         {t("Connexion")}
       </Link>
-      <Link to="../register" className={cl(!isLogin && css.active)}>
+      <Link to="../register" className={cl(isRegister && css.active)}>
         {"→ "}
         {t("Inscription")}
       </Link>
