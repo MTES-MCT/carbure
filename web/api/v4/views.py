@@ -323,7 +323,7 @@ def stock_split(request, *args, **kwargs):
         lot.parent_stock = stock
         # common, mandatory data
         lot.delivery_site_country = Pays.objects.get(code_pays=entry['delivery_site_country_id'])
-        lot.transport_document_reference = entry['transport_document_reference']
+        lot.transport_document_reference = entry.get('transport_document_reference', '')
         lot.delivery_date = entry['delivery_date']
         lot.period = lot.delivery_date.year * 100 + lot.delivery_date.month
         if 'dispatch_date' in entry:
