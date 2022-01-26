@@ -4,12 +4,12 @@ import { useNavigate } from "react-router-dom"
 import Form, { useForm } from "common-v2/components/form"
 import { Mail, Lock, Return, UserAdd } from "common-v2/components/icons"
 import { TextInput } from "common-v2/components/input"
-import { Container, Logo, Switcher } from "./login"
+import { Container, Switcher } from "./login"
 import { useNotify } from "common-v2/components/notifications"
 import { useMutation } from "common-v2/hooks/async"
 import * as api from "../api"
 
-const Register = () => {
+export const Register = () => {
   const { t } = useTranslation()
   const notify = useNotify()
   const navigate = useNavigate()
@@ -23,7 +23,7 @@ const Register = () => {
   const register = useMutation(api.register, {
     onSuccess: () => {
       notify(t("Le compte a bien été créé !"), { variant: "success" })
-      navigate("../registered")
+      navigate("../register-pending")
     },
 
     onError: () => {
@@ -35,10 +35,6 @@ const Register = () => {
 
   return (
     <Container>
-      <header>
-        <Logo />
-      </header>
-
       <section>
         <Switcher />
       </section>
@@ -76,6 +72,11 @@ const Register = () => {
             {...bind("repeatPassword")}
             error={!isPassOk ? t("Les mots de passe de correspondent pas") : undefined} // prettier-ignore
           />
+          <Button
+            variant="link"
+            label={t("Je n'ai pas reçu le lien d'activation")}
+            to="../activate-request"
+          />
         </Form>
       </section>
 
@@ -106,4 +107,29 @@ const Register = () => {
   )
 }
 
-export default Register
+export const RegisterPending = () => {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+
+  return (
+    <Container>
+      <section>
+        <p>
+          {t(
+            "Votre demande d'inscription a bien été envoyée. Vous recevrez un email sous peu contenant un lien qui vous permettra d'activer votre compte afin de pouvoir vous connecter."
+          )}
+        </p>
+      </section>
+
+      <footer>
+        <Button
+          center
+          variant="secondary"
+          icon={Return}
+          label={t("Retour")}
+          action={() => navigate("/")}
+        />
+      </footer>
+    </Container>
+  )
+}
