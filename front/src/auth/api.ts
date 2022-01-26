@@ -20,26 +20,36 @@ export function verifyOTP(otp: string) {
   return api.post("/auth/verify-otp", { otp })
 }
 
-export function requestPasswordReset(email: string) {
+export function requestResetPassword(email: string) {
   return api.post("/auth/request-password-reset", { email })
 }
 
 export function resetPassword(
+  token: string | null,
   old_password: string,
   password1: string,
   password2: string
 ) {
+  if (token === null) {
+    throw new Error("Missing token for password reset")
+  }
+
   return api.post("/auth/reset-password", {
+    token,
     old_password,
     password1,
     password2,
   })
 }
 
-export function requestActivationLink(email: string) {
+export function requestActivateAccount(email: string) {
   return api.post("/auth/request-activation-link", { email })
 }
 
-export function activateAccount(hash: string) {
-  return api.post("/auth/activate", { hash })
+export function activateAccount(token: string | null) {
+  if (token === null) {
+    throw new Error("Token missing for account activation")
+  }
+
+  return api.post("/auth/activate", { token })
 }

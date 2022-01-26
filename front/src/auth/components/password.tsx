@@ -1,13 +1,14 @@
-import Button from "common-v2/components/button"
 import { useTranslation } from "react-i18next"
+import Button from "common-v2/components/button"
 import { useNavigate } from "react-router-dom"
 import Form, { useForm } from "common-v2/components/form"
 import { Lock, Mail, Refresh, Return, Save } from "common-v2/components/icons"
 import { TextInput } from "common-v2/components/input"
-import { Container, Logo } from "./login"
+import { Container } from "./login"
 import { useNotify } from "common-v2/components/notifications"
 import { useMutation } from "common-v2/hooks/async"
 import * as api from "../api"
+import { useToken } from "./activate"
 
 export const ResetPasswordRequest = () => {
   const { t } = useTranslation()
@@ -18,7 +19,7 @@ export const ResetPasswordRequest = () => {
     email: "" as string | undefined,
   })
 
-  const requestPasswordReset = useMutation(api.requestPasswordReset, {
+  const requestPasswordReset = useMutation(api.requestResetPassword, {
     onSuccess: () => {
       notify(t("La demande de changement de mot de passe a été envoyée !"), {
         variant: "success",
@@ -35,10 +36,6 @@ export const ResetPasswordRequest = () => {
 
   return (
     <Container>
-      <header>
-        <Logo />
-      </header>
-
       <section>
         <p>
           {t(
@@ -90,10 +87,6 @@ export const ResetPasswordPending = () => {
 
   return (
     <Container>
-      <header>
-        <Logo />
-      </header>
-
       <section>
         <p>
           {t(
@@ -126,6 +119,8 @@ export const ResetPassword = () => {
     repeatNewPassword: "" as string | undefined,
   })
 
+  const token = useToken()
+
   const resetPassword = useMutation(api.resetPassword, {
     onSuccess: () => {
       notify(t("Le mot de passe a bien été changé !"), { variant: "success" })
@@ -143,10 +138,6 @@ export const ResetPassword = () => {
 
   return (
     <Container>
-      <header>
-        <Logo />
-      </header>
-
       <section>
         <p>
           {t(
@@ -160,6 +151,7 @@ export const ResetPassword = () => {
           id="reset-password"
           onSubmit={() =>
             resetPassword.execute(
+              token!,
               value.oldPassword!,
               value.newPassword!,
               value.repeatNewPassword!
@@ -172,7 +164,6 @@ export const ResetPassword = () => {
             type="password"
             label={t("Ancien mot de passe")}
             {...bind("oldPassword")}
-            style={{ marginBottom: "var(--spacing-l)" }}
           />
           <TextInput
             variant="solid"
@@ -198,6 +189,7 @@ export const ResetPassword = () => {
           loading={resetPassword.loading}
           disabled={
             !isPassOk ||
+            !token ||
             !value.oldPassword ||
             !value.newPassword ||
             !value.repeatNewPassword

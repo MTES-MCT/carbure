@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 import Form, { useForm } from "common-v2/components/form"
 import { Lock, Return, UserCheck } from "common-v2/components/icons"
 import { TextInput } from "common-v2/components/input"
-import { Container, Logo } from "./login"
+import { Container } from "./login"
 import { useNotify } from "common-v2/components/notifications"
 import { useMutation } from "common-v2/hooks/async"
 import * as api from "../api"
@@ -43,14 +43,10 @@ const OTP = () => {
 
   return (
     <Container>
-      <header>
-        <Logo />
-      </header>
-
       <section>
         <p>
           {t(
-            "Un code à 6 chiffres vient de vous être envoyé à l'adresse email spécifiée, veuillez l'entrer dans le champ ci-dessous pour confirmer votre connexion :"
+            "Un code à 6 chiffres vient d'être envoyé à l'adresse email spécifiée, veuillez l'entrer dans le champ ci-dessous pour confirmer votre connexion :"
           )}
         </p>
       </section>
@@ -70,12 +66,11 @@ const OTP = () => {
       <section>
         <p>
           {t(
-            "Notez qu'il vous faudra peut-être patienter quelques minutes avant que l'email n'arrive dans votre boite mail."
+            "Notez qu'il vous faudra peut-être patienter quelques minutes avant que l'email n'arrive dans votre boite de réception."
           )}
         </p>
         <Button
           variant="link"
-          loading={requestOTP.loading}
           label={t("Renvoyer le code à l'adresse indiquée")}
           action={() => requestOTP.execute()}
         />
