@@ -67,7 +67,9 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
       </main>
 
       <footer>
-        {stockData && <SplitOneButton stock={stockData?.stock} />}
+        {stockData && stockData.stock.remaining_volume > 0 && (
+          <SplitOneButton stock={stockData.stock} />
+        )}
         <Alert icon={AlertCircle} variant="info">
           <p>
             <Trans>
