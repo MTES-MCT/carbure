@@ -290,7 +290,7 @@ const ProcessingDialog = ({
           </p>
           <p>
             {t(
-              `Les dépôts concernés doivent être enregistrés en tant que "tiers" ou "processing" \net l'opérateur tiers doit être indiqué pour apparaître dans la liste ci-dessous.`
+              `Les dépôts concernés doivent être enregistrés en tant que "tiers" ou "processing" et l'opérateur tiers doit être indiqué pour apparaître dans la liste ci-dessous.`
             )}
           </p>
           {/* Plus d'informations sur le processing sur [Guide] */}

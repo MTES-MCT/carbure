@@ -17,6 +17,8 @@
   flex-direction: column;
   background-color: var(--body);
   border: 1px solid var(--gray-medium);
+  width: min-content;
+  min-width: 480px;
   max-width: 100%;
   max-height: 100%;
   overflow: hidden;
