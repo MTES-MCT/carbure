@@ -61,7 +61,7 @@ const Certificates = () => {
   const validCertificates = certificateData.filter(e => !isExpired(e.certificate.valid_until)) // prettier-ignore
 
   return (
-    <Panel style={{ marginBottom: "var(--spacing-l)" }}>
+    <Panel id="certificates" style={{ marginBottom: "var(--spacing-l)" }}>
       <header>
         <h1>{t("Certificats")}</h1>
         <Button

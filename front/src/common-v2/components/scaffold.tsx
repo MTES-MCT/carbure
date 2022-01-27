@@ -28,8 +28,15 @@ export const ActionBar = (props: JSX.IntrinsicElements["section"]) => (
 )
 
 // a enclosed box with its own <header>, many <section> and <footer>
-export const Panel = (props: JSX.IntrinsicElements["article"]) => (
-  <article {...props} className={cl(css.panel, props.className)} />
+export const Panel = ({
+  id,
+  children,
+  ...props
+}: JSX.IntrinsicElements["article"]) => (
+  <article {...props} className={cl(css.panel, props.className)}>
+    {id && <div id={id} className={css.anchor} />}
+    {children}
+  </article>
 )
 
 // a container that automatically arranges its content into a grid

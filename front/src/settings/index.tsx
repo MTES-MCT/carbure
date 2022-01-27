@@ -42,6 +42,11 @@ const Settings = () => {
               <Trans>Options</Trans>
             </a>
           )}
+          {hasCertificates && (
+            <a href="#certificates">
+              <Trans>Certificats</Trans>
+            </a>
+          )}
           {hasDepot && (
             <a href="#depot">
               <Trans>Dépôts</Trans>
@@ -55,11 +60,6 @@ const Settings = () => {
           {isProducer && (
             <a href="#double-counting">
               <Trans>Double comptage</Trans>
-            </a>
-          )}
-          {hasCertificates && (
-            <a href="#certificates">
-              <Trans>Certificats</Trans>
             </a>
           )}
           {entity.hasRights(UserRole.Admin) && (
