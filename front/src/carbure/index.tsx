@@ -33,7 +33,7 @@ const Carbure = () => {
           <Route path="/" element={<Home />} />
           <Route path="/public_stats" element={<PublicStats />} />
 
-          {!isAuth && <Route path="/auth/*" element={<Auth />} />}
+          <Route path="/auth/*" element={<Auth />} />
 
           {isAuth && <Route path="/pending" element={<Pending />} />}
           {isAuth && <Route path="/account" element={<Account />} />}

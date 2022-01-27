@@ -28,7 +28,8 @@ const Login = () => {
   const login = useMutation(api.login, {
     onSuccess: () => {
       notify(t("Un code vient de vous être envoyé"), { variant: "success" })
-      navigate("otp")
+      api.requestOTP()
+      navigate("../otp")
     },
     onError: () => {
       notify(t("La connexion a échoué"), { variant: "danger" })
