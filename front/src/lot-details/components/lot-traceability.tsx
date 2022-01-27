@@ -12,13 +12,14 @@ export interface TraceabilityProps {
 export const LotTraceability = ({ details }: TraceabilityProps) => {
   const { t } = useTranslation()
 
-  const parentLot = details?.parent_lot
-  const parentStock = details?.parent_stock
+  const parentLot = details?.parent_lot ?? undefined
+  const parentStock = details?.parent_stock ?? undefined
 
   const childrenLot = details?.children_lot ?? []
   const childrenStock = details?.children_stock ?? []
 
-  const noChildren = childrenLot.length === 0 && childrenStock.length === 0
+  const hasParent = parentLot !== undefined || parentStock !== undefined
+  const hasChildren = childrenLot.length > 0 || childrenStock.length > 0
 
   const childrenLotVolume = childrenLot.reduce(
     (total, child) => total + child.volume,
@@ -32,71 +33,71 @@ export const LotTraceability = ({ details }: TraceabilityProps) => {
 
   return (
     <Collapse icon={Split} variant="info" label={t("Traçabilité")}>
-      <section>
-        <b>{t("Parent")}</b>
-        <ul>
-          {parentLot && (
-            <li>
-              <ExternalLink to={`../../in/${parentLot.id}`}>
-                Lot {parentLot.carbure_id}:
-                <b>
-                  {t(parentLot.biofuel?.code ?? "", { ns: "biofuels" })}{" "}
-                  {formatNumber(parentLot.volume)} L
-                </b>
-              </ExternalLink>
-            </li>
-          )}
+      {hasParent && (
+        <section>
+          <b>{t("Parent")}</b>
+          <ul>
+            {parentLot && (
+              <li>
+                <ExternalLink to={`../../in/${parentLot.id}`}>
+                  Lot {parentLot.carbure_id}:
+                  <b>
+                    {t(parentLot.biofuel?.code ?? "", { ns: "biofuels" })}{" "}
+                    {formatNumber(parentLot.volume)} L
+                  </b>
+                </ExternalLink>
+              </li>
+            )}
 
-          {parentStock && (
-            <li>
-              <ExternalLink to={`../stocks/${parentStock.id}`}>
-                Stock {parentStock.carbure_id}:
-                <b>
-                  {t(parentStock.biofuel?.code ?? "", {
-                    ns: "biofuels",
-                  })}{" "}
-                  {formatNumber(parentStock.initial_volume)} L
-                </b>
-              </ExternalLink>
-            </li>
-          )}
+            {parentStock && (
+              <li>
+                <ExternalLink to={`../stocks/${parentStock.id}`}>
+                  Stock {parentStock.carbure_id}:
+                  <b>
+                    {t(parentStock.biofuel?.code ?? "", {
+                      ns: "biofuels",
+                    })}{" "}
+                    {formatNumber(parentStock.initial_volume)} L
+                  </b>
+                </ExternalLink>
+              </li>
+            )}
+          </ul>
+        </section>
+      )}
 
-          {!parentLot && !parentStock && <li>{t("Aucun parent trouvé")}</li>}
-        </ul>
-      </section>
+      {hasChildren && (
+        <section>
+          <b>{t("Enfants")}</b>
+          <ul>
+            {childrenLot?.map((child) => (
+              <li key={child.id}>
+                <ExternalLink to={`../../out/${child.id}`}>
+                  Lot {child.carbure_id}:{" "}
+                  <b>
+                    {t(child.biofuel?.code ?? "", { ns: "biofuels" })}{" "}
+                    {formatNumber(child.volume)} L
+                  </b>
+                </ExternalLink>
+              </li>
+            ))}
 
-      <section>
-        <b>{t("Enfants")}</b>
-        <ul>
-          {childrenLot?.map((child) => (
-            <li key={child.id}>
-              <ExternalLink to={`../../out/${child.id}`}>
-                Lot {child.carbure_id}:{" "}
-                <b>
-                  {t(child.biofuel?.code ?? "", { ns: "biofuels" })}{" "}
-                  {formatNumber(child.volume)} L
-                </b>
-              </ExternalLink>
-            </li>
-          ))}
-
-          {childrenStock?.map((child, i) => (
-            <li key={i}>
-              <ExternalLink to={`../../stocks/${child.id}`}>
-                Stock {child.carbure_id}:{" "}
-                <b>
-                  {t(child.biofuel?.code ?? "", {
-                    ns: "biofuels",
-                  })}{" "}
-                  {formatNumber(child.initial_volume)} L
-                </b>
-              </ExternalLink>
-            </li>
-          ))}
-
-          {noChildren && <li>{t("Aucun enfant trouvé")}</li>}
-        </ul>
-      </section>
+            {childrenStock?.map((child, i) => (
+              <li key={i}>
+                <ExternalLink to={`../../stocks/${child.id}`}>
+                  Stock {child.carbure_id}:{" "}
+                  <b>
+                    {t(child.biofuel?.code ?? "", {
+                      ns: "biofuels",
+                    })}{" "}
+                    {formatNumber(child.initial_volume)} L
+                  </b>
+                </ExternalLink>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <footer>
         {t("Volume total transféré aux enfants:")}{" "}
