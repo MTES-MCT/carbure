@@ -2,9 +2,8 @@ import { useTranslation } from "react-i18next"
 
 import useEntity from "carbure/hooks/entity"
 import { UserRole } from "carbure/types"
-import { useMutation, useQuery } from "common-v2/hooks/async"
+import { useMutation } from "common-v2/hooks/async"
 import { Panel, LoaderOverlay } from "common-v2/components/scaffold"
-import Select from "common-v2/components/select"
 import Checkbox from "common-v2/components/checkbox"
 import * as api from "../api-v2"
 
@@ -13,12 +12,6 @@ const CompanySettings = () => {
   const entity = useEntity()
 
   const canModify = entity.hasRights(UserRole.Admin, UserRole.ReadWrite)
-  const { isTrader } = entity
-
-  const certificates = useQuery(api.getMyCertificates, {
-    key: "entity-certificates",
-    params: [entity!.id],
-  })
 
   const toggleMAC = useMutation(
     (toggle: boolean) => api.toggleMAC(entity.id, toggle),
@@ -40,15 +33,7 @@ const CompanySettings = () => {
     { invalidates: ["user-settings"] }
   )
 
-  const setDefaultCertificate = useMutation(
-    (cert: string | undefined) => api.setDefaultCertificate(entity.id, cert!),
-    { invalidates: ["user-settings"] }
-  )
-
-  const certificateData = certificates.result?.data.data ?? []
-
   const isLoading =
-    certificates.loading ||
     toggleMAC.loading ||
     toggleStocks.loading ||
     toggleDirectDeliveries.loading ||
@@ -61,6 +46,26 @@ const CompanySettings = () => {
       </header>
 
       <section>
+        <p>
+          {t(
+            "Ces options vous permettent de personnaliser l'interface de la page Transactions de CarbuRe pour n'y montrer que les fonctionnalités pertinentes pour votre activité."
+          )}
+        </p>
+      </section>
+
+      <section style={{ paddingBottom: "var(--spacing-l)" }}>
+        <Checkbox
+          disabled={!canModify}
+          label={t("Ma société gère un stock sur CarbuRe")}
+          value={entity.has_stocks}
+          onChange={toggleStocks.execute}
+        />
+        <Checkbox
+          disabled={!canModify}
+          label={t("Ma société a une activité de négoce")}
+          value={entity.has_trading}
+          onChange={toggleTrading.execute}
+        />
         <Checkbox
           disabled={!canModify}
           label={t("Ma société effectue des mises à consommation")}
@@ -70,34 +75,10 @@ const CompanySettings = () => {
         <Checkbox
           disabled={!canModify}
           label={t("Ma société effectue des livraisons directes")}
-          value={entity.has_direct_deliveries || isTrader}
+          value={entity.has_direct_deliveries}
           onChange={toggleDirectDeliveries.execute}
         />
-
-        <Checkbox
-          disabled={!canModify}
-          label={t("Ma société a une activité de négoce")}
-          value={entity.has_trading || isTrader}
-          onChange={toggleTrading.execute}
-        />
-        <Checkbox
-          disabled={!canModify}
-          label={t("Ma société gère un stock sur CarbuRe")}
-          value={entity.has_stocks || isTrader}
-          onChange={toggleStocks.execute}
-        />
       </section>
-
-      <footer>
-        <Select
-          label={t("Certificat par défaut")}
-          placeholder={t("Sélectionner un certificat")}
-          value={entity.default_certificate}
-          onChange={setDefaultCertificate.execute}
-          options={certificateData}
-          style={{ flex: 1 }}
-        />
-      </footer>
 
       {isLoading && <LoaderOverlay />}
     </Panel>
