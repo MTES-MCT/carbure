@@ -1,3 +1,4 @@
+import { useMemo } from "react"
 import { useNavigate, useLocation, useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import * as api from "./api"
@@ -27,7 +28,6 @@ import LotActions from "./components/actions"
 import { Entity } from "carbure/types"
 import LotTraceability, { hasTraceability } from "./components/lot-traceability"
 import { invalidate } from "common-v2/hooks/invalidate"
-import { useMemo } from "react"
 
 export interface LotDetailsProps {
   neighbors: number[]

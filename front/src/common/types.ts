@@ -53,6 +53,13 @@ export interface Depot {
   address: string
 }
 
+export interface EntityDepot {
+  depot: Depot | null
+  ownership_type: OwnershipType
+  blending_is_outsourced: boolean
+  blender: Entity | null
+}
+
 export interface Certificate {
   certificate_id: string
   certificate_type: CertificateType
