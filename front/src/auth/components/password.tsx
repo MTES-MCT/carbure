@@ -157,7 +157,6 @@ export const ResetPassword = () => {
             )
           }
         >
-   
           <TextInput
             variant="solid"
             icon={Lock}

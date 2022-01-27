@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import Button from "common-v2/components/button"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"

@@ -60,6 +60,8 @@ export function Button<T>({
   const icon = typeof Icon === "function" ? <Icon /> : Icon
   const hasIconAndText = Boolean(Icon) && Boolean(label || children)
 
+  const content = label ?? children
+
   return (
     <LinkWrapper href={href} to={to}>
       <button
@@ -85,7 +87,7 @@ export function Button<T>({
         }}
       >
         {loading ? <Loader /> : icon}
-        {variant !== "icon" && <span>{label ?? children}</span>}
+        {variant !== "icon" && (center ? <span>{content}</span> : content)}
       </button>
     </LinkWrapper>
   )
