@@ -15,6 +15,7 @@ export interface TableProps<T> {
   order?: Order
   onOrder?: (order: Order | undefined) => void
   onAction?: (value: T) => void
+  rowProps?: (row: T, i?: number) => JSX.IntrinsicElements["li"]
 }
 
 export function Table<T>({
@@ -25,6 +26,7 @@ export function Table<T>({
   columns,
   rows,
   order: controlledOrder,
+  rowProps,
   onOrder,
   onAction,
 }: TableProps<T>) {
@@ -62,6 +64,7 @@ export function Table<T>({
         {[...rows].sort(compare).map((row, i) => (
           <li
             key={i}
+            {...rowProps?.(row, i)}
             data-interactive={onAction ? true : undefined}
             onClick={onAction ? () => onAction(row) : undefined}
           >

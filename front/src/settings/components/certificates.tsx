@@ -58,6 +58,7 @@ const Certificates = () => {
   )
 
   const certificateData = certificates.result?.data.data ?? []
+  const validCertificates = certificateData.filter(e => !isExpired(e.certificate.valid_until)) // prettier-ignore
 
   return (
     <Panel style={{ marginBottom: "var(--spacing-l)" }}>
@@ -81,7 +82,7 @@ const Certificates = () => {
           placeholder={t("Sélectionner un certificat")}
           value={entity.default_certificate}
           onChange={setDefaultCertificate.execute}
-          options={certificateData}
+          options={validCertificates}
           normalize={normalizeEntityCertificate}
           style={{ flex: 1 }}
         />
@@ -100,6 +101,9 @@ const Certificates = () => {
       {certificateData.length > 0 && (
         <Table
           rows={certificateData}
+          rowProps={(cert) => ({
+            style: cert.has_been_updated ? { opacity: 0.5 } : undefined,
+          })}
           columns={[
             {
               key: "id",
