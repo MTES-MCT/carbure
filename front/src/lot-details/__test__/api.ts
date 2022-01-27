@@ -3,7 +3,7 @@ import { setupServer } from "msw/node"
 import { Data } from "common/__test__/helpers"
 import { LotDetails } from "../types"
 import { CorrectionStatus, DeliveryType, LotStatus } from "transactions/types"
-import { okDynamicSettings } from "settings/__test__/api"
+import { okDeliverySites, okDynamicSettings } from "settings/__test__/api"
 import {
   okBiocarburantsSearch,
   okCountrySearch,
@@ -105,6 +105,7 @@ export default setupServer(
   okCommentLot,
 
   okDynamicSettings,
+  okDeliverySites,
   okBiocarburantsSearch,
   okMatierePremiereSearch,
   okEntitySearch,
