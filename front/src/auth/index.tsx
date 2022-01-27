@@ -17,8 +17,8 @@ const Auth = () => (
     <Route path="logout" element={<Logout />} />
     <Route path="register" element={<Register />} />
     <Route path="register-pending" element={<RegisterPending />} />
-    <Route path="activate" element={<Activate />} />
     <Route path="activate-request" element={<ActivateRequest />} />
+    <Route path="activate" element={<Activate />} />
     <Route path="reset-password-request" element={<ResetPasswordRequest />} />
     <Route path="reset-password-pending" element={<ResetPasswordPending />} />
     <Route path="reset-password" element={<ResetPassword />} />
