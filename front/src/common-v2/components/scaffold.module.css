@@ -68,9 +68,16 @@
 .panel {
   display: flex;
   flex-direction: column;
+  position: relative;
   background-color: var(--white);
   border: 1px solid var(--gray-medium);
   gap: var(--spacing-l);
+}
+
+.panel .anchor {
+  position: absolute;
+  top: -72px;
+  pointer-events: none;
 }
 
 .panel > header {
