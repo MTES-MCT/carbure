@@ -1,5 +1,11 @@
 import { useMemo } from "react"
-import { Route, Routes, useNavigate, useLocation } from "react-router-dom"
+import {
+  Route,
+  Routes,
+  useNavigate,
+  useLocation,
+  Navigate,
+} from "react-router-dom"
 import * as api from "../../api"
 import { Entity } from "carbure/types"
 import {
@@ -10,7 +16,7 @@ import {
   LotQuery,
   Filter,
 } from "../../types"
-import { useStatus } from "../status"
+import { useAutoStatus } from "../status"
 import { useQuery } from "common-v2/hooks/async"
 import { Order } from "common-v2/components/table"
 import { Bar } from "common-v2/components/scaffold"
@@ -26,6 +32,7 @@ import LotAdd from "lot-add"
 import LotDetails from "lot-details"
 import useStore from "common-v2/hooks/store"
 import { useMatomo } from "matomo"
+import { getDefaultCategory, useAutoCategory } from "../category"
 
 export interface LotsProps {
   entity: Entity
@@ -38,9 +45,10 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const status = useStatus()
+  const status = useAutoStatus()
+  const category = useAutoCategory(status, snapshot)
 
-  const [state, actions] = useQueryParamsStore(entity, year, status, snapshot)
+  const [state, actions] = useQueryParamsStore(entity, year, status, category, snapshot) // prettier-ignore
   const query = useLotQuery(state)
 
   const lots = useQuery(api.getLots, {
@@ -66,9 +74,14 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
   const showLotDetails = (lot: Lot) => {
     matomo.push(["trackEvent", "lots-details", "show-lot-details"])
     navigate({
-      pathname: `${status}/${lot.id}`,
+      pathname: `${status}/${category}/${lot.id}`,
       search: location.search,
     })
+  }
+
+  if (category === undefined) {
+    const defaultCategory = getDefaultCategory(status, snapshot)
+    return <Navigate to={`${status}/${defaultCategory}`} />
   }
 
   return (
@@ -155,8 +168,11 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
       </section>
 
       <Routes>
-        <Route path="drafts/add" element={<LotAdd />} />
-        <Route path=":status/:id" element={<LotDetails neighbors={ids} />} />
+        <Route path="drafts/pending/add" element={<LotAdd />} />
+        <Route
+          path=":status/:category/:id"
+          element={<LotDetails neighbors={ids} />}
+        />
       </Routes>
     </>
   )
@@ -222,6 +238,7 @@ export function useQueryParamsStore(
   entity: Entity,
   year: number,
   status: string,
+  category?: string,
   snapshot?: Snapshot | undefined
 ) {
   const [limit, saveLimit] = useLimit()
@@ -266,7 +283,7 @@ export function useQueryParamsStore(
         page: 0,
       }),
 
-      setSnapshot: (snapshot: Snapshot | undefined) => (state) => {
+      setSnapshot: (snapshot: Snapshot) => (state) => {
         return {
           snapshot,
           category: getDefaultCategory(state.status, snapshot),
@@ -369,40 +386,16 @@ export function useQueryParamsStore(
     actions.setStatus(status as Status)
   }
 
-  if (state.snapshot !== snapshot) {
+  // sync store state with category set in the route
+  if (category && state.category !== category) {
+    actions.setCategory(category)
+  }
+
+  if (snapshot && state.snapshot !== snapshot) {
     actions.setSnapshot(snapshot)
   }
 
   return [state, actions] as [typeof state, typeof actions]
-}
-
-function getDefaultCategory(status: string, snapshot: Snapshot | undefined) {
-  if (snapshot === undefined) return "pending"
-  if (status === "drafts") return "pending"
-
-  const count = snapshot.lots
-
-  let pending = 0
-  let tofix = 0
-  let total = 0
-
-  if (status === "in") {
-    pending = count.in_pending
-    tofix = count.in_tofix
-    total = count.in_total
-  } else if (status === "out") {
-    pending = count.out_pending
-    tofix = count.out_tofix
-    total = count.out_total
-  } else if (status === "stocks") {
-    pending = count.stock
-    total = count.stock_total
-  }
-
-  if (pending > 0) return "pending"
-  else if (tofix > 0) return "correction"
-  else if (total > 0) return "history"
-  else return "pending"
 }
 
 export function useLotQuery({
