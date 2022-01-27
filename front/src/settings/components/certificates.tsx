@@ -20,10 +20,14 @@ import {
   Refresh,
   AlertCircle,
 } from "common-v2/components/icons"
-import { normalizeCertificate } from "common-v2/utils/normalizers"
+import {
+  normalizeCertificate,
+  normalizeEntityCertificate,
+} from "common-v2/utils/normalizers"
 import { Certificate, EntityCertificate } from "common/types"
 import { isExpired } from "./common"
 import Alert from "common-v2/components/alert"
+import Select from "common-v2/components/select"
 
 const Certificates = () => {
   const { t } = useTranslation()
@@ -48,6 +52,11 @@ const Certificates = () => {
     },
   })
 
+  const setDefaultCertificate = useMutation(
+    (cert: string | undefined) => api.setDefaultCertificate(entity.id, cert!),
+    { invalidates: ["user-settings"] }
+  )
+
   const certificateData = certificates.result?.data.data ?? []
 
   return (
@@ -65,6 +74,19 @@ const Certificates = () => {
           style={{ fontSize: "0.87em" }}
         />
       </header>
+
+      <section>
+        <Select
+          label={t("Certificat par défaut")}
+          placeholder={t("Sélectionner un certificat")}
+          value={entity.default_certificate}
+          onChange={setDefaultCertificate.execute}
+          options={certificateData}
+          normalize={normalizeEntityCertificate}
+          style={{ flex: 1 }}
+        />
+      </section>
+
       {certificateData.length === 0 && (
         <section style={{ paddingBottom: "var(--spacing-l)" }}>
           <Alert
@@ -74,6 +96,7 @@ const Certificates = () => {
           />
         </section>
       )}
+
       {certificateData.length > 0 && (
         <Table
           rows={certificateData}
