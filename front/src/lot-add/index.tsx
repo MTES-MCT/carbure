@@ -25,7 +25,7 @@ export const LotAdd = () => {
     invalidates: ["lots", "snapshot", "year", "lot-summary"],
 
     onSuccess: (res) => {
-      navigate({ pathname: `../drafts/${res.data.data?.id}`, search })
+      navigate({ pathname: `../drafts/pending/${res.data.data?.id}`, search })
       notify(t("Le lot a bien été créé"), { variant: "success" })
     },
 
@@ -34,7 +34,7 @@ export const LotAdd = () => {
     },
   })
 
-  const close = () => navigate({ pathname: `../drafts`, search })
+  const close = () => navigate({ pathname: `../drafts/pending`, search })
 
   return (
     <Dialog onClose={close}>
