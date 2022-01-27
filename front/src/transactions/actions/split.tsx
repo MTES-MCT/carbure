@@ -78,7 +78,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
       <main>
         <section>
           {t(
-            "Veuillez remplir le formulaire ci-dessous afin de créer un nouveau lot \nbasé sur le stock sélectionné :"
+            "Veuillez remplir le formulaire ci-dessous afin de créer un nouveau lot basé sur le stock sélectionné :"
           )}
         </section>
         <section>

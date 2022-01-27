@@ -61,8 +61,6 @@ const StockExcelDialog = ({ onClose }: StockExcelDialogProps) => {
               d'accélérer cette procédure.
             </Trans>
           </p>
-        </section>
-        <section>
           <p>
             <Trans>
               Ce fichier doit respecter certaines règles dont vous trouverez les

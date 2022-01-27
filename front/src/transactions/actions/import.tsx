@@ -77,13 +77,11 @@ const ImportDialog = ({ onClose }: ImportDialogProps) => {
           </p>
           <p>
             <Trans>
-              Notez que vous pouvez aussi réaliser un <i>drag-and-drop</i> de
-              votre fichier Excel directement sur la page Transactions de
-              CarbuRe afin d'accélérer cette procédure.
+              Notez que vous pouvez aussi réaliser un drag-and-drop de votre
+              fichier Excel directement sur la page Transactions de CarbuRe afin
+              d'accélérer cette procédure.
             </Trans>
           </p>
-        </section>
-        <section>
           <p>
             <Trans>
               Ce fichier doit respecter certaines règles dont vous trouverez les
