@@ -28,6 +28,7 @@ import LotActions from "./components/actions"
 import { Entity } from "carbure/types"
 import LotTraceability, { hasTraceability } from "./components/lot-traceability"
 import { invalidate } from "common-v2/hooks/invalidate"
+import { useCategory } from "transactions/components/category"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -43,6 +44,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
 
   const entity = useEntity()
   const status = useStatus()
+  const category = useCategory()
   const params = useParams<"id">()
 
   const lot = useQuery(api.getLotDetails, {
@@ -81,7 +83,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const closeDialog = () => {
     invalidate("lots")
     navigate({
-      pathname: `../${status}`,
+      pathname: `../${status}/${category}`,
       search: location.search,
     })
   }
@@ -163,7 +165,11 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
 
         {lotData && <LotActions lot={lotData.lot} />}
 
-        <NavigationButtons neighbors={neighbors} root={`../${status}`} />
+        <NavigationButtons
+          neighbors={neighbors}
+          root={`../${status}/${category}`}
+        />
+
         <Button icon={Return} label={t("Retour")} action={closeDialog} />
       </footer>
 

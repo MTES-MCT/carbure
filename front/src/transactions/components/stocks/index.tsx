@@ -14,6 +14,7 @@ import { SearchBar } from "../search-bar"
 import { StockSummaryBar } from "./stock-summary"
 import StockDetails from "stock-details"
 import { QueryParams, useQueryParamsStore } from "../lots"
+import { useAutoCategory } from "../category"
 
 export interface StocksProps {
   entity: Entity
@@ -27,7 +28,10 @@ export const Stocks = ({ entity, year, snapshot }: StocksProps) => {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const [state, actions] = useQueryParamsStore(entity, year, "stocks", snapshot)
+  const status = "stocks"
+  const category = useAutoCategory(status, snapshot)
+
+  const [state, actions] = useQueryParamsStore(entity, year, status, category, snapshot) // prettier-ignore
   const query = useStockQuery(state)
 
   const stocks = useQuery(api.getStocks, {
@@ -49,7 +53,7 @@ export const Stocks = ({ entity, year, snapshot }: StocksProps) => {
 
   const showStockDetails = (stock: Stock) =>
     navigate({
-      pathname: `${stock.id}`,
+      pathname: `${category}/${stock.id}`,
       search: location.search,
     })
 
@@ -119,7 +123,10 @@ export const Stocks = ({ entity, year, snapshot }: StocksProps) => {
       </section>
 
       <Routes>
-        <Route path=":id" element={<StockDetails neighbors={ids} />} />
+        <Route
+          path=":category/:id"
+          element={<StockDetails neighbors={ids} />}
+        />
       </Routes>
     </>
   )

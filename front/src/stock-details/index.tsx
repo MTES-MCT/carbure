@@ -14,6 +14,7 @@ import Alert from "common-v2/components/alert"
 import { formatNumber, formatPercentage } from "common-v2/utils/formatters"
 import StockTraceability from "./components/stock-traceability"
 import { SplitOneButton } from "transactions/actions/split"
+import { useCategory } from "transactions/components/category"
 
 interface StockDetailsProps {
   neighbors: number[]
@@ -26,6 +27,7 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
   const location = useLocation()
 
   const entity = useEntity()
+  const category = useCategory()
   const params = useParams<"id">()
 
   const stock = useQuery(api.getStockDetails, {
@@ -41,7 +43,7 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
 
   const closeDialog = () =>
     navigate({
-      pathname: `..`,
+      pathname: `../${category}`,
       search: location.search,
     })
 
@@ -78,7 +80,7 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
             </Trans>
           </p>
         </Alert>
-        <NavigationButtons neighbors={neighbors} root=".." />
+        <NavigationButtons neighbors={neighbors} root={`../${category}`} />
         <Button icon={Return} label={t("Retour")} action={closeDialog} />
       </footer>
 

@@ -1,6 +1,7 @@
 import cl from "clsx"
+import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import { useMatch } from "react-router-dom"
+import { useMatch, useNavigate } from "react-router-dom"
 import { Snapshot, Status } from "../types"
 import Tabs from "common-v2/components/tabs"
 import { Bell, Loader } from "common-v2/components/icons"
@@ -156,7 +157,22 @@ const StatusRecap = ({
 
 export function useStatus() {
   const match = useMatch("/org/:entity/transactions/:year/:status/*") // prettier-ignore
-  return (match?.params.status ?? "unknown") as Status
+  const status = match?.params.status as Status | undefined
+  return status ?? "drafts"
+}
+
+export function useAutoStatus() {
+  const navigate = useNavigate()
+  const match = useMatch("/org/:entity/transactions/:year/:status/*") // prettier-ignore
+  const status = match?.params.status as Status | undefined
+
+  useEffect(() => {
+    if (status === undefined) {
+      navigate("drafts/pending")
+    }
+  }, [status, navigate])
+
+  return status ?? "drafts"
 }
 
 export default StatusTabs

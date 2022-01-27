@@ -14,7 +14,7 @@ import * as api from "./api"
 import { Main } from "common-v2/components/scaffold"
 import Select from "common-v2/components/select"
 import { PortalProvider } from "common-v2/components/portal"
-import { StatusTabs, useStatus } from "./components/status"
+import { StatusTabs } from "./components/status"
 import { DeclarationButton } from "./actions/declaration"
 import { ImportArea } from "./actions/import"
 import Lots from "./components/lots"
@@ -24,7 +24,6 @@ export const Transactions = () => {
   const { t } = useTranslation()
 
   const entity = useEntity()
-  const status = useStatus()
 
   const years = useYears("transactions", api.getYears)
 
@@ -32,10 +31,6 @@ export const Transactions = () => {
     key: "snapshot",
     params: [entity.id, years.selected],
   })
-
-  if (status === "unknown") {
-    return <Navigate to="drafts" />
-  }
 
   const snapshotData = snapshot.result?.data.data
 
@@ -72,7 +67,17 @@ export const Transactions = () => {
           </header>
 
           <Routes>
-            <Route path="stocks/*" element={<Stocks {...props} />} />
+            <Route
+              path="stocks/*"
+              element={
+                // if entity does not have stock redirect to default drafts
+                entity.has_stocks ? (
+                  <Stocks {...props} />
+                ) : (
+                  <Navigate to="../drafts/pending" />
+                )
+              }
+            />
             <Route path="*" element={<Lots {...props} />} />
           </Routes>
         </Main>

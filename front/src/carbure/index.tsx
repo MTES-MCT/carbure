@@ -72,12 +72,11 @@ const Org = () => {
       {(isAdmin || isAuditor) && <Route path="controls/:year/*" element={<Controls />} />}
       {(isAdmin || hasDCA) && <Route path="double-counting/*" element={<DoubleCounting />} />}
 
-      {isIndustry && <Route path="*" element={<Navigate to="transactions" />} />}
       {isIndustry && <Route path="transactions" element={<Navigate to={`${currentYear}`} />} />}
-
-      {(isAuditor) && <Route path="*" element={<Navigate to="controls" />} />}
       {(isAdmin || isAuditor) && <Route path="controls" element={<Navigate to={`${currentYear}`} />} />}
 
+      {isIndustry && <Route path="*" element={<Navigate to="transactions" />} />}
+      {(isAuditor) && <Route path="*" element={<Navigate to="controls" />} />}
       {isAdmin && <Route path="*" element={<Navigate to="dashboard" />} />}
       {hasDCA && <Route path="*" element={<Navigate to="double-counting" />} />}
     </Routes>
