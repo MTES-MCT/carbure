@@ -13,7 +13,6 @@ import { MarkManyAsFixedButton } from "transactions/actions/mark-as-fixed"
 import { RecallManyButton } from "transactions/actions/recall"
 import { ApproveManyFixesButton } from "transactions/actions/approve-fix"
 import { ExportLotsButton } from "transactions/actions/export"
-import { TransferManyButton } from "transactions/actions/transfer"
 
 export interface ActionBarProps {
   count: number

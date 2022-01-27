@@ -9,6 +9,7 @@ import {
   ProductionSite,
   Certificate,
   EntityCertificate,
+  EntityDepot,
 } from "common/types"
 import { DeliveryType } from "transactions/types"
 
@@ -48,6 +49,12 @@ export const normalizeProductionSite: Normalizer<ProductionSite | string> = (ps)
 export const normalizeDepot: Normalizer<Depot | string> = (depot) => ({
   value: depot,
   label: isString(depot) ? depot : depot.name,
+})
+
+// prettier-ignore
+export const normalizeEntityDepot: Normalizer<EntityDepot> = (depot) => ({
+  label: `${depot.blender!.name} - ${depot.depot!.name}`,
+  value: depot
 })
 
 // prettier-ignore
