@@ -23,8 +23,11 @@ const TransactionAddWithRouter = ({
   children?: React.ReactNode
 }) => (
   <PortalProvider>
-    <TestRoot url={`/org/${entityID}/transactions/draft/add`}>
-      <Route path="/org/:entity/transactions/draft/add" element={<LotAdd />} />
+    <TestRoot url={`/org/${entityID}/transactions/draft/pending/add`}>
+      <Route
+        path="/org/:entity/transactions/draft/pending/add"
+        element={<LotAdd />}
+      />
       {children}
     </TestRoot>
   </PortalProvider>
@@ -146,7 +149,7 @@ test("check the form fields are working", async () => {
   setEntity(producer)
   render(
     <TransactionAddWithRouter entityID={producer.id}>
-      <Route path="/drafts/0" element={<span>LOT CREATED</span>} />
+      <Route path="/drafts/pending/0" element={<span>LOT CREATED</span>} />
     </TransactionAddWithRouter>
   )
 
