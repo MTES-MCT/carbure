@@ -8,6 +8,7 @@ import {
   Feedstock,
   ProductionSite,
   Certificate,
+  EntityCertificate,
 } from "common/types"
 import { DeliveryType } from "transactions/types"
 
@@ -77,6 +78,12 @@ export const normalizeAnomalyFilter: Normalizer<Option, string> = (anomaly) => (
 export const normalizeCertificate: Normalizer<Certificate> = (certificate) => ({
   value: certificate,
   label: `${certificate.certificate_id} - ${certificate.certificate_holder}`,
+})
+
+// prettier-ignore
+export const normalizeEntityCertificate: Normalizer<EntityCertificate,string> = (ec) => ({
+  value: ec.certificate.certificate_id,
+  label: `${ec.certificate.certificate_id} - ${ec.certificate.certificate_holder}`,
 })
 
 export const normalizeDeliveryType: Normalizer<DeliveryType> = (type) => ({
