@@ -128,7 +128,12 @@ export const LotSummary = ({
       orderBy: (item) => item.supplier ?? "",
       cell: (item) => <Cell text={item.supplier ?? t("Inconnu")} />,
     },
-
+    {
+      key: "client",
+      header: t("Client"),
+      orderBy: (item) => item.client ?? "",
+      cell: (item) => <Cell text={item.client ?? t("Inconnu")} />,
+    },
     {
       key: "biofuel",
       header: t("Biocarburant"),
