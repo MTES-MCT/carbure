@@ -4,13 +4,14 @@ from django.contrib.sites.shortcuts import get_current_site
 from authtools.forms import UserCreationForm
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from pytz import timezone
+from django.utils import timezone
 from accounts.tokens import account_activation_token
 from django.template import loader
 from django.conf import settings
 from django_otp.plugins.otp_email.models import EmailDevice
 from django.core.mail import send_mail
-from django.contrib.auth import authenticate, logout, PasswordResetTokenGenerator
+from django.contrib.auth import authenticate, logout
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.auth.decorators import login_required
 from django_otp import user_has_device
 from accounts.forms import UserResendActivationLinkForm, OTPForm
@@ -55,9 +56,11 @@ def register(request):
         return JsonResponse({'status': 'error', 'message': 'Incorrect method. Expected POST'}, status=400)
 
 def user_login(request):
-    login = request.POST.get('login', '')
+    email = request.POST.get('email', '')
     password = request.POST.get('password', '')
-    if authenticate(username=login, password=password):
+    user = authenticate(username=email, password=password)
+    login(request, user)
+    if user.is_authenticated:
         request.session.set_expiry(3 * 30 * 24 * 60 * 60) # 3 months
         return JsonResponse({'status': 'success', 'message': 'User logged in'})
     else:
@@ -67,7 +70,7 @@ def user_logout(request):
     logout(request)
     return JsonResponse({'status': 'success'})
 
-@login_required()
+@login_required
 def request_otp(request):
     # send token by email and display form
     send_new_token(request)

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import Button from "common-v2/components/button"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
@@ -56,7 +57,6 @@ const OTP = () => {
           <TextInput
             variant="solid"
             icon={Lock}
-            type="password"
             label={t("Code reçu par email")}
             {...bind("otp")}
           />

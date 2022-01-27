@@ -16,8 +16,8 @@ export function requestOTP() {
   return api.post("/auth/request-otp")
 }
 
-export function verifyOTP(otp: string) {
-  return api.post("/auth/verify-otp", { otp })
+export function verifyOTP(otp_token: string) {
+  return api.post("/auth/verify-otp", { otp_token })
 }
 
 export function requestResetPassword(email: string) {
