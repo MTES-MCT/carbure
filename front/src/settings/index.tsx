@@ -71,10 +71,10 @@ const Settings = () => {
 
         <SettingsBody>
           {hasOptions && <CompanySettings />}
+          {hasCertificates && <Certificates />}
           {hasDepot && <DeliverySitesSettings settings={deliverySites} />}
           {isProducer && <ProductionSitesSettings settings={productionSites} />}
           {isProducer && <DoubleCountingSettings />}
-          {hasCertificates && <Certificates />}
           {entity.hasRights(UserRole.Admin) && (
             <EntityUserRights entity={entity} />
           )}
