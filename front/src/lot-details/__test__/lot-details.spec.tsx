@@ -30,16 +30,16 @@ afterAll(() => server.close())
 const LotDetailsWithRouter = ({ entity }: { entity: Entity }) => {
   setEntity(entity)
   return (
-    <TestRoot url={`/org/${entity.id}/transactions/2021/draft/0`}>
+    <TestRoot url={`/org/${entity.id}/transactions/2021/draft/pending/0`}>
       <Route
-        path="/org/:entity/transactions/:year/:status/*"
+        path="/org/:entity/transactions/:year/:status/:category/:id"
         element={
           <PortalProvider>
             <LotDetails neighbors={[]} />
           </PortalProvider>
         }
       />
-      <Route path="/draft" element={<p>EMPTY</p>} />
+      <Route path="/draft/pending" element={<p>EMPTY</p>} />
     </TestRoot>
   )
 }

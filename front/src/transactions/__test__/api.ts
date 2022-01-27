@@ -16,7 +16,11 @@ import {
 
 import { Data } from "common/__test__/helpers"
 import * as data from "./data"
-import { okDynamicSettings, okSettings } from "settings/__test__/api"
+import {
+  okDeliverySites,
+  okDynamicSettings,
+  okSettings,
+} from "settings/__test__/api"
 import { Snapshot, LotList } from "transactions/types"
 
 // init data
@@ -118,6 +122,7 @@ export default setupServer(
   okSendLot,
 
   okDynamicSettings,
+  okDeliverySites,
 
   okBiocarburantsSearch,
   okCountrySearch,

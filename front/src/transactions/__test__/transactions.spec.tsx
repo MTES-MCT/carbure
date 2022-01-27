@@ -30,9 +30,9 @@ const TransactionsWithRouter = ({
 }) => {
   setEntity(entity)
   return (
-    <TestRoot url={`/org/${entity.id}/transactions/2021/${status}`}>
+    <TestRoot url={`/org/${entity.id}/transactions/2021/${status}/pending`}>
       <Route
-        path={`/org/${entity.id}/transactions/:year/:status/*`}
+        path={`/org/${entity.id}/transactions/:year/*`}
         element={
           <PortalProvider>
             <Transactions />
