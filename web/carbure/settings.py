@@ -43,6 +43,7 @@ if env('TEST') is False:
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 
 OTP_EMAIL_TOKEN_VALIDITY = 1800 # 30 minutes
+OTP_EMAIL_THROTTLE_FACTOR = 0 # no throttle
 
 # Application definition
 INSTALLED_APPS = [
