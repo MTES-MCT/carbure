@@ -430,3 +430,10 @@ export const Lock = ({ className, ...props }: IconProps) => (
     <path d="M8 11v-4a4 4 0 0 1 8 0v4" />
   </Icon>
 )
+
+export const User = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("user", className)}>
+    <circle cx="12" cy="7" r="4" />
+    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+  </Icon>
+)

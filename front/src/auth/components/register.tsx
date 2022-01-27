@@ -2,7 +2,7 @@ import Button from "common-v2/components/button"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import Form, { useForm } from "common-v2/components/form"
-import { Mail, Lock, Return, UserAdd } from "common-v2/components/icons"
+import { Mail, Lock, Return, UserAdd, User } from "common-v2/components/icons"
 import { TextInput } from "common-v2/components/input"
 import { Container, Switcher } from "./login"
 import { useNotify } from "common-v2/components/notifications"
@@ -62,7 +62,7 @@ export const Register = () => {
           <TextInput
             variant="solid"
             placeholder="Jean-Pierre CHAMPOLLION"
-            icon={Mail}
+            icon={User}
             label={t("Nom")}
             {...bind("name")}
           />
