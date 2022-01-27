@@ -21,7 +21,7 @@ const Login = () => {
   const navigate = useNavigate()
 
   const { value, bind } = useForm({
-    email: "" as string | undefined,
+    username: "" as string | undefined,
     password: "" as string | undefined,
   })
 
@@ -45,14 +45,14 @@ const Login = () => {
       <section>
         <Form
           id="login"
-          onSubmit={() => login.execute(value.email!, value.password!)}
+          onSubmit={() => login.execute(value.username!, value.password!)}
         >
           <TextInput
             variant="solid"
             icon={Mail}
             type="email"
             label={t("Adresse email")}
-            {...bind("email")}
+            {...bind("username")}
           />
           <TextInput
             variant="solid"
@@ -73,7 +73,7 @@ const Login = () => {
         <Button
           center
           loading={login.loading}
-          disabled={!value.email || !value.password}
+          disabled={!value.username || !value.password}
           variant="primary"
           icon={UserCheck}
           submit="login"

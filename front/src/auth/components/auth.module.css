@@ -40,7 +40,8 @@
 }
 
 .auth .panel > section button {
-  height: 66px;
+  /* height: 32px; */
+  margin-top: var(--spacing-m);
   align-self: center;
 }
 

@@ -16,6 +16,7 @@ export const Register = () => {
 
   const { value, bind } = useForm({
     email: "" as string | undefined,
+    name: "" as string | undefined,
     password: "" as string | undefined,
     repeatPassword: "" as string | undefined,
   })
@@ -45,6 +46,7 @@ export const Register = () => {
           onSubmit={() =>
             register.execute(
               value.email!,
+              value.name!,
               value.password!,
               value.repeatPassword!
             )
@@ -56,6 +58,13 @@ export const Register = () => {
             type="email"
             label={t("Adresse email")}
             {...bind("email")}
+          />
+          <TextInput
+            variant="solid"
+            placeholder="Jean-Pierre CHAMPOLLION"
+            icon={Mail}
+            label={t("Nom")}
+            {...bind("name")}
           />
           <TextInput
             variant="solid"

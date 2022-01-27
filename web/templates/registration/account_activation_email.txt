@@ -2,7 +2,7 @@ Bonjour {{ user.name }},
 
 Veuillez cliquer sur le lien suivant pour confirmer votre inscription sur CarbuRe :
 
-https://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+https://{{ domain }}/app/auth/activate?uidb64={{uid}}&token={{token}}
 
 Ce lien n'est valable que quelques minutes. Il est à usage unique.
 

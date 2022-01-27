@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import { useNavigate, useSearchParams } from "react-router-dom"
+import { useNavigate, useParams, useSearchParams } from "react-router-dom"
 import { useMutation, useQuery } from "common-v2/hooks/async"
 import { useNotify } from "common-v2/components/notifications"
 import Form, { useForm } from "common-v2/components/form"
@@ -14,6 +14,7 @@ import {
 } from "common-v2/components/icons"
 import Button from "common-v2/components/button"
 import { Container } from "./login"
+
 import * as api from "../api"
 import css from "./auth.module.css"
 
@@ -21,11 +22,11 @@ export const Activate = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
 
-  const token = useToken()
+  const { uidb64, token } = useToken()
 
   const activate = useQuery(api.activateAccount, {
     key: "activate-account",
-    params: [token],
+    params: [uidb64, token],
   })
 
   const isSuccess = activate.status === "success"
@@ -89,7 +90,7 @@ export const ActivateRequest = () => {
       notify(t("Le nouveau lien d'activation a été envoyé !"), {
         variant: "success",
       })
-      navigate("../reset-password-pending")
+      navigate("../register-pending")
     },
 
     onError: () => {
@@ -149,13 +150,17 @@ export const ActivateRequest = () => {
 export function useToken() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const token = searchParams.get("token")
+
+  const uidb64 = searchParams.get('uidb64') ?? undefined
+  const token = searchParams.get('token') ?? undefined
 
   useEffect(() => {
-    if (token === null) {
-      navigate("/")
+    if (uidb64 === undefined || token === undefined) {
+      console.log({ uidb64, token })
+      
+      // navigate("/")
     }
-  }, [token, navigate])
+  }, [uidb64, token, navigate])
 
-  return token
+  return { uidb64, token }
 }

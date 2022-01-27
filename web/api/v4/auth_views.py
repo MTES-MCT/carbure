@@ -53,18 +53,22 @@ def register(request):
         email_otp.save()
         return JsonResponse({'status': 'success', 'message': 'User Created'})
     else:
-        return JsonResponse({'status': 'error', 'message': 'Incorrect method. Expected POST'}, status=400)
+        errors = {key: e for key, e in form.errors.items()}
+        return JsonResponse({'status': 'error', 'message': 'Invalid Form', 'errors': errors}, status=400)
 
 def user_login(request):
-    email = request.POST.get('email', '')
+    username = request.POST.get('username', '')
     password = request.POST.get('password', '')
-    user = authenticate(username=email, password=password)
+    user = authenticate(username=username, password=password)
     login(request, user)
-    if user.is_authenticated:
-        request.session.set_expiry(3 * 30 * 24 * 60 * 60) # 3 months
-        return JsonResponse({'status': 'success', 'message': 'User logged in'})
-    else:
-        return JsonResponse({'status': 'error', 'message': 'Invalid credentials'}, status=400)
+    try:
+        if user.is_authenticated:
+            request.session.set_expiry(3 * 30 * 24 * 60 * 60) # 3 months
+            return JsonResponse({'status': 'success', 'message': 'User logged in'})
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Invalid credentials'}, status=400)
+    except:
+        return JsonResponse({'status': 'error', 'message': 'Account not activated'}, status=400)
 
 def user_logout(request):
     logout(request)
@@ -108,17 +112,22 @@ def verify_otp(request):
                 return JsonResponse({'status': 'error', 'message': 'Unknown error'}, status=400)
     return JsonResponse({'status': 'error', 'message': 'Invalid Form'}, status=400)
 
-@login_required
 def request_password_reset(request):
+    username = request.POST.get('username', '')
+    try:
+        user = get_user_model().objects.get(email=username)
+    except:
+        return JsonResponse({'status': 'error', 'message': 'User not found'}, status=400)
+
     prtg = PasswordResetTokenGenerator()
     current_site = get_current_site(request)
     # send email
     email_subject = 'Carbure - Réinitialisation du mot de passe'
     email_context = {
-        'user': request.user,
+        'user': user,
         'domain': current_site.domain,
-        'uid': urlsafe_base64_encode(force_bytes(request.user.pk)),
-        'token': prtg.make_token(request.user),
+        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+        'token': prtg.make_token(user),
     }
     html_message = loader.render_to_string('registration/password_reset_email.html', email_context)
     text_message = loader.render_to_string('registration/password_reset_email.txt', email_context)
@@ -127,20 +136,28 @@ def request_password_reset(request):
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
         html_message=html_message,
-        recipient_list=[request.user.email],
+        recipient_list=[user.email],
         fail_silently=False,
     )
     return JsonResponse({'status': 'success'})
 
-
-@login_required
 def reset_password(request):
-    token =  request.POST.get('token', '')
-    password = request.POST.get('password', '')
+    uidb64 = request.POST.get('uidb64', '')
+    token = request.POST.get('token', '') 
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user_model = get_user_model()
+        user = user_model.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    password = request.POST.get('password1', '')
+    password2 = request.POST.get('password2', '')
+    if password != password2:
+        return JsonResponse({'status': 'error', 'message': 'Passwords do not match'}, status=400)
     prtg = PasswordResetTokenGenerator()
-    if prtg.check_token(request.user, token):
-        request.user.set_password(password)
-        request.user.save()
+    if prtg.check_token(user, token):
+        user.set_password(password)
+        user.save()
         return JsonResponse({'status': 'success'})
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid Form'}, status=400)

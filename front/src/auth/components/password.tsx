@@ -114,12 +114,11 @@ export const ResetPassword = () => {
   const navigate = useNavigate()
 
   const { value, bind } = useForm({
-    oldPassword: "" as string | undefined,
     newPassword: "" as string | undefined,
     repeatNewPassword: "" as string | undefined,
   })
 
-  const token = useToken()
+  const { uidb64, token } = useToken()
 
   const resetPassword = useMutation(api.resetPassword, {
     onSuccess: () => {
@@ -151,20 +150,14 @@ export const ResetPassword = () => {
           id="reset-password"
           onSubmit={() =>
             resetPassword.execute(
-              token!,
-              value.oldPassword!,
+              uidb64,
+              token,
               value.newPassword!,
               value.repeatNewPassword!
             )
           }
         >
-          <TextInput
-            variant="solid"
-            icon={Lock}
-            type="password"
-            label={t("Ancien mot de passe")}
-            {...bind("oldPassword")}
-          />
+   
           <TextInput
             variant="solid"
             icon={Lock}
@@ -190,7 +183,6 @@ export const ResetPassword = () => {
           disabled={
             !isPassOk ||
             !token ||
-            !value.oldPassword ||
             !value.newPassword ||
             !value.repeatNewPassword
           }
