@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import { useNavigate, useParams, useSearchParams } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { useMutation, useQuery } from "common-v2/hooks/async"
 import { useNotify } from "common-v2/components/notifications"
 import Form, { useForm } from "common-v2/components/form"
@@ -151,14 +151,12 @@ export function useToken() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
 
-  const uidb64 = searchParams.get('uidb64') ?? undefined
-  const token = searchParams.get('token') ?? undefined
+  const uidb64 = searchParams.get("uidb64") ?? undefined
+  const token = searchParams.get("token") ?? undefined
 
   useEffect(() => {
     if (uidb64 === undefined || token === undefined) {
-      console.log({ uidb64, token })
-      
-      // navigate("/")
+      navigate("/")
     }
   }, [uidb64, token, navigate])
 

@@ -1,6 +1,11 @@
 import { api } from "common-v2/services/api"
 
-export function register(email: string, name: string, password1: string, password2: string) {
+export function register(
+  email: string,
+  name: string,
+  password1: string,
+  password2: string
+) {
   return api.post("/auth/register", { email, name, password1, password2 })
 }
 
@@ -46,7 +51,10 @@ export function requestActivateAccount(email: string) {
   return api.post("/auth/request-activation-link", { email })
 }
 
-export function activateAccount(uidb64: string | undefined, token: string | undefined) {
+export function activateAccount(
+  uidb64: string | undefined,
+  token: string | undefined
+) {
   if (uidb64 === undefined || token === undefined) {
     throw new Error("Missing token for account activation")
   }
