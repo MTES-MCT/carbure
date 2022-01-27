@@ -144,6 +144,8 @@ export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
   const entity = useEntity()
   const { value, bind } = useFormContext<LotFormValue>()
 
+  const { isOperator, has_stocks, has_mac, has_direct_deliveries } = entity
+
   const isDraft = value.lot === undefined || value.lot.lot_status === "DRAFT"
 
   const isCreator =
@@ -160,6 +162,14 @@ export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
     return null
   }
 
+  const options = [
+    isOperator && DeliveryType.Blending,
+    has_stocks && DeliveryType.Stock,
+    has_mac && DeliveryType.RFC,
+    has_direct_deliveries && DeliveryType.Direct,
+    DeliveryType.Export,
+  ].filter((o) => o !== false) as DeliveryType[]
+
   return (
     <Select
       clear
@@ -168,13 +178,7 @@ export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
       normalize={norm.normalizeDeliveryType}
       {...bind("delivery_type")}
       {...props}
-      options={[
-        DeliveryType.Blending,
-        DeliveryType.Stock,
-        DeliveryType.RFC,
-        DeliveryType.Direct,
-        DeliveryType.Export,
-      ]}
+      options={options}
     />
   )
 }
