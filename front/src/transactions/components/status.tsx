@@ -7,6 +7,7 @@ import { Bell, Loader } from "common-v2/components/icons"
 import { Col, Row } from "common-v2/components/scaffold"
 import css from "./status.module.css"
 import { formatNumber } from "common-v2/utils/formatters"
+import useEntity from "carbure/hooks/entity"
 
 export interface StatusTabsProps {
   loading: boolean
@@ -17,6 +18,7 @@ export const StatusTabs = ({
   loading,
   count = defaultCount,
 }: StatusTabsProps) => {
+  const entity = useEntity()
   const { t } = useTranslation()
 
   return (
@@ -48,7 +50,7 @@ export const StatusTabs = ({
             />
           ),
         },
-        {
+        entity.has_stocks && {
           key: "stock",
           path: "stocks",
           label: (
