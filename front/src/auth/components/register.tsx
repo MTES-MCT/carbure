@@ -61,7 +61,7 @@ export const Register = () => {
           />
           <TextInput
             variant="solid"
-            placeholder="Jean-Pierre CHAMPOLLION"
+            placeholder="Jean-François CHAMPOLLION"
             icon={User}
             label={t("Nom")}
             {...bind("name")}
