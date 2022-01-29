@@ -1,4 +1,5 @@
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
+import { useTranslation } from "react-i18next"
 import {
   Route,
   Routes,
@@ -33,6 +34,8 @@ import LotDetails from "lot-details"
 import useStore from "common-v2/hooks/store"
 import { useMatomo } from "matomo"
 import { getDefaultCategory, useAutoCategory } from "../category"
+import useTitle from "common-v2/hooks/title"
+import { AdminStatus } from "controls/types"
 
 export interface LotsProps {
   entity: Entity
@@ -371,6 +374,9 @@ export function useQueryParamsStore(
     }
   )
 
+  // sync tab title with current state
+  useLotTitle(state)
+
   // sync store state with entity set from above
   if (state.entity.id !== entity.id) {
     actions.setEntity(entity)
@@ -396,6 +402,43 @@ export function useQueryParamsStore(
   }
 
   return [state, actions] as [typeof state, typeof actions]
+}
+
+export function useLotTitle(state: QueryParams) {
+  const { t } = useTranslation()
+
+  const statuses: Record<Status, string> = {
+    drafts: t("brouillons"),
+    in: t("lots reçus"),
+    out: t("lots envoyés"),
+    stocks: t("stocks"),
+    declaration: "",
+    unknown: "",
+  }
+
+  const adminStatuses: Record<AdminStatus, string> = {
+    alerts: t("alertes"),
+    corrections: t("corrections"),
+    declarations: t("déclarations"),
+    pinned: t("lots épinglés"),
+    unknown: "",
+  }
+
+  const categories: any = {
+    pending: t("en attente"),
+    correction: t("en correction"),
+    history: "",
+  }
+
+  const entity = state.entity.name
+  const year = state.year
+  const status =
+    state.status in statuses
+      ? statuses[state.status]
+      : adminStatuses[state.status as AdminStatus] ?? ""
+  const category = state.status in statuses ? categories[state.category] : ""
+
+  useTitle(`${entity} ∙ ${status} ${category} ${year}`)
 }
 
 export function useLotQuery({

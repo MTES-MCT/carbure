@@ -1,6 +1,6 @@
 import { Fragment, useState, useEffect } from "react"
 import { Route, Routes, Navigate } from "react-router-dom"
-import { Trans } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import useEntity from "carbure/hooks/entity"
 import useAPI from "common/hooks/use-api"
 import { Header, Main, Title, Box } from "common/components"
@@ -10,8 +10,12 @@ import AgreementList from "./components/agreement-list"
 import QuotasList from "./components/dc-quotas"
 import * as api from "./api"
 import styles from "./index.module.css"
+import useTitle from "common-v2/hooks/title"
 
 const DoubleCounting = () => {
+  const { t } = useTranslation()
+  useTitle(t("Double comptage"))
+
   const entity = useEntity()
 
   const [year, setYear] = useState(new Date().getFullYear())
