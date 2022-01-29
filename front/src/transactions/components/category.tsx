@@ -19,6 +19,7 @@ export const DraftsSwitcher = ({
   const { t } = useTranslation()
   return (
     <Tabs
+      keepSearch
       variant="switcher"
       focus={category}
       onFocus={onSwitch}
@@ -41,6 +42,7 @@ export const InputSwitcher = ({
   const { t } = useTranslation()
   return (
     <Tabs
+      keepSearch
       variant="switcher"
       focus={category}
       onFocus={onSwitch}
@@ -73,6 +75,7 @@ export const StockSwitcher = ({
   const { t } = useTranslation()
   return (
     <Tabs
+      keepSearch
       variant="switcher"
       focus={category}
       onFocus={onSwitch}
@@ -101,6 +104,7 @@ export const OutputSwitcher = ({
 
   return (
     <Tabs
+      keepSearch
       variant="switcher"
       focus={category}
       onFocus={onSwitch}
@@ -141,8 +145,8 @@ export function useAutoCategory(
   useEffect(() => {
     if (category === undefined) {
       const defaultCategory = getDefaultCategory(status, snapshot)
-      if (status === "stocks") navigate(defaultCategory)
-      else navigate(`${status}/${defaultCategory}`)
+      if (status === "stocks") navigate(defaultCategory, { replace: true })
+      else navigate(`${status}/${defaultCategory}`, { replace: true })
     }
   }, [category, status, snapshot, navigate])
 

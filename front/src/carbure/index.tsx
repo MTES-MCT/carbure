@@ -39,7 +39,9 @@ const Carbure = () => {
           {isAuth && <Route path="/account" element={<Account />} />}
           {isAuth && <Route path="/org/:entity/*" element={<Org />} />}
 
-          {!user.loading && <Route path="*" element={<Navigate to="/" />} />}
+          {!user.loading && (
+            <Route path="*" element={<Navigate replace to="/" />} />
+          )}
         </Routes>
 
         <Footer />
@@ -72,13 +74,13 @@ const Org = () => {
       {(isAdmin || isAuditor) && <Route path="controls/:year/*" element={<Controls />} />}
       {(isAdmin || hasDCA) && <Route path="double-counting/*" element={<DoubleCounting />} />}
 
-      {isIndustry && <Route path="transactions" element={<Navigate to={`${currentYear}`} />} />}
-      {(isAdmin || isAuditor) && <Route path="controls" element={<Navigate to={`${currentYear}`} />} />}
+      {isIndustry && <Route path="transactions" element={<Navigate replace to={`${currentYear}`} />} />}
+      {(isAdmin || isAuditor) && <Route path="controls" element={<Navigate replace to={`${currentYear}`} />} />}
 
-      {isIndustry && <Route path="*" element={<Navigate to="transactions" />} />}
-      {(isAuditor) && <Route path="*" element={<Navigate to="controls" />} />}
-      {isAdmin && <Route path="*" element={<Navigate to="dashboard" />} />}
-      {hasDCA && <Route path="*" element={<Navigate to="double-counting" />} />}
+      {isIndustry && <Route path="*" element={<Navigate replace to="transactions" />} />}
+      {isAuditor && <Route path="*" element={<Navigate replace to="controls" />} />}
+      {isAdmin && <Route path="*" element={<Navigate replace to="dashboard" />} />}
+      {hasDCA && <Route path="*" element={<Navigate replace to="double-counting" />} />}
     </Routes>
 
   )

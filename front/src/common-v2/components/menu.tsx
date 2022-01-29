@@ -58,7 +58,11 @@ export function Menu({
               if (item.group) {
                 return <b>{item.label}</b>
               } else if (item.data.path) {
-                return <Link to={item.data.path}>{item.label}</Link>
+                return (
+                  <Link to={item.data.path} onClick={(e) => e.preventDefault()}>
+                    {item.label}
+                  </Link>
+                )
               } else {
                 return <p onClick={item.data.action}>{item.label}</p>
               }
