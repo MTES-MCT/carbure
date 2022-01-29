@@ -11,12 +11,12 @@ const Pending = () => {
   const user = useUser()
 
   if (!user.isAuthenticated()) {
-    return <Navigate to="/" />
+    return <Navigate replace to="/" />
   }
 
   if (user.hasEntities()) {
     const firstEntity = user.getFirstEntity()!
-    return <Navigate to={`/org/${firstEntity.id}`} />
+    return <Navigate replace to={`/org/${firstEntity.id}`} />
   }
 
   if (user.loading) {

@@ -168,7 +168,7 @@ export function useAutoStatus() {
 
   useEffect(() => {
     if (status === undefined) {
-      navigate("drafts/pending")
+      navigate("drafts/pending", { replace: true })
     }
   }, [status, navigate])
 

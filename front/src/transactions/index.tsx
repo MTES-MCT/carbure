@@ -74,7 +74,7 @@ export const Transactions = () => {
                 entity.has_stocks ? (
                   <Stocks {...props} />
                 ) : (
-                  <Navigate to="../drafts/pending" />
+                  <Navigate replace to="../drafts/pending" />
                 )
               }
             />

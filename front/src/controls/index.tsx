@@ -24,7 +24,7 @@ export const Controls = () => {
   })
 
   if (status === "unknown") {
-    return <Navigate to="alerts" />
+    return <Navigate replace to="alerts" />
   }
 
   const snapshotData = snapshot.result?.data.data
