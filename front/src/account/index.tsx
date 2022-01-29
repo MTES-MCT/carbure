@@ -1,24 +1,30 @@
-import { Trans } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import { Main } from "common-v2/components/scaffold"
 import { AccountAccesRights } from "./components/access-rights"
 import { AccountAuthentication } from "./components/authentication"
+import useTitle from "common-v2/hooks/title"
 
-const Account = () => (
-  <Main>
-    <header>
-      <h1>
-        <Trans>Mon compte</Trans>
-      </h1>
-    </header>
+const Account = () => {
+  const { t } = useTranslation()
+  useTitle(t("Mon compte"))
 
-    <section>
-      <AccountAccesRights />
-    </section>
+  return (
+    <Main>
+      <header>
+        <h1>
+          <Trans>Mon compte</Trans>
+        </h1>
+      </header>
 
-    <section>
-      <AccountAuthentication />
-    </section>
-  </Main>
-)
+      <section>
+        <AccountAccesRights />
+      </section>
+
+      <section>
+        <AccountAuthentication />
+      </section>
+    </Main>
+  )
+}
 
 export default Account

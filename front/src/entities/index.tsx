@@ -14,8 +14,12 @@ import {
   EntityUsersList,
 } from "./components/entity-list"
 import EntityDetails from "./routes/entity-details"
+import useTitle from "common-v2/hooks/title"
 
 const Entities = () => {
+  const { t } = useTranslation()
+  useTitle(t("Sociétés"))
+
   return (
     <Routes>
       <Route path=":id" element={<EntityDetails />} />

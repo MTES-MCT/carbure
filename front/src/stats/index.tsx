@@ -8,6 +8,7 @@ import IframeResizer from "iframe-resizer-react"
 import useAPI from "common/hooks/use-api"
 import api from "common/services/api"
 import { EntityType } from "carbure/types"
+import useTitle from "common-v2/hooks/title"
 
 function getHash(entityId: number) {
   return api.get("/settings/entity-hash", { entity_id: entityId })
@@ -26,6 +27,8 @@ const Stats = ({ entity }: StatsProps) => {
   }, [entity, getEntityHash])
 
   const { t } = useTranslation()
+
+  useTitle(t("Statistiques"))
 
   if (entityHash.data === null) {
     return null

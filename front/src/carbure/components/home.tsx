@@ -19,6 +19,7 @@ import {
   UserCheck,
 } from "common-v2/components/icons"
 import { Button } from "common-v2/components/button"
+import useTitle from "common-v2/hooks/title"
 
 interface HomeStats {
   total_volume: number
@@ -30,7 +31,9 @@ interface HomeStats {
 }
 
 const Home = () => {
-  useTranslation()
+  const { t } = useTranslation()
+  useTitle(t("Accueil"))
+
   const user = useUser()
 
   const stats = useQuery(() => api.get<Api<HomeStats>>("/v3/common/stats"), {

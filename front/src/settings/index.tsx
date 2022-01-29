@@ -1,4 +1,4 @@
-import { Trans } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import { EntityManager } from "carbure/hooks/entity"
 
 import { PortalProvider } from "common-v2/components/portal"
@@ -17,8 +17,12 @@ import EntityUserRights from "./components/user-rights"
 import { UserRole } from "carbure/types"
 import DoubleCountingSettings from "./components/double-counting"
 import useEntity from "carbure/hooks/entity"
+import useTitle from "common-v2/hooks/title"
 
 const Settings = () => {
+  const { t } = useTranslation()
+  useTitle(t("Société"))
+
   const entity = useEntity()
 
   const { productionSites, deliverySites } = useSettings(entity)

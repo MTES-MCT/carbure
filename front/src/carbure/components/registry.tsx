@@ -8,9 +8,12 @@ import { SearchInput } from "common-v2/components/input"
 import { Alert } from "common-v2/components/alert"
 import { AlertCircle } from "common-v2/components/icons"
 import Table from "common-v2/components/table"
+import useTitle from "common-v2/hooks/title"
 
 const Registry = () => {
   const { t } = useTranslation()
+  useTitle(t("Annuaire"))
+
   const [query, setQuery] = useState<string | undefined>("")
 
   const entities = useQuery(findEntities, {

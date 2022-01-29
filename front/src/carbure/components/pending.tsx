@@ -5,9 +5,12 @@ import css from "./pending.module.css"
 import { LoaderOverlay, Main } from "common-v2/components/scaffold"
 import Alert from "common-v2/components/alert"
 import { AlertTriangle, InfoCircle } from "common-v2/components/icons"
+import useTitle from "common-v2/hooks/title"
 
 const Pending = () => {
-  useTranslation()
+  const { t } = useTranslation()
+  useTitle(t("Premiers pas"))
+
   const user = useUser()
 
   if (!user.isAuthenticated()) {
