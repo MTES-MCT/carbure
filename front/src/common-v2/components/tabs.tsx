@@ -20,8 +20,9 @@ export interface Tab {
 export interface TabsProps extends Layout {
   className?: string
   style?: React.CSSProperties
-  tabs: (Tab | false)[]
   variant?: TabVariant
+  keepSearch?: boolean
+  tabs: (Tab | false)[]
   focus?: string
   onFocus?: (tab: string) => void
   children?: (tab: string) => React.ReactNode
@@ -31,6 +32,7 @@ export const Tabs = ({
   className,
   style,
   variant = "section",
+  keepSearch,
   tabs: tabsConfig,
   focus: controlledFocus,
   onFocus,
@@ -38,6 +40,7 @@ export const Tabs = ({
   ...props
 }: TabsProps) => {
   const matcher = useMatcher()
+  const location = useLocation()
   const tabs = tabsConfig.filter(Boolean) as Tab[]
   const match = tabs.find((tab) => matcher(tab.path)) ?? tabs[0]
   const [focus, setFocus] = useState(controlledFocus ?? match.key)
@@ -69,7 +72,10 @@ export const Tabs = ({
           }
 
           return (
-            <NavLink {...props} to={tab.path}>
+            <NavLink
+              {...props}
+              to={keepSearch ? tab.path + location.search : tab.path}
+            >
               {tab.label}
             </NavLink>
           )
