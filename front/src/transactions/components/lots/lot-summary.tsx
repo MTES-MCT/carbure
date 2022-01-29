@@ -277,7 +277,11 @@ interface PreviewCellProps {
 export const PreviewCell = ({ status, item, query }: PreviewCellProps) => {
   const { t } = useTranslation()
 
-  const filters: Record<string, any> = { periods: query.periods }
+  const filters: Record<string, any> = {
+    periods: query.periods,
+    biofuels: [item.biofuel_code],
+  }
+
   if (status === "in") {
     filters.suppliers = [item.supplier]
   } else {
@@ -286,7 +290,7 @@ export const PreviewCell = ({ status, item, query }: PreviewCellProps) => {
 
   return (
     <ExternalLink
-      href={`../${query.year}/${status}?${toSearchParams(filters)}`}
+      href={`../../${query.year}/${status}/history?${toSearchParams(filters)}`}
     >
       {t("Voir")}
     </ExternalLink>
