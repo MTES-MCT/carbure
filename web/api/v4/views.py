@@ -350,7 +350,11 @@ def stock_split(request, *args, **kwargs):
             if 'carbure_client_id' in entry:
                 lot.carbure_client_id = entry['carbure_client_id']
             if 'carbure_delivery_site_id' in entry:
-                 lot.carbure_delivery_site_id = entry['carbure_delivery_site_id']
+                try:
+                    delivery_site = Depot.objects.get(id=entry['carbure_delivery_site_id'])
+                    lot.carbure_delivery_site = delivery_site
+                except:
+                    lot.carbure_delivery_site = None 
             if 'unknown_client' in entry:
                 lot.unknown_client = entry['unknown_client']
             if 'unknown_delivery_site' in entry:
@@ -362,7 +366,11 @@ def stock_split(request, *args, **kwargs):
                     return JsonResponse({'status': 'error', 'message': 'Missing field %s in json object'}, status=400)
             lot.transport_document_type = entry.get('transport_document_type', CarbureLot.OTHER)
             lot.transport_document_reference = entry['transport_document_reference']
-            lot.carbure_delivery_site_id = entry['carbure_delivery_site_id']
+            try:
+                delivery_site = Depot.objects.get(id=entry['carbure_delivery_site_id'])
+                lot.carbure_delivery_site = delivery_site
+            except:
+                lot.carbure_delivery_site = None 
             lot.carbure_client_id = entry['carbure_client_id']
         lot.save()
         # update stock
@@ -758,6 +766,31 @@ def lots_send(request, *args, **kwargs):
             event.lot = lot
             event.user = request.user
             event.save()
+            if lot.delivery_type == CarbureLot.STOCK:
+                stock = CarbureStock()
+                stock.parent_lot = lot
+                if lot.carbure_delivery_site is None:
+                    lot.lot_status = CarbureLot.DRAFT
+                    lot.save()
+                    return JsonResponse({'status': 'error', 'message': 'Cannot add stock into unknown Depot'}, status=400)
+                stock.depot = lot.carbure_delivery_site
+                stock.carbure_client = lot.carbure_client
+                stock.remaining_volume = lot.volume
+                stock.remaining_weight = lot.weight
+                stock.remaining_lhv_amount = lot.lhv_amount
+                stock.feedstock = lot.feedstock
+                stock.biofuel = lot.biofuel
+                stock.country_of_origin = lot.country_of_origin
+                stock.carbure_production_site = lot.carbure_production_site
+                stock.unknown_production_site = lot.unknown_production_site
+                stock.production_country = lot.production_country
+                stock.carbure_supplier = lot.carbure_supplier
+                stock.unknown_supplier = lot.unknown_supplier
+                stock.ghg_reduction = lot.ghg_reduction
+                stock.ghg_reduction_red_ii = lot.ghg_reduction_red_ii
+                stock.save()
+                stock.carbure_id = '%sS%d' % (lot.carbure_id, stock.id)
+                stock.save()
         else:
             pass
         lot.save()
