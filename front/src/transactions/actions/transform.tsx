@@ -133,7 +133,7 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
   const stockRows = stocks.result?.data.data?.stocks ?? []
 
   return (
-    <Dialog limit onClose={onClose}>
+    <Dialog onClose={onClose}>
       <header>
         <h1>{t("Transformation en ETBE")}</h1>
       </header>

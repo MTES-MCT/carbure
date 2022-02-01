@@ -11,7 +11,6 @@ import { Overlay } from "./scaffold"
 export interface DialogProps {
   className?: string
   style?: React.CSSProperties
-  limit?: boolean
   children: React.ReactNode
   onClose: () => void
 }
@@ -19,18 +18,13 @@ export interface DialogProps {
 export const Dialog = ({
   className,
   style,
-  limit,
   children,
   onClose,
 }: DialogProps) => (
   <Portal onClose={onClose}>
     <div className={css.screen}>
       <Overlay onClick={onClose} />
-      <div
-        data-limit={limit ? true : undefined}
-        className={cl(css.dialog, className)}
-        style={style}
-      >
+      <div className={cl(css.dialog, className)} style={style}>
         {children}
         <Button
           variant="icon"

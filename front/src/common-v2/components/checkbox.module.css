@@ -3,7 +3,7 @@
   align-items: center;
   gap: var(--spacing-m);
   cursor: pointer;
-  white-space: nowrap;
+  /* white-space: nowrap; */
 }
 
 .checkbox:hover {
@@ -17,7 +17,8 @@
 }
 
 .square {
-  display: flex;
+  display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
   justify-self: center;

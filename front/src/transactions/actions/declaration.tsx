@@ -147,7 +147,7 @@ export const DeclarationDialog = ({
   const hasNext = timeline.month < 11 || years.includes(timeline.year + 1)
 
   return (
-    <Dialog limit onClose={onClose}>
+    <Dialog onClose={onClose}>
       <header>
         <h1>{t("Déclaration de durabilité")}</h1>
       </header>
