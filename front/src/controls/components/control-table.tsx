@@ -10,7 +10,7 @@ import {
   useLotColumns,
 } from "transactions/components/lots/lot-table"
 
-export interface LotTableProps {
+export interface ControlTableProps {
   loading: boolean
   lots: Lot[]
   errors: Record<number, LotError[]>
@@ -21,7 +21,7 @@ export interface LotTableProps {
   onOrder: (order: Order | undefined) => void
 }
 
-export const LotTable = memo(
+export const ControlTable = memo(
   ({
     loading,
     lots,
@@ -31,7 +31,7 @@ export const LotTable = memo(
     onSelect,
     onAction,
     onOrder,
-  }: LotTableProps) => {
+  }: ControlTableProps) => {
     const columns = useLotColumns()
     return (
       <Table
@@ -59,4 +59,4 @@ export const LotTable = memo(
   }
 )
 
-export default LotTable
+export default ControlTable

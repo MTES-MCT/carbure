@@ -7,10 +7,10 @@ import { Bar } from "common-v2/components/scaffold"
 import Pagination from "common-v2/components/pagination"
 import NoResult from "transactions/components/no-result"
 import Filters from "transactions/components/filters"
-import { LotTable } from "./lot-table"
-import { LotActions } from "./lot-actions"
+import ControlTable from "./control-table"
+import ControlActions from "./control-actions"
 import { DeadlineSwitch, InvalidSwitch } from "transactions/components/switches"
-import { LotSummaryBar } from "./lot-summary"
+import { LotSummaryBar } from "./control-summary"
 import { useLotQuery, useQueryParamsStore } from "transactions/components/lots"
 import { Filter, Lot } from "transactions/types"
 import ControlDetails from "control-details"
@@ -68,7 +68,7 @@ export const Lots = ({ entity, year }: LotsProps) => {
       </Bar>
 
       <section>
-        <LotActions
+        <ControlActions
           count={count}
           query={query}
           selection={state.selection}
@@ -110,7 +110,7 @@ export const Lots = ({ entity, year }: LotsProps) => {
               onFilter={actions.setFilters}
             />
 
-            <LotTable
+            <ControlTable
               loading={lots.loading}
               order={state.order}
               lots={lotList}

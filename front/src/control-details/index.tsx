@@ -7,7 +7,7 @@ import useEntity from "carbure/hooks/entity"
 import { LoaderOverlay } from "common-v2/components/scaffold"
 import Dialog from "common-v2/components/dialog"
 import Button from "common-v2/components/button"
-import { Alarm, Return } from "common-v2/components/icons"
+import { Alarm, Edit, Return } from "common-v2/components/icons"
 import LotForm, { useLotForm } from "lot-add/components/lot-form"
 import LotTag from "transactions/components/lots/lot-tag"
 import Comments from "lot-details/components/comments"
@@ -24,6 +24,8 @@ import LotTraceability, {
 } from "lot-details/components/lot-traceability"
 import { WarningAnomalies } from "./components/warnings"
 import { invalidate } from "common-v2/hooks/invalidate"
+import { PinOneButton } from "controls/actions/pin"
+import * as controls from "controls/api"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -47,6 +49,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const lotData = lot.result?.data.data
   const creator = lotData?.lot.added_by
   const comments = lotData?.comments ?? []
+  const controlComments = lotData?.control_comments ?? []
   const changes = getLotChanges(lotData?.updates)
   const [errors, warnings] = separateAnomalies(lotData?.errors ?? [])
 
@@ -104,6 +107,19 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
           </section>
         )}
 
+        {lotData && controlComments.length > 0 && (
+          <section>
+            <Comments
+              icon={Edit}
+              variant="warning"
+              title={t("Notes de contrôle")}
+              lot={lotData?.lot}
+              comments={controlComments}
+              commentLots={controls.commentLots}
+            />
+          </section>
+        )}
+
         {hasTraceability(lotData) && (
           <section>
             <LotTraceability details={lotData} />
@@ -118,6 +134,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
       </main>
 
       <footer>
+        {lotData && <PinOneButton lot={lotData?.lot} />}
         <NavigationButtons neighbors={neighbors} root={`../${status}`} />
         <Button icon={Return} label={t("Retour")} action={closeDialog} />
       </footer>
