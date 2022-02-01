@@ -1,6 +1,6 @@
 import { Api, api, download } from "common-v2/services/api"
 import { Option } from "common-v2/utils/normalize"
-import { LotSummary, Snapshot } from "./types"
+import { LotSummary, Snapshot } from "../types"
 import { Filter, LotList, LotQuery } from "transactions/types"
 import { selectionOrQuery } from "transactions/api"
 
@@ -12,11 +12,11 @@ const QUERY_RESET: Partial<LotQuery> = {
 }
 
 export function getYears(entity_id: number) {
-  return api.get<Api<number[]>>("/admin/years", { params: { entity_id } })
+  return api.get<Api<number[]>>("/auditor/years", { params: { entity_id } })
 }
 
 export function getSnapshot(entity_id: number, year: number) {
-  return api.get<Api<Snapshot>>("/admin/snapshot", {
+  return api.get<Api<Snapshot>>("/auditor/snapshot", {
     params: { entity_id, year },
   })
 }
@@ -24,11 +24,11 @@ export function getSnapshot(entity_id: number, year: number) {
 // ENDPOINTS FOR LOTS
 
 export function getLots(query: LotQuery) {
-  return api.get<Api<LotList>>("/admin/lots", { params: query })
+  return api.get<Api<LotList>>("/auditor/lots", { params: query })
 }
 
 export function downloadLots(query: LotQuery, selection: number[]) {
-  return download("/admin/lots", {
+  return download("/auditor/lots", {
     ...selectionOrQuery(query, selection),
     export: true,
   })
@@ -39,7 +39,7 @@ export function getLotsSummary(
   selection: number[],
   short?: boolean
 ) {
-  return api.get<Api<LotSummary>>("/admin/lots/summary", {
+  return api.get<Api<LotSummary>>("/auditor/lots/summary", {
     params: { ...query, selection, ...QUERY_RESET, short },
   })
 }
@@ -47,12 +47,12 @@ export function getLotsSummary(
 export function getLotFilters(field: Filter, query: LotQuery) {
   const params = { field, ...query, ...QUERY_RESET }
   return api
-    .get<Api<Option[]>>("/admin/lots/filters", { params })
+    .get<Api<Option[]>>("/auditor/lots/filters", { params })
     .then((res) => res.data.data ?? [])
 }
 
 export function pinLots(entity_id: number, selection: number[]) {
-  return api.post("/admin/lots/pin", { entity_id, selection })
+  return api.post("/auditor/lots/pin", { entity_id, selection })
 }
 
 export async function commentLots(
@@ -63,7 +63,7 @@ export async function commentLots(
 ) {
   if (!comment) return
 
-  return api.post<Api<void>>("/admin/lots/comment", {
+  return api.post<Api<void>>("/auditor/lots/comment", {
     entity_id: query.entity_id,
     selection,
     is_visible_by_auditor,

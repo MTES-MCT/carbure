@@ -1,6 +1,7 @@
 import { useNavigate, useLocation, useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import * as api from "./api"
+import pickApi from "./api"
+import pickControlsApi from "controls/api"
 import { useQuery } from "common-v2/hooks/async"
 import { useStatus } from "controls/components/status"
 import useEntity from "carbure/hooks/entity"
@@ -25,7 +26,6 @@ import LotTraceability, {
 import { WarningAnomalies } from "./components/warnings"
 import { invalidate } from "common-v2/hooks/invalidate"
 import { PinOneButton } from "controls/actions/pin"
-import * as controls from "controls/api"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -40,6 +40,9 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const entity = useEntity()
   const status = useStatus()
   const params = useParams<"id">()
+
+  const api = pickApi(entity)
+  const controls = pickControlsApi(entity)
 
   const lot = useQuery(api.getLotDetails, {
     key: "control-details",

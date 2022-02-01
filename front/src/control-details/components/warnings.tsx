@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import useEntity from "carbure/hooks/entity"
 import { CheckboxGroup } from "common-v2/components/checkbox"
@@ -6,8 +7,7 @@ import { AlertTriangle } from "common-v2/components/icons"
 import { useMutation } from "common-v2/hooks/async"
 import { normalizeAnomaly } from "lot-details/components/anomalies"
 import { Lot, LotError } from "transactions/types"
-import * as api from "../api"
-import { useState } from "react"
+import pickApi from "../api"
 
 export interface WarningAnomaliesProps {
   lot: Lot
@@ -16,7 +16,9 @@ export interface WarningAnomaliesProps {
 
 export const WarningAnomalies = ({ lot, anomalies }: WarningAnomaliesProps) => {
   const { t } = useTranslation()
+
   const entity = useEntity()
+  const api = pickApi(entity)
 
   const ackWarning = useMutation((error: string) =>
     api.toggleWarning(entity.id, lot.id, error)

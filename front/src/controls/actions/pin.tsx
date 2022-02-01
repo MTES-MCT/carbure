@@ -1,39 +1,59 @@
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { Lot } from "transactions/types"
-import * as api from "../api"
-import useEntity from "carbure/hooks/entity"
+import pickApi from "../api"
+import useEntity, { EntityManager } from "carbure/hooks/entity"
 import { useMutation } from "common-v2/hooks/async"
 import { useNotify } from "common-v2/components/notifications"
 import { variations } from "common-v2/utils/formatters"
 import Button from "common-v2/components/button"
 import Dialog from "common-v2/components/dialog"
-import { Pin, Return } from "common-v2/components/icons"
+import { Pin, PinOff, Return } from "common-v2/components/icons"
 import { usePortal } from "common-v2/components/portal"
-import { useStatus } from "transactions/components/status"
+import { useStatus } from "../components/status"
 import { TextInput } from "common-v2/components/input"
 import { LotSummary } from "../components/control-summary"
 import Checkbox from "common-v2/components/checkbox"
 import Form, { useForm } from "common-v2/components/form"
+import { AdminStatus } from "controls/types"
 
 export interface PinManyButtonProps {
   disabled?: boolean
+  pinned?: boolean
   selection: number[]
+  lots: Lot[]
 }
 
-export const PinManyButton = ({ disabled, selection }: PinManyButtonProps) => {
+export const PinManyButton = ({
+  disabled,
+  selection,
+  pinned: forcePinned,
+  lots,
+}: PinManyButtonProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
+  const entity = useEntity()
+  const status = useStatus() as AdminStatus
+
+  const pinned =
+    forcePinned ||
+    status === "pinned" ||
+    (lots.length > 0 && lots.every((lot) => isPinned(entity, lot)))
 
   return (
     <Button
       disabled={disabled || selection.length === 0}
-      variant="primary"
-      icon={Pin}
-      label={t("Épingler la sélection")}
+      variant={pinned ? "warning" : "primary"}
+      icon={pinned ? PinOff : Pin}
+      label={pinned ? t("Désépingler la sélection") : t("Épingler la sélection")} // prettier-ignore
       action={() =>
         portal((close) => (
-          <PinDialog summary selection={selection} onClose={close} />
+          <PinDialog
+            summary
+            pinned={pinned}
+            selection={selection}
+            onClose={close}
+          />
         ))
       }
     />
@@ -49,27 +69,33 @@ export const PinOneButton = ({ icon, lot }: PinOneButtonProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
+  const entity = useEntity()
+  const pinned = isPinned(entity, lot)
+
   return (
     <Button
       captive
-      variant={icon ? "icon" : "primary"}
-      icon={Pin}
-      title={t("Épingler")}
-      label={t("Épingler")}
+      variant={icon ? "icon" : pinned ? "warning" : "primary"}
+      icon={pinned ? PinOff : Pin}
+      title={pinned ? t("Désépingler") : t("Épingler")}
+      label={pinned ? t("Désépingler") : t("Épingler")}
       action={() =>
-        portal((close) => <PinDialog selection={[lot.id]} onClose={close} />)
+        portal((close) => (
+          <PinDialog pinned={pinned} selection={[lot.id]} onClose={close} />
+        ))
       }
     />
   )
 }
 
 interface PinDialogProps {
+  pinned?: boolean
   summary?: boolean
   selection: number[]
   onClose: () => void
 }
 
-const PinDialog = ({ summary, selection, onClose }: PinDialogProps) => {
+const PinDialog = ({ pinned, summary, selection, onClose }: PinDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
   const status = useStatus()
@@ -79,16 +105,16 @@ const PinDialog = ({ summary, selection, onClose }: PinDialogProps) => {
 
   const form = useForm({
     comment: undefined as string | undefined,
-    notifyAuditor: false,
+    notifyExternal: false,
   })
 
   const pinAndComment = useMutation(pinAndCommentLots, {
-    invalidates: ["control-details"],
+    invalidates: ["controls", "control-details", "controls-snapshot"],
 
     onSuccess: () => {
       const text = v({
-        one: t("Le lot a bien été épinglé !"),
-        many: t("Les lots ont bien été épinglés !"),
+        one: t("Le lot a bien été mis à jour !"),
+        many: t("Les lots ont bien été mis à jour !"),
       })
 
       notify(text, { variant: "success" })
@@ -97,8 +123,8 @@ const PinDialog = ({ summary, selection, onClose }: PinDialogProps) => {
 
     onError: () => {
       const text = v({
-        one: t("Le lot n'a pas pu être épinglé !"),
-        many: t("Les lots n'ont pas pu être épinglés !"),
+        one: t("Le lot n'a pas pu être mis à jour !"),
+        many: t("Les lots n'ont pas pu être mis à jour !"),
       })
 
       notify(text, { variant: "danger" })
@@ -116,34 +142,53 @@ const PinDialog = ({ summary, selection, onClose }: PinDialogProps) => {
       <header>
         <h1>
           {v({
-            one: t("Épingler un lot"),
-            many: t("Épingler des lots"),
+            one: pinned ? t("Désépingler un lot") : t("Épingler un lot"),
+            many: pinned ? t("Désépingler des lots") : t("Épingler des lots"),
           })}
         </h1>
       </header>
       <main>
         <section>
-          {v({
-            one: t("Voulez-vous épingler ce lot ?"),
-            many: t("Voulez-vous épingler les lots sélectionnés ?"),
-          })}
-        </section>
-        <section>
-          <Form id="pin">
-            <TextInput
-              required
-              label={t("Commentaire")}
-              {...form.bind("comment")}
-            />
-            <Checkbox
-              {...form.bind("notifyAuditor")}
-              label={v({
-                one: t("Signaler ce lot aux auditeurs"),
-                many: t("Signaler ces lots aux auditeurs"),
+          <p>
+            {v({
+              one: pinned
+                ? t("Voulez-vous désépingler ce lot ?")
+                : t("Voulez-vous épingler ce lot ?"),
+              many: pinned
+                ? t("Voulez-vous désépingler les lots sélectionnés ?")
+                : t("Voulez-vous épingler les lots sélectionnés ?"),
+            })}{" "}
+          </p>
+          {!pinned && selection.length > 1 && (
+            <p>
+              {v({
+                one: "",
+                many: t("Si des lots déjà épinglés sont sélectionnés, ils seront désépinglés."), // prettier-ignore
               })}
-            />
-          </Form>
+            </p>
+          )}
         </section>
+        {!pinned && (
+          <section>
+            <Form id="pin">
+              <TextInput
+                label={t("Commentaire (optionnel)")}
+                {...form.bind("comment")}
+              />
+              <Checkbox
+                {...form.bind("notifyExternal")}
+                label={v({
+                  one: entity.isAdmin
+                    ? t("Signaler ce lot aux auditeurs")
+                    : t("Signaler ce lot à l'administration"),
+                  many: entity.isAdmin
+                    ? t("Signaler ces lots aux auditeurs")
+                    : t("Signaler ces lots à l'administration"),
+                })}
+              />
+            </Form>
+          </section>
+        )}
         {summary && <LotSummary query={query} selection={selection} />}
       </main>
       <footer>
@@ -156,17 +201,16 @@ const PinDialog = ({ summary, selection, onClose }: PinDialogProps) => {
         />
         <Button
           submit="pin"
-          disabled={!form.value.comment}
           loading={pinAndComment.loading}
-          variant="primary"
+          variant={pinned ? "warning" : "primary"}
           icon={Pin}
-          label={t("Épingler")}
+          label={pinned ? t("Désépingler") : t("Épingler")}
           action={() =>
             pinAndComment.execute(
-              entity.id,
+              entity,
               selection,
-              form.value.comment!,
-              form.value.notifyAuditor
+              form.value.comment,
+              form.value.notifyExternal
             )
           }
         />
@@ -176,11 +220,30 @@ const PinDialog = ({ summary, selection, onClose }: PinDialogProps) => {
 }
 
 async function pinAndCommentLots(
-  entity_id: number,
+  entity: EntityManager,
   selection: number[],
-  comment: string,
-  notifyAuditor?: boolean
+  comment?: string,
+  notifyExternal: boolean = false
 ) {
-  await api.pinLots(entity_id, selection)
-  await api.commentLots({ entity_id }, selection, comment, notifyAuditor)
+  const api = pickApi(entity)
+  await api.pinLots(entity.id, selection)
+
+  if (comment !== undefined) {
+    const notifyAdmin = entity.isAdmin || (entity.isAuditor && notifyExternal)
+    const notifyAuditor = entity.isAuditor || (entity.isAdmin && notifyExternal)
+
+    await api.commentLots(
+      { entity_id: entity.id },
+      selection,
+      comment,
+      notifyAdmin,
+      notifyAuditor
+    )
+  }
+}
+
+function isPinned(entity: EntityManager, lot: Lot) {
+  if (entity.isAdmin) return lot.highlighted_by_admin === true
+  if (entity.isAuditor) return lot.highlighted_by_auditor === true
+  else return false
 }

@@ -2,13 +2,13 @@ import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 import useEntity from "carbure/hooks/entity"
 import { useQuery } from "common-v2/hooks/async"
-import * as api from "./api"
 import { Main } from "common-v2/components/scaffold"
 import Select from "common-v2/components/select"
 import { PortalProvider } from "common-v2/components/portal"
 import { StatusTabs, useStatus } from "./components/status"
 import Lots from "./components/lots"
 import { useYears } from "transactions"
+import pickApi from "./api"
 
 export const Controls = () => {
   const { t } = useTranslation()
@@ -16,10 +16,12 @@ export const Controls = () => {
   const entity = useEntity()
   const status = useStatus()
 
+  const api = pickApi(entity)
+
   const years = useYears("controls", api.getYears)
 
   const snapshot = useQuery(api.getSnapshot, {
-    key: "snapshot",
+    key: "controls-snapshot",
     params: [entity.id, years.selected],
   })
 

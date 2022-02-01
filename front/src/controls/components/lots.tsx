@@ -1,6 +1,6 @@
 import { Route, Routes, useNavigate, useLocation } from "react-router-dom"
-import * as api from "../api"
-import { Entity } from "carbure/types"
+import pickApi from "../api"
+import { EntityManager } from "carbure/hooks/entity"
 import { useQuery } from "common-v2/hooks/async"
 import { useStatus } from "./status"
 import { Bar } from "common-v2/components/scaffold"
@@ -16,7 +16,7 @@ import { Filter, Lot } from "transactions/types"
 import ControlDetails from "control-details"
 
 export interface LotsProps {
-  entity: Entity
+  entity: EntityManager
   year: number
 }
 
@@ -28,6 +28,8 @@ export const Lots = ({ entity, year }: LotsProps) => {
 
   const [state, actions] = useQueryParamsStore(entity, year, status)
   const query = useLotQuery(state)
+
+  const api = pickApi(entity)
 
   const lots = useQuery(api.getLots, {
     key: "controls",
@@ -71,6 +73,7 @@ export const Lots = ({ entity, year }: LotsProps) => {
         <ControlActions
           count={count}
           query={query}
+          lots={lotsData?.lots ?? []}
           selection={state.selection}
           search={state.search}
           onSearch={actions.setSearch}
