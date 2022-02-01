@@ -202,7 +202,7 @@ export const LotSummary = ({
           </h2>
 
           <Table
-            style={{ width: "min(50vw, 960px)" }}
+            style={{ width: "max(50vw, 960px)" }}
             rows={lots}
             columns={[...columns]}
           />

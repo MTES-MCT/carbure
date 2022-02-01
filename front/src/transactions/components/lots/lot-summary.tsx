@@ -187,7 +187,7 @@ export const LotSummary = ({
             })}
           </h2>
           <Table
-            style={{ width: "min(50vw, 960px)" }}
+            style={{ width: "max(50vw, 960px)" }}
             rows={input}
             columns={[
               {
@@ -232,7 +232,7 @@ export const LotSummary = ({
           </h2>
           <Table
             rows={output}
-            style={{ width: "min(50vw, 960px)" }}
+            style={{ width: "max(50vw, 960px)" }}
             columns={[
               {
                 key: "client",
