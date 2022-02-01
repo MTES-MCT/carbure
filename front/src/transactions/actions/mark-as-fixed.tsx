@@ -44,11 +44,13 @@ export const MarkManyAsFixedButton = ({
 
 export interface MarkOneAsFixedButtonProps {
   icon?: boolean
+  disabled?: boolean
   lot: Lot
 }
 
 export const MarkOneAsFixedButton = ({
   icon,
+  disabled,
   lot,
 }: MarkOneAsFixedButtonProps) => {
   const { t } = useTranslation()
@@ -57,6 +59,7 @@ export const MarkOneAsFixedButton = ({
   return (
     <Button
       captive
+      disabled={disabled}
       variant={icon ? "icon" : "success"}
       icon={Check}
       title={t("Confirmer la correction")}

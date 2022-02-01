@@ -50,10 +50,11 @@ export const SendManyButton = ({
 
 export interface SendIconButtonProps {
   icon?: boolean
+  disabled?: boolean
   lot: Lot
 }
 
-export const SendOneButton = ({ icon, lot }: SendIconButtonProps) => {
+export const SendOneButton = ({ icon, disabled, lot }: SendIconButtonProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const portal = usePortal()
@@ -61,6 +62,7 @@ export const SendOneButton = ({ icon, lot }: SendIconButtonProps) => {
   return (
     <Button
       captive
+      disabled={disabled}
       variant={icon ? "icon" : "success"}
       icon={Check}
       title={t("Envoyer")}
