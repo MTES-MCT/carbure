@@ -67,8 +67,18 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
     },
   })
 
+  const { isOperator, has_stocks, has_mac, has_direct_deliveries } = entity
+
   const clientIsEntity =
     value.client instanceof Object && value.client.id === entity.id
+
+  const deliveryTypes = [
+    isOperator && DeliveryType.Blending,
+    has_stocks && DeliveryType.Stock,
+    has_mac && DeliveryType.RFC,
+    has_direct_deliveries && DeliveryType.Direct,
+    DeliveryType.Export,
+  ].filter((o) => o !== false) as DeliveryType[]
 
   return (
     <Dialog onClose={onClose}>
@@ -116,13 +126,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
                 placeholder={t("Choisissez un type")}
                 normalize={norm.normalizeDeliveryType}
                 {...bind("delivery_type")}
-                options={[
-                  // DeliveryType.Blending,
-                  // DeliveryType.Stock,
-                  DeliveryType.RFC,
-                  DeliveryType.Direct,
-                  DeliveryType.Export,
-                ]}
+                options={deliveryTypes}
               />
             )}
             <Autocomplete
@@ -131,13 +135,21 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
               normalize={norm.normalizeDepot}
               {...bind("delivery_site")}
             />
-            <Autocomplete
-              required
-              label={t("Pays de livraison")}
-              getOptions={findCountries}
-              normalize={norm.normalizeCountry}
-              {...bind("delivery_site_country")}
-            />
+            {value.delivery_site instanceof Object ? (
+              <TextInput
+                disabled
+                label={t("Pays de livraison")}
+                value={norm.normalizeCountry(value.delivery_site.country).label}
+              />
+            ) : (
+              <Autocomplete
+                required
+                label={t("Pays de livraison")}
+                getOptions={findCountries}
+                normalize={norm.normalizeCountry}
+                {...bind("delivery_site_country")}
+              />
+            )}
             <DateInput
               required
               label={t("Date de livraison")}
