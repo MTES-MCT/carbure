@@ -152,6 +152,7 @@ export const StockSummary = ({
             })}
           </h2>
           <Table
+            style={{ width: "max(50vw, 960px)" }}
             rows={stock}
             columns={[
               {
