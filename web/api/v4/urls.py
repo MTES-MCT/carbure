@@ -1,5 +1,5 @@
 from django.urls import path, include
-from api.v4 import views, auth_views, certificates, admin
+from api.v4 import views, auth_views, certificates, admin, auditor
 
 urlpatterns = [
     #### AUTH
@@ -93,4 +93,15 @@ urlpatterns = [
     path('admin/lots/toggle-warning', admin.toggle_warning, name='api-v4-admin-toggle-warning'),
     path('admin/lots/pin', admin.toggle_pin, name='api-v4-admin-pin-lots'),
     path('admin/lots/comment', admin.add_comment, name='api-v4-admin-add-comment'),
+
+    # AUDITOR
+    path('auditor/years', auditor.get_years, name='api-v4-auditor-get-years'),
+    path('auditor/snapshot', auditor.get_snapshot, name='api-v4-auditor-get-snapshot'),
+    path('auditor/lots', auditor.get_lots, name='api-v4-auditor-get-lots'),
+    path('auditor/lots/summary', auditor.get_lots_summary, name='api-v4-auditor-get-lots-summary'),
+    path('auditor/lots/details', auditor.get_lot_details, name='api-v4-auditor-get-lot-details'),
+    path('auditor/lots/filters', auditor.get_lots_filters, name='api-v4-auditor-get-lots-filters'),
+    path('auditor/lots/toggle-warning', auditor.toggle_warning, name='api-v4-auditor-toggle-warning'),
+    path('auditor/lots/pin', auditor.toggle_pin, name='api-v4-auditor-pin-lots'),
+    path('auditor/lots/comment', auditor.add_comment, name='api-v4-auditor-add-comment'),
 ]

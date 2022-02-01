@@ -225,13 +225,13 @@ async function pinAndCommentLots(
   comment?: string,
   notifyExternal: boolean = false
 ) {
+  const notifyAdmin = entity.isAdmin || (entity.isAuditor && notifyExternal)
+  const notifyAuditor = entity.isAuditor || (entity.isAdmin && notifyExternal)
+
   const api = pickApi(entity)
-  await api.pinLots(entity.id, selection)
+  await api.pinLots(entity.id, selection, notifyAdmin, notifyAuditor)
 
   if (comment !== undefined) {
-    const notifyAdmin = entity.isAdmin || (entity.isAuditor && notifyExternal)
-    const notifyAuditor = entity.isAuditor || (entity.isAdmin && notifyExternal)
-
     await api.commentLots(
       { entity_id: entity.id },
       selection,

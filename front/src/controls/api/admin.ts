@@ -51,8 +51,18 @@ export function getLotFilters(field: Filter, query: LotQuery) {
     .then((res) => res.data.data ?? [])
 }
 
-export function pinLots(entity_id: number, selection: number[]) {
-  return api.post("/admin/lots/pin", { entity_id, selection })
+export function pinLots(
+  entity_id: number,
+  selection: number[],
+  notify_admin?: boolean,
+  notify_auditor?: boolean
+) {
+  return api.post("/admin/lots/pin", {
+    entity_id,
+    selection,
+    notify_admin,
+    notify_auditor,
+  })
 }
 
 export async function commentLots(
