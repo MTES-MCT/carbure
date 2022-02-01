@@ -63,7 +63,7 @@ const ImportDialog = ({ onClose }: ImportDialogProps) => {
   const [file, setFile] = useState<File | undefined>()
 
   return (
-    <Dialog limit onClose={onClose}>
+    <Dialog onClose={onClose}>
       <header>
         <h1>{t("Import Excel")}</h1>
       </header>

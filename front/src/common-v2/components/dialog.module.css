@@ -24,10 +24,6 @@
   overflow: hidden;
 }
 
-.dialog[data-limit] {
-  max-width: 960px;
-}
-
 .close {
   position: absolute;
   top: 0;

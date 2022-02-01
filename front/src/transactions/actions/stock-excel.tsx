@@ -41,7 +41,7 @@ const StockExcelDialog = ({ onClose }: StockExcelDialogProps) => {
   const [file, setFile] = useState<File | undefined>()
 
   return (
-    <Dialog limit onClose={onClose}>
+    <Dialog onClose={onClose}>
       <header>
         <h1>{t("Extraire des lots des stocks avec Excel")}</h1>
       </header>
