@@ -162,6 +162,7 @@ export interface StockSummary {
 export interface SummaryItem {
   client?: string
   supplier?: string
+  delivery_type?: DeliveryType
   biofuel_code: string | null
   volume_sum: number
   avg_ghg_reduction: number | null

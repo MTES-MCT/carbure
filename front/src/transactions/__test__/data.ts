@@ -1,5 +1,5 @@
 import { lot } from "lot-details/__test__/data"
-import { LotList, LotSummary, Snapshot } from "transactions/types"
+import { DeliveryType, LotList, LotSummary, Snapshot } from "transactions/types"
 
 export const emptySnapshot: Snapshot = {
   lots: {
@@ -56,6 +56,7 @@ export const lotSummary: LotSummary = {
   in: [
     {
       supplier: "ROQUETTE",
+      delivery_type: DeliveryType.Blending,
       biofuel_code: "ETH",
       volume_sum: 12345,
       avg_ghg_reduction: 76.15,
@@ -66,6 +67,7 @@ export const lotSummary: LotSummary = {
   out: [
     {
       client: "TERF",
+      delivery_type: DeliveryType.Processing,
       biofuel_code: "ETH",
       volume_sum: 12345,
       avg_ghg_reduction: 78.57,
