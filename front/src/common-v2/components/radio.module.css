@@ -1,9 +1,10 @@
 .radio {
   display: flex;
   align-items: center;
-  gap: var(--spacing-s);
+  gap: var(--spacing-m);
   cursor: pointer;
   text-align: left;
+  white-space: nowrap;
 }
 
 .radio:hover {
