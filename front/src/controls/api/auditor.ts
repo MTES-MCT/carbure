@@ -69,6 +69,7 @@ export async function commentLots(
   query: LotQuery,
   selection: number[] | undefined,
   comment: string,
+  is_visible_by_admin?: boolean,
   is_visible_by_auditor?: boolean
 ) {
   if (!comment) return
@@ -76,6 +77,7 @@ export async function commentLots(
   return api.post<Api<void>>("/auditor/lots/comment", {
     entity_id: query.entity_id,
     selection,
+    is_visible_by_admin,
     is_visible_by_auditor,
     comment,
   })

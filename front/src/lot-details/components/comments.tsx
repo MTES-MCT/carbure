@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import { LotComment } from "../types"
 import { useMutation } from "common-v2/hooks/async"
 import { formatDateTime } from "common-v2/utils/formatters"
-import Collapse, { CollapseVariant } from "common-v2/components/collapse"
+import Collapse from "common-v2/components/collapse"
 import Form from "common-v2/components/form"
 import { TextInput } from "common-v2/components/input"
 import Button from "common-v2/components/button"
@@ -13,38 +13,26 @@ import useEntity from "carbure/hooks/entity"
 import { Lot } from "transactions/types"
 export interface CommentsProps {
   readOnly?: boolean
-  title?: string
-  icon?: React.ComponentType
-  variant?: CollapseVariant
   lot: Lot
   comments: LotComment[]
-  commentLots?: typeof api.commentLots
 }
 
-export const Comments = ({
-  readOnly,
-  title,
-  icon,
-  variant,
-  lot,
-  comments,
-  commentLots = api.commentLots,
-}: CommentsProps) => {
+export const Comments = ({ readOnly, lot, comments }: CommentsProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
 
   const [comment = "", setComment] = useState<string | undefined>()
 
-  const addComment = useMutation(commentLots, {
-    invalidates: ["lot-details", "control-details"],
+  const addComment = useMutation(api.commentLots, {
+    invalidates: ["lot-details"],
     onSuccess: () => setComment(""),
   })
 
   return (
     <Collapse
-      icon={icon ?? Message}
-      variant={variant ?? "info"}
-      label={`${title ?? t("Commentaires")} (${comments.length})`}
+      icon={Message}
+      variant="info"
+      label={`${t("Commentaires")} (${comments.length})`}
     >
       <section>
         {comments.map((comment, i) => (

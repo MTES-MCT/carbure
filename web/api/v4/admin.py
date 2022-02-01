@@ -196,6 +196,7 @@ def add_comment(request, *args, **kwargs):
         lot_comment.user = request.user
         lot_comment.lot = lot
         lot_comment.comment_type = CarbureLotComment.ADMIN
+        lot_comment.is_visible_by_admin = True
         lot_comment.is_visible_by_auditor = is_visible_by_auditor
         lot_comment.comment = comment
         lot_comment.save()
