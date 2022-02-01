@@ -45,6 +45,7 @@ export function Table<T>({
               title={
                 typeof column.header === "string" ? column.header : undefined
               }
+              style={column.style}
               className={cl(
                 css.header,
                 column.className,
@@ -71,6 +72,7 @@ export function Table<T>({
             {columns.filter(isVisible).map((column, i) => (
               <div
                 key={column.key ?? i}
+                style={column.style}
                 className={cl(
                   css.cell,
                   column.className,
@@ -200,6 +202,7 @@ export interface Column<T> {
   header?: React.ReactNode
   key?: string
   className?: string
+  style?: React.CSSProperties
   small?: boolean
   hidden?: boolean
   orderBy?: OrderBy<T>

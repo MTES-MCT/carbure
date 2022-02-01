@@ -61,17 +61,20 @@
   flex-direction: column;
   padding: 0 var(--spacing-l);
   gap: var(--spacing-s);
-  white-space: pre-wrap;
+  text-align: justify;
 }
 
 .dialog > main > p {
   padding: 0 var(--spacing-l);
-  white-space: pre-wrap;
 }
 
 .dialog > main > section a {
   color: var(--blue-medium);
   text-decoration: underline;
+}
+
+.dialog > main > section p {
+  text-align: justify;
 }
 
 .dialog > main > h2 {

@@ -3,7 +3,7 @@
   align-items: center;
   gap: var(--spacing-s);
   cursor: pointer;
-  white-space: nowrap;
+  text-align: left;
 }
 
 .radio:hover {
