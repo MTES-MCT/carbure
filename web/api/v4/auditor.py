@@ -206,7 +206,8 @@ def add_comment(request, *args, **kwargs):
         lot_comment.entity = entity
         lot_comment.user = request.user
         lot_comment.lot = lot
-        lot_comment.comment_type = CarbureLotComment.ADMIN
+        lot_comment.comment_type = CarbureLotComment.AUDITOR
+        lot_comment.is_visible_by_auditor = True
         lot_comment.is_visible_by_admin = is_visible_by_admin
         lot_comment.comment = comment
         lot_comment.save()

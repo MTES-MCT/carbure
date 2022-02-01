@@ -1,14 +1,13 @@
 import { useNavigate, useLocation, useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import pickApi from "./api"
-import pickControlsApi from "controls/api"
 import { useQuery } from "common-v2/hooks/async"
 import { useStatus } from "controls/components/status"
 import useEntity from "carbure/hooks/entity"
 import { LoaderOverlay } from "common-v2/components/scaffold"
 import Dialog from "common-v2/components/dialog"
 import Button from "common-v2/components/button"
-import { Alarm, Edit, Return } from "common-v2/components/icons"
+import { Alarm, Return } from "common-v2/components/icons"
 import LotForm, { useLotForm } from "lot-add/components/lot-form"
 import LotTag from "transactions/components/lots/lot-tag"
 import Comments from "lot-details/components/comments"
@@ -26,6 +25,7 @@ import LotTraceability, {
 import { WarningAnomalies } from "./components/warnings"
 import { invalidate } from "common-v2/hooks/invalidate"
 import { PinOneButton } from "controls/actions/pin"
+import ControlComments from "./components/control-comments"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -42,7 +42,6 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const params = useParams<"id">()
 
   const api = pickApi(entity)
-  const controls = pickControlsApi(entity)
 
   const lot = useQuery(api.getLotDetails, {
     key: "control-details",
@@ -110,16 +109,9 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
           </section>
         )}
 
-        {lotData && controlComments.length > 0 && (
+        {lotData && (
           <section>
-            <Comments
-              icon={Edit}
-              variant="warning"
-              title={t("Notes de contrôle")}
-              lot={lotData?.lot}
-              comments={controlComments}
-              commentLots={controls.commentLots}
-            />
+            <ControlComments lot={lotData?.lot} comments={controlComments} />
           </section>
         )}
 
