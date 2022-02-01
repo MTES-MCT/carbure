@@ -51,7 +51,9 @@ export const StockTraceability = ({ details }: TraceabilityProps) => {
 
             {parentTransform && (
               <li>
-                <ExternalLink to={`../${parentTransform.source_stock.id}`}>
+                <ExternalLink
+                  to={`../history/${parentTransform.source_stock.id}`}
+                >
                   Stock {parentTransform.source_stock.carbure_id}:
                   <b>
                     {t(parentTransform.source_stock.biofuel?.code ?? "", {
@@ -85,7 +87,7 @@ export const StockTraceability = ({ details }: TraceabilityProps) => {
 
             {childrenTransform?.map((child, i) => (
               <li key={i}>
-                <ExternalLink to={`../${child.dest_stock.id}`}>
+                <ExternalLink to={`../history/${child.dest_stock.id}`}>
                   Stock {child.dest_stock.carbure_id}:{" "}
                   <b>
                     {t(child.dest_stock.biofuel?.code ?? "", {
