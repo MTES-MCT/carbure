@@ -147,7 +147,7 @@ export const DeclarationDialog = ({
   const hasNext = timeline.month < 11 || years.includes(timeline.year + 1)
 
   return (
-    <Dialog onClose={onClose}>
+    <Dialog style={{ width: "max(50vw, 960px)" }} onClose={onClose}>
       <header>
         <h1>{t("Déclaration de durabilité")}</h1>
       </header>
