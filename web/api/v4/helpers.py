@@ -527,6 +527,9 @@ def get_lot_errors(lot, entity=None):
     if entity.entity_type == Entity.ADMIN:
         errors = lot.genericerror_set.filter(display_to_admin=True)
         return GenericErrorAdminSerializer(errors, many=True, read_only=True).data
+    elif entity.entity_type == Entity.AUDITOR:
+        errors = lot.genericerror_set.filter(display_to_auditor=True)
+        return GenericErrorAdminSerializer(errors, many=True, read_only=True).data
     else:
         errors = GenericError.objects.filter(lot_id=lot.id)
         errors = errors.filter(Q(lot__added_by=entity, display_to_creator=True) | Q(lot__carbure_client=entity, display_to_recipient=True))
@@ -537,6 +540,8 @@ def get_lots_errors(lots, entity):
     errors = GenericError.objects.filter(lot_id__in=lot_ids)
     if entity.entity_type == Entity.ADMIN:
         errors = errors.filter(display_to_admin=True, acked_by_admin=False)
+    elif entity.entity_type == Entity.AUDITOR:
+        errors = errors.filter(display_to_auditor=True, acked_by_auditor=False)
     else:
         errors = errors.filter(Q(lot__added_by=entity, display_to_creator=True, acked_by_creator=False) | Q(lot__carbure_client=entity, display_to_recipient=True, acked_by_recipient=False))
     data = {}
@@ -556,7 +561,7 @@ def get_stock_events(lot, entity=None):
         return []
     return CarbureStockEventSerializer(lot.carburelotevent_set.all(), many=True).data
 
-def get_lot_comments(lot):
+def get_lot_comments(lot, entity=None):
     if lot is None:
         return []
     comments = lot.carburelotcomment_set.filter(comment_type=CarbureLotComment.REGULAR)

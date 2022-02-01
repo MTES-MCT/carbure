@@ -1542,8 +1542,7 @@ def validate_declaration(request, *args, **kwargs):
         (weekday, lastday) = monthrange(nextmonth.year, nextmonth.month)
         deadline = datetime.date(year=nextmonth.year, month=nextmonth.month, day=lastday)
         declaration, _ = SustainabilityDeclaration.objects.get_or_create(entity_id=entity_id, period=period_d, deadline=deadline)
-    except Exception as err:
-        print(err)
+    except:
         return JsonResponse({'status': 'error', 'message': 'Could not parse period.'}, status=400)
 
     # ensure everything is in order
@@ -1656,23 +1655,22 @@ def toggle_warning(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
     lot_id = request.POST.get('lot_id')
-    error = request.POST.get('error')
-
+    errors = request.POST.getlist('errors')
     try:
-        lot = CarbureLot.objects.get(id=lot_id)
-        lot_error = GenericError.objects.get(lot_id=lot_id, error=error)
-    except:
-        traceback.print_exc()
-        return JsonResponse({'status': "error", 'message': "Could not locate wanted lot or error"}, status=404)
-
-    try:
-        # is creator
-        if lot.added_by_id == int(entity_id):
-            lot_error.acked_by_creator = not lot_error.acked_by_creator
-        # is recipient
-        if lot.carbure_client_id == int(entity_id):
-            lot_error.acked_by_recipient = not lot_error.acked_by_recipient
-        lot_error.save()
+        for error in errors:
+            try:
+                lot = CarbureLot.objects.get(id=lot_id)
+                lot_error = GenericError.objects.get(lot_id=lot_id, error=error)
+            except:
+                traceback.print_exc()
+                return JsonResponse({'status': "error", 'message': "Could not locate wanted lot or error"}, status=404)
+            # is creator
+            if lot.added_by_id == int(entity_id):
+                lot_error.acked_by_creator = not lot_error.acked_by_creator
+            # is recipient
+            if lot.carbure_client_id == int(entity_id):
+                lot_error.acked_by_recipient = not lot_error.acked_by_recipient
+            lot_error.save()
         return JsonResponse({'status': "success"})
     except:
         traceback.print_exc()
