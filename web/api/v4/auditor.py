@@ -154,15 +154,16 @@ def get_lots_filters(request, *args, **kwargs):
 @is_auditor
 def toggle_warning(request, *args, **kwargs):
     lot_id = request.POST.get('lot_id')
-    error = request.POST.get('error')
+    errors = request.POST.getlist('errors')
     try:
-        lot_error = GenericError.objects.get(lot_id=lot_id, error=error)
-    except:
-        traceback.print_exc()
-        return JsonResponse({'status': "error", 'message': "Could not locate wanted lot or error"}, status=404)
-    try:
-        lot_error.acked_by_admin = not lot_error.acked_by_admin
-        lot_error.save()
+        for error in errors:
+            try:
+                lot_error = GenericError.objects.get(lot_id=lot_id, error=error)
+            except:
+                traceback.print_exc()
+                return JsonResponse({'status': "error", 'message': "Could not locate wanted lot or error"}, status=404)
+            lot_error.acked_by_auditor = not lot_error.acked_by_auditor
+            lot_error.save()
         return JsonResponse({'status': "success"})
     except:
         traceback.print_exc()
@@ -179,7 +180,6 @@ def toggle_pin(request, *args, **kwargs):
             When(highlighted_by_auditor=True, then=Value(False)),
             When(highlighted_by_auditor=False, then=Value(True)),
         ))
-        print('NOTICE ME', notify_admin, lots[0].highlighted_by_auditor)
         if (notify_admin):
             lots.update(highlighted_by_admin=True)
         return JsonResponse({'status': "success"})

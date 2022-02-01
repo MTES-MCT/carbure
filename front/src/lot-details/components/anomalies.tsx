@@ -1,7 +1,12 @@
 import { useTranslation } from "react-i18next"
 import { Lot, LotError } from "transactions/types"
 import Collapse from "common-v2/components/collapse"
-import { AlertOctagon, AlertTriangle } from "common-v2/components/icons"
+import {
+  AlertOctagon,
+  AlertTriangle,
+  Eye,
+  EyeOff,
+} from "common-v2/components/icons"
 import { CheckboxGroup } from "common-v2/components/checkbox"
 import i18next from "i18next"
 import useEntity from "carbure/hooks/entity"
@@ -9,6 +14,7 @@ import { useMutation } from "common-v2/hooks/async"
 import * as api from "../api"
 import { Normalizer } from "common-v2/utils/normalize"
 import { useState } from "react"
+import Button from "common-v2/components/button"
 
 export interface BlockingAnomaliesProps {
   anomalies: LotError[]
@@ -50,6 +56,7 @@ export const WarningAnomalies = ({ lot, anomalies }: WarningAnomaliesProps) => {
 
   const isCreator = lot.added_by?.id === entity.id
   const isRecipient = lot.carbure_client?.id === entity.id
+
   function isAcked(anomaly: LotError) {
     if (isCreator) return anomaly.acked_by_creator
     else if (isRecipient) return anomaly.acked_by_recipient
@@ -61,9 +68,11 @@ export const WarningAnomalies = ({ lot, anomalies }: WarningAnomaliesProps) => {
   )
 
   const ackWarning = useMutation(
-    (error: string) => api.toggleWarning(entity.id, lot.id, error),
+    (errors: string[]) => api.toggleWarning(entity.id, lot.id, errors),
     { invalidates: [] }
   )
+
+  const isAllChecked = anomalies.every((a) => checked?.includes(a.error))
 
   return (
     <Collapse
@@ -82,14 +91,31 @@ export const WarningAnomalies = ({ lot, anomalies }: WarningAnomaliesProps) => {
         )}
       </section>
 
-      <footer>
+      <section>
         <CheckboxGroup
           variant="opacity"
           value={checked}
           options={anomalies}
           onChange={setChecked}
-          onToggle={(error) => ackWarning.execute(error)}
+          onToggle={(error) => ackWarning.execute([error])}
           normalize={normalizeAnomaly}
+        />
+      </section>
+
+      <footer>
+        <Button
+          icon={isAllChecked ? Eye : EyeOff}
+          loading={ackWarning.loading}
+          label={
+            isAllChecked
+              ? t("Rétablir toutes ces remarques")
+              : t("Ignorer toutes ces remarques")
+          }
+          action={() => {
+            const errors = anomalies.map((a) => a.error)
+            ackWarning.execute(errors)
+            setChecked(isAllChecked ? [] : errors)
+          }}
         />
       </footer>
     </Collapse>

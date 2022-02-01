@@ -19,7 +19,7 @@ export function updateLot(entity_id: number, form: LotFormValue) {
 export function toggleWarning(
   entity_id: number,
   lot_id: number,
-  error: string
+  errors: string[]
 ) {
-  return api.post("/lots/toggle-warning", { entity_id, lot_id, error })
+  return api.post("/lots/toggle-warning", { entity_id, lot_id, errors })
 }
