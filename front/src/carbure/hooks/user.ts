@@ -1,5 +1,4 @@
 import { createContext, useContext } from "react"
-import { AxiosError } from "axios"
 import { useQuery } from "common-v2/hooks/async"
 import { Entity, UserRight, UserRightRequest } from "../types"
 import * as api from "../api"

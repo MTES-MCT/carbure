@@ -7,19 +7,25 @@ import { waitWhileLoading } from "common/__test__/helpers"
 import Controls from "../index"
 
 import server from "./api"
+import useEntity from "carbure/hooks/entity"
+
+const ControlsWithUser = () => {
+  const entity = useEntity()
+  if (entity.isAdmin || entity.isAuditor) return <Controls />
+  else return null
+}
 
 const ControlsWithRouter = ({ status }: { status: AdminStatus }) => (
-  <TestRoot url={`/org/0/controls/2021/${status}`}>
-    <Route path="/org/0/controls/:year/:status/*" element={<Controls />} />
+  <TestRoot url={`/org/3/controls/2021/${status}`}>
+    <Route
+      path="/org/:entity/controls/:year/:status/*"
+      element={<ControlsWithUser />}
+    />
   </TestRoot>
 )
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
-
-afterEach(() => {
-  server.resetHandlers()
-})
-
+afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 test("admin: display an empty list of transactions", async () => {
