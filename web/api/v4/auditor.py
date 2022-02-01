@@ -6,23 +6,25 @@ from django.db.models.functions.comparison import Coalesce
 
 from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
-from core.decorators import is_admin
+from core.decorators import check_user_rights, is_auditor
 from api.v4.helpers import filter_lots, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_with_errors, get_lots_with_metadata, get_lots_filters_data, get_stock_events
 from api.v4.helpers import get_transaction_distance
 
-from core.models import CarbureLot, CarbureLotComment, CarbureStock, CarbureStockTransformation, Entity, GenericError
+from core.models import CarbureLot, CarbureLotComment, CarbureStock, CarbureStockTransformation, Entity, GenericError, UserRights
 from core.serializers import CarbureLotAdminSerializer, CarbureLotCommentSerializer, CarbureLotPublicSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
+from api.v4.admin import get_admin_summary_data
 
-
-@is_admin
+@check_user_rights()
+@is_auditor
 def get_years(request, *args, **kwargs):
-    data_lots = CarbureLot.objects.values_list('year', flat=True).distinct()
+    data_lots = get_auditor_lots(request).values_list('year', flat=True).distinct()
     data_transforms = CarbureStockTransformation.objects.values_list('transformation_dt__year', flat=True).distinct()
     data = set(list(data_transforms) + list(data_lots))
     return JsonResponse({'status': 'success', 'data': list(data)})
 
 
-@is_admin
+@check_user_rights()
+@is_auditor
 def get_snapshot(request, *args, **kwargs):
     year = request.GET.get('year', False)
     entity_id = request.GET.get('entity_id', False)
@@ -36,11 +38,11 @@ def get_snapshot(request, *args, **kwargs):
 
     data = {}
     entity = Entity.objects.get(id=entity_id)
-    lots = CarbureLot.objects.filter(year=year).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
+    lots = get_auditor_lots(request).filter(year=year)
     alerts = get_lots_with_errors(lots, entity)
     corrections = lots.exclude(correction_status=CarbureLot.NO_PROBLEMO)
     # declarations = lots.exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
-    pinned = lots.filter(highlighted_by_admin=True)
+    pinned = lots.filter(highlighted_by_auditor=True)
 
     data['lots'] = {'alerts': alerts.count(),
                     'corrections': corrections.count(),
@@ -49,7 +51,8 @@ def get_snapshot(request, *args, **kwargs):
     return JsonResponse({'status': 'success', 'data': data})
 
 
-@is_admin
+@check_user_rights()
+@is_auditor
 def get_lots(request, *args, **kwargs):
     status = request.GET.get('status', False)
     selection = request.GET.get('selection', False)
@@ -58,14 +61,15 @@ def get_lots(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
     try:
         entity = Entity.objects.get(id=entity_id)
-        lots = get_admin_lots_by_status(entity, status)
+        lots = get_auditor_lots_by_status(entity, status, request)
         return get_lots_with_metadata(lots, entity, request.GET)
     except Exception:
         traceback.print_exc()
         return JsonResponse({'status': 'error', 'message': "Could not get lots"}, status=400)
 
 
-@is_admin
+@check_user_rights()
+@is_auditor
 def get_lots_summary(request, *args, **kwargs):
     status = request.GET.get('status', False)
     short = request.GET.get('short', False)
@@ -74,7 +78,7 @@ def get_lots_summary(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
     try:
         entity = Entity.objects.get(id=entity_id)
-        lots = get_admin_lots_by_status(entity, status)
+        lots = get_auditor_lots_by_status(entity, status, request)
         lots = filter_lots(lots, request.GET, entity, will_aggregate=True)
         summary = get_admin_summary_data(lots, short == 'true')
         return JsonResponse({'status': 'success', 'data': summary})
@@ -83,7 +87,8 @@ def get_lots_summary(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Could not get lots summary"}, status=400)
 
 
-@is_admin
+@check_user_rights()
+@is_auditor
 def get_lot_details(request, *args, **kwargs):
     lot_id = request.GET.get('lot_id', False)
     entity_id = request.GET.get('entity_id', False)
@@ -104,11 +109,12 @@ def get_lot_details(request, *args, **kwargs):
     #data['certificates'] = check_certificates(tx)
     data['updates'] = get_lot_updates(lot)
     data['comments'] = get_lot_comments(lot)
-    data['control_comments'] = get_admin_lot_comments(lot)
+    data['control_comments'] = get_auditor_lot_comments(lot)
     return JsonResponse({'status': 'success', 'data': data})
 
 
-@is_admin
+@check_user_rights()
+@is_auditor
 def get_stock_details(request, *args, **kwargs):
     stock_id = request.GET.get('stock_id', False)
     if not stock_id:
@@ -128,7 +134,8 @@ def get_stock_details(request, *args, **kwargs):
     return JsonResponse({'status': 'success', 'data': data})
 
 
-@is_admin
+@check_user_rights()
+@is_auditor
 def get_lots_filters(request, *args, **kwargs):
     status = request.GET.get('status', False)
     field = request.GET.get('field', False)
@@ -136,14 +143,15 @@ def get_lots_filters(request, *args, **kwargs):
     if not field:
         return JsonResponse({'status': 'error', 'message': 'Please specify the field for which you want the filters'}, status=400)
     entity = Entity.objects.get(id=entity_id)
-    lots = get_admin_lots_by_status(entity, status)
+    lots = get_auditor_lots_by_status(entity, status, request)
     data = get_lots_filters_data(lots, request.GET, entity, field)
     if data is None:
         return JsonResponse({'status': 'error', 'message': "Could not find specified filter"}, status=400)
     else:
         return JsonResponse({'status': 'success', 'data': data})
 
-@is_admin
+@check_user_rights()
+@is_auditor
 def toggle_warning(request, *args, **kwargs):
     lot_id = request.POST.get('lot_id')
     error = request.POST.get('error')
@@ -160,30 +168,33 @@ def toggle_warning(request, *args, **kwargs):
         traceback.print_exc()
         return JsonResponse({'status': "error", 'message': "Could not update warning"}, status=500)
 
-@is_admin
+@check_user_rights()
+@is_auditor
 def toggle_pin(request, *args, **kwargs):
     selection = request.POST.getlist('selection', [])
-    notify_auditor = request.POST.get('notify_auditor') == 'true'
+    notify_admin = request.POST.get('notify_admin') == 'true'
     try:
         lots = CarbureLot.objects.filter(id__in=selection)
-        lots.update(highlighted_by_admin=Case(
-            When(highlighted_by_admin=True, then=Value(False)),
-            When(highlighted_by_admin=False, then=Value(True)),
+        lots.update(highlighted_by_auditor=Case(
+            When(highlighted_by_auditor=True, then=Value(False)),
+            When(highlighted_by_auditor=False, then=Value(True)),
         ))
-        if (notify_auditor):
-            lots.update(highlighted_by_auditor=True)
+        print('NOTICE ME', notify_admin, lots[0].highlighted_by_auditor)
+        if (notify_admin):
+            lots.update(highlighted_by_admin=True)
         return JsonResponse({'status': "success"})
     except:
         traceback.print_exc()
         return JsonResponse({'status': "error", 'message': "Could not pin lots"}, status=500)
 
 
-@is_admin
+@check_user_rights()
+@is_auditor
 def add_comment(request, *args, **kwargs):
     entity_id = request.POST.get('entity_id')
     selection = request.POST.getlist('selection', [])
     comment = request.POST.get('comment', False)
-    is_visible_by_auditor = request.POST.get('is_visible_by_auditor') == 'true'
+    is_visible_by_admin = request.POST.get('is_visible_by_admin') == 'true'
 
     if not comment:
         return JsonResponse({'status': 'error', 'message': 'Missing comment'}, status=400)
@@ -196,14 +207,17 @@ def add_comment(request, *args, **kwargs):
         lot_comment.user = request.user
         lot_comment.lot = lot
         lot_comment.comment_type = CarbureLotComment.ADMIN
-        lot_comment.is_visible_by_auditor = is_visible_by_auditor
+        lot_comment.is_visible_by_admin = is_visible_by_admin
         lot_comment.comment = comment
         lot_comment.save()
 
     return JsonResponse({'status': 'success'})
 
 
-def get_admin_lots_by_status(entity, status):
+def get_auditor_lots(request):
+    rights = request.session.get('rights')
+    allowed_entities = [entity for entity in rights if rights[entity] == UserRights.AUDITOR]
+
     lots = CarbureLot.objects.select_related(
         'carbure_producer', 'carbure_supplier', 'carbure_client', 'added_by',
         'carbure_production_site', 'carbure_production_site__producer', 'carbure_production_site__country', 'production_country',
@@ -215,7 +229,11 @@ def get_admin_lots_by_status(entity, status):
     ).prefetch_related('genericerror_set', 'carbure_production_site__productionsitecertificate_set')
 
     lots = lots.exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
+    return lots.filter(Q(carbure_client__in=allowed_entities) | Q(carbure_supplier__in=allowed_entities) | Q(added_by__in=allowed_entities))
 
+
+def get_auditor_lots_by_status(entity, status, request):
+    lots = get_auditor_lots(request)
     if status == 'ALERTS':
         lots = get_lots_with_errors(lots, entity, will_aggregate=True)
     elif status == 'CORRECTIONS':
@@ -223,41 +241,12 @@ def get_admin_lots_by_status(entity, status):
     elif status == 'DECLARATIONS':
         lots = lots.exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
     elif status == 'PINNED':
-        lots = lots.filter(highlighted_by_admin=True)
-
+        lots = lots.filter(highlighted_by_auditor=True)
     return lots
 
 
-def get_admin_summary_data(lots, short=False):
-    data = {'count': lots.count(), 'total_volume': lots.aggregate(Sum('volume'))['volume__sum'] or 0}
-
-    if short:
-        return data
-
-    pending_filter = Q(lot_status__in=[CarbureLot.PENDING, CarbureLot.REJECTED]) | Q(correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED])
-
-    lots = lots.annotate(
-        supplier=Coalesce('carbure_supplier__name', 'unknown_supplier'),
-        client=Coalesce('carbure_client__name', 'unknown_client'),
-        biofuel_code=F('biofuel__code')
-    ).values(
-        'supplier',
-        'client',
-        'biofuel_code',
-        'delivery_type'
-    ).annotate(
-        volume_sum=Sum('volume'),
-        avg_ghg_reduction=Sum(F('volume') * F('ghg_reduction')) / Sum('volume'),
-        total=Count('id'),
-        pending=Count('id', filter=pending_filter)
-    ).distinct().order_by()
-
-    data['lots'] = list(lots)
-    return data
-
-
-def get_admin_lot_comments(lot):
+def get_auditor_lot_comments(lot):
     if lot is None:
         return []
-    comments = lot.carburelotcomment_set.filter(Q(comment_type=CarbureLotComment.ADMIN) | Q(is_visible_by_admin=True))
+    comments = lot.carburelotcomment_set.filter(Q(comment_type=CarbureLotComment.AUDITOR) | Q(is_visible_by_auditor=True))
     return CarbureLotCommentSerializer(comments, many=True).data
