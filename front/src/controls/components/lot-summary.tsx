@@ -13,6 +13,7 @@ import { Filter, Return } from "common-v2/components/icons"
 import { FilterManager, ResetButton } from "transactions/components/filters"
 import NoResult from "transactions/components/no-result"
 import { LotCell } from "transactions/components/lots/lot-summary"
+import { getDeliveryLabel } from "common-v2/utils/normalizers"
 
 export interface LotSummaryBarProps extends Partial<FilterManager> {
   query: LotQuery
@@ -133,6 +134,12 @@ export const LotSummary = ({
       header: t("Client"),
       orderBy: (item) => item.client ?? "",
       cell: (item) => <Cell text={item.client ?? t("Inconnu")} />,
+    },
+    {
+      key: "delivery",
+      header: t("Livraison"),
+      orderBy: (item) => item.delivery_type ?? "",
+      cell: (item) => <Cell text={getDeliveryLabel(item.delivery_type)} />,
     },
     {
       key: "biofuel",

@@ -3,6 +3,7 @@ import { useQuery } from "common-v2/hooks/async"
 import * as api from "../../api"
 import { LotQuery, SummaryItem } from "../../types"
 import { formatNumber, formatPercentage } from "common-v2/utils/formatters"
+import { getDeliveryLabel } from "common-v2/utils/normalizers"
 import { toSearchParams } from "common-v2/services/api"
 import { usePortal } from "common-v2/components/portal"
 import { LoaderOverlay } from "common-v2/components/scaffold"
@@ -193,6 +194,14 @@ export const LotSummary = ({
                 header: t("Fournisseur"),
                 orderBy: (item) => item.supplier ?? "",
                 cell: (item) => <Cell text={item.supplier ?? t("Inconnu")} />,
+              },
+              {
+                key: "delivery",
+                header: t("Livraison"),
+                orderBy: (item) => item.delivery_type ?? "",
+                cell: (item) => (
+                  <Cell text={getDeliveryLabel(item.delivery_type)} />
+                ),
               },
               ...columns,
               {

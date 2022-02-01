@@ -647,7 +647,8 @@ def get_lots_summary_data(lots, entity, short=False):
         biofuel_code=F('biofuel__code')
     ).values(
         'supplier',
-        'biofuel_code'
+        'biofuel_code',
+        'delivery_type'
     ).annotate(
         volume_sum=Sum('volume'),
         avg_ghg_reduction=Sum(F('volume') * F('ghg_reduction')) / Sum('volume'),

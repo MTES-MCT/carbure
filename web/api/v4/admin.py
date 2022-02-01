@@ -235,7 +235,8 @@ def get_admin_summary_data(lots, short=False):
     ).values(
         'supplier',
         'client',
-        'biofuel_code'
+        'biofuel_code',
+        'delivery_type'
     ).annotate(
         volume_sum=Sum('volume'),
         avg_ghg_reduction=Sum(F('volume') * F('ghg_reduction')) / Sum('volume'),
