@@ -91,6 +91,6 @@ urlpatterns = [
     path('admin/lots/details', admin.get_lot_details, name='api-v4-admin-get-lot-details'),
     path('admin/lots/filters', admin.get_lots_filters, name='api-v4-admin-get-lots-filters'),
     path('admin/lots/toggle-warning', admin.toggle_warning, name='api-v4-admin-toggle-warning'),
-    path('admin/lots/pin', admin.pin_lots, name='api-v4-admin-pin-lots'),
+    path('admin/lots/pin', admin.toggle_pin, name='api-v4-admin-pin-lots'),
     path('admin/lots/comment', admin.add_comment, name='api-v4-admin-add-comment'),
 ]

@@ -1,6 +1,7 @@
 import traceback
 from django.db.models.aggregates import Count, Sum
 from django.db.models.expressions import F
+from django.db.models import Case, Value, When
 from django.db.models.functions.comparison import Coalesce
 
 from django.http.response import JsonResponse
@@ -10,7 +11,7 @@ from api.v4.helpers import filter_lots, get_lot_comments, get_lot_errors, get_lo
 from api.v4.helpers import get_transaction_distance
 
 from core.models import CarbureLot, CarbureLotComment, CarbureStock, CarbureStockTransformation, Entity, GenericError
-from core.serializers import CarbureLotCommentSerializer, CarbureLotPublicSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
+from core.serializers import CarbureLotAdminSerializer, CarbureLotCommentSerializer, CarbureLotPublicSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
 
 
 @is_admin
@@ -93,10 +94,10 @@ def get_lot_details(request, *args, **kwargs):
     lot = CarbureLot.objects.get(pk=lot_id)
 
     data = {}
-    data['lot'] = CarbureLotPublicSerializer(lot).data
-    data['parent_lot'] = CarbureLotPublicSerializer(lot.parent_lot).data if lot.parent_lot else None
+    data['lot'] = CarbureLotAdminSerializer(lot).data
+    data['parent_lot'] = CarbureLotAdminSerializer(lot.parent_lot).data if lot.parent_lot else None
     data['parent_stock'] = CarbureStockPublicSerializer(lot.parent_stock).data if lot.parent_stock else None
-    data['children_lot'] = CarbureLotPublicSerializer(CarbureLot.objects.filter(parent_lot=lot), many=True).data
+    data['children_lot'] = CarbureLotAdminSerializer(CarbureLot.objects.filter(parent_lot=lot), many=True).data
     data['children_stock'] = CarbureStockPublicSerializer(CarbureStock.objects.filter(parent_lot=lot), many=True).data
     data['distance'] = get_transaction_distance(lot)
     data['errors'] = get_lot_errors(lot, entity)
@@ -160,10 +161,13 @@ def toggle_warning(request, *args, **kwargs):
         return JsonResponse({'status': "error", 'message': "Could not update warning"}, status=500)
 
 @is_admin
-def pin_lots(request, *args, **kwargs):
+def toggle_pin(request, *args, **kwargs):
     selection = request.POST.getlist('selection', [])
     try:
-        CarbureLot.objects.filter(id__in=selection).update(highlighted_by_admin=True)
+        CarbureLot.objects.filter(id__in=selection).update(highlighted_by_admin=Case(
+            When(highlighted_by_admin=True, then=Value(False)),
+            When(highlighted_by_admin=False, then=Value(True)),
+        ))
         return JsonResponse({'status': "success"})
     except:
         traceback.print_exc()

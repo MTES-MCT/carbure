@@ -252,7 +252,7 @@ class CarbureLotPublicSerializer(serializers.ModelSerializer):
 class CarbureLotAdminSerializer(CarbureLotPublicSerializer):
     class Meta:
         model = CarbureLot
-        fields = ['year', 'period', 'carbure_id',
+        fields = ['id', 'year', 'period', 'carbure_id',
                   'carbure_producer', 'unknown_producer', 'carbure_production_site', 'unknown_production_site',
                   'production_country', 'production_site_commissioning_date', 'production_site_certificate', 'production_site_double_counting_certificate',
                   'carbure_supplier', 'unknown_supplier', 'supplier_certificate', 'supplier_certificate_type',

@@ -1,6 +1,6 @@
 import { Trans, useTranslation } from "react-i18next"
 import { useQuery } from "common-v2/hooks/async"
-import * as api from "../api"
+import pickApi from "../api"
 import { LotQuery, SummaryItem } from "transactions/types"
 import { formatNumber, formatPercentage } from "common-v2/utils/formatters"
 import { usePortal } from "common-v2/components/portal"
@@ -14,6 +14,7 @@ import { FilterManager, ResetButton } from "transactions/components/filters"
 import NoResult from "transactions/components/no-result"
 import { LotCell } from "transactions/components/lots/lot-summary"
 import { getDeliveryLabel } from "common-v2/utils/normalizers"
+import useEntity from "carbure/hooks/entity"
 
 export interface LotSummaryBarProps extends Partial<FilterManager> {
   query: LotQuery
@@ -28,6 +29,9 @@ export const LotSummaryBar = ({
 }: LotSummaryBarProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
+
+  const entity = useEntity()
+  const api = pickApi(entity)
 
   const summary = useQuery(api.getLotsSummary, {
     key: "lots-summary",
@@ -116,6 +120,9 @@ export const LotSummary = ({
   selection = EMPTY,
 }: LotSummaryProps) => {
   const { t } = useTranslation()
+
+  const entity = useEntity()
+  const api = pickApi(entity)
 
   const summary = useQuery(api.getLotsSummary, {
     key: "lots-summary-details",

@@ -16,7 +16,7 @@ from certificates.models import DoubleCountingRegistration
 from core.ign_distance import get_distance
 from core.models import Biocarburant, CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, Entity, EntityCertificate, EntityDepot, GenericCertificate, MatierePremiere, Pays, TransactionDistance, UserRights
 from core.models import GenericError
-from core.serializers import CarbureLotCommentSerializer, CarbureLotEventSerializer, CarbureLotPublicSerializer, CarbureStockEventSerializer, CarbureStockPublicSerializer, GenericErrorAdminSerializer, GenericErrorSerializer
+from core.serializers import CarbureLotAdminSerializer, CarbureLotCommentSerializer, CarbureLotEventSerializer, CarbureLotPublicSerializer, CarbureStockEventSerializer, CarbureStockPublicSerializer, GenericErrorAdminSerializer, GenericErrorSerializer
 from core.xlsx_v3 import export_carbure_lots, export_carbure_stock
 from producers.models import ProductionSite
 
@@ -86,7 +86,11 @@ def get_lots_with_metadata(lots, entity, query):
     total_errors, total_deadline = count_lots_of_interest(lots, entity)
 
     # enrich dataset with additional metadata
-    serializer = CarbureLotPublicSerializer(returned, many=True)
+    if entity.entity_type in (Entity.ADMIN, Entity.AUDITOR):
+        serializer = CarbureLotAdminSerializer(returned, many=True)
+    else:
+        serializer = CarbureLotPublicSerializer(returned, many=True)
+
     data = {}
     data['lots'] = serializer.data
     data['from'] = from_idx
