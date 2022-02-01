@@ -82,7 +82,6 @@ export const DeclarationDialog = ({
   const declarations = useQuery(api.getDeclarations, {
     key: "declarations",
     params: [entity.id, timeline.year],
-    onSuccess: () => setTimeline(timeline),
   })
 
   const validateDeclaration = useMutation(api.validateDeclaration, {

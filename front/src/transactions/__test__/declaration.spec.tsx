@@ -6,6 +6,7 @@ import { DeclarationDialog } from "../actions/declaration"
 
 import server from "./api"
 import { PortalProvider } from "common-v2/components/portal"
+import userEvent from "@testing-library/user-event"
 
 const DeclarationSummary = () => (
   <PortalProvider>
@@ -30,6 +31,11 @@ test("display transaction details", async () => {
   await waitWhileLoading()
 
   screen.getByText("Déclaration de durabilité")
+
+  userEvent.click(screen.getByDisplayValue("Choisissez un mois"))
+  userEvent.click(screen.getByText("Janvier : 2 lots"))
+
+  await waitWhileLoading()
 
   screen.getByText(/Lots reçus/)
   screen.getByText(/Lots envoyés/)

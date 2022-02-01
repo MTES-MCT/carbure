@@ -54,7 +54,7 @@ export const ChevronDown = ({ className, ...props }: IconProps) => (
 )
 
 export const ChevronLeft = ({ className, ...props }: IconProps) => (
-  <Icon {...props} className={cl("chevron-down", className)}>
+  <Icon {...props} className={cl("chevron-left", className)}>
     <polyline points="15 6 9 12 15 18" />
   </Icon>
 )
@@ -87,7 +87,7 @@ export const Cross = ({ className, ...props }: IconProps) => (
 )
 
 export const AlertCircle = ({ className, ...props }: IconProps) => (
-  <Icon {...props} className={cl("cross", className)}>
+  <Icon {...props} className={cl("alert-circle", className)}>
     <circle cx="12" cy="12" r="9" />
     <line x1="12" y1="8" x2="12" y2="12" />
     <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -95,14 +95,14 @@ export const AlertCircle = ({ className, ...props }: IconProps) => (
 )
 
 export const Copy = ({ className, ...props }: IconProps) => (
-  <Icon {...props} className={cl("cross", className)}>
+  <Icon {...props} className={cl("copy", className)}>
     <rect x="8" y="8" width="12" height="12" rx="2" />
     <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2" />
   </Icon>
 )
 
 export const Check = ({ className, ...props }: IconProps) => (
-  <Icon {...props} className={cl("cross", className)}>
+  <Icon {...props} className={cl("check", className)}>
     <path d="M5 12l5 5l10 -10" />
   </Icon>
 )
@@ -142,7 +142,7 @@ export const Loader = ({ className, ...props }: IconProps) => (
 )
 
 export const Rapport = ({ className, ...props }: IconProps) => (
-  <Icon {...props} className={cl("rapport", className)}>
+  <Icon {...props} className={cl("report", className)}>
     <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
     <rect x="9" y="3" width="6" height="4" rx="2" />
     <line x1="9" y1="12" x2="9.01" y2="12" />
@@ -176,7 +176,7 @@ export const AlertTriangle = ({ className, ...props }: IconProps) => (
 )
 
 export const AlertOctagon = ({ className, ...props }: IconProps) => (
-  <Icon {...props} className={cl("alert-triangle", className)}>
+  <Icon {...props} className={cl("alert-octagon", className)}>
     <path d="M8.7 3h6.6c0.3 0 .5 .1 .7 .3l4.7 4.7c0.2 .2 .3 .4 .3 .7v6.6c0 .3 -.1 .5 -.3 .7l-4.7 4.7c-0.2 .2 -.4 .3 -.7 .3h-6.6c-0.3 0 -.5 -.1 -.7 -.3l-4.7 -4.7c-0.2 -.2 -.3 -.4 -.3 -.7v-6.6c0 -.3 .1 -.5 .3 -.7l4.7 -4.7c0.2 -.2 .4 -.3 .7 -.3z" />
     <line x1="12" y1="8" x2="12" y2="12" />
     <line x1="12" y1="16" x2="12.01" y2="16" />

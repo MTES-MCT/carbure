@@ -1,4 +1,4 @@
-from calendar import calendar
+from calendar import calendar, monthrange
 import datetime
 from json.encoder import py_encode_basestring_ascii
 import unicodedata
@@ -291,7 +291,7 @@ def stock_split(request, *args, **kwargs):
 
     for entry in unserialized:
         # check minimum fields
-        required_fields = ['stock_id', 'volume', 'delivery_date', 'delivery_site_country_id'] 
+        required_fields = ['stock_id', 'volume', 'delivery_date', 'delivery_site_country_id']
         for field in required_fields:
             if field not in entry:
                 return JsonResponse({'status': 'error', 'message': 'Missing field %s in json object' % (field)}, status=400)
@@ -353,13 +353,13 @@ def stock_split(request, *args, **kwargs):
                 lot.carbure_client_id = entry['carbure_client_id']
             delivery_site_id = entry.get('carbure_delivery_site_id', None)
             if delivery_site_id is None:
-                lot.carbure_delivery_site = None 
+                lot.carbure_delivery_site = None
             else:
                 try:
                     delivery_site = Depot.objects.get(id=delivery_site_id)
                     lot.carbure_delivery_site = delivery_site
                 except:
-                    lot.carbure_delivery_site = None 
+                    lot.carbure_delivery_site = None
             if 'unknown_client' in entry:
                 lot.unknown_client = entry['unknown_client']
             if 'unknown_delivery_site' in entry:
@@ -373,13 +373,13 @@ def stock_split(request, *args, **kwargs):
             lot.transport_document_reference = entry['transport_document_reference']
             delivery_site_id = entry.get('carbure_delivery_site_id', None)
             if delivery_site_id is None:
-                lot.carbure_delivery_site = None 
+                lot.carbure_delivery_site = None
             else:
                 try:
                     delivery_site = Depot.objects.get(id=delivery_site_id)
                     lot.carbure_delivery_site = delivery_site
                 except:
-                    lot.carbure_delivery_site = None 
+                    lot.carbure_delivery_site = None
             lot.carbure_client_id = entry['carbure_client_id']
         lot.save()
         # update stock
@@ -1539,10 +1539,11 @@ def validate_declaration(request, *args, **kwargs):
         month = period_int % 100
         period_d = datetime.date(year=year, month=month, day=1)
         nextmonth = period_d + datetime.timedelta(days=31)
-        (weekday, lastday) = calendar.monthrange(nextmonth.year, nextmonth.month)
-        deadline = datetime.date(year=nextmonth.year, month=nextmonth.month, day=lastday)           
+        (weekday, lastday) = monthrange(nextmonth.year, nextmonth.month)
+        deadline = datetime.date(year=nextmonth.year, month=nextmonth.month, day=lastday)
         declaration, _ = SustainabilityDeclaration.objects.get_or_create(entity_id=entity_id, period=period_d, deadline=deadline)
-    except:
+    except Exception as err:
+        print(err)
         return JsonResponse({'status': 'error', 'message': 'Could not parse period.'}, status=400)
 
     # ensure everything is in order
@@ -1591,8 +1592,8 @@ def invalidate_declaration(request, *args, **kwargs):
         month = period_int % 100
         period_d = datetime.date(year=year, month=month, day=1)
         nextmonth = period_d + datetime.timedelta(days=31)
-        (weekday, lastday) = calendar.monthrange(nextmonth.year, nextmonth.month)
-        deadline = datetime.date(year=nextmonth.year, month=nextmonth.month, day=lastday)           
+        (weekday, lastday) = monthrange(nextmonth.year, nextmonth.month)
+        deadline = datetime.date(year=nextmonth.year, month=nextmonth.month, day=lastday)
         declaration, _ = SustainabilityDeclaration.objects.get_or_create(entity_id=entity_id, period=period_d, deadline=deadline)
         declaration.declared = False
         declaration.checked = False
