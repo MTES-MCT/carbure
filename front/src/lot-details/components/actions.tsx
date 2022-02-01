@@ -12,10 +12,11 @@ import { ApproveOneFixButton } from "transactions/actions/approve-fix"
 
 export interface ActionBarProps {
   icon?: boolean
+  canSave?: boolean
   lot: Lot
 }
 
-export const LotActions = ({ lot }: ActionBarProps) => {
+export const LotActions = ({ lot, canSave }: ActionBarProps) => {
   const entity = useEntity()
 
   const isCreator = lot.added_by?.id === entity.id
@@ -27,7 +28,7 @@ export const LotActions = ({ lot }: ActionBarProps) => {
 
   return (
     <Fragment>
-      {status === "DRAFT" && <SendOneButton lot={lot} />}
+      {status === "DRAFT" && <SendOneButton lot={lot} disabled={!canSave} />}
 
       {(status === "DRAFT" || status === "REJECTED") && (
         <DeleteOneButton lot={lot} />
@@ -47,7 +48,9 @@ export const LotActions = ({ lot }: ActionBarProps) => {
       {(isCreator || isSupplier) && status !== "DRAFT" && (
         <Fragment>
           {correction === "NO_PROBLEMO" && <RecallOneButton lot={lot} />}
-          {correction === "IN_CORRECTION" && <MarkOneAsFixedButton lot={lot} />}
+          {correction === "IN_CORRECTION" && (
+            <MarkOneAsFixedButton lot={lot} disabled={!canSave} />
+          )}
         </Fragment>
       )}
 

@@ -163,7 +163,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
           />
         )}
 
-        {lotData && <LotActions lot={lotData.lot} />}
+        {lotData && <LotActions lot={lotData.lot} canSave={canSave} />}
 
         <NavigationButtons
           neighbors={neighbors}
