@@ -99,6 +99,10 @@
   overflow: hidden;
 }
 
+.cell .multiline > strong > svg {
+  margin-bottom: -5px;
+}
+
 .selection {
   align-self: stretch;
   flex: 0 0 min-content;
