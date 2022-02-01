@@ -35,7 +35,5 @@ const auditor = {
 }
 
 export default function pickApi(entity: EntityManager) {
-  if (entity.isAdmin) return admin
-  else if (entity.isAuditor) return auditor
-  else throw new Error("Entity is not allowed to do controls")
+  return entity.isAdmin ? admin : auditor
 }
