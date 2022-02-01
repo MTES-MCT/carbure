@@ -552,10 +552,11 @@ def get_stock_events(lot, entity=None):
         return []
     return CarbureStockEventSerializer(lot.carburelotevent_set.all(), many=True).data
 
-def get_lot_comments(lot, entity=None):
+def get_lot_comments(lot):
     if lot is None:
         return []
-    return CarbureLotCommentSerializer(lot.carburelotcomment_set.all(), many=True).data
+    comments = lot.carburelotcomment_set.filter(comment_type=CarbureLotComment.REGULAR)
+    return CarbureLotCommentSerializer(comments, many=True).data
 
 def get_transaction_distance(lot):
     url_link = 'https://www.google.com/maps/dir/?api=1&origin=%s&destination=%s&travelmode=driving'

@@ -2,6 +2,7 @@ import { Api, api, download } from "common-v2/services/api"
 import { Option } from "common-v2/utils/normalize"
 import { LotSummary, Snapshot } from "./types"
 import { Filter, LotList, LotQuery } from "transactions/types"
+import { selectionOrQuery } from "transactions/api"
 
 const QUERY_RESET: Partial<LotQuery> = {
   limit: undefined,
@@ -28,7 +29,7 @@ export function getLots(query: LotQuery) {
 
 export function downloadLots(query: LotQuery, selection: number[]) {
   return download("/admin/lots", {
-    ...getParams(query, selection),
+    ...selectionOrQuery(query, selection),
     export: true,
   })
 }
@@ -50,20 +51,22 @@ export function getLotFilters(field: Filter, query: LotQuery) {
     .then((res) => res.data.data ?? [])
 }
 
+export function pinLots(entity_id: number, selection: number[]) {
+  return api.post("/admin/lots/pin", { entity_id, selection })
+}
+
 export async function commentLots(
   query: LotQuery,
   selection: number[] | undefined,
-  comment: string
+  comment: string,
+  is_visible_by_auditor?: boolean
 ) {
   if (!comment) return
 
   return api.post<Api<void>>("/admin/lots/comment", {
-    ...getParams(query, selection),
+    entity_id: query.entity_id,
+    selection,
+    is_visible_by_auditor,
     comment,
   })
-}
-
-export function getParams(query: LotQuery, selection?: number[]) {
-  if (!selection || selection.length === 0) return query
-  else return { entity_id: query.entity_id, selection }
 }

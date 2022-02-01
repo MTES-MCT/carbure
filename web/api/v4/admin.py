@@ -6,11 +6,11 @@ from django.db.models.functions.comparison import Coalesce
 from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
 from core.decorators import is_admin
-from api.v4.helpers import filter_lots, get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_with_errors, get_lots_with_metadata, get_lots_filters_data, get_stock_events
+from api.v4.helpers import filter_lots, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_with_errors, get_lots_with_metadata, get_lots_filters_data, get_stock_events
 from api.v4.helpers import get_transaction_distance
 
 from core.models import CarbureLot, CarbureLotComment, CarbureStock, CarbureStockTransformation, Entity, GenericError
-from core.serializers import CarbureLotPublicSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
+from core.serializers import CarbureLotCommentSerializer, CarbureLotPublicSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
 
 
 @is_admin
@@ -103,6 +103,7 @@ def get_lot_details(request, *args, **kwargs):
     #data['certificates'] = check_certificates(tx)
     data['updates'] = get_lot_updates(lot)
     data['comments'] = get_lot_comments(lot)
+    data['control_comments'] = get_admin_lot_comments(lot)
     return JsonResponse({'status': 'success', 'data': data})
 
 
@@ -141,42 +142,6 @@ def get_lots_filters(request, *args, **kwargs):
     else:
         return JsonResponse({'status': 'success', 'data': data})
 
-
-@is_admin
-def add_comment(request, *args, **kwargs):
-    entity_id = request.POST.get('entity_id', False)
-    status = request.POST.get('status', False)
-    comment = request.POST.get('comment', False)
-    if not comment:
-        return JsonResponse({'status': 'error', 'message': 'Missing comment'}, status=400)
-    is_visible_by_admin = request.POST.get('is_visible_by_admin', False)
-    is_visible_by_auditor = request.POST.get('is_visible_by_auditor', False)
-    entity = Entity.objects.get(id=entity_id)
-    lots = get_entity_lots_by_status(entity, status)
-    lots = filter_lots(lots, request.POST, entity)
-    for lot in lots.iterator():
-        if lot.carbure_supplier != entity and lot.carbure_client != entity and entity.entity_type not in [Entity.AUDITOR, Entity.ADMIN]:
-            return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to comment on this lot'}, status=403)
-
-        lot_comment = CarbureLotComment()
-        lot_comment.entity = entity
-        lot_comment.user = request.user
-        lot_comment.lot = lot
-        if entity.entity_type == Entity.AUDITOR:
-            lot_comment.comment_type = CarbureLotComment.AUDITOR
-            if is_visible_by_admin == 'true':
-                lot_comment.is_visible_by_admin = True
-        elif entity.entity_type == Entity.ADMIN:
-            lot_comment.comment_type = CarbureLotComment.ADMIN
-            if is_visible_by_auditor == 'true':
-                lot_comment.is_visible_by_auditor = True
-        else:
-            lot_comment.comment_type = CarbureLotComment.REGULAR
-        lot_comment.comment = comment
-        lot_comment.save()
-    return JsonResponse({'status': 'success'})
-
-
 @is_admin
 def toggle_warning(request, *args, **kwargs):
     lot_id = request.POST.get('lot_id')
@@ -193,6 +158,41 @@ def toggle_warning(request, *args, **kwargs):
     except:
         traceback.print_exc()
         return JsonResponse({'status': "error", 'message': "Could not update warning"}, status=500)
+
+@is_admin
+def pin_lots(request, *args, **kwargs):
+    selection = request.POST.getlist('selection', [])
+    try:
+        CarbureLot.objects.filter(id__in=selection).update(highlighted_by_admin=True)
+        return JsonResponse({'status': "success"})
+    except:
+        traceback.print_exc()
+        return JsonResponse({'status': "error", 'message': "Could not pin lots"}, status=500)
+
+
+@is_admin
+def add_comment(request, *args, **kwargs):
+    entity_id = request.POST.get('entity_id')
+    selection = request.POST.getlist('selection', [])
+    comment = request.POST.get('comment', False)
+    is_visible_by_auditor = request.POST.get('is_visible_by_auditor') == 'true'
+
+    if not comment:
+        return JsonResponse({'status': 'error', 'message': 'Missing comment'}, status=400)
+
+    entity = Entity.objects.get(id=entity_id)
+    lots = CarbureLot.objects.filter(id__in=selection)
+    for lot in lots.iterator():
+        lot_comment = CarbureLotComment()
+        lot_comment.entity = entity
+        lot_comment.user = request.user
+        lot_comment.lot = lot
+        lot_comment.comment_type = CarbureLotComment.ADMIN
+        lot_comment.is_visible_by_auditor = is_visible_by_auditor
+        lot_comment.comment = comment
+        lot_comment.save()
+
+    return JsonResponse({'status': 'success'})
 
 
 def get_admin_lots_by_status(entity, status):
@@ -246,3 +246,10 @@ def get_admin_summary_data(lots, short=False):
 
     data['lots'] = list(lots)
     return data
+
+
+def get_admin_lot_comments(lot):
+    if lot is None:
+        return []
+    comments = lot.carburelotcomment_set.filter(Q(comment_type=CarbureLotComment.ADMIN) | Q(is_visible_by_admin=True))
+    return CarbureLotCommentSerializer(comments, many=True).data

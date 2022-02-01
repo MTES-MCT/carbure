@@ -10,6 +10,7 @@ export interface LotDetails {
   distance: Distance | null
   updates: LotUpdate<any>[]
   comments: LotComment[]
+  control_comments?: LotComment[]
   errors: LotError[]
 }
 

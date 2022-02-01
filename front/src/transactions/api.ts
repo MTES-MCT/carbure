@@ -43,7 +43,10 @@ export function importLots(entity_id: number, file: File) {
 }
 
 export function downloadLots(query: LotQuery, selection: number[]) {
-  return download("/lots", { ...getParams(query, selection), export: true })
+  return download("/lots", {
+    ...selectionOrQuery(query, selection),
+    export: true,
+  })
 }
 
 export function getLotsSummary(
@@ -78,7 +81,7 @@ export function getLotFilters(field: Filter, query: LotQuery) {
 }
 
 export function sendLots(query: LotQuery, selection?: number[]) {
-  return api.post<Api<void>>("/lots/send", getParams(query, selection))
+  return api.post<Api<void>>("/lots/send", selectionOrQuery(query, selection))
 }
 
 export function acceptReleaseForConsumption(
@@ -87,14 +90,14 @@ export function acceptReleaseForConsumption(
 ) {
   return api.post<Api<void>>(
     "/lots/accept-release-for-consumption",
-    getParams(query, selection)
+    selectionOrQuery(query, selection)
   )
 }
 
 export function acceptInStock(query: LotQuery, selection?: number[]) {
   return api.post<Api<void>>(
     "/lots/accept-in-stock",
-    getParams(query, selection)
+    selectionOrQuery(query, selection)
   )
 }
 
@@ -110,7 +113,7 @@ export function acceptForTrading(
       : { unknown_client: client }
 
   return api.post<Api<void>>("/lots/accept-trading", {
-    ...getParams(query, selection),
+    ...selectionOrQuery(query, selection),
     ...params,
     certificate,
   })
@@ -122,7 +125,7 @@ export function acceptForProcessing(
   processing_entity_id: number
 ) {
   return api.post<Api<void>>("/lots/accept-processing", {
-    ...getParams(query, selection),
+    ...selectionOrQuery(query, selection),
     processing_entity_id,
   })
 }
@@ -133,7 +136,7 @@ export function acceptForBlending(
 ) {
   return api.post<Api<void>>(
     "/lots/accept-blending",
-    getParams(query, selection)
+    selectionOrQuery(query, selection)
   )
 }
 
@@ -143,7 +146,7 @@ export function acceptForDirectDelivery(
 ) {
   return api.post<Api<void>>(
     "/lots/accept-direct-delivery",
-    getParams(query, selection)
+    selectionOrQuery(query, selection)
   )
 }
 
@@ -151,15 +154,18 @@ export function acceptForExport(
   query: LotQuery,
   selection: number[] | undefined
 ) {
-  return api.post<Api<void>>("/lots/accept-export", getParams(query, selection))
+  return api.post<Api<void>>(
+    "/lots/accept-export",
+    selectionOrQuery(query, selection)
+  )
 }
 
 export function deleteLots(query: LotQuery, selection?: number[]) {
-  return api.post<Api<void>>("/lots/delete", getParams(query, selection))
+  return api.post<Api<void>>("/lots/delete", selectionOrQuery(query, selection))
 }
 
 export function rejectLots(query: LotQuery, selection?: number[]) {
-  return api.post<Api<void>>("/lots/reject", getParams(query, selection))
+  return api.post<Api<void>>("/lots/reject", selectionOrQuery(query, selection))
 }
 
 export function requestFix(entity_id: number, lot_ids: number[]) {
@@ -186,12 +192,12 @@ export async function commentLots(
   if (!comment) return
 
   return api.post<Api<void>>("/lots/comment", {
-    ...getParams(query, selection),
+    ...selectionOrQuery(query, selection),
     comment,
   })
 }
 
-export function getParams(query: LotQuery, selection?: number[]) {
+export function selectionOrQuery(query: LotQuery, selection?: number[]) {
   if (!selection || selection.length === 0) return query
   else return { entity_id: query.entity_id, selection }
 }
@@ -203,7 +209,10 @@ export function getStocks(query: StockQuery) {
 }
 
 export function downloadStocks(query: StockQuery, selection: number[]) {
-  return download("/stocks", { ...getParams(query, selection), export: true })
+  return download("/stocks", {
+    ...selectionOrQuery(query, selection),
+    export: true,
+  })
 }
 
 export function getStockSummary(
