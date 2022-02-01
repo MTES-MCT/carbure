@@ -187,6 +187,7 @@ export const LotSummary = ({
             })}
           </h2>
           <Table
+            style={{ width: "min(50vw, 960px)" }}
             rows={input}
             columns={[
               {
@@ -231,10 +232,13 @@ export const LotSummary = ({
           </h2>
           <Table
             rows={output}
+            style={{ width: "min(50vw, 960px)" }}
             columns={[
               {
                 key: "client",
                 header: t("Client"),
+                // add padding to align when there are input lots with the extra delivery column
+                style: input.length > 0 ? { flex: 2, marginRight: 'var(--spacing-m)' } : undefined, // prettier-ignore
                 orderBy: (item) => item.client ?? "",
                 cell: (item) => <Cell text={item.client ?? t("Inconnu")} />,
               },

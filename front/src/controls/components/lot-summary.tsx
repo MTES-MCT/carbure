@@ -200,7 +200,12 @@ export const LotSummary = ({
               volume: formatNumber(lotsVolume),
             })}
           </h2>
-          <Table rows={lots} columns={[...columns]} />
+
+          <Table
+            style={{ width: "min(50vw, 960px)" }}
+            rows={lots}
+            columns={[...columns]}
+          />
         </>
       )}
 
