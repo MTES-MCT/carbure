@@ -19,7 +19,7 @@ from api.v4.helpers import send_email_declaration_invalidated, send_email_declar
 from api.v4.lots import construct_carbure_lot, bulk_insert_lots, try_get_date
 from api.v4.sanity_checks import bulk_sanity_checks, sanity_check
 
-from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Entity, GenericError, Pays, SustainabilityDeclaration, UserRights
+from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, Entity, GenericError, Pays, SustainabilityDeclaration, UserRights
 from core.serializers import CarbureLotPublicSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
 from core.xlsx_v3 import template_v4, template_v4_stocks
 
@@ -148,7 +148,8 @@ def get_stock_details(request, *args, **kwargs):
     data['stock'] = CarbureStockPublicSerializer(stock).data
     data['parent_lot'] = CarbureLotPublicSerializer(stock.parent_lot).data if stock.parent_lot else None
     data['parent_transformation'] = CarbureStockTransformationPublicSerializer(stock.parent_transformation).data if stock.parent_transformation else None
-    data['children_lot'] = CarbureLotPublicSerializer(CarbureLot.objects.filter(parent_stock=stock), many=True).data
+    children = CarbureLot.objects.filter(parent_stock=stock).exclude(lot_status=CarbureLot.DELETED)
+    data['children_lot'] = CarbureLotPublicSerializer(children, many=True).data
     data['children_transformation'] = CarbureStockTransformationPublicSerializer(CarbureStockTransformation.objects.filter(source_stock=stock), many=True).data
     data['events'] = get_stock_events(stock.parent_lot, entity_id)
     data['updates'] = get_lot_updates(stock.parent_lot, entity_id)
@@ -338,6 +339,7 @@ def stock_split(request, *args, **kwargs):
 
         delivery_type = entry.get('delivery_type', CarbureLot.UNKNOWN)
         if delivery_type in [CarbureLot.RFC, CarbureLot.EXPORT]:
+            lot.delivery_type = delivery_type
             # carbure_client, carbure_delivery_site, transport_document_type and transport_document_reference are optional
             if 'transport_document_type' in entry:
                 lot.transport_document_type = entry['transport_document_type']
@@ -349,9 +351,12 @@ def stock_split(request, *args, **kwargs):
                 lot.transport_document_reference = lot.delivery_type
             if 'carbure_client_id' in entry:
                 lot.carbure_client_id = entry['carbure_client_id']
-            if 'carbure_delivery_site_id' in entry:
+            delivery_site_id = entry.get('carbure_delivery_site_id', None)
+            if delivery_site_id is None:
+                lot.carbure_delivery_site = None 
+            else:
                 try:
-                    delivery_site = Depot.objects.get(id=entry['carbure_delivery_site_id'])
+                    delivery_site = Depot.objects.get(id=delivery_site_id)
                     lot.carbure_delivery_site = delivery_site
                 except:
                     lot.carbure_delivery_site = None 
@@ -366,11 +371,15 @@ def stock_split(request, *args, **kwargs):
                     return JsonResponse({'status': 'error', 'message': 'Missing field %s in json object'}, status=400)
             lot.transport_document_type = entry.get('transport_document_type', CarbureLot.OTHER)
             lot.transport_document_reference = entry['transport_document_reference']
-            try:
-                delivery_site = Depot.objects.get(id=entry['carbure_delivery_site_id'])
-                lot.carbure_delivery_site = delivery_site
-            except:
+            delivery_site_id = entry.get('carbure_delivery_site_id', None)
+            if delivery_site_id is None:
                 lot.carbure_delivery_site = None 
+            else:
+                try:
+                    delivery_site = Depot.objects.get(id=delivery_site_id)
+                    lot.carbure_delivery_site = delivery_site
+                except:
+                    lot.carbure_delivery_site = None 
             lot.carbure_client_id = entry['carbure_client_id']
         lot.save()
         # update stock
@@ -458,7 +467,8 @@ def get_lot_details(request, *args, **kwargs):
     else:
         data['parent_lot'] = None
         data['parent_stock'] = None
-    data['children_lot'] = CarbureLotPublicSerializer(CarbureLot.objects.filter(parent_lot=lot), many=True).data
+    children = CarbureLot.objects.filter(parent_lot=lot).exclude(lot_status=CarbureLot.DELETED)
+    data['children_lot'] = CarbureLotPublicSerializer(children, many=True).data
     data['children_stock'] = CarbureStockPublicSerializer(CarbureStock.objects.filter(parent_lot=lot), many=True).data
     data['distance'] = get_transaction_distance(lot)
     data['errors'] = get_lot_errors(lot, entity)
@@ -822,6 +832,11 @@ def lots_delete(request, *args, **kwargs):
         event.save()
         lot.lot_status = CarbureLot.DELETED
         lot.save()
+        if lot.parent_stock is not None:
+            lot.parent_stock.remaining_volume = round(lot.parent_stock.remaining_volume + lot.volume, 2)
+            lot.parent_stock.remaining_weight = lot.parent_stock.get_weight()
+            lot.parent_stock.remaining_lhv_amount = lot.parent_stock.get_lhv_amount()
+            lot.parent_stock.save()
     return JsonResponse({'status': 'success'})
 
 
