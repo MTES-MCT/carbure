@@ -69,10 +69,10 @@ def fix_other_stock():
         parent_tx = LotTransaction.objects.filter(lot=l.parent_lot)
         if tx.count() > 1 or parent_tx.count() > 1:
             parent = parent_tx[0]
-            #for t in parent_tx:
-            #    print('PARENT', t.id, t.lot_id, t.lot.biocarburant.name, t.lot.volume, t.carbure_client, t.delivery_date)
+            for t in parent_tx:
+                print('PARENT', t.id, t.lot_id, t.lot.biocarburant.name, t.lot.volume, t.carbure_client, t.delivery_date)
             for t in tx:
-                #print(t.id, t.lot_id, t.lot.biocarburant.name, t.lot.volume, t.carbure_client, t.delivery_date, t.parent_tx)                
+                print(t.id, t.lot_id, t.lot.biocarburant.name, t.lot.volume, t.carbure_client, t.delivery_date, t.parent_tx)                
                 if t.parent_tx is None:
                     if tx.count() == 1:
                         print('Marking Parent tx as %d' % (parent.id))                        

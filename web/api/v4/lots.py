@@ -24,6 +24,8 @@ UNKNOWN_DELIVERY_COUNTRY = "UNKNOWN_DELIVERY_COUNTRY"
 UNKNOWN_CLIENT = "UNKNOWN_CLIENT"
 
 def try_get_date(dd):
+    if dd is None:
+        return dd
     if isinstance(dd, int):
         return datetime.datetime.fromordinal(datetime.datetime(1900, 1, 1).toordinal() + dd - 2)
     if isinstance(dd, datetime.datetime):
