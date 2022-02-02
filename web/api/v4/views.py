@@ -282,7 +282,7 @@ def stock_split(request, *args, **kwargs):
 
     try:
         unserialized = json.loads(payload)
-        # expected format: [{stock_id: 12344, volume: 3244.33, transport_document_type: 'DAE', transport_document_reference: 'FR221244342WW'
+        # expected format: [{stock_id: "L20140-4243-XXX", volume: 3244.33, transport_document_type: 'DAE', transport_document_reference: 'FR221244342WW'
         # dispatch_date: '2021-05-11', carbure_delivery_site_id: None, unknown_delivery_site: "SomeUnknownDepot", delivery_site_country_id: 120,
         # delivery_type: 'EXPORT', carbure_client_id: 12, unknown_client: None}]
     except:
@@ -291,6 +291,7 @@ def stock_split(request, *args, **kwargs):
     if not isinstance(unserialized, list):
         return JsonResponse({'status': 'error', 'message': 'Parsed JSON is not a list'}, status=400)
 
+    new_lot_ids = []
     for entry in unserialized:
         # check minimum fields
         required_fields = ['stock_id', 'volume', 'delivery_date']
@@ -299,7 +300,7 @@ def stock_split(request, *args, **kwargs):
                 return JsonResponse({'status': 'error', 'message': 'Missing field %s in json object' % (field)}, status=400)
 
         try:
-            stock = CarbureStock.objects.get(pk=entry['stock_id'])
+            stock = CarbureStock.objects.get(carbure_id=entry['stock_id'])
         except:
             return JsonResponse({'status': 'error', 'message': 'Could not find stock'}, status=400)
 
@@ -352,7 +353,6 @@ def stock_split(request, *args, **kwargs):
             lot.carbure_delivery_site = delivery_site
             lot.delivery_site_country = delivery_site.country
         except:
-            print('Could not fetch delivery site %s' % (delivery_site_id))
             pass
         try:
             lot.carbure_client = Entity.objects.get(id=entry.get('carbure_client_id', None))
@@ -369,7 +369,8 @@ def stock_split(request, *args, **kwargs):
             if lot.delivery_site_country is None:
                 return JsonResponse({'status': 'error', 'message': 'Mandatory delivery_site_country'}, status=400)
         lot.save()
-        bulk_sanity_checks([lot], prefetched_data)
+        new_lot_ids.append(lot.id)
+        bulk_sanity_checks([lot], prefetched_data, background=False)
         # update stock
         if rounded_volume >= stock.remaining_volume:
             stock.remaining_volume = 0
@@ -387,7 +388,7 @@ def stock_split(request, *args, **kwargs):
         e.lot = lot
         e.user = request.user
         e.save()
-    return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'success', 'data': new_lot_ids})
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])

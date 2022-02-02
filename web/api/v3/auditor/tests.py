@@ -47,21 +47,22 @@ class AuditorAPITest(TestCase):
         # pass otp
         usermodel = get_user_model()
         user = usermodel.objects.get(email=self.admin_email)
-        device = EmailDevice.objects.get(user=user)
-        device.generate_token()
-        response = self.client.post(reverse('otp-verify'), {'otp_token': device.token})
-        self.assertEqual(response.status_code, 302) #  redirected to home page
+        response = self.client.post(reverse('api-v4-request-otp'))
+        self.assertEqual(response.status_code, 200)
+        device, created = EmailDevice.objects.get_or_create(user=user)
+        response = self.client.post(reverse('api-v4-verify-otp'), {'otp_token': device.token})
+        self.assertEqual(response.status_code, 200)
 
     def login_and_pass_otp(self, email, password):
         loggedin = self.client.login(username=email, password=password)
         self.assertTrue(loggedin)
-        response = self.client.get(reverse('otp-verify'))
-        self.assertEqual(response.status_code, 200)
         usermodel = get_user_model()
         user = usermodel.objects.get(email=email)
-        device = EmailDevice.objects.get(user=user)
-        response = self.client.post(reverse('otp-verify'), {'otp_token': device.token})
-        self.assertEqual(response.status_code, 302)
+        response = self.client.post(reverse('api-v4-request-otp'))
+        self.assertEqual(response.status_code, 200)
+        device, created = EmailDevice.objects.get_or_create(user=user)
+        response = self.client.post(reverse('api-v4-verify-otp'), {'otp_token': device.token})
+        self.assertEqual(response.status_code, 200)
 
     # def test_auditor_comments(self):
     #     # login as user

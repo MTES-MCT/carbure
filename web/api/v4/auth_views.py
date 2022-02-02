@@ -77,7 +77,6 @@ def user_logout(request):
 @login_required
 def request_otp(request):
     # send token by email and display form
-    send_new_token(request)
     if not user_has_device(request.user):
         email_otp = EmailDevice()
         email_otp.user = request.user
@@ -85,6 +84,7 @@ def request_otp(request):
         email_otp.confirmed = True
         email_otp.email = request.user.email
         email_otp.save()
+    send_new_token(request)
     device = EmailDevice.objects.get(user=request.user)
     dt = device.valid_until.astimezone(pytz.timezone('Europe/Paris'))
     return JsonResponse({'status': 'success', 'valid_until': dt.strftime("%m/%d/%Y, %H:%M")})
