@@ -304,7 +304,7 @@ export interface StockQuery {
 }
 
 export interface StockPayload {
-  stock_id: number | undefined
+  stock_id: string | undefined
   volume: number | undefined
   transport_document_type: string | undefined
   transport_document_reference: string | undefined

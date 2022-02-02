@@ -67,7 +67,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
 
   const { value, bind, setValue, setField } = useForm({ ...defaultSplit, entity }, { setValue: checkForm })
   const deliveryTypes = getDeliveryTypes(entity, value.client)
-
+  value.stock_id = stock.carbure_id
   const splitStock = useMutation(api.splitStock, {
     invalidates: ["snapshot", "stock-details"],
 
@@ -176,7 +176,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
           label={t("Extraire lot")}
           action={() => {
             matomo.push(["trackEvent", "stocks", "split-stock"])
-            splitStock.execute(entity.id, [formToStockPayload(stock.id, value)])
+            splitStock.execute(entity.id, [formToStockPayload(value)])
           }}
         />
       </footer>
@@ -185,11 +185,10 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
 }
 
 function formToStockPayload(
-  stock_id: number,
   form: SplitForm
 ): StockPayload {
   return {
-    stock_id,
+    stock_id: form.stock_id,
     volume: form.volume,
     transport_document_reference: form.transport_document_reference,
     transport_document_type: undefined,
@@ -210,6 +209,7 @@ function formToStockPayload(
 
 const defaultSplit = {
   entity: {} as EntityManager,
+  stock_id: undefined as string | undefined,
   delivery_type: undefined as string | undefined,
   volume: 0 as number | undefined,
   transport_document_reference: undefined as string | undefined,
