@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next"
 import { DeliveryType, Stock, StockPayload } from "../types"
 import * as api from "../api"
-import useEntity from "carbure/hooks/entity"
+import useEntity, { EntityManager } from "carbure/hooks/entity"
 import { useMutation } from "common-v2/hooks/async"
 import { useNotify } from "common-v2/components/notifications"
 import Button from "common-v2/components/button"
@@ -18,6 +18,7 @@ import * as norm from "common-v2/utils/normalizers"
 import { useMatomo } from "matomo"
 import Select from "common-v2/components/select"
 import { formatNumber } from "common-v2/utils/formatters"
+import { getDeliveryTypes } from "lot-add/components/delivery-fields"
 
 export interface SplitOneButtonProps {
   disabled?: boolean
@@ -46,16 +47,29 @@ interface ApproveFixDialogProps {
   onClose: () => void
 }
 
+function checkForm(form: SplitForm) {
+  const knownClient = form.client instanceof Object ? form.client : null
+  const isClientEntity = knownClient?.id === form.entity.id
+  const isClientUnknown = knownClient === null
+
+  if (!isClientEntity && !isClientUnknown) {
+    form.delivery_type = undefined
+  }
+
+  return form
+}
+
 const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
   const matomo = useMatomo()
   const entity = useEntity()
 
-  const { value, bind, setValue, setField } = useForm(defaultSplit)
+  const { value, bind, setValue, setField } = useForm({ ...defaultSplit, entity }, { setValue: checkForm })
+  const deliveryTypes = getDeliveryTypes(entity, value.client)
 
   const splitStock = useMutation(api.splitStock, {
-    invalidates: ["snapshot"],
+    invalidates: ["snapshot", "stock-details"],
 
     onSuccess: () => {
       notify(t("Le lot a bien été ajouté à vos brouillons !"), { variant: "success" }) // prettier-ignore
@@ -66,19 +80,6 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
       notify(t("Le lot n'a pas pu être créé"), { variant: "danger" })
     },
   })
-
-  const { isOperator, has_stocks, has_mac, has_direct_deliveries } = entity
-
-  const clientIsEntity =
-    value.client instanceof Object && value.client.id === entity.id
-
-  const deliveryTypes = [
-    isOperator && DeliveryType.Blending,
-    has_stocks && DeliveryType.Stock,
-    has_mac && DeliveryType.RFC,
-    has_direct_deliveries && DeliveryType.Direct,
-    DeliveryType.Export,
-  ].filter((o) => o !== false) as DeliveryType[]
 
   return (
     <Dialog onClose={onClose}>
@@ -119,7 +120,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
               create={norm.identity}
               {...bind("client")}
             />
-            {clientIsEntity && (
+            {deliveryTypes.length > 0 && (
               <Select
                 clear
                 label={t("Type de livraison")}
@@ -133,6 +134,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
               label={t("Site de livraison")}
               getOptions={findDepots}
               normalize={norm.normalizeDepot}
+              create={norm.identity}
               {...bind("delivery_site")}
             />
             {value.delivery_site instanceof Object ? (
@@ -184,7 +186,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
 
 function formToStockPayload(
   stock_id: number,
-  form: typeof defaultSplit
+  form: SplitForm
 ): StockPayload {
   return {
     stock_id,
@@ -207,6 +209,7 @@ function formToStockPayload(
 }
 
 const defaultSplit = {
+  entity: {} as EntityManager,
   delivery_type: undefined as string | undefined,
   volume: 0 as number | undefined,
   transport_document_reference: undefined as string | undefined,
@@ -215,3 +218,5 @@ const defaultSplit = {
   delivery_site: undefined as Depot | string | undefined,
   delivery_site_country: undefined as Country | undefined,
 }
+
+type SplitForm = typeof defaultSplit

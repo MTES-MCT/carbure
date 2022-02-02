@@ -635,7 +635,7 @@
   "Extraire un lot": "Extract batch",
   "Le lot a bien été ajouté à vos brouillons !": "The batch was added to your drafts !",
   "Le lot n'a pas pu être créé": "The batch could not be created",
-  "Veuillez remplir le formulaire ci-dessous afin de créer un nouveau lot basé sur le stock sélectionné :": "Fill de form below in order to create a new batch based on the selected stock:",
+  "Veuillez remplir le formulaire ci-dessous afin de créer un nouveau lot basé sur le stock sélectionné :": "Fill the form below in order to create a new batch based on the selected stock:",
   "Volume ({{volume}} litres disponibles)_one": "Volume ({{volume}} liter available)",
   "Volume ({{volume}} litres disponibles)_other": "Volume ({{volume}} liters available)",
   "Tout mettre": "Put everything",

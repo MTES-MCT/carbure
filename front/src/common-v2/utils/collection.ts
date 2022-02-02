@@ -15,3 +15,7 @@ export function sortBy<T, V>(list: T[], by: (value: T) => V) {
     }
   })
 }
+
+export function compact<T>(list: Array<T | false | null | undefined>) {
+  return list.filter(item => item !== false && item !== null && item !== undefined) as Array<T>
+}

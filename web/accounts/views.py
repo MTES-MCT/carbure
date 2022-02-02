@@ -102,33 +102,33 @@ def activate(request, uidb64, token):
     else:
         return render(request, 'registration/account_activation_invalid.html')
 
-# static - not an endpoint
-def send_new_token(request):
-    device = EmailDevice.objects.get(user=request.user)
-    current_site = get_current_site(request)
-    # if current token is expired, generate a new one
-    now = timezone.now()
-    if now > device.valid_until:
-        device.generate_token(valid_secs=settings.OTP_EMAIL_TOKEN_VALIDITY)
-    email_subject = 'Carbure - Code de Sécurité'
-    dt = device.valid_until.astimezone(pytz.timezone('Europe/Paris'))
-    expiry = "%s %s" % (dt.strftime('%H:%M'), dt.tzname())
-    email_context = {
-        'user': request.user,
-        'domain': current_site.domain,
-        'token': device.token,
-        'token_expiry': expiry,
-    }
-    html_message = loader.render_to_string('accounts/otp_token_email.html', email_context)
-    text_message = loader.render_to_string('accounts/otp_token_email.txt', email_context)
-    send_mail(
-        subject=email_subject,
-        message=text_message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        html_message=html_message,
-        recipient_list=[request.user.email],
-        fail_silently=False,
-    )
+# # static - not an endpoint
+# def send_new_token(request):
+#     device = EmailDevice.objects.get(user=request.user)
+#     current_site = get_current_site(request)
+#     # if current token is expired, generate a new one
+#     now = timezone.now()
+#     if now > device.valid_until:
+#         device.generate_token(valid_secs=settings.OTP_EMAIL_TOKEN_VALIDITY)
+#     email_subject = 'Carbure - Code de Sécurité'
+#     dt = device.valid_until.astimezone(pytz.timezone('Europe/Paris'))
+#     expiry = "%s %s" % (dt.strftime('%H:%M'), dt.tzname())
+#     email_context = {
+#         'user': request.user,
+#         'domain': current_site.domain,
+#         'token': device.token,
+#         'token_expiry': expiry,
+#     }
+#     html_message = loader.render_to_string('accounts/otp_token_email.html', email_context)
+#     text_message = loader.render_to_string('accounts/otp_token_email.txt', email_context)
+#     send_mail(
+#         subject=email_subject,
+#         message=text_message,
+#         from_email=settings.DEFAULT_FROM_EMAIL,
+#         html_message=html_message,
+#         recipient_list=[request.user.email],
+#         fail_silently=False,
+#     )
 
 @login_required
 def otp_verify(request):
