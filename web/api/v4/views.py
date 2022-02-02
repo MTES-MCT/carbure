@@ -277,6 +277,8 @@ def stock_split(request, *args, **kwargs):
     payload = request.POST.get('payload', False)
     if not payload:
         return JsonResponse({'status': 'error', 'message': 'Missing payload'}, status=400)
+    entity = Entity.objects.get(id=entity_id)
+    prefetched_data = get_prefetched_data(entity)
 
     try:
         unserialized = json.loads(payload)
@@ -291,7 +293,7 @@ def stock_split(request, *args, **kwargs):
 
     for entry in unserialized:
         # check minimum fields
-        required_fields = ['stock_id', 'volume', 'delivery_date', 'delivery_site_country_id']
+        required_fields = ['stock_id', 'volume', 'delivery_date']
         for field in required_fields:
             if field not in entry:
                 return JsonResponse({'status': 'error', 'message': 'Missing field %s in json object' % (field)}, status=400)
@@ -309,79 +311,65 @@ def stock_split(request, *args, **kwargs):
         except:
             return JsonResponse({'status': 'error', 'message': 'Could not parse volume'}, status=400)
 
-        # delivery_type = entry['delivery_type']
-        # if delivery_type not in [CarbureLot.BLENDING, CarbureLot.EXPORT, CarbureLot.DIRECT, CarbureLot.PROCESSING, CarbureLot.RFC]:
-        #     return JsonResponse({'status': 'error', 'message': 'Cannot split stock for this type of delivery'}, status=400)
-
         # create child lot
         rounded_volume = round(volume, 2)
         lot = stock.get_parent_lot()
         lot.pk = None
+        lot.transport_document_reference = None
+        lot.carbure_client = None
+        lot.unknown_client = None
+        lot.carbure_delivery_site = None
+        lot.unknown_delivery_site = None
+        lot.delivery_site_country = None
         lot.lot_status = CarbureLot.DRAFT
+        lot.delivery_type = CarbureLot.UNKNOWN
         lot.volume = rounded_volume
         lot.weight = lot.get_weight()
         lot.lhv_amount = lot.get_lhv_amount()
         lot.parent_stock = stock
         # common, mandatory data
-        lot.delivery_site_country = Pays.objects.get(code_pays=entry['delivery_site_country_id'])
         lot.delivery_date = try_get_date(entry['delivery_date'])
         lot.period = lot.delivery_date.year * 100 + lot.delivery_date.month
-        if 'dispatch_date' in entry:
-            lot.dispatch_date = entry['dispatch_date']
         lot.carbure_dispatch_site = stock.depot
         lot.dispatch_site_country = lot.carbure_dispatch_site.country
         lot.carbure_supplier_id = entity_id
-        lot.added_bt_id = entity_id
-        if 'carbure_client_id' in entry:
-            lot.carbure_client_id = entry['carbure_client_id']
-        elif 'unknown_client' in entry:
-            lot.unknown_client = entry['unknown_client']
-
-        delivery_type = entry.get('delivery_type', CarbureLot.UNKNOWN)
-        if delivery_type in [CarbureLot.RFC, CarbureLot.EXPORT]:
-            lot.delivery_type = delivery_type
-            # carbure_client, carbure_delivery_site, transport_document_type and transport_document_reference are optional
-            if 'transport_document_type' in entry:
-                lot.transport_document_type = entry['transport_document_type']
-            else:
-                lot.transport_document_type = CarbureLot.OTHER
-            if 'transport_document_reference' in entry:
-                lot.transport_document_reference = entry['transport_document_reference']
-            else:
-                lot.transport_document_reference = lot.delivery_type
-            if 'carbure_client_id' in entry:
-                lot.carbure_client_id = entry['carbure_client_id']
-            delivery_site_id = entry.get('carbure_delivery_site_id', None)
-            if delivery_site_id is None:
-                lot.carbure_delivery_site = None
-            else:
-                try:
-                    delivery_site = Depot.objects.get(id=delivery_site_id)
-                    lot.carbure_delivery_site = delivery_site
-                except:
-                    lot.carbure_delivery_site = None
-            if 'unknown_client' in entry:
-                lot.unknown_client = entry['unknown_client']
-            if 'unknown_delivery_site' in entry:
-                lot.unknown_delivery_site = entry['unknown_delivery_site']
-        else: # BLENDING, DIRECT, PROCESSING, UNKNOWN
-            required_fields = ['transport_document_reference', 'carbure_delivery_site_id', 'carbure_client_id']
-            for field in required_fields:
-                if field not in entry:
-                    return JsonResponse({'status': 'error', 'message': 'Missing field %s in json object'}, status=400)
-            lot.transport_document_type = entry.get('transport_document_type', CarbureLot.OTHER)
-            lot.transport_document_reference = entry['transport_document_reference']
-            delivery_site_id = entry.get('carbure_delivery_site_id', None)
-            if delivery_site_id is None:
-                lot.carbure_delivery_site = None
-            else:
-                try:
-                    delivery_site = Depot.objects.get(id=delivery_site_id)
-                    lot.carbure_delivery_site = delivery_site
-                except:
-                    lot.carbure_delivery_site = None
-            lot.carbure_client_id = entry['carbure_client_id']
+        lot.added_by_id = entity_id
+        lot.dispatch_date = entry.get('dispatch_date', None)
+        lot.unknown_client = entry.get('unknown_client', None)
+        lot.unknown_delivery_site = entry.get('unknown_delivery_site', None)
+        country_code = entry.get('delivery_site_country_id', None)
+        if country_code is not None:
+            try:
+                lot.delivery_site_country = Pays.objects.get(code_pays=country_code)
+            except:
+                lot.delivery_site_country = None
+        lot.transport_document_type = entry.get('transport_document_type', CarbureLot.OTHER)
+        lot.delivery_type = entry.get('delivery_type', CarbureLot.UNKNOWN)
+        lot.transport_document_reference = entry.get('transport_document_reference', lot.delivery_type)
+        delivery_site_id = entry.get('carbure_delivery_site_id', None)
+        try:
+            delivery_site = Depot.objects.get(depot_id=delivery_site_id)
+            lot.carbure_delivery_site = delivery_site
+            lot.delivery_site_country = delivery_site.country
+        except:
+            print('Could not fetch delivery site %s' % (delivery_site_id))
+            pass
+        try:
+            lot.carbure_client = Entity.objects.get(id=entry.get('carbure_client_id', None))
+        except:
+            lot.carbure_client = None
+        if lot.delivery_type in [CarbureLot.BLENDING, CarbureLot.DIRECT, CarbureLot.PROCESSING]:
+            if lot.transport_document_reference is None:
+                return JsonResponse({'status': 'error', 'message': 'Missing transport_document_reference'}, status=400)
+            if lot.carbure_client is None:
+                return JsonResponse({'status': 'error', 'message': 'Mandatory carbure_client_id'}, status=400)
+            if lot.carbure_delivery_site is None:
+                return JsonResponse({'status': 'error', 'message': 'Mandatory carbure_delivery_site'}, status=400)
+        else:
+            if lot.delivery_site_country is None:
+                return JsonResponse({'status': 'error', 'message': 'Mandatory delivery_site_country'}, status=400)
         lot.save()
+        bulk_sanity_checks([lot], prefetched_data)
         # update stock
         if rounded_volume >= stock.remaining_volume:
             stock.remaining_volume = 0
@@ -398,9 +386,6 @@ def stock_split(request, *args, **kwargs):
         e.event_type = CarbureLotEvent.CREATED
         e.lot = lot
         e.user = request.user
-        e.save()
-        e.pk = None
-        e.event_type = CarbureLotEvent.ACCEPTED
         e.save()
     return JsonResponse({'status': 'success'})
 

@@ -92,6 +92,14 @@ export function useLotForm(lot?: Lot | undefined, lotErrors: LotError[] = []) {
       value.delivery_site_country = value.delivery_site.country
     }
 
+    const knownClient = value.client instanceof Object ? value.client : undefined
+    const isClientEntity = knownClient?.id === entity.id
+    const isClientUnknown = knownClient === undefined
+  
+    if (!isClientEntity && !isClientUnknown) {
+      value.delivery_type = undefined
+    }
+
     // update GES summary
     const total = computeGHGTotal(value)
     const reduction = computeGHGReduction(total, GHG_REFERENCE)

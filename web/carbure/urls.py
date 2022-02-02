@@ -20,8 +20,8 @@ import debug_toolbar
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('authtools.urls')),
-    path('accounts/', include('accounts.urls')),
+    #path('accounts/', include('authtools.urls')),
+    #path('accounts/', include('accounts.urls')),
     path('', public_views.index, name='index'),
 
     path('stats', public_views.stats, name='stats'),

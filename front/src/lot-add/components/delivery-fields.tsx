@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import useEntity from "carbure/hooks/entity"
+import useEntity, { EntityManager } from "carbure/hooks/entity"
 import { Fieldset, useBind, useFormContext } from "common-v2/components/form"
 import Autocomplete, {
   AutocompleteProps,
@@ -13,6 +13,7 @@ import { Entity } from "carbure/types"
 import { Country, Depot } from "common/types"
 import Select, { SelectProps } from "common-v2/components/select"
 import { DeliveryType } from "transactions/types"
+import { compact } from "common-v2/utils/collection"
 
 interface DeliveryFieldsProps {
   readOnly?: boolean
@@ -139,36 +140,16 @@ export const ClientField = (props: AutocompleteProps<Entity | string>) => {
   )
 }
 
+// DeliveryType field should only appear when the client is either the current entity or an unknown one
 export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { value, bind } = useFormContext<LotFormValue>()
+  const deliveryTypes = getDeliveryTypes(entity, value.client)
 
-  const { isOperator, has_stocks, has_mac, has_direct_deliveries } = entity
-
-  const isDraft = value.lot === undefined || value.lot.lot_status === "DRAFT"
-
-  const isCreator =
-    value.lot?.added_by instanceof Object
-      ? value.lot.added_by.id === entity.id
-      : value.lot === undefined
-
-  const isClient =
-    value.client instanceof Object
-      ? value.client.id === entity.id //
-      : false
-
-  if (!isDraft || !isCreator || !isClient) {
+  if (deliveryTypes.length === 0) {
     return null
   }
-
-  const options = [
-    isOperator && DeliveryType.Blending,
-    has_stocks && DeliveryType.Stock,
-    has_mac && DeliveryType.RFC,
-    has_direct_deliveries && DeliveryType.Direct,
-    DeliveryType.Export,
-  ].filter((o) => o !== false) as DeliveryType[]
 
   return (
     <Select
@@ -176,11 +157,26 @@ export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
       label={t("Type de livraison")}
       placeholder={t("Choisissez un type")}
       normalize={norm.normalizeDeliveryType}
+      options={deliveryTypes}
       {...bind("delivery_type")}
       {...props}
-      options={options}
     />
   )
+}
+
+export function getDeliveryTypes(entity: EntityManager, client: Entity | string | undefined) {
+  const { isOperator, has_stocks, has_mac, has_direct_deliveries } = entity
+  const isClientEntity = client instanceof Object ? client.id === entity.id : false // prettier-ignore
+  const isClientUnknown = client === undefined || typeof client === "string"
+
+  return compact([
+    isClientEntity && isOperator && DeliveryType.Blending,
+    isClientEntity && has_stocks && DeliveryType.Stock,
+    isClientUnknown && has_mac && DeliveryType.RFC,
+    isClientUnknown && has_direct_deliveries && DeliveryType.Direct,
+    isClientUnknown && DeliveryType.Export,
+  ])
+
 }
 
 export const DeliverySiteField = (props: AutocompleteProps<Depot | string>) => {
