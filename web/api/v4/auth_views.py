@@ -35,8 +35,8 @@ def register(request):
             'uid': urlsafe_base64_encode(force_bytes(user.pk)),
             'token': account_activation_token.make_token(user),
         }
-        html_message = loader.render_to_string('registration/account_activation_email.html', email_context)
-        text_message = loader.render_to_string('registration/account_activation_email.txt', email_context)
+        html_message = loader.render_to_string('emails/account_activation_email.html', email_context)
+        text_message = loader.render_to_string('emails/account_activation_email.txt', email_context)
         send_mail(
             subject=email_subject,
             message=text_message,
@@ -129,8 +129,8 @@ def request_password_reset(request):
         'uid': urlsafe_base64_encode(force_bytes(user.pk)),
         'token': prtg.make_token(user),
     }
-    html_message = loader.render_to_string('registration/password_reset_email.html', email_context)
-    text_message = loader.render_to_string('registration/password_reset_email.txt', email_context)
+    html_message = loader.render_to_string('emails/password_reset_email.html', email_context)
+    text_message = loader.render_to_string('emails/password_reset_email.txt', email_context)
     send_mail(
         subject=email_subject,
         message=text_message,
@@ -176,8 +176,8 @@ def request_activation_link(request):
                 'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                 'token': account_activation_token.make_token(user),
             }
-            html_message = loader.render_to_string('registration/account_activation_email.html', email_context)
-            text_message = loader.render_to_string('registration/account_activation_email.txt', email_context)
+            html_message = loader.render_to_string('emails/account_activation_email.html', email_context)
+            text_message = loader.render_to_string('emails/account_activation_email.txt', email_context)
             send_mail(
                 subject=email_subject,
                 message=text_message,
@@ -226,8 +226,8 @@ def send_new_token(request):
         'token': device.token,
         'token_expiry': expiry,
     }
-    html_message = loader.render_to_string('accounts/otp_token_email.html', email_context)
-    text_message = loader.render_to_string('accounts/otp_token_email.txt', email_context)
+    html_message = loader.render_to_string('emails/otp_token_email.html', email_context)
+    text_message = loader.render_to_string('emails/otp_token_email.txt', email_context)
     send_mail(
         subject=email_subject,
         message=text_message,
