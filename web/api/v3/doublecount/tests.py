@@ -39,11 +39,11 @@ class DCAAPITest(TransactionTestCase):
         loggedin = self.client.login(username=self.user_email, password=self.user_password)
         self.assertTrue(loggedin)          
         # pass otp verification
-        response = self.client.get(reverse('otp-verify'))
+        response = self.client.post(reverse('api-v4-request-otp'))
         self.assertEqual(response.status_code, 200)
-        device = EmailDevice.objects.get(user=self.user1)
-        response = self.client.post(reverse('otp-verify'), {'otp_token': device.token})
-        self.assertEqual(response.status_code, 302)
+        device, created = EmailDevice.objects.get_or_create(user=self.user1)
+        response = self.client.post(reverse('api-v4-verify-otp'), {'otp_token': device.token})
+        self.assertEqual(response.status_code, 200)
 
     def test_dca_sourcing(self):
         # download template sourcing

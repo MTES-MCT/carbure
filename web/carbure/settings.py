@@ -58,7 +58,6 @@ INSTALLED_APPS = [
     'django_admin_listfilter_dropdown',
     'authtools',
     'core',
-    'accounts',
     'producers',
     'certificates',
     'api',
@@ -158,8 +157,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-LOGIN_REDIRECT_URL = 'otp-verify'
-LOGOUT_REDIRECT_URL = 'index'
 SESSION_COOKIE_AGE = 60*60*24*30 # 30 days
 
 DEFAULT_FROM_EMAIL = "contact@carbure.beta.gouv.fr"

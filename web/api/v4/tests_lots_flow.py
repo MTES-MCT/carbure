@@ -38,11 +38,11 @@ class LotsFlowTest(TestCase):
         UserRights.objects.update_or_create(entity=self.operator, user=self.user1, role=UserRights.RW)
 
         # pass otp verification
-        response = self.client.get(reverse('otp-verify'))
+        response = self.client.post(reverse('api-v4-request-otp'))
         self.assertEqual(response.status_code, 200)
-        device = EmailDevice.objects.get(user=self.user1)
-        response = self.client.post(reverse('otp-verify'), {'otp_token': device.token})
-        self.assertEqual(response.status_code, 302)
+        device, created = EmailDevice.objects.get_or_create(user=self.user1)
+        response = self.client.post(reverse('api-v4-verify-otp'), {'otp_token': device.token})
+        self.assertEqual(response.status_code, 200)
 
     def create_draft(self, lot=None, **kwargs):
         if lot is None:

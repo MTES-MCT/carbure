@@ -1,6 +1,6 @@
 import datetime
 import random
-
+import json
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -38,12 +38,14 @@ class LotsFlowTest(TestCase):
         UserRights.objects.update_or_create(entity=self.producer, user=self.user1, role=UserRights.RW)
         UserRights.objects.update_or_create(entity=self.trader, user=self.user1, role=UserRights.RW)
         UserRights.objects.update_or_create(entity=self.operator, user=self.user1, role=UserRights.RW)
+        self.depots = Depot.objects.all()
 
         # pass otp verification
+        response = self.client.post(reverse('api-v4-request-otp'))
+        self.assertEqual(response.status_code, 200)
         device, created = EmailDevice.objects.get_or_create(user=self.user1)
         response = self.client.post(reverse('api-v4-verify-otp'), {'otp_token': device.token})
-        self.assertEqual(response.status_code, 302)
-        self.depots = Depot.objects.all()
+        self.assertEqual(response.status_code, 200)
 
     def create_draft(self, lot=None, **kwargs):
         if lot is None:
@@ -62,11 +64,11 @@ class LotsFlowTest(TestCase):
         lot = CarbureLot.objects.get(id=lot.id)
         return lot
         
-    def stock_slit(self, payload):
-        response = self.client.post(reverse('api-v4-stock-split'), {'entity_id': self.trader.id, 'payload': payload})
+    def stock_split(self, payload):
+        response = self.client.post(reverse('api-v4-stock-split'), {'entity_id': self.producer.id, 'payload': json.dumps(payload)})
         self.assertEqual(response.status_code, 200)
         data = response.json()['data']
-        lot_id = data['id']        
+        lot_id = data[0]
         lot = CarbureLot.objects.get(id=lot_id)
         return lot
 
@@ -77,33 +79,35 @@ class LotsFlowTest(TestCase):
         self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)
         self.assertEqual(lot.delivery_type, CarbureLot.STOCK)
 
+        stock = CarbureStock.objects.get(parent_lot=lot)
+
         today = datetime.date.today().strftime('%d/%m/%Y')
         # 1: split 10000L for export
-        payload = {'volume': 10000, 'stock_id': lot.carbure_id, 'delivery_date': today, 'delivery_site_country_id': 'DE', 'delivery_type': 'EXPORT'}
-        lot = self.stock_split(payload)
+        payload = {'volume': 10000, 'stock_id': stock.carbure_id, 'delivery_date': today, 'delivery_site_country_id': 'DE', 'delivery_type': 'EXPORT'}
+        lot = self.stock_split([payload])
         self.assertEqual(lot.lot_status, CarbureLot.DRAFT)
         self.assertEqual(lot.delivery_type, CarbureLot.EXPORT)
 
         # 2: split 10000L for RFC
-        payload = {'volume': 10000, 'stock_id': lot.carbure_id, 'delivery_date': today, 'delivery_site_country_id': 'FR', 'delivery_type': 'RFC'}
-        lot = self.stock_split(payload)
+        payload = {'volume': 10000, 'stock_id': stock.carbure_id, 'delivery_date': today, 'delivery_site_country_id': 'FR', 'delivery_type': 'RFC'}
+        lot = self.stock_split([payload])
         self.assertEqual(lot.lot_status, CarbureLot.DRAFT)
         self.assertEqual(lot.delivery_type, CarbureLot.RFC)
 
         # 3: split 10000L for blending
-        payload = {'volume': 10000, 'stock_id': lot.carbure_id, 'delivery_date': today, 'delivery_site_country_id': 'FR', 'delivery_type': 'BLENDING', 'transport_document_reference': 'FR-BLENDING-TEST', 'carbure_delivery_site_id': random.choice(self.depots).depot_id, 'carbure_client_id': self.trader.id}
-        lot = self.stock_split(payload)
+        payload = {'volume': 10000, 'stock_id': stock.carbure_id, 'delivery_date': today, 'delivery_site_country_id': 'FR', 'delivery_type': 'BLENDING', 'transport_document_reference': 'FR-BLENDING-TEST', 'carbure_delivery_site_id': random.choice(self.depots).depot_id, 'carbure_client_id': self.trader.id}
+        lot = self.stock_split([payload])
         self.assertEqual(lot.lot_status, CarbureLot.DRAFT)
         self.assertEqual(lot.delivery_type, CarbureLot.BLENDING)
 
         # 4: split 10000L for carbure_client
-        payload = {'volume': 10000, 'stock_id': lot.carbure_id, 'delivery_date': today, 'delivery_site_country_id': 'FR', 'transport_document_reference': 'FR-SPLIT-SEND-TEST', 'carbure_delivery_site_id': random.choice(self.depots).depot_id, 'carbure_client_id': self.operator.id}
-        lot = self.stock_split(payload)
+        payload = {'volume': 10000, 'stock_id': stock.carbure_id, 'delivery_date': today, 'delivery_site_country_id': 'FR', 'transport_document_reference': 'FR-SPLIT-SEND-TEST', 'carbure_delivery_site_id': random.choice(self.depots).depot_id, 'carbure_client_id': self.operator.id}
+        lot = self.stock_split([payload])
         self.assertEqual(lot.lot_status, CarbureLot.DRAFT)
         self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
 
         # 5: split 10000L for unknown_client
-        payload = {'volume': 10000, 'stock_id': lot.carbure_id, 'delivery_date': today, 'delivery_site_country_id': 'DE', 'transport_document_reference': 'FR-BLENDING-TEST', 'unknown_client': "FOREIGN CLIENT"}
-        lot = self.stock_split(payload)
+        payload = {'volume': 10000, 'stock_id': stock.carbure_id, 'delivery_date': today, 'delivery_site_country_id': 'DE', 'transport_document_reference': 'FR-BLENDING-TEST', 'unknown_client': "FOREIGN CLIENT"}
+        lot = self.stock_split([payload])
         self.assertEqual(lot.lot_status, CarbureLot.DRAFT)
         self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
