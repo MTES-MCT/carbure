@@ -19,7 +19,7 @@ export const LotTag = ({ lot, ...props }: LotTagProps) => {
   const delivery = lot.delivery_type
 
   const isClient = lot.carbure_client?.id === entity.id
-  const knowsDelivery = isClient || entity.isAdmin || delivery !== DeliveryType.Unknown
+  const knowsDelivery = (isClient || entity.isAdmin) && delivery !== DeliveryType.Unknown // prettier-ignore
 
   if (status === LotStatus.Draft) {
     label = t("Brouillon")
