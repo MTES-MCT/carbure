@@ -193,6 +193,8 @@ const DRAFT_FILTERS = [
 ]
 
 const IN_FILTERS = [
+  Filter.LotStatus,
+  Filter.DeliveryTypes,
   Filter.Periods,
   Filter.Biofuels,
   Filter.Feedstocks,
@@ -203,11 +205,13 @@ const IN_FILTERS = [
 ]
 
 const OUT_FILTERS = [
+  Filter.LotStatus,
   Filter.Periods,
   Filter.Biofuels,
   Filter.Feedstocks,
   Filter.CountriesOfOrigin,
   Filter.Clients,
+  Filter.ClientTypes,
   Filter.ProductionSites,
   Filter.DeliverySites,
 ]
@@ -477,8 +481,6 @@ export function useLotQuery({
       category,
       search,
       invalid,
-      deadline,
-      page,
       limit,
       order,
       filters,

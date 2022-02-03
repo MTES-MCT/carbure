@@ -571,7 +571,7 @@ class CarbureLotAdmin(admin.ModelAdmin):
                   ('carbure_production_site', NameSortedRelatedOnlyDropdownFilter),)
 
     def get_producer(self, obj):
-        return obj.carbure_producer.name if obj.carbure_producer else 'U - ' + obj.unknown_producer
+        return obj.carbure_producer.name if obj.carbure_producer else 'U - ' + str(obj.unknown_producer)
     get_producer.admin_order_field  = 'carbure_producer__name'
     get_producer.short_description = 'Producer'
 

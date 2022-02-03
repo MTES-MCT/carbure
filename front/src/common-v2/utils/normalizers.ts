@@ -1,6 +1,7 @@
 import i18next from "i18next"
 import { Normalizer, Option } from "./normalize"
-import { Entity } from "carbure/types"
+import { Entity, EntityType, UserRole } from "carbure/types"
+import { DeliveryType, LotStatus } from "transactions/types"
 import {
   Biofuel,
   Country,
@@ -11,7 +12,6 @@ import {
   EntityCertificate,
   EntityDepot,
 } from "common/types"
-import { DeliveryType } from "transactions/types"
 
 export const normalizeBiofuel: Normalizer<Biofuel> = (biofuel) => ({
   value: biofuel,
@@ -57,6 +57,24 @@ export const normalizeEntityDepot: Normalizer<EntityDepot> = (depot) => ({
   value: depot
 })
 
+
+// prettier-ignore
+export const normalizeCertificate: Normalizer<Certificate> = (certificate) => ({
+  value: certificate,
+  label: `${certificate.certificate_id} - ${certificate.certificate_holder}`,
+})
+
+// prettier-ignore
+export const normalizeEntityCertificate: Normalizer<EntityCertificate,string> = (ec) => ({
+  value: ec.certificate.certificate_id,
+  label: `${ec.certificate.certificate_id} - ${ec.certificate.certificate_holder}`,
+})
+
+export const normalizeDeliveryType: Normalizer<DeliveryType> = (delivery) => ({
+  value: delivery,
+  label: getDeliveryLabel(delivery),
+})
+
 // prettier-ignore
 export const normalizeFeedstockFilter: Normalizer<Option, string> = (feedstock) => ({
   value: feedstock.value,
@@ -82,21 +100,76 @@ export const normalizeAnomalyFilter: Normalizer<Option, string> = (anomaly) => (
 })
 
 // prettier-ignore
-export const normalizeCertificate: Normalizer<Certificate> = (certificate) => ({
-  value: certificate,
-  label: `${certificate.certificate_id} - ${certificate.certificate_holder}`,
+export const normalizeDeliveryTypeFilter: Normalizer<Option<DeliveryType>, string> = (delivery) => ({
+  value: delivery.value,
+  label: getDeliveryLabel(delivery.value)
 })
 
 // prettier-ignore
-export const normalizeEntityCertificate: Normalizer<EntityCertificate,string> = (ec) => ({
-  value: ec.certificate.certificate_id,
-  label: `${ec.certificate.certificate_id} - ${ec.certificate.certificate_holder}`,
+export const normalizeLotStatusFilter: Normalizer<Option<LotStatus>, string> = (status) => ({
+  value: status.value,
+  label: getStatusLabel(status.value)
 })
 
-export const normalizeDeliveryType: Normalizer<DeliveryType> = (delivery) => ({
-  value: delivery,
-  label: getDeliveryLabel(delivery),
+// prettier-ignore
+export const normalizeEntityTypeFilter: Normalizer<Option<EntityType>, string> = (type) => ({
+  value: type.value,
+  label: getEntityTypeLabel(type.value)
 })
+
+export function getEntityTypeLabel(type: EntityType) {
+  switch(type) {
+    case EntityType.Administration:
+      return i18next.t("Administration")
+    case EntityType.Operator:
+      return i18next.t("Opérateur")
+    case EntityType.Producer:
+      return i18next.t("Producteur")
+    case EntityType.Auditor:
+      return i18next.t("Auditeur")
+    case EntityType.Trader:
+      return i18next.t("Trader")
+    case EntityType.ExternalAdmin:
+      return i18next.t("Administration Externe")
+    case EntityType.Unknown:
+    default:
+      return i18next.t("Inconnu")
+  }
+}
+
+export function getUserRoleLabel(role: UserRole) {
+  switch(role) {
+    case UserRole.ReadOnly:
+      return i18next.t("Lecture seule")
+    case UserRole.ReadWrite:
+      return i18next.t("Lecture/écriture")
+    case UserRole.Admin:
+      return i18next.t("Administration")
+    case UserRole.Auditor:
+      return i18next.t("Audit")
+    default:
+      return i18next.t("Autre")
+  }
+}
+
+export function getStatusLabel(status: LotStatus | undefined) {
+  switch (status) {
+    case LotStatus.Draft:
+      return i18next.t("Brouillon")
+    case LotStatus.Pending:
+      return i18next.t("En attente")
+    case LotStatus.Accepted:
+      return i18next.t("Accepté")
+    case LotStatus.Rejected:
+      return i18next.t("Refusé")
+    case LotStatus.Frozen:
+      return i18next.t("Déclaré")
+    case LotStatus.Deleted:
+      return i18next.t("Supprimé")
+    default:
+      return i18next.t("N/A")
+  }
+}
 
 export function getDeliveryLabel(delivery: DeliveryType | undefined) {
   switch (delivery) {

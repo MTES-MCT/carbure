@@ -14,7 +14,7 @@ import * as common from "common-v2/api"
 import { useMutation } from "common-v2/hooks/async"
 import { usePortal } from "common-v2/components/portal"
 import { formatDate } from "common-v2/utils/formatters"
-import { normalizeEntity } from "common-v2/utils/normalizers"
+import { normalizeEntity, getEntityTypeLabel, getUserRoleLabel } from "common-v2/utils/normalizers"
 import { Button, ExternalLink } from "common-v2/components/button"
 import { LoaderOverlay, Panel } from "common-v2/components/scaffold"
 import { Alert } from "common-v2/components/alert"
@@ -37,22 +37,6 @@ export const AccountAccesRights = () => {
   const revokeMyself = useMutation(api.revokeMyself, {
     invalidates: ["user-settings"],
   })
-
-  const entityTypes = {
-    [EntityType.Administration]: t("Administration"),
-    [EntityType.Operator]: t("Opérateur"),
-    [EntityType.Producer]: t("Producteur"),
-    [EntityType.Auditor]: t("Auditeur"),
-    [EntityType.Trader]: t("Trader"),
-    [EntityType.ExternalAdmin]: t("Administration Externe"),
-  }
-
-  const roleLabels = {
-    [UserRole.ReadOnly]: t("Lecture seule"),
-    [UserRole.ReadWrite]: t("Lecture/écriture"),
-    [UserRole.Admin]: t("Administration"),
-    [UserRole.Auditor]: t("Audit"),
-  }
 
   const loading = user.loading || revokeMyself.loading
 
@@ -97,11 +81,11 @@ export const AccountAccesRights = () => {
             },
             {
               header: t("Type"),
-              cell: (r) => <Cell text={entityTypes[r.entity.entity_type]} />,
+              cell: (r) => <Cell text={getEntityTypeLabel(r.entity.entity_type)} />,
             },
             {
               header: t("Droits"),
-              cell: (r) => <Cell text={roleLabels[r.role]} />,
+              cell: (r) => <Cell text={getUserRoleLabel(r.role)} />,
             },
             {
               header: t("Date"),

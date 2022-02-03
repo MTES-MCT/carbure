@@ -182,11 +182,10 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
     delivery_types = query.getlist('delivery_types', [])
     errors = query.getlist('errors', [])
     search = query.get('query', False)
-    is_highlighted_by_admin = query.get('is_highlighted_by_admin', None)
-    is_highlighted_by_auditor = query.get('is_highlighted_by_auditor', None)
     selection = query.getlist('selection', [])
     history = query.get('history', False)
     correction = query.get('correction', False)
+    client_types = query.getlist('client_types', [])
 
     # selection overrides all other filters
     if len(selection) > 0:
@@ -219,17 +218,11 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
         lots = lots.filter(delivery_type__in=delivery_types)
     if len(correction_statuses) > 0 and 'correction_statuses' not in blacklist:
         lots = lots.filter(correction_status__in=correction_statuses)
-
-    if is_highlighted_by_admin is not None and 'is_highlighted_by_admin' not in blacklist:
-        if is_highlighted_by_admin == 'true':
-            lots = lots.filter(highlighted_by_admin=True)
-        else:
-            lots = lots.filter(highlighted_by_admin=False)
-    if is_highlighted_by_auditor is not None and 'is_highlighted_by_auditor' not in blacklist:
-        if is_highlighted_by_auditor == 'true':
-            lots = lots.filter(is_highlighted_by_auditor=True)
-        else:
-            lots = lots.filter(is_highlighted_by_auditor=False)
+    if len(client_types) > 0 and 'client_types' not in blacklist:
+        client_type_filter = Q(carbure_client__entity_type__in=client_types)
+        if Entity.UNKNOWN in client_types:
+            client_type_filter = client_type_filter | Q(carbure_client__isnull=True)
+        lots = lots.filter(client_type_filter)
 
     if len(errors) > 0 and 'errors' not in blacklist:
         lots = lots.filter(genericerror__error__in=errors)
@@ -364,12 +357,25 @@ def get_lots_filters_data(lots, query, entity, field):
         return normalize_filter(set(suppliers))
 
     if field == 'errors':
-        generic_errors = lots.values('genericerror__error').distinct()
+        generic_errors = lots.values('genericerror__error').exclude(genericerror__error=None).distinct()
         return normalize_filter(generic_errors, 'genericerror__error')
 
     if field == 'added_by':
         added_by = lots.values('added_by__name').distinct()
         return normalize_filter(added_by, 'added_by__name')
+
+    if field == 'delivery_types':
+        delivery_types = lots.values('delivery_type').distinct()
+        return normalize_filter(delivery_types, 'delivery_type')
+
+    if field == 'lot_status':
+        lot_status = lots.values('lot_status').distinct()
+        return normalize_filter(lot_status, 'lot_status')
+
+    if field == 'client_types':
+        client_types = list(lots.exclude(carbure_client=None).values('carbure_client__entity_type').distinct())
+        client_types.append({'carbure_client__entity_type': Entity.UNKNOWN})
+        return normalize_filter(client_types, 'carbure_client__entity_type')
 
 def get_stock_filters_data(stock, query, entity_id, field):
     stock = filter_stock(stock, query, entity_id=entity_id, blacklist=[field])

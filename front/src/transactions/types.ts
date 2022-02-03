@@ -221,7 +221,6 @@ export enum TransportDocumentType {
 }
 
 export enum Filter {
-  DeliveryStatus = "delivery_status",
   Feedstocks = "feedstocks",
   Biofuels = "biofuels",
   Periods = "periods",
@@ -233,12 +232,10 @@ export enum Filter {
   Depots = "depots",
   AddedBy = "added_by",
   Errors = "errors",
-  Forwarded = "is_forwarded",
-  Mac = "is_mac",
-  HiddenByAdmin = "is_hidden_by_admin",
-  HiddenByAuditor = "is_hidden_by_auditor",
   ClientTypes = "client_types",
   ShowEmpty = "show_empty",
+  DeliveryTypes = "delivery_types",
+  LotStatus = "lot_status"
 }
 
 export type FilterSelection = Partial<Record<Filter, string[]>>
@@ -264,7 +261,6 @@ export interface LotQuery {
   deadline?: boolean
   history?: boolean
   correction?: boolean
-  [Filter.DeliveryStatus]?: string[]
   [Filter.Feedstocks]?: string[]
   [Filter.Biofuels]?: string[]
   [Filter.Periods]?: string[]
@@ -275,10 +271,6 @@ export interface LotQuery {
   [Filter.DeliverySites]?: string[]
   [Filter.AddedBy]?: string[]
   [Filter.Errors]?: string[]
-  [Filter.Forwarded]?: string[]
-  [Filter.Mac]?: string[]
-  [Filter.HiddenByAdmin]?: string[]
-  [Filter.HiddenByAuditor]?: string[]
   [Filter.ClientTypes]?: string[]
 }
 
