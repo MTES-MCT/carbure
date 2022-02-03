@@ -11,6 +11,9 @@ import {
   normalizeBiofuelFilter,
   normalizeCountryFilter,
   normalizeFeedstockFilter,
+  normalizeDeliveryTypeFilter,
+  normalizeLotStatusFilter,
+  normalizeEntityTypeFilter
 } from "common-v2/utils/normalizers"
 
 export interface FiltersProps<Q> {
@@ -31,7 +34,6 @@ export function Filters<T>({
   const { t } = useTranslation()
 
   const filterLabels = {
-    [Filter.DeliveryStatus]: t("Livraison"),
     [Filter.Periods]: t("Périodes"),
     [Filter.ProductionSites]: t("Sites de production"),
     [Filter.Feedstocks]: t("Matières Premières"),
@@ -43,12 +45,10 @@ export function Filters<T>({
     [Filter.Suppliers]: t("Fournisseurs"),
     [Filter.AddedBy]: t("Ajouté par"),
     [Filter.Errors]: t("Incohérences"),
-    [Filter.Forwarded]: t("Lots Transférés"),
-    [Filter.Mac]: t("Mises à consommation"),
-    [Filter.HiddenByAdmin]: t("Lots ignorés"),
-    [Filter.HiddenByAuditor]: t("Lots ignorés"),
     [Filter.ClientTypes]: t("Types de client"),
     [Filter.ShowEmpty]: t("Inclure stocks vides"),
+    [Filter.DeliveryTypes]: t("Types de livraison"),
+    [Filter.LotStatus]: t("Statut")
   }
 
   return (
@@ -109,11 +109,14 @@ export const FilterSelect = ({
   />
 )
 
-const filterNormalizers: Partial<Record<Filter, Normalizer<Option, string>>> = {
+const filterNormalizers: Partial<Record<Filter, Normalizer<Option<any>, string>>> = {
   [Filter.Feedstocks]: normalizeFeedstockFilter,
   [Filter.Biofuels]: normalizeBiofuelFilter,
   [Filter.CountriesOfOrigin]: normalizeCountryFilter,
   [Filter.Errors]: normalizeAnomalyFilter,
+  [Filter.DeliveryTypes]: normalizeDeliveryTypeFilter,
+  [Filter.LotStatus]: normalizeLotStatusFilter,
+  [Filter.ClientTypes]: normalizeEntityTypeFilter,
 }
 
 export function useFilterParams() {

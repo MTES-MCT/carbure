@@ -14,11 +14,12 @@ export const LotTag = ({ lot, ...props }: LotTagProps) => {
   let label = t("N/A")
   let variant: TagVariant | undefined = undefined
 
-  const isClient = lot.carbure_client?.id === entity.id
-
   const status = lot.lot_status
   const correction = lot.correction_status
   const delivery = lot.delivery_type
+
+  const isClient = lot.carbure_client?.id === entity.id
+  const knowsDelivery = isClient || entity.isAdmin || delivery !== DeliveryType.Unknown
 
   if (status === LotStatus.Draft) {
     label = t("Brouillon")
@@ -37,7 +38,7 @@ export const LotTag = ({ lot, ...props }: LotTagProps) => {
   } else if (status === LotStatus.Deleted) {
     label = t("Supprimé")
     variant = "danger"
-  } else if (isClient && delivery !== DeliveryType.Unknown) {
+  } else if (knowsDelivery) {
     variant = "success"
     if (delivery === DeliveryType.Blending) {
       label = t("Incorporé")

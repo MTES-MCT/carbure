@@ -103,12 +103,7 @@ const EntityUserRights = ({ entity }: { entity: Entity }) => {
     }
   })
 
-  const roleLabels = {
-    [UserRole.ReadOnly]: t("Lecture seule"),
-    [UserRole.ReadWrite]: t("Lecture/écriture"),
-    [UserRole.Admin]: t("Administration"),
-    [UserRole.Auditor]: t("Audit"),
-  }
+
 
   const columns: Column<UserRightRequest>[] = [
     padding,
@@ -123,7 +118,7 @@ const EntityUserRights = ({ entity }: { entity: Entity }) => {
     },
     {
       header: t("Droits"),
-      render: (r) => roleLabels[r.role],
+      render: (r) => getUserRoleLabel(r.role),
     },
     {
       header: t("Date"),

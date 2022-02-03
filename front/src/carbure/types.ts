@@ -17,6 +17,7 @@ export enum EntityType {
   Administration = "Administration",
   Auditor = "Auditor",
   ExternalAdmin = "Administration Externe",
+  Unknown = "Unknown"
 }
 
 export type ExternalAdminPages = "DCA" | "TIRIB"
