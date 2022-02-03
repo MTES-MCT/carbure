@@ -313,18 +313,15 @@ def sort_lots(lots, query):
     return lots
 
 
-def normalize_filter(list, value=None, label=None, has_unknown=False):
-    filters = []
+def normalize_filter(list, value=None, label=None):
     if value is None:
-        filters = [{'value': item, 'label': item} for item in list if item]
+        return [{'value': item, 'label': item} for item in list]
     elif label is None:
-        filters = [{'value': item[value], 'label': item[value]} for item in list if item]
+        return [{'value': item[value], 'label': item[value]} for item in list]
     else:
-        filters = [{'value': item[value], 'label': item[label]} for item in list if item]
-    if has_unknown:
-        filters.append({'value': 'UNKNOWN', 'label': "Inconnu"})
-    return filters
+        return [{'value': item[value], 'label': item[label]} for item in list]
 
+UNKNOWN_VALUE = 'UNKNOWN'
 def get_lots_filters_data(lots, query, entity, field):
     lots = filter_lots(lots, query, entity, blacklist=[field])
 
@@ -344,42 +341,6 @@ def get_lots_filters_data(lots, query, entity, field):
         periods = lots.values('period').distinct()
         return [{'value': str(v['period']), 'label': "%d-%02d" % (v['period']/100, v['period'] % 100)} for v in periods if v]
 
-    if field == 'production_sites':
-        production_sites = []
-        for item in lots.values('carbure_production_site__name', 'unknown_production_site').distinct():
-            if item['carbure_production_site__name'] not in ('', None):
-                production_sites.append(item['carbure_production_site__name'])
-            elif item['unknown_production_site'] not in ('', None):
-                production_sites.append(item['unknown_production_site'])
-        return normalize_filter(set(production_sites), has_unknown=True)
-
-    if field == 'delivery_sites':
-        delivery_sites = []
-        for item in lots.values('carbure_delivery_site__name', 'unknown_delivery_site').distinct():
-            if item['carbure_delivery_site__name'] not in ('', None):
-                delivery_sites.append(item['carbure_delivery_site__name'])
-            elif item['unknown_delivery_site'] not in ('', None):
-                delivery_sites.append(item['unknown_delivery_site'])
-        return normalize_filter(set(delivery_sites), has_unknown=True)
-
-    if field == 'clients':
-        clients = []
-        for item in lots.values('carbure_client__name', 'unknown_client').distinct():
-            if item['carbure_client__name'] not in ('', None):
-                clients.append(item['carbure_client__name'])
-            elif item['unknown_client'] not in ('', None):
-                clients.append(item['unknown_client'])
-        return normalize_filter(set(clients), has_unknown=True)
-
-    if field == 'suppliers':
-        suppliers = []
-        for item in lots.values('carbure_supplier__name', 'unknown_supplier').distinct():
-            if item['carbure_supplier__name'] not in ('', None):
-                suppliers.append(item['carbure_supplier__name'])
-            elif item['unknown_supplier'] not in ('', None):
-                suppliers.append(item['unknown_supplier'])
-        return normalize_filter(set(suppliers), has_unknown=True)
-
     if field == 'errors':
         generic_errors = lots.values('genericerror__error').exclude(genericerror__error=None).distinct()
         return normalize_filter(generic_errors, 'genericerror__error')
@@ -396,10 +357,35 @@ def get_lots_filters_data(lots, query, entity, field):
         lot_status = lots.values('lot_status').distinct()
         return normalize_filter(lot_status, 'lot_status')
 
+    if field == 'production_sites':
+        production_sites = []
+        for item in lots.annotate(production_site=Coalesce('carbure_production_site__name', 'unknown_production_site')).values('production_site').distinct():
+            production_sites.append(item['production_site'] or UNKNOWN_VALUE)
+        return normalize_filter(set(production_sites))
+
+    if field == 'delivery_sites':
+        delivery_sites = []
+        for item in lots.annotate(delivery_site=Coalesce('carbure_delivery_site__name', 'unknown_delivery_site')).values('delivery_site').distinct():
+            delivery_sites.append(item['delivery_site'] or UNKNOWN_VALUE)
+        return normalize_filter(set(delivery_sites))
+
+    if field == 'suppliers':
+        suppliers = []
+        for item in lots.annotate(supplier=Coalesce('carbure_supplier__name', 'unknown_supplier')).values('supplier').distinct():
+            suppliers.append(item['supplier'] or UNKNOWN_VALUE)
+        return normalize_filter(set(suppliers))
+
+    if field == 'clients':
+        clients = []
+        for item in lots.annotate(client=Coalesce('carbure_client__name', 'unknown_client')).values('client').distinct():
+            clients.append(item['client'] or UNKNOWN_VALUE)
+        return normalize_filter(set(clients))
+
     if field == 'client_types':
-        client_types = list(lots.exclude(carbure_client=None).values('carbure_client__entity_type').distinct())
-        client_types.append({'carbure_client__entity_type': Entity.UNKNOWN})
-        return normalize_filter(client_types, 'carbure_client__entity_type')
+        client_types = []
+        for item in lots.values('carbure_client__entity_type').distinct():
+            client_types.append(item['carbure_client__entity_type'] or Entity.UNKNOWN)
+        return normalize_filter(set(client_types))
 
 def get_stock_filters_data(stock, query, entity_id, field):
     stock = filter_stock(stock, query, entity_id=entity_id, blacklist=[field])
