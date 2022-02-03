@@ -1,6 +1,5 @@
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
-import { EntityType } from "carbure/types"
 import { useQuery } from "common-v2/hooks/async"
 import { findEntities } from "common-v2/api"
 import { Main } from "common-v2/components/scaffold"
@@ -9,6 +8,7 @@ import { Alert } from "common-v2/components/alert"
 import { AlertCircle } from "common-v2/components/icons"
 import Table from "common-v2/components/table"
 import useTitle from "common-v2/hooks/title"
+import { getEntityTypeLabel } from "common-v2/utils/normalizers"
 
 const Registry = () => {
   const { t } = useTranslation()
@@ -20,15 +20,6 @@ const Registry = () => {
     key: "entities",
     params: [query],
   })
-
-  const entityTypes = {
-    [EntityType.Administration]: t("Administration"),
-    [EntityType.Operator]: t("Opérateur"),
-    [EntityType.Producer]: t("Producteur"),
-    [EntityType.Auditor]: t("Auditeur"),
-    [EntityType.Trader]: t("Trader"),
-    [EntityType.ExternalAdmin]: t("Administration Externe"),
-  }
 
   const entitiesData = entities.result ?? []
   const isEmpty = entitiesData.length === 0
@@ -74,8 +65,8 @@ const Registry = () => {
               {
                 key: "entity_type",
                 header: t("Activité"),
-                cell: (e) => entityTypes[e.entity_type],
-                orderBy: (e) => entityTypes[e.entity_type],
+                cell: (e) => getEntityTypeLabel(e.entity_type),
+                orderBy: (e) => getEntityTypeLabel(e.entity_type),
               },
             ]}
           />

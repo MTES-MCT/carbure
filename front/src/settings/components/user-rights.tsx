@@ -8,13 +8,14 @@ import { AlertCircle, Check, Cross } from "common-v2/components/icons"
 import { Section, SectionBody, SectionHeader } from "common/components/section"
 import Table, { Actions, Column, padding } from "common/components/table"
 import useAPI from "common/hooks/use-api"
-import { UserRightRequest, UserRightStatus, UserRole } from "carbure/types"
+import { UserRightRequest, UserRightStatus } from "carbure/types"
 import { useEffect } from "react"
 import { formatDate } from "settings/components/common"
 import * as api from "../api"
 import styles from "entities/components/user-rights.module.css"
 import colStyles from "common/components/table.module.css"
 import { Entity } from "carbure/types"
+import { getUserRoleLabel } from "common-v2/utils/normalizers"
 
 const RIGHTS_ORDER = {
   [UserRightStatus.Pending]: 0,
@@ -102,8 +103,6 @@ const EntityUserRights = ({ entity }: { entity: Entity }) => {
         return []
     }
   })
-
-
 
   const columns: Column<UserRightRequest>[] = [
     padding,
