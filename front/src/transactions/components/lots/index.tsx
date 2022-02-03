@@ -484,6 +484,8 @@ export function useLotQuery({
       limit,
       order,
       filters,
+      deadline,
+      page,
     ]
   )
 }

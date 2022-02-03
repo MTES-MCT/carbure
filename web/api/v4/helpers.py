@@ -186,6 +186,7 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
     history = query.get('history', False)
     correction = query.get('correction', False)
     client_types = query.getlist('client_types', [])
+    lot_status = query.getlist('lot_status', False)
 
     # selection overrides all other filters
     if len(selection) > 0:
@@ -195,6 +196,9 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
         lots = lots.filter(Q(correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED]) | Q(lot_status=CarbureLot.REJECTED))
     elif history != 'true' and entity.entity_type not in (Entity.ADMIN):
         lots = lots.exclude(lot_status__in=[CarbureLot.FROZEN, CarbureLot.ACCEPTED])
+
+    if lot_status and 'lot_status' not in blacklist:
+        lots = lots.filter(lot_status__in=lot_status)
 
     if year and 'year' not in blacklist:
         lots = lots.filter(year=year)
