@@ -65,9 +65,8 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
   const matomo = useMatomo()
   const entity = useEntity()
 
-  const { value, bind, setValue, setField } = useForm({ ...defaultSplit, entity }, { setValue: checkForm })
+  const { value, bind, setValue, setField } = useForm({ ...defaultSplit, entity, stock_id: stock.carbure_id}, { setValue: checkForm })
   const deliveryTypes = getDeliveryTypes(entity, value.client)
-  value.stock_id = stock.carbure_id
   const splitStock = useMutation(api.splitStock, {
     invalidates: ["snapshot", "stock-details"],
 
