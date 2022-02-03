@@ -6,15 +6,7 @@ import { Normalizer, Option } from "common-v2/utils/normalize"
 import { Grid, Row } from "common-v2/components/scaffold"
 import { MultiSelect, MultiSelectProps } from "common-v2/components/multi-select" // prettier-ignore
 import Button from "common-v2/components/button"
-import {
-  normalizeAnomalyFilter,
-  normalizeBiofuelFilter,
-  normalizeCountryFilter,
-  normalizeFeedstockFilter,
-  normalizeDeliveryTypeFilter,
-  normalizeLotStatusFilter,
-  normalizeEntityTypeFilter
-} from "common-v2/utils/normalizers"
+import * as norm from "common-v2/utils/normalizers"
 
 export interface FiltersProps<Q> {
   query: Q
@@ -48,7 +40,7 @@ export function Filters<T>({
     [Filter.ClientTypes]: t("Types de client"),
     [Filter.ShowEmpty]: t("Inclure stocks vides"),
     [Filter.DeliveryTypes]: t("Types de livraison"),
-    [Filter.LotStatus]: t("Statut")
+    [Filter.LotStatus]: t("Statut"),
   }
 
   return (
@@ -105,18 +97,24 @@ export const FilterSelect = ({
     value={value}
     onChange={onChange}
     normalize={filterNormalizers[field]}
-    sort={(item) => item.label}
+    sort={(item) => (item.value === "UNKNOWN" ? "" : item.label)}
   />
 )
 
-const filterNormalizers: Partial<Record<Filter, Normalizer<Option<any>, string>>> = {
-  [Filter.Feedstocks]: normalizeFeedstockFilter,
-  [Filter.Biofuels]: normalizeBiofuelFilter,
-  [Filter.CountriesOfOrigin]: normalizeCountryFilter,
-  [Filter.Errors]: normalizeAnomalyFilter,
-  [Filter.DeliveryTypes]: normalizeDeliveryTypeFilter,
-  [Filter.LotStatus]: normalizeLotStatusFilter,
-  [Filter.ClientTypes]: normalizeEntityTypeFilter,
+type FilterNormalizers= Partial<Record<Filter, Normalizer<Option<any>, string>>> // prettier-ignore
+const filterNormalizers: FilterNormalizers = {
+  [Filter.Feedstocks]: norm.normalizeFeedstockFilter,
+  [Filter.Biofuels]: norm.normalizeBiofuelFilter,
+  [Filter.CountriesOfOrigin]: norm.normalizeCountryFilter,
+  [Filter.Errors]: norm.normalizeAnomalyFilter,
+  [Filter.DeliveryTypes]: norm.normalizeDeliveryTypeFilter,
+  [Filter.LotStatus]: norm.normalizeLotStatusFilter,
+  [Filter.ClientTypes]: norm.normalizeEntityTypeFilter,
+  [Filter.Suppliers]: norm.normalizeUnknownFilter,
+  [Filter.Clients]: norm.normalizeUnknownFilter,
+  [Filter.DeliverySites]: norm.normalizeUnknownFilter,
+  [Filter.ProductionSites]: norm.normalizeUnknownFilter,
+  [Filter.Depots]: norm.normalizeUnknownFilter,
 }
 
 export function useFilterParams() {
