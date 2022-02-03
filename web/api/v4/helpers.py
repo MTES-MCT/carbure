@@ -202,26 +202,43 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
 
     if year and 'year' not in blacklist:
         lots = lots.filter(year=year)
+    if len(delivery_types) > 0 and 'delivery_types' not in blacklist:
+        lots = lots.filter(delivery_type__in=delivery_types)
+    if len(correction_statuses) > 0 and 'correction_statuses' not in blacklist:
+        lots = lots.filter(correction_status__in=correction_statuses)
     if len(periods) > 0 and 'periods' not in blacklist:
         lots = lots.filter(period__in=periods)
-    if len(production_sites) > 0 and 'production_sites' not in blacklist:
-        lots = lots.filter(Q(carbure_production_site__name__in=production_sites) | Q(unknown_production_site__in=production_sites))
     if len(feedstocks) > 0 and 'feedstocks' not in blacklist:
         lots = lots.filter(feedstock__code__in=feedstocks)
     if len(biofuels) > 0 and 'biofuels' not in blacklist:
         lots = lots.filter(biofuel__code__in=biofuels)
     if len(countries_of_origin) > 0 and 'countries_of_origin' not in blacklist:
         lots = lots.filter(country_of_origin__code_pays__in=countries_of_origin)
+
+    if len(production_sites) > 0 and 'production_sites' not in blacklist:
+        production_site_filter = Q(carbure_production_site__name__in=production_sites) | Q(unknown_production_site__in=production_sites)
+        if 'UNKNOWN' in production_sites:
+            production_site_filter = production_site_filter | (Q(carbure_production_site__isnull=True) & (Q(unknown_production_site=None) | Q(unknown_production_site='')))
+        lots = lots.filter(production_site_filter)
+
     if len(delivery_sites) > 0 and 'delivery_sites' not in blacklist:
-        lots = lots.filter(Q(carbure_delivery_site__name__in=delivery_sites) | Q(unknown_delivery_site__in=delivery_sites))
+        delivery_site_filter = Q(carbure_delivery_site__name__in=delivery_sites) | Q(unknown_delivery_site__in=delivery_sites)
+        if 'UNKNOWN' in delivery_sites:
+            delivery_site_filter = delivery_site_filter | (Q(carbure_delivery_site__isnull=True) & (Q(unknown_delivery_site=None) | Q(unknown_delivery_site='')))
+        lots = lots.filter(delivery_site_filter)
+
     if len(clients) > 0 and 'clients' not in blacklist:
-        lots = lots.filter(Q(carbure_client__name__in=clients) | Q(unknown_client__in=clients))
+        client_filter = Q(carbure_client__name__in=clients) | Q(unknown_client__in=clients)
+        if 'UNKNOWN' in clients:
+            client_filter = client_filter | (Q(carbure_client__isnull=True) & (Q(unknown_client=None) | Q(unknown_client='')))
+        lots = lots.filter(client_filter)
+
     if len(suppliers) > 0 and 'suppliers' not in blacklist:
-        lots = lots.filter(Q(carbure_supplier__name__in=suppliers) | Q(unknown_supplier__in=suppliers))
-    if len(delivery_types) > 0 and 'delivery_types' not in blacklist:
-        lots = lots.filter(delivery_type__in=delivery_types)
-    if len(correction_statuses) > 0 and 'correction_statuses' not in blacklist:
-        lots = lots.filter(correction_status__in=correction_statuses)
+        supplier_filter = Q(carbure_supplier__name__in=suppliers) | Q(unknown_supplier__in=suppliers)
+        if 'UNKNOWN' in suppliers:
+            supplier_filter = supplier_filter | (Q(carbure_supplier__isnull=True) & (Q(unknown_supplier=None) | Q(unknown_supplier='')))
+        lots = lots.filter(supplier_filter)
+
     if len(client_types) > 0 and 'client_types' not in blacklist:
         client_type_filter = Q(carbure_client__entity_type__in=client_types)
         if Entity.UNKNOWN in client_types:
@@ -296,14 +313,17 @@ def sort_lots(lots, query):
     return lots
 
 
-def normalize_filter(list, value=None, label=None):
+def normalize_filter(list, value=None, label=None, has_unknown=False):
+    filters = []
     if value is None:
-        return [{'value': item, 'label': item} for item in list if item]
-    if label is None:
-        return [{'value': item[value], 'label': item[value]} for item in list if item]
+        filters = [{'value': item, 'label': item} for item in list if item]
+    elif label is None:
+        filters = [{'value': item[value], 'label': item[value]} for item in list if item]
     else:
-        return [{'value': item[value], 'label': item[label]} for item in list if item]
-
+        filters = [{'value': item[value], 'label': item[label]} for item in list if item]
+    if has_unknown:
+        filters.append({'value': 'UNKNOWN', 'label': "Inconnu"})
+    return filters
 
 def get_lots_filters_data(lots, query, entity, field):
     lots = filter_lots(lots, query, entity, blacklist=[field])
@@ -331,7 +351,7 @@ def get_lots_filters_data(lots, query, entity, field):
                 production_sites.append(item['carbure_production_site__name'])
             elif item['unknown_production_site'] not in ('', None):
                 production_sites.append(item['unknown_production_site'])
-        return normalize_filter(set(production_sites))
+        return normalize_filter(set(production_sites), has_unknown=True)
 
     if field == 'delivery_sites':
         delivery_sites = []
@@ -340,7 +360,7 @@ def get_lots_filters_data(lots, query, entity, field):
                 delivery_sites.append(item['carbure_delivery_site__name'])
             elif item['unknown_delivery_site'] not in ('', None):
                 delivery_sites.append(item['unknown_delivery_site'])
-        return normalize_filter(set(delivery_sites))
+        return normalize_filter(set(delivery_sites), has_unknown=True)
 
     if field == 'clients':
         clients = []
@@ -349,7 +369,7 @@ def get_lots_filters_data(lots, query, entity, field):
                 clients.append(item['carbure_client__name'])
             elif item['unknown_client'] not in ('', None):
                 clients.append(item['unknown_client'])
-        return normalize_filter(set(clients))
+        return normalize_filter(set(clients), has_unknown=True)
 
     if field == 'suppliers':
         suppliers = []
@@ -358,7 +378,7 @@ def get_lots_filters_data(lots, query, entity, field):
                 suppliers.append(item['carbure_supplier__name'])
             elif item['unknown_supplier'] not in ('', None):
                 suppliers.append(item['unknown_supplier'])
-        return normalize_filter(set(suppliers))
+        return normalize_filter(set(suppliers), has_unknown=True)
 
     if field == 'errors':
         generic_errors = lots.values('genericerror__error').exclude(genericerror__error=None).distinct()

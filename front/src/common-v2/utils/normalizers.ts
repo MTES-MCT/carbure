@@ -57,7 +57,6 @@ export const normalizeEntityDepot: Normalizer<EntityDepot> = (depot) => ({
   value: depot
 })
 
-
 // prettier-ignore
 export const normalizeCertificate: Normalizer<Certificate> = (certificate) => ({
   value: certificate,
@@ -117,8 +116,14 @@ export const normalizeEntityTypeFilter: Normalizer<Option<EntityType>, string> =
   label: getEntityTypeLabel(type.value)
 })
 
+// prettier-ignore
+export const normalizeUnknownFilter: Normalizer<Option<any>, string> = (nullable) => ({
+  value: nullable.value,
+  label: nullable.value === "Unknown" ? i18next.t("Inconnu") : nullable.label
+})
+
 export function getEntityTypeLabel(type: EntityType) {
-  switch(type) {
+  switch (type) {
     case EntityType.Administration:
       return i18next.t("Administration")
     case EntityType.Operator:
@@ -138,7 +143,7 @@ export function getEntityTypeLabel(type: EntityType) {
 }
 
 export function getUserRoleLabel(role: UserRole) {
-  switch(role) {
+  switch (role) {
     case UserRole.ReadOnly:
       return i18next.t("Lecture seule")
     case UserRole.ReadWrite:
