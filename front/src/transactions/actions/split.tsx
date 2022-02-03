@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next"
-import { DeliveryType, Stock, StockPayload } from "../types"
+import { Stock, StockPayload } from "../types"
 import * as api from "../api"
-import useEntity, { EntityManager } from "carbure/hooks/entity"
+import useEntity from "carbure/hooks/entity"
 import { useMutation } from "common-v2/hooks/async"
 import { useNotify } from "common-v2/components/notifications"
 import Button from "common-v2/components/button"
@@ -47,26 +47,31 @@ interface ApproveFixDialogProps {
   onClose: () => void
 }
 
-function checkForm(form: SplitForm) {
-  const knownClient = form.client instanceof Object ? form.client : null
-  const isClientEntity = knownClient?.id === form.entity.id
-  const isClientUnknown = knownClient === null
-
-  if (!isClientEntity && !isClientUnknown) {
-    form.delivery_type = undefined
-  }
-
-  return form
-}
-
 const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
   const matomo = useMatomo()
   const entity = useEntity()
 
-  const { value, bind, setValue, setField } = useForm({ ...defaultSplit, entity, stock_id: stock.carbure_id}, { setValue: checkForm })
+  const { value, bind, setValue, setField } = useForm<SplitForm>(
+    { ...defaultSplit, stock_id: stock.carbure_id },
+    {
+      setValue: (form) => {
+        const knownClient = form.client instanceof Object ? form.client : null
+        const isClientEntity = knownClient?.id === entity.id
+        const isClientUnknown = knownClient === null
+
+        if (!isClientEntity && !isClientUnknown) {
+          form.delivery_type = undefined
+        }
+
+        return form
+      },
+    }
+  )
+
   const deliveryTypes = getDeliveryTypes(entity, value.client)
+
   const splitStock = useMutation(api.splitStock, {
     invalidates: ["snapshot", "stock-details"],
 
@@ -183,9 +188,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
   )
 }
 
-function formToStockPayload(
-  form: SplitForm
-): StockPayload {
+function formToStockPayload(form: SplitForm): StockPayload {
   return {
     stock_id: form.stock_id,
     volume: form.volume,
@@ -207,7 +210,6 @@ function formToStockPayload(
 }
 
 const defaultSplit = {
-  entity: {} as EntityManager,
   stock_id: undefined as string | undefined,
   delivery_type: undefined as string | undefined,
   volume: 0 as number | undefined,
