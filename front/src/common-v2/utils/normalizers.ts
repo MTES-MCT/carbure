@@ -119,7 +119,7 @@ export const normalizeEntityTypeFilter: Normalizer<Option<EntityType>, string> =
 // prettier-ignore
 export const normalizeUnknownFilter: Normalizer<Option<any>, string> = (nullable) => ({
   value: nullable.value,
-  label: nullable.value === "Unknown" ? i18next.t("Inconnu") : nullable.label
+  label: nullable.value === "UNKNOWN" ? i18next.t("Inconnu") : nullable.label
 })
 
 export function getEntityTypeLabel(type: EntityType) {
