@@ -148,7 +148,6 @@ def sanity_check(lot, prefetched_data):
         elif lot.ghg_reduction_red_ii > 99:
             errors.append(generic_error(error='GHG_REDUC_SUP_99', lot=lot))
         elif lot.ghg_reduction_red_ii < 50:
-            is_sane = False
             errors.append(generic_error(error='GHG_REDUC_INF_50', lot=lot, is_blocking=True))
         else:
             # all good
@@ -159,17 +158,14 @@ def sanity_check(lot, prefetched_data):
         elif lot.ghg_reduction > 99:
             errors.append(generic_error(error='GHG_REDUC_SUP_99', lot=lot))
         elif lot.ghg_reduction < 50:
-            is_sane = False
             errors.append(generic_error(error='GHG_REDUC_INF_50', lot=lot, is_blocking=True))
         else:
             # all good
             pass
 
     if lot.etd <= 0:
-        is_sane = False
         errors.append(generic_error(error='GHG_ETD_0', lot=lot, is_blocking=True, field='etd'))
     if lot.ep <= 0:
-        is_sane = False
         errors.append(generic_error(error='GHG_EP_0', lot=lot, is_blocking=True, field='ep'))
     if lot.el < 0:
         errors.append(generic_error(error='GHG_EL_NEG', lot=lot, field='el'))
@@ -177,10 +173,8 @@ def sanity_check(lot, prefetched_data):
     commissioning_date = lot.production_site_commissioning_date
     if commissioning_date and isinstance(commissioning_date, datetime.datetime) or isinstance(commissioning_date, datetime.date):
         if commissioning_date > oct2015 and lot.ghg_reduction < 60:
-            is_sane = False
             errors.append(generic_error(error='GHG_REDUC_INF_60', lot=lot, is_blocking=True))
         if commissioning_date >= jan2021 and lot.ghg_reduction < 65:
-            is_sane = False
             errors.append(generic_error(error='GHG_REDUC_INF_65', lot=lot, is_blocking=True))
 
     # provenance des matieres premieres
@@ -219,10 +213,8 @@ def sanity_check(lot, prefetched_data):
     if lot.biofuel and lot.feedstock:
         # consistence des matieres premieres avec biocarburant
         if lot.biofuel.is_alcool and lot.feedstock.compatible_alcool is False:
-            is_sane = False
             errors.append(generic_error(error='MP_BC_INCOHERENT', lot=lot, is_blocking=True, extra="%s issu de fermentation et %s n'est pas fermentescible" % (lot.biofuel.name, lot.feedstock.name), fields=['biofuel_code', 'feedstock_code']))
         if lot.biofuel.is_graisse and lot.feedstock.compatible_graisse is False:
-            is_sane = False
             errors.append(generic_error(error='MP_BC_INCOHERENT', lot=lot, is_blocking=True, extra="Matière première (%s) incompatible avec Esthers Méthyliques" % (lot.feedstock.name), fields=['biofuel_code', 'feedstock_code']))
 
         # double comptage, cas specifiques
@@ -230,33 +222,25 @@ def sanity_check(lot, prefetched_data):
             in_carbure_without_dc = lot.carbure_production_site and not lot.carbure_production_site.dc_reference
             not_in_carbure_without_dc = lot.unknown_production_site and not lot.production_site_double_counting_certificate
             if in_carbure_without_dc or not_in_carbure_without_dc:
-                is_sane = False
                 errors.append(generic_error(error='MISSING_REF_DBL_COUNTING', lot=lot, is_blocking=True, extra="%s de %s" % (lot.biofuel.name, lot.feedstock.name), field='production_site_dbl_counting'))
 
         if lot.biofuel.is_graisse:
             if lot.biofuel.code == 'EMHU' and lot.feedstock.code != 'HUILE_ALIMENTAIRE_USAGEE':
-                is_sane = False
                 errors.append(generic_error(error='MP_BC_INCOHERENT', lot=lot, is_blocking=True, extra="%s doit être à base d'huiles alimentaires usagées" % (lot.biofuel.name), fields=['biofuel_code', 'feedstock_code']))
             if lot.biofuel.code == 'EMHV' and lot.feedstock.code not in ['COLZA', 'TOURNESOL', 'SOJA', 'HUILE_PALME']:
-                is_sane = False
                 errors.append(generic_error(error='MP_BC_INCOHERENT',  lot=lot, is_blocking=True, extra="%s doit être à base de végétaux (Colza, Tournesol, Soja, Huile de Palme)" % (lot.biofuel.name), fields=['biofuel_code', 'feedstock_code']))
             if lot.biofuel.code == 'EMHA' and lot.feedstock.code not in ['HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2', 'HUILES_OU_GRAISSES_ANIMALES_CAT3']:
-                is_sane = False
                 errors.append(generic_error(error='MP_BC_INCOHERENT', lot=lot, is_blocking=True, extra="%s doit être à base d'huiles ou graisses animales" % (lot.biofuel.name), fields=['biofuel_code', 'feedstock_code']))
 
         if lot.feedstock.code in ['HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2', 'HUILES_OU_GRAISSES_ANIMALES_CAT3'] and lot.biofuel.code not in ['EMHA', 'HOE', 'HOG']:
-            is_sane = False
             errors.append(generic_error(error='MP_BC_INCOHERENT', lot=lot, is_blocking=True, extra="Des huiles ou graisses animales ne peuvent donner que des EMHA ou HOG/HOE", fields=['biofuel_code', 'feedstock_code']))
         if lot.feedstock.code == 'HUILE_ALIMENTAIRE_USAGEE' and lot.biofuel.code not in ['EMHU', 'HOE', 'HOG']:
-            is_sane = False
             errors.append(generic_error(error='MP_BC_INCOHERENT', lot=lot, is_blocking=True, extra="Des huiles alimentaires usagées ne peuvent donner que des EMHU ou HOG/HOE", fields=['biofuel_code', 'feedstock_code']))
 
         if lot.feedstock.code in ['MAIS', 'BLE', 'BETTERAVE', 'CANNE_A_SUCRE', 'RESIDUS_VINIQUES', 'LIES_DE_VIN', 'MARC_DE_RAISIN'] and lot.biofuel.code not in ['ETH', 'ETBE', 'ED95']:
-            is_sane = False
             errors.append(generic_error(error='MP_BC_INCOHERENT', lot=lot, is_blocking=True, extra="Maïs, Blé, Betterave, Canne à Sucre ou Résidus Viniques ne peuvent créer que de l'Éthanol ou ETBE", fields=['biofuel_code', 'feedstock_code']))
 
         if not lot.feedstock.is_huile_vegetale and lot.biofuel.code in ['HVOE', 'HVOG']:
-            is_sane = False
             errors.append(generic_error(error='MP_BC_INCOHERENT', lot=lot, is_blocking=True, extra="Un HVO doit provenir d'huiles végétales uniquement. Pour les autres huiles hydrotraitées, voir la nomenclature HOE/HOG", fields=['biofuel_code', 'feedstock_code']))
 
     # configuration
@@ -282,8 +266,12 @@ def sanity_check(lot, prefetched_data):
     # CERTIFICATES CHECK
     check_certificates(prefetched_data, lot, errors)
     if lot.delivery_date > future:
-        is_sane = False
         errors.append(GenericError(lot=lot, field='delivery_date', error="DELIVERY_IN_THE_FUTURE", extra="La date de livraison est dans le futur", value=lot.delivery_date, display_to_creator=True, is_blocking=True))
+
+    for e in errors:
+        if e.is_blocking:
+            is_sane = False
+            break
     return is_sane, errors
 
 
