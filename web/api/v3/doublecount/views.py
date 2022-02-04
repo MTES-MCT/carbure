@@ -229,6 +229,7 @@ def upload_file(request, *args, **kwargs):
             traceback.print_exc()
         return JsonResponse({'status': 'success', 'data': {'dca_id': dca.id}})
     except Exception as e:
+        traceback.print_exc()
         return JsonResponse({'status': "error", 'message': "File parsing error"}, status=400)
 
 
