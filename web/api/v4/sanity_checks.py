@@ -192,7 +192,8 @@ def sanity_check(lot, prefetched_data):
             errors.append(generic_error(error='DEPRECATED_MP', lot=lot, field='feedstock'))
 
         if lot.feedstock.category == 'CONV' and lot.eec == 0:
-            errors.append(generic_error(error='GHG_EEC_0', lot=lot, extra="GES Culture 0 pour MP conventionnelle (%s)" % (lot.feedstock.name), field='eec'))
+            # 2022-02-01: is_blocking=True sur demande de Guillaume
+            errors.append(generic_error(error='GHG_EEC_0', lot=lot, is_blocking=True, extra="GES Culture 0 pour MP conventionnelle (%s)" % (lot.feedstock.name), field='eec'))
 
         if lot.feedstock.code == 'SOJA':
             if lot.country_of_origin.code_pays not in ['US', 'AR', 'BR', 'UY', 'PY']:
