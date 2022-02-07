@@ -15,6 +15,7 @@ import { formatNumber, formatPercentage } from "common-v2/utils/formatters"
 import StockTraceability from "./components/stock-traceability"
 import { SplitOneButton } from "transactions/actions/split"
 import { useCategory } from "transactions/components/category"
+import { UserRole } from "carbure/types"
 
 interface StockDetailsProps {
   neighbors: number[]
@@ -34,6 +35,8 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
     key: "stock-details",
     params: [entity.id, parseInt(params.id!)],
   })
+
+  const hasEditRights = entity.hasRights(UserRole.Admin, UserRole.ReadWrite)
 
   const stockData = stock.result?.data.data
   const owner = stockData?.stock.carbure_client
@@ -69,7 +72,7 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
       </main>
 
       <footer>
-        {stockData && stockData.stock.remaining_volume > 0 && (
+        {hasEditRights && stockData && stockData.stock.remaining_volume > 0 && (
           <SplitOneButton stock={stockData.stock} />
         )}
         <Alert icon={AlertCircle} variant="info">

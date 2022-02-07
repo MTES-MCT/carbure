@@ -108,7 +108,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
               icon={() => (
                 <Button
                   variant="primary"
-                  label={t("Max")}
+                  label={t("Maximum")}
                   action={() => setField("volume", stock.remaining_volume ?? 0)}
                 />
               )}
