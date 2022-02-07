@@ -213,6 +213,7 @@ export const DeliverySiteCountryField = (props: AutocompleteProps<Country>) => {
     return (
       <TextInput
         disabled
+        readOnly={props.readOnly}
         label={t("Pays de livraison")}
         value={norm.normalizeCountry(value.delivery_site.country).label}
       />

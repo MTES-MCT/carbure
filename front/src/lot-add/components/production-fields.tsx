@@ -164,6 +164,7 @@ export const ProductionCountryField = (props: AutocompleteProps<Country>) => {
     return (
       <TextInput
         disabled
+        readOnly={props.readOnly}
         label={t("Pays de production")}
         value={norm.normalizeCountry(value.production_site.country).label}
       />
