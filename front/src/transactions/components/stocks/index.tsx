@@ -1,7 +1,8 @@
 import { useMemo } from "react"
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom"
-import { Entity } from "carbure/types"
+import { UserRole } from "carbure/types"
 import { Snapshot, Stock, StockQuery, Filter } from "../../types"
+import useEntity from "carbure/hooks/entity"
 import { useQuery } from "common-v2/hooks/async"
 import * as api from "../../api"
 import { Bar } from "common-v2/components/scaffold"
@@ -17,16 +18,17 @@ import { QueryParams, useQueryParamsStore } from "../lots"
 import { useAutoCategory } from "../category"
 
 export interface StocksProps {
-  entity: Entity
   year: number
   snapshot: Snapshot | undefined
 }
 
 const EMPTY: number[] = []
 
-export const Stocks = ({ entity, year, snapshot }: StocksProps) => {
+export const Stocks = ({ year, snapshot }: StocksProps) => {
   const navigate = useNavigate()
   const location = useLocation()
+
+  const entity = useEntity()
 
   const status = "stocks"
   const category = useAutoCategory(status, snapshot)
@@ -74,15 +76,19 @@ export const Stocks = ({ entity, year, snapshot }: StocksProps) => {
           count={snapshot?.lots}
           search={state.search}
           category={state.category}
+          query={query}
+          selection={state.selection}
           onSearch={actions.setSearch}
           onSwitch={actions.setCategory}
         />
 
-        <StockActions
-          count={count}
-          query={query}
-          selection={state.selection} //
-        />
+        {entity.hasRights(UserRole.Admin, UserRole.ReadWrite) && (
+          <StockActions
+            count={count}
+            query={query}
+            selection={state.selection}
+          />
+        )}
 
         {count === 0 && (
           <NoResult

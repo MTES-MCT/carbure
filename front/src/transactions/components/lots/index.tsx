@@ -8,7 +8,7 @@ import {
   Navigate,
 } from "react-router-dom"
 import * as api from "../../api"
-import { Entity } from "carbure/types"
+import { Entity, UserRole } from "carbure/types"
 import {
   Lot,
   Snapshot,
@@ -17,6 +17,7 @@ import {
   LotQuery,
   Filter,
 } from "../../types"
+import useEntity from "carbure/hooks/entity"
 import { useAutoStatus } from "../status"
 import { useQuery } from "common-v2/hooks/async"
 import { Order } from "common-v2/components/table"
@@ -38,16 +39,16 @@ import useTitle from "common-v2/hooks/title"
 import { AdminStatus } from "controls/types"
 
 export interface LotsProps {
-  entity: Entity
   year: number
   snapshot: Snapshot | undefined
 }
 
-export const Lots = ({ entity, year, snapshot }: LotsProps) => {
+export const Lots = ({ year, snapshot }: LotsProps) => {
   const matomo = useMatomo()
   const location = useLocation()
   const navigate = useNavigate()
 
+  const entity = useEntity()
   const status = useAutoStatus()
   const category = useAutoCategory(status, snapshot)
 
@@ -104,16 +105,20 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
           count={snapshot?.lots}
           search={state.search}
           category={state.category}
+          query={query}
+          selection={state.selection}
           onSearch={actions.setSearch}
           onSwitch={actions.setCategory}
         />
 
-        <LotActions
-          count={count}
-          category={state.category}
-          query={query}
-          selection={state.selection} //
-        />
+        {entity.hasRights(UserRole.Admin, UserRole.ReadWrite) && (
+          <LotActions
+            count={count}
+            category={state.category}
+            query={query}
+            selection={state.selection}
+          />
+        )}
 
         {(state.invalid || totalErrors > 0) && (
           <InvalidSwitch
