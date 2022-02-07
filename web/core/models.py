@@ -4,7 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 import hashlib
-from django.db.models.signals import pre_delete, pre_save
+from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
 
 usermodel = get_user_model()
@@ -973,8 +973,8 @@ class CarbureStockTransformation(models.Model):
         verbose_name = 'CarbureStockTransformation'
         verbose_name_plural = 'CarbureStockTransformation'
 
-@receiver(pre_save, sender=CarbureLot)
-def lot_pre_save_gen_carbure_id(sender, instance, *args, **kwargs):
+@receiver(post_save, sender=CarbureLot)
+def lot_post_save_gen_carbure_id(sender, instance, *args, **kwargs):
     instance.generate_carbure_id()
 
 @receiver(pre_delete, sender=CarbureStockTransformation, dispatch_uid='stock_transformation_delete_signal')
@@ -1092,8 +1092,8 @@ class CarbureStock(models.Model):
             period = parent_lot.period
         self.carbure_id = 'S{period}-{country_of_production}-{delivery_site_id}-{id}'.format(period=period, country_of_production=country_of_production, delivery_site_id=delivery_site_id, id=self.id)
 
-@receiver(pre_save, sender=CarbureStock)
-def stock_pre_save_gen_carbure_id(sender, instance, *args, **kwargs):
+@receiver(post_save, sender=CarbureStock)
+def stock_post_save_gen_carbure_id(sender, instance, *args, **kwargs):
     instance.generate_carbure_id()
 
 class CarbureLotEvent(models.Model):

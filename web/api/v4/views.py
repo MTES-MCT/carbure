@@ -50,6 +50,8 @@ def get_snapshot(request, *args, **kwargs):
     lots = CarbureLot.objects.filter(year=year)
 
     drafts = lots.filter(added_by_id=entity_id, lot_status=CarbureLot.DRAFT)
+    drafts_imported = drafts.exclude(parent_stock__isnull=False)
+    drafts_stocks = drafts.filter(parent_stock__isnull=False)
 
     lots_in = lots.filter(carbure_client_id=entity_id).exclude(lot_status__in=[CarbureLot.DELETED, CarbureLot.DRAFT])
     lots_in_pending = lots_in.filter(lot_status=CarbureLot.PENDING)
@@ -65,7 +67,8 @@ def get_snapshot(request, *args, **kwargs):
     data['lots'] = {'draft': drafts.count(),
                     'in_total': lots_in.count(), 'in_pending': lots_in_pending.count(), 'in_tofix': lots_in_tofix.count(),
                     'stock': stock_not_empty.count(), 'stock_total': stock.count(),
-                    'out_total': lots_out.count(), 'out_pending': lots_out_pending.count(), 'out_tofix': lots_out_tofix.count()}
+                    'out_total': lots_out.count(), 'out_pending': lots_out_pending.count(), 'out_tofix': lots_out_tofix.count(),
+                    'draft_imported': drafts_imported.count(), 'draft_stocks': drafts_stocks.count()}
     return JsonResponse({'status': 'success', 'data': data})
 
 
@@ -301,7 +304,7 @@ def stock_split(request, *args, **kwargs):
 
         try:
             stock = CarbureStock.objects.get(carbure_id=entry['stock_id'])
-        except:
+        except Exception as e:
             return JsonResponse({'status': 'error', 'message': 'Could not find stock'}, status=400)
 
         if stock.carbure_client_id != int(entity_id):

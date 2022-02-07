@@ -187,6 +187,7 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
     correction = query.get('correction', False)
     client_types = query.getlist('client_types', [])
     lot_status = query.getlist('lot_status', False)
+    category = query.get('category', False)
 
     # selection overrides all other filters
     if len(selection) > 0:
@@ -214,6 +215,12 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
         lots = lots.filter(biofuel__code__in=biofuels)
     if len(countries_of_origin) > 0 and 'countries_of_origin' not in blacklist:
         lots = lots.filter(country_of_origin__code_pays__in=countries_of_origin)
+    if category == 'stocks':
+        lots = lots.filter(parent_stock__isnull=False)
+    elif category == 'imported':
+        lots = lots.filter(parent_stock__isnull=True)
+    else:
+        pass
 
     if len(production_sites) > 0 and 'production_sites' not in blacklist:
         production_site_filter = Q(carbure_production_site__name__in=production_sites) | Q(unknown_production_site__in=production_sites)
