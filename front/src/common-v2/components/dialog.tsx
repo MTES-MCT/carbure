@@ -42,6 +42,7 @@ export interface ConfirmProps {
   description: string
   confirm: string
   variant: ButtonVariant
+  icon?: React.ComponentType | React.ElementType
   onConfirm: () => Promise<any>
   onClose: () => void
 }
@@ -51,6 +52,7 @@ export const Confirm = ({
   description,
   confirm,
   variant,
+  icon = Check,
   onConfirm,
   onClose,
 }: ConfirmProps) => {
@@ -66,7 +68,7 @@ export const Confirm = ({
       <footer>
         <Button asideX icon={Return} label={t("Retour")} action={onClose} />
         <Button
-          icon={Check}
+          icon={icon}
           variant={variant}
           label={confirm}
           action={() => onConfirm().then(onClose)}

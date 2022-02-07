@@ -2,7 +2,6 @@ import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import {
   Entity,
-  EntityType,
   UserRightRequest,
   UserRightStatus,
   UserRole,
@@ -14,7 +13,11 @@ import * as common from "common-v2/api"
 import { useMutation } from "common-v2/hooks/async"
 import { usePortal } from "common-v2/components/portal"
 import { formatDate } from "common-v2/utils/formatters"
-import { normalizeEntity, getEntityTypeLabel, getUserRoleLabel } from "common-v2/utils/normalizers"
+import {
+  normalizeEntity,
+  getEntityTypeLabel,
+  getUserRoleLabel,
+} from "common-v2/utils/normalizers"
 import { Button, ExternalLink } from "common-v2/components/button"
 import { LoaderOverlay, Panel } from "common-v2/components/scaffold"
 import { Alert } from "common-v2/components/alert"
@@ -81,7 +84,9 @@ export const AccountAccesRights = () => {
             },
             {
               header: t("Type"),
-              cell: (r) => <Cell text={getEntityTypeLabel(r.entity.entity_type)} />,
+              cell: (r) => (
+                <Cell text={getEntityTypeLabel(r.entity.entity_type)} />
+              ),
             },
             {
               header: t("Droits"),
@@ -105,6 +110,7 @@ export const AccountAccesRights = () => {
                 action={() =>
                   portal((close) => (
                     <Confirm
+                      icon={Cross}
                       variant="danger"
                       title={t("Annuler mes accès")}
                       description={t(`Voulez vous annuler votre accès à {{entity}} ?`, { entity: right.entity.name })} // prettier-ignore
