@@ -25,7 +25,7 @@ import { isExpiring } from "common-v2/utils/deadline"
 import Alert from "common-v2/components/alert"
 import NavigationButtons from "./components/navigation"
 import LotActions from "./components/actions"
-import { Entity } from "carbure/types"
+import { Entity, UserRole } from "carbure/types"
 import LotTraceability, { hasTraceability } from "./components/lot-traceability"
 import { invalidate } from "common-v2/hooks/invalidate"
 import { useCategory } from "transactions/components/category"
@@ -72,7 +72,10 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
 
   const form = useLotForm(lotData?.lot, errors)
 
-  const editable = isEditable(lotData?.lot, entity)
+  const editable =
+    isEditable(lotData?.lot, entity) &&
+    entity.hasRights(UserRole.Admin, UserRole.ReadWrite)
+
   const expiring = isExpiring(lotData?.lot)
 
   const canSave = useMemo(
@@ -133,7 +136,11 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
 
         {lotData && comments.length > 0 && (
           <section>
-            <Comments lot={lotData?.lot} comments={comments} />
+            <Comments
+              readOnly={!editable}
+              lot={lotData?.lot}
+              comments={comments}
+            />
           </section>
         )}
 
@@ -163,7 +170,9 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
           />
         )}
 
-        {lotData && <LotActions lot={lotData.lot} canSave={canSave} />}
+        {lotData && editable && (
+          <LotActions lot={lotData.lot} canSave={canSave} />
+        )}
 
         <NavigationButtons
           neighbors={neighbors}

@@ -15,6 +15,7 @@ import * as api from "../api"
 import { Normalizer } from "common-v2/utils/normalize"
 import { useState } from "react"
 import Button from "common-v2/components/button"
+import { UserRole } from "carbure/types"
 
 export interface BlockingAnomaliesProps {
   anomalies: LotError[]
@@ -72,6 +73,7 @@ export const WarningAnomalies = ({ lot, anomalies }: WarningAnomaliesProps) => {
     { invalidates: [] }
   )
 
+  const hasEditRights = entity.hasRights(UserRole.Admin, UserRole.ReadWrite)
   const isAllChecked = anomalies.every((a) => checked?.includes(a.error))
 
   return (
@@ -85,38 +87,52 @@ export const WarningAnomalies = ({ lot, anomalies }: WarningAnomaliesProps) => {
           "Des incohérences potentielles ont été détectées, elles n'empêchent pas la validation du lot mais peuvent donner lieu à un contrôle."
         )}
       </section>
+
+      {hasEditRights && (
+        <section>
+          {t(
+            "Si vous souhaitez ignorer certaines de ces remarques, vous pouvez cocher la case correspondante. Lorsque toutes les cases sont cochées, le lot n'apparait plus comme incohérent sur CarbuRe."
+          )}
+        </section>
+      )}
+
       <section>
-        {t(
-          "Si vous souhaitez ignorer certaines de ces remarques, vous pouvez cocher la case correspondante. Lorsque toutes les cases sont cochées, le lot n'apparait plus comme incohérent sur CarbuRe."
+        {hasEditRights && (
+          <CheckboxGroup
+            variant="opacity"
+            value={checked}
+            options={anomalies}
+            onChange={setChecked}
+            onToggle={(error) => ackWarning.execute([error])}
+            normalize={normalizeAnomaly}
+          />
+        )}
+        {!hasEditRights && (
+          <ul>
+            {anomalies.map((anomaly, i) => (
+              <li key={i}>{getAnomalyText(anomaly)}</li>
+            ))}
+          </ul>
         )}
       </section>
 
-      <section>
-        <CheckboxGroup
-          variant="opacity"
-          value={checked}
-          options={anomalies}
-          onChange={setChecked}
-          onToggle={(error) => ackWarning.execute([error])}
-          normalize={normalizeAnomaly}
-        />
-      </section>
-
       <footer>
-        <Button
-          icon={isAllChecked ? Eye : EyeOff}
-          loading={ackWarning.loading}
-          label={
-            isAllChecked
-              ? t("Rétablir toutes ces remarques")
-              : t("Ignorer toutes ces remarques")
-          }
-          action={() => {
-            const errors = anomalies.map((a) => a.error)
-            ackWarning.execute(errors)
-            setChecked(isAllChecked ? [] : errors)
-          }}
-        />
+        {hasEditRights && (
+          <Button
+            icon={isAllChecked ? Eye : EyeOff}
+            loading={ackWarning.loading}
+            label={
+              isAllChecked
+                ? t("Rétablir toutes ces remarques")
+                : t("Ignorer toutes ces remarques")
+            }
+            action={() => {
+              const errors = anomalies.map((a) => a.error)
+              ackWarning.execute(errors)
+              setChecked(isAllChecked ? [] : errors)
+            }}
+          />
+        )}
       </footer>
     </Collapse>
   )
