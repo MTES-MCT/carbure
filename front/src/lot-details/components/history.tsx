@@ -20,6 +20,7 @@ export const LotHistory = ({ changes }: HistoryProps) => {
       label={t("Historique des modifications ({{amount}})", { amount: changes.length })} // prettier-ignore
     >
       <Table
+        order={{ column: "date", direction: "desc" }}
         rows={changes}
         columns={[
           {
@@ -51,17 +52,22 @@ export const LotHistory = ({ changes }: HistoryProps) => {
 }
 
 const FieldChange = ({ change }: { change: LotChange }) => {
-  const valueBefore = change.valueBefore ? JSON.stringify(change.valueBefore) : "" // prettier-ignore
-  const valueAfter = change.valueAfter ? JSON.stringify(change.valueAfter) : ""
+  const valueBefore = getFieldValue(change.valueBefore)
+  const valueAfter = getFieldValue(change.valueAfter)
 
   return (
-    <Row title={`${valueBefore ?? "∅"} → ${valueAfter ?? "∅"}`}>
-      {change.valueAfter && (
-        <span style={{ marginRight: 12 }}>{valueAfter}</span>
+    <Row
+      title={`${valueBefore ?? "∅"} → ${valueAfter ?? "∅"}`}
+      style={{ flexWrap: "wrap" }}
+    >
+      {valueAfter && <span style={{ marginRight: 12 }}>{valueAfter}</span>}
+      {valueBefore && (
+        <span
+          style={{ color: "var(--gray-dark)", textDecoration: "line-through" }}
+        >
+          {valueBefore}
+        </span>
       )}
-      <span style={{ fontWeight: "normal", textDecoration: "line-through" }}>
-        {valueBefore}
-      </span>
     </Row>
   )
 }
@@ -71,8 +77,8 @@ export interface LotChange {
   date: string
   field: string
   label: string
-  valueBefore: any
-  valueAfter: any
+  valueBefore: string
+  valueAfter: string
 }
 
 export function getLotChanges(updates: LotUpdate<any>[] = []): LotChange[] {
@@ -81,31 +87,31 @@ export function getLotChanges(updates: LotUpdate<any>[] = []): LotChange[] {
       // only show updates for the moment
       .filter((u) => u.event_type === "UPDATED")
       // flatten the updates so we have one row per change
-      .flatMap((u) => {
-        // backwards compatilibilty (maybe remove it later)
-        if ("field" in u.metadata) {
-          return {
-            field: u.metadata.field,
-            label: i18next.t(u.metadata.field, { ns: "fields" }),
-            valueBefore: u.metadata.value_before,
-            valueAfter: u.metadata.value_after,
-            user: u.user,
-            date: u.event_dt,
-          }
-        }
-
-        return (u.metadata as LotFieldUpdate).changed.map(
+      .flatMap((u) =>
+        (u.metadata as LotFieldUpdate).changed.map(
           ([field, valueBefore, valueAfter]) => ({
             field,
-            label: i18next.t(field, { ns: "fields" }),
-            valueBefore,
-            valueAfter,
             user: u.user,
             date: u.event_dt,
+            label: i18next.t(field, { ns: "fields" }),
+            valueBefore: getFieldValue(valueBefore),
+            valueAfter: getFieldValue(valueAfter),
           })
         )
-      })
+      )
       // remove updates with fields that are not translated
       .filter((u) => u.label !== u.field)
+      // remove updates that show no change
+      .filter((u) => u.valueBefore !== u.valueAfter)
   )
+}
+
+function getFieldValue(value: any) {
+  if (value instanceof Object && "name" in value) {
+    return `${value.name}`
+  } else if (["string", "number", "boolean"].includes(typeof value)) {
+    return `${value}`
+  } else {
+    return ""
+  }
 }
