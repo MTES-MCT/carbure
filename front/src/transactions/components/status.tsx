@@ -9,6 +9,7 @@ import { Col, Row } from "common-v2/components/scaffold"
 import css from "./status.module.css"
 import { formatNumber } from "common-v2/utils/formatters"
 import useEntity from "carbure/hooks/entity"
+import { compact } from "common-v2/utils/collection"
 
 export interface StatusTabsProps {
   loading: boolean
@@ -26,7 +27,7 @@ export const StatusTabs = ({
     <Tabs
       variant="main"
       className={css.statusTabs}
-      tabs={[
+      tabs={compact([
         {
           key: "draft",
           path: "drafts",
@@ -75,7 +76,7 @@ export const StatusTabs = ({
             />
           ),
         },
-      ]}
+      ])}
     />
   )
 }

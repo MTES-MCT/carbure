@@ -15,6 +15,7 @@ import { ChevronRight, Question } from "common-v2/components/icons"
 import republique from "../assets/images/republique.svg"
 import marianne from "../assets/images/Marianne.svg"
 import css from "./top-bar.module.css"
+import { compact } from "common-v2/utils/collection"
 
 const Topbar = () => {
   const entity = useEntity()
@@ -87,7 +88,7 @@ const Navigation = ({ entity }: NavigationProps) => {
         element={
           <Tabs
             variant="header"
-            tabs={[
+            tabs={compact([
               isAdmin && {
                 key: "dashboard",
                 path: "dashboard",
@@ -129,7 +130,7 @@ const Navigation = ({ entity }: NavigationProps) => {
                 path: "registry",
                 label: t("Annuaire"),
               },
-            ]}
+            ])}
           />
         }
       />
