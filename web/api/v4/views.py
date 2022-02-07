@@ -333,6 +333,7 @@ def stock_split(request, *args, **kwargs):
         lot.parent_stock = stock
         # common, mandatory data
         lot.delivery_date = try_get_date(entry['delivery_date'])
+        lot.year = lot.delivery_date.year
         lot.period = lot.delivery_date.year * 100 + lot.delivery_date.month
         lot.carbure_dispatch_site = stock.depot
         lot.dispatch_site_country = lot.carbure_dispatch_site.country
@@ -375,7 +376,7 @@ def stock_split(request, *args, **kwargs):
         # check if the stock has enough volume and update it
         if rounded_volume > stock.remaining_volume:
             return JsonResponse({'status': 'error', 'message': 'Not enough stock available Available [%.2f] Requested [%.2f]' % (stock.remaining_volume, rounded_volume)}, status=400)
-        
+
         lot.save()
         stock.remaining_volume = round(stock.remaining_volume - rounded_volume, 2)
         stock.remaining_weight = stock.get_weight()
