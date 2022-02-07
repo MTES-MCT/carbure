@@ -112,7 +112,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
         <section>
           <LotForm
             form={form}
-            readOnly={!editable}
+            readOnly={!editable || !hasEditRights}
             onSubmit={(form) => {
               matomo.push(["trackEvent", "lots-details", "save-lot-changes"])
               updateLot.execute(entity.id, form!)
@@ -156,7 +156,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
       </main>
 
       <footer>
-        {editable && (
+        {editable && hasEditRights && (
           <Button
             loading={updateLot.loading}
             disabled={canSave}
