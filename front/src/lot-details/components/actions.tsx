@@ -41,10 +41,6 @@ export const LotActions = ({ lot, canSave }: ActionBarProps) => {
         </Fragment>
       )}
 
-      {/* {isClient && status !== "DRAFT" && correction === "NO_PROBLEMO" && (
-        <TransferOneButton lot={lot} />
-      )} */}
-
       {(isCreator || isSupplier) && status !== "DRAFT" && (
         <Fragment>
           {correction === "NO_PROBLEMO" && <RecallOneButton lot={lot} />}
