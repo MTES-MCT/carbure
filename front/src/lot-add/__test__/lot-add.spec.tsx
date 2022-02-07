@@ -194,16 +194,13 @@ test("check the form fields are working", async () => {
   userEvent.click(await screen.findByText("Opérateur Test"))
   await screen.findByDisplayValue("Opérateur Test")
 
-  const dsite = getField(/^Site de livraison/)
-  const dsiteCountry = getField("Pays de livraison")
+  expect(getField("Pays de livraison")).not.toBeDisabled()
 
-  expect(dsiteCountry).not.toBeDisabled()
-
-  userEvent.type(dsite, "Test") // prettier-ignore
+  userEvent.type(getField(/^Site de livraison/), "Test") // prettier-ignore
   userEvent.click(await screen.findByText("Test Delivery Site"))
   await screen.findByDisplayValue("Test Delivery Site")
 
-  expect(dsiteCountry).toBeDisabled()
+  expect(getField("Pays de livraison")).toBeDisabled()
 
   userEvent.type(getField("Champ libre"), "blabla")
 

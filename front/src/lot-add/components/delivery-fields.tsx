@@ -208,6 +208,7 @@ export const DeliverySiteField = (props: AutocompleteProps<Depot | string>) => {
 export const DeliverySiteCountryField = (props: AutocompleteProps<Country>) => {
   const { t } = useTranslation()
   const { value, bind } = useFormContext<LotFormValue>()
+  const bound = bind("delivery_site_country")
 
   if (value.delivery_site instanceof Object) {
     return (
@@ -216,11 +217,11 @@ export const DeliverySiteCountryField = (props: AutocompleteProps<Country>) => {
         readOnly={props.readOnly}
         label={t("Pays de livraison")}
         value={norm.normalizeCountry(value.delivery_site.country).label}
+        error={bound.error}
       />
     )
   }
 
-  const bound = bind("delivery_site_country")
   return (
     <Autocomplete
       label={t("Pays de livraison")}
