@@ -13,7 +13,7 @@
 .notification {
   display: flex;
   position: relative;
-  width: 400px;
+  width: 480px;
   font-size: 1.1em;
   background-color: var(--black);
   color: var(--white);
