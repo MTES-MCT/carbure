@@ -30,10 +30,12 @@ import Tag, { TagVariant } from "common-v2/components/tag"
 import Form from "common-v2/components/form"
 import { useMatomo } from "matomo"
 import { useNotify } from "common-v2/components/notifications"
+import { useNavigate } from "react-router-dom"
 
 export const AccountAccesRights = () => {
   const { t } = useTranslation()
   const portal = usePortal()
+  const navigate = useNavigate()
 
   const user = useUser()
 
@@ -71,6 +73,7 @@ export const AccountAccesRights = () => {
 
       {user.requests.length > 0 && (
         <Table
+          onAction={(right) => navigate(`/org/${right.entity.id}`)}
           rows={user.requests}
           columns={[
             {
@@ -104,6 +107,7 @@ export const AccountAccesRights = () => {
             },
             actionColumn<UserRightRequest>((right) => [
               <Button
+                captive
                 variant="icon"
                 icon={Cross}
                 title={t("Annuler")}
