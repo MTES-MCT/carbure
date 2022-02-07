@@ -21,7 +21,7 @@ export const StockExcelButton = () => {
   return (
     <Button
       icon={Upload}
-      label={t("Extraire avec excel")}
+      label={t("Répartir avec excel")}
       action={() => portal((close) => <StockExcelDialog onClose={close} />)}
     />
   )
@@ -43,7 +43,7 @@ const StockExcelDialog = ({ onClose }: StockExcelDialogProps) => {
   return (
     <Dialog onClose={onClose}>
       <header>
-        <h1>{t("Extraire des lots des stocks avec Excel")}</h1>
+        <h1>{t("Répartir des lots des stocks avec Excel")}</h1>
       </header>
       <main>
         <section>
@@ -135,7 +135,7 @@ function useExtractStock(onClose?: () => void) {
     },
 
     onError: () => {
-      notify(t("L'extraction des stocks a échoué"), { variant: "danger" })
+      notify(t("La répartition des stocks a échoué"), { variant: "danger" })
       onClose?.()
     },
   })
