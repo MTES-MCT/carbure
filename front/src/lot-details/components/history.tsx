@@ -87,8 +87,19 @@ export function getLotChanges(updates: LotUpdate<any>[] = []): LotChange[] {
       // only show updates for the moment
       .filter((u) => u.event_type === "UPDATED")
       // flatten the updates so we have one row per change
-      .flatMap((u) =>
-        (u.metadata as LotFieldUpdate).changed.map(
+      .flatMap((u) => {
+        if ("field" in u.metadata) {
+          return {
+            field: u.metadata.field,
+            label: i18next.t(u.metadata.field, { ns: "fields" }),
+            valueBefore: u.metadata.value_before,
+            valueAfter: u.metadata.value_after,
+            user: u.user,
+            date: u.event_dt,
+          }
+        }
+
+        return (u.metadata as LotFieldUpdate).changed.map(
           ([field, valueBefore, valueAfter]) => ({
             field,
             user: u.user,
@@ -98,7 +109,7 @@ export function getLotChanges(updates: LotUpdate<any>[] = []): LotChange[] {
             valueAfter: getFieldValue(valueAfter),
           })
         )
-      )
+      })
       // remove updates with fields that are not translated
       .filter((u) => u.label !== u.field)
       // remove updates that show no change
