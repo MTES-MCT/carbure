@@ -9,7 +9,7 @@ export const CreateButton = () => {
       variant="primary"
       icon={Plus}
       label={t("Créer un lot")}
-      to="drafts/pending/add"
+      to="drafts/imported/add"
     />
   )
 }

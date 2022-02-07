@@ -171,7 +171,7 @@ export function useAutoStatus() {
 
   useEffect(() => {
     if (status === undefined) {
-      navigate("drafts/pending", { replace: true })
+      navigate("drafts/imported", { replace: true })
     }
   }, [status, navigate])
 
