@@ -6,11 +6,13 @@ import * as api from "../api"
 import { useMatomo } from "matomo"
 
 export interface ExportLotsButtonProps {
+  asideX?: boolean
   query: LotQuery
   selection: number[]
 }
 
 export const ExportLotsButton = ({
+  asideX,
   query,
   selection,
 }: ExportLotsButtonProps) => {
@@ -18,7 +20,7 @@ export const ExportLotsButton = ({
   const { t } = useTranslation()
   return (
     <Button
-      asideX
+      asideX={asideX}
       icon={Download}
       label={t("Exporter vers Excel")}
       action={() => {
@@ -35,11 +37,13 @@ export const ExportLotsButton = ({
 }
 
 export interface ExportStockButtonProps {
+  asideX?: boolean
   query: StockQuery
   selection: number[]
 }
 
 export const ExportStocksButton = ({
+  asideX,
   query,
   selection,
 }: ExportStockButtonProps) => {
@@ -47,7 +51,7 @@ export const ExportStocksButton = ({
   const { t } = useTranslation()
   return (
     <Button
-      asideX
+      asideX={asideX}
       icon={Download}
       label={t("Exporter vers Excel")}
       action={() => {

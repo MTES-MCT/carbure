@@ -15,7 +15,7 @@ export const StockActions = ({ count, ...props }: StockActionsProps) => {
     <ActionBar>
       <StockExcelButton />
       <TransformManyButton {...props} />
-      <ExportStocksButton {...props} />
+      <ExportStocksButton asideX {...props} />
     </ActionBar>
   )
 }

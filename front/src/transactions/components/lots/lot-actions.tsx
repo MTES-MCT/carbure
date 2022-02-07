@@ -67,7 +67,7 @@ export const LotActions = ({ count, category, ...props }: ActionBarProps) => {
         </Fragment>
       )}
 
-      <ExportLotsButton {...props} />
+      <ExportLotsButton asideX {...props} />
     </ActionBar>
   )
 }

@@ -8,6 +8,7 @@ import {
   useParams,
   useLocation,
 } from "react-router-dom"
+import { UserRole } from "carbure/types"
 import useEntity from "carbure/hooks/entity"
 import { useQuery } from "common-v2/hooks/async"
 import * as api from "./api"
@@ -35,7 +36,7 @@ export const Transactions = () => {
   const snapshotData = snapshot.result?.data.data
 
   // common props for subroutes
-  const props = { entity, year: years.selected, snapshot: snapshotData }
+  const props = { year: years.selected, snapshot: snapshotData }
 
   return (
     <PortalProvider>
@@ -55,7 +56,12 @@ export const Transactions = () => {
                 sort={(year) => -year.value}
               />
 
-              <DeclarationButton year={years.selected} years={years.options} />
+              {entity.hasRights(UserRole.Admin, UserRole.ReadWrite) && (
+                <DeclarationButton
+                  year={years.selected}
+                  years={years.options}
+                />
+              )}
             </section>
 
             <section>

@@ -1,4 +1,4 @@
-import { Snapshot } from "../types"
+import { LotQuery, Snapshot } from "../types"
 import { useStatus } from "./status"
 import { SearchInput } from "common-v2/components/input"
 import { ActionBar } from "common-v2/components/scaffold"
@@ -8,17 +8,35 @@ import {
   OutputSwitcher,
   StockSwitcher,
 } from "./category"
+import useEntity from "carbure/hooks/entity"
+import { UserRole } from "carbure/types"
+import {
+  ExportLotsButton,
+  ExportStocksButton,
+} from "transactions/actions/export"
 
 export interface SearchBarProps {
   category: string
   search: string | undefined
   count: Snapshot["lots"] | undefined
+  query: LotQuery
+  selection: number[]
   onSearch: (search: string | undefined) => void
   onSwitch: (category: string) => void
 }
 
-export const SearchBar = ({ search, onSearch, ...props }: SearchBarProps) => {
+export const SearchBar = ({
+  search,
+  onSearch,
+  query,
+  selection,
+  ...props
+}: SearchBarProps) => {
+  const entity = useEntity()
   const status = useStatus()
+
+  const isReadOnly = !entity.hasRights(UserRole.Admin, UserRole.ReadWrite)
+
   return (
     <ActionBar>
       {status === "drafts" && <DraftsSwitcher {...props} />}
@@ -33,6 +51,12 @@ export const SearchBar = ({ search, onSearch, ...props }: SearchBarProps) => {
         value={search}
         onChange={onSearch}
       />
+      {isReadOnly &&
+        (status === "stocks" ? (
+          <ExportStocksButton query={query} selection={selection} />
+        ) : (
+          <ExportLotsButton query={query} selection={selection} />
+        ))}
     </ActionBar>
   )
 }
