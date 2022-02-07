@@ -64,22 +64,27 @@ class LotsFlowTest(TestCase):
         lot = CarbureLot.objects.get(id=lot.id)
         return lot
         
-    def stock_split(self, payload):
+    def stock_split(self, payload, fail=False):
         response = self.client.post(reverse('api-v4-stock-split'), {'entity_id': self.producer.id, 'payload': json.dumps(payload)})
-        self.assertEqual(response.status_code, 200)
-        data = response.json()['data']
-        lot_id = data[0]
-        lot = CarbureLot.objects.get(id=lot_id)
-        return lot
+        if not fail:
+            self.assertEqual(response.status_code, 200)
+            data = response.json()['data']
+            lot_id = data[0]
+            lot = CarbureLot.objects.get(id=lot_id)
+            return lot
+        else:
+            self.assertEqual(response.status_code, 400)
+            return None
+
 
     def test_stock_split(self):
         lot = self.create_draft(carbure_client_id=self.producer.id, volume=50000, delivery_type=CarbureLot.STOCK) # assume the producer also manages his stock in CarbuRe
         lot = self.send_lot(lot)
-        lot = CarbureLot.objects.get(id=lot.id)
-        self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)
-        self.assertEqual(lot.delivery_type, CarbureLot.STOCK)
+        parent_lot = CarbureLot.objects.get(id=lot.id)
+        self.assertEqual(parent_lot.lot_status, CarbureLot.ACCEPTED)
+        self.assertEqual(parent_lot.delivery_type, CarbureLot.STOCK)
 
-        stock = CarbureStock.objects.get(parent_lot=lot)
+        stock = CarbureStock.objects.get(parent_lot=parent_lot)
 
         today = datetime.date.today().strftime('%d/%m/%Y')
         # 1: split 10000L for export
@@ -111,3 +116,15 @@ class LotsFlowTest(TestCase):
         lot = self.stock_split([payload])
         self.assertEqual(lot.lot_status, CarbureLot.DRAFT)
         self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
+        stock = CarbureStock.objects.get(parent_lot=parent_lot)
+        self.assertEqual(stock.remaining_volume, 0)
+
+        # 6: split 10000L for unknown_client - not enough volume
+        payload = {'volume': 10000, 'stock_id': stock.carbure_id, 'delivery_date': today, 'delivery_site_country_id': 'DE', 'transport_document_reference': 'FR-BLENDING-TEST', 'unknown_client': "FOREIGN CLIENT"}
+        failed = self.stock_split([payload], fail=True)
+
+        # 7: delete a draft, check that volume is correctly re-credited
+        response = self.client.post(reverse('api-v4-delete-lots'), {'entity_id': self.producer.id, 'lot_ids': [lot.id]})
+        self.assertEqual(response.status_code, 200)
+        stock = CarbureStock.objects.get(parent_lot=parent_lot)
+        self.assertEqual(stock.remaining_volume, 10000)
