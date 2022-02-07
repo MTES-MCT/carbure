@@ -368,20 +368,18 @@ def stock_split(request, *args, **kwargs):
         else:
             if lot.delivery_site_country is None:
                 return JsonResponse({'status': 'error', 'message': 'Mandatory delivery_site_country'}, status=400)
+
+        # check if the stock has enough volume and update it
+        if rounded_volume > stock.remaining_volume:
+            return JsonResponse({'status': 'error', 'message': 'Not enough stock available Available [%.2f] Requested [%.2f]' % (stock.remaining_volume, rounded_volume)}, status=400)
+        
         lot.save()
+        stock.remaining_volume = round(stock.remaining_volume - rounded_volume, 2)
+        stock.remaining_weight = stock.get_weight()
+        stock.remaining_lhv_amount = stock.get_lhv_amount()
+        stock.save()
         new_lot_ids.append(lot.id)
         bulk_sanity_checks([lot], prefetched_data, background=False)
-        # update stock
-        if rounded_volume >= stock.remaining_volume:
-            stock.remaining_volume = 0
-            stock.remaining_weight = 0
-            stock.remaining_lhv_amount = 0
-            rounded_volume = round(stock.remaining_volume, 2)
-        else:
-            stock.remaining_volume = round(stock.remaining_volume - rounded_volume, 2)
-            stock.remaining_weight = stock.get_weight()
-            stock.remaining_lhv_amount = stock.get_lhv_amount()
-        stock.save()
         # create events
         e = CarbureLotEvent()
         e.event_type = CarbureLotEvent.CREATED
