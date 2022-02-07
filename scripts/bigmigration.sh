@@ -6,3 +6,4 @@ python3 $CARBURE_HOME/scripts/check_etbe.py
 python3 $CARBURE_HOME/scripts/check_etbe.py
 python3 $CARBURE_HOME/scripts/recalc_stocks.py
 python3 $CARBURE_HOME/scripts/migration_v4.py
+python3 $CARBURE_HOME/scripts/flag_entities.py
