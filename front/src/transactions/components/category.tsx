@@ -30,7 +30,7 @@ export const DraftsSwitcher = ({
         {
           key: "imported",
           path: "drafts/imported",
-          label: `${t("Brouillons en attente")} (${formatNumber(count?.draft ?? 0)})`, // prettier-ignore
+          label: `${t("Brouillons en attente")} (${formatNumber(count?.draft_imported ?? 0)})`, // prettier-ignore
         },
         entity.has_stocks && {
           key: "stocks",
