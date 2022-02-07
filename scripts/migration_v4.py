@@ -319,8 +319,8 @@ def create_new_tx_and_child(tx, parent_stock_id=None):
             lot.save()
             TX_ID_MIGRATED[child.id] = lot.id
         except:
-            print('Forwarded TX has not child tx. strange')
-
+            tx.is_forwarded = False
+            tx.save()
     return lot
 
 BULK_COMMENTS = []
