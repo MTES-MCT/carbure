@@ -149,7 +149,7 @@ test("check the form fields are working", async () => {
   setEntity(producer)
   render(
     <TransactionAddWithRouter entityID={producer.id}>
-      <Route path="/drafts/pending/0" element={<span>LOT CREATED</span>} />
+      <Route path="/drafts/imported/0" element={<span>LOT CREATED</span>} />
     </TransactionAddWithRouter>
   )
 

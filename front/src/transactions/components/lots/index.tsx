@@ -176,7 +176,7 @@ export const Lots = ({ year, snapshot }: LotsProps) => {
       </section>
 
       <Routes>
-        <Route path="drafts/pending/add" element={<LotAdd />} />
+        <Route path="drafts/imported/add" element={<LotAdd />} />
         <Route
           path=":status/:category/:id"
           element={<LotDetails neighbors={ids} />}

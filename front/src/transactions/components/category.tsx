@@ -151,8 +151,8 @@ export function useAutoCategory(
   const category = match?.params.category
 
   useEffect(() => {
-    if (category === undefined) {
-      const defaultCategory = getDefaultCategory(status, snapshot)
+    const defaultCategory = getDefaultCategory(status, snapshot)
+    if (!isStatusCategory(status, category)) {
       if (status === "stocks") navigate(defaultCategory, { replace: true })
       else navigate(`${status}/${defaultCategory}`, { replace: true })
     }
@@ -166,7 +166,12 @@ export function getDefaultCategory(
   snapshot: Snapshot | undefined
 ) {
   if (snapshot === undefined) return "pending"
-  if (status === "drafts") return "pending"
+
+  if (status === "drafts") {
+    if (snapshot.lots.draft_imported > 0) return "imported"
+    else if (snapshot.lots.draft_stocks > 0) return "stocks"
+    else return "imported"
+  }
 
   const count = snapshot.lots
 
@@ -191,4 +196,16 @@ export function getDefaultCategory(
   else if (tofix > 0) return "correction"
   else if (total > 0) return "history"
   else return "pending"
+}
+
+function isStatusCategory(status: string, category: string | undefined) {
+  if (category === undefined) {
+    return false
+  } else if (status === "drafts") {
+    return ["imported", "stocks"].includes(category)
+  } else if (status === "stocks") {
+    return ["pending", "history"].includes(category)
+  } else {
+    return ["pending", "correction", "history"].includes(category)
+  }
 }

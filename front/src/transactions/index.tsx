@@ -80,7 +80,7 @@ export const Transactions = () => {
                 entity.has_stocks ? (
                   <Stocks {...props} />
                 ) : (
-                  <Navigate replace to="../drafts/pending" />
+                  <Navigate replace to="../drafts/imported" />
                 )
               }
             />
