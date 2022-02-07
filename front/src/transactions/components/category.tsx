@@ -4,6 +4,8 @@ import { formatNumber } from "common-v2/utils/formatters"
 import Tabs from "common-v2/components/tabs"
 import { useMatch, useNavigate } from "react-router-dom"
 import { useEffect } from "react"
+import { compact } from "common-v2/utils/collection"
+import useEntity from "carbure/hooks/entity"
 
 interface CategorySwitcherProps {
   category: string
@@ -17,19 +19,25 @@ export const DraftsSwitcher = ({
   onSwitch,
 }: CategorySwitcherProps) => {
   const { t } = useTranslation()
+  const entity = useEntity()
   return (
     <Tabs
       keepSearch
       variant="switcher"
       focus={category}
       onFocus={onSwitch}
-      tabs={[
+      tabs={compact([
         {
-          key: "pending",
-          path: "drafts/pending",
-          label: `${t("Tous les brouillons")} (${formatNumber(count?.draft ?? 0)})`, // prettier-ignore
+          key: "imported",
+          path: "drafts/imported",
+          label: `${t("Brouillons en attente")} (${formatNumber(count?.draft ?? 0)})`, // prettier-ignore
         },
-      ]}
+        entity.has_stocks && {
+          key: "stocks",
+          path: "drafts/stocks",
+          label: `${t("Stocks prêts à l'envoi")} (${formatNumber(count?.draft_stocks ?? 0)})`, // prettier-ignore
+        },
+      ])}
     />
   )
 }

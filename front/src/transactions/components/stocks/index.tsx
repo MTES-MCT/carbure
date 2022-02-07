@@ -162,6 +162,7 @@ export function useStockQuery({
     () => ({
       entity_id: entity.id,
       year,
+      category,
       history: category === "history" ? true : undefined,
       query: search ? search : undefined,
       sort_by: order?.column,

@@ -468,6 +468,7 @@ export function useLotQuery({
       entity_id: entity.id,
       year,
       status: status.toUpperCase(),
+      category,
       query: search ? search : undefined,
       history: category === "history" ? true : undefined,
       correction: category === "correction" ? true : undefined,
