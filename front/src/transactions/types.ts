@@ -113,11 +113,13 @@ export interface StockList {
 export interface Snapshot {
   lots: {
     draft: number
+    draft_imported: number
+    draft_stocks: number
     in_total: number
     in_pending: number
     in_tofix: number
-    stock: number
     stock_total: number
+    stock: number
     out_total: number
     out_pending: number
     out_tofix: number
@@ -235,7 +237,7 @@ export enum Filter {
   ClientTypes = "client_types",
   ShowEmpty = "show_empty",
   DeliveryTypes = "delivery_types",
-  LotStatus = "lot_status"
+  LotStatus = "lot_status",
 }
 
 export type FilterSelection = Partial<Record<Filter, string[]>>
@@ -261,6 +263,7 @@ export interface LotQuery {
   deadline?: boolean
   history?: boolean
   correction?: boolean
+  category?: string
   [Filter.Feedstocks]?: string[]
   [Filter.Biofuels]?: string[]
   [Filter.Periods]?: string[]

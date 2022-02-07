@@ -4,6 +4,8 @@ import { DeliveryType, LotList, LotSummary, Snapshot } from "transactions/types"
 export const emptySnapshot: Snapshot = {
   lots: {
     draft: 0,
+    draft_imported: 0,
+    draft_stocks: 0,
     in_total: 0,
     in_pending: 0,
     in_tofix: 0,
@@ -16,6 +18,8 @@ export const emptySnapshot: Snapshot = {
 }
 export const snapshot: Snapshot = {
   lots: {
+    draft_imported: 30,
+    draft_stocks: 0,
     draft: 30,
     in_total: 20,
     in_pending: 0,

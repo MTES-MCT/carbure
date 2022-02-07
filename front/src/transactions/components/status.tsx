@@ -82,6 +82,8 @@ export const StatusTabs = ({
 }
 
 const defaultCount: Snapshot["lots"] = {
+  draft_imported: 0,
+  draft_stocks: 0,
   draft: 0,
   in_pending: 0,
   in_tofix: 0,
