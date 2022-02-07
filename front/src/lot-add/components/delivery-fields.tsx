@@ -4,7 +4,11 @@ import { Fieldset, useBind, useFormContext } from "common-v2/components/form"
 import Autocomplete, {
   AutocompleteProps,
 } from "common-v2/components/autocomplete"
-import { DateInput, DateInputProps } from "common-v2/components/input"
+import {
+  DateInput,
+  DateInputProps,
+  TextInput,
+} from "common-v2/components/input"
 import { UserCheck } from "common-v2/components/icons"
 import * as api from "common-v2/api"
 import * as norm from "common-v2/utils/normalizers"
@@ -164,7 +168,10 @@ export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
   )
 }
 
-export function getDeliveryTypes(entity: EntityManager, client: Entity | string | undefined) {
+export function getDeliveryTypes(
+  entity: EntityManager,
+  client: Entity | string | undefined
+) {
   const { isOperator, has_stocks, has_mac, has_direct_deliveries } = entity
   const isClientEntity = client instanceof Object ? client.id === entity.id : false // prettier-ignore
   const isClientUnknown = client === undefined || typeof client === "string"
@@ -176,7 +183,6 @@ export function getDeliveryTypes(entity: EntityManager, client: Entity | string 
     isClientUnknown && has_direct_deliveries && DeliveryType.Direct,
     isClientUnknown && DeliveryType.Export,
   ])
-
 }
 
 export const DeliverySiteField = (props: AutocompleteProps<Depot | string>) => {
@@ -202,11 +208,20 @@ export const DeliverySiteField = (props: AutocompleteProps<Depot | string>) => {
 export const DeliverySiteCountryField = (props: AutocompleteProps<Country>) => {
   const { t } = useTranslation()
   const { value, bind } = useFormContext<LotFormValue>()
-  const bound = bind("delivery_site_country")
 
+  if (value.delivery_site instanceof Object) {
+    return (
+      <TextInput
+        disabled
+        label={t("Pays de livraison")}
+        value={norm.normalizeCountry(value.delivery_site.country).label}
+      />
+    )
+  }
+
+  const bound = bind("delivery_site_country")
   return (
     <Autocomplete
-      disabled={value.delivery_site instanceof Object}
       label={t("Pays de livraison")}
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={api.findCountries}
