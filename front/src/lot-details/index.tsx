@@ -72,10 +72,8 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
 
   const form = useLotForm(lotData?.lot, errors)
 
-  const editable =
-    isEditable(lotData?.lot, entity) &&
-    entity.hasRights(UserRole.Admin, UserRole.ReadWrite)
-
+  const editable = isEditable(lotData?.lot, entity)
+  const hasEditRights = entity.hasRights(UserRole.Admin, UserRole.ReadWrite)
   const expiring = isExpiring(lotData?.lot)
 
   const canSave = useMemo(
@@ -170,7 +168,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
           />
         )}
 
-        {lotData && editable && (
+        {lotData && hasEditRights && (
           <LotActions lot={lotData.lot} canSave={canSave} />
         )}
 
@@ -191,7 +189,6 @@ function isEditable(lot: Lot | undefined, entity: Entity) {
   if (lot === undefined) return false
 
   const isCreator = lot.added_by?.id === entity.id
-
   return (
     [LotStatus.Draft, LotStatus.Rejected].includes(lot.lot_status) ||
     (isCreator && lot.correction_status === CorrectionStatus.InCorrection)
