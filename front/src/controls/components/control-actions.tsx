@@ -26,7 +26,6 @@ export const ControlActions = ({
 
   return (
     <ActionBar>
-      <ExportLotsButton {...props} />
       <PinManyButton {...props} lots={selectedLots} />
 
       <SearchInput
@@ -36,6 +35,8 @@ export const ControlActions = ({
         value={search}
         onChange={onSearch}
       />
+
+      <ExportLotsButton {...props} />
     </ActionBar>
   )
 }
