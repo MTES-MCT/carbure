@@ -22,7 +22,7 @@ export interface TabsProps extends Layout {
   style?: React.CSSProperties
   variant?: TabVariant
   keepSearch?: boolean
-  tabs: (Tab | false)[]
+  tabs: Tab[]
   focus?: string
   onFocus?: (tab: string) => void
   children?: (tab: string) => React.ReactNode
