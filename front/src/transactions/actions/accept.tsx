@@ -632,9 +632,9 @@ const TradingDialog = ({
 
     onSuccess: () => {
       const text = v({
-        zero: t("Les lots ont été placés dans votre stock !"),
-        one: t("Le lot a été placé dans votre stock !"),
-        many: t("Les lots sélectionnés ont été placés dans votre stock !"),
+        zero: t("Les lots ont été transférés !"),
+        one: t("Le lot a été transféré !"),
+        many: t("Les lots sélectionnés ont été transférés !"),
       })
 
       notify(text, { variant: "success" })
@@ -742,9 +742,9 @@ const ProcessingDialog = ({
 
     onSuccess: () => {
       const text = v({
-        zero: t("Les lots ont été placés dans votre stock !"),
-        one: t("Le lot a été placé dans votre stock !"),
-        many: t("Les lots sélectionnés ont été placés dans votre stock !"),
+        zero: t("Les lots ont été transférés au tiers !"),
+        one: t("Le lot a été transféré au tiers !"),
+        many: t("Les lots sélectionnés ont été transférés au tiers !"),
       })
 
       notify(text, { variant: "success" })
