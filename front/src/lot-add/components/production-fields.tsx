@@ -147,23 +147,32 @@ export const ProductionSiteDoubleCountingCertificateField = (
 ) => {
   const { t } = useTranslation()
   const { value, bind } = useFormContext<LotFormValue>()
-  return (
-    <TextInput
-      disabled={value.production_site instanceof Object}
-      label={t("Certificat double-comptage")}
-      {...bind("production_site_double_counting_certificate")}
-      {...props}
-    />
-  )
+
+  const dcProps =
+    value.production_site instanceof Object
+      ? { ...props, disabled: true, value: value.production_site.dc_reference }
+      : { ...props, ...bind("production_site_double_counting_certificate") }
+
+  return <TextInput label={t("Certificat double-comptage")} {...dcProps} />
 }
 
 export const ProductionCountryField = (props: AutocompleteProps<Country>) => {
   const { t } = useTranslation()
   const { value, bind } = useFormContext<LotFormValue>()
+
+  if (value.production_site instanceof Object) {
+    return (
+      <TextInput
+        disabled
+        label={t("Pays de production")}
+        value={norm.normalizeCountry(value.production_site.country).label}
+      />
+    )
+  }
+
   const bound = bind("production_country")
   return (
     <Autocomplete
-      disabled={value.production_site instanceof Object}
       label={t("Pays de production")}
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={api.findCountries}
@@ -177,14 +186,13 @@ export const ProductionCountryField = (props: AutocompleteProps<Country>) => {
 export const ProductionSiteCommissioningDateField = (props: DateInputProps) => {
   const { t } = useTranslation()
   const { value, bind } = useFormContext<LotFormValue>()
-  return (
-    <DateInput
-      disabled={value.production_site instanceof Object}
-      label={t("Date de mise en service")}
-      {...bind("production_site_commissioning_date")}
-      {...props}
-    />
-  )
+
+  const dateProps =
+    value.production_site instanceof Object
+      ? { ...props, disabled: true, value: value.production_site.date_mise_en_service } // prettier-ignore
+      : { ...props, ...bind("production_site_commissioning_date") }
+
+  return <DateInput label={t("Date de mise en service")} {...dateProps} />
 }
 
 export default ProductionFields
