@@ -2,29 +2,39 @@
 
 ## Commands
 
-- `npm start`: start frontend development server
-- `npm run build`: bundle the dependencies together and prepare them for production
-- `npm test`: run integration tests
+- `npm start`: Démarrer le serveur de développement
+- `npm run build`: Compiler le code pour le préparer à la production
+- `npm test`: Lancer les tests d'intégration
 
-## Dependencies
+## Dépendances
 
-- `react-scripts` (create-react-app)
-- `react`
-- `react-dom`
-- `react-router-dom` (client-side routing)
-- `clsx` (conditional css class selection)
-- `js-cookie`
+- `create-react-app`
+- `typescript`
+- `react` + `react-dom`
+- `react-router-dom`: navigation client
+- `axios`: communication avec l'api
+- `react-async-hook`: intégration de l'async dans react
+- `clsx`: outil pour combiner des classes CSS
+- `i18next`: gestion des traductions
+- `date-fns`: gestion des dates
+- `js-cookie`: gestion des cookies
 
 ## Structure
 
-- `public`: static files
-- `src`: app source code
-  - `assets`: static files that will be imported in the source code
-  - `components`: presentational and helper components
-    - `system`: design components that are shared all over the app
-  - `hooks`: custom react hooks for business logic
-  - `routes`: "controller" components rendered at a given route
-  - `services`: helper functions to talk to external services
-  - `utils`: general helper functions
-  - `app.tsx`: application root component
-  - `index.tsx`: application entry point
+- `public`: Fichiers statiques
+- `src`: Code source du frontend
+  - `account`: Gestion du compte utilisateur
+  - `auth`: Authentification utilisateur
+  - `carbure`: Point d'entrée de l'application
+  - `common` + `common-v2`: Design system + outils pour structurer l'app
+  - `control-details`: Détails d'un lot contrôlé (admin + auditeur)
+  - `controls`: Liste des lots à contrôler (admin + auditeur)
+  - `dashboard`: Informations générales sur les déclarations (admin)
+  - `doublecount`: Gestion des dossiers double comptage (admin + admin externe)
+  - `entities`: Liste des sociétés enregistrées (admin)
+  - `lot-add`: Formulaire de création de lot
+  - `lot-details`: Détails d'un lot existant
+  - `settings`: Configuration d'une société
+  - `stats`: Statistiques privées
+  - `stock-details`: Détails d'un stock existant
+  - `transactions`: Liste des transactions d'une société
