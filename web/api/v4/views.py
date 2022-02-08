@@ -684,7 +684,8 @@ def lots_send(request, *args, **kwargs):
             continue
 
         # sanity check !!!
-        if not sanity_check(lot, prefetched_data):
+        is_sane, errors = sanity_check(lot, prefetched_data)
+        if not is_sane:
             nb_rejected += 1
             continue
         nb_sent += 1
@@ -792,6 +793,8 @@ def lots_send(request, *args, **kwargs):
         else:
             pass
         lot.save()
+    if nb_sent == 0:
+        return JsonResponse({'status': 'success', 'data': {'submitted': nb_lots, 'sent': nb_sent, 'auto-accepted': nb_auto_accepted, 'ignored': nb_ignored, 'rejected': nb_rejected}}, status=400)
     return JsonResponse({'status': 'success', 'data': {'submitted': nb_lots, 'sent': nb_sent, 'auto-accepted': nb_auto_accepted, 'ignored': nb_ignored, 'rejected': nb_rejected}})
 
 
