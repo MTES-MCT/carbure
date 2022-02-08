@@ -166,6 +166,7 @@ const RequestFixDialog = ({
               "trackEvent",
               "lot-corrections",
               "client-request-fix",
+              "",
               selection.length,
             ])
             requestFix.execute(entity.id, selection, comment)
