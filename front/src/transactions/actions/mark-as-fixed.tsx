@@ -169,6 +169,7 @@ const MarkAsFixedDialog = ({
               "trackEvent",
               "lot-corrections",
               "supplier-mark-as-fixed",
+              "",
               selection.length,
             ])
             markAsFixed.execute(entity.id, selection, status, comment)

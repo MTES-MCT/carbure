@@ -164,7 +164,6 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
             icon={Save}
             submit="lot-form"
             label={t("Sauvegarder")}
-            action={() => matomo.push(["trackEvent", "lots", "save-changes"])}
           />
         )}
 

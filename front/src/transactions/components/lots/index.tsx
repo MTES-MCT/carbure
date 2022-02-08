@@ -76,7 +76,7 @@ export const Lots = ({ year, snapshot }: LotsProps) => {
   const totalDeadline = lotsData?.total_deadline ?? 0
 
   const showLotDetails = (lot: Lot) => {
-    matomo.push(["trackEvent", "lots-details", "show-lot-details"])
+    matomo.push(["trackEvent", "lots-details", "show-lot-details", lot.id])
     navigate({
       pathname: `${status}/${category}/${lot.id}`,
       search: location.search,
