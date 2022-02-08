@@ -239,6 +239,7 @@ const ReleaseForConsumptionDialog = ({
               "trackEvent",
               "lots-accept",
               "release-for-consumption",
+              "",
               selection.length,
             ])
             acceptLots.execute(query, selection)
@@ -327,6 +328,7 @@ const InStockDialog = ({
               "trackEvent",
               "lots-accept",
               "to-stock",
+              "",
               selection.length,
             ])
             acceptLots.execute(query, selection)
@@ -416,6 +418,7 @@ const BlendingDialog = ({
               "trackEvent",
               "lots-accept",
               "blending",
+              "",
               selection.length,
             ])
             acceptLots.execute(query, selection)
@@ -505,6 +508,7 @@ const DirectDeliveryDialog = ({
               "trackEvent",
               "lots-accept",
               "direct-delivery",
+              "",
               selection.length,
             ])
             acceptLots.execute(query, selection)
@@ -593,7 +597,8 @@ const ExportDialog = ({
             matomo.push([
               "trackEvent",
               "lots-accept",
-              "direct-delivery",
+              "exportation",
+              "",
               selection.length,
             ])
             acceptLots.execute(query, selection)
@@ -712,6 +717,7 @@ const TradingDialog = ({
               "trackEvent",
               "lots-accept",
               "transfer-without-stock",
+              "",
               selection.length,
             ])
             acceptLots.execute(query, selection, client!, certificate!)
@@ -828,6 +834,7 @@ const ProcessingDialog = ({
               "trackEvent",
               "lots-accept",
               "processing",
+              "",
               selection.length,
             ])
             acceptLots.execute(subquery, selection, depot!.blender!.id)
