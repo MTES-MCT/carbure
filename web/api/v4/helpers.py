@@ -147,6 +147,8 @@ def get_lots_with_errors(lots, entity, will_aggregate=False):
         tx_errors = GenericError.objects.filter(lot=OuterRef('pk'))
         if entity.entity_type == Entity.ADMIN:
             filter = Q(display_to_admin=True, acked_by_admin=False)
+        elif entity.entity_type == Entity.AUDITOR:
+            filter = Q(display_to_auditor=True, acked_by_auditor=False)
         else:
             filter = Q(lot__added_by=entity, display_to_creator=True, acked_by_creator=False) | Q(lot__carbure_client=entity, display_to_recipient=True, acked_by_recipient=False)
         tx_errors = tx_errors.filter(filter)
@@ -155,6 +157,9 @@ def get_lots_with_errors(lots, entity, will_aggregate=False):
     else:
         if entity.entity_type == Entity.ADMIN:
             filter = Q(genericerror__display_to_admin=True, genericerror__acked_by_admin=False)
+            counter = Count('genericerror', filter=filter)
+        elif entity.entity_type == Entity.AUDITOR:
+            filter = Q(genericerror__display_to_auditor=True, genericerror__acked_by_auditor=False)
             counter = Count('genericerror', filter=filter)
         else:
             filter = Q(added_by=entity, genericerror__display_to_creator=True, genericerror__acked_by_creator=False) | Q(carbure_client=entity, genericerror__display_to_recipient=True, genericerror__acked_by_recipient=False)
