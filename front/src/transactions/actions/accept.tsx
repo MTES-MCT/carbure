@@ -239,6 +239,7 @@ const ReleaseForConsumptionDialog = ({
               "trackEvent",
               "lots-accept",
               "release-for-consumption",
+              "",
               selection.length,
             ])
             acceptLots.execute(query, selection)
@@ -327,6 +328,7 @@ const InStockDialog = ({
               "trackEvent",
               "lots-accept",
               "to-stock",
+              "",
               selection.length,
             ])
             acceptLots.execute(query, selection)
@@ -416,6 +418,7 @@ const BlendingDialog = ({
               "trackEvent",
               "lots-accept",
               "blending",
+              "",
               selection.length,
             ])
             acceptLots.execute(query, selection)
@@ -505,6 +508,7 @@ const DirectDeliveryDialog = ({
               "trackEvent",
               "lots-accept",
               "direct-delivery",
+              "",
               selection.length,
             ])
             acceptLots.execute(query, selection)
@@ -593,7 +597,8 @@ const ExportDialog = ({
             matomo.push([
               "trackEvent",
               "lots-accept",
-              "direct-delivery",
+              "exportation",
+              "",
               selection.length,
             ])
             acceptLots.execute(query, selection)
@@ -632,9 +637,9 @@ const TradingDialog = ({
 
     onSuccess: () => {
       const text = v({
-        zero: t("Les lots ont été placés dans votre stock !"),
-        one: t("Le lot a été placé dans votre stock !"),
-        many: t("Les lots sélectionnés ont été placés dans votre stock !"),
+        zero: t("Les lots ont été transférés !"),
+        one: t("Le lot a été transféré !"),
+        many: t("Les lots sélectionnés ont été transférés !"),
       })
 
       notify(text, { variant: "success" })
@@ -712,6 +717,7 @@ const TradingDialog = ({
               "trackEvent",
               "lots-accept",
               "transfer-without-stock",
+              "",
               selection.length,
             ])
             acceptLots.execute(query, selection, client!, certificate!)
@@ -742,9 +748,9 @@ const ProcessingDialog = ({
 
     onSuccess: () => {
       const text = v({
-        zero: t("Les lots ont été placés dans votre stock !"),
-        one: t("Le lot a été placé dans votre stock !"),
-        many: t("Les lots sélectionnés ont été placés dans votre stock !"),
+        zero: t("Les lots ont été transférés au tiers !"),
+        one: t("Le lot a été transféré au tiers !"),
+        many: t("Les lots sélectionnés ont été transférés au tiers !"),
       })
 
       notify(text, { variant: "success" })
@@ -828,6 +834,7 @@ const ProcessingDialog = ({
               "trackEvent",
               "lots-accept",
               "processing",
+              "",
               selection.length,
             ])
             acceptLots.execute(subquery, selection, depot!.blender!.id)

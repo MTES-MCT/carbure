@@ -157,6 +157,7 @@ const RecallDialog = ({ summary, selection, onClose }: RecallDialogProps) => {
               "trackEvent",
               "lot-corrections",
               "supplier-recall-lot",
+              "",
               selection.length,
             ])
             recallLots.execute(entity.id, selection, comment)

@@ -57,7 +57,7 @@ export const ExportStocksButton = ({
       action={() => {
         matomo.push([
           "trackEvent",
-          "lots",
+          "stocks",
           "export-stocks-excel",
           selection.length,
         ])

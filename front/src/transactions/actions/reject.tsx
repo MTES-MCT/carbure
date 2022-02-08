@@ -175,6 +175,7 @@ const RejectDialog = ({
               "trackEvent",
               "lot-corrections",
               "client-reject-lot",
+              "",
               selection.length,
             ])
             rejectLots.execute(query, selection, comment)

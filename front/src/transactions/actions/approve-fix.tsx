@@ -155,6 +155,7 @@ const ApproveFixDialog = ({
               "trackEvent",
               "lot-corrections",
               "client-approve-fix",
+              "",
               selection.length,
             ])
             approveFix.execute(entity.id, selection)
