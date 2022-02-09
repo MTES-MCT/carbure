@@ -11,10 +11,11 @@ from django.db.models.fields import NOT_PROVIDED
 
 from django.http.response import HttpResponse, JsonResponse
 from django.db.models.query_utils import Q
+from api.v4.certificates import get_certificates
 from core.common import convert_template_row_to_formdata, get_uploaded_files_directory
 from core.decorators import check_user_rights
 from api.v4.helpers import filter_lots, filter_stock, get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock
-from api.v4.helpers import get_prefetched_data, get_stock_events, get_stock_with_metadata, get_stock_filters_data, get_stocks_summary_data, get_transaction_distance, handle_eth_to_etbe_transformation
+from api.v4.helpers import get_prefetched_data, get_stock_events, get_stock_with_metadata, get_stock_filters_data, get_stocks_summary_data, get_transaction_distance, handle_eth_to_etbe_transformation, get_known_certificates
 from api.v4.helpers import send_email_declaration_invalidated, send_email_declaration_validated
 from api.v4.lots import construct_carbure_lot, bulk_insert_lots, try_get_date
 from api.v4.sanity_checks import bulk_sanity_checks, sanity_check
@@ -460,7 +461,7 @@ def get_lot_details(request, *args, **kwargs):
     data['children_stock'] = CarbureStockPublicSerializer(CarbureStock.objects.filter(parent_lot=lot), many=True).data
     data['distance'] = get_transaction_distance(lot)
     data['errors'] = get_lot_errors(lot, entity)
-    #data['certificates'] = check_certificates(tx)
+    data['certificates'] = get_known_certificates(lot, entity)
     data['updates'] = get_lot_updates(lot, entity)
     data['comments'] = get_lot_comments(lot, entity)
     return JsonResponse({'status': 'success', 'data': data})
@@ -596,8 +597,8 @@ def update_lot(request, *args, **kwargs):
                 subfield = s[1]
                 if mainfield in foreign_key_to_field_mapping:
                     subfield_to_record = foreign_key_to_field_mapping[mainfield]
-                if subfield != subfield_to_record:
-                    continue
+                    if subfield != subfield_to_record:
+                        continue
                 field = mainfield
             changed.append((field, data[0], data[1]))
         if action == 'add':

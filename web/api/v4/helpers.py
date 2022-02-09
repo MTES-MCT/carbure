@@ -12,6 +12,7 @@ from django.http.response import HttpResponse, JsonResponse
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from certificates.models import DoubleCountingRegistration
+from core.common import try_get_certificate, try_get_double_counting_certificate
 
 from core.ign_distance import get_distance
 from core.models import Biocarburant, CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, Entity, EntityCertificate, EntityDepot, GenericCertificate, MatierePremiere, Pays, TransactionDistance, UserRights
@@ -829,4 +830,23 @@ def get_prefetched_data(entity=None):
     d['clientsbyname'] = {c.name.upper(): c for c in Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.OPERATOR, Entity.TRADER])}
     d['certificates'] = {c.certificate_id.upper(): c for c in GenericCertificate.objects.filter(valid_until__gte=lastyear)}
     d['double_counting_certificates'] = {c.certificate_id: c for c in DoubleCountingRegistration.objects.all()}
+    return d
+
+
+def get_known_certificates(lot, entity):
+    d = {
+         'production_site_certificate': None,
+         'supplier_certificate': None,
+         'vendor_certificate': None,
+         'production_site_double_counting_certificate': None,
+        }
+    # production site certificate
+    if lot.production_site_certificate:
+        d['production_site_certificate'] = try_get_certificate(lot.production_site_certificate)
+    if lot.supplier_certificate:
+        d['supplier_certificate'] = try_get_certificate(lot.supplier_certificate)
+    if lot.vendor_certificate:
+        d['vendor_certificate'] = try_get_certificate(lot.vendor_certificate)
+    if lot.production_site_double_counting_certificate:
+        d['production_site_double_counting_certificate'] = try_get_double_counting_certificate(lot.production_site_double_counting_certificate)
     return d
