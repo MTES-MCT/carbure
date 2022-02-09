@@ -182,6 +182,7 @@ export function getDeliveryTypes(
     isClientUnknown && has_mac && DeliveryType.RFC,
     isClientUnknown && has_direct_deliveries && DeliveryType.Direct,
     isClientUnknown && DeliveryType.Export,
+    isClientUnknown && DeliveryType.Unknown,
   ])
 }
 
