@@ -862,6 +862,7 @@ def get_declarations(request, *args, **kwargs):
 
     period_lots = CarbureLot.objects.filter(period__in=periods) \
         .filter(Q(carbure_client_id=entity_id) | Q(carbure_supplier_id=entity_id)) \
+        .exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED]) \
         .values('period') \
         .annotate(count=Count('id', distinct=True))
     lots_by_period = {}
@@ -1537,13 +1538,13 @@ def validate_declaration(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Could not parse period.'}, status=400)
 
     # ensure everything is in order
-    pending_reception = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, lot_status__in=[CarbureLot.DRAFT, CarbureLot.PENDING]).count()
+    pending_reception = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, lot_status=CarbureLot.PENDING).count()
     if pending_reception > 0:
         return JsonResponse({'status': 'error', 'message': 'Cannot validate declaration. Some lots are pending reception.'}, status=400)
     pending_correction = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, lot_status__in=[CarbureLot.ACCEPTED], correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED]).count()
     if pending_correction > 0:
         return JsonResponse({'status': 'error', 'message': 'Cannot validate declaration. Some accepted lots need correction.'}, status=400)
-    lots_sent_rejected_or_drafts = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, lot_status__in=[CarbureLot.DRAFT, CarbureLot.REJECTED]).count()
+    lots_sent_rejected_or_drafts = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, lot_status=CarbureLot.REJECTED).count()
     if lots_sent_rejected_or_drafts > 0:
         return JsonResponse({'status': 'error', 'message': 'Cannot validate declaration. Some outgoing lots need your attention.'}, status=400)
     lots_sent_to_fix = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, lot_status__in=[CarbureLot.ACCEPTED], correction_status__in=[CarbureLot.IN_CORRECTION]).count()
