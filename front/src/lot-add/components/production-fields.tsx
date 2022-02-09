@@ -16,6 +16,7 @@ import { LotFormValue } from "./lot-form"
 import { UserCheck } from "common-v2/components/icons"
 import { Entity } from "carbure/types"
 import { Country, ProductionSite } from "common/types"
+import CertificateIcon from "lot-details/components/certificate"
 
 interface ProductionFieldsProps {
   readOnly?: boolean
@@ -124,8 +125,14 @@ export const ProductionSiteCertificateField = (
       ? value.production_site.id
       : undefined
 
+  // prettier-ignore
+  const icon = value.certificates?.production_site_certificate
+    ? <CertificateIcon certificate={value.certificates?.production_site_certificate} />
+    : undefined
+
   return (
     <Autocomplete
+      icon={icon}
       label={t("Certificat du site de production")}
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={(query) =>
@@ -154,7 +161,18 @@ export const ProductionSiteDoubleCountingCertificateField = (
       ? { ...props, disabled: true, error: bound.error, value: value.production_site.dc_reference } // prettier-ignore
       : { ...props, ...bound }
 
-  return <TextInput label={t("Certificat double-comptage")} {...dcProps} />
+  // prettier-ignore
+  const icon = value.certificates?.production_site_double_counting_certificate
+    ? <CertificateIcon certificate={value.certificates?.production_site_double_counting_certificate} />
+    : undefined
+
+  return (
+    <TextInput
+      icon={icon}
+      label={t("Certificat double-comptage")}
+      {...dcProps}
+    />
+  )
 }
 
 export const ProductionCountryField = (props: AutocompleteProps<Country>) => {

@@ -19,6 +19,7 @@ import ProductionFields from "./production-fields"
 import DeliveryFields from "./delivery-fields"
 import { EmissionFields, ReductionFields } from "./ghg-fields"
 import { Entity } from "carbure/types"
+import { LotCertificates } from "lot-details/types"
 
 export interface LotFormProps {
   readOnly?: boolean
@@ -39,9 +40,13 @@ export const LotForm = ({ form, onSubmit, ...props }: LotFormProps) => (
 const GHG_REFERENCE = 83.8
 const GHG_REFERENCE_RED_II = 94.0
 
-export function useLotForm(lot?: Lot | undefined, lotErrors: LotError[] = []) {
+export function useLotForm(
+  lot?: Lot | undefined,
+  lotErrors: LotError[] = [],
+  certs?: LotCertificates
+) {
   const entity = useEntity()
-  const value = useMemo(() => lotToFormValue(lot), [lot])
+  const value = useMemo(() => lotToFormValue(lot, certs), [lot, certs])
   const errors = useLotFieldErrors(lotErrors)
 
   function setValue(value: LotFormValue): LotFormValue {
@@ -92,10 +97,11 @@ export function useLotForm(lot?: Lot | undefined, lotErrors: LotError[] = []) {
       value.delivery_site_country = value.delivery_site.country
     }
 
-    const knownClient = value.client instanceof Object ? value.client : undefined
+    const knownClient =
+      value.client instanceof Object ? value.client : undefined
     const isClientEntity = knownClient?.id === entity.id
     const isClientUnknown = knownClient === undefined
-  
+
     if (!isClientEntity && !isClientUnknown) {
       value.delivery_type = undefined
     }
@@ -157,8 +163,9 @@ export function useLotFieldErrors(
 }
 
 export const defaultLot = {
-  // save the whole Lot data so we can access it in the form (errorsToFields[err.error] ?? [])
+  // save the whole Lot data so we can access it in the form
   lot: undefined as Lot | undefined,
+  certificates: undefined as LotCertificates | undefined,
 
   transport_document_reference: undefined as string | undefined,
   volume: 0 as number | undefined,
@@ -201,30 +208,35 @@ export const defaultLot = {
 
 export type LotFormValue = typeof defaultLot
 
-// prettier-ignore
-export const lotToFormValue: (lot: Lot | undefined) => LotFormValue = (lot) => ({
+type LotToFormValue = (lot: Lot | undefined, certificates?: LotCertificates) => LotFormValue // prettier-ignore
+export const lotToFormValue: LotToFormValue = (lot, certificates) => ({
   lot,
+  certificates,
 
   transport_document_reference: lot?.transport_document_reference ?? undefined,
   volume: lot?.volume ?? undefined,
   biofuel: lot?.biofuel ?? undefined,
   feedstock: lot?.feedstock ?? undefined,
   country_of_origin: lot?.country_of_origin ?? undefined,
-  free_field: lot?.free_field?.replace('\n', ', ') ?? undefined,
+  free_field: lot?.free_field?.replace("\n", ", ") ?? undefined,
 
   producer: lot?.carbure_producer ?? lot?.unknown_producer ?? undefined,
-  production_site: lot?.carbure_production_site ?? lot?.unknown_production_site ?? undefined,
+  production_site:
+    lot?.carbure_production_site ?? lot?.unknown_production_site ?? undefined,
   production_country: lot?.production_country ?? undefined,
   production_site_certificate: lot?.production_site_certificate ?? undefined,
-  production_site_commissioning_date: lot?.production_site_commissioning_date ?? undefined,
-  production_site_double_counting_certificate: lot?.production_site_double_counting_certificate ?? undefined,
+  production_site_commissioning_date:
+    lot?.production_site_commissioning_date ?? undefined,
+  production_site_double_counting_certificate:
+    lot?.production_site_double_counting_certificate ?? undefined,
 
   supplier: lot?.carbure_supplier ?? lot?.unknown_supplier ?? undefined,
   supplier_certificate: lot?.supplier_certificate ?? undefined,
   vendor_certificate: lot?.vendor_certificate ?? undefined,
   client: lot?.carbure_client ?? lot?.unknown_client ?? undefined,
   delivery_type: lot?.delivery_type,
-  delivery_site: lot?.carbure_delivery_site ?? lot?.unknown_delivery_site ?? undefined,
+  delivery_site:
+    lot?.carbure_delivery_site ?? lot?.unknown_delivery_site ?? undefined,
   delivery_site_country: lot?.delivery_site_country ?? undefined,
   delivery_date: lot?.delivery_date ?? undefined,
 

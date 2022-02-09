@@ -332,6 +332,8 @@
   "Vous ne pouvez pas valider ce lot tant que les problèmes suivants n'ont pas été adressés :": "You cannot release this batch until the following issues have been addressed:",
   "Des incohérences potentielles ont été détectées, elles n'empêchent pas la validation du lot mais peuvent donner lieu à un contrôle.": "Potential anomalies have been detected, they do not prevent validation of the batch but may eventually lead to a control.",
   "Erreur de validation": "Validation error",
+  "Détails du certificat": "Certificate details",
+  "Identifiant": "Identifier",
   "Commentaires": "Comments",
   "Historique des modifications ({{amount}})": "Update history ({{amount}})",
   "Champ modifié": "Modified field",

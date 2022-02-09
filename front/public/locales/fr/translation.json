@@ -339,6 +339,8 @@
   "Vous ne pouvez pas valider ce lot tant que les problèmes suivants n'ont pas été adressés :": "Vous ne pouvez pas valider ce lot tant que les problèmes suivants n'ont pas été adressés :",
   "Des incohérences potentielles ont été détectées, elles n'empêchent pas la validation du lot mais peuvent donner lieu à un contrôle.": "Des incohérences potentielles ont été détectées, elles n'empêchent pas la validation du lot mais peuvent donner lieu à un contrôle.",
   "Erreur de validation": "Erreur de validation",
+  "Détails du certificat": "Détails du certificat",
+  "Identifiant": "Identifiant",
   "Commentaires": "Commentaires",
   "Historique des modifications ({{amount}})": "Historique des modifications ({{amount}})",
   "Champ modifié": "Champ modifié",

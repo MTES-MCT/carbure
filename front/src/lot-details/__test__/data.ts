@@ -77,6 +77,12 @@ export const lotDetails: LotDetails = {
   parent_stock: null,
   children_lot: [],
   children_stock: [],
+  certificates: {
+    production_site_certificate: null,
+    production_site_double_counting_certificate: null,
+    supplier_certificate: null,
+    vendor_certificate: null,
+  },
 }
 
 export const errors: LotError[] = [
