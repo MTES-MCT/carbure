@@ -14,7 +14,7 @@ from pandas._typing import FilePathOrBuffer, Scalar
 from django.db import transaction
 
 
-from core.models import GenericCertificate, LotV2, LotTransaction, GenericError, TransactionUpdateHistory
+from core.models import CarbureLot, GenericCertificate, LotV2, LotTransaction, GenericError, TransactionUpdateHistory
 from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
 from core.models import TransactionDistance, EntityDepot
 from core.notifications import notify_pending_lot, notify_lot_fixed
@@ -1158,7 +1158,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         # 'supplier', 'supplier_certificate', ('vendor_certificate') removed,
         # 'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
         # 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee',
-        # 'dae', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country',]
+        # 'dae', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country', 'delivery_type']
 
         # TARGET COLUMNS
         # free_field, carbure_producer, unknown_producer, carbure_production_site, unknown_production_site
@@ -1193,7 +1193,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         lot['feedstock_code'] = lot_row.get('matiere_premiere_code', '')
         lot['biofuel_code'] = lot_row.get('biocarburant_code', '')
         lot['country_code'] = lot_row.get('pays_origine_code', '')
-
+        lot['delivery_type'] = lot_row.get('delivery_type', CarbureLot.UNKNOWN)
         for key in ['el']: # negative value allowed
             try:
                 lot[key] = float(lot_row.get(key, 0))
