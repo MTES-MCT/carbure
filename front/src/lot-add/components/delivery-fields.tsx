@@ -164,7 +164,7 @@ export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
   const { value, bind } = useFormContext<LotFormValue>()
   const deliveryTypes = getDeliveryTypes(entity, value.client)
 
-  if (deliveryTypes.length === 0) {
+  if (deliveryTypes.length === 0 || value.lot?.lot_status === "PENDING") {
     return null
   }
 
