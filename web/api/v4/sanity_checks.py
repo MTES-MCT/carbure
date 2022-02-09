@@ -55,6 +55,7 @@ def generic_error(error, **kwargs):
     d = {
         'display_to_creator': True,
         'display_to_admin': True,
+        'display_to_auditor': True,
         'error': error,
     }
     d.update(kwargs)
