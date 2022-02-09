@@ -1,7 +1,6 @@
 import logging
 from django.db.models import Q, Count
 from django.http import JsonResponse
-from core.common import check_certificates
 
 from core.models import AdminTransactionComment, LotTransaction
 from core.models import UserRights
@@ -116,7 +115,7 @@ def get_details(request, *args, **kwargs):
     data['admin_comments'] = [c.natural_key() for c in tx.admintransactioncomment_set.filter(is_visible_by_auditor=True)]
     data['updates'] = get_history(tx)
     data['deadline'] = get_current_deadline()
-    data['certificates'] = check_certificates(tx)
+    #data['certificates'] = check_certificates(tx)
 
     return JsonResponse({'status': 'success', 'data': data})
 

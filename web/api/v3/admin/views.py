@@ -23,7 +23,7 @@ from django.template.loader import render_to_string
 
 from core.models import LotTransaction, UserRightsRequests, SustainabilityDeclaration, Control
 from api.v3.lots.helpers import Perf, get_lots_with_metadata, get_lots_with_errors, get_snapshot_filters, get_errors, filter_lots, get_general_summary, sort_lots
-from core.common import check_certificates, get_transaction_distance
+from core.common import get_transaction_distance
 from doublecount.models import DoubleCountingAgreement
 
 
@@ -250,7 +250,7 @@ def get_details(request, *args, **kwargs):
 
     data = {}
     data['transaction'] = tx.natural_key(admin=True)
-    data['certificates'] = check_certificates(tx)
+    #data['certificates'] = check_certificates(tx)
     data['distance'] = get_transaction_distance(tx)
     data['errors'] = get_errors(tx, entity=None, is_admin=True)
     data['deadline'] = deadline_date.strftime("%Y-%m-%d")
