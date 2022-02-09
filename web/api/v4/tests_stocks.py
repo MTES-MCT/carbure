@@ -1,15 +1,20 @@
 import datetime
 import random
 import json
+from typing import Generic
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
-from core.models import CarbureLot, CarbureStock, MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot, UserRights
+from core.models import CarbureLot, CarbureStock, GenericError, MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot, UserRights
 from api.v3.common.urls import urlpatterns
 from django_otp.plugins.otp_email.models import EmailDevice
 from api.v4.tests_utils import get_lot
 
+def debug_errors(lot):
+    errors = GenericError.objects.filter(lot=lot)
+    for e in errors:
+        print(e.error, e.field, e.value, e.extra)
 
 class LotsFlowTest(TestCase):
     fixtures = [
