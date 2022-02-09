@@ -62,8 +62,9 @@ def try_get_double_counting_certificate(cert):
          'valid_from': '',
          'matches': 0,
          'found': False,
+         'certificate_type': 'DC',
          'certificate_id': cert,
-         }
+        }
     matches = DoubleCountingRegistration.objects.filter(certificate_id=cert)
     count = matches.count()
     d['matches'] = count
@@ -80,30 +81,30 @@ def try_get_double_counting_certificate(cert):
     return d
 
 
-def check_certificates(tx):
-    d = {
-         'production_site_certificate': None,
-         'supplier_certificate': None,
-         'vendor_certificate': None,
-         'unknown_production_site_dbl_counting': None,
-         'double_counting_reference': None
-        }
-    # production site certificate
-    if tx.lot.carbure_production_site_reference:
-        d['production_site_certificate'] = try_get_certificate(tx.lot.carbure_production_site_reference)
-    if tx.lot.unknown_production_site_reference:
-        d['production_site_certificate'] = try_get_certificate(tx.lot.unknown_production_site_reference)
-    if tx.lot.unknown_supplier_certificate:
-        d['supplier_certificate'] = try_get_certificate(tx.lot.unknown_supplier_certificate)
-    if tx.carbure_vendor_certificate:
-        d['vendor_certificate'] = try_get_certificate(tx.carbure_vendor_certificate)
-    if tx.lot.unknown_production_site_dbl_counting:
-        d['unknown_production_site_dbl_counting'] = try_get_double_counting_certificate(tx.lot.unknown_production_site_dbl_counting)
-    elif tx.lot.carbure_production_site and tx.lot.carbure_production_site.dc_reference:
-        d['double_counting_reference'] = try_get_double_counting_certificate(tx.lot.carbure_production_site.dc_reference)
-    else:
-        pass
-    return d
+# def check_certificates(tx):
+#     d = {
+#          'production_site_certificate': None,
+#          'supplier_certificate': None,
+#          'vendor_certificate': None,
+#          'unknown_production_site_dbl_counting': None,
+#          'double_counting_reference': None
+#         }
+#     # production site certificate
+#     if tx.lot.carbure_production_site_reference:
+#         d['production_site_certificate'] = try_get_certificate(tx.lot.carbure_production_site_reference)
+#     if tx.lot.unknown_production_site_reference:
+#         d['production_site_certificate'] = try_get_certificate(tx.lot.unknown_production_site_reference)
+#     if tx.lot.unknown_supplier_certificate:
+#         d['supplier_certificate'] = try_get_certificate(tx.lot.unknown_supplier_certificate)
+#     if tx.carbure_vendor_certificate:
+#         d['vendor_certificate'] = try_get_certificate(tx.carbure_vendor_certificate)
+#     if tx.lot.unknown_production_site_dbl_counting:
+#         d['unknown_production_site_dbl_counting'] = try_get_double_counting_certificate(tx.lot.unknown_production_site_dbl_counting)
+#     elif tx.lot.carbure_production_site and tx.lot.carbure_production_site.dc_reference:
+#         d['double_counting_reference'] = try_get_double_counting_certificate(tx.lot.carbure_production_site.dc_reference)
+#     else:
+#         pass
+#     return d
 
 def get_uploaded_files_directory():
     directory = '/app/files'
