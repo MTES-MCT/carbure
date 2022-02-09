@@ -86,6 +86,8 @@ def check_certificates(prefetched_data, lot, errors):
         errors.append(generic_error(error='NO_PRODSITE_CERT', lot=lot, field='production_site_certificate'))
     else:
         cert = lot.production_site_certificate
+        if cert is not None:
+            cert = cert.upper()
         if cert not in prefetched_data['certificates']:
             errors.append(generic_error(error='UNKNOWN_PRODSITE_CERT', lot=lot, field='production_site_certificate'))
         else:
@@ -99,6 +101,8 @@ def check_certificates(prefetched_data, lot, errors):
         errors.append(generic_error(error='NO_SUPPLIER_CERT', lot=lot, field='supplier_certificate'))
     else:
         cert = lot.supplier_certificate
+        if cert is not None:
+            cert = cert.upper()        
         if cert not in prefetched_data['certificates']:
             errors.append(generic_error(error='UNKNOWN_SUPPLIER_CERT', lot=lot, field='supplier_certificate'))
         else:
