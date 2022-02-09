@@ -19,6 +19,7 @@ def get_lot(entity):
         'carbure_production_site': psite.name,
         'biofuel_code': 'ETH',
         'feedstock_code': 'BETTERAVE',
+        'country_code': 'FR',
         'volume': 34500,
         'eec': 1.0,
         'el': 1.0,
