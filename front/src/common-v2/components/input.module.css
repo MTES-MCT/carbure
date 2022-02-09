@@ -59,7 +59,6 @@
 .field[data-disabled] .control {
   color: var(--gray-dark);
   background-color: var(--gray-highlight);
-  pointer-events: none;
 }
 
 .field[data-readonly] .control {
@@ -140,7 +139,7 @@
   color: var(--gray-dark);
 }
 
-.icon button {
+.icon button:not(:global(.icon)) {
   margin: calc(-1 * var(--spacing-s));
   margin-left: var(--spacing-s);
 }

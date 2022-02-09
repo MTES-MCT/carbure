@@ -65,12 +65,13 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   })
 
   const lotData = lot.result?.data.data
+  const certificates = lotData?.certificates
   const creator = lotData?.lot.added_by
   const comments = lotData?.comments ?? []
   const changes = getLotChanges(lotData?.updates)
   const [errors, warnings] = separateAnomalies(lotData?.errors ?? [])
 
-  const form = useLotForm(lotData?.lot, errors)
+  const form = useLotForm(lotData?.lot, errors, certificates)
 
   const editable = isEditable(lotData?.lot, entity)
   const hasEditRights = entity.hasRights(UserRole.Admin, UserRole.ReadWrite)

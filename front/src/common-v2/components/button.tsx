@@ -76,6 +76,7 @@ export function Button<T>({
         style={style}
         className={cl(
           css.button,
+          variant,
           variant && css[variant],
           center && css.center,
           hasIconAndText && css.composite,
