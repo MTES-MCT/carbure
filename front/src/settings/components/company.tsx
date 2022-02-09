@@ -68,7 +68,7 @@ const CompanySettings = () => {
         />
         <Checkbox
           disabled={!canModify}
-          label={t("Ma société effectue des mises à consommation")}
+          label={t("Ma société effectue des mises à consommation (B100, ED95)")}
           value={entity.has_mac}
           onChange={toggleMAC.execute}
         />
