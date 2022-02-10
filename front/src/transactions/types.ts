@@ -207,10 +207,11 @@ export enum DeliveryType {
   RFC = "RFC", // release for consumption / mise a consommation
   Stock = "STOCK",
   Blending = "BLENDING", // incorporation
-  Export = "EXPORT",
+  Exportation = "EXPORT",
   Trading = "TRADING",
   Processing = "PROCESSING",
   Direct = "DIRECT", // livraison directe
+  National = "NATIONAL",
 }
 
 export enum TransportDocumentType {

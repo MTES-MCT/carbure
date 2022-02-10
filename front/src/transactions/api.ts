@@ -150,6 +150,16 @@ export function acceptForDirectDelivery(
   )
 }
 
+export function acceptForNational(
+  query: LotQuery,
+  selection: number[] | undefined
+) {
+  return api.post<Api<void>>(
+    "/lots/accept-national",
+    selectionOrQuery(query, selection)
+  )
+}
+
 export function acceptForExport(
   query: LotQuery,
   selection: number[] | undefined

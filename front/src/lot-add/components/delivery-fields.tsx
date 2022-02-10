@@ -189,14 +189,20 @@ export function getDeliveryTypes(
   const isClientEntity = client instanceof Object ? client.id === entity.id : false // prettier-ignore
   const isClientUnknown = client === undefined || typeof client === "string"
 
-  return compact([
+  const types = compact<DeliveryType>([
     isClientEntity && isOperator && DeliveryType.Blending,
     isClientEntity && has_stocks && DeliveryType.Stock,
     isClientUnknown && has_mac && DeliveryType.RFC,
     isClientUnknown && has_direct_deliveries && DeliveryType.Direct,
-    isClientUnknown && DeliveryType.Export,
-    isClientUnknown && DeliveryType.Unknown,
+    isClientUnknown && DeliveryType.National,
+    isClientUnknown && DeliveryType.Exportation,
   ])
+
+  if (types.length > 0) {
+    types.push(DeliveryType.Unknown)
+  }
+
+  return types
 }
 
 export const DeliverySiteField = (props: AutocompleteProps<Depot | string>) => {
