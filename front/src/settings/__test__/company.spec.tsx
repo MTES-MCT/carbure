@@ -28,7 +28,7 @@ test("check the company section of the settings for a producer", async () => {
 
   expect(await screen.findAllByText("Options")).toHaveLength(2)
 
-  const mac = screen.getByLabelText("Ma société effectue des mises à consommation") // prettier-ignore
+  const mac = screen.getByLabelText("Ma société effectue des mises à consommation (B100, ED95)") // prettier-ignore
   const trading = screen.getByLabelText("Ma société a une activité de négoce")
 
   expect(mac).toBeChecked()
@@ -62,7 +62,7 @@ test("check the company section of the settings for a trader", async () => {
 
   expect(await screen.findAllByText("Options")).toHaveLength(2)
 
-  const mac = screen.getByLabelText("Ma société effectue des mises à consommation") // prettier-ignore
+  const mac = screen.getByLabelText("Ma société effectue des mises à consommation (B100, ED95)") // prettier-ignore
 
   expect(mac).toBeChecked()
 
@@ -78,7 +78,7 @@ test("check the company section of the settings for an operator", async () => {
 
   expect(await screen.findAllByText("Options")).toHaveLength(2)
 
-  const mac = screen.getByLabelText("Ma société effectue des mises à consommation") // prettier-ignore
+  const mac = screen.getByLabelText("Ma société effectue des mises à consommation (B100, ED95)") // prettier-ignore
 
   expect(mac).toBeChecked()
 

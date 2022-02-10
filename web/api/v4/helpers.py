@@ -201,7 +201,7 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
 
     if correction == 'true':
         lots = lots.filter(Q(correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED]) | Q(lot_status=CarbureLot.REJECTED))
-    elif history != 'true' and entity.entity_type not in (Entity.ADMIN):
+    elif history != 'true' and entity.entity_type not in (Entity.ADMIN, Entity.AUDITOR):
         lots = lots.exclude(lot_status__in=[CarbureLot.FROZEN, CarbureLot.ACCEPTED])
 
     if lot_status and 'lot_status' not in blacklist:
