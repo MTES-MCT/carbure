@@ -71,7 +71,7 @@ export interface CheckboxGroupProps<T, V> extends CheckboxControl {
   value: V[] | undefined
   variant?: "default" | "opacity"
   onChange: (value: V[] | undefined) => void
-  onToggle?: (value: V) => void
+  onToggle?: (value: V, checked: boolean) => void
   normalize?: Normalizer<T, V>
 }
 
@@ -102,9 +102,9 @@ export function CheckboxGroup<T, V extends string | number>({
           readOnly={readOnly}
           required={required}
           value={selection.isSelected(value)}
-          onChange={() => {
+          onChange={(checked) => {
             selection.onSelect(value)
-            onToggle?.(value)
+            onToggle?.(value, checked)
           }}
         />
       ))}

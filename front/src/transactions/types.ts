@@ -185,6 +185,7 @@ export interface LotError {
   acked_by_creator: boolean
   acked_by_recipient: boolean
   acked_by_admin: boolean
+  acked_by_auditor: boolean
 }
 
 export enum LotStatus {
@@ -207,10 +208,11 @@ export enum DeliveryType {
   RFC = "RFC", // release for consumption / mise a consommation
   Stock = "STOCK",
   Blending = "BLENDING", // incorporation
-  Export = "EXPORT",
+  Exportation = "EXPORT",
   Trading = "TRADING",
   Processing = "PROCESSING",
   Direct = "DIRECT", // livraison directe
+  National = "NATIONAL",
 }
 
 export enum TransportDocumentType {

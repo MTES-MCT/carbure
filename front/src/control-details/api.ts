@@ -9,11 +9,17 @@ const admin = {
     })
   },
 
-  toggleWarning(entity_id: number, lot_id: number, errors: string[]) {
+  toggleWarning(
+    entity_id: number,
+    lot_id: number,
+    errors: string[],
+    checked: boolean
+  ) {
     return api.post("/admin/lots/toggle-warning", {
       entity_id,
       lot_id,
       errors,
+      checked,
     })
   },
 }
@@ -25,11 +31,17 @@ const auditor = {
     })
   },
 
-  toggleWarning(entity_id: number, lot_id: number, errors: string[]) {
+  toggleWarning(
+    entity_id: number,
+    lot_id: number,
+    errors: string[],
+    checked: boolean
+  ) {
     return api.post("/auditor/lots/toggle-warning", {
       entity_id,
       lot_id,
       errors,
+      checked,
     })
   },
 }

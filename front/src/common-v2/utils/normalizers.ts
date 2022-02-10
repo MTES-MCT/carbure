@@ -182,7 +182,7 @@ export function getDeliveryLabel(delivery: DeliveryType | undefined) {
       return i18next.t("Incorporation")
     case DeliveryType.Direct:
       return i18next.t("Livraison directe")
-    case DeliveryType.Export:
+    case DeliveryType.Exportation:
       return i18next.t("Exportation")
     case DeliveryType.Processing:
       return i18next.t("Processing")
@@ -192,9 +192,11 @@ export function getDeliveryLabel(delivery: DeliveryType | undefined) {
       return i18next.t("Mise en stock")
     case DeliveryType.Trading:
       return i18next.t("Transfert sans stockage")
+    case DeliveryType.National:
+      return i18next.t("Livraison nationale")
     case DeliveryType.Unknown:
     default:
-      return i18next.t("Nationale")
+      return i18next.t("Inconnu")
   }
 }
 
