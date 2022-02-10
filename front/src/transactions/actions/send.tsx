@@ -146,7 +146,7 @@ const SendDialog = ({
             one: t("Vous vous apprêtez à envoyer ce lot à ses destinataires"),
             many: t("Vous vous apprêtez à envoyer les lots sélectionnés à leurs destinataires"), // prettier-ignore
           })}
-          {t(", assurez-vous que les conditions ci-dessous sont respectées :")}
+          {t(", assurez-vous que les conditions ci-dessous sont respectées")}
         </section>
         <section>
           <Checkbox
