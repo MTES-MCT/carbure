@@ -110,9 +110,9 @@ test("display the transaction form - pure producer", async () => {
   checkDeliveryFields()
   checkGESFields()
 
-  const prodField = await screen.findByDisplayValue(/^Producteur/)
-  expect(prodField).toBeDisabled()
-  expect(prodField).toHaveValue(producer.name)
+  const prodField = await screen.findAllByDisplayValue(/^Producteur/)
+  expect(prodField[0]).toBeDisabled()
+  expect(prodField[0]).toHaveValue(producer.name)
 })
 
 test("display the transaction form - operator", async () => {
