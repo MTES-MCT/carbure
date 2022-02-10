@@ -155,7 +155,7 @@ export function acceptForNational(
   selection: number[] | undefined
 ) {
   return api.post<Api<void>>(
-    "/lots/accept-national",
+    "/lots/accept-national-delivery",
     selectionOrQuery(query, selection)
   )
 }
