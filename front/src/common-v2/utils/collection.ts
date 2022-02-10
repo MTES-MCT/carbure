@@ -16,6 +16,18 @@ export function sortBy<T, V>(list: T[], by: (value: T) => V) {
   })
 }
 
+export function groupBy<T>(list: T[], by: (value: T) => string | number) {
+  const groups: Record<string, T[]> = {}
+  list.forEach((item) => {
+    const group = by(item)
+    groups[group] = groups[group] || []
+    groups[group].push(item)
+  })
+  return groups
+}
+
 export function compact<T>(list: Array<T | false | null | undefined>) {
-  return list.filter(item => item !== false && item !== null && item !== undefined) as Array<T>
+  return list.filter(
+    (item) => item !== false && item !== null && item !== undefined
+  ) as Array<T>
 }

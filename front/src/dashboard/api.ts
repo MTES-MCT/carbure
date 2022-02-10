@@ -1,35 +1,14 @@
-import api from "common/services/api"
-import { Entity } from "carbure/types"
-import {
-  DeclarationsByEntityType,
-  groupDeclarationsByEntities,
-} from "./helpers"
+import api, { Api } from "common-v2/services/api"
+import { getLotFilters } from "controls/api/admin"
+import { Filter } from "transactions/types"
+import { DashboardDeclaration } from "./types"
 
-export function getDeclarations(
-  year: number,
-  month: number
-): Promise<[Entity[], string[], DeclarationsByEntityType]> {
-  return api
-    .get("/admin/dashboard/declarations", { year, month })
-    .then(groupDeclarationsByEntities)
-}
-
-export function checkDeclaration(id: number): Promise<any> {
-  return api.post("/admin/dashboard/declaration/check", { id })
-}
-
-export function uncheckDeclaration(id: number): Promise<any> {
-  return api.post("/admin/dashboard/declaration/uncheck", { id })
-}
-
-export function sendDeclarationReminder(
-  entity_id: number,
-  year: number,
-  month: number
-): Promise<any> {
-  return api.post("/admin/dashboard/declaration/send-reminder", {
-    entity_id,
-    year,
-    month,
+export function getDeclarations(period: string) {
+  return api.get<Api<DashboardDeclaration[]>>("/admin/dashboard/declarations", {
+    params: { period },
   })
+}
+
+export function getPeriods(entity_id: number) {
+  return getLotFilters(Filter.Periods, { entity_id, status: "DECLARATIONS" })
 }
