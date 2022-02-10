@@ -194,7 +194,7 @@ export function getDeliveryLabel(delivery: DeliveryType | undefined) {
       return i18next.t("Transfert sans stockage")
     case DeliveryType.Unknown:
     default:
-      return i18next.t("N/A")
+      return i18next.t("Nationale")
   }
 }
 

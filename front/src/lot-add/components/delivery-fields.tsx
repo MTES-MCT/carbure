@@ -18,6 +18,7 @@ import { Country, Depot } from "common/types"
 import Select, { SelectProps } from "common-v2/components/select"
 import { DeliveryType } from "transactions/types"
 import { compact } from "common-v2/utils/collection"
+import CertificateIcon from "lot-details/components/certificate"
 
 interface DeliveryFieldsProps {
   readOnly?: boolean
@@ -71,9 +72,15 @@ export const SupplierCertificateField = (props: AutocompleteProps<string>) => {
   const supplier = value.supplier instanceof Object ? value.supplier : undefined
   const isSupplier = entity.id === supplier?.id
 
+  // prettier-ignore
+  const icon = value.certificates?.supplier_certificate
+    ? <CertificateIcon certificate={value.certificates?.supplier_certificate} />
+    : undefined
+
   return (
     <Autocomplete
       label={t("Certificat du fournisseur")}
+      icon={icon}
       placeholder={supplier?.default_certificate}
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={(query) =>
@@ -107,10 +114,16 @@ export const MyCertificateField = (props: AutocompleteProps<string>) => {
     return null
   }
 
+  // prettier-ignore
+  const icon = value.certificates?.vendor_certificate
+    ? <CertificateIcon certificate={value.certificates?.vendor_certificate} />
+    : undefined
+
   return (
     <Autocomplete
       label={t("Votre certificat")}
       placeholder={entity?.default_certificate}
+      icon={icon}
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={(query) =>
         api.findMyCertificates(query, { entity_id: entity.id })
@@ -151,7 +164,7 @@ export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
   const { value, bind } = useFormContext<LotFormValue>()
   const deliveryTypes = getDeliveryTypes(entity, value.client)
 
-  if (deliveryTypes.length === 0) {
+  if (deliveryTypes.length === 0 || value.lot?.lot_status === "PENDING") {
     return null
   }
 
@@ -182,6 +195,7 @@ export function getDeliveryTypes(
     isClientUnknown && has_mac && DeliveryType.RFC,
     isClientUnknown && has_direct_deliveries && DeliveryType.Direct,
     isClientUnknown && DeliveryType.Export,
+    isClientUnknown && DeliveryType.Unknown,
   ])
 }
 

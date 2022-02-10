@@ -12,6 +12,7 @@ export interface LotDetails {
   comments: LotComment[]
   control_comments?: LotComment[]
   errors: LotError[]
+  certificates: LotCertificates
 }
 
 export interface Distance {
@@ -41,4 +42,21 @@ export interface LotComment {
   comment_type: string
   comment_dt: string
   comment: string
+}
+
+export interface LotCertificates {
+  production_site_certificate: LotCertificate | null
+  supplier_certificate: LotCertificate | null
+  vendor_certificate: LotCertificate | null
+  production_site_double_counting_certificate: LotCertificate | null
+}
+
+export interface LotCertificate {
+  holder: string
+  valid_until: string
+  valid_from: string
+  matches: number
+  found: boolean
+  certificate_id: string
+  certificate_type: string
 }
