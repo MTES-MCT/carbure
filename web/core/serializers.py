@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import CarbureLot, CarbureLotEvent, CarbureLotComment, CarbureStock, CarbureStockTransformation, Depot, Entity, EntityCertificate, EntityDepot, GenericCertificate, GenericError
+from core.models import CarbureLot, CarbureLotEvent, CarbureLotComment, CarbureStock, CarbureStockTransformation, Depot, Entity, EntityCertificate, EntityDepot, GenericCertificate, GenericError, SustainabilityDeclaration
 from doublecount.serializers import BiofuelSerializer, CountrySerializer, EntitySerializer, FeedStockSerializer
 from producers.models import ProductionSite
 
@@ -280,3 +280,15 @@ class EntityCertificateSerializer(serializers.ModelSerializer):
     class Meta:
         model = EntityCertificate
         fields = ['entity', 'certificate', 'has_been_updated']
+
+
+class SustainabilityDeclarationSerializer(serializers.ModelSerializer):
+    entity = EntitySerializer()
+    period = serializers.SerializerMethodField()
+
+    def get_period(self, obj):
+        return obj.period.year * 100 + obj.period.month
+
+    class Meta:
+        model = SustainabilityDeclaration
+        fields = ['entity', 'declared', 'checked', 'deadline', 'period', 'reminder_count']
