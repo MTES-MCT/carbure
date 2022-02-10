@@ -43,10 +43,15 @@ export const DeliveryFields = (props: DeliveryFieldsProps) => {
 export const SupplierField = (props: AutocompleteProps<Entity | string>) => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const bind = useBind<LotFormValue>()
+  const { value, bind } = useFormContext<LotFormValue>()
 
   const { value: supplier, ...bound } = bind("supplier")
   const isKnown = supplier instanceof Object
+
+  const isProducerEntity =
+    entity.isProducer &&
+    value.producer instanceof Object &&
+    value.producer.id === entity.id
 
   return (
     <Autocomplete
@@ -59,6 +64,7 @@ export const SupplierField = (props: AutocompleteProps<Entity | string>) => {
       normalize={norm.normalizeEntityOrUnknown}
       {...bound}
       {...props}
+      disabled={isProducerEntity || props.disabled}
     />
   )
 }
@@ -81,7 +87,6 @@ export const SupplierCertificateField = (props: AutocompleteProps<string>) => {
     <Autocomplete
       label={t("Certificat du fournisseur")}
       icon={icon}
-      placeholder={supplier?.default_certificate}
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={(query) =>
         isSupplier
@@ -121,8 +126,8 @@ export const MyCertificateField = (props: AutocompleteProps<string>) => {
 
   return (
     <Autocomplete
+      required
       label={t("Votre certificat")}
-      placeholder={entity?.default_certificate}
       icon={icon}
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={(query) =>
@@ -140,12 +145,13 @@ export const ClientField = (props: AutocompleteProps<Entity | string>) => {
   const bind = useBind<LotFormValue>()
   const bound = bind("client")
   const isKnown = bound.value instanceof Object
+  const hasClients =
+    entity.has_mac || entity.has_direct_deliveries || entity.has_trading
 
   return (
     <Autocomplete
-      disabled={entity.isOperator && !entity.has_mac}
+      disabled={entity.isOperator && !hasClients}
       label={t("Client")}
-      placeholder={entity.isOperator ? entity.name : undefined}
       icon={isKnown ? UserCheck : undefined}
       create={norm.identity}
       defaultOptions={bound.value ? [bound.value] : undefined}
