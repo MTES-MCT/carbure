@@ -841,9 +841,10 @@ class CarbureLot(models.Model):
     TRADING = "TRADING"
     PROCESSING = "PROCESSING"
     DIRECT = "DIRECT" # livraison directe
-    FLUSHED = "FLUSHED" # emptying stock for accounting or rounding purpuse
+    FLUSHED = "FLUSHED" # emptying stock for accounting or rounding purpose
+    NATIONAL = "NATIONAL"
     DELIVERY_TYPES = ((UNKNOWN, UNKNOWN), (RFC, RFC), (STOCK, STOCK), (BLENDING, BLENDING), (EXPORT, EXPORT),
-                      (TRADING, TRADING), (PROCESSING, PROCESSING), (DIRECT, DIRECT), (FLUSHED, FLUSHED), )
+                      (TRADING, TRADING), (PROCESSING, PROCESSING), (DIRECT, DIRECT), (FLUSHED, FLUSHED), (NATIONAL, NATIONAL), )
     delivery_type = models.CharField(max_length=64, choices=DELIVERY_TYPES, blank=False, null=False, default=UNKNOWN)
     declared_by_supplier = models.BooleanField(default=False)
     declared_by_client = models.BooleanField(default=False)
