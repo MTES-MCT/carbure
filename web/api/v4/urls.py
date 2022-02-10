@@ -44,6 +44,7 @@ urlpatterns = [
     path('lots/accept-blending', views.accept_blending, name='api-v4-accept-blending'),
     path('lots/accept-export', views.accept_export, name='api-v4-accept-export'),
     path('lots/accept-direct-delivery', views.accept_direct_delivery, name='api-v4-accept-direct-delivery'),
+    path('lots/accept-national-delivery', views.accept_national_delivery, name='api-v4-accept-national-delivery'),
     ### Warnings
     path('lots/toggle-warning', views.toggle_warning, name='api-v4-toggle-warning'),
 
