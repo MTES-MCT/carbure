@@ -125,14 +125,12 @@ export const ProductionSiteCertificateField = (
       ? value.production_site.id
       : undefined
 
-  // prettier-ignore
-  const icon = value.certificates?.production_site_certificate
-    ? <CertificateIcon certificate={value.certificates?.production_site_certificate} />
-    : undefined
+  const certificate =
+    value.certificates?.production_site_certificate ?? undefined
 
   return (
     <Autocomplete
-      icon={icon}
+      icon={<CertificateIcon certificate={certificate} />}
       label={t("Certificat du site de production")}
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={(query) =>
@@ -161,14 +159,12 @@ export const ProductionSiteDoubleCountingCertificateField = (
       ? { ...props, disabled: true, error: bound.error, value: value.production_site.dc_reference } // prettier-ignore
       : { ...props, ...bound }
 
-  // prettier-ignore
-  const icon = value.certificates?.production_site_double_counting_certificate
-    ? <CertificateIcon certificate={value.certificates?.production_site_double_counting_certificate} />
-    : undefined
+  const certificate =
+    value.certificates?.production_site_double_counting_certificate ?? undefined
 
   return (
     <TextInput
-      icon={icon}
+      icon={<CertificateIcon certificate={certificate} />}
       label={t("Certificat double-comptage")}
       {...dcProps}
     />

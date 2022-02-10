@@ -7,12 +7,16 @@ import { LotCertificate } from "lot-details/types"
 import { useTranslation } from "react-i18next"
 
 interface CertificateProps {
-  certificate: LotCertificate
+  certificate: LotCertificate | undefined
 }
 
 export const CertificateIcon = ({ certificate }: CertificateProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
+
+  if (!certificate || !certificate.found) {
+    return null
+  }
 
   return (
     <Button

@@ -78,15 +78,12 @@ export const SupplierCertificateField = (props: AutocompleteProps<string>) => {
   const supplier = value.supplier instanceof Object ? value.supplier : undefined
   const isSupplier = entity.id === supplier?.id
 
-  // prettier-ignore
-  const icon = value.certificates?.supplier_certificate
-    ? <CertificateIcon certificate={value.certificates?.supplier_certificate} />
-    : undefined
+  const certificate = value.certificates?.supplier_certificate ?? undefined
 
   return (
     <Autocomplete
       label={t("Certificat du fournisseur")}
-      icon={icon}
+      icon={<CertificateIcon certificate={certificate} />}
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={(query) =>
         isSupplier
@@ -119,16 +116,13 @@ export const MyCertificateField = (props: AutocompleteProps<string>) => {
     return null
   }
 
-  // prettier-ignore
-  const icon = value.certificates?.vendor_certificate
-    ? <CertificateIcon certificate={value.certificates?.vendor_certificate} />
-    : undefined
+  const certificate = value.certificates?.vendor_certificate ?? undefined
 
   return (
     <Autocomplete
       required
       label={t("Votre certificat")}
-      icon={icon}
+      icon={<CertificateIcon certificate={certificate} />}
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={(query) =>
         api.findMyCertificates(query, { entity_id: entity.id })
