@@ -43,7 +43,7 @@ export const LotTag = ({ lot, ...props }: LotTagProps) => {
     if (delivery === DeliveryType.Blending) {
       label = t("Incorporé")
     } else if (delivery === DeliveryType.Direct) {
-      label = t("Livraison directe")
+      label = t("Livr. directe")
     } else if (delivery === DeliveryType.Exportation) {
       label = t("Exporté")
     } else if (delivery === DeliveryType.Processing) {
@@ -55,7 +55,7 @@ export const LotTag = ({ lot, ...props }: LotTagProps) => {
     } else if (delivery === DeliveryType.Trading) {
       label = t("Transféré")
     } else if (delivery === DeliveryType.National) {
-      label = t("Accepté")
+      label = t("Livr. nationale")
     }
   } else if (status === LotStatus.Accepted) {
     variant = "success"
