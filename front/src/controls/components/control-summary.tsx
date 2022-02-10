@@ -34,7 +34,7 @@ export const LotSummaryBar = ({
   const api = pickApi(entity)
 
   const summary = useQuery(api.getLotsSummary, {
-    key: "lots-summary",
+    key: "controls-summary",
     params: [query, selection, true],
   })
 

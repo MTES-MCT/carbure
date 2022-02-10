@@ -1649,6 +1649,7 @@ def toggle_warning(request, *args, **kwargs):
     entity_id = context['entity_id']
     lot_id = request.POST.get('lot_id')
     errors = request.POST.getlist('errors')
+    checked = request.POST.get('checked') == 'true'
     try:
         for error in errors:
             try:
@@ -1659,10 +1660,10 @@ def toggle_warning(request, *args, **kwargs):
                 return JsonResponse({'status': "error", 'message': "Could not locate wanted lot or error"}, status=404)
             # is creator
             if lot.added_by_id == int(entity_id):
-                lot_error.acked_by_creator = not lot_error.acked_by_creator
+                lot_error.acked_by_creator = checked
             # is recipient
             if lot.carbure_client_id == int(entity_id):
-                lot_error.acked_by_recipient = not lot_error.acked_by_recipient
+                lot_error.acked_by_recipient = checked
             lot_error.save()
         return JsonResponse({'status': "success"})
     except:
