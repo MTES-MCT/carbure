@@ -54,8 +54,15 @@ export function useLotForm(
 
     // for producers
     if (entity.isProducer) {
-      if (!entity.has_trading) {
+      if (!entity.has_trading && !entity.has_stocks) {
         value.producer = entity
+      }
+
+      const isProducerEntity =
+        value.producer instanceof Object && value.producer.id === entity.id
+
+      if (isProducerEntity) {
+        value.supplier = entity
       }
     }
 
