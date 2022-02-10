@@ -185,6 +185,7 @@ export interface LotError {
   acked_by_creator: boolean
   acked_by_recipient: boolean
   acked_by_admin: boolean
+  acked_by_auditor: boolean
 }
 
 export enum LotStatus {
