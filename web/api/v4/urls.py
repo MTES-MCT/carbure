@@ -14,7 +14,6 @@ urlpatterns = [
     path('auth/activate', auth_views.activate, name='api-v4-activate'),
 
 
-
     # GET
     path('years', views.get_years, name='api-v4-get-years'),
     path('snapshot', views.get_snapshot, name='api-v4-get-snapshot'),
@@ -93,6 +92,7 @@ urlpatterns = [
     path('admin/lots/toggle-warning', admin.toggle_warning, name='api-v4-admin-toggle-warning'),
     path('admin/lots/pin', admin.toggle_pin, name='api-v4-admin-pin-lots'),
     path('admin/lots/comment', admin.add_comment, name='api-v4-admin-add-comment'),
+    path('admin/dashboard/declarations', admin.get_declarations, name='api-v4-admin-get-declarations'),
 
     # AUDITOR
     path('auditor/years', auditor.get_years, name='api-v4-auditor-get-years'),
