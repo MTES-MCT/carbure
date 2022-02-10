@@ -234,7 +234,8 @@ export const lotToFormValue: LotToFormValue = (lot, certificates) => ({
   supplier_certificate: lot?.supplier_certificate ?? undefined,
   vendor_certificate: lot?.vendor_certificate ?? undefined,
   client: lot?.carbure_client ?? lot?.unknown_client ?? undefined,
-  delivery_type: lot?.delivery_type,
+  delivery_type:
+    lot?.delivery_type === "UNKNOWN" ? undefined : lot?.delivery_type,
   delivery_site:
     lot?.carbure_delivery_site ?? lot?.unknown_delivery_site ?? undefined,
   delivery_site_country: lot?.delivery_site_country ?? undefined,
