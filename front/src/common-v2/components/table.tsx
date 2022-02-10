@@ -5,9 +5,12 @@ import { multipleSelection } from "../utils/selection"
 import css from "./table.module.css"
 import { Col, LoaderOverlay } from "./scaffold"
 
+export type TableVariant = "spaced" | "compact"
+
 export interface TableProps<T> {
   className?: string
   style?: React.CSSProperties
+  variant?: TableVariant
   loading?: boolean
   headless?: boolean
   columns: Column<T>[]
@@ -21,6 +24,7 @@ export interface TableProps<T> {
 export function Table<T>({
   className,
   style,
+  variant,
   loading,
   headless,
   columns,
@@ -34,7 +38,11 @@ export function Table<T>({
   const compare = useCompare(columns, order)
 
   return (
-    <div data-list className={cl(css.table, className)} style={style}>
+    <div
+      data-list
+      className={cl(css.table, variant && css[variant], className)}
+      style={style}
+    >
       {!headless && (
         <header className={css.columns}>
           {columns.filter(isVisible).map((column, i) => (
@@ -212,17 +220,29 @@ export type OrderBy<T> = (value: T) => string | number
 
 export type CellVariant = "warning"
 export interface CellProps {
+  className?: string
+  style?: React.CSSProperties
   variant?: CellVariant
   icon?: React.FunctionComponent | React.ReactNode
   text?: any
   sub?: any
 }
 
-export const Cell = ({ variant, icon: Icon, text, sub }: CellProps) => {
+export const Cell = ({
+  variant,
+  className,
+  style,
+  icon: Icon,
+  text,
+  sub,
+}: CellProps) => {
   const icon = typeof Icon === "function" ? <Icon /> : Icon
 
   return (
-    <Col className={cl(css.multiline, variant && css[variant])}>
+    <Col
+      className={cl(css.multiline, variant && css[variant], className)}
+      style={style}
+    >
       <strong title={`${text}`}>
         {text || sub} {icon}
       </strong>

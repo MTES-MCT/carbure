@@ -437,3 +437,9 @@ export const User = ({ className, ...props }: IconProps) => (
     <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
   </Icon>
 )
+
+export const Square = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("square", className)}>
+    <rect width={24} height={24} fill={props.color} strokeWidth={0} />
+  </Icon>
+)

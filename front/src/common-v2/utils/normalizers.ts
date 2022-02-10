@@ -12,6 +12,7 @@ import {
   EntityCertificate,
   EntityDepot,
 } from "common/types"
+import { formatPeriod } from "./formatters"
 
 export const normalizeBiofuel: Normalizer<Biofuel> = (biofuel) => ({
   value: biofuel,
@@ -72,6 +73,11 @@ export const normalizeEntityCertificate: Normalizer<EntityCertificate,string> = 
 export const normalizeDeliveryType: Normalizer<DeliveryType> = (delivery) => ({
   value: delivery,
   label: getDeliveryLabel(delivery),
+})
+
+export const normalizePeriod: Normalizer<number> = (period) => ({
+  value: period,
+  label: formatPeriod(period),
 })
 
 // prettier-ignore
