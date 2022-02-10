@@ -438,7 +438,7 @@ test("transaction details form as producer - producer trades unknown producer lo
   const psiteCountry = getField("Pays de production")
   expect(psiteCountry).toHaveValue("France")
 
-  expect(getField("Votre certificat")).toHaveValue("ISCC1000 - Vendor")
+  expect(getField("Votre certificat *")).toHaveValue("ISCC1000 - Vendor")
 })
 
 test("transaction details form as operator - producer trades unknown producer lot to operator", async () => {

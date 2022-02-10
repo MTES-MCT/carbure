@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next"
 import { Entity, EntityType } from "carbure/types"
 import { EntityDepot } from "common/types"
 import { Lot, LotQuery } from "transactions/types"
-import Menu, { MenuItem } from "common-v2/components/menu"
+import Menu from "common-v2/components/menu"
 import { Check, Return } from "common-v2/components/icons"
 import { useMutation, useQuery } from "common-v2/hooks/async"
 import * as api from "../api"
@@ -22,6 +22,7 @@ import * as norm from "common-v2/utils/normalizers"
 import { getDeliverySites } from "settings/api"
 import { findEntities, findMyCertificates } from "common-v2/api"
 import Select from "common-v2/components/select"
+import { compact } from "common-v2/utils/collection"
 
 export interface AcceptManyButtonProps {
   disabled?: boolean
@@ -104,7 +105,7 @@ function useAcceptOptions(params: {
   const summary = params.summary ?? false
   const props = { query, selection, summary }
 
-  const options = [
+  return compact([
     isOperator && {
       label: i18next.t("Incorporation"),
       action: () =>
@@ -145,13 +146,16 @@ function useAcceptOptions(params: {
         portal((close) => <TradingDialog {...props} onClose={close} />),
     },
     {
+      label: i18next.t("Livraison nationale"),
+      action: () =>
+        portal((close) => <NationalDialog {...props} onClose={close} />),
+    },
+    {
       label: i18next.t("Exportation"),
       action: () =>
         portal((close) => <ExportDialog {...props} onClose={close} />),
     },
-  ]
-
-  return options.filter((option) => option !== false) as MenuItem[]
+  ])
 }
 
 interface AcceptDialogProps {
@@ -519,6 +523,96 @@ const DirectDeliveryDialog = ({
   )
 }
 
+const NationalDialog = ({
+  summary,
+  query,
+  selection,
+  onClose,
+}: AcceptDialogProps) => {
+  const { t } = useTranslation()
+  const notify = useNotify()
+  const matomo = useMatomo()
+
+  const v = variations(selection.length)
+
+  const acceptLots = useMutation(api.acceptForNational, {
+    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
+
+    onSuccess: () => {
+      const text = v({
+        zero: t("Les lots ont été marqués comme livraison nationale !"),
+        one: t("Le lot a été marqué comme livraison nationale !"),
+        many: t("Les lots sélectionnés ont été marqués comme livraison nationale !"), // prettier-ignore
+      })
+
+      notify(text, { variant: "success" })
+      onClose()
+    },
+
+    onError: () => {
+      const text = v({
+        zero: t("Les lots n'ont pas pu être acceptés !"),
+        one: t("Le lot n'a pas pu être accepté !"),
+        many: t("Les lots sélectionnés n'ont pas pu être acceptés !"),
+      })
+
+      notify(text, { variant: "danger" })
+      onClose()
+    },
+  })
+
+  return (
+    <Dialog onClose={onClose}>
+      <header>
+        <h1>
+          {v({
+            zero: t("Livrer les lots en France"),
+            one: t("Livrer le lot en France"),
+            many: t("Livrer les lots en France"),
+          })}
+        </h1>
+      </header>
+      <main>
+        <section>
+          {v({
+            zero: t("Voulez-vous accepter les lots pour livraison nationale ?"),
+            one: t("Voulez-vous accepter le lot pour livraison nationale ?"),
+            many: t("Voulez-vous accepter les lots sélectionnés pour livraison nationale ?"), // prettier-ignore
+          })}
+        </section>
+
+        {summary && <LotSummary query={query} selection={selection} />}
+      </main>
+      <footer>
+        <Button
+          asideX
+          disabled={acceptLots.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
+        />
+        <Button
+          submit
+          loading={acceptLots.loading}
+          variant="success"
+          icon={Check}
+          label={t("Livrer")}
+          action={() => {
+            matomo.push([
+              "trackEvent",
+              "lots-accept",
+              "national",
+              "",
+              selection.length,
+            ])
+            acceptLots.execute(query, selection)
+          }}
+        />
+      </footer>
+    </Dialog>
+  )
+}
+
 const ExportDialog = ({
   summary,
   query,
@@ -609,12 +703,12 @@ const ExportDialog = ({
   )
 }
 
-interface AcceptDialogProps {
-  summary?: boolean
-  query: LotQuery
-  selection: number[]
-  onClose: () => void
-}
+// interface AcceptDialogProps {
+//   summary?: boolean
+//   query: LotQuery
+//   selection: number[]
+//   onClose: () => void
+// }
 
 const TradingDialog = ({
   summary,

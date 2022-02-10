@@ -234,7 +234,7 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
       </main>
       <footer>
         <Button
-          disabled={volumeDiff !== 0}
+          disabled={volumeDiff !== 0 || stockRows.length === 0}
           loading={transformETBE.loading}
           submit="etbe"
           variant="primary"

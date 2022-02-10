@@ -8,7 +8,7 @@ import useEntity from "carbure/hooks/entity"
 import { useMutation } from "common-v2/hooks/async"
 import * as api from "../api"
 import { Normalizer } from "common-v2/utils/normalize"
-import { Fragment, useState } from "react"
+import { Fragment, useCallback, useEffect, useState } from "react"
 import { UserRole } from "carbure/types"
 
 export interface BlockingAnomaliesProps {
@@ -49,21 +49,25 @@ export const WarningAnomalies = ({ lot, anomalies }: WarningAnomaliesProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
 
-  const isCreator = lot.added_by?.id === entity.id
-  const isRecipient = lot.carbure_client?.id === entity.id
-
-  function isAcked(anomaly: LotError) {
-    if (isCreator) return anomaly.acked_by_creator
-    else if (isRecipient) return anomaly.acked_by_recipient
-    else return false
-  }
-
-  const [checked, setChecked] = useState<string[] | undefined>(
-    anomalies.filter(isAcked).map((a) => a.error)
+  const isAcked = useCallback(
+    (anomaly: LotError) => {
+      const isCreator = lot.added_by?.id === entity.id
+      const isRecipient = lot.carbure_client?.id === entity.id
+      if (isCreator) return anomaly.acked_by_creator
+      else if (isRecipient) return anomaly.acked_by_recipient
+      else return false
+    },
+    [entity.id, lot]
   )
 
+  const [checked, setChecked] = useState<string[] | undefined>([])
+
+  useEffect(() => {
+    setChecked(anomalies.filter(isAcked).map((a) => a.error))
+  }, [anomalies, isAcked])
+
   const ackWarning = useMutation(
-    (errors: string[]) => api.toggleWarning(entity.id, lot.id, errors),
+    (errors: string[], checked: boolean) => api.toggleWarning(entity.id, lot.id, errors, checked), // prettier-ignore
     { invalidates: [] }
   )
 
@@ -106,12 +110,11 @@ export const WarningAnomalies = ({ lot, anomalies }: WarningAnomaliesProps) => {
               style={{
                 fontStyle: "italic",
                 marginLeft: "var(--spacing-s)",
-                marginBottom: -8,
               }}
               label={t("Ignorer toutes ces remarques")}
-              onChange={() => {
+              onChange={(checked) => {
                 const errors = anomalies.map((a) => a.error)
-                ackWarning.execute(errors)
+                ackWarning.execute(errors, checked)
                 setChecked(isAllChecked ? [] : errors)
               }}
             />
@@ -120,7 +123,7 @@ export const WarningAnomalies = ({ lot, anomalies }: WarningAnomaliesProps) => {
               value={checked}
               options={anomalies}
               onChange={setChecked}
-              onToggle={(error) => ackWarning.execute([error])}
+              onToggle={(error, checked) => ackWarning.execute([error], checked)} // prettier-ignore
               normalize={normalizeAnomaly}
             />
           </Fragment>
