@@ -30,7 +30,7 @@ distlib==0.3.0
 distro==1.4.0
 Django==4.0.2
 django-admin-list-filter-dropdown==1.0.3
-django-authtools @ git+git://github.com/mplanes/django-authtools@72b456b75bc11772284663a71544f96747ab3f6a
+django-authtools @ git+git://github.com/mplanes/django-authtools@190538c469da7c6fc2163e97dd8ba20c9290f1c7
 django-debug-toolbar==3.2.1
 django-environ==0.4.5
 django-filter==2.4.0
