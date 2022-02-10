@@ -10,8 +10,8 @@ async-timeout==3.0.1
 attrs==19.3.0
 beautifulsoup4==4.9.3
 blessings==1.7
-boto3==1.17.82
-botocore==1.20.82
+boto3==1.20.52
+botocore==1.23.52
 branca==0.4.2
 bs4==0.0.1
 CacheControl==0.12.6
@@ -30,7 +30,7 @@ distlib==0.3.0
 distro==1.4.0
 Django==4.0.2
 django-admin-list-filter-dropdown==1.0.3
-django-authtools @ git+git://github.com/mplanes/django-authtools@190538c469da7c6fc2163e97dd8ba20c9290f1c7
+django-authtools @ git+git://github.com/mplanes/django-authtools@fd220f7e1ccc42d77d5f7bd89614e536fd62a9a9
 django-debug-toolbar==3.2.1
 django-environ==0.4.5
 django-filter==2.4.0
@@ -104,7 +104,7 @@ requests==2.25.1
 resolvelib==0.5.4
 retrying==1.3.3
 rsa==4.7.2
-s3transfer==0.4.2
+s3transfer==0.5.1
 sentry-sdk==0.14.2
 six==1.14.0
 soupsieve==2.0.1
