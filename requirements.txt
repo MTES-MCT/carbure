@@ -113,6 +113,7 @@ tabulate==0.8.9
 toml==0.10.2
 tqdm==4.62.3
 typing-extensions==3.7.4.1
+tzdata==2021.5
 urllib3==1.26.5
 webencodings==0.5.1
 wrapt==1.12.1
