@@ -85,6 +85,12 @@ server {
         uwsgi_pass  django;
         include     /etc/nginx/conf.d/uwsgi_params;
     }
+
+    
+    location /v2 {
+      return 301 /app;
+    }
+
 }
 
 server {
