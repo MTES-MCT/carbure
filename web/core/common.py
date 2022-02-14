@@ -1206,7 +1206,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
                 lot[key] = 0
         lot['transport_document_reference'] = lot_row.get('dae', '')
         lot['delivery_date'] = lot_row.get('delivery_date', '')
-        delivery_site = lot_row.get('delivery_site', '')
+        delivery_site = str(lot_row.get('delivery_site', ''))
         if delivery_site.upper() in prefetched_data['depots']:
             lot['carbure_delivery_site_depot_id'] = prefetched_data['depots'][delivery_site.upper()].depot_id
         elif delivery_site.upper() in prefetched_data['depotsbyname']:
