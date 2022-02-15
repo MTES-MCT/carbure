@@ -11,6 +11,7 @@ export interface EntityManager extends Entity {
   isOperator: boolean
   isTrader: boolean
   isIndustry: boolean
+  canTrade: boolean
   hasPage: (page: ExternalAdminPages) => boolean
   hasRights: (...roles: UserRole[]) => boolean
 }
@@ -43,6 +44,8 @@ export function useEntity(): EntityManager {
     isOperator: type === EntityType.Operator,
     isTrader: type === EntityType.Trader,
     isIndustry: isIndustry(type),
+
+    canTrade: !!entity?.has_stocks || !!entity?.has_trading,
 
     hasPage: (page: ExternalAdminPages) =>
       entity?.ext_admin_pages?.includes(page) ?? false,

@@ -16,6 +16,7 @@ export const EmissionFields = (props: GHGFieldsProps) => {
   return (
     <Fieldset small label={t("Émissions")}>
       <NumberInput
+        required={value.feedstock?.category === "CONV"}
         label="EEC"
         title={t("Émissions résultant de l'extraction ou de la culture des matières premières")} // prettier-ignore
         {...bind("eec")}
