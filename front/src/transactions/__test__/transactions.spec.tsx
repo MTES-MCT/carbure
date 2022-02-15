@@ -188,7 +188,7 @@ test("sent selected draft lots", async () => {
   userEvent.click(document.querySelector("[data-checkbox]")!)
 
   // click on the send selection button
-  userEvent.click(screen.getByText("Envoyer sélection"))
+  userEvent.click(await screen.findByText("Envoyer sélection"))
 
   // confirm the sending
   const title = screen.getByText("Envoyer ce brouillon")
