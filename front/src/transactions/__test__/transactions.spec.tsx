@@ -182,13 +182,17 @@ test("send all draft lots", async () => {
 test("sent selected draft lots", async () => {
   render(<TransactionsWithRouter status="drafts" entity={operator} />)
 
-  await screen.findByText("2021")
+  await waitWhileLoading()
+
+  screen.getByText("2021")
 
   // select the first lot
-  userEvent.click(document.querySelector("[data-checkbox]")!)
+  userEvent.click(document.querySelector("li [data-checkbox]")!)
+
+  await waitWhileLoading()
 
   // click on the send selection button
-  userEvent.click(await screen.findByText("Envoyer sélection"))
+  userEvent.click(screen.getByText("Envoyer sélection"))
 
   // confirm the sending
   const title = screen.getByText("Envoyer ce brouillon")
