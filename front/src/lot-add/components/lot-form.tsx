@@ -60,7 +60,6 @@ export function useLotForm(
 
       if (isLotProducer(entity, value)) {
         value.supplier = entity
-        value.supplier_certificate = value.production_site_certificate
       }
     }
 

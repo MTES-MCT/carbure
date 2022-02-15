@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom"
+import { Route } from "react-router-dom"
 import { render, TestRoot } from "setupTests"
 import { screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
@@ -45,19 +45,19 @@ const LotDetailsWithRouter = ({ entity }: { entity: Entity }) => {
 }
 
 function checkLotFields() {
-  getField("N° document d'accompagnement *")
-  getField("Volume en litres (Ethanol à 20°, autres à 15°) *")
-  getField("Biocarburant *")
-  getField(/^Matière première */)
-  getField("Pays d'origine de la matière première *")
+  getField("N° document d'accompagnement")
+  getField("Volume en litres")
+  getField("Biocarburant")
+  getField("Matière première")
+  getField("Pays d'origine de la matière première")
 }
 
 function checkProductionFields() {
-  getField(/^Site de production/)
+  getField("Site de production")
   getField("Certificat du site de production")
   getField("Pays de production")
   getField("Date de mise en service")
-  getField("Certificat double-comptage")
+  // getField("Certificat double-comptage")
 }
 
 function checkOriginFields() {
@@ -68,18 +68,18 @@ function checkOriginFields() {
 }
 
 function checkDeliveryFields() {
-  getField(/^Client/)
-  getField(/^Site de livraison/)
+  getField("Client")
+  getField("Site de livraison")
   getField("Pays de livraison")
-  getField("Date de livraison *")
+  getField("Date de livraison")
 }
 
 function checkGESFields() {
   getField("Émissions")
   getField("EEC")
   getField("EL")
-  getField("EP *")
-  getField("ETD *")
+  getField("EP")
+  getField("ETD")
   getField("EU")
 
   getField("Réductions")
@@ -127,51 +127,51 @@ test("edit transaction details", async () => {
 
   screen.getByText(/^Détails du lot/)
 
-  const dae = getField("N° document d'accompagnement *")
+  const dae = getField("N° document d'accompagnement")
   userEvent.clear(dae)
   userEvent.type(dae, "DAETEST")
 
-  const vol = getField("Volume en litres (Ethanol à 20°, autres à 15°) *")
+  const vol = getField("Volume en litres")
   userEvent.clear(vol)
   userEvent.type(vol, "20000")
 
-  const bio = getField("Biocarburant *")
+  const bio = getField("Biocarburant")
   userEvent.clear(bio)
   userEvent.type(bio, "EM")
   userEvent.click(await screen.findByText("EMHV"))
   await screen.findByDisplayValue("EMHV")
 
-  const mp = getField(/Matière première \*/)
+  const mp = getField("Matière première")
   userEvent.clear(mp)
   userEvent.type(mp, "Co")
   userEvent.click(await screen.findByText("Colza"))
   await screen.findByDisplayValue("Colza")
 
-  const ct: any = getField("Pays d'origine de la matière première *")
+  const ct: any = getField("Pays d'origine de la matière première")
   userEvent.clear(ct)
   userEvent.type(ct, "Fra")
   userEvent.click(await screen.findByText("France"))
   await screen.findAllByDisplayValue("France")
 
-  const dd = getField("Date de livraison *")
+  const dd = getField("Date de livraison")
   userEvent.clear(dd)
   userEvent.type(dd, "2021-31-01")
 
   screen.getAllByDisplayValue("Producteur Test")
 
-  const ps = getField(/^Site de production/)
+  const ps = getField("Site de production")
   userEvent.clear(ps)
   userEvent.type(ps, "Test")
   userEvent.click(await screen.findByText("Test Production Site"))
   await screen.findByDisplayValue("Test Production Site")
 
-  const cli = getField(/^Client/)
+  const cli = getField("Client")
   userEvent.clear(cli)
   userEvent.type(cli, "Test")
   userEvent.click(await screen.findByText("Opérateur Test"))
   await screen.findByDisplayValue("Opérateur Test")
 
-  const ds = getField(/^Site de livraison/)
+  const ds = getField("Site de livraison")
   userEvent.clear(ds)
   userEvent.type(ds, "Test")
   userEvent.click(await screen.findByText("Test Delivery Site"))
@@ -189,11 +189,11 @@ test("edit transaction details", async () => {
   userEvent.clear(el)
   userEvent.type(el, "1.1")
 
-  const ep = getField("EP *")
+  const ep = getField("EP")
   userEvent.clear(ep)
   userEvent.type(ep, "1.2")
 
-  const etd = getField("ETD *")
+  const etd = getField("ETD")
   userEvent.clear(etd)
   userEvent.type(etd, "1.3")
 
@@ -292,7 +292,7 @@ test("send draft lot from details", async () => {
   userEvent.click(send)
 
   // dialog to confirm the sending
-  const title = screen.getByText("Envoyer ce brouillon")
+  const title = await screen.findByText("Envoyer ce brouillon")
   clickOnCheckboxesAndConfirm()
 
   await screen.findByText("En attente")
@@ -377,7 +377,7 @@ test("accept sous reserve inbox lot from details", async () => {
   userEvent.click(await screen.findByText("Demander une correction"))
 
   screen.getByText("Demander une correction", { selector: "h1" })
-  userEvent.type(getField("Commentaire *"), "test is incorrect") // prettier-ignore
+  userEvent.type(getField("Commentaire"), "test is incorrect") // prettier-ignore
   userEvent.click(screen.getByText("Demander correction"))
 
   await screen.findByText("En correction")
@@ -394,7 +394,7 @@ test("reject inbox lot from details", async () => {
 
   // confirm the transaction
   screen.getByText("Refuser ce lot", { selector: "h1" })
-  userEvent.type(getField("Commentaire *"), "not for me") // prettier-ignore
+  userEvent.type(getField("Commentaire"), "not for me") // prettier-ignore
   userEvent.click(screen.getAllByText("Refuser")[1])
 
   await screen.findByText("Refusé")
@@ -424,13 +424,13 @@ test("transaction details form as producer - producer trades unknown producer lo
 
   await screen.findByDisplayValue("Unknown Producer")
 
-  const supplier = getField(/^Fournisseur/)
+  const supplier = getField("Fournisseur")
   expect(supplier).toHaveValue("Unknown Supplier")
 
   const supplierCertif = getField("Certificat du fournisseur")
   expect(supplierCertif).toHaveValue("ISCC2000 - Supplier")
 
-  expect(getField(/^Site de production/)).toHaveValue("Unknown Production Site")
+  expect(getField("Site de production")).toHaveValue("Unknown Production Site")
 
   const certif = getField("Certificat du site de production")
   expect(certif).toHaveValue("2BS - KNOWN PSITE")
@@ -438,7 +438,7 @@ test("transaction details form as producer - producer trades unknown producer lo
   const psiteCountry = getField("Pays de production")
   expect(psiteCountry).toHaveValue("France")
 
-  expect(getField("Votre certificat *")).toHaveValue("ISCC1000 - Vendor")
+  expect(getField("Votre certificat")).toHaveValue("ISCC1000 - Vendor")
 })
 
 test("transaction details form as operator - producer trades unknown producer lot to operator", async () => {
@@ -462,9 +462,9 @@ test("transaction details form as operator - producer trades unknown producer lo
   checkGESFields()
 
   await screen.findByDisplayValue("Unknown Producer")
-  expect(getField(/^Fournisseur/)).toHaveValue("Producteur Test")
+  expect(getField("Fournisseur")).toHaveValue("Producteur Test")
   expect(getField("Certificat du fournisseur")).toHaveValue("ISCC1000 - Vendor")
-  expect(getField(/^Site de production/)).toHaveValue("Unknown Production Site")
+  expect(getField("Site de production")).toHaveValue("Unknown Production Site")
   expect(getField("Certificat du site de production")).toHaveValue(
     "2BS - KNOWN PSITE"
   )
@@ -494,11 +494,11 @@ test("transaction details form as operator - operator self accepts lot", async (
   checkGESFields()
 
   await screen.findByDisplayValue("Unknown Producer")
-  expect(getField(/^Fournisseur/)).toHaveValue("Unknown Supplier")
+  expect(getField("Fournisseur")).toHaveValue("Unknown Supplier")
   expect(getField("Certificat du fournisseur")).toHaveValue(
     "ISCC2000 - Supplier"
   )
-  expect(getField(/^Site de production/)).toHaveValue("Unknown Production Site")
+  expect(getField("Site de production")).toHaveValue("Unknown Production Site")
   expect(getField("Certificat du site de production")).toHaveValue(
     "2BS - KNOWN PSITE"
   )
