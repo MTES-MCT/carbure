@@ -34,19 +34,19 @@ const TransactionAddWithRouter = ({
 )
 
 function checkLotFields() {
-  getField("N° document d'accompagnement *")
-  getField("Volume en litres (Ethanol à 20°, autres à 15°) *")
-  getField("Biocarburant *")
-  getField(/^Matière première */)
-  getField("Pays d'origine de la matière première *")
+  getField("N° document d'accompagnement")
+  getField("Volume en litres")
+  getField("Biocarburant")
+  getField("Matière première")
+  getField("Pays d'origine de la matière première")
 }
 
 function checkProductionFields() {
-  getField(/^Site de production/)
+  getField("Site de production")
   getField("Certificat du site de production")
   getField("Pays de production")
   getField("Date de mise en service")
-  getField("Certificat double-comptage")
+  // getField("Certificat double-comptage")
 }
 
 function checkOriginFields() {
@@ -57,18 +57,18 @@ function checkOriginFields() {
 }
 
 function checkDeliveryFields() {
-  getField(/^Client/)
-  getField(/^Site de livraison/)
+  getField("Client")
+  getField("Site de livraison")
   getField("Pays de livraison")
-  getField("Date de livraison *")
+  getField("Date de livraison")
 }
 
 function checkGESFields() {
   getField("Émissions")
   getField("EEC")
   getField("EL")
-  getField("EP *")
-  getField("ETD *")
+  getField("EP")
+  getField("ETD")
   getField("EU")
 
   getField("Réductions")
@@ -156,47 +156,47 @@ test("check the form fields are working", async () => {
   // await waitWhileLoading()
   await screen.findByText("Créer un nouveau lot")
 
-  userEvent.type(getField("N° document d'accompagnement *"), "DAETEST") // prettier-ignore
-  userEvent.type(getField("Volume en litres (Ethanol à 20°, autres à 15°) *"), "10000") // prettier-ignore
+  userEvent.type(getField("N° document d'accompagnement"), "DAETEST") // prettier-ignore
+  userEvent.type(getField("Volume en litres"), "10000") // prettier-ignore
 
-  userEvent.type(getField("Biocarburant *"), "EM")
+  userEvent.type(getField("Biocarburant"), "EM")
   userEvent.click(await screen.findByText("EMHV"))
   await screen.findByDisplayValue("EMHV")
 
-  userEvent.type(getField("Matière première *"), "Co")
+  userEvent.type(getField("Matière première"), "Co")
   userEvent.click(await screen.findByText("Colza"))
   await screen.findByDisplayValue("Colza")
 
-  userEvent.type(getField("Pays d'origine de la matière première *"), "France")
+  userEvent.type(getField("Pays d'origine de la matière première"), "France")
   await waitWhileLoading()
 
-  userEvent.type(getField("Date de livraison *"), "2020-31-12")
+  userEvent.type(getField("Date de livraison"), "2020-31-12")
 
   userEvent.type(getField("Producteur"), "Pr")
   userEvent.click(await screen.findByText("Producteur Test"))
   await screen.findByDisplayValue("Producteur Test")
 
-  userEvent.type(getField(/^Site de production/), "Test")
+  userEvent.type(getField("Site de production"), "Test")
   userEvent.click(await screen.findByText("Test Production Site"))
   await screen.findByDisplayValue("Test Production Site")
 
   const psiteCountry = getField("Pays de production")
   const psiteComDate = getField("Date de mise en service")
-  const psiteDC = getField("Certificat double-comptage")
+  // const psiteDC = getField("Certificat double-comptage")
 
   expect(psiteCountry).toBeDisabled()
   expect(psiteCountry).toHaveValue("France")
-  expect(psiteDC).toBeDisabled()
+  // expect(psiteDC).toBeDisabled()
   expect(psiteComDate).toBeDisabled()
   expect(psiteComDate).toHaveValue("2000-01-31")
 
-  userEvent.type(getField(/^Client/), "Test")
+  userEvent.type(getField("Client"), "Test")
   userEvent.click(await screen.findByText("Opérateur Test"))
   await screen.findByDisplayValue("Opérateur Test")
 
   expect(getField("Pays de livraison")).not.toBeDisabled()
 
-  userEvent.type(getField(/^Site de livraison/), "Test") // prettier-ignore
+  userEvent.type(getField("Site de livraison"), "Test") // prettier-ignore
   userEvent.click(await screen.findByText("Test Delivery Site"))
   await screen.findByDisplayValue("Test Delivery Site")
 
@@ -206,8 +206,8 @@ test("check the form fields are working", async () => {
 
   userEvent.type(getField("EEC"), "10")
   userEvent.type(getField("EL"), "1.1")
-  userEvent.type(getField("EP *"), "1.2")
-  userEvent.type(getField("ETD *"), "1.3")
+  userEvent.type(getField("EP"), "1.2")
+  userEvent.type(getField("ETD"), "1.3")
   userEvent.type(getField("EU"), "1.4")
 
   userEvent.type(getField("ESCA"), "1.1")

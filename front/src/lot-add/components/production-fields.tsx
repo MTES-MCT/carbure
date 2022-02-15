@@ -85,7 +85,7 @@ export const ProductionSiteField = (
   const producer = value.producer instanceof Object ? value.producer.id : undefined // prettier-ignore
 
   // for unknown producers, we show a simple input to type unknown production sites
-  if (!producer) {
+  if (producer === undefined) {
     return (
       <TextInput
         label={t("Site de production")}
