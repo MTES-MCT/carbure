@@ -358,7 +358,7 @@ export const GroupField = ({
       {label && (
         <label className={css.label} title={label}>
           {label}
-          {required && " *"}
+          {required && !(disabled || readOnly) && " *"}
         </label>
       )}
 
@@ -412,7 +412,7 @@ export const Field = ({
     {label && (
       <label className={css.label} title={title ?? label}>
         {label}
-        {required && " *"}
+        {required && !(disabled || readOnly) && " *"}
       </label>
     )}
 

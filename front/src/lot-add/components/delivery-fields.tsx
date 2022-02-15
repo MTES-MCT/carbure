@@ -12,7 +12,14 @@ import {
 import { UserCheck } from "common-v2/components/icons"
 import * as api from "common-v2/api"
 import * as norm from "common-v2/utils/normalizers"
-import { LotFormValue } from "./lot-form"
+import {
+  isExternalDelivery,
+  isLotClient,
+  isLotProducer,
+  isLotSupplier,
+  isLotVendor,
+  LotFormValue,
+} from "./lot-form"
 import { Entity } from "carbure/types"
 import { Country, Depot } from "common/types"
 import Select, { SelectProps } from "common-v2/components/select"
@@ -28,10 +35,10 @@ export const DeliveryFields = (props: DeliveryFieldsProps) => {
   const { t } = useTranslation()
   return (
     <Fieldset label={t("Livraison")}>
-      <MyCertificateField {...props} />
       <SupplierField {...props} />
       <SupplierCertificateField {...props} />
       <ClientField {...props} />
+      <MyCertificateField {...props} />
       <DeliveryTypeField {...props} />
       <DeliverySiteField {...props} />
       <DeliverySiteCountryField {...props} />
@@ -48,10 +55,10 @@ export const SupplierField = (props: AutocompleteProps<Entity | string>) => {
   const { value: supplier, ...bound } = bind("supplier")
   const isKnown = supplier instanceof Object
 
-  const isProducerEntity =
-    entity.isProducer &&
-    value.producer instanceof Object &&
-    value.producer.id === entity.id
+  // when the producer is the entity, it is also the supplier so hide this field
+  if (isLotProducer(entity, value)) {
+    return null
+  }
 
   return (
     <Autocomplete
@@ -64,7 +71,6 @@ export const SupplierField = (props: AutocompleteProps<Entity | string>) => {
       normalize={norm.normalizeEntityOrUnknown}
       {...bound}
       {...props}
-      disabled={isProducerEntity || props.disabled}
     />
   )
 }
@@ -73,20 +79,23 @@ export const SupplierCertificateField = (props: AutocompleteProps<string>) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { value, bind } = useFormContext<LotFormValue>()
-  const bound = bind("supplier_certificate")
 
-  const supplier = value.supplier instanceof Object ? value.supplier : undefined
-  const isSupplier = entity.id === supplier?.id
+  // when the producer is the entity, it is also the supplier so hide this field
+  if (isLotProducer(entity, value)) {
+    return null
+  }
 
   const certificate = value.certificates?.supplier_certificate ?? undefined
+  const bound = bind("supplier_certificate")
 
   return (
     <Autocomplete
+      required={isLotClient(entity, value)}
       label={t("Certificat du fournisseur")}
       icon={<CertificateIcon certificate={certificate} />}
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={(query) =>
-        isSupplier
+        isLotSupplier(entity, value)
           ? api.findMyCertificates(query, { entity_id: entity.id })
           : api.findCertificates(query)
       }
@@ -102,17 +111,8 @@ export const MyCertificateField = (props: AutocompleteProps<string>) => {
   const { value, bind } = useFormContext<LotFormValue>()
   const bound = bind("vendor_certificate")
 
-  const supplier = value.supplier instanceof Object ? value.supplier : undefined
-  const client = value.client instanceof Object ? value.client : undefined
-
   // hide this field if this entity is NOT an intermediary
-  // or if the supplier and client are not defined
-  if (
-    supplier?.id === entity.id ||
-    client?.id === entity.id ||
-    !value.supplier ||
-    !value.client
-  ) {
+  if (!isLotVendor(entity, value) || !entity.canTrade) {
     return null
   }
 
@@ -121,7 +121,7 @@ export const MyCertificateField = (props: AutocompleteProps<string>) => {
   return (
     <Autocomplete
       required
-      label={t("Votre certificat")}
+      label={t("Votre certificat de négoce")}
       icon={<CertificateIcon certificate={certificate} />}
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={(query) =>
@@ -136,14 +136,14 @@ export const MyCertificateField = (props: AutocompleteProps<string>) => {
 export const ClientField = (props: AutocompleteProps<Entity | string>) => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const bind = useBind<LotFormValue>()
+  const { value, bind } = useFormContext<LotFormValue>()
   const bound = bind("client")
   const isKnown = bound.value instanceof Object
-  const hasClients =
-    entity.has_mac || entity.has_direct_deliveries || entity.has_trading
+  const hasClients = entity.has_mac || entity.has_direct_deliveries || entity.has_trading // prettier-ignore
 
   return (
     <Autocomplete
+      required={!isExternalDelivery(value)}
       disabled={entity.isOperator && !hasClients}
       label={t("Client")}
       icon={isKnown ? UserCheck : undefined}
@@ -201,12 +201,13 @@ export function getDeliveryTypes(
 
 export const DeliverySiteField = (props: AutocompleteProps<Depot | string>) => {
   const { t } = useTranslation()
-  const bind = useBind<LotFormValue>()
+  const { value, bind } = useFormContext<LotFormValue>()
   const bound = bind("delivery_site")
   const isKnown = bound.value instanceof Object
 
   return (
     <Autocomplete
+      required={!isExternalDelivery(value)}
       label={t("Site de livraison")}
       icon={isKnown ? UserCheck : undefined}
       create={norm.identity}
@@ -224,6 +225,18 @@ export const DeliverySiteCountryField = (props: AutocompleteProps<Country>) => {
   const { value, bind } = useFormContext<LotFormValue>()
   const bound = bind("delivery_site_country")
 
+  if (value.delivery_type === DeliveryType.National) {
+    return (
+      <TextInput
+        disabled
+        readOnly={props.readOnly}
+        label={t("Pays de livraison")}
+        value={t("France")}
+        error={bound.error}
+      />
+    )
+  }
+
   if (value.delivery_site instanceof Object) {
     return (
       <TextInput
@@ -238,6 +251,7 @@ export const DeliverySiteCountryField = (props: AutocompleteProps<Country>) => {
 
   return (
     <Autocomplete
+      required
       label={t("Pays de livraison")}
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={api.findCountries}

@@ -79,9 +79,16 @@ export const FeedstockField = (props: AutocompleteProps<Feedstock>) => {
   const { t } = useTranslation()
   const bind = useBind<LotFormValue>()
   const bound = bind("feedstock")
+
+  // prettier-ignore
+  const icon = bound.value
+    ? <span style={{ fontSize: '0.9em' }}>{bound.value.category.toUpperCase()}</span>
+    : undefined
+
   return (
     <Autocomplete
       required
+      icon={icon}
       label={t("Matière première")}
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={api.findFeedstocks}

@@ -42,15 +42,16 @@ export const ProducerField = (props: AutocompleteProps<Entity | string>) => {
   const entity = useEntity()
   const bind = useBind<LotFormValue>()
 
-  const { value, ...bound } = bind("producer")
-  const isKnown = value instanceof Object
+  const { value: producer, ...bound } = bind("producer")
+  const isKnown = producer instanceof Object
 
+  // for entities that aren't producers, only show a simple text input to type an unknown producer
   if (!entity.isProducer) {
     return (
       <TextInput
         label={t("Producteur")}
         icon={isKnown ? UserCheck : undefined}
-        value={isKnown ? value.name : value}
+        value={isKnown ? producer.name : producer}
         {...bound}
         {...(props as TextInputProps)}
       />
@@ -61,10 +62,10 @@ export const ProducerField = (props: AutocompleteProps<Entity | string>) => {
     <Autocomplete
       disabled={!entity.has_trading && !entity.has_stocks}
       label={t("Producteur")}
-      value={value}
+      value={producer}
       icon={isKnown ? UserCheck : undefined}
       create={norm.identity}
-      defaultOptions={value ? [value] : [entity]}
+      defaultOptions={producer ? [producer] : [entity]}
       normalize={norm.normalizeEntityOrUnknown}
       {...bound}
       {...props}
@@ -81,11 +82,10 @@ export const ProductionSiteField = (
   const { value: productionSite, ...bound } = bind("production_site")
   const isKnown = productionSite instanceof Object
 
-  const isKnownProducer = value.producer instanceof Object
-  const producer =
-    value.producer instanceof Object ? value.producer.id : undefined
+  const producer = value.producer instanceof Object ? value.producer.id : undefined // prettier-ignore
 
-  if (!isKnownProducer) {
+  // for unknown producers, we show a simple input to type unknown production sites
+  if (!producer) {
     return (
       <TextInput
         label={t("Site de production")}
@@ -97,12 +97,13 @@ export const ProductionSiteField = (
     )
   }
 
+  // otherwise autocomplete the producer's production sites
   return (
     <Autocomplete
+      required
       label={t("Site de production")}
       value={productionSite}
       icon={isKnown ? UserCheck : undefined}
-      create={norm.identity}
       defaultOptions={isKnown ? [productionSite] : undefined}
       getOptions={(query) => api.findProductionSites(query, producer)}
       normalize={norm.normalizeProductionSite}
@@ -128,6 +129,7 @@ export const ProductionSiteCertificateField = (
   const certificate =
     value.certificates?.production_site_certificate ?? undefined
 
+  // if the production site is known, only propose its own certificates
   return (
     <Autocomplete
       icon={<CertificateIcon certificate={certificate} />}
@@ -152,8 +154,15 @@ export const ProductionSiteDoubleCountingCertificateField = (
 ) => {
   const { t } = useTranslation()
   const { value, bind } = useFormContext<LotFormValue>()
+
+  // hide field for non-DC feedstocks
+  if (!value.feedstock?.is_double_compte) {
+    return null
+  }
+
   const bound = bind("production_site_double_counting_certificate")
 
+  // if the production site is known, use its DC data instead of expecting manual input
   const dcProps =
     value.production_site instanceof Object
       ? { ...props, disabled: true, error: bound.error, value: value.production_site.dc_reference } // prettier-ignore
@@ -208,7 +217,7 @@ export const ProductionSiteCommissioningDateField = (props: DateInputProps) => {
   const dateProps =
     value.production_site instanceof Object
       ? { ...props, disabled: true, error: bound.error, value: value.production_site.date_mise_en_service } // prettier-ignore
-      : { ...props, ...bound }
+      : { ...props, ...bound, required: true }
 
   return <DateInput label={t("Date de mise en service")} {...dateProps} />
 }

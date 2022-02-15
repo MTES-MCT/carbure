@@ -50,7 +50,7 @@ export function useLotForm(
   const errors = useLotFieldErrors(lotErrors)
 
   function setValue(value: LotFormValue): LotFormValue {
-    if (value.lot) return value
+    if (value.lot && value.lot.lot_status !== "DRAFT") return value
 
     // for producers
     if (entity.isProducer) {
@@ -58,11 +58,9 @@ export function useLotForm(
         value.producer = entity
       }
 
-      const isProducerEntity =
-        value.producer instanceof Object && value.producer.id === entity.id
-
-      if (isProducerEntity) {
+      if (isLotProducer(entity, value)) {
         value.supplier = entity
+        value.supplier_certificate = value.production_site_certificate
       }
     }
 
@@ -79,29 +77,16 @@ export function useLotForm(
     }
 
     // automatically set the default certificate of the supplier
-    const supplier = value.supplier instanceof Object ? value.supplier : undefined // prettier-ignore
     if (
-      supplier?.id === entity.id &&
+      isLotSupplier(entity, value) &&
+      !isLotProducer(entity, value) &&
       value.supplier_certificate === undefined
     ) {
       value.supplier_certificate = entity.default_certificate
     }
 
-    // autofill production fields
-    if (value.production_site instanceof Object) {
-      value.production_country = value.production_site.country
-      value.production_site_commissioning_date =
-        value.production_site.date_mise_en_service
-
-      value.production_site_double_counting_certificate = value.feedstock
-        ?.is_double_compte
-        ? value.production_site.dc_reference
-        : undefined
-    }
-
-    // autofill delivery site fields
-    if (value.delivery_site instanceof Object) {
-      value.delivery_site_country = value.delivery_site.country
+    if (isLotVendor(entity, value) && value.vendor_certificate === undefined) {
+      value.vendor_certificate = entity.default_certificate
     }
 
     const knownClient =
@@ -326,6 +311,50 @@ export function lotFormToPayload(lot: LotFormValue | undefined) {
       typeof lot.delivery_site === "string" ? lot.delivery_site : undefined,
     delivery_site_country_code: lot.delivery_site_country?.code_pays,
   }
+}
+
+export function isExternalDelivery(value: LotFormValue) {
+  return (
+    value.delivery_type &&
+    [
+      DeliveryType.Exportation,
+      DeliveryType.National,
+      DeliveryType.RFC,
+      DeliveryType.Direct,
+    ].includes(value.delivery_type)
+  )
+}
+
+// tells if the entity is an intermediate in the transaction
+export function isLotVendor(entity: Entity, value: LotFormValue) {
+  const isSupplier = isLotSupplier(entity, value)
+  const hasSupplier = !!value.supplier
+
+  const isClient = isLotClient(entity, value)
+  const hasClient = !!value.client
+
+  return (!isSupplier && !isClient) || (!hasSupplier && !hasClient)
+}
+
+export function isLotClient(entity: Entity, value: LotFormValue) {
+  const client = value.client instanceof Object ? value.client : undefined
+  return client?.id === entity.id
+}
+
+export function isLotSupplier(entity: Entity, value: LotFormValue) {
+  const supplier = value.supplier instanceof Object ? value.supplier : undefined
+  return supplier?.id === entity.id
+}
+
+export function isLotProducer(
+  entity: Entity,
+  value: LotFormValue,
+  withTrading?: boolean
+) {
+  const producer = value.producer instanceof Object ? value.producer : undefined
+  const isProducerEntity = producer?.id === entity.id
+  const hasTrading = !!producer?.has_stocks && !!producer.has_trading
+  return withTrading ? isProducerEntity && hasTrading : isProducerEntity
 }
 
 // check if the content of the form has changed compared to the data loaded from the api

@@ -15,7 +15,7 @@ class EntitySerializer(serializers.ModelSerializer):
 class FeedStockSerializer(serializers.ModelSerializer):
     class Meta:
         model = MatierePremiere
-        fields = ['name', 'name_en', 'code']
+        fields = ['name', 'name_en', 'code', 'category', 'is_double_compte']
 
 class BiofuelSerializer(serializers.ModelSerializer):
     class Meta:
@@ -69,7 +69,7 @@ class DoubleCountingAgreementFullSerializer(serializers.ModelSerializer):
     producer_user = serializers.SlugRelatedField(
         read_only=True,
         slug_field='email'
-    )        
+    )
     dgec_validator = serializers.SlugRelatedField(
         read_only=True,
         slug_field='name'
@@ -81,7 +81,7 @@ class DoubleCountingAgreementFullSerializer(serializers.ModelSerializer):
     dgddi_validator = serializers.SlugRelatedField(
         read_only=True,
         slug_field='name'
-    )        
+    )
     producer = EntitySerializer(read_only=True)
 
     class Meta:
@@ -101,7 +101,7 @@ class DoubleCountingAgreementFullSerializerWithForeignKeys(serializers.ModelSeri
     producer_user = serializers.SlugRelatedField(
         read_only=True,
         slug_field='email'
-    )    
+    )
     dgec_validator = serializers.SlugRelatedField(
         read_only=True,
         slug_field='name'
@@ -113,7 +113,7 @@ class DoubleCountingAgreementFullSerializerWithForeignKeys(serializers.ModelSeri
     dgddi_validator = serializers.SlugRelatedField(
         read_only=True,
         slug_field='name'
-    )      
+    )
     sourcing = DoubleCountingSourcingSerializer(many=True, read_only=True)
     aggregated_sourcing = serializers.SerializerMethodField()
     production = DoubleCountingProductionSerializer(many=True, read_only=True)
