@@ -302,9 +302,11 @@
                       <td>
                         <p>Bonjour {{user.name}},</p>
                         <p>Vous pouvez maintenant vous connecter à CarbuRe en cliquant sur ce lien :</p>
-                        <a href="https://{{ domain }}/app/auth/otp?token={{ token }}">
-                          https://{{ domain }}/app/auth/otp?token={{ token }}
-                        </a>
+                        <p>
+                          <a href="https://{{ domain }}/app/auth/otp?token={{ token }}">
+                            https://{{ domain }}/app/auth/otp?token={{ token }}
+                          </a>
+                        </p>
                         <p>Si le lien ne fonctionne pas, veuillez entrer manuellement le code suivant dans CarbuRe :</p>
                         <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                           <tbody>
