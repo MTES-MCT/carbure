@@ -1,6 +1,6 @@
 import Button from "common-v2/components/button"
 import { useTranslation } from "react-i18next"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import Form, { useForm } from "common-v2/components/form"
 import { Lock, Return, UserCheck } from "common-v2/components/icons"
 import { TextInput } from "common-v2/components/input"
@@ -8,11 +8,13 @@ import { Container } from "./login"
 import { useNotify } from "common-v2/components/notifications"
 import { useMutation } from "common-v2/hooks/async"
 import * as api from "../api"
+import { useEffect } from "react"
 
 const OTP = () => {
   const { t } = useTranslation()
   const notify = useNotify()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
 
   const { value, bind } = useForm({
     otp: "" as string | undefined,
@@ -40,6 +42,14 @@ const OTP = () => {
       notify(t("Le code n'a pas pu être envoyé !"), { variant: "danger" })
     },
   })
+
+  // if a code is specified in the url, automatically call the api with it
+  const execVerifyOTP = verifyOTP.execute
+  useEffect(() => {
+    if (searchParams.has("token")) {
+      execVerifyOTP(searchParams.get("token")!)
+    }
+  }, [searchParams, execVerifyOTP])
 
   return (
     <Container>
