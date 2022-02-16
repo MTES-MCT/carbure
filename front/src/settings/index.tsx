@@ -29,7 +29,7 @@ const Settings = () => {
 
   const { isProducer, isTrader, isOperator } = entity
 
-  const hasCertificates = isProducer || isTrader
+  const hasCertificates = isProducer || isTrader || isOperator
   const hasDepot = isProducer || isOperator || isTrader
   const hasOptions = isProducer || isOperator || isTrader
 
