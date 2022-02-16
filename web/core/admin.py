@@ -34,12 +34,12 @@ class EntityAdmin(admin.ModelAdmin):
 
 
 class UserRightsAdmin(admin.ModelAdmin):
-    list_display = ('user', 'entity')
+    list_display = ('user', 'entity', 'role')
     search_fields = ('user__name', 'entity__name')
 
 
 class UserRightsRequestsAdmin(admin.ModelAdmin):
-    list_display = ('user', 'entity', 'status')
+    list_display = ('user', 'entity', 'status', 'role')
     search_fields = ('user__name', 'entity__name', 'status')
 
 

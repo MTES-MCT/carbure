@@ -986,7 +986,20 @@ def mark_as_fixed(request, *args, **kwargs):
         else:
             lot.correction_status = CarbureLot.FIXED
         lot.save()
-
+        child = CarbureLot.objects.filter(parent_lot=lot)
+        for c in child:
+            c.copy_sustainability_data(lot)
+            # also copy transaction detail
+            c.volume = lot.volume
+            c.weight = lot.weight
+            c.lhv_amount = lot.lhv_amount
+            c.transport_document_type = lot.transport_document_type
+            c.transport_document_reference = lot.transport_document_reference
+            c.delivery_date = lot.delivery_date
+            c.carbure_delivery_site = lot.carbure_delivery_site
+            c.unknown_delivery_site = lot.unknown_delivery_site
+            c.delivery_site_country = lot.delivery_site_country
+            c.save()
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.MARKED_AS_FIXED
         event.lot = lot
@@ -1018,7 +1031,7 @@ def approve_fix(request, *args, **kwargs):
             stocks = CarbureStock.objects.filter(parent_lot=lot)
             children = CarbureLot.objects.filter(parent_stock__in=stocks)
             for c in children:
-                c.update_sustainability_data(lot)
+                c.copy_sustainability_data(lot)
                 c.save()
                 event = CarbureLotEvent()
                 event.event_type = CarbureLotEvent.UPDATED
@@ -1031,7 +1044,7 @@ def approve_fix(request, *args, **kwargs):
                 new_stock = t.dest_stock
                 child = CarbureLot.objects.filter(parent_stock=new_stock)
                 for c in child:
-                    c.update_sustainability_data(lot)
+                    c.copy_sustainability_data(lot)
                     c.save()
                     event = CarbureLotEvent()
                     event.event_type = CarbureLotEvent.UPDATED
