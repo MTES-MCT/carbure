@@ -52,7 +52,6 @@ class Entity(models.Model):
             'sustainability_officer': self.sustainability_officer, 'sustainability_officer_phone_number': self.sustainability_officer_phone_number,
             'registered_address': self.registered_address, 'default_certificate': self.default_certificate}
         if self.entity_type == Entity.EXTERNAL_ADMIN:
-            print("WAS", self)
             d['ext_admin_pages'] = [e.right for e in self.externaladminrights_set.all()]
         return d
 

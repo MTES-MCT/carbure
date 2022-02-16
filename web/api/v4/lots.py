@@ -5,7 +5,7 @@ from typing import Generic, List
 from django.db.models.query import QuerySet
 from numpy.lib.function_base import insert
 from api.v4.sanity_checks import bulk_sanity_checks
-from core.models import CarbureLot, CarbureLotEvent, CarbureStock, Entity, GenericError, LotTransaction
+from core.models import CarbureLot, CarbureLotEvent, CarbureStock, Entity, GenericError
 
 INCORRECT_DELIVERY_DATE = "INCORRECT_DELIVERY_DATE"
 INCORRECT_FORMAT_DELIVERY_DATE = "INCORRECT_FORMAT_DELIVERY_DATE"
