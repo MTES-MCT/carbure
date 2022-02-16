@@ -70,6 +70,7 @@ const PrivateTopbar = ({ user, entity }: PrivateTopbarProps) => {
 
       <LanguageSelection />
       <UserMenu user={user} entity={entity} />
+      <Faq />
     </Header>
   )
 }
