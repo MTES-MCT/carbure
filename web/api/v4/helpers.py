@@ -645,8 +645,9 @@ def send_email_declaration_validated(declaration):
     else:
         # PROD
         recipients = [r.user.email for r in UserRights.objects.filter(entity=declaration.entity, user__is_staff=False, user__is_superuser=False).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])]
-
-    msg = EmailMultiAlternatives(subject=email_subject, body=text_message % (declaration.period), from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc)
+        
+    period = declaration.period.strftime('%Y-%m')
+    msg = EmailMultiAlternatives(subject=email_subject, body=text_message % (period), from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc)
     msg.send()
 
 def send_email_declaration_invalidated(declaration):
@@ -669,7 +670,8 @@ def send_email_declaration_invalidated(declaration):
         # PROD
         recipients = [r.user.email for r in UserRights.objects.filter(entity=declaration.entity, user__is_staff=False, user__is_superuser=False).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])]
 
-    msg = EmailMultiAlternatives(subject=email_subject, body=text_message % (declaration.period), from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc)
+    period = declaration.period.strftime('%Y-%m')
+    msg = EmailMultiAlternatives(subject=email_subject, body=text_message % (period), from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc)
     msg.send()
 
 
