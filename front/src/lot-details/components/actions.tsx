@@ -43,9 +43,10 @@ export const LotActions = ({ lot, canSave }: ActionBarProps) => {
 
       {(isCreator || isSupplier) && status !== "DRAFT" && (
         <Fragment>
-          {correction === "NO_PROBLEMO" && <RecallOneButton lot={lot} />}
-          {correction === "IN_CORRECTION" && (
+          {correction === "IN_CORRECTION" ? (
             <MarkOneAsFixedButton lot={lot} disabled={!canSave} />
+            ) : (
+            <RecallOneButton lot={lot} />
           )}
         </Fragment>
       )}

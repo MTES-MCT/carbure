@@ -60,5 +60,12 @@
   "UNKNOWN_DAE_FORMAT": "Le format du numéro douanier semble incorrect",
   "UNKNOWN_DOUBLE_COUNTING_CERTIFICATE": "Le certificat double compte est inconnu",
   "EXPIRED_DOUBLE_COUNTING_CERTIFICATE": "Certificat double compte expiré",
-  "POTENTIAL_DUPLICATE": "Doublon potentiel détecté"
+  "POTENTIAL_DUPLICATE": "Doublon potentiel détecté",
+  "MISSING_DELIVERY_SITE_COUNTRY": "Le pays de livraison est manquant",
+  "COULD_NOT_FIND_PRODUCTION_SITE": "Le site de production n'est pas configuré sur votre page société",
+  "EEC_WITH_RESIDUE": "Les émissions GES liées à l'Extraction et la Culture d'une matière première non-conventionnelle doivent être de 0",
+  "MISSING_COUNTRY_OF_ORIGIN": "Le pays d'origine de la matière première est manquant",
+  "UNKNOWN_COUNTRY_OF_ORIGIN": "Le pays d'origine de la matière première n'est pas reconnu",
+  "UNKNOWN_DELIVERY_SITE": "Le site de livraison n'est pas reconnu",
+  "UNKNOWN_DELIVERY_COUNTRY": "Le pays de livraison n'est pas reconnu"
 }

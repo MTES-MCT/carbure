@@ -60,5 +60,12 @@
   "UNKNOWN_DAE_FORMAT": "Customs ID format incorrect",
   "UNKNOWN_DOUBLE_COUNTING_CERTIFICATE": "Unknown double counting certificate",
   "EXPIRED_DOUBLE_COUNTING_CERTIFICATE": "Double counting certificate expired",
-  "POTENTIAL_DUPLICATE": "Potential duplicate found"
+  "POTENTIAL_DUPLICATE": "Potential duplicate found",
+  "MISSING_DELIVERY_SITE_COUNTRY": "Delivery site country is missing",
+  "COULD_NOT_FIND_PRODUCTION_SITE": "The production site is not configured on your company page",
+  "EEC_WITH_RESIDUE": "Non-conventional feedstock GHG emissions related to extraction and cultivation should be 0",
+  "MISSING_COUNTRY_OF_ORIGIN": "Feedstock country of origin is missing",
+  "UNKNOWN_COUNTRY_OF_ORIGIN": "Feedstock country of origin is not recognized",
+  "UNKNOWN_DELIVERY_SITE": "Delivery site is not recognized",
+  "UNKNOWN_DELIVERY_COUNTRY": "Delivery site country is not recognized"
 }
