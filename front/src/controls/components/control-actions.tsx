@@ -3,6 +3,8 @@ import { SearchInput } from "common-v2/components/input"
 import { ExportLotsButton } from "../actions/export"
 import { Lot, LotQuery } from "transactions/types"
 import { PinManyButton } from "controls/actions/pin"
+import DeliveryMapButton from "controls/actions/delivery-map"
+import useEntity from "carbure/hooks/entity"
 
 export interface ActionBarProps {
   count: number
@@ -22,11 +24,13 @@ export const ControlActions = ({
   onSwitch,
   ...props
 }: ActionBarProps) => {
+  const entity = useEntity()
   const selectedLots = lots.filter((lot) => props.selection.includes(lot.id))
 
   return (
     <ActionBar>
       <PinManyButton {...props} lots={selectedLots} />
+      {entity.isAdmin && <DeliveryMapButton {...props} />}
 
       <SearchInput
         asideX
