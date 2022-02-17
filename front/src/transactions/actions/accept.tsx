@@ -146,11 +146,6 @@ function useAcceptOptions(params: {
         portal((close) => <TradingDialog {...props} onClose={close} />),
     },
     {
-      label: i18next.t("Livraison nationale"),
-      action: () =>
-        portal((close) => <NationalDialog {...props} onClose={close} />),
-    },
-    {
       label: i18next.t("Exportation"),
       action: () =>
         portal((close) => <ExportDialog {...props} onClose={close} />),
