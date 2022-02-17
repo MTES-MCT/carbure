@@ -1242,6 +1242,9 @@ def accept_in_stock(request, *args, **kwargs):
         stock = CarbureStock()
         stock.parent_lot = lot
         if lot.carbure_delivery_site is None:
+            lot.lot_status = CarbureLot.PENDING
+            lot.delivery_type = CarbureLot.UNKNOWN
+            lot.save()
             return JsonResponse({'status': 'error', 'message': 'Cannot add stock for unknown Depot'}, status=400)
         stock.depot = lot.carbure_delivery_site
         stock.carbure_client = lot.carbure_client
