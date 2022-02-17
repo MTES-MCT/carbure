@@ -194,7 +194,6 @@ export function getDeliveryTypes(
     isClientEntity && has_stocks && DeliveryType.Stock,
     isClientUnknown && has_mac && DeliveryType.RFC,
     isClientUnknown && has_direct_deliveries && DeliveryType.Direct,
-    isClientUnknown && DeliveryType.National,
     isClientUnknown && DeliveryType.Exportation,
   ])
 }
@@ -224,18 +223,6 @@ export const DeliverySiteCountryField = (props: AutocompleteProps<Country>) => {
   const { t } = useTranslation()
   const { value, bind } = useFormContext<LotFormValue>()
   const bound = bind("delivery_site_country")
-
-  if (value.delivery_type === DeliveryType.National) {
-    return (
-      <TextInput
-        disabled
-        readOnly={props.readOnly}
-        label={t("Pays de livraison")}
-        value={t("France")}
-        error={bound.error}
-      />
-    )
-  }
 
   if (value.delivery_site instanceof Object) {
     return (

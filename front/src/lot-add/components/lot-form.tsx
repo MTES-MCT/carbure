@@ -315,12 +315,9 @@ export function lotFormToPayload(lot: LotFormValue | undefined) {
 export function isExternalDelivery(value: LotFormValue) {
   return (
     value.delivery_type &&
-    [
-      DeliveryType.Exportation,
-      DeliveryType.National,
-      DeliveryType.RFC,
-      DeliveryType.Direct,
-    ].includes(value.delivery_type)
+    [DeliveryType.Exportation, DeliveryType.RFC, DeliveryType.Direct].includes(
+      value.delivery_type
+    )
   )
 }
 

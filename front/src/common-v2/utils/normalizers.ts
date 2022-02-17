@@ -198,11 +198,9 @@ export function getDeliveryLabel(delivery: DeliveryType | undefined) {
       return i18next.t("Mise en stock")
     case DeliveryType.Trading:
       return i18next.t("Transfert sans stockage")
-    case DeliveryType.National:
-      return i18next.t("Livraison nationale")
     case DeliveryType.Unknown:
     default:
-      return i18next.t("Inconnu")
+      return i18next.t("En attente")
   }
 }
 

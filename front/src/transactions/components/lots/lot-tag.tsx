@@ -54,8 +54,6 @@ export const LotTag = ({ lot, ...props }: LotTagProps) => {
       label = t("Stocké")
     } else if (delivery === DeliveryType.Trading) {
       label = t("Transféré")
-    } else if (delivery === DeliveryType.National) {
-      label = t("Livr. nationale")
     }
   } else if (status === LotStatus.Accepted) {
     variant = "success"
