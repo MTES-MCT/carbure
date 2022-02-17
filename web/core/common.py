@@ -1169,8 +1169,8 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
 
         lot['carbure_stock_id'] = lot_row.get('carbure_stock_id', '')
         lot['free_field'] = lot_row.get('champ_libre', '')
-        producer = lot_row.get('producer', '')
-        production_site = lot_row.get('production_site', '')
+        producer = lot_row.get('producer', '').strip()
+        production_site = lot_row.get('production_site', '').strip()
         if producer is None or producer == '' or producer.upper() == entity.name.upper():
             # I am the producer
             if production_site.upper() in prefetched_data['my_production_sites']:
@@ -1183,16 +1183,16 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
             
             lot['production_country_code'] = lot_row.get('production_site_country', None)
             lot['production_site_commissioning_date'] = lot_row.get('production_site_commissioning_date', '')
-            lot['production_site_certificate'] = lot_row.get('production_site_certificate', '')
+            lot['production_site_certificate'] = lot_row.get('production_site_reference', '')
             lot['production_site_double_counting_certificate'] = lot_row.get('production_site_double_counting_certificate', '')
             lot['unknown_supplier'] = lot_row.get('supplier', '')
             lot['supplier_certificate'] = lot_row.get('supplier_certificate', '')
 
         lot['vendor_certificate'] = lot_row.get('vendor_certificate', '')
         lot['volume'] = lot_row.get('volume', 0)
-        lot['feedstock_code'] = lot_row.get('matiere_premiere_code', '')
-        lot['biofuel_code'] = lot_row.get('biocarburant_code', '')
-        lot['country_code'] = lot_row.get('pays_origine_code', '')
+        lot['feedstock_code'] = lot_row.get('matiere_premiere_code', '').strip()
+        lot['biofuel_code'] = lot_row.get('biocarburant_code', '').strip()
+        lot['country_code'] = lot_row.get('pays_origine_code', '').strip()
         lot['delivery_type'] = lot_row.get('delivery_type', CarbureLot.UNKNOWN)
         for key in ['el']: # negative value allowed
             try:
