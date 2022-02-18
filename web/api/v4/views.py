@@ -532,6 +532,7 @@ def add_excel(request, *args, **kwargs):
     lots = []
     lots_errors = []
     for row in data:
+        print(row)
         lot_obj, errors = construct_carbure_lot(d, entity, row)
         if not lot_obj:
             nb_invalid += 1
@@ -540,7 +541,9 @@ def add_excel(request, *args, **kwargs):
         nb_total += 1
         lots.append(lot_obj)
         lots_errors.append(errors)
+    print('Lot creation done. bulk insert')
     lots_created = bulk_insert_lots(entity, lots, lots_errors, d)
+    print('Done')
     if len(lots_created) == 0:
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=500)
     for lot in lots_created:
