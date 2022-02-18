@@ -324,7 +324,15 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
 
 def bulk_insert_lots(entity: Entity, lots: List[CarbureLot], errors: List[GenericError], prefetched_data: dict) -> QuerySet:
     created = CarbureLot.objects.bulk_create(lots, batch_size=100)
-    inserted_lots = CarbureLot.objects.filter(added_by=entity).order_by('-id')[0:len(lots)]
+    inserted_lots = CarbureLot.objects.select_related(
+        'carbure_producer', 'carbure_supplier', 'carbure_client', 'added_by',
+        'carbure_production_site', 'carbure_production_site__producer', 'carbure_production_site__country', 'production_country',
+        'carbure_dispatch_site', 'carbure_dispatch_site__country', 'dispatch_site_country',
+        'carbure_delivery_site', 'carbure_delivery_site__country', 'delivery_site_country',
+        'feedstock', 'biofuel', 'country_of_origin',
+        'parent_lot', 'parent_stock', 'parent_stock__carbure_client', 'parent_stock__carbure_supplier',
+        'parent_stock__feedstock', 'parent_stock__biofuel', 'parent_stock__depot', 'parent_stock__country_of_origin', 'parent_stock__production_country'
+    ).prefetch_related('genericerror_set', 'carbure_production_site__productionsitecertificate_set').filter(added_by=entity).order_by('-id')[0:len(lots)]
     errors = reversed(errors) # lots are fetched by DESC ID
     for lot, lot_errors in zip(inserted_lots, errors):
         for e in lot_errors:

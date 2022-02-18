@@ -1175,16 +1175,17 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
             # I am the producer
             if production_site.upper() in prefetched_data['my_production_sites']:
                 lot['carbure_production_site'] = production_site
+                lot['production_site_certificate'] = lot_row.get('production_site_reference', '')
+                lot['production_site_double_counting_certificate'] = lot_row.get('double_counting_registration', '')
             # carbure_supplier and carbure_producer will be set to entity in construct_carbure_lot
         else:
             # I am not the producer
             lot['unknown_producer'] = producer
             lot['unknown_production_site'] = production_site
-            
             lot['production_country_code'] = lot_row.get('production_site_country', None)
             lot['production_site_commissioning_date'] = lot_row.get('production_site_commissioning_date', '')
             lot['production_site_certificate'] = lot_row.get('production_site_reference', '')
-            lot['production_site_double_counting_certificate'] = lot_row.get('production_site_double_counting_certificate', '')
+            lot['production_site_double_counting_certificate'] = lot_row.get('double_counting_registration', '')
             lot['unknown_supplier'] = lot_row.get('supplier', '')
             lot['supplier_certificate'] = lot_row.get('supplier_certificate', '')
 
