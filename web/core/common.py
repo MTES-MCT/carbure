@@ -1215,8 +1215,8 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         else:
             lot['unknown_delivery_site'] = delivery_site
             delivery_site_country = lot_row.get('delivery_site_country', '')
-            lot['delivery_site_country_code'] = delivery_site_country
-        client = lot_row.get('client', '').upper()
+            lot['delivery_site_country_code'] = delivery_site_country.strip()
+        client = lot_row.get('client', '').upper().strip()
         if client in prefetched_data['clientsbyname']:
             lot['carbure_client_id'] = prefetched_data['clientsbyname'][client].id
         else:
