@@ -383,6 +383,12 @@ def stock_split(request, *args, **kwargs):
         stock.remaining_weight = stock.get_weight()
         stock.remaining_lhv_amount = stock.get_lhv_amount()
         stock.save()
+        event = CarbureStockEvent()
+        event.event_type = CarbureStockEvent.SPLIT
+        event.stock = stock
+        event.user = request.user
+        event.metadata = {'message': 'Envoi lot.', 'volume_to_deduct': lot.volume}
+        event.save()
         new_lot_ids.append(lot.id)
         bulk_sanity_checks([lot], prefetched_data, background=False)
         # create events
@@ -695,22 +701,6 @@ def lots_send(request, *args, **kwargs):
         event.lot = lot
         event.user = request.user
         event.save()
-
-        if lot.parent_stock:
-            stock = CarbureStock.objects.get(pk=lot.parent_stock.pk) # re-fetch every time to make sure the remaining volume is up to date
-            if stock.remaining_volume >= lot.volume:
-                stock.remaining_volume = round(stock.remaining_volume - lot.volume, 2)
-                stock.remaining_weight = stock.get_weight()
-                stock.remaining_lhv_amount = stock.get_lhv_amount()
-                stock.save()
-                event = CarbureStockEvent()
-                event.event_type = CarbureStockEvent.SPLIT
-                event.stock = stock
-                event.user = request.user
-                event.metadata = {'message': 'Envoi lot.', 'volume_to_deduct': lot.volume}
-                event.save()
-            else:
-                return JsonResponse({'status': 'error', 'message': 'Available volume lower than lot volume'}, status=400)
 
         lot.lot_status = CarbureLot.PENDING
 
