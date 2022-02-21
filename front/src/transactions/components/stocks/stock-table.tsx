@@ -8,6 +8,7 @@ import {
 } from "common-v2/utils/formatters"
 import Table, { Cell, Order, selectionColumn } from "common-v2/components/table"
 import StockTag from "./stock-tag"
+import { isRedII } from "lot-add/components/ghg-fields"
 
 export interface StockTableProps {
   loading: boolean
@@ -102,9 +103,12 @@ export const StockTable = memo(
             small: true,
             key: "ghg_reduction",
             header: t("Réd. GES"),
-            cell: (stock) => (
-              <Cell text={`${stock.ghg_reduction.toFixed(2)}%`} />
-            ),
+            cell: (stock) => {
+              const reduction = isRedII(stock.delivery_date)
+                ? stock.ghg_reduction_red_ii
+                : stock.ghg_reduction
+              return <Cell text={`${reduction.toFixed(2)}%`} />
+            },
           },
         ]}
       />
