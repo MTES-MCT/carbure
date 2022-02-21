@@ -258,3 +258,15 @@ export function transformETBE(
     payload: JSON.stringify(payload),
   })
 }
+
+export function flushStocks(
+  entity_id: number,
+  stock_ids: number[],
+  free_field: string
+) {
+  return api.post("/stocks/flush", {
+    entity_id,
+    stock_ids,
+    free_field,
+  })
+}
