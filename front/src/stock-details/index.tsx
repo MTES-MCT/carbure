@@ -16,6 +16,7 @@ import StockTraceability from "./components/stock-traceability"
 import { SplitOneButton } from "transactions/actions/split"
 import { useCategory } from "transactions/components/category"
 import { UserRole } from "carbure/types"
+// import { FlushOneButton } from "transactions/actions/flush-stock"
 
 interface StockDetailsProps {
   neighbors: number[]
@@ -73,7 +74,10 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
 
       <footer>
         {hasEditRights && stockData && stockData.stock.remaining_volume > 0 && (
-          <SplitOneButton stock={stockData.stock} />
+          <>
+            <SplitOneButton stock={stockData.stock} />
+            {/* <FlushOneButton stock={stockData.stock} /> */}
+          </>
         )}
         <Alert icon={AlertCircle} variant="info">
           <p>
