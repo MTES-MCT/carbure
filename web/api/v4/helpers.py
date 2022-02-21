@@ -500,7 +500,7 @@ def filter_stock(stock, query, entity_id=None, blacklist=[]):
     if len(selection) > 0:
         stock = stock.filter(pk__in=selection)
     if len(periods) > 0 and 'periods' not in blacklist:
-        stock = stock.filter(parent_lot__period__in=periods)
+        stock = stock.filter(Q(parent_lot__period__in=periods) | Q(parent_transformation__source_stock__period__in=periods))
     if len(feedstocks) > 0 and 'feedstocks' not in blacklist:
         stock = stock.filter(feedstock__code__in=feedstocks)
     if len(biofuels) > 0 and 'biofuels' not in blacklist:
