@@ -569,6 +569,7 @@ class CarbureLotAdmin(admin.ModelAdmin):
                   ('carbure_supplier', NameSortedRelatedOnlyDropdownFilter), ('carbure_client', NameSortedRelatedOnlyDropdownFilter),  
                   'delivery_type', ('carbure_delivery_site', NameSortedRelatedOnlyDropdownFilter),
                   ('carbure_production_site', NameSortedRelatedOnlyDropdownFilter),)
+    search_fields = ('id', 'transport_document_reference', 'free_field', 'carbure_id', 'volume')
 
     def get_producer(self, obj):
         return obj.carbure_producer.name if obj.carbure_producer else 'U - ' + str(obj.unknown_producer)
