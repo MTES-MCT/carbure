@@ -451,3 +451,11 @@ export const Map = ({ className, ...props }: IconProps) => (
     <line x1="15" y1="7" x2="15" y2="20" />
   </Icon>
 )
+
+export const DropOff = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("drop-off", className)}>
+    <path d="M8.454 8.458l-1.653 2.545a6 6 0 0 0 10.32 6.123" />
+    <path d="M18 14a5.971 5.971 0 0 0 -.803 -3l-5.197 -8l-1.968 3.03" />
+    <path d="M3 3l18 18" />
+  </Icon>
+)

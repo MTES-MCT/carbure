@@ -212,6 +212,7 @@ export enum DeliveryType {
   Trading = "TRADING",
   Processing = "PROCESSING",
   Direct = "DIRECT", // livraison directe
+  Flushed = "FLUSHED",
 }
 
 export enum TransportDocumentType {
