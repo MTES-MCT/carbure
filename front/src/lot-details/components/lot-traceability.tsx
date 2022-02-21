@@ -7,9 +7,19 @@ import { Split } from "common-v2/components/icons"
 
 export interface TraceabilityProps {
   details: LotDetails | undefined
+  parentLotRoot?: string
+  parentStockRoot?: string
+  childLotRoot?: string
+  childStockRoot?: string
 }
 
-export const LotTraceability = ({ details }: TraceabilityProps) => {
+export const LotTraceability = ({
+  details,
+  parentLotRoot = "../../in/history/",
+  parentStockRoot = "../stocks/history/",
+  childLotRoot = "../../out/history/",
+  childStockRoot = "../../stocks/history/",
+}: TraceabilityProps) => {
   const { t } = useTranslation()
 
   const parentLot = details?.parent_lot ?? undefined
@@ -39,7 +49,7 @@ export const LotTraceability = ({ details }: TraceabilityProps) => {
           <ul>
             {parentLot && (
               <li>
-                <ExternalLink to={`../../in/history/${parentLot.id}`}>
+                <ExternalLink to={`${parentLotRoot}${parentLot.id}`}>
                   Lot {parentLot.carbure_id}:
                   <b>
                     {t(parentLot.biofuel?.code ?? "", { ns: "biofuels" })}{" "}
@@ -51,7 +61,7 @@ export const LotTraceability = ({ details }: TraceabilityProps) => {
 
             {parentStock && (
               <li>
-                <ExternalLink to={`../stocks/history/${parentStock.id}`}>
+                <ExternalLink to={`${parentStockRoot}${parentStock.id}`}>
                   Stock {parentStock.carbure_id}:
                   <b>
                     {t(parentStock.biofuel?.code ?? "", {
@@ -72,7 +82,7 @@ export const LotTraceability = ({ details }: TraceabilityProps) => {
           <ul>
             {childrenLot?.map((child) => (
               <li key={child.id}>
-                <ExternalLink to={`../../out/history/${child.id}`}>
+                <ExternalLink to={`${childLotRoot}${child.id}`}>
                   Lot {child.carbure_id}:{" "}
                   <b>
                     {t(child.biofuel?.code ?? "", { ns: "biofuels" })}{" "}
@@ -84,7 +94,7 @@ export const LotTraceability = ({ details }: TraceabilityProps) => {
 
             {childrenStock?.map((child, i) => (
               <li key={i}>
-                <ExternalLink to={`../../stocks/history/${child.id}`}>
+                <ExternalLink to={`${childStockRoot}${child.id}`}>
                   Stock {child.carbure_id}:{" "}
                   <b>
                     {t(child.biofuel?.code ?? "", {
