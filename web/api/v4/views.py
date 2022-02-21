@@ -193,29 +193,17 @@ def stock_cancel_transformation(request, *args, **kwargs):
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def stock_flush(request, *args, **kwargs):
     context = kwargs['context']
-    entity_id = context['entity_id']
-    payload = request.POST.getlist('payload', False)
-    free_field = request.POST.getlist('free_field', False)
-    if not payload:
-        return JsonResponse({'status': 'error', 'message': 'Missing payload'}, status=400)
+    entity_id = int(context['entity_id'])
+    # payload = request.POST.get('payload', False)
+    stock_ids = request.POST.getlist('stock_ids')
+    free_field = request.POST.get('free_field', False)
+    if not stock_ids:
+        return JsonResponse({'status': 'error', 'message': 'Missing stock_ids'}, status=400)
 
-    try:
-        unserialized = json.loads(payload)
-        # expected format: [{stock_id: 12344, volume_flushed: 3244.33}]
-    except:
-        return JsonResponse({'status': 'error', 'message': 'Cannot parse payload into JSON'}, status=400)
-
-    if not isinstance(unserialized, list):
-        return JsonResponse({'status': 'error', 'message': 'Parsed JSON is not a list'}, status=400)
-
-    for entry in unserialized:
-        if 'stock_id' not in entry:
-            return JsonResponse({'status': 'error', 'message': 'Missing key stock_id in object'}, status=400)
-        if 'volume_flushed' not in entry:
-            return JsonResponse({'status': 'error', 'message': 'Missing key volume_flushed in object'}, status=400)
+    for stock_id in stock_ids:
 
         try:
-            stock = CarbureStock.objects.filter(pk=entry['stock_id'])
+            stock = CarbureStock.objects.get(pk=stock_id)
         except:
             return JsonResponse({'status': 'error', 'message': 'Could not find stock'}, status=400)
 
@@ -223,7 +211,7 @@ def stock_flush(request, *args, **kwargs):
             return JsonResponse({'status': 'forbidden', 'message': 'Stock does not belong to you'}, status=403)
 
         try:
-            volume_to_flush = float(entry['volume_flushed'])
+            volume_to_flush = stock.remaining_volume
         except:
             return JsonResponse({'status': 'error', 'message': 'Could not parse volume to flush'}, status=400)
 
@@ -239,7 +227,7 @@ def stock_flush(request, *args, **kwargs):
             stock.remaining_lhv_amount = stock.get_lhv_amount()
         stock.save()
         # create flushed lot
-        lot = stock.parent_lot
+        lot = stock.get_parent_lot()
         lot.pk = None
         lot.transport_document_type = CarbureLot.OTHER
         lot.transport_document_reference = 'N/A - FLUSH'
