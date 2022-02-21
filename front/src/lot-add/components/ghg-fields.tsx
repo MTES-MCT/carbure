@@ -90,25 +90,26 @@ export const ReductionFields = (props: GHGFieldsProps) => {
         {...props}
       />
 
-      <TextInput
-        asideY
-        readOnly
-        label={t("Réd. RED I")}
-        value={formatPercentage(value.ghg_reduction ?? 0)}
-      />
-      {isRedII(value.delivery_date) && (
+      {isRedII(value.delivery_date) ? (
         <TextInput
           readOnly
           label={t("Réd. RED II")}
           value={formatPercentage(value.ghg_reduction_red_ii ?? 0)}
+        />
+      ) : (
+        <TextInput
+          asideY
+          readOnly
+          label={t("Réd. RED I")}
+          value={formatPercentage(value.ghg_reduction ?? 0)}
         />
       )}
     </Fieldset>
   )
 }
 
-export function isRedII(deliveryDate: string = "") {
-  const date = new Date(deliveryDate)
+export function isRedII(deliveryDate: string | undefined | null) {
+  const date = deliveryDate ? new Date(deliveryDate) : new Date()
   return isAfter(date, JULY_FIRST_21)
 }
 
