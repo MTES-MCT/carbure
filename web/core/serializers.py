@@ -65,6 +65,7 @@ class CarbureLotCSVSerializer(serializers.ModelSerializer):
     country_of_origin = serializers.SerializerMethodField()
     biofuel = serializers.SerializerMethodField()
     feedstock = serializers.SerializerMethodField()
+    production_site_double_counting_certificate = serializers.SerializerMethodField()
 
     class Meta:
         model = CarbureLot
@@ -76,6 +77,9 @@ class CarbureLotCSVSerializer(serializers.ModelSerializer):
                   'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ghg_reference_red_ii', 'ghg_reduction_red_ii',
                   'free_field'
                   ]
+
+    def get_production_site_double_counting_certificate(self, obj):
+        return obj.production_site_double_counting_certificate if obj.feedstock and obj.feedstock.is_double_compte else ''
 
     def get_producer(self, obj):
         return obj.carbure_producer.name if obj.carbure_producer else obj.unknown_producer
