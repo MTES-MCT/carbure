@@ -15,6 +15,7 @@ import Table, {
 } from "common-v2/components/table"
 import { Alarm } from "common-v2/components/icons"
 import LotTag from "./lot-tag"
+import { isRedII } from "lot-add/components/ghg-fields"
 
 export interface LotTableProps {
   loading: boolean
@@ -130,11 +131,8 @@ export function useLotColumns() {
       header: t("Site de production"),
       cell: (lot: Lot) => (
         <Cell
-          // prettier-ignore
-          text={lot.carbure_production_site?.name ?? lot.unknown_production_site}
-          sub={t(lot.production_country?.code_pays ?? "", {
-            ns: "countries",
-          })}
+          text={lot.carbure_production_site?.name ?? lot.unknown_production_site} // prettier-ignore
+          sub={t(lot.production_country?.code_pays ?? "", { ns: "countries" })} // prettier-ignore
         />
       ),
     },
@@ -153,7 +151,12 @@ export function useLotColumns() {
       small: true,
       key: "ghg_reduction",
       header: t("Réd. GES"),
-      cell: (lot: Lot) => <Cell text={`${lot.ghg_reduction.toFixed(2)}%`} />,
+      cell: (lot: Lot) => {
+        const reduction = isRedII(lot.delivery_date)
+          ? lot.ghg_reduction_red_ii
+          : lot.ghg_reduction
+        return <Cell text={`${reduction.toFixed(2)}%`} />
+      },
     },
   }
 }
