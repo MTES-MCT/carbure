@@ -23,6 +23,7 @@ import { getDeliverySites } from "settings/api"
 import { findEntities, findMyCertificates } from "common-v2/api"
 import Select from "common-v2/components/select"
 import { compact } from "common-v2/utils/collection"
+import Form from "common-v2/components/form"
 
 export interface AcceptManyButtonProps {
   disabled?: boolean
@@ -211,11 +212,9 @@ const ReleaseForConsumptionDialog = ({
       </header>
       <main>
         <section>
-          {v({
-            zero: t("Voulez-vous accepter ce lot pour mise à consommation ?"),
-            one: t("Voulez-vous accepter ce lot pour mise à consommation ?"),
-            many: t("Voulez-vous accepter les lots sélectionnés pour mise à consommation ?"), // prettier-ignore
-          })}
+          {t(
+            "En acceptant ces lots, vous indiquez réaliser des mises à consommation de B100 ou ED95."
+          )}
         </section>
         {summary && <LotSummary query={query} selection={selection} />}
       </main>
@@ -292,19 +291,19 @@ const InStockDialog = ({
       <header>
         <h1>
           {v({
-            zero: t("Accepter les lots"),
-            one: t("Accepter le lot"),
-            many: t("Accepter les lots"),
+            zero: t("Placer les lots en stock"),
+            one: t("Placer le lot en stock"),
+            many: t("Placer les lots en stock"),
           })}
         </h1>
       </header>
       <main>
         <section>
-          {v({
-            zero: t("Voulez-vous accepter ces lots dans votre stock ?"),
-            one: t("Voulez-vous accepter ce lot dans votre stock ?"),
-            many: t("Voulez-vous accepter les lots sélectionnés dans votre stock ?"), // prettier-ignore
-          })}
+          <p>
+            {t(
+              "Une mise en stock vous permet d'alimenter votre stock sur CarbuRe avec les lots que vous recevez de vos différents fournisseurs. Une fois la procédure terminée, vous pourrez manipuler ces nouveaux stocks depuis l'onglet \"Lots en stock\" de la page Transaction."
+            )}
+          </p>
         </section>
         {summary && <LotSummary query={query} selection={selection} />}
       </main>
@@ -381,19 +380,17 @@ const BlendingDialog = ({
       <header>
         <h1>
           {v({
-            zero: t("Incorporer les lots"),
-            one: t("Incorporer le lot"),
-            many: t("Incorporer les lots"),
+            zero: t("Incorporation des lots"),
+            one: t("Incorporation de lot"),
+            many: t("Incorporation des lots"),
           })}
         </h1>
       </header>
       <main>
         <section>
-          {v({
-            zero: t("Voulez-vous accepter les lots pour incorporation ?"),
-            one: t("Voulez-vous accepter le lot pour incorporation ?"),
-            many: t("Voulez-vous accepter les lots sélectionnés pour incorporation ?"), // prettier-ignore
-          })}
+          {t(
+            "En acceptant ces lots, vous indiquez qu'ils sont utilisés dans le cadre d'incorporations en EFS."
+          )}
         </section>
 
         {summary && <LotSummary query={query} selection={selection} />}
@@ -411,7 +408,7 @@ const BlendingDialog = ({
           loading={acceptLots.loading}
           variant="success"
           icon={Check}
-          label={t("Incorporer")}
+          label={t("Incorporation")}
           action={() => {
             matomo.push([
               "trackEvent",
@@ -479,11 +476,9 @@ const DirectDeliveryDialog = ({
       </header>
       <main>
         <section>
-          {v({
-            zero: t("Voulez-vous accepter les lots pour livraison directe ?"),
-            one: t("Voulez-vous accepter le lot pour livraison directe ?"),
-            many: t("Voulez-vous accepter les lots sélectionnés pour livraison directe ?"), // prettier-ignore
-          })}
+          {t(
+            "En acceptant ces lots pour livraison directe, vous indiquez qu'ils seront utilisés dans le cadre d'incorporations de biocarburant faites à l'étranger mais destinées au marché français"
+          )}
         </section>
 
         {summary && <LotSummary query={query} selection={selection} />}
@@ -501,102 +496,12 @@ const DirectDeliveryDialog = ({
           loading={acceptLots.loading}
           variant="success"
           icon={Check}
-          label={t("Livrer")}
+          label={t("Livraison directe")}
           action={() => {
             matomo.push([
               "trackEvent",
               "lots-accept",
               "direct-delivery",
-              "",
-              selection.length,
-            ])
-            acceptLots.execute(query, selection)
-          }}
-        />
-      </footer>
-    </Dialog>
-  )
-}
-
-const NationalDialog = ({
-  summary,
-  query,
-  selection,
-  onClose,
-}: AcceptDialogProps) => {
-  const { t } = useTranslation()
-  const notify = useNotify()
-  const matomo = useMatomo()
-
-  const v = variations(selection.length)
-
-  const acceptLots = useMutation(api.acceptForNational, {
-    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
-
-    onSuccess: () => {
-      const text = v({
-        zero: t("Les lots ont été marqués comme livraison nationale !"),
-        one: t("Le lot a été marqué comme livraison nationale !"),
-        many: t("Les lots sélectionnés ont été marqués comme livraison nationale !"), // prettier-ignore
-      })
-
-      notify(text, { variant: "success" })
-      onClose()
-    },
-
-    onError: () => {
-      const text = v({
-        zero: t("Les lots n'ont pas pu être acceptés !"),
-        one: t("Le lot n'a pas pu être accepté !"),
-        many: t("Les lots sélectionnés n'ont pas pu être acceptés !"),
-      })
-
-      notify(text, { variant: "danger" })
-      onClose()
-    },
-  })
-
-  return (
-    <Dialog onClose={onClose}>
-      <header>
-        <h1>
-          {v({
-            zero: t("Livrer les lots en France"),
-            one: t("Livrer le lot en France"),
-            many: t("Livrer les lots en France"),
-          })}
-        </h1>
-      </header>
-      <main>
-        <section>
-          {v({
-            zero: t("Voulez-vous accepter les lots pour livraison nationale ?"),
-            one: t("Voulez-vous accepter le lot pour livraison nationale ?"),
-            many: t("Voulez-vous accepter les lots sélectionnés pour livraison nationale ?"), // prettier-ignore
-          })}
-        </section>
-
-        {summary && <LotSummary query={query} selection={selection} />}
-      </main>
-      <footer>
-        <Button
-          asideX
-          disabled={acceptLots.loading}
-          icon={Return}
-          label={t("Annuler")}
-          action={onClose}
-        />
-        <Button
-          submit
-          loading={acceptLots.loading}
-          variant="success"
-          icon={Check}
-          label={t("Livrer")}
-          action={() => {
-            matomo.push([
-              "trackEvent",
-              "lots-accept",
-              "national",
               "",
               selection.length,
             ])
@@ -651,19 +556,17 @@ const ExportDialog = ({
       <header>
         <h1>
           {v({
-            zero: t("Exporter les lots"),
-            one: t("Exporter le lot"),
-            many: t("Exporter les lots"),
+            zero: t("Exportation des lots"),
+            one: t("Exportation de lot"),
+            many: t("Exportation des lots"),
           })}
         </h1>
       </header>
       <main>
         <section>
-          {v({
-            zero: t("Voulez-vous accepter les lots pour exportation ?"),
-            one: t("Voulez-vous accepter le lot pour exportation ?"),
-            many: t("Voulez-vous accepter les lots sélectionnés pour exportation ?"), // prettier-ignore
-          })}
+          {t(
+            "En acceptant des lots pour exportation, vous indiquez qu'ils sont destinés au marché étranger."
+          )}
         </section>
 
         {summary && <LotSummary query={query} selection={selection} />}
@@ -681,7 +584,7 @@ const ExportDialog = ({
           loading={acceptLots.loading}
           variant="success"
           icon={Check}
-          label={t("Exporter")}
+          label={t("Exportation")}
           action={() => {
             matomo.push([
               "trackEvent",
@@ -697,13 +600,6 @@ const ExportDialog = ({
     </Dialog>
   )
 }
-
-// interface AcceptDialogProps {
-//   summary?: boolean
-//   query: LotQuery
-//   selection: number[]
-//   onClose: () => void
-// }
 
 const TradingDialog = ({
   summary,
@@ -760,29 +656,50 @@ const TradingDialog = ({
       </header>
       <main>
         <section>
-          {v({
-            zero: t("Voulez-vous transférer ces lots ?"),
-            one: t("Voulez-vous transférer ce lot ?"),
-            many: t("Voulez-vous transférer les lots sélectionnés ?"),
-          })}
+          <p>
+            {t(
+              "La fonctionnalité de transfert vous permet de transmettre un lot que vous avez reçu de l'un de vos fournisseurs directement vers l'un de vos clients."
+            )}
+          </p>
+          <p>
+            {t(
+              'Une fois la procédure terminée, vous pourrez retrouver le lot initial de votre fournisseur dans l\'onglet "Lots reçus" ainsi que le lot transféré à votre client dans l\'onglet "Lots envoyés".'
+            )}
+          </p>
         </section>
         <section>
-          <Autocomplete
-            label={t("Destinataire")}
-            value={client}
-            onChange={setClient}
-            getOptions={findEntities}
-            normalize={norm.normalizeEntityOrUnknown}
-            create={norm.identity}
-          />
-          <Autocomplete
-            label={t("Certificat")}
-            value={certificate}
-            onChange={setCertificate}
-            getOptions={(query) =>
-              findMyCertificates(query, { entity_id: entity.id })
-            }
-          />
+          <Form
+            id="transfer-form"
+            onSubmit={() => {
+              matomo.push([
+                "trackEvent",
+                "lots-accept",
+                "transfer-without-stock",
+                "",
+                selection.length,
+              ])
+              acceptLots.execute(query, selection, client!, certificate!)
+            }}
+          >
+            <Autocomplete
+              required
+              label={t("Client")}
+              value={client}
+              onChange={setClient}
+              getOptions={findEntities}
+              normalize={norm.normalizeEntityOrUnknown}
+              create={norm.identity}
+            />
+            <Autocomplete
+              required
+              label={t("Votre certificat de négoce")}
+              value={certificate}
+              onChange={setCertificate}
+              getOptions={(query) =>
+                findMyCertificates(query, { entity_id: entity.id })
+              }
+            />
+          </Form>
         </section>
         {summary && <LotSummary query={query} selection={selection} />}
       </main>
@@ -795,22 +712,12 @@ const TradingDialog = ({
           action={onClose}
         />
         <Button
-          submit
+          submit="transfer-form"
           loading={acceptLots.loading}
           disabled={!client || !certificate}
           variant="success"
           icon={Check}
           label={t("Transférer")}
-          action={() => {
-            matomo.push([
-              "trackEvent",
-              "lots-accept",
-              "transfer-without-stock",
-              "",
-              selection.length,
-            ])
-            acceptLots.execute(query, selection, client!, certificate!)
-          }}
         />
       </footer>
     </Dialog>
@@ -880,18 +787,24 @@ const ProcessingDialog = ({
       <main>
         <section>
           <p>
-            {t("Les lots incorporés par un tiers doivent lui être transférés.")}
+            {t(
+              "L'incoporation par un tiers (ou processing) consiste à faire réaliser l'incoporation par un opérateur autre que vous-même."
+            )}
           </p>
           <p>
             {t(
-              `Les dépôts concernés doivent être enregistrés en tant que "tiers" ou "processing" et l'opérateur tiers doit être indiqué pour apparaître dans la liste ci-dessous.`
+              `Sur la page "Société", vous pouvez configurer les dépôts concernés par cette pratique lorsque vous précisez comme type de propriété "tiers" ou "processing" et que vous spécifiez l'opérateur tiers qui se chargera des incorporations.`
             )}
           </p>
-          {/* Plus d'informations sur le processing sur [Guide] */}
+          <p>
+            {t(
+              `Une fois le lot accepté, vous pourrez retrouver le lot initial de votre fournisseur dans l'onglet "Lots reçus" ainsi que le lot transféré à l'opérateur tiers dans l'onglet "Lots envoyés".`
+            )}
+          </p>
         </section>
         <section>
           <Select
-            label={t("Société tierce")}
+            label={t("Opérateur tiers")}
             placeholder={t("Choisir une société")}
             value={depot}
             onChange={setDepot}
