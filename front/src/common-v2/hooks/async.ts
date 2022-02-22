@@ -3,7 +3,6 @@ import {
   useAsyncCallback,
   UseAsyncCallbackOptions,
 } from "react-async-hook"
-import { staleWhileLoading } from "./async-list"
 import { invalidate, useInvalidate } from "./invalidate"
 
 export type QueryOptions<R, A extends any[]> = UseAsyncCallbackOptions<R> & {
@@ -42,4 +41,8 @@ export function useMutation<R, A extends any[]>(
       options.onSuccess?.(res, opts)
     },
   })
+}
+
+export const staleWhileLoading = {
+  setLoading: (state: any) => ({ ...state, loading: true }),
 }

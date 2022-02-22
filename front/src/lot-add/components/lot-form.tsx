@@ -20,6 +20,7 @@ import DeliveryFields from "./delivery-fields"
 import { EmissionFields, ReductionFields } from "./ghg-fields"
 import { Entity } from "carbure/types"
 import { LotCertificates } from "lot-details/types"
+import { matches } from "common-v2/utils/collection"
 
 export interface LotFormProps {
   readOnly?: boolean
@@ -54,12 +55,12 @@ export function useLotForm(
 
     // for producers
     if (entity.isProducer) {
-      if (!entity.has_trading && !entity.has_stocks) {
-        value.producer = entity
+      if (isLotProducer(entity, value) && value.supplier === undefined) {
+        value.supplier = entity
       }
 
-      if (isLotProducer(entity, value)) {
-        value.supplier = entity
+      if (!entity.has_trading && !entity.has_stocks) {
+        value.producer = entity
       }
     }
 
@@ -78,10 +79,10 @@ export function useLotForm(
     // automatically set the default certificate of the supplier
     if (
       isLotSupplier(entity, value) &&
-      !isLotProducer(entity, value) &&
       value.supplier_certificate === undefined
     ) {
       value.supplier_certificate = entity.default_certificate
+      value.vendor_certificate = undefined
     }
 
     if (isLotVendor(entity, value) && value.vendor_certificate === undefined) {
@@ -360,7 +361,7 @@ export function hasChange(
 ) {
   const formPayload = lotFormToPayload(form)
   const lotPayload = lotFormToPayload(lotToFormValue(lot))
-  return JSON.stringify(formPayload) === JSON.stringify(lotPayload)
+  return matches(formPayload, lotPayload)
 }
 
 // prettier-ignore

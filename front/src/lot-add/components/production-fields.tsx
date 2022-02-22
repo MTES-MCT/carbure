@@ -17,6 +17,7 @@ import { UserCheck } from "common-v2/components/icons"
 import { Entity } from "carbure/types"
 import { Country, ProductionSite } from "common/types"
 import CertificateIcon from "lot-details/components/certificate"
+import { compact, uniqueBy } from "common-v2/utils/collection"
 
 interface ProductionFieldsProps {
   readOnly?: boolean
@@ -58,6 +59,11 @@ export const ProducerField = (props: AutocompleteProps<Entity | string>) => {
     )
   }
 
+  const defaultOptions = uniqueBy(
+    compact([producer, entity]),
+    (v) => norm.normalizeEntityOrUnknown(v).label
+  )
+
   return (
     <Autocomplete
       disabled={!entity.has_trading && !entity.has_stocks}
@@ -65,7 +71,7 @@ export const ProducerField = (props: AutocompleteProps<Entity | string>) => {
       value={producer}
       icon={isKnown ? UserCheck : undefined}
       create={norm.identity}
-      defaultOptions={producer ? [producer] : [entity]}
+      defaultOptions={defaultOptions}
       normalize={norm.normalizeEntityOrUnknown}
       {...bound}
       {...props}

@@ -1,12 +1,12 @@
+import { matches } from "./collection"
+
 export function singleSelection<V>(
   selectedValue: V | undefined,
   onSelectValue: ((value: V | undefined) => void) | undefined
 ) {
-  const selectedKey = JSON.stringify(selectedValue)
-
   function isSelected(value: V) {
     if (selectedValue === undefined) return false
-    return selectedKey === JSON.stringify(value)
+    return matches(value, selectedValue)
   }
 
   function onSelect(value: V | undefined) {
@@ -20,34 +20,23 @@ export function multipleSelection<V>(
   selectedValues: V[] | undefined,
   onSelectValues: ((value: V[]) => void) | undefined
 ) {
-  const selectedKeys = selectedValues?.map((value) => JSON.stringify(value))
-
   function isSelected(value: V | undefined) {
-    if (selectedKeys === undefined || value === undefined) return false
-    else return selectedKeys.includes(JSON.stringify(value))
+    if (selectedValues === undefined || value === undefined) return false
+    else return selectedValues.some((v) => matches(v, value))
   }
 
   function isAllSelected(values: V[]) {
-    if (!selectedKeys) return false
-
-    const keys = values.map((value) => JSON.stringify(value))
-    const sortedKeys = keys.sort()
-    const sortedSelection = selectedKeys.sort()
-
-    return (
-      sortedKeys.length === sortedSelection.length &&
-      sortedKeys.every((key, i) => key === sortedSelection[i])
-    )
+    if (!selectedValues) return false
+    return values.every(isSelected)
   }
 
   function onSelect(value: V | undefined) {
     if (value === undefined) return onSelectValues?.([])
 
-    const key = JSON.stringify(value)
     const values = selectedValues ?? []
     const selected = isSelected(value)
       ? // remove item from selection
-        values.filter((v) => JSON.stringify(v) !== key)
+        values.filter((v) => matches(v, value))
       : // or add it at the end
         [...values, value]
 
