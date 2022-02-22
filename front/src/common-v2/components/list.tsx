@@ -16,6 +16,7 @@ import {
 } from "../utils/normalize"
 import { SearchInput } from "./input"
 import css from "./list.module.css"
+import { matches } from "common-v2/utils/collection"
 
 export interface ListProps<T, V> {
   controlRef?: React.RefObject<HTMLElement>
@@ -123,9 +124,8 @@ export function List<T, V>({
       return <li>{i18next.t("Aucune entrée trouvée")}</li>
     }
 
-    return items.map(({ key, value, label, children, disabled, data }) => {
+    return items.map(({ value, label, children, disabled, data }) => {
       const config: ItemConfig<T, V> = {
-        key,
         value,
         label,
         level,
@@ -243,20 +243,17 @@ export function useSelection<T, V>({
   }, [selectedValue])
 
   const normItems = listTreeItems(items)
-  const normFocus = normItems.find(
-    (item) => item.key === JSON.stringify(focused)
-  )
 
   const { isSelected, onSelect } = multiple
     ? multipleSelection(selectedValues, onSelectValues)
     : singleSelection(selectedValue, onSelectValue)
 
   function isFocused(value: V) {
-    return JSON.stringify(value) === normFocus?.key
+    return matches(value, focused)
   }
 
   function index() {
-    return normItems.findIndex((item) => item.key === normFocus?.key)
+    return normItems.findIndex((item) => matches(item.value, focused))
   }
 
   function prev() {

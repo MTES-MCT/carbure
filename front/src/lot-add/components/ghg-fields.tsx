@@ -50,7 +50,6 @@ export const EmissionFields = (props: GHGFieldsProps) => {
       />
 
       <TextInput
-        asideY
         readOnly
         label="Total"
         value={formatGHG(value.ghg_total ?? 0)}
@@ -98,7 +97,6 @@ export const ReductionFields = (props: GHGFieldsProps) => {
         />
       ) : (
         <TextInput
-          asideY
           readOnly
           label={t("Réd. RED I")}
           value={formatPercentage(value.ghg_reduction ?? 0)}

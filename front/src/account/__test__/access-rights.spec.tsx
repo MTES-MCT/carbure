@@ -75,13 +75,12 @@ test("use the access request menu", async () => {
 
   // test that the autocomplete is working nicely
   await screen.findByText("Producteur Test")
-  const trader = screen.getByText("Trader Test")
 
   // click an the Trader option to select it
-  userEvent.click(trader)
+  userEvent.click(screen.getByText("Trader Test"))
 
   // check that the the input has the right selected value
-  expect(input.getAttribute("value")).toBe("Trader Test")
+  await screen.findByDisplayValue("Trader Test")
 
   // validate the choice by clicking the submit button
   userEvent.click(screen.getByText("Demander l'accès"))

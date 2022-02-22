@@ -8,8 +8,7 @@ export function normalizeItems<T, V>(
 ) {
   const normalizeItem = (data: T) => {
     const { children, ...norm } = normalize(data)
-    const key = JSON.stringify(norm.value)
-    const normTree: Normalized<T, V> = { ...norm, data, key }
+    const normTree: Normalized<T, V> = { ...norm, data }
 
     if (children) {
       normTree.children = normalizeItems(children, normalize, filter, sort)
@@ -50,7 +49,6 @@ export const defaultFilter = Boolean
 export type Sorter<T, V> = (item: Normalized<T, V>) => string | number
 
 export interface Normalized<T, V> {
-  key: string
   data: T
   value: V
   label: string

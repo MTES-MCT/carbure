@@ -117,7 +117,13 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
 
         {hasTraceability(lotData) && (
           <section>
-            <LotTraceability details={lotData} />
+            <LotTraceability
+              details={lotData}
+              parentLotRoot="../../declarations/"
+              parentStockRoot="../../stocks/"
+              childLotRoot="../../declarations/"
+              childStockRoot="../../stocks/"
+            />
           </section>
         )}
 

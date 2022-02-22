@@ -6,7 +6,7 @@ export interface Entity {
   has_trading: boolean
   has_stocks: boolean
   has_direct_deliveries: boolean
-  default_certificate: string
+  default_certificate?: string
   ext_admin_pages?: ExternalAdminPages[]
 }
 
@@ -17,7 +17,7 @@ export enum EntityType {
   Administration = "Administration",
   Auditor = "Auditor",
   ExternalAdmin = "Administration Externe",
-  Unknown = "Unknown"
+  Unknown = "Unknown",
 }
 
 export type ExternalAdminPages = "DCA" | "TIRIB"
