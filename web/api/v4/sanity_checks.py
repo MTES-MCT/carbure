@@ -331,7 +331,7 @@ def sanity_check_mandatory_fields(lot):
     if lot.carbure_client and lot.carbure_client.entity_type == Entity.OPERATOR:
         # client is an operator
         # make sure we have a certificate
-        if not lot.supplier_certificate:
+        if not lot.supplier_certificate and not lot.vendor_certificate:
             errors.append(generic_error(error='MISSING_SUPPLIER_CERTIFICATE', lot=lot, field='supplier_certificate', is_blocking=True))
             is_valid = False
     return is_valid, errors
