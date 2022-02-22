@@ -320,6 +320,7 @@ def stock_split(request, *args, **kwargs):
         lot.weight = lot.get_weight()
         lot.lhv_amount = lot.get_lhv_amount()
         lot.parent_stock = stock
+        lot.parent_lot = None
         # common, mandatory data
         lot.delivery_date = try_get_date(entry['delivery_date'])
         lot.year = lot.delivery_date.year
