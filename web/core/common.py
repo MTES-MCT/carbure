@@ -1171,12 +1171,9 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         lot['free_field'] = lot_row.get('champ_libre', '')
         producer = lot_row.get('producer', '').strip()
         production_site = lot_row.get('production_site', '').strip()
-        if producer is None or producer == '' or producer.upper() == entity.name.upper():
+        if (producer is None or producer == '' or producer.upper() == entity.name.upper()) and production_site.upper() in prefetched_data['my_production_sites']:
             # I am the producer
-            if production_site.upper() in prefetched_data['my_production_sites']:
-                lot['carbure_production_site'] = production_site
-                lot['production_site_certificate'] = lot_row.get('production_site_reference', '')
-                lot['production_site_double_counting_certificate'] = lot_row.get('double_counting_registration', '')
+            lot['carbure_production_site'] = production_site
             # carbure_supplier and carbure_producer will be set to entity in construct_carbure_lot
         else:
             # I am not the producer
@@ -1184,11 +1181,11 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
             lot['unknown_production_site'] = production_site
             lot['production_country_code'] = lot_row.get('production_site_country', None)
             lot['production_site_commissioning_date'] = lot_row.get('production_site_commissioning_date', '')
-            lot['production_site_certificate'] = lot_row.get('production_site_reference', '')
-            lot['production_site_double_counting_certificate'] = lot_row.get('double_counting_registration', '')
             lot['unknown_supplier'] = lot_row.get('supplier', '')
             lot['supplier_certificate'] = lot_row.get('supplier_certificate', '')
 
+        lot['production_site_certificate'] = lot_row.get('production_site_reference', '')
+        lot['production_site_double_counting_certificate'] = lot_row.get('double_counting_registration', '')
         lot['vendor_certificate'] = lot_row.get('vendor_certificate', '')
         lot['volume'] = lot_row.get('volume', 0)
         lot['feedstock_code'] = lot_row.get('matiere_premiere_code', '').strip()

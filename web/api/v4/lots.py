@@ -24,6 +24,10 @@ UNKNOWN_DELIVERY_COUNTRY = "UNKNOWN_DELIVERY_COUNTRY"
 UNKNOWN_CLIENT = "UNKNOWN_CLIENT"
 
 def try_get_date(dd):
+    if isinstance(dd, str):
+        dd = dd.strip()
+    if dd == '':
+        return None
     if dd is None:
         return dd
     if isinstance(dd, int):
@@ -36,6 +40,10 @@ def try_get_date(dd):
         return datetime.datetime.strptime(dd, "%Y-%m-%d").date()
     except Exception:
         pass
+    try:
+        return datetime.datetime.strptime(dd, "%d/%m/%Y").date()
+    except Exception:
+        pass    
     return dateutil.parser.parse(dd, dayfirst=True).date()
 
 def fill_delivery_date(lot, data):
@@ -286,7 +294,7 @@ def fill_client_data(lot, data, entity, prefetched_data):
 
 def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
     errors = []
-
+    print(data)
     if existing_lot:
         lot = existing_lot
     else:
