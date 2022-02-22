@@ -294,7 +294,6 @@ def fill_client_data(lot, data, entity, prefetched_data):
 
 def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
     errors = []
-    print(data)
     if existing_lot:
         lot = existing_lot
     else:
