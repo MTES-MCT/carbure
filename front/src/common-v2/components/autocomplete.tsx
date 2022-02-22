@@ -1,4 +1,5 @@
 import { useAsyncList } from "common-v2/hooks/async-list"
+import { matches } from "common-v2/utils/collection"
 import { useEffect, useRef, useState } from "react"
 import {
   defaultNormalizer,
@@ -120,7 +121,7 @@ export function useAutocomplete<T, V>({
 
   // update query when selected values label change
   useEffect(() => {
-    if (asyncOptions.label) setQuery(asyncOptions.label)
+    setQuery(asyncOptions.label)
   }, [asyncOptions.label])
 
   useEffect(() => {
@@ -142,10 +143,10 @@ export function useAutocomplete<T, V>({
     create?: (query: string) => V
   ) {
     const isQuery = createQueryFilter<T, V>(query, true)
-    const matches = normalizeItems(options, normalize, isQuery)
-    const match = matches.length > 0 ? matches[0] : undefined
+    const itemMatches = normalizeItems(options, normalize, isQuery)
+    const match = itemMatches.length > 0 ? itemMatches[0] : undefined
 
-    if (match && JSON.stringify(match.value) !== JSON.stringify(value)) {
+    if (match && !matches(match.value, value)) {
       onChange?.(match.value)
     } else if (create) {
       onChange?.(create(query))

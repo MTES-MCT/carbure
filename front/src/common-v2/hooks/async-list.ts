@@ -1,4 +1,4 @@
-import { uniqueBy } from "common-v2/utils/collection"
+import { compact, matches } from "common-v2/utils/collection"
 import { useAsync, useAsyncCallback, UseAsyncReturn } from "react-async-hook"
 import {
   Normalizer,
@@ -7,6 +7,7 @@ import {
   denormalizeItems,
   labelize,
 } from "../utils/normalize"
+import { staleWhileLoading } from "./async"
 
 export interface AsyncListOptions<T, V> {
   selectedValue?: V
@@ -44,33 +45,27 @@ export function useAsyncList<T, V>({
           : selectedValues ?? EMPTY
 
       const values = dirtyValues.filter((v: any) => v !== "" && v !== undefined)
-      const keys = values.map((value) => JSON.stringify(value))
 
       // nothing to do if there's no selection
       if (values.length === 0) return EMPTY
 
-      const cachedItems = uniqueBy(
-        [
-          ...(asyncSelectedItems.result ?? []),
-          ...(asyncItems.result ?? []),
-          ...(defaultItems ?? []),
-          ...(items ?? []),
-        ],
-        (item) => JSON.stringify(normalize(item).value)
-      )
+      const cachedItems = [
+        ...(asyncSelectedItems.result ?? []),
+        ...(asyncItems.result ?? []),
+        ...(defaultItems ?? []),
+        ...(items ?? []),
+      ]
 
       function findCachedItem(value: V) {
-        const key = JSON.stringify(value)
-        return cachedItems.find(
-          (item) => JSON.stringify(normalize(item).value) === key
-        )
+        return cachedItems.find((item) => matches(value, normalize(item).value))
       }
 
-      // nothing to do if we already have items for each value or we still loading them
-      if (values.every(findCachedItem)) {
-        return cachedItems.filter((item) =>
-          keys.includes(JSON.stringify(normalize(item).value))
-        )
+      // look for cached versions of the current values
+      const valuesCachedItems = compact(values.map(findCachedItem))
+
+      // nothing to do if we already have items for each value
+      if (valuesCachedItems.length === values.length) {
+        return valuesCachedItems
       }
 
       // prepare an array to store the items potentially matching the selection
@@ -92,9 +87,8 @@ export function useAsyncList<T, V>({
         const promises = values.map(async (value) => {
           const selectedValueItem = findCachedItem(value)
           if (selectedValueItem) return selectedValueItem
-          const key = JSON.stringify(value)
           const foundItems = await findItems("")
-          return foundItems.find((i) => JSON.stringify(normalize(i).value) === key); // prettier-ignore
+          return foundItems.find((item) => matches(value, normalize(item).value)); // prettier-ignore
         })
 
         const results = await Promise.all(promises)
@@ -106,7 +100,7 @@ export function useAsyncList<T, V>({
       const normItems = normalizeItems(availableItems, normalize, isSelected)
       return denormalizeItems(normItems)
     },
-    [selectedValue, selectedValues, items],
+    [selectedValue, selectedValues, items, defaultItems],
     staleWhileLoading
   )
 
@@ -118,8 +112,4 @@ export function useAsyncList<T, V>({
     label: labelize(asyncSelectedItems.result ?? [], normalize),
     execute: asyncItems.execute,
   }
-}
-
-export const staleWhileLoading = {
-  setLoading: (state: any) => ({ ...state, loading: true }),
 }
