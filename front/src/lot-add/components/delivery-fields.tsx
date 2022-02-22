@@ -24,7 +24,7 @@ import { Entity } from "carbure/types"
 import { Country, Depot } from "common/types"
 import Select, { SelectProps } from "common-v2/components/select"
 import { DeliveryType } from "transactions/types"
-import { compact } from "common-v2/utils/collection"
+import { compact, uniqueBy } from "common-v2/utils/collection"
 import CertificateIcon from "lot-details/components/certificate"
 
 interface DeliveryFieldsProps {
@@ -37,8 +37,8 @@ export const DeliveryFields = (props: DeliveryFieldsProps) => {
     <Fieldset label={t("Livraison")}>
       <SupplierField {...props} />
       <SupplierCertificateField {...props} />
-      <ClientField {...props} />
       <MyCertificateField {...props} />
+      <ClientField {...props} />
       <DeliveryTypeField {...props} />
       <DeliverySiteField {...props} />
       <DeliverySiteCountryField {...props} />
@@ -55,18 +55,19 @@ export const SupplierField = (props: AutocompleteProps<Entity | string>) => {
   const { value: supplier, ...bound } = bind("supplier")
   const isKnown = supplier instanceof Object
 
-  // when the producer is the entity, it is also the supplier so hide this field
-  if (isLotProducer(entity, value)) {
-    return null
-  }
+  const defaultOptions = uniqueBy(
+    compact([supplier, entity]),
+    (v) => norm.normalizeEntityOrUnknown(v).label
+  )
 
   return (
     <Autocomplete
+      disabled={props.disabled || isLotProducer(entity, value)}
       label={t("Fournisseur")}
       value={supplier}
       icon={isKnown ? UserCheck : undefined}
       create={norm.identity}
-      defaultOptions={supplier ? [supplier] : [entity]}
+      defaultOptions={defaultOptions}
       getOptions={async () => [entity]}
       normalize={norm.normalizeEntityOrUnknown}
       {...bound}
@@ -79,11 +80,6 @@ export const SupplierCertificateField = (props: AutocompleteProps<string>) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { value, bind } = useFormContext<LotFormValue>()
-
-  // when the producer is the entity, it is also the supplier so hide this field
-  if (isLotProducer(entity, value)) {
-    return null
-  }
 
   const certificate = value.certificates?.supplier_certificate ?? undefined
   const bound = bind("supplier_certificate")

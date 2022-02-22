@@ -29,16 +29,23 @@ export const normalizeCountry: Normalizer<Country> = (country) => ({
   label: i18next.t(country.code_pays, { ns: "countries" }),
 })
 
-export const normalizeEntityOrUnknown: Normalizer<Entity | string> = (
-  entity
-) => ({
-  value: entity,
-  label: isString(entity) ? entity : entity.name,
-})
+// prettier-ignore
+export const normalizeEntityOrUnknown: Normalizer<Entity | string> = (entity) => {
+  if (isString(entity)) return { value: entity, label: entity }
+  else return normalizeEntity(entity)
+}
 
 export const normalizeEntity: Normalizer<Entity> = (entity) => ({
-  value: entity,
   label: entity.name,
+  value: {
+    id: entity.id,
+    name: entity.name,
+    entity_type: entity.entity_type,
+    has_mac: entity.has_mac,
+    has_trading: entity.has_trading,
+    has_direct_deliveries: entity.has_direct_deliveries,
+    has_stocks: entity.has_stocks,
+  },
 })
 
 // prettier-ignore
