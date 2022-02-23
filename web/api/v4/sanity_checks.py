@@ -184,7 +184,7 @@ def sanity_check(lot, prefetched_data):
 
     # provenance des matieres premieres
     if lot.feedstock and lot.country_of_origin:
-        if lot.feedstock.category != 'CONV' and lot.eec != 0:
+        if lot.feedstock.category != 'CONV' and lot.feedstock.code != 'EP2' and lot.eec != 0:
             errors.append(generic_error(error='EEC_WITH_RESIDUE', lot=lot, field='eec'))
 
         if lot.feedstock.code == "RESIDUS_VINIQUES":
