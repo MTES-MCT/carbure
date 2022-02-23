@@ -361,8 +361,8 @@ test("accept inbox lot from details", async () => {
   userEvent.click(await screen.findByText("Incorporation"))
 
   // confirm the transaction
-  screen.getByText("Incorporer le lot", { selector: "h1" })
-  userEvent.click(screen.getByText("Incorporer"))
+  screen.getByText("Incorporation de lot", { selector: "h1" })
+  userEvent.click(screen.getByText("Incorporation"))
 
   await screen.findByText("Incorporé")
 })
