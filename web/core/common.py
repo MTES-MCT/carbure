@@ -1185,11 +1185,10 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
             lot['production_country_code'] = lot_row.get('production_site_country', None)
             lot['production_site_commissioning_date'] = lot_row.get('production_site_commissioning_date', '')
             lot['unknown_supplier'] = lot_row.get('supplier', '')
-            lot['supplier_certificate'] = lot_row.get('supplier_certificate', '')
-
         lot['production_site_certificate'] = lot_row.get('production_site_reference', '')
         lot['production_site_double_counting_certificate'] = lot_row.get('double_counting_registration', '')
         lot['vendor_certificate'] = lot_row.get('vendor_certificate', '')
+        lot['supplier_certificate'] = lot_row.get('supplier_certificate', '')
         lot['volume'] = lot_row.get('volume', 0)
         lot['feedstock_code'] = lot_row.get('matiere_premiere_code', '').strip()
         lot['biofuel_code'] = lot_row.get('biocarburant_code', '').strip()
