@@ -54,11 +54,7 @@ def fill_delivery_date(lot, data):
     try:
         delivery_date = data['delivery_date']
         dd = try_get_date(delivery_date)
-        diff = today - dd
-        if diff > datetime.timedelta(days=365):
-            errors.append(GenericError(lot=lot, field='delivery_date', error=INCORRECT_DELIVERY_DATE, value=delivery_date, display_to_creator=True, is_blocking=True))
-        else:
-            lot.delivery_date = dd
+        lot.delivery_date = dd
     except Exception:
         errors.append(GenericError(lot=lot, field='delivery_date', error=INCORRECT_FORMAT_DELIVERY_DATE, value=delivery_date, display_to_creator=True, is_blocking=True))
     lot.period = lot.delivery_date.year * 100 + lot.delivery_date.month
