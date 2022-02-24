@@ -571,6 +571,14 @@ class CarbureLotAdmin(admin.ModelAdmin):
                   ('carbure_production_site', NameSortedRelatedOnlyDropdownFilter),)
     search_fields = ('id', 'transport_document_reference', 'free_field', 'carbure_id', 'volume')
 
+    actions = ['regen_carbure_id',]
+
+    def regen_carbure_id(self, request, queryset):
+        for lot in queryset:
+            lot.generate_carbure_id()
+            lot.save()
+    regen_carbure_id.short_description = "Regénérer CarbureID"
+
     def get_producer(self, obj):
         return obj.carbure_producer.name if obj.carbure_producer else 'U - ' + str(obj.unknown_producer)
     get_producer.admin_order_field  = 'carbure_producer__name'
