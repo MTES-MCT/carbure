@@ -1,149 +1,135 @@
-import json
-import datetime
-from django.db.models import Q
-from django.http import JsonResponse, HttpResponse
-from core.models import LotV2, LotTransaction, ETBETransformation, TransactionUpdateHistory
-from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, LotV2, Depot
-from core.decorators import check_rights
-from core.common import calculate_ghg, load_mb_lot, bulk_insert
-from core.common import load_excel_file, send_lot_from_stock, generate_carbure_id
-from core.xlsx_v3 import template_stock, template_stock_bcghg
-from django_otp.decorators import otp_required
-from api.v3.lots.helpers import get_snapshot_filters, get_summary, filter_lots, sort_lots, get_lots_with_metadata
+# sort_key_to_django_field = {'period': 'lot__period',
+#                             'biocarburant': 'lot__biocarburant__name',
+#                             'matiere_premiere': 'lot__matiere_premiere__name',
+#                             'ghg_reduction': 'lot__ghg_reduction',
+#                             'volume': 'lot__volume',
+#                             'pays_origine': 'lot__pays_origine__name',
+#                             'client': 'carbure_client__name',
+#                             'vendor': 'carbure_vendor__name',
+#                             'depot': 'carbure_delivery_site',
+#                             }
 
 
-sort_key_to_django_field = {'period': 'lot__period',
-                            'biocarburant': 'lot__biocarburant__name',
-                            'matiere_premiere': 'lot__matiere_premiere__name',
-                            'ghg_reduction': 'lot__ghg_reduction',
-                            'volume': 'lot__volume',
-                            'pays_origine': 'lot__pays_origine__name',
-                            'client': 'carbure_client__name',
-                            'vendor': 'carbure_vendor__name',
-                            'depot': 'carbure_delivery_site',
-                            }
+# def filter_stock_transactions(entity, querySet):
+#     status = querySet.get('status', False)
+#     show_empty = querySet.get('show_empty', False)
+#     if show_empty == 'true':
+#         show_empty = True
+#     else:
+#         show_empty = False
+
+#     if not status:
+#         raise Exception('Status is not specified')
+
+#     if entity.entity_type not in (Entity.PRODUCER, Entity.TRADER):
+#         raise Exception('Entity does not have stocks')
+
+#     if status == 'tosend':
+#         return LotTransaction.objects.filter(lot__added_by=entity, lot__status=LotV2.DRAFT).exclude(lot__parent_lot=None)
+#     elif status == 'in':
+#         return LotTransaction.objects.filter(carbure_client=entity, lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.PENDING, LotTransaction.TOFIX, LotTransaction.FIXED])
+#     elif status == 'stock':
+#         stock = LotTransaction.objects.filter(carbure_client=entity, lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__fused_with=None, is_forwarded=False, is_mac=False)
+#         if not show_empty:
+#             stock = stock.filter(lot__remaining_volume__gt=0)
+#         return stock
+#     else:
+#         raise Exception('Unknown status')
 
 
-def filter_stock_transactions(entity, querySet):
-    status = querySet.get('status', False)
-    show_empty = querySet.get('show_empty', False)
-    if show_empty == 'true':
-        show_empty = True
-    else:
-        show_empty = False
+# @check_rights('entity_id')
+# def get_stocks(request, *args, **kwargs):
+#     context = kwargs['context']
+#     entity = context['entity']
 
-    if not status:
-        raise Exception('Status is not specified')
-
-    if entity.entity_type not in (Entity.PRODUCER, Entity.TRADER):
-        raise Exception('Entity does not have stocks')
-
-    if status == 'tosend':
-        return LotTransaction.objects.filter(lot__added_by=entity, lot__status=LotV2.DRAFT).exclude(lot__parent_lot=None)
-    elif status == 'in':
-        return LotTransaction.objects.filter(carbure_client=entity, lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.PENDING, LotTransaction.TOFIX, LotTransaction.FIXED])
-    elif status == 'stock':
-        stock = LotTransaction.objects.filter(carbure_client=entity, lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__fused_with=None, is_forwarded=False, is_mac=False)
-        if not show_empty:
-            stock = stock.filter(lot__remaining_volume__gt=0)
-        return stock
-    else:
-        raise Exception('Unknown status')
+#     try:
+#         txs = filter_stock_transactions(entity, request.GET)
+#         return get_lots_with_metadata(txs, entity, request.GET, admin=False, stocks=True)
+#     except Exception:
+#         return JsonResponse({'status': 'error', 'message': "Could not get lots"}, status=400)
 
 
-@check_rights('entity_id')
-def get_stocks(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
+# @check_rights('entity_id')
+# def get_stocks_summary(request, *args, **kwargs):
+#     context = kwargs['context']
+#     entity = context['entity']
 
-    try:
-        txs = filter_stock_transactions(entity, request.GET)
-        return get_lots_with_metadata(txs, entity, request.GET, admin=False, stocks=True)
-    except Exception:
-        return JsonResponse({'status': 'error', 'message': "Could not get lots"}, status=400)
+#     short = request.GET.get('short', False)
 
-
-@check_rights('entity_id')
-def get_stocks_summary(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
-
-    short = request.GET.get('short', False)
-
-    try:
-        txs = filter_stock_transactions(entity, request.GET)
-        txs = filter_lots(txs, request.GET, entity=entity)[0]
-        txs = sort_lots(txs, request.GET)
-        data = get_summary(txs, entity, short)
-        return JsonResponse({'status': 'success', 'data': data})
-    except Exception:
-        return JsonResponse({'status': 'error', 'message': "Could not get lots summary"}, status=400)
+#     try:
+#         txs = filter_stock_transactions(entity, request.GET)
+#         txs = filter_lots(txs, request.GET, entity=entity)[0]
+#         txs = sort_lots(txs, request.GET)
+#         data = get_summary(txs, entity, short)
+#         return JsonResponse({'status': 'success', 'data': data})
+#     except Exception:
+#         return JsonResponse({'status': 'error', 'message': "Could not get lots summary"}, status=400)
 
 
-@check_rights('entity_id')
-def get_snapshot(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
+# @check_rights('entity_id')
+# def get_snapshot(request, *args, **kwargs):
+#     context = kwargs['context']
+#     entity = context['entity']
 
-    data = {}
+#     data = {}
 
-    if entity.entity_type in ['Producteur', 'Trader']:
-        # drafts are lot that will be extracted from mass balance and sent to a client
-        tx_drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot=None)
-        draft = tx_drafts.count()
-        tx_inbox = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=[LotTransaction.PENDING, LotTransaction.TOFIX, LotTransaction.FIXED])
-        inbox = tx_inbox.count()
-        tx_stock = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__fused_with=None, lot__remaining_volume__gt=0, is_forwarded=False, is_mac=False)
-        stock = tx_stock.count()
-        data['lots'] = {'in': inbox,  'stock': stock, 'tosend': draft}
-    else:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
+#     if entity.entity_type in ['Producteur', 'Trader']:
+#         # drafts are lot that will be extracted from mass balance and sent to a client
+#         tx_drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot=None)
+#         draft = tx_drafts.count()
+#         tx_inbox = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=[LotTransaction.PENDING, LotTransaction.TOFIX, LotTransaction.FIXED])
+#         inbox = tx_inbox.count()
+#         tx_stock = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__fused_with=None, lot__remaining_volume__gt=0, is_forwarded=False, is_mac=False)
+#         stock = tx_stock.count()
+#         data['lots'] = {'in': inbox,  'stock': stock, 'tosend': draft}
+#     else:
+#         return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
 
-    data['filters'] = [
-        'periods',
-        'biocarburants',
-        'matieres_premieres',
-        'countries_of_origin',
-        'vendors',
-        'production_sites',
-        'delivery_sites',
-        'show_empty'
-    ]
-    return JsonResponse({'status': 'success', 'data': data})
-
-
-@check_rights('entity_id')
-def get_filters(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
-    field = request.GET.get('field', False)
-    if not field:
-        return JsonResponse({'status': 'error', 'message': 'Please specify the field for which you want the filters'}, status=400)
-
-    txs = filter_stock_transactions(entity, request.GET)
-    txs = filter_lots(txs, request.GET, entity=entity, blacklist=[field])[0]
-
-    d = get_snapshot_filters(txs, entity, [field])
-    if field in d:
-        values = d[field]
-    else:
-        return JsonResponse({'status': 'error', 'message': "Something went wrong"}, status=400)
-    return JsonResponse({'status': 'success', 'data': values})
+#     data['filters'] = [
+#         'periods',
+#         'biocarburants',
+#         'matieres_premieres',
+#         'countries_of_origin',
+#         'vendors',
+#         'production_sites',
+#         'delivery_sites',
+#         'show_empty'
+#     ]
+#     return JsonResponse({'status': 'success', 'data': data})
 
 
-@check_rights('entity_id')
-def get_depots(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
-    biocarburant_code = request.GET.get('biocarburant_code', False)
+# @check_rights('entity_id')
+# def get_filters(request, *args, **kwargs):
+#     context = kwargs['context']
+#     entity = context['entity']
+#     field = request.GET.get('field', False)
+#     if not field:
+#         return JsonResponse({'status': 'error', 'message': 'Please specify the field for which you want the filters'}, status=400)
 
-    # return list of depots that have a stock
-    stock = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__fused_with=None, lot__volume__gt=0)
-    if biocarburant_code:
-        stock = stock.filter(lot__biocarburant__code=biocarburant_code)
+#     txs = filter_stock_transactions(entity, request.GET)
+#     txs = filter_lots(txs, request.GET, entity=entity, blacklist=[field])[0]
 
-    depots = sorted(list(set([s.carbure_delivery_site.name if s.carbure_delivery_site else s.unknown_delivery_site for s in stock])))
-    return JsonResponse({'status': 'success', 'data': depots})
+#     d = get_snapshot_filters(txs, entity, [field])
+#     if field in d:
+#         values = d[field]
+#     else:
+#         return JsonResponse({'status': 'error', 'message': "Something went wrong"}, status=400)
+#     return JsonResponse({'status': 'success', 'data': values})
+
+
+# @check_rights('entity_id')
+# def get_depots(request, *args, **kwargs):
+#     context = kwargs['context']
+#     entity = context['entity']
+#     biocarburant_code = request.GET.get('biocarburant_code', False)
+
+#     # return list of depots that have a stock
+#     stock = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__fused_with=None, lot__volume__gt=0)
+#     if biocarburant_code:
+#         stock = stock.filter(lot__biocarburant__code=biocarburant_code)
+
+#     depots = sorted(list(set([s.carbure_delivery_site.name if s.carbure_delivery_site else s.unknown_delivery_site for s in stock])))
+#     return JsonResponse({'status': 'success', 'data': depots})
 
 
 # @check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
@@ -207,107 +193,107 @@ def get_depots(request, *args, **kwargs):
 #     return JsonResponse({'status': 'success', 'data': {'tx_ids': [tx.id for tx in new_txs]}})
 
 
-@check_rights('entity_id')
-def get_template_mass_balance(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
+# @check_rights('entity_id')
+# def get_template_mass_balance(request, *args, **kwargs):
+#     context = kwargs['context']
+#     entity = context['entity']
 
-    file_location = template_stock(entity)
-    try:
-        with open(file_location, 'rb') as f:
-            file_data = f.read()
-            # sending response
-            response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = 'attachment; filename="carbure_template_mass_balance.xlsx"'
-            return response
-    except Exception:
-        return JsonResponse({'status': "error", 'message': "Error creating template file"}, status=500)
+#     file_location = template_stock(entity)
+#     try:
+#         with open(file_location, 'rb') as f:
+#             file_data = f.read()
+#             # sending response
+#             response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
+#             response['Content-Disposition'] = 'attachment; filename="carbure_template_mass_balance.xlsx"'
+#             return response
+#     except Exception:
+#         return JsonResponse({'status': "error", 'message': "Error creating template file"}, status=500)
 
-@check_rights('entity_id')
-def get_template_mass_balance_bcghg(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
+# @check_rights('entity_id')
+# def get_template_mass_balance_bcghg(request, *args, **kwargs):
+#     context = kwargs['context']
+#     entity = context['entity']
 
-    file_location = template_stock_bcghg(entity)
-    try:
-        with open(file_location, 'rb') as f:
-            file_data = f.read()
-            # sending response
-            response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = 'attachment; filename="carbure_template_mass_balance.xlsx"'
-            return response
-    except Exception:
-        return JsonResponse({'status': "error", 'message': "Error creating template file"}, status=500)
+#     file_location = template_stock_bcghg(entity)
+#     try:
+#         with open(file_location, 'rb') as f:
+#             file_data = f.read()
+#             # sending response
+#             response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
+#             response['Content-Disposition'] = 'attachment; filename="carbure_template_mass_balance.xlsx"'
+#             return response
+#     except Exception:
+#         return JsonResponse({'status': "error", 'message': "Error creating template file"}, status=500)
 
-@check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
-def upload_mass_balance(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
-    file = request.FILES.get('file')
-    if file is None:
-        return JsonResponse({'status': "error", 'message': "Missing File"}, status=400)
+# @check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
+# def upload_mass_balance(request, *args, **kwargs):
+#     context = kwargs['context']
+#     entity = context['entity']
+#     file = request.FILES.get('file')
+#     if file is None:
+#         return JsonResponse({'status': "error", 'message': "Missing File"}, status=400)
 
-    # save file
-    now = datetime.datetime.now()
-    filename = '%s_%s.xlsx' % (now.strftime('%Y%m%d'), entity.name.upper())
-    filepath = '/tmp/%s' % (filename)
-    with open(filepath, 'wb+') as destination:
-        for chunk in file.chunks():
-            destination.write(chunk)
+#     # save file
+#     now = datetime.datetime.now()
+#     filename = '%s_%s.xlsx' % (now.strftime('%Y%m%d'), entity.name.upper())
+#     filepath = '/tmp/%s' % (filename)
+#     with open(filepath, 'wb+') as destination:
+#         for chunk in file.chunks():
+#             destination.write(chunk)
 
-    nb_loaded, nb_total, errors = load_excel_file(entity, request.user, file, mass_balance=True)
-    if nb_loaded is False:
-        return JsonResponse({'status': 'error', 'message': 'Could not load Excel file'})
-    data = {'loaded': nb_loaded, 'total': nb_total}
-    return JsonResponse({'status': 'success', 'data': data})
-
-
-# given a set of objectives and constraints, outputs a list of lots/sublots that solves the problem
-@check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
-def generate_batch(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
-    volume = request.GET.get('volume', False)
-    biocarburant = request.GET.get('biocarburant_code', False)
-    depot_source = request.GET.get('depot_id', False)
-    mp_blacklist = request.GET.getlist('mp_blacklist', False)
-    ghg_target = request.GET.get('ghg_target', False)
-
-    if not biocarburant:
-        return JsonResponse({'status': "error", 'message': "Missing biocarburant_code"}, status=400)
-    if not volume:
-        return JsonResponse({'status': "error", 'message': "Missing volume"}, status=400)
+#     nb_loaded, nb_total, errors = load_excel_file(entity, request.user, file, mass_balance=True)
+#     if nb_loaded is False:
+#         return JsonResponse({'status': 'error', 'message': 'Could not load Excel file'})
+#     data = {'loaded': nb_loaded, 'total': nb_total}
+#     return JsonResponse({'status': 'success', 'data': data})
 
 
-    # get current stock
-    txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__fused_with=None, lot__volume__gt=0)
-    # filter by requested biofuel
-    txs = txs.filter(lot__biocarburant__code=biocarburant)
+# # given a set of objectives and constraints, outputs a list of lots/sublots that solves the problem
+# @check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
+# def generate_batch(request, *args, **kwargs):
+#     context = kwargs['context']
+#     entity = context['entity']
+#     volume = request.GET.get('volume', False)
+#     biocarburant = request.GET.get('biocarburant_code', False)
+#     depot_source = request.GET.get('depot_id', False)
+#     mp_blacklist = request.GET.getlist('mp_blacklist', False)
+#     ghg_target = request.GET.get('ghg_target', False)
 
-    stock_per_depot = {}
-    for tx in txs:
-        if tx.delivery_site_is_in_carbure:
-            if tx.carbure_delivery_site not in stock_per_depot:
-                stock_per_depot[tx.carbure_delivery_site] = []
-            stock_per_depot[tx.carbure_delivery_site].append(tx)
-        else:
-            if tx.unknown_delivery_site not in stock_per_depot:
-                stock_per_depot[tx.unknown_delivery_site] = []
-            stock_per_depot[tx.unknown_delivery_site].append(tx)
-    # filter by depot_source if requested
-    depots_to_check = stock_per_depot.keys()
-    if depot_source:
-        if depot_source not in stock_per_depot:
-            return JsonResponse({'status': 'error', 'message': 'Could not find enough volume in depot %s' % (depot_source)}, status=400)
-        else:
-            depots_to_check = [stock_per_depot[depot_source]]
+#     if not biocarburant:
+#         return JsonResponse({'status': "error", 'message': "Missing biocarburant_code"}, status=400)
+#     if not volume:
+#         return JsonResponse({'status': "error", 'message': "Missing volume"}, status=400)
 
-    # do the actual calculations
-    for depot in depots_to_check:
-        # do we have enough volume ?
-        pass
 
-    return JsonResponse({'status': 'success', 'data': []})
+#     # get current stock
+#     txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__fused_with=None, lot__volume__gt=0)
+#     # filter by requested biofuel
+#     txs = txs.filter(lot__biocarburant__code=biocarburant)
+
+#     stock_per_depot = {}
+#     for tx in txs:
+#         if tx.delivery_site_is_in_carbure:
+#             if tx.carbure_delivery_site not in stock_per_depot:
+#                 stock_per_depot[tx.carbure_delivery_site] = []
+#             stock_per_depot[tx.carbure_delivery_site].append(tx)
+#         else:
+#             if tx.unknown_delivery_site not in stock_per_depot:
+#                 stock_per_depot[tx.unknown_delivery_site] = []
+#             stock_per_depot[tx.unknown_delivery_site].append(tx)
+#     # filter by depot_source if requested
+#     depots_to_check = stock_per_depot.keys()
+#     if depot_source:
+#         if depot_source not in stock_per_depot:
+#             return JsonResponse({'status': 'error', 'message': 'Could not find enough volume in depot %s' % (depot_source)}, status=400)
+#         else:
+#             depots_to_check = [stock_per_depot[depot_source]]
+
+#     # do the actual calculations
+#     for depot in depots_to_check:
+#         # do we have enough volume ?
+#         pass
+
+#     return JsonResponse({'status': 'success', 'data': []})
 
 # @check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
 # def send_drafts(request, *args, **kwargs):
@@ -345,104 +331,104 @@ def generate_batch(request, *args, **kwargs):
 #     return JsonResponse({'status': status, 'data': data}, status=status_code)
 
 
-def convert_eth_stock_to_etbe(request, entity, c):
-    previous_stock_tx_id = c['previous_stock_tx_id']
-    volume_ethanol = c['volume_ethanol']
-    volume_etbe = c['volume_etbe']
-    volume_denaturant = c['volume_denaturant']
-    volume_etbe_eligible = c['volume_etbe_eligible']
-    etbe = Biocarburant.objects.get(code='ETBE')
+# def convert_eth_stock_to_etbe(request, entity, c):
+#     previous_stock_tx_id = c['previous_stock_tx_id']
+#     volume_ethanol = c['volume_ethanol']
+#     volume_etbe = c['volume_etbe']
+#     volume_denaturant = c['volume_denaturant']
+#     volume_etbe_eligible = c['volume_etbe_eligible']
+#     etbe = Biocarburant.objects.get(code='ETBE')
 
-    # retrieve stock line
-    previous_stock_tx = LotTransaction.objects.get(carbure_client=entity, delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], id=previous_stock_tx_id)
-    # check if source TX is Ethanol
-    if previous_stock_tx.lot.biocarburant.code != 'ETH':
-        raise Exception("Only ETH can be converted to ETBE")
-
-
-    previous_lot_id = previous_stock_tx.lot.pk
-    previous_tx_id = previous_stock_tx.pk
-    new_lot = LotV2.objects.get(pk=previous_lot_id)
-    new_lot.pk = None
-    new_lot.added_by = entity
-    new_lot.data_origin_entity
-    new_lot.added_by_user = request.user
-    new_lot.save()
-    new_lot.carbure_id = generate_carbure_id(new_lot)
-    new_lot.is_transformed = True
-    new_lot.source = 'MANUAL'
-    new_lot.biocarburant = etbe
-
-    volume_ethanol = round(float(volume_ethanol), 2)
-    volume_etbe = round(float(volume_etbe), 2)
-    volume_etbe_eligible = round(float(volume_etbe_eligible), 2)
-    volume_denaturant = round(float(volume_denaturant), 2)
+#     # retrieve stock line
+#     previous_stock_tx = LotTransaction.objects.get(carbure_client=entity, delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], id=previous_stock_tx_id)
+#     # check if source TX is Ethanol
+#     if previous_stock_tx.lot.biocarburant.code != 'ETH':
+#         raise Exception("Only ETH can be converted to ETBE")
 
 
-    # check available volume
-    if previous_stock_tx.lot.remaining_volume < volume_ethanol:
-        raise Exception("Cannot convert more ETH than stock")
+#     previous_lot_id = previous_stock_tx.lot.pk
+#     previous_tx_id = previous_stock_tx.pk
+#     new_lot = LotV2.objects.get(pk=previous_lot_id)
+#     new_lot.pk = None
+#     new_lot.added_by = entity
+#     new_lot.data_origin_entity
+#     new_lot.added_by_user = request.user
+#     new_lot.save()
+#     new_lot.carbure_id = generate_carbure_id(new_lot)
+#     new_lot.is_transformed = True
+#     new_lot.source = 'MANUAL'
+#     new_lot.biocarburant = etbe
 
-    previous_stock_tx.lot.remaining_volume -= volume_ethanol
-    previous_stock_tx.lot.remaining_volume = round(previous_stock_tx.lot.remaining_volume, 2)
-    previous_stock_tx.lot.save()
-
-    new_lot.volume = volume_etbe
-    new_lot.remaining_volume = volume_etbe
-    new_lot.parent_lot = None
-    new_lot.save()
-
-    # create transaction
-    transaction = previous_stock_tx
-    transaction.pk = None
-    transaction.parent_tx_id = previous_tx_id
-    transaction.lot = new_lot
-    transaction.carbure_vendor = entity
-    transaction.dae = 'CONVERSION-ETBE'
-    transaction.champ_libre = 'CONVERSION-ETBE'
-    transaction.save()
-
-    previous_stock_tx.child_tx_id = transaction.pk
-    assert(previous_stock_tx.child_tx_id != None)
-    assert(previous_stock_tx.child_tx_id != previous_stock_tx_id)
-    assert(transaction.pk != previous_stock_tx_id)
-    assert(transaction.parent_tx_id != transaction.pk)
-    assert(transaction.parent_tx_id != None)
-
-    # save ETBE Transformation
-    t = ETBETransformation()
-    t.previous_stock_id = previous_stock_tx_id
-    t.new_stock = transaction
-    t.volume_ethanol = volume_ethanol
-    t.volume_etbe = volume_etbe
-    t.volume_etbe_eligible = volume_etbe_eligible
-    t.volume_denaturant = volume_denaturant
-    t.added_by = entity
-    t.added_by_user = request.user
-    t.save()
+#     volume_ethanol = round(float(volume_ethanol), 2)
+#     volume_etbe = round(float(volume_etbe), 2)
+#     volume_etbe_eligible = round(float(volume_etbe_eligible), 2)
+#     volume_denaturant = round(float(volume_denaturant), 2)
 
 
-@check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
-def convert_to_etbe(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
+#     # check available volume
+#     if previous_stock_tx.lot.remaining_volume < volume_ethanol:
+#         raise Exception("Cannot convert more ETH than stock")
 
-    conversions = request.POST.get('conversions', False)
-    if not conversions:
-        return JsonResponse({'status': 'error', 'message': 'Missing conversions'}, status=400)
+#     previous_stock_tx.lot.remaining_volume -= volume_ethanol
+#     previous_stock_tx.lot.remaining_volume = round(previous_stock_tx.lot.remaining_volume, 2)
+#     previous_stock_tx.lot.save()
 
-    try:
-        cs = json.loads(conversions)
-    except Exception:
-        return JsonResponse({'status': 'error', 'message': 'Could not deserialize POST data'}, status=400)
+#     new_lot.volume = volume_etbe
+#     new_lot.remaining_volume = volume_etbe
+#     new_lot.parent_lot = None
+#     new_lot.save()
 
-    for c in cs:
-        try:
-            convert_eth_stock_to_etbe(request, entity, c)
-        except Exception:
-            return JsonResponse({'status': 'error'}, status=400)
+#     # create transaction
+#     transaction = previous_stock_tx
+#     transaction.pk = None
+#     transaction.parent_tx_id = previous_tx_id
+#     transaction.lot = new_lot
+#     transaction.carbure_vendor = entity
+#     transaction.dae = 'CONVERSION-ETBE'
+#     transaction.champ_libre = 'CONVERSION-ETBE'
+#     transaction.save()
 
-    return JsonResponse({'status': 'success'})
+#     previous_stock_tx.child_tx_id = transaction.pk
+#     assert(previous_stock_tx.child_tx_id != None)
+#     assert(previous_stock_tx.child_tx_id != previous_stock_tx_id)
+#     assert(transaction.pk != previous_stock_tx_id)
+#     assert(transaction.parent_tx_id != transaction.pk)
+#     assert(transaction.parent_tx_id != None)
+
+#     # save ETBE Transformation
+#     t = ETBETransformation()
+#     t.previous_stock_id = previous_stock_tx_id
+#     t.new_stock = transaction
+#     t.volume_ethanol = volume_ethanol
+#     t.volume_etbe = volume_etbe
+#     t.volume_etbe_eligible = volume_etbe_eligible
+#     t.volume_denaturant = volume_denaturant
+#     t.added_by = entity
+#     t.added_by_user = request.user
+#     t.save()
+
+
+# @check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
+# def convert_to_etbe(request, *args, **kwargs):
+#     context = kwargs['context']
+#     entity = context['entity']
+
+#     conversions = request.POST.get('conversions', False)
+#     if not conversions:
+#         return JsonResponse({'status': 'error', 'message': 'Missing conversions'}, status=400)
+
+#     try:
+#         cs = json.loads(conversions)
+#     except Exception:
+#         return JsonResponse({'status': 'error', 'message': 'Could not deserialize POST data'}, status=400)
+
+#     for c in cs:
+#         try:
+#             convert_eth_stock_to_etbe(request, entity, c)
+#         except Exception:
+#             return JsonResponse({'status': 'error'}, status=400)
+
+#     return JsonResponse({'status': 'success'})
 
 
 # @check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
