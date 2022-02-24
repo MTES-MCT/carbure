@@ -45,7 +45,7 @@ export const LotActions = ({ lot, canSave }: ActionBarProps) => {
         <Fragment>
           {correction === "IN_CORRECTION" ? (
             <MarkOneAsFixedButton lot={lot} disabled={!canSave} />
-            ) : (
+          ) : (
             <RecallOneButton lot={lot} />
           )}
         </Fragment>
@@ -58,6 +58,10 @@ export const LotActions = ({ lot, canSave }: ActionBarProps) => {
             <RequestOneFixButton lot={lot} />
           )}
         </Fragment>
+      )}
+
+      {isCreator && status === "PENDING" && correction === "IN_CORRECTION" && (
+        <DeleteOneButton lot={lot} />
       )}
     </Fragment>
   )
