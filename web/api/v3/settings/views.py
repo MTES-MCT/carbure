@@ -17,8 +17,6 @@ from core.decorators import check_rights, otp_or_403
 from certificates.models import ProductionSiteCertificate
 
 from core.models import UserRightsRequests, UserRights
-from api.v3.lots.views import get_entity_lots_by_status
-from api.v3.sanity_checks import bulk_sanity_checks
 
 @otp_or_403
 def get_settings(request):
