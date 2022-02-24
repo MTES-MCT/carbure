@@ -389,7 +389,7 @@ const BlendingDialog = ({
       <main>
         <section>
           {t(
-            "En acceptant ces lots, vous indiquez qu'ils sont utilisés dans le cadre d'incorporations en EFS."
+            "En acceptant ces lots, vous indiquez qu'ils sont utilisés dans le cadre d'incorporations en EFS ou Usine exercée."
           )}
         </section>
 
