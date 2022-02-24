@@ -815,6 +815,19 @@ def lots_delete(request, *args, **kwargs):
             event.user = None
             event.metadata = {'message': 'child lot deleted. recredit volume.', 'volume_to_credit': lot.volume}
             event.save()
+        if lot.parent_lot:
+            if lot.parent_lot.delivery_type in [CarbureLot.PROCESSING, CarbureLot.TRADING]:
+                lot.parent_lot.lot_status = CarbureLot.PENDING
+                lot.parent_lot.delivery_type = CarbureLot.OTHER
+                lot.parent_lot.save()
+                # save event
+                event = CarbureLotEvent()
+                event.event_type = CarbureLotEvent.RECALLED
+                event.lot = lot.parent_lot
+                event.user = None
+                event.metadata = {'message': 'child lot deleted. back to inbox.'}
+                event.save()
+
     return JsonResponse({'status': 'success'})
 
 
