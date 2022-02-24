@@ -44,7 +44,10 @@ export function importLots(entity_id: number, file: File) {
 
 export function downloadLots(query: LotQuery, selection: number[]) {
   return download("/lots", {
-    ...selectionOrQuery(query, selection),
+    ...selectionOrQuery(
+      { ...query, limit: undefined, from_idx: undefined },
+      selection
+    ),
     export: true,
   })
 }
@@ -220,7 +223,10 @@ export function getStocks(query: StockQuery) {
 
 export function downloadStocks(query: StockQuery, selection: number[]) {
   return download("/stocks", {
-    ...selectionOrQuery(query, selection),
+    ...selectionOrQuery(
+      { ...query, from_idx: undefined, limit: undefined },
+      selection
+    ),
     export: true,
   })
 }
