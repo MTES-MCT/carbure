@@ -997,9 +997,11 @@ def delete_stock_transformation(sender, instance, using, **kwargs):
 @receiver(pre_delete, sender=CarbureLot, dispatch_uid='lot_delete_signal')
 def delete_lot(sender, instance, using, **kwargs):
     # if we come from stock, recredit
-    if instance.parent_stock:
+    if instance.lot_status != CarbureLot.DELETED and instance.parent_stock: # if lot is already in status DELETED, we have already recredited the stock
         # this lot was a split from a stock
         instance.parent_stock.remaining_volume = round(instance.parent_stock.remaining_volume + instance.volume, 2)
+        instance.parent_stock.remaining_weight = instance.parent_stock.get_weight()
+        instance.parent_stock.remaining_lhv_amount = instance.parent_stock.get_lhv_amount()        
         instance.parent_stock.save()
         # save event
         event = CarbureStockEvent()
