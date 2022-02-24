@@ -792,7 +792,7 @@ def lots_delete(request, *args, **kwargs):
         if lot.added_by != entity:
             return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to delete this lot'}, status=403)
 
-        if lot.lot_status not in [CarbureLot.DRAFT, CarbureLot.REJECTED]:
+        if lot.lot_status not in [CarbureLot.DRAFT, CarbureLot.REJECTED] and not (lot.lot_status == CarbureLot.PENDING and lot.correction_status == CarbureLot.IN_CORRECTION):
             # cannot delete lot accepted / frozen or already deleted
             return JsonResponse({'status': 'error', 'message': 'Cannot delete lot'}, status=400)
 
@@ -808,6 +808,13 @@ def lots_delete(request, *args, **kwargs):
             lot.parent_stock.remaining_weight = lot.parent_stock.get_weight()
             lot.parent_stock.remaining_lhv_amount = lot.parent_stock.get_lhv_amount()
             lot.parent_stock.save()
+            # save event
+            event = CarbureStockEvent()
+            event.event_type = CarbureStockEvent.UNSPLIT
+            event.stock = lot.parent_stock
+            event.user = None
+            event.metadata = {'message': 'child lot deleted. recredit volume.', 'volume_to_credit': lot.volume}
+            event.save()
     return JsonResponse({'status': 'success'})
 
 
