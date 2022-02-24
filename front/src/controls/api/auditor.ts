@@ -29,7 +29,10 @@ export function getLots(query: LotQuery) {
 
 export function downloadLots(query: LotQuery, selection: number[]) {
   return download("/auditor/lots", {
-    ...selectionOrQuery(query, selection),
+    ...selectionOrQuery(
+      { ...query, from_idx: undefined, limit: undefined },
+      selection
+    ),
     export: true,
   })
 }
