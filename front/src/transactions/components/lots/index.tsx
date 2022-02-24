@@ -277,7 +277,6 @@ export function useQueryParamsStore(
         entity,
         category: getDefaultCategory(state.status, state.snapshot),
         filters: filtersParams,
-        search: undefined,
         invalid: false,
         deadline: false,
         selection: [],
@@ -288,7 +287,6 @@ export function useQueryParamsStore(
         year,
         category: getDefaultCategory(state.status, state.snapshot),
         filters: filtersParams,
-        search: undefined,
         invalid: false,
         deadline: false,
         selection: [],
@@ -300,7 +298,6 @@ export function useQueryParamsStore(
           snapshot,
           category: getDefaultCategory(state.status, snapshot),
           filters: filtersParams,
-          search: undefined,
           invalid: false,
           deadline: false,
           selection: [],
@@ -312,7 +309,6 @@ export function useQueryParamsStore(
         status,
         category: getDefaultCategory(status, state.snapshot),
         filters: filtersParams,
-        search: undefined,
         invalid: false,
         deadline: false,
         selection: [],
@@ -322,7 +318,6 @@ export function useQueryParamsStore(
       setCategory: (category: string) => ({
         category,
         filters: filtersParams,
-        search: undefined,
         invalid: false,
         deadline: false,
         selection: [],
@@ -335,7 +330,6 @@ export function useQueryParamsStore(
         })
         return {
           filters,
-          search: undefined,
           selection: [],
           page: 0,
         }
