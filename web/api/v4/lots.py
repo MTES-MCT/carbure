@@ -184,6 +184,12 @@ def fill_volume_info(lot, data):
 
 def fill_supplier_info(lot, data, entity):
     errors = []
+
+    if lot.parent_stock:
+        lot.carbure_supplier = entity
+        lot.supplier_certificate = data.get('vendor_certificate', entity.default_certificate)
+        return errors
+
     # I am a producer, this is my own production
     if lot.carbure_producer and lot.carbure_producer.id == entity.id:
         lot.carbure_supplier = entity
