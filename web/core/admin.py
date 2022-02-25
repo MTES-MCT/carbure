@@ -657,7 +657,6 @@ class CarbureLotEventAdmin(admin.ModelAdmin):
     list_display = ['lot_id', 'event_type', 'event_dt', 'user']
     list_filter = ['event_type']
     search_fields = ['lot__id']
-    raw_id_fields = ['lot__id']
 
 @admin.register(CarbureLotComment)
 class CarbureLotCommentAdmin(admin.ModelAdmin):
