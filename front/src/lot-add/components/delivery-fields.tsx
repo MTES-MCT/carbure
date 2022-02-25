@@ -188,9 +188,9 @@ export function getDeliveryTypes(
   return compact<DeliveryType>([
     isClientEntity && isOperator && DeliveryType.Blending,
     isClientEntity && has_stocks && DeliveryType.Stock,
-    isClientUnknown && has_mac && DeliveryType.RFC,
-    isClientUnknown && has_direct_deliveries && DeliveryType.Direct,
-    isClientUnknown && DeliveryType.Exportation,
+    (isClientUnknown || isClientEntity) && has_mac && DeliveryType.RFC,
+    (isClientUnknown || isClientEntity) && has_direct_deliveries && DeliveryType.Direct, // prettier-ignore
+    (isClientUnknown || isClientEntity) && DeliveryType.Exportation,
   ])
 }
 
