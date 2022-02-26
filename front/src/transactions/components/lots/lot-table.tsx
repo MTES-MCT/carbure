@@ -12,10 +12,12 @@ import Table, {
   Order,
   markerColumn,
   selectionColumn,
+  actionColumn,
 } from "common-v2/components/table"
 import { Alarm } from "common-v2/components/icons"
 import LotTag from "./lot-tag"
 import { isRedII } from "lot-add/components/ghg-fields"
+import { DuplicateOneButton } from "transactions/actions/duplicate"
 
 export interface LotTableProps {
   loading: boolean
@@ -60,6 +62,7 @@ export const LotTable = memo(
           columns.productionSite,
           columns.depot,
           columns.ghgReduction,
+          columns.actions,
         ]}
       />
     )
@@ -158,6 +161,10 @@ export function useLotColumns() {
         return <Cell text={`${reduction.toFixed(2)}%`} />
       },
     },
+
+    actions: actionColumn((lot: Lot) => [
+      <DuplicateOneButton icon lot={lot} />,
+    ]),
   }
 }
 interface PeriodCellProps {

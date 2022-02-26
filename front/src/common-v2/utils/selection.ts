@@ -36,7 +36,7 @@ export function multipleSelection<V>(
     const values = selectedValues ?? []
     const selected = isSelected(value)
       ? // remove item from selection
-        values.filter((v) => matches(v, value))
+        values.filter((v) => !matches(v, value))
       : // or add it at the end
         [...values, value]
 

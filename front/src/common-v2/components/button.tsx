@@ -16,6 +16,7 @@ export type ButtonVariant =
   | "icon"
 
 export interface ButtonProps<T = void> extends Layout {
+  autoFocus?: boolean
   className?: string
   style?: React.CSSProperties
   children?: React.ReactNode
@@ -40,6 +41,7 @@ export function Button<T>({
   style,
   children,
   domRef,
+  autoFocus,
   disabled,
   loading,
   asideX,
@@ -67,6 +69,7 @@ export function Button<T>({
       <button
         ref={domRef}
         {...layout({ asideX, asideY, spread })}
+        autoFocus={autoFocus}
         data-captive={captive ? true : undefined}
         tabIndex={tabIndex}
         disabled={disabled || loading}
