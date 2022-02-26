@@ -27,6 +27,14 @@ from core.models import EmailNotification, ETBETransformation
 from api.v3.sanity_checks import bulk_sanity_checks
 from core.common import calculate_ghg
 
+def custom_titled_filter(title):
+    class Wrapper(admin.FieldListFilter):
+        def __new__(cls, *args, **kwargs):
+            instance = admin.FieldListFilter.create(*args, **kwargs)
+            instance.title = title
+            return instance
+    return Wrapper
+
 class EntityAdmin(admin.ModelAdmin):
     list_display = ('entity_type', 'name', 'parent_entity')
     search_fields = ('entity_type', 'name')
@@ -568,7 +576,7 @@ class CarbureLotAdmin(admin.ModelAdmin):
     list_filter = ('year', ('period', DropdownFilter), 'lot_status', 'correction_status', ('biofuel', NameSortedRelatedOnlyDropdownFilter), ('feedstock', NameSortedRelatedOnlyDropdownFilter), 
                   ('carbure_supplier', NameSortedRelatedOnlyDropdownFilter), ('carbure_client', NameSortedRelatedOnlyDropdownFilter),  
                   'delivery_type', ('carbure_delivery_site', NameSortedRelatedOnlyDropdownFilter),
-                  ('carbure_production_site', NameSortedRelatedOnlyDropdownFilter),)
+                  ('carbure_production_site', NameSortedRelatedOnlyDropdownFilter), ('carbure_client__entity_type', custom_titled_filter('Type de client')))
     search_fields = ('id', 'transport_document_reference', 'free_field', 'carbure_id', 'volume')
 
     actions = ['regen_carbure_id',]
