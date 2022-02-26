@@ -895,6 +895,9 @@ class CarbureLot(models.Model):
         verbose_name = 'CarbureLot'
         verbose_name_plural = 'CarbureLots'
 
+    def __str__(self):
+        return str(self.id)
+
 
     def get_weight(self):
         if not self.biofuel:

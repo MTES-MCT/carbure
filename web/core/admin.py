@@ -569,7 +569,7 @@ class ExtAdminRightsAdmin(admin.ModelAdmin):
 
 @admin.register(CarbureLot)
 class CarbureLotAdmin(admin.ModelAdmin):
-    list_display = ['year', 'period', 'transport_document_reference', 'get_producer', 'get_production_site', 'get_supplier', 'get_client', 
+    list_display = ['id', 'parent_lot', 'parent_stock', 'year', 'period', 'transport_document_reference', 'get_producer', 'get_production_site', 'get_supplier', 'get_client', 
     'delivery_date', 'get_delivery_site', 'get_biofuel', 'get_feedstock', 'volume', 'lot_status', 'correction_status', 'delivery_type',
     ]
     raw_id_fields = ['parent_lot', 'parent_stock']
@@ -624,11 +624,19 @@ class CarbureLotAdmin(admin.ModelAdmin):
 
 @admin.register(CarbureStock)
 class CarbureStockAdmin(admin.ModelAdmin):
-    list_display = ['carbure_id', 'get_client', 'get_depot',  'get_biofuel', 'get_feedstock', 'get_orig_volume', 'remaining_volume', 'get_supplier']
+    list_display = ['parent_lot', 'carbure_id', 'get_client', 'get_depot',  'get_biofuel', 'get_feedstock', 'get_orig_volume', 'remaining_volume', 'get_supplier']
     raw_id_fields = ['parent_lot', 'parent_transformation']
     list_filter = (('parent_lot__period', DropdownFilter), ('biofuel', NameSortedRelatedOnlyDropdownFilter), ('feedstock', NameSortedRelatedOnlyDropdownFilter), 
                   ('carbure_supplier', NameSortedRelatedOnlyDropdownFilter), ('carbure_client', NameSortedRelatedOnlyDropdownFilter),  
                   ('depot', NameSortedRelatedOnlyDropdownFilter),)
+    search_fields = ('id', 'parent_lot__transport_document_reference', 'parent_lot__free_field', 'parent_lot__carbure_id', 'carbure_id',)    
+    actions = ['regen_carbure_id',]
+
+    def regen_carbure_id(self, request, queryset):
+        for stock in queryset:
+            stock.generate_carbure_id()
+            stock.save()
+    regen_carbure_id.short_description = "Regénérer CarbureID"
 
     def get_supplier(self, obj):
         return obj.carbure_supplier.name if obj.carbure_supplier else 'U - %s' % (obj.unknown_supplier)
