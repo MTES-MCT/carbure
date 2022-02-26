@@ -774,6 +774,7 @@ class CarbureLot(models.Model):
     period = models.IntegerField(blank=False, null=False) # index
     year = models.IntegerField(blank=False, null=False) # index
     carbure_id = models.CharField(max_length=64, blank=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     # production data
     carbure_producer = models.ForeignKey(Entity, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name='carbure_producer')
