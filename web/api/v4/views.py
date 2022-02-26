@@ -317,6 +317,7 @@ def stock_split(request, *args, **kwargs):
         lot.lot_status = CarbureLot.DRAFT
         lot.delivery_type = CarbureLot.UNKNOWN
         lot.volume = rounded_volume
+        lot.biofuel = stock.biofuel
         lot.weight = lot.get_weight()
         lot.lhv_amount = lot.get_lhv_amount()
         lot.parent_stock = stock
