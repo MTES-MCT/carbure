@@ -83,6 +83,10 @@ export function getLotFilters(field: Filter, query: LotQuery) {
     .then((res) => res.data.data ?? [])
 }
 
+export function duplicateLots(entity_id: number, lot_id: number) {
+  return api.post<Api<void>>("/lots/duplicate", { entity_id, lot_id })
+}
+
 export function sendLots(query: LotQuery, selection?: number[]) {
   return api.post<Api<void>>("/lots/send", selectionOrQuery(query, selection))
 }
