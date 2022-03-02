@@ -30,21 +30,15 @@ rules['GHG_EL_NEG'] = "Émissions GES liées à l'Affectation des terres Négati
 rules['MP_NOT_CONFIGURED'] = "Matière Première non enregistrée sur votre Site de Production"
 rules['BC_NOT_CONFIGURED'] = "Biocarburant non enregistré sur votre Site de Production"
 rules['DEPOT_NOT_CONFIGURED'] = "Ce site de livraison n'est pas rattaché à votre société"
-rules['MISSING_PRODSITE_CERTIFICATE'] = "Aucun certificat n'est associé à ce site de Production"
 rules['UNKNOWN_CLIENT'] = "Le client n'est pas enregistré sur Carbure"
 rules['UNKNOWN_DELIVERY_SITE'] = "Livraison en France - Dépôt Inconnu"
 rules['NOT_ALLOWED'] = "Vous ne pouvez pas ajouter les lots d'un producteur inscrit sur CarbuRe"
 rules['DEPRECATED_MP'] = "Les résidus viniques vont disparaître au profit de deux nouvelles matières premières: Marc de raisin et Lies de vin. Merci de mettre à jour vos déclarations en conséquence."
-
-rules['NO_PRODSITE_CERT'] = "Certificat du site de production absent"
 rules['UNKNOWN_PRODSITE_CERT'] = "Certificat de site de production inconnu"
 rules['EXPIRED_PRODSITE_CERT'] = "Certificat du site de production expiré"
 rules['NO_SUPPLIER_CERT'] = "Certificat du fournisseur original absent"
 rules['UNKNOWN_SUPPLIER_CERT'] = "Certificat de fournisseur inconnu"
 rules['EXPIRED_SUPPLIER_CERT'] = "Certificat du fournisseur expiré"
-rules['NO_VENDOR_CERT'] = "Certificat du fournisseur absent"
-rules['UNKNOWN_VENDOR_CERT'] = "Certificat inconnu"
-rules['EXPIRED_VENDOR_CERT'] = "Certificat du fournisseur expiré"
 rules['UNKNOWN_DAE_FORMAT'] = "Le format du numéro douanier semble incorrect"
 rules['UNKNOWN_DOUBLE_COUNTING_CERTIFICATE'] = "Le certificat double compte est inconnu"
 rules['EXPIRED_DOUBLE_COUNTING_CERTIFICATE'] = "Le certificat double n'est plus valide"
@@ -83,9 +77,7 @@ def bulk_sanity_checks(lots, prefetched_data, background=True):
 
 def check_certificates(prefetched_data, lot, errors):
     # PRODUCTION SITE CERTIFICATES
-    if not lot.production_site_certificate:
-        errors.append(generic_error(error='NO_PRODSITE_CERT', lot=lot, field='production_site_certificate'))
-    else:
+    if lot.production_site_certificate:
         cert = lot.production_site_certificate
         if cert is not None:
             cert = cert.upper()
