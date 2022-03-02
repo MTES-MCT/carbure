@@ -184,33 +184,40 @@ def fill_volume_info(lot, data):
 
 def fill_supplier_info(lot, data, entity):
     errors = []
+    # definitions: 
+    # supplier = my supplier - who supplied the biofuel to me
+    # vendor = me (as a producer or trader)
 
+    # OPERATOR: no vendor_certificate and supplier_certificate is mandatory
+    # PRODUCER: vendor_certificate is mandatory (and becomes lot.supplier_certificate)
+    # TRADER: supplier_certificate optional, vendor_certificate mandatory (and becomes lot.supplier_certificate)
+
+    # default values
+    lot.carbure_supplier = None
+    lot.unknown_supplier = data.get('unknown_supplier', None)
+    lot.supplier_certificate = data.get('vendor_certificate', data.get('supplier_certificate', entity.default_certificate))
+    ### LOT FROM STOCK
     if lot.parent_stock:
         lot.carbure_supplier = entity
-        lot.supplier_certificate = data.get('vendor_certificate', entity.default_certificate)
         return errors
-
-    # I am a producer, this is my own production
+    ### MY OWN PRODUCTION
+    # EXCEL
     if lot.carbure_producer and lot.carbure_producer.id == entity.id:
         lot.carbure_supplier = entity
         lot.unknown_supplier = None
-    elif data.get('carbure_supplier_id') == str(entity.id):
+    # WEB FORM
+    if data.get('carbure_supplier_id', '') == str(entity.id):
         lot.carbure_supplier = entity
         lot.unknown_supplier = None
-    else:
-        lot.carbure_supplier = None
-        lot.unknown_supplier = data.get('unknown_supplier', None)
-    lot.supplier_certificate = data.get('supplier_certificate', None)
-    # NO SUPPLIER IS SPECIFIED AND I AM NOT THE CLIENT
+    # NO SUPPLIER IS SPECIFIED AND I AM NOT THE CLIENT - ASSUME I AM THE SUPPLIER
     if entity != lot.carbure_client and not lot.carbure_supplier and not lot.unknown_supplier and not lot.vendor_certificate:
         lot.carbure_supplier = entity
-        lot.supplier_certificate = data.get('supplier_certificate', entity.default_certificate)
-    # I AM NEITHER THE PRODUCER NOR THE CLIENT
+        lot.unknown_supplier = None
+    # I AM NEITHER THE PRODUCER NOR THE CLIENT - TRADING
     if entity != lot.carbure_supplier and entity != lot.carbure_client:
-        lot.carbure_vendor = entity # this will flag the transaction when it is validated
+        lot.carbure_vendor = entity # this will flag the transaction when it is validated in order to create 2 transactions (unknown_supplier -> vendor and vendor -> client)
+        lot.supplier_certificate = data.get('supplier_certificate', '')
         lot.vendor_certificate = data.get('vendor_certificate', entity.default_certificate)
-    elif lot.supplier_certificate is None:
-        lot.supplier_certificate = entity.default_certificate
     return errors
 
 def fill_ghg_info(lot, data):
