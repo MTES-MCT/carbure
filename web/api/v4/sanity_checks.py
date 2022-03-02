@@ -82,41 +82,41 @@ def check_certificates(prefetched_data, lot, errors):
         if cert is not None:
             cert = cert.upper()
         if cert not in prefetched_data['certificates']:
-            errors.append(generic_error(error='UNKNOWN_PRODSITE_CERT', lot=lot, field='production_site_certificate'))
+            errors.append(generic_error(error='UNKNOWN_PRODSITE_CERT', lot=lot, display_to_recipient=True, field='production_site_certificate'))
         else:
             # certificate is set and exists. is it valid?
             c = prefetched_data['certificates'][cert]
             if c.valid_until < lot.delivery_date:
-                 errors.append(generic_error(error='EXPIRED_PRODSITE_CERT', lot=lot, field='production_site_certificate'))
+                 errors.append(generic_error(error='EXPIRED_PRODSITE_CERT', lot=lot, display_to_recipient=True, field='production_site_certificate'))
 
     # SUPPLIER CERT
     if not lot.supplier_certificate:
-        errors.append(generic_error(error='NO_SUPPLIER_CERT', lot=lot, field='supplier_certificate'))
+        errors.append(generic_error(error='NO_SUPPLIER_CERT', lot=lot, display_to_recipient=True, field='supplier_certificate'))
     else:
         cert = lot.supplier_certificate
         if cert is not None:
             cert = cert.upper()        
         if cert not in prefetched_data['certificates']:
-            errors.append(generic_error(error='UNKNOWN_SUPPLIER_CERT', lot=lot, field='supplier_certificate'))
+            errors.append(generic_error(error='UNKNOWN_SUPPLIER_CERT', lot=lot, display_to_recipient=True, field='supplier_certificate'))
         else:
             # certificate is set and exists. is it valid?
             c = prefetched_data['certificates'][cert]
             if c.valid_until < lot.delivery_date:
-                 errors.append(generic_error(error='EXPIRED_SUPPLIER_CERT', lot=lot, field='supplier_certificate'))
+                 errors.append(generic_error(error='EXPIRED_SUPPLIER_CERT', lot=lot, display_to_recipient=True, field='supplier_certificate'))
 
     # DOUBLE COUNTING CERTIFICATES
     if lot.feedstock and lot.feedstock.is_double_compte:
         # identify where the certificate is (attached to prod site or attached to lot)
         dc_cert = lot.production_site_double_counting_certificate
         if not dc_cert:
-            errors.append(generic_error(error='MISSING_REF_DBL_COUNTING', lot=lot, field='dc_reference'))
+            errors.append(generic_error(error='MISSING_REF_DBL_COUNTING', lot=lot, display_to_recipient=True, field='dc_reference'))
         else:
             if dc_cert not in prefetched_data['double_counting_certificates']:
-                errors.append(generic_error(error='UNKNOWN_DOUBLE_COUNTING_CERTIFICATE', lot=lot, field='dc_reference'))
+                errors.append(generic_error(error='UNKNOWN_DOUBLE_COUNTING_CERTIFICATE', lot=lot, display_to_recipient=True, field='dc_reference'))
             else:
                 dcc = prefetched_data['double_counting_certificates'][dc_cert]
                 if dcc.valid_until < lot.delivery_date:
-                    errors.append(generic_error(error='EXPIRED_DOUBLE_COUNTING_CERTIFICATE', lot=lot))
+                    errors.append(generic_error(error='EXPIRED_DOUBLE_COUNTING_CERTIFICATE', display_to_recipient=True, lot=lot))
     return errors
 
 def sanity_check(lot, prefetched_data):
