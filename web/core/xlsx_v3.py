@@ -819,14 +819,13 @@ def make_template_carbure_lots_sheet(workbook, entity):
 
     if entity.entity_type in [Entity.PRODUCER, Entity.TRADER]:
         # CASE 5 not my production - TRADING
-        rows.append(['TRADING - fournisseur hors-carbure', 'BioFuel GmbH', 'BioFuel Berlin', 'ISCC-DE-XXXX-XXX', 'DE', '22/11/2001', '', 'BioFuel Trader GmbH', 'ISCC-DE-XXXX-XXX', 'TRADER-CERTIFICATE', 32300, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), 'TMF', today, 'EPHS Melun', '', ''])
+        rows.append(['TRADING - fournisseur hors-carbure', 'BioFuel GmbH', 'BioFuel Berlin', 'ISCC-DE-XXXX-XXX', 'DE', '22/11/2001', '', 'BioFuel Trader GmbH', 'ISCC-DE-BIOFUEL-GMBH', 'MON-CERTIFICAT-DE-TRADING', 32300, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), 'TMF', today, 'EPHS Melun', '', ''])
         # CASE 6
-        rows.append(['ajout en stock', 'BioFuel GmbH', 'BioFuel Berlin', 'ISCC-DE-XXXX-XXX', 'DE', '22/11/2001', '', 'BioFuel Trader GmbH', 'ISCC-DE-XXXX-XXX', 'TRADER-CERTIFICATE', 35400, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), entity.name, today, random.choice(delivery_sites).name, '', 'STOCK'])
+        rows.append(['ajout en stock', 'BioFuel GmbH', 'BioFuel Berlin', 'ISCC-DE-XXXX-XXX', 'DE', '22/11/2001', '', 'BioFuel Trader GmbH', 'ISCC-DE-XXXX-XXX', '', 35400, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), entity.name, today, random.choice(delivery_sites).name, '', 'STOCK'])
 
     if entity.entity_type == Entity.OPERATOR:
         # CASE 7 BLENDING
-        rows.append(['incorporation, fournisseur hors-carbure', 'BioFuel GmbH', 'BioFuel Berlin', 'ISCC-DE-XXXX-XXX', 'DE', '22/11/2001', '', 'BioFuel Trader GmbH', 'ISCC-DE-XXXX-XXX', 'TRADER-CERTIFICATE', 35400, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), entity.name, today, random.choice(delivery_sites).name, '', 'BLENDING'])
-
+        rows.append(['incorporation, fournisseur hors-carbure', 'BioFuel GmbH', 'BioFuel Berlin', 'ISCC-DE-XXXX-XXX', 'DE', '22/11/2001', '', 'BioFuel Trader GmbH', 'ISCC-DE-XXXX-XXX', '', 35400, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), entity.name, today, random.choice(delivery_sites).name, '', 'BLENDING'])
 
     rowid = 0
     for row in rows:

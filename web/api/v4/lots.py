@@ -195,7 +195,12 @@ def fill_supplier_info(lot, data, entity):
     # default values
     lot.carbure_supplier = None
     lot.unknown_supplier = data.get('unknown_supplier', None)
-    lot.supplier_certificate = data.get('vendor_certificate', data.get('supplier_certificate', entity.default_certificate))
+    lot.supplier_certificate = data.get('vendor_certificate', '')
+    if lot.supplier_certificate == '':
+        lot.supplier_certificate = data.get('supplier_certificate', '')
+    if lot.supplier_certificate == '':
+        lot.supplier_certificate = entity.default_certificate
+
     ### LOT FROM STOCK
     if lot.parent_stock:
         lot.carbure_supplier = entity
