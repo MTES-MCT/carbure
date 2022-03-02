@@ -446,7 +446,7 @@ def get_lot_details(request, *args, **kwargs):
     data = {}
     data['lot'] = CarbureLotPublicSerializer(lot).data
     entity = Entity.objects.get(id=entity_id)
-    if entity.entity_type == Entity.ADMIN or lot.added_by == entity:
+    if entity.entity_type == Entity.ADMIN or (lot.added_by == entity or (lot.parent_lot and lot.parent_lot.carbure_client == entity)):
         data['parent_lot'] = CarbureLotPublicSerializer(lot.parent_lot).data if lot.parent_lot else None
         data['parent_stock'] = CarbureStockPublicSerializer(lot.parent_stock).data if lot.parent_stock else None
     else:
