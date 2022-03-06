@@ -481,7 +481,6 @@ def get_stock_with_metadata(stock, entity_id, query, is_admin=False):
 
 
 def filter_stock(stock, query, entity_id=None, blacklist=[]):
-    year = query.get('year', False)
     periods = query.getlist('periods', [])
     depots = query.getlist('depots', [])
     feedstocks = query.getlist('feedstocks', [])
@@ -495,8 +494,6 @@ def filter_stock(stock, query, entity_id=None, blacklist=[]):
 
     if history != 'true':
         stock = stock.filter(remaining_volume__gt=0)
-    if year and 'year' not in blacklist:
-        stock = stock.filter(Q(parent_lot__year=year) | Q(parent_transformation__transformation_dt__year=year))
     if len(selection) > 0:
         stock = stock.filter(pk__in=selection)
     if len(periods) > 0 and 'periods' not in blacklist:
@@ -645,7 +642,7 @@ def send_email_declaration_validated(declaration):
     else:
         # PROD
         recipients = [r.user.email for r in UserRights.objects.filter(entity=declaration.entity, user__is_staff=False, user__is_superuser=False).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])]
-        
+
     period = declaration.period.strftime('%Y-%m')
     msg = EmailMultiAlternatives(subject=email_subject, body=text_message % (period), from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc)
     msg.send()
