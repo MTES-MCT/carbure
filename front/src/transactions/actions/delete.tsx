@@ -151,12 +151,6 @@ const DeleteDialog = ({
       <footer>
         <Button
           asideX
-          disabled={deleteLots.loading}
-          icon={Return}
-          label={t("Annuler")}
-          action={onClose}
-        />
-        <Button
           submit
           loading={deleteLots.loading}
           variant="danger"
@@ -166,6 +160,12 @@ const DeleteDialog = ({
             matomo.push(["trackEvent", "lots", "delete-lot", selection.length])
             deleteLots.execute(query, selection)
           }}
+        />
+        <Button
+          disabled={deleteLots.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
         />
       </footer>
     </Dialog>

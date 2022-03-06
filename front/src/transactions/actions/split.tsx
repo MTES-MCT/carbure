@@ -167,12 +167,6 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
       <footer>
         <Button
           asideX
-          disabled={splitStock.loading}
-          icon={Return}
-          label={t("Annuler")}
-          action={onClose}
-        />
-        <Button
           submit="split-stock"
           loading={splitStock.loading}
           variant="primary"
@@ -182,6 +176,12 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
             matomo.push(["trackEvent", "stocks", "split-stock"])
             splitStock.execute(entity.id, [formToStockPayload(value)])
           }}
+        />
+        <Button
+          disabled={splitStock.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
         />
       </footer>
     </Dialog>

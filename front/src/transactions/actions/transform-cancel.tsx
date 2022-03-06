@@ -144,12 +144,6 @@ const CancelTransformDialog = ({
       <footer>
         <Button
           asideX
-          disabled={cancelTransformations.loading}
-          icon={Return}
-          label={t("Annuler")}
-          action={onClose}
-        />
-        <Button
           submit
           loading={cancelTransformations.loading}
           variant="warning"
@@ -164,6 +158,12 @@ const CancelTransformDialog = ({
             ])
             cancelTransformations.execute(query.entity_id, selection)
           }}
+        />
+        <Button
+          disabled={cancelTransformations.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
         />
       </footer>
     </Dialog>
