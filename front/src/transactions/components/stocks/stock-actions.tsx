@@ -3,6 +3,7 @@ import { ActionBar } from "common-v2/components/scaffold"
 import { TransformManyButton } from "transactions/actions/transform"
 import { ExportStocksButton } from "transactions/actions/export"
 import { StockExcelButton } from "transactions/actions/stock-excel"
+import { CancelManyTransformButton } from "transactions/actions/transform-cancel"
 // import { FlushManyButton } from "transactions/actions/flush-stock"
 
 export interface StockActionsProps {
@@ -16,6 +17,7 @@ export const StockActions = ({ count, ...props }: StockActionsProps) => {
     <ActionBar>
       <StockExcelButton />
       <TransformManyButton {...props} />
+      <CancelManyTransformButton {...props} />
       {/* <FlushManyButton {...props} /> */}
       <ExportStocksButton asideX {...props} />
     </ActionBar>

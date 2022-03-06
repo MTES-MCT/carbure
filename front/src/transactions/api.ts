@@ -269,6 +269,10 @@ export function transformETBE(
   })
 }
 
+export function cancelTransformations(entity_id: number, stock_ids: number[]) {
+  return api.post("/stocks/cancel-transformation", { entity_id, stock_ids })
+}
+
 export function flushStocks(
   entity_id: number,
   stock_ids: number[],
