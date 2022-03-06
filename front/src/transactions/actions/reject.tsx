@@ -159,12 +159,6 @@ const RejectDialog = ({
       <footer>
         <Button
           asideX
-          disabled={rejectLots.loading}
-          icon={Return}
-          label={t("Annuler")}
-          action={onClose}
-        />
-        <Button
           submit
           loading={rejectLots.loading}
           variant="danger"
@@ -180,6 +174,12 @@ const RejectDialog = ({
             ])
             rejectLots.execute(query, selection, comment)
           }}
+        />
+        <Button
+          disabled={rejectLots.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
         />
       </footer>
     </Dialog>

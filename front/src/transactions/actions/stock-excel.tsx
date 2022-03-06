@@ -98,12 +98,6 @@ const StockExcelDialog = ({ onClose }: StockExcelDialogProps) => {
       <footer>
         <Button
           asideX
-          disabled={importLots.loading}
-          icon={Return}
-          label={t("Annuler")}
-          action={onClose}
-        />
-        <Button
           loading={importLots.loading}
           disabled={!file}
           variant="primary"
@@ -113,6 +107,12 @@ const StockExcelDialog = ({ onClose }: StockExcelDialogProps) => {
             matomo.push(["trackEvent", "lots-create", "import-lots-excel"])
             importLots.execute(entity.id, file!)
           }}
+        />
+        <Button
+          disabled={importLots.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
         />
       </footer>
     </Dialog>

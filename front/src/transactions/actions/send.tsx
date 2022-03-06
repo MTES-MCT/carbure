@@ -165,12 +165,6 @@ const SendDialog = ({
       <footer>
         <Button
           asideX
-          disabled={sendLots.loading}
-          icon={Return}
-          label={t("Annuler")}
-          action={onClose}
-        />
-        <Button
           submit
           loading={sendLots.loading}
           disabled={!durability || !validity}
@@ -181,6 +175,12 @@ const SendDialog = ({
             matomo.push(["trackEvent", "lots", "send-lot", selection.length])
             sendLots.execute(query, selection)
           }}
+        />
+        <Button
+          disabled={sendLots.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
         />
       </footer>
     </Dialog>
