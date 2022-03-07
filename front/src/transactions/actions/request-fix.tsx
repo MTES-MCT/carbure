@@ -150,12 +150,6 @@ const RequestFixDialog = ({
       <footer>
         <Button
           asideX
-          disabled={requestFix.loading}
-          icon={Return}
-          label={t("Annuler")}
-          action={onClose}
-        />
-        <Button
           submit
           loading={requestFix.loading}
           variant="warning"
@@ -171,6 +165,12 @@ const RequestFixDialog = ({
             ])
             requestFix.execute(entity.id, selection, comment)
           }}
+        />
+        <Button
+          disabled={requestFix.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
         />
       </footer>
     </Dialog>

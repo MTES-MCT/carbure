@@ -207,8 +207,8 @@ const CertificateAddDialog = ({ onClose }: CertificateAddDialogProps) => {
         </section>
       </main>
       <footer>
-        <Button asideX icon={Return} label={t("Retour")} action={onClose} />
         <Button
+          asideX
           loading={addCertificate.loading}
           disabled={!certificate}
           variant="primary"
@@ -222,6 +222,7 @@ const CertificateAddDialog = ({ onClose }: CertificateAddDialogProps) => {
             )
           }
         />
+        <Button icon={Return} label={t("Retour")} action={onClose} />
       </footer>
     </Dialog>
   )
@@ -322,8 +323,8 @@ const CertificateUpdateDialog = ({
         </section>
       </main>
       <footer>
-        <Button asideX icon={Return} label={t("Retour")} action={onClose} />
         <Button
+          asideX
           loading={updateCertificate.loading}
           disabled={!certificate}
           variant="primary"
@@ -339,6 +340,7 @@ const CertificateUpdateDialog = ({
             )
           }
         />
+        <Button icon={Return} label={t("Retour")} action={onClose} />
       </footer>
     </Dialog>
   )

@@ -221,12 +221,6 @@ const ReleaseForConsumptionDialog = ({
       <footer>
         <Button
           asideX
-          disabled={acceptLots.loading}
-          icon={Return}
-          label={t("Annuler")}
-          action={onClose}
-        />
-        <Button
           submit
           loading={acceptLots.loading}
           variant="success"
@@ -242,6 +236,12 @@ const ReleaseForConsumptionDialog = ({
             ])
             acceptLots.execute(query, selection)
           }}
+        />
+        <Button
+          disabled={acceptLots.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
         />
       </footer>
     </Dialog>
@@ -310,12 +310,6 @@ const InStockDialog = ({
       <footer>
         <Button
           asideX
-          disabled={acceptLots.loading}
-          icon={Return}
-          label={t("Annuler")}
-          action={onClose}
-        />
-        <Button
           submit
           loading={acceptLots.loading}
           variant="success"
@@ -331,6 +325,12 @@ const InStockDialog = ({
             ])
             acceptLots.execute(query, selection)
           }}
+        />
+        <Button
+          disabled={acceptLots.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
         />
       </footer>
     </Dialog>
@@ -398,12 +398,6 @@ const BlendingDialog = ({
       <footer>
         <Button
           asideX
-          disabled={acceptLots.loading}
-          icon={Return}
-          label={t("Annuler")}
-          action={onClose}
-        />
-        <Button
           submit
           loading={acceptLots.loading}
           variant="success"
@@ -419,6 +413,12 @@ const BlendingDialog = ({
             ])
             acceptLots.execute(query, selection)
           }}
+        />
+        <Button
+          disabled={acceptLots.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
         />
       </footer>
     </Dialog>
@@ -486,12 +486,6 @@ const DirectDeliveryDialog = ({
       <footer>
         <Button
           asideX
-          disabled={acceptLots.loading}
-          icon={Return}
-          label={t("Annuler")}
-          action={onClose}
-        />
-        <Button
           submit
           loading={acceptLots.loading}
           variant="success"
@@ -507,6 +501,12 @@ const DirectDeliveryDialog = ({
             ])
             acceptLots.execute(query, selection)
           }}
+        />
+        <Button
+          disabled={acceptLots.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
         />
       </footer>
     </Dialog>
@@ -574,12 +574,6 @@ const ExportDialog = ({
       <footer>
         <Button
           asideX
-          disabled={acceptLots.loading}
-          icon={Return}
-          label={t("Annuler")}
-          action={onClose}
-        />
-        <Button
           submit
           loading={acceptLots.loading}
           variant="success"
@@ -595,6 +589,12 @@ const ExportDialog = ({
             ])
             acceptLots.execute(query, selection)
           }}
+        />
+        <Button
+          disabled={acceptLots.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
         />
       </footer>
     </Dialog>
@@ -706,18 +706,18 @@ const TradingDialog = ({
       <footer>
         <Button
           asideX
-          disabled={acceptLots.loading}
-          icon={Return}
-          label={t("Annuler")}
-          action={onClose}
-        />
-        <Button
           submit="transfer-form"
           loading={acceptLots.loading}
           disabled={!client || !certificate}
           variant="success"
           icon={Check}
           label={t("Transférer")}
+        />
+        <Button
+          disabled={acceptLots.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
         />
       </footer>
     </Dialog>
@@ -819,12 +819,6 @@ const ProcessingDialog = ({
       <footer>
         <Button
           asideX
-          disabled={acceptLots.loading}
-          icon={Return}
-          label={t("Annuler")}
-          action={onClose}
-        />
-        <Button
           submit
           loading={acceptLots.loading}
           disabled={!depot}
@@ -841,6 +835,12 @@ const ProcessingDialog = ({
             ])
             acceptLots.execute(subquery, selection, depot!.blender!.id)
           }}
+        />
+        <Button
+          disabled={acceptLots.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
         />
       </footer>
     </Dialog>

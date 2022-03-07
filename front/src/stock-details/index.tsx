@@ -16,6 +16,7 @@ import StockTraceability from "./components/stock-traceability"
 import { SplitOneButton } from "transactions/actions/split"
 import { useCategory } from "transactions/components/category"
 import { UserRole } from "carbure/types"
+import { CancelOneTransformButton } from "transactions/actions/transform-cancel"
 // import { FlushOneButton } from "transactions/actions/flush-stock"
 
 interface StockDetailsProps {
@@ -77,6 +78,9 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
           <>
             <SplitOneButton stock={stockData.stock} />
             {/* <FlushOneButton stock={stockData.stock} /> */}
+            {stockData.parent_transformation && (
+              <CancelOneTransformButton stock={stockData.stock} />
+            )}
           </>
         )}
         <Alert icon={AlertCircle} variant="info">
