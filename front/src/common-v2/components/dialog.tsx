@@ -66,13 +66,14 @@ export const Confirm = ({
         <section>{description}</section>
       </main>
       <footer>
-        <Button asideX icon={Return} label={t("Retour")} action={onClose} />
         <Button
+          asideX
           icon={icon}
           variant={variant}
           label={confirm}
           action={() => onConfirm().then(onClose)}
         />
+        <Button icon={Return} label={t("Retour")} action={onClose} />
       </footer>
     </Dialog>
   )

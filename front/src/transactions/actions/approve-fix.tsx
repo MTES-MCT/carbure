@@ -139,12 +139,6 @@ const ApproveFixDialog = ({
       <footer>
         <Button
           asideX
-          disabled={approveFix.loading}
-          icon={Return}
-          label={t("Annuler")}
-          action={onClose}
-        />
-        <Button
           submit
           loading={approveFix.loading}
           variant="primary"
@@ -160,6 +154,12 @@ const ApproveFixDialog = ({
             ])
             approveFix.execute(entity.id, selection)
           }}
+        />
+        <Button
+          disabled={approveFix.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
         />
       </footer>
     </Dialog>

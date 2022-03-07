@@ -153,17 +153,17 @@ const FlushDialog = ({ summary, selection, onClose }: FlushDialogProps) => {
       <footer>
         <Button
           asideX
-          disabled={flushStocks.loading}
-          icon={Return}
-          label={t("Annuler")}
-          action={onClose}
-        />
-        <Button
           submit="flush-form"
           loading={flushStocks.loading}
           variant="warning"
           icon={DropOff}
           label={t("Vider")}
+        />
+        <Button
+          disabled={flushStocks.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
         />
       </footer>
     </Dialog>

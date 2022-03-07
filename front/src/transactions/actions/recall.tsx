@@ -141,12 +141,6 @@ const RecallDialog = ({ summary, selection, onClose }: RecallDialogProps) => {
       <footer>
         <Button
           asideX
-          disabled={recallLots.loading}
-          icon={Return}
-          label={t("Annuler")}
-          action={onClose}
-        />
-        <Button
           submit
           loading={recallLots.loading}
           variant="warning"
@@ -162,6 +156,12 @@ const RecallDialog = ({ summary, selection, onClose }: RecallDialogProps) => {
             ])
             recallLots.execute(entity.id, selection, comment)
           }}
+        />
+        <Button
+          disabled={recallLots.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
         />
       </footer>
     </Dialog>

@@ -151,12 +151,6 @@ const DuplicateDialog = ({
       <footer>
         <Button
           asideX
-          disabled={duplicateLots.loading}
-          icon={Return}
-          label={t("Annuler")}
-          action={onClose}
-        />
-        <Button
           autoFocus
           loading={duplicateLots.loading}
           variant="primary"
@@ -171,6 +165,12 @@ const DuplicateDialog = ({
             ])
             duplicateLots.execute(query.entity_id, selection[0])
           }}
+        />
+        <Button
+          disabled={duplicateLots.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
         />
       </footer>
     </Dialog>

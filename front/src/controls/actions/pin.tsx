@@ -194,12 +194,6 @@ const PinDialog = ({ pinned, summary, selection, onClose }: PinDialogProps) => {
       <footer>
         <Button
           asideX
-          disabled={pinAndComment.loading}
-          icon={Return}
-          label={t("Annuler")}
-          action={onClose}
-        />
-        <Button
           submit="pin"
           loading={pinAndComment.loading}
           variant={pinned ? "warning" : "primary"}
@@ -213,6 +207,12 @@ const PinDialog = ({ pinned, summary, selection, onClose }: PinDialogProps) => {
               form.value.notifyExternal
             )
           }
+        />
+        <Button
+          disabled={pinAndComment.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
         />
       </footer>
     </Dialog>

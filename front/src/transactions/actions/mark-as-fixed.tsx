@@ -153,12 +153,6 @@ const MarkAsFixedDialog = ({
       <footer>
         <Button
           asideX
-          disabled={markAsFixed.loading}
-          icon={Return}
-          label={t("Annuler")}
-          action={onClose}
-        />
-        <Button
           submit
           loading={markAsFixed.loading}
           variant="success"
@@ -174,6 +168,12 @@ const MarkAsFixedDialog = ({
             ])
             markAsFixed.execute(entity.id, selection, status, comment)
           }}
+        />
+        <Button
+          disabled={markAsFixed.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
         />
       </footer>
     </Dialog>

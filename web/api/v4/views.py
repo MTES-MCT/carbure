@@ -168,13 +168,13 @@ def stock_cancel_transformation(request, *args, **kwargs):
     if not stock_ids:
         return JsonResponse({'status': 'error', 'message': 'Missing stock_ids'}, status=400)
 
-    for stock_id in stock_ids:
-        try:
-            stock = CarbureStock.objects.filter(pk=stock_id)
-        except:
-            return JsonResponse({'status': 'error', 'message': 'Could not find stock'}, status=400)
+    try:
+        stocks = CarbureStock.objects.filter(pk__in=stock_ids)
+    except:
+        return JsonResponse({'status': 'error', 'message': 'Could not find stock'}, status=400)
 
-        if stock.carbure_client_id != entity_id:
+    for stock in stocks:
+        if stock.carbure_client_id != int(entity_id):
             return JsonResponse({'status': 'forbidden', 'message': 'Stock does not belong to you'}, status=403)
 
         if stock.parent_transformation_id is None:
@@ -183,7 +183,7 @@ def stock_cancel_transformation(request, *args, **kwargs):
         # all good
         # delete of transformation should trigger a cascading delete of child_lots + recredit volume to the parent_stock
         event = CarbureStockEvent()
-        event.stock = stock.parent_transformation.parent_stock
+        event.stock = stock.parent_transformation.source_stock
         event.event_type = CarbureStockEvent.UNTRANSFORMED
         event.user = request.user
         event.save()
