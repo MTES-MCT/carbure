@@ -68,7 +68,7 @@ const CompanySettings = () => {
         />
         <Checkbox
           disabled={!canModify}
-          label={t("Ma société effectue des mises à consommation (B100, ED95)")}
+          label={t("Ma société effectue des mises à consommation (B100 et ED95 uniquement)")} // prettier-ignore
           value={entity.has_mac}
           onChange={toggleMAC.execute}
         />
