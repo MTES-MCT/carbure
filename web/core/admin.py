@@ -578,7 +578,7 @@ class CarbureLotAdmin(admin.ModelAdmin):
                   'delivery_type', ('carbure_delivery_site', NameSortedRelatedOnlyDropdownFilter),
                   ('carbure_production_site', NameSortedRelatedOnlyDropdownFilter), ('carbure_client__entity_type', custom_titled_filter('Type de client')))
     search_fields = ('id', 'transport_document_reference', 'free_field', 'carbure_id', 'volume')
-
+    readonly_fields = ('created_at',)
     actions = ['regen_carbure_id',]
 
     def regen_carbure_id(self, request, queryset):
