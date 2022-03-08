@@ -57,6 +57,7 @@ function Autocomplete<T, V>({
     <>
       <TextInput
         {...props}
+        autoComplete={false}
         loading={loading || autocomplete.loading}
         domRef={triggerRef}
         value={autocomplete.query}
