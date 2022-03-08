@@ -139,9 +139,6 @@ export const DeclarationDialog = ({
     }
   }
 
-  const hasLots = Boolean(declaration?.lots)
-  const hasPending = Boolean(declaration?.pending)
-
   const hasPrev = timeline.month > 0 || years.includes(timeline.year - 1)
   const hasNext = timeline.month < 11 || years.includes(timeline.year + 1)
 
@@ -207,7 +204,6 @@ export const DeclarationDialog = ({
           />
         ) : (
           <Button
-            disabled={!hasLots || hasPending}
             loading={validateDeclaration.loading}
             variant="primary"
             icon={Check}
