@@ -129,7 +129,7 @@ class LotsFlowTest(TestCase):
         failed = self.stock_split([payload], fail=True)
 
         # 7: delete a draft, check that volume is correctly re-credited
-        response = self.client.post(reverse('api-v4-delete-lots'), {'entity_id': self.producer.id, 'lot_ids': [lot.id]})
+        response = self.client.post(reverse('api-v4-delete-lots'), {'entity_id': self.producer.id, 'selection': [lot.id]})
         self.assertEqual(response.status_code, 200)
         stock = CarbureStock.objects.get(parent_lot=parent_lot)
         self.assertEqual(stock.remaining_volume, 10000)
