@@ -113,7 +113,7 @@ export const DeclarationDialog = ({
   })
 
   const declarationsData = declarations.result?.data.data ?? []
-  const declaration = declarationsData[timeline.month]
+  const declaration = declarationsData[timeline.month] as DeclarationSummary | undefined
   const period = timeline.year * 100 + timeline.month + 1
 
   // generate a special query to get the summary for this declaration
@@ -138,6 +138,8 @@ export const DeclarationDialog = ({
       setTimeline({ ...timeline, month: timeline.month + 1 })
     }
   }
+
+  const hasPending = declaration ? declaration.pending > 0 : false
 
   const hasPrev = timeline.month > 0 || years.includes(timeline.year - 1)
   const hasNext = timeline.month < 11 || years.includes(timeline.year + 1)
@@ -204,6 +206,7 @@ export const DeclarationDialog = ({
           />
         ) : (
           <Button
+            disabled={hasPending}
             loading={validateDeclaration.loading}
             variant="primary"
             icon={Check}
