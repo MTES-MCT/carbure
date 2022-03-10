@@ -36,6 +36,7 @@ export interface Control extends Layout {
 
 export interface TextInputProps extends Control {
   value?: string | undefined
+  autoComplete?: boolean
   onChange?: (value: string | undefined) => void
 }
 
@@ -197,6 +198,7 @@ export interface InputProps extends Control {
   min?: number
   max?: number
   step?: number
+  autoComplete?: boolean
   value: string | number | undefined
   onChange?: React.ChangeEventHandler<HTMLInputElement>
   onClear?: () => void
@@ -211,6 +213,7 @@ export const Input = ({
   value,
   onChange,
   onClear,
+  autoComplete,
   ...props
 }: InputProps) => (
   <Field {...props} onClear={onClear}>
@@ -219,6 +222,7 @@ export const Input = ({
       disabled={props.disabled}
       readOnly={props.readOnly}
       required={props.required}
+      autoComplete={!autoComplete ? "off" : undefined}
       type={props.type}
       name={name}
       placeholder={placeholder}
