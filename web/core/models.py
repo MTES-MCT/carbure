@@ -980,6 +980,10 @@ class CarbureStockTransformation(models.Model):
 @receiver(pre_save, sender=CarbureLot)
 def lot_pre_save_gen_carbure_id(sender, instance, *args, **kwargs):
     instance.generate_carbure_id()
+    if instance.weight == 0:
+        instance.weight = instance.get_weight()
+    if instance.lhv_amount == 0:
+        instance.lhv_amount = instance.get_lhv_amount()
 
 @receiver(pre_delete, sender=CarbureStockTransformation, dispatch_uid='stock_transformation_delete_signal')
 def delete_stock_transformation(sender, instance, using, **kwargs):
