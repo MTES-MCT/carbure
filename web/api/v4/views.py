@@ -546,6 +546,19 @@ def add_excel(request, *args, **kwargs):
         e.user = request.user
         e.metadata = {'source': 'EXCEL'}
         e.save()
+        if lot.parent_stock:
+            rounded_volume = round(lot.volume, 2)
+            stock = CarbureStock.objects.get(id=lot.parent_stock.id) # force fetch in db to get the actual uncached remaining_volume
+            stock.remaining_volume = round(stock.remaining_volume - rounded_volume, 2)
+            stock.remaining_weight = stock.get_weight()
+            stock.remaining_lhv_amount = stock.get_lhv_amount()
+            stock.save()
+            event = CarbureStockEvent()
+            event.event_type = CarbureStockEvent.SPLIT
+            event.stock = stock
+            event.user = request.user
+            event.metadata = {'message': 'Envoi lot.', 'volume_to_deduct': lot.volume}
+            event.save()
     return JsonResponse({'status': 'success', 'data': {'lots': nb_total, 'valid': nb_valid, 'invalid': nb_invalid}})
 
 
@@ -805,10 +818,11 @@ def lots_delete(request, *args, **kwargs):
         lot.lot_status = CarbureLot.DELETED
         lot.save()
         if lot.parent_stock is not None:
-            lot.parent_stock.remaining_volume = round(lot.parent_stock.remaining_volume + lot.volume, 2)
-            lot.parent_stock.remaining_weight = lot.parent_stock.get_weight()
-            lot.parent_stock.remaining_lhv_amount = lot.parent_stock.get_lhv_amount()
-            lot.parent_stock.save()
+            stock = CarbureStock.objects.get(id=lot.parent_stock.id) # force refresh from db
+            stock.remaining_volume = round(stock.remaining_volume + lot.volume, 2)
+            stock.remaining_weight = stock.get_weight()
+            stock.remaining_lhv_amount = stock.get_lhv_amount()
+            stock.save()
             # save event
             event = CarbureStockEvent()
             event.event_type = CarbureStockEvent.UNSPLIT
