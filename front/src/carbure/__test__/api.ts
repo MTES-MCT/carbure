@@ -14,7 +14,7 @@ import {
   okSummary,
 } from "transactions/__test__/api"
 
-export const okStats = rest.get("/api/v3/common/stats", (req, res, ctx) => {
+export const okStats = rest.get("/api/stats", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
