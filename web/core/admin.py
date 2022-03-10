@@ -15,6 +15,7 @@ from django.shortcuts import render
 from django_admin_listfilter_dropdown.filters import DropdownFilter, RelatedOnlyDropdownFilter, ChoiceDropdownFilter
 from django.utils.translation import gettext_lazy as _
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
+from django.db.models import Sum
 
 
 from authtools.admin import NamedUserAdmin
@@ -630,13 +631,32 @@ class CarbureStockAdmin(admin.ModelAdmin):
                   ('carbure_supplier', NameSortedRelatedOnlyDropdownFilter), ('carbure_client', NameSortedRelatedOnlyDropdownFilter),  
                   ('depot', NameSortedRelatedOnlyDropdownFilter),)
     search_fields = ('id', 'parent_lot__transport_document_reference', 'parent_lot__free_field', 'parent_lot__carbure_id', 'carbure_id',)    
-    actions = ['regen_carbure_id',]
+    actions = ['regen_carbure_id', 'recalc_stock']
 
     def regen_carbure_id(self, request, queryset):
         for stock in queryset:
             stock.generate_carbure_id()
             stock.save()
     regen_carbure_id.short_description = "Regénérer CarbureID"
+
+    def recalc_stock(self, request, queryset):
+        for stock in queryset:
+            child_volume = CarbureLot.objects.filter(parent_stock=stock).exclude(lot_status=CarbureLot.DELETED).aggregate(child_volume=Sum('volume'))
+            vol = child_volume['child_volume']
+            if vol is None:
+                vol = 0
+            transformations_volume = CarbureStockTransformation.objects.filter(source_stock=stock).aggregate(vol=Sum('volume_deducted_from_source'))
+            if transformations_volume['vol'] is not None:
+                vol += transformations_volume['vol']
+            initial_volume = stock.parent_lot.volume if stock.parent_lot else stock.parent_transformation.volume_destination
+            theo_remaining = initial_volume - vol
+            diff = stock.remaining_volume - theo_remaining
+            if abs(diff) > 0.1:
+                stock.remaining_volume = round(theo_remaining, 2)
+                stock.remaining_weight = stock.get_weight()
+                stock.remaining_lhv_amount = stock.get_lhv_amount()
+                stock.save()
+    recalc_stock.short_description = "Recalculer stock restant"
 
     def get_supplier(self, obj):
         return obj.carbure_supplier.name if obj.carbure_supplier else 'U - %s' % (obj.unknown_supplier)
