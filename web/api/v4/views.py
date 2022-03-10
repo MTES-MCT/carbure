@@ -6,7 +6,7 @@ import dictdiffer
 import json
 import time
 import traceback
-from django.db.models.aggregates import Count
+from django.db.models.aggregates import Count, Sum
 from django.db.models.fields import NOT_PROVIDED
 
 from django.http.response import HttpResponse, JsonResponse
@@ -1699,3 +1699,21 @@ def toggle_warning(request, *args, **kwargs):
     except:
         traceback.print_exc()
         return JsonResponse({'status': "error", 'message': "Could not update warning"}, status=500)
+
+
+def get_stats(request):
+    try:
+        today = datetime.date.today()
+        year = str(today.year)
+        total_volume = CarbureLot.objects.filter(lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN], year=year, carbure_client__entity_type=Entity.OPERATOR).aggregate(Sum('volume'))
+        entity_count = Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.TRADER, Entity.OPERATOR]).values('entity_type').annotate(count=Count('id'))
+        entities = {}
+        for r in entity_count:
+            entities[r['entity_type']] = r['count']
+        total = total_volume['volume__sum']
+        if total is None:
+            total = 1000
+        return JsonResponse({'status': 'success', 'data': {'total_volume': total / 1000, 'entities': entities}})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': 'Could not compute statistics'})
+

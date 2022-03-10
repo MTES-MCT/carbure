@@ -71,6 +71,8 @@ urlpatterns = [
     path('download-template', views.get_template, name='api-v4-get-template'),
     path('download-template-stock', views.get_template_stock, name='api-v4-get-template-stock'),
 
+    # STATS
+    path('stats', views.get_stats, name='api-v4-get-stats'),
 
     # SETTINGS
     path('get-certificates', certificates.get_certificates, name='api-v4-settings-get-certificates'),
