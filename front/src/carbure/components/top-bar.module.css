@@ -27,6 +27,10 @@
   height: 24px;
 }
 
+.menus {
+  gap: var(--spacing-m);
+}
+
 .shortcut {
   display: flex;
   align-items: center;

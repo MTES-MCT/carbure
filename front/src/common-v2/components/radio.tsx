@@ -23,7 +23,7 @@ export interface RadioProps extends RadioControl {
   children?: React.ReactNode
   value?: string | number
   checked?: boolean
-  onChange: (value: string) => void
+  onChange?: (value: string) => void
 }
 
 export const Radio = ({

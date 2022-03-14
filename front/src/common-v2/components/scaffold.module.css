@@ -2,7 +2,6 @@
   display: flex;
   background-color: var(--white);
   padding: 0 var(--main-spacing-x);
-  gap: var(--spacing-m);
   box-shadow: var(--shadow);
   min-height: 64px;
 }

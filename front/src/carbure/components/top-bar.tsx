@@ -7,7 +7,7 @@ import useLocalStorage from "common-v2/hooks/storage"
 import { useMatomo } from "matomo"
 import Menu from "common-v2/components/menu"
 import { Anchors } from "common-v2/components/dropdown"
-import { Header } from "common-v2/components/scaffold"
+import { Header, Row } from "common-v2/components/scaffold"
 import Button from "common-v2/components/button"
 import Tabs from "common-v2/components/tabs"
 import Select from "common-v2/components/select"
@@ -16,6 +16,7 @@ import republique from "../assets/images/republique.svg"
 import marianne from "../assets/images/Marianne.svg"
 import css from "./top-bar.module.css"
 import { compact } from "common-v2/utils/collection"
+import Notifications from "./notifications"
 
 const Topbar = () => {
   const entity = useEntity()
@@ -68,8 +69,12 @@ const PrivateTopbar = ({ user, entity }: PrivateTopbarProps) => {
 
       {!isBlank && <Navigation entity={entity} />}
 
-      <LanguageSelection />
-      <UserMenu user={user} entity={entity} />
+      <Row asideX className={css.menus}>
+        <LanguageSelection />
+        <UserMenu user={user} entity={entity} />
+        <Notifications />
+      </Row>
+
       <Faq />
     </Header>
   )
