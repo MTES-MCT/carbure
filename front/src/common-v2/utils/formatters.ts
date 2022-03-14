@@ -1,5 +1,8 @@
 import i18n from "i18n"
 import format from "date-fns/intlFormat"
+import formatDistanceToNow from "date-fns/formatDistanceToNow"
+import fr from "date-fns/locale/fr"
+import en from "date-fns/locale/en-GB"
 
 export function formatPeriod(period: number | string) {
   const num = typeof period === "string" ? parseInt(period) : period
@@ -42,6 +45,15 @@ export function formatDate(
   } catch (e) {
     return "N/A"
   }
+}
+
+export function formatElapsedTime(date: Date | string | null) {
+  if (date === null) return ""
+
+  return formatDistanceToNow(new Date(date), {
+    addSuffix: true,
+    locale: i18n.language === "en" ? en : fr,
+  })
 }
 
 export function formatDateTime(date: Date | string | null) {

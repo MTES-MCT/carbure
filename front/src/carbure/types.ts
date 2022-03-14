@@ -59,3 +59,18 @@ export enum UserRole {
   Admin = "ADMIN",
   Auditor = "AUDITOR",
 }
+
+export interface Notification {
+  id: number
+  dest: Entity
+  date: string
+  type: NotificationType
+  acked: boolean
+  send_by_email: boolean
+  email_sent: boolean
+  meta: any
+}
+
+export enum NotificationType {
+  Received = "RECEIVED",
+}
