@@ -67,5 +67,7 @@
   "MISSING_COUNTRY_OF_ORIGIN": "Feedstock country of origin is missing",
   "UNKNOWN_COUNTRY_OF_ORIGIN": "Feedstock country of origin is not recognized",
   "UNKNOWN_DELIVERY_SITE": "Delivery site is not recognized",
-  "UNKNOWN_DELIVERY_COUNTRY": "Delivery site country is not recognized"
+  "UNKNOWN_DELIVERY_COUNTRY": "Delivery site country is not recognized",
+  "ETD_HIGHER_THAN_DEFAULT": "Transport and Distribution GHG emissions higher than default value"
+
 }
