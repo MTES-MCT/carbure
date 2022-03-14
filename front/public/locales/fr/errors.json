@@ -67,5 +67,6 @@
   "MISSING_COUNTRY_OF_ORIGIN": "Le pays d'origine de la matière première est manquant",
   "UNKNOWN_COUNTRY_OF_ORIGIN": "Le pays d'origine de la matière première n'est pas reconnu",
   "UNKNOWN_DELIVERY_SITE": "Le site de livraison n'est pas reconnu",
-  "UNKNOWN_DELIVERY_COUNTRY": "Le pays de livraison n'est pas reconnu"
+  "UNKNOWN_DELIVERY_COUNTRY": "Le pays de livraison n'est pas reconnu",
+  "ETD_HIGHER_THAN_DEFAULT": "Émissions GES liées au Transport et à la Distribution supérieures à la valeur par défaut"
 }
