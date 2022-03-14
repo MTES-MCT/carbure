@@ -1,12 +1,13 @@
-aiohttp==3.7.4.post0
+aiohttp==3.8.1
 aiohttp-cors==0.7.0
 aioredis==1.3.1
+aiosignal==1.2.0
 ansible==4.6.0
 ansible-core==2.11.6
 appdirs==1.4.3
 asgiref==3.5.0
 astroid==2.4.2
-async-timeout==3.0.1
+async-timeout==4.0.2
 attrs==19.3.0
 beautifulsoup4==4.9.3
 blessings==1.7
@@ -19,6 +20,7 @@ cachetools==4.2.0
 certifi==2019.11.28
 cffi==1.13.2
 chardet==3.0.4
+charset-normalizer==2.0.12
 click==7.1.2
 colorama==0.4.3
 colorful==0.5.4
@@ -30,7 +32,6 @@ distlib==0.3.0
 distro==1.4.0
 Django==4.0.2
 django-admin-list-filter-dropdown==1.0.3
-django-authtools @ git+git://github.com/mplanes/django-authtools@fd220f7e1ccc42d77d5f7bd89614e536fd62a9a9
 django-debug-toolbar==3.2.1
 django-environ==0.4.5
 django-filter==2.4.0
@@ -44,6 +45,7 @@ et-xmlfile==1.0.1
 filelock==3.0.12
 flake8==3.7.9
 folium==0.12.1
+frozenlist==1.3.0
 fsspec==2021.4.0
 google-api-core==1.24.1
 google-auth==1.24.0
@@ -73,7 +75,7 @@ moz-sql-parser==3.32.20026
 msgpack==1.0.2
 multidict==4.7.5
 mysqlclient==1.4.6
-numpy==1.19.2
+numpy==1.22.3
 nvidia-ml-py3==7.352.0
 opencensus==0.7.11
 opencensus-context==0.1.2
@@ -119,3 +121,4 @@ webencodings==0.5.1
 wrapt==1.12.1
 XlsxWriter==1.2.8
 yarl==1.4.2
+git+git://github.com/mplanes/django-authtools
