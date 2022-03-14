@@ -580,7 +580,19 @@ class CarbureLotAdmin(admin.ModelAdmin):
                   ('carbure_production_site', NameSortedRelatedOnlyDropdownFilter), ('carbure_client__entity_type', custom_titled_filter('Type de client')))
     search_fields = ('id', 'transport_document_reference', 'free_field', 'carbure_id', 'volume')
     readonly_fields = ('created_at',)
-    actions = ['regen_carbure_id',]
+    actions = ['regen_carbure_id', 'send_to_pending', 'send_to_draft']
+
+    def send_to_pending(self, request, queryset):
+        for lot in queryset:
+            lot.lot_status = CarbureLot.PENDING
+            lot.save()
+    send_to_pending.short_description = "Renvoi en attente"
+
+    def send_to_draft(self, request, queryset):
+        for lot in queryset:
+            lot.lot_status = CarbureLot.DRAFT
+            lot.save()
+    send_to_draft.short_description = "Renvoi en brouillons"
 
     def regen_carbure_id(self, request, queryset):
         for lot in queryset:
