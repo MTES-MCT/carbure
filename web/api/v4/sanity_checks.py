@@ -167,7 +167,7 @@ def sanity_check(lot, prefetched_data):
     if lot.etd <= 0:
         errors.append(generic_error(error='GHG_ETD_0', lot=lot, is_blocking=True, field='etd'))
     if lot.etd > ETD_DEFAULT_VALUE:
-        errors.append(generic_error(error='ETD_HIGHER_THAN_DEFAULT', lot=lot, is_blocking=False, field='etd'))        
+        errors.append(generic_error(error='ETD_HIGHER_THAN_DEFAULT', lot=lot, field='etd'))
     if lot.ep <= 0:
         errors.append(generic_error(error='GHG_EP_0', lot=lot, is_blocking=True, field='ep'))
     if lot.el < 0:
