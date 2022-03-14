@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'certificates',
     'api',
     'doublecount',
+    'ml',
 ]
 
 AUTH_USER_MODEL = 'authtools.User'
