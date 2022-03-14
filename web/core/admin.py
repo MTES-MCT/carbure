@@ -405,10 +405,10 @@ class TransactionCommentAdmin(admin.ModelAdmin):
 
 
 class GenericErrorAdmin(admin.ModelAdmin):
-    list_display = ('tx', 'error', 'is_blocking', 'display_to_creator', 'display_to_recipient')
-    search_fields = ('tx__lot__carbure_id', 'error', 'extra')
+    list_display = ('lot', 'error', 'is_blocking', 'display_to_creator', 'display_to_recipient', 'field', 'fields', 'value', 'extra')
+    search_fields = ('error', 'field', 'extra')
     list_filter = ('error', 'is_blocking', )
-    raw_id_fields = ('tx', )
+    raw_id_fields = ('lot', 'tx')
 
 
 class SustainabilityDeclarationAdmin(admin.ModelAdmin):
