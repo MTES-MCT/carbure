@@ -806,7 +806,7 @@ def lots_delete(request, *args, **kwargs):
         if lot.added_by != entity:
             return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to delete this lot'}, status=403)
 
-        if lot.lot_status not in [CarbureLot.DRAFT, CarbureLot.REJECTED] and not (lot.lot_status == CarbureLot.PENDING and lot.correction_status == CarbureLot.IN_CORRECTION):
+        if lot.lot_status not in [CarbureLot.DRAFT, CarbureLot.REJECTED] and not (lot.lot_status in [CarbureLot.PENDING, CarbureLot.ACCEPTED] and lot.correction_status == CarbureLot.IN_CORRECTION):
             # cannot delete lot accepted / frozen or already deleted
             return JsonResponse({'status': 'error', 'message': 'Cannot delete lot'}, status=400)
 
@@ -962,6 +962,9 @@ def request_fix(request, *args, **kwargs):
             lot = CarbureLot.objects.get(pk=lot_id)
         except:
             return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
+
+        if lot.lot_status == CarbureLot.FROZEN:
+            return JsonResponse({'status': 'error', 'message': 'Lot is already declared, now in read-only mode.'}, status=400)
 
         if lot.carbure_client != entity:
             return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to change this lot'}, status=403)
