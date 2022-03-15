@@ -34,9 +34,11 @@ const PublicTopbar = () => {
   return (
     <Header>
       <Logo />
-      <LanguageSelection />
-      <Button asideX to="/auth/register" label={t("S'inscrire")} />
-      <Button variant="primary" to="/auth/login" label={t("Se connecter")} />
+      <Row asideX className={css.menus}>
+        <LanguageSelection />
+        <Button asideX to="/auth/register" label={t("S'inscrire")} />
+        <Button variant="primary" to="/auth/login" label={t("Se connecter")} />
+      </Row>
       <Faq />
     </Header>
   )

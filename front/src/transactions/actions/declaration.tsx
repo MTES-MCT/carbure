@@ -171,6 +171,7 @@ export const DeclarationDialog = ({
               value={timeline.year}
               onChange={(year = currentYear) => setTimeline({ ...timeline, year })} // prettier-ignore
               options={years}
+              sort={v => -v.value}
               style={{ flex: 1 }}
             />
             <Select

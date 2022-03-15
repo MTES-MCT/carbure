@@ -63,14 +63,21 @@ export enum UserRole {
 export interface Notification {
   id: number
   dest: Entity
-  date: string
+  datetime: string
   type: NotificationType
   acked: boolean
   send_by_email: boolean
   email_sent: boolean
-  meta: any
+  meta: null | any
 }
 
 export enum NotificationType {
-  Received = "RECEIVED",
+  CorrectionRequest = "CORRECTION_REQUEST",
+  CorrectionDone = "CORRECTION_DONE",
+  LotsRejected = "LOTS_REJECTED",
+  LotsReceived = "LOTS_RECEIVED",
+  LotsRecalled = "LOTS_RECALLED",
+  CertificateExpired = "CERTIFICATE_EXPIRED",
+  // DeclarationValidated = "DECLARATION_VALIDATED",
+  // DeclarationCancelled = "DECLARATION_CANCELLED"
 }
