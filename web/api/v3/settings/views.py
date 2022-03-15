@@ -9,7 +9,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
-from core.models import CarbureStock, Entity, GenericError, LotTransaction, UserRights, LotV2, Pays, MatierePremiere, Biocarburant, Depot, EntityDepot
+from core.models import CarbureLot, CarbureStock, Entity, GenericError, UserRights, Pays, MatierePremiere, Biocarburant, Depot, EntityDepot
 from core.serializers import EntityCertificateSerializer, GenericCertificateSerializer
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
 from core.decorators import check_rights, otp_or_403
@@ -219,8 +219,8 @@ def delete_production_site(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Unknown Production Site"}, status=400)
 
     # make sure there is no impact by deleting this
-    lots = LotV2.objects.filter(carbure_production_site=ps, status='Validated')
-    if len(lots) > 0:
+    lots = CarbureLot.objects.filter(carbure_production_site=ps, lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN])
+    if lots.count() > 0:
         msg = "Validated lots associated with this production site. Cannot delete"
         return JsonResponse({'status': 'error', 'message': msg}, status=400)
     ps.delete()
@@ -262,8 +262,8 @@ def set_production_site_mp(request, *args, **kwargs):
                             }, status=400)
 
     # remove errors
-    impacted_txs = LotTransaction.objects.filter(lot__carbure_production_site=ps, lot__matiere_premiere=mp)
-    GenericError.objects.filter(tx__in=impacted_txs, error="MP_NOT_CONFIGURED").delete()
+    impacted_txs = CarbureLot.objects.filter(carbure_production_site=ps, feedstock=mp)
+    GenericError.objects.filter(lot__in=impacted_txs, error="MP_NOT_CONFIGURED").delete()
     return JsonResponse({'status': 'success'})
 
 
@@ -301,8 +301,8 @@ def set_production_site_bc(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
                             }, status=400)
     # remove errors
-    impacted_txs = LotTransaction.objects.filter(lot__carbure_production_site=ps, lot__biocarburant=bc)
-    GenericError.objects.filter(tx__in=impacted_txs, error="BC_NOT_CONFIGURED").delete()
+    impacted_txs = CarbureLot.objects.filter(carbure_production_site=ps, biofuel=bc)
+    GenericError.objects.filter(lot__in=impacted_txs, error="BC_NOT_CONFIGURED").delete()
     return JsonResponse({'status': 'success'})
 
 

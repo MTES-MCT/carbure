@@ -1,28 +1,19 @@
 import logging
-import datetime
 from django.db.models.aggregates import Sum
-from django.db.models.expressions import Ref
 from django.http.response import HttpResponse
-import pytz
-import calendar
-from dateutil.rrule import rrule, MONTHLY
-from dateutil.relativedelta import relativedelta
 import folium
 import random
 import math
 
 from django.http import JsonResponse
-from core.decorators import is_admin, is_admin_or_external_admin
+from core.decorators import is_admin
 from django.contrib.auth import get_user_model
-from core.models import Entity, Lot, UserRights, Control, ControlMessages, ProductionSite, LotV2, GenericError, AdminTransactionComment
-from django.db.models import Q, Count, Subquery, OuterRef, Value, IntegerField
-from django.contrib.auth.forms import PasswordResetForm
+from core.models import CarbureLot, Entity, UserRights, ProductionSite
+from django.db.models import Q, Count
 from django.core.mail import send_mail
 from django.conf import settings
-from django.template.loader import render_to_string
 
-from core.models import LotTransaction, UserRightsRequests, SustainabilityDeclaration, Control
-from api.v3.lots.helpers import Perf, get_lots_with_metadata, get_lots_with_errors, get_snapshot_filters, get_errors, filter_lots, get_general_summary, sort_lots
+from core.models import UserRightsRequests
 from core.common import get_transaction_distance
 from doublecount.models import DoubleCountingAgreement
 
@@ -177,155 +168,6 @@ def delete_entity(request):
     return JsonResponse({"status": "success", "data": "success"})
 
 
-def get_lots_by_status(txs, querySet):
-    status = querySet.get('status', False)
-    hidden = querySet.get('is_hidden_by_admin', None)
-
-    if status == 'alert':
-        txs = get_lots_with_errors(txs)
-    elif status == 'correction':
-        txs = txs.filter(delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED, LotTransaction.FIXED])
-    elif status == 'declaration':
-        txs = txs.filter(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.PENDING, LotTransaction.FROZEN])
-    elif status == 'highlight':
-        txs = txs.filter(highlighted_by_admin=True)
-
-    if hidden is None:
-        txs = txs.filter(hidden_by_admin=False)
-
-    return txs
-
-
-@is_admin
-def get_lots(request):
-    status = request.GET.get('status', False)
-
-    if not status:
-        return JsonResponse({'status': 'error', 'message': "Please provide a status"}, status=400)
-
-    try:
-        txs = LotTransaction.objects.select_related(
-            'lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country',
-            'lot__unknown_production_country', 'lot__matiere_premiere', 'lot__biocarburant', 'lot__pays_origine', 'lot__added_by', 'lot__data_origin_entity',
-            'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country'
-        ).prefetch_related('genericerror_set', 'lot__carbure_production_site__productionsitecertificate_set')
-
-        txs = txs.filter(lot__status=LotV2.VALIDATED)
-        txs = get_lots_by_status(txs, request.GET)
-        return get_lots_with_metadata(txs, None, request.GET, admin=True)
-
-    except Exception:
-        import traceback
-        traceback.print_exc()
-        return JsonResponse({'status': 'error', 'message': "Something went wrong"}, status=400)
-
-
-@is_admin
-def get_lots_summary(request, *args, **kwargs):
-    short = request.GET.get('short', False)
-
-    try:
-        txs = LotTransaction.objects.filter(lot__status=LotV2.VALIDATED)
-        txs = get_lots_by_status(txs, request.GET)
-        txs = filter_lots(txs, request.GET)[0]
-        txs = sort_lots(txs, request.GET)
-        data = get_general_summary(txs, short)
-        return JsonResponse({'status': 'success', 'data': data})
-    except Exception:
-        return JsonResponse({'status': 'error', 'message': "Could not get lots summary"}, status=400)
-
-
-@is_admin
-def get_details(request, *args, **kwargs):
-    tx_id = request.GET.get('tx_id', False)
-
-    if not tx_id:
-        return JsonResponse({'status': 'error', 'message': 'Missing tx_id'}, status=400)
-
-    tx = LotTransaction.objects.get(pk=tx_id)
-
-    now = datetime.datetime.now()
-    (_, last_day) = calendar.monthrange(now.year, now.month)
-    deadline_date = now.replace(day=last_day)
-
-    data = {}
-    data['transaction'] = tx.natural_key(admin=True)
-    #data['certificates'] = check_certificates(tx)
-    data['distance'] = get_transaction_distance(tx)
-    data['errors'] = get_errors(tx, entity=None, is_admin=True)
-    data['deadline'] = deadline_date.strftime("%Y-%m-%d")
-    data['comments'] = [c.natural_key() for c in tx.transactioncomment_set.all()]
-    data['admin_comments'] = [c.natural_key() for c in tx.admintransactioncomment_set.filter(is_visible_by_admin=True)]
-    data['updates'] = [c.natural_key() for c in tx.transactionupdatehistory_set.all().order_by('-datetime')]
-    return JsonResponse({'status': 'success', 'data': data})
-
-
-@is_admin
-def get_snapshot(request):
-    year = request.GET.get('year', False)
-
-    today = datetime.date.today()
-    date_from = today.replace(month=1, day=1)
-    date_until = today.replace(month=12, day=31)
-
-    if year:
-        try:
-            year = int(year)
-            date_from = datetime.date(year=year, month=1, day=1)
-            date_until = datetime.date(year=year, month=12, day=31)
-        except Exception:
-            return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
-
-    try:
-        data = {}
-        txs = LotTransaction.objects.all()
-        data['years'] = [t.year for t in txs.dates('delivery_date', 'year')]
-        txs = txs.filter(lot__status='Validated', delivery_date__gte=date_from, delivery_date__lte=date_until)
-
-        alerts = txs.annotate(Count('genericerror')).filter(genericerror__count__gt=0).count()
-        correction = txs.filter(delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED, LotTransaction.FIXED]).count()
-        declaration = txs.filter(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.PENDING, LotTransaction.FROZEN]).count()
-        highlight = txs.filter(highlighted_by_admin=True).count()
-        data['lots'] = {'alert': alerts, 'correction': correction, 'declaration': declaration, 'highlight': highlight}
-        data['filters'] = [
-            'delivery_status',
-            'periods',
-            'biocarburants',
-            'matieres_premieres',
-            'countries_of_origin',
-            'vendors',
-            'clients',
-            'production_sites',
-            'delivery_sites',
-            'added_by',
-            'errors',
-            'is_forwarded',
-            'is_mac',
-            'is_hidden_by_admin',
-            'client_types'
-        ]
-    except Exception:
-        return JsonResponse({'status': 'error', 'message': "Exception"}, status=400)
-    return JsonResponse({"status": "success", "data": data})
-
-
-@is_admin
-def get_filters(request, *args, **kwargs):
-    field = request.GET.get('field', False)
-    if not field:
-        return JsonResponse({'status': 'error', 'message': "Missing field"}, status=400)
-
-    txs = LotTransaction.objects.filter(lot__status=LotV2.VALIDATED)
-    txs = get_lots_by_status(txs, request.GET)
-    txs = filter_lots(txs, request.GET, blacklist=[field])[0]
-    d = get_snapshot_filters(txs, None, [field])
-    if field in d:
-        values = d[field]
-    else:
-        return JsonResponse({'status': 'error', 'message': "Something went wrong"}, status=400)
-    return JsonResponse({'status': 'success', 'data': values})
-
-
 @is_admin
 def get_rights_requests(request):
     q = request.GET.get('q', False)
@@ -383,375 +225,291 @@ def update_right_request(request):
     return JsonResponse({"status": "success"})
 
 
-@is_admin
-def get_certificates(request):
-    return JsonResponse({"status": "success"})
-
-
-@is_admin
-def update_certificate(request):
-    return JsonResponse({"status": "success"})
-
-
-@is_admin
-def get_controls(request):
-    q = request.GET.get('q', False)
-    status = request.GET.get('status', False)
-
-    controls = Control.objects.all()
-    if q:
-        controls = controls.filter(Q(tx__lot__carbure_producer__name__icontains=q) |
-                                   Q(tx__carbure_client__name__icontains=q))
-    if status:
-        controls = controls.filter(status=status)
-    controls_sez = [r.natural_key() for r in controls]
-    return JsonResponse({"status": "success", "data": controls_sez})
-
-
-@is_admin
-def open_control(request):
-    tx_id = request.POST.get('tx_id', False)
-    if not tx_id:
-        return JsonResponse({'status': 'error', 'message': "Please provide a source tx_id"}, status=400)
-
-    try:
-        tx = LotTransaction.objects.get(id=tx_id)
-    except:
-        return JsonResponse({'status': 'error', 'message': "Could not find tx associated with tx_id"}, status=400)
-
-    ctrl = Control()
-    ctrl.tx = tx
-    ctrl.status = 'OPEN'
-    ctrl.save()
-    return JsonResponse({"status": "success"})
-
-
-@is_admin
-def close_control(request):
-    ctrl_id = request.POST.get('id', False)
-    if not ctrl_id:
-        return JsonResponse({'status': 'error', 'message': "Please provide a control id"}, status=400)
-
-    try:
-        ctrl = Control.objects.get(id=ctrl_id)
-    except:
-        return JsonResponse({'status': 'error', 'message': "Could not find control"}, status=400)
-
-    ctrl.status = 'CLOSED'
-    ctrl.save()
-    return JsonResponse({"status": "success"})
-
-
-def init_declaration(entity, declarations):
-    if entity in declarations:
-        return declarations[entity]
-    else:
-        declarations[entity] = {'drafts': 0, 'output': 0, 'input': 0, 'corrections': 0}
-        return declarations[entity]
-
-
-def get_period_declarations(period):
-    txs = LotTransaction.objects.filter(lot__period=period).select_related('carbure_vendor', 'carbure_client', 'lot__added_by').values(
-        'carbure_vendor__id', 'carbure_client__id', 'lot__added_by__id', 'delivery_status', 'lot__status')
-
-    entities = set()
-    declarations = {}
-
-    for tx in txs.iterator():
-        author = tx['lot__added_by__id']
-        vendor = tx['carbure_vendor__id'] if tx['carbure_vendor__id'] else None
-        client = tx['carbure_client__id'] if tx['carbure_client__id'] else None
-
-        if author and tx['lot__status'] == 'Draft':
-            entities.add(author)
-            declaration = init_declaration(author, declarations)
-            declaration['drafts'] += 1
-        else:
-            if client:
-                entities.add(client)
-                declaration = init_declaration(client, declarations)
-                declaration['input'] += 1
-            if vendor:
-                entities.add(vendor)
-                declaration = init_declaration(vendor, declarations)
-                declaration['output'] += 1
-            if author and tx['delivery_status'] in (LotTransaction.TOFIX, LotTransaction.REJECTED, LotTransaction.FIXED):
-                entities.add(author)
-                declaration = init_declaration(author, declarations)
-                declaration['corrections'] += 1
-
-    return declarations
-
-@is_admin
-def get_declarations(request):
-    year = request.GET.get('year', False)
-    month = request.GET.get('month', False)
-    now = datetime.datetime.now()
-
-    if not month:
-        month = now.month
-    else:
-        month = int(month)
-
-    if not year:
-        year = now.year
-    else:
-        year = int(year)
-
-    #### CREATE DECLARATIONS IF MISSING
-    # we are in month N, we want to see period N-2, N-1 and N
-    ref_period = datetime.datetime(year=year, month=month, day=1)
-    periods = [ref_period, ref_period - relativedelta(months=1), ref_period - relativedelta(months=2)]
-    entities = Entity.objects.all()
-    to_create = []
-    for p in periods:
-        # calculate deadline date
-        nextmonth = p + datetime.timedelta(days=31)
-        (weekday, lastday) = calendar.monthrange(nextmonth.year, nextmonth.month)
-        deadline = datetime.date(year=nextmonth.year, month=nextmonth.month, day=lastday)
-        # 1) get existing objects
-        sds = SustainabilityDeclaration.objects.filter(period=p)
-        existing = {s.entity.id: s for s in sds}
-
-        # 2) check if all entities have a declaration
-        for e in entities:
-            if e.id not in existing:
-                to_create.append(SustainabilityDeclaration(entity=e, period=p, deadline=deadline))
-
-    # 3) create objects if missing
-    SustainabilityDeclaration.objects.bulk_create(to_create)
-
-
-    #### FETCH DECLARATIONS FROM DB
-    declarations = SustainabilityDeclaration.objects.filter(entity__in=entities, period__in=periods).select_related('entity')
-    tx_counts = {}
-    for p in periods:
-        period = "%d-%02d" % (p.year, p.month)
-        tx_counts[period] = get_period_declarations(period)
-
-    declarations_sez = []
-    for d in declarations:
-        period = "%d-%02d" % (d.period.year, d.period.month)
-        if d.entity.id in tx_counts[period]:
-            d.lots = tx_counts[period][d.entity.id]
-        else:
-            d.lots = {'drafts': 0, 'output': 0, 'input': 0, 'corrections': 0}
-        sez_data = d.natural_key()
-        sez_data['lots'] = d.lots
-        declarations_sez.append(sez_data)
-    return JsonResponse({"status": "success", "data": declarations_sez})
-
-
-@is_admin
-def send_declaration_reminder(request):
-    entity_id = request.POST.get('entity_id', False)
-    year = request.POST.get('year', False)
-    month = request.POST.get('month', False)
-
-    if not entity_id:
-        return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
-
-    if not year:
-        return JsonResponse({'status': 'error', 'message': "Missing year"}, status=400)
-
-    if not month:
-        return JsonResponse({'status': 'error', 'message': "Missing month"}, status=400)
-
-
-    try:
-        period = datetime.date(year=int(year), month=int(month), day=1)
-        declaration = SustainabilityDeclaration.objects.get(entity__id=entity_id, period=period, declared=False)
-    except Exception:
-        return JsonResponse({'status': 'error', 'message': "Could not find declaration"}, status=400)
-
-    declaration.reminder_count += 1
-    declaration.save()
-
-    context = {}
-    context['entity_id'] = entity_id
-    context['lots_validated'] = LotV2.objects.filter(added_by=declaration.entity, status='Validated').count()
-    period = declaration.period.strftime('%Y-%m')
-    context['PERIOD'] = period
-    email_subject = 'Carbure - Déclaration %s' % (period)
-    html_message = render_to_string('emails/relance_manuelle_fr.html', context)
-    text_message = render_to_string('emails/relance_manuelle_fr.txt', context)
-    rights = UserRights.objects.filter(entity__id=entity_id)
-    recipients = [r.user.email for r in rights]
-
-    send_mail(
-        subject=email_subject,
-        message=text_message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        html_message=html_message,
-        recipient_list=recipients,
-        fail_silently=False,
-    )
-
-    return JsonResponse({"status": "success"})
-
-
-@is_admin
-def check_declaration(request):
-    id = request.POST.get('id', False)
-    if not id:
-        return JsonResponse({'status': 'error', 'message': "Please provide the declaration id"}, status=400)
-
-    try:
-        dec = SustainabilityDeclaration.objects.get(id=id)
-    except:
-        return JsonResponse({'status': 'error', 'message': "Could not find declaration"}, status=400)
-
-    dec.checked = True
-    dec.save()
-    return JsonResponse({"status": "success"})
-
-
-@is_admin
-def uncheck_declaration(request):
-    id = request.POST.get('id', False)
-    if not id:
-        return JsonResponse({'status': 'error', 'message': "Please provide the declaration id"}, status=400)
-
-    try:
-        dec = SustainabilityDeclaration.objects.get(id=id)
-    except:
-        return JsonResponse({'status': 'error', 'message': "Could not find declaration"}, status=400)
-
-    dec.checked = False
-    dec.save()
-    return JsonResponse({"status": "success"})
-
-@is_admin
-def controls_add_message(request):
-    control_id = request.POST.get('control_id', False)
-    message = request.POST.get('message', False)
-
-    if not control_id:
-        return JsonResponse({'status': 'error', 'message': 'Please submit a control_id'}, status=400)
-    if not message:
-        return JsonResponse({'status': 'error', 'message': 'Please submit a message'}, status=400)
-
-    try:
-        control = Control.objects.get(id=control_id)
-    except:
-        return JsonResponse({'status': 'error', 'message': 'Could not find control'}, status=400)
-
-    # all good
-    msg = ControlMessages()
-    msg.control = control
-    msg.user = request.user
-    msg.entity = Entity.objects.filter(entity_type='Administrateur')[0]
-    msg.message = message
-    msg.save()
-    return JsonResponse({'status': 'success'})
-
-
-
-@is_admin
-def ack_alerts(request):
-    alert_ids = request.POST.getlist('alert_ids', False)
-    if not alert_ids:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing alert_ids"}, status=400)
-
-    GenericError.objects.filter(id__in=alert_ids).update(acked_by_admin=True)
-    return JsonResponse({'status': 'success'})
-
-
-
-@is_admin
-def highlight_alerts(request):
-    alert_ids = request.POST.getlist('alert_ids', False)
-    if not alert_ids:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing alert_ids"}, status=400)
-
-    GenericError.objects.filter(id__in=alert_ids).update(highlighted_by_admin=True)
-    return JsonResponse({'status': 'success'})
-
-
-@is_admin
-def highlight_transactions(request):
-    tx_ids = request.POST.getlist('tx_ids', False)
-    notify_auditor = request.POST.get('notify_auditor', False)
-
-    if not tx_ids:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=400)
-
-    txs = LotTransaction.objects.filter(id__in=tx_ids)
-
-    for tx in txs.iterator():
-        tx.highlighted_by_admin = not tx.highlighted_by_admin
-        if tx.highlighted_by_admin:
-            tx.hidden_by_admin = False
-        if notify_auditor == 'true':
-            tx.highlighted_by_auditor = True
-        tx.save()
-
-    return JsonResponse({'status': 'success'})
-
-@is_admin
-def hide_transactions(request):
-    tx_ids = request.POST.getlist('tx_ids', False)
-
-    if not tx_ids:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=400)
-
-    txs = LotTransaction.objects.filter(id__in=tx_ids)
-
-    for tx in txs.iterator():
-        tx.hidden_by_admin = not tx.hidden_by_admin
-        if tx.hidden_by_admin:
-            tx.highlighted_by_admin = False
-        tx.save()
-        tx.genericerror_set.all().update(acked_by_admin=True)
-    return JsonResponse({'status': 'success'})
-
-
-@is_admin
-def admin_comment_transaction(request):
-    entity_id = request.POST.get('entity_id', False)
-    tx_ids = request.POST.getlist('tx_ids', False)
-    comment = request.POST.get('comment', False)
-    is_visible_by_auditor = request.POST.get('is_visible_by_auditor', False)
-    if is_visible_by_auditor == 'true':
-        is_visible_by_auditor = True
-    else:
-        is_visible_by_auditor = False
-
-    if not entity_id:
-        return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
-    if not tx_ids:
-        return JsonResponse({'status': 'error', 'message': "Missing tx_ids"}, status=400)
-    if not comment:
-        return JsonResponse({'status': 'error', 'message': "Missing comment"}, status=400)
-
-    for tx_id in tx_ids:
-        tx = LotTransaction.objects.get(id=tx_id)
-        c = AdminTransactionComment()
-        c.tx = tx
-        c.comment = comment
-        c.entity_id = entity_id
-        c.is_visible_by_admin = True
-        c.is_visible_by_auditor = is_visible_by_auditor
-        c.save()
-    return JsonResponse({'status': 'success'})
-
-
-@is_admin
-def admin_delete_transactions(request):
-    tx_ids = request.POST.getlist('tx_ids', False)
-
-    if not tx_ids:
-        return JsonResponse({'status': 'error', 'message': "Missing tx_ids"}, status=400)
-
-    for tx_id in tx_ids:
-        tx = LotTransaction.objects.get(id=tx_id)
-        lot_id = tx.lot.id
-        tx.delete()
-        lot = LotV2.objects.get(id=lot_id)
-        remaining_tx = LotTransaction.objects.filter(lot=lot).count()
-        if remaining_tx == 0:
-            lot.delete()
-    return JsonResponse({'status': 'success'})
+# def init_declaration(entity, declarations):
+#     if entity in declarations:
+#         return declarations[entity]
+#     else:
+#         declarations[entity] = {'drafts': 0, 'output': 0, 'input': 0, 'corrections': 0}
+#         return declarations[entity]
+
+
+# def get_period_declarations(period):
+#     txs = LotTransaction.objects.filter(lot__period=period).select_related('carbure_vendor', 'carbure_client', 'lot__added_by').values(
+#         'carbure_vendor__id', 'carbure_client__id', 'lot__added_by__id', 'delivery_status', 'lot__status')
+
+#     entities = set()
+#     declarations = {}
+
+#     for tx in txs.iterator():
+#         author = tx['lot__added_by__id']
+#         vendor = tx['carbure_vendor__id'] if tx['carbure_vendor__id'] else None
+#         client = tx['carbure_client__id'] if tx['carbure_client__id'] else None
+
+#         if author and tx['lot__status'] == 'Draft':
+#             entities.add(author)
+#             declaration = init_declaration(author, declarations)
+#             declaration['drafts'] += 1
+#         else:
+#             if client:
+#                 entities.add(client)
+#                 declaration = init_declaration(client, declarations)
+#                 declaration['input'] += 1
+#             if vendor:
+#                 entities.add(vendor)
+#                 declaration = init_declaration(vendor, declarations)
+#                 declaration['output'] += 1
+#             if author and tx['delivery_status'] in (LotTransaction.TOFIX, LotTransaction.REJECTED, LotTransaction.FIXED):
+#                 entities.add(author)
+#                 declaration = init_declaration(author, declarations)
+#                 declaration['corrections'] += 1
+
+#     return declarations
+
+# @is_admin
+# def get_declarations(request):
+#     year = request.GET.get('year', False)
+#     month = request.GET.get('month', False)
+#     now = datetime.datetime.now()
+
+#     if not month:
+#         month = now.month
+#     else:
+#         month = int(month)
+
+#     if not year:
+#         year = now.year
+#     else:
+#         year = int(year)
+
+#     #### CREATE DECLARATIONS IF MISSING
+#     # we are in month N, we want to see period N-2, N-1 and N
+#     ref_period = datetime.datetime(year=year, month=month, day=1)
+#     periods = [ref_period, ref_period - relativedelta(months=1), ref_period - relativedelta(months=2)]
+#     entities = Entity.objects.all()
+#     to_create = []
+#     for p in periods:
+#         # calculate deadline date
+#         nextmonth = p + datetime.timedelta(days=31)
+#         (weekday, lastday) = calendar.monthrange(nextmonth.year, nextmonth.month)
+#         deadline = datetime.date(year=nextmonth.year, month=nextmonth.month, day=lastday)
+#         # 1) get existing objects
+#         sds = SustainabilityDeclaration.objects.filter(period=p)
+#         existing = {s.entity.id: s for s in sds}
+
+#         # 2) check if all entities have a declaration
+#         for e in entities:
+#             if e.id not in existing:
+#                 to_create.append(SustainabilityDeclaration(entity=e, period=p, deadline=deadline))
+
+#     # 3) create objects if missing
+#     SustainabilityDeclaration.objects.bulk_create(to_create)
+
+
+#     #### FETCH DECLARATIONS FROM DB
+#     declarations = SustainabilityDeclaration.objects.filter(entity__in=entities, period__in=periods).select_related('entity')
+#     tx_counts = {}
+#     for p in periods:
+#         period = "%d-%02d" % (p.year, p.month)
+#         tx_counts[period] = get_period_declarations(period)
+
+#     declarations_sez = []
+#     for d in declarations:
+#         period = "%d-%02d" % (d.period.year, d.period.month)
+#         if d.entity.id in tx_counts[period]:
+#             d.lots = tx_counts[period][d.entity.id]
+#         else:
+#             d.lots = {'drafts': 0, 'output': 0, 'input': 0, 'corrections': 0}
+#         sez_data = d.natural_key()
+#         sez_data['lots'] = d.lots
+#         declarations_sez.append(sez_data)
+#     return JsonResponse({"status": "success", "data": declarations_sez})
+
+
+# @is_admin
+# def send_declaration_reminder(request):
+#     entity_id = request.POST.get('entity_id', False)
+#     year = request.POST.get('year', False)
+#     month = request.POST.get('month', False)
+
+#     if not entity_id:
+#         return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
+
+#     if not year:
+#         return JsonResponse({'status': 'error', 'message': "Missing year"}, status=400)
+
+#     if not month:
+#         return JsonResponse({'status': 'error', 'message': "Missing month"}, status=400)
+
+
+#     try:
+#         period = datetime.date(year=int(year), month=int(month), day=1)
+#         declaration = SustainabilityDeclaration.objects.get(entity__id=entity_id, period=period, declared=False)
+#     except Exception:
+#         return JsonResponse({'status': 'error', 'message': "Could not find declaration"}, status=400)
+
+#     declaration.reminder_count += 1
+#     declaration.save()
+
+#     context = {}
+#     context['entity_id'] = entity_id
+#     context['lots_validated'] = LotV2.objects.filter(added_by=declaration.entity, status='Validated').count()
+#     period = declaration.period.strftime('%Y-%m')
+#     context['PERIOD'] = period
+#     email_subject = 'Carbure - Déclaration %s' % (period)
+#     html_message = render_to_string('emails/relance_manuelle_fr.html', context)
+#     text_message = render_to_string('emails/relance_manuelle_fr.txt', context)
+#     rights = UserRights.objects.filter(entity__id=entity_id)
+#     recipients = [r.user.email for r in rights]
+
+#     send_mail(
+#         subject=email_subject,
+#         message=text_message,
+#         from_email=settings.DEFAULT_FROM_EMAIL,
+#         html_message=html_message,
+#         recipient_list=recipients,
+#         fail_silently=False,
+#     )
+
+#     return JsonResponse({"status": "success"})
+
+
+# @is_admin
+# def check_declaration(request):
+#     id = request.POST.get('id', False)
+#     if not id:
+#         return JsonResponse({'status': 'error', 'message': "Please provide the declaration id"}, status=400)
+
+#     try:
+#         dec = SustainabilityDeclaration.objects.get(id=id)
+#     except:
+#         return JsonResponse({'status': 'error', 'message': "Could not find declaration"}, status=400)
+
+#     dec.checked = True
+#     dec.save()
+#     return JsonResponse({"status": "success"})
+
+
+# @is_admin
+# def uncheck_declaration(request):
+#     id = request.POST.get('id', False)
+#     if not id:
+#         return JsonResponse({'status': 'error', 'message': "Please provide the declaration id"}, status=400)
+
+#     try:
+#         dec = SustainabilityDeclaration.objects.get(id=id)
+#     except:
+#         return JsonResponse({'status': 'error', 'message': "Could not find declaration"}, status=400)
+
+#     dec.checked = False
+#     dec.save()
+#     return JsonResponse({"status": "success"})
+
+
+# @is_admin
+# def ack_alerts(request):
+#     alert_ids = request.POST.getlist('alert_ids', False)
+#     if not alert_ids:
+#         return JsonResponse({'status': 'forbidden', 'message': "Missing alert_ids"}, status=400)
+
+#     GenericError.objects.filter(id__in=alert_ids).update(acked_by_admin=True)
+#     return JsonResponse({'status': 'success'})
+
+
+
+# @is_admin
+# def highlight_alerts(request):
+#     alert_ids = request.POST.getlist('alert_ids', False)
+#     if not alert_ids:
+#         return JsonResponse({'status': 'forbidden', 'message': "Missing alert_ids"}, status=400)
+
+#     GenericError.objects.filter(id__in=alert_ids).update(highlighted_by_admin=True)
+#     return JsonResponse({'status': 'success'})
+
+
+# @is_admin
+# def highlight_transactions(request):
+#     tx_ids = request.POST.getlist('tx_ids', False)
+#     notify_auditor = request.POST.get('notify_auditor', False)
+
+#     if not tx_ids:
+#         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=400)
+
+#     txs = LotTransaction.objects.filter(id__in=tx_ids)
+
+#     for tx in txs.iterator():
+#         tx.highlighted_by_admin = not tx.highlighted_by_admin
+#         if tx.highlighted_by_admin:
+#             tx.hidden_by_admin = False
+#         if notify_auditor == 'true':
+#             tx.highlighted_by_auditor = True
+#         tx.save()
+
+#     return JsonResponse({'status': 'success'})
+
+# @is_admin
+# def hide_transactions(request):
+#     tx_ids = request.POST.getlist('tx_ids', False)
+
+#     if not tx_ids:
+#         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=400)
+
+#     txs = LotTransaction.objects.filter(id__in=tx_ids)
+
+#     for tx in txs.iterator():
+#         tx.hidden_by_admin = not tx.hidden_by_admin
+#         if tx.hidden_by_admin:
+#             tx.highlighted_by_admin = False
+#         tx.save()
+#         tx.genericerror_set.all().update(acked_by_admin=True)
+#     return JsonResponse({'status': 'success'})
+
+
+# @is_admin
+# def admin_comment_transaction(request):
+#     entity_id = request.POST.get('entity_id', False)
+#     tx_ids = request.POST.getlist('tx_ids', False)
+#     comment = request.POST.get('comment', False)
+#     is_visible_by_auditor = request.POST.get('is_visible_by_auditor', False)
+#     if is_visible_by_auditor == 'true':
+#         is_visible_by_auditor = True
+#     else:
+#         is_visible_by_auditor = False
+
+#     if not entity_id:
+#         return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
+#     if not tx_ids:
+#         return JsonResponse({'status': 'error', 'message': "Missing tx_ids"}, status=400)
+#     if not comment:
+#         return JsonResponse({'status': 'error', 'message': "Missing comment"}, status=400)
+
+#     for tx_id in tx_ids:
+#         tx = LotTransaction.objects.get(id=tx_id)
+#         c = AdminTransactionComment()
+#         c.tx = tx
+#         c.comment = comment
+#         c.entity_id = entity_id
+#         c.is_visible_by_admin = True
+#         c.is_visible_by_auditor = is_visible_by_auditor
+#         c.save()
+#     return JsonResponse({'status': 'success'})
+
+
+# @is_admin
+# def admin_delete_transactions(request):
+#     tx_ids = request.POST.getlist('tx_ids', False)
+
+#     if not tx_ids:
+#         return JsonResponse({'status': 'error', 'message': "Missing tx_ids"}, status=400)
+
+#     for tx_id in tx_ids:
+#         tx = LotTransaction.objects.get(id=tx_id)
+#         lot_id = tx.lot.id
+#         tx.delete()
+#         lot = LotV2.objects.get(id=lot_id)
+#         remaining_tx = LotTransaction.objects.filter(lot=lot).count()
+#         if remaining_tx == 0:
+#             lot.delete()
+#     return JsonResponse({'status': 'success'})
 
 
 # not an api endpoint
@@ -775,17 +533,16 @@ def grade(volume, min, max):
 
 @is_admin
 def map(request):
-    txs = LotTransaction.objects.select_related(
-        'lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country',
-        'lot__unknown_production_country', 'lot__matiere_premiere', 'lot__biocarburant', 'lot__pays_origine', 'lot__added_by', 'lot__data_origin_entity',
-        'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country'
-    ).prefetch_related('genericerror_set', 'lot__carbure_production_site__productionsitecertificate_set')
-    txs = txs.filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.PENDING, LotTransaction.FROZEN])
-    txs, _, _, _ = filter_lots(txs, request.GET)
+    lots = CarbureLot.objects.select_related(
+        'carbure_producer', 'carbure_production_site', 'production_country',
+        'feedstock', 'biofuel', 'country_of_origin', 'added_by', 
+        'carbure_supplier', 'carbure_client', 'carbure_delivery_site', 'delivery_site_country',
+    ).filter(lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN, CarbureLot.PENDING])
+    lots = filter_lots(lots, request.GET)
 
     # on veut: nom site de depart, gps depart, nom site arrivee, gps arrivee, volume
-    txs = txs.filter(lot__carbure_production_site__isnull=False, carbure_delivery_site__isnull=False)
-    values = txs.values('lot__carbure_production_site__name', 'lot__carbure_production_site__gps_coordinates', 'carbure_delivery_site__name', 'carbure_delivery_site__gps_coordinates').annotate(volume=Sum('lot__volume'))
+    lots = lots.filter(carbure_production_site__isnull=False, carbure_delivery_site__isnull=False)
+    values = lots.values('carbure_production_site__name', 'carbure_production_site__gps_coordinates', 'carbure_delivery_site__name', 'carbure_delivery_site__gps_coordinates').annotate(volume=Sum('volume'))
 
     volume_min = 999999
     volume_max = 0
@@ -802,22 +559,22 @@ def map(request):
     for v in values:
         try:
             # start coordinates
-            slat, slon = v['lot__carbure_production_site__gps_coordinates'].split(',')
+            slat, slon = v['carbure_production_site__gps_coordinates'].split(',')
             # end coordinates
             elat, elon = v['carbure_delivery_site__gps_coordinates'].split(',')
         except:
             print('Missing start or end gps coordinates')
-            print('Start %s : %s' % (v['lot__carbure_production_site__name'].encode('utf-8'), v['lot__carbure_production_site__gps_coordinates']))
+            print('Start %s : %s' % (v['carbure_production_site__name'].encode('utf-8'), v['carbure_production_site__gps_coordinates']))
             print('End %s : %s' % (v['carbure_delivery_site__name'].encode('utf-8'), v['carbure_delivery_site__gps_coordinates']))
             continue
 
-        if v['lot__carbure_production_site__gps_coordinates'] not in known_prod_sites:
-            known_prod_sites.append(v['lot__carbure_production_site__gps_coordinates'])
+        if v['carbure_production_site__gps_coordinates'] not in known_prod_sites:
+            known_prod_sites.append(v['carbure_production_site__gps_coordinates'])
             c = couleur()
             folium.Circle(
                 radius=50e2,
                 location=[slat, slon],
-                popup=v['lot__carbure_production_site__name'],
+                popup=v['carbure_production_site__name'],
                 color= c,
                 fill=True,
                 fill_opacity=1,
@@ -833,6 +590,6 @@ def map(request):
                 fill_opacity=1,
             ).add_to(m)
         volume = v['volume']
-        folium.PolyLine([(float(slat),float(slon)),(float(elat),float(elon))], color=c, weight=grade(volume, volume_min, volume_max), line_cap='round', opacity=0.7, popup=v['lot__carbure_production_site__name']+' vers '+v['carbure_delivery_site__name']+' : \n'+str(volume)+' litres').add_to(m)
+        folium.PolyLine([(float(slat),float(slon)),(float(elat),float(elon))], color=c, weight=grade(volume, volume_min, volume_max), line_cap='round', opacity=0.7, popup=v['carbure_production_site__name']+' vers '+v['carbure_delivery_site__name']+' : \n'+str(volume)+' litres').add_to(m)
     return HttpResponse(m._repr_html_())
 
