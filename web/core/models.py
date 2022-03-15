@@ -843,6 +843,7 @@ class CarbureNotification(models.Model):
     type = models.CharField(max_length=32, null=False, blank=False, choices=NOTIFICATION_TYPES)
     acked = models.BooleanField(default=False)
     send_by_email = models.BooleanField(default=False)
+    notify_administrator = models.BooleanField(default=False)
     email_sent = models.BooleanField(default=False)
     meta = models.JSONField(blank=True, null=True)
 
