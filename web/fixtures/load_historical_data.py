@@ -156,6 +156,8 @@ def load_lot(lot):
     if isinstance(dd, str):
         try:
             year = int(dd[6:10])
+            if year < 20:
+                year += 2000
             month = int(dd[3:5])
             day = int(dd[0:2])        
             dd = datetime.datetime(year=year, month=month, day=day)
@@ -181,6 +183,7 @@ def load_lot(lot):
          'production_site_certificate': lot['production_site_reference'],
          'production_site_double_counting_certificate': lot['double_counting_registration'],
          'carbure_supplier': None, 'unknown_supplier': None, 'supplier_certificate': None,
+         'carbure_client': op, 'delivery_date': dd,
     }
     vol = lot['volume']
     if isinstance(vol, str):
@@ -262,7 +265,7 @@ def load_lot(lot):
 def load_file(year, filename, delete=False):
     if delete:
         lots = CarbureLot.objects.filter(added_by=mtes, period=year, free_field='import carbure').delete()
-
+    
     wb = openpyxl.load_workbook(filename, data_only=True)
     lots_sheet = wb['Feuil1']
     colid2field = {}
