@@ -26,7 +26,7 @@ def main(args):
     
     for entity in entities:
         
-        notifs = CarbureNotification.objects.filter(dest=entity, send_by_email=True, email_sent=False).aggregate(Count('id'), Min('datetime'), Max('datetime'))
+        notifs = CarbureNotification.objects.filter(dest=entity, send_by_email=True, email_sent=False, datetime__date=today).aggregate(Count('id'), Min('datetime'), Max('datetime'))
         if notifs['id__count'] > 0:
             entity_oldest_notif[entity] = notifs['datetime__min']
 
@@ -40,7 +40,7 @@ def main(args):
             continue
 
         print('#### ENTITY %s ####' % (entity.name))
-        notifs = CarbureNotification.objects.filter(dest=entity, send_by_email=True, email_sent=False)
+        notifs = CarbureNotification.objects.filter(dest=entity, send_by_email=True, email_sent=False, datetime__date=today)
         correction_requests = notifs.filter(type=CarbureNotification.CORRECTION_REQUEST)
         correction_done = notifs.filter(type=CarbureNotification.CORRECTION_DONE)
         lots_rejected = notifs.filter(type=CarbureNotification.LOTS_REJECTED)
