@@ -23,7 +23,7 @@ from doublecount.models import DoubleCountingAgreement, DoubleCountingDocFile, D
 from doublecount.serializers import DoubleCountingAgreementFullSerializer, DoubleCountingAgreementPartialSerializer
 from doublecount.serializers import DoubleCountingAgreementFullSerializerWithForeignKeys, DoubleCountingAgreementPartialSerializerWithForeignKeys
 from doublecount.helpers import load_dc_file, load_dc_sourcing_data, load_dc_production_data
-from core.models import Entity, LotTransaction, LotV2, UserRights, MatierePremiere, Pays, Biocarburant
+from core.models import Entity, UserRights, MatierePremiere, Pays, Biocarburant, CarbureLot
 from core.xlsx_v3 import export_dca, make_biofuels_sheet, make_dc_mps_sheet, make_countries_sheet, make_dc_production_sheet, make_dc_sourcing_sheet
 from carbure.storage_backends import AWSStorage
 from django.core.files.storage import FileSystemStorage
@@ -431,13 +431,13 @@ def get_quotas_snapshot_admin(request, *args, **kwargs):
     detailed_quotas = DoubleCountingProduction.objects.values('year', 'dca__producer', 'dca__production_site', 'biofuel', 'feedstock', 'approved_quota').filter(year=year, feedstock_id__in=feedstocks.keys())
     # get a sum of all double count production
     # 2021 - PRODUCER TEST - PRODUCTION SITE 01 - BIOFUELID - FEEDSTOCKID - VOLUME
-    double_counted_production = LotTransaction.objects.filter(lot__status=LotV2.VALIDATED, lot__carbure_producer__in=producers.keys(), lot__carbure_production_site__in=production_sites.keys(), lot__year=year, lot__matiere_premiere_id__in=feedstocks.keys(), lot__biocarburant_id__in=biofuels.keys()) \
-        .values('lot__year', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__matiere_premiere', 'lot__biocarburant', 'lot__biocarburant__masse_volumique').annotate(volume=Sum('lot__volume'))
+    double_counted_production = CarbureLot.objects.filter(lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN], carbure_producer__in=producers.keys(), carbure_production_site__in=production_sites.keys(), year=year, feedstock_id__in=feedstocks.keys(), biofuel_id__in=biofuels.keys()) \
+        .values('year', 'carbure_producer', 'carbure_production_site', 'feedstock', 'biofuel', 'biofuel__masse_volumique').annotate(volume=Sum('volume'))
 
     # Merge both datasets
     df1 = pd.DataFrame(detailed_quotas).rename(columns={'dca__producer': 'producer_id', 'dca__production_site': 'production_site_id', 'biofuel': 'biofuel_id', 'feedstock': 'feedstock_id'})
-    df2 = pd.DataFrame(double_counted_production).rename(columns={'lot__year': 'year', 'lot__carbure_producer': 'producer_id', 'lot__carbure_production_site': 'production_site_id', 
-                                                                  'lot__matiere_premiere': 'feedstock_id', 'lot__biocarburant': 'biofuel_id', 'lot__biocarburant__masse_volumique': 'masse_volumique'})
+    df2 = pd.DataFrame(double_counted_production).rename(columns={'carbure_producer': 'producer_id', 'carbure_production_site': 'production_site_id', 
+                                                                  'feedstock': 'feedstock_id', 'biofuel': 'biofuel_id', 'biofuel__masse_volumique': 'masse_volumique'})
     df1.set_index(['year', 'producer_id', 'production_site_id', 'biofuel_id', 'feedstock_id'], inplace=True)
     df2.set_index(['year', 'producer_id', 'production_site_id', 'biofuel_id', 'feedstock_id'], inplace=True)
     res = df1.merge(df2, how='outer', left_index=True, right_index=True).fillna(0)
@@ -535,13 +535,12 @@ def get_production_site_quotas_admin(request, *args, **kwargs):
     feedstocks = {m.id: m for m in MatierePremiere.objects.filter(is_double_compte=True)}
 
     detailed_quotas = DoubleCountingProduction.objects.values('biofuel', 'feedstock', 'approved_quota').filter(year=year, dca__production_site_id=production_site_id)
-    production = LotTransaction.objects.filter(lot__status=LotV2.VALIDATED, lot__carbure_production_site_id=production_site_id, lot__year=year) \
-    .values('lot__matiere_premiere', 'lot__biocarburant', 'lot__biocarburant__masse_volumique').filter(lot__matiere_premiere_id__in=feedstocks.keys()).annotate(volume=Sum('lot__volume'), nb_lots=Count('id'))
+    production = CarbureLot.objects.filter(lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN], carbure_production_site_id=production_site_id, year=year) \
+    .values('feedstock', 'biofuel', 'biofuel__masse_volumique').filter(feedstock_id__in=feedstocks.keys()).annotate(volume=Sum('volume'), nb_lots=Count('id'))
 
     # Merge both datasets
     df1 = pd.DataFrame(columns={'biofuel', 'feedstock', 'approved_quota'}, data=detailed_quotas).rename(columns={'biofuel': 'biofuel_id', 'feedstock': 'feedstock_id'})
-    df2 = pd.DataFrame(columns={'lot__matiere_premiere', 'lot__biocarburant', 'volume', 'nb_lots', 'lot__biocarburant__masse_volumique'}, data=production).rename(columns={'lot__matiere_premiere': 'feedstock_id', 'lot__biocarburant': 'biofuel_id', 
-    'lot__biocarburant__masse_volumique': 'masse_volumique'})
+    df2 = pd.DataFrame(columns={'feedstock', 'biofuel', 'volume', 'nb_lots', 'biofuel__masse_volumique'}, data=production).rename(columns={'feedstock': 'feedstock_id', 'biofuel': 'biofuel_id', 'biofuel__masse_volumique': 'masse_volumique'})
     df1.set_index(['biofuel_id', 'feedstock_id'], inplace=True)
     df2.set_index(['biofuel_id', 'feedstock_id'], inplace=True)
     res = df1.merge(df2, how='outer', left_index=True, right_index=True).fillna(0).reset_index()
@@ -564,13 +563,12 @@ def get_production_site_quotas(request, *args, **kwargs):
         return JsonResponse({'status': "error", 'message': "Not authorised"}, status=403)
 
     detailed_quotas = DoubleCountingProduction.objects.values('biofuel', 'feedstock', 'approved_quota').filter(dca_id=dca_id)
-    production = LotTransaction.objects.filter(lot__status=LotV2.VALIDATED, lot__carbure_production_site_id=dca.production_site) \
-    .values('lot__year', 'lot__matiere_premiere', 'lot__biocarburant', 'lot__biocarburant__masse_volumique').filter(lot__matiere_premiere_id__in=feedstocks.keys()).annotate(volume=Sum('lot__volume'), nb_lots=Count('id'))
+    production = CarbureLot.objects.filter(lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN], carbure_production_site_id=dca.production_site) \
+    .values('year', 'feedstock', 'biofuel', 'biofuel__masse_volumique').filter(feedstock_id__in=feedstocks.keys()).annotate(volume=Sum('volume'), nb_lots=Count('id'))
 
     # Merge both datasets
     df1 = pd.DataFrame(columns={'biofuel', 'feedstock', 'approved_quota'}, data=detailed_quotas).rename(columns={'biofuel': 'biofuel_id', 'feedstock': 'feedstock_id'})
-    df2 = pd.DataFrame(columns={'lot__matiere_premiere', 'lot__biocarburant', 'volume', 'nb_lots', 'lot__biocarburant__masse_volumique'}, data=production).rename(columns={'lot__matiere_premiere': 'feedstock_id', 'lot__biocarburant': 'biofuel_id', 
-    'lot__biocarburant__masse_volumique': 'masse_volumique'})
+    df2 = pd.DataFrame(columns={'feedstock', 'biofuel', 'volume', 'nb_lots', 'biofuel__masse_volumique'}, data=production).rename(columns={'feedstock': 'feedstock_id', 'biofuel': 'biofuel_id', 'biofuel__masse_volumique': 'masse_volumique'})
     df1.set_index(['biofuel_id', 'feedstock_id'], inplace=True)
     df2.set_index(['biofuel_id', 'feedstock_id'], inplace=True)
     res = df1.merge(df2, how='outer', left_index=True, right_index=True).fillna(0).reset_index()

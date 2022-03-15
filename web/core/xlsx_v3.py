@@ -1,6 +1,5 @@
 import os
 import django
-from rest_framework import serializers
 import xlsxwriter
 import datetime
 import random
@@ -11,7 +10,7 @@ from core.serializers import CarbureLotCSVSerializer, CarbureStockCSVSerializer
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import CarbureStock, GenericCertificate, MatierePremiere, Biocarburant, Pays, Depot, Entity, ProductionSite, LotTransaction
+from core.models import CarbureStock, GenericCertificate, MatierePremiere, Biocarburant, Pays, Depot, Entity, ProductionSite
 
 
 UNKNOWN_PRODUCERS = [{'name': 'ITANOL', 'country': 'IT', 'production_site': 'BERGAMO', 'ref': 'ISCC-IT-100001010', 'date':'2017-12-01', 'dc':'IT_001_2020'},
@@ -162,88 +161,88 @@ def make_producers_or_traders_lots_sheet_advanced(workbook, entity, nb_lots, is_
             colid += 1
 
 
-def make_mb_extract_sheet(workbook, entity):
-    worksheet_lots = workbook.add_worksheet("lots")
-    clients = Entity.objects.filter(entity_type__in=['Opérateur', 'Producteur', 'Trader']).exclude(id=entity.id)
-    delivery_sites = Depot.objects.all()
-    mb_lots = LotTransaction.objects.filter(carbure_client=entity, delivery_status='A', lot__status="Validated", lot__fused_with=None)
-    my_vendor_certificates = get_my_certificates(entity=entity)
+# def make_mb_extract_sheet(workbook, entity):
+#     worksheet_lots = workbook.add_worksheet("lots")
+#     clients = Entity.objects.filter(entity_type__in=['Opérateur', 'Producteur', 'Trader']).exclude(id=entity.id)
+#     delivery_sites = Depot.objects.all()
+#     mb_lots = LotTransaction.objects.filter(carbure_client=entity, delivery_status='A', lot__status="Validated", lot__fused_with=None)
+#     my_vendor_certificates = get_my_certificates(entity=entity)
 
-    # 4/10 chances of having an exported lot
-    exported_lots = [1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
-    # header
-    bold = workbook.add_format({'bold': True})
-    columns = ['carbure_id', 'volume', 'dae', 'champ_libre', 'vendor_certificate', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
-    for i, c in enumerate(columns):
-        worksheet_lots.write(0, i, c, bold)
+#     # 4/10 chances of having an exported lot
+#     exported_lots = [1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
+#     # header
+#     bold = workbook.add_format({'bold': True})
+#     columns = ['carbure_id', 'volume', 'dae', 'champ_libre', 'vendor_certificate', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
+#     for i, c in enumerate(columns):
+#         worksheet_lots.write(0, i, c, bold)
 
-    clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
-    today = datetime.date.today().strftime('%Y-%m-%d')
-    if not len(mb_lots):
-        return
-    for i in range(10):
-        client = random.choice(clients)
-        site = random.choice(delivery_sites)
-        exported = random.choice(exported_lots)
-        lot_source = random.choice(mb_lots)
-        my_vendor_certificate = random.choice(my_vendor_certificates)
+#     clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
+#     today = datetime.date.today().strftime('%Y-%m-%d')
+#     if not len(mb_lots):
+#         return
+#     for i in range(10):
+#         client = random.choice(clients)
+#         site = random.choice(delivery_sites)
+#         exported = random.choice(exported_lots)
+#         lot_source = random.choice(mb_lots)
+#         my_vendor_certificate = random.choice(my_vendor_certificates)
 
-        row = [lot_source.lot.carbure_id, int(lot_source.lot.volume / 2), get_random_dae(), clientid, my_vendor_certificate]
-        if exported == 1:
-            # client is not in carbure
-            c = random.choice(FOREIGN_CLIENTS)
-            row += [c['name'], today, c['delivery_site'], c['country']]
-        else:
-            # regular transaction. sell to someone else
-            row += [client.name, today, site.depot_id, '']
+#         row = [lot_source.lot.carbure_id, int(lot_source.lot.volume / 2), get_random_dae(), clientid, my_vendor_certificate]
+#         if exported == 1:
+#             # client is not in carbure
+#             c = random.choice(FOREIGN_CLIENTS)
+#             row += [c['name'], today, c['delivery_site'], c['country']]
+#         else:
+#             # regular transaction. sell to someone else
+#             row += [client.name, today, site.depot_id, '']
 
-        colid = 0
-        for elem in row:
-            worksheet_lots.write(i+1, colid, elem)
-            colid += 1
+#         colid = 0
+#         for elem in row:
+#             worksheet_lots.write(i+1, colid, elem)
+#             colid += 1
 
 
-def make_mb_extract_sheet_bcghg(workbook, entity):
-    worksheet_lots = workbook.add_worksheet("lots")
-    clients = Entity.objects.filter(entity_type__in=['Opérateur', 'Producteur', 'Trader']).exclude(id=entity.id)
-    delivery_sites = Depot.objects.all()
-    mb_lots = LotTransaction.objects.filter(carbure_client=entity, delivery_status='A', lot__status="Validated", lot__fused_with=None)
-    my_vendor_certificates = get_my_certificates(entity=entity)
+# def make_mb_extract_sheet_bcghg(workbook, entity):
+#     worksheet_lots = workbook.add_worksheet("lots")
+#     clients = Entity.objects.filter(entity_type__in=['Opérateur', 'Producteur', 'Trader']).exclude(id=entity.id)
+#     delivery_sites = Depot.objects.all()
+#     mb_lots = LotTransaction.objects.filter(carbure_client=entity, delivery_status='A', lot__status="Validated", lot__fused_with=None)
+#     my_vendor_certificates = get_my_certificates(entity=entity)
 
-    # 4/10 chances of having an exported lot
-    exported_lots = [1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
-    # header
-    bold = workbook.add_format({'bold': True})
-    columns = ['biocarburant_code', 'matiere_premiere_code', 'ghg_total', 'depot', 'volume', 'dae', 'champ_libre', 'vendor_certificate', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
-    for i, c in enumerate(columns):
-        worksheet_lots.write(0, i, c, bold)
+#     # 4/10 chances of having an exported lot
+#     exported_lots = [1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
+#     # header
+#     bold = workbook.add_format({'bold': True})
+#     columns = ['biocarburant_code', 'matiere_premiere_code', 'ghg_total', 'depot', 'volume', 'dae', 'champ_libre', 'vendor_certificate', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
+#     for i, c in enumerate(columns):
+#         worksheet_lots.write(0, i, c, bold)
 
-    clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
-    today = datetime.date.today().strftime('%d/%m/%Y')
-    if not len(mb_lots):
-        return
-    for i in range(10):
-        client = random.choice(clients)
-        site = random.choice(delivery_sites)
-        exported = random.choice(exported_lots)
-        lot_source = random.choice(mb_lots)
-        my_vendor_certificate = random.choice(my_vendor_certificates)
+#     clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
+#     today = datetime.date.today().strftime('%d/%m/%Y')
+#     if not len(mb_lots):
+#         return
+#     for i in range(10):
+#         client = random.choice(clients)
+#         site = random.choice(delivery_sites)
+#         exported = random.choice(exported_lots)
+#         lot_source = random.choice(mb_lots)
+#         my_vendor_certificate = random.choice(my_vendor_certificates)
 
-        row = [lot_source.lot.biocarburant.code, lot_source.lot.matiere_premiere.code, lot_source.lot.ghg_total,
-               lot_source.carbure_delivery_site.depot_id if lot_source.delivery_site_is_in_carbure else lot_source.unknown_delivery_site,
-               int(lot_source.lot.volume / 2), get_random_dae(), clientid, my_vendor_certificate]
-        if exported == 1:
-            # client is not in carbure
-            c = random.choice(FOREIGN_CLIENTS)
-            row += [c['name'], today, c['delivery_site'], c['country']]
-        else:
-            # regular transaction. sell to someone else
-            row += [client.name, today, site.depot_id, '']
+#         row = [lot_source.lot.biocarburant.code, lot_source.lot.matiere_premiere.code, lot_source.lot.ghg_total,
+#                lot_source.carbure_delivery_site.depot_id if lot_source.delivery_site_is_in_carbure else lot_source.unknown_delivery_site,
+#                int(lot_source.lot.volume / 2), get_random_dae(), clientid, my_vendor_certificate]
+#         if exported == 1:
+#             # client is not in carbure
+#             c = random.choice(FOREIGN_CLIENTS)
+#             row += [c['name'], today, c['delivery_site'], c['country']]
+#         else:
+#             # regular transaction. sell to someone else
+#             row += [client.name, today, site.depot_id, '']
 
-        colid = 0
-        for elem in row:
-            worksheet_lots.write(i+1, colid, elem)
-            colid += 1
+#         colid = 0
+#         for elem in row:
+#             worksheet_lots.write(i+1, colid, elem)
+#             colid += 1
 
 
 

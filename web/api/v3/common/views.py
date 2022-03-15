@@ -1,8 +1,8 @@
 import datetime
 from django.http import JsonResponse
 from django.db.models import Q, Count, Sum
-from core.models import Entity, Biocarburant, MatierePremiere, Depot, Pays, LotTransaction
-from core.models import Control, ControlMessages, UserRights
+from core.models import CarbureLot, Entity, Biocarburant, MatierePremiere, Depot, Pays
+from core.models import UserRights
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
 from core.decorators import check_rights
 from django_otp.decorators import otp_required
@@ -162,58 +162,17 @@ def create_delivery_site(request):
     return JsonResponse({'status': 'success'})
 
 
-@otp_required
-@check_rights('entity_id')
-def get_controls(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
-    controls = Control.objects.filter(tx__lot__data_origin_entity=entity)
-    sez = [c.natural_key() for c in controls]
-    return JsonResponse({'status': 'success', 'data': sez})
-
-@otp_required
-def controls_upload_file(request):
-    return JsonResponse({'status': 'success'})
-
-@otp_required
-def controls_add_message(request):
-    control_id = request.POST.get('control_id', False)
-    message = request.POST.get('message', False)
-
-    if not control_id:
-        return JsonResponse({'status': 'error', 'message': 'Please submit a control_id'}, status=400)
-    if not message:
-        return JsonResponse({'status': 'error', 'message': 'Please submit a message'}, status=400)
-
-    try:
-        control = Control.objects.get(id=control_id)
-    except:
-        return JsonResponse({'status': 'error', 'message': 'Could not find control'}, status=400)
-
-    rights = {r.entity for r in UserRights.objects.filter(user=request.user)}
-    if control.tx.lot.data_origin_entity not in rights:
-        return JsonResponse({'status': 'error', 'message': 'Permission denied'}, status=403)
-
-    # all good
-    msg = ControlMessages()
-    msg.control = control
-    msg.user = request.user
-    msg.entity = control.tx.lot.data_origin_entity
-    msg.message = message
-    msg.save()
-    return JsonResponse({'status': 'success'})
-
 
 def get_stats(request):
     try:
         today = datetime.date.today()
         year = str(today.year)
-        total_volume = LotTransaction.objects.filter(lot__status='Validated', delivery_status__in=['F', 'A'], is_forwarded=False, lot__period__startswith=year, carbure_client__entity_type=Entity.OPERATOR).aggregate(Sum('lot__volume'))
+        total_volume = CarbureLot.objects.filter(lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN], year=year, delivery_type=CarbureLot.BLENDING).aggregate(Sum('volume'))
         entity_count = Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.TRADER, Entity.OPERATOR]).values('entity_type').annotate(count=Count('id'))
         entities = {}
         for r in entity_count:
             entities[r['entity_type']] = r['count']
-        total = total_volume['lot__volume__sum']
+        total = total_volume['volume__sum']
         if total is None:
             total = 1000
         return JsonResponse({'status': 'success', 'data': {'total_volume': total / 1000, 'entities': entities}})
