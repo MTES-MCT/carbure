@@ -304,4 +304,4 @@ class CarbureNotificationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CarbureNotification
-        fields = ['dest', 'datetime', 'type', 'acked', 'send_by_email', 'email_sent', 'meta']
+        fields = ['id', 'dest', 'datetime', 'type', 'acked', 'send_by_email', 'email_sent', 'meta']
