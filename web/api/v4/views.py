@@ -20,8 +20,8 @@ from api.v4.helpers import send_email_declaration_invalidated, send_email_declar
 from api.v4.lots import construct_carbure_lot, bulk_insert_lots, try_get_date
 from api.v4.sanity_checks import bulk_sanity_checks, sanity_check
 
-from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, Entity, GenericError, Pays, SustainabilityDeclaration, UserRights
-from core.serializers import CarbureLotPublicSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
+from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, Entity, GenericError, Pays, SustainabilityDeclaration, UserRights
+from core.serializers import CarbureLotPublicSerializer, CarbureNotificationSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
 from core.xlsx_v3 import template_v4, template_v4_stocks
 
 
@@ -32,6 +32,14 @@ def get_years(request, *args, **kwargs):
     data_transforms = CarbureStockTransformation.objects.filter(entity_id=entity_id).values_list('transformation_dt__year', flat=True).distinct()
     data = set(list(data_transforms) + list(data_lots))
     return JsonResponse({'status': 'success', 'data': list(data)})
+
+
+@check_user_rights()
+def get_notifications(request, *args, **kwargs):
+    entity_id = int(kwargs['context']['entity_id'])
+    notifications = CarbureNotification.objects.filter(dest_id=entity_id, acked=False)
+    data = CarbureNotificationSerializer(notifications, many=True).data
+    return JsonResponse({'status': 'success', 'data': data})
 
 
 @check_user_rights()
