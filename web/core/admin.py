@@ -17,6 +17,7 @@ from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureS
 from core.models import Depot, GenericError
 from core.models import SustainabilityDeclaration, EntityDepot
 from core.models import TransactionDistance
+from core.models import CarbureNotification
 
 def custom_titled_filter(title):
     class Wrapper(admin.FieldListFilter):
@@ -367,10 +368,12 @@ class CarbureStockTransformationAdmin(admin.ModelAdmin):
     list_display = ['transformation_type', 'source_stock_id', 'dest_stock_id', 'entity', 'transformation_dt']
     list_filter = ['transformation_type', 'entity']
 
-#@admin.register(CarbureNotification)
-#class CarbureNotificationAdmin(admin.ModelAdmin):
-#    list_display = []
-#    list_filter = ['is_sent', 'send_copy_to_admin']
+
+@admin.register(CarbureNotification)
+class CarbureNotificationAdmin(admin.ModelAdmin):
+    list_display = ['dest', 'datetime', 'type', 'acked', 'send_by_email', 'email_sent']
+    list_filter = ['acked', 'send_by_email', 'email_sent', 'dest']
+
 
 @admin.register(GenericCertificate)
 class GenericCertificateAdmin(admin.ModelAdmin):
