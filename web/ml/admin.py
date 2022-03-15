@@ -6,6 +6,7 @@ from ml.models import EECStats, EPStats, ETDStats
 @admin.register(EECStats)
 class EECStatsAdmin(admin.ModelAdmin):
     list_display = ('feedstock', 'origin', 'nb_lots', 'default_value', 'stddev', 'average')
+    list_filter = ('feedstock', 'origin',)
 
 @admin.register(EPStats)
 class EPStatsAdmin(admin.ModelAdmin):
