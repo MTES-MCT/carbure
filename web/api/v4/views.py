@@ -21,6 +21,7 @@ from api.v4.lots import construct_carbure_lot, bulk_insert_lots, try_get_date
 from api.v4.sanity_checks import bulk_sanity_checks, sanity_check
 
 from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, Entity, GenericError, Pays, SustainabilityDeclaration, UserRights
+from core.notifications import notify_correction_done, notify_correction_request, notify_declaration_cancelled, notify_declaration_validated, notify_lots_recalled, notify_lots_received, notify_lots_rejected, notify_lots_recalled
 from core.serializers import CarbureLotPublicSerializer, CarbureNotificationSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
 from core.xlsx_v3 import template_v4, template_v4_stocks
 
@@ -37,9 +38,18 @@ def get_years(request, *args, **kwargs):
 @check_user_rights()
 def get_notifications(request, *args, **kwargs):
     entity_id = int(kwargs['context']['entity_id'])
-    notifications = CarbureNotification.objects.filter(dest_id=entity_id, acked=False)
+    notifications = CarbureNotification.objects.filter(dest_id=entity_id).order_by('-datetime')[0:15]
     data = CarbureNotificationSerializer(notifications, many=True).data
     return JsonResponse({'status': 'success', 'data': data})
+
+
+@check_user_rights()
+def ack_notifications(request, *args, **kwargs):
+    entity_id = int(kwargs['context']['entity_id'])
+    notification_ids = request.POST.getlist('notification_ids', False)
+    notifications = CarbureNotification.objects.filter(dest_id=entity_id, id__in=notification_ids)
+    notifications.update(acked=True)
+    return JsonResponse({'status': 'success'})
 
 
 @check_user_rights()
@@ -689,6 +699,7 @@ def lots_send(request, *args, **kwargs):
     nb_rejected = 0
     nb_ignored = 0
     nb_auto_accepted = 0
+    trading_lots = []
     prefetched_data = get_prefetched_data(entity)
     for lot in filtered_lots:
         if lot.added_by != entity:
@@ -744,6 +755,7 @@ def lots_send(request, *args, **kwargs):
             lot.vendor_certificate_type = ''
             lot.lot_status = CarbureLot.PENDING
             lot.save()
+            trading_lots.append(lot)
             event = CarbureLotEvent()
             event.event_type = CarbureLotEvent.ACCEPTED
             event.lot = lot
@@ -797,6 +809,9 @@ def lots_send(request, *args, **kwargs):
         lot.save()
     if nb_sent == 0:
         return JsonResponse({'status': 'success', 'data': {'submitted': nb_lots, 'sent': nb_sent, 'auto-accepted': nb_auto_accepted, 'ignored': nb_ignored, 'rejected': nb_rejected}}, status=400)
+    ids = [i.id for i in filtered_lots] + [i.id for i in trading_lots]
+    notif_lots = CarbureLot.objects.filter(id__in=ids)
+    notify_lots_received(notif_lots)
     return JsonResponse({'status': 'success', 'data': {'submitted': nb_lots, 'sent': nb_sent, 'auto-accepted': nb_auto_accepted, 'ignored': nb_ignored, 'rejected': nb_rejected}})
 
 
@@ -965,12 +980,11 @@ def request_fix(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
 
     entity = Entity.objects.get(pk=entity_id)
-    for lot_id in lot_ids:
-        try:
-            lot = CarbureLot.objects.get(pk=lot_id)
-        except:
-            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
-
+    try:
+        lots = CarbureLot.objects.filter(pk__in=lot_ids)
+    except:
+        return JsonResponse({'status': 'error', 'message': 'Could not find lots'}, status=400)
+    for lot in lots.iterator():
         if lot.lot_status == CarbureLot.FROZEN:
             return JsonResponse({'status': 'error', 'message': 'Lot is already declared, now in read-only mode.'}, status=400)
 
@@ -983,6 +997,7 @@ def request_fix(request, *args, **kwargs):
         event.lot = lot
         event.user = request.user
         event.save()
+    notify_correction_request(lots)
     return JsonResponse({'status': 'success'})
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
@@ -994,12 +1009,11 @@ def mark_as_fixed(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
 
     entity = Entity.objects.get(pk=entity_id)
-    for lot_id in lot_ids:
-        try:
-            lot = CarbureLot.objects.get(pk=lot_id)
-        except:
-            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
-
+    try:
+        lots = CarbureLot.objects.filter(pk__in=lot_ids)
+    except:
+        return JsonResponse({'status': 'error', 'message': 'Could not find lots'}, status=400)
+    for lot in lots.iterator():
         if lot.added_by != entity and lot.carbure_supplier != entity and lot.carbure_client != entity:
             return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to change this lot'}, status=403)
 
@@ -1030,6 +1044,7 @@ def mark_as_fixed(request, *args, **kwargs):
         event.lot = lot
         event.user = request.user
         event.save()
+    notify_correction_done(lots)
     return JsonResponse({'status': 'success'})
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
@@ -1095,21 +1110,17 @@ def reject_lot(request, *args, **kwargs):
     lots = filter_lots(lots, request.POST, entity, will_aggregate=True)
 
     for lot in lots.iterator():
-        notify_sender = False
-
         if lot.carbure_client != entity:
             return JsonResponse({'status': 'forbidden', 'message': 'Only the client can reject this lot'}, status=403)
 
         if lot.lot_status == CarbureLot.DRAFT:
             return JsonResponse({'status': 'error', 'message': 'Cannot reject DRAFT'}, status=400)
         elif lot.lot_status == CarbureLot.PENDING:
-            # ok no problem
             pass
         elif lot.lot_status == CarbureLot.REJECTED:
             return JsonResponse({'status': 'error', 'message': 'Lot is already rejected.'}, status=400)
         elif lot.lot_status == CarbureLot.ACCEPTED:
-            # ok but will send a notification to the sender
-            notify_sender = True
+            pass
         elif lot.lot_status == CarbureLot.FROZEN:
             return JsonResponse({'status': 'error', 'message': 'Lot is Frozen. Cannot reject. Please invalidate declaration first.'}, status=400)
         elif lot.lot_status == CarbureLot.DELETED:
@@ -1124,12 +1135,7 @@ def reject_lot(request, *args, **kwargs):
         event.lot = lot
         event.user = request.user
         event.save()
-        # if notify_sender:
-        #     if event.lot.carbure_supplier and event.lot.carbure_client != event.lot.carbure_supplier:
-        #         n = CarbureNotification()
-        #         n.event = event
-        #         n.recipient = event.lot.carbure_supplier
-        #         n.save()
+    notify_lots_rejected(lots)
     return JsonResponse({'status': 'success'})
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
@@ -1141,13 +1147,11 @@ def recall_lot(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
 
     entity = Entity.objects.get(pk=entity_id)
-    for lot_id in lot_ids:
-        notify_client = False
-        try:
-            lot = CarbureLot.objects.get(pk=lot_id)
-        except:
-            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
-
+    try:
+        lots = CarbureLot.objects.filter(pk__in=lot_ids)
+    except:
+        return JsonResponse({'status': 'error', 'message': 'Could not find lots'}, status=400)
+    for lot in lots.iterator():
         if lot.carbure_supplier != entity and lot.added_by != entity:
             return JsonResponse({'status': 'forbidden', 'message': 'Only the vendor can recall the lot'}, status=403)
 
@@ -1166,8 +1170,6 @@ def recall_lot(request, *args, **kwargs):
         elif lot.lot_status == CarbureLot.DELETED:
             return JsonResponse({'status': 'error', 'message': 'Lot is deleted. Cannot recall'}, status=400)
 
-        # lot.lot_status = CarbureLot.DRAFT
-        # lot.correction_status = CarbureLot.NO_PROBLEMO
         lot.correction_status = CarbureLot.IN_CORRECTION
         lot.save()
         event = CarbureLotEvent()
@@ -1175,12 +1177,7 @@ def recall_lot(request, *args, **kwargs):
         event.lot = lot
         event.user = request.user
         event.save()
-        # if notify_client:
-        #     if event.lot.carbure_client and event.lot.carbure_client != event.lot.carbure_supplier:
-        #         n = CarbureNotification()
-        #         n.event = event
-        #         n.recipient = event.lot.carbure_client
-        #         n.save()
+    notify_lots_recalled(lots)
     return JsonResponse({'status': 'success'})
 
 
@@ -1609,6 +1606,7 @@ def validate_declaration(request, *args, **kwargs):
     declaration.declared = True
     declaration.save()
     # send email
+    notify_declaration_validated(declaration)
     send_email_declaration_validated(declaration)
     return JsonResponse({'status': 'success'})
 
@@ -1648,6 +1646,7 @@ def invalidate_declaration(request, *args, **kwargs):
     CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True, lot_status=CarbureLot.FROZEN).update(lot_status=CarbureLot.ACCEPTED)
     CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True, lot_status=CarbureLot.FROZEN).update(lot_status=CarbureLot.ACCEPTED)
     # send email
+    notify_declaration_cancelled(declaration)
     send_email_declaration_invalidated(declaration)
     return JsonResponse({'status': 'success'})
 

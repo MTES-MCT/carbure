@@ -1,0 +1,36 @@
+Bonjour,
+
+Vous avez {{nb_notifications}} nouvelles notifications sur CarbuRe:
+{% if correction_requests|length > 0 %}
+Demandes de corrections: {{correction_requests|length}}
+{% for cr in correction_requests %}
+Client {{cr.meta.client}} Lots concernés: {{cr.meta.count}} https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/out/correction
+{% endfor %}
+{% endif %}
+{% if correction_done|length > 0 %}
+Lots corrigés par vos fournisseurs: {{correction_done|length}}
+{% for cr in correction_done %}
+Fournisseur {{cr.meta.supplier}} Lots concernés: {{cr.meta.count}} https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/in/correction
+{% endfor %}
+{% endif %}
+{% if lots_rejected|length > 0 %}
+Lots refusés par vos clients: {{lots_rejected|length}}
+{% for cr in lots_rejected %}
+Client {{cr.meta.client}} Lots concernés: {{cr.meta.count}} https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/out/correction
+{% endfor %}
+{% endif %}
+{% if lots_received|length > 0 %}
+Lots reçus: {{lots_received|length}}
+{% for cr in lots_received %}
+Fournisseur {{cr.meta.supplier}} Lots concernés: {{cr.meta.count}} https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/in/pending
+{% endfor %}
+{% endif %}
+{% if lots_recalled|length > 0 %}
+Lots rappelés par vos fournisseurs: {{lots_recalled|length}}
+{% for cr in lots_recalled %}
+Fournisseur {{cr.meta.supplier}} Lots concernés: {{cr.meta.count}} Lien https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/in/pending
+{% endfor %}
+{% endif %}
+Bonne journée,
+L'équipe CarbuRe
+
