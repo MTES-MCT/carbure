@@ -13,7 +13,7 @@ from django.db.models import Sum
 
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
-from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockTransformation, Entity, EntityCertificate, ExternalAdminRights, GenericCertificate, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, UserRightsRequests
+from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, CarbureStockTransformation, Entity, EntityCertificate, ExternalAdminRights, GenericCertificate, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, UserRightsRequests
 from core.models import Depot, GenericError
 from core.models import SustainabilityDeclaration, EntityDepot
 from core.models import TransactionDistance
@@ -367,10 +367,10 @@ class CarbureStockTransformationAdmin(admin.ModelAdmin):
     list_display = ['transformation_type', 'source_stock_id', 'dest_stock_id', 'entity', 'transformation_dt']
     list_filter = ['transformation_type', 'entity']
 
-@admin.register(CarbureNotification)
-class CarbureNotificationAdmin(admin.ModelAdmin):
-    list_display = []
-    list_filter = ['is_sent', 'send_copy_to_admin']
+#@admin.register(CarbureNotification)
+#class CarbureNotificationAdmin(admin.ModelAdmin):
+#    list_display = []
+#    list_filter = ['is_sent', 'send_copy_to_admin']
 
 @admin.register(GenericCertificate)
 class GenericCertificateAdmin(admin.ModelAdmin):

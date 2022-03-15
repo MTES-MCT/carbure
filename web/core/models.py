@@ -762,23 +762,6 @@ class CarbureLotComment(models.Model):
         verbose_name = 'CarbureLotComment'
         verbose_name_plural = 'CarbureLotComments'
 
-
-class CarbureNotification(models.Model):
-    event = models.ForeignKey(CarbureLotEvent, null=False, blank=False, on_delete=models.CASCADE)
-    notif_dt = models.DateTimeField(auto_now_add=True)
-    recipient = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.CASCADE)
-    send_copy_to_admin = models.BooleanField(default=False)
-    is_sent = models.BooleanField(default=False)
-    sent_dt = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        db_table = 'carbure_notifications'
-        verbose_name = 'Carbure Email Notification'
-        verbose_name_plural = 'Cabure Email Notifications'
-        indexes = [
-            models.Index(fields=['is_sent']),
-        ]
-
 class CarbureStockEvent(models.Model):
     CREATED = "CREATED"
     UPDATED = "UPDATED"
@@ -842,3 +825,31 @@ class EntityCertificate(models.Model):
         ]
         verbose_name = 'CarbureEntityCertificates'
         verbose_name_plural = 'CarbureEntityCertificates'
+
+
+# class Notification(models.Model):
+#     CORRECTION_REQUEST = "CORRECTION_REQUEST"
+#     CORRECTION_DONE = "CORRECTION_DONE"
+#     LOTS_REJECTED = "LOTS_REJECTED"
+#     LOTS_RECEIVED = "LOTS_RECEIVED"
+#     CERTIFICATE_EXPIRED = "CERTIFICATE_EXPIRED"
+#     DECLARATION_VALIDATED = "DECLARATION_VALIDATED"
+#     DECLARATION_CANCELLED = "DECLARATION_CANCELLED"
+
+#     NOTIFICATION_TYPES = [(CORRECTION_REQUEST, CORRECTION_REQUEST), (CORRECTION_DONE, CORRECTION_DONE), (LOTS_REJECTED, LOTS_REJECTED), (CERTIFICATE_EXPIRED, CERTIFICATE_EXPIRED), (DECLARATION_VALIDATED, DECLARATION_VALIDATED), (DECLARATION_CANCELLED, DECLARATION_CANCELLED)]
+
+#     dest = models.ForeignKey(Entity, blank=False, null=False, on_delete=models.CASCADE)
+#     datetime = models.DateTimeField(null=False, blank=False)
+#     type = models.CharField(max_length=32, null=False, blank=False, choices=NOTIFICATION_TYPES)
+#     acked = models.BooleanField(default=False)
+#     send_by_email = models.BooleanField(default=False)
+#     email_sent = models.BooleanField(default=False)
+#     meta = models.JSONField(blank=True, null=True)
+
+#     class Meta:
+#         db_table = 'carbure_notifications'
+#         indexes = [
+#             models.Index(fields=['dest']),
+#         ]
+#         verbose_name = 'CarbureNotification'
+#         verbose_name_plural = 'CarbureNotifications'
