@@ -296,3 +296,12 @@ class SustainabilityDeclarationSerializer(serializers.ModelSerializer):
     class Meta:
         model = SustainabilityDeclaration
         fields = ['entity', 'declared', 'checked', 'deadline', 'period', 'reminder_count']
+
+
+
+#class NotificationSerializer(serializers.ModelSerializer):
+#    dest = EntitySerializer()
+
+#    class Meta:
+#        model = Notification
+#        fields = ['dest', 'datetime', 'type', 'acked', 'send_by_email', 'email_sent', 'meta']

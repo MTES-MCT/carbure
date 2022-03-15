@@ -20,7 +20,7 @@ from api.v4.helpers import send_email_declaration_invalidated, send_email_declar
 from api.v4.lots import construct_carbure_lot, bulk_insert_lots, try_get_date
 from api.v4.sanity_checks import bulk_sanity_checks, sanity_check
 
-from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, Entity, GenericError, Pays, SustainabilityDeclaration, UserRights
+from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, Entity, GenericError, Pays, SustainabilityDeclaration, UserRights
 from core.serializers import CarbureLotPublicSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
 from core.xlsx_v3 import template_v4, template_v4_stocks
 
@@ -1116,12 +1116,12 @@ def reject_lot(request, *args, **kwargs):
         event.lot = lot
         event.user = request.user
         event.save()
-        if notify_sender:
-            if event.lot.carbure_supplier and event.lot.carbure_client != event.lot.carbure_supplier:
-                n = CarbureNotification()
-                n.event = event
-                n.recipient = event.lot.carbure_supplier
-                n.save()
+        # if notify_sender:
+        #     if event.lot.carbure_supplier and event.lot.carbure_client != event.lot.carbure_supplier:
+        #         n = CarbureNotification()
+        #         n.event = event
+        #         n.recipient = event.lot.carbure_supplier
+        #         n.save()
     return JsonResponse({'status': 'success'})
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
@@ -1167,12 +1167,12 @@ def recall_lot(request, *args, **kwargs):
         event.lot = lot
         event.user = request.user
         event.save()
-        if notify_client:
-            if event.lot.carbure_client and event.lot.carbure_client != event.lot.carbure_supplier:
-                n = CarbureNotification()
-                n.event = event
-                n.recipient = event.lot.carbure_client
-                n.save()
+        # if notify_client:
+        #     if event.lot.carbure_client and event.lot.carbure_client != event.lot.carbure_supplier:
+        #         n = CarbureNotification()
+        #         n.event = event
+        #         n.recipient = event.lot.carbure_client
+        #         n.save()
     return JsonResponse({'status': 'success'})
 
 
