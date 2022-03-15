@@ -827,29 +827,29 @@ class EntityCertificate(models.Model):
         verbose_name_plural = 'CarbureEntityCertificates'
 
 
-# class Notification(models.Model):
-#     CORRECTION_REQUEST = "CORRECTION_REQUEST"
-#     CORRECTION_DONE = "CORRECTION_DONE"
-#     LOTS_REJECTED = "LOTS_REJECTED"
-#     LOTS_RECEIVED = "LOTS_RECEIVED"
-#     CERTIFICATE_EXPIRED = "CERTIFICATE_EXPIRED"
-#     DECLARATION_VALIDATED = "DECLARATION_VALIDATED"
-#     DECLARATION_CANCELLED = "DECLARATION_CANCELLED"
+class CarbureNotification(models.Model):
+    CORRECTION_REQUEST = "CORRECTION_REQUEST"
+    CORRECTION_DONE = "CORRECTION_DONE"
+    LOTS_REJECTED = "LOTS_REJECTED"
+    LOTS_RECEIVED = "LOTS_RECEIVED"
+    CERTIFICATE_EXPIRED = "CERTIFICATE_EXPIRED"
+    DECLARATION_VALIDATED = "DECLARATION_VALIDATED"
+    DECLARATION_CANCELLED = "DECLARATION_CANCELLED"
 
-#     NOTIFICATION_TYPES = [(CORRECTION_REQUEST, CORRECTION_REQUEST), (CORRECTION_DONE, CORRECTION_DONE), (LOTS_REJECTED, LOTS_REJECTED), (CERTIFICATE_EXPIRED, CERTIFICATE_EXPIRED), (DECLARATION_VALIDATED, DECLARATION_VALIDATED), (DECLARATION_CANCELLED, DECLARATION_CANCELLED)]
+    NOTIFICATION_TYPES = [(CORRECTION_REQUEST, CORRECTION_REQUEST), (CORRECTION_DONE, CORRECTION_DONE), (LOTS_REJECTED, LOTS_REJECTED), (CERTIFICATE_EXPIRED, CERTIFICATE_EXPIRED), (DECLARATION_VALIDATED, DECLARATION_VALIDATED), (DECLARATION_CANCELLED, DECLARATION_CANCELLED)]
 
-#     dest = models.ForeignKey(Entity, blank=False, null=False, on_delete=models.CASCADE)
-#     datetime = models.DateTimeField(null=False, blank=False)
-#     type = models.CharField(max_length=32, null=False, blank=False, choices=NOTIFICATION_TYPES)
-#     acked = models.BooleanField(default=False)
-#     send_by_email = models.BooleanField(default=False)
-#     email_sent = models.BooleanField(default=False)
-#     meta = models.JSONField(blank=True, null=True)
+    dest = models.ForeignKey(Entity, blank=False, null=False, on_delete=models.CASCADE)
+    datetime = models.DateTimeField(null=False, blank=False)
+    type = models.CharField(max_length=32, null=False, blank=False, choices=NOTIFICATION_TYPES)
+    acked = models.BooleanField(default=False)
+    send_by_email = models.BooleanField(default=False)
+    email_sent = models.BooleanField(default=False)
+    meta = models.JSONField(blank=True, null=True)
 
-#     class Meta:
-#         db_table = 'carbure_notifications'
-#         indexes = [
-#             models.Index(fields=['dest']),
-#         ]
-#         verbose_name = 'CarbureNotification'
-#         verbose_name_plural = 'CarbureNotifications'
+    class Meta:
+        db_table = 'carbure_notifications'
+        indexes = [
+            models.Index(fields=['dest_id']),
+        ]
+        verbose_name = 'CarbureNotification'
+        verbose_name_plural = 'CarbureNotifications'

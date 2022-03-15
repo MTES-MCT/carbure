@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import CarbureLot, CarbureLotEvent, CarbureLotComment, CarbureStock, CarbureStockTransformation, Depot, Entity, EntityCertificate, EntityDepot, GenericCertificate, GenericError, SustainabilityDeclaration
+from core.models import CarbureLot, CarbureLotEvent, CarbureLotComment, CarbureNotification, CarbureStock, CarbureStockTransformation, Depot, Entity, EntityCertificate, EntityDepot, GenericCertificate, GenericError, SustainabilityDeclaration
 from doublecount.serializers import BiofuelSerializer, CountrySerializer, EntitySerializer, FeedStockSerializer
 from producers.models import ProductionSite
 
@@ -299,9 +299,9 @@ class SustainabilityDeclarationSerializer(serializers.ModelSerializer):
 
 
 
-#class NotificationSerializer(serializers.ModelSerializer):
-#    dest = EntitySerializer()
+class CarbureNotificationSerializer(serializers.ModelSerializer):
+    dest = EntitySerializer()
 
-#    class Meta:
-#        model = Notification
-#        fields = ['dest', 'datetime', 'type', 'acked', 'send_by_email', 'email_sent', 'meta']
+    class Meta:
+        model = CarbureNotification
+        fields = ['dest', 'datetime', 'type', 'acked', 'send_by_email', 'email_sent', 'meta']
