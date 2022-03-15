@@ -29,23 +29,15 @@ const FAKE_NOTIF: Notification = {
     has_trading: false,
     has_direct_deliveries: false,
   },
-  date: "2022-03-14",
-  type: NotificationType.Received,
+  datetime: "2022-03-14",
+  type: NotificationType.LotsReceived,
   acked: false,
   send_by_email: false,
   email_sent: false,
   meta: {
     year: 2022,
-    received_lots: 12,
-    sender: {
-      id: 10,
-      name: "Producteur Test MTE",
-      entity_type: EntityType.Producer,
-      has_mac: false,
-      has_stocks: false,
-      has_trading: false,
-      has_direct_deliveries: false,
-    },
+    lots: 12,
+    supplier: "Producteur Test MTE",
   },
 }
 
@@ -55,7 +47,7 @@ const FAKE_NOTIFS = [
     ...FAKE_NOTIF,
     id: 20,
     date: "2022-03-13",
-    meta: { ...FAKE_NOTIF.meta, received_lots: 245 },
+    meta: { ...FAKE_NOTIF.meta, lots: 245 },
   },
   {
     ...FAKE_NOTIF,
@@ -89,7 +81,7 @@ const Notifications = () => {
 
   if (entity.id === -1) return null
 
-  const items = FAKE_NOTIFS
+  const items = notifications.result?.data.data ?? []
   const pending = items.filter((n) => !n.acked).map((n) => n.id)
 
   return (
@@ -127,11 +119,11 @@ const Notifications = () => {
             <List
               controlRef={triggerRef}
               className={css.items}
-              items={FAKE_NOTIFS}
+              items={items}
               normalize={normalizeNotification}
               onSelectValue={(item) => {
                 if (!item) return
-                ackNotifications.execute(entity.id, [item.id])
+                !item.acked && ackNotifications.execute(entity.id, [item.id])
                 navigate(getNotificationLink(item))
                 close()
               }}
@@ -140,11 +132,11 @@ const Notifications = () => {
                 <Link
                   style={{ flex: 1 }}
                   to={getNotificationLink(notif)}
-                  title={formatDateTime(notif.date)}
+                  title={formatDateTime(notif.datetime)}
                 >
                   <Col>
                     <p className={css.notificationTime}>
-                      {formatElapsedTime(notif.date)}
+                      {formatElapsedTime(notif.datetime)}
                     </p>
                     <Row
                       className={cl(
@@ -153,7 +145,7 @@ const Notifications = () => {
                       )}
                     >
                       {getNotificationText(notif)}
-                      <Radio checked={!notif.acked} />
+                      <Radio readOnly checked={!notif.acked} />
                     </Row>
                   </Col>
                 </Link>
@@ -188,18 +180,62 @@ const normalizeNotification: Normalizer<Notification> = (notif) => ({
 
 function getNotificationText(notif: Notification) {
   switch (notif.type) {
-    case NotificationType.Received:
-      return t("Vous avez reçu {{count}} lots de {{sender}}", {
-        count: notif.meta.received_lots,
-        sender: notif.meta.sender.name,
+    case NotificationType.LotsReceived:
+      return t("Vous avez reçu {{count}} lots de {{supplier}}", {
+        count: notif.meta?.count ?? 0,
+        supplier: notif.meta?.supplier,
+      })
+
+    case NotificationType.LotsRejected:
+      return t("Votre client {{client}} a rejeté {{count}} lots", {
+        count: notif.meta?.count ?? 0,
+        client: notif.meta?.client,
+      })
+
+    case NotificationType.LotsRecalled:
+      return t("Votre fournisser {{supplier}} corrige des erreurs sur {{count}} lots", {
+        count: notif.meta?.count ?? 0,
+        supplier: notif.meta?.supplier,
+      })
+
+    case NotificationType.CorrectionRequest:
+      return t("Vous avez reçu {{count}} demandes de correction de {{client}}", {
+        count: notif.meta?.count,
+        client: notif.meta?.client,
+      })
+
+    case NotificationType.CorrectionDone:
+      return t("Votre fournisseur {{supplier}} a fini de corriger {{count}} lots", {
+        count: notif.meta?.count ?? 0,
+        supplier: notif.meta?.supplier,
+      })
+
+    case NotificationType.CertificateExpired:
+      return t("Votre certificat {{certificate}} est expiré", {
+        certificate: notif.meta?.certificate,
       })
   }
 }
 
 function getNotificationLink(notif: Notification) {
   switch (notif.type) {
-    case NotificationType.Received:
-      return `/org/${notif.dest.id}/transactions/${notif.meta.year}/in/pending?suppliers=${notif.meta.sender.name}`
+    case NotificationType.LotsReceived:
+      return `/org/${notif.dest.id}/transactions/${notif.meta?.year}/in/pending?suppliers=${notif.meta?.supplier}`
+
+    case NotificationType.LotsRejected:
+      return `/org/${notif.dest.id}/transactions/${notif.meta?.year}/out/correction?clients=${notif.meta?.client}`
+
+    case NotificationType.LotsRecalled:
+      return `/org/${notif.dest.id}/transactions/${notif.meta?.year}/in/correction?suppliers=${notif.meta?.supplier}`
+
+    case NotificationType.CorrectionRequest:
+      return `/org/${notif.dest.id}/transactions/${notif.meta?.year}/out/correction?clients=${notif.meta?.client}`
+
+    case NotificationType.CorrectionDone:
+      return `/org/${notif.dest.id}/transactions/${notif.meta?.year}/in/correction?suppliers=${notif.meta?.supplier}`
+
+    case NotificationType.CertificateExpired:
+      return `/org/${notif.dest.id}/settings#certificates`
   }
 }
 
