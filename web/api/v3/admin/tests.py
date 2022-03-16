@@ -35,7 +35,7 @@ class AdminAPITest(TestCase):
         # a few entities
         self.entity1, _ = Entity.objects.update_or_create(name='Le Super Producteur 1', entity_type='Producteur')
         self.entity2, _ = Entity.objects.update_or_create(name='Le Super Producteur 2', entity_type='Producteur')
-        self.entity3, _ = Entity.objects.update_or_create(name='Le Super Administrateur 1', entity_type='Administrateur')
+        self.entity3, _ = Entity.objects.update_or_create(name='Le Super Administrateur 1', entity_type=Entity.ADMIN)
         self.entity4, _ = Entity.objects.update_or_create(name='Le Super Operateur 1', entity_type='Opérateur')
         self.entity5, _ = Entity.objects.update_or_create(name='Le Super Trader 1', entity_type='Trader')        
 
@@ -45,6 +45,7 @@ class AdminAPITest(TestCase):
         UserRights.objects.update_or_create(user=self.user1, entity=self.entity3)
         UserRights.objects.update_or_create(user=self.user2, entity=self.entity2)
         UserRights.objects.update_or_create(user=self.user3, entity=self.entity4)
+        UserRights.objects.update_or_create(user=self.admin_user, entity=self.entity3)
 
         # login as an admin
         loggedin = self.client.login(username=self.admin_email, password=self.admin_password)
