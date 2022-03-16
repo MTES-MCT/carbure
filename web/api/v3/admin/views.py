@@ -16,7 +16,7 @@ from django.conf import settings
 from core.models import UserRightsRequests
 from core.common import get_transaction_distance
 from doublecount.models import DoubleCountingAgreement
-
+from api.v4.helpers import filter_lots
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -533,12 +533,14 @@ def grade(volume, min, max):
 
 @is_admin
 def map(request):
+    admin_entities_rights = UserRights.objects.filter(user=request.user, entity__entity_type=Entity.ADMIN)
+    entity = admin_entities_rights[0].entity
     lots = CarbureLot.objects.select_related(
         'carbure_producer', 'carbure_production_site', 'production_country',
         'feedstock', 'biofuel', 'country_of_origin', 'added_by', 
         'carbure_supplier', 'carbure_client', 'carbure_delivery_site', 'delivery_site_country',
     ).filter(lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN, CarbureLot.PENDING])
-    lots = filter_lots(lots, request.GET)
+    lots = filter_lots(lots, request.GET, entity)
 
     # on veut: nom site de depart, gps depart, nom site arrivee, gps arrivee, volume
     lots = lots.filter(carbure_production_site__isnull=False, carbure_delivery_site__isnull=False)
