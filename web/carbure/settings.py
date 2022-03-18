@@ -106,19 +106,15 @@ WSGI_APPLICATION = 'carbure.wsgi.application'
 # id = models.AutoField(primary_key=True)
 DEFAULT_AUTO_FIELD='django.db.models.AutoField'
 
-if env('TEST') is False:
-    DATABASES = {'default': {
-        'ENGINE': 'django_query_profiler.django.db.backends.mysql',
-        'NAME': env('DJANGO_DATABASE'),
-        'USER': env('DJANGO_DB_USER'),
-        'PASSWORD': env('DJANGO_DB_PASSWORD'),
-        'HOST': env('DJANGO_DB_HOST'),
-        'PORT': env('DJANGO_DB_PORT'),
-        }
+DATABASES = {'default': {
+    'ENGINE': 'django_query_profiler.django.db.backends.mysql',
+    'NAME': env('DJANGO_DATABASE'),
+    'USER': env('DJANGO_DB_USER'),
+    'PASSWORD': env('DJANGO_DB_PASSWORD'),
+    'HOST': env('DJANGO_DB_HOST'),
+    'PORT': env('DJANGO_DB_PORT'),
     }
-else:
-    print('TESTING MODE')
-    DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3'}}
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
