@@ -12,6 +12,31 @@ django.setup()
 usermodel = get_user_model()
 from core.models import Entity, MatierePremiere, Pays, Biocarburant, CarbureLot
 
+default_eec_values = {
+    'ETHBETTERAVE':12,
+    'ETHBLE':23,
+    'ETHMAIS':20,
+    'ETHCANNE_A_SUCRE':14,
+    'ETBEBETTERAVE':12,
+    'ETBEBLE':23,
+    'ETBEMAIS':20,
+    'ETBECANNE_A_SUCRE':14,
+    'EMHVCOLZA':29,
+    'EMHVTOURNESOL':18,
+    'EMHVSOJA':19,
+    'EMHVHUILE_PALME':14,
+    'EMHUHUILE_ALIMENTAIRE_USAGEE':0,
+    'HVOGCOLZA':30,
+    'HVOGTOURNESOL':18,
+    'HVOGHUILE_PALME':15,
+    'HVOECOLZA':30,
+    'HVOETOURNESOL':18,
+    'HVOEHUILE_PALME':15,
+    'HVOCOLZA':30,
+    'HVOTOURNESOL':18,
+    'HVOHUILE_PALME':15,
+}
+
 # load data
 producers = {p.name.upper():p for p in Entity.objects.filter(entity_type='Producteur')}
 Entity.objects.update_or_create(name='ATLANTIC ENERGY', entity_type=Entity.OPERATOR)
@@ -182,9 +207,12 @@ def load_lot(lot):
          'production_country': upsc, 'production_site_commissioning_date': lupscd,
          'production_site_certificate': lot['production_site_reference'],
          'production_site_double_counting_certificate': lot['double_counting_registration'],
-         'carbure_supplier': None, 'unknown_supplier': None, 'supplier_certificate': None,
-         'carbure_client': op, 'delivery_date': dd,
+         'carbure_supplier': None, 'unknown_supplier': None,
+         'carbure_client': op, 'delivery_date': dd, 'transport_document_reference': dae,
     }
+    cert = lot.get('supplier_certificate', '')
+    if cert is not None:
+        d['supplier_certificate'] = cert[0:63]
     vol = lot['volume']
     if isinstance(vol, str):
         vol = vol.replace(',', '').replace(' ', '')
@@ -226,30 +254,40 @@ def load_lot(lot):
     else:
         lpo = ''
     if lpo not in countries:
-        print('Could not find country of origin %s' % (lpo))
-        return
+        print('Could not find country of origin %s - assuming france' % (lpo))
+        lpo = 'FR'
     d['country_of_origin'] = countries[lpo]
-    d['ep'] = lot['ep'] if type(lot['ep']) == 'float' else 0
-    d['etd'] = lot['etd'] if type(lot['etd']) == 'float' else 0
-    d['ghg_total'] = lot['GES TOTAL']
-    d['ghg_reference'] = 83.8
-    if d['ghg_total'] is None:
-        if d['ep'] + d['etd'] > 0:
-            d['ghg_total'] = d['ep'] + d['etd']
-        else:
-            print('GHG TOTAL is NONE')
-            print(lot)
-            return
-    ghg_total = d['ghg_total']
-    if isinstance(ghg_total, str):
-        ghg_total = ghg_total.replace(',', '.')
+    ##### GES
+    ### case 1: ep and etd are defined
     try:
-        ghg_total = float(ghg_total)
+        d['ep'] = float(lot['ep'])
+        d['etd'] = float(lot['etd'])
+        d['ghg_total'] = d['ep'] + d['etd']
+        eec_key = bc.code+mp.code
+        if eec_key in default_eec_values:
+            d['eec'] = default_eec_values[eec_key]
+            d['ep'] -= d['eec']
     except:
-        print('could not parse ghg value %s' % (ghg_total))
+        ### else only take GES TOTAL
+        ghg_total = lot['GES TOTAL']
+        if isinstance(ghg_total, str):
+            ghg_total = ghg_total.replace(',', '.')
+            try:
+                ghg_total = float(ghg_total)
+                d['ghg_total'] = ghg_total
+            except:
+                print('could not parse ghg value %s' % (ghg_total))
+                print(lot)
+                return
+        else:
+            d['ghg_total'] = ghg_total
+    if d['ghg_total'] is None:
+        print('NONE GES')
+        print(lot)
         return
-    d['ghg_total'] = ghg_total
-    d['ghg_reduction'] = round((1.0 - (ghg_total / d['ghg_reference'])) * 100.0, 2)
+    d['ghg_reference'] = 83.8
+    d['ghg_total'] = round(d['ghg_total'], 2)
+    d['ghg_reduction'] = round((1.0 - (d['ghg_total'] / d['ghg_reference'])) * 100.0, 2)
     d['lot_status'] = CarbureLot.FROZEN
     d['added_by'] = mtes
     d['free_field'] = 'import carbure'
@@ -264,7 +302,9 @@ def load_lot(lot):
     
 def load_file(year, filename, delete=False):
     if delete:
-        lots = CarbureLot.objects.filter(added_by=mtes, period=year, free_field='import carbure').delete()
+        lots = CarbureLot.objects.filter(added_by=mtes, year=year, free_field='import carbure').delete()
+        print(lots)
+        return
     
     wb = openpyxl.load_workbook(filename, data_only=True)
     lots_sheet = wb['Feuil1']
