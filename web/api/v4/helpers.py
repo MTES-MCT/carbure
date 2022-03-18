@@ -44,16 +44,18 @@ def get_entity_stock(entity_id):
                         'carbure_client', 'carbure_supplier')
 
 
-def get_entity_lots_by_status(entity, status=None):
+def get_entity_lots_by_status(entity, status=None, export=False):
     lots = CarbureLot.objects.select_related(
-        'carbure_producer', 'carbure_supplier', 'carbure_client', 'added_by',
+        'carbure_producer', 'carbure_supplier', 'carbure_client', 'added_by', 'carbure_vendor',
         'carbure_production_site', 'carbure_production_site__producer', 'carbure_production_site__country', 'production_country',
         'carbure_dispatch_site', 'carbure_dispatch_site__country', 'dispatch_site_country',
         'carbure_delivery_site', 'carbure_delivery_site__country', 'delivery_site_country',
         'feedstock', 'biofuel', 'country_of_origin',
         'parent_lot', 'parent_stock', 'parent_stock__carbure_client', 'parent_stock__carbure_supplier',
         'parent_stock__feedstock', 'parent_stock__biofuel', 'parent_stock__depot', 'parent_stock__country_of_origin', 'parent_stock__production_country'
-    ).prefetch_related('genericerror_set', 'carbure_production_site__productionsitecertificate_set')
+    )
+    if not export:
+        lots = lots.prefetch_related('genericerror_set', 'carbure_production_site__productionsitecertificate_set')
     if status == 'DRAFTS':
         lots = lots.filter(added_by=entity, lot_status=CarbureLot.DRAFT)
     elif status == 'IN':
@@ -76,6 +78,15 @@ def get_lots_with_metadata(lots, entity, query):
     lots = filter_lots(lots, query, entity)
     # sorting
     lots = sort_lots(lots, query)
+
+    if export:
+        file_location = export_carbure_lots(entity, lots)
+        with open(file_location, "rb") as excel:
+            data = excel.read()
+            ctype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            response = HttpResponse(content=data, content_type=ctype)
+            response['Content-Disposition'] = 'attachment; filename="%s"' % (file_location)
+        return response
 
     # pagination
     from_idx = int(from_idx)
@@ -101,17 +112,8 @@ def get_lots_with_metadata(lots, entity, query):
     data['total_deadline'] = total_deadline
     data['errors'] = get_lots_errors(returned, entity)
     data['ids'] = list(lots.values_list('id', flat=True))
+    return JsonResponse({'status': 'success', 'data': data})
 
-    if not export:
-        return JsonResponse({'status': 'success', 'data': data})
-    else:
-        file_location = export_carbure_lots(entity, returned)
-        with open(file_location, "rb") as excel:
-            data = excel.read()
-            ctype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            response = HttpResponse(content=data, content_type=ctype)
-            response['Content-Disposition'] = 'attachment; filename="%s"' % (file_location)
-        return response
 
 
 def get_current_deadline():
