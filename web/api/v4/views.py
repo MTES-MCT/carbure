@@ -97,11 +97,12 @@ def get_lots(request, *args, **kwargs):
     entity_id = context['entity_id']
     status = request.GET.get('status', False)
     selection = request.GET.get('selection', False)
+    export = request.GET.get('export', False)
     if not status and not selection:
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
     try:
         entity = Entity.objects.get(id=entity_id)
-        lots = get_entity_lots_by_status(entity, status)
+        lots = get_entity_lots_by_status(entity, status, export)
         return get_lots_with_metadata(lots, entity, request.GET)
     except Exception:
         traceback.print_exc()

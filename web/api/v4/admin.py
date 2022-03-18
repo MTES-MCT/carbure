@@ -60,11 +60,12 @@ def get_lots(request, *args, **kwargs):
     status = request.GET.get('status', False)
     selection = request.GET.get('selection', False)
     entity_id = request.GET.get('entity_id', False)
+    export = request.GET.get('export', False)
     if not status and not selection:
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
     try:
         entity = Entity.objects.get(id=entity_id)
-        lots = get_admin_lots_by_status(entity, status)
+        lots = get_admin_lots_by_status(entity, status, export)
         return get_lots_with_metadata(lots, entity, request.GET)
     except Exception:
         traceback.print_exc()
@@ -357,7 +358,7 @@ def init_declaration(entity, period, declarations):
     return declarations[entity][period]
 
 
-def get_admin_lots_by_status(entity, status):
+def get_admin_lots_by_status(entity, status, export=False):
     lots = CarbureLot.objects.select_related(
         'carbure_producer', 'carbure_supplier', 'carbure_client', 'added_by',
         'carbure_production_site', 'carbure_production_site__producer', 'carbure_production_site__country', 'production_country',
@@ -366,7 +367,9 @@ def get_admin_lots_by_status(entity, status):
         'feedstock', 'biofuel', 'country_of_origin',
         'parent_lot', 'parent_stock', 'parent_stock__carbure_client', 'parent_stock__carbure_supplier',
         'parent_stock__feedstock', 'parent_stock__biofuel', 'parent_stock__depot', 'parent_stock__country_of_origin', 'parent_stock__production_country'
-    ).prefetch_related('genericerror_set', 'carbure_production_site__productionsitecertificate_set')
+    )
+    if not export:
+        lots = lots.prefetch_related('genericerror_set', 'carbure_production_site__productionsitecertificate_set')
 
     lots = lots.exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
 
