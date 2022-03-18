@@ -346,7 +346,7 @@ def stock_split(request, *args, **kwargs):
         lot.year = lot.delivery_date.year
         lot.period = lot.delivery_date.year * 100 + lot.delivery_date.month
         lot.carbure_dispatch_site = stock.depot
-        lot.dispatch_site_country = lot.carbure_dispatch_site.country
+        lot.dispatch_site_country = lot.carbure_dispatch_site.country if lot.carbure_dispatch_site else None
         lot.carbure_supplier_id = entity_id
         lot.added_by_id = entity_id
         lot.dispatch_date = entry.get('dispatch_date', None)
