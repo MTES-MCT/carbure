@@ -9,6 +9,11 @@ include:
 
 variables:
   DS_PYTHON_VERSION: 3
+  MYSQL_DATABASE: "carbure_mysql_test_db"
+  MYSQL_ROOT_PASSWORD: "carbure_mysql_ci_db_password"
+
+services:
+  - mysql:latest
 
 prune_images:
   stage: prune
@@ -56,12 +61,18 @@ quality:
 test:
   image: registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:$CI_COMMIT_SHORT_SHA
   stage: test
+  variables:
+    DJANGO_DATABASE: $MYSQL_DATABASE
+    DJANGO_DB_USER: "root"
+    DJANGO_DB_PASSWORD: $MYSQL_ROOT_PASSWORD
+    DJANGO_DB_HOST: mysql
+    DJANGO_DB_PORT: 3306
   script:
     - export SECRET_KEY="j(h%-0woxpb@5k%@1p5_b&fqq2v&!v6r&d$#@rwkawnsy)*5k@"
     - export SENTRY_DSN=""
+    - export TEST=1    
     - export ALLOWED_HOSTS="carbure.local"
     - export CARBURE_HOME=/app
-    - export TEST=1
     - export IMAGE_TAG=ci
     - echo "Testing..."
     - cd /app/web
