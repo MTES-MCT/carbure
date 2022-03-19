@@ -1,6 +1,6 @@
 image:
-  docker:dind
-
+  docker:20.10.11-dind
+  
 stages:
   - prune
   - build
@@ -14,6 +14,13 @@ variables:
   DS_PYTHON_VERSION: 3
   MYSQL_DATABASE: "carbure_mysql_test_db"
   MYSQL_ROOT_PASSWORD: "carbure_mysql_ci_db_password"
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+
+services:
+  - name: docker:20.10.11-dind
+    alias: docker
+
 
 #prune_images:
 #  stage: prune
