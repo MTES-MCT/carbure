@@ -3,18 +3,20 @@ import useTitle from "common-v2/hooks/title"
 import IframeResizer from "iframe-resizer-react"
 import { useTranslation } from "react-i18next"
 
+const currentYear = new Date().getFullYear()
+
 const PublicStats = () => {
   const { t } = useTranslation()
   useTitle(t("Statistiques publiques"))
 
   const publicLink =
-    "https://metabase.carbure.beta.gouv.fr/public/dashboard/98aaecc5-4899-4f6f-8649-fa906977e73b"
+    "https://metabase.carbure.beta.gouv.fr/public/dashboard/7850c353-c225-4b51-9181-6e45f59ea3ba"
 
   return (
     <Main>
       <section>
         <IframeResizer
-          src={publicLink}
+          src={`${publicLink}?annee=${currentYear}`}
           frameBorder="0"
           allowTransparency
           style={{ boxShadow: "var(--shadow)" }}
