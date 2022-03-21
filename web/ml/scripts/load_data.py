@@ -11,7 +11,7 @@ from ml.models import EECStats, EPStats
 from core.models import Entity, MatierePremiere, Biocarburant, CarbureLot
 
 def load_eec_data():
-    data = CarbureLot.objects.filter(feedstock__category=MatierePremiere.CONV, lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN], country_of_origin__isnull=False)\
+    data = CarbureLot.objects.filter(year__gte=2021, feedstock__category=MatierePremiere.CONV, lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN], country_of_origin__isnull=False)\
     .exclude(eec=0)\
     .values('feedstock', 'country_of_origin')\
     .annotate(nb_lots=Count('eec'), average=Avg('eec'), stddev=StdDev('eec'), min=Min('eec'), max=Max('eec'))\
@@ -25,7 +25,7 @@ def load_eec_data():
         EECStats.objects.update_or_create(feedstock_id=entry['feedstock'], origin_id=entry['country_of_origin'], defaults=d)
 
 def load_ep_data():
-    data = CarbureLot.objects.filter(lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN], country_of_origin__isnull=False)\
+    data = CarbureLot.objects.filter(year__gte=2021, lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN], country_of_origin__isnull=False)\
     .exclude(ep=0)\
     .values('biofuel', 'feedstock',)\
     .annotate(nb_lots=Count('ep'), average=Avg('ep'), stddev=StdDev('ep'), min=Min('ep'), max=Max('ep'))\
