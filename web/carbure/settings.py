@@ -116,6 +116,11 @@ DATABASES = {'default': {
     }
 }
 
+if env('TEST') == 1:
+    DATABASES['default']['OPTIONS'] = {
+        'auth_plugin': 'mysql_native_password'
+    }
+
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
