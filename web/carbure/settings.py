@@ -117,6 +117,7 @@ DATABASES = {'default': {
 }
 
 if env('TEST') == 1:
+    print("DB TESTING MODE")
     DATABASES['default']['OPTIONS'] = {
         'auth_plugin': 'mysql_native_password'
     }
