@@ -67,7 +67,7 @@ quality:
 
 test:
   services:
-  - mysql:latest
+  - mysql:5.7
   image: registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:$CI_COMMIT_SHORT_SHA
   stage: test
   variables:
