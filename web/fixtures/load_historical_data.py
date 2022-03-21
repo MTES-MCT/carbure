@@ -265,8 +265,12 @@ def load_lot(lot):
         d['ghg_total'] = d['ep'] + d['etd']
         eec_key = bc.code+mp.code
         if eec_key in default_eec_values:
-            d['eec'] = default_eec_values[eec_key]
-            d['ep'] -= d['eec']
+            eec = default_eec_values[eec_key]
+            if d['ep'] - eec < 0:
+                pass
+            else:
+                d['eec'] = eec
+                d['ep'] -= eec
     except:
         ### else only take GES TOTAL
         ghg_total = lot['GES TOTAL']
