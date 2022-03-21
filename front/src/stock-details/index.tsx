@@ -17,7 +17,7 @@ import { SplitOneButton } from "transactions/actions/split"
 import { useCategory } from "transactions/components/category"
 import { UserRole } from "carbure/types"
 import { CancelOneTransformButton } from "transactions/actions/transform-cancel"
-// import { FlushOneButton } from "transactions/actions/flush-stock"
+import { FlushOneButton } from "transactions/actions/flush-stock"
 
 interface StockDetailsProps {
   neighbors: number[]
@@ -44,7 +44,7 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
   const owner = stockData?.stock.carbure_client
   const remaining = stockData?.stock.remaining_volume ?? 0
   const volume = stockData?.stock.initial_volume ?? 0
-  const percent = (100 * remaining) / (volume || 1)
+  const percentLeft = volume > 0 ? (100 * remaining) / volume : 100
 
   const closeDialog = () =>
     navigate({
@@ -77,7 +77,7 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
         {hasEditRights && stockData && stockData.stock.remaining_volume > 0 && (
           <>
             <SplitOneButton stock={stockData.stock} />
-            {/* <FlushOneButton stock={stockData.stock} /> */}
+            {percentLeft <= 1 && <FlushOneButton stock={stockData.stock} />}
             {stockData.parent_transformation && (
               <CancelOneTransformButton stock={stockData.stock} />
             )}
@@ -87,7 +87,7 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
           <p>
             <Trans>
               <b>{{ remaining: formatNumber(remaining) }} litres restants</b> (
-              {{ percent: formatPercentage(percent) }})
+              {{ percent: formatPercentage(percentLeft) }})
             </Trans>
           </p>
         </Alert>

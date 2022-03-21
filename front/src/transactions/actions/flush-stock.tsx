@@ -30,7 +30,7 @@ export const FlushManyButton = ({
   return (
     <Button
       disabled={disabled || selection.length === 0}
-      variant="warning"
+      variant="danger"
       icon={DropOff}
       label={t("Marquer comme vide")}
       action={() =>
@@ -54,7 +54,7 @@ export const FlushOneButton = ({ icon, stock }: FlushOneButtonProps) => {
   return (
     <Button
       captive
-      variant={icon ? "icon" : "warning"}
+      variant={icon ? "icon" : "danger"}
       icon={DropOff}
       label={t("Marquer comme vide")}
       action={() =>
@@ -155,7 +155,7 @@ const FlushDialog = ({ summary, selection, onClose }: FlushDialogProps) => {
           asideX
           submit="flush-form"
           loading={flushStocks.loading}
-          variant="warning"
+          variant="danger"
           icon={DropOff}
           label={t("Vider")}
         />
