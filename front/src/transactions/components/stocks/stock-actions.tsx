@@ -4,7 +4,7 @@ import { TransformManyButton } from "transactions/actions/transform"
 import { ExportStocksButton } from "transactions/actions/export"
 import { StockExcelButton } from "transactions/actions/stock-excel"
 import { CancelManyTransformButton } from "transactions/actions/transform-cancel"
-// import { FlushManyButton } from "transactions/actions/flush-stock"
+import { FlushManyButton } from "transactions/actions/flush-stock"
 
 export interface StockActionsProps {
   count: number
@@ -18,7 +18,7 @@ export const StockActions = ({ count, ...props }: StockActionsProps) => {
       <StockExcelButton />
       <TransformManyButton {...props} />
       <CancelManyTransformButton {...props} />
-      {/* <FlushManyButton {...props} /> */}
+      <FlushManyButton {...props} />
       <ExportStocksButton asideX {...props} />
     </ActionBar>
   )
