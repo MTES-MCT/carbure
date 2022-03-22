@@ -116,11 +116,20 @@ def check_certificates(prefetched_data, lot, errors):
             errors.append(generic_error(error='MISSING_REF_DBL_COUNTING', lot=lot, display_to_recipient=True, field='dc_reference'))
         else:
             if dc_cert not in prefetched_data['double_counting_certificates']:
-                errors.append(generic_error(error='UNKNOWN_DOUBLE_COUNTING_CERTIFICATE', lot=lot, display_to_recipient=True, field='dc_reference'))
+                # 2022-03-22: GC requests that this is a blocking error
+                errors.append(generic_error(error='UNKNOWN_DOUBLE_COUNTING_CERTIFICATE', lot=lot, blocking=True, display_to_recipient=True, field='dc_reference'))
             else:
                 dcc = prefetched_data['double_counting_certificates'][dc_cert]
-                if dcc.valid_until < lot.delivery_date:
+                dcc_period = dcc.valid_until.year * 100 + dcc.valid_until.month # ex 202012
+                if dcc_period < lot.period:
+                    # 2022-03-22: GC requests that expired dc certificates are blocking after the next declaration. 
+                    # Ex: a certificate expiring at the beginning of June is valid for the June declaration
+                    errors.append(generic_error(error='EXPIRED_DOUBLE_COUNTING_CERTIFICATE', display_to_recipient=True, is_blocking=True, lot=lot))
+                elif dcc.valid_until < lot.delivery_date:
+                    # Non blocking
                     errors.append(generic_error(error='EXPIRED_DOUBLE_COUNTING_CERTIFICATE', display_to_recipient=True, lot=lot))
+                else:
+                    pass
     return errors
 
 def sanity_check(lot, prefetched_data):
