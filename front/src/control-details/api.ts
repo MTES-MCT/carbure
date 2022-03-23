@@ -1,6 +1,6 @@
 import { EntityManager } from "carbure/hooks/entity"
 import api, { Api } from "common-v2/services/api"
-import { LotDetails } from "lot-details/types"
+import { LotDetails } from "transaction-details/types"
 
 const admin = {
   getLotDetails(entity_id: number, lot_id: number) {

@@ -13,7 +13,7 @@ import NoResult from "../no-result"
 import StockActions from "./stock-actions"
 import { SearchBar } from "../search-bar"
 import { StockSummaryBar } from "./stock-summary"
-import StockDetails from "stock-details"
+import StockDetails from "transaction-details/components/stocks"
 import { QueryParams, useQueryParamsStore } from "../lots"
 import { useAutoCategory } from "../category"
 

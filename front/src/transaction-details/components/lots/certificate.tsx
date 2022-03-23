@@ -3,7 +3,7 @@ import Dialog from "common-v2/components/dialog"
 import { FileCheck, Return } from "common-v2/components/icons"
 import { usePortal } from "common-v2/components/portal"
 import { formatDate } from "common-v2/utils/formatters"
-import { LotCertificate } from "lot-details/types"
+import { LotCertificate } from "transaction-details/types"
 import { useTranslation } from "react-i18next"
 
 interface CertificateProps {

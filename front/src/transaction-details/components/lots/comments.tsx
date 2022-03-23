@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { LotComment } from "../types"
+import { LotComment } from "../../types"
 import { useMutation } from "common-v2/hooks/async"
 import { formatDateTime } from "common-v2/utils/formatters"
 import Collapse from "common-v2/components/collapse"

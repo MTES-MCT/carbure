@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { LotComment } from "lot-details/types"
+import { LotComment } from "transaction-details/types"
 import { useMutation } from "common-v2/hooks/async"
 import { formatDateTime } from "common-v2/utils/formatters"
 import Collapse from "common-v2/components/collapse"

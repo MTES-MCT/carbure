@@ -5,7 +5,7 @@ import Checkbox, { CheckboxGroup } from "common-v2/components/checkbox"
 import Collapse from "common-v2/components/collapse"
 import { AlertTriangle } from "common-v2/components/icons"
 import { useMutation } from "common-v2/hooks/async"
-import { normalizeAnomaly } from "lot-details/components/anomalies"
+import { normalizeAnomaly } from "transaction-details/components/lots/anomalies"
 import { Lot, LotError } from "transactions/types"
 import pickApi from "../api"
 

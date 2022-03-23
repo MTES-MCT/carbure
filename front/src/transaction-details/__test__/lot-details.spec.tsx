@@ -5,8 +5,8 @@ import userEvent from "@testing-library/user-event"
 import { Entity } from "carbure/types"
 
 import { operator, producer } from "common/__test__/data"
-import LotDetails from "../index"
-import { LotDetails as LotDetailsData } from "lot-details/types"
+import LotDetails from "../components/lots/index"
+import { LotDetails as LotDetailsData } from "transaction-details/types"
 
 import server from "./api"
 
