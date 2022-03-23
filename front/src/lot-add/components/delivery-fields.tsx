@@ -25,7 +25,7 @@ import { Country, Depot } from "common/types"
 import Select, { SelectProps } from "common-v2/components/select"
 import { DeliveryType } from "transactions/types"
 import { compact, uniqueBy } from "common-v2/utils/collection"
-import CertificateIcon from "lot-details/components/certificate"
+import CertificateIcon from "transaction-details/components/lots/certificate"
 
 interface DeliveryFieldsProps {
   readOnly?: boolean

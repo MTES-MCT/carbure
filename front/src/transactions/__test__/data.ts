@@ -1,4 +1,4 @@
-import { lot } from "lot-details/__test__/data"
+import { lot } from "transaction-details/__test__/data"
 import { DeliveryType, LotList, LotSummary, Snapshot } from "transactions/types"
 
 export const emptySnapshot: Snapshot = {

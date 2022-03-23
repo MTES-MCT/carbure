@@ -16,7 +16,7 @@ import { LotFormValue } from "./lot-form"
 import { UserCheck } from "common-v2/components/icons"
 import { Entity } from "carbure/types"
 import { Country, ProductionSite } from "common/types"
-import CertificateIcon from "lot-details/components/certificate"
+import CertificateIcon from "transaction-details/components/lots/certificate"
 import { compact, uniqueBy } from "common-v2/utils/collection"
 
 interface ProductionFieldsProps {

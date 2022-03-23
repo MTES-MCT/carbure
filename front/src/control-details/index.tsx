@@ -10,18 +10,21 @@ import Button from "common-v2/components/button"
 import { Alarm, Return } from "common-v2/components/icons"
 import LotForm, { useLotForm } from "lot-add/components/lot-form"
 import LotTag from "transactions/components/lots/lot-tag"
-import Comments from "lot-details/components/comments"
+import Comments from "transaction-details/components/lots/comments"
 import {
   BlockingAnomalies,
   separateAnomalies,
-} from "lot-details/components/anomalies"
-import { getLotChanges, LotHistory } from "lot-details/components/history"
+} from "transaction-details/components/lots/anomalies"
+import {
+  getLotChanges,
+  LotHistory,
+} from "transaction-details/components/lots/history"
 import { isExpiring } from "common-v2/utils/deadline"
 import Alert from "common-v2/components/alert"
-import NavigationButtons from "lot-details/components/navigation"
+import NavigationButtons from "transaction-details/components/lots/navigation"
 import LotTraceability, {
   hasTraceability,
-} from "lot-details/components/lot-traceability"
+} from "transaction-details/components/lots/lot-traceability"
 import { WarningAnomalies } from "./components/warnings"
 import { invalidate } from "common-v2/hooks/invalidate"
 import { PinOneButton } from "controls/actions/pin"

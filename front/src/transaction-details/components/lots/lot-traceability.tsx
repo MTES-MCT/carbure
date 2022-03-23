@@ -1,33 +1,43 @@
+import { useTranslation } from "react-i18next"
 import { ExternalLink } from "common-v2/components/button"
 import Collapse from "common-v2/components/collapse"
-import { Split } from "common-v2/components/icons"
 import { formatNumber } from "common-v2/utils/formatters"
-import { useTranslation } from "react-i18next"
-import { StockDetails } from "stock-details/types"
+import { LotDetails } from "transaction-details/types"
+import { Split } from "common-v2/components/icons"
 
 export interface TraceabilityProps {
-  details: StockDetails | undefined
+  details: LotDetails | undefined
+  parentLotRoot?: string
+  parentStockRoot?: string
+  childLotRoot?: string
+  childStockRoot?: string
 }
 
-export const StockTraceability = ({ details }: TraceabilityProps) => {
+export const LotTraceability = ({
+  details,
+  parentLotRoot = "../../in/history/",
+  parentStockRoot = "../stocks/history/",
+  childLotRoot = "../../out/history/",
+  childStockRoot = "../../stocks/history/",
+}: TraceabilityProps) => {
   const { t } = useTranslation()
 
   const parentLot = details?.parent_lot ?? undefined
-  const parentTransform = details?.parent_transformation ?? undefined
+  const parentStock = details?.parent_stock ?? undefined
 
   const childrenLot = details?.children_lot ?? []
-  const childrenTransform = details?.children_transformation ?? []
+  const childrenStock = details?.children_stock ?? []
 
-  const hasParent = parentLot !== undefined || parentTransform !== undefined
-  const hasChildren = childrenLot.length > 0 || childrenTransform.length > 0
+  const hasParent = parentLot !== undefined || parentStock !== undefined
+  const hasChildren = childrenLot.length > 0 || childrenStock.length > 0
 
   const childrenLotVolume = childrenLot.reduce(
     (total, child) => total + child.volume,
     0
   )
 
-  const childrenTransformVolume = childrenTransform.reduce(
-    (total, child) => total + child.volume_deducted_from_source,
+  const childrenTransformVolume = childrenStock.reduce(
+    (total, child) => total + child.initial_volume,
     0
   )
 
@@ -39,7 +49,7 @@ export const StockTraceability = ({ details }: TraceabilityProps) => {
           <ul>
             {parentLot && (
               <li>
-                <ExternalLink to={`../../in/history/${parentLot.id}`}>
+                <ExternalLink to={`${parentLotRoot}${parentLot.id}`}>
                   Lot {parentLot.carbure_id}:
                   <b>
                     {t(parentLot.biofuel?.code ?? "", { ns: "biofuels" })}{" "}
@@ -49,18 +59,15 @@ export const StockTraceability = ({ details }: TraceabilityProps) => {
               </li>
             )}
 
-            {parentTransform && (
+            {parentStock && (
               <li>
-                <ExternalLink
-                  to={`../history/${parentTransform.source_stock.id}`}
-                >
-                  Stock {parentTransform.source_stock.carbure_id}:
+                <ExternalLink to={`${parentStockRoot}${parentStock.id}`}>
+                  Stock {parentStock.carbure_id}:
                   <b>
-                    {t(parentTransform.source_stock.biofuel?.code ?? "", {
+                    {t(parentStock.biofuel?.code ?? "", {
                       ns: "biofuels",
                     })}{" "}
-                    {formatNumber(parentTransform.volume_deducted_from_source)}{" "}
-                    L
+                    {formatNumber(parentStock.initial_volume)} L
                   </b>
                 </ExternalLink>
               </li>
@@ -75,7 +82,7 @@ export const StockTraceability = ({ details }: TraceabilityProps) => {
           <ul>
             {childrenLot?.map((child) => (
               <li key={child.id}>
-                <ExternalLink to={`../../out/history/${child.id}`}>
+                <ExternalLink to={`${childLotRoot}${child.id}`}>
                   Lot {child.carbure_id}:{" "}
                   <b>
                     {t(child.biofuel?.code ?? "", { ns: "biofuels" })}{" "}
@@ -85,19 +92,15 @@ export const StockTraceability = ({ details }: TraceabilityProps) => {
               </li>
             ))}
 
-            {childrenTransform?.map((child, i) => (
+            {childrenStock?.map((child, i) => (
               <li key={i}>
-                <ExternalLink to={`../history/${child.dest_stock.id}`}>
-                  Stock {child.dest_stock.carbure_id}:{" "}
+                <ExternalLink to={`${childStockRoot}${child.id}`}>
+                  Stock {child.carbure_id}:{" "}
                   <b>
-                    {t(child.dest_stock.biofuel?.code ?? "", {
+                    {t(child.biofuel?.code ?? "", {
                       ns: "biofuels",
                     })}{" "}
-                    {formatNumber(child.volume_destination)} L (
-                    {t(child.source_stock.biofuel?.code ?? "", {
-                      ns: "biofuels",
-                    })}{" "}
-                    {formatNumber(child.volume_deducted_from_source)} L)
+                    {formatNumber(child.initial_volume)} L
                   </b>
                 </ExternalLink>
               </li>
@@ -114,4 +117,15 @@ export const StockTraceability = ({ details }: TraceabilityProps) => {
   )
 }
 
-export default StockTraceability
+export function hasTraceability(details: LotDetails | undefined) {
+  if (details === undefined) return false
+
+  return (
+    details.parent_lot !== null ||
+    details.parent_stock !== null ||
+    (details.children_lot && details.children_lot.length > 0) ||
+    (details.children_stock && details.children_stock.length > 0)
+  )
+}
+
+export default LotTraceability

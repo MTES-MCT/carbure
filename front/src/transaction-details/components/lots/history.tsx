@@ -5,7 +5,7 @@ import { History } from "common-v2/components/icons"
 import { Row } from "common-v2/components/scaffold"
 import Table, { Cell } from "common-v2/components/table"
 import { formatDateTime } from "common-v2/utils/formatters"
-import { LotFieldUpdate, LotUpdate } from "lot-details/types"
+import { LotFieldUpdate, LotUpdate } from "transaction-details/types"
 
 export interface HistoryProps {
   changes: LotChange[]

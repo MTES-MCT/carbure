@@ -1,6 +1,6 @@
 import api, { Api } from "common-v2/services/api"
 import { lotFormToPayload, LotFormValue } from "lot-add/components/lot-form"
-import { LotDetails } from "./types"
+import { LotDetails, StockDetails } from "./types"
 
 export function getLotDetails(entity_id: number, lot_id: number) {
   return api.get<Api<LotDetails>>("/lots/details", {
@@ -27,5 +27,11 @@ export function toggleWarning(
     lot_id,
     errors,
     checked,
+  })
+}
+
+export function getStockDetails(entity_id: number, stock_id: number) {
+  return api.get<Api<StockDetails>>("/stocks/details", {
+    params: { entity_id, stock_id },
   })
 }
