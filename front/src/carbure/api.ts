@@ -5,8 +5,11 @@ export function getUserSettings() {
   return api.get<Api<User>>("/v3/settings/")
 }
 
-export function getNotifications(entity_id: number) {
-  return api.get<Api<Notification[]>>("/notifications", { params: { entity_id } })
+export async function getNotifications(entity_id: number) {
+  if (entity_id === -1) return
+  return api.get<Api<Notification[]>>("/notifications", {
+    params: { entity_id },
+  })
 }
 
 export function ackNotifications(

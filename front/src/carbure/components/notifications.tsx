@@ -7,7 +7,7 @@ import css from "./notifications.module.css"
 import Button from "common-v2/components/button"
 import { useRef } from "react"
 import List from "common-v2/components/list"
-import { EntityType, Notification, NotificationType } from "carbure/types"
+import { Notification, NotificationType } from "carbure/types"
 import { Normalizer } from "common-v2/utils/normalize"
 import { t } from "i18next"
 import { Link } from "react-router-dom"
@@ -17,51 +17,6 @@ import { formatDateTime, formatElapsedTime } from "common-v2/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { useMutation, useQuery } from "common-v2/hooks/async"
 import * as api from "../api"
-
-const FAKE_NOTIF: Notification = {
-  id: 10,
-  dest: {
-    id: 10,
-    name: "Producteur Test MTE",
-    entity_type: EntityType.Producer,
-    has_mac: false,
-    has_stocks: false,
-    has_trading: false,
-    has_direct_deliveries: false,
-  },
-  datetime: "2022-03-14",
-  type: NotificationType.LotsReceived,
-  acked: false,
-  send_by_email: false,
-  email_sent: false,
-  meta: {
-    year: 2022,
-    lots: 12,
-    supplier: "Producteur Test MTE",
-  },
-}
-
-const FAKE_NOTIFS = [
-  FAKE_NOTIF,
-  {
-    ...FAKE_NOTIF,
-    id: 20,
-    date: "2022-03-13",
-    meta: { ...FAKE_NOTIF.meta, lots: 245 },
-  },
-  {
-    ...FAKE_NOTIF,
-    id: 30,
-    date: "2022-02-04",
-    acked: true,
-  },
-  {
-    ...FAKE_NOTIF,
-    id: 40,
-    date: "2020-01-01",
-    acked: true,
-  },
-]
 
 const Notifications = () => {
   const { t } = useTranslation()
@@ -193,22 +148,31 @@ function getNotificationText(notif: Notification) {
       })
 
     case NotificationType.LotsRecalled:
-      return t("Votre fournisser {{supplier}} corrige des erreurs sur {{count}} lots", {
-        count: notif.meta?.count ?? 0,
-        supplier: notif.meta?.supplier,
-      })
+      return t(
+        "Votre fournisser {{supplier}} corrige des erreurs sur {{count}} lots",
+        {
+          count: notif.meta?.count ?? 0,
+          supplier: notif.meta?.supplier,
+        }
+      )
 
     case NotificationType.CorrectionRequest:
-      return t("Vous avez reçu {{count}} demandes de correction de {{client}}", {
-        count: notif.meta?.count,
-        client: notif.meta?.client,
-      })
+      return t(
+        "Vous avez reçu {{count}} demandes de correction de {{client}}",
+        {
+          count: notif.meta?.count,
+          client: notif.meta?.client,
+        }
+      )
 
     case NotificationType.CorrectionDone:
-      return t("Votre fournisseur {{supplier}} a fini de corriger {{count}} lots", {
-        count: notif.meta?.count ?? 0,
-        supplier: notif.meta?.supplier,
-      })
+      return t(
+        "Votre fournisseur {{supplier}} a fini de corriger {{count}} lots",
+        {
+          count: notif.meta?.count ?? 0,
+          supplier: notif.meta?.supplier,
+        }
+      )
 
     case NotificationType.CertificateExpired:
       return t("Votre certificat {{certificate}} est expiré", {
