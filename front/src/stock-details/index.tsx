@@ -1,17 +1,15 @@
 import { useNavigate, useLocation, useParams } from "react-router-dom"
-import { Trans, useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next"
 import * as api from "./api"
 import { useQuery } from "common-v2/hooks/async"
 import useEntity from "carbure/hooks/entity"
 import Dialog from "common-v2/components/dialog"
 import Button from "common-v2/components/button"
-import { AlertCircle, Return } from "common-v2/components/icons"
+import { Return } from "common-v2/components/icons"
 import StockForm from "./components/stock-form"
 import StockTag from "transactions/components/stocks/stock-tag"
 import { LoaderOverlay } from "common-v2/components/scaffold"
 import NavigationButtons from "lot-details/components/navigation"
-import Alert from "common-v2/components/alert"
-import { formatNumber, formatPercentage } from "common-v2/utils/formatters"
 import StockTraceability from "./components/stock-traceability"
 import { SplitOneButton } from "transactions/actions/split"
 import { useCategory } from "transactions/components/category"
@@ -83,14 +81,6 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
             )}
           </>
         )}
-        <Alert icon={AlertCircle} variant="info">
-          <p>
-            <Trans>
-              <b>{{ remaining: formatNumber(remaining) }} litres restants</b> (
-              {{ percent: formatPercentage(percentLeft) }})
-            </Trans>
-          </p>
-        </Alert>
         <NavigationButtons neighbors={neighbors} root={`../${category}`} />
         <Button icon={Return} label={t("Retour")} action={closeDialog} />
       </footer>
