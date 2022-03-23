@@ -225,6 +225,18 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
                         [stock.id]: volume ?? 0,
                       })
                     }
+                    icon={() => (
+                      <Button
+                        variant="primary"
+                        label={t("Max")}
+                        action={() =>
+                          setAttributions({
+                            ...attributions,
+                            [stock.id]: stock.remaining_volume ?? 0,
+                          })
+                        }
+                      />
+                    )}
                   />
                 ),
               },
