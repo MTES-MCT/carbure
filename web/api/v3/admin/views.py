@@ -66,8 +66,7 @@ def get_entity_production_sites(request):
             psite_data['outputs'] = [o.natural_key() for o in ps.productionsiteoutput_set.all()]
             certificates = []
             for pc in ps.productionsitecertificate_set.all():
-                c = pc.certificate_iscc.certificate if pc.type == 'ISCC' else pc.certificate_2bs.certificate
-                certificates.append({'certificate_id': c.certificate_id, 'holder': c.certificate_holder, 'type': pc.type})
+                certificates.append(pc.natural_key())
             psite_data['certificates'] = certificates
             data.append(psite_data)
 
@@ -537,7 +536,7 @@ def map(request):
     entity = admin_entities_rights[0].entity
     lots = CarbureLot.objects.select_related(
         'carbure_producer', 'carbure_production_site', 'production_country',
-        'feedstock', 'biofuel', 'country_of_origin', 'added_by', 
+        'feedstock', 'biofuel', 'country_of_origin', 'added_by',
         'carbure_supplier', 'carbure_client', 'carbure_delivery_site', 'delivery_site_country',
     ).filter(lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN, CarbureLot.PENDING])
     lots = filter_lots(lots, request.GET, entity)
