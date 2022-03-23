@@ -15,6 +15,7 @@ from django.conf import settings
 
 from core.models import UserRightsRequests
 from core.common import get_transaction_distance
+from core.serializers import GenericCertificateSerializer
 from doublecount.models import DoubleCountingAgreement
 from api.v4.helpers import filter_lots
 
@@ -91,10 +92,11 @@ def get_entity_certificates(request):
 
     try:
         e = Entity.objects.get(pk=entity_id)
-        iscc = [ps.natural_key() for ps in e.entityiscctradingcertificate_set.all()]
-        dbs = [ps.natural_key() for ps in e.entitydbstradingcertificate_set.all()]
-        return JsonResponse({"status": "success", "data": iscc + dbs})
-    except Exception:
+        certs = [ps.certificate for ps in e.entitycertificate_set.all()]
+        data = GenericCertificateSerializer(certs, many=True).data
+        return JsonResponse({"status": "success", "data": data})
+    except Exception as err:
+        print(err)
         return JsonResponse({"status": "error", "message": "Could not find entity certificates" }, status=400)
 
 @is_admin
