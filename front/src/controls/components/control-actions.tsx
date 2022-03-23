@@ -5,32 +5,39 @@ import { Lot, LotQuery } from "transactions/types"
 import { PinManyButton } from "controls/actions/pin"
 import DeliveryMapButton from "controls/actions/delivery-map"
 import useEntity from "carbure/hooks/entity"
+import { useStatus } from "./status"
 
 export interface ActionBarProps {
   count: number
   query: LotQuery
-  selection: number[]
-  lots: Lot[]
+  selection?: number[]
+  lots?: Lot[]
   search: string | undefined
   onSearch: (search: string | undefined) => void
   onSwitch: (category: string) => void
 }
 
 export const ControlActions = ({
-  count,
   search,
   lots,
+  query,
+  selection,
   onSearch,
-  onSwitch,
-  ...props
 }: ActionBarProps) => {
   const entity = useEntity()
-  const selectedLots = lots.filter((lot) => props.selection.includes(lot.id))
+  const status = useStatus()
+
+  const selectedLots = lots?.filter((lot) => selection?.includes(lot.id))
+  const props = { query, selection: selection ?? [] }
 
   return (
     <ActionBar>
-      <PinManyButton {...props} lots={selectedLots} />
-      {entity.isAdmin && <DeliveryMapButton {...props} />}
+      {status !== "stocks" && (
+        <>
+          {selectedLots && <PinManyButton {...props} lots={selectedLots} />}
+          {entity.isAdmin && <DeliveryMapButton {...props} />}
+        </>
+      )}
 
       <SearchInput
         asideX

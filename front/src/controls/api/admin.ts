@@ -1,7 +1,14 @@
 import { Api, api, download } from "common-v2/services/api"
 import { Option } from "common-v2/utils/normalize"
 import { LotSummary, Snapshot } from "../types"
-import { Filter, LotList, LotQuery } from "transactions/types"
+import {
+  Filter,
+  LotList,
+  LotQuery,
+  StockList,
+  StockQuery,
+  StockSummary,
+} from "transactions/types"
 import { selectionOrQuery } from "transactions/api"
 
 const QUERY_RESET: Partial<LotQuery> = {
@@ -21,10 +28,12 @@ export function getSnapshot(entity_id: number, year: number) {
   })
 }
 
-// ENDPOINTS FOR LOTS
-
 export function getLots(query: LotQuery) {
   return api.get<Api<LotList>>("/admin/lots", { params: query })
+}
+
+export function getStocks(query: StockQuery) {
+  return api.get<Api<StockList>>("/admin/stocks", { params: query })
 }
 
 export function downloadLots(query: LotQuery, selection: number[]) {
@@ -43,6 +52,16 @@ export function getLotsSummary(
   short?: boolean
 ) {
   return api.get<Api<LotSummary>>("/admin/lots/summary", {
+    params: { ...query, selection, ...QUERY_RESET, short },
+  })
+}
+
+export function getStocksSummary(
+  query: StockQuery,
+  selection: number[],
+  short?: boolean
+) {
+  return api.get<Api<StockSummary>>("/admin/stocks/summary", {
     params: { ...query, selection, ...QUERY_RESET, short },
   })
 }

@@ -423,6 +423,7 @@ export function useLotTitle(state: QueryParams) {
     alerts: t("alertes"),
     corrections: t("corrections"),
     declarations: t("déclarations"),
+    stocks: t("stocks"),
     pinned: t("lots épinglés"),
     unknown: "",
   }

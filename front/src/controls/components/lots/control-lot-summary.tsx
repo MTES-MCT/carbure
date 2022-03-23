@@ -1,6 +1,6 @@
 import { Trans, useTranslation } from "react-i18next"
 import { useQuery } from "common-v2/hooks/async"
-import pickApi from "../api"
+import pickApi from "../../api"
 import { LotQuery, SummaryItem } from "transactions/types"
 import { formatNumber, formatPercentage } from "common-v2/utils/formatters"
 import { usePortal } from "common-v2/components/portal"
