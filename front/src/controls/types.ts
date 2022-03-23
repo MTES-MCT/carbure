@@ -4,6 +4,7 @@ export type AdminStatus =
   | "alerts"
   | "corrections"
   | "declarations"
+  | "stocks"
   | "pinned"
   | "unknown"
 
@@ -12,6 +13,7 @@ export interface Snapshot {
     alerts: number
     corrections: number
     declarations: number
+    stocks: number
     pinned: number
   }
 }

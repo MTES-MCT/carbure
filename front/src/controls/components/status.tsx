@@ -54,6 +54,17 @@ export const StatusTabs = ({
           ),
         },
         {
+          key: "stocks",
+          path: "stocks",
+          label: (
+            <StatusRecap
+              loading={loading}
+              count={count.stocks}
+              label={t("Stocks", { count: count.stocks })}
+            />
+          ),
+        },
+        {
           key: "pinned",
           path: "pinned",
           label: (
@@ -73,6 +84,7 @@ const defaultCount: Snapshot["lots"] = {
   alerts: 0,
   corrections: 0,
   declarations: 0,
+  stocks: 0,
   pinned: 0,
 }
 

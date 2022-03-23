@@ -9,6 +9,7 @@ import { StatusTabs, useStatus } from "./components/status"
 import Lots from "./components/lots"
 import { useYears } from "transactions"
 import pickApi from "./api"
+import Stocks from "./components/stocks"
 
 export const Controls = () => {
   const { t } = useTranslation()
@@ -58,6 +59,7 @@ export const Controls = () => {
         </header>
 
         <Routes>
+          <Route path="stocks/*" element={<Stocks {...props} />} />
           <Route path="*" element={<Lots {...props} />} />
         </Routes>
       </Main>

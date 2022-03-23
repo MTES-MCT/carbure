@@ -1,19 +1,19 @@
 import { Route, Routes, useNavigate, useLocation } from "react-router-dom"
-import pickApi from "../api"
+import pickApi from "../../api"
 import { EntityManager } from "carbure/hooks/entity"
 import { useQuery } from "common-v2/hooks/async"
-import { useStatus } from "./status"
+import { useStatus } from "../status"
 import { Bar } from "common-v2/components/scaffold"
 import Pagination from "common-v2/components/pagination"
 import NoResult from "transactions/components/no-result"
 import Filters from "transactions/components/filters"
-import ControlTable from "./control-table"
-import ControlActions from "./control-actions"
+import ControlTable from "./control-lot-table"
+import ControlActions from "../control-actions"
 import { DeadlineSwitch, InvalidSwitch } from "transactions/components/switches"
-import { LotSummaryBar } from "./control-summary"
+import { LotSummaryBar } from "./control-lot-summary"
 import { useLotQuery, useQueryParamsStore } from "transactions/components/lots"
 import { Filter, Lot } from "transactions/types"
-import ControlDetails from "control-details"
+import ControlLotDetails from "control-details/components/lot"
 
 export interface LotsProps {
   entity: EntityManager
@@ -138,7 +138,7 @@ export const Lots = ({ entity, year }: LotsProps) => {
       <Routes>
         <Route
           path=":status/:id"
-          element={<ControlDetails neighbors={ids} />}
+          element={<ControlLotDetails neighbors={ids} />}
         />
       </Routes>
     </>

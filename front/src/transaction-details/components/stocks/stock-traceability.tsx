@@ -7,9 +7,19 @@ import { StockDetails } from "../../types"
 
 export interface TraceabilityProps {
   details: StockDetails | undefined
+  parentLotRoot?: string
+  parentTransfoRoot?: string
+  childLotRoot?: string
+  childTransfoRoot?: string
 }
 
-export const StockTraceability = ({ details }: TraceabilityProps) => {
+export const StockTraceability = ({
+  details,
+  parentLotRoot = "../../in/history/",
+  parentTransfoRoot = "../stocks/history/",
+  childLotRoot = "../../out/history/",
+  childTransfoRoot = "../../stocks/history/",
+}: TraceabilityProps) => {
   const { t } = useTranslation()
 
   const parentLot = details?.parent_lot ?? undefined
@@ -111,6 +121,18 @@ export const StockTraceability = ({ details }: TraceabilityProps) => {
         <b>{formatNumber(childrenLotVolume + childrenTransformVolume)} L</b>
       </footer>
     </Collapse>
+  )
+}
+
+export function hasTraceability(details: StockDetails | undefined) {
+  if (details === undefined) return false
+
+  return (
+    details.parent_lot !== null ||
+    details.parent_transformation !== null ||
+    (details.children_lot && details.children_lot.length > 0) ||
+    (details.children_transformation &&
+      details.children_transformation.length > 0)
   )
 }
 

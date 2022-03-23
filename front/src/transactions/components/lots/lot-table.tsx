@@ -167,6 +167,7 @@ export function useLotColumns() {
     ]),
   }
 }
+
 interface PeriodCellProps {
   lot: Lot
 }

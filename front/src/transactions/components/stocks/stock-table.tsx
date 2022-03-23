@@ -30,7 +30,7 @@ export const StockTable = memo(
     onAction,
     onOrder,
   }: StockTableProps) => {
-    const { t } = useTranslation()
+    const columns = useStockColumns()
     return (
       <Table
         loading={loading}
@@ -39,81 +39,94 @@ export const StockTable = memo(
         onOrder={onOrder}
         rows={stocks}
         columns={[
-          selectionColumn(stocks, selected, onSelect, (stock) => stock.id),
-          {
-            header: t("Statut"),
-            cell: (stock) => <StockTag stock={stock} />,
-          },
-          {
-            header: t("Période"),
-            cell: (stock) => (
-              <Cell
-                text={formatPeriod(stock.period)}
-                sub={formatDate(stock.delivery_date)}
-              />
-            ),
-          },
-          {
-            key: "volume",
-            header: t("Biocarburant"),
-            cell: (stock) => (
-              <Cell
-                text={t(stock.biofuel?.name ?? "", { ns: "biofuels" })}
-                sub={`${formatNumber(stock.remaining_volume)} L`} // prettier-ignore
-              />
-            ),
-          },
-          {
-            key: "feedstock",
-            header: t("Matière première"),
-            cell: (stock) => (
-              <Cell
-                text={t(stock.feedstock?.name ?? "", { ns: "feedstocks" })}
-                sub={t(stock.country_of_origin?.name ?? "", { ns: "countries" })} // prettier-ignore
-              />
-            ),
-          },
-          {
-            header: t("Fournisseur"),
-            cell: (stock) => (
-              <Cell
-                text={stock.carbure_supplier?.name ?? stock.unknown_supplier}
-              />
-            ),
-          },
-          {
-            header: t("Site de production"),
-            cell: (stock) => (
-              <Cell
-                text={stock.carbure_production_site?.name ?? stock.unknown_production_site} // prettier-ignore
-                sub={t(stock.production_country?.name ?? "", { ns: "countries" })} // prettier-ignore
-              />
-            ),
-          },
-          {
-            header: t("Dépôt"),
-            cell: (stock) => (
-              <Cell
-                text={stock.depot?.name}
-                sub={t(stock.depot?.country?.name ?? "", { ns: "countries" })}
-              />
-            ),
-          },
-          {
-            small: true,
-            key: "ghg_reduction",
-            header: t("Réd. GES"),
-            cell: (stock) => {
-              const reduction = isRedII(stock.delivery_date)
-                ? stock.ghg_reduction_red_ii
-                : stock.ghg_reduction
-              return <Cell text={`${reduction.toFixed(2)}%`} />
-            },
-          },
+          selectionColumn(stocks, selected, onSelect, (s: Stock) => s.id),
+          columns.status,
+          columns.period,
+          columns.biofuel,
+          columns.feedstock,
+          columns.supplier,
+          columns.productionSite,
+          columns.depot,
+          columns.ghgReduction,
         ]}
       />
     )
   }
 )
+
+export function useStockColumns() {
+  const { t } = useTranslation()
+
+  return {
+    status: {
+      header: t("Statut"),
+      cell: (stock: Stock) => <StockTag stock={stock} />,
+    },
+    period: {
+      header: t("Période"),
+      cell: (stock: Stock) => (
+        <Cell
+          text={formatPeriod(stock.period)}
+          sub={formatDate(stock.delivery_date)}
+        />
+      ),
+    },
+    biofuel: {
+      key: "volume",
+      header: t("Biocarburant"),
+      cell: (stock: Stock) => (
+        <Cell
+          text={t(stock.biofuel?.name ?? "", { ns: "biofuels" })}
+          sub={`${formatNumber(stock.remaining_volume)} L`} // prettier-ignore
+        />
+      ),
+    },
+    feedstock: {
+      key: "feedstock",
+      header: t("Matière première"),
+      cell: (stock: Stock) => (
+        <Cell
+          text={t(stock.feedstock?.name ?? "", { ns: "feedstocks" })}
+          sub={t(stock.country_of_origin?.name ?? "", { ns: "countries" })} // prettier-ignore
+        />
+      ),
+    },
+    supplier: {
+      header: t("Fournisseur"),
+      cell: (stock: Stock) => (
+        <Cell text={stock.carbure_supplier?.name ?? stock.unknown_supplier} />
+      ),
+    },
+    productionSite: {
+      header: t("Site de production"),
+      cell: (stock: Stock) => (
+        <Cell
+          text={stock.carbure_production_site?.name ?? stock.unknown_production_site} // prettier-ignore
+          sub={t(stock.production_country?.name ?? "", { ns: "countries" })} // prettier-ignore
+        />
+      ),
+    },
+    depot: {
+      header: t("Dépôt"),
+      cell: (stock: Stock) => (
+        <Cell
+          text={stock.depot?.name}
+          sub={t(stock.depot?.country?.name ?? "", { ns: "countries" })}
+        />
+      ),
+    },
+    ghgReduction: {
+      small: true,
+      key: "ghg_reduction",
+      header: t("Réd. GES"),
+      cell: (stock: Stock) => {
+        const reduction = isRedII(stock.delivery_date)
+          ? stock.ghg_reduction_red_ii
+          : stock.ghg_reduction
+        return <Cell text={`${reduction.toFixed(2)}%`} />
+      },
+    },
+  }
+}
 
 export default StockTable
