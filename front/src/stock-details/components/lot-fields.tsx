@@ -20,7 +20,8 @@ export const LotFields = () => {
 
   return (
     <Fieldset label={t("Stock")}>
-      <VolumeField />
+      <InitialVolumeField />
+      <RemainingVolumeField />
       <BiofuelField />
       <FeedstockField />
       <CountryOfOriginField />
@@ -42,14 +43,35 @@ export const LotFields = () => {
   )
 }
 
-export const VolumeField = (props: NumberInputProps) => {
+export const InitialVolumeField = (props: NumberInputProps) => {
   const { t } = useTranslation()
   const bind = useBind<StockFormValue>()
   return (
     <NumberInput
       readOnly
       label={t("Volume initial en litres (Ethanol à 20°, autres à 15°)")}
-      {...bind("volume")}
+      {...bind("initial_volume")}
+      {...props}
+    />
+  )
+}
+
+export const RemainingVolumeField = (props: NumberInputProps) => {
+  const { t } = useTranslation()
+  const { bind, value } = useFormContext<StockFormValue>()
+
+  const percentLeft =
+    value.remaining_volume && value.initial_volume
+      ? 100 * (value.remaining_volume / value.initial_volume)
+      : 0
+
+  return (
+    <NumberInput
+      readOnly
+      label={
+        t("Volume restant en litres") + ` (${formatPercentage(percentLeft)})`
+      }
+      {...bind("remaining_volume")}
       {...props}
     />
   )
