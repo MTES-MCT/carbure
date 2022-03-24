@@ -142,7 +142,6 @@ def get_stocks_summary(request, *args, **kwargs):
 
 @is_admin
 def get_stock_filters(request, *args, **kwargs):
-    context = kwargs['context']
     field = request.GET.get('field', False)
     if not field:
         return JsonResponse({'status': 'error', 'message': 'Please specify the field for which you want the filters'}, status=400)
