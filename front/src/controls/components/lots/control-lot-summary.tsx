@@ -1,126 +1,39 @@
-import { Trans, useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next"
 import { useQuery } from "common-v2/hooks/async"
 import pickApi from "../../api"
-import { LotQuery, SummaryItem } from "transactions/types"
-import { formatNumber, formatPercentage } from "common-v2/utils/formatters"
-import { usePortal } from "common-v2/components/portal"
+import { formatNumber } from "common-v2/utils/formatters"
 import { LoaderOverlay } from "common-v2/components/scaffold"
-import Alert from "common-v2/components/alert"
-import Button from "common-v2/components/button"
-import Dialog from "common-v2/components/dialog"
-import Table, { Cell, Column } from "common-v2/components/table"
-import { Filter, Return } from "common-v2/components/icons"
-import { FilterManager, ResetButton } from "transactions/components/filters"
+import Table from "common-v2/components/table"
 import NoResult from "transactions/components/no-result"
-import { LotCell } from "transactions/components/lots/lot-summary"
-import { getDeliveryLabel } from "common-v2/utils/normalizers"
+import {
+  LotSummaryBar,
+  LotSummaryBarProps,
+  LotSummaryProps,
+  useSummaryColumns,
+} from "transactions/components/lots/lot-summary"
 import useEntity from "carbure/hooks/entity"
 
-export interface LotSummaryBarProps extends Partial<FilterManager> {
-  query: LotQuery
-  selection: number[]
-}
-
-export const LotSummaryBar = ({
-  query,
-  selection,
-  filters,
-  onFilter,
-}: LotSummaryBarProps) => {
-  const { t } = useTranslation()
-  const portal = usePortal()
-
+export const ControlLotSummaryBar = (props: LotSummaryBarProps) => {
   const entity = useEntity()
   const api = pickApi(entity)
 
-  const summary = useQuery(api.getLotsSummary, {
-    key: "controls-summary",
-    params: [query, selection, true],
-  })
-
-  const summaryData = summary.result?.data.data ?? { count: 0, total_volume: 0 }
-
   return (
-    <Alert loading={summary.loading} icon={Filter} variant="info">
-      <p>
-        <Trans count={summaryData.count}>
-          <b>{{ count: formatNumber(summaryData.count) }} lots</b> pour un total
-          de <b>{{ volume: formatNumber(summaryData.total_volume) }} litres</b>
-        </Trans>
-      </p>
-
-      <Button
-        variant="link"
-        label={t("Voir le récapitulatif")}
-        action={() =>
-          portal((close) => (
-            <LotSummaryDialog
-              query={query}
-              selection={selection}
-              onClose={close}
-            />
-          ))
-        }
-      />
-
-      {filters && onFilter && (
-        <ResetButton filters={filters} onFilter={onFilter} />
-      )}
-    </Alert>
+    <LotSummaryBar
+      {...props}
+      getSummary={api.getLotsSummary}
+      renderSummary={ControlLotSummary}
+    />
   )
-}
-
-export interface LotSummaryDialogProps {
-  query: LotQuery
-  selection: number[]
-  onClose: () => void
-}
-
-export const LotSummaryDialog = ({
-  query,
-  selection,
-  onClose,
-}: LotSummaryDialogProps) => {
-  const { t } = useTranslation()
-
-  return (
-    <Dialog onClose={onClose}>
-      <header>
-        <h1>{t("Récapitulatif des lots")}</h1>
-      </header>
-
-      <main>
-        <section>
-          {t(
-            "Ce tableau résume les informations principales des lots correspondant à votre recherche ou sélection."
-          )}
-        </section>
-
-        <LotSummary query={query} selection={selection} />
-      </main>
-
-      <footer>
-        <Button asideX icon={Return} label={t("Retour")} action={onClose} />
-      </footer>
-    </Dialog>
-  )
-}
-
-export interface LotSummaryProps {
-  pending?: boolean
-  query: LotQuery
-  selection?: number[]
 }
 
 const EMPTY: number[] = []
 
-export const LotSummary = ({
+export const ControlLotSummary = ({
   pending,
   query,
   selection = EMPTY,
 }: LotSummaryProps) => {
   const { t } = useTranslation()
-
   const entity = useEntity()
   const api = pickApi(entity)
 
@@ -129,63 +42,12 @@ export const LotSummary = ({
     params: [query, selection],
   })
 
-  const columns: Column<SummaryItem>[] = [
-    {
-      key: "supplier",
-      header: t("Fournisseur"),
-      orderBy: (item) => item.supplier ?? "",
-      cell: (item) => <Cell text={item.supplier ?? t("Inconnu")} />,
-    },
-    {
-      key: "client",
-      header: t("Client"),
-      orderBy: (item) => item.client ?? "",
-      cell: (item) => <Cell text={item.client ?? t("Inconnu")} />,
-    },
-    {
-      key: "delivery",
-      header: t("Livraison"),
-      orderBy: (item) => item.delivery_type ?? "",
-      cell: (item) => <Cell text={getDeliveryLabel(item.delivery_type)} />,
-    },
-    {
-      key: "biofuel",
-      header: t("Biocarburant"),
-      orderBy: (item) =>
-        t(item.biofuel_code ?? "", { ns: "biofuels" }) as string,
-      cell: (item) => (
-        <Cell text={t(item.biofuel_code ?? "", { ns: "biofuels" })} />
-      ),
-    },
-    {
-      key: "volume",
-      header: t("Volume (litres)"),
-      orderBy: (item) => item.volume_sum,
-      cell: (item) => <Cell text={formatNumber(item.volume_sum)} />,
-    },
-    {
-      small: true,
-      key: "lots",
-      header: pending ? t("Lots validés") : t("Lots"),
-      orderBy: (item) => (pending ? item.total - item.pending : item.total),
-      cell: (item) => <LotCell pending={pending} item={item} />,
-    },
-    {
-      small: true,
-      key: "ghg",
-      header: t("Réd. GES"),
-      orderBy: (item) => item.avg_ghg_reduction || 0,
-      cell: (item) => (
-        <Cell text={formatPercentage(item.avg_ghg_reduction || 0)} />
-      ),
-    },
-  ]
-
   const summaryData = summary.result?.data.data
-
   const lots = summaryData?.lots ?? []
   const lotsAmount = lots.reduce((count, item) => count + item.total, 0)
   const lotsVolume = lots.reduce((volume, item) => volume + item.volume_sum, 0) // prettier-ignore
+
+  const columns = useSummaryColumns(query)
 
   return (
     <>
@@ -211,7 +73,16 @@ export const LotSummary = ({
           <Table
             style={{ width: "max(50vw, 960px)" }}
             rows={lots}
-            columns={[...columns]}
+            columns={[
+              columns.supplier,
+              columns.client,
+              columns.delivery,
+              columns.biofuel,
+              columns.volume,
+              columns.count,
+              pending ? columns.countWithPending : columns.count,
+              columns.ghgReduction,
+            ]}
           />
         </>
       )}

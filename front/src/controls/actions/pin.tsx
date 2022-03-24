@@ -12,7 +12,7 @@ import { Pin, PinOff, Return } from "common-v2/components/icons"
 import { usePortal } from "common-v2/components/portal"
 import { useStatus } from "../components/status"
 import { TextInput } from "common-v2/components/input"
-import { LotSummary } from "../components/lots/control-lot-summary"
+import { ControlLotSummary } from "../components/lots/control-lot-summary"
 import Checkbox from "common-v2/components/checkbox"
 import Form, { useForm } from "common-v2/components/form"
 import { AdminStatus } from "controls/types"
@@ -189,7 +189,7 @@ const PinDialog = ({ pinned, summary, selection, onClose }: PinDialogProps) => {
             </Form>
           </section>
         )}
-        {summary && <LotSummary query={query} selection={selection} />}
+        {summary && <ControlLotSummary query={query} selection={selection} />}
       </main>
       <footer>
         <Button
