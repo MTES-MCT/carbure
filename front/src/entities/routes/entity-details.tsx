@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import { useEffect } from "react"
 import { useParams } from "react-router-dom"
 
 import useAPI from "common/hooks/use-api"
@@ -32,10 +32,11 @@ import Certificates from "entities/components/certificates"
 const EntityDetails = () => {
   const close = useClose("..")
   const { id = "" } = useParams<"id">()
+  const entityID = parseInt(id, 10)
+
   const [entity, getEntity] = useAPI(api.getEntityDetails)
   const [depots, getDepots] = useAPI(api.getEntityDepots)
   const [productionSites, getProductionSites] = useAPI(api.getEntityProductionSites) // prettier-ignore
-  const [certificates, getCertificates] = useAPI(api.getEntityCertificates)
 
   const isProducer = entity.data?.entity_type === EntityType.Producer
 
@@ -77,12 +78,10 @@ const EntityDetails = () => {
   }
 
   useEffect(() => {
-    const entityID = parseInt(id, 10)
     getEntity(entityID)
     getDepots(entityID)
     getProductionSites(entityID)
-    getCertificates(entityID)
-  }, [getEntity, getDepots, getProductionSites, getCertificates, id])
+  }, [getEntity, getDepots, getProductionSites, entityID])
 
   return (
     <Main>
@@ -109,7 +108,7 @@ const EntityDetails = () => {
         {isProducer && (
           <ProductionSitesSettings settings={productionSiteSettings} />
         )}
-        <Certificates certificates={certificates} />
+        <Certificates entity={entityID} />
       </SettingsBody>
     </Main>
   )
