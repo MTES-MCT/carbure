@@ -116,7 +116,6 @@ export const EntityDoubleCountingList = ({ entities }: EntityListProps) => {
         </AlertFilter>
       )}
       <Table columns={columns} rows={rows} />
-      const navigate = useNavigate()
     </Fragment>
   )
 }

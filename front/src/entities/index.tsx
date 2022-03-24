@@ -2,19 +2,19 @@ import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Routes, Route } from "react-router-dom"
 import { LoaderOverlay, Main, Title } from "common/components"
-import { LabelInput } from "common/components/input"
 import Tabs from "common/components/tabs"
 import useAPI from "common/hooks/use-api"
 import { SettingsBody, SettingsHeader } from "settings/components/common"
 import * as api from "./api"
 import {
-  EntityCertificatesList,
   EntityDoubleCountingList,
   EntityFactoriesList,
   EntityUsersList,
 } from "./components/entity-list"
 import EntityDetails from "./routes/entity-details"
 import useTitle from "common-v2/hooks/title"
+import Certificates from "./components/certificates"
+import { SearchInput } from "common-v2/components/input"
 
 const Entities = () => {
   const { t } = useTranslation()
@@ -30,12 +30,12 @@ const Entities = () => {
 
 const EntityList = () => {
   const { t } = useTranslation()
-  const [query, setQuery] = useState("")
+  const [query, setQuery] = useState<string | undefined>("")
   const [entities, getEntities] = useAPI(api.getEntities)
   const [tab, setTab] = useState("factories")
 
   useEffect(() => {
-    getEntities(query)
+    getEntities(query ?? "")
   }, [getEntities, query])
 
   const entityTabs = [
@@ -54,11 +54,13 @@ const EntityList = () => {
       </SettingsHeader>
 
       <SettingsBody>
-        <LabelInput
-          label="Rechercher..."
-          placeholder="Entrez le nom d'une société..."
+        <SearchInput
+          clear
+          debounce={250}
+          label="Recherche"
+          placeholder="Entrez du texte pour filtrer les résultats..."
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={setQuery}
         />
 
         <Tabs tabs={entityTabs} focus={tab} onFocus={setTab} />
@@ -69,9 +71,7 @@ const EntityList = () => {
           <EntityDoubleCountingList entities={entityList} />
         )}
 
-        {tab === "certificates" && (
-          <EntityCertificatesList entities={entityList} />
-        )}
+        {tab === "certificates" && <Certificates search={query} />}
 
         {tab === "users" && <EntityUsersList entities={entityList} />}
 
