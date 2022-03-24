@@ -103,6 +103,12 @@ urlpatterns = [
     path('admin/entity-certificates', admin.get_entity_certificates, name='api-v4-admin-get-entity-certificates'),
     path('admin/entity-certificates/check', admin.check_entity_certificate, name='api-v4-admin-check-entity-certificate'),
 
+    path('admin/stocks', admin.get_stocks, name='api-v4-admin-get-stocks'),
+    path('admin/stocks/details', admin.get_stock_details, name='api-v4-admin-get-stock-details'),
+    path('admin/stocks/summary', admin.get_stock_summary, name='api-v4-admin-get-stock-summary'),
+    path('admin/stocks/filters', admin.get_stock_filters, name='api-v4-admin-get-stock-filters'),
+
+
     # AUDITOR
     path('auditor/years', auditor.get_years, name='api-v4-auditor-get-years'),
     path('auditor/snapshot', auditor.get_snapshot, name='api-v4-auditor-get-snapshot'),

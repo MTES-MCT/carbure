@@ -43,6 +43,15 @@ def get_entity_stock(entity_id):
                         'carbure_production_site', 'carbure_production_site__country', 'production_country',
                         'carbure_client', 'carbure_supplier')
 
+# admin only
+def get_all_stock():
+    return CarbureStock.objects.all() \
+    .select_related('parent_lot', 'parent_transformation',
+                    'biofuel', 'feedstock', 'country_of_origin',
+                    'depot', 'depot__country',
+                    'carbure_production_site', 'carbure_production_site__country', 'production_country',
+                    'carbure_client', 'carbure_supplier')
+
 
 def get_entity_lots_by_status(entity, status=None, export=False):
     lots = CarbureLot.objects.select_related(
@@ -402,8 +411,8 @@ def get_lots_filters_data(lots, query, entity, field):
             client_types.append(item['carbure_client__entity_type'] or Entity.UNKNOWN)
         return normalize_filter(set(client_types))
 
-def get_stock_filters_data(stock, query, entity_id, field):
-    stock = filter_stock(stock, query, entity_id=entity_id, blacklist=[field])
+def get_stock_filters_data(stock, query, field):
+    stock = filter_stock(stock, query, blacklist=[field])
 
     if field == 'feedstocks':
         feedstocks = MatierePremiere.objects.filter(id__in=stock.values('feedstock__id').distinct()).values('code', 'name')
@@ -444,13 +453,13 @@ def get_stock_filters_data(stock, query, entity_id, field):
         return normalize_filter(set(production_sites))
 
 
-def get_stock_with_metadata(stock, entity_id, query, is_admin=False):
+def get_stock_with_metadata(stock, query):
     export = query.get('export', False)
     limit = query.get('limit', None)
     from_idx = query.get('from_idx', "0")
 
     # filtering
-    stock = filter_stock(stock, query, entity_id)
+    stock = filter_stock(stock, query)
     # sorting
     stock = sort_stock(stock, query)
 
@@ -473,7 +482,7 @@ def get_stock_with_metadata(stock, entity_id, query, is_admin=False):
     if not export:
         return JsonResponse({'status': 'success', 'data': data})
     else:
-        file_location = export_carbure_stock(entity_id, returned)
+        file_location = export_carbure_stock(returned)
         with open(file_location, "rb") as excel:
             data = excel.read()
             ctype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -482,7 +491,7 @@ def get_stock_with_metadata(stock, entity_id, query, is_admin=False):
         return response
 
 
-def filter_stock(stock, query, entity_id=None, blacklist=[]):
+def filter_stock(stock, query, blacklist=[]):
     periods = query.getlist('periods', [])
     depots = query.getlist('depots', [])
     feedstocks = query.getlist('feedstocks', [])
@@ -493,6 +502,7 @@ def filter_stock(stock, query, entity_id=None, blacklist=[]):
     search = query.get('query', False)
     selection = query.getlist('selection', [])
     history = query.get('history', False)
+    clients = query.getlist('clients', [])
 
     if history != 'true':
         stock = stock.filter(remaining_volume__gt=0)
@@ -512,6 +522,8 @@ def filter_stock(stock, query, entity_id=None, blacklist=[]):
         stock = stock.filter(Q(carbure_supplier__name__in=suppliers) | Q(unknown_supplier__in=suppliers))
     if len(production_sites) > 0 and 'production_sites' not in blacklist:
         stock = stock.filter(Q(carbure_production_site__name__in=production_sites) | Q(unknown_production_site__in=production_sites))
+    if len(clients):
+        stock = stock.filter(carbure_client__name__in=clients)
     if search and 'query' not in blacklist:
         stock = stock.filter(
             Q(feedstock__name__icontains=search) |
@@ -714,7 +726,7 @@ def get_lots_summary_data(lots, entity, short=False):
     return data
 
 
-def get_stocks_summary_data(stocks, entity_id, short=False):
+def get_stocks_summary_data(stocks, entity_id=None, short=False):
     data = {
         'count': stocks.count(),
         'total_remaining_volume': stocks.aggregate(Sum('remaining_volume'))['remaining_volume__sum'] or 0
@@ -722,21 +734,19 @@ def get_stocks_summary_data(stocks, entity_id, short=False):
 
     if short:
         return data
-
-    stock_summary = stocks.filter(carbure_client_id=entity_id).annotate(
+    if entity_id is not None:
+        stocks = stocks.filter(carbure_client_id=entity_id)
+    stock_summary = stocks.annotate(
         supplier=Coalesce('carbure_supplier__name', 'unknown_supplier'),
         biofuel_code=F('biofuel__code')
     ).values(
         'supplier',
         'biofuel_code'
     ).annotate(
-        # volume_sum=Sum('parent_lot__volume'),
         remaining_volume_sum=Sum('remaining_volume'),
         avg_ghg_reduction=Sum(F('remaining_volume') * F('ghg_reduction')) / Sum('remaining_volume'),
         total=Count('id'),
     ).order_by()
-
-    # data['total_volume'] = stocks.aggregate(Sum('parent_lot__volume'))['parent_lot__volume__sum'] or 0,
     data['stock'] = list(stock_summary)
     return data
 
