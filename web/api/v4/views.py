@@ -1728,3 +1728,27 @@ def get_stats(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': 'Could not compute statistics'})
 
+
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
+def update_entity(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    legal_name = request.POST.get('legal_name', False)
+    registration_id = request.POST.get('registration_id', False)
+    sustainability_officer_phone_number = request.POST.get('sustainability_officer_phone_number', False)
+    sustainability_officer = request.POST.get('sustainability_officer', False)
+    registered_address = request.POST.get('registered_address', False)
+    entity = Entity.objects.get(id=entity_id)
+
+    if legal_name:
+        entity.legal_name = legal_name
+    if sustainability_officer_phone_number:
+        entity.sustainability_officer_phone_number = sustainability_officer_phone_number
+    if registration_id:
+        entity.registration_id = registration_id
+    if sustainability_officer:
+        entity.sustainability_officer = sustainability_officer
+    if registered_address:
+        entity.registered_address = registered_address
+    entity.save()
+    return JsonResponse({'status': 'success'})

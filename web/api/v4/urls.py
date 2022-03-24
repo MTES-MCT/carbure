@@ -85,6 +85,7 @@ urlpatterns = [
     path('get-my-certificates', certificates.get_my_certificates, name='api-v4-settings-get-my-certificates'),
     path('set-production-site-certificates', certificates.set_production_site_certificates, name='api-v4-settings-set-production-site-certificates'),
     path('set-default-certificate', certificates.set_default_certificate, name='api-v4-settings-set-default-certificate'),
+    path('update-entity', views.update_entity, name='api-v4-settings-update-entity'),
 
 
     # ADMIN
