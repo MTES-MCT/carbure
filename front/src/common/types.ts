@@ -75,9 +75,11 @@ export interface Certificate {
 }
 
 export interface EntityCertificate {
+  id: number
   certificate: Certificate
   entity: Entity
   has_been_updated: boolean
+  checked_by_admin: boolean
 }
 
 export enum DepotType {

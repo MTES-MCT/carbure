@@ -11,8 +11,7 @@ import {
   DoubleCountingProduction,
   QuotaDetails,
 } from "doublecount/types"
-import { Title, LoaderOverlay, Box } from "common/components"
-import { SectionHeader, SectionBody, Section } from "common/components/section"
+import { LoaderOverlay, Box } from "common/components"
 import { useRights } from "carbure/hooks/entity"
 import Table, {
   Line,
@@ -22,7 +21,7 @@ import Table, {
   Row,
 } from "common/components/table"
 import tableCSS from "common/components/table.module.css"
-import { AsyncButton, Button } from "common/components/button"
+import Button from "common-v2/components/button"
 import {
   AlertCircle,
   Check,
@@ -61,6 +60,8 @@ import YearTable from "doublecount/components/year-table"
 import DoubleCountingStatus from "doublecount/components/dc-status"
 import { SourcingAggregationTable } from "doublecount/components/dc-tables"
 import { formatNumber } from "common-v2/utils/formatters"
+import { Panel } from "common-v2/components/scaffold"
+import { FileInput } from "common-v2/components/input"
 
 type DoubleCountingUploadPromptProps = PromptProps<void> & {
   entity: Entity
@@ -73,8 +74,8 @@ const DoubleCountingUploadPrompt = ({
   const { t } = useTranslation()
 
   const [productionSite, setProductionSite] = useState<ProductionSite | null>(null) // prettier-ignore
-  const [doubleCountingFile, setDoubleCountingFile] = useState<File | null>(null) // prettier-ignore
-  const [documentationFile, setDocumentationFile] = useState<File | null>(null) // prettier-ignore
+  const [doubleCountingFile, setDoubleCountingFile] = useState<File | undefined>(undefined) // prettier-ignore
+  const [documentationFile, setDocumentationFile] = useState<File | undefined>(undefined) // prettier-ignore
 
   const [uploading, uploadFile] = useAPI(api.uploadDoubleCountingFile)
   const [uploadingDoc, uploadDocFile] = useAPI(
@@ -136,23 +137,12 @@ const DoubleCountingUploadPrompt = ({
           </Trans>
         </div>
 
-        <Button
-          as="label"
-          level={doubleCountingFile ? "success" : "primary"}
+        <FileInput
           icon={doubleCountingFile ? Check : Upload}
           className={styles.settingsFormButton}
-        >
-          {doubleCountingFile ? (
-            doubleCountingFile.name
-          ) : (
-            <Trans>Importer les informations double comptage</Trans>
-          )}
-          <input
-            type="file"
-            className={styles.importFileInput}
-            onChange={(e) => setDoubleCountingFile(e!.target.files![0])}
-          />
-        </Button>
+          label={t("Importer les informations double comptage")}
+          onChange={setDoubleCountingFile}
+        />
 
         <div className={styles.settingsText}>
           <Trans>
@@ -162,35 +152,24 @@ const DoubleCountingUploadPrompt = ({
           </Trans>
         </div>
 
-        <Button
-          as="label"
-          level={documentationFile ? "success" : "primary"}
-          icon={documentationFile ? Check : Upload}
+        <FileInput
+          icon={doubleCountingFile ? Check : Upload}
           className={styles.settingsFormButton}
-        >
-          {documentationFile ? (
-            documentationFile.name
-          ) : (
-            <Trans>Importer la description</Trans>
-          )}
-          <input
-            type="file"
-            className={styles.importFileInput}
-            onChange={(e) => setDocumentationFile(e!.target.files![0])}
-          />
-        </Button>
+          label={t("Importer la description")}
+          onChange={setDocumentationFile}
+        />
 
         <DialogButtons>
-          <AsyncButton
+          <Button
             loading={uploading.loading || uploadingDoc.loading}
             disabled={disabled}
-            level="primary"
+            variant="primary"
             icon={Check}
-            onClick={submitAgreement}
+            action={submitAgreement}
           >
             <Trans>Soumettre le dossier</Trans>
-          </AsyncButton>
-          <Button icon={Return} onClick={() => onResolve()}>
+          </Button>
+          <Button icon={Return} action={() => onResolve()}>
             <Trans>Annuler</Trans>
           </Button>
         </DialogButtons>
@@ -329,9 +308,9 @@ const DoubleCountingSourcingPrompt = ({
         />
 
         <DialogButtons>
-          <AsyncButton
+          <Button
             submit
-            level="primary"
+            variant="primary"
             loading={loading}
             icon={add ? Plus : Save}
           >
@@ -340,8 +319,8 @@ const DoubleCountingSourcingPrompt = ({
             ) : (
               <Trans>Enregistrer les modifications</Trans>
             )}
-          </AsyncButton>
-          <Button icon={Return} onClick={() => onResolve()}>
+          </Button>
+          <Button icon={Return} action={() => onResolve()}>
             <Trans>Annuler</Trans>
           </Button>
         </DialogButtons>
@@ -483,9 +462,9 @@ const DoubleCountingProductionPrompt = ({
         />
 
         <DialogButtons>
-          <AsyncButton
+          <Button
             submit
-            level="primary"
+            variant="primary"
             loading={loading}
             icon={add ? Plus : Save}
           >
@@ -494,8 +473,8 @@ const DoubleCountingProductionPrompt = ({
             ) : (
               <Trans>Enregistrer les modifications</Trans>
             )}
-          </AsyncButton>
-          <Button icon={Return} onClick={() => onResolve()}>
+          </Button>
+          <Button icon={Return} action={() => onResolve()}>
             <Trans>Annuler</Trans>
           </Button>
         </DialogButtons>
@@ -930,7 +909,7 @@ const DoubleCountingPrompt = ({
           )}
         </Box>
 
-        <Button icon={Return} onClick={() => onResolve()}>
+        <Button icon={Return} action={() => onResolve()}>
           <Trans>Retour</Trans>
         </Button>
       </DialogButtons>
@@ -999,16 +978,17 @@ const DoubleCountingSettings = () => {
   }))
 
   return (
-    <Section id="double-counting">
-      <SectionHeader>
-        <Title>
+    <Panel id="double-counting">
+      <header>
+        <h1>
           <Trans>Dossiers double comptage</Trans>
-        </Title>
+        </h1>
         {canModify && (
           <Button
-            level="primary"
+            asideX
+            variant="primary"
             icon={Plus}
-            onClick={async () => {
+            action={async () => {
               if (entity === null) return
 
               await prompt((resolve) => (
@@ -1024,14 +1004,14 @@ const DoubleCountingSettings = () => {
             <Trans>Ajouter un dossier double comptage</Trans>
           </Button>
         )}
-      </SectionHeader>
+      </header>
 
       {isEmpty && (
-        <SectionBody>
+        <section style={{ marginBottom: "var(--spacing-l)" }}>
           <Alert icon={AlertCircle} level="warning">
             <Trans>Aucun dossier double comptage trouvé</Trans>
           </Alert>
-        </SectionBody>
+        </section>
       )}
 
       {!isEmpty && (
@@ -1039,7 +1019,7 @@ const DoubleCountingSettings = () => {
       )}
 
       {agreements.loading && <LoaderOverlay />}
-    </Section>
+    </Panel>
   )
 }
 

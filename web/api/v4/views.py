@@ -228,17 +228,13 @@ def stock_flush(request, *args, **kwargs):
             return JsonResponse({'status': 'forbidden', 'message': 'Stock does not belong to you'}, status=403)
 
         volume_to_flush = stock.remaining_volume
-        # initial_volume = stock.get_parent_lot().volume
-        # if volume_to_flush > initial_volume * 0.05:
-        #     return JsonResponse({'status': 'error', 'message': 'Cannot flush more than 5 percent of initial volume'}, status=400)
-
         initial_volume = 0
         if stock.parent_lot:
             initial_volume = stock.parent_lot.volume
         elif stock.parent_transformation:
             initial_volume = stock.parent_transformation.volume_destination
 
-        if volume_to_flush / initial_volume > 0.01:
+        if volume_to_flush > initial_volume * 0.05:
             return JsonResponse({'status': 'error', 'message': 'Cannot flush a stock with a remaining volume greater than 1%'}, status=400)
 
         # update remaining stock

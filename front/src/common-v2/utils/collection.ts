@@ -1,3 +1,5 @@
+import { standardize } from "./formatters"
+
 export function uniqueBy<T, V>(list: T[], by: (value: T) => V) {
   const keys = list.map(by)
   return list.filter((item, i) => keys.lastIndexOf(by(item)) === i)
@@ -40,6 +42,18 @@ export function isScalar(value: unknown) {
     value === undefined ||
     value === null
   )
+}
+
+export function matchesSearch(
+  search: string,
+  fields: string[],
+  exact?: boolean
+) {
+  const stdQuery = standardize(search)
+  return fields.some((field) => {
+    const stdField = standardize(field)
+    return exact ? stdField === stdQuery : stdField.includes(stdQuery)
+  })
 }
 
 export function matches(source: any, target: any, strict = false): boolean {

@@ -71,6 +71,15 @@ export const Tabs = ({
             return <button {...props}>{tab.label}</button>
           }
 
+          // anchor link to same page
+          if (tab.path.startsWith("#")) {
+            return (
+              <a {...props} href={tab.path}>
+                {tab.label}
+              </a>
+            )
+          }
+
           return (
             <NavLink
               {...props}

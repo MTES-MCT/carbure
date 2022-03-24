@@ -5,7 +5,6 @@ import { PortalProvider } from "common-v2/components/portal"
 import useDeliverySites from "./hooks/use-delivery-sites"
 import useProductionSites from "./hooks/use-production-sites"
 
-import { Main, Title } from "common/components"
 import { SettingsHeader, SettingsBody } from "./components/common"
 import DeliverySitesSettings from "./components/delivery-site"
 import ProductionSitesSettings from "./components/production-site"
@@ -18,6 +17,7 @@ import { UserRole } from "carbure/types"
 import DoubleCountingSettings from "./components/double-counting"
 import useEntity from "carbure/hooks/entity"
 import useTitle from "common-v2/hooks/title"
+import { Main } from "common-v2/components/scaffold"
 
 const Settings = () => {
   const { t } = useTranslation()
@@ -36,9 +36,9 @@ const Settings = () => {
   return (
     <PortalProvider>
       <Main>
-        <SettingsHeader>
-          <Title>{entity?.name}</Title>
-        </SettingsHeader>
+        <header>
+          <h1>{entity?.name}</h1>
+        </header>
 
         <Sticky>
           {hasOptions && (
@@ -73,7 +73,7 @@ const Settings = () => {
           )}
         </Sticky>
 
-        <SettingsBody>
+        <section>
           {hasOptions && <CompanySettings />}
           {hasCertificates && <Certificates />}
           {hasDepot && <DeliverySitesSettings settings={deliverySites} />}
@@ -82,7 +82,7 @@ const Settings = () => {
           {entity.hasRights(UserRole.Admin) && (
             <EntityUserRights entity={entity} />
           )}
-        </SettingsBody>
+        </section>
       </Main>
     </PortalProvider>
   )
