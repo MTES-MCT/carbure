@@ -765,7 +765,7 @@ def export_carbure_lots(entity, transactions):
     workbook.close()
     return location
 
-def export_carbure_stock(entity, stocks):
+def export_carbure_stock(stocks):
     today = datetime.date.today()
     location = '/tmp/carbure_stock_%s.xlsx' % (today.strftime('%Y%m%d_%H%M'))
     workbook = xlsxwriter.Workbook(location)

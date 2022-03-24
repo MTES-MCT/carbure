@@ -115,7 +115,7 @@ def get_stock(request, *args, **kwargs):
     entity_id = context['entity_id']
     try:
         stock = get_entity_stock(entity_id)
-        return get_stock_with_metadata(stock, entity_id, request.GET)
+        return get_stock_with_metadata(stock, request.GET)
     except Exception:
         traceback.print_exc()
         return JsonResponse({'status': 'error', 'message': "Could not get stock"}, status=400)
@@ -886,7 +886,7 @@ def get_stock_filters(request, *args, **kwargs):
     if not field:
         return JsonResponse({'status': 'error', 'message': 'Please specify the field for which you want the filters'}, status=400)
     txs = get_entity_stock(entity_id)
-    data = get_stock_filters_data(txs, request.GET, entity_id, field)
+    data = get_stock_filters_data(txs, request.GET, field)
     if data is None:
         return JsonResponse({'status': 'error', 'message': "Could not find specified filter"}, status=400)
     else:
