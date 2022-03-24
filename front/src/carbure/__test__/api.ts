@@ -30,7 +30,20 @@ export const okStats = rest.get("/api/stats", (req, res, ctx) => {
   )
 })
 
+export const okNotifications = rest.get(
+  "/api/notifications",
+  (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data: [],
+      })
+    )
+  }
+)
+
 export default setupServer(
+  okNotifications,
   okSettings,
   okSnapshot,
   okYears,
