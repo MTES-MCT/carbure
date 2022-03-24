@@ -102,10 +102,9 @@ urlpatterns = [
     path('admin/dashboard/declarations', admin.get_declarations, name='api-v4-admin-get-declarations'),
     path('admin/entity-certificates', admin.get_entity_certificates, name='api-v4-admin-get-entity-certificates'),
     path('admin/entity-certificates/check', admin.check_entity_certificate, name='api-v4-admin-check-entity-certificate'),
-
     path('admin/stocks', admin.get_stocks, name='api-v4-admin-get-stocks'),
     path('admin/stocks/details', admin.get_stock_details, name='api-v4-admin-get-stock-details'),
-    path('admin/stocks/summary', admin.get_stock_summary, name='api-v4-admin-get-stock-summary'),
+    path('admin/stocks/summary', admin.get_stocks_summary, name='api-v4-admin-get-stock-summary'),
     path('admin/stocks/filters', admin.get_stock_filters, name='api-v4-admin-get-stock-filters'),
 
 
@@ -119,4 +118,8 @@ urlpatterns = [
     path('auditor/lots/toggle-warning', auditor.toggle_warning, name='api-v4-auditor-toggle-warning'),
     path('auditor/lots/pin', auditor.toggle_pin, name='api-v4-auditor-pin-lots'),
     path('auditor/lots/comment', auditor.add_comment, name='api-v4-auditor-add-comment'),
+    path('auditor/stocks', auditor.get_stocks, name='api-v4-auditor-get-stocks'),
+    path('auditor/stocks/details', auditor.get_stock_details, name='api-v4-auditor-get-stock-details'),
+    path('auditor/stocks/summary', auditor.get_stocks_summary, name='api-v4-auditor-get-stock-summary'),
+    path('auditor/stocks/filters', auditor.get_stock_filters, name='api-v4-auditor-get-stock-filters'),    
 ]

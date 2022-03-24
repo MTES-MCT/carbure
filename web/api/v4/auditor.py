@@ -7,7 +7,7 @@ from django.db.models.functions.comparison import Coalesce
 from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
 from core.decorators import check_user_rights, is_auditor
-from api.v4.helpers import filter_lots, filter_stock, get_entity_stock, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_with_errors, get_lots_with_metadata, get_lots_filters_data, get_stock_events, get_stock_filters_data, get_stock_with_metadata, get_stocks_summary_data
+from api.v4.helpers import filter_lots, filter_stock, get_auditor_stock, get_entity_stock, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_with_errors, get_lots_with_metadata, get_lots_filters_data, get_stock_events, get_stock_filters_data, get_stock_with_metadata, get_stocks_summary_data
 from api.v4.helpers import get_transaction_distance
 
 from core.models import CarbureLot, CarbureLotComment, CarbureStock, CarbureStockTransformation, Entity, GenericError, UserRights
@@ -41,12 +41,16 @@ def get_snapshot(request, *args, **kwargs):
     lots = get_auditor_lots(request).filter(year=year)
     alerts = get_lots_with_errors(lots, entity)
     corrections = lots.exclude(correction_status=CarbureLot.NO_PROBLEMO)
-    # declarations = lots.exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
+    
+    stock = get_auditor_stock(request.user)
+    stock_not_empty = stock.filter(remaining_volume__gt=0)
+
     pinned = lots.filter(highlighted_by_auditor=True)
 
     data['lots'] = {'alerts': alerts.count(),
                     'corrections': corrections.count(),
                     'declarations': lots.count(),
+                    'stocks': stock_not_empty.count(),
                     'pinned': pinned.count()}
     return JsonResponse({'status': 'success', 'data': data})
 
@@ -260,7 +264,7 @@ def get_stocks(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
     try:
-        stock = get_entity_stock(entity_id)
+        stock = get_auditor_stock(request.user)
         return get_stock_with_metadata(stock, request.GET)
     except Exception:
         traceback.print_exc()
@@ -273,7 +277,7 @@ def get_stocks_summary(request, *args, **kwargs):
     entity_id = context['entity_id']
     short = request.GET.get('short', False)
     try:
-        stock = get_entity_stock(entity_id)
+        stock = get_auditor_stock(request.user)
         stock = filter_stock(stock, request.GET)
         summary = get_stocks_summary_data(stock, None, short == 'true')
         return JsonResponse({'status': 'success', 'data': summary})
@@ -289,7 +293,7 @@ def get_stock_filters(request, *args, **kwargs):
     field = request.GET.get('field', False)
     if not field:
         return JsonResponse({'status': 'error', 'message': 'Please specify the field for which you want the filters'}, status=400)
-    txs = get_entity_stock(entity_id)
+    txs = get_auditor_stock(request.user)
     data = get_stock_filters_data(txs, request.GET, field)
     if data is None:
         return JsonResponse({'status': 'error', 'message': "Could not find specified filter"}, status=400)
