@@ -9,10 +9,10 @@ import NoResult from "transactions/components/no-result"
 import Filters from "transactions/components/filters"
 import ControlActions from "../control-actions"
 import ControlStockTable from "./control-stock-table"
-import { StockSummaryBar } from "./control-stock-summary"
+import { ControlStockSummaryBar } from "./control-stock-summary"
 import { useLotQuery, useQueryParamsStore } from "transactions/components/lots"
 import { Filter, Stock } from "transactions/types"
-import ControlDetails from "control-details"
+import ControlStockDetails from "control-details/components/stock"
 
 export interface StocksProps {
   entity: EntityManager
@@ -42,14 +42,14 @@ export const Stocks = ({ entity, year }: StocksProps) => {
   })
 
   const stocksData = stocks.result?.data.data
-  const lotList = stocksData?.stocks ?? []
+  const stockList = stocksData?.stocks ?? []
   const ids = stocksData?.ids ?? []
   const count = stocksData?.returned ?? 0
   const total = stocksData?.total ?? 0
 
   const showStockDetails = (stock: Stock) =>
     navigate({
-      pathname: `stocks/${stock.id}`,
+      pathname: `${stock.id}`,
       search: location.search,
     })
 
@@ -84,7 +84,7 @@ export const Stocks = ({ entity, year }: StocksProps) => {
 
         {count > 0 && (
           <>
-            <StockSummaryBar
+            <ControlStockSummaryBar
               query={query}
               selection={state.selection}
               filters={state.filters}
@@ -94,7 +94,7 @@ export const Stocks = ({ entity, year }: StocksProps) => {
             <ControlStockTable
               loading={stocks.loading}
               order={state.order}
-              stocks={lotList}
+              stocks={stockList}
               selected={state.selection}
               onSelect={actions.setSelection}
               onAction={showStockDetails}
@@ -113,10 +113,7 @@ export const Stocks = ({ entity, year }: StocksProps) => {
       </section>
 
       <Routes>
-        <Route
-          path=":status/:id"
-          element={<ControlDetails neighbors={ids} />}
-        />
+        <Route path=":id" element={<ControlStockDetails neighbors={ids} />} />
       </Routes>
     </>
   )
