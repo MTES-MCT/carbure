@@ -53,6 +53,18 @@ def get_all_stock():
                     'carbure_client', 'carbure_supplier')
 
 
+def get_auditor_stock(auditor):
+    rights = UserRights.objects.filter(user=auditor, role=UserRights.AUDITOR)
+    print(rights)
+    entities = [r.entity_id for r in rights]
+    print(entities)
+    return CarbureStock.objects.filter(carbure_client__in=entities) \
+    .select_related('parent_lot', 'parent_transformation',
+                    'biofuel', 'feedstock', 'country_of_origin',
+                    'depot', 'depot__country',
+                    'carbure_production_site', 'carbure_production_site__country', 'production_country',
+                    'carbure_client', 'carbure_supplier')
+
 def get_entity_lots_by_status(entity, status=None, export=False):
     lots = CarbureLot.objects.select_related(
         'carbure_producer', 'carbure_supplier', 'carbure_client', 'added_by', 'carbure_vendor',

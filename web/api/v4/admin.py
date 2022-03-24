@@ -129,7 +129,7 @@ def get_stocks(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Could not get stock"}, status=400)
 
 @is_admin
-def get_stock_summary(request, *args, **kwargs):
+def get_stocks_summary(request, *args, **kwargs):
     short = request.GET.get('short', False)
     try:
         stock = get_all_stock()
