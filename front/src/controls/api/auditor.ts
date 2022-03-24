@@ -73,6 +73,13 @@ export function getLotFilters(field: Filter, query: LotQuery) {
     .then((res) => res.data.data ?? [])
 }
 
+export function getStockFilters(field: Filter, query: StockQuery) {
+  const params = { field, ...query, ...QUERY_RESET }
+  return api
+    .get<Api<Option[]>>("/auditor/stocks/filters", { params })
+    .then((res) => res.data.data ?? [])
+}
+
 export function pinLots(
   entity_id: number,
   selection: number[],

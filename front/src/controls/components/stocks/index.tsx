@@ -61,7 +61,7 @@ export const Stocks = ({ entity, year }: StocksProps) => {
           filters={ADMIN_FILTERS}
           selected={state.filters}
           onSelect={actions.setFilters}
-          getFilters={api.getLotFilters}
+          getFilters={api.getStockFilters}
         />
       </Bar>
 
