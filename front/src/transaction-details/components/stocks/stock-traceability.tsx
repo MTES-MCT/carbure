@@ -49,7 +49,7 @@ export const StockTraceability = ({
           <ul>
             {parentLot && (
               <li>
-                <ExternalLink to={`../../in/history/${parentLot.id}`}>
+                <ExternalLink to={`${parentLotRoot}${parentLot.id}`}>
                   Lot {parentLot.carbure_id}:
                   <b>
                     {t(parentLot.biofuel?.code ?? "", { ns: "biofuels" })}{" "}
@@ -62,7 +62,7 @@ export const StockTraceability = ({
             {parentTransform && (
               <li>
                 <ExternalLink
-                  to={`../history/${parentTransform.source_stock.id}`}
+                  to={`${parentTransfoRoot}${parentTransform.source_stock.id}`}
                 >
                   Stock {parentTransform.source_stock.carbure_id}:
                   <b>
@@ -85,7 +85,7 @@ export const StockTraceability = ({
           <ul>
             {childrenLot?.map((child) => (
               <li key={child.id}>
-                <ExternalLink to={`../../out/history/${child.id}`}>
+                <ExternalLink to={`${childLotRoot}${child.id}`}>
                   Lot {child.carbure_id}:{" "}
                   <b>
                     {t(child.biofuel?.code ?? "", { ns: "biofuels" })}{" "}
@@ -97,7 +97,7 @@ export const StockTraceability = ({
 
             {childrenTransform?.map((child, i) => (
               <li key={i}>
-                <ExternalLink to={`../history/${child.dest_stock.id}`}>
+                <ExternalLink to={`${childTransfoRoot}${child.dest_stock.id}`}>
                   Stock {child.dest_stock.carbure_id}:{" "}
                   <b>
                     {t(child.dest_stock.biofuel?.code ?? "", {

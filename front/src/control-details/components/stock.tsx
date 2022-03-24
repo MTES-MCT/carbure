@@ -80,7 +80,7 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
       </main>
 
       <footer>
-        <NavigationButtons neighbors={neighbors} root={`../${status}`} />
+        <NavigationButtons neighbors={neighbors} root={`..`} />
         <Button icon={Return} label={t("Retour")} action={closeDialog} />
       </footer>
 
