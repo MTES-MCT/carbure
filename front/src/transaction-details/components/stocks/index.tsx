@@ -75,7 +75,7 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
         {hasEditRights && stockData && stockData.stock.remaining_volume > 0 && (
           <>
             <SplitOneButton stock={stockData.stock} />
-            {percentLeft <= 1 && <FlushOneButton stock={stockData.stock} />}
+            {percentLeft <= 5 && <FlushOneButton stock={stockData.stock} />}
             {stockData.parent_transformation && (
               <CancelOneTransformButton stock={stockData.stock} />
             )}
