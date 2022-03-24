@@ -58,7 +58,7 @@ export const Stocks = ({ entity, year }: StocksProps) => {
       <Bar>
         <Filters
           query={query}
-          filters={ADMIN_FILTERS}
+          filters={ADMIN_STOCK_FILTERS}
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilters={api.getStockFilters}
@@ -119,20 +119,14 @@ export const Stocks = ({ entity, year }: StocksProps) => {
   )
 }
 
-const ADMIN_FILTERS = [
-  Filter.LotStatus,
-  Filter.DeliveryTypes,
+const ADMIN_STOCK_FILTERS = [
   Filter.Periods,
   Filter.Biofuels,
   Filter.Feedstocks,
   Filter.CountriesOfOrigin,
   Filter.Suppliers,
-  Filter.Clients,
-  Filter.ClientTypes,
   Filter.ProductionSites,
-  Filter.DeliverySites,
-  Filter.AddedBy,
-  Filter.Errors,
+  Filter.Depots,
 ]
 
 export default Stocks
