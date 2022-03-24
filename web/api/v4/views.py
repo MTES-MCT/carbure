@@ -213,14 +213,12 @@ def stock_cancel_transformation(request, *args, **kwargs):
 def stock_flush(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = int(context['entity_id'])
-    # payload = request.POST.get('payload', False)
     stock_ids = request.POST.getlist('stock_ids')
     free_field = request.POST.get('free_field', False)
     if not stock_ids:
         return JsonResponse({'status': 'error', 'message': 'Missing stock_ids'}, status=400)
 
     for stock_id in stock_ids:
-
         try:
             stock = CarbureStock.objects.get(pk=stock_id)
         except:
@@ -229,10 +227,10 @@ def stock_flush(request, *args, **kwargs):
         if stock.carbure_client_id != entity_id:
             return JsonResponse({'status': 'forbidden', 'message': 'Stock does not belong to you'}, status=403)
 
-        try:
-            volume_to_flush = stock.remaining_volume
-        except:
-            return JsonResponse({'status': 'error', 'message': 'Could not parse volume to flush'}, status=400)
+        initial_volume = stock.get_parent_lot().volume
+        volume_to_flush = stock.remaining_volume
+        if volume_to_flush > initial_volume * 0.05:
+            return JsonResponse({'status': 'error', 'message': 'Cannot flush more than 5 percent of initial volume'}, status=400)
 
         # update remaining stock
         rounded_volume = round(volume_to_flush, 2)
