@@ -99,6 +99,8 @@ urlpatterns = [
     path('admin/lots/comment', admin.add_comment, name='api-v4-admin-add-comment'),
     path('admin/map', admin.map, name='api-v4-admin-map'),
     path('admin/dashboard/declarations', admin.get_declarations, name='api-v4-admin-get-declarations'),
+    path('admin/entity-certificates', admin.get_entity_certificates, name='api-v4-admin-get-entity-certificates'),
+    path('admin/entity-certificates/check', admin.check_entity_certificate, name='api-v4-admin-check-entity-certificate'),
 
     # AUDITOR
     path('auditor/years', auditor.get_years, name='api-v4-auditor-get-years'),
