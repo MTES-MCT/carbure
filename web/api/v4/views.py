@@ -479,7 +479,7 @@ def get_lot_details(request, *args, **kwargs):
     data['children_stock'] = CarbureStockPublicSerializer(CarbureStock.objects.filter(parent_lot=lot), many=True).data
     data['distance'] = get_transaction_distance(lot)
     data['errors'] = get_lot_errors(lot, entity)
-    data['certificates'] = get_known_certificates(lot, entity)
+    data['certificates'] = get_known_certificates(lot)
     data['updates'] = get_lot_updates(lot, entity)
     data['comments'] = get_lot_comments(lot, entity)
     return JsonResponse({'status': 'success', 'data': data})
