@@ -3,19 +3,22 @@ import * as api from "../../api"
 import { StockQuery } from "../../types"
 import { useQuery } from "common-v2/hooks/async"
 import { usePortal } from "common-v2/components/portal"
-import { formatNumber, formatPercentage } from "common-v2/utils/formatters"
+import { formatNumber } from "common-v2/utils/formatters"
 import { LoaderOverlay } from "common-v2/components/scaffold"
 import Alert from "common-v2/components/alert"
 import Button from "common-v2/components/button"
 import Dialog from "common-v2/components/dialog"
-import Table, { Cell } from "common-v2/components/table"
+import Table from "common-v2/components/table"
 import { Filter, Return } from "common-v2/components/icons"
 import { FilterManager, ResetButton } from "../filters"
 import NoResult from "../no-result"
+import { useSummaryColumns } from "../lots/lot-summary"
 
 export interface StockSummaryBarProps extends Partial<FilterManager> {
   query: StockQuery
   selection: number[]
+  getSummary?: typeof api.getStockSummary
+  renderSummary?: typeof StockSummary
 }
 
 export const StockSummaryBar = ({
@@ -23,11 +26,13 @@ export const StockSummaryBar = ({
   selection,
   filters,
   onFilter,
+  getSummary = api.getStockSummary,
+  renderSummary = StockSummary,
 }: StockSummaryBarProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
-  const summary = useQuery(api.getStockSummary, {
+  const summary = useQuery(getSummary, {
     key: "stock-summary",
     params: [query, selection, true],
   })
@@ -59,6 +64,8 @@ export const StockSummaryBar = ({
               query={query}
               selection={selection}
               onClose={close}
+              getSummary={getSummary}
+              renderSummary={renderSummary}
             />
           ))
         }
@@ -75,12 +82,16 @@ export interface StockSummaryDialogProps {
   query: StockQuery
   selection: number[]
   onClose: () => void
+  getSummary?: typeof api.getStockSummary
+  renderSummary?: typeof StockSummary
 }
 
 export const StockSummaryDialog = ({
   query,
   selection,
   onClose,
+  getSummary,
+  renderSummary: Summary = StockSummary,
 }: StockSummaryDialogProps) => {
   const { t } = useTranslation()
 
@@ -97,7 +108,7 @@ export const StockSummaryDialog = ({
           )}
         </section>
 
-        <StockSummary query={query} selection={selection} />
+        <Summary query={query} selection={selection} getSummary={getSummary} />
       </main>
 
       <footer>
@@ -110,6 +121,7 @@ export const StockSummaryDialog = ({
 export interface StockSummaryProps {
   query: StockQuery
   selection?: number[]
+  getSummary?: typeof api.getStockSummary
 }
 
 const EMPTY: number[] = []
@@ -117,10 +129,11 @@ const EMPTY: number[] = []
 export const StockSummary = ({
   query,
   selection = EMPTY,
+  getSummary = api.getStockSummary,
 }: StockSummaryProps) => {
   const { t } = useTranslation()
 
-  const summary = useQuery(api.getStockSummary, {
+  const summary = useQuery(getSummary, {
     key: "stocks-summary-details",
     params: [query, selection],
   })
@@ -130,6 +143,8 @@ export const StockSummary = ({
   const stock = summaryData?.stock ?? []
   const stockLots = stock.reduce((count, item) => count + item.total, 0)
   const stockVolume = stock.reduce((volume, item) => volume + (item.remaining_volume_sum ?? 0), 0) // prettier-ignore
+
+  const columns = useSummaryColumns(query)
 
   return (
     <>
@@ -155,44 +170,11 @@ export const StockSummary = ({
             style={{ width: "max(50vw, 960px)" }}
             rows={stock}
             columns={[
-              {
-                key: "supplier",
-                header: t("Fournisseur"),
-                orderBy: (item) => item.supplier ?? "",
-                cell: (item) => <Cell text={item.supplier ?? t("Inconnu")} />,
-              },
-              {
-                key: "biofuel",
-                header: t("Biocarburant"),
-                orderBy: (item) => item.biofuel_code ?? "",
-                cell: (item) => (
-                  <Cell text={t(item.biofuel_code ?? "", { ns: "biofuels" })} />
-                ),
-              },
-              {
-                key: "volume",
-                header: t("Volume restant (litres)"),
-                orderBy: (item) => item.remaining_volume_sum ?? 0,
-                cell: (item) => (
-                  <Cell text={formatNumber(item.remaining_volume_sum ?? 0)} />
-                ),
-              },
-              {
-                small: true,
-                key: "lots",
-                header: t("Lots"),
-                orderBy: (item) => item.total,
-                cell: (item) => <Cell text={item.total} />,
-              },
-              {
-                small: true,
-                key: "ghg",
-                header: t("Réd. GES"),
-                orderBy: (item) => item.avg_ghg_reduction || 0,
-                cell: (item) => (
-                  <Cell text={formatPercentage(item.avg_ghg_reduction || 0)} />
-                ),
-              },
+              columns.supplier,
+              columns.biofuel,
+              columns.remainingVolume,
+              columns.count,
+              columns.ghgReduction,
             ]}
           />
         </>

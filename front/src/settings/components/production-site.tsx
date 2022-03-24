@@ -18,7 +18,7 @@ import useForm from "common/hooks/use-form"
 
 import { Title, Box, LoaderOverlay } from "common/components"
 import { LabelInput, Label, LabelCheckbox } from "common/components/input"
-import { Button } from "common/components/button"
+import Button from "common-v2/components/button"
 import {
   AlertCircle,
   Cross,
@@ -35,7 +35,6 @@ import Table, {
   Row,
   padding,
 } from "common/components/table"
-import { SectionHeader, SectionBody, Section } from "common/components/section"
 import {
   Dialog,
   DialogButtons,
@@ -51,6 +50,7 @@ import RadioGroup from "common/components/radio-group"
 import { formatDate, SettingsForm } from "./common"
 import { getMyCertificates } from "../api-v2"
 import { useRights } from "carbure/hooks/entity"
+import { Panel } from "common-v2/components/scaffold"
 
 export type ProductionSiteState = {
   // site
@@ -310,15 +310,15 @@ export const ProductionSitePrompt = ({
         <DialogButtons>
           {!readOnly && (
             <Button
-              level="primary"
+              variant="primary"
               icon={Save}
               disabled={!canSave}
-              onClick={() => data && onResolve(data)}
+              action={() => data && onResolve(data)}
             >
               <Trans>Sauvegarder</Trans>
             </Button>
           )}
-          <Button icon={Return} onClick={() => onResolve()}>
+          <Button icon={Return} action={() => onResolve()}>
             <Trans>Retour</Trans>
           </Button>
         </DialogButtons>
@@ -385,28 +385,29 @@ const ProductionSitesSettings = ({
   )
 
   return (
-    <Section id="production">
-      <SectionHeader>
+    <Panel id="production">
+      <header>
         <Title>
           <Trans>Sites de production</Trans>
         </Title>
         {canModify && settings.createProductionSite && (
           <Button
-            level="primary"
+            asideX
+            variant="primary"
             icon={Plus}
-            onClick={settings.createProductionSite}
+            action={settings.createProductionSite}
           >
             <Trans>Ajouter un site de production</Trans>
           </Button>
         )}
-      </SectionHeader>
+      </header>
 
       {settings.isEmpty && (
-        <SectionBody>
+        <section style={{ marginBottom: "var(--spacing-l)" }}>
           <Alert icon={AlertCircle} level="warning">
             <Trans>Aucun site de production trouvé</Trans>
           </Alert>
-        </SectionBody>
+        </section>
       )}
 
       {!settings.isEmpty && (
@@ -414,7 +415,7 @@ const ProductionSitesSettings = ({
       )}
 
       {settings.isLoading && <LoaderOverlay />}
-    </Section>
+    </Panel>
   )
 }
 

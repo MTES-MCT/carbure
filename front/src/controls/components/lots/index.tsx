@@ -10,7 +10,7 @@ import Filters from "transactions/components/filters"
 import ControlTable from "./control-lot-table"
 import ControlActions from "../control-actions"
 import { DeadlineSwitch, InvalidSwitch } from "transactions/components/switches"
-import { LotSummaryBar } from "./control-lot-summary"
+import { ControlLotSummaryBar } from "./control-lot-summary"
 import { useLotQuery, useQueryParamsStore } from "transactions/components/lots"
 import { Filter, Lot } from "transactions/types"
 import ControlLotDetails from "control-details/components/lot"
@@ -106,7 +106,7 @@ export const Lots = ({ entity, year }: LotsProps) => {
 
         {count > 0 && (
           <>
-            <LotSummaryBar
+            <ControlLotSummaryBar
               query={query}
               selection={state.selection}
               filters={state.filters}

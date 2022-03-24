@@ -44,7 +44,7 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
   const closeDialog = () => {
     invalidate("controls", "controls-snapshot", "controls-summary")
     navigate({
-      pathname: `../stocks`,
+      pathname: `..`,
       search: location.search,
     })
   }

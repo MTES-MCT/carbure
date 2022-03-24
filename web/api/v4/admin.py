@@ -458,12 +458,17 @@ def get_admin_lot_comments(lot):
     comments = lot.carburelotcomment_set.filter(Q(comment_type=CarbureLotComment.ADMIN) | Q(is_visible_by_admin=True))
     return CarbureLotCommentSerializer(comments, many=True).data
 
+
 @is_admin
 def get_entity_certificates(request, *args, **kwargs):
-    ec = EntityCertificate.objects.filter(checked_by_admin=False).order_by('-added_dt')
+    entity_id = request.GET.get("entity_id", False)
+    ec = EntityCertificate.objects.order_by('-added_dt', 'checked_by_admin').select_related('entity', 'certificate')
+    if entity_id:
+        ec = ec.filter(entity_id=entity_id)
+
     serializer = EntityCertificateSerializer(ec, many=True)
     return JsonResponse({'status': "success", 'data': serializer.data})
-    
+
 
 @is_admin
 def check_entity_certificate(request, *args, **kwargs):
