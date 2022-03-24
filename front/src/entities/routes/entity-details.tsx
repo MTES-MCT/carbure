@@ -4,11 +4,8 @@ import { useParams } from "react-router-dom"
 import useAPI from "common/hooks/use-api"
 import useClose from "common/hooks/use-close"
 
-import { Main, Title } from "common/components"
-import { Return } from "common-v2/components/icons"
-import Sticky from "common/components/sticky"
-import { Button } from "common/components/button"
-import { SettingsBody, SettingsHeader } from "settings/components/common"
+import { ChevronLeft, Return } from "common-v2/components/icons"
+import { Button } from "common-v2/components/button"
 import UserRights from "../components/user-rights"
 import * as api from "../api"
 import DeliverySitesSettings, {
@@ -28,6 +25,9 @@ import {
   ProductionSiteState,
 } from "settings/components/production-site"
 import Certificates from "entities/components/certificates"
+import { Main, Row } from "common-v2/components/scaffold"
+import Tabs from "common-v2/components/tabs"
+import { compact } from "common-v2/utils/collection"
 
 const EntityDetails = () => {
   const close = useClose("..")
@@ -85,31 +85,35 @@ const EntityDetails = () => {
 
   return (
     <Main>
-      <SettingsHeader row>
-        <Title>{entity.data?.name}</Title>
-        <Button icon={Return} onClick={close}>
-          Retour
-        </Button>
-      </SettingsHeader>
+      <header>
+        <Row style={{ alignItems: "center", gap: "var(--spacing-m)" }}>
+          <Button icon={ChevronLeft} action={close} label="Retour" />
+          <h1>{entity.data?.name}</h1>
+        </Row>
+      </header>
 
-      <Sticky>
-        <a href="#users">Utilisateurs</a>
-        <a href="#depot">Dépots</a>
-        {isProducer && <a href="#production">Sites de production</a>}
-        <a href="#iscc">ISCC</a>
-        <a href="#2bs">2BS</a>
-        <a href="#red">REDCert</a>
-        <a href="#csn">Système national</a>
-      </Sticky>
+      <Tabs
+        variant="sticky"
+        tabs={compact([
+          { key: "users", path: "#users", label: "Utilisateurs" },
+          { key: "depot", path: "#depot", label: "Depots" },
+          isProducer && {
+            key: "production",
+            path: "#production",
+            label: "Sites de production",
+          },
+          { key: "certificates", path: "#certificates", label: "Certificats" },
+        ])}
+      />
 
-      <SettingsBody>
+      <section>
         <UserRights />
         <DeliverySitesSettings settings={depotSettings} />
         {isProducer && (
           <ProductionSitesSettings settings={productionSiteSettings} />
         )}
         <Certificates entity={entityID} />
-      </SettingsBody>
+      </section>
     </Main>
   )
 }

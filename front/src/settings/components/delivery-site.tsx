@@ -11,9 +11,9 @@ import styles from "./settings.module.css"
 
 import * as common from "common/api"
 
-import { Title, Box, LoaderOverlay } from "common/components"
+import { Box, LoaderOverlay } from "common/components"
 import { LabelInput, Label, LabelCheckbox } from "common/components/input"
-import { Button } from "common/components/button"
+import Button from "common-v2/components/button"
 import { AlertCircle, Cross, Plus, Return } from "common-v2/components/icons"
 import { Alert } from "common/components/alert"
 import Table, {
@@ -24,7 +24,6 @@ import Table, {
   Row,
   padding,
 } from "common/components/table"
-import { SectionHeader, SectionBody, Section } from "common/components/section"
 import {
   Dialog,
   DialogButtons,
@@ -38,6 +37,7 @@ import { SettingsForm } from "./common"
 import useForm from "common/hooks/use-form"
 import { Entity } from "carbure/types"
 import { useRights } from "carbure/hooks/entity"
+import { Panel } from "common-v2/components/scaffold"
 
 type DeliverySiteFinderPromptProps = PromptProps<EntityDeliverySite> & {
   entity: Entity
@@ -124,14 +124,14 @@ export const DeliverySiteFinderPrompt = ({
 
         <DialogButtons>
           <Button
-            level="primary"
+            variant="primary"
             icon={Plus}
             disabled={!hasChange}
-            onClick={() => onResolve(data)}
+            action={() => onResolve(data)}
           >
             <Trans>Ajouter</Trans>
           </Button>
-          <Button onClick={() => onResolve()}>
+          <Button action={() => onResolve()}>
             <Trans>Annuler</Trans>
           </Button>
         </DialogButtons>
@@ -294,7 +294,7 @@ export const DeliverySitePrompt = ({
         <hr />
 
         <DialogButtons>
-          <Button icon={Return} onClick={() => onResolve()}>
+          <Button icon={Return} action={() => onResolve()}>
             <Trans>Retour</Trans>
           </Button>
         </DialogButtons>
@@ -368,28 +368,29 @@ const DeliverySitesSettings = ({ settings }: DeliverySitesSettingsProps) => {
   }))
 
   return (
-    <Section id="depot">
-      <SectionHeader>
-        <Title>
+    <Panel id="depot">
+      <header>
+        <h1>
           <Trans>Dépôts</Trans>
-        </Title>
+        </h1>
         {canModify && settings.addDeliverySite && (
           <Button
-            level="primary"
+            asideX
+            variant="primary"
             icon={Plus}
-            onClick={settings.addDeliverySite}
+            action={settings.addDeliverySite}
           >
             <Trans>Ajouter un dépôt</Trans>
           </Button>
         )}
-      </SectionHeader>
+      </header>
 
       {settings.isEmpty && (
-        <SectionBody>
+        <section style={{ marginBottom: "var(--spacing-l)" }}>
           <Alert icon={AlertCircle} level="warning">
             <Trans>Aucun dépôt trouvé</Trans>
           </Alert>
-        </SectionBody>
+        </section>
       )}
 
       {!settings.isEmpty && (
@@ -397,7 +398,7 @@ const DeliverySitesSettings = ({ settings }: DeliverySitesSettingsProps) => {
       )}
 
       {settings.isLoading && <LoaderOverlay />}
-    </Section>
+    </Panel>
   )
 }
 

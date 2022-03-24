@@ -1,10 +1,8 @@
 import { RightStatus } from "account/components/access-rights"
-import { Title } from "common/components"
 import { Alert } from "common/components/alert"
 import { confirm } from "common/components/dialog"
 import { AlertCircle, Check, Cross } from "common-v2/components/icons"
 import { Input } from "common/components/input"
-import { Section, SectionBody, SectionHeader } from "common/components/section"
 import Table, { Actions, Column, padding } from "common/components/table"
 import useAPI from "common/hooks/use-api"
 import { UserRightRequest, UserRightStatus, UserRole } from "carbure/types"
@@ -12,8 +10,8 @@ import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import { formatDate } from "settings/components/common"
 import * as api from "../api"
-import colStyles from "common/components/table.module.css"
 import styles from "./user-rights.module.css"
+import { Panel } from "common-v2/components/scaffold"
 
 const ROLE_LABELS = {
   [UserRole.ReadOnly]: "Lecture seule",
@@ -33,7 +31,6 @@ const RIGHTS_COLUMNS: Column<UserRightRequest>[] = [
   padding,
   {
     header: "Statut",
-    className: colStyles.narrowColumn,
     render: (r: UserRightRequest) => <RightStatus status={r.status} />,
   },
   {
@@ -119,12 +116,12 @@ const UserRights = () => {
   })
 
   return (
-    <Section id="users">
-      <SectionHeader>
-        <Title>Utilisateurs</Title>
-      </SectionHeader>
+    <Panel id="users">
+      <header>
+        <h1>Utilisateurs</h1>
+      </header>
 
-      <SectionBody>
+      <section>
         {(query.length > 0 || rows.length > 0) && (
           <Input
             placeholder="Rechercher utilisateur..."
@@ -141,12 +138,12 @@ const UserRights = () => {
             Aucun utilisateur associé à cette entité
           </Alert>
         )}
-      </SectionBody>
+      </section>
 
       {rows.length > 0 && (
         <Table columns={[...RIGHTS_COLUMNS, actions]} rows={rows} />
       )}
-    </Section>
+    </Panel>
   )
 }
 

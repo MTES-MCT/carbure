@@ -40,7 +40,7 @@ const CompanySettings = () => {
     toggleTrading.loading
 
   return (
-    <Panel id="options" style={{ marginBottom: "var(--spacing-l)" }}>
+    <Panel id="options">
       <header>
         <h1>{t("Options")}</h1>
       </header>

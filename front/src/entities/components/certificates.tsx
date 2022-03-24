@@ -36,7 +36,7 @@ const Certificates = ({ search = "", entity }: CertificatesProps) => {
   )
 
   return (
-    <Panel style={{ marginBottom: "var(--spacing-l)" }}>
+    <Panel id="certificates">
       <header>
         <h1>{t("Certificats")}</h1>
       </header>
@@ -48,12 +48,14 @@ const Certificates = ({ search = "", entity }: CertificatesProps) => {
       {certData.length > 0 && (
         <Table
           rows={certData}
-          columns={[
-            {
-              key: "entity",
-              header: t("Société"),
-              orderBy: (c) => c.entity.name,
-              cell: (c) => <Cell text={c.entity.name} />,
+          columns={compact([
+            entity === undefined && {
+              key: "entities",
+              header: "Société",
+              orderBy: (e) => e.entity.name,
+              cell: (e) => (
+                <Cell text={e.entity.name} sub={t(e.entity.entity_type)} />
+              ),
             },
             {
               key: "id",
@@ -84,7 +86,7 @@ const Certificates = ({ search = "", entity }: CertificatesProps) => {
                 !c.checked_by_admin && <CheckCertificate certificate={c} />,
               ])
             ),
-          ]}
+          ])}
         />
       )}
 
