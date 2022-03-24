@@ -818,6 +818,7 @@ class EntityCertificate(models.Model):
     entity = models.ForeignKey(Entity, blank=False, null=False, on_delete=models.CASCADE)
     has_been_updated = models.BooleanField(default=False)
     checked_by_admin = models.BooleanField(default=False)
+    added_dt = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'carbure_entity_certificates'
