@@ -856,7 +856,7 @@ def get_prefetched_data(entity=None):
     return d
 
 
-def get_known_certificates(lot, entity):
+def get_known_certificates(lot):
     d = {
          'production_site_certificate': None,
          'supplier_certificate': None,

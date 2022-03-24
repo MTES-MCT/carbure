@@ -7,7 +7,7 @@ from django.db.models.functions.comparison import Coalesce
 from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
 from core.decorators import check_user_rights, is_auditor
-from api.v4.helpers import filter_lots, filter_stock, get_auditor_stock, get_entity_stock, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_with_errors, get_lots_with_metadata, get_lots_filters_data, get_stock_events, get_stock_filters_data, get_stock_with_metadata, get_stocks_summary_data
+from api.v4.helpers import filter_lots, filter_stock, get_auditor_stock, get_entity_stock, get_known_certificates, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_with_errors, get_lots_with_metadata, get_lots_filters_data, get_stock_events, get_stock_filters_data, get_stock_with_metadata, get_stocks_summary_data
 from api.v4.helpers import get_transaction_distance
 
 from core.models import CarbureLot, CarbureLotComment, CarbureStock, CarbureStockTransformation, Entity, GenericError, UserRights
@@ -99,8 +99,20 @@ def get_lot_details(request, *args, **kwargs):
     if not lot_id:
         return JsonResponse({'status': 'error', 'message': 'Missing lot_id'}, status=400)
 
-    entity = Entity.objects.get(id=entity_id)
+    auditor = Entity.objects.get(id=entity_id)
     lot = CarbureLot.objects.get(pk=lot_id)
+    client_id = str(lot.carbure_client_id)
+    supplier_id = str(lot.carbure_supplier_id)
+
+    has_right_to_audit_client = False
+    has_right_to_audit_supplier = False
+    if client_id in request.session['rights'] and request.session['rights'][client_id] == UserRights.AUDITOR:
+        has_right_to_audit_client = True
+    if supplier_id in request.session['rights'] and request.session['rights'][supplier_id] == UserRights.AUDITOR:
+        has_right_to_audit_supplier = True
+
+    if not has_right_to_audit_client and not has_right_to_audit_supplier:
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     data = {}
     data['lot'] = CarbureLotAdminSerializer(lot).data
@@ -109,8 +121,8 @@ def get_lot_details(request, *args, **kwargs):
     data['children_lot'] = CarbureLotAdminSerializer(CarbureLot.objects.filter(parent_lot=lot), many=True).data
     data['children_stock'] = CarbureStockPublicSerializer(CarbureStock.objects.filter(parent_lot=lot), many=True).data
     data['distance'] = get_transaction_distance(lot)
-    data['errors'] = get_lot_errors(lot, entity)
-    #data['certificates'] = check_certificates(tx)
+    data['errors'] = get_lot_errors(lot, auditor)
+    data['certificates'] = get_known_certificates(lot)
     data['updates'] = get_lot_updates(lot)
     data['comments'] = get_lot_comments(lot)
     data['control_comments'] = get_auditor_lot_comments(lot)
@@ -310,7 +322,8 @@ def get_stock_details(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Missing stock_id'}, status=400)
 
     stock = CarbureStock.objects.get(pk=stock_id)
-    if str(stock.carbure_client_id) != entity_id:
+    client_id = str(stock.carbure_client_id)
+    if client_id not in request.session['rights'] or request.session['rights'][client_id] != UserRights.AUDITOR:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     data = {}
