@@ -227,10 +227,10 @@ def stock_flush(request, *args, **kwargs):
         if stock.carbure_client_id != entity_id:
             return JsonResponse({'status': 'forbidden', 'message': 'Stock does not belong to you'}, status=403)
 
-        initial_volume = stock.get_parent_lot().volume
         volume_to_flush = stock.remaining_volume
-        if volume_to_flush > initial_volume * 0.05:
-            return JsonResponse({'status': 'error', 'message': 'Cannot flush more than 5 percent of initial volume'}, status=400)
+        # initial_volume = stock.get_parent_lot().volume
+        # if volume_to_flush > initial_volume * 0.05:
+        #     return JsonResponse({'status': 'error', 'message': 'Cannot flush more than 5 percent of initial volume'}, status=400)
 
         initial_volume = 0
         if stock.parent_lot:
