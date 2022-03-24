@@ -16,8 +16,8 @@ from core.decorators import is_admin
 from api.v4.helpers import filter_lots, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_with_errors, get_lots_with_metadata, get_lots_filters_data, get_stock_events
 from api.v4.helpers import get_transaction_distance
 
-from core.models import CarbureLot, CarbureLotComment, CarbureStock, CarbureStockTransformation, Entity, GenericError, SustainabilityDeclaration
-from core.serializers import CarbureLotAdminSerializer, CarbureLotCommentSerializer, CarbureLotPublicSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer, SustainabilityDeclarationSerializer
+from core.models import CarbureLot, CarbureLotComment, CarbureStock, CarbureStockTransformation, Entity, EntityCertificate, GenericError, SustainabilityDeclaration
+from core.serializers import CarbureLotAdminSerializer, CarbureLotCommentSerializer, CarbureLotPublicSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer, EntityCertificateSerializer, SustainabilityDeclarationSerializer
 
 
 @is_admin
@@ -419,3 +419,22 @@ def get_admin_lot_comments(lot):
     comments = lot.carburelotcomment_set.filter(Q(comment_type=CarbureLotComment.ADMIN) | Q(is_visible_by_admin=True))
     return CarbureLotCommentSerializer(comments, many=True).data
 
+@is_admin
+def get_entity_certificates(request, *args, **kwargs):
+    ec = EntityCertificate.objects.filter(checked_by_admin=False).order_by('-added_dt')
+    serializer = EntityCertificateSerializer(ec, many=True)
+    return JsonResponse({'status': "success", 'data': serializer.data})
+    
+
+@is_admin
+def check_entity_certificate(request, *args, **kwargs):
+    entity_certificate_id = request.POST.get('entity_certificate_id', False)
+    if not entity_certificate_id:
+        return JsonResponse({'status': "error", 'message': "Missing entity_certificate_id"}, status=400)
+    try:
+        ec = EntityCertificate.objects.get(id=entity_certificate_id)
+        ec.checked_by_admin = True
+        ec.save()
+        return JsonResponse({'status': "success"})
+    except:
+        return JsonResponse({'status': "error", 'message': "Could not mark certificate as checked"}, status=500)
