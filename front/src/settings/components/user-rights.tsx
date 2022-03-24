@@ -1,11 +1,9 @@
 import { Trans, useTranslation } from "react-i18next"
 
 import { RightStatus } from "account/components/access-rights"
-import { Title } from "common/components"
 import { Alert } from "common/components/alert"
 import { confirm } from "common/components/dialog"
 import { AlertCircle, Check, Cross } from "common-v2/components/icons"
-import { Section, SectionBody, SectionHeader } from "common/components/section"
 import Table, { Actions, Column, padding } from "common/components/table"
 import useAPI from "common/hooks/use-api"
 import { UserRightRequest, UserRightStatus } from "carbure/types"
@@ -16,6 +14,7 @@ import styles from "entities/components/user-rights.module.css"
 import colStyles from "common/components/table.module.css"
 import { Entity } from "carbure/types"
 import { getUserRoleLabel } from "common-v2/utils/normalizers"
+import { Panel } from "common-v2/components/scaffold"
 
 const RIGHTS_ORDER = {
   [UserRightStatus.Pending]: 0,
@@ -134,15 +133,15 @@ const EntityUserRights = ({ entity }: { entity: Entity }) => {
   ]
 
   return (
-    <Section id="users">
-      <SectionHeader>
-        <Title>
+    <Panel id="users">
+      <header>
+        <h1>
           <Trans>Utilisateurs</Trans>
-        </Title>
-      </SectionHeader>
+        </h1>
+      </header>
 
-      <SectionBody>
-        {rows.length === 0 && (
+      {rows.length === 0 && (
+        <section style={{ marginBottom: "var(--spacing-l)" }}>
           <Alert
             icon={AlertCircle}
             level="warning"
@@ -150,11 +149,11 @@ const EntityUserRights = ({ entity }: { entity: Entity }) => {
           >
             <Trans>Aucun utilisateur associé à cette entité</Trans>
           </Alert>
-        )}
-      </SectionBody>
+        </section>
+      )}
 
       {rows.length > 0 && <Table columns={columns} rows={rows} />}
-    </Section>
+    </Panel>
   )
 }
 

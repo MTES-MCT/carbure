@@ -9,19 +9,13 @@ export interface EntityDetails {
   requests: number
   depots: number
   production_sites: number
-  iscc: number
-  dbs: number
-  redcert: number
-  sn: number
+  certificates: number
   double_counting: number
   double_counting_requests: number
 }
 
-export function getEntities(
-  query: string,
-  has_requests?: boolean
-): Promise<EntityDetails[]> {
-  return api.get("/admin/entities", { q: query, has_requests })
+export function getEntities(): Promise<EntityDetails[]> {
+  return api.get("/admin/entities")
 }
 
 export function getEntityDetails(entity_id: number): Promise<Entity> {
