@@ -6,8 +6,6 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    replaces = [('ml', '0001_initial'), ('ml', '0002_alter_eecstats_default_value_and_more'), ('ml', '0003_rename_default_value_max_eec_epstats_default_value_max_ep_and_more')]
-
     initial = True
 
     dependencies = [
