@@ -915,6 +915,7 @@ def get_declarations(request, *args, **kwargs):
 
     pending_period_lots = CarbureLot.objects.filter(period__in=periods) \
         .filter(Q(carbure_client_id=entity_id) | Q(carbure_supplier_id=entity_id)) \
+        .exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED]) \
         .filter(Q(lot_status__in=[CarbureLot.PENDING, CarbureLot.REJECTED]) | Q(correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED])) \
         .values('period') \
         .annotate(count=Count('id', distinct=True))
