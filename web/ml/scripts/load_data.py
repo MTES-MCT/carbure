@@ -7,7 +7,7 @@ from django.db.models import Avg, Count, Min, Max
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from ml.models import EECStats, EPStats
+from ml.models import EECStats, EPStats, ETDStats
 from core.models import Entity, MatierePremiere, Biocarburant, CarbureLot
 
 def load_eec_data():
@@ -39,7 +39,19 @@ def load_ep_data():
         EPStats.objects.update_or_create(biofuel_id=entry['biofuel'], feedstock_id=entry['feedstock'], defaults=d)
 
 def load_etd_data():
-    pass
+    data = {
+        'BETTERAVE': 2,
+        'BLE': 2,
+        'MAIS': 2,
+        'CANNE_A_SUCRE': 9,
+        'SOJA': 13,
+        'TOURNESOL': 1,
+        'COLZA': 1,
+        'HUILE_ALIMENTAIRE_USAGEE': 1,
+    }
+    for k, v in data.items():
+        feedstock = MatierePremiere.objects.get(code=k)
+        ETDStats.objects.update_or_create(feedstock=feedstock, default_value=v)
 
 if __name__ == '__main__':
     load_eec_data()
