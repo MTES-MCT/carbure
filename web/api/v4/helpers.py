@@ -716,7 +716,7 @@ def get_lots_summary_data(lots, entity, short=False):
         'delivery_type'
     ).annotate(
         volume_sum=Sum('volume'),
-        avg_ghg_reduction=Sum(F('volume') * F('ghg_reduction')) / Sum('volume'),
+        avg_ghg_reduction=Sum(F('volume') * F('ghg_reduction_red_ii')) / Sum('volume'),
         total=Count('id'),
         pending=Count('id', filter=pending_filter)
     ).order_by()
@@ -729,7 +729,7 @@ def get_lots_summary_data(lots, entity, short=False):
         'biofuel_code'
     ).annotate(
         volume_sum=Sum('volume'),
-        avg_ghg_reduction=Sum(F('volume') * F('ghg_reduction')) / Sum('volume'),
+        avg_ghg_reduction=Sum(F('volume') * F('ghg_reduction_red_ii')) / Sum('volume'),
         total=Count('id'),
         pending=Count('id', filter=pending_filter)
     ).order_by()
@@ -757,7 +757,7 @@ def get_stocks_summary_data(stocks, entity_id=None, short=False):
         'biofuel_code'
     ).annotate(
         remaining_volume_sum=Sum('remaining_volume'),
-        avg_ghg_reduction=Sum(F('remaining_volume') * F('ghg_reduction')) / Sum('remaining_volume'),
+        avg_ghg_reduction=Sum(F('remaining_volume') * F('ghg_reduction_red_ii')) / Sum('remaining_volume'),
         total=Count('id'),
     ).order_by()
     data['stock'] = list(stock_summary)
