@@ -1024,7 +1024,7 @@ def mark_as_fixed(request, *args, **kwargs):
         if lot.lot_status == CarbureLot.REJECTED:
             lot.lot_status = CarbureLot.PENDING
             lot.correction_status = CarbureLot.NO_PROBLEMO
-        elif lot.added_by == entity and lot.carbure_client == entity:
+        elif lot.added_by == entity and (lot.carbure_client == entity or lot.carbure_client is None):
             lot.correction_status = CarbureLot.NO_PROBLEMO
         else:
             lot.correction_status = CarbureLot.FIXED
