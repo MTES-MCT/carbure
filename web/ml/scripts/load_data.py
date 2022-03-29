@@ -40,14 +40,16 @@ def load_ep_data():
 
 def load_etd_data():
     data = {
-        'BETTERAVE': 2,
-        'BLE': 2,
-        'MAIS': 2,
-        'CANNE_A_SUCRE': 9,
-        'SOJA': 13,
-        'TOURNESOL': 1,
-        'COLZA': 1,
-        'HUILE_ALIMENTAIRE_USAGEE': 1,
+        'BETTERAVE': 2.3,
+        'BLE': 2.2,
+        'MAIS': 2.2,
+        'CANNE_A_SUCRE': 9.7,
+        'SOJA': 8.9,
+        'TOURNESOL': 2.1,
+        'COLZA': 1.8,
+        'HUILE_ALIMENTAIRE_USAGEE': 1.7,
+        'HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2': 1.5,
+        'HUILES_OU_GRAISSES_ANIMALES_CAT3': 1.5
     }
     for k, v in data.items():
         feedstock = MatierePremiere.objects.get(code=k)
