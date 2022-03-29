@@ -19,6 +19,7 @@ from core.models import Biocarburant, CarbureLot, CarbureLotComment, CarbureLotE
 from core.models import GenericError
 from core.serializers import CarbureLotAdminSerializer, CarbureLotCommentSerializer, CarbureLotEventSerializer, CarbureLotPublicSerializer, CarbureStockEventSerializer, CarbureStockPublicSerializer, GenericErrorAdminSerializer, GenericErrorSerializer
 from core.xlsx_v3 import export_carbure_lots, export_carbure_stock
+from ml.models import EECStats, EPStats, ETDStats
 from producers.models import ProductionSite
 
 
@@ -853,6 +854,9 @@ def get_prefetched_data(entity=None):
     d['clientsbyname'] = {c.name.upper(): c for c in Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.OPERATOR, Entity.TRADER])}
     d['certificates'] = {c.certificate_id.upper(): c for c in GenericCertificate.objects.filter(valid_until__gte=lastyear)}
     d['double_counting_certificates'] = {c.certificate_id: c for c in DoubleCountingRegistration.objects.all()}
+    d['etd'] = {s.feedstock: s.default_value for s in ETDStats.objects.all()}
+    d['eec'] = {s.feedstock.code + s.origin.code_pays: s for s in EECStats.objects.all()}
+    d['ep'] = {s.feedstock.code + s.biofuel.code: s for s in EPStats.objects.all()}
     return d
 
 
