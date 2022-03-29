@@ -20,8 +20,8 @@ class EPStats(models.Model):
     feedstock = models.ForeignKey(MatierePremiere, null=False, blank=False, on_delete=models.CASCADE)
     biofuel = models.ForeignKey(Biocarburant, null=False, blank=False, on_delete=models.CASCADE)
     nb_lots = models.IntegerField(null=False, blank=False)
-    default_value_min_eec = models.FloatField(null=False, blank=False, default=0.0)
-    default_value_max_eec = models.FloatField(null=False, blank=False, default=0.0)
+    default_value_min_ep = models.FloatField(null=False, blank=False, default=0.0)
+    default_value_max_ep = models.FloatField(null=False, blank=False, default=0.0)
     stddev = models.FloatField(null=False, blank=False)
     average = models.FloatField(null=False, blank=False)
 
