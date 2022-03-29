@@ -11,9 +11,20 @@ from ml.models import EECStats, EPStats, ETDStats
 from core.models import Entity, MatierePremiere, Biocarburant, CarbureLot
 
 def load_eec_data():
+    default_values = {
+        'BETTERAVE': 9.6,
+        'MAIS': 25.5,
+        'BLE': 27,
+        'ORGE': 27,
+        'CANNE_A_SUCRE': 17.1,
+        'SOJA':22.1,
+        'COLZA':33.4,
+        'TOURNESOL':26.9,
+    }
+    
     data = CarbureLot.objects.filter(year__gte=2021, feedstock__category=MatierePremiere.CONV, lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN], country_of_origin__isnull=False)\
     .exclude(eec=0)\
-    .values('feedstock', 'country_of_origin')\
+    .values('feedstock', 'feedstock__code', 'country_of_origin')\
     .annotate(nb_lots=Count('eec'), average=Avg('eec'), stddev=StdDev('eec'), min=Min('eec'), max=Max('eec'))\
     .exclude(nb_lots__lt=10)
     for entry in data:
@@ -22,6 +33,8 @@ def load_eec_data():
             'stddev': round(entry['stddev'], 2),
             'average': round(entry['average'], 2),
         }
+        if entry['feedstock__code'] in default_values:
+            d['default_value'] = default_values[entry['feedstock__code']]
         EECStats.objects.update_or_create(feedstock_id=entry['feedstock'], origin_id=entry['country_of_origin'], defaults=d)
 
 def load_ep_data():  
