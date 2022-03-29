@@ -1,9 +1,11 @@
 import datetime
+from email.policy import default
 from inspect import trace
 import re
 import traceback
 from django import db
 from core.models import CarbureLot, GenericError, Entity
+from ml.models import EECStats
 # definitions
 
 oct2015 = datetime.date(year=2015, month=10, day=5)
@@ -48,6 +50,13 @@ rules['EXPIRED_DOUBLE_COUNTING_CERTIFICATE'] = "Le certificat double n'est plus 
 rules['POTENTIAL_DUPLICATE'] = "Doublon potentiel détecté. Un autre lot avec le même numéro douanier, biocarburant, matière première, volume et caractéristiques GES existe."
 rules['EEC_WITH_RESIDUE'] = "Émissions GES liées à l'Extraction et la Culture non nulles sur Feedstock non-conventionnel"
 
+EEC_ANORMAL_LOW = "EEC_ANORMAL_LOW"
+EEC_ANORMAL_HIGH = "EEC_ANORMAL_HIGH"
+EP_ANORMAL_LOW = "EP_ANORMAL_LOW"
+EP_ANORMAL_HIGH = "EP_ANORMAL_HIGH"
+ETD_ANORMAL_HIGH = "ETD_ANORMAL_HIGH"
+ETD_NO_EU_TOO_LOW = "ETD_NO_EU_TOO_LOW"
+ETD_EU_DEFAULT_VALUE = "ETD_EU_DEFAULT_VALUE"
 
 def generic_error(error, **kwargs):
     d = {
@@ -77,6 +86,40 @@ def bulk_sanity_checks(lots, prefetched_data, background=True):
             traceback.print_exc()
     GenericError.objects.bulk_create(errors, batch_size=1000)
     return results
+
+def check_ghg_values(prefetched_data, lot, errors):
+    etd = prefetched_data['etd']
+    eec = prefetched_data['eec']
+    ep = prefetched_data['ep']
+
+    if lot.feedstock in etd:
+        default_value = etd[lot.feedstock]
+        if lot.etd > 2 * default_value and lot.etd > 5:
+            errors.append(generic_error(error=ETD_ANORMAL_HIGH, lot=lot, display_to_creator=False))
+        if lot.country_of_origin:
+            if not lot.country_of_origin.is_in_europe and lot.etd < 1:
+                errors.append(generic_error(error=ETD_NO_EU_TOO_LOW, lot=lot, display_to_creator=False))
+            if lot.country_of_origin.is_in_europe and lot.etd == 0.5:
+                errors.append(generic_error(error=ETD_EU_DEFAULT_VALUE, lot=lot, display_to_creator=False))
+
+    if lot.feedstock and lot.country_of_origin:
+        key = lot.feedstock.code + lot.country_of_origin.code_pays
+        if key in eec:
+            entry = eec[key]
+            if lot.eec < 0.8 * min(entry.average, entry.stddev):
+                errors.append(generic_error(error=EEC_ANORMAL_LOW, lot=lot, display_to_creator=False))
+            if lot.eec > 1.2 * max(entry.average, entry.stddev):
+                errors.append(generic_error(error=EEC_ANORMAL_HIGH, lot=lot, display_to_creator=False))
+
+            
+    if lot.feedstock and lot.biofuel:
+        key = lot.feedstock.code + lot.biofuel.code
+        if key in ep:
+            entry = ep[key]
+            if lot.ep < 0.8 * entry.average:
+                errors.append(generic_error(error=EP_ANORMAL_LOW, lot=lot, display_to_creator=False))
+            if lot.ep > 1.2 * entry.default_value_max_ep:
+                errors.append(generic_error(error=EP_ANORMAL_HIGH, lot=lot, display_to_creator=False))
 
 
 def check_certificates(prefetched_data, lot, errors):
@@ -277,6 +320,8 @@ def sanity_check(lot, prefetched_data):
                 errors.append(generic_error(error='DEPOT_NOT_CONFIGURED', lot=lot, display_to_recipient=True, display_to_creator=False, field='delivery_site'))
     # CERTIFICATES CHECK
     check_certificates(prefetched_data, lot, errors)
+    # ML STATS CHECK
+    check_ghg_values(prefetched_data, lot, errors)
     if lot.delivery_date > future:
         errors.append(GenericError(lot=lot, field='delivery_date', error="DELIVERY_IN_THE_FUTURE", extra="La date de livraison est dans le futur", value=lot.delivery_date, display_to_creator=True, is_blocking=True))
 
