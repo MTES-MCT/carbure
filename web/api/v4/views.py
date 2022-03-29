@@ -738,6 +738,7 @@ def lots_send(request, *args, **kwargs):
             final_client = lot.carbure_client
             nb_auto_accepted += 1
             lot.lot_status = CarbureLot.ACCEPTED
+            lot.delivery_type = CarbureLot.TRADING
             lot.carbure_client = entity
             lot.save()
             first_lot_id = lot.id
@@ -758,6 +759,7 @@ def lots_send(request, *args, **kwargs):
             lot.vendor_certificate = ''
             lot.vendor_certificate_type = ''
             lot.lot_status = CarbureLot.PENDING
+            lot.delivery_type = CarbureLot.UNKNOWN
             lot.save()
             trading_lots.append(lot)
             event = CarbureLotEvent()
