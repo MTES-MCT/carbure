@@ -166,7 +166,7 @@ export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
   }
 
   // prevent editing delivery type when doing a correction for a lot that duplicated for forwarding
-  const isDraft = value.lot && value.lot.lot_status === "DRAFT"
+  const isDraft = !value.lot || value.lot.lot_status === "DRAFT"
   const hasChildren = value.delivery_type && [DeliveryType.Stock, DeliveryType.Processing, DeliveryType.Trading].includes(value.delivery_type)
 
   return (
