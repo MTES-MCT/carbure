@@ -29,6 +29,7 @@ import { Entity, UserRole } from "carbure/types"
 import LotTraceability, { hasTraceability } from "./lot-traceability"
 import { invalidate } from "common-v2/hooks/invalidate"
 import { useCategory } from "transactions/components/category"
+import { formatDate } from "common-v2/utils/formatters"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -98,6 +99,8 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
           {t("Détails du lot")} #{lotData?.lot.carbure_id || lotData?.lot.id}
           {" · "}
           {creator?.name ?? "N/A"}
+          {" · "}
+          {lotData && formatDate(lotData.lot.created_at)}
         </h1>
 
         {expiring && (

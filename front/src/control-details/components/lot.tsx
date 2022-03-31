@@ -29,6 +29,7 @@ import { WarningAnomalies } from "./warnings"
 import { invalidate } from "common-v2/hooks/invalidate"
 import { PinOneButton } from "controls/actions/pin"
 import ControlComments from "./control-comments"
+import { formatDate } from "common-v2/utils/formatters"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -78,6 +79,8 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
           {t("Détails du lot")} #{lotData?.lot.carbure_id || lotData?.lot.id}
           {" · "}
           {creator?.name ?? "N/A"}
+          {" · "}
+          {lotData && formatDate(lotData.lot.created_at)}
         </h1>
 
         {expiring && (
