@@ -71,13 +71,16 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    #'django.middleware.csrf.CsrfViewMiddleware',
+#    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'core.logging_middleware.LoggingMiddleware',
 ]
+
+#CSRF_TRUSTED_ORIGINS = env.list('ALLOWED_HOSTS')
+CSRF_TRUSTED_ORIGINS = ["http://carbure.local:8090"]
 
 X_FRAME_OPTIONS = "SAMEORIGIN"
 

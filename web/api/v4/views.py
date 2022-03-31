@@ -756,7 +756,7 @@ def lots_send(request, *args, **kwargs):
             lot.supplier_certificate = lot.vendor_certificate
             lot.supplier_certificate_type = lot.vendor_certificate_type
             lot.carbure_vendor = None
-            lot.vendor_certificate = ''
+            lot.vendor_certificate = None
             lot.vendor_certificate_type = ''
             lot.lot_status = CarbureLot.PENDING
             lot.delivery_type = CarbureLot.UNKNOWN
