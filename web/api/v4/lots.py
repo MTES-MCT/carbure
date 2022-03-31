@@ -272,11 +272,14 @@ def fill_delivery_data(lot, data, entity, prefetched_data):
     if lot.transport_document_type is None:
         lot.transport_document_type = CarbureLot.DAE
     lot.transport_document_reference = data.get('transport_document_reference', None)
+
     delivery_type = data.get('delivery_type', None)
     if delivery_type is None:
         lot.delivery_type = CarbureLot.UNKNOWN
     else:
         lot.delivery_type = data.get('delivery_type', None)
+        if lot.delivery_type not in [CarbureLot.UNKNOWN, CarbureLot.RFC, CarbureLot.STOCK, CarbureLot.BLENDING, CarbureLot.EXPORT, CarbureLot.TRADING, CarbureLot.PROCESSING, CarbureLot.DIRECT, CarbureLot.FLUSHED]:
+            lot.delivery_type = CarbureLot.UNKNOWN
     dest = data.get('carbure_delivery_site_depot_id', None)
     if dest in prefetched_data['depots']:
         lot.carbure_delivery_site = prefetched_data['depots'][dest]
