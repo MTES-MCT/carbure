@@ -19,6 +19,7 @@ import { useMatomo } from "matomo"
 import Select from "common-v2/components/select"
 import { formatNumber } from "common-v2/utils/formatters"
 import { getDeliveryTypes } from "lot-add/components/delivery-fields"
+import { findMyCertificates } from "common-v2/api"
 
 export interface SplitOneButtonProps {
   disabled?: boolean
@@ -118,6 +119,13 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
               {...bind("transport_document_reference")}
             />
             <Autocomplete
+              required
+              label={t("Votre certificat de négoce")}
+              getOptions={(query) => findMyCertificates(query, { entity_id: entity.id })}
+              placeholder={entity.default_certificate}
+              {...bind('supplier_certificate')}
+            />
+            <Autocomplete
               label={t("Client")}
               getOptions={findEntities}
               normalize={norm.normalizeEntityOrUnknown}
@@ -192,6 +200,7 @@ function formToStockPayload(form: SplitForm): StockPayload {
   return {
     stock_id: form.stock_id,
     volume: form.volume,
+    supplier_certificate: form.supplier_certificate,
     transport_document_reference: form.transport_document_reference,
     transport_document_type: undefined,
     delivery_type: form.delivery_type,
@@ -214,6 +223,7 @@ const defaultSplit = {
   delivery_type: undefined as string | undefined,
   volume: 0 as number | undefined,
   transport_document_reference: undefined as string | undefined,
+  supplier_certificate: undefined as string | undefined,
   client: undefined as Entity | string | undefined,
   delivery_date: undefined as string | undefined,
   delivery_site: undefined as Depot | string | undefined,

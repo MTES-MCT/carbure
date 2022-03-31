@@ -304,6 +304,7 @@ export interface StockQuery {
 export interface StockPayload {
   stock_id: string | undefined
   volume: number | undefined
+  supplier_certificate: string | undefined
   transport_document_type: string | undefined
   transport_document_reference: string | undefined
   delivery_date: string | undefined
