@@ -218,10 +218,13 @@ def fill_vendor_data(lot, data, entity):
     if entity != lot.carbure_supplier and entity != lot.carbure_client:
         lot.carbure_vendor = entity # this will flag the transaction when it is validated in order to create 2 transactions (unknown_supplier -> vendor and vendor -> client)
         lot.vendor_certificate = data.get('vendor_certificate', entity.default_certificate)
-    # patch to deal with people who confuse vendor certificate for supplier certificate
-    elif not lot.supplier_certificate:
-        # maybe they used vendor_certificate ?
-        lot.supplier_certificate = data.get('vendor_certificate', '')
+    else:
+        lot.vendor_certificate = ''
+        lot.carbure_vendor = None
+        # patch to deal with people who confuse vendor certificate for supplier certificate
+        if not lot.supplier_certificate:
+            # maybe they used vendor_certificate ?
+            lot.supplier_certificate = data.get('vendor_certificate', '')
 
 def fill_ghg_info(lot, data):
     errors = []
@@ -292,12 +295,18 @@ def fill_delivery_data(lot, data, entity, prefetched_data):
         delivery_country_code = data.get('delivery_site_country_code', None)
         if delivery_country_code in prefetched_data['countries']:
             lot.delivery_site_country = prefetched_data['countries'][delivery_country_code]
+
+    if entity.entity_type == Entity.OPERATOR and lot.carbure_client == entity and lot.delivery_type == CarbureLot.UNKNOWN:
+        lot.delivery_type = CarbureLot.BLENDING
     return errors
 
 
 def fill_client_data(lot, data, entity, prefetched_data):
     errors = []
     carbure_client_id = data.get('carbure_client_id', None)
+    if entity.entity_type == Entity.OPERATOR and carbure_client_id is None and lot.delivery_type == CarbureLot.UNKNOWN:
+        lot.carbure_client = entity
+
     try:
         carbure_client_id = int(carbure_client_id)
         if carbure_client_id in prefetched_data['clients']:
@@ -309,7 +318,7 @@ def fill_client_data(lot, data, entity, prefetched_data):
             else:
                 errors.append(GenericError(lot=lot, field='carbure_client_id', error=UNKNOWN_CLIENT, display_to_creator=True))
     except:
-        lot.carbure_client = None
+        pass
     lot.unknown_client = data.get('unknown_client', None)
     return errors
 
