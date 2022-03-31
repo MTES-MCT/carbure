@@ -65,6 +65,7 @@ export const lot: Lot = {
   unknown_delivery_site: "",
   delivery_site_country: country,
   free_field: "",
+  created_at: "2020-01-31",
 }
 
 export const lotDetails: LotDetails = {
