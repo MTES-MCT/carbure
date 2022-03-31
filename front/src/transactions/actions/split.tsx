@@ -119,11 +119,12 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
               {...bind("transport_document_reference")}
             />
             <Autocomplete
-              required
               label={t("Votre certificat de négoce")}
-              getOptions={(query) => findMyCertificates(query, { entity_id: entity.id })}
+              getOptions={(query) =>
+                findMyCertificates(query, { entity_id: entity.id })
+              }
               placeholder={entity.default_certificate}
-              {...bind('supplier_certificate')}
+              {...bind("supplier_certificate")}
             />
             <Autocomplete
               label={t("Client")}
