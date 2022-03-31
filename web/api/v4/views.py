@@ -298,7 +298,7 @@ def stock_split(request, *args, **kwargs):
         unserialized = json.loads(payload)
         # expected format: [{stock_id: "L20140-4243-XXX", volume: 3244.33, transport_document_type: 'DAE', transport_document_reference: 'FR221244342WW'
         # dispatch_date: '2021-05-11', carbure_delivery_site_id: None, unknown_delivery_site: "SomeUnknownDepot", delivery_site_country_id: 120,
-        # delivery_type: 'EXPORT', carbure_client_id: 12, unknown_client: None}]
+        # delivery_type: 'EXPORT', carbure_client_id: 12, unknown_client: None, supplier_certificate: "MON_CERTIFICAT"}]
     except:
         return JsonResponse({'status': 'error', 'message': 'Cannot parse payload into JSON'}, status=400)
 
@@ -351,6 +351,7 @@ def stock_split(request, *args, **kwargs):
         lot.carbure_dispatch_site = stock.depot
         lot.dispatch_site_country = lot.carbure_dispatch_site.country if lot.carbure_dispatch_site else None
         lot.carbure_supplier_id = entity_id
+        lot.supplier_certificate = entry.get('supplier_certificate', entity.default_certificate)
         lot.added_by_id = entity_id
         lot.dispatch_date = entry.get('dispatch_date', None)
         lot.unknown_client = entry.get('unknown_client', None)
