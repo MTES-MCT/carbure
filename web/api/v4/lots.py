@@ -3,6 +3,7 @@ import unicodedata
 import dateutil
 from typing import Generic, List
 from django.db.models.query import QuerySet
+from django.db.models.query_utils import Q
 from numpy.lib.function_base import insert
 from api.v4.sanity_checks import bulk_sanity_checks
 from core.models import CarbureLot, CarbureLotEvent, CarbureStock, Entity, GenericError
@@ -81,12 +82,11 @@ def fill_production_info(lot, data, entity, prefetched_data):
         # NEW LOT
         lot.production_site_certificate = data.get('production_site_certificate', None)
         lot.production_site_certificate_type = data.get('production_site_certificate_type', None)
-        unknown_producer = data.get('unknown_producer', None)
+        carbure_production_site = data.get('carbure_production_site', '').upper()
         # CASE 2
-        if unknown_producer is None and entity.entity_type == Entity.PRODUCER:
+        if carbure_production_site and entity.entity_type == Entity.PRODUCER:
             lot.carbure_producer = entity
             lot.unknown_producer = None
-            carbure_production_site = data.get('carbure_production_site', '').upper()
             if carbure_production_site in prefetched_data['my_production_sites']:
                 lot.carbure_production_site = prefetched_data['my_production_sites'][carbure_production_site]
             else:
@@ -222,7 +222,7 @@ def fill_vendor_data(lot, data, entity):
         lot.vendor_certificate = None
         lot.carbure_vendor = None
         # patch to deal with people who confuse vendor certificate for supplier certificate
-        if not lot.supplier_certificate:
+        if not lot.supplier_certificate and data.get('vendor_certificate', False):
             # maybe they used vendor_certificate ?
             lot.supplier_certificate = data.get('vendor_certificate', '')
 
@@ -331,11 +331,11 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
     lot.free_field = data.get('free_field', None)
     lot.added_by = entity
     carbure_stock_id = data.get('carbure_stock_id', False)
-    if carbure_stock_id:
+    if carbure_stock_id or lot.parent_stock_id:
         # Lot is extracted from STOCK.
         # FILL sustainability data from parent_stock
         try:
-            parent_stock = CarbureStock.objects.get(carbure_id=carbure_stock_id)
+            parent_stock = CarbureStock.objects.get(Q(carbure_id=carbure_stock_id) | Q(pk=lot.parent_stock_id))
         except:
             return None, []
         original_lot = parent_stock.get_parent_lot()
@@ -344,6 +344,7 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
         lot.copy_sustainability_data(original_lot)
         lot.carbure_dispatch_site = parent_stock.depot
         lot.carbure_supplier = parent_stock.carbure_client
+        lot.biofuel = parent_stock.biofuel
     else:
         # FILL sustainability data from excel file
         errors += fill_production_info(lot, data, entity, prefetched_data)
