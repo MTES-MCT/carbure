@@ -442,7 +442,7 @@ def get_admin_summary_data(lots, short=False):
         'delivery_type'
     ).annotate(
         volume_sum=Sum('volume'),
-        avg_ghg_reduction=Sum(F('volume') * F('ghg_reduction')) / Sum('volume'),
+        avg_ghg_reduction=Sum(F('volume') * F('ghg_reduction_red_ii')) / Sum('volume'),
         total=Count('id'),
         pending=Count('id', filter=pending_filter)
     ).distinct().order_by()
