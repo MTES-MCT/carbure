@@ -219,7 +219,7 @@ def fill_vendor_data(lot, data, entity):
         lot.carbure_vendor = entity # this will flag the transaction when it is validated in order to create 2 transactions (unknown_supplier -> vendor and vendor -> client)
         lot.vendor_certificate = data.get('vendor_certificate', entity.default_certificate)
     else:
-        lot.vendor_certificate = ''
+        lot.vendor_certificate = None
         lot.carbure_vendor = None
         # patch to deal with people who confuse vendor certificate for supplier certificate
         if not lot.supplier_certificate:
