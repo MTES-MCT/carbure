@@ -62,6 +62,7 @@ export interface Lot {
   ghg_reduction_red_ii: number
   free_field: string
   added_by: Entity
+  created_at: string
   highlighted_by_admin?: boolean
   highlighted_by_auditor?: boolean
 }

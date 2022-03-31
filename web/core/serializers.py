@@ -249,7 +249,7 @@ class CarbureLotPublicSerializer(serializers.ModelSerializer):
                   'lot_status', 'correction_status',
                   'volume', 'weight', 'lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
                   'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ghg_reference_red_ii', 'ghg_reduction_red_ii',
-                  'free_field', 'added_by', 'carbure_vendor', 'vendor_certificate', 'vendor_certificate_type',
+                  'free_field', 'added_by', 'created_at', 'carbure_vendor', 'vendor_certificate', 'vendor_certificate_type',
                   ]
 
 
@@ -266,9 +266,8 @@ class CarbureLotAdminSerializer(CarbureLotPublicSerializer):
                   'lot_status', 'correction_status',
                   'volume', 'weight', 'lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
                   'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ghg_reference_red_ii', 'ghg_reduction_red_ii',
-                  'free_field', 'added_by', 'highlighted_by_auditor', 'highlighted_by_admin', 'carbure_vendor', 'vendor_certificate', 'vendor_certificate_type',
+                  'free_field', 'added_by', 'created_at', 'highlighted_by_auditor', 'highlighted_by_admin', 'carbure_vendor', 'vendor_certificate', 'vendor_certificate_type',
                   ]
-
 
 
 class GenericCertificateSerializer(serializers.ModelSerializer):
