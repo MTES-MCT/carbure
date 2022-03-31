@@ -21,6 +21,7 @@ import {
   LotFormValue,
 } from "./lot-form"
 import { Entity } from "carbure/types"
+import { LotStatus } from "transactions/types"
 import { Country, Depot } from "common/types"
 import Select, { SelectProps } from "common-v2/components/select"
 import { DeliveryType } from "transactions/types"
@@ -158,15 +159,20 @@ export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { value, bind } = useFormContext<LotFormValue>()
-  const deliveryTypes = getDeliveryTypes(entity, value.client)
+  const deliveryTypes = getDeliveryTypes(entity, value.client, value.lot?.lot_status)
 
   if (deliveryTypes.length === 0 || value.lot?.lot_status === "PENDING") {
     return null
   }
 
+  // prevent editing delivery type when doing a correction for a lot that duplicated for forwarding
+  const isDraft = value.lot && value.lot.lot_status === "DRAFT"
+  const hasChildren = value.delivery_type && [DeliveryType.Stock, DeliveryType.Processing, DeliveryType.Trading].includes(value.delivery_type)
+
   return (
     <Select
       clear
+      disabled={!isDraft && hasChildren}
       label={t("Type de livraison")}
       placeholder={t("Choisissez un type")}
       normalize={norm.normalizeDeliveryType}
@@ -179,9 +185,10 @@ export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
 
 export function getDeliveryTypes(
   entity: EntityManager,
-  client: Entity | string | undefined
+  client: Entity | string | undefined,
+  status: LotStatus = LotStatus.Draft
 ) {
-  const { isOperator, has_stocks, has_mac, has_direct_deliveries } = entity
+  const { isOperator, has_stocks, has_mac, has_direct_deliveries, has_trading } = entity
   const isClientEntity = client instanceof Object ? client.id === entity.id : false // prettier-ignore
   const isClientUnknown = client === undefined || typeof client === "string"
 
@@ -191,6 +198,7 @@ export function getDeliveryTypes(
     (isClientUnknown || isClientEntity) && has_mac && DeliveryType.RFC,
     (isClientUnknown || isClientEntity) && has_direct_deliveries && DeliveryType.Direct, // prettier-ignore
     (isClientUnknown || isClientEntity) && DeliveryType.Exportation,
+    status !== LotStatus.Draft && has_trading && DeliveryType.Trading
   ])
 }
 
