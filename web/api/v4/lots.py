@@ -188,42 +188,40 @@ def fill_supplier_info(lot, data, entity):
     # supplier = my supplier - who supplied the biofuel to me
     # vendor = me (as a producer or trader)
 
-    # OPERATOR: no vendor_certificate and supplier_certificate is mandatory
-    # PRODUCER: vendor_certificate is mandatory (and becomes lot.supplier_certificate)
-    # TRADER: supplier_certificate optional, vendor_certificate mandatory (and becomes lot.supplier_certificate)
+    # OPERATOR: no vendor_certificate and supplier_certificate is mandatory (and becomes lot.supplier_certificate)
+    # PRODUCER: no vendor_certificate and supplier_certificate is mandatory (and becomes lot.supplier_certificate)
+    # TRADER: supplier_certificate optional (lot.supplier_certificate of lot1), 
+    #         vendor_certificate mandatory (and becomes lot.supplier_certificate of lot2)
 
     # default values
     lot.carbure_supplier = None
     lot.unknown_supplier = data.get('unknown_supplier', None)
-    lot.supplier_certificate = data.get('vendor_certificate', '')
-    if lot.supplier_certificate == '':
-        lot.supplier_certificate = data.get('supplier_certificate', '')
-    if lot.supplier_certificate == '':
-        lot.supplier_certificate = entity.default_certificate
+    lot.supplier_certificate = data.get('supplier_certificate', '')
 
-    ### LOT FROM STOCK
+    # I AM THE SUPPLIER
+    if data.get('carbure_supplier_id') == str(entity.id):
+        lot.carbure_supplier = entity
+        lot.supplier_certificate = data.get('supplier_certificate', entity.default_certificate)
+    # LOT FROM STOCK
     if lot.parent_stock:
         lot.carbure_supplier = entity
-        return errors
-    ### MY OWN PRODUCTION
-    # EXCEL
-    if lot.carbure_producer and lot.carbure_producer.id == entity.id:
+        lot.supplier_certificate = data.get('supplier_certificate', entity.default_certificate)
+    # EXCEL: NO SUPPLIER IS SPECIFIED AND I AM THE PRODUCER
+    if lot.carbure_producer and lot.carbure_producer.id == entity.id and not lot.carbure_supplier:
         lot.carbure_supplier = entity
-        lot.unknown_supplier = None
-    # WEB FORM
-    if data.get('carbure_supplier_id', '') == str(entity.id):
-        lot.carbure_supplier = entity
-        lot.unknown_supplier = None
-    # NO SUPPLIER IS SPECIFIED AND I AM NOT THE CLIENT - ASSUME I AM THE SUPPLIER
-    if entity != lot.carbure_client and not lot.carbure_supplier and not lot.unknown_supplier and not lot.vendor_certificate:
-        lot.carbure_supplier = entity
-        lot.unknown_supplier = None
-    # I AM NEITHER THE PRODUCER NOR THE CLIENT - TRADING
+        lot.supplier_certificate = data.get('supplier_certificate', entity.default_certificate)
+
+    return errors
+
+def fill_vendor_data(lot, data, entity):
+    # I AM NEITHER THE PRODUCER NOR THE CLIENT - TRADING - OVERRIDE SOME FIELDS
     if entity != lot.carbure_supplier and entity != lot.carbure_client:
         lot.carbure_vendor = entity # this will flag the transaction when it is validated in order to create 2 transactions (unknown_supplier -> vendor and vendor -> client)
-        lot.supplier_certificate = data.get('supplier_certificate', '')
         lot.vendor_certificate = data.get('vendor_certificate', entity.default_certificate)
-    return errors
+    # patch to deal with people who confuse vendor certificate for supplier certificate
+    elif not lot.supplier_certificate:
+        # maybe they used vendor_certificate ?
+        lot.supplier_certificate = data.get('vendor_certificate', '')
 
 def fill_ghg_info(lot, data):
     errors = []
@@ -266,13 +264,7 @@ def fill_ghg_info(lot, data):
     lot.update_ghg()
     return errors
 
-def fill_delivery_data(lot, data, entity, prefetched_data):
-    errors = []
-    lot.transport_document_type = data.get('transport_document_type', None)
-    if lot.transport_document_type is None:
-        lot.transport_document_type = CarbureLot.DAE
-    lot.transport_document_reference = data.get('transport_document_reference', None)
-
+def fill_delivery_type(lot, data):
     delivery_type = data.get('delivery_type', None)
     if delivery_type is None:
         lot.delivery_type = CarbureLot.UNKNOWN
@@ -280,6 +272,14 @@ def fill_delivery_data(lot, data, entity, prefetched_data):
         lot.delivery_type = data.get('delivery_type', None)
         if lot.delivery_type not in [CarbureLot.UNKNOWN, CarbureLot.RFC, CarbureLot.STOCK, CarbureLot.BLENDING, CarbureLot.EXPORT, CarbureLot.TRADING, CarbureLot.PROCESSING, CarbureLot.DIRECT, CarbureLot.FLUSHED]:
             lot.delivery_type = CarbureLot.UNKNOWN
+
+def fill_delivery_data(lot, data, entity, prefetched_data):
+    errors = []
+    lot.transport_document_type = data.get('transport_document_type', None)
+    if lot.transport_document_type is None:
+        lot.transport_document_type = CarbureLot.DAE
+    lot.transport_document_reference = data.get('transport_document_reference', None)
+
     dest = data.get('carbure_delivery_site_depot_id', None)
     if dest in prefetched_data['depots']:
         lot.carbure_delivery_site = prefetched_data['depots'][dest]
@@ -342,12 +342,13 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
         errors += fill_ghg_info(lot, data)
 
     # common data
+    fill_delivery_type(lot, data)
+    errors += fill_client_data(lot, data, entity, prefetched_data)
     errors += fill_volume_info(lot, data)
     errors += fill_delivery_date(lot, data)
     errors += fill_supplier_info(lot, data, entity)
     errors += fill_delivery_data(lot, data, entity, prefetched_data)
-    errors += fill_client_data(lot, data, entity, prefetched_data)
-
+    fill_vendor_data(lot, data, entity)
     return lot, errors
 
 def bulk_insert_lots(entity: Entity, lots: List[CarbureLot], errors: List[GenericError], prefetched_data: dict) -> QuerySet:

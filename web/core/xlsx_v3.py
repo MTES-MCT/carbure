@@ -811,7 +811,7 @@ def make_template_carbure_lots_sheet(workbook, entity):
             rows.append(['ajout pour client hors-carbure', '', random.choice(psites).name, '', '', '', '', '', '', '', 36000, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), 'UNKNOWN CLIENT GmbH', today, 'UNKNOWN DEPOT', 'DE', ''])
             
             # CASE 3 my production - custom certificate
-            rows.append(['ajout simple et choix du certificat', '', random.choice(psites).name, '', '', '', '', '', '', 'ISCC-XXXX-XXXX', 36500, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), random.choice(clients).name, today, random.choice(delivery_sites).name, '', ''])
+            rows.append(['ajout simple et choix du certificat', '', random.choice(psites).name, '', '', '', '', '', 'ISCC-XXXX-XXXX', '', 36500, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), random.choice(clients).name, today, random.choice(delivery_sites).name, '', ''])
             # CASE 4
             rows.append(['mise a consommation', '', random.choice(psites).name, '', '', '', '', '', '', '', 5700, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), 'MAC', today, '', 'FR', 'RFC'])
 
