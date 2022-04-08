@@ -97,9 +97,9 @@ def check_ghg_values(prefetched_data, lot, errors):
         if lot.etd > 2 * default_value and lot.etd > 5:
             errors.append(generic_error(error=ETD_ANORMAL_HIGH, lot=lot, display_to_creator=False))
         if lot.country_of_origin:
-            if not lot.country_of_origin.is_in_europe and lot.etd < 1:
+            if not lot.country_of_origin.is_in_europe and lot.etd < default_value:
                 errors.append(generic_error(error=ETD_NO_EU_TOO_LOW, lot=lot, display_to_creator=False))
-            if lot.country_of_origin.is_in_europe and lot.etd == 0.5:
+            if lot.country_of_origin.is_in_europe and lot.etd == default_value:
                 errors.append(generic_error(error=ETD_EU_DEFAULT_VALUE, lot=lot, display_to_creator=False))
 
     if lot.feedstock and lot.country_of_origin:
