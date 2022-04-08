@@ -97,7 +97,7 @@ def notify_lots_recalled(lots):
 def notify_declaration_cancelled(declaration):
     notif = CarbureNotification()
     notif.type = CarbureNotification.DECLARATION_CANCELLED
-    notif.dest_id = declaration.entity
+    notif.dest = declaration.entity
     notif.send_by_email = False
     notif.notify_administrator = False
     notif.save()
@@ -105,7 +105,7 @@ def notify_declaration_cancelled(declaration):
 def notify_declaration_validated(declaration):
     notif = CarbureNotification()
     notif.type = CarbureNotification.DECLARATION_VALIDATED
-    notif.dest_id = declaration.entity
+    notif.dest = declaration.entity
     notif.send_by_email = False
     notif.notify_administrator = False
     notif.save()
