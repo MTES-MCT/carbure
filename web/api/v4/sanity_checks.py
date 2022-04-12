@@ -160,7 +160,7 @@ def check_certificates(prefetched_data, lot, errors):
         else:
             if dc_cert not in prefetched_data['double_counting_certificates']:
                 # 2022-03-22: GC requests that this is a blocking error
-                errors.append(generic_error(error='UNKNOWN_DOUBLE_COUNTING_CERTIFICATE', lot=lot, blocking=True, display_to_recipient=True, field='dc_reference'))
+                errors.append(generic_error(error='UNKNOWN_DOUBLE_COUNTING_CERTIFICATE', lot=lot, is_blocking=True, display_to_recipient=True, field='dc_reference'))
             else:
                 dcc = prefetched_data['double_counting_certificates'][dc_cert]
                 dcc_period = dcc.valid_until.year * 100 + dcc.valid_until.month # ex 202012
