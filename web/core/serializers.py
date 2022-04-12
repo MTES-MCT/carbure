@@ -65,6 +65,7 @@ class CarbureLotCSVSerializer(serializers.ModelSerializer):
     country_of_origin = serializers.SerializerMethodField()
     biofuel = serializers.SerializerMethodField()
     feedstock = serializers.SerializerMethodField()
+    feedstock_category = serializers.SerializerMethodField()
     production_site_double_counting_certificate = serializers.SerializerMethodField()
 
     class Meta:
@@ -73,7 +74,7 @@ class CarbureLotCSVSerializer(serializers.ModelSerializer):
                   'production_country', 'production_site_commissioning_date', 'production_site_certificate', 'production_site_double_counting_certificate',
                   'supplier', 'supplier_certificate',
                   'transport_document_reference', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country', 'delivery_type',
-                  'volume', 'weight', 'lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
+                  'volume', 'weight', 'lhv_amount', 'feedstock', 'feedstock_category', 'biofuel', 'country_of_origin',
                   'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ghg_reference_red_ii', 'ghg_reduction_red_ii',
                   'free_field'
                   ]
@@ -107,6 +108,9 @@ class CarbureLotCSVSerializer(serializers.ModelSerializer):
 
     def get_feedstock(self, obj):
         return obj.feedstock.code if obj.feedstock else ''
+
+    def get_feedstock_category(self, obj):
+        return obj.feedstock.category if obj.feedstock else ''
 
     def get_biofuel(self, obj):
         return obj.biofuel.code if obj.biofuel else ''
