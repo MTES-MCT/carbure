@@ -678,9 +678,9 @@ class CarbureStock(models.Model):
         if self.parent_lot:
             return self.parent_lot.delivery_date
         elif self.parent_transformation:
-            return self.parent_transformation.transformation_dt
+            return self.parent_transformation.transformation_dt.date()
         else:
-            return datetime.datetime.now()
+            return datetime.date.today()
         # return self.parent_lot.delivery_date if self.parent_lot else self.parent_transformation.transformation_dt
 
     def update_remaining_volume(self, volume_to_recredit, volume_to_debit):

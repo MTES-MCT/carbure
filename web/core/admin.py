@@ -289,7 +289,7 @@ class CarbureLotAdmin(admin.ModelAdmin):
 
 @admin.register(CarbureStock)
 class CarbureStockAdmin(admin.ModelAdmin):
-    list_display = ['parent_lot', 'carbure_id', 'get_client', 'get_depot',  'get_biofuel', 'get_feedstock', 'get_orig_volume', 'remaining_volume', 'get_supplier']
+    list_display = ['parent_lot', 'get_delivery_date', 'carbure_id', 'get_client', 'get_depot',  'get_biofuel', 'get_feedstock', 'get_orig_volume', 'remaining_volume', 'get_supplier']
     raw_id_fields = ['parent_lot', 'parent_transformation']
     list_filter = (('parent_lot__period', DropdownFilter), ('biofuel', NameSortedRelatedOnlyDropdownFilter), ('feedstock', NameSortedRelatedOnlyDropdownFilter), 
                   ('carbure_supplier', NameSortedRelatedOnlyDropdownFilter), ('carbure_client', NameSortedRelatedOnlyDropdownFilter),  
@@ -321,6 +321,10 @@ class CarbureStockAdmin(admin.ModelAdmin):
                 stock.remaining_lhv_amount = stock.get_lhv_amount()
                 stock.save()
     recalc_stock.short_description = "Recalculer stock restant"
+
+    def get_delivery_date(self, obj):
+        return obj.get_delivery_date()
+    get_delivery_date.short_description = 'Delivery Date'
 
     def get_supplier(self, obj):
         return obj.carbure_supplier.name if obj.carbure_supplier else 'U - %s' % (obj.unknown_supplier)
