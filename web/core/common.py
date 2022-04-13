@@ -1,4 +1,6 @@
 import datetime
+from urllib import response
+from django.http import JsonResponse
 import openpyxl
 import numpy as np
 import os
@@ -7,6 +9,9 @@ from multiprocessing import Process
 import pandas as pd
 from pandas._typing import Scalar
 from typing import List
+
+from requests import JSONDecodeError
+from core.carburetypes import Carbure
 
 from core.models import CarbureLot, GenericCertificate,  GenericError
 from core.models import TransactionDistance
@@ -232,3 +237,19 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
             lot['unknown_client'] = client
         lots_data.append(lot)
     return lots_data
+
+def ErrorResponse(status_code, error=None, data=None):
+    response_data = {}
+    response_data['status'] = Carbure.ERROR
+    if data is not None:
+        response_data['data'] = data
+    if error is not None:
+        response_data['error'] = error
+    return JsonResponse(response_data, status_code=status_code)
+
+def SuccessResponse(data=None):
+    response_data = {}
+    response_data['status'] = Carbure.SUCCESS
+    if data is not None:
+        response_data['data'] = data
+    return JsonResponse(response_data)
