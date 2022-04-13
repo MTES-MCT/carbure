@@ -10,7 +10,6 @@ import pandas as pd
 from pandas._typing import Scalar
 from typing import List
 
-from requests import JSONDecodeError
 from core.carburetypes import Carbure
 
 from core.models import CarbureLot, GenericCertificate,  GenericError
