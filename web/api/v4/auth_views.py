@@ -19,6 +19,9 @@ from django_otp import login as login_with_device
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.contrib.auth import login
+from core.carburetypes import Carbure, CarbureError
+
+from core.common import ErrorResponse, SuccessResponse
 
 def register(request):
     form = UserCreationForm(request.POST)
@@ -51,10 +54,12 @@ def register(request):
         email_otp.confirmed = True
         email_otp.email = user.email
         email_otp.save()
-        return JsonResponse({'status': 'success', 'message': 'User Created'})
+        #return JsonResponse({'status': 'success', 'message': 'User Created'})
+        return SuccessResponse()
     else:
         errors = {key: e for key, e in form.errors.items()}
-        return JsonResponse({'status': 'error', 'message': 'Invalid Form', 'errors': errors}, status=400)
+        #return JsonResponse({'status': 'error', 'message': 'Invalid Form', 'errors': errors}, status=400)
+        return ErrorResponse(400, CarbureError.INVALID_REGISTRATION_FORM, data=errors)
 
 def user_login(request):
     username = request.POST.get('username', '')
@@ -64,15 +69,19 @@ def user_login(request):
     try:
         if user.is_authenticated:
             request.session.set_expiry(3 * 30 * 24 * 60 * 60) # 3 months
-            return JsonResponse({'status': 'success', 'message': 'User logged in'})
+            #return JsonResponse({'status': 'success', 'message': 'User logged in'})
+            return SuccessResponse()
         else:
-            return JsonResponse({'status': 'error', 'message': 'Invalid credentials'}, status=400)
+            #return JsonResponse({'status': 'error', 'message': 'Invalid credentials'}, status=400)
+            return ErrorResponse(400, CarbureError.INVALID_LOGIN_CREDENTIALS)
     except:
-        return JsonResponse({'status': 'error', 'message': 'Account not activated'}, status=400)
+        #return JsonResponse({'status': 'error', 'message': 'Account not activated'}, status=400)
+        return ErrorResponse(400, CarbureError.ACCOUNT_NOT_ACTIVATED)
 
 def user_logout(request):
     logout(request)
-    return JsonResponse({'status': 'success'})
+    #return JsonResponse({'status': 'success'})
+    return SuccessResponse()
 
 @login_required
 def request_otp(request):
@@ -87,7 +96,8 @@ def request_otp(request):
     send_new_token(request)
     device = EmailDevice.objects.get(user=request.user)
     dt = device.valid_until.astimezone(pytz.timezone('Europe/Paris'))
-    return JsonResponse({'status': 'success', 'valid_until': dt.strftime("%m/%d/%Y, %H:%M")})
+    #return JsonResponse({'status': 'success', 'valid_until': dt.strftime("%m/%d/%Y, %H:%M")})
+    return SuccessResponse(data={'valid_until': dt.strftime("%m/%d/%Y, %H:%M")})
 
 @login_required
 def verify_otp(request):
@@ -105,26 +115,33 @@ def verify_otp(request):
         device = EmailDevice.objects.get(user=request.user)
         if device.verify_token(form.clean_otp_token()):
             login_with_device(request, device)
-            return JsonResponse({'status': 'success'})
+            #return JsonResponse({'status': 'success'})
+            return SuccessResponse()
         else:
             is_allowed, _ = device.verify_is_allowed()
             now = timezone.now()
             if now > device.valid_until:
-                return JsonResponse({'status': 'error', 'message': 'Code expired'}, status=400)
+                #return JsonResponse({'status': 'error', 'message': 'Code expired'}, status=400)
+                return ErrorResponse(400, CarbureError.OTP_EXPIRED_CODE)
             elif device.token != form.clean_otp_token():
-                return JsonResponse({'status': 'error', 'message': 'Code invalid'}, status=400)
+                #return JsonResponse({'status': 'error', 'message': 'Code invalid'}, status=400)
+                return ErrorResponse(400, CarbureError.OTP_INVALID_CODE)
             elif not is_allowed:
-                return JsonResponse({'status': 'error', 'message': 'Rate limited'}, status=400)
+                #return JsonResponse({'status': 'error', 'message': 'Rate limited'}, status=400)
+                return ErrorResponse(400, CarbureError.OTP_RATE_LIMITED)
             else:
-                return JsonResponse({'status': 'error', 'message': 'Unknown error'}, status=400)
-    return JsonResponse({'status': 'error', 'message': 'Invalid Form'}, status=400)
+                #return JsonResponse({'status': 'error', 'message': 'Unknown error'}, status=400)
+                return ErrorResponse(400, CarbureError.OTP_UNKNOWN_ERROR)
+    #return JsonResponse({'status': 'error', 'message': 'Invalid Form'}, status=400)
+    return ErrorResponse(400, CarbureError.OTP_INVALID_FORM)
 
 def request_password_reset(request):
     username = request.POST.get('username', '')
     try:
         user = get_user_model().objects.get(email=username)
     except:
-        return JsonResponse({'status': 'error', 'message': 'User not found'}, status=400)
+        #return JsonResponse({'status': 'error', 'message': 'User not found'}, status=400)
+        return ErrorResponse(400, CarbureError.PASSWORD_RESET_USER_NOT_FOUND)
 
     prtg = PasswordResetTokenGenerator()
     current_site = get_current_site(request)
@@ -146,7 +163,8 @@ def request_password_reset(request):
         recipient_list=[user.email],
         fail_silently=False,
     )
-    return JsonResponse({'status': 'success'})
+    #return JsonResponse({'status': 'success'})
+    return SuccessResponse()
 
 def reset_password(request):
     uidb64 = request.POST.get('uidb64', '')
@@ -160,14 +178,18 @@ def reset_password(request):
     password = request.POST.get('password1', '')
     password2 = request.POST.get('password2', '')
     if password != password2:
-        return JsonResponse({'status': 'error', 'message': 'Passwords do not match'}, status=400)
+        #return JsonResponse({'status': 'error', 'message': 'Passwords do not match'}, status=400)
+        return ErrorResponse(400, CarbureError.PASSWORD_RESET_MISMATCH)
     prtg = PasswordResetTokenGenerator()
     if prtg.check_token(user, token):
         user.set_password(password)
         user.save()
-        return JsonResponse({'status': 'success'})
+        #return JsonResponse({'status': 'success'})
+        return SuccessResponse()
     else:
-        return JsonResponse({'status': 'error', 'message': 'Invalid Form'}, status=400)
+        #return JsonResponse({'status': 'error', 'message': 'Invalid Form'}, status=400)
+        return ErrorResponse(400, CarbureError.PASSWORD_RESET_INVALID_FORM)
+
 
 def request_activation_link(request):
     form = UserResendActivationLinkForm(request.POST)
@@ -193,10 +215,14 @@ def request_activation_link(request):
                 recipient_list=[user.email],
                 fail_silently=False,
             )
-            return JsonResponse({'status': 'success'})
+            #return JsonResponse({'status': 'success'})
+            return SuccessResponse()
         except Exception:
-            return JsonResponse({'status': 'error', 'message': 'Could not resend activation link'}, status=400)
-    return JsonResponse({'status': 'error', 'message': 'Invalid Form'}, status=400)
+            #return JsonResponse({'status': 'error', 'message': 'Could not resend activation link'}, status=400)
+            return ErrorResponse(400, CarbureError.ACTIVATION_LINK_ERROR)
+    #return JsonResponse({'status': 'error', 'message': 'Invalid Form'}, status=400)
+    return ErrorResponse(400, CarbureError.ACTIVATION_LINK_INVALID_FORM)
+    
 
 def activate(request):
     uidb64 = request.POST.get('uidb64', '')
@@ -211,9 +237,11 @@ def activate(request):
         user.is_active = True
         user.save()
         login(request, user)
-        return JsonResponse({'status': 'success'})
+        #return JsonResponse({'status': 'success'})
+        return SuccessResponse()
     else:
-        return JsonResponse({'status': 'error', 'message': 'Could not activate user account'}, status=400)
+        #return JsonResponse({'status': 'error', 'message': 'Could not activate user account'}, status=400)
+        return ErrorResponse(400, CarbureError.ACTIVATION_COULD_NOT_ACTIVATE_USER)
 
 
 # static - not an endpoint
