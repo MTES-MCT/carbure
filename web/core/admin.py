@@ -388,8 +388,8 @@ class GenericCertificateAdmin(admin.ModelAdmin):
 
 @admin.register(EntityCertificate)
 class EntityCertificateAdmin(admin.ModelAdmin):
-    list_display = ['entity', 'get_certificate_id', 'get_certificate_type', 'get_certificate_holder', 'get_valid_from', 'get_valid_until', 'checked_by_admin']
-    list_filter = ['certificate__certificate_type', 'checked_by_admin']
+    list_display = ['entity', 'get_certificate_id', 'get_certificate_type', 'get_certificate_holder', 'get_valid_from', 'get_valid_until', 'checked_by_admin', 'rejected_by_admin']
+    list_filter = ['certificate__certificate_type', 'checked_by_admin', 'rejected_by_admin']
     search_fields = ('entity__name', 'certificate__certificate_holder', 'certificate__certificate_id')
     raw_id_fields = ['certificate', 'entity']
 

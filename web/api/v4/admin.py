@@ -477,6 +477,21 @@ def check_entity_certificate(request, *args, **kwargs):
     try:
         ec = EntityCertificate.objects.get(id=entity_certificate_id)
         ec.checked_by_admin = True
+        ec.rejected_by_admin = False
+        ec.save()
+        return JsonResponse({'status': "success"})
+    except:
+        return JsonResponse({'status': "error", 'message': "Could not mark certificate as checked"}, status=500)
+
+@is_admin
+def reject_entity_certificate(request, *args, **kwargs):
+    entity_certificate_id = request.POST.get('entity_certificate_id', False)
+    if not entity_certificate_id:
+        return JsonResponse({'status': "error", 'message': "Missing entity_certificate_id"}, status=400)
+    try:
+        ec = EntityCertificate.objects.get(id=entity_certificate_id)
+        ec.checked_by_admin = False
+        ec.rejected_by_admin = True
         ec.save()
         return JsonResponse({'status': "success"})
     except:
