@@ -80,6 +80,7 @@ export interface EntityCertificate {
   entity: Entity
   has_been_updated: boolean
   checked_by_admin: boolean
+  rejected_by_admin: boolean
 }
 
 export enum DepotType {

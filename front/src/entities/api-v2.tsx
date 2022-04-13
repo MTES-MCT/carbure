@@ -10,3 +10,7 @@ export function getEntityCertificates(entity_id?: number) {
 export function checkEntityCertificate(entity_certificate_id: number) {
   return api.post("admin/entity-certificates/check", { entity_certificate_id })
 }
+
+export function rejectEntityCertificate(entity_certificate_id: number) {
+  return api.post("admin/entity-certificates/reject", { entity_certificate_id })
+}

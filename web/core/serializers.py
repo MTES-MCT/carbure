@@ -286,7 +286,7 @@ class EntityCertificateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EntityCertificate
-        fields = ['id', 'entity', 'certificate', 'has_been_updated', 'checked_by_admin', 'added_dt']
+        fields = ['id', 'entity', 'certificate', 'has_been_updated', 'checked_by_admin', 'rejected_by_admin', 'added_dt']
 
 
 class SustainabilityDeclarationSerializer(serializers.ModelSerializer):
