@@ -307,7 +307,7 @@
 
                         {% if correction_requests|length > 0 %}
                         <p>
-                          Demandes de corrections: {{correction_requests|length}}
+                          Demandes de corrections: <br />
                           {% for cr in correction_requests %}
                           Client {{cr.meta.client}} Lots concernés: {{cr.meta.count}} <a href="https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/out/correction">Voir</a>
                           {% endfor %}
@@ -315,7 +315,7 @@
                         {% endif %}
                         {% if correction_done|length > 0 %}
                         <p>
-                          Lots corrigés par vos fournisseurs: {{correction_done|length}}
+                          Lots corrigés par vos fournisseurs: <br />
                           {% for cr in correction_done %}
                           Fournisseur {{cr.meta.supplier}} Lots concernés: {{cr.meta.count}} <a href="https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/in/correction">Voir</a>
                           {% endfor %}
@@ -323,7 +323,7 @@
                         {% endif %}
                         {% if lots_rejected|length > 0 %}
                         <p>
-                          Lots refusés par vos clients: {{lots_rejected|length}}
+                          Lots refusés par vos clients: <br />
                           {% for cr in lots_rejected %}
                           Client {{cr.meta.client}} Lots concernés: {{cr.meta.count}} <a href="https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/out/correction">Voir</a>
                           {% endfor %}
@@ -331,7 +331,7 @@
                         {% endif %}
                         {% if lots_received|length > 0 %}
                         <p>
-                          Lots reçus: {{lots_received|length}}
+                          Lots reçus: <br />
                           {% for cr in lots_received %}
                           Fournisseur {{cr.meta.supplier}} Lots concernés: {{cr.meta.count}} <a href="https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/in/pending">Voir</a>
                           {% endfor %}
@@ -339,7 +339,7 @@
                         {% endif %}
                         {% if lots_recalled|length > 0 %}
                         <p>
-                          Lots rappelés par vos fournisseurs: {{lots_recalled|length}}
+                          Lots rappelés par vos fournisseurs: <br />
                           {% for cr in lots_recalled %}
                           Fournisseur {{cr.meta.supplier}} Lots concernés: {{cr.meta.count}} Lien <a href="https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/in/pending">Voir</a>
                           {% endfor %}
