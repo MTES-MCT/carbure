@@ -53,9 +53,9 @@ server {
         alias /var/www/html;
     }
 
-    location ~* \.(jpg|jpeg|png|gif|ico|css|js|webp|svg|woff2)$ {
-        expires 7d;
-    }
+    #location ~* \.(jpg|jpeg|png|gif|ico|css|js|webp|svg|woff2)$ {
+    #    expires 7d;
+    #}
 
     # serve v2 static files
     location /app {
