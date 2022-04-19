@@ -49,8 +49,26 @@ def get_certificateData(nonce, recordsTotal, test, latest):
 
 def cleanCertificateData(data):
     allData = pd.concat(data)
+    #print(allData.iloc[0])
+    #0     <span data-tooltip aria-haspopup="1" class="ha...
+    #1                            EU-ISCC-Cert-GR209-1271304
+    #2     <span data-tooltip aria-haspopup="1" class="ha...
+    #3     <span data-tooltip aria-haspopup="1" class="ha...
+    #4                                                   UCO
+    #5                                                  None
+    #6                                                  None
+    #7                                            2016-12-29
+    #8                                            2017-12-28
+    #9                                                  None
+    #10    <span data-tooltip aria-haspopup="1" class="ha...
+    #11    <a class="cert-map" href="https://www.google.c...
+    #12    <a class="cert-file" href=" https://certificat...
+    #13                                                 None
+    #14                                                   20
+    ######## 2022-04-19: added column "products" after api change
+    
     allData.columns = ['cert_status', 'certificate', 'certificate_holder', 'scope',
-                       'raw_material', 'addons', 'valid_from', 'valid_until', 'issuing_cb',
+                       'raw_material', 'addons', 'products', 'valid_from', 'valid_until', 'issuing_cb',
                        'map', 'certificate_report', 'audit_report', "unknown_column", "unknown_column_bis"]
 
     # extraction de la balise HTML
