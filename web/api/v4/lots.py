@@ -1,5 +1,5 @@
 import datetime
-import unicodedata
+import traceback
 import dateutil
 from typing import Generic, List
 from django.db.models.query import QuerySet
@@ -43,6 +43,10 @@ def try_get_date(dd):
         pass
     try:
         return datetime.datetime.strptime(dd, "%d/%m/%Y").date()
+    except Exception:
+        pass
+    try:
+        return datetime.datetime.strptime(dd, "%d/%m/%y").date()
     except Exception:
         pass
     return dateutil.parser.parse(dd, dayfirst=True).date()
@@ -334,10 +338,15 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
     if carbure_stock_id or lot.parent_stock_id:
         # Lot is extracted from STOCK.
         # FILL sustainability data from parent_stock
-        try:
-            parent_stock = CarbureStock.objects.get(Q(carbure_id=carbure_stock_id) | Q(pk=lot.parent_stock_id))
-        except:
-            return None, []
+        if lot.parent_stock is not None:
+            parent_stock = lot.parent_stock
+        else:
+            try:
+                parent_stock = CarbureStock.objects.get(carbure_id=carbure_stock_id)
+            except Exception as e:
+                #traceback.print_exc()
+                print('Could not find stock %s' % (carbure_stock_id))
+                return None, []
         original_lot = parent_stock.get_parent_lot()
         lot.parent_stock = parent_stock
         lot.copy_production_details(original_lot)
