@@ -125,6 +125,7 @@ const ADMIN_STOCK_FILTERS = [
   Filter.Feedstocks,
   Filter.CountriesOfOrigin,
   Filter.Suppliers,
+  Filter.Clients,
   Filter.ProductionSites,
   Filter.Depots,
 ]
