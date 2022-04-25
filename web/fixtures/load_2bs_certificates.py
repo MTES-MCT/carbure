@@ -53,7 +53,7 @@ def load_certificates(valid=True):
             'valid_from': valid_from,
             'valid_until': valid_until,
             'download_link': 'https://www.2bsvs.org/scripts/telecharger_certificat.php?certificat=%s' % (row['Numéro 2BS']),
-            'scope': {'Type de certificate': row['Type de certification']},
+            'scope': "%s" % (row['Type de certification']),
             'input': None,
             'output': None,
         }
