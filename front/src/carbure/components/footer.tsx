@@ -8,7 +8,7 @@ import logoFabNum from "../assets/images/logo-fabriquenumerique.svg"
 import logoBetaGouv from "../assets/images/betagouvfr.svg"
 import logoFranceRelance from "../assets/images/france-relance.webp"
 import logoEuropeanUnion from "../assets/images/union-europeenne.webp"
-import { ExternalLink, LinkedIn, Slack } from "common-v2/components/icons"
+import { ExternalLink, LinkedIn, Mail, Slack } from "common-v2/components/icons"
 import { Footer } from "common-v2/components/scaffold"
 
 const CarbureFooter = () => {
@@ -37,6 +37,19 @@ const CarbureFooter = () => {
         </ul>
 
         <ul className={styles.footerSocialLinks}>
+          <li>
+            <Trans>Nous contacter :</Trans>
+          </li>
+          <li>
+            <a
+              href="mailto:carbure@beta.gouv.fr"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Mail />
+              <Trans>Email</Trans>
+            </a>
+          </li>
           <li>
             <a
               href="https://carbure-beta-gouv.slack.com/"
