@@ -177,7 +177,6 @@ export const LotSummary = ({
               columns.volume,
               pending ? columns.countWithPending : columns.count,
               columns.ghgReduction,
-              columns.shortcut,
               pending && columns.shortcut,
             ])}
           />
