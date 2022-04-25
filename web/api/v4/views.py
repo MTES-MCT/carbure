@@ -730,7 +730,7 @@ def lots_send(request, *args, **kwargs):
         event.save()
 
         lot.lot_status = CarbureLot.PENDING
-
+        lot.generate_carbure_id()
         #### SPECIFIC CASES
         # I AM NEITHER THE PRODUCER NOR THE CLIENT (Trading)
         # create two transactions. unknown producer/supplier -> me and me -> client
