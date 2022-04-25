@@ -68,8 +68,8 @@ def cleanCertificateData(data):
     ######## 2022-04-19: added column "products" after api change
     
     allData.columns = ['cert_status', 'certificate', 'certificate_holder', 'scope',
-                       'raw_material', 'addons', 'products', 'valid_from', 'valid_until', 'issuing_cb',
-                       'map', 'certificate_report', 'audit_report', "unknown_column", "unknown_column_bis"]
+                       'raw_material', 'addons', 'products', 'valid_from', 'valid_until', 'suspended', 'issuing_cb',
+                       'map', 'certificate_report', 'audit_report', "unknown_column"]
 
     # extraction de la balise HTML
     allData['certificate_holder'] = allData['certificate_holder'].str.replace('.*title="(.*)">.*', '\\1')
