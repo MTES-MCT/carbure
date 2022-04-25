@@ -29,7 +29,7 @@ const CarbureFooter = () => {
             </a>
           </li>
           <li>
-            <Link to="/public_stats" target="_blank" rel="noreferrer">
+            <Link to="/stats" target="_blank" rel="noreferrer">
               <Trans>Statistiques publiques</Trans>
               <ExternalLink />
             </Link>

@@ -24,6 +24,7 @@ import {
   normalizeCertificate,
   normalizeEntityCertificate,
 } from "common-v2/utils/normalizers"
+import { formatJSON } from "common-v2/utils/formatters"
 import { Certificate, EntityCertificate } from "common/types"
 import { isExpired } from "./common"
 import Alert from "common-v2/components/alert"
@@ -104,6 +105,11 @@ const Certificates = () => {
           rowProps={(cert) => ({
             style: cert.has_been_updated ? { opacity: 0.5 } : undefined,
           })}
+          onAction={(c) => {
+            if (c.certificate.download_link) {
+              window.open(c.certificate.download_link)
+            }
+          }}
           columns={[
             {
               key: "id",
@@ -116,6 +122,12 @@ const Certificates = () => {
               header: t("Type"),
               orderBy: (c) => c.certificate.certificate_type,
               cell: (c) => <Cell text={c.certificate.certificate_type} />,
+            },
+            {
+              key: 'scope',
+              header: t("Périmètre"),
+              orderBy: (c) => JSON.stringify(c.certificate.scope),
+              cell: (c) => <Cell text={c.certificate.scope ? formatJSON(c.certificate.scope) : t("N/A")} />,
             },
             {
               key: "holder",
@@ -140,6 +152,7 @@ const Certificates = () => {
                       description={t("Voulez-vous supprimer ce certificat ?")}
                       confirm={t("Supprimer")}
                       variant="danger"
+                      onClose={close}
                       onConfirm={() =>
                         deleteCertificate.execute(
                           entity.id,
@@ -147,7 +160,6 @@ const Certificates = () => {
                           c.certificate.certificate_type
                         )
                       }
-                      onClose={close}
                     />
                   ))
                 }
@@ -347,3 +359,4 @@ const CertificateUpdateDialog = ({
 }
 
 export default Certificates
+
