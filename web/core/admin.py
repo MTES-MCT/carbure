@@ -222,7 +222,7 @@ class NameSortedRelatedOnlyDropdownFilter(RelatedOnlyDropdownFilter):
 
 @admin.register(CarbureLot)
 class CarbureLotAdmin(admin.ModelAdmin):
-    list_display = ['id', 'parent_lot', 'parent_stock', 'year', 'period', 'transport_document_reference', 'get_producer', 'get_production_site', 'get_supplier', 'get_client', 
+    list_display = ['id', 'carbure_id', 'parent_lot', 'parent_stock', 'year', 'period', 'transport_document_reference', 'get_producer', 'get_production_site', 'get_supplier', 'get_client', 
     'delivery_date', 'get_delivery_site', 'get_biofuel', 'get_feedstock', 'volume', 'lot_status', 'correction_status', 'delivery_type',
     ]
     raw_id_fields = ['parent_lot', 'parent_stock']
