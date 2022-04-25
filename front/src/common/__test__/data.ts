@@ -12,6 +12,11 @@ export const producer: Entity = {
   has_stocks: false,
   has_direct_deliveries: false,
   default_certificate: "",
+  legal_name: "",
+  registered_address: "",
+  registration_id: "",
+  sustainability_officer: "",
+  sustainability_officer_phone_number: "",
 }
 
 export const trader: Entity = {
@@ -23,6 +28,11 @@ export const trader: Entity = {
   has_stocks: false,
   has_direct_deliveries: false,
   default_certificate: "",
+  legal_name: "",
+  registered_address: "",
+  registration_id: "",
+  sustainability_officer: "",
+  sustainability_officer_phone_number: "",
 }
 
 export const operator: Entity = {
@@ -34,6 +44,11 @@ export const operator: Entity = {
   has_stocks: false,
   has_direct_deliveries: false,
   default_certificate: "",
+  legal_name: "",
+  registered_address: "",
+  registration_id: "",
+  sustainability_officer: "",
+  sustainability_officer_phone_number: "",
 }
 
 export const admin: Entity = {
@@ -45,6 +60,11 @@ export const admin: Entity = {
   has_stocks: false,
   has_direct_deliveries: false,
   default_certificate: "",
+  legal_name: "",
+  registered_address: "",
+  registration_id: "",
+  sustainability_officer: "",
+  sustainability_officer_phone_number: "",
 }
 
 // COUNTRIES

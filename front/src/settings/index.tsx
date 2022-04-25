@@ -5,11 +5,11 @@ import { PortalProvider } from "common-v2/components/portal"
 import useDeliverySites from "./hooks/use-delivery-sites"
 import useProductionSites from "./hooks/use-production-sites"
 
-import { SettingsHeader, SettingsBody } from "./components/common"
 import DeliverySitesSettings from "./components/delivery-site"
 import ProductionSitesSettings from "./components/production-site"
 
-import CompanySettings from "./components/company"
+import CompanyOptions from "./components/company-options"
+import CompanyInfo from "./components/company-info"
 import Certificates from "./components/certificates"
 import Sticky from "common/components/sticky"
 import EntityUserRights from "./components/user-rights"
@@ -74,7 +74,8 @@ const Settings = () => {
         </Sticky>
 
         <section>
-          {hasOptions && <CompanySettings />}
+          {hasOptions && <CompanyOptions />}
+          {hasOptions && <CompanyInfo />}
           {hasCertificates && <Certificates />}
           {hasDepot && <DeliverySitesSettings settings={deliverySites} />}
           {isProducer && <ProductionSitesSettings settings={productionSites} />}

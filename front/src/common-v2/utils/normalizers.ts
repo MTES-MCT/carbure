@@ -45,6 +45,12 @@ export const normalizeEntity: Normalizer<Entity> = (entity) => ({
     has_trading: entity.has_trading,
     has_direct_deliveries: entity.has_direct_deliveries,
     has_stocks: entity.has_stocks,
+    legal_name: entity.legal_name,
+    registered_address: entity.registered_address,
+    registration_id: entity.registration_id,
+    sustainability_officer: entity.sustainability_officer,
+    sustainability_officer_phone_number:
+      entity.sustainability_officer_phone_number,
   },
 })
 
