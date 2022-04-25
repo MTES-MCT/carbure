@@ -17,10 +17,13 @@
   padding: 12px var(--main-spacing);
 }
 
+.footerUpper ul {
+  gap: var(--spacing-l);
+}
+
 .footerUpper li a {
   display: flex;
   align-items: center;
-  margin-right: 32px;
 }
 
 .footerUpper li a:hover {
@@ -122,10 +125,6 @@ ul.footerSocialLinks {
 .footerLower .fakeLink:hover {
   color: var(--black);
   text-decoration: underline;
-}
-
-.footerSocialLinks {
-  margin-left: auto;
 }
 
 .footerPartners {
