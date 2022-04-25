@@ -2,6 +2,11 @@ export interface Entity {
   id: number
   name: string
   entity_type: EntityType
+  legal_name: string
+  registration_id: string
+  sustainability_officer_phone_number: string
+  sustainability_officer: string
+  registered_address: string
   has_mac: boolean
   has_trading: boolean
   has_stocks: boolean

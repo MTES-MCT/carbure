@@ -29,6 +29,12 @@ export function useEntity(): EntityManager {
     id: entityID,
     name: entity?.name ?? "",
     entity_type: entity?.entity_type ?? EntityType.Operator,
+    legal_name: entity?.legal_name ?? "",
+    registration_id: entity?.registration_id ?? "",
+    sustainability_officer_phone_number:
+      entity?.sustainability_officer_phone_number ?? "",
+    sustainability_officer: entity?.sustainability_officer ?? "",
+    registered_address: entity?.registered_address ?? "",
     has_mac: entity?.has_mac ?? false,
     has_trading: entity?.has_trading ?? false,
     has_stocks: entity?.has_stocks ?? false,

@@ -7,7 +7,7 @@ import { Panel, LoaderOverlay } from "common-v2/components/scaffold"
 import Checkbox from "common-v2/components/checkbox"
 import * as api from "../api-v2"
 
-const CompanySettings = () => {
+const CompanyOptions = () => {
   const { t } = useTranslation()
   const entity = useEntity()
 
@@ -48,7 +48,7 @@ const CompanySettings = () => {
       <section>
         <p>
           {t(
-            "Ces options vous permettent de personnaliser l'interface de la page Transactions de CarbuRe pour n'y montrer que les fonctionnalités pertinentes pour votre activité."
+            "Les options ci-dessous vous permettent de personnaliser l'interface de la page Transactions de CarbuRe pour n'y montrer que les fonctionnalités pertinentes pour votre activité."
           )}
         </p>
       </section>
@@ -85,4 +85,4 @@ const CompanySettings = () => {
   )
 }
 
-export default CompanySettings
+export default CompanyOptions
