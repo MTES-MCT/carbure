@@ -20,21 +20,9 @@ import debug_toolbar
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    #path('accounts/', include('authtools.urls')),
-    #path('accounts/', include('accounts.urls')),
     path('', public_views.index, name='index'),
-
-    path('stats', public_views.stats, name='stats'),
     path('api/', include('api.urls')),
-
-    # deprecated - will be removed soon
-    #path('producers/', include('producers.urls')),
-    #path('operators/', include('operators.urls')),
-    #path('traders/', include('traders.urls')),
-    #path('administrators/', include('administrators.urls')),
     path('core/', include('core.urls')),
-    path('annuaire', public_views.annuaire, name='annuaire'),
-
     # path('__debug__/', include(debug_toolbar.urls)),
     path('django_query_profiler/', include('django_query_profiler.client.urls'))
 ]
