@@ -73,6 +73,7 @@ def cleanCertificateData(data):
 
     # extraction de la balise HTML
     allData['certificate_holder'] = allData['certificate_holder'].str.replace('.*title="(.*)">.*', '\\1')
+    allData['scope'] = allData['scope'].str.replace('.*title="(.*)">.*', '\\1')
     allData['raw_material'] = allData['raw_material'].str.replace('.*title="(.*)">.*', '\\1')
     allData['issuing_cb'] = allData['issuing_cb'].str.replace('.*title="(.*)">.*', '\\1')
     allData['map'] = allData['map'].str.replace('.*href="(.*)">.*', '\\1')
