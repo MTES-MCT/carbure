@@ -98,7 +98,7 @@ def load_certificates():
             'address': '%s, %s, %s' % (cert['City'], cert['Post code'], cert['Country']),
             'valid_from': valid_from,
             'valid_until': valid_until,
-            'scope': {'type': cert['Type']},
+            'scope': "%s" % (cert['Type']),
             'input': {'Type of biomass': cert['Type of biomass']},
             'output': None,
         }

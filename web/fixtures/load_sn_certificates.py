@@ -80,7 +80,7 @@ def load_certificates():
             'valid_from': datetime.date(2000, 1, 1),
             'valid_until': valid_until,
             'download_link': '',
-            'scope': {'Catégorie opérateur': cert['Catégorie opérateur']},
+            'scope': "%s" % (cert['Catégorie opérateur']),
             'input': None,
             'output': None,
         }

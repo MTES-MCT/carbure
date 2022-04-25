@@ -63,7 +63,7 @@ def load_certificates():
             'address': row['certificate_holder'],
             'valid_from': valid_from,
             'valid_until': valid_until,
-            'scope': {'addons': row['addons'], 'scope': row['scope']},
+            'scope': "%s" % (row['scope']),
             'download_link': row['certificate_report'],
             'input': {'raw_material': row['raw_material']},
             'output': '',
