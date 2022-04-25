@@ -97,6 +97,12 @@ export function useStockColumns() {
         <Cell text={stock.carbure_supplier?.name ?? stock.unknown_supplier} />
       ),
     },
+    client: {
+      header: t("Client"),
+      cell: (stock: Stock) => (
+        <Cell text={stock.carbure_client?.name ?? 'N/A'} />
+      ),
+    },
     productionSite: {
       header: t("Site de production"),
       cell: (stock: Stock) => (

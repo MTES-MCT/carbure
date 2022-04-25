@@ -447,6 +447,10 @@ def get_stock_filters_data(stock, query, field):
         depots = Depot.objects.filter(id__in=stock.values('depot__id').distinct()).values('name', 'depot_id')
         return normalize_filter(depots, 'name')
 
+    if field == 'clients':
+        clients = stock.filter(carbure_client__isnull=False).values_list('carbure_client__name', flat=True).distinct()
+        return normalize_filter(clients)
+
     if field == 'suppliers':
         suppliers = []
         for item in stock.values('carbure_supplier__name', 'unknown_supplier').distinct():

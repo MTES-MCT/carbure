@@ -38,6 +38,7 @@ export const ControlStockTable = memo(
           columns.biofuel,
           columns.feedstock,
           columns.supplier,
+          columns.client,
           columns.productionSite,
           columns.depot,
           columns.ghgReduction,
