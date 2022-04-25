@@ -67,6 +67,10 @@ export function formatDeadline(deadline: Date | string | null) {
   return formatDate(deadline, { month: "long", year: undefined })
 }
 
+export function formatJSON(json: any) {
+  return JSON.stringify(json).replaceAll(/["\{\}\[\]]/g, '')
+}
+
 // prepare string for comparison by putting it to lowercase and removing accents
 export function standardize(str: string) {
   if (!str) return ""

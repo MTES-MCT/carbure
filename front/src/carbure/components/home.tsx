@@ -191,7 +191,7 @@ const Home = () => {
 
         <Button
           icon={ExternalLink}
-          href="/app/public_stats"
+          href="/app/stats"
           className={styles.homeButton}
         >
           <Trans>Voir les statistiques</Trans>

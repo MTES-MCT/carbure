@@ -31,7 +31,7 @@ const Carbure = () => {
 
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/public_stats" element={<PublicStats />} />
+          <Route path="/stats" element={<PublicStats />} />
 
           <Route path="/auth/*" element={<Auth />} />
 
