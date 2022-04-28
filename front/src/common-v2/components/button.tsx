@@ -154,4 +154,27 @@ export const ExternalLink = ({
   }
 }
 
+export type MailtoProps = JSX.IntrinsicElements["a"] & {
+  user: string
+  host: string
+}
+
+export const MailTo = ({
+  user,
+  host,
+  className,
+  children,
+  ...props
+}: MailtoProps) => (
+  <a
+    href={`mailto:${user}@${host}`}
+    target="_blank"
+    rel="noreferrer"
+    className={cl(css.mailto, className)}
+    {...props}
+  >
+    {children}
+  </a>
+)
+
 export default Button

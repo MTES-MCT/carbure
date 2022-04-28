@@ -21,7 +21,7 @@ import Table, {
   Row,
 } from "common/components/table"
 import tableCSS from "common/components/table.module.css"
-import Button from "common-v2/components/button"
+import Button, { MailTo } from "common-v2/components/button"
 import {
   AlertCircle,
   Check,
@@ -790,13 +790,9 @@ const DoubleCountingPrompt = ({
           <Trans>
             Pour toute question concernant l'évolution de votre dossier,
             contactez-nous à l'adresse{" "}
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="mailto:doublecompte@carbure.beta.gouv.fr"
-            >
-              doublecompte@carbure.beta.gouv.fr
-            </a>
+            <MailTo user="doublecompte" host="beta.gouv.fr">
+              disponible sur ce lien
+            </MailTo>
           </Trans>
         </Box>
       </DialogText>

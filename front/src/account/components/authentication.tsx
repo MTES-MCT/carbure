@@ -25,7 +25,12 @@ export const AccountAuthentication = () => {
       </header>
 
       <footer>
-        <TextInput readOnly label={t("Addresse email")} value={user.email} />
+        <TextInput
+          readOnly
+          label={t("Addresse email")}
+          value={user.email}
+          style={{ flex: 1 }}
+        />
       </footer>
     </Panel>
   )
