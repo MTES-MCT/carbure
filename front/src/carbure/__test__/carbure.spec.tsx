@@ -48,7 +48,7 @@ test("display alert message when connected without access rights", async () => {
 
   // screen.getByText("Pour plus d'informations contactez nous sur ou par e-mail à l'addresse.") // prettier-ignore
   screen.getByText("le Slack de CarbuRe")
-  screen.getByText("carbure@beta.gouv.fr")
+  screen.getByText("disponible sur ce lien")
 })
 
 test("pick an entity from the menu", async () => {
