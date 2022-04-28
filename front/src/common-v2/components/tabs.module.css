@@ -65,7 +65,7 @@
   padding: var(--spacing-m) var(--main-spacing-x);
   background-color: var(--gray-light);
   box-shadow: var(--shadow);
-  z-index: 1;
+  z-index: 2;
 }
 
 .section,
