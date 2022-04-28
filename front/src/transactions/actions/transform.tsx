@@ -195,7 +195,7 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
                 cell: (stock) => (
                   <Cell
                     text={t(stock.biofuel!.code, { ns: "biofuels" })}
-                    sub={stock.remaining_volume}
+                    sub={formatNumber(stock.remaining_volume) + " L"}
                   />
                 ),
               },
@@ -228,6 +228,10 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
                     icon={() => (
                       <Button
                         variant="primary"
+                        style={{
+                          fontSize: "0.75em",
+                          padding: "var(--spacing-s)",
+                        }}
                         label={t("Max")}
                         action={() =>
                           setAttributions({
