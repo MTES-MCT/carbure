@@ -161,6 +161,8 @@ export const defaultLot = {
 
   transport_document_reference: undefined as string | undefined,
   volume: 0 as number | undefined,
+  weight: 0 as number | undefined,
+  lhv_amount: 0 as number | undefined,
   biofuel: undefined as Biofuel | undefined,
   feedstock: undefined as Feedstock | undefined,
   country_of_origin: undefined as Country | undefined,
@@ -207,6 +209,8 @@ export const lotToFormValue: LotToFormValue = (lot, certificates) => ({
 
   transport_document_reference: lot?.transport_document_reference ?? undefined,
   volume: lot?.volume ?? undefined,
+  weight: lot?.weight ?? undefined,
+  lhv_amount: lot?.lhv_amount ?? undefined,
   biofuel: lot?.biofuel ?? undefined,
   feedstock: lot?.feedstock ?? undefined,
   country_of_origin: lot?.country_of_origin ?? undefined,
@@ -255,6 +259,8 @@ export function lotFormToPayload(lot: LotFormValue | undefined) {
     transport_document_type: undefined,
     transport_document_reference: lot.transport_document_reference,
     volume: lot.volume,
+    weight: lot.weight,
+    lhv_amount: lot.lhv_amount,
     biofuel_code: lot.biofuel?.code,
     feedstock_code: lot.feedstock?.code,
     country_code: lot.country_of_origin?.code_pays,
