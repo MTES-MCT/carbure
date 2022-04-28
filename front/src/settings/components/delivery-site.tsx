@@ -13,7 +13,7 @@ import * as common from "common/api"
 
 import { Box, LoaderOverlay } from "common/components"
 import { LabelInput, Label, LabelCheckbox } from "common/components/input"
-import Button from "common-v2/components/button"
+import Button, { MailTo } from "common-v2/components/button"
 import { AlertCircle, Cross, Plus, Return } from "common-v2/components/icons"
 import { Alert } from "common/components/alert"
 import Table, {
@@ -111,16 +111,15 @@ export const DeliverySiteFinderPrompt = ({
           />
         )}
 
-        <a
-          href="mailto:carbure@beta.gouv.fr"
-          target="_blank"
-          rel="noreferrer"
+        <MailTo
+          user="carbure"
+          host="beta.gouv.fr"
           className={styles.settingsLink}
         >
           <Trans>
             Le dépôt que je recherche n'est pas enregistré sur CarbuRe.
           </Trans>
-        </a>
+        </MailTo>
 
         <DialogButtons>
           <Button

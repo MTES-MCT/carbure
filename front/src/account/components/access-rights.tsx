@@ -18,10 +18,16 @@ import {
   getEntityTypeLabel,
   getUserRoleLabel,
 } from "common-v2/utils/normalizers"
-import { Button, ExternalLink } from "common-v2/components/button"
+import { Button, MailTo } from "common-v2/components/button"
 import { LoaderOverlay, Panel } from "common-v2/components/scaffold"
 import { Alert } from "common-v2/components/alert"
-import { AlertTriangle, Cross, Plus, Return } from "common-v2/components/icons"
+import {
+  AlertTriangle,
+  Cross,
+  Plus,
+  Return,
+  ExternalLink,
+} from "common-v2/components/icons"
 import Table, { actionColumn, Cell } from "common-v2/components/table"
 import Dialog, { Confirm } from "common-v2/components/dialog"
 import Autocomplete from "common-v2/components/autocomplete"
@@ -217,9 +223,10 @@ export const EntityDialog = ({ onClose }: EntityDialogProps) => {
           </Form>
         </section>
         <section>
-          <ExternalLink href="mailto:carbure@beta.gouv.fr">
+          <MailTo user="carbure" host="beta.gouv.fr">
             <Trans>Ma société n'est pas enregistrée sur CarbuRe.</Trans>
-          </ExternalLink>
+            <ExternalLink size={20} />
+          </MailTo>
         </section>
       </main>
       <footer>
