@@ -11,8 +11,6 @@
   background-color: var(--white);
   border: 1px solid var(--gray-medium);
   font-size: var(--font-size);
-  padding: var(--spacing-s);
-  gap: var(--spacing-xs);
 }
 
 .group {
@@ -26,6 +24,9 @@
   background-color: transparent;
   border: none;
   border-bottom: 1px solid var(--gray-medium);
+}
+
+.inline input {
   padding: var(--spacing-xs) var(--spacing-s);
 }
 
@@ -101,7 +102,7 @@
   text-align: left;
   background-color: transparent;
   border: none;
-  padding: 0;
+  padding: var(--spacing-s);
   font-size: var(--font-size);
   font-family: var(--font-family);
   font-weight: inherit;
@@ -132,16 +133,18 @@
   height: 24px;
 }
 
-.icon {
+.icon,
+.searchIcon {
   display: flex;
-  align-items: center;
   flex-shrink: 0;
   color: var(--gray-dark);
 }
 
-.icon button:not(:global(.icon)) {
-  margin: calc(-1 * var(--spacing-s));
-  margin-left: var(--spacing-s);
+.icon > :global(.icon),
+.searchIcon > :global(.icon) {
+  align-self: center;
+  margin: var(--spacing-s);
+  margin-left: 0;
 }
 
 .control textarea + .icon {
@@ -159,12 +162,16 @@
 }
 
 .search .control {
-  padding: var(--spacing-s);
   background-color: var(--white);
 }
 
-.search .icon:first-child {
-  margin: 0 var(--spacing-s);
+.search .searchIcon :global(.icon) {
+  margin: var(--spacing-s) var(--spacing-m);
+  margin-right: var(--spacing-xs);
+}
+
+.search input {
+  padding: var(--spacing-s);
 }
 
 .fileplaceholder {
