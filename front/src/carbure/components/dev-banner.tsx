@@ -21,8 +21,8 @@ const DevBanner = () => {
         right: 0,
         width: maximised ? "100%" : 50,
         height: maximised ? undefined : 50,
-        backgroundColor: "var(--orange-medium)",
-        padding: maximised ? "var(--spacing-s) var(--main-spacing)" : 0,
+        backgroundColor: "#ffbb40dd",
+        padding: maximised ? "var(--spacing-xs) var(--main-spacing)" : 0,
         opacity: maximised ? 1 : 0.75,
         zIndex: 10,
       }}
