@@ -17,11 +17,8 @@ VALID_SCOPES = {}
 today = datetime.date.today()
 CSV_FOLDER = '/tmp'
 
-existing = {c.certificate_id: c for c in GenericCertificate.objects.filter(certificate_type=GenericCertificate.DBS)}
-
 def load_certificates(valid=True):
     new = []
-    invalidated = []
     if valid:
         filename = '%s/Certificates2BS_%s.csv' % (CSV_FOLDER, today.strftime('%Y-%m-%d'))
     else:
@@ -57,14 +54,6 @@ def load_certificates(valid=True):
             'input': None,
             'output': None,
         }
-        if valid:
-            d['scope']['valid'] = True
-        else:
-            d['scope']['valid'] = False
-            if row['Numéro 2BS'] in existing:
-                ec = existing[row['Numéro 2BS']]
-                if 'valid' in ec.scope and ec.scope['valid'] is True:
-                    invalidated.append(ec)
         try:
             o, c = GenericCertificate.objects.update_or_create(certificate_id=row['Numéro 2BS'], defaults=d)
             if c:
@@ -75,7 +64,7 @@ def load_certificates(valid=True):
             print(e)
         print(i, end="\r")
     csvfile.close()
-    return i, new, invalidated
+    return i, new
 
 def summary(nb_valid, nb_invalid, new_valids, new_invalids, args):
     mail_content = "Güten Früden, <br />\n"
@@ -103,8 +92,8 @@ def summary(nb_valid, nb_invalid, new_valids, new_invalids, args):
 
 def main(args):
     # update data
-    nb_valid_certificates, new_valids, _ = load_certificates(valid=True)
-    nb_invalid_certificates, _, new_invalids = load_certificates(valid=False)
+    nb_valid_certificates, new_valids = load_certificates(valid=True)
+    nb_invalid_certificates, new_invalids = load_certificates(valid=False)
     summary(nb_valid_certificates, nb_invalid_certificates, new_valids, new_invalids, args)
 
 if __name__ == '__main__':
