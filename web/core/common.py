@@ -116,7 +116,7 @@ def convert_cell(cell, convert_float: bool) -> Scalar:
 def get_sheet_data(sheet, convert_float: bool) -> List[List[Scalar]]:
     data: List[List[Scalar]] = []
     for row in sheet.rows:
-        data.append([convert_cell(cell, convert_float) for cell in row])
+        data.append([convert_cell(cell, convert_float) if isinstance(cell, openpyxl.cell.cell.Cell) else '' for cell in row])
     return data
 
 
