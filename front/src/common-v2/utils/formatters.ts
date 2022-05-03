@@ -68,7 +68,7 @@ export function formatDeadline(deadline: Date | string | null) {
 }
 
 export function formatJSON(json: any) {
-  return JSON.stringify(json).replaceAll(/["\{\}\[\]]/g, '')
+  return JSON.stringify(json).replaceAll(/["\{\}\[\]]/g, "")
 }
 
 // prepare string for comparison by putting it to lowercase and removing accents

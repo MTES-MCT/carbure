@@ -124,10 +124,18 @@ const Certificates = () => {
               cell: (c) => <Cell text={c.certificate.certificate_type} />,
             },
             {
-              key: 'scope',
+              key: "scope",
               header: t("Périmètre"),
               orderBy: (c) => JSON.stringify(c.certificate.scope),
-              cell: (c) => <Cell text={c.certificate.scope ? formatJSON(c.certificate.scope) : t("N/A")} />,
+              cell: (c) => (
+                <Cell
+                  text={
+                    c.certificate.scope
+                      ? formatJSON(c.certificate.scope)
+                      : t("N/A")
+                  }
+                />
+              ),
             },
             {
               key: "holder",
@@ -143,6 +151,7 @@ const Certificates = () => {
             },
             actionColumn<EntityCertificate>((c) => [
               <Button
+                captive
                 variant="icon"
                 icon={Cross}
                 action={() =>
@@ -359,4 +368,3 @@ const CertificateUpdateDialog = ({
 }
 
 export default Certificates
-

@@ -6,6 +6,7 @@ import { LoaderOverlay, Main } from "common-v2/components/scaffold"
 import Alert from "common-v2/components/alert"
 import { AlertTriangle, InfoCircle } from "common-v2/components/icons"
 import useTitle from "common-v2/hooks/title"
+import { MailTo } from "common-v2/components/button"
 
 const Pending = () => {
   const { t } = useTranslation()
@@ -93,14 +94,9 @@ const Pending = () => {
               le Slack de CarbuRe
             </a>{" "}
             ou par e-mail à l'addresse{" "}
-            <a
-              href="mailto:carbure@beta.gouv.fr"
-              target="_blank"
-              rel="noreferrer"
-              className={css.link}
-            >
-              carbure@beta.gouv.fr
-            </a>
+            <MailTo user="carbure" host="beta.gouv.fr" className={css.link}>
+              disponible sur ce lien
+            </MailTo>
             .
           </Trans>
         </p>
