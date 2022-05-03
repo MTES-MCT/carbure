@@ -440,8 +440,10 @@ def get_stock_filters_data(stock, query, field):
         return normalize_filter(countries, 'code_pays', 'name')
 
     if field == 'periods':
-        periods = stock.filter(parent_lot__isnull=False).values('parent_lot__period').distinct()
-        return [{'value': str(v['parent_lot__period']), 'label': "%d-%02d" % (v['parent_lot__period']/100, v['parent_lot__period'] % 100)} for v in periods if v]
+        set1 = stock.filter(parent_lot__isnull=False).values('parent_lot__period').distinct()
+        set2 = stock.filter(parent_transformation__isnull=False).values('parent_transformation__source_stock__parent_lot__period').distinct()
+        periods = list(set([s['parent_lot__period'] for s in set1] + [s['parent_transformation__source_stock__parent_lot__period'] for s in set2]))
+        return [{'value': str(p), 'label': "%d-%02d" % (p/100, p % 100)} for p in periods]
 
     if field == 'depots':
         depots = Depot.objects.filter(id__in=stock.values('depot__id').distinct()).values('name', 'depot_id')
@@ -526,7 +528,7 @@ def filter_stock(stock, query, blacklist=[]):
     if len(selection) > 0:
         stock = stock.filter(pk__in=selection)
     if len(periods) > 0 and 'periods' not in blacklist:
-        stock = stock.filter(Q(parent_lot__period__in=periods) | Q(parent_transformation__source_stock__period__in=periods))
+        stock = stock.filter(Q(parent_lot__period__in=periods) | Q(parent_transformation__source_stock__parent_lot__period__in=periods))
     if len(feedstocks) > 0 and 'feedstocks' not in blacklist:
         stock = stock.filter(feedstock__code__in=feedstocks)
     if len(biofuels) > 0 and 'biofuels' not in blacklist:
