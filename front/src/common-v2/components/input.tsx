@@ -310,7 +310,7 @@ export const SearchInput = ({
         clear && search && onChange ? () => onChange(undefined) : undefined
       }
     >
-      <div className={css.icon}>
+      <div className={css.searchIcon}>
         <Search />
       </div>
 
@@ -401,60 +401,63 @@ export const Field = ({
   style,
   children,
   onClear,
-}: FieldProps) => (
-  <div
-    data-field
-    data-disabled={disabled ? true : undefined}
-    data-readonly={readOnly ? true : undefined}
-    data-loading={loading ? true : undefined}
-    data-error={error ? true : undefined}
-    title={title}
-    style={style}
-    className={cl(css.field, variant && css[variant], className)}
-    {...layout({ asideX, asideY, spread })}
-  >
-    {label && (
-      <label className={css.label} title={title ?? label}>
-        {label}
-        {required && !(disabled || readOnly) && " *"}
-      </label>
-    )}
+}: FieldProps) => {
+  const icon =
+    loading === true ? (
+      <Loader passthrough />
+    ) : error ? (
+      <AlertTriangle title={error} />
+    ) : typeof Icon === "function" ? (
+      <Icon />
+    ) : Icon !== undefined ? (
+      Icon
+    ) : loading === false ? (
+      <Placeholder />
+    ) : null
 
+  return (
     <div
-      tabIndex={-1}
-      data-interactive={isInteractive(type) ? true : undefined}
-      ref={domRef as React.RefObject<HTMLDivElement>}
-      className={css.control}
+      data-field
+      data-disabled={disabled ? true : undefined}
+      data-readonly={readOnly ? true : undefined}
+      data-loading={loading ? true : undefined}
+      data-error={error ? true : undefined}
+      title={title}
+      style={style}
+      className={cl(css.field, variant && css[variant], className)}
+      {...layout({ asideX, asideY, spread })}
     >
-      {children}
-
-      {!disabled && !readOnly && onClear && (
-        <Button
-          captive
-          variant="icon"
-          icon={Cross}
-          action={onClear}
-          tabIndex={-1}
-          className={css.icon}
-        />
+      {label && (
+        <label className={css.label} title={title ?? label}>
+          {label}
+          {required && !(disabled || readOnly) && " *"}
+        </label>
       )}
 
-      <div className={css.icon}>
-        {loading === true ? (
-          <Loader passthrough />
-        ) : error ? (
-          <AlertTriangle title={error} />
-        ) : typeof Icon === "function" ? (
-          <Icon />
-        ) : Icon !== undefined ? (
-          Icon
-        ) : loading === false ? (
-          <Placeholder />
-        ) : null}
+      <div
+        tabIndex={-1}
+        data-interactive={isInteractive(type) ? true : undefined}
+        ref={domRef as React.RefObject<HTMLDivElement>}
+        className={css.control}
+      >
+        {children}
+
+        {!disabled && !readOnly && onClear && (
+          <Button
+            captive
+            variant="icon"
+            icon={Cross}
+            action={onClear}
+            tabIndex={-1}
+            className={css.icon}
+          />
+        )}
+
+        {icon && <div className={css.icon}>{icon}</div>}
       </div>
     </div>
-  </div>
-)
+  )
+}
 
 function isInteractive(type: string | undefined) {
   return type === "button" || type === "file"

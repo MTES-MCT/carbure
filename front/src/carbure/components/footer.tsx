@@ -10,6 +10,7 @@ import logoFranceRelance from "../assets/images/france-relance.webp"
 import logoEuropeanUnion from "../assets/images/union-europeenne.webp"
 import { ExternalLink, LinkedIn, Mail, Slack } from "common-v2/components/icons"
 import { Footer } from "common-v2/components/scaffold"
+import { MailTo } from "common-v2/components/button"
 
 const CarbureFooter = () => {
   useTranslation()
@@ -41,14 +42,10 @@ const CarbureFooter = () => {
             <Trans>Nous contacter :</Trans>
           </li>
           <li>
-            <a
-              href="mailto:carbure@beta.gouv.fr"
-              target="_blank"
-              rel="noreferrer"
-            >
+            <MailTo user="carbure" host="beta.gouv.fr">
               <Mail />
               <Trans>Email</Trans>
-            </a>
+            </MailTo>
           </li>
           <li>
             <a

@@ -76,7 +76,7 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
 
   const [attributions, setAttributions] = useState<Record<number, number>>({})
 
-  const { value, bind } = useForm({
+  const { value, bind, setField } = useForm({
     volume_etbe: 0 as number | undefined,
     volume_ethanol: 0 as number | undefined,
     volume_denaturant: 0 as number | undefined,
@@ -132,6 +132,9 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
 
   const stockRows = stocks.result?.data.data?.stocks ?? []
 
+  // records if there's a difference between current volume and lot assignments
+  const hasMismatch = !isNaN(volumeDiff) && volumeDiff !== 0
+
   return (
     <Dialog onClose={onClose}>
       <header>
@@ -161,6 +164,21 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
                 <NumberInput
                   label={t("Volume d'Éthanol utilisé")}
                   {...bind("volume_ethanol")}
+                  icon={
+                    hasMismatch && (
+                      <Button
+                        label={t("Ajuster")}
+                        icon={AlertCircle}
+                        variant="danger"
+                        action={() =>
+                          setField(
+                            "volume_ethanol",
+                            (value.volume_ethanol ?? 0) - volumeDiff
+                          )
+                        }
+                      />
+                    )
+                  }
                 />
               </Fieldset>
               <Fieldset>
@@ -195,7 +213,7 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
                 cell: (stock) => (
                   <Cell
                     text={t(stock.biofuel!.code, { ns: "biofuels" })}
-                    sub={stock.remaining_volume}
+                    sub={formatNumber(stock.remaining_volume) + " L"}
                   />
                 ),
               },
@@ -228,6 +246,10 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
                     icon={() => (
                       <Button
                         variant="primary"
+                        style={{
+                          fontSize: "0.75em",
+                          padding: "var(--spacing-s)",
+                        }}
                         label={t("Max")}
                         action={() =>
                           setAttributions({
@@ -255,7 +277,7 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
           action={onTransform}
         />
 
-        {!isNaN(volumeDiff) && volumeDiff !== 0 && (
+        {hasMismatch && (
           <Alert variant="danger" icon={AlertCircle}>
             {t(
               "Les volumes attribués ne correspondent pas ({{ diff }} litres)",
