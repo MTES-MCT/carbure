@@ -244,7 +244,7 @@ def ErrorResponse(status_code, error=None, data=None):
         response_data['data'] = data
     if error is not None:
         response_data['error'] = error
-    return JsonResponse(response_data, status_code=status_code)
+    return JsonResponse(response_data, status=status_code)
 
 def SuccessResponse(data=None):
     response_data = {}
