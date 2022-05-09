@@ -100,6 +100,7 @@ def notify_declaration_cancelled(declaration):
     notif.dest = declaration.entity
     notif.send_by_email = False
     notif.notify_administrator = False
+    notif.meta = {'period': declaration.period }
     notif.save()
 
 def notify_declaration_validated(declaration):
@@ -108,4 +109,5 @@ def notify_declaration_validated(declaration):
     notif.dest = declaration.entity
     notif.send_by_email = False
     notif.notify_administrator = False
+    notif.meta = {'period': declaration.period }
     notif.save()
