@@ -1,14 +1,23 @@
+import { useEffect, useRef, useState } from "react"
+import { Trans, useTranslation } from "react-i18next"
 import Button from "common-v2/components/button"
 import { AlertCircle } from "common-v2/components/icons"
 import { Row } from "common-v2/components/scaffold"
-import { useState } from "react"
-import { Trans, useTranslation } from "react-i18next"
+import { isProduction } from "common-v2/utils/context"
 
 const DevBanner = () => {
   const { t } = useTranslation()
+
   const [maximised, setMaximized] = useState(true)
 
-  if (window.location.hostname === "carbure.beta.gouv.fr") return null
+  const HEIGHT = `var(--spacing-xl)`
+
+  useEffect(() => {
+    const header = document.querySelector("#app header") as HTMLElement
+    if (header) header.style.marginTop = maximised ? HEIGHT : ""
+  }, [maximised, HEIGHT])
+
+  if (isProduction()) return null
 
   return (
     <Row
@@ -19,11 +28,11 @@ const DevBanner = () => {
         position: "fixed",
         top: 0,
         right: 0,
-        width: maximised ? "100%" : 50,
-        height: maximised ? undefined : 50,
+        width: maximised ? "100%" : HEIGHT,
+        height: HEIGHT,
         backgroundColor: "#ffbb40dd",
-        padding: maximised ? "var(--spacing-xs) var(--main-spacing)" : 0,
-        opacity: maximised ? 1 : 0.75,
+        padding: maximised ? "var(--spacing-s) var(--main-spacing)" : 0,
+        // opacity: maximised ? 1 : 0.75,
         zIndex: 10,
       }}
     >

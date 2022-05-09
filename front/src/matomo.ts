@@ -1,3 +1,4 @@
+import { isProduction } from "common-v2/utils/context"
 import React, { useContext, useLayoutEffect } from "react"
 import { useLocation } from "react-router-dom"
 
@@ -19,7 +20,7 @@ export const MatomoProvider = (props: any) => {
     const matomo = window._paq ?? []
     const push = (args: [string, ...any[]]) => {
       // only track production
-      if (window.location.hostname === "carbure.beta.gouv.fr") {
+      if (isProduction()) {
         matomo.push(args)
       }
     }
