@@ -1,5 +1,7 @@
 import cl from "clsx"
+import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
+import { useMatomo } from "matomo"
 import useEntity from "carbure/hooks/entity"
 import Dropdown, { Anchors } from "common-v2/components/dropdown"
 import { Bell, Check, Loader } from "common-v2/components/icons"
@@ -10,7 +12,6 @@ import List from "common-v2/components/list"
 import { Notification, NotificationType } from "carbure/types"
 import { Normalizer } from "common-v2/utils/normalize"
 import { t } from "i18next"
-import { Link } from "react-router-dom"
 import Radio from "common-v2/components/radio"
 import { Col, Row } from "common-v2/components/scaffold"
 import {
@@ -25,6 +26,7 @@ import * as api from "../api"
 const Notifications = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const matomo = useMatomo()
   const triggerRef = useRef<HTMLButtonElement>(null)
 
   const entity = useEntity()
@@ -62,6 +64,7 @@ const Notifications = () => {
         className={css.notificationMenu}
         triggerRef={triggerRef}
         anchor={Anchors.bottomRight}
+        onOpen={() => matomo.push(["trackEvent", "notifications", "open"])}
       >
         {({ close }) => (
           <>
