@@ -177,7 +177,7 @@ export const LotSummary = ({
               columns.volume,
               pending ? columns.countWithPending : columns.count,
               columns.ghgReduction,
-              pending && columns.shortcut,
+              pending && columns.shortcutInput,
             ])}
           />
         </>
@@ -205,7 +205,7 @@ export const LotSummary = ({
               columns.volume,
               pending ? columns.countWithPending : columns.count,
               columns.ghgReduction,
-              pending && columns.shortcut,
+              pending && columns.shortcutOutput,
             ])}
           />
         </>
@@ -290,7 +290,14 @@ export function useSummaryColumns(query: LotQuery) {
         <Cell text={formatPercentage(item.avg_ghg_reduction || 0)} />
       ),
     },
-    shortcut: {
+    shortcutInput: {
+      small: true,
+      header: t("Aperçu"),
+      cell: (item: SummaryItem) => (
+        <PreviewCell status="in" item={item} query={query} />
+      ),
+    },
+    shortcutOutput: {
       small: true,
       header: t("Aperçu"),
       cell: (item: SummaryItem) => (
