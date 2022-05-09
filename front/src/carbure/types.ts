@@ -83,6 +83,6 @@ export enum NotificationType {
   LotsReceived = "LOTS_RECEIVED",
   LotsRecalled = "LOTS_RECALLED",
   CertificateExpired = "CERTIFICATE_EXPIRED",
-  // DeclarationValidated = "DECLARATION_VALIDATED",
-  // DeclarationCancelled = "DECLARATION_CANCELLED"
+  DeclarationValidated = "DECLARATION_VALIDATED",
+  DeclarationCancelled = "DECLARATION_CANCELLED",
 }
