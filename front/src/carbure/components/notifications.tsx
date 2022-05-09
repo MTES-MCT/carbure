@@ -13,7 +13,11 @@ import { t } from "i18next"
 import { Link } from "react-router-dom"
 import Radio from "common-v2/components/radio"
 import { Col, Row } from "common-v2/components/scaffold"
-import { formatDateTime, formatElapsedTime } from "common-v2/utils/formatters"
+import {
+  formatDateTime,
+  formatElapsedTime,
+  formatPeriod,
+} from "common-v2/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { useMutation, useQuery } from "common-v2/hooks/async"
 import * as api from "../api"
@@ -178,6 +182,19 @@ function getNotificationText(notif: Notification) {
       return t("Votre certificat {{certificate}} est expiré", {
         certificate: notif.meta?.certificate,
       })
+
+    case NotificationType.DeclarationValidated:
+      return t("Votre déclaration pour la période {{period}} a été validée", {
+        period: formatPeriod(notif.meta?.period ?? 0),
+      })
+
+    case NotificationType.DeclarationCancelled:
+      return t("Votre déclaration pour la période {{period}} a été annulée", {
+        period: formatPeriod(notif.meta?.period ?? 0),
+      })
+
+    default:
+      return ""
   }
 }
 
@@ -200,6 +217,9 @@ function getNotificationLink(notif: Notification) {
 
     case NotificationType.CertificateExpired:
       return `/org/${notif.dest.id}/settings#certificates`
+
+    default:
+      return "#"
   }
 }
 
