@@ -260,7 +260,7 @@ export function useSummaryColumns(query: LotQuery) {
       ),
     },
     remainingVolume: {
-      key: "volume",
+      key: "remainingVolume",
       header: t("Volume restant (litres)"),
       orderBy: (item: SummaryItem) => item.remaining_volume_sum ?? 0,
       cell: (item: SummaryItem) => (
@@ -276,7 +276,7 @@ export function useSummaryColumns(query: LotQuery) {
     },
     countWithPending: {
       small: true,
-      key: "lots",
+      key: "validatedLots",
       header: t("Lots validés"),
       orderBy: (item: SummaryItem) => item.total - item.pending,
       cell: (item: SummaryItem) => <PendingCountCell item={item} />,
