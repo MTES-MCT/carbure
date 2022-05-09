@@ -17,16 +17,23 @@ import marianne from "../assets/images/Marianne.svg"
 import css from "./top-bar.module.css"
 import { compact } from "common-v2/utils/collection"
 import Notifications from "./notifications"
+import DevBanner from "./dev-banner"
 
 const Topbar = () => {
   const entity = useEntity()
   const user = useUser()
 
-  if (!user.isAuthenticated()) {
-    return <PublicTopbar />
-  } else {
-    return <PrivateTopbar entity={entity} user={user} />
-  }
+  return (
+    <>
+      <DevBanner />
+
+      {user.isAuthenticated() ? (
+        <PrivateTopbar entity={entity} user={user} />
+      ) : (
+        <PublicTopbar />
+      )}
+    </>
+  )
 }
 
 const PublicTopbar = () => {
