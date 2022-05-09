@@ -482,8 +482,16 @@ class CarbureLot(models.Model):
     free_field = models.TextField(blank=True, null=True, default=None)
 
     # admin / auditor checks & filters
-    highlighted_by_admin = models.BooleanField(default=False)
-    highlighted_by_auditor = models.BooleanField(default=False)
+    highlighted_by_admin = models.BooleanField(default=False) # admin requests audit of this lot
+    highlighted_by_auditor = models.BooleanField(default=False) # auditor suspicion - adds it to the control list
+    random_control_requested = models.BooleanField(default=False) # random control
+    ml_control_requested = models.BooleanField(default=False) # machine learning suspicion
+
+    # auditor decision
+    CONFORM = "CONFORM"
+    NONCONFORM = "NONCONFORM"
+    AUDIT_STATUS = ((UNKNOWN, UNKNOWN), (CONFORM, CONFORM), (NONCONFORM, NONCONFORM))
+    audit_status = models.CharField(max_length=24, choices=AUDIT_STATUS, default=UNKNOWN)
 
     class Meta:
         db_table = 'carbure_lots'
