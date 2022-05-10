@@ -3,8 +3,10 @@ import { useTranslation } from "react-i18next"
 import useEntity from "carbure/hooks/entity"
 import { UserRole } from "carbure/types"
 import { useMutation } from "common-v2/hooks/async"
-import { Panel, LoaderOverlay } from "common-v2/components/scaffold"
+import { Panel, LoaderOverlay, Row } from "common-v2/components/scaffold"
 import Checkbox from "common-v2/components/checkbox"
+import Select from "common-v2/components/select"
+import { Calculator } from "common-v2/components/icons"
 import * as api from "../api-v2"
 
 const CompanyOptions = () => {
@@ -48,10 +50,30 @@ const CompanyOptions = () => {
       <section>
         <p>
           {t(
-            "Les options ci-dessous vous permettent de personnaliser l'interface de la page Transactions de CarbuRe pour n'y montrer que les fonctionnalités pertinentes pour votre activité."
+            "Les options ci-dessous vous permettent de personnaliser l'interface de CarbuRe pour n'y montrer que les fonctionnalités pertinentes pour votre activité."
           )}
         </p>
       </section>
+
+      {/* <section>
+        <Row style={{ alignItems: "center" }}>
+          <Calculator size={18} style={{ marginRight: 16 }} />
+
+          {t("Ma société préfère afficher les quantités en")}
+
+          <Select
+            variant="inline"
+            value={entity.preferred_unit}
+            onChange={(u) => entity.setUnit(u!)}
+            style={{ marginLeft: "var(--spacing-xs)" }}
+            options={[
+              { value: "l", label: t("litres (Éthanol à 20°, autres à 15°)") },
+              { value: "kg", label: t("kilogrammes") },
+              { value: "MJ/kg", label: t("MG/kg") },
+            ]}
+          />
+        </Row>
+      </section> */}
 
       <section style={{ paddingBottom: "var(--spacing-l)" }}>
         <Checkbox
