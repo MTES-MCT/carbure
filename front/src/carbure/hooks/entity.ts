@@ -1,3 +1,5 @@
+import useLocalStorage from "common-v2/hooks/storage"
+import { Unit } from "common/types"
 import { useMatch } from "react-router-dom"
 import { Entity, EntityType, ExternalAdminPages, UserRole } from "../types"
 import { useUser } from "./user"
@@ -14,6 +16,7 @@ export interface EntityManager extends Entity {
   canTrade: boolean
   hasPage: (page: ExternalAdminPages) => boolean
   hasRights: (...roles: UserRole[]) => boolean
+  setUnit: (unit: Unit) => void
 }
 
 export function useEntity(): EntityManager {
@@ -24,6 +27,8 @@ export function useEntity(): EntityManager {
   const entityRights = user.getRights(entityID)
   const entity = entityRights?.entity
   const type = entity?.entity_type
+
+  const [unit, setUnit] = useLocalStorage<Unit>("carbure:preferred-unit", "l")
 
   return {
     id: entityID,
@@ -39,6 +44,7 @@ export function useEntity(): EntityManager {
     has_trading: entity?.has_trading ?? false,
     has_stocks: entity?.has_stocks ?? false,
     has_direct_deliveries: entity?.has_direct_deliveries ?? false,
+    preferred_unit: unit ?? "l",
     default_certificate: entity?.default_certificate ?? "",
     ext_admin_pages: entity?.ext_admin_pages ?? [],
 
@@ -58,6 +64,8 @@ export function useEntity(): EntityManager {
 
     hasRights: (...roles: UserRole[]) =>
       (entityRights && roles.includes(entityRights.role)) ?? false,
+
+    setUnit,
   }
 }
 

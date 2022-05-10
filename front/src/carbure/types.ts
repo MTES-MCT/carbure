@@ -11,6 +11,7 @@ export interface Entity {
   has_trading: boolean
   has_stocks: boolean
   has_direct_deliveries: boolean
+  preferred_unit?: "l" | "kg" | "MJ/kg"
   default_certificate?: string
   ext_admin_pages?: ExternalAdminPages[]
 }

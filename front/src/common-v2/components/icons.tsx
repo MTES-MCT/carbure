@@ -459,3 +459,16 @@ export const DropOff = ({ className, ...props }: IconProps) => (
     <path d="M3 3l18 18" />
   </Icon>
 )
+
+export const Calculator = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("drop-off", className)}>
+    <rect x="4" y="3" width="16" height="18" rx="2" />
+    <rect x="8" y="7" width="8" height="3" rx="1" />
+    <line x1="8" y1="14" x2="8" y2="14.01" />
+    <line x1="12" y1="14" x2="12" y2="14.01" />
+    <line x1="16" y1="14" x2="16" y2="14.01" />
+    <line x1="8" y1="17" x2="8" y2="17.01" />
+    <line x1="12" y1="17" x2="12" y2="17.01" />
+    <line x1="16" y1="17" x2="16" y2="17.01" />
+  </Icon>
+)

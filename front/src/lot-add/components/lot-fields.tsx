@@ -14,8 +14,8 @@ import Select from "common-v2/components/select"
 import * as api from "common-v2/api"
 import * as norm from "common-v2/utils/normalizers"
 import { LotFormValue } from "./lot-form"
-import { Biofuel, Country, Feedstock } from "common/types"
-import useLocalStorage from "common-v2/hooks/storage"
+import { Biofuel, Country, Feedstock, Unit } from "common/types"
+import useEntity from "carbure/hooks/entity"
 
 interface LotFieldsProps {
   readOnly?: boolean
@@ -65,17 +65,21 @@ export const VolumeField = (props: NumberInputProps) => {
 export const QuantityField = (props: NumberInputProps) => {
   const { t } = useTranslation()
   const bind = useBind<LotFormValue>()
+  const entity = useEntity()
 
-  const [unit, setUnit] = useLocalStorage<"volume" | "weight" | "lhv_amount">(
-    "carbure:preferred-unit",
-    "volume"
-  )
+  const [unit, setUnit] = useState<Unit | undefined>(entity.preferred_unit)
 
   const units = [
-    { value: "volume", label: t("litres") },
-    { value: "weight", label: t("kg") },
-    { value: "lhv_amount", label: t("MJ/kg") },
+    { value: "l", label: t("litres") },
+    { value: "kg", label: t("kg") },
+    { value: "MJ/kg", label: t("MJ/kg") },
   ]
+
+  const unitToField = {
+    l: "volume" as "volume",
+    kg: "weight" as "weight",
+    "MJ/kg": "lhv_amount" as "lhv_amount",
+  }
 
   return (
     <NumberInput
@@ -89,7 +93,7 @@ export const QuantityField = (props: NumberInputProps) => {
           options={units}
         />
       }
-      {...bind(unit)}
+      {...bind(unitToField[unit ?? "l"])}
       {...props}
     />
   )
