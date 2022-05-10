@@ -43,11 +43,11 @@ export const Tabs = ({
   const location = useLocation()
   const tabs = tabsConfig.filter(Boolean) as Tab[]
   const match = tabs.find((tab) => matcher(tab.path)) ?? tabs[0]
-  const [focus, setFocus] = useState(controlledFocus ?? match.key)
+  const [focus, setFocus] = useState(controlledFocus ?? match?.key)
 
   useEffect(() => {
-    setFocus(controlledFocus ?? match.key)
-  }, [controlledFocus, match.key])
+    setFocus(controlledFocus ?? match?.key)
+  }, [controlledFocus, match?.key])
 
   return (
     <>
