@@ -27,6 +27,7 @@ export const LotFields = (props: LotFieldsProps) => {
     <Fieldset label={t("Lot")}>
       <TransportDocumentField {...props} />
       <VolumeField {...props} />
+      {/* <QuantityField {...props} /> */}
       <BiofuelField {...props} />
       <FeedstockField {...props} />
       <CountryOfOriginField {...props} />
@@ -72,8 +73,8 @@ export const QuantityField = (props: NumberInputProps) => {
 
   const units = [
     { value: "volume", label: t("litres") },
-    { value: "weight", label: t("tonnes") },
-    { value: "lhv_amount", label: t("PCI") },
+    { value: "weight", label: t("kg") },
+    { value: "lhv_amount", label: t("MJ/kg") },
   ]
 
   return (

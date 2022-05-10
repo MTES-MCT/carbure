@@ -28,7 +28,7 @@
 }
 
 .menus {
-  gap: var(--spacing-m);
+  gap: var(--spacing-s);
 }
 
 .shortcut {

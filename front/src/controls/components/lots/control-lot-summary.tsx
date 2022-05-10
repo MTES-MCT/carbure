@@ -29,7 +29,6 @@ export const ControlLotSummaryBar = (props: LotSummaryBarProps) => {
 const EMPTY: number[] = []
 
 export const ControlLotSummary = ({
-  pending,
   query,
   selection = EMPTY,
 }: LotSummaryProps) => {
@@ -80,7 +79,6 @@ export const ControlLotSummary = ({
               columns.biofuel,
               columns.volume,
               columns.count,
-              pending ? columns.countWithPending : columns.count,
               columns.ghgReduction,
             ]}
           />

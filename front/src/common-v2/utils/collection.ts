@@ -74,6 +74,3 @@ export function matches(source: any, target: any, strict = false): boolean {
 
   return true
 }
-
-// @ts-ignore
-window.matches = matches
