@@ -48,6 +48,11 @@ const Certificates = ({ search = "", entity }: CertificatesProps) => {
       {certData.length > 0 && (
         <Table
           rows={certData}
+          onAction={(e) => {
+            if (e.certificate.download_link) {
+              window.open(e.certificate.download_link)
+            }
+          }}
           columns={compact([
             entity === undefined && {
               key: "entities",
@@ -74,6 +79,12 @@ const Certificates = ({ search = "", entity }: CertificatesProps) => {
               header: t("Détenteur"),
               orderBy: (c) => c.certificate.certificate_holder,
               cell: (c) => <Cell text={c.certificate.certificate_holder} />,
+            },
+            {
+              key: "scope",
+              header: t("Périmètre"),
+              orderBy: (c) => c.certificate.scope ?? "-",
+              cell: (c) => <Cell text={c.certificate.scope ?? "-"} />,
             },
             {
               key: "validity",
@@ -117,6 +128,7 @@ const CheckCertificate = ({ certificate }: ActionProps) => {
 
   return (
     <Button
+      captive
       variant="icon"
       title={t("Valider le certificat")}
       icon={Check}
@@ -166,6 +178,7 @@ const RejectCertificate = ({ certificate }: ActionProps) => {
 
   return (
     <Button
+      captive
       variant="icon"
       title={t("Refuser le certificat")}
       icon={Cross}
