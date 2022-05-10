@@ -130,6 +130,12 @@ export const normalizeLotStatusFilter: Normalizer<Option<LotStatus>, string> = (
 })
 
 // prettier-ignore
+export const normalizeEntityType: Normalizer<EntityType> = (type) => ({
+  value: type,
+  label: getEntityTypeLabel(type)
+})
+
+// prettier-ignore
 export const normalizeEntityTypeFilter: Normalizer<Option<EntityType>, string> = (type) => ({
   value: type.value,
   label: getEntityTypeLabel(type.value)
