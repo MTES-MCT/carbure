@@ -9,7 +9,7 @@ import * as serviceWorker from "./serviceWorker"
 import Carbure from "./carbure"
 import NotificationsProvider from "common/components/notifications"
 import { MatomoProvider } from "./matomo"
-import { LoaderOverlay } from "common/components"
+import { LoaderOverlay } from "common-v2/components/scaffold"
 import { PortalProvider } from "common-v2/components/portal"
 
 ReactDOM.render(
