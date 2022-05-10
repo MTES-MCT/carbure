@@ -22,9 +22,9 @@ import { compact } from "common-v2/utils/collection"
 
 const Settings = () => {
   const { t } = useTranslation()
-  useTitle(t("Société"))
 
   const entity = useEntity()
+  useTitle(`${entity.name} · ${t("Société")}`)
 
   const { productionSites, deliverySites } = useSettings(entity)
 
