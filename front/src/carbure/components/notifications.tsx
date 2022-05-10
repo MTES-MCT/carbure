@@ -1,5 +1,7 @@
 import cl from "clsx"
+import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
+import { useMatomo } from "matomo"
 import useEntity from "carbure/hooks/entity"
 import Dropdown, { Anchors } from "common-v2/components/dropdown"
 import { Bell, Check, Loader } from "common-v2/components/icons"
@@ -10,10 +12,13 @@ import List from "common-v2/components/list"
 import { Notification, NotificationType } from "carbure/types"
 import { Normalizer } from "common-v2/utils/normalize"
 import { t } from "i18next"
-import { Link } from "react-router-dom"
 import Radio from "common-v2/components/radio"
 import { Col, Row } from "common-v2/components/scaffold"
-import { formatDateTime, formatElapsedTime } from "common-v2/utils/formatters"
+import {
+  formatDateTime,
+  formatElapsedTime,
+  formatPeriod,
+} from "common-v2/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { useMutation, useQuery } from "common-v2/hooks/async"
 import * as api from "../api"
@@ -21,6 +26,7 @@ import * as api from "../api"
 const Notifications = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const matomo = useMatomo()
   const triggerRef = useRef<HTMLButtonElement>(null)
 
   const entity = useEntity()
@@ -58,6 +64,7 @@ const Notifications = () => {
         className={css.notificationMenu}
         triggerRef={triggerRef}
         anchor={Anchors.bottomRight}
+        onOpen={() => matomo.push(["trackEvent", "notifications", "open"])}
       >
         {({ close }) => (
           <>
@@ -178,6 +185,19 @@ function getNotificationText(notif: Notification) {
       return t("Votre certificat {{certificate}} est expiré", {
         certificate: notif.meta?.certificate,
       })
+
+    case NotificationType.DeclarationValidated:
+      return t("Votre déclaration pour la période {{period}} a été validée", {
+        period: formatPeriod(notif.meta?.period ?? 0),
+      })
+
+    case NotificationType.DeclarationCancelled:
+      return t("Votre déclaration pour la période {{period}} a été annulée", {
+        period: formatPeriod(notif.meta?.period ?? 0),
+      })
+
+    default:
+      return ""
   }
 }
 
@@ -200,6 +220,9 @@ function getNotificationLink(notif: Notification) {
 
     case NotificationType.CertificateExpired:
       return `/org/${notif.dest.id}/settings#certificates`
+
+    default:
+      return "#"
   }
 }
 

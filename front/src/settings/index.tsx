@@ -46,6 +46,11 @@ const Settings = () => {
               <Trans>Options</Trans>
             </a>
           )}
+          {hasOptions && (
+            <a href="#info">
+              <Trans>Informations</Trans>
+            </a>
+          )}
           {hasCertificates && (
             <a href="#certificates">
               <Trans>Certificats</Trans>

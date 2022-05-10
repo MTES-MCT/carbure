@@ -25,8 +25,6 @@ const Carbure = () => {
   return (
     <UserContext.Provider value={user}>
       <div id="app">
-        <DevBanner />
-
         <Topbar />
 
         <Routes>
