@@ -43,11 +43,11 @@ export const Tabs = ({
   const location = useLocation()
   const tabs = tabsConfig.filter(Boolean) as Tab[]
   const match = tabs.find((tab) => matcher(tab.path)) ?? tabs[0]
-  const [focus, setFocus] = useState(controlledFocus ?? match.key)
+  const [focus, setFocus] = useState(controlledFocus ?? match?.key)
 
   useEffect(() => {
-    setFocus(controlledFocus ?? match.key)
-  }, [controlledFocus, match.key])
+    setFocus(controlledFocus ?? match?.key)
+  }, [controlledFocus, match?.key])
 
   return (
     <>
@@ -97,12 +97,15 @@ export const Tabs = ({
 }
 
 export function useMatcher() {
+  const location = useLocation()
   const parentPath = useResolvedPath(".").pathname.trim()
-  const currentPath = useLocation().pathname.trim()
+  const currentPath = location.pathname.trim()
 
   return (path: string | undefined) => {
     if (path === undefined) {
       return null
+    } else if (path.startsWith("#")) {
+      return path === location.hash
     } else {
       const tabPath = resolvePath(path, parentPath).pathname.trim()
       const startsWithPath =

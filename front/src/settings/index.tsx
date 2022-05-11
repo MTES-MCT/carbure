@@ -1,4 +1,4 @@
-import { Trans, useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next"
 import { EntityManager } from "carbure/hooks/entity"
 
 import { PortalProvider } from "common-v2/components/portal"
@@ -11,19 +11,20 @@ import ProductionSitesSettings from "./components/production-site"
 import CompanyOptions from "./components/company-options"
 import CompanyInfo from "./components/company-info"
 import Certificates from "./components/certificates"
-import Sticky from "common/components/sticky"
 import EntityUserRights from "./components/user-rights"
 import { UserRole } from "carbure/types"
 import DoubleCountingSettings from "./components/double-counting"
 import useEntity from "carbure/hooks/entity"
 import useTitle from "common-v2/hooks/title"
 import { Main } from "common-v2/components/scaffold"
+import Tabs from "common-v2/components/tabs"
+import { compact } from "common-v2/utils/collection"
 
 const Settings = () => {
   const { t } = useTranslation()
-  useTitle(t("Société"))
 
   const entity = useEntity()
+  useTitle(`${entity.name} · ${t("Société")}`)
 
   const { productionSites, deliverySites } = useSettings(entity)
 
@@ -40,44 +41,46 @@ const Settings = () => {
           <h1>{entity?.name}</h1>
         </header>
 
-        <Sticky>
-          {hasOptions && (
-            <a href="#options">
-              <Trans>Options</Trans>
-            </a>
-          )}
-          {hasOptions && (
-            <a href="#info">
-              <Trans>Informations</Trans>
-            </a>
-          )}
-          {hasCertificates && (
-            <a href="#certificates">
-              <Trans>Certificats</Trans>
-            </a>
-          )}
-          {hasDepot && (
-            <a href="#depot">
-              <Trans>Dépôts</Trans>
-            </a>
-          )}
-          {isProducer && (
-            <a href="#production">
-              <Trans>Sites de production</Trans>
-            </a>
-          )}
-          {isProducer && (
-            <a href="#double-counting">
-              <Trans>Double comptage</Trans>
-            </a>
-          )}
-          {entity.hasRights(UserRole.Admin) && (
-            <a href="#users">
-              <Trans>Utilisateurs</Trans>
-            </a>
-          )}
-        </Sticky>
-
+        <Tabs
+          variant="sticky"
+          tabs={compact([
+            hasOptions && {
+              path: "#options",
+              key: "options",
+              label: t("Options"),
+            },
+            hasOptions && {
+              path: "#info",
+              key: "info",
+              label: t("Informations"),
+            },
+            hasCertificates && {
+              path: "#certificates",
+              key: "certificates",
+              label: t("Certificats"),
+            },
+            hasDepot && {
+              path: "#depot",
+              key: "depot",
+              label: t("Dépôts"),
+            },
+            isProducer && {
+              path: "#production",
+              key: "production",
+              label: t("Sites de production"),
+            },
+            isProducer && {
+              path: "#double-counting",
+              key: "double-counting",
+              label: t("Double comptage"),
+            },
+            entity.hasRights(UserRole.Admin) && {
+              path: "#users",
+              key: "users",
+              label: t("Utilisateurs"),
+            },
+          ])}
+        />
         <section>
           {hasOptions && <CompanyOptions />}
           {hasOptions && <CompanyInfo />}

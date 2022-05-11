@@ -124,24 +124,16 @@ const Certificates = () => {
               cell: (c) => <Cell text={c.certificate.certificate_type} />,
             },
             {
-              key: "scope",
-              header: t("Périmètre"),
-              orderBy: (c) => JSON.stringify(c.certificate.scope),
-              cell: (c) => (
-                <Cell
-                  text={
-                    c.certificate.scope
-                      ? formatJSON(c.certificate.scope)
-                      : t("N/A")
-                  }
-                />
-              ),
-            },
-            {
               key: "holder",
               header: t("Détenteur"),
               orderBy: (c) => c.certificate.certificate_holder,
               cell: (c) => <Cell text={c.certificate.certificate_holder} />,
+            },
+            {
+              key: "scope",
+              header: t("Périmètre"),
+              orderBy: (c) => c.certificate.scope ?? "-",
+              cell: (c) => <Cell text={c.certificate.scope ?? "-"} />,
             },
             {
               key: "validity",

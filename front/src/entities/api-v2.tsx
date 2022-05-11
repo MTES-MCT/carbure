@@ -1,5 +1,6 @@
 import api, { Api } from "common-v2/services/api"
 import { EntityCertificate } from "common/types"
+import { EntityDetails } from "./api"
 
 export function getEntityCertificates(entity_id?: number) {
   return api.get<Api<EntityCertificate[]>>("/admin/entity-certificates", {
@@ -13,4 +14,8 @@ export function checkEntityCertificate(entity_certificate_id: number) {
 
 export function rejectEntityCertificate(entity_certificate_id: number) {
   return api.post("admin/entity-certificates/reject", { entity_certificate_id })
+}
+
+export function getEntities() {
+  return api.get<Api<EntityDetails[]>>("/v3/admin/entities")
 }
