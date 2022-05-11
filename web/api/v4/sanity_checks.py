@@ -14,8 +14,6 @@ july1st2021 = datetime.date(year=2021, month=7, day=1)
 future = datetime.date.today() + datetime.timedelta(days=15) # docker containers are restarted everyday - not an issue
 dae_pattern = re.compile('^([a-zA-Z0-9/]+$)')
 
-ETD_DEFAULT_VALUE = 2.4
-
 rules = {}
 rules['GHG_REDUC_INF_50'] = "La réduction de gaz à effet de serre est inférieure à 50%, il n'est pas possible d'enregistrer ce lot dans CarbuRe"
 rules['GHG_REDUC_SUP_100'] = "La réduction de gaz à effet de serre est supérieure à 100%"
@@ -28,7 +26,6 @@ rules['MISSING_REF_DBL_COUNTING'] = "Numéro d'enregistrement Double Compte manq
 rules['VOLUME_FAIBLE'] = "Volume inhabituellement faible."
 rules['MAC_BC_WRONG'] = "Biocarburant incompatible avec un mise à consommation (seuls ED95 ou B100 sont autorisés)"
 rules['GHG_ETD_0'] = "Émissions GES liées au Transport et à la Distribution nulles"
-rules['ETD_HIGHER_THAN_DEFAULT'] = "Émissions GES liées au Transport et à la Distribution supérieures à la valeur par défaut"
 rules['GHG_EP_0'] = "Émissions GES liées à la Transformation de la matière première nulles"
 rules['GHG_EEC_0'] = "Émissions GES liées à l'Extraction et la Culture nulles"
 rules['GHG_EL_NEG'] = "Émissions GES liées à l'Affectation des terres Négatives"
@@ -218,8 +215,6 @@ def sanity_check(lot, prefetched_data):
 
     if lot.etd <= 0:
         errors.append(generic_error(error='GHG_ETD_0', lot=lot, is_blocking=True, field='etd'))
-    if lot.etd > ETD_DEFAULT_VALUE:
-        errors.append(generic_error(error='ETD_HIGHER_THAN_DEFAULT', lot=lot, field='etd'))
     if lot.ep <= 0:
         errors.append(generic_error(error='GHG_EP_0', lot=lot, is_blocking=True, field='ep'))
     if lot.el < 0:
