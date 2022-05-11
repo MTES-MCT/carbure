@@ -9,7 +9,7 @@
   border-color: var(--orange-medium);
 }
 
-.entityRequestsCount {
+.requestHighlight {
   color: var(--orange-dark);
 }
 

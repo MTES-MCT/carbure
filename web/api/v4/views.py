@@ -12,6 +12,7 @@ from django.db.models.fields import NOT_PROVIDED
 from django.http.response import HttpResponse, JsonResponse
 from django.db.models.query_utils import Q
 from api.v4.certificates import get_certificates
+from core.carburetypes import Carbure
 from core.common import convert_template_row_to_formdata, get_uploaded_files_directory
 from core.decorators import check_user_rights
 from api.v4.helpers import filter_lots, filter_stock, get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock
@@ -1722,13 +1723,14 @@ def toggle_warning(request, *args, **kwargs):
 def get_stats(request):
     try:
         today = datetime.date.today()
-        year = str(today.year)
-        total_volume = CarbureLot.objects.filter(lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN], year=year, carbure_client__entity_type=Entity.OPERATOR).aggregate(Sum('volume'))
+        lots = CarbureLot.objects.filter(delivery_type__in=[CarbureLot.BLENDING, CarbureLot.DIRECT, CarbureLot.RFC], year=today.year).select_related('biofuel')
+        total_volume = lots.aggregate(Sum('volume'))['volume__sum']
+        total_volume_etbe = lots.filter(biofuel__code='ETBE').aggregate(Sum('volume'))['volume__sum']
         entity_count = Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.TRADER, Entity.OPERATOR]).values('entity_type').annotate(count=Count('id'))
         entities = {}
         for r in entity_count:
             entities[r['entity_type']] = r['count']
-        total = total_volume['volume__sum']
+        total = round(total_volume) - round(total_volume_etbe) + round(total_volume_etbe * 27 * 0.37 / 21)
         if total is None:
             total = 1000
         return JsonResponse({'status': 'success', 'data': {'total_volume': total / 1000, 'entities': entities}})

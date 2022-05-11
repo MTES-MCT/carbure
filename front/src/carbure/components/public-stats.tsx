@@ -16,7 +16,7 @@ const PublicStats = () => {
     <Main>
       <section>
         <IframeResizer
-          src={`${publicLink}?annee=${currentYear}`}
+          src={`${publicLink}?annee=${currentYear}#hide_parameters=annee`}
           frameBorder="0"
           allowTransparency
           style={{ boxShadow: "var(--shadow)" }}
