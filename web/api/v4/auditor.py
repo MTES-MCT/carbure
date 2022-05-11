@@ -1,3 +1,4 @@
+from imp import source_from_cache
 import traceback
 from django.db.models.aggregates import Count, Sum
 from django.db.models.expressions import F
@@ -6,6 +7,7 @@ from django.db.models.functions.comparison import Coalesce
 
 from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
+from core.common import SuccessResponse
 from core.decorators import check_user_rights, is_auditor
 from api.v4.helpers import filter_lots, filter_stock, get_auditor_stock, get_entity_stock, get_known_certificates, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_with_errors, get_lots_with_metadata, get_lots_filters_data, get_stock_events, get_stock_filters_data, get_stock_with_metadata, get_stocks_summary_data
 from api.v4.helpers import get_transaction_distance
@@ -203,6 +205,30 @@ def toggle_pin(request, *args, **kwargs):
     except:
         traceback.print_exc()
         return JsonResponse({'status': "error", 'message': "Could not pin lots"}, status=500)
+
+@check_user_rights()
+@is_auditor
+def mark_conform(request, *args, **kwargs):
+    selection = request.POST.getlist('selection', [])
+    try:
+        lots = CarbureLot.objects.filter(id__in=selection)
+        lots.update(audit_status=CarbureLot.CONFORM)
+        return SuccessResponse()
+    except:
+        traceback.print_exc()
+        return JsonResponse({'status': "error", 'message': "Could not mark lots as conform"}, status=500)
+
+@check_user_rights()
+@is_auditor
+def mark_nonconform(request, *args, **kwargs):
+    selection = request.POST.getlist('selection', [])
+    try:
+        lots = CarbureLot.objects.filter(id__in=selection)
+        lots.update(audit_status=CarbureLot.NONCONFORM)
+        return SuccessResponse()
+    except:
+        traceback.print_exc()
+        return JsonResponse({'status': "error", 'message': "Could not mark lots as conform"}, status=500)
 
 
 @check_user_rights()
