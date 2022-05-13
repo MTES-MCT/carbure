@@ -218,6 +218,7 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
     client_types = query.getlist('client_types', [])
     lot_status = query.getlist('lot_status', False)
     category = query.get('category', False)
+    scores = query.get('scores', [])
 
     # selection overrides all other filters
     if len(selection) > 0:
@@ -245,6 +246,8 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
         lots = lots.filter(biofuel__code__in=biofuels)
     if len(countries_of_origin) > 0 and 'countries_of_origin' not in blacklist:
         lots = lots.filter(country_of_origin__code_pays__in=countries_of_origin)
+    if len(scores):
+        lots = lots.filter(data_reliability_score__in=scores)
     if category == 'stocks':
         lots = lots.filter(parent_stock__isnull=False)
     elif category == 'imported':
@@ -423,6 +426,10 @@ def get_lots_filters_data(lots, query, entity, field):
         for item in lots.values('carbure_client__entity_type').distinct():
             client_types.append(item['carbure_client__entity_type'] or Entity.UNKNOWN)
         return normalize_filter(set(client_types))
+
+    if field == 'score':
+        scores = lots.values('data_reliability_score').distinct()
+        return [{'value': v['data_reliability_score'], 'label': v['data_reliability_score']} for v in scores]
 
 def get_stock_filters_data(stock, query, field):
     stock = filter_stock(stock, query, blacklist=[field])

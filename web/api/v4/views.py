@@ -21,9 +21,9 @@ from api.v4.helpers import send_email_declaration_invalidated, send_email_declar
 from api.v4.lots import construct_carbure_lot, bulk_insert_lots, try_get_date
 from api.v4.sanity_checks import bulk_sanity_checks, sanity_check
 
-from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, Entity, GenericError, Pays, SustainabilityDeclaration, UserRights
+from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureLotReliabilityScore, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, Entity, GenericError, Pays, SustainabilityDeclaration, UserRights
 from core.notifications import notify_correction_done, notify_correction_request, notify_declaration_cancelled, notify_declaration_validated, notify_lots_recalled, notify_lots_received, notify_lots_rejected, notify_lots_recalled
-from core.serializers import CarbureLotPublicSerializer, CarbureNotificationSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
+from core.serializers import CarbureLotPublicSerializer, CarbureLotReliabilityScoreSerializer, CarbureNotificationSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
 from core.xlsx_v3 import template_v4, template_v4_stocks
 
 
@@ -484,6 +484,7 @@ def get_lot_details(request, *args, **kwargs):
     data['certificates'] = get_known_certificates(lot)
     data['updates'] = get_lot_updates(lot, entity)
     data['comments'] = get_lot_comments(lot, entity)
+    data['score'] = CarbureLotReliabilityScoreSerializer(lot.carburelotreliabilityscore_set.all(), many=True).data
     return JsonResponse({'status': 'success', 'data': data})
 
 
@@ -1609,8 +1610,16 @@ def validate_declaration(request, *args, **kwargs):
         bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLARED, lot=lot, user=request.user))
     CarbureLotEvent.objects.bulk_create(bulk_events)
     # freeze lots
-    CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True).update(lot_status=CarbureLot.FROZEN)
-    CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True).update(lot_status=CarbureLot.FROZEN)
+    lots_to_freeze = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True)
+    lots_to_freeze.update(lot_status=CarbureLot.FROZEN)
+    scores = [CarbureLotReliabilityScore(lot=l, max_score=1, score=1, item=CarbureLotReliabilityScore.LOT_DECLARED) for l in lots_to_freeze]
+    CarbureLotReliabilityScore.objects.bulk_create(scores)
+
+    lots_to_freeze = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True)
+    lots_to_freeze.update(lot_status=CarbureLot.FROZEN)
+    scores = [CarbureLotReliabilityScore(lot=l, max_score=1, score=1, item=CarbureLotReliabilityScore.LOT_DECLARED) for l in lots_to_freeze]
+    CarbureLotReliabilityScore.objects.bulk_create(scores)
+
     # mark declaration
     declaration.declared = True
     declaration.save()
@@ -1652,8 +1661,13 @@ def invalidate_declaration(request, *args, **kwargs):
         bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLCANCEL, lot=lot, user=request.user))
     CarbureLotEvent.objects.bulk_create(bulk_events)
     # unfreeze lots
-    CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True, lot_status=CarbureLot.FROZEN).update(lot_status=CarbureLot.ACCEPTED)
-    CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True, lot_status=CarbureLot.FROZEN).update(lot_status=CarbureLot.ACCEPTED)
+    lots_to_unfreeze = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True, lot_status=CarbureLot.FROZEN)
+    lots_to_unfreeze.update(lot_status=CarbureLot.ACCEPTED)
+    lots_to_unfreeze_second_batch = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True, lot_status=CarbureLot.FROZEN)
+    lots_to_unfreeze_second_batch.update(lot_status=CarbureLot.ACCEPTED)
+    batch = lots_to_unfreeze + lots_to_unfreeze_second_batch
+    CarbureLotReliabilityScore.objects.filter(lots__in=batch, item=CarbureLotReliabilityScore.LOT_DECLARED).delete()
+
     # send email
     notify_declaration_cancelled(declaration)
     send_email_declaration_invalidated(declaration)

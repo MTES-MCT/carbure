@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import CarbureLot, CarbureLotEvent, CarbureLotComment, CarbureNotification, CarbureStock, CarbureStockTransformation, Depot, Entity, EntityCertificate, EntityDepot, GenericCertificate, GenericError, SustainabilityDeclaration
+from core.models import CarbureLot, CarbureLotEvent, CarbureLotComment, CarbureLotReliabilityScore, CarbureNotification, CarbureStock, CarbureStockTransformation, Depot, Entity, EntityCertificate, EntityDepot, GenericCertificate, GenericError, SustainabilityDeclaration
 from doublecount.serializers import BiofuelSerializer, CountrySerializer, EntitySerializer, FeedStockSerializer
 from producers.models import ProductionSite
 
@@ -253,7 +253,7 @@ class CarbureLotPublicSerializer(serializers.ModelSerializer):
                   'lot_status', 'correction_status',
                   'volume', 'weight', 'lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
                   'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ghg_reference_red_ii', 'ghg_reduction_red_ii',
-                  'free_field', 'added_by', 'created_at', 'carbure_vendor', 'vendor_certificate', 'vendor_certificate_type',
+                  'free_field', 'added_by', 'created_at', 'carbure_vendor', 'vendor_certificate', 'vendor_certificate_type', 'data_reliability_score',
                   ]
 
 
@@ -270,9 +270,13 @@ class CarbureLotAdminSerializer(CarbureLotPublicSerializer):
                   'lot_status', 'correction_status',
                   'volume', 'weight', 'lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
                   'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ghg_reference_red_ii', 'ghg_reduction_red_ii',
-                  'free_field', 'added_by', 'created_at', 'highlighted_by_auditor', 'highlighted_by_admin', 'carbure_vendor', 'vendor_certificate', 'vendor_certificate_type',
+                  'free_field', 'added_by', 'created_at', 'highlighted_by_auditor', 'highlighted_by_admin', 'carbure_vendor', 'vendor_certificate', 'vendor_certificate_type', 'data_reliability_score',
                   ]
 
+class CarbureLotReliabilityScoreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CarbureLotReliabilityScore
+        field = ['item', 'max_score', 'score', 'comment']
 
 class GenericCertificateSerializer(serializers.ModelSerializer):
     class Meta:
