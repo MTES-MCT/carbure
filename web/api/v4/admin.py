@@ -17,7 +17,7 @@ from api.v4.helpers import filter_lots, filter_stock, get_all_stock, get_known_c
 from api.v4.helpers import get_transaction_distance
 
 from core.models import CarbureLot, CarbureLotComment, CarbureStock, CarbureStockTransformation, Entity, EntityCertificate, GenericError, SustainabilityDeclaration
-from core.serializers import CarbureLotAdminSerializer, CarbureLotCommentSerializer, CarbureLotPublicSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer, EntityCertificateSerializer, SustainabilityDeclarationSerializer
+from core.serializers import CarbureLotAdminSerializer, CarbureLotCommentSerializer, CarbureLotPublicSerializer, CarbureLotReliabilityScoreSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer, EntityCertificateSerializer, SustainabilityDeclarationSerializer
 
 
 @is_admin
@@ -116,6 +116,7 @@ def get_lot_details(request, *args, **kwargs):
     data['updates'] = get_lot_updates(lot)
     data['comments'] = get_lot_comments(lot)
     data['control_comments'] = get_admin_lot_comments(lot)
+    data['score'] = CarbureLotReliabilityScoreSerializer(lot.carburelotreliabilityscore_set.all(), many=True).data
     return JsonResponse({'status': 'success', 'data': data})
 
 @is_admin
