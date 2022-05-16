@@ -19,7 +19,7 @@ django.setup()
 from core.models import GenericCertificate
 
 today = datetime.date.today()
-CSV_FOLDER = '/tmp/redcert/'
+CSV_FOLDER = '/tmp/'
 
 def get_sheet_data(sheet, convert_float: bool) -> List[List[Scalar]]:
     data: List[List[Scalar]] = []
