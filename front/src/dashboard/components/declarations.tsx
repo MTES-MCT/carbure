@@ -70,6 +70,7 @@ const Declarations = () => {
             <Button icon={ChevronLeft} action={() => movePeriod(-1)} />
             <Select
               search
+              loading={periods.loading}
               value={period}
               onChange={setPeriod}
               options={periodData}
@@ -94,18 +95,21 @@ const Declarations = () => {
       {focus === EntityType.Operator && (
         <DeclarationTable
           period={period!}
+          loading={declarations.loading}
           declarations={groupedByEntityType[EntityType.Operator]}
         />
       )}
       {focus === EntityType.Producer && (
         <DeclarationTable
           period={period!}
+          loading={declarations.loading}
           declarations={groupedByEntityType[EntityType.Producer]}
         />
       )}
       {focus === EntityType.Trader && (
         <DeclarationTable
           period={period!}
+          loading={declarations.loading}
           declarations={groupedByEntityType[EntityType.Trader]}
         />
       )}
@@ -114,17 +118,23 @@ const Declarations = () => {
 }
 
 interface DeclarationTableProps {
+  loading: boolean
   period: string
   declarations: DashboardDeclaration[] | undefined
 }
 
-const DeclarationTable = ({ period, declarations }: DeclarationTableProps) => {
+const DeclarationTable = ({
+  loading,
+  period,
+  declarations,
+}: DeclarationTableProps) => {
   const { t } = useTranslation()
 
   if (!declarations || declarations.length === 0) {
     return (
       <section style={{ paddingBottom: "var(--spacing-l)" }}>
         <Alert
+          loading={loading}
           icon={AlertCircle}
           variant="warning"
           label={t("Aucune déclaration trouvée pour cette période.")}
@@ -136,7 +146,9 @@ const DeclarationTable = ({ period, declarations }: DeclarationTableProps) => {
   const columns = getDeclarationDashboardColumns(period)
   const rows = getEntityDeclarationsByPeriod(declarations)
 
-  return <Table variant="compact" rows={rows} columns={columns} />
+  return (
+    <Table variant="compact" loading={loading} rows={rows} columns={columns} />
+  )
 }
 
 const Legend = () => (

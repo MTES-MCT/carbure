@@ -24,6 +24,7 @@ export function Select<T, V>({
   value,
   placeholder = "Select an option",
   options,
+  loading,
   getOptions,
   onChange,
   onOpen,
@@ -57,7 +58,7 @@ export function Select<T, V>({
         value={asyncOptions.label || placeholder}
         icon={<ChevronDown passthrough />}
         onClear={onClear}
-        loading={asyncOptions.loading}
+        loading={loading || asyncOptions.loading}
       />
 
       {!props.disabled && !props.readOnly && (
