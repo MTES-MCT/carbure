@@ -662,8 +662,8 @@ class CarbureLotReliabilityScore(models.Model):
                     (FEEDSTOCK_REGISTERED, FEEDSTOCK_REGISTERED), (BIOFUEL_REGISTERED, BIOFUEL_REGISTERED), (DELIVERY_SITE_REGISTERED, DELIVERY_SITE_REGISTERED))
 
     lot = models.ForeignKey(CarbureLot, blank=False, null=False, on_delete=models.CASCADE)
-    max_score = models.IntegerField(default=1)
-    score = models.IntegerField(default=1)
+    max_score = models.FloatField(default=1)
+    score = models.FloatField(default=1)
     item = models.CharField(max_length=32, choices=SCORE_ITEMS, blank=False, null=False, default='Unknown')
     comment = models.TextField(blank=True, null=True, default=None)
 
