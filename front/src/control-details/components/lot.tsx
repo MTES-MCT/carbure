@@ -30,6 +30,7 @@ import { invalidate } from "common-v2/hooks/invalidate"
 import { PinOneButton } from "controls/actions/pin"
 import ControlComments from "./control-comments"
 import { formatDate } from "common-v2/utils/formatters"
+import Score from "transaction-details/components/score"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -74,9 +75,10 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   return (
     <Dialog onClose={closeDialog}>
       <header>
+        {lotData && <Score big lot={lotData.lot} details={lotData.score} />}
         {lotData && <LotTag big lot={lotData.lot} />}
         <h1>
-          {t("Détails du lot")} #{lotData?.lot.carbure_id || lotData?.lot.id}
+          {t("Lot")} #{lotData?.lot.carbure_id || lotData?.lot.id}
           {" · "}
           {creator?.name ?? "N/A"}
           {" · "}
@@ -88,6 +90,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
             icon={Alarm}
             variant="warning"
             label={t("À valider avant la fin du mois")}
+            style={{ marginLeft: "auto" }}
           />
         )}
       </header>

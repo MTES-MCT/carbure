@@ -38,6 +38,7 @@ export const Alert = ({
   return (
     <div
       style={style}
+      title={label}
       className={cl(
         css.alert,
         className,

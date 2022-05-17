@@ -54,8 +54,7 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
       <header>
         {stockData && <StockTag big stock={stockData.stock} />}
         <h1>
-          {t("Détails du lot")} #
-          {stockData?.stock.carbure_id || stockData?.stock.id}
+          {t("Stock")} #{stockData?.stock.carbure_id || stockData?.stock.id}
           {" · "}
           {creator?.name ?? "N/A"}
         </h1>
