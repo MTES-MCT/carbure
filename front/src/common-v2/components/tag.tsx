@@ -1,3 +1,4 @@
+import React from "react"
 import cl from "clsx"
 import {
   defaultNormalizer,
@@ -16,11 +17,27 @@ export interface TagProps {
   variant?: TagVariant
   label?: string
   children?: React.ReactNode
+  style?: React.CSSProperties
+  className?: string
+  onClick?: () => void
   onDismiss?: () => void
 }
 
-export const Tag = ({ big, variant, label, children, onDismiss }: TagProps) => (
-  <span className={cl(css.tag, variant && css[variant], big && css.big)}>
+export const Tag = ({
+  big,
+  variant,
+  label,
+  children,
+  className,
+  style,
+  onClick,
+  onDismiss,
+}: TagProps) => (
+  <span
+    style={style}
+    className={cl(css.tag, variant && css[variant], big && css.big, className)}
+    onClick={onClick}
+  >
     {label ?? children}
     {onDismiss && (
       <Button captive variant="icon" icon={Cross} action={onDismiss} />

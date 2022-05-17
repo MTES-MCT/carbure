@@ -84,6 +84,7 @@ export const lotDetails: LotDetails = {
     supplier_certificate: null,
     vendor_certificate: null,
   },
+  score: [],
 }
 
 export const errors: LotError[] = [

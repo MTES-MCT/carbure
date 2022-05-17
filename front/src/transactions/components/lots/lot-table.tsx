@@ -18,6 +18,7 @@ import { Alarm } from "common-v2/components/icons"
 import LotTag from "./lot-tag"
 import { isRedII } from "lot-add/components/ghg-fields"
 import { DuplicateOneButton } from "transactions/actions/duplicate"
+import Score from "transaction-details/components/score"
 
 export interface LotTableProps {
   loading: boolean
@@ -52,6 +53,7 @@ export const LotTable = memo(
         columns={[
           markerColumn<Lot>((lot) => getLotMarker(lot, errors)),
           selectionColumn(lots, selected, onSelect, (lot) => lot.id),
+          columns.score,
           columns.status,
           columns.period,
           columns.document,
@@ -73,6 +75,12 @@ export function useLotColumns() {
   const { t } = useTranslation()
 
   return {
+    score: {
+      small: true,
+      header: t("Score"),
+      cell: (lot: Lot) => <Score lot={lot} />,
+    },
+
     status: {
       header: t("Statut"),
       cell: (lot: Lot) => <LotTag lot={lot} />,

@@ -65,6 +65,7 @@ export interface Lot {
   created_at: string
   highlighted_by_admin?: boolean
   highlighted_by_auditor?: boolean
+  data_reliability_score?: string
 }
 
 export interface LotList {

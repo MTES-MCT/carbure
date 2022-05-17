@@ -32,11 +32,12 @@
 }
 
 .close:hover {
-  background-color: var(--gray-highlight);
+  background-color: #e7e7e7cc;
 }
 
 .dialog h1 {
   font-size: 1.33em;
+  white-space: nowrap;
 }
 
 .dialog > header {

@@ -1,0 +1,34 @@
+.scoreList {
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+  margin: 0;
+  gap: var(--spacing-m);
+}
+
+.scoreTag {
+  width: 32;
+  justify-content: center;
+  font-size: 16;
+  font-weight: bold;
+  color: var(--white);
+}
+
+.scoreItem {
+  display: flex;
+  margin-left: var(--spacing-s);
+  color: var(--gray-dark);
+}
+
+.scoreResult {
+  display: flex;
+  align-items: flex-end;
+  font-weight: bold;
+}
+
+.separator {
+  flex: 1 0;
+  min-width: 32px;
+  margin: 0 12px;
+  border-bottom: 1px dashed var(--gray-dark);
+}

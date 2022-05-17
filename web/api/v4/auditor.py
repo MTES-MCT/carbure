@@ -13,7 +13,7 @@ from api.v4.helpers import filter_lots, filter_stock, get_auditor_stock, get_ent
 from api.v4.helpers import get_transaction_distance
 
 from core.models import CarbureLot, CarbureLotComment, CarbureStock, CarbureStockTransformation, Entity, GenericError, UserRights
-from core.serializers import CarbureLotAdminSerializer, CarbureLotCommentSerializer, CarbureLotPublicSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
+from core.serializers import CarbureLotAdminSerializer, CarbureLotCommentSerializer, CarbureLotPublicSerializer, CarbureLotReliabilityScoreSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
 from api.v4.admin import get_admin_summary_data
 
 @check_user_rights()
@@ -43,7 +43,7 @@ def get_snapshot(request, *args, **kwargs):
     lots = get_auditor_lots(request).filter(year=year)
     alerts = get_lots_with_errors(lots, entity)
     corrections = lots.exclude(correction_status=CarbureLot.NO_PROBLEMO)
-    
+
     stock = get_auditor_stock(request.user)
     stock_not_empty = stock.filter(remaining_volume__gt=0)
 
@@ -128,6 +128,7 @@ def get_lot_details(request, *args, **kwargs):
     data['updates'] = get_lot_updates(lot)
     data['comments'] = get_lot_comments(lot)
     data['control_comments'] = get_auditor_lot_comments(lot)
+    data['score'] = CarbureLotReliabilityScoreSerializer(lot.carburelotreliabilityscore_set.all(), many=True).data
     return JsonResponse({'status': 'success', 'data': data})
 
 

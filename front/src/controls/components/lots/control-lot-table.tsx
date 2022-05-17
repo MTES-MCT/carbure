@@ -43,6 +43,7 @@ export const ControlTable = memo(
         columns={[
           markerColumn<Lot>((lot) => getLotMarker(lot, errors)),
           selectionColumn(lots, selected, onSelect, (lot) => lot.id),
+          columns.score,
           columns.status,
           columns.period,
           columns.document,
