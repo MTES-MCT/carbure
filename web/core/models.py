@@ -942,6 +942,9 @@ class EntityCertificate(models.Model):
     rejected_by_admin = models.BooleanField(default=False)
     added_dt = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return '%s - %s' % (self.entity.name, self.certificate.certificate_id)
+
     class Meta:
         db_table = 'carbure_entity_certificates'
         indexes = [
