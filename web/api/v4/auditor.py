@@ -29,7 +29,6 @@ def get_years(request, *args, **kwargs):
 @is_auditor
 def get_snapshot(request, *args, **kwargs):
     year = request.GET.get('year', False)
-    entity_id = request.GET.get('entity_id', False)
     if year:
         try:
             year = int(year)
@@ -38,22 +37,15 @@ def get_snapshot(request, *args, **kwargs):
     else:
         return JsonResponse({'status': 'error', 'message': 'Missing year'}, status=400)
 
+    auditor_lots = get_auditor_lots(request).filter(year=year)
+    lots = auditor_lots.filter(year=year).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
+    alerts = lots.filter(Q(highlighted_by_admin=True) | Q(highlighted_by_auditor=True) | Q(random_control_requested=True) | Q(ml_control_requested=True))
+
+    auditor_stock = get_auditor_stock(request.user)
+    stock = auditor_stock.filter(remaining_volume__gt=0)
+
     data = {}
-    entity = Entity.objects.get(id=entity_id)
-    lots = get_auditor_lots(request).filter(year=year)
-    alerts = get_lots_with_errors(lots, entity)
-    corrections = lots.exclude(correction_status=CarbureLot.NO_PROBLEMO)
-
-    stock = get_auditor_stock(request.user)
-    stock_not_empty = stock.filter(remaining_volume__gt=0)
-
-    pinned = lots.filter(highlighted_by_auditor=True)
-
-    data['lots'] = {'alerts': alerts.count(),
-                    'corrections': corrections.count(),
-                    'declarations': lots.count(),
-                    'stocks': stock_not_empty.count(),
-                    'pinned': pinned.count()}
+    data['lots'] = {'alerts': alerts.count(), 'lots': lots.count(), 'stocks': stock.count()}
     return JsonResponse({'status': 'success', 'data': data})
 
 
@@ -280,13 +272,9 @@ def get_auditor_lots(request):
 def get_auditor_lots_by_status(entity, status, request):
     lots = get_auditor_lots(request)
     if status == 'ALERTS':
-        lots = get_lots_with_errors(lots, entity, will_aggregate=True)
-    elif status == 'CORRECTIONS':
-        lots = lots.exclude(correction_status=CarbureLot.NO_PROBLEMO)
-    elif status == 'DECLARATIONS':
+        lots = lots.filter(Q(highlighted_by_admin=True) | Q(highlighted_by_auditor=True) | Q(random_control_requested=True) | Q(ml_control_requested=True))
+    elif status == 'LOTS':
         lots = lots.exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
-    elif status == 'PINNED':
-        lots = lots.filter(highlighted_by_auditor=True)
     return lots
 
 
