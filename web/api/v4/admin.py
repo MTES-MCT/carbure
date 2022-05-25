@@ -41,7 +41,7 @@ def get_snapshot(request, *args, **kwargs):
 
     lots = CarbureLot.objects.filter(year=year).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
     stock = CarbureStock.objects.filter(remaining_volume__gt=0)
-    alerts = lots.filter(Q(highlighted_by_admin=True) | Q(highlighted_by_auditor=True) | Q(random_control_requested=True) | Q(ml_control_requested=True))
+    alerts = lots.filter(Q(highlighted_by_admin=True) | Q(random_control_requested=True) | Q(ml_control_requested=True))
     data = {}
 
     data['lots'] = {'alerts': alerts.count(), 'lots': lots.count(), 'stocks': stock.count()}
@@ -402,7 +402,7 @@ def get_admin_lots_by_status(entity, status, export=False):
     lots = lots.exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
 
     if status == 'ALERTS':
-        lots = lots.filter(Q(highlighted_by_admin=True) | Q(highlighted_by_auditor=True) | Q(random_control_requested=True) | Q(ml_control_requested=True))
+        lots = lots.filter(Q(highlighted_by_admin=True) | Q(random_control_requested=True) | Q(ml_control_requested=True))
     elif status == 'LOTS':
         lots = lots.exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
 

@@ -175,6 +175,14 @@ export const AlertTriangle = ({ className, ...props }: IconProps) => (
   </Icon>
 )
 
+export const AlertTriangleOff = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("alert-triangle-off", className)}>
+    <path d="M12 9v2m0 4v.01" />
+    <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75" />
+    <line x1="3" y1="3" x2="21" y2="21" />
+  </Icon>
+)
+
 export const AlertOctagon = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("alert-octagon", className)}>
     <path d="M8.7 3h6.6c0.3 0 .5 .1 .7 .3l4.7 4.7c0.2 .2 .3 .4 .3 .7v6.6c0 .3 -.1 .5 -.3 .7l-4.7 4.7c-0.2 .2 -.4 .3 -.7 .3h-6.6c-0.3 0 -.5 -.1 -.7 -.3l-4.7 -4.7c-0.2 -.2 -.3 -.4 -.3 -.7v-6.6c0 -.3 .1 -.5 .3 -.7l4.7 -4.7c0.2 -.2 .4 -.3 .7 -.3z" />
