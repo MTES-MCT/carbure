@@ -242,6 +242,8 @@ export enum Filter {
   ShowEmpty = "show_empty",
   DeliveryTypes = "delivery_types",
   LotStatus = "lot_status",
+  CorrectionStatus = "correction_status",
+  Scores = "scores",
 }
 
 export type FilterSelection = Partial<Record<Filter, string[]>>

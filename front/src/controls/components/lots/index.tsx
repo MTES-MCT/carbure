@@ -148,6 +148,7 @@ export const Lots = ({ entity, year }: LotsProps) => {
 const ADMIN_FILTERS = [
   Filter.LotStatus,
   Filter.DeliveryTypes,
+  Filter.CorrectionStatus,
   Filter.Periods,
   Filter.Biofuels,
   Filter.Feedstocks,
@@ -159,6 +160,7 @@ const ADMIN_FILTERS = [
   Filter.DeliverySites,
   Filter.AddedBy,
   Filter.Errors,
+  Filter.Scores,
 ]
 
 export default Lots

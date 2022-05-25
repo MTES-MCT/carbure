@@ -41,18 +41,20 @@ export function Filters<T>({
     [Filter.ShowEmpty]: t("Inclure stocks vides"),
     [Filter.DeliveryTypes]: t("Types de livraison"),
     [Filter.LotStatus]: t("Statut"),
+    [Filter.CorrectionStatus]: t("Corrections"),
+    [Filter.Scores]: t("Score"),
   }
 
   return (
     <Grid>
-      {filters.map((field) => (
+      {filters.map((filter) => (
         <FilterSelect
-          key={field}
-          field={field}
-          placeholder={filterLabels[field]}
-          value={selected[field]}
-          onChange={(value) => onSelect({ ...selected, [field]: value ?? [] })}
-          getOptions={() => getFilters(field, query)}
+          key={filter}
+          field={filter}
+          placeholder={filterLabels[filter]}
+          value={selected[filter]}
+          onChange={(value) => onSelect({ ...selected, [filter]: value ?? [] })}
+          getOptions={() => getFilters(filter, query)}
         />
       ))}
     </Grid>
@@ -101,7 +103,7 @@ export const FilterSelect = ({
   />
 )
 
-type FilterNormalizers= Partial<Record<Filter, Normalizer<Option<any>, string>>> // prettier-ignore
+type FilterNormalizers= Partial<Record<Filter, Normalizer<any>>> // prettier-ignore
 const filterNormalizers: FilterNormalizers = {
   [Filter.Feedstocks]: norm.normalizeFeedstockFilter,
   [Filter.Biofuels]: norm.normalizeBiofuelFilter,
@@ -115,6 +117,8 @@ const filterNormalizers: FilterNormalizers = {
   [Filter.DeliverySites]: norm.normalizeUnknownFilter,
   [Filter.ProductionSites]: norm.normalizeUnknownFilter,
   [Filter.Depots]: norm.normalizeUnknownFilter,
+  [Filter.Periods]: norm.normalizePeriodFilter,
+  [Filter.CorrectionStatus]: norm.normalizeCorrectionFilter,
 }
 
 export function useFilterParams() {
