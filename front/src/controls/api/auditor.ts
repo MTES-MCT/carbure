@@ -111,3 +111,17 @@ export async function commentLots(
     comment,
   })
 }
+
+export async function markAsConform(entity_id: number, selection: number[]) {
+  return api.post<Api<void>>("/auditor/lots/mark-as-conform", {
+    entity_id,
+    selection,
+  })
+}
+
+export async function markAsNonConform(entity_id: number, selection: number[]) {
+  return api.post<Api<void>>("/auditor/lots/mark-as-nonconform", {
+    entity_id,
+    selection,
+  })
+}

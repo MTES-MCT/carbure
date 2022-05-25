@@ -1,12 +1,6 @@
 import { SummaryItem } from "transactions/types"
 
-export type AdminStatus =
-  | "alerts"
-  | "corrections"
-  | "declarations"
-  | "stocks"
-  | "pinned"
-  | "unknown"
+export type AdminStatus = "alerts" | "lots" | "stocks" | "unknown"
 
 export interface Snapshot {
   lots: {

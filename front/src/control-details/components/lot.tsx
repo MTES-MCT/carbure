@@ -31,6 +31,7 @@ import { AlertOneButton } from "controls/actions/alert"
 import ControlComments from "./control-comments"
 import { formatDate } from "common-v2/utils/formatters"
 import Score from "transaction-details/components/score"
+import { SetOneConformityButton } from "controls/actions/set-conformity"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -144,7 +145,10 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
       </main>
 
       <footer>
-        {lotData && <AlertOneButton lot={lotData?.lot} />}
+        {lotData && <AlertOneButton lot={lotData.lot} />}
+        {lotData && entity.isAuditor && (
+          <SetOneConformityButton lot={lotData.lot} />
+        )}
         <NavigationButtons neighbors={neighbors} root={`../${status}`} />
         <Button icon={Return} label={t("Retour")} action={closeDialog} />
       </footer>
