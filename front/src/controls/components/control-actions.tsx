@@ -2,7 +2,7 @@ import { ActionBar } from "common-v2/components/scaffold"
 import { SearchInput } from "common-v2/components/input"
 import { ExportLotsButton } from "../actions/export"
 import { Lot, LotQuery } from "transactions/types"
-import { PinManyButton } from "controls/actions/pin"
+import { AlertManyButton } from "controls/actions/alert"
 import DeliveryMapButton from "controls/actions/delivery-map"
 import useEntity from "carbure/hooks/entity"
 import { useStatus } from "./status"
@@ -34,7 +34,7 @@ export const ControlActions = ({
     <ActionBar>
       {status !== "stocks" && (
         <>
-          {selectedLots && <PinManyButton {...props} lots={selectedLots} />}
+          {selectedLots && <AlertManyButton {...props} lots={selectedLots} />}
           {entity.isAdmin && <DeliveryMapButton {...props} />}
         </>
       )}

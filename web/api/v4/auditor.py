@@ -39,7 +39,7 @@ def get_snapshot(request, *args, **kwargs):
 
     auditor_lots = get_auditor_lots(request).filter(year=year)
     lots = auditor_lots.filter(year=year).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
-    alerts = lots.filter(Q(highlighted_by_admin=True) | Q(highlighted_by_auditor=True) | Q(random_control_requested=True) | Q(ml_control_requested=True))
+    alerts = lots.filter(Q(highlighted_by_auditor=True) | Q(random_control_requested=True) | Q(ml_control_requested=True))
 
     auditor_stock = get_auditor_stock(request.user)
     stock = auditor_stock.filter(remaining_volume__gt=0)
@@ -272,7 +272,7 @@ def get_auditor_lots(request):
 def get_auditor_lots_by_status(entity, status, request):
     lots = get_auditor_lots(request)
     if status == 'ALERTS':
-        lots = lots.filter(Q(highlighted_by_admin=True) | Q(highlighted_by_auditor=True) | Q(random_control_requested=True) | Q(ml_control_requested=True))
+        lots = lots.filter(Q(highlighted_by_auditor=True) | Q(random_control_requested=True) | Q(ml_control_requested=True))
     elif status == 'LOTS':
         lots = lots.exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
     return lots

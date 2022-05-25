@@ -8,7 +8,11 @@ import { useNotify } from "common-v2/components/notifications"
 import { variations } from "common-v2/utils/formatters"
 import Button from "common-v2/components/button"
 import Dialog from "common-v2/components/dialog"
-import { Pin, PinOff, Return } from "common-v2/components/icons"
+import {
+  AlertTriangle,
+  AlertTriangleOff,
+  Return,
+} from "common-v2/components/icons"
 import { usePortal } from "common-v2/components/portal"
 import { useStatus } from "../components/status"
 import { TextInput } from "common-v2/components/input"
@@ -17,19 +21,19 @@ import Checkbox from "common-v2/components/checkbox"
 import Form, { useForm } from "common-v2/components/form"
 import { AdminStatus } from "controls/types"
 
-export interface PinManyButtonProps {
+export interface AlertManyButtonProps {
   disabled?: boolean
   pinned?: boolean
   selection: number[]
   lots: Lot[]
 }
 
-export const PinManyButton = ({
+export const AlertManyButton = ({
   disabled,
   selection,
   pinned: forcePinned,
   lots,
-}: PinManyButtonProps) => {
+}: AlertManyButtonProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
   const entity = useEntity()
@@ -43,12 +47,12 @@ export const PinManyButton = ({
   return (
     <Button
       disabled={disabled || selection.length === 0}
-      variant={pinned ? "warning" : "primary"}
-      icon={pinned ? PinOff : Pin}
-      label={pinned ? t("Désépingler la sélection") : t("Épingler la sélection")} // prettier-ignore
+      variant="warning"
+      icon={pinned ? AlertTriangleOff : AlertTriangle}
+      label={pinned ? t("Annuler le signalement") : t("Signaler la sélection")} // prettier-ignore
       action={() =>
         portal((close) => (
-          <PinDialog
+          <AlertDialog
             summary
             pinned={pinned}
             selection={selection}
@@ -60,12 +64,12 @@ export const PinManyButton = ({
   )
 }
 
-export interface PinOneButtonProps {
+export interface AlertOneButtonProps {
   icon?: boolean
   lot: Lot
 }
 
-export const PinOneButton = ({ icon, lot }: PinOneButtonProps) => {
+export const AlertOneButton = ({ icon, lot }: AlertOneButtonProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
@@ -75,27 +79,32 @@ export const PinOneButton = ({ icon, lot }: PinOneButtonProps) => {
   return (
     <Button
       captive
-      variant={icon ? "icon" : pinned ? "warning" : "primary"}
-      icon={pinned ? PinOff : Pin}
-      title={pinned ? t("Désépingler") : t("Épingler")}
-      label={pinned ? t("Désépingler") : t("Épingler")}
+      variant={icon ? "icon" : "warning"}
+      icon={pinned ? AlertTriangleOff : AlertTriangle}
+      title={pinned ? t("Annuler le signalement") : t("Signaler")}
+      label={pinned ? t("Annuler le signalement") : t("Signaler")}
       action={() =>
         portal((close) => (
-          <PinDialog pinned={pinned} selection={[lot.id]} onClose={close} />
+          <AlertDialog pinned={pinned} selection={[lot.id]} onClose={close} />
         ))
       }
     />
   )
 }
 
-interface PinDialogProps {
+interface AlertDialogProps {
   pinned?: boolean
   summary?: boolean
   selection: number[]
   onClose: () => void
 }
 
-const PinDialog = ({ pinned, summary, selection, onClose }: PinDialogProps) => {
+const AlertDialog = ({
+  pinned,
+  summary,
+  selection,
+  onClose,
+}: AlertDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
   const status = useStatus()
@@ -142,8 +151,10 @@ const PinDialog = ({ pinned, summary, selection, onClose }: PinDialogProps) => {
       <header>
         <h1>
           {v({
-            one: pinned ? t("Désépingler un lot") : t("Épingler un lot"),
-            many: pinned ? t("Désépingler des lots") : t("Épingler des lots"),
+            one: pinned ? t("Annuler un signalement") : t("Signaler un lot"),
+            many: pinned
+              ? t("Annuler des signalements")
+              : t("Signaler des lots"),
           })}
         </h1>
       </header>
@@ -152,18 +163,18 @@ const PinDialog = ({ pinned, summary, selection, onClose }: PinDialogProps) => {
           <p>
             {v({
               one: pinned
-                ? t("Voulez-vous désépingler ce lot ?")
-                : t("Voulez-vous épingler ce lot ?"),
+                ? t("Voulez-vous annuler le signalement de ce lot ?")
+                : t("Voulez-vous signaler ce lot ?"),
               many: pinned
-                ? t("Voulez-vous désépingler les lots sélectionnés ?")
-                : t("Voulez-vous épingler les lots sélectionnés ?"),
-            })}{" "}
+                ? t("Voulez-vous annuler le signalement des lots sélectionnés ?") // prettier-ignore
+                : t("Voulez-vous signaler les lots sélectionnés ?"),
+            })}
           </p>
           {!pinned && selection.length > 1 && (
             <p>
               {v({
                 one: "",
-                many: t("Si des lots déjà épinglés sont sélectionnés, ils seront désépinglés."), // prettier-ignore
+                many: t("Si des lots déjà signalés sont sélectionnés, leur signalement sera annulé."), // prettier-ignore
               })}
             </p>
           )}
@@ -196,9 +207,9 @@ const PinDialog = ({ pinned, summary, selection, onClose }: PinDialogProps) => {
           asideX
           submit="pin"
           loading={pinAndComment.loading}
-          variant={pinned ? "warning" : "primary"}
-          icon={Pin}
-          label={pinned ? t("Désépingler") : t("Épingler")}
+          variant="warning"
+          icon={pinned ? AlertTriangleOff : AlertTriangle}
+          label={pinned ? t("Annuler le signalement") : t("Signaler")}
           action={() =>
             pinAndComment.execute(
               entity,
