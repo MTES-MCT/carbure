@@ -11,8 +11,7 @@ export type AdminStatus =
 export interface Snapshot {
   lots: {
     alerts: number
-    corrections: number
-    declarations: number
+    lots: number
     stocks: number
     pinned: number
   }
