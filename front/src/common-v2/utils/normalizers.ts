@@ -1,7 +1,7 @@
 import i18next from "i18next"
-import { Normalizer, Option } from "./normalize"
+import { Normalizer } from "./normalize"
 import { Entity, EntityType, UserRole } from "carbure/types"
-import { DeliveryType, LotStatus } from "transactions/types"
+import { CorrectionStatus, DeliveryType, LotStatus } from "transactions/types"
 import {
   Biofuel,
   Country,
@@ -93,58 +93,61 @@ export const normalizePeriod: Normalizer<number> = (period) => ({
   label: formatPeriod(period),
 })
 
-// prettier-ignore
-export const normalizeFeedstockFilter: Normalizer<Option, string> = (feedstock) => ({
-  value: feedstock.value,
-  label: i18next.t(feedstock.value, { ns: "feedstocks" }),
+export const normalizeFeedstockFilter: Normalizer<string> = (feedstock) => ({
+  value: feedstock,
+  label: i18next.t(feedstock, { ns: "feedstocks" }),
+})
+
+export const normalizeBiofuelFilter: Normalizer<string> = (biofuel) => ({
+  value: biofuel,
+  label: i18next.t(biofuel, { ns: "biofuels" }),
+})
+
+export const normalizeCountryFilter: Normalizer<string> = (country) => ({
+  value: country,
+  label: i18next.t(country, { ns: "countries" }),
+})
+
+export const normalizeAnomalyFilter: Normalizer<string> = (anomaly) => ({
+  value: anomaly,
+  label: i18next.t(anomaly, { ns: "errors" }),
 })
 
 // prettier-ignore
-export const normalizeBiofuelFilter: Normalizer<Option, string> = (biofuel) => ({
-  value: biofuel.value,
-  label: i18next.t(biofuel.value, { ns: "biofuels" }),
+export const normalizeDeliveryTypeFilter: Normalizer<DeliveryType> = (delivery) => ({
+  value: delivery,
+  label: getDeliveryLabel(delivery)
 })
 
-// prettier-ignore
-export const normalizeCountryFilter: Normalizer<Option, string> = (country) => ({
-  value: country.value,
-  label: i18next.t(country.value, { ns: "countries" }),
+export const normalizeLotStatusFilter: Normalizer<LotStatus> = (status) => ({
+  value: status,
+  label: getStatusLabel(status),
 })
 
-// prettier-ignore
-export const normalizeAnomalyFilter: Normalizer<Option, string> = (anomaly) => ({
-  value: anomaly.value,
-  label: i18next.t(anomaly.value, { ns: 'errors'})
-})
-
-// prettier-ignore
-export const normalizeDeliveryTypeFilter: Normalizer<Option<DeliveryType>, string> = (delivery) => ({
-  value: delivery.value,
-  label: getDeliveryLabel(delivery.value)
-})
-
-// prettier-ignore
-export const normalizeLotStatusFilter: Normalizer<Option<LotStatus>, string> = (status) => ({
-  value: status.value,
-  label: getStatusLabel(status.value)
-})
-
-// prettier-ignore
 export const normalizeEntityType: Normalizer<EntityType> = (type) => ({
   value: type,
-  label: getEntityTypeLabel(type)
+  label: getEntityTypeLabel(type),
+})
+
+export const normalizeEntityTypeFilter: Normalizer<EntityType> = (type) => ({
+  value: type,
+  label: getEntityTypeLabel(type),
+})
+
+export const normalizeUnknownFilter: Normalizer<string> = (nullable) => ({
+  value: nullable,
+  label: nullable === "UNKNOWN" ? i18next.t("Inconnu") : nullable,
+})
+
+export const normalizePeriodFilter: Normalizer<string> = (period) => ({
+  value: period,
+  label: formatPeriod(period),
 })
 
 // prettier-ignore
-export const normalizeEntityTypeFilter: Normalizer<Option<EntityType>, string> = (type) => ({
-  value: type.value,
-  label: getEntityTypeLabel(type.value)
-})
-
-// prettier-ignore
-export const normalizeUnknownFilter: Normalizer<Option<any>, string> = (nullable) => ({
-  value: nullable.value,
-  label: nullable.value === "UNKNOWN" ? i18next.t("Inconnu") : nullable.label
+export const normalizeCorrectionFilter: Normalizer<CorrectionStatus> = (correction) => ({
+  value: correction,
+  label: getCorrectionLabel(correction)
 })
 
 export function getEntityTypeLabel(type: EntityType) {
@@ -220,8 +223,20 @@ export function getDeliveryLabel(delivery: DeliveryType | undefined) {
     case DeliveryType.Flushed:
       return i18next.t("Vidé")
     case DeliveryType.Unknown:
+      return i18next.t("Inconnu")
     default:
-      return i18next.t("En attente")
+      return delivery || "N/A"
+  }
+}
+
+export function getCorrectionLabel(correction: CorrectionStatus) {
+  switch (correction) {
+    case CorrectionStatus.NoProblem:
+      return i18next.t("Pas de correction")
+    case CorrectionStatus.InCorrection:
+      return i18next.t("En correction")
+    case CorrectionStatus.Fixed:
+      return i18next.t("Corrigé")
   }
 }
 
