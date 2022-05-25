@@ -19,7 +19,6 @@ import { TextInput } from "common-v2/components/input"
 import { ControlLotSummary } from "../components/lots/control-lot-summary"
 import Checkbox from "common-v2/components/checkbox"
 import Form, { useForm } from "common-v2/components/form"
-import { AdminStatus } from "controls/types"
 
 export interface AlertManyButtonProps {
   disabled?: boolean
@@ -37,11 +36,9 @@ export const AlertManyButton = ({
   const { t } = useTranslation()
   const portal = usePortal()
   const entity = useEntity()
-  const status = useStatus() as AdminStatus
 
   const pinned =
     forcePinned ||
-    status === "pinned" ||
     (lots.length > 0 && lots.every((lot) => isPinned(entity, lot)))
 
   return (

@@ -421,10 +421,8 @@ export function useLotTitle(state: QueryParams) {
 
   const adminStatuses: Record<AdminStatus, string> = {
     alerts: t("alertes"),
-    corrections: t("corrections"),
-    declarations: t("déclarations"),
+    lots: t("lots"),
     stocks: t("stocks"),
-    pinned: t("lots épinglés"),
     unknown: "",
   }
 
