@@ -1,5 +1,8 @@
+import cl from "clsx"
 import Button from "common-v2/components/button"
 import Dialog from "common-v2/components/dialog"
+
+import Checkbox from "common-v2/components/checkbox"
 import { Return } from "common-v2/components/icons"
 import { usePortal } from "common-v2/components/portal"
 import Tag from "common-v2/components/tag"
@@ -13,6 +16,7 @@ interface ScoreProps {
   big?: boolean
   details?: LotScore[]
 }
+
 
 export const Score = ({ lot, big, details }: ScoreProps) => {
   const portal = usePortal()
@@ -46,21 +50,46 @@ interface ScoreDialogProps {
   onClose: () => void
 }
 
+// - customs and carbure match (4pts)
+// - data source is producer (3pts)
+// - lot declared (1pt)
+// - certificates validated by admin (2pts)
+//   -- producer_certificate_checked (1pt)
+//   -- supplier_certificate_checked (1pt)
+// - configuration anomalies (1pt)
+//   -- feedstock_registered [ ]
+//   -- biofuel_registered [ ]
+//   -- delivery_site_registered [ ]
+// - certificate anomalies (1pt)
+//   -- producer_certificate_provided [ ]
+//   -- producer_certificate_exists [ ]
+//   -- supplier_certificate_provided [ ]
+//   -- supplier_certificate_exists [ ]
+
+
 const ScoreDialog = ({ lot, details, onClose }: ScoreDialogProps) => {
   const { t } = useTranslation()
 
   // prettier-ignore
   const scoreItems = {
-    CUSTOMS_AND_CARBURE_MATCH: t("Les données de CarbuRe correspondent à celles des douanes"),
-    DATA_SOURCE_IS_PRODUCER: t("La donnée a été entrée par le producteur du biocarburant"),
-    LOT_DECLARED: t("Le lot a été validé au sein d'une déclaration"),
-    PRODUCER_CERTIFICATE_EXISTS: t("Le certificat du producteur est connu par l'administration"),
-    PRODUCER_CERTIFICATE_CHECKED: t("Le certificat du producteur a été validé par l'administration"),
-    SUPPLIER_CERTIFICATE_EXISTS: t("Le certificat du fournisseur est connu par l'administration"),
-    SUPPLIER_CERTIFICATE_CHECKED: t("Le certificat du fournisseur a été validé par l'administration"),
-    FEEDSTOCK_REGISTERED: t("La matière première est bien déclarée sur le site de production"),
-    BIOFUEL_REGISTERED: t("Le biocarburant est bien déclaré sur le site de production"),
-    DELIVERY_SITE_REGISTERED: t("Le site de livraison est bien associé au client du lot"),
+    CUSTOMS_AND_CARBURE_MATCH: t("Les données de CarbuRe correspondent à celles des douanes"), // 0 or 4 --- NO META
+    DATA_SOURCE_IS_PRODUCER: t("La donnée a été entrée par le producteur du biocarburant"), // 0 or 3 --- NO META
+    LOT_DECLARED: t("Le lot a été validé au sein d'une déclaration"), // 0 or 1 --- NO META
+    CERTIFICATES_VALIDATED: t("Les certificats ont été approuvés par l'administration"), // 0, 1, 2 --- META
+    ANOMALIES_CONFIGURATION: t("Les sites de production et de livraison sont bien configurés"), // 0, 1 ---META
+    ANOMALIES_CERTIFICATES: t("Les certificats ne présentent aucune anomalie"), // 0, 1 --- META
+  }
+
+  const scoreSubItems = {
+    producer_certificate_checked: t("Le certificat du producteur a été approuvé par l'administration"),
+    supplier_certificate_checked: t("Le certificat du fournisseur a été approuvé par l'administration"),
+    producer_certificate_provided: t("Le certificat du producteur est bien renseigné"),
+    producer_certificate_exists: t("Le certificat du producteur existe dans la base de données CarbuRe"),
+    supplier_certificate_provided: t("Le certificat du fournisseur est bien renseigné"),
+    supplier_certificate_exists: t("Le certificat du fournisseur existe dans la base de données CarbuRe"),
+    feedstock_registered: t("La matière première est bien déclarée sur le site de production"),
+    biofuel_registered: t("Le biocarburant est bien déclaré sur le site de production"),
+    delivery_site_registered: t("Le site de livraison est bien associé au client du lot"),
   }
 
   return (
@@ -92,6 +121,19 @@ const ScoreDialog = ({ lot, details, onClose }: ScoreDialogProps) => {
                     {detail.score} / {detail.max_score} {t("points")}
                   </span>
                 </div>
+                {detail.meta && (
+                  <ul className={css.scoreSubItems}>
+                    {Object.entries(detail.meta).map(([meta, checked]) => (
+                      <li key={meta} className={cl(css.scoreSubItem)} style={{ color: !checked ? 'var(--gray-dark)' : undefined }}>
+                        <span>
+                          {scoreSubItems[meta as keyof typeof scoreSubItems]}
+                        </span>
+                        <span className={css.separator} />
+                        <Checkbox value={checked} />
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
             ))}
           </ul>

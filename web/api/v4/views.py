@@ -1610,14 +1610,16 @@ def validate_declaration(request, *args, **kwargs):
         bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLARED, lot=lot, user=request.user))
     CarbureLotEvent.objects.bulk_create(bulk_events)
     # freeze lots
+    lots_frozen = []
     lots_to_freeze = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True)
     lots_to_freeze.update(lot_status=CarbureLot.FROZEN)
-    scores = [CarbureLotReliabilityScore(lot=l, max_score=1, score=1, item=CarbureLotReliabilityScore.LOT_DECLARED) for l in lots_to_freeze]
-    CarbureLotReliabilityScore.objects.bulk_create(scores)
+    lots_frozen += [l.id for l in lots_to_freeze]
 
     lots_to_freeze = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True)
     lots_to_freeze.update(lot_status=CarbureLot.FROZEN)
-    scores = [CarbureLotReliabilityScore(lot=l, max_score=1, score=1, item=CarbureLotReliabilityScore.LOT_DECLARED) for l in lots_to_freeze]
+    lots_frozen += [l.id for l in lots_to_freeze]
+    
+    scores = [CarbureLotReliabilityScore(lot=l, max_score=1, score=1, item=CarbureLotReliabilityScore.LOT_DECLARED) for l in list(set(lots_to_freeze))]
     CarbureLotReliabilityScore.objects.bulk_create(scores)
 
     # mark declaration

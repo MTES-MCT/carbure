@@ -3,7 +3,7 @@
   flex-direction: column;
   width: max-content;
   margin: 0;
-  gap: var(--spacing-m);
+  gap: var(--spacing-l);
 }
 
 .scoreTag {
@@ -20,6 +20,17 @@
   color: var(--gray-dark);
 }
 
+.scoreSubItems {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
+  margin-top: var(--spacing-m);
+}
+
+.scoreSubItem {
+  display: flex;
+}
+
 .scoreResult {
   display: flex;
   align-items: flex-end;
@@ -32,3 +43,4 @@
   margin: 0 12px;
   border-bottom: 1px dashed var(--gray-dark);
 }
+

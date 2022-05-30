@@ -276,7 +276,7 @@ class CarbureLotAdminSerializer(CarbureLotPublicSerializer):
 class CarbureLotReliabilityScoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarbureLotReliabilityScore
-        fields = ['item', 'max_score', 'score', 'comment']
+        fields = ['item', 'max_score', 'score', 'meta']
 
 class GenericCertificateSerializer(serializers.ModelSerializer):
     class Meta:
