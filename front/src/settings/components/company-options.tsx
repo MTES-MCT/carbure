@@ -75,7 +75,7 @@ const CompanyOptions = () => {
         </Row>
       </section> */}
 
-      <section style={{ paddingBottom: "var(--spacing-l)" }}>
+      <section>
         <Checkbox
           disabled={!canModify}
           label={t("Ma société gère un stock sur CarbuRe")}
@@ -101,6 +101,8 @@ const CompanyOptions = () => {
           onChange={toggleDirectDeliveries.execute}
         />
       </section>
+
+      <footer />
 
       {isLoading && <LoaderOverlay />}
     </Panel>

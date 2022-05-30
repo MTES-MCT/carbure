@@ -67,14 +67,17 @@ export const AccountAccesRights = () => {
       </header>
 
       {user.requests.length === 0 && (
-        <section style={{ paddingBottom: "var(--spacing-l)" }}>
-          <Alert variant="warning" icon={AlertTriangle}>
-            <Trans>
-              Aucune autorisation pour ce compte, ajoutez une organisation pour
-              continuer.
-            </Trans>
-          </Alert>
-        </section>
+        <>
+          <section>
+            <Alert variant="warning" icon={AlertTriangle}>
+              <Trans>
+                Aucune autorisation pour ce compte, ajoutez une organisation
+                pour continuer.
+              </Trans>
+            </Alert>
+          </section>
+          <footer />
+        </>
       )}
 
       {user.requests.length > 0 && (
