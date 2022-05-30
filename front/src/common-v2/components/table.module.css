@@ -49,6 +49,7 @@
 
 .rows > li > a {
   flex: 1;
+  min-width: 0;
 }
 
 .rows > li,
@@ -184,9 +185,8 @@
 .actions {
   display: flex;
   flex: 0.33;
-  min-width: min-content;
+  min-width: 0;
   justify-content: center;
-  /* justify-content: flex-end; */
   gap: var(--spacing-s);
 }
 
