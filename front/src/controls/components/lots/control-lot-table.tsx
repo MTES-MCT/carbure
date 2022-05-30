@@ -1,4 +1,5 @@
 import { memo } from "react"
+import { To } from "react-router-dom"
 import { Lot, LotError } from "transactions/types"
 import Table, {
   Order,
@@ -16,8 +17,8 @@ export interface ControlTableProps {
   errors: Record<number, LotError[]>
   order: Order | undefined
   selected: number[]
+  rowLink: (lot: Lot) => To
   onSelect: (selected: number[]) => void
-  onAction: (lot: Lot) => void
   onOrder: (order: Order | undefined) => void
 }
 
@@ -28,8 +29,8 @@ export const ControlTable = memo(
     errors,
     order,
     selected,
+    rowLink,
     onSelect,
-    onAction,
     onOrder,
   }: ControlTableProps) => {
     const columns = useLotColumns()
@@ -37,8 +38,8 @@ export const ControlTable = memo(
       <Table
         loading={loading}
         order={order}
-        onAction={onAction}
         onOrder={onOrder}
+        rowLink={rowLink}
         rows={lots}
         columns={[
           markerColumn<Lot>((lot) => getLotMarker(lot, errors)),

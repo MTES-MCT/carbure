@@ -9,15 +9,17 @@ import {
 import Table, { Cell, Order, selectionColumn } from "common-v2/components/table"
 import StockTag from "./stock-tag"
 import { isRedII } from "lot-add/components/ghg-fields"
+import { To } from "react-router-dom"
 
 export interface StockTableProps {
   loading: boolean
   stocks: Stock[]
   order: Order | undefined
   selected: number[]
+  rowLink: (stock: Stock) => To
   onSelect: (selected: number[]) => void
-  onAction: (stock: Stock) => void
   onOrder: (order: Order | undefined) => void
+  onAction?: (stock: Stock) => void
 }
 
 export const StockTable = memo(
@@ -26,6 +28,7 @@ export const StockTable = memo(
     stocks,
     order,
     selected,
+    rowLink,
     onSelect,
     onAction,
     onOrder,
@@ -37,6 +40,7 @@ export const StockTable = memo(
         order={order}
         onAction={onAction}
         onOrder={onOrder}
+        rowLink={rowLink}
         rows={stocks}
         columns={[
           selectionColumn(stocks, selected, onSelect, (s: Stock) => s.id),
@@ -100,7 +104,7 @@ export function useStockColumns() {
     client: {
       header: t("Client"),
       cell: (stock: Stock) => (
-        <Cell text={stock.carbure_client?.name ?? 'N/A'} />
+        <Cell text={stock.carbure_client?.name ?? "N/A"} />
       ),
     },
     productionSite: {

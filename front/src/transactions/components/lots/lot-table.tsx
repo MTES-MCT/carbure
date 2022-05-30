@@ -19,6 +19,7 @@ import LotTag from "./lot-tag"
 import { isRedII } from "lot-add/components/ghg-fields"
 import { DuplicateOneButton } from "transactions/actions/duplicate"
 import Score from "transaction-details/components/score"
+import { To } from "react-router-dom"
 
 export interface LotTableProps {
   loading: boolean
@@ -26,6 +27,7 @@ export interface LotTableProps {
   errors: Record<number, LotError[]>
   order: Order | undefined
   selected: number[]
+  rowLink: (lot: Lot) => To
   onSelect: (selected: number[]) => void
   onAction: (lot: Lot) => void
   onOrder: (order: Order | undefined) => void
@@ -38,6 +40,7 @@ export const LotTable = memo(
     errors,
     order,
     selected,
+    rowLink,
     onSelect,
     onAction,
     onOrder,
@@ -49,6 +52,7 @@ export const LotTable = memo(
         order={order}
         onAction={onAction}
         onOrder={onOrder}
+        rowLink={rowLink}
         rows={lots}
         columns={[
           markerColumn<Lot>((lot) => getLotMarker(lot, errors)),
