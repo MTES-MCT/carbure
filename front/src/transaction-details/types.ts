@@ -66,7 +66,7 @@ export interface LotScore {
   item: string
   max_score: number
   score: number
-  comment: string | null
+  meta: Record<string, boolean> | null
 }
 
 export interface StockDetails {

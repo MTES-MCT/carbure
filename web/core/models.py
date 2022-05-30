@@ -570,70 +570,74 @@ class CarbureLot(models.Model):
         self.update_ghg()
 
     def recalc_reliability_score(self):
+        CarbureLotReliabilityScore.objects.filter(lot=self).delete()
         nb_points = 0
-        # data source is producer
+        # data source is producer 3 POINTS
         if self.carbure_producer != None:
             nb_points += 3
-            CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.DATA_SOURCE_IS_PRODUCER, defaults={'max_score':3, 'score':3, 'comment':None})
+            CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.DATA_SOURCE_IS_PRODUCER, defaults={'max_score':3, 'score':3})
         else:
-            CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.DATA_SOURCE_IS_PRODUCER, defaults={'max_score':3, 'score':0, 'comment':None})
+            CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.DATA_SOURCE_IS_PRODUCER, defaults={'max_score':3, 'score':0})
 
-        # lot declared
+        # lot declared by both 1 POINT
         if self.lot_status == CarbureLot.FROZEN:
             nb_points += 1
-            CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.LOT_DECLARED, defaults={'max_score':1, 'score':1, 'comment':None})
+            CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.LOT_DECLARED, defaults={'max_score':1, 'score':1})
         else:
-            CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.LOT_DECLARED, defaults={'max_score':1, 'score':0, 'comment':None})
+            CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.LOT_DECLARED, defaults={'max_score':1, 'score':0})
 
-        # certificates
+        # certificates validated by DGEC 2 points
+        producer_certificate_checked = False
+        supplier_certificate_checked = False
         if self.carbure_producer:
             if EntityCertificate.objects.filter(entity=self.carbure_producer, certificate__certificate_id=self.production_site_certificate, checked_by_admin=True).count() > 0:
-                nb_points += 1
-                CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.PRODUCER_CERTIFICATE_CHECKED, defaults={'max_score': 1, 'score': 1, 'comment': None})
-            else:
-                CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.PRODUCER_CERTIFICATE_CHECKED, defaults={'max_score': 1, 'score': 0, 'comment': "Producer certificate not validated by DGEC"})
+                producer_certificate_checked = True
         if self.carbure_supplier:
             if EntityCertificate.objects.filter(entity=self.carbure_supplier, certificate__certificate_id=self.supplier_certificate, checked_by_admin=True).count() > 0:
-                nb_points += 1
-                CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.SUPPLIER_CERTIFICATE_CHECKED, defaults={'max_score': 1, 'score': 1, 'comment': None})
-            else:
-                CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.SUPPLIER_CERTIFICATE_CHECKED, defaults={'max_score': 1, 'score': 0, 'comment': "Supplier certificate not validated by DGEC"})
+                supplier_certificate_checked = True
+        cert_checked_score = producer_certificate_checked + supplier_certificate_checked
+        CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.CERTIFICATES_VALIDATED, defaults={'max_score':2, 'score':cert_checked_score, 
+        'meta':{'producer_certificate_checked': producer_certificate_checked, 'supplier_certificate_checked': supplier_certificate_checked}})
 
-        ### anomalies
-        if GenericCertificate.objects.filter(certificate_id=self.production_site_certificate).count() > 0:
-            nb_points += 0.5
-            CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.PRODUCER_CERTIFICATE_EXISTS, defaults={'max_score': 0.5, 'score': 0.5, 'comment': None})
-        else:
-            CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.PRODUCER_CERTIFICATE_EXISTS, defaults={'max_score': 0.5, 'score': 0, 'comment': "Unknown production site certificate"})
-        if GenericCertificate.objects.filter(certificate_id=self.supplier_certificate).count() > 0:
-            nb_points += 0.5
-            CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.SUPPLIER_CERTIFICATE_EXISTS, defaults={'max_score': 0.5, 'score': 0.5, 'comment': None})
-        else:
-            CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.SUPPLIER_CERTIFICATE_EXISTS, defaults={'max_score': 0.5, 'score': 0, 'comment': "Unknown supplier certificate"})
-
+        ### configuration issues
+        feedstock_registered = False
+        biofuel_registered = False
+        delivery_site_registered = False
         if self.carbure_production_site:
             if ProductionSiteInput.objects.filter(production_site=self.carbure_production_site, matiere_premiere=self.feedstock).count() > 0:
-                nb_points += 0.5
-                CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.FEEDSTOCK_REGISTERED, defaults={'max_score': 0.5, 'score': 0.5, 'comment': None})
-            else:
-                CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.FEEDSTOCK_REGISTERED, defaults={'max_score': 0.5, 'score': 0, 'comment': "Feedstock not registered in production site settings"})
+                feedstock_registered = True
             if ProductionSiteOutput.objects.filter(production_site=self.carbure_production_site, biocarburant=self.biofuel).count() > 0:
-                nb_points += 0.5
-                CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.BIOFUEL_REGISTERED, defaults={'max_score': 0.5, 'score': 0.5, 'comment': None})
-            else:
-                CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.BIOFUEL_REGISTERED, defaults={'max_score': 0.5, 'score': 0, 'comment': "Biofuel not registered in production site settings"})
-        else:
-            CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.FEEDSTOCK_REGISTERED, defaults={'max_score': 0.5, 'score': 0, 'comment': "Production site not registered"})
-            CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.BIOFUEL_REGISTERED, defaults={'max_score': 0.5, 'score': 0, 'comment': "Production site not registered"})
-
+                biofuel_registered = True
         if self.carbure_delivery_site:
             if EntityDepot.objects.filter(entity=self.carbure_client, depot=self.carbure_delivery_site).count() > 0:
-                nb_points += 0.5
-                CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.DELIVERY_SITE_REGISTERED, defaults={'max_score': 0.5, 'score': 0.5, 'comment': None})
-            else:
-                CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.DELIVERY_SITE_REGISTERED, defaults={'max_score': 0.5, 'score': 0, 'comment': None})
+                delivery_site_registered = True
+        full_score = feedstock_registered and biofuel_registered and delivery_site_registered
+        CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.ANOMALIES_CONFIGURATION, defaults={'score':1 if full_score else 0, 
+            'meta':{'feedstock_registered': feedstock_registered, 'biofuel_registered': biofuel_registered, 'delivery_site_registered': delivery_site_registered}})
 
-        if nb_points == 7.5:
+        # certificates
+        producer_certificate_provided = False
+        producer_certificate_exists = False
+        supplier_certificate_provided = False
+        supplier_certificate_exists = False
+        if self.carbure_producer:
+            if EntityCertificate.objects.filter(entity=self.carbure_producer, certificate__certificate_id=self.production_site_certificate, checked_by_admin=True).count() > 0:
+                producer_certificate_provided = True
+        if self.carbure_supplier:
+            if EntityCertificate.objects.filter(entity=self.carbure_supplier, certificate__certificate_id=self.supplier_certificate, checked_by_admin=True).count() > 0:
+                supplier_certificate_provided = True
+
+        if GenericCertificate.objects.filter(certificate_id=self.production_site_certificate).count() > 0:
+            producer_certificate_exists = True
+        if GenericCertificate.objects.filter(certificate_id=self.supplier_certificate).count() > 0:
+            supplier_certificate_exists = True
+
+        all_certs_ok = producer_certificate_provided and producer_certificate_exists and supplier_certificate_provided and supplier_certificate_exists
+        CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.ANOMALIES_CERTIFICATES, defaults={'score':1 if all_certs_ok else 0, 
+            'meta':{'producer_certificate_provided': producer_certificate_provided, 'producer_certificate_exists': producer_certificate_exists, 
+            'supplier_certificate_provided': supplier_certificate_provided, 'supplier_certificate_exists':supplier_certificate_exists}})
+
+        if nb_points == 8:
             self.data_reliability_score = 'A'
         elif nb_points >= 6:
             self.data_reliability_score = 'B'
@@ -646,26 +650,22 @@ class CarbureLot(models.Model):
 
 
 class CarbureLotReliabilityScore(models.Model):
-    CUSTOMS_AND_CARBURE_MATCH = "CUSTOMS_AND_CARBURE_MATCH" # 4
-    DATA_SOURCE_IS_PRODUCER = "DATA_SOURCE_IS_PRODUCER" # 3
-    LOT_DECLARED = "LOT_DECLARED" # 1
-    PRODUCER_CERTIFICATE_EXISTS = "PRODUCER_CERTIFICATE_EXISTS" # 0.5
-    PRODUCER_CERTIFICATE_CHECKED = "PRODUCER_CERTIFICATE_CHECKED" # 0.5
-    SUPPLIER_CERTIFICATE_EXISTS = "SUPPLIER_CERTIFICATE_EXISTS" # 0.5
-    SUPPLIER_CERTIFICATE_CHECKED = "SUPPLIER_CERTIFICATE_CHECKED" # 0.5
-    FEEDSTOCK_REGISTERED = "FEEDSTOCK_REGISTERED" # 0.5
-    BIOFUEL_REGISTERED = "BIOFUEL_REGISTERED" # 0.5
-    DELIVERY_SITE_REGISTERED = "DELIVERY_SITE_REGISTERED" # 0.5
+    CUSTOMS_AND_CARBURE_MATCH = "CUSTOMS_AND_CARBURE_MATCH" # 0 or 4 --- NO META
+    DATA_SOURCE_IS_PRODUCER = "DATA_SOURCE_IS_PRODUCER" # 0 or 3 --- NO META
+    LOT_DECLARED = "LOT_DECLARED" # 0 or 1 --- NO META
+
+    CERTIFICATES_VALIDATED = "CERTIFICATES_VALIDATED" # 0, 1, 2 --- META
+    ANOMALIES_CERTIFICATES = "ANOMALIES_CERTIFICATES" # 0, 1 --- META
+    ANOMALIES_CONFIGURATION = "ANOMALIES_CONFIGURATION" # 0, 1 ---META
 
     SCORE_ITEMS = ((CUSTOMS_AND_CARBURE_MATCH, CUSTOMS_AND_CARBURE_MATCH), (DATA_SOURCE_IS_PRODUCER, DATA_SOURCE_IS_PRODUCER), (LOT_DECLARED, LOT_DECLARED), 
-                    (PRODUCER_CERTIFICATE_CHECKED, PRODUCER_CERTIFICATE_CHECKED), (SUPPLIER_CERTIFICATE_CHECKED, SUPPLIER_CERTIFICATE_CHECKED), (SUPPLIER_CERTIFICATE_EXISTS, SUPPLIER_CERTIFICATE_EXISTS),
-                    (FEEDSTOCK_REGISTERED, FEEDSTOCK_REGISTERED), (BIOFUEL_REGISTERED, BIOFUEL_REGISTERED), (DELIVERY_SITE_REGISTERED, DELIVERY_SITE_REGISTERED))
+                    (ANOMALIES_CERTIFICATES, ANOMALIES_CERTIFICATES), (ANOMALIES_CONFIGURATION, ANOMALIES_CONFIGURATION))
 
     lot = models.ForeignKey(CarbureLot, blank=False, null=False, on_delete=models.CASCADE)
     max_score = models.FloatField(default=1)
     score = models.FloatField(default=1)
     item = models.CharField(max_length=32, choices=SCORE_ITEMS, blank=False, null=False, default='Unknown')
-    comment = models.TextField(blank=True, null=True, default=None)
+    meta = models.JSONField(blank=True, null=True, default=None)
 
     def __str__(self):
         return self.item
