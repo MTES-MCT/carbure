@@ -140,7 +140,7 @@ export const normalizeUnknownFilter: Normalizer<string> = (nullable) => ({
 })
 
 export const normalizePeriodFilter: Normalizer<string> = (period) => ({
-  value: period,
+  value: `${period}`,
   label: formatPeriod(period),
 })
 
