@@ -10,6 +10,7 @@ import Table, { Cell, Order, selectionColumn } from "common-v2/components/table"
 import StockTag from "./stock-tag"
 import { isRedII } from "lot-add/components/ghg-fields"
 import { To } from "react-router-dom"
+import useEntity from "carbure/hooks/entity"
 
 export interface StockTableProps {
   loading: boolean
@@ -85,6 +86,11 @@ export function useStockColumns() {
         />
       ),
     },
+    quantity: {
+      key: "volume",
+      header: t("Biocarburant"),
+      cell: (stock: Stock) => <BiofuelCell stock={stock} />,
+    },
     feedstock: {
       key: "feedstock",
       header: t("Matière première"),
@@ -137,6 +143,30 @@ export function useStockColumns() {
       },
     },
   }
+}
+
+interface StockCellProps {
+  stock: Stock
+}
+
+export const BiofuelCell = ({ stock }: StockCellProps) => {
+  const { t } = useTranslation()
+  const entity = useEntity()
+
+  const unitToField = {
+    l: "remaining_volume" as "remaining_volume",
+    kg: "remaining_weight" as "remaining_weight",
+    MJ: "remaining_lhv_amount" as "remaining_lhv_amount",
+  }
+
+  const field = unitToField[entity.preferred_unit ?? "l"]
+
+  return (
+    <Cell
+      text={t(stock.biofuel?.code ?? "", { ns: "biofuels" })}
+      sub={`${formatNumber(stock[field])} ${entity.preferred_unit}`}
+    />
+  )
 }
 
 export default StockTable

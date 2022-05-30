@@ -1,3 +1,5 @@
+import { Unit } from "common/types"
+
 export interface Entity {
   id: number
   name: string
@@ -11,7 +13,7 @@ export interface Entity {
   has_trading: boolean
   has_stocks: boolean
   has_direct_deliveries: boolean
-  preferred_unit?: "l" | "kg" | "MJ/kg"
+  preferred_unit?: Unit
   default_certificate?: string
   ext_admin_pages?: ExternalAdminPages[]
 }
