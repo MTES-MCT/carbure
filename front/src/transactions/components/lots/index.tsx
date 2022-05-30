@@ -75,13 +75,14 @@ export const Lots = ({ year, snapshot }: LotsProps) => {
   const totalErrors = lotsData?.total_errors ?? 0
   const totalDeadline = lotsData?.total_deadline ?? 0
 
-  const showLotDetails = (lot: Lot) => {
+  const trackShowLotDetails = (lot: Lot) => {
     matomo.push(["trackEvent", "lots-details", "show-lot-details", lot.id])
-    navigate({
-      pathname: `${status}/${category}/${lot.id}`,
-      search: location.search,
-    })
   }
+
+  const showLotDetails = (lot: Lot) => ({
+    pathname: `${status}/${category}/${lot.id}`,
+    search: location.search,
+  })
 
   if (category === undefined) {
     const defaultCategory = getDefaultCategory(status, snapshot)
@@ -159,8 +160,9 @@ export const Lots = ({ year, snapshot }: LotsProps) => {
               lots={lotList}
               errors={lotErrors}
               selected={state.selection}
+              rowLink={showLotDetails}
               onSelect={actions.setSelection}
-              onAction={showLotDetails}
+              onAction={trackShowLotDetails}
               onOrder={actions.setOrder}
             />
 

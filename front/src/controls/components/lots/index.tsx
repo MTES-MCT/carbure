@@ -51,11 +51,10 @@ export const Lots = ({ entity, year }: LotsProps) => {
   const totalErrors = lotsData?.total_errors ?? 0
   const totalDeadline = lotsData?.total_deadline ?? 0
 
-  const showLotDetails = (lot: Lot) =>
-    navigate({
-      pathname: `${status}/${lot.id}`,
-      search: location.search,
-    })
+  const showLotDetails = (lot: Lot) => ({
+    pathname: `${status}/${lot.id}`,
+    search: location.search,
+  })
 
   return (
     <>
@@ -120,8 +119,8 @@ export const Lots = ({ entity, year }: LotsProps) => {
               errors={lotErrors}
               selected={state.selection}
               onSelect={actions.setSelection}
-              onAction={showLotDetails}
               onOrder={actions.setOrder}
+              rowLink={showLotDetails}
             />
 
             <Pagination

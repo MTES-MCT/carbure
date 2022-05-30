@@ -91,8 +91,9 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
             <h1>Récapitulatif des sociétés</h1>
           </header>
           <Table
+            loading={entities.loading}
             rows={matchedEntities}
-            onAction={(e) => navigate(`${e.entity.id}`)}
+            rowLink={(e) => `${e.entity.id}`}
             columns={[
               {
                 key: "entities",

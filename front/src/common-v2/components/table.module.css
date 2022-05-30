@@ -43,10 +43,18 @@
 }
 
 .rows > li {
-  display: flex;
-  align-items: center;
   position: relative;
   padding: 0 var(--spacing-l);
+}
+
+.rows > li > a {
+  flex: 1;
+}
+
+.rows > li,
+.rows > li > a {
+  display: flex;
+  align-items: center;
   gap: var(--spacing-m);
 }
 

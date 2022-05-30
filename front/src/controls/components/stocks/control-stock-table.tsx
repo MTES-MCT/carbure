@@ -2,6 +2,7 @@ import { memo } from "react"
 import { Stock } from "transactions/types"
 import Table, { Order, selectionColumn } from "common-v2/components/table"
 import { useStockColumns } from "transactions/components/stocks/stock-table"
+import { To } from "react-router-dom"
 
 export interface ControlStockTableProps {
   loading: boolean
@@ -9,8 +10,8 @@ export interface ControlStockTableProps {
   order: Order | undefined
   selected: number[]
   onSelect: (selected: number[]) => void
-  onAction: (stock: Stock) => void
   onOrder: (order: Order | undefined) => void
+  rowLink: (stock: Stock) => To
 }
 
 export const ControlStockTable = memo(
@@ -20,16 +21,16 @@ export const ControlStockTable = memo(
     order,
     selected,
     onSelect,
-    onAction,
     onOrder,
+    rowLink,
   }: ControlStockTableProps) => {
     const columns = useStockColumns()
     return (
       <Table
         loading={loading}
         order={order}
-        onAction={onAction}
         onOrder={onOrder}
+        rowLink={rowLink}
         rows={stocks}
         columns={[
           selectionColumn(stocks, selected, onSelect, (s: Stock) => s.id),

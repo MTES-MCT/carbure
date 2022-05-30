@@ -53,11 +53,10 @@ export const Stocks = ({ year, snapshot }: StocksProps) => {
   const count = stocksData?.returned ?? 0
   const total = stocksData?.total ?? 0
 
-  const showStockDetails = (stock: Stock) =>
-    navigate({
-      pathname: `${category}/${stock.id}`,
-      search: location.search,
-    })
+  const showStockDetails = (stock: Stock) => ({
+    pathname: `${category}/${stock.id}`,
+    search: location.search,
+  })
 
   return (
     <>
@@ -114,7 +113,7 @@ export const Stocks = ({ year, snapshot }: StocksProps) => {
               selected={state.selection}
               onSelect={actions.setSelection}
               onOrder={actions.setOrder}
-              onAction={showStockDetails}
+              rowLink={showStockDetails}
             />
 
             <Pagination

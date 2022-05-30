@@ -1,4 +1,5 @@
 import cl from "clsx"
+import { Link, To } from "react-router-dom"
 import useControlledState from "../hooks/controlled-state"
 import Checkbox from "./checkbox"
 import { multipleSelection } from "../utils/selection"
@@ -19,6 +20,7 @@ export interface TableProps<T> {
   onOrder?: (order: Order | undefined) => void
   onAction?: (value: T) => void
   rowProps?: (row: T, i?: number) => JSX.IntrinsicElements["li"]
+  rowLink?: (row: T) => To
 }
 
 export function Table<T>({
@@ -31,6 +33,7 @@ export function Table<T>({
   rows,
   order: controlledOrder,
   rowProps,
+  rowLink,
   onOrder,
   onAction,
 }: TableProps<T>) {
@@ -70,28 +73,35 @@ export function Table<T>({
       )}
 
       <ul className={css.rows}>
-        {[...rows].sort(compare).map((row, i) => (
-          <li
-            key={i}
-            {...rowProps?.(row, i)}
-            data-interactive={onAction ? true : undefined}
-            onClick={onAction ? () => onAction(row) : undefined}
-          >
-            {columns.filter(isVisible).map((column, i) => (
-              <div
-                key={column.key ?? i}
-                style={column.style}
-                className={cl(
-                  css.cell,
-                  column.className,
-                  column.small && css.small
-                )}
-              >
-                {column.cell(row)}
-              </div>
-            ))}
-          </li>
-        ))}
+        {[...rows].sort(compare).map((row, i) => {
+          const props = rowProps?.(row, i) ?? {}
+          const link = rowLink?.(row)
+
+          const cells = columns.filter(isVisible).map((column, i) => (
+            <div
+              key={column.key ?? i}
+              style={column.style}
+              className={cl(
+                css.cell,
+                column.className,
+                column.small && css.small
+              )}
+            >
+              {column.cell(row)}
+            </div>
+          ))
+
+          return (
+            <li
+              key={i}
+              {...props}
+              data-interactive={onAction ? true : undefined}
+              onClick={onAction ? () => onAction(row) : undefined}
+            >
+              {link ? <Link to={link}>{cells}</Link> : cells}
+            </li>
+          )
+        })}
       </ul>
 
       {loading && <LoaderOverlay />}
