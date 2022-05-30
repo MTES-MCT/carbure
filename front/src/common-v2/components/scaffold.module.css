@@ -105,6 +105,10 @@
   padding-top: 0;
 }
 
+.panel > footer:empty {
+  padding: 0;
+}
+
 section.bar {
   display: flex;
   background-color: var(--white);

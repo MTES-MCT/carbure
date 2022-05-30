@@ -132,14 +132,17 @@ const DeclarationTable = ({
 
   if (!declarations || declarations.length === 0) {
     return (
-      <section style={{ paddingBottom: "var(--spacing-l)" }}>
-        <Alert
-          loading={loading}
-          icon={AlertCircle}
-          variant="warning"
-          label={t("Aucune déclaration trouvée pour cette période.")}
-        />
-      </section>
+      <>
+        <section>
+          <Alert
+            loading={loading}
+            icon={AlertCircle}
+            variant="warning"
+            label={t("Aucune déclaration trouvée pour cette période.")}
+          />
+        </section>
+        <footer />
+      </>
     )
   }
 

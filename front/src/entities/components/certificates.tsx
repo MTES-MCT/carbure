@@ -41,9 +41,12 @@ const Certificates = ({ search = "", entity }: CertificatesProps) => {
         <h1>{t("Certificats")}</h1>
       </header>
       {certData.length === 0 && (
-        <section style={{ paddingBottom: "var(--spacing-l)" }}>
-          <NoResult />
-        </section>
+        <>
+          <section>
+            <NoResult />
+          </section>
+          <footer />
+        </>
       )}
       {certData.length > 0 && (
         <Table

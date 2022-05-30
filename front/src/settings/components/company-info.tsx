@@ -44,7 +44,7 @@ const CompanyInfo = () => {
         />
       </header>
 
-      <section style={{ paddingBottom: "var(--spacing-l)" }}>
+      <section>
         <Form
           id="entity-info"
           onSubmit={() => {
@@ -88,6 +88,8 @@ const CompanyInfo = () => {
           />
         </Form>
       </section>
+
+      <footer />
 
       {updateEntity.loading && <LoaderOverlay />}
     </Panel>

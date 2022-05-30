@@ -90,13 +90,16 @@ const Certificates = () => {
       </section>
 
       {certificateData.length === 0 && (
-        <section style={{ paddingBottom: "var(--spacing-l)" }}>
-          <Alert
-            variant="warning"
-            icon={AlertCircle}
-            label={t("Aucun certificat associé à cette société")}
-          />
-        </section>
+        <>
+          <section>
+            <Alert
+              variant="warning"
+              icon={AlertCircle}
+              label={t("Aucun certificat associé à cette société")}
+            />
+          </section>
+          <footer />
+        </>
       )}
 
       {certificateData.length > 0 && (
