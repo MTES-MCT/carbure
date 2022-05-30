@@ -20,6 +20,7 @@ import { isRedII } from "lot-add/components/ghg-fields"
 import { DuplicateOneButton } from "transactions/actions/duplicate"
 import Score from "transaction-details/components/score"
 import { To } from "react-router-dom"
+import useEntity from "carbure/hooks/entity"
 
 export interface LotTableProps {
   loading: boolean
@@ -117,6 +118,12 @@ export function useLotColumns() {
       ),
     },
 
+    quantity: {
+      key: "volume",
+      header: t("Biocarburant"),
+      cell: (lot: Lot) => <BiofuelCell lot={lot} />,
+    },
+
     feedstock: {
       key: "feedstock",
       header: t("Matière première"),
@@ -180,11 +187,31 @@ export function useLotColumns() {
   }
 }
 
-interface PeriodCellProps {
+interface LotCellProps {
   lot: Lot
 }
 
-export const PeriodCell = ({ lot }: PeriodCellProps) => {
+export const BiofuelCell = ({ lot }: LotCellProps) => {
+  const { t } = useTranslation()
+  const entity = useEntity()
+
+  const unitToField = {
+    l: "volume" as "volume",
+    kg: "weight" as "weight",
+    MJ: "lhv_amount" as "lhv_amount",
+  }
+
+  const field = unitToField[entity.preferred_unit ?? "l"]
+
+  return (
+    <Cell
+      text={t(lot.biofuel?.code ?? "", { ns: "biofuels" })}
+      sub={`${formatNumber(lot[field])} ${entity.preferred_unit}`}
+    />
+  )
+}
+
+export const PeriodCell = ({ lot }: LotCellProps) => {
   const expiring = isExpiring(lot)
   return (
     <Cell

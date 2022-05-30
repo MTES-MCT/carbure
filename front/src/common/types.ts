@@ -83,7 +83,7 @@ export interface EntityCertificate {
   rejected_by_admin: boolean
 }
 
-export type Unit = "l" | "kg" | "MJ/kg"
+export type Unit = "l" | "kg" | "MJ"
 
 export enum DepotType {
   EFS = "EFS",

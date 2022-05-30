@@ -69,7 +69,7 @@ const CompanyOptions = () => {
             options={[
               { value: "l", label: t("litres (Éthanol à 20°, autres à 15°)") },
               { value: "kg", label: t("kilogrammes") },
-              { value: "MJ/kg", label: t("MG/kg") },
+              { value: "MJ", label: t("MG") },
             ]}
           />
         </Row>
