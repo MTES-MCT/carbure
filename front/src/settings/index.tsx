@@ -88,9 +88,7 @@ const Settings = () => {
           {hasDepot && <DeliverySitesSettings settings={deliverySites} />}
           {isProducer && <ProductionSitesSettings settings={productionSites} />}
           {isProducer && <DoubleCountingSettings />}
-          {entity.hasRights(UserRole.Admin) && (
-            <EntityUserRights entity={entity} />
-          )}
+          {entity.hasRights(UserRole.Admin) && <EntityUserRights />}
         </section>
       </Main>
     </PortalProvider>
