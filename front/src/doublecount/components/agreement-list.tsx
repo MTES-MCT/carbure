@@ -29,13 +29,6 @@ const AgreementList = ({ entity, year }: AgreementListProps) => {
     params: [year],
   })
 
-  const tabs = [
-    { key: "pending", label: t("En attente") },
-    { key: "accepted", label: t("Accepté") },
-    { key: "expired", label: t("Expiré") },
-    { key: "rejected", label: t("Refusé") },
-  ]
-
   const columns: Column<DoubleCounting>[] = [
     {
       header: t("Statut"),
@@ -83,7 +76,16 @@ const AgreementList = ({ entity, year }: AgreementListProps) => {
 
   return (
     <section>
-      <Tabs tabs={tabs} focus={tab} onFocus={setTab} />
+      <Tabs
+        focus={tab}
+        onFocus={setTab}
+        tabs={[
+          { key: "pending", label: t("En attente") },
+          { key: "accepted", label: t("Accepté") },
+          { key: "expired", label: t("Expiré") },
+          { key: "rejected", label: t("Refusé") },
+        ]}
+      />
 
       {tab === "pending" && (
         <Fragment>
