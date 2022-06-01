@@ -1,8 +1,6 @@
 import { useTranslation } from "react-i18next"
-import { EntityManager } from "carbure/hooks/entity"
 
 import { PortalProvider } from "common-v2/components/portal"
-import useProductionSites from "./hooks/use-production-sites"
 
 import DeliverySitesSettings from "./components/delivery-site"
 import ProductionSitesSettings from "./components/production-site"
@@ -24,8 +22,6 @@ const Settings = () => {
 
   const entity = useEntity()
   useTitle(`${entity.name} · ${t("Société")}`)
-
-  const { productionSites } = useSettings(entity)
 
   const { isProducer, isTrader, isOperator } = entity
 
@@ -85,21 +81,13 @@ const Settings = () => {
           {hasOptions && <CompanyInfo />}
           {hasCertificates && <Certificates />}
           {hasDepot && <DeliverySitesSettings entity={entity} />}
-          {isProducer && <ProductionSitesSettings settings={productionSites} />}
+          {isProducer && <ProductionSitesSettings entity={entity} />}
           {isProducer && <DoubleCountingSettings />}
           {entity.hasRights(UserRole.Admin) && <EntityUserRights />}
         </section>
       </Main>
     </PortalProvider>
   )
-}
-
-function useSettings(entity: EntityManager) {
-  const productionSites = useProductionSites(entity)
-
-  return {
-    productionSites,
-  }
 }
 
 export default Settings
