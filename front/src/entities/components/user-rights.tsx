@@ -3,7 +3,7 @@ import { Alert } from "common-v2/components/alert"
 import { Confirm } from "common-v2/components/dialog"
 import { AlertCircle, Check, Cross } from "common-v2/components/icons"
 import { Input } from "common-v2/components/input"
-import Table, { actionColumn, Column } from "common-v2/components/table"
+import Table, { actionColumn, Cell } from "common-v2/components/table"
 import { useQuery, useMutation } from "common-v2/hooks/async"
 import { UserRightRequest, UserRightStatus, UserRole } from "carbure/types"
 import { useEffect, useState } from "react"
@@ -62,7 +62,7 @@ const UserRights = () => {
     ))
   }
 
-  const rows = rights.result ?? []
+  const rows = rights.result?.data.data ?? []
 
   return (
     <Panel id="users">
@@ -95,6 +95,7 @@ const UserRights = () => {
           rows={rows}
           columns={[
             {
+              small: true,
               key: "status",
               header: "Statut",
               orderBy: (r) => RIGHTS_ORDER[r.status],
@@ -104,15 +105,17 @@ const UserRights = () => {
               key: "user",
               header: "Utilisateur",
               orderBy: (r) => r.user[0] ?? "",
-              cell: (r) => r.user[0] ?? "",
+              cell: (r) => <Cell text={r.user[0] ?? ""} />,
             },
             {
+              small: true,
               key: "role",
               header: "Droits",
               orderBy: (r) => ROLE_LABELS[r.role],
               cell: (r) => ROLE_LABELS[r.role],
             },
             {
+              small: true,
               key: "date",
               header: "Date",
               orderBy: (r) => r.date_requested,

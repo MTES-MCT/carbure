@@ -4,7 +4,7 @@ import { RightStatus } from "account/components/access-rights"
 import { Alert } from "common-v2/components/alert"
 import { Confirm } from "common-v2/components/dialog"
 import { AlertCircle, Check, Cross } from "common-v2/components/icons"
-import Table, { actionColumn } from "common-v2/components/table"
+import Table, { actionColumn, Cell } from "common-v2/components/table"
 import { useQuery, useMutation } from "common-v2/hooks/async"
 import { UserRightRequest, UserRightStatus } from "carbure/types"
 import { formatDate } from "settings/components/common"
@@ -44,15 +44,14 @@ const EntityUserRights = () => {
       </header>
 
       {rows.length === 0 && (
-        <section style={{ marginBottom: "var(--spacing-l)" }}>
-          <Alert
-            icon={AlertCircle}
-            variant="warning"
-            className={styles.emptyUserRights}
-          >
-            <Trans>Aucun utilisateur associé à cette entité</Trans>
-          </Alert>
-        </section>
+        <>
+          <section>
+            <Alert icon={AlertCircle} variant="warning">
+              <Trans>Aucun utilisateur associé à cette entité</Trans>
+            </Alert>
+          </section>
+          <footer />
+        </>
       )}
 
       {rows.length > 0 && (
@@ -61,8 +60,8 @@ const EntityUserRights = () => {
           rows={rows}
           columns={[
             {
-              key: "status",
               small: true,
+              key: "status",
               header: "Statut",
               orderBy: (r) => RIGHTS_ORDER[r.status],
               cell: (r) => <RightStatus status={r.status} />,
@@ -71,15 +70,17 @@ const EntityUserRights = () => {
               key: "user",
               header: t("Utilisateur"),
               orderBy: (r) => r.user[0] ?? "",
-              cell: (r) => r.user[0] ?? "",
+              cell: (r) => <Cell text={r.user[0] ?? ""} />,
             },
             {
+              small: true,
               key: "role",
               header: t("Droits"),
               orderBy: (r) => getUserRoleLabel(r.role),
               cell: (r) => getUserRoleLabel(r.role),
             },
             {
+              small: true,
               key: "date",
               header: t("Date"),
               orderBy: (r) => r.date_requested,
