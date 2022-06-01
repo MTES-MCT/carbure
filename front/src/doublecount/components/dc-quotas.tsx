@@ -1,15 +1,15 @@
 import { Fragment } from "react"
 import { Trans, useTranslation } from "react-i18next"
-import { useQuery } from "common-v2/hooks/async"
-import { LoaderOverlay } from "common-v2/components/scaffold"
-import Table, { Cell, Column } from "common-v2/components/table"
-import { Dialog } from "common-v2/components/dialog"
-import { Button } from "common-v2/components/button"
-import { Return } from "common-v2/components/icons"
-import { formatNumber } from "common-v2/utils/formatters"
+import { useQuery } from "common/hooks/async"
+import { LoaderOverlay } from "common/components/scaffold"
+import Table, { Cell, Column } from "common/components/table"
+import { Dialog } from "common/components/dialog"
+import { Button } from "common/components/button"
+import { Return } from "common/components/icons"
+import { formatNumber } from "common/utils/formatters"
 import { QuotaOverview, QuotaDetails } from "../types"
 import * as api from "../api"
-import { usePortal } from "common-v2/components/portal"
+import { usePortal } from "common/components/portal"
 
 type QuotasListProps = {
   year: number

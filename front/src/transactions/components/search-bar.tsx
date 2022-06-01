@@ -1,7 +1,7 @@
 import { LotQuery, Snapshot } from "../types"
 import { useStatus } from "./status"
-import { SearchInput } from "common-v2/components/input"
-import { ActionBar } from "common-v2/components/scaffold"
+import { SearchInput } from "common/components/input"
+import { ActionBar } from "common/components/scaffold"
 import {
   DraftsSwitcher,
   InputSwitcher,

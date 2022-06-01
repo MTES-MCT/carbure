@@ -2,29 +2,29 @@ import React, { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api/certificates"
 import useEntity from "carbure/hooks/entity"
-import { useNotify } from "common-v2/components/notifications"
-import { useQuery, useMutation } from "common-v2/hooks/async"
-import { usePortal } from "common-v2/components/portal"
-import { formatDate } from "common-v2/utils/formatters"
-import { Panel, Row } from "common-v2/components/scaffold"
-import Button from "common-v2/components/button"
-import Dialog, { Confirm } from "common-v2/components/dialog"
-import Table, { Cell, actionColumn } from "common-v2/components/table"
-import Autocomplete from "common-v2/components/autocomplete"
+import { useNotify } from "common/components/notifications"
+import { useQuery, useMutation } from "common/hooks/async"
+import { usePortal } from "common/components/portal"
+import { formatDate } from "common/utils/formatters"
+import { Panel, Row } from "common/components/scaffold"
+import Button from "common/components/button"
+import Dialog, { Confirm } from "common/components/dialog"
+import Table, { Cell, actionColumn } from "common/components/table"
+import Autocomplete from "common/components/autocomplete"
 import {
   Cross,
   Plus,
   Return,
   Refresh,
   AlertCircle,
-} from "common-v2/components/icons"
+} from "common/components/icons"
 import {
   normalizeCertificate,
   normalizeEntityCertificate,
-} from "common-v2/utils/normalizers"
-import { Certificate, EntityCertificate } from "common-v2/types"
-import Alert from "common-v2/components/alert"
-import Select from "common-v2/components/select"
+} from "common/utils/normalizers"
+import { Certificate, EntityCertificate } from "common/types"
+import Alert from "common/components/alert"
+import Select from "common/components/select"
 import isBefore from "date-fns/isBefore"
 
 const Certificates = () => {

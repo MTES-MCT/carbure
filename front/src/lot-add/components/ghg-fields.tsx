@@ -1,9 +1,9 @@
 import { useTranslation } from "react-i18next"
 import isAfter from "date-fns/isAfter"
-import { Fieldset, useFormContext } from "common-v2/components/form"
-import { NumberInput, TextInput } from "common-v2/components/input"
+import { Fieldset, useFormContext } from "common/components/form"
+import { NumberInput, TextInput } from "common/components/input"
 import { LotFormValue } from "./lot-form"
-import { formatPercentage, formatGHG } from "common-v2/utils/formatters"
+import { formatPercentage, formatGHG } from "common/utils/formatters"
 
 interface GHGFieldsProps {
   readOnly?: boolean

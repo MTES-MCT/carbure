@@ -1,4 +1,4 @@
-import { api } from "common-v2/services/api"
+import { api } from "common/services/api"
 
 export function toggleMAC(entity_id: number, shouldEnable: boolean) {
   const endpoint = shouldEnable

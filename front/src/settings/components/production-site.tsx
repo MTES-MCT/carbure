@@ -7,41 +7,35 @@ import {
   Feedstock,
   GESOption,
   ProductionSiteDetails,
-} from "common-v2/types"
+} from "common/types"
 
-import * as common from "common-v2/api"
-import Form, { useForm } from "common-v2/components/form"
+import * as common from "common/api"
+import Form, { useForm } from "common/components/form"
 
-import { Row, LoaderOverlay } from "common-v2/components/scaffold"
-import { TextInput } from "common-v2/components/input"
-import Checkbox from "common-v2/components/checkbox"
-import Button from "common-v2/components/button"
-import {
-  AlertCircle,
-  Cross,
-  Plus,
-  Return,
-  Save,
-} from "common-v2/components/icons"
-import { Alert } from "common-v2/components/alert"
-import Table, { actionColumn, Cell } from "common-v2/components/table"
-import Dialog, { Confirm } from "common-v2/components/dialog"
-import Autocomplete from "common-v2/components/autocomplete"
-import TagAutocomplete from "common-v2/components/tag-autocomplete"
-import { RadioGroup } from "common-v2/components/radio"
+import { Row, LoaderOverlay } from "common/components/scaffold"
+import { TextInput } from "common/components/input"
+import Checkbox from "common/components/checkbox"
+import Button from "common/components/button"
+import { AlertCircle, Cross, Plus, Return, Save } from "common/components/icons"
+import { Alert } from "common/components/alert"
+import Table, { actionColumn, Cell } from "common/components/table"
+import Dialog, { Confirm } from "common/components/dialog"
+import Autocomplete from "common/components/autocomplete"
+import TagAutocomplete from "common/components/tag-autocomplete"
+import { RadioGroup } from "common/components/radio"
 import { useRights } from "carbure/hooks/entity"
-import { Panel } from "common-v2/components/scaffold"
-import { formatDate } from "common-v2/utils/formatters"
-import { compact } from "common-v2/utils/collection"
+import { Panel } from "common/components/scaffold"
+import { formatDate } from "common/utils/formatters"
+import { compact } from "common/utils/collection"
 import {
   normalizeBiofuel,
   normalizeCountry,
   normalizeFeedstock,
-} from "common-v2/utils/normalizers"
-import { usePortal } from "common-v2/components/portal"
-import { useMutation, useQuery } from "common-v2/hooks/async"
+} from "common/utils/normalizers"
+import { usePortal } from "common/components/portal"
+import { useMutation, useQuery } from "common/hooks/async"
 import * as api from "../api/production-sites"
-import { useNotify } from "common-v2/components/notifications"
+import { useNotify } from "common/components/notifications"
 
 type ProductionSitesSettingsProps = {
   readOnly?: boolean

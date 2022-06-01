@@ -2,11 +2,11 @@ import { Link, Navigate } from "react-router-dom"
 import { Trans, useTranslation } from "react-i18next"
 import { useUser } from "carbure/hooks/user"
 import css from "./pending.module.css"
-import { LoaderOverlay, Main } from "common-v2/components/scaffold"
-import Alert from "common-v2/components/alert"
-import { AlertTriangle, InfoCircle } from "common-v2/components/icons"
-import useTitle from "common-v2/hooks/title"
-import { MailTo } from "common-v2/components/button"
+import { LoaderOverlay, Main } from "common/components/scaffold"
+import Alert from "common/components/alert"
+import { AlertTriangle, InfoCircle } from "common/components/icons"
+import useTitle from "common/hooks/title"
+import { MailTo } from "common/components/button"
 
 const Pending = () => {
   const { t } = useTranslation()

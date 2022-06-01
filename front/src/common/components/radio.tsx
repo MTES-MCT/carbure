@@ -1,5 +1,5 @@
 import cl from "clsx"
-import { Disk } from "common-v2/components/icons"
+import { Disk } from "common/components/icons"
 import { singleSelection } from "../utils/selection"
 import {
   defaultNormalizer,

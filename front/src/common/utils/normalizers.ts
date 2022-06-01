@@ -11,7 +11,7 @@ import {
   Certificate,
   EntityCertificate,
   EntityDepot,
-} from "common-v2/types"
+} from "common/types"
 import { formatPeriod } from "./formatters"
 
 export const normalizeBiofuel: Normalizer<Biofuel> = (biofuel) => ({

@@ -4,19 +4,19 @@ import { useTranslation } from "react-i18next"
 import cl from "clsx"
 import * as api from "../api-v2"
 import css from "./entity-summary.module.css"
-import Table, { Cell } from "common-v2/components/table"
-import { Alert } from "common-v2/components/alert"
-import { AlertTriangle } from "common-v2/components/icons"
-import { Panel, LoaderOverlay, Grid } from "common-v2/components/scaffold"
-import { useQuery } from "common-v2/hooks/async"
-import { matchesSearch } from "common-v2/utils/collection"
-import MultiSelect from "common-v2/components/multi-select"
-import Select from "common-v2/components/select"
+import Table, { Cell } from "common/components/table"
+import { Alert } from "common/components/alert"
+import { AlertTriangle } from "common/components/icons"
+import { Panel, LoaderOverlay, Grid } from "common/components/scaffold"
+import { useQuery } from "common/hooks/async"
+import { matchesSearch } from "common/utils/collection"
+import MultiSelect from "common/components/multi-select"
+import Select from "common/components/select"
 import { EntityType } from "carbure/types"
 import {
   getEntityTypeLabel,
   normalizeEntityType,
-} from "common-v2/utils/normalizers"
+} from "common/utils/normalizers"
 import { EntityDetails } from "entities/api"
 
 type EntitySummaryProps = {

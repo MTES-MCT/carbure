@@ -2,12 +2,12 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Routes, Route } from "react-router-dom"
 import EntityDetails from "./routes/entity-details"
-import useTitle from "common-v2/hooks/title"
+import useTitle from "common/hooks/title"
 import Certificates from "./components/certificates"
-import { SearchInput } from "common-v2/components/input"
+import { SearchInput } from "common/components/input"
 import { EntitySummary } from "./components/entity-summary"
-import { Main } from "common-v2/components/scaffold"
-import Tabs from "common-v2/components/tabs"
+import { Main } from "common/components/scaffold"
+import Tabs from "common/components/tabs"
 
 const Entities = () => {
   const { t } = useTranslation()

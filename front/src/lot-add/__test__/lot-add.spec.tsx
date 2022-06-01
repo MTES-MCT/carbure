@@ -3,11 +3,11 @@ import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Route } from "react-router-dom"
 
-import { operator, producer, trader } from "common-v2/__test__/data"
-import { getField, waitWhileLoading } from "common-v2/__test__/helpers"
+import { operator, producer, trader } from "common/__test__/data"
+import { getField, waitWhileLoading } from "common/__test__/helpers"
 import LotAdd from "../index"
 
-import { PortalProvider } from "common-v2/components/portal"
+import { PortalProvider } from "common/components/portal"
 import { setEntity } from "settings/__test__/api"
 import server from "./api"
 

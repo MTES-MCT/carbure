@@ -1,14 +1,14 @@
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
-import { useQuery } from "common-v2/hooks/async"
-import { findEntities } from "common-v2/api"
-import { Main } from "common-v2/components/scaffold"
-import { SearchInput } from "common-v2/components/input"
-import { Alert } from "common-v2/components/alert"
-import { AlertCircle } from "common-v2/components/icons"
-import Table from "common-v2/components/table"
-import useTitle from "common-v2/hooks/title"
-import { getEntityTypeLabel } from "common-v2/utils/normalizers"
+import { useQuery } from "common/hooks/async"
+import { findEntities } from "common/api"
+import { Main } from "common/components/scaffold"
+import { SearchInput } from "common/components/input"
+import { Alert } from "common/components/alert"
+import { AlertCircle } from "common/components/icons"
+import Table from "common/components/table"
+import useTitle from "common/hooks/title"
+import { getEntityTypeLabel } from "common/utils/normalizers"
 
 const Registry = () => {
   const { t } = useTranslation()

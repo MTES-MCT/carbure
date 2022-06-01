@@ -1,5 +1,5 @@
 import { Entity, EntityType, UserRole } from "carbure/types"
-import { DepotType, GESOption, ProductionSiteDetails } from "common-v2/types"
+import { DepotType, GESOption, ProductionSiteDetails } from "common/types"
 
 // ENTITIES
 

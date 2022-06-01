@@ -1,11 +1,11 @@
 import { render, TestRoot } from "setupTests"
 import { screen } from "@testing-library/react"
 import { Route } from "react-router-dom"
-import { getByTextContent, waitWhileLoading } from "common-v2/__test__/helpers"
+import { getByTextContent, waitWhileLoading } from "common/__test__/helpers"
 import { DeclarationDialog } from "../actions/declaration"
 
 import server from "./api"
-import { PortalProvider } from "common-v2/components/portal"
+import { PortalProvider } from "common/components/portal"
 import userEvent from "@testing-library/user-event"
 
 const DeclarationSummary = () => (

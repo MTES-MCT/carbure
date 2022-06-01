@@ -1,4 +1,4 @@
-import api, { Api } from "common-v2/services/api"
+import api, { Api } from "common/services/api"
 import { lotFormToPayload, LotFormValue } from "lot-add/components/lot-form"
 import { LotDetails, StockDetails } from "./types"
 

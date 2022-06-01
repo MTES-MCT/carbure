@@ -8,19 +8,15 @@ import {
   Depot,
   Feedstock,
   ProductionSite,
-} from "common-v2/types"
-import Form, {
-  FormErrors,
-  FormManager,
-  useForm,
-} from "common-v2/components/form"
+} from "common/types"
+import Form, { FormErrors, FormManager, useForm } from "common/components/form"
 import LotFields from "./lot-fields"
 import ProductionFields from "./production-fields"
 import DeliveryFields from "./delivery-fields"
 import { EmissionFields, ReductionFields } from "./ghg-fields"
 import { Entity } from "carbure/types"
 import { LotCertificates } from "transaction-details/types"
-import { matches } from "common-v2/utils/collection"
+import { matches } from "common/utils/collection"
 
 export interface LotFormProps {
   readOnly?: boolean

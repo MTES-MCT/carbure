@@ -2,7 +2,7 @@ import { Fragment, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { Entity, UserRole } from "carbure/types"
 import useEntity from "carbure/hooks/entity"
-import { ProductionSite } from "common-v2/types"
+import { ProductionSite } from "common/types"
 import {
   DoubleCounting,
   DoubleCountingStatus as DCStatus,
@@ -10,10 +10,10 @@ import {
   DoubleCountingProduction,
   QuotaDetails,
 } from "doublecount/types"
-import { Col, LoaderOverlay } from "common-v2/components/scaffold"
+import { Col, LoaderOverlay } from "common/components/scaffold"
 import { useRights } from "carbure/hooks/entity"
-import Table, { Cell, actionColumn, Column } from "common-v2/components/table"
-import Button, { DownloadLink, MailTo } from "common-v2/components/button"
+import Table, { Cell, actionColumn, Column } from "common/components/table"
+import Button, { DownloadLink, MailTo } from "common/components/button"
 import {
   AlertCircle,
   Check,
@@ -22,22 +22,22 @@ import {
   Return,
   Save,
   Upload,
-} from "common-v2/components/icons"
-import { Alert } from "common-v2/components/alert"
-import Dialog, { Confirm } from "common-v2/components/dialog"
+} from "common/components/icons"
+import { Alert } from "common/components/alert"
+import Dialog, { Confirm } from "common/components/dialog"
 import {
   findBiofuels,
   findCountries,
   findFeedstocks,
   findProductionSites,
-} from "common-v2/api"
-import AutoComplete from "common-v2/components/autocomplete"
+} from "common/api"
+import AutoComplete from "common/components/autocomplete"
 import * as api from "../api/double-counting"
-import { useMutation, useQuery } from "common-v2/hooks/async"
-import Tabs from "common-v2/components/tabs"
-import { Form } from "common-v2/components/form"
-import { NumberInput } from "common-v2/components/input"
-import { useForm } from "common-v2/components/form"
+import { useMutation, useQuery } from "common/hooks/async"
+import Tabs from "common/components/tabs"
+import { Form } from "common/components/form"
+import { NumberInput } from "common/components/input"
+import { useForm } from "common/components/form"
 import YearTable from "doublecount/components/year-table"
 import DoubleCountingStatus from "doublecount/components/dc-status"
 import { SourcingAggregationTable } from "doublecount/components/dc-tables"
@@ -45,17 +45,17 @@ import {
   formatDate,
   formatDateYear,
   formatNumber,
-} from "common-v2/utils/formatters"
-import { Panel } from "common-v2/components/scaffold"
-import { FileInput } from "common-v2/components/input"
+} from "common/utils/formatters"
+import { Panel } from "common/components/scaffold"
+import { FileInput } from "common/components/input"
 import {
   normalizeBiofuel,
   normalizeCountry,
   normalizeFeedstock,
   normalizeProductionSite,
-} from "common-v2/utils/normalizers"
-import { usePortal } from "common-v2/components/portal"
-import { compact } from "common-v2/utils/collection"
+} from "common/utils/normalizers"
+import { usePortal } from "common/components/portal"
+import { compact } from "common/utils/collection"
 
 const DoubleCountingSettings = () => {
   const { t } = useTranslation()

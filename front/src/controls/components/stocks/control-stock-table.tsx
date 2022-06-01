@@ -1,6 +1,6 @@
 import { memo } from "react"
 import { Stock } from "transactions/types"
-import Table, { Order, selectionColumn } from "common-v2/components/table"
+import Table, { Order, selectionColumn } from "common/components/table"
 import { useStockColumns } from "transactions/components/stocks/stock-table"
 import { To } from "react-router-dom"
 

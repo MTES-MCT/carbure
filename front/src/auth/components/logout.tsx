@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom"
-import { useQuery } from "common-v2/hooks/async"
-import { LoaderOverlay } from "common-v2/components/scaffold"
-import { invalidate } from "common-v2/hooks/invalidate"
+import { useQuery } from "common/hooks/async"
+import { LoaderOverlay } from "common/components/scaffold"
+import { invalidate } from "common/hooks/invalidate"
 import * as api from "../api"
-import { useNotify } from "common-v2/components/notifications"
+import { useNotify } from "common/components/notifications"
 import { useTranslation } from "react-i18next"
 
 export const Logout = () => {

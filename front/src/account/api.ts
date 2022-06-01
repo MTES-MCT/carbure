@@ -1,4 +1,4 @@
-import api from "common-v2/services/api"
+import api from "common/services/api"
 import { UserRole } from "carbure/types"
 
 export function requestAccess(

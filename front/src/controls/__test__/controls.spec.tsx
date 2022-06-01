@@ -3,7 +3,7 @@ import { screen } from "@testing-library/react"
 import { Route } from "react-router-dom"
 import { AdminStatus } from "controls/types"
 
-import { waitWhileLoading } from "common-v2/__test__/helpers"
+import { waitWhileLoading } from "common/__test__/helpers"
 import Controls from "../index"
 
 import server from "./api"

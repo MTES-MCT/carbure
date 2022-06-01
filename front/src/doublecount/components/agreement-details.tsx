@@ -2,11 +2,11 @@ import { Fragment, useState } from "react"
 import { useTranslation, Trans } from "react-i18next"
 import { EntityType } from "carbure/types"
 import { Admin, DoubleCountingStatus as DCStatus } from "../types"
-import { Col, LoaderOverlay } from "common-v2/components/scaffold"
-import Tabs from "common-v2/components/tabs"
-import { Button, DownloadLink } from "common-v2/components/button"
+import { Col, LoaderOverlay } from "common/components/scaffold"
+import Tabs from "common/components/tabs"
+import { Button, DownloadLink } from "common/components/button"
 import * as api from "../api"
-import { Confirm, Dialog } from "common-v2/components/dialog"
+import { Confirm, Dialog } from "common/components/dialog"
 import { Entity } from "carbure/types"
 import {
   Return,
@@ -15,9 +15,9 @@ import {
   Cross,
   Save,
   AlertCircle,
-} from "common-v2/components/icons"
-import { Alert } from "common-v2/components/alert"
-import { useNotify } from "common-v2/components/notifications"
+} from "common/components/icons"
+import { Alert } from "common/components/alert"
+import { useNotify } from "common/components/notifications"
 import DoubleCountingStatus from "./dc-status"
 import {
   SourcingAggregationTable,
@@ -25,10 +25,10 @@ import {
   ProductionTable,
   StatusTable,
 } from "./dc-tables"
-import { FileInput } from "common-v2/components/input"
-import { useMutation, useQuery } from "common-v2/hooks/async"
-import { usePortal } from "common-v2/components/portal"
-import { formatDate } from "common-v2/utils/formatters"
+import { FileInput } from "common/components/input"
+import { useMutation, useQuery } from "common/hooks/async"
+import { usePortal } from "common/components/portal"
+import { formatDate } from "common/utils/formatters"
 
 export type DoubleCountingDialogProps = {
   agreementID: number

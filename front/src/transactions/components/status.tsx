@@ -3,13 +3,13 @@ import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { useMatch, useNavigate } from "react-router-dom"
 import { Snapshot, Status } from "../types"
-import Tabs from "common-v2/components/tabs"
-import { Bell, Loader } from "common-v2/components/icons"
-import { Col, Row } from "common-v2/components/scaffold"
+import Tabs from "common/components/tabs"
+import { Bell, Loader } from "common/components/icons"
+import { Col, Row } from "common/components/scaffold"
 import css from "./status.module.css"
-import { formatNumber } from "common-v2/utils/formatters"
+import { formatNumber } from "common/utils/formatters"
 import useEntity from "carbure/hooks/entity"
-import { compact } from "common-v2/utils/collection"
+import { compact } from "common/utils/collection"
 
 export interface StatusTabsProps {
   loading: boolean

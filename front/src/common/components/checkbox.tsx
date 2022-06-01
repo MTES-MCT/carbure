@@ -1,5 +1,5 @@
 import cl from "clsx"
-import { Check } from "common-v2/components/icons"
+import { Check } from "common/components/icons"
 import css from "./checkbox.module.css"
 import { GroupField } from "./input"
 import { multipleSelection } from "../utils/selection"
