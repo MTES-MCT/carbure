@@ -3,7 +3,7 @@ import {
   okErrorsTranslations,
   okFieldsTranslations,
   okTranslations,
-} from "common/__test__/api"
+} from "common-v2/__test__/api"
 import { rest } from "msw"
 import { setupServer } from "msw/node"
 import { okSettings } from "settings/__test__/api"

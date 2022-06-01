@@ -8,7 +8,7 @@ import {
   Depot,
   Feedstock,
   ProductionSite,
-} from "common/types"
+} from "common-v2/types"
 import Form, {
   FormErrors,
   FormManager,

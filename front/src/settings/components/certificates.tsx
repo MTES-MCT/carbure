@@ -22,7 +22,7 @@ import {
   normalizeCertificate,
   normalizeEntityCertificate,
 } from "common-v2/utils/normalizers"
-import { Certificate, EntityCertificate } from "common/types"
+import { Certificate, EntityCertificate } from "common-v2/types"
 import Alert from "common-v2/components/alert"
 import Select from "common-v2/components/select"
 import isBefore from "date-fns/isBefore"

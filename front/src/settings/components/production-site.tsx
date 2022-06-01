@@ -7,7 +7,7 @@ import {
   Feedstock,
   GESOption,
   ProductionSiteDetails,
-} from "common/types"
+} from "common-v2/types"
 
 import * as common from "common-v2/api"
 import Form, { useForm } from "common-v2/components/form"

@@ -10,7 +10,7 @@ import {
 } from "common-v2/components/input"
 import * as norm from "common-v2/utils/normalizers"
 import { StockFormValue } from "./stock-form"
-import { Biofuel, Country, Feedstock } from "common/types"
+import { Biofuel, Country, Feedstock } from "common-v2/types"
 import { formatPercentage } from "common-v2/utils/formatters"
 import { isRedII } from "lot-add/components/ghg-fields"
 

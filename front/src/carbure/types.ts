@@ -1,4 +1,4 @@
-import { Unit } from "common/types"
+import { Unit } from "common-v2/types"
 
 export interface Entity {
   id: number
