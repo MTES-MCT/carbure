@@ -1,5 +1,4 @@
 import React, { useState } from "react"
-import cl from "clsx"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api/certificates"
 import useEntity from "carbure/hooks/entity"
@@ -7,7 +6,7 @@ import { useNotify } from "common-v2/components/notifications"
 import { useQuery, useMutation } from "common-v2/hooks/async"
 import { usePortal } from "common-v2/components/portal"
 import { formatDate } from "common-v2/utils/formatters"
-import { Panel } from "common-v2/components/scaffold"
+import { Panel, Row } from "common-v2/components/scaffold"
 import Button from "common-v2/components/button"
 import Dialog, { Confirm } from "common-v2/components/dialog"
 import Table, { Cell, actionColumn } from "common-v2/components/table"
@@ -256,7 +255,17 @@ export const ExpirationDate = ({ link }: ExpirationDateProps) => {
   const updated = link.has_been_updated
 
   return (
-    <span style={{ color: expired ? "var(--orange-dark)" : undefined }}>
+    <Row
+      style={
+        expired
+          ? {
+              alignItems: "center",
+              color: "var(--orange-dark)",
+              gap: "var(--spacing-s)",
+            }
+          : undefined
+      }
+    >
       {expired && !updated && (
         <React.Fragment>
           {formatted}
@@ -279,7 +288,7 @@ export const ExpirationDate = ({ link }: ExpirationDateProps) => {
       {expired && updated && <Trans>Mis à jour ({{ formatted }})</Trans>}
 
       {!expired && formatted}
-    </span>
+    </Row>
   )
 }
 

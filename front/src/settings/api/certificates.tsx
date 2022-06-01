@@ -59,18 +59,6 @@ export function updateCertificate(
   })
 }
 
-export function setProductionSiteCertificates(
-  entity_id: number,
-  production_site_id: number,
-  certificate_ids: string[]
-) {
-  return api.post("/set-production-site-certificates", {
-    entity_id,
-    production_site_id,
-    certificate_ids,
-  })
-}
-
 export function setDefaultCertificate(
   entity_id: number,
   certificate_id: string

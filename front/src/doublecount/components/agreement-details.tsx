@@ -10,7 +10,6 @@ import { Confirm, Dialog } from "common-v2/components/dialog"
 import { Entity } from "carbure/types"
 import {
   Return,
-  Upload,
   Download,
   Check,
   Cross,
