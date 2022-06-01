@@ -153,15 +153,3 @@ export function deleteDeliverySite(
     delivery_site_id,
   })
 }
-
-export function getEntityRights(entity_id: number): Promise<EntityRights> {
-  return api.get("/settings/get-entity-rights", { entity_id })
-}
-
-export function revokeUserRights(entity_id: number, email: string) {
-  return api.post("/settings/revoke-user", { entity_id, email })
-}
-
-export function acceptUserRightsRequest(entity_id: number, request_id: number) {
-  return api.post("/settings/accept-user", { entity_id, request_id })
-}
