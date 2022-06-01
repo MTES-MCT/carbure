@@ -54,13 +54,23 @@ export const normalizeEntity: Normalizer<Entity> = (entity) => ({
   },
 })
 
+export const normalizeProductionSite: Normalizer<ProductionSite> = (ps) => ({
+  value: ps,
+  label: ps.name,
+})
+
 // prettier-ignore
-export const normalizeProductionSite: Normalizer<ProductionSite | string> = (ps) => ({
+export const normalizeProductionSiteOrUnknown: Normalizer<ProductionSite | string> = (ps) => ({
   value: ps,
   label: isString(ps) ? ps : ps.name,
 })
 
-export const normalizeDepot: Normalizer<Depot | string> = (depot) => ({
+export const normalizeDepot: Normalizer<Depot> = (depot) => ({
+  value: depot,
+  label: depot.name,
+})
+
+export const normalizeDepotOrUnknown: Normalizer<Depot | string> = (depot) => ({
   value: depot,
   label: isString(depot) ? depot : depot.name,
 })

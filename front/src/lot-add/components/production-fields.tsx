@@ -112,7 +112,7 @@ export const ProductionSiteField = (
       icon={isKnown ? UserCheck : undefined}
       defaultOptions={isKnown ? [productionSite] : undefined}
       getOptions={(query) => api.findProductionSites(query, producer)}
-      normalize={norm.normalizeProductionSite}
+      normalize={norm.normalizeProductionSiteOrUnknown}
       {...bound}
       {...props}
     />

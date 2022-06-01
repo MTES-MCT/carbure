@@ -159,7 +159,12 @@ export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { value, bind } = useFormContext<LotFormValue>()
-  const deliveryTypes = getDeliveryTypes(entity, value.client, value.lot?.lot_status)
+
+  const deliveryTypes = getDeliveryTypes(
+    entity,
+    value.client,
+    value.lot?.lot_status
+  )
 
   if (deliveryTypes.length === 0 || value.lot?.lot_status === "PENDING") {
     return null
@@ -167,7 +172,14 @@ export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
 
   // prevent editing delivery type when doing a correction for a lot that duplicated for forwarding
   const isDraft = !value.lot || value.lot.lot_status === "DRAFT"
-  const hasChildren = value.delivery_type && [DeliveryType.Stock, DeliveryType.Processing, DeliveryType.Trading].includes(value.delivery_type)
+
+  const hasChildren =
+    !!value.delivery_type &&
+    [
+      DeliveryType.Stock,
+      DeliveryType.Processing,
+      DeliveryType.Trading,
+    ].includes(value.delivery_type)
 
   return (
     <Select
@@ -188,7 +200,13 @@ export function getDeliveryTypes(
   client: Entity | string | undefined,
   status: LotStatus = LotStatus.Draft
 ) {
-  const { isOperator, has_stocks, has_mac, has_direct_deliveries, has_trading } = entity
+  const {
+    isOperator,
+    has_stocks,
+    has_mac,
+    has_direct_deliveries,
+    has_trading,
+  } = entity
   const isClientEntity = client instanceof Object ? client.id === entity.id : false // prettier-ignore
   const isClientUnknown = client === undefined || typeof client === "string"
 
@@ -198,7 +216,7 @@ export function getDeliveryTypes(
     (isClientUnknown || isClientEntity) && has_mac && DeliveryType.RFC,
     (isClientUnknown || isClientEntity) && has_direct_deliveries && DeliveryType.Direct, // prettier-ignore
     (isClientUnknown || isClientEntity) && DeliveryType.Exportation,
-    status !== LotStatus.Draft && has_trading && DeliveryType.Trading
+    status !== LotStatus.Draft && has_trading && DeliveryType.Trading,
   ])
 }
 
@@ -216,7 +234,7 @@ export const DeliverySiteField = (props: AutocompleteProps<Depot | string>) => {
       create={norm.identity}
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={api.findDepots}
-      normalize={norm.normalizeDepot}
+      normalize={norm.normalizeDepotOrUnknown}
       {...bound}
       {...props}
     />

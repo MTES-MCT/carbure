@@ -146,7 +146,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
             <Autocomplete
               label={t("Site de livraison")}
               getOptions={findDepots}
-              normalize={norm.normalizeDepot}
+              normalize={norm.normalizeDepotOrUnknown}
               create={norm.identity}
               {...bind("delivery_site")}
             />

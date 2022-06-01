@@ -50,6 +50,7 @@ import {
   normalizeBiofuel,
   normalizeCountry,
   normalizeFeedstock,
+  normalizeProductionSite,
 } from "common-v2/utils/normalizers"
 import { usePortal } from "common-v2/components/portal"
 import { compact } from "common-v2/utils/collection"
@@ -493,31 +494,16 @@ const DoubleCountingDialog = ({
       </main>
       <footer>
         <Col style={{ marginRight: "auto" }}>
-          <a
-            href={excelURL ?? "#"}
-            target="_blank"
-            rel="noreferrer"
-            className={styles.settingsBottomLink}
-          >
+          <a href={excelURL ?? "#"} target="_blank" rel="noreferrer">
             <Upload />
             <Trans>Télécharger le dossier au format excel</Trans>
           </a>
-          <a
-            href={documentationURL ?? "#"}
-            target="_blank"
-            rel="noreferrer"
-            className={styles.settingsBottomLink}
-          >
+          <a href={documentationURL ?? "#"} target="_blank" rel="noreferrer">
             <Upload />
             <Trans>Télécharger la description de l'activité</Trans>
           </a>
           {decisionURL && (
-            <a
-              href={decisionURL}
-              target="_blank"
-              rel="noreferrer"
-              className={styles.settingsBottomLink}
-            >
+            <a href={decisionURL} target="_blank" rel="noreferrer">
               <Upload />
               <Trans>Télécharger la décision de l'administration</Trans>
             </a>
@@ -605,7 +591,7 @@ const DoubleCountingUploadDialog = ({
               label={t("Site de production")}
               placeholder={t("Rechercher un site de production")}
               getOptions={(search) => findProductionSites(search, entity.id)}
-              normalize={(ps: ProductionSite) => ({ value: ps, label: ps.name })} // prettier-ignore
+              normalize={normalizeProductionSite}
               {...bind("productionSite")}
             />
 
@@ -736,7 +722,7 @@ const DoubleCountingSourcingDialog = ({
   const loading = addSourcing.loading || updateSourcing.loading
 
   return (
-    <Dialog onClose={onClose} className={styles.settingsDialog}>
+    <Dialog onClose={onClose}>
       <header>
         <h1>{t("Approvisionnement")} </h1>
       </header>
