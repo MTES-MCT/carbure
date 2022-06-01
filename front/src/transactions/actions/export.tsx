@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next"
 import { LotQuery, StockQuery } from "../types"
-import { Download } from "common-v2/components/icons"
-import Button from "common-v2/components/button"
+import { Download } from "common/components/icons"
+import Button from "common/components/button"
 import * as api from "../api"
 import { useMatomo } from "matomo"
 

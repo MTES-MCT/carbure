@@ -8,7 +8,7 @@ import {
   okEntitySearch,
   okMatierePremiereSearch,
   okProductionSitesSearch,
-} from "common-v2/__test__/api"
+} from "common/__test__/api"
 import { lot } from "transaction-details/__test__/data"
 
 export const okAddLot = rest.post("/api/lots/add", (req, res, ctx) => {

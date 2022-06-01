@@ -1,7 +1,7 @@
 import cl from "clsx"
 import React, { useState } from "react"
 import css from "./collapse.module.css"
-import { ChevronDown } from "common-v2/components/icons"
+import { ChevronDown } from "common/components/icons"
 
 export type CollapseVariant = "info" | "success" | "warning" | "danger"
 

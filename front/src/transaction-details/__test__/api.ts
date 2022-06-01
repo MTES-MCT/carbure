@@ -1,6 +1,6 @@
 import { rest } from "msw"
 import { setupServer } from "msw/node"
-import { Data } from "common-v2/__test__/helpers"
+import { Data } from "common/__test__/helpers"
 import { LotDetails } from "../types"
 import { CorrectionStatus, DeliveryType, LotStatus } from "transactions/types"
 import { okDeliverySites, okDynamicSettings } from "settings/__test__/api"
@@ -11,8 +11,8 @@ import {
   okEntitySearch,
   okMatierePremiereSearch,
   okProductionSitesSearch,
-} from "common-v2/__test__/api"
-import { producer } from "common-v2/__test__/data"
+} from "common/__test__/api"
+import { producer } from "common/__test__/data"
 
 export const okLotDetails = rest.get("/api/lots/details", (req, res, ctx) => {
   return res(

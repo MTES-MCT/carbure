@@ -1,4 +1,4 @@
-import { compact, matches } from "common-v2/utils/collection"
+import { compact, matches } from "common/utils/collection"
 import { useAsync, useAsyncCallback, UseAsyncReturn } from "react-async-hook"
 import {
   Normalizer,

@@ -3,24 +3,24 @@ import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 import { useMatomo } from "matomo"
 import useEntity from "carbure/hooks/entity"
-import Dropdown, { Anchors } from "common-v2/components/dropdown"
-import { Bell, Check, Loader } from "common-v2/components/icons"
+import Dropdown, { Anchors } from "common/components/dropdown"
+import { Bell, Check, Loader } from "common/components/icons"
 import css from "./notifications.module.css"
-import Button from "common-v2/components/button"
+import Button from "common/components/button"
 import { useRef } from "react"
-import List from "common-v2/components/list"
+import List from "common/components/list"
 import { Notification, NotificationType } from "carbure/types"
-import { Normalizer } from "common-v2/utils/normalize"
+import { Normalizer } from "common/utils/normalize"
 import { t } from "i18next"
-import Radio from "common-v2/components/radio"
-import { Col, Row } from "common-v2/components/scaffold"
+import Radio from "common/components/radio"
+import { Col, Row } from "common/components/scaffold"
 import {
   formatDateTime,
   formatElapsedTime,
   formatPeriod,
-} from "common-v2/utils/formatters"
+} from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import { useMutation, useQuery } from "common-v2/hooks/async"
+import { useMutation, useQuery } from "common/hooks/async"
 import * as api from "../api"
 
 const Notifications = () => {

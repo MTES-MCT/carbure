@@ -1,14 +1,12 @@
 import { useTranslation } from "react-i18next"
-import { Fieldset, useBind } from "common-v2/components/form"
-import Autocomplete, {
-  AutocompleteProps,
-} from "common-v2/components/autocomplete"
-import { DateInput, DateInputProps } from "common-v2/components/input"
-import { UserCheck } from "common-v2/components/icons"
-import * as norm from "common-v2/utils/normalizers"
+import { Fieldset, useBind } from "common/components/form"
+import Autocomplete, { AutocompleteProps } from "common/components/autocomplete"
+import { DateInput, DateInputProps } from "common/components/input"
+import { UserCheck } from "common/components/icons"
+import * as norm from "common/utils/normalizers"
 import { StockFormValue } from "./stock-form"
 import { Entity } from "carbure/types"
-import { Country, Depot, ProductionSite } from "common-v2/types"
+import { Country, Depot, ProductionSite } from "common/types"
 
 export const JourneyFields = () => {
   const { t } = useTranslation()

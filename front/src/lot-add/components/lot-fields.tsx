@@ -1,20 +1,18 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import Autocomplete, {
-  AutocompleteProps,
-} from "common-v2/components/autocomplete"
-import { Fieldset, useBind } from "common-v2/components/form"
+import Autocomplete, { AutocompleteProps } from "common/components/autocomplete"
+import { Fieldset, useBind } from "common/components/form"
 import {
   NumberInput,
   NumberInputProps,
   TextInput,
   TextInputProps,
-} from "common-v2/components/input"
-import Select from "common-v2/components/select"
-import * as api from "common-v2/api"
-import * as norm from "common-v2/utils/normalizers"
+} from "common/components/input"
+import Select from "common/components/select"
+import * as api from "common/api"
+import * as norm from "common/utils/normalizers"
 import { LotFormValue } from "./lot-form"
-import { Biofuel, Country, Feedstock, Unit } from "common-v2/types"
+import { Biofuel, Country, Feedstock, Unit } from "common/types"
 import useEntity from "carbure/hooks/entity"
 
 interface LotFieldsProps {

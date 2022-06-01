@@ -1,9 +1,9 @@
 import { useTranslation } from "react-i18next"
-import { useQuery } from "common-v2/hooks/async"
+import { useQuery } from "common/hooks/async"
 import pickApi from "../../api"
-import { formatNumber } from "common-v2/utils/formatters"
-import { LoaderOverlay } from "common-v2/components/scaffold"
-import Table from "common-v2/components/table"
+import { formatNumber } from "common/utils/formatters"
+import { LoaderOverlay } from "common/components/scaffold"
+import Table from "common/components/table"
 import NoResult from "transactions/components/no-result"
 import {
   LotSummaryBar,

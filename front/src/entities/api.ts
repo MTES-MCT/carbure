@@ -1,6 +1,6 @@
-import api, { Api } from "common-v2/services/api"
+import api, { Api } from "common/services/api"
 import { Entity, UserRightRequest, UserRightStatus } from "carbure/types"
-import { ProductionSiteDetails, EntityDepot } from "common-v2/types"
+import { ProductionSiteDetails, EntityDepot } from "common/types"
 
 export interface EntityDetails {
   entity: Entity

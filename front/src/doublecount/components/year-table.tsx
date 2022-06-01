@@ -1,4 +1,4 @@
-import Table, { Column } from "common-v2/components/table"
+import Table, { Column } from "common/components/table"
 import { Fragment } from "react"
 
 function groupRowsByYear<T extends { year: number }>(items: T[]) {

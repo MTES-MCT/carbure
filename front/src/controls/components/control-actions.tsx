@@ -1,5 +1,5 @@
-import { ActionBar } from "common-v2/components/scaffold"
-import { SearchInput } from "common-v2/components/input"
+import { ActionBar } from "common/components/scaffold"
+import { SearchInput } from "common/components/input"
 import { ExportLotsButton } from "../actions/export"
 import { Lot, LotQuery } from "transactions/types"
 import { AlertManyButton } from "controls/actions/alert"

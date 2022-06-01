@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next"
-import Alert from "common-v2/components/alert"
-import { AlertCircle } from "common-v2/components/icons"
+import Alert from "common/components/alert"
+import { AlertCircle } from "common/components/icons"
 import { FilterManager, ResetButton } from "./filters"
 
 interface NoResultProps extends Partial<FilterManager> {

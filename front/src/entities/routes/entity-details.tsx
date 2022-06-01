@@ -1,16 +1,16 @@
 import { useNavigate, useParams } from "react-router-dom"
-import { ChevronLeft } from "common-v2/components/icons"
-import { Button } from "common-v2/components/button"
+import { ChevronLeft } from "common/components/icons"
+import { Button } from "common/components/button"
 import UserRights from "../components/user-rights"
 import * as api from "../api"
 import DeliverySitesSettings from "settings/components/delivery-site"
 import ProductionSitesSettings from "settings/components/production-site"
 import { EntityType } from "carbure/types"
 import Certificates from "entities/components/certificates"
-import { Main, Row } from "common-v2/components/scaffold"
-import Tabs from "common-v2/components/tabs"
-import { compact } from "common-v2/utils/collection"
-import { useQuery } from "common-v2/hooks/async"
+import { Main, Row } from "common/components/scaffold"
+import Tabs from "common/components/tabs"
+import { compact } from "common/utils/collection"
+import { useQuery } from "common/hooks/async"
 
 const EntityDetails = () => {
   const navigate = useNavigate()

@@ -1,23 +1,21 @@
 import { useTranslation } from "react-i18next"
 import useEntity from "carbure/hooks/entity"
-import Autocomplete, {
-  AutocompleteProps,
-} from "common-v2/components/autocomplete"
-import { Fieldset, useBind, useFormContext } from "common-v2/components/form"
+import Autocomplete, { AutocompleteProps } from "common/components/autocomplete"
+import { Fieldset, useBind, useFormContext } from "common/components/form"
 import {
   DateInput,
   DateInputProps,
   TextInput,
   TextInputProps,
-} from "common-v2/components/input"
-import * as api from "common-v2/api"
-import * as norm from "common-v2/utils/normalizers"
+} from "common/components/input"
+import * as api from "common/api"
+import * as norm from "common/utils/normalizers"
 import { LotFormValue } from "./lot-form"
-import { UserCheck } from "common-v2/components/icons"
+import { UserCheck } from "common/components/icons"
 import { Entity } from "carbure/types"
-import { Country, ProductionSite } from "common-v2/types"
+import { Country, ProductionSite } from "common/types"
 import CertificateIcon from "transaction-details/components/lots/certificate"
-import { compact, uniqueBy } from "common-v2/utils/collection"
+import { compact, uniqueBy } from "common/utils/collection"
 
 interface ProductionFieldsProps {
   readOnly?: boolean

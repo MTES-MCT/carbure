@@ -1,9 +1,9 @@
 import { useTranslation } from "react-i18next"
 import { useMatch } from "react-router-dom"
 import { Snapshot, AdminStatus } from "../types"
-import Tabs from "common-v2/components/tabs"
-import { Loader } from "common-v2/components/icons"
-import { formatNumber } from "common-v2/utils/formatters"
+import Tabs from "common/components/tabs"
+import { Loader } from "common/components/icons"
+import { formatNumber } from "common/utils/formatters"
 
 export interface StatusTabsProps {
   loading: boolean

@@ -1,5 +1,5 @@
 import { Fragment } from "react"
-import { ActionBar } from "common-v2/components/scaffold"
+import { ActionBar } from "common/components/scaffold"
 import { LotQuery } from "transactions/types"
 import { useStatus } from "transactions/components/status"
 import { CreateButton } from "transactions/actions/create"

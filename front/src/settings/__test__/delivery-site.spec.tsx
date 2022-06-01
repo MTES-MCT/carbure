@@ -2,14 +2,14 @@ import { render, TestRoot } from "setupTests"
 import { waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Route } from "react-router-dom"
-import { deliverySite, producer } from "common-v2/__test__/data"
-import { getField, waitWhileLoading } from "common-v2/__test__/helpers"
+import { deliverySite, producer } from "common/__test__/data"
+import { getField, waitWhileLoading } from "common/__test__/helpers"
 import Settings from "../index"
 
 import server, { setDeliverySites, setEntity } from "./api"
 import DeliverySitesSettings from "settings/components/delivery-site"
 import { getDeliverySites } from "settings/api/delivery-sites"
-import { PortalProvider } from "common-v2/components/portal"
+import { PortalProvider } from "common/components/portal"
 
 const SettingsWithHooks = () => {
   return (

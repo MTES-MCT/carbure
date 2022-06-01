@@ -6,7 +6,7 @@ import Portal from "./portal"
 import Button, { ButtonVariant } from "./button"
 import { Cross, Check, Return } from "./icons"
 import { Overlay } from "./scaffold"
-import { useMutation } from "common-v2/hooks/async"
+import { useMutation } from "common/hooks/async"
 
 export interface DialogProps {
   className?: string

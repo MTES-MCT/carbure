@@ -1,6 +1,6 @@
 import cl from "clsx"
 import React, { useState } from "react"
-import { Loader } from "common-v2/components/icons"
+import { Loader } from "common/components/icons"
 import css from "./alert.module.css"
 
 export type AlertVariant = "info" | "success" | "warning" | "danger"

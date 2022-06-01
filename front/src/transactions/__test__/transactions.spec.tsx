@@ -5,13 +5,13 @@ import { setEntity } from "settings/__test__/api"
 
 import Transactions from "../index"
 import { render, screen } from "@testing-library/react"
-import { Data, waitWhileLoading } from "common-v2/__test__/helpers"
-import { operator } from "common-v2/__test__/data"
+import { Data, waitWhileLoading } from "common/__test__/helpers"
+import { operator } from "common/__test__/data"
 import server from "./api"
 import { emptyLots, emptySnapshot, lots, snapshot } from "./data"
 import userEvent from "@testing-library/user-event"
 import { clickOnCheckboxesAndConfirm } from "./helpers"
-import { PortalProvider } from "common-v2/components/portal"
+import { PortalProvider } from "common/components/portal"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 beforeEach(() => {

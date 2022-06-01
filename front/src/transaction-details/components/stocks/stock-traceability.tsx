@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next"
-import { ExternalLink } from "common-v2/components/button"
-import Collapse from "common-v2/components/collapse"
-import { Split } from "common-v2/components/icons"
-import { formatNumber } from "common-v2/utils/formatters"
+import { ExternalLink } from "common/components/button"
+import Collapse from "common/components/collapse"
+import { Split } from "common/components/icons"
+import { formatNumber } from "common/utils/formatters"
 import { StockDetails } from "../../types"
 
 export interface TraceabilityProps {

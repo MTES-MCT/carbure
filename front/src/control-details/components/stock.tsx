@@ -1,17 +1,17 @@
 import { useNavigate, useLocation, useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import pickApi from "../api"
-import { useQuery } from "common-v2/hooks/async"
+import { useQuery } from "common/hooks/async"
 import { useStatus } from "controls/components/status"
 import useEntity from "carbure/hooks/entity"
-import { LoaderOverlay } from "common-v2/components/scaffold"
-import Dialog from "common-v2/components/dialog"
-import Button from "common-v2/components/button"
-import { Return } from "common-v2/components/icons"
+import { LoaderOverlay } from "common/components/scaffold"
+import Dialog from "common/components/dialog"
+import Button from "common/components/button"
+import { Return } from "common/components/icons"
 import StockTag from "transactions/components/stocks/stock-tag"
 import NavigationButtons from "transaction-details/components/lots/navigation"
 
-import { invalidate } from "common-v2/hooks/invalidate"
+import { invalidate } from "common/hooks/invalidate"
 import StockForm from "transaction-details/components/stocks/stock-form"
 import StockTraceability, {
   hasTraceability,

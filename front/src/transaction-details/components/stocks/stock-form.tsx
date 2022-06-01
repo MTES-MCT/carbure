@@ -1,5 +1,5 @@
 import { Stock } from "transactions/types"
-import Form, { useForm } from "common-v2/components/form"
+import Form, { useForm } from "common/components/form"
 import { useEffect, useMemo } from "react"
 import { Entity } from "carbure/types"
 import {
@@ -8,7 +8,7 @@ import {
   Depot,
   Feedstock,
   ProductionSite,
-} from "common-v2/types"
+} from "common/types"
 import LotFields from "./lot-fields"
 import JourneyFields from "./journey-fields"
 

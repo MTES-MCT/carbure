@@ -1,17 +1,11 @@
 import { useTranslation } from "react-i18next"
 import useEntity, { EntityManager } from "carbure/hooks/entity"
-import { Fieldset, useBind, useFormContext } from "common-v2/components/form"
-import Autocomplete, {
-  AutocompleteProps,
-} from "common-v2/components/autocomplete"
-import {
-  DateInput,
-  DateInputProps,
-  TextInput,
-} from "common-v2/components/input"
-import { UserCheck } from "common-v2/components/icons"
-import * as api from "common-v2/api"
-import * as norm from "common-v2/utils/normalizers"
+import { Fieldset, useBind, useFormContext } from "common/components/form"
+import Autocomplete, { AutocompleteProps } from "common/components/autocomplete"
+import { DateInput, DateInputProps, TextInput } from "common/components/input"
+import { UserCheck } from "common/components/icons"
+import * as api from "common/api"
+import * as norm from "common/utils/normalizers"
 import {
   isExternalDelivery,
   isLotClient,
@@ -22,10 +16,10 @@ import {
 } from "./lot-form"
 import { Entity } from "carbure/types"
 import { LotStatus } from "transactions/types"
-import { Country, Depot } from "common-v2/types"
-import Select, { SelectProps } from "common-v2/components/select"
+import { Country, Depot } from "common/types"
+import Select, { SelectProps } from "common/components/select"
 import { DeliveryType } from "transactions/types"
-import { compact, uniqueBy } from "common-v2/utils/collection"
+import { compact, uniqueBy } from "common/utils/collection"
 import CertificateIcon from "transaction-details/components/lots/certificate"
 
 interface DeliveryFieldsProps {

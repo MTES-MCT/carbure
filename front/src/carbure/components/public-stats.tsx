@@ -1,5 +1,5 @@
-import { Main } from "common-v2/components/scaffold"
-import useTitle from "common-v2/hooks/title"
+import { Main } from "common/components/scaffold"
+import useTitle from "common/hooks/title"
 import IframeResizer from "iframe-resizer-react"
 import { useTranslation } from "react-i18next"
 

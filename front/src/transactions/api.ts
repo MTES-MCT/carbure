@@ -1,6 +1,6 @@
 import { Entity } from "carbure/types"
-import { api, Api, download } from "common-v2/services/api"
-import { Option } from "common-v2/utils/normalize"
+import { api, Api, download } from "common/services/api"
+import { Option } from "common/utils/normalize"
 import {
   LotList,
   LotQuery,

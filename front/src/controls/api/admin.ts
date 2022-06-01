@@ -1,5 +1,5 @@
-import { Api, api, download } from "common-v2/services/api"
-import { Option } from "common-v2/utils/normalize"
+import { Api, api, download } from "common/services/api"
+import { Option } from "common/utils/normalize"
 import { LotSummary, Snapshot } from "../types"
 import {
   Filter,

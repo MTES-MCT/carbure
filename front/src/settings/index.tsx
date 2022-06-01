@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next"
 
-import { PortalProvider } from "common-v2/components/portal"
+import { PortalProvider } from "common/components/portal"
 
 import DeliverySitesSettings from "./components/delivery-site"
 import ProductionSitesSettings from "./components/production-site"
@@ -12,10 +12,10 @@ import EntityUserRights from "./components/user-rights"
 import { UserRole } from "carbure/types"
 import DoubleCountingSettings from "./components/double-counting"
 import useEntity from "carbure/hooks/entity"
-import useTitle from "common-v2/hooks/title"
-import { Main } from "common-v2/components/scaffold"
-import Tabs from "common-v2/components/tabs"
-import { compact } from "common-v2/utils/collection"
+import useTitle from "common/hooks/title"
+import { Main } from "common/components/scaffold"
+import Tabs from "common/components/tabs"
+import { compact } from "common/utils/collection"
 
 const Settings = () => {
   const { t } = useTranslation()

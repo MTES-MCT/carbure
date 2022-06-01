@@ -1,5 +1,5 @@
-import api, { Api } from "common-v2/services/api"
-import { GESOption, ProductionSiteDetails } from "common-v2/types"
+import api, { Api } from "common/services/api"
+import { GESOption, ProductionSiteDetails } from "common/types"
 
 export function getProductionSites(entity_id: number) {
   return api.get<Api<ProductionSiteDetails[]>>(

@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom"
-import { LoaderOverlay } from "common-v2/components/scaffold"
+import { LoaderOverlay } from "common/components/scaffold"
 import useLoadUser, { UserContext } from "./hooks/user"
 import useEntity from "./hooks/entity"
 import DevBanner from "./components/dev-banner"

@@ -1,5 +1,5 @@
-import { useAsyncList } from "common-v2/hooks/async-list"
-import { matches } from "common-v2/utils/collection"
+import { useAsyncList } from "common/hooks/async-list"
+import { matches } from "common/utils/collection"
 import React, { useEffect, useRef, useState } from "react"
 import {
   defaultNormalizer,
