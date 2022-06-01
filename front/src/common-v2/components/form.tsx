@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useState } from "react"
 import cl from "clsx"
-import { identity } from "common-v2/utils/normalizers"
+import { identity } from "../utils/normalizers"
 import css from "./form.module.css"
 
 export type FormVariant = "inline" | "columns"

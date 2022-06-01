@@ -1,11 +1,10 @@
 import React from "react"
 import { useTranslation } from "react-i18next"
 import cl from "clsx"
-import { Cross } from "common-v2/components/icons"
 import css from "./dialog.module.css"
 import Portal from "./portal"
 import Button, { ButtonVariant } from "./button"
-import { Check, Return } from "./icons"
+import { Cross, Check, Return } from "./icons"
 import { Overlay } from "./scaffold"
 
 export interface DialogProps {

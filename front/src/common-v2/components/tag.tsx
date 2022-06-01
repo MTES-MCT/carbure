@@ -7,7 +7,7 @@ import {
 } from "../utils/normalize"
 import { multipleSelection } from "../utils/selection"
 import Button from "./button"
-import { Cross } from "common-v2/components/icons"
+import { Cross } from "./icons"
 import css from "./tag.module.css"
 
 export type TagVariant = "info" | "success" | "warning" | "danger"

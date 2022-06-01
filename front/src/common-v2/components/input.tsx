@@ -1,17 +1,11 @@
 import React, { useEffect, useRef, useState } from "react"
+import { useTranslation } from "react-i18next"
 import cl from "clsx"
 import Button from "./button"
-import {
-  AlertTriangle,
-  Cross,
-  Loader,
-  Search,
-  Placeholder,
-} from "common-v2/components/icons"
+import { AlertTriangle, Cross, Loader, Search, Placeholder } from "./icons"
 import { Col, layout, Layout, Overlay } from "./scaffold"
 import { isInside } from "./dropdown"
 import css from "./input.module.css"
-import { useTranslation } from "react-i18next"
 
 export type FieldVariant = "outline" | "solid" | "inline" | "text"
 
