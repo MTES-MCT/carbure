@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom"
+import { Route, Routes, useLocation } from "react-router-dom"
 import { UserRole } from "carbure/types"
 import { Snapshot, Stock, StockQuery, Filter } from "../../types"
 import useEntity from "carbure/hooks/entity"
@@ -25,7 +25,6 @@ export interface StocksProps {
 const EMPTY: number[] = []
 
 export const Stocks = ({ year, snapshot }: StocksProps) => {
-  const navigate = useNavigate()
   const location = useLocation()
 
   const entity = useEntity()

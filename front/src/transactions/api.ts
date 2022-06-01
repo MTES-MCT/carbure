@@ -79,7 +79,7 @@ export function invalidateDeclaration(entity_id: number, period: number) {
 export function getLotFilters(field: Filter, query: LotQuery) {
   const params = { field, ...query, ...QUERY_RESET }
   return api
-    .get<Api<Option[]>>("/lots/filters", { params })
+    .get<Api<string[]>>("/lots/filters", { params })
     .then((res) => res.data.data ?? [])
 }
 

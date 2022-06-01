@@ -2,7 +2,6 @@ import { Navigate, Route, Routes } from "react-router-dom"
 import { LoaderOverlay } from "common/components/scaffold"
 import useLoadUser, { UserContext } from "./hooks/user"
 import useEntity from "./hooks/entity"
-import DevBanner from "./components/dev-banner"
 import Topbar from "./components/top-bar"
 import Footer from "./components/footer"
 import Pending from "./components/pending"
@@ -15,7 +14,7 @@ import Account from "account"
 import DoubleCounting from "doublecount"
 import Dashboard from "dashboard"
 import Controls from "controls"
-import Entities from "../entities" // not using  path prevents import
+import Entities from "companies"
 import Auth from "auth"
 
 const Carbure = () => {
