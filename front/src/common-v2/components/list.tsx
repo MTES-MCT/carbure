@@ -16,7 +16,7 @@ import {
 } from "../utils/normalize"
 import { SearchInput } from "./input"
 import css from "./list.module.css"
-import { matches } from "common-v2/utils/collection"
+import { matches } from "../utils/collection"
 
 export interface ListProps<T, V> {
   controlRef?: React.RefObject<HTMLElement>

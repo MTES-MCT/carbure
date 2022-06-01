@@ -24,7 +24,6 @@ import {
   normalizeCertificate,
   normalizeEntityCertificate,
 } from "common-v2/utils/normalizers"
-import { formatJSON } from "common-v2/utils/formatters"
 import { Certificate, EntityCertificate } from "common/types"
 import { isExpired } from "./common"
 import Alert from "common-v2/components/alert"

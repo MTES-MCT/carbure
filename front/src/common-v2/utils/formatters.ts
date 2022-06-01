@@ -47,6 +47,13 @@ export function formatDate(
   }
 }
 
+export function formatDateTime(date: Date | string | null) {
+  return formatDate(date, {
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+}
+
 export function formatElapsedTime(date: Date | string | null) {
   if (date === null) return ""
 
@@ -56,19 +63,8 @@ export function formatElapsedTime(date: Date | string | null) {
   })
 }
 
-export function formatDateTime(date: Date | string | null) {
-  return formatDate(date, {
-    hour: "2-digit",
-    minute: "2-digit",
-  })
-}
-
 export function formatDeadline(deadline: Date | string | null) {
   return formatDate(deadline, { month: "long", year: undefined })
-}
-
-export function formatJSON(json: any) {
-  return JSON.stringify(json).replaceAll(/["\{\}\[\]]/g, "")
 }
 
 // prepare string for comparison by putting it to lowercase and removing accents

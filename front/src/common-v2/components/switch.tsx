@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import Alert, { AlertProps } from "common-v2/components/alert"
-import { Button } from "common-v2/components/button"
+import Alert, { AlertProps } from "./alert"
+import { Button } from "./button"
 
 export interface SwitchProps extends AlertProps {
   dismissable?: boolean
