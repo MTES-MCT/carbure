@@ -55,4 +55,5 @@
   gap: var(--spacing-s);
   align-items: center;
   flex-wrap: wrap;
+  margin: var(--spacing-s);
 }

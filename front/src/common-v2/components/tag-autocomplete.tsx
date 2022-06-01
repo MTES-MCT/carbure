@@ -1,3 +1,5 @@
+import { useAsyncList } from "common-v2/hooks/async-list"
+import { matches } from "common-v2/utils/collection"
 import React, { useEffect, useRef, useState } from "react"
 import {
   defaultNormalizer,
@@ -12,9 +14,11 @@ import { Control, Field } from "./input"
 import List, { createQueryFilter, defaultRenderer, Renderer } from "./list"
 import { TagGroup } from "./tag"
 
-export interface TagAutocompleteProps<T, V> extends Control, Trigger {
+export interface TagAutocompleteProps<T, V = T> extends Control, Trigger {
   value: V[] | undefined
-  options: T[]
+  options?: T[]
+  defaultOptions?: T[]
+  getOptions?: (search: string) => Promise<T[]>
   onChange: (value: V[] | undefined) => void
   onQuery?: (query: string) => Promise<T[] | void> | T[] | void
   normalize?: Normalizer<T, V>
@@ -22,10 +26,12 @@ export interface TagAutocompleteProps<T, V> extends Control, Trigger {
   sort?: Sorter<T, V>
 }
 
-function TagAutocomplete<T, V>({
+function TagAutocomplete<T, V = T>({
   placeholder,
   value,
   options,
+  defaultOptions,
+  getOptions,
   onChange,
   onQuery,
   anchor,
@@ -38,6 +44,8 @@ function TagAutocomplete<T, V>({
   const autocomplete = useTagAutocomplete({
     value,
     options,
+    defaultOptions,
+    getOptions,
     onChange,
     onQuery,
     normalize,
@@ -48,6 +56,7 @@ function TagAutocomplete<T, V>({
       <Field {...props} domRef={triggerRef}>
         <TagGroup
           variant="info"
+          readOnly={props.disabled || props.readOnly}
           items={autocomplete.tags}
           onDismiss={onChange}
           normalize={normalize}
@@ -55,17 +64,18 @@ function TagAutocomplete<T, V>({
           <input
             readOnly={props.readOnly}
             disabled={props.disabled}
-            placeholder={placeholder}
+            placeholder={props.readOnly ? undefined : placeholder}
             value={autocomplete.query}
             onChange={(e) => autocomplete.onQuery(e.target.value)}
             onKeyDown={autocomplete.onKeyDown}
+            style={{ padding: 0 }}
           />
         </TagGroup>
       </Field>
 
       {!props.disabled && !props.readOnly && (
         <Dropdown
-          open={autocomplete.open && options.length > 0}
+          open={autocomplete.open && autocomplete.suggestions.length > 0}
           triggerRef={triggerRef}
           onOpen={() => autocomplete.onQuery(autocomplete.query)}
           onToggle={autocomplete.setOpen}
@@ -93,7 +103,9 @@ function TagAutocomplete<T, V>({
 
 interface AutocompleteConfig<T, V> {
   value: V[] | undefined
-  options: T[]
+  options?: T[]
+  defaultOptions?: T[]
+  getOptions?: (query: string) => Promise<T[]>
   onChange: (value: V[] | undefined) => void
   onQuery?: (query: string) => Promise<T[] | void> | T[] | void
   normalize?: Normalizer<T, V>
@@ -102,6 +114,8 @@ interface AutocompleteConfig<T, V> {
 export function useTagAutocomplete<T, V>({
   value = [],
   options,
+  defaultOptions,
+  getOptions,
   onChange,
   onQuery,
   normalize = defaultNormalizer,
@@ -109,8 +123,16 @@ export function useTagAutocomplete<T, V>({
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState("")
 
-  const [suggestions, setSuggestions] = useState(options)
-  useEffect(() => setSuggestions(options), [options])
+  const asyncOptions = useAsyncList({
+    selectedValues: value,
+    items: options,
+    defaultItems: defaultOptions,
+    findItems: getOptions,
+    normalize,
+  })
+
+  const [suggestions, setSuggestions] = useState(asyncOptions.items)
+  useEffect(() => setSuggestions(asyncOptions.items), [asyncOptions.items])
 
   function filterOptions(query: string): T[] {
     const options = suggestions
@@ -125,6 +147,11 @@ export function useTagAutocomplete<T, V>({
 
     const matches = filterOptions(query)
     setSuggestions(matches)
+
+    // if we fetch the options asyncly, start it now
+    if (getOptions) {
+      await asyncOptions.execute(query)
+    }
   }
 
   function onSelect(values: V[] | undefined) {
@@ -138,8 +165,9 @@ export function useTagAutocomplete<T, V>({
     }
   }
 
+  const allOptions = [...asyncOptions.items, ...(defaultOptions ?? [])]
   const tags = value
-    .map((v) => options.find((o) => normalize(o).value === v))
+    .map((v) => allOptions.find((o) => matches(v, normalize(o).value)))
     .filter(Boolean) as T[]
 
   return {
