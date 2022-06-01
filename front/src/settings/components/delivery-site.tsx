@@ -1,11 +1,5 @@
 import { Trans, useTranslation } from "react-i18next"
-import {
-  Country,
-  Depot,
-  DepotType,
-  EntityDepot,
-  OwnershipType,
-} from "common/types"
+import { Depot, DepotType, EntityDepot, OwnershipType } from "common/types"
 import { EntityType, UserRole } from "carbure/types"
 import * as common from "common-v2/api"
 import * as api from "../api/delivery-sites"
