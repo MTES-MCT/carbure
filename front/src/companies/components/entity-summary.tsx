@@ -17,7 +17,7 @@ import {
   getEntityTypeLabel,
   normalizeEntityType,
 } from "common/utils/normalizers"
-import { EntityDetails } from "entities/api"
+import { EntityDetails } from "companies/api"
 
 type EntitySummaryProps = {
   search?: string

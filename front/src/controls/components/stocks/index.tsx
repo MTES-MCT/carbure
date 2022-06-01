@@ -1,4 +1,4 @@
-import { Route, Routes, useNavigate, useLocation } from "react-router-dom"
+import { Route, Routes, useLocation } from "react-router-dom"
 import pickApi from "../../api"
 import { EntityManager } from "carbure/hooks/entity"
 import { useQuery } from "common/hooks/async"
@@ -20,7 +20,6 @@ export interface StocksProps {
 }
 
 export const Stocks = ({ entity, year }: StocksProps) => {
-  const navigate = useNavigate()
   const location = useLocation()
 
   const status = useStatus()

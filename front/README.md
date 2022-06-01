@@ -17,7 +17,6 @@
 - `clsx`: outil pour combiner des classes CSS
 - `i18next`: gestion des traductions
 - `date-fns`: gestion des dates
-- `js-cookie`: gestion des cookies
 
 ## Structure
 
@@ -27,11 +26,11 @@
   - `auth`: Authentification utilisateur
   - `carbure`: Point d'entrée de l'application
   - `common` + `common-v2`: Design system + outils pour structurer l'app
+  - `companies`: Liste des sociétés enregistrées (admin)
   - `control-details`: Détails d'un lot contrôlé (admin + auditeur)
   - `controls`: Liste des lots à contrôler (admin + auditeur)
   - `dashboard`: Informations générales sur les déclarations (admin)
   - `doublecount`: Gestion des dossiers double comptage (admin + admin externe)
-  - `entities`: Liste des sociétés enregistrées (admin)
   - `lot-add`: Formulaire de création de lot
   - `lot-details`: Détails d'un lot existant
   - `settings`: Configuration d'une société

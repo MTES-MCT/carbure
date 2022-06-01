@@ -7,7 +7,7 @@ import { Control, Input } from "./input"
 import List from "./list"
 import Checkbox from "./checkbox"
 
-export interface MultiSelectProps<T, V> extends Control, Trigger {
+export interface MultiSelectProps<T, V = T> extends Control, Trigger {
   clear?: boolean
   search?: boolean
   value?: V[] | undefined

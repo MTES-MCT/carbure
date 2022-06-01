@@ -98,8 +98,8 @@ export const normalizeDeliveryType: Normalizer<DeliveryType> = (delivery) => ({
   label: getDeliveryLabel(delivery),
 })
 
-export const normalizePeriod: Normalizer<number> = (period) => ({
-  value: period,
+export const normalizePeriod: Normalizer<string> = (period) => ({
+  value: String(period),
   label: formatPeriod(period),
 })
 

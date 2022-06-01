@@ -1,12 +1,6 @@
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
-import {
-  Route,
-  Routes,
-  useNavigate,
-  useLocation,
-  Navigate,
-} from "react-router-dom"
+import { Route, Routes, useLocation, Navigate } from "react-router-dom"
 import * as api from "../../api"
 import { Entity, UserRole } from "carbure/types"
 import {
@@ -46,7 +40,6 @@ export interface LotsProps {
 export const Lots = ({ year, snapshot }: LotsProps) => {
   const matomo = useMatomo()
   const location = useLocation()
-  const navigate = useNavigate()
 
   const entity = useEntity()
   const status = useAutoStatus()
