@@ -1,18 +1,5 @@
 import api from "common/services/api"
-import { Entity } from "carbure/types"
-import {
-  ProductionSite,
-  OwnershipType,
-  GESOption,
-  ProductionSiteDetails,
-} from "common/types"
-import {
-  DoubleCounting,
-  DoubleCountingDetails,
-  QuotaDetails,
-} from "doublecount/types"
-import { EntityRights } from "./types"
-import { EntityDeliverySite } from "./hooks/use-delivery-sites"
+import { ProductionSite, GESOption, ProductionSiteDetails } from "common/types"
 
 export function getProductionSites(
   entityID: number
@@ -119,37 +106,5 @@ export function setProductionSiteBC(
     entity_id: entity_id,
     production_site_id: productionSiteID,
     biocarburant_codes: biocarburants,
-  })
-}
-
-export function getDeliverySites(entity_id: number) {
-  return api.get<EntityDeliverySite[]>("/settings/get-delivery-sites", {
-    entity_id,
-  })
-}
-
-export function addDeliverySite(
-  entity_id: number,
-  delivery_site_id: string,
-  ownership_type: OwnershipType,
-  blending_outsourced: boolean,
-  blending_entity: Entity | null
-) {
-  return api.post("/settings/add-delivery-site", {
-    entity_id,
-    delivery_site_id,
-    ownership_type,
-    blending_outsourced,
-    blending_entity_id: blending_entity?.id ?? null,
-  })
-}
-
-export function deleteDeliverySite(
-  entity_id: number,
-  delivery_site_id: string
-) {
-  return api.post("/settings/delete-delivery-site", {
-    entity_id,
-    delivery_site_id,
   })
 }

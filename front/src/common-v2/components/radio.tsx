@@ -67,7 +67,7 @@ export const Radio = ({
 export interface RadioGroupProps<T, V> extends RadioControl {
   options: T[]
   value: V | undefined
-  onChange: (value: V | undefined) => void
+  onChange?: (value: V | undefined) => void
   normalize?: Normalizer<T, V>
 }
 

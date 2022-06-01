@@ -1,172 +1,162 @@
 import { Trans, useTranslation } from "react-i18next"
-
-import { Country, DepotType, OwnershipType } from "common/types"
-import { EntityType, UserRole } from "carbure/types"
 import {
-  DeliverySiteSettingsHook,
-  EntityDeliverySite,
-} from "../hooks/use-delivery-sites"
-
-import styles from "./settings.module.css"
-
-import * as common from "common/api"
-
-import { Box, LoaderOverlay } from "common/components"
-import { LabelInput, Label, LabelCheckbox } from "common/components/input"
+  Country,
+  Depot,
+  DepotType,
+  EntityDepot,
+  OwnershipType,
+} from "common/types"
+import { EntityType, UserRole } from "carbure/types"
+import * as common from "common-v2/api"
+import * as api from "../api/delivery-sites"
+import { Row, LoaderOverlay } from "common-v2/components/scaffold"
+import { TextInput } from "common-v2/components/input"
+import Checkbox from "common-v2/components/checkbox"
 import Button, { MailTo } from "common-v2/components/button"
 import { AlertCircle, Cross, Plus, Return } from "common-v2/components/icons"
-import { Alert } from "common/components/alert"
-import Table, {
-  Actions,
-  arrow,
-  Column,
-  Line,
-  Row,
-  padding,
-} from "common/components/table"
-import {
-  Dialog,
-  DialogButtons,
-  DialogText,
-  DialogTitle,
-  PromptProps,
-} from "common/components/dialog"
-import { LabelAutoComplete } from "common/components/autocomplete"
-import RadioGroup from "common/components/radio-group"
-import { SettingsForm } from "./common"
-import useForm from "common/hooks/use-form"
+import { Alert } from "common-v2/components/alert"
+import Table, { actionColumn, Cell } from "common-v2/components/table"
+import { Confirm, Dialog } from "common-v2/components/dialog"
+import AutoComplete from "common-v2/components/autocomplete"
+import { RadioGroup } from "common-v2/components/radio"
+import { Form, useForm } from "common-v2/components/form"
 import { Entity } from "carbure/types"
-import { useRights } from "carbure/hooks/entity"
+import useEntity, { useRights } from "carbure/hooks/entity"
 import { Panel } from "common-v2/components/scaffold"
+import { normalizeDepot, normalizeEntity } from "common-v2/utils/normalizers"
+import { compact } from "common-v2/utils/collection"
+import { useMutation, useQuery } from "common-v2/hooks/async"
+import { useNotify } from "common-v2/components/notifications"
+import { usePortal } from "common-v2/components/portal"
 
-type DeliverySiteFinderPromptProps = PromptProps<EntityDeliverySite> & {
+interface DeliverySiteSettingsProps {
+  readOnly?: boolean
   entity: Entity
+  getDepots?: typeof api.getDeliverySites
 }
 
-export const DeliverySiteFinderPrompt = ({
+const DeliverySitesSettings = ({
+  readOnly,
   entity,
-  onResolve,
-}: DeliverySiteFinderPromptProps) => {
+  getDepots = api.getDeliverySites,
+}: DeliverySiteSettingsProps) => {
   const { t } = useTranslation()
+  const rights = useRights()
+  const portal = usePortal()
 
-  const { data, hasChange, onChange } = useForm<EntityDeliverySite>({
-    depot: null,
-    ownership_type: OwnershipType.ThirdParty,
-    blending_is_outsourced: false,
-    blender: null,
+  const deliverySites = useQuery(getDepots, {
+    key: "delivery-sites",
+    params: [entity.id],
   })
 
-  const ownerShipTypes = [
-    { value: OwnershipType.Own, label: "Propre" },
-    { value: OwnershipType.ThirdParty, label: "Tiers" },
-    { value: OwnershipType.Processing, label: "Processing" },
-  ]
+  const deliverySitesData = deliverySites.result?.data.data ?? []
+  const isEmpty = deliverySitesData.length === 0
+
+  const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
+
+  const depotTypeLabels = {
+    [DepotType.EFS]: t("EFS"),
+    [DepotType.EFPE]: t("EFPE"),
+    [DepotType.Other]: t("Autre"),
+    [DepotType.BiofuelDepot]: t("Biofuel Depot"),
+    [DepotType.OilDepot]: t("Oil Depot"),
+  }
+
+  function findDeliverySite() {
+    portal((close) => <DeliverySiteFinderDialog onClose={close} />)
+  }
+
+  function showDeliverySite(deliverySite: EntityDepot) {
+    portal((close) => (
+      <DeliverySiteDialog deliverySite={deliverySite} onClose={close} />
+    ))
+  }
 
   return (
-    <Dialog onResolve={onResolve}>
-      <DialogTitle text={t("Ajouter dépôt")} />
-      <DialogText text={t("Veuillez rechercher un dépôt que vous utilisez.")} />
-
-      <SettingsForm>
-        <LabelAutoComplete
-          label={t("Dépôt")}
-          placeholder={t("Rechercher un dépôt...")}
-          name="depot"
-          value={data.depot}
-          getQuery={common.findDeliverySites}
-          onChange={onChange}
-          getValue={(d) => d.depot_id}
-          getLabel={(d) => d.name}
-          queryArgs={[entity?.id]}
-        />
-
-        <Label label="Propriété">
-          <RadioGroup
-            row
-            value={data.ownership_type}
-            name="ownership_type"
-            options={ownerShipTypes}
-            onChange={onChange}
-          />
-        </Label>
-
-        {entity && entity.entity_type === EntityType.Operator && (
-          <LabelCheckbox
-            name="blending_is_outsourced"
-            label={t("Incorporation potentiellement effectuée par un tiers")}
-            checked={data.blending_is_outsourced}
-            onChange={onChange}
-          />
-        )}
-        {data.blending_is_outsourced && (
-          <LabelAutoComplete
-            label={t("Incorporateur Tiers")}
-            placeholder={t("Rechercher un opérateur pétrolier...")}
-            name="blender"
-            value={data.blender}
-            getQuery={common.findOperators}
-            onChange={onChange}
-            getValue={(c) => c.id.toString()}
-            getLabel={(c) => c.name}
-          />
-        )}
-
-        <MailTo
-          user="carbure"
-          host="beta.gouv.fr"
-          className={styles.settingsLink}
-        >
-          <Trans>
-            Le dépôt que je recherche n'est pas enregistré sur CarbuRe.
-          </Trans>
-        </MailTo>
-
-        <DialogButtons>
+    <Panel id="depot">
+      <header>
+        <h1>
+          <Trans>Dépôts</Trans>
+        </h1>
+        {!readOnly && canModify && (
           <Button
+            asideX
             variant="primary"
             icon={Plus}
-            disabled={!hasChange}
-            action={() => onResolve(data)}
-          >
-            <Trans>Ajouter</Trans>
-          </Button>
-          <Button action={() => onResolve()}>
-            <Trans>Annuler</Trans>
-          </Button>
-        </DialogButtons>
-      </SettingsForm>
-    </Dialog>
+            label={t("Ajouter un dépôt")}
+            action={findDeliverySite}
+          />
+        )}
+      </header>
+
+      {isEmpty && (
+        <>
+          <section>
+            <Alert icon={AlertCircle} variant="warning">
+              <Trans>Aucun dépôt trouvé</Trans>
+            </Alert>
+          </section>
+          <footer />
+        </>
+      )}
+
+      {!isEmpty && (
+        <Table
+          rows={deliverySitesData}
+          onAction={showDeliverySite}
+          columns={[
+            {
+              header: t("ID"),
+              cell: (ds) => <Cell text={ds.depot!.depot_id} />,
+            },
+            {
+              header: t("Nom"),
+              cell: (ds) => <Cell text={ds.depot!.name} />,
+            },
+            {
+              header: t("Type"),
+              cell: (ds) => (
+                <Cell text={depotTypeLabels[ds.depot!.depot_type]} />
+              ),
+            },
+            {
+              header: t("Ville"),
+              cell: (ds) => (
+                <Cell
+                  text={`${ds.depot!.city}, ${t(ds.depot!.country.code_pays, {
+                    ns: "countries",
+                  })}`}
+                />
+              ),
+            },
+            actionColumn<EntityDepot>((ds) =>
+              compact([
+                !readOnly && canModify && (
+                  <DeleteDeliverySiteButton deliverySite={ds} />
+                ),
+              ])
+            ),
+          ]}
+        />
+      )}
+
+      {deliverySites.loading && <LoaderOverlay />}
+    </Panel>
   )
 }
 
-type DeliverySiteState = {
-  name: string
-  city: string
-  country: Country | null
-  depot_id: string
-  depot_type: DepotType
-  address: string
-  postal_code: string
-  ownership_type: OwnershipType
-  blending_is_outsourced: boolean
-  blender: string
+type DeliverySiteDialogProps = {
+  deliverySite: EntityDepot
+  onClose: () => void
 }
 
-type DeliverySitePromptProps = PromptProps<EntityDeliverySite> & {
-  title: string
-  description?: string
-  deliverySite?: EntityDeliverySite
-}
-
-export const DeliverySitePrompt = ({
-  title,
-  description,
+export const DeliverySiteDialog = ({
   deliverySite,
-  onResolve,
-}: DeliverySitePromptProps) => {
+  onClose,
+}: DeliverySiteDialogProps) => {
   const { t } = useTranslation()
 
-  const form: DeliverySiteState = {
+  const form = {
     name: deliverySite?.depot?.name ?? "",
     city: deliverySite?.depot?.city ?? "",
     country: deliverySite?.depot?.country ?? null,
@@ -194,210 +184,278 @@ export const DeliverySitePrompt = ({
   ]
 
   return (
-    <Dialog onResolve={onResolve}>
-      <DialogTitle text={title} />
-      {description && <DialogText text={description} />}
+    <Dialog onClose={onClose}>
+      <header>
+        <h1>{t("Détails du dépôt")}</h1>
+      </header>
 
-      <SettingsForm>
+      <main>
+        <section>
+          <Form>
+            <RadioGroup
+              disabled
+              label={t("Propriété")}
+              value={form.ownership_type}
+              name="ownership_type"
+              options={ownerShipTypes}
+            />
+
+            <hr />
+
+            <Checkbox
+              disabled
+              label={t("L'incorporation est effectuée par un tiers")}
+              name="blending_is_outsourced"
+              value={form.blending_is_outsourced}
+            />
+            {form.blending_is_outsourced && (
+              <TextInput
+                readOnly
+                label={t("Incorporateur")}
+                name="blender"
+                value={form.blender}
+              />
+            )}
+
+            <hr />
+
+            <TextInput
+              readOnly
+              label={t("Nom du site")}
+              name="name"
+              value={form.name}
+            />
+            <TextInput
+              readOnly
+              label={t("ID de douane")}
+              name="depot_id"
+              value={form.depot_id}
+            />
+
+            <hr />
+
+            <RadioGroup
+              disabled
+              label={t("Type de dépôt")}
+              value={form.depot_type}
+              name="depot_type"
+              options={depotTypes}
+            />
+
+            <hr />
+
+            <TextInput
+              readOnly
+              label={t("Adresse")}
+              name="address"
+              value={form.address}
+            />
+
+            <Row style={{ gap: "var(--spacing-s)" }}>
+              <TextInput
+                readOnly
+                label={t("Ville")}
+                name="city"
+                value={form.city}
+              />
+              <TextInput
+                readOnly
+                label={t("Code postal")}
+                name="postal_code"
+                value={form.postal_code}
+              />
+            </Row>
+
+            <TextInput
+              readOnly
+              label={t("Pays")}
+              placeholder={t("Rechercher un pays...")}
+              name="country"
+              value={
+                form.country
+                  ? (t(form.country.code_pays, { ns: "countries" }) as string)
+                  : ""
+              }
+            />
+          </Form>
+        </section>
+
         <hr />
+      </main>
 
-        <Label label={t("Propriété")}>
-          <RadioGroup
-            row
-            readOnly
-            value={form.ownership_type}
-            name="ownership_type"
-            options={ownerShipTypes}
-          />
-        </Label>
-
-        <hr />
-
-        <Label label={t("Incorporation tierce")}>
-          <LabelCheckbox
-            disabled
-            label={t("L'incorporation est effectuée par un tiers")}
-            name="blending_is_outsourced"
-            defaultChecked={form.blending_is_outsourced}
-          />
-          <LabelInput
-            readOnly
-            label={t("Incorporateur")}
-            name="blender"
-            value={form.blender}
-          />
-        </Label>
-        <hr />
-
-        <LabelInput
-          readOnly
-          label={t("Nom du site")}
-          name="name"
-          value={form.name}
-        />
-        <LabelInput
-          readOnly
-          label={t("ID de douane")}
-          name="depot_id"
-          value={form.depot_id}
-        />
-
-        <hr />
-
-        <Label label={t("Type de dépôt")}>
-          <RadioGroup
-            row
-            readOnly
-            value={form.depot_type}
-            name="depot_type"
-            options={depotTypes}
-          />
-        </Label>
-
-        <hr />
-
-        <LabelInput
-          readOnly
-          label={t("Adresse")}
-          name="address"
-          value={form.address}
-        />
-
-        <Box row>
-          <LabelInput
-            readOnly
-            label={t("Ville")}
-            name="city"
-            value={form.city}
-          />
-          <LabelInput
-            readOnly
-            label={t("Code postal")}
-            name="postal_code"
-            value={form.postal_code}
-          />
-        </Box>
-
-        <LabelInput
-          readOnly
-          label={t("Pays")}
-          placeholder={t("Rechercher un pays...")}
-          name="country"
-          value={
-            form.country
-              ? (t(form.country.code_pays, { ns: "countries" }) as string)
-              : ""
-          }
-        />
-
-        <hr />
-
-        <DialogButtons>
-          <Button icon={Return} action={() => onResolve()}>
-            <Trans>Retour</Trans>
-          </Button>
-        </DialogButtons>
-      </SettingsForm>
+      <footer>
+        <Button asideX icon={Return} action={onClose}>
+          <Trans>Retour</Trans>
+        </Button>
+      </footer>
     </Dialog>
   )
 }
 
-type DeliverySitesSettingsProps = {
-  settings: DeliverySiteSettingsHook
+type DeliverySiteFinderDialogProps = {
+  onClose: () => void
 }
 
-const DeliverySitesSettings = ({ settings }: DeliverySitesSettingsProps) => {
+export const DeliverySiteFinderDialog = ({
+  onClose,
+}: DeliverySiteFinderDialogProps) => {
   const { t } = useTranslation()
-  const rights = useRights()
+  const entity = useEntity()
+  const notify = useNotify()
 
-  const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
+  const addDeliverySite = useMutation(api.addDeliverySite, {
+    invalidates: ["delivery-sites"],
 
-  const depotTypeLabels = {
-    [DepotType.EFS]: t("EFS"),
-    [DepotType.EFPE]: t("EFPE"),
-    [DepotType.Other]: t("Autre"),
-    [DepotType.BiofuelDepot]: t("Biofuel Depot"),
-    [DepotType.OilDepot]: t("Oil Depot"),
-  }
+    onSuccess: () => {
+      notify(t("Le dépôt a bien été ajouté !"), { variant: "success" })
+    },
 
-  const actions =
-    canModify && settings.deleteDeliverySite
-      ? Actions([
-          {
-            icon: Cross,
-            title: t("Supprimer le dépôt"),
-            action: (ds: EntityDeliverySite) =>
-              settings.deleteDeliverySite!(ds),
-          },
-        ])
-      : arrow
+    onError: () => {
+      notify(t("Impossible d'ajouter le dépôt."), { variant: "danger" })
+    },
+  })
 
-  const columns: Column<EntityDeliverySite>[] = [
-    padding,
-    {
-      header: t("ID"),
-      render: (ds) => <Line text={ds.depot!.depot_id} />,
-    },
-    {
-      header: t("Nom"),
-      className: styles.settingsTableColumn,
-      render: (ds) => <Line text={ds.depot!.name} />,
-    },
-    {
-      header: t("Type"),
-      render: (ds) => <Line text={depotTypeLabels[ds.depot!.depot_type]} />,
-    },
-    {
-      header: t("Ville"),
-      className: styles.settingsTableColumn,
-      render: (ds) => (
-        <Line
-          text={`${ds.depot!.city}, ${t(ds.depot!.country.code_pays, {
-            ns: "countries",
-          })}`}
-        />
-      ),
-    },
-    actions,
+  const { value, bind } = useForm({
+    depot: undefined as Depot | undefined,
+    ownership_type: OwnershipType.ThirdParty as OwnershipType | undefined,
+    blending_is_outsourced: false,
+    blender: undefined as Entity | undefined,
+  })
+
+  const ownerShipTypes = [
+    { value: OwnershipType.Own, label: "Propre" },
+    { value: OwnershipType.ThirdParty, label: "Tiers" },
+    { value: OwnershipType.Processing, label: "Processing" },
   ]
 
-  const rows: Row<EntityDeliverySite>[] = settings.deliverySites.map((ds) => ({
-    value: ds,
-    onClick: () => settings.showDeliverySite(ds),
-  }))
+  async function submitDepot() {
+    if (!value.depot) return
+
+    await addDeliverySite.execute(
+      entity.id,
+      value.depot.depot_id,
+      value.ownership_type!,
+      value.blending_is_outsourced,
+      value.blender
+    )
+  }
 
   return (
-    <Panel id="depot">
+    <Dialog onClose={onClose}>
       <header>
-        <h1>
-          <Trans>Dépôts</Trans>
-        </h1>
-        {canModify && settings.addDeliverySite && (
-          <Button
-            asideX
-            variant="primary"
-            icon={Plus}
-            action={settings.addDeliverySite}
-          >
-            <Trans>Ajouter un dépôt</Trans>
-          </Button>
-        )}
+        <h1>{t("Ajouter dépôt")}</h1>
       </header>
 
-      {settings.isEmpty && (
-        <section style={{ marginBottom: "var(--spacing-l)" }}>
-          <Alert icon={AlertCircle} level="warning">
-            <Trans>Aucun dépôt trouvé</Trans>
-          </Alert>
+      <main>
+        <section>
+          <p>{t("Veuillez rechercher un dépôt que vous utilisez.")}</p>
         </section>
-      )}
 
-      {!settings.isEmpty && (
-        <Table columns={columns} rows={rows} className={styles.settingsTable} />
-      )}
+        <section>
+          <Form id="add-depot" onSubmit={submitDepot}>
+            <AutoComplete
+              label={t("Dépôt à ajouter")}
+              placeholder={t("Rechercher un dépôt...")}
+              getOptions={(search) => common.findDepots(search, entity.id)}
+              normalize={normalizeDepot}
+              {...bind("depot")}
+            />
 
-      {settings.isLoading && <LoaderOverlay />}
-    </Panel>
+            <RadioGroup
+              label={t("Propriété")}
+              options={ownerShipTypes}
+              {...bind("ownership_type")}
+            />
+
+            {entity && entity.entity_type === EntityType.Operator && (
+              <Checkbox
+                label={t("Incorporation potentiellement effectuée par un tiers")} // prettier-ignore
+                {...bind("blending_is_outsourced")}
+              />
+            )}
+            {value.blending_is_outsourced && (
+              <AutoComplete
+                label={t("Incorporateur Tiers")}
+                placeholder={t("Rechercher un opérateur pétrolier...")}
+                getOptions={common.findOperators}
+                normalize={normalizeEntity}
+                {...bind("blender")}
+              />
+            )}
+
+            <MailTo user="carbure" host="beta.gouv.fr">
+              <Trans>
+                Le dépôt que je recherche n'est pas enregistré sur CarbuRe.
+              </Trans>
+            </MailTo>
+          </Form>
+        </section>
+      </main>
+
+      <footer>
+        <Button
+          asideX
+          variant="primary"
+          submit="add-depot"
+          icon={Plus}
+          label={t("Ajouter")}
+        />
+        <Button action={onClose} label={t("Annuler")} />
+      </footer>
+    </Dialog>
+  )
+}
+
+const DeleteDeliverySiteButton = ({
+  deliverySite,
+}: {
+  deliverySite: EntityDepot
+}) => {
+  const { t } = useTranslation()
+  const notify = useNotify()
+  const portal = usePortal()
+
+  const entity = useEntity()
+
+  const deleteDeliverySite = useMutation(api.deleteDeliverySite, {
+    invalidates: ["delivery-sites"],
+
+    onSuccess: () => {
+      notify(t("Le dépôt a bien été supprimé !"), { variant: "success" })
+    },
+
+    onError: () => {
+      notify(t("Impossible de supprimer le dépôt."), { variant: "danger" })
+    },
+  })
+
+  return (
+    <Button
+      captive
+      variant="icon"
+      icon={Cross}
+      title={t("Supprimer le dépôt")}
+      action={() =>
+        portal((close) => (
+          <Confirm
+            title={t("Supprimer dépôt")}
+            description={t("Voulez-vous supprimer le dépôt {{depot}} de votre liste ?", { depot: deliverySite.depot!.name })} // prettier-ignore
+            confirm={t("Supprimer")}
+            icon={Cross}
+            variant="danger"
+            onClose={close}
+            onConfirm={async () => {
+              if (deliverySite.depot) {
+                await deleteDeliverySite.execute(
+                  entity.id,
+                  deliverySite.depot.depot_id
+                )
+              }
+            }}
+          />
+        ))
+      }
+    />
   )
 }
 

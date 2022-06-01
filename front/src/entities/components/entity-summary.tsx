@@ -27,7 +27,6 @@ type Operation = "user" | "certificate" | "double-counting"
 
 export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
   const { t } = useTranslation()
-  const navigate = useNavigate()
 
   const entities = useQuery(api.getEntities, {
     key: "entities",
