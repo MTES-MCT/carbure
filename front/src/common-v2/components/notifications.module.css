@@ -1,4 +1,4 @@
-:global(#notifications) {
+:global(#notifications-v2) {
   display: flex;
   flex-direction: column-reverse;
   position: fixed;
@@ -6,7 +6,7 @@
   left: 0;
   margin: 0;
   padding: var(--spacing-s);
-  z-index: 2;
+  z-index: 3;
   gap: var(--spacing-s);
 }
 

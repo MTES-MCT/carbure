@@ -78,7 +78,7 @@ export const normalizeCertificate: Normalizer<Certificate> = (certificate) => ({
 })
 
 // prettier-ignore
-export const normalizeEntityCertificate: Normalizer<EntityCertificate,string> = (ec) => ({
+export const normalizeEntityCertificate: Normalizer<EntityCertificate, string> = (ec) => ({
   value: ec.certificate.certificate_id,
   label: `${ec.certificate.certificate_id} - ${ec.certificate.certificate_holder}`,
 })

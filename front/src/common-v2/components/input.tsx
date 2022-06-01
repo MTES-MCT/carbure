@@ -6,6 +6,7 @@ import { AlertTriangle, Cross, Loader, Search, Placeholder } from "./icons"
 import { Col, layout, Layout, Overlay } from "./scaffold"
 import { isInside } from "./dropdown"
 import css from "./input.module.css"
+import i18next from "i18next"
 
 export type FieldVariant = "outline" | "solid" | "inline" | "text"
 
@@ -106,7 +107,7 @@ export interface FileInputProps extends Control {
 
 export const FileInput = ({
   clear,
-  placeholder = "Select a file",
+  placeholder = i18next.t("Select a file"),
   value,
   onChange,
   ...props

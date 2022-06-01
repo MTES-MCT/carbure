@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next"
 import { DoubleCountingStatus as DCStatus } from "../types"
-import Badge, { Variant } from "common/components/badge"
+import Tag, { TagVariant } from "common-v2/components/tag"
 
-const statusToVariant: Record<DCStatus, Variant> = {
+const statusToVariant: Record<DCStatus, TagVariant> = {
   [DCStatus.Accepted]: "success",
   [DCStatus.InProgress]: "warning",
   [DCStatus.Pending]: "info",
@@ -10,7 +10,13 @@ const statusToVariant: Record<DCStatus, Variant> = {
   [DCStatus.Lapsed]: "warning",
 }
 
-const DoubleCountingStatus = ({ status }: { status: DCStatus }) => {
+const DoubleCountingStatus = ({
+  big,
+  status,
+}: {
+  big?: boolean
+  status: DCStatus
+}) => {
   const { t } = useTranslation()
 
   const statusLabels = {
@@ -22,9 +28,9 @@ const DoubleCountingStatus = ({ status }: { status: DCStatus }) => {
   }
 
   return (
-    <Badge style={{ marginRight: 12 }} variant={statusToVariant[status]}>
+    <Tag big={big} variant={statusToVariant[status]}>
       {statusLabels[status]}
-    </Badge>
+    </Tag>
   )
 }
 

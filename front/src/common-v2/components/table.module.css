@@ -5,6 +5,10 @@
   flex-direction: column;
 }
 
+h2 + .table[data-headless] {
+  margin-top: calc(-1 * var(--spacing-s));
+}
+
 .table.compact {
   padding-bottom: var(--spacing-xs);
 }
