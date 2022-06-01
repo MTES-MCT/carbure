@@ -1,5 +1,5 @@
 import cl from "clsx"
-import { Loader } from "common-v2/components/icons"
+import { Loader, Upload } from "common-v2/components/icons"
 import css from "./button.module.css"
 import { Layout, layout } from "./scaffold"
 import { Link } from "react-router-dom"
@@ -174,6 +174,24 @@ export const MailTo = ({
     {...props}
   >
     {children}
+  </a>
+)
+
+export const DownloadLink = ({
+  href: url,
+  label,
+}: {
+  href: string
+  label: string
+}) => (
+  <a
+    href={url ?? "#"}
+    className={css.downloadLink}
+    target="_blank"
+    rel="noreferrer"
+  >
+    <Upload />
+    {label}
   </a>
 )
 

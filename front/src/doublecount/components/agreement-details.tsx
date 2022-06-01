@@ -4,11 +4,10 @@ import { EntityType } from "carbure/types"
 import { Admin, DoubleCountingStatus as DCStatus } from "../types"
 import { Col, LoaderOverlay } from "common-v2/components/scaffold"
 import Tabs from "common-v2/components/tabs"
-import { Button } from "common-v2/components/button"
+import { Button, DownloadLink } from "common-v2/components/button"
 import * as api from "../api"
 import { Confirm, Dialog } from "common-v2/components/dialog"
 import { Entity } from "carbure/types"
-import styles from "settings/components/settings.module.css"
 import {
   Return,
   Upload,
@@ -18,7 +17,6 @@ import {
   Save,
   AlertCircle,
 } from "common-v2/components/icons"
-import { formatDate } from "settings/components/common"
 import { Alert } from "common-v2/components/alert"
 import { useNotify } from "common-v2/components/notifications"
 import DoubleCountingStatus from "./dc-status"
@@ -31,6 +29,7 @@ import {
 import { FileInput } from "common-v2/components/input"
 import { useMutation, useQuery } from "common-v2/hooks/async"
 import { usePortal } from "common-v2/components/portal"
+import { formatDate } from "common-v2/utils/formatters"
 
 export type DoubleCountingDialogProps = {
   agreementID: number
@@ -263,35 +262,20 @@ export const DoubleCountingDialog = ({
       </main>
 
       <footer>
-        <Col style={{ marginRight: "auto" }}>
-          <a
+        <Col style={{ gap: "var(--spacing-xs)", marginRight: "auto" }}>
+          <DownloadLink
             href={excelURL ?? "#"}
-            target="_blank"
-            rel="noreferrer"
-            className={styles.settingsBottomLink}
-          >
-            <Upload />
-            <Trans>Télécharger le dossier au format excel</Trans>
-          </a>
-          <a
+            label={t("Télécharger le dossier au format excel")}
+          />
+          <DownloadLink
             href={documentationURL ?? "#"}
-            target="_blank"
-            rel="noreferrer"
-            className={styles.settingsBottomLink}
-          >
-            <Upload />
-            <Trans>Télécharger la description de l'activité</Trans>
-          </a>
-          {decisionFile && (
-            <a
+            label={t("Télécharger la description de l'activité")}
+          />
+          {decisionURL && (
+            <DownloadLink
               href={decisionURL ?? "#"}
-              target="_blank"
-              rel="noreferrer"
-              className={styles.settingsBottomLink}
-            >
-              <Upload />
-              <Trans>Télécharger la décision de l'administration</Trans>
-            </a>
+              label={t("Téléchargerla décision de l'administration")}
+            />
           )}
         </Col>
 
@@ -305,7 +289,7 @@ export const DoubleCountingDialog = ({
           />
         )}
 
-        {!isDone && (
+        {!isDone && !agreement.loading && (
           <Fragment>
             {isAdmin && (
               <Button

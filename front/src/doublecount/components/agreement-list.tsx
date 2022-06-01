@@ -6,13 +6,13 @@ import Tabs from "common-v2/components/tabs"
 import Table, { Column, Cell } from "common-v2/components/table"
 import { Alert } from "common-v2/components/alert"
 import { AlertCircle } from "common-v2/components/icons"
-import { formatDate, YEAR_ONLY } from "settings/components/common"
 import { DoubleCountingDialog } from "./agreement-details"
 import { usePortal } from "common-v2/components/portal"
 import { Entity } from "carbure/types"
 import DoubleCountingStatus from "./dc-status"
 import * as api from "../api"
 import { useQuery } from "common-v2/hooks/async"
+import { formatDate, formatDateYear } from "common-v2/utils/formatters"
 
 type AgreementListProps = {
   entity: Entity
@@ -43,10 +43,7 @@ const AgreementList = ({ entity, year }: AgreementListProps) => {
       header: t("Période de validité"),
       cell: (a) => (
         <Cell
-          text={`${formatDate(a.period_start, YEAR_ONLY)} - ${formatDate(
-            a.period_end,
-            YEAR_ONLY
-          )}`}
+          text={`${formatDateYear(a.period_start)} - ${formatDateYear(a.period_end)}`} // prettier-ignore
         />
       ),
     },

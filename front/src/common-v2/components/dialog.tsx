@@ -80,7 +80,7 @@ export const Confirm = ({
           loading={confirmAction.loading}
           action={() => confirmAction.execute().then(onClose)}
         />
-        <Button icon={Return} label={t("Retour")} action={onClose} />
+        <Button icon={Return} label={t("Annuler")} action={onClose} />
       </footer>
     </Dialog>
   )
