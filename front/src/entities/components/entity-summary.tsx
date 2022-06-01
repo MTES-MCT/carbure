@@ -204,9 +204,11 @@ const EntityInfoCell = ({ data }: { data: EntityInfo[] }) => (
   <ul className={css.tableList}>
     {data.every((i) => !i.count) && "-"}
     {data.map(
-      ({ count, label, highlight }) =>
+      ({ count, label, highlight }, i) =>
         count > 0 && (
-          <li className={cl(highlight && css.requestHighlight)}>{label}</li>
+          <li key={i} className={cl(highlight && css.requestHighlight)}>
+            {label}
+          </li>
         )
     )}
   </ul>
