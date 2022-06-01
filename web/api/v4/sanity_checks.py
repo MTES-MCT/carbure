@@ -82,7 +82,13 @@ def bulk_sanity_checks(lots, prefetched_data, background=True):
         except:
             traceback.print_exc()
     GenericError.objects.bulk_create(errors, batch_size=1000)
+    bulk_scoring(lots)
     return results
+
+def bulk_scoring(lots):
+    for l in lots:
+        l.recalc_reliability_score()
+        l.save()
 
 def check_ghg_values(prefetched_data, lot, errors):
     etd = prefetched_data['etd']

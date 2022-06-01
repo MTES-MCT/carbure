@@ -129,7 +129,7 @@ const ScoreDialog = ({ lot, details, onClose }: ScoreDialogProps) => {
                           {scoreSubItems[meta as keyof typeof scoreSubItems]}
                         </span>
                         <span className={css.separator} />
-                        <Checkbox value={checked} />
+                        <Checkbox readOnly value={checked} />
                       </li>
                     ))}
                   </ul>

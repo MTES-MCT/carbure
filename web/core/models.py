@@ -620,13 +620,10 @@ class CarbureLot(models.Model):
         producer_certificate_exists = False
         supplier_certificate_provided = False
         supplier_certificate_exists = False
-        if self.carbure_producer:
-            if EntityCertificate.objects.filter(entity=self.carbure_producer, certificate__certificate_id=self.production_site_certificate, checked_by_admin=True).count() > 0:
+        if self.production_site_certificate:
                 producer_certificate_provided = True
-        if self.carbure_supplier:
-            if EntityCertificate.objects.filter(entity=self.carbure_supplier, certificate__certificate_id=self.supplier_certificate, checked_by_admin=True).count() > 0:
+        if self.supplier_certificate:
                 supplier_certificate_provided = True
-
         if GenericCertificate.objects.filter(certificate_id=self.production_site_certificate).count() > 0:
             producer_certificate_exists = True
         if GenericCertificate.objects.filter(certificate_id=self.supplier_certificate).count() > 0:
