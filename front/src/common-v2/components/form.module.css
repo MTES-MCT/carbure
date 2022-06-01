@@ -16,6 +16,7 @@
   gap: 0;
 }
 
+.form [data-field],
 .inline [data-field] {
   flex: 1;
 }
@@ -41,8 +42,4 @@
   padding: 0;
   margin-left: var(--spacing-xs);
   margin-bottom: var(--spacing-s);
-}
-
-.fieldset input {
-  /* width: 0; */
 }

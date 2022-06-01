@@ -46,6 +46,7 @@ export const Tag = ({
 )
 
 export interface TagGroupProps<T, V> {
+  readOnly?: boolean
   children?: React.ReactNode
   variant?: TagVariant
   items: T[] | undefined
@@ -54,6 +55,7 @@ export interface TagGroupProps<T, V> {
 }
 
 export function TagGroup<T, V>({
+  readOnly,
   children,
   variant,
   items,
@@ -68,10 +70,12 @@ export function TagGroup<T, V>({
     <div className={css.group}>
       {normItems.map((item) => (
         <Tag
-          key={String(item.value)}
+          key={String(item.label)}
           variant={variant}
           label={item.label}
-          onDismiss={onDismiss ? () => onSelect(item.value) : undefined}
+          onDismiss={
+            !readOnly && onDismiss ? () => onSelect(item.value) : undefined
+          }
         />
       ))}
       {children}
