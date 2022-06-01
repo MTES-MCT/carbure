@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react"
+import { Fragment, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import styles from "./settings.module.css"
 import { Entity, UserRole } from "carbure/types"
@@ -11,16 +11,9 @@ import {
   DoubleCountingProduction,
   QuotaDetails,
 } from "doublecount/types"
-import { LoaderOverlay, Box } from "common/components"
+import { Col, LoaderOverlay } from "common-v2/components/scaffold"
 import { useRights } from "carbure/hooks/entity"
-import Table, {
-  Line,
-  TwoLines,
-  Actions,
-  Column,
-  Row,
-} from "common/components/table"
-import tableCSS from "common/components/table.module.css"
+import Table, { Cell, actionColumn, Column } from "common-v2/components/table"
 import Button, { MailTo } from "common-v2/components/button"
 import {
   AlertCircle,
@@ -31,736 +24,188 @@ import {
   Save,
   Upload,
 } from "common-v2/components/icons"
-import { Alert } from "common/components/alert"
-import {
-  confirm,
-  Dialog,
-  DialogButtons,
-  DialogText,
-  DialogTitle,
-  prompt,
-  PromptProps,
-} from "common/components/dialog"
+import { Alert } from "common-v2/components/alert"
+import Dialog, { Confirm } from "common-v2/components/dialog"
 import { formatDate, YEAR_ONLY } from "./common"
 import {
-  findBiocarburants,
+  findBiofuels,
   findCountries,
-  findMatieresPremieres,
+  findFeedstocks,
   findProductionSites,
-} from "common/api"
-import { LabelAutoComplete } from "common/components/autocomplete"
-import * as api from "../api"
-import useAPI from "common/hooks/use-api"
-import { padding } from "common/components/table"
-import Tabs from "common/components/tabs"
-import { Form } from "common/components/form"
-import { LabelInput } from "common/components/input"
-import useForm from "common/hooks/use-form"
+} from "common-v2/api"
+import AutoComplete from "common-v2/components/autocomplete"
+import * as api from "../api/double-counting"
+import { useMutation, useQuery } from "common-v2/hooks/async"
+import Tabs from "common-v2/components/tabs"
+import { Form } from "common-v2/components/form"
+import { NumberInput } from "common-v2/components/input"
+import { useForm } from "common-v2/components/form"
 import YearTable from "doublecount/components/year-table"
 import DoubleCountingStatus from "doublecount/components/dc-status"
 import { SourcingAggregationTable } from "doublecount/components/dc-tables"
 import { formatNumber } from "common-v2/utils/formatters"
 import { Panel } from "common-v2/components/scaffold"
 import { FileInput } from "common-v2/components/input"
+import {
+  normalizeBiofuel,
+  normalizeCountry,
+  normalizeFeedstock,
+} from "common-v2/utils/normalizers"
+import { usePortal } from "common-v2/components/portal"
+import { compact } from "common-v2/utils/collection"
 
-type DoubleCountingUploadPromptProps = PromptProps<void> & {
-  entity: Entity
-}
-
-const DoubleCountingUploadPrompt = ({
-  entity,
-  onResolve,
-}: DoubleCountingUploadPromptProps) => {
+const DoubleCountingSettings = () => {
   const { t } = useTranslation()
+  const rights = useRights()
+  const entity = useEntity()
+  const portal = usePortal()
 
-  const [productionSite, setProductionSite] = useState<ProductionSite | null>(null) // prettier-ignore
-  const [doubleCountingFile, setDoubleCountingFile] = useState<File | undefined>(undefined) // prettier-ignore
-  const [documentationFile, setDocumentationFile] = useState<File | undefined>(undefined) // prettier-ignore
+  const agreements = useQuery(api.getDoubleCountingAgreements, {
+    key: "dc-agreements",
+    params: [entity.id],
+  })
 
-  const [uploading, uploadFile] = useAPI(api.uploadDoubleCountingFile)
-  const [uploadingDoc, uploadDocFile] = useAPI(
-    api.uploadDoubleCountingDescriptionFile
-  )
+  const agreementsData = agreements.result?.data.data ?? []
+  const isEmpty = agreementsData.length === 0
+  const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
 
-  const disabled = !productionSite || !doubleCountingFile || !documentationFile
-
-  async function submitAgreement() {
-    if (!entity || !productionSite || !doubleCountingFile || !documentationFile)
-      return
-
-    const res = await uploadFile(
-      entity.id,
-      productionSite.id,
-      doubleCountingFile
-    )
-    res && (await uploadDocFile(entity.id, res.dca_id, documentationFile))
-
-    onResolve()
-  }
-
-  return (
-    <Dialog onResolve={onResolve} className={styles.settingsPrompt}>
-      <DialogTitle text={t("Création dossier double comptage")} />
-
-      <Form>
-        <div className={styles.settingsText}>
-          <Trans>
-            Dans un premier temps, renseignez le site de production concerné par
-            votre demande.
-          </Trans>
-        </div>
-
-        <LabelAutoComplete
-          label={t("Site de production")}
-          placeholder={t("Rechercher un site de production")}
-          className={styles.settingsField}
-          value={productionSite}
-          onChange={(e: any) => setProductionSite(e.target.value)}
-          getQuery={findProductionSites}
-          getValue={(ps: any) => ps.id}
-          getLabel={(ps: any) => ps.name}
-          queryArgs={[entity?.id]}
-          minLength={0}
-        />
-
-        <div className={styles.settingsText}>
-          <a
-            href="/api/v3/doublecount/get-template"
-            className={styles.settingsLink}
-          >
-            <Trans>Téléchargez le modèle depuis ce lien</Trans>
-          </a>
-          <Trans>
-            puis remplissez les <b>deux premiers onglets</b> afin de détailler
-            vos approvisionnements et productions sujets au double comptage.
-            Ensuite, importez ce fichier avec le bouton ci-dessous :
-          </Trans>
-        </div>
-
-        <FileInput
-          icon={doubleCountingFile ? Check : Upload}
-          className={styles.settingsFormButton}
-          label={t("Importer les informations double comptage")}
-          onChange={setDoubleCountingFile}
-        />
-
-        <div className={styles.settingsText}>
-          <Trans>
-            Finalement, veuillez importer un fichier texte contenant la
-            description de vos méthodes d'approvisionnement et de production
-            ayant trait au double comptage.
-          </Trans>
-        </div>
-
-        <FileInput
-          icon={doubleCountingFile ? Check : Upload}
-          className={styles.settingsFormButton}
-          label={t("Importer la description")}
-          onChange={setDocumentationFile}
-        />
-
-        <DialogButtons>
-          <Button
-            loading={uploading.loading || uploadingDoc.loading}
-            disabled={disabled}
-            variant="primary"
-            icon={Check}
-            action={submitAgreement}
-          >
-            <Trans>Soumettre le dossier</Trans>
-          </Button>
-          <Button icon={Return} action={() => onResolve()}>
-            <Trans>Annuler</Trans>
-          </Button>
-        </DialogButtons>
-      </Form>
-    </Dialog>
-  )
-}
-
-type DoubleCountingSourcingPromptProps = PromptProps<true | void> & {
-  add?: boolean
-  dcaID: number
-  sourcing?: DoubleCountingSourcing
-  entity: Entity
-}
-
-const DoubleCountingSourcingPrompt = ({
-  add,
-  dcaID,
-  sourcing,
-  entity,
-  onResolve,
-}: DoubleCountingSourcingPromptProps) => {
-  const { t } = useTranslation()
-
-  const { data, onChange } = useForm<Partial<DoubleCountingSourcing>>(
-    sourcing ?? {
-      year: new Date().getFullYear(),
-      feedstock: undefined,
-      metric_tonnes: 0,
-      origin_country: undefined,
-      transit_country: undefined,
-      supply_country: undefined,
-    }
-  )
-
-  const [adding, addSourcing] = useAPI(api.addDoubleCountingSourcing)
-  const [updating, updateSourcing] = useAPI(api.updateDoubleCountingSourcing)
-
-  async function saveSourcing() {
-    if (
-      entity === null ||
-      !data.year ||
-      !data.metric_tonnes ||
-      !data.feedstock ||
-      !data.origin_country ||
-      !data.transit_country ||
-      !data.supply_country
-    )
-      return
-
-    if (add) {
-      await addSourcing(
-        entity.id,
-        dcaID,
-        data.year,
-        data.metric_tonnes,
-        data.feedstock.code,
-        data.origin_country.code_pays,
-        data.transit_country.code_pays,
-        data.supply_country.code_pays
-      )
-    } else if (sourcing) {
-      await updateSourcing(entity.id, sourcing.id, data.metric_tonnes)
-    }
-
-    onResolve(true)
-  }
-
-  const loading = adding.loading || updating.loading
-
-  return (
-    <Dialog onResolve={onResolve} className={styles.settingsPrompt}>
-      <DialogTitle text={t("Approvisionnement")} />
-      <DialogText
-        text={t(
-          "Précisez les informations concernant votre approvisionnement en matière première dans le formularie ci-dessous."
-        )}
+  function showAgreementDialog(dc: DoubleCounting) {
+    portal((resolve) => (
+      <DoubleCountingDialog
+        entity={entity}
+        agreementID={dc.id}
+        onClose={resolve}
       />
-
-      <Form className={styles.settingsForm} onSubmit={saveSourcing}>
-        <LabelInput
-          disabled={!add}
-          label={t("Année")}
-          name="year"
-          value={data.year}
-          onChange={onChange}
-        />
-        <LabelAutoComplete
-          disabled={!add}
-          name="feedstock"
-          label={t("Matière première")}
-          minLength={0}
-          value={data.feedstock}
-          onChange={onChange}
-          getValue={(mp) => mp.code}
-          getLabel={(mp) => t(mp.code, { ns: "feedstocks" })}
-          getQuery={findMatieresPremieres}
-          queryArgs={[true]}
-        />
-        <LabelInput
-          label={t("Poids en tonnes")}
-          type="number"
-          name="metric_tonnes"
-          value={data.metric_tonnes}
-          onChange={onChange}
-        />
-        <LabelAutoComplete
-          disabled={!add}
-          name="origin_country"
-          label={t("Pays d'origine")}
-          value={data.origin_country}
-          getValue={(c) => c.code_pays}
-          getLabel={(c) => t(c.code_pays, { ns: "countries" })}
-          getQuery={findCountries}
-          onChange={onChange}
-        />
-        <LabelAutoComplete
-          disabled={!add}
-          name="transit_country"
-          label={t("Pays de transit")}
-          value={data.transit_country}
-          getValue={(c) => c.code_pays}
-          getLabel={(c) => t(c.code_pays, { ns: "countries" })}
-          getQuery={findCountries}
-          onChange={onChange}
-        />
-        <LabelAutoComplete
-          disabled={!add}
-          name="supply_country"
-          label={t("Pays d'approvisionnement")}
-          value={data.supply_country}
-          getValue={(c) => c.code_pays}
-          getLabel={(c) => t(c.code_pays, { ns: "countries" })}
-          getQuery={findCountries}
-          onChange={onChange}
-        />
-
-        <DialogButtons>
-          <Button
-            submit
-            variant="primary"
-            loading={loading}
-            icon={add ? Plus : Save}
-          >
-            {add ? (
-              <Trans>Ajouter un approvisionnement</Trans>
-            ) : (
-              <Trans>Enregistrer les modifications</Trans>
-            )}
-          </Button>
-          <Button icon={Return} action={() => onResolve()}>
-            <Trans>Annuler</Trans>
-          </Button>
-        </DialogButtons>
-      </Form>
-    </Dialog>
-  )
-}
-
-type DoubleCountingProductionPromptProps = PromptProps<true | void> & {
-  add?: boolean
-  dcaID: number
-  production?: DoubleCountingProduction
-  entity: Entity
-}
-
-const DoubleCountingProductionPrompt = ({
-  add,
-  dcaID,
-  production,
-  entity,
-  onResolve,
-}: DoubleCountingProductionPromptProps) => {
-  const { t } = useTranslation()
-
-  const { data, onChange } = useForm<Partial<DoubleCountingProduction>>(
-    production ?? {
-      year: new Date().getFullYear(),
-      feedstock: undefined,
-      biofuel: undefined,
-      estimated_production: 0,
-      max_production_capacity: 0,
-      requested_quota: 0,
-    }
-  )
-
-  const [adding, addProduction] = useAPI(api.addDoubleCountingProduction)
-  const [updating, updateProduction] = useAPI(
-    api.updateDoubleCountingProduction
-  )
-
-  async function saveProduction() {
-    if (
-      entity === null ||
-      !data.year ||
-      !data.feedstock ||
-      !data.biofuel ||
-      !data.requested_quota ||
-      !data.estimated_production ||
-      !data.max_production_capacity
-    )
-      return
-
-    if (add) {
-      await addProduction(
-        entity.id,
-        dcaID,
-        data.year,
-        data.feedstock.code,
-        data.biofuel.code,
-        data.estimated_production,
-        data.max_production_capacity,
-        data.requested_quota
-      )
-    } else if (production) {
-      await updateProduction(
-        entity.id,
-        production.id,
-        data.estimated_production,
-        data.max_production_capacity,
-        data.requested_quota
-      )
-    }
-
-    onResolve(true)
+    ))
   }
 
-  const loading = adding.loading || updating.loading
+  function showUploadDialog() {
+    portal((resolve) => (
+      <DoubleCountingUploadDialog entity={entity} onClose={resolve} />
+    ))
+  }
 
   return (
-    <Dialog onResolve={onResolve} className={styles.settingsPrompt}>
-      <DialogTitle text={t("Approvisionnement")} />
-      <DialogText
-        text={t(
-          "Précisez les informations concernant votre approvisionnement en matière première dans le formularie ci-dessous."
-        )}
-      />
-
-      <Form className={styles.settingsForm} onSubmit={saveProduction}>
-        <LabelInput
-          disabled={!add}
-          label={t("Année")}
-          name="year"
-          value={data.year}
-          onChange={onChange}
-        />
-        <LabelAutoComplete
-          disabled={!add}
-          name="feedstock"
-          label={t("Matière première")}
-          minLength={0}
-          value={data.feedstock}
-          onChange={onChange}
-          getValue={(mp) => mp.code}
-          getLabel={(mp) => t(mp.code, { ns: "feedstocks" })}
-          getQuery={findMatieresPremieres}
-          queryArgs={[true]}
-        />
-        <LabelAutoComplete
-          disabled={!add}
-          name="biofuel"
-          label={t("Biocarburant")}
-          minLength={0}
-          value={data.biofuel}
-          onChange={onChange}
-          getValue={(bc) => bc.code}
-          getLabel={(bc) => t(bc.code, { ns: "biofuels" })}
-          getQuery={findBiocarburants}
-        />
-        <LabelInput
-          label={t("Production maximale")}
-          type="number"
-          name="max_production_capacity"
-          value={data.max_production_capacity}
-          onChange={onChange}
-        />
-        <LabelInput
-          label={t("Production estimée")}
-          type="number"
-          name="estimated_production"
-          value={data.estimated_production}
-          onChange={onChange}
-        />
-        <LabelInput
-          label={t("Quota demandé")}
-          type="number"
-          name="requested_quota"
-          value={data.requested_quota}
-          onChange={onChange}
-        />
-
-        <DialogButtons>
+    <Panel id="double-counting">
+      <header>
+        <h1>
+          <Trans>Dossiers double comptage</Trans>
+        </h1>
+        {canModify && (
           <Button
-            submit
+            asideX
             variant="primary"
-            loading={loading}
-            icon={add ? Plus : Save}
-          >
-            {add ? (
-              <Trans>Ajouter une production</Trans>
-            ) : (
-              <Trans>Enregistrer les modifications</Trans>
-            )}
-          </Button>
-          <Button icon={Return} action={() => onResolve()}>
-            <Trans>Annuler</Trans>
-          </Button>
-        </DialogButtons>
-      </Form>
-    </Dialog>
+            icon={Plus}
+            action={showUploadDialog}
+            label={t("Ajouter un dossier double comptage")}
+          />
+        )}
+      </header>
+
+      {isEmpty && (
+        <>
+          <section>
+            <Alert icon={AlertCircle} variant="warning">
+              <Trans>Aucun dossier double comptage trouvé</Trans>
+            </Alert>
+          </section>
+          <footer />
+        </>
+      )}
+
+      {!isEmpty && (
+        <Table
+          rows={agreementsData}
+          onAction={showAgreementDialog}
+          columns={[
+            {
+              header: t("Statut"),
+              cell: (dc) => <DoubleCountingStatus status={dc.status} />,
+            },
+            {
+              header: t("Site de production"),
+              cell: (dc) => <Cell text={dc.production_site} />,
+            },
+            {
+              header: t("Période de validité"),
+              cell: (dc) => (
+                <Cell
+                  text={`${formatDate(
+                    dc.period_start,
+                    YEAR_ONLY
+                  )} - ${formatDate(dc.period_end, YEAR_ONLY)}`}
+                />
+              ),
+            },
+            {
+              header: t("Date de soumission"),
+              cell: (dc) => <Cell text={formatDate(dc.creation_date)} />,
+            },
+          ]}
+        />
+      )}
+
+      {agreements.loading && <LoaderOverlay />}
+    </Panel>
   )
 }
 
-type QuotasTableProps = {
-  entity: Entity
-  agreement: DoubleCounting | null
-}
-
-const QuotasTable = ({ entity, agreement }: QuotasTableProps) => {
-  const { t } = useTranslation()
-
-  const [details, getDetails] = useAPI(api.getQuotaDetails)
-
-  const entityID = entity?.id ?? -1
-  const dcaID = agreement?.id ?? -1
-
-  useEffect(() => {
-    getDetails(entityID, dcaID)
-  }, [getDetails, entityID, dcaID])
-
-  const columns: Column<QuotaDetails>[] = [
-    {
-      header: t("Biocarburant"),
-      render: (d) => <Line text={d.biofuel.name} />,
-    },
-    {
-      header: t("Matière première"),
-      render: (d) => <Line text={d.feedstock.name} />,
-    },
-    { header: t("Nombre de lots"), render: (d) => d.nb_lots },
-    {
-      header: t("Volume produit"),
-      render: (d) => (
-        <TwoLines
-          text={`${formatNumber(d.volume)} L`}
-          sub={`${d.current_production_weight_sum_tonnes} t`}
-        />
-      ),
-    },
-    {
-      header: t("Quota approuvé"),
-      render: (d) => <Line text={formatNumber(d.approved_quota)} />,
-    },
-    {
-      header: t("Progression des quotas"),
-      render: (d) => (
-        <progress
-          max={d.approved_quota}
-          value={d.current_production_weight_sum_tonnes}
-          title={`${d.current_production_weight_sum_tonnes} / ${d.approved_quota}`}
-        />
-      ),
-    },
-  ]
-
-  const rows = (details.data ?? []).map((value) => ({ value }))
-
-  return (
-    <>
-      <Table columns={columns} rows={rows} className={tableCSS.flexTable} />
-      {details.loading && <LoaderOverlay />}
-    </>
-  )
-}
-
-type DoubleCountingPromptProps = PromptProps<any> & {
+type DoubleCountingDialogProps = {
   entity: Entity
   agreementID: number
+  onClose: () => void
 }
 
-const DoubleCountingPrompt = ({
+const DoubleCountingDialog = ({
   entity,
   agreementID,
-  onResolve,
-}: DoubleCountingPromptProps) => {
+  onClose,
+}: DoubleCountingDialogProps) => {
   const { t } = useTranslation()
+  const entityID = entity?.id
+  const portal = usePortal()
 
   const [focus, setFocus] = useState("aggregated_sourcing")
 
-  const [agreement, getAgreement] = useAPI(api.getDoubleCountingDetails)
-  const [, deleteSourcing] = useAPI(api.deleteDoubleCountingSourcing)
-  const [, deleteProduction] = useAPI(api.deleteDoubleCountingProduction)
+  const agreement = useQuery(api.getDoubleCountingDetails, {
+    key: "dc-details",
+    params: [entityID, agreementID],
+  })
 
-  const entityID = entity?.id
+  const deleteSourcing = useMutation(api.deleteDoubleCountingSourcing, {
+    invalidates: ["dc-details"],
+  })
 
-  useEffect(() => {
-    if (entityID !== undefined) {
-      getAgreement(entityID, agreementID)
-    }
-  }, [entityID, agreementID, getAgreement])
+  const deleteProduction = useMutation(api.deleteDoubleCountingProduction, {
+    invalidates: ["dc-details"],
+  })
 
-  const dcaID = agreement.data?.id ?? -1
-  const dcaStatus = agreement.data?.status ?? DCStatus.Pending
+  const dcaID = agreement.result?.data.data?.id ?? -1
+  const dcaStatus = agreement.result?.data.data?.status ?? DCStatus.Pending
 
   const isAccepted = dcaStatus === DCStatus.Accepted
   const isFinal = dcaStatus !== DCStatus.Pending
 
-  function reloadAgreement() {
-    if (entity === null) return
-    getAgreement(entity.id, agreementID)
-  }
+  const sourcingRows: DoubleCountingSourcing[] =
+    agreement.result?.data.data?.sourcing ?? []
 
-  async function removeSourcingRow(sourcingID: number) {
-    if (!entity || isFinal) return
+  const agreementData = agreement.result?.data.data
+  const productionRows = agreementData?.production ?? []
 
-    const ok = await confirm(
-      t("Supprimer approvisionnement"),
-      t("Voulez-vous supprimer cette ligne d'approvisionnement ?")
-    )
-
-    if (ok) {
-      await deleteSourcing(entity.id, sourcingID)
-      reloadAgreement()
-    }
-  }
-
-  async function removeProductionRow(productionID: number) {
-    if (!entity || isFinal) return
-
-    const ok = await confirm(
-      t("Supprimer production"),
-      t("Voulez-vous supprimer cette ligne de production ?")
-    )
-
-    if (ok) {
-      await deleteProduction(entity.id, productionID)
-      reloadAgreement()
-    }
-  }
-
-  const sourcingColumns: Column<DoubleCountingSourcing>[] = [
-    padding,
-    {
-      header: t("Matière première"),
-      render: (s) => <Line text={t(s.feedstock.code, { ns: "feedstocks" })} />,
-    },
-    {
-      header: t("Poids en tonnes"),
-      render: (s) => <Line text={formatNumber(s.metric_tonnes)} />,
-    },
-    {
-      header: t("Origine"),
-      render: (s) => (
-        <Line text={t(s.origin_country.code_pays, { ns: "countries" })} />
-      ),
-    },
-    {
-      header: t("Approvisionnement"),
-      render: (s) =>
-        s.supply_country && (
-          <Line text={t(s.supply_country.code_pays, { ns: "countries" })} />
-        ),
-    },
-    {
-      header: t("Transit"),
-      render: (s) =>
-        s.transit_country && (
-          <Line text={t(s.transit_country.code_pays, { ns: "countries" })} />
-        ),
-    },
-    padding,
-  ]
-
-  if (!isFinal) {
-    sourcingColumns.splice(
-      -1,
-      0,
-      Actions((s) => [
-        {
-          icon: Cross,
-          action: () => removeSourcingRow(s.id),
-          title: t("Supprimer approvisionnement"),
-        },
-      ])
-    )
-  }
-
-  const sourcingRows: Row<DoubleCountingSourcing>[] = (
-    agreement.data?.sourcing ?? []
-  ).map((s) => ({
-    value: s,
-    onClick: isFinal
-      ? undefined
-      : async () => {
-          const ok = await prompt((resolve) => (
-            <DoubleCountingSourcingPrompt
-              entity={entity}
-              dcaID={dcaID}
-              sourcing={s}
-              onResolve={resolve}
-            />
-          ))
-
-          ok && reloadAgreement()
-        },
-  }))
-
-  const productionColumns: Column<DoubleCountingProduction>[] = [
-    padding,
-    {
-      header: t("Matière première"),
-      render: (p) => <Line text={t(p.feedstock.code, { ns: "feedstocks" })} />,
-    },
-    {
-      header: t("Biocarburant"),
-      render: (p) => <Line text={t(p.biofuel.code, { ns: "biofuels" })} />,
-    },
-    {
-      header: t("Prod. max"),
-      render: (p) => (
-        <Line text={formatNumber(p.max_production_capacity ?? 0)} />
-      ),
-    },
-    {
-      header: t("Prod. estimée"),
-      render: (p) => <Line text={formatNumber(p.estimated_production)} />,
-    },
-    {
-      header: t("Quota demandé"),
-      render: (p) => <Line text={formatNumber(p.requested_quota)} />,
-    },
-    {
-      header: t("Quota approuvé"),
-      render: (p) =>
-        p.approved_quota === -1 ? (
-          t("En attente")
-        ) : (
-          <Line text={formatNumber(p.approved_quota)} />
-        ),
-    },
-    padding,
-  ]
-
-  if (!isFinal) {
-    productionColumns.splice(
-      -1,
-      0,
-      Actions((s) => [
-        {
-          icon: Cross,
-          action: () => removeProductionRow(s.id),
-          title: t("Supprimer production"),
-        },
-      ])
-    )
-  }
-
-  const productionRows: Row<DoubleCountingProduction>[] = (
-    agreement.data?.production ?? []
-  ).map((p) => ({
-    value: p,
-    onClick: isFinal
-      ? undefined
-      : async () => {
-          const ok = await prompt((resolve) => (
-            <DoubleCountingProductionPrompt
-              entity={entity}
-              dcaID={dcaID}
-              production={p}
-              onResolve={resolve}
-            />
-          ))
-
-          ok && reloadAgreement()
-        },
-  }))
-
-  const productionSite = agreement.data?.production_site ?? "N/A"
-  const creationDate = agreement.data?.creation_date
-    ? formatDate(agreement.data.creation_date)
+  const productionSite = agreementData?.production_site ?? "N/A"
+  const creationDate = agreementData?.creation_date
+    ? formatDate(agreementData.creation_date)
     : "N/A"
 
-  const documentationFile = agreement.data?.documents.find(
+  const documentationFile = agreementData?.documents.find(
     (doc) => doc.file_type === "SOURCING"
   )
-  const decisionFile = agreement.data?.documents.find(
+  const decisionFile = agreementData?.documents.find(
     (doc) => doc.file_type === "DECISION"
   )
 
   const excelURL =
-    agreement.data &&
+    agreementData &&
     `/api/v3/doublecount/agreement?dca_id=${dcaID}&entity_id=${entity?.id}&export=true`
   const documentationURL =
     entity &&
@@ -771,109 +216,283 @@ const DoubleCountingPrompt = ({
     decisionFile &&
     `/api/v3/doublecount/download-admin-decision?entity_id=${entity.id}&dca_id=${dcaID}&file_id=${decisionFile.id}`
 
-  return (
-    <Dialog wide onResolve={onResolve} className={styles.settingsPrompt}>
-      <Box row>
-        <DoubleCountingStatus status={dcaStatus} />
-        <DialogTitle text={t("Dossier double comptage")} />
-      </Box>
+  function showSourcingDialog(sourcing: DoubleCountingSourcing) {
+    if (isFinal) return
 
-      <DialogText>
-        <Box row>
-          <Trans>
-            Pour le site de production <b>{{ productionSite }}</b>, soumis le{" "}
-            <b>{{ creationDate }}</b>
-          </Trans>
-        </Box>
-
-        <Box row>
-          <Trans>
-            Pour toute question concernant l'évolution de votre dossier,
-            contactez-nous à l'adresse{" "}
-            <MailTo user="doublecompte" host="beta.gouv.fr">
-              disponible sur ce lien
-            </MailTo>
-          </Trans>
-        </Box>
-      </DialogText>
-
-      <Tabs
-        tabs={[
-          { key: "aggregated_sourcing", label: t("Approvisionnement") },
-          { key: "sourcing", label: t("Approvisionnement (détaillé)") },
-          { key: "production", label: t("Production") },
-          isAccepted && { key: "quotas", label: t("Suivi des quotas") },
-        ]}
-        focus={focus}
-        onFocus={setFocus}
+    portal((close) => (
+      <DoubleCountingSourcingDialog
+        entity={entity}
+        dcaID={dcaID}
+        sourcing={sourcing}
+        onClose={close}
       />
+    ))
+  }
 
-      <div className={styles.modalTableContainer}>
+  function showNewSourcingDialog() {
+    if (isFinal) return
+
+    portal((close) => (
+      <DoubleCountingSourcingDialog
+        add
+        entity={entity}
+        dcaID={dcaID}
+        onClose={close}
+      />
+    ))
+  }
+
+  async function removeSourcingRow(sourcingID: number) {
+    if (!entity || isFinal) return
+
+    portal((close) => (
+      <Confirm
+        variant="danger"
+        title={t("Supprimer approvisionnement")}
+        description={t("Voulez-vous supprimer cette ligne d'approvisionnement ?")} // prettier-ignore
+        confirm="Supprimer"
+        icon={Cross}
+        onConfirm={() => deleteSourcing.execute(entity.id, sourcingID)}
+        onClose={close}
+      />
+    ))
+  }
+
+  function showProductionDialog(production: DoubleCountingProduction) {
+    if (isFinal) return
+
+    portal((close) => (
+      <DoubleCountingProductionDialog
+        entity={entity}
+        dcaID={dcaID}
+        production={production}
+        onClose={close}
+      />
+    ))
+  }
+
+  function showNewProductionDialog() {
+    if (isFinal) return
+
+    portal((close) => (
+      <DoubleCountingProductionDialog
+        add
+        entity={entity}
+        dcaID={dcaID}
+        onClose={close}
+      />
+    ))
+  }
+
+  async function removeProductionRow(productionID: number) {
+    if (!entity || isFinal) return
+
+    portal((close) => (
+      <Confirm
+        variant="danger"
+        title={t("Supprimer production")}
+        description={t("Voulez-vous supprimer cette ligne de production ?")} // prettier-ignore
+        confirm="Supprimer"
+        icon={Cross}
+        onConfirm={() => deleteProduction.execute(entity.id, productionID)}
+        onClose={close}
+      />
+    ))
+  }
+
+  return (
+    <Dialog fullscreen onClose={onClose}>
+      <header>
+        <DoubleCountingStatus big status={dcaStatus} />
+        <h1>{t("Dossier double comptage")}</h1>
+      </header>
+
+      <main>
+        <section>
+          <p>
+            <Trans>
+              Pour le site de production <b>{{ productionSite }}</b>, soumis le{" "}
+              <b>{{ creationDate }}</b>
+            </Trans>
+          </p>
+
+          <p>
+            <Trans>
+              Pour toute question concernant l'évolution de votre dossier,
+              contactez-nous à l'adresse{" "}
+              <MailTo user="doublecompte" host="beta.gouv.fr">
+                disponible sur ce lien
+              </MailTo>
+            </Trans>
+          </p>
+        </section>
+
+        <section>
+          <Tabs
+            tabs={compact([
+              { key: "aggregated_sourcing", label: t("Approvisionnement") },
+              { key: "sourcing", label: t("Approvisionnement (détaillé)") },
+              { key: "production", label: t("Production") },
+              isAccepted && { key: "quotas", label: t("Suivi des quotas") },
+            ])}
+            focus={focus}
+            onFocus={setFocus}
+          />
+        </section>
+
         {focus === "aggregated_sourcing" && (
           <SourcingAggregationTable
-            sourcing={agreement.data?.aggregated_sourcing ?? []}
+            sourcing={agreementData?.aggregated_sourcing ?? []}
           />
         )}
 
         {focus === "sourcing" && (
           <Fragment>
-            <YearTable columns={sourcingColumns} rows={sourcingRows} />
+            <YearTable<DoubleCountingSourcing>
+              rows={sourcingRows}
+              onAction={showSourcingDialog}
+              columns={compact([
+                {
+                  header: t("Matière première"),
+                  cell: (s) => (
+                    <Cell text={t(s.feedstock.code, { ns: "feedstocks" })} />
+                  ),
+                },
+                {
+                  header: t("Poids en tonnes"),
+                  cell: (s) => <Cell text={formatNumber(s.metric_tonnes)} />,
+                },
+                {
+                  header: t("Origine"),
+                  cell: (s) => (
+                    <Cell
+                      text={t(s.origin_country.code_pays, { ns: "countries" })}
+                    />
+                  ),
+                },
+                {
+                  header: t("Approvisionnement"),
+                  cell: (s) =>
+                    s.supply_country && (
+                      <Cell
+                        text={t(s.supply_country.code_pays, {
+                          ns: "countries",
+                        })}
+                      />
+                    ),
+                },
+                {
+                  header: t("Transit"),
+                  cell: (s) =>
+                    s.transit_country && (
+                      <Cell
+                        text={t(s.transit_country.code_pays, {
+                          ns: "countries",
+                        })}
+                      />
+                    ),
+                },
+                !isFinal &&
+                  actionColumn((s) => [
+                    <Button
+                      captive
+                      variant="icon"
+                      icon={Cross}
+                      action={() => removeSourcingRow(s.id)}
+                      title={t("Supprimer approvisionnement")}
+                    />,
+                  ]),
+              ])}
+            />
 
             {!isFinal && (
-              <span
-                className={styles.modalTableAddRow}
-                onClick={async () => {
-                  const ok = await prompt((resolve) => (
-                    <DoubleCountingSourcingPrompt
-                      add
-                      dcaID={dcaID}
-                      entity={entity}
-                      onResolve={resolve}
-                    />
-                  ))
-
-                  ok && reloadAgreement()
-                }}
-              >
-                <Trans>+ Ajouter une ligne d'approvisionnement</Trans>
-              </span>
+              <section>
+                <Button
+                  variant="link"
+                  icon={Plus}
+                  action={showNewSourcingDialog}
+                  label={t("Ajouter une ligne d'approvisionnement")}
+                />
+              </section>
             )}
           </Fragment>
         )}
 
         {focus === "production" && (
           <Fragment>
-            <YearTable columns={productionColumns} rows={productionRows} />
+            <YearTable<DoubleCountingProduction>
+              rows={productionRows}
+              onAction={showProductionDialog}
+              columns={compact([
+                {
+                  header: t("Matière première"),
+                  cell: (p) => (
+                    <Cell text={t(p.feedstock.code, { ns: "feedstocks" })} />
+                  ),
+                },
+                {
+                  header: t("Biocarburant"),
+                  cell: (p) => (
+                    <Cell text={t(p.biofuel.code, { ns: "biofuels" })} />
+                  ),
+                },
+                {
+                  header: t("Prod. max"),
+                  cell: (p) => (
+                    <Cell text={formatNumber(p.max_production_capacity ?? 0)} />
+                  ),
+                },
+                {
+                  header: t("Prod. estimée"),
+                  cell: (p) => (
+                    <Cell text={formatNumber(p.estimated_production)} />
+                  ),
+                },
+                {
+                  header: t("Quota demandé"),
+                  cell: (p) => <Cell text={formatNumber(p.requested_quota)} />,
+                },
+                {
+                  header: t("Quota approuvé"),
+                  cell: (p) =>
+                    p.approved_quota === -1 ? (
+                      t("En attente")
+                    ) : (
+                      <Cell text={formatNumber(p.approved_quota)} />
+                    ),
+                },
+                !isFinal &&
+                  actionColumn((s) => [
+                    <Button
+                      captive
+                      variant="icon"
+                      icon={Cross}
+                      action={() => removeProductionRow(s.id)}
+                      title={t("Supprimer production")}
+                    />,
+                  ]),
+              ])}
+            />
 
             {!isFinal && (
-              <span
-                className={styles.modalTableAddRow}
-                onClick={async () => {
-                  await prompt((resolve) => (
-                    <DoubleCountingProductionPrompt
-                      add
-                      dcaID={dcaID}
-                      entity={entity}
-                      onResolve={resolve}
-                    />
-                  ))
-
-                  reloadAgreement()
-                }}
-              >
-                <Trans>+ Ajouter une ligne de production</Trans>
-              </span>
+              <section>
+                <Button
+                  variant="link"
+                  icon={Plus}
+                  action={showNewProductionDialog}
+                  label={t("Ajouter une ligne de production")}
+                />
+              </section>
             )}
           </Fragment>
         )}
 
         {focus === "quotas" && (
-          <QuotasTable entity={entity} agreement={agreement.data} />
+          <QuotasTable entity={entity} agreement={agreementData} />
         )}
-      </div>
-
-      <DialogButtons>
-        <Box style={{ marginRight: "auto" }}>
+      </main>
+      <footer>
+        <Col style={{ marginRight: "auto" }}>
           <a
             href={excelURL ?? "#"}
             target="_blank"
@@ -903,120 +522,503 @@ const DoubleCountingPrompt = ({
               <Trans>Télécharger la décision de l'administration</Trans>
             </a>
           )}
-        </Box>
+        </Col>
 
-        <Button icon={Return} action={() => onResolve()}>
+        <Button icon={Return} action={onClose}>
           <Trans>Retour</Trans>
         </Button>
-      </DialogButtons>
+      </footer>
 
       {agreement.loading && <LoaderOverlay />}
     </Dialog>
   )
 }
 
-const DoubleCountingSettings = () => {
+type DoubleCountingUploadDialogProps = {
+  entity: Entity
+  onClose: () => void
+}
+
+const DoubleCountingUploadDialog = ({
+  entity,
+  onClose,
+}: DoubleCountingUploadDialogProps) => {
   const { t } = useTranslation()
-  const rights = useRights()
+
+  const { value, bind } = useForm({
+    productionSite: undefined as ProductionSite | undefined,
+    doubleCountingFile: undefined as File | undefined,
+    documentationFile: undefined as File | undefined,
+  })
+
+  const uploadFile = useMutation(api.uploadDoubleCountingFile)
+  const uploadDocFile = useMutation(api.uploadDoubleCountingDescriptionFile)
+
+  const disabled =
+    !value.productionSite ||
+    !value.doubleCountingFile ||
+    !value.documentationFile
+
+  async function submitAgreement() {
+    if (
+      !entity ||
+      !value.productionSite ||
+      !value.doubleCountingFile ||
+      !value.documentationFile
+    )
+      return
+
+    const res = await uploadFile.execute(
+      entity.id,
+      value.productionSite.id,
+      value.doubleCountingFile
+    )
+
+    if (res.data.data) {
+      await uploadDocFile.execute(
+        entity.id,
+        res.data.data.dca_id,
+        value.documentationFile
+      )
+    }
+
+    onClose()
+  }
+
+  return (
+    <Dialog onClose={onClose}>
+      <header>
+        <h1>{t("Création dossier double comptage")}</h1>
+      </header>
+
+      <main>
+        <section>
+          <Form id="dc-request">
+            <p>
+              <Trans>
+                Dans un premier temps, renseignez le site de production concerné
+                par votre demande.
+              </Trans>
+            </p>
+
+            <AutoComplete
+              label={t("Site de production")}
+              placeholder={t("Rechercher un site de production")}
+              getOptions={(search) => findProductionSites(search, entity.id)}
+              normalize={(ps: ProductionSite) => ({ value: ps, label: ps.name })} // prettier-ignore
+              {...bind("productionSite")}
+            />
+
+            <p>
+              <a href="/api/v3/doublecount/get-template">
+                <Trans>Téléchargez le modèle depuis ce lien</Trans>
+              </a>{" "}
+              <Trans>
+                puis remplissez les <b>deux premiers onglets</b> afin de
+                détailler vos approvisionnements et productions sujets au double
+                comptage. Ensuite, importez ce fichier avec le bouton ci-dessous
+                :
+              </Trans>
+            </p>
+
+            <FileInput
+              icon={value.doubleCountingFile ? Check : Upload}
+              label={t("Importer les informations double comptage")}
+              {...bind("doubleCountingFile")}
+            />
+
+            <p>
+              <Trans>
+                Finalement, veuillez importer un fichier texte contenant la
+                description de vos méthodes d'approvisionnement et de production
+                ayant trait au double comptage.
+              </Trans>
+            </p>
+
+            <FileInput
+              icon={value.documentationFile ? Check : Upload}
+              label={t("Importer la description")}
+              {...bind("documentationFile")}
+            />
+          </Form>
+        </section>
+      </main>
+
+      <footer>
+        <Button
+          asideX
+          submit="dc-request"
+          loading={uploadFile.loading || uploadDocFile.loading}
+          disabled={disabled}
+          variant="primary"
+          icon={Check}
+          action={submitAgreement}
+          label={t("Soumettre le dossier")}
+        />
+        <Button icon={Return} action={onClose} label={t("Annuler")} />
+      </footer>
+    </Dialog>
+  )
+}
+
+type DoubleCountingSourcingDialogProps = {
+  add?: boolean
+  dcaID: number
+  sourcing?: DoubleCountingSourcing
+  entity: Entity
+  onClose: () => void
+}
+
+const DoubleCountingSourcingDialog = ({
+  add,
+  dcaID,
+  sourcing,
+  entity,
+  onClose,
+}: DoubleCountingSourcingDialogProps) => {
+  const { t } = useTranslation()
+
+  const { value, bind } = useForm<Partial<DoubleCountingSourcing>>(
+    sourcing ?? {
+      year: new Date().getFullYear(),
+      feedstock: undefined,
+      metric_tonnes: 0,
+      origin_country: undefined,
+      transit_country: undefined,
+      supply_country: undefined,
+    }
+  )
+
+  const addSourcing = useMutation(api.addDoubleCountingSourcing, {
+    invalidates: ["dc-details"],
+  })
+
+  const updateSourcing = useMutation(api.updateDoubleCountingSourcing, {
+    invalidates: ["dc-details"],
+  })
+
+  async function saveSourcing() {
+    if (
+      !value.year ||
+      !value.metric_tonnes ||
+      !value.feedstock ||
+      !value.origin_country ||
+      !value.transit_country ||
+      !value.supply_country
+    ) {
+      return
+    }
+
+    if (add) {
+      await addSourcing.execute(
+        entity.id,
+        dcaID,
+        value.year,
+        value.metric_tonnes,
+        value.feedstock.code,
+        value.origin_country.code_pays,
+        value.transit_country.code_pays,
+        value.supply_country.code_pays
+      )
+    } else if (sourcing) {
+      await updateSourcing.execute(entity.id, sourcing.id, value.metric_tonnes)
+    }
+  }
+
+  const disabled =
+    !value.year ||
+    !value.metric_tonnes ||
+    !value.feedstock ||
+    !value.origin_country ||
+    !value.transit_country ||
+    !value.supply_country
+
+  const loading = addSourcing.loading || updateSourcing.loading
+
+  return (
+    <Dialog onClose={onClose} className={styles.settingsDialog}>
+      <header>
+        <h1>{t("Approvisionnement")} </h1>
+      </header>
+
+      <main>
+        <section>
+          <p>
+            {t(
+              "Précisez les informations concernant votre approvisionnement en matière première dans le formularie ci-dessous."
+            )}
+          </p>
+        </section>
+
+        <section>
+          <Form id="sourcing" onSubmit={saveSourcing}>
+            <NumberInput disabled={!add} label={t("Année")} {...bind("year")} />
+            <AutoComplete
+              disabled={!add}
+              label={t("Matière première")}
+              normalize={normalizeFeedstock}
+              getOptions={(search) => findFeedstocks(search, true)}
+              defaultOptions={compact([value.feedstock])}
+              {...bind("feedstock")}
+            />
+            <NumberInput
+              label={t("Poids en tonnes")}
+              type="number"
+              {...bind("metric_tonnes")}
+            />
+            <AutoComplete
+              disabled={!add}
+              label={t("Pays d'origine")}
+              getOptions={findCountries}
+              defaultOptions={compact([value.origin_country])}
+              normalize={normalizeCountry}
+              {...bind("origin_country")}
+            />
+            <AutoComplete
+              disabled={!add}
+              label={t("Pays de transit")}
+              getOptions={findCountries}
+              defaultOptions={compact([value.transit_country])}
+              normalize={normalizeCountry}
+              {...bind("transit_country")}
+            />
+            <AutoComplete
+              disabled={!add}
+              label={t("Pays d'approvisionnement")}
+              getOptions={findCountries}
+              defaultOptions={compact([value.supply_country])}
+              normalize={normalizeCountry}
+              {...bind("supply_country")}
+            />
+          </Form>
+        </section>
+      </main>
+
+      <footer>
+        <Button
+          asideX
+          disabled={disabled}
+          submit="sourcing"
+          variant="primary"
+          loading={loading}
+          icon={add ? Plus : Save}
+        >
+          {add ? (
+            <Trans>Ajouter un approvisionnement</Trans>
+          ) : (
+            <Trans>Enregistrer les modifications</Trans>
+          )}
+        </Button>
+        <Button icon={Return} action={onClose} label={t("Annuler")} />
+      </footer>
+    </Dialog>
+  )
+}
+
+type DoubleCountingProductionDialogProps = {
+  add?: boolean
+  dcaID: number
+  production?: DoubleCountingProduction
+  entity: Entity
+  onClose: () => void
+}
+
+const DoubleCountingProductionDialog = ({
+  add,
+  dcaID,
+  production,
+  onClose,
+}: DoubleCountingProductionDialogProps) => {
+  const { t } = useTranslation()
   const entity = useEntity()
 
-  const [agreements, getAgreements] = useAPI(api.getDoubleCountingAgreements)
-
-  const entityID = entity?.id
-
-  useEffect(() => {
-    if (entityID !== undefined) {
-      getAgreements(entityID)
+  const { value, bind } = useForm<Partial<DoubleCountingProduction>>(
+    production ?? {
+      year: new Date().getFullYear(),
+      feedstock: undefined,
+      biofuel: undefined,
+      estimated_production: 0,
+      max_production_capacity: 0,
+      requested_quota: 0,
     }
-  }, [entityID, getAgreements])
+  )
 
-  const isEmpty = !agreements.data || agreements.data.length === 0
-  const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
+  const addProduction = useMutation(api.addDoubleCountingProduction, {
+    invalidates: ["dc-details"],
+  })
 
-  const columns: Column<DoubleCounting>[] = [
-    padding,
+  const updateProduction = useMutation(api.updateDoubleCountingProduction, {
+    invalidates: ["dc-details"],
+  })
+
+  async function saveProduction() {
+    if (
+      !value.year ||
+      !value.feedstock ||
+      !value.biofuel ||
+      !value.requested_quota ||
+      !value.estimated_production ||
+      !value.max_production_capacity
+    ) {
+      return
+    }
+
+    if (add) {
+      await addProduction.execute(
+        entity.id,
+        dcaID,
+        value.year,
+        value.feedstock.code,
+        value.biofuel.code,
+        value.estimated_production,
+        value.max_production_capacity,
+        value.requested_quota
+      )
+    } else if (production) {
+      await updateProduction.execute(
+        entity.id,
+        production.id,
+        value.estimated_production,
+        value.max_production_capacity,
+        value.requested_quota
+      )
+    }
+  }
+
+  const disabled =
+    !value.year ||
+    !value.feedstock ||
+    !value.biofuel ||
+    !value.requested_quota ||
+    !value.estimated_production ||
+    !value.max_production_capacity
+
+  const loading = addProduction.loading || updateProduction.loading
+
+  return (
+    <Dialog onClose={onClose}>
+      <header>
+        <h1>{t("Production")}</h1>
+      </header>
+      <main>
+        <section>
+          <p>
+            {t(
+              "Précisez les informations concernant votre production de biocarburant dans le formularie ci-dessous."
+            )}
+          </p>
+        </section>
+        <section>
+          <Form id="dc-production" onSubmit={saveProduction}>
+            <NumberInput disabled={!add} label={t("Année")} {...bind("year")} />
+            <AutoComplete
+              disabled={!add}
+              label={t("Matière première")}
+              normalize={normalizeFeedstock}
+              getOptions={(search) => findFeedstocks(search, true)}
+              defaultOptions={compact([value.feedstock])}
+              {...bind("feedstock")}
+            />
+            <AutoComplete
+              disabled={!add}
+              label={t("Biocarburant")}
+              getOptions={findBiofuels}
+              defaultOptions={compact([value.biofuel])}
+              normalize={normalizeBiofuel}
+              {...bind("biofuel")}
+            />
+            <NumberInput
+              label={t("Production maximale")}
+              type="number"
+              {...bind("max_production_capacity")}
+            />
+            <NumberInput
+              label={t("Production estimée")}
+              type="number"
+              {...bind("estimated_production")}
+            />
+            <NumberInput
+              label={t("Quota demandé")}
+              type="number"
+              {...bind("requested_quota")}
+            />
+          </Form>
+        </section>
+      </main>
+      <footer>
+        <Button
+          asideX
+          disabled={disabled}
+          submit="dc-production"
+          variant="primary"
+          loading={loading}
+          icon={add ? Plus : Save}
+        >
+          {add ? (
+            <Trans>Ajouter une production</Trans>
+          ) : (
+            <Trans>Enregistrer les modifications</Trans>
+          )}
+        </Button>
+        <Button icon={Return} action={onClose} label={t("Annuler")} />
+      </footer>
+    </Dialog>
+  )
+}
+
+type QuotasTableProps = {
+  entity: Entity
+  agreement: DoubleCounting | undefined
+}
+
+const QuotasTable = ({ entity, agreement }: QuotasTableProps) => {
+  const { t } = useTranslation()
+
+  const entityID = entity?.id ?? -1
+  const dcaID = agreement?.id ?? -1
+
+  const details = useQuery(api.getQuotaDetails, {
+    key: "quota-details",
+    params: [entityID, dcaID],
+  })
+
+  const columns: Column<QuotaDetails>[] = [
     {
-      header: t("Statut"),
-      render: (dc) => <DoubleCountingStatus status={dc.status} />,
+      header: t("Biocarburant"),
+      cell: (d) => <Cell text={d.biofuel.name} />,
     },
     {
-      header: t("Site de production"),
-      render: (dc) => <Line text={dc.production_site} />,
+      header: t("Matière première"),
+      cell: (d) => <Cell text={d.feedstock.name} />,
     },
+    { header: t("Nombre de lots"), cell: (d) => d.nb_lots },
     {
-      header: t("Période de validité"),
-      render: (dc) => (
-        <Line
-          text={`${formatDate(dc.period_start, YEAR_ONLY)} - ${formatDate(
-            dc.period_end,
-            YEAR_ONLY
-          )}`}
+      header: t("Volume produit"),
+      cell: (d) => (
+        <Cell
+          text={`${formatNumber(d.volume)} L`}
+          sub={`${d.current_production_weight_sum_tonnes} t`}
         />
       ),
     },
     {
-      header: t("Date de soumission"),
-      render: (dc) => <Line text={formatDate(dc.creation_date)} />,
+      header: t("Quota approuvé"),
+      cell: (d) => <Cell text={formatNumber(d.approved_quota)} />,
     },
-    padding,
+    {
+      header: t("Progression des quotas"),
+      cell: (d) => (
+        <progress
+          max={d.approved_quota}
+          value={d.current_production_weight_sum_tonnes}
+          title={`${d.current_production_weight_sum_tonnes} / ${d.approved_quota}`}
+        />
+      ),
+    },
   ]
 
-  const rows: Row<DoubleCounting>[] = (agreements.data ?? []).map((dc) => ({
-    value: dc,
-    onClick: () =>
-      prompt((resolve) => (
-        <DoubleCountingPrompt
-          entity={entity}
-          agreementID={dc.id}
-          onResolve={resolve}
-        />
-      )),
-  }))
-
-  return (
-    <Panel id="double-counting">
-      <header>
-        <h1>
-          <Trans>Dossiers double comptage</Trans>
-        </h1>
-        {canModify && (
-          <Button
-            asideX
-            variant="primary"
-            icon={Plus}
-            action={async () => {
-              if (entity === null) return
-
-              await prompt((resolve) => (
-                <DoubleCountingUploadPrompt
-                  entity={entity}
-                  onResolve={resolve}
-                />
-              ))
-
-              getAgreements(entity.id)
-            }}
-          >
-            <Trans>Ajouter un dossier double comptage</Trans>
-          </Button>
-        )}
-      </header>
-
-      {isEmpty && (
-        <section style={{ marginBottom: "var(--spacing-l)" }}>
-          <Alert icon={AlertCircle} level="warning">
-            <Trans>Aucun dossier double comptage trouvé</Trans>
-          </Alert>
-        </section>
-      )}
-
-      {!isEmpty && (
-        <Table columns={columns} rows={rows} className={styles.settingsTable} />
-      )}
-
-      {agreements.loading && <LoaderOverlay />}
-    </Panel>
-  )
+  const rows = details.result?.data.data ?? []
+  return <Table loading={details.loading} columns={columns} rows={rows} />
 }
 
 export default DoubleCountingSettings

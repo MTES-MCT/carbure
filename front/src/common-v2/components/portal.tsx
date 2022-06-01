@@ -65,7 +65,7 @@ export type PortalRenderer = (close: () => void) => React.ReactElement<any, any>
 
 export interface PortalManager {
   portals: PortalInstance[]
-  portal: (render: PortalRenderer) => void
+  portal: (render: PortalRenderer) => Promise<void>
   close: (key: string) => void
 }
 
@@ -77,12 +77,16 @@ export function usePortalManager(): PortalManager {
   }, [])
 
   const portal = useCallback(
-    (render: PortalRenderer) => {
-      const key = Math.random().toString(36).slice(2)
-      const close = () => closeKey(key)
-      const content = render(close)
-      setPortals((portals) => [...portals, { key, content, close }])
-    },
+    (render: PortalRenderer) =>
+      new Promise<void>((resolve) => {
+        const key = Math.random().toString(36).slice(2)
+        function close() {
+          closeKey(key)
+          resolve()
+        }
+        const content = render(close)
+        setPortals((portals) => [...portals, { key, content, close }])
+      }),
     [closeKey]
   )
 

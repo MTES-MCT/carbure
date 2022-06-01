@@ -75,7 +75,9 @@ interface StatusRecapProps {
 const StatusRecap = ({ loading, count = 0, label }: StatusRecapProps) => {
   return (
     <>
-      <p>{loading ? <Loader size={20} /> : formatNumber(count)} </p>
+      <p style={{ fontWeight: "normal" }}>
+        {loading ? <Loader size={20} /> : formatNumber(count)}{" "}
+      </p>
       <strong>{label}</strong>
     </>
   )

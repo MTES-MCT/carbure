@@ -43,6 +43,7 @@ export function Table<T>({
   return (
     <div
       data-list
+      data-headless={headless ? "" : undefined}
       className={cl(css.table, variant && css[variant], className)}
       style={style}
     >

@@ -10,6 +10,7 @@ import { Overlay } from "./scaffold"
 export interface DialogProps {
   className?: string
   style?: React.CSSProperties
+  fullscreen?: boolean
   children: React.ReactNode
   onClose: () => void
 }
@@ -18,12 +19,16 @@ export const Dialog = ({
   className,
   style,
   children,
+  fullscreen,
   onClose,
 }: DialogProps) => (
   <Portal onClose={onClose}>
     <div className={css.screen}>
       <Overlay onClick={onClose} />
-      <div className={cl(css.dialog, className)} style={style}>
+      <div
+        className={cl(css.dialog, fullscreen && css.fullscreen, className)}
+        style={style}
+      >
         {children}
         <Button
           variant="icon"
