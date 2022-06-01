@@ -154,6 +154,7 @@ const Certificates = () => {
                       title={t("Suppression certificat")}
                       description={t("Voulez-vous supprimer ce certificat ?")}
                       confirm={t("Supprimer")}
+                      icon={Cross}
                       variant="danger"
                       onClose={close}
                       onConfirm={() =>
