@@ -22,7 +22,7 @@ import {
 } from "./lot-form"
 import { Entity } from "carbure/types"
 import { LotStatus } from "transactions/types"
-import { Country, Depot } from "common/types"
+import { Country, Depot } from "common-v2/types"
 import Select, { SelectProps } from "common-v2/components/select"
 import { DeliveryType } from "transactions/types"
 import { compact, uniqueBy } from "common-v2/utils/collection"

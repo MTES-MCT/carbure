@@ -2,7 +2,7 @@ import { Fragment, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { Entity, UserRole } from "carbure/types"
 import useEntity from "carbure/hooks/entity"
-import { ProductionSite } from "common/types"
+import { ProductionSite } from "common-v2/types"
 import {
   DoubleCounting,
   DoubleCountingStatus as DCStatus,

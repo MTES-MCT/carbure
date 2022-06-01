@@ -8,7 +8,7 @@ import {
   Certificate,
   ProductionSiteDetails,
   EntityCertificate,
-} from "common/types"
+} from "common-v2/types"
 
 import api, { Api } from "./services/api"
 

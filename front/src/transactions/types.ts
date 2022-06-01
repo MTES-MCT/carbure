@@ -5,7 +5,7 @@ import {
   Depot,
   Feedstock,
   ProductionSite,
-} from "common/types"
+} from "common-v2/types"
 
 export interface Lot {
   id: number

@@ -14,7 +14,7 @@ import Select from "common-v2/components/select"
 import * as api from "common-v2/api"
 import * as norm from "common-v2/utils/normalizers"
 import { LotFormValue } from "./lot-form"
-import { Biofuel, Country, Feedstock, Unit } from "common/types"
+import { Biofuel, Country, Feedstock, Unit } from "common-v2/types"
 import useEntity from "carbure/hooks/entity"
 
 interface LotFieldsProps {

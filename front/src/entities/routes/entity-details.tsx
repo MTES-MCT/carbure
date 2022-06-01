@@ -1,5 +1,4 @@
-import { useParams } from "react-router-dom"
-import useClose from "common/hooks/use-close"
+import { useNavigate, useParams } from "react-router-dom"
 import { ChevronLeft } from "common-v2/components/icons"
 import { Button } from "common-v2/components/button"
 import UserRights from "../components/user-rights"
@@ -14,7 +13,7 @@ import { compact } from "common-v2/utils/collection"
 import { useQuery } from "common-v2/hooks/async"
 
 const EntityDetails = () => {
-  const close = useClose("..")
+  const navigate = useNavigate()
   const { id = "" } = useParams<"id">()
   const entityID = parseInt(id, 10)
 
@@ -30,7 +29,11 @@ const EntityDetails = () => {
     <Main>
       <header>
         <Row style={{ alignItems: "center", gap: "var(--spacing-m)" }}>
-          <Button icon={ChevronLeft} action={close} label="Retour" />
+          <Button
+            icon={ChevronLeft}
+            action={() => navigate("..")}
+            label="Retour"
+          />
           <h1>{entityData?.name}</h1>
         </Row>
       </header>

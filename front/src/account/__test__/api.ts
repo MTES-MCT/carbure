@@ -2,14 +2,14 @@ import { rest } from "msw"
 import { setupServer } from "msw/node"
 
 import { UserRightStatus } from "carbure/types"
-import { producer, trader } from "common/__test__/data"
-import { clone } from "common/__test__/helpers"
+import { producer, trader } from "common-v2/__test__/data"
+import { clone } from "common-v2/__test__/helpers"
 import {
   okEntitySearch,
   okErrorsTranslations,
   okFieldsTranslations,
   okTranslations,
-} from "common/__test__/api"
+} from "common-v2/__test__/api"
 
 let accessRequests: any[] = []
 

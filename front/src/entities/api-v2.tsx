@@ -1,5 +1,5 @@
 import api, { Api } from "common-v2/services/api"
-import { EntityCertificate } from "common/types"
+import { EntityCertificate } from "common-v2/types"
 import { EntityDetails } from "./api"
 
 export function getEntityCertificates(entity_id?: number) {

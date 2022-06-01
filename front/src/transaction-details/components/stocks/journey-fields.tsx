@@ -8,7 +8,7 @@ import { UserCheck } from "common-v2/components/icons"
 import * as norm from "common-v2/utils/normalizers"
 import { StockFormValue } from "./stock-form"
 import { Entity } from "carbure/types"
-import { Country, Depot, ProductionSite } from "common/types"
+import { Country, Depot, ProductionSite } from "common-v2/types"
 
 export const JourneyFields = () => {
   const { t } = useTranslation()
