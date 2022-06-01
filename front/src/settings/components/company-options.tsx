@@ -7,7 +7,7 @@ import { Panel, LoaderOverlay, Row } from "common-v2/components/scaffold"
 import Checkbox from "common-v2/components/checkbox"
 // import Select from "common-v2/components/select"
 // import { Calculator } from "common-v2/components/icons"
-import * as api from "../api-v2"
+import * as api from "../api/company"
 
 const CompanyOptions = () => {
   const { t } = useTranslation()

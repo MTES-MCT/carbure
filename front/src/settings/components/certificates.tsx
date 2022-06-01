@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import cl from "clsx"
 import { Trans, useTranslation } from "react-i18next"
-import * as api from "../api-v2"
+import * as api from "../api/certificates"
 import css from "./settings.module.css"
 import useEntity from "carbure/hooks/entity"
 import { useNotify } from "common-v2/components/notifications"
