@@ -5,7 +5,7 @@ import Table, { actionColumn, Cell } from "common-v2/components/table"
 import Button from "common-v2/components/button"
 import { Check, Cross, Return } from "common-v2/components/icons"
 import { usePortal } from "common-v2/components/portal"
-import Dialog from "common-v2/components/dialog"
+import Dialog, { Confirm } from "common-v2/components/dialog"
 import { useMutation, useQuery } from "common-v2/hooks/async"
 import * as api from "../api-v2"
 import { useNotify } from "common-v2/components/notifications"
@@ -137,27 +137,14 @@ const CheckCertificate = ({ certificate }: ActionProps) => {
       icon={Check}
       action={() =>
         portal((close) => (
-          <Dialog onClose={close}>
-            <header>
-              <h1>{t("Valider le certificat")}</h1>
-            </header>
-            <main>
-              <p>{t("Voulez-vous valider ce certificat ?")}</p>
-            </main>
-            <footer>
-              <Button
-                asideX
-                loading={checkCertificate.loading}
-                variant="primary"
-                icon={Check}
-                label={t("Valider")}
-                action={() =>
-                  checkCertificate.execute(certificate.id).then(close)
-                }
-              />
-              <Button icon={Return} label={t("Annuler")} action={close} />
-            </footer>
-          </Dialog>
+          <Confirm
+            title={t("Valider le certificat")}
+            description={t("Voulez-vous valider ce certificat ?")}
+            variant="success"
+            confirm={t("Valider")}
+            onClose={close}
+            onConfirm={() => checkCertificate.execute(certificate.id)}
+          />
         ))
       }
     />
@@ -187,27 +174,17 @@ const RejectCertificate = ({ certificate }: ActionProps) => {
       icon={Cross}
       action={() =>
         portal((close) => (
-          <Dialog onClose={close}>
-            <header>
-              <h1>{t("Refuser le certificat")}</h1>
-            </header>
-            <main>
-              <p>{t("Voulez-vous refuser ce certificat ?")}</p>
-            </main>
-            <footer>
-              <Button
-                asideX
-                loading={rejectCertificate.loading}
-                variant="primary"
-                icon={Check}
-                label={t("Confirmer")}
-                action={() =>
-                  rejectCertificate.execute(certificate.id).then(close)
-                }
-              />
-              <Button icon={Return} label={t("Annuler")} action={close} />
-            </footer>
-          </Dialog>
+          <Confirm
+            title={t("Refuser le certificat")}
+            description={t("Voulez-vous refuser ce certificat ?")}
+            variant="danger"
+            confirm={t("Refuser")}
+            icon={Cross}
+            onClose={close}
+            onConfirm={() =>
+              rejectCertificate.execute(certificate.id).then(close)
+            }
+          />
         ))
       }
     />

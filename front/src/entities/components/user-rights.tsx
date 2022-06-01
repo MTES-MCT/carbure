@@ -8,7 +8,6 @@ import { useQuery, useMutation } from "common-v2/hooks/async"
 import { UserRightRequest, UserRightStatus, UserRole } from "carbure/types"
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
-import { formatDate } from "settings/components/common"
 import * as api from "../api"
 import styles from "./user-rights.module.css"
 import { Panel } from "common-v2/components/scaffold"
@@ -16,6 +15,7 @@ import { usePortal } from "common-v2/components/portal"
 import { useTranslation } from "react-i18next"
 import Button from "common-v2/components/button"
 import { compact } from "common-v2/utils/collection"
+import { formatDate } from "common-v2/utils/formatters"
 
 const ROLE_LABELS = {
   [UserRole.ReadOnly]: "Lecture seule",

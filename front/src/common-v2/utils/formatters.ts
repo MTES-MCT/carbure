@@ -47,6 +47,10 @@ export function formatDate(
   }
 }
 
+export function formatDateYear(date: Date | string | null) {
+  return formatDate(date, { month: undefined, day: undefined })
+}
+
 export function formatDateTime(date: Date | string | null) {
   return formatDate(date, {
     hour: "2-digit",

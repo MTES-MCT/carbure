@@ -6,7 +6,7 @@ import { ProductionSiteDetails } from "common/types"
 
 import useAPI from "common/hooks/use-api"
 import * as api from "../api"
-import * as api2 from "../api-v2"
+import * as api2 from "../api/certificates"
 import {
   ProductionSitePrompt,
   ProductionSiteState,

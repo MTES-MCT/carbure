@@ -2,7 +2,6 @@ import React, { useState } from "react"
 import cl from "clsx"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api/certificates"
-import css from "./settings.module.css"
 import useEntity from "carbure/hooks/entity"
 import { useNotify } from "common-v2/components/notifications"
 import { useQuery, useMutation } from "common-v2/hooks/async"
@@ -25,9 +24,9 @@ import {
   normalizeEntityCertificate,
 } from "common-v2/utils/normalizers"
 import { Certificate, EntityCertificate } from "common/types"
-import { isExpired } from "./common"
 import Alert from "common-v2/components/alert"
 import Select from "common-v2/components/select"
+import isBefore from "date-fns/isBefore"
 
 const Certificates = () => {
   const { t } = useTranslation()
@@ -257,7 +256,7 @@ export const ExpirationDate = ({ link }: ExpirationDateProps) => {
   const updated = link.has_been_updated
 
   return (
-    <span className={cl(css.expirationDate, expired && css.expired)}>
+    <span style={{ color: expired ? "var(--orange-dark)" : undefined }}>
       {expired && !updated && (
         <React.Fragment>
           {formatted}
@@ -360,6 +359,16 @@ const CertificateUpdateDialog = ({
       </footer>
     </Dialog>
   )
+}
+
+export function isExpired(date: string) {
+  try {
+    const now = new Date()
+    const valid_until = new Date(date)
+    return isBefore(valid_until, now)
+  } catch (e) {
+    return false
+  }
 }
 
 export default Certificates

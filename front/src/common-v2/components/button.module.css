@@ -165,3 +165,12 @@
 .mailto {
   align-items: center;
 }
+
+.downloadLink {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--blue-medium);
+  text-decoration: underline;
+  gap: var(--spacing-s);
+}

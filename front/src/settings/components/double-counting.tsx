@@ -1,6 +1,5 @@
 import { Fragment, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
-import styles from "./settings.module.css"
 import { Entity, UserRole } from "carbure/types"
 import useEntity from "carbure/hooks/entity"
 import { ProductionSite } from "common/types"
@@ -14,7 +13,7 @@ import {
 import { Col, LoaderOverlay } from "common-v2/components/scaffold"
 import { useRights } from "carbure/hooks/entity"
 import Table, { Cell, actionColumn, Column } from "common-v2/components/table"
-import Button, { MailTo } from "common-v2/components/button"
+import Button, { DownloadLink, MailTo } from "common-v2/components/button"
 import {
   AlertCircle,
   Check,
@@ -26,7 +25,6 @@ import {
 } from "common-v2/components/icons"
 import { Alert } from "common-v2/components/alert"
 import Dialog, { Confirm } from "common-v2/components/dialog"
-import { formatDate, YEAR_ONLY } from "./common"
 import {
   findBiofuels,
   findCountries,
@@ -43,7 +41,11 @@ import { useForm } from "common-v2/components/form"
 import YearTable from "doublecount/components/year-table"
 import DoubleCountingStatus from "doublecount/components/dc-status"
 import { SourcingAggregationTable } from "doublecount/components/dc-tables"
-import { formatNumber } from "common-v2/utils/formatters"
+import {
+  formatDate,
+  formatDateYear,
+  formatNumber,
+} from "common-v2/utils/formatters"
 import { Panel } from "common-v2/components/scaffold"
 import { FileInput } from "common-v2/components/input"
 import {
@@ -131,10 +133,7 @@ const DoubleCountingSettings = () => {
               header: t("Période de validité"),
               cell: (dc) => (
                 <Cell
-                  text={`${formatDate(
-                    dc.period_start,
-                    YEAR_ONLY
-                  )} - ${formatDate(dc.period_end, YEAR_ONLY)}`}
+                  text={`${formatDateYear(dc.period_start)} - ${formatDateYear(dc.period_end)}`} // prettier-ignore
                 />
               ),
             },
@@ -493,20 +492,20 @@ const DoubleCountingDialog = ({
         )}
       </main>
       <footer>
-        <Col style={{ marginRight: "auto" }}>
-          <a href={excelURL ?? "#"} target="_blank" rel="noreferrer">
-            <Upload />
-            <Trans>Télécharger le dossier au format excel</Trans>
-          </a>
-          <a href={documentationURL ?? "#"} target="_blank" rel="noreferrer">
-            <Upload />
-            <Trans>Télécharger la description de l'activité</Trans>
-          </a>
+        <Col style={{ gap: "var(--spacing-xs)", marginRight: "auto" }}>
+          <DownloadLink
+            href={excelURL ?? "#"}
+            label={t("Télécharger le dossier au format excel")}
+          />
+          <DownloadLink
+            href={documentationURL ?? "#"}
+            label={t("Télécharger la description de l'activité")}
+          />
           {decisionURL && (
-            <a href={decisionURL} target="_blank" rel="noreferrer">
-              <Upload />
-              <Trans>Télécharger la décision de l'administration</Trans>
-            </a>
+            <DownloadLink
+              href={decisionURL ?? "#"}
+              label={t("Téléchargerla décision de l'administration")}
+            />
           )}
         </Col>
 

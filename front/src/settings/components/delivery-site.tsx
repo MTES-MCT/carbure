@@ -106,21 +106,28 @@ const DeliverySitesSettings = ({
           onAction={showDeliverySite}
           columns={[
             {
+              key: "id",
               header: t("ID"),
+              orderBy: (ds) => ds.depot?.depot_id ?? "",
               cell: (ds) => <Cell text={ds.depot!.depot_id} />,
             },
             {
+              key: "name",
               header: t("Nom"),
+              orderBy: (ds) => ds.depot?.name ?? "",
               cell: (ds) => <Cell text={ds.depot!.name} />,
             },
             {
+              key: "type",
               header: t("Type"),
               cell: (ds) => (
                 <Cell text={depotTypeLabels[ds.depot!.depot_type]} />
               ),
             },
             {
+              key: "city",
               header: t("Ville"),
+              orderBy: (ds) => ds.depot?.city ?? "",
               cell: (ds) => (
                 <Cell
                   text={`${ds.depot!.city}, ${t(ds.depot!.country.code_pays, {

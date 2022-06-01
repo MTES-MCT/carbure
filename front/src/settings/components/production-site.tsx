@@ -11,8 +11,6 @@ import {
 } from "common/types"
 import { ProductionSiteSettingsHook } from "../hooks/use-production-sites"
 
-import styles from "./settings.module.css"
-
 import * as common from "common/api"
 import useForm from "common/hooks/use-form"
 
@@ -47,10 +45,11 @@ import {
   MultiAutocomplete,
 } from "common/components/autocomplete"
 import RadioGroup from "common/components/radio-group"
-import { formatDate, SettingsForm } from "./common"
-import { getMyCertificates } from "../api-v2"
+import { getMyCertificates } from "../api/certificates"
 import { useRights } from "carbure/hooks/entity"
 import { Panel } from "common-v2/components/scaffold"
+import Form from "common-v2/components/form"
+import { formatDate } from "common-v2/utils/formatters"
 
 export type ProductionSiteState = {
   // site
@@ -84,7 +83,7 @@ export type ProductionSiteState = {
 type ProductionSitePromptProps = PromptProps<ProductionSiteState> & {
   title: string
   description?: string
-  entity: Entity | null
+  entity: Entity | undefined
   productionSite?: ProductionSiteDetails
   readOnly?: boolean
 }
@@ -139,7 +138,7 @@ export const ProductionSitePrompt = ({
       <DialogTitle text={title} />
       {description && <DialogText text={description} />}
 
-      <SettingsForm>
+      <Form>
         <hr />
 
         <LabelInput
@@ -322,7 +321,7 @@ export const ProductionSitePrompt = ({
             <Trans>Retour</Trans>
           </Button>
         </DialogButtons>
-      </SettingsForm>
+      </Form>
     </Dialog>
   )
 }
@@ -354,24 +353,20 @@ const ProductionSitesSettings = ({
     padding,
     {
       header: t("ID"),
-      className: styles.settingsTableColumn,
       render: (ps) => <Line text={`${ps.site_id}`} />,
     },
     {
       header: t("Nom"),
-      className: styles.settingsTableColumn,
       render: (ps) => <Line text={ps.name} />,
     },
     {
       header: t("Pays"),
-      className: styles.settingsTableColumn,
       render: (ps) => (
         <Line text={t(ps.country?.code_pays, { ns: "countries" })} />
       ),
     },
     {
       header: t("Date de mise en service"),
-      className: styles.settingsTableColumn,
       render: (ps) => <Line text={formatDate(ps.date_mise_en_service)} />,
     },
     actions,
@@ -403,16 +398,17 @@ const ProductionSitesSettings = ({
       </header>
 
       {settings.isEmpty && (
-        <section style={{ marginBottom: "var(--spacing-l)" }}>
-          <Alert icon={AlertCircle} level="warning">
-            <Trans>Aucun site de production trouvé</Trans>
-          </Alert>
-        </section>
+        <>
+          <section>
+            <Alert icon={AlertCircle} level="warning">
+              <Trans>Aucun site de production trouvé</Trans>
+            </Alert>
+          </section>
+          <footer />
+        </>
       )}
 
-      {!settings.isEmpty && (
-        <Table columns={columns} rows={rows} className={styles.settingsTable} />
-      )}
+      {!settings.isEmpty && <Table columns={columns} rows={rows} />}
 
       {settings.isLoading && <LoaderOverlay />}
     </Panel>

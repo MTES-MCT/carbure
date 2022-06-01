@@ -8,18 +8,12 @@ import { ChevronLeft } from "common-v2/components/icons"
 import { Button } from "common-v2/components/button"
 import UserRights from "../components/user-rights"
 import * as api from "../api"
-import DeliverySitesSettings, {
-  DeliverySiteDialog,
-} from "settings/components/delivery-site"
+import DeliverySitesSettings from "settings/components/delivery-site"
 import { ProductionSiteSettingsHook } from "settings/hooks/use-production-sites"
 import ProductionSitesSettings from "settings/components/production-site"
-import { prompt } from "common/components/dialog"
 import { EntityType } from "carbure/types"
-import { EntityDepot, ProductionSiteDetails } from "common/types"
-import {
-  ProductionSitePrompt,
-  ProductionSiteState,
-} from "settings/components/production-site"
+import { ProductionSiteDetails } from "common/types"
+import { ProductionSitePrompt } from "settings/components/production-site"
 import Certificates from "entities/components/certificates"
 import { Main, Row } from "common-v2/components/scaffold"
 import Tabs from "common-v2/components/tabs"

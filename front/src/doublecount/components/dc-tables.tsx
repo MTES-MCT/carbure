@@ -10,9 +10,8 @@ import {
 import Table, { Column, Cell } from "common-v2/components/table"
 import { NumberInput } from "common-v2/components/input"
 import { Entity } from "carbure/types"
-import { formatDate } from "settings/components/common"
 import YearTable from "./year-table"
-import { formatNumber } from "common-v2/utils/formatters"
+import { formatDate, formatNumber } from "common-v2/utils/formatters"
 
 type ValidationStatus = {
   approved: boolean

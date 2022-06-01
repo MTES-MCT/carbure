@@ -7,7 +7,6 @@ import { AlertCircle, Check, Cross } from "common-v2/components/icons"
 import Table, { actionColumn, Cell } from "common-v2/components/table"
 import { useQuery, useMutation } from "common-v2/hooks/async"
 import { UserRightRequest, UserRightStatus } from "carbure/types"
-import { formatDate } from "settings/components/common"
 import * as api from "../api/user-rights"
 import styles from "entities/components/user-rights.module.css"
 import { getUserRoleLabel } from "common-v2/utils/normalizers"
@@ -16,6 +15,7 @@ import useEntity from "carbure/hooks/entity"
 import { compact } from "common-v2/utils/collection"
 import Button from "common-v2/components/button"
 import { usePortal } from "common-v2/components/portal"
+import { formatDate } from "common-v2/utils/formatters"
 
 const RIGHTS_ORDER = {
   [UserRightStatus.Pending]: 0,
