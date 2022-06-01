@@ -184,16 +184,16 @@ export const okAddProductionSite = rest.post(
   (req, res, ctx) => {
     const body = req.body as FormData
 
-    setProductionSites([
-      {
-        ...productionSite,
-        name: body.get("name") as string,
-        date_mise_en_service: body.get("date_mise_en_service") as string,
-        site_id: body.get("site_id") as string,
-      },
-    ])
+    const psite = {
+      ...productionSite,
+      name: body.get("name") as string,
+      date_mise_en_service: body.get("date_mise_en_service") as string,
+      site_id: body.get("site_id") as string,
+    }
 
-    return res(ctx.json({ status: "success" }))
+    setProductionSites([psite])
+
+    return res(ctx.json({ status: "success", data: psite }))
   }
 )
 
