@@ -19,7 +19,7 @@ import useEntity from "carbure/hooks/entity"
 import { Anchors } from "common-v2/components/dropdown"
 import Autocomplete from "common-v2/components/autocomplete"
 import * as norm from "common-v2/utils/normalizers"
-import { getDeliverySites } from "settings/api"
+import { getDeliverySites } from "settings/api/delivery-sites"
 import { findEntities, findMyCertificates } from "common-v2/api"
 import Select from "common-v2/components/select"
 import { compact } from "common-v2/utils/collection"
@@ -850,6 +850,6 @@ const ProcessingDialog = ({
 async function getProcessingDepots(entity_id: number, type: EntityType) {
   if (type !== EntityType.Operator) return []
 
-  const depots: EntityDepot[] = await getDeliverySites(entity_id)
-  return depots.filter((depot) => depot.blending_is_outsourced)
+  const depots = await getDeliverySites(entity_id)
+  return depots.data.data?.filter((depot) => depot.blending_is_outsourced) ?? []
 }

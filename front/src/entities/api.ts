@@ -1,7 +1,6 @@
-import api from "common/services/api"
+import api, { Api } from "common-v2/services/api"
 import { Entity, UserRightRequest, UserRightStatus } from "carbure/types"
-import { ProductionSiteDetails } from "common/types"
-import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
+import { ProductionSiteDetails, EntityDepot } from "common/types"
 
 export interface EntityDetails {
   entity: Entity
@@ -16,47 +15,48 @@ export interface EntityDetails {
 }
 
 export function getEntities(): Promise<EntityDetails[]> {
-  return api.get("/admin/entities")
+  return api.get("/v3/admin/entities")
 }
 
-export function getEntityDetails(entity_id: number): Promise<Entity> {
-  return api.get("/admin/entities/details", { entity_id })
+export function getEntityDetails(entity_id: number) {
+  return api.get<Api<Entity>>("/v3/admin/entities/details", {
+    params: { entity_id },
+  })
 }
 
-export function getEntityDepots(
-  entity_id: number
-): Promise<EntityDeliverySite[]> {
-  return api.get("/admin/entities/depots", { entity_id })
+export function getEntityDepots(entity_id: number) {
+  return api.get<Api<EntityDepot[]>>("/v3/admin/entities/depots", {
+    params: { entity_id },
+  })
 }
 
-export function getEntityProductionSites(
-  entity_id: number
-): Promise<ProductionSiteDetails[]> {
-  return api.get("/admin/entities/production_sites", { entity_id })
+export function getEntityProductionSites(entity_id: number) {
+  return api.get<Api<ProductionSiteDetails[]>>(
+    "/v3/admin/entities/production_sites",
+    {
+      params: { entity_id },
+    }
+  )
 }
 
-export function getEntityCertificates(entity_id: number): Promise<any[]> {
-  return api.get("/admin/entities/certificates", { entity_id })
-}
-
-export function getUsers(query: string, entity_id: number): Promise<any[]> {
-  return api.get("/admin/users", { q: query, entity_id })
+export function getUsers(query: string, entity_id: number) {
+  return api.get<Api<UserRightRequest[]>>("/v3/admin/users", {
+    params: { q: query, entity_id },
+  })
 }
 
 export function getUsersRightRequests(
   query: string,
   entity_id: number,
   statuses?: UserRightStatus[]
-): Promise<UserRightRequest[]> {
-  return api.get("/admin/users/rights-requests", {
-    q: query,
-    entity_id,
-    statuses,
+) {
+  return api.get<Api<UserRightRequest[]>>("/v3/admin/users/rights-requests", {
+    params: { q: query, entity_id, statuses },
   })
 }
 
 export function updateUsersRights(user_id: number, status?: UserRightStatus) {
-  return api.post("/admin/users/update-right-request", {
+  return api.post("/v3/admin/users/update-right-request", {
     id: user_id,
     status,
   })
