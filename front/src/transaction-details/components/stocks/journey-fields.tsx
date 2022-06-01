@@ -39,7 +39,7 @@ export const ProductionSiteField = (
       label={t("Site de production")}
       icon={isKnown ? UserCheck : undefined}
       defaultOptions={bound.value ? [bound.value] : undefined}
-      normalize={norm.normalizeProductionSite}
+      normalize={norm.normalizeProductionSiteOrUnknown}
       {...bound}
       {...props}
     />
@@ -112,7 +112,7 @@ export const DepotField = (props: AutocompleteProps<Depot | string>) => {
       label={t("Site de livraison")}
       icon={isKnown ? UserCheck : undefined}
       defaultOptions={bound.value ? [bound.value] : undefined}
-      normalize={norm.normalizeDepot}
+      normalize={norm.normalizeDepotOrUnknown}
       {...bound}
       {...props}
     />
