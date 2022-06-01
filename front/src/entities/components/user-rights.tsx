@@ -1,10 +1,10 @@
 import { RightStatus } from "account/components/access-rights"
-import { Alert } from "common/components/alert"
-import { confirm } from "common/components/dialog"
+import { Alert } from "common-v2/components/alert"
+import { Confirm } from "common-v2/components/dialog"
 import { AlertCircle, Check, Cross } from "common-v2/components/icons"
-import { Input } from "common/components/input"
-import Table, { Actions, Column, padding } from "common/components/table"
-import useAPI from "common/hooks/use-api"
+import { Input } from "common-v2/components/input"
+import Table, { actionColumn, Column } from "common-v2/components/table"
+import { useQuery, useMutation } from "common-v2/hooks/async"
 import { UserRightRequest, UserRightStatus, UserRole } from "carbure/types"
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
@@ -12,6 +12,10 @@ import { formatDate } from "settings/components/common"
 import * as api from "../api"
 import styles from "./user-rights.module.css"
 import { Panel } from "common-v2/components/scaffold"
+import { usePortal } from "common-v2/components/portal"
+import { useTranslation } from "react-i18next"
+import Button from "common-v2/components/button"
+import { compact } from "common-v2/utils/collection"
 
 const ROLE_LABELS = {
   [UserRole.ReadOnly]: "Lecture seule",
@@ -27,93 +31,38 @@ const RIGHTS_ORDER = {
   [UserRightStatus.Rejected]: 3,
 }
 
-const RIGHTS_COLUMNS: Column<UserRightRequest>[] = [
-  padding,
-  {
-    header: "Statut",
-    render: (r: UserRightRequest) => <RightStatus status={r.status} />,
-  },
-  {
-    header: "Utilisateur",
-    render: (r) => r.user[0] ?? "",
-  },
-  {
-    header: "Droits",
-    render: (r) => ROLE_LABELS[r.role],
-  },
-  {
-    header: "Date",
-    render: (r) => {
-      const dateRequested = formatDate(r.date_requested)
-      const dateExpired = r.expiration_date ? formatDate(r.expiration_date) : null // prettier-ignore
-
-      return dateExpired
-        ? `${dateRequested} (expire le ${dateExpired})`
-        : dateRequested
-    },
-  },
-]
-
 const UserRights = () => {
-  const { id } = useParams<"id">()
-  const [query, setQuery] = useState("")
-  const [rights, getRights] = useAPI(api.getUsersRightRequests)
+  const { t } = useTranslation()
+  const portal = usePortal()
 
+  const { id } = useParams<"id">()
   const entityID = parseInt(id ?? "", 10)
-  const [, updateRight] = useAPI(api.updateUsersRights)
+
+  const [query, setQuery] = useState("")
+
+  const rights = useQuery(api.getUsersRightRequests, {
+    key: "user-right-requests",
+    params: [query, entityID],
+  })
+
+  const updateRight = useMutation(api.updateUsersRights, {
+    invalidates: ["user-right-requests"],
+  })
 
   async function updateRightRequest(user: number, status: UserRightStatus) {
-    const ok = await confirm(
-      "Modifier droits d'accès",
-      `Voulez vous changer les droits d'accès de cet utilisateur en: ${status} ?`
-    )
-
-    if (ok && entityID >= 0) {
-      await updateRight(user, status)
-      await getRights(query, entityID)
-    }
+    portal((close) => (
+      <Confirm
+        title={t("Modifier droits d'accès")}
+        description={t(`Voulez vous changer les droits d'accès de cet utilisateur en: {{status}} ?`, { status })} // prettier-ignore
+        confirm={t("Confirmer")}
+        variant="primary"
+        onClose={close}
+        onConfirm={async () => updateRight.execute(user, status)}
+      />
+    ))
   }
 
-  useEffect(() => {
-    getRights(query, entityID)
-  }, [getRights, query, entityID])
-
-  const rows = (rights.data ?? [])
-    .map((r) => ({ value: r }))
-    .sort((a, b) => RIGHTS_ORDER[a.value.status] - RIGHTS_ORDER[b.value.status])
-
-  // available actions are different depending on the status of the user
-  const actions = Actions<UserRightRequest>((right) => {
-    switch (right.status) {
-      case UserRightStatus.Accepted:
-        return [
-          {
-            title: "Révoqer",
-            icon: Cross,
-            action: (r) => updateRightRequest(r.id, UserRightStatus.Revoked),
-          },
-        ]
-
-      case UserRightStatus.Pending:
-      case UserRightStatus.Rejected:
-      case UserRightStatus.Revoked:
-        return [
-          {
-            title: "Accepter",
-            icon: Check,
-            action: (r) => updateRightRequest(r.id, UserRightStatus.Accepted),
-          },
-          {
-            title: "Refuser",
-            icon: Cross,
-            action: (r) => updateRightRequest(r.id, UserRightStatus.Rejected),
-          },
-        ]
-
-      default:
-        return []
-    }
-  })
+  const rows = rights.result ?? []
 
   return (
     <Panel id="users">
@@ -132,7 +81,7 @@ const UserRights = () => {
         {rows.length === 0 && (
           <Alert
             icon={AlertCircle}
-            level="warning"
+            variant="warning"
             className={styles.emptyUserRights}
           >
             Aucun utilisateur associé à cette entité
@@ -141,7 +90,77 @@ const UserRights = () => {
       </section>
 
       {rows.length > 0 && (
-        <Table columns={[...RIGHTS_COLUMNS, actions]} rows={rows} />
+        <Table
+          order={{ column: "status", direction: "asc" }}
+          rows={rows}
+          columns={[
+            {
+              key: "status",
+              header: "Statut",
+              orderBy: (r) => RIGHTS_ORDER[r.status],
+              cell: (r: UserRightRequest) => <RightStatus status={r.status} />,
+            },
+            {
+              key: "user",
+              header: "Utilisateur",
+              orderBy: (r) => r.user[0] ?? "",
+              cell: (r) => r.user[0] ?? "",
+            },
+            {
+              key: "role",
+              header: "Droits",
+              orderBy: (r) => ROLE_LABELS[r.role],
+              cell: (r) => ROLE_LABELS[r.role],
+            },
+            {
+              key: "date",
+              header: "Date",
+              orderBy: (r) => r.date_requested,
+              cell: (r) => {
+                const dateRequested = formatDate(r.date_requested)
+                const dateExpired = r.expiration_date ? formatDate(r.expiration_date) : null // prettier-ignore
+
+                return dateExpired
+                  ? `${dateRequested} (expire le ${dateExpired})`
+                  : dateRequested
+              },
+            },
+            actionColumn<UserRightRequest>((right) =>
+              compact([
+                right.status === UserRightStatus.Accepted && (
+                  <Button
+                    variant="icon"
+                    title={t("Révoqer")}
+                    icon={Cross}
+                    action={() =>
+                      updateRightRequest(right.id, UserRightStatus.Revoked)
+                    }
+                  />
+                ),
+                right.status !== UserRightStatus.Accepted && (
+                  <Button
+                    variant="icon"
+                    title={t("Accepter")}
+                    icon={Check}
+                    action={() =>
+                      updateRightRequest(right.id, UserRightStatus.Accepted)
+                    }
+                  />
+                ),
+                right.status !== UserRightStatus.Accepted && (
+                  <Button
+                    variant="icon"
+                    title={t("Refuser")}
+                    icon={Cross}
+                    action={() =>
+                      updateRightRequest(right.id, UserRightStatus.Rejected)
+                    }
+                  />
+                ),
+              ])
+            ),
+          ]}
+        />
       )}
     </Panel>
   )

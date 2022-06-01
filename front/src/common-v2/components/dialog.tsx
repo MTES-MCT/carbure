@@ -6,6 +6,7 @@ import Portal from "./portal"
 import Button, { ButtonVariant } from "./button"
 import { Cross, Check, Return } from "./icons"
 import { Overlay } from "./scaffold"
+import { useMutation } from "common-v2/hooks/async"
 
 export interface DialogProps {
   className?: string
@@ -61,6 +62,7 @@ export const Confirm = ({
   onClose,
 }: ConfirmProps) => {
   const { t } = useTranslation()
+  const confirmAction = useMutation(onConfirm)
   return (
     <Dialog onClose={onClose}>
       <header>
@@ -75,7 +77,8 @@ export const Confirm = ({
           icon={icon}
           variant={variant}
           label={confirm}
-          action={() => onConfirm().then(onClose)}
+          loading={confirmAction.loading}
+          action={() => confirmAction.execute().then(onClose)}
         />
         <Button icon={Return} label={t("Retour")} action={onClose} />
       </footer>

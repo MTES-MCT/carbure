@@ -65,7 +65,7 @@ export function Table<T>({
               )}
             >
               {order && column.key === order.column && (
-                <span>{order.direction === "asc" ? " ▲" : " ▼"}</span>
+                <span>{order.direction === "asc" ? " ▼" : " ▲"}</span>
               )}{" "}
               {column.header}
             </div>
