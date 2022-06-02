@@ -1,7 +1,5 @@
-import { Fragment } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useQuery } from "common/hooks/async"
-import { LoaderOverlay } from "common/components/scaffold"
 import Table, { Cell, Column } from "common/components/table"
 import { Dialog } from "common/components/dialog"
 import { Button } from "common/components/button"
