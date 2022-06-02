@@ -65,7 +65,7 @@ export const Notification = ({
 
 // initialize notification container and add it to the dom
 const notifications = document.createElement("ul")
-notifications.id = "notifications-v2"
+notifications.id = "notifications"
 document.body.append(notifications)
 
 export const DEFAULT_TIMEOUT = 10000

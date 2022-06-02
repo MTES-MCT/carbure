@@ -9,7 +9,6 @@ import { UserRightRequest, UserRightStatus, UserRole } from "carbure/types"
 import { useState } from "react"
 import { useParams } from "react-router-dom"
 import * as api from "../api"
-import styles from "./user-rights.module.css"
 import { Panel } from "common/components/scaffold"
 import { usePortal } from "common/components/portal"
 import { useTranslation } from "react-i18next"
@@ -79,11 +78,7 @@ const UserRights = () => {
           />
         )}
         {rows.length === 0 && (
-          <Alert
-            icon={AlertCircle}
-            variant="warning"
-            className={styles.emptyUserRights}
-          >
+          <Alert icon={AlertCircle} variant="warning">
             Aucun utilisateur associé à cette entité
           </Alert>
         )}

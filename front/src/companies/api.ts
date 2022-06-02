@@ -1,21 +1,14 @@
 import api, { Api } from "common/services/api"
 import { Entity, UserRightRequest, UserRightStatus } from "carbure/types"
-import { ProductionSiteDetails, EntityDepot } from "common/types"
+import {
+  ProductionSiteDetails,
+  EntityDepot,
+  EntityCertificate,
+} from "common/types"
+import { EntityDetails } from "./types"
 
-export interface EntityDetails {
-  entity: Entity
-  users: number
-  requests: number
-  depots: number
-  production_sites: number
-  certificates: number
-  certificates_pending: number
-  double_counting: number
-  double_counting_requests: number
-}
-
-export function getEntities(): Promise<EntityDetails[]> {
-  return api.get("/v3/admin/entities")
+export function getEntities() {
+  return api.get<Api<EntityDetails[]>>("/v3/admin/entities")
 }
 
 export function getEntityDetails(entity_id: number) {
@@ -60,4 +53,18 @@ export function updateUsersRights(user_id: number, status?: UserRightStatus) {
     id: user_id,
     status,
   })
+}
+
+export function getEntityCertificates(entity_id?: number) {
+  return api.get<Api<EntityCertificate[]>>("/admin/entity-certificates", {
+    params: { entity_id },
+  })
+}
+
+export function checkEntityCertificate(entity_certificate_id: number) {
+  return api.post("admin/entity-certificates/check", { entity_certificate_id })
+}
+
+export function rejectEntityCertificate(entity_certificate_id: number) {
+  return api.post("admin/entity-certificates/reject", { entity_certificate_id })
 }

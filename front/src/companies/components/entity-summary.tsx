@@ -1,7 +1,8 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import cl from "clsx"
-import * as api from "../api-v2"
+import * as api from "../api"
+import { EntityDetails } from "companies/types"
 import css from "./entity-summary.module.css"
 import Table, { Cell } from "common/components/table"
 import { Alert } from "common/components/alert"
@@ -16,7 +17,6 @@ import {
   getEntityTypeLabel,
   normalizeEntityType,
 } from "common/utils/normalizers"
-import { EntityDetails } from "companies/api"
 
 type EntitySummaryProps = {
   search?: string
