@@ -49,6 +49,7 @@ urlpatterns = [
     path('lots/accept-direct-delivery', views.accept_direct_delivery, name='api-v4-accept-direct-delivery'),
     ### Warnings
     path('lots/toggle-warning', views.toggle_warning, name='api-v4-toggle-warning'),
+    path('lots/recalc-score', views.recalc_score, name='api-v4-recalc-score'),
 
     # STOCKS
     path('stocks', views.get_stock, name='api-v4-get-stock'),
@@ -65,12 +66,6 @@ urlpatterns = [
     path('declarations/validate', views.validate_declaration, name='api-v4-validate-declaration'),
     path('declarations/invalidate', views.invalidate_declaration, name='api-v4-invalidate-declaration'),
 
-    #### missing endpoints vs previous version
-    # GET
-    #path('declaration-summary', views.get_declaration_summary, name='api-v3-lots-get-declaration-summary'),
-    #path('summary', views.get_lots_summary, name='api-v3-lots-get-lots-summary'),
-    # POST
-    # IMPORT/FILES
     path('download-template', views.get_template, name='api-v4-get-template'),
     path('download-template-stock', views.get_template_stock, name='api-v4-get-template-stock'),
 
