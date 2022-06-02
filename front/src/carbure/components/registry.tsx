@@ -1,14 +1,14 @@
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useQuery } from "common/hooks/async"
-import { findEntities } from "common/api"
+import { findEntities } from "carbure/api"
 import { Main } from "common/components/scaffold"
 import { SearchInput } from "common/components/input"
 import { Alert } from "common/components/alert"
 import { AlertCircle } from "common/components/icons"
 import Table from "common/components/table"
 import useTitle from "common/hooks/title"
-import { getEntityTypeLabel } from "common/utils/normalizers"
+import { getEntityTypeLabel } from "carbure/utils/normalizers"
 
 const Registry = () => {
   const { t } = useTranslation()

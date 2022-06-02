@@ -21,7 +21,7 @@ import Alert from "common/components/alert"
 import { formatPeriod } from "common/utils/formatters"
 import i18next from "i18next"
 import { Link } from "react-router-dom"
-import { normalizePeriod } from "common/utils/normalizers"
+import { normalizePeriod } from "carbure/utils/normalizers"
 
 const date = new Date()
 const currentPeriod = `${date.getFullYear() * 100 + date.getMonth() + 1}`

@@ -23,17 +23,6 @@ configure({
   },
 })
 
-const modal = document.createElement("div")
-modal.setAttribute("id", "modal")
-
-const dropdown = document.createElement("div")
-dropdown.setAttribute("id", "dropdown")
-
-const notifications = document.createElement("div")
-notifications.setAttribute("id", "notifications")
-
-document.body.append(modal, dropdown, notifications)
-
 // mock window.open (jsdom does not implement it)
 window.open = jest.fn()
 
@@ -96,9 +85,3 @@ export function render(element: any) {
   document.body.append(root)
   return baseRender(element, { container: root })
 }
-
-beforeEach(() => {
-  modal.textContent = ""
-  dropdown.textContent = ""
-  notifications.textContent = ""
-})

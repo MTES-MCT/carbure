@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 
-export default function useTitle(title: string) {
+export default function useTitle(title: string, prefix: string = "CarbuRe ∙ ") {
   useEffect(() => {
-    document.title = `CarbuRe ∙ ${title}`
-  }, [title])
+    document.title = `${prefix}${title}`
+  }, [prefix, title])
 }

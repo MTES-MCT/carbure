@@ -3,7 +3,7 @@ import { waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Route } from "react-router-dom"
 
-import { admin, operator, producer, trader } from "common/__test__/data"
+import { admin, operator, producer, trader } from "carbure/__test__/data"
 import Settings from "../index"
 import server, { okDynamicSettings, setEntity } from "./api"
 

@@ -8,7 +8,7 @@ import server from "./api"
 import { MemoryRouter } from "react-router"
 import { Suspense } from "react"
 import { LoaderOverlay } from "common/components/scaffold"
-import { producer } from "common/__test__/data"
+import { producer } from "carbure/__test__/data"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 beforeEach(() => setEntity(producer))
@@ -25,7 +25,7 @@ const CarbureWithRouter = () => {
   )
 }
 
-test("display alert message when connected without access rights", async () => {
+test.only("display alert message when connected without access rights", async () => {
   server.use(okEmptySettings)
   render(<CarbureWithRouter />)
 

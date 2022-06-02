@@ -6,8 +6,8 @@ import {
   operator,
   producer,
   productionSite,
-} from "common/__test__/data"
-import { clone } from "common/__test__/helpers"
+} from "carbure/__test__/data"
+import { clone } from "carbure/__test__/helpers"
 import { LotDetails } from "transaction-details/types"
 import {
   CorrectionStatus,

@@ -1,6 +1,5 @@
-import { Entity } from "carbure/types"
 import api, { Api } from "common/services/api"
-import { EntityDepot, OwnershipType } from "common/types"
+import { Entity, EntityDepot, OwnershipType } from "carbure/types"
 
 export function getDeliverySites(entity_id: number) {
   return api.get<Api<EntityDepot[]>>("/v3/settings/get-delivery-sites", {

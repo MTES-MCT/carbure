@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { EntityCertificate } from "common/types"
+import { EntityCertificate } from "carbure/types"
 import { LoaderOverlay, Panel } from "common/components/scaffold"
 import Table, { actionColumn, Cell } from "common/components/table"
 import Button from "common/components/button"

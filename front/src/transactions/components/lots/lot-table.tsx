@@ -2,7 +2,7 @@ import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import { Lot, LotError } from "transactions/types"
 import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
-import { isExpiring } from "common/utils/deadline"
+import { isExpiring } from "transactions/utils/deadline"
 import Table, {
   Cell,
   Order,

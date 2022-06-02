@@ -1,4 +1,4 @@
-import { producer } from "common/__test__/data"
+import { producer } from "carbure/__test__/data"
 import { rest } from "msw"
 import { setupServer } from "msw/node"
 
@@ -12,9 +12,9 @@ import {
   okTranslations,
   okFieldsTranslations,
   okErrorsTranslations,
-} from "common/__test__/api"
+} from "carbure/__test__/api"
 
-import { Data } from "common/__test__/helpers"
+import { Data } from "carbure/__test__/helpers"
 import * as data from "./data"
 import {
   okDeliverySites,

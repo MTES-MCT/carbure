@@ -1,15 +1,16 @@
 import { Trans, useTranslation } from "react-i18next"
 
-import { Entity, UserRole } from "carbure/types"
 import {
+  Entity,
+  UserRole,
   Biofuel,
   Country,
   Feedstock,
   GESOption,
   ProductionSiteDetails,
-} from "common/types"
+} from "carbure/types"
 
-import * as common from "common/api"
+import * as common from "carbure/api"
 import Form, { useForm } from "common/components/form"
 
 import { Row, LoaderOverlay } from "common/components/scaffold"
@@ -31,7 +32,7 @@ import {
   normalizeBiofuel,
   normalizeCountry,
   normalizeFeedstock,
-} from "common/utils/normalizers"
+} from "carbure/utils/normalizers"
 import { usePortal } from "common/components/portal"
 import { useMutation, useQuery } from "common/hooks/async"
 import * as api from "../api/production-sites"

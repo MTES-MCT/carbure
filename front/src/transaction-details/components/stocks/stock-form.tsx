@@ -1,14 +1,14 @@
 import { Stock } from "transactions/types"
 import Form, { useForm } from "common/components/form"
 import { useEffect, useMemo } from "react"
-import { Entity } from "carbure/types"
 import {
+  Entity,
   Biofuel,
   Country,
   Depot,
   Feedstock,
   ProductionSite,
-} from "common/types"
+} from "carbure/types"
 import LotFields from "./lot-fields"
 import JourneyFields from "./journey-fields"
 

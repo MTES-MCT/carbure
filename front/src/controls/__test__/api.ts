@@ -1,4 +1,4 @@
-import { admin, entityRight } from "common/__test__/data"
+import { admin, entityRight } from "carbure/__test__/data"
 import { rest } from "msw"
 import { setupServer } from "msw/node"
 
@@ -6,7 +6,7 @@ import {
   okTranslations,
   okFieldsTranslations,
   okErrorsTranslations,
-} from "common/__test__/api"
+} from "carbure/__test__/api"
 
 import { getFilter } from "transactions/__test__/data"
 import { lotSummary } from "./data"

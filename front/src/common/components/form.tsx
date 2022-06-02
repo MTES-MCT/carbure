@@ -1,6 +1,5 @@
 import React, { useCallback, useContext, useState } from "react"
 import cl from "clsx"
-import { identity } from "../utils/normalizers"
 import css from "./form.module.css"
 
 export type FormVariant = "inline" | "columns"
@@ -78,6 +77,10 @@ export interface FormManager<T> {
 
 export type FormErrors<T> = Partial<Record<keyof T, string>>
 const EMPTY_ERRORS: FormErrors<any> = {}
+
+function identity<T>(value: T) {
+  return value
+}
 
 export interface FormOptions<T> {
   errors?: FormErrors<T>

@@ -4,13 +4,13 @@ import { screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Entity } from "carbure/types"
 
-import { operator, producer } from "common/__test__/data"
+import { operator, producer } from "carbure/__test__/data"
 import LotDetails from "../components/lots/index"
 import { LotDetails as LotDetailsData } from "transaction-details/types"
 
 import server from "./api"
 
-import { Data, getField } from "common/__test__/helpers"
+import { Data, getField } from "carbure/__test__/helpers"
 import { PortalProvider } from "common/components/portal"
 import { clickOnCheckboxesAndConfirm } from "../../transactions/__test__/helpers"
 import { setEntity } from "settings/__test__/api"

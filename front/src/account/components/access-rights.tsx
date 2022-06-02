@@ -9,7 +9,7 @@ import {
 import { useUser } from "carbure/hooks/user"
 
 import * as api from "../api"
-import * as common from "common/api"
+import * as common from "carbure/api"
 import { useMutation } from "common/hooks/async"
 import { usePortal } from "common/components/portal"
 import { formatDate } from "common/utils/formatters"
@@ -17,7 +17,7 @@ import {
   normalizeEntity,
   getEntityTypeLabel,
   getUserRoleLabel,
-} from "common/utils/normalizers"
+} from "carbure/utils/normalizers"
 import { Button, MailTo } from "common/components/button"
 import { LoaderOverlay, Panel } from "common/components/scaffold"
 import { Alert } from "common/components/alert"

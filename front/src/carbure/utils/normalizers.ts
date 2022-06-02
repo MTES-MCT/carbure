@@ -1,8 +1,10 @@
 import i18next from "i18next"
-import { Normalizer } from "./normalize"
-import { Entity, EntityType, UserRole } from "carbure/types"
+import { Normalizer } from "common/utils/normalize"
 import { CorrectionStatus, DeliveryType, LotStatus } from "transactions/types"
 import {
+  Entity,
+  EntityType,
+  UserRole,
   Biofuel,
   Country,
   Depot,
@@ -11,8 +13,8 @@ import {
   Certificate,
   EntityCertificate,
   EntityDepot,
-} from "common/types"
-import { formatPeriod } from "./formatters"
+} from "carbure/types"
+import { formatPeriod } from "common/utils/formatters"
 
 export const normalizeBiofuel: Normalizer<Biofuel> = (biofuel) => ({
   value: biofuel,

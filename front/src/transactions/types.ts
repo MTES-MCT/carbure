@@ -1,11 +1,11 @@
-import { Entity } from "carbure/types"
 import {
+  Entity,
   Biofuel,
   Country,
   Depot,
   Feedstock,
   ProductionSite,
-} from "common/types"
+} from "carbure/types"
 
 export interface Lot {
   id: number

@@ -19,7 +19,7 @@ import {
   getLotChanges,
   LotHistory,
 } from "transaction-details/components/lots/history"
-import { isExpiring } from "common/utils/deadline"
+import { isExpiring } from "transactions/utils/deadline"
 import Alert from "common/components/alert"
 import NavigationButtons from "transaction-details/components/lots/navigation"
 import LotTraceability, {

@@ -4,8 +4,8 @@ import { Fieldset, useBind, useFormContext } from "common/components/form"
 import Autocomplete, { AutocompleteProps } from "common/components/autocomplete"
 import { DateInput, DateInputProps, TextInput } from "common/components/input"
 import { UserCheck } from "common/components/icons"
-import * as api from "common/api"
-import * as norm from "common/utils/normalizers"
+import * as api from "carbure/api"
+import * as norm from "carbure/utils/normalizers"
 import {
   isExternalDelivery,
   isLotClient,
@@ -14,9 +14,8 @@ import {
   isLotVendor,
   LotFormValue,
 } from "./lot-form"
-import { Entity } from "carbure/types"
 import { LotStatus } from "transactions/types"
-import { Country, Depot } from "common/types"
+import { Entity, Country, Depot } from "carbure/types"
 import Select, { SelectProps } from "common/components/select"
 import { DeliveryType } from "transactions/types"
 import { compact, uniqueBy } from "common/utils/collection"
