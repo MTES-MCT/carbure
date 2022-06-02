@@ -1,13 +1,13 @@
 import { useTranslation } from "react-i18next"
 import useEntity from "carbure/hooks/entity"
 import { Entity, UserRole } from "carbure/types"
-import { useMutation } from "common-v2/hooks/async"
-import { Panel, LoaderOverlay } from "common-v2/components/scaffold"
-import * as api from "../api-v2"
-import Form, { useForm } from "common-v2/components/form"
-import { TextInput } from "common-v2/components/input"
-import Button from "common-v2/components/button"
-import { Save } from "common-v2/components/icons"
+import { useMutation } from "common/hooks/async"
+import { Panel, LoaderOverlay } from "common/components/scaffold"
+import * as api from "../api/company"
+import Form, { useForm } from "common/components/form"
+import { TextInput } from "common/components/input"
+import Button from "common/components/button"
+import { Save } from "common/components/icons"
 
 const CompanyInfo = () => {
   const { t } = useTranslation()

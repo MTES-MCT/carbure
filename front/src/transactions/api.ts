@@ -1,6 +1,6 @@
 import { Entity } from "carbure/types"
-import { api, Api, download } from "common-v2/services/api"
-import { Option } from "common-v2/utils/normalize"
+import { api, Api, download } from "common/services/api"
+import { Option } from "common/utils/normalize"
 import {
   LotList,
   LotQuery,
@@ -79,7 +79,7 @@ export function invalidateDeclaration(entity_id: number, period: number) {
 export function getLotFilters(field: Filter, query: LotQuery) {
   const params = { field, ...query, ...QUERY_RESET }
   return api
-    .get<Api<Option[]>>("/lots/filters", { params })
+    .get<Api<string[]>>("/lots/filters", { params })
     .then((res) => res.data.data ?? [])
 }
 

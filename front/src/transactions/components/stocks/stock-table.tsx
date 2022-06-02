@@ -1,12 +1,8 @@
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import { Stock } from "../../types"
-import {
-  formatNumber,
-  formatDate,
-  formatPeriod,
-} from "common-v2/utils/formatters"
-import Table, { Cell, Order, selectionColumn } from "common-v2/components/table"
+import { formatNumber, formatDate, formatPeriod } from "common/utils/formatters"
+import Table, { Cell, Order, selectionColumn } from "common/components/table"
 import StockTag from "./stock-tag"
 import { isRedII } from "lot-add/components/ghg-fields"
 import { To } from "react-router-dom"

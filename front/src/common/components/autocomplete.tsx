@@ -1,279 +1,211 @@
-import React, { useEffect, useRef, useState } from "react"
-import cl from "clsx"
+import { useAsyncList } from "common/hooks/async-list"
+import { matches } from "common/utils/collection"
+import { useEffect, useRef, useState } from "react"
+import {
+  defaultNormalizer,
+  Normalizer,
+  normalizeItems,
+  denormalizeItems,
+  Sorter,
+} from "../utils/normalize"
+import Dropdown, { Trigger } from "./dropdown"
+import { Control, TextInput } from "./input"
+import List, { createQueryFilter, defaultRenderer, Renderer } from "./list"
 
-import styles from "./autocomplete.module.css"
-
-import useAPI from "../hooks/use-api"
-import { Input, InputProps, Label, LabelProps } from "./input"
-import { DropdownItem, DropdownOptions, useDropdown } from "./dropdown"
-import { Cross } from "common-v2/components/icons"
-
-const rawGetLabel = (v: any) => `${v}`
-const rawGetValue = (v: any) => `${v}`
-
-// prepare string for comparison by putting it to lowercase and removing accents
-function normalize(str: string) {
-  return str
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-}
-
-function useAutoComplete<T>(
-  value: T | string | null,
-  name: string,
-  queryArgs: any[],
-  minLength: number,
-  target: Element | null,
-  loose: boolean,
-  search: boolean,
-  onChange: (e: any) => void,
-  getLabel: (option: T) => string,
-  getQuery: (q: string, ...a: any[]) => Promise<T[]>
-) {
-  const dd = useDropdown(target)
-  const [suggestions, resolveQuery] = useAPI(getQuery)
-
-  const [query, setQuery] = useState("")
-
-  // on change, modify the query to match selection and send event to parent
-  function change(value: T, close?: boolean) {
-    setQuery(getLabel(value))
-    onChange({ target: { name, value } })
-    close && dd.toggle(false)
-  }
-
-  async function onQuery(
-    e: React.ChangeEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>
-  ) {
-    const queryLabel = "value" in e.target ? e.target.value : ""
-    const valueLabel = value === null ? '' : typeof value === "string" ? value : getLabel(value) // prettier-ignore
-
-    if (queryLabel !== query) {
-      setQuery(queryLabel)
-    }
-
-    if (queryLabel.length === 0) {
-      onChange({ target: { name, value: null } })
-    }
-
-    if (queryLabel.length < minLength) {
-      dd.toggle(false)
-    } else {
-      dd.toggle(true)
-
-      // only apply loose value if it doesn't match current value label
-      if (loose && queryLabel !== valueLabel) {
-        onChange({ target: { name, value: queryLabel } })
-      }
-
-      if (search) {
-        const suggestions = await resolveQuery(queryLabel, ...queryArgs)
-
-        if (suggestions) {
-          // compare query and suggestion by ignoring case and accents
-          const compared = normalize(queryLabel)
-          const suggestion = suggestions?.find((s) => compared === normalize(getLabel(s))) // prettier-ignore
-
-          // only apply new suggestion if it's not already selected
-          if (suggestion && suggestion !== value) {
-            onChange({ target: { name, value: suggestion } })
-          }
-        }
-      }
-    }
-  }
-
-  // modify input content when passed value is changed
-  useEffect(() => {
-    if (value === null) {
-      setQuery("")
-    } else if (typeof value === "string") {
-      setQuery(value)
-    } else {
-      setQuery(getLabel(value))
-    }
-  }, [value, getLabel])
-
-  return { dd, query, suggestions, onQuery, change }
-}
-
-export type AutoCompleteProps<T> = Omit<InputProps, "value"> & {
-  value?: T | string | null
+export interface AutocompleteProps<T, V = T> extends Control, Trigger {
+  value?: V | undefined
   options?: T[]
-  queryArgs?: any[]
-  minLength?: number
-  loose?: boolean
-  search?: boolean
-  getValue?: (option: T) => string
-  getLabel?: (option: T) => string
-  onChange?: (e: any) => void
-  getQuery?: (q: string, ...a: any[]) => Promise<T[]>
+  defaultOptions?: T[]
+  getOptions?: (query: string) => Promise<T[]>
+  onChange?: (value: V | undefined) => void
+  onQuery?: (query: string) => void
+  create?: (value: string) => V
+  normalize?: Normalizer<T, V>
+  children?: Renderer<T, V>
+  sort?: Sorter<T, V>
 }
 
-export function AutoComplete<T>({
-  value = null,
-  name,
-  queryArgs = [],
-  readOnly,
-  minLength = 1,
-  loose = false,
-  search = true,
-  onChange = () => {},
-  getValue = rawGetValue,
-  getLabel = rawGetLabel,
-  getQuery = async () => [],
+function Autocomplete<T, V>({
+  loading,
+  value,
+  options,
+  defaultOptions,
+  getOptions,
+  onChange,
+  onQuery,
+  create,
+  anchor,
+  normalize = defaultNormalizer,
+  children = defaultRenderer,
+  sort,
   ...props
-}: AutoCompleteProps<T>) {
-  const target = useRef<HTMLInputElement>(null)
+}: AutocompleteProps<T, V>) {
+  const triggerRef = useRef<HTMLInputElement>(null)
 
-  const { dd, query, suggestions, onQuery, change } = useAutoComplete(
+  const autocomplete = useAutocomplete({
     value,
-    name!,
-    queryArgs,
-    minLength,
-    target.current,
-    loose,
-    search,
+    options,
+    defaultOptions,
+    getOptions,
     onChange,
-    getLabel,
-    getQuery
-  )
-
-  const isEmpty = !suggestions.data || suggestions.data.length === 0
+    onQuery,
+    create,
+    normalize,
+  })
 
   return (
-    <React.Fragment>
-      <Input
+    <>
+      <TextInput
         {...props}
-        value={query}
-        name={name}
-        readOnly={readOnly}
-        onChange={onQuery}
-        innerRef={target}
-        onFocus={onQuery}
-        autoComplete="off"
-        onBlur={() => dd.toggle(false)}
+        autoComplete={false}
+        loading={loading || autocomplete.loading}
+        domRef={triggerRef}
+        value={autocomplete.query}
+        onChange={autocomplete.onQuery}
       />
 
-      {search && !readOnly && !isEmpty && dd.isOpen && target.current && (
-        <DropdownOptions
-          liveUpdate
-          parent={target.current}
-          options={suggestions.data!}
-          onChange={change}
+      {!props.disabled && !props.readOnly && (
+        <Dropdown
+          open={autocomplete.open && autocomplete.suggestions.length > 0}
+          triggerRef={triggerRef}
+          onOpen={autocomplete.execute}
+          onToggle={autocomplete.setOpen}
+          anchor={anchor}
         >
-          {(options, focused) =>
-            options.map((o, i) => (
-              <DropdownItem
-                key={getValue(o)}
-                focused={focused === i}
-                title={getLabel(o)}
-                onClick={() => change(o)}
-              >
-                <span>{getLabel(o)}</span>
-              </DropdownItem>
-            ))
-          }
-        </DropdownOptions>
+          <List
+            controlRef={triggerRef}
+            items={autocomplete.suggestions}
+            selectedValue={value}
+            children={children}
+            normalize={normalize}
+            onFocus={onChange}
+            onSelectValue={autocomplete.onSelect}
+            sort={sort}
+          />
+        </Dropdown>
       )}
-    </React.Fragment>
+    </>
   )
 }
 
-export type LabelAutoCompleteProps<T> = AutoCompleteProps<T> & LabelProps
-
-export function LabelAutoComplete<T>({
-  label,
-  error,
-  tooltip,
-  required,
-  disabled,
-  readOnly,
-  icon,
-  ...props
-}: LabelAutoCompleteProps<T>) {
-  return (
-    <Label
-      label={label}
-      error={error}
-      tooltip={tooltip}
-      required={required}
-      disabled={disabled}
-      readOnly={readOnly}
-      icon={icon}
-    >
-      <AutoComplete {...props} readOnly={readOnly} disabled={disabled} />
-    </Label>
-  )
+interface AutocompleteConfig<T, V> {
+  value?: V | undefined
+  options?: T[]
+  defaultOptions?: T[]
+  getOptions?: (query: string) => Promise<T[]>
+  onChange?: (value: V | undefined) => void
+  onQuery?: (query: string) => void
+  create?: (value: string) => V
+  normalize?: Normalizer<T, V>
 }
 
-type MultiAutocompleteProps<T> = Omit<
-  AutoCompleteProps<T>,
-  "value" | "onChange"
-> & {
-  value: T[]
-  onChange: (e: any) => void
-}
-
-export function MultiAutocomplete<T>({
+export function useAutocomplete<T, V>({
   value,
-  name,
+  options,
+  defaultOptions,
+  getOptions,
   onChange,
-  getValue = rawGetValue,
-  getLabel = rawGetLabel,
-  readOnly,
-  ...props
-}: MultiAutocompleteProps<T>) {
-  function addValue(e: any) {
-    // if the value is not already in the list, add it
-    if (
-      e.target.value !== null &&
-      !value.some((v) => getValue(v) === getValue(e.target.value))
-    ) {
-      onChange({ target: { name, value: [...value, e.target.value] } })
+  onQuery,
+  create,
+  normalize = defaultNormalizer,
+}: AutocompleteConfig<T, V>) {
+  const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState("")
+
+  const asyncOptions = useAsyncList({
+    selectedValue: value,
+    items: options,
+    defaultItems: defaultOptions,
+    findItems: getOptions,
+    normalize,
+  })
+
+  // update query when selected values label change
+  useEffect(() => {
+    setQuery(asyncOptions.label)
+  }, [asyncOptions.label])
+
+  useEffect(() => {
+    if (value === undefined) setQuery("")
+  }, [value])
+
+  const [suggestions, setSuggestions] = useState(options ?? [])
+  useEffect(() => setSuggestions(asyncOptions.items), [asyncOptions.items])
+
+  function filterOptions(query: string): T[] {
+    const options = asyncOptions.items
+    const includesQuery = createQueryFilter(query)
+    return denormalizeItems(normalizeItems(options, normalize, includesQuery))
+  }
+
+  function matchQuery(
+    query: string,
+    options: T[],
+    create?: (query: string) => V
+  ) {
+    const isQuery = createQueryFilter<T, V>(query, true)
+    const itemMatches = normalizeItems(options, normalize, isQuery)
+    const match = itemMatches.length > 0 ? itemMatches[0] : undefined
+
+    if (match && !matches(match.value, value)) {
+      onChange?.(match.value)
+    } else if (create) {
+      onChange?.(create(query))
     }
   }
 
-  // remove the given value from the list
-  function removeValue(option: T) {
-    const next = value.filter((v) => getValue(v) !== getValue(option))
-    onChange({ target: { name, value: next } })
+  const defaultQuery = query
+  async function onQueryChange(query: string = defaultQuery) {
+    setQuery(query ?? "")
+    onQuery?.(query ?? "")
+
+    // reset autocomplete value if query is emptied
+    if (query === undefined || query === "") onChange?.(undefined)
+    // stop here if we emptied the input with the clear button
+    if (query === undefined) return setOpen(false)
+
+    // otherwise, the user is typing so show the dropdown
+    setOpen(true)
+
+    // find options that could match the current query
+    const suggestions = filterOptions(query)
+
+    // set them as suggestions and check if one of them matches the query exactly
+    setSuggestions(suggestions)
+    matchQuery(query, suggestions, create)
+
+    // if we fetch the options asyncly, start it now
+    if (getOptions) {
+      const nextOptions = await asyncOptions.execute(query)
+      if (nextOptions) matchQuery(query, nextOptions)
+    }
   }
 
-  return (
-    <div
-      className={cl(
-        styles.multiWrapper,
-        readOnly && styles.multiWrapperReadOnly
-      )}
-    >
-      {value.map((v) => (
-        <span key={getValue(v)} className={styles.multiValue}>
-          {getLabel(v)}
-          {!readOnly && (
-            <Cross
-              className={styles.multiValueDelete}
-              onClick={(e) => {
-                e.preventDefault()
-                removeValue(v)
-              }}
-            />
-          )}
-        </span>
-      ))}
-      {!readOnly && (
-        <AutoComplete<T>
-          {...props}
-          value={null}
-          name={name}
-          readOnly={readOnly}
-          onChange={addValue}
-          getValue={getValue}
-          getLabel={getLabel}
-          className={styles.multiInput}
-        />
-      )}
-    </div>
-  )
+  function onSelect(value: V | undefined) {
+    onChange?.(value)
+    setOpen(false)
+
+    const norm = asyncOptions.items
+      ?.map(normalize)
+      .find((item) => item.value === value)
+
+    if (norm) {
+      // reeset query and filter options based on the selected value label
+      setQuery(norm.label ?? "")
+      setSuggestions(filterOptions(norm.label))
+    }
+  }
+
+  return {
+    loading: asyncOptions.loading,
+    query,
+    suggestions,
+    open,
+    setOpen,
+    execute: () => asyncOptions.execute(query),
+    onQuery: onQueryChange,
+    onSelect,
+  }
 }
+
+export default Autocomplete

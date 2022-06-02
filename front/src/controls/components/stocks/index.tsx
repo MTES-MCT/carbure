@@ -1,10 +1,10 @@
-import { Route, Routes, useNavigate, useLocation } from "react-router-dom"
+import { Route, Routes, useLocation } from "react-router-dom"
 import pickApi from "../../api"
 import { EntityManager } from "carbure/hooks/entity"
-import { useQuery } from "common-v2/hooks/async"
+import { useQuery } from "common/hooks/async"
 import { useStatus } from "../status"
-import { Bar } from "common-v2/components/scaffold"
-import Pagination from "common-v2/components/pagination"
+import { Bar } from "common/components/scaffold"
+import Pagination from "common/components/pagination"
 import NoResult from "transactions/components/no-result"
 import Filters from "transactions/components/filters"
 import ControlActions from "../control-actions"
@@ -20,7 +20,6 @@ export interface StocksProps {
 }
 
 export const Stocks = ({ entity, year }: StocksProps) => {
-  const navigate = useNavigate()
   const location = useLocation()
 
   const status = useStatus()

@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next"
-import { Main } from "common-v2/components/scaffold"
-import useTitle from "common-v2/hooks/title"
+import { Main } from "common/components/scaffold"
+import useTitle from "common/hooks/title"
 import Declarations from "./components/declarations"
 
 const Dashboard = () => {

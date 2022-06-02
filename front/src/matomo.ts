@@ -1,4 +1,4 @@
-import { isProduction } from "common-v2/utils/context"
+import { isProduction } from "common/utils/context"
 import React, { useContext, useLayoutEffect } from "react"
 import { useLocation } from "react-router-dom"
 

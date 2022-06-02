@@ -1,12 +1,12 @@
 import { useMemo } from "react"
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom"
+import { Route, Routes, useLocation } from "react-router-dom"
 import { UserRole } from "carbure/types"
 import { Snapshot, Stock, StockQuery, Filter } from "../../types"
 import useEntity from "carbure/hooks/entity"
-import { useQuery } from "common-v2/hooks/async"
+import { useQuery } from "common/hooks/async"
 import * as api from "../../api"
-import { Bar } from "common-v2/components/scaffold"
-import Pagination from "common-v2/components/pagination"
+import { Bar } from "common/components/scaffold"
+import Pagination from "common/components/pagination"
 import Filters from "../filters"
 import StockTable from "./stock-table"
 import NoResult from "../no-result"
@@ -25,7 +25,6 @@ export interface StocksProps {
 const EMPTY: number[] = []
 
 export const Stocks = ({ year, snapshot }: StocksProps) => {
-  const navigate = useNavigate()
   const location = useLocation()
 
   const entity = useEntity()

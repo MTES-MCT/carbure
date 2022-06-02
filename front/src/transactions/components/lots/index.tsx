@@ -1,12 +1,6 @@
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
-import {
-  Route,
-  Routes,
-  useNavigate,
-  useLocation,
-  Navigate,
-} from "react-router-dom"
+import { Route, Routes, useLocation, Navigate } from "react-router-dom"
 import * as api from "../../api"
 import { Entity, UserRole } from "carbure/types"
 import {
@@ -19,10 +13,10 @@ import {
 } from "../../types"
 import useEntity from "carbure/hooks/entity"
 import { useAutoStatus } from "../status"
-import { useQuery } from "common-v2/hooks/async"
-import { Order } from "common-v2/components/table"
-import { Bar } from "common-v2/components/scaffold"
-import Pagination, { useLimit } from "common-v2/components/pagination"
+import { useQuery } from "common/hooks/async"
+import { Order } from "common/components/table"
+import { Bar } from "common/components/scaffold"
+import Pagination, { useLimit } from "common/components/pagination"
 import Filters, { useFilterParams } from "../filters"
 import { LotTable } from "./lot-table"
 import NoResult from "../no-result"
@@ -32,10 +26,10 @@ import { LotSummaryBar } from "./lot-summary"
 import SearchBar from "../search-bar"
 import LotAdd from "lot-add"
 import LotDetails from "transaction-details/components/lots"
-import useStore from "common-v2/hooks/store"
+import useStore from "common/hooks/store"
 import { useMatomo } from "matomo"
 import { getDefaultCategory, useAutoCategory } from "../category"
-import useTitle from "common-v2/hooks/title"
+import useTitle from "common/hooks/title"
 import { AdminStatus } from "controls/types"
 
 export interface LotsProps {
@@ -46,7 +40,6 @@ export interface LotsProps {
 export const Lots = ({ year, snapshot }: LotsProps) => {
   const matomo = useMatomo()
   const location = useLocation()
-  const navigate = useNavigate()
 
   const entity = useEntity()
   const status = useAutoStatus()

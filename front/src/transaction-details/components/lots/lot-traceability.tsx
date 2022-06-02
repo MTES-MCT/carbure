@@ -1,9 +1,9 @@
 import { useTranslation } from "react-i18next"
-import { ExternalLink } from "common-v2/components/button"
-import Collapse from "common-v2/components/collapse"
-import { formatNumber } from "common-v2/utils/formatters"
+import { ExternalLink } from "common/components/button"
+import Collapse from "common/components/collapse"
+import { formatNumber } from "common/utils/formatters"
 import { LotDetails } from "transaction-details/types"
-import { Split } from "common-v2/components/icons"
+import { Split } from "common/components/icons"
 
 export interface TraceabilityProps {
   details: LotDetails | undefined

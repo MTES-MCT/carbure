@@ -2,12 +2,12 @@ import { useTranslation } from "react-i18next"
 
 import useEntity from "carbure/hooks/entity"
 import { UserRole } from "carbure/types"
-import { useMutation } from "common-v2/hooks/async"
-import { Panel, LoaderOverlay, Row } from "common-v2/components/scaffold"
-import Checkbox from "common-v2/components/checkbox"
-import Select from "common-v2/components/select"
-import { Calculator } from "common-v2/components/icons"
-import * as api from "../api-v2"
+import { useMutation } from "common/hooks/async"
+import { Panel, LoaderOverlay, Row } from "common/components/scaffold"
+import Checkbox from "common/components/checkbox"
+// import Select from "common/components/select"
+// import { Calculator } from "common/components/icons"
+import * as api from "../api/company"
 
 const CompanyOptions = () => {
   const { t } = useTranslation()

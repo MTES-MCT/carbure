@@ -2,18 +2,18 @@ import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useSearchParams } from "react-router-dom"
 import { Filter, FilterSelection } from "../types"
-import { Normalizer, Option } from "common-v2/utils/normalize"
-import { Grid, Row } from "common-v2/components/scaffold"
-import { MultiSelect, MultiSelectProps } from "common-v2/components/multi-select" // prettier-ignore
-import Button from "common-v2/components/button"
-import * as norm from "common-v2/utils/normalizers"
+import { Normalizer } from "common/utils/normalize"
+import { Grid, Row } from "common/components/scaffold"
+import { MultiSelect, MultiSelectProps } from "common/components/multi-select" // prettier-ignore
+import Button from "common/components/button"
+import * as norm from "common/utils/normalizers"
 
 export interface FiltersProps<Q> {
   query: Q
   filters: Filter[]
   selected: FilterSelection
   onSelect: (filters: FilterSelection) => void
-  getFilters: (field: Filter, query: Q) => Promise<Option[]>
+  getFilters: (field: Filter, query: Q) => Promise<any[]>
 }
 
 export function Filters<T>({
@@ -81,7 +81,7 @@ export const ResetButton = ({ filters, onFilter }: FilterManager) => {
 }
 
 export type FilterSelectProps = { field: Filter } & Omit<
-  MultiSelectProps<Option, string>,
+  MultiSelectProps<string>,
   "options"
 >
 

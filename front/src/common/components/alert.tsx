@@ -1,100 +1,57 @@
-import React, { useState } from "react"
 import cl from "clsx"
+import React, { useState } from "react"
+import { Loader } from "common/components/icons"
+import css from "./alert.module.css"
 
-import styles from "./alert.module.css"
-import { SystemProps } from "./index"
-import { Loader } from "common-v2/components/icons"
-import { Trans } from "react-i18next"
+export type AlertVariant = "info" | "success" | "warning" | "danger"
 
-export const AlertLink = ({
-  children,
-  className,
-  ...props
-}: React.HTMLProps<HTMLSpanElement>) => (
-  <span {...props} className={cl(styles.alertLink, className)}>
-    {children}
-  </span>
-)
-
-export type AlertProps = SystemProps &
-  React.HTMLProps<HTMLDivElement> & {
-    icon?: React.ComponentType
-    level?: "warning" | "error" | "info"
-    onClose?: (event: React.MouseEvent) => void
-  }
+export interface AlertProps {
+  variant?: AlertVariant
+  loading?: boolean
+  icon?: React.FunctionComponent | React.ReactNode
+  label?: string
+  children?: React.ReactNode | CustomRenderer
+  style?: React.CSSProperties
+  className?: string
+}
 
 export const Alert = ({
-  level,
-  icon: AlertIcon,
+  variant,
+  loading,
+  icon: Icon,
+  label,
   children,
   className,
-  ...props
+  style,
 }: AlertProps) => {
-  const divClassName = cl(styles.alert, className, {
-    [styles.alertWarning]: level === "warning",
-    [styles.alertError]: level === "error",
-    [styles.alertInfo]: level === "info",
-  })
+  const [open, setOpen] = useState(true)
+
+  if (!open) return null
+
+  const config = {
+    close: () => setOpen(false),
+  }
+
+  const icon = typeof Icon === "function" ? <Icon /> : Icon
+  const child = typeof children === "function" ? children(config) : children
 
   return (
-    <div {...props} className={divClassName}>
-      {AlertIcon && <AlertIcon />}
-      {children}
+    <div
+      style={style}
+      title={label}
+      className={cl(
+        css.alert,
+        className,
+        loading && css.loading,
+        variant && css[variant]
+      )}
+    >
+      {loading ? <Loader /> : icon}
+      {label ?? child}
     </div>
   )
 }
 
-type AlertFilterProps = AlertProps & {
-  loading?: boolean
-  active?: boolean
-  onActivate?: () => void
-  onDispose?: () => void
-}
+type CustomRenderer = (config: { close: () => void }) => React.ReactNode
 
-export const AlertFilter = ({
-  loading,
-  children,
-  active,
-  icon,
-  onActivate,
-  onDispose,
-  ...props
-}: AlertFilterProps) => {
-  const [open, setOpen] = useState(true)
-
-  if (!open) {
-    return null
-  }
-
-  return (
-    <Alert
-      {...props}
-      icon={loading ? Loader : icon}
-      className={cl(styles.alertFilter, loading && styles.alertLoading)}
-    >
-      {children}
-
-      {onActivate &&
-        onDispose &&
-        (active ? (
-          <AlertLink onClick={onDispose}>
-            <Trans>Revenir à la liste complète</Trans>
-          </AlertLink>
-        ) : (
-          <AlertLink onClick={onActivate}>
-            <Trans>Voir la liste</Trans>
-          </AlertLink>
-        ))}
-
-      <span
-        className={cl(styles.alertLink, styles.alertClose)}
-        onClick={() => {
-          active && onDispose && onDispose()
-          setOpen(false)
-        }}
-      >
-        <Trans>Masquer ce message</Trans>
-      </span>
-    </Alert>
-  )
-}
+export default Alert

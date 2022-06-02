@@ -1,10 +1,10 @@
 import i18next from "i18next"
 import { useTranslation } from "react-i18next"
-import Collapse from "common-v2/components/collapse"
-import { History } from "common-v2/components/icons"
-import { Row } from "common-v2/components/scaffold"
-import Table, { Cell } from "common-v2/components/table"
-import { formatDateTime } from "common-v2/utils/formatters"
+import Collapse from "common/components/collapse"
+import { History } from "common/components/icons"
+import { Row } from "common/components/scaffold"
+import Table, { Cell } from "common/components/table"
+import { formatDateTime } from "common/utils/formatters"
 import { LotFieldUpdate, LotUpdate } from "transaction-details/types"
 
 export interface HistoryProps {

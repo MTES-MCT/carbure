@@ -2,24 +2,24 @@ import { useTranslation } from "react-i18next"
 import { Stock, StockPayload } from "../types"
 import * as api from "../api"
 import useEntity from "carbure/hooks/entity"
-import { useMutation } from "common-v2/hooks/async"
-import { useNotify } from "common-v2/components/notifications"
-import Button from "common-v2/components/button"
-import Dialog from "common-v2/components/dialog"
-import { Drop, Return } from "common-v2/components/icons"
-import { usePortal } from "common-v2/components/portal"
-import Form, { useForm } from "common-v2/components/form"
+import { useMutation } from "common/hooks/async"
+import { useNotify } from "common/components/notifications"
+import Button from "common/components/button"
+import Dialog from "common/components/dialog"
+import { Drop, Return } from "common/components/icons"
+import { usePortal } from "common/components/portal"
+import Form, { useForm } from "common/components/form"
 import { Entity } from "carbure/types"
 import { Country, Depot } from "common/types"
-import { DateInput, NumberInput, TextInput } from "common-v2/components/input"
-import Autocomplete from "common-v2/components/autocomplete"
-import { findCountries, findDepots, findEntities } from "common-v2/api"
-import * as norm from "common-v2/utils/normalizers"
+import { DateInput, NumberInput, TextInput } from "common/components/input"
+import Autocomplete from "common/components/autocomplete"
+import { findCountries, findDepots, findEntities } from "common/api"
+import * as norm from "common/utils/normalizers"
 import { useMatomo } from "matomo"
-import Select from "common-v2/components/select"
-import { formatNumber } from "common-v2/utils/formatters"
+import Select from "common/components/select"
+import { formatNumber } from "common/utils/formatters"
 import { getDeliveryTypes } from "lot-add/components/delivery-fields"
-import { findMyCertificates } from "common-v2/api"
+import { findMyCertificates } from "common/api"
 
 export interface SplitOneButtonProps {
   disabled?: boolean
@@ -146,7 +146,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
             <Autocomplete
               label={t("Site de livraison")}
               getOptions={findDepots}
-              normalize={norm.normalizeDepot}
+              normalize={norm.normalizeDepotOrUnknown}
               create={norm.identity}
               {...bind("delivery_site")}
             />

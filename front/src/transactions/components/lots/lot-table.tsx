@@ -1,20 +1,16 @@
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import { Lot, LotError } from "transactions/types"
-import {
-  formatDate,
-  formatNumber,
-  formatPeriod,
-} from "common-v2/utils/formatters"
-import { isExpiring } from "common-v2/utils/deadline"
+import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
+import { isExpiring } from "common/utils/deadline"
 import Table, {
   Cell,
   Order,
   markerColumn,
   selectionColumn,
   actionColumn,
-} from "common-v2/components/table"
-import { Alarm } from "common-v2/components/icons"
+} from "common/components/table"
+import { Alarm } from "common/components/icons"
 import LotTag from "./lot-tag"
 import { isRedII } from "lot-add/components/ghg-fields"
 import { DuplicateOneButton } from "transactions/actions/duplicate"
