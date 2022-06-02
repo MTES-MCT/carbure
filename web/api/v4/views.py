@@ -13,13 +13,13 @@ from django.http.response import HttpResponse, JsonResponse
 from django.db.models.query_utils import Q
 from api.v4.certificates import get_certificates
 from core.carburetypes import Carbure
-from core.common import convert_template_row_to_formdata, get_uploaded_files_directory
+from core.common import ErrorResponse, SuccessResponse, convert_template_row_to_formdata, get_uploaded_files_directory
 from core.decorators import check_user_rights
 from api.v4.helpers import filter_lots, filter_stock, get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock
 from api.v4.helpers import get_prefetched_data, get_stock_events, get_stock_with_metadata, get_stock_filters_data, get_stocks_summary_data, get_transaction_distance, handle_eth_to_etbe_transformation, get_known_certificates
 from api.v4.helpers import send_email_declaration_invalidated, send_email_declaration_validated
 from api.v4.lots import construct_carbure_lot, bulk_insert_lots, try_get_date
-from api.v4.sanity_checks import bulk_sanity_checks, sanity_check
+from api.v4.sanity_checks import bulk_sanity_checks, bulk_scoring, sanity_check
 
 from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureLotReliabilityScore, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, Entity, GenericError, Pays, SustainabilityDeclaration, UserRights
 from core.notifications import notify_correction_done, notify_correction_request, notify_declaration_cancelled, notify_declaration_validated, notify_lots_recalled, notify_lots_received, notify_lots_rejected, notify_lots_recalled
@@ -1610,17 +1610,13 @@ def validate_declaration(request, *args, **kwargs):
         bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLARED, lot=lot, user=request.user))
     CarbureLotEvent.objects.bulk_create(bulk_events)
     # freeze lots
-    lots_frozen = []
     lots_to_freeze = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True)
     lots_to_freeze.update(lot_status=CarbureLot.FROZEN)
-    lots_frozen += [l.id for l in lots_to_freeze]
+    bulk_scoring(lots_to_freeze)
 
     lots_to_freeze = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True)
-    lots_to_freeze.update(lot_status=CarbureLot.FROZEN)
-    lots_frozen += [l.id for l in lots_to_freeze]
-    
-    scores = [CarbureLotReliabilityScore(lot=l, max_score=1, score=1, item=CarbureLotReliabilityScore.LOT_DECLARED) for l in list(set(lots_to_freeze))]
-    CarbureLotReliabilityScore.objects.bulk_create(scores)
+    lots_to_freeze.update(lot_status=CarbureLot.FROZEN)   
+    bulk_scoring(lots_to_freeze)
 
     # mark declaration
     declaration.declared = True
@@ -1667,8 +1663,8 @@ def invalidate_declaration(request, *args, **kwargs):
     lots_to_unfreeze.update(lot_status=CarbureLot.ACCEPTED)
     lots_to_unfreeze_second_batch = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True, lot_status=CarbureLot.FROZEN)
     lots_to_unfreeze_second_batch.update(lot_status=CarbureLot.ACCEPTED)
-    batch = lots_to_unfreeze + lots_to_unfreeze_second_batch
-    CarbureLotReliabilityScore.objects.filter(lots__in=batch, item=CarbureLotReliabilityScore.LOT_DECLARED).delete()
+    bulk_scoring(lots_to_unfreeze)
+    bulk_scoring(lots_to_unfreeze_second_batch)
 
     # send email
     notify_declaration_cancelled(declaration)
@@ -1734,6 +1730,19 @@ def toggle_warning(request, *args, **kwargs):
     except:
         traceback.print_exc()
         return JsonResponse({'status': "error", 'message': "Could not update warning"}, status=500)
+
+@check_user_rights()
+def recalc_score(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    lot_id = request.POST.get('lot_id')
+    try:
+        lot = CarbureLot.objects.get(id=lot_id)
+        lot.recalc_reliability_score()
+        lot.save()
+    except:
+        return ErrorResponse(404)
+    return SuccessResponse()
 
 
 def get_stats(request):

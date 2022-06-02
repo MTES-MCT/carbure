@@ -12,6 +12,7 @@ from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
 import folium
 from api.v3.admin.views import couleur, grade
+from api.v4.sanity_checks import bulk_scoring
 from core.decorators import is_admin
 from api.v4.helpers import filter_lots, filter_stock, get_all_stock, get_known_certificates, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_with_errors, get_lots_with_metadata, get_lots_filters_data, get_stock_events, get_stock_filters_data, get_stock_with_metadata, get_stocks_summary_data
 from api.v4.helpers import get_transaction_distance
@@ -465,6 +466,9 @@ def check_entity_certificate(request, *args, **kwargs):
         ec.checked_by_admin = True
         ec.rejected_by_admin = False
         ec.save()
+        slots = CarbureLot.objects.filter(carbure_supplier=ec.entity, supplier_certificate=ec.certificate.certificate_id)
+        plots = CarbureLot.objects.filter(carbure_producer=ec.entity, producer_certificate=ec.certificate.certificate_id)
+        bulk_scoring(slots + plots)
         return JsonResponse({'status': "success"})
     except:
         return JsonResponse({'status': "error", 'message': "Could not mark certificate as checked"}, status=500)
@@ -479,6 +483,9 @@ def reject_entity_certificate(request, *args, **kwargs):
         ec.checked_by_admin = False
         ec.rejected_by_admin = True
         ec.save()
+        slots = CarbureLot.objects.filter(carbure_supplier=ec.entity, supplier_certificate=ec.certificate.certificate_id)
+        plots = CarbureLot.objects.filter(carbure_producer=ec.entity, producer_certificate=ec.certificate.certificate_id)
+        bulk_scoring(slots + plots)
         return JsonResponse({'status': "success"})
     except:
         return JsonResponse({'status': "error", 'message': "Could not mark certificate as checked"}, status=500)

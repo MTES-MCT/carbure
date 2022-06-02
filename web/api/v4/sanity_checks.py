@@ -65,7 +65,6 @@ def generic_error(error, **kwargs):
     d.update(kwargs)
     return GenericError(**d)
 
-
 def bulk_sanity_checks(lots, prefetched_data, background=True):
     results = []
     errors = []
