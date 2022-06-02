@@ -1,4 +1,4 @@
-:global(#notifications-v2) {
+:global(#notifications) {
   display: flex;
   flex-direction: column-reverse;
   position: fixed;

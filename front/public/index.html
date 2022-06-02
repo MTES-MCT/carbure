@@ -1,35 +1,32 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <title>CarbuRe</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <div id="modal"></div>
-    <div id="dropdown"></div>
-    <div id="notifications"></div>
 
-    <!-- Matomo -->
-    <script type="text/javascript">
-      var _paq = window._paq || [];
-      (function() {
-        var u="https://stats.data.gouv.fr/";
-        _paq.push(['setTrackerUrl', u+'matomo.php']);
-        _paq.push(['setSiteId', '134']);
-        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-        g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-      })();
-    </script>
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="Web site created using create-react-app" />
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+  <title>CarbuRe</title>
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
+
+  <!-- Matomo -->
+  <script type="text/javascript">
+    var _paq = window._paq || [];
+    (function () {
+      var u = "https://stats.data.gouv.fr/";
+      _paq.push(['setTrackerUrl', u + 'matomo.php']);
+      _paq.push(['setSiteId', '134']);
+      var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+      g.type = 'text/javascript'; g.async = true; g.defer = true; g.src = u + 'matomo.js'; s.parentNode.insertBefore(g, s);
+    })();
+  </script>
+</body>
+
 </html>
