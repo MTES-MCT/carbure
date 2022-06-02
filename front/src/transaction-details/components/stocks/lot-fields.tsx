@@ -6,9 +6,9 @@ import {
   NumberInputProps,
   TextInput,
 } from "common/components/input"
-import * as norm from "common/utils/normalizers"
+import * as norm from "carbure/utils/normalizers"
 import { StockFormValue } from "./stock-form"
-import { Biofuel, Country, Feedstock } from "common/types"
+import { Biofuel, Country, Feedstock } from "carbure/types"
 import { formatPercentage } from "common/utils/formatters"
 import { isRedII } from "lot-add/components/ghg-fields"
 

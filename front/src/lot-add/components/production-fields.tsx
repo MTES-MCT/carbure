@@ -8,12 +8,11 @@ import {
   TextInput,
   TextInputProps,
 } from "common/components/input"
-import * as api from "common/api"
-import * as norm from "common/utils/normalizers"
+import * as api from "carbure/api"
+import * as norm from "carbure/utils/normalizers"
 import { LotFormValue } from "./lot-form"
 import { UserCheck } from "common/components/icons"
-import { Entity } from "carbure/types"
-import { Country, ProductionSite } from "common/types"
+import { Entity, Country, ProductionSite } from "carbure/types"
 import CertificateIcon from "transaction-details/components/lots/certificate"
 import { compact, uniqueBy } from "common/utils/collection"
 

@@ -3,18 +3,18 @@ import { useTranslation } from "react-i18next"
 import useEntity from "carbure/hooks/entity"
 import { DeliveryType, Lot, LotError } from "transactions/types"
 import {
+  Entity,
   Biofuel,
   Country,
   Depot,
   Feedstock,
   ProductionSite,
-} from "common/types"
+} from "carbure/types"
 import Form, { FormErrors, FormManager, useForm } from "common/components/form"
 import LotFields from "./lot-fields"
 import ProductionFields from "./production-fields"
 import DeliveryFields from "./delivery-fields"
 import { EmissionFields, ReductionFields } from "./ghg-fields"
-import { Entity } from "carbure/types"
 import { LotCertificates } from "transaction-details/types"
 import { matches } from "common/utils/collection"
 

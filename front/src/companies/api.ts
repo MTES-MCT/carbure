@@ -1,10 +1,12 @@
 import api, { Api } from "common/services/api"
-import { Entity, UserRightRequest, UserRightStatus } from "carbure/types"
 import {
+  Entity,
+  UserRightRequest,
+  UserRightStatus,
   ProductionSiteDetails,
   EntityDepot,
   EntityCertificate,
-} from "common/types"
+} from "carbure/types"
 import { EntityDetails } from "./types"
 
 export function getEntities() {

@@ -9,17 +9,20 @@ import Dialog from "common/components/dialog"
 import { Drop, Return } from "common/components/icons"
 import { usePortal } from "common/components/portal"
 import Form, { useForm } from "common/components/form"
-import { Entity } from "carbure/types"
-import { Country, Depot } from "common/types"
+import { Entity, Country, Depot } from "carbure/types"
 import { DateInput, NumberInput, TextInput } from "common/components/input"
 import Autocomplete from "common/components/autocomplete"
-import { findCountries, findDepots, findEntities } from "common/api"
-import * as norm from "common/utils/normalizers"
+import {
+  findCountries,
+  findDepots,
+  findEntities,
+  findMyCertificates,
+} from "carbure/api"
+import * as norm from "carbure/utils/normalizers"
 import { useMatomo } from "matomo"
 import Select from "common/components/select"
 import { formatNumber } from "common/utils/formatters"
 import { getDeliveryTypes } from "lot-add/components/delivery-fields"
-import { findMyCertificates } from "common/api"
 
 export interface SplitOneButtonProps {
   disabled?: boolean

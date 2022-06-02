@@ -1,7 +1,7 @@
 import { rest } from "msw"
 import { setupServer } from "msw/node"
 
-import { OwnershipType } from "common/types"
+import { OwnershipType } from "carbure/types"
 
 import {
   deliverySite,
@@ -11,15 +11,15 @@ import {
   entityRights,
   entityRight,
   entityRequest,
-} from "common/__test__/data"
+} from "carbure/__test__/data"
 import {
   okCountrySearch,
   okDeliverySitesSearch,
   okTranslations,
   okErrorsTranslations,
   okFieldsTranslations,
-} from "common/__test__/api"
-import { clone, Data } from "common/__test__/helpers"
+} from "carbure/__test__/api"
+import { clone, Data } from "carbure/__test__/helpers"
 
 let deliverySites: any[] = []
 let productionSites: any[] = []

@@ -1,5 +1,5 @@
 import useLocalStorage from "common/hooks/storage"
-import { Unit } from "common/types"
+import { Unit } from "carbure/types"
 import { useMatch } from "react-router-dom"
 import { Entity, EntityType, ExternalAdminPages, UserRole } from "../types"
 import { useUser } from "./user"

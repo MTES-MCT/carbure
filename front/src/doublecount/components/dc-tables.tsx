@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { EntityType } from "carbure/types"
+import { Entity, EntityType } from "carbure/types"
 import {
   Admin,
   DoubleCountingSourcing,
@@ -9,7 +9,6 @@ import {
 } from "../types"
 import Table, { Column, Cell } from "common/components/table"
 import { NumberInput } from "common/components/input"
-import { Entity } from "carbure/types"
 import YearTable from "./year-table"
 import { formatDate, formatNumber } from "common/utils/formatters"
 

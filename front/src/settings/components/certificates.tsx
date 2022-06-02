@@ -21,8 +21,8 @@ import {
 import {
   normalizeCertificate,
   normalizeEntityCertificate,
-} from "common/utils/normalizers"
-import { Certificate, EntityCertificate } from "common/types"
+} from "carbure/utils/normalizers"
+import { Certificate, EntityCertificate } from "carbure/types"
 import Alert from "common/components/alert"
 import Select from "common/components/select"
 import isBefore from "date-fns/isBefore"

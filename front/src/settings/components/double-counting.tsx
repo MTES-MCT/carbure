@@ -1,8 +1,7 @@
 import { Fragment, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
-import { Entity, UserRole } from "carbure/types"
 import useEntity from "carbure/hooks/entity"
-import { ProductionSite } from "common/types"
+import { Entity, UserRole, ProductionSite } from "carbure/types"
 import {
   DoubleCounting,
   DoubleCountingStatus as DCStatus,
@@ -30,7 +29,7 @@ import {
   findCountries,
   findFeedstocks,
   findProductionSites,
-} from "common/api"
+} from "carbure/api"
 import AutoComplete from "common/components/autocomplete"
 import * as api from "../api/double-counting"
 import { useMutation, useQuery } from "common/hooks/async"
@@ -53,7 +52,7 @@ import {
   normalizeCountry,
   normalizeFeedstock,
   normalizeProductionSite,
-} from "common/utils/normalizers"
+} from "carbure/utils/normalizers"
 import { usePortal } from "common/components/portal"
 import { compact } from "common/utils/collection"
 

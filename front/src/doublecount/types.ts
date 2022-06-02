@@ -1,5 +1,10 @@
-import { Entity } from "carbure/types"
-import { ProductionSite, Feedstock, Biofuel, Country } from "common/types"
+import {
+  Entity,
+  ProductionSite,
+  Feedstock,
+  Biofuel,
+  Country,
+} from "carbure/types"
 
 export enum Admin {
   DGEC = "MTE - DGEC",

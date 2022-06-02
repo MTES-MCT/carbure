@@ -1,11 +1,10 @@
 import { Route, Routes } from "react-router-dom"
 import { Trans, useTranslation } from "react-i18next"
 import IframeResizer from "iframe-resizer-react"
-import { Entity } from "carbure/types"
 import { Main, Panel } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import api, { Api } from "common/services/api"
-import { EntityType } from "carbure/types"
+import { Entity, EntityType } from "carbure/types"
 import useTitle from "common/hooks/title"
 import useEntity from "carbure/hooks/entity"
 

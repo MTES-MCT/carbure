@@ -1,7 +1,14 @@
 import { Trans, useTranslation } from "react-i18next"
-import { Depot, DepotType, EntityDepot, OwnershipType } from "common/types"
-import { EntityType, UserRole } from "carbure/types"
-import * as common from "common/api"
+import {
+  Entity,
+  EntityType,
+  UserRole,
+  Depot,
+  DepotType,
+  EntityDepot,
+  OwnershipType,
+} from "carbure/types"
+import * as common from "carbure/api"
 import * as api from "../api/delivery-sites"
 import { Row, LoaderOverlay } from "common/components/scaffold"
 import { TextInput } from "common/components/input"
@@ -14,10 +21,9 @@ import { Confirm, Dialog } from "common/components/dialog"
 import AutoComplete from "common/components/autocomplete"
 import { RadioGroup } from "common/components/radio"
 import { Form, useForm } from "common/components/form"
-import { Entity } from "carbure/types"
 import useEntity, { useRights } from "carbure/hooks/entity"
 import { Panel } from "common/components/scaffold"
-import { normalizeDepot, normalizeEntity } from "common/utils/normalizers"
+import { normalizeDepot, normalizeEntity } from "carbure/utils/normalizers"
 import { compact } from "common/utils/collection"
 import { useMutation, useQuery } from "common/hooks/async"
 import { useNotify } from "common/components/notifications"

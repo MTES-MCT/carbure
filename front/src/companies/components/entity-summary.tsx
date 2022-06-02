@@ -16,7 +16,7 @@ import { EntityType } from "carbure/types"
 import {
   getEntityTypeLabel,
   normalizeEntityType,
-} from "common/utils/normalizers"
+} from "carbure/utils/normalizers"
 
 type EntitySummaryProps = {
   search?: string

@@ -21,7 +21,7 @@ import {
   WarningAnomalies,
 } from "./anomalies"
 import { getLotChanges, LotHistory } from "./history"
-import { isExpiring } from "common/utils/deadline"
+import { isExpiring } from "transactions/utils/deadline"
 import Alert from "common/components/alert"
 import NavigationButtons from "./navigation"
 import LotActions from "./actions"

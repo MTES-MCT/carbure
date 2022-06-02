@@ -1,5 +1,11 @@
-import { Entity, EntityType, UserRole } from "carbure/types"
-import { DepotType, GESOption, ProductionSiteDetails } from "common/types"
+import {
+  Entity,
+  EntityType,
+  UserRole,
+  DepotType,
+  GESOption,
+  ProductionSiteDetails,
+} from "carbure/types"
 
 // ENTITIES
 

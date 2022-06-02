@@ -1,13 +1,12 @@
 import { Fragment, useState } from "react"
 import { useTranslation, Trans } from "react-i18next"
-import { EntityType } from "carbure/types"
 import { Admin, DoubleCountingStatus as DCStatus } from "../types"
 import { Col, LoaderOverlay } from "common/components/scaffold"
 import Tabs from "common/components/tabs"
 import { Button, DownloadLink } from "common/components/button"
 import * as api from "../api"
 import { Confirm, Dialog } from "common/components/dialog"
-import { Entity } from "carbure/types"
+import { Entity, EntityType } from "carbure/types"
 import {
   Return,
   Download,
