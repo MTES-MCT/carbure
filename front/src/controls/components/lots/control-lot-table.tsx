@@ -5,7 +5,7 @@ import Table, {
   Order,
   markerColumn,
   selectionColumn,
-} from "common-v2/components/table"
+} from "common/components/table"
 import {
   getLotMarker,
   useLotColumns,

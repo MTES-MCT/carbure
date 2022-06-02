@@ -8,8 +8,8 @@ import operators from "../assets/images/operators.svg"
 import schema from "../assets/images/schema.svg"
 import { EntityType } from "carbure/types"
 import { useUser } from "carbure/hooks/user"
-import api, { Api } from "common-v2/services/api"
-import { useQuery } from "common-v2/hooks/async"
+import api, { Api } from "common/services/api"
+import { useQuery } from "common/hooks/async"
 import {
   ChevronRight,
   ExternalLink,
@@ -17,9 +17,9 @@ import {
   Plus,
   UserAdd,
   UserCheck,
-} from "common-v2/components/icons"
-import { Button } from "common-v2/components/button"
-import useTitle from "common-v2/hooks/title"
+} from "common/components/icons"
+import { Button } from "common/components/button"
+import useTitle from "common/hooks/title"
 
 interface HomeStats {
   total_volume: number

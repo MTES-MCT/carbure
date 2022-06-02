@@ -1,36 +1,28 @@
-import Cookies from "js-cookie"
+import axios from "axios"
 
-export const API_ROOT = `${window.location.origin}/api/v3`
+const API_ROOT = `${window.location.origin}/api`
 
-type Params = { [k: string]: any }
-type Options = { [k: string]: any }
-
-export type ApiResponse<T> =
-  | { status: "error"; message: string }
-  | { status: "forbidden"; message: string }
-  | { status: "success"; data: T }
-
-function isEmpty(value: any) {
-  return typeof value === "undefined" || value === null
+export interface Api<T> {
+  status: "success" | "error"
+  data?: T
+  error?: string
 }
 
-// keep only parameters that are defined
-export function filterParams(params: Params) {
-  const okParams: Params = {}
+export const api = axios.create({
+  baseURL: API_ROOT,
+  paramsSerializer: (params) => toSearchParams(params).toString(),
+  transformRequest: (data) => toFormData(data),
+  // xsrfCookieName: "csrftoken",
+  // xsrfHeaderName: "X-CSRFTOKEN",
+})
 
-  for (const key in params) {
-    if (!isEmpty(params[key])) {
-      okParams[key] = params[key]
-    }
-  }
-
-  return okParams
+export function download(endpoint: string, params: any) {
+  return window.open(API_ROOT + endpoint + "?" + toSearchParams(params))
 }
 
 // converts an javascript object into FormData
-function toFormData(obj: any): FormData {
+export function toFormData(obj: any): FormData {
   const formData = new FormData()
-
   for (const key in obj) {
     if (Array.isArray(obj[key])) {
       obj[key].forEach((value: any) => formData.append(key, value.toString()))
@@ -38,77 +30,27 @@ function toFormData(obj: any): FormData {
       formData.append(key, obj[key])
     }
   }
-
   return formData
 }
 
-// check if the api response is correct and return its data
-// if there's a problem, throw an error
-async function checkResponse<T>(res: Response): Promise<T> {
-  if (res.status === 500) {
-    throw new Error("Erreur serveur")
-  }
-
-  // default data to true in case the api sends nothing
-  const parsed = await res.json()
-  parsed.data = parsed.data ?? true
-
-  const json: ApiResponse<T> = parsed
-
-  // if the response contains an error, throw it so we can catch it elsewhere
-  if (json.status === "error" || json.status === "forbidden") {
-    throw new Error(json.message)
-  }
-  // otherwise, return only the fetched data
-  else {
-    return json.data
-  }
-}
-
-function download(endpoint: string, params: Params) {
-  return window.open(API_ROOT + endpoint + "?" + queryParams(params))
-}
-
-async function get<T = any>(
-  endpoint: string,
-  params?: Params,
-  options?: Options
-): Promise<T> {
-  const opts: Options = { credentials: "same-origin", ...options }
-  const res = await fetch(API_ROOT + endpoint + "?" + queryParams(params), opts)
-  return checkResponse<T>(res)
-}
-
-async function post<T = any>(
-  endpoint: string,
-  body?: Params,
-  options?: Options
-): Promise<T> {
-  const fetchOptions: Params = { ...options, method: "POST" }
-  const csrf = Cookies.get("csrftoken")
-
-  if (body) {
-    fetchOptions.body = toFormData(body)
-    fetchOptions.body.append("csrfmiddlewaretoken", csrf)
-  }
-
-  const res = await fetch(API_ROOT + endpoint, fetchOptions)
-  return checkResponse<T>(res)
-}
-
-function queryParams(params: any) {
-  const okParams = filterParams(params ?? {})
+export function toSearchParams(params: any) {
   const urlParams = new URLSearchParams()
-  for (const key in okParams) {
-    const param = okParams[key]
+  for (const key in params) {
+    const param = params[key]
     if (Array.isArray(param)) {
       param.forEach((value) => urlParams.append(key, value))
-    } else {
+    } else if (!isEmpty(param)) {
       urlParams.append(key, param)
     }
   }
-  return urlParams.toString()
+  return urlParams
 }
 
-const api = { download, get, post }
+function isEmpty(value: any) {
+  const isNull = value === null
+  const isUndefined = value === undefined
+  const isEmpty = Array.isArray(value) && value.length === 0
+  return isNull || isUndefined || isEmpty
+}
+
 export default api

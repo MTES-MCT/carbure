@@ -1,5 +1,5 @@
-import { Api, api, download } from "common-v2/services/api"
-import { Option } from "common-v2/utils/normalize"
+import { Api, api, download } from "common/services/api"
+import { Option } from "common/utils/normalize"
 import { LotSummary, Snapshot } from "../types"
 import {
   Filter,
@@ -69,7 +69,7 @@ export function getStocksSummary(
 export function getLotFilters(field: Filter, query: LotQuery) {
   const params = { field, ...query, ...QUERY_RESET }
   return api
-    .get<Api<Option[]>>("/admin/lots/filters", { params })
+    .get<Api<string[]>>("/admin/lots/filters", { params })
     .then((res) => res.data.data ?? [])
 }
 

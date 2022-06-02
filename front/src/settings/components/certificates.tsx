@@ -1,34 +1,31 @@
 import React, { useState } from "react"
-import cl from "clsx"
 import { Trans, useTranslation } from "react-i18next"
-import * as api from "../api-v2"
-import css from "./settings.module.css"
+import * as api from "../api/certificates"
 import useEntity from "carbure/hooks/entity"
-import { useNotify } from "common-v2/components/notifications"
-import { useQuery, useMutation } from "common-v2/hooks/async"
-import { usePortal } from "common-v2/components/portal"
-import { formatDate } from "common-v2/utils/formatters"
-import { Panel } from "common-v2/components/scaffold"
-import Button from "common-v2/components/button"
-import Dialog, { Confirm } from "common-v2/components/dialog"
-import Table, { Cell, actionColumn } from "common-v2/components/table"
-import Autocomplete from "common-v2/components/autocomplete"
+import { useNotify } from "common/components/notifications"
+import { useQuery, useMutation } from "common/hooks/async"
+import { usePortal } from "common/components/portal"
+import { formatDate } from "common/utils/formatters"
+import { Panel, Row } from "common/components/scaffold"
+import Button from "common/components/button"
+import Dialog, { Confirm } from "common/components/dialog"
+import Table, { Cell, actionColumn } from "common/components/table"
+import Autocomplete from "common/components/autocomplete"
 import {
   Cross,
   Plus,
   Return,
   Refresh,
   AlertCircle,
-} from "common-v2/components/icons"
+} from "common/components/icons"
 import {
   normalizeCertificate,
   normalizeEntityCertificate,
-} from "common-v2/utils/normalizers"
-import { formatJSON } from "common-v2/utils/formatters"
+} from "common/utils/normalizers"
 import { Certificate, EntityCertificate } from "common/types"
-import { isExpired } from "./common"
-import Alert from "common-v2/components/alert"
-import Select from "common-v2/components/select"
+import Alert from "common/components/alert"
+import Select from "common/components/select"
+import isBefore from "date-fns/isBefore"
 
 const Certificates = () => {
   const { t } = useTranslation()
@@ -155,6 +152,7 @@ const Certificates = () => {
                       title={t("Suppression certificat")}
                       description={t("Voulez-vous supprimer ce certificat ?")}
                       confirm={t("Supprimer")}
+                      icon={Cross}
                       variant="danger"
                       onClose={close}
                       onConfirm={() =>
@@ -257,7 +255,17 @@ export const ExpirationDate = ({ link }: ExpirationDateProps) => {
   const updated = link.has_been_updated
 
   return (
-    <span className={cl(css.expirationDate, expired && css.expired)}>
+    <Row
+      style={
+        expired
+          ? {
+              alignItems: "center",
+              color: "var(--orange-dark)",
+              gap: "var(--spacing-s)",
+            }
+          : undefined
+      }
+    >
       {expired && !updated && (
         <React.Fragment>
           {formatted}
@@ -280,7 +288,7 @@ export const ExpirationDate = ({ link }: ExpirationDateProps) => {
       {expired && updated && <Trans>Mis à jour ({{ formatted }})</Trans>}
 
       {!expired && formatted}
-    </span>
+    </Row>
   )
 }
 
@@ -360,6 +368,16 @@ const CertificateUpdateDialog = ({
       </footer>
     </Dialog>
   )
+}
+
+export function isExpired(date: string) {
+  try {
+    const now = new Date()
+    const valid_until = new Date(date)
+    return isBefore(valid_until, now)
+  } catch (e) {
+    return false
+  }
 }
 
 export default Certificates

@@ -11,7 +11,7 @@ import { LotDetails as LotDetailsData } from "transaction-details/types"
 import server from "./api"
 
 import { Data, getField } from "common/__test__/helpers"
-import { PortalProvider } from "common-v2/components/portal"
+import { PortalProvider } from "common/components/portal"
 import { clickOnCheckboxesAndConfirm } from "../../transactions/__test__/helpers"
 import { setEntity } from "settings/__test__/api"
 import {

@@ -11,7 +11,7 @@ import server from "./api"
 import { emptyLots, emptySnapshot, lots, snapshot } from "./data"
 import userEvent from "@testing-library/user-event"
 import { clickOnCheckboxesAndConfirm } from "./helpers"
-import { PortalProvider } from "common-v2/components/portal"
+import { PortalProvider } from "common/components/portal"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 beforeEach(() => {

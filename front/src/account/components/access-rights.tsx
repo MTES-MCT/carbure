@@ -9,33 +9,33 @@ import {
 import { useUser } from "carbure/hooks/user"
 
 import * as api from "../api"
-import * as common from "common-v2/api"
-import { useMutation } from "common-v2/hooks/async"
-import { usePortal } from "common-v2/components/portal"
-import { formatDate } from "common-v2/utils/formatters"
+import * as common from "common/api"
+import { useMutation } from "common/hooks/async"
+import { usePortal } from "common/components/portal"
+import { formatDate } from "common/utils/formatters"
 import {
   normalizeEntity,
   getEntityTypeLabel,
   getUserRoleLabel,
-} from "common-v2/utils/normalizers"
-import { Button, MailTo } from "common-v2/components/button"
-import { LoaderOverlay, Panel } from "common-v2/components/scaffold"
-import { Alert } from "common-v2/components/alert"
+} from "common/utils/normalizers"
+import { Button, MailTo } from "common/components/button"
+import { LoaderOverlay, Panel } from "common/components/scaffold"
+import { Alert } from "common/components/alert"
 import {
   AlertTriangle,
   Cross,
   Plus,
   Return,
   ExternalLink,
-} from "common-v2/components/icons"
-import Table, { actionColumn, Cell } from "common-v2/components/table"
-import Dialog, { Confirm } from "common-v2/components/dialog"
-import Autocomplete from "common-v2/components/autocomplete"
-import { RadioGroup } from "common-v2/components/radio"
-import Tag, { TagVariant } from "common-v2/components/tag"
-import Form from "common-v2/components/form"
+} from "common/components/icons"
+import Table, { actionColumn, Cell } from "common/components/table"
+import Dialog, { Confirm } from "common/components/dialog"
+import Autocomplete from "common/components/autocomplete"
+import { RadioGroup } from "common/components/radio"
+import Tag, { TagVariant } from "common/components/tag"
+import Form from "common/components/form"
 import { useMatomo } from "matomo"
-import { useNotify } from "common-v2/components/notifications"
+import { useNotify } from "common/components/notifications"
 import { useNavigate } from "react-router-dom"
 
 export const AccountAccesRights = () => {

@@ -1,16 +1,15 @@
-import { Fragment, useState, useEffect } from "react"
+import { useState } from "react"
 import { Route, Routes, Navigate } from "react-router-dom"
 import { Trans, useTranslation } from "react-i18next"
 import useEntity from "carbure/hooks/entity"
-import useAPI from "common/hooks/use-api"
-import { Header, Main, Title, Box } from "common/components"
-import { TabButton } from "common/components/button"
-import { Select } from "common/components/select"
+import { useQuery } from "common/hooks/async"
+import { Main } from "common/components/scaffold"
+import Select from "common/components/select"
 import AgreementList from "./components/agreement-list"
 import QuotasList from "./components/dc-quotas"
 import * as api from "./api"
-import styles from "./index.module.css"
-import useTitle from "common-v2/hooks/title"
+import useTitle from "common/hooks/title"
+import Tabs from "common/components/tabs"
 
 const DoubleCounting = () => {
   const { t } = useTranslation()
@@ -19,59 +18,54 @@ const DoubleCounting = () => {
   const entity = useEntity()
 
   const [year, setYear] = useState(new Date().getFullYear())
-  const [snapshot, getSnapshot] = useAPI(api.getDoubleCountingSnapshot)
+  const snapshot = useQuery(api.getDoubleCountingSnapshot, {
+    key: "dc-snapshot",
+    params: [],
+    onSuccess: (snapshot) => {
+      const years = snapshot.data.data?.years ?? []
+      if (!years.includes(year)) setYear(years[0])
+    },
+  })
 
-  useEffect(() => {
-    getSnapshot()
-  }, [getSnapshot])
-
-  useEffect(() => {
-    if (snapshot.data === null) return
-
-    if (!snapshot.data.years.includes(year)) {
-      setYear(snapshot.data.years[0])
-    }
-  }, [snapshot.data, year])
+  const snapshotData = snapshot.result?.data.data
 
   return (
-    <Fragment>
-      <Header className={styles.doublecountHeader}>
-        <Box row className={styles.doublecountTitle}>
-          <Title>
-            <Trans>Double comptage</Trans>
-          </Title>
+    <Main>
+      <header>
+        <section>
+          <h1>{t("Double comptage")}</h1>
 
           <Select
-            level="inline"
+            variant="inline"
             value={year}
             onChange={(v) => setYear(v as number)}
-            className={styles.doublecountYears}
-            options={snapshot.data?.years.map((year) => ({
+            options={snapshotData?.years.map((year) => ({
               label: `${year}`,
               value: year,
             }))}
           />
-        </Box>
+        </section>
 
-        <Box row className={styles.doublecountTabs}>
-          <TabButton to="agreements">
-            <Trans>Dossiers</Trans>
-          </TabButton>
-          <TabButton to="quotas">
-            <Trans>Quotas</Trans>
-          </TabButton>
-        </Box>
-      </Header>
+        <section>
+          <Tabs
+            variant="main"
+            tabs={[
+              { key: "agreements", path: "agreements", label: t("Dossiers") },
+              { key: "quotas", path: "quotas", label: t("Quotas") },
+            ]}
+          />
+        </section>
+      </header>
 
-      {/* prettier-ignore */}
-      <Main className={styles.doublecountMain}>
-        <Routes>
-          <Route path="agreements" element={<AgreementList entity={entity} year={year} />} />
-          <Route path="quotas" element={<QuotasList year={year} />} />
-          <Route path="*" element={<Navigate to="agreements" />} />
-        </Routes>
-      </Main>
-    </Fragment>
+      <Routes>
+        <Route
+          path="agreements"
+          element={<AgreementList entity={entity} year={year} />}
+        />
+        <Route path="quotas" element={<QuotasList year={year} />} />
+        <Route path="*" element={<Navigate to="agreements" />} />
+      </Routes>
+    </Main>
   )
 }
 

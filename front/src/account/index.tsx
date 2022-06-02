@@ -1,8 +1,8 @@
 import { Trans, useTranslation } from "react-i18next"
-import { Main } from "common-v2/components/scaffold"
+import { Main } from "common/components/scaffold"
 import { AccountAccesRights } from "./components/access-rights"
 import { AccountAuthentication } from "./components/authentication"
-import useTitle from "common-v2/hooks/title"
+import useTitle from "common/hooks/title"
 
 const Account = () => {
   const { t } = useTranslation()

@@ -6,7 +6,7 @@ import Account from "../index"
 import server, { setAccessRequests } from "./api"
 import { producer } from "common/__test__/data"
 import { getField, waitWhileLoading } from "common/__test__/helpers"
-import { PortalProvider } from "common-v2/components/portal"
+import { PortalProvider } from "common/components/portal"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 

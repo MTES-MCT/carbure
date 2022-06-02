@@ -2,22 +2,18 @@ import { useMemo, useState } from "react"
 import i18next from "i18next"
 import { Trans, useTranslation } from "react-i18next"
 import { DeclarationSummary, LotQuery } from "../types"
-import { Normalizer } from "common-v2/utils/normalize"
+import { Normalizer } from "common/utils/normalize"
 import useEntity from "carbure/hooks/entity"
-import { useNotify } from "common-v2/components/notifications"
-import { useMutation, useQuery } from "common-v2/hooks/async"
-import { usePortal } from "common-v2/components/portal"
+import { useNotify } from "common/components/notifications"
+import { useMutation, useQuery } from "common/hooks/async"
+import { usePortal } from "common/components/portal"
 import * as api from "../api"
-import Button from "common-v2/components/button"
-import Dialog from "common-v2/components/dialog"
+import Button from "common/components/button"
+import Dialog from "common/components/dialog"
 import { LotSummary } from "../components/lots/lot-summary"
-import Select from "common-v2/components/select"
-import Alert from "common-v2/components/alert"
-import {
-  capitalize,
-  formatDate,
-  formatPeriod,
-} from "common-v2/utils/formatters"
+import Select from "common/components/select"
+import Alert from "common/components/alert"
+import { capitalize, formatDate, formatPeriod } from "common/utils/formatters"
 import {
   AlertCircle,
   Certificate,
@@ -26,9 +22,9 @@ import {
   ChevronRight,
   Cross,
   Return,
-} from "common-v2/components/icons"
+} from "common/components/icons"
 import { Entity } from "carbure/types"
-import { Row } from "common-v2/components/scaffold"
+import { Row } from "common/components/scaffold"
 import { useMatomo } from "matomo"
 
 export interface DeclarationButtonProps {
@@ -113,7 +109,9 @@ export const DeclarationDialog = ({
   })
 
   const declarationsData = declarations.result?.data.data ?? []
-  const declaration = declarationsData[timeline.month] as DeclarationSummary | undefined
+  const declaration = declarationsData[timeline.month] as
+    | DeclarationSummary
+    | undefined
   const period = timeline.year * 100 + timeline.month + 1
 
   // generate a special query to get the summary for this declaration
@@ -171,7 +169,7 @@ export const DeclarationDialog = ({
               value={timeline.year}
               onChange={(year = currentYear) => setTimeline({ ...timeline, year })} // prettier-ignore
               options={years}
-              sort={v => -v.value}
+              sort={(v) => -v.value}
               style={{ flex: 1 }}
             />
             <Select

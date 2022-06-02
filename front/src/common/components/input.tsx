@@ -1,224 +1,459 @@
-import React, { useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
+import { useTranslation } from "react-i18next"
 import cl from "clsx"
-import styles from "./input.module.css"
-import {
-  AlertTriangle,
-  Check,
-  IconProps,
-  Upload,
-} from "common-v2/components/icons"
-import { Box, SystemProps } from "./index"
-import { AsyncButton, AsyncButtonProps } from "./button"
-import { FormChangeHandler } from "common/hooks/use-form"
+import Button from "./button"
+import { AlertTriangle, Cross, Loader, Search, Placeholder } from "./icons"
+import { Col, layout, Layout, Overlay } from "./scaffold"
+import { isInside } from "./dropdown"
+import css from "./input.module.css"
+import i18next from "i18next"
 
-// INPUT COMPONENT
+export type FieldVariant = "outline" | "solid" | "inline" | "text"
 
-export type InputProps = SystemProps &
-  React.InputHTMLAttributes<HTMLInputElement> & {
-    innerRef?: React.Ref<HTMLInputElement>
-  }
-
-export const Input = ({ className, innerRef, ...props }: InputProps) => (
-  <input
-    {...props}
-    disabled={!props.readOnly && props.disabled}
-    type={props.readOnly ? "text" : props.type}
-    ref={innerRef}
-    placeholder={props.readOnly ? "N/A" : props.placeholder}
-    className={cl(styles.input, className)}
-  />
-)
-// LABEL COMPONENT
-
-export type LabelProps = SystemProps &
-  Omit<React.HTMLProps<HTMLLabelElement>, "value" | "onChange" | "label"> & {
-    error?: string | null
-    tooltip?: string
-    label?: React.ReactNode
-    required?: boolean
-    icon?: React.ComponentType<IconProps>
-  }
-
-export const Label = ({
-  className,
-  disabled,
-  error,
-  tooltip,
-  label,
-  readOnly,
-  required = false,
-  icon: Icon,
-  children,
-  ...props
-}: LabelProps) => (
-  <label
-    {...props}
-    title={[error ?? '', tooltip, typeof label === "string" ? label : ''].find(Boolean)} // prettier-ignore
-    className={cl(
-      styles.labelWrapper,
-      !readOnly && disabled && styles.disabledLabel,
-      error && styles.errorLabel,
-      (disabled || readOnly) && styles.readonlyLabel,
-      className
-    )}
-  >
-    <div className={styles.labelText}>
-      {error && <AlertTriangle size={16} />}
-      {label}
-      {!readOnly && required && " *"}
-    </div>
-    {children}
-    {Icon && <Icon className={styles.labelIcon} />}
-  </label>
-)
-
-// FORM INPUT COMPONENT
-
-export type LabelInputProps = InputProps & {
-  label?: string
-  error?: string
-  tooltip?: string
-  icon?: React.ComponentType<IconProps>
-}
-
-export const LabelInput = ({
-  label,
-  disabled,
-  error,
-  tooltip,
-  className,
-  required,
-  style,
-  icon,
-  ...props
-}: LabelInputProps) => (
-  <Label
-    required={required}
-    disabled={disabled}
-    error={error}
-    tooltip={tooltip}
-    label={label}
-    icon={icon}
-    readOnly={props.readOnly}
-    className={className}
-    style={style}
-  >
-    <Input {...props} disabled={disabled} />
-  </Label>
-)
-
-// CHECKBOX COMPONENT
-
-type CheckboxProps = Omit<React.HTMLProps<HTMLDivElement>, "onChange"> & {
-  checked?: boolean
+export interface Control extends Layout {
+  className?: string
+  style?: React.CSSProperties
+  variant?: FieldVariant
+  clear?: boolean
   disabled?: boolean
   readOnly?: boolean
-  onChange?: FormChangeHandler<any>
-}
-
-export const Checkbox = ({
-  checked,
-  disabled,
-  readOnly,
-  className,
-  name,
-  onChange,
-  ...props
-}: CheckboxProps) => {
-  const handleChange = onChange
-    ? () => onChange({ target: { type: "checkbox", checked: !checked, name } })
-    : undefined
-
-  return (
-    <Box
-      {...props}
-      className={cl(
-        styles.checkbox,
-        checked && styles.checkboxChecked,
-        disabled && styles.checkboxDisabled,
-        readOnly && styles.checkboxReadOnly,
-        className
-      )}
-      aria-checked={checked}
-      aria-disabled={disabled}
-      onClick={handleChange}
-    >
-      {checked ? <Check stroke={3} /> : null}
-    </Box>
-  )
-}
-
-type LabelCheckboxProps = Omit<LabelProps, "onChange"> &
-  CheckboxProps & {
-    value?: boolean
-  }
-
-export const LabelCheckbox = ({
-  label,
-  className,
-  disabled,
-  readOnly,
-  value,
-  checked,
-  name,
-  onChange,
-  ...props
-}: LabelCheckboxProps) => {
-  const id = useRef(Math.random().toString(36).slice(2))
-
-  const handleChange = onChange
-    ? () => onChange({ target: { type: "checkbox", checked: !checked, name } })
-    : undefined
-
-  return (
-    <label
-      id={id.current}
-      className={cl(
-        styles.labelCheckbox,
-        (readOnly || disabled) && styles.disabledLabel,
-        className
-      )}
-      onClick={handleChange}
-    >
-      <Checkbox
-        {...props}
-        name={name}
-        disabled={disabled}
-        checked={checked ?? value}
-        onChange={onChange}
-        role="checkbox"
-        aria-labelledby={id.current}
-      />
-      {label}
-    </label>
-  )
-}
-
-type FileInputProps = Omit<AsyncButtonProps, "value" | "onChange"> & {
+  required?: boolean
+  loading?: boolean
+  error?: string
+  label?: string
+  type?: string
+  name?: string
   placeholder?: string
-  value: File | undefined
-  onChange: (value: File | undefined) => void
+  title?: string
+  icon?: React.FunctionComponent | React.ReactNode
+  domRef?: React.RefObject<HTMLElement>
+}
+
+export interface TextInputProps extends Control {
+  value?: string | undefined
+  autoComplete?: boolean
+  onChange?: (value: string | undefined) => void
+}
+
+export const TextInput = ({
+  clear,
+  value,
+  onChange,
+  ...props
+}: TextInputProps) => (
+  <Input
+    {...props}
+    value={value ?? ""}
+    onChange={onChange ? (e) => onChange(e.target.value) : undefined}
+    onClear={clear && value && onChange ? () => onChange(undefined) : undefined}
+  />
+)
+
+export interface NumberInputProps extends Control {
+  min?: number
+  max?: number
+  step?: number
+  value?: number | undefined
+  onChange?: (value: number | undefined) => void
+}
+
+export const NumberInput = ({
+  clear,
+  value,
+  onChange,
+  ...props
+}: NumberInputProps) => (
+  <Input
+    {...props}
+    type={props.readOnly ? "text" : "number"}
+    value={value ?? ""}
+    onClear={clear && value && onChange ? () => onChange(undefined) : undefined}
+    onChange={
+      !onChange
+        ? undefined
+        : (e) => {
+            const value = parseFloat(e.target.value)
+            const change = isNaN(value) ? undefined : value
+            onChange(change)
+          }
+    }
+  />
+)
+
+export interface DateInputProps extends Control {
+  value?: string | undefined
+  onChange?: (value: string | undefined) => void
+}
+
+export const DateInput = ({
+  clear,
+  value,
+  onChange,
+  ...props
+}: DateInputProps) => (
+  <Input
+    {...props}
+    type="date"
+    value={value ?? ""}
+    onChange={onChange ? (e) => onChange(e.target.value) : undefined}
+    onClear={clear && value && onChange ? () => onChange(undefined) : undefined}
+  />
+)
+
+export interface FileInputProps extends Control {
+  value?: File | undefined
+  onChange?: (value: File | undefined) => void
 }
 
 export const FileInput = ({
+  clear,
+  placeholder = i18next.t("Select a file"),
+  value,
+  onChange,
+  ...props
+}: FileInputProps) => (
+  <Field
+    {...props}
+    type="file"
+    onClear={clear && value && onChange ? () => onChange(undefined) : undefined}
+  >
+    <label tabIndex={0} className={css.file}>
+      <input
+        hidden
+        disabled={props.disabled}
+        readOnly={props.readOnly}
+        required={props.required}
+        name={props.name}
+        type="file"
+        onChange={onChange ? (e) => onChange(e.target.files?.[0]) : undefined}
+      />
+      {value?.name ?? placeholder}
+    </label>
+  </Field>
+)
+
+export interface FileAreaProps {
+  className?: string
+  style?: React.CSSProperties
+  children?: React.ReactNode
+  label?: string
+  icon?: React.FunctionComponent | React.ReactNode
+  value?: File | undefined
+  onChange?: (value: File | undefined) => void
+}
+
+export const FileArea = ({
+  children,
+  icon: Icon,
+  label,
+  onChange,
+  ...props
+}: FileAreaProps) => {
+  const [active, setActive] = useState(false)
+  const icon = typeof Icon === "function" ? <Icon /> : Icon
+
+  return (
+    <div
+      {...props}
+      data-active={active ? true : undefined}
+      onDragOver={(e) => {
+        e.preventDefault()
+        if (!active && e.dataTransfer.types.includes("Files")) {
+          setActive(true)
+        }
+      }}
+      onDragLeave={(e) => {
+        e.preventDefault()
+        if (!isInside(e.currentTarget, e.relatedTarget)) {
+          setActive(false)
+        }
+      }}
+      onDrop={(e) => {
+        e.preventDefault()
+        if (e.dataTransfer.files.length > 0) {
+          onChange?.(e.dataTransfer.files[0])
+          setActive(false)
+        }
+      }}
+    >
+      {children}
+      {active && (
+        <Overlay>
+          <Col className={css.fileplaceholder}>
+            {icon}
+            {label}
+          </Col>
+        </Overlay>
+      )}
+    </div>
+  )
+}
+
+export interface InputProps extends Control {
+  min?: number
+  max?: number
+  step?: number
+  autoComplete?: boolean
+  value: string | number | undefined
+  onChange?: React.ChangeEventHandler<HTMLInputElement>
+  onClear?: () => void
+}
+
+export const Input = ({
+  name,
+  placeholder,
+  min,
+  max,
+  step,
+  value,
+  onChange,
+  onClear,
+  autoComplete,
+  ...props
+}: InputProps) => (
+  <Field {...props} onClear={onClear}>
+    <input
+      title={`${value}`}
+      disabled={props.disabled}
+      readOnly={props.readOnly}
+      required={props.required}
+      autoComplete={!autoComplete ? "off" : undefined}
+      type={props.type}
+      name={name}
+      placeholder={placeholder}
+      min={min}
+      max={max}
+      step={step}
+      value={value}
+      onChange={onChange}
+    />
+  </Field>
+)
+
+export interface TextAreaProps extends Control {
+  rows?: number
+  cols?: number
+  value: string | undefined
+  onChange: (value: string | undefined) => void
+}
+
+export const TextArea = ({
+  rows,
+  cols,
+  clear,
+  name,
   placeholder,
   value,
   onChange,
   ...props
-}: FileInputProps) => {
+}: TextAreaProps) => (
+  <Field
+    {...props}
+    onClear={clear && value ? () => onChange(undefined) : undefined}
+  >
+    <textarea
+      title={value}
+      rows={rows}
+      cols={cols}
+      disabled={props.disabled}
+      readOnly={props.readOnly}
+      required={props.required}
+      name={name}
+      placeholder={placeholder}
+      value={value ?? ""}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  </Field>
+)
+
+export interface SearchInputProps extends TextInputProps {
+  debounce?: number
+}
+
+export const SearchInput = ({
+  className,
+  clear,
+  name,
+  placeholder,
+  debounce,
+  value,
+  onChange,
+  ...props
+}: SearchInputProps) => {
+  const { t } = useTranslation()
+
+  const timeoutRef = useRef<number>()
+  const [search, setSearch] = useState(value ?? "")
+
+  useEffect(() => {
+    setSearch(value ?? "")
+  }, [value])
+
+  function debouncedSearch(search: string) {
+    if (!debounce) return onChange?.(search)
+
+    setSearch(search)
+    timeoutRef.current && window.clearTimeout(timeoutRef.current)
+    timeoutRef.current = window.setTimeout(() => onChange?.(search), debounce)
+  }
+
   return (
-    <AsyncButton
-      as="label"
-      level={value ? "success" : "primary"}
-      icon={value ? Check : Upload}
+    <Field
       {...props}
+      className={cl(css.search, className)}
+      onClear={
+        clear && search && onChange ? () => onChange(undefined) : undefined
+      }
     >
+      <div className={css.searchIcon}>
+        <Search />
+      </div>
+
       <input
-        hidden
-        type="file"
-        onChange={(e) => onChange(e!.target.files![0])}
+        title={search}
+        disabled={props.disabled}
+        readOnly={props.readOnly}
+        required={props.required}
+        name={name}
+        placeholder={placeholder ?? t("Rechercher...")}
+        value={search ?? ""}
+        onChange={(e) => debouncedSearch(e.target.value)}
       />
-      {value ? value.name : placeholder}
-    </AsyncButton>
+    </Field>
   )
+}
+
+export interface GroupFieldProps extends Control {
+  children?: React.ReactNode
+}
+
+export const GroupField = ({
+  domRef,
+  asideX,
+  asideY,
+  spread,
+  disabled,
+  readOnly,
+  loading,
+  required,
+  error,
+  label,
+  variant,
+  className,
+  style,
+  children,
+}: GroupFieldProps) => {
+  return (
+    <div
+      data-field
+      data-disabled={disabled ? true : undefined}
+      data-readonly={readOnly ? true : undefined}
+      data-loading={loading ? true : undefined}
+      data-error={error ? true : undefined}
+      style={style}
+      className={cl(css.field, variant && css[variant], className)}
+      {...layout({ asideX, asideY, spread })}
+    >
+      {label && (
+        <label className={css.label} title={label}>
+          {label}
+          {required && !(disabled || readOnly) && " *"}
+        </label>
+      )}
+
+      <div
+        tabIndex={-1}
+        ref={domRef as React.RefObject<HTMLDivElement>}
+        className={css.group}
+      >
+        {children}
+      </div>
+    </div>
+  )
+}
+
+export interface FieldProps extends Control {
+  children?: React.ReactNode
+  onClear?: () => void
+}
+
+export const Field = ({
+  domRef,
+  asideX,
+  asideY,
+  spread,
+  disabled,
+  readOnly,
+  loading,
+  required,
+  type,
+  error,
+  label,
+  icon: Icon,
+  variant,
+  title,
+  className,
+  style,
+  children,
+  onClear,
+}: FieldProps) => {
+  const icon =
+    loading === true ? (
+      <Loader passthrough />
+    ) : error ? (
+      <AlertTriangle title={error} />
+    ) : typeof Icon === "function" ? (
+      <Icon />
+    ) : Icon !== undefined ? (
+      Icon
+    ) : loading === false ? (
+      <Placeholder />
+    ) : null
+
+  return (
+    <div
+      data-field
+      data-disabled={disabled ? true : undefined}
+      data-readonly={readOnly ? true : undefined}
+      data-loading={loading ? true : undefined}
+      data-error={error ? true : undefined}
+      title={title}
+      style={style}
+      className={cl(css.field, variant && css[variant], className)}
+      {...layout({ asideX, asideY, spread })}
+    >
+      {label && (
+        <label className={css.label} title={title ?? label}>
+          {label}
+          {required && !(disabled || readOnly) && " *"}
+        </label>
+      )}
+
+      <div
+        tabIndex={-1}
+        data-interactive={isInteractive(type) ? true : undefined}
+        ref={domRef as React.RefObject<HTMLDivElement>}
+        className={css.control}
+      >
+        {children}
+
+        {!disabled && !readOnly && onClear && (
+          <Button
+            captive
+            variant="icon"
+            icon={Cross}
+            action={onClear}
+            tabIndex={-1}
+            className={css.icon}
+          />
+        )}
+
+        {icon && <div className={css.icon}>{icon}</div>}
+      </div>
+    </div>
+  )
+}
+
+function isInteractive(type: string | undefined) {
+  return type === "button" || type === "file"
 }

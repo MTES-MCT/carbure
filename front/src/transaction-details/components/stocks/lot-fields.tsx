@@ -1,17 +1,15 @@
 import { useTranslation } from "react-i18next"
-import Autocomplete, {
-  AutocompleteProps,
-} from "common-v2/components/autocomplete"
-import { Fieldset, useBind, useFormContext } from "common-v2/components/form"
+import Autocomplete, { AutocompleteProps } from "common/components/autocomplete"
+import { Fieldset, useBind, useFormContext } from "common/components/form"
 import {
   NumberInput,
   NumberInputProps,
   TextInput,
-} from "common-v2/components/input"
-import * as norm from "common-v2/utils/normalizers"
+} from "common/components/input"
+import * as norm from "common/utils/normalizers"
 import { StockFormValue } from "./stock-form"
 import { Biofuel, Country, Feedstock } from "common/types"
-import { formatPercentage } from "common-v2/utils/formatters"
+import { formatPercentage } from "common/utils/formatters"
 import { isRedII } from "lot-add/components/ghg-fields"
 
 export const LotFields = () => {

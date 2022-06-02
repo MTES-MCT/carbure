@@ -1,9 +1,9 @@
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
-import Button from "common-v2/components/button"
-import { AlertCircle } from "common-v2/components/icons"
-import { Row } from "common-v2/components/scaffold"
-import { isProduction } from "common-v2/utils/context"
+import Button from "common/components/button"
+import { AlertCircle } from "common/components/icons"
+import { Row } from "common/components/scaffold"
+import { isProduction } from "common/utils/context"
 
 const DevBanner = () => {
   const { t } = useTranslation()

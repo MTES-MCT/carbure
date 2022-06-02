@@ -3,22 +3,22 @@ import { useTranslation } from "react-i18next"
 import { Lot } from "transactions/types"
 import pickApi from "../api"
 import useEntity, { EntityManager } from "carbure/hooks/entity"
-import { useMutation } from "common-v2/hooks/async"
-import { useNotify } from "common-v2/components/notifications"
-import { variations } from "common-v2/utils/formatters"
-import Button from "common-v2/components/button"
-import Dialog from "common-v2/components/dialog"
+import { useMutation } from "common/hooks/async"
+import { useNotify } from "common/components/notifications"
+import { variations } from "common/utils/formatters"
+import Button from "common/components/button"
+import Dialog from "common/components/dialog"
 import {
   AlertTriangle,
   AlertTriangleOff,
   Return,
-} from "common-v2/components/icons"
-import { usePortal } from "common-v2/components/portal"
+} from "common/components/icons"
+import { usePortal } from "common/components/portal"
 import { useStatus } from "../components/status"
-import { TextInput } from "common-v2/components/input"
+import { TextInput } from "common/components/input"
 import { ControlLotSummary } from "../components/lots/control-lot-summary"
-import Checkbox from "common-v2/components/checkbox"
-import Form, { useForm } from "common-v2/components/form"
+import Checkbox from "common/components/checkbox"
+import Form, { useForm } from "common/components/form"
 
 export interface AlertManyButtonProps {
   disabled?: boolean

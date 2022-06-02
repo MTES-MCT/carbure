@@ -7,7 +7,7 @@ import Carbure from "../index"
 import server from "./api"
 import { MemoryRouter } from "react-router"
 import { Suspense } from "react"
-import { LoaderOverlay } from "common/components"
+import { LoaderOverlay } from "common/components/scaffold"
 import { producer } from "common/__test__/data"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))

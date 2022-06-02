@@ -1,8 +1,8 @@
 import { Trans } from "react-i18next"
-import { formatDeadline } from "common-v2/utils/formatters"
-import { AlertCircle, Alarm } from "common-v2/components/icons"
-import Switch, { SwitchProps } from "common-v2/components/switch"
-import { getCurrentDeadline } from "common-v2/utils/deadline"
+import { formatDeadline } from "common/utils/formatters"
+import { AlertCircle, Alarm } from "common/components/icons"
+import Switch, { SwitchProps } from "common/components/switch"
+import { getCurrentDeadline } from "common/utils/deadline"
 
 export interface InvalidSwitchProps extends SwitchProps {
   count: number

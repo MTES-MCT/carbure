@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { Tag, TagProps, TagVariant } from "common-v2/components/tag"
+import { Tag, TagProps, TagVariant } from "common/components/tag"
 import { Stock } from "../../types"
 
 export interface StockTagProps extends TagProps {
