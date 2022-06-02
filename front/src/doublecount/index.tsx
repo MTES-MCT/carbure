@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Route, Routes, Navigate } from "react-router-dom"
-import { Trans, useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next"
 import useEntity from "carbure/hooks/entity"
 import { useQuery } from "common/hooks/async"
 import { Main } from "common/components/scaffold"

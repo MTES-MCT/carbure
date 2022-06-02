@@ -2,7 +2,6 @@ import { useNavigate, useLocation, useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import pickApi from "../api"
 import { useQuery } from "common/hooks/async"
-import { useStatus } from "controls/components/status"
 import useEntity from "carbure/hooks/entity"
 import { LoaderOverlay } from "common/components/scaffold"
 import Dialog from "common/components/dialog"
@@ -28,7 +27,6 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
   const location = useLocation()
 
   const entity = useEntity()
-  const status = useStatus()
   const params = useParams<"id">()
 
   const api = pickApi(entity)
