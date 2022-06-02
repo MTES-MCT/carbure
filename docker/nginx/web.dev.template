@@ -23,7 +23,6 @@ server {
     add_header Strict-Transport-Security "max-age=300; includeSubDomains; preload; always;";
     add_header X-XSS-Protection "1; mode=block";
 
-
     root /var/www/html;
 
     # serve static files
