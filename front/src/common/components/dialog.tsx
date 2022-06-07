@@ -23,23 +23,21 @@ export const Dialog = ({
   fullscreen,
   onClose,
 }: DialogProps) => (
-  <Portal onClose={onClose}>
-    <div className={css.screen}>
-      <Overlay onClick={onClose} />
-      <div
-        className={cl(css.dialog, fullscreen && css.fullscreen, className)}
-        style={style}
-      >
-        {children}
-        <Button
-          variant="icon"
-          icon={Cross}
-          action={onClose}
-          className={css.close}
-        />
-      </div>
+  <div className={css.screen}>
+    <Overlay onClick={onClose} />
+    <div
+      className={cl(css.dialog, fullscreen && css.fullscreen, className)}
+      style={style}
+    >
+      {children}
+      <Button
+        variant="icon"
+        icon={Cross}
+        action={onClose}
+        className={css.close}
+      />
     </div>
-  </Portal>
+  </div>
 )
 
 export interface ConfirmProps {

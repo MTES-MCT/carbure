@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from "react"
-import ReactDOM from "react-dom"
 import cl from "clsx"
 import { Cross } from "./icons"
 import Button from "./button"
@@ -16,7 +15,7 @@ export interface NotificationOptions {
 }
 
 export function useNotify(): Notifier {
-  const portal = usePortal()
+  const portal = usePortal(notifications)
   return (content, options) =>
     portal((close) => (
       <Notification content={content} options={options} onClose={close} />
@@ -43,7 +42,7 @@ export const Notification = ({
     return () => window.clearTimeout(timeoutRef.current)
   }, [timeoutRef, onClose])
 
-  return ReactDOM.createPortal(
+  return (
     <li
       onClick={() => window.clearTimeout(timeoutRef.current)}
       className={cl(css.notification, options?.variant && css[options.variant])}
@@ -55,8 +54,7 @@ export const Notification = ({
         action={onClose}
         className={css.close}
       />
-    </li>,
-    notifications
+    </li>
   )
 }
 
