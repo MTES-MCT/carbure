@@ -59,7 +59,7 @@
   opacity: 1;
 }
 
-@media screen and (min-width: 1600px) {
+@media screen and (max-width: 1600px) {
   .faq {
     display: none;
   }
