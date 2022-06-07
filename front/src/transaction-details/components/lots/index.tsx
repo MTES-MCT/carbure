@@ -31,6 +31,7 @@ import { invalidate } from "common/hooks/invalidate"
 import { useCategory } from "transactions/components/category"
 import { formatDate } from "common/utils/formatters"
 import Score from "../score"
+import Portal from "common/components/portal"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -93,101 +94,103 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   }
 
   return (
-    <Dialog onClose={closeDialog}>
-      <header>
-        {lotData && <Score big lot={lotData.lot} details={lotData.score} />}
-        {lotData && <LotTag big lot={lotData.lot} />}
-        <h1>
-          {t("Lot")} #{lotData?.lot.carbure_id || lotData?.lot.id}
-          {" · "}
-          {creator?.name ?? "N/A"}
-          {" · "}
-          {lotData && formatDate(lotData.lot.created_at)}
-        </h1>
+    <Portal onClose={closeDialog}>
+      <Dialog onClose={closeDialog}>
+        <header>
+          {lotData && <Score big lot={lotData.lot} details={lotData.score} />}
+          {lotData && <LotTag big lot={lotData.lot} />}
+          <h1>
+            {t("Lot")} #{lotData?.lot.carbure_id || lotData?.lot.id}
+            {" · "}
+            {creator?.name ?? "N/A"}
+            {" · "}
+            {lotData && formatDate(lotData.lot.created_at)}
+          </h1>
 
-        {expiring && (
-          <Alert
-            icon={Alarm}
-            variant="warning"
-            label={t("À valider avant la fin du mois")}
-            style={{ marginLeft: "auto" }}
-          />
-        )}
-      </header>
+          {expiring && (
+            <Alert
+              icon={Alarm}
+              variant="warning"
+              label={t("À valider avant la fin du mois")}
+              style={{ marginLeft: "auto" }}
+            />
+          )}
+        </header>
 
-      <main>
-        <section>
-          <LotForm
-            form={form}
-            readOnly={!editable || !hasEditRights}
-            onSubmit={(form) => {
-              matomo.push(["trackEvent", "lots-details", "save-lot-changes"])
-              updateLot.execute(entity.id, form!)
-            }}
-          />
-        </section>
-
-        {errors.length > 0 && (
+        <main>
           <section>
-            <BlockingAnomalies anomalies={errors} />
-          </section>
-        )}
-
-        {warnings.length > 0 && (
-          <section>
-            <WarningAnomalies lot={lotData!.lot} anomalies={warnings} />
-          </section>
-        )}
-
-        {lotData && comments.length > 0 && (
-          <section>
-            <Comments
-              readOnly={!editable}
-              lot={lotData?.lot}
-              comments={comments}
+            <LotForm
+              form={form}
+              readOnly={!editable || !hasEditRights}
+              onSubmit={(form) => {
+                matomo.push(["trackEvent", "lots-details", "save-lot-changes"])
+                updateLot.execute(entity.id, form!)
+              }}
             />
           </section>
-        )}
 
-        {hasTraceability(lotData) && (
-          <section>
-            <LotTraceability details={lotData} />
-          </section>
-        )}
+          {errors.length > 0 && (
+            <section>
+              <BlockingAnomalies anomalies={errors} />
+            </section>
+          )}
 
-        {changes.length > 0 && (
-          <section>
-            <LotHistory changes={changes} />
-          </section>
-        )}
-      </main>
+          {warnings.length > 0 && (
+            <section>
+              <WarningAnomalies lot={lotData!.lot} anomalies={warnings} />
+            </section>
+          )}
 
-      <footer>
-        {editable && hasEditRights && (
-          <Button
-            loading={updateLot.loading}
-            disabled={canSave}
-            variant="primary"
-            icon={Save}
-            submit="lot-form"
-            label={t("Sauvegarder")}
+          {lotData && comments.length > 0 && (
+            <section>
+              <Comments
+                readOnly={!editable}
+                lot={lotData?.lot}
+                comments={comments}
+              />
+            </section>
+          )}
+
+          {hasTraceability(lotData) && (
+            <section>
+              <LotTraceability details={lotData} />
+            </section>
+          )}
+
+          {changes.length > 0 && (
+            <section>
+              <LotHistory changes={changes} />
+            </section>
+          )}
+        </main>
+
+        <footer>
+          {editable && hasEditRights && (
+            <Button
+              loading={updateLot.loading}
+              disabled={canSave}
+              variant="primary"
+              icon={Save}
+              submit="lot-form"
+              label={t("Sauvegarder")}
+            />
+          )}
+
+          {lotData && hasEditRights && (
+            <LotActions lot={lotData.lot} canSave={canSave} />
+          )}
+
+          <NavigationButtons
+            neighbors={neighbors}
+            root={`../${status}/${category}`}
           />
-        )}
 
-        {lotData && hasEditRights && (
-          <LotActions lot={lotData.lot} canSave={canSave} />
-        )}
+          <Button icon={Return} label={t("Retour")} action={closeDialog} />
+        </footer>
 
-        <NavigationButtons
-          neighbors={neighbors}
-          root={`../${status}/${category}`}
-        />
-
-        <Button icon={Return} label={t("Retour")} action={closeDialog} />
-      </footer>
-
-      {lot.loading && <LoaderOverlay />}
-    </Dialog>
+        {lot.loading && <LoaderOverlay />}
+      </Dialog>
+    </Portal>
   )
 }
 

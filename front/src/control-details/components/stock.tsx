@@ -15,6 +15,7 @@ import StockForm from "transaction-details/components/stocks/stock-form"
 import StockTraceability, {
   hasTraceability,
 } from "transaction-details/components/stocks/stock-traceability"
+import Portal from "common/components/portal"
 
 export interface StockDetailsProps {
   neighbors: number[]
@@ -48,41 +49,43 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
   }
 
   return (
-    <Dialog onClose={closeDialog}>
-      <header>
-        {stockData && <StockTag big stock={stockData.stock} />}
-        <h1>
-          {t("Stock")} #{stockData?.stock.carbure_id || stockData?.stock.id}
-          {" · "}
-          {creator?.name ?? "N/A"}
-        </h1>
-      </header>
+    <Portal onClose={closeDialog}>
+      <Dialog onClose={closeDialog}>
+        <header>
+          {stockData && <StockTag big stock={stockData.stock} />}
+          <h1>
+            {t("Stock")} #{stockData?.stock.carbure_id || stockData?.stock.id}
+            {" · "}
+            {creator?.name ?? "N/A"}
+          </h1>
+        </header>
 
-      <main>
-        <section>
-          <StockForm stock={stockData?.stock} />
-        </section>
-
-        {hasTraceability(stockData) && (
+        <main>
           <section>
-            <StockTraceability
-              details={stockData}
-              parentLotRoot="../../declarations/"
-              parentTransfoRoot="../../stocks/"
-              childLotRoot="../../declarations/"
-              childTransfoRoot="../../stocks/"
-            />
+            <StockForm stock={stockData?.stock} />
           </section>
-        )}
-      </main>
 
-      <footer>
-        <NavigationButtons neighbors={neighbors} root={`..`} />
-        <Button icon={Return} label={t("Retour")} action={closeDialog} />
-      </footer>
+          {hasTraceability(stockData) && (
+            <section>
+              <StockTraceability
+                details={stockData}
+                parentLotRoot="../../declarations/"
+                parentTransfoRoot="../../stocks/"
+                childLotRoot="../../declarations/"
+                childTransfoRoot="../../stocks/"
+              />
+            </section>
+          )}
+        </main>
 
-      {stock.loading && <LoaderOverlay />}
-    </Dialog>
+        <footer>
+          <NavigationButtons neighbors={neighbors} root={`..`} />
+          <Button icon={Return} label={t("Retour")} action={closeDialog} />
+        </footer>
+
+        {stock.loading && <LoaderOverlay />}
+      </Dialog>
+    </Portal>
   )
 }
 

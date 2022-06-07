@@ -16,6 +16,7 @@ import { useCategory } from "transactions/components/category"
 import { UserRole } from "carbure/types"
 import { CancelOneTransformButton } from "transactions/actions/transform-cancel"
 import { FlushOneButton } from "transactions/actions/flush-stock"
+import Portal from "common/components/portal"
 
 interface StockDetailsProps {
   neighbors: number[]
@@ -51,42 +52,44 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
     })
 
   return (
-    <Dialog onClose={closeDialog}>
-      <header>
-        {stockData && <StockTag big stock={stockData.stock} />}
-        <h1>
-          {t("Stock")} #{stockData?.stock.carbure_id}
-          {" · "}
-          {owner?.name ?? "N/A"}
-        </h1>
-      </header>
+    <Portal onClose={closeDialog}>
+      <Dialog onClose={closeDialog}>
+        <header>
+          {stockData && <StockTag big stock={stockData.stock} />}
+          <h1>
+            {t("Stock")} #{stockData?.stock.carbure_id}
+            {" · "}
+            {owner?.name ?? "N/A"}
+          </h1>
+        </header>
 
-      <main>
-        <section>
-          <StockForm stock={stockData?.stock} />
-        </section>
+        <main>
+          <section>
+            <StockForm stock={stockData?.stock} />
+          </section>
 
-        <section>
-          <StockTraceability details={stockData} />
-        </section>
-      </main>
+          <section>
+            <StockTraceability details={stockData} />
+          </section>
+        </main>
 
-      <footer>
-        {hasEditRights && stockData && stockData.stock.remaining_volume > 0 && (
-          <>
-            <SplitOneButton stock={stockData.stock} />
-            {percentLeft <= 5 && <FlushOneButton stock={stockData.stock} />}
-            {stockData.parent_transformation && (
-              <CancelOneTransformButton stock={stockData.stock} />
-            )}
-          </>
-        )}
-        <NavigationButtons neighbors={neighbors} root={`../${category}`} />
-        <Button icon={Return} label={t("Retour")} action={closeDialog} />
-      </footer>
+        <footer>
+          {hasEditRights && stockData && stockData.stock.remaining_volume > 0 && (
+            <>
+              <SplitOneButton stock={stockData.stock} />
+              {percentLeft <= 5 && <FlushOneButton stock={stockData.stock} />}
+              {stockData.parent_transformation && (
+                <CancelOneTransformButton stock={stockData.stock} />
+              )}
+            </>
+          )}
+          <NavigationButtons neighbors={neighbors} root={`../${category}`} />
+          <Button icon={Return} label={t("Retour")} action={closeDialog} />
+        </footer>
 
-      {stock.loading && <LoaderOverlay />}
-    </Dialog>
+        {stock.loading && <LoaderOverlay />}
+      </Dialog>
+    </Portal>
   )
 }
 
