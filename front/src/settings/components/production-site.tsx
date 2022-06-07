@@ -104,8 +104,7 @@ const ProductionSitesSettings = ({
   function editProductionSite(prodSite: ProductionSiteDetails) {
     portal((close) => (
       <ProductionSiteDialog
-        title={t("Modification site de production")}
-        description={t("Veuillez entrer les nouvelles informations de votre site de production.")} // prettier-ignore
+        title={t("Détails du site de production")}
         entity={entity}
         productionSite={prodSite}
         readOnly={!canModify}
@@ -345,7 +344,7 @@ export const ProductionSiteDialog = ({
               {...bind("name")}
             />
 
-            <Row style={{ gap: "var(--spacing-s)" }}>
+            <Row style={{ gap: "var(--spacing-m)" }}>
               <TextInput
                 readOnly={readOnly}
                 label={t("N° d'identification (SIRET)")}
@@ -355,13 +354,14 @@ export const ProductionSiteDialog = ({
                 readOnly={readOnly}
                 type="date"
                 label={t("Date de mise en service")}
+                style={{ flex: 1 }}
                 {...bind("date_mise_en_service")}
               />
             </Row>
 
             <hr />
 
-            <Row style={{ gap: "var(--spacing-s)" }}>
+            <Row style={{ gap: "var(--spacing-m)" }}>
               <TextInput
                 readOnly={readOnly}
                 label={t("Ville")}
@@ -391,7 +391,7 @@ export const ProductionSiteDialog = ({
               {...bind("manager_name")}
             />
 
-            <Row style={{ gap: "var(--spacing-s)" }}>
+            <Row style={{ gap: "var(--spacing-m)" }}>
               <TextInput
                 readOnly={readOnly}
                 label={t("N° de téléphone du gérant")}

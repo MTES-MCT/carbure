@@ -164,6 +164,14 @@ section.actionbar {
   background-color: var(--gray-light);
 }
 
+hr {
+  width: 100%;
+  border-width: 0px;
+  border-bottom-width: 0px;
+  border-bottom-width: 1px;
+  color: var(--gray-highlight);
+}
+
 [data-asidex] {
   margin-left: auto;
 }
