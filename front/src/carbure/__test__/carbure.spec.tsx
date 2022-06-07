@@ -1,17 +1,20 @@
+import { Suspense } from "react"
+import { MemoryRouter } from "react-router"
 import { render } from "setupTests"
 import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { okEmptySettings, setEntity } from "settings/__test__/api"
 import Carbure from "../index"
-
 import server from "./api"
-import { MemoryRouter } from "react-router"
-import { Suspense } from "react"
 import { LoaderOverlay } from "common/components/scaffold"
-import { producer } from "carbure/__test__/data"
+import { okEmptySettings, okSettings } from "settings/__test__/api"
+import {
+  okLots,
+  okSnapshot,
+  okYears,
+  okSummary,
+} from "transactions/__test__/api"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
-beforeEach(() => setEntity(producer))
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
@@ -25,7 +28,7 @@ const CarbureWithRouter = () => {
   )
 }
 
-test.only("display alert message when connected without access rights", async () => {
+test("display alert message when connected without access rights", async () => {
   server.use(okEmptySettings)
   render(<CarbureWithRouter />)
 
@@ -52,6 +55,7 @@ test.only("display alert message when connected without access rights", async ()
 })
 
 test("pick an entity from the menu", async () => {
+  server.use(okSettings, okSnapshot, okYears, okLots, okSummary)
   render(<CarbureWithRouter />)
 
   const menu = await screen.findByText("Menu")

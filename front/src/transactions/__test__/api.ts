@@ -2,6 +2,7 @@ import { producer } from "carbure/__test__/data"
 import { rest } from "msw"
 import { setupServer } from "msw/node"
 
+import { Data } from "carbure/__test__/helpers"
 import {
   okBiocarburantsSearch,
   okCountrySearch,
@@ -14,7 +15,6 @@ import {
   okErrorsTranslations,
 } from "carbure/__test__/api"
 
-import { Data } from "carbure/__test__/helpers"
 import * as data from "./data"
 import {
   okDeliverySites,
@@ -53,6 +53,7 @@ export const okYears = rest.get("/api/years", (req, res, ctx) => {
     })
   )
 })
+
 export const okDeclarations = rest.get("/api/declarations", (req, res, ctx) => {
   return res(
     ctx.json({
