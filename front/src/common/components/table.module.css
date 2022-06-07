@@ -199,6 +199,5 @@ h2 + .table[data-headless] {
 }
 
 .actions button {
-  width: 20px;
   color: var(--gray-dark);
 }

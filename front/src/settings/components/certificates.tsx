@@ -341,7 +341,6 @@ const CertificateUpdateDialog = ({
       notify(t("Le certificat n'a pas pu être mis à jour !"), {
         variant: "danger",
       })
-      onClose()
     },
   })
 
