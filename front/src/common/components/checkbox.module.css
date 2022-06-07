@@ -17,7 +17,8 @@
   user-select: none;
 }
 
-.checkbox:focus-within .square {
+.checkbox:focus-within .square,
+.checkbox:active .square {
   outline: 2px double;
   outline-offset: 1px;
 }

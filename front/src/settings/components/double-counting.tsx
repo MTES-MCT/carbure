@@ -676,6 +676,7 @@ const DoubleCountingSourcingDialog = ({
 
   const addSourcing = useMutation(api.addDoubleCountingSourcing, {
     invalidates: ["dc-details"],
+    onSuccess: () => onClose(),
   })
 
   const updateSourcing = useMutation(api.updateDoubleCountingSourcing, {
@@ -835,6 +836,7 @@ const DoubleCountingProductionDialog = ({
 
   const addProduction = useMutation(api.addDoubleCountingProduction, {
     invalidates: ["dc-details"],
+    onSuccess: () => onClose(),
   })
 
   const updateProduction = useMutation(api.updateDoubleCountingProduction, {
