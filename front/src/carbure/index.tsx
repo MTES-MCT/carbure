@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom"
 import { LoaderOverlay } from "common/components/scaffold"
 import useUserManager, { UserContext } from "./hooks/user"
 import useEntity, { EntityContext, useEntityManager } from "./hooks/entity"
+import { PortalProvider } from "common/components/portal"
 import Topbar from "./components/top-bar"
 import Footer from "./components/footer"
 import Pending from "./components/pending"
@@ -26,28 +27,30 @@ const Carbure = () => {
   return (
     <UserContext.Provider value={user}>
       <EntityContext.Provider value={entity}>
-        <div id="app">
-          <Topbar />
+        <PortalProvider>
+          <div id="app">
+            <Topbar />
 
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/stats" element={<PublicStats />} />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/stats" element={<PublicStats />} />
 
-            <Route path="/auth/*" element={<Auth />} />
+              <Route path="/auth/*" element={<Auth />} />
 
-            {isAuth && <Route path="/pending" element={<Pending />} />}
-            {isAuth && <Route path="/account" element={<Account />} />}
-            {isAuth && <Route path="/org/:entity/*" element={<Org />} />}
+              {isAuth && <Route path="/pending" element={<Pending />} />}
+              {isAuth && <Route path="/account" element={<Account />} />}
+              {isAuth && <Route path="/org/:entity/*" element={<Org />} />}
 
-            {!user.loading && (
-              <Route path="*" element={<Navigate replace to="/" />} />
-            )}
-          </Routes>
+              {!user.loading && (
+                <Route path="*" element={<Navigate replace to="/" />} />
+              )}
+            </Routes>
 
-          <Footer />
+            <Footer />
 
-          {user.loading && <LoaderOverlay />}
-        </div>
+            {user.loading && <LoaderOverlay />}
+          </div>
+        </PortalProvider>
       </EntityContext.Provider>
     </UserContext.Provider>
   )

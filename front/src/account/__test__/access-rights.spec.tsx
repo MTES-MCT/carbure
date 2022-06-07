@@ -6,7 +6,6 @@ import Account from "../index"
 import server, { setAccessRequests } from "./api"
 import { producer } from "carbure/__test__/data"
 import { getField, waitWhileLoading } from "carbure/__test__/helpers"
-import { PortalProvider } from "common/components/portal"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 
@@ -22,14 +21,7 @@ afterAll(() => server.close())
 const AccountWithHooks = () => {
   return (
     <TestRoot url="/">
-      <Route
-        path="/"
-        element={
-          <PortalProvider>
-            <Account />
-          </PortalProvider>
-        }
-      />
+      <Route path="/" element={<Account />} />
     </TestRoot>
   )
 }

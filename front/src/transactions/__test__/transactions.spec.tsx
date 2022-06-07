@@ -11,7 +11,6 @@ import server from "./api"
 import { emptyLots, emptySnapshot, lots, snapshot } from "./data"
 import userEvent from "@testing-library/user-event"
 import { clickOnCheckboxesAndConfirm } from "./helpers"
-import { PortalProvider } from "common/components/portal"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 beforeEach(() => {
@@ -33,11 +32,7 @@ const TransactionsWithRouter = ({
     <TestRoot url={`/org/${entity.id}/transactions/2021/${status}/pending`}>
       <Route
         path={`/org/${entity.id}/transactions/:year/*`}
-        element={
-          <PortalProvider>
-            <Transactions />
-          </PortalProvider>
-        }
+        element={<Transactions />}
       />
     </TestRoot>
   )

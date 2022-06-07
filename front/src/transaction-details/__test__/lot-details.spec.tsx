@@ -11,7 +11,6 @@ import { LotDetails as LotDetailsData } from "transaction-details/types"
 import server from "./api"
 
 import { Data, getField } from "carbure/__test__/helpers"
-import { PortalProvider } from "common/components/portal"
 import { clickOnCheckboxesAndConfirm } from "../../transactions/__test__/helpers"
 import { setEntity } from "settings/__test__/api"
 import {
@@ -33,11 +32,7 @@ const LotDetailsWithRouter = ({ entity }: { entity: Entity }) => {
     <TestRoot url={`/org/${entity.id}/transactions/2021/draft/pending/0`}>
       <Route
         path="/org/:entity/transactions/:year/:status/:category/:id"
-        element={
-          <PortalProvider>
-            <LotDetails neighbors={[]} />
-          </PortalProvider>
-        }
+        element={<LotDetails neighbors={[]} />}
       />
       <Route path="/draft/pending" element={<p>EMPTY</p>} />
     </TestRoot>

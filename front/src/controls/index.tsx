@@ -4,7 +4,6 @@ import useEntity from "carbure/hooks/entity"
 import { useQuery } from "common/hooks/async"
 import { Main } from "common/components/scaffold"
 import Select from "common/components/select"
-import { PortalProvider } from "common/components/portal"
 import { StatusTabs, useStatus } from "./components/status"
 import Lots from "./components/lots"
 import { useYears } from "transactions"
@@ -36,34 +35,32 @@ export const Controls = () => {
   const props = { entity, year: years.selected, snapshot: snapshotData }
 
   return (
-    <PortalProvider>
-      <Main>
-        <header>
-          <section>
-            <h1>{t("Transactions")}</h1>
+    <Main>
+      <header>
+        <section>
+          <h1>{t("Transactions")}</h1>
 
-            <Select
-              loading={years.loading}
-              variant="inline"
-              placeholder={t("Choisir une année")}
-              value={years.selected}
-              onChange={years.setYear}
-              options={years.options}
-              sort={(year) => -year.value}
-            />
-          </section>
+          <Select
+            loading={years.loading}
+            variant="inline"
+            placeholder={t("Choisir une année")}
+            value={years.selected}
+            onChange={years.setYear}
+            options={years.options}
+            sort={(year) => -year.value}
+          />
+        </section>
 
-          <section>
-            <StatusTabs loading={snapshot.loading} count={snapshotData?.lots} />
-          </section>
-        </header>
+        <section>
+          <StatusTabs loading={snapshot.loading} count={snapshotData?.lots} />
+        </section>
+      </header>
 
-        <Routes>
-          <Route path="stocks/*" element={<Stocks {...props} />} />
-          <Route path="*" element={<Lots {...props} />} />
-        </Routes>
-      </Main>
-    </PortalProvider>
+      <Routes>
+        <Route path="stocks/*" element={<Stocks {...props} />} />
+        <Route path="*" element={<Lots {...props} />} />
+      </Routes>
+    </Main>
   )
 }
 

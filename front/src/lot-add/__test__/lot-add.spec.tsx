@@ -7,7 +7,6 @@ import { operator, producer, trader } from "carbure/__test__/data"
 import { getField, waitWhileLoading } from "carbure/__test__/helpers"
 import LotAdd from "../index"
 
-import { PortalProvider } from "common/components/portal"
 import { setEntity } from "settings/__test__/api"
 import server from "./api"
 
@@ -22,15 +21,13 @@ const TransactionAddWithRouter = ({
   entityID?: number
   children?: React.ReactNode
 }) => (
-  <PortalProvider>
-    <TestRoot url={`/org/${entityID}/transactions/draft/pending/add`}>
-      <Route
-        path="/org/:entity/transactions/draft/pending/add"
-        element={<LotAdd />}
-      />
-      {children}
-    </TestRoot>
-  </PortalProvider>
+  <TestRoot url={`/org/${entityID}/transactions/draft/pending/add`}>
+    <Route
+      path="/org/:entity/transactions/draft/pending/add"
+      element={<LotAdd />}
+    />
+    {children}
+  </TestRoot>
 )
 
 function checkLotFields() {

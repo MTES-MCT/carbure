@@ -15,6 +15,7 @@ import biofuels from "../public/locales/fr/biofuels.json"
 import countries from "../public/locales/fr/countries.json"
 import useUserManager, { UserContext, UserManager } from "carbure/hooks/user"
 import { EntityContext, useEntityManager } from "carbure/hooks/entity"
+import { PortalProvider } from "common/components/portal"
 
 configure({
   getElementError(message) {
@@ -79,8 +80,10 @@ const App = ({ children }: RootProps) => {
   return (
     <UserContext.Provider value={user}>
       <EntityContext.Provider value={entity}>
-        <Routes>{children}</Routes>
-        {user.loading && <LoaderOverlay />}
+        <PortalProvider>
+          <Routes>{children}</Routes>
+          {user.loading && <LoaderOverlay />}
+        </PortalProvider>
       </EntityContext.Provider>
     </UserContext.Provider>
   )

@@ -9,16 +9,13 @@ import * as serviceWorker from "./serviceWorker"
 import Carbure from "./carbure"
 import { MatomoProvider } from "./matomo"
 import { LoaderOverlay } from "common/components/scaffold"
-import { PortalProvider } from "common/components/portal"
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter basename="/app">
       <MatomoProvider>
         <Suspense fallback={<LoaderOverlay />}>
-          <PortalProvider>
-            <Carbure />
-          </PortalProvider>
+          <Carbure />
         </Suspense>
       </MatomoProvider>
     </BrowserRouter>

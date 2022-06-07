@@ -14,7 +14,6 @@ import { useQuery } from "common/hooks/async"
 import * as api from "./api"
 import { Main } from "common/components/scaffold"
 import Select from "common/components/select"
-import { PortalProvider } from "common/components/portal"
 import { StatusTabs } from "./components/status"
 import { DeclarationButton } from "./actions/declaration"
 import { ImportArea } from "./actions/import"
@@ -39,56 +38,48 @@ export const Transactions = () => {
   const props = { year: years.selected, snapshot: snapshotData }
 
   return (
-    <PortalProvider>
-      <ImportArea>
-        <Main>
-          <header>
-            <section>
-              <h1>{t("Transactions")}</h1>
+    <ImportArea>
+      <Main>
+        <header>
+          <section>
+            <h1>{t("Transactions")}</h1>
 
-              <Select
-                loading={years.loading}
-                variant="inline"
-                placeholder={t("Choisir une année")}
-                value={years.selected}
-                onChange={years.setYear}
-                options={years.options}
-                sort={(year) => -year.value}
-              />
-
-              {entity.hasRights(UserRole.Admin, UserRole.ReadWrite) && (
-                <DeclarationButton
-                  year={years.selected}
-                  years={years.options}
-                />
-              )}
-            </section>
-
-            <section>
-              <StatusTabs
-                loading={snapshot.loading}
-                count={snapshotData?.lots}
-              />
-            </section>
-          </header>
-
-          <Routes>
-            <Route
-              path="stocks/*"
-              element={
-                // if entity does not have stock redirect to default drafts
-                entity.has_stocks ? (
-                  <Stocks {...props} />
-                ) : (
-                  <Navigate replace to="../drafts/imported" />
-                )
-              }
+            <Select
+              loading={years.loading}
+              variant="inline"
+              placeholder={t("Choisir une année")}
+              value={years.selected}
+              onChange={years.setYear}
+              options={years.options}
+              sort={(year) => -year.value}
             />
-            <Route path="*" element={<Lots {...props} />} />
-          </Routes>
-        </Main>
-      </ImportArea>
-    </PortalProvider>
+
+            {entity.hasRights(UserRole.Admin, UserRole.ReadWrite) && (
+              <DeclarationButton year={years.selected} years={years.options} />
+            )}
+          </section>
+
+          <section>
+            <StatusTabs loading={snapshot.loading} count={snapshotData?.lots} />
+          </section>
+        </header>
+
+        <Routes>
+          <Route
+            path="stocks/*"
+            element={
+              // if entity does not have stock redirect to default drafts
+              entity.has_stocks ? (
+                <Stocks {...props} />
+              ) : (
+                <Navigate replace to="../drafts/imported" />
+              )
+            }
+          />
+          <Route path="*" element={<Lots {...props} />} />
+        </Routes>
+      </Main>
+    </ImportArea>
   )
 }
 
