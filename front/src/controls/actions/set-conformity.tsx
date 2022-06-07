@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Lot } from "transactions/types"
 import * as api from "../api/auditor"
@@ -12,6 +12,9 @@ import { Check, Cross, Return } from "common/components/icons"
 import { usePortal } from "common/components/portal"
 import { useStatus } from "../components/status"
 import { ControlLotSummary } from "../components/lots/control-lot-summary"
+import Form from "common/components/form"
+import { TextInput } from "common/components/input"
+import i18next from "i18next"
 
 export interface SetManyConformityButtonProps {
   disabled?: boolean
@@ -86,7 +89,9 @@ const ConformityDialog = ({
 
   const v = variations(selection.length)
 
-  const markAsConform = useMutation(api.markAsConform, {
+  const [comment, setComment] = useState<string | undefined>(undefined)
+
+  const markAsConform = useMutation(markAsConformAndComment, {
     invalidates: ["controls", "control-details", "controls-snapshot"],
 
     onSuccess: () => {
@@ -110,7 +115,7 @@ const ConformityDialog = ({
     },
   })
 
-  const markAsNonConform = useMutation(api.markAsNonConform, {
+  const markAsNonConform = useMutation(markAsNonConformAndComment, {
     invalidates: ["controls", "control-details", "controls-snapshot"],
 
     onSuccess: () => {
@@ -157,6 +162,18 @@ const ConformityDialog = ({
             )}
           </p>
         </section>
+        <section>
+          <Form id="conformity-form">
+            <TextInput
+              autoFocus
+              required
+              label={t("Commentaire")}
+              value={comment}
+              onChange={setComment}
+            />
+          </Form>
+        </section>
+
         {summary && <ControlLotSummary query={query} selection={selection} />}
       </main>
       <footer>
@@ -167,7 +184,7 @@ const ConformityDialog = ({
           variant="success"
           icon={Check}
           label={t("CONFORME")}
-          action={() => markAsConform.execute(entity.id, selection)}
+          action={() => markAsConform.execute(entity.id, selection, comment!)}
         />
         <Button
           disabled={markAsConform.loading}
@@ -175,7 +192,9 @@ const ConformityDialog = ({
           variant="danger"
           icon={Cross}
           label={t("NON CONFORME")}
-          action={() => markAsNonConform.execute(entity.id, selection)}
+          action={() =>
+            markAsNonConform.execute(entity.id, selection, comment!)
+          }
         />
         <Button
           disabled={markAsConform.loading}
@@ -186,4 +205,24 @@ const ConformityDialog = ({
       </footer>
     </Dialog>
   )
+}
+
+async function markAsConformAndComment(
+  entity_id: number,
+  selection: number[],
+  comment: string
+) {
+  const fullComment = `[${i18next.t("CONFORME")}] ${comment}`
+  await api.markAsConform(entity_id, selection)
+  await api.commentLots({ entity_id }, selection, fullComment, true, true)
+}
+
+async function markAsNonConformAndComment(
+  entity_id: number,
+  selection: number[],
+  comment: string
+) {
+  const fullComment = `[${i18next.t("NON CONFORME")}] ${comment}`
+  await api.markAsNonConform(entity_id, selection)
+  await api.commentLots({ entity_id }, selection, fullComment, true, true)
 }
