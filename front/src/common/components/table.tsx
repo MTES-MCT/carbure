@@ -5,6 +5,7 @@ import Checkbox from "./checkbox"
 import { multipleSelection } from "../utils/selection"
 import css from "./table.module.css"
 import { Col, LoaderOverlay } from "./scaffold"
+import { ChevronRight } from "./icons"
 
 export type TableVariant = "spaced" | "compact"
 
@@ -161,7 +162,11 @@ export function actionColumn<T>(
 ): Column<T> {
   return {
     className: css.actions,
-    cell: (value) => actions(value).map((e, key) => ({ ...e, key })),
+    cell: (value) => {
+      const buttons = actions(value).map((e, key) => ({ ...e, key }))
+      if (buttons.length === 0) return <ChevronRight color="var(--gray-dark)" />
+      else return buttons
+    },
   }
 }
 
