@@ -32,6 +32,7 @@ import ControlComments from "./control-comments"
 import { formatDate } from "common/utils/formatters"
 import Score from "transaction-details/components/score"
 import { SetOneConformityButton } from "controls/actions/set-conformity"
+import Portal from "common/components/portal"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -74,87 +75,89 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   }
 
   return (
-    <Dialog onClose={closeDialog}>
-      <header>
-        {lotData && <Score big lot={lotData.lot} details={lotData.score} />}
-        {lotData && <LotTag big lot={lotData.lot} />}
-        <h1>
-          {t("Lot")} #{lotData?.lot.carbure_id || lotData?.lot.id}
-          {" · "}
-          {creator?.name ?? "N/A"}
-          {" · "}
-          {lotData && formatDate(lotData.lot.created_at)}
-        </h1>
+    <Portal onClose={closeDialog}>
+      <Dialog onClose={closeDialog}>
+        <header>
+          {lotData && <Score big lot={lotData.lot} details={lotData.score} />}
+          {lotData && <LotTag big lot={lotData.lot} />}
+          <h1>
+            {t("Lot")} #{lotData?.lot.carbure_id || lotData?.lot.id}
+            {" · "}
+            {creator?.name ?? "N/A"}
+            {" · "}
+            {lotData && formatDate(lotData.lot.created_at)}
+          </h1>
 
-        {expiring && (
-          <Alert
-            icon={Alarm}
-            variant="warning"
-            label={t("À valider avant la fin du mois")}
-            style={{ marginLeft: "auto" }}
-          />
-        )}
-      </header>
-
-      <main>
-        <section>
-          <LotForm readOnly form={form} />
-        </section>
-
-        {errors.length > 0 && (
-          <section>
-            <BlockingAnomalies anomalies={errors} />
-          </section>
-        )}
-
-        {warnings.length > 0 && (
-          <section>
-            <WarningAnomalies lot={lotData!.lot} anomalies={warnings} />
-          </section>
-        )}
-
-        {lotData && comments.length > 0 && (
-          <section>
-            <Comments readOnly lot={lotData?.lot} comments={comments} />
-          </section>
-        )}
-
-        {lotData && (
-          <section>
-            <ControlComments lot={lotData?.lot} comments={controlComments} />
-          </section>
-        )}
-
-        {hasTraceability(lotData) && (
-          <section>
-            <LotTraceability
-              details={lotData}
-              parentLotRoot="../../declarations/"
-              parentStockRoot="../../stocks/"
-              childLotRoot="../../declarations/"
-              childStockRoot="../../stocks/"
+          {expiring && (
+            <Alert
+              icon={Alarm}
+              variant="warning"
+              label={t("À valider avant la fin du mois")}
+              style={{ marginLeft: "auto" }}
             />
-          </section>
-        )}
+          )}
+        </header>
 
-        {changes.length > 0 && (
+        <main>
           <section>
-            <LotHistory changes={changes} />
+            <LotForm readOnly form={form} />
           </section>
-        )}
-      </main>
 
-      <footer>
-        {lotData && <AlertOneButton lot={lotData.lot} />}
-        {lotData && entity.isAuditor && (
-          <SetOneConformityButton lot={lotData.lot} />
-        )}
-        <NavigationButtons neighbors={neighbors} root={`../${status}`} />
-        <Button icon={Return} label={t("Retour")} action={closeDialog} />
-      </footer>
+          {errors.length > 0 && (
+            <section>
+              <BlockingAnomalies anomalies={errors} />
+            </section>
+          )}
 
-      {lot.loading && <LoaderOverlay />}
-    </Dialog>
+          {warnings.length > 0 && (
+            <section>
+              <WarningAnomalies lot={lotData!.lot} anomalies={warnings} />
+            </section>
+          )}
+
+          {lotData && comments.length > 0 && (
+            <section>
+              <Comments readOnly lot={lotData?.lot} comments={comments} />
+            </section>
+          )}
+
+          {lotData && (
+            <section>
+              <ControlComments lot={lotData?.lot} comments={controlComments} />
+            </section>
+          )}
+
+          {hasTraceability(lotData) && (
+            <section>
+              <LotTraceability
+                details={lotData}
+                parentLotRoot="../../declarations/"
+                parentStockRoot="../../stocks/"
+                childLotRoot="../../declarations/"
+                childStockRoot="../../stocks/"
+              />
+            </section>
+          )}
+
+          {changes.length > 0 && (
+            <section>
+              <LotHistory changes={changes} />
+            </section>
+          )}
+        </main>
+
+        <footer>
+          {lotData && <AlertOneButton lot={lotData.lot} />}
+          {lotData && entity.isAuditor && (
+            <SetOneConformityButton lot={lotData.lot} />
+          )}
+          <NavigationButtons neighbors={neighbors} root={`../${status}`} />
+          <Button icon={Return} label={t("Retour")} action={closeDialog} />
+        </footer>
+
+        {lot.loading && <LoaderOverlay />}
+      </Dialog>
+    </Portal>
   )
 }
 
