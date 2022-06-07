@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useRef } from "react"
+import React, { useEffect, useRef } from "react"
 import ReactDOM from "react-dom"
 import cl from "clsx"
 import { Cross } from "./icons"
 import Button from "./button"
-import { PortalContext } from "./portal"
+import { usePortal } from "./portal"
 import css from "./notifications.module.css"
 
 export type Notifier = (
@@ -16,12 +16,9 @@ export interface NotificationOptions {
 }
 
 export function useNotify(): Notifier {
-  const manager = useContext(PortalContext)
-  if (manager === undefined) {
-    throw new Error("Notification context is not defined")
-  }
+  const portal = usePortal()
   return (content, options) =>
-    manager.portal((close) => (
+    portal((close) => (
       <Notification content={content} options={options} onClose={close} />
     ))
 }
