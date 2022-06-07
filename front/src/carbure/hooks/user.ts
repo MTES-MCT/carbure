@@ -16,7 +16,7 @@ export interface UserManager {
   getFirstEntity: () => Entity | null
 }
 
-export function useLoadUser(): UserManager {
+export function useUserManager(): UserManager {
   const settings = useQuery(api.getUserSettings, {
     key: "user-settings",
     params: [],
@@ -72,4 +72,4 @@ export function reloadUserSettings() {
   invalidate("user-settings")
 }
 
-export default useLoadUser
+export default useUserManager

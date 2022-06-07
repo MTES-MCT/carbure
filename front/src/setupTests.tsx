@@ -13,7 +13,8 @@ import fields from "../public/locales/fr/fields.json"
 import feedstocks from "../public/locales/fr/feedstocks.json"
 import biofuels from "../public/locales/fr/biofuels.json"
 import countries from "../public/locales/fr/countries.json"
-import useLoadUser, { UserContext, UserManager } from "carbure/hooks/user"
+import useUserManager, { UserContext, UserManager } from "carbure/hooks/user"
+import { EntityContext, useEntityManager } from "carbure/hooks/entity"
 
 configure({
   getElementError(message) {
@@ -58,24 +59,30 @@ i18n.use(initReactI18next).init({
   },
 })
 
-type TestRootProps = {
-  url: string
-  children: React.ReactNode | ((user: UserManager) => React.ReactNode)
+type RootProps = {
+  url?: string
+  children: React.ReactNode
 }
 
-export const TestRoot = ({ url, children }: TestRootProps) => {
-  const user = useLoadUser()
-  const element = typeof children === "function" ? children(user) : children
+export const TestRoot = ({ url, children }: RootProps) => (
+  <MemoryRouter initialEntries={[url ?? "/"]}>
+    <Suspense fallback={<LoaderOverlay />}>
+      <App>{children}</App>
+    </Suspense>
+  </MemoryRouter>
+)
+
+const App = ({ children }: RootProps) => {
+  const user = useUserManager()
+  const entity = useEntityManager(user)
 
   return (
-    <MemoryRouter initialEntries={[url]}>
-      <Suspense fallback={<LoaderOverlay />}>
-        <UserContext.Provider value={user}>
-          <Routes>{element}</Routes>
-          {user.loading && <LoaderOverlay />}
-        </UserContext.Provider>
-      </Suspense>
-    </MemoryRouter>
+    <UserContext.Provider value={user}>
+      <EntityContext.Provider value={entity}>
+        <Routes>{children}</Routes>
+        {user.loading && <LoaderOverlay />}
+      </EntityContext.Provider>
+    </UserContext.Provider>
   )
 }
 

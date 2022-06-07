@@ -1,8 +1,9 @@
 import useLocalStorage from "common/hooks/storage"
 import { Unit } from "carbure/types"
 import { useMatch } from "react-router-dom"
+import { createContext, useContext } from "react"
 import { Entity, EntityType, ExternalAdminPages, UserRole } from "../types"
-import { useUser } from "./user"
+import { UserManager } from "./user"
 
 export interface EntityManager extends Entity {
   isBlank: boolean
@@ -19,8 +20,7 @@ export interface EntityManager extends Entity {
   setUnit: (unit: Unit) => void
 }
 
-export function useEntity(): EntityManager {
-  const user = useUser()
+export function useEntityManager(user: UserManager): EntityManager {
   const match = useMatch("/org/:entity/*")
 
   const entityID = parseInt(match?.params.entity ?? "-1", 10)
@@ -68,6 +68,14 @@ export function useEntity(): EntityManager {
     setUnit,
   }
 }
+
+function useEntity() {
+  const entity = useContext(EntityContext)
+  if (entity === undefined) throw new Error("Entity context is undefined")
+  return entity
+}
+
+export const EntityContext = createContext<EntityManager | undefined>(undefined)
 
 const INDUSTRY = [EntityType.Producer, EntityType.Operator, EntityType.Trader]
 export function isIndustry(type: EntityType | undefined) {
