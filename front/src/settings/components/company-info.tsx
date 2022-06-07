@@ -50,7 +50,7 @@ const CompanyInfo = () => {
         <section>
           <p>
             {t(
-              "Veuillez renseigner les informations légales concernant votre société."
+              "Veuillez renseigner les informations de contact de votre société."
             )}
           </p>
         </section>
