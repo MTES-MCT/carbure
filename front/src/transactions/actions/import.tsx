@@ -11,6 +11,7 @@ import { usePortal } from "common/components/portal"
 import { FileArea, FileInput } from "common/components/input"
 import { LoaderOverlay } from "common/components/scaffold"
 import { useMatomo } from "matomo"
+import Form from "common/components/form"
 
 const FAQ_URL = "https://carbure-1.gitbook.io/faq/"
 const TEMPLATE_URL = "/api/download-template"
@@ -99,18 +100,21 @@ const ImportDialog = ({ onClose }: ImportDialogProps) => {
           </p>
         </section>
         <section>
-          <FileInput
-            loading={importLots.loading}
-            icon={file ? Check : Upload}
-            label={t("Fichier excel")}
-            placeholder={file ? file.name : t("Importer un fichier")}
-            onChange={setFile}
-          />
+          <Form id="import-excel">
+            <FileInput
+              loading={importLots.loading}
+              icon={file ? Check : Upload}
+              label={t("Fichier excel")}
+              placeholder={file ? file.name : t("Importer un fichier")}
+              onChange={setFile}
+            />
+          </Form>
         </section>
       </main>
       <footer>
         <Button
           asideX
+          submit="import-excel"
           loading={importLots.loading}
           disabled={!file}
           variant="primary"

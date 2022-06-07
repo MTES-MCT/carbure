@@ -27,6 +27,7 @@ import Alert from "common/components/alert"
 import Select from "common/components/select"
 import isBefore from "date-fns/isBefore"
 import { compact } from "common/utils/collection"
+import Form from "common/components/form"
 
 const Certificates = () => {
   const { t } = useTranslation()
@@ -74,7 +75,6 @@ const Certificates = () => {
             action={() =>
               portal((close) => <CertificateAddDialog onClose={close} />)
             }
-            style={{ fontSize: "0.87em" }}
           />
         )}
       </header>
@@ -201,12 +201,15 @@ const CertificateAddDialog = ({ onClose }: CertificateAddDialogProps) => {
 
   const addCertificate = useMutation(api.addCertificate, {
     invalidates: ["my-certificates"],
-    onSuccess: () =>
-      notify(t("Le certificat a bien été ajouté !"), { variant: "success" }),
-    onError: () =>
+    onSuccess: () => {
+      notify(t("Le certificat a bien été ajouté !"), { variant: "success" })
+      onClose()
+    },
+    onError: () => {
       notify(t("Le certificat n'a pas pu être ajouté !"), {
         variant: "danger",
-      }),
+      })
+    },
   })
 
   return (
@@ -221,20 +224,24 @@ const CertificateAddDialog = ({ onClose }: CertificateAddDialogProps) => {
           )}
         </section>
         <section>
-          <Autocomplete
-            label={t("Rechercher un certificat")}
-            value={certificate}
-            onChange={setCertificate}
-            getOptions={(query) =>
-              api.getCertificates(query).then((res) => res.data.data ?? [])
-            }
-            normalize={normalizeCertificate}
-          />
+          <Form id="add-certificate">
+            <Autocomplete
+              autoFocus
+              label={t("Rechercher un certificat")}
+              value={certificate}
+              onChange={setCertificate}
+              getOptions={(query) =>
+                api.getCertificates(query).then((res) => res.data.data ?? [])
+              }
+              normalize={normalizeCertificate}
+            />
+          </Form>
         </section>
       </main>
       <footer>
         <Button
           asideX
+          submit="add-certificate"
           loading={addCertificate.loading}
           disabled={!certificate}
           variant="primary"
@@ -350,20 +357,24 @@ const CertificateUpdateDialog = ({
           )}
         </section>
         <section>
-          <Autocomplete
-            label={t("Rechercher un certificat")}
-            value={certificate}
-            onChange={setCertificate}
-            getOptions={(query) =>
-              api.getCertificates(query).then((res) => res.data.data ?? [])
-            }
-            normalize={normalizeCertificate}
-          />
+          <Form id="replace-certificate">
+            <Autocomplete
+              autoFocus={true}
+              label={t("Rechercher un certificat")}
+              value={certificate}
+              onChange={setCertificate}
+              getOptions={(query) =>
+                api.getCertificates(query).then((res) => res.data.data ?? [])
+              }
+              normalize={normalizeCertificate}
+            />
+          </Form>
         </section>
       </main>
       <footer>
         <Button
           asideX
+          submit="replace-certificate"
           loading={updateCertificate.loading}
           disabled={!certificate}
           variant="primary"

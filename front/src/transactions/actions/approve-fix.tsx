@@ -139,7 +139,7 @@ const ApproveFixDialog = ({
       <footer>
         <Button
           asideX
-          submit
+          autoFocus
           loading={approveFix.loading}
           variant="primary"
           icon={Check}

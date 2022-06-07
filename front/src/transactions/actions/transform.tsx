@@ -158,6 +158,7 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
             <Form id="etbe" variant="columns">
               <Fieldset>
                 <NumberInput
+                  autoFocus
                   label={t("Volume d'ETBE produit")}
                   {...bind("volume_etbe")}
                 />

@@ -17,6 +17,11 @@
   user-select: none;
 }
 
+.checkbox:focus-within .square {
+  outline: 2px double;
+  outline-offset: 1px;
+}
+
 .square {
   display: inline-flex;
   flex-shrink: 0;
@@ -48,4 +53,10 @@
 
 .opacity .checkbox[data-checked] {
   opacity: 0.5;
+}
+
+.input {
+  position: absolute;
+  opacity: 0;
+  z-index: -1;
 }

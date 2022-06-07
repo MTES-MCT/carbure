@@ -39,6 +39,7 @@ export const TransportDocumentField = (props: TextInputProps) => {
   const bind = useBind<LotFormValue>()
   return (
     <TextInput
+      autoFocus
       required
       label={t("N° document d'accompagnement")}
       {...bind("transport_document_reference")}
@@ -121,7 +122,7 @@ export const FeedstockField = (props: AutocompleteProps<Feedstock>) => {
 
   // prettier-ignore
   const icon = bound.value
-    ? <span style={{ alignSelf: 'center', fontSize: '0.9em' }}>{bound.value.category.toUpperCase()}</span>
+    ? <span className="icon" style={{ fontSize: '0.9em' }}>{bound.value.category.toUpperCase()}</span>
     : undefined
 
   return (

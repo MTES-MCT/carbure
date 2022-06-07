@@ -48,6 +48,7 @@ const Login = () => {
           onSubmit={() => login.execute(value.username!, value.password!)}
         >
           <TextInput
+            autoFocus
             variant="solid"
             icon={Mail}
             type="email"

@@ -14,6 +14,7 @@ import { TextInput } from "common/components/input"
 import { useStatus } from "transactions/components/status"
 import { LotSummary } from "../components/lots/lot-summary"
 import { useMatomo } from "matomo"
+import Form from "common/components/form"
 
 export interface MarkManyAsFixedButtonProps {
   disabled?: boolean
@@ -141,19 +142,22 @@ const MarkAsFixedDialog = ({
           })}
         </section>
         <section>
-          <TextInput
-            required
-            label={t("Commentaire")}
-            value={comment}
-            onChange={setComment}
-          />
+          <Form id="mark-as-fixed">
+            <TextInput
+              autoFocus
+              required
+              label={t("Commentaire")}
+              value={comment}
+              onChange={setComment}
+            />
+          </Form>
         </section>
         {summary && <LotSummary query={query} selection={selection} />}
       </main>
       <footer>
         <Button
           asideX
-          submit
+          submit="mark-as-fixed"
           loading={markAsFixed.loading}
           variant="success"
           icon={Check}

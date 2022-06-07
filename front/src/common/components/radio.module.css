@@ -17,6 +17,16 @@
   user-select: none;
 }
 
+.radio:focus-within .circle {
+  outline: 2px solid;
+  outline-offset: 1px;
+}
+
+.input {
+  position: absolute;
+  opacity: 0;
+}
+
 .circle {
   display: flex;
   flex-shrink: 0;

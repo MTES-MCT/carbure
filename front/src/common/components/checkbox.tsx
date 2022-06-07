@@ -13,6 +13,7 @@ export interface CheckboxControl {
   className?: string
   style?: React.CSSProperties
   disabled?: boolean
+  autoFocus?: boolean
   readOnly?: boolean
   required?: boolean
   name?: string
@@ -31,6 +32,7 @@ export const Checkbox = ({
   disabled,
   readOnly,
   required,
+  autoFocus,
   value,
   label,
   name,
@@ -49,14 +51,14 @@ export const Checkbox = ({
     style={style}
   >
     <input
-      hidden
       type="checkbox"
+      autoFocus={autoFocus}
       disabled={disabled}
       readOnly={readOnly}
       required={required}
       name={name}
       checked={value ?? false}
-      className="checkbox-input"
+      className={cl("checkbox-input", css.input)}
       onChange={onChange ? (e) => onChange(e.target.checked) : undefined}
       // prevent duplicate click event being propagated when clicking on label
       onClick={(e) => e.stopPropagation()}

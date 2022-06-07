@@ -103,6 +103,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
         <section>
           <Form id="split-stock">
             <NumberInput
+              autoFocus
               required
               {...bind("volume")}
               label={t("Volume ({{volume}} litres disponibles)", {

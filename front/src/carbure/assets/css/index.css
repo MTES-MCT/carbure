@@ -46,9 +46,3 @@ textarea,
 select {
   font-family: var(--font-family);
 }
-
-@media screen and (min-width: 1600px) {
-  :root {
-    --main-spacing: 120px;
-  }
-}

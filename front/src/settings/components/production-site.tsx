@@ -339,6 +339,7 @@ export const ProductionSiteDialog = ({
         <section>
           <Form id="production-site" onSubmit={submitProductionSite}>
             <TextInput
+              autoFocus
               readOnly={readOnly}
               label={t("Nom du site")}
               {...bind("name")}
