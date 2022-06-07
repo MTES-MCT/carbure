@@ -96,6 +96,7 @@ export function Table<T>({
             <li
               key={i}
               {...props}
+              className={cl(link && css.rowLink)}
               data-interactive={onAction ? true : undefined}
               onClick={onAction ? () => onAction(row) : undefined}
             >
