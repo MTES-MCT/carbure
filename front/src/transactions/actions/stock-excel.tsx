@@ -10,6 +10,7 @@ import { Check, Return, Upload } from "common/components/icons"
 import { usePortal } from "common/components/portal"
 import { FileInput } from "common/components/input"
 import { useMatomo } from "matomo"
+import Form from "common/components/form"
 
 const FAQ_URL = "https://carbure-1.gitbook.io/faq/gerer-mes-lots-1/producteur-trader-ajouter-des-lots/ajout-de-lot-via-fichier-excel" // prettier-ignore
 const TEMPLATE_URL = "/api/download-template-stock"
@@ -86,18 +87,21 @@ const StockExcelDialog = ({ onClose }: StockExcelDialogProps) => {
           </p> */}
         </section>
         <section>
-          <FileInput
-            loading={importLots.loading}
-            icon={file ? Check : Upload}
-            label={t("Fichier excel")}
-            placeholder={file ? file.name : t("Importer un fichier")}
-            onChange={setFile}
-          />
+          <Form id="stock-excel">
+            <FileInput
+              loading={importLots.loading}
+              icon={file ? Check : Upload}
+              label={t("Fichier excel")}
+              placeholder={file ? file.name : t("Importer un fichier")}
+              onChange={setFile}
+            />
+          </Form>
         </section>
       </main>
       <footer>
         <Button
           asideX
+          submit="stock-excel"
           loading={importLots.loading}
           disabled={!file}
           variant="primary"

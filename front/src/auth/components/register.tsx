@@ -53,6 +53,7 @@ export const Register = () => {
           }
         >
           <TextInput
+            autoFocus
             variant="solid"
             icon={Mail}
             type="email"

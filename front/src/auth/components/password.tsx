@@ -50,6 +50,7 @@ export const ResetPasswordRequest = () => {
           onSubmit={() => requestPasswordReset.execute(value.email!)}
         >
           <TextInput
+            autoFocus
             variant="solid"
             icon={Mail}
             type="email"
@@ -158,6 +159,7 @@ export const ResetPassword = () => {
           }
         >
           <TextInput
+            autoFocus
             variant="solid"
             icon={Lock}
             type="password"

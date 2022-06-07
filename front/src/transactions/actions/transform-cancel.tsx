@@ -144,7 +144,7 @@ const CancelTransformDialog = ({
       <footer>
         <Button
           asideX
-          submit
+          autoFocus
           loading={cancelTransformations.loading}
           variant="warning"
           icon={Cross}

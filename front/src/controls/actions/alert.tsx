@@ -180,6 +180,7 @@ const AlertDialog = ({
           <section>
             <Form id="pin">
               <TextInput
+                autoFocus
                 label={t("Commentaire (optionnel)")}
                 {...form.bind("comment")}
               />

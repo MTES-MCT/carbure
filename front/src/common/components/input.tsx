@@ -13,6 +13,7 @@ export type FieldVariant = "outline" | "solid" | "inline" | "text"
 export interface Control extends Layout {
   className?: string
   style?: React.CSSProperties
+  autoFocus?: boolean
   variant?: FieldVariant
   clear?: boolean
   disabled?: boolean
@@ -109,6 +110,7 @@ export const FileInput = ({
   clear,
   placeholder = i18next.t("Select a file"),
   value,
+  autoFocus,
   onChange,
   ...props
 }: FileInputProps) => (
@@ -117,13 +119,14 @@ export const FileInput = ({
     type="file"
     onClear={clear && value && onChange ? () => onChange(undefined) : undefined}
   >
-    <label tabIndex={0} className={css.file}>
+    <label className={css.file}>
       <input
-        hidden
+        autoFocus={autoFocus}
         disabled={props.disabled}
         readOnly={props.readOnly}
         required={props.required}
         name={props.name}
+        style={{ opacity: 0, position: "absolute" }}
         type="file"
         onChange={onChange ? (e) => onChange(e.target.files?.[0]) : undefined}
       />
@@ -206,9 +209,10 @@ export const Input = ({
   max,
   step,
   value,
+  autoComplete,
+  autoFocus,
   onChange,
   onClear,
-  autoComplete,
   ...props
 }: InputProps) => (
   <Field {...props} onClear={onClear}>
@@ -217,6 +221,7 @@ export const Input = ({
       disabled={props.disabled}
       readOnly={props.readOnly}
       required={props.required}
+      autoFocus={autoFocus}
       autoComplete={!autoComplete ? "off" : undefined}
       type={props.type}
       name={name}
@@ -244,6 +249,7 @@ export const TextArea = ({
   name,
   placeholder,
   value,
+  autoFocus,
   onChange,
   ...props
 }: TextAreaProps) => (
@@ -255,6 +261,7 @@ export const TextArea = ({
       title={value}
       rows={rows}
       cols={cols}
+      autoFocus={autoFocus}
       disabled={props.disabled}
       readOnly={props.readOnly}
       required={props.required}
@@ -277,6 +284,7 @@ export const SearchInput = ({
   placeholder,
   debounce,
   value,
+  autoFocus,
   onChange,
   ...props
 }: SearchInputProps) => {
@@ -311,6 +319,7 @@ export const SearchInput = ({
 
       <input
         title={search}
+        autoFocus={autoFocus}
         disabled={props.disabled}
         readOnly={props.readOnly}
         required={props.required}

@@ -220,7 +220,7 @@ const ReleaseForConsumptionDialog = ({
       <footer>
         <Button
           asideX
-          submit
+          autoFocus
           loading={acceptLots.loading}
           variant="success"
           icon={Check}
@@ -309,7 +309,7 @@ const InStockDialog = ({
       <footer>
         <Button
           asideX
-          submit
+          autoFocus
           loading={acceptLots.loading}
           variant="success"
           icon={Check}
@@ -397,7 +397,7 @@ const BlendingDialog = ({
       <footer>
         <Button
           asideX
-          submit
+          autoFocus
           loading={acceptLots.loading}
           variant="success"
           icon={Check}
@@ -485,7 +485,7 @@ const DirectDeliveryDialog = ({
       <footer>
         <Button
           asideX
-          submit
+          autoFocus
           loading={acceptLots.loading}
           variant="success"
           icon={Check}
@@ -573,7 +573,7 @@ const ExportDialog = ({
       <footer>
         <Button
           asideX
-          submit
+          autoFocus
           loading={acceptLots.loading}
           variant="success"
           icon={Check}
@@ -681,6 +681,7 @@ const TradingDialog = ({
             }}
           >
             <Autocomplete
+              autoFocus
               required
               label={t("Client")}
               value={client}
@@ -802,14 +803,17 @@ const ProcessingDialog = ({
           </p>
         </section>
         <section>
-          <Select
-            label={t("Opérateur tiers")}
-            placeholder={t("Choisir une société")}
-            value={depot}
-            onChange={setDepot}
-            options={depots}
-            normalize={norm.normalizeEntityDepot}
-          />
+          <Form id="processing">
+            <Select
+              autoFocus
+              label={t("Opérateur tiers")}
+              placeholder={t("Choisir une société")}
+              value={depot}
+              onChange={setDepot}
+              options={depots}
+              normalize={norm.normalizeEntityDepot}
+            />
+          </Form>
         </section>
         {depot && summary && (
           <LotSummary query={subquery} selection={selection} />
@@ -818,7 +822,7 @@ const ProcessingDialog = ({
       <footer>
         <Button
           asideX
-          submit
+          submit="processing"
           loading={acceptLots.loading}
           disabled={!depot}
           variant="success"

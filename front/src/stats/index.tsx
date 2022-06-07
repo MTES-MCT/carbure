@@ -79,7 +79,7 @@ const Stats = ({ entity }: StatsProps) => {
   }
 
   return (
-    <Main style={{ padding: "32px var(--main-spacing)" }}>
+    <Main style={{ padding: "32px var(--main-spacing-x)" }}>
       <Panel
         style={{
           boxShadow: textShadow,

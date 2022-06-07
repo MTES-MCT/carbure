@@ -14,6 +14,7 @@ import { useStatus } from "transactions/components/status"
 import { TextInput } from "common/components/input"
 import { LotSummary } from "../components/lots/lot-summary"
 import { useMatomo } from "matomo"
+import Form from "common/components/form"
 
 export interface RequestManyFixesButtonProps {
   disabled?: boolean
@@ -138,19 +139,22 @@ const RequestFixDialog = ({
           })}
         </section>
         <section>
-          <TextInput
-            required
-            label={t("Commentaire")}
-            value={comment}
-            onChange={setComment}
-          />
+          <Form id="request-fix">
+            <TextInput
+              autoFocus
+              required
+              label={t("Commentaire")}
+              value={comment}
+              onChange={setComment}
+            />
+          </Form>
         </section>
         {summary && <LotSummary query={query} selection={selection} />}
       </main>
       <footer>
         <Button
           asideX
-          submit
+          submit="request-fix"
           loading={requestFix.loading}
           variant="warning"
           icon={Wrench}

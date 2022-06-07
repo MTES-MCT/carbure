@@ -13,6 +13,7 @@ import { Check, Return } from "common/components/icons"
 import { usePortal } from "common/components/portal"
 import { LotSummary } from "../components/lots/lot-summary"
 import { useMatomo } from "matomo"
+import Form from "common/components/form"
 
 export interface SendButtonProps {
   disabled?: boolean
@@ -149,23 +150,26 @@ const SendDialog = ({
           {t(", assurez-vous que les conditions ci-dessous sont respectées")}
         </section>
         <section>
-          <Checkbox
-            value={durability}
-            onChange={setDurability}
-            label={t("Je certifie que cette déclaration respecte les critères de durabilité conformément à la réglementation en vigueur.")} // prettier-ignore
-          />
-          <Checkbox
-            value={validity}
-            onChange={setValidity}
-            label={t("Je certifie que les informations renseignées sont réelles et valides")} // prettier-ignore
-          />
+          <Form id="send-lot">
+            <Checkbox
+              autoFocus
+              value={durability}
+              onChange={setDurability}
+              label={t("Je certifie que cette déclaration respecte les critères de durabilité conformément à la réglementation en vigueur.")} // prettier-ignore
+            />
+            <Checkbox
+              value={validity}
+              onChange={setValidity}
+              label={t("Je certifie que les informations renseignées sont réelles et valides")} // prettier-ignore
+            />
+          </Form>
         </section>
         {summary && <LotSummary query={query} selection={selection} />}
       </main>
       <footer>
         <Button
           asideX
-          submit
+          submit="send-lot"
           loading={sendLots.loading}
           disabled={!durability || !validity}
           variant="primary"

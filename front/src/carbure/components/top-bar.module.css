@@ -58,3 +58,9 @@
 .faq:hover {
   opacity: 1;
 }
+
+@media screen and (min-width: 1600px) {
+  .faq {
+    display: none;
+  }
+}

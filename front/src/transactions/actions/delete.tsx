@@ -151,7 +151,7 @@ const DeleteDialog = ({
       <footer>
         <Button
           asideX
-          submit
+          autoFocus
           loading={deleteLots.loading}
           variant="danger"
           icon={Cross}

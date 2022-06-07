@@ -116,6 +116,7 @@ export const ActivateRequest = () => {
           onSubmit={() => requestActivationLink.execute(value.email!)}
         >
           <TextInput
+            autoFocus
             variant="solid"
             icon={Mail}
             type="email"

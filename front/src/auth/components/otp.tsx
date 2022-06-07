@@ -64,6 +64,7 @@ const OTP = () => {
       <section>
         <Form id="otp" onSubmit={() => verifyOTP.execute(value.otp!)}>
           <TextInput
+            autoFocus
             variant="solid"
             icon={Lock}
             label={t("Code reçu par email")}

@@ -13,6 +13,7 @@ import { Cross, Return } from "common/components/icons"
 import { TextInput } from "common/components/input"
 import { LotSummary } from "../components/lots/lot-summary"
 import { useMatomo } from "matomo"
+import Form from "common/components/form"
 
 export interface RejectManyButtonProps {
   disabled?: boolean
@@ -147,19 +148,22 @@ const RejectDialog = ({
           })}
         </section>
         <section>
-          <TextInput
-            required
-            label={t("Commentaire")}
-            value={comment}
-            onChange={setComment}
-          />
+          <Form id="reject">
+            <TextInput
+              autoFocus
+              required
+              label={t("Commentaire")}
+              value={comment}
+              onChange={setComment}
+            />
+          </Form>
         </section>
         {summary && <LotSummary query={query} selection={selection} />}
       </main>
       <footer>
         <Button
           asideX
-          submit
+          submit="reject"
           loading={rejectLots.loading}
           variant="danger"
           icon={Cross}

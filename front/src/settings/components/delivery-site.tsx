@@ -315,6 +315,7 @@ export const DeliverySiteFinderDialog = ({
 
     onSuccess: () => {
       notify(t("Le dépôt a bien été ajouté !"), { variant: "success" })
+      onClose()
     },
 
     onError: () => {
@@ -361,6 +362,7 @@ export const DeliverySiteFinderDialog = ({
         <section>
           <Form id="add-depot" onSubmit={submitDepot}>
             <AutoComplete
+              autoFocus
               label={t("Dépôt à ajouter")}
               placeholder={t("Rechercher un dépôt...")}
               getOptions={(search) => common.findDepots(search, entity.id)}
@@ -402,6 +404,7 @@ export const DeliverySiteFinderDialog = ({
       <footer>
         <Button
           asideX
+          loading={addDeliverySite.loading}
           variant="primary"
           submit="add-depot"
           icon={Plus}

@@ -586,6 +586,7 @@ const DoubleCountingUploadDialog = ({
             </p>
 
             <AutoComplete
+              autoFocus
               label={t("Site de production")}
               placeholder={t("Rechercher un site de production")}
               getOptions={(search) => findProductionSites(search, entity.id)}
@@ -736,7 +737,12 @@ const DoubleCountingSourcingDialog = ({
 
         <section>
           <Form id="sourcing" onSubmit={saveSourcing}>
-            <NumberInput disabled={!add} label={t("Année")} {...bind("year")} />
+            <NumberInput
+              autoFocus
+              disabled={!add}
+              label={t("Année")}
+              {...bind("year")}
+            />
             <AutoComplete
               disabled={!add}
               label={t("Matière première")}
@@ -894,7 +900,12 @@ const DoubleCountingProductionDialog = ({
         </section>
         <section>
           <Form id="dc-production" onSubmit={saveProduction}>
-            <NumberInput disabled={!add} label={t("Année")} {...bind("year")} />
+            <NumberInput
+              autoFocus
+              disabled={!add}
+              label={t("Année")}
+              {...bind("year")}
+            />
             <AutoComplete
               disabled={!add}
               label={t("Matière première")}

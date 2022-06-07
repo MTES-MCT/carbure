@@ -190,6 +190,7 @@ export const EntityDialog = ({ onClose }: EntityDialogProps) => {
             }}
           >
             <Autocomplete
+              autoFocus
               label={t("Organisation")}
               placeholder={t("Rechercher une société...")}
               name="entity"

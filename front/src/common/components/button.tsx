@@ -87,6 +87,7 @@ export function Button<T>({
         )}
         onClick={(e) => {
           captive && e.stopPropagation()
+          captive && e.preventDefault()
           action?.()
         }}
       >

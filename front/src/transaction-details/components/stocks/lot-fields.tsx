@@ -46,6 +46,7 @@ export const InitialVolumeField = (props: NumberInputProps) => {
   const bind = useBind<StockFormValue>()
   return (
     <NumberInput
+      autoFocus
       readOnly
       label={t("Volume initial en litres (Ethanol à 20°, autres à 15°)")}
       {...bind("initial_volume")}

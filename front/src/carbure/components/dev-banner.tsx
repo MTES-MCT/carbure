@@ -23,7 +23,7 @@ const DevBanner = () => {
         width: maximised ? "100%" : "var(--spacing-xl)",
         height: "var(--spacing-xl)",
         backgroundColor: "#ffbb40dd",
-        padding: maximised ? "var(--spacing-s) var(--main-spacing)" : 0,
+        padding: maximised ? "var(--spacing-s) var(--main-spacing-x)" : 0,
         zIndex: 10,
       }}
     >

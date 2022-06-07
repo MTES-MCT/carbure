@@ -74,6 +74,7 @@ export const Confirm = ({
       <footer>
         <Button
           asideX
+          autoFocus
           icon={icon}
           variant={variant}
           label={confirm}

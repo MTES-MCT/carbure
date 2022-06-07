@@ -142,6 +142,7 @@ const FlushDialog = ({ summary, selection, onClose }: FlushDialogProps) => {
             }}
           >
             <TextInput
+              autoFocus
               label={t("Commentaire (optionnel)")}
               value={freeField}
               onChange={setFreeField}
