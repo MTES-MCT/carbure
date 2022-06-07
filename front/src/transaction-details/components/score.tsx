@@ -2,8 +2,7 @@ import cl from "clsx"
 import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 
-import Checkbox from "common/components/checkbox"
-import { Return } from "common/components/icons"
+import { Check, Cross, Return } from "common/components/icons"
 import { usePortal } from "common/components/portal"
 import Tag from "common/components/tag"
 import { useTranslation } from "react-i18next"
@@ -151,7 +150,19 @@ const ScoreDialog = ({ lot, details, onClose }: ScoreDialogProps) => {
                           {scoreSubItems[meta as keyof typeof scoreSubItems]}
                         </span>
                         <span className={css.separator} />
-                        <Checkbox readOnly value={checked} />
+                        {checked ? (
+                          <Check
+                            size={20}
+                            color="var(--green-dark)"
+                            style={{ border: "1px solid var(--green-dark)" }}
+                          />
+                        ) : (
+                          <Cross
+                            size={20}
+                            color="var(--red-dark)"
+                            style={{ border: "1px solid var(--red-dark)" }}
+                          />
+                        )}
                       </li>
                     ))}
                   </ul>
