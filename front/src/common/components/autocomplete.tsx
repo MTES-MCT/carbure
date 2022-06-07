@@ -57,6 +57,7 @@ function Autocomplete<T, V>({
     <>
       <TextInput
         {...props}
+        placeholder={props.readOnly ? undefined : props.placeholder}
         autoComplete={false}
         loading={loading || autocomplete.loading}
         domRef={triggerRef}

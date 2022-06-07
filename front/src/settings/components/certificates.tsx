@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api/certificates"
-import useEntity from "carbure/hooks/entity"
+import useEntity, { useRights } from "carbure/hooks/entity"
 import { useNotify } from "common/components/notifications"
 import { useQuery, useMutation } from "common/hooks/async"
 import { usePortal } from "common/components/portal"
@@ -22,14 +22,16 @@ import {
   normalizeCertificate,
   normalizeEntityCertificate,
 } from "carbure/utils/normalizers"
-import { Certificate, EntityCertificate } from "carbure/types"
+import { Certificate, EntityCertificate, UserRole } from "carbure/types"
 import Alert from "common/components/alert"
 import Select from "common/components/select"
 import isBefore from "date-fns/isBefore"
+import { compact } from "common/utils/collection"
 
 const Certificates = () => {
   const { t } = useTranslation()
   const entity = useEntity()
+  const rights = useRights()
   const notify = useNotify()
   const portal = usePortal()
 
@@ -55,6 +57,7 @@ const Certificates = () => {
     { invalidates: ["user-settings"] }
   )
 
+  const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
   const certificateData = certificates.result?.data.data ?? []
   const validCertificates = certificateData.filter(e => !isExpired(e.certificate.valid_until)) // prettier-ignore
 
@@ -62,20 +65,23 @@ const Certificates = () => {
     <Panel id="certificates">
       <header>
         <h1>{t("Certificats")}</h1>
-        <Button
-          asideX
-          variant="primary"
-          icon={Plus}
-          label={t("Ajouter un certificat")}
-          action={() =>
-            portal((close) => <CertificateAddDialog onClose={close} />)
-          }
-          style={{ fontSize: "0.87em" }}
-        />
+        {canModify && (
+          <Button
+            asideX
+            variant="primary"
+            icon={Plus}
+            label={t("Ajouter un certificat")}
+            action={() =>
+              portal((close) => <CertificateAddDialog onClose={close} />)
+            }
+            style={{ fontSize: "0.87em" }}
+          />
+        )}
       </header>
 
       <section>
         <Select
+          disabled={!canModify}
           label={t("Certificat par défaut")}
           placeholder={t("Sélectionner un certificat")}
           value={entity.default_certificate}
@@ -139,34 +145,40 @@ const Certificates = () => {
               key: "validity",
               header: t("Validité"),
               orderBy: (c) => c.certificate.valid_until,
-              cell: (c) => <ExpirationDate link={c} />,
+              cell: (c) => <ExpirationDate link={c} readOnly={!canModify} />,
             },
-            actionColumn<EntityCertificate>((c) => [
-              <Button
-                captive
-                variant="icon"
-                icon={Cross}
-                action={() =>
-                  portal((close) => (
-                    <Confirm
-                      title={t("Suppression certificat")}
-                      description={t("Voulez-vous supprimer ce certificat ?")}
-                      confirm={t("Supprimer")}
-                      icon={Cross}
-                      variant="danger"
-                      onClose={close}
-                      onConfirm={() =>
-                        deleteCertificate.execute(
-                          entity.id,
-                          c.certificate.certificate_id,
-                          c.certificate.certificate_type
-                        )
-                      }
-                    />
-                  ))
-                }
-              />,
-            ]),
+            actionColumn<EntityCertificate>((c) =>
+              compact([
+                canModify && (
+                  <Button
+                    captive
+                    variant="icon"
+                    icon={Cross}
+                    action={() =>
+                      portal((close) => (
+                        <Confirm
+                          title={t("Suppression certificat")}
+                          description={t(
+                            "Voulez-vous supprimer ce certificat ?"
+                          )}
+                          confirm={t("Supprimer")}
+                          icon={Cross}
+                          variant="danger"
+                          onClose={close}
+                          onConfirm={() =>
+                            deleteCertificate.execute(
+                              entity.id,
+                              c.certificate.certificate_id,
+                              c.certificate.certificate_type
+                            )
+                          }
+                        />
+                      ))
+                    }
+                  />
+                ),
+              ])
+            ),
           ]}
         />
       )}
@@ -244,9 +256,10 @@ const CertificateAddDialog = ({ onClose }: CertificateAddDialogProps) => {
 
 type ExpirationDateProps = {
   link: EntityCertificate
+  readOnly?: boolean
 }
 
-export const ExpirationDate = ({ link }: ExpirationDateProps) => {
+export const ExpirationDate = ({ link, readOnly }: ExpirationDateProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
@@ -269,19 +282,21 @@ export const ExpirationDate = ({ link }: ExpirationDateProps) => {
       {expired && !updated && (
         <React.Fragment>
           {formatted}
-          <Button
-            captive
-            icon={Refresh}
-            label={t("Mise à jour")}
-            action={() =>
-              portal((close) => (
-                <CertificateUpdateDialog
-                  oldCertificate={link.certificate}
-                  onClose={close}
-                />
-              ))
-            }
-          />
+          {!readOnly && (
+            <Button
+              captive
+              icon={Refresh}
+              label={t("Mise à jour")}
+              action={() =>
+                portal((close) => (
+                  <CertificateUpdateDialog
+                    oldCertificate={link.certificate}
+                    onClose={close}
+                  />
+                ))
+              }
+            />
+          )}
         </React.Fragment>
       )}
 

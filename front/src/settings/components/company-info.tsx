@@ -34,15 +34,27 @@ const CompanyInfo = () => {
     <Panel id="info">
       <header>
         <h1>{t("Informations sur la société")}</h1>
-        <Button
-          asideX
-          submit="entity-info"
-          disabled={!canSave}
-          icon={Save}
-          variant="primary"
-          label={t("Enregistrer les modifications")}
-        />
+        {canModify && (
+          <Button
+            asideX
+            submit="entity-info"
+            disabled={!canSave}
+            icon={Save}
+            variant="primary"
+            label={t("Enregistrer les modifications")}
+          />
+        )}
       </header>
+
+      {canModify && (
+        <section>
+          <p>
+            {t(
+              "Veuillez renseigner les informations légales concernant votre société."
+            )}
+          </p>
+        </section>
+      )}
 
       <section>
         <Form
@@ -61,28 +73,28 @@ const CompanyInfo = () => {
           }}
         >
           <TextInput
-            disabled={!canModify}
+            readOnly={!canModify}
             label={t("Nom légal")}
             {...bind("legal_name")}
           />
           <TextInput
-            disabled={!canModify}
+            readOnly={!canModify}
             label={t("N° d'enregistrement de la société")}
             {...bind("registration_id")}
           />
           <TextInput
-            disabled={!canModify}
+            readOnly={!canModify}
             label={t("Addresse de la société")}
             {...bind("registered_address")}
           />
           <TextInput
-            disabled={!canModify}
+            readOnly={!canModify}
             label={t("Responsable durabilité")}
             {...bind("sustainability_officer")}
           />
           <TextInput
             type="phone"
-            disabled={!canModify}
+            readOnly={!canModify}
             label={t("N° téléphone responsable durabilité")}
             {...bind("sustainability_officer_phone_number")}
           />
