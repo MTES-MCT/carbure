@@ -4,12 +4,10 @@ import userEvent from "@testing-library/user-event"
 import { Route } from "react-router-dom"
 import { deliverySite, producer } from "carbure/__test__/data"
 import { getField, waitWhileLoading } from "carbure/__test__/helpers"
-import Settings from "../index"
 
 import server, { setDeliverySites, setEntity } from "./api"
 import DeliverySitesSettings from "settings/components/delivery-site"
 import { getDeliverySites } from "settings/api/delivery-sites"
-import { PortalProvider } from "common/components/portal"
 
 const SettingsWithHooks = () => {
   return (
@@ -17,12 +15,10 @@ const SettingsWithHooks = () => {
       <Route
         path="/org/0/settings"
         element={
-          <PortalProvider>
-            <DeliverySitesSettings
-              entity={producer}
-              getDepots={getDeliverySites}
-            />
-          </PortalProvider>
+          <DeliverySitesSettings
+            entity={producer}
+            getDepots={getDeliverySites}
+          />
         }
       />
     </TestRoot>

@@ -6,7 +6,6 @@ import { producer, productionSite } from "carbure/__test__/data"
 import { getField, waitWhileLoading } from "carbure/__test__/helpers"
 
 import server, { setDeliverySites, setEntity, setProductionSites } from "./api"
-import { PortalProvider } from "common/components/portal"
 import ProductionSitesSettings from "settings/components/production-site"
 
 const SettingsWithHooks = () => {
@@ -14,11 +13,7 @@ const SettingsWithHooks = () => {
     <TestRoot url="/org/0/settings">
       <Route
         path="/org/0/settings"
-        element={
-          <PortalProvider>
-            <ProductionSitesSettings entity={producer} />
-          </PortalProvider>
-        }
+        element={<ProductionSitesSettings entity={producer} />}
       />
     </TestRoot>
   )

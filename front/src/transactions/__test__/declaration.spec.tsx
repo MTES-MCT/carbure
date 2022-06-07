@@ -5,20 +5,17 @@ import { getByTextContent, waitWhileLoading } from "carbure/__test__/helpers"
 import { DeclarationDialog } from "../actions/declaration"
 
 import server from "./api"
-import { PortalProvider } from "common/components/portal"
 import userEvent from "@testing-library/user-event"
 
 const DeclarationSummary = () => (
-  <PortalProvider>
-    <TestRoot url="/">
-      <Route
-        path="/"
-        element={
-          <DeclarationDialog year={2021} years={[2021]} onClose={() => {}} />
-        }
-      />
-    </TestRoot>
-  </PortalProvider>
+  <TestRoot url="/">
+    <Route
+      path="/"
+      element={
+        <DeclarationDialog year={2021} years={[2021]} onClose={() => {}} />
+      }
+    />
+  </TestRoot>
 )
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))

@@ -1,7 +1,5 @@
 import { useTranslation } from "react-i18next"
 
-import { PortalProvider } from "common/components/portal"
-
 import DeliverySitesSettings from "./components/delivery-site"
 import ProductionSitesSettings from "./components/production-site"
 
@@ -30,63 +28,61 @@ const Settings = () => {
   const hasOptions = isProducer || isOperator || isTrader
 
   return (
-    <PortalProvider>
-      <Main>
-        <header>
-          <h1>{entity?.name}</h1>
-        </header>
+    <Main>
+      <header>
+        <h1>{entity?.name}</h1>
+      </header>
 
-        <Tabs
-          variant="sticky"
-          tabs={compact([
-            hasOptions && {
-              path: "#options",
-              key: "options",
-              label: t("Options"),
-            },
-            hasOptions && {
-              path: "#info",
-              key: "info",
-              label: t("Informations"),
-            },
-            hasCertificates && {
-              path: "#certificates",
-              key: "certificates",
-              label: t("Certificats"),
-            },
-            hasDepot && {
-              path: "#depot",
-              key: "depot",
-              label: t("Dépôts"),
-            },
-            isProducer && {
-              path: "#production",
-              key: "production",
-              label: t("Sites de production"),
-            },
-            isProducer && {
-              path: "#double-counting",
-              key: "double-counting",
-              label: t("Double comptage"),
-            },
-            entity.hasRights(UserRole.Admin) && {
-              path: "#users",
-              key: "users",
-              label: t("Utilisateurs"),
-            },
-          ])}
-        />
-        <section>
-          {hasOptions && <CompanyOptions />}
-          {hasOptions && <CompanyInfo />}
-          {hasCertificates && <Certificates />}
-          {hasDepot && <DeliverySitesSettings entity={entity} />}
-          {isProducer && <ProductionSitesSettings entity={entity} />}
-          {isProducer && <DoubleCountingSettings />}
-          {entity.hasRights(UserRole.Admin) && <EntityUserRights />}
-        </section>
-      </Main>
-    </PortalProvider>
+      <Tabs
+        variant="sticky"
+        tabs={compact([
+          hasOptions && {
+            path: "#options",
+            key: "options",
+            label: t("Options"),
+          },
+          hasOptions && {
+            path: "#info",
+            key: "info",
+            label: t("Informations"),
+          },
+          hasCertificates && {
+            path: "#certificates",
+            key: "certificates",
+            label: t("Certificats"),
+          },
+          hasDepot && {
+            path: "#depot",
+            key: "depot",
+            label: t("Dépôts"),
+          },
+          isProducer && {
+            path: "#production",
+            key: "production",
+            label: t("Sites de production"),
+          },
+          isProducer && {
+            path: "#double-counting",
+            key: "double-counting",
+            label: t("Double comptage"),
+          },
+          entity.hasRights(UserRole.Admin) && {
+            path: "#users",
+            key: "users",
+            label: t("Utilisateurs"),
+          },
+        ])}
+      />
+      <section>
+        {hasOptions && <CompanyOptions />}
+        {hasOptions && <CompanyInfo />}
+        {hasCertificates && <Certificates />}
+        {hasDepot && <DeliverySitesSettings entity={entity} />}
+        {isProducer && <ProductionSitesSettings entity={entity} />}
+        {isProducer && <DoubleCountingSettings />}
+        {entity.hasRights(UserRole.Admin) && <EntityUserRights />}
+      </section>
+    </Main>
   )
 }
 
