@@ -48,12 +48,16 @@ h2 + .table[data-headless] {
 
 .rows > li {
   position: relative;
+}
+
+.rows > li:not(.rowLink) {
   padding: 0 var(--spacing-l);
 }
 
 .rows > li > a {
   flex: 1;
   min-width: 0;
+  padding: 0 var(--spacing-l);
 }
 
 .rows > li,
