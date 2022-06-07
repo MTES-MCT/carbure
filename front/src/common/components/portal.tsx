@@ -4,17 +4,17 @@ import React, {
   useCallback,
   useState,
   createContext,
-  cloneElement,
   useContext,
 } from "react"
 import ReactDOM from "react-dom"
 
 export interface PortalProps {
   children: React.ReactNode
+  root?: HTMLElement
   onClose?: () => void
 }
 
-export const Portal = ({ children, onClose }: PortalProps) => {
+export const Portal = ({ children, root, onClose }: PortalProps) => {
   const portalRef = useRef<HTMLDivElement>(null)
 
   // watch for interactions on the target to act as trigger
@@ -36,7 +36,7 @@ export const Portal = ({ children, onClose }: PortalProps) => {
     <div ref={portalRef} data-portal="">
       {children}
     </div>,
-    document.body
+    root ?? document.body
   )
 }
 
@@ -53,16 +53,18 @@ export const PortalProvider = ({ children }: PortalProviderProps) => {
   return (
     <PortalContext.Provider value={manager}>
       {children}
-      <Portals list={manager.portals} />
+      {manager.portals.map((e) => (
+        <Portal key={e.key} root={e.root} onClose={e.close}>
+          {e.render(e.close)}
+        </Portal>
+      ))}
     </PortalContext.Provider>
   )
 }
 
-export type PortalRenderer = (close: () => void) => React.ReactElement<any, any>
-
 export interface PortalManager {
   portals: PortalInstance[]
-  portal: (render: PortalRenderer) => Promise<void>
+  portal: PortalRegister
   close: (key: string) => void
 }
 
@@ -74,42 +76,45 @@ export function usePortalManager(): PortalManager {
   }, [])
 
   const portal = useCallback(
-    (render: PortalRenderer) =>
-      new Promise<void>((resolve) => {
+    (render: PortalRenderer, root?: HTMLElement) => {
+      return new Promise<void>((resolve) => {
         const key = Math.random().toString(36).slice(2)
         function close() {
           closeKey(key)
           resolve()
         }
-        setPortals((portals) => [...portals, { key, render, close }])
-      }),
+        setPortals((portals) => [...portals, { key, root, render, close }])
+      })
+    },
     [closeKey]
   )
 
   return { portals, portal, close: closeKey }
 }
 
-export function usePortal() {
+export function usePortal(defaultRoot?: HTMLElement): PortalRegister {
   const manager = useContext(PortalContext)
   if (manager === undefined) throw new Error("Portal context is not defined")
-  return manager.portal
+  return useCallback(
+    (render, root = defaultRoot) => manager.portal(render, root),
+    [defaultRoot]
+  )
 }
 
 export const PortalContext = createContext<PortalManager | undefined>(undefined)
 
-export interface PortalsProps {
-  list: PortalInstance[]
-}
-
-export const Portals = ({ list }: PortalsProps) => {
-  if (list.length === 0) return null
-  return <>{list.map((e) => cloneElement(e.render(e.close), { key: e.key }))}</>
-}
+export type PortalRegister = (
+  render: PortalRenderer,
+  root?: HTMLElement
+) => Promise<void>
 
 export interface PortalInstance {
   key: string
+  root?: HTMLElement
   render: PortalRenderer
   close: () => void
 }
+
+export type PortalRenderer = (close: () => void) => React.ReactElement<any, any>
 
 export default Portal
