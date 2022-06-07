@@ -272,7 +272,7 @@ export const DoubleCountingDialog = ({
           {decisionURL && (
             <DownloadLink
               href={decisionURL ?? "#"}
-              label={t("Téléchargerla décision de l'administration")}
+              label={t("Télécharger la décision de l'administration")}
             />
           )}
         </Col>
