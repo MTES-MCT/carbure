@@ -4,13 +4,7 @@ import translations from "../../../public/locales/fr/translation.json"
 import errors from "../../../public/locales/fr/errors.json"
 import fields from "../../../public/locales/fr/fields.json"
 import { EntityType } from "carbure/types"
-import { okSettings } from "settings/__test__/api"
-import {
-  okLots,
-  okSnapshot,
-  okYears,
-  okSummary,
-} from "transactions/__test__/api"
+
 import {
   country,
   deliverySite,
@@ -145,11 +139,6 @@ export const okFieldsTranslations = rest.get(
 
 export default setupServer(
   okNotifications,
-  okSettings,
-  okSnapshot,
-  okYears,
-  okLots,
-  okSummary,
   okTranslations,
   okErrorsTranslations,
   okFieldsTranslations,
