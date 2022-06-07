@@ -15,15 +15,7 @@ export interface PortalProps {
 }
 
 export const Portal = ({ children, onClose }: PortalProps) => {
-  const containerRef = useRef(document.createElement("div"))
-
-  // add the container div to the document and remove it when not needed
-  useEffect(() => {
-    const portal = containerRef.current
-    ;(portal.dataset as any).portal = true
-    document.body.appendChild(portal)
-    return () => portal.remove()
-  }, [])
+  const portalRef = useRef<HTMLDivElement>(null)
 
   // watch for interactions on the target to act as trigger
   useEffect(() => {
@@ -31,7 +23,7 @@ export const Portal = ({ children, onClose }: PortalProps) => {
       switch (e.key) {
         // when pressing escape close the portal if it's the last one opened
         case "Escape":
-          if (isLastPortal(containerRef.current)) onClose?.()
+          if (isLastPortal(portalRef.current!)) onClose?.()
           break
       }
     }
@@ -40,11 +32,16 @@ export const Portal = ({ children, onClose }: PortalProps) => {
     return () => window.removeEventListener("keydown", onKeyDown, true)
   }, [onClose])
 
-  return ReactDOM.createPortal(children, containerRef.current)
+  return ReactDOM.createPortal(
+    <div ref={portalRef} data-portal="">
+      {children}
+    </div>,
+    document.body
+  )
 }
 
 export function isLastPortal(element: Element) {
-  return element.matches("div[data-portal]:last-child")
+  return element.matches("[data-portal]:last-child")
 }
 
 export interface PortalProviderProps {
@@ -84,8 +81,7 @@ export function usePortalManager(): PortalManager {
           closeKey(key)
           resolve()
         }
-        const content = render(close)
-        setPortals((portals) => [...portals, { key, content, close }])
+        setPortals((portals) => [...portals, { key, render, close }])
       }),
     [closeKey]
   )
@@ -107,12 +103,12 @@ export interface PortalsProps {
 
 export const Portals = ({ list }: PortalsProps) => {
   if (list.length === 0) return null
-  else return <>{list.map((e) => cloneElement(e.content, { key: e.key }))}</>
+  return <>{list.map((e) => cloneElement(e.render(e.close), { key: e.key }))}</>
 }
 
 export interface PortalInstance {
   key: string
-  content: React.ReactElement<any, any>
+  render: PortalRenderer
   close: () => void
 }
 
