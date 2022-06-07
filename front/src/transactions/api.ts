@@ -284,3 +284,7 @@ export function flushStocks(
     free_field,
   })
 }
+
+export function cancelAcceptLots(entity_id: number, selection: number[]) {
+  return api.post("/lots/cancel-accept", { entity_id, selection })
+}
