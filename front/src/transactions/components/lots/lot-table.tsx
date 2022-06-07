@@ -17,6 +17,7 @@ import { DuplicateOneButton } from "transactions/actions/duplicate"
 import Score from "transaction-details/components/score"
 import { To } from "react-router-dom"
 import useEntity from "carbure/hooks/entity"
+import { compact } from "common/utils/collection"
 
 export interface LotTableProps {
   loading: boolean
@@ -74,6 +75,7 @@ export const LotTable = memo(
 
 export function useLotColumns() {
   const { t } = useTranslation()
+  const entity = useEntity()
 
   return {
     score: {
@@ -177,9 +179,11 @@ export function useLotColumns() {
       },
     },
 
-    actions: actionColumn((lot: Lot) => [
-      <DuplicateOneButton icon lot={lot} />,
-    ]),
+    actions: actionColumn((lot: Lot) =>
+      compact([
+        lot.added_by?.id === entity.id && <DuplicateOneButton icon lot={lot} />,
+      ])
+    ),
   }
 }
 
