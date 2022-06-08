@@ -304,7 +304,7 @@ def set_production_site_bc(request, *args, **kwargs):
                 # remove errors
                 impacted_txs = CarbureLot.objects.filter(carbure_production_site=ps, biofuel=bc)
                 bulk_scoring(impacted_txs)
-                GenericError.objects.filter(lot__in=impacted_txs, error="BC_NOT_CONFIGURED").delete()            
+                GenericError.objects.filter(lot__in=impacted_txs, error="BC_NOT_CONFIGURED").delete()
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
                             }, status=400)
@@ -375,8 +375,8 @@ def delete_delivery_site(request, *args, **kwargs):
 
     try:
         EntityDepot.objects.filter(entity=entity, depot__depot_id=delivery_site_id).delete()
-        lots = CarbureLot.objects.filter(carbure_client=entity, carbure_delivery_site_id=delivery_site_id)
-        bulk_scoring(lots)        
+        lots = CarbureLot.objects.filter(carbure_client=entity, carbure_delivery_site__depot_id=delivery_site_id)
+        bulk_scoring(lots)
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not delete entity's delivery site",
                             }, status=400)
