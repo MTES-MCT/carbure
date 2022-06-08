@@ -14,6 +14,7 @@ import useTitle from "common/hooks/title"
 import { Main } from "common/components/scaffold"
 import Tabs from "common/components/tabs"
 import { compact } from "common/utils/collection"
+import { getEntityTypeLabel } from "carbure/utils/normalizers"
 
 const Settings = () => {
   const { t } = useTranslation()
@@ -30,7 +31,9 @@ const Settings = () => {
   return (
     <Main>
       <header>
-        <h1>{entity?.name}</h1>
+        <h1>
+          {entity.name} · {getEntityTypeLabel(entity.entity_type)}
+        </h1>
       </header>
 
       <Tabs
