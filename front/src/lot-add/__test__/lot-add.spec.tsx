@@ -174,9 +174,7 @@ test("check the form fields are working", async () => {
   const producerFields = await screen.findAllByDisplayValue("Producteur Test")
   expect(producerFields).toHaveLength(2)
 
-  const psite = getField("Site de production")
-  userEvent.click(psite)
-  userEvent.type(psite, "Test")
+  userEvent.type(getField("Site de production"), "Test")
   userEvent.click(await screen.findByText("Test Production Site"))
   await screen.findByDisplayValue("Test Production Site")
 

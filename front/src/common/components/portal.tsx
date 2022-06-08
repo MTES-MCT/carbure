@@ -5,6 +5,7 @@ import React, {
   useState,
   createContext,
   useContext,
+  useLayoutEffect,
 } from "react"
 import ReactDOM from "react-dom"
 
@@ -19,7 +20,7 @@ export const Portal = ({ children, root, onClose }: PortalProps) => {
 
   // when the portal closes, give focus back to the element that was active before the portal opened
   const activeRef = useRef(document.activeElement as HTMLElement | null)
-  useEffect(() => () => activeRef.current?.focus(), [])
+  useLayoutEffect(() => () => activeRef.current?.focus(), [])
 
   // watch for interactions on the target to act as trigger
   useEffect(() => {
