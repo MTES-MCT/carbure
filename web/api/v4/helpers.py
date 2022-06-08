@@ -356,7 +356,7 @@ def sort_lots(lots, query):
 
 
 def prepare_filters(filter_list):
-    return sorted(list(set(filter_list)))
+    return sorted(list(set([i for i in filter_list if i is not None])))
 
 
 UNKNOWN_VALUE = 'UNKNOWN'
