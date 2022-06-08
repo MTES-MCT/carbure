@@ -17,6 +17,10 @@ export interface PortalProps {
 export const Portal = ({ children, root, onClose }: PortalProps) => {
   const portalRef = useRef<HTMLDivElement>(null)
 
+  // when the portal closes, give focus back to the element that was active before the portal opened
+  const activeRef = useRef(document.activeElement as HTMLElement | null)
+  useEffect(() => () => activeRef.current?.focus(), [])
+
   // watch for interactions on the target to act as trigger
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -79,10 +83,13 @@ export function usePortalManager(): PortalManager {
     (render: PortalRenderer, root?: HTMLElement) => {
       return new Promise<void>((resolve) => {
         const key = Math.random().toString(36).slice(2)
+        const activeElement = document.activeElement as HTMLElement | null
+        console.log(activeElement)
         function close() {
           closeKey(key)
           resolve()
         }
+
         setPortals((portals) => [...portals, { key, root, render, close }])
       })
     },
