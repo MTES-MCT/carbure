@@ -83,13 +83,10 @@ export function usePortalManager(): PortalManager {
     (render: PortalRenderer, root?: HTMLElement) => {
       return new Promise<void>((resolve) => {
         const key = Math.random().toString(36).slice(2)
-        const activeElement = document.activeElement as HTMLElement | null
-        console.log(activeElement)
         function close() {
           closeKey(key)
           resolve()
         }
-
         setPortals((portals) => [...portals, { key, root, render, close }])
       })
     },
