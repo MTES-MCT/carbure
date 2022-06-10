@@ -71,7 +71,7 @@ def main(args):
             # PROD
             recipients = [r.user.email for r in UserRights.objects.filter(entity=entity, user__is_staff=False, user__is_superuser=False).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])]
             if notifs.filter(notify_administrator=True).count() > 0:
-                cc = "carbure@beta.gouv.fr" 
+                cc = ["carbure@beta.gouv.fr"]
 
         msg = EmailMultiAlternatives(subject=email_subject, body=text_message, from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc)
         msg.attach_alternative(html_message, "text/html")
