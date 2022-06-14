@@ -32,7 +32,7 @@ const TransactionAddWithRouter = ({
 
 function checkLotFields() {
   getField("N° document d'accompagnement")
-  getField("Volume en litres")
+  getField("Quantité")
   getField("Biocarburant")
   getField("Matière première")
   getField("Pays d'origine de la matière première")
@@ -154,7 +154,7 @@ test("check the form fields are working", async () => {
   await screen.findByText("Créer un nouveau lot")
 
   userEvent.type(getField("N° document d'accompagnement"), "DAETEST") // prettier-ignore
-  userEvent.type(getField("Volume en litres"), "10000") // prettier-ignore
+  userEvent.type(getField("Quantité"), "10000") // prettier-ignore
 
   userEvent.type(getField("Biocarburant"), "EM")
   userEvent.click(await screen.findByText("EMHV"))
