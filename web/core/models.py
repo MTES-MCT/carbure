@@ -694,6 +694,12 @@ class CarbureStockTransformation(models.Model):
     entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
     transformation_dt = models.DateTimeField(auto_now_add=True)
 
+    def get_weight(self):
+        return self.volume_destination * self.source_stock.biofuel.masse_volumique
+
+    def get_lhv_amount(self):
+        return self.volume_destination * self.source_stock.biofuel.pci_litre
+
     class Meta:
         db_table = 'carbure_stock_transformations'
         indexes = [models.Index(fields=['entity']),]

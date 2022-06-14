@@ -8,12 +8,14 @@ import {
   TextInput,
   TextInputProps,
 } from "common/components/input"
-import Select from "common/components/select"
+import Select, { SelectProps } from "common/components/select"
 import * as api from "carbure/api"
 import * as norm from "carbure/utils/normalizers"
 import { LotFormValue } from "./lot-form"
 import { Biofuel, Country, Feedstock, Unit } from "carbure/types"
 import useEntity from "carbure/hooks/entity"
+import { urlToHttpOptions } from "url"
+import { Option } from "common/utils/normalize"
 
 interface LotFieldsProps {
   readOnly?: boolean
@@ -24,8 +26,8 @@ export const LotFields = (props: LotFieldsProps) => {
   return (
     <Fieldset label={t("Lot")}>
       <TransportDocumentField {...props} />
-      <VolumeField {...props} />
-      {/* <QuantityField {...props} /> */}
+      {/* <VolumeField {...props} /> */}
+      <QuantityField {...props} />
       <BiofuelField {...props} />
       <FeedstockField {...props} />
       <CountryOfOriginField {...props} />
@@ -68,12 +70,6 @@ export const QuantityField = (props: NumberInputProps) => {
 
   const [unit, setUnit] = useState<Unit | undefined>(entity.preferred_unit)
 
-  const units = [
-    { value: "l", label: t("litres") },
-    { value: "kg", label: t("kg") },
-    { value: "MJ", label: t("MJ") },
-  ]
-
   const unitToField = {
     l: "volume" as "volume",
     kg: "weight" as "weight",
@@ -84,18 +80,23 @@ export const QuantityField = (props: NumberInputProps) => {
     <NumberInput
       required
       label={t("Quantité")}
-      icon={
-        <Select
-          variant="text"
-          value={unit}
-          onChange={(u) => setUnit(u!)}
-          options={units}
-        />
-      }
+      icon={<UnitSelect value={unit} onChange={setUnit} />}
       {...bind(unitToField[unit ?? "l"])}
       {...props}
     />
   )
+}
+
+export const UnitSelect = (props: SelectProps<Option<Unit>, Unit>) => {
+  const { t } = useTranslation()
+
+  const units: Option<Unit>[] = [
+    { value: "l", label: t("litres") },
+    { value: "kg", label: t("kg") },
+    { value: "MJ", label: t("MJ") },
+  ]
+
+  return <Select variant="text" options={units} {...props} />
 }
 
 export const BiofuelField = (props: AutocompleteProps<Biofuel>) => {
