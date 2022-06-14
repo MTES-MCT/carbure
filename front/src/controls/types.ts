@@ -14,5 +14,7 @@ export interface Snapshot {
 export interface LotSummary {
   count: number
   total_volume: number
+  total_weight: number
+  total_lhv_amount: number
   lots: SummaryItem[]
 }

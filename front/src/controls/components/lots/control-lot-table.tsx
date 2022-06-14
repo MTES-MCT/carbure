@@ -48,7 +48,7 @@ export const ControlTable = memo(
           columns.status,
           columns.period,
           columns.document,
-          columns.volume,
+          columns.quantity,
           columns.feedstock,
           columns.supplier,
           columns.client,

@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next"
 import { useQuery } from "common/hooks/async"
 import pickApi from "../../api"
-import { formatNumber } from "common/utils/formatters"
+import { formatNumber, formatUnit } from "common/utils/formatters"
 import { LoaderOverlay } from "common/components/scaffold"
 import Table from "common/components/table"
 import NoResult from "transactions/components/no-result"
@@ -42,9 +42,19 @@ export const ControlLotSummary = ({
   })
 
   const summaryData = summary.result?.data.data
+
+  const unitToField = {
+    l: "volume_sum" as "volume_sum",
+    kg: "weight_sum" as "weight_sum",
+    MJ: "lhv_amount_sum" as "lhv_amount_sum",
+  }
+
+  const unit = entity.preferred_unit ?? "l"
+  const field = unitToField[unit]
+
   const lots = summaryData?.lots ?? []
   const lotsAmount = lots.reduce((count, item) => count + item.total, 0)
-  const lotsVolume = lots.reduce((volume, item) => volume + item.volume_sum, 0) // prettier-ignore
+  const lotsQuantity = lots.reduce((quantity, item) => quantity + item[field], 0) // prettier-ignore
 
   const columns = useSummaryColumns(query)
 
@@ -63,10 +73,7 @@ export const ControlLotSummary = ({
             {" ▸ "}
             {t("{{count}} lots", { count: lotsAmount })}
             {" ▸ "}
-            {t("{{volume}} litres", {
-              count: lotsVolume,
-              volume: formatNumber(lotsVolume),
-            })}
+            {formatUnit(lotsQuantity, unit)}
           </h2>
 
           <Table
@@ -77,7 +84,7 @@ export const ControlLotSummary = ({
               columns.client,
               columns.delivery,
               columns.biofuel,
-              columns.volume,
+              columns.quantity,
               columns.count,
               columns.ghgReduction,
             ]}

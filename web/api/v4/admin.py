@@ -411,7 +411,12 @@ def get_admin_lots_by_status(entity, status, export=False):
 
 
 def get_admin_summary_data(lots, short=False):
-    data = {'count': lots.count(), 'total_volume': lots.aggregate(Sum('volume'))['volume__sum'] or 0}
+    data = {
+        'count': lots.count(), 
+        'total_volume': lots.aggregate(Sum('volume'))['volume__sum'] or 0,
+        'total_weight': lots.aggregate(Sum('weight'))['weight__sum'] or 0,
+        'total_lhv_amount': lots.aggregate(Sum('lhv_amount'))['lhv_amount__sum'] or 0,
+    }
 
     if short:
         return data
@@ -429,6 +434,8 @@ def get_admin_summary_data(lots, short=False):
         'delivery_type'
     ).annotate(
         volume_sum=Sum('volume'),
+        weight_sum=Sum('weight'),
+        lhv_amount_sum=Sum('lhv_amount'),
         avg_ghg_reduction=Sum(F('volume') * F('ghg_reduction_red_ii')) / Sum('volume'),
         total=Count('id'),
         pending=Count('id', filter=pending_filter)

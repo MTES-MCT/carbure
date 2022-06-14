@@ -46,7 +46,11 @@ export const defaultStock = {
   feedstock: undefined as Feedstock | undefined,
   country_of_origin: undefined as Country | undefined,
   initial_volume: 0 as number | undefined,
+  initial_weight: 0 as number | undefined,
+  initial_lhv_amount: 0 as number | undefined,
   remaining_volume: 0 as number | undefined,
+  remaining_weight: 0 as number | undefined,
+  remaining_lhv_amount: 0 as number | undefined,
 
   production_site: undefined as ProductionSite | string | undefined,
   production_country: undefined as Country | undefined,
@@ -68,7 +72,11 @@ export const stockToFormValue: (stock: Stock | undefined) => StockFormValue = (
   stock,
 
   initial_volume: stock?.initial_volume,
+  initial_weight: stock?.initial_weight,
+  initial_lhv_amount: stock?.initial_lhv_amount,
   remaining_volume: stock?.remaining_volume,
+  remaining_weight: stock?.remaining_weight,
+  remaining_lhv_amount: stock?.remaining_lhv_amount,
   biofuel: stock?.biofuel ?? undefined,
   feedstock: stock?.feedstock ?? undefined,
   country_of_origin: stock?.country_of_origin ?? undefined,
