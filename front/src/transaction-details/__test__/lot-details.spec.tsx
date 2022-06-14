@@ -41,7 +41,7 @@ const LotDetailsWithRouter = ({ entity }: { entity: Entity }) => {
 
 function checkLotFields() {
   getField("N° document d'accompagnement")
-  getField("Volume en litres")
+  getField("Quantité")
   getField("Biocarburant")
   getField("Matière première")
   getField("Pays d'origine de la matière première")
@@ -126,7 +126,7 @@ test("edit transaction details", async () => {
   userEvent.clear(dae)
   userEvent.type(dae, "DAETEST")
 
-  const vol = getField("Volume en litres")
+  const vol = getField("Quantité")
   userEvent.clear(vol)
   userEvent.type(vol, "20000")
 
