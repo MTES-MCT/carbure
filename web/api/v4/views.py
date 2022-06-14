@@ -2,6 +2,7 @@ from calendar import calendar, monthrange
 import datetime
 from json.encoder import py_encode_basestring_ascii
 import unicodedata
+from webbrowser import get
 import dictdiffer
 import json
 import time
@@ -11,6 +12,7 @@ from django.db.models.fields import NOT_PROVIDED
 
 from django.http.response import HttpResponse, JsonResponse
 from django.db.models.query_utils import Q
+from django.shortcuts import get_object_or_404
 from api.v4.certificates import get_certificates
 from core.carburetypes import Carbure
 from core.common import ErrorResponse, SuccessResponse, convert_template_row_to_formdata, get_uploaded_files_directory
@@ -1736,9 +1738,10 @@ def recalc_score(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
     lot_id = request.POST.get('lot_id')
+    prefetched_data = get_prefetched_data()
     try:
         lot = CarbureLot.objects.get(id=lot_id)
-        lot.recalc_reliability_score()
+        lot.recalc_reliability_score(prefetched_data)
         lot.save()
     except:
         return ErrorResponse(404)

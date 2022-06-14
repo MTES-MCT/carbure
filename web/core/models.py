@@ -569,71 +569,76 @@ class CarbureLot(models.Model):
         self.ghg_reduction_red_ii = other.ghg_reduction_red_ii
         self.update_ghg()
 
-    def recalc_reliability_score(self):
-        CarbureLotReliabilityScore.objects.filter(lot=self).delete()
-        nb_points = 0
+    def recalc_reliability_score(self, prefetched_data):
         # data source is producer 3 POINTS
+        data_source_is_producer = CarbureLotReliabilityScore(lot=self, item=CarbureLotReliabilityScore.DATA_SOURCE_IS_PRODUCER, max_score=3, score=0)
         if self.carbure_producer != None:
-            nb_points += 3
-            CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.DATA_SOURCE_IS_PRODUCER, defaults={'max_score':3, 'score':3})
-        else:
-            CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.DATA_SOURCE_IS_PRODUCER, defaults={'max_score':3, 'score':0})
+            data_source_is_producer.score = 3
 
         # lot declared by both 1 POINT
+        lot_declared_both = CarbureLotReliabilityScore(lot=self, item=CarbureLotReliabilityScore.LOT_DECLARED, max_score=1, score=0)
         if self.lot_status == CarbureLot.FROZEN:
-            nb_points += 1
-            CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.LOT_DECLARED, defaults={'max_score':1, 'score':1})
-        else:
-            CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.LOT_DECLARED, defaults={'max_score':1, 'score':0})
+            lot_declared_both.score = 1
 
         # certificates validated by DGEC 2 points
-        producer_certificate_checked = False
-        supplier_certificate_checked = False
-        if self.carbure_producer:
-            if EntityCertificate.objects.filter(entity=self.carbure_producer, certificate__certificate_id=self.production_site_certificate, checked_by_admin=True).count() > 0:
-                producer_certificate_checked = True
-        if self.carbure_supplier:
-            if EntityCertificate.objects.filter(entity=self.carbure_supplier, certificate__certificate_id=self.supplier_certificate, checked_by_admin=True).count() > 0:
-                supplier_certificate_checked = True
-        cert_checked_score = producer_certificate_checked + supplier_certificate_checked
-        CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.CERTIFICATES_VALIDATED, defaults={'max_score':2, 'score':cert_checked_score, 
-        'meta':{'producer_certificate_checked': producer_certificate_checked, 'supplier_certificate_checked': supplier_certificate_checked}})
+        certificates_validated = CarbureLotReliabilityScore(lot=self, item=CarbureLotReliabilityScore.CERTIFICATES_VALIDATED, max_score=2, score=0, meta={'producer_certificate_checked': False, 'supplier_certificate_checked': False})
+        if self.carbure_producer \
+            and self.carbure_producer.id in prefetched_data['entity_certificates'] \
+            and self.production_site_certificate in prefetched_data['entity_certificates'][self.carbure_producer.id] \
+            and prefetched_data['entity_certificates'][self.carbure_producer.id][self.production_site_certificate].checked_by_admin:
+                certificates_validated.meta['producer_certificate_checked'] = True
+                certificates_validated.score += 1
+        if self.carbure_supplier \
+            and self.carbure_supplier.id in prefetched_data['entity_certificates'] \
+            and self.supplier_certificate in prefetched_data['entity_certificates'][self.carbure_supplier.id] \
+            and prefetched_data['entity_certificates'][self.carbure_supplier.id][self.supplier_certificate].checked_by_admin:
+                certificates_validated.meta['supplier_certificate_checked'] = True
+                certificates_validated.score += 1
 
         ### configuration issues
-        feedstock_registered = False
-        biofuel_registered = False
-        delivery_site_registered = False
-        if self.carbure_production_site:
-            if ProductionSiteInput.objects.filter(production_site=self.carbure_production_site, matiere_premiere=self.feedstock).count() > 0:
-                feedstock_registered = True
-            if ProductionSiteOutput.objects.filter(production_site=self.carbure_production_site, biocarburant=self.biofuel).count() > 0:
-                biofuel_registered = True
-        if self.carbure_delivery_site:
-            if EntityDepot.objects.filter(entity=self.carbure_client, depot=self.carbure_delivery_site).count() > 0:
-                delivery_site_registered = True
-        full_score = feedstock_registered and biofuel_registered and delivery_site_registered
-        CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.ANOMALIES_CONFIGURATION, defaults={'score':1 if full_score else 0, 
-            'meta':{'feedstock_registered': feedstock_registered, 'biofuel_registered': biofuel_registered, 'delivery_site_registered': delivery_site_registered}})
+        config = CarbureLotReliabilityScore(lot=self, item=CarbureLotReliabilityScore.ANOMALIES_CONFIGURATION, max_score=1, score=0, meta={'feedstock_registered': False, 'biofuel_registered': False, 'delivery_site_registered': False})
+        if self.carbure_production_site and self.carbure_production_site.id in prefetched_data['production_sites']:
+            if self.feedstock.id in prefetched_data['production_sites'][self.carbure_production_site.id]['feedstock_ids']:
+                config.meta['feedstock_registered'] = True
+            if self.biofuel.id in prefetched_data['production_sites'][self.carbure_production_site.id]['biofuel_ids']:
+                config.meta['biofuel_registered'] = True
+        if self.carbure_delivery_site and self.carbure_client and self.carbure_client.id in prefetched_data['depotsbyentity'] and self.carbure_delivery_site.depot_id in prefetched_data['depotsbyentity'][self.carbure_client.id]:
+            config.meta['delivery_site_registered'] = True
+        if config.meta['feedstock_registered'] and config.meta['biofuel_registered'] and config.meta['delivery_site_registered']:
+            config.score = 1
 
         # certificates
-        producer_certificate_provided = False
-        producer_certificate_exists = False
-        supplier_certificate_provided = False
-        supplier_certificate_exists = False
+        certificates = CarbureLotReliabilityScore(lot=self, item=CarbureLotReliabilityScore.ANOMALIES_CERTIFICATES, max_score=1, score=0, 
+        meta={'producer_certificate_provided': False, 'producer_certificate_exists': False, 
+            'supplier_certificate_provided': False, 'supplier_certificate_exists':False})
+        # certificates are provided
         if self.production_site_certificate:
-            producer_certificate_provided = True
+            certificates.meta['producer_certificate_provided'] = True
         if self.supplier_certificate:
-            supplier_certificate_provided = True
-        if GenericCertificate.objects.filter(certificate_id=self.production_site_certificate).count() > 0:
-            producer_certificate_exists = True
-        if GenericCertificate.objects.filter(certificate_id=self.supplier_certificate).count() > 0:
-            supplier_certificate_exists = True
+            certificates.meta['supplier_certificate_provided'] = True
 
-        all_certs_ok = producer_certificate_provided and producer_certificate_exists and supplier_certificate_provided and supplier_certificate_exists
-        CarbureLotReliabilityScore.objects.update_or_create(lot=self, item=CarbureLotReliabilityScore.ANOMALIES_CERTIFICATES, defaults={'score':1 if all_certs_ok else 0, 
-            'meta':{'producer_certificate_provided': producer_certificate_provided, 'producer_certificate_exists': producer_certificate_exists, 
-            'supplier_certificate_provided': supplier_certificate_provided, 'supplier_certificate_exists':supplier_certificate_exists}})
+        # certificates exist in our database
+        if self.production_site_certificate in prefetched_data['checked_certificates']:
+            certificates.meta['producer_certificate_exists'] = prefetched_data['checked_certificates'][self.production_site_certificate]
+        elif GenericCertificate.objects.filter(certificate_id=self.production_site_certificate).count() > 0:
+            certificates.meta['producer_certificate_exists'] = True
+            prefetched_data['checked_certificates'][self.production_site_certificate] = True # add to cache
+        else:
+            prefetched_data['checked_certificates'][self.production_site_certificate] = False # add to cache
 
+        if self.supplier_certificate in prefetched_data['checked_certificates']:
+            certificates.meta['supplier_certificate_exists'] = prefetched_data['checked_certificates'][self.supplier_certificate]
+        elif GenericCertificate.objects.filter(certificate_id=self.supplier_certificate).count() > 0:
+            certificates.meta['supplier_certificate_exists'] = True
+            prefetched_data['checked_certificates'][self.supplier_certificate] = True # add to cache
+        else:
+            prefetched_data['checked_certificates'][self.supplier_certificate] = False # add to cache
+
+        if certificates.meta['producer_certificate_provided'] and certificates.meta['producer_certificate_exists'] and certificates.meta['supplier_certificate_provided'] and certificates.meta['supplier_certificate_exists']:
+            certificates.score = 1
+        
+        score_entries = [data_source_is_producer, lot_declared_both, certificates_validated, config, certificates]
+        nb_points = sum([s.score for s in score_entries])
         if nb_points == 8:
             self.data_reliability_score = 'A'
         elif nb_points >= 6:
@@ -644,7 +649,7 @@ class CarbureLot(models.Model):
             self.data_reliability_score = 'D'
         else:
             self.data_reliability_score = 'E'
-
+        return score_entries
 
 class CarbureLotReliabilityScore(models.Model):
     CUSTOMS_AND_CARBURE_MATCH = "CUSTOMS_AND_CARBURE_MATCH" # 0 or 4 --- NO META

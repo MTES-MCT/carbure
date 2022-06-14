@@ -4,8 +4,11 @@ from inspect import trace
 import re
 import traceback
 from django import db
-from core.models import CarbureLot, GenericError, Entity
+from api.v4.helpers import get_prefetched_data
+from core.models import CarbureLot, CarbureLotReliabilityScore, GenericError, Entity
 from ml.models import EECStats
+from django.db import transaction
+
 # definitions
 
 oct2015 = datetime.date(year=2015, month=10, day=5)
@@ -81,13 +84,25 @@ def bulk_sanity_checks(lots, prefetched_data, background=True):
         except:
             traceback.print_exc()
     GenericError.objects.bulk_create(errors, batch_size=1000)
-    bulk_scoring(lots)
+    bulk_scoring(lots, prefetched_data)
     return results
 
-def bulk_scoring(lots):
-    for l in lots:
-        l.recalc_reliability_score()
-        l.save()
+def bulk_scoring(lots, prefetched_data=None):
+    if not prefetched_data:
+        prefetched_data = get_prefetched_data()
+    # delete scoring entries for the lots
+    lotids = [l.id for l in lots]
+    CarbureLotReliabilityScore.objects.filter(lot_id__in=lotids).delete()
+    # recalc score
+    clrs = []
+    # bulk update lots
+    with transaction.atomic():
+        for l in lots:
+            clrs_entries = l.recalc_reliability_score(prefetched_data)
+            clrs += clrs_entries
+            l.save()
+    # bulk create score entries
+    CarbureLotReliabilityScore.objects.bulk_create(clrs)
 
 def check_ghg_values(prefetched_data, lot, errors):
     etd = prefetched_data['etd']

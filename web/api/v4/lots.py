@@ -213,7 +213,9 @@ def fill_supplier_info(lot, data, entity):
     # EXCEL: NO SUPPLIER IS SPECIFIED AND I AM THE PRODUCER
     if lot.carbure_producer and lot.carbure_producer.id == entity.id and not lot.carbure_supplier:
         lot.carbure_supplier = entity
-        lot.supplier_certificate = data.get('supplier_certificate', entity.default_certificate)
+        lot.supplier_certificate = data.get('supplier_certificate')
+        if lot.supplier_certificate == '':
+            lot.supplier_certificate = entity.default_certificate
 
     return errors
 
@@ -380,7 +382,7 @@ def bulk_insert_lots(entity: Entity, lots: List[CarbureLot], errors: List[Generi
         'feedstock', 'biofuel', 'country_of_origin',
         'parent_lot', 'parent_stock', 'parent_stock__carbure_client', 'parent_stock__carbure_supplier',
         'parent_stock__feedstock', 'parent_stock__biofuel', 'parent_stock__depot', 'parent_stock__country_of_origin', 'parent_stock__production_country'
-    ).prefetch_related('genericerror_set', 'carbure_production_site__productionsitecertificate_set').filter(added_by=entity).order_by('-id')[0:len(lots)]
+    ).prefetch_related('genericerror_set', 'carbure_production_site__productionsitecertificate_set', 'carbure_production_site__productionsiteinput_set', 'carbure_production_site__productionsiteoutput_set').filter(added_by=entity).order_by('-id')[0:len(lots)]
     errors = reversed(errors) # lots are fetched by DESC ID
     for lot, lot_errors in zip(inserted_lots, errors):
         for e in lot_errors:

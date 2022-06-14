@@ -11,6 +11,7 @@ from django.db.models.query_utils import Q
 from django.http.response import HttpResponse, JsonResponse
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
+from numpy import product
 from certificates.models import DoubleCountingRegistration
 from core.common import try_get_certificate, try_get_double_counting_certificate
 
@@ -863,23 +864,51 @@ def get_prefetched_data(entity=None):
         d['my_production_sites'] = {ps.name.upper(): ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').filter(producer=entity)}
         # get all my linked certificates
         d['my_vendor_certificates'] = [c.certificate.certificate_id for c in EntityCertificate.objects.filter(entity=entity)]
-    else:
-        d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').all()}
+    
+    
+    # MAPPING OF ENTITIES AND DELIVERY SITES
+    # dict {'entity1': [depot1, depot2],
+    #       'entity2': [depot42],
+    # }
     depotsbyentities = dict()
-    associated_depots = EntityDepot.objects.all()
+    associated_depots = EntityDepot.objects.select_related('depot').all()
     for entitydepot in associated_depots.iterator():
         if entitydepot.entity_id in depotsbyentities:
-            depotsbyentities[entitydepot.entity_id].append(entitydepot.depot_id)
+            depotsbyentities[entitydepot.entity_id].append(entitydepot.depot.depot_id)
         else:
-            depotsbyentities[entitydepot.entity_id] = [entitydepot.depot_id]
+            depotsbyentities[entitydepot.entity_id] = [entitydepot.depot.depot_id]
     d['depotsbyentity'] = depotsbyentities
+
+    # MAPPING OF ENTITIES AND THEIR CERTIFICATES
+    # dict {'entity1': {'cert1_id': cert1, 'cert2_id': cert2},
+    #       'entity2': {'cert14_id': cert14},
+    # }
+    entity_certificates = {}
+    certificates = EntityCertificate.objects.select_related('certificate').all()
+    for entitycertificate in certificates.iterator():
+        if entitycertificate.entity.id not in entity_certificates:
+            entity_certificates[entitycertificate.entity.id] = {}
+        entity_certificates[entitycertificate.entity.id][entitycertificate.certificate.certificate_id] = entitycertificate
+    d['entity_certificates'] = entity_certificates
+
+    # MAPPING OF PRODUCTION SITES AND THEIR INPUT/OUTPUTS
+    production_sites = {}
+    all_ps = ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').all()
+    for psite in all_ps.iterator():
+        production_sites[psite.id] = {}
+        production_sites[psite.id]['feedstock_ids'] = [mp['matiere_premiere_id'] for mp in psite.productionsiteinput_set.all().values('matiere_premiere_id')]
+        production_sites[psite.id]['biofuel_ids'] = [bc['biocarburant_id'] for bc in psite.productionsiteoutput_set.all().values('biocarburant_id')]
+    d['production_sites'] = production_sites
+
     d['clients'] = {c.id: c for c in Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.OPERATOR, Entity.TRADER])}
     d['clientsbyname'] = {c.name.upper(): c for c in Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.OPERATOR, Entity.TRADER])}
     d['certificates'] = {c.certificate_id.upper(): c for c in GenericCertificate.objects.filter(valid_until__gte=lastyear)}
     d['double_counting_certificates'] = {c.certificate_id: c for c in DoubleCountingRegistration.objects.all()}
-    d['etd'] = {s.feedstock: s.default_value for s in ETDStats.objects.all()}
-    d['eec'] = {s.feedstock.code + s.origin.code_pays: s for s in EECStats.objects.all()}
-    d['ep'] = {s.feedstock.code + s.biofuel.code: s for s in EPStats.objects.all()}
+    d['etd'] = {s.feedstock: s.default_value for s in ETDStats.objects.select_related('feedstock').all()}
+    d['eec'] = {s.feedstock.code + s.origin.code_pays: s for s in EECStats.objects.select_related('feedstock', 'origin').all()}
+    d['ep'] = {s.feedstock.code + s.biofuel.code: s for s in EPStats.objects.select_related('feedstock', 'biofuel').all()}
+    
+    d['checked_certificates'] = {} # used as cache in CarbureLot model - recalc reliability score
     return d
 
 
