@@ -200,7 +200,7 @@ def fill_supplier_info(lot, data, entity):
     # default values
     lot.carbure_supplier = None
     lot.unknown_supplier = data.get('unknown_supplier', None)
-    lot.supplier_certificate = data.get('supplier_certificate', '')
+    lot.supplier_certificate = str(data.get('supplier_certificate', '')).strip()
 
     # I AM THE SUPPLIER
     if data.get('carbure_supplier_id') == str(entity.id):
@@ -213,8 +213,7 @@ def fill_supplier_info(lot, data, entity):
     # EXCEL: NO SUPPLIER IS SPECIFIED AND I AM THE PRODUCER
     if lot.carbure_producer and lot.carbure_producer.id == entity.id and not lot.carbure_supplier:
         lot.carbure_supplier = entity
-        lot.supplier_certificate = data.get('supplier_certificate')
-        if lot.supplier_certificate == '':
+        if not lot.supplier_certificate:
             lot.supplier_certificate = entity.default_certificate
 
     return errors
