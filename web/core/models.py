@@ -486,6 +486,7 @@ class CarbureLot(models.Model):
     highlighted_by_auditor = models.BooleanField(default=False) # auditor suspicion - adds it to the control list
     random_control_requested = models.BooleanField(default=False) # random control
     ml_control_requested = models.BooleanField(default=False) # machine learning suspicion
+    ml_scoring = models.FloatField(default=0.0) # score calculated by machine learning script
 
     # auditor decision
     CONFORM = "CONFORM"
