@@ -330,7 +330,7 @@ def sanity_check(lot, prefetched_data):
             errors.append(generic_error(error='DEPOT_NOT_CONFIGURED', lot=lot, display_to_recipient=True, display_to_creator=False, field='delivery_site'))
         else:
             # some delivery sites linked to entity
-            if lot.carbure_delivery_site and lot.carbure_delivery_site.id not in prefetched_data['depotsbyentity'][lot.carbure_client.id]:
+            if lot.carbure_delivery_site and lot.carbure_delivery_site.depot_id not in prefetched_data['depotsbyentity'][lot.carbure_client.id]:
                 # this specific delivery site is not linked
                 errors.append(generic_error(error='DEPOT_NOT_CONFIGURED', lot=lot, display_to_recipient=True, display_to_creator=False, field='delivery_site'))
     # CERTIFICATES CHECK

@@ -58,11 +58,11 @@ class LotsCertifMayhemTest(TestCase):
         lot = CarbureLot.objects.get(id=lot_id)
         return lot
 
-    def send_lot(self, lot):
+    def send_lot(self, lot, expected_status=200):
         response = self.client.post(reverse('api-v4-send-lots'), {'entity_id': self.producer.id, 'selection': [lot.id]})
         if response.status_code != 200:
             print(response.json())
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, expected_status)
         lot = CarbureLot.objects.get(id=lot.id)
         return lot   
 
