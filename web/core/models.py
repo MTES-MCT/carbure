@@ -50,7 +50,7 @@ class Entity(models.Model):
             'has_mac': self.has_mac, 'has_trading': self.has_trading, 'has_direct_deliveries': self.has_direct_deliveries, 'has_stocks': self.has_stocks,
             'legal_name': self.legal_name, 'registration_id': self.registration_id,
             'sustainability_officer': self.sustainability_officer, 'sustainability_officer_phone_number': self.sustainability_officer_phone_number,
-            'registered_address': self.registered_address, 'default_certificate': self.default_certificate}
+            'registered_address': self.registered_address, 'default_certificate': self.default_certificate, 'preferred_unit': self.preferred_unit}
         if self.entity_type == Entity.EXTERNAL_ADMIN:
             d['ext_admin_pages'] = [e.right for e in self.externaladminrights_set.all()]
         return d

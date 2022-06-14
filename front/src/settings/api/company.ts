@@ -1,3 +1,4 @@
+import { Unit } from "carbure/types"
 import { api } from "common/services/api"
 
 export function toggleMAC(entity_id: number, shouldEnable: boolean) {
@@ -47,4 +48,8 @@ export function updateEntity(
     sustainability_officer,
     sustainability_officer_phone_number,
   })
+}
+
+export function setEntityPreferredUnit(entity_id: number, unit: Unit) {
+  return api.post("/set-preferred-unit", { entity_id, unit })
 }

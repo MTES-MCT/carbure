@@ -35,6 +35,10 @@ const CompanyOptions = () => {
     { invalidates: ["user-settings"] }
   )
 
+  const setPreferredUnit = useMutation(api.setEntityPreferredUnit, {
+    invalidates: ["user-settings"],
+  })
+
   const isLoading =
     toggleMAC.loading ||
     toggleStocks.loading ||
@@ -64,7 +68,7 @@ const CompanyOptions = () => {
           <Select
             variant="inline"
             value={entity.preferred_unit}
-            onChange={(u) => entity.setUnit(u!)}
+            onChange={(unit) => setPreferredUnit.execute(entity.id, unit!)}
             style={{ marginLeft: "var(--spacing-xs)" }}
             options={[
               { value: "l", label: t("litres (Éthanol à 20°, autres à 15°)") },
