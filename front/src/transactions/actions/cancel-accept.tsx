@@ -110,15 +110,21 @@ const CancelAcceptDialog = ({
         many: t("Les lots n'ont pas pu être renvoyés dans la boîte de réception !"), // prettier-ignore
       })
 
-      if (error === "CANCEL_ACCEPT_NOT_ALLOWED") {
-        text += " "
+      text += " "
+
+      if (error === "WRONG_STATUS") {
+        text += v({
+          one: t("Le lot n'a pas encore été accepté ou est déjà déclaré."), // prettier-ignore
+          many: t("Certains lots n'ont pas encore été acceptés ou sont déjà déclarés."), // prettier-ignore
+        })
+      } else if (error === "CHILDREN_IN_USE") {
         text += v({
           one: t("Des lots ou stocks créés à partir de celui-ci ont déjà été utilisés."), // prettier-ignore
           many: t("Des lots ou stocks créés à partir de ceux-ci ont déjà été utilisés."), // prettier-ignore
         })
       }
 
-      notify(text, { variant: "danger" })
+      notify(text.trim(), { variant: "danger" })
       onClose()
     },
   })
