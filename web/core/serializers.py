@@ -179,6 +179,8 @@ class CarbureStockPublicSerializer(serializers.ModelSerializer):
     production_country = CountrySerializer(read_only=True)
     carbure_supplier = EntitySerializer(read_only=True)
     initial_volume = serializers.SerializerMethodField()
+    initial_weight = serializers.SerializerMethodField()
+    initial_lhv_amount = serializers.SerializerMethodField()
     delivery_date = serializers.SerializerMethodField()
     period = serializers.SerializerMethodField()
 
@@ -187,7 +189,7 @@ class CarbureStockPublicSerializer(serializers.ModelSerializer):
         fields = ['id', 'carbure_id', 'depot', 'carbure_client',
                   'remaining_volume', 'remaining_weight', 'remaining_lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
                   'carbure_production_site', 'unknown_production_site', 'production_country', 'carbure_supplier', 'unknown_supplier',
-                  'ghg_reduction', 'ghg_reduction_red_ii', 'initial_volume', 'delivery_date', 'period']
+                  'ghg_reduction', 'ghg_reduction_red_ii', 'initial_volume', 'delivery_date', 'period', 'initial_weight', 'initial_lhv_amount']
 
     def get_initial_volume(self, obj):
         if obj.parent_lot:
@@ -196,7 +198,22 @@ class CarbureStockPublicSerializer(serializers.ModelSerializer):
             return obj.parent_transformation.volume_destination
         else:
             return 0
-        # return obj.parent_lot.volume if obj.parent_lot else obj.parent_transformation.volume_destination
+
+    def get_initial_weight(self, obj):
+        if obj.parent_lot:
+            return obj.parent_lot.weight
+        elif obj.parent_transformation:
+            return obj.parent_transformation.get_weight()
+        else:
+            return 0
+
+    def get_initial_lhv_amount(self, obj):
+        if obj.parent_lot:
+            return obj.parent_lot.lhv_amount
+        elif obj.parent_transformation:
+            return obj.parent_transformation.get_lhv_amount()
+        else:
+            return 0
 
     def get_delivery_date(self, obj):
         return obj.get_delivery_date().strftime('%Y-%m-%d')

@@ -40,6 +40,7 @@ class Entity(models.Model):
     hash = models.CharField(max_length=32, null=True, blank=True, default='')
     default_certificate = models.CharField(max_length=64, null=True, blank=True, default='')
     notifications_enabled = models.BooleanField(default=False)
+    preferred_unit = models.CharField(max_length=64, choices=(('l', 'litres'), ('kg', 'kg'), ('MJ', 'MJ')), default='l')
 
     def __str__(self):
         return self.name
@@ -49,7 +50,7 @@ class Entity(models.Model):
             'has_mac': self.has_mac, 'has_trading': self.has_trading, 'has_direct_deliveries': self.has_direct_deliveries, 'has_stocks': self.has_stocks,
             'legal_name': self.legal_name, 'registration_id': self.registration_id,
             'sustainability_officer': self.sustainability_officer, 'sustainability_officer_phone_number': self.sustainability_officer_phone_number,
-            'registered_address': self.registered_address, 'default_certificate': self.default_certificate}
+            'registered_address': self.registered_address, 'default_certificate': self.default_certificate, 'preferred_unit': self.preferred_unit}
         if self.entity_type == Entity.EXTERNAL_ADMIN:
             d['ext_admin_pages'] = [e.right for e in self.externaladminrights_set.all()]
         return d
@@ -694,6 +695,12 @@ class CarbureStockTransformation(models.Model):
     transformed_by = models.ForeignKey(usermodel, null=True, blank=True, on_delete=models.SET_NULL)
     entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
     transformation_dt = models.DateTimeField(auto_now_add=True)
+
+    def get_weight(self):
+        return self.volume_destination * self.source_stock.biofuel.masse_volumique
+
+    def get_lhv_amount(self):
+        return self.volume_destination * self.source_stock.biofuel.pci_litre
 
     class Meta:
         db_table = 'carbure_stock_transformations'

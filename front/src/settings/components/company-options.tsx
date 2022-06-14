@@ -3,11 +3,10 @@ import { useTranslation } from "react-i18next"
 import useEntity from "carbure/hooks/entity"
 import { UserRole } from "carbure/types"
 import { useMutation } from "common/hooks/async"
-import { Panel, LoaderOverlay } from "common/components/scaffold"
-// import { Panel, LoaderOverlay, Row } from "common/components/scaffold"
+import { Panel, LoaderOverlay, Row } from "common/components/scaffold"
 import Checkbox from "common/components/checkbox"
-// import Select from "common/components/select"
-// import { Calculator } from "common/components/icons"
+import { Calculator } from "common/components/icons"
+import Select from "common/components/select"
 import * as api from "../api/company"
 
 const CompanyOptions = () => {
@@ -36,6 +35,10 @@ const CompanyOptions = () => {
     { invalidates: ["user-settings"] }
   )
 
+  const setPreferredUnit = useMutation(api.setEntityPreferredUnit, {
+    invalidates: ["user-settings"],
+  })
+
   const isLoading =
     toggleMAC.loading ||
     toggleStocks.loading ||
@@ -56,7 +59,7 @@ const CompanyOptions = () => {
         </p>
       </section>
 
-      {/* <section>
+      <section>
         <Row style={{ alignItems: "center" }}>
           <Calculator size={18} style={{ marginRight: 16 }} />
 
@@ -65,7 +68,7 @@ const CompanyOptions = () => {
           <Select
             variant="inline"
             value={entity.preferred_unit}
-            onChange={(u) => entity.setUnit(u!)}
+            onChange={(unit) => setPreferredUnit.execute(entity.id, unit!)}
             style={{ marginLeft: "var(--spacing-xs)" }}
             options={[
               { value: "l", label: t("litres (Éthanol à 20°, autres à 15°)") },
@@ -74,7 +77,7 @@ const CompanyOptions = () => {
             ]}
           />
         </Row>
-      </section> */}
+      </section>
 
       <section>
         <Checkbox

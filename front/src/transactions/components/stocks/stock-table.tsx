@@ -1,7 +1,12 @@
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import { Stock } from "../../types"
-import { formatNumber, formatDate, formatPeriod } from "common/utils/formatters"
+import {
+  formatNumber,
+  formatDate,
+  formatPeriod,
+  formatUnit,
+} from "common/utils/formatters"
 import Table, { Cell, Order, selectionColumn } from "common/components/table"
 import StockTag from "./stock-tag"
 import { isRedII } from "lot-add/components/ghg-fields"
@@ -43,7 +48,7 @@ export const StockTable = memo(
           selectionColumn(stocks, selected, onSelect, (s: Stock) => s.id),
           columns.status,
           columns.period,
-          columns.biofuel,
+          columns.quantity,
           columns.feedstock,
           columns.supplier,
           columns.productionSite,
@@ -155,12 +160,13 @@ export const BiofuelCell = ({ stock }: StockCellProps) => {
     MJ: "remaining_lhv_amount" as "remaining_lhv_amount",
   }
 
-  const field = unitToField[entity.preferred_unit ?? "l"]
+  const unit = entity.preferred_unit ?? "l"
+  const field = unitToField[unit]
 
   return (
     <Cell
       text={t(stock.biofuel?.code ?? "", { ns: "biofuels" })}
-      sub={`${formatNumber(stock[field])} ${entity.preferred_unit}`}
+      sub={formatUnit(stock[field], unit)}
     />
   )
 }

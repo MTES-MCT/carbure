@@ -36,7 +36,7 @@ export const ControlStockTable = memo(
           selectionColumn(stocks, selected, onSelect, (s: Stock) => s.id),
           columns.status,
           columns.period,
-          columns.biofuel,
+          columns.quantity,
           columns.feedstock,
           columns.supplier,
           columns.client,
