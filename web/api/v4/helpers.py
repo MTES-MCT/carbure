@@ -724,7 +724,12 @@ def send_email_declaration_invalidated(declaration):
 
 
 def get_lots_summary_data(lots, entity, short=False):
-    data = {'count': lots.count(), 'total_volume': lots.aggregate(Sum('volume'))['volume__sum'] or 0}
+    data = {
+        'count': lots.count(), 
+        'total_volume': lots.aggregate(Sum('volume'))['volume__sum'] or 0,
+        'total_weight': lots.aggregate(Sum('weight'))['weight__sum'] or 0,
+        'total_lhv_amount': lots.aggregate(Sum('lhv_amount'))['lhv_amount__sum'] or 0
+    }
 
     if short:
         return data
@@ -740,6 +745,8 @@ def get_lots_summary_data(lots, entity, short=False):
         'delivery_type'
     ).annotate(
         volume_sum=Sum('volume'),
+        weight_sum=Sum('weight'),
+        lhv_amount_sum=Sum('lhv_amount'),
         avg_ghg_reduction=Sum(F('volume') * F('ghg_reduction_red_ii')) / Sum('volume'),
         total=Count('id'),
         pending=Count('id', filter=pending_filter)
@@ -753,6 +760,8 @@ def get_lots_summary_data(lots, entity, short=False):
         'biofuel_code'
     ).annotate(
         volume_sum=Sum('volume'),
+        weight_sum=Sum('weight'),
+        lhv_amount_sum=Sum('lhv_amount'),
         avg_ghg_reduction=Sum(F('volume') * F('ghg_reduction_red_ii')) / Sum('volume'),
         total=Count('id'),
         pending=Count('id', filter=pending_filter)
@@ -766,7 +775,9 @@ def get_lots_summary_data(lots, entity, short=False):
 def get_stocks_summary_data(stocks, entity_id=None, short=False):
     data = {
         'count': stocks.count(),
-        'total_remaining_volume': stocks.aggregate(Sum('remaining_volume'))['remaining_volume__sum'] or 0
+        'total_remaining_volume': stocks.aggregate(Sum('remaining_volume'))['remaining_volume__sum'] or 0,
+        'total_remaining_weight': stocks.aggregate(Sum('remaining_weight'))['remaining_weight__sum'] or 0,
+        'total_remaining_lhv_amount': stocks.aggregate(Sum('remaining_lhv_amount'))['remaining_lhv_amount__sum'] or 0
     }
 
     if short:
@@ -781,6 +792,8 @@ def get_stocks_summary_data(stocks, entity_id=None, short=False):
         'biofuel_code'
     ).annotate(
         remaining_volume_sum=Sum('remaining_volume'),
+        remaining_weight_sum=Sum('remaining_weight'),
+        remaining_lhv_amount_sum=Sum('remaining_lhv_amount'),
         avg_ghg_reduction=Sum(F('remaining_volume') * F('ghg_reduction_red_ii')) / Sum('remaining_volume'),
         total=Count('id'),
     ).order_by()

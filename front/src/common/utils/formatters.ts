@@ -3,6 +3,8 @@ import format from "date-fns/intlFormat"
 import formatDistanceToNow from "date-fns/formatDistanceToNow"
 import fr from "date-fns/locale/fr"
 import en from "date-fns/locale/en-GB"
+import { Unit } from "carbure/types"
+import i18next from "i18next"
 
 export function formatPeriod(period: number | string) {
   const num = typeof period === "string" ? parseInt(period) : period
@@ -15,6 +17,16 @@ export function formatNumber(num: number) {
 
 export function formatPercentage(num: number) {
   return formatNumber(num) + "%"
+}
+
+export function formatUnit(num: number, unit: Unit) {
+  const unitLabel = {
+    l: i18next.t("litres", { count: num }),
+    kg: i18next.t("kg"),
+    MJ: i18next.t("MJ"),
+  }
+
+  return `${formatNumber(num)} ${unitLabel[unit]}`
 }
 
 export function formatGHG(num: number) {

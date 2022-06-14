@@ -1,7 +1,12 @@
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import { Lot, LotError } from "transactions/types"
-import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
+import {
+  formatDate,
+  formatNumber,
+  formatPeriod,
+  formatUnit,
+} from "common/utils/formatters"
 import { isExpiring } from "transactions/utils/deadline"
 import Table, {
   Cell,
@@ -59,7 +64,7 @@ export const LotTable = memo(
           columns.status,
           columns.period,
           columns.document,
-          columns.volume,
+          columns.quantity,
           columns.feedstock,
           columns.supplier,
           columns.client,
@@ -201,12 +206,13 @@ export const BiofuelCell = ({ lot }: LotCellProps) => {
     MJ: "lhv_amount" as "lhv_amount",
   }
 
-  const field = unitToField[entity.preferred_unit ?? "l"]
+  const unit = entity.preferred_unit ?? "l"
+  const field = unitToField[unit]
 
   return (
     <Cell
       text={t(lot.biofuel?.code ?? "", { ns: "biofuels" })}
-      sub={`${formatNumber(lot[field])} ${entity.preferred_unit}`}
+      sub={formatUnit(lot[field], unit)}
     />
   )
 }

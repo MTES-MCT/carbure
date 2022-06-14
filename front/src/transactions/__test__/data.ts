@@ -57,12 +57,16 @@ export const lots: LotList = {
 export const lotSummary: LotSummary = {
   count: 2,
   total_volume: 24690,
+  total_weight: 24690,
+  total_lhv_amount: 24690,
   in: [
     {
       supplier: "ROQUETTE",
       delivery_type: DeliveryType.Blending,
       biofuel_code: "ETH",
       volume_sum: 12345,
+      weight_sum: 12345,
+      lhv_amount_sum: 12345,
       avg_ghg_reduction: 76.15,
       total: 1,
       pending: 1,
@@ -74,6 +78,8 @@ export const lotSummary: LotSummary = {
       delivery_type: DeliveryType.Processing,
       biofuel_code: "ETH",
       volume_sum: 12345,
+      weight_sum: 12345,
+      lhv_amount_sum: 12345,
       avg_ghg_reduction: 78.57,
       total: 1,
       pending: 0,
