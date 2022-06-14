@@ -14,7 +14,7 @@ from django.http.response import HttpResponse, JsonResponse
 from django.db.models.query_utils import Q
 from django.shortcuts import get_object_or_404
 from api.v4.certificates import get_certificates
-from core.carburetypes import Carbure
+from core.carburetypes import Carbure, CarbureError
 from core.common import ErrorResponse, SuccessResponse, convert_template_row_to_formdata, get_uploaded_files_directory
 from core.decorators import check_user_rights
 from api.v4.helpers import filter_lots, filter_stock, get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock
@@ -1793,3 +1793,62 @@ def set_entity_preferred_unit(request, *args, **kwargs):
     entity.preferred_unit = unit
     entity.save()
     return JsonResponse({'status': 'success'})
+
+
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
+def cancel_accept_lots(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    lot_ids = request.POST.getlist('lot_ids', False)
+    if not lot_ids:
+        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
+
+    entity = Entity.objects.get(pk=entity_id)
+    try:
+        lots = CarbureLot.objects.filter(pk__in=lot_ids)
+    except:
+        return JsonResponse({'status': 'error', 'message': 'Could not find lots'}, status=400)
+    for lot in lots.iterator():
+        if lot.carbure_client != entity:
+            return JsonResponse({'status': 'forbidden', 'message': 'Only the vendor can recall the lot'}, status=403)
+
+        if lot.lot_status == CarbureLot.DRAFT:
+            return JsonResponse({'status': 'error', 'message': 'Cannot cancel DRAFT'}, status=400)
+        elif lot.lot_status == CarbureLot.PENDING:
+            return JsonResponse({'status': 'error', 'message': 'Cannot cancel PENDING'}, status=400)
+        elif lot.lot_status == CarbureLot.REJECTED:
+            return JsonResponse({'status': 'error', 'message': 'Lot is already rejected. Cancel accept has no effect'}, status=400)
+        elif lot.lot_status == CarbureLot.FROZEN:
+            return JsonResponse({'status': 'error', 'message': 'Lot is Frozen. Cannot recall. Please invalidate declaration first.'}, status=400)
+        elif lot.lot_status == CarbureLot.DELETED:
+            return JsonResponse({'status': 'error', 'message': 'Lot is deleted. Cannot cancel accept.'}, status=400)
+
+        # delete new lots created when the lot was accepted
+        if lot.delivery_type in (CarbureLot.PROCESSING, CarbureLot.TRADING):
+            children_lots = CarbureLot.objects.filter(parent_lot=lot).exclude(lot_status__in=(CarbureLot.DELETED))
+            # do not do anything if the children lots are already used
+            if children_lots.filter(lot_status__in=(CarbureLot.ACCEPTED, CarbureLot.FROZEN)).count() > 0:
+                return ErrorResponse(400, CarbureError.CANCEL_ACCEPT_NOT_ALLOWED, lot.id)
+            else:
+                children_lots.delete()
+
+        # delete new stocks created when the lot was accepted
+        if lot.delivery_type == CarbureLot.STOCK:
+            children_stocks = CarbureStock.objects.filter(parent_lot=lot)
+            children_stocks_children_lots = CarbureLot.objects.filter(parent_stock__in=children_stocks).exclude(lot_status=CarbureLot.DELETED)
+            children_stocks_children_trans = CarbureStockTransformation.objects.filter(source_stock__in=children_stocks)
+            # do not do anything if the children stocks are already used
+            if children_stocks_children_lots.count() > 0 or children_stocks_children_trans.count() > 0:
+                return ErrorResponse(400, CarbureError.CANCEL_ACCEPT_NOT_ALLOWED, lot.carbure_id)
+            else:
+                children_stocks.delete()
+
+        lot.lot_status = CarbureLot.PENDING
+        lot.delivery_type = CarbureLot.UNKNOWN
+        lot.save()
+        event = CarbureLotEvent()
+        event.event_type = CarbureLotEvent.CANCELLED
+        event.lot = lot
+        event.user = request.user
+        event.save()
+    return SuccessResponse()

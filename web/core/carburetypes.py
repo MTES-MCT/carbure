@@ -17,4 +17,5 @@ class CarbureError:
     ACTIVATION_LINK_ERROR = "Could not send activation link" 
     ACTIVATION_LINK_INVALID_FORM = "Activation link invalid form"
     ACTIVATION_COULD_NOT_ACTIVATE_USER = "Could not activate user account"
+    CANCEL_ACCEPT_NOT_ALLOWED = "CANCEL_ACCEPT_NOT_ALLOWED"
     

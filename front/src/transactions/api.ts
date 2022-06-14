@@ -285,6 +285,6 @@ export function flushStocks(
   })
 }
 
-export function cancelAcceptLots(entity_id: number, selection: number[]) {
-  return api.post("/lots/cancel-accept", { entity_id, selection })
+export function cancelAcceptLots(entity_id: number, lot_ids: number[]) {
+  return api.post("/lots/cancel-accept", { entity_id, lot_ids })
 }
