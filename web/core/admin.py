@@ -13,6 +13,7 @@ from django.db.models import Sum
 
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
+from api.v4.helpers import get_prefetched_data
 from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, CarbureStockTransformation, Entity, EntityCertificate, ExternalAdminRights, GenericCertificate, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, UserRightsRequests
 from core.models import Depot, GenericError
 from core.models import SustainabilityDeclaration, EntityDepot
@@ -253,8 +254,9 @@ class CarbureLotAdmin(admin.ModelAdmin):
     regen_carbure_id.short_description = "Regénérer CarbureID"
 
     def recalc_score(self, request, queryset):
+        prefetched_data = get_prefetched_data()
         for lot in queryset:
-            lot.recalc_reliability_score()
+            lot.recalc_reliability_score(prefetched_data)
             lot.save()
     recalc_score.short_description = "Recalculer Note"
 
