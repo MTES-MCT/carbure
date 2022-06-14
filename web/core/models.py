@@ -40,6 +40,7 @@ class Entity(models.Model):
     hash = models.CharField(max_length=32, null=True, blank=True, default='')
     default_certificate = models.CharField(max_length=64, null=True, blank=True, default='')
     notifications_enabled = models.BooleanField(default=False)
+    preferred_unit = models.CharField(max_length=64, choices=(('l', 'litres'), ('kg', 'kg'), ('MJ', 'MJ')), default='l')
 
     def __str__(self):
         return self.name
