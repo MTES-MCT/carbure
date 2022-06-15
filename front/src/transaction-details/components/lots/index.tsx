@@ -32,6 +32,7 @@ import { useCategory } from "transactions/components/category"
 import { formatDate } from "common/utils/formatters"
 import Score from "../score"
 import Portal from "common/components/portal"
+import Flags from "flags.json"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -97,7 +98,9 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
     <Portal onClose={closeDialog}>
       <Dialog onClose={closeDialog}>
         <header>
-          {lotData && <Score big lot={lotData.lot} details={lotData.score} />}
+          {Flags.scoring && lotData && (
+            <Score big lot={lotData.lot} details={lotData.score} />
+          )}
           {lotData && <LotTag big lot={lotData.lot} />}
           <h1>
             {t("Lot")} #{lotData?.lot.carbure_id || lotData?.lot.id}
