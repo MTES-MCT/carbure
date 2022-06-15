@@ -14,6 +14,7 @@ import { isRedII } from "lot-add/components/ghg-fields"
 import useEntity from "carbure/hooks/entity"
 import { useState } from "react"
 import { UnitSelect } from "lot-add/components/lot-fields"
+import Flags from "flags.json"
 
 export const LotFields = () => {
   const { t } = useTranslation()
@@ -21,8 +22,10 @@ export const LotFields = () => {
 
   return (
     <Fieldset label={t("Stock")}>
-      <InitialQuantityField />
-      <RemainingQuantityField />
+      {!Flags.preferred_unit && <InitialVolumeField />}
+      {!Flags.preferred_unit && <RemainingVolumeField />}
+      {Flags.preferred_unit && <InitialQuantityField />}
+      {Flags.preferred_unit && <RemainingQuantityField />}
       <BiofuelField />
       <FeedstockField />
       <CountryOfOriginField />

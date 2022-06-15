@@ -14,6 +14,8 @@ import { FilterManager, ResetButton } from "../filters"
 import NoResult from "../no-result"
 import { useSummaryColumns } from "../lots/lot-summary"
 import useEntity from "carbure/hooks/entity"
+import Flags from "flags.json"
+import { compact } from "common/utils/collection"
 
 export interface StockSummaryBarProps extends Partial<FilterManager> {
   query: StockQuery
@@ -52,7 +54,7 @@ export const StockSummaryBar = ({
     MJ: "total_remaining_lhv_amount" as "total_remaining_lhv_amount",
   }
 
-  const unit = entity.preferred_unit ?? "l"
+  const unit = !Flags.preferred_unit ? "l" : entity.preferred_unit ?? "l"
   const field = unitToField[unit]
 
   return (
@@ -157,7 +159,7 @@ export const StockSummary = ({
     MJ: "remaining_lhv_amount_sum" as "remaining_lhv_amount_sum",
   }
 
-  const unit = entity.preferred_unit ?? "l"
+  const unit = !Flags.preferred_unit ? "l" : entity.preferred_unit ?? "l"
   const field = unitToField[unit]
 
   const stock = summaryData?.stock ?? []
@@ -186,13 +188,14 @@ export const StockSummary = ({
           <Table
             style={{ width: "max(50vw, 960px)" }}
             rows={stock}
-            columns={[
+            columns={compact([
               columns.supplier,
               columns.biofuel,
-              columns.remainingQuantity,
+              !Flags.preferred_unit && columns.remainingVolume,
+              Flags.preferred_unit && columns.remainingQuantity,
               columns.count,
               columns.ghgReduction,
-            ]}
+            ])}
           />
         </>
       )}

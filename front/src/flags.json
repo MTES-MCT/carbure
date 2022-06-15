@@ -1,3 +1,4 @@
 {
-  "scoring": false
+  "scoring": false,
+  "preferred_unit": false
 }

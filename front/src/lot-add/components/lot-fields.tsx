@@ -14,8 +14,8 @@ import * as norm from "carbure/utils/normalizers"
 import { LotFormValue } from "./lot-form"
 import { Biofuel, Country, Feedstock, Unit } from "carbure/types"
 import useEntity from "carbure/hooks/entity"
-import { urlToHttpOptions } from "url"
 import { Option } from "common/utils/normalize"
+import Flags from "flags.json"
 
 interface LotFieldsProps {
   readOnly?: boolean
@@ -26,8 +26,8 @@ export const LotFields = (props: LotFieldsProps) => {
   return (
     <Fieldset label={t("Lot")}>
       <TransportDocumentField {...props} />
-      {/* <VolumeField {...props} /> */}
-      <QuantityField {...props} />
+      {!Flags.preferred_unit && <VolumeField {...props} />}
+      {Flags.preferred_unit && <QuantityField {...props} />}
       <BiofuelField {...props} />
       <FeedstockField {...props} />
       <CountryOfOriginField {...props} />
