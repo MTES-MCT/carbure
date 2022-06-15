@@ -1157,9 +1157,6 @@ def recall_lot(request, *args, **kwargs):
     if not lot_ids:
         return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
 
-    # 2 USE CASES
-    ### 1: I have sent the lot and want to recall to drafts
-    ### 2: I have accepted the lot and want to send it back to Pending
     entity = Entity.objects.get(pk=entity_id)
     try:
         lots = CarbureLot.objects.filter(pk__in=lot_ids)
@@ -1171,29 +1168,28 @@ def recall_lot(request, *args, **kwargs):
 
         if lot.lot_status == CarbureLot.DRAFT:
             return JsonResponse({'status': 'error', 'message': 'Cannot recall DRAFT'}, status=400)
-        elif lot.lot_status == CarbureLot.PENDING and lot.carbure_supplier == entity:
+        elif lot.lot_status == CarbureLot.PENDING:
             # ok no problem
-            lot.correction_status = CarbureLot.NO_PROBLEMO
-            lot.lot_status = CarbureLot.DRAFT
-            lot.save()
+            pass
         elif lot.lot_status == CarbureLot.REJECTED:
             return JsonResponse({'status': 'error', 'message': 'Lot is already rejected. Recall has no effect'}, status=400)
-        elif lot.lot_status == CarbureLot.ACCEPTED and lot.carbure_client == entity:
-            # ok, send back to pending
-            lot.correction_status = CarbureLot.NO_PROBLEMO
-            lot.lot_status = CarbureLot.PENDING
-            lot.save()            
+        elif lot.lot_status == CarbureLot.ACCEPTED:
+            # ok but will send a notification to the client
+            notify_client = True
         elif lot.lot_status == CarbureLot.FROZEN:
             return JsonResponse({'status': 'error', 'message': 'Lot is Frozen. Cannot recall. Please invalidate declaration first.'}, status=400)
         elif lot.lot_status == CarbureLot.DELETED:
             return JsonResponse({'status': 'error', 'message': 'Lot is deleted. Cannot recall'}, status=400)
+
+        lot.correction_status = CarbureLot.IN_CORRECTION
+        lot.save()
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.RECALLED
         event.lot = lot
         event.user = request.user
         event.save()
-    #notify_lots_recalled(lots)
-    return SuccessResponse()
+    notify_lots_recalled(lots)
+    return JsonResponse({'status': 'success'})
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
