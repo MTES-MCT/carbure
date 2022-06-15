@@ -852,9 +852,10 @@ class CarbureLotEvent(models.Model):
     DECLCANCEL = "DECLCANCEL"
     DELETED = "DELETED"
     RESTORED = "RESTORED"
+    CANCELLED = "CANCELLED"
     EVENT_TYPES = ((CREATED, CREATED), (UPDATED, UPDATED), (VALIDATED, VALIDATED), (FIX_REQUESTED, FIX_REQUESTED), (MARKED_AS_FIXED, MARKED_AS_FIXED),
                     (FIX_ACCEPTED, FIX_ACCEPTED), (ACCEPTED, ACCEPTED), (REJECTED, REJECTED), (RECALLED, RECALLED), (DECLARED, DECLARED), (DELETED, DELETED), (DECLCANCEL, DECLCANCEL),
-                    (RESTORED, RESTORED),)
+                    (RESTORED, RESTORED),(CANCELLED, CANCELLED))
     event_type = models.CharField(max_length=32, null=False, blank=False, choices=EVENT_TYPES)
     event_dt = models.DateTimeField(auto_now_add=True, null=False, blank=False)
     lot = models.ForeignKey(CarbureLot, null=False, blank=False, on_delete=models.CASCADE)
