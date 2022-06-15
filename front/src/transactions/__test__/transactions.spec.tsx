@@ -11,6 +11,7 @@ import server from "./api"
 import { emptyLots, emptySnapshot, lots, snapshot } from "./data"
 import userEvent from "@testing-library/user-event"
 import { clickOnCheckboxesAndConfirm } from "./helpers"
+import Flags from "flags.json"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 beforeEach(() => {
@@ -85,7 +86,7 @@ test("display a list of 1 transaction", async () => {
   screen.getAllByText("Brouillon")
   screen.getByText("2020-01")
   screen.getByText("EMHV")
-  screen.getByText("12 345 litres")
+  screen.getByText(Flags.preferred_unit ? "12 345 litres" : "12 345 L")
   screen.getByText("Colza")
   screen.getByText("Producteur Test")
   screen.getByText("Test Production Site")

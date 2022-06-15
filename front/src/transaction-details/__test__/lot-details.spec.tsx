@@ -20,6 +20,7 @@ import {
   rejectedDetails,
   sentDetails,
 } from "./data"
+import Flags from "flags.json"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 beforeEach(() => Data.set("lot-details", lotDetails))
@@ -41,7 +42,7 @@ const LotDetailsWithRouter = ({ entity }: { entity: Entity }) => {
 
 function checkLotFields() {
   getField("N° document d'accompagnement")
-  getField("Quantité")
+  getField(Flags.preferred_unit ? "Quantité" : "Volume en litres")
   getField("Biocarburant")
   getField("Matière première")
   getField("Pays d'origine de la matière première")
@@ -126,7 +127,7 @@ test("edit transaction details", async () => {
   userEvent.clear(dae)
   userEvent.type(dae, "DAETEST")
 
-  const vol = getField("Quantité")
+  const vol = getField(Flags.preferred_unit ? "Quantité" : "Volume en litres")
   userEvent.clear(vol)
   userEvent.type(vol, "20000")
 
