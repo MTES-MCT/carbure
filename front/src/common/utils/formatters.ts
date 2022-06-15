@@ -101,5 +101,6 @@ export function variations(count: number) {
     if (count === 0) return labels.zero ?? "N/A"
     if (count === 1) return labels.one
     if (count > 1) return labels.many
+    else return ""
   }
 }
