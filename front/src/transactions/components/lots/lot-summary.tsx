@@ -370,7 +370,7 @@ export const QuantityCell = ({ item }: SummaryCellProps) => {
   const unit = entity.preferred_unit ?? "l"
   const field = unitToField[unit]
 
-  return <Cell text={`${formatNumber(item[field] ?? 0)} ${unit}`} />
+  return <Cell text={formatUnit(item[field] ?? 0, unit)} />
 }
 
 export const RemainingQuantityCell = ({ item }: SummaryCellProps) => {
@@ -385,7 +385,7 @@ export const RemainingQuantityCell = ({ item }: SummaryCellProps) => {
   const unit = entity.preferred_unit ?? "l"
   const field = unitToField[unit]
 
-  return <Cell text={`${formatNumber(item[field] ?? 0)} ${unit}`} />
+  return <Cell text={formatUnit(item[field] ?? 0, unit)} />
 }
 
 interface PreviewCellProps {
