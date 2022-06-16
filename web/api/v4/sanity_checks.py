@@ -6,6 +6,7 @@ import traceback
 from django import db
 from api.v4.helpers import get_prefetched_data
 from core.models import CarbureLot, CarbureLotReliabilityScore, GenericError, Entity
+from core.carburetypes import CarbureCertificatesErrors
 from ml.models import EECStats
 from django.db import transaction
 
@@ -167,6 +168,13 @@ def check_certificates(prefetched_data, lot, errors):
             c = prefetched_data['certificates'][cert]
             if c.valid_until < lot.delivery_date:
                  errors.append(generic_error(error='EXPIRED_SUPPLIER_CERT', lot=lot, display_to_recipient=True, field='supplier_certificate'))
+
+    if lot.carbure_supplier \
+        and lot.carbure_supplier.id in prefetched_data['entity_certificates'] \
+        and lot.supplier_certificate in prefetched_data['entity_certificates'][lot.carbure_supplier.id] \
+        and prefetched_data['entity_certificates'][lot.carbure_supplier.id][lot.supplier_certificate].rejected_by_admin:
+            errors.append(generic_error(error=CarbureCertificatesErrors.REJECTED_SUPPLIER_CERTIFICATE, lot=lot, is_blocking=True, field='supplier_certificate'))
+
 
     # DOUBLE COUNTING CERTIFICATES
     if lot.feedstock and lot.feedstock.is_double_compte:

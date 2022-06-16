@@ -18,3 +18,5 @@ class CarbureError:
     ACTIVATION_LINK_INVALID_FORM = "Activation link invalid form"
     ACTIVATION_COULD_NOT_ACTIVATE_USER = "Could not activate user account"
     
+class CarbureCertificatesErrors:
+    REJECTED_SUPPLIER_CERTIFICATE = "Your supplier certificate has been rejected by the DGEC"
