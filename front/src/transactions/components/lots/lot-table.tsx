@@ -23,6 +23,7 @@ import Score from "transaction-details/components/score"
 import { To } from "react-router-dom"
 import useEntity from "carbure/hooks/entity"
 import { compact } from "common/utils/collection"
+import Flags from "flags.json"
 
 export interface LotTableProps {
   loading: boolean
@@ -57,14 +58,15 @@ export const LotTable = memo(
         onOrder={onOrder}
         rowLink={rowLink}
         rows={lots}
-        columns={[
+        columns={compact([
           markerColumn<Lot>((lot) => getLotMarker(lot, errors)),
           selectionColumn(lots, selected, onSelect, (lot) => lot.id),
-          columns.score,
+          Flags.scoring && columns.score,
           columns.status,
           columns.period,
           columns.document,
-          columns.quantity,
+          !Flags.preferred_unit && columns.volume,
+          Flags.preferred_unit && columns.quantity,
           columns.feedstock,
           columns.supplier,
           columns.client,
@@ -72,7 +74,7 @@ export const LotTable = memo(
           columns.depot,
           columns.ghgReduction,
           columns.actions,
-        ]}
+        ])}
       />
     )
   }

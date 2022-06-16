@@ -3,6 +3,8 @@ import { Stock } from "transactions/types"
 import Table, { Order, selectionColumn } from "common/components/table"
 import { useStockColumns } from "transactions/components/stocks/stock-table"
 import { To } from "react-router-dom"
+import Flags from "flags.json"
+import { compact } from "common/utils/collection"
 
 export interface ControlStockTableProps {
   loading: boolean
@@ -32,18 +34,19 @@ export const ControlStockTable = memo(
         onOrder={onOrder}
         rowLink={rowLink}
         rows={stocks}
-        columns={[
+        columns={compact([
           selectionColumn(stocks, selected, onSelect, (s: Stock) => s.id),
           columns.status,
           columns.period,
-          columns.quantity,
+          !Flags.preferred_unit && columns.biofuel,
+          Flags.preferred_unit && columns.quantity,
           columns.feedstock,
           columns.supplier,
           columns.client,
           columns.productionSite,
           columns.depot,
           columns.ghgReduction,
-        ]}
+        ])}
       />
     )
   }
