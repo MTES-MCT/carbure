@@ -389,7 +389,7 @@ def init_declaration(entity, period, declarations):
 
 def get_admin_lots_by_status(entity, status, export=False):
     lots = CarbureLot.objects.select_related(
-        'carbure_producer', 'carbure_supplier', 'carbure_client', 'added_by',
+        'carbure_producer', 'carbure_supplier', 'carbure_client', 'added_by', 'carbure_vendor',
         'carbure_production_site', 'carbure_production_site__producer', 'carbure_production_site__country', 'production_country',
         'carbure_dispatch_site', 'carbure_dispatch_site__country', 'dispatch_site_country',
         'carbure_delivery_site', 'carbure_delivery_site__country', 'delivery_site_country',
