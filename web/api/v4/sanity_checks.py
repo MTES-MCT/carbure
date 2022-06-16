@@ -117,9 +117,9 @@ def check_ghg_values(prefetched_data, lot, errors):
         key = lot.feedstock.code + lot.country_of_origin.code_pays
         if key in eec:
             entry = eec[key]
-            if lot.eec < 0.8 * min(entry.average, entry.stddev):
+            if lot.eec < 0.8 * min(entry.default_value, entry.average):
                 errors.append(generic_error(error=CarbureMLGHGErrors.EEC_ANORMAL_LOW, lot=lot, display_to_creator=False))
-            if lot.eec > 1.2 * max(entry.average, entry.stddev):
+            if lot.eec > 1.2 * max(entry.default_value, entry.average):
                 errors.append(generic_error(error=CarbureMLGHGErrors.EEC_ANORMAL_HIGH, lot=lot, display_to_creator=False))
     if lot.feedstock and lot.biofuel:
         key = lot.feedstock.code + lot.biofuel.code
