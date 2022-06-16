@@ -36,7 +36,7 @@ class ProductionSite(models.Model):
         db_table = 'producer_sites'
         verbose_name = 'Site de Production'
         verbose_name_plural = 'Sites de Production'
-
+        ordering = ['name']
 
 class ProductionSiteInput(models.Model):
     INPUT_STATUS = (('Pending', 'En attente de validation'), ('Valid', 'Validé'))
