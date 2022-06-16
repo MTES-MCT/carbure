@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 import hashlib
 from django.db.models.signals import pre_delete, pre_save
 from django.dispatch import receiver
+from numpy import deprecate
 
 usermodel = get_user_model()
 
@@ -72,6 +73,7 @@ class Entity(models.Model):
         db_table = 'entities'
         verbose_name = 'Entity'
         verbose_name_plural = 'Entities'
+        ordering = ['name']
 
 
 
@@ -176,7 +178,7 @@ class Biocarburant(models.Model):
         db_table = 'biocarburants'
         verbose_name = 'Biocarburant'
         verbose_name_plural = 'Biocarburants'
-
+        ordering = ['name']
 
 class MatierePremiere(models.Model):
     CONV = 'CONV'
@@ -210,7 +212,7 @@ class MatierePremiere(models.Model):
         db_table = 'matieres_premieres'
         verbose_name = 'Matiere Premiere'
         verbose_name_plural = 'Matieres Premieres'
-
+        ordering = ['name']
 
 class Pays(models.Model):
     code_pays = models.CharField(max_length=64)
@@ -229,7 +231,7 @@ class Pays(models.Model):
         db_table = 'pays'
         verbose_name = 'Pays'
         verbose_name_plural = 'Pays'
-
+        ordering = ['name']
 
 class Depot(models.Model):
     EFS = 'EFS'
@@ -262,6 +264,7 @@ class Depot(models.Model):
         db_table = 'depots'
         verbose_name = 'Dépôt'
         verbose_name_plural = 'Dépôts'
+        ordering = ['name']
 
 class EntityDepot(models.Model):
     OWN = 'OWN'
