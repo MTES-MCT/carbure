@@ -63,6 +63,7 @@ export interface Lot {
   free_field: string
   added_by: Entity
   created_at: string
+  audit_status?: Conformity
   highlighted_by_admin?: boolean
   highlighted_by_auditor?: boolean
   data_reliability_score?: string
@@ -256,6 +257,7 @@ export enum Filter {
   LotStatus = "lot_status",
   CorrectionStatus = "correction_status",
   Scores = "scores",
+  Conformity = "conformity",
 }
 
 export type FilterSelection = Partial<Record<Filter, string[]>>
@@ -346,3 +348,5 @@ export interface Distance {
   error: string // PRODUCTION_SITE_NOT_IN_CARBURE, DELIVERY_SITE_NOT_IN_CARBURE, PRODUCTION_SITE_COORDINATES_NOT_IN_CARBURE, DELIVERY_SITE_COORDINATES_NOT_IN_CARBURE, API_ERROR
   source: null | "DB" | "API"
 }
+
+export type Conformity = "UNKNOWN" | "CONFORM" | "NONCONFORM"

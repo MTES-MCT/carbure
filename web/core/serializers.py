@@ -284,7 +284,7 @@ class CarbureLotAdminSerializer(CarbureLotPublicSerializer):
                   'transport_document_type', 'transport_document_reference', 'carbure_client', 'unknown_client',
                   'dispatch_date', 'carbure_dispatch_site', 'unknown_dispatch_site', 'dispatch_site_country',
                   'delivery_date', 'carbure_delivery_site', 'unknown_delivery_site', 'delivery_site_country', 'delivery_type',
-                  'lot_status', 'correction_status',
+                  'lot_status', 'correction_status', 'audit_status',
                   'volume', 'weight', 'lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
                   'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ghg_reference_red_ii', 'ghg_reduction_red_ii',
                   'free_field', 'added_by', 'created_at', 'highlighted_by_auditor', 'highlighted_by_admin', 'carbure_vendor', 'vendor_certificate', 'vendor_certificate_type', 'data_reliability_score',
