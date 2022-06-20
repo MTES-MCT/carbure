@@ -217,8 +217,9 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
     client_types = query.getlist('client_types', [])
     lot_status = query.getlist('lot_status', False)
     category = query.get('category', False)
-    scores = query.get('scores', [])
+    scores = query.getlist('scores', [])
     added_by = query.getlist('added_by', [])
+    conformity = query.getlist('conformity', [])
 
     # selection overrides all other filters
     if len(selection) > 0:
@@ -290,6 +291,9 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
 
     if len(added_by) > 0 and 'added_by' not in blacklist:
         lots = lots.filter(added_by__name__in=added_by)
+
+    if len(conformity) > 0 and 'conformity' not in blacklist:
+        lots = lots.filter(audit_status__in=conformity)
 
     if search and 'query' not in blacklist:
         lots = lots.filter(
