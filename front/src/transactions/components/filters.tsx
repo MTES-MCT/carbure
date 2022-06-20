@@ -43,6 +43,7 @@ export function Filters<T>({
     [Filter.LotStatus]: t("Statut"),
     [Filter.CorrectionStatus]: t("Corrections"),
     [Filter.Scores]: t("Score"),
+    [Filter.Conformity]: t("Conformité"),
   }
 
   return (
@@ -119,6 +120,7 @@ const filterNormalizers: FilterNormalizers = {
   [Filter.Depots]: norm.normalizeUnknownFilter,
   [Filter.Periods]: norm.normalizePeriodFilter,
   [Filter.CorrectionStatus]: norm.normalizeCorrectionFilter,
+  [Filter.Conformity]: norm.normalizeConformityFilter,
 }
 
 export function useFilterParams() {

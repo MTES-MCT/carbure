@@ -1,6 +1,11 @@
 import i18next from "i18next"
 import { Normalizer } from "common/utils/normalize"
-import { CorrectionStatus, DeliveryType, LotStatus } from "transactions/types"
+import {
+  Conformity,
+  CorrectionStatus,
+  DeliveryType,
+  LotStatus,
+} from "transactions/types"
 import {
   Entity,
   EntityType,
@@ -162,6 +167,12 @@ export const normalizeCorrectionFilter: Normalizer<CorrectionStatus> = (correcti
   label: getCorrectionLabel(correction)
 })
 
+// prettier-ignore
+export const normalizeConformityFilter: Normalizer<Conformity> = (conformity) => ({
+  value: conformity,
+  label: getConformityLabel(conformity)
+})
+
 export function getEntityTypeLabel(type: EntityType) {
   switch (type) {
     case EntityType.Administration:
@@ -249,6 +260,17 @@ export function getCorrectionLabel(correction: CorrectionStatus) {
       return i18next.t("En correction")
     case CorrectionStatus.Fixed:
       return i18next.t("Corrigé")
+  }
+}
+
+export function getConformityLabel(conformity: Conformity) {
+  switch (conformity) {
+    case "UNKNOWN":
+      return i18next.t("Indéterminée")
+    case "CONFORM":
+      return i18next.t("Conforme")
+    case "NONCONFORM":
+      return i18next.t("Non conforme")
   }
 }
 

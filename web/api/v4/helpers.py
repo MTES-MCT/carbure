@@ -437,6 +437,10 @@ def get_lots_filters_data(lots, query, entity, field):
         corrections = lots.values_list('correction_status', flat=True).distinct()
         return prepare_filters(corrections)
 
+    if field == 'conformity':
+        conformities = lots.values_list('audit_status', flat=True).distinct()
+        return prepare_filters(conformities)
+
 
 def get_stock_filters_data(stock, query, field):
     stock = filter_stock(stock, query, blacklist=[field])
@@ -725,7 +729,7 @@ def send_email_declaration_invalidated(declaration):
 
 def get_lots_summary_data(lots, entity, short=False):
     data = {
-        'count': lots.count(), 
+        'count': lots.count(),
         'total_volume': lots.aggregate(Sum('volume'))['volume__sum'] or 0,
         'total_weight': lots.aggregate(Sum('weight'))['weight__sum'] or 0,
         'total_lhv_amount': lots.aggregate(Sum('lhv_amount'))['lhv_amount__sum'] or 0
@@ -877,8 +881,8 @@ def get_prefetched_data(entity=None):
         d['my_production_sites'] = {ps.name.upper(): ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').filter(producer=entity)}
         # get all my linked certificates
         d['my_vendor_certificates'] = [c.certificate.certificate_id for c in EntityCertificate.objects.filter(entity=entity)]
-    
-    
+
+
     # MAPPING OF ENTITIES AND DELIVERY SITES
     # dict {'entity1': [depot1, depot2],
     #       'entity2': [depot42],
@@ -920,7 +924,7 @@ def get_prefetched_data(entity=None):
     d['etd'] = {s.feedstock: s.default_value for s in ETDStats.objects.select_related('feedstock').all()}
     d['eec'] = {s.feedstock.code + s.origin.code_pays: s for s in EECStats.objects.select_related('feedstock', 'origin').all()}
     d['ep'] = {s.feedstock.code + s.biofuel.code: s for s in EPStats.objects.select_related('feedstock', 'biofuel').all()}
-    
+
     d['checked_certificates'] = {} # used as cache in CarbureLot model - recalc reliability score
     return d
 

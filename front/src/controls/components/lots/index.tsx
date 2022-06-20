@@ -158,6 +158,7 @@ const ADMIN_FILTERS = [
   Filter.DeliverySites,
   Filter.AddedBy,
   Filter.Errors,
+  Filter.Conformity,
   Filter.Scores,
 ]
 
