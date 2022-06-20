@@ -2,7 +2,11 @@ import { useTranslation } from "react-i18next"
 import { Tag, TagProps, TagVariant } from "common/components/tag"
 import { Lot, LotStatus, CorrectionStatus, DeliveryType } from "../../types"
 import useEntity from "carbure/hooks/entity"
-import { AlertTriangle, CheckCircle } from "common/components/icons"
+import {
+  AlertTriangle,
+  Certificate,
+  CheckCircle,
+} from "common/components/icons"
 
 export interface LotTagProps extends TagProps {
   lot: Lot
@@ -70,20 +74,17 @@ export const LotTag = ({ lot, ...props }: LotTagProps) => {
 
   return (
     <Tag {...props} variant={variant}>
+      {lot.lot_status === LotStatus.Frozen && (
+        <Certificate title={t("Lot déclaré")} />
+      )}
+
       {label}
+
       {lot.audit_status === "NONCONFORM" && (
-        <AlertTriangle
-          color="var(--red-dark)"
-          style={{ marginTop: 4 }}
-          title={t("Non conforme")}
-        />
+        <AlertTriangle color="var(--red-dark)" title={t("Non conforme")} />
       )}
       {lot.audit_status === "CONFORM" && (
-        <CheckCircle
-          color="var(--green-dark)"
-          style={{ marginTop: 4 }}
-          title={t("Conforme")}
-        />
+        <CheckCircle color="var(--green-dark)" title={t("Conforme")} />
       )}
     </Tag>
   )
