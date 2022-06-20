@@ -151,6 +151,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-s);
+  white-space: nowrap;
 }
 
 .external:hover {
