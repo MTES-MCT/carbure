@@ -171,6 +171,7 @@ export enum NotificationType {
   CertificateExpired = "CERTIFICATE_EXPIRED",
   DeclarationValidated = "DECLARATION_VALIDATED",
   DeclarationCancelled = "DECLARATION_CANCELLED",
+  DeclarationReminder = "DECLARATION_REMINDER",
 }
 
 export enum DepotType {

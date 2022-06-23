@@ -8,6 +8,7 @@ import {
   useParams,
   useLocation,
 } from "react-router-dom"
+import HashRoute from "common/components/hash-route"
 import { UserRole } from "carbure/types"
 import useEntity from "carbure/hooks/entity"
 import { useQuery } from "common/hooks/async"
@@ -15,7 +16,7 @@ import * as api from "./api"
 import { Main } from "common/components/scaffold"
 import Select from "common/components/select"
 import { StatusTabs } from "./components/status"
-import { DeclarationButton } from "./actions/declaration"
+import { DeclarationButton, DeclarationDialog } from "./actions/declaration"
 import { ImportArea } from "./actions/import"
 import Lots from "./components/lots"
 import Stocks from "./components/stocks"
@@ -55,7 +56,7 @@ export const Transactions = () => {
             />
 
             {entity.hasRights(UserRole.Admin, UserRole.ReadWrite) && (
-              <DeclarationButton year={years.selected} years={years.options} />
+              <DeclarationButton />
             )}
           </section>
 
@@ -78,6 +79,8 @@ export const Transactions = () => {
           />
           <Route path="*" element={<Lots {...props} />} />
         </Routes>
+
+        <HashRoute path="#declarations/*" element={<DeclarationDialog />} />
       </Main>
     </ImportArea>
   )

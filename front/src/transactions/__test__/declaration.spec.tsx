@@ -8,13 +8,8 @@ import server from "./api"
 import userEvent from "@testing-library/user-event"
 
 const DeclarationSummary = () => (
-  <TestRoot url="/">
-    <Route
-      path="/"
-      element={
-        <DeclarationDialog year={2021} years={[2021]} onClose={() => {}} />
-      }
-    />
+  <TestRoot url="/#declarations">
+    <Route path="/" element={<DeclarationDialog />} />
   </TestRoot>
 )
 

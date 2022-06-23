@@ -1,12 +1,13 @@
 import { useMemo, useState } from "react"
 import i18next from "i18next"
 import { Trans, useTranslation } from "react-i18next"
+import { useNavigate } from "react-router-dom"
 import { DeclarationSummary, LotQuery } from "../types"
 import { Normalizer } from "common/utils/normalize"
 import useEntity from "carbure/hooks/entity"
 import { useNotify } from "common/components/notifications"
 import { useMutation, useQuery } from "common/hooks/async"
-import { usePortal } from "common/components/portal"
+import Portal from "common/components/portal"
 import * as api from "../api"
 import Button from "common/components/button"
 import Dialog from "common/components/dialog"
@@ -26,52 +27,52 @@ import {
 import { Entity } from "carbure/types"
 import { Row } from "common/components/scaffold"
 import { useMatomo } from "matomo"
+import { useHashMatch } from "common/components/hash-route"
 
-export interface DeclarationButtonProps {
-  year: number
-  years: number[]
-}
-
-export const DeclarationButton = ({ year, years }: DeclarationButtonProps) => {
+export const DeclarationButton = () => {
   const { t } = useTranslation()
-  const portal = usePortal()
   return (
     <Button
       asideX
       variant="primary"
       icon={Certificate}
       label={t("Valider ma déclaration")}
-      action={() =>
-        portal((close) => (
-          <DeclarationDialog year={year} years={years} onClose={close} />
-        ))
-      }
+      to="#declarations"
     />
   )
 }
 
 export interface DeclarationDialogProps {
-  year: number
   years: number[]
-  onClose: () => void
 }
 
 const now = new Date()
-const currentMonth = now.getMonth()
-const currentYear = now.getFullYear()
+const currentPeriod = now.getFullYear() * 100 + now.getMonth() + 1 // add 1 so we're not 0 based for the months
 
-export const DeclarationDialog = ({
-  year: initialYear,
-  years,
-  onClose,
-}: DeclarationDialogProps) => {
+export const DeclarationDialog = () => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const notify = useNotify()
+
   const matomo = useMatomo()
   const entity = useEntity()
 
+  const years = useQuery(api.getYears, {
+    key: "years",
+    params: [entity.id],
+  })
+
+  const match = useHashMatch("#declarations/:period")
+
+  const initialPeriod = match?.params.period
+    ? parseInt(match.params.period)
+    : currentPeriod
+
+  const initialMonth = initialPeriod % 100
+  const initialYear = Math.floor(initialPeriod / 100)
+
   const [timeline, setTimeline] = useState({
-    month: currentMonth,
+    month: initialMonth,
     year: initialYear,
   })
 
@@ -108,11 +109,10 @@ export const DeclarationDialog = ({
     },
   })
 
+  const yearsData = years.result?.data.data ?? [initialYear]
   const declarationsData = declarations.result?.data.data ?? []
-  const declaration = declarationsData[timeline.month] as
-    | DeclarationSummary
-    | undefined
-  const period = timeline.year * 100 + timeline.month + 1
+  const declaration = declarationsData[timeline.month] as DeclarationSummary | undefined // prettier-ignore
+  const period = timeline.year * 100 + timeline.month
 
   // generate a special query to get the summary for this declaration
   const query = useDeclarationQuery({
@@ -122,16 +122,16 @@ export const DeclarationDialog = ({
   })
 
   function prev() {
-    if (timeline.month === 0) {
-      setTimeline({ year: timeline.year - 1, month: 11 })
+    if (timeline.month === 1) {
+      setTimeline({ year: timeline.year - 1, month: 12 })
     } else {
       setTimeline({ ...timeline, month: timeline.month - 1 })
     }
   }
 
   function next() {
-    if (timeline.month === 11) {
-      setTimeline({ year: timeline.year + 1, month: 0 })
+    if (timeline.month === 12) {
+      setTimeline({ year: timeline.year + 1, month: 1 })
     } else {
       setTimeline({ ...timeline, month: timeline.month + 1 })
     }
@@ -139,101 +139,107 @@ export const DeclarationDialog = ({
 
   const hasPending = declaration ? declaration.pending > 0 : false
 
-  const hasPrev = timeline.month > 0 || years.includes(timeline.year - 1)
-  const hasNext = timeline.month < 11 || years.includes(timeline.year + 1)
+  const hasPrev = timeline.month > 1 || yearsData.includes(timeline.year - 1)
+  const hasNext = timeline.month < 12 || yearsData.includes(timeline.year + 1)
+
+  function onClose() {
+    navigate("#")
+  }
 
   return (
-    <Dialog style={{ width: "max(50vw, 960px)" }} onClose={onClose}>
-      <header>
-        <h1>{t("Déclaration de durabilité")}</h1>
-      </header>
+    <Portal>
+      <Dialog style={{ width: "max(50vw, 960px)" }} onClose={onClose}>
+        <header>
+          <h1>{t("Déclaration de durabilité")}</h1>
+        </header>
 
-      <main>
-        <section>
-          <p>
-            {t(
-              "Les tableaux suivants vous montrent un récapitulatif de vos entrées et sorties pour la période sélectionnée."
-            )}
-          </p>
-          <p>
-            {t(
-              "Afin d'être comptabilisés, les brouillons que vous avez créé pour cette période devront être envoyés avant la fin du mois suivant ladite période. Une fois la totalité de ces lots validée, vous pourrez vérifier ici l'état global de vos transactions et finalement procéder à la déclaration."
-            )}
-          </p>
-        </section>
-        <section>
-          <Row style={{ gap: "var(--spacing-s)" }}>
-            <Button disabled={!hasPrev} icon={ChevronLeft} action={prev} />
-            <Select
-              placeholder={t("Choisissez une année")}
-              value={timeline.year}
-              onChange={(year = currentYear) => setTimeline({ ...timeline, year })} // prettier-ignore
-              options={years}
-              sort={(v) => -v.value}
-              style={{ flex: 1 }}
-            />
-            <Select
-              loading={declarations.loading}
-              placeholder={t("Choisissez un mois")}
-              value={timeline.month}
-              onChange={(month = currentMonth) => setTimeline({ ...timeline, month })} // prettier-ignore
-              options={declarationsData}
-              normalize={normalizeDeclaration}
-              style={{ flex: 2 }}
-            />
-            <Button disabled={!hasNext} icon={ChevronRight} action={next} />
-          </Row>
-        </section>
-        {declaration && <LotSummary pending query={query} />}
-      </main>
-      <footer>
-        {declaration?.declaration?.declared ? (
-          <Button
-            icon={Cross}
-            loading={invalidateDeclaration.loading}
-            variant="warning"
-            label={t("Annuler la déclaration")}
-            action={() => {
-              matomo.push([
-                "trackEvent",
-                "declarations",
-                "invalidate-declaration",
-                declaration?.period,
-              ])
-              invalidateDeclaration.execute(entity.id, period)
-            }}
-          />
-        ) : (
-          <Button
-            disabled={hasPending}
-            loading={validateDeclaration.loading}
-            variant="primary"
-            icon={Check}
-            label={t("Valider la déclaration")}
-            action={() => {
-              matomo.push([
-                "trackEvent",
-                "declarations",
-                "validate-declaration",
-                declaration?.period,
-              ])
-              validateDeclaration.execute(entity.id, period)
-            }}
-          />
-        )}
-        {declaration && declaration.pending > 0 && (
-          <Alert variant="warning" icon={AlertCircle}>
+        <main>
+          <section>
             <p>
-              <Trans count={declaration.pending}>
-                Encore <b>{{ count: declaration.pending }} lots</b> en attente
-                de validation
-              </Trans>
+              {t(
+                "Les tableaux suivants vous montrent un récapitulatif de vos entrées et sorties pour la période sélectionnée."
+              )}
             </p>
-          </Alert>
-        )}
-        <Button asideX icon={Return} label={t("Retour")} action={onClose} />
-      </footer>
-    </Dialog>
+            <p>
+              {t(
+                "Afin d'être comptabilisés, les brouillons que vous avez créé pour cette période devront être envoyés avant la fin du mois suivant ladite période. Une fois la totalité de ces lots validée, vous pourrez vérifier ici l'état global de vos transactions et finalement procéder à la déclaration."
+              )}
+            </p>
+          </section>
+          <section>
+            <Row style={{ gap: "var(--spacing-s)" }}>
+              <Button disabled={!hasPrev} icon={ChevronLeft} action={prev} />
+              <Select
+                placeholder={t("Choisissez une année")}
+                value={timeline.year}
+                onChange={(year = initialYear) => setTimeline({ ...timeline, year })} // prettier-ignore
+                options={yearsData}
+                sort={(v) => -v.value}
+                style={{ flex: 1 }}
+              />
+              <Select
+                loading={declarations.loading}
+                placeholder={t("Choisissez un mois")}
+                value={timeline.month}
+                onChange={(month = initialMonth) => setTimeline({ ...timeline, month })} // prettier-ignore
+                options={declarationsData}
+                normalize={normalizeDeclaration}
+                style={{ flex: 2 }}
+              />
+              <Button disabled={!hasNext} icon={ChevronRight} action={next} />
+            </Row>
+          </section>
+          {declaration && <LotSummary pending query={query} />}
+        </main>
+        <footer>
+          {declaration?.declaration?.declared ? (
+            <Button
+              icon={Cross}
+              loading={invalidateDeclaration.loading}
+              variant="warning"
+              label={t("Annuler la déclaration")}
+              action={() => {
+                matomo.push([
+                  "trackEvent",
+                  "declarations",
+                  "invalidate-declaration",
+                  declaration?.period,
+                ])
+                invalidateDeclaration.execute(entity.id, period)
+              }}
+            />
+          ) : (
+            <Button
+              disabled={hasPending}
+              loading={validateDeclaration.loading}
+              variant="primary"
+              icon={Check}
+              label={t("Valider la déclaration")}
+              action={() => {
+                matomo.push([
+                  "trackEvent",
+                  "declarations",
+                  "validate-declaration",
+                  declaration?.period,
+                ])
+                validateDeclaration.execute(entity.id, period)
+              }}
+            />
+          )}
+          {declaration && declaration.pending > 0 && (
+            <Alert variant="warning" icon={AlertCircle}>
+              <p>
+                <Trans count={declaration.pending}>
+                  Encore <b>{{ count: declaration.pending }} lots</b> en attente
+                  de validation
+                </Trans>
+              </p>
+            </Alert>
+          )}
+          <Button asideX icon={Return} label={t("Retour")} action={onClose} />
+        </footer>
+      </Dialog>
+    </Portal>
   )
 }
 
@@ -259,7 +265,7 @@ function useDeclarationQuery({ entity, year, period }: DeclarationQueryState) {
 const normalizeDeclaration: Normalizer<DeclarationSummary, number> = (
   declaration
 ) => {
-  const month = (declaration.period % 100) - 1
+  const month = declaration.period % 100
   const date = formatPeriod(declaration.period) + "-01"
   const localized = formatDate(date, { day: undefined, year: undefined, month: 'long' }) // prettier-ignore
   const extra = i18next.t("{{count}} lots", { count: declaration.lots })
