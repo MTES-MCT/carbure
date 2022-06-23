@@ -196,6 +196,12 @@ function getNotificationText(notif: Notification) {
         period: formatPeriod(notif.meta?.period ?? 0),
       })
 
+    case NotificationType.DeclarationReminder:
+      return t(
+        "La période {{period}} arrive à sa fin, pensez à valider votre déclaration.",
+        { period: formatPeriod(notif.meta?.period ?? 0) }
+      )
+
     default:
       return ""
   }
@@ -220,6 +226,9 @@ function getNotificationLink(notif: Notification) {
 
     case NotificationType.CertificateExpired:
       return `/org/${notif.dest.id}/settings#certificates`
+
+    case NotificationType.DeclarationReminder:
+      return `#declarations/${notif.meta?.period}`
 
     default:
       return "#"

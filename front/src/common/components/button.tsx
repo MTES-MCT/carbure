@@ -44,9 +44,6 @@ export function Button<T>({
   autoFocus,
   disabled,
   loading,
-  asideX,
-  asideY,
-  spread,
   captive,
   variant,
   label,
@@ -58,6 +55,7 @@ export function Button<T>({
   to,
   center,
   action,
+  ...props
 }: ButtonProps<T>) {
   const icon = typeof Icon === "function" ? <Icon /> : Icon
   const hasIconAndText = Boolean(Icon) && Boolean(label || children)
@@ -65,10 +63,10 @@ export function Button<T>({
   const content = label ?? children
 
   return (
-    <LinkWrapper href={href} to={to}>
+    <LinkWrapper href={href} to={to} {...props}>
       <button
         ref={domRef}
-        {...layout({ asideX, asideY, spread })}
+        {...layout(props)}
         autoFocus={autoFocus}
         data-captive={captive ? true : undefined}
         tabIndex={tabIndex}
@@ -98,22 +96,22 @@ export function Button<T>({
   )
 }
 
-interface LinkWrapperProps {
+interface LinkWrapperProps extends Layout {
   href?: string
   to?: string
   children: React.ReactNode
 }
 
-const LinkWrapper = ({ href, to, children }: LinkWrapperProps) => {
+const LinkWrapper = ({ href, to, children, ...props }: LinkWrapperProps) => {
   if (href) {
     return (
-      <a href={href} className={css.wrapper}>
+      <a href={href} className={css.wrapper} {...layout(props)}>
         {children}
       </a>
     )
   } else if (to) {
     return (
-      <Link to={to} className={css.wrapper}>
+      <Link to={to} className={css.wrapper} {...layout(props)}>
         {children}
       </Link>
     )

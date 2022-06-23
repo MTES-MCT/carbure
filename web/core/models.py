@@ -613,8 +613,8 @@ class CarbureLot(models.Model):
             config.score = 1
 
         # certificates
-        certificates = CarbureLotReliabilityScore(lot=self, item=CarbureLotReliabilityScore.ANOMALIES_CERTIFICATES, max_score=1, score=0, 
-        meta={'producer_certificate_provided': False, 'producer_certificate_exists': False, 
+        certificates = CarbureLotReliabilityScore(lot=self, item=CarbureLotReliabilityScore.ANOMALIES_CERTIFICATES, max_score=1, score=0,
+        meta={'producer_certificate_provided': False, 'producer_certificate_exists': False,
             'supplier_certificate_provided': False, 'supplier_certificate_exists':False})
         # certificates are provided
         if self.production_site_certificate:
@@ -641,7 +641,7 @@ class CarbureLot(models.Model):
 
         if certificates.meta['producer_certificate_provided'] and certificates.meta['producer_certificate_exists'] and certificates.meta['supplier_certificate_provided'] and certificates.meta['supplier_certificate_exists']:
             certificates.score = 1
-        
+
         score_entries = [data_source_is_producer, lot_declared_both, certificates_validated, config, certificates]
         nb_points = sum([s.score for s in score_entries])
         if nb_points == 8:
@@ -665,7 +665,7 @@ class CarbureLotReliabilityScore(models.Model):
     ANOMALIES_CERTIFICATES = "ANOMALIES_CERTIFICATES" # 0, 1 --- META
     ANOMALIES_CONFIGURATION = "ANOMALIES_CONFIGURATION" # 0, 1 ---META
 
-    SCORE_ITEMS = ((CUSTOMS_AND_CARBURE_MATCH, CUSTOMS_AND_CARBURE_MATCH), (DATA_SOURCE_IS_PRODUCER, DATA_SOURCE_IS_PRODUCER), (LOT_DECLARED, LOT_DECLARED), 
+    SCORE_ITEMS = ((CUSTOMS_AND_CARBURE_MATCH, CUSTOMS_AND_CARBURE_MATCH), (DATA_SOURCE_IS_PRODUCER, DATA_SOURCE_IS_PRODUCER), (LOT_DECLARED, LOT_DECLARED),
                     (ANOMALIES_CERTIFICATES, ANOMALIES_CERTIFICATES), (ANOMALIES_CONFIGURATION, ANOMALIES_CONFIGURATION))
 
     lot = models.ForeignKey(CarbureLot, blank=False, null=False, on_delete=models.CASCADE)
@@ -744,7 +744,7 @@ def delete_lot(sender, instance, using, **kwargs):
         # this lot was a split from a stock
         instance.parent_stock.remaining_volume = round(instance.parent_stock.remaining_volume + instance.volume, 2)
         instance.parent_stock.remaining_weight = instance.parent_stock.get_weight()
-        instance.parent_stock.remaining_lhv_amount = instance.parent_stock.get_lhv_amount()        
+        instance.parent_stock.remaining_lhv_amount = instance.parent_stock.get_lhv_amount()
         instance.parent_stock.save()
         # save event
         event = CarbureStockEvent()
@@ -977,8 +977,9 @@ class CarbureNotification(models.Model):
     CERTIFICATE_EXPIRED = "CERTIFICATE_EXPIRED"
     DECLARATION_VALIDATED = "DECLARATION_VALIDATED"
     DECLARATION_CANCELLED = "DECLARATION_CANCELLED"
+    DECLARATION_REMINDER = "DECLARATION_REMINDER"
 
-    NOTIFICATION_TYPES = [(CORRECTION_REQUEST, CORRECTION_REQUEST), (CORRECTION_DONE, CORRECTION_DONE), (LOTS_REJECTED, LOTS_REJECTED), (LOTS_RECEIVED, LOTS_RECEIVED), (LOTS_RECALLED, LOTS_RECALLED), (CERTIFICATE_EXPIRED, CERTIFICATE_EXPIRED), (DECLARATION_VALIDATED, DECLARATION_VALIDATED), (DECLARATION_CANCELLED, DECLARATION_CANCELLED)]
+    NOTIFICATION_TYPES = [(CORRECTION_REQUEST, CORRECTION_REQUEST), (CORRECTION_DONE, CORRECTION_DONE), (LOTS_REJECTED, LOTS_REJECTED), (LOTS_RECEIVED, LOTS_RECEIVED), (LOTS_RECALLED, LOTS_RECALLED), (CERTIFICATE_EXPIRED, CERTIFICATE_EXPIRED), (DECLARATION_VALIDATED, DECLARATION_VALIDATED), (DECLARATION_CANCELLED, DECLARATION_CANCELLED), (DECLARATION_REMINDER, DECLARATION_REMINDER)]
 
     dest = models.ForeignKey(Entity, blank=False, null=False, on_delete=models.CASCADE)
     datetime = models.DateTimeField(null=False, blank=False, auto_now_add=True)
