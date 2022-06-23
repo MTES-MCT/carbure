@@ -111,7 +111,7 @@ export const DeclarationDialog = () => {
 
   const yearsData = years.result?.data.data ?? [initialYear]
   const declarationsData = declarations.result?.data.data ?? []
-  const declaration = declarationsData[timeline.month] as DeclarationSummary | undefined // prettier-ignore
+  const declaration = declarationsData[timeline.month - 1] as DeclarationSummary | undefined // prettier-ignore
   const period = timeline.year * 100 + timeline.month
 
   // generate a special query to get the summary for this declaration
@@ -180,8 +180,8 @@ export const DeclarationDialog = () => {
               <Select
                 loading={declarations.loading}
                 placeholder={t("Choisissez un mois")}
-                value={timeline.month}
-                onChange={(month = initialMonth) => setTimeline({ ...timeline, month })} // prettier-ignore
+                value={period}
+                onChange={(period = initialPeriod) => setTimeline({ ...timeline, month: period % 100 })} // prettier-ignore
                 options={declarationsData}
                 normalize={normalizeDeclaration}
                 style={{ flex: 2 }}
@@ -265,10 +265,13 @@ function useDeclarationQuery({ entity, year, period }: DeclarationQueryState) {
 const normalizeDeclaration: Normalizer<DeclarationSummary, number> = (
   declaration
 ) => {
-  const month = declaration.period % 100
   const date = formatPeriod(declaration.period) + "-01"
   const localized = formatDate(date, { day: undefined, year: undefined, month: 'long' }) // prettier-ignore
   const extra = i18next.t("{{count}} lots", { count: declaration.lots })
   const ok = declaration.declaration?.declared ? " ✔" : ""
-  return { value: month, label: `${capitalize(localized)} : ${extra}${ok}` }
+
+  return {
+    value: declaration.period,
+    label: `${capitalize(localized)} : ${extra}${ok}`,
+  }
 }

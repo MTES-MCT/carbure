@@ -406,9 +406,9 @@ export const PreviewCell = ({ status, item, query }: PreviewCellProps) => {
   }
 
   if (status === "in") {
-    filters.suppliers = [item.supplier]
+    filters.suppliers = [item.supplier ?? "UNKNOWN"]
   } else {
-    filters.clients = [item.client]
+    filters.clients = [item.client ?? "UNKNOWN"]
   }
 
   return (
