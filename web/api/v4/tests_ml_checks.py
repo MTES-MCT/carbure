@@ -2,6 +2,7 @@ import datetime
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.db.models import Count
 
 from core.models import CarbureLot, GenericError, MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot, UserRights
 from django_otp.plugins.otp_email.models import EmailDevice
@@ -12,7 +13,7 @@ class LotGHGTest(TestCase):
     fixtures = [
         'json/biofuels.json',
         'json/feedstock.json',
-        'json/countries.json',        
+        'json/countries.json',
         'json/entities.json',
         'json/productionsites.json',
         'json/depots.json',
@@ -27,7 +28,7 @@ class LotGHGTest(TestCase):
         loggedin = self.client.login(username=self.user1.email, password=self.password)
         self.assertTrue(loggedin)
 
-        self.producer = Entity.objects.filter(entity_type=Entity.PRODUCER)[0]
+        self.producer = Entity.objects.filter(entity_type=Entity.PRODUCER).annotate(psites=Count('productionsite')).filter(psites__gt=0)[0]
         UserRights.objects.update_or_create(entity=self.producer, user=self.user1, role=UserRights.RW)
 
         # pass otp verification
@@ -44,7 +45,7 @@ class LotGHGTest(TestCase):
         response = self.client.post(reverse('api-v4-add-lots'), lot)
         self.assertEqual(response.status_code, 200)
         data = response.json()['data']
-        lot_id = data['id']        
+        lot_id = data['id']
         lot = CarbureLot.objects.get(id=lot_id)
         return lot
 
@@ -80,7 +81,7 @@ class LotGHGTest(TestCase):
         nb_errors = GenericError.objects.filter(lot_id=lot.id, error="EP_ANORMAL_HIGH").count()
         self.assertEqual(nb_errors, 1)
 
-    
+
     def test_etd_too_high(self):
         lot = self.create_draft(biofuel_code='ETH', feedstock_code='BETTERAVE', etd=5.1)
         lot = self.send_lot(lot)
@@ -100,4 +101,4 @@ class LotGHGTest(TestCase):
         lot = self.send_lot(lot)
         nb_errors = GenericError.objects.filter(lot_id=lot.id, error="ETD_NO_EU_TOO_LOW").count()
         self.assertEqual(nb_errors, 1)
-        
+

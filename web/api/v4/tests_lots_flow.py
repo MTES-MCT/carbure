@@ -1,6 +1,7 @@
 import datetime
 from django.test import TestCase
 from django.urls import reverse
+from django.db.models import Count
 from django.contrib.auth import get_user_model
 
 from core.models import CarbureLot, CarbureStock, MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot, UserRights
@@ -28,7 +29,7 @@ class LotsFlowTest(TestCase):
         loggedin = self.client.login(username=self.user1.email, password=self.password)
         self.assertTrue(loggedin)
 
-        self.producer = Entity.objects.filter(entity_type=Entity.PRODUCER)[0]
+        self.producer = Entity.objects.filter(entity_type=Entity.PRODUCER).annotate(psites=Count('productionsite')).filter(psites__gt=0)[0]
         self.trader = Entity.objects.filter(entity_type=Entity.TRADER)[0]
         self.trader.default_certificate = "TRADER_CERTIFICATE"
         self.trader.save()
@@ -51,7 +52,7 @@ class LotsFlowTest(TestCase):
         response = self.client.post(reverse('api-v4-add-lots'), lot)
         self.assertEqual(response.status_code, 200)
         data = response.json()['data']
-        lot_id = data['id']        
+        lot_id = data['id']
         lot = CarbureLot.objects.get(id=lot_id)
         return lot
 
@@ -101,7 +102,7 @@ class LotsFlowTest(TestCase):
         lot = self.create_draft()
         lot = self.send_lot(lot)
         self.assertEqual(lot.lot_status, CarbureLot.PENDING)
-        
+
     def test_accept_in_stock(self):
         lot = self.create_draft(carbure_client_id=self.trader.id)
         lot = self.send_lot(lot)
@@ -113,13 +114,13 @@ class LotsFlowTest(TestCase):
         self.assertEqual(lot.delivery_type, CarbureLot.STOCK)
         stock = CarbureStock.objects.filter(parent_lot=lot).count()
         self.assertEqual(stock, 1)
-        
+
 
     def test_accept_rfc(self):
         lot = self.create_draft(carbure_client_id=self.operator.id)
         lot = self.send_lot(lot)
         self.assertEqual(lot.lot_status, CarbureLot.PENDING)
-        self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)    
+        self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
         response = self.client.post(reverse('api-v4-accept-rfc'), {'entity_id': self.operator.id, 'selection': [lot.id]})
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)
@@ -130,8 +131,8 @@ class LotsFlowTest(TestCase):
         lot = self.create_draft(unknown_client="CLIENT MAC", delivery_type='RFC', carbure_client_id='')
         lot = self.send_lot(lot)
         self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)
-        self.assertEqual(lot.delivery_type, CarbureLot.RFC)    
-        
+        self.assertEqual(lot.delivery_type, CarbureLot.RFC)
+
     def test_accept_trading_to_carbure_client(self):
         lot = self.create_draft(carbure_client_id=self.trader.id)
         lot = self.send_lot(lot)
