@@ -228,13 +228,13 @@ function getNotificationLink(notif: Notification) {
       return `/org/${notif.dest.id}/settings#certificates`
 
     case NotificationType.DeclarationValidated:
-      return `#declarations/${notif.meta?.period}`
+      return `#declaration/${notif.meta?.period}`
 
     case NotificationType.DeclarationCancelled:
-      return `#declarations/${notif.meta?.period}`
+      return `#declaration/${notif.meta?.period}`
 
     case NotificationType.DeclarationReminder:
-      return `#declarations/${notif.meta?.period}`
+      return `#declaration/${notif.meta?.period}`
 
     default:
       return "#"

@@ -2,7 +2,7 @@ import cl from "clsx"
 import { Loader, Upload } from "common/components/icons"
 import css from "./button.module.css"
 import { Layout, layout } from "./scaffold"
-import { Link } from "react-router-dom"
+import { Link, To } from "react-router-dom"
 import { ExternalLink as ExternalLinkIcon } from "common/components/icons"
 
 export type ButtonVariant =
@@ -32,7 +32,7 @@ export interface ButtonProps<T = void> extends Layout {
   submit?: string | boolean
   tabIndex?: number
   href?: string
-  to?: string
+  to?: To
   action?: (() => T) | (() => Promise<T>)
 }
 
@@ -98,7 +98,7 @@ export function Button<T>({
 
 interface LinkWrapperProps extends Layout {
   href?: string
-  to?: string
+  to?: To
   children: React.ReactNode
 }
 
@@ -121,7 +121,7 @@ const LinkWrapper = ({ href, to, children, ...props }: LinkWrapperProps) => {
 }
 
 interface ExternalLinkProps {
-  to?: string
+  to?: To
   href?: string
   className?: string
   children?: React.ReactNode

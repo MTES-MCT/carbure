@@ -1,4 +1,4 @@
-import { useNavigate, useLocation, useParams } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import pickApi from "../api"
 import { useQuery } from "common/hooks/async"
@@ -16,6 +16,7 @@ import StockTraceability, {
   hasTraceability,
 } from "transaction-details/components/stocks/stock-traceability"
 import Portal from "common/components/portal"
+import { useHashMatch } from "common/components/hash-route"
 
 export interface StockDetailsProps {
   neighbors: number[]
@@ -28,13 +29,13 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
   const location = useLocation()
 
   const entity = useEntity()
-  const params = useParams<"id">()
+  const match = useHashMatch("stock/:id")
 
   const api = pickApi(entity)
 
   const stock = useQuery(api.getStockDetails, {
     key: "control-stock-details",
-    params: [entity.id, parseInt(params.id!)],
+    params: [entity.id, parseInt(match?.params.id!)],
   })
 
   const stockData = stock.result?.data.data
@@ -42,10 +43,7 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
 
   const closeDialog = () => {
     invalidate("controls", "controls-snapshot", "controls-summary")
-    navigate({
-      pathname: `..`,
-      search: location.search,
-    })
+    navigate({ search: location.search, hash: "#" })
   }
 
   return (
@@ -79,7 +77,7 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
         </main>
 
         <footer>
-          <NavigationButtons neighbors={neighbors} root={`..`} />
+          <NavigationButtons neighbors={neighbors} />
           <Button icon={Return} label={t("Retour")} action={closeDialog} />
         </footer>
 

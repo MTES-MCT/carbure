@@ -3,15 +3,15 @@ import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import Button from "common/components/button"
 import { ChevronLeft, ChevronRight } from "common/components/icons"
+import { useHashMatch } from "common/components/hash-route"
 
 export interface NavigationProps {
   neighbors: number[]
-  root: string
 }
 
-export const NavigationButtons = ({ neighbors, root }: NavigationProps) => {
+export const NavigationButtons = ({ neighbors }: NavigationProps) => {
   const { t } = useTranslation()
-  const nav = useNavigation(neighbors, root)
+  const nav = useNavigation(neighbors)
 
   return (
     <>
@@ -32,12 +32,13 @@ export const NavigationButtons = ({ neighbors, root }: NavigationProps) => {
   )
 }
 
-export function useNavigation(neighbors: number[], root: string) {
+export function useNavigation(neighbors: number[]) {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const params = useParams<"id">()
-  const current = parseInt(params.id ?? "")
+  const match = useHashMatch(":root/:id")
+  const root = match?.params.root
+  const current = parseInt(match?.params.id ?? "")
 
   const index = neighbors.indexOf(current)
   const total = neighbors.length
@@ -58,13 +59,15 @@ export function useNavigation(neighbors: number[], root: string) {
   const next = useCallback(() => {
     if (isOut) {
       navigate({
-        pathname: `${root}/${neighbors[0]}`,
+        pathname: location.pathname,
         search: location.search,
+        hash: `${root}/${neighbors[0]}`,
       })
     } else if (hasNext) {
       navigate({
-        pathname: `${root}/${neighbors[index + 1]}`,
+        pathname: location.pathname,
         search: location.search,
+        hash: `${root}/${neighbors[index + 1]}`,
       })
     }
   }, [neighbors, root, hasNext, isOut, index, navigate, location])

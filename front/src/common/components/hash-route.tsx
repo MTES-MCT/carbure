@@ -12,10 +12,7 @@ export const HashRoute = ({ path, element }: HashRouteProps) => {
 
 export const useHashMatch: typeof useMatch = (pattern) => {
   const location = useLocation()
-  return matchPath(
-    String(pattern).replace("#", "/"),
-    location.hash.replace("#", "/")
-  )
+  return matchPath(`/${pattern}`, location.hash.replace("#", "/"))
 }
 
 export default HashRoute

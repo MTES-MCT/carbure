@@ -16,6 +16,7 @@ import { StockSummaryBar } from "./stock-summary"
 import StockDetails from "transaction-details/components/stocks"
 import { QueryParams, useQueryParamsStore } from "../lots"
 import { useAutoCategory } from "../category"
+import HashRoute from "common/components/hash-route"
 
 export interface StocksProps {
   year: number
@@ -53,8 +54,9 @@ export const Stocks = ({ year, snapshot }: StocksProps) => {
   const total = stocksData?.total ?? 0
 
   const showStockDetails = (stock: Stock) => ({
-    pathname: `${category}/${stock.id}`,
+    pathname: location.pathname,
     search: location.search,
+    hash: `stock/${stock.id}`,
   })
 
   return (
@@ -126,12 +128,7 @@ export const Stocks = ({ year, snapshot }: StocksProps) => {
         )}
       </section>
 
-      <Routes>
-        <Route
-          path=":category/:id"
-          element={<StockDetails neighbors={ids} />}
-        />
-      </Routes>
+      <HashRoute path="stock/:id" element={<StockDetails neighbors={ids} />} />
     </>
   )
 }

@@ -80,7 +80,7 @@ export const Transactions = () => {
           <Route path="*" element={<Lots {...props} />} />
         </Routes>
 
-        <HashRoute path="#declarations/*" element={<DeclarationDialog />} />
+        <HashRoute path="declaration/*" element={<DeclarationDialog />} />
       </Main>
     </ImportArea>
   )

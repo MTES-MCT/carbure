@@ -14,6 +14,7 @@ import { ControlLotSummaryBar } from "./control-lot-summary"
 import { useLotQuery, useQueryParamsStore } from "transactions/components/lots"
 import { Filter, Lot } from "transactions/types"
 import ControlLotDetails from "control-details/components/lot"
+import HashRoute from "common/components/hash-route"
 
 export interface LotsProps {
   entity: EntityManager
@@ -51,8 +52,9 @@ export const Lots = ({ entity, year }: LotsProps) => {
   const totalDeadline = lotsData?.total_deadline ?? 0
 
   const showLotDetails = (lot: Lot) => ({
-    pathname: `${status}/${lot.id}`,
+    pathname: location.pathname,
     search: location.search,
+    hash: `lot/${lot.id}`,
   })
 
   return (
@@ -133,12 +135,10 @@ export const Lots = ({ entity, year }: LotsProps) => {
         )}
       </section>
 
-      <Routes>
-        <Route
-          path=":status/:id"
-          element={<ControlLotDetails neighbors={ids} />}
-        />
-      </Routes>
+      <HashRoute
+        path="lot/:id"
+        element={<ControlLotDetails neighbors={ids} />}
+      />
     </>
   )
 }

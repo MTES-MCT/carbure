@@ -1,4 +1,4 @@
-import { useNavigate, useLocation, useParams } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import pickApi from "../api"
 import { useQuery } from "common/hooks/async"
@@ -34,6 +34,7 @@ import Score from "transaction-details/components/score"
 import { SetOneConformityButton } from "controls/actions/set-conformity"
 import Portal from "common/components/portal"
 import Flags from "flags.json"
+import { useHashMatch } from "common/components/hash-route"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -47,13 +48,13 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
 
   const entity = useEntity()
   const status = useStatus()
-  const params = useParams<"id">()
+  const match = useHashMatch("lot/:id")
 
   const api = pickApi(entity)
 
   const lot = useQuery(api.getLotDetails, {
     key: "control-details",
-    params: [entity.id, parseInt(params.id!)],
+    params: [entity.id, parseInt(match?.params.id!)],
   })
 
   const lotData = lot.result?.data.data
@@ -69,10 +70,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
 
   const closeDialog = () => {
     invalidate("controls", "controls-snapshot", "controls-summary")
-    navigate({
-      pathname: `../${status}`,
-      search: location.search,
-    })
+    navigate({ search: location.search, hash: "#" })
   }
 
   return (
@@ -154,7 +152,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
           {lotData && entity.isAuditor && (
             <SetOneConformityButton lot={lotData.lot} />
           )}
-          <NavigationButtons neighbors={neighbors} root={`../${status}`} />
+          <NavigationButtons neighbors={neighbors} />
           <Button icon={Return} label={t("Retour")} action={closeDialog} />
         </footer>
 

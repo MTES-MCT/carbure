@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import { useNavigate, useLocation, useParams } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import * as api from "../../api"
 import { useMatomo } from "matomo"
@@ -33,6 +33,7 @@ import { formatDate } from "common/utils/formatters"
 import Score from "../score"
 import Portal from "common/components/portal"
 import Flags from "flags.json"
+import { useHashMatch } from "common/components/hash-route"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -49,11 +50,11 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const entity = useEntity()
   const status = useStatus()
   const category = useCategory()
-  const params = useParams<"id">()
+  const match = useHashMatch("lot/:id")
 
   const lot = useQuery(api.getLotDetails, {
     key: "lot-details",
-    params: [entity.id, parseInt(params.id!)],
+    params: [entity.id, parseInt(match?.params.id!)],
   })
 
   const updateLot = useMutation(api.updateLot, {
@@ -88,10 +89,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
 
   const closeDialog = () => {
     invalidate("lots")
-    navigate({
-      pathname: `../${status}/${category}`,
-      search: location.search,
-    })
+    navigate({ search: location.search, hash: "#" })
   }
 
   return (
@@ -183,10 +181,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
             <LotActions lot={lotData.lot} canSave={canSave} />
           )}
 
-          <NavigationButtons
-            neighbors={neighbors}
-            root={`../${status}/${category}`}
-          />
+          <NavigationButtons neighbors={neighbors} />
 
           <Button icon={Return} label={t("Retour")} action={closeDialog} />
         </footer>
