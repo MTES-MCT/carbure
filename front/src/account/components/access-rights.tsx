@@ -166,7 +166,7 @@ export const EntityDialog = ({ onClose }: EntityDialogProps) => {
     onSuccess: () =>
       notify(t("La société a été ajoutée !"), { variant: "success" }),
     onError: () =>
-      notify(t("La société n'a pas pu être ajoutée !"), { variant: "success" }),
+      notify(t("La société n'a pas pu être ajoutée !"), { variant: "danger" }),
   })
 
   return (
