@@ -13,6 +13,7 @@ import { ControlStockSummaryBar } from "./control-stock-summary"
 import { useLotQuery, useQueryParamsStore } from "transactions/components/lots"
 import { Filter, Stock } from "transactions/types"
 import ControlStockDetails from "control-details/components/stock"
+import HashRoute from "common/components/hash-route"
 
 export interface StocksProps {
   entity: EntityManager
@@ -47,8 +48,9 @@ export const Stocks = ({ entity, year }: StocksProps) => {
   const total = stocksData?.total ?? 0
 
   const showStockDetails = (stock: Stock) => ({
-    pathname: `${stock.id}`,
+    pathname: location.pathname,
     search: location.search,
+    hash: `stock/${stock.id}`,
   })
 
   return (
@@ -110,9 +112,10 @@ export const Stocks = ({ entity, year }: StocksProps) => {
         )}
       </section>
 
-      <Routes>
-        <Route path=":id" element={<ControlStockDetails neighbors={ids} />} />
-      </Routes>
+      <HashRoute
+        path="stock/:id"
+        element={<ControlStockDetails neighbors={ids} />}
+      />
     </>
   )
 }

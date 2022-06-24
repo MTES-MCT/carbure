@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react"
 import i18next from "i18next"
 import { Trans, useTranslation } from "react-i18next"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { DeclarationSummary, LotQuery } from "../types"
 import { Normalizer } from "common/utils/normalize"
 import useEntity from "carbure/hooks/entity"
@@ -31,13 +31,14 @@ import { useHashMatch } from "common/components/hash-route"
 
 export const DeclarationButton = () => {
   const { t } = useTranslation()
+  const location = useLocation()
   return (
     <Button
       asideX
       variant="primary"
       icon={Certificate}
       label={t("Valider ma déclaration")}
-      to="#declarations"
+      to={{ search: location.search, hash: "#declaration" }}
     />
   )
 }
@@ -53,6 +54,7 @@ export const DeclarationDialog = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const notify = useNotify()
+  const location = useLocation()
 
   const matomo = useMatomo()
   const entity = useEntity()
@@ -62,7 +64,7 @@ export const DeclarationDialog = () => {
     params: [entity.id],
   })
 
-  const match = useHashMatch("#declarations/:period")
+  const match = useHashMatch("declaration/:period")
 
   const initialPeriod = match?.params.period
     ? parseInt(match.params.period)
@@ -143,11 +145,11 @@ export const DeclarationDialog = () => {
   const hasNext = timeline.month < 12 || yearsData.includes(timeline.year + 1)
 
   function onClose() {
-    navigate("#")
+    navigate({ search: location.search, hash: "#" })
   }
 
   return (
-    <Portal>
+    <Portal onClose={onClose}>
       <Dialog style={{ width: "max(50vw, 960px)" }} onClose={onClose}>
         <header>
           <h1>{t("Déclaration de durabilité")}</h1>

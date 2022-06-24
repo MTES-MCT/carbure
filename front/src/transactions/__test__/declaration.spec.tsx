@@ -8,7 +8,7 @@ import server from "./api"
 import userEvent from "@testing-library/user-event"
 
 const DeclarationSummary = () => (
-  <TestRoot url="/#declarations">
+  <TestRoot url="/#declaration">
     <Route path="/" element={<DeclarationDialog />} />
   </TestRoot>
 )

@@ -31,6 +31,7 @@ import { useMatomo } from "matomo"
 import { getDefaultCategory, useAutoCategory } from "../category"
 import useTitle from "common/hooks/title"
 import { AdminStatus } from "controls/types"
+import HashRoute from "common/components/hash-route"
 
 export interface LotsProps {
   year: number
@@ -73,8 +74,9 @@ export const Lots = ({ year, snapshot }: LotsProps) => {
   }
 
   const showLotDetails = (lot: Lot) => ({
-    pathname: `${status}/${category}/${lot.id}`,
+    pathname: location.pathname,
     search: location.search,
+    hash: `lot/${lot.id}`,
   })
 
   if (category === undefined) {
@@ -170,13 +172,8 @@ export const Lots = ({ year, snapshot }: LotsProps) => {
         )}
       </section>
 
-      <Routes>
-        <Route path="drafts/imported/add" element={<LotAdd />} />
-        <Route
-          path=":status/:category/:id"
-          element={<LotDetails neighbors={ids} />}
-        />
-      </Routes>
+      <HashRoute path="add" element={<LotAdd />} />
+      <HashRoute path="lot/:id" element={<LotDetails neighbors={ids} />} />
     </>
   )
 }
