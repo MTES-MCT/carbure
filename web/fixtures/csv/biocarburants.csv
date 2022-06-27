@@ -18,6 +18,6 @@ MT,Méthanol,20,16,0.8,1,0,0,1,0
 TAEE,TAEE,38,29,0.763,0,0,1,0,0
 HVP,Huile végétale pure,37,34,0.919,0,1,0,0,0
 HCU,Huile provenant d'huiles de cuisson usagées,0,0,0,0,1,0,0,0
-EMAG,EMAG,0,0,0,0,1,1,0,1
-ED95,Éthanol pour ED95,0,0,0,1,0,1,1,0
-B100,B100,0,0,0,0,1,1,0,1
+EMAG,EMAG,37,33,0.892,0,1,1,0,1
+ED95,Éthanol pour ED95,27,21,0.778,1,0,1,1,0
+B100,B100,37,33,0.892,0,1,1,0,1
