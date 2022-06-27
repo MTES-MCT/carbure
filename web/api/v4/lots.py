@@ -6,6 +6,7 @@ from django.db.models.query import QuerySet
 from django.db.models.query_utils import Q
 from numpy.lib.function_base import insert
 from api.v4.sanity_checks import bulk_sanity_checks
+from core.carburetypes import CarbureUnit
 from core.models import CarbureLot, CarbureLotEvent, CarbureStock, Entity, GenericError
 
 INCORRECT_DELIVERY_DATE = "INCORRECT_DELIVERY_DATE"
@@ -18,6 +19,7 @@ UNKNOWN_BIOFUEL = "UNKNOWN_BIOFUEL"
 UNKNOWN_FEEDSTOCK = "UNKNOWN_FEEDSTOCK"
 UNKNOWN_COUNTRY_OF_ORIGIN = "UNKNOWN_COUNTRY_OF_ORIGIN"
 MISSING_VOLUME = "MISSING_VOLUME"
+UNKNOWN_UNIT = "UNKNOWN_UNIT"
 VOLUME_FORMAT_INCORRECT = "VOLUME_FORMAT_INCORRECT"
 WRONG_FLOAT_FORMAT = "WRONG_FLOAT_FORMAT"
 UNKNOWN_DELIVERY_SITE = "UNKNOWN_DELIVERY_SITE"
@@ -170,8 +172,32 @@ def fill_volume_info(lot, data):
     if lot.parent_lot is None:
         volume = data.get('volume', None)
         if not volume:
-            errors.append(GenericError(lot=lot, field='volume', error=MISSING_VOLUME, display_to_creator=True, is_blocking=True))
+            unit = data.get('unit', '').lower()
+            if not unit:
+                errors.append(GenericError(lot=lot, field='volume', error=MISSING_VOLUME, display_to_creator=True, is_blocking=True))
+            else:
+                amount = data.get('amount', 0)
+                try:
+                    amount = round(abs(float(amount)), 2)
+                except:
+                    amount = 0
+                    errors.append(GenericError(lot=lot, field='volume', error=VOLUME_FORMAT_INCORRECT, display_to_creator=True, is_blocking=True))
+                if unit == CarbureUnit.KILOGRAM:
+                    lot.weight = amount
+                    lot.volume = lot.get_volume()
+                    lot.lhv_amount = lot.get_lhv_amount()                    
+                elif unit == CarbureUnit.LHV:
+                    lot.lhv_amount = amount
+                    lot.weight = lot.lhv_amount / lot.biofuel.pci_litre
+                    lot.volume = lot.get_volume()
+                elif unit == CarbureUnit.LITER:
+                    lot.volume = amount
+                    lot.weight = lot.get_weight()
+                    lot.lhv_amount = lot.get_lhv_amount()     
+                else:
+                    errors.append(GenericError(lot=lot, field='volume', error=UNKNOWN_UNIT, display_to_creator=True, is_blocking=True))
         else:
+            # 2022-06-27 MP: why this try/catch? should set volume to 0 and create generic error right?
             try:
                 volume = round(abs(float(volume)), 2)
                 if lot.volume != 0 and volume != lot.volume:
@@ -182,8 +208,8 @@ def fill_volume_info(lot, data):
             except Exception:
                 lot.volume = 0
                 errors.append(GenericError(lot=lot, field='volume', error=VOLUME_FORMAT_INCORRECT, display_to_creator=True, is_blocking=True))
-        lot.weight = lot.get_weight()
-        lot.lhv_amount = lot.get_lhv_amount()
+            lot.weight = lot.get_weight()
+            lot.lhv_amount = lot.get_lhv_amount()
     return errors
 
 def fill_supplier_info(lot, data, entity):

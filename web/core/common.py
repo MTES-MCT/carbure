@@ -166,8 +166,10 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
     for row in df.iterrows():
         lot_row = row[1]
         lot = {}
-        if lot_row.get('volume', '') == '':
-            # ignore rows with no volume
+        if lot_row.get('volume', '') == '' and (lot_row.get('unit', '') == '' or lot_row.get('amount', '') == ''):
+            # ignore rows with no volume or no unit+amount
+            # this is mostly done to ignore entirely empty rows read in the excel/csv file
+            # without this, we can receive dozens of empty rows...
             continue
         # TEMPLATE COLUMNS
         # 'champ_libre', 
@@ -204,6 +206,8 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         lot['vendor_certificate'] = lot_row.get('vendor_certificate', '')
         lot['supplier_certificate'] = lot_row.get('supplier_certificate', '')
         lot['volume'] = lot_row.get('volume', 0)
+        lot['amount'] = lot_row.get('amount', 0)
+        lot['unit'] = lot_row.get('unit', None)
         lot['feedstock_code'] = lot_row.get('matiere_premiere_code', '').strip()
         lot['biofuel_code'] = lot_row.get('biocarburant_code', '').strip()
         lot['country_code'] = lot_row.get('pays_origine_code', '').strip()
