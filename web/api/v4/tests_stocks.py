@@ -5,6 +5,7 @@ from typing import Generic
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.db.models import Count
 
 from core.models import CarbureLot, CarbureStock, GenericError, MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot, UserRights
 from api.v3.common.urls import urlpatterns
@@ -16,7 +17,7 @@ def debug_errors(lot):
     for e in errors:
         print(e.error, e.field, e.value, e.extra)
 
-class LotsFlowTest(TestCase):
+class StocksFlowTest(TestCase):
     fixtures = [
         'json/biofuels.json',
         'json/feedstock.json',
@@ -35,7 +36,7 @@ class LotsFlowTest(TestCase):
         loggedin = self.client.login(username=self.user1.email, password=self.password)
         self.assertTrue(loggedin)
 
-        self.producer = Entity.objects.filter(entity_type=Entity.PRODUCER)[0]
+        self.producer = Entity.objects.filter(entity_type=Entity.PRODUCER).annotate(psites=Count('productionsite')).filter(psites__gt=0)[0]
         self.trader = Entity.objects.filter(entity_type=Entity.TRADER)[0]
         self.trader.default_certificate = "TRADER_CERTIFICATE"
         self.trader.save()
@@ -59,7 +60,7 @@ class LotsFlowTest(TestCase):
         response = self.client.post(reverse('api-v4-add-lots'), lot)
         self.assertEqual(response.status_code, 200)
         data = response.json()['data']
-        lot_id = data['id']        
+        lot_id = data['id']
         lot = CarbureLot.objects.get(id=lot_id)
         return lot
 
@@ -68,7 +69,7 @@ class LotsFlowTest(TestCase):
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)
         return lot
-        
+
     def stock_split(self, payload, fail=False):
         response = self.client.post(reverse('api-v4-stock-split'), {'entity_id': self.producer.id, 'payload': json.dumps(payload)})
         if not fail:
