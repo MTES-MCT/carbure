@@ -516,16 +516,22 @@ class CarbureLot(models.Model):
     def __str__(self):
         return str(self.id)
 
+    def get_volume(self): # from mass
+        if not self.biofuel:
+            return 0
+        if self.weight == 0:
+            return 0
+        return round(self.weight / self.biofuel.masse_volumique, 2)
 
     def get_weight(self):
         if not self.biofuel:
             return 0
-        return self.volume * self.biofuel.masse_volumique
+        return round(self.volume * self.biofuel.masse_volumique, 2)
 
     def get_lhv_amount(self):
         if not self.biofuel:
             return 0
-        return self.volume * self.biofuel.pci_litre
+        return round(self.volume * self.biofuel.pci_litre, 2)
 
     def generate_carbure_id(self):
         country_of_production = '00'
