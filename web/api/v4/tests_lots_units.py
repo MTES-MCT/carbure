@@ -63,16 +63,16 @@ class LotsTestUnits(TestCase):
         self.assertEqual(lot.volume, 1000)
 
     def test_create_kilogram(self):
-        lot = self.create_draft(lot=None, unit='kilogram', amount=1000)
+        lot = self.create_draft(lot=None, unit='kg', quantity=1000)
         self.assertEqual(lot.lot_status, CarbureLot.DRAFT)
         self.assertEqual(lot.weight, 1000)
 
     def test_create_liters(self):
-        lot = self.create_draft(lot=None, unit='liter', amount=1000)
+        lot = self.create_draft(lot=None, unit='l', quantity=1000)
         self.assertEqual(lot.lot_status, CarbureLot.DRAFT)
         self.assertEqual(lot.volume, 1000)
         
     def test_create_pci(self):
-        lot = self.create_draft(lot=None, unit='lhv', amount=1000)
+        lot = self.create_draft(lot=None, unit='mj', quantity=1000)
         self.assertEqual(lot.lot_status, CarbureLot.DRAFT)
         self.assertEqual(lot.lhv_amount, 1000)
