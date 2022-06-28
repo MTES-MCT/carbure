@@ -475,7 +475,8 @@ def check_entity_certificate(request, *args, **kwargs):
         ec.save()
         slots = CarbureLot.objects.filter(carbure_supplier=ec.entity, supplier_certificate=ec.certificate.certificate_id)
         plots = CarbureLot.objects.filter(carbure_producer=ec.entity, production_site_certificate=ec.certificate.certificate_id)
-        bulk_scoring(list(slots) + list(plots))
+        #bulk_scoring(list(slots) + list(plots))
+        background_bulk_scoring(list(slots) + list(plots))
         return JsonResponse({'status': "success"})
     except:
         return JsonResponse({'status': "error", 'message': "Could not mark certificate as checked"}, status=500)
@@ -492,7 +493,8 @@ def reject_entity_certificate(request, *args, **kwargs):
         ec.save()
         slots = CarbureLot.objects.filter(carbure_supplier=ec.entity, supplier_certificate=ec.certificate.certificate_id)
         plots = CarbureLot.objects.filter(carbure_producer=ec.entity, production_site_certificate=ec.certificate.certificate_id)
-        bulk_scoring(list(slots) + list(plots))
+        #bulk_scoring(list(slots) + list(plots))
+        background_bulk_scoring(list(slots) + list(plots))
         return JsonResponse({'status': "success"})
     except:
         return JsonResponse({'status': "error", 'message': "Could not mark certificate as checked"}, status=500)
