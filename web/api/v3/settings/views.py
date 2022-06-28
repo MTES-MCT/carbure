@@ -9,7 +9,8 @@ from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from api.v4.sanity_checks import background_bulk_scoring, bulk_scoring
+from api.v4.helpers import get_prefetched_data
+from api.v4.sanity_checks import background_bulk_scoring, bulk_sanity_checks, bulk_scoring
 
 from core.models import CarbureLot, CarbureLotReliabilityScore, CarbureStock, Entity, GenericError, UserRights, Pays, MatierePremiere, Biocarburant, Depot, EntityDepot
 from core.serializers import EntityCertificateSerializer, GenericCertificateSerializer
@@ -317,14 +318,12 @@ def set_production_site_bc(request, *args, **kwargs):
 @check_rights('entity_id')
 def get_delivery_sites(request, *args, **kwargs):
     entity = kwargs['context']['entity']
-
     try:
         ds = EntityDepot.objects.filter(entity=entity)
         ds = [d.natural_key() for d in ds]
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not find entity's delivery sites",
                             }, status=400)
-
     return JsonResponse({'status': 'success', 'data': ds})
 
 
@@ -363,7 +362,9 @@ def add_delivery_site(request, *args, **kwargs):
         ed, created = EntityDepot.objects.update_or_create(entity=entity, depot=ds, defaults={'ownership_type': ownership_type, 'blending_is_outsourced': blending_is_outsourced, 'blender': blender})
         lots = CarbureLot.objects.filter(carbure_client=entity, carbure_delivery_site=ds)
         #bulk_scoring(lots)
-        background_bulk_scoring(lots)
+        #background_bulk_scoring(lots)
+        prefetched_data = get_prefetched_data(entity)
+        bulk_sanity_checks(lots, prefetched_data)
     except Exception:
         traceback.print_exc()
         return JsonResponse({'status': 'error', 'message': "Could not link entity to delivery site",
