@@ -1049,6 +1049,10 @@ def mark_as_fixed(request, *args, **kwargs):
             c.carbure_delivery_site = lot.carbure_delivery_site
             c.unknown_delivery_site = lot.unknown_delivery_site
             c.delivery_site_country = lot.delivery_site_country
+            c.carbure_producer = lot.carbure_producer
+            c.unknown_producer = lot.unknown_producer
+            c.carbure_production_site = lot.carbure_production_site
+            c.unknown_production_site = lot.unknown_production_site
             c.save()
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.MARKED_AS_FIXED
