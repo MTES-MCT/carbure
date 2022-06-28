@@ -1,3 +1,4 @@
+import { Entity } from "carbure/types"
 import api, { Api } from "common/services/api"
 import { lotFormToPayload, LotFormValue } from "lot-add/components/lot-form"
 import { LotDetails, StockDetails } from "./types"

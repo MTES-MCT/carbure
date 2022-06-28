@@ -76,9 +76,9 @@ class CarbureSanityCheckErrors:
     WRONG_DELIVERY_DATE = "WRONG_DELIVERY_DATE"
     MISSING_DELIVERY_SITE_COUNTRY = "MISSING_DELIVERY_SITE_COUNTRY"
     MISSING_FEEDSTOCK_COUNTRY_OF_ORIGIN = "MISSING_FEEDSTOCK_COUNTRY_OF_ORIGIN"
-    
+
 
 class CarbureUnit:
-    KILOGRAM = "kilogram"
-    LITER = "liter"
-    LHV = "lhv"
+    KILOGRAM = "kg"
+    LITER = "l"
+    LHV = "mj"

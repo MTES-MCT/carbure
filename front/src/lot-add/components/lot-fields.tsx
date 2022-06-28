@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import Autocomplete, { AutocompleteProps } from "common/components/autocomplete"
-import { Fieldset, useBind } from "common/components/form"
+import { Fieldset, useBind, useFormContext } from "common/components/form"
 import {
   NumberInput,
   NumberInputProps,
@@ -65,10 +65,9 @@ export const VolumeField = (props: NumberInputProps) => {
 
 export const QuantityField = (props: NumberInputProps) => {
   const { t } = useTranslation()
-  const bind = useBind<LotFormValue>()
-  const entity = useEntity()
+  const { bind, value } = useFormContext<LotFormValue>()
 
-  const [unit, setUnit] = useState<Unit | undefined>(entity.preferred_unit)
+  const unit = value.unit ?? "l"
 
   const unitToField = {
     l: "volume" as "volume",
@@ -80,7 +79,7 @@ export const QuantityField = (props: NumberInputProps) => {
     <NumberInput
       required
       label={t("Quantité")}
-      icon={<UnitSelect value={unit} onChange={setUnit} />}
+      icon={<UnitSelect {...bind('unit')} />}
       {...bind(unitToField[unit ?? "l"])}
       {...props}
     />
