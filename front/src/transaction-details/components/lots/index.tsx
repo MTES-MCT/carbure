@@ -83,8 +83,8 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const expiring = isExpiring(lotData?.lot)
 
   const canSave = useMemo(
-    () => hasChange(form.value, lotData?.lot),
-    [form.value, lotData?.lot]
+    () => hasChange(form.value, lotData?.lot, entity),
+    [form.value, lotData?.lot, entity]
   )
 
   const closeDialog = () => {

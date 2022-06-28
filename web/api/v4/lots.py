@@ -176,22 +176,22 @@ def fill_volume_info(lot, data):
             if not unit:
                 errors.append(GenericError(lot=lot, field='volume', error=MISSING_VOLUME, display_to_creator=True, is_blocking=True))
             else:
-                amount = data.get('amount', 0)
+                quantity = data.get('quantity', 0)
                 try:
-                    amount = round(abs(float(amount)), 2)
+                    quantity = round(abs(float(quantity)), 2)
                 except:
-                    amount = 0
+                    quantity = 0
                     errors.append(GenericError(lot=lot, field='volume', error=VOLUME_FORMAT_INCORRECT, display_to_creator=True, is_blocking=True))
                 if unit == CarbureUnit.KILOGRAM:
-                    lot.weight = amount
+                    lot.weight = quantity
                     lot.volume = lot.get_volume()
                     lot.lhv_amount = lot.get_lhv_amount()                    
                 elif unit == CarbureUnit.LHV:
-                    lot.lhv_amount = amount
-                    lot.weight = lot.lhv_amount / lot.biofuel.pci_litre
-                    lot.volume = lot.get_volume()
+                    lot.lhv_amount = quantity
+                    lot.volume = round(lot.lhv_amount / lot.biofuel.pci_litre, 2)
+                    lot.weight = lot.get_weight()
                 elif unit == CarbureUnit.LITER:
-                    lot.volume = amount
+                    lot.volume = quantity
                     lot.weight = lot.get_weight()
                     lot.lhv_amount = lot.get_lhv_amount()     
                 else:
