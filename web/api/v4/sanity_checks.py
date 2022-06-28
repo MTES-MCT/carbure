@@ -1,6 +1,7 @@
 import datetime
 from email.policy import default
 from inspect import trace
+from multiprocessing.dummy import Process
 import re
 import traceback
 from django import db
@@ -78,8 +79,17 @@ def bulk_sanity_checks(lots, prefetched_data, background=True):
         except:
             traceback.print_exc()
     GenericError.objects.bulk_create(errors, batch_size=1000)
-    bulk_scoring(lots, prefetched_data)
+    #bulk_scoring(lots, prefetched_data)
+    background_bulk_scoring(lots, prefetched_data)
     return results
+
+
+def background_bulk_scoring(lots, prefetched_data=None):
+    #print('Start background bulk_scoring')
+    p = Process(target=bulk_scoring, args=(lots, prefetched_data))
+    p.start()
+    #print('done calling bulk_scoring in background %s' % (datetime.datetime.now()))
+
 
 def bulk_scoring(lots, prefetched_data=None):
     if not prefetched_data:
@@ -97,6 +107,8 @@ def bulk_scoring(lots, prefetched_data=None):
             l.save()
     # bulk create score entries
     CarbureLotReliabilityScore.objects.bulk_create(clrs)
+    #print('end background bulk_scoring %s' % (datetime.datetime.now()))
+
 
 def check_ghg_values(prefetched_data, lot, errors):
     etd = prefetched_data['etd']

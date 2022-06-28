@@ -9,7 +9,7 @@ from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from api.v4.sanity_checks import bulk_scoring
+from api.v4.sanity_checks import background_bulk_scoring, bulk_scoring
 
 from core.models import CarbureLot, CarbureLotReliabilityScore, CarbureStock, Entity, GenericError, UserRights, Pays, MatierePremiere, Biocarburant, Depot, EntityDepot
 from core.serializers import EntityCertificateSerializer, GenericCertificateSerializer
@@ -262,7 +262,8 @@ def set_production_site_mp(request, *args, **kwargs):
             if created:
                 # remove errors
                 impacted_txs = CarbureLot.objects.filter(carbure_production_site=ps, feedstock=mp)
-                bulk_scoring(impacted_txs)
+                #bulk_scoring(impacted_txs)
+                background_bulk_scoring(impacted_txs)
                 GenericError.objects.filter(lot__in=impacted_txs, error="MP_NOT_CONFIGURED").delete()
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
@@ -303,7 +304,8 @@ def set_production_site_bc(request, *args, **kwargs):
             if created:
                 # remove errors
                 impacted_txs = CarbureLot.objects.filter(carbure_production_site=ps, biofuel=bc)
-                bulk_scoring(impacted_txs)
+                #bulk_scoring(impacted_txs)
+                background_bulk_scoring(impacted_txs)
                 GenericError.objects.filter(lot__in=impacted_txs, error="BC_NOT_CONFIGURED").delete()
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
@@ -360,7 +362,8 @@ def add_delivery_site(request, *args, **kwargs):
     try:
         ed, created = EntityDepot.objects.update_or_create(entity=entity, depot=ds, defaults={'ownership_type': ownership_type, 'blending_is_outsourced': blending_is_outsourced, 'blender': blender})
         lots = CarbureLot.objects.filter(carbure_client=entity, carbure_delivery_site=ds)
-        bulk_scoring(lots)
+        #bulk_scoring(lots)
+        background_bulk_scoring(lots)
     except Exception:
         traceback.print_exc()
         return JsonResponse({'status': 'error', 'message': "Could not link entity to delivery site",
@@ -376,7 +379,8 @@ def delete_delivery_site(request, *args, **kwargs):
     try:
         EntityDepot.objects.filter(entity=entity, depot__depot_id=delivery_site_id).delete()
         lots = CarbureLot.objects.filter(carbure_client=entity, carbure_delivery_site__depot_id=delivery_site_id)
-        bulk_scoring(lots)
+        #bulk_scoring(lots)
+        background_bulk_scoring(lots)
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not delete entity's delivery site",
                             }, status=400)
