@@ -11,6 +11,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from api.v4.helpers import get_prefetched_data
 from api.v4.sanity_checks import background_bulk_scoring, bulk_sanity_checks, bulk_scoring
+from core.carburetypes import CarbureSanityCheckErrors
 
 from core.models import CarbureLot, CarbureLotReliabilityScore, CarbureStock, Entity, GenericError, UserRights, Pays, MatierePremiere, Biocarburant, Depot, EntityDepot
 from core.serializers import EntityCertificateSerializer, GenericCertificateSerializer
@@ -362,9 +363,8 @@ def add_delivery_site(request, *args, **kwargs):
         ed, created = EntityDepot.objects.update_or_create(entity=entity, depot=ds, defaults={'ownership_type': ownership_type, 'blending_is_outsourced': blending_is_outsourced, 'blender': blender})
         lots = CarbureLot.objects.filter(carbure_client=entity, carbure_delivery_site=ds)
         #bulk_scoring(lots)
-        #background_bulk_scoring(lots)
-        prefetched_data = get_prefetched_data(entity)
-        bulk_sanity_checks(lots, prefetched_data)
+        background_bulk_scoring(lots)
+        GenericError.objects.filter(lot__in=lots, error=CarbureSanityCheckErrors.DEPOT_NOT_CONFIGURED).delete()
     except Exception:
         traceback.print_exc()
         return JsonResponse({'status': 'error', 'message': "Could not link entity to delivery site",

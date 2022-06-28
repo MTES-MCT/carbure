@@ -86,9 +86,11 @@ def bulk_sanity_checks(lots, prefetched_data, background=True):
 
 def background_bulk_scoring(lots, prefetched_data=None):
     #print('Start background bulk_scoring')
-    p = Process(target=bulk_scoring, args=(lots, prefetched_data))
-    p.start()
+    bulk_scoring(lots, prefetched_data)
+    #p = Process(target=bulk_scoring, args=(lots, prefetched_data))
+    #p.start()
     #print('done calling bulk_scoring in background %s' % (datetime.datetime.now()))
+    #pass
 
 
 def bulk_scoring(lots, prefetched_data=None):
