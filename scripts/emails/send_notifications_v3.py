@@ -73,7 +73,7 @@ def main(args):
             if notifs.filter(notify_administrator=True).count() > 0:
                 cc = ["carbure@beta.gouv.fr"]
 
-        msg = EmailMultiAlternatives(subject=email_subject, body=text_message, from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc)
+        msg = EmailMultiAlternatives(subject=email_subject, body=text_message, from_email="noreply@carbure.beta.gouv.fr", to=recipients, cc=cc)
         msg.attach_alternative(html_message, "text/html")
         if not args.test:
             notifs.update(email_sent=True)
