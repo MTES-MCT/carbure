@@ -2,7 +2,7 @@ FROM ubuntu:20.04
 
 # base
 RUN apt-get update
-RUN apt-get install mariadb-client libmariadbclient-dev -y
+RUN apt-get install mariadb-client libmariadbd-dev libffi-dev -y
 RUN apt-get install python3.7 python3-pip python3-dev git -y
 RUN apt-get install redis -y
 
