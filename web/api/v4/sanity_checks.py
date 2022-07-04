@@ -265,6 +265,9 @@ def sanity_check(lot, prefetched_data):
     if lot.delivery_type == CarbureLot.RFC and lot.biofuel.code not in ['ED95', 'B100', 'ETH', 'EMHV', 'EMHU']:
         errors.append(generic_error(error=CarbureSanityCheckErrors.MAC_BC_WRONG, lot=lot, is_blocking=True, fields=['biofuel', 'delivery_type']))
 
+    if lot.delivery_type == CarbureLot.RFC and lot.carbure_delivery_site and lot.carbure_delivery_site.depot_type != 'EFPE':
+        errors.append(generic_error(error=CarbureSanityCheckErrors.MAC_NOT_EFPE, lot=lot, fields=['delivery_type']))
+        
     # check volume
     if lot.volume < 2000 and lot.delivery_type not in [CarbureLot.RFC, CarbureLot.FLUSHED]:
         errors.append(generic_error(error=CarbureSanityCheckErrors.VOLUME_FAIBLE, lot=lot, field='volume'))
