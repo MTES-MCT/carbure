@@ -6,7 +6,7 @@ from django.db.models.query import QuerySet
 from django.db.models.query_utils import Q
 from numpy.lib.function_base import insert
 from api.v4.sanity_checks import bulk_sanity_checks
-from core.carburetypes import CarbureUnit
+from core.carburetypes import CarbureUnit, CarbureStockErrors
 from core.models import CarbureLot, CarbureLotEvent, CarbureStock, Entity, GenericError
 
 INCORRECT_DELIVERY_DATE = "INCORRECT_DELIVERY_DATE"
@@ -59,7 +59,7 @@ def fill_delivery_date(lot, data):
     # default: today
     lot.delivery_date = today
     try:
-        delivery_date = data['delivery_date']
+        delivery_date = data.get('delivery_date', '')
         dd = try_get_date(delivery_date)
         lot.delivery_date = dd
     except Exception:
@@ -169,7 +169,29 @@ def fill_basic_info(lot, data, prefetched_data):
 def fill_volume_info(lot, data):
     errors = []
     ### VOLUME
-    if lot.parent_lot is None:
+    if lot.parent_stock is not None:
+        # UPDATING VOLUME OF A LOT COMING FROM A STOCK SPLIT
+        # 1) check volume diff
+        try:
+            new_volume = round(abs(float(data.get('volume', 0))), 2)
+        except Exception:
+            new_volume = 0
+            errors.append(GenericError(lot=lot, field='volume', error=VOLUME_FORMAT_INCORRECT, display_to_creator=True, is_blocking=True))       
+        diff = round(lot.volume - new_volume, 2)
+        # 2) if new volume > old volume, ensure we have enough stock
+        if diff < 0 and lot.parent_stock.remaining_volume < abs(diff):
+            # not enough stock remaining, dont change anything
+            errors.append(GenericError(lot=lot, field='volume', error=CarbureStockErrors.NOT_ENOUGH_VOLUME_LEFT, display_to_creator=True))
+        else:
+            # all good
+            lot.volume = new_volume
+            lot.weight = lot.get_weight()
+            lot.lhv_amount = lot.get_lhv_amount()            
+            lot.parent_stock.remaining_volume = round(lot.parent_stock.remaining_volume + diff, 2)
+            lot.parent_stock.remaining_weight = lot.parent_stock.get_weight()
+            lot.parent_stock.remaining_lhv_amount = lot.parent_stock.get_lhv_amount()
+            lot.parent_stock.save()
+    elif lot.parent_lot is None:
         volume = data.get('volume', None)
         if not volume:
             unit = data.get('unit', '').lower()
@@ -197,7 +219,7 @@ def fill_volume_info(lot, data):
                 else:
                     errors.append(GenericError(lot=lot, field='volume', error=UNKNOWN_UNIT, display_to_creator=True, is_blocking=True))
         else:
-            # 2022-06-27 MP: why this try/catch? should set volume to 0 and create generic error right?
+            # let's actually read the volume entered in the form/excel and try to parse it as a float
             try:
                 volume = round(abs(float(volume)), 2)
                 if lot.volume != 0 and volume != lot.volume:
