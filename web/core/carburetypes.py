@@ -79,6 +79,9 @@ class CarbureSanityCheckErrors:
     MISSING_FEEDSTOCK_COUNTRY_OF_ORIGIN = "MISSING_FEEDSTOCK_COUNTRY_OF_ORIGIN"
 
 
+class CarbureStockErrors:
+    NOT_ENOUGH_VOLUME_LEFT = "NOT_ENOUGH_VOLUME_LEFT"
+    
 class CarbureUnit:
     KILOGRAM = "kg"
     LITER = "l"
