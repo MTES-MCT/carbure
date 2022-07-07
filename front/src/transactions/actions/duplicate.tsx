@@ -12,46 +12,6 @@ import { usePortal } from "common/components/portal"
 import { LotSummary } from "../components/lots/lot-summary"
 import { useMatomo } from "matomo"
 
-export interface DuplicateManyButtonProps {
-  disabled?: boolean
-  all?: boolean
-  query: LotQuery
-  selection: number[]
-}
-
-export const DuplicateManyButton = ({
-  disabled,
-  all,
-  query,
-  selection,
-}: DuplicateManyButtonProps) => {
-  const { t } = useTranslation()
-  const portal = usePortal()
-
-  return (
-    <Button
-      disabled={disabled || (!all && selection.length === 0)}
-      variant="primary"
-      icon={Copy}
-      label={
-        !all || selection.length > 0
-          ? t("Dupliquer la sélection")
-          : t("Dupliquer tout")
-      }
-      action={() =>
-        portal((close) => (
-          <DuplicateDialog
-            summary
-            query={query}
-            selection={selection}
-            onClose={close}
-          />
-        ))
-      }
-    />
-  )
-}
-
 export interface DuplicateOneButtonProps {
   icon?: boolean
   lot: Lot
