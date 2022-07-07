@@ -43,10 +43,6 @@ export const DeclarationButton = () => {
   )
 }
 
-export interface DeclarationDialogProps {
-  years: number[]
-}
-
 const now = new Date()
 const currentPeriod = now.getFullYear() * 100 + now.getMonth() + 1 // add 1 so we're not 0 based for the months
 
