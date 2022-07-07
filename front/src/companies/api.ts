@@ -34,12 +34,6 @@ export function getEntityProductionSites(entity_id: number) {
   )
 }
 
-export function getUsers(query: string, entity_id: number) {
-  return api.get<Api<UserRightRequest[]>>("/v3/admin/users", {
-    params: { q: query, entity_id },
-  })
-}
-
 export function getUsersRightRequests(
   query: string,
   entity_id: number,

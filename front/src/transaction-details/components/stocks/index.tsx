@@ -12,7 +12,6 @@ import { LoaderOverlay } from "common/components/scaffold"
 import NavigationButtons from "transaction-details/components/lots/navigation"
 import StockTraceability from "./stock-traceability"
 import { SplitOneButton } from "transactions/actions/split"
-import { useCategory } from "transactions/components/category"
 import { UserRole } from "carbure/types"
 import { CancelOneTransformButton } from "transactions/actions/transform-cancel"
 import { FlushOneButton } from "transactions/actions/flush-stock"
@@ -30,7 +29,6 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
   const location = useLocation()
 
   const entity = useEntity()
-  const category = useCategory()
   const match = useHashMatch("stock/:id")
 
   const stock = useQuery(api.getStockDetails, {

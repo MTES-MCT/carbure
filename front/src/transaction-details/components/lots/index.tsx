@@ -6,7 +6,6 @@ import { useMatomo } from "matomo"
 import { CorrectionStatus, Lot, LotStatus } from "transactions/types"
 import { useQuery, useMutation } from "common/hooks/async"
 import { useNotify } from "common/components/notifications"
-import { useStatus } from "transactions/components/status"
 import useEntity from "carbure/hooks/entity"
 import { LoaderOverlay } from "common/components/scaffold"
 import Dialog from "common/components/dialog"
@@ -28,7 +27,6 @@ import LotActions from "./actions"
 import { Entity, UserRole } from "carbure/types"
 import LotTraceability, { hasTraceability } from "./lot-traceability"
 import { invalidate } from "common/hooks/invalidate"
-import { useCategory } from "transactions/components/category"
 import { formatDate } from "common/utils/formatters"
 import Score from "../score"
 import Portal from "common/components/portal"
@@ -48,8 +46,6 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const location = useLocation()
 
   const entity = useEntity()
-  const status = useStatus()
-  const category = useCategory()
   const match = useHashMatch("lot/:id")
 
   const lot = useQuery(api.getLotDetails, {
