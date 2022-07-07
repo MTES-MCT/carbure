@@ -17,10 +17,10 @@ export interface TraceabilityProps {
 
 export const StockTraceability = ({
   details,
-  parentLotRoot = "../../in/history/",
-  parentTransfoRoot = "../history/",
-  childLotRoot = "../../out/history/",
-  childTransfoRoot = "../history/",
+  parentLotRoot = "../in/history",
+  parentTransfoRoot = "history",
+  childLotRoot = "../out/history",
+  childTransfoRoot = "history",
 }: TraceabilityProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -59,7 +59,7 @@ export const StockTraceability = ({
           <ul>
             {parentLot && (
               <li>
-                <ExternalLink to={`${parentLotRoot}${parentLot.id}`}>
+                <ExternalLink to={`${parentLotRoot}#lot/${parentLot.id}`}>
                   Lot {parentLot.carbure_id}:
                   <b>
                     {t(parentLot.biofuel?.code ?? "", { ns: "biofuels" })}{" "}
@@ -72,14 +72,20 @@ export const StockTraceability = ({
             {parentTransform && (
               <li>
                 <ExternalLink
-                  to={`${parentTransfoRoot}${parentTransform.source_stock.id}`}
+                  to={`${parentTransfoRoot}#stock/${parentTransform.source_stock.id}`}
                 >
                   Stock {parentTransform.source_stock.carbure_id}:
                   <b>
                     {t(parentTransform.source_stock.biofuel?.code ?? "", {
                       ns: "biofuels",
                     })}{" "}
-                    {formatUnit(parentTransform.dest_stock[stockField], unit)}
+                    {formatUnit(parentTransform.source_stock[stockField], unit)}{" "}
+                    (-
+                    {formatUnit(
+                      parentTransform.volume_deducted_from_source,
+                      "l"
+                    )}
+                    )
                   </b>
                 </ExternalLink>
               </li>
@@ -94,7 +100,7 @@ export const StockTraceability = ({
           <ul>
             {childrenLot?.map((child) => (
               <li key={child.id}>
-                <ExternalLink to={`${childLotRoot}${child.id}`}>
+                <ExternalLink to={`${childLotRoot}#lot/${child.id}`}>
                   Lot {child.carbure_id}:{" "}
                   <b>
                     {t(child.biofuel?.code ?? "", { ns: "biofuels" })}{" "}
@@ -106,13 +112,16 @@ export const StockTraceability = ({
 
             {childrenTransform?.map((child, i) => (
               <li key={i}>
-                <ExternalLink to={`${childTransfoRoot}${child.dest_stock.id}`}>
+                <ExternalLink
+                  to={`${childTransfoRoot}#stock/${child.dest_stock.id}`}
+                >
                   Stock {child.dest_stock.carbure_id}:{" "}
                   <b>
                     {t(child.dest_stock.biofuel?.code ?? "", {
                       ns: "biofuels",
                     })}{" "}
-                    {formatUnit(child.dest_stock[stockField], unit)}
+                    {formatUnit(child.dest_stock[stockField], unit)} (-
+                    {formatUnit(child.volume_deducted_from_source, "l")})
                   </b>
                 </ExternalLink>
               </li>
