@@ -67,7 +67,7 @@ def notify_lots_received(lots):
         if client['carbure_supplier__name'] is None: ### batches added to stock
             continue
         try:
-            # if the same notif exists 
+            # if the same notif exists
             notif = CarbureNotification.objects.get(dest_id=client['carbure_client'], type=CarbureNotification.LOTS_RECEIVED, acked=False, email_sent=False, meta__contains={'supplier': client['carbure_supplier__name']})
             notif.meta['count'] = notif.meta['count'] + client['count']
         except:
@@ -100,6 +100,8 @@ def notify_declaration_cancelled(declaration):
     notif.dest = declaration.entity
     notif.send_by_email = False
     notif.notify_administrator = False
+    period = declaration.period.year * 100 + declaration.period.month
+    notif.meta = {'period': period}
     notif.save()
 
 def notify_declaration_validated(declaration):
@@ -108,4 +110,6 @@ def notify_declaration_validated(declaration):
     notif.dest = declaration.entity
     notif.send_by_email = False
     notif.notify_administrator = False
+    period = declaration.period.year * 100 + declaration.period.month
+    notif.meta = {'period': period}
     notif.save()

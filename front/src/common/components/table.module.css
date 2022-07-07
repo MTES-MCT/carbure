@@ -1,115 +1,203 @@
 .table {
-  width: 100%;
-  border-spacing: 0;
-  font-weight: 600;
-  font-size: var(--font-size);
-  table-layout: fixed;
+  --min-cell-width: var(--spacing-xxl);
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
-.tableRow,
-.table tbody tr {
+h2 + .table[data-headless] {
+  margin-top: calc(-1 * var(--spacing-s));
+}
+
+.table.compact {
+  padding-bottom: var(--spacing-xs);
+}
+
+.columns {
+  display: flex;
+  align-items: flex-end;
+  padding: 0 var(--spacing-l);
+  gap: var(--spacing-m);
+}
+
+.header {
+  flex: 1 1 0%;
+  color: var(--blue-dark);
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 0.8em;
+  padding: var(--spacing-s) 0;
+}
+
+.header[data-sortable] {
   cursor: pointer;
 }
 
-.table .tableRow:nth-child(even),
-.table tbody tr:nth-child(even) {
-  background-color: var(--white);
+.rows {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+  gap: 1px;
 }
 
-.table .tableRow:nth-child(odd),
-.table tbody tr:nth-child(odd) {
+.compact .rows {
+  gap: var(--spacing-xs);
+}
+
+.rows > li {
+  position: relative;
+}
+
+.rows > li:not(.rowLink) {
+  padding: 0 var(--spacing-l);
+}
+
+.rows > li > a {
+  flex: 1;
+  min-width: 0;
+  padding: 0 var(--spacing-l);
+}
+
+.rows > li,
+.rows > li > a {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-m);
+}
+
+.compact .rows > li {
+  padding: 0 var(--spacing-xs);
+  gap: var(--spacing-xs);
+}
+
+.rows > li[data-interactive] {
+  cursor: pointer;
+}
+
+.rows > li:nth-child(odd) {
   background-color: var(--gray-light);
 }
 
-.table .tableRow:hover,
-.table tbody tr:hover {
+.rows > li:nth-child(even) {
+  background-color: var(--white);
+}
+
+.rows > li:hover {
   background-color: var(--gray-highlight);
-  z-index: 1;
 }
 
-.tableHeader,
-.table th {
-  flex: 1 0;
-  align-items: flex-end;
-  color: var(--blue-medium);
-  text-transform: uppercase;
-  font-size: 0.75em;
-  font-weight: bold;
-  padding: 8px;
-  user-select: none;
-  cursor: pointer;
+.cell {
+  flex: 1 1 0%;
+  padding: var(--spacing-m) 0;
 }
 
-.tableCell,
-.table .table tbody tr td {
-  flex: 1 0;
+.compact .cell {
+  padding: 0;
+}
+
+.cell strong {
+  display: inline-flex;
   align-items: center;
+  gap: var(--spacing-xs);
   font-weight: 600;
-  padding: 16px 8px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }
 
-.flexTable .tableHead .tableHeader:first-child,
-.flexTable .tableRow .tableCell:first-child {
-  padding-left: 24px;
-}
-
-.flexTable .tableHead .tableHeader:last-child,
-.flexTable .tableRow .tableCell:last-child {
-  padding-right: 24px;
-}
-
-.dualRow {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.rowLine {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.lineWarning {
-  color: var(--orange-dark);
-}
-
-.extraInfo {
-  font-size: 0.87em;
-  color: var(--gray-dark);
-}
-
-.actionColumn {
-  flex: 0.5;
-  justify-content: center;
-}
-
-.actionCell {
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-  color: var(--gray-dark);
-}
-
-.actionCell :global(.icon) {
+.cell strong [data-icon] {
   width: 20px;
 }
 
-.actionCell :global(.icon):hover {
-  stroke: var(--blue-medium);
+.cell .warning strong {
+  color: var(--orange-dark);
 }
 
-.actionCell :global(.icon):not(:last-child) {
-  margin-right: 4px;
+.cell small {
+  color: var(--gray-dark);
 }
 
-div.paddingColumn {
-  flex: 0 0 24px;
+.small {
+  flex: 0.5 1;
 }
 
-div.narrowColumn {
-  flex: 0.4;
+.cell,
+.header {
+  min-width: 0;
+}
+
+.header,
+.cell .multiline > * {
+  display: block;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.cell .multiline > strong > svg {
+  margin-bottom: -5px;
+}
+
+.selection {
+  align-self: stretch;
+  flex: 0 0 min-content;
+  min-width: 0;
+  padding: 0;
+  margin-left: calc(-1 * var(--spacing-l));
+  margin-right: calc(-1 * var(--spacing-s));
+}
+
+.selection [data-checkbox] {
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-l);
+}
+
+.header.selection [data-checkbox] {
+  padding: var(--spacing-s) var(--spacing-l);
+}
+
+.marker {
+  display: block;
+  position: absolute;
+  min-width: 4px;
+  height: 100%;
+  padding: 0;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+}
+
+.marker > * {
+  width: var(--spacing-xs);
+  height: 100%;
+}
+
+.marker .warning {
+  background-color: var(--orange-medium);
+}
+
+.marker .danger {
+  background-color: var(--red-dark);
+}
+
+.marker .success {
+  background-color: var(--green-medium);
+}
+
+.marker .info {
+  background-color: var(--blue-medium);
+}
+
+.actions {
+  display: flex;
+  flex: 0.33;
+  min-width: 0;
+  justify-content: center;
+  gap: var(--spacing-s);
+}
+
+.actions button {
+  color: var(--gray-dark);
 }

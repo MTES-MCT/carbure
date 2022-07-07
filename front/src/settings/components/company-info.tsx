@@ -1,13 +1,13 @@
 import { useTranslation } from "react-i18next"
 import useEntity from "carbure/hooks/entity"
 import { Entity, UserRole } from "carbure/types"
-import { useMutation } from "common-v2/hooks/async"
-import { Panel, LoaderOverlay } from "common-v2/components/scaffold"
-import * as api from "../api-v2"
-import Form, { useForm } from "common-v2/components/form"
-import { TextInput } from "common-v2/components/input"
-import Button from "common-v2/components/button"
-import { Save } from "common-v2/components/icons"
+import { useMutation } from "common/hooks/async"
+import { Panel, LoaderOverlay } from "common/components/scaffold"
+import * as api from "../api/company"
+import Form, { useForm } from "common/components/form"
+import { TextInput } from "common/components/input"
+import Button from "common/components/button"
+import { Save } from "common/components/icons"
 
 const CompanyInfo = () => {
   const { t } = useTranslation()
@@ -34,17 +34,29 @@ const CompanyInfo = () => {
     <Panel id="info">
       <header>
         <h1>{t("Informations sur la société")}</h1>
-        <Button
-          asideX
-          submit="entity-info"
-          disabled={!canSave}
-          icon={Save}
-          variant="primary"
-          label={t("Enregistrer les modifications")}
-        />
+        {canModify && (
+          <Button
+            asideX
+            submit="entity-info"
+            disabled={!canSave}
+            icon={Save}
+            variant="primary"
+            label={t("Enregistrer les modifications")}
+          />
+        )}
       </header>
 
-      <section style={{ paddingBottom: "var(--spacing-l)" }}>
+      {canModify && (
+        <section>
+          <p>
+            {t(
+              "Veuillez renseigner les informations de contact de votre société."
+            )}
+          </p>
+        </section>
+      )}
+
+      <section>
         <Form
           id="entity-info"
           onSubmit={() => {
@@ -61,33 +73,35 @@ const CompanyInfo = () => {
           }}
         >
           <TextInput
-            disabled={!canModify}
+            readOnly={!canModify}
             label={t("Nom légal")}
             {...bind("legal_name")}
           />
           <TextInput
-            disabled={!canModify}
+            readOnly={!canModify}
             label={t("N° d'enregistrement de la société")}
             {...bind("registration_id")}
           />
           <TextInput
-            disabled={!canModify}
+            readOnly={!canModify}
             label={t("Addresse de la société")}
             {...bind("registered_address")}
           />
           <TextInput
-            disabled={!canModify}
+            readOnly={!canModify}
             label={t("Responsable durabilité")}
             {...bind("sustainability_officer")}
           />
           <TextInput
             type="phone"
-            disabled={!canModify}
+            readOnly={!canModify}
             label={t("N° téléphone responsable durabilité")}
             {...bind("sustainability_officer_phone_number")}
           />
         </Form>
       </section>
+
+      <footer />
 
       {updateEntity.loading && <LoaderOverlay />}
     </Panel>

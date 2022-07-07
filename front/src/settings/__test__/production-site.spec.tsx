@@ -2,16 +2,19 @@ import { render, TestRoot } from "setupTests"
 import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Route } from "react-router-dom"
-import { producer, productionSite } from "common/__test__/data"
-import { waitWhileLoading } from "common/__test__/helpers"
-import Settings from "../index"
+import { producer, productionSite } from "carbure/__test__/data"
+import { getField, waitWhileLoading } from "carbure/__test__/helpers"
 
 import server, { setDeliverySites, setEntity, setProductionSites } from "./api"
+import ProductionSitesSettings from "settings/components/production-site"
 
 const SettingsWithHooks = () => {
   return (
     <TestRoot url="/org/0/settings">
-      {(app) => <Route path="/org/0/settings" element={<Settings />} />}
+      <Route
+        path="/org/0/settings"
+        element={<ProductionSitesSettings entity={producer} />}
+      />
     </TestRoot>
   )
 }
@@ -32,7 +35,7 @@ test("check the production site section of the settings", async () => {
 
   await waitWhileLoading()
 
-  expect(screen.getAllByText("Sites de production")).toHaveLength(2)
+  screen.getByText("Sites de production")
   screen.getByText("Ajouter un site de production")
   screen.getByText("Aucun site de production trouvé")
 })
@@ -50,11 +53,11 @@ test("add a production site in settings", async () => {
 
   expect(submit.closest("button")).toBeDisabled()
 
-  userEvent.type(screen.getByLabelText("N° d'identification (SIRET)"), "654321")
-  userEvent.type(screen.getByLabelText("Nom du site"), "Other Production Site")
-  userEvent.type(screen.getByLabelText("Date de mise en service"), "2010-01-31")
+  userEvent.type(getField("N° d'identification \\(SIRET\\)"), "654321")
+  userEvent.type(getField("Nom du site"), "Other Production Site")
+  userEvent.type(getField("Date de mise en service"), "2010-01-31")
 
-  userEvent.type(screen.getByLabelText("Pays"), "France")
+  userEvent.type(getField("Pays"), "France")
   const country = await screen.findByText("France")
   userEvent.click(country)
 
@@ -84,7 +87,7 @@ test("update a production site details", async () => {
   userEvent.click(ps)
 
   // check that the base values in the form are good
-  const input = screen.getByLabelText("Nom du site")
+  const input = getField("Nom du site")
   expect(input).toHaveValue("Test Production Site")
 
   // clear the psite name and type a new one
@@ -92,12 +95,16 @@ test("update a production site details", async () => {
   userEvent.type(input, "Other Production Site")
 
   // save the changes
-  userEvent.click(screen.getByText("Sauvegarder"))
+  const save = screen.getByText("Sauvegarder")
+  userEvent.click(save)
+
+  expect(save.closest("button")).toBeDisabled()
 
   await waitWhileLoading()
 
-  // modal is closed
-  expect(screen.queryByLabelText("Nom du site")).not.toBeInTheDocument()
+  expect(save.closest("button")).not.toBeDisabled()
+
+  userEvent.click(screen.getByText("Retour"))
 
   // wait for the api to load the new data and check that it's actually changed
   const row = await screen.findByText("Other Production Site")
@@ -106,9 +113,11 @@ test("update a production site details", async () => {
   userEvent.click(row)
 
   // verify that the inputs are fine as well
-  expect(screen.getByLabelText("Nom du site")).toHaveValue(
-    "Other Production Site"
-  )
+  expect(getField("Nom du site")).toHaveValue("Other Production Site")
+
+  await waitWhileLoading()
+
+  userEvent.click(screen.getByText("Retour"))
 })
 
 test("remove a production site section in settings", async () => {
@@ -130,7 +139,7 @@ test("remove a production site section in settings", async () => {
   // click on the delete button and then confirm the action on the popup
   userEvent.click(deleteButton)
   screen.getByText("Suppression site")
-  userEvent.click(screen.getByText("Confirmer"))
+  userEvent.click(screen.getByText("Supprimer"))
 
   await waitWhileLoading()
 

@@ -1,7 +1,10 @@
 import { memo } from "react"
 import { Stock } from "transactions/types"
-import Table, { Order, selectionColumn } from "common-v2/components/table"
+import Table, { Order, selectionColumn } from "common/components/table"
 import { useStockColumns } from "transactions/components/stocks/stock-table"
+import { To } from "react-router-dom"
+import Flags from "flags.json"
+import { compact } from "common/utils/collection"
 
 export interface ControlStockTableProps {
   loading: boolean
@@ -9,8 +12,8 @@ export interface ControlStockTableProps {
   order: Order | undefined
   selected: number[]
   onSelect: (selected: number[]) => void
-  onAction: (stock: Stock) => void
   onOrder: (order: Order | undefined) => void
+  rowLink: (stock: Stock) => To
 }
 
 export const ControlStockTable = memo(
@@ -20,29 +23,30 @@ export const ControlStockTable = memo(
     order,
     selected,
     onSelect,
-    onAction,
     onOrder,
+    rowLink,
   }: ControlStockTableProps) => {
     const columns = useStockColumns()
     return (
       <Table
         loading={loading}
         order={order}
-        onAction={onAction}
         onOrder={onOrder}
+        rowLink={rowLink}
         rows={stocks}
-        columns={[
+        columns={compact([
           selectionColumn(stocks, selected, onSelect, (s: Stock) => s.id),
           columns.status,
           columns.period,
-          columns.biofuel,
+          !Flags.preferred_unit && columns.biofuel,
+          Flags.preferred_unit && columns.quantity,
           columns.feedstock,
           columns.supplier,
           columns.client,
           columns.productionSite,
           columns.depot,
           columns.ghgReduction,
-        ]}
+        ])}
       />
     )
   }

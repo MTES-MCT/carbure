@@ -9,6 +9,7 @@ import { MarkOneAsFixedButton } from "transactions/actions/mark-as-fixed"
 import useEntity from "carbure/hooks/entity"
 import { RecallOneButton } from "transactions/actions/recall"
 import { ApproveOneFixButton } from "transactions/actions/approve-fix"
+import { CancelAcceptOneButton } from "transactions/actions/cancel-accept"
 
 export interface ActionBarProps {
   icon?: boolean
@@ -40,6 +41,8 @@ export const LotActions = ({ lot, canSave }: ActionBarProps) => {
           <RejectOneButton lot={lot} />
         </Fragment>
       )}
+
+      {isClient && status === "ACCEPTED" && <CancelAcceptOneButton lot={lot} />}
 
       {(isCreator || isSupplier) && status !== "DRAFT" && (
         <Fragment>

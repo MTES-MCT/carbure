@@ -1,19 +1,19 @@
 import { useState, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import useEntity from "carbure/hooks/entity"
-import { useQuery, useMutation } from "common-v2/hooks/async"
-import { usePortal } from "common-v2/components/portal"
-import { useNotify } from "common-v2/components/notifications"
-import Form, { Fieldset, useForm } from "common-v2/components/form"
-import Alert from "common-v2/components/alert"
-import Button from "common-v2/components/button"
-import Menu from "common-v2/components/menu"
-import Dialog from "common-v2/components/dialog"
-import Table, { Cell } from "common-v2/components/table"
-import { NumberInput } from "common-v2/components/input"
-import { Flask, Return, AlertCircle } from "common-v2/components/icons"
+import { useQuery, useMutation } from "common/hooks/async"
+import { usePortal } from "common/components/portal"
+import { useNotify } from "common/components/notifications"
+import Form, { Fieldset, useForm } from "common/components/form"
+import Alert from "common/components/alert"
+import Button from "common/components/button"
+import Menu from "common/components/menu"
+import Dialog from "common/components/dialog"
+import Table, { Cell } from "common/components/table"
+import { NumberInput } from "common/components/input"
+import { Flask, Return, AlertCircle } from "common/components/icons"
 import { StockQuery, TransformETBEPayload } from "../types"
-import { formatPercentage, formatNumber } from "common-v2/utils/formatters"
+import { formatPercentage, formatNumber } from "common/utils/formatters"
 import * as api from "../api"
 
 const PART_ETH_IN_ETBE = 0.47
@@ -158,6 +158,7 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
             <Form id="etbe" variant="columns">
               <Fieldset>
                 <NumberInput
+                  autoFocus
                   label={t("Volume d'ETBE produit")}
                   {...bind("volume_etbe")}
                 />

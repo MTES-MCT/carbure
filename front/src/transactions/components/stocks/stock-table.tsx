@@ -5,19 +5,25 @@ import {
   formatNumber,
   formatDate,
   formatPeriod,
-} from "common-v2/utils/formatters"
-import Table, { Cell, Order, selectionColumn } from "common-v2/components/table"
+  formatUnit,
+} from "common/utils/formatters"
+import Table, { Cell, Order, selectionColumn } from "common/components/table"
 import StockTag from "./stock-tag"
 import { isRedII } from "lot-add/components/ghg-fields"
+import { To } from "react-router-dom"
+import useEntity from "carbure/hooks/entity"
+import Flags from "flags.json"
+import { compact } from "common/utils/collection"
 
 export interface StockTableProps {
   loading: boolean
   stocks: Stock[]
   order: Order | undefined
   selected: number[]
+  rowLink: (stock: Stock) => To
   onSelect: (selected: number[]) => void
-  onAction: (stock: Stock) => void
   onOrder: (order: Order | undefined) => void
+  onAction?: (stock: Stock) => void
 }
 
 export const StockTable = memo(
@@ -26,6 +32,7 @@ export const StockTable = memo(
     stocks,
     order,
     selected,
+    rowLink,
     onSelect,
     onAction,
     onOrder,
@@ -37,18 +44,20 @@ export const StockTable = memo(
         order={order}
         onAction={onAction}
         onOrder={onOrder}
+        rowLink={rowLink}
         rows={stocks}
-        columns={[
+        columns={compact([
           selectionColumn(stocks, selected, onSelect, (s: Stock) => s.id),
           columns.status,
           columns.period,
-          columns.biofuel,
+          !Flags.preferred_unit && columns.biofuel,
+          Flags.preferred_unit && columns.quantity,
           columns.feedstock,
           columns.supplier,
           columns.productionSite,
           columns.depot,
           columns.ghgReduction,
-        ]}
+        ])}
       />
     )
   }
@@ -81,6 +90,11 @@ export function useStockColumns() {
         />
       ),
     },
+    quantity: {
+      key: "volume",
+      header: t("Biocarburant"),
+      cell: (stock: Stock) => <BiofuelCell stock={stock} />,
+    },
     feedstock: {
       key: "feedstock",
       header: t("Matière première"),
@@ -100,7 +114,7 @@ export function useStockColumns() {
     client: {
       header: t("Client"),
       cell: (stock: Stock) => (
-        <Cell text={stock.carbure_client?.name ?? 'N/A'} />
+        <Cell text={stock.carbure_client?.name ?? "N/A"} />
       ),
     },
     productionSite: {
@@ -133,6 +147,31 @@ export function useStockColumns() {
       },
     },
   }
+}
+
+interface StockCellProps {
+  stock: Stock
+}
+
+export const BiofuelCell = ({ stock }: StockCellProps) => {
+  const { t } = useTranslation()
+  const entity = useEntity()
+
+  const unitToField = {
+    l: "remaining_volume" as "remaining_volume",
+    kg: "remaining_weight" as "remaining_weight",
+    MJ: "remaining_lhv_amount" as "remaining_lhv_amount",
+  }
+
+  const unit = entity.preferred_unit ?? "l"
+  const field = unitToField[unit]
+
+  return (
+    <Cell
+      text={t(stock.biofuel?.code ?? "", { ns: "biofuels" })}
+      sub={formatUnit(stock[field], unit)}
+    />
+  )
 }
 
 export default StockTable

@@ -1,18 +1,20 @@
 import { useTranslation } from "react-i18next"
-import Autocomplete, {
-  AutocompleteProps,
-} from "common-v2/components/autocomplete"
-import { Fieldset, useBind, useFormContext } from "common-v2/components/form"
+import Autocomplete, { AutocompleteProps } from "common/components/autocomplete"
+import { Fieldset, useBind, useFormContext } from "common/components/form"
 import {
   NumberInput,
   NumberInputProps,
   TextInput,
-} from "common-v2/components/input"
-import * as norm from "common-v2/utils/normalizers"
+} from "common/components/input"
+import * as norm from "carbure/utils/normalizers"
 import { StockFormValue } from "./stock-form"
-import { Biofuel, Country, Feedstock } from "common/types"
-import { formatPercentage } from "common-v2/utils/formatters"
+import { Biofuel, Country, Feedstock, Unit } from "carbure/types"
+import { formatPercentage } from "common/utils/formatters"
 import { isRedII } from "lot-add/components/ghg-fields"
+import useEntity from "carbure/hooks/entity"
+import { useState } from "react"
+import { UnitSelect } from "lot-add/components/lot-fields"
+import Flags from "flags.json"
 
 export const LotFields = () => {
   const { t } = useTranslation()
@@ -20,8 +22,10 @@ export const LotFields = () => {
 
   return (
     <Fieldset label={t("Stock")}>
-      <InitialVolumeField />
-      <RemainingVolumeField />
+      {!Flags.preferred_unit && <InitialVolumeField />}
+      {!Flags.preferred_unit && <RemainingVolumeField />}
+      {Flags.preferred_unit && <InitialQuantityField />}
+      {Flags.preferred_unit && <RemainingQuantityField />}
       <BiofuelField />
       <FeedstockField />
       <CountryOfOriginField />
@@ -56,6 +60,30 @@ export const InitialVolumeField = (props: NumberInputProps) => {
   )
 }
 
+export const InitialQuantityField = (props: NumberInputProps) => {
+  const { t } = useTranslation()
+  const bind = useBind<StockFormValue>()
+  const entity = useEntity()
+
+  const [unit, setUnit] = useState<Unit | undefined>(entity.preferred_unit)
+
+  const unitToField = {
+    l: "initial_volume" as "initial_volume",
+    kg: "initial_weight" as "initial_weight",
+    MJ: "initial_lhv_amount" as "initial_lhv_amount",
+  }
+
+  return (
+    <NumberInput
+      readOnly
+      label={t("Quantité initiale")}
+      icon={<UnitSelect value={unit} onChange={setUnit} />}
+      {...bind(unitToField[unit ?? "l"])}
+      {...props}
+    />
+  )
+}
+
 export const RemainingVolumeField = (props: NumberInputProps) => {
   const { t } = useTranslation()
   const { bind, value } = useFormContext<StockFormValue>()
@@ -72,6 +100,35 @@ export const RemainingVolumeField = (props: NumberInputProps) => {
         t("Volume restant en litres") + ` (${formatPercentage(percentLeft)})`
       }
       {...bind("remaining_volume")}
+      {...props}
+    />
+  )
+}
+
+export const RemainingQuantityField = (props: NumberInputProps) => {
+  const { t } = useTranslation()
+  const { bind, value } = useFormContext<StockFormValue>()
+  const entity = useEntity()
+
+  const [unit, setUnit] = useState<Unit | undefined>(entity.preferred_unit)
+
+  const unitToField = {
+    l: "remaining_volume" as "remaining_volume",
+    kg: "remaining_weight" as "remaining_weight",
+    MJ: "remaining_lhv_amount" as "remaining_lhv_amount",
+  }
+
+  const percentLeft =
+    value.remaining_volume && value.initial_volume
+      ? 100 * (value.remaining_volume / value.initial_volume)
+      : 0
+
+  return (
+    <NumberInput
+      readOnly
+      label={`${t("Quantité restante")} (${formatPercentage(percentLeft)})`}
+      icon={<UnitSelect value={unit} onChange={setUnit} />}
+      {...bind(unitToField[unit ?? "l"])}
       {...props}
     />
   )

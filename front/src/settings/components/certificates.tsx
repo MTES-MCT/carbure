@@ -1,38 +1,38 @@
 import React, { useState } from "react"
-import cl from "clsx"
 import { Trans, useTranslation } from "react-i18next"
-import * as api from "../api-v2"
-import css from "./settings.module.css"
-import useEntity from "carbure/hooks/entity"
-import { useNotify } from "common-v2/components/notifications"
-import { useQuery, useMutation } from "common-v2/hooks/async"
-import { usePortal } from "common-v2/components/portal"
-import { formatDate } from "common-v2/utils/formatters"
-import { Panel } from "common-v2/components/scaffold"
-import Button from "common-v2/components/button"
-import Dialog, { Confirm } from "common-v2/components/dialog"
-import Table, { Cell, actionColumn } from "common-v2/components/table"
-import Autocomplete from "common-v2/components/autocomplete"
+import * as api from "../api/certificates"
+import useEntity, { useRights } from "carbure/hooks/entity"
+import { useNotify } from "common/components/notifications"
+import { useQuery, useMutation } from "common/hooks/async"
+import { usePortal } from "common/components/portal"
+import { formatDate } from "common/utils/formatters"
+import { Panel, Row } from "common/components/scaffold"
+import Button from "common/components/button"
+import Dialog, { Confirm } from "common/components/dialog"
+import Table, { Cell, actionColumn } from "common/components/table"
+import Autocomplete from "common/components/autocomplete"
 import {
   Cross,
   Plus,
   Return,
   Refresh,
   AlertCircle,
-} from "common-v2/components/icons"
+} from "common/components/icons"
 import {
   normalizeCertificate,
   normalizeEntityCertificate,
-} from "common-v2/utils/normalizers"
-import { formatJSON } from "common-v2/utils/formatters"
-import { Certificate, EntityCertificate } from "common/types"
-import { isExpired } from "./common"
-import Alert from "common-v2/components/alert"
-import Select from "common-v2/components/select"
+} from "carbure/utils/normalizers"
+import { Certificate, EntityCertificate, UserRole } from "carbure/types"
+import Alert from "common/components/alert"
+import Select from "common/components/select"
+import isBefore from "date-fns/isBefore"
+import { compact } from "common/utils/collection"
+import Form from "common/components/form"
 
 const Certificates = () => {
   const { t } = useTranslation()
   const entity = useEntity()
+  const rights = useRights()
   const notify = useNotify()
   const portal = usePortal()
 
@@ -58,6 +58,7 @@ const Certificates = () => {
     { invalidates: ["user-settings"] }
   )
 
+  const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
   const certificateData = certificates.result?.data.data ?? []
   const validCertificates = certificateData.filter(e => !isExpired(e.certificate.valid_until)) // prettier-ignore
 
@@ -65,20 +66,22 @@ const Certificates = () => {
     <Panel id="certificates">
       <header>
         <h1>{t("Certificats")}</h1>
-        <Button
-          asideX
-          variant="primary"
-          icon={Plus}
-          label={t("Ajouter un certificat")}
-          action={() =>
-            portal((close) => <CertificateAddDialog onClose={close} />)
-          }
-          style={{ fontSize: "0.87em" }}
-        />
+        {canModify && (
+          <Button
+            asideX
+            variant="primary"
+            icon={Plus}
+            label={t("Ajouter un certificat")}
+            action={() =>
+              portal((close) => <CertificateAddDialog onClose={close} />)
+            }
+          />
+        )}
       </header>
 
       <section>
         <Select
+          disabled={!canModify}
           label={t("Certificat par défaut")}
           placeholder={t("Sélectionner un certificat")}
           value={entity.default_certificate}
@@ -90,13 +93,16 @@ const Certificates = () => {
       </section>
 
       {certificateData.length === 0 && (
-        <section style={{ paddingBottom: "var(--spacing-l)" }}>
-          <Alert
-            variant="warning"
-            icon={AlertCircle}
-            label={t("Aucun certificat associé à cette société")}
-          />
-        </section>
+        <>
+          <section>
+            <Alert
+              variant="warning"
+              icon={AlertCircle}
+              label={t("Aucun certificat associé à cette société")}
+            />
+          </section>
+          <footer />
+        </>
       )}
 
       {certificateData.length > 0 && (
@@ -124,56 +130,55 @@ const Certificates = () => {
               cell: (c) => <Cell text={c.certificate.certificate_type} />,
             },
             {
-              key: "scope",
-              header: t("Périmètre"),
-              orderBy: (c) => JSON.stringify(c.certificate.scope),
-              cell: (c) => (
-                <Cell
-                  text={
-                    c.certificate.scope
-                      ? formatJSON(c.certificate.scope)
-                      : t("N/A")
-                  }
-                />
-              ),
-            },
-            {
               key: "holder",
               header: t("Détenteur"),
               orderBy: (c) => c.certificate.certificate_holder,
               cell: (c) => <Cell text={c.certificate.certificate_holder} />,
             },
             {
+              key: "scope",
+              header: t("Périmètre"),
+              orderBy: (c) => c.certificate.scope ?? "-",
+              cell: (c) => <Cell text={c.certificate.scope ?? "-"} />,
+            },
+            {
               key: "validity",
               header: t("Validité"),
               orderBy: (c) => c.certificate.valid_until,
-              cell: (c) => <ExpirationDate link={c} />,
+              cell: (c) => <ExpirationDate link={c} readOnly={!canModify} />,
             },
-            actionColumn<EntityCertificate>((c) => [
-              <Button
-                captive
-                variant="icon"
-                icon={Cross}
-                action={() =>
-                  portal((close) => (
-                    <Confirm
-                      title={t("Suppression certificat")}
-                      description={t("Voulez-vous supprimer ce certificat ?")}
-                      confirm={t("Supprimer")}
-                      variant="danger"
-                      onClose={close}
-                      onConfirm={() =>
-                        deleteCertificate.execute(
-                          entity.id,
-                          c.certificate.certificate_id,
-                          c.certificate.certificate_type
-                        )
-                      }
-                    />
-                  ))
-                }
-              />,
-            ]),
+            actionColumn<EntityCertificate>((c) =>
+              compact([
+                canModify && (
+                  <Button
+                    captive
+                    variant="icon"
+                    icon={Cross}
+                    action={() =>
+                      portal((close) => (
+                        <Confirm
+                          title={t("Suppression certificat")}
+                          description={t(
+                            "Voulez-vous supprimer ce certificat ?"
+                          )}
+                          confirm={t("Supprimer")}
+                          icon={Cross}
+                          variant="danger"
+                          onClose={close}
+                          onConfirm={() =>
+                            deleteCertificate.execute(
+                              entity.id,
+                              c.certificate.certificate_id,
+                              c.certificate.certificate_type
+                            )
+                          }
+                        />
+                      ))
+                    }
+                  />
+                ),
+              ])
+            ),
           ]}
         />
       )}
@@ -196,12 +201,15 @@ const CertificateAddDialog = ({ onClose }: CertificateAddDialogProps) => {
 
   const addCertificate = useMutation(api.addCertificate, {
     invalidates: ["my-certificates"],
-    onSuccess: () =>
-      notify(t("Le certificat a bien été ajouté !"), { variant: "success" }),
-    onError: () =>
+    onSuccess: () => {
+      notify(t("Le certificat a bien été ajouté !"), { variant: "success" })
+      onClose()
+    },
+    onError: () => {
       notify(t("Le certificat n'a pas pu être ajouté !"), {
         variant: "danger",
-      }),
+      })
+    },
   })
 
   return (
@@ -216,20 +224,24 @@ const CertificateAddDialog = ({ onClose }: CertificateAddDialogProps) => {
           )}
         </section>
         <section>
-          <Autocomplete
-            label={t("Rechercher un certificat")}
-            value={certificate}
-            onChange={setCertificate}
-            getOptions={(query) =>
-              api.getCertificates(query).then((res) => res.data.data ?? [])
-            }
-            normalize={normalizeCertificate}
-          />
+          <Form id="add-certificate">
+            <Autocomplete
+              autoFocus
+              label={t("Rechercher un certificat")}
+              value={certificate}
+              onChange={setCertificate}
+              getOptions={(query) =>
+                api.getCertificates(query).then((res) => res.data.data ?? [])
+              }
+              normalize={normalizeCertificate}
+            />
+          </Form>
         </section>
       </main>
       <footer>
         <Button
           asideX
+          submit="add-certificate"
           loading={addCertificate.loading}
           disabled={!certificate}
           variant="primary"
@@ -251,9 +263,10 @@ const CertificateAddDialog = ({ onClose }: CertificateAddDialogProps) => {
 
 type ExpirationDateProps = {
   link: EntityCertificate
+  readOnly?: boolean
 }
 
-export const ExpirationDate = ({ link }: ExpirationDateProps) => {
+export const ExpirationDate = ({ link, readOnly }: ExpirationDateProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
@@ -262,30 +275,42 @@ export const ExpirationDate = ({ link }: ExpirationDateProps) => {
   const updated = link.has_been_updated
 
   return (
-    <span className={cl(css.expirationDate, expired && css.expired)}>
+    <Row
+      style={
+        expired
+          ? {
+              alignItems: "center",
+              color: "var(--orange-dark)",
+              gap: "var(--spacing-s)",
+            }
+          : undefined
+      }
+    >
       {expired && !updated && (
         <React.Fragment>
           {formatted}
-          <Button
-            captive
-            icon={Refresh}
-            label={t("Mise à jour")}
-            action={() =>
-              portal((close) => (
-                <CertificateUpdateDialog
-                  oldCertificate={link.certificate}
-                  onClose={close}
-                />
-              ))
-            }
-          />
+          {!readOnly && (
+            <Button
+              captive
+              icon={Refresh}
+              label={t("Mise à jour")}
+              action={() =>
+                portal((close) => (
+                  <CertificateUpdateDialog
+                    oldCertificate={link.certificate}
+                    onClose={close}
+                  />
+                ))
+              }
+            />
+          )}
         </React.Fragment>
       )}
 
       {expired && updated && <Trans>Mis à jour ({{ formatted }})</Trans>}
 
       {!expired && formatted}
-    </span>
+    </Row>
   )
 }
 
@@ -316,7 +341,6 @@ const CertificateUpdateDialog = ({
       notify(t("Le certificat n'a pas pu être mis à jour !"), {
         variant: "danger",
       })
-      onClose()
     },
   })
 
@@ -332,20 +356,24 @@ const CertificateUpdateDialog = ({
           )}
         </section>
         <section>
-          <Autocomplete
-            label={t("Rechercher un certificat")}
-            value={certificate}
-            onChange={setCertificate}
-            getOptions={(query) =>
-              api.getCertificates(query).then((res) => res.data.data ?? [])
-            }
-            normalize={normalizeCertificate}
-          />
+          <Form id="replace-certificate">
+            <Autocomplete
+              autoFocus={true}
+              label={t("Rechercher un certificat")}
+              value={certificate}
+              onChange={setCertificate}
+              getOptions={(query) =>
+                api.getCertificates(query).then((res) => res.data.data ?? [])
+              }
+              normalize={normalizeCertificate}
+            />
+          </Form>
         </section>
       </main>
       <footer>
         <Button
           asideX
+          submit="replace-certificate"
           loading={updateCertificate.loading}
           disabled={!certificate}
           variant="primary"
@@ -365,6 +393,16 @@ const CertificateUpdateDialog = ({
       </footer>
     </Dialog>
   )
+}
+
+export function isExpired(date: string) {
+  try {
+    const now = new Date()
+    const valid_until = new Date(date)
+    return isBefore(valid_until, now)
+  } catch (e) {
+    return false
+  }
 }
 
 export default Certificates

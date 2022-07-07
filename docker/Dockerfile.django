@@ -1,9 +1,10 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 # base
 RUN apt-get update
-RUN apt-get install mariadb-client libmariadbd-dev libffi-dev -y
-RUN apt-get install python3.7 python3-pip python3-dev git -y
+
+RUN apt-get install mariadb-client libmariadb-dev libmariadbd-dev libffi-dev -y
+RUN apt-get install python3.10 python3-pip python3-dev git -y
 RUN apt-get install redis -y
 
 ENV PYTHONUNBUFFERED 1

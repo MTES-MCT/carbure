@@ -1,18 +1,18 @@
 import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { useNavigate, useSearchParams } from "react-router-dom"
-import { useMutation, useQuery } from "common-v2/hooks/async"
-import { useNotify } from "common-v2/components/notifications"
-import Form, { useForm } from "common-v2/components/form"
-import { TextInput } from "common-v2/components/input"
+import { useMutation, useQuery } from "common/hooks/async"
+import { useNotify } from "common/components/notifications"
+import Form, { useForm } from "common/components/form"
+import { TextInput } from "common/components/input"
 import {
   Loader,
   Mail,
   Refresh,
   Return,
   UserCheck,
-} from "common-v2/components/icons"
-import Button from "common-v2/components/button"
+} from "common/components/icons"
+import Button from "common/components/button"
 import { Container } from "./login"
 
 import * as api from "../api"
@@ -116,6 +116,7 @@ export const ActivateRequest = () => {
           onSubmit={() => requestActivationLink.execute(value.email!)}
         >
           <TextInput
+            autoFocus
             variant="solid"
             icon={Mail}
             type="email"

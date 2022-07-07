@@ -1,5 +1,5 @@
-import { Api, api, download } from "common-v2/services/api"
-import { Option } from "common-v2/utils/normalize"
+import { Api, api, download } from "common/services/api"
+import { Option } from "common/utils/normalize"
 import { LotSummary, Snapshot } from "../types"
 import {
   Filter,
@@ -109,5 +109,19 @@ export async function commentLots(
     is_visible_by_admin,
     is_visible_by_auditor,
     comment,
+  })
+}
+
+export async function markAsConform(entity_id: number, selection: number[]) {
+  return api.post<Api<void>>("/auditor/lots/mark-as-conform", {
+    entity_id,
+    selection,
+  })
+}
+
+export async function markAsNonConform(entity_id: number, selection: number[]) {
+  return api.post<Api<void>>("/auditor/lots/mark-as-nonconform", {
+    entity_id,
+    selection,
   })
 }

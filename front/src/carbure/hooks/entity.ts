@@ -1,6 +1,7 @@
 import { useMatch } from "react-router-dom"
+import { createContext, useContext } from "react"
 import { Entity, EntityType, ExternalAdminPages, UserRole } from "../types"
-import { useUser } from "./user"
+import { UserManager } from "./user"
 
 export interface EntityManager extends Entity {
   isBlank: boolean
@@ -16,8 +17,7 @@ export interface EntityManager extends Entity {
   hasRights: (...roles: UserRole[]) => boolean
 }
 
-export function useEntity(): EntityManager {
-  const user = useUser()
+export function useEntityManager(user: UserManager): EntityManager {
   const match = useMatch("/org/:entity/*")
 
   const entityID = parseInt(match?.params.entity ?? "-1", 10)
@@ -39,6 +39,7 @@ export function useEntity(): EntityManager {
     has_trading: entity?.has_trading ?? false,
     has_stocks: entity?.has_stocks ?? false,
     has_direct_deliveries: entity?.has_direct_deliveries ?? false,
+    preferred_unit: entity?.preferred_unit ?? "l",
     default_certificate: entity?.default_certificate ?? "",
     ext_admin_pages: entity?.ext_admin_pages ?? [],
 
@@ -60,6 +61,14 @@ export function useEntity(): EntityManager {
       (entityRights && roles.includes(entityRights.role)) ?? false,
   }
 }
+
+function useEntity() {
+  const entity = useContext(EntityContext)
+  if (entity === undefined) throw new Error("Entity context is undefined")
+  return entity
+}
+
+export const EntityContext = createContext<EntityManager | undefined>(undefined)
 
 const INDUSTRY = [EntityType.Producer, EntityType.Operator, EntityType.Trader]
 export function isIndustry(type: EntityType | undefined) {

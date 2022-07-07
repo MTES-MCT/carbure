@@ -1,11 +1,12 @@
-import { ActionBar } from "common-v2/components/scaffold"
-import { SearchInput } from "common-v2/components/input"
+import { ActionBar } from "common/components/scaffold"
+import { SearchInput } from "common/components/input"
 import { ExportLotsButton } from "../actions/export"
 import { Lot, LotQuery } from "transactions/types"
-import { PinManyButton } from "controls/actions/pin"
+import { AlertManyButton } from "controls/actions/alert"
 import DeliveryMapButton from "controls/actions/delivery-map"
 import useEntity from "carbure/hooks/entity"
 import { useStatus } from "./status"
+import { SetManyConformityButton } from "controls/actions/set-conformity"
 
 export interface ActionBarProps {
   count: number
@@ -34,8 +35,11 @@ export const ControlActions = ({
     <ActionBar>
       {status !== "stocks" && (
         <>
-          {selectedLots && <PinManyButton {...props} lots={selectedLots} />}
+          {selectedLots && <AlertManyButton {...props} lots={selectedLots} />}
           {entity.isAdmin && <DeliveryMapButton {...props} />}
+          {entity.isAuditor && status === "alerts" && (
+            <SetManyConformityButton {...props} />
+          )}
         </>
       )}
 

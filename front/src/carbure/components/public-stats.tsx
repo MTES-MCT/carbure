@@ -1,5 +1,5 @@
-import { Main } from "common-v2/components/scaffold"
-import useTitle from "common-v2/hooks/title"
+import { Main } from "common/components/scaffold"
+import useTitle from "common/hooks/title"
 import IframeResizer from "iframe-resizer-react"
 import { useTranslation } from "react-i18next"
 
@@ -16,7 +16,7 @@ const PublicStats = () => {
     <Main>
       <section>
         <IframeResizer
-          src={`${publicLink}?annee=${currentYear}`}
+          src={`${publicLink}?annee=${currentYear}#hide_parameters=annee`}
           frameBorder="0"
           allowTransparency
           style={{ boxShadow: "var(--shadow)" }}

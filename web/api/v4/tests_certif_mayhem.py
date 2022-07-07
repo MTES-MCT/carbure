@@ -1,6 +1,7 @@
 import datetime
 from django.test import TestCase
 from django.urls import reverse
+from django.db.models import Count
 from django.contrib.auth import get_user_model
 
 from core.models import CarbureLot, CarbureStock, MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot, UserRights
@@ -28,14 +29,14 @@ class LotsCertifMayhemTest(TestCase):
         loggedin = self.client.login(username=self.user1.email, password=self.password)
         self.assertTrue(loggedin)
 
-        self.producer = Entity.objects.filter(entity_type=Entity.PRODUCER)[0]
+        self.producer = Entity.objects.filter(entity_type=Entity.PRODUCER).annotate(psites=Count('productionsite')).filter(psites__gt=0)[0]
         self.producer.default_certificate = "PRODUCER_CERTIFICATE"
         self.producer.save()
 
-        self.trader = Entity.objects.filter(entity_type=Entity.TRADER)[0]
+        self.trader = Entity.objects.get(pk=18) #  .filter(entity_type=Entity.TRADER)[0]
         self.trader.default_certificate = "TRADER_CERTIFICATE"
         self.trader.save()
-        self.operator = Entity.objects.filter(entity_type=Entity.OPERATOR)[0]
+        self.operator = Entity.objects.get(pk=1) # .filter(entity_type=Entity.OPERATOR)[0]
         UserRights.objects.update_or_create(entity=self.producer, user=self.user1, role=UserRights.RW)
         UserRights.objects.update_or_create(entity=self.trader, user=self.user1, role=UserRights.RW)
         UserRights.objects.update_or_create(entity=self.operator, user=self.user1, role=UserRights.RW)
@@ -54,17 +55,17 @@ class LotsCertifMayhemTest(TestCase):
         response = self.client.post(reverse('api-v4-add-lots'), lot)
         self.assertEqual(response.status_code, 200)
         data = response.json()['data']
-        lot_id = data['id']        
+        lot_id = data['id']
         lot = CarbureLot.objects.get(id=lot_id)
         return lot
 
-    def send_lot(self, lot):
+    def send_lot(self, lot, expected_status=200):
         response = self.client.post(reverse('api-v4-send-lots'), {'entity_id': self.producer.id, 'selection': [lot.id]})
         if response.status_code != 200:
             print(response.json())
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, expected_status)
         lot = CarbureLot.objects.get(id=lot.id)
-        return lot   
+        return lot
 
     # Cas normal: Mon Certificat = 'supplier_certificate'
     # Cas "trading": Certificat du fournisseur = 'supplier_certificate', mon certificat = 'vendor_certificate'
@@ -74,14 +75,14 @@ class LotsCertifMayhemTest(TestCase):
         lot = self.send_lot(lot)
         self.assertEqual(lot.supplier_certificate, self.producer.default_certificate)
         self.assertEqual(lot.vendor_certificate, None)
-    
+
     def test_send_lot_with_supplier_certificate(self):
         # producer to operator, will use what is provided
         lot = self.create_draft(supplier_certificate="TOTO")
         lot = self.send_lot(lot)
         self.assertEqual(lot.supplier_certificate, "TOTO")
         self.assertEqual(lot.vendor_certificate, None)
-        
+
     def test_send_lot_with_vendor_certificate(self):
         # TRADING - trading lot with no supplier certificate provided
         lot = self.create_draft(production_site_commissioning_date="12/12/2012", vendor_certificate="TOTO", carbure_producer='', carbure_production_site='', unknown_producer="BIOFUEL GMBH")

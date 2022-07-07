@@ -1,4 +1,5 @@
 import datetime
+import traceback
 from dateutil.relativedelta import *
 
 from django.http import JsonResponse
@@ -8,8 +9,11 @@ from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from api.v4.helpers import get_prefetched_data
+from api.v4.sanity_checks import background_bulk_scoring, bulk_sanity_checks, bulk_scoring
+from core.carburetypes import CarbureSanityCheckErrors
 
-from core.models import CarbureLot, CarbureStock, Entity, GenericError, UserRights, Pays, MatierePremiere, Biocarburant, Depot, EntityDepot
+from core.models import CarbureLot, CarbureLotReliabilityScore, CarbureStock, Entity, GenericError, UserRights, Pays, MatierePremiere, Biocarburant, Depot, EntityDepot
 from core.serializers import EntityCertificateSerializer, GenericCertificateSerializer
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
 from core.decorators import check_rights, otp_or_403
@@ -257,13 +261,15 @@ def set_production_site_mp(request, *args, **kwargs):
         ProductionSiteInput.objects.filter(production_site=ps).delete()
         for mp in mp_list:
             obj, created = ProductionSiteInput.objects.update_or_create(production_site=ps, matiere_premiere=mp)
+            if created:
+                # remove errors
+                impacted_txs = CarbureLot.objects.filter(carbure_production_site=ps, feedstock=mp)
+                #bulk_scoring(impacted_txs)
+                background_bulk_scoring(impacted_txs)
+                GenericError.objects.filter(lot__in=impacted_txs, error="MP_NOT_CONFIGURED").delete()
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
                             }, status=400)
-
-    # remove errors
-    impacted_txs = CarbureLot.objects.filter(carbure_production_site=ps, feedstock=mp)
-    GenericError.objects.filter(lot__in=impacted_txs, error="MP_NOT_CONFIGURED").delete()
     return JsonResponse({'status': 'success'})
 
 
@@ -297,26 +303,28 @@ def set_production_site_bc(request, *args, **kwargs):
         ProductionSiteOutput.objects.filter(production_site=ps).delete()
         for bc in bc_list:
             obj, created = ProductionSiteOutput.objects.update_or_create(production_site=ps, biocarburant=bc)
+            if created:
+                # remove errors
+                impacted_txs = CarbureLot.objects.filter(carbure_production_site=ps, biofuel=bc)
+                #bulk_scoring(impacted_txs)
+                background_bulk_scoring(impacted_txs)
+                GenericError.objects.filter(lot__in=impacted_txs, error="BC_NOT_CONFIGURED").delete()
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
                             }, status=400)
-    # remove errors
-    impacted_txs = CarbureLot.objects.filter(carbure_production_site=ps, biofuel=bc)
-    GenericError.objects.filter(lot__in=impacted_txs, error="BC_NOT_CONFIGURED").delete()
+
     return JsonResponse({'status': 'success'})
 
 
 @check_rights('entity_id')
 def get_delivery_sites(request, *args, **kwargs):
     entity = kwargs['context']['entity']
-
     try:
         ds = EntityDepot.objects.filter(entity=entity)
         ds = [d.natural_key() for d in ds]
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not find entity's delivery sites",
                             }, status=400)
-
     return JsonResponse({'status': 'success', 'data': ds})
 
 
@@ -352,8 +360,13 @@ def add_delivery_site(request, *args, **kwargs):
             return JsonResponse({'status': 'error', 'message': "Could not find outsourcing blender"}, status=400)
 
     try:
-        EntityDepot.objects.update_or_create(entity=entity, depot=ds, defaults={'ownership_type': ownership_type, 'blending_is_outsourced': blending_is_outsourced, 'blender': blender})
+        ed, created = EntityDepot.objects.update_or_create(entity=entity, depot=ds, defaults={'ownership_type': ownership_type, 'blending_is_outsourced': blending_is_outsourced, 'blender': blender})
+        lots = CarbureLot.objects.filter(carbure_client=entity, carbure_delivery_site=ds)
+        #bulk_scoring(lots)
+        background_bulk_scoring(lots)
+        GenericError.objects.filter(lot__in=lots, error=CarbureSanityCheckErrors.DEPOT_NOT_CONFIGURED).delete()
     except Exception:
+        traceback.print_exc()
         return JsonResponse({'status': 'error', 'message': "Could not link entity to delivery site",
                             }, status=400)
     return JsonResponse({'status': 'success'})
@@ -366,6 +379,9 @@ def delete_delivery_site(request, *args, **kwargs):
 
     try:
         EntityDepot.objects.filter(entity=entity, depot__depot_id=delivery_site_id).delete()
+        lots = CarbureLot.objects.filter(carbure_client=entity, carbure_delivery_site__depot_id=delivery_site_id)
+        #bulk_scoring(lots)
+        background_bulk_scoring(lots)
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not delete entity's delivery site",
                             }, status=400)

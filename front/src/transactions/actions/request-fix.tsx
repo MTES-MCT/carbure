@@ -3,17 +3,18 @@ import { useTranslation } from "react-i18next"
 import { Lot } from "../types"
 import * as api from "../api"
 import useEntity from "carbure/hooks/entity"
-import { useMutation } from "common-v2/hooks/async"
-import { useNotify } from "common-v2/components/notifications"
-import { variations } from "common-v2/utils/formatters"
-import Button from "common-v2/components/button"
-import Dialog from "common-v2/components/dialog"
-import { Return, Wrench } from "common-v2/components/icons"
-import { usePortal } from "common-v2/components/portal"
+import { useMutation } from "common/hooks/async"
+import { useNotify } from "common/components/notifications"
+import { variations } from "common/utils/formatters"
+import Button from "common/components/button"
+import Dialog from "common/components/dialog"
+import { Return, Wrench } from "common/components/icons"
+import { usePortal } from "common/components/portal"
 import { useStatus } from "transactions/components/status"
-import { TextInput } from "common-v2/components/input"
+import { TextInput } from "common/components/input"
 import { LotSummary } from "../components/lots/lot-summary"
 import { useMatomo } from "matomo"
+import Form from "common/components/form"
 
 export interface RequestManyFixesButtonProps {
   disabled?: boolean
@@ -138,19 +139,22 @@ const RequestFixDialog = ({
           })}
         </section>
         <section>
-          <TextInput
-            required
-            label={t("Commentaire")}
-            value={comment}
-            onChange={setComment}
-          />
+          <Form id="request-fix">
+            <TextInput
+              autoFocus
+              required
+              label={t("Commentaire")}
+              value={comment}
+              onChange={setComment}
+            />
+          </Form>
         </section>
         {summary && <LotSummary query={query} selection={selection} />}
       </main>
       <footer>
         <Button
           asideX
-          submit
+          submit="request-fix"
           loading={requestFix.loading}
           variant="warning"
           icon={Wrench}

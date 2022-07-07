@@ -2,15 +2,16 @@ import React, { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api"
 import useEntity from "carbure/hooks/entity"
-import { useMutation } from "common-v2/hooks/async"
-import { useNotify } from "common-v2/components/notifications"
-import Button, { ExternalLink as Ext } from "common-v2/components/button"
-import Dialog from "common-v2/components/dialog"
-import { Check, Return, Upload } from "common-v2/components/icons"
-import { usePortal } from "common-v2/components/portal"
-import { FileArea, FileInput } from "common-v2/components/input"
-import { LoaderOverlay } from "common-v2/components/scaffold"
+import { useMutation } from "common/hooks/async"
+import { useNotify } from "common/components/notifications"
+import Button, { ExternalLink as Ext } from "common/components/button"
+import Dialog from "common/components/dialog"
+import { Check, Return, Upload } from "common/components/icons"
+import { usePortal } from "common/components/portal"
+import { FileArea, FileInput } from "common/components/input"
+import { LoaderOverlay } from "common/components/scaffold"
 import { useMatomo } from "matomo"
+import Form from "common/components/form"
 
 const FAQ_URL = "https://carbure-1.gitbook.io/faq/"
 const TEMPLATE_URL = "/api/download-template"
@@ -99,18 +100,21 @@ const ImportDialog = ({ onClose }: ImportDialogProps) => {
           </p>
         </section>
         <section>
-          <FileInput
-            loading={importLots.loading}
-            icon={file ? Check : Upload}
-            label={t("Fichier excel")}
-            placeholder={file ? file.name : t("Importer un fichier")}
-            onChange={setFile}
-          />
+          <Form id="import-excel">
+            <FileInput
+              loading={importLots.loading}
+              icon={file ? Check : Upload}
+              label={t("Fichier excel")}
+              placeholder={file ? file.name : t("Importer un fichier")}
+              onChange={setFile}
+            />
+          </Form>
         </section>
       </main>
       <footer>
         <Button
           asideX
+          submit="import-excel"
           loading={importLots.loading}
           disabled={!file}
           variant="primary"

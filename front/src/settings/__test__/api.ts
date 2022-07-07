@@ -1,7 +1,7 @@
 import { rest } from "msw"
 import { setupServer } from "msw/node"
 
-import { OwnershipType } from "common/types"
+import { OwnershipType } from "carbure/types"
 
 import {
   deliverySite,
@@ -11,15 +11,15 @@ import {
   entityRights,
   entityRight,
   entityRequest,
-} from "common/__test__/data"
+} from "carbure/__test__/data"
 import {
   okCountrySearch,
   okDeliverySitesSearch,
   okTranslations,
   okErrorsTranslations,
   okFieldsTranslations,
-} from "common/__test__/api"
-import { clone, Data } from "common/__test__/helpers"
+} from "carbure/__test__/api"
+import { clone, Data } from "carbure/__test__/helpers"
 
 let deliverySites: any[] = []
 let productionSites: any[] = []
@@ -184,16 +184,16 @@ export const okAddProductionSite = rest.post(
   (req, res, ctx) => {
     const body = req.body as FormData
 
-    setProductionSites([
-      {
-        ...productionSite,
-        name: body.get("name") as string,
-        date_mise_en_service: body.get("date_mise_en_service") as string,
-        site_id: body.get("site_id") as string,
-      },
-    ])
+    const psite = {
+      ...productionSite,
+      name: body.get("name") as string,
+      date_mise_en_service: body.get("date_mise_en_service") as string,
+      site_id: body.get("site_id") as string,
+    }
 
-    return res(ctx.json({ status: "success" }))
+    setProductionSites([psite])
+
+    return res(ctx.json({ status: "success", data: psite }))
   }
 )
 

@@ -28,8 +28,33 @@
   --gray-dark: #6a6a6a;
   --gray-highlight: #e7e7e7;
 
-  --font-size: 15px;
+  --score-a: #18753c;
+  --score-b: #99c221;
+  --score-c: #fcc63a;
+  --score-d: #ff732c;
+  --score-e: #f60700;
+
+  --font-size: 16px;
   --font-family: Marianne, arial, sans-serif;
 
-  --main-spacing: 32px;
+  --spacing-xxs: 2px;
+  --spacing-xs: 4px;
+  --spacing-s: 8px;
+  --spacing-m: 16px;
+  --spacing-l: 24px;
+  --spacing-xl: 40px;
+  --spacing-xxl: 128px;
+
+  --main-spacing-x: var(--spacing-l);
+  --main-spacing-y: var(--spacing-l);
+
+  --shadow: 0 1px 2px var(--gray-medium);
+  --border: 1px solid var(--gray-highlight);
+  --border-radius: var(--spacing-xs);
+}
+
+@media screen and (min-width: 1600px) {
+  :root {
+    --main-spacing-x: var(--spacing-xxl);
+  }
 }

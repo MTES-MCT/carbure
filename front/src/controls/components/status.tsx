@@ -1,9 +1,9 @@
 import { useTranslation } from "react-i18next"
 import { useMatch } from "react-router-dom"
 import { Snapshot, AdminStatus } from "../types"
-import Tabs from "common-v2/components/tabs"
-import { Loader } from "common-v2/components/icons"
-import { formatNumber } from "common-v2/utils/formatters"
+import Tabs from "common/components/tabs"
+import { Loader } from "common/components/icons"
+import { formatNumber } from "common/utils/formatters"
 
 export interface StatusTabsProps {
   loading: boolean
@@ -27,29 +27,18 @@ export const StatusTabs = ({
             <StatusRecap
               loading={loading}
               count={count.alerts}
-              label={t("Alertes", { count: count.alerts })}
+              label={t("Signalements", { count: count.alerts })}
             />
           ),
         },
         {
-          key: "corrections",
-          path: "corrections",
+          key: "lots",
+          path: "lots",
           label: (
             <StatusRecap
               loading={loading}
-              count={count.corrections}
-              label={t("Corrections", { count: count.corrections })}
-            />
-          ),
-        },
-        {
-          key: "declarations",
-          path: "declarations",
-          label: (
-            <StatusRecap
-              loading={loading}
-              count={count.declarations}
-              label={t("Déclarations", { count: count.declarations })}
+              count={count.lots}
+              label={t("Lots", { count: count.lots })}
             />
           ),
         },
@@ -64,17 +53,6 @@ export const StatusTabs = ({
             />
           ),
         },
-        {
-          key: "pinned",
-          path: "pinned",
-          label: (
-            <StatusRecap
-              loading={loading}
-              count={count.pinned}
-              label={t("Lots épinglés", { count: count.pinned })}
-            />
-          ),
-        },
       ]}
     />
   )
@@ -82,8 +60,7 @@ export const StatusTabs = ({
 
 const defaultCount: Snapshot["lots"] = {
   alerts: 0,
-  corrections: 0,
-  declarations: 0,
+  lots: 0,
   stocks: 0,
   pinned: 0,
 }
@@ -98,7 +75,9 @@ interface StatusRecapProps {
 const StatusRecap = ({ loading, count = 0, label }: StatusRecapProps) => {
   return (
     <>
-      <p>{loading ? <Loader size={20} /> : formatNumber(count)} </p>
+      <p style={{ fontWeight: "normal" }}>
+        {loading ? <Loader size={20} /> : formatNumber(count)}{" "}
+      </p>
       <strong>{label}</strong>
     </>
   )

@@ -8,7 +8,7 @@ class ProductionSiteCertificateAdmin(admin.ModelAdmin):
     search_fields = ('production_site__name', )
     
     def get_certificate_type(self, obj):
-        return obj.certificate.certificate_type
+        return obj.certificate.certificate.certificate_type
     get_certificate_type.short_description = 'Type'
 
 admin.site.register(ProductionSiteCertificate, ProductionSiteCertificateAdmin)    

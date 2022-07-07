@@ -1,26 +1,32 @@
 import cl from "clsx"
-import { useNavigate } from "react-router-dom"
-import useEntity from "carbure/hooks/entity"
-import Dropdown, { Anchors } from "common-v2/components/dropdown"
-import { Bell, Check, Loader } from "common-v2/components/icons"
-import css from "./notifications.module.css"
-import Button from "common-v2/components/button"
-import { useRef } from "react"
-import List from "common-v2/components/list"
-import { Notification, NotificationType } from "carbure/types"
-import { Normalizer } from "common-v2/utils/normalize"
-import { t } from "i18next"
 import { Link } from "react-router-dom"
-import Radio from "common-v2/components/radio"
-import { Col, Row } from "common-v2/components/scaffold"
-import { formatDateTime, formatElapsedTime } from "common-v2/utils/formatters"
+import { useNavigate } from "react-router-dom"
+import { useMatomo } from "matomo"
+import useEntity from "carbure/hooks/entity"
+import Dropdown, { Anchors } from "common/components/dropdown"
+import { Bell, Check, Loader } from "common/components/icons"
+import css from "./notifications.module.css"
+import Button from "common/components/button"
+import { useRef } from "react"
+import List from "common/components/list"
+import { Notification, NotificationType } from "carbure/types"
+import { Normalizer } from "common/utils/normalize"
+import { t } from "i18next"
+import Radio from "common/components/radio"
+import { Col, Row } from "common/components/scaffold"
+import {
+  formatDateTime,
+  formatElapsedTime,
+  formatPeriod,
+} from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import { useMutation, useQuery } from "common-v2/hooks/async"
+import { useMutation, useQuery } from "common/hooks/async"
 import * as api from "../api"
 
 const Notifications = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const matomo = useMatomo()
   const triggerRef = useRef<HTMLButtonElement>(null)
 
   const entity = useEntity()
@@ -58,6 +64,7 @@ const Notifications = () => {
         className={css.notificationMenu}
         triggerRef={triggerRef}
         anchor={Anchors.bottomRight}
+        onOpen={() => matomo.push(["trackEvent", "notifications", "open"])}
       >
         {({ close }) => (
           <>
@@ -178,6 +185,25 @@ function getNotificationText(notif: Notification) {
       return t("Votre certificat {{certificate}} est expiré", {
         certificate: notif.meta?.certificate,
       })
+
+    case NotificationType.DeclarationValidated:
+      return t("Votre déclaration pour la période {{period}} a été validée", {
+        period: formatPeriod(notif.meta?.period ?? 0),
+      })
+
+    case NotificationType.DeclarationCancelled:
+      return t("Votre déclaration pour la période {{period}} a été annulée", {
+        period: formatPeriod(notif.meta?.period ?? 0),
+      })
+
+    case NotificationType.DeclarationReminder:
+      return t(
+        "La période {{period}} arrive à sa fin, pensez à valider votre déclaration.",
+        { period: formatPeriod(notif.meta?.period ?? 0) }
+      )
+
+    default:
+      return ""
   }
 }
 
@@ -200,6 +226,18 @@ function getNotificationLink(notif: Notification) {
 
     case NotificationType.CertificateExpired:
       return `/org/${notif.dest.id}/settings#certificates`
+
+    case NotificationType.DeclarationValidated:
+      return `#declaration/${notif.meta?.period}`
+
+    case NotificationType.DeclarationCancelled:
+      return `#declaration/${notif.meta?.period}`
+
+    case NotificationType.DeclarationReminder:
+      return `#declaration/${notif.meta?.period}`
+
+    default:
+      return "#"
   }
 }
 

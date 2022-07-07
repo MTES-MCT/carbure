@@ -1,17 +1,11 @@
 import { useTranslation } from "react-i18next"
 import useEntity, { EntityManager } from "carbure/hooks/entity"
-import { Fieldset, useBind, useFormContext } from "common-v2/components/form"
-import Autocomplete, {
-  AutocompleteProps,
-} from "common-v2/components/autocomplete"
-import {
-  DateInput,
-  DateInputProps,
-  TextInput,
-} from "common-v2/components/input"
-import { UserCheck } from "common-v2/components/icons"
-import * as api from "common-v2/api"
-import * as norm from "common-v2/utils/normalizers"
+import { Fieldset, useBind, useFormContext } from "common/components/form"
+import Autocomplete, { AutocompleteProps } from "common/components/autocomplete"
+import { DateInput, DateInputProps, TextInput } from "common/components/input"
+import { UserCheck } from "common/components/icons"
+import * as api from "carbure/api"
+import * as norm from "carbure/utils/normalizers"
 import {
   isExternalDelivery,
   isLotClient,
@@ -20,12 +14,11 @@ import {
   isLotVendor,
   LotFormValue,
 } from "./lot-form"
-import { Entity } from "carbure/types"
 import { LotStatus } from "transactions/types"
-import { Country, Depot } from "common/types"
-import Select, { SelectProps } from "common-v2/components/select"
+import { Entity, Country, Depot } from "carbure/types"
+import Select, { SelectProps } from "common/components/select"
 import { DeliveryType } from "transactions/types"
-import { compact, uniqueBy } from "common-v2/utils/collection"
+import { compact, uniqueBy } from "common/utils/collection"
 import CertificateIcon from "transaction-details/components/lots/certificate"
 
 interface DeliveryFieldsProps {
@@ -159,7 +152,12 @@ export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { value, bind } = useFormContext<LotFormValue>()
-  const deliveryTypes = getDeliveryTypes(entity, value.client, value.lot?.lot_status)
+
+  const deliveryTypes = getDeliveryTypes(
+    entity,
+    value.client,
+    value.lot?.lot_status
+  )
 
   if (deliveryTypes.length === 0 || value.lot?.lot_status === "PENDING") {
     return null
@@ -167,7 +165,14 @@ export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
 
   // prevent editing delivery type when doing a correction for a lot that duplicated for forwarding
   const isDraft = !value.lot || value.lot.lot_status === "DRAFT"
-  const hasChildren = value.delivery_type && [DeliveryType.Stock, DeliveryType.Processing, DeliveryType.Trading].includes(value.delivery_type)
+
+  const hasChildren =
+    !!value.delivery_type &&
+    [
+      DeliveryType.Stock,
+      DeliveryType.Processing,
+      DeliveryType.Trading,
+    ].includes(value.delivery_type)
 
   return (
     <Select
@@ -188,7 +193,13 @@ export function getDeliveryTypes(
   client: Entity | string | undefined,
   status: LotStatus = LotStatus.Draft
 ) {
-  const { isOperator, has_stocks, has_mac, has_direct_deliveries, has_trading } = entity
+  const {
+    isOperator,
+    has_stocks,
+    has_mac,
+    has_direct_deliveries,
+    has_trading,
+  } = entity
   const isClientEntity = client instanceof Object ? client.id === entity.id : false // prettier-ignore
   const isClientUnknown = client === undefined || typeof client === "string"
 
@@ -198,7 +209,7 @@ export function getDeliveryTypes(
     (isClientUnknown || isClientEntity) && has_mac && DeliveryType.RFC,
     (isClientUnknown || isClientEntity) && has_direct_deliveries && DeliveryType.Direct, // prettier-ignore
     (isClientUnknown || isClientEntity) && DeliveryType.Exportation,
-    status !== LotStatus.Draft && has_trading && DeliveryType.Trading
+    status !== LotStatus.Draft && has_trading && DeliveryType.Trading,
   ])
 }
 
@@ -216,7 +227,7 @@ export const DeliverySiteField = (props: AutocompleteProps<Depot | string>) => {
       create={norm.identity}
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={api.findDepots}
-      normalize={norm.normalizeDepot}
+      normalize={norm.normalizeDepotOrUnknown}
       {...bound}
       {...props}
     />

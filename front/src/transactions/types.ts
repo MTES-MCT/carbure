@@ -1,11 +1,11 @@
-import { Entity } from "carbure/types"
 import {
+  Entity,
   Biofuel,
   Country,
   Depot,
   Feedstock,
   ProductionSite,
-} from "common/types"
+} from "carbure/types"
 
 export interface Lot {
   id: number
@@ -63,8 +63,10 @@ export interface Lot {
   free_field: string
   added_by: Entity
   created_at: string
+  audit_status?: Conformity
   highlighted_by_admin?: boolean
   highlighted_by_auditor?: boolean
+  data_reliability_score?: string
 }
 
 export interface LotList {
@@ -85,6 +87,8 @@ export interface Stock {
   biofuel: Biofuel | null
   country_of_origin: Country | null
   initial_volume: number
+  initial_weight: number
+  initial_lhv_amount: number
   remaining_volume: number
   remaining_weight: number
   remaining_lhv_amount: number
@@ -153,14 +157,20 @@ export interface DeclarationSummary {
 export interface LotSummary {
   count: number
   total_volume: number
+  total_weight: number
+  total_lhv_amount: number
   in?: SummaryItem[]
   out?: SummaryItem[]
 }
 
 export interface StockSummary {
   count: number
-  total_remaining_volume: number
   total_volume?: number
+  total_weight?: number
+  total_lhv_amount?: number
+  total_remaining_volume: number
+  total_remaining_weight: number
+  total_remaining_lhv_amount: number
   stock?: SummaryItem[]
 }
 
@@ -170,10 +180,14 @@ export interface SummaryItem {
   delivery_type?: DeliveryType
   biofuel_code: string | null
   volume_sum: number
+  weight_sum: number
+  lhv_amount_sum: number
   avg_ghg_reduction: number | null
   total: number
   pending: number
   remaining_volume_sum?: number
+  remaining_weight_sum?: number
+  remaining_lhv_amount_sum?: number
 }
 
 export interface LotError {
@@ -241,6 +255,9 @@ export enum Filter {
   ShowEmpty = "show_empty",
   DeliveryTypes = "delivery_types",
   LotStatus = "lot_status",
+  CorrectionStatus = "correction_status",
+  Scores = "scores",
+  Conformity = "conformity",
 }
 
 export type FilterSelection = Partial<Record<Filter, string[]>>
@@ -331,3 +348,5 @@ export interface Distance {
   error: string // PRODUCTION_SITE_NOT_IN_CARBURE, DELIVERY_SITE_NOT_IN_CARBURE, PRODUCTION_SITE_COORDINATES_NOT_IN_CARBURE, DELIVERY_SITE_COORDINATES_NOT_IN_CARBURE, API_ERROR
   source: null | "DB" | "API"
 }
+
+export type Conformity = "UNKNOWN" | "CONFORM" | "NONCONFORM"

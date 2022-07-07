@@ -11,6 +11,7 @@ from django.db.models.query_utils import Q
 from django.http.response import HttpResponse, JsonResponse
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
+from numpy import product
 from certificates.models import DoubleCountingRegistration
 from core.common import try_get_certificate, try_get_double_counting_certificate
 
@@ -56,11 +57,9 @@ def get_all_stock():
 
 def get_auditor_stock(auditor):
     rights = UserRights.objects.filter(user=auditor, role=UserRights.AUDITOR)
-    print(rights)
     entities = [r.entity_id for r in rights]
-    print(entities)
     return CarbureStock.objects.filter(carbure_client__in=entities) \
-    .select_related('parent_lot', 'parent_transformation',
+        .select_related('parent_lot', 'parent_transformation',
                     'biofuel', 'feedstock', 'country_of_origin',
                     'depot', 'depot__country',
                     'carbure_production_site', 'carbure_production_site__country', 'production_country',
@@ -208,7 +207,7 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
     biofuels = query.getlist('biofuels', [])
     clients = query.getlist('clients', [])
     suppliers = query.getlist('suppliers', [])
-    correction_statuses = query.getlist('correction_statuses', [])
+    correction_status = query.getlist('correction_status', [])
     delivery_types = query.getlist('delivery_types', [])
     errors = query.getlist('errors', [])
     search = query.get('query', False)
@@ -218,6 +217,9 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
     client_types = query.getlist('client_types', [])
     lot_status = query.getlist('lot_status', False)
     category = query.get('category', False)
+    scores = query.getlist('scores', [])
+    added_by = query.getlist('added_by', [])
+    conformity = query.getlist('conformity', [])
 
     # selection overrides all other filters
     if len(selection) > 0:
@@ -235,8 +237,8 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
         lots = lots.filter(year=year)
     if len(delivery_types) > 0 and 'delivery_types' not in blacklist:
         lots = lots.filter(delivery_type__in=delivery_types)
-    if len(correction_statuses) > 0 and 'correction_statuses' not in blacklist:
-        lots = lots.filter(correction_status__in=correction_statuses)
+    if len(correction_status) > 0 and 'correction_status' not in blacklist:
+        lots = lots.filter(correction_status__in=correction_status)
     if len(periods) > 0 and 'periods' not in blacklist:
         lots = lots.filter(period__in=periods)
     if len(feedstocks) > 0 and 'feedstocks' not in blacklist:
@@ -245,6 +247,8 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
         lots = lots.filter(biofuel__code__in=biofuels)
     if len(countries_of_origin) > 0 and 'countries_of_origin' not in blacklist:
         lots = lots.filter(country_of_origin__code_pays__in=countries_of_origin)
+    if len(scores):
+        lots = lots.filter(data_reliability_score__in=scores)
     if category == 'stocks':
         lots = lots.filter(parent_stock__isnull=False)
     elif category == 'imported':
@@ -284,6 +288,12 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
 
     if len(errors) > 0 and 'errors' not in blacklist:
         lots = lots.filter(genericerror__error__in=errors)
+
+    if len(added_by) > 0 and 'added_by' not in blacklist:
+        lots = lots.filter(added_by__name__in=added_by)
+
+    if len(conformity) > 0 and 'conformity' not in blacklist:
+        lots = lots.filter(audit_status__in=conformity)
 
     if search and 'query' not in blacklist:
         lots = lots.filter(
@@ -350,108 +360,124 @@ def sort_lots(lots, query):
     return lots
 
 
-def normalize_filter(list, value=None, label=None):
-    if value is None:
-        return [{'value': item, 'label': item} for item in list]
-    elif label is None:
-        return [{'value': item[value], 'label': item[value]} for item in list]
-    else:
-        return [{'value': item[value], 'label': item[label]} for item in list]
+def prepare_filters(filter_list):
+    return sorted(list(set([i for i in filter_list if i is not None])))
+
 
 UNKNOWN_VALUE = 'UNKNOWN'
 def get_lots_filters_data(lots, query, entity, field):
     lots = filter_lots(lots, query, entity, blacklist=[field])
 
     if field == 'feedstocks':
-        feedstocks = MatierePremiere.objects.filter(id__in=lots.values('feedstock__id').distinct()).values('code', 'name')
-        return normalize_filter(feedstocks, 'code', 'name')
+        lot_feedstocks = lots.values('feedstock__id').distinct()
+        feedstocks = MatierePremiere.objects.filter(id__in=lot_feedstocks)
+        return prepare_filters(feedstocks.values_list('code', flat=True))
 
     if field == 'biofuels':
-        biofuels = Biocarburant.objects.filter(id__in=lots.values('biofuel__id').distinct()).values('code', 'name')
-        return normalize_filter(biofuels, 'code', 'name')
+        lot_biofuels = lots.values('biofuel__id').distinct()
+        biofuels = Biocarburant.objects.filter(id__in=lot_biofuels).values_list('code', flat=True)
+        return prepare_filters(biofuels)
 
     if field == 'countries_of_origin':
-        countries = Pays.objects.filter(id__in=lots.values('country_of_origin').distinct()).values('code_pays', 'name')
-        return normalize_filter(countries, 'code_pays', 'name')
+        lot_countries = lots.values('country_of_origin').distinct()
+        countries = Pays.objects.filter(id__in=lot_countries).values_list('code_pays', flat=True)
+        return prepare_filters(countries)
 
     if field == 'periods':
-        periods = lots.values('period').distinct()
-        return [{'value': str(v['period']), 'label': "%d-%02d" % (v['period']/100, v['period'] % 100)} for v in periods if v]
+        periods = lots.values_list('period', flat=True).distinct()
+        return prepare_filters(periods)
 
     if field == 'errors':
-        generic_errors = lots.values('genericerror__error').exclude(genericerror__error=None).distinct()
-        return normalize_filter(generic_errors, 'genericerror__error')
+        generic_errors = lots.values_list('genericerror__error', flat=True).exclude(genericerror__error=None).distinct()
+        return prepare_filters(generic_errors)
 
     if field == 'added_by':
-        added_by = lots.values('added_by__name').distinct()
-        return normalize_filter(added_by, 'added_by__name')
+        added_by = lots.values_list('added_by__name', flat=True).distinct()
+        return prepare_filters(added_by)
 
     if field == 'delivery_types':
-        delivery_types = lots.values('delivery_type').distinct()
-        return normalize_filter(delivery_types, 'delivery_type')
+        delivery_types = lots.values_list('delivery_type', flat=True).distinct()
+        return prepare_filters(delivery_types)
 
     if field == 'lot_status':
-        lot_status = lots.values('lot_status').distinct()
-        return normalize_filter(lot_status, 'lot_status')
+        lot_status = lots.values_list('lot_status', flat=True).distinct()
+        return prepare_filters(lot_status)
 
     if field == 'production_sites':
         production_sites = []
         for item in lots.annotate(production_site=Coalesce('carbure_production_site__name', 'unknown_production_site')).values('production_site').distinct():
             production_sites.append(item['production_site'] or UNKNOWN_VALUE)
-        return normalize_filter(set(production_sites))
+        return prepare_filters(production_sites)
 
     if field == 'delivery_sites':
         delivery_sites = []
         for item in lots.annotate(delivery_site=Coalesce('carbure_delivery_site__name', 'unknown_delivery_site')).values('delivery_site').distinct():
             delivery_sites.append(item['delivery_site'] or UNKNOWN_VALUE)
-        return normalize_filter(set(delivery_sites))
+        return prepare_filters(delivery_sites)
 
     if field == 'suppliers':
         suppliers = []
         for item in lots.annotate(supplier=Coalesce('carbure_supplier__name', 'unknown_supplier')).values('supplier').distinct():
             suppliers.append(item['supplier'] or UNKNOWN_VALUE)
-        return normalize_filter(set(suppliers))
+        return prepare_filters(suppliers)
 
     if field == 'clients':
         clients = []
         for item in lots.annotate(client=Coalesce('carbure_client__name', 'unknown_client')).values('client').distinct():
             clients.append(item['client'] or UNKNOWN_VALUE)
-        return normalize_filter(set(clients))
+        return prepare_filters(clients)
 
     if field == 'client_types':
         client_types = []
         for item in lots.values('carbure_client__entity_type').distinct():
             client_types.append(item['carbure_client__entity_type'] or Entity.UNKNOWN)
-        return normalize_filter(set(client_types))
+        return prepare_filters(client_types)
+
+    if field == 'scores':
+        scores = lots.values_list('data_reliability_score', flat=True).distinct()
+        return prepare_filters(scores)
+
+    if field == 'correction_status':
+        corrections = lots.values_list('correction_status', flat=True).distinct()
+        return prepare_filters(corrections)
+
+    if field == 'conformity':
+        conformities = lots.values_list('audit_status', flat=True).distinct()
+        return prepare_filters(conformities)
+
 
 def get_stock_filters_data(stock, query, field):
     stock = filter_stock(stock, query, blacklist=[field])
 
     if field == 'feedstocks':
-        feedstocks = MatierePremiere.objects.filter(id__in=stock.values('feedstock__id').distinct()).values('code', 'name')
-        return normalize_filter(feedstocks, 'code', 'name')
+        stock_feedstocks = stock.values('feedstock__id').distinct()
+        feedstocks = MatierePremiere.objects.filter(id__in=stock_feedstocks).values_list('code', flat=True)
+        return prepare_filters(feedstocks)
 
     if field == 'biofuels':
-        biofuels = Biocarburant.objects.filter(id__in=stock.values('biofuel__id').distinct()).values('code', 'name')
-        return normalize_filter(biofuels, 'code', 'name')
+        stock_biofuels = stock.values('biofuel__id').distinct()
+        biofuels = Biocarburant.objects.filter(id__in=stock_biofuels).values_list('code')
+        return prepare_filters(biofuels)
 
     if field == 'countries_of_origin':
-        countries = Pays.objects.filter(id__in=stock.values('country_of_origin').distinct()).values('code_pays', 'name')
-        return normalize_filter(countries, 'code_pays', 'name')
+        stock_countries = stock.values('country_of_origin').distinct()
+        countries = Pays.objects.filter(id__in=stock_countries).values_list('code_pays', flat=True)
+        return prepare_filters(countries)
 
     if field == 'periods':
         set1 = stock.filter(parent_lot__isnull=False).values('parent_lot__period').distinct()
         set2 = stock.filter(parent_transformation__isnull=False).values('parent_transformation__source_stock__parent_lot__period').distinct()
-        periods = list(set([s['parent_lot__period'] for s in set1] + [s['parent_transformation__source_stock__parent_lot__period'] for s in set2]))
-        return [{'value': str(p), 'label': "%d-%02d" % (p/100, p % 100)} for p in periods]
+        periods = [s['parent_lot__period'] for s in set1] + [s['parent_transformation__source_stock__parent_lot__period'] for s in set2]
+        return prepare_filters(periods)
 
     if field == 'depots':
-        depots = Depot.objects.filter(id__in=stock.values('depot__id').distinct()).values('name', 'depot_id')
-        return normalize_filter(depots, 'name')
+        stock_depots = stock.values('depot__id').distinct()
+        depots = Depot.objects.filter(id__in=stock_depots).values_list('name', flat=True)
+        return prepare_filters(depots)
 
     if field == 'clients':
         clients = stock.filter(carbure_client__isnull=False).values_list('carbure_client__name', flat=True).distinct()
-        return normalize_filter(clients)
+        return prepare_filters(clients)
 
     if field == 'suppliers':
         suppliers = []
@@ -460,7 +486,7 @@ def get_stock_filters_data(stock, query, field):
                 suppliers.append(item['carbure_supplier__name'])
             elif item['unknown_supplier'] not in ('', None):
                 suppliers.append(item['unknown_supplier'])
-        return normalize_filter(set(suppliers))
+        return prepare_filters(suppliers)
 
     if field == 'production_sites':
         production_sites = []
@@ -469,7 +495,7 @@ def get_stock_filters_data(stock, query, field):
                 production_sites.append(item['carbure_production_site__name'])
             elif item['unknown_production_site'] not in ('', None):
                 production_sites.append(item['unknown_production_site'])
-        return normalize_filter(set(production_sites))
+        return prepare_filters(production_sites)
 
 
 def get_stock_with_metadata(stock, query):
@@ -706,7 +732,12 @@ def send_email_declaration_invalidated(declaration):
 
 
 def get_lots_summary_data(lots, entity, short=False):
-    data = {'count': lots.count(), 'total_volume': lots.aggregate(Sum('volume'))['volume__sum'] or 0}
+    data = {
+        'count': lots.count(),
+        'total_volume': lots.aggregate(Sum('volume'))['volume__sum'] or 0,
+        'total_weight': lots.aggregate(Sum('weight'))['weight__sum'] or 0,
+        'total_lhv_amount': lots.aggregate(Sum('lhv_amount'))['lhv_amount__sum'] or 0
+    }
 
     if short:
         return data
@@ -722,6 +753,8 @@ def get_lots_summary_data(lots, entity, short=False):
         'delivery_type'
     ).annotate(
         volume_sum=Sum('volume'),
+        weight_sum=Sum('weight'),
+        lhv_amount_sum=Sum('lhv_amount'),
         avg_ghg_reduction=Sum(F('volume') * F('ghg_reduction_red_ii')) / Sum('volume'),
         total=Count('id'),
         pending=Count('id', filter=pending_filter)
@@ -735,6 +768,8 @@ def get_lots_summary_data(lots, entity, short=False):
         'biofuel_code'
     ).annotate(
         volume_sum=Sum('volume'),
+        weight_sum=Sum('weight'),
+        lhv_amount_sum=Sum('lhv_amount'),
         avg_ghg_reduction=Sum(F('volume') * F('ghg_reduction_red_ii')) / Sum('volume'),
         total=Count('id'),
         pending=Count('id', filter=pending_filter)
@@ -748,7 +783,9 @@ def get_lots_summary_data(lots, entity, short=False):
 def get_stocks_summary_data(stocks, entity_id=None, short=False):
     data = {
         'count': stocks.count(),
-        'total_remaining_volume': stocks.aggregate(Sum('remaining_volume'))['remaining_volume__sum'] or 0
+        'total_remaining_volume': stocks.aggregate(Sum('remaining_volume'))['remaining_volume__sum'] or 0,
+        'total_remaining_weight': stocks.aggregate(Sum('remaining_weight'))['remaining_weight__sum'] or 0,
+        'total_remaining_lhv_amount': stocks.aggregate(Sum('remaining_lhv_amount'))['remaining_lhv_amount__sum'] or 0
     }
 
     if short:
@@ -763,6 +800,8 @@ def get_stocks_summary_data(stocks, entity_id=None, short=False):
         'biofuel_code'
     ).annotate(
         remaining_volume_sum=Sum('remaining_volume'),
+        remaining_weight_sum=Sum('remaining_weight'),
+        remaining_lhv_amount_sum=Sum('remaining_lhv_amount'),
         avg_ghg_reduction=Sum(F('remaining_volume') * F('ghg_reduction_red_ii')) / Sum('remaining_volume'),
         total=Count('id'),
     ).order_by()
@@ -846,23 +885,51 @@ def get_prefetched_data(entity=None):
         d['my_production_sites'] = {ps.name.upper(): ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').filter(producer=entity)}
         # get all my linked certificates
         d['my_vendor_certificates'] = [c.certificate.certificate_id for c in EntityCertificate.objects.filter(entity=entity)]
-    else:
-        d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').all()}
+
+
+    # MAPPING OF ENTITIES AND DELIVERY SITES
+    # dict {'entity1': [depot1, depot2],
+    #       'entity2': [depot42],
+    # }
     depotsbyentities = dict()
-    associated_depots = EntityDepot.objects.all()
+    associated_depots = EntityDepot.objects.select_related('depot').all()
     for entitydepot in associated_depots.iterator():
         if entitydepot.entity_id in depotsbyentities:
-            depotsbyentities[entitydepot.entity_id].append(entitydepot.depot_id)
+            depotsbyentities[entitydepot.entity_id].append(entitydepot.depot.depot_id)
         else:
-            depotsbyentities[entitydepot.entity_id] = [entitydepot.depot_id]
+            depotsbyentities[entitydepot.entity_id] = [entitydepot.depot.depot_id]
     d['depotsbyentity'] = depotsbyentities
+
+    # MAPPING OF ENTITIES AND THEIR CERTIFICATES
+    # dict {'entity1': {'cert1_id': cert1, 'cert2_id': cert2},
+    #       'entity2': {'cert14_id': cert14},
+    # }
+    entity_certificates = {}
+    certificates = EntityCertificate.objects.select_related('certificate').all()
+    for entitycertificate in certificates.iterator():
+        if entitycertificate.entity.id not in entity_certificates:
+            entity_certificates[entitycertificate.entity.id] = {}
+        entity_certificates[entitycertificate.entity.id][entitycertificate.certificate.certificate_id] = entitycertificate
+    d['entity_certificates'] = entity_certificates
+
+    # MAPPING OF PRODUCTION SITES AND THEIR INPUT/OUTPUTS
+    production_sites = {}
+    all_ps = ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').all()
+    for psite in all_ps.iterator():
+        production_sites[psite.id] = {}
+        production_sites[psite.id]['feedstock_ids'] = [mp['matiere_premiere_id'] for mp in psite.productionsiteinput_set.all().values('matiere_premiere_id')]
+        production_sites[psite.id]['biofuel_ids'] = [bc['biocarburant_id'] for bc in psite.productionsiteoutput_set.all().values('biocarburant_id')]
+    d['production_sites'] = production_sites
+
     d['clients'] = {c.id: c for c in Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.OPERATOR, Entity.TRADER])}
     d['clientsbyname'] = {c.name.upper(): c for c in Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.OPERATOR, Entity.TRADER])}
     d['certificates'] = {c.certificate_id.upper(): c for c in GenericCertificate.objects.filter(valid_until__gte=lastyear)}
     d['double_counting_certificates'] = {c.certificate_id: c for c in DoubleCountingRegistration.objects.all()}
-    d['etd'] = {s.feedstock: s.default_value for s in ETDStats.objects.all()}
-    d['eec'] = {s.feedstock.code + s.origin.code_pays: s for s in EECStats.objects.all()}
-    d['ep'] = {s.feedstock.code + s.biofuel.code: s for s in EPStats.objects.all()}
+    d['etd'] = {s.feedstock: s.default_value for s in ETDStats.objects.select_related('feedstock').all()}
+    d['eec'] = {s.feedstock.code + s.origin.code_pays: s for s in EECStats.objects.select_related('feedstock', 'origin').all()}
+    d['ep'] = {s.feedstock.code + s.biofuel.code: s for s in EPStats.objects.select_related('feedstock', 'biofuel').all()}
+
+    d['checked_certificates'] = {} # used as cache in CarbureLot model - recalc reliability score
     return d
 
 

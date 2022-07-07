@@ -12,12 +12,13 @@ from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
 import folium
 from api.v3.admin.views import couleur, grade
+from api.v4.sanity_checks import bulk_scoring
 from core.decorators import is_admin
 from api.v4.helpers import filter_lots, filter_stock, get_all_stock, get_known_certificates, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_with_errors, get_lots_with_metadata, get_lots_filters_data, get_stock_events, get_stock_filters_data, get_stock_with_metadata, get_stocks_summary_data
 from api.v4.helpers import get_transaction_distance
 
 from core.models import CarbureLot, CarbureLotComment, CarbureStock, CarbureStockTransformation, Entity, EntityCertificate, GenericError, SustainabilityDeclaration
-from core.serializers import CarbureLotAdminSerializer, CarbureLotCommentSerializer, CarbureLotPublicSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer, EntityCertificateSerializer, SustainabilityDeclarationSerializer
+from core.serializers import CarbureLotAdminSerializer, CarbureLotCommentSerializer, CarbureLotPublicSerializer, CarbureLotReliabilityScoreSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer, EntityCertificateSerializer, SustainabilityDeclarationSerializer
 
 
 @is_admin
@@ -31,7 +32,6 @@ def get_years(request, *args, **kwargs):
 @is_admin
 def get_snapshot(request, *args, **kwargs):
     year = request.GET.get('year', False)
-    entity_id = request.GET.get('entity_id', False)
     if year:
         try:
             year = int(year)
@@ -40,22 +40,12 @@ def get_snapshot(request, *args, **kwargs):
     else:
         return JsonResponse({'status': 'error', 'message': 'Missing year'}, status=400)
 
-    data = {}
-    entity = Entity.objects.get(id=entity_id)
     lots = CarbureLot.objects.filter(year=year).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
-    alerts = get_lots_with_errors(lots, entity)
-    corrections = lots.exclude(correction_status=CarbureLot.NO_PROBLEMO)
-    
-    stock = CarbureStock.objects.all()
-    stock_not_empty = stock.filter(remaining_volume__gt=0)
+    stock = CarbureStock.objects.filter(remaining_volume__gt=0)
+    alerts = lots.filter(Q(highlighted_by_admin=True) | Q(random_control_requested=True) | Q(ml_control_requested=True))
+    data = {}
 
-    pinned = lots.filter(highlighted_by_admin=True)
-
-    data['lots'] = {'alerts': alerts.count(),
-                    'corrections': corrections.count(),
-                    'declarations': lots.count(),
-                    'stocks': stock_not_empty.count(),
-                    'pinned': pinned.count()}
+    data['lots'] = {'alerts': alerts.count(), 'lots': lots.count(), 'stocks': stock.count()}
     return JsonResponse({'status': 'success', 'data': data})
 
 
@@ -116,6 +106,7 @@ def get_lot_details(request, *args, **kwargs):
     data['updates'] = get_lot_updates(lot)
     data['comments'] = get_lot_comments(lot)
     data['control_comments'] = get_admin_lot_comments(lot)
+    data['score'] = CarbureLotReliabilityScoreSerializer(lot.carburelotreliabilityscore_set.all(), many=True).data
     return JsonResponse({'status': 'success', 'data': data})
 
 @is_admin
@@ -398,7 +389,7 @@ def init_declaration(entity, period, declarations):
 
 def get_admin_lots_by_status(entity, status, export=False):
     lots = CarbureLot.objects.select_related(
-        'carbure_producer', 'carbure_supplier', 'carbure_client', 'added_by',
+        'carbure_producer', 'carbure_supplier', 'carbure_client', 'added_by', 'carbure_vendor',
         'carbure_production_site', 'carbure_production_site__producer', 'carbure_production_site__country', 'production_country',
         'carbure_dispatch_site', 'carbure_dispatch_site__country', 'dispatch_site_country',
         'carbure_delivery_site', 'carbure_delivery_site__country', 'delivery_site_country',
@@ -412,19 +403,20 @@ def get_admin_lots_by_status(entity, status, export=False):
     lots = lots.exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
 
     if status == 'ALERTS':
-        lots = get_lots_with_errors(lots, entity, will_aggregate=True)
-    elif status == 'CORRECTIONS':
-        lots = lots.exclude(correction_status=CarbureLot.NO_PROBLEMO)
-    elif status == 'DECLARATIONS':
+        lots = lots.filter(Q(highlighted_by_admin=True) | Q(random_control_requested=True) | Q(ml_control_requested=True))
+    elif status == 'LOTS':
         lots = lots.exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
-    elif status == 'PINNED':
-        lots = lots.filter(highlighted_by_admin=True)
 
     return lots
 
 
 def get_admin_summary_data(lots, short=False):
-    data = {'count': lots.count(), 'total_volume': lots.aggregate(Sum('volume'))['volume__sum'] or 0}
+    data = {
+        'count': lots.count(), 
+        'total_volume': lots.aggregate(Sum('volume'))['volume__sum'] or 0,
+        'total_weight': lots.aggregate(Sum('weight'))['weight__sum'] or 0,
+        'total_lhv_amount': lots.aggregate(Sum('lhv_amount'))['lhv_amount__sum'] or 0,
+    }
 
     if short:
         return data
@@ -442,6 +434,8 @@ def get_admin_summary_data(lots, short=False):
         'delivery_type'
     ).annotate(
         volume_sum=Sum('volume'),
+        weight_sum=Sum('weight'),
+        lhv_amount_sum=Sum('lhv_amount'),
         avg_ghg_reduction=Sum(F('volume') * F('ghg_reduction_red_ii')) / Sum('volume'),
         total=Count('id'),
         pending=Count('id', filter=pending_filter)
@@ -479,6 +473,10 @@ def check_entity_certificate(request, *args, **kwargs):
         ec.checked_by_admin = True
         ec.rejected_by_admin = False
         ec.save()
+        slots = CarbureLot.objects.filter(carbure_supplier=ec.entity, supplier_certificate=ec.certificate.certificate_id)
+        plots = CarbureLot.objects.filter(carbure_producer=ec.entity, production_site_certificate=ec.certificate.certificate_id)
+        #bulk_scoring(list(slots) + list(plots))
+        background_bulk_scoring(list(slots) + list(plots))
         return JsonResponse({'status': "success"})
     except:
         return JsonResponse({'status': "error", 'message': "Could not mark certificate as checked"}, status=500)
@@ -493,6 +491,10 @@ def reject_entity_certificate(request, *args, **kwargs):
         ec.checked_by_admin = False
         ec.rejected_by_admin = True
         ec.save()
+        slots = CarbureLot.objects.filter(carbure_supplier=ec.entity, supplier_certificate=ec.certificate.certificate_id)
+        plots = CarbureLot.objects.filter(carbure_producer=ec.entity, production_site_certificate=ec.certificate.certificate_id)
+        #bulk_scoring(list(slots) + list(plots))
+        background_bulk_scoring(list(slots) + list(plots))
         return JsonResponse({'status': "success"})
     except:
         return JsonResponse({'status': "error", 'message': "Could not mark certificate as checked"}, status=500)

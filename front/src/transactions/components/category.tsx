@@ -1,10 +1,10 @@
 import { useTranslation } from "react-i18next"
 import { Snapshot, Status } from "../types"
-import { formatNumber } from "common-v2/utils/formatters"
-import Tabs from "common-v2/components/tabs"
+import { formatNumber } from "common/utils/formatters"
+import Tabs from "common/components/tabs"
 import { useMatch, useNavigate } from "react-router-dom"
 import { useEffect } from "react"
-import { compact } from "common-v2/utils/collection"
+import { compact } from "common/utils/collection"
 import useEntity from "carbure/hooks/entity"
 
 interface CategorySwitcherProps {

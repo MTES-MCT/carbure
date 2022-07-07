@@ -1,12 +1,12 @@
 import { useMemo } from "react"
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom"
+import { useLocation } from "react-router-dom"
 import { UserRole } from "carbure/types"
 import { Snapshot, Stock, StockQuery, Filter } from "../../types"
 import useEntity from "carbure/hooks/entity"
-import { useQuery } from "common-v2/hooks/async"
+import { useQuery } from "common/hooks/async"
 import * as api from "../../api"
-import { Bar } from "common-v2/components/scaffold"
-import Pagination from "common-v2/components/pagination"
+import { Bar } from "common/components/scaffold"
+import Pagination from "common/components/pagination"
 import Filters from "../filters"
 import StockTable from "./stock-table"
 import NoResult from "../no-result"
@@ -16,6 +16,7 @@ import { StockSummaryBar } from "./stock-summary"
 import StockDetails from "transaction-details/components/stocks"
 import { QueryParams, useQueryParamsStore } from "../lots"
 import { useAutoCategory } from "../category"
+import HashRoute from "common/components/hash-route"
 
 export interface StocksProps {
   year: number
@@ -25,7 +26,6 @@ export interface StocksProps {
 const EMPTY: number[] = []
 
 export const Stocks = ({ year, snapshot }: StocksProps) => {
-  const navigate = useNavigate()
   const location = useLocation()
 
   const entity = useEntity()
@@ -53,11 +53,11 @@ export const Stocks = ({ year, snapshot }: StocksProps) => {
   const count = stocksData?.returned ?? 0
   const total = stocksData?.total ?? 0
 
-  const showStockDetails = (stock: Stock) =>
-    navigate({
-      pathname: `${category}/${stock.id}`,
-      search: location.search,
-    })
+  const showStockDetails = (stock: Stock) => ({
+    pathname: location.pathname,
+    search: location.search,
+    hash: `stock/${stock.id}`,
+  })
 
   return (
     <>
@@ -114,7 +114,7 @@ export const Stocks = ({ year, snapshot }: StocksProps) => {
               selected={state.selection}
               onSelect={actions.setSelection}
               onOrder={actions.setOrder}
-              onAction={showStockDetails}
+              rowLink={showStockDetails}
             />
 
             <Pagination
@@ -128,12 +128,7 @@ export const Stocks = ({ year, snapshot }: StocksProps) => {
         )}
       </section>
 
-      <Routes>
-        <Route
-          path=":category/:id"
-          element={<StockDetails neighbors={ids} />}
-        />
-      </Routes>
+      <HashRoute path="stock/:id" element={<StockDetails neighbors={ids} />} />
     </>
   )
 }

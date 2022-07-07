@@ -1,17 +1,16 @@
 import { useMemo } from "react"
-import { useNavigate, useLocation, useParams } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import * as api from "../../api"
 import { useMatomo } from "matomo"
 import { CorrectionStatus, Lot, LotStatus } from "transactions/types"
-import { useQuery, useMutation } from "common-v2/hooks/async"
-import { useNotify } from "common-v2/components/notifications"
-import { useStatus } from "transactions/components/status"
+import { useQuery, useMutation } from "common/hooks/async"
+import { useNotify } from "common/components/notifications"
 import useEntity from "carbure/hooks/entity"
-import { LoaderOverlay } from "common-v2/components/scaffold"
-import Dialog from "common-v2/components/dialog"
-import Button from "common-v2/components/button"
-import { Alarm, Return, Save } from "common-v2/components/icons"
+import { LoaderOverlay } from "common/components/scaffold"
+import Dialog from "common/components/dialog"
+import Button from "common/components/button"
+import { Alarm, Return, Save } from "common/components/icons"
 import LotForm, { hasChange, useLotForm } from "lot-add/components/lot-form"
 import LotTag from "transactions/components/lots/lot-tag"
 import Comments from "./comments"
@@ -21,15 +20,18 @@ import {
   WarningAnomalies,
 } from "./anomalies"
 import { getLotChanges, LotHistory } from "./history"
-import { isExpiring } from "common-v2/utils/deadline"
-import Alert from "common-v2/components/alert"
+import { isExpiring } from "transactions/utils/deadline"
+import Alert from "common/components/alert"
 import NavigationButtons from "./navigation"
 import LotActions from "./actions"
 import { Entity, UserRole } from "carbure/types"
 import LotTraceability, { hasTraceability } from "./lot-traceability"
-import { invalidate } from "common-v2/hooks/invalidate"
-import { useCategory } from "transactions/components/category"
-import { formatDate } from "common-v2/utils/formatters"
+import { invalidate } from "common/hooks/invalidate"
+import { formatDate } from "common/utils/formatters"
+import Score from "../score"
+import Portal from "common/components/portal"
+import Flags from "flags.json"
+import { useHashMatch } from "common/components/hash-route"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -44,13 +46,11 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const location = useLocation()
 
   const entity = useEntity()
-  const status = useStatus()
-  const category = useCategory()
-  const params = useParams<"id">()
+  const match = useHashMatch("lot/:id")
 
   const lot = useQuery(api.getLotDetails, {
     key: "lot-details",
-    params: [entity.id, parseInt(params.id!)],
+    params: [entity.id, parseInt(match?.params.id!)],
   })
 
   const updateLot = useMutation(api.updateLot, {
@@ -79,112 +79,112 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const expiring = isExpiring(lotData?.lot)
 
   const canSave = useMemo(
-    () => hasChange(form.value, lotData?.lot),
-    [form.value, lotData?.lot]
+    () => hasChange(form.value, lotData?.lot, entity),
+    [form.value, lotData?.lot, entity]
   )
 
   const closeDialog = () => {
     invalidate("lots")
-    navigate({
-      pathname: `../${status}/${category}`,
-      search: location.search,
-    })
+    navigate({ search: location.search, hash: "#" })
   }
 
   return (
-    <Dialog onClose={closeDialog}>
-      <header>
-        {lotData && <LotTag big lot={lotData.lot} />}
-        <h1>
-          {t("Détails du lot")} #{lotData?.lot.carbure_id || lotData?.lot.id}
-          {" · "}
-          {creator?.name ?? "N/A"}
-          {" · "}
-          {lotData && formatDate(lotData.lot.created_at)}
-        </h1>
+    <Portal onClose={closeDialog}>
+      <Dialog onClose={closeDialog}>
+        <header>
+          {Flags.scoring && lotData && (
+            <Score big lot={lotData.lot} details={lotData.score} />
+          )}
+          {lotData && <LotTag big lot={lotData.lot} />}
+          <h1>
+            {t("Lot")} #{lotData?.lot.carbure_id || lotData?.lot.id}
+            {" · "}
+            {creator?.name ?? "N/A"}
+            {" · "}
+            {lotData && formatDate(lotData.lot.created_at)}
+          </h1>
 
-        {expiring && (
-          <Alert
-            icon={Alarm}
-            variant="warning"
-            label={t("À valider avant la fin du mois")}
-          />
-        )}
-      </header>
+          {expiring && (
+            <Alert
+              icon={Alarm}
+              variant="warning"
+              label={t("À valider avant la fin du mois")}
+              style={{ marginLeft: "auto" }}
+            />
+          )}
+        </header>
 
-      <main>
-        <section>
-          <LotForm
-            form={form}
-            readOnly={!editable || !hasEditRights}
-            onSubmit={(form) => {
-              matomo.push(["trackEvent", "lots-details", "save-lot-changes"])
-              updateLot.execute(entity.id, form!)
-            }}
-          />
-        </section>
-
-        {errors.length > 0 && (
+        <main>
           <section>
-            <BlockingAnomalies anomalies={errors} />
-          </section>
-        )}
-
-        {warnings.length > 0 && (
-          <section>
-            <WarningAnomalies lot={lotData!.lot} anomalies={warnings} />
-          </section>
-        )}
-
-        {lotData && comments.length > 0 && (
-          <section>
-            <Comments
-              readOnly={!editable}
-              lot={lotData?.lot}
-              comments={comments}
+            <LotForm
+              form={form}
+              readOnly={!editable || !hasEditRights}
+              onSubmit={(form) => {
+                matomo.push(["trackEvent", "lots-details", "save-lot-changes"])
+                updateLot.execute(entity.id, form!)
+              }}
             />
           </section>
-        )}
 
-        {hasTraceability(lotData) && (
-          <section>
-            <LotTraceability details={lotData} />
-          </section>
-        )}
+          {errors.length > 0 && (
+            <section>
+              <BlockingAnomalies anomalies={errors} />
+            </section>
+          )}
 
-        {changes.length > 0 && (
-          <section>
-            <LotHistory changes={changes} />
-          </section>
-        )}
-      </main>
+          {warnings.length > 0 && (
+            <section>
+              <WarningAnomalies lot={lotData!.lot} anomalies={warnings} />
+            </section>
+          )}
 
-      <footer>
-        {editable && hasEditRights && (
-          <Button
-            loading={updateLot.loading}
-            disabled={canSave}
-            variant="primary"
-            icon={Save}
-            submit="lot-form"
-            label={t("Sauvegarder")}
-          />
-        )}
+          {lotData && comments.length > 0 && (
+            <section>
+              <Comments
+                readOnly={!editable}
+                lot={lotData?.lot}
+                comments={comments}
+              />
+            </section>
+          )}
 
-        {lotData && hasEditRights && (
-          <LotActions lot={lotData.lot} canSave={canSave} />
-        )}
+          {hasTraceability(lotData) && (
+            <section>
+              <LotTraceability details={lotData} />
+            </section>
+          )}
 
-        <NavigationButtons
-          neighbors={neighbors}
-          root={`../${status}/${category}`}
-        />
+          {changes.length > 0 && (
+            <section>
+              <LotHistory changes={changes} />
+            </section>
+          )}
+        </main>
 
-        <Button icon={Return} label={t("Retour")} action={closeDialog} />
-      </footer>
+        <footer>
+          {editable && hasEditRights && (
+            <Button
+              loading={updateLot.loading}
+              disabled={canSave}
+              variant="primary"
+              icon={Save}
+              submit="lot-form"
+              label={t("Sauvegarder")}
+            />
+          )}
 
-      {lot.loading && <LoaderOverlay />}
-    </Dialog>
+          {lotData && hasEditRights && (
+            <LotActions lot={lotData.lot} canSave={canSave} />
+          )}
+
+          <NavigationButtons neighbors={neighbors} />
+
+          <Button icon={Return} label={t("Retour")} action={closeDialog} />
+        </footer>
+
+        {lot.loading && <LoaderOverlay />}
+      </Dialog>
+    </Portal>
   )
 }
 

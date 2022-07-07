@@ -2,18 +2,18 @@ import { useTranslation } from "react-i18next"
 import { Stock } from "../types"
 import * as api from "../api"
 import useEntity from "carbure/hooks/entity"
-import { useMutation } from "common-v2/hooks/async"
-import { usePortal } from "common-v2/components/portal"
-import { useNotify } from "common-v2/components/notifications"
-import { variations } from "common-v2/utils/formatters"
-import Button from "common-v2/components/button"
-import Dialog from "common-v2/components/dialog"
-import { DropOff, Return } from "common-v2/components/icons"
+import { useMutation } from "common/hooks/async"
+import { usePortal } from "common/components/portal"
+import { useNotify } from "common/components/notifications"
+import { variations } from "common/utils/formatters"
+import Button from "common/components/button"
+import Dialog from "common/components/dialog"
+import { DropOff, Return } from "common/components/icons"
 import { useMatomo } from "matomo"
 import { StockSummary } from "transactions/components/stocks/stock-summary"
 import { useMemo, useState } from "react"
-import { TextInput } from "common-v2/components/input"
-import Form from "common-v2/components/form"
+import { TextInput } from "common/components/input"
+import Form from "common/components/form"
 
 export interface FlushManyButtonProps {
   disabled?: boolean
@@ -142,6 +142,7 @@ const FlushDialog = ({ summary, selection, onClose }: FlushDialogProps) => {
             }}
           >
             <TextInput
+              autoFocus
               label={t("Commentaire (optionnel)")}
               value={freeField}
               onChange={setFreeField}

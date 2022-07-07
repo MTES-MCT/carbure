@@ -2,16 +2,25 @@ import { render, TestRoot } from "setupTests"
 import { waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Route } from "react-router-dom"
-import { deliverySite, producer } from "common/__test__/data"
-import { waitWhileLoading } from "common/__test__/helpers"
-import Settings from "../index"
+import { deliverySite, producer } from "carbure/__test__/data"
+import { getField, waitWhileLoading } from "carbure/__test__/helpers"
 
 import server, { setDeliverySites, setEntity } from "./api"
+import DeliverySitesSettings from "settings/components/delivery-site"
+import { getDeliverySites } from "settings/api/delivery-sites"
 
 const SettingsWithHooks = () => {
   return (
     <TestRoot url="/org/0/settings">
-      {(app) => <Route path="/org/0/settings" element={<Settings />} />}
+      <Route
+        path="/org/0/settings"
+        element={
+          <DeliverySitesSettings
+            entity={producer}
+            getDepots={getDeliverySites}
+          />
+        }
+      />
     </TestRoot>
   )
 }
@@ -33,7 +42,7 @@ test("check the delivery site section of the settings", async () => {
 
   await waitWhileLoading()
 
-  expect(screen.getAllByText("Dépôts")).toHaveLength(2)
+  screen.getByText("Dépôts")
   screen.getByText("Ajouter un dépôt")
   screen.getByText("Aucun dépôt trouvé")
 })
@@ -48,7 +57,7 @@ test("add a delivery site in settings", async () => {
   userEvent.click(button)
 
   // wait for dialog to open
-  const input = await screen.findByLabelText("Dépôt")
+  const input = getField("Dépôt à ajouter")
   userEvent.type(input, "Test")
 
   const option = await screen.findByText("Test Delivery Site")
@@ -78,7 +87,7 @@ test("check a delivery site details", async () => {
   const ds = screen.getByText("Test Delivery Site")
   userEvent.click(ds)
 
-  const input = screen.getByLabelText("Nom du site")
+  const input = getField("Nom du site")
 
   expect(input).toHaveValue("Test Delivery Site")
 })
@@ -90,7 +99,7 @@ test("remove a delivery site in settings", async () => {
 
   await waitWhileLoading()
 
-  expect(screen.getAllByText("Dépôts")).toHaveLength(2)
+  screen.getByText("Dépôts")
 
   const deleteButton = screen.getByTitle("Supprimer le dépôt")
 
@@ -101,7 +110,7 @@ test("remove a delivery site in settings", async () => {
 
   // click on the delete button and then confirm the action on the popup
   userEvent.click(deleteButton)
-  userEvent.click(screen.getByText("Confirmer"))
+  userEvent.click(screen.getByText("Supprimer"))
 
   await waitWhileLoading()
 

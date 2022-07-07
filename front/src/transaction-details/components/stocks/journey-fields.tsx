@@ -1,14 +1,11 @@
 import { useTranslation } from "react-i18next"
-import { Fieldset, useBind } from "common-v2/components/form"
-import Autocomplete, {
-  AutocompleteProps,
-} from "common-v2/components/autocomplete"
-import { DateInput, DateInputProps } from "common-v2/components/input"
-import { UserCheck } from "common-v2/components/icons"
-import * as norm from "common-v2/utils/normalizers"
+import { Fieldset, useBind } from "common/components/form"
+import Autocomplete, { AutocompleteProps } from "common/components/autocomplete"
+import { DateInput, DateInputProps } from "common/components/input"
+import { UserCheck } from "common/components/icons"
+import * as norm from "carbure/utils/normalizers"
 import { StockFormValue } from "./stock-form"
-import { Entity } from "carbure/types"
-import { Country, Depot, ProductionSite } from "common/types"
+import { Entity, Country, Depot, ProductionSite } from "carbure/types"
 
 export const JourneyFields = () => {
   const { t } = useTranslation()
@@ -39,7 +36,7 @@ export const ProductionSiteField = (
       label={t("Site de production")}
       icon={isKnown ? UserCheck : undefined}
       defaultOptions={bound.value ? [bound.value] : undefined}
-      normalize={norm.normalizeProductionSite}
+      normalize={norm.normalizeProductionSiteOrUnknown}
       {...bound}
       {...props}
     />
@@ -112,7 +109,7 @@ export const DepotField = (props: AutocompleteProps<Depot | string>) => {
       label={t("Site de livraison")}
       icon={isKnown ? UserCheck : undefined}
       defaultOptions={bound.value ? [bound.value] : undefined}
-      normalize={norm.normalizeDepot}
+      normalize={norm.normalizeDepotOrUnknown}
       {...bound}
       {...props}
     />

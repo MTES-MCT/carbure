@@ -2,6 +2,7 @@ import datetime
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.db.models import Count
 
 from core.models import CarbureLot, CarbureStock, MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot, UserRights
 from api.v3.common.urls import urlpatterns
@@ -28,7 +29,7 @@ class LotsFlowTest(TestCase):
         loggedin = self.client.login(username=self.user1.email, password=self.password)
         self.assertTrue(loggedin)
 
-        self.producer = Entity.objects.filter(entity_type=Entity.PRODUCER)[0]
+        self.producer = Entity.objects.filter(entity_type=Entity.PRODUCER).annotate(psites=Count('productionsite')).filter(psites__gt=0)[0]
         self.trader = Entity.objects.filter(entity_type=Entity.TRADER)[0]
         self.trader.default_certificate = "TRADER_CERTIFICATE"
         self.trader.save()
@@ -51,7 +52,7 @@ class LotsFlowTest(TestCase):
         response = self.client.post(reverse('api-v4-add-lots'), lot)
         self.assertEqual(response.status_code, 200)
         data = response.json()['data']
-        lot_id = data['id']        
+        lot_id = data['id']
         lot = CarbureLot.objects.get(id=lot_id)
         return lot
 
@@ -78,12 +79,12 @@ class LotsFlowTest(TestCase):
         self.assertEqual(lot.correction_status, CarbureLot.IN_CORRECTION)
         self.assertEqual(lot.lot_status, CarbureLot.PENDING)
         lotdata['lot_id'] = lot.id
-        lotdata['volume'] = 42000        
+        lotdata['volume'] = 42000
         response = self.client.post(reverse('api-v4-update-lot'), lotdata)
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)
         self.assertEqual(lot.volume, 42000)
-        
+
     def test_simple_correction(self):
         lotdata = get_lot(entity=self.producer)
         lot = self.create_draft(lot=lotdata, carbure_client_id=self.trader.id)
@@ -96,9 +97,9 @@ class LotsFlowTest(TestCase):
         lot = CarbureLot.objects.get(id=lot.id)
         self.assertEqual(lot.lot_status, CarbureLot.PENDING)
         self.assertEqual(lot.correction_status, CarbureLot.IN_CORRECTION)
-        # we update 
+        # we update
         lotdata['lot_id'] = lot.id
-        lotdata['volume'] = 42000        
+        lotdata['volume'] = 42000
         response = self.client.post(reverse('api-v4-update-lot'), lotdata)
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)
@@ -119,7 +120,7 @@ class LotsFlowTest(TestCase):
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)
         self.assertEqual(lot.correction_status, CarbureLot.NO_PROBLEMO)
-        self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)        
+        self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)
 
 
     def test_cascading_correction_trading(self):

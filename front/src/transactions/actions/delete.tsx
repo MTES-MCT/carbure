@@ -2,13 +2,13 @@ import { useTranslation } from "react-i18next"
 import { Lot, LotQuery } from "../types"
 import * as api from "../api"
 import useEntity from "carbure/hooks/entity"
-import { useMutation } from "common-v2/hooks/async"
-import { useNotify } from "common-v2/components/notifications"
-import { variations } from "common-v2/utils/formatters"
-import Button from "common-v2/components/button"
-import Dialog from "common-v2/components/dialog"
-import { Cross, Return } from "common-v2/components/icons"
-import { usePortal } from "common-v2/components/portal"
+import { useMutation } from "common/hooks/async"
+import { useNotify } from "common/components/notifications"
+import { variations } from "common/utils/formatters"
+import Button from "common/components/button"
+import Dialog from "common/components/dialog"
+import { Cross, Return } from "common/components/icons"
+import { usePortal } from "common/components/portal"
 import { LotSummary } from "../components/lots/lot-summary"
 import { useMatomo } from "matomo"
 
@@ -151,7 +151,7 @@ const DeleteDialog = ({
       <footer>
         <Button
           asideX
-          submit
+          autoFocus
           loading={deleteLots.loading}
           variant="danger"
           icon={Cross}

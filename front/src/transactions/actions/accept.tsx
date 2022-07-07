@@ -2,28 +2,27 @@ import { useMemo, useState } from "react"
 import i18next from "i18next"
 import { useMatomo } from "matomo"
 import { useTranslation } from "react-i18next"
-import { Entity, EntityType } from "carbure/types"
-import { EntityDepot } from "common/types"
+import { Entity, EntityType, EntityDepot } from "carbure/types"
 import { Lot, LotQuery } from "transactions/types"
-import Menu from "common-v2/components/menu"
-import { Check, Return } from "common-v2/components/icons"
-import { useMutation, useQuery } from "common-v2/hooks/async"
+import Menu from "common/components/menu"
+import { Check, Return } from "common/components/icons"
+import { useMutation, useQuery } from "common/hooks/async"
 import * as api from "../api"
-import { useNotify } from "common-v2/components/notifications"
-import { variations } from "common-v2/utils/formatters"
-import Dialog from "common-v2/components/dialog"
+import { useNotify } from "common/components/notifications"
+import { variations } from "common/utils/formatters"
+import Dialog from "common/components/dialog"
 import { LotSummary } from "transactions/components/lots/lot-summary"
-import Button from "common-v2/components/button"
-import { usePortal } from "common-v2/components/portal"
+import Button from "common/components/button"
+import { usePortal } from "common/components/portal"
 import useEntity from "carbure/hooks/entity"
-import { Anchors } from "common-v2/components/dropdown"
-import Autocomplete from "common-v2/components/autocomplete"
-import * as norm from "common-v2/utils/normalizers"
-import { getDeliverySites } from "settings/api"
-import { findEntities, findMyCertificates } from "common-v2/api"
-import Select from "common-v2/components/select"
-import { compact } from "common-v2/utils/collection"
-import Form from "common-v2/components/form"
+import { Anchors } from "common/components/dropdown"
+import Autocomplete from "common/components/autocomplete"
+import * as norm from "carbure/utils/normalizers"
+import { getDeliverySites } from "settings/api/delivery-sites"
+import { findEntities, findMyCertificates } from "carbure/api"
+import Select from "common/components/select"
+import { compact } from "common/utils/collection"
+import Form from "common/components/form"
 
 export interface AcceptManyButtonProps {
   disabled?: boolean
@@ -221,7 +220,7 @@ const ReleaseForConsumptionDialog = ({
       <footer>
         <Button
           asideX
-          submit
+          autoFocus
           loading={acceptLots.loading}
           variant="success"
           icon={Check}
@@ -310,7 +309,7 @@ const InStockDialog = ({
       <footer>
         <Button
           asideX
-          submit
+          autoFocus
           loading={acceptLots.loading}
           variant="success"
           icon={Check}
@@ -398,7 +397,7 @@ const BlendingDialog = ({
       <footer>
         <Button
           asideX
-          submit
+          autoFocus
           loading={acceptLots.loading}
           variant="success"
           icon={Check}
@@ -486,7 +485,7 @@ const DirectDeliveryDialog = ({
       <footer>
         <Button
           asideX
-          submit
+          autoFocus
           loading={acceptLots.loading}
           variant="success"
           icon={Check}
@@ -574,7 +573,7 @@ const ExportDialog = ({
       <footer>
         <Button
           asideX
-          submit
+          autoFocus
           loading={acceptLots.loading}
           variant="success"
           icon={Check}
@@ -682,6 +681,7 @@ const TradingDialog = ({
             }}
           >
             <Autocomplete
+              autoFocus
               required
               label={t("Client")}
               value={client}
@@ -803,14 +803,17 @@ const ProcessingDialog = ({
           </p>
         </section>
         <section>
-          <Select
-            label={t("Opérateur tiers")}
-            placeholder={t("Choisir une société")}
-            value={depot}
-            onChange={setDepot}
-            options={depots}
-            normalize={norm.normalizeEntityDepot}
-          />
+          <Form id="processing">
+            <Select
+              autoFocus
+              label={t("Opérateur tiers")}
+              placeholder={t("Choisir une société")}
+              value={depot}
+              onChange={setDepot}
+              options={depots}
+              normalize={norm.normalizeEntityDepot}
+            />
+          </Form>
         </section>
         {depot && summary && (
           <LotSummary query={subquery} selection={selection} />
@@ -819,7 +822,7 @@ const ProcessingDialog = ({
       <footer>
         <Button
           asideX
-          submit
+          submit="processing"
           loading={acceptLots.loading}
           disabled={!depot}
           variant="success"
@@ -850,6 +853,6 @@ const ProcessingDialog = ({
 async function getProcessingDepots(entity_id: number, type: EntityType) {
   if (type !== EntityType.Operator) return []
 
-  const depots: EntityDepot[] = await getDeliverySites(entity_id)
-  return depots.filter((depot) => depot.blending_is_outsourced)
+  const depots = await getDeliverySites(entity_id)
+  return depots.data.data?.filter((depot) => depot.blending_is_outsourced) ?? []
 }

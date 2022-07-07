@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { EntityType } from "carbure/types"
+import { Entity, EntityType } from "carbure/types"
 import {
   Admin,
   DoubleCountingSourcing,
@@ -7,12 +7,10 @@ import {
   DoubleCountingDetails,
   DoubleCountingSourcingAggregation,
 } from "../types"
-import Table, { Column, Line, Row, padding } from "common/components/table"
-import { Input } from "common/components/input"
-import { Entity } from "carbure/types"
-import { formatDate } from "settings/components/common"
+import Table, { Column, Cell } from "common/components/table"
+import { NumberInput } from "common/components/input"
 import YearTable from "./year-table"
-import { formatNumber } from "common-v2/utils/formatters"
+import { formatDate, formatNumber } from "common/utils/formatters"
 
 type ValidationStatus = {
   approved: boolean
@@ -30,41 +28,37 @@ export const SourcingTable = ({ sourcing }: SourcingTableProps) => {
   const { t } = useTranslation()
 
   const columns: Column<DoubleCountingSourcing>[] = [
-    padding,
     {
       header: t("Matière première"),
-      render: (s) => <Line text={t(s.feedstock.code, { ns: "feedstocks" })} />,
+      cell: (s) => <Cell text={t(s.feedstock.code, { ns: "feedstocks" })} />,
     },
     {
       header: t("Poids en tonnes"),
-      render: (s) => <Line text={formatNumber(s.metric_tonnes)} />,
+      cell: (s) => <Cell text={formatNumber(s.metric_tonnes)} />,
     },
     {
       header: t("Origine"),
-      render: (s) => (
-        <Line text={t(s.origin_country.code_pays, { ns: "countries" })} />
+      cell: (s) => (
+        <Cell text={t(s.origin_country.code_pays, { ns: "countries" })} />
       ),
     },
     {
       header: t("Approvisionnement"),
-      render: (s) =>
+      cell: (s) =>
         s.supply_country && (
-          <Line text={t(s.supply_country.code_pays, { ns: "countries" })} />
+          <Cell text={t(s.supply_country.code_pays, { ns: "countries" })} />
         ),
     },
     {
       header: t("Transit"),
-      render: (s) =>
+      cell: (s) =>
         s.transit_country && (
-          <Line text={t(s.transit_country.code_pays, { ns: "countries" })} />
+          <Cell text={t(s.transit_country.code_pays, { ns: "countries" })} />
         ),
     },
-    padding,
   ]
 
-  const rows = sourcing.map((v) => ({ value: v }))
-
-  return <YearTable columns={columns} rows={rows} />
+  return <YearTable columns={columns} rows={sourcing} />
 }
 
 type SourcingAggregationTableProps = {
@@ -77,33 +71,29 @@ export const SourcingAggregationTable = ({
   const { t } = useTranslation()
 
   const columns: Column<DoubleCountingSourcingAggregation>[] = [
-    padding,
     {
       header: t("Matière première"),
-      render: (s) => <Line text={t(s.feedstock.code, { ns: "feedstocks" })} />,
+      cell: (s) => <Cell text={t(s.feedstock.code, { ns: "feedstocks" })} />,
     },
     {
       header: t("Poids total en tonnes"),
-      render: (s) => <Line text={formatNumber(s.sum)} />,
+      cell: (s) => <Cell text={formatNumber(s.sum)} />,
     },
     {
       header: t("Pays d'origine"),
-      render: (s) => <Line text={s.count} />,
+      cell: (s) => <Cell text={s.count} />,
     },
-    padding,
   ]
 
-  const rows = sourcing.map((v) => ({ value: v }))
-
-  return <YearTable columns={columns} rows={rows} />
+  return <YearTable columns={columns} rows={sourcing} />
 }
 
 type ProductionTableProps = {
   done?: boolean
   entity: Entity
-  quotas: Record<string, string>
+  quotas: Record<string, number>
   production: DoubleCountingProduction[]
-  setQuotas: (quotas: Record<string, string>) => void
+  setQuotas: (quotas: Record<string, number>) => void
 }
 
 export const ProductionTable = ({
@@ -116,74 +106,67 @@ export const ProductionTable = ({
   const { t } = useTranslation()
 
   const productionColumns: Column<DoubleCountingProduction>[] = [
-    padding,
     {
       header: t("Matière première"),
-      render: (p) => <Line text={t(p.feedstock.code, { ns: "feedstocks" })} />,
+      cell: (p) => <Cell text={t(p.feedstock.code, { ns: "feedstocks" })} />,
     },
     {
       header: t("Biocarburant"),
-      render: (p) => <Line text={t(p.biofuel.code, { ns: "biofuels" })} />,
+      cell: (p) => <Cell text={t(p.biofuel.code, { ns: "biofuels" })} />,
     },
     {
       header: t("Prod. max"),
-      render: (p) => (
-        <Line text={formatNumber(p.max_production_capacity ?? 0)} />
-      ),
+      cell: (p) => <Cell text={formatNumber(p.max_production_capacity ?? 0)} />,
     },
     {
       header: t("Prod. estimée"),
-      render: (p) => <Line text={formatNumber(p.estimated_production ?? 0)} />,
+      cell: (p) => <Cell text={formatNumber(p.estimated_production ?? 0)} />,
     },
     {
       header: t("Quota demandé"),
-      render: (p) => <Line text={formatNumber(p.requested_quota)} />,
+      cell: (p) => <Cell text={formatNumber(p.requested_quota)} />,
     },
     {
       header: t("Quota approuvé"),
-      render: (p) => {
+      cell: (p) => {
         if (done || entity?.entity_type !== EntityType.Administration) {
           return p.approved_quota >= 0 ? p.approved_quota : p.requested_quota
         }
 
         return (
-          <Input
+          <NumberInput
             value={quotas[p.id]}
-            onChange={(e) =>
+            onChange={(value) =>
               setQuotas({
                 ...quotas,
-                [p.id]: e.target.value,
+                [p.id]: value,
               })
             }
           />
         )
       },
     },
-    padding,
   ]
 
-  const rows = production.map((v) => ({ value: v }))
-
-  return <YearTable columns={productionColumns} rows={rows} />
+  return <YearTable columns={productionColumns} rows={production} />
 }
 
 type StatusTableProps = {
-  agreement: DoubleCountingDetails | null
+  agreement: DoubleCountingDetails | undefined
 }
 
 export const StatusTable = ({ agreement }: StatusTableProps) => {
   const { t } = useTranslation()
 
   const statusColumns: Column<ValidationStatus>[] = [
-    padding,
     {
       header: t("Administration"),
-      render: (s) => <Line text={s.entity} />,
+      cell: (s) => <Cell text={s.entity} />,
     },
     {
       header: t("Statut"),
-      render: (s) => (
-        <Line
+      cell: (s) => (
+        <Cell
           text={
             !s.approved && s.user
               ? t("Refusé")
@@ -196,16 +179,15 @@ export const StatusTable = ({ agreement }: StatusTableProps) => {
     },
     {
       header: t("Validateur"),
-      render: (s) => <Line text={s.user} />,
+      cell: (s) => <Cell text={s.user} />,
     },
     {
       header: t("Date"),
-      render: (s) => <Line text={formatDate(s.date)} />,
+      cell: (s) => <Cell text={formatDate(s.date)} />,
     },
-    padding,
   ]
 
-  const statusRows: Row<ValidationStatus>[] = [
+  const statusRows: ValidationStatus[] = [
     {
       approved: agreement?.dgec_validated ?? false,
       date: agreement?.dgec_validated_dt ?? "",
@@ -224,7 +206,7 @@ export const StatusTable = ({ agreement }: StatusTableProps) => {
       user: agreement?.dgpe_validator ?? "",
       entity: Admin.DGPE,
     },
-  ].map((value) => ({ value }))
+  ]
 
   return <Table columns={statusColumns} rows={statusRows} />
 }

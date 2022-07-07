@@ -1,4 +1,4 @@
-import { admin, entityRight } from "common/__test__/data"
+import { admin, entityRight } from "carbure/__test__/data"
 import { rest } from "msw"
 import { setupServer } from "msw/node"
 
@@ -6,7 +6,7 @@ import {
   okTranslations,
   okFieldsTranslations,
   okErrorsTranslations,
-} from "common/__test__/api"
+} from "carbure/__test__/api"
 
 import { getFilter } from "transactions/__test__/data"
 import { lotSummary } from "./data"
@@ -50,9 +50,8 @@ export const okSnapshot = rest.get("/api/admin/snapshot", (req, res, ctx) => {
       data: {
         lots: {
           alerts: 0,
-          corrections: 0,
-          declarations: 0,
-          pinned: 0,
+          lots: 0,
+          stocks: 0,
         },
       },
     })

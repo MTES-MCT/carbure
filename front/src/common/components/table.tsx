@@ -1,160 +1,271 @@
-import React from "react"
 import cl from "clsx"
+import { Link, To } from "react-router-dom"
+import useControlledState from "../hooks/controlled-state"
+import Checkbox from "./checkbox"
+import { multipleSelection } from "../utils/selection"
+import css from "./table.module.css"
+import { Col, LoaderOverlay } from "./scaffold"
+import { ChevronRight } from "./icons"
 
-import { Box, SystemProps } from "."
-import styles from "./table.module.css"
-import { ChevronRight, IconProps } from "common-v2/components/icons"
-import { TFunctionResult } from "i18next"
+export type TableVariant = "spaced" | "compact"
 
-type LineProps = {
-  text: string | number | TFunctionResult
-  small?: boolean
-  level?: "warning"
+export interface TableProps<T> {
+  className?: string
+  style?: React.CSSProperties
+  variant?: TableVariant
+  loading?: boolean
+  headless?: boolean
+  columns: Column<T>[]
+  rows: T[]
+  order?: Order
+  onOrder?: (order: Order | undefined) => void
+  onAction?: (value: T) => void
+  rowProps?: (row: T, i?: number) => JSX.IntrinsicElements["li"]
+  rowLink?: (row: T) => To
 }
 
-export const Line = ({ text, small = false, level }: LineProps) => (
-  <span
-    title={`${text}`}
-    className={cl(
-      styles.rowLine,
-      small && styles.extraInfo,
-      level === "warning" && styles.lineWarning
-    )}
-  >
-    {small ? text : text || "N/A"}
-  </span>
-)
+export function Table<T>({
+  className,
+  style,
+  variant,
+  loading,
+  headless,
+  columns,
+  rows,
+  order: controlledOrder,
+  rowProps,
+  rowLink,
+  onOrder,
+  onAction,
+}: TableProps<T>) {
+  const { order, orderBy } = useOrderBy(controlledOrder, onOrder)
+  const compare = useCompare(columns, order)
 
-type TwoLinesProps = { text: string; sub: string }
+  return (
+    <div
+      data-list
+      data-headless={headless ? "" : undefined}
+      className={cl(css.table, variant && css[variant], className)}
+      style={style}
+    >
+      {!headless && (
+        <header className={css.columns}>
+          {columns.filter(isVisible).map((column, i) => (
+            <div
+              key={column.key ?? i}
+              data-sortable={column.key ? true : undefined}
+              onClick={column.key ? () => orderBy(column.key!) : undefined}
+              title={
+                typeof column.header === "string" ? column.header : undefined
+              }
+              style={column.style}
+              className={cl(
+                css.header,
+                column.className,
+                column.small && css.small
+              )}
+            >
+              {order && column.key === order.column && (
+                <span>{order.direction === "asc" ? " ▼" : " ▲"}</span>
+              )}{" "}
+              {column.header}
+            </div>
+          ))}
+        </header>
+      )}
 
-export const TwoLines = ({ text, sub }: TwoLinesProps) => (
-  <div className={styles.dualRow}>
-    <Line text={text} />
-    <Line small text={sub} />
-  </div>
-)
+      <ul className={css.rows}>
+        {[...rows].sort(compare).map((row, i) => {
+          const props = rowProps?.(row, i) ?? {}
+          const link = rowLink?.(row)
 
-export const arrow: Column<any> = {
-  className: styles.actionColumn,
-  render: () => (
-    <Box className={styles.actionCell}>
-      <ChevronRight />
-    </Box>
-  ),
-}
+          const cells = columns.filter(isVisible).map((column, i) => (
+            <div
+              key={column.key ?? i}
+              style={column.style}
+              className={cl(
+                css.cell,
+                column.className,
+                column.small && css.small
+              )}
+            >
+              {column.cell(row)}
+            </div>
+          ))
 
-interface Action<T> {
-  icon: React.ComponentType<IconProps>
-  title: string
-  action: (i: T) => void
-}
-
-export function Actions<T>(
-  config: Action<T>[] | ((c: T) => Action<T>[])
-): Column<T> {
-  return {
-    className: styles.actionColumn,
-
-    render: (cell) => (
-      <Box row className={styles.actionCell}>
-        {/* if config is a function, create actions dynamically */}
-        {(typeof config === "function" ? config(cell) : config).map(
-          ({ icon: Icon, title, action }, i) => (
-            <Icon
+          return (
+            <li
               key={i}
-              title={title}
-              onClick={(e) => {
-                e.stopPropagation()
-                action(cell)
-              }}
-            />
+              {...props}
+              className={cl(link && css.rowLink)}
+              data-interactive={onAction ? true : undefined}
+              onClick={onAction ? () => onAction(row) : undefined}
+            >
+              {link ? <Link to={link}>{cells}</Link> : cells}
+            </li>
           )
-        )}
-      </Box>
+        })}
+      </ul>
+
+      {loading && <LoaderOverlay />}
+    </div>
+  )
+}
+
+function isVisible(column: Column<any>) {
+  return !column.hidden
+}
+
+export function selectionColumn<T, V>(
+  rows: T[],
+  selected: V[],
+  onSelect: (selected: V[]) => void,
+  identify: (item: T) => V
+): Column<T> {
+  const values = rows.map(identify)
+  const selection = multipleSelection(selected, onSelect)
+
+  return {
+    className: css.selection,
+    header: (
+      <Checkbox
+        captive
+        value={selection.isAllSelected(values)}
+        onChange={() => selection.onSelectAll(values)}
+      />
+    ),
+    cell: (item) => (
+      <Checkbox
+        captive
+        value={selection.isSelected(identify(item))}
+        onChange={() => selection.onSelect(identify(item))}
+      />
     ),
   }
 }
 
+export type MarkerVariant = "info" | "success" | "warning" | "danger"
+export type Marker<T> = (value: T) => MarkerVariant | undefined
+
+export function markerColumn<T>(mark: Marker<T>): Column<T> {
+  return {
+    className: css.marker,
+    cell: (value) => {
+      const variant = mark(value)
+      return variant ? <div className={css[variant]} /> : null
+    },
+  }
+}
+
+export function actionColumn<T>(
+  actions: (value: T) => React.ReactElement[]
+): Column<T> {
+  return {
+    className: css.actions,
+    cell: (value) => {
+      const buttons = actions(value).map((e, key) => ({ ...e, key }))
+      if (buttons.length === 0) return <ChevronRight color="var(--gray-dark)" />
+      else return buttons
+    },
+  }
+}
+
+export interface Order {
+  column: string
+  direction: "asc" | "desc"
+}
+
+export function useOrderBy(
+  orderControlled?: Order | undefined,
+  setOrderControlled?: (order: Order | undefined) => void
+) {
+  const [order, setOrder] = useControlledState<Order | undefined>(
+    undefined,
+    orderControlled,
+    setOrderControlled
+  )
+
+  function orderBy(column: string) {
+    if (!order || column !== order.column) {
+      setOrder({ column, direction: "asc" })
+    } else if (column === order.column) {
+      if (order.direction === "asc") {
+        setOrder({ column, direction: "desc" })
+      } else {
+        setOrder(undefined)
+      }
+    }
+  }
+
+  return { order, orderBy }
+}
+
+const collator = new Intl.Collator([], { numeric: true })
+export function useCompare<T>(columns: Column<T>[], order: Order | undefined) {
+  const column = columns.find(({ key }) => key && key === order?.column)
+
+  return function compare(a: T, b: T) {
+    if (!order || !column || !column.orderBy) return 0
+
+    const direction = order.direction === "asc" ? 1 : -1
+    const referenceA = column.orderBy(a)
+    const referenceB = column.orderBy(b)
+
+    if (typeof referenceA === "number" && typeof referenceB === "number") {
+      return direction * (referenceA - referenceB)
+    } else {
+      return (
+        direction *
+        collator.compare(referenceA.toString(), referenceB.toString())
+      )
+    }
+  }
+}
+
 export interface Column<T> {
-  /** element displayed in table header */
+  cell: (value: T) => React.ReactNode
   header?: React.ReactNode
-  /** key by which this column should sort */
-  sortBy?: string
-  /**  a class for the `<th>` element */
+  key?: string
   className?: string
-  /** helper for local sorting */
-  orderBy?: (value: T) => any
-  /** how to render a cell based on the row data */
-  render: (row: T) => React.ReactNode
+  style?: React.CSSProperties
+  small?: boolean
+  hidden?: boolean
+  orderBy?: OrderBy<T>
 }
 
-export interface Row<T> {
-  /** class of the `<tr>` element  */
+export type OrderBy<T> = (value: T) => string | number
+
+export type CellVariant = "warning"
+export interface CellProps {
   className?: string
-  /** callback when user clicks on row  */
-  onClick?: () => void
-  /** raw data for this row  */
-  value: T
+  style?: React.CSSProperties
+  variant?: CellVariant
+  icon?: React.FunctionComponent | React.ReactNode
+  text?: any
+  sub?: any
 }
 
-export type TableProps<T> = SystemProps & {
-  rows: Row<T>[]
-  columns: Column<T>[]
-  sortBy?: string
-  order?: "asc" | "desc"
-  headless?: boolean
-  onSort?: (s: string) => void
-}
-
-export default function Table<T>({
-  rows,
-  columns,
-  sortBy,
-  order,
-  headless = false,
+export const Cell = ({
+  variant,
   className,
-  onSort,
-  ...props
-}: TableProps<T>) {
-  return (
-    <Box {...props} className={cl(styles.table, className)}>
-      {!headless && (
-        <Box row className={styles.tableHead}>
-          {columns.map((column, c) => (
-            <Box
-              row
-              key={c}
-              className={cl(styles.tableHeader, column.className)}
-              onClick={() => column.sortBy && onSort && onSort(column.sortBy)}
-            >
-              {column.header ?? null}
-              {sortBy && sortBy === column.sortBy && (
-                <span>{order === "asc" ? " ▲" : " ▼"}</span>
-              )}
-            </Box>
-          ))}
-        </Box>
-      )}
+  style,
+  icon: Icon,
+  text,
+  sub,
+}: CellProps) => {
+  const icon = typeof Icon === "function" ? <Icon /> : Icon
 
-      {rows.map((row, r) => (
-        <Box
-          row
-          key={r}
-          className={cl(styles.tableRow, row.className)}
-          onClick={row.onClick}
-        >
-          {columns.map((column, c) => (
-            <Box row key={c} className={cl(styles.tableCell, column.className)}>
-              {column.render(row.value)}
-            </Box>
-          ))}
-        </Box>
-      ))}
-    </Box>
+  return (
+    <Col
+      className={cl(css.multiline, variant && css[variant], className)}
+      style={style}
+    >
+      <strong title={`${text}`}>
+        {text || sub} {icon}
+      </strong>
+      {text && sub !== undefined && <small title={`${sub}`}>{sub}</small>}
+    </Col>
   )
 }
 
-export const padding: Column<any> = {
-  className: styles.paddingColumn,
-  render: () => null,
-}
+export default Table

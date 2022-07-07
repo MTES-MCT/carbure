@@ -1,145 +1,66 @@
-import React, { useCallback, useContext, useState } from "react"
+import React, { useEffect, useRef } from "react"
 import cl from "clsx"
-import ReactDOM from "react-dom"
+import { Cross } from "./icons"
+import Button from "./button"
+import { usePortal } from "./portal"
+import css from "./notifications.module.css"
 
-import styles from "./notifications.module.css"
-
-import { Box } from "."
-import { Cross } from "common-v2/components/icons"
-import { useTranslation } from "react-i18next"
-
-const DEFAULT_TIMEOUT = 10000
-
-interface Notification {
-  key: string
-  level: "default" | "success" | "error" | "warning"
-  text: string
-  list?: string[]
-  timeout: NodeJS.Timeout | null
+export type Notifier = (
+  content: React.ReactNode,
+  options?: NotificationOptions
+) => void
+export interface NotificationOptions {
+  variant?: NotificationVariant
+  timeout?: number
 }
 
-interface NotificationsHook {
-  list: Notification[]
-  push: (n: {
-    text: string
-    duration?: number
-    level?: Notification["level"]
-    list?: string[]
-  }) => Notification
-  dispose: (k: string) => void
+export function useNotify(): Notifier {
+  const portal = usePortal(notifications)
+  return (content, options) =>
+    portal((close) => (
+      <Notification content={content} options={options} onClose={close} />
+    ))
 }
 
-function useNotifications(): NotificationsHook {
-  const [notifications, setNotifications] = useState<Notification[]>([])
+export type NotificationVariant = "info" | "success" | "warning" | "danger"
 
-  const push: NotificationsHook["push"] = useCallback(
-    ({ text, duration = DEFAULT_TIMEOUT, list, level = "default" }) => {
-      const key = `${text}-${Date.now()}`
-
-      // set auto close with timeout
-      const timeout = setTimeout(() => {
-        setNotifications((list) => list.filter((n) => n.key !== key))
-      }, duration)
-
-      const notification = { key, text, timeout, level, list }
-      setNotifications((list) => [...list, notification])
-
-      return notification
-    },
-    []
-  )
-
-  const dispose = useCallback((key: string) => {
-    setNotifications((list) => {
-      const notification = list.find((n) => n.key === key)
-
-      if (notification) {
-        notification.timeout && clearTimeout(notification.timeout)
-        return list.filter((n) => n.key !== key)
-      }
-
-      return list
-    })
-  }, [])
-
-  return { list: notifications, push, dispose }
+export interface NotificationProps {
+  content: React.ReactNode
+  options?: NotificationOptions
+  onClose: () => void
 }
 
-type NotificationsProps = {
-  notifications: NotificationsHook
-}
+export const Notification = ({
+  content,
+  options,
+  onClose,
+}: NotificationProps) => {
+  const timeoutRef = useRef<number>()
 
-const Notifications = ({ notifications }: NotificationsProps) => {
-  const { t } = useTranslation()
-
-  if (notifications.list.length === 0) {
-    return null
-  }
-
-  return ReactDOM.createPortal(
-    <Box as="ul" className={styles.notificationsWrapper}>
-      {notifications.list.map((n, i) => (
-        <Box
-          as="li"
-          row
-          key={i}
-          className={cl(
-            styles.notification,
-            n.level === "success" && styles.success,
-            n.level === "warning" && styles.warning,
-            n.level === "error" && styles.error
-          )}
-        >
-          {n.text}
-          {n.list && (
-            <ul className={styles.notificationList}>
-              {n.list.map((l) => (
-                <li key={l}>{l}</li>
-              ))}
-            </ul>
-          )}
-          <Cross
-            title={t("Fermer la notification")}
-            size={32}
-            onClick={() => notifications.dispose(n.key)}
-          />
-        </Box>
-      ))}
-    </Box>,
-    document.getElementById("notifications")!
-  )
-}
-
-const NotificationsContext = React.createContext<NotificationsHook>({
-  list: [],
-  push: () => ({
-    key: "",
-    level: "default",
-    text: "",
-    timeout: null,
-  }),
-  dispose: () => {},
-})
-
-export function useNotificationContext() {
-  return useContext(NotificationsContext)
-}
-
-type NotificationsProviderProps = {
-  children: React.ReactNode
-}
-
-const NotificationsProvider = ({ children }: NotificationsProviderProps) => {
-  const notifications = useNotifications()
+  useEffect(() => {
+    timeoutRef.current = window.setTimeout(onClose, DEFAULT_TIMEOUT)
+    return () => window.clearTimeout(timeoutRef.current)
+  }, [timeoutRef, onClose])
 
   return (
-    <React.Fragment>
-      <NotificationsContext.Provider value={notifications}>
-        {children}
-      </NotificationsContext.Provider>
-      <Notifications notifications={notifications} />
-    </React.Fragment>
+    <li
+      onClick={() => window.clearTimeout(timeoutRef.current)}
+      className={cl(css.notification, options?.variant && css[options.variant])}
+    >
+      <span className={css.content}>{content}</span>
+      <Button
+        variant="icon"
+        icon={Cross}
+        action={onClose}
+        className={css.close}
+      />
+    </li>
   )
 }
 
-export default NotificationsProvider
+// initialize notification container and add it to the dom
+const notifications = document.createElement("ul")
+notifications.id = "notifications"
+document.body.append(notifications)
+
+export const DEFAULT_TIMEOUT = 10000

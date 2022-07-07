@@ -4,14 +4,13 @@ import { screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Entity } from "carbure/types"
 
-import { operator, producer } from "common/__test__/data"
+import { operator, producer } from "carbure/__test__/data"
 import LotDetails from "../components/lots/index"
 import { LotDetails as LotDetailsData } from "transaction-details/types"
 
 import server from "./api"
 
-import { Data, getField } from "common/__test__/helpers"
-import { PortalProvider } from "common-v2/components/portal"
+import { Data, getField } from "carbure/__test__/helpers"
 import { clickOnCheckboxesAndConfirm } from "../../transactions/__test__/helpers"
 import { setEntity } from "settings/__test__/api"
 import {
@@ -21,6 +20,8 @@ import {
   rejectedDetails,
   sentDetails,
 } from "./data"
+import Flags from "flags.json"
+import HashRoute from "common/components/hash-route"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 beforeEach(() => Data.set("lot-details", lotDetails))
@@ -30,13 +31,11 @@ afterAll(() => server.close())
 const LotDetailsWithRouter = ({ entity }: { entity: Entity }) => {
   setEntity(entity)
   return (
-    <TestRoot url={`/org/${entity.id}/transactions/2021/draft/pending/0`}>
+    <TestRoot url={`/org/${entity.id}/transactions/2021/drafts/imported#lot/0`}>
       <Route
-        path="/org/:entity/transactions/:year/:status/:category/:id"
+        path="/org/:entity/transactions/:year/:status/:category"
         element={
-          <PortalProvider>
-            <LotDetails neighbors={[]} />
-          </PortalProvider>
+          <HashRoute path="lot/:id" element={<LotDetails neighbors={[]} />} />
         }
       />
       <Route path="/draft/pending" element={<p>EMPTY</p>} />
@@ -46,7 +45,7 @@ const LotDetailsWithRouter = ({ entity }: { entity: Entity }) => {
 
 function checkLotFields() {
   getField("N° document d'accompagnement")
-  getField("Volume en litres")
+  getField(Flags.preferred_unit ? "Quantité" : "Volume en litres")
   getField("Biocarburant")
   getField("Matière première")
   getField("Pays d'origine de la matière première")
@@ -95,7 +94,7 @@ function checkGESFields() {
 test("display transaction details", async () => {
   render(<LotDetailsWithRouter entity={producer} />)
 
-  await screen.findByText(/Détails du lot #TEST01/)
+  await screen.findByText(/Lot #TEST01/)
 
   screen.getByDisplayValue("DAETEST")
 
@@ -125,13 +124,13 @@ test("edit transaction details", async () => {
 
   const save: any = await screen.findByText("Sauvegarder")
 
-  screen.getByText(/^Détails du lot/)
+  screen.getAllByText(/^Lot/)
 
   const dae = getField("N° document d'accompagnement")
   userEvent.clear(dae)
   userEvent.type(dae, "DAETEST")
 
-  const vol = getField("Volume en litres")
+  const vol = getField(Flags.preferred_unit ? "Quantité" : "Volume en litres")
   userEvent.clear(vol)
   userEvent.type(vol, "20000")
 

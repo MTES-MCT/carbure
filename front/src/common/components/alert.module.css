@@ -1,98 +1,56 @@
-/* ALERT COMPONENT */
-
 .alert {
   display: flex;
-  position: relative;
-  align-items: center;
-  font-size: var(--font-size);
+  padding: var(--spacing-s) var(--spacing-m);
+  gap: var(--spacing-m);
+  background-color: var(--gray-highlight);
   border: 1px solid var(--gray-medium);
-  background-color: var(--gray-light);
-  padding: 8px 16px;
+  border-radius: var(--border-radius);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.alertWarning {
-  border-color: var(--orange-medium);
-  background-color: var(--orange-light);
+.alert.loading {
+  opacity: 0.66;
 }
 
-.alertError {
-  border-color: var(--red-medium);
-  background-color: var(--red-light);
+.alert [data-icon] {
+  flex-shrink: 0;
+  color: var(--gray-dark);
 }
 
-.alertInfo {
-  border-color: var(--blue-highlight);
+.info {
   background-color: var(--blue-light);
+  border-color: var(--blue-highlight);
 }
 
-.alert > :global(.icon) {
-  width: 20px;
-  margin-right: 8px;
-  stroke: var(--gray-dark);
+.info [data-icon] {
+  color: var(--blue-medium);
 }
 
-.alertWarning :global(.icon) {
-  stroke: var(--orange-dark);
+.success {
+  background-color: var(--green-light);
+  border-color: var(--green-medium);
 }
 
-.alertError :global(.icon) {
-  stroke: var(--red-dark);
+.success [data-icon] {
+  color: var(--green-dark);
 }
 
-.alertInfo :global(.icon) {
-  stroke: var(--blue-dark);
+.warning {
+  background-color: var(--orange-light);
+  border-color: var(--orange-medium);
 }
 
-.alertFilter {
-  margin-bottom: 24px;
+.warning [data-icon] {
+  color: var(--orange-dark);
 }
 
-.alertLink {
-  color: var(--blue-dark);
-  margin-left: 16px;
-  text-decoration: underline;
-  cursor: pointer;
+.danger {
+  background-color: var(--red-light);
+  border-color: var(--red-medium);
 }
 
-.alertExtra {
-  margin-left: 4px;
-  color: var(--blue-dark);
-}
-
-.alertClose {
-  margin-left: auto;
-}
-
-.alertLoading {
-  opacity: 0.5;
-}
-
-.collapsibleAlert {
-  flex-direction: column;
-  align-items: stretch;
-  padding: 0;
-}
-
-.collapsibleBar {
-  cursor: pointer;
-  align-items: center;
-  padding: 8px 16px;
-}
-
-.collapsibleBar > :global(.icon):first-child {
-  margin-right: 8px;
-}
-
-.alert .collapsibleTitle {
-  font-size: var(--font-size);
-}
-
-.collapsibleArrow {
-  margin-left: auto;
-  margin-right: -8px;
-}
-
-.collapsibleDetails {
-  padding: 16px;
-  padding-top: 8px;
+.danger [data-icon] {
+  color: var(--red-dark);
 }

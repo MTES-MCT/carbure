@@ -4,7 +4,7 @@ import { Suspense } from "react"
 import { render as baseRender } from "@testing-library/react"
 import { configure } from "@testing-library/dom"
 import { initReactI18next } from "react-i18next"
-import { LoaderOverlay } from "common-v2/components/scaffold"
+import { LoaderOverlay } from "common/components/scaffold"
 import { MemoryRouter, Routes } from "react-router"
 
 import translation from "../public/locales/fr/translation.json"
@@ -13,7 +13,9 @@ import fields from "../public/locales/fr/fields.json"
 import feedstocks from "../public/locales/fr/feedstocks.json"
 import biofuels from "../public/locales/fr/biofuels.json"
 import countries from "../public/locales/fr/countries.json"
-import useLoadUser, { UserContext, UserManager } from "carbure/hooks/user"
+import useUserManager, { UserContext } from "carbure/hooks/user"
+import { EntityContext, useEntityManager } from "carbure/hooks/entity"
+import { PortalProvider } from "common/components/portal"
 
 configure({
   getElementError(message) {
@@ -22,17 +24,6 @@ configure({
     return error
   },
 })
-
-const modal = document.createElement("div")
-modal.setAttribute("id", "modal")
-
-const dropdown = document.createElement("div")
-dropdown.setAttribute("id", "dropdown")
-
-const notifications = document.createElement("div")
-notifications.setAttribute("id", "notifications")
-
-document.body.append(modal, dropdown, notifications)
 
 // mock window.open (jsdom does not implement it)
 window.open = jest.fn()
@@ -69,24 +60,32 @@ i18n.use(initReactI18next).init({
   },
 })
 
-type TestRootProps = {
-  url: string
-  children: React.ReactNode | ((user: UserManager) => React.ReactNode)
+type RootProps = {
+  url?: string
+  children: React.ReactNode
 }
 
-export const TestRoot = ({ url, children }: TestRootProps) => {
-  const user = useLoadUser()
-  const element = typeof children === "function" ? children(user) : children
+export const TestRoot = ({ url, children }: RootProps) => (
+  <MemoryRouter initialEntries={[url ?? "/"]}>
+    <Suspense fallback={<LoaderOverlay />}>
+      <App>{children}</App>
+    </Suspense>
+  </MemoryRouter>
+)
+
+const App = ({ children }: RootProps) => {
+  const user = useUserManager()
+  const entity = useEntityManager(user)
 
   return (
-    <MemoryRouter initialEntries={[url]}>
-      <Suspense fallback={<LoaderOverlay />}>
-        <UserContext.Provider value={user}>
-          <Routes>{element}</Routes>
+    <UserContext.Provider value={user}>
+      <EntityContext.Provider value={entity}>
+        <PortalProvider>
+          <Routes>{children}</Routes>
           {user.loading && <LoaderOverlay />}
-        </UserContext.Provider>
-      </Suspense>
-    </MemoryRouter>
+        </PortalProvider>
+      </EntityContext.Provider>
+    </UserContext.Provider>
   )
 }
 
@@ -96,9 +95,3 @@ export function render(element: any) {
   document.body.append(root)
   return baseRender(element, { container: root })
 }
-
-beforeEach(() => {
-  modal.textContent = ""
-  dropdown.textContent = ""
-  notifications.textContent = ""
-})

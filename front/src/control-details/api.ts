@@ -1,5 +1,5 @@
 import { EntityManager } from "carbure/hooks/entity"
-import api, { Api } from "common-v2/services/api"
+import api, { Api } from "common/services/api"
 import { LotDetails, StockDetails } from "transaction-details/types"
 
 const admin = {

@@ -1,8 +1,7 @@
 import { createContext, useContext } from "react"
-import { useQuery } from "common-v2/hooks/async"
+import { useQuery } from "common/hooks/async"
 import { Entity, UserRight, UserRightRequest } from "../types"
 import * as api from "../api"
-import { invalidate } from "common-v2/hooks/invalidate"
 
 export interface UserManager {
   loading: boolean
@@ -16,7 +15,7 @@ export interface UserManager {
   getFirstEntity: () => Entity | null
 }
 
-export function useLoadUser(): UserManager {
+export function useUserManager(): UserManager {
   const settings = useQuery(api.getUserSettings, {
     key: "user-settings",
     params: [],
@@ -68,8 +67,4 @@ export function useUser() {
   return user
 }
 
-export function reloadUserSettings() {
-  invalidate("user-settings")
-}
-
-export default useLoadUser
+export default useUserManager

@@ -6,6 +6,7 @@ from django.db.models.query import QuerySet
 from django.db.models.query_utils import Q
 from numpy.lib.function_base import insert
 from api.v4.sanity_checks import bulk_sanity_checks
+from core.carburetypes import CarbureUnit, CarbureStockErrors
 from core.models import CarbureLot, CarbureLotEvent, CarbureStock, Entity, GenericError
 
 INCORRECT_DELIVERY_DATE = "INCORRECT_DELIVERY_DATE"
@@ -18,6 +19,7 @@ UNKNOWN_BIOFUEL = "UNKNOWN_BIOFUEL"
 UNKNOWN_FEEDSTOCK = "UNKNOWN_FEEDSTOCK"
 UNKNOWN_COUNTRY_OF_ORIGIN = "UNKNOWN_COUNTRY_OF_ORIGIN"
 MISSING_VOLUME = "MISSING_VOLUME"
+UNKNOWN_UNIT = "UNKNOWN_UNIT"
 VOLUME_FORMAT_INCORRECT = "VOLUME_FORMAT_INCORRECT"
 WRONG_FLOAT_FORMAT = "WRONG_FLOAT_FORMAT"
 UNKNOWN_DELIVERY_SITE = "UNKNOWN_DELIVERY_SITE"
@@ -57,7 +59,7 @@ def fill_delivery_date(lot, data):
     # default: today
     lot.delivery_date = today
     try:
-        delivery_date = data['delivery_date']
+        delivery_date = data.get('delivery_date', '')
         dd = try_get_date(delivery_date)
         lot.delivery_date = dd
     except Exception:
@@ -167,11 +169,57 @@ def fill_basic_info(lot, data, prefetched_data):
 def fill_volume_info(lot, data):
     errors = []
     ### VOLUME
-    if lot.parent_lot is None:
+    if lot.parent_stock is not None:
+        # UPDATING VOLUME OF A LOT COMING FROM A STOCK SPLIT
+        # 1) check volume diff
+        try:
+            new_volume = round(abs(float(data.get('volume', 0))), 2)
+        except Exception:
+            new_volume = 0
+            errors.append(GenericError(lot=lot, field='volume', error=VOLUME_FORMAT_INCORRECT, display_to_creator=True, is_blocking=True))       
+        diff = round(lot.volume - new_volume, 2)
+        # 2) if new volume > old volume, ensure we have enough stock
+        if diff < 0 and lot.parent_stock.remaining_volume < abs(diff):
+            # not enough stock remaining, dont change anything
+            errors.append(GenericError(lot=lot, field='volume', error=CarbureStockErrors.NOT_ENOUGH_VOLUME_LEFT, display_to_creator=True))
+        else:
+            # all good
+            lot.volume = new_volume
+            lot.weight = lot.get_weight()
+            lot.lhv_amount = lot.get_lhv_amount()            
+            lot.parent_stock.remaining_volume = round(lot.parent_stock.remaining_volume + diff, 2)
+            lot.parent_stock.remaining_weight = lot.parent_stock.get_weight()
+            lot.parent_stock.remaining_lhv_amount = lot.parent_stock.get_lhv_amount()
+            lot.parent_stock.save()
+    elif lot.parent_lot is None:
         volume = data.get('volume', None)
         if not volume:
-            errors.append(GenericError(lot=lot, field='volume', error=MISSING_VOLUME, display_to_creator=True, is_blocking=True))
+            unit = data.get('unit', '').lower()
+            if not unit:
+                errors.append(GenericError(lot=lot, field='volume', error=MISSING_VOLUME, display_to_creator=True, is_blocking=True))
+            else:
+                quantity = data.get('quantity', 0)
+                try:
+                    quantity = round(abs(float(quantity)), 2)
+                except:
+                    quantity = 0
+                    errors.append(GenericError(lot=lot, field='volume', error=VOLUME_FORMAT_INCORRECT, display_to_creator=True, is_blocking=True))
+                if unit == CarbureUnit.KILOGRAM:
+                    lot.weight = quantity
+                    lot.volume = lot.get_volume()
+                    lot.lhv_amount = lot.get_lhv_amount()                    
+                elif unit == CarbureUnit.LHV:
+                    lot.lhv_amount = quantity
+                    lot.volume = round(lot.lhv_amount / lot.biofuel.pci_litre, 2)
+                    lot.weight = lot.get_weight()
+                elif unit == CarbureUnit.LITER:
+                    lot.volume = quantity
+                    lot.weight = lot.get_weight()
+                    lot.lhv_amount = lot.get_lhv_amount()     
+                else:
+                    errors.append(GenericError(lot=lot, field='volume', error=UNKNOWN_UNIT, display_to_creator=True, is_blocking=True))
         else:
+            # let's actually read the volume entered in the form/excel and try to parse it as a float
             try:
                 volume = round(abs(float(volume)), 2)
                 if lot.volume != 0 and volume != lot.volume:
@@ -182,8 +230,8 @@ def fill_volume_info(lot, data):
             except Exception:
                 lot.volume = 0
                 errors.append(GenericError(lot=lot, field='volume', error=VOLUME_FORMAT_INCORRECT, display_to_creator=True, is_blocking=True))
-        lot.weight = lot.get_weight()
-        lot.lhv_amount = lot.get_lhv_amount()
+            lot.weight = lot.get_weight()
+            lot.lhv_amount = lot.get_lhv_amount()
     return errors
 
 def fill_supplier_info(lot, data, entity):
@@ -200,7 +248,7 @@ def fill_supplier_info(lot, data, entity):
     # default values
     lot.carbure_supplier = None
     lot.unknown_supplier = data.get('unknown_supplier', None)
-    lot.supplier_certificate = data.get('supplier_certificate', '')
+    lot.supplier_certificate = str(data.get('supplier_certificate', '')).strip()
 
     # I AM THE SUPPLIER
     if data.get('carbure_supplier_id') == str(entity.id):
@@ -213,7 +261,8 @@ def fill_supplier_info(lot, data, entity):
     # EXCEL: NO SUPPLIER IS SPECIFIED AND I AM THE PRODUCER
     if lot.carbure_producer and lot.carbure_producer.id == entity.id and not lot.carbure_supplier:
         lot.carbure_supplier = entity
-        lot.supplier_certificate = data.get('supplier_certificate', entity.default_certificate)
+        if not lot.supplier_certificate:
+            lot.supplier_certificate = entity.default_certificate
 
     return errors
 
@@ -380,7 +429,7 @@ def bulk_insert_lots(entity: Entity, lots: List[CarbureLot], errors: List[Generi
         'feedstock', 'biofuel', 'country_of_origin',
         'parent_lot', 'parent_stock', 'parent_stock__carbure_client', 'parent_stock__carbure_supplier',
         'parent_stock__feedstock', 'parent_stock__biofuel', 'parent_stock__depot', 'parent_stock__country_of_origin', 'parent_stock__production_country'
-    ).prefetch_related('genericerror_set', 'carbure_production_site__productionsitecertificate_set').filter(added_by=entity).order_by('-id')[0:len(lots)]
+    ).prefetch_related('genericerror_set', 'carbure_production_site__productionsitecertificate_set', 'carbure_production_site__productionsiteinput_set', 'carbure_production_site__productionsiteoutput_set').filter(added_by=entity).order_by('-id')[0:len(lots)]
     errors = reversed(errors) # lots are fetched by DESC ID
     for lot, lot_errors in zip(inserted_lots, errors):
         for e in lot_errors:

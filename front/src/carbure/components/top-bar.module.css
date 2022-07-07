@@ -28,7 +28,7 @@
 }
 
 .menus {
-  gap: var(--spacing-m);
+  gap: var(--spacing-s);
 }
 
 .shortcut {
@@ -57,4 +57,10 @@
 
 .faq:hover {
   opacity: 1;
+}
+
+@media screen and (max-width: 1600px) {
+  .faq {
+    display: none;
+  }
 }

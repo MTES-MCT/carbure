@@ -1,3 +1,4 @@
+from imp import source_from_cache
 import traceback
 from django.db.models.aggregates import Count, Sum
 from django.db.models.expressions import F
@@ -6,12 +7,13 @@ from django.db.models.functions.comparison import Coalesce
 
 from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
+from core.common import SuccessResponse
 from core.decorators import check_user_rights, is_auditor
 from api.v4.helpers import filter_lots, filter_stock, get_auditor_stock, get_entity_stock, get_known_certificates, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_with_errors, get_lots_with_metadata, get_lots_filters_data, get_stock_events, get_stock_filters_data, get_stock_with_metadata, get_stocks_summary_data
 from api.v4.helpers import get_transaction_distance
 
 from core.models import CarbureLot, CarbureLotComment, CarbureStock, CarbureStockTransformation, Entity, GenericError, UserRights
-from core.serializers import CarbureLotAdminSerializer, CarbureLotCommentSerializer, CarbureLotPublicSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
+from core.serializers import CarbureLotAdminSerializer, CarbureLotCommentSerializer, CarbureLotPublicSerializer, CarbureLotReliabilityScoreSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
 from api.v4.admin import get_admin_summary_data
 
 @check_user_rights()
@@ -27,7 +29,6 @@ def get_years(request, *args, **kwargs):
 @is_auditor
 def get_snapshot(request, *args, **kwargs):
     year = request.GET.get('year', False)
-    entity_id = request.GET.get('entity_id', False)
     if year:
         try:
             year = int(year)
@@ -36,22 +37,15 @@ def get_snapshot(request, *args, **kwargs):
     else:
         return JsonResponse({'status': 'error', 'message': 'Missing year'}, status=400)
 
+    auditor_lots = get_auditor_lots(request).filter(year=year)
+    lots = auditor_lots.filter(year=year).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
+    alerts = lots.filter(Q(highlighted_by_auditor=True) | Q(random_control_requested=True) | Q(ml_control_requested=True))
+
+    auditor_stock = get_auditor_stock(request.user)
+    stock = auditor_stock.filter(remaining_volume__gt=0)
+
     data = {}
-    entity = Entity.objects.get(id=entity_id)
-    lots = get_auditor_lots(request).filter(year=year)
-    alerts = get_lots_with_errors(lots, entity)
-    corrections = lots.exclude(correction_status=CarbureLot.NO_PROBLEMO)
-    
-    stock = get_auditor_stock(request.user)
-    stock_not_empty = stock.filter(remaining_volume__gt=0)
-
-    pinned = lots.filter(highlighted_by_auditor=True)
-
-    data['lots'] = {'alerts': alerts.count(),
-                    'corrections': corrections.count(),
-                    'declarations': lots.count(),
-                    'stocks': stock_not_empty.count(),
-                    'pinned': pinned.count()}
+    data['lots'] = {'alerts': alerts.count(), 'lots': lots.count(), 'stocks': stock.count()}
     return JsonResponse({'status': 'success', 'data': data})
 
 
@@ -126,6 +120,7 @@ def get_lot_details(request, *args, **kwargs):
     data['updates'] = get_lot_updates(lot)
     data['comments'] = get_lot_comments(lot)
     data['control_comments'] = get_auditor_lot_comments(lot)
+    data['score'] = CarbureLotReliabilityScoreSerializer(lot.carburelotreliabilityscore_set.all(), many=True).data
     return JsonResponse({'status': 'success', 'data': data})
 
 
@@ -204,6 +199,30 @@ def toggle_pin(request, *args, **kwargs):
         traceback.print_exc()
         return JsonResponse({'status': "error", 'message': "Could not pin lots"}, status=500)
 
+@check_user_rights()
+@is_auditor
+def mark_conform(request, *args, **kwargs):
+    selection = request.POST.getlist('selection', [])
+    try:
+        lots = CarbureLot.objects.filter(id__in=selection)
+        lots.update(audit_status=CarbureLot.CONFORM)
+        return SuccessResponse()
+    except:
+        traceback.print_exc()
+        return JsonResponse({'status': "error", 'message': "Could not mark lots as conform"}, status=500)
+
+@check_user_rights()
+@is_auditor
+def mark_nonconform(request, *args, **kwargs):
+    selection = request.POST.getlist('selection', [])
+    try:
+        lots = CarbureLot.objects.filter(id__in=selection)
+        lots.update(audit_status=CarbureLot.NONCONFORM)
+        return SuccessResponse()
+    except:
+        traceback.print_exc()
+        return JsonResponse({'status': "error", 'message': "Could not mark lots as conform"}, status=500)
+
 
 @check_user_rights()
 @is_auditor
@@ -253,13 +272,9 @@ def get_auditor_lots(request):
 def get_auditor_lots_by_status(entity, status, request):
     lots = get_auditor_lots(request)
     if status == 'ALERTS':
-        lots = get_lots_with_errors(lots, entity, will_aggregate=True)
-    elif status == 'CORRECTIONS':
-        lots = lots.exclude(correction_status=CarbureLot.NO_PROBLEMO)
-    elif status == 'DECLARATIONS':
+        lots = lots.filter(Q(highlighted_by_auditor=True) | Q(random_control_requested=True) | Q(ml_control_requested=True))
+    elif status == 'LOTS':
         lots = lots.exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
-    elif status == 'PINNED':
-        lots = lots.filter(highlighted_by_auditor=True)
     return lots
 
 
