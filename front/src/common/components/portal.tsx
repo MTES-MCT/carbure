@@ -100,9 +100,10 @@ export function usePortalManager(): PortalManager {
 export function usePortal(defaultRoot?: HTMLElement): PortalRegister {
   const manager = useContext(PortalContext)
   if (manager === undefined) throw new Error("Portal context is not defined")
+  const portal = manager.portal
   return useCallback(
-    (render, root = defaultRoot) => manager.portal(render, root),
-    [defaultRoot]
+    (render, root = defaultRoot) => portal(render, root),
+    [defaultRoot, portal]
   )
 }
 

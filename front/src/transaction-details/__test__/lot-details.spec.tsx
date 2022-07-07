@@ -21,6 +21,7 @@ import {
   sentDetails,
 } from "./data"
 import Flags from "flags.json"
+import HashRoute from "common/components/hash-route"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 beforeEach(() => Data.set("lot-details", lotDetails))
@@ -30,10 +31,12 @@ afterAll(() => server.close())
 const LotDetailsWithRouter = ({ entity }: { entity: Entity }) => {
   setEntity(entity)
   return (
-    <TestRoot url={`/org/${entity.id}/transactions/2021/draft/pending/0`}>
+    <TestRoot url={`/org/${entity.id}/transactions/2021/drafts/imported#lot/0`}>
       <Route
-        path="/org/:entity/transactions/:year/:status/:category/:id"
-        element={<LotDetails neighbors={[]} />}
+        path="/org/:entity/transactions/:year/:status/:category"
+        element={
+          <HashRoute path="lot/:id" element={<LotDetails neighbors={[]} />} />
+        }
       />
       <Route path="/draft/pending" element={<p>EMPTY</p>} />
     </TestRoot>

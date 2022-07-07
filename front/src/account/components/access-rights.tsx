@@ -144,11 +144,6 @@ export const AccountAccesRights = () => {
   )
 }
 
-export type AccessRequest = {
-  entity: Entity
-  role: UserRole
-}
-
 export interface EntityDialogProps {
   onClose: () => void
 }
