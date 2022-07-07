@@ -10,7 +10,7 @@ import {
 import { Register, RegisterPending } from "./components/register"
 import { Activate, ActivateRequest } from "./components/activate"
 import { Logout } from "./components/logout"
-import useTitle from "common-v2/hooks/title"
+import useTitle from "common/hooks/title"
 
 const Auth = () => {
   const { t } = useTranslation()

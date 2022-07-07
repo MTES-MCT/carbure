@@ -1,7 +1,6 @@
 @import "./reset.css";
 @import "./fonts.css";
 @import "./theme.css";
-@import "./theme-v2.css";
 
 * {
   box-sizing: border-box;
@@ -46,10 +45,4 @@ input,
 textarea,
 select {
   font-family: var(--font-family);
-}
-
-@media screen and (min-width: 1600px) {
-  :root {
-    --main-spacing: 120px;
-  }
 }

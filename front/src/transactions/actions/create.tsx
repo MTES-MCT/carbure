@@ -1,15 +1,10 @@
 import { useTranslation } from "react-i18next"
-import Button from "common-v2/components/button"
-import { Plus } from "common-v2/components/icons"
+import Button from "common/components/button"
+import { Plus } from "common/components/icons"
 
 export const CreateButton = () => {
   const { t } = useTranslation()
   return (
-    <Button
-      variant="primary"
-      icon={Plus}
-      label={t("Créer un lot")}
-      to="drafts/imported/add"
-    />
+    <Button variant="primary" icon={Plus} label={t("Créer un lot")} to="#add" />
   )
 }

@@ -1,9 +1,9 @@
 import { useTranslation } from "react-i18next"
-import { useQuery } from "common-v2/hooks/async"
+import { useQuery } from "common/hooks/async"
 import pickApi from "../../api"
-import { formatNumber } from "common-v2/utils/formatters"
-import { LoaderOverlay } from "common-v2/components/scaffold"
-import Table from "common-v2/components/table"
+import { formatUnit } from "common/utils/formatters"
+import { LoaderOverlay } from "common/components/scaffold"
+import Table from "common/components/table"
 import NoResult from "transactions/components/no-result"
 import {
   LotSummaryBar,
@@ -12,6 +12,8 @@ import {
   useSummaryColumns,
 } from "transactions/components/lots/lot-summary"
 import useEntity from "carbure/hooks/entity"
+import Flags from "flags.json"
+import { compact } from "common/utils/collection"
 
 export const ControlLotSummaryBar = (props: LotSummaryBarProps) => {
   const entity = useEntity()
@@ -29,7 +31,6 @@ export const ControlLotSummaryBar = (props: LotSummaryBarProps) => {
 const EMPTY: number[] = []
 
 export const ControlLotSummary = ({
-  pending,
   query,
   selection = EMPTY,
 }: LotSummaryProps) => {
@@ -43,9 +44,19 @@ export const ControlLotSummary = ({
   })
 
   const summaryData = summary.result?.data.data
+
+  const unitToField = {
+    l: "volume_sum" as "volume_sum",
+    kg: "weight_sum" as "weight_sum",
+    MJ: "lhv_amount_sum" as "lhv_amount_sum",
+  }
+
+  const unit = !Flags.preferred_unit ? "l" : entity.preferred_unit ?? "l"
+  const field = unitToField[unit]
+
   const lots = summaryData?.lots ?? []
   const lotsAmount = lots.reduce((count, item) => count + item.total, 0)
-  const lotsVolume = lots.reduce((volume, item) => volume + item.volume_sum, 0) // prettier-ignore
+  const lotsQuantity = lots.reduce((quantity, item) => quantity + item[field], 0) // prettier-ignore
 
   const columns = useSummaryColumns(query)
 
@@ -64,25 +75,22 @@ export const ControlLotSummary = ({
             {" ▸ "}
             {t("{{count}} lots", { count: lotsAmount })}
             {" ▸ "}
-            {t("{{volume}} litres", {
-              count: lotsVolume,
-              volume: formatNumber(lotsVolume),
-            })}
+            {formatUnit(lotsQuantity, unit)}
           </h2>
 
           <Table
             style={{ width: "max(50vw, 960px)" }}
             rows={lots}
-            columns={[
+            columns={compact([
               columns.supplier,
               columns.client,
               columns.delivery,
               columns.biofuel,
-              columns.volume,
+              !Flags.preferred_unit && columns.volume,
+              Flags.preferred_unit && columns.quantity,
               columns.count,
-              pending ? columns.countWithPending : columns.count,
               columns.ghgReduction,
-            ]}
+            ])}
           />
         </>
       )}

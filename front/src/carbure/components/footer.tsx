@@ -8,12 +8,14 @@ import logoFabNum from "../assets/images/logo-fabriquenumerique.svg"
 import logoBetaGouv from "../assets/images/betagouvfr.svg"
 import logoFranceRelance from "../assets/images/france-relance.webp"
 import logoEuropeanUnion from "../assets/images/union-europeenne.webp"
-import { ExternalLink, LinkedIn, Mail, Slack } from "common-v2/components/icons"
-import { Footer } from "common-v2/components/scaffold"
-import { MailTo } from "common-v2/components/button"
+import { ExternalLink, LinkedIn, Mail, Slack } from "common/components/icons"
+import { Footer } from "common/components/scaffold"
+import { MailTo } from "common/components/button"
+import { useUser } from "carbure/hooks/user"
 
 const CarbureFooter = () => {
   useTranslation()
+  const user = useUser()
 
   return (
     <Footer className={styles.footer}>
@@ -41,12 +43,14 @@ const CarbureFooter = () => {
           <li>
             <Trans>Nous contacter :</Trans>
           </li>
-          <li>
-            <MailTo user="carbure" host="beta.gouv.fr">
-              <Mail />
-              <Trans>Email</Trans>
-            </MailTo>
-          </li>
+          {user.isAuthenticated() && (
+            <li>
+              <MailTo user="carbure" host="beta.gouv.fr">
+                <Mail />
+                <Trans>Email</Trans>
+              </MailTo>
+            </li>
+          )}
           <li>
             <a
               href="https://carbure-beta-gouv.slack.com/"

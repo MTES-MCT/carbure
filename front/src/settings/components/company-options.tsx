@@ -2,10 +2,13 @@ import { useTranslation } from "react-i18next"
 
 import useEntity from "carbure/hooks/entity"
 import { UserRole } from "carbure/types"
-import { useMutation } from "common-v2/hooks/async"
-import { Panel, LoaderOverlay } from "common-v2/components/scaffold"
-import Checkbox from "common-v2/components/checkbox"
-import * as api from "../api-v2"
+import { useMutation } from "common/hooks/async"
+import { Panel, LoaderOverlay, Row } from "common/components/scaffold"
+import Checkbox from "common/components/checkbox"
+import { Calculator } from "common/components/icons"
+import Select from "common/components/select"
+import * as api from "../api/company"
+import Flags from "flags.json"
 
 const CompanyOptions = () => {
   const { t } = useTranslation()
@@ -33,6 +36,10 @@ const CompanyOptions = () => {
     { invalidates: ["user-settings"] }
   )
 
+  const setPreferredUnit = useMutation(api.setEntityPreferredUnit, {
+    invalidates: ["user-settings"],
+  })
+
   const isLoading =
     toggleMAC.loading ||
     toggleStocks.loading ||
@@ -48,12 +55,37 @@ const CompanyOptions = () => {
       <section>
         <p>
           {t(
-            "Les options ci-dessous vous permettent de personnaliser l'interface de la page Transactions de CarbuRe pour n'y montrer que les fonctionnalités pertinentes pour votre activité."
+            "Les options ci-dessous vous permettent de personnaliser l'interface de CarbuRe pour n'y montrer que les fonctionnalités pertinentes pour votre activité."
           )}
         </p>
       </section>
 
-      <section style={{ paddingBottom: "var(--spacing-l)" }}>
+      {Flags.preferred_unit && (
+        <section>
+          <Row style={{ alignItems: "center" }}>
+            <Calculator size={18} style={{ marginRight: 16 }} />
+
+            {t("Ma société préfère afficher les quantités en")}
+
+            <Select
+              variant="inline"
+              value={entity.preferred_unit}
+              onChange={(unit) => setPreferredUnit.execute(entity.id, unit!)}
+              style={{ marginLeft: "var(--spacing-xs)" }}
+              options={[
+                {
+                  value: "l",
+                  label: t("litres (Éthanol à 20°, autres à 15°)"),
+                },
+                { value: "kg", label: t("kilogrammes") },
+                { value: "MJ", label: t("mégajoules") },
+              ]}
+            />
+          </Row>
+        </section>
+      )}
+
+      <section>
         <Checkbox
           disabled={!canModify}
           label={t("Ma société gère un stock sur CarbuRe")}
@@ -79,6 +111,8 @@ const CompanyOptions = () => {
           onChange={toggleDirectDeliveries.execute}
         />
       </section>
+
+      <footer />
 
       {isLoading && <LoaderOverlay />}
     </Panel>

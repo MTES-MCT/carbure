@@ -13,6 +13,7 @@ export interface LotDetails {
   control_comments?: LotComment[]
   errors: LotError[]
   certificates: LotCertificates
+  score: LotScore[]
 }
 
 export interface Distance {
@@ -59,6 +60,13 @@ export interface LotCertificate {
   found: boolean
   certificate_id: string
   certificate_type: string
+}
+
+export interface LotScore {
+  item: string
+  max_score: number
+  score: number
+  meta: Record<string, boolean> | null
 }
 
 export interface StockDetails {

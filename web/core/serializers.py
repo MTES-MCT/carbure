@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import CarbureLot, CarbureLotEvent, CarbureLotComment, CarbureNotification, CarbureStock, CarbureStockTransformation, Depot, Entity, EntityCertificate, EntityDepot, GenericCertificate, GenericError, SustainabilityDeclaration
+from core.models import CarbureLot, CarbureLotEvent, CarbureLotComment, CarbureLotReliabilityScore, CarbureNotification, CarbureStock, CarbureStockTransformation, Depot, Entity, EntityCertificate, EntityDepot, GenericCertificate, GenericError, SustainabilityDeclaration
 from doublecount.serializers import BiofuelSerializer, CountrySerializer, EntitySerializer, FeedStockSerializer
 from producers.models import ProductionSite
 
@@ -179,6 +179,8 @@ class CarbureStockPublicSerializer(serializers.ModelSerializer):
     production_country = CountrySerializer(read_only=True)
     carbure_supplier = EntitySerializer(read_only=True)
     initial_volume = serializers.SerializerMethodField()
+    initial_weight = serializers.SerializerMethodField()
+    initial_lhv_amount = serializers.SerializerMethodField()
     delivery_date = serializers.SerializerMethodField()
     period = serializers.SerializerMethodField()
 
@@ -187,7 +189,7 @@ class CarbureStockPublicSerializer(serializers.ModelSerializer):
         fields = ['id', 'carbure_id', 'depot', 'carbure_client',
                   'remaining_volume', 'remaining_weight', 'remaining_lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
                   'carbure_production_site', 'unknown_production_site', 'production_country', 'carbure_supplier', 'unknown_supplier',
-                  'ghg_reduction', 'ghg_reduction_red_ii', 'initial_volume', 'delivery_date', 'period']
+                  'ghg_reduction', 'ghg_reduction_red_ii', 'initial_volume', 'delivery_date', 'period', 'initial_weight', 'initial_lhv_amount']
 
     def get_initial_volume(self, obj):
         if obj.parent_lot:
@@ -196,7 +198,22 @@ class CarbureStockPublicSerializer(serializers.ModelSerializer):
             return obj.parent_transformation.volume_destination
         else:
             return 0
-        # return obj.parent_lot.volume if obj.parent_lot else obj.parent_transformation.volume_destination
+
+    def get_initial_weight(self, obj):
+        if obj.parent_lot:
+            return obj.parent_lot.weight
+        elif obj.parent_transformation:
+            return obj.parent_transformation.get_weight()
+        else:
+            return 0
+
+    def get_initial_lhv_amount(self, obj):
+        if obj.parent_lot:
+            return obj.parent_lot.lhv_amount
+        elif obj.parent_transformation:
+            return obj.parent_transformation.get_lhv_amount()
+        else:
+            return 0
 
     def get_delivery_date(self, obj):
         return obj.get_delivery_date().strftime('%Y-%m-%d')
@@ -253,7 +270,7 @@ class CarbureLotPublicSerializer(serializers.ModelSerializer):
                   'lot_status', 'correction_status',
                   'volume', 'weight', 'lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
                   'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ghg_reference_red_ii', 'ghg_reduction_red_ii',
-                  'free_field', 'added_by', 'created_at', 'carbure_vendor', 'vendor_certificate', 'vendor_certificate_type',
+                  'free_field', 'added_by', 'created_at', 'carbure_vendor', 'vendor_certificate', 'vendor_certificate_type', 'data_reliability_score',
                   ]
 
 
@@ -267,12 +284,16 @@ class CarbureLotAdminSerializer(CarbureLotPublicSerializer):
                   'transport_document_type', 'transport_document_reference', 'carbure_client', 'unknown_client',
                   'dispatch_date', 'carbure_dispatch_site', 'unknown_dispatch_site', 'dispatch_site_country',
                   'delivery_date', 'carbure_delivery_site', 'unknown_delivery_site', 'delivery_site_country', 'delivery_type',
-                  'lot_status', 'correction_status',
+                  'lot_status', 'correction_status', 'audit_status',
                   'volume', 'weight', 'lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
                   'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ghg_reference_red_ii', 'ghg_reduction_red_ii',
-                  'free_field', 'added_by', 'created_at', 'highlighted_by_auditor', 'highlighted_by_admin', 'carbure_vendor', 'vendor_certificate', 'vendor_certificate_type',
+                  'free_field', 'added_by', 'created_at', 'highlighted_by_auditor', 'highlighted_by_admin', 'carbure_vendor', 'vendor_certificate', 'vendor_certificate_type', 'data_reliability_score',
                   ]
 
+class CarbureLotReliabilityScoreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CarbureLotReliabilityScore
+        fields = ['item', 'max_score', 'score', 'meta']
 
 class GenericCertificateSerializer(serializers.ModelSerializer):
     class Meta:

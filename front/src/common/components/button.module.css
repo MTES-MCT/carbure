@@ -1,30 +1,29 @@
-/* BUTTON COMPONENT */
-
+/* base style */
 .button {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  gap: var(--spacing-s);
   background-color: var(--white);
   border: 1px solid var(--gray-medium);
+  color: var(--black);
   font-weight: 600;
-  padding: 8px 12px;
-  padding-right: 16px;
+  padding: var(--spacing-s) var(--spacing-m);
   cursor: pointer;
   font-size: var(--font-size);
-  color: var(--black);
+  font-family: var(--font-family);
+  white-space: nowrap;
 }
 
-.button :global(.icon) {
-  width: 20px;
-  height: 20px;
-  margin-right: 8px;
+.wrapper {
+  align-self: center;
 }
 
-.buttonIcon {
-  padding: 4px;
+.button [data-icon] {
+  flex-shrink: 0;
 }
 
-.buttonIcon :global(.icon) {
-  margin-right: 0;
+.composite {
+  padding-left: var(--spacing-s);
 }
 
 .button:hover {
@@ -37,116 +36,142 @@
   transform: translate3D(1px, 1px, 0);
 }
 
-.button:disabled,
-.button.buttonDisabled {
+.button:disabled {
   opacity: 0.5;
   cursor: auto;
   pointer-events: none;
 }
 
-.buttonPrimary {
+/* variant primary */
+.primary {
   color: var(--white);
   background-color: var(--blue-medium);
   border-color: var(--blue-medium);
 }
 
-.buttonPrimary:hover {
+.primary:hover {
   color: var(--white);
   background-color: var(--blue-dark);
 }
 
-.buttonSecondary {
+/* variant secondary */
+.secondary {
+  color: var(--black);
+  background-color: var(--gray-light);
+  border-color: var(--gray-medium);
+}
+
+.secondary:hover {
   color: var(--blue-dark);
-  background-color: var(--blue-light);
-  border-color: var(--blue-medium);
+  border-color: var(--blue-dark);
 }
 
-.buttonSecondary:hover {
-  color: var(--white);
-  background-color: var(--blue-dark);
-}
-
-.buttonWarning {
-  color: var(--orange-dark);
-  background-color: var(--orange-light);
-  border-color: var(--orange-medium);
-}
-
-.buttonWarning:hover {
-  color: var(--white);
-  background-color: var(--orange-dark);
-  border-color: var(--orange-dark);
-}
-
-.buttonDanger {
-  color: var(--red-dark);
-  background-color: var(--red-light);
-  border-color: var(--red-medium);
-}
-
-.buttonDanger:hover {
-  color: var(--white);
-  background-color: var(--red-dark);
-  border-color: var(--red-dark);
-}
-
-.buttonSuccess {
+/* variant success */
+.success {
   color: var(--green-dark);
   background-color: var(--green-light);
   border-color: var(--green-medium);
 }
 
-.buttonSuccess:hover {
+.success:hover {
   color: var(--white);
   background-color: var(--green-dark);
   border-color: var(--green-dark);
 }
 
-a .button {
-  height: 100%;
+/* variant warning */
+.warning {
+  color: var(--orange-dark);
+  background-color: var(--orange-light);
+  border-color: var(--orange-medium);
 }
 
-/* STATUS BUTTON */
-
-.statusButton {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: space-around;
-  font-size: 1.25em;
-  font-weight: 400;
-  background-color: var(--white);
-  padding: 20px 24px;
-  padding-bottom: 24px;
+.warning:hover {
+  color: var(--white);
+  background-color: var(--orange-dark);
+  border-color: var(--orange-dark);
 }
 
-.statusButtonAmount {
-  display: flex;
+/* variant danger */
+.danger {
+  color: var(--red-dark);
+  background-color: var(--red-light);
+  border-color: var(--red-medium);
+}
+
+.danger:hover {
+  color: var(--white);
+  background-color: var(--red-dark);
+  border-color: var(--red-dark);
+}
+
+/* variant text */
+.text {
+  border: none;
+  background-color: transparent;
+  color: var(--black);
+}
+
+.text:hover {
+  background-color: transparent;
+  color: var(--blue-dark);
+}
+
+.text[data-disabled] {
+  color: var(--gray-medium);
+}
+
+/* variant link */
+.link {
+  padding: 0;
+  text-decoration: underline;
+  color: var(--blue-dark);
+  background-color: transparent;
+  border: none;
+  font-weight: normal;
+}
+
+.link:hover {
+  background-color: transparent;
+}
+
+/* variant icon */
+.icon {
+  padding: 0;
+  border: none;
+  background-color: transparent;
+}
+
+.icon:hover {
+  background-color: transparent;
+  color: var(--blue-dark);
+}
+
+.external {
+  display: inline-flex;
   align-items: center;
-  height: 24px;
+  gap: var(--spacing-s);
+  white-space: nowrap;
 }
 
-.statusButtonAmount :global(.icon) {
-  width: unset;
-  margin: 1px;
+.external:hover {
+  text-decoration: underline;
 }
 
-.activeStatusButton {
-  border-bottom: 4px solid var(--blue-medium);
-  padding-bottom: 21px;
+.center span {
+  flex: 1;
+  text-align: center;
 }
 
-.statusButtonLabel {
-  text-align: left;
-  font-weight: 800;
-  margin-top: 4px;
+.mailto {
+  align-items: center;
 }
 
-.activeStatusButton .statusButtonLabel {
+.downloadLink {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
   color: var(--blue-medium);
-}
-
-.button input[type="file"] {
-  display: none;
+  text-decoration: underline;
+  gap: var(--spacing-s);
 }

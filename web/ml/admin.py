@@ -11,6 +11,7 @@ class EECStatsAdmin(admin.ModelAdmin):
 @admin.register(EPStats)
 class EPStatsAdmin(admin.ModelAdmin):
     list_display = ('feedstock', 'biofuel', 'nb_lots', 'default_value_min_ep', 'default_value_max_ep', 'stddev', 'average')
+    list_filter = ('feedstock', 'biofuel',)
     
 @admin.register(ETDStats)
 class ETDStatsAdmin(admin.ModelAdmin):

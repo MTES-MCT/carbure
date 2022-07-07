@@ -1,12 +1,12 @@
 import { useTranslation } from "react-i18next"
-import Button from "common-v2/components/button"
+import Button from "common/components/button"
 import { useNavigate } from "react-router-dom"
-import Form, { useForm } from "common-v2/components/form"
-import { Lock, Mail, Refresh, Return, Save } from "common-v2/components/icons"
-import { TextInput } from "common-v2/components/input"
+import Form, { useForm } from "common/components/form"
+import { Lock, Mail, Refresh, Return, Save } from "common/components/icons"
+import { TextInput } from "common/components/input"
 import { Container } from "./login"
-import { useNotify } from "common-v2/components/notifications"
-import { useMutation } from "common-v2/hooks/async"
+import { useNotify } from "common/components/notifications"
+import { useMutation } from "common/hooks/async"
 import * as api from "../api"
 import { useToken } from "./activate"
 
@@ -50,6 +50,7 @@ export const ResetPasswordRequest = () => {
           onSubmit={() => requestPasswordReset.execute(value.email!)}
         >
           <TextInput
+            autoFocus
             variant="solid"
             icon={Mail}
             type="email"
@@ -158,6 +159,7 @@ export const ResetPassword = () => {
           }
         >
           <TextInput
+            autoFocus
             variant="solid"
             icon={Lock}
             type="password"

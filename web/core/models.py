@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 import hashlib
 from django.db.models.signals import pre_delete, pre_save
 from django.dispatch import receiver
+from numpy import deprecate
 
 usermodel = get_user_model()
 
@@ -40,6 +41,7 @@ class Entity(models.Model):
     hash = models.CharField(max_length=32, null=True, blank=True, default='')
     default_certificate = models.CharField(max_length=64, null=True, blank=True, default='')
     notifications_enabled = models.BooleanField(default=False)
+    preferred_unit = models.CharField(max_length=64, choices=(('l', 'litres'), ('kg', 'kg'), ('MJ', 'MJ')), default='l')
 
     def __str__(self):
         return self.name
@@ -49,7 +51,7 @@ class Entity(models.Model):
             'has_mac': self.has_mac, 'has_trading': self.has_trading, 'has_direct_deliveries': self.has_direct_deliveries, 'has_stocks': self.has_stocks,
             'legal_name': self.legal_name, 'registration_id': self.registration_id,
             'sustainability_officer': self.sustainability_officer, 'sustainability_officer_phone_number': self.sustainability_officer_phone_number,
-            'registered_address': self.registered_address, 'default_certificate': self.default_certificate}
+            'registered_address': self.registered_address, 'default_certificate': self.default_certificate, 'preferred_unit': self.preferred_unit}
         if self.entity_type == Entity.EXTERNAL_ADMIN:
             d['ext_admin_pages'] = [e.right for e in self.externaladminrights_set.all()]
         return d
@@ -71,6 +73,7 @@ class Entity(models.Model):
         db_table = 'entities'
         verbose_name = 'Entity'
         verbose_name_plural = 'Entities'
+        ordering = ['name']
 
 
 
@@ -175,7 +178,7 @@ class Biocarburant(models.Model):
         db_table = 'biocarburants'
         verbose_name = 'Biocarburant'
         verbose_name_plural = 'Biocarburants'
-
+        ordering = ['name']
 
 class MatierePremiere(models.Model):
     CONV = 'CONV'
@@ -209,7 +212,7 @@ class MatierePremiere(models.Model):
         db_table = 'matieres_premieres'
         verbose_name = 'Matiere Premiere'
         verbose_name_plural = 'Matieres Premieres'
-
+        ordering = ['name']
 
 class Pays(models.Model):
     code_pays = models.CharField(max_length=64)
@@ -228,7 +231,7 @@ class Pays(models.Model):
         db_table = 'pays'
         verbose_name = 'Pays'
         verbose_name_plural = 'Pays'
-
+        ordering = ['name']
 
 class Depot(models.Model):
     EFS = 'EFS'
@@ -261,6 +264,7 @@ class Depot(models.Model):
         db_table = 'depots'
         verbose_name = 'Dépôt'
         verbose_name_plural = 'Dépôts'
+        ordering = ['name']
 
 class EntityDepot(models.Model):
     OWN = 'OWN'
@@ -286,7 +290,7 @@ class EntityDepot(models.Model):
         verbose_name_plural = 'Dépôts Entité'
 
 
-from producers.models import ProductionSite
+from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
 
 
 class SustainabilityDeclaration(models.Model):
@@ -482,8 +486,20 @@ class CarbureLot(models.Model):
     free_field = models.TextField(blank=True, null=True, default=None)
 
     # admin / auditor checks & filters
-    highlighted_by_admin = models.BooleanField(default=False)
-    highlighted_by_auditor = models.BooleanField(default=False)
+    highlighted_by_admin = models.BooleanField(default=False) # admin requests audit of this lot
+    highlighted_by_auditor = models.BooleanField(default=False) # auditor suspicion - adds it to the control list
+    random_control_requested = models.BooleanField(default=False) # random control
+    ml_control_requested = models.BooleanField(default=False) # machine learning suspicion
+    ml_scoring = models.FloatField(default=0.0) # score calculated by machine learning script
+
+    # auditor decision
+    CONFORM = "CONFORM"
+    NONCONFORM = "NONCONFORM"
+    AUDIT_STATUS = ((UNKNOWN, UNKNOWN), (CONFORM, CONFORM), (NONCONFORM, NONCONFORM))
+    audit_status = models.CharField(max_length=24, choices=AUDIT_STATUS, default=UNKNOWN)
+
+    # scoring
+    data_reliability_score = models.CharField(max_length=1, default='F')
 
     class Meta:
         db_table = 'carbure_lots'
@@ -500,16 +516,22 @@ class CarbureLot(models.Model):
     def __str__(self):
         return str(self.id)
 
+    def get_volume(self): # from mass
+        if not self.biofuel:
+            return 0
+        if self.weight == 0:
+            return 0
+        return round(self.weight / self.biofuel.masse_volumique, 2)
 
     def get_weight(self):
         if not self.biofuel:
             return 0
-        return self.volume * self.biofuel.masse_volumique
+        return round(self.volume * self.biofuel.masse_volumique, 2)
 
     def get_lhv_amount(self):
         if not self.biofuel:
             return 0
-        return self.volume * self.biofuel.pci_litre
+        return round(self.volume * self.biofuel.pci_litre, 2)
 
     def generate_carbure_id(self):
         country_of_production = '00'
@@ -558,6 +580,117 @@ class CarbureLot(models.Model):
         self.ghg_reduction_red_ii = other.ghg_reduction_red_ii
         self.update_ghg()
 
+    def recalc_reliability_score(self, prefetched_data):
+        # data source is producer 3 POINTS
+        data_source_is_producer = CarbureLotReliabilityScore(lot=self, item=CarbureLotReliabilityScore.DATA_SOURCE_IS_PRODUCER, max_score=3, score=0)
+        if self.carbure_producer != None:
+            data_source_is_producer.score = 3
+
+        # lot declared by both 1 POINT
+        lot_declared_both = CarbureLotReliabilityScore(lot=self, item=CarbureLotReliabilityScore.LOT_DECLARED, max_score=1, score=0)
+        if self.lot_status == CarbureLot.FROZEN:
+            lot_declared_both.score = 1
+
+        # certificates validated by DGEC 2 points
+        certificates_validated = CarbureLotReliabilityScore(lot=self, item=CarbureLotReliabilityScore.CERTIFICATES_VALIDATED, max_score=2, score=0, meta={'producer_certificate_checked': False, 'supplier_certificate_checked': False})
+        if self.carbure_producer \
+            and self.carbure_producer.id in prefetched_data['entity_certificates'] \
+            and self.production_site_certificate in prefetched_data['entity_certificates'][self.carbure_producer.id] \
+            and prefetched_data['entity_certificates'][self.carbure_producer.id][self.production_site_certificate].checked_by_admin:
+                certificates_validated.meta['producer_certificate_checked'] = True
+                certificates_validated.score += 1
+        if self.carbure_supplier \
+            and self.carbure_supplier.id in prefetched_data['entity_certificates'] \
+            and self.supplier_certificate in prefetched_data['entity_certificates'][self.carbure_supplier.id] \
+            and prefetched_data['entity_certificates'][self.carbure_supplier.id][self.supplier_certificate].checked_by_admin:
+                certificates_validated.meta['supplier_certificate_checked'] = True
+                certificates_validated.score += 1
+
+        ### configuration issues
+        config = CarbureLotReliabilityScore(lot=self, item=CarbureLotReliabilityScore.ANOMALIES_CONFIGURATION, max_score=1, score=0, meta={'feedstock_registered': False, 'biofuel_registered': False, 'delivery_site_registered': False})
+        if self.carbure_production_site and self.carbure_production_site.id in prefetched_data['production_sites']:
+            if self.feedstock.id in prefetched_data['production_sites'][self.carbure_production_site.id]['feedstock_ids']:
+                config.meta['feedstock_registered'] = True
+            if self.biofuel.id in prefetched_data['production_sites'][self.carbure_production_site.id]['biofuel_ids']:
+                config.meta['biofuel_registered'] = True
+        if self.carbure_delivery_site and self.carbure_client and self.carbure_client.id in prefetched_data['depotsbyentity'] and self.carbure_delivery_site.depot_id in prefetched_data['depotsbyentity'][self.carbure_client.id]:
+            config.meta['delivery_site_registered'] = True
+        if config.meta['feedstock_registered'] and config.meta['biofuel_registered'] and config.meta['delivery_site_registered']:
+            config.score = 1
+
+        # certificates
+        certificates = CarbureLotReliabilityScore(lot=self, item=CarbureLotReliabilityScore.ANOMALIES_CERTIFICATES, max_score=1, score=0,
+        meta={'producer_certificate_provided': False, 'producer_certificate_exists': False,
+            'supplier_certificate_provided': False, 'supplier_certificate_exists':False})
+        # certificates are provided
+        if self.production_site_certificate:
+            certificates.meta['producer_certificate_provided'] = True
+        if self.supplier_certificate:
+            certificates.meta['supplier_certificate_provided'] = True
+
+        # certificates exist in our database
+        if self.production_site_certificate in prefetched_data['checked_certificates']:
+            certificates.meta['producer_certificate_exists'] = prefetched_data['checked_certificates'][self.production_site_certificate]
+        elif GenericCertificate.objects.filter(certificate_id=self.production_site_certificate).count() > 0:
+            certificates.meta['producer_certificate_exists'] = True
+            prefetched_data['checked_certificates'][self.production_site_certificate] = True # add to cache
+        else:
+            prefetched_data['checked_certificates'][self.production_site_certificate] = False # add to cache
+
+        if self.supplier_certificate in prefetched_data['checked_certificates']:
+            certificates.meta['supplier_certificate_exists'] = prefetched_data['checked_certificates'][self.supplier_certificate]
+        elif GenericCertificate.objects.filter(certificate_id=self.supplier_certificate).count() > 0:
+            certificates.meta['supplier_certificate_exists'] = True
+            prefetched_data['checked_certificates'][self.supplier_certificate] = True # add to cache
+        else:
+            prefetched_data['checked_certificates'][self.supplier_certificate] = False # add to cache
+
+        if certificates.meta['producer_certificate_provided'] and certificates.meta['producer_certificate_exists'] and certificates.meta['supplier_certificate_provided'] and certificates.meta['supplier_certificate_exists']:
+            certificates.score = 1
+
+        score_entries = [data_source_is_producer, lot_declared_both, certificates_validated, config, certificates]
+        nb_points = sum([s.score for s in score_entries])
+        if nb_points == 8:
+            self.data_reliability_score = 'A'
+        elif nb_points >= 6:
+            self.data_reliability_score = 'B'
+        elif nb_points >= 3:
+            self.data_reliability_score = 'C'
+        elif nb_points >= 1:
+            self.data_reliability_score = 'D'
+        else:
+            self.data_reliability_score = 'E'
+        return score_entries
+
+class CarbureLotReliabilityScore(models.Model):
+    CUSTOMS_AND_CARBURE_MATCH = "CUSTOMS_AND_CARBURE_MATCH" # 0 or 4 --- NO META
+    DATA_SOURCE_IS_PRODUCER = "DATA_SOURCE_IS_PRODUCER" # 0 or 3 --- NO META
+    LOT_DECLARED = "LOT_DECLARED" # 0 or 1 --- NO META
+
+    CERTIFICATES_VALIDATED = "CERTIFICATES_VALIDATED" # 0, 1, 2 --- META
+    ANOMALIES_CERTIFICATES = "ANOMALIES_CERTIFICATES" # 0, 1 --- META
+    ANOMALIES_CONFIGURATION = "ANOMALIES_CONFIGURATION" # 0, 1 ---META
+
+    SCORE_ITEMS = ((CUSTOMS_AND_CARBURE_MATCH, CUSTOMS_AND_CARBURE_MATCH), (DATA_SOURCE_IS_PRODUCER, DATA_SOURCE_IS_PRODUCER), (LOT_DECLARED, LOT_DECLARED),
+                    (ANOMALIES_CERTIFICATES, ANOMALIES_CERTIFICATES), (ANOMALIES_CONFIGURATION, ANOMALIES_CONFIGURATION))
+
+    lot = models.ForeignKey(CarbureLot, blank=False, null=False, on_delete=models.CASCADE)
+    max_score = models.FloatField(default=1)
+    score = models.FloatField(default=1)
+    item = models.CharField(max_length=32, choices=SCORE_ITEMS, blank=False, null=False, default='Unknown')
+    meta = models.JSONField(blank=True, null=True, default=None)
+
+    def __str__(self):
+        return self.item
+
+    class Meta:
+        db_table = 'carbure_lots_scores'
+        indexes = [models.Index(fields=['lot']),]
+        verbose_name = 'CarbureLotReliabilityScore'
+        verbose_name_plural = 'CarbureLotReliabilityScores'
+
+
+
 class CarbureStockTransformation(models.Model):
     UNKNOWN = "UNKNOWN"
     ETH_ETBE = "ETH_ETBE"
@@ -572,6 +705,12 @@ class CarbureStockTransformation(models.Model):
     entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
     transformation_dt = models.DateTimeField(auto_now_add=True)
 
+    def get_weight(self):
+        return self.volume_destination * self.source_stock.biofuel.masse_volumique
+
+    def get_lhv_amount(self):
+        return self.volume_destination * self.source_stock.biofuel.pci_litre
+
     class Meta:
         db_table = 'carbure_stock_transformations'
         indexes = [models.Index(fields=['entity']),]
@@ -585,6 +724,7 @@ def lot_pre_save_gen_carbure_id(sender, instance, *args, **kwargs):
         instance.weight = instance.get_weight()
     if instance.lhv_amount == 0:
         instance.lhv_amount = instance.get_lhv_amount()
+
 
 @receiver(pre_delete, sender=CarbureStockTransformation, dispatch_uid='stock_transformation_delete_signal')
 def delete_stock_transformation(sender, instance, using, **kwargs):
@@ -610,7 +750,7 @@ def delete_lot(sender, instance, using, **kwargs):
         # this lot was a split from a stock
         instance.parent_stock.remaining_volume = round(instance.parent_stock.remaining_volume + instance.volume, 2)
         instance.parent_stock.remaining_weight = instance.parent_stock.get_weight()
-        instance.parent_stock.remaining_lhv_amount = instance.parent_stock.get_lhv_amount()        
+        instance.parent_stock.remaining_lhv_amount = instance.parent_stock.get_lhv_amount()
         instance.parent_stock.save()
         # save event
         event = CarbureStockEvent()
@@ -721,9 +861,10 @@ class CarbureLotEvent(models.Model):
     DECLCANCEL = "DECLCANCEL"
     DELETED = "DELETED"
     RESTORED = "RESTORED"
+    CANCELLED = "CANCELLED"
     EVENT_TYPES = ((CREATED, CREATED), (UPDATED, UPDATED), (VALIDATED, VALIDATED), (FIX_REQUESTED, FIX_REQUESTED), (MARKED_AS_FIXED, MARKED_AS_FIXED),
                     (FIX_ACCEPTED, FIX_ACCEPTED), (ACCEPTED, ACCEPTED), (REJECTED, REJECTED), (RECALLED, RECALLED), (DECLARED, DECLARED), (DELETED, DELETED), (DECLCANCEL, DECLCANCEL),
-                    (RESTORED, RESTORED),)
+                    (RESTORED, RESTORED),(CANCELLED, CANCELLED))
     event_type = models.CharField(max_length=32, null=False, blank=False, choices=EVENT_TYPES)
     event_dt = models.DateTimeField(auto_now_add=True, null=False, blank=False)
     lot = models.ForeignKey(CarbureLot, null=False, blank=False, on_delete=models.CASCADE)
@@ -821,6 +962,9 @@ class EntityCertificate(models.Model):
     rejected_by_admin = models.BooleanField(default=False)
     added_dt = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return '%s - %s' % (self.entity.name, self.certificate.certificate_id)
+
     class Meta:
         db_table = 'carbure_entity_certificates'
         indexes = [
@@ -839,8 +983,9 @@ class CarbureNotification(models.Model):
     CERTIFICATE_EXPIRED = "CERTIFICATE_EXPIRED"
     DECLARATION_VALIDATED = "DECLARATION_VALIDATED"
     DECLARATION_CANCELLED = "DECLARATION_CANCELLED"
+    DECLARATION_REMINDER = "DECLARATION_REMINDER"
 
-    NOTIFICATION_TYPES = [(CORRECTION_REQUEST, CORRECTION_REQUEST), (CORRECTION_DONE, CORRECTION_DONE), (LOTS_REJECTED, LOTS_REJECTED), (LOTS_RECEIVED, LOTS_RECEIVED), (LOTS_RECALLED, LOTS_RECALLED), (CERTIFICATE_EXPIRED, CERTIFICATE_EXPIRED), (DECLARATION_VALIDATED, DECLARATION_VALIDATED), (DECLARATION_CANCELLED, DECLARATION_CANCELLED)]
+    NOTIFICATION_TYPES = [(CORRECTION_REQUEST, CORRECTION_REQUEST), (CORRECTION_DONE, CORRECTION_DONE), (LOTS_REJECTED, LOTS_REJECTED), (LOTS_RECEIVED, LOTS_RECEIVED), (LOTS_RECALLED, LOTS_RECALLED), (CERTIFICATE_EXPIRED, CERTIFICATE_EXPIRED), (DECLARATION_VALIDATED, DECLARATION_VALIDATED), (DECLARATION_CANCELLED, DECLARATION_CANCELLED), (DECLARATION_REMINDER, DECLARATION_REMINDER)]
 
     dest = models.ForeignKey(Entity, blank=False, null=False, on_delete=models.CASCADE)
     datetime = models.DateTimeField(null=False, blank=False, auto_now_add=True)

@@ -1,18 +1,21 @@
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../../api"
 import { StockQuery } from "../../types"
-import { useQuery } from "common-v2/hooks/async"
-import { usePortal } from "common-v2/components/portal"
-import { formatNumber } from "common-v2/utils/formatters"
-import { LoaderOverlay } from "common-v2/components/scaffold"
-import Alert from "common-v2/components/alert"
-import Button from "common-v2/components/button"
-import Dialog from "common-v2/components/dialog"
-import Table from "common-v2/components/table"
-import { Filter, Return } from "common-v2/components/icons"
+import { useQuery } from "common/hooks/async"
+import { usePortal } from "common/components/portal"
+import { formatNumber, formatUnit } from "common/utils/formatters"
+import { LoaderOverlay } from "common/components/scaffold"
+import Alert from "common/components/alert"
+import Button from "common/components/button"
+import Dialog from "common/components/dialog"
+import Table from "common/components/table"
+import { Filter, Return } from "common/components/icons"
 import { FilterManager, ResetButton } from "../filters"
 import NoResult from "../no-result"
 import { useSummaryColumns } from "../lots/lot-summary"
+import useEntity from "carbure/hooks/entity"
+import Flags from "flags.json"
+import { compact } from "common/utils/collection"
 
 export interface StockSummaryBarProps extends Partial<FilterManager> {
   query: StockQuery
@@ -31,6 +34,7 @@ export const StockSummaryBar = ({
 }: StockSummaryBarProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
+  const entity = useEntity()
 
   const summary = useQuery(getSummary, {
     key: "stock-summary",
@@ -40,7 +44,18 @@ export const StockSummaryBar = ({
   const summaryData = summary.result?.data.data ?? {
     count: 0,
     total_remaining_volume: 0,
+    total_remaining_weight: 0,
+    total_remaining_lhv_amount: 0,
   }
+
+  const unitToField = {
+    l: "total_remaining_volume" as "total_remaining_volume",
+    kg: "total_remaining_weight" as "total_remaining_weight",
+    MJ: "total_remaining_lhv_amount" as "total_remaining_lhv_amount",
+  }
+
+  const unit = !Flags.preferred_unit ? "l" : entity.preferred_unit ?? "l"
+  const field = unitToField[unit]
 
   return (
     <Alert loading={summary.loading} icon={Filter} variant="info">
@@ -48,10 +63,7 @@ export const StockSummaryBar = ({
         <Trans count={summaryData.count}>
           <b>{{ count: formatNumber(summaryData.count) }} stocks</b> pour un
           total de{" "}
-          <b>
-            {{ volume: formatNumber(summaryData.total_remaining_volume) }}{" "}
-            litres restants
-          </b>
+          <b>{{ volume: formatUnit(summaryData[field], unit) }} restants</b>
         </Trans>
       </p>
 
@@ -132,6 +144,7 @@ export const StockSummary = ({
   getSummary = api.getStockSummary,
 }: StockSummaryProps) => {
   const { t } = useTranslation()
+  const entity = useEntity()
 
   const summary = useQuery(getSummary, {
     key: "stocks-summary-details",
@@ -140,9 +153,18 @@ export const StockSummary = ({
 
   const summaryData = summary.result?.data.data
 
+  const unitToField = {
+    l: "remaining_volume_sum" as "remaining_volume_sum",
+    kg: "remaining_weight_sum" as "remaining_weight_sum",
+    MJ: "remaining_lhv_amount_sum" as "remaining_lhv_amount_sum",
+  }
+
+  const unit = !Flags.preferred_unit ? "l" : entity.preferred_unit ?? "l"
+  const field = unitToField[unit]
+
   const stock = summaryData?.stock ?? []
   const stockLots = stock.reduce((count, item) => count + item.total, 0)
-  const stockVolume = stock.reduce((volume, item) => volume + (item.remaining_volume_sum ?? 0), 0) // prettier-ignore
+  const stockQuantity = stock.reduce((quantity, item) => quantity + (item[field] ?? 0), 0) // prettier-ignore
 
   const columns = useSummaryColumns(query)
 
@@ -161,21 +183,19 @@ export const StockSummary = ({
             {" ▸ "}
             {t("{{count}} lots", { count: stockLots })}
             {" ▸ "}
-            {t("{{volume}} litres", {
-              count: stockVolume,
-              volume: formatNumber(stockVolume),
-            })}
+            {formatUnit(stockQuantity, unit)}
           </h2>
           <Table
             style={{ width: "max(50vw, 960px)" }}
             rows={stock}
-            columns={[
+            columns={compact([
               columns.supplier,
               columns.biofuel,
-              columns.remainingVolume,
+              !Flags.preferred_unit && columns.remainingVolume,
+              Flags.preferred_unit && columns.remainingQuantity,
               columns.count,
               columns.ghgReduction,
-            ]}
+            ])}
           />
         </>
       )}

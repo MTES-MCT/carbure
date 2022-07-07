@@ -13,6 +13,7 @@ from django.db.models import Sum
 
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
+from api.v4.helpers import get_prefetched_data
 from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, CarbureStockTransformation, Entity, EntityCertificate, ExternalAdminRights, GenericCertificate, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, UserRightsRequests
 from core.models import Depot, GenericError
 from core.models import SustainabilityDeclaration, EntityDepot
@@ -232,7 +233,7 @@ class CarbureLotAdmin(admin.ModelAdmin):
                   ('carbure_production_site', NameSortedRelatedOnlyDropdownFilter), ('carbure_client__entity_type', custom_titled_filter('Type de client')))
     search_fields = ('id', 'transport_document_reference', 'free_field', 'carbure_id', 'volume')
     readonly_fields = ('created_at',)
-    actions = ['regen_carbure_id', 'send_to_pending', 'send_to_draft']
+    actions = ['regen_carbure_id', 'send_to_pending', 'send_to_draft', 'recalc_score']
 
     def send_to_pending(self, request, queryset):
         for lot in queryset:
@@ -251,6 +252,13 @@ class CarbureLotAdmin(admin.ModelAdmin):
             lot.generate_carbure_id()
             lot.save()
     regen_carbure_id.short_description = "Regénérer CarbureID"
+
+    def recalc_score(self, request, queryset):
+        prefetched_data = get_prefetched_data()
+        for lot in queryset:
+            lot.recalc_reliability_score(prefetched_data)
+            lot.save()
+    recalc_score.short_description = "Recalculer Note"
 
     def get_producer(self, obj):
         return obj.carbure_producer.name if obj.carbure_producer else 'U - ' + str(obj.unknown_producer)

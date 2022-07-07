@@ -2,17 +2,17 @@ import React from "react"
 import cl from "clsx"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
-import Button from "common-v2/components/button"
-import Form, { useForm } from "common-v2/components/form"
-import { Mail, Lock, UserCheck, Return } from "common-v2/components/icons"
-import { TextInput } from "common-v2/components/input"
+import Button from "common/components/button"
+import Form, { useForm } from "common/components/form"
+import { Mail, Lock, UserCheck, Return } from "common/components/icons"
+import { TextInput } from "common/components/input"
 import { useMatch } from "react-router-dom"
 import { Link } from "react-router-dom"
-import { Overlay, Panel } from "common-v2/components/scaffold"
+import { Overlay, Panel } from "common/components/scaffold"
 import marianne from "carbure/assets/images/Marianne.svg"
 import css from "./auth.module.css"
-import { useNotify } from "common-v2/components/notifications"
-import { useMutation } from "common-v2/hooks/async"
+import { useNotify } from "common/components/notifications"
+import { useMutation } from "common/hooks/async"
 import * as api from "../api"
 
 const Login = () => {
@@ -48,6 +48,7 @@ const Login = () => {
           onSubmit={() => login.execute(value.username!, value.password!)}
         >
           <TextInput
+            autoFocus
             variant="solid"
             icon={Mail}
             type="email"

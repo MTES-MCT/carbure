@@ -1,9 +1,9 @@
 import { Trans, useTranslation } from "react-i18next"
 import { useUser } from "carbure/hooks/user"
-import { TextInput } from "common-v2/components/input"
-import { Button } from "common-v2/components/button"
-import { Edit } from "common-v2/components/icons"
-import { Panel } from "common-v2/components/scaffold"
+import { TextInput } from "common/components/input"
+import { Button } from "common/components/button"
+import { Edit } from "common/components/icons"
+import { Panel } from "common/components/scaffold"
 
 export const AccountAuthentication = () => {
   const { t } = useTranslation()

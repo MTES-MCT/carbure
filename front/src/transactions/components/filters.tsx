@@ -2,18 +2,18 @@ import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useSearchParams } from "react-router-dom"
 import { Filter, FilterSelection } from "../types"
-import { Normalizer, Option } from "common-v2/utils/normalize"
-import { Grid, Row } from "common-v2/components/scaffold"
-import { MultiSelect, MultiSelectProps } from "common-v2/components/multi-select" // prettier-ignore
-import Button from "common-v2/components/button"
-import * as norm from "common-v2/utils/normalizers"
+import { Normalizer } from "common/utils/normalize"
+import { Grid, Row } from "common/components/scaffold"
+import { MultiSelect, MultiSelectProps } from "common/components/multi-select" // prettier-ignore
+import Button from "common/components/button"
+import * as norm from "carbure/utils/normalizers"
 
 export interface FiltersProps<Q> {
   query: Q
   filters: Filter[]
   selected: FilterSelection
   onSelect: (filters: FilterSelection) => void
-  getFilters: (field: Filter, query: Q) => Promise<Option[]>
+  getFilters: (field: Filter, query: Q) => Promise<any[]>
 }
 
 export function Filters<T>({
@@ -41,18 +41,21 @@ export function Filters<T>({
     [Filter.ShowEmpty]: t("Inclure stocks vides"),
     [Filter.DeliveryTypes]: t("Types de livraison"),
     [Filter.LotStatus]: t("Statut"),
+    [Filter.CorrectionStatus]: t("Corrections"),
+    [Filter.Scores]: t("Score"),
+    [Filter.Conformity]: t("Conformité"),
   }
 
   return (
     <Grid>
-      {filters.map((field) => (
+      {filters.map((filter) => (
         <FilterSelect
-          key={field}
-          field={field}
-          placeholder={filterLabels[field]}
-          value={selected[field]}
-          onChange={(value) => onSelect({ ...selected, [field]: value ?? [] })}
-          getOptions={() => getFilters(field, query)}
+          key={filter}
+          field={filter}
+          placeholder={filterLabels[filter]}
+          value={selected[filter]}
+          onChange={(value) => onSelect({ ...selected, [filter]: value ?? [] })}
+          getOptions={() => getFilters(filter, query)}
         />
       ))}
     </Grid>
@@ -79,7 +82,7 @@ export const ResetButton = ({ filters, onFilter }: FilterManager) => {
 }
 
 export type FilterSelectProps = { field: Filter } & Omit<
-  MultiSelectProps<Option, string>,
+  MultiSelectProps<string>,
   "options"
 >
 
@@ -101,7 +104,7 @@ export const FilterSelect = ({
   />
 )
 
-type FilterNormalizers= Partial<Record<Filter, Normalizer<Option<any>, string>>> // prettier-ignore
+type FilterNormalizers= Partial<Record<Filter, Normalizer<any>>> // prettier-ignore
 const filterNormalizers: FilterNormalizers = {
   [Filter.Feedstocks]: norm.normalizeFeedstockFilter,
   [Filter.Biofuels]: norm.normalizeBiofuelFilter,
@@ -115,6 +118,9 @@ const filterNormalizers: FilterNormalizers = {
   [Filter.DeliverySites]: norm.normalizeUnknownFilter,
   [Filter.ProductionSites]: norm.normalizeUnknownFilter,
   [Filter.Depots]: norm.normalizeUnknownFilter,
+  [Filter.Periods]: norm.normalizePeriodFilter,
+  [Filter.CorrectionStatus]: norm.normalizeCorrectionFilter,
+  [Filter.Conformity]: norm.normalizeConformityFilter,
 }
 
 export function useFilterParams() {

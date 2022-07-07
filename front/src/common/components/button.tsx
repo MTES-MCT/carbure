@@ -1,80 +1,197 @@
-import React from "react"
 import cl from "clsx"
-import { NavLink, NavLinkProps } from "react-router-dom"
-import styles from "./button.module.css"
-import { Loader } from "common-v2/components/icons"
-import { SystemProps, AsProp } from "./index"
+import { Loader, Upload } from "common/components/icons"
+import css from "./button.module.css"
+import { Layout, layout } from "./scaffold"
+import { Link, To } from "react-router-dom"
+import { ExternalLink as ExternalLinkIcon } from "common/components/icons"
 
-// BUTTON COMPONENT
-export type ButtonProps = SystemProps &
-  AsProp &
-  React.HTMLProps<HTMLButtonElement> & {
-    submit?: string | boolean
-    level?: "primary" | "warning" | "danger" | "success" | "secondary"
-    icon?: React.ComponentType
+export type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "success"
+  | "warning"
+  | "danger"
+  | "text"
+  | "link"
+  | "icon"
+
+export interface ButtonProps<T = void> extends Layout {
+  autoFocus?: boolean
+  className?: string
+  style?: React.CSSProperties
+  children?: React.ReactNode
+  domRef?: React.RefObject<HTMLButtonElement>
+  disabled?: boolean
+  loading?: boolean
+  captive?: boolean
+  center?: boolean
+  variant?: ButtonVariant
+  label?: string
+  title?: string
+  icon?: React.ReactNode | (() => React.ReactNode)
+  submit?: string | boolean
+  tabIndex?: number
+  href?: string
+  to?: To
+  action?: (() => T) | (() => Promise<T>)
+}
+
+export function Button<T>({
+  className,
+  style,
+  children,
+  domRef,
+  autoFocus,
+  disabled,
+  loading,
+  captive,
+  variant,
+  label,
+  title,
+  icon: Icon,
+  submit,
+  tabIndex,
+  href,
+  to,
+  center,
+  action,
+  ...props
+}: ButtonProps<T>) {
+  const icon = typeof Icon === "function" ? <Icon /> : Icon
+  const hasIconAndText = Boolean(Icon) && Boolean(label || children)
+
+  const content = label ?? children
+
+  return (
+    <LinkWrapper href={href} to={to} {...props}>
+      <button
+        ref={domRef}
+        {...layout(props)}
+        autoFocus={autoFocus}
+        data-captive={captive ? true : undefined}
+        tabIndex={tabIndex}
+        disabled={disabled || loading}
+        type={submit ? "submit" : "button"}
+        form={typeof submit === "string" ? submit : undefined}
+        title={title}
+        style={style}
+        className={cl(
+          css.button,
+          variant,
+          variant && css[variant],
+          center && css.center,
+          hasIconAndText && css.composite,
+          className
+        )}
+        onClick={(e) => {
+          captive && e.stopPropagation()
+          captive && e.preventDefault()
+          action?.()
+        }}
+      >
+        {loading ? <Loader /> : icon}
+        {variant !== "icon" && (center ? <span>{content}</span> : content)}
+      </button>
+    </LinkWrapper>
+  )
+}
+
+interface LinkWrapperProps extends Layout {
+  href?: string
+  to?: To
+  children: React.ReactNode
+}
+
+const LinkWrapper = ({ href, to, children, ...props }: LinkWrapperProps) => {
+  if (href) {
+    return (
+      <a href={href} className={css.wrapper} {...layout(props)}>
+        {children}
+      </a>
+    )
+  } else if (to) {
+    return (
+      <Link to={to} className={css.wrapper} {...layout(props)}>
+        {children}
+      </Link>
+    )
+  } else {
+    return <>{children}</>
+  }
+}
+
+interface ExternalLinkProps {
+  to?: To
+  href?: string
+  className?: string
+  children?: React.ReactNode
+}
+
+export const ExternalLink = ({
+  className,
+  children,
+  to,
+  href,
+}: ExternalLinkProps) => {
+  const props = {
+    className: cl(css.external, className),
+    children: (
+      <>
+        {children}
+        <ExternalLinkIcon size={20} />
+      </>
+    ),
   }
 
-export const Button = ({
-  as: Tag = "button",
-  submit,
-  icon: Icon,
-  level,
+  if (to !== undefined) {
+    return <Link {...props} to={to} />
+  } else if (href !== undefined) {
+    // eslint-disable-next-line
+    return <a {...props} href={href} target="_blank" rel="noreferrer" />
+  } else {
+    throw new Error("Missing url in external link")
+  }
+}
+
+export type MailtoProps = JSX.IntrinsicElements["a"] & {
+  user: string
+  host: string
+}
+
+export const MailTo = ({
+  user,
+  host,
   className,
   children,
   ...props
-}: ButtonProps) => {
-  const btnClassName = cl(styles.button, className, {
-    [styles.buttonIcon]: Boolean(Icon) && !children,
-    [styles.buttonPrimary]: level === "primary",
-    [styles.buttonWarning]: level === "warning",
-    [styles.buttonDanger]: level === "danger",
-    [styles.buttonSuccess]: level === "success",
-    [styles.buttonSecondary]: level === "secondary",
-    [styles.buttonDisabled]: props.disabled,
-  })
-
-  return (
-    <Tag
-      {...props}
-      type={submit ? "submit" : undefined}
-      form={typeof submit === "string" ? submit : undefined}
-      className={btnClassName}
-    >
-      {Icon && <Icon />}
-      {children && <span>{children}</span>}
-    </Tag>
-  )
-}
-// ASYNC BUTTON COMPONENT
-export type AsyncButtonProps = ButtonProps & {
-  loading: boolean
-}
-
-export const AsyncButton = ({
-  loading,
-  icon,
-  disabled,
-  ...props
-}: AsyncButtonProps) => (
-  <Button
+}: MailtoProps) => (
+  <a
+    href={`mailto:${user}@${host}`}
+    target="_blank"
+    rel="noreferrer"
+    className={cl(css.mailto, className)}
     {...props}
-    icon={loading ? Loader : icon}
-    disabled={loading || disabled}
-  />
-)
-
-export const TabButton = ({ children, className, ...props }: NavLinkProps) => (
-  <NavLink
-    {...props}
-    className={({ isActive }) =>
-      cl(
-        styles.button,
-        styles.statusButton,
-        isActive && styles.activeStatusButton,
-        className
-      )
-    }
   >
-    <span className={styles.statusButtonLabel}>{children}</span>
-  </NavLink>
+    {children}
+  </a>
 )
+
+export const DownloadLink = ({
+  href: url,
+  label,
+}: {
+  href: string
+  label: string
+}) => (
+  <a
+    href={url ?? "#"}
+    className={css.downloadLink}
+    target="_blank"
+    rel="noreferrer"
+  >
+    <Upload />
+    {label}
+  </a>
+)
+
+export default Button

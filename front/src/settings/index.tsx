@@ -1,9 +1,4 @@
-import { Trans, useTranslation } from "react-i18next"
-import { EntityManager } from "carbure/hooks/entity"
-
-import { PortalProvider } from "common-v2/components/portal"
-import useDeliverySites from "./hooks/use-delivery-sites"
-import useProductionSites from "./hooks/use-production-sites"
+import { useTranslation } from "react-i18next"
 
 import DeliverySitesSettings from "./components/delivery-site"
 import ProductionSitesSettings from "./components/production-site"
@@ -11,21 +6,21 @@ import ProductionSitesSettings from "./components/production-site"
 import CompanyOptions from "./components/company-options"
 import CompanyInfo from "./components/company-info"
 import Certificates from "./components/certificates"
-import Sticky from "common/components/sticky"
 import EntityUserRights from "./components/user-rights"
 import { UserRole } from "carbure/types"
 import DoubleCountingSettings from "./components/double-counting"
 import useEntity from "carbure/hooks/entity"
-import useTitle from "common-v2/hooks/title"
-import { Main } from "common-v2/components/scaffold"
+import useTitle from "common/hooks/title"
+import { Main } from "common/components/scaffold"
+import Tabs from "common/components/tabs"
+import { compact } from "common/utils/collection"
+import { getEntityTypeLabel } from "carbure/utils/normalizers"
 
 const Settings = () => {
   const { t } = useTranslation()
-  useTitle(t("Société"))
 
   const entity = useEntity()
-
-  const { productionSites, deliverySites } = useSettings(entity)
+  useTitle(`${entity.name} · ${t("Société")}`)
 
   const { isProducer, isTrader, isOperator } = entity
 
@@ -34,69 +29,64 @@ const Settings = () => {
   const hasOptions = isProducer || isOperator || isTrader
 
   return (
-    <PortalProvider>
-      <Main>
-        <header>
-          <h1>{entity?.name}</h1>
-        </header>
+    <Main>
+      <header>
+        <h1>
+          {entity.name} · {getEntityTypeLabel(entity.entity_type)}
+        </h1>
+      </header>
 
-        <Sticky>
-          {hasOptions && (
-            <a href="#options">
-              <Trans>Options</Trans>
-            </a>
-          )}
-          {hasCertificates && (
-            <a href="#certificates">
-              <Trans>Certificats</Trans>
-            </a>
-          )}
-          {hasDepot && (
-            <a href="#depot">
-              <Trans>Dépôts</Trans>
-            </a>
-          )}
-          {isProducer && (
-            <a href="#production">
-              <Trans>Sites de production</Trans>
-            </a>
-          )}
-          {isProducer && (
-            <a href="#double-counting">
-              <Trans>Double comptage</Trans>
-            </a>
-          )}
-          {entity.hasRights(UserRole.Admin) && (
-            <a href="#users">
-              <Trans>Utilisateurs</Trans>
-            </a>
-          )}
-        </Sticky>
-
-        <section>
-          {hasOptions && <CompanyOptions />}
-          {hasOptions && <CompanyInfo />}
-          {hasCertificates && <Certificates />}
-          {hasDepot && <DeliverySitesSettings settings={deliverySites} />}
-          {isProducer && <ProductionSitesSettings settings={productionSites} />}
-          {isProducer && <DoubleCountingSettings />}
-          {entity.hasRights(UserRole.Admin) && (
-            <EntityUserRights entity={entity} />
-          )}
-        </section>
-      </Main>
-    </PortalProvider>
+      <Tabs
+        variant="sticky"
+        tabs={compact([
+          hasOptions && {
+            path: "#options",
+            key: "options",
+            label: t("Options"),
+          },
+          hasOptions && {
+            path: "#info",
+            key: "info",
+            label: t("Informations"),
+          },
+          hasCertificates && {
+            path: "#certificates",
+            key: "certificates",
+            label: t("Certificats"),
+          },
+          hasDepot && {
+            path: "#depot",
+            key: "depot",
+            label: t("Dépôts"),
+          },
+          isProducer && {
+            path: "#production",
+            key: "production",
+            label: t("Sites de production"),
+          },
+          isProducer && {
+            path: "#double-counting",
+            key: "double-counting",
+            label: t("Double comptage"),
+          },
+          entity.hasRights(UserRole.Admin) && {
+            path: "#users",
+            key: "users",
+            label: t("Utilisateurs"),
+          },
+        ])}
+      />
+      <section>
+        {hasOptions && <CompanyOptions />}
+        {hasOptions && <CompanyInfo />}
+        {hasCertificates && <Certificates />}
+        {hasDepot && <DeliverySitesSettings entity={entity} />}
+        {isProducer && <ProductionSitesSettings entity={entity} />}
+        {isProducer && <DoubleCountingSettings />}
+        {entity.hasRights(UserRole.Admin) && <EntityUserRights />}
+      </section>
+    </Main>
   )
-}
-
-function useSettings(entity: EntityManager) {
-  const productionSites = useProductionSites(entity)
-  const deliverySites = useDeliverySites(entity)
-
-  return {
-    productionSites,
-    deliverySites,
-  }
 }
 
 export default Settings

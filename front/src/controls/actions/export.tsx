@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next"
-import { Download } from "common-v2/components/icons"
-import Button from "common-v2/components/button"
+import { Download } from "common/components/icons"
+import Button from "common/components/button"
 import { LotQuery } from "transactions/types"
 import pickApi from "../api"
 import useEntity from "carbure/hooks/entity"

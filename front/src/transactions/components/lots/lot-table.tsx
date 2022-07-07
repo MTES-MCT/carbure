@@ -5,19 +5,25 @@ import {
   formatDate,
   formatNumber,
   formatPeriod,
-} from "common-v2/utils/formatters"
-import { isExpiring } from "common-v2/utils/deadline"
+  formatUnit,
+} from "common/utils/formatters"
+import { isExpiring } from "transactions/utils/deadline"
 import Table, {
   Cell,
   Order,
   markerColumn,
   selectionColumn,
   actionColumn,
-} from "common-v2/components/table"
-import { Alarm } from "common-v2/components/icons"
+} from "common/components/table"
+import { Alarm } from "common/components/icons"
 import LotTag from "./lot-tag"
 import { isRedII } from "lot-add/components/ghg-fields"
 import { DuplicateOneButton } from "transactions/actions/duplicate"
+import Score from "transaction-details/components/score"
+import { To } from "react-router-dom"
+import useEntity from "carbure/hooks/entity"
+import { compact } from "common/utils/collection"
+import Flags from "flags.json"
 
 export interface LotTableProps {
   loading: boolean
@@ -25,6 +31,7 @@ export interface LotTableProps {
   errors: Record<number, LotError[]>
   order: Order | undefined
   selected: number[]
+  rowLink: (lot: Lot) => To
   onSelect: (selected: number[]) => void
   onAction: (lot: Lot) => void
   onOrder: (order: Order | undefined) => void
@@ -37,6 +44,7 @@ export const LotTable = memo(
     errors,
     order,
     selected,
+    rowLink,
     onSelect,
     onAction,
     onOrder,
@@ -48,14 +56,17 @@ export const LotTable = memo(
         order={order}
         onAction={onAction}
         onOrder={onOrder}
+        rowLink={rowLink}
         rows={lots}
-        columns={[
+        columns={compact([
           markerColumn<Lot>((lot) => getLotMarker(lot, errors)),
           selectionColumn(lots, selected, onSelect, (lot) => lot.id),
+          Flags.scoring && columns.score,
           columns.status,
           columns.period,
           columns.document,
-          columns.volume,
+          !Flags.preferred_unit && columns.volume,
+          Flags.preferred_unit && columns.quantity,
           columns.feedstock,
           columns.supplier,
           columns.client,
@@ -63,7 +74,7 @@ export const LotTable = memo(
           columns.depot,
           columns.ghgReduction,
           columns.actions,
-        ]}
+        ])}
       />
     )
   }
@@ -71,8 +82,15 @@ export const LotTable = memo(
 
 export function useLotColumns() {
   const { t } = useTranslation()
+  const entity = useEntity()
 
   return {
+    score: {
+      small: true,
+      header: t("Score"),
+      cell: (lot: Lot) => <Score lot={lot} />,
+    },
+
     status: {
       header: t("Statut"),
       cell: (lot: Lot) => <LotTag lot={lot} />,
@@ -103,6 +121,12 @@ export function useLotColumns() {
           sub={`${formatNumber(lot.volume)} L`}
         />
       ),
+    },
+
+    quantity: {
+      key: "volume",
+      header: t("Biocarburant"),
+      cell: (lot: Lot) => <BiofuelCell lot={lot} />,
     },
 
     feedstock: {
@@ -162,17 +186,40 @@ export function useLotColumns() {
       },
     },
 
-    actions: actionColumn((lot: Lot) => [
-      <DuplicateOneButton icon lot={lot} />,
-    ]),
+    actions: actionColumn((lot: Lot) =>
+      compact([
+        lot.added_by?.id === entity.id && <DuplicateOneButton icon lot={lot} />,
+      ])
+    ),
   }
 }
 
-interface PeriodCellProps {
+interface LotCellProps {
   lot: Lot
 }
 
-export const PeriodCell = ({ lot }: PeriodCellProps) => {
+export const BiofuelCell = ({ lot }: LotCellProps) => {
+  const { t } = useTranslation()
+  const entity = useEntity()
+
+  const unitToField = {
+    l: "volume" as "volume",
+    kg: "weight" as "weight",
+    MJ: "lhv_amount" as "lhv_amount",
+  }
+
+  const unit = entity.preferred_unit ?? "l"
+  const field = unitToField[unit]
+
+  return (
+    <Cell
+      text={t(lot.biofuel?.code ?? "", { ns: "biofuels" })}
+      sub={formatUnit(lot[field], unit)}
+    />
+  )
+}
+
+export const PeriodCell = ({ lot }: LotCellProps) => {
   const expiring = isExpiring(lot)
   return (
     <Cell

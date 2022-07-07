@@ -3,7 +3,7 @@ import { screen } from "@testing-library/react"
 import { Route } from "react-router-dom"
 import { AdminStatus } from "controls/types"
 
-import { waitWhileLoading } from "common/__test__/helpers"
+import { waitWhileLoading } from "carbure/__test__/helpers"
 import Controls from "../index"
 
 import server from "./api"
@@ -33,9 +33,9 @@ test("admin: display an empty list of transactions", async () => {
 
   await waitWhileLoading()
 
-  await screen.findByText("Alerte")
-  screen.getByText("Correction")
-  screen.getByText("Déclaration")
+  await screen.findByText("Signalement")
+  screen.getByText("Lot")
+  screen.getByText("Stock")
 
   screen.getByText("Périodes")
   screen.getByText("Biocarburants")

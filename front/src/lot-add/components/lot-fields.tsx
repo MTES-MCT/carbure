@@ -1,21 +1,19 @@
-import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import Autocomplete, {
-  AutocompleteProps,
-} from "common-v2/components/autocomplete"
-import { Fieldset, useBind } from "common-v2/components/form"
+import Autocomplete, { AutocompleteProps } from "common/components/autocomplete"
+import { Fieldset, useBind, useFormContext } from "common/components/form"
 import {
   NumberInput,
   NumberInputProps,
   TextInput,
   TextInputProps,
-} from "common-v2/components/input"
-import Select from "common-v2/components/select"
-import * as api from "common-v2/api"
-import * as norm from "common-v2/utils/normalizers"
+} from "common/components/input"
+import Select, { SelectProps } from "common/components/select"
+import * as api from "carbure/api"
+import * as norm from "carbure/utils/normalizers"
 import { LotFormValue } from "./lot-form"
-import { Biofuel, Country, Feedstock } from "common/types"
-import useLocalStorage from "common-v2/hooks/storage"
+import { Biofuel, Country, Feedstock, Unit } from "carbure/types"
+import { Option } from "common/utils/normalize"
+import Flags from "flags.json"
 
 interface LotFieldsProps {
   readOnly?: boolean
@@ -26,7 +24,8 @@ export const LotFields = (props: LotFieldsProps) => {
   return (
     <Fieldset label={t("Lot")}>
       <TransportDocumentField {...props} />
-      <VolumeField {...props} />
+      {!Flags.preferred_unit && <VolumeField {...props} />}
+      {Flags.preferred_unit && <QuantityField {...props} />}
       <BiofuelField {...props} />
       <FeedstockField {...props} />
       <CountryOfOriginField {...props} />
@@ -40,6 +39,7 @@ export const TransportDocumentField = (props: TextInputProps) => {
   const bind = useBind<LotFormValue>()
   return (
     <TextInput
+      autoFocus
       required
       label={t("N° document d'accompagnement")}
       {...bind("transport_document_reference")}
@@ -63,35 +63,37 @@ export const VolumeField = (props: NumberInputProps) => {
 
 export const QuantityField = (props: NumberInputProps) => {
   const { t } = useTranslation()
-  const bind = useBind<LotFormValue>()
+  const { bind, value } = useFormContext<LotFormValue>()
 
-  const [unit, setUnit] = useLocalStorage<"volume" | "weight" | "lhv_amount">(
-    "carbure:preferred-unit",
-    "volume"
-  )
+  const unit = value.unit ?? "l"
 
-  const units = [
-    { value: "volume", label: t("litres") },
-    { value: "weight", label: t("tonnes") },
-    { value: "lhv_amount", label: t("PCI") },
-  ]
+  const unitToField = {
+    l: "volume" as "volume",
+    kg: "weight" as "weight",
+    MJ: "lhv_amount" as "lhv_amount",
+  }
 
   return (
     <NumberInput
       required
       label={t("Quantité")}
-      icon={
-        <Select
-          variant="text"
-          value={unit}
-          onChange={(u) => setUnit(u!)}
-          options={units}
-        />
-      }
-      {...bind(unit)}
+      icon={<UnitSelect {...bind("unit")} />}
+      {...bind(unitToField[unit ?? "l"])}
       {...props}
     />
   )
+}
+
+export const UnitSelect = (props: SelectProps<Option<Unit>, Unit>) => {
+  const { t } = useTranslation()
+
+  const units: Option<Unit>[] = [
+    { value: "l", label: t("litres") },
+    { value: "kg", label: t("kg") },
+    { value: "MJ", label: t("MJ") },
+  ]
+
+  return <Select variant="text" options={units} {...props} />
 }
 
 export const BiofuelField = (props: AutocompleteProps<Biofuel>) => {
@@ -118,7 +120,7 @@ export const FeedstockField = (props: AutocompleteProps<Feedstock>) => {
 
   // prettier-ignore
   const icon = bound.value
-    ? <span style={{ alignSelf: 'center', fontSize: '0.9em' }}>{bound.value.category.toUpperCase()}</span>
+    ? <span className="icon" style={{ fontSize: '0.9em' }}>{bound.value.category.toUpperCase()}</span>
     : undefined
 
   return (

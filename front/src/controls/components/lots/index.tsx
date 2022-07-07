@@ -1,10 +1,10 @@
-import { Route, Routes, useNavigate, useLocation } from "react-router-dom"
+import { useLocation } from "react-router-dom"
 import pickApi from "../../api"
 import { EntityManager } from "carbure/hooks/entity"
-import { useQuery } from "common-v2/hooks/async"
+import { useQuery } from "common/hooks/async"
 import { useStatus } from "../status"
-import { Bar } from "common-v2/components/scaffold"
-import Pagination from "common-v2/components/pagination"
+import { Bar } from "common/components/scaffold"
+import Pagination from "common/components/pagination"
 import NoResult from "transactions/components/no-result"
 import Filters from "transactions/components/filters"
 import ControlTable from "./control-lot-table"
@@ -14,6 +14,7 @@ import { ControlLotSummaryBar } from "./control-lot-summary"
 import { useLotQuery, useQueryParamsStore } from "transactions/components/lots"
 import { Filter, Lot } from "transactions/types"
 import ControlLotDetails from "control-details/components/lot"
+import HashRoute from "common/components/hash-route"
 
 export interface LotsProps {
   entity: EntityManager
@@ -21,7 +22,6 @@ export interface LotsProps {
 }
 
 export const Lots = ({ entity, year }: LotsProps) => {
-  const navigate = useNavigate()
   const location = useLocation()
 
   const status = useStatus()
@@ -51,11 +51,11 @@ export const Lots = ({ entity, year }: LotsProps) => {
   const totalErrors = lotsData?.total_errors ?? 0
   const totalDeadline = lotsData?.total_deadline ?? 0
 
-  const showLotDetails = (lot: Lot) =>
-    navigate({
-      pathname: `${status}/${lot.id}`,
-      search: location.search,
-    })
+  const showLotDetails = (lot: Lot) => ({
+    pathname: location.pathname,
+    search: location.search,
+    hash: `lot/${lot.id}`,
+  })
 
   return (
     <>
@@ -120,8 +120,8 @@ export const Lots = ({ entity, year }: LotsProps) => {
               errors={lotErrors}
               selected={state.selection}
               onSelect={actions.setSelection}
-              onAction={showLotDetails}
               onOrder={actions.setOrder}
+              rowLink={showLotDetails}
             />
 
             <Pagination
@@ -135,18 +135,17 @@ export const Lots = ({ entity, year }: LotsProps) => {
         )}
       </section>
 
-      <Routes>
-        <Route
-          path=":status/:id"
-          element={<ControlLotDetails neighbors={ids} />}
-        />
-      </Routes>
+      <HashRoute
+        path="lot/:id"
+        element={<ControlLotDetails neighbors={ids} />}
+      />
     </>
   )
 }
 
 const ADMIN_FILTERS = [
   Filter.LotStatus,
+  Filter.CorrectionStatus,
   Filter.DeliveryTypes,
   Filter.Periods,
   Filter.Biofuels,
@@ -159,6 +158,8 @@ const ADMIN_FILTERS = [
   Filter.DeliverySites,
   Filter.AddedBy,
   Filter.Errors,
+  Filter.Conformity,
+  Filter.Scores,
 ]
 
 export default Lots

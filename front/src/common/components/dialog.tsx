@@ -1,117 +1,87 @@
 import React from "react"
-import ReactDOM from "react-dom"
+import { useTranslation } from "react-i18next"
 import cl from "clsx"
+import css from "./dialog.module.css"
+import Button, { ButtonVariant } from "./button"
+import { Cross, Check, Return } from "./icons"
+import { Overlay } from "./scaffold"
+import { useMutation } from "common/hooks/async"
 
-import styles from "./dialog.module.css"
-
-import { Title, Box } from "."
-import { Button } from "./button"
-import Modal from "./modal"
-import NotificationsProvider from "./notifications"
-import { Trans } from "react-i18next"
-import Table, { TableProps } from "./table"
-
-type DialogProps = PromptProps<any> & {
-  children: React.ReactNode
+export interface DialogProps {
   className?: string
-  wide?: boolean
+  style?: React.CSSProperties
+  fullscreen?: boolean
+  children: React.ReactNode
+  onClose: () => void
 }
 
 export const Dialog = ({
-  children,
   className,
-  wide = false,
-  onResolve,
+  style,
+  children,
+  fullscreen,
+  onClose,
 }: DialogProps) => (
-  <Modal
-    className={cl(styles.dialog, wide && styles.dialogWide, className)}
-    onClose={() => onResolve()}
-  >
-    {children}
-  </Modal>
+  <div className={css.screen}>
+    <Overlay onClick={onClose} />
+    <div
+      className={cl(css.dialog, fullscreen && css.fullscreen, className)}
+      style={style}
+    >
+      {children}
+      <Button
+        variant="icon"
+        icon={Cross}
+        action={onClose}
+        className={css.close}
+      />
+    </div>
+  </div>
 )
 
-type ContentProps = { text?: string; children?: React.ReactNode }
+export interface ConfirmProps {
+  title: string
+  description: string
+  confirm: string
+  variant: ButtonVariant
+  icon?: React.ComponentType | React.ElementType
+  onConfirm: () => Promise<any>
+  onClose: () => void
+}
 
-export const DialogTitle = ({ text, children }: ContentProps) => (
-  <Title>{text ?? children}</Title>
-)
-
-export const DialogText = ({ text, children }: ContentProps) => (
-  <span className={styles.dialogMessage}>{text ?? children}</span>
-)
-
-export const DialogSubtitle = ({ text, children }: ContentProps) => (
-  <h2 className={styles.dialogSubtitle}>{text ?? children}</h2>
-)
-
-export function DialogTable<T>(props: TableProps<T>) {
+export const Confirm = ({
+  title,
+  description,
+  confirm,
+  variant,
+  icon = Check,
+  onConfirm,
+  onClose,
+}: ConfirmProps) => {
+  const { t } = useTranslation()
+  const confirmAction = useMutation(onConfirm)
   return (
-    <Table {...props} className={cl(styles.dialogTable, props.className)} />
+    <Dialog onClose={onClose}>
+      <header>
+        <h1>{title}</h1>
+      </header>
+      <main>
+        <section>{description}</section>
+      </main>
+      <footer>
+        <Button
+          asideX
+          autoFocus
+          icon={icon}
+          variant={variant}
+          label={confirm}
+          loading={confirmAction.loading}
+          action={() => confirmAction.execute().then(onClose)}
+        />
+        <Button icon={Return} label={t("Annuler")} action={onClose} />
+      </footer>
+    </Dialog>
   )
 }
 
-export const DialogButtons = (props: any) => (
-  <Box {...props} row className={cl(props.className, styles.dialogButtons)} />
-)
-
-export type PromptProps<T> = {
-  onResolve: (result?: T) => void
-}
-
-// return a promise that resolves only when the confirm or cancel button is clicked
-export function prompt<T>(
-  render: (resolve: (result?: T) => void) => React.ReactNode
-  // form: React.ComponentType<PromptFormProps<T>>
-): Promise<T | undefined> {
-  return new Promise((resolve) => {
-    const container = document.createElement("tmp")
-
-    function onResolve(result?: T) {
-      resolve(result)
-      ReactDOM.unmountComponentAtNode(container)
-    }
-
-    // render component imperatively, outside of the regular react container
-    ReactDOM.render(
-      <NotificationsProvider>{render(onResolve)}</NotificationsProvider>,
-      container
-    )
-  })
-}
-
-type ConfirmPromptProps = {
-  title: string
-  description: string
-  onResolve: (result?: boolean) => void
-}
-
-const ConfirmPrompt = ({
-  title,
-  description,
-  onResolve,
-}: ConfirmPromptProps) => (
-  <Dialog onResolve={onResolve}>
-    <DialogTitle text={title} />
-    <DialogText text={description} />
-
-    <DialogButtons>
-      <Button level="primary" onClick={() => onResolve(true)}>
-        <Trans>Confirmer</Trans>
-      </Button>
-      <Button onClick={() => onResolve(false)}>
-        <Trans>Annuler</Trans>
-      </Button>
-    </DialogButtons>
-  </Dialog>
-)
-
-export function confirm(title: string, description: string) {
-  return prompt((resolve) => (
-    <ConfirmPrompt
-      title={title}
-      description={description}
-      onResolve={resolve}
-    />
-  )).then(Boolean)
-}
+export default Dialog

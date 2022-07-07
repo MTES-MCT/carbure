@@ -68,5 +68,12 @@
   "UNKNOWN_COUNTRY_OF_ORIGIN": "Le pays d'origine de la matière première n'est pas reconnu",
   "UNKNOWN_DELIVERY_SITE": "Le site de livraison n'est pas reconnu",
   "UNKNOWN_DELIVERY_COUNTRY": "Le pays de livraison n'est pas reconnu",
-  "ETD_HIGHER_THAN_DEFAULT": "Émissions GES liées au Transport et à la Distribution supérieures à la valeur par défaut"
+  "ETD_HIGHER_THAN_DEFAULT": "Émissions GES liées au Transport et à la Distribution supérieures à la valeur par défaut",
+  "ETD_NO_EU_TOO_LOW": "Émissions GES liées au Transport et à la Distribution inférieures à la valeur par défaut",
+  "ETD_EU_DEFAULT_VALUE": "Émissions GES liées au Transport et à la Distribution toujours égales à la valeur par défaut",
+  "ETD_ANORMAL_HIGH": "Émissions GES liées au Transport et à la Distribution anormalement élevées",
+  "EEC_ANORMAL_LOW": "Émissions GES liées à l'Extraction et la Culture anormalement faibles",
+  "EEC_ANORMAL_HIGH": "Émissions GES liées à l'Extraction et la Culture anormalement élevées",
+  "EP_ANORMAL_LOW": "Émissions GES liées à la Transformation anormalement faibles",
+  "EP_ANORMAL_HIGH": "Émissions GES liées à la Transformation anormalement élevées"
 }

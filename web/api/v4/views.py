@@ -2,6 +2,7 @@ from calendar import calendar, monthrange
 import datetime
 from json.encoder import py_encode_basestring_ascii
 import unicodedata
+from webbrowser import get
 import dictdiffer
 import json
 import time
@@ -11,18 +12,19 @@ from django.db.models.fields import NOT_PROVIDED
 
 from django.http.response import HttpResponse, JsonResponse
 from django.db.models.query_utils import Q
+from django.shortcuts import get_object_or_404
 from api.v4.certificates import get_certificates
-from core.common import convert_template_row_to_formdata, get_uploaded_files_directory
+from core.common import ErrorResponse, SuccessResponse, convert_template_row_to_formdata, get_uploaded_files_directory
 from core.decorators import check_user_rights
 from api.v4.helpers import filter_lots, filter_stock, get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock
 from api.v4.helpers import get_prefetched_data, get_stock_events, get_stock_with_metadata, get_stock_filters_data, get_stocks_summary_data, get_transaction_distance, handle_eth_to_etbe_transformation, get_known_certificates
 from api.v4.helpers import send_email_declaration_invalidated, send_email_declaration_validated
 from api.v4.lots import construct_carbure_lot, bulk_insert_lots, try_get_date
-from api.v4.sanity_checks import bulk_sanity_checks, sanity_check
+from api.v4.sanity_checks import background_bulk_scoring, bulk_sanity_checks, bulk_scoring, sanity_check
 
-from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, Entity, GenericError, Pays, SustainabilityDeclaration, UserRights
+from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureLotReliabilityScore, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, Entity, GenericError, Pays, SustainabilityDeclaration, UserRights
 from core.notifications import notify_correction_done, notify_correction_request, notify_declaration_cancelled, notify_declaration_validated, notify_lots_recalled, notify_lots_received, notify_lots_rejected, notify_lots_recalled
-from core.serializers import CarbureLotPublicSerializer, CarbureNotificationSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
+from core.serializers import CarbureLotPublicSerializer, CarbureLotReliabilityScoreSerializer, CarbureNotificationSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
 from core.xlsx_v3 import template_v4, template_v4_stocks
 
 
@@ -483,6 +485,7 @@ def get_lot_details(request, *args, **kwargs):
     data['certificates'] = get_known_certificates(lot)
     data['updates'] = get_lot_updates(lot, entity)
     data['comments'] = get_lot_comments(lot, entity)
+    data['score'] = CarbureLotReliabilityScoreSerializer(lot.carburelotreliabilityscore_set.all(), many=True).data
     return JsonResponse({'status': 'success', 'data': data})
 
 
@@ -1046,6 +1049,10 @@ def mark_as_fixed(request, *args, **kwargs):
             c.carbure_delivery_site = lot.carbure_delivery_site
             c.unknown_delivery_site = lot.unknown_delivery_site
             c.delivery_site_country = lot.delivery_site_country
+            c.carbure_producer = lot.carbure_producer
+            c.unknown_producer = lot.unknown_producer
+            c.carbure_production_site = lot.carbure_production_site
+            c.unknown_production_site = lot.unknown_production_site
             c.save()
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.MARKED_AS_FIXED
@@ -1608,8 +1615,16 @@ def validate_declaration(request, *args, **kwargs):
         bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLARED, lot=lot, user=request.user))
     CarbureLotEvent.objects.bulk_create(bulk_events)
     # freeze lots
-    CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True).update(lot_status=CarbureLot.FROZEN)
-    CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True).update(lot_status=CarbureLot.FROZEN)
+    lots_to_freeze = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True)
+    lots_to_freeze.update(lot_status=CarbureLot.FROZEN)
+    #bulk_scoring(lots_to_freeze)
+    background_bulk_scoring(lots_to_freeze)
+
+    lots_to_freeze = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True)
+    lots_to_freeze.update(lot_status=CarbureLot.FROZEN)   
+    #bulk_scoring(lots_to_freeze)
+    background_bulk_scoring(lots_to_freeze)
+
     # mark declaration
     declaration.declared = True
     declaration.save()
@@ -1651,8 +1666,16 @@ def invalidate_declaration(request, *args, **kwargs):
         bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLCANCEL, lot=lot, user=request.user))
     CarbureLotEvent.objects.bulk_create(bulk_events)
     # unfreeze lots
-    CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True, lot_status=CarbureLot.FROZEN).update(lot_status=CarbureLot.ACCEPTED)
-    CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True, lot_status=CarbureLot.FROZEN).update(lot_status=CarbureLot.ACCEPTED)
+    lots_to_unfreeze = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True, lot_status=CarbureLot.FROZEN)
+    lots_to_unfreeze.update(lot_status=CarbureLot.ACCEPTED)
+    lots_to_unfreeze_second_batch = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True, lot_status=CarbureLot.FROZEN)
+    lots_to_unfreeze_second_batch.update(lot_status=CarbureLot.ACCEPTED)
+    #bulk_scoring(lots_to_unfreeze)
+    #bulk_scoring(lots_to_unfreeze_second_batch)
+
+    background_bulk_scoring(lots_to_unfreeze)
+    background_bulk_scoring(lots_to_unfreeze_second_batch)
+
     # send email
     notify_declaration_cancelled(declaration)
     send_email_declaration_invalidated(declaration)
@@ -1718,17 +1741,32 @@ def toggle_warning(request, *args, **kwargs):
         traceback.print_exc()
         return JsonResponse({'status': "error", 'message': "Could not update warning"}, status=500)
 
+@check_user_rights()
+def recalc_score(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    lot_id = request.POST.get('lot_id')
+    prefetched_data = get_prefetched_data()
+    try:
+        lot = CarbureLot.objects.get(id=lot_id)
+        lot.recalc_reliability_score(prefetched_data)
+        lot.save()
+    except:
+        return ErrorResponse(404)
+    return SuccessResponse()
+
 
 def get_stats(request):
     try:
         today = datetime.date.today()
-        year = str(today.year)
-        total_volume = CarbureLot.objects.filter(lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN], year=year, carbure_client__entity_type=Entity.OPERATOR).aggregate(Sum('volume'))
+        lots = CarbureLot.objects.filter(delivery_type__in=[CarbureLot.BLENDING, CarbureLot.DIRECT, CarbureLot.RFC], year=today.year).select_related('biofuel')
+        total_volume = lots.aggregate(Sum('volume'))['volume__sum']
+        total_volume_etbe = lots.filter(biofuel__code='ETBE').aggregate(Sum('volume'))['volume__sum']
         entity_count = Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.TRADER, Entity.OPERATOR]).values('entity_type').annotate(count=Count('id'))
         entities = {}
         for r in entity_count:
             entities[r['entity_type']] = r['count']
-        total = total_volume['volume__sum']
+        total = round(total_volume) - round(total_volume_etbe) + round(total_volume_etbe * 27 * 0.37 / 21)
         if total is None:
             total = 1000
         return JsonResponse({'status': 'success', 'data': {'total_volume': total / 1000, 'entities': entities}})
@@ -1740,22 +1778,81 @@ def get_stats(request):
 def update_entity(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
-    legal_name = request.POST.get('legal_name', False)
-    registration_id = request.POST.get('registration_id', False)
-    sustainability_officer_phone_number = request.POST.get('sustainability_officer_phone_number', False)
-    sustainability_officer = request.POST.get('sustainability_officer', False)
-    registered_address = request.POST.get('registered_address', False)
+    legal_name = request.POST.get('legal_name', '')
+    registration_id = request.POST.get('registration_id', '')
+    sustainability_officer_phone_number = request.POST.get('sustainability_officer_phone_number', '')
+    sustainability_officer = request.POST.get('sustainability_officer', '')
+    registered_address = request.POST.get('registered_address', '')
     entity = Entity.objects.get(id=entity_id)
-
-    if legal_name:
-        entity.legal_name = legal_name
-    if sustainability_officer_phone_number:
-        entity.sustainability_officer_phone_number = sustainability_officer_phone_number
-    if registration_id:
-        entity.registration_id = registration_id
-    if sustainability_officer:
-        entity.sustainability_officer = sustainability_officer
-    if registered_address:
-        entity.registered_address = registered_address
+    entity.legal_name = legal_name
+    entity.sustainability_officer_phone_number = sustainability_officer_phone_number
+    entity.registration_id = registration_id
+    entity.sustainability_officer = sustainability_officer
+    entity.registered_address = registered_address
     entity.save()
     return JsonResponse({'status': 'success'})
+
+
+@check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
+def set_entity_preferred_unit(request, *args, **kwargs):
+    entity_id = kwargs['context']['entity_id']
+    unit = request.POST.get('unit', 'l')
+    entity = Entity.objects.get(id=entity_id)
+    entity.preferred_unit = unit
+    entity.save()
+    return JsonResponse({'status': 'success'})
+
+
+class CancelErrors:
+    MISSING_LOT_IDS = "MISSING_LOT_IDS"
+    CANCEL_ACCEPT_NOT_ALLOWED = "CANCEL_ACCEPT_NOT_ALLOWED"
+    NOT_LOT_CLIENT = "NOT_LOT_CLIENT"
+    WRONG_STATUS = "WRONG_STATUS"
+    CHILDREN_IN_USE = "CHILDREN_IN_USE"
+
+@check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
+def cancel_accept_lots(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    lot_ids = request.POST.getlist('lot_ids', False)
+    if not lot_ids:
+        return ErrorResponse(400, CancelErrors.MISSING_LOT_IDS)
+
+    entity = Entity.objects.get(pk=entity_id)
+    lots = CarbureLot.objects.filter(pk__in=lot_ids)
+    for lot in lots.iterator():
+        if lot.carbure_client != entity:
+            return ErrorResponse(403, CancelErrors.NOT_LOT_CLIENT)
+
+        if lot.lot_status in (CarbureLot.DRAFT, CarbureLot.PENDING, CarbureLot.REJECTED,CarbureLot.FROZEN,CarbureLot.DELETED):
+            return ErrorResponse(400, CancelErrors.WRONG_STATUS)
+
+        # delete new lots created when the lot was accepted
+        if lot.delivery_type in (CarbureLot.PROCESSING, CarbureLot.TRADING):
+            children_lots = CarbureLot.objects.filter(parent_lot=lot).exclude(lot_status__in=(CarbureLot.DELETED))
+            # do not do anything if the children lots are already used
+            if children_lots.filter(lot_status__in=(CarbureLot.ACCEPTED, CarbureLot.FROZEN)).count() > 0:
+                return ErrorResponse(400, CancelErrors.CHILDREN_IN_USE)
+            else:
+                children_lots.delete()
+
+        # delete new stocks created when the lot was accepted
+        if lot.delivery_type == CarbureLot.STOCK:
+            children_stocks = CarbureStock.objects.filter(parent_lot=lot)
+            children_stocks_children_lots = CarbureLot.objects.filter(parent_stock__in=children_stocks).exclude(lot_status=CarbureLot.DELETED)
+            children_stocks_children_trans = CarbureStockTransformation.objects.filter(source_stock__in=children_stocks)
+            # do not do anything if the children stocks are already used
+            if children_stocks_children_lots.count() > 0 or children_stocks_children_trans.count() > 0:
+                return ErrorResponse(400, CancelErrors.CHILDREN_IN_USE)
+            else:
+                children_stocks.delete()
+
+        lot.lot_status = CarbureLot.PENDING
+        lot.delivery_type = CarbureLot.UNKNOWN
+        lot.save()
+        event = CarbureLotEvent()
+        event.event_type = CarbureLotEvent.CANCELLED
+        event.lot = lot
+        event.user = request.user
+        event.save()
+    return SuccessResponse()

@@ -1,5 +1,5 @@
 import { Fragment } from "react"
-import { ActionBar } from "common-v2/components/scaffold"
+import { ActionBar } from "common/components/scaffold"
 import { LotQuery } from "transactions/types"
 import { useStatus } from "transactions/components/status"
 import { CreateButton } from "transactions/actions/create"
@@ -13,6 +13,7 @@ import { MarkManyAsFixedButton } from "transactions/actions/mark-as-fixed"
 import { RecallManyButton } from "transactions/actions/recall"
 import { ApproveManyFixesButton } from "transactions/actions/approve-fix"
 import { ExportLotsButton } from "transactions/actions/export"
+import { CancelAcceptManyButton } from "transactions/actions/cancel-accept"
 
 export interface ActionBarProps {
   count: number
@@ -50,7 +51,7 @@ export const LotActions = ({ count, category, ...props }: ActionBarProps) => {
               <DeleteManyButton {...props} />
             </Fragment>
           )}
-          {/* {category !== "correction" && <TransferManyButton {...props} />} */}
+          {category === "history" && <CancelAcceptManyButton {...props} />}
           <RequestManyFixesButton {...props} />
         </Fragment>
       )}

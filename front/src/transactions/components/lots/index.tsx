@@ -1,12 +1,6 @@
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
-import {
-  Route,
-  Routes,
-  useNavigate,
-  useLocation,
-  Navigate,
-} from "react-router-dom"
+import { useLocation, Navigate } from "react-router-dom"
 import * as api from "../../api"
 import { Entity, UserRole } from "carbure/types"
 import {
@@ -19,24 +13,25 @@ import {
 } from "../../types"
 import useEntity from "carbure/hooks/entity"
 import { useAutoStatus } from "../status"
-import { useQuery } from "common-v2/hooks/async"
-import { Order } from "common-v2/components/table"
-import { Bar } from "common-v2/components/scaffold"
-import Pagination, { useLimit } from "common-v2/components/pagination"
+import { useQuery } from "common/hooks/async"
+import { Order } from "common/components/table"
+import { Bar } from "common/components/scaffold"
+import Pagination, { useLimit } from "common/components/pagination"
 import Filters, { useFilterParams } from "../filters"
-import { LotTable } from "./lot-table"
+import LotTable from "./lot-table"
 import NoResult from "../no-result"
-import { LotActions } from "./lot-actions"
+import LotActions from "./lot-actions"
 import { DeadlineSwitch, InvalidSwitch } from "../switches"
 import { LotSummaryBar } from "./lot-summary"
 import SearchBar from "../search-bar"
 import LotAdd from "lot-add"
 import LotDetails from "transaction-details/components/lots"
-import useStore from "common-v2/hooks/store"
+import useStore from "common/hooks/store"
 import { useMatomo } from "matomo"
 import { getDefaultCategory, useAutoCategory } from "../category"
-import useTitle from "common-v2/hooks/title"
+import useTitle from "common/hooks/title"
 import { AdminStatus } from "controls/types"
+import HashRoute from "common/components/hash-route"
 
 export interface LotsProps {
   year: number
@@ -46,7 +41,6 @@ export interface LotsProps {
 export const Lots = ({ year, snapshot }: LotsProps) => {
   const matomo = useMatomo()
   const location = useLocation()
-  const navigate = useNavigate()
 
   const entity = useEntity()
   const status = useAutoStatus()
@@ -75,13 +69,15 @@ export const Lots = ({ year, snapshot }: LotsProps) => {
   const totalErrors = lotsData?.total_errors ?? 0
   const totalDeadline = lotsData?.total_deadline ?? 0
 
-  const showLotDetails = (lot: Lot) => {
+  const trackShowLotDetails = (lot: Lot) => {
     matomo.push(["trackEvent", "lots-details", "show-lot-details", lot.id])
-    navigate({
-      pathname: `${status}/${category}/${lot.id}`,
-      search: location.search,
-    })
   }
+
+  const showLotDetails = (lot: Lot) => ({
+    pathname: location.pathname,
+    search: location.search,
+    hash: `lot/${lot.id}`,
+  })
 
   if (category === undefined) {
     const defaultCategory = getDefaultCategory(status, snapshot)
@@ -159,8 +155,9 @@ export const Lots = ({ year, snapshot }: LotsProps) => {
               lots={lotList}
               errors={lotErrors}
               selected={state.selection}
+              rowLink={showLotDetails}
               onSelect={actions.setSelection}
-              onAction={showLotDetails}
+              onAction={trackShowLotDetails}
               onOrder={actions.setOrder}
             />
 
@@ -175,13 +172,8 @@ export const Lots = ({ year, snapshot }: LotsProps) => {
         )}
       </section>
 
-      <Routes>
-        <Route path="drafts/imported/add" element={<LotAdd />} />
-        <Route
-          path=":status/:category/:id"
-          element={<LotDetails neighbors={ids} />}
-        />
-      </Routes>
+      <HashRoute path="add" element={<LotAdd />} />
+      <HashRoute path="lot/:id" element={<LotDetails neighbors={ids} />} />
     </>
   )
 }
@@ -421,10 +413,8 @@ export function useLotTitle(state: QueryParams) {
 
   const adminStatuses: Record<AdminStatus, string> = {
     alerts: t("alertes"),
-    corrections: t("corrections"),
-    declarations: t("déclarations"),
+    lots: t("lots"),
     stocks: t("stocks"),
-    pinned: t("lots épinglés"),
     unknown: "",
   }
 

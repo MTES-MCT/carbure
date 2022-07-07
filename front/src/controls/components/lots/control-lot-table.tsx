@@ -1,14 +1,17 @@
 import { memo } from "react"
+import { To } from "react-router-dom"
 import { Lot, LotError } from "transactions/types"
 import Table, {
   Order,
   markerColumn,
   selectionColumn,
-} from "common-v2/components/table"
+} from "common/components/table"
 import {
   getLotMarker,
   useLotColumns,
 } from "transactions/components/lots/lot-table"
+import { compact } from "common/utils/collection"
+import Flags from "flags.json"
 
 export interface ControlTableProps {
   loading: boolean
@@ -16,8 +19,8 @@ export interface ControlTableProps {
   errors: Record<number, LotError[]>
   order: Order | undefined
   selected: number[]
+  rowLink: (lot: Lot) => To
   onSelect: (selected: number[]) => void
-  onAction: (lot: Lot) => void
   onOrder: (order: Order | undefined) => void
 }
 
@@ -28,8 +31,8 @@ export const ControlTable = memo(
     errors,
     order,
     selected,
+    rowLink,
     onSelect,
-    onAction,
     onOrder,
   }: ControlTableProps) => {
     const columns = useLotColumns()
@@ -37,23 +40,25 @@ export const ControlTable = memo(
       <Table
         loading={loading}
         order={order}
-        onAction={onAction}
         onOrder={onOrder}
+        rowLink={rowLink}
         rows={lots}
-        columns={[
+        columns={compact([
           markerColumn<Lot>((lot) => getLotMarker(lot, errors)),
           selectionColumn(lots, selected, onSelect, (lot) => lot.id),
+          Flags.scoring && columns.score,
           columns.status,
           columns.period,
           columns.document,
-          columns.volume,
+          !Flags.preferred_unit && columns.volume,
+          Flags.preferred_unit && columns.quantity,
           columns.feedstock,
           columns.supplier,
           columns.client,
           columns.productionSite,
           columns.depot,
           columns.ghgReduction,
-        ]}
+        ])}
       />
     )
   }

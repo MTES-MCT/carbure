@@ -7,21 +7,15 @@ import "./carbure/assets/css/index.css"
 import * as serviceWorker from "./serviceWorker"
 
 import Carbure from "./carbure"
-import NotificationsProvider from "common/components/notifications"
 import { MatomoProvider } from "./matomo"
-import { LoaderOverlay } from "common/components"
-import { PortalProvider } from "common-v2/components/portal"
+import { LoaderOverlay } from "common/components/scaffold"
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter basename="/app">
       <MatomoProvider>
         <Suspense fallback={<LoaderOverlay />}>
-          <NotificationsProvider>
-            <PortalProvider>
-              <Carbure />
-            </PortalProvider>
-          </NotificationsProvider>
+          <Carbure />
         </Suspense>
       </MatomoProvider>
     </BrowserRouter>

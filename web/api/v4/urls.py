@@ -47,8 +47,10 @@ urlpatterns = [
     path('lots/accept-blending', views.accept_blending, name='api-v4-accept-blending'),
     path('lots/accept-export', views.accept_export, name='api-v4-accept-export'),
     path('lots/accept-direct-delivery', views.accept_direct_delivery, name='api-v4-accept-direct-delivery'),
+    path('lots/cancel-accept', views.cancel_accept_lots, name='api-v4-cancel-accept'),
     ### Warnings
     path('lots/toggle-warning', views.toggle_warning, name='api-v4-toggle-warning'),
+    path('lots/recalc-score', views.recalc_score, name='api-v4-recalc-score'),
 
     # STOCKS
     path('stocks', views.get_stock, name='api-v4-get-stock'),
@@ -65,12 +67,6 @@ urlpatterns = [
     path('declarations/validate', views.validate_declaration, name='api-v4-validate-declaration'),
     path('declarations/invalidate', views.invalidate_declaration, name='api-v4-invalidate-declaration'),
 
-    #### missing endpoints vs previous version
-    # GET
-    #path('declaration-summary', views.get_declaration_summary, name='api-v3-lots-get-declaration-summary'),
-    #path('summary', views.get_lots_summary, name='api-v3-lots-get-lots-summary'),
-    # POST
-    # IMPORT/FILES
     path('download-template', views.get_template, name='api-v4-get-template'),
     path('download-template-stock', views.get_template_stock, name='api-v4-get-template-stock'),
 
@@ -86,7 +82,7 @@ urlpatterns = [
     path('set-production-site-certificates', certificates.set_production_site_certificates, name='api-v4-settings-set-production-site-certificates'),
     path('set-default-certificate', certificates.set_default_certificate, name='api-v4-settings-set-default-certificate'),
     path('update-entity', views.update_entity, name='api-v4-settings-update-entity'),
-
+    path('set-preferred-unit', views.set_entity_preferred_unit, name='api-v3-settings-preferred-unit'),
 
     # ADMIN
     path('admin/years', admin.get_years, name='api-v4-admin-get-years'),
@@ -123,5 +119,7 @@ urlpatterns = [
     path('auditor/stocks', auditor.get_stocks, name='api-v4-auditor-get-stocks'),
     path('auditor/stocks/details', auditor.get_stock_details, name='api-v4-auditor-get-stock-details'),
     path('auditor/stocks/summary', auditor.get_stocks_summary, name='api-v4-auditor-get-stock-summary'),
-    path('auditor/stocks/filters', auditor.get_stock_filters, name='api-v4-auditor-get-stock-filters'),    
+    path('auditor/stocks/filters', auditor.get_stock_filters, name='api-v4-auditor-get-stock-filters'),
+    path('auditor/lots/mark-as-conform', auditor.mark_conform, name='api-v4-auditor-mark-as-conform'),
+    path('auditor/lots/mark-as-nonconform', auditor.mark_nonconform, name='api-v4-auditor-mark-as-nonconform'),
 ]

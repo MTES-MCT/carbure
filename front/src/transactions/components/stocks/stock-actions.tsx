@@ -1,5 +1,5 @@
 import { StockQuery } from "../../types"
-import { ActionBar } from "common-v2/components/scaffold"
+import { ActionBar } from "common/components/scaffold"
 import { TransformManyButton } from "transactions/actions/transform"
 import { ExportStocksButton } from "transactions/actions/export"
 import { StockExcelButton } from "transactions/actions/stock-excel"

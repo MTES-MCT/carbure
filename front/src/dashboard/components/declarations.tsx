@@ -1,26 +1,27 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import useEntity from "carbure/hooks/entity"
-import { useQuery } from "common-v2/hooks/async"
-import { LoaderOverlay, Panel, Row } from "common-v2/components/scaffold"
+import { useQuery } from "common/hooks/async"
+import { Panel, Row } from "common/components/scaffold"
 import {
   AlertCircle,
   ChevronLeft,
   ChevronRight,
   Square,
-} from "common-v2/components/icons"
-import Tabs from "common-v2/components/tabs"
-import Table, { Cell, Column } from "common-v2/components/table"
-import Select from "common-v2/components/select"
-import Button from "common-v2/components/button"
+} from "common/components/icons"
+import Tabs from "common/components/tabs"
+import Table, { Cell, Column } from "common/components/table"
+import Select from "common/components/select"
+import Button from "common/components/button"
 import * as api from "../api"
 import { DashboardDeclaration } from "dashboard/types"
-import { groupBy, sortBy } from "common-v2/utils/collection"
+import { groupBy, sortBy } from "common/utils/collection"
 import { EntityType } from "carbure/types"
-import Alert from "common-v2/components/alert"
-import { formatPeriod } from "common-v2/utils/formatters"
+import Alert from "common/components/alert"
+import { formatPeriod } from "common/utils/formatters"
 import i18next from "i18next"
 import { Link } from "react-router-dom"
+import { normalizePeriod } from "carbure/utils/normalizers"
 
 const date = new Date()
 const currentPeriod = `${date.getFullYear() * 100 + date.getMonth() + 1}`
@@ -42,7 +43,7 @@ const Declarations = () => {
     params: [period!],
   })
 
-  const periodData = (periods.result ?? []).sort((a, b) => a.value < b.value ? 1 : -1) // prettier-ignore
+  const periodData = (periods.result ?? []).map(String).sort((a, b) => a < b ? 1 : -1) // prettier-ignore
   const declarationData = declarations.result?.data.data ?? []
 
   const groupedByEntityType = groupBy(
@@ -52,10 +53,10 @@ const Declarations = () => {
 
   function movePeriod(direction: number) {
     if (!periodData) return
-    const index = periodData.findIndex((p) => p.value === period)
+    const index = periodData.findIndex((p) => p === period)
     // we remove direction because the array is in antichronological order
     const newIndex = Math.max(0, Math.min(index - direction, periodData.length - 1)) // prettier-ignore
-    setPeriod(periodData[newIndex].value)
+    setPeriod(periodData[newIndex])
   }
 
   return (
@@ -70,9 +71,11 @@ const Declarations = () => {
             <Button icon={ChevronLeft} action={() => movePeriod(-1)} />
             <Select
               search
+              loading={periods.loading}
               value={period}
               onChange={setPeriod}
               options={periodData}
+              normalize={normalizePeriod}
               style={{ width: 200 }}
             />
             <Button icon={ChevronRight} action={() => movePeriod(+1)} />
@@ -94,18 +97,21 @@ const Declarations = () => {
       {focus === EntityType.Operator && (
         <DeclarationTable
           period={period!}
+          loading={declarations.loading}
           declarations={groupedByEntityType[EntityType.Operator]}
         />
       )}
       {focus === EntityType.Producer && (
         <DeclarationTable
           period={period!}
+          loading={declarations.loading}
           declarations={groupedByEntityType[EntityType.Producer]}
         />
       )}
       {focus === EntityType.Trader && (
         <DeclarationTable
           period={period!}
+          loading={declarations.loading}
           declarations={groupedByEntityType[EntityType.Trader]}
         />
       )}
@@ -114,29 +120,40 @@ const Declarations = () => {
 }
 
 interface DeclarationTableProps {
+  loading: boolean
   period: string
   declarations: DashboardDeclaration[] | undefined
 }
 
-const DeclarationTable = ({ period, declarations }: DeclarationTableProps) => {
+const DeclarationTable = ({
+  loading,
+  period,
+  declarations,
+}: DeclarationTableProps) => {
   const { t } = useTranslation()
 
   if (!declarations || declarations.length === 0) {
     return (
-      <section style={{ paddingBottom: "var(--spacing-l)" }}>
-        <Alert
-          icon={AlertCircle}
-          variant="warning"
-          label={t("Aucune déclaration trouvée pour cette période.")}
-        />
-      </section>
+      <>
+        <section>
+          <Alert
+            loading={loading}
+            icon={AlertCircle}
+            variant="warning"
+            label={t("Aucune déclaration trouvée pour cette période.")}
+          />
+        </section>
+        <footer />
+      </>
     )
   }
 
   const columns = getDeclarationDashboardColumns(period)
   const rows = getEntityDeclarationsByPeriod(declarations)
 
-  return <Table variant="compact" rows={rows} columns={columns} />
+  return (
+    <Table variant="compact" loading={loading} rows={rows} columns={columns} />
+  )
 }
 
 const Legend = () => (

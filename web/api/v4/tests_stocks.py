@@ -5,6 +5,7 @@ from typing import Generic
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.db.models import Count
 
 from core.models import CarbureLot, CarbureStock, GenericError, MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot, UserRights
 from api.v3.common.urls import urlpatterns
@@ -16,7 +17,7 @@ def debug_errors(lot):
     for e in errors:
         print(e.error, e.field, e.value, e.extra)
 
-class LotsFlowTest(TestCase):
+class StocksFlowTest(TestCase):
     fixtures = [
         'json/biofuels.json',
         'json/feedstock.json',
@@ -35,7 +36,7 @@ class LotsFlowTest(TestCase):
         loggedin = self.client.login(username=self.user1.email, password=self.password)
         self.assertTrue(loggedin)
 
-        self.producer = Entity.objects.filter(entity_type=Entity.PRODUCER)[0]
+        self.producer = Entity.objects.filter(entity_type=Entity.PRODUCER).annotate(psites=Count('productionsite')).filter(psites__gt=0)[0]
         self.trader = Entity.objects.filter(entity_type=Entity.TRADER)[0]
         self.trader.default_certificate = "TRADER_CERTIFICATE"
         self.trader.save()
@@ -59,7 +60,7 @@ class LotsFlowTest(TestCase):
         response = self.client.post(reverse('api-v4-add-lots'), lot)
         self.assertEqual(response.status_code, 200)
         data = response.json()['data']
-        lot_id = data['id']        
+        lot_id = data['id']
         lot = CarbureLot.objects.get(id=lot_id)
         return lot
 
@@ -68,7 +69,7 @@ class LotsFlowTest(TestCase):
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)
         return lot
-        
+
     def stock_split(self, payload, fail=False):
         response = self.client.post(reverse('api-v4-stock-split'), {'entity_id': self.producer.id, 'payload': json.dumps(payload)})
         if not fail:
@@ -128,8 +129,38 @@ class LotsFlowTest(TestCase):
         payload = {'volume': 10000, 'stock_id': stock.carbure_id, 'delivery_date': today, 'delivery_site_country_id': 'DE', 'transport_document_reference': 'FR-BLENDING-TEST', 'unknown_client': "FOREIGN CLIENT"}
         failed = self.stock_split([payload], fail=True)
 
-        # 7: delete a draft, check that volume is correctly re-credited
+        # 7: update a draft, check that volume is correctly adjusted
+        data = {
+            'lot_id': lot.id,
+            'volume': 9000,
+            'entity_id': lot.carbure_producer.id,
+            'delivery_date': today,
+            'delivery_site_country_id': 'DE',
+            'transport_document_reference': 'FR-UPDATED-DAE',
+            'unknown_client': "FOREIGN CLIENT",
+        }        
+        response = self.client.post(reverse('api-v4-update-lot'), data)
+        self.assertEqual(response.status_code, 200)
+        lot = CarbureLot.objects.get(id=lot.id)
+        self.assertEqual(lot.volume, 9000) # volume updated
+        self.assertEqual(lot.transport_document_reference, "FR-UPDATED-DAE")
+        stock = CarbureStock.objects.get(id=lot.parent_stock.id)
+        self.assertEqual(stock.remaining_volume, 1000)
+
+        # 8 update a draft with more than volume left, ensure lot and stock are not updated
+        data['volume'] = 11000
+        response = self.client.post(reverse('api-v4-update-lot'), data)
+        self.assertEqual(response.status_code, 200)
+        lot = CarbureLot.objects.get(id=lot.id)
+        self.assertEqual(lot.volume, 9000) # volume NOT updated
+        stock = CarbureStock.objects.get(id=lot.parent_stock.id)
+        self.assertEqual(stock.remaining_volume, 1000)
+        
+        
+        # 9: delete a draft, check that volume is correctly re-credited
         response = self.client.post(reverse('api-v4-delete-lots'), {'entity_id': self.producer.id, 'selection': [lot.id]})
         self.assertEqual(response.status_code, 200)
         stock = CarbureStock.objects.get(parent_lot=parent_lot)
         self.assertEqual(stock.remaining_volume, 10000)
+
+        

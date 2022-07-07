@@ -1,12 +1,12 @@
-import Button from "common-v2/components/button"
+import Button from "common/components/button"
 import { useTranslation } from "react-i18next"
 import { useNavigate, useSearchParams } from "react-router-dom"
-import Form, { useForm } from "common-v2/components/form"
-import { Lock, Return, UserCheck } from "common-v2/components/icons"
-import { TextInput } from "common-v2/components/input"
+import Form, { useForm } from "common/components/form"
+import { Lock, Return, UserCheck } from "common/components/icons"
+import { TextInput } from "common/components/input"
 import { Container } from "./login"
-import { useNotify } from "common-v2/components/notifications"
-import { useMutation } from "common-v2/hooks/async"
+import { useNotify } from "common/components/notifications"
+import { useMutation } from "common/hooks/async"
 import * as api from "../api"
 import { useEffect } from "react"
 
@@ -64,6 +64,7 @@ const OTP = () => {
       <section>
         <Form id="otp" onSubmit={() => verifyOTP.execute(value.otp!)}>
           <TextInput
+            autoFocus
             variant="solid"
             icon={Lock}
             label={t("Code reçu par email")}

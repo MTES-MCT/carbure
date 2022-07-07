@@ -3,30 +3,37 @@ import { Link, Route, Routes, useLocation, useNavigate } from "react-router-dom"
 import { Trans, useTranslation } from "react-i18next"
 import useEntity, { EntityManager } from "carbure/hooks/entity"
 import { UserManager, useUser } from "carbure/hooks/user"
-import useLocalStorage from "common-v2/hooks/storage"
+import useLocalStorage from "common/hooks/storage"
 import { useMatomo } from "matomo"
-import Menu from "common-v2/components/menu"
-import { Anchors } from "common-v2/components/dropdown"
-import { Header, Row } from "common-v2/components/scaffold"
-import Button from "common-v2/components/button"
-import Tabs from "common-v2/components/tabs"
-import Select from "common-v2/components/select"
-import { ChevronRight, Question } from "common-v2/components/icons"
+import Menu from "common/components/menu"
+import { Anchors } from "common/components/dropdown"
+import { Header, Row } from "common/components/scaffold"
+import Button from "common/components/button"
+import Tabs from "common/components/tabs"
+import Select from "common/components/select"
+import { ChevronRight, Question } from "common/components/icons"
 import republique from "../assets/images/republique.svg"
 import marianne from "../assets/images/Marianne.svg"
 import css from "./top-bar.module.css"
-import { compact } from "common-v2/utils/collection"
+import { compact } from "common/utils/collection"
 import Notifications from "./notifications"
+import DevBanner from "./dev-banner"
 
 const Topbar = () => {
   const entity = useEntity()
   const user = useUser()
 
-  if (!user.isAuthenticated()) {
-    return <PublicTopbar />
-  } else {
-    return <PrivateTopbar entity={entity} user={user} />
-  }
+  return (
+    <>
+      <DevBanner />
+
+      {user.isAuthenticated() ? (
+        <PrivateTopbar entity={entity} user={user} />
+      ) : (
+        <PublicTopbar />
+      )}
+    </>
+  )
 }
 
 const PublicTopbar = () => {

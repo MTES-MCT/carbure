@@ -14,7 +14,7 @@
   display: flex;
   background-color: var(--gray-highlight);
   align-self: stretch;
-  padding: 12px var(--main-spacing);
+  padding: var(--spacing-s) var(--main-spacing-x);
 }
 
 .footerUpper ul {
@@ -40,9 +40,9 @@
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid var(--gray-highlight);
-  padding-bottom: 16px;
+  padding-bottom: var(--spacing-m);
   flex-wrap: wrap;
-  padding: 16px var(--main-spacing);
+  padding: var(--spacing-m) var(--main-spacing-x);
 }
 
 .footerLogos {
@@ -51,7 +51,7 @@
 
 .footerMTES {
   max-height: 200px;
-  margin-right: 32px;
+  margin-right: var(--spacing-l);
 }
 
 .footerBetagouv {
@@ -68,12 +68,12 @@
   font-size: 1.1em;
   text-align: justify;
   margin: 0;
-  margin-bottom: 24px;
+  margin-bottom: var(--spacing-l);
 }
 
 .footerLower {
   display: flex;
-  padding: 16px var(--main-spacing);
+  padding: var(--spacing-m) var(--main-spacing-x);
   flex-wrap: wrap;
   font-size: 0.9em;
 }
@@ -89,7 +89,7 @@
 .footerGouvLinks li {
   font-weight: bold;
   font-size: 1.1em;
-  margin-left: 24px;
+  margin-left: var(--spacing-l);
 }
 .footerGouvLinks li:first-child {
   margin-left: 0;
@@ -98,7 +98,7 @@
 .footerLower ul li {
   display: flex;
   align-items: center;
-  margin-left: 16px;
+  margin-left: var(--spacing-m);
 }
 
 .footerLegalLinks li:not(:last-child)::after {
@@ -106,7 +106,7 @@
   height: 75%;
   width: 2px;
   background-color: var(--gray-highlight);
-  margin-left: 16px;
+  margin-left: var(--spacing-m);
 }
 
 ul.footerSocialLinks {
@@ -131,13 +131,13 @@ ul.footerSocialLinks {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 24px var(--main-spacing);
+  padding: var(--spacing-l) var(--main-spacing-x);
   border-bottom: 1px solid var(--gray-highlight);
 }
 
 .footerPartnersLogos {
   display: flex;
-  gap: 24px;
+  gap: var(--spacing-l);
 }
 
 .footerPartnersLogos img {

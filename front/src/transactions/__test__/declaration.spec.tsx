@@ -1,24 +1,16 @@
 import { render, TestRoot } from "setupTests"
 import { screen } from "@testing-library/react"
 import { Route } from "react-router-dom"
-import { getByTextContent, waitWhileLoading } from "common/__test__/helpers"
+import { getByTextContent, waitWhileLoading } from "carbure/__test__/helpers"
 import { DeclarationDialog } from "../actions/declaration"
 
 import server from "./api"
-import { PortalProvider } from "common-v2/components/portal"
 import userEvent from "@testing-library/user-event"
 
 const DeclarationSummary = () => (
-  <PortalProvider>
-    <TestRoot url="/">
-      <Route
-        path="/"
-        element={
-          <DeclarationDialog year={2021} years={[2021]} onClose={() => {}} />
-        }
-      />
-    </TestRoot>
-  </PortalProvider>
+  <TestRoot url="/#declaration">
+    <Route path="/" element={<DeclarationDialog />} />
+  </TestRoot>
 )
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))

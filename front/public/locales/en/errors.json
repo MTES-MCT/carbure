@@ -68,6 +68,12 @@
   "UNKNOWN_COUNTRY_OF_ORIGIN": "Feedstock country of origin is not recognized",
   "UNKNOWN_DELIVERY_SITE": "Delivery site is not recognized",
   "UNKNOWN_DELIVERY_COUNTRY": "Delivery site country is not recognized",
-  "ETD_HIGHER_THAN_DEFAULT": "Transport and Distribution GHG emissions higher than default value"
-
+  "ETD_HIGHER_THAN_DEFAULT": "Transport and Distribution GHG emissions higher than default value",
+  "ETD_NO_EU_TOO_LOW": "Transport and Distribution GHG emissions smaller than the default value",
+  "ETD_EU_DEFAULT_VALUE": "Transport and Distribution GHG emissions still has the default value",
+  "ETD_ANORMAL_HIGH": "Transport and Distribution GHG emissions abnormally high",
+  "EEC_ANORMAL_LOW": "Extraction and Culture GHG emissions abnormally high",
+  "EEC_ANORMAL_HIGH": "Extraction and Culture GHG emissions abnormally low",
+  "EP_ANORMAL_LOW": "Transformation GHG emissions abnormally low",
+  "EP_ANORMAL_HIGH": "Transformation GHG emissions abnormally high"
 }
