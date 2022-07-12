@@ -9,7 +9,7 @@ import {
   Depot,
   Feedstock,
   ProductionSite,
-  Unit
+  Unit,
 } from "carbure/types"
 import Form, { FormErrors, FormManager, useForm } from "common/components/form"
 import LotFields from "./lot-fields"
@@ -44,7 +44,10 @@ export function useLotForm(
   certs?: LotCertificates
 ) {
   const entity = useEntity()
-  const value = useMemo(() => lotToFormValue(lot, entity, certs), [lot, entity, certs])
+  const value = useMemo(
+    () => lotToFormValue(lot, entity, certs),
+    [lot, entity, certs]
+  )
   const errors = useLotFieldErrors(lotErrors)
 
   function setValue(value: LotFormValue): LotFormValue {
@@ -160,7 +163,7 @@ export const defaultLot = {
   volume: 0 as number | undefined,
   weight: 0 as number | undefined,
   lhv_amount: 0 as number | undefined,
-  unit: 'l' as Unit | undefined,
+  unit: "l" as Unit | undefined,
   biofuel: undefined as Biofuel | undefined,
   feedstock: undefined as Feedstock | undefined,
   country_of_origin: undefined as Country | undefined,
@@ -255,12 +258,12 @@ export const lotToFormValue: LotToFormValue = (lot, entity, certificates) => ({
 export function lotFormToPayload(lot: LotFormValue | undefined) {
   if (lot === undefined) return {}
 
-  const unit = lot.unit ?? 'l'
+  const unit = lot.unit ?? "l"
 
   const unitToField = {
-    l: 'volume' as "volume",
-    kg: 'weight' as "weight",
-    MJ: "lhv_amount" as "lhv_amount"
+    l: "volume" as "volume",
+    kg: "weight" as "weight",
+    MJ: "lhv_amount" as "lhv_amount",
   }
 
   // use preferred unit as default quantity to send to the api
@@ -327,9 +330,6 @@ export function lotFormToPayload(lot: LotFormValue | undefined) {
       typeof lot.delivery_site === "string" ? lot.delivery_site : undefined,
     delivery_site_country_code: lot.delivery_site_country?.code_pays,
   }
-}
-
-export function extractLotQuantity(lot: LotFormValue) {
 }
 
 export function isExternalDelivery(value: LotFormValue) {

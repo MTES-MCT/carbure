@@ -76,7 +76,7 @@ export const InitialQuantityField = (props: NumberInputProps) => {
   return (
     <NumberInput
       readOnly
-      label={t("Quantité")}
+      label={t("Quantité initiale")}
       icon={<UnitSelect value={unit} onChange={setUnit} />}
       {...bind(unitToField[unit ?? "l"])}
       {...props}

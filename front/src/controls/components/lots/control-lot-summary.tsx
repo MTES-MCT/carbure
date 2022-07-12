@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next"
 import { useQuery } from "common/hooks/async"
 import pickApi from "../../api"
-import { formatNumber, formatUnit } from "common/utils/formatters"
+import { formatUnit } from "common/utils/formatters"
 import { LoaderOverlay } from "common/components/scaffold"
 import Table from "common/components/table"
 import NoResult from "transactions/components/no-result"

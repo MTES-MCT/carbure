@@ -2,7 +2,6 @@ import { createContext, useContext } from "react"
 import { useQuery } from "common/hooks/async"
 import { Entity, UserRight, UserRightRequest } from "../types"
 import * as api from "../api"
-import { invalidate } from "common/hooks/invalidate"
 
 export interface UserManager {
   loading: boolean
@@ -66,10 +65,6 @@ export function useUser() {
   const user = useContext(UserContext)
   if (user === undefined) throw new Error("User context is not defined")
   return user
-}
-
-export function reloadUserSettings() {
-  invalidate("user-settings")
 }
 
 export default useUserManager

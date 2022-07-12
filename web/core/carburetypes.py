@@ -54,6 +54,7 @@ class CarbureSanityCheckErrors:
     EEC_WITH_RESIDUE = "EEC_WITH_RESIDUE"
 
     MAC_BC_WRONG = "MAC_BC_WRONG"
+    MAC_NOT_EFPE = "MAC_NOT_EFPE"    
     VOLUME_FAIBLE = "VOLUME_FAIBLE"
     PROVENANCE_MP = "PROVENANCE_MP"
     DEPRECATED_MP = "DEPRECATED_MP"
@@ -78,6 +79,9 @@ class CarbureSanityCheckErrors:
     MISSING_FEEDSTOCK_COUNTRY_OF_ORIGIN = "MISSING_FEEDSTOCK_COUNTRY_OF_ORIGIN"
 
 
+class CarbureStockErrors:
+    NOT_ENOUGH_VOLUME_LEFT = "NOT_ENOUGH_VOLUME_LEFT"
+    
 class CarbureUnit:
     KILOGRAM = "kg"
     LITER = "l"
