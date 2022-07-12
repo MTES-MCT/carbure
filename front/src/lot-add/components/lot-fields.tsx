@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import Autocomplete, { AutocompleteProps } from "common/components/autocomplete"
 import { Fieldset, useBind, useFormContext } from "common/components/form"
@@ -13,7 +12,6 @@ import * as api from "carbure/api"
 import * as norm from "carbure/utils/normalizers"
 import { LotFormValue } from "./lot-form"
 import { Biofuel, Country, Feedstock, Unit } from "carbure/types"
-import useEntity from "carbure/hooks/entity"
 import { Option } from "common/utils/normalize"
 import Flags from "flags.json"
 
@@ -79,7 +77,7 @@ export const QuantityField = (props: NumberInputProps) => {
     <NumberInput
       required
       label={t("Quantité")}
-      icon={<UnitSelect {...bind('unit')} />}
+      icon={<UnitSelect {...bind("unit")} />}
       {...bind(unitToField[unit ?? "l"])}
       {...props}
     />

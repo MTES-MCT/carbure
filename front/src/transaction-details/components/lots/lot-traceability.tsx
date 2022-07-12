@@ -17,10 +17,10 @@ export interface TraceabilityProps {
 
 export const LotTraceability = ({
   details,
-  parentLotRoot = "../../in/history/",
-  parentStockRoot = "../stocks/history/",
-  childLotRoot = "../../out/history/",
-  childStockRoot = "../../stocks/history/",
+  parentLotRoot = "../in/history",
+  parentStockRoot = "../stocks/history",
+  childLotRoot = "../out/history",
+  childStockRoot = "../stocks/history",
 }: TraceabilityProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -59,7 +59,7 @@ export const LotTraceability = ({
           <ul>
             {parentLot && (
               <li>
-                <ExternalLink to={`${parentLotRoot}${parentLot.id}`}>
+                <ExternalLink to={`${parentLotRoot}#lot/${parentLot.id}`}>
                   Lot {parentLot.carbure_id}:
                   <b>
                     {t(parentLot.biofuel?.code ?? "", { ns: "biofuels" })}{" "}
@@ -71,7 +71,7 @@ export const LotTraceability = ({
 
             {parentStock && (
               <li>
-                <ExternalLink to={`${parentStockRoot}${parentStock.id}`}>
+                <ExternalLink to={`${parentStockRoot}#stock/${parentStock.id}`}>
                   Stock {parentStock.carbure_id}:
                   <b>
                     {t(parentStock.biofuel?.code ?? "", {
@@ -92,7 +92,7 @@ export const LotTraceability = ({
           <ul>
             {childrenLot?.map((child) => (
               <li key={child.id}>
-                <ExternalLink to={`${childLotRoot}${child.id}`}>
+                <ExternalLink to={`${childLotRoot}#lot/${child.id}`}>
                   Lot {child.carbure_id}:{" "}
                   <b>
                     {t(child.biofuel?.code ?? "", { ns: "biofuels" })}{" "}
@@ -104,7 +104,7 @@ export const LotTraceability = ({
 
             {childrenStock?.map((child, i) => (
               <li key={i}>
-                <ExternalLink to={`${childStockRoot}${child.id}`}>
+                <ExternalLink to={`${childStockRoot}#stock/${child.id}`}>
                   Stock {child.carbure_id}:{" "}
                   <b>
                     {t(child.biofuel?.code ?? "", {

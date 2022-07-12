@@ -108,7 +108,7 @@ const StockExcelDialog = ({ onClose }: StockExcelDialogProps) => {
           icon={Upload}
           label={t("Importer")}
           action={() => {
-            matomo.push(["trackEvent", "lots-create", "import-lots-excel"])
+            matomo.push(["trackEvent", "lots-create", "extract-stock-excel"])
             importLots.execute(entity.id, file!)
           }}
         />

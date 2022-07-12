@@ -141,17 +141,6 @@ export const Loader = ({ className, ...props }: IconProps) => (
   </Icon>
 )
 
-export const Rapport = ({ className, ...props }: IconProps) => (
-  <Icon {...props} className={cl("report", className)}>
-    <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
-    <rect x="9" y="3" width="6" height="4" rx="2" />
-    <line x1="9" y1="12" x2="9.01" y2="12" />
-    <line x1="13" y1="12" x2="15" y2="12" />
-    <line x1="9" y1="16" x2="9.01" y2="16" />
-    <line x1="13" y1="16" x2="15" y2="16" />
-  </Icon>
-)
-
 export const Upload = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("upload", className)}>
     <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
@@ -191,28 +180,9 @@ export const AlertOctagon = ({ className, ...props }: IconProps) => (
   </Icon>
 )
 
-export const Calendar = ({ className, ...props }: IconProps) => (
-  <Icon {...props} className={cl("calendar", className)}>
-    <rect x="4" y="5" width="16" height="16" rx="2" />
-    <line x1="16" y1="3" x2="16" y2="7" />
-    <line x1="8" y1="3" x2="8" y2="7" />
-    <line x1="4" y1="11" x2="20" y2="11" />
-    <line x1="11" y1="15" x2="12" y2="15" />
-    <line x1="12" y1="15" x2="12" y2="18" />
-  </Icon>
-)
-
 export const Return = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("return", className)}>
     <path d="M9 11l-4 4l4 4m-4 -4h11a4 4 0 0 0 0 -8h-1" />
-  </Icon>
-)
-
-export const Back = ({ className, ...props }: IconProps) => (
-  <Icon {...props} className={cl("back", className)}>
-    <line x1="5" y1="12" x2="19" y2="12" />
-    <line x1="5" y1="12" x2="11" y2="18" />
-    <line x1="5" y1="12" x2="11" y2="6" />
   </Icon>
 )
 
@@ -276,15 +246,6 @@ export const Flask = ({ className, ...props }: IconProps) => (
   </Icon>
 )
 
-export const Forward = ({ className, ...props }: IconProps) => (
-  <Icon {...props} className={cl("forward", className)}>
-    <path d="M12 18h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v7.5" />
-    <path d="M3 6l9 6l9 -6" />
-    <path d="M15 18h6" />
-    <path d="M18 15l3 3l-3 3" />
-  </Icon>
-)
-
 export const Certificate = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("certificate", className)}>
     <circle cx="15" cy="15" r="3" />
@@ -301,38 +262,6 @@ export const UserCheck = ({ className, ...props }: IconProps) => (
     <circle cx="9" cy="7" r="4" />
     <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
     <path d="M16 11l2 2l4 -4" />
-  </Icon>
-)
-
-export const Eye = ({ className, ...props }: IconProps) => (
-  <Icon {...props} className={cl("eye", className)}>
-    <path d="M10.584 10.587a2 2 0 0 0 2.828 2.83" />
-    <path d="M9.363 5.365a9.466 9.466 0 0 1 2.637 -.365c4 0 7.333 2.333 10 7c-.778 1.361 -1.612 2.524 -2.503 3.488m-2.14 1.861c-1.631 1.1 -3.415 1.651 -5.357 1.651c-4 0 -7.333 -2.333 -10 -7c1.369 -2.395 2.913 -4.175 4.632 -5.341" />
-  </Icon>
-)
-
-export const EyeOff = ({ className, ...props }: IconProps) => (
-  <Icon {...props} className={cl("eye-off", className)}>
-    <line x1="3" y1="3" x2="21" y2="21" />
-    <path d="M10.584 10.587a2 2 0 0 0 2.828 2.83" />
-    <path d="M9.363 5.365a9.466 9.466 0 0 1 2.637 -.365c4 0 7.333 2.333 10 7c-.778 1.361 -1.612 2.524 -2.503 3.488m-2.14 1.861c-1.631 1.1 -3.415 1.651 -5.357 1.651c-4 0 -7.333 -2.333 -10 -7c1.369 -2.395 2.913 -4.175 4.632 -5.341" />
-  </Icon>
-)
-
-export const Pin = ({ className, ...props }: IconProps) => (
-  <Icon {...props} className={cl("pin", className)}>
-    <path d="M15 4.5l-4 4l-4 1.5l-1.5 1.5l7 7l1.5 -1.5l1.5 -4l4 -4" />
-    <line x1="9" y1="15" x2="4.5" y2="19.5" />
-    <line x1="14.5" y1="4" x2="20" y2="9.5" />
-  </Icon>
-)
-
-export const PinOff = ({ className, ...props }: IconProps) => (
-  <Icon {...props} className={cl("pin-off", className)}>
-    <line x1="3" y1="3" x2="21" y2="21" />
-    <path d="M15 4.5l-3.249 3.249m-2.57 1.433l-2.181 .818l-1.5 1.5l7 7l1.5 -1.5l.82 -2.186m1.43 -2.563l3.25 -3.251" />
-    <line x1="9" y1="15" x2="4.5" y2="19.5" />
-    <line x1="14.5" y1="4" x2="20" y2="9.5" />
   </Icon>
 )
 

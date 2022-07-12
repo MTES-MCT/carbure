@@ -2,6 +2,7 @@ import argparse
 import os
 import django
 from tqdm import tqdm
+import datetime
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
@@ -9,6 +10,8 @@ django.setup()
 from api.v4.helpers import get_prefetched_data
 from core.models import CarbureLot
 from ml.models import EECStats, EPStats, ETDStats
+
+DATE_BEGIN = datetime.date.today() - datetime.timedelta(days=540) # approx 18 months
 
 def calc_ml_score(args):
     data = get_prefetched_data()
@@ -19,7 +22,7 @@ def calc_ml_score(args):
     # {s.feedstock.code + s.biofuel.code: s for s in EPStats.objects.select_related('feedstock', 'biofuel').all()}
     ep = data['ep']
 
-    lots = CarbureLot.objects.select_related('feedstock', 'country_of_origin').filter(lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN])
+    lots = CarbureLot.objects.select_related('feedstock', 'country_of_origin').filter(created_at__gt=DATE_BEGIN, lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN])
     if args.year:
         lots = lots.filter(year=args.year)
     
@@ -43,16 +46,16 @@ def calc_ml_score(args):
             if entry.default_value_max_ep > 0 and l.ep > 1.2 * entry.default_value_max_ep:
                 score += ((l.ep - entry.default_value_max_ep) / entry.default_value_max_ep)**2
                 
-        if l.feedstock in etd:
-            default_value = etd[l.feedstock]
-            if l.etd > 2 * default_value and l.etd > 5:
-                score += 1 # louche - ETD trop gros
-            if l.country_of_origin:
-                if not l.country_of_origin.is_in_europe and l.etd <= default_value:
-                    score += 1 # valeur ETD par defaut sur un lot qui vient de loin
-                if l.country_of_origin.is_in_europe and l.etd == default_value:
-                    score += 0.5 # lot ne vient pas de loin, pas d'effort de calcul
         # etd penalisation
+        # if l.feedstock in etd:
+        #    default_value = etd[l.feedstock]
+        #    if l.etd > 2 * default_value and l.etd > 5:
+        #        score += 1 # louche - ETD trop gros
+        #    if l.country_of_origin:
+        #        if not l.country_of_origin.is_in_europe and l.etd <= default_value:
+        #            score += 1 # valeur ETD par defaut sur un lot qui vient de loin
+        #        if l.country_of_origin.is_in_europe and l.etd == default_value:
+        #            score += 0.5 # lot ne vient pas de loin, pas d'effort de calcul
         l.ml_scoring = score
         l.save()
 
