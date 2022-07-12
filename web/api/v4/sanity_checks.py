@@ -344,7 +344,7 @@ def sanity_check(lot, prefetched_data):
             bcs = [pso.biocarburant for pso in prefetched_data['my_production_sites'][lot.carbure_production_site.name].productionsiteoutput_set.all()]
             if lot.biofuel not in bcs:
                 errors.append(generic_error(error=CarbureSanityCheckErrors.BC_NOT_CONFIGURED, lot=lot, display_to_recipient=False, field='biofuel_code'))
-    if lot.carbure_client:
+    if lot.carbure_client and lot.delivery_type != CarbureLot.TRADING: # ignore delivery issues for trading
         if lot.carbure_client.id not in prefetched_data['depotsbyentity']:
             # not a single delivery sites linked to entity
             errors.append(generic_error(error=CarbureSanityCheckErrors.DEPOT_NOT_CONFIGURED, lot=lot, display_to_recipient=True, display_to_creator=False, field='delivery_site'))
