@@ -60,11 +60,14 @@ export const StockSummaryBar = ({
   return (
     <Alert loading={summary.loading} icon={Filter} variant="info">
       <p>
-        <Trans count={summaryData.count}>
-          <b>{{ count: formatNumber(summaryData.count) }} stocks</b> pour un
-          total de{" "}
-          <b>{{ volume: formatUnit(summaryData[field], unit) }} restants</b>
-        </Trans>
+        <Trans
+          defaults="<b>{{amount}} stocks</b> pour un total de <b>{{volume}} restants</b>"
+          count={summaryData.count}
+          values={{
+            amount: formatNumber(summaryData.count),
+            volume: formatUnit(summaryData[field], unit),
+          }}
+        />
       </p>
 
       <Button

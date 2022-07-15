@@ -182,7 +182,8 @@ export const okProductionSites = rest.get(
 export const okAddProductionSite = rest.post(
   "/api/v3/settings/add-production-site",
   (req, res, ctx) => {
-    const body = req.body as FormData
+    // @ts-ignore
+    const body = req._body as FormData
 
     const psite = {
       ...productionSite,
@@ -200,7 +201,8 @@ export const okAddProductionSite = rest.post(
 export const okUpdateProductionSite = rest.post(
   "/api/v3/settings/update-production-site",
   (req, res, ctx) => {
-    const body = req.body as FormData
+    // @ts-ignore
+    const body = req._body as FormData
 
     setProductionSites([
       {

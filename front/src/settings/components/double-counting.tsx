@@ -309,10 +309,10 @@ const DoubleCountingDialog = ({
       <main>
         <section>
           <p>
-            <Trans>
-              Pour le site de production <b>{{ productionSite }}</b>, soumis le{" "}
-              <b>{{ creationDate }}</b>
-            </Trans>
+            <Trans
+              values={{ productionSite, creationDate }}
+              defaults="Pour le site de production <b>{{ productionSite }}</b>, soumis le <b>{{ creationDate }}</b>"
+            />
           </p>
 
           <p>

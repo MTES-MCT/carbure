@@ -52,16 +52,20 @@ test("populated acces rights in account page", async () => {
 })
 
 test("use the access request menu", async () => {
+  const user = userEvent.setup()
+
   render(<AccountWithHooks />)
 
   await waitWhileLoading()
 
   const button = screen.getByText("Ajouter une organisation")
-  userEvent.click(button)
+  await user.click(button)
+
+  await screen.findByText("Ajout organisation")
 
   const input = getField("Organisation")
 
-  userEvent.type(input, "Test")
+  await user.type(input, "Test")
 
   expect(input).toHaveValue("Test")
 
@@ -69,13 +73,13 @@ test("use the access request menu", async () => {
   await screen.findByText("Producteur Test")
 
   // click an the Trader option to select it
-  userEvent.click(screen.getByText("Trader Test"))
+  user.click(screen.getByText("Trader Test"))
 
   // check that the the input has the right selected value
   await screen.findByDisplayValue("Trader Test")
 
   // validate the choice by clicking the submit button
-  userEvent.click(screen.getByText("Demander l'accès"))
+  user.click(screen.getByText("Demander l'accès"))
 
   await waitWhileLoading()
 

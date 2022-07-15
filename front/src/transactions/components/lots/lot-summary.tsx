@@ -65,10 +65,14 @@ export const LotSummaryBar = ({
   return (
     <Alert loading={summary.loading} icon={Filter} variant="info">
       <p>
-        <Trans count={summaryData.count}>
-          <b>{{ count: formatNumber(summaryData.count) }} lots</b> pour un total
-          de <b>{{ volume: formatUnit(summaryData[field], unit) }}</b>
-        </Trans>
+        <Trans
+          defaults="<b>{{amount}} lots</b> pour un total de <b>{{volume}}</b>"
+          count={summaryData.count}
+          values={{
+            amount: formatNumber(summaryData.count),
+            volume: formatUnit(summaryData[field], unit),
+          }}
+        ></Trans>
       </p>
 
       <Button

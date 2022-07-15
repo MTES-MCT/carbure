@@ -103,7 +103,7 @@ const CancelAcceptDialog = ({
     },
 
     onError: (err) => {
-      const error = (err as AxiosError).response?.data.error
+      const error = (err as AxiosError<{ error: string }>).response?.data.error
 
       let text = v({
         one: t("Le lot n'a pas pu être renvoyé dans la boîte de réception !"),

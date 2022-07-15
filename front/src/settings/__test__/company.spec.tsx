@@ -6,6 +6,7 @@ import { Route } from "react-router-dom"
 import { admin, operator, producer, trader } from "carbure/__test__/data"
 import Settings from "../index"
 import server, { okDynamicSettings, setEntity } from "./api"
+import { waitWhileLoading } from "carbure/__test__/helpers"
 
 const SettingsWithHooks = ({ entityID }: { entityID?: number }) => {
   return (
@@ -22,11 +23,16 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 test("check the company section of the settings for a producer", async () => {
+  const user = userEvent.setup()
   setEntity(producer)
 
   render(<SettingsWithHooks entityID={producer.id} />)
 
+  await waitWhileLoading()
+
   expect(await screen.findAllByText("Options")).toHaveLength(2)
+
+  await screen.findByDisplayValue("litres (Éthanol à 20°, autres à 15°)")
 
   const mac = screen.getByLabelText("Ma société effectue des mises à consommation (B100 et ED95 uniquement)") // prettier-ignore
   const trading = screen.getByLabelText("Ma société a une activité de négoce")
@@ -34,28 +40,25 @@ test("check the company section of the settings for a producer", async () => {
   expect(mac).toBeChecked()
   expect(trading).toBeChecked()
 
-  userEvent.click(mac)
-  await waitFor(() => {
-    expect(mac).not.toBeChecked()
-  })
+  await user.click(mac)
+  // await waitWhileLoading()
+  expect(mac).not.toBeChecked()
 
-  userEvent.click(trading)
-  await waitFor(() => {
-    expect(trading).not.toBeChecked()
-  })
+  await user.click(trading)
+  // await waitWhileLoading()
+  expect(trading).not.toBeChecked()
 
-  userEvent.click(mac)
-  await waitFor(() => {
-    expect(mac).toBeChecked()
-  })
+  await user.click(mac)
+  // await waitWhileLoading()
+  expect(mac).toBeChecked()
 
-  userEvent.click(trading)
-  await waitFor(() => {
-    expect(trading).toBeChecked()
-  })
+  await user.click(trading)
+  // await waitWhileLoading()
+  expect(trading).toBeChecked()
 })
 
 test("check the company section of the settings for a trader", async () => {
+  const user = userEvent.setup()
   setEntity(trader)
 
   render(<SettingsWithHooks entityID={trader.id} />)
@@ -66,12 +69,13 @@ test("check the company section of the settings for a trader", async () => {
 
   expect(mac).toBeChecked()
 
-  userEvent.click(mac)
+  await user.click(mac)
 
   await waitFor(() => expect(mac).not.toBeChecked())
 })
 
 test("check the company section of the settings for an operator", async () => {
+  const user = userEvent.setup()
   setEntity(operator)
 
   render(<SettingsWithHooks entityID={operator.id} />)
@@ -82,7 +86,7 @@ test("check the company section of the settings for an operator", async () => {
 
   expect(mac).toBeChecked()
 
-  userEvent.click(mac)
+  await user.click(mac)
 
   await waitFor(() => {
     expect(mac).not.toBeChecked()

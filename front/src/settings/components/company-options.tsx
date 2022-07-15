@@ -60,30 +60,28 @@ const CompanyOptions = () => {
         </p>
       </section>
 
-      {Flags.preferred_unit && (
-        <section>
-          <Row style={{ alignItems: "center" }}>
-            <Calculator size={18} style={{ marginRight: 16 }} />
+      <section>
+        <Row style={{ alignItems: "center" }}>
+          <Calculator size={18} style={{ marginRight: 16 }} />
 
-            {t("Ma société préfère afficher les quantités en")}
+          {t("Ma société préfère afficher les quantités en")}
 
-            <Select
-              variant="inline"
-              value={entity.preferred_unit}
-              onChange={(unit) => setPreferredUnit.execute(entity.id, unit!)}
-              style={{ marginLeft: "var(--spacing-xs)" }}
-              options={[
-                {
-                  value: "l",
-                  label: t("litres (Éthanol à 20°, autres à 15°)"),
-                },
-                { value: "kg", label: t("kilogrammes") },
-                { value: "MJ", label: t("mégajoules") },
-              ]}
-            />
-          </Row>
-        </section>
-      )}
+          <Select
+            variant="inline"
+            value={entity.preferred_unit}
+            onChange={(unit) => setPreferredUnit.execute(entity.id, unit!)}
+            style={{ marginLeft: "var(--spacing-xs)" }}
+            options={[
+              {
+                value: "l",
+                label: t("litres (Éthanol à 20°, autres à 15°)"),
+              },
+              { value: "kg", label: t("kilogrammes") },
+              { value: "MJ", label: t("mégajoules") },
+            ]}
+          />
+        </Row>
+      </section>
 
       <section>
         <Checkbox

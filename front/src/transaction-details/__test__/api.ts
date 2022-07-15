@@ -87,7 +87,8 @@ export const okCommentLot = rest.post("/api/lots/comment", (req, res, ctx) => {
       user: "producer@test.com",
       comment_type: "REGULAR",
       comment_dt: "2021-11-30T16:02:45.832791+01:00",
-      comment: (req.body as FormData).get("comment")?.toString() ?? "error",
+      // @ts-ignore
+      comment: (req._body as FormData).get("comment")?.toString() ?? "error",
     })
   })
   return res(ctx.json({ status: "success" }))

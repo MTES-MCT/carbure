@@ -144,6 +144,8 @@ test("display the transaction form - trader", async () => {
 })
 
 test("check the form fields are working", async () => {
+  const user = userEvent.setup()
+
   setEntity(producer)
   render(
     <TransactionAddWithRouter entityID={producer.id}>
@@ -154,29 +156,28 @@ test("check the form fields are working", async () => {
   // await waitWhileLoading()
   await screen.findByText("Créer un nouveau lot")
 
-  userEvent.type(getField("N° document d'accompagnement"), "DAETEST") // prettier-ignore
-  userEvent.type(getField(Flags.preferred_unit ? "Quantité" : "Volume en litres"), "10000") // prettier-ignore
+  await user.type(getField("N° document d'accompagnement"), "DAETEST") // prettier-ignore
+  await user.type(getField(Flags.preferred_unit ? "Quantité" : "Volume en litres"), "10000") // prettier-ignore
 
-  userEvent.type(getField("Biocarburant"), "EM")
-  userEvent.click(await screen.findByText("EMHV"))
+  await user.type(getField("Biocarburant"), "EM")
+  await user.click(await screen.findByText("EMHV"))
   await screen.findByDisplayValue("EMHV")
 
-  userEvent.type(getField("Matière première"), "Co")
-  userEvent.click(await screen.findByText("Colza"))
+  await user.type(getField("Matière première"), "Co")
+  await user.click(await screen.findByText("Colza"))
   await screen.findByDisplayValue("Colza")
 
-  userEvent.type(getField("Pays d'origine de la matière première"), "France")
-  await waitWhileLoading()
+  await user.type(getField("Pays d'origine de la matière première"), "France")
 
-  userEvent.type(getField("Date de livraison"), "2020-31-12")
+  await user.type(getField("Date de livraison"), "2020-31-12")
 
-  userEvent.type(getField("Producteur"), "Pr")
-  userEvent.click(await screen.findByText("Producteur Test"))
+  await user.type(getField("Producteur"), "Pr")
+  await user.click(await screen.findByText("Producteur Test"))
   const producerFields = await screen.findAllByDisplayValue("Producteur Test")
   expect(producerFields).toHaveLength(2)
 
-  userEvent.type(getField("Site de production"), "Test")
-  userEvent.click(await screen.findByText("Test Production Site"))
+  await user.type(getField("Site de production"), "Test")
+  await user.click(await screen.findByText("Test Production Site"))
   await screen.findByDisplayValue("Test Production Site")
 
   const psiteCountry = getField("Pays de production")
@@ -189,32 +190,32 @@ test("check the form fields are working", async () => {
   expect(psiteComDate).toBeDisabled()
   expect(psiteComDate).toHaveValue("2000-01-31")
 
-  userEvent.type(getField("Client"), "Test")
-  userEvent.click(await screen.findByText("Opérateur Test"))
+  await user.type(getField("Client"), "Test")
+  await user.click(await screen.findByText("Opérateur Test"))
   await screen.findByDisplayValue("Opérateur Test")
 
   expect(getField("Pays de livraison")).not.toBeDisabled()
 
-  userEvent.type(getField("Site de livraison"), "Test") // prettier-ignore
-  userEvent.click(await screen.findByText("Test Delivery Site"))
+  await user.type(getField("Site de livraison"), "Test") // prettier-ignore
+  await user.click(await screen.findByText("Test Delivery Site"))
   await screen.findByDisplayValue("Test Delivery Site")
 
   expect(getField("Pays de livraison")).toBeDisabled()
 
-  userEvent.type(getField("Champ libre"), "blabla")
+  await user.type(getField("Champ libre"), "blabla")
 
-  userEvent.type(getField("EEC"), "10")
-  userEvent.type(getField("EL"), "1.1")
-  userEvent.type(getField("EP"), "1.2")
-  userEvent.type(getField("ETD"), "1.3")
-  userEvent.type(getField("EU"), "1.4")
+  await user.type(getField("EEC"), "10")
+  await user.type(getField("EL"), "1.1")
+  await user.type(getField("EP"), "1.2")
+  await user.type(getField("ETD"), "1.3")
+  await user.type(getField("EU"), "1.4")
 
-  userEvent.type(getField("ESCA"), "1.1")
-  userEvent.type(getField("ECCS"), "1.2")
-  userEvent.type(getField("ECCR"), "1.3")
-  userEvent.type(getField("EEE"), "1.4")
+  await user.type(getField("ESCA"), "1.1")
+  await user.type(getField("ECCS"), "1.2")
+  await user.type(getField("ECCR"), "1.3")
+  await user.type(getField("EEE"), "1.4")
 
-  userEvent.click(screen.getByText("Créer lot"))
+  await user.click(screen.getByText("Créer lot"))
 
   // await waitWhileLoading()
 

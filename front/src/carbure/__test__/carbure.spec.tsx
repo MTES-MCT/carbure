@@ -29,11 +29,13 @@ const CarbureWithRouter = () => {
 }
 
 test("display alert message when connected without access rights", async () => {
+  const user = userEvent.setup()
+
   server.use(okEmptySettings)
   render(<CarbureWithRouter />)
 
   const link = await screen.findAllByText("Lier le compte à des sociétés")
-  userEvent.click(link[0].closest("a")!)
+  await user.click(link[0].closest("a")!)
 
   await screen.findByText("🌻 Bienvenue sur CarbuRe")
 
@@ -55,25 +57,25 @@ test("display alert message when connected without access rights", async () => {
 })
 
 test("pick an entity from the menu", async () => {
+  const user = userEvent.setup()
+
   server.use(okSettings, okSnapshot, okYears, okLots, okSummary)
   render(<CarbureWithRouter />)
 
   const menu = await screen.findByText("Menu")
 
-  userEvent.click(menu)
+  await user.click(menu)
 
   const producer = await screen.findByText("Producteur Test")
-  userEvent.click(producer)
+  await user.click(producer)
 
   screen.getByText("Transactions", { selector: "a" })
   screen.getByText("Société", { selector: "a" })
 
-  userEvent.click(menu)
+  await user.click(menu)
 
-  const operator = await screen.findByText("Opérateur Test")
-  userEvent.click(operator)
+  const operator = await screen.findAllByText("Opérateur Test")
+  await user.click(operator[1])
 
   expect(menu.textContent).toBe("Opérateur Test")
-
-  await screen.findAllByTestId("loader")
 })

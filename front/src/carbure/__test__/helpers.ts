@@ -41,5 +41,7 @@ export function getField(label: any) {
 }
 
 export function getByTextContent(textContent: string) {
-  return screen.getAllByText((_, node) => node?.textContent === textContent)
+  return screen.getAllByText((content, node) => {
+    return content === textContent || node?.textContent === textContent
+  })
 }

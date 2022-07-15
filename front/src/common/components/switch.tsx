@@ -6,6 +6,7 @@ import { Button } from "./button"
 export interface SwitchProps extends AlertProps {
   dismissable?: boolean
   active: boolean
+  children?: React.ReactNode
   onSwitch: (active: boolean) => void
 }
 

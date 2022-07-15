@@ -23,6 +23,8 @@ i18n
     },
     react: {
       useSuspense: true,
+      transSupportBasicHtmlNodes: true,
+      transKeepBasicHtmlNodesFor: ["b", "i"],
     },
     backend: {
       loadPath: "/app/locales/{{lng}}/{{ns}}.json",
