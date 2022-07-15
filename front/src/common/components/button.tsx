@@ -28,7 +28,7 @@ export interface ButtonProps<T = void> extends Layout {
   variant?: ButtonVariant
   label?: string
   title?: string
-  icon?: React.ReactNode | (() => React.ReactNode)
+  icon?: React.ReactNode | React.ComponentType
   submit?: string | boolean
   tabIndex?: number
   href?: string

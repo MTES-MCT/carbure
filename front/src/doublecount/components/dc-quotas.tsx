@@ -136,11 +136,10 @@ const QuotasDetailsDialog = ({
       <main>
         <section>
           <p>
-            <Trans>
-              Voici les détail de l'évolution des quotas pour le site de
-              production <b>{{ productionSite }}</b> de <b>{{ producer }}</b> en{" "}
-              <b>{{ year }}</b>
-            </Trans>
+            <Trans
+              values={{ productionSite, producer, year }}
+              defaults="Voici les détail de l'évolution des quotas pour le site de production <b>{{ productionSite }}</b> de <b>{{ producer }}</b> en <b>{{ year }}</b>"
+            />
           </p>
         </section>
 

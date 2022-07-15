@@ -109,12 +109,13 @@ test("check draft actions", async () => {
 })
 
 test("check inbox actions", async () => {
+  const user = userEvent.setup()
+
   render(<TransactionsWithRouter status="in" entity={operator} />)
 
   await waitWhileLoading()
 
-  userEvent.click(screen.getByText("En attente (0)"))
-  await waitWhileLoading()
+  await user.click(screen.getByText("En attente (0)"))
 
   // check global actions
   screen.getByText("Accepter tout")
@@ -125,18 +126,18 @@ test("check inbox actions", async () => {
 })
 
 test("check outbox actions", async () => {
+  const user = userEvent.setup()
+
   render(<TransactionsWithRouter status="out" entity={operator} />)
 
   await waitWhileLoading()
   screen.getByText("Exporter vers Excel")
 
-  userEvent.click(screen.getByText("En attente (0)"))
-  await waitWhileLoading()
+  await user.click(screen.getByText("En attente (0)"))
 
   screen.getByText("Corriger la sélection")
 
-  userEvent.click(screen.getByText("Corrections (0)"))
-  await waitWhileLoading()
+  await user.click(screen.getByText("Corrections (0)"))
 
   screen.getByText("Confirmer les corrections")
   screen.getByText("Supprimer la sélection")
@@ -145,6 +146,8 @@ test("check outbox actions", async () => {
 })
 
 test("send all draft lots", async () => {
+  const user = userEvent.setup()
+
   render(<TransactionsWithRouter status="drafts" entity={operator} />)
 
   await screen.findByText("2021")
@@ -156,12 +159,12 @@ test("send all draft lots", async () => {
   expect(button).not.toBeDisabled()
 
   // click on the send all button
-  userEvent.click(button)
+  await user.click(button)
 
   // confirm the sending
   const title = screen.getByText("Envoyer tous les brouillons")
-  await waitWhileLoading()
-  clickOnCheckboxesAndConfirm()
+  await clickOnCheckboxesAndConfirm(user)
+
   await waitWhileLoading()
 
   expect(title).not.toBeInTheDocument()
@@ -176,6 +179,8 @@ test("send all draft lots", async () => {
 })
 
 test("sent selected draft lots", async () => {
+  const user = userEvent.setup()
+
   render(<TransactionsWithRouter status="drafts" entity={operator} />)
 
   await waitWhileLoading()
@@ -183,16 +188,15 @@ test("sent selected draft lots", async () => {
   screen.getByText("2021")
 
   // select the first lot
-  userEvent.click(document.querySelector("li [data-checkbox]")!)
-
-  await waitWhileLoading()
+  await user.click(document.querySelector("li [data-checkbox]")!)
 
   // click on the send selection button
-  userEvent.click(screen.getByText("Envoyer sélection"))
+  await user.click(screen.getByText("Envoyer sélection"))
 
   // confirm the sending
   const title = screen.getByText("Envoyer ce brouillon")
-  clickOnCheckboxesAndConfirm()
+  await clickOnCheckboxesAndConfirm(user)
+
   await waitWhileLoading()
 
   expect(title).not.toBeInTheDocument()

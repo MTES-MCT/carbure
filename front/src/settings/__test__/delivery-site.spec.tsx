@@ -48,26 +48,27 @@ test("check the delivery site section of the settings", async () => {
 })
 
 test("add a delivery site in settings", async () => {
+  const user = userEvent.setup()
   render(<SettingsWithHooks />)
 
   await waitWhileLoading()
 
   const button = screen.getByText("Ajouter un dépôt")
 
-  userEvent.click(button)
+  await user.click(button)
 
   // wait for dialog to open
   const input = getField("Dépôt à ajouter")
-  userEvent.type(input, "Test")
+  await user.type(input, "Test")
 
   const option = await screen.findByText("Test Delivery Site")
-  userEvent.click(option)
+  await user.click(option)
 
   await waitFor(() => {
     expect(input).toHaveValue("Test Delivery Site")
   })
 
-  userEvent.click(screen.getByText("Ajouter"))
+  await user.click(screen.getByText("Ajouter"))
 
   await waitWhileLoading()
 
@@ -78,6 +79,7 @@ test("add a delivery site in settings", async () => {
 })
 
 test("check a delivery site details", async () => {
+  const user = userEvent.setup()
   setDeliverySites([deliverySite])
 
   render(<SettingsWithHooks />)
@@ -85,7 +87,7 @@ test("check a delivery site details", async () => {
   await waitWhileLoading()
 
   const ds = screen.getByText("Test Delivery Site")
-  userEvent.click(ds)
+  await user.click(ds)
 
   const input = getField("Nom du site")
 
@@ -93,6 +95,8 @@ test("check a delivery site details", async () => {
 })
 
 test("remove a delivery site in settings", async () => {
+  const user = userEvent.setup()
+
   setDeliverySites([deliverySite])
 
   render(<SettingsWithHooks />)
@@ -109,8 +113,8 @@ test("remove a delivery site in settings", async () => {
   screen.getByText("Test City, France")
 
   // click on the delete button and then confirm the action on the popup
-  userEvent.click(deleteButton)
-  userEvent.click(screen.getByText("Supprimer"))
+  await user.click(deleteButton)
+  await user.click(screen.getByText("Supprimer"))
 
   await waitWhileLoading()
 

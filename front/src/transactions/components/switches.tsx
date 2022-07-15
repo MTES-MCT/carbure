@@ -22,9 +22,10 @@ export const InvalidSwitch = ({
   >
     <p>
       {!active && <Trans>Parmi ces résultats, </Trans>}
-      <Trans count={count}>
-        <b>{{ count }} lots</b> présentent des <b>incohérences</b>
-      </Trans>
+      <Trans
+        count={count}
+        defaults="<b>{{count}} lots</b> présentent des <b>incohérences</b>"
+      />
     </p>
   </Switch>
 )
@@ -53,10 +54,11 @@ export const DeadlineSwitch = ({
     >
       <p>
         {!active && <Trans>Parmi ces résultats, </Trans>}
-        <Trans count={count}>
-          <b>{{ count }} lots</b> doivent être déclarés avant le{" "}
-          <b>{{ date }}</b>
-        </Trans>
+        <Trans
+          count={count}
+          values={{ date }}
+          defaults="<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>"
+        />
       </p>
     </Switch>
   )

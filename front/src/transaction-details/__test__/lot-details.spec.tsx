@@ -10,7 +10,7 @@ import { LotDetails as LotDetailsData } from "transaction-details/types"
 
 import server from "./api"
 
-import { Data, getField } from "carbure/__test__/helpers"
+import { Data, getField, waitWhileLoading } from "carbure/__test__/helpers"
 import { clickOnCheckboxesAndConfirm } from "../../transactions/__test__/helpers"
 import { setEntity } from "settings/__test__/api"
 import {
@@ -38,7 +38,7 @@ const LotDetailsWithRouter = ({ entity }: { entity: Entity }) => {
           <HashRoute path="lot/:id" element={<LotDetails neighbors={[]} />} />
         }
       />
-      <Route path="/draft/pending" element={<p>EMPTY</p>} />
+      <Route path="/draft/imported" element={<p>EMPTY</p>} />
     </TestRoot>
   )
 }
@@ -96,30 +96,32 @@ test("display transaction details", async () => {
 
   await screen.findByText(/Lot #TEST01/)
 
-  screen.getByDisplayValue("DAETEST")
+  await screen.findByDisplayValue("DAETEST")
 
-  screen.getByDisplayValue("12345")
-  screen.getByDisplayValue("EMHV")
-  screen.getByDisplayValue("Colza")
-  screen.getByDisplayValue("2020-01-31")
-  screen.getAllByDisplayValue("Producteur Test")
-  screen.getByDisplayValue("Test Production Site")
-  screen.getByDisplayValue("2000-01-31")
-  screen.getByDisplayValue("Opérateur Test")
-  screen.getByDisplayValue("Test Delivery Site")
-  screen.getByDisplayValue("12")
-  screen.getByDisplayValue("1")
-  screen.getByDisplayValue("11 gCO2eq/MJ")
-  screen.getByDisplayValue("86,87%")
+  await screen.findByDisplayValue("12345")
+  await screen.findByDisplayValue("EMHV")
+  await screen.findByDisplayValue("Colza")
+  await screen.findByDisplayValue("2020-01-31")
+  await screen.findAllByDisplayValue("Producteur Test")
+  await screen.findByDisplayValue("Test Production Site")
+  await screen.findByDisplayValue("2000-01-31")
+  await screen.findByDisplayValue("Opérateur Test")
+  await screen.findByDisplayValue("Test Delivery Site")
+  await screen.findByDisplayValue("12")
+  await screen.findByDisplayValue("1")
+  await screen.findByDisplayValue("11 gCO2eq/MJ")
+  await screen.findByDisplayValue("86,87%")
 
-  const countries = screen.getAllByDisplayValue("France")
-  const zeros = screen.getAllByDisplayValue("0")
+  const countries = await screen.findAllByDisplayValue("France")
+  const zeros = await screen.findAllByDisplayValue("0")
 
   expect(countries.length).toBe(3)
   expect(zeros.length).toBe(7)
 })
 
 test("edit transaction details", async () => {
+  const user = userEvent.setup()
+
   render(<LotDetailsWithRouter entity={producer} />)
 
   const save: any = await screen.findByText("Sauvegarder")
@@ -127,103 +129,105 @@ test("edit transaction details", async () => {
   screen.getAllByText(/^Lot/)
 
   const dae = getField("N° document d'accompagnement")
-  userEvent.clear(dae)
-  userEvent.type(dae, "DAETEST")
+  await user.clear(dae)
+  await user.type(dae, "DAETEST")
 
   const vol = getField(Flags.preferred_unit ? "Quantité" : "Volume en litres")
-  userEvent.clear(vol)
-  userEvent.type(vol, "20000")
+  await user.clear(vol)
+  await user.type(vol, "20000")
 
   const bio = getField("Biocarburant")
-  userEvent.clear(bio)
-  userEvent.type(bio, "EM")
-  userEvent.click(await screen.findByText("EMHV"))
+  await user.clear(bio)
+  await user.type(bio, "EM")
+  await user.click(await screen.findByText("EMHV"))
   await screen.findByDisplayValue("EMHV")
 
   const mp = getField("Matière première")
-  userEvent.clear(mp)
-  userEvent.type(mp, "Co")
-  userEvent.click(await screen.findByText("Colza"))
+  await user.clear(mp)
+  await user.type(mp, "Co")
+  await user.click(await screen.findByText("Colza"))
   await screen.findByDisplayValue("Colza")
 
   const ct: any = getField("Pays d'origine de la matière première")
-  userEvent.clear(ct)
-  userEvent.type(ct, "Fra")
-  userEvent.click(await screen.findByText("France"))
+  await user.clear(ct)
+  await user.type(ct, "Fra")
+  await user.click(await screen.findByText("France"))
   await screen.findAllByDisplayValue("France")
 
   const dd = getField("Date de livraison")
-  userEvent.clear(dd)
-  userEvent.type(dd, "2021-31-01")
+  await user.clear(dd)
+  await user.type(dd, "2021-31-01")
 
   screen.getAllByDisplayValue("Producteur Test")
 
   const ps = getField("Site de production")
-  userEvent.clear(ps)
-  userEvent.type(ps, "Test")
-  userEvent.click(await screen.findByText("Test Production Site"))
+  await user.clear(ps)
+  await user.type(ps, "Test")
+  await user.click(await screen.findByText("Test Production Site"))
   await screen.findByDisplayValue("Test Production Site")
 
   const cli = getField("Client")
-  userEvent.clear(cli)
-  userEvent.type(cli, "Test")
-  userEvent.click(await screen.findByText("Opérateur Test"))
+  await user.clear(cli)
+  await user.type(cli, "Test")
+  await user.click(await screen.findByText("Opérateur Test"))
   await screen.findByDisplayValue("Opérateur Test")
 
   const ds = getField("Site de livraison")
-  userEvent.clear(ds)
-  userEvent.type(ds, "Test")
-  userEvent.click(await screen.findByText("Test Delivery Site"))
+  await user.clear(ds)
+  await user.type(ds, "Test")
+  await user.click(await screen.findByText("Test Delivery Site"))
   await screen.findByDisplayValue("Test Delivery Site")
 
   const cl = getField("Champ libre")
-  userEvent.clear(cl)
-  userEvent.type(cl, "blabla")
+  await user.clear(cl)
+  await user.type(cl, "blabla")
 
   const eec = getField("EEC")
-  userEvent.clear(eec)
-  userEvent.type(eec, "10")
+  await user.clear(eec)
+  await user.type(eec, "10")
 
   const el = getField("EL")
-  userEvent.clear(el)
-  userEvent.type(el, "1.1")
+  await user.clear(el)
+  await user.type(el, "1.1")
 
   const ep = getField("EP")
-  userEvent.clear(ep)
-  userEvent.type(ep, "1.2")
+  await user.clear(ep)
+  await user.type(ep, "1.2")
 
   const etd = getField("ETD")
-  userEvent.clear(etd)
-  userEvent.type(etd, "1.3")
+  await user.clear(etd)
+  await user.type(etd, "1.3")
 
   const eu = getField("EU")
-  userEvent.clear(eu)
-  userEvent.type(eu, "1.4")
+  await user.clear(eu)
+  await user.type(eu, "1.4")
 
   const esca = getField("ESCA")
-  userEvent.clear(esca)
-  userEvent.type(esca, "1.1")
+  await user.clear(esca)
+  await user.type(esca, "1.1")
 
   const eccs = getField("ECCS")
-  userEvent.clear(eccs)
-  userEvent.type(eccs, "1.2")
+  await user.clear(eccs)
+  await user.type(eccs, "1.2")
 
   const eccr = getField("ECCR")
-  userEvent.clear(eccr)
-  userEvent.type(eccr, "1.3")
+  await user.clear(eccr)
+  await user.type(eccr, "1.3")
 
   const eee = getField("EEE")
-  userEvent.clear(eee)
-  userEvent.type(eee, "1.4")
+  await user.clear(eee)
+  await user.type(eee, "1.4")
 
   expect(save.closest("button")).not.toBeDisabled()
 
-  userEvent.click(save)
+  await user.click(save)
 
   await screen.findByDisplayValue("DAETEST UPDATED")
 }, 30000)
 
 test("check transaction errors", async () => {
+  const user = userEvent.setup()
+
   Data.set("lot-details", errorDetails)
   render(<LotDetailsWithRouter entity={producer} />)
 
@@ -239,7 +243,7 @@ test("check transaction errors", async () => {
   expect(comdate.closest("[data-field]")).toHaveAttribute("data-error")
 
   const errors = screen.getByText("Erreurs (2)")
-  userEvent.click(errors)
+  await user.click(errors)
 
   screen.getByText("Le site de production n'est pas reconnu", {
     selector: "li",
@@ -250,151 +254,175 @@ test("check transaction errors", async () => {
   )
 
   const warnings = screen.getByText("Remarques (1)")
-  userEvent.click(warnings)
+  await user.click(warnings)
 
   screen.getByText("Certificat du site de production absent")
 
-  userEvent.click(screen.getByText("Retour"))
+  await user.click(screen.getByText("Retour"))
 })
 
 test("check transaction comments", async () => {
+  const user = userEvent.setup()
+
   Data.set("lot-details", tofixDetails)
   render(<LotDetailsWithRouter entity={producer} />)
 
   await screen.findByText("En correction")
 
   const comments = screen.getByText("Commentaires (1)")
-  userEvent.click(comments)
+  await user.click(comments)
 
   screen.getByText(/Opérateur Test:/)
   screen.getByText("Ces lots ont été affectés par erreur")
 
-  userEvent.type(
+  await user.type(
     screen.getByPlaceholderText("Entrez un commentaire..."),
     "test ok"
   )
 
-  userEvent.click(screen.getByText("Envoyer"))
+  await user.click(screen.getByText("Envoyer"))
 
   await screen.findByText("Commentaires (2)")
   screen.getByText(/Producteur Test:/)
   screen.getByText("test ok")
 
-  userEvent.click(screen.getByText("Retour"))
+  await user.click(screen.getByText("Retour"))
 })
 
 test("send draft lot from details", async () => {
+  const user = userEvent.setup()
+
   render(<LotDetailsWithRouter entity={producer} />)
 
   // click on the send action
   const send = await screen.findByText("Envoyer")
-  userEvent.click(send)
+  await user.click(send)
 
   // dialog to confirm the sending
   const title = await screen.findByText("Envoyer ce brouillon")
-  clickOnCheckboxesAndConfirm()
+  await clickOnCheckboxesAndConfirm(user)
 
   await screen.findByText("En attente")
   expect(title).not.toBeInTheDocument()
 
-  userEvent.click(screen.getByText("Retour"))
+  await user.click(screen.getByText("Retour"))
 })
 
 test("delete draft lot from details", async () => {
+  const user = userEvent.setup()
+
   render(<LotDetailsWithRouter entity={producer} />)
 
   // click on the send action
   const send = await screen.findByText("Supprimer")
-  userEvent.click(send)
+  await user.click(send)
 
   // dialog to confirm the sending
   const title = screen.getByText("Supprimer ce lot")
-  userEvent.click(screen.getAllByText("Supprimer")[1])
+  await user.click(screen.getAllByText("Supprimer")[1])
 
   await waitFor(() => expect(title).not.toBeInTheDocument())
 })
 
 test("resend tofix lot from details", async () => {
+  const user = userEvent.setup()
+
   Data.set("lot-details", tofixDetails)
   render(<LotDetailsWithRouter entity={producer} />)
 
   // click on the send action
   const send = await screen.findByText("Confirmer la correction")
-  userEvent.click(send)
+  await user.click(send)
 
   // confirm the sending
   const title = screen.getByText("Confirmer la correction", { selector: "h1" })
-  userEvent.click(screen.getByText("Confirmer correction"))
+  await user.click(screen.getByText("Confirmer correction"))
 
   await screen.findByText("Corrigé")
   expect(title).not.toBeInTheDocument()
 
   const comments = screen.getByText("Commentaires (1)")
-  userEvent.click(comments)
+  await user.click(comments)
 
-  userEvent.click(screen.getByText("Retour"))
+  await user.click(screen.getByText("Retour"))
 })
 
 test("delete tofix lot from details", async () => {
+  const user = userEvent.setup()
+
   Data.set("lot-details", rejectedDetails)
   render(<LotDetailsWithRouter entity={producer} />)
 
   // click on the send action
   const send = await screen.findByText("Supprimer")
-  userEvent.click(send)
+  await user.click(send)
 
   // confirm the sending
   const title = screen.getByText("Supprimer ce lot")
-  userEvent.click(screen.getAllByText("Supprimer")[1])
+  await user.click(screen.getAllByText("Supprimer")[1])
 
   await waitFor(() => expect(title).not.toBeInTheDocument())
 })
 
 test("accept inbox lot from details", async () => {
+  const user = userEvent.setup()
+
   Data.set("lot-details", sentDetails)
   render(<LotDetailsWithRouter entity={operator} />)
 
   await screen.findByText("En attente")
 
-  userEvent.click(await screen.findByText("Accepter"))
-  userEvent.click(await screen.findByText("Incorporation"))
+  await user.click(await screen.findByText("Accepter"))
+  await user.click(await screen.findByText("Incorporation"))
 
   // confirm the transaction
   screen.getByText("Incorporation de lot", { selector: "h1" })
-  userEvent.click(screen.getByText("Incorporation"))
+  await user.click(screen.getByText("Incorporation"))
 
   await screen.findByText("Incorporé")
 })
 
 test("accept sous reserve inbox lot from details", async () => {
+  const user = userEvent.setup()
+
   Data.set("lot-details", sentDetails)
 
   render(<LotDetailsWithRouter entity={operator} />)
 
   await screen.findByText("En attente")
 
-  userEvent.click(await screen.findByText("Demander une correction"))
+  await user.click(await screen.findByText("Demander une correction"))
 
   screen.getByText("Demander une correction", { selector: "h1" })
-  userEvent.type(getField("Commentaire"), "test is incorrect") // prettier-ignore
-  userEvent.click(screen.getByText("Demander correction"))
+  await user.type(getField("Commentaire"), "test is incorrect") // prettier-ignore
+  await user.click(screen.getByText("Demander correction"))
 
   await screen.findByText("En correction")
 })
 
 test("reject inbox lot from details", async () => {
+  const user = userEvent.setup()
+
   Data.set("lot-details", sentDetails)
 
   render(<LotDetailsWithRouter entity={operator} />)
 
+  await waitWhileLoading()
+
   await screen.findByText("En attente")
 
-  userEvent.click(await screen.findByText("Refuser"))
+  await user.click(await screen.findByText("Refuser"))
 
   // confirm the transaction
-  screen.getByText("Refuser ce lot", { selector: "h1" })
-  userEvent.type(getField("Commentaire"), "not for me") // prettier-ignore
-  userEvent.click(screen.getAllByText("Refuser")[1])
+  await screen.findByText("Refuser ce lot", { selector: "h1" })
+  const rejectButton = screen.getAllByText("Refuser")[1]
+  expect(rejectButton).toBeDisabled()
+  const comment = getField("Commentaire")
+  await user.type(comment, "not for me") // prettier-ignore
+  expect(rejectButton).not.toBeDisabled()
+  await user.click(rejectButton)
+
+  await waitWhileLoading()
 
   await screen.findByText("Refusé")
 })
@@ -461,12 +489,10 @@ test("transaction details form as operator - producer trades unknown producer lo
   checkGESFields()
 
   await screen.findByDisplayValue("Unknown Producer")
-  expect(getField("Fournisseur")).toHaveValue("Producteur Test")
-  expect(getField("Certificat du fournisseur")).toHaveValue("ISCC1000 - Vendor")
-  expect(getField("Site de production")).toHaveValue("Unknown Production Site")
-  expect(getField("Certificat du site de production")).toHaveValue(
-    "2BS - KNOWN PSITE"
-  )
+  await screen.findByDisplayValue("Producteur Test")
+  await screen.findByDisplayValue("ISCC1000 - Vendor")
+  await screen.findByDisplayValue("Unknown Production Site")
+  await screen.findByDisplayValue("2BS - KNOWN PSITE")
   expect(getField("Pays de production")).toHaveValue("France")
 })
 
@@ -484,6 +510,10 @@ test("transaction details form as operator - operator self accepts lot", async (
 
   render(<LotDetailsWithRouter entity={operator} />)
 
+  await waitWhileLoading()
+
+  // screen.debug(undefined, Infinity)
+
   await screen.findByDisplayValue("DAETEST")
 
   checkLotFields()
@@ -493,13 +523,9 @@ test("transaction details form as operator - operator self accepts lot", async (
   checkGESFields()
 
   await screen.findByDisplayValue("Unknown Producer")
-  expect(getField("Fournisseur")).toHaveValue("Unknown Supplier")
-  expect(getField("Certificat du fournisseur")).toHaveValue(
-    "ISCC2000 - Supplier"
-  )
-  expect(getField("Site de production")).toHaveValue("Unknown Production Site")
-  expect(getField("Certificat du site de production")).toHaveValue(
-    "2BS - KNOWN PSITE"
-  )
-  expect(getField("Pays de production")).toHaveValue("France")
+  await screen.findByDisplayValue("Unknown Supplier")
+  await screen.findByDisplayValue("ISCC2000 - Supplier")
+  await screen.findByDisplayValue("Unknown Production Site")
+  await screen.findByDisplayValue("2BS - KNOWN PSITE")
+  await screen.findAllByDisplayValue("France")
 })

@@ -1,5 +1,5 @@
 import React, { Suspense } from "react"
-import ReactDOM from "react-dom"
+import { createRoot } from "react-dom/client"
 import { BrowserRouter } from "react-router-dom"
 
 import "./i18n"
@@ -10,7 +10,7 @@ import Carbure from "./carbure"
 import { MatomoProvider } from "./matomo"
 import { LoaderOverlay } from "common/components/scaffold"
 
-ReactDOM.render(
+createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter basename="/app">
       <MatomoProvider>
@@ -19,8 +19,7 @@ ReactDOM.render(
         </Suspense>
       </MatomoProvider>
     </BrowserRouter>
-  </React.StrictMode>,
-  document.getElementById("root")
+  </React.StrictMode>
 )
 
 // If you want your app to work offline and load faster, you can change

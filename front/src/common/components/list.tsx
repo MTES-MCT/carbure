@@ -121,7 +121,7 @@ export function List<T, V>({
 
   function renderItems(items: Normalized<T, V>[], level: number = 0) {
     if (items.length === 0) {
-      return <li>{i18next.t("Aucune entrée trouvée")}</li>
+      return <li>{i18next.t("Aucune entrée trouvée") as string}</li>
     }
 
     return items.map(({ value, label, children, disabled, data }) => {

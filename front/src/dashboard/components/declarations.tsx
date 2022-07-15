@@ -194,7 +194,7 @@ function getEntityDeclarationsByPeriod(declarations: DashboardDeclaration[]) {
 
 function getDeclarationDashboardColumns(period: string) {
   const entityColumn: Column<any> = {
-    header: i18next.t("Entité"),
+    header: i18next.t("Entité") as string,
     cell: (d) => <Cell style={{ paddingLeft: 20 }} text={d.entity} />,
   }
 

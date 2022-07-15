@@ -227,10 +227,10 @@ export const DeclarationDialog = () => {
           {declaration && declaration.pending > 0 && (
             <Alert variant="warning" icon={AlertCircle}>
               <p>
-                <Trans count={declaration.pending}>
-                  Encore <b>{{ count: declaration.pending }} lots</b> en attente
-                  de validation
-                </Trans>
+                <Trans
+                  count={declaration.pending}
+                  defaults="Encore <b>{{count}} lots</b> en attente de validation"
+                />
               </p>
             </Alert>
           )}

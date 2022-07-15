@@ -23,6 +23,7 @@ export const producer: Entity = {
   registration_id: "",
   sustainability_officer: "",
   sustainability_officer_phone_number: "",
+  preferred_unit: "l",
 }
 
 export const trader: Entity = {
@@ -39,6 +40,7 @@ export const trader: Entity = {
   registration_id: "",
   sustainability_officer: "",
   sustainability_officer_phone_number: "",
+  preferred_unit: "l",
 }
 
 export const operator: Entity = {
@@ -55,6 +57,7 @@ export const operator: Entity = {
   registration_id: "",
   sustainability_officer: "",
   sustainability_officer_phone_number: "",
+  preferred_unit: "l",
 }
 
 export const admin: Entity = {
@@ -71,6 +74,7 @@ export const admin: Entity = {
   registration_id: "",
   sustainability_officer: "",
   sustainability_officer_phone_number: "",
+  preferred_unit: "l",
 }
 
 // COUNTRIES

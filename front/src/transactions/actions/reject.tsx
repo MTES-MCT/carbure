@@ -148,7 +148,19 @@ const RejectDialog = ({
           })}
         </section>
         <section>
-          <Form id="reject">
+          <Form
+            id="reject"
+            onSubmit={() => {
+              // matomo.push([
+              //   "trackEvent",
+              //   "lot-corrections",
+              //   "client-reject-lot",
+              //   "",
+              //   selection.length,
+              // ])
+              rejectLots.execute(query, selection, comment)
+            }}
+          >
             <TextInput
               autoFocus
               required
@@ -165,19 +177,10 @@ const RejectDialog = ({
           asideX
           submit="reject"
           loading={rejectLots.loading}
+          disabled={comment.length === 0}
           variant="danger"
           icon={Cross}
           label={t("Refuser")}
-          action={() => {
-            matomo.push([
-              "trackEvent",
-              "lot-corrections",
-              "client-reject-lot",
-              "",
-              selection.length,
-            ])
-            rejectLots.execute(query, selection, comment)
-          }}
         />
         <Button
           disabled={rejectLots.loading}

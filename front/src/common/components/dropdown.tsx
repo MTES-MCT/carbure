@@ -34,7 +34,7 @@ export const Dropdown = ({
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   const setOpen = useCallback(
-    (willOpen) => {
+    (willOpen: boolean) => {
       if (willOpen !== open) {
         _setOpen(willOpen)
         if (willOpen) onOpen?.()

@@ -18,16 +18,16 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 test("display transaction details", async () => {
+  const user = userEvent.setup()
+
   render(<DeclarationSummary />)
 
   await waitWhileLoading()
 
   screen.getByText("Déclaration de durabilité")
 
-  userEvent.click(screen.getByDisplayValue("Choisissez un mois"))
-  userEvent.click(screen.getByText("Janvier : 2 lots"))
-
-  await waitWhileLoading()
+  await user.click(screen.getByDisplayValue("Choisissez un mois"))
+  await user.click(screen.getByText("Janvier : 2 lots"))
 
   screen.getByText(/Lots reçus/)
   screen.getByText(/Lots envoyés/)
