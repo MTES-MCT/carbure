@@ -17,5 +17,5 @@ export function acceptUserRightsRequest(entity_id: number, request_id: number) {
 }
 
 export function changeUserRole(entity_id: number, email : string, role: UserRole) {
-  return api.post("/v3/settings/change-user-role", { entity_id, email, role })
+  return api.post("/settings/change-user-role", { entity_id, email, role })
 }
