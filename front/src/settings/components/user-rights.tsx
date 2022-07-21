@@ -255,6 +255,8 @@ export const UserRoleDialog = ({ onClose, request }: UserRightsProps) => {
   const userEmail = request.user[0]
 
   const changeUserRole = useMutation(api.changeUserRole, {
+    invalidates: ["entity-rights"],
+
     onSuccess: () => {
       notify(t("Le rôle de l'utilisateur a été modifié !"), { variant: "success" })
       onClose()
