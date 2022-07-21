@@ -73,13 +73,13 @@ test("use the access request menu", async () => {
   await screen.findByText("Producteur Test")
 
   // click an the Trader option to select it
-  user.click(screen.getByText("Trader Test"))
+  await user.click(screen.getByText("Trader Test"))
 
   // check that the the input has the right selected value
   await screen.findByDisplayValue("Trader Test")
 
   // validate the choice by clicking the submit button
-  user.click(screen.getByText("Demander l'accès"))
+  await user.click(screen.getByText("Demander l'accès"))
 
   await waitWhileLoading()
 
