@@ -1,4 +1,3 @@
-import traceback
 from django.contrib.auth import get_user_model
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
@@ -28,18 +27,19 @@ def change_user_role(request, *args, **kwargs):
         return ErrorResponse(404, ChangeUserRoleError.MISSING_USER)
 
     try:
-        rights = UserRights.objects.get(user=user, entity_id=entity_id)
-        rights_request = UserRightsRequests.objects.get(user=user, entity_id=entity_id)
+        rights = UserRights.objects.filter(user=user, entity_id=entity_id).first()
+        rights_request = UserRightsRequests.objects.filter(user=user, entity_id=entity_id).first()
     except:
-        return ErrorResponse(400, ChangeUserRoleError.NO_PRIOR_RIGHTS)
+        pass
 
     try:
-        rights.role = role
-        rights.save()
-        rights_request.role = role
-        rights_request.save()
+        if rights:
+            rights.role = role
+            rights.save()
+        if rights_request:
+            rights_request.role = role
+            rights_request.save()
     except:
-        traceback.print_exc()
         return ErrorResponse(400, ChangeUserRoleError.UPDATE_FAILED)
 
     return SuccessResponse()
