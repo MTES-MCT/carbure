@@ -229,17 +229,14 @@ const RevokeUserButton = ({ request }: UserActionButton) => {
 const EditUserRightsButton = ({ request }: UserActionButton) => {
   const { t } = useTranslation()
   const portal = usePortal()
-  // const entity = useEntity()
-  // const user = request.user[0]
 
   return (
     <Button
       captive
       variant="icon"
       icon={Edit}
-      title={t("Modifier droits d'accès")}
-      action={() => portal((close) => <UserRightsDialog onClose={close} request={request} />)}
-
+      title={t("Modifier le rôle")}
+      action={() => portal((close) => <UserRoleDialog onClose={close} request={request} />)}
     />
   )
 }
@@ -250,41 +247,36 @@ export interface UserRightsProps {
   request: UserRightRequest
 }
 
-export const UserRightsDialog = ({ onClose, request }: UserRightsProps) => {
+export const UserRoleDialog = ({ onClose, request }: UserRightsProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
   const entity = useEntity()
-
   const [role, setRole] = useState<UserRole | undefined>(request.role)
   const userEmail = request.user[0]
-  const userId = request.id
 
-  const editUserRights = useMutation(api.editUserRights, {
-    // invalidates: ["user-settings"],
+  const changeUserRole = useMutation(api.changeUserRole, {
     onSuccess: () => {
-      notify(t("Les droits d'accès ont été modifiés !"), { variant: "success" })
+      notify(t("Le rôle de l'utilisateur a été modifié !"), { variant: "success" })
       onClose()
     },
     onError: () => {
-      notify(t("Les droits d'accès n'ont pas pu être modifiés."), { variant: "danger" })
+      notify(t("Le rôle de l'utilisateur n'a pas pu être modifié !"), { variant: "danger" })
     }
   })
 
   const handleSubmit = async () => {
-    // matomo.push(["trackEvent", "account", "edit-access-right"])
-    await editUserRights.execute(entity!.id, userId, role!)
-  
+    await changeUserRole.execute(entity.id, userEmail, role!)
   }
 
   return (
     <Dialog onClose={onClose}>
       <header>
-        <h1>{t("Modifier droits d'accès")}</h1>
+        <h1>{t("Modifier le rôle")}</h1>
       </header>
       <main>
       <section> 
           {t(
-            "Modifier les droits d'accès de l'utilisateur {{userEmail}} ?",
+            "Modifier le role de l'utilisateur {{userEmail}} ?",
             { userEmail }
           )}
         </section>
@@ -293,7 +285,6 @@ export const UserRightsDialog = ({ onClose, request }: UserRightsProps) => {
             id="access-right"
             onSubmit={handleSubmit}
           >
-
             <RadioGroup
               label={t("Rôle")}
               name="role"
@@ -311,11 +302,7 @@ export const UserRightsDialog = ({ onClose, request }: UserRightsProps) => {
                 {
                   value: UserRole.Admin,
                   label: t("Administration (contrôle complet de la société sur CarbuRe)"), // prettier-ignore
-                },
-                // {
-                //   value: UserRole.Auditor,
-                //   label: t("Audit (accès spécial pour auditeurs)"),
-                // },
+                }  
               ]}
             />
           </Form>
@@ -325,9 +312,9 @@ export const UserRightsDialog = ({ onClose, request }: UserRightsProps) => {
       <footer>
         <Button
           variant="primary"
-          loading={editUserRights.loading}
+          loading={changeUserRole.loading}
           icon={Edit}
-          label={t("Modifier les droits")}
+          label={t("Modifier le rôle")}
           disabled={!entity || !role}
           submit="access-right"
         />
