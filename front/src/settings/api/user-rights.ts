@@ -1,5 +1,6 @@
 import api, { Api } from "common/services/api"
 import { EntityRights } from "settings/types"
+import { UserRole } from 'carbure/types';
 
 export function getEntityRights(entity_id: number) {
   return api.get<Api<EntityRights>>("/v3/settings/get-entity-rights", {
@@ -13,4 +14,8 @@ export function revokeUserRights(entity_id: number, email: string) {
 
 export function acceptUserRightsRequest(entity_id: number, request_id: number) {
   return api.post("/v3/settings/accept-user", { entity_id, request_id })
+}
+
+export function editUserRights(entity_id: number, user_id : number, role: UserRole) {
+  return api.post("/v3/settings/edit-user-rights", { entity_id, user_id, role })
 }
