@@ -409,15 +409,17 @@ export const Field = ({
   const icon =
     loading === true ? (
       <Loader passthrough />
-    ) : error ? (
-      <AlertTriangle title={error} />
     ) : typeof Icon === "function" ? (
       <Icon />
     ) : Icon !== undefined ? (
       Icon
+    ) : error ? (
+      <AlertTriangle title={error} />
     ) : loading === false ? (
       <Placeholder />
     ) : null
+
+  console.log({ error, Icon })
 
   return (
     <div
