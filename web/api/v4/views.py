@@ -573,15 +573,9 @@ def add_excel(request, *args, **kwargs):
         e.metadata = {'source': 'EXCEL'}
         e.save()
         if lot.parent_stock:
-            rounded_volume = round(lot.volume, 2)
-            stock = CarbureStock.objects.get(id=lot.parent_stock.id) # force fetch in db to get the actual uncached remaining_volume
-            stock.remaining_volume = round(stock.remaining_volume - rounded_volume, 2)
-            stock.remaining_weight = stock.get_weight()
-            stock.remaining_lhv_amount = stock.get_lhv_amount()
-            stock.save()
             event = CarbureStockEvent()
             event.event_type = CarbureStockEvent.SPLIT
-            event.stock = stock
+            event.stock = lot.parent_stock
             event.user = request.user
             event.metadata = {'message': 'Envoi lot.', 'volume_to_deduct': lot.volume}
             event.save()
@@ -1621,7 +1615,7 @@ def validate_declaration(request, *args, **kwargs):
     background_bulk_scoring(lots_to_freeze)
 
     lots_to_freeze = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True)
-    lots_to_freeze.update(lot_status=CarbureLot.FROZEN)   
+    lots_to_freeze.update(lot_status=CarbureLot.FROZEN)
     #bulk_scoring(lots_to_freeze)
     background_bulk_scoring(lots_to_freeze)
 
