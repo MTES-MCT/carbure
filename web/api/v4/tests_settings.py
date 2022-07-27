@@ -25,7 +25,7 @@ class SettingsTest(TestCase):
 
     def test_change_user_role_missing_user(self):
         res = self.client.post(Endpoint.change_user_role, {'email': 'missing@carbure.test', 'entity_id': self.entity.id, 'role': 'RW'})
-        self.assertEqual(res.status_code, 404)
+        self.assertEqual(res.status_code, 400)
         data = res.json()
         self.assertEqual(data['error'], 'MISSING_USER')
 
