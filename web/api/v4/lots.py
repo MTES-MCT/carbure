@@ -166,6 +166,35 @@ def fill_basic_info(lot, data, prefetched_data):
                 lot.country_of_origin = countries[country_code]
     return errors
 
+def compute_lot_quantity(lot, data):
+    volume = None
+    weight = None
+    lhv_amount = None
+
+    if 'quantity' in data and 'unit' in data:
+        quantity = round(float(data.get('quantity')), 2)
+        unit = data.get('unit')
+    elif 'volume' in data:
+        quantity = round(float(data.get('volume')), 2)
+        unit = CarbureUnit.LITER
+    else:
+        raise Exception("No quantity or volume was specified")
+
+    if unit == CarbureUnit.LITER:
+        volume = quantity
+        weight = round(volume * lot.biofuel.masse_volumique, 2)
+        lhv_amount = round(volume * lot.biofuel.pci_litre, 2)
+    elif unit == CarbureUnit.KILOGRAM:
+        weight = quantity
+        volume = round(weight / lot.biofuel.masse_volumique, 2)
+        lhv_amount = round(volume * lot.biofuel.pci_litre, 2)
+    elif unit == CarbureUnit.LHV:
+        lhv_amount = quantity
+        volume = round(lhv_amount / lot.biofuel.pci_litre, 2)
+        weight = round(volume * lot.biofuel.masse_volumique, 2)
+
+    return {'volume': volume, 'weight': weight, 'lhv_amount': lhv_amount}
+
 def fill_volume_info(lot, data):
     errors = []
     ### VOLUME
@@ -173,76 +202,44 @@ def fill_volume_info(lot, data):
         # UPDATING VOLUME OF A LOT COMING FROM A STOCK SPLIT
         # 1) check volume diff
         try:
-            new_volume = round(abs(float(data.get('volume', 0))), 2)
-        except Exception:
-            new_volume = 0
-            errors.append(GenericError(lot=lot, field='volume', error=VOLUME_FORMAT_INCORRECT, display_to_creator=True, is_blocking=True))       
-        diff = round(lot.volume - new_volume, 2)
-        # 2) if new volume > old volume, ensure we have enough stock
-        if diff < 0 and lot.parent_stock.remaining_volume < abs(diff):
-            # not enough stock remaining, dont change anything
-            errors.append(GenericError(lot=lot, field='volume', error=CarbureStockErrors.NOT_ENOUGH_VOLUME_LEFT, display_to_creator=True))
-        else:
-            # all good
-            lot.volume = new_volume
-            lot.weight = lot.get_weight()
-            lot.lhv_amount = lot.get_lhv_amount()            
-            lot.parent_stock.remaining_volume = round(lot.parent_stock.remaining_volume + diff, 2)
-            lot.parent_stock.remaining_weight = lot.parent_stock.get_weight()
-            lot.parent_stock.remaining_lhv_amount = lot.parent_stock.get_lhv_amount()
-            lot.parent_stock.save()
-    elif lot.parent_lot is None:
-        volume = data.get('volume', None)
-        if not volume:
-            unit = data.get('unit', '').lower()
-            if not unit:
-                errors.append(GenericError(lot=lot, field='volume', error=MISSING_VOLUME, display_to_creator=True, is_blocking=True))
+            quantity = compute_lot_quantity(lot, data)
+            diff = round(lot.volume - quantity['volume'], 2)
+            # 2) if new volume > old volume, ensure we have enough stock
+            if diff < 0 and lot.parent_stock.remaining_volume < abs(diff):
+                # not enough stock remaining, dont change anything
+                errors.append(GenericError(lot=lot, field='volume', error=CarbureStockErrors.NOT_ENOUGH_VOLUME_LEFT, display_to_creator=True))
             else:
-                quantity = data.get('quantity', 0)
-                try:
-                    quantity = round(abs(float(quantity)), 2)
-                except:
-                    quantity = 0
-                    errors.append(GenericError(lot=lot, field='volume', error=VOLUME_FORMAT_INCORRECT, display_to_creator=True, is_blocking=True))
-                if unit == CarbureUnit.KILOGRAM:
-                    lot.weight = quantity
-                    lot.volume = lot.get_volume()
-                    lot.lhv_amount = lot.get_lhv_amount()                    
-                elif unit == CarbureUnit.LHV:
-                    lot.lhv_amount = quantity
-                    lot.volume = round(lot.lhv_amount / lot.biofuel.pci_litre, 2)
-                    lot.weight = lot.get_weight()
-                elif unit == CarbureUnit.LITER:
-                    lot.volume = quantity
-                    lot.weight = lot.get_weight()
-                    lot.lhv_amount = lot.get_lhv_amount()     
-                else:
-                    errors.append(GenericError(lot=lot, field='volume', error=UNKNOWN_UNIT, display_to_creator=True, is_blocking=True))
-        else:
-            # let's actually read the volume entered in the form/excel and try to parse it as a float
-            try:
-                volume = round(abs(float(volume)), 2)
-                if lot.volume != 0 and volume != lot.volume:
-                    lot.volume = volume
-                else:
-                    # initial volume setting or override
-                    lot.volume = volume
-            except Exception:
-                lot.volume = 0
-                errors.append(GenericError(lot=lot, field='volume', error=VOLUME_FORMAT_INCORRECT, display_to_creator=True, is_blocking=True))
-            lot.weight = lot.get_weight()
-            lot.lhv_amount = lot.get_lhv_amount()
+                # all good
+                lot.volume = quantity['volume']
+                lot.weight = quantity['weight']
+                lot.lhv_amount = quantity['lhv_amount']
+                lot.parent_stock.remaining_volume = round(lot.parent_stock.remaining_volume + diff, 2)
+                lot.parent_stock.remaining_weight = lot.parent_stock.get_weight()
+                lot.parent_stock.remaining_lhv_amount = lot.parent_stock.get_lhv_amount()
+                lot.parent_stock.save()
+        except Exception:
+            errors.append(GenericError(lot=lot, field='volume', error=VOLUME_FORMAT_INCORRECT, display_to_creator=True, is_blocking=True))
+
+    elif lot.parent_lot is None:
+        try:
+            quantity = compute_lot_quantity(lot, data)
+            lot.volume = quantity['volume']
+            lot.weight = quantity['weight']
+            lot.lhv_amount = quantity['lhv_amount']
+        except:
+            traceback.print_exc()
+            errors.append(GenericError(lot=lot, field='volume', error=VOLUME_FORMAT_INCORRECT, display_to_creator=True, is_blocking=True))
     return errors
 
 def fill_supplier_info(lot, data, entity):
     errors = []
-    # definitions: 
+    # definitions:
     # supplier = my supplier - who supplied the biofuel to me
     # vendor = me (as a producer or trader)
 
     # OPERATOR: no vendor_certificate and supplier_certificate is mandatory (and becomes lot.supplier_certificate)
     # PRODUCER: no vendor_certificate and supplier_certificate is mandatory (and becomes lot.supplier_certificate)
-    # TRADER: supplier_certificate optional (lot.supplier_certificate of lot1), 
+    # TRADER: supplier_certificate optional (lot.supplier_certificate of lot1),
     #         vendor_certificate mandatory (and becomes lot.supplier_certificate of lot2)
 
     # default values
