@@ -419,8 +419,6 @@ export const Field = ({
       <Placeholder />
     ) : null
 
-  console.log({ error, Icon })
-
   return (
     <div
       data-field
