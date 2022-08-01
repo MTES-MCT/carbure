@@ -15,7 +15,7 @@ RESIDUS_VINIQUES,Résidus viniques,1,0,1,0,1,ANN-IX-A
 SOJA,Soja,0,1,0,1,1,CONV
 TOURNESOL,Tournesol,0,1,0,1,1,CONV
 GLYCERINE_BRUTE,Glycérine brute,1,1,1,0,1,ANN-IX-A
-DECHETS_BOIS,Déchets de bois,1,0,1,0,1,ANN-IX-A
+DECHETS_BOIS,Déchets de bois,1,1,1,0,1,ANN-IX-A
 DECHETS_INDUSTRIELS,Déchets industriels,1,1,1,0,1,ANN-IX-A
 ALGUES,Algues,1,1,1,0,1,ANN-IX-A
 PAILLE,Paille,1,0,1,0,1,ANN-IX-A
