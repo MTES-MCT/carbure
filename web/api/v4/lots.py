@@ -171,10 +171,10 @@ def compute_lot_quantity(lot, data):
     weight = None
     lhv_amount = None
 
-    if 'quantity' in data and 'unit' in data:
+    if data.get('quantity') is not None and data.get('unit') is not None:
         quantity = round(float(data.get('quantity')), 2)
         unit = data.get('unit')
-    elif 'volume' in data:
+    elif data.get('volume') is not None:
         quantity = round(float(data.get('volume')), 2)
         unit = CarbureUnit.LITER
     else:
