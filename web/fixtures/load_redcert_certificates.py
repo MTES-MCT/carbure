@@ -9,7 +9,7 @@ from django.conf import settings
 import openpyxl
 import pandas as pd
 from typing import TYPE_CHECKING, Dict, List, Optional
-from pandas._typing import FilePathOrBuffer, Scalar
+from pandas._typing import Scalar
 
 from django.core.mail import send_mail
 from django.db import transaction
