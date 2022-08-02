@@ -4,6 +4,7 @@ import csv
 import calendar
 import datetime
 import argparse
+from django.conf import settings
 from django.core.mail import send_mail
 from django.db import transaction
 import pandas as pd
@@ -25,7 +26,7 @@ def load_certificates():
     new = []
     filename = '%s/Certificates_%s.csv' % (CSV_FOLDER, today.strftime('%Y-%m-%d'))
     df = pd.read_csv(filename, sep=',', quotechar='"', lineterminator="\n")
-    df.fillna('', inplace=True)    
+    df.fillna('', inplace=True)
     for i, row in df.iterrows():
         try:
             if '.' in row['valid_from']:
@@ -42,7 +43,7 @@ def load_certificates():
         try:
             if '.' in row['valid_until']:
                 vu = row['valid_until'].split('.')
-                valid_until = datetime.date(year=2000 + int(vu[2]), month=int(vu[1]), day=int(vu[0]))                
+                valid_until = datetime.date(year=2000 + int(vu[2]), month=int(vu[1]), day=int(vu[0]))
             elif '-' in row['valid_until']:
                 valid_until = datetime.datetime.strptime(row['valid_until'], '%Y-%m-%d').date()
             else:
@@ -84,7 +85,7 @@ def summary(nb, new, args):
     mail_content = "Güten Früden, <br />\n"
     mail_content += "Le chargement des certificats ISCC s'est bien passé.<br />\n"
     mail_content += "%d certificats ont été chargés<br />\n" % (nb)
-    
+
     if not len(new):
         mail_content += "Aucun nouveau certificat détecté<br />\n"
     else:
@@ -92,15 +93,12 @@ def summary(nb, new, args):
             mail_content += "Nouveau certificat ISCC détecté: [%s] - [%s]<br />\n" % (nc.certificate_id, nc.certificate_holder)
 
     if args.email:
-        if args.test:
-            dst = ['martin.planes@beta.gouv.fr']
-        else:
-            dst = ['carbure@beta.gouv.fr']
-        send_mail('Certificats ISCC - %d certificats - %d nouveaux' % (nb, len(new)), mail_content, 'carbure@beta.gouv.fr', dst, fail_silently=False)
+        dst = ['carbure@beta.gouv.fr']
+        send_mail('Certificats ISCC - %d certificats - %d nouveaux' % (nb, len(new)), mail_content, settings.DEFAULT_FROM_EMAIL, dst, fail_silently=False)
     else:
         print(mail_content)
-        
-        
+
+
 def main(args):
     load_certificates()
     nb_certificates, new_certificates = load_certificates()
@@ -109,7 +107,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Load ISCC certificates in database')
     parser.add_argument('--email', dest='email', action='store_true', default=False, help='Send a summary email')
-    parser.add_argument('--test', dest='test', action='store_true', default=False, help='Send summary email to developers only')    
-    args = parser.parse_args()    
+    parser.add_argument('--test', dest='test', action='store_true', default=False, help='Send summary email to developers only')
+    args = parser.parse_args()
     main(args)
 

@@ -165,7 +165,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 SESSION_COOKIE_AGE = 60*60*24*30 # 30 days
 
-DEFAULT_FROM_EMAIL = "contact@carbure.beta.gouv.fr"
+DEFAULT_FROM_EMAIL = "noreply@carbure.beta.gouv.fr"
 if env('IMAGE_TAG') in ['dev', 'staging', 'prod']:
     EMAIL_HOST = env('EMAIL_HOST')
     EMAIL_PORT = env('EMAIL_PORT')
