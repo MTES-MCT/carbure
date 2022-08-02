@@ -50,8 +50,9 @@ export function useNavigation(neighbors: number[]) {
   const prev = useCallback(() => {
     if (hasPrev) {
       navigate({
-        pathname: `${root}/${neighbors[index - 1]}`,
+        pathname: location.pathname,
         search: location.search,
+        hash: `${root}/${neighbors[index - 1]}`,
       })
     }
   }, [neighbors, root, hasPrev, index, navigate, location])
