@@ -5,6 +5,7 @@ import calendar
 import datetime
 import re
 import argparse
+from django.conf import settings
 import openpyxl
 import pandas as pd
 from typing import TYPE_CHECKING, Dict, List, Optional
@@ -55,7 +56,7 @@ def load_certificates():
     new = []
     invalidated = []
     existing = {c.certificate_id: c for c in GenericCertificate.objects.filter(certificate_type=GenericCertificate.REDCERT)}
-    
+
     filename = '%s/REDcert-certificates.xlsx' % (CSV_FOLDER)
     wb = openpyxl.load_workbook(filename, data_only=True)
     sheet = wb.worksheets[0]
@@ -64,7 +65,7 @@ def load_certificates():
     data = data[1:]
     df = pd.DataFrame(data, columns=column_names)
     df.fillna('', inplace=True)
-    total_certs = len(df)    
+    total_certs = len(df)
     i = 0
     for row in df.iterrows():
         i += 1
@@ -80,7 +81,7 @@ def load_certificates():
         #Certification body                       TÜV NORD CERT GmbH
         #Type                              Certificate REDcert² Chem
         #State                                                 Valid
-        #Type of biomass  
+        #Type of biomass
         valid_from = datetime.datetime.strptime(cert['Valid from'], "%d.%m.%Y").date()
         valid_until = datetime.datetime.strptime(cert['Valid until'], "%d.%m.%Y").date()
         if cert.Identifier in existing:
@@ -115,7 +116,7 @@ def summary(args, nb_certificates, new_certificates, newly_invalidated_certifica
     mail_content = "Hallo, <br />\n"
     mail_content += "Das Kärgement für zertificaten REDCert ist gut.<br />\n"
     mail_content += "%d zertificaten loaded<br />\n" % (nb_certificates)
-    
+
     if len(new_certificates):
         mail_content += "Nouveaux certificats enregistrés:<br />\n"
         for nc in new_certificates:
@@ -130,19 +131,16 @@ def summary(args, nb_certificates, new_certificates, newly_invalidated_certifica
             mail_content += '%s - %s' % (previous.certificate_id, previous.certificate_holder)
             mail_content += '<br />'
             mail_content += "Date de validité précédente: %s<br />" % (prev_valid_date)
-            mail_content += "Nouvelle Date de validité: %s<br />" % (new_valid_date)            
+            mail_content += "Nouvelle Date de validité: %s<br />" % (new_valid_date)
             mail_content += '<br />'
 
     subject = "Certificats REDCert"
     if fraud:
         subject += ' - ACHTUNG FRAUDE -'
-    if args.email:
         dst = ['carbure@beta.gouv.fr']
-        if args.test:
-            dst = ['martin.planes@beta.gouv.fr']            
-        send_mail(subject, mail_content, 'carbure@beta.gouv.fr', dst, fail_silently=False)
+        send_mail(subject, mail_content, settings.DEFAULT_FROM_EMAIL, dst, fail_silently=False)
     else:
-        print(mail_content)        
+        print(mail_content)
 
 def main(args):
     nb_certificates, new_certificates, newly_invalidated_certificates = load_certificates()
@@ -151,6 +149,6 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Load REDCert certificates in database')
     parser.add_argument('--email', dest='email', action='store_true', default=False, help='Send a summary email')
-    parser.add_argument('--test', dest='test', action='store_true', default=False, help='Send summary email to developers')    
-    args = parser.parse_args()    
+    parser.add_argument('--test', dest='test', action='store_true', default=False, help='Send summary email to developers')
+    args = parser.parse_args()
     main(args)

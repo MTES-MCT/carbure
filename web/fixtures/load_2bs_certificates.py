@@ -6,6 +6,7 @@ import datetime
 import re
 import argparse
 import unicodedata
+from django.conf import settings
 from django.core.mail import send_mail
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
@@ -22,7 +23,7 @@ def load_certificates(valid=True):
     if valid:
         filename = '%s/Certificates2BS_%s.csv' % (CSV_FOLDER, today.strftime('%Y-%m-%d'))
     else:
-        filename = '%s/Certificates2BS_invalid_%s.csv' % (CSV_FOLDER, today.strftime('%Y-%m-%d'))        
+        filename = '%s/Certificates2BS_invalid_%s.csv' % (CSV_FOLDER, today.strftime('%Y-%m-%d'))
     csvfile = open(filename, 'r')
     reader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
     i = 0
@@ -41,7 +42,7 @@ def load_certificates(valid=True):
             valid_until = datetime.date(year=int(vu[2]), month=int(vu[1]), day=int(vu[0]))
         except:
             valid_until = datetime.date(year=1970, month=1, day=1)
-            
+
         d = {
             'certificate_type': GenericCertificate.DBS,
             'certificate_holder': unicodedata.normalize('NFKD', row['Nom']),
@@ -70,7 +71,7 @@ def summary(nb_valid, nb_invalid, new_valids, new_invalids, args):
     mail_content = "Güten Früden, <br />\n"
     mail_content += "Le chargement des certificats 2BS s'est bien passé.<br />\n"
     mail_content += "%d certificats valides et %d certificats invalides ont été chargés<br />\n" % (nb_valid, nb_invalid)
-    
+
     if not len(new_valids):
         mail_content += "Aucun nouveau certificat détecté<br />\n"
     else:
@@ -80,15 +81,13 @@ def summary(nb_valid, nb_invalid, new_valids, new_invalids, args):
     if len(new_invalids):
         for nc in new_invalids:
             mail_content += "INVALIDATION. Certificat 2BS annulé ou périmé: [%s] - [%s]<br />\n" % (nc.certificate_id, nc.certificate_holder)
-            
+
     if args.email:
         dst = ['carbure@beta.gouv.fr']
-        if args.test:
-            dst = ['martin.planes@beta.gouv.fr']            
-        send_mail('Certificats 2BS', mail_content, 'carbure@beta.gouv.fr', dst, fail_silently=False)
+        send_mail('Certificats 2BS', mail_content, settings.DEFAULT_FROM_EMAIL, dst, fail_silently=False)
     else:
         print(mail_content)
-        
+
 
 def main(args):
     # update data
@@ -99,6 +98,6 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Load 2BS certificates in database')
     parser.add_argument('--email', dest='email', action='store_true', default=False, help='Send a summary email')
-    parser.add_argument('--test', dest='test', action='store_true', default=False, help='Send summary email to developers')    
-    args = parser.parse_args()    
+    parser.add_argument('--test', dest='test', action='store_true', default=False, help='Send summary email to developers')
+    args = parser.parse_args()
     main(args)

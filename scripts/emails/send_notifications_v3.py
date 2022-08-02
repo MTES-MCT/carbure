@@ -23,9 +23,9 @@ def main(args):
     email_notif_sent = 0
     entity_oldest_notif = {}
     today = datetime.date.today()
-    
+
     for entity in entities:
-        
+
         notifs = CarbureNotification.objects.filter(dest=entity, send_by_email=True, email_sent=False, datetime__date=today).aggregate(Count('id'), Min('datetime'), Max('datetime'))
         if notifs['id__count'] > 0:
             entity_oldest_notif[entity] = notifs['datetime__min']
@@ -73,7 +73,7 @@ def main(args):
             if notifs.filter(notify_administrator=True).count() > 0:
                 cc = ["carbure@beta.gouv.fr"]
 
-        msg = EmailMultiAlternatives(subject=email_subject, body=text_message, from_email="noreply@carbure.beta.gouv.fr", to=recipients, cc=cc)
+        msg = EmailMultiAlternatives(subject=email_subject, body=text_message, from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc)
         msg.attach_alternative(html_message, "text/html")
         if not args.test:
             notifs.update(email_sent=True)
@@ -88,7 +88,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Send email notifications')
     parser.add_argument('--test', action='store_true', default=False, dest='test', help='Do not actually send emails')
-    args = parser.parse_args()    
+    args = parser.parse_args()
     main(args)
-    
-    
+
+
