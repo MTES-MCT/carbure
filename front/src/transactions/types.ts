@@ -258,6 +258,7 @@ export enum Filter {
   CorrectionStatus = "correction_status",
   Scores = "scores",
   Conformity = "conformity",
+  ML = "ml_scoring",
 }
 
 export type FilterSelection = Partial<Record<Filter, string[]>>
@@ -350,3 +351,5 @@ export interface Distance {
 }
 
 export type Conformity = "UNKNOWN" | "CONFORM" | "NONCONFORM"
+
+export type ML = "OK" | "KO"

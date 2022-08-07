@@ -160,6 +160,7 @@ const ADMIN_FILTERS = [
   Filter.Errors,
   Filter.Conformity,
   Filter.Scores,
+  Filter.ML,
 ]
 
 export default Lots

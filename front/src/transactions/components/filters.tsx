@@ -44,6 +44,7 @@ export function Filters<T>({
     [Filter.CorrectionStatus]: t("Corrections"),
     [Filter.Scores]: t("Score"),
     [Filter.Conformity]: t("Conformité"),
+    [Filter.ML]: t("ML"),
   }
 
   return (
