@@ -46,7 +46,7 @@ def calc_ml_score(args):
             if entry.default_value_max_ep > 0 and l.ep > 1.2 * entry.default_value_max_ep:
                 score += ((l.ep - entry.default_value_max_ep) / entry.default_value_max_ep)**2
                 
-        # etd penalisation
+        # etd penalisation ###### NOT INCLUDED FOR NOW - fausse les resultats - trop de faux positifs, trop different du premier check
         # if l.feedstock in etd:
         #    default_value = etd[l.feedstock]
         #    if l.etd > 2 * default_value and l.etd > 5:
@@ -57,6 +57,8 @@ def calc_ml_score(args):
         #        if l.country_of_origin.is_in_europe and l.etd == default_value:
         #            score += 0.5 # lot ne vient pas de loin, pas d'effort de calcul
         l.ml_scoring = score
+        if score > 0:
+            l.ml_control_requested = True
         l.save()
 
 def main():

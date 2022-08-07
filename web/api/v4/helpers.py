@@ -220,6 +220,7 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
     scores = query.getlist('scores', [])
     added_by = query.getlist('added_by', [])
     conformity = query.getlist('conformity', [])
+    ml = query.getlist('ml_scoring', False)
 
     # selection overrides all other filters
     if len(selection) > 0:
@@ -294,6 +295,12 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
 
     if len(conformity) > 0 and 'conformity' not in blacklist:
         lots = lots.filter(audit_status__in=conformity)
+
+    if ml and 'ml_scoring' not in blacklist:
+        if ml == 'KO':
+            lots = lots.filter(ml_scoring_requested=True)
+        else:
+            lots = lots.filter(ml_scoring_requested=False)
 
     if search and 'query' not in blacklist:
         lots = lots.filter(
@@ -444,6 +451,9 @@ def get_lots_filters_data(lots, query, entity, field):
     if field == 'conformity':
         conformities = lots.values_list('audit_status', flat=True).distinct()
         return prepare_filters(conformities)
+
+    if field == 'ml_scoring':
+        return prepare_filters(["KO", "OK"])
 
 
 def get_stock_filters_data(stock, query, field):
