@@ -341,7 +341,13 @@ class GenericError(models.Model):
         db_table = 'generic_errors'
         verbose_name = 'Generic Error'
         verbose_name_plural = 'Generic Errors'
-
+        indexes = [
+            models.Index(fields=['lot']),
+            models.Index(fields=['lot', 'acked_by_admin', 'display_to_admin']),
+            models.Index(fields=['lot', 'acked_by_creator', 'display_to_creator']),
+            models.Index(fields=['lot', 'acked_by_recipient', 'display_to_recipient']),
+            models.Index(fields=['lot', 'acked_by_auditor', 'display_to_auditor']),
+        ]
 
 class TransactionDistance(models.Model):
     starting_point = models.CharField(max_length=64, blank=True, null=True, default=None)
@@ -507,6 +513,8 @@ class CarbureLot(models.Model):
                    models.Index(fields=['year', 'carbure_client']),
                    models.Index(fields=['year', 'carbure_supplier']),
                    models.Index(fields=['year', 'period']),
+                   models.Index(fields=['year', 'lot_status']),
+                   models.Index(fields=['year', 'period', 'lot_status']),
                    models.Index(fields=['year', 'period', 'carbure_client']),
                    models.Index(fields=['year', 'period', 'carbure_supplier']),
                   ]
