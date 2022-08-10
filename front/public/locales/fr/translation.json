@@ -936,10 +936,10 @@
   "Entamé": "Entamé",
   "Vide": "Vide",
   "Parmi ces résultats, ": "Parmi ces résultats, ",
-  "<b>{{count}} lots</b> présentent des <b>incohérences</b>_one": "<b>{{count}} lot</b> présentent des <b>incohérences</b>",
+  "<b>{{count}} lots</b> présentent des <b>incohérences</b>_one": "<b>{{count}} lot</b> présente des <b>incohérences</b>",
   "<b>{{count}} lots</b> présentent des <b>incohérences</b>_many": "<b>{{count}} lots</b> présentent des <b>incohérences</b>",
   "<b>{{count}} lots</b> présentent des <b>incohérences</b>_other": "<b>{{count}} lots</b> présentent des <b>incohérences</b>",
-  "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_one": "<b>{{count}} lot</b> doivent être déclarés avant le <b>{{date}}</b>",
+  "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_one": "<b>{{count}} lot</b> doit être déclaré avant le <b>{{date}}</b>",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_many": "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_other": "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>",
   "Brouillon_plural": "Brouillons"
