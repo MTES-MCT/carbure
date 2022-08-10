@@ -104,4 +104,5 @@
   gap: var(--spacing-m);
   border-top: 1px solid var(--gray-highlight);
   margin-top: auto;
+  align-self: end;
 }
