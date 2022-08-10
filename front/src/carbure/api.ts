@@ -61,7 +61,7 @@ export function findProductionSites(query?: string, producer_id?: number) {
     .then(extract)
 }
 
-export function findDepots(query: string, entity_id?: number) {
+export function findDepots(query?: string, entity_id?: number) {
   return api
     .get<Api<Depot[]>>("/v3/common/delivery-sites", {
       params: { query, entity_id },
