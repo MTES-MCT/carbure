@@ -278,7 +278,7 @@ export const UserRoleDialog = ({ onClose, request }: UserRightsProps) => {
       <main>
       <section> 
           {t(
-            "Modifier le role de l'utilisateur {{userEmail}} ?",
+            "Modifier le rôle de l'utilisateur {{userEmail}} ?",
             { userEmail }
           )}
         </section>
