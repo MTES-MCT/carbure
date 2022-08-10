@@ -510,6 +510,13 @@ class CarbureLot(models.Model):
     class Meta:
         db_table = 'carbure_lots'
         indexes = [models.Index(fields=['year']),
+                   models.Index(fields=['period']),
+                   models.Index(fields=['biofuel']),
+                   models.Index(fields=['feedstock']),
+                   models.Index(fields=['carbure_supplier']),
+                   models.Index(fields=['carbure_client']),
+                   models.Index(fields=['carbure_delivery_site']),
+                   models.Index(fields=['carbure_production_site']),
                    models.Index(fields=['year', 'carbure_client']),
                    models.Index(fields=['year', 'carbure_supplier']),
                    models.Index(fields=['year', 'period']),
