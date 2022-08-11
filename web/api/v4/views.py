@@ -1470,6 +1470,7 @@ def accept_processing(request, *args, **kwargs):
         child_lot.carbure_supplier = entity
         child_lot.unknown_supplier = None
         child_lot.parent_lot_id = parent_lot_id
+        child_lot.parent_stock_id = None
         child_lot.save()
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.CREATED
@@ -1554,6 +1555,7 @@ def accept_trading(request, *args, **kwargs):
         child_lot.supplier_certificate = certificate
         child_lot.unknown_supplier = None
         child_lot.parent_lot_id = parent_lot_id
+        child_lot.parent_stock_id = None
         child_lot.save()
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.CREATED
