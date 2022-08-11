@@ -26,12 +26,6 @@ const Biofuels = () => {
             cell: (e) => e.name,
             orderBy: (e) => e.name,
           },
-          // {
-          //   key: "category",
-          //   header: t("Catégorie"),
-          //   cell: (e) => e.category,
-          //   orderBy: (e) => e.category,
-          // },
         ]}
       />
     </Fragment>
