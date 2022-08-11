@@ -17,10 +17,19 @@ export const okRequestPasswordReset = rest.post("api/auth/request-password-reset
   return res(ctx.json({ status: "success" }))
 })
 
+export const okRegisterPending = rest.post("api/auth/register", (req, res, ctx) => {
+  return res(ctx.json({ status: "success" }))
+})
+
+export const okRequestAcivationLink = rest.post("api/auth/request-activation-link", (req, res, ctx) => {
+  return res(ctx.json({ status: "success" }))
+})
+
 export default setupServer(
   okSettings,
   okLogin,
   okOtp,
-  okRequestPasswordReset
-
+  okRequestPasswordReset,
+  okRegisterPending,
+  okRequestAcivationLink
 )
