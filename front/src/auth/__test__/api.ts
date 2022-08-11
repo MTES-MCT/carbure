@@ -9,7 +9,18 @@ export const okLogin = rest.post("/api/auth/login", (req, res, ctx) => {
   return res(ctx.json({ status: "success" }))
 })
 
+export const okOtp = rest.post("/api/auth/request-otp", (req, res, ctx) => {
+  return res(ctx.json({ status: "success" }))
+})
+
+export const okRequestPasswordReset = rest.post("api/auth/request-password-reset", (req, res, ctx) => {
+  return res(ctx.json({ status: "success" }))
+})
+
 export default setupServer(
-  okSettings
+  okSettings,
+  okLogin,
+  okOtp,
+  okRequestPasswordReset
 
 )
