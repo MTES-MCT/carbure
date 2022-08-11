@@ -41,7 +41,7 @@ const Depots = () => {
           columns={[
             {
               key: "name",
-              header: t("Société"),
+              header: t("Dépôt"),
               cell: (e) => e.name,
               orderBy: (e) => e.name,
             },
