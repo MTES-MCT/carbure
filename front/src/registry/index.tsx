@@ -12,7 +12,6 @@ import Feedstocks from "./components/feedstocks"
 const Registry = () => {
   const { t } = useTranslation()
   useTitle(t("Annuaire"))
-  const [focus, setFocus] = useState("companies")
 
   return (
     <Main>
@@ -23,10 +22,8 @@ const Registry = () => {
       </header>
 
       <Tabs
-        focus={focus}
-        onFocus={setFocus}
         variant="sticky"
-        tabs={compact([
+        tabs={[
           {
             path: "#companies",
             key: "companies",
@@ -47,15 +44,17 @@ const Registry = () => {
             key: "depots",
             label: t("Dépôts"),
           },
-        ])}
-      />
-
-      <section>
-        {focus === "companies" && <Companies />}
-        {focus === "feedstocks" && <Feedstocks />}
-        {focus === "biofuels" && <Biofuels />}
-        {focus === "depots" && <Depots />}
-      </section>
+        ]}
+      >
+        {(focus) => (
+          <section>
+            {focus === "companies" && <Companies />}
+            {focus === "feedstocks" && <Feedstocks />}
+            {focus === "biofuels" && <Biofuels />}
+            {focus === "depots" && <Depots />}
+          </section>
+        )}
+      </Tabs>
     </Main>
   )
 }

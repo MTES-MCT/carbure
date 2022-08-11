@@ -2,16 +2,10 @@ import { Route } from "react-router-dom"
 import { TestRoot } from "setupTests"
 
 import { render, screen } from "@testing-library/react"
-import Login from "auth/components/login"
-import server from "./api"
 import userEvent from "@testing-library/user-event"
+import Auth from "auth"
 import { getField, waitWhileLoading } from "carbure/__test__/helpers"
-import OTP from "auth/components/otp"
-import { Register } from "../components/register"
-import {
-  ResetPasswordPending,
-  ResetPasswordRequest,
-} from "auth/components/password"
+import server from "./api"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 afterEach(() => server.resetHandlers())
@@ -19,9 +13,8 @@ afterAll(() => server.close())
 
 const AuthWithRouter = ({ children }: { children?: React.ReactNode }) => {
   return (
-    <TestRoot url={`/app/auth/login`}>
-      <Route path={`/app/auth/login`} element={<Login />} />
-      {children}
+    <TestRoot url={`/auth/login`}>
+      <Route path="/auth/*" element={<Auth />} />
     </TestRoot>
   )
 }
@@ -38,11 +31,7 @@ test("display the login form", async () => {
 })
 
 test("Switch to the register form", async () => {
-  render(
-    <AuthWithRouter>
-      <Route path={`/register`} element={<Register />} />
-    </AuthWithRouter>
-  )
+  render(<AuthWithRouter />)
   const user = userEvent.setup()
   await screen.findByText("→ Inscription")
   await user.click(await screen.findByText("→ Inscription"))
@@ -50,11 +39,7 @@ test("Switch to the register form", async () => {
 })
 
 test("fill and submit the login form", async () => {
-  render(
-    <AuthWithRouter>
-      <Route path={`/otp`} element={<OTP />} />
-    </AuthWithRouter>
-  )
+  render(<AuthWithRouter />)
   const user = userEvent.setup()
   await user.type(getField("Adresse email"), "test@company.com")
   await user.type(getField("Mot de passe"), "azerty")
@@ -63,18 +48,7 @@ test("fill and submit the login form", async () => {
 })
 
 test("want to reset password", async () => {
-  render(
-    <AuthWithRouter>
-      <Route
-        path={`/reset-password-request`}
-        element={<ResetPasswordRequest />}
-      />
-      <Route
-        path={`/reset-password-pending`}
-        element={<ResetPasswordPending />}
-      />
-    </AuthWithRouter>
-  )
+  render(<AuthWithRouter />)
   const user = userEvent.setup()
 
   await user.click(await screen.findByText("J'ai oublié mon mot de passe"))

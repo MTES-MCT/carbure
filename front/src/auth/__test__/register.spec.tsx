@@ -7,6 +7,7 @@ import { ActivateRequest } from "auth/components/activate"
 import { getField, waitWhileLoading } from "carbure/__test__/helpers"
 import { Register, RegisterPending } from "../components/register"
 import server from "./api"
+import Auth from "auth"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 afterEach(() => server.resetHandlers())
@@ -14,9 +15,8 @@ afterAll(() => server.close())
 
 const AuthWithRouter = ({ children }: { children?: React.ReactNode }) => {
   return (
-    <TestRoot url={`/app/auth/register`}>
-      <Route path={`/app/auth/register`} element={<Register />} />
-      {children}
+    <TestRoot url={`/auth/register`}>
+      <Route path="/auth/*" element={<Auth />} />
     </TestRoot>
   )
 }
@@ -31,11 +31,7 @@ test("display the register form", async () => {
 })
 
 test("fill and submit the register form", async () => {
-  render(
-    <AuthWithRouter>
-      <Route path={`/register-pending`} element={<RegisterPending />} />
-    </AuthWithRouter>
-  )
+  render(<AuthWithRouter />)
 
   const user = userEvent.setup()
   await user.type(getField("Adresse email"), "test@company.com")
@@ -48,11 +44,7 @@ test("fill and submit the register form", async () => {
 })
 
 test("resend activation link", async () => {
-  render(
-    <AuthWithRouter>
-      <Route path={`/activate-request`} element={<ActivateRequest />} />
-    </AuthWithRouter>
-  )
+  render(<AuthWithRouter />)
   const user = userEvent.setup()
   await user.click(await screen.findByText("Je n'ai pas reçu le lien d'activation")) // prettier-ignore
   await user.type(getField("Adresse email du compte"), "test@company.com")
