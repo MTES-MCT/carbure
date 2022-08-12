@@ -31,6 +31,8 @@
     "i18next-parser": "^6.5.0"
   },
   "scripts": {
+    "start-server": "cd ../ && docker-compose up -d && cd front && open http://carbure.local:8090/",
+    "stop-server": "docker-compose down",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
