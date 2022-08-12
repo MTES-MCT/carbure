@@ -117,4 +117,4 @@ webencodings==0.5.1
 wrapt==1.12.1
 XlsxWriter==1.2.8
 yarl==1.4.2
-django-authtools @ git+https://github.com/mplanes/django-authtools@fd220f7e1ccc42d77d5f7bd89614e536fd62a9a9
+django-authtools==2.0.0
