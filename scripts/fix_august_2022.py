@@ -3,6 +3,7 @@ import os
 import django
 import argparse
 from django.db.models import Sum
+from tqdm import tqdm
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
@@ -11,7 +12,7 @@ from core.models import *
 
 def recalc_all_stocks():
     stocks = CarbureStock.objects.all()
-    for stock in stocks:
+    for stock in tqdm(stocks):
         child_volume = CarbureLot.objects.filter(parent_stock=stock).exclude(lot_status=CarbureLot.DELETED).aggregate(child_volume=Sum('volume'))
         vol = child_volume['child_volume']
         if vol is None:
@@ -30,7 +31,7 @@ def recalc_all_stocks():
     
 def freeze_old_declarations():
     declarations = SustainabilityDeclaration.objects.filter(period__lt='2022-01-01', declared=False)
-    for declaration in declarations:
+    for declaration in tqdm(declarations):
         period_int = int(declaration.period.year * 100 + declaration.period.month)
         # ensure everything is in order
         pending_reception = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, lot_status=CarbureLot.PENDING).count()
@@ -58,9 +59,15 @@ def freeze_old_declarations():
         # mark declaration
         declaration.declared = True
         declaration.save()
-        
+
+def recalc_old_pci_values():
+    lots = CarbureLot.objects.filter(lhv_amount=0)
+    for l in tqdm(lots):
+        l.lhv_amount = l.get_lhv_amount()
+        l.weight = l.get_weight()
+        l.save()
 
 if __name__ == '__main__':
     recalc_all_stocks()
     freeze_old_declarations()
-    
+    recalc_old_pci_values()
