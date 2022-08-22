@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useMemo, useState, Fragment } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api/certificates"
 import useEntity, { useRights } from "carbure/hooks/entity"
@@ -142,10 +142,16 @@ const Certificates = () => {
               cell: (c) => <Cell text={c.certificate.scope ?? "-"} />,
             },
             {
-              key: "validity",
-              header: t("Validité"),
+              key: "expiration",
+              header: t("Expiration"),
               orderBy: (c) => c.certificate.valid_until,
               cell: (c) => <ExpirationDate link={c} readOnly={!canModify} />,
+            },
+            {
+              key: "validition",
+              header: t("Validation"),
+              orderBy: (c) => c.rejected_by_admin.toString(),
+              cell: (c) => <Validation link={c} />,
             },
             actionColumn<EntityCertificate>((c) =>
               compact([
@@ -261,6 +267,44 @@ const CertificateAddDialog = ({ onClose }: CertificateAddDialogProps) => {
   )
 }
 
+type ValidationProps = {
+  link: EntityCertificate
+}
+
+export const Validation = ({ link }: ValidationProps) => {
+  const { t } = useTranslation()
+
+  const expired = isExpired(link.certificate.valid_until)
+
+  const validationString = useMemo((): string => {
+    if (expired) {
+      return t("Expiré")
+    } else if (link.rejected_by_admin) {
+      return t("Refusé")
+    } else {
+      if (link.checked_by_admin) {
+        return t("Accepté")
+      } else {
+        return t("En cours")
+      }
+    }
+  }, [])
+
+  return (
+    <Row
+      style={
+        link.rejected_by_admin || expired
+          ? { color: "var(--orange-dark)" }
+          : !link.checked_by_admin
+          ? { color: "var(--orange-medium)" }
+          : undefined
+      }
+    >
+      {validationString}
+    </Row>
+  )
+}
+
 type ExpirationDateProps = {
   link: EntityCertificate
   readOnly?: boolean
@@ -287,13 +331,12 @@ export const ExpirationDate = ({ link, readOnly }: ExpirationDateProps) => {
       }
     >
       {expired && !updated && (
-        <React.Fragment>
-          {formatted}
-          {!readOnly && (
+        <Fragment>
+          {!readOnly ? (
             <Button
               captive
               icon={Refresh}
-              label={t("Mise à jour")}
+              label={t("Mettre à jour")}
               action={() =>
                 portal((close) => (
                   <CertificateUpdateDialog
@@ -303,8 +346,10 @@ export const ExpirationDate = ({ link, readOnly }: ExpirationDateProps) => {
                 ))
               }
             />
+          ) : (
+            formatted
           )}
-        </React.Fragment>
+        </Fragment>
       )}
 
       {expired && updated && <Trans>Mis à jour ({{ formatted }})</Trans>}
