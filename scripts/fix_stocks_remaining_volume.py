@@ -13,7 +13,7 @@ from core.models import *
 def fix_stocks_remaining_volume():
     stocks = CarbureStock.objects.all()
     with transaction.atomic():
-        for stock in tqdm(stocks.iterator()):
+        for stock in tqdm(stocks):
             child_volume = CarbureLot.objects.filter(parent_stock=stock).exclude(lot_status=CarbureLot.DELETED).aggregate(child_volume=Sum('volume'))
             vol = child_volume['child_volume']
             if vol is None:
