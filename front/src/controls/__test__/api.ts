@@ -10,6 +10,7 @@ import {
 
 import { getFilter } from "transactions/__test__/data"
 import { lotSummary } from "./data"
+import { lots } from "./data"
 
 export const okAdminSettings = rest.get("/api/v3/settings", (req, res, ctx) => {
   return res(
@@ -63,10 +64,10 @@ export const okLots = rest.get("/api/admin/lots", (req, res, ctx) => {
     ctx.json({
       status: "success",
       data: {
-        lots: [],
+        lots: lots,
         from: 0,
-        returned: 0,
-        total: 0,
+        returned: 3,
+        total: 3,
         total_errors: 0,
         total_deadline: 0,
         errors: {},
@@ -78,7 +79,7 @@ export const okLots = rest.get("/api/admin/lots", (req, res, ctx) => {
 export const okStocks = rest.get("/api/admin/stocks", (req, res, ctx) => {
   return res(
     ctx.json({
-      status: "success"
+      status: "success",
     })
   )
 })
