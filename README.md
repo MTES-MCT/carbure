@@ -7,7 +7,7 @@ Traçabilité et durabilité des biocarburants, de la production à la distribut
 - python3
 - pyenv
 - virtualenv
-- mysql client
+- mysql-client
 
 ## Configuration et Installation
 
@@ -15,22 +15,26 @@ Traçabilité et durabilité des biocarburants, de la production à la distribut
 - Créez un fichier `.env` à la racine du dépôt en vous basant sur le fichier `.env.example` disponible dans le dossier
 
 
+
 Ensuite, créez un environnement virtuel pour python 3.10:
 
-- pyenv install 3.10.5
-- pyenv local 3.10.5
-- pyenv exec python -m venv venv
-- source venv/bin/activate
-- pip install -r requirements.txt
+- `pyenv install 3.10.5`
+- `pyenv local 3.10.5`
+- `pyenv exec python -m venv venv`
+- `source venv/bin/activate`
+- `pip install -r requirements.txt`
 
 Je recommande de créer un alias pour charger l'environnement de développement.
 par exemple:
-- alias carbure='cd /path/du/repository; source loadenv.sh;'
+- `alias carbure='cd /path/du/repository; source loadenv.sh;'`
+
+Dans le dossier /front, téléchargez les modules
+- `npm install` 
 
 Vous pouvez désormais builder les images docker et lancer le projet:
 
-- docker-compose build
-- docker-compose up -d
+- `docker-compose build`
+- `docker-compose up -d`
 
 Le script loadenv.sh permet d'interagir avec les containers.
 
@@ -49,7 +53,7 @@ Lancer `sh scripts/recovery/restore_db.sh` pour télécharger un dump contenant 
 
 # Authentification à Carbure
 
-- Pour ajouter un nouveau super utilisateur à la db locale, taper `python3 web/manage.py createsuperuser`
+- Pour ajouter un nouveau super utilisateur à la db locale, taper `docker exec -it carbure_app python3 web/manage.py createsuperuser`
 - Ensuite aller sur http://carbure.local:8090/app/auth/login
 - Utiliser les informations renseignées à l'étape 1 puis valider l'authentification
 - Carbure demande d'entrer un code envoyé par email
