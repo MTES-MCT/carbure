@@ -75,6 +75,14 @@ export const okLots = rest.get("/api/admin/lots", (req, res, ctx) => {
   )
 })
 
+export const okStocks = rest.get("/api/admin/stocks", (req, res, ctx) => {
+  return res(
+    ctx.json({
+      status: "success"
+    })
+  )
+})
+
 export const okYears = rest.get("/api/admin/years", (req, res, ctx) => {
   return res(
     ctx.json({
@@ -94,5 +102,6 @@ export default setupServer(
   okFilters,
   okYears,
   okSnapshot,
+  okStocks,
   okAdminSettings
 )
