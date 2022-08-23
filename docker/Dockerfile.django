@@ -8,14 +8,17 @@ RUN apt-get install python3.10 python3-pip python3-dev git -y
 RUN apt-get install redis -y
 
 ENV PYTHONUNBUFFERED 1
+ENV PIPENV_VENV_IN_PROJECT 1
 
-RUN mkdir /app
 WORKDIR /app
 
-COPY requirements.txt /app/
-
 RUN python3 -m pip install uwsgi
-RUN python3 -m pip install -r requirements.txt
+RUN pip3 install pipenv
+
+COPY Pipfile ./
+COPY Pipfile.lock ./
+
+RUN pipenv install --system --deploy
 
 RUN mkdir /app/web
 
