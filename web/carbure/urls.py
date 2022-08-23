@@ -23,6 +23,5 @@ urlpatterns = [
     path('stats', public_views.stats, name='index'),
     path('api/', include('api.urls')),
     path('core/', include('core.urls')),
-    # path('__debug__/', include(debug_toolbar.urls)),
     path('django_query_profiler/', include('django_query_profiler.client.urls'))
 ]
