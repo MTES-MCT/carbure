@@ -276,33 +276,21 @@ export const Validation = ({ link }: ValidationProps) => {
 
   const expired = isExpired(link.certificate.valid_until)
 
-  const validationString = useMemo((): string => {
-    if (expired) {
-      return t("Expiré")
-    } else if (link.rejected_by_admin) {
-      return t("Refusé")
-    } else {
-      if (link.checked_by_admin) {
-        return t("Accepté")
-      } else {
-        return t("En cours")
-      }
-    }
-  }, [])
+  const getValidationString = (): string => {
+    if (expired) return t("Expiré")
+    if (link.rejected_by_admin) return t("Refusé")
+    if (link.checked_by_admin) return t("Accepté")
+    return t("En cours")
+  }
 
-  return (
-    <Row
-      style={
-        link.rejected_by_admin || expired
-          ? { color: "var(--orange-dark)" }
-          : !link.checked_by_admin
-          ? { color: "var(--orange-medium)" }
-          : undefined
-      }
-    >
-      {validationString}
-    </Row>
-  )
+  const getRowStyle = (): { color: string } | undefined => {
+    if (link.rejected_by_admin || expired)
+      return { color: "var(--orange-dark)" }
+    if (!link.checked_by_admin) return { color: "var(--orange-medium)" }
+    return undefined
+  }
+
+  return <Row style={getRowStyle()}>{getValidationString()}</Row>
 }
 
 type ExpirationDateProps = {
