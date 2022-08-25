@@ -12,7 +12,7 @@ const Depots = () => {
   const [query, setQuery] = useState<string | undefined>("")
   const depots = useQuery(findDepots, {
     key: "depots",
-    params: [query],
+    params: [query, true],
   })
 
   const depotsData = depots.result ?? []
@@ -50,6 +50,12 @@ const Depots = () => {
               header: t("Ville"),
               cell: (e) => e.city,
               orderBy: (e) => e.city,
+            },
+            {
+              key: "depot_id",
+              header: t("ID"),
+              cell: (e) => e.depot_id,
+              orderBy: (e) => e.depot_id,
             },
           ]}
         />
