@@ -13,4 +13,4 @@ python /app/web/fixtures/load_matierespremieres.py
 python /app/web/fixtures/load_sn_certificates.py
 
 # run server with gunicorn
-gunicorn --chdir ./web server.wsgi --log-file -
+gunicorn --chdir ./web carbure.wsgi --log-file -
