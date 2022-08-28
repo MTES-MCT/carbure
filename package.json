@@ -4,13 +4,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "(cd frontend; npm install; npm run build)"
+    "build": "(cd front; npm install; npm run build)"
   },
   "engines": {
     "node": "16.16.0",
     "npm": "8.11"
   },
   "cacheDirectories": [
-    "frontend/node_modules"
+    "front/node_modules"
   ]
 }
