@@ -167,6 +167,10 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 STATICFILES_STORAGE = "spa.storage.SPAStaticFilesStorage"
 
+if env('IMAGE_TAG') in ['dev', 'staging', 'prod']:
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, '../front/build')]
+
+
 SESSION_COOKIE_AGE = 60*60*24*30 # 30 days
 
 DEFAULT_FROM_EMAIL = "noreply@carbure.beta.gouv.fr"
