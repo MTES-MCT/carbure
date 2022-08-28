@@ -1,7 +1,4 @@
 from django.shortcuts import redirect
 
-def index(request):
-    return redirect('/app/')
-
-def stats(request):
-    return redirect('/app/stats')
+def redirect_app(request, path):
+    return redirect("/" + path, permanent=True)
