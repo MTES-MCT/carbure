@@ -1,9 +1,7 @@
-version: "3.5"
 services:
-  carbure-mariadb:
-    image: mariadb:latest
-    restart: always
-    container_name: carbure_mariadb
+  carbure_database:
+    image: mysql:latest
+    container_name: carbure_database
     environment:
       ENV: ${IMAGE_TAG}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -11,26 +9,41 @@ services:
       MYSQL_USER: ${DJANGO_DB_USER}
       MYSQL_PASSWORD: ${DJANGO_DB_PASSWORD}
     volumes:
-      - carburedb:/var/lib/mysql
+      - carbure_database:/var/lib/mysql
     networks:
-      - carbure
-    ports:
-      - 3306:3306
+      - carbure_network
 
-  carbure-django:
+  carbure_redis:
+    image: redis:latest
+    container_name: carbure_redis
+    networks:
+      - carbure_network
+
+  carbure_frontend:
+    image: carbure_frontend
+    container_name: carbure_frontend
     build:
-      context: ${CARBURE_HOME}
-      dockerfile: docker/Dockerfile.django
-    command: bash /app/web/run.sh
-    restart: always
-    container_name: carbure_app
-    image: carbure_app:local
+      context: ./front
+    volumes:
+      - ./front:/app
+    networks:
+      - carbure_network
+
+  carbure_backend:
+    image: carbure_backend
+    container_name: carbure_backend
+    depends_on:
+      - carbure_database
+      - carbure_redis
+    build:
+      context: .
+      dockerfile: ./web/Dockerfile
     environment:
       IMAGE_TAG: ${IMAGE_TAG}
       DJANGO_DATABASE: ${DJANGO_DATABASE}
       DJANGO_DB_USER: ${DJANGO_DB_USER}
       DJANGO_DB_PASSWORD: ${DJANGO_DB_PASSWORD}
-      DJANGO_DB_HOST: carbure-mariadb
+      DJANGO_DB_HOST: carbure_database
       DJANGO_DB_PORT: 3306
       DJANGO_NGINX_HOST: ${DJANGO_NGINX_HOST}
       SECRET_KEY: ${SECRET_KEY}
@@ -52,56 +65,29 @@ services:
       AWS_S3_ENDPOINT_URL: ${AWS_S3_ENDPOINT_URL}
       AWS_S3_USE_SSL: ${AWS_S3_USE_SSL}
     volumes:
-      - ${CARBURE_HOME}:/app #for dev only, allows for auto-refresh of files
-      - uploadedfiles:/app/files
-    depends_on:
-      - carbure-mariadb
-    networks:
-      - carbure
+      - ./web:/app/web
+      - ./scripts:/app/scripts
+      - carbure_files:/app/files
 
-  carbure-frontend:
-    stdin_open: true
-    restart: always
-    container_name: carbure_frontend
-    image: carbure_frontend:local
-    build:
-      context: ${CARBURE_HOME}
-      dockerfile: docker/Dockerfile.frontend
-    volumes:
-      - ./front:/app # needed for hot-reloading
     networks:
-      - carbure
+      - carbure_network
 
-  carbure-web-proxy:
-    build:
-      context: ${CARBURE_HOME}
-      dockerfile: docker/Dockerfile.web
-      target: nginx
-    restart: always
-    container_name: carbure_web
-    image: carbure_web:local
-    environment:
-      NGINX_HOSTS: ${NGINX_HOSTS}
-      IMAGE_TAG: ${IMAGE_TAG}
-    command: /opt/run_nginx.sh
+  carbure_gateway:
+    image: nginx:latest
+    container_name: carbure_gateway
     depends_on:
-      - carbure-django
-      - carbure-frontend
+      - carbure_frontend
+      - carbure_backend
     volumes:
-      # dev: mount static directory
-      - ${CARBURE_HOME}/web/static:/var/www/html
-      - uploadedfiles:/app/files
+      - ./gateway:/etc/nginx/conf.d
+    networks:
+      - carbure_network
     ports:
       - 8090:80
-    networks:
-      - carbure
 
 volumes:
-  carburedb:
-    name: carbure_carburedb
-  uploadedfiles:
-    name: carbure_uploadedfiles
+  carbure_database: {}
+  carbure_files: {}
 
 networks:
-  carbure:
-    name: carbure_default
+  carbure_network: {}
