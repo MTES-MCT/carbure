@@ -252,6 +252,7 @@ class Depot(models.Model):
 
     gps_coordinates = models.CharField(max_length=64, blank=True, null=True, default=None)
     accise = models.CharField(max_length=32, blank=True, null=True, default=None)
+    private = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

@@ -7,7 +7,6 @@ from producers.models import ProductionSite, ProductionSiteInput, ProductionSite
 from core.decorators import check_rights
 from django_otp.decorators import otp_required
 
-
 def get_matieres_premieres(request):
     q = request.GET.get('query', False)
     double_count_only = request.GET.get('double_count_only', False)
@@ -78,10 +77,11 @@ def get_operators(request):
 
 def get_delivery_sites(request):
     q = request.GET.get('query', False)
-    entity_id = request.GET.get('entity_id', False)
-
+    pub = request.GET.get('public_only', False)
     try:
         dsites = Depot.objects.all().order_by('name')
+        if pub: 
+            dsites = dsites.filter(private=False)
         if q:
             dsites = dsites.filter(Q(name__icontains=q) | Q(depot_id__icontains=q) | Q(city__icontains=q))
     except Exception:

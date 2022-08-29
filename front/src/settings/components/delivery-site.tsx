@@ -365,7 +365,7 @@ export const DeliverySiteFinderDialog = ({
               autoFocus
               label={t("Dépôt à ajouter")}
               placeholder={t("Rechercher un dépôt...")}
-              getOptions={(search) => common.findDepots(search, entity.id)}
+              getOptions={(search) => common.findDepots(search)}
               normalize={normalizeDepot}
               {...bind("depot")}
             />
