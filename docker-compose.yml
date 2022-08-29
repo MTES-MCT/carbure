@@ -1,7 +1,7 @@
 services:
-  carbure_database:
+  carbure-mariadb:
     image: mysql:latest
-    container_name: carbure_database
+    container_name: carbure_mariadb
     environment:
       ENV: ${IMAGE_TAG}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -9,18 +9,18 @@ services:
       MYSQL_USER: ${DJANGO_DB_USER}
       MYSQL_PASSWORD: ${DJANGO_DB_PASSWORD}
     volumes:
-      - carbure_database:/var/lib/mysql
+      - carburedb:/var/lib/mysql
     networks:
       - carbure_network
 
-  carbure_redis:
+  carbure-redis:
     image: redis:latest
     container_name: carbure_redis
     networks:
       - carbure_network
 
-  carbure_frontend:
-    image: carbure_frontend
+  carbure-frontend:
+    image: carbure_frontend:local
     container_name: carbure_frontend
     build:
       context: ./front
@@ -29,12 +29,12 @@ services:
     networks:
       - carbure_network
 
-  carbure_backend:
-    image: carbure_backend
-    container_name: carbure_backend
+  carbure-django:
+    image: carbure_app:local
+    container_name: carbure_app
     depends_on:
-      - carbure_database
-      - carbure_redis
+      - carbure-mariadb
+      - carbure-redis
     build:
       context: .
       dockerfile: ./web/Dockerfile
@@ -43,7 +43,7 @@ services:
       DJANGO_DATABASE: ${DJANGO_DATABASE}
       DJANGO_DB_USER: ${DJANGO_DB_USER}
       DJANGO_DB_PASSWORD: ${DJANGO_DB_PASSWORD}
-      DJANGO_DB_HOST: carbure_database
+      DJANGO_DB_HOST: carbure-mariadb
       DJANGO_DB_PORT: 3306
       DJANGO_NGINX_HOST: ${DJANGO_NGINX_HOST}
       SECRET_KEY: ${SECRET_KEY}
@@ -67,17 +67,17 @@ services:
     volumes:
       - ./web:/app/web
       - ./scripts:/app/scripts
-      - carbure_files:/app/files
+      - uploadedfiles:/app/files
 
     networks:
       - carbure_network
 
-  carbure_gateway:
+  carbure-web-proxy:
     image: nginx:latest
-    container_name: carbure_gateway
+    container_name: carbure_web
     depends_on:
-      - carbure_frontend
-      - carbure_backend
+      - carbure-frontend
+      - carbure-django
     volumes:
       - ./gateway:/etc/nginx/conf.d
     networks:
@@ -86,8 +86,11 @@ services:
       - 8090:80
 
 volumes:
-  carbure_database: {}
-  carbure_files: {}
+  carburedb:
+    name: carbure_carburedb
+  uploadedfiles:
+    name: carbure_uploadedfiles
 
 networks:
-  carbure_network: {}
+  carbure:
+    name: carbure_default
