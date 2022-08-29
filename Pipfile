@@ -29,6 +29,7 @@ django-storages = "*"
 django-spa = "*"
 gunicorn = "*"
 tzdata = "*"
+coverage = "*"
 
 [dev-packages]
 black = "*"
