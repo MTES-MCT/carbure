@@ -70,10 +70,11 @@ AUTH_USER_MODEL = 'authtools.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    "spa.middleware.SPAMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'spa.middleware.SPAMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-#    'django.middleware.csrf.CsrfViewMiddleware',
+   'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -81,7 +82,6 @@ MIDDLEWARE = [
     'core.logging_middleware.LoggingMiddleware',
 ]
 
-#CSRF_TRUSTED_ORIGINS = env.list('ALLOWED_HOSTS')
 CSRF_TRUSTED_ORIGINS = ["http://carbure.local:8090"]
 
 X_FRAME_OPTIONS = "SAMEORIGIN"
