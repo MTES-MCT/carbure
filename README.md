@@ -7,16 +7,20 @@ Traçabilité et durabilité des biocarburants, de la production à la distribut
 - python3
 - pyenv
 - virtualenv
+- mysql
 - mysql-client
+- node
 
 ## Configuration et Installation
 
 - Clonez le repository: git clone https://github.com/MTES-MCT/carbure.git
 - Créez un fichier `.env` à la racine du dépôt en vous basant sur le fichier `.env.example` disponible dans le dossier
 
+Dans le dossier /front, téléchargez les modules : 
 
+- `npm install` 
 
-Ensuite, créez un environnement virtuel pour python 3.10:
+Ensuite, créez un environnement virtuel pour python 3.10 :
 
 - `pyenv install 3.10.5`
 - `pyenv local 3.10.5`
@@ -25,30 +29,26 @@ Ensuite, créez un environnement virtuel pour python 3.10:
 - `pip install -r requirements.txt`
 
 Je recommande de créer un alias pour charger l'environnement de développement.
-par exemple:
+par exemple :
+
 - `alias carbure='cd /path/du/repository; source loadenv.sh;'`
+***Le script loadenv.sh permet d'interagir avec les containers.***
 
-Dans le dossier /front, téléchargez les modules
-- `npm install` 
-
-Vous pouvez désormais builder les images docker et lancer le projet:
+Vous pouvez désormais builder les images docker et lancer le projet :
 
 - `docker-compose build`
 - `docker-compose up -d`
-
-Le script loadenv.sh permet d'interagir avec les containers.
-
-
-## Création d'un nom de domaine local personnalisé 
-
-- Aller dans le fichier `/etc/hosts` (sur linux et mac)
-- Ajouter la ligne `127.0.0.1	carbure.local`
-- Vous pouvez maintenant accéder à votre version locale de carbure à l'adresse http://carbure.local:8090/
 
 
 ## Alimenter la base de données de dev
 
 Lancer `sh scripts/recovery/restore_db.sh` pour télécharger un dump contenant des données utilisables en local
+
+## Création d'un nom de domaine local personnalisé 
+
+- Aller dans le fichier `/etc/hosts` (sur linux et mac)
+- Ajouter la ligne `127.0.0.1 carbure.local`
+- Vous pouvez maintenant accéder à votre version locale de carbure à l'adresse http://carbure.local:8090/
 
 
 # Authentification à Carbure
