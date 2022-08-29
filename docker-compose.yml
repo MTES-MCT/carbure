@@ -11,13 +11,13 @@ services:
     volumes:
       - carburedb:/var/lib/mysql
     networks:
-      - carbure_network
+      - carbure
 
   carbure-redis:
     image: redis:latest
     container_name: carbure_redis
     networks:
-      - carbure_network
+      - carbure
 
   carbure-frontend:
     image: carbure_frontend:local
@@ -27,7 +27,7 @@ services:
     volumes:
       - ./front:/app
     networks:
-      - carbure_network
+      - carbure
 
   carbure-django:
     image: carbure_app:local
@@ -68,9 +68,8 @@ services:
       - ./web:/app/web
       - ./scripts:/app/scripts
       - uploadedfiles:/app/files
-
     networks:
-      - carbure_network
+      - carbure
 
   carbure-web-proxy:
     image: nginx:latest
@@ -81,7 +80,7 @@ services:
     volumes:
       - ./gateway:/etc/nginx/conf.d
     networks:
-      - carbure_network
+      - carbure
     ports:
       - 8090:80
 
