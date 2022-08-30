@@ -37,7 +37,6 @@ env = environ.Env(
     EMAIL_HOST_USER=(str, ""),
     EMAIL_HOST_PASSWORD=(str, ""),
     EMAIL_USE_TLS=(str, ""),
-
 )
 
 # False if not in os.environ
@@ -99,8 +98,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'core.logging_middleware.LoggingMiddleware',
 ]
-
-CSRF_TRUSTED_ORIGINS = ["http://carbure.local:8090"]
 
 X_FRAME_OPTIONS = "SAMEORIGIN"
 
