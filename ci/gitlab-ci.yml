@@ -1,0 +1,91 @@
+stages:
+  - prepare
+  - check
+  - deploy
+
+# use prebuild CI image when running checks
+.checks:
+  image: $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest
+  before_script:
+    - mv /app/front/node_modules ./front
+
+# prepare git env to push new code to scalingo
+.scalingo:
+  image: alpine:latest
+  before_script:
+    - mkdir ~/.ssh
+    - apk add --update git openssh-client
+    - eval $(ssh-agent -s)
+    - echo "$SCALINGO_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - ssh-keyscan $SCALINGO_SSH_HOST >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - git config user.name $GIT_USER_NAME
+    - git config user.email $GIT_USER_EMAIL
+    - git remote add scalingo-dev $SCALINGO_GIT_REMOTE_DEV
+    - git remote add scalingo-staging $SCALINGO_GIT_REMOTE_STAGING
+    - git remote add scalingo-prod $SCALINGO_GIT_REMOTE_PROD
+    - git fetch origin main --unshallow
+    - git checkout main
+
+build-ci-image:
+  stage: prepare
+  image: docker:stable
+  services:
+    - docker:dind
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -f ci/Dockerfile -t $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest .
+    - docker push $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest
+  only:
+    changes:
+      - ci/Dockerfile
+      - Pipfile
+      - Pipfile.lock
+      - front/package.json
+      - front/package-lock.json
+
+check-backend:
+  stage: check
+  extends: .checks
+  script:
+    - mypy web
+    - python3 web/manage.py test web
+  only:
+    changes:
+      - web/**/*
+
+check-frontend:
+  stage: check
+  extends: .checks
+  script:
+    - cd front
+    - npx eslint --ext .ts,.tsx src/
+    - npm test
+  only:
+    changes:
+      - front/**/*
+
+deploy-dev:
+  stage: deploy
+  extends: .scalingo
+  except:
+    - master
+  script:
+    - git push scalingo-dev CI_COMMIT_BRANCH:master -f
+
+deploy-staging:
+  stage: deploy
+  extends: .scalingo
+  only:
+    - master
+  script:
+    - git push scalingo-staging master -f
+
+deploy-prod:
+  stage: deploy
+  extends: .scalingo
+  when: manual
+  only:
+    - master
+  script:
+    - git push scalingo-prod master -f
