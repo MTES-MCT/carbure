@@ -40,11 +40,7 @@ services:
       dockerfile: ./web/Dockerfile
     environment:
       IMAGE_TAG: ${IMAGE_TAG}
-      DJANGO_DATABASE: ${DJANGO_DATABASE}
-      DJANGO_DB_USER: ${DJANGO_DB_USER}
-      DJANGO_DB_PASSWORD: ${DJANGO_DB_PASSWORD}
-      DJANGO_DB_HOST: carbure-mariadb
-      DJANGO_DB_PORT: 3306
+      DATABASE_URL: ${DATABASE_URL}
       DJANGO_NGINX_HOST: ${DJANGO_NGINX_HOST}
       SECRET_KEY: ${SECRET_KEY}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS}
