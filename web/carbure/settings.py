@@ -110,15 +110,8 @@ WSGI_APPLICATION = 'carbure.wsgi.application'
 # id = models.AutoField(primary_key=True)
 DEFAULT_AUTO_FIELD='django.db.models.AutoField'
 
-DATABASES = {'default': {
-    'ENGINE': 'django_query_profiler.django.db.backends.mysql',
-    'NAME': env('DJANGO_DATABASE'),
-    'USER': env('DJANGO_DB_USER'),
-    'PASSWORD': env('DJANGO_DB_PASSWORD'),
-    'HOST': env('DJANGO_DB_HOST'),
-    'PORT': env('DJANGO_DB_PORT'),
-    }
-}
+# Load db setup from DATABASE_URL env variable
+DATABASES = {"default": env.db()}
 
 if env('TEST') == 1:
     print("DB TESTING MODE")
@@ -167,7 +160,6 @@ STATICFILES_STORAGE = "spa.storage.SPAStaticFilesStorage"
 
 if env('IMAGE_TAG') in ['dev', 'staging', 'prod']:
     STATICFILES_DIRS = [os.path.join(BASE_DIR, '../front/build')]
-
 
 SESSION_COOKIE_AGE = 60*60*24*30 # 30 days
 
@@ -225,8 +217,6 @@ LOGGING = {
 
 
 if DEBUG:
-    INSTALLED_APPS += [
-        'django_query_profiler'
-    ]
-
+    INSTALLED_APPS += ['django_query_profiler']
+    DATABASES["default"]["ENGINE"] = "django_query_profiler." + DATABASES["default"]["ENGINE"]
     MIDDLEWARE = ['django_query_profiler.client.middleware.QueryProfilerMiddleware'] + MIDDLEWARE
