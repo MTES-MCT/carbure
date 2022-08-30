@@ -211,7 +211,7 @@ def check_certificates(prefetched_data, lot, errors):
     else:
         cert = lot.supplier_certificate
         if cert is not None:
-            cert = cert.upper()        
+            cert = cert.upper()
         if cert not in prefetched_data['certificates']:
             errors.append(generic_error(error=CarbureCertificatesErrors.UNKNOWN_SUPPLIER_CERT, lot=lot, display_to_recipient=True, field='supplier_certificate'))
         else:
@@ -237,11 +237,11 @@ def check_certificates(prefetched_data, lot, errors):
             if dc_cert not in prefetched_data['double_counting_certificates']:
                 # 2022-03-22: GC requests that this is a blocking error
                 errors.append(generic_error(error=CarbureCertificatesErrors.UNKNOWN_DOUBLE_COUNTING_CERTIFICATE, lot=lot, is_blocking=True, display_to_recipient=True, field='dc_reference'))
-            else:
+            elif not lot.parent_lot and not lot.parent_stock:
                 dcc = prefetched_data['double_counting_certificates'][dc_cert]
                 dcc_period = dcc.valid_until.year * 100 + dcc.valid_until.month # ex 202012
                 if dcc_period < lot.period:
-                    # 2022-03-22: GC requests that expired dc certificates are blocking after the next declaration. 
+                    # 2022-03-22: GC requests that expired dc certificates are blocking after the next declaration.
                     # Ex: a certificate expiring at the beginning of June is valid for the June declaration
                     errors.append(generic_error(error=CarbureCertificatesErrors.EXPIRED_DOUBLE_COUNTING_CERTIFICATE, display_to_recipient=True, is_blocking=True, lot=lot))
                 elif dcc.valid_until < lot.delivery_date:
@@ -267,7 +267,7 @@ def sanity_check(lot, prefetched_data):
 
     if lot.delivery_type == CarbureLot.RFC and lot.carbure_delivery_site and lot.carbure_delivery_site.depot_type != 'EFPE':
         errors.append(generic_error(error=CarbureSanityCheckErrors.MAC_NOT_EFPE, lot=lot, fields=['delivery_type']))
-        
+
     # check volume
     if lot.volume < 2000 and lot.delivery_type not in [CarbureLot.RFC, CarbureLot.FLUSHED]:
         errors.append(generic_error(error=CarbureSanityCheckErrors.VOLUME_FAIBLE, lot=lot, field='volume'))
