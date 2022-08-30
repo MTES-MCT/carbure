@@ -8,7 +8,7 @@ import argparse
 import openpyxl
 import pandas as pd
 from typing import TYPE_CHECKING, Dict, List, Optional
-from pandas._typing import FilePathOrBuffer, Scalar
+from pandas._typing import Scalar
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
@@ -70,8 +70,8 @@ def load_certificates():
         # Fin de validité        2025-12-31 00:00:00
         # Name: 84, dtype: object
         valid_until = cert['Fin de validité'].date()
-        
-        
+
+
         d = {
             'certificate_type': GenericCertificate.SYSTEME_NATIONAL,
             'certificate_holder': cert['Nom'],
@@ -90,7 +90,7 @@ def load_certificates():
         except Exception:
             print('failed')
     return
-       
+
 def main():
     load_certificates()
 
