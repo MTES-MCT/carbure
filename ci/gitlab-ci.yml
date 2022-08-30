@@ -28,8 +28,8 @@ variables:
     - git remote add scalingo-dev $SCALINGO_GIT_REMOTE_DEV
     - git remote add scalingo-staging $SCALINGO_GIT_REMOTE_STAGING
     - git remote add scalingo-prod $SCALINGO_GIT_REMOTE_PROD
-    - git fetch origin main --unshallow
-    - git checkout main
+    - git fetch origin $CI_COMMIT_BRANCH --unshallow
+    - git checkout $CI_COMMIT_BRANCH
 
 build-ci-image:
   stage: prepare
@@ -84,7 +84,7 @@ deploy-dev:
   except:
     - master
   script:
-    - git push scalingo-dev CI_COMMIT_BRANCH:master -f
+    - git push scalingo-dev $CI_COMMIT_BRANCH:master -f
 
 deploy-staging:
   stage: deploy
