@@ -53,13 +53,6 @@ check-backend:
   extends: .checks
   services:
     - mysql:8.0
-  variables:
-    DJANGO_DATABASE: $MYSQL_DATABASE
-    DJANGO_DB_USER: root
-    DJANGO_DB_PASSWORD: $MYSQL_ROOT_PASSWORD
-    DJANGO_DB_HOST: mysql
-    DJANGO_DB_PORT: 3306
-    SECRECT_KEY: $SECRET_KEY
   script:
     - mypy web
     - TEST=1 python3 web/manage.py test web

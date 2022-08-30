@@ -16,10 +16,28 @@ from django_query_profiler.settings import *
 
 import environ
 env = environ.Env(
-    # set casting, default value
     DEBUG=(bool, False),
     TEST=(bool, False),
-    AWS_DCDOCS_STORAGE_BUCKET_NAME=(str, '')
+    IMAGE_TAG=(str, "local"),
+    CARBURE_HOME=(str, ""),
+    ALLOWED_HOSTS=(list, ["localhost"]),
+    CSRF_TRUSTED_ORIGINS=(list, ["http://localhost:8000"]),
+    DJANGO_QUERY_PROFILER_REDIS_HOST=(str, "localhost"),
+    DATABASE_URL=(str, ""),
+    SENTRY_DSN=(str, ""),
+    AWS_ACCESS_KEY_ID=(str, ""),
+    AWS_SECRET_ACCESS_KEY=(str, ""),
+    AWS_S3_ENDPOINT_URL=(str, ""),
+    AWS_S3_REGION_NAME=(str, ""),
+    AWS_S3_USE_SSL=(str, ""),
+    AWS_STORAGE_BUCKET_NAME=(str, ""),
+    AWS_DCDOCS_STORAGE_BUCKET_NAME=(str, ""),
+    EMAIL_HOST=(str, ""),
+    EMAIL_PORT=(str, ""),
+    EMAIL_HOST_USER=(str, ""),
+    EMAIL_HOST_PASSWORD=(str, ""),
+    EMAIL_USE_TLS=(str, ""),
+
 )
 
 # False if not in os.environ
