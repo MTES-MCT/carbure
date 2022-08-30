@@ -3,6 +3,10 @@ stages:
   - check
   - deploy
 
+variables:
+  MYSQL_DATABASE: carbure_mysql_test_db
+  MYSQL_ROOT_PASSWORD: carbure_mysql_ci_db_password
+
 # use prebuild CI image when running checks
 .checks:
   image: $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest
@@ -47,9 +51,17 @@ build-ci-image:
 check-backend:
   stage: check
   extends: .checks
+  services:
+    - mysql:8.0
+  variables:
+    DJANGO_DATABASE: $MYSQL_DATABASE
+    DJANGO_DB_USER: root
+    DJANGO_DB_PASSWORD: $MYSQL_ROOT_PASSWORD
+    DJANGO_DB_HOST: mysql
+    DJANGO_DB_PORT: 3306
   script:
     - mypy web
-    - python3 web/manage.py test web
+    - TEST=1 python3 web/manage.py test web
   only:
     changes:
       - web/**/*
