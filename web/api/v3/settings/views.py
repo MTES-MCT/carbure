@@ -3,6 +3,7 @@ import traceback
 from dateutil.relativedelta import *
 
 from django.http import JsonResponse
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.db.models import Q
 from django_otp.decorators import otp_required
 from django.template.loader import render_to_string
@@ -22,6 +23,7 @@ from certificates.models import ProductionSiteCertificate
 
 from core.models import UserRightsRequests, UserRights
 
+@ensure_csrf_cookie
 @otp_or_403
 def get_settings(request):
     # user-rights
