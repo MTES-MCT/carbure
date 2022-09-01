@@ -23,4 +23,4 @@ RUN pipenv install --system --deploy
 COPY web web
 COPY scripts scripts
 
-CMD [ "bash", "./web/entrypoint.sh" ]
+CMD [ "sh", "./web/entrypoint.sh" ]

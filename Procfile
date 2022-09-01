@@ -1,1 +1,1 @@
-web: sh Procfile.sh
+web: sh web/entrypoint.sh
