@@ -46,11 +46,11 @@ def main(args):
             'nb_notifications': notifs.count(),
             'domain': domain,
             'lots_in': lots_in,
-            'lots_in_suppliers': ','.join(set([n.linked_tx.carbure_vendor.name if n.linked_tx.carbure_vendor for n in lots_in])),
+            'lots_in_suppliers': ','.join(set([n.linked_tx.carbure_vendor.name for n in lots_in if n.linked_tx.carbure_vendor ])),
             'lots_fixed': lots_fixed,
-            'lots_fixed_suppliers': ','.join(set([n.linked_tx.carbure_vendor.name if n.linked_tx.carbure_vendor for n in lots_fixed])),
+            'lots_fixed_suppliers': ','.join(set([n.linked_tx.carbure_vendor.name for n in lots_fixed if n.linked_tx.carbure_vendor ])),
             'lots_tofix': lots_tofix,
-            'lots_tofix_clients': ','.join(set([n.linked_tx.carbure_client.name if n.linked_tx.carbure_client for n in lots_tofix])),
+            'lots_tofix_clients': ','.join(set([n.linked_tx.carbure_client.name for n in lots_tofix if n.linked_tx.carbure_client])),
             'nb_notifications': len(notifs)
         }
         html_message = loader.render_to_string('emails/notifications.v2.html', email_context)
