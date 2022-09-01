@@ -5,8 +5,7 @@ Traçabilité et durabilité des biocarburants, de la production à la distribut
 - docker
 - docker-compose
 - python3
-- pyenv
-- virtualenv
+- pipenv
 - mysql
 - mysql-client
 - node
@@ -16,17 +15,9 @@ Traçabilité et durabilité des biocarburants, de la production à la distribut
 - Clonez le repository: git clone https://github.com/MTES-MCT/carbure.git
 - Créez un fichier `.env` à la racine du dépôt en vous basant sur le fichier `.env.example` disponible dans le dossier
 
-Dans le dossier /front, téléchargez les modules : 
+Ensuite, créez un environnement virtuel pour python 3.10:
 
-- `npm install` 
-
-Ensuite, créez un environnement virtuel pour python 3.10 :
-
-- `pyenv install 3.10.5`
-- `pyenv local 3.10.5`
-- `pyenv exec python -m venv venv`
-- `source venv/bin/activate`
-- `pip install -r requirements.txt`
+- `pipenv install`
 
 Je recommande de créer un alias pour charger l'environnement de développement.
 par exemple :
@@ -34,7 +25,10 @@ par exemple :
 - `alias carbure='cd /path/du/repository; source loadenv.sh;'`
 ***Le script loadenv.sh permet d'interagir avec les containers.***
 
-Vous pouvez désormais builder les images docker et lancer le projet :
+Dans le dossier /front, téléchargez les modules
+- `npm install`
+
+Vous pouvez désormais builder les images docker et lancer le projet:
 
 - `docker-compose build`
 - `docker-compose up -d`
@@ -44,7 +38,7 @@ Vous pouvez désormais builder les images docker et lancer le projet :
 
 Lancer `sh scripts/recovery/restore_db.sh` pour télécharger un dump contenant des données utilisables en local
 
-## Création d'un nom de domaine local personnalisé 
+## Création d'un nom de domaine local personnalisé
 
 - Aller dans le fichier `/etc/hosts` (sur linux et mac)
 - Ajouter la ligne `127.0.0.1 carbure.local`
@@ -54,7 +48,7 @@ Lancer `sh scripts/recovery/restore_db.sh` pour télécharger un dump contenant 
 # Authentification à Carbure
 
 - Pour ajouter un nouveau super utilisateur à la db locale, taper `docker exec -it carbure_app python3 web/manage.py createsuperuser`
-- Ensuite aller sur http://carbure.local:8090/app/auth/login
+- Ensuite aller sur http://carbure.local:8090/auth/login
 - Utiliser les informations renseignées à l'étape 1 puis valider l'authentification
 - Carbure demande d'entrer un code envoyé par email
 - Dans la version de dev ce code sera uniquement affiché dans les logs de django, visibles en tapant `docker logs carbure_app`
@@ -69,15 +63,14 @@ Lancer `sh scripts/recovery/restore_db.sh` pour télécharger un dump contenant 
 - ouvrir ubuntu dans le windows terminal puis taper:
 - `sudo apt-get update`
 - `sudo apt-get install python3 python3-dev python3-virtualenv default-libmysqlclient-dev build-essential`
+- `pip install --user pipenv`
 
 Ensuite, setup normalement le projet:
 - ajouter les clé ssh https://docs.gitlab.com/ee/ssh/#generate-an-ssh-key-pair
 - dans le terminal ubuntu, taper:
 - `git clone git@gitlab.com:la-fabrique-numerique/biocarburants.git carbure`
 - `cd carbure`
-- `virtualenv -p python3 venv`
-- `source venv/bin/activate`
-- `pip install -r requirements.txt`
+- `pipenv install`
 - `docker-compose up --build -d`
 - `source loadenv.sh`
 - `code .`
