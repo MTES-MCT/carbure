@@ -14,8 +14,9 @@ def send_declaration_reminder():
     today = datetime.today()
     period = today.year * 100 + today.month
 
-    entities = Entity.objects.filter(entity_type__in=(Entity.OPERATOR, Entity.PRODUCER, Entity.TRADER)) \
-        .prefetch_related('sustainabilitydeclaration_set')
+    entities = Entity.objects.filter(
+        entity_type__in=(Entity.OPERATOR, Entity.PRODUCER, Entity.TRADER)
+    ).prefetch_related("sustainabilitydeclaration_set")
 
     for entity in entities:
         declarations = entity.sustainabilitydeclaration_set.filter(period__year=today.year, period__month=today.month)
@@ -28,12 +29,12 @@ def send_declaration_reminder():
                     type=CarbureNotification.DECLARATION_REMINDER,
                     datetime=today,
                     send_by_email=True,
-                    meta={'year': today.year, 'period': period}
+                    meta={"year": today.year, "period": period},
                 )
             )
 
     CarbureNotification.objects.bulk_create(notifications)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     send_declaration_reminder()
