@@ -145,3 +145,6 @@ dump.rdb
 .DS_Store
 
 web/static
+
+# huey temporary databases and logs
+huey-cron.*

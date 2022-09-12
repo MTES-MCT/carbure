@@ -29,6 +29,7 @@ django-storages = "*"
 gunicorn = "*"
 tzdata = "*"
 coverage = "*"
+huey = "*"
 
 [dev-packages]
 black = "*"
