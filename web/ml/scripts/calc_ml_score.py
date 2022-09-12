@@ -25,6 +25,8 @@ def calc_ml_score(args):
     lots = CarbureLot.objects.select_related('feedstock', 'country_of_origin').filter(created_at__gt=DATE_BEGIN, lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN])
     if args.year:
         lots = lots.filter(year=args.year)
+    if args.period:
+        lots = lots.filter(period=args.period)
     
     for l in tqdm(lots.iterator()):
         score = 0
@@ -64,6 +66,7 @@ def calc_ml_score(args):
 def main():
     parser = argparse.ArgumentParser(description='Calculate machine learning score')
     parser.add_argument('--year', dest='year', action='store', help='year')    
+    parser.add_argument('--period', dest='period', action='store', help='period')    
     args = parser.parse_args()
 
     calc_ml_score(args)

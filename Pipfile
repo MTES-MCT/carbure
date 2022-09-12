@@ -30,6 +30,7 @@ gunicorn = "*"
 tzdata = "*"
 coverage = "*"
 huey = "*"
+lxml = "*"
 
 [dev-packages]
 black = "*"
