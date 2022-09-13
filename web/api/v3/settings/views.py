@@ -21,7 +21,7 @@ from core.decorators import check_rights, otp_or_403
 from certificates.models import ProductionSiteCertificate
 
 from core.models import UserRightsRequests, UserRights
-from web.carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring
+from carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring
 
 @ensure_csrf_cookie
 @otp_or_403

@@ -11,7 +11,7 @@ from core.models import Entity, EntityCertificate, GenericCertificate, UserRight
 from core.serializers import EntityCertificateSerializer, GenericCertificateSerializer
 from producers.models import ProductionSite
 from core.models import CarbureLot
-from web.carbure.tasks import background_bulk_sanity_checks
+from carbure.tasks import background_bulk_sanity_checks
 
 def get_certificates(request, *args, **kwargs):
     query = request.GET.get('query', '')
