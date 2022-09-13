@@ -21,7 +21,7 @@ from core.decorators import check_rights, otp_or_403
 from certificates.models import ProductionSiteCertificate
 
 from core.models import UserRightsRequests, UserRights
-from web.carbure.tasks import background_bulk_scoring
+from web.carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring
 
 @ensure_csrf_cookie
 @otp_or_403
@@ -267,6 +267,7 @@ def set_production_site_mp(request, *args, **kwargs):
                 # remove errors
                 impacted_txs = CarbureLot.objects.filter(carbure_production_site=ps, feedstock=mp)
                 background_bulk_scoring(impacted_txs)
+                background_bulk_sanity_checks(impacted_txs)
                 GenericError.objects.filter(lot__in=impacted_txs, error="MP_NOT_CONFIGURED").delete()
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
@@ -308,6 +309,7 @@ def set_production_site_bc(request, *args, **kwargs):
                 # remove errors
                 impacted_txs = CarbureLot.objects.filter(carbure_production_site=ps, biofuel=bc)
                 background_bulk_scoring(impacted_txs)
+                background_bulk_sanity_checks(impacted_txs)
                 GenericError.objects.filter(lot__in=impacted_txs, error="BC_NOT_CONFIGURED").delete()
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
@@ -363,6 +365,7 @@ def add_delivery_site(request, *args, **kwargs):
         ed, created = EntityDepot.objects.update_or_create(entity=entity, depot=ds, defaults={'ownership_type': ownership_type, 'blending_is_outsourced': blending_is_outsourced, 'blender': blender})
         lots = CarbureLot.objects.filter(carbure_client=entity, carbure_delivery_site=ds)
         background_bulk_scoring(lots)
+        background_bulk_sanity_checks(lots)
         GenericError.objects.filter(lot__in=lots, error=CarbureSanityCheckErrors.DEPOT_NOT_CONFIGURED).delete()
     except Exception:
         traceback.print_exc()
@@ -380,6 +383,7 @@ def delete_delivery_site(request, *args, **kwargs):
         EntityDepot.objects.filter(entity=entity, depot__depot_id=delivery_site_id).delete()
         lots = CarbureLot.objects.filter(carbure_client=entity, carbure_delivery_site__depot_id=delivery_site_id)
         background_bulk_scoring(lots)
+        background_bulk_sanity_checks(lots)
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not delete entity's delivery site",
                             }, status=400)
