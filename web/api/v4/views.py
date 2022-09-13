@@ -517,9 +517,9 @@ def add_lot(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=400)
     # run sanity checks, insert lot and errors
     lots_created = bulk_insert_lots(entity, [lot_obj], [errors], d)
-    background_bulk_scoring([lots_created])
     if len(lots_created) == 0:
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=500)
+    background_bulk_scoring([lots_created])
     e = CarbureLotEvent()
     e.event_type = CarbureLotEvent.CREATED
     e.lot_id = lots_created[0].id
