@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 import os
 import sentry_sdk
-from huey import SqliteHuey
 from sentry_sdk.integrations.django import DjangoIntegration
 from django_query_profiler.settings import *
 
@@ -77,6 +76,7 @@ INSTALLED_APPS = [
     'django_otp.plugins.otp_email',
     'django_admin_listfilter_dropdown',
     'authtools',
+    'huey.contrib.djhuey',
     'core',
     'producers',
     'certificates',
@@ -232,8 +232,14 @@ LOGGING = {
     },
 }
 
-# Huey instance to setup background tasks
-huey = SqliteHuey(filename="huey-carbure.db")
+# Huey settings
+HUEY = {
+    'name': 'carbure',
+    'huey_class': 'huey.SqliteHuey',
+    'filename': 'huey-carbure.db',
+    'immediate': False,
+    'consumer': {'workers': 2}
+}
 
 
 if DEBUG:

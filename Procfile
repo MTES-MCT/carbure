@@ -1,3 +1,3 @@
 web: sh web/entrypoint.sh
-worker: huey_consumer web.carbure.settings.huey --workers=2 --logfile=./huey-carbure.log
+worker: python3 web/manage.py run_huey
 clock: huey_consumer cron.schedule.huey --workers=2 --logfile=./huey-cron.log

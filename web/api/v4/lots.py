@@ -5,9 +5,9 @@ from typing import Generic, List
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import Q
 from numpy.lib.function_base import insert
-from api.v4.sanity_checks import bulk_sanity_checks
 from core.carburetypes import CarbureUnit, CarbureStockErrors
 from core.models import CarbureLot, CarbureLotEvent, CarbureStock, Entity, GenericError
+from web.api.v4.sanity_checks import bulk_sanity_checks
 
 INCORRECT_DELIVERY_DATE = "INCORRECT_DELIVERY_DATE"
 INCORRECT_FORMAT_DELIVERY_DATE = "INCORRECT_FORMAT_DELIVERY_DATE"
@@ -431,6 +431,6 @@ def bulk_insert_lots(entity: Entity, lots: List[CarbureLot], errors: List[Generi
     for lot, lot_errors in zip(inserted_lots, errors):
         for e in lot_errors:
             e.lot_id = lot.id
-    bulk_sanity_checks(inserted_lots, prefetched_data, background=False)
+    bulk_sanity_checks(inserted_lots, prefetched_data)
     GenericError.objects.bulk_create([error for lot_errors in errors for error in lot_errors], batch_size=100)
     return inserted_lots
