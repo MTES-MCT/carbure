@@ -7,7 +7,7 @@ from django.db.models.query_utils import Q
 from numpy.lib.function_base import insert
 from core.carburetypes import CarbureUnit, CarbureStockErrors
 from core.models import CarbureLot, CarbureLotEvent, CarbureStock, Entity, GenericError
-from web.api.v4.sanity_checks import bulk_sanity_checks
+from api.v4.sanity_checks import bulk_sanity_checks
 
 INCORRECT_DELIVERY_DATE = "INCORRECT_DELIVERY_DATE"
 INCORRECT_FORMAT_DELIVERY_DATE = "INCORRECT_FORMAT_DELIVERY_DATE"
