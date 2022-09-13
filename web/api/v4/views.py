@@ -26,7 +26,7 @@ from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureL
 from core.notifications import notify_correction_done, notify_correction_request, notify_declaration_cancelled, notify_declaration_validated, notify_lots_recalled, notify_lots_received, notify_lots_rejected, notify_lots_recalled
 from core.serializers import CarbureLotPublicSerializer, CarbureLotReliabilityScoreSerializer, CarbureNotificationSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
 from core.xlsx_v3 import template_v4, template_v4_stocks
-from web.carbure.tasks import background_bulk_scoring
+from carbure.tasks import background_bulk_scoring
 
 
 @check_user_rights()

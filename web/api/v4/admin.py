@@ -19,7 +19,7 @@ from api.v4.helpers import get_transaction_distance
 
 from core.models import CarbureLot, CarbureLotComment, CarbureStock, CarbureStockTransformation, Entity, EntityCertificate, GenericError, SustainabilityDeclaration
 from core.serializers import CarbureLotAdminSerializer, CarbureLotCommentSerializer, CarbureLotPublicSerializer, CarbureLotReliabilityScoreSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer, EntityCertificateSerializer, SustainabilityDeclarationSerializer
-from web.carbure.tasks import background_bulk_scoring
+from carbure.tasks import background_bulk_scoring
 
 
 @is_admin
