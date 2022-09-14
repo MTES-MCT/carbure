@@ -28,6 +28,8 @@ from core.xlsx_v3 import export_dca, make_biofuels_sheet, make_dc_mps_sheet, mak
 from carbure.storage_backends import AWSStorage
 from django.core.files.storage import FileSystemStorage
 
+from core.common import ErrorResponse
+
 @check_rights('entity_id')
 def get_agreements(request, *args, **kwargs):
     entity = kwargs['context']['entity']
@@ -211,7 +213,7 @@ def upload_file(request, *args, **kwargs):
     sourcing_data, production_data = load_dc_file(filepath)
 
     # get dc period for upload
-    years = list(sourcing_data['year']) + list(production_data['year'])
+    years = [int(year) for year in list(sourcing_data['year']) + list(production_data['year']) if year]
     end_year = max(years)
     start = datetime.date(end_year - 1, 1, 1)
     end = datetime.date(end_year, 12, 31)
@@ -219,8 +221,13 @@ def upload_file(request, *args, **kwargs):
     dca, created = DoubleCountingAgreement.objects.get_or_create(producer=entity, production_site_id=production_site_id, period_start=start, period_end=end, defaults={'producer_user': request.user})
 
     try:
-        load_dc_sourcing_data(dca, sourcing_data)
-        load_dc_production_data(dca, production_data)
+        sourcing_errors = load_dc_sourcing_data(dca, sourcing_data)
+        production_errors = load_dc_production_data(dca, production_data)
+
+        if len(sourcing_errors) > 0 or len(production_errors) > 0:
+            dca.delete()
+            return ErrorResponse(400, 'DOUBLE_COUNTING_IMPORT_FAILED', {"errors": {"sourcing": sourcing_errors, "production": production_errors}})
+
         # send confirmation email
         try:
             send_dca_confirmation_email(dca)
