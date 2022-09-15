@@ -29,6 +29,7 @@ from carbure.storage_backends import AWSStorage
 from django.core.files.storage import FileSystemStorage
 
 from core.common import ErrorResponse
+from doublecount.dc_sanity_checks import check_dc_globally
 
 @check_rights('entity_id')
 def get_agreements(request, *args, **kwargs):
@@ -223,10 +224,12 @@ def upload_file(request, *args, **kwargs):
     try:
         sourcing_errors = load_dc_sourcing_data(dca, sourcing_data)
         production_errors = load_dc_production_data(dca, production_data)
+        global_errors = check_dc_globally(dca)
 
-        if len(sourcing_errors) > 0 or len(production_errors) > 0:
+        if len(sourcing_errors) > 0 or len(production_errors) > 0 or len(global_errors) > 0:
             dca.delete()
-            return ErrorResponse(400, 'DOUBLE_COUNTING_IMPORT_FAILED', {"errors": {"sourcing": sourcing_errors, "production": production_errors}})
+            errors = {"sourcing": sourcing_errors, "production": production_errors, "global": global_errors}
+            return ErrorResponse(400, 'DOUBLE_COUNTING_IMPORT_FAILED', {"errors": errors})
 
         # send confirmation email
         try:
