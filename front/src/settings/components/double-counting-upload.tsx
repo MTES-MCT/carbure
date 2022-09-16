@@ -11,10 +11,7 @@ import { useMutation } from "common/hooks/async"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api/double-counting"
 import { AxiosError } from "axios"
-import {
-  DoubleCountingUpload,
-  DoubleCountingUploadError,
-} from "doublecount/types"
+import { DoubleCountingUploadErrors } from "doublecount/types"
 
 type DoubleCountingUploadDialogProps = {
   entity: Entity
@@ -34,12 +31,16 @@ const DoubleCountingUploadDialog = ({
   })
 
   const uploadFile = useMutation(api.uploadDoubleCountingFile, {
-    // onSuccess: () =>
+    onSuccess: (res) => {
+      console.log("okkk:", res)
+    },
     // notify(t("La société a été ajoutée !"), { variant: "success" }),
     onError: (err) => {
-      const errors = (err as AxiosError<DoubleCountingUpload>).response?.data
-        .errors
-      console.log("error:", errors)
+      // const error = (err as AxiosError<{ error: string }>).response?.data.error
+      const errors = (
+        err as AxiosError<{ data: { errors: DoubleCountingUploadErrors } }>
+      ).response?.data.data.errors
+      console.log(">error:", errors)
 
       // notify(t("La société n'a pas pu être ajoutée !"), { variant: "danger" }),
     },
@@ -66,9 +67,8 @@ const DoubleCountingUploadDialog = ({
       value.productionSite.id,
       value.doubleCountingFile
     )
-    console.log("res:", res)
 
-    if (res.data.data) {
+    if (res.data.status === "success" && res.data.data) {
       await uploadDocFile.execute(
         entity.id,
         res.data.data.dca_id,
