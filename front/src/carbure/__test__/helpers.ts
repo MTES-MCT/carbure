@@ -1,4 +1,5 @@
 import { screen, waitForElementToBeRemoved } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 
 export async function waitWhileLoading() {
   try {
@@ -38,6 +39,16 @@ export function getField(label: any) {
   const field = screen.getByText(rx).parentElement?.querySelector("input")
   if (!field) throw new Error(`Cannot find field with label like ${label}`)
   return field
+}
+
+export async function uploadFileField(label: string, file?: any) {
+  const user = userEvent.setup()
+  if (!file) {
+    file = new File(["hello"], "hello.png", { type: "image/png" })
+  }
+  const dcInput = await getField(label)
+  await user.upload(dcInput, file)
+  return dcInput
 }
 
 export function getByTextContent(textContent: string) {
