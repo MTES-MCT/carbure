@@ -31,6 +31,7 @@ export interface DoubleCounting {
   creation_date: string
 }
 
+
 export interface DoubleCountingSourcingAggregation {
   year: number
   sum: number
@@ -58,6 +59,24 @@ export interface DoubleCountingProduction {
   requested_quota: number
   approved_quota: number
 }
+
+
+export interface DoubleCountingUploadError {
+  error: string
+  is_blocking: boolean
+  line_number: number
+  meta: null | any
+}
+
+
+export interface DoubleCountingUpload extends DoubleCounting {
+  dca_id: number
+  errors?: {
+    sourcing?: DoubleCountingUploadError[]
+    production?: DoubleCountingUploadError[]
+  }
+}
+
 
 export interface DoubleCountingDetails extends DoubleCounting {
   sourcing: DoubleCountingSourcing[]

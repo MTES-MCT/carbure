@@ -2,6 +2,7 @@ import api, { Api } from "common/services/api"
 import {
   DoubleCounting,
   DoubleCountingDetails,
+  DoubleCountingUpload,
   QuotaDetails,
 } from "doublecount/types"
 
@@ -22,11 +23,12 @@ export function uploadDoubleCountingFile(
   production_site_id: number,
   file: File
 ) {
-  return api.post<Api<{ dca_id: number }>>("/v3/doublecount/upload", {
+  const res = api.post<Api<DoubleCountingUpload>>("/v3/doublecount/upload", {
     entity_id,
     production_site_id,
     file,
   })
+  return res
 }
 
 export function uploadDoubleCountingDescriptionFile(
