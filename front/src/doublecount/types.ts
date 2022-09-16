@@ -69,13 +69,11 @@ export interface DoubleCountingUploadError {
 }
 
 
-export interface DoubleCountingUpload extends DoubleCounting {
-  dca_id: number
-  errors?: {
-    sourcing?: DoubleCountingUploadError[]
-    production?: DoubleCountingUploadError[]
-  }
+export interface DoubleCountingUploadErrors extends DoubleCounting {
+  sourcing?: DoubleCountingUploadError[]
+  production?: DoubleCountingUploadError[]
 }
+
 
 
 export interface DoubleCountingDetails extends DoubleCounting {

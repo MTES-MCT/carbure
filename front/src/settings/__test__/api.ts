@@ -259,11 +259,26 @@ export const okAgreements = rest.get(
   }
 )
 
+export const koDoubleCountUploadApplication = rest.post(
+  "/api/v3/doublecount/upload",
+  (req, res, ctx) => {
+    return res(
+      ctx.status(400),
+      ctx.json({
+        status: "error",
+        error: "DOUBLE_COUNTING_IMPORT_FAILED",
+        data: dcApplicationErrors,
+      })
+    )
+  }
+)
+
 import {
   okProductionSitesSearch,
 } from "carbure/__test__/api"
 
 export default setupServer(
+  koDoubleCountUploadApplication,
   okSettings,
   okEnableMac,
   okDisableMac,
@@ -290,47 +305,42 @@ export default setupServer(
   okAgreements
 )
 
-
-// {
-//   "status": "error",
-//   "error": "DOUBLE_COUNTING_IMPORT_FAILED",
-//   "data": {
-//     "errors": {
-//       "sourcing": [
-//         {
-//           "error": "UNKNOWN_FEEDSTOCK",
-//           "is_blocking": true,
-//           "line_number": 2,
-//           "meta": { "feedstock": "FUIMERAav" }
-//         },
-//         {
-//           "error": "NOT_DC_FEEDSTOCK",
-//           "is_blocking": false,
-//           "line_number": 9,
-//           "meta": { "feedstock": "BETTERAVE" }
-//         }
-//       ],
-//       "production": [
-//         {
-//           "error": "UNKNOWN_BIOFUEL",
-//           "is_blocking": true,
-//           "line_number": 2,
-//           "meta": { "biofuel": "SFALKWJ" }
-//         },
-//         {
-//           "error": "UNKNOWN_FEEDSTOCK",
-//           "is_blocking": true,
-//           "line_number": 3,
-//           "meta": { "feedstock": "Asdasasfw2323" }
-//         },
-//         { "error": "MISSING_BIOFUEL", "is_blocking": true, "line_number": 4 },
-//         {
-//           "error": "NOT_DC_FEEDSTOCK",
-//           "is_blocking": true,
-//           "line_number": 5,
-//           "meta": { "feedstock": "BLE" }
-//         }
-//       ]
-//     }
-//   }
-// }
+const dcApplicationErrors = {
+  "errors": {
+    "sourcing": [
+      {
+        "error": "UNKNOWN_FEEDSTOCK",
+        "is_blocking": true,
+        "line_number": 2,
+        "meta": { "feedstock": "FUIMERAav" }
+      },
+      {
+        "error": "NOT_DC_FEEDSTOCK",
+        "is_blocking": false,
+        "line_number": 9,
+        "meta": { "feedstock": "BETTERAVE" }
+      }
+    ],
+    "production": [
+      {
+        "error": "UNKNOWN_BIOFUEL",
+        "is_blocking": true,
+        "line_number": 2,
+        "meta": { "biofuel": "SFALKWJ" }
+      },
+      {
+        "error": "UNKNOWN_FEEDSTOCK",
+        "is_blocking": true,
+        "line_number": 3,
+        "meta": { "feedstock": "Asdasasfw2323" }
+      },
+      { "error": "MISSING_BIOFUEL", "is_blocking": true, "line_number": 4 },
+      {
+        "error": "NOT_DC_FEEDSTOCK",
+        "is_blocking": true,
+        "line_number": 5,
+        "meta": { "feedstock": "BLE" }
+      }
+    ]
+  }
+}
