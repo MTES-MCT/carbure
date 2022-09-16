@@ -30,7 +30,7 @@ beforeEach(() => server.use(okDynamicSettings))
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
-test("check upload a double counting application", async () => {
+test("check upload should fail", async () => {
   const user = userEvent.setup()
   setEntity(producer)
   render(<SettingsWithHooks entityID={producer.id} />)
@@ -53,5 +53,6 @@ test("check upload a double counting application", async () => {
   expect(descriptionInput.files).toHaveLength(1)
 
   const submitButton = await screen.findByText("Soumettre le dossier")
+
   await user.click(submitButton)
 })
