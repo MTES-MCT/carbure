@@ -25,9 +25,9 @@ variables:
     - chmod 644 ~/.ssh/known_hosts
     - git config user.name $GIT_USER_NAME
     - git config user.email $GIT_USER_EMAIL
-    - git remote add scalingo-dev $SCALINGO_GIT_REMOTE_DEV
-    - git remote add scalingo-staging $SCALINGO_GIT_REMOTE_STAGING
-    - git remote add scalingo-prod $SCALINGO_GIT_REMOTE_PROD
+    - git remote add scalingo-dev $SCALINGO_GIT_REMOTE_DEV || true
+    - git remote add scalingo-staging $SCALINGO_GIT_REMOTE_STAGING || true
+    - git remote add scalingo-prod $SCALINGO_GIT_REMOTE_PROD || true
     - git fetch origin $CI_COMMIT_BRANCH --unshallow
     - git checkout $CI_COMMIT_BRANCH
 
