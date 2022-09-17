@@ -56,7 +56,7 @@ check-backend:
   script:
     - export CARBURE_HOME=$(pwd)
     - export DATABASE_URL=mysql://root:$MYSQL_ROOT_PASSWORD@mysql:3306/$MYSQL_DATABASE
-    # - mypy web
+    - mypy web || true
     - TEST=1 python3 web/manage.py test web
   only:
     changes:
