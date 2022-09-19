@@ -32,7 +32,7 @@ const DoubleCountingUploadDialog = ({
   onClose,
 }: DoubleCountingUploadDialogProps) => {
   const { t } = useTranslation()
-  const [errors, setErrors] = useState<DoubleCountingUploadError[]>([])
+  const [errors, setErrors] = useState<DoubleCountingUploadErrors>()
   const notify = useNotify()
 
   const { value, bind } = useForm({
@@ -43,27 +43,27 @@ const DoubleCountingUploadDialog = ({
 
   const uploadFile = useMutation(api.uploadDoubleCountingFile, {
     onSuccess: (res) => {
-      console.log("okkk:", res)
       notify(t("Votre dossier double comptage a bien été envoyé !"), {
         variant: "success",
       })
     },
     onError: (err) => {
       const error = (err as AxiosError<{ error: string }>).response?.data.error
-      console.log("error:", error)
       if (error === "DOUBLE_COUNTING_IMPORT_FAILED") {
-        const respErrors = (
+        const errors = (
           err as AxiosError<{ data: { errors: DoubleCountingUploadErrors } }>
         ).response?.data.data.errors
-        console.log(">error:", respErrors)
-
-        const errors = [
-          ...(respErrors?.global ?? []),
-          ...(respErrors?.sourcing ?? []),
-          ...(respErrors?.production ?? []),
-        ]
         console.log("errors:", errors)
         setErrors(errors)
+      } else {
+        notify(
+          t(
+            "L'envoie de votre dossier double a échoué. Merci de contacter l'équipe Carbure"
+          ),
+          {
+            variant: "danger",
+          }
+        )
       }
     },
   })
@@ -159,7 +159,7 @@ const DoubleCountingUploadDialog = ({
               {...bind("documentationFile")}
             />
 
-            {errors.length && <BlockingErrors errors={errors} />}
+            {errors && <BlockingErrors errors={errors} />}
           </Form>
         </section>
       </main>
@@ -184,16 +184,21 @@ const DoubleCountingUploadDialog = ({
 export default DoubleCountingUploadDialog
 
 export interface BlockingErrorsProps {
-  errors: DoubleCountingUploadError[]
+  errors: DoubleCountingUploadErrors
 }
 
 const BlockingErrors = ({ errors }: BlockingErrorsProps) => {
+  const allErrors = [
+    ...(errors?.global ?? []),
+    ...(errors?.sourcing ?? []),
+    ...(errors?.production ?? []),
+  ]
   const { t } = useTranslation()
   return (
     <Collapse
       variant="danger"
       icon={AlertOctagon}
-      label={`${t("Erreurs")} (${errors.length})`}
+      label={`${t("Erreurs")} (${allErrors.length})`}
     >
       <section>
         {t(
@@ -203,8 +208,16 @@ const BlockingErrors = ({ errors }: BlockingErrorsProps) => {
 
       <footer>
         <ul>
-          {errors.map((error, i) => (
+          {errors.global?.map((error, i) => (
             <li key={i}>{getErrorText(error)}</li>
+          ))}
+          {errors.sourcing?.map((error, i) => (
+            <li key={i}>
+              {t("Approvisionnement") + " - " + getErrorText(error)}
+            </li>
+          ))}
+          {errors.production?.map((error, i) => (
+            <li key={i}>{t("Production") + " - " + getErrorText(error)}</li>
           ))}
         </ul>
       </footer>
