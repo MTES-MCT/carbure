@@ -51,7 +51,7 @@ def check_production_line(production, data, line):
     elif not production.biofuel_id:
         errors.append(error(DoubleCountingError.UNKNOWN_BIOFUEL, line, {"biofuel": data.biofuel}))
 
-    if production.feedstock and production.biofuel:
+    if production.feedstock_id and production.biofuel_id:
         incompatibilities = check_compatibility_feedstock_biofuel(production.feedstock, production.biofuel)
         meta = {"feedstock": production.feedstock.code, "biofuel": production.biofuel.code}
         errors += [error(DoubleCountingError.MP_BC_INCOHERENT, line, {**meta, "info": i}) for i in incompatibilities]

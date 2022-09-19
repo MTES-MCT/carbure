@@ -60,11 +60,15 @@ export interface DoubleCountingProduction {
   approved_quota: number
 }
 
+export enum DoubleCountingUploadErrorType {
+  UnkownFeedstock = "UNKNOWN_FEEDSTOCK",
+}
+
 
 export interface DoubleCountingUploadError {
   error: string
   is_blocking: boolean
-  line_number: number
+  line_number: number | null
   meta: null | any
 }
 
@@ -72,6 +76,7 @@ export interface DoubleCountingUploadError {
 export interface DoubleCountingUploadErrors extends DoubleCounting {
   sourcing?: DoubleCountingUploadError[]
   production?: DoubleCountingUploadError[]
+  global?: DoubleCountingUploadError[]
 }
 
 

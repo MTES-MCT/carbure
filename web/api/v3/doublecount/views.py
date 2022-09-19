@@ -188,9 +188,11 @@ def send_dca_status_email(dca):
 
 @check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def upload_file(request, *args, **kwargs):
+
     context = kwargs['context']
     entity = context['entity']
     production_site_id = request.POST.get('production_site_id', None)
+
     if not production_site_id:
         return JsonResponse({'status': "error", 'message': "Missing production_site_id"}, status=400)
 
@@ -223,8 +225,15 @@ def upload_file(request, *args, **kwargs):
 
     try:
         sourcing_errors = load_dc_sourcing_data(dca, sourcing_data)
+        print("sourcing_errors:")
+        print(sourcing_errors)
+        print("production_data:")
+        print(production_data)
         production_errors = load_dc_production_data(dca, production_data)
+
         global_errors = check_dc_globally(dca)
+        print("global_errors:")
+        print(global_errors)
 
         if len(sourcing_errors) > 0 or len(production_errors) > 0 or len(global_errors) > 0:
             dca.delete()
