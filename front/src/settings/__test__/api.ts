@@ -20,6 +20,10 @@ import {
   okFieldsTranslations,
 } from "carbure/__test__/api"
 import { clone, Data } from "carbure/__test__/helpers"
+import {
+  okProductionSitesSearch,
+} from "carbure/__test__/api"
+import { dcApplicationErrors } from "./data"
 
 let deliverySites: any[] = []
 let productionSites: any[] = []
@@ -259,6 +263,30 @@ export const okAgreements = rest.get(
   }
 )
 
+export const okDoubleCountUploadApplication = rest.post(
+  "/api/v3/doublecount/upload",
+  (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data: { dca_id: 142332 }
+      })
+    )
+  }
+)
+
+export const okDoubleCountUploadDocumentation = rest.post(
+  "/api/v3/doublecount/upload-documentation",
+  (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data: { dca_id: 142332 }
+      })
+    )
+  }
+)
+
 export const koDoubleCountUploadApplication = rest.post(
   "/api/v3/doublecount/upload",
   (req, res, ctx) => {
@@ -273,12 +301,11 @@ export const koDoubleCountUploadApplication = rest.post(
   }
 )
 
-import {
-  okProductionSitesSearch,
-} from "carbure/__test__/api"
 
 export default setupServer(
   koDoubleCountUploadApplication,
+  okDoubleCountUploadDocumentation,
+  okDoubleCountUploadApplication,
   okSettings,
   okEnableMac,
   okDisableMac,
@@ -304,43 +331,3 @@ export default setupServer(
   okSelfCertificates,
   okAgreements
 )
-
-const dcApplicationErrors = {
-  "errors": {
-    "sourcing": [
-      {
-        "error": "UNKNOWN_FEEDSTOCK",
-        "is_blocking": true,
-        "line_number": 2,
-        "meta": { "feedstock": "FUIMERAav" }
-      },
-      {
-        "error": "NOT_DC_FEEDSTOCK",
-        "is_blocking": false,
-        "line_number": 9,
-        "meta": { "feedstock": "BETTERAVE" }
-      }
-    ],
-    "production": [
-      {
-        "error": "UNKNOWN_BIOFUEL",
-        "is_blocking": true,
-        "line_number": 2,
-        "meta": { "biofuel": "SFALKWJ" }
-      },
-      {
-        "error": "UNKNOWN_FEEDSTOCK",
-        "is_blocking": true,
-        "line_number": 3,
-        "meta": { "feedstock": "Asdasasfw2323" }
-      },
-      { "error": "MISSING_BIOFUEL", "is_blocking": true, "line_number": 4 },
-      {
-        "error": "NOT_DC_FEEDSTOCK",
-        "is_blocking": true,
-        "line_number": 5,
-        "meta": { "feedstock": "BLE" }
-      }
-    ]
-  }
-}

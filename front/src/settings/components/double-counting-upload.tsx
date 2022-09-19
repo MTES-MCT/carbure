@@ -5,13 +5,22 @@ import AutoComplete from "common/components/autocomplete"
 import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import { Form, useForm } from "common/components/form"
-import { Check, Return, Upload } from "common/components/icons"
+import { AlertOctagon, Check, Return, Upload } from "common/components/icons"
 import { FileInput } from "common/components/input"
 import { useMutation } from "common/hooks/async"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api/double-counting"
 import { AxiosError } from "axios"
-import { DoubleCountingUploadErrors } from "doublecount/types"
+import {
+  DoubleCountingUploadError,
+  DoubleCountingUploadErrors,
+  DoubleCountingUploadErrorType,
+} from "doublecount/types"
+import Collapse from "common/components/collapse"
+import { useState } from "react"
+import { t } from "i18next"
+import { getErrorText } from "settings/utils/double-counting"
+import { useNotify } from "common/components/notifications"
 
 type DoubleCountingUploadDialogProps = {
   entity: Entity
@@ -23,6 +32,8 @@ const DoubleCountingUploadDialog = ({
   onClose,
 }: DoubleCountingUploadDialogProps) => {
   const { t } = useTranslation()
+  const [errors, setErrors] = useState<DoubleCountingUploadError[]>([])
+  const notify = useNotify()
 
   const { value, bind } = useForm({
     productionSite: undefined as ProductionSite | undefined,
@@ -33,16 +44,27 @@ const DoubleCountingUploadDialog = ({
   const uploadFile = useMutation(api.uploadDoubleCountingFile, {
     onSuccess: (res) => {
       console.log("okkk:", res)
+      notify(t("Votre dossier double comptage a bien été envoyé !"), {
+        variant: "success",
+      })
     },
-    // notify(t("La société a été ajoutée !"), { variant: "success" }),
     onError: (err) => {
-      // const error = (err as AxiosError<{ error: string }>).response?.data.error
-      const errors = (
-        err as AxiosError<{ data: { errors: DoubleCountingUploadErrors } }>
-      ).response?.data.data.errors
-      console.log(">error:", errors)
+      const error = (err as AxiosError<{ error: string }>).response?.data.error
+      console.log("error:", error)
+      if (error === "DOUBLE_COUNTING_IMPORT_FAILED") {
+        const respErrors = (
+          err as AxiosError<{ data: { errors: DoubleCountingUploadErrors } }>
+        ).response?.data.data.errors
+        console.log(">error:", respErrors)
 
-      // notify(t("La société n'a pas pu être ajoutée !"), { variant: "danger" }),
+        const errors = [
+          ...(respErrors?.global ?? []),
+          ...(respErrors?.sourcing ?? []),
+          ...(respErrors?.production ?? []),
+        ]
+        console.log("errors:", errors)
+        setErrors(errors)
+      }
     },
   })
 
@@ -62,21 +84,22 @@ const DoubleCountingUploadDialog = ({
     )
       return
 
-    const res = await uploadFile.execute(
-      entity.id,
-      value.productionSite.id,
-      value.doubleCountingFile
-    )
-
-    if (res.data.status === "success" && res.data.data) {
-      await uploadDocFile.execute(
+    try {
+      const res = await uploadFile.execute(
         entity.id,
-        res.data.data.dca_id,
-        value.documentationFile
+        value.productionSite.id,
+        value.doubleCountingFile
       )
-    }
 
-    onClose()
+      if (res.data.data) {
+        await uploadDocFile.execute(
+          entity.id,
+          res.data.data.dca_id,
+          value.documentationFile
+        )
+        onClose()
+      }
+    } catch (error) {}
   }
 
   return (
@@ -135,6 +158,8 @@ const DoubleCountingUploadDialog = ({
               label={t("Importer la description")}
               {...bind("documentationFile")}
             />
+
+            {errors.length && <BlockingErrors errors={errors} />}
           </Form>
         </section>
       </main>
@@ -157,3 +182,32 @@ const DoubleCountingUploadDialog = ({
 }
 
 export default DoubleCountingUploadDialog
+
+export interface BlockingErrorsProps {
+  errors: DoubleCountingUploadError[]
+}
+
+const BlockingErrors = ({ errors }: BlockingErrorsProps) => {
+  const { t } = useTranslation()
+  return (
+    <Collapse
+      variant="danger"
+      icon={AlertOctagon}
+      label={`${t("Erreurs")} (${errors.length})`}
+    >
+      <section>
+        {t(
+          "Vous ne pouvez pas valider ce lot tant que les problèmes suivants n'ont pas été adressés :"
+        )}
+      </section>
+
+      <footer>
+        <ul>
+          {errors.map((error, i) => (
+            <li key={i}>{getErrorText(error)}</li>
+          ))}
+        </ul>
+      </footer>
+    </Collapse>
+  )
+}
