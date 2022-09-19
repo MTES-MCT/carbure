@@ -24,6 +24,7 @@ env = environ.Env(
     CSRF_TRUSTED_ORIGINS=(list, ["http://localhost:8000"]),
     DJANGO_QUERY_PROFILER_REDIS_HOST=(str, "localhost"),
     DATABASE_URL=(str, ""),
+    REDIS_URL=(str, ""),
     SENTRY_DSN=(str, ""),
     AWS_ACCESS_KEY_ID=(str, ""),
     AWS_SECRET_ACCESS_KEY=(str, ""),
@@ -235,8 +236,8 @@ LOGGING = {
 # Huey settings
 HUEY = {
     'name': 'carbure',
-    'huey_class': 'huey.SqliteHuey',
-    'filename': 'huey-carbure.db',
+    'huey_class': 'huey.RedisHuey',
+    'url': env('REDIS_URL'),
     'immediate': False,
     'consumer': {'workers': 2}
 }
