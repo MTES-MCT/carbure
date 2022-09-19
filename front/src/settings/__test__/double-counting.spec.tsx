@@ -55,17 +55,29 @@ test("check double counting upload with error display errors", async () => {
   await fillForm()
 
   await waitWhileLoading()
-  const error1 = {
-    error: "UNKNOWN_FEEDSTOCK",
-    line_number: 2,
-    is_blocking: true,
-    meta: {
-      feedstock: "FUIMERAav",
-    },
-  }
 
-  const error1Text = getErrorText(error1)
-  await screen.getByText(error1Text)
+  const errors = [
+    ...dcApplicationErrors.errors.sourcing,
+    ...dcApplicationErrors.errors.production,
+  ]
+
+  console.log("error1Text:", getErrorText(errors[0]))
+  await screen.getByText(
+    "Approvisionnement - Ligne 2 : La matière première FUIMERAav n'est pas reconnue. Vérifiez la syntaxe de ce code."
+  )
+  // await screen.getByText(
+  //   "Production - Ligne 2 : Le biocarburant SFALKWJ n'est pas reconnu. Vérifiez la syntaxe de ce code."
+  // )
+  // await screen.getByText("Production - Ligne 4 : Le biocarburant est manquant")
+  // await screen.getByText(
+  //   "Production - Ligne 3 : La matière première Asdasasfw2323 n'est pas reconnue. Vérifiez la syntaxe de ce code."
+  // )
+  // await screen.getByText(
+  //   "Production - Ligne 5 : La matière première BLE n’est pas comprise dans la liste des matières premières pouvant être double comptées."
+  // )
+  // await screen.getByText(
+  //   "Le poids de matière première approvisionnée MARC_DE_RAISIN ne doit pas être supérieur à la quantité de biocarburant produite estimée."
+  // )
 })
 
 const fillForm = async () => {
