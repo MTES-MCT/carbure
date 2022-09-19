@@ -1,6 +1,6 @@
 export const dcApplicationErrors = {
     "errors": {
-        sourcing: [
+        "sourcing": [
             {
                 "error": "UNKNOWN_FEEDSTOCK",
                 "line_number": 2,
