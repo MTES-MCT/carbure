@@ -62,6 +62,11 @@ export interface DoubleCountingProduction {
 
 export enum DoubleCountingUploadErrorType {
   UnkownFeedstock = "UNKNOWN_FEEDSTOCK",
+  UnkownBiofuel = "UNKNOWN_BIOFUEL",
+  MissingBiofuel = "MISSING_BIOFUEL",
+  NotDcFeedstock = "NOT_DC_FEEDSTOCK",
+  MpBcIncoherent = "MP_BC_INCOHERENT",
+  ProductionMismatchSupply = "PRODUCTION_MISMATCH_SUPPLY",
 }
 
 
