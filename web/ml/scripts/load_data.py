@@ -21,7 +21,7 @@ def load_eec_data():
         'COLZA':33.4,
         'TOURNESOL':26.9,
     }
-    
+
     data = CarbureLot.objects.filter(year__gte=2021, feedstock__category=MatierePremiere.CONV, lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN], country_of_origin__isnull=False)\
     .exclude(eec=0)\
     .values('feedstock', 'feedstock__code', 'country_of_origin')\
@@ -37,23 +37,23 @@ def load_eec_data():
             d['default_value'] = default_values[entry['feedstock__code']]
         EECStats.objects.update_or_create(feedstock_id=entry['feedstock'], origin_id=entry['country_of_origin'], defaults=d)
 
-def load_ep_data():  
+def load_ep_data():
     referential = {
         'ETHBETTERAVE': (10.6, 38.3),
         'ETHMAIS': (2.6, 40.1),
         'ETHCANNE_A_SUCRE': (1.8, 1.8),
         'ETHBLE': (2.2, 42.5),
-        'ETHORGE': (2.2, 42.5),	
+        'ETHORGE': (2.2, 42.5),
         'ETBEBETTERAVE': (10.6, 38.3),
         'ETBEMAIS': (2.6, 40.1),
         'ETBECANNE_A_SUCRE': (1.8, 1.8),
         'ETBEBLE': (2.2, 42.5),
-        'ETBEORGE': (2.2, 42.5),	
+        'ETBEORGE': (2.2, 42.5),
         'ED95BETTERAVE': (10.6, 38.3),
         'ED95MAIS': (2.6, 40.1),
         'ED95CANNE_A_SUCRE': (1.8, 1.8),
         'ED95BLE': (2.2, 42.5),
-        'ED95ORGE': (2.2, 42.5),	
+        'ED95ORGE': (2.2, 42.5),
 
         'EMHVCOLZA': (16.3, 16.3),
         'EMHVSOJA': (16.9, 16.9),
@@ -64,17 +64,17 @@ def load_ep_data():
         'HVOECOLZA': (15, 15),
         'HVOGCOLZA': (15, 15),
         'HVOESOJA': (15.2, 15.2),
-        'HVOGSOJA': (15.2, 15.2),        
+        'HVOGSOJA': (15.2, 15.2),
         'HVOETOURNESOL': (14.7, 14.7),
         'HVOGTOURNESOL': (14.7, 14.7),
 
-        'HOEHUILE_ALIMENTAIRE_USAGEE': (14.3, 14.3),        
+        'HOEHUILE_ALIMENTAIRE_USAGEE': (14.3, 14.3),
         'HOEHUILES_OU_GRAISSES_ANIMALES_CAT3': (20.3, 20.3),
         'HOGHUILES_OU_GRAISSES_ANIMALES_CAT3': (20.3, 20.3),
-        'HOGHUILE_ALIMENTAIRE_USAGEE': (14.3, 14.3),        
+        'HOGHUILE_ALIMENTAIRE_USAGEE': (14.3, 14.3),
         'HOEHUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2': (20.3, 20.3),
         'HOGHUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2': (20.3, 20.3),
-        
+
         'HVPCOLZA': (5.2, 5.2),
         'HVPSOJA': (5.9, 5.9),
         'HVPTOURNESOL': (5.4, 5.4),
@@ -82,7 +82,7 @@ def load_ep_data():
     }
 
 
-    
+
     data = CarbureLot.objects.filter(year__gte=2021, lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN], country_of_origin__isnull=False)\
     .exclude(ep=0)\
     .values('biofuel', 'feedstock', 'biofuel__code', 'feedstock__code')\
@@ -118,7 +118,10 @@ def load_etd_data():
         feedstock = MatierePremiere.objects.get(code=k)
         ETDStats.objects.update_or_create(feedstock=feedstock, default_value=v)
 
-if __name__ == '__main__':
+def load_ml_data():
     load_eec_data()
     load_ep_data()
     load_etd_data()
+
+if __name__ == '__main__':
+    load_ml_data()
