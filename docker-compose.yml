@@ -12,10 +12,14 @@ services:
       - carburedb:/var/lib/mysql
     networks:
       - carbure
+    ports:
+      - 33060:3306
 
   carbure-redis:
     image: redis:latest
     container_name: carbure_redis
+    volumes:
+      - carbureredis:/data
     networks:
       - carbure
 
@@ -40,7 +44,7 @@ services:
       dockerfile: ./web/Dockerfile
     environment:
       IMAGE_TAG: ${IMAGE_TAG}
-      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_URL: mysql://$MYSQL_USER:$MYSQL_PASSWORD@carbure-mariadb:3306/$MYSQL_DATABASE
       REDIS_URL: ${REDIS_URL}
       SECRET_KEY: ${SECRET_KEY}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS}
@@ -61,6 +65,8 @@ services:
       AWS_S3_REGION_NAME: ${AWS_S3_REGION_NAME}
       AWS_S3_ENDPOINT_URL: ${AWS_S3_ENDPOINT_URL}
       AWS_S3_USE_SSL: ${AWS_S3_USE_SSL}
+      SCALINGO_TOKEN: ${SCALINGO_TOKEN}
+      SCALINGO_MYSQL_UUID: ${SCALINGO_TOKEN_UUID}
     volumes:
       - ./web:/app/web
       - ./scripts:/app/scripts
@@ -85,6 +91,8 @@ services:
 volumes:
   carburedb:
     name: carbure_carburedb
+  carbureredis:
+    name: carbure_carbureredis
   uploadedfiles:
     name: carbure_uploadedfiles
 
