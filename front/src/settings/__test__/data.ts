@@ -66,8 +66,8 @@ export const dcApplicationErrors = {
                 "is_blocking": true,
                 "meta": {
                     "feedstock": "MARC_DE_RAISIN",
-                    "sourcing": 10000,
-                    "production": 8000
+                    "sourcing": 8000,
+                    "production": 10000
                 }
             }
         ]

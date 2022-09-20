@@ -41,7 +41,7 @@ export function getErrorText(error: DoubleCountingUploadError) {
       break
     case DoubleCountingUploadErrorType.ProductionMismatchSourcing:
       errorText += t(
-        "La quantité de matière première approvisionnée ({{sourcing}} tonnes de {{feedstock}}) ne doit pas être supérieur à la quantité de biocarburant produite estimée ({{production}} tonnes).",
+        "La quantité de matière première approvisionnée ({{sourcing}} tonnes de {{feedstock}}) doit être supérieur à la quantité de biocarburant produite estimée ({{production}} tonnes).",
         { feedstock: error.meta?.feedstock, production: error.meta?.production, sourcing: error.meta?.sourcing }
       )
       break
