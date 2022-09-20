@@ -54,7 +54,8 @@ def check_production_line(production, data, line):
     if production.feedstock_id and production.biofuel_id:
         incompatibilities = check_compatibility_feedstock_biofuel(production.feedstock, production.biofuel)
         meta = {"feedstock": production.feedstock.code, "biofuel": production.biofuel.code, "infos": incompatibilities}
-        errors.append(error(DoubleCountingError.MP_BC_INCOHERENT, line, meta))
+        if len(incompatibilities) > 0:
+            errors.append(error(DoubleCountingError.MP_BC_INCOHERENT, line, meta))
 
     # check that requested quotas aren't bigger than estimated production
     if (production.requested_quota or 0) > (production.estimated_production or 0):
