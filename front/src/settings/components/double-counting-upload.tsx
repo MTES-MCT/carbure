@@ -42,18 +42,12 @@ const DoubleCountingUploadDialog = ({
   })
 
   const uploadFile = useMutation(api.uploadDoubleCountingFile, {
-    onSuccess: (res) => {
-      notify(t("Votre dossier double comptage a bien été envoyé !"), {
-        variant: "success",
-      })
-    },
     onError: (err) => {
       const error = (err as AxiosError<{ error: string }>).response?.data.error
       if (error === "DOUBLE_COUNTING_IMPORT_FAILED") {
         const errors = (
           err as AxiosError<{ data: { errors: DoubleCountingUploadErrors } }>
         ).response?.data.data.errors
-        console.log("errors:", errors)
         setErrors(errors)
       } else {
         notify(
@@ -97,6 +91,9 @@ const DoubleCountingUploadDialog = ({
           res.data.data.dca_id,
           value.documentationFile
         )
+        notify(t("Votre dossier double comptage a bien été envoyé !"), {
+          variant: "success",
+        })
         onClose()
       }
     } catch (error) {}

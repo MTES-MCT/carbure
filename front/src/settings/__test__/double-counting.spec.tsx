@@ -38,13 +38,13 @@ beforeEach(() => server.use(okDynamicSettings))
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
-// test("check double counting upload ", async () => {
-//   server.use(okDoubleCountUploadApplication)
-//   const user = userEvent.setup()
-//   setEntity(producer)
-//   render(<SettingsWithHooks entityID={producer.id} />)
-//   await fillForm()
-// })
+test("check double counting upload ", async () => {
+  server.use(okDoubleCountUploadApplication)
+  const user = userEvent.setup()
+  setEntity(producer)
+  render(<SettingsWithHooks entityID={producer.id} />)
+  await fillForm()
+})
 
 test("check double counting upload with error display errors", async () => {
   server.use(koDoubleCountUploadApplication)
@@ -56,28 +56,49 @@ test("check double counting upload with error display errors", async () => {
 
   await waitWhileLoading()
 
-  const errors = [
-    ...dcApplicationErrors.errors.sourcing,
-    ...dcApplicationErrors.errors.production,
-  ]
-
-  console.log("error1Text:", getErrorText(errors[0]))
   await screen.getByText(
     "Approvisionnement - Ligne 2 : La matière première FUIMERAav n'est pas reconnue. Vérifiez la syntaxe de ce code."
   )
-  // await screen.getByText(
-  //   "Production - Ligne 2 : Le biocarburant SFALKWJ n'est pas reconnu. Vérifiez la syntaxe de ce code."
-  // )
-  // await screen.getByText("Production - Ligne 4 : Le biocarburant est manquant")
-  // await screen.getByText(
-  //   "Production - Ligne 3 : La matière première Asdasasfw2323 n'est pas reconnue. Vérifiez la syntaxe de ce code."
-  // )
-  // await screen.getByText(
-  //   "Production - Ligne 5 : La matière première BLE n’est pas comprise dans la liste des matières premières pouvant être double comptées."
-  // )
-  // await screen.getByText(
-  //   "Le poids de matière première approvisionnée MARC_DE_RAISIN ne doit pas être supérieur à la quantité de biocarburant produite estimée."
-  // )
+
+  //UNKNOWN_BIOFUEL
+  await screen.getByText(
+    "Production - Ligne 2 : Le biocarburant SFALKWJ n'est pas reconnu. Vérifiez la syntaxe de ce code."
+  )
+
+  //UNKNOWN_FEEDSTOCK
+  await screen.getByText(
+    "Production - Ligne 3 : La matière première Asdasasfw2323 n'est pas reconnue. Vérifiez la syntaxe de ce code."
+  )
+
+  //MISSING_BIOFUEL
+  await screen.getByText("Production - Ligne 4 : Le biocarburant est manquant.")
+
+  //NOT_DC_FEEDSTOCK
+  await screen.getByText(
+    "Production - Ligne 5 : La matière première BLE n’est pas comprise dans la liste des matières premières pouvant être double comptées."
+  )
+
+  //MP_BC_INCOHERENT
+  await screen.getByText(
+    "Production - Ligne 4 : La matière première MARC_DE_RAISIN est incohérente avec le biocarburant B100."
+  )
+
+  //PRODUCTION_MISMATCH_SOURCING
+  await screen.getByText(
+    "La quantité de matière première approvisionnée (10000 tonnes de MARC_DE_RAISIN) ne doit pas être supérieur à la quantité de biocarburant produite estimée (8000 tonnes)."
+  )
+
+  //POME_GT_2000
+  await screen.getByText(
+    "Production - La production éstimée de biocarburant à partir de EFFLUENTS_HUILERIES_PALME_RAFLE ne doit pas excéder 2000 tonnes par an pour une usine de production."
+  )
+
+  //Not unrecognized errors
+  try {
+    await screen.getByText("Erreur de validation")
+  } catch (error) {
+    expect(error).not.toBeNull()
+  }
 })
 
 const fillForm = async () => {
