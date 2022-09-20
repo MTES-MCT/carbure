@@ -5,8 +5,8 @@ from huey import crontab
 from huey.contrib.djhuey import periodic_task, db_periodic_task, db_task
 
 from api.v4.sanity_checks import bulk_sanity_checks, bulk_scoring
-from cron.declaration_reminder import send_declaration_reminder
-from scripts.emails.send_notifications_v3 import send_notification_emails
+from carbure.scripts.send_declaration_reminder import send_declaration_reminder
+from carbure.scripts.send_notification_emails import send_notification_emails
 from ml.scripts.calc_ml_score import calc_ml_score
 from ml.scripts.load_data import load_ml_data
 
