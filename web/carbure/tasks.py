@@ -1,5 +1,6 @@
 import subprocess
 import datetime
+from os import environ as env
 from huey import crontab
 from huey.contrib.djhuey import periodic_task, db_periodic_task, db_task
 
@@ -21,12 +22,14 @@ def background_bulk_scoring(lots, prefetched_data=None):
 
 @periodic_task(crontab(hour=23, minute=45))
 def backup_prod_db() -> None:
-    subprocess.run(["bash", "/app/scripts/backup/backup_prod_db.sh"])
+    if env.get('IMAGE_TAG') == "prod":
+        subprocess.run(["bash", "/app/scripts/backup/backup_prod_db.sh"])
 
 
 @periodic_task(crontab(hour=0, minute=45))
 def restore_prod_db() -> None:
-    subprocess.run(["bash", "/app/scripts/recovery/restore_db.sh"])
+    if env.get('IMAGE_TAG') == "staging":
+        subprocess.run(["bash", "/app/scripts/recovery/restore_db.sh"])
 
 
 @db_periodic_task(crontab(day_of_week="Sun", hour=4, minute=0))
@@ -44,10 +47,10 @@ def download_iscc_certificates() -> None:
 #     subprocess.run(["bash", "/app/cron/download_redcert_certificates.sh"])
 
 
-# @db_periodic_task(crontab(hour="19,20,21,22,23", minute=30))
-@db_periodic_task(crontab(hour=18, minute="16,17,18,19,20"))
+@db_periodic_task(crontab(hour="19,20,21,22,23", minute=30))
 def periodic_send_notification_emails() -> None:
-    send_notification_emails()
+    if env.get('IMAGE_TAG') == "prod":
+        send_notification_emails()
 
 
 @db_periodic_task(crontab(day=23, hour=8, minute=0))
