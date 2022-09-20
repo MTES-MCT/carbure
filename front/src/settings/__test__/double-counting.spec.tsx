@@ -1,25 +1,21 @@
-import { render, TestRoot } from "setupTests"
-import { waitFor, screen, fireEvent } from "@testing-library/react"
+import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Route } from "react-router-dom"
+import { render, TestRoot } from "setupTests"
 
-import { admin, operator, producer, trader } from "carbure/__test__/data"
-import Settings from "../index"
-import server, {
-  koDoubleCountUploadApplication,
-  okDoubleCountUploadApplication,
-  okDynamicSettings,
-  setEntity,
-} from "./api"
+import { producer } from "carbure/__test__/data"
 import {
   getField,
   uploadFileField,
   waitWhileLoading,
 } from "carbure/__test__/helpers"
 import DoubleCountingSettings from "settings/components/double-counting"
-import { dcApplicationErrors } from "./data"
-import { getErrorText } from "settings/utils/double-counting"
-import { DoubleCountingUploadErrorType } from "doublecount/types"
+import server, {
+  koDoubleCountUploadApplication,
+  okDoubleCountUploadApplication,
+  okDynamicSettings,
+  setEntity,
+} from "./api"
 
 const SettingsWithHooks = ({ entityID }: { entityID?: number }) => {
   return (
