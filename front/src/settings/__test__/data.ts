@@ -40,27 +40,34 @@ export const dcApplicationErrors = {
                 "meta": {
                     "feedstock": "BLE"
                 }
+            },
+            {
+                "error": "MP_BC_INCOHERENT",
+                "line_number": 4,
+                "is_blocking": true,
+                "meta": {
+                    "feedstock": "MARC_DE_RAISIN",
+                    "biofuel": "B100",
+                    "info": [
+                        "Matière première (Marc de raisin) incompatible avec Esthers Méthyliques"
+                    ]
+                }
+            },
+            {
+                "error": "POME_GT_2000",
+                "line_number": null,
+                "is_blocking": true,
             }
         ],
         "global": [
             {
-                "error": "PRODUCTION_MISMATCH_SUPPLY",
+                "error": "PRODUCTION_MISMATCH_SOURCING",
                 "line_number": null,
                 "is_blocking": true,
                 "meta": {
                     "feedstock": "MARC_DE_RAISIN",
-                    "sourcing": 0,
+                    "sourcing": 10000,
                     "production": 8000
-                }
-            },
-            {
-                "error": "PRODUCTION_MISMATCH_SUPPLY",
-                "line_number": null,
-                "is_blocking": true,
-                "meta": {
-                    "feedstock": "LIES_DE_VIN",
-                    "sourcing": 0,
-                    "production": 10000
                 }
             }
         ]

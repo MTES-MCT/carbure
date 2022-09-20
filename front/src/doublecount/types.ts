@@ -66,7 +66,8 @@ export enum DoubleCountingUploadErrorType {
   MissingBiofuel = "MISSING_BIOFUEL",
   NotDcFeedstock = "NOT_DC_FEEDSTOCK",
   MpBcIncoherent = "MP_BC_INCOHERENT",
-  ProductionMismatchSupply = "PRODUCTION_MISMATCH_SUPPLY",
+  ProductionMismatchSourcing = "PRODUCTION_MISMATCH_SOURCING",
+  PomeGt2000 = "POME_GT_2000",
 }
 
 
@@ -74,7 +75,7 @@ export interface DoubleCountingUploadError {
   error: string
   is_blocking: boolean
   line_number: number | null
-  meta: null | any
+  meta?: null | any
 }
 
 
