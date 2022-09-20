@@ -35,23 +35,31 @@ export function getErrorText(error: DoubleCountingUploadError) {
         "La matière première {{feedstock}} est incohérente avec le biocarburant {{biofuel}}.",
         { feedstock: error.meta?.feedstock, biofuel: error.meta?.biofuel }
       )
+      if (error.meta.infos) {
+        errorText += " " + error.meta.infos.join(' ')
+      }
       break
-    case DoubleCountingUploadErrorType.ProductionMismatchSupply:
+    case DoubleCountingUploadErrorType.ProductionMismatchSourcing:
       errorText += t(
-        "Le poids de matière première approvisionnée {{feedstock}} ne doit pas être supérieur à la quantité de biocarburant produite estimée.",
-        { feedstock: error.meta?.feedstock }
+        "La quantité de matière première approvisionnée ({{sourcing}} tonnes de {{feedstock}}) ne doit pas être supérieur à la quantité de biocarburant produite estimée ({{production}} tonnes).",
+        { feedstock: error.meta?.feedstock, production: error.meta?.production, sourcing: error.meta?.sourcing }
       )
       break
-    // case DoubleCountingUploadErrorType.ProductionMismatchSupply:
-    //   errorText += t(
-    //     "La production éstimée de biocarburant à partir de {{feedstock}} ne doit pas excéder 2000 tonnes par an pour une usine de production",
-    //     { feedstock: error.meta?.feedstock  }
-    //   )
-    //   break
+    case DoubleCountingUploadErrorType.PomeGt2000:
+      errorText += t(
+        "La production éstimée de biocarburant à partir de EFFLUENTS_HUILERIES_PALME_RAFLE ne doit pas excéder 2000 tonnes par an pour une usine de production."
+      )
+      break
+
 
     default:
       errorText += t("Erreur de validation")
       break
   }
+
+  // if (error.meta?.info?.length > 0) {
+  //   errorText += `<i>${error.meta.info.join(' ')}</i>`
+  // }
+
   return errorText
 }
