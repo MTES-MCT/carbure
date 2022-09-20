@@ -18,7 +18,7 @@ export const Collapse = ({
   icon: Icon,
   label,
   children,
-  isOpen = true,
+  isOpen = false,
 }: CollapseProps) => {
   const [open, setOpen] = useState(isOpen)
   const icon = typeof Icon === "function" ? <Icon /> : Icon
