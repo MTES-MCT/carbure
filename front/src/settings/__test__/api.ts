@@ -4,25 +4,16 @@ import { setupServer } from "msw/node"
 import { OwnershipType } from "carbure/types"
 
 import {
-  deliverySite,
-  operator,
-  producer,
-  productionSite,
-  entityRights,
-  entityRight,
-  entityRequest,
-} from "carbure/__test__/data"
-import {
   okCountrySearch,
-  okDeliverySitesSearch,
-  okTranslations,
-  okErrorsTranslations,
-  okFieldsTranslations,
+  okDeliverySitesSearch, okErrorsTranslations,
+  okFieldsTranslations, okProductionSitesSearch, okTranslations
 } from "carbure/__test__/api"
-import { clone, Data } from "carbure/__test__/helpers"
 import {
-  okProductionSitesSearch,
-} from "carbure/__test__/api"
+  deliverySite, entityRequest, entityRight, entityRights, operator,
+  producer,
+  productionSite
+} from "carbure/__test__/data"
+import { clone, Data } from "carbure/__test__/helpers"
 import { dcApplicationErrors } from "./data"
 
 let deliverySites: any[] = []

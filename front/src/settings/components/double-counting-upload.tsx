@@ -1,26 +1,21 @@
+import { AxiosError } from "axios"
 import { findProductionSites } from "carbure/api"
 import { Entity, ProductionSite } from "carbure/types"
 import { normalizeProductionSite } from "carbure/utils/normalizers"
 import AutoComplete from "common/components/autocomplete"
 import Button from "common/components/button"
+import Collapse from "common/components/collapse"
 import Dialog from "common/components/dialog"
 import { Form, useForm } from "common/components/form"
 import { AlertOctagon, Check, Return, Upload } from "common/components/icons"
 import { FileInput } from "common/components/input"
-import { useMutation } from "common/hooks/async"
-import { Trans, useTranslation } from "react-i18next"
-import * as api from "../api/double-counting"
-import { AxiosError } from "axios"
-import {
-  DoubleCountingUploadError,
-  DoubleCountingUploadErrors,
-  DoubleCountingUploadErrorType,
-} from "doublecount/types"
-import Collapse from "common/components/collapse"
-import { useState } from "react"
-import { t } from "i18next"
-import { getErrorText } from "settings/utils/double-counting"
 import { useNotify } from "common/components/notifications"
+import { useMutation } from "common/hooks/async"
+import { DoubleCountingUploadErrors } from "doublecount/types"
+import { useState } from "react"
+import { Trans, useTranslation } from "react-i18next"
+import { getErrorText } from "settings/utils/double-counting"
+import * as api from "../api/double-counting"
 
 type DoubleCountingUploadDialogProps = {
   entity: Entity
