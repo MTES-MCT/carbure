@@ -1,43 +1,55 @@
 #!/bin/bash
 
-# crontab to run on the server (dev and staging ONLY)
-# 45 1 * * * docker cp carbure_app:/app/scripts/recovery/restore_db.sh /tmp/ && bash /tmp/restore_db.sh
-
-set -x
-if [ -z "$1" ]
-  then
-      DATE=$(date -d yesterday +"%Y/%m/%d")
-else
-    DATE=$1
+# check environment
+if [ "$IMAGE_TAG" != "local" ] && [ "$IMAGE_TAG" != "staging" ]
+then
+  echo "This script can only be run in local or staging"
+  exit 1
 fi
 
-echo "Loading $DATE database backup"
+# setup scalingo on staging
+if [ "$IMAGE_TAG" == "staging" ]
+then
+  dbclient-fetcher mysql 8
+  install-scalingo-cli && scalingo login --api-token $SCALINGO_TOKEN
+fi
 
-# delete staging and dev database
-echo "Deleting database from staging/dev"
-docker cp carbure_app:/app/scripts/recovery/delete_db.sh /tmp
-docker cp /tmp/delete_db.sh carbure_mariadb:/tmp
-docker exec carbure_mariadb bash /tmp/delete_db.sh
+# clean up any previous local backup
+rm -r /tmp/backups
+mkdir -p /tmp/backups
 
-# download yesterday's database
-echo "Download database backup"
-docker exec carbure_app python3 /app/scripts/recovery/s3recovery.py -b carbure.database -d $DATE
+# download latest backup
+scalingo --app carbure-prod --addon $SCALINGO_MYSQL_UUID backups-download --output /tmp/backups
 
-# decompress downloaded backup and copy it into database container
-echo "Copy backup to database container"
-docker cp carbure_app:/tmp/backup.tgz /tmp
-tar -xzf /tmp/backup.tgz -C /tmp
-mv /tmp/tmp/backup*.sql /tmp/backup.sql
-docker cp /tmp/backup.sql carbure_mariadb:/tmp/backup.sql
+# decompress backup
+echo "Decompressing backup..."
+tar -xzf /tmp/backups/*.tar.gz -C /tmp/backups
 
-# load backup
-echo "Loading database backup"
-docker cp carbure_app:/app/scripts/recovery/load_backup.sh /tmp
-docker cp /tmp/load_backup.sh carbure_mariadb:/tmp
-docker exec carbure_mariadb bash /tmp/load_backup.sh
+# remove lines mentionning production database
+echo "Cleaning SQL..."
+grep -vE "(carbure_pro_)" /tmp/backups/*.sql > /tmp/backups/backup.sql
 
-# cleanup
-rm -r /tmp/tmp
-rm /tmp/backup.sql
-rm /tmp/backup.tgz
-docker exec carbure_app rm /tmp/backup.tgz
+# extract DATABASE_URL parts
+export MYSQL_DATABASE=$(echo $DATABASE_URL | cut -d'/' -f4)
+export DB_DETAILS=$(echo $DATABASE_URL | cut -d'/' -f3)
+export MYSQL_HOST=$(echo $DB_DETAILS | cut -d'@' -f2 | cut -d':' -f1)
+export MYSQL_PORT=$(echo $DB_DETAILS | cut -d'@' -f2 | cut -d':' -f2)
+export MYSQL_USER=$(echo $DB_DETAILS | cut -d'@' -f1 | cut -d':' -f1)
+export MYSQL_PASSWORD=$(echo $DB_DETAILS | cut -d'@' -f1 | cut -d':' -f2)
+
+alias mysql="mysql --user=$MYSQL_USER --password=$MYSQL_PASSWORD --host=$MYSQL_HOST --port=$MYSQL_PORT --protocol=tcp"
+
+# Clean up old database
+echo "Cleaning previous database '$MYSQL_DATABASE'..."
+mysql -e "DROP DATABASE \`$MYSQL_DATABASE\`;"
+mysql -e "CREATE DATABASE \`$MYSQL_DATABASE\`;"
+
+# Restore the backup
+echo "Restoring backup in database..."
+mysql $MYSQL_DATABASE < /tmp/backups/backup.sql
+
+# Cleanup
+echo "Cleaning up..."
+rm -r /tmp/backups
+
+echo "OK"
