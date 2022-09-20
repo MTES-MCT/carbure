@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useRef, useState } from "react"
-import i18next from "i18next"
 import cl from "clsx"
-import { isInside } from "./dropdown"
-import { multipleSelection, singleSelection } from "../utils/selection"
+import i18next from "i18next"
+import React, { useCallback, useEffect, useRef, useState } from "react"
+import { matches } from "../utils/collection"
 import { standardize } from "../utils/formatters"
 import {
   defaultFilter,
@@ -10,13 +9,14 @@ import {
   Filter,
   listTreeItems,
   Normalized,
-  Normalizer,
   normalizeItems,
+  Normalizer,
   Sorter,
 } from "../utils/normalize"
+import { multipleSelection, singleSelection } from "../utils/selection"
+import { isInside } from "./dropdown"
 import { SearchInput } from "./input"
 import css from "./list.module.css"
-import { matches } from "../utils/collection"
 
 export interface ListProps<T, V> {
   controlRef?: React.RefObject<HTMLElement>
