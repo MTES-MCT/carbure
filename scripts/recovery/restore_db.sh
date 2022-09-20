@@ -37,16 +37,17 @@ export MYSQL_PORT=$(echo $DB_DETAILS | cut -d'@' -f2 | cut -d':' -f2)
 export MYSQL_USER=$(echo $DB_DETAILS | cut -d'@' -f1 | cut -d':' -f1)
 export MYSQL_PASSWORD=$(echo $DB_DETAILS | cut -d'@' -f1 | cut -d':' -f2)
 
-alias mysql="mysql --user=$MYSQL_USER --password=$MYSQL_PASSWORD --host=$MYSQL_HOST --port=$MYSQL_PORT --protocol=tcp"
+shopt -s expand_aliases # allow aliases inside script
+alias carbure-mysql="mysql --user=$MYSQL_USER --password=$MYSQL_PASSWORD --host=$MYSQL_HOST --port=$MYSQL_PORT --protocol=tcp"
 
 # Clean up old database
 echo "Cleaning previous database '$MYSQL_DATABASE'..."
-mysql -e "DROP DATABASE \`$MYSQL_DATABASE\`;"
-mysql -e "CREATE DATABASE \`$MYSQL_DATABASE\`;"
+carbure-mysql -e "DROP DATABASE \`$MYSQL_DATABASE\`;"
+carbure-mysql -e "CREATE DATABASE \`$MYSQL_DATABASE\`;"
 
 # Restore the backup
 echo "Restoring backup in database..."
-mysql $MYSQL_DATABASE < /tmp/backups/backup.sql
+carbure-mysql $MYSQL_DATABASE < /tmp/backups/backup.sql
 
 # Cleanup
 echo "Cleaning up..."
