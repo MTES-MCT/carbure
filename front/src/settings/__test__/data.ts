@@ -48,9 +48,7 @@ export const dcApplicationErrors = {
                 "meta": {
                     "feedstock": "MARC_DE_RAISIN",
                     "biofuel": "B100",
-                    "info": [
-                        "Matière première (Marc de raisin) incompatible avec Esthers Méthyliques"
-                    ]
+
                 }
             },
             {

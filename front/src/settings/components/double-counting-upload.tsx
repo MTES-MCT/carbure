@@ -47,7 +47,7 @@ const DoubleCountingUploadDialog = ({
       } else {
         notify(
           t(
-            "L'envoie de votre dossier double a échoué. Merci de contacter l'équipe Carbure"
+            "L'envoie de votre dossier double comptage a échoué. Merci de contacter l'équipe Carbure"
           ),
           {
             variant: "danger",
@@ -188,13 +188,14 @@ const BlockingErrors = ({ errors }: BlockingErrorsProps) => {
   const { t } = useTranslation()
   return (
     <Collapse
+      isOpen={true}
       variant="danger"
       icon={AlertOctagon}
       label={`${t("Erreurs")} (${allErrors.length})`}
     >
       <section>
         {t(
-          "Vous ne pouvez pas valider ce lot tant que les problèmes suivants n'ont pas été adressés :"
+          "Vous ne pouvez pas valider ce dossier tant que les problèmes suivants n'ont pas été corrigés. Merci de modifiez le fichier excel et resoumettez-le."
         )}
       </section>
 

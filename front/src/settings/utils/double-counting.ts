@@ -41,13 +41,13 @@ export function getErrorText(error: DoubleCountingUploadError) {
       break
     case DoubleCountingUploadErrorType.ProductionMismatchSourcing:
       errorText += t(
-        "La quantité de matière première approvisionnée ({{sourcing}} tonnes de {{feedstock}}) doit être supérieur à la quantité de biocarburant produite estimée ({{production}} tonnes).",
+        "La quantité de matière première approvisionnée ({{sourcing}} tonnes de {{feedstock}}) doit être supérieure à la quantité de biocarburant produite estimée ({{production}} tonnes).",
         { feedstock: error.meta?.feedstock, production: error.meta?.production, sourcing: error.meta?.sourcing }
       )
       break
     case DoubleCountingUploadErrorType.PomeGt2000:
       errorText += t(
-        "La production éstimée de biocarburant à partir de EFFLUENTS_HUILERIES_PALME_RAFLE ne doit pas excéder 2000 tonnes par an pour une usine de production."
+        "La production estimée de biocarburant à partir de EFFLUENTS_HUILERIES_PALME_RAFLE ne doit pas excéder 2000 tonnes par an pour une usine de production."
       )
       break
 
@@ -56,10 +56,6 @@ export function getErrorText(error: DoubleCountingUploadError) {
       errorText += t("Erreur de validation")
       break
   }
-
-  // if (error.meta?.info?.length > 0) {
-  //   errorText += `<i>${error.meta.info.join(' ')}</i>`
-  // }
 
   return errorText
 }
