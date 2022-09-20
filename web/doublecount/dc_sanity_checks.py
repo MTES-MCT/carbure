@@ -4,7 +4,7 @@ from doublecount.models import DoubleCountingProduction, DoubleCountingSourcing
 
 class DoubleCountingError:
     NOT_DC_FEEDSTOCK = "NOT_DC_FEEDSTOCK"
-    PRODUCTION_MISMATCH_SUPPLY = "PRODUCTION_MISMATCH_SUPPLY"
+    PRODUCTION_MISMATCH_SOURCING = "PRODUCTION_MISMATCH_SOURCING"
     POME_GT_2000 = "POME_GT_2000"
     PRODUCTION_MISMATCH_QUOTA = "PRODUCTION_MISMATCH_QUOTA"
     MP_BC_INCOHERENT = "MP_BC_INCOHERENT"
@@ -53,8 +53,8 @@ def check_production_line(production, data, line):
 
     if production.feedstock_id and production.biofuel_id:
         incompatibilities = check_compatibility_feedstock_biofuel(production.feedstock, production.biofuel)
-        meta = {"feedstock": production.feedstock.code, "biofuel": production.biofuel.code}
-        errors += [error(DoubleCountingError.MP_BC_INCOHERENT, line, {**meta, "info": i}) for i in incompatibilities]
+        meta = {"feedstock": production.feedstock.code, "biofuel": production.biofuel.code, "infos": incompatibilities}
+        errors.append(error(DoubleCountingError.MP_BC_INCOHERENT, line, meta))
 
     # check that requested quotas aren't bigger than estimated production
     if (production.requested_quota or 0) > (production.estimated_production or 0):
@@ -98,10 +98,10 @@ def check_sourcing_vs_production(sourcing, production):
             s = sourcing_per_feedstock.get(feedstock__code=p["feedstock__code"], year=p["year"])
             if p["quantity"] > s["quantity"]:
                 meta = {"feedstock": p["feedstock__code"], "sourcing": s["quantity"], "production": p["quantity"]}
-                errors.append(error(DoubleCountingError.PRODUCTION_MISMATCH_SUPPLY, meta=meta))
+                errors.append(error(DoubleCountingError.PRODUCTION_MISMATCH_SOURCING, meta=meta))
         except:
             meta = {"feedstock": p["feedstock__code"], "sourcing": 0, "production": p["quantity"]}
-            errors.append(error(DoubleCountingError.PRODUCTION_MISMATCH_SUPPLY, meta=meta))
+            errors.append(error(DoubleCountingError.PRODUCTION_MISMATCH_SOURCING, meta=meta))
 
     return errors
 
