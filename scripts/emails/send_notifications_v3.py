@@ -4,7 +4,7 @@ import datetime
 import argparse
 from django.db.models import Count, Min, Max
 from django.template import loader
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives, get_connection
 from django.conf import settings
 import pytz
 
@@ -16,13 +16,21 @@ from core.models import CarbureNotification, Entity, UserRights
 
 MAX_NOTIF_PER_HOUR = 20
 
-def main(args):
+def send_notification_emails(args=None):
     entities = Entity.objects.annotate(num_notifs=Count('carburenotification')).order_by('-num_notifs')
     domain = os.environ['ALLOWED_HOSTS']
     one_hour_ago = pytz.utc.localize(datetime.datetime.now() - datetime.timedelta(hours=1))
     email_notif_sent = 0
     entity_oldest_notif = {}
     today = datetime.date.today()
+
+    connection = get_connection()
+
+    try:
+        connection.open()
+    except Exception:
+        print("Could not connect to email backend")
+        return
 
     for entity in entities:
 
@@ -73,9 +81,9 @@ def main(args):
             if notifs.filter(notify_administrator=True).count() > 0:
                 cc = ["carbure@beta.gouv.fr"]
 
-        msg = EmailMultiAlternatives(subject=email_subject, body=text_message, from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc)
+        msg = EmailMultiAlternatives(connection=connection, subject=email_subject, body=text_message, from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc)
         msg.attach_alternative(html_message, "text/html")
-        if not args.test:
+        if args and not args.test:
             notifs.update(email_sent=True)
             msg.send()
         else:
@@ -89,6 +97,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Send email notifications')
     parser.add_argument('--test', action='store_true', default=False, dest='test', help='Do not actually send emails')
     args = parser.parse_args()
-    main(args)
+    send_notification_emails(args)
 
 
