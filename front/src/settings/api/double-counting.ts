@@ -3,7 +3,7 @@ import {
   DoubleCounting,
   DoubleCountingDetails,
   DoubleCountingUploadErrors,
-  QuotaDetails,
+  QuotaDetails
 } from "doublecount/types"
 
 export function getDoubleCountingAgreements(entity_id: number) {

@@ -1,9 +1,6 @@
 import {
-  Entity,
-  ProductionSite,
-  Feedstock,
   Biofuel,
-  Country,
+  Country, Entity, Feedstock, ProductionSite
 } from "carbure/types"
 
 export enum Admin {
