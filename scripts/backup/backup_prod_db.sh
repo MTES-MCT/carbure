@@ -1,15 +1,25 @@
 #!/bin/sh
 
-# dump db
-mysqldump -h $DJANGO_DB_HOST -u $DJANGO_DB_USER -p"$DJANGO_DB_PASSWORD" $DJANGO_DATABASE > /tmp/backup-$(date +\%F).sql
+if [ "$IMAGE_TAG" != "prod" ]
+then
+  echo "This script can only be run in production"
+  exit 1
+fi
 
-tar -czf /tmp/backup-$(date +\%F).tgz /tmp/backup-$(date +\%F).sql
+# setup scalingo
+install-scalingo-cli
+scalingo login --api-token $SCALINGO_TOKEN
 
-# upload db
-python3 /app/scripts/backup/s3backup.py -b carbure.database -f /tmp/backup-$(date +\%F).tgz # scaleway
-python3 /app/scripts/backup/s3backblaze.py -f /tmp/backup-$(date +\%F).tgz # backblaze
+# download latest backup
+mkdir -p /tmp/backups
+scalingo --app carbure-prod --addon $SCALINGO_MYSQL_UUID backups-download --output /tmp/backups
 
-# cleanup s3 bucket
-python3 /app/scripts/backup/s3cleanup.py -b carbure.database
+# upload backup to backblaze
+echo "Uploading backup to backblaze..."
+python3 /app/scripts/backup/s3backblaze.py -f /tmp/backups/*.tar.gz
+
+# cleanup
+echo "Cleaning up..."
+rm -r /tmp/backups
 
 echo "OK"
