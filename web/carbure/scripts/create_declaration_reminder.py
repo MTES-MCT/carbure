@@ -8,7 +8,7 @@ django.setup()
 from core.models import CarbureNotification, Entity
 
 
-def send_declaration_reminder():
+def create_declaration_reminder() -> None:
     notifications = []
 
     today = datetime.today()
@@ -37,4 +37,4 @@ def send_declaration_reminder():
 
 
 if __name__ == "__main__":
-    send_declaration_reminder()
+    create_declaration_reminder()
