@@ -29,7 +29,7 @@ if env.get("IMAGE_TAG") == "prod":
 
     @periodic_task(crontab(hour=23, minute=45))
     def periodic_backup_prod_db() -> None:
-        subprocess.run(["bash", "/app/scripts/backup/backup_prod_db.sh"])
+        subprocess.run(["bash", "/app/scripts/database/backup_prod_db.sh"])
 
     @db_periodic_task(crontab(day_of_week="Sun", hour=3, minute=0))
     def periodic_update_2bs_certificates() -> None:
@@ -68,4 +68,4 @@ if env.get("IMAGE_TAG") == "staging":
 
     @periodic_task(crontab(hour=0, minute=45))
     def restore_prod_db() -> None:
-        subprocess.run(["bash", "/app/scripts/recovery/restore_db.sh"])
+        subprocess.run(["bash", "/app/scripts/database/restore_db.sh"])
