@@ -22,8 +22,7 @@ Ensuite, créez un environnement virtuel pour python 3.10:
 Je recommande de créer un alias pour charger l'environnement de développement.
 par exemple :
 
-- `alias carbure='cd /path/du/repository; source loadenv.sh;'`
-***Le script loadenv.sh permet d'interagir avec les containers.***
+- `alias carbure='cd /path/du/repository; pipenv shell;'`
 
 Dans le dossier /front, téléchargez les modules
 - `npm install`
@@ -62,7 +61,7 @@ Lancer `sh scripts/recovery/restore_db.sh` pour télécharger un dump contenant 
 - activer ubuntu dans les options de docker desktop (resources > wsl)
 - ouvrir ubuntu dans le windows terminal puis taper:
 - `sudo apt-get update`
-- `sudo apt-get install python3 python3-dev python3-virtualenv default-libmysqlclient-dev build-essential`
+- `sudo apt-get install python3 python3-dev python3-pip default-libmysqlclient-dev build-essential`
 - `pip install --user pipenv`
 
 Ensuite, setup normalement le projet:
@@ -71,6 +70,6 @@ Ensuite, setup normalement le projet:
 - `git clone git@gitlab.com:la-fabrique-numerique/biocarburants.git carbure`
 - `cd carbure`
 - `pipenv install`
+- `(cd front; npm install)`
 - `docker-compose up --build -d`
-- `source loadenv.sh`
 - `code .`
