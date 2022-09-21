@@ -35,7 +35,7 @@ Vous pouvez désormais builder les images docker et lancer le projet:
 
 ## Alimenter la base de données de dev
 
-Lancer `sh scripts/recovery/restore_db.sh` pour télécharger un dump contenant des données utilisables en local
+Lancer `sh scripts/database/restore_db.sh` pour télécharger un dump contenant des données utilisables en local
 
 ## Création d'un nom de domaine local personnalisé
 

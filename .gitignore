@@ -146,6 +146,4 @@ dump.rdb
 
 web/static
 
-# huey temporary databases and logs
-huey-cron.*
-huey-carbure.*
+files
