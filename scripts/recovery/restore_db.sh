@@ -38,7 +38,7 @@ export MYSQL_USER=$(echo $DB_DETAILS | cut -d'@' -f1 | cut -d':' -f1)
 export MYSQL_PASSWORD=$(echo $DB_DETAILS | cut -d'@' -f1 | cut -d':' -f2)
 
 shopt -s expand_aliases # allow aliases inside script
-alias carbure-mysql="mysql --user=$MYSQL_USER --password=$MYSQL_PASSWORD --host=$MYSQL_HOST --port=$MYSQL_PORT --protocol=tcp"
+alias carbure-mysql="mysql --user=$MYSQL_USER --password=$MYSQL_PASSWORD --host=$MYSQL_HOST --port=$MYSQL_PORT $1"
 
 # Clean up old database
 echo "Cleaning previous database '$MYSQL_DATABASE'..."
