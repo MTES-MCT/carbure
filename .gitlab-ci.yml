@@ -78,8 +78,8 @@ check-frontend:
 deploy-dev:
   stage: deploy
   extends: .scalingo
-  except:
-    - master
+  only:
+    - dev
   script:
     - git push scalingo-dev $CI_COMMIT_BRANCH:master -f
 
