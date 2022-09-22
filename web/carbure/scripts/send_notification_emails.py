@@ -3,8 +3,9 @@ from typing import cast
 import django
 import datetime
 import argparse
-from django.db.models import Count, Min, Max
+from django.utils import timezone
 from django.template import loader
+from django.db.models import Count, Min, Max
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.conf import settings
 import pytz
@@ -23,7 +24,7 @@ def send_notification_emails(test: bool = False) -> None:
     one_hour_ago = pytz.utc.localize(datetime.datetime.now() - datetime.timedelta(hours=1))
     email_notif_sent = 0
     entity_oldest_notif = {}
-    today = datetime.date.today()
+    beginning_of_today = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
     connection = get_connection()
 
@@ -38,7 +39,7 @@ def send_notification_emails(test: bool = False) -> None:
             dest=entity,
             send_by_email=True,
             email_sent=False,
-            datetime__date=today,
+            datetime__gte=beginning_of_today,
         ).aggregate(Count("id"), Min("datetime"), Max("datetime"))
 
         if all_notifs["id__count"] > 0:
@@ -59,7 +60,7 @@ def send_notification_emails(test: bool = False) -> None:
             dest=entity,
             send_by_email=True,
             email_sent=False,
-            datetime__date=today,
+            datetime__gte=beginning_of_today,
         )
 
         correction_requests = notifs.filter(type=CarbureNotification.CORRECTION_REQUEST)
