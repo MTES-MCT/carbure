@@ -1,49 +1,63 @@
-version: "3.5"
 services:
   carbure-mariadb:
-    image: mariadb:latest
-    restart: always
+    image: mysql:latest
     container_name: carbure_mariadb
     environment:
       ENV: ${IMAGE_TAG}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${DJANGO_DATABASE}
-      MYSQL_USER: ${DJANGO_DB_USER}
-      MYSQL_PASSWORD: ${DJANGO_DB_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - carburedb:/var/lib/mysql
     networks:
       - carbure
     ports:
-      - 3306:3306
+      - 33060:3306
+
+  carbure-redis:
+    image: redis:latest
+    container_name: carbure_redis
+    volumes:
+      - carbureredis:/data
+    networks:
+      - carbure
+
+  carbure-frontend:
+    image: carbure_frontend:local
+    container_name: carbure_frontend
+    build:
+      context: ./front
+    volumes:
+      - ./front:/app
+    networks:
+      - carbure
 
   carbure-django:
-    build:
-      context: ${CARBURE_HOME}
-      dockerfile: docker/Dockerfile.django
-    command: bash /app/web/run.sh
-    restart: always
-    container_name: carbure_app
     image: carbure_app:local
+    container_name: carbure_app
+    depends_on:
+      - carbure-mariadb
+      - carbure-redis
+    build:
+      context: .
+      dockerfile: ./web/Dockerfile
     environment:
       IMAGE_TAG: ${IMAGE_TAG}
-      DJANGO_DATABASE: ${DJANGO_DATABASE}
-      DJANGO_DB_USER: ${DJANGO_DB_USER}
-      DJANGO_DB_PASSWORD: ${DJANGO_DB_PASSWORD}
-      DJANGO_DB_HOST: carbure-mariadb
-      DJANGO_DB_PORT: 3306
-      DJANGO_NGINX_HOST: ${DJANGO_NGINX_HOST}
+      DATABASE_URL: mysql://$MYSQL_USER:$MYSQL_PASSWORD@carbure-mariadb:3306/$MYSQL_DATABASE
+      REDIS_URL: ${REDIS_URL}
       SECRET_KEY: ${SECRET_KEY}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS}
       DEBUG: ${DEBUG}
       CARBURE_HOME: /app
+      PYTHONPATH: /app:/app/web
       SENTRY_DSN: ${SENTRY_DSN}
       EMAIL_HOST: ${EMAIL_HOST}
       EMAIL_PORT: ${EMAIL_PORT}
       EMAIL_HOST_USER: ${EMAIL_HOST_USER}
       EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
       EMAIL_USE_TLS: ${EMAIL_USE_TLS}
-      PYTHONPATH: /app:/app/web
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_STORAGE_BUCKET_NAME: ${AWS_STORAGE_BUCKET_NAME}
@@ -51,54 +65,34 @@ services:
       AWS_S3_REGION_NAME: ${AWS_S3_REGION_NAME}
       AWS_S3_ENDPOINT_URL: ${AWS_S3_ENDPOINT_URL}
       AWS_S3_USE_SSL: ${AWS_S3_USE_SSL}
+      SCALINGO_TOKEN: ${SCALINGO_TOKEN}
+      SCALINGO_MYSQL_UUID: ${SCALINGO_TOKEN_UUID}
     volumes:
-      - ${CARBURE_HOME}:/app #for dev only, allows for auto-refresh of files
+      - ./web:/app/web
+      - ./scripts:/app/scripts
+      - ./cron:/app/cron
       - uploadedfiles:/app/files
-    depends_on:
-      - carbure-mariadb
-    networks:
-      - carbure
-
-  carbure-frontend:
-    stdin_open: true
-    restart: always
-    container_name: carbure_frontend
-    image: carbure_frontend:local
-    build:
-      context: ${CARBURE_HOME}
-      dockerfile: docker/Dockerfile.frontend
-    volumes:
-      - ./front:/app # needed for hot-reloading
     networks:
       - carbure
 
   carbure-web-proxy:
-    build:
-      context: ${CARBURE_HOME}
-      dockerfile: docker/Dockerfile.web
-      target: nginx
-    restart: always
+    image: nginx:latest
     container_name: carbure_web
-    image: carbure_web:local
-    environment:
-      NGINX_HOSTS: ${NGINX_HOSTS}
-      IMAGE_TAG: ${IMAGE_TAG}
-    command: /opt/run_nginx.sh
     depends_on:
-      - carbure-django
       - carbure-frontend
+      - carbure-django
     volumes:
-      # dev: mount static directory
-      - ${CARBURE_HOME}/web/static:/var/www/html
-      - uploadedfiles:/app/files
-    ports:
-      - 8090:80
+      - ./gateway:/etc/nginx/conf.d
     networks:
       - carbure
+    ports:
+      - 8090:80
 
 volumes:
   carburedb:
     name: carbure_carburedb
+  carbureredis:
+    name: carbure_carbureredis
   uploadedfiles:
     name: carbure_uploadedfiles
 

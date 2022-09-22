@@ -10,6 +10,8 @@ from core.decorators import check_user_rights
 from core.models import Entity, EntityCertificate, GenericCertificate, UserRights
 from core.serializers import EntityCertificateSerializer, GenericCertificateSerializer
 from producers.models import ProductionSite
+from core.models import CarbureLot
+from carbure.tasks import background_bulk_sanity_checks
 
 def get_certificates(request, *args, **kwargs):
     query = request.GET.get('query', '')
@@ -30,6 +32,8 @@ def add_certificate(request, *args, **kwargs):
     entity = Entity.objects.get(id=entity_id)
     certificate = GenericCertificate.objects.get(certificate_type=certificate_type, certificate_id=certificate_id)
     EntityCertificate.objects.update_or_create(entity=entity, certificate=certificate)
+    lots = CarbureLot.objects.filter(Q(supplier_certificate=certificate_id) | Q(production_site_certificate=certificate_id))
+    background_bulk_sanity_checks(lots)
     return JsonResponse({'status': "success"})
 
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
@@ -46,6 +50,8 @@ def delete_certificate(request, *args, **kwargs):
     certificate = GenericCertificate.objects.get(certificate_type=certificate_type, certificate_id=certificate_id)
     try:
         EntityCertificate.objects.get(entity=entity, certificate=certificate).delete()
+        lots = CarbureLot.objects.filter(Q(supplier_certificate=certificate_id) | Q(production_site_certificate=certificate_id))
+        background_bulk_sanity_checks(lots)
     except:
         return JsonResponse({'status': 'error', 'message': 'Could not find certificate'}, status=400)
     return JsonResponse({'status': "success"})
