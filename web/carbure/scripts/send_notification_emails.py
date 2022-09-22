@@ -111,7 +111,7 @@ def send_notification_emails(test: bool = False) -> None:
         )
 
         msg.attach_alternative(html_message, "text/html")
-        if test:
+        if not test:
             notifs.update(email_sent=True)
             msg.send()
         else:
