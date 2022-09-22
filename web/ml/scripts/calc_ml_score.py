@@ -13,7 +13,7 @@ from ml.models import EECStats, EPStats, ETDStats
 
 DATE_BEGIN = datetime.date.today() - datetime.timedelta(days=540) # approx 18 months
 
-def calc_ml_score(args):
+def calc_ml_score(year=None, period=None):
     data = get_prefetched_data()
     # {s.feedstock: s.default_value for s in ETDStats.objects.select_related('feedstock').all()}
     etd = data['etd']
@@ -23,9 +23,11 @@ def calc_ml_score(args):
     ep = data['ep']
 
     lots = CarbureLot.objects.select_related('feedstock', 'country_of_origin').filter(created_at__gt=DATE_BEGIN, lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN])
-    if args.year:
-        lots = lots.filter(year=args.year)
-    
+    if year:
+        lots = lots.filter(year=year)
+    if period:
+        lots = lots.filter(period=period)
+
     for l in tqdm(lots.iterator()):
         score = 0
         # eec penalisation
@@ -45,7 +47,7 @@ def calc_ml_score(args):
                 score += ((entry.average - l.ep) / entry.average)**2
             if entry.default_value_max_ep > 0 and l.ep > 1.2 * entry.default_value_max_ep:
                 score += ((l.ep - entry.default_value_max_ep) / entry.default_value_max_ep)**2
-                
+
         # etd penalisation ###### NOT INCLUDED FOR NOW - fausse les resultats - trop de faux positifs, trop different du premier check
         # if l.feedstock in etd:
         #    default_value = etd[l.feedstock]
@@ -63,10 +65,11 @@ def calc_ml_score(args):
 
 def main():
     parser = argparse.ArgumentParser(description='Calculate machine learning score')
-    parser.add_argument('--year', dest='year', action='store', help='year')    
+    parser.add_argument('--year', dest='year', action='store', help='year')
+    parser.add_argument('--period', dest='period', action='store', help='period')
     args = parser.parse_args()
 
-    calc_ml_score(args)
+    calc_ml_score(args.year, args.period)
 
 if __name__ == '__main__':
     main()

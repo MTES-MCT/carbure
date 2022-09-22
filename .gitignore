@@ -143,3 +143,7 @@ node_modules
 dump.rdb
 
 .DS_Store
+
+web/static
+
+files

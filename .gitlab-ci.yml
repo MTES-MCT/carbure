@@ -1,162 +1,101 @@
-image:
-  docker:20.10.11-dind
-  
 stages:
-  - prune
-  - build
-  - test
+  - prepare
+  - check
   - deploy
 
-include:
-  - template: Dependency-Scanning.gitlab-ci.yml
-
 variables:
-  DS_PYTHON_VERSION: 3
-  MYSQL_DATABASE: "carbure_mysql_test_db"
-  MYSQL_ROOT_PASSWORD: "carbure_mysql_ci_db_password"
-  DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: ""
+  MYSQL_DATABASE: carbure_mysql_test_db
+  MYSQL_ROOT_PASSWORD: carbure_mysql_ci_db_password
 
-services:
-  - name: docker:20.10.11-dind
-    alias: docker
-
-
-#prune_images:
-#  stage: prune
-#  script:
-#    - CONTAINERS=$(docker ps -a -q --filter=status=exited --filter=status=dead)
-#    - docker rm -v ${CONTAINERS}
-#    - docker image prune -a --force --filter "until=240h"
-
-build_redcert_downloader:
-  stage: build
+# use prebuild CI image when running checks
+.checks:
+  image: $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest
   before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  script:
-    - echo "Building redcert downloader"
-    - docker build web/fixtures/redcert -t registry.gitlab.com/la-fabrique-numerique/biocarburants/redcert_downloader:latest -f web/fixtures/redcert/Dockerfile
-    - docker push registry.gitlab.com/la-fabrique-numerique/biocarburants/redcert_downloader:latest
-  when: manual
+    - mv /app/front/node_modules ./front
 
-build_django:
-  stage: build
+# prepare git env to push new code to scalingo
+.scalingo:
+  image: alpine:latest
   before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  script:
-    - echo "Building django app"
-    - docker build -t registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:$CI_COMMIT_SHORT_SHA -f docker/Dockerfile.django .
-    - docker push registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:$CI_COMMIT_SHORT_SHA
+    - mkdir ~/.ssh
+    - apk add --update git openssh-client
+    - eval $(ssh-agent -s)
+    - echo "$SCALINGO_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - ssh-keyscan $SCALINGO_SSH_HOST >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - git config user.name $GIT_USER_NAME
+    - git config user.email $GIT_USER_EMAIL
+    - git remote add scalingo-dev $SCALINGO_GIT_REMOTE_DEV || true
+    - git remote add scalingo-staging $SCALINGO_GIT_REMOTE_STAGING || true
+    - git remote add scalingo-prod $SCALINGO_GIT_REMOTE_PROD || true
+    - git fetch origin $CI_COMMIT_BRANCH --unshallow
+    - git checkout $CI_COMMIT_BRANCH
 
-build_web:
-  stage: build
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  script:
-    - echo "Building reverse proxy"
-    - docker build -t registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:$CI_COMMIT_SHORT_SHA -f docker/Dockerfile.web .
-    - docker push registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:$CI_COMMIT_SHORT_SHA
-
-quality:
-  image: registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:$CI_COMMIT_SHORT_SHA
-  stage: test
-  allow_failure: true
-  script:
-    - echo "Code quality checks..."
-    - flake8 --config .flake8 web
-
-test:
+build-ci-image:
+  stage: prepare
+  image: docker:stable
   services:
-  - mysql:5.7
-  image: registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:$CI_COMMIT_SHORT_SHA
-  stage: test
-  variables:
-    DJANGO_DATABASE: $MYSQL_DATABASE
-    DJANGO_DB_USER: "root"
-    DJANGO_DB_PASSWORD: $MYSQL_ROOT_PASSWORD
-    DJANGO_DB_HOST: mysql
-    DJANGO_DB_PORT: 3306
+    - docker:dind
   script:
-    - export SECRET_KEY="j(h%-0woxpb@5k%@1p5_b&fqq2v&!v6r&d$#@rwkawnsy)*5k@"
-    - export SENTRY_DSN=""
-    - export TEST=1    
-    - export ALLOWED_HOSTS="carbure.local"
-    - export CARBURE_HOME=/app
-    - export IMAGE_TAG=ci
-    - echo "Testing..."
-    - cd /app/web
-    - coverage run ./manage.py test
-    - coverage report
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -f ci/Dockerfile -t $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest .
+    - docker push $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest
+  only:
+    changes:
+      - ci/Dockerfile
+      - Pipfile
+      - Pipfile.lock
+      - front/package.json
+      - front/package-lock.json
 
-test_frontend:
-  stage: test
-  image: node:16.8.0-alpine
-  cache:
-    paths:
-      - front/node_modules
+check-backend:
+  stage: check
+  extends: .checks
+  services:
+    - mysql:8.0
+    - redis:latest
   script:
-    - echo "Testing frontend..."
+    - export CARBURE_HOME=$(pwd)
+    - export DATABASE_URL=mysql://root:$MYSQL_ROOT_PASSWORD@mysql:3306/$MYSQL_DATABASE
+    - export REDIS_URL=redis://redis:6379
+    - mypy web || true
+    - TEST=1 python3 web/manage.py test web
+  only:
+    changes:
+      - web/**/*
+
+check-frontend:
+  stage: check
+  extends: .checks
+  script:
     - cd front
-    - npm install
-    - CI=true npm test
+    - npx eslint --ext .ts,.tsx src/
+    - npm test
+  only:
+    changes:
+      - front/**/*
 
-dev_push_django:
+deploy-dev:
   stage: deploy
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  extends: .scalingo
+  only:
+    - dev
   script:
-    - docker image prune -a --force --filter "until=240h"
-    - docker pull registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:$CI_COMMIT_SHORT_SHA
-    - docker tag registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:$CI_COMMIT_SHORT_SHA registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:dev
-    - docker push registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:dev
+    - git push scalingo-dev $CI_COMMIT_BRANCH:master -f
 
-dev_push_web:
+deploy-staging:
   stage: deploy
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  script:
-    - docker image prune -a --force --filter "until=240h"
-    - docker pull registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:$CI_COMMIT_SHORT_SHA
-    - docker tag registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:$CI_COMMIT_SHORT_SHA registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:dev
-    - docker push registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:dev
-
-staging_push_django:
-  stage: deploy
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  script:
-    - docker image prune -a --force --filter "until=240h"
-    - docker pull registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:$CI_COMMIT_SHORT_SHA
-    - docker tag registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:$CI_COMMIT_SHORT_SHA registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:staging
-    - docker push registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:staging
+  extends: .scalingo
   only:
     - master
-
-staging_push_web:
-  stage: deploy
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - docker image prune -a --force --filter "until=240h"
-    - docker pull registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:$CI_COMMIT_SHORT_SHA
-    - docker tag registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:$CI_COMMIT_SHORT_SHA registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:staging
-    - docker push registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:staging
-  only:
-    - master
+    - git push scalingo-staging master -f
 
-prod:
+deploy-prod:
   stage: deploy
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  script:
-    - docker pull registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:$CI_COMMIT_SHORT_SHA
-    - docker pull registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:$CI_COMMIT_SHORT_SHA
-    - docker tag registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:$CI_COMMIT_SHORT_SHA registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:prod
-    - docker tag registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:$CI_COMMIT_SHORT_SHA registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:prod
-    - docker push registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:prod
-    - docker push registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:prod
+  extends: .scalingo
   when: manual
   only:
     - master
-
-
+  script:
+    - git push scalingo-prod master -f
