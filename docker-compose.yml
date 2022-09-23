@@ -66,7 +66,7 @@ services:
       AWS_S3_ENDPOINT_URL: ${AWS_S3_ENDPOINT_URL}
       AWS_S3_USE_SSL: ${AWS_S3_USE_SSL}
       SCALINGO_TOKEN: ${SCALINGO_TOKEN}
-      SCALINGO_MYSQL_UUID: ${SCALINGO_TOKEN_UUID}
+      SCALINGO_MYSQL_UUID: ${SCALINGO_MYSQL_UUID}
     volumes:
       - ./web:/app/web
       - ./scripts:/app/scripts

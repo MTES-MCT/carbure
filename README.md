@@ -9,11 +9,14 @@ Traçabilité et durabilité des biocarburants, de la production à la distribut
 - mysql
 - mysql-client
 - node
+- scalingo `curl -O https://cli-dl.scalingo.com/install && bash install`
 
 ## Configuration et Installation
 
 - Clonez le repository: git clone https://github.com/MTES-MCT/carbure.git
-- Créez un fichier `.env` à la racine du dépôt en vous basant sur le fichier `.env.example` disponible dans le dossier
+- Créez un fichier `.env` à la racine du dépôt en vous basant sur le fichier `.env.example` disponible dans le dossier (Tu peux retrouver la pluspart des valeurs dans la section "Environnement" de carbure-prod sur scalingo https://dashboard.scalingo.com/apps/osc-fr1/carbure-prod/environment)
+- créer un accès ssh à ton compte Scalingo (https://dashboard.scalingo.com/account/keys) et un API token (dans ton profile scalingo https://dashboard.scalingo.com/account/tokens)
+- remplir SCALINGO_TOKEN=le token que tu as créé dans tom compte
 
 Ensuite, créez un environnement virtuel pour python 3.10:
 
@@ -27,15 +30,16 @@ par exemple :
 Dans le dossier /front, téléchargez les modules
 - `npm install`
 
-Vous pouvez désormais builder les images docker et lancer le projet:
 
+
+
+Vous pouvez désormais builder les images docker et lancer le projet:
 - `docker-compose build`
 - `docker-compose up -d`
 
-
 ## Alimenter la base de données de dev
-
 Lancer `sh scripts/database/restore_db.sh` pour télécharger un dump contenant des données utilisables en local
+
 
 ## Création d'un nom de domaine local personnalisé
 
