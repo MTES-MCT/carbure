@@ -35,7 +35,7 @@ export function getErrorText(error: DoubleCountingUploadError) {
         "La matière première {{feedstock}} est incohérente avec le biocarburant {{biofuel}}.",
         { feedstock: error.meta?.feedstock, biofuel: error.meta?.biofuel }
       )
-      if (error.meta.infos) {
+      if (error.meta?.infos) {
         errorText += " " + error.meta.infos.join(' ')
       }
       break

@@ -42,12 +42,12 @@ const DoubleCountingUploadDialog = ({
       if (error === "DOUBLE_COUNTING_IMPORT_FAILED") {
         const errors = (
           err as AxiosError<{ data: { errors: DoubleCountingUploadErrors } }>
-        ).response?.data.data.errors
+        ).response?.data?.data?.errors
         setErrors(errors)
       } else {
         notify(
           t(
-            "L'envoie de votre dossier double comptage a échoué. Merci de contacter l'équipe Carbure"
+            "L'envoi de votre dossier double comptage a échoué. Merci de contacter l'équipe Carbure"
           ),
           {
             variant: "danger",
