@@ -16,8 +16,6 @@ import server, {
   okDynamicSettings,
   setEntity,
 } from "./api"
-import { dcApplicationErrors } from "./data"
-import { getErrorText } from "settings/utils/double-counting"
 
 const SettingsWithHooks = ({ entityID }: { entityID?: number }) => {
   return (
@@ -30,7 +28,11 @@ const SettingsWithHooks = ({ entityID }: { entityID?: number }) => {
   )
 }
 
-beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
+beforeAll(() =>
+  server.listen({
+    onUnhandledRequest: "warn",
+  })
+)
 
 beforeEach(() => server.use(okDynamicSettings))
 afterEach(() => server.resetHandlers())

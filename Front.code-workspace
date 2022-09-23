@@ -14,10 +14,7 @@
     },
     "workbench.colorCustomizations": {
       "titleBar.activeBackground": "#000092",
-      "titleBar.activeForeground": "#000092",
-    },
-    "html.format.wrapLineLength": 0
-  },
+      "titleBar.activeForeground": "#000092"
+    }
+  }
 }
-
-
