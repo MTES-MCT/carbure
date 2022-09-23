@@ -1,0 +1,16 @@
+{
+  "name": "frontend-scalingo",
+  "description": "Empty package.json to allow scalingo nodejs buildpack to setup properly",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "(cd front; npm install; npm run build)"
+  },
+  "engines": {
+    "node": "16.16.0",
+    "npm": "8.11"
+  },
+  "cacheDirectories": [
+    "front/node_modules"
+  ]
+}

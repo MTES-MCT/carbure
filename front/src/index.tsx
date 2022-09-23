@@ -12,7 +12,7 @@ import { LoaderOverlay } from "common/components/scaffold"
 
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <BrowserRouter basename="/app">
+    <BrowserRouter>
       <MatomoProvider>
         <Suspense fallback={<LoaderOverlay />}>
           <Carbure />

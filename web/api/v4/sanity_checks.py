@@ -63,11 +63,11 @@ def generic_error(error, **kwargs):
     d.update(kwargs)
     return GenericError(**d)
 
-def bulk_sanity_checks(lots, prefetched_data, background=True):
+def bulk_sanity_checks(lots, prefetched_data=None):
+    if not prefetched_data:
+        prefetched_data = get_prefetched_data()
     results = []
     errors = []
-    if background == True:
-        db.connections.close_all()
     # cleanup previous errors
     lot_ids = [l.id for l in lots]
     GenericError.objects.filter(lot_id__in=lot_ids).delete()
@@ -79,18 +79,7 @@ def bulk_sanity_checks(lots, prefetched_data, background=True):
         except:
             traceback.print_exc()
     GenericError.objects.bulk_create(errors, batch_size=1000)
-    #bulk_scoring(lots, prefetched_data)
-    background_bulk_scoring(lots, prefetched_data)
     return results
-
-
-def background_bulk_scoring(lots, prefetched_data=None):
-    #print('Start background bulk_scoring')
-    bulk_scoring(lots, prefetched_data)
-    #p = Process(target=bulk_scoring, args=(lots, prefetched_data))
-    #p.start()
-    #print('done calling bulk_scoring in background %s' % (datetime.datetime.now()))
-    #pass
 
 
 def bulk_scoring(lots, prefetched_data=None):

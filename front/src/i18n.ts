@@ -27,7 +27,7 @@ i18n
       transKeepBasicHtmlNodesFor: ["b", "i"],
     },
     backend: {
-      loadPath: "/app/locales/{{lng}}/{{ns}}.json",
+      loadPath: "/locales/{{lng}}/{{ns}}.json",
     },
   })
 

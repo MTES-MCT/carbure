@@ -20,12 +20,13 @@ from api.v4.helpers import filter_lots, filter_stock, get_entity_lots_by_status,
 from api.v4.helpers import get_prefetched_data, get_stock_events, get_stock_with_metadata, get_stock_filters_data, get_stocks_summary_data, get_transaction_distance, handle_eth_to_etbe_transformation, get_known_certificates
 from api.v4.helpers import send_email_declaration_invalidated, send_email_declaration_validated
 from api.v4.lots import construct_carbure_lot, bulk_insert_lots, try_get_date
-from api.v4.sanity_checks import background_bulk_scoring, bulk_sanity_checks, bulk_scoring, sanity_check
+from api.v4.sanity_checks import sanity_check, bulk_sanity_checks
 
 from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureLotReliabilityScore, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, Entity, GenericError, Pays, SustainabilityDeclaration, UserRights
 from core.notifications import notify_correction_done, notify_correction_request, notify_declaration_cancelled, notify_declaration_validated, notify_lots_recalled, notify_lots_received, notify_lots_rejected, notify_lots_recalled
 from core.serializers import CarbureLotPublicSerializer, CarbureLotReliabilityScoreSerializer, CarbureNotificationSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
 from core.xlsx_v3 import template_v4, template_v4_stocks
+from carbure.tasks import background_bulk_scoring
 
 
 @check_user_rights()
@@ -405,7 +406,7 @@ def stock_split(request, *args, **kwargs):
         event.metadata = {'message': 'Envoi lot.', 'volume_to_deduct': lot.volume}
         event.save()
         new_lot_ids.append(lot.id)
-        bulk_sanity_checks([lot], prefetched_data, background=False)
+        bulk_sanity_checks([lot], prefetched_data)
         # create events
         e = CarbureLotEvent()
         e.event_type = CarbureLotEvent.CREATED
@@ -518,6 +519,7 @@ def add_lot(request, *args, **kwargs):
     lots_created = bulk_insert_lots(entity, [lot_obj], [errors], d)
     if len(lots_created) == 0:
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=500)
+    background_bulk_scoring([lots_created])
     e = CarbureLotEvent()
     e.event_type = CarbureLotEvent.CREATED
     e.lot_id = lots_created[0].id
@@ -565,6 +567,7 @@ def add_excel(request, *args, **kwargs):
     lots_created = bulk_insert_lots(entity, lots, lots_errors, d)
     if len(lots_created) == 0:
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=500)
+    background_bulk_scoring(lots_created)
     for lot in lots_created:
         e = CarbureLotEvent()
         e.event_type = CarbureLotEvent.CREATED
@@ -607,7 +610,7 @@ def update_lot(request, *args, **kwargs):
     for e in errors:
         e.lot = updated_lot
     GenericError.objects.bulk_create(errors, batch_size=100)
-    bulk_sanity_checks([updated_lot], d, background=False)
+    bulk_sanity_checks([updated_lot], d)
     data = CarbureLotPublicSerializer(updated_lot).data
     diff = dictdiffer.diff(previous, data)
     added = []
@@ -1613,12 +1616,10 @@ def validate_declaration(request, *args, **kwargs):
     # freeze lots
     lots_to_freeze = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True)
     lots_to_freeze.update(lot_status=CarbureLot.FROZEN)
-    #bulk_scoring(lots_to_freeze)
     background_bulk_scoring(lots_to_freeze)
 
     lots_to_freeze = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True)
     lots_to_freeze.update(lot_status=CarbureLot.FROZEN)
-    #bulk_scoring(lots_to_freeze)
     background_bulk_scoring(lots_to_freeze)
 
     # mark declaration
@@ -1666,8 +1667,6 @@ def invalidate_declaration(request, *args, **kwargs):
     lots_to_unfreeze.update(lot_status=CarbureLot.ACCEPTED)
     lots_to_unfreeze_second_batch = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True, lot_status=CarbureLot.FROZEN)
     lots_to_unfreeze_second_batch.update(lot_status=CarbureLot.ACCEPTED)
-    #bulk_scoring(lots_to_unfreeze)
-    #bulk_scoring(lots_to_unfreeze_second_batch)
 
     background_bulk_scoring(lots_to_unfreeze)
     background_bulk_scoring(lots_to_unfreeze_second_batch)
