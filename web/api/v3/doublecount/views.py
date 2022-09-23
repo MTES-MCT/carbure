@@ -28,6 +28,9 @@ from core.xlsx_v3 import export_dca, make_biofuels_sheet, make_dc_mps_sheet, mak
 from carbure.storage_backends import AWSStorage
 from django.core.files.storage import FileSystemStorage
 
+from core.common import ErrorResponse
+from doublecount.dc_sanity_checks import check_dc_globally
+
 @check_rights('entity_id')
 def get_agreements(request, *args, **kwargs):
     entity = kwargs['context']['entity']
@@ -185,9 +188,11 @@ def send_dca_status_email(dca):
 
 @check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def upload_file(request, *args, **kwargs):
+
     context = kwargs['context']
     entity = context['entity']
     production_site_id = request.POST.get('production_site_id', None)
+
     if not production_site_id:
         return JsonResponse({'status': "error", 'message': "Missing production_site_id"}, status=400)
 
@@ -211,7 +216,7 @@ def upload_file(request, *args, **kwargs):
     sourcing_data, production_data = load_dc_file(filepath)
 
     # get dc period for upload
-    years = list(sourcing_data['year']) + list(production_data['year'])
+    years = [int(year) for year in list(sourcing_data['year']) + list(production_data['year']) if year]
     end_year = max(years)
     start = datetime.date(end_year - 1, 1, 1)
     end = datetime.date(end_year, 12, 31)
@@ -219,8 +224,22 @@ def upload_file(request, *args, **kwargs):
     dca, created = DoubleCountingAgreement.objects.get_or_create(producer=entity, production_site_id=production_site_id, period_start=start, period_end=end, defaults={'producer_user': request.user})
 
     try:
-        load_dc_sourcing_data(dca, sourcing_data)
-        load_dc_production_data(dca, production_data)
+        sourcing_errors = load_dc_sourcing_data(dca, sourcing_data)
+        print("sourcing_errors:")
+        print(sourcing_errors)
+        print("production_data:")
+        print(production_data)
+        production_errors = load_dc_production_data(dca, production_data)
+
+        global_errors = check_dc_globally(dca)
+        print("global_errors:")
+        print(global_errors)
+
+        if len(sourcing_errors) > 0 or len(production_errors) > 0 or len(global_errors) > 0:
+            dca.delete()
+            errors = {"sourcing": sourcing_errors, "production": production_errors, "global": global_errors}
+            return ErrorResponse(400, 'DOUBLE_COUNTING_IMPORT_FAILED', {"errors": errors})
+
         # send confirmation email
         try:
             send_dca_confirmation_email(dca)

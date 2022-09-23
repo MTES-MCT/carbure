@@ -10,6 +10,7 @@ export interface CollapseProps {
   icon?: React.FunctionComponent | React.ReactNode
   label?: string
   children?: React.ReactNode
+  isOpen?: boolean
 }
 
 export const Collapse = ({
@@ -17,8 +18,9 @@ export const Collapse = ({
   icon: Icon,
   label,
   children,
+  isOpen = false,
 }: CollapseProps) => {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(isOpen)
   const icon = typeof Icon === "function" ? <Icon /> : Icon
 
   return (
