@@ -4,22 +4,17 @@ import { setupServer } from "msw/node"
 import { OwnershipType } from "carbure/types"
 
 import {
-  deliverySite,
-  operator,
-  producer,
-  productionSite,
-  entityRights,
-  entityRight,
-  entityRequest,
-} from "carbure/__test__/data"
-import {
   okCountrySearch,
-  okDeliverySitesSearch,
-  okTranslations,
-  okErrorsTranslations,
-  okFieldsTranslations,
+  okDeliverySitesSearch, okErrorsTranslations,
+  okFieldsTranslations, okProductionSitesSearch, okTranslations
 } from "carbure/__test__/api"
+import {
+  deliverySite, entityRequest, entityRight, entityRights, operator,
+  producer,
+  productionSite
+} from "carbure/__test__/data"
 import { clone, Data } from "carbure/__test__/helpers"
+import { dcApplicationErrors } from "./data"
 
 let deliverySites: any[] = []
 let productionSites: any[] = []
@@ -259,7 +254,49 @@ export const okAgreements = rest.get(
   }
 )
 
+export const okDoubleCountUploadApplication = rest.post(
+  "/api/v3/doublecount/upload",
+  (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data: { dca_id: 142332 }
+      })
+    )
+  }
+)
+
+export const okDoubleCountUploadDocumentation = rest.post(
+  "/api/v3/doublecount/upload-documentation",
+  (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data: { dca_id: 142332 }
+      })
+    )
+  }
+)
+
+export const koDoubleCountUploadApplication = rest.post(
+  "/api/v3/doublecount/upload",
+  (req, res, ctx) => {
+    return res(
+      ctx.status(400),
+      ctx.json({
+        status: "error",
+        error: "DOUBLE_COUNTING_IMPORT_FAILED",
+        data: dcApplicationErrors,
+      })
+    )
+  }
+)
+
+
 export default setupServer(
+  koDoubleCountUploadApplication,
+  okDoubleCountUploadDocumentation,
+  okDoubleCountUploadApplication,
   okSettings,
   okEnableMac,
   okDisableMac,
@@ -269,6 +306,7 @@ export default setupServer(
   okAddDeliverySite,
   okDeleteDeliverySite,
   okProductionSites,
+  okProductionSitesSearch,
   okAddProductionSite,
   okUpdateProductionSite,
   okDeleteProductionSite,
