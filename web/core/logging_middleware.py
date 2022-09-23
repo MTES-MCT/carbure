@@ -201,6 +201,10 @@ class LoggingMiddleware(object):
             if i != last:
                 part = part + self.boundary
 
+            # do not log anything containing a password
+            if "password" in part:
+                continue
+
             self.logger.log(log_level, part, logging_context)
 
     def _log_resp(self, level, response, logging_context):

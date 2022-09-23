@@ -67,10 +67,10 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
             <section>
               <StockTraceability
                 details={stockData}
-                parentLotRoot="../../declarations"
-                parentTransfoRoot="../../stocks"
-                childLotRoot="../../declarations"
-                childTransfoRoot="../../stocks"
+                parentLotRoot="../declarations"
+                parentTransfoRoot="../stocks"
+                childLotRoot="../declarations"
+                childTransfoRoot="../stocks"
               />
             </section>
           )}
