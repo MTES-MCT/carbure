@@ -59,7 +59,15 @@ if env('TEST') is False:
     )
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
+
+SESSION_COOKIE_AGE = 60*60*24*30 # 30 days
+SESSION_COOKIE_SAMESITE = 'Strict'
+SESSION_COOKIE_HTTPONLY=True
+SESSION_COOKIE_SECURE=env('IMAGE_TAG') in ('dev', 'staging', 'prod')
+
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS")
+CSRF_COOKIE_SAMESITE = 'Strict'
+CSRF_COOKIE_SECURE=env('IMAGE_TAG') in ('dev', 'staging', 'prod')
 
 OTP_EMAIL_TOKEN_VALIDITY = 1800 # 30 minutes
 OTP_EMAIL_THROTTLE_FACTOR = 0 # no throttle
@@ -179,7 +187,6 @@ STATICFILES_STORAGE = "spa.storage.SPAStaticFilesStorage"
 if env('IMAGE_TAG') in ['dev', 'staging', 'prod']:
     STATICFILES_DIRS = [os.path.join(BASE_DIR, '../front/build')]
 
-SESSION_COOKIE_AGE = 60*60*24*30 # 30 days
 
 DEFAULT_FROM_EMAIL = "noreply@carbure.beta.gouv.fr"
 if env('IMAGE_TAG') in ['dev', 'staging', 'prod']:
