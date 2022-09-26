@@ -97,18 +97,20 @@ export function getLotChanges(updates: LotUpdate<any>[] = []): LotChange[] {
             user: u.user,
             date: u.event_dt,
           }
+        } else if ("changed" in u.metadata) {
+          return (u.metadata as LotFieldUpdate).changed.map(
+            ([field, valueBefore, valueAfter]) => ({
+              field,
+              user: u.user,
+              date: u.event_dt,
+              label: i18next.t(field, { ns: "fields" }),
+              valueBefore: getFieldValue(valueBefore),
+              valueAfter: getFieldValue(valueAfter),
+            })
+          )
+        } else {
+          return []
         }
-
-        return (u.metadata as LotFieldUpdate).changed.map(
-          ([field, valueBefore, valueAfter]) => ({
-            field,
-            user: u.user,
-            date: u.event_dt,
-            label: i18next.t(field, { ns: "fields" }),
-            valueBefore: getFieldValue(valueBefore),
-            valueAfter: getFieldValue(valueAfter),
-          })
-        )
       })
       // remove updates with fields that are not translated
       .filter((u) => u.label !== u.field)
