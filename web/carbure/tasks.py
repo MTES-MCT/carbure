@@ -31,15 +31,15 @@ if env.get("IMAGE_TAG") == "prod":
     def periodic_backup_prod_db() -> None:
         subprocess.run(["bash", "/app/scripts/database/backup_prod_db.sh"])
 
-    @db_periodic_task(crontab(day_of_week="Sun", hour=3, minute=0))
+    @db_periodic_task(crontab(day_of_week=7, hour=3, minute=0))
     def periodic_update_2bs_certificates() -> None:
         update_2bs_certificates(email=True)
 
-    @db_periodic_task(crontab(day_of_week="Sun", hour=4, minute=0))
+    @db_periodic_task(crontab(day_of_week=7, hour=4, minute=0))
     def periodic_update_iscc_certificates() -> None:
         update_iscc_certificates(email=True)
 
-    @db_periodic_task(crontab(day_of_week="Sun", hour=5, minute=0))
+    @db_periodic_task(crontab(day_of_week=7, hour=5, minute=0))
     def periodic_update_redcert_certificates() -> None:
         update_redcert_certificates(email=True)
 
