@@ -29,6 +29,7 @@ export const MatomoProvider = (props: any) => {
 
   useLayoutEffect(() => {
     const matomo = value()
+    matomo.push(["disableCookies"])
     matomo.push(["setCustomUrl", window.location.href])
     matomo.push(["trackPageView"])
   }, [location.pathname])
