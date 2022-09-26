@@ -27,7 +27,7 @@ export interface LotUpdate<T> {
   user: string
   event_type: string
   event_dt: string
-  metadata: T
+  metadata?: T
   label?: string
 }
 
