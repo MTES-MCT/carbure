@@ -32,6 +32,7 @@ coverage = "*"
 huey = "*"
 lxml = "*"
 requests = "*"
+django-csp = "*"
 
 [dev-packages]
 black = "*"

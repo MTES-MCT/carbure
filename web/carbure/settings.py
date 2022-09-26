@@ -98,6 +98,8 @@ AUTH_USER_MODEL = 'authtools.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'csp.middleware.CSPMiddleware',
     'spa.middleware.SPAMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -105,11 +107,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'core.logging_middleware.LoggingMiddleware',
 ]
-
-X_FRAME_OPTIONS = "SAMEORIGIN"
 
 ROOT_URLCONF = 'carbure.urls'
 
@@ -184,6 +183,8 @@ STATIC_URL = '/assets/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_STORAGE = "spa.storage.SPAStaticFilesStorage"
 
+WHITENOISE_ALLOW_ALL_ORIGINS=False
+
 if env('IMAGE_TAG') in ['dev', 'staging', 'prod']:
     STATICFILES_DIRS = [os.path.join(BASE_DIR, '../front/build')]
 
@@ -254,3 +255,10 @@ if DEBUG:
     INSTALLED_APPS += ['django_query_profiler']
     DATABASES["default"]["ENGINE"] = "django_query_profiler." + DATABASES["default"]["ENGINE"]
     MIDDLEWARE = ['django_query_profiler.client.middleware.QueryProfilerMiddleware'] + MIDDLEWARE
+
+
+# CSP header configuration
+CSP_DEFAULT_SRC="self"
+CSP_IMG_SRC="self"
+CSP_STYLE_SRC="self"
+CSP_SCRIPT_SRC=("self", "stats.data.gouv.fr")
