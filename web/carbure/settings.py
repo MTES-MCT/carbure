@@ -258,7 +258,7 @@ if DEBUG:
 
 
 # CSP header configuration
-CSP_DEFAULT_SRC="self"
-CSP_IMG_SRC="self"
-CSP_STYLE_SRC="self"
-CSP_SCRIPT_SRC=("self", "stats.data.gouv.fr")
+CSP_DEFAULT_SRC="'self'"
+CSP_IMG_SRC="'self'"
+CSP_STYLE_SRC="'self'"
+CSP_SCRIPT_SRC=("'self'", "stats.data.gouv.fr")
