@@ -179,7 +179,6 @@ def check_ghg_values(prefetched_data, lot, errors):
             errors.append(generic_error(error=CarbureSanityCheckErrors.GHG_REDUC_INF_65, lot=lot, is_blocking=True))
 
 
-
 def check_certificates(prefetched_data, lot, errors):
     # PRODUCTION SITE CERTIFICATES
     if lot.production_site_certificate:
@@ -312,9 +311,9 @@ def sanity_check(lot, prefetched_data):
                 errors.append(generic_error(error=CarbureSanityCheckErrors.MP_BC_INCOHERENT, lot=lot, is_blocking=True, extra="%s doit être à base d'huiles ou graisses animales" % (lot.biofuel.name), fields=['biofuel_code', 'feedstock_code']))
 
         if lot.feedstock.code in ['HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2', 'HUILES_OU_GRAISSES_ANIMALES_CAT3'] and lot.biofuel.code not in ['EMHA', 'HOE', 'HOG', 'HOC', 'HCC', 'HCG', 'HCE', 'B100']:
-            errors.append(generic_error(error=CarbureSanityCheckErrors.MP_BC_INCOHERENT, lot=lot, is_blocking=True, extra="Des huiles ou graisses animales ne peuvent donner que des EMHA ou HOG/HOE/HOC", fields=['biofuel_code', 'feedstock_code']))
-        if lot.feedstock.code == 'HUILE_ALIMENTAIRE_USAGEE' and lot.biofuel.code not in ['EMHU', 'HOE', 'HOG', 'HOC', 'HCC', 'HCG', 'HCE']:
-            errors.append(generic_error(error=CarbureSanityCheckErrors.MP_BC_INCOHERENT, lot=lot, is_blocking=True, extra="Des huiles alimentaires usagées ne peuvent donner que des EMHU ou HOG/HOE/HOC", fields=['biofuel_code', 'feedstock_code']))
+            errors.append(generic_error(error=CarbureSanityCheckErrors.MP_BC_INCOHERENT, lot=lot, is_blocking=True, extra="Des huiles ou graisses animales ne peuvent donner que des EMHA, B100 ou HOG/HOE/HOC", fields=['biofuel_code', 'feedstock_code']))
+        if lot.feedstock.code == 'HUILE_ALIMENTAIRE_USAGEE' and lot.biofuel.code not in ['EMHU', 'HOE', 'HOG', 'HOC', 'HCC', 'HCG', 'HCE', "B100"]:
+            errors.append(generic_error(error=CarbureSanityCheckErrors.MP_BC_INCOHERENT, lot=lot, is_blocking=True, extra="Des huiles alimentaires usagées ne peuvent donner que des EMHU, B100 ou HOG/HOE/HOC", fields=['biofuel_code', 'feedstock_code']))
 
         if lot.feedstock.code in ['MAIS', 'BLE', 'BETTERAVE', 'CANNE_A_SUCRE', 'RESIDUS_VINIQUES', 'LIES_DE_VIN', 'MARC_DE_RAISIN'] and lot.biofuel.code not in ['ETH', 'ETBE', 'ED95']:
             errors.append(generic_error(error=CarbureSanityCheckErrors.MP_BC_INCOHERENT, lot=lot, is_blocking=True, extra="Maïs, Blé, Betterave, Canne à Sucre ou Résidus Viniques ne peuvent créer que de l'Éthanol ou ETBE", fields=['biofuel_code', 'feedstock_code']))
