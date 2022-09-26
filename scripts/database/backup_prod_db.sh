@@ -16,7 +16,7 @@ scalingo --app carbure-prod --addon $SCALINGO_MYSQL_UUID backups-download --outp
 
 # upload backup to backblaze
 echo "Uploading backup to backblaze..."
-python3 /app/scripts/backup/s3backblaze.py -f /tmp/backups/*.tar.gz
+python3 /app/scripts/database/s3backblaze.py -f /tmp/backups/*.tar.gz
 
 # cleanup
 echo "Cleaning up..."
