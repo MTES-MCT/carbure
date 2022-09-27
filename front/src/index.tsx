@@ -4,7 +4,6 @@ import { BrowserRouter } from "react-router-dom"
 
 import "./i18n"
 import "./carbure/assets/css/index.css"
-import * as serviceWorker from "./serviceWorker"
 
 import Carbure from "./carbure"
 import { MatomoProvider } from "./matomo"
@@ -21,8 +20,3 @@ createRoot(document.getElementById("root")!).render(
     </BrowserRouter>
   </React.StrictMode>
 )
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.register()
