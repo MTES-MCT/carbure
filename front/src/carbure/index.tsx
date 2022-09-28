@@ -17,6 +17,7 @@ import Dashboard from "dashboard"
 import Controls from "controls"
 import Entities from "companies"
 import Auth from "auth"
+import SafCertificates from "saf-certificates"
 
 const Carbure = () => {
   const user = useUserManager()
@@ -61,7 +62,7 @@ const currentYear = new Date().getFullYear()
 const Org = () => {
   const entity = useEntity()
 
-  const { isAdmin, isAuditor, isExternal, isIndustry } = entity
+  const { isAdmin, isAuditor, isExternal, isIndustry, can_handle_saf } = entity
   const hasDCA = isExternal && entity.hasPage("DCA")
 
   // prettier-ignore
@@ -70,6 +71,7 @@ const Org = () => {
         <Route path="settings" element={<Settings />} />
 
         {isIndustry && <Route path="transactions/:year/*" element={<Transactions />} />}
+        {can_handle_saf && <Route path="saf-certificates/:year/*" element={<SafCertificates />} />}
         {isIndustry && <Route path="registry" element={<Registry />} />}
 
         {isAdmin && <Route path="dashboard" element={<Dashboard />} />}
@@ -79,6 +81,7 @@ const Org = () => {
         {(isAdmin || hasDCA) && <Route path="double-counting/*" element={<DoubleCounting />} />}
 
         {isIndustry && <Route path="transactions" element={<Navigate replace to={`${currentYear}`} />} />}
+        {can_handle_saf && <Route path="saf-certificates" element={<Navigate replace to={`${currentYear}`} />} />}
         {(isAdmin || isAuditor) && <Route path="controls" element={<Navigate replace to={`${currentYear}`} />} />}
 
         {isIndustry && <Route path="*" element={<Navigate replace to="transactions" />} />}
