@@ -27,10 +27,24 @@ export function Filters<T>({
 
   const filterLabels = {
     [Filter.Periods]: t("Périodes"),
+    [Filter.ProductionSites]: t("Sites de production"),
     [Filter.Feedstocks]: t("Matières Premières"),
     [Filter.Biofuels]: t("Biocarburants"),
-    [Filter.Clients]: t("Clients"),
     [Filter.CountriesOfOrigin]: t("Pays d'origine"),
+    [Filter.DeliverySites]: t("Sites de livraison"),
+    [Filter.Depots]: t("Dépôts"),
+    [Filter.Clients]: t("Clients"),
+    [Filter.Suppliers]: t("Fournisseurs"),
+    [Filter.AddedBy]: t("Ajouté par"),
+    [Filter.Errors]: t("Incohérences"),
+    [Filter.ClientTypes]: t("Types de client"),
+    [Filter.ShowEmpty]: t("Inclure stocks vides"),
+    [Filter.DeliveryTypes]: t("Types de livraison"),
+    [Filter.LotStatus]: t("Statut"),
+    [Filter.CorrectionStatus]: t("Corrections"),
+    [Filter.Scores]: t("Score"),
+    [Filter.Conformity]: t("Conformité"),
+    [Filter.ML]: t("ML"),
   }
 
   return (
@@ -91,13 +105,23 @@ export const FilterSelect = ({
   />
 )
 
-type FilterNormalizers = Partial<Record<Filter, Normalizer<any>>>
+type FilterNormalizers= Partial<Record<Filter, Normalizer<any>>> // prettier-ignore
 const filterNormalizers: FilterNormalizers = {
   [Filter.Feedstocks]: norm.normalizeFeedstockFilter,
   [Filter.Biofuels]: norm.normalizeBiofuelFilter,
   [Filter.CountriesOfOrigin]: norm.normalizeCountryFilter,
+  [Filter.Errors]: norm.normalizeAnomalyFilter,
+  [Filter.DeliveryTypes]: norm.normalizeDeliveryTypeFilter,
+  [Filter.LotStatus]: norm.normalizeLotStatusFilter,
+  [Filter.ClientTypes]: norm.normalizeEntityTypeFilter,
+  [Filter.Suppliers]: norm.normalizeUnknownFilter,
   [Filter.Clients]: norm.normalizeUnknownFilter,
+  [Filter.DeliverySites]: norm.normalizeUnknownFilter,
+  [Filter.ProductionSites]: norm.normalizeUnknownFilter,
+  [Filter.Depots]: norm.normalizeUnknownFilter,
   [Filter.Periods]: norm.normalizePeriodFilter,
+  [Filter.CorrectionStatus]: norm.normalizeCorrectionFilter,
+  [Filter.Conformity]: norm.normalizeConformityFilter,
 }
 
 export function useFilterParams() {
