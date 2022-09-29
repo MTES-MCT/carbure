@@ -12,7 +12,7 @@ import HashRoute from "common/components/hash-route"
 import { UserRole } from "carbure/types"
 import useEntity from "carbure/hooks/entity"
 import { useQuery } from "common/hooks/async"
-import * as api from "../transactions/api"
+import * as api from "./api"
 import { Main } from "common/components/scaffold"
 import Select from "common/components/select"
 import StatusTabs from "./components/status"
@@ -32,7 +32,7 @@ export const SafCertificates = () => {
 
   const years = useYears("saf-certificates", api.getYears)
 
-  const snapshot = useQuery(api.getSnapshot, {
+  const snapshot = useQuery(api.getSafSnapshot, {
     key: "snapshot",
     params: [entity.id, years.selected],
   })
@@ -61,7 +61,7 @@ export const SafCertificates = () => {
           </section>
 
           <section>
-            <StatusTabs loading={snapshot.loading} count={snapshotData?.lots} />
+            <StatusTabs loading={snapshot.loading} count={snapshotData} />
           </section>
         </header>
 
