@@ -1,7 +1,7 @@
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useLocation, Navigate } from "react-router-dom"
-import * as api from "../../../transactions/api"
+import * as api from "../../api"
 import { Entity, UserRole } from "carbure/types"
 import {
   Lot,
@@ -55,8 +55,8 @@ export const Certificates = ({ year, snapshot }: CertificatesProps) => {
   const [state, actions] = useQueryParamsStore(entity, year, status, category, snapshot) // prettier-ignore
   const query = useLotQuery(state)
 
-  const lots = useQuery(api.getLots, {
-    key: "lots",
+  const lots = useQuery(api.getSafCertificates, {
+    key: "saf_certificates",
     params: [query],
 
     onSuccess: () => {

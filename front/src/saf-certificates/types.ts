@@ -82,11 +82,11 @@ export interface SafCertificateQuery {
   from_idx?: number
   limit?: number
   category?: string
-  [Filter.Feedstocks]?: string[]
-  [Filter.Biofuels]?: string[]
-  [Filter.Periods]?: string[]
-  [Filter.CountriesOfOrigin]?: string[]
-  [Filter.Clients]?: string[]
+  [SafCertificateFilter.Feedstocks]?: string[]
+  [SafCertificateFilter.Biofuels]?: string[]
+  [SafCertificateFilter.Periods]?: string[]
+  [SafCertificateFilter.CountriesOfOrigin]?: string[]
+  [SafCertificateFilter.Clients]?: string[]
 }
 
 export enum SafCertificateStatus {
@@ -96,7 +96,7 @@ export enum SafCertificateStatus {
   Rejected = "REJECTED",
 }
 
-export enum Filter {
+export enum SafCertificateFilter {
   Feedstocks = "feedstocks",
   Biofuels = "biofuels",
   Periods = "periods",
@@ -111,4 +111,4 @@ export interface LotPreview {
   delivery_date: string
 }
 
-export type FilterSelection = Partial<Record<Filter, string[]>>
+export type FilterSelection = Partial<Record<SafCertificateFilter, string[]>>
