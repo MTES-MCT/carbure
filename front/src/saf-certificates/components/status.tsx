@@ -9,10 +9,11 @@ import { Col, Row } from "common/components/scaffold"
 import { formatNumber } from "common/utils/formatters"
 import useEntity from "carbure/hooks/entity"
 import { compact } from "common/utils/collection"
+import { SafCertificateStatus, SafSnapshot } from "saf-certificates/types"
 
 export interface StatusTabsProps {
   loading: boolean
-  count: Snapshot["lots"] | undefined
+  count: SafSnapshot | undefined
 }
 
 export const StatusTabs = ({
@@ -32,8 +33,8 @@ export const StatusTabs = ({
           label: (
             <StatusRecap
               loading={loading}
-              count={count.draft}
-              label={t("Lots SAF", { count: count.draft })}
+              count={count.to_assign}
+              label={t("Lots SAF", { count: count.to_assign })}
             />
           ),
         },
@@ -43,23 +44,8 @@ export const StatusTabs = ({
           label: (
             <StatusRecap
               loading={loading}
-              count={count.in_total}
-              pending={count.in_pending}
-              tofix={count.in_tofix}
-              label={t("Certificats en attente", { count: count.in_total })}
-            />
-          ),
-        },
-        {
-          key: "accepted",
-          path: "accepted",
-          label: (
-            <StatusRecap
-              loading={loading}
-              count={count.in_total}
-              pending={count.in_pending}
-              tofix={count.in_tofix}
-              label={t("Certificats refusés", { count: count.in_total })}
+              count={count.pending}
+              label={t("Certificats en attente", { count: count.pending })}
             />
           ),
         },
@@ -69,10 +55,20 @@ export const StatusTabs = ({
           label: (
             <StatusRecap
               loading={loading}
-              count={count.in_total}
-              pending={count.in_pending}
-              tofix={count.in_tofix}
-              label={t("Certificats acceptés", { count: count.in_total })}
+              count={count.rejected}
+              hasAlert={true}
+              label={t("Certificats acceptés", { count: count.rejected })}
+            />
+          ),
+        },
+        {
+          key: "accepted",
+          path: "accepted",
+          label: (
+            <StatusRecap
+              loading={loading}
+              count={count.accepted}
+              label={t("Certificats refusés", { count: count.accepted })}
             />
           ),
         },
@@ -81,37 +77,29 @@ export const StatusTabs = ({
   )
 }
 
-const defaultCount: Snapshot["lots"] = {
-  draft_imported: 0,
-  draft_stocks: 0,
-  draft: 0,
-  in_pending: 0,
-  in_tofix: 0,
-  in_total: 0,
-  stock: 0,
-  stock_total: 0,
-  out_pending: 0,
-  out_tofix: 0,
-  out_total: 0,
+const defaultCount: SafSnapshot = {
+  to_assign: 0,
+  to_assign_available: 0,
+  to_assign_history: 0,
+  pending: 0,
+  rejected: 0,
+  accepted: 0,
 }
 
 interface StatusRecapProps {
   loading: boolean
   count: number
   label: string
-  pending?: number
-  tofix?: number
+  hasAlert?: boolean
 }
 
 const StatusRecap = ({
   loading,
   count = 0,
-  pending = 0,
-  tofix = 0,
+  hasAlert = false,
   label,
 }: StatusRecapProps) => {
   const { t } = useTranslation()
-  const hasAlert = pending > 0 || tofix > 0
 
   return (
     <>
@@ -137,23 +125,6 @@ const StatusRecap = ({
           </Col>
         )}
       </Row>
-
-      {hasAlert && (
-        <Col>
-          {pending > 0 && (
-            <p>
-              <strong>{formatNumber(pending)}</strong>{" "}
-              {t("lots en attente", { count: pending })}
-            </p>
-          )}
-          {tofix > 0 && (
-            <p>
-              <strong>{formatNumber(tofix)}</strong>{" "}
-              {t("lots à corriger", { count: tofix })}
-            </p>
-          )}
-        </Col>
-      )}
     </>
   )
 }
