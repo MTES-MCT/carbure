@@ -1,7 +1,7 @@
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useSearchParams } from "react-router-dom"
-import { Filter, FilterSelection } from "../../transactions/types"
+import { Filter, FilterSelection } from "../types"
 import { Normalizer } from "common/utils/normalize"
 import { Grid, Row } from "common/components/scaffold"
 import { MultiSelect, MultiSelectProps } from "common/components/multi-select" // prettier-ignore
@@ -27,24 +27,10 @@ export function Filters<T>({
 
   const filterLabels = {
     [Filter.Periods]: t("Périodes"),
-    [Filter.ProductionSites]: t("Sites de production"),
     [Filter.Feedstocks]: t("Matières Premières"),
     [Filter.Biofuels]: t("Biocarburants"),
     [Filter.CountriesOfOrigin]: t("Pays d'origine"),
-    [Filter.DeliverySites]: t("Sites de livraison"),
-    [Filter.Depots]: t("Dépôts"),
     [Filter.Clients]: t("Clients"),
-    [Filter.Suppliers]: t("Fournisseurs"),
-    [Filter.AddedBy]: t("Ajouté par"),
-    [Filter.Errors]: t("Incohérences"),
-    [Filter.ClientTypes]: t("Types de client"),
-    [Filter.ShowEmpty]: t("Inclure stocks vides"),
-    [Filter.DeliveryTypes]: t("Types de livraison"),
-    [Filter.LotStatus]: t("Statut"),
-    [Filter.CorrectionStatus]: t("Corrections"),
-    [Filter.Scores]: t("Score"),
-    [Filter.Conformity]: t("Conformité"),
-    [Filter.ML]: t("ML"),
   }
 
   return (
@@ -110,18 +96,8 @@ const filterNormalizers: FilterNormalizers = {
   [Filter.Feedstocks]: norm.normalizeFeedstockFilter,
   [Filter.Biofuels]: norm.normalizeBiofuelFilter,
   [Filter.CountriesOfOrigin]: norm.normalizeCountryFilter,
-  [Filter.Errors]: norm.normalizeAnomalyFilter,
-  [Filter.DeliveryTypes]: norm.normalizeDeliveryTypeFilter,
-  [Filter.LotStatus]: norm.normalizeLotStatusFilter,
-  [Filter.ClientTypes]: norm.normalizeEntityTypeFilter,
-  [Filter.Suppliers]: norm.normalizeUnknownFilter,
-  [Filter.Clients]: norm.normalizeUnknownFilter,
-  [Filter.DeliverySites]: norm.normalizeUnknownFilter,
-  [Filter.ProductionSites]: norm.normalizeUnknownFilter,
-  [Filter.Depots]: norm.normalizeUnknownFilter,
   [Filter.Periods]: norm.normalizePeriodFilter,
-  [Filter.CorrectionStatus]: norm.normalizeCorrectionFilter,
-  [Filter.Conformity]: norm.normalizeConformityFilter,
+  [Filter.Clients]: norm.normalizeUnknownFilter,
 }
 
 export function useFilterParams() {

@@ -216,7 +216,7 @@ export interface QueryParams {
   entity: Entity
   year: number
   status: Status
-  category: string
+  category?: string
   filters: FilterSelection
   search: string | undefined
   invalid: boolean
