@@ -173,10 +173,18 @@ def check_ghg_values(prefetched_data, lot, errors):
 
     commissioning_date = lot.production_site_commissioning_date
     if commissioning_date and isinstance(commissioning_date, datetime.datetime) or isinstance(commissioning_date, datetime.date):
-        if commissioning_date > oct2015 and lot.ghg_reduction < 60:
-            errors.append(generic_error(error=CarbureSanityCheckErrors.GHG_REDUC_INF_60, lot=lot, is_blocking=True))
-        if commissioning_date >= jan2021 and lot.ghg_reduction < 65:
-            errors.append(generic_error(error=CarbureSanityCheckErrors.GHG_REDUC_INF_65, lot=lot, is_blocking=True))
+        if lot.delivery_date >= july1st2021:
+            # RED II
+            if commissioning_date > oct2015 and lot.ghg_reduction_red_ii < 60:
+                errors.append(generic_error(error=CarbureSanityCheckErrors.GHG_REDUC_INF_60, lot=lot, is_blocking=True))
+            if commissioning_date >= jan2021 and lot.ghg_reduction_red_ii < 65:
+                errors.append(generic_error(error=CarbureSanityCheckErrors.GHG_REDUC_INF_65, lot=lot, is_blocking=True))
+        else:
+            # RED I
+            if commissioning_date > oct2015 and lot.ghg_reduction < 60:
+                errors.append(generic_error(error=CarbureSanityCheckErrors.GHG_REDUC_INF_60, lot=lot, is_blocking=True))
+            if commissioning_date >= jan2021 and lot.ghg_reduction < 65:
+                errors.append(generic_error(error=CarbureSanityCheckErrors.GHG_REDUC_INF_65, lot=lot, is_blocking=True))
 
 
 def check_certificates(prefetched_data, lot, errors):
