@@ -1,7 +1,7 @@
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useSearchParams } from "react-router-dom"
-import { Filter, FilterSelection } from "../types"
+import { SafCertificateFilter, FilterSelection } from "../types"
 import { Normalizer } from "common/utils/normalize"
 import { Grid, Row } from "common/components/scaffold"
 import { MultiSelect, MultiSelectProps } from "common/components/multi-select" // prettier-ignore
@@ -10,10 +10,10 @@ import * as norm from "carbure/utils/normalizers"
 
 export interface FiltersProps<Q> {
   query: Q
-  filters: Filter[]
+  filters: SafCertificateFilter[]
   selected: FilterSelection
   onSelect: (filters: FilterSelection) => void
-  getFilters: (field: Filter, query: Q) => Promise<any[]>
+  getFilters: (field: SafCertificateFilter, query: Q) => Promise<any[]>
 }
 
 export function Filters<T>({
@@ -26,11 +26,11 @@ export function Filters<T>({
   const { t } = useTranslation()
 
   const filterLabels = {
-    [Filter.Periods]: t("Périodes"),
-    [Filter.Feedstocks]: t("Matières Premières"),
-    [Filter.Biofuels]: t("Biocarburants"),
-    [Filter.CountriesOfOrigin]: t("Pays d'origine"),
-    [Filter.Clients]: t("Clients"),
+    [SafCertificateFilter.Periods]: t("Périodes"),
+    [SafCertificateFilter.Feedstocks]: t("Matières Premières"),
+    [SafCertificateFilter.Biofuels]: t("Biocarburants"),
+    [SafCertificateFilter.CountriesOfOrigin]: t("Pays d'origine"),
+    [SafCertificateFilter.Clients]: t("Clients"),
   }
 
   return (
@@ -68,7 +68,7 @@ export const ResetButton = ({ filters, onFilter }: FilterManager) => {
   )
 }
 
-export type FilterSelectProps = { field: Filter } & Omit<
+export type FilterSelectProps = { field: SafCertificateFilter } & Omit<
   MultiSelectProps<string>,
   "options"
 >
@@ -91,13 +91,13 @@ export const FilterSelect = ({
   />
 )
 
-type FilterNormalizers= Partial<Record<Filter, Normalizer<any>>> // prettier-ignore
+type FilterNormalizers= Partial<Record<SafCertificateFilter, Normalizer<any>>> // prettier-ignore
 const filterNormalizers: FilterNormalizers = {
-  [Filter.Feedstocks]: norm.normalizeFeedstockFilter,
-  [Filter.Biofuels]: norm.normalizeBiofuelFilter,
-  [Filter.CountriesOfOrigin]: norm.normalizeCountryFilter,
-  [Filter.Periods]: norm.normalizePeriodFilter,
-  [Filter.Clients]: norm.normalizeUnknownFilter,
+  [SafCertificateFilter.Feedstocks]: norm.normalizeFeedstockFilter,
+  [SafCertificateFilter.Biofuels]: norm.normalizeBiofuelFilter,
+  [SafCertificateFilter.CountriesOfOrigin]: norm.normalizeCountryFilter,
+  [SafCertificateFilter.Periods]: norm.normalizePeriodFilter,
+  [SafCertificateFilter.Clients]: norm.normalizeUnknownFilter,
 }
 
 export function useFilterParams() {
@@ -109,7 +109,7 @@ export function useFilterParams() {
 export function searchToFilters(search: URLSearchParams) {
   const filters: FilterSelection = {}
   search.forEach((value, filter) => {
-    const fkey = filter as Filter
+    const fkey = filter as SafCertificateFilter
     filters[fkey] = filters[fkey] ?? []
     filters[fkey]!.push(value)
   })

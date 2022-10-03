@@ -23,7 +23,7 @@ import {
 import { ImportArea } from "../transactions/actions/import"
 import Lots from "../transactions/components/lots"
 import Stocks from "../transactions/components/stocks"
-// import Certificates from "./components/certificates"
+import { Certificates } from "./components/certificates"
 
 export const SafCertificates = () => {
   const { t } = useTranslation()
