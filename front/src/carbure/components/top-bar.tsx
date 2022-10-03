@@ -95,7 +95,7 @@ interface NavigationProps {
 
 const Navigation = ({ entity }: NavigationProps) => {
   const { t } = useTranslation()
-  const { isAdmin, isAuditor, isIndustry, can_handle_saf } = entity
+  const { isAdmin, isAuditor, isIndustry, has_saf } = entity
 
   //TODO
   return (
@@ -124,7 +124,7 @@ const Navigation = ({ entity }: NavigationProps) => {
                 label: t("Transactions"),
               },
 
-              (isAdmin || can_handle_saf) && {
+              (isAdmin || has_saf) && {
                 key: "saf-certificates",
                 path: "saf-certificates",
                 label: t("SAF"),
