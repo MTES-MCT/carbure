@@ -14,7 +14,7 @@ export function getYears(entity_id: number) {
 }
 
 export function getSafSnapshot(entity_id: number, year: number) {
-  return api.get<Api<SafSnapshot>>("/snapshot", {
+  return api.get<Api<SafSnapshot>>("/saf-snapshot", {
     params: { entity_id, year },
   })
 }

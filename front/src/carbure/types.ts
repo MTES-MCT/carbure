@@ -14,7 +14,7 @@ export interface Entity {
   preferred_unit?: Unit
   default_certificate?: string
   ext_admin_pages?: ExternalAdminPages[]
-  can_handle_saf?: boolean
+  has_saf?: boolean
 }
 
 export interface User {

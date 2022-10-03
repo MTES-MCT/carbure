@@ -50,25 +50,25 @@ export const StatusTabs = ({
           ),
         },
         {
-          key: "rejected",
-          path: "rejected",
-          label: (
-            <StatusRecap
-              loading={loading}
-              count={count.rejected}
-              hasAlert={true}
-              label={t("Certificats acceptés", { count: count.rejected })}
-            />
-          ),
-        },
-        {
           key: "accepted",
           path: "accepted",
           label: (
             <StatusRecap
               loading={loading}
+              count={count.rejected}
+              hasAlert={!!count.rejected}
+              label={t("Certificats refusés", { count: count.rejected })}
+            />
+          ),
+        },
+        {
+          key: "rejected",
+          path: "rejected",
+          label: (
+            <StatusRecap
+              loading={loading}
               count={count.accepted}
-              label={t("Certificats refusés", { count: count.accepted })}
+              label={t("Certificats acceptés", { count: count.accepted })}
             />
           ),
         },
