@@ -136,17 +136,9 @@ export function useStatus() {
 }
 
 export function useAutoStatus() {
-  const navigate = useNavigate()
-  const match = useMatch("/org/:entity/transactions/:year/:status/*") // prettier-ignore
-  const status = match?.params.status as Status | undefined
-
-  useEffect(() => {
-    if (status === undefined) {
-      navigate("drafts/imported", { replace: true })
-    }
-  }, [status, navigate])
-
-  return status ?? "drafts"
+  const match = useMatch("/org/:entity/saf-certificates/:year/:status") // prettier-ignore
+  const status = match?.params.status
+  return status
 }
 
 export default StatusTabs
