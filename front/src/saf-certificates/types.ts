@@ -5,6 +5,7 @@ import {
   Feedstock,
   ProductionSite,
 } from "carbure/types"
+import { Order } from "common/components/table"
 
 export interface SafCertificate {
   id: number
@@ -95,6 +96,12 @@ export enum SafCertificateStatus {
   Accepted = "ACCEPTED",
   Rejected = "REJECTED",
 }
+export enum SafCertificateQueryStatus {
+  ToAssign = "to-assign",
+  Pending = "pending",
+  Accepted = "accepted",
+  Rejected = "rejected",
+}
 
 export enum SafCertificateFilter {
   Feedstocks = "feedstocks",
@@ -112,3 +119,18 @@ export interface LotPreview {
 }
 
 export type FilterSelection = Partial<Record<SafCertificateFilter, string[]>>
+
+export interface QueryParams {
+  entity: Entity
+  year: number
+  status: string | undefined
+  filters: FilterSelection
+  search: string | undefined
+  invalid: boolean
+  deadline: boolean
+  selection: number[]
+  page: number
+  limit: number | undefined
+  order: Order | undefined
+  snapshot: SafSnapshot | undefined
+}

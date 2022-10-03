@@ -24,6 +24,7 @@ import { ImportArea } from "../transactions/actions/import"
 import Lots from "../transactions/components/lots"
 import Stocks from "../transactions/components/stocks"
 import { Certificates } from "./components/certificates"
+import { safSnapshot } from "./__test__/data"
 
 export const SafCertificates = () => {
   const { t } = useTranslation()
@@ -37,9 +38,11 @@ export const SafCertificates = () => {
     params: [entity.id, years.selected],
   })
 
-  const snapshotData = snapshot.result?.data.data
+  // const snapshotData = snapshot.result?.data.data
+  const snapshotData = safSnapshot
 
   // common props for subroutes
+
   const props = { year: years.selected, snapshot: snapshotData }
 
   return (
@@ -66,7 +69,7 @@ export const SafCertificates = () => {
         </header>
 
         <Routes>
-          {/* <Route path="*" element={<Certificates {...props} />} /> */}
+          <Route path="*" element={<Certificates {...props} />} />
         </Routes>
       </Main>
     </ImportArea>
