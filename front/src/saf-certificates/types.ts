@@ -123,7 +123,7 @@ export type FilterSelection = Partial<Record<SafCertificateFilter, string[]>>
 export interface QueryParams {
   entity: Entity
   year: number
-  status: string | undefined
+  status: SafCertificateQueryStatus | undefined
   filters: FilterSelection
   search: string | undefined
   invalid: boolean
