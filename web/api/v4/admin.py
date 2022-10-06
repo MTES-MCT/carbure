@@ -7,9 +7,10 @@ from django.db.models.expressions import F
 from django.db.models import Case, Value, When
 from django.db.models.functions.comparison import Coalesce
 from django.http import HttpResponse
-
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
+from csp.decorators import csp_exempt
 import folium
 from api.v3.admin.views import couleur, grade
 from api.v4.sanity_checks import bulk_scoring
@@ -244,6 +245,8 @@ def add_comment(request, *args, **kwargs):
 
 
 @is_admin
+@csp_exempt
+@xframe_options_sameorigin
 def map(request):
     status = request.GET.get('status', False)
     entity_id = request.GET.get('entity_id', False)
@@ -413,7 +416,7 @@ def get_admin_lots_by_status(entity, status, export=False):
 
 def get_admin_summary_data(lots, short=False):
     data = {
-        'count': lots.count(), 
+        'count': lots.count(),
         'total_volume': lots.aggregate(Sum('volume'))['volume__sum'] or 0,
         'total_weight': lots.aggregate(Sum('weight'))['weight__sum'] or 0,
         'total_lhv_amount': lots.aggregate(Sum('lhv_amount'))['lhv_amount__sum'] or 0,
