@@ -95,7 +95,7 @@ const DoubleCountingUploadDialog = ({
   }
 
   return (
-    <Dialog onClose={onClose}>
+    <Dialog onClose={onClose} fullscreen>
       <header>
         <h1>{t("Création dossier double comptage")}</h1>
       </header>
