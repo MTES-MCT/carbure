@@ -1,5 +1,8 @@
-from django.db.models import Sum
-from doublecount.models import DoubleCountingProduction, DoubleCountingSourcing
+from typing import List, TypedDict
+from django.db.models import Sum, QuerySet
+from doublecount.models import DoubleCountingAgreement, DoubleCountingProduction, DoubleCountingSourcing
+from core.models import Biocarburant, MatierePremiere
+from doublecount.dc_parser import ProductionRow, SourcingRow
 
 
 class DoubleCountingError:
@@ -14,7 +17,14 @@ class DoubleCountingError:
     MISSING_BIOFUEL = "MISSING_BIOFUEL"
 
 
-def error(type, line=None, meta={}, is_blocking=True):
+class DcError(TypedDict):
+    error: str
+    line_number: int
+    is_blocking: bool
+    meta: dict
+
+
+def error(type: str, line: int = -1, meta: dict = {}, is_blocking: bool = True) -> DcError:
     return {
         "error": type,
         "line_number": line,
@@ -24,32 +34,34 @@ def error(type, line=None, meta={}, is_blocking=True):
 
 
 # check a line in the sourcing section of an imported dc excel file
-def check_sourcing_line(sourcing, data, line):
-    errors = []
+def check_sourcing_row(sourcing: DoubleCountingSourcing, data: SourcingRow) -> List[DcError]:
+    errors: List[DcError] = []
+    line = data["line"]
 
-    if not data.feedstock:
+    if not data["feedstock"]:
         errors.append(error(DoubleCountingError.MISSING_FEEDSTOCK, line))
     elif not sourcing.feedstock_id:
-        errors.append(error(DoubleCountingError.UNKNOWN_FEEDSTOCK, line, {"feedstock": data.feedstock}))
+        errors.append(error(DoubleCountingError.UNKNOWN_FEEDSTOCK, line, {"feedstock": data["feedstock"]}))
 
     return errors
 
 
 # check a line in the production section of an imported dc excel file
-def check_production_line(production, data, line):
-    errors = []
+def check_production_row(production: DoubleCountingProduction, data: ProductionRow) -> List[DcError]:
+    errors: List[DcError] = []
+    line = data["line"]
 
-    if not data.feedstock:
+    if not data["feedstock"]:
         errors.append(error(DoubleCountingError.MISSING_FEEDSTOCK, line))
     elif not production.feedstock_id:
-        errors.append(error(DoubleCountingError.UNKNOWN_FEEDSTOCK, line, {"feedstock": data.feedstock}))
+        errors.append(error(DoubleCountingError.UNKNOWN_FEEDSTOCK, line, {"feedstock": data["feedstock"]}))
     elif (production.requested_quota or 0) > 0 and not production.feedstock.is_double_compte:
         errors.append(error(DoubleCountingError.NOT_DC_FEEDSTOCK, line, {"feedstock": production.feedstock.code}))
 
-    if not data.biofuel:
+    if not data["biofuel"]:
         errors.append(error(DoubleCountingError.MISSING_BIOFUEL, line))
     elif not production.biofuel_id:
-        errors.append(error(DoubleCountingError.UNKNOWN_BIOFUEL, line, {"biofuel": data.biofuel}))
+        errors.append(error(DoubleCountingError.UNKNOWN_BIOFUEL, line, {"biofuel": data["biofuel"]}))
 
     if production.feedstock_id and production.biofuel_id:
         incompatibilities = check_compatibility_feedstock_biofuel(production.feedstock, production.biofuel)
@@ -65,8 +77,8 @@ def check_production_line(production, data, line):
 
 
 # check rules that check sourcing and production
-def check_dc_globally(dca):
-    errors = []
+def check_dc_globally(dca: DoubleCountingAgreement) -> List[DcError]:
+    errors: List[DcError] = []
 
     sourcing = DoubleCountingSourcing.objects.filter(dca_id=dca.id)
     production = DoubleCountingProduction.objects.filter(dca_id=dca.id)
@@ -78,8 +90,10 @@ def check_dc_globally(dca):
 
 
 # check that sourcing feedstock quantities match production biofuel quantities
-def check_sourcing_vs_production(sourcing, production):
-    errors = []
+def check_sourcing_vs_production(
+    sourcing: QuerySet[DoubleCountingSourcing], production: QuerySet[DoubleCountingProduction]
+) -> List[DcError]:
+    errors: List[DcError] = []
 
     # group sourcing by feedstock and year, and sum the total quantity
     sourcing_per_feedstock = (
@@ -108,8 +122,8 @@ def check_sourcing_vs_production(sourcing, production):
 
 
 # check that biofuels made with POME (EFFLUENTS_HUILERIES_PALME_RAFLE) aren't produced for more than 2000 tonnes
-def check_pome_excess(production):
-    errors = []
+def check_pome_excess(production: QuerySet[DoubleCountingProduction]) -> List[DcError]:
+    errors: List[DcError] = []
 
     pome_production_per_year = (
         production.select_related("feedstock")
@@ -127,22 +141,22 @@ def check_pome_excess(production):
 
 
 # check if the biofuel can be made with the specified feedstock
-def check_compatibility_feedstock_biofuel(feedstock, biofuel):
-    errors = []
+def check_compatibility_feedstock_biofuel(feedstock: MatierePremiere, biofuel: Biocarburant) -> List[str]:
+    errors: List[str] = []
 
     if biofuel.is_alcool and feedstock.compatible_alcool is False:
-        errors.append(("%s issu de fermentation et %s n'est pas fermentescible" % (biofuel.name, feedstock.name),))
+        errors.append("%s issu de fermentation et %s n'est pas fermentescible" % (biofuel.name, feedstock.name))
 
     if biofuel.is_graisse and feedstock.compatible_graisse is False:
-        errors.append(("Matière première (%s) incompatible avec Esthers Méthyliques" % (feedstock.name),))
+        errors.append("Matière première (%s) incompatible avec Esthers Méthyliques" % (feedstock.name))
 
     if biofuel.is_graisse:
         if biofuel.code == "EMHU" and feedstock.code != "HUILE_ALIMENTAIRE_USAGEE":
-            errors.append(("%s doit être à base d'huiles alimentaires usagées" % (biofuel.name),))
+            errors.append("%s doit être à base d'huiles alimentaires usagées" % (biofuel.name))
 
         if biofuel.code == "EMHV" and feedstock.code not in ["COLZA", "TOURNESOL", "SOJA", "HUILE_PALME"]:
             errors.append(
-                ("%s doit être à base de végétaux (Colza, Tournesol, Soja, Huile de Palme)" % (biofuel.name),)
+                "%s doit être à base de végétaux (Colza, Tournesol, Soja, Huile de Palme)" % (biofuel.name),
             )
 
         if biofuel.code == "EMHA" and feedstock.code not in [
@@ -155,7 +169,7 @@ def check_compatibility_feedstock_biofuel(feedstock, biofuel):
         "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2",
         "HUILES_OU_GRAISSES_ANIMALES_CAT3",
     ] and biofuel.code not in ["EMHA", "HOE", "HOG", "HOC", "HCC", "HCG", "HCE", "B100"]:
-        errors.append(("Des huiles ou graisses animales ne peuvent donner que des EMHA ou HOG/HOE/HOC",))
+        errors.append("Des huiles ou graisses animales ne peuvent donner que des EMHA ou HOG/HOE/HOC")
 
     if feedstock.code == "HUILE_ALIMENTAIRE_USAGEE" and biofuel.code not in [
         "EMHU",

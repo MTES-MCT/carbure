@@ -22,7 +22,7 @@ from producers.models import ProductionSite
 from doublecount.models import DoubleCountingAgreement, DoubleCountingDocFile, DoubleCountingSourcing, DoubleCountingProduction
 from doublecount.serializers import DoubleCountingAgreementFullSerializer, DoubleCountingAgreementPartialSerializer
 from doublecount.serializers import DoubleCountingAgreementFullSerializerWithForeignKeys, DoubleCountingAgreementPartialSerializerWithForeignKeys
-from doublecount.helpers import load_dc_file, load_dc_sourcing_data, load_dc_production_data
+from doublecount.helpers import load_dc_sourcing_data, load_dc_production_data
 from core.models import Entity, UserRights, MatierePremiere, Pays, Biocarburant, CarbureLot
 from core.xlsx_v3 import export_dca, make_biofuels_sheet, make_dc_mps_sheet, make_countries_sheet, make_dc_production_sheet, make_dc_sourcing_sheet
 from carbure.storage_backends import AWSStorage
@@ -30,6 +30,7 @@ from django.core.files.storage import FileSystemStorage
 
 from core.common import ErrorResponse
 from doublecount.dc_sanity_checks import check_dc_globally
+from web.doublecount.dc_parser import parse_dc_excel
 
 @check_rights('entity_id')
 def get_agreements(request, *args, **kwargs):
@@ -63,11 +64,11 @@ def get_agreements_admin(request):
     expired_s = DoubleCountingAgreementFullSerializer(expired, many=True)
     pending_s = DoubleCountingAgreementFullSerializer(pending, many=True)
     progress_s = DoubleCountingAgreementFullSerializer(progress, many=True)
-    data = {'accepted': {'count': accepted_count, 'agreements': accepted_s.data}, 
-            'rejected':  {'count': rejected_count, 'agreements': rejected_s.data}, 
-            'expired': {'count': expired_count, 'agreements': expired_s.data},  
+    data = {'accepted': {'count': accepted_count, 'agreements': accepted_s.data},
+            'rejected':  {'count': rejected_count, 'agreements': rejected_s.data},
+            'expired': {'count': expired_count, 'agreements': expired_s.data},
             'progress': {'count': progress_count, 'agreements': progress_s.data},
-            'pending': {'count': pending_count, 'agreements': pending_s.data}, 
+            'pending': {'count': pending_count, 'agreements': pending_s.data},
             }
     return JsonResponse({'status': 'success', 'data': data})
 
@@ -130,7 +131,7 @@ def get_agreement_admin(request, *args, **kwargs):
         return response
 
 def send_dca_confirmation_email(dca):
-    text_message = """ 
+    text_message = """
     Bonjour,
 
     Nous vous confirmons la réception de votre dossier de demande d'agrément au double-comptage.
@@ -146,14 +147,14 @@ def send_dca_confirmation_email(dca):
     else:
         # PROD
         recipients = [r.user.email for r in UserRights.objects.filter(entity=dca.producer, user__is_staff=False, user__is_superuser=False).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])]
-        cc = "carbure@beta.gouv.fr" 
+        cc = "carbure@beta.gouv.fr"
 
     email = EmailMessage(subject=email_subject, body=text_message, from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc)
     email.send(fail_silently=False)
 
 def send_dca_status_email(dca):
     if dca.status == DoubleCountingAgreement.ACCEPTED:
-        text_message = """ 
+        text_message = """
         Bonjour,
 
         Votre dossier de demande d'agrément au double-comptage pour le site de production %s a été accepté.
@@ -162,7 +163,7 @@ def send_dca_status_email(dca):
         L'équipe CarbuRe
         """ % (dca.production_site.name)
     elif dca.status == DoubleCountingAgreement.REJECTED:
-        text_message = """ 
+        text_message = """
         Bonjour,
 
         Votre dossier de demande d'agrément au double-comptage pour le site de production %s a été accepté.
@@ -181,14 +182,13 @@ def send_dca_status_email(dca):
     else:
         # PROD
         recipients = [r.user.email for r in UserRights.objects.filter(entity=dca.producer, user__is_staff=False, user__is_superuser=False).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])]
-        cc = "carbure@beta.gouv.fr" 
+        cc = "carbure@beta.gouv.fr"
     email = EmailMessage(subject=email_subject, body=text_message, from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc)
     email.send(fail_silently=False)
 
 
 @check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def upload_file(request, *args, **kwargs):
-
     context = kwargs['context']
     entity = context['entity']
     production_site_id = request.POST.get('production_site_id', None)
@@ -213,23 +213,24 @@ def upload_file(request, *args, **kwargs):
         for chunk in f.chunks():
             destination.write(chunk)
 
-    sourcing_data, production_data = load_dc_file(filepath)
+    sourcing_rows, production_rows = parse_dc_excel(filepath)
 
     # get dc period for upload
-    years = [int(year) for year in list(sourcing_data['year']) + list(production_data['year']) if year]
+    years = [sourcing['year'] for sourcing in sourcing_rows]
     end_year = max(years)
     start = datetime.date(end_year - 1, 1, 1)
     end = datetime.date(end_year, 12, 31)
 
     dca, created = DoubleCountingAgreement.objects.get_or_create(producer=entity, production_site_id=production_site_id, period_start=start, period_end=end, defaults={'producer_user': request.user})
 
+
     try:
-        sourcing_errors = load_dc_sourcing_data(dca, sourcing_data)
+        sourcing_errors = load_dc_sourcing_data(dca, sourcing_rows)
         print("sourcing_errors:")
         print(sourcing_errors)
         print("production_data:")
-        print(production_data)
-        production_errors = load_dc_production_data(dca, production_data)
+        print(production_rows)
+        production_errors = load_dc_production_data(dca, production_rows)
 
         global_errors = check_dc_globally(dca)
         print("global_errors:")
@@ -455,7 +456,7 @@ def get_quotas_snapshot_admin(request, *args, **kwargs):
 
     # Merge both datasets
     df1 = pd.DataFrame(detailed_quotas).rename(columns={'dca__producer': 'producer_id', 'dca__production_site': 'production_site_id', 'biofuel': 'biofuel_id', 'feedstock': 'feedstock_id'})
-    df2 = pd.DataFrame(double_counted_production).rename(columns={'carbure_producer': 'producer_id', 'carbure_production_site': 'production_site_id', 
+    df2 = pd.DataFrame(double_counted_production).rename(columns={'carbure_producer': 'producer_id', 'carbure_production_site': 'production_site_id',
                                                                   'feedstock': 'feedstock_id', 'biofuel': 'biofuel_id', 'biofuel__masse_volumique': 'masse_volumique'})
     df1.set_index(['year', 'producer_id', 'production_site_id', 'biofuel_id', 'feedstock_id'], inplace=True)
     df2.set_index(['year', 'producer_id', 'production_site_id', 'biofuel_id', 'feedstock_id'], inplace=True)
@@ -463,7 +464,7 @@ def get_quotas_snapshot_admin(request, *args, **kwargs):
     res['current_production_weight_sum_tonnes'] = (res['volume'] * res['masse_volumique'] / 1000).apply(lambda x: round(x, 2))
     res['full'] = (res['current_production_weight_sum_tonnes'] == res['approved_quota']).astype(int)
     res['breached'] = (res['current_production_weight_sum_tonnes'] > res['approved_quota']).astype(int)
-    grouped = res.groupby(['year', 'producer_id', 'production_site_id']).agg(nb_quotas=('full', 'count'), 
+    grouped = res.groupby(['year', 'producer_id', 'production_site_id']).agg(nb_quotas=('full', 'count'),
                                                                              nb_full_quotas=('full', 'sum'),
                                                                              nb_breached_quotas=('breached', 'sum'),
                                                                              approved_quota_weight_sum=('approved_quota', 'sum'),
@@ -518,11 +519,11 @@ def upload_decision_admin(request):
     filepath = '/tmp/%s' % (dcf.file_name)
     with open(filepath, 'wb') as file:
         s3.download_fileobj(os.environ['AWS_DCDOCS_STORAGE_BUCKET_NAME'], s3filepath, file)
-    f = open(filepath, "rb") 
+    f = open(filepath, "rb")
     # send an email
     recipients = [u.user.email for u in UserRights.objects.filter(entity=dca.producer, role=UserRights.ADMIN)]
     subject = "CarbuRe - Agrément Double Compte"
-    body = """ 
+    body = """
     Bonjour,
 
     La décision d'agrément au double comptage concernant votre site de production %s est désormais accessible sur votre compte CarbuRe.
@@ -571,7 +572,7 @@ def get_production_site_quotas_admin(request, *args, **kwargs):
 @check_rights('entity_id')
 def get_production_site_quotas(request, *args, **kwargs):
     context = kwargs['context']
-    entity = context['entity']    
+    entity = context['entity']
     dca_id = request.GET.get('dca_id', False)
     biofuels = {p.id: p for p in Biocarburant.objects.all()}
     feedstocks = {m.id: m for m in MatierePremiere.objects.filter(is_double_compte=True)}
@@ -626,7 +627,7 @@ def approve_dca(request, *args, **kwargs):
         dca.dgpe_validated_dt = pytz.utc.localize(datetime.datetime.now())
     elif entity.name == 'DGDDI':
         if not dca.status == DoubleCountingAgreement.INPROGRESS:
-            return JsonResponse({'status': "error", 'message': "La DGEC doit valider le dossier en premier"}, status=400)        
+            return JsonResponse({'status': "error", 'message': "La DGEC doit valider le dossier en premier"}, status=400)
         dca.dgddi_validated = True
         dca.dgddi_validator = request.user
         dca.dgddi_validated_dt = pytz.utc.localize(datetime.datetime.now())
