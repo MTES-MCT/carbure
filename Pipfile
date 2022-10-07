@@ -33,6 +33,7 @@ tqdm = "==4.64.1"
 tzdata = "==2022.4"
 whitenoise = "==6.2.0"
 xlsxwriter = "==3.0.3"
+djangorestframework-stubs = {extras = ["compatible-mypy"], version = "*"}
 
 [dev-packages]
 black = "*"
