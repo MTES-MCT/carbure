@@ -36,7 +36,7 @@ export const okSnapshot = rest.get("/api/saf-snapshot", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
-      data: data.safSnapshot,
+      data: data.safOperatorSnapshot,
     })
   )
 })

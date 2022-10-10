@@ -97,7 +97,6 @@ const Navigation = ({ entity }: NavigationProps) => {
   const { t } = useTranslation()
   const { isAdmin, isAuditor, isIndustry, has_saf } = entity
 
-  //TODO
   return (
     <Routes>
       <Route
@@ -125,9 +124,9 @@ const Navigation = ({ entity }: NavigationProps) => {
               },
 
               (isAdmin || has_saf) && {
-                key: "saf-certificates",
-                path: "saf-certificates",
-                label: t("SAF"),
+                key: "saf",
+                path: "saf",
+                label: t("Aviation"),
               },
 
               isAdmin && {
