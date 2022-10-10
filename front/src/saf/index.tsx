@@ -23,23 +23,22 @@ import {
 import { ImportArea } from "../transactions/actions/import"
 import Lots from "../transactions/components/lots"
 import Stocks from "../transactions/components/stocks"
-import { Certificates } from "./components/certificates"
-import { safSnapshot } from "./__test__/data"
+// import { Tickets  } from "./components/tickets"
 
-export const SafCertificates = () => {
+export const Saf = () => {
   const { t } = useTranslation()
 
   const entity = useEntity()
 
-  const years = useYears("saf-certificates", api.getYears)
+  const years = useYears("saf", api.getYears)
 
-  const snapshot = useQuery(api.getSafSnapshot, {
+  const snapshot = useQuery(api.getSafOperatorSnapshot, {
     key: "snapshot",
     params: [entity.id, years.selected],
   })
 
-  // const snapshotData = snapshot.result?.data.data
-  const snapshotData = safSnapshot
+  const snapshotData = snapshot.result?.data.data
+  // const snapshotData = SafOperatorSnapshot
 
   // common props for subroutes
 
@@ -50,7 +49,7 @@ export const SafCertificates = () => {
       <Main>
         <header>
           <section>
-            <h1>{t("SAF")}</h1>
+            <h1>{t("Carburant Durable d’Aviation - CDA")}</h1>
 
             <Select
               loading={years.loading}
@@ -68,9 +67,9 @@ export const SafCertificates = () => {
           </section>
         </header>
 
-        <Routes>
-          <Route path="*" element={<Certificates {...props} />} />
-        </Routes>
+        {/* <Routes>
+          <Route path="*" element={<Tickets {...props} />} />
+        </Routes> */}
       </Main>
     </ImportArea>
   )
@@ -123,4 +122,4 @@ function listYears(years: number[] | undefined) {
   else return [currentYear]
 }
 
-export default SafCertificates
+export default Saf

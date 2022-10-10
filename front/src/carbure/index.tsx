@@ -17,7 +17,7 @@ import Dashboard from "dashboard"
 import Controls from "controls"
 import Entities from "companies"
 import Auth from "auth"
-import SafCertificates from "saf-certificates"
+import Saf from "saf"
 
 const Carbure = () => {
   const user = useUserManager()
@@ -70,23 +70,34 @@ const Org = () => {
       <Routes>
         <Route path="settings" element={<Settings />} />
 
-        {isIndustry && <Route path="transactions/:year/*" element={<Transactions />} />}
-        {has_saf && <Route path="saf-certificates/:year/*" element={<SafCertificates />} />}
-        {isIndustry && <Route path="registry" element={<Registry />} />}
+        {isIndustry && 
+          (<>
+          <Route path="transactions/:year/*" element={<Transactions />} />
+          <Route path="registry" element={<Registry />} />
+          <Route path="transactions" element={<Navigate replace to={`${currentYear}`} />} />
+          <Route path="*" element={<Navigate replace to="transactions" />} />
+          </>
+          )}
+        
+        {has_saf && (<>
+          <Route path="saf/:year/*" element={<Saf />} />
+          <Route path="saf" element={<Navigate replace to={`${currentYear}/ticket-sources`} />} />
+        </>)} 
 
-        {isAdmin && <Route path="dashboard" element={<Dashboard />} />}
-        {isAdmin && <Route path="entities/*" element={<Entities />} />}
+        {isAdmin && (<> 
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="*" element={<Navigate replace to="dashboard" />} />
+          <Route path="entities/*" element={<Entities />} />
+        </>)}
 
-        {(isAdmin || isAuditor) && <Route path="controls/:year/*" element={<Controls />} />}
-        {(isAdmin || hasDCA) && <Route path="double-counting/*" element={<DoubleCounting />} />}
-
-        {isIndustry && <Route path="transactions" element={<Navigate replace to={`${currentYear}`} />} />}
-        {has_saf && <Route path="saf-certificates" element={<Navigate replace to={`${currentYear}/to-assign`} />} />}
-        {(isAdmin || isAuditor) && <Route path="controls" element={<Navigate replace to={`${currentYear}`} />} />}
-
-        {isIndustry && <Route path="*" element={<Navigate replace to="transactions" />} />}
+        {(isAdmin || isAuditor) && (<> 
+          <Route path="controls/:year/*" element={<Controls />} />
+          <Route path="controls" element={<Navigate replace to={`${currentYear}`} />} />
+        </>)}
         {isAuditor && <Route path="*" element={<Navigate replace to="controls" />} />}
-        {isAdmin && <Route path="*" element={<Navigate replace to="dashboard" />} />}
+        
+        
+        {(isAdmin || hasDCA)  && <Route path="double-counting/*" element={<DoubleCounting />} />}
         {hasDCA && <Route path="*" element={<Navigate replace to="double-counting" />} />}
       </Routes>
   )

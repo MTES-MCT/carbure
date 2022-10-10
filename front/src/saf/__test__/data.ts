@@ -1,14 +1,15 @@
 import { Biofuel, Country, Feedstock } from "carbure/types";
-import { SafCertificate, SafCertificateStatus, SafSnapshot } from "saf-certificates/types";
+import { SafTicketSource, SafTicketSourceStatus, SafOperatorSnapshot } from "saf/types";
 
 
-export const safSnapshot: SafSnapshot = {
-  to_assign: 4,
-  to_assign_available: 3,
-  to_assign_history: 1,
-  pending: 2,
-  rejected: 1,
-  accepted: 2
+export const safOperatorSnapshot: SafOperatorSnapshot = {
+  ticket_sources_volume: 15000,
+  ticket_sources_available: 2,
+  ticket_sources_history: 3,
+  tickets: 1,
+  tickets_pending: 2,
+  tickets_rejected: 1,
+  tickets_accepted: 1,
 }
 
 const feedstock1: Feedstock = {
@@ -28,21 +29,19 @@ const country1: Country = {
   is_in_europe: true
 }
 
-export const safCertificate: SafCertificate = {
+
+export const safTicketSource: SafTicketSource = {
   id: 12343,
   carbure_id: "A12332",
   year: 2021,
   period: 202001,
-  date: null,
-  carbure_client: null,
-  status: SafCertificateStatus.Accepted,
+  date: '20200109',
   total_volume: 10000,
   assigned_volume: 0,
-  assigned_clients: [],
   feedstock: feedstock1,
   biofuel: bioduel1,
   country_of_origin: country1,
   ghg_reduction: 54,
 }
 
-export const safCertificates: SafCertificate[] = [safCertificate, safCertificate]
+export const safTicketSources: SafTicketSource[] = [safTicketSource, safTicketSource]

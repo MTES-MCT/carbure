@@ -9,11 +9,11 @@ import { Col, Row } from "common/components/scaffold"
 import { formatNumber } from "common/utils/formatters"
 import useEntity from "carbure/hooks/entity"
 import { compact } from "common/utils/collection"
-import { SafCertificateStatus, SafSnapshot } from "saf-certificates/types"
+import { SafTicketSourceStatus, SafOperatorSnapshot } from "saf/types"
 
 export interface StatusTabsProps {
   loading: boolean
-  count: SafSnapshot | undefined
+  count: SafOperatorSnapshot | undefined
 }
 
 export const StatusTabs = ({
@@ -28,47 +28,24 @@ export const StatusTabs = ({
       variant="main"
       tabs={compact([
         {
-          key: "to-assign",
-          path: "to-assign",
+          key: "ticket-sources",
+          path: "ticket-sources",
           label: (
             <StatusRecap
               loading={loading}
-              count={count.to_assign}
-              label={t("Lots SAF", { count: count.to_assign })}
+              count={count.ticket_sources_volume}
+              label={t("Litres à affecter", { count: count.ticket_sources_volume })}
             />
           ),
         },
         {
-          key: "pending",
-          path: "pending",
+          key: "tickets",
+          path: "tickets",
           label: (
             <StatusRecap
               loading={loading}
-              count={count.pending}
-              label={t("Certificats en attente", { count: count.pending })}
-            />
-          ),
-        },
-        {
-          key: "accepted",
-          path: "accepted",
-          label: (
-            <StatusRecap
-              loading={loading}
-              count={count.rejected}
-              hasAlert={!!count.rejected}
-              label={t("Certificats refusés", { count: count.rejected })}
-            />
-          ),
-        },
-        {
-          key: "rejected",
-          path: "rejected",
-          label: (
-            <StatusRecap
-              loading={loading}
-              count={count.accepted}
-              label={t("Certificats acceptés", { count: count.accepted })}
+              count={count.tickets}
+              label={t("Tickets envoyés", { count: count.tickets })}
             />
           ),
         },
@@ -77,13 +54,14 @@ export const StatusTabs = ({
   )
 }
 
-const defaultCount: SafSnapshot = {
-  to_assign: 0,
-  to_assign_available: 0,
-  to_assign_history: 0,
-  pending: 0,
-  rejected: 0,
-  accepted: 0,
+const defaultCount: SafOperatorSnapshot = {
+  ticket_sources_volume: 0,
+  ticket_sources_available: 0,
+  ticket_sources_history: 0,
+  tickets: 0,
+  tickets_pending: 0,
+  tickets_rejected: 0,
+  tickets_accepted: 0,
 }
 
 interface StatusRecapProps {
@@ -129,14 +107,9 @@ const StatusRecap = ({
   )
 }
 
-export function useStatus() {
-  const match = useMatch("/org/:entity/transactions/:year/:status/*") // prettier-ignore
-  const status = match?.params.status as Status | undefined
-  return status ?? "drafts"
-}
 
 export function useAutoStatus() {
-  const match = useMatch("/org/:entity/saf-certificates/:year/:status") // prettier-ignore
+  const match = useMatch("/org/:entity/saf/:year/:status") // prettier-ignore
   const status = match?.params.status
   return status
 }
