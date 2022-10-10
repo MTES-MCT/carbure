@@ -85,10 +85,10 @@ def parse_sourcing(excel_file: Workbook, sheet_name: str) -> List[SourcingRow]:
 
 
 def parse_production(excel_file: Workbook) -> List[ProductionRow]:
-    production_sheet = excel_file["Production"]
     production_rows: List[ProductionRow] = []
 
     current_year = -1
+    production_sheet = excel_file["Production"]
 
     for line, row in enumerate(production_sheet.iter_rows()):
         try:
@@ -106,8 +106,8 @@ def parse_production(excel_file: Workbook) -> List[ProductionRow]:
         if current_year == -1 or not feedstock_name or not biofuel_name:
             continue
 
-        feedstock = dc_feedstock_to_carbure_feedstock.get(feedstock_name, "")
-        biofuel = dc_biofuel_to_carbure_biofuel.get(biofuel_name, "")
+        feedstock = dc_feedstock_to_carbure_feedstock.get(feedstock_name.strip(), None)
+        biofuel = dc_biofuel_to_carbure_biofuel.get(biofuel_name.strip(), None)
 
         production: ProductionRow = {
             "line": line + 1,
@@ -121,9 +121,8 @@ def parse_production(excel_file: Workbook) -> List[ProductionRow]:
 
         production_rows.append(production)
 
-    quota_sheet = excel_file["Reconnaissance double comptage"]
-
     current_year = -1
+    quota_sheet = excel_file["Reconnaissance double comptage"]
 
     for row in quota_sheet.iter_rows():
         try:
@@ -133,9 +132,15 @@ def parse_production(excel_file: Workbook) -> List[ProductionRow]:
         except Exception:
             pass
 
-        biofuel = dc_biofuel_to_carbure_biofuel.get(row[2].value, None)
-        feedstock = dc_feedstock_to_carbure_feedstock.get(row[3].value, None)
+        biofuel_name = row[2].value
+        feedstock_name = row[3].value
         requested_quota = row[4].value
+
+        if current_year == -1 or not feedstock_name or not biofuel_name:
+            continue
+
+        biofuel = dc_biofuel_to_carbure_biofuel.get(biofuel_name.strip(), None)
+        feedstock = dc_feedstock_to_carbure_feedstock.get(feedstock_name.strip(), None)
 
         for production in production_rows:
             if (
