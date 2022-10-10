@@ -214,6 +214,7 @@ if env('TEST') is False:
     AWS_S3_SIGNATURE_VERSION = 's3v4'
     AWS_S3_FILE_OVERWRITE = False
     AWS_S3_VERIFY = True
+    WHITENOISE_AUTOREFRESH=True
 
 
 LOGGING = {
