@@ -30,7 +30,7 @@ from django.core.files.storage import FileSystemStorage
 
 from core.common import ErrorResponse
 from doublecount.dc_sanity_checks import check_dc_globally
-from web.doublecount.dc_parser import parse_dc_excel
+from doublecount.dc_parser import parse_dc_excel
 
 @check_rights('entity_id')
 def get_agreements(request, *args, **kwargs):
