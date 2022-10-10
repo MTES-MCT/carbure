@@ -2,14 +2,14 @@ import { Entity } from "carbure/types"
 import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
-import { useFilterParams } from "saf-certificates/components/filters"
-import { FilterSelection, QueryParams, SafCertificateQueryStatus, SafSnapshot } from "saf-certificates/types"
+import { useFilterParams } from "saf/components/filters"
+import { SafFilterSelection, SafStates,  SafTicketSourceStatus, SafOperatorSnapshot } from "saf/types"
 
 export function useQueryParamsStore(
   entity: Entity,
   year: number,
   status: string | undefined,
-  snapshot?: SafSnapshot | undefined
+  snapshot?: SafOperatorSnapshot | undefined
 ) {
   const [limit, saveLimit] = useLimit()
   const [filtersParams, setFiltersParams] = useFilterParams()
@@ -28,7 +28,7 @@ export function useQueryParamsStore(
       selection: [],
       page: 0,
       limit,
-    } as QueryParams,
+    } as SafStates,
     {
       setEntity: (entity: Entity) => (state) => ({
         entity,
@@ -48,7 +48,7 @@ export function useQueryParamsStore(
         page: 0,
       }),
 
-      setSnapshot: (snapshot: SafSnapshot) => (state) => {
+      setSnapshot: (snapshot: SafOperatorSnapshot) => (state) => {
         return {
           snapshot,
           filters: filtersParams,
@@ -59,7 +59,7 @@ export function useQueryParamsStore(
         }
       },
 
-      setStatus: (status: SafCertificateQueryStatus) => (state) => ({
+      setStatus: (status: SafTicketSourceStatus) => (state) => ({
         status,
         filters: filtersParams,
         invalid: false,
@@ -68,7 +68,7 @@ export function useQueryParamsStore(
         page: 0,
       }),
 
-      setFilters: (filters: FilterSelection) => {
+      setFilters: (filters: SafFilterSelection) => {
         setTimeout(() => {
           setFiltersParams(filters)
         })
@@ -136,7 +136,7 @@ export function useQueryParamsStore(
 
   // sync store state with status set in the route
   if (state.status !== status) {
-    actions.setStatus(status as SafCertificateQueryStatus)
+    actions.setStatus(status as SafTicketSourceStatus)
   }
 
   if (snapshot && state.snapshot !== snapshot) {

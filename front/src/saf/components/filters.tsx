@@ -1,7 +1,7 @@
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useSearchParams } from "react-router-dom"
-import { SafCertificateFilter, FilterSelection } from "../types"
+import { SafFilter, SafFilterSelection } from "../types"
 import { Normalizer } from "common/utils/normalize"
 import { Grid, Row } from "common/components/scaffold"
 import { MultiSelect, MultiSelectProps } from "common/components/multi-select" // prettier-ignore
@@ -10,10 +10,10 @@ import * as norm from "carbure/utils/normalizers"
 
 export interface FiltersProps<Q> {
   query: Q
-  filters: SafCertificateFilter[]
-  selected: FilterSelection
-  onSelect: (filters: FilterSelection) => void
-  getFilters: (field: SafCertificateFilter, query: Q) => Promise<any[]>
+  filters: SafFilter[]
+  selected: SafFilterSelection
+  onSelect: (filters: SafFilterSelection) => void
+  getFilters: (field: SafFilter, query: Q) => Promise<any[]>
 }
 
 export function Filters<T>({
@@ -26,11 +26,10 @@ export function Filters<T>({
   const { t } = useTranslation()
 
   const filterLabels = {
-    [SafCertificateFilter.Periods]: t("Périodes"),
-    [SafCertificateFilter.Feedstocks]: t("Matières Premières"),
-    [SafCertificateFilter.Biofuels]: t("Biocarburants"),
-    [SafCertificateFilter.CountriesOfOrigin]: t("Pays d'origine"),
-    [SafCertificateFilter.Clients]: t("Clients"),
+    [SafFilter.Periods]: t("Périodes"),
+    [SafFilter.Feedstocks]: t("Matières Premières"),
+    [SafFilter.Clients]: t("Clients"),
+    [SafFilter.Supplier]: t("Fournisseur"),
   }
 
   return (
@@ -50,8 +49,8 @@ export function Filters<T>({
 }
 
 export interface FilterManager {
-  filters: FilterSelection
-  onFilter: (filters: FilterSelection) => void
+  filters: SafFilterSelection
+  onFilter: (filters: SafFilterSelection) => void
 }
 
 export const ResetButton = ({ filters, onFilter }: FilterManager) => {
@@ -68,7 +67,7 @@ export const ResetButton = ({ filters, onFilter }: FilterManager) => {
   )
 }
 
-export type FilterSelectProps = { field: SafCertificateFilter } & Omit<
+export type FilterSelectProps = { field: SafFilter } & Omit<
   MultiSelectProps<string>,
   "options"
 >
@@ -91,13 +90,11 @@ export const FilterSelect = ({
   />
 )
 
-type FilterNormalizers= Partial<Record<SafCertificateFilter, Normalizer<any>>> // prettier-ignore
+type FilterNormalizers= Partial<Record<SafFilter, Normalizer<any>>> // prettier-ignore
 const filterNormalizers: FilterNormalizers = {
-  [SafCertificateFilter.Feedstocks]: norm.normalizeFeedstockFilter,
-  [SafCertificateFilter.Biofuels]: norm.normalizeBiofuelFilter,
-  [SafCertificateFilter.CountriesOfOrigin]: norm.normalizeCountryFilter,
-  [SafCertificateFilter.Periods]: norm.normalizePeriodFilter,
-  [SafCertificateFilter.Clients]: norm.normalizeUnknownFilter,
+  [SafFilter.Feedstocks]: norm.normalizeFeedstockFilter,
+  [SafFilter.Periods]: norm.normalizePeriodFilter,
+  [SafFilter.Clients]: norm.normalizeUnknownFilter,
 }
 
 export function useFilterParams() {
@@ -107,16 +104,16 @@ export function useFilterParams() {
 }
 
 export function searchToFilters(search: URLSearchParams) {
-  const filters: FilterSelection = {}
+  const filters: SafFilterSelection = {}
   search.forEach((value, filter) => {
-    const fkey = filter as SafCertificateFilter
+    const fkey = filter as SafFilter
     filters[fkey] = filters[fkey] ?? []
     filters[fkey]!.push(value)
   })
   return filters
 }
 
-export function countFilters(filters: FilterSelection | undefined) {
+export function countFilters(filters: SafFilterSelection | undefined) {
   if (filters === undefined) return 0
   return Object.values(filters).reduce((total, list) => total + list.length, 0)
 }
