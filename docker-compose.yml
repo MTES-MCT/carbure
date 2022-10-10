@@ -44,7 +44,7 @@ services:
       dockerfile: ./web/Dockerfile
     environment:
       IMAGE_TAG: ${IMAGE_TAG}
-      DATABASE_URL: mysql://$MYSQL_USER:$MYSQL_PASSWORD@carbure-mariadb:3306/$MYSQL_DATABASE
+      DATABASE_URL: mysql://root:$MYSQL_ROOT_PASSWORD@carbure-mariadb:3306/$MYSQL_DATABASE
       REDIS_URL: ${REDIS_URL}
       SECRET_KEY: ${SECRET_KEY}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS}
