@@ -109,15 +109,15 @@ export interface SafQuery {
   [SafFilter.Clients]?: string[]
 }
 
-export interface SafTicketSourceListResponse {
-  saf_ticket_source_list: SafTicketSource[]
+export interface SafTicketSourcesResponse {
+  saf_ticket_sources: SafTicketSource[]
   from: number
   returned: number
   total: number
   ids: number[]
 }
 
-export interface SafTicketListResponse {
+export interface SafTicketsResponse {
   saf_ticket_list: SafTicket[]
   from: number
   returned: number

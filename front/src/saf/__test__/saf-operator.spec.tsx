@@ -1,16 +1,14 @@
 import { Entity } from "carbure/types"
 import { Route } from "react-router-dom"
-import { TestRoot } from "setupTests"
 import { setEntity } from "settings/__test__/api"
+import { TestRoot } from "setupTests"
 
-import Transactions, { Saf } from "../index"
 import { render, screen } from "@testing-library/react"
-import { Data, getField, waitWhileLoading } from "carbure/__test__/helpers"
-import { operator } from "carbure/__test__/data"
-import server from "./api"
-import { safOperatorSnapshot, safTicketSources } from "./data"
 import userEvent from "@testing-library/user-event"
-import Flags from "flags.json"
+import { operator } from "carbure/__test__/data"
+import { getField, waitWhileLoading } from "carbure/__test__/helpers"
+import { Saf } from "../index"
+import server from "./api"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 
@@ -49,6 +47,9 @@ test("display the status tabs", async () => {
   //Status
   screen.getByText("Disponible (2)")
   screen.getByText("Historique (3)")
+
+  //Pagination
+  screen.getByText("résultats")
 })
 
 test("Select a filter", async () => {

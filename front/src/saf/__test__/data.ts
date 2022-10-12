@@ -1,5 +1,5 @@
 import { Biofuel, Country, Feedstock } from "carbure/types";
-import { SafTicketSource, SafTicketSourceStatus, SafOperatorSnapshot } from "saf/types";
+import { SafTicketSource, SafTicketSourceStatus, SafOperatorSnapshot, SafTicketSourcesResponse } from "saf/types";
 
 
 export const safOperatorSnapshot: SafOperatorSnapshot = {
@@ -49,4 +49,10 @@ export const safTicketSource: SafTicketSource = {
   ghg_reduction: 54,
 }
 
-export const safTicketSources: SafTicketSource[] = [safTicketSource, safTicketSource]
+export const safTicketSourcesResponse: SafTicketSourcesResponse = {
+  saf_ticket_sources: [safTicketSource, safTicketSource, safTicketSource, safTicketSource, safTicketSource, safTicketSource, safTicketSource, safTicketSource, safTicketSource, safTicketSource, safTicketSource],
+  from: 1,
+  returned: 1,
+  total: 11,
+  ids: [12343, 12343]
+}
