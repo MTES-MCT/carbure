@@ -110,9 +110,9 @@ const StatusRecap = ({
 }
 
 export function useAutoStatus() {
-  const match = useMatch("/org/:entity/saf/:year/:status") // prettier-ignore
+  const match = useMatch("/org/:entity/saf/:year/ticket-sources/:status") // prettier-ignore
   const status = match?.params.status
-  return status
+  return status ?? SafTicketSourceStatus.Available
 }
 
 export default OperatorTabs

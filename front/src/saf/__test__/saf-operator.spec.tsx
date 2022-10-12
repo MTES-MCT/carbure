@@ -45,6 +45,10 @@ test("display the status tabs", async () => {
   screen.getByText("Clients")
   screen.getByText("Matières Premières")
   screen.getByText("Périodes")
+
+  //Status
+  screen.getByText("Disponible (2)")
+  screen.getByText("Historique (3)")
 })
 
 test("Select a filter", async () => {

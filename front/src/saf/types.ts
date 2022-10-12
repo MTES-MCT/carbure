@@ -45,7 +45,7 @@ export interface LotPreview {
 }
 
 
-export interface SafTicket  {
+export interface SafTicket {
   id: number
   carbure_id: string
   year: number
@@ -97,7 +97,7 @@ export interface SafTicketAssignementQuery {
 
 export interface SafQuery {
   entity_id: number
-  status?: SafTicketSourceStatus | SafTicketStatus
+  status?: string
   year?: number
   search?: string
   order_by?: string
@@ -133,8 +133,8 @@ export enum SafTicketSourceStatus {
 export interface SafStates { //old QueryParams
   entity: Entity
   year: number
-  status: SafTicketSourceStatus | SafTicketStatus
-  filters: SafFilterSelection 
+  status: SafTicketSourceStatus | SafTicketStatus | string
+  filters: SafFilterSelection
   search: string | undefined
   selection: number[]
   page: number
