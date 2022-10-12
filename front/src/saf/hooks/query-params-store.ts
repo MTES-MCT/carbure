@@ -1,9 +1,8 @@
 import { Entity } from "carbure/types"
 import { useLimit } from "common/components/pagination"
-import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
-import { useFilterParams } from "saf/components/filters"
-import { SafFilterSelection, SafStates,  SafTicketSourceStatus, SafOperatorSnapshot } from "saf/types"
+import { SafFilterSelection, SafOperatorSnapshot, SafStates, SafTicketSourceStatus } from "saf/types"
+import { useFilterSearchParams } from "./filter-search-params"
 
 export function useQueryParamsStore(
   entity: Entity,
@@ -11,8 +10,9 @@ export function useQueryParamsStore(
   status: string | undefined,
   snapshot?: SafOperatorSnapshot | undefined
 ) {
+
   const [limit, saveLimit] = useLimit()
-  const [filtersParams, setFiltersParams] = useFilterParams()
+  const [filtersParams, setFiltersParams] = useFilterSearchParams()
 
   const [state, actions] = useStore(
     {
@@ -79,45 +79,45 @@ export function useQueryParamsStore(
         }
       },
 
-      setSearch: (search: string | undefined) => ({
-        search,
-        selection: [],
-        page: 0,
-      }),
+      // setSearch: (search: string | undefined) => ({
+      //   search,
+      //   selection: [],
+      //   page: 0,
+      // }),
 
-      setInvalid: (invalid: boolean) => ({
-        invalid,
-        selection: [],
-        page: 0,
-      }),
+      // setInvalid: (invalid: boolean) => ({
+      //   invalid,
+      //   selection: [],
+      //   page: 0,
+      // }),
 
-      setDeadline: (deadline: boolean) => ({
-        deadline,
-        selection: [],
-        page: 0,
-      }),
+      // setDeadline: (deadline: boolean) => ({
+      //   deadline,
+      //   selection: [],
+      //   page: 0,
+      // }),
 
-      setOrder: (order: Order | undefined) => ({
-        order,
-      }),
+      // setOrder: (order: Order | undefined) => ({
+      //   order,
+      // }),
 
-      setSelection: (selection: number[]) => ({
-        selection,
-      }),
+      // setSelection: (selection: number[]) => ({
+      //   selection,
+      // }),
 
-      setPage: (page?: number) => ({
-        page,
-        selection: [],
-      }),
+      // setPage: (page?: number) => ({
+      //   page,
+      //   selection: [],
+      // }),
 
-      setLimit: (limit?: number) => {
-        saveLimit(limit)
-        return {
-          limit,
-          selection: [],
-          page: 0,
-        }
-      },
+      // setLimit: (limit?: number) => {
+      //   saveLimit(limit)
+      //   return {
+      //     limit,
+      //     selection: [],
+      //     page: 0,
+      //   }
+      // },
     }
   )
 

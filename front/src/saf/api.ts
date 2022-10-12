@@ -1,13 +1,13 @@
 import { api, Api } from "common/services/api"
-import {  SafOperatorSnapshot, SafQuery, SafTicketSourceListResponse } from "./types"
+import { SafFilter, SafOperatorSnapshot, SafQuery, SafTicketSourceListResponse } from "./types"
 
 
-// const QUERY_RESET: Partial<Saf> = {
-//   limit: undefined,
-//   from_idx: undefined,
-//   order_by: undefined,
-//   direction: undefined,
-// }
+const QUERY_RESET: Partial<SafQuery> = {
+  limit: undefined,
+  from_idx: undefined,
+  order_by: undefined,
+  direction: undefined,
+}
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/years", { params: { entity_id } })
@@ -23,11 +23,12 @@ export function getSafTicketsSources(query: SafQuery) {
   return api.get<Api<SafTicketSourceListResponse>>("/saf-tickets-sources", { params: query })
 }
 
-// export function getLotFilters(field: SafCertificateFilter, query: SafCertificateQuery) {
-//   const params = { field, ...query, ...QUERY_RESET }
-//   return api
-//     .get<Api<string[]>>("/saf-certificates/filters", { params })
-//     .then((res) => res.data.data ?? [])
-// }
+export function getTicketSourceFilters(field: SafFilter, query?: SafQuery) {
+  const params = { field, ...query, ...QUERY_RESET }
+  // params.field = filter
+  return api
+    .get<Api<string[]>>("/saf-tickets-sources/filters", { params })
+    .then((res) => res.data.data ?? [])
+}
 
 
