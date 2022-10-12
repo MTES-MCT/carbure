@@ -12,6 +12,11 @@ export const safOperatorSnapshot: SafOperatorSnapshot = {
   tickets_accepted: 1,
 }
 
+export const safClientFilterOptions: string[] = [
+  "Air France",
+  "CORSAIR",
+]
+
 const feedstock1: Feedstock = {
   code: 'LIES_DE_VIN',
   name: 'Lies de vin',
