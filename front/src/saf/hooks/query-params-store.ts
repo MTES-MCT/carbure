@@ -48,18 +48,16 @@ export function useQueryParamsStore(
         page: 0,
       }),
 
-      setSnapshot: (snapshot: SafOperatorSnapshot) => (state) => {
-        return {
-          snapshot,
-          filters: filtersParams,
-          invalid: false,
-          deadline: false,
-          selection: [],
-          page: 0,
-        }
-      },
+      setSnapshot: (snapshot: SafOperatorSnapshot) => (state) => ({
+        snapshot,
+        filters: filtersParams,
+        invalid: false,
+        deadline: false,
+        selection: [],
+        page: 0,
+      }),
 
-      setStatus: (status: SafTicketSourceStatus) => (state) => ({
+      setStatus: (status: string) => (state) => ({
         status,
         filters: filtersParams,
         invalid: false,
@@ -134,7 +132,7 @@ export function useQueryParamsStore(
     actions.setYear(year)
   }
 
-  // sync store state with status set in the route
+  // // sync store state with status set in the route
   if (state.status !== status) {
     actions.setStatus(status as SafTicketSourceStatus)
   }
