@@ -9,6 +9,7 @@ import {
   SafOperatorSnapshot,
   SafQuery,
   SafStates,
+  SafTicketSource,
   SafTicketSourceStatus,
 } from "saf/types"
 import * as api from "../../api"
@@ -16,6 +17,9 @@ import { useAutoStatus } from "../operator-tabs"
 import { Filters } from "./filters"
 import { useMemo } from "react"
 import { StatusSwitcher } from "./status-switcher"
+import Pagination from "common/components/pagination"
+import * as data from "../../__test__/data"
+import TicketSourcesTable from "./table"
 
 export interface CertificatesProps {
   year: number
@@ -27,8 +31,21 @@ export const TicketSources = ({ year, snapshot }: CertificatesProps) => {
 
   const entity = useEntity()
   const status = useAutoStatus()
-  const [state, actions] = useQueryParamsStore(entity, year, status, snapshot) // prettier-ignore
+  const [state, actions] = useQueryParamsStore(entity, year, status, snapshot)
   const query = useTicketSourcesQuery(state)
+
+  const ticketSourcesResponse = data.safTicketSourcesResponse // TODO remplacer par la vrai requete
+  const total = ticketSourcesResponse?.total ?? 0
+  const count = ticketSourcesResponse?.returned ?? 0
+  const ticketSources = ticketSourcesResponse.saf_ticket_sources
+
+  const showTicketSourceDetail = (ticketSource: SafTicketSource) => {
+    return {
+      pathname: location.pathname,
+      search: location.search,
+      hash: `ticket-source/${ticketSource.id}`,
+    }
+  }
 
   return (
     <>
@@ -50,6 +67,28 @@ export const TicketSources = ({ year, snapshot }: CertificatesProps) => {
             status={status}
           />
         </ActionBar>
+
+        {count > 0 && (
+          <>
+            <TicketSourcesTable
+              loading={false}
+              order={state.order}
+              ticketSources={ticketSources}
+              rowLink={showTicketSourceDetail}
+              onOrder={actions.setOrder}
+            />
+
+            {(state.limit || 0) < total && (
+              <Pagination
+                page={state.page}
+                limit={state.limit}
+                total={total}
+                onPage={actions.setPage}
+                onLimit={actions.setLimit}
+              />
+            )}
+          </>
+        )}
       </section>
     </>
   )
