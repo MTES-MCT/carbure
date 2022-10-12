@@ -2,7 +2,7 @@ import { useLocation } from "react-router-dom"
 
 import useEntity from "carbure/hooks/entity"
 
-import { Bar } from "common/components/scaffold"
+import { ActionBar, Bar } from "common/components/scaffold"
 import { useQueryParamsStore } from "saf/hooks/query-params-store"
 import {
   SafFilter,
@@ -15,6 +15,7 @@ import * as api from "../../api"
 import { useAutoStatus } from "../operator-tabs"
 import { Filters } from "./filters"
 import { useMemo } from "react"
+import { StatusSwitcher } from "./status-switcher"
 
 export interface CertificatesProps {
   year: number
@@ -22,11 +23,10 @@ export interface CertificatesProps {
 }
 
 export const TicketSources = ({ year, snapshot }: CertificatesProps) => {
-  // const matomo = useMatomo()
   const location = useLocation()
 
   const entity = useEntity()
-  const status = SafTicketSourceStatus.Available // useAutoStatus()
+  const status = useAutoStatus()
   const [state, actions] = useQueryParamsStore(entity, year, status, snapshot) // prettier-ignore
   const query = useTicketSourcesQuery(state)
 
@@ -42,6 +42,15 @@ export const TicketSources = ({ year, snapshot }: CertificatesProps) => {
           }
         />
       </Bar>
+      <section>
+        <ActionBar>
+          <StatusSwitcher
+            onSwitch={actions.setStatus}
+            count={snapshot}
+            status={status}
+          />
+        </ActionBar>
+      </section>
     </>
   )
 }
