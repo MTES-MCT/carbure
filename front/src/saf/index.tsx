@@ -23,6 +23,7 @@ import {
 import { ImportArea } from "../transactions/actions/import"
 import Lots from "../transactions/components/lots"
 import Stocks from "../transactions/components/stocks"
+import { safOperatorSnapshot } from "./__test__/data"
 // import { Tickets  } from "./components/tickets"
 
 export const Saf = () => {
@@ -37,8 +38,8 @@ export const Saf = () => {
     params: [entity.id, years.selected],
   })
 
-  const snapshotData = snapshot.result?.data.data
-  // const snapshotData = SafOperatorSnapshot
+  // const snapshotData = snapshot.result?.data.data
+  const snapshotData = safOperatorSnapshot
 
   // common props for subroutes
 
