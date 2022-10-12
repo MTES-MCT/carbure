@@ -23,7 +23,7 @@ export function getSafTicketsSources(query: SafQuery) {
   return api.get<Api<SafTicketSourceListResponse>>("/saf-tickets-sources", { params: query })
 }
 
-export function getTicketSourceFilters(field: SafFilter, query?: SafQuery) {
+export function getTicketSourceFilters(field: SafFilter, query: SafQuery) {
   const params = { field, ...query, ...QUERY_RESET }
   // params.field = filter
   return api
