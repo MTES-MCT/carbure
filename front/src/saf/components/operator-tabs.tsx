@@ -16,7 +16,7 @@ export interface StatusTabsProps {
   count: SafOperatorSnapshot | undefined
 }
 
-export const StatusTabs = ({
+export const OperatorTabs = ({
   loading,
   count = defaultCount,
 }: StatusTabsProps) => {
@@ -34,7 +34,9 @@ export const StatusTabs = ({
             <StatusRecap
               loading={loading}
               count={count.ticket_sources_volume}
-              label={t("Litres à affecter", { count: count.ticket_sources_volume })}
+              label={t("Litres à affecter", {
+                count: count.ticket_sources_volume,
+              })}
             />
           ),
         },
@@ -107,11 +109,10 @@ const StatusRecap = ({
   )
 }
 
-
 export function useAutoStatus() {
   const match = useMatch("/org/:entity/saf/:year/:status") // prettier-ignore
   const status = match?.params.status
   return status
 }
 
-export default StatusTabs
+export default OperatorTabs

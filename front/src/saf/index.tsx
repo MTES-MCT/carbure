@@ -1,28 +1,20 @@
+import useEntity from "carbure/hooks/entity"
+import { Main } from "common/components/scaffold"
+import Select from "common/components/select"
+import { useQuery } from "common/hooks/async"
 import { useCallback } from "react"
 import { useTranslation } from "react-i18next"
 import {
-  Navigate,
   Route,
   Routes,
+  useLocation,
   useNavigate,
   useParams,
-  useLocation,
 } from "react-router-dom"
-import HashRoute from "common/components/hash-route"
-import { UserRole } from "carbure/types"
-import useEntity from "carbure/hooks/entity"
-import { useQuery } from "common/hooks/async"
-import * as api from "./api"
-import { Main } from "common/components/scaffold"
-import Select from "common/components/select"
-import StatusTabs from "./components/status"
-import {
-  DeclarationButton,
-  DeclarationDialog,
-} from "../transactions/actions/declaration"
 import { ImportArea } from "../transactions/actions/import"
-import Lots from "../transactions/components/lots"
-import Stocks from "../transactions/components/stocks"
+import * as api from "./api"
+import OperatorTabs from "./components/operator-tabs"
+import TicketSources from "./components/ticket-sources"
 import { safOperatorSnapshot } from "./__test__/data"
 // import { Tickets  } from "./components/tickets"
 
@@ -40,10 +32,6 @@ export const Saf = () => {
 
   // const snapshotData = snapshot.result?.data.data
   const snapshotData = safOperatorSnapshot
-
-  // common props for subroutes
-
-  const props = { year: years.selected, snapshot: snapshotData }
 
   return (
     <ImportArea>
@@ -64,13 +52,18 @@ export const Saf = () => {
           </section>
 
           <section>
-            <StatusTabs loading={snapshot.loading} count={snapshotData} />
+            <OperatorTabs loading={snapshot.loading} count={snapshotData} />
           </section>
         </header>
 
-        {/* <Routes>
-          <Route path="*" element={<Tickets {...props} />} />
-        </Routes> */}
+        <Routes>
+          <Route
+            path="*"
+            element={
+              <TicketSources year={years.selected} snapshot={snapshotData} />
+            }
+          />
+        </Routes>
       </Main>
     </ImportArea>
   )
