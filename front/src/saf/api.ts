@@ -20,7 +20,7 @@ export function getSafOperatorSnapshot(entity_id: number, year: number) {
 }
 
 export function getSafTicketsSources(query: SafQuery) {
-  return api.get<Api<SafTicketSourceListResponse>>("/saf-certificates", { params: query })
+  return api.get<Api<SafTicketSourceListResponse>>("/saf-tickets-sources", { params: query })
 }
 
 // export function getLotFilters(field: SafCertificateFilter, query: SafCertificateQuery) {

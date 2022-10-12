@@ -35,14 +35,13 @@ const SafWithRouter = ({
   )
 }
 
-test("display an empty list of transactions", async () => {
+test("display the status tabs", async () => {
   render(<SafWithRouter status="ticket-sources" entity={operator} />)
 
   await waitWhileLoading()
 
-  screen.getByText("4")
-  screen.getByText("Lots SAF")
-  screen.getByText("Certificats en attente")
-  screen.getByText("Certificats refusés")
-  screen.getByText("Certificats acceptés")
+  screen.getByText("15 000")
+  screen.getByText("Litres à affecter")
+  screen.getByText("Tickets envoyés")
+  
 })
