@@ -5,7 +5,7 @@ import { setEntity } from "settings/__test__/api"
 
 import Transactions, { Saf } from "../index"
 import { render, screen } from "@testing-library/react"
-import { Data, waitWhileLoading } from "carbure/__test__/helpers"
+import { Data, getField, waitWhileLoading } from "carbure/__test__/helpers"
 import { operator } from "carbure/__test__/data"
 import server from "./api"
 import { safOperatorSnapshot, safTicketSources } from "./data"
@@ -27,10 +27,7 @@ const SafWithRouter = ({
   setEntity(entity)
   return (
     <TestRoot url={`/org/${entity.id}/saf/2021/${status}`}>
-      <Route
-        path={`/org/${entity.id}/saf/:year/*`}
-        element={<Saf />}
-      />
+      <Route path={`/org/${entity.id}/saf/:year/*`} element={<Saf />} />
     </TestRoot>
   )
 }
@@ -43,7 +40,21 @@ test("display the status tabs", async () => {
   screen.getByText("15 000")
   screen.getByText("Litres à affecter")
   screen.getByText("Tickets envoyés")
-  
+
+  //Filters
+  screen.getByText("Clients")
+  screen.getByText("Matières Premières")
+  screen.getByText("Périodes")
 })
 
-
+test("Select a filter", async () => {
+  render(<SafWithRouter status="ticket-sources" entity={operator} />)
+  const user = userEvent.setup()
+  const filter = await screen.findByText("Clients")
+  await user.click(filter)
+  const filterValue = await screen.findByText("CORSAIR")
+  await user.click(filterValue)
+  const filterValue2 = await screen.findByText("Air France")
+  await user.click(filterValue2)
+  getField("CORSAIR, Air France")
+})
