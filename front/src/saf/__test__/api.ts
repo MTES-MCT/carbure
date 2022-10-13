@@ -17,7 +17,7 @@ export const okYears = rest.get("/api/years", (req, res, ctx) => {
   )
 })
 
-export const okSnapshot = rest.get("/api/saf-snapshot", (req, res, ctx) => {
+export const okSnapshot = rest.get("/api/saf/snapshot", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -26,7 +26,7 @@ export const okSnapshot = rest.get("/api/saf-snapshot", (req, res, ctx) => {
   )
 })
 
-export const okFilter = rest.get("/api/saf-tickets-sources/filters", (req, res, ctx) => {
+export const okFilter = rest.get("/api/saf/tickets-sources/filters", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -35,11 +35,20 @@ export const okFilter = rest.get("/api/saf-tickets-sources/filters", (req, res, 
   )
 })
 
-export const okSafTicketSources = rest.get("/api/saf-tickets-sources", (req, res, ctx) => {
+export const okSafTicketSources = rest.get("/api/saf/tickets-sources", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
       data: data.safTicketSourcesResponse,
+    })
+  )
+})
+
+export const okSafTickets = rest.get("/api/saf/tickets", (req, res, ctx) => {
+  return res(
+    ctx.json({
+      status: "success",
+      data: data.safTicketsResponse,
     })
   )
 })
@@ -49,5 +58,6 @@ export default setupServer(
   okSnapshot,
   okSettings,
   okFilter,
-  okSafTicketSources
+  okSafTicketSources,
+  okSafTickets
 )

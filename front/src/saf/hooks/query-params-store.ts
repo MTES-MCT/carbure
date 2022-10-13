@@ -61,7 +61,6 @@ export function useQueryParamsStore(
       }),
 
       setStatus: (status: SafTicketSourceStatus | SafTicketStatus) => {
-        console.log('set status:', status)
         return {
           status,
           filters: filtersParams,

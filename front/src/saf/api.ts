@@ -14,28 +14,28 @@ export function getYears(entity_id: number) {
 }
 
 export function getSafOperatorSnapshot(entity_id: number, year: number) {
-  return api.get<Api<SafOperatorSnapshot>>("/saf-snapshot", {
+  return api.get<Api<SafOperatorSnapshot>>("/saf/snapshot", {
     params: { entity_id, year },
   })
 }
 
 export function getSafTicketsSources(query: SafQuery) {
-  return api.get<Api<SafTicketSourcesResponse>>("/saf-tickets-sources", { params: query })
+  return api.get<Api<SafTicketSourcesResponse>>("/saf/tickets-sources", { params: query })
 }
 export function getSafTickets(query: SafQuery) {
-  return api.get<Api<SafTicketsResponse>>("/saf-tickets", { params: query })
+  return api.get<Api<SafTicketsResponse>>("/saf/tickets", { params: query })
 }
 
 export function getTicketSourceFilters(field: SafFilter, query: SafQuery) {
   const params = { field, ...query, ...QUERY_RESET }
 
   //TO TEST without data
-  return new Promise<any[]>((resolve) => {
-    resolve(data.safClientFilterOptions)
-  })
+  // return new Promise<any[]>((resolve) => {
+  //   resolve(data.safClientFilterOptions)
+  // })
 
   return api
-    .get<Api<string[]>>("/saf-tickets-sources/filters", { params })
+    .get<Api<string[]>>("/saf/tickets-sources/filters", { params })
     .then((res) => res.data.data ?? [])
 
 
