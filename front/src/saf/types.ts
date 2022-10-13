@@ -56,7 +56,7 @@ export interface SafTicket {
   feedstock: Feedstock
   biofuel: Biofuel
   country_of_origin: Country
-  ghg_reduction: number
+  ghg_reduction: number // attention pour les lots c'etait ghg_reduction_red_ii
 }
 
 export interface SafTicketDetails extends SafTicket, SafProduction, SafDurability {

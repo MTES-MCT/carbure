@@ -220,6 +220,7 @@ export const BiofuelCell = ({ lot }: LotCellProps) => {
 }
 
 export const PeriodCell = ({ lot }: LotCellProps) => {
+  console.log("lot:", lot)
   const expiring = isExpiring(lot)
   return (
     <Cell
