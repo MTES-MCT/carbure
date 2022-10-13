@@ -38,9 +38,9 @@ const country1: Country = {
 export const safTicketSource: SafTicketSource = {
   id: 12343,
   carbure_id: "A12332",
-  year: 2021,
-  period: 202001,
-  date: '20200109',
+  year: 2022,
+  period: 202201,
+  date: '2022-02-08',
   total_volume: 10000,
   assigned_volume: 0,
   feedstock: feedstock1,
@@ -49,8 +49,22 @@ export const safTicketSource: SafTicketSource = {
   ghg_reduction: 54,
 }
 
+export const safTicketSource2: SafTicketSource = {
+  id: 22343,
+  carbure_id: "A22332",
+  year: 2022,
+  period: 202202,
+  date: '2022-01-10',
+  total_volume: 5000,
+  assigned_volume: 2000,
+  feedstock: feedstock1,
+  biofuel: bioduel1,
+  country_of_origin: country1,
+  ghg_reduction: 64,
+}
+
 export const safTicketSourcesResponse: SafTicketSourcesResponse = {
-  saf_ticket_sources: [safTicketSource, safTicketSource, safTicketSource, safTicketSource, safTicketSource, safTicketSource, safTicketSource, safTicketSource, safTicketSource, safTicketSource, safTicketSource],
+  saf_ticket_sources: [safTicketSource, safTicketSource2, safTicketSource, safTicketSource2, safTicketSource2, safTicketSource, safTicketSource, safTicketSource, safTicketSource, safTicketSource, safTicketSource],
   from: 1,
   returned: 1,
   total: 11,

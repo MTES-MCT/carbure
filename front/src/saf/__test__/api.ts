@@ -35,12 +35,11 @@ export const okFilter = rest.get("/api/saf-tickets-sources/filters", (req, res, 
   )
 })
 
-
-export const okSafCertificates = rest.get("/api/saf-certificates", (req, res, ctx) => {
+export const okSafTicketSources = rest.get("/api/saf-tickets-sources", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
-      data: Data.get("saf-snapshot"),
+      data: data.safTicketSourcesResponse,
     })
   )
 })
@@ -49,5 +48,6 @@ export default setupServer(
   okYears,
   okSnapshot,
   okSettings,
-  okFilter
+  okFilter,
+  okSafTicketSources
 )

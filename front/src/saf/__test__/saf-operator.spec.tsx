@@ -38,6 +38,12 @@ test("display the status tabs", async () => {
   screen.getByText("15 000")
   screen.getByText("Litres à affecter")
   screen.getByText("Tickets envoyés")
+})
+
+test("display ticket sources tab", async () => {
+  render(<SafWithRouter status="ticket-sources" entity={operator} />)
+
+  await waitWhileLoading()
 
   //Filters
   screen.getByText("Clients")
@@ -47,6 +53,15 @@ test("display the status tabs", async () => {
   //Status
   screen.getByText("Disponible (2)")
   screen.getByText("Historique (3)")
+
+  //Tableau
+  let result = screen.getAllByText("Disponible")
+  expect(result.length).toEqual(11)
+
+  result = screen.getAllByText("3 000 L")
+  expect(result.length).toEqual(3)
+  result = screen.getAllByText("/10 000 L")
+  expect(result.length).toEqual(8)
 
   //Pagination
   screen.getByText("résultats")
