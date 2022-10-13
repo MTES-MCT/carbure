@@ -123,7 +123,7 @@ const Navigation = ({ entity }: NavigationProps) => {
                 label: t("Transactions"),
               },
 
-              (isAdmin || has_saf) && {
+              has_saf && {
                 key: "saf",
                 path: "saf",
                 label: t("Aviation"),
