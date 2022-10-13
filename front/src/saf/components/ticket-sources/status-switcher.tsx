@@ -3,9 +3,9 @@ import { useTranslation } from "react-i18next"
 import { SafOperatorSnapshot, SafTicketSourceStatus } from "saf/types"
 
 interface StatusSwitcherProps {
-  status: string
+  status: SafTicketSourceStatus
   count: SafOperatorSnapshot | undefined
-  onSwitch: (status: string) => void
+  onSwitch: (status: SafTicketSourceStatus) => void
 }
 export const StatusSwitcher = ({
   status,
@@ -19,7 +19,7 @@ export const StatusSwitcher = ({
       keepSearch
       variant="switcher"
       focus={status}
-      onFocus={onSwitch}
+      onFocus={(status) => onSwitch(status as SafTicketSourceStatus)}
       tabs={[
         {
           key: SafTicketSourceStatus.Available,

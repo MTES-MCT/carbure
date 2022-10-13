@@ -1,15 +1,12 @@
-import cl from "clsx"
-import { useEffect } from "react"
-import { useTranslation } from "react-i18next"
-import { useMatch, useNavigate } from "react-router-dom"
-import { Snapshot, Status } from "../../transactions/types"
-import Tabs from "common/components/tabs"
+import useEntity from "carbure/hooks/entity"
 import { Bell, Loader } from "common/components/icons"
 import { Col, Row } from "common/components/scaffold"
-import { formatNumber } from "common/utils/formatters"
-import useEntity from "carbure/hooks/entity"
+import Tabs from "common/components/tabs"
 import { compact } from "common/utils/collection"
-import { SafTicketSourceStatus, SafOperatorSnapshot } from "saf/types"
+import { formatNumber } from "common/utils/formatters"
+import { useTranslation } from "react-i18next"
+import { useMatch } from "react-router-dom"
+import { SafOperatorSnapshot, SafTicketSourceStatus } from "saf/types"
 
 export interface StatusTabsProps {
   loading: boolean
@@ -111,7 +108,7 @@ const StatusRecap = ({
 
 export function useAutoStatus() {
   const match = useMatch("/org/:entity/saf/:year/ticket-sources/:status") // prettier-ignore
-  const status = match?.params.status
+  const status = match?.params.status as SafTicketSourceStatus
   return status ?? SafTicketSourceStatus.Available
 }
 

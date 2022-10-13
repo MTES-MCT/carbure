@@ -6,6 +6,7 @@ import { ActionBar, Bar } from "common/components/scaffold"
 import { useQueryParamsStore } from "saf/hooks/query-params-store"
 import {
   SafFilter,
+  SafFilterSelection,
   SafOperatorSnapshot,
   SafQuery,
   SafStates,
@@ -21,6 +22,11 @@ import Pagination from "common/components/pagination"
 import * as data from "../../__test__/data"
 import TicketSourcesTable from "./table"
 import { useQuery } from "common/hooks/async"
+import { AlertCircle } from "common/components/icons"
+import Alert from "common/components/alert"
+import { ResetButton } from "transactions/components/filters"
+import { useTranslation } from "react-i18next"
+import { SearchInput } from "common/components/input"
 
 export interface CertificatesProps {
   year: number
@@ -34,6 +40,7 @@ export const TicketSources = ({ year, snapshot }: CertificatesProps) => {
   const status = useAutoStatus()
   const [state, actions] = useQueryParamsStore(entity, year, status, snapshot)
   const query = useTicketSourcesQuery(state)
+  console.log("query:", query)
 
   const ticketSourcesResponse = useQuery(api.getSafTicketsSources, {
     key: "ticket-sources",
@@ -73,9 +80,17 @@ export const TicketSources = ({ year, snapshot }: CertificatesProps) => {
             count={snapshot}
             status={status}
           />
+
+          <SearchInput
+            asideX
+            clear
+            debounce={250}
+            value={state.search}
+            onChange={actions.setSearch}
+          />
         </ActionBar>
 
-        {count > 0 && ticketSources && (
+        {count > 0 && ticketSources ? (
           <>
             <TicketSourcesTable
               loading={false}
@@ -95,6 +110,12 @@ export const TicketSources = ({ year, snapshot }: CertificatesProps) => {
               />
             )}
           </>
+        ) : (
+          <NoResult
+            loading={ticketSourcesResponse.loading}
+            filters={state.filters}
+            onFilter={actions.setFilters}
+          />
         )}
       </section>
     </>
@@ -120,7 +141,7 @@ export function useTicketSourcesQuery({
       entity_id: entity.id,
       year,
       status,
-      query: search ? search : undefined,
+      search,
       from_idx: page * (limit ?? 0),
       limit: limit || undefined,
       sort_by: order?.column,
@@ -128,5 +149,27 @@ export function useTicketSourcesQuery({
       ...filters,
     }),
     [entity.id, year, status, search, limit, order, filters, page]
+  )
+}
+
+export interface FilterManager {
+  filters: SafFilterSelection
+  onFilter: (filters: SafFilterSelection) => void
+}
+
+interface NoResultProps extends Partial<FilterManager> {
+  loading?: boolean
+}
+
+export const NoResult = ({ loading, filters, onFilter }: NoResultProps) => {
+  const { t } = useTranslation()
+
+  return (
+    <Alert loading={loading} variant="warning" icon={AlertCircle}>
+      <p>{t("Aucun résultat trouvé pour cette recherche")}</p>
+      {filters && onFilter && Object.keys(filters).length && (
+        <ResetButton filters={filters} onFilter={onFilter} />
+      )}
+    </Alert>
   )
 }

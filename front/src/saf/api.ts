@@ -1,7 +1,7 @@
 import { api, Api } from "common/services/api"
 import { SafFilter, SafOperatorSnapshot, SafQuery, SafTicketSourcesResponse } from "./types"
 
-
+import * as data from "./__test__/data"
 const QUERY_RESET: Partial<SafQuery> = {
   limit: undefined,
   from_idx: undefined,
@@ -25,10 +25,17 @@ export function getSafTicketsSources(query: SafQuery) {
 
 export function getTicketSourceFilters(field: SafFilter, query: SafQuery) {
   const params = { field, ...query, ...QUERY_RESET }
-  // params.field = filter
+
+  //TO TEST without data
+  return new Promise<any[]>((resolve) => {
+    resolve(data.safClientFilterOptions)
+  })
+
   return api
     .get<Api<string[]>>("/saf-tickets-sources/filters", { params })
     .then((res) => res.data.data ?? [])
+
+
 }
 
 
