@@ -2,39 +2,39 @@ import { useLocation } from "react-router-dom"
 
 import useEntity from "carbure/hooks/entity"
 
+import Alert from "common/components/alert"
+import { AlertCircle } from "common/components/icons"
+import { SearchInput } from "common/components/input"
+import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
+import { useQuery } from "common/hooks/async"
+import { useMemo } from "react"
+import { useTranslation } from "react-i18next"
 import { useQueryParamsStore } from "saf/hooks/query-params-store"
+import { useSafQuery } from "saf/hooks/saf-query"
 import {
   SafFilter,
   SafFilterSelection,
   SafOperatorSnapshot,
   SafQuery,
   SafStates,
-  SafTicketSource,
-  SafTicketSourceStatus,
+  SafTicket,
+  SafTicketStatus,
 } from "saf/types"
-import * as api from "../../api"
-import { useAutoStatus } from "../operator-tabs"
-import { Filters } from "../filters"
-import { useMemo } from "react"
-import { StatusSwitcher } from "./status-switcher"
-import Pagination from "common/components/pagination"
-import * as data from "../../__test__/data"
-import TicketSourcesTable from "./table"
-import { useQuery } from "common/hooks/async"
-import { AlertCircle } from "common/components/icons"
-import Alert from "common/components/alert"
 import { ResetButton } from "transactions/components/filters"
-import { useTranslation } from "react-i18next"
-import { SearchInput } from "common/components/input"
-import { useSafQuery } from "saf/hooks/saf-query"
+import * as api from "../../api"
+import * as data from "../../__test__/data"
+import { Filters } from "../filters"
+import { useAutoStatus } from "../operator-tabs"
+import { StatusSwitcher } from "./status-switcher"
+import TicketsTable from "./table"
 
-export interface TicketSourcesProps {
+export interface TicketsProps {
   year: number
   snapshot: SafOperatorSnapshot
 }
 
-export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
+export const Tickets = ({ year, snapshot }: TicketsProps) => {
   const location = useLocation()
 
   const entity = useEntity()
@@ -42,22 +42,22 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
   const [state, actions] = useQueryParamsStore(entity, year, status, snapshot)
   const query = useSafQuery(state)
 
-  const ticketSourcesResponse = useQuery(api.getSafTicketsSources, {
-    key: "ticket-sources",
+  const ticketsResponse = useQuery(api.getSafTickets, {
+    key: "tickets",
     params: [query],
   })
 
-  const ticketSoucesData = ticketSourcesResponse.result?.data.data
-  // const ticketSoucesData = data.safTicketSourcesResponse // TO TEST with testing d:ata
-  const total = ticketSoucesData?.total ?? 0
-  const count = ticketSoucesData?.returned ?? 0
-  const ticketSources = ticketSoucesData?.saf_ticket_sources
+  // const ticketsData = ticketsResponse.result?.data.data
+  const ticketsData = data.safTicketsResponse // TO TEST with testing d:ata
+  const total = ticketsData?.total ?? 0
+  const count = ticketsData?.returned ?? 0
+  const tickets = ticketsData?.saf_tickets
 
-  const showTicketSourceDetail = (ticketSource: SafTicketSource) => {
+  const showTicketDetail = (ticket: SafTicket) => {
     return {
       pathname: location.pathname,
       search: location.search,
-      hash: `ticket-source/${ticketSource.id}`,
+      hash: `tickets/${ticket.id}`,
     }
   }
 
@@ -78,7 +78,7 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
           <StatusSwitcher
             onSwitch={actions.setStatus}
             count={snapshot}
-            status={status as SafTicketSourceStatus}
+            status={status as SafTicketStatus}
           />
 
           <SearchInput
@@ -90,13 +90,14 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
           />
         </ActionBar>
 
-        {count > 0 && ticketSources ? (
+        {count > 0 && tickets ? (
           <>
-            <TicketSourcesTable
+            <TicketsTable
               loading={false}
               order={state.order}
-              ticketSources={ticketSources}
-              rowLink={showTicketSourceDetail}
+              status={status as SafTicketStatus}
+              tickets={tickets}
+              rowLink={showTicketDetail}
               onOrder={actions.setOrder}
             />
 
@@ -112,7 +113,7 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
           </>
         ) : (
           <NoResult
-            loading={ticketSourcesResponse.loading}
+            loading={ticketsResponse.loading}
             filters={state.filters}
             onFilter={actions.setFilters}
           />
@@ -124,7 +125,33 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
 
 const FILTERS = [SafFilter.Clients, SafFilter.Periods, SafFilter.Feedstocks]
 
-export default TicketSources
+export default Tickets
+
+export function useTicketSourcesQuery({
+  entity,
+  status,
+  year,
+  search,
+  page = 0,
+  limit,
+  order,
+  filters,
+}: SafStates) {
+  return useMemo<SafQuery>(
+    () => ({
+      entity_id: entity.id,
+      year,
+      status,
+      search,
+      from_idx: page * (limit ?? 0),
+      limit: limit || undefined,
+      sort_by: order?.column,
+      order: order?.direction,
+      ...filters,
+    }),
+    [entity.id, year, status, search, limit, order, filters, page]
+  )
+}
 
 export interface FilterManager {
   filters: SafFilterSelection

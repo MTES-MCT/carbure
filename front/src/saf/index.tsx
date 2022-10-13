@@ -15,6 +15,7 @@ import { ImportArea } from "../transactions/actions/import"
 import * as api from "./api"
 import OperatorTabs from "./components/operator-tabs"
 import TicketSources from "./components/ticket-sources"
+import Tickets from "./components/tickets"
 import { safOperatorSnapshot } from "./__test__/data"
 
 export const Saf = () => {
@@ -29,8 +30,8 @@ export const Saf = () => {
     params: [entity.id, years.selected],
   })
 
-  const snapshotData = snapshot.result?.data.data
-  // const snapshotData = safOperatorSnapshot // TO TEST with testing data
+  // const snapshotData = snapshot.result?.data.data
+  const snapshotData = safOperatorSnapshot // TO TEST with testing data
 
   return (
     <ImportArea>
@@ -57,10 +58,14 @@ export const Saf = () => {
 
         <Routes>
           <Route
-            path="*"
+            path="/ticket-sources/*"
             element={
               <TicketSources year={years.selected} snapshot={snapshotData} />
             }
+          />
+          <Route
+            path="/tickets/*"
+            element={<Tickets year={years.selected} snapshot={snapshotData} />}
           />
         </Routes>
       </Main>
