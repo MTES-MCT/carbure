@@ -133,7 +133,7 @@ export enum SafTicketSourceStatus {
 export interface SafStates { //old QueryParams
   entity: Entity
   year: number
-  status: SafTicketSourceStatus | SafTicketStatus | string
+  status: SafTicketSourceStatus | SafTicketStatus
   filters: SafFilterSelection
   search: string | undefined
   selection: number[]

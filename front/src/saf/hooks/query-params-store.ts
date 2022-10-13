@@ -2,13 +2,15 @@ import { Entity } from "carbure/types"
 import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
+import useTitle from "common/hooks/title"
+import { useTranslation } from "react-i18next"
 import { SafFilterSelection, SafOperatorSnapshot, SafStates, SafTicketSourceStatus } from "saf/types"
 import { useFilterSearchParams } from "./filter-search-params"
 
 export function useQueryParamsStore(
   entity: Entity,
   year: number,
-  status: string | undefined,
+  status: SafTicketSourceStatus,
   snapshot?: SafOperatorSnapshot | undefined
 ) {
 
@@ -31,7 +33,7 @@ export function useQueryParamsStore(
       limit,
     } as SafStates,
     {
-      setEntity: (entity: Entity) => (state) => ({
+      setEntity: (entity: Entity) => ({
         entity,
         filters: filtersParams,
         invalid: false,
@@ -40,7 +42,7 @@ export function useQueryParamsStore(
         page: 0,
       }),
 
-      setYear: (year: number) => (state) => ({
+      setYear: (year: number) => ({
         year,
         filters: filtersParams,
         invalid: false,
@@ -49,7 +51,7 @@ export function useQueryParamsStore(
         page: 0,
       }),
 
-      setSnapshot: (snapshot: SafOperatorSnapshot) => (state) => ({
+      setSnapshot: (snapshot: SafOperatorSnapshot) => ({
         snapshot,
         filters: filtersParams,
         invalid: false,
@@ -58,7 +60,7 @@ export function useQueryParamsStore(
         page: 0,
       }),
 
-      setStatus: (status: string) => (state) => ({
+      setStatus: (status: SafTicketSourceStatus) => ({
         status,
         filters: filtersParams,
         invalid: false,
@@ -78,31 +80,19 @@ export function useQueryParamsStore(
         }
       },
 
-      // setSearch: (search: string | undefined) => ({
-      //   search,
-      //   selection: [],
-      //   page: 0,
-      // }),
-
-      // setInvalid: (invalid: boolean) => ({
-      //   invalid,
-      //   selection: [],
-      //   page: 0,
-      // }),
-
-      // setDeadline: (deadline: boolean) => ({
-      //   deadline,
-      //   selection: [],
-      //   page: 0,
-      // }),
+      setSearch: (search: string | undefined) => ({
+        search,
+        selection: [],
+        page: 0,
+      }),
 
       setOrder: (order: Order | undefined) => ({
         order,
       }),
 
-      // setSelection: (selection: number[]) => ({
-      //   selection,
-      // }),
+      setSelection: (selection: number[]) => ({
+        selection,
+      }),
 
       setPage: (page?: number) => ({
         page,
@@ -121,7 +111,7 @@ export function useQueryParamsStore(
   )
 
   // sync tab title with current state
-  // useLotTitle(state)
+  usePageTitle(state)
 
   // sync store state with entity set from above
   if (state.entity.id !== entity.id) {
@@ -135,7 +125,7 @@ export function useQueryParamsStore(
 
   // // sync store state with status set in the route
   if (state.status !== status) {
-    actions.setStatus(status as SafTicketSourceStatus)
+    actions.setStatus(status)
   }
 
   if (snapshot && state.snapshot !== snapshot) {
@@ -143,4 +133,19 @@ export function useQueryParamsStore(
   }
 
   return [state, actions] as [typeof state, typeof actions]
+}
+
+export function usePageTitle(state: SafStates) {
+  const { t } = useTranslation()
+
+  const statuses: any = {
+    [SafTicketSourceStatus.Available]: t("Disponible"),
+    [SafTicketSourceStatus.History]: t("Historique"),
+  }
+
+  const entity = state.entity.name
+  const year = state.year
+  const status = statuses[state.status]
+
+  useTitle(`${entity} ∙ ${status} ${year}`)
 }
