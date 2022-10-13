@@ -23,12 +23,12 @@ export const StatusSwitcher = ({
       tabs={[
         {
           key: SafTicketSourceStatus.Available,
-          path: `ticket-sources/${SafTicketSourceStatus.Available}`,
+          path: `${SafTicketSourceStatus.Available}`,
           label: `${t("Disponible")} (${count?.ticket_sources_available ?? 0})`,
         },
         {
           key: SafTicketSourceStatus.History,
-          path: `ticket-sources/${SafTicketSourceStatus.History}`,
+          path: `${SafTicketSourceStatus.History}`,
           label: `${t("Historique")} (${count?.ticket_sources_history ?? 0})`,
         },
       ]}

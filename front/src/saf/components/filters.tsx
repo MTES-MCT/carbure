@@ -3,7 +3,7 @@ import { MultiSelect, MultiSelectProps } from "common/components/multi-select"; 
 import { Grid } from "common/components/scaffold"
 import { Normalizer } from "common/utils/normalize"
 import { useTranslation } from "react-i18next"
-import { SafFilter, SafFilterSelection } from "../../types"
+import { SafFilter, SafFilterSelection } from "../types"
 
 export interface FiltersProps {
   filters: SafFilter[]
