@@ -31,7 +31,7 @@ import { useSafQuery } from "saf/hooks/saf-query"
 
 export interface TicketSourcesProps {
   year: number
-  snapshot: SafOperatorSnapshot
+  snapshot: SafOperatorSnapshot | undefined
 }
 
 export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
@@ -48,7 +48,7 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
   })
 
   const ticketSoucesData = ticketSourcesResponse.result?.data.data
-  // const ticketSoucesData = data.safTicketSourcesResponse // TO TEST with testing d:ata
+  // const ticketSoucesData = data.safTicketSourcesResponse //TO TEST with testing d:ata
   const total = ticketSoucesData?.total ?? 0
   const count = ticketSoucesData?.returned ?? 0
   const ticketSources = ticketSoucesData?.saf_ticket_sources

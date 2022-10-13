@@ -1,4 +1,5 @@
 import useEntity from "carbure/hooks/entity"
+import cl from "clsx"
 import { Bell, Loader } from "common/components/icons"
 import { Col, Row } from "common/components/scaffold"
 import Tabs from "common/components/tabs"
@@ -6,6 +7,8 @@ import { compact } from "common/utils/collection"
 import { formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { useMatch, useParams } from "react-router-dom"
+import css from "./tabs.module.css"
+
 import {
   SafOperatorSnapshot,
   SafTicketSourceStatus,
@@ -27,27 +30,39 @@ export const OperatorTabs = ({
   return (
     <Tabs
       variant="main"
+      className={css.safTabs}
       tabs={compact([
         {
           key: "ticket-sources",
           path: "ticket-sources",
           label: (
-            <StatusRecap
-              loading={loading}
-              count={count.ticket_sources_volume}
-              label={t("Litres à affecter", {
-                count: count.ticket_sources_volume,
-              })}
-            />
+            <Row>
+              <Col>
+                <p>
+                  {loading ? (
+                    <Loader size={20} />
+                  ) : (
+                    formatNumber(count.ticket_sources_volume)
+                  )}
+                </p>
+                <strong>
+                  {t("Litres à affecter", {
+                    count: count.ticket_sources_volume,
+                  })}
+                </strong>
+              </Col>
+            </Row>
           ),
         },
         {
           key: "tickets",
           path: "tickets",
           label: (
-            <StatusRecap
+            <TicketRecap
               loading={loading}
               count={count.tickets}
+              pending={count.tickets_pending}
+              rejected={count.tickets_rejected}
               label={t("Tickets envoyés", { count: count.tickets })}
             />
           ),
@@ -67,24 +82,27 @@ const defaultCount: SafOperatorSnapshot = {
   tickets_accepted: 0,
 }
 
-interface StatusRecapProps {
+interface TicketRecapProps {
   loading: boolean
   count: number
+  pending: number
+  rejected: number
   label: string
-  hasAlert?: boolean
 }
 
-const StatusRecap = ({
+const TicketRecap = ({
   loading,
   count = 0,
-  hasAlert = false,
+  pending = 0,
+  rejected = 0,
   label,
-}: StatusRecapProps) => {
+}: TicketRecapProps) => {
   const { t } = useTranslation()
+  const hasAlert = pending > 0 || rejected > 0
 
   return (
     <>
-      <Row>
+      <Row className={cl(hasAlert && css.recto)}>
         <Col>
           <p>{loading ? <Loader size={20} /> : formatNumber(count)}</p>
           <strong>{label}</strong>
@@ -106,6 +124,22 @@ const StatusRecap = ({
           </Col>
         )}
       </Row>
+      {hasAlert && (
+        <Col className={css.verso}>
+          {pending > 0 && (
+            <p>
+              <strong>{formatNumber(pending)}</strong>{" "}
+              {t("tickets en attente", { count: pending })}
+            </p>
+          )}
+          {rejected > 0 && (
+            <p>
+              <strong>{formatNumber(rejected)}</strong>{" "}
+              {t("tickets refusés", { count: rejected })}
+            </p>
+          )}
+        </Col>
+      )}
     </>
   )
 }

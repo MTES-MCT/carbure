@@ -30,8 +30,8 @@ export const Saf = () => {
     params: [entity.id, years.selected],
   })
 
-  // const snapshotData = snapshot.result?.data.data
-  const snapshotData = safOperatorSnapshot // TO TEST with testing data
+  const snapshotData = snapshot.result?.data.data
+  // const snapshotData = safOperatorSnapshot //TO TEST with testing data
 
   return (
     <ImportArea>
