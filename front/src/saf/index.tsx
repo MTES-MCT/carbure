@@ -16,7 +16,6 @@ import * as api from "./api"
 import OperatorTabs from "./components/operator-tabs"
 import TicketSources from "./components/ticket-sources"
 import { safOperatorSnapshot } from "./__test__/data"
-// import { Tickets  } from "./components/tickets"
 
 export const Saf = () => {
   const { t } = useTranslation()
@@ -30,8 +29,8 @@ export const Saf = () => {
     params: [entity.id, years.selected],
   })
 
-  // const snapshotData = snapshot.result?.data.data
-  const snapshotData = safOperatorSnapshot
+  const snapshotData = snapshot.result?.data.data
+  // const snapshotData = safOperatorSnapshot // TO TEST with testing data
 
   return (
     <ImportArea>

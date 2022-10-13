@@ -20,6 +20,7 @@ import { StatusSwitcher } from "./status-switcher"
 import Pagination from "common/components/pagination"
 import * as data from "../../__test__/data"
 import TicketSourcesTable from "./table"
+import { useQuery } from "common/hooks/async"
 
 export interface CertificatesProps {
   year: number
@@ -34,10 +35,16 @@ export const TicketSources = ({ year, snapshot }: CertificatesProps) => {
   const [state, actions] = useQueryParamsStore(entity, year, status, snapshot)
   const query = useTicketSourcesQuery(state)
 
-  const ticketSourcesResponse = data.safTicketSourcesResponse // TODO remplacer par la vrai requete
-  const total = ticketSourcesResponse?.total ?? 0
-  const count = ticketSourcesResponse?.returned ?? 0
-  const ticketSources = ticketSourcesResponse.saf_ticket_sources
+  const ticketSourcesResponse = useQuery(api.getSafTicketsSources, {
+    key: "ticket-sources",
+    params: [query],
+  })
+
+  const ticketSoucesData = ticketSourcesResponse.result?.data.data
+  // const ticketSoucesData = data.safTicketSourcesResponse // TO TEST with testing data
+  const total = ticketSoucesData?.total ?? 0
+  const count = ticketSoucesData?.returned ?? 0
+  const ticketSources = ticketSoucesData?.saf_ticket_sources
 
   const showTicketSourceDetail = (ticketSource: SafTicketSource) => {
     return {
@@ -68,7 +75,7 @@ export const TicketSources = ({ year, snapshot }: CertificatesProps) => {
           />
         </ActionBar>
 
-        {count > 0 && (
+        {count > 0 && ticketSources && (
           <>
             <TicketSourcesTable
               loading={false}

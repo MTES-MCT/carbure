@@ -1,5 +1,7 @@
-import Table, { Order } from "common/components/table"
+import Table, { Cell, Order } from "common/components/table"
 import { compact } from "common/utils/collection"
+import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
+import { isRedII } from "lot-add/components/ghg-fields"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import { To } from "react-router-dom"
@@ -30,7 +32,13 @@ export const TicketSourcesTable = memo(
         onOrder={onOrder}
         rowLink={rowLink}
         rows={ticketSources}
-        columns={compact([columns.status])}
+        columns={compact([
+          columns.status,
+          columns.availableVolume,
+          columns.period,
+          columns.feedstock,
+          columns.ghgReduction,
+        ])}
       />
     )
   }
@@ -46,7 +54,57 @@ export function useColumns() {
         <TicketSourceTag ticketSource={ticketSource} />
       ),
     },
+
+    availableVolume: {
+      header: t("Volume disponible"),
+      cell: (ticketSource: SafTicketSource) => (
+        <Cell
+          text={`${formatNumber(
+            ticketSource.total_volume - ticketSource.assigned_volume
+          )} L`}
+          sub={`/${formatNumber(ticketSource.total_volume)} L`}
+        />
+      ),
+    },
+
+    period: {
+      key: "period",
+      header: t("Période"),
+      cell: (ticketSource: SafTicketSource) => (
+        <PeriodCell period={ticketSource.period} date={ticketSource.date} />
+      ),
+    },
+
+    feedstock: {
+      key: "feedstock",
+      header: t("Matière première"),
+      cell: (ticketSource: SafTicketSource) => (
+        <Cell
+          text={t(ticketSource.feedstock?.code ?? "", { ns: "feedstocks" })}
+          sub={t(ticketSource.country_of_origin?.code_pays ?? "", {
+            ns: "countries",
+          })}
+        />
+      ),
+    },
+
+    ghgReduction: {
+      small: true,
+      key: "ghg_reduction",
+      header: t("Réd. GES"),
+      cell: (ticketSource: SafTicketSource) => {
+        return <Cell text={`${ticketSource.ghg_reduction.toFixed(2)}%`} />
+      },
+    },
   }
 }
 
 export default TicketSourcesTable
+
+interface PeriodCellProps {
+  period: number
+  date: string
+}
+export const PeriodCell = ({ period, date }: PeriodCellProps) => {
+  return <Cell text={formatPeriod(period)} sub={formatDate(date)} />
+}
