@@ -4,13 +4,13 @@ import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
 import useTitle from "common/hooks/title"
 import { useTranslation } from "react-i18next"
-import { SafFilterSelection, SafOperatorSnapshot, SafStates, SafTicketSourceStatus } from "saf/types"
+import { SafFilterSelection, SafOperatorSnapshot, SafStates, SafTicketSourceStatus, SafTicketStatus } from "saf/types"
 import { useFilterSearchParams } from "./filter-search-params"
 
 export function useQueryParamsStore(
   entity: Entity,
   year: number,
-  status: SafTicketSourceStatus,
+  status: SafTicketSourceStatus | SafTicketStatus,
   snapshot?: SafOperatorSnapshot | undefined
 ) {
 
@@ -60,14 +60,17 @@ export function useQueryParamsStore(
         page: 0,
       }),
 
-      setStatus: (status: SafTicketSourceStatus) => ({
-        status,
-        filters: filtersParams,
-        invalid: false,
-        deadline: false,
-        selection: [],
-        page: 0,
-      }),
+      setStatus: (status: SafTicketSourceStatus | SafTicketStatus) => {
+        console.log('set status:', status)
+        return {
+          status,
+          filters: filtersParams,
+          invalid: false,
+          deadline: false,
+          selection: [],
+          page: 0,
+        }
+      },
 
       setFilters: (filters: SafFilterSelection) => {
         setTimeout(() => {
@@ -141,6 +144,9 @@ export function usePageTitle(state: SafStates) {
   const statuses: any = {
     [SafTicketSourceStatus.Available]: t("Disponible"),
     [SafTicketSourceStatus.History]: t("Historique"),
+    [SafTicketStatus.Accepted]: t("Acceptés"),
+    [SafTicketStatus.Pending]: t("En attente"),
+    [SafTicketStatus.Rejected]: t("Refusés")
   }
 
   const entity = state.entity.name

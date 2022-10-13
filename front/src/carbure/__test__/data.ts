@@ -8,6 +8,23 @@ import {
 } from "carbure/types"
 
 // ENTITIES
+export const company: Entity = { //TODO à definir en fonction des types choisis pour les compagnies aeriennes
+  id: 0,
+  name: "Compagnie Test",
+  entity_type: EntityType.Producer,
+  has_mac: true,
+  has_trading: true,
+  has_stocks: false,
+  has_direct_deliveries: false,
+  default_certificate: "",
+  legal_name: "",
+  registered_address: "",
+  registration_id: "",
+  sustainability_officer: "",
+  sustainability_officer_phone_number: "",
+  preferred_unit: "l",
+}
+
 
 export const producer: Entity = {
   id: 0,

@@ -5,8 +5,12 @@ import Tabs from "common/components/tabs"
 import { compact } from "common/utils/collection"
 import { formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import { useMatch } from "react-router-dom"
-import { SafOperatorSnapshot, SafTicketSourceStatus } from "saf/types"
+import { useMatch, useParams } from "react-router-dom"
+import {
+  SafOperatorSnapshot,
+  SafTicketSourceStatus,
+  SafTicketStatus,
+} from "saf/types"
 
 export interface StatusTabsProps {
   loading: boolean
@@ -107,9 +111,18 @@ const StatusRecap = ({
 }
 
 export function useAutoStatus() {
-  const match = useMatch("/org/:entity/saf/:year/ticket-sources/:status") // prettier-ignore
-  const status = match?.params.status as SafTicketSourceStatus
-  return status ?? SafTicketSourceStatus.Available
+  const matchView = useMatch("/org/:entity/saf/:year/:view/*")
+  const matchStatus = useMatch("/org/:entity/saf/:year/:view/:status")
+
+  if (matchView?.params.view === "ticket-sources") {
+    const status = matchStatus?.params.status as SafTicketSourceStatus
+    return status ?? SafTicketSourceStatus.Available
+  } else if (matchView?.params.view === "tickets") {
+    const status = matchStatus?.params.status as SafTicketStatus
+    return status ?? SafTicketStatus.Pending
+  } else {
+    return SafTicketSourceStatus.Available
+  }
 }
 
 export default OperatorTabs

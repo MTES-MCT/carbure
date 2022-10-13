@@ -71,7 +71,10 @@ export function useColumns() {
       key: "period",
       header: t("Période"),
       cell: (ticketSource: SafTicketSource) => (
-        <PeriodCell period={ticketSource.period} date={ticketSource.date} />
+        <Cell
+          text={formatPeriod(ticketSource.period)}
+          sub={formatDate(ticketSource.date)}
+        />
       ),
     },
 
@@ -100,11 +103,3 @@ export function useColumns() {
 }
 
 export default TicketSourcesTable
-
-interface PeriodCellProps {
-  period: number
-  date: string
-}
-export const PeriodCell = ({ period, date }: PeriodCellProps) => {
-  return <Cell text={formatPeriod(period)} sub={formatDate(date)} />
-}

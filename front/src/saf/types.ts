@@ -28,7 +28,7 @@ export interface SafTicketSource {
   feedstock: Feedstock
   biofuel: Biofuel
   country_of_origin: Country
-  ghg_reduction: number
+  ghg_reduction: number // attention pour les lots c'etait ghg_reduction_red_ii
 }
 
 export interface SafTicketSourceDetails extends SafTicketSource, SafProduction, SafDurability {
@@ -52,6 +52,7 @@ export interface SafTicket {
   period: number
   date: string
   supplier: Entity
+  client_name: string
   volume: number
   feedstock: Feedstock
   biofuel: Biofuel
@@ -61,7 +62,6 @@ export interface SafTicket {
 
 export interface SafTicketDetails extends SafTicket, SafProduction, SafDurability {
   parent_ticket_source?: SafTicketSource
-  client: Entity
   agreement_reference: string
   agreement_date: string
 }
@@ -118,7 +118,7 @@ export interface SafTicketSourcesResponse {
 }
 
 export interface SafTicketsResponse {
-  saf_ticket_list: SafTicket[]
+  saf_tickets: SafTicket[]
   from: number
   returned: number
   total: number
