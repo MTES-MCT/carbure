@@ -6,7 +6,11 @@ import { TestRoot } from "setupTests"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { operator } from "carbure/__test__/data"
-import { getField, waitWhileLoading } from "carbure/__test__/helpers"
+import {
+  findByTextInNode,
+  getField,
+  waitWhileLoading,
+} from "carbure/__test__/helpers"
 import { Saf } from "../index"
 import server from "./api"
 
@@ -29,8 +33,8 @@ test("display the status tabs", async () => {
 
   await waitWhileLoading()
 
-  screen.getByText("15 000")
-  screen.getByText("Litres à affecter")
+  screen.getByText("11")
+  screen.getByText("Volumes disponibles")
   screen.getByText("Tickets envoyés")
 })
 
@@ -40,12 +44,16 @@ test("display ticket sources tab", async () => {
   await waitWhileLoading()
 
   //Filters
-  screen.getByText("Clients")
+  // const header = document.querySelectorAll("main header")[0]
+  // if (header) within(header).getAllByText("Clients")
+  // let result = screen.getAllByText("Clients").closest("a")
+  // expect(result.length).toEqual(2)
+  await findByTextInNode("Clients", "INPUT")
   screen.getByText("Matières Premières")
   screen.getByText("Périodes")
 
   //Status
-  screen.getByText("Disponible (2)")
+  screen.getByText("Disponible (11)")
   screen.getByText("Historique (3)")
 
   //Tableau
@@ -67,7 +75,7 @@ test("display tickets tab", async () => {
   await waitWhileLoading()
 
   //Filters
-  screen.getByText("Clients")
+  await findByTextInNode("Clients", "INPUT")
   screen.getByText("Matières Premières")
   screen.getByText("Périodes")
 
@@ -96,11 +104,14 @@ test("Select a status", async () => {
 test("Select a filter", async () => {
   render(<SafWithRouter view="ticket-sources" entity={operator} />)
   const user = userEvent.setup()
-  const filter = await screen.findByText("Clients")
-  await user.click(filter)
+  let filterButton = await findByTextInNode("Clients", "INPUT")
+  await user.click(filterButton)
+
   const filterValue = await screen.findByText("CORSAIR")
   await user.click(filterValue)
-  const filterValue2 = await screen.findByText("Air France")
+
+  let filterValue2 = await findByTextInNode("Air France", "LABEL")
   await user.click(filterValue2)
+
   getField("CORSAIR, Air France")
 })

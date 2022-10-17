@@ -42,12 +42,12 @@ export const OperatorTabs = ({
                   {loading ? (
                     <Loader size={20} />
                   ) : (
-                    formatNumber(count.ticket_sources_volume)
+                    formatNumber(count.ticket_sources_available)
                   )}
                 </p>
                 <strong>
-                  {t("Litres à affecter", {
-                    count: count.ticket_sources_volume,
+                  {t("Volumes disponibles", {
+                    count: count.ticket_sources_available,
                   })}
                 </strong>
               </Col>
@@ -73,7 +73,6 @@ export const OperatorTabs = ({
 }
 
 const defaultCount: SafOperatorSnapshot = {
-  ticket_sources_volume: 0,
   ticket_sources_available: 0,
   ticket_sources_history: 0,
   tickets: 0,

@@ -4,10 +4,9 @@ import { SafTicketSource, SafTicketSourceStatus, SafOperatorSnapshot, SafTicketS
 
 
 export const safOperatorSnapshot: SafOperatorSnapshot = {
-  ticket_sources_volume: 15000,
-  ticket_sources_available: 2,
+  ticket_sources_available: 11,
   ticket_sources_history: 3,
-  tickets: 1,
+  tickets: 4,
   tickets_pending: 2,
   tickets_rejected: 1,
   tickets_accepted: 1,
@@ -43,6 +42,7 @@ export const safTicketSource: SafTicketSource = {
   period: 202201,
   date: '2022-02-08',
   total_volume: 10000,
+  clients_names: [],
   assigned_volume: 0,
   feedstock: feedstock1,
   biofuel: bioduel1,
@@ -56,6 +56,7 @@ export const safTicketSource2: SafTicketSource = {
   year: 2022,
   period: 202202,
   date: '2022-01-10',
+  clients_names: ["Air France"],
   total_volume: 5000,
   assigned_volume: 2000,
   feedstock: feedstock1,
