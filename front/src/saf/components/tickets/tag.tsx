@@ -10,8 +10,8 @@ export interface TicketTagProps extends TagProps {
 export const TicketTag = ({ ticket, status, ...props }: TicketTagProps) => {
   const { t } = useTranslation()
 
-  let label = t("N/A")
-  let variant: TagVariant | undefined = undefined
+  let label
+  let variant: TagVariant
 
   if (status === SafTicketStatus.Accepted) {
     label = t("Accepté")
