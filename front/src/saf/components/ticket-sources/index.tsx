@@ -28,6 +28,8 @@ import { ResetButton } from "transactions/components/filters"
 import { useTranslation } from "react-i18next"
 import { SearchInput } from "common/components/input"
 import { useSafQuery } from "saf/hooks/saf-query"
+import HashRoute from "common/components/hash-route"
+import TicketSourceDetail from "../ticket-source-details"
 
 export interface TicketSourcesProps {
   year: number
@@ -42,7 +44,7 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
   const [state, actions] = useQueryParamsStore(entity, year, status, snapshot)
   const query = useSafQuery(state)
 
-  const ticketSourcesResponse = useQuery(api.getSafTicketsSources, {
+  const ticketSourcesResponse = useQuery(api.getSafTicketSources, {
     key: "ticket-sources",
     params: [query],
   })
@@ -118,6 +120,7 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
           />
         )}
       </section>
+      <HashRoute path="ticket-source/:id" element={<TicketSourceDetail />} />
     </>
   )
 }
