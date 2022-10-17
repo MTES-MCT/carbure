@@ -29,10 +29,10 @@ export function getSafTickets(query: SafQuery) {
 export function getTicketSourceFilters(field: SafFilter, query: SafQuery) {
   const params = { field, ...query, ...QUERY_RESET }
 
-  //TO TEST without data
-  // return new Promise<any[]>((resolve) => {
-  //   resolve(data.safClientFilterOptions)
-  // })
+  // TO TEST without data
+  return new Promise<any[]>((resolve) => {
+    resolve(data.safClientFilterOptions)
+  })
 
   return api
     .get<Api<string[]>>("/saf/tickets-sources/filters", { params })

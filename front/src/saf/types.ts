@@ -8,7 +8,6 @@ import {
 import { Order } from "common/components/table"
 
 export interface SafOperatorSnapshot {
-  ticket_sources_volume: number
   ticket_sources_available: number
   ticket_sources_history: number
   tickets: number
@@ -25,6 +24,7 @@ export interface SafTicketSource {
   date: string
   total_volume: number
   assigned_volume: number
+  clients_names: string[]
   feedstock: Feedstock
   biofuel: Biofuel
   country_of_origin: Country
