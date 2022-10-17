@@ -17,11 +17,12 @@ class Entity(models.Model):
     ADMIN = 'Administration'
     AUDITOR = 'Auditor'
     EXTERNAL_ADMIN = 'Administration Externe'
+    AIRLINE = 'Compagnie aérienne'
     UNKNOWN = 'Unknown'
     ENTITY_TYPES = ((PRODUCER, 'Producteur'), (OPERATOR, 'Opérateur'),
                     (ADMIN, 'Administration'), (TRADER, 'Trader'),
                     (AUDITOR, 'Auditeur'), (EXTERNAL_ADMIN, EXTERNAL_ADMIN),
-                    (UNKNOWN, 'Unknown'))
+                    (AIRLINE, AIRLINE), (UNKNOWN, 'Unknown'))
 
     name = models.CharField(max_length=64, unique=True)
     date_added = models.DateTimeField(auto_now_add=True)
