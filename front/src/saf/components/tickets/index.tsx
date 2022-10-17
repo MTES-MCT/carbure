@@ -47,8 +47,8 @@ export const Tickets = ({ year, snapshot }: TicketsProps) => {
     params: [query],
   })
 
-  const ticketsData = ticketsResponse.result?.data.data
-  // const ticketsData = data.safTicketsResponse //TO TEST with testing d:ata
+  // const ticketsData = ticketsResponse.result?.data.data
+  const ticketsData = data.safTicketsResponse //TO TEST with testing d:ata
   const total = ticketsData?.total ?? 0
   const count = ticketsData?.returned ?? 0
   const tickets = ticketsData?.saf_tickets
