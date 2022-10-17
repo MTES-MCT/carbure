@@ -1,6 +1,6 @@
 import { Biofuel, Country, Feedstock } from "carbure/types";
-import { company, producer } from "carbure/__test__/data";
-import { SafTicketSource, SafTicketSourceStatus, SafOperatorSnapshot, SafTicketSourcesResponse, SafTicketsResponse, SafTicket } from "saf/types";
+import { company, operator, producer, productionSite } from "carbure/__test__/data";
+import { SafTicketSource, SafTicketSourceStatus, SafOperatorSnapshot, SafTicketSourcesResponse, SafTicketsResponse, SafTicket, SafTicketSourceDetails, LotPreview } from "saf/types";
 
 
 export const safOperatorSnapshot: SafOperatorSnapshot = {
@@ -48,6 +48,50 @@ export const safTicketSource: SafTicketSource = {
   biofuel: bioduel1,
   country_of_origin: country1,
   ghg_reduction: 54,
+}
+
+export const lotPreview: LotPreview = {
+  id: 12345678,
+  carbure_id: "12345678",
+  volume: 1000,
+  delivery_date: "2022-02-08"
+}
+
+export const safTicketSourceDetails: SafTicketSourceDetails = {
+  id: 12343,
+  carbure_id: "A12332",
+  year: 2022,
+  period: 202201,
+  date: '2022-02-08',
+  total_volume: 10000,
+  clients_names: [],
+  assigned_volume: 0,
+  feedstock: feedstock1,
+  biofuel: bioduel1,
+  country_of_origin: country1,
+  ghg_reduction: 54,
+  parent_lot: lotPreview,
+  created_at: '2022-02-12',
+  added_by: operator,
+
+
+  carbure_producer: producer,
+  unknown_producer: '',
+  carbure_production_site: productionSite,
+  unknown_production_site: '',
+  production_site_commissioning_date: "2000-01-31",
+
+  eec: 14.5,
+  el: 0,
+  ep: 7,
+  etd: 2,
+  eu: 0,
+  esca: 0,
+  eccs: 0,
+  eccr: 0,
+  eee: 0,
+  ghg_total: 23.5,
+  ghg_reference: 83.8,
 }
 
 export const safTicketSource2: SafTicketSource = {
