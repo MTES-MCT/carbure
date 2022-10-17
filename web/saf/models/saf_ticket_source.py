@@ -2,6 +2,12 @@ from django.db import models
 
 
 class SafTicketSource(models.Model):
+    class Meta:
+        db_table = "saf_ticket_source"
+        verbose_name = "Source ticket SAF"
+        verbose_name_plural = "Sources ticket SAF"
+        ordering = ["carbure_id"]
+
     carbure_id = models.CharField(max_length=64, unique=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     added_by = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.SET_NULL, related_name="saf_source_owner")  # fmt: skip
@@ -38,9 +44,3 @@ class SafTicketSource(models.Model):
     ghg_reduction = models.FloatField(default=0.0)
 
     parent_lot = models.ForeignKey("core.CarbureLot", null=True, blank=True, on_delete=models.CASCADE)
-
-    class Meta:
-        db_table = "saf_ticket_source"
-        verbose_name = "Source ticket SAF"
-        verbose_name_plural = "Sources ticket SAF"
-        ordering = ["carbure_id"]

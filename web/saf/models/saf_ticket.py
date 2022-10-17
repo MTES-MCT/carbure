@@ -2,6 +2,19 @@ from django.db import models
 
 
 class SafTicket(models.Model):
+    class Meta:
+        db_table = "saf_ticket"
+        verbose_name = "Ticket SAF"
+        verbose_name_plural = "Tickets SAF"
+        ordering = ["carbure_id"]
+
+    PENDING = "PENDING"
+    ACCEPTED = "ACCEPTED"
+    REJECTED = "REJECTED"
+
+    ticket_statuses = [(PENDING, "En attente"), (ACCEPTED, "Accepté"), (REJECTED, "Refusé")]
+    status = models.CharField(max_length=24, choices=ticket_statuses, default=PENDING)
+
     carbure_id = models.CharField(max_length=64, unique=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     added_by = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.SET_NULL, related_name="saf_owner")  # fmt: skip
@@ -41,9 +54,3 @@ class SafTicket(models.Model):
     ghg_reduction = models.FloatField(default=0.0)
 
     parent_ticket_source = models.ForeignKey("saf.SafTicketSource", null=True, on_delete=models.SET_NULL, related_name="saf_ticket")  # fmt: skip
-
-    class Meta:
-        db_table = "saf_ticket"
-        verbose_name = "Ticket SAF"
-        verbose_name_plural = "Tickets SAF"
-        ordering = ["carbure_id"]
