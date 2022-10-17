@@ -18,7 +18,7 @@ WORKDIR /app
 COPY Pipfile ./
 COPY Pipfile.lock ./
 RUN pip3 install pipenv
-RUN pipenv install --system --deploy
+RUN pipenv install --dev --system --deploy
 
 COPY web web
 COPY scripts scripts
