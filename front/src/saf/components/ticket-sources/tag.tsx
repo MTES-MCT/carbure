@@ -12,10 +12,10 @@ export const TicketSourceTag = ({
 }: TicketSourceTagProps) => {
   const { t } = useTranslation()
 
-  let label = t("N/A")
-  let variant: TagVariant | undefined = undefined
   const available_volume =
     ticketSource.total_volume - ticketSource.assigned_volume
+  let label
+  let variant: TagVariant
 
   if (available_volume > 0) {
     label = t("Disponible")
