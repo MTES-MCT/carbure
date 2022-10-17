@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import SafTicketSource
+from .models import SafTicketSource, SafTicket
 
 
 @admin.register(SafTicketSource)
@@ -20,4 +20,26 @@ class SafTicketSourceAdmin(admin.ModelAdmin):
         "period",
         "feedstock",
         "biofuel",
+    )
+
+
+@admin.register(SafTicket)
+class SafTicketAdmin(admin.ModelAdmin):
+    list_display = (
+        "carbure_id",
+        "created_at",
+        "added_by",
+        "period",
+        "volume",
+        "feedstock",
+        "biofuel",
+        "country_of_origin",
+        "client",
+    )
+    list_filter = (
+        "added_by",
+        "period",
+        "feedstock",
+        "biofuel",
+        "client",
     )
