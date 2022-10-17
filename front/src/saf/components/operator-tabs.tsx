@@ -150,12 +150,14 @@ export function useAutoStatus() {
   if (matchView?.params.view === "ticket-sources") {
     const status = matchStatus?.params.status as SafTicketSourceStatus
     return status ?? SafTicketSourceStatus.Available
-  } else if (matchView?.params.view === "tickets") {
+  }
+
+  if (matchView?.params.view === "tickets") {
     const status = matchStatus?.params.status as SafTicketStatus
     return status ?? SafTicketStatus.Pending
-  } else {
-    return SafTicketSourceStatus.Available
   }
+
+  return SafTicketSourceStatus.Available
 }
 
 export default OperatorTabs
