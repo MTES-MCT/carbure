@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import { SafTicketSource } from "saf/types"
 
 export interface TicketSourceTagProps extends TagProps {
-  ticketSource: SafTicketSource
+  ticketSource: SafTicketSource | undefined
 }
 
 export const TicketSourceTag = ({
@@ -11,6 +11,8 @@ export const TicketSourceTag = ({
   ...props
 }: TicketSourceTagProps) => {
   const { t } = useTranslation()
+
+  if (!ticketSource) return null
 
   const available_volume =
     ticketSource.total_volume - ticketSource.assigned_volume

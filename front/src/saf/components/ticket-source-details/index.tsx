@@ -17,10 +17,11 @@ import * as api from "../../api"
 import TicketSourceTag from "../ticket-sources/tag"
 import TicketSourceFields from "./fields"
 import Collapse from "common/components/collapse"
-import { LotPreview, SafTicketPreview } from "saf/types"
+import { LotPreview, SafTicketPreview, SafTicketSource } from "saf/types"
 import { useEffect, useRef } from "react"
 import NavigationButtons from "transaction-details/components/lots/navigation"
 import TicketTag from "../tickets/tag"
+import { cp } from "fs/promises"
 
 export interface TicketSourceDetailsProps {
   neighbors: number[]
@@ -35,15 +36,18 @@ export const TicketSourceDetails = ({
   const location = useLocation()
 
   const entity = useEntity()
-  const match = useHashMatch("lot/:id")
+  const match = useHashMatch("ticket-source/:id")
 
   const ticketSourceResponse = useQuery(api.getSafTicketSourceDetails, {
     key: "ticket-source-details",
     params: [entity.id, parseInt(match?.params.id!)],
   })
-  // const ticketSource = ticketSourceResponse.result?.data.data
+
+  // const ticketSource = ticketSourceResponse.result?.data?.data
   const ticketSource = safTicketSourceDetails //TO TEST
-  const hasAssignements = ticketSource?.assigned_tickets?.length > 0
+  const hasAssignements = ticketSource
+    ? ticketSource?.assigned_tickets?.length > 0
+    : false
 
   useEffect(() => {
     if (hasAssignements && assignementsRef?.current)
@@ -66,7 +70,8 @@ export const TicketSourceDetails = ({
         <header>
           <TicketSourceTag ticketSource={ticketSource} />
           <h1>
-            {t("Volume SAF n°")} {ticketSource?.carbure_id}
+            {t("Volume SAF n°")}
+            {ticketSource?.carbure_id ?? "..."}
           </h1>
         </header>
 
@@ -75,15 +80,13 @@ export const TicketSourceDetails = ({
             <TicketSourceFields ticketSource={ticketSource} />
           </section>
           {hasAssignements && (
-            <section>
-              <AssignedTickets tickets={ticketSource.assigned_tickets} />
+            <section ref={assignementsRef}>
+              <AssignedTickets ticketSource={ticketSource} />
             </section>
           )}
           <section>
-            <LotOrigin parent_lot={ticketSource.parent_lot} />
+            <LotOrigin parent_lot={ticketSource?.parent_lot} />
           </section>
-
-          <section ref={assignementsRef}></section>
         </main>
 
         <footer>
@@ -106,25 +109,35 @@ export const TicketSourceDetails = ({
 
 export default TicketSourceDetails
 
-const AssignedTickets = ({ tickets }: { tickets: SafTicketPreview[] }) => {
+const AssignedTickets = ({
+  ticketSource,
+}: {
+  ticketSource: SafTicketSource | undefined
+}) => {
   const { t } = useTranslation()
 
   const showTicket = (ticket: SafTicketPreview) => {}
+  if (!ticketSource) return null
 
   return (
     <Collapse
       isOpen={true}
       variant="info"
-      icon={Split}
-      label={"Tickets affectés"}
+      icon={Send}
+      label={
+        t("Tickets affectés") +
+        ` (${formatNumber(ticketSource.assigned_volume)}L/${formatNumber(
+          ticketSource.total_volume
+        )})`
+      }
     >
       <section>
         <ul>
-          {tickets.map((ticket) => {
+          {ticketSource.assigned_tickets.map((ticket) => {
             return (
-              <li>
+              <li key={ticket.id}>
                 <Button variant="link" action={() => showTicket(ticket)}>
-                  {ticket.client_name} - {formatNumber(ticket.volume)}L -{" "}
+                  {ticket.client_name} - {formatNumber(ticket.volume)} L -{" "}
                   {t("Affecté le")} {formatDate(ticket.date)}{" "}
                 </Button>{" "}
                 <TicketTag status={ticket.status} small />
@@ -140,7 +153,7 @@ const AssignedTickets = ({ tickets }: { tickets: SafTicketPreview[] }) => {
 
 const LotOrigin = ({ parent_lot }: { parent_lot?: LotPreview }) => {
   const { t } = useTranslation()
-
+  if (!parent_lot) return null
   return (
     <Collapse isOpen={true} variant="info" icon={Split} label={"Lot Initial"}>
       <section>
