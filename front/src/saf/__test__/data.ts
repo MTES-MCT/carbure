@@ -95,7 +95,7 @@ export const safTicketSourceDetails: SafTicketSourceDetails = {
 
 export const safTicketSource2: SafTicketSource = {
   id: 22343,
-  carbure_id: "A22332",
+  carbure_id: "B21234",
   year: 2022,
   period: 202202,
   date: '2022-01-10',
@@ -113,12 +113,12 @@ export const safTicketSourcesResponse: SafTicketSourcesResponse = {
   from: 1,
   returned: 1,
   total: 11,
-  ids: [12343, 12343]
+  ids: [22343, 12343]
 }
 
 
 export const safTicket: SafTicket = {
-  id: 22343,
+  id: 12343,
   carbure_id: "A22332",
   year: 2022,
   period: 202202,
