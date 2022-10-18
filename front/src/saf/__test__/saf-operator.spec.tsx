@@ -35,7 +35,7 @@ test("display the status tabs", async () => {
 
   screen.getByText("11")
   screen.getByText("Volumes disponibles")
-  screen.getByText("Tickets envoyés")
+  screen.getByText("Tickets affectés")
 })
 
 test("display ticket sources tab", async () => {
@@ -113,5 +113,5 @@ test("Select a filter", async () => {
   let filterValue2 = await findByTextInNode("Air France", "LABEL")
   await user.click(filterValue2)
 
-  getField("CORSAIR, Air France")
+  await getField("CORSAIR, Air France")
 })

@@ -82,7 +82,7 @@ export const safTicketSourceDetails: SafTicketSourceDetails = {
   period: 202201,
   date: '2022-02-08',
   total_volume: 5000,
-  assigned_volume: 0,
+  assigned_volume: 3000,
   feedstock: feedstock1,
   biofuel: bioduel1,
   country_of_origin: country1,
