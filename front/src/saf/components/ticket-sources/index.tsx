@@ -51,6 +51,8 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
 
   // const ticketSoucesData = ticketSourcesResponse.result?.data.data
   const ticketSoucesData = data.safTicketSourcesResponse //TO TEST with testing d:ata
+  const ids = ticketSoucesData?.ids ?? []
+
   const total = ticketSoucesData?.total ?? 0
   const count = ticketSoucesData?.returned ?? 0
   const ticketSources = ticketSoucesData?.saf_ticket_sources
@@ -120,7 +122,10 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
           />
         )}
       </section>
-      <HashRoute path="ticket-source/:id" element={<TicketSourceDetail />} />
+      <HashRoute
+        path="ticket-source/:id"
+        element={<TicketSourceDetail neighbors={ids} />}
+      />
     </>
   )
 }

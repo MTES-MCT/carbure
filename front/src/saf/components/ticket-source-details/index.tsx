@@ -3,7 +3,7 @@ import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import { Fieldset } from "common/components/form"
 import { useHashMatch } from "common/components/hash-route"
-import { Return, Split } from "common/components/icons"
+import { Return, Send, Split } from "common/components/icons"
 import { TextInput } from "common/components/input"
 import Portal from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
@@ -19,8 +19,15 @@ import TicketSourceFields from "./fields"
 import Collapse from "common/components/collapse"
 import { LotPreview } from "saf/types"
 import { useEffect, useRef } from "react"
+import NavigationButtons from "transaction-details/components/lots/navigation"
 
-export const TicketSourceDetails = () => {
+export interface TicketSourceDetailsProps {
+  neighbors: number[]
+}
+export const TicketSourceDetails = ({
+  neighbors,
+}: TicketSourceDetailsProps) => {
+  console.log("neighbors:", neighbors)
   const { t } = useTranslation()
   const assignementsRef = useRef<HTMLElement>(null)
 
@@ -50,6 +57,8 @@ export const TicketSourceDetails = () => {
     navigate({ search: location.search, hash: "#" })
   }
 
+  const showAssignement = () => {}
+
   return (
     <Portal onClose={closeDialog}>
       <Dialog onClose={closeDialog}>
@@ -71,6 +80,14 @@ export const TicketSourceDetails = () => {
         </main>
 
         <footer>
+          <Button
+            icon={Send}
+            label={t("Affecter")}
+            variant="primary"
+            action={showAssignement}
+          />
+          <NavigationButtons neighbors={neighbors} />
+
           <Button icon={Return} label={t("Retour")} action={closeDialog} />
         </footer>
 
