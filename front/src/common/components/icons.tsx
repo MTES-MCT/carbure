@@ -336,6 +336,14 @@ export const Split = ({ className, ...props }: IconProps) => (
   </Icon>
 )
 
+export const Send = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("send", className)}>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <line x1="10" y1="14" x2="21" y2="3" />
+    <path d="M21 3l-6.5 18a0.55 .55 0 0 1 -1 0l-3.5 -7l-7 -3.5a0.55 .55 0 0 1 0 -1l18 -6.5" />
+  </Icon>
+)
+
 export const Drop = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("drop", className)}>
     <path d="M6.8 11a6 6 0 1 0 10.396 0l-5.197 -8l-5.2 8z" />
