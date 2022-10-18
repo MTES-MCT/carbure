@@ -1,4 +1,4 @@
-import { DoubleCountingUploadError, DoubleCountingUploadErrorType } from "doublecount/types"
+import { DoubleCountingUploadError, DoubleCountingUploadErrorType } from "double-counting/types"
 import { t } from "i18next"
 
 export function getErrorText(error: DoubleCountingUploadError) {
