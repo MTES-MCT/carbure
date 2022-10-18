@@ -74,7 +74,6 @@ export const safTicketSourceDetails: SafTicketSourceDetails = {
   created_at: '2022-02-12',
   added_by: operator,
 
-
   carbure_producer: producer,
   unknown_producer: '',
   carbure_production_site: productionSite,
@@ -91,7 +90,7 @@ export const safTicketSourceDetails: SafTicketSourceDetails = {
   eccr: 0,
   eee: 0,
   ghg_total: 23.5,
-  ghg_reference: 83.8,
+
 }
 
 export const safTicketSource2: SafTicketSource = {

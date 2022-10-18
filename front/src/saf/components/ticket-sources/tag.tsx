@@ -22,7 +22,7 @@ export const TicketSourceTag = ({
     variant = "success"
   } else {
     label = t("Affecté")
-    variant = "info"
+    variant = "none"
   }
 
   return (

@@ -10,7 +10,7 @@ import Button from "./button"
 import { Cross } from "./icons"
 import css from "./tag.module.css"
 
-export type TagVariant = "info" | "success" | "warning" | "danger"
+export type TagVariant = "info" | "success" | "warning" | "danger" | "none"
 
 export interface TagProps {
   big?: boolean

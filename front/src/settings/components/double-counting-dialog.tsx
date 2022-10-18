@@ -9,14 +9,14 @@ import Tabs from "common/components/tabs"
 import { useMutation, useQuery } from "common/hooks/async"
 import { compact } from "common/utils/collection"
 import { formatDate, formatNumber } from "common/utils/formatters"
-import DoubleCountingStatus from "doublecount/components/dc-status"
-import { SourcingAggregationTable } from "doublecount/components/dc-tables"
-import YearTable from "doublecount/components/year-table"
+import DoubleCountingStatus from "double-counting/components/dc-status"
+import { SourcingAggregationTable } from "double-counting/components/dc-tables"
+import YearTable from "double-counting/components/year-table"
 import {
   DoubleCountingProduction,
   DoubleCountingSourcing,
   DoubleCountingStatus as DCStatus,
-} from "doublecount/types"
+} from "double-counting/types"
 import { Fragment, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api/double-counting"
