@@ -93,7 +93,7 @@ const DoubleCountingUploadDialog = ({
         })
         onClose()
       }
-    } catch (error) {}
+    } catch (error) { }
   }
 
   return (
