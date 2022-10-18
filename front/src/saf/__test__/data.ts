@@ -1,6 +1,6 @@
 import { Biofuel, Country, Feedstock } from "carbure/types";
 import { company, operator, producer, productionSite } from "carbure/__test__/data";
-import { SafTicketSource, SafTicketSourceStatus, SafOperatorSnapshot, SafTicketSourcesResponse, SafTicketsResponse, SafTicket, SafTicketSourceDetails, LotPreview } from "saf/types";
+import { SafTicketSource, SafTicketSourceStatus, SafOperatorSnapshot, SafTicketSourcesResponse, SafTicketsResponse, SafTicket, SafTicketSourceDetails, LotPreview, SafTicketPreview, SafTicketStatus } from "saf/types";
 
 
 export const safOperatorSnapshot: SafOperatorSnapshot = {
@@ -42,8 +42,8 @@ export const safTicketSource: SafTicketSource = {
   period: 202201,
   date: '2022-02-08',
   total_volume: 10000,
-  clients_names: [],
   assigned_volume: 0,
+  assigned_tickets: [],
   feedstock: feedstock1,
   biofuel: bioduel1,
   country_of_origin: country1,
@@ -57,14 +57,31 @@ export const lotPreview: LotPreview = {
   delivery_date: "2022-02-08"
 }
 
+export const safTicketPreview1: SafTicketPreview = {
+  id: 92343,
+  carbure_id: "X12332",
+  client_name: "Air France",
+  volume: 1000,
+  date: '2022-01-10',
+  status: SafTicketStatus.Rejected
+}
+
+export const safTicketPreview2: SafTicketPreview = {
+  id: 92344,
+  carbure_id: "X12333",
+  client_name: "CORSAIR",
+  volume: 2000,
+  date: '2022-02-10',
+  status: SafTicketStatus.Pending
+}
+
 export const safTicketSourceDetails: SafTicketSourceDetails = {
   id: 12343,
   carbure_id: "A12332",
   year: 2022,
   period: 202201,
   date: '2022-02-08',
-  total_volume: 10000,
-  clients_names: [],
+  total_volume: 5000,
   assigned_volume: 0,
   feedstock: feedstock1,
   biofuel: bioduel1,
@@ -73,7 +90,7 @@ export const safTicketSourceDetails: SafTicketSourceDetails = {
   parent_lot: lotPreview,
   created_at: '2022-02-12',
   added_by: operator,
-
+  assigned_tickets: [safTicketPreview1, safTicketPreview2], //[],//
   carbure_producer: producer,
   unknown_producer: '',
   carbure_production_site: productionSite,
@@ -99,7 +116,7 @@ export const safTicketSource2: SafTicketSource = {
   year: 2022,
   period: 202202,
   date: '2022-01-10',
-  clients_names: ["Air France"],
+  assigned_tickets: [safTicketPreview1, safTicketPreview2],
   total_volume: 5000,
   assigned_volume: 2000,
   feedstock: feedstock1,

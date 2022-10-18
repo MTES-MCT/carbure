@@ -35,7 +35,7 @@ export const TicketSourcesTable = memo(
         columns={compact([
           columns.status,
           columns.availableVolume,
-          columns.clients_names,
+          columns.clients,
           columns.period,
           columns.feedstock,
           columns.ghgReduction,
@@ -67,13 +67,13 @@ export function useColumns() {
       ),
     },
 
-    clients_names: {
-      key: "clients_names",
+    clients: {
+      key: "clients",
       header: t("Clients"),
       cell: (ticketSource: SafTicketSource) => {
         const value =
-          ticketSource.clients_names.length > 0
-            ? ticketSource.clients_names.join(", ")
+          ticketSource.assigned_tickets.length > 0
+            ? ticketSource.assigned_tickets.map((t) => t.client_name).join(", ")
             : "-"
         return <Cell text={value} />
       },

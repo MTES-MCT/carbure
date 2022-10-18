@@ -9,7 +9,7 @@ import Portal from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { invalidate } from "common/hooks/invalidate"
-import { formatNumber } from "common/utils/formatters"
+import { formatDate, formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { safTicketSourceDetails } from "saf/__test__/data"
@@ -17,9 +17,10 @@ import * as api from "../../api"
 import TicketSourceTag from "../ticket-sources/tag"
 import TicketSourceFields from "./fields"
 import Collapse from "common/components/collapse"
-import { LotPreview } from "saf/types"
+import { LotPreview, SafTicketPreview } from "saf/types"
 import { useEffect, useRef } from "react"
 import NavigationButtons from "transaction-details/components/lots/navigation"
+import TicketTag from "../tickets/tag"
 
 export interface TicketSourceDetailsProps {
   neighbors: number[]
@@ -27,7 +28,6 @@ export interface TicketSourceDetailsProps {
 export const TicketSourceDetails = ({
   neighbors,
 }: TicketSourceDetailsProps) => {
-  console.log("neighbors:", neighbors)
   const { t } = useTranslation()
   const assignementsRef = useRef<HTMLElement>(null)
 
@@ -41,16 +41,17 @@ export const TicketSourceDetails = ({
     key: "ticket-source-details",
     params: [entity.id, parseInt(match?.params.id!)],
   })
-
-  useEffect(() => {
-    assignementsRef.current?.scrollIntoView({
-      block: "end",
-      behavior: "smooth",
-    })
-  }, [assignementsRef])
-
   // const ticketSource = ticketSourceResponse.result?.data.data
   const ticketSource = safTicketSourceDetails //TO TEST
+  const hasAssignements = ticketSource?.assigned_tickets?.length > 0
+
+  useEffect(() => {
+    if (hasAssignements && assignementsRef?.current)
+      assignementsRef.current.scrollIntoView({
+        block: "end",
+        behavior: "smooth",
+      })
+  }, [assignementsRef, hasAssignements])
 
   const closeDialog = () => {
     invalidate("ticket-sources")
@@ -73,9 +74,15 @@ export const TicketSourceDetails = ({
           <section>
             <TicketSourceFields ticketSource={ticketSource} />
           </section>
+          {hasAssignements && (
+            <section>
+              <AssignedTickets tickets={ticketSource.assigned_tickets} />
+            </section>
+          )}
           <section>
             <LotOrigin parent_lot={ticketSource.parent_lot} />
           </section>
+
           <section ref={assignementsRef}></section>
         </main>
 
@@ -98,6 +105,38 @@ export const TicketSourceDetails = ({
 }
 
 export default TicketSourceDetails
+
+const AssignedTickets = ({ tickets }: { tickets: SafTicketPreview[] }) => {
+  const { t } = useTranslation()
+
+  const showTicket = (ticket: SafTicketPreview) => {}
+
+  return (
+    <Collapse
+      isOpen={true}
+      variant="info"
+      icon={Split}
+      label={"Tickets affectés"}
+    >
+      <section>
+        <ul>
+          {tickets.map((ticket) => {
+            return (
+              <li>
+                <Button variant="link" action={() => showTicket(ticket)}>
+                  {ticket.client_name} - {formatNumber(ticket.volume)}L -{" "}
+                  {t("Affecté le")} {formatDate(ticket.date)}{" "}
+                </Button>{" "}
+                <TicketTag status={ticket.status} small />
+              </li>
+            )
+          })}
+        </ul>
+      </section>
+      <footer></footer>
+    </Collapse>
+  )
+}
 
 const LotOrigin = ({ parent_lot }: { parent_lot?: LotPreview }) => {
   const { t } = useTranslation()
