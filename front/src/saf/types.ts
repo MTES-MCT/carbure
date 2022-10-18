@@ -67,10 +67,10 @@ export interface SafTicketDetails extends SafTicket, SafProduction, SafDurabilit
 }
 
 export interface SafProduction {
-  carbure_producer: Entity
-  unknown_producer: string
-  carbure_production_site: ProductionSite
-  unknown_production_site: string
+  carbure_producer: Entity | null
+  unknown_producer: string | null
+  carbure_production_site: ProductionSite | null
+  unknown_production_site: string | null
   production_site_commissioning_date: string
 }
 
@@ -85,7 +85,7 @@ export interface SafDurability {
   eccr: number
   eee: number
   ghg_total: number
-  ghg_reference: number
+  ghg_reduction: number
 }
 
 export interface SafTicketAssignementQuery {
