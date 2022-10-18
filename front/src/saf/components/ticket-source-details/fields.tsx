@@ -12,14 +12,14 @@ import css from "../../../common/components/form.module.css"
 import * as norm from "carbure/utils/normalizers"
 
 interface TicketSourceFieldsProps {
-  ticketSource: SafTicketSourceDetails
+  ticketSource: SafTicketSourceDetails | undefined
 }
 export const TicketSourceFields = ({
   ticketSource,
 }: TicketSourceFieldsProps) => {
   const { t } = useTranslation()
 
-  const production_site_name = ticketSource.carbure_production_site
+  if (!ticketSource) return null
 
   return (
     <div className={cl(css.form, css.columns)}>
