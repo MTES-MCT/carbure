@@ -19,6 +19,7 @@ from django.core.mail import send_mail, get_connection
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
+from core.utils import bulk_update_or_create
 from core.models import GenericCertificate
 
 
@@ -54,7 +55,7 @@ def download_certificates(url: str, valid: bool = True) -> None:
 
 
 def save_2bs_certificates(valid: bool = True) -> Tuple[int, list]:
-    new = []
+    certificates = []
     if valid:
         filename = "%s/Certificates2BS_%s.csv" % (DESTINATION_FOLDER, today.strftime("%Y-%m-%d"))
     else:
@@ -78,28 +79,24 @@ def save_2bs_certificates(valid: bool = True) -> Tuple[int, list]:
         except:
             valid_until = datetime.date(year=1970, month=1, day=1)
 
-        d = {
-            "certificate_type": GenericCertificate.DBS,
-            "certificate_holder": unicodedata.normalize("NFKD", row["Nom"]),
-            "certificate_issuer": "",
-            "address": unicodedata.normalize("NFKD", "%s - %s" % (row["Coordonnées"], row["Pays"])),
-            "valid_from": valid_from,
-            "valid_until": valid_until,
-            "download_link": "https://www.2bsvs.org/scripts/telecharger_certificat.php?certificat=%s"
-            % (row["Numéro 2BS"]),
-            "scope": "%s" % (row["Type de certification"]),
-            "input": None,
-            "output": None,
-        }
-        try:
-            o, c = GenericCertificate.objects.update_or_create(certificate_id=row["Numéro 2BS"], defaults=d)
-            if c:
-                new.append(o)
-        except Exception as e:
-            print("Could not load certificate")
-            print(row)
-            print(e)
-        print(i, end="\r")
+        certificates.append(
+            {
+                "certificate_id": row["Numéro 2BS"],
+                "certificate_type": GenericCertificate.DBS,
+                "certificate_holder": unicodedata.normalize("NFKD", row["Nom"]),
+                "certificate_issuer": "",
+                "address": unicodedata.normalize("NFKD", "%s - %s" % (row["Coordonnées"], row["Pays"])),
+                "valid_from": valid_from,
+                "valid_until": valid_until,
+                "download_link": "https://www.2bsvs.org/scripts/telecharger_certificat.php?certificat=%s"
+                % (row["Numéro 2BS"]),
+                "scope": "%s" % (row["Type de certification"]),
+                "input": None,
+                "output": None,
+            }
+        )
+    existing, new = bulk_update_or_create(GenericCertificate, "certificate_id", certificates)
+    print("[2BS Certificates] %d updated, %d created" % (len(existing), len(new)))
     csvfile.close()
     return i, new
 
@@ -111,9 +108,9 @@ def send_email_summary(
     new_invalids: list,
     email: bool = False,
 ) -> None:
-    mail_content = "Güten Früden, <br />\n"
-    mail_content += "Le chargement des certificats 2BS s'est bien passé.<br />\n"
-    mail_content += "%d certificats valides et %d certificats invalides ont été chargés<br />\n" % (
+    mail_content = "Güten Früden,<br />\n"
+    mail_content += "La mise à jour des certificats 2BS s'est bien passée.<br />\n"
+    mail_content += "%d certificats valides et %d certificats expirés ont été chargés<br />\n" % (
         nb_valid,
         nb_invalid,
     )

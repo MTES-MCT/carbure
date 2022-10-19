@@ -16,6 +16,7 @@ from django.core.mail import send_mail, get_connection
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
+from core.utils import bulk_update_or_create
 from core.models import GenericCertificate
 
 
@@ -47,7 +48,7 @@ def download_redcert_certificates() -> None:
 
 
 def save_redcert_certificates() -> Tuple[int, list, list]:
-    new = []
+    certificates = []
     invalidated = []
     existing = {c.certificate_id: c for c in GenericCertificate.objects.filter(certificate_type=GenericCertificate.REDCERT)}  # fmt: skip
 
@@ -85,24 +86,23 @@ def save_redcert_certificates() -> Tuple[int, list, list]:
                 print(valid_until, existingcert.valid_until)
                 invalidated.append((cert, existingcert, existingcert.valid_until, valid_until))
 
-        d = {
-            "certificate_type": GenericCertificate.REDCERT,
-            "certificate_holder": cert["Name of the certificate holder"],
-            "certificate_issuer": cert["Certification body"],
-            "address": "%s, %s, %s" % (cert["City"], cert["Post code"], cert["Country"]),
-            "valid_from": valid_from,
-            "valid_until": valid_until,
-            "scope": "%s" % (cert["Type"]),
-            "input": {"Type of biomass": cert["Type of biomass"]},
-            "output": None,
-        }
-        try:
-            o, c = GenericCertificate.objects.update_or_create(certificate_id=cert["Identifier"], defaults=d)
-            # print('Loaded %s' % (cert['Identifier']))
-            if c == True:
-                new.append(o)
-        except Exception as e:
-            print(e)
+        certificates.append(
+            {
+                "certificate_id": cert["Identifier"],
+                "certificate_type": GenericCertificate.REDCERT,
+                "certificate_holder": cert["Name of the certificate holder"],
+                "certificate_issuer": cert["Certification body"],
+                "address": "%s, %s, %s" % (cert["City"], cert["Post code"], cert["Country"]),
+                "valid_from": valid_from,
+                "valid_until": valid_until,
+                "scope": "%s" % (cert["Type"]),
+                "input": {"Type of biomass": cert["Type of biomass"]},
+                "output": None,
+            }
+        )
+
+    existing, new = bulk_update_or_create(GenericCertificate, "certificate_id", certificates)
+    print("[REDcert Certificates] %d updated, %d created" % (len(existing), len(new)))
     return i, new, invalidated
 
 
@@ -112,12 +112,12 @@ def send_email_summary(
     newly_invalidated_certificates: list,
     email: bool,
 ) -> None:
-    mail_content = "Hallo, <br />\n"
-    mail_content += "Das Kärgement für zertificaten REDCert ist gut.<br />\n"
-    mail_content += "%d zertificaten loaded<br />\n" % (nb_certificates)
+    mail_content = "Bonjour, <br />\n"
+    mail_content += "La mise à jour des certificats REDcert s'est bien passée.<br />\n"
+    mail_content += "%d certificats vérifiés<br />\n" % (nb_certificates)
 
     if len(new_certificates):
-        mail_content += "Nouveaux certificats enregistrés:<br />\n"
+        mail_content += "%d nouveaux certificats enregistrés :<br />\n" % len(new_certificates)
         for nc in new_certificates:
             mail_content += "%s - %s" % (nc.certificate_type, nc.certificate_holder)
             mail_content += "<br />"
@@ -126,7 +126,7 @@ def send_email_summary(
     if len(newly_invalidated_certificates):
         for (_, previous, prev_valid_date, new_valid_date) in newly_invalidated_certificates:
             fraud = True
-            mail_content += "**** ACHTUNG certificat invalidé *****<br />"
+            mail_content += "**** Certificat expiré *****<br />"
             mail_content += "%s - %s" % (previous.certificate_id, previous.certificate_holder)
             mail_content += "<br />"
             mail_content += "Date de validité précédente: %s<br />" % (prev_valid_date)
@@ -138,7 +138,7 @@ def send_email_summary(
         connection.open()
         if email and fraud:
             send_mail(
-                "Certificats REDCert - ACHTUNG FRAUDE",
+                "Certificats REDcert",
                 mail_content,
                 settings.DEFAULT_FROM_EMAIL,
                 ["carbure@beta.gouv.fr"],
