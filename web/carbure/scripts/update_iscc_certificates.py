@@ -23,6 +23,7 @@ from django.core.mail import send_mail, get_connection
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
+from core.utils import bulk_update_or_create
 from core.models import GenericCertificate
 
 
@@ -94,11 +95,12 @@ def download_iscc_certificates(test: bool, latest: bool) -> None:
 
 
 def save_iscc_certificates(email: bool) -> Tuple[int, list]:
-    new = []
+    certificates = []
     filename = "%s/Certificates_%s.csv" % (DESTINATION_FOLDER, today.strftime("%Y-%m-%d"))
     df = pd.read_csv(filename, sep=",", quotechar='"', lineterminator="\n")
     df.fillna("", inplace=True)
-    for i, row in df.iterrows():
+
+    for _, row in df.iterrows():
         try:
             if "." in row["valid_from"]:
                 vf = row["valid_from"].split(".")
@@ -129,34 +131,30 @@ def save_iscc_certificates(email: bool) -> Tuple[int, list]:
         else:
             holder = row["certificate_holder"]
 
-        d = {
-            "certificate_type": GenericCertificate.ISCC,
-            "certificate_holder": holder,
-            "certificate_issuer": row["issuing_cb"],
-            "address": row["certificate_holder"],
-            "valid_from": valid_from,
-            "valid_until": valid_until,
-            "scope": "%s" % (row["scope"]),
-            "download_link": row["certificate_report"],
-            "input": {"raw_material": row["raw_material"]},
-            "output": "",
-        }
+        certificates.append(
+            {
+                "certificate_id": row["certificate"],
+                "certificate_type": GenericCertificate.ISCC,
+                "certificate_holder": holder,
+                "certificate_issuer": row["issuing_cb"],
+                "address": row["certificate_holder"],
+                "valid_from": valid_from,
+                "valid_until": valid_until,
+                "scope": "%s" % (row["scope"]),
+                "download_link": row["certificate_report"],
+                "input": {"raw_material": row["raw_material"]},
+                "output": "",
+            }
+        )
 
-        try:
-            print("Saving %s" % (row["certificate"]))
-            o, c = GenericCertificate.objects.update_or_create(certificate_id=row["certificate"], defaults=d)
-            if c:
-                new.append(c)
-        except Exception as e:
-            print("could not create certificate:")
-            print(row)
-            print(e)
-    return cast(int, i), new
+    existing, new = bulk_update_or_create(GenericCertificate, "certificate_id", certificates)
+    print("[ISCC Certificates] %d updated, %d created" % (len(existing), len(new)))
+    return len(certificates), new
 
 
 def send_email_summary(nb: int, new: list, email: bool) -> None:
     mail_content = "Güten Früden, <br />\n"
-    mail_content += "Le chargement des certificats ISCC s'est bien passé.<br />\n"
+    mail_content += "La mise à jour des certificats ISCC s'est bien passée.<br />\n"
     mail_content += "%d certificats ont été chargés<br />\n" % (nb)
 
     if not len(new):

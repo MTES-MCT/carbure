@@ -10,13 +10,16 @@ import pandas as pd
 from typing import TYPE_CHECKING, Dict, List, Optional
 from pandas._typing import Scalar
 
+from web.core.utils import bulk_update_or_create
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 from core.models import GenericCertificate
 
 today = datetime.date.today()
-CSV_FOLDER = os.environ['CARBURE_HOME'] + '/web/fixtures/csv/'
+CSV_FOLDER = os.environ["CARBURE_HOME"] + "/web/fixtures/csv/"
+
 
 def get_sheet_data(sheet, convert_float: bool) -> List[List[Scalar]]:
     data: List[List[Scalar]] = []
@@ -49,14 +52,15 @@ def convert_cell(cell, convert_float: bool) -> Scalar:
 
 
 def load_certificates():
-    filename = '%s/systeme_national.xlsx' % (CSV_FOLDER)
+    certificates = []
+    filename = "%s/systeme_national.xlsx" % (CSV_FOLDER)
     wb = openpyxl.load_workbook(filename, data_only=True)
     sheet = wb.worksheets[0]
     data = get_sheet_data(sheet, convert_float=True)
     column_names = data[0]
     data = data[1:]
     df = pd.DataFrame(data, columns=column_names)
-    df.fillna('', inplace=True)
+    df.fillna("", inplace=True)
     total_certs = len(df)
     # print(total_certs)
     # print(df)
@@ -69,30 +73,34 @@ def load_certificates():
         # Catégorie opérateur                      6
         # Fin de validité        2025-12-31 00:00:00
         # Name: 84, dtype: object
-        valid_until = cert['Fin de validité'].date()
+        valid_until = cert["Fin de validité"].date()
 
-
-        d = {
-            'certificate_type': GenericCertificate.SYSTEME_NATIONAL,
-            'certificate_holder': cert['Nom'],
-            'certificate_issuer': 'DGEC',
-            'address': '',
-            'valid_from': datetime.date(2000, 1, 1),
-            'valid_until': valid_until,
-            'download_link': '',
-            'scope': "%s" % (cert['Catégorie opérateur']),
-            'input': None,
-            'output': None,
-        }
-        try:
-            o, c = GenericCertificate.objects.update_or_create(certificate_id=cert['Numéro SN'], defaults=d)
-            print('Loaded %s' % (o.certificate_id))
-        except Exception:
-            print('failed')
+        certificates.append(
+            {
+                "certificate_id": cert["Numéro SN"],
+                "certificate_type": GenericCertificate.SYSTEME_NATIONAL,
+                "certificate_holder": cert["Nom"],
+                "certificate_issuer": "DGEC",
+                "address": "",
+                "valid_from": datetime.date(2000, 1, 1),
+                "valid_until": valid_until,
+                "download_link": "",
+                "scope": "%s" % (cert["Catégorie opérateur"]),
+                "input": None,
+                "output": None,
+            }
+        )
+    try:
+        existing, new = bulk_update_or_create(GenericCertificate, "certificate_id", certificates)
+        print("[SN Certificates]: %d updated, %d created" % (len(existing), len(new)))
+    except Exception as e:
+        print("failed", e)
     return
+
 
 def main():
     load_certificates()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
