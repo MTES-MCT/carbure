@@ -28,6 +28,8 @@ import { ResetButton } from "transactions/components/filters"
 import { useTranslation } from "react-i18next"
 import { SearchInput } from "common/components/input"
 import { useSafQuery } from "saf/hooks/saf-query"
+import HashRoute from "common/components/hash-route"
+import TicketSourceDetail from "../ticket-source-details"
 
 export interface TicketSourcesProps {
   year: number
@@ -42,13 +44,15 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
   const [state, actions] = useQueryParamsStore(entity, year, status, snapshot)
   const query = useSafQuery(state)
 
-  const ticketSourcesResponse = useQuery(api.getSafTicketsSources, {
+  const ticketSourcesResponse = useQuery(api.getSafTicketSources, {
     key: "ticket-sources",
     params: [query],
   })
 
   // const ticketSoucesData = ticketSourcesResponse.result?.data.data
   const ticketSoucesData = data.safTicketSourcesResponse //TO TEST with testing d:ata
+  const ids = ticketSoucesData?.ids ?? []
+
   const total = ticketSoucesData?.total ?? 0
   const count = ticketSoucesData?.returned ?? 0
   const ticketSources = ticketSoucesData?.saf_ticket_sources
@@ -118,6 +122,10 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
           />
         )}
       </section>
+      <HashRoute
+        path="ticket-source/:id"
+        element={<TicketSourceDetail neighbors={ids} />}
+      />
     </>
   )
 }

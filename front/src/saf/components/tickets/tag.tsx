@@ -3,11 +3,11 @@ import { useTranslation } from "react-i18next"
 import { SafTicket, SafTicketSource, SafTicketStatus } from "saf/types"
 
 export interface TicketTagProps extends TagProps {
-  ticket: SafTicket
   status: SafTicketStatus
+  small?: boolean
 }
 
-export const TicketTag = ({ ticket, status, ...props }: TicketTagProps) => {
+export const TicketTag = ({ status, small }: TicketTagProps) => {
   const { t } = useTranslation()
 
   let label
@@ -25,7 +25,7 @@ export const TicketTag = ({ ticket, status, ...props }: TicketTagProps) => {
   }
 
   return (
-    <Tag {...props} variant={variant}>
+    <Tag variant={variant} small={small}>
       {label}
     </Tag>
   )

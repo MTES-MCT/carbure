@@ -24,17 +24,18 @@ export interface SafTicketSource {
   date: string
   total_volume: number
   assigned_volume: number
-  clients_names: string[]
   feedstock: Feedstock
   biofuel: Biofuel
   country_of_origin: Country
+  assigned_tickets: SafTicketPreview[]
   ghg_reduction: number // attention pour les lots c'etait ghg_reduction_red_ii
 }
 
 export interface SafTicketSourceDetails extends SafTicketSource, SafProduction, SafDurability {
   parent_lot?: LotPreview
   created_at: string
-  added_by: Entity
+  added_by: Entity,
+
 }
 
 export interface LotPreview {
@@ -44,6 +45,14 @@ export interface LotPreview {
   delivery_date: string
 }
 
+export interface SafTicketPreview {
+  id: number
+  carbure_id: string
+  client_name: string
+  date: string
+  volume: number
+  status: SafTicketStatus
+}
 
 export interface SafTicket {
   id: number
@@ -67,10 +76,10 @@ export interface SafTicketDetails extends SafTicket, SafProduction, SafDurabilit
 }
 
 export interface SafProduction {
-  carbure_producer: Entity
-  unknown_producer: string
-  carbure_production_site: ProductionSite
-  unknown_production_site: string
+  carbure_producer: Entity | null
+  unknown_producer: string | null
+  carbure_production_site: ProductionSite | null
+  unknown_production_site: string | null
   production_site_commissioning_date: string
 }
 
@@ -85,7 +94,7 @@ export interface SafDurability {
   eccr: number
   eee: number
   ghg_total: number
-  ghg_reference: number
+  ghg_reduction: number
 }
 
 export interface SafTicketAssignementQuery {

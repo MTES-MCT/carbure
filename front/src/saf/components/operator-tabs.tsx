@@ -63,7 +63,7 @@ export const OperatorTabs = ({
               count={count.tickets}
               pending={count.tickets_pending}
               rejected={count.tickets_rejected}
-              label={t("Tickets envoyés", { count: count.tickets })}
+              label={t("Tickets affectés", { count: count.tickets })}
             />
           ),
         },

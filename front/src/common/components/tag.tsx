@@ -10,10 +10,11 @@ import Button from "./button"
 import { Cross } from "./icons"
 import css from "./tag.module.css"
 
-export type TagVariant = "info" | "success" | "warning" | "danger"
+export type TagVariant = "info" | "success" | "warning" | "danger" | "none"
 
 export interface TagProps {
   big?: boolean
+  small?: boolean
   variant?: TagVariant
   label?: string
   children?: React.ReactNode
@@ -25,6 +26,7 @@ export interface TagProps {
 
 export const Tag = ({
   big,
+  small,
   variant,
   label,
   children,
@@ -35,7 +37,13 @@ export const Tag = ({
 }: TagProps) => (
   <span
     style={style}
-    className={cl(css.tag, variant && css[variant], big && css.big, className)}
+    className={cl(
+      css.tag,
+      variant && css[variant],
+      big && css.big,
+      small && css.small,
+      className
+    )}
     onClick={onClick}
   >
     {label ?? children}

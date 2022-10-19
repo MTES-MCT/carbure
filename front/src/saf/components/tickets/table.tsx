@@ -52,9 +52,7 @@ export function useColumns(status: SafTicketStatus) {
   return {
     status: {
       header: t("Statut"),
-      cell: (ticket: SafTicket) => (
-        <TicketTag ticket={ticket} status={status} />
-      ),
+      cell: () => <TicketTag status={status} />,
     },
 
     availableVolume: {

@@ -1,5 +1,5 @@
 import { api, Api } from "common/services/api"
-import { SafFilter, SafOperatorSnapshot, SafQuery, SafTicketSourcesResponse, SafTicketsResponse } from "./types"
+import { SafFilter, SafOperatorSnapshot, SafQuery, SafTicketSourceDetails, SafTicketSourcesResponse, SafTicketsResponse } from "./types"
 
 import * as data from "./__test__/data"
 const QUERY_RESET: Partial<SafQuery> = {
@@ -19,9 +19,17 @@ export function getSafOperatorSnapshot(entity_id: number, year: number) {
   })
 }
 
-export function getSafTicketsSources(query: SafQuery) {
+export function getSafTicketSources(query: SafQuery) {
   return api.get<Api<SafTicketSourcesResponse>>("/saf/tickets-sources", { params: query })
 }
+
+export function getSafTicketSourceDetails(entity_id: number, ticket_source_id: number) {
+  console.log('entity_id: number, ticket_source_id:', entity_id, ticket_source_id)
+  return api.get<Api<SafTicketSourceDetails>>("/saf/tickets-sources/", {
+    params: { ticket_source_id, entity_id }
+  })
+}
+
 export function getSafTickets(query: SafQuery) {
   return api.get<Api<SafTicketsResponse>>("/saf/tickets", { params: query })
 }

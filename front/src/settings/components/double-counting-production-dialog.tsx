@@ -16,7 +16,7 @@ import {
   DoubleCounting,
   DoubleCountingProduction,
   QuotaDetails,
-} from "doublecount/types"
+} from "double-counting/types"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api/double-counting"
 
