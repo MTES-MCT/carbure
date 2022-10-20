@@ -329,3 +329,10 @@ class CarbureNotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarbureNotification
         fields = ['id', 'dest', 'datetime', 'type', 'acked', 'send_by_email', 'email_sent', 'meta']
+
+
+
+class EntityPreviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Entity
+        fields = ['id', 'name', 'entity_type']
