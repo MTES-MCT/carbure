@@ -1,4 +1,5 @@
 import datetime
+from email.policy import default
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
@@ -17,11 +18,12 @@ class Entity(models.Model):
     ADMIN = 'Administration'
     AUDITOR = 'Auditor'
     EXTERNAL_ADMIN = 'Administration Externe'
+    AIRLINE = 'Compagnie aérienne'
     UNKNOWN = 'Unknown'
     ENTITY_TYPES = ((PRODUCER, 'Producteur'), (OPERATOR, 'Opérateur'),
                     (ADMIN, 'Administration'), (TRADER, 'Trader'),
                     (AUDITOR, 'Auditeur'), (EXTERNAL_ADMIN, EXTERNAL_ADMIN),
-                    (UNKNOWN, 'Unknown'))
+                    (AIRLINE, AIRLINE), (UNKNOWN, 'Unknown'))
 
     name = models.CharField(max_length=64, unique=True)
     date_added = models.DateTimeField(auto_now_add=True)
@@ -42,6 +44,7 @@ class Entity(models.Model):
     default_certificate = models.CharField(max_length=64, null=True, blank=True, default='')
     notifications_enabled = models.BooleanField(default=False)
     preferred_unit = models.CharField(max_length=64, choices=(('l', 'litres'), ('kg', 'kg'), ('MJ', 'MJ')), default='l')
+    has_saf = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
