@@ -13,7 +13,6 @@ class SafTicketFactory(factory.django.DjangoModelFactory):
 
     carbure_id = factory.Faker("lexify", text="????????????")
     created_at = factory.Faker("date_time_this_year")
-    added_by = factory.Iterator(Entity.objects.all())
 
     status = random.choice((SafTicket.PENDING, SafTicket.ACCEPTED, SafTicket.REJECTED))
 
@@ -29,6 +28,7 @@ class SafTicketFactory(factory.django.DjangoModelFactory):
     biofuel = factory.Iterator(Biocarburant.objects.all())
     country_of_origin = factory.Iterator(Pays.objects.all())
 
+    supplier = factory.Iterator(Entity.objects.filter(entity_type=Entity.OPERATOR))
     client = factory.Iterator(Entity.objects.filter(entity_type=Entity.OPERATOR))
 
     carbure_producer = factory.Iterator(Entity.objects.filter(entity_type=Entity.PRODUCER))

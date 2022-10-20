@@ -17,12 +17,11 @@ class SafTicket(models.Model):
 
     carbure_id = models.CharField(max_length=64, unique=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
-    added_by = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.SET_NULL, related_name="saf_owner")  # fmt: skip
 
     year = models.IntegerField(blank=False, null=False)
     period = models.IntegerField(blank=False, null=False)
 
-    agreement_reference = models.CharField(max_length=64, unique=True)
+    agreement_reference = models.CharField(max_length=64)
     agreement_date = models.DateField(null=True)
 
     volume = models.FloatField(blank=False, null=False)
@@ -30,6 +29,7 @@ class SafTicket(models.Model):
     feedstock = models.ForeignKey("core.MatierePremiere", null=True, on_delete=models.SET_NULL)
     country_of_origin = models.ForeignKey("core.Pays", null=True, on_delete=models.SET_NULL, related_name="saf_origin_country")  # fmt: skip
 
+    supplier = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.SET_NULL, related_name="saf_owner")  # fmt: skip
     client = models.ForeignKey("core.Entity", null=True, blank=True, default=None, on_delete=models.SET_NULL)  # fmt: skip
 
     carbure_producer = models.ForeignKey("core.Entity", null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="saf_producer")  # fmt: skip

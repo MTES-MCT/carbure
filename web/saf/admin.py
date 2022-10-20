@@ -28,7 +28,7 @@ class SafTicketAdmin(admin.ModelAdmin):
     list_display = (
         "carbure_id",
         "created_at",
-        "added_by",
+        "supplier",
         "period",
         "volume",
         "feedstock",
@@ -37,7 +37,7 @@ class SafTicketAdmin(admin.ModelAdmin):
         "client",
     )
     list_filter = (
-        "added_by",
+        "supplier",
         "period",
         "feedstock",
         "biofuel",
