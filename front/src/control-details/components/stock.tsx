@@ -42,7 +42,6 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
   const creator = stockData?.stock.carbure_client
 
   const closeDialog = () => {
-    invalidate("controls", "controls-snapshot", "controls-summary")
     navigate({ search: location.search, hash: "#" })
   }
 

@@ -84,7 +84,6 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   )
 
   const closeDialog = () => {
-    invalidate("lots")
     navigate({ search: location.search, hash: "#" })
   }
 
