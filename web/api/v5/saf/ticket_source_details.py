@@ -10,9 +10,9 @@ from saf.models import SafTicketSource
 from saf.serializers import SafTicketSourceDetailsSerializer
 
 
-class SafTicketSourceError:
+class SafTicketSourceDetailsError:
     TICKET_SOURCE_LISTING_FAILED = "TICKET_SOURCE_LISTING_FAILED"
-    FILTERS_MALFORMED = "FILTERS_MALFORMED"
+    PARAMS_MALFORMED = "PARAMS_MALFORMED"
 
 
 @check_user_rights()
@@ -22,7 +22,7 @@ def get_ticket_source_details(request, *args, **kwargs):
         ticket_source_id = int(request.GET.get("ticket_source_id"))
     except:
         traceback.print_exc()
-        return ErrorResponse(400, SafTicketSourceError.FILTERS_MALFORMED)
+        return ErrorResponse(400, SafTicketSourceDetailsError.PARAMS_MALFORMED)
 
     try:
         ticket_source = (
@@ -38,4 +38,4 @@ def get_ticket_source_details(request, *args, **kwargs):
         return SuccessResponse(serialized.data)
     except Exception:
         traceback.print_exc()
-        return ErrorResponse(400, SafTicketSourceError.TICKET_SOURCE_LISTING_FAILED)
+        return ErrorResponse(400, SafTicketSourceDetailsError.TICKET_SOURCE_LISTING_FAILED)

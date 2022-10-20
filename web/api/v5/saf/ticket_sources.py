@@ -12,7 +12,7 @@ from saf.serializers import SafTicketSourceSerializer
 
 class SafTicketSourceError:
     TICKET_SOURCE_LISTING_FAILED = "TICKET_SOURCE_LISTING_FAILED"
-    FILTERS_MALFORMED = "FILTERS_MALFORMED"
+    PARAMS_MALFORMED = "PARAMS_MALFORMED"
 
 
 @check_user_rights()
@@ -23,7 +23,7 @@ def get_ticket_sources(request, *args, **kwargs):
         from_idx = int(request.GET.get("from_idx", 0))
         limit = int(request.GET.get("limit", 25))
     except:
-        return ErrorResponse(400, SafTicketSourceError.FILTERS_MALFORMED)
+        return ErrorResponse(400, SafTicketSourceError.PARAMS_MALFORMED)
 
     try:
         ticket_sources = (
