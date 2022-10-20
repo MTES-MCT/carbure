@@ -6,8 +6,6 @@ from api.v4.tests_utils import setup_current_user
 from core.models import Entity
 from saf.factories import SafTicketSourceFactory, SafTicketFactory
 from saf.models import SafTicketSource, SafTicket
-from core.models import Biocarburant, MatierePremiere, Pays
-from producers.models import ProductionSite
 
 
 class SafSnapshotTest(TestCase):
