@@ -6,8 +6,8 @@ from django.core.paginator import Paginator
 
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
-from saf.models.saf_ticket_source import SafTicketSource
-from saf.serializers.saf_ticket_source import SafTicketSourceSerializer
+from saf.models import SafTicketSource
+from saf.serializers import SafTicketSourceSerializer
 
 
 class SafTicketSourceError:
