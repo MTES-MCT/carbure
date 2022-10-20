@@ -58,7 +58,6 @@ export const TicketSourceDetails = ({
   }, [assignementsRef, hasAssignements])
 
   const closeDialog = () => {
-    invalidate("ticket-sources")
     navigate({ search: location.search, hash: "#" })
   }
 
