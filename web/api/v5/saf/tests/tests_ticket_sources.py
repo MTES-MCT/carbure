@@ -8,7 +8,7 @@ from core.models import Entity, MatierePremiere, Biocarburant, Pays
 from saf.models import SafTicketSource, SafTicket
 
 
-class SafYearsTest(TestCase):
+class SafTicketSourcesTest(TestCase):
     fixtures = [
         "json/biofuels.json",
         "json/feedstock.json",

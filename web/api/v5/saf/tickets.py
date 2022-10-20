@@ -17,9 +17,8 @@ class SafTicketError:
 
 @check_user_rights()
 def get_tickets(request, *args, **kwargs):
-    entity_id = int(kwargs["context"]["entity_id"])
-
     try:
+        entity_id = int(kwargs["context"]["entity_id"])
         year = int(request.GET.get("year"))
         status = request.GET["status"]
         from_idx = int(request.GET.get("from_idx", 0))
