@@ -32,9 +32,6 @@ def get_ticket_source_details(request, *args, **kwargs):
         )
 
         serialized = SafTicketSourceDetailsSerializer(ticket_source)
-
-        print(serialized.data)
-
         return SuccessResponse(serialized.data)
     except Exception:
         traceback.print_exc()

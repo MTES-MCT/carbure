@@ -2,7 +2,6 @@ from rest_framework import serializers
 
 from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer
 from core.serializers import ProductionSiteSerializer, EntityPreviewSerializer
-from .saf_ticket import SafTicketPreviewSerializer
 from saf.models import SafTicketSource
 
 
@@ -30,6 +29,8 @@ class SafTicketSourceSerializer(serializers.ModelSerializer):
     assigned_tickets = serializers.SerializerMethodField()
 
     def get_assigned_tickets(self, obj):
+        from .saf_ticket import SafTicketPreviewSerializer
+
         return SafTicketPreviewSerializer(obj.saf_tickets, many=True).data
 
 
@@ -76,4 +77,17 @@ class SafTicketSourceDetailsSerializer(serializers.ModelSerializer):
     assigned_tickets = serializers.SerializerMethodField()
 
     def get_assigned_tickets(self, obj):
+        from .saf_ticket import SafTicketPreviewSerializer
+
         return SafTicketPreviewSerializer(obj.saf_tickets, many=True).data
+
+
+class SafTicketSourcePreviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SafTicketSource
+        fields = [
+            "id",
+            "carbure_id",
+            "total_volume",
+            "assigned_volume",
+        ]
