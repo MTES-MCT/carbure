@@ -17,9 +17,8 @@ class SafTicketSourceError:
 
 @check_user_rights()
 def get_ticket_sources(request, *args, **kwargs):
-    entity_id = int(kwargs["context"]["entity_id"])
-
     try:
+        entity_id = int(kwargs["context"]["entity_id"])
         year = int(request.GET.get("year"))
         from_idx = int(request.GET.get("from_idx", 0))
         limit = int(request.GET.get("limit", 25))
@@ -29,8 +28,8 @@ def get_ticket_sources(request, *args, **kwargs):
     try:
         ticket_sources = (
             SafTicketSource.objects.filter(year=year, added_by_id=entity_id)
-            .prefetch_related("saf_ticket")
-            .prefetch_related("saf_ticket__client")
+            .prefetch_related("saf_tickets")
+            .prefetch_related("saf_tickets__client")
         )
 
         paginator = Paginator(ticket_sources, limit)

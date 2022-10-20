@@ -8,19 +8,17 @@ from saf.models import SafTicketSource, SafTicket
 
 
 class SafSnapshotError:
-    YEAR_MALFORMED = "YEAR_MALFORMED"
+    FILTERS_MALFORMED = "FILTERS_MALFORMED"
     SNAPSHOT_FAILED = "SNAPSHOT_FAILED"
 
 
 @check_user_rights()
 def get_snapshot(request, *args, **kwargs):
-    entity_id = int(kwargs["context"]["entity_id"])
-    year = request.GET.get("year")
-
     try:
-        year = int(year)
+        entity_id = int(kwargs["context"]["entity_id"])
+        year = int(request.GET.get("year"))
     except:
-        return ErrorResponse(400, SafSnapshotError.YEAR_MALFORMED)
+        return ErrorResponse(400, SafSnapshotError.FILTERS_MALFORMED)
 
     sources = SafTicketSource.objects.filter(year=year, added_by_id=entity_id)
     tickets = SafTicket.objects.filter(year=year, added_by_id=entity_id)
