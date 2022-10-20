@@ -25,16 +25,17 @@ def get_snapshot(request, *args, **kwargs):
     sources = SafTicketSource.objects.filter(year=year, added_by_id=entity_id)
     tickets = SafTicket.objects.filter(year=year, added_by_id=entity_id)
 
-    snapshot = {}
     try:
-        snapshot["ticket_sources_available"] = sources.filter(assigned_volume__lt=F("total_volume")).count()
-        snapshot["ticket_sources_history"] = sources.filter(assigned_volume=F("total_volume")).count()
-        snapshot["tickets"] = tickets.count()
-        snapshot["tickets_pending"] = tickets.filter(status=SafTicket.PENDING).count()
-        snapshot["tickets_accepted"] = tickets.filter(status=SafTicket.ACCEPTED).count()
-        snapshot["tickets_rejected"] = tickets.filter(status=SafTicket.REJECTED).count()
+        return SuccessResponse(
+            {
+                "ticket_sources_available": sources.filter(assigned_volume__lt=F("total_volume")).count(),
+                "ticket_sources_history": sources.filter(assigned_volume=F("total_volume")).count(),
+                "tickets": tickets.count(),
+                "tickets_pending": tickets.filter(status=SafTicket.PENDING).count(),
+                "tickets_accepted": tickets.filter(status=SafTicket.ACCEPTED).count(),
+                "tickets_rejected": tickets.filter(status=SafTicket.REJECTED).count(),
+            }
+        )
     except Exception:
         traceback.print_exc()
         return ErrorResponse(400, SafSnapshotError.SNAPSHOT_FAILED)
-
-    return SuccessResponse(snapshot)
