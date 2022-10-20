@@ -7,7 +7,7 @@ from producers.models import ProductionSite
 from saf.models import SafTicket
 
 
-class SafTicketFactory(factory.Factory):
+class SafTicketFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = SafTicket
 
