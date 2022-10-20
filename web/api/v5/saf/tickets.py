@@ -1,4 +1,4 @@
-# /api/v5/saf/ticket-s
+# /api/v5/saf/tickets
 
 from math import floor
 import traceback
@@ -12,7 +12,7 @@ from saf.serializers import SafTicketSerializer
 
 class SafTicketError:
     TICKET_LISTING_FAILED = "TICKET_LISTING_FAILED"
-    FILTERS_MALFORMED = "FILTERS_MALFORMED"
+    PARAMS_MALFORMED = "PARAMS_MALFORMED"
 
 
 @check_user_rights()
@@ -25,7 +25,7 @@ def get_tickets(request, *args, **kwargs):
         limit = int(request.GET.get("limit", 25))
     except:
         traceback.print_exc()
-        return ErrorResponse(400, SafTicketError.FILTERS_MALFORMED)
+        return ErrorResponse(400, SafTicketError.PARAMS_MALFORMED)
 
     try:
         tickets = SafTicket.objects.filter(status=status, year=year, supplier_id=entity_id).select_related(
