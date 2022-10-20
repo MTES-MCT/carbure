@@ -1,5 +1,6 @@
 # /api/v5/saf/years
 
+import traceback
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
 from saf.models import SafTicketSource, SafTicket
@@ -17,8 +18,8 @@ def get_years(request, *args, **kwargs):
         ticket_source_years = SafTicketSource.objects.filter(added_by_id=entity_id).values_list("year", flat=True).distinct()  # fmt:skip
         ticket_years = SafTicket.objects.filter(added_by_id=entity_id).values_list("year", flat=True).distinct()
         years = sorted(set(list(ticket_source_years) + list(ticket_years)))
-    except Exception as e:
-        print(e)
+    except Exception:
+        traceback.print_exc()
         return ErrorResponse(400, SafYearsError.YEAR_LISTING_FAILED)
 
     return SuccessResponse(years)
