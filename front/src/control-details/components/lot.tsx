@@ -67,7 +67,6 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const expiring = isExpiring(lotData?.lot)
 
   const closeDialog = () => {
-    invalidate("controls", "controls-snapshot", "controls-summary")
     navigate({ search: location.search, hash: "#" })
   }
 
