@@ -23,7 +23,7 @@ class SafTicket(models.Model):
     period = models.IntegerField(blank=False, null=False)
 
     agreement_reference = models.CharField(max_length=64, unique=True)
-    agreement_date = models.DateTimeField(auto_now_add=True, null=True)
+    agreement_date = models.DateField(null=True)
 
     volume = models.FloatField(blank=False, null=False)
     biofuel = models.ForeignKey("core.Biocarburant", null=True, on_delete=models.SET_NULL)
