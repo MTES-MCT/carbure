@@ -48,4 +48,19 @@ export function getTicketSourceFilters(field: SafFilter, query: SafQuery) {
 
 }
 
+export function assignSafTicket(
+  entity_id: number,
+  volume: number,
+  client_id: number,
+  agreement_reference: string,
+  agreement_date: string,
+) {
+  return api.post("/saf/tickets-sources/assignement", {
+    entity_id,
+    volume,
+    client_id,
+    agreement_reference,
+    agreement_date
+  })
+}
 
