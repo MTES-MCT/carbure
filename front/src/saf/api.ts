@@ -24,7 +24,6 @@ export function getSafTicketSources(query: SafQuery) {
 }
 
 export function getSafTicketSourceDetails(entity_id: number, ticket_source_id: number) {
-  console.log('entity_id: number, ticket_source_id:', entity_id, ticket_source_id)
   return api.get<Api<SafTicketSourceDetails>>("/saf/tickets-sources/", {
     params: { ticket_source_id, entity_id }
   })
