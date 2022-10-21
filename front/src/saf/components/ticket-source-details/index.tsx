@@ -2,10 +2,10 @@ import useEntity from "carbure/hooks/entity"
 import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import { Fieldset } from "common/components/form"
-import { useHashMatch } from "common/components/hash-route"
+import HashRoute, { useHashMatch } from "common/components/hash-route"
 import { Return, Send, Split } from "common/components/icons"
 import { TextInput } from "common/components/input"
-import Portal from "common/components/portal"
+import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { invalidate } from "common/hooks/invalidate"
@@ -22,6 +22,7 @@ import { useEffect, useRef } from "react"
 import NavigationButtons from "transaction-details/components/lots/navigation"
 import TicketTag from "../tickets/tag"
 import { cp } from "fs/promises"
+import TicketAssignment from "./assignment"
 
 export interface TicketSourceDetailsProps {
   neighbors: number[]
@@ -37,6 +38,7 @@ export const TicketSourceDetails = ({
 
   const entity = useEntity()
   const match = useHashMatch("ticket-source/:id")
+  const portal = usePortal()
 
   const ticketSourceResponse = useQuery(api.getSafTicketSourceDetails, {
     key: "ticket-source-details",
@@ -62,7 +64,9 @@ export const TicketSourceDetails = ({
   }
 
   const showAssignement = () => {
-    //TODO open assignement modal
+    portal((close) => (
+      <TicketAssignment ticketSource={ticketSource} onClose={close} />
+    ))
   }
 
   return (
@@ -71,7 +75,7 @@ export const TicketSourceDetails = ({
         <header>
           <TicketSourceTag ticketSource={ticketSource} />
           <h1>
-            {t("Volume SAF n°")}
+            {t("Volume CAD n°")}
             {ticketSource?.carbure_id ?? "..."}
           </h1>
         </header>
