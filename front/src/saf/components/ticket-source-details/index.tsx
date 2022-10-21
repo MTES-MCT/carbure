@@ -61,7 +61,9 @@ export const TicketSourceDetails = ({
     navigate({ search: location.search, hash: "#" })
   }
 
-  const showAssignement = () => {}
+  const showAssignement = () => {
+    //TODO open assignement modal
+  }
 
   return (
     <Portal onClose={closeDialog}>
@@ -115,7 +117,10 @@ const AssignedTickets = ({
 }) => {
   const { t } = useTranslation()
 
-  const showTicket = (ticket: SafTicketPreview) => {}
+  const showTicket = (ticket: SafTicketPreview) => {
+    //TODO open ticket modal
+  }
+
   if (!ticketSource) return null
 
   return (
@@ -152,7 +157,6 @@ const AssignedTickets = ({
 
 const LotOrigin = ({ parent_lot }: { parent_lot?: LotPreview }) => {
   const { t } = useTranslation()
-  if (!parent_lot) return null
   return (
     <Collapse isOpen={true} variant="info" icon={Split} label={"Lot Initial"}>
       <section>
