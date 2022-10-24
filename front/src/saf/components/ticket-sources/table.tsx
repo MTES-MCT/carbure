@@ -85,7 +85,7 @@ export function useColumns() {
       cell: (ticketSource: SafTicketSource) => (
         <Cell
           text={formatPeriod(ticketSource.period)}
-          sub={formatDate(ticketSource.date)}
+          sub={formatDate(ticketSource.created_at)}
         />
       ),
     },

@@ -14,15 +14,17 @@ class SafSnapshotError:
 
 @check_user_rights()
 def get_snapshot(request, *args, **kwargs):
+
     try:
         entity_id = int(kwargs["context"]["entity_id"])
         year = int(request.GET.get("year"))
     except:
         return ErrorResponse(400, SafSnapshotError.PARAMS_MALFORMED)
-
+    print("_______")
     sources = SafTicketSource.objects.filter(year=year, added_by_id=entity_id)
-    tickets = SafTicket.objects.filter(year=year, added_by_id=entity_id)
+    tickets = SafTicket.objects.filter(year=year, supplier_id=entity_id)
 
+    print(tickets)
     try:
         return SuccessResponse(
             {

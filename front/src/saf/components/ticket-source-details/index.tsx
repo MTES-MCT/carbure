@@ -23,6 +23,8 @@ import NavigationButtons from "transaction-details/components/lots/navigation"
 import TicketTag from "../tickets/tag"
 import { cp } from "fs/promises"
 import TicketAssignment from "./assignment"
+import { useNotify } from "common/components/notifications"
+import { Entity } from "carbure/types"
 
 export interface TicketSourceDetailsProps {
   neighbors: number[]
@@ -35,7 +37,7 @@ export const TicketSourceDetails = ({
 
   const navigate = useNavigate()
   const location = useLocation()
-
+  const notify = useNotify()
   const entity = useEntity()
   const match = useHashMatch("ticket-source/:id")
   const portal = usePortal()
@@ -45,8 +47,8 @@ export const TicketSourceDetails = ({
     params: [entity.id, parseInt(match?.params.id!)],
   })
 
-  // const ticketSource = ticketSourceResponse.result?.data?.data
-  const ticketSource = safTicketSourceDetails //TO TEST
+  const ticketSource = ticketSourceResponse.result?.data?.data
+  // const ticketSource = safTicketSourceDetails //TO TEST
   const hasAssignements = ticketSource
     ? ticketSource?.assigned_tickets?.length > 0
     : false
@@ -63,9 +65,23 @@ export const TicketSourceDetails = ({
     navigate({ search: location.search, hash: "#" })
   }
 
+  const handleticketAssigned = (volume: number, clientName: string) => {
+    notify(
+      t("{{volume}} litres ont bien été assignés à {{clientName}}.", {
+        volume,
+        clientName,
+      }),
+      { variant: "success" }
+    )
+  }
+
   const showAssignement = () => {
     portal((close) => (
-      <TicketAssignment ticketSource={ticketSource} onClose={close} />
+      <TicketAssignment
+        ticketSource={ticketSource!}
+        onClose={close}
+        onTicketAssigned={handleticketAssigned}
+      />
     ))
   }
 
@@ -99,6 +115,7 @@ export const TicketSourceDetails = ({
             icon={Send}
             label={t("Affecter")}
             variant="primary"
+            disabled={!ticketSource}
             action={showAssignement}
           />
           <NavigationButtons neighbors={neighbors} />

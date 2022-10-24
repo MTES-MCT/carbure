@@ -1,3 +1,4 @@
+import { Entity } from "carbure/types"
 import { api, Api } from "common/services/api"
 import { SafFilter, SafOperatorSnapshot, SafQuery, SafTicketSourceDetails, SafTicketSourcesResponse, SafTicketsResponse } from "./types"
 
@@ -10,27 +11,27 @@ const QUERY_RESET: Partial<SafQuery> = {
 }
 
 export function getYears(entity_id: number) {
-  return api.get<Api<number[]>>("/years", { params: { entity_id } })
+  return api.get<Api<number[]>>("/v5/saf/years", { params: { entity_id } })
 }
 
 export function getSafOperatorSnapshot(entity_id: number, year: number) {
-  return api.get<Api<SafOperatorSnapshot>>("/saf/snapshot", {
+  return api.get<Api<SafOperatorSnapshot>>("/v5/saf/snapshot", {
     params: { entity_id, year },
   })
 }
 
 export function getSafTicketSources(query: SafQuery) {
-  return api.get<Api<SafTicketSourcesResponse>>("/saf/tickets-sources", { params: query })
+  return api.get<Api<SafTicketSourcesResponse>>("/v5/saf/ticket-sources", { params: query })
 }
 
 export function getSafTicketSourceDetails(entity_id: number, ticket_source_id: number) {
-  return api.get<Api<SafTicketSourceDetails>>("/saf/tickets-sources/", {
+  return api.get<Api<SafTicketSourceDetails>>("/v5/saf/ticket-sources/details", {
     params: { ticket_source_id, entity_id }
   })
 }
 
 export function getSafTickets(query: SafQuery) {
-  return api.get<Api<SafTicketsResponse>>("/saf/tickets", { params: query })
+  return api.get<Api<SafTicketsResponse>>("/v5/saf/tickets", { params: query })
 }
 
 export function getTicketSourceFilters(field: SafFilter, query: SafQuery) {
@@ -42,7 +43,7 @@ export function getTicketSourceFilters(field: SafFilter, query: SafQuery) {
   })
 
   return api
-    .get<Api<string[]>>("/saf/tickets-sources/filters", { params })
+    .get<Api<string[]>>("/v5/saf/tickets-sources/filters", { params })
     .then((res) => res.data.data ?? [])
 
 
@@ -51,14 +52,14 @@ export function getTicketSourceFilters(field: SafFilter, query: SafQuery) {
 export function assignSafTicket(
   entity_id: number,
   volume: number,
-  client_id: number,
-  agreement_reference: string,
-  agreement_date: string,
+  client: Entity,
+  agreement_reference?: string,
+  agreement_date?: string,
 ) {
-  return api.post("/saf/tickets-sources/assignement", {
+  return api.post("/v5/saf/tickets-sources/assignement", {
     entity_id,
     volume,
-    client_id,
+    client_id: client.id,
     agreement_reference,
     agreement_date
   })
