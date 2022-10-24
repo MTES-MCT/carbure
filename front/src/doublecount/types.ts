@@ -1,6 +1,9 @@
 import {
   Biofuel,
-  Country, Entity, Feedstock, ProductionSite
+  Country,
+  Entity,
+  Feedstock,
+  ProductionSite,
 } from "carbure/types"
 
 export enum Admin {
@@ -27,7 +30,6 @@ export interface DoubleCounting {
   producer_user: string
   creation_date: string
 }
-
 
 export interface DoubleCountingSourcingAggregation {
   year: number
@@ -65,8 +67,9 @@ export enum DoubleCountingUploadErrorType {
   MpBcIncoherent = "MP_BC_INCOHERENT",
   ProductionMismatchSourcing = "PRODUCTION_MISMATCH_SOURCING",
   PomeGt2000 = "POME_GT_2000",
+  MissingEstimatedProduction = "MISSING_ESTIMATED_PRODUCTION",
+  MissingFeedstock = "MISSING_FEEDSTOCK",
 }
-
 
 export interface DoubleCountingUploadError {
   error: string
@@ -75,14 +78,11 @@ export interface DoubleCountingUploadError {
   meta?: null | any
 }
 
-
 export interface DoubleCountingUploadErrors extends DoubleCounting {
   sourcing?: DoubleCountingUploadError[]
   production?: DoubleCountingUploadError[]
   global?: DoubleCountingUploadError[]
 }
-
-
 
 export interface DoubleCountingDetails extends DoubleCounting {
   sourcing: DoubleCountingSourcing[]
