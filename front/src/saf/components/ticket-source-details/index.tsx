@@ -15,7 +15,6 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { safTicketSourceDetails } from "saf/__test__/data"
 import * as api from "../../api"
 import TicketSourceTag from "../ticket-sources/tag"
-import TicketSourceFields from "./fields"
 import Collapse from "common/components/collapse"
 import { LotPreview, SafTicketPreview, SafTicketSource } from "saf/types"
 import { useEffect, useRef } from "react"
@@ -25,6 +24,7 @@ import { cp } from "fs/promises"
 import TicketAssignment from "./assignment"
 import { useNotify } from "common/components/notifications"
 import { Entity } from "carbure/types"
+import TicketSourceFields from "./fields"
 
 export interface TicketSourceDetailsProps {
   neighbors: number[]
@@ -65,7 +65,7 @@ export const TicketSourceDetails = ({
     navigate({ search: location.search, hash: "#" })
   }
 
-  const handleticketAssigned = (volume: number, clientName: string) => {
+  const handleTicketAssigned = (volume: number, clientName: string) => {
     notify(
       t("{{volume}} litres ont bien été assignés à {{clientName}}.", {
         volume,
@@ -80,7 +80,7 @@ export const TicketSourceDetails = ({
       <TicketAssignment
         ticketSource={ticketSource!}
         onClose={close}
-        onTicketAssigned={handleticketAssigned}
+        onTicketAssigned={handleTicketAssigned}
       />
     ))
   }

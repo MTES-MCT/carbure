@@ -28,6 +28,9 @@ import { Filters } from "../filters"
 import { useAutoStatus } from "../operator-tabs"
 import { StatusSwitcher } from "./status-switcher"
 import TicketsTable from "./table"
+import HashRoute from "common/components/hash-route"
+import TicketDetails from "../ticket-details"
+import NoResult from "../no-result"
 
 export interface TicketsProps {
   year: number
@@ -49,6 +52,8 @@ export const Tickets = ({ year, snapshot }: TicketsProps) => {
 
   // const ticketsData = ticketsResponse.result?.data.data
   const ticketsData = data.safTicketsResponse //TO TEST with testing d:ata
+  const ids = ticketsData?.ids ?? []
+
   const total = ticketsData?.total ?? 0
   const count = ticketsData?.returned ?? 0
   const tickets = ticketsData?.saf_tickets
@@ -57,7 +62,7 @@ export const Tickets = ({ year, snapshot }: TicketsProps) => {
     return {
       pathname: location.pathname,
       search: location.search,
-      hash: `tickets/${ticket.id}`,
+      hash: `ticket/${ticket.id}`,
     }
   }
 
@@ -119,6 +124,10 @@ export const Tickets = ({ year, snapshot }: TicketsProps) => {
           />
         )}
       </section>
+      <HashRoute
+        path="ticket/:id"
+        element={<TicketDetails neighbors={ids} />}
+      />
     </>
   )
 }
@@ -150,27 +159,5 @@ export function useTicketSourcesQuery({
       ...filters,
     }),
     [entity.id, year, status, search, limit, order, filters, page]
-  )
-}
-
-export interface FilterManager {
-  filters: SafFilterSelection
-  onFilter: (filters: SafFilterSelection) => void
-}
-
-interface NoResultProps extends Partial<FilterManager> {
-  loading?: boolean
-}
-
-export const NoResult = ({ loading, filters, onFilter }: NoResultProps) => {
-  const { t } = useTranslation()
-
-  return (
-    <Alert loading={loading} variant="warning" icon={AlertCircle}>
-      <p>{t("Aucun résultat trouvé pour cette recherche")}</p>
-      {filters && onFilter && Object.keys(filters).length && (
-        <ResetButton filters={filters} onFilter={onFilter} />
-      )}
-    </Alert>
   )
 }
