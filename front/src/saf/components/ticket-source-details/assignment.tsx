@@ -66,7 +66,7 @@ export const TicketAssignment = ({
 
   return (
     <Portal onClose={closeDialog}>
-      <Dialog onClose={closeDialog}>
+      <Dialog onClose={closeDialog} fullscreen>
         <header>
           <h1>
             {t("Affecter le volume CAD n°")}

@@ -30,6 +30,7 @@ import { SearchInput } from "common/components/input"
 import { useSafQuery } from "saf/hooks/saf-query"
 import HashRoute from "common/components/hash-route"
 import TicketSourceDetail from "../ticket-source-details"
+import NoResult from "../no-result"
 
 export interface TicketSourcesProps {
   year: number
@@ -133,25 +134,3 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
 const FILTERS = [SafFilter.Clients, SafFilter.Periods, SafFilter.Feedstocks]
 
 export default TicketSources
-
-export interface FilterManager {
-  filters: SafFilterSelection
-  onFilter: (filters: SafFilterSelection) => void
-}
-
-interface NoResultProps extends Partial<FilterManager> {
-  loading?: boolean
-}
-
-export const NoResult = ({ loading, filters, onFilter }: NoResultProps) => {
-  const { t } = useTranslation()
-
-  return (
-    <Alert loading={loading} variant="warning" icon={AlertCircle}>
-      <p>{t("Aucun résultat trouvé pour cette recherche")}</p>
-      {filters && onFilter && Object.keys(filters).length && (
-        <ResetButton filters={filters} onFilter={onFilter} />
-      )}
-    </Alert>
-  )
-}
