@@ -20,6 +20,7 @@ def get_ticket_sources(request, *args, **kwargs):
     try:
         entity_id = int(kwargs["context"]["entity_id"])
         year = int(request.GET.get("year"))
+        status = request.GET.get("status")
         from_idx = int(request.GET.get("from_idx", 0))
         limit = int(request.GET.get("limit", 25))
     except:
@@ -37,6 +38,7 @@ def get_ticket_sources(request, *args, **kwargs):
         page = paginator.page(current_page)
 
         ids = ticket_sources.values_list("id", flat=True)
+        print(ids)
         serialized = SafTicketSourceSerializer(page.object_list, many=True)
 
         return SuccessResponse(
