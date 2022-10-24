@@ -45,14 +45,19 @@ export const TicketAssignment = ({
   const entity = useEntity()
 
   const [client, setClient] = useState<Entity | string | undefined>()
-  const { value, bind, setField } = useForm<Partial<SafTicketAssignementQuery>>(
-    {
-      volume: 0,
-      client_id: undefined,
-      agreement_reference: undefined,
-      agreement_date: undefined,
-    }
-  )
+
+  const { value, bind, setField, errors } = useForm<
+    Partial<SafTicketAssignementQuery>
+  >({
+    volume: 0,
+    client_id: undefined,
+    agreement_reference: undefined,
+    agreement_date: undefined,
+  })
+
+  // errors.volume = "test"
+  const remainingVolume =
+    ticketSource.total_volume - ticketSource.assigned_volume
 
   const closeDialog = () => {
     onClose()
@@ -63,25 +68,25 @@ export const TicketAssignment = ({
   })
 
   const assignTicket = async () => {
-    //TODO create assignement
-    // await assignSafTicket.execute(entity_id : entity.id, volume: value.volume, client_id: client.id,   agreement_reference: value.agreement_reference,      agreement_date: value.agreement_date,)
+    console.log("ok")
+    errors.volume = "test"
+    // await assignSafTicket.execute(
+    //   entity.id,
+    //   value.volume as number,
+    //   client?.id as number,
+    //   value.agreement_reference as string,
+    //   value.agreement_date as string
+    // )
   }
 
   const setMaximumVolume = () => {
-    //
+    setField("volume", remainingVolume)
   }
 
   const findSafClient = (query: string) => {
     return findEntities(query)
   }
 
-  const clientOnChange = (value: Entity | undefined) => {
-    if (!value) return
-    setField("client_id", value.id)
-  }
-
-  const remainingVolume =
-    ticketSource.total_volume - ticketSource.assigned_volume
   return (
     <Portal onClose={closeDialog}>
       <Dialog onClose={closeDialog}>
@@ -100,23 +105,40 @@ export const TicketAssignment = ({
               )}
             </p>
 
-            <Form id="access-right" onSubmit={assignTicket}>
-              <NumberInput
-                required
-                label={t("Volume ({{volume}} litres disponibles)", {
-                  count: remainingVolume,
-                  volume: formatNumber(remainingVolume),
-                })}
-                type="number"
-                {...bind("volume")}
-                icon={
-                  <Button
-                    label={t("Maximum")}
-                    action={setMaximumVolume}
-                    variant="primary"
-                  />
-                }
-              />
+            <Form id="assign-ticket" onSubmit={assignTicket}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "end",
+                }}
+              >
+                <NumberInput
+                  // error={{ error: "tu peux pas" }}
+                  required
+                  label={t("Volume ({{volume}} litres disponibles)", {
+                    count: remainingVolume,
+                    volume: formatNumber(remainingVolume),
+                  })}
+                  style={{ flex: 1 }}
+                  max={remainingVolume}
+                  min={0}
+                  type="number"
+                  {...bind("volume")}
+                  // icon={
+                  //   <Button
+                  //     label={t("Maximum")}
+                  //     action={setMaximumVolume}
+                  //     variant="primary"
+                  //   />
+                  // }
+                />
+                <Button
+                  // style={{ height: "max-content" }}
+                  label={t("Maximum")}
+                  action={setMaximumVolume}
+                  variant="primary"
+                />
+              </div>
 
               <Autocomplete
                 required
@@ -147,7 +169,7 @@ export const TicketAssignment = ({
             icon={Send}
             label={t("Affecter")}
             variant="primary"
-            action={assignTicket}
+            submit="assign-ticket"
           />
 
           <Button icon={Return} label={t("Retour")} action={closeDialog} />
