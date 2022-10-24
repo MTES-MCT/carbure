@@ -21,7 +21,7 @@ export interface SafTicketSource {
   carbure_id: string
   year: number
   period: number
-  date: string
+  created_at: string
   total_volume: number
   assigned_volume: number
   feedstock: Feedstock
@@ -33,7 +33,6 @@ export interface SafTicketSource {
 
 export interface SafTicketSourceDetails extends SafTicketSource, SafProduction, SafDurability {
   parent_lot?: LotPreview
-  created_at: string
   added_by: Entity,
 
 }
