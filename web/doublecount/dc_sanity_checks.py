@@ -15,6 +15,7 @@ class DoubleCountingError:
     UNKNOWN_BIOFUEL = "UNKNOWN_BIOFUEL"
     MISSING_FEEDSTOCK = "MISSING_FEEDSTOCK"
     MISSING_BIOFUEL = "MISSING_BIOFUEL"
+    MISSING_ESTIMATED_PRODUCTION = "MISSING_ESTIMATED_PRODUCTION"
 
 
 class DcError(TypedDict):
@@ -62,6 +63,9 @@ def check_production_row(production: DoubleCountingProduction, data: ProductionR
         errors.append(error(DoubleCountingError.MISSING_BIOFUEL, line))
     elif not production.biofuel_id:
         errors.append(error(DoubleCountingError.UNKNOWN_BIOFUEL, line, {"biofuel": data["biofuel"]}))
+
+    if not production.estimated_production or not data["estimated_production"]:
+        errors.append(error(DoubleCountingError.MISSING_ESTIMATED_PRODUCTION, line))
 
     if production.feedstock_id and production.biofuel_id:
         incompatibilities = check_compatibility_feedstock_biofuel(production.feedstock, production.biofuel)
@@ -112,10 +116,10 @@ def check_sourcing_vs_production(
             # check that the sourced amount of feedstock roughly matches the total production generated with this feedstock
             s = sourcing_per_feedstock.get(feedstock__code=p["feedstock__code"], year=p["year"])
             if p["quantity"] > s["quantity"]:
-                meta = {"feedstock": p["feedstock__code"], "sourcing": s["quantity"], "production": p["quantity"]}
+                meta = {"feedstock": p["feedstock__code"], "year": p["year"], "sourcing": s["quantity"], "production": p["quantity"]}  # fmt:skip
                 errors.append(error(DoubleCountingError.PRODUCTION_MISMATCH_SOURCING, meta=meta))
         except:
-            meta = {"feedstock": p["feedstock__code"], "sourcing": 0, "production": p["quantity"]}
+            meta = {"feedstock": p["feedstock__code"], "year": p["year"], "sourcing": 0, "production": p["quantity"]}
             errors.append(error(DoubleCountingError.PRODUCTION_MISMATCH_SOURCING, meta=meta))
 
     return errors
