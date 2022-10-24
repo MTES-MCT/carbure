@@ -1,6 +1,6 @@
 import { Entity } from "carbure/types"
 import { api, Api } from "common/services/api"
-import { SafFilter, SafOperatorSnapshot, SafQuery, SafTicketSourceDetails, SafTicketSourcesResponse, SafTicketsResponse } from "./types"
+import { SafFilter, SafOperatorSnapshot, SafQuery, SafTicketDetails, SafTicketSourceDetails, SafTicketSourcesResponse, SafTicketsResponse } from "./types"
 
 import * as data from "./__test__/data"
 const QUERY_RESET: Partial<SafQuery> = {
@@ -34,6 +34,10 @@ export function getSafTickets(query: SafQuery) {
   return api.get<Api<SafTicketsResponse>>("/v5/saf/tickets", { params: query })
 }
 
+export function getSafTicketDetails(entity_id: number, ticket_id: number) {
+  return api.get<Api<SafTicketDetails>>("/v5/saf/tickets/details", { params: { entity_id, ticket_id } })
+}
+
 export function getTicketSourceFilters(field: SafFilter, query: SafQuery) {
   const params = { field, ...query, ...QUERY_RESET }
 
@@ -45,7 +49,6 @@ export function getTicketSourceFilters(field: SafFilter, query: SafQuery) {
   return api
     .get<Api<string[]>>("/v5/saf/tickets-sources/filters", { params })
     .then((res) => res.data.data ?? [])
-
 
 }
 
@@ -65,3 +68,13 @@ export function assignSafTicket(
   })
 }
 
+
+export function cancelSafTicket(
+  entity_id: number,
+  ticket_id: number,
+) {
+  return api.post("/v5/saf/tickets/cancel", {
+    entity_id,
+    ticket_id
+  })
+}
