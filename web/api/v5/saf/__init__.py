@@ -6,6 +6,7 @@ from .ticket_sources import get_ticket_sources
 from .ticket_source_details import get_ticket_source_details
 from .tickets import get_tickets
 from .ticket_details import get_ticket_details
+from .assign_ticket import assign_ticket
 
 urlpatterns = [
     # overview
@@ -15,6 +16,7 @@ urlpatterns = [
     path("ticket-sources", get_ticket_sources, name="api-v5-saf-ticket-sources"),
     path("ticket-sources/details", get_ticket_source_details, name="api-v5-saf-ticket-source-details"),
     # tickets
+    path("assign-ticket", assign_ticket, name="api-v5-saf-assign-ticket"),
     path("tickets", get_tickets, name="api-v5-saf-tickets"),
     path("tickets/details", get_ticket_details, name="api-v5-saf-ticket-details"),
 ]
