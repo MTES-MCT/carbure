@@ -38,7 +38,6 @@ def get_ticket_sources(request, *args, **kwargs):
         page = paginator.page(current_page)
 
         ids = ticket_sources.values_list("id", flat=True)
-        print(ids)
         serialized = SafTicketSourceSerializer(page.object_list, many=True)
 
         return SuccessResponse(
