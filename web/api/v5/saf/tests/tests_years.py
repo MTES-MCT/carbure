@@ -26,7 +26,7 @@ class SafYearsTest(TestCase):
         SafTicketSourceFactory.create_batch(10, year=2022, added_by_id=self.entity.id)
 
         SafTicket.objects.all().delete()
-        SafTicketFactory.create_batch(10, year=2022, added_by_id=self.entity.id)
+        SafTicketFactory.create_batch(10, year=2022, supplier_id=self.entity.id)
 
     def test_saf_years(self):
         response = self.client.get(reverse("api-v5-saf-years"), {"entity_id": self.entity.id})

@@ -27,9 +27,9 @@ class SafSnapshotTest(TestCase):
         SafTicketSourceFactory.create_batch(20, year=2022, added_by_id=self.entity.id, total_volume=30000, assigned_volume=30000)  # fmt:skip
 
         SafTicket.objects.all().delete()
-        SafTicketFactory.create_batch(15, year=2022, added_by_id=self.entity.id, status=SafTicket.PENDING)
-        SafTicketFactory.create_batch(10, year=2022, added_by_id=self.entity.id, status=SafTicket.ACCEPTED)
-        SafTicketFactory.create_batch(5, year=2022, added_by_id=self.entity.id, status=SafTicket.REJECTED)
+        SafTicketFactory.create_batch(15, year=2022, supplier_id=self.entity.id, status=SafTicket.PENDING)
+        SafTicketFactory.create_batch(10, year=2022, supplier_id=self.entity.id, status=SafTicket.ACCEPTED)
+        SafTicketFactory.create_batch(5, year=2022, supplier_id=self.entity.id, status=SafTicket.REJECTED)
 
     def test_saf_snapshot_simple(self):
         response = self.client.get(reverse("api-v5-saf-snapshot"), {"entity_id": self.entity.id, "year": 2021})
