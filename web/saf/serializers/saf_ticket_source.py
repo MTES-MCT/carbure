@@ -3,6 +3,7 @@ from rest_framework import serializers
 from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer
 from core.serializers import ProductionSiteSerializer, EntityPreviewSerializer
 from saf.models import SafTicketSource
+from web.core.serializers import CarbureLotPreviewSerializer
 
 
 class SafTicketSourceSerializer(serializers.ModelSerializer):
@@ -66,6 +67,7 @@ class SafTicketSourceDetailsSerializer(serializers.ModelSerializer):
             "eee",
             "ghg_reduction",
             "ghg_total",
+            "parent_lot",
         ]
 
     feedstock = FeedStockSerializer(read_only=True)
@@ -75,6 +77,7 @@ class SafTicketSourceDetailsSerializer(serializers.ModelSerializer):
     carbure_producer = EntityPreviewSerializer(read_only=True)
     carbure_production_site = ProductionSiteSerializer(read_only=True)
     assigned_tickets = serializers.SerializerMethodField()
+    parent_lot = CarbureLotPreviewSerializer()
 
     def get_assigned_tickets(self, obj):
         from .saf_ticket import SafTicketPreviewSerializer
