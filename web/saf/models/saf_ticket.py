@@ -54,3 +54,40 @@ class SafTicket(models.Model):
     ghg_reduction = models.FloatField(default=0.0)
 
     parent_ticket_source = models.ForeignKey("saf.SafTicketSource", null=True, on_delete=models.SET_NULL, related_name="saf_tickets")  # fmt: skip
+
+
+def create_ticket_from_source(ticket_source, client_id, volume, agreement_date, agreement_reference):
+    return SafTicket(
+        client_id=client_id,
+        volume=volume,
+        agreement_date=agreement_date,
+        agreement_reference=agreement_reference,
+        status=SafTicket.PENDING,
+        carbure_id=ticket_source.carbure_id,
+        created_at=ticket_source.created_at,
+        year=ticket_source.year,
+        period=ticket_source.period,
+        biofuel=ticket_source.biofuel,
+        feedstock=ticket_source.feedstock,
+        country_of_origin=ticket_source.country_of_origin,
+        supplier_id=ticket_source.added_by_id,
+        carbure_producer=ticket_source.carbure_producer,
+        unknown_producer=ticket_source.unknown_producer,
+        carbure_production_site=ticket_source.carbure_production_site,
+        unknown_production_site=ticket_source.unknown_production_site,
+        production_country=ticket_source.production_country,
+        production_site_commissioning_date=ticket_source.production_site_commissioning_date,
+        eec=ticket_source.eec,
+        el=ticket_source.el,
+        ep=ticket_source.ep,
+        etd=ticket_source.etd,
+        eu=ticket_source.eu,
+        esca=ticket_source.esca,
+        eccs=ticket_source.eccs,
+        eccr=ticket_source.eccr,
+        eee=ticket_source.eee,
+        ghg_total=ticket_source.ghg_total,
+        ghg_reference=ticket_source.ghg_reference,
+        ghg_reduction=ticket_source.ghg_reduction,
+        parent_ticket_source=ticket_source,
+    )
