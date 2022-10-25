@@ -290,6 +290,12 @@ class CarbureLotAdminSerializer(CarbureLotPublicSerializer):
                   'free_field', 'added_by', 'created_at', 'highlighted_by_auditor', 'highlighted_by_admin', 'carbure_vendor', 'vendor_certificate', 'vendor_certificate_type', 'data_reliability_score',
                   ]
 
+
+class CarbureLotPreviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CarbureLot
+        fields = ["id",  "carbure_id", "volume", "delivery_date"]
+
 class CarbureLotReliabilityScoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarbureLotReliabilityScore
