@@ -8,7 +8,7 @@ from saf.models import SafTicketSource, SafTicket
 
 
 class SafSnapshotError:
-    PARAMS_MALFORMED = "PARAMS_MALFORMED"
+    MALFORMED_PARAMS = "MALFORMED_PARAMS"
     SNAPSHOT_FAILED = "SNAPSHOT_FAILED"
 
 
@@ -19,12 +19,11 @@ def get_snapshot(request, *args, **kwargs):
         entity_id = int(kwargs["context"]["entity_id"])
         year = int(request.GET.get("year"))
     except:
-        return ErrorResponse(400, SafSnapshotError.PARAMS_MALFORMED)
-
-    sources = SafTicketSource.objects.filter(year=year, added_by_id=entity_id)
-    tickets = SafTicket.objects.filter(year=year, supplier_id=entity_id)
+        return ErrorResponse(400, SafSnapshotError.PARAMS_MALFORMaED)
 
     try:
+        sources = SafTicketSource.objects.filter(year=year, added_by_id=entity_id)
+        tickets = SafTicket.objects.filter(year=year, supplier_id=entity_id)
         return SuccessResponse(
             {
                 "ticket_sources_available": sources.filter(assigned_volume__lt=F("total_volume")).count(),
