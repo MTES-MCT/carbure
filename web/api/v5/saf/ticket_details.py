@@ -12,7 +12,7 @@ from saf.serializers import SafTicketDetailsSerializer
 
 class SafTicketError:
     TICKET_LISTING_FAILED = "TICKET_LISTING_FAILED"
-    PARAMS_MALFORMED = "PARAMS_MALFORMED"
+    MALFORMED_PARAMS = "MALFORMED_PARAMS"
 
 
 @check_user_rights()
@@ -22,7 +22,7 @@ def get_ticket_details(request, *args, **kwargs):
         ticket_id = int(request.GET.get("ticket_id"))
     except:
         traceback.print_exc()
-        return ErrorResponse(400, SafTicketError.PARAMS_MALFORMED)
+        return ErrorResponse(400, SafTicketError.MALFORMED_PARAMS)
 
     try:
         ticket = SafTicket.objects.select_related("parent_ticket_source").get(id=ticket_id, supplier_id=entity_id)
