@@ -13,6 +13,7 @@ from carbure.scripts.send_notification_emails import send_notification_emails
 from carbure.scripts.update_2bs_certificates import update_2bs_certificates
 from carbure.scripts.update_iscc_certificates import update_iscc_certificates
 from carbure.scripts.update_redcert_certificates import update_redcert_certificates
+from saf.models.saf_ticket_source import create_ticket_sources_from_lots
 
 
 @db_task()
@@ -23,6 +24,11 @@ def background_bulk_sanity_checks(lots: QuerySet, prefetched_data: dict | None =
 @db_task()
 def background_bulk_scoring(lots: QuerySet, prefetched_data: dict | None = None) -> None:
     bulk_scoring(lots, prefetched_data)
+
+
+@db_task()
+def background_create_ticket_sources_from_lots(lots: QuerySet) -> None:
+    create_ticket_sources_from_lots(lots)
 
 
 if env.get("IMAGE_TAG") == "prod":

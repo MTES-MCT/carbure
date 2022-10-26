@@ -154,6 +154,7 @@ class SafTicketSourceDetailsTest(TestCase):
                     "volume": 30000.0,
                 }
             ],
+            "parent_lot": None,
         }
 
         self.maxDiff = None
