@@ -44,14 +44,15 @@ export const TicketAssignment = ({
 
   const assignTicket = async () => {
     if (value.volume! < 1) setFieldError("volume", t("Entrez un volume"))
-    //TO TEST uncomment below
-    // await assignSafTicket.execute(
-    //   entity.id,
-    //   value.volume!,
-    //   value.client!,
-    //   value.agreement_reference,
-    //   value.agreement_date
-    // )
+    // TO TEST uncomment below
+    await assignSafTicket.execute(
+      entity.id,
+      ticketSource.id,
+      value.volume!,
+      value.client!,
+      value.agreement_reference,
+      value.agreement_date
+    )
     onTicketAssigned(value.volume!, value.client!.name)
     onClose()
   }
@@ -61,7 +62,8 @@ export const TicketAssignment = ({
   }
 
   const findSafClient = (query: string) => {
-    return findEntities(query)
+    //TODO implement the query
+    return api.findClients(query)
   }
 
   return (
