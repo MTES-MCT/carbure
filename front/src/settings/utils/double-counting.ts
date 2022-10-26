@@ -1,7 +1,7 @@
 import {
   DoubleCountingUploadError,
   DoubleCountingUploadErrorType,
-} from "doublecount/types"
+} from "../../double-counting/types"
 import { t } from "i18next"
 
 export function getErrorText(error: DoubleCountingUploadError) {
