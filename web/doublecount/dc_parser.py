@@ -199,9 +199,9 @@ dc_feedstock_to_carbure_feedstock: dict[str, str | None] = {
     "Paille": "PAILLE",
     "Râpes": "RAPES",
     "Seigle": "SEIGLE",
-    "Soja ": "SOJA ",
+    "Soja ": "SOJA",
     "Tallol": "TALLOL",
-    "Tournesol ": "TOURNESOL ",
+    "Tournesol ": "TOURNESOL",
     "Triticale": "TRITICALE",
 }
 
