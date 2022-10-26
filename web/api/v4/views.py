@@ -9,6 +9,7 @@ import time
 import traceback
 from django.db.models.aggregates import Count, Sum
 from django.db.models.fields import NOT_PROVIDED
+from django.db import transaction
 
 from django.http.response import HttpResponse, JsonResponse
 from django.db.models.query_utils import Q
@@ -555,33 +556,34 @@ def add_excel(request, *args, **kwargs):
     nb_invalid = 0
     lots = []
     lots_errors = []
-    for row in data:
-        lot_obj, errors = construct_carbure_lot(d, entity, row)
-        if not lot_obj:
-            nb_invalid += 1
-        else:
-            nb_valid += 1
-        nb_total += 1
-        lots.append(lot_obj)
-        lots_errors.append(errors)
-    lots_created = bulk_insert_lots(entity, lots, lots_errors, d)
-    if len(lots_created) == 0:
-        return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=500)
-    background_bulk_scoring(lots_created)
-    for lot in lots_created:
-        e = CarbureLotEvent()
-        e.event_type = CarbureLotEvent.CREATED
-        e.lot_id = lot.id
-        e.user = request.user
-        e.metadata = {'source': 'EXCEL'}
-        e.save()
-        if lot.parent_stock:
-            event = CarbureStockEvent()
-            event.event_type = CarbureStockEvent.SPLIT
-            event.stock = lot.parent_stock
-            event.user = request.user
-            event.metadata = {'message': 'Envoi lot.', 'volume_to_deduct': lot.volume}
-            event.save()
+    with transaction.atomic():
+        for row in data:
+            lot_obj, errors = construct_carbure_lot(d, entity, row)
+            if not lot_obj:
+                nb_invalid += 1
+            else:
+                nb_valid += 1
+            nb_total += 1
+            lots.append(lot_obj)
+            lots_errors.append(errors)
+        lots_created = bulk_insert_lots(entity, lots, lots_errors, d)
+        if len(lots_created) == 0:
+            return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=500)
+        background_bulk_scoring(lots_created)
+        for lot in lots_created:
+            e = CarbureLotEvent()
+            e.event_type = CarbureLotEvent.CREATED
+            e.lot_id = lot.id
+            e.user = request.user
+            e.metadata = {'source': 'EXCEL'}
+            e.save()
+            if lot.parent_stock:
+                event = CarbureStockEvent()
+                event.event_type = CarbureStockEvent.SPLIT
+                event.stock = lot.parent_stock
+                event.user = request.user
+                event.metadata = {'message': 'Envoi lot.', 'volume_to_deduct': lot.volume}
+                event.save()
     return JsonResponse({'status': 'success', 'data': {'lots': nb_total, 'valid': nb_valid, 'invalid': nb_invalid}})
 
 
