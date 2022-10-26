@@ -63,6 +63,7 @@ export const dcApplicationErrors = {
                 "line_number": null,
                 "is_blocking": true,
                 "meta": {
+                    "year": 2002,
                     "feedstock": "MARC_DE_RAISIN",
                     "sourcing": 8000,
                     "production": 10000
