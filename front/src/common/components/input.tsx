@@ -27,6 +27,7 @@ export interface Control extends Layout {
   placeholder?: string
   title?: string
   icon?: React.FunctionComponent | React.ReactNode
+  rightContent?: React.ReactNode
   domRef?: React.RefObject<HTMLElement>
 }
 
@@ -73,10 +74,10 @@ export const NumberInput = ({
       !onChange
         ? undefined
         : (e) => {
-            const value = parseFloat(e.target.value)
-            const change = isNaN(value) ? undefined : value
-            onChange(change)
-          }
+          const value = parseFloat(e.target.value)
+          const change = isNaN(value) ? undefined : value
+          onChange(change)
+        }
     }
   />
 )
@@ -399,6 +400,7 @@ export const Field = ({
   error,
   label,
   icon: Icon,
+  rightContent,
   variant,
   title,
   className,
@@ -458,6 +460,8 @@ export const Field = ({
         )}
 
         {icon && <div className={css.icon}>{icon}</div>}
+        {!!rightContent && rightContent}
+
       </div>
     </div>
   )

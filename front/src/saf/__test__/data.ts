@@ -1,6 +1,6 @@
 import { Biofuel, Country, Feedstock } from "carbure/types";
 import { company, operator, producer, productionSite } from "carbure/__test__/data";
-import { SafTicketSource, SafTicketSourceStatus, SafOperatorSnapshot, SafTicketSourcesResponse, SafTicketsResponse, SafTicket, SafTicketSourceDetails, LotPreview, SafTicketPreview, SafTicketStatus } from "saf/types";
+import { SafTicketSource, SafTicketSourceStatus, SafOperatorSnapshot, SafTicketSourcesResponse, SafTicketsResponse, SafTicket, SafTicketSourceDetails, LotPreview, SafTicketPreview, SafTicketStatus, SafTicketDetails } from "saf/types";
 
 
 export const safOperatorSnapshot: SafOperatorSnapshot = {
@@ -40,7 +40,7 @@ export const safTicketSource: SafTicketSource = {
   carbure_id: "A12332",
   year: 2022,
   period: 202201,
-  date: '2022-02-08',
+  created_at: '2022-02-08',
   total_volume: 10000,
   assigned_volume: 0,
   assigned_tickets: [],
@@ -80,7 +80,7 @@ export const safTicketSourceDetails: SafTicketSourceDetails = {
   carbure_id: "A12332",
   year: 2022,
   period: 202201,
-  date: '2022-02-08',
+  created_at: '2022-02-08',
   total_volume: 5000,
   assigned_volume: 3000,
   feedstock: feedstock1,
@@ -88,7 +88,6 @@ export const safTicketSourceDetails: SafTicketSourceDetails = {
   country_of_origin: country1,
   ghg_reduction: 54,
   parent_lot: lotPreview,
-  created_at: '2022-02-12',
   added_by: operator,
   assigned_tickets: [safTicketPreview1, safTicketPreview2], //[],//
   carbure_producer: producer,
@@ -115,7 +114,7 @@ export const safTicketSource2: SafTicketSource = {
   carbure_id: "B21234",
   year: 2022,
   period: 202202,
-  date: '2022-01-10',
+  created_at: '2022-01-10',
   assigned_tickets: [safTicketPreview1, safTicketPreview2],
   total_volume: 5000,
   assigned_volume: 2000,
@@ -147,8 +146,43 @@ export const safTicket: SafTicket = {
   biofuel: bioduel1,
   country_of_origin: country1,
   ghg_reduction: 74,
+  status: SafTicketStatus.Rejected,
 }
 
+
+export const safTicketDetails: SafTicketDetails = {
+  id: 12343,
+  carbure_id: "A22332",
+  status: SafTicketStatus.Rejected,
+  year: 2022,
+  period: 202202,
+  client_name: "Air France",
+  date: '2022-01-10',
+  supplier: producer,
+  volume: 2000,
+  feedstock: feedstock1,
+  biofuel: bioduel1,
+  country_of_origin: country1,
+  client_comment: "C'eest vraiment n'importe quoi !",
+  ghg_reduction: 74,
+  agreement_reference: 'Facture202201010',
+  agreement_date: '2022-01-10',
+  carbure_producer: producer,
+  unknown_producer: '',
+  carbure_production_site: productionSite,
+  unknown_production_site: '',
+  production_site_commissioning_date: "2000-01-31",
+  eec: 14.5,
+  el: 0,
+  ep: 7,
+  etd: 2,
+  eu: 0,
+  esca: 0,
+  eccs: 0,
+  eccr: 0,
+  eee: 0,
+  ghg_total: 23.5,
+}
 
 export const safTicketsResponse: SafTicketsResponse = {
   saf_tickets: [safTicket, safTicket],
