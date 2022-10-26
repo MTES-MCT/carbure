@@ -2,10 +2,10 @@ import useEntity from "carbure/hooks/entity"
 import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import { Fieldset } from "common/components/form"
-import { useHashMatch } from "common/components/hash-route"
+import HashRoute, { useHashMatch } from "common/components/hash-route"
 import { Return, Send, Split } from "common/components/icons"
 import { TextInput } from "common/components/input"
-import Portal from "common/components/portal"
+import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { invalidate } from "common/hooks/invalidate"
@@ -15,13 +15,16 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { safTicketSourceDetails } from "saf/__test__/data"
 import * as api from "../../api"
 import TicketSourceTag from "../ticket-sources/tag"
-import TicketSourceFields from "./fields"
 import Collapse from "common/components/collapse"
 import { LotPreview, SafTicketPreview, SafTicketSource } from "saf/types"
 import { useEffect, useRef } from "react"
 import NavigationButtons from "transaction-details/components/lots/navigation"
 import TicketTag from "../tickets/tag"
 import { cp } from "fs/promises"
+import TicketAssignment from "./assignment"
+import { useNotify } from "common/components/notifications"
+import { Entity } from "carbure/types"
+import TicketSourceFields from "./fields"
 
 export interface TicketSourceDetailsProps {
   neighbors: number[]
@@ -34,17 +37,18 @@ export const TicketSourceDetails = ({
 
   const navigate = useNavigate()
   const location = useLocation()
-
+  const notify = useNotify()
   const entity = useEntity()
   const match = useHashMatch("ticket-source/:id")
+  const portal = usePortal()
 
   const ticketSourceResponse = useQuery(api.getSafTicketSourceDetails, {
     key: "ticket-source-details",
     params: [entity.id, parseInt(match?.params.id!)],
   })
 
-  // const ticketSource = ticketSourceResponse.result?.data?.data
-  const ticketSource = safTicketSourceDetails //TO TEST
+  const ticketSource = ticketSourceResponse.result?.data?.data
+  // const ticketSource = safTicketSourceDetails //TO TEST
   const hasAssignements = ticketSource
     ? ticketSource?.assigned_tickets?.length > 0
     : false
@@ -61,8 +65,24 @@ export const TicketSourceDetails = ({
     navigate({ search: location.search, hash: "#" })
   }
 
+  const handleTicketAssigned = (volume: number, clientName: string) => {
+    notify(
+      t("{{volume}} litres ont bien été assignés à {{clientName}}.", {
+        volume,
+        clientName,
+      }),
+      { variant: "success" }
+    )
+  }
+
   const showAssignement = () => {
-    //TODO open assignement modal
+    portal((close) => (
+      <TicketAssignment
+        ticketSource={ticketSource!}
+        onClose={close}
+        onTicketAssigned={handleTicketAssigned}
+      />
+    ))
   }
 
   return (
@@ -71,7 +91,7 @@ export const TicketSourceDetails = ({
         <header>
           <TicketSourceTag ticketSource={ticketSource} />
           <h1>
-            {t("Volume SAF n°")}
+            {t("Volume CAD n°")}
             {ticketSource?.carbure_id ?? "..."}
           </h1>
         </header>
@@ -95,6 +115,7 @@ export const TicketSourceDetails = ({
             icon={Send}
             label={t("Affecter")}
             variant="primary"
+            disabled={!ticketSource}
             action={showAssignement}
           />
           <NavigationButtons neighbors={neighbors} />

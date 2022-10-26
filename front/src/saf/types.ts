@@ -21,7 +21,7 @@ export interface SafTicketSource {
   carbure_id: string
   year: number
   period: number
-  date: string
+  created_at: string
   total_volume: number
   assigned_volume: number
   feedstock: Feedstock
@@ -33,9 +33,15 @@ export interface SafTicketSource {
 
 export interface SafTicketSourceDetails extends SafTicketSource, SafProduction, SafDurability {
   parent_lot?: LotPreview
-  created_at: string
   added_by: Entity,
 
+}
+
+export interface SafLot {
+  feedstock: Feedstock
+  biofuel: Biofuel
+  country_of_origin: Country
+  volume: number
 }
 
 export interface LotPreview {
@@ -67,12 +73,14 @@ export interface SafTicket {
   biofuel: Biofuel
   country_of_origin: Country
   ghg_reduction: number // attention pour les lots c'etait ghg_reduction_red_ii
+  status: SafTicketStatus
 }
 
 export interface SafTicketDetails extends SafTicket, SafProduction, SafDurability {
-  parent_ticket_source?: SafTicketSource
+  // parent_ticket_source?: SafTicketSource TODO on a vraiment besoin de ça ? ce n'est pas visible sur les maquettes
   agreement_reference: string
   agreement_date: string
+  client_comment?: string
 }
 
 export interface SafProduction {
