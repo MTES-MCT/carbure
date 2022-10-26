@@ -75,16 +75,18 @@ test("check double counting upload with error display errors", async () => {
 
   //NOT_DC_FEEDSTOCK
   await screen.getByText(
-    "Production - Ligne 5 : La matière première BLE n’est pas comprise dans la liste des matières premières pouvant être double comptées."
+    "Production - Ligne 5 : La matière première Blé n’est pas comprise dans la liste des matières premières pouvant être double comptées."
   )
+
+  screen.debug(undefined, Infinity)
 
   //MP_BC_INCOHERENT
   await screen.getByText(
-    "Production - Ligne 4 : La matière première MARC_DE_RAISIN est incohérente avec le biocarburant B100."
+    "Production - Ligne 4 : La matière première Marc de raisin est incohérente avec le biocarburant B100."
   )
   //PRODUCTION_MISMATCH_SOURCING
   await screen.getByText(
-    "La quantité de matière première approvisionnée (8000 tonnes de MARC_DE_RAISIN) doit être supérieure à la quantité de biocarburant produite estimée (10000 tonnes)."
+    "En 2002, la quantité de matière première approvisionnée (8000 tonnes de Marc de raisin) doit être supérieure à la quantité de biocarburant produite estimée (10000 tonnes)."
   )
 
   //POME_GT_2000
