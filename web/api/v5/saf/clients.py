@@ -18,7 +18,6 @@ class SafClientsError:
 def get_clients(request, *args, **kwargs):
     try:
         q = request.GET.get('query', False)
-        # TODO Entity.AIRLINE
         entities = Entity.objects.filter(entity_type=Entity.AIRLINE).order_by('name')
     except:
         traceback.print_exc()

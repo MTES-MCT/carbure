@@ -108,7 +108,7 @@ export function useColumns() {
       key: "ghg_reduction",
       header: t("Réd. GES"),
       cell: (ticketSource: SafTicketSource) => {
-        return <Cell text={`${ticketSource.ghg_reduction.toFixed(2)}%`} />
+        return <Cell text={`${ticketSource.ghg_reduction.toFixed(0)}%`} />
       },
     },
   }

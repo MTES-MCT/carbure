@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import { SafTicket, SafTicketSource, SafTicketStatus } from "saf/types"
 
 export interface TicketTagProps extends TagProps {
-  status: SafTicketStatus
+  status: SafTicketStatus | undefined
   small?: boolean
 }
 
@@ -31,7 +31,7 @@ export const TicketTag = ({ status, small }: TicketTagProps) => {
 
     default:
       label = t("N/A")
-      variant = "danger"
+      variant = "none"
       break
   }
 

@@ -21,6 +21,7 @@ export const BlockingAnomalies = ({ anomalies }: BlockingAnomaliesProps) => {
     <Collapse
       variant="danger"
       icon={AlertOctagon}
+      isOpen={true}
       label={`${t("Erreurs")} (${anomalies.length})`}
     >
       <section>
