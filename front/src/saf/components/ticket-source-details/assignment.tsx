@@ -62,7 +62,6 @@ export const TicketAssignment = ({
   }
 
   const findSafClient = (query: string) => {
-    //TODO implement the query
     return api.findClients(query)
   }
 
