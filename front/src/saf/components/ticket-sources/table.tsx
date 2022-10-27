@@ -73,7 +73,7 @@ export function useColumns() {
       cell: (ticketSource: SafTicketSource) => {
         const value =
           ticketSource.assigned_tickets.length > 0
-            ? ticketSource.assigned_tickets.map((t) => t.client_name).join(", ")
+            ? ticketSource.assigned_tickets.map((t) => t.client).join(", ")
             : "-"
         return <Cell text={value} />
       },

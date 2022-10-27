@@ -78,8 +78,7 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
               )}
             </>
           )}
-          <NavigationButtons neighbors={neighbors} />
-          <Button icon={Return} label={t("Retour")} action={closeDialog} />
+          <NavigationButtons neighbors={neighbors} closeAction={closeDialog} />
         </footer>
 
         {stock.loading && <LoaderOverlay />}

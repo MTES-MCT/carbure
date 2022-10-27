@@ -102,9 +102,7 @@ export const TicketDetails = ({ neighbors }: TicketDetailsProps) => {
             disabled={!ticket}
             action={showCancelModal}
           />
-          <NavigationButtons neighbors={neighbors} />
-
-          <Button icon={Return} label={t("Retour")} action={closeDialog} />
+          <NavigationButtons neighbors={neighbors} closeAction={closeDialog} />
         </footer>
 
         {ticketResponse.loading && <LoaderOverlay />}

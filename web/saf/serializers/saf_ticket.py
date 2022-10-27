@@ -3,6 +3,17 @@ from rest_framework import serializers
 from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer
 from core.serializers import EntityPreviewSerializer, ProductionSiteSerializer
 from saf.models import SafTicket
+from core.models import Entity
+
+
+class SafClientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Entity
+        fields = [
+            "id",
+            "entity_type",
+            "name"
+        ]
 
 
 class SafTicketSerializer(serializers.ModelSerializer):
@@ -90,6 +101,7 @@ class SafTicketPreviewSerializer(serializers.ModelSerializer):
             "agreement_date",
             "volume",
             "status",
+            "created_at"
         ]
 
     client = serializers.SlugRelatedField(read_only=True, slug_field="name")

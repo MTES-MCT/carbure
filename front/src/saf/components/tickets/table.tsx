@@ -64,7 +64,7 @@ export function useColumns(status: SafTicketStatus) {
 
     client: {
       header: t("Client"),
-      cell: (ticket: SafTicket) => <Cell text={ticket.client_name} />,
+      cell: (ticket: SafTicket) => <Cell text={ticket.client} />,
     },
 
     period: {
@@ -73,7 +73,7 @@ export function useColumns(status: SafTicketStatus) {
       cell: (ticket: SafTicket) => (
         <Cell
           text={formatPeriod(ticket.period)}
-          sub={formatDate(ticket.date)}
+          sub={formatDate(ticket.created_at)}
         />
       ),
     },
