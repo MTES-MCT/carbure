@@ -21,6 +21,7 @@ def get_snapshot(request, *args, **kwargs):
     except:
         return ErrorResponse(400, SafSnapshotError.PARAMS_MALFORMED)
 
+    print(tickets)
     try:
         sources = SafTicketSource.objects.filter(year=year, added_by_id=entity_id)
         tickets = SafTicket.objects.filter(year=year, supplier_id=entity_id)

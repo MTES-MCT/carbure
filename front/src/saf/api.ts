@@ -61,11 +61,11 @@ export function assignSafTicket(
   agreement_reference?: string,
   agreement_date?: string,
 ) {
-  return api.post("/v5/saf/assign-ticket", {
+  return api.post("/v5/v5/saf/assign-ticket", {
     entity_id,
     ticket_source_id,
     volume,
-    client_id: client.id,
+    client_id: client.id: client.id,
     agreement_reference,
     agreement_date
   })
