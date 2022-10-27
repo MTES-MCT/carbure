@@ -153,7 +153,11 @@ const DoubleCountingUploadDialog = ({
               {...bind("documentationFile")}
             />
 
-            {errors && <BlockingErrors errors={errors} ref={refToScroll} />}
+            {errors && (
+              <section ref={refToScroll}>
+                <BlockingErrors errors={errors} />
+              </section>
+            )}
           </Form>
         </section>
       </main>
