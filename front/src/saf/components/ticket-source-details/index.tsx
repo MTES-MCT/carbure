@@ -8,6 +8,7 @@ import { useNotify } from "common/components/notifications"
 import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
+import useScrollToRef from "common/hooks/scroll-to-ref"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import { useEffect, useRef } from "react"
 import { useTranslation } from "react-i18next"
@@ -19,8 +20,10 @@ import { Lot } from "transactions/types"
 import * as api from "../../api"
 import TicketSourceTag from "../ticket-sources/tag"
 import TicketTag from "../tickets/tag"
+import AssignedTickets from "./assigned-tickets"
 import TicketAssignment from "./assignment"
 import TicketSourceFields from "./fields"
+import ParentLot from "./parent-lot"
 
 export interface TicketSourceDetailsProps {
   neighbors: number[]
@@ -29,7 +32,6 @@ export const TicketSourceDetails = ({
   neighbors,
 }: TicketSourceDetailsProps) => {
   const { t } = useTranslation()
-  const assignementsRef = useRef<HTMLElement>(null)
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -44,19 +46,12 @@ export const TicketSourceDetails = ({
   })
 
   const ticketSource = ticketSourceResponse.result?.data?.data
-  console.log("ticketSource:", ticketSource)
   // const ticketSource = safTicketSourceDetails //TO TEST
   const hasAssignements = ticketSource
     ? ticketSource?.assigned_tickets?.length > 0
     : false
 
-  useEffect(() => {
-    if (hasAssignements && assignementsRef?.current)
-      assignementsRef.current.scrollIntoView({
-        block: "end",
-        behavior: "smooth",
-      })
-  }, [assignementsRef, hasAssignements])
+  const { refToScroll } = useScrollToRef(hasAssignements)
 
   const closeDialog = () => {
     navigate({ search: location.search, hash: "#" })
@@ -98,12 +93,12 @@ export const TicketSourceDetails = ({
             <TicketSourceFields ticketSource={ticketSource} />
           </section>
           {hasAssignements && (
-            <section ref={assignementsRef}>
+            <section ref={refToScroll}>
               <AssignedTickets ticketSource={ticketSource} />
             </section>
           )}
           <section>
-            <LotOrigin parent_lot={ticketSource?.parent_lot} />
+            <ParentLot parent_lot={ticketSource?.parent_lot} />
           </section>
         </main>
 
@@ -112,7 +107,10 @@ export const TicketSourceDetails = ({
             icon={Send}
             label={t("Affecter")}
             variant="primary"
-            disabled={!ticketSource}
+            disabled={
+              !ticketSource ||
+              ticketSource.assigned_volume === ticketSource.total_volume
+            }
             action={showAssignement}
           />
           <NavigationButtons neighbors={neighbors} closeAction={closeDialog} />
@@ -125,81 +123,3 @@ export const TicketSourceDetails = ({
 }
 
 export default TicketSourceDetails
-
-const AssignedTickets = ({
-  ticketSource,
-}: {
-  ticketSource: SafTicketSource | undefined
-}) => {
-  const { t } = useTranslation()
-
-  const showTicket = (ticket: SafTicketPreview) => {
-    //TODO open ticket modal
-  }
-
-  if (!ticketSource) return null
-
-  return (
-    <Collapse
-      isOpen={true}
-      variant="info"
-      icon={Send}
-      label={
-        t("Tickets affectés") +
-        ` (${formatNumber(ticketSource.assigned_volume)}L/${formatNumber(
-          ticketSource.total_volume
-        )})`
-      }
-    >
-      <section>
-        <ul>
-          {ticketSource.assigned_tickets.map((ticket) => {
-            return (
-              <li key={ticket.id}>
-                <Button variant="link" action={() => showTicket(ticket)}>
-                  {ticket.client} - {formatNumber(ticket.volume)} L -{" "}
-                  {t("Affecté le")} {formatDate(ticket.created_at)}{" "}
-                </Button>{" "}
-                <TicketTag status={ticket.status} small />
-              </li>
-            )
-          })}
-        </ul>
-      </section>
-      <footer></footer>
-    </Collapse>
-  )
-}
-
-const LotOrigin = ({ parent_lot }: { parent_lot?: LotPreview }) => {
-  const { t } = useTranslation()
-  const location = useLocation()
-  const navigate = useNavigate()
-
-  const showLotDetails = () => {
-    navigate({
-      pathname: location.pathname,
-      search: location.search,
-      hash: `lot/${parent_lot?.id}`,
-    })
-  }
-
-  return (
-    <Collapse isOpen={true} variant="info" icon={Split} label={"Lot Initial"}>
-      <section>
-        <ul>
-          <li>
-            {parent_lot ? (
-              <Button variant="link" action={showLotDetails}>
-                {parent_lot.carbure_id}
-              </Button>
-            ) : (
-              t("Inconnu")
-            )}
-          </li>
-        </ul>
-      </section>
-      <footer></footer>
-    </Collapse>
-  )
-}

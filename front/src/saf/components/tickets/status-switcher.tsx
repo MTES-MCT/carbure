@@ -22,18 +22,18 @@ export const StatusSwitcher = ({
       onFocus={(status) => onSwitch(status as SafTicketStatus)}
       tabs={[
         {
-          key: SafTicketStatus.Pending,
-          path: SafTicketStatus.Pending,
+          key: SafTicketStatus.Pending.toLowerCase(),
+          path: SafTicketStatus.Pending.toLowerCase(),
           label: `${t("En attente")} (${count?.tickets_pending ?? 0})`,
         },
         {
-          key: SafTicketStatus.Rejected,
-          path: SafTicketStatus.Rejected,
+          key: SafTicketStatus.Rejected.toLowerCase(),
+          path: SafTicketStatus.Rejected.toLowerCase(),
           label: `${t("Refusés")} (${count?.tickets_rejected ?? 0})`,
         },
         {
-          key: SafTicketStatus.Accepted,
-          path: SafTicketStatus.Accepted,
+          key: SafTicketStatus.Accepted.toLowerCase(),
+          path: SafTicketStatus.Accepted.toLowerCase(),
           label: `${t("Acceptés")} (${count?.tickets_accepted ?? 0})`,
         },
       ]}

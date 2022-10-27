@@ -22,7 +22,7 @@ export const NavigationButtons = ({
 
   return (
     <div data-asidex={true} className={cl(css.navigation)}>
-      {neighbors.length > 0 && (
+      {neighbors.length > 1 && (
         <>
           <Button
             disabled={!nav.hasPrev}

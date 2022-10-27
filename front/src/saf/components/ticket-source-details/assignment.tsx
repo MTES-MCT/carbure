@@ -39,7 +39,7 @@ export const TicketAssignment = ({
   }
 
   const assignSafTicket = useMutation(api.assignSafTicket, {
-    invalidates: ["ticket-source-details"],
+    invalidates: ["ticket-source-details", "ticket-sources"],
   })
 
   const assignTicket = async () => {

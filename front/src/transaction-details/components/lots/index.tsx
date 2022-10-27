@@ -32,6 +32,7 @@ import Score from "../score"
 import Portal from "common/components/portal"
 import Flags from "flags.json"
 import { useHashMatch } from "common/components/hash-route"
+import useScrollToRef from "common/hooks/scroll-to-ref"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -71,6 +72,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const comments = lotData?.comments ?? []
   const changes = getLotChanges(lotData?.updates)
   const [errors, warnings] = separateAnomalies(lotData?.errors ?? [])
+  const { refToScroll } = useScrollToRef(errors.length > 0)
 
   const form = useLotForm(lotData?.lot, errors, certificates)
 
@@ -126,7 +128,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
           </section>
 
           {errors.length > 0 && (
-            <section>
+            <section ref={refToScroll}>
               <BlockingAnomalies anomalies={errors} />
             </section>
           )}

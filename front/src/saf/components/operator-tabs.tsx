@@ -92,12 +92,11 @@ interface TicketRecapProps {
 const TicketRecap = ({
   loading,
   count = 0,
-  pending = 0,
   rejected = 0,
   label,
 }: TicketRecapProps) => {
   const { t } = useTranslation()
-  const hasAlert = pending > 0 || rejected > 0
+  const hasAlert = rejected > 0
 
   return (
     <>
@@ -125,12 +124,6 @@ const TicketRecap = ({
       </Row>
       {hasAlert && (
         <Col className={css.verso}>
-          {pending > 0 && (
-            <p>
-              <strong>{formatNumber(pending)}</strong>{" "}
-              {t("tickets en attente", { count: pending })}
-            </p>
-          )}
           {rejected > 0 && (
             <p>
               <strong>{formatNumber(rejected)}</strong>{" "}
