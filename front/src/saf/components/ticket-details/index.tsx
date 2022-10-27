@@ -39,17 +39,6 @@ export const TicketDetails = ({ neighbors }: TicketDetailsProps) => {
 
   const ticket = ticketResponse.result?.data?.data
   // const ticket = safTicketDetails //TO TEST
-  // const commentRef = ticket
-  //   ? ticket?.client_comment?.length > 0
-  //   : false
-
-  // useEffect(() => { TODO go to comment block
-  //   if (hasAssignements && assignementsRef?.current)
-  //     assignementsRef.current.scrollIntoView({
-  //       block: "end",
-  //       behavior: "smooth",
-  //     })
-  // }, [assignementsRef, hasAssignements])
 
   const handleTicketCanceled = () => {
     notify(
@@ -59,7 +48,6 @@ export const TicketDetails = ({ neighbors }: TicketDetailsProps) => {
   }
 
   const showCancelModal = () => {
-    //TODO show modal
     portal((close) => (
       <CancelAssignment
         ticket={ticket!}
