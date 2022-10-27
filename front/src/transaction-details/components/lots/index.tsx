@@ -7,7 +7,7 @@ import { CorrectionStatus, Lot, LotStatus } from "transactions/types"
 import { useQuery, useMutation } from "common/hooks/async"
 import { useNotify } from "common/components/notifications"
 import useEntity from "carbure/hooks/entity"
-import { LoaderOverlay } from "common/components/scaffold"
+import { layout, LoaderOverlay } from "common/components/scaffold"
 import Dialog from "common/components/dialog"
 import Button from "common/components/button"
 import { Alarm, Return, Save } from "common/components/icons"
@@ -176,9 +176,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
             <LotActions lot={lotData.lot} canSave={canSave} />
           )}
 
-          <NavigationButtons neighbors={neighbors} />
-
-          <Button icon={Return} label={t("Retour")} action={closeDialog} />
+          <NavigationButtons neighbors={neighbors} closeAction={closeDialog} />
         </footer>
 
         {lot.loading && <LoaderOverlay />}

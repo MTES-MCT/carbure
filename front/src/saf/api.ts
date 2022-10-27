@@ -1,5 +1,5 @@
-import { AxiosResponse } from "axios"
-import { Entity } from "carbure/types"
+import { extract } from "carbure/api"
+import { Entity, EntityPreview } from "carbure/types"
 import { api, Api } from "common/services/api"
 import { SafFilter, SafOperatorSnapshot, SafQuery, SafTicketDetails, SafTicketSourceDetails, SafTicketSourcesResponse, SafTicketsResponse } from "./types"
 
@@ -57,15 +57,15 @@ export function assignSafTicket(
   entity_id: number,
   ticket_source_id: number,
   volume: number,
-  client: Entity,
+  client: EntityPreview,
   agreement_reference?: string,
   agreement_date?: string,
 ) {
-  return api.post("/v5/v5/saf/assign-ticket", {
+  return api.post("/v5/saf/assign-ticket", {
     entity_id,
     ticket_source_id,
     volume,
-    client_id: client.id: client.id,
+    client_id: client.id,
     agreement_reference,
     agreement_date
   })
@@ -81,17 +81,10 @@ export function cancelSafTicket(
     ticket_id
   })
 }
-export function extract<T>(res: AxiosResponse<Api<T[]>>) {
-  return res.data.data ?? []
-}
+
 
 export async function findClients(query?: string) {
-  await api
-    .get<Api<Entity[]>>("/v5/saf/clients", { params: { query } })
-    .then(extract => {
-      console.log('extract:', extract)
-
-    })
-
-  return []
+  return api
+    .get<Api<EntityPreview[]>>("/v5/saf/clients", { params: { query } })
+    .then(extract)
 }

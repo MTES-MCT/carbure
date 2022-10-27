@@ -1,29 +1,25 @@
 import useEntity from "carbure/hooks/entity"
 import Button from "common/components/button"
+import Collapse from "common/components/collapse"
 import Dialog from "common/components/dialog"
-import { Fieldset } from "common/components/form"
 import HashRoute, { useHashMatch } from "common/components/hash-route"
 import { Return, Send, Split } from "common/components/icons"
-import { TextInput } from "common/components/input"
+import { useNotify } from "common/components/notifications"
 import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import { invalidate } from "common/hooks/invalidate"
 import { formatDate, formatNumber } from "common/utils/formatters"
+import { useEffect, useRef } from "react"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
-import { safTicketSourceDetails } from "saf/__test__/data"
+import { LotPreview, SafTicketPreview, SafTicketSource } from "saf/types"
+import LotDetails from "transaction-details/components/lots"
+import NavigationButtons from "transaction-details/components/lots/navigation"
+import { Lot } from "transactions/types"
 import * as api from "../../api"
 import TicketSourceTag from "../ticket-sources/tag"
-import Collapse from "common/components/collapse"
-import { LotPreview, SafTicketPreview, SafTicketSource } from "saf/types"
-import { useEffect, useRef } from "react"
-import NavigationButtons from "transaction-details/components/lots/navigation"
 import TicketTag from "../tickets/tag"
-import { cp } from "fs/promises"
 import TicketAssignment from "./assignment"
-import { useNotify } from "common/components/notifications"
-import { Entity } from "carbure/types"
 import TicketSourceFields from "./fields"
 
 export interface TicketSourceDetailsProps {
@@ -48,6 +44,7 @@ export const TicketSourceDetails = ({
   })
 
   const ticketSource = ticketSourceResponse.result?.data?.data
+  console.log("ticketSource:", ticketSource)
   // const ticketSource = safTicketSourceDetails //TO TEST
   const hasAssignements = ticketSource
     ? ticketSource?.assigned_tickets?.length > 0
@@ -118,9 +115,7 @@ export const TicketSourceDetails = ({
             disabled={!ticketSource}
             action={showAssignement}
           />
-          <NavigationButtons neighbors={neighbors} />
-
-          <Button icon={Return} label={t("Retour")} action={closeDialog} />
+          <NavigationButtons neighbors={neighbors} closeAction={closeDialog} />
         </footer>
 
         {ticketSourceResponse.loading && <LoaderOverlay />}
@@ -162,8 +157,8 @@ const AssignedTickets = ({
             return (
               <li key={ticket.id}>
                 <Button variant="link" action={() => showTicket(ticket)}>
-                  {ticket.client_name} - {formatNumber(ticket.volume)} L -{" "}
-                  {t("Affecté le")} {formatDate(ticket.date)}{" "}
+                  {ticket.client} - {formatNumber(ticket.volume)} L -{" "}
+                  {t("Affecté le")} {formatDate(ticket.created_at)}{" "}
                 </Button>{" "}
                 <TicketTag status={ticket.status} small />
               </li>
@@ -178,13 +173,26 @@ const AssignedTickets = ({
 
 const LotOrigin = ({ parent_lot }: { parent_lot?: LotPreview }) => {
   const { t } = useTranslation()
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  const showLotDetails = () => {
+    navigate({
+      pathname: location.pathname,
+      search: location.search,
+      hash: `lot/${parent_lot?.id}`,
+    })
+  }
+
   return (
     <Collapse isOpen={true} variant="info" icon={Split} label={"Lot Initial"}>
       <section>
         <ul>
           <li>
             {parent_lot ? (
-              <Button variant="link">{parent_lot.carbure_id}</Button>
+              <Button variant="link" action={showLotDetails}>
+                {parent_lot.carbure_id}
+              </Button>
             ) : (
               t("Inconnu")
             )}
