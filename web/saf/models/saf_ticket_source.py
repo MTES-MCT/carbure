@@ -1,7 +1,6 @@
 from datetime import datetime
-from django.db import models
-from django.dispatch import receiver
-from django.db.models.signals import pre_save
+from django.db import models, transaction
+from core.utils import bulk_update_or_create
 
 
 class SafTicketSource(models.Model):
@@ -11,7 +10,7 @@ class SafTicketSource(models.Model):
         verbose_name_plural = "Tickets source SAF"
         ordering = ["carbure_id"]
 
-    carbure_id = models.CharField(max_length=64, unique=True)
+    carbure_id = models.CharField(max_length=64, null=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     added_by = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.SET_NULL, related_name="saf_source_owner")  # fmt: skip
 
@@ -49,61 +48,71 @@ class SafTicketSource(models.Model):
     parent_lot = models.ForeignKey("core.CarbureLot", null=True, blank=True, on_delete=models.CASCADE)
 
     def generate_carbure_id(self):
-        self.carbure_id = "T{period}-{country_of_production}-{id}".format(
+        self.carbure_id = "TS{period}-{country_of_production}-{id}".format(
             period=self.period,
             country_of_production=self.production_country.code_pays,
             id=self.id,
         )
 
 
-@receiver(pre_save, sender=SafTicketSource)
-def saf_ticket_source_pre_save_gen_carbure_id(sender, instance, *args, **kwargs):
-    instance.generate_carbure_id()
-
-
 # list of accepted SAF
 SAF = ("HVOC", "HOC", "HCC")
 
 
+@transaction.atomic
 def create_ticket_sources_from_lots(lots):
-    ticket_sources = []
+    ticket_source_data = []
 
     today = datetime.today()
     period = today.year * 100 + today.month
 
-    for lot in lots.exclude(lot_status__in=("DRAFT", "PENDING", "DELETED")).filter(biofuel__code__in=SAF).iterator():
-        ticket_sources.append(
-            SafTicketSource(
-                carbure_id=lot.carbure_id,
-                created_at=lot.created_at,
-                added_by_id=lot.carbure_client_id,
-                year=today.year,
-                period=period,
-                total_volume=lot.volume,
-                assigned_volume=0,
-                feedstock_id=lot.feedstock_id,
-                biofuel_id=lot.biofuel_id,
-                country_of_origin_id=lot.country_of_origin_id,
-                carbure_producer_id=lot.carbure_producer_id,
-                unknown_producer=lot.unknown_producer,
-                carbure_production_site_id=lot.carbure_production_site_id,
-                unknown_production_site=lot.unknown_production_site,
-                production_country_id=lot.production_country_id,
-                production_site_commissioning_date=lot.production_site_commissioning_date,
-                eec=lot.eec,
-                el=lot.el,
-                ep=lot.ep,
-                etd=lot.etd,
-                eu=lot.eu,
-                esca=lot.esca,
-                eccs=lot.eccs,
-                eccr=lot.eccr,
-                eee=lot.eee,
-                ghg_total=lot.ghg_total,
-                ghg_reference=lot.ghg_reference,
-                ghg_reduction=lot.ghg_reduction,
-                parent_lot=lot,
-            )
+    # make sure we only have declared lotsof SAF in the queryset
+    saf_lots = lots.exclude(lot_status__in=("DRAFT", "PENDING", "DELETED")).filter(biofuel__code__in=SAF)
+
+    for lot in saf_lots.iterator():
+        ticket_source_data.append(
+            {
+                "carbure_id": None,
+                "created_at": lot.created_at,
+                "added_by_id": lot.carbure_client_id,
+                "year": today.year,
+                "period": period,
+                "total_volume": lot.volume,
+                "assigned_volume": 0,
+                "feedstock_id": lot.feedstock_id,
+                "biofuel_id": lot.biofuel_id,
+                "country_of_origin_id": lot.country_of_origin_id,
+                "carbure_producer_id": lot.carbure_producer_id,
+                "unknown_producer": lot.unknown_producer,
+                "carbure_production_site_id": lot.carbure_production_site_id,
+                "unknown_production_site": lot.unknown_production_site,
+                "production_country_id": lot.production_country_id,
+                "production_site_commissioning_date": lot.production_site_commissioning_date,
+                "eec": lot.eec,
+                "el": lot.el,
+                "ep": lot.ep,
+                "etd": lot.etd,
+                "eu": lot.eu,
+                "esca": lot.esca,
+                "eccs": lot.eccs,
+                "eccr": lot.eccr,
+                "eee": lot.eee,
+                "ghg_total": lot.ghg_total,
+                "ghg_reference": lot.ghg_reference,
+                "ghg_reduction": lot.ghg_reduction,
+                "parent_lot_id": lot.id,
+            }
         )
 
-    return SafTicketSource.objects.bulk_create(ticket_sources)
+    # update ticket sources that were already created for some of the given lots (happens when a lot was declared then undeclared then declared again)
+    # and create new ones for lots that were not already declared
+    bulk_update_or_create(SafTicketSource, "parent_lot_id", ticket_source_data)
+
+    # regenerate carbure_ids for the new ticket sources now that they definitely have an actual id
+    ticket_sources = SafTicketSource.objects.filter(parent_lot_id__in=saf_lots.values("id"))
+    for ticket_source in ticket_sources:
+        ticket_source.generate_carbure_id()
+        print(ticket_source.carbure_id)
+    SafTicketSource.objects.bulk_update(ticket_sources, ["carbure_id"])
+
+    return ticket_sources
