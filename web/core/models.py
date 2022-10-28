@@ -782,7 +782,7 @@ def delete_lot(sender, instance, using, **kwargs):
     if instance.parent_lot:
         if instance.parent_lot.delivery_type in [CarbureLot.PROCESSING, CarbureLot.TRADING]:
             instance.parent_lot.lot_status = CarbureLot.PENDING
-            instance.parent_lot.delivery_type = CarbureLot.OTHER
+            instance.parent_lot.delivery_type = CarbureLot.UNKNOWN
             instance.parent_lot.save()
             # save event
             event = CarbureLotEvent()
