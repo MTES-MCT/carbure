@@ -262,7 +262,7 @@ export function getDeliveryLabel(delivery: DeliveryType | undefined) {
     case DeliveryType.Flushed:
       return i18next.t("Vidé")
     case DeliveryType.Unknown:
-      return i18next.t("Inconnu")
+      return i18next.t("En attente")
     default:
       return delivery || "N/A"
   }

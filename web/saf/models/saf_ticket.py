@@ -1,4 +1,7 @@
+from datetime import datetime
 from django.db import models
+from django.dispatch import receiver
+from django.db.models.signals import pre_save
 
 
 class SafTicket(models.Model):
@@ -55,18 +58,32 @@ class SafTicket(models.Model):
 
     parent_ticket_source = models.ForeignKey("saf.SafTicketSource", null=True, on_delete=models.SET_NULL, related_name="saf_tickets")  # fmt: skip
 
+    def generate_carbure_id(self):
+        self.carbure_id = "T{period}-{country_of_production}-{id}".format(
+            period=self.period,
+            country_of_production=self.production_country.code_pays,
+            id=self.id,
+        )
+
+
+@receiver(pre_save, sender=SafTicket)
+def saf_ticket_pre_save_gen_carbure_id(sender, instance, *args, **kwargs):
+    instance.generate_carbure_id()
+
 
 def create_ticket_from_source(ticket_source, client_id, volume, agreement_date, agreement_reference):
+    today = datetime.today()
+    period = today.year * 100 + today.month
+
     return SafTicket(
         client_id=client_id,
         volume=volume,
         agreement_date=agreement_date,
         agreement_reference=agreement_reference,
         status=SafTicket.PENDING,
-        carbure_id=ticket_source.carbure_id,
         created_at=ticket_source.created_at,
-        year=ticket_source.year,
-        period=ticket_source.period,
+        year=today.year,
+        period=period,
         biofuel=ticket_source.biofuel,
         feedstock=ticket_source.feedstock,
         country_of_origin=ticket_source.country_of_origin,
