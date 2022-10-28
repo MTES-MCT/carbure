@@ -1,4 +1,7 @@
+from datetime import datetime
 from django.db import models
+from django.dispatch import receiver
+from django.db.models.signals import pre_save
 
 
 class SafTicketSource(models.Model):
@@ -45,6 +48,18 @@ class SafTicketSource(models.Model):
 
     parent_lot = models.ForeignKey("core.CarbureLot", null=True, blank=True, on_delete=models.CASCADE)
 
+    def generate_carbure_id(self):
+        self.carbure_id = "T{period}-{country_of_production}-{id}".format(
+            period=self.period,
+            country_of_production=self.production_country.code_pays,
+            id=self.id,
+        )
+
+
+@receiver(pre_save, sender=SafTicketSource)
+def saf_ticket_source_pre_save_gen_carbure_id(sender, instance, *args, **kwargs):
+    instance.generate_carbure_id()
+
 
 # list of accepted SAF
 SAF = ("HVOC", "HOC", "HCC")
@@ -53,14 +68,17 @@ SAF = ("HVOC", "HOC", "HCC")
 def create_ticket_sources_from_lots(lots):
     ticket_sources = []
 
+    today = datetime.today()
+    period = today.year * 100 + today.month
+
     for lot in lots.exclude(lot_status__in=("DRAFT", "PENDING", "DELETED")).filter(biofuel__code__in=SAF).iterator():
         ticket_sources.append(
             SafTicketSource(
                 carbure_id=lot.carbure_id,
                 created_at=lot.created_at,
                 added_by_id=lot.carbure_client_id,
-                year=lot.year,
-                period=lot.period,
+                year=today.year,
+                period=period,
                 total_volume=lot.volume,
                 assigned_volume=0,
                 feedstock_id=lot.feedstock_id,
