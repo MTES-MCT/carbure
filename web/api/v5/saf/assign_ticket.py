@@ -46,8 +46,8 @@ def assign_ticket(request, *args, **kwargs):
                 agreement_date=agreement_date,
                 agreement_reference=agreement_reference,
             )
-            ticket.save()
-            ticket_source.assigned_volume += volume
+
+            ticket_source.assigned_volume += ticket.volume
             ticket_source.save()
 
         return SuccessResponse()
