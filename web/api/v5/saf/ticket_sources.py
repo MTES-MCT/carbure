@@ -4,6 +4,7 @@ from math import floor
 import traceback
 from django.core.paginator import Paginator
 from django.db.models.expressions import F
+from django.db.models import Q
 
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
@@ -53,6 +54,7 @@ def parse_ticket_source_query(query):
     entity_id = int(query["entity_id"])
     status = query["status"]
     year = int(query["year"])
+    search = query.get("search", None)
     period = [int(p) for p in query.getlist("period")] if "period" in query else None
     client = query.getlist("client") if "client" in query else None
     feedstock = query.getlist("feedstock") if "feedstock" in query else None
@@ -64,12 +66,13 @@ def parse_ticket_source_query(query):
         "status": status,
         "feedstock": feedstock,
         "client": client,
+        "search": search,
     }
 
 
 def find_ticket_sources(**filters):
     ticket_sources = (
-        SafTicketSource.objects.select_related("feedstock")
+        SafTicketSource.objects.select_related("feedstock", "biofuel", "country_of_origin", "carbure_production_site")
         .prefetch_related("saf_tickets")
         .prefetch_related("saf_tickets__client")
     )
@@ -95,5 +98,17 @@ def find_ticket_sources(**filters):
         ticket_sources = ticket_sources.filter(assigned_volume__gte=F("total_volume"))
     else:
         raise Exception("Status '%s' does not exist for ticket sources" % filters["status"])
+
+    if filters["search"] != None:
+        ticket_sources = ticket_sources.filter(
+            Q(carbure_id__icontains=filters["search"])
+            | Q(saf_tickets__client__name__icontains=filters["search"])
+            | Q(feedstock__name__icontains=filters["search"])
+            | Q(biofuel__name__icontains=filters["search"])
+            | Q(country_of_origin__name__icontains=filters["search"])
+            | Q(agreement_reference__icontains=filters["search"])
+            | Q(carbure_production_site__name__icontains=filters["search"])
+            | Q(unknown_production_site__icontains=filters["search"])
+        )
 
     return ticket_sources
