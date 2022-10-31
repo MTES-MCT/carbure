@@ -3,7 +3,7 @@
 import traceback
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
-from saf.models.saf_ticket_source import find_ticket_sources
+from .ticket_sources import parse_ticket_source_query, find_ticket_sources
 
 
 class SafTicketSourceFiltersError:
@@ -15,37 +15,19 @@ class SafTicketSourceFiltersError:
 @check_user_rights()
 def get_ticket_source_filters(request, *args, **kwargs):
     try:
-        entity_id = int(kwargs["context"]["entity_id"])
-        status = request.GET.get("status")
-        year = int(request.GET.get("year"))
+        query = parse_ticket_source_query(request.GET)
         filter = request.GET.get("filter")
-        period = [int(p) for p in request.GET.getlist("period")] if "period" in request.GET else None
-        client = request.GET.getlist("client") if "client" in request.GET else None
-        feedstock = request.GET.getlist("feedstock") if "feedstock" in request.GET else None
     except:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketSourceFiltersError.MALFORMED_PARAMS)
 
     try:
-        query = {
-            "entity_id": entity_id,
-            "year": year,
-            "period": period,
-            "status": status,
-            "feedstock": feedstock,
-            "client": client,
-            filter: None,  # do not apply the filter we are listing so we can get all its possible values in the current context
-        }
-
+        # do not apply the filter we are listing so we can get all its possible values in the current context
+        query[filter] = None
+        # find all ticket sources matching the rest of the query
         ticket_sources = find_ticket_sources(**query)
-
-        data = []
-        if filter == "client":
-            data = get_filter_values(ticket_sources, "saf_tickets__client__name")
-        elif filter == "period":
-            data = get_filter_values(ticket_sources, "period")
-        elif filter == "feedstock":
-            data = get_filter_values(ticket_sources, "feedstock__code")
+        # get the available values for the selected filter
+        data = get_filter_values(ticket_sources, filter)
 
         return SuccessResponse(list(set(data)))
     except:
@@ -54,5 +36,15 @@ def get_ticket_source_filters(request, *args, **kwargs):
 
 
 def get_filter_values(ticket_sources, filter):
-    values = ticket_sources.values_list(filter, flat=True).distinct()
+    if not filter:
+        raise Exception("No filter was specified")
+
+    if filter == "client":
+        column = "saf_tickets__client__name"
+    elif filter == "period":
+        column = "period"
+    elif filter == "feedstock":
+        column = "feedstock__code"
+
+    values = ticket_sources.values_list(column, flat=True).distinct()
     return [v for v in values if v]
