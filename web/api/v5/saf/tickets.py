@@ -3,7 +3,6 @@
 from math import floor
 import traceback
 from django.core.paginator import Paginator
-from django.db.models.expressions import F
 
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
