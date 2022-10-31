@@ -41,6 +41,9 @@ build-ci-image:
     - docker build -f ci/Dockerfile -t $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest .
     - docker push $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest
   only:
+    refs:
+      - dev
+      - master
     changes:
       - ci/Dockerfile
       - Pipfile
