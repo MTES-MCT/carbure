@@ -17,7 +17,8 @@ import Dashboard from "dashboard"
 import Controls from "controls"
 import Entities from "companies"
 import Auth from "auth"
-import Saf from "saf"
+import Saf from "saf/operator"
+import SafClient from "saf/client"
 
 const Carbure = () => {
   const user = useUserManager()
@@ -62,8 +63,15 @@ const currentYear = new Date().getFullYear()
 const Org = () => {
   const entity = useEntity()
 
-  const { isAdmin, isAuditor, isExternal, isIndustry, isOperator, has_saf } =
-    entity
+  const {
+    isAdmin,
+    isAuditor,
+    isExternal,
+    isIndustry,
+    isOperator,
+    has_saf,
+    isAirline,
+  } = entity
   const hasDCA = isExternal && entity.hasPage("DCA")
 
   // prettier-ignore
@@ -83,6 +91,11 @@ const Org = () => {
         {has_saf && isOperator && (<>
           <Route path="saf/:year/*" element={<Saf />} />
           <Route path="saf" element={<Navigate replace to={`${currentYear}/ticket-sources`} />} />
+        </>)} 
+
+        {isAirline && (<>
+          <Route path="saf/:year/*" element={<SafClient />} />
+          <Route path="saf" element={<Navigate replace to={`${currentYear}/tickets`} />} />
         </>)} 
 
         {isAdmin && (<> 

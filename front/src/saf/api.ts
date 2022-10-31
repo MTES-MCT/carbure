@@ -15,7 +15,7 @@ export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/v5/saf/years", { params: { entity_id } })
 }
 
-export function getSafOperatorSnapshot(entity_id: number, year: number) {
+export function getSafSnapshot(entity_id: number, year: number) {
   return api.get<Api<SafOperatorSnapshot>>("/v5/saf/snapshot", {
     params: { entity_id, year },
   })

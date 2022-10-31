@@ -9,6 +9,7 @@ export interface EntityManager extends Entity {
   isExternal: boolean
   isAuditor: boolean
   isProducer: boolean
+  isAirline: boolean
   isOperator: boolean
   isTrader: boolean
   isIndustry: boolean
@@ -47,6 +48,7 @@ export function useEntityManager(user: UserManager): EntityManager {
     isAdmin: type === EntityType.Administration,
     isExternal: type === EntityType.ExternalAdmin,
     isAuditor: type === EntityType.Auditor,
+    isAirline: type === EntityType.Airline,
     isProducer: type === EntityType.Producer,
     isOperator: type === EntityType.Operator,
     isTrader: type === EntityType.Trader,

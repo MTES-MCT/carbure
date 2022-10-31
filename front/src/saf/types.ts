@@ -16,6 +16,11 @@ export interface SafOperatorSnapshot {
   tickets_accepted: number,
 }
 
+export interface SafClientSnapshot {
+  tickets_pending: number,
+  tickets_accepted: number,
+}
+
 export interface SafTicketSource {
   id: number
   carbure_id: string
