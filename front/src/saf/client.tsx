@@ -4,10 +4,12 @@ import Select from "common/components/select"
 import { useQuery } from "common/hooks/async"
 import useYears from "common/hooks/years"
 import { useTranslation } from "react-i18next"
-import { Routes } from "react-router-dom"
+import { Navigate, Route, Routes } from "react-router-dom"
 import { ImportArea } from "../transactions/actions/import"
 import * as api from "./api"
 import ClientTabs from "./components/client-tabs"
+import Tickets from "./components/tickets"
+import { SafTicketStatus } from "./types"
 import { safClientSnapshot } from "./__test__/data"
 
 export const SafClient = () => {
@@ -47,7 +49,21 @@ export const SafClient = () => {
           </section>
         </header>
 
-        <Routes></Routes>
+        <Routes>
+          <Route
+            path="/tickets/*"
+            element={<Tickets year={years.selected} snapshot={snapshotData} />}
+          />
+          <Route
+            path="*"
+            element={
+              <Navigate
+                replace
+                to={`tickets/${SafTicketStatus.Pending.toLocaleLowerCase()}`}
+              />
+            }
+          />
+        </Routes>
       </Main>
     </ImportArea>
   )

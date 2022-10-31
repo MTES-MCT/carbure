@@ -1,3 +1,4 @@
+import useEntity from "carbure/hooks/entity"
 import Table, { Cell, Order } from "common/components/table"
 import { compact } from "common/utils/collection"
 import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
@@ -17,15 +18,9 @@ export interface TicketsTableProps {
 }
 
 export const TicketsTable = memo(
-  ({
-    loading,
-    tickets,
-    order,
-    rowLink,
-    onOrder,
-    status,
-  }: TicketsTableProps) => {
-    const columns = useColumns(status)
+  ({ loading, tickets, order, rowLink, onOrder }: TicketsTableProps) => {
+    const { isAirline } = useEntity()
+    const columns = useColumns()
     return (
       <Table
         loading={loading}
@@ -35,7 +30,7 @@ export const TicketsTable = memo(
         rows={tickets}
         columns={compact([
           columns.status,
-          columns.client,
+          isAirline ? columns.supplier : columns.client,
           columns.availableVolume,
           columns.period,
           columns.feedstock,
@@ -46,13 +41,13 @@ export const TicketsTable = memo(
   }
 )
 
-export function useColumns(status: SafTicketStatus) {
+export function useColumns() {
   const { t } = useTranslation()
 
   return {
     status: {
       header: t("Statut"),
-      cell: () => <TicketTag status={status} />,
+      cell: (ticket: SafTicket) => <TicketTag status={ticket.status} />,
     },
 
     availableVolume: {
@@ -65,6 +60,11 @@ export function useColumns(status: SafTicketStatus) {
     client: {
       header: t("Client"),
       cell: (ticket: SafTicket) => <Cell text={ticket.client} />,
+    },
+
+    supplier: {
+      header: t("Fournisseur"),
+      cell: (ticket: SafTicket) => <Cell text={ticket.supplier} />,
     },
 
     period: {

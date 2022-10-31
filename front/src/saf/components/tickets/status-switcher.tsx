@@ -4,7 +4,7 @@ import { SafOperatorSnapshot, SafTicketStatus } from "saf/types"
 
 interface StatusSwitcherProps {
   status: SafTicketStatus
-  count: SafOperatorSnapshot | undefined
+  count?: SafOperatorSnapshot
   onSwitch: (status: SafTicketStatus) => void
 }
 export const StatusSwitcher = ({

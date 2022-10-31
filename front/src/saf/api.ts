@@ -39,7 +39,7 @@ export function getSafTicketDetails(entity_id: number, ticket_id: number) {
   return api.get<Api<SafTicketDetails>>("/v5/saf/tickets/details", { params: { entity_id, ticket_id } })
 }
 
-export function getTicketSourceFilters(field: SafFilter, query: SafQuery) {
+export function getSafFilters(field: SafFilter, query: SafQuery) {
   const params = { field, ...query, ...QUERY_RESET }
 
   // TO TEST without data

@@ -80,21 +80,9 @@ export const ClientTabs = ({
   )
 }
 
-const defaultCount: SafOperatorSnapshot = {
-  ticket_sources_available: 0,
-  ticket_sources_history: 0,
-  tickets: 0,
+const defaultCount: SafClientSnapshot = {
   tickets_pending: 0,
-  tickets_rejected: 0,
   tickets_accepted: 0,
-}
-
-interface TicketRecapProps {
-  loading: boolean
-  count: number
-  pending: number
-  rejected: number
-  label: string
 }
 
 export function useAutoStatus() {
