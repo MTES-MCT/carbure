@@ -6,6 +6,7 @@ import useYears from "common/hooks/years"
 import { useCallback } from "react"
 import { useTranslation } from "react-i18next"
 import {
+  Navigate,
   Route,
   Routes,
   useLocation,
@@ -17,6 +18,7 @@ import * as api from "./api"
 import OperatorTabs from "./components/operator-tabs"
 import TicketSources from "./components/ticket-sources"
 import Tickets from "./components/tickets"
+import { SafTicketSourceStatus, SafTicketStatus } from "./types"
 import { safOperatorSnapshot } from "./__test__/data"
 
 export const Saf = () => {
@@ -58,14 +60,41 @@ export const Saf = () => {
 
         <Routes>
           <Route
-            path="/ticket-sources/*"
+            path="ticket-sources/*"
             element={
               <TicketSources year={years.selected} snapshot={snapshotData} />
             }
           />
           <Route
-            path="/tickets/*"
+            path="ticket-sources"
+            element={
+              <Navigate
+                replace
+                to={SafTicketSourceStatus.Available.toLocaleLowerCase()}
+              />
+            }
+          />
+          <Route
+            path="tickets/*"
             element={<Tickets year={years.selected} snapshot={snapshotData} />}
+          />
+          <Route
+            path="tickets"
+            element={
+              <Navigate
+                replace
+                to={SafTicketStatus.Pending.toLocaleLowerCase()}
+              />
+            }
+          />
+          <Route
+            path="*"
+            element={
+              <Navigate
+                replace
+                to={`ticket-sources/${SafTicketSourceStatus.Available.toLocaleLowerCase()}`}
+              />
+            }
           />
         </Routes>
       </Main>

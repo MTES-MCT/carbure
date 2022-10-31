@@ -75,9 +75,7 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
           filters={FILTERS}
           selected={state.filters}
           onSelect={actions.setFilters}
-          getFilterOptions={(filter) =>
-            api.getTicketSourceFilters(filter, query)
-          }
+          getFilterOptions={(filter) => api.getSafFilters(filter, query)}
         />
       </Bar>
       <section>
