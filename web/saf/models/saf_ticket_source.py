@@ -1,5 +1,6 @@
 from datetime import datetime
 from django.db import models, transaction
+from django.db.models.expressions import F
 from core.utils import bulk_update_or_create
 
 
@@ -114,5 +115,35 @@ def create_ticket_sources_from_lots(lots):
         ticket_source.generate_carbure_id()
         print(ticket_source.carbure_id)
     SafTicketSource.objects.bulk_update(ticket_sources, ["carbure_id"])
+
+    return ticket_sources
+
+
+def find_ticket_sources(**filters):
+    ticket_sources = (
+        SafTicketSource.objects.select_related("feedstock")
+        .prefetch_related("saf_tickets")
+        .prefetch_related("saf_tickets__client")
+    )
+
+    if filters["entity_id"] != None:
+        ticket_sources = ticket_sources.filter(added_by_id=filters["entity_id"])
+
+    if filters["year"] != None:
+        ticket_sources = ticket_sources.filter(year=filters["year"])
+
+    if filters["period"] != None:
+        ticket_sources = ticket_sources.filter(period__in=filters["period"])
+
+    if filters["feedstock"] != None:
+        ticket_sources = ticket_sources.filter(feedstock__code__in=filters["feedstock"])
+
+    if filters["client"] != None:
+        ticket_sources = ticket_sources.filter(saf_tickets__client__name__in=filters["client"])
+
+    if filters["status"] == "available":
+        ticket_sources = ticket_sources.filter(assigned_volume__lt=F("total_volume"))
+    elif filters["status"] == "history":
+        ticket_sources = ticket_sources.filter(assigned_volume__gte=F("total_volume"))
 
     return ticket_sources
