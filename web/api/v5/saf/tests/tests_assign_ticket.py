@@ -38,6 +38,8 @@ class SafSnapshotTest(TestCase):
             "agreement_date": "2022-06-01",
         }
 
+        today = datetime.today()
+
         response = self.client.post(reverse("api-v5-saf-assign-ticket"), query)
 
         self.assertEqual(response.status_code, 200)
@@ -51,11 +53,11 @@ class SafSnapshotTest(TestCase):
         self.assertEqual(ticket.agreement_date.isoformat(), "2022-06-01")
         self.assertEqual(ticket.agreement_reference, "AGREF")
         self.assertEqual(ticket.status, "PENDING")
-        self.assertEqual(ticket.carbure_id, self.ticket_source.carbure_id)
+        self.assertEqual(ticket.carbure_id, "T%d-%s-%d" % (ticket.period, self.ticket_source.production_country.code_pays, ticket.id))  # fmt:skip
         self.assertEqual(ticket.client_id, self.ticket_client.id)
         self.assertEqual(ticket.volume, 10000)
-        self.assertEqual(ticket.year, self.ticket_source.year)
-        self.assertEqual(ticket.period, self.ticket_source.period)
+        self.assertEqual(ticket.year, today.year)
+        self.assertEqual(ticket.period, today.year * 100 + today.month)
         self.assertEqual(ticket.feedstock_id, self.ticket_source.feedstock_id)
         self.assertEqual(ticket.biofuel_id, self.ticket_source.biofuel_id)
         self.assertEqual(ticket.country_of_origin_id, self.ticket_source.country_of_origin_id)

@@ -54,10 +54,10 @@ export interface LotPreview {
 export interface SafTicketPreview {
   id: number
   carbure_id: string
-  client_name: string
-  date: string
+  client: string
   volume: number
   status: SafTicketStatus
+  created_at: string
 }
 
 export interface SafTicket {
@@ -65,9 +65,9 @@ export interface SafTicket {
   carbure_id: string
   year: number
   period: number
-  date: string
+  created_at: string
   supplier: Entity
-  client_name: string
+  client: string
   volume: number
   feedstock: Feedstock
   biofuel: Biofuel
@@ -163,9 +163,9 @@ export interface SafStates { //old QueryParams
 export type SafFilterSelection = Partial<Record<SafFilter, string[]>>
 
 export enum SafTicketStatus {
-  Pending = "pending",
-  Accepted = "accepted",
-  Rejected = "rejected",
+  Pending = "PENDING",
+  Accepted = "ACCEPTED",
+  Rejected = "REJECTED",
 }
 
 export enum SafFilter {

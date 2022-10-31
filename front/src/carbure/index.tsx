@@ -62,7 +62,8 @@ const currentYear = new Date().getFullYear()
 const Org = () => {
   const entity = useEntity()
 
-  const { isAdmin, isAuditor, isExternal, isIndustry, has_saf } = entity
+  const { isAdmin, isAuditor, isExternal, isIndustry, isOperator, has_saf } =
+    entity
   const hasDCA = isExternal && entity.hasPage("DCA")
 
   // prettier-ignore
@@ -79,7 +80,7 @@ const Org = () => {
           </>
           )}
         
-        {has_saf && (<>
+        {has_saf && isOperator && (<>
           <Route path="saf/:year/*" element={<Saf />} />
           <Route path="saf" element={<Navigate replace to={`${currentYear}/ticket-sources`} />} />
         </>)} 

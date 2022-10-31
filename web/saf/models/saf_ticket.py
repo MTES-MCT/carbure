@@ -1,7 +1,5 @@
 from datetime import datetime
 from django.db import models
-from django.dispatch import receiver
-from django.db.models.signals import pre_save
 
 
 class SafTicket(models.Model):
@@ -18,7 +16,7 @@ class SafTicket(models.Model):
     ticket_statuses = [(PENDING, "En attente"), (ACCEPTED, "Accepté"), (REJECTED, "Refusé")]
     status = models.CharField(max_length=24, choices=ticket_statuses, default=PENDING)
 
-    carbure_id = models.CharField(max_length=64, unique=True)
+    carbure_id = models.CharField(max_length=64, null=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     year = models.IntegerField(blank=False, null=False)
@@ -66,16 +64,11 @@ class SafTicket(models.Model):
         )
 
 
-@receiver(pre_save, sender=SafTicket)
-def saf_ticket_pre_save_gen_carbure_id(sender, instance, *args, **kwargs):
-    instance.generate_carbure_id()
-
-
 def create_ticket_from_source(ticket_source, client_id, volume, agreement_date, agreement_reference):
     today = datetime.today()
     period = today.year * 100 + today.month
 
-    return SafTicket(
+    ticket = SafTicket.objects.create(
         client_id=client_id,
         volume=volume,
         agreement_date=agreement_date,
@@ -108,3 +101,8 @@ def create_ticket_from_source(ticket_source, client_id, volume, agreement_date, 
         ghg_reduction=ticket_source.ghg_reduction,
         parent_ticket_source=ticket_source,
     )
+
+    ticket.generate_carbure_id()
+    ticket.save()
+
+    return ticket

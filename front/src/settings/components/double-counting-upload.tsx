@@ -11,6 +11,7 @@ import { AlertOctagon, Check, Return, Upload } from "common/components/icons"
 import { FileInput } from "common/components/input"
 import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
+import useScrollToRef from "common/hooks/scroll-to-ref"
 import { DoubleCountingUploadErrors } from "double-counting/types"
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
@@ -29,6 +30,7 @@ const DoubleCountingUploadDialog = ({
   const { t } = useTranslation()
   const [errors, setErrors] = useState<DoubleCountingUploadErrors>()
   const notify = useNotify()
+  const { refToScroll } = useScrollToRef(!!errors)
 
   const { value, bind } = useForm({
     productionSite: undefined as ProductionSite | undefined,
@@ -151,7 +153,11 @@ const DoubleCountingUploadDialog = ({
               {...bind("documentationFile")}
             />
 
-            {errors && <BlockingErrors errors={errors} />}
+            {errors && (
+              <section ref={refToScroll}>
+                <BlockingErrors errors={errors} />
+              </section>
+            )}
           </Form>
         </section>
       </main>

@@ -182,7 +182,7 @@ export function useLotColumns() {
         const reduction = isRedII(lot.delivery_date)
           ? lot.ghg_reduction_red_ii
           : lot.ghg_reduction
-        return <Cell text={`${reduction.toFixed(2)}%`} />
+        return <Cell text={`${reduction.toFixed(0)}%`} />
       },
     },
 

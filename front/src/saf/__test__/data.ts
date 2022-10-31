@@ -60,18 +60,18 @@ export const lotPreview: LotPreview = {
 export const safTicketPreview1: SafTicketPreview = {
   id: 92343,
   carbure_id: "X12332",
-  client_name: "Air France",
+  client: "Air France",
   volume: 1000,
-  date: '2022-01-10',
+  created_at: '2022-01-10',
   status: SafTicketStatus.Rejected
 }
 
 export const safTicketPreview2: SafTicketPreview = {
   id: 92344,
   carbure_id: "X12333",
-  client_name: "CORSAIR",
+  client: "CORSAIR",
   volume: 2000,
-  date: '2022-02-10',
+  created_at: '2022-02-10',
   status: SafTicketStatus.Pending
 }
 
@@ -138,8 +138,8 @@ export const safTicket: SafTicket = {
   carbure_id: "A22332",
   year: 2022,
   period: 202202,
-  client_name: "Air France",
-  date: '2022-01-10',
+  client: "Air France",
+  created_at: '2022-01-10',
   supplier: producer,
   volume: 2000,
   feedstock: feedstock1,
@@ -156,8 +156,8 @@ export const safTicketDetails: SafTicketDetails = {
   status: SafTicketStatus.Rejected,
   year: 2022,
   period: 202202,
-  client_name: "Air France",
-  date: '2022-01-10',
+  client: "Air France",
+  created_at: '2022-01-10',
   supplier: producer,
   volume: 2000,
   feedstock: feedstock1,

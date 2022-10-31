@@ -10,6 +10,7 @@ import { useQuery } from "common/hooks/async"
 import { useRef } from "react"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
+import { SafTicketStatus } from "saf/types"
 import { safTicketDetails } from "saf/__test__/data"
 import NavigationButtons from "transaction-details/components/lots/navigation"
 import * as api from "../../api"
@@ -28,7 +29,7 @@ export const TicketDetails = ({ neighbors }: TicketDetailsProps) => {
   const location = useLocation()
   const notify = useNotify()
   const entity = useEntity()
-  const match = useHashMatch("ticket-source/:id")
+  const match = useHashMatch("ticket/:id")
   const portal = usePortal()
 
   const ticketResponse = useQuery(api.getSafTicketDetails, {
@@ -36,19 +37,8 @@ export const TicketDetails = ({ neighbors }: TicketDetailsProps) => {
     params: [entity.id, parseInt(match?.params.id!)],
   })
 
-  // const ticket = ticketResponse.result?.data?.data
-  const ticket = safTicketDetails //TO TEST
-  // const commentRef = ticket
-  //   ? ticket?.client_comment?.length > 0
-  //   : false
-
-  // useEffect(() => { TODO go to comment block
-  //   if (hasAssignements && assignementsRef?.current)
-  //     assignementsRef.current.scrollIntoView({
-  //       block: "end",
-  //       behavior: "smooth",
-  //     })
-  // }, [assignementsRef, hasAssignements])
+  const ticket = ticketResponse.result?.data?.data
+  // const ticket = safTicketDetails //TO TEST
 
   const handleTicketCanceled = () => {
     notify(
@@ -58,7 +48,6 @@ export const TicketDetails = ({ neighbors }: TicketDetailsProps) => {
   }
 
   const showCancelModal = () => {
-    //TODO show modal
     portal((close) => (
       <CancelAssignment
         ticket={ticket!}
@@ -76,7 +65,7 @@ export const TicketDetails = ({ neighbors }: TicketDetailsProps) => {
     <Portal onClose={closeDialog}>
       <Dialog onClose={closeDialog}>
         <header>
-          <TicketTag status={ticket.status} />
+          <TicketTag status={ticket?.status} />
           <h1>
             {t("Ticket n°")}
             {ticket?.carbure_id ?? "..."}
@@ -95,16 +84,16 @@ export const TicketDetails = ({ neighbors }: TicketDetailsProps) => {
         </main>
 
         <footer>
-          <Button
-            icon={Cross}
-            label={t("Annuler l'affectation")}
-            variant="danger"
-            disabled={!ticket}
-            action={showCancelModal}
-          />
-          <NavigationButtons neighbors={neighbors} />
-
-          <Button icon={Return} label={t("Retour")} action={closeDialog} />
+          {ticket?.status === SafTicketStatus.Pending && (
+            <Button
+              icon={Cross}
+              label={t("Annuler l'affectation")}
+              variant="danger"
+              disabled={!ticket}
+              action={showCancelModal}
+            />
+          )}
+          <NavigationButtons neighbors={neighbors} closeAction={closeDialog} />
         </footer>
 
         {ticketResponse.loading && <LoaderOverlay />}
