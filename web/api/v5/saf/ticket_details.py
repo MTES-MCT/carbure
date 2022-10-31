@@ -1,8 +1,6 @@
-# /api/v5/saf/ticket-s
+# /api/v5/saf/tickets/details
 
-from math import floor
 import traceback
-from django.core.paginator import Paginator
 
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights

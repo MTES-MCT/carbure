@@ -112,7 +112,6 @@ def create_ticket_sources_from_lots(lots):
     ticket_sources = SafTicketSource.objects.filter(parent_lot_id__in=saf_lots.values("id"))
     for ticket_source in ticket_sources:
         ticket_source.generate_carbure_id()
-        print(ticket_source.carbure_id)
     SafTicketSource.objects.bulk_update(ticket_sources, ["carbure_id"])
 
     return ticket_sources
