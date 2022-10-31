@@ -11,7 +11,7 @@ import {
   getField,
   waitWhileLoading,
 } from "carbure/__test__/helpers"
-import { Saf } from "../index"
+import { Saf } from "../operator"
 import server from "./api"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))

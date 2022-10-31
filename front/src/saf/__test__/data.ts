@@ -1,6 +1,6 @@
 import { Biofuel, Country, Feedstock } from "carbure/types";
 import { company, operator, producer, productionSite } from "carbure/__test__/data";
-import { SafTicketSource, SafTicketSourceStatus, SafOperatorSnapshot, SafTicketSourcesResponse, SafTicketsResponse, SafTicket, SafTicketSourceDetails, LotPreview, SafTicketPreview, SafTicketStatus, SafTicketDetails } from "saf/types";
+import { SafTicketSource, SafTicketSourceStatus, SafOperatorSnapshot, SafTicketSourcesResponse, SafTicketsResponse, SafTicket, SafTicketSourceDetails, LotPreview, SafTicketPreview, SafTicketStatus, SafTicketDetails, SafClientSnapshot } from "saf/types";
 
 
 export const safOperatorSnapshot: SafOperatorSnapshot = {
@@ -11,6 +11,12 @@ export const safOperatorSnapshot: SafOperatorSnapshot = {
   tickets_rejected: 1,
   tickets_accepted: 1,
 }
+
+export const safClientSnapshot: SafClientSnapshot = {
+  tickets_pending: 2,
+  tickets_accepted: 1
+}
+
 
 export const safClientFilterOptions: string[] = [
   "Air France",
