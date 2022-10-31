@@ -5,11 +5,11 @@ from django.urls import reverse
 
 from api.v4.tests_utils import setup_current_user
 from core.models import Entity
-from saf.factories import SafTicketSourceFactory, SafTicketFactory
+from saf.factories import SafTicketSourceFactory
 from saf.models import SafTicketSource, SafTicket
 
 
-class SafSnapshotTest(TestCase):
+class SafAssignTicketTest(TestCase):
     fixtures = [
         "json/biofuels.json",
         "json/feedstock.json",
