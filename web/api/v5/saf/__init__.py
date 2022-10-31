@@ -1,5 +1,6 @@
 from django.urls import path
 
+from .clients import get_clients
 from .years import get_years
 from .snapshot import get_snapshot
 from .ticket_sources import get_ticket_sources
@@ -19,4 +20,5 @@ urlpatterns = [
     path("assign-ticket", assign_ticket, name="api-v5-saf-assign-ticket"),
     path("tickets", get_tickets, name="api-v5-saf-tickets"),
     path("tickets/details", get_ticket_details, name="api-v5-saf-ticket-details"),
+    path("clients", get_clients, name="api-v5-saf-clients"),
 ]

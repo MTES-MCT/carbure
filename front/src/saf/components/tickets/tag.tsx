@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import { SafTicket, SafTicketSource, SafTicketStatus } from "saf/types"
 
 export interface TicketTagProps extends TagProps {
-  status: SafTicketStatus
+  status?: SafTicketStatus
   small?: boolean
 }
 
@@ -13,15 +13,26 @@ export const TicketTag = ({ status, small }: TicketTagProps) => {
   let label
   let variant: TagVariant
 
-  if (status === SafTicketStatus.Accepted) {
-    label = t("Accepté")
-    variant = "success"
-  } else if (status === SafTicketStatus.Pending) {
-    label = t("En attente")
-    variant = "info"
-  } else {
-    label = t("Refusé")
-    variant = "danger"
+  switch (status) {
+    case SafTicketStatus.Accepted:
+      label = t("Accepté")
+      variant = "success"
+      break
+
+    case SafTicketStatus.Pending:
+      label = t("En attente")
+      variant = "info"
+      break
+
+    case SafTicketStatus.Rejected:
+      label = t("Refusé")
+      variant = "danger"
+      break
+
+    default:
+      label = t("N/A")
+      variant = "none"
+      break
   }
 
   return (

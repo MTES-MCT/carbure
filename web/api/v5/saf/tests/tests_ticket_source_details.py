@@ -107,7 +107,6 @@ class SafTicketSourceDetailsTest(TestCase):
             "carbure_id": "carbure-id-001",
             "year": 2022,
             "period": 202201,
-            "created_at": "2022-01-01T01:00:00+01:00",
             "total_volume": 30000.0,
             "assigned_volume": 0.0,
             "carbure_producer": None,
@@ -158,5 +157,10 @@ class SafTicketSourceDetailsTest(TestCase):
         }
 
         self.maxDiff = None
+
+        # do not check created_at as its automatically generated
+        response_ticket_source = response.json()["data"]
+        response_ticket_source.pop("created_at")
+        response_ticket_source["assigned_tickets"][0].pop("created_at")
 
         self.assertEqual(response.json()["data"], expected_ticket_source)

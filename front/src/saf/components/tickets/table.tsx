@@ -64,18 +64,13 @@ export function useColumns(status: SafTicketStatus) {
 
     client: {
       header: t("Client"),
-      cell: (ticket: SafTicket) => <Cell text={ticket.client_name} />,
+      cell: (ticket: SafTicket) => <Cell text={ticket.client} />,
     },
 
     period: {
       key: "period",
       header: t("Période"),
-      cell: (ticket: SafTicket) => (
-        <Cell
-          text={formatPeriod(ticket.period)}
-          sub={formatDate(ticket.date)}
-        />
-      ),
+      cell: (ticket: SafTicket) => <Cell text={formatPeriod(ticket.period)} />,
     },
 
     feedstock: {
@@ -96,7 +91,7 @@ export function useColumns(status: SafTicketStatus) {
       key: "ghg_reduction",
       header: t("Réd. GES"),
       cell: (ticket: SafTicket) => (
-        <Cell text={`${ticket.ghg_reduction.toFixed(2)}%`} />
+        <Cell text={`${ticket.ghg_reduction.toFixed(0)}%`} />
       ),
     },
   }

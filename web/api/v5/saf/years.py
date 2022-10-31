@@ -14,7 +14,8 @@ class SafYearsError:
 def get_years(request, *args, **kwargs):
     try:
         entity_id = int(kwargs["context"]["entity_id"])
-        ticket_source_years = SafTicketSource.objects.filter(added_by_id=entity_id).values_list("year", flat=True).distinct()  # fmt:skip
+        ticket_source_years = SafTicketSource.objects.filter(
+            added_by_id=entity_id).values_list("year", flat=True).distinct()  # fmt:skip
         ticket_years = SafTicket.objects.filter(supplier_id=entity_id).values_list("year", flat=True).distinct()
         years = sorted(set(list(ticket_source_years) + list(ticket_years)))
         return SuccessResponse(years)

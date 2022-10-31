@@ -17,6 +17,12 @@ export interface Entity {
   has_saf?: boolean
 }
 
+export interface EntityPreview {
+  id: number
+  name: string
+  entity_type: EntityType
+}
+
 export interface User {
   email: string
   rights: UserRight[]

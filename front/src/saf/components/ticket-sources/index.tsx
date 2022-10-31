@@ -31,6 +31,8 @@ import { useSafQuery } from "saf/hooks/saf-query"
 import HashRoute from "common/components/hash-route"
 import TicketSourceDetail from "../ticket-source-details"
 import NoResult from "../no-result"
+import LotDetails from "transaction-details/components/lots"
+import TicketDetails from "../ticket-details"
 
 export interface TicketSourcesProps {
   year: number
@@ -127,6 +129,8 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
         path="ticket-source/:id"
         element={<TicketSourceDetail neighbors={ids} />}
       />
+      <HashRoute path="lot/:id" element={<LotDetails neighbors={[]} />} />
+      <HashRoute path="ticket/:id" element={<TicketDetails neighbors={[]} />} />
     </>
   )
 }

@@ -73,7 +73,7 @@ export function useColumns() {
       cell: (ticketSource: SafTicketSource) => {
         const value =
           ticketSource.assigned_tickets.length > 0
-            ? ticketSource.assigned_tickets.map((t) => t.client_name).join(", ")
+            ? ticketSource.assigned_tickets.map((t) => t.client).join(", ")
             : "-"
         return <Cell text={value} />
       },
@@ -108,7 +108,7 @@ export function useColumns() {
       key: "ghg_reduction",
       header: t("Réd. GES"),
       cell: (ticketSource: SafTicketSource) => {
-        return <Cell text={`${ticketSource.ghg_reduction.toFixed(2)}%`} />
+        return <Cell text={`${ticketSource.ghg_reduction.toFixed(0)}%`} />
       },
     },
   }

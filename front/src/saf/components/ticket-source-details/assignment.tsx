@@ -1,6 +1,6 @@
 import { findEntities } from "carbure/api"
 import useEntity from "carbure/hooks/entity"
-import { Entity } from "carbure/types"
+import { Entity, EntityPreview } from "carbure/types"
 import * as norm from "carbure/utils/normalizers"
 import Autocomplete from "common/components/autocomplete"
 import Button from "common/components/button"
@@ -39,19 +39,20 @@ export const TicketAssignment = ({
   }
 
   const assignSafTicket = useMutation(api.assignSafTicket, {
-    invalidates: ["ticket-source-details"],
+    invalidates: ["ticket-source-details", "ticket-sources"],
   })
 
   const assignTicket = async () => {
     if (value.volume! < 1) setFieldError("volume", t("Entrez un volume"))
-    //TO TEST uncomment below
-    // await assignSafTicket.execute(
-    //   entity.id,
-    //   value.volume!,
-    //   value.client!,
-    //   value.agreement_reference,
-    //   value.agreement_date
-    // )
+    // TO TEST uncomment below
+    await assignSafTicket.execute(
+      entity.id,
+      ticketSource.id,
+      value.volume!,
+      value.client!,
+      value.agreement_reference,
+      value.agreement_date
+    )
     onTicketAssigned(value.volume!, value.client!.name)
     onClose()
   }
@@ -61,7 +62,7 @@ export const TicketAssignment = ({
   }
 
   const findSafClient = (query: string) => {
-    return findEntities(query)
+    return api.findClients(query)
   }
 
   return (
@@ -107,7 +108,7 @@ export const TicketAssignment = ({
                 required
                 label={t("Client")}
                 getOptions={findSafClient}
-                normalize={norm.normalizeEntity}
+                normalize={norm.normalizeEntityPreview}
                 {...bind("client")}
               />
 
@@ -143,7 +144,7 @@ export default TicketAssignment
 
 const defaultAssignment = {
   volume: 0 as number | undefined,
-  client: undefined as Entity | undefined,
+  client: undefined as EntityPreview | undefined,
   agreement_reference: undefined as string | undefined,
   agreement_date: undefined as string | undefined,
 }
