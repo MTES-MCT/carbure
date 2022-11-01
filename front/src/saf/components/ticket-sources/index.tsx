@@ -2,37 +2,29 @@ import { useLocation } from "react-router-dom"
 
 import useEntity from "carbure/hooks/entity"
 
+import HashRoute from "common/components/hash-route"
+import { SearchInput } from "common/components/input"
+import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
+import { useQuery } from "common/hooks/async"
 import { useQueryParamsStore } from "saf/hooks/query-params-store"
+import { useSafQuery } from "saf/hooks/saf-query"
 import {
   SafFilter,
-  SafFilterSelection,
   SafOperatorSnapshot,
-  SafQuery,
-  SafStates,
   SafTicketSource,
   SafTicketSourceStatus,
 } from "saf/types"
-import * as api from "../../api"
-import { useAutoStatus } from "../operator-tabs"
-import { Filters } from "../filters"
-import { useMemo } from "react"
-import { StatusSwitcher } from "./status-switcher"
-import Pagination from "common/components/pagination"
-import * as data from "../../__test__/data"
-import TicketSourcesTable from "./table"
-import { useQuery } from "common/hooks/async"
-import { AlertCircle } from "common/components/icons"
-import Alert from "common/components/alert"
-import { ResetButton } from "transactions/components/filters"
-import { useTranslation } from "react-i18next"
-import { SearchInput } from "common/components/input"
-import { useSafQuery } from "saf/hooks/saf-query"
-import HashRoute from "common/components/hash-route"
-import TicketSourceDetail from "../ticket-source-details"
-import NoResult from "../no-result"
 import LotDetails from "transaction-details/components/lots"
-import TicketDetails from "../ticket-details"
+import * as api from "../../api"
+import * as data from "../../__test__/data"
+import { Filters } from "../filters"
+import NoResult from "../no-result"
+import { useAutoStatus } from "../operator-tabs"
+import { OperatorTicketDetails } from "../ticket-details/operator"
+import TicketSourceDetail from "../ticket-source-details"
+import { StatusSwitcher } from "./status-switcher"
+import TicketSourcesTable from "./table"
 
 export interface TicketSourcesProps {
   year: number
@@ -128,7 +120,10 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
         element={<TicketSourceDetail neighbors={ids} />}
       />
       <HashRoute path="lot/:id" element={<LotDetails neighbors={[]} />} />
-      <HashRoute path="ticket/:id" element={<TicketDetails neighbors={[]} />} />
+      <HashRoute
+        path="ticket/:id"
+        element={<OperatorTicketDetails neighbors={[]} />}
+      />
     </>
   )
 }

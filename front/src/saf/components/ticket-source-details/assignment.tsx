@@ -43,7 +43,11 @@ export const TicketAssignment = ({
   })
 
   const assignTicket = async () => {
-    if (value.volume! < 1) setFieldError("volume", t("Entrez un volume"))
+    if (value.volume! < 1) {
+      setFieldError("volume", t("Entrez un volume"))
+      return
+    }
+
     // TO TEST uncomment below
     await assignSafTicket.execute(
       entity.id,

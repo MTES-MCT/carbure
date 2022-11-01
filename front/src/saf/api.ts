@@ -82,6 +82,17 @@ export function cancelSafTicket(
   })
 }
 
+export function rejectSafTicket(
+  entity_id: number,
+  ticket_id: number,
+  comment: string
+) {
+  return api.post("/v5/saf/tickets/reject", {
+    entity_id,
+    comment
+  })
+}
+
 
 export async function findClients(query?: string) {
   return api

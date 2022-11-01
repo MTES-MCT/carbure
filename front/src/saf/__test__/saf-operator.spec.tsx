@@ -97,7 +97,7 @@ test("Select a status", async () => {
   const user = userEvent.setup()
   const statusButton = await screen.findByText("Refusés (1)")
   await user.click(statusButton)
-  let result = screen.getAllByText("Refusé")
+  let result = screen.getAllByText("En attente")
   expect(result.length).toEqual(2)
 })
 

@@ -1,6 +1,7 @@
 import { Fieldset } from "common/components/form"
 import { DateInput, NumberInput, TextInput } from "common/components/input"
 import {
+  formatDate,
   formatGHG,
   formatNumber,
   formatPercentage,
@@ -20,6 +21,7 @@ interface TicketFieldsProps {
   ticket: SafTicketDetails | undefined
 }
 export const TicketFields = ({ ticket }: TicketFieldsProps) => {
+  console.log("ticket:", ticket)
   const { t } = useTranslation()
 
   if (!ticket) return null
@@ -75,6 +77,20 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
         <DateInput
           label={t("Date de mise en service")}
           value={ticket.production_site_commissioning_date}
+          readOnly
+        />
+      </Fieldset>
+      <Fieldset label={t("Affectation")}>
+        <TextInput label={t("Fournisseur")} value={ticket.supplier} readOnly />
+        <TextInput label={t("Client")} value={ticket.client} readOnly />
+        <TextInput
+          label={t("N° de contrat")}
+          value={ticket.agreement_reference ?? t("N/A")}
+          readOnly
+        />
+        <DateInput
+          label={t("Date du contrat")}
+          value={ticket.agreement_date ?? t("N/A")}
           readOnly
         />
       </Fieldset>

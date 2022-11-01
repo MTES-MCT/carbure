@@ -9,12 +9,7 @@ import { useTranslation } from "react-i18next"
 import { useMatch, useParams } from "react-router-dom"
 import css from "./tabs.module.css"
 
-import {
-  SafClientSnapshot,
-  SafOperatorSnapshot,
-  SafTicketSourceStatus,
-  SafTicketStatus,
-} from "saf/types"
+import { SafClientSnapshot, SafTicketStatus } from "saf/types"
 
 export interface StatusTabsProps {
   loading: boolean
