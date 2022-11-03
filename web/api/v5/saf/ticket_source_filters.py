@@ -38,11 +38,11 @@ def get_filter_values(ticket_sources, filter):
     if not filter:
         raise Exception("No filter was specified")
 
-    if filter == "client":
+    if filter == "clients":
         column = "saf_tickets__client__name"
-    elif filter == "period":
+    elif filter == "periods":
         column = "period"
-    elif filter == "feedstock":
+    elif filter == "feedstocks":
         column = "feedstock__code"
 
     values = ticket_sources.values_list(column, flat=True).distinct()

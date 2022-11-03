@@ -141,16 +141,16 @@ export function usePageTitle(state: SafStates) {
   const { t } = useTranslation()
 
   const statuses: any = {
-    [SafTicketSourceStatus.Available]: t("Disponible"),
-    [SafTicketSourceStatus.History]: t("Historique"),
-    [SafTicketStatus.Accepted]: t("Acceptés"),
-    [SafTicketStatus.Pending]: t("En attente"),
-    [SafTicketStatus.Rejected]: t("Refusés")
+    [SafTicketSourceStatus.Available]: t("Volume disponibles"),
+    [SafTicketSourceStatus.History]: t("Volume historiques"),
+    [SafTicketStatus.Accepted]: t("Tickets acceptés"),
+    [SafTicketStatus.Pending]: t("Tickets en attente"),
+    [SafTicketStatus.Rejected]: t("Tickets refusés")
   }
 
   const entity = state.entity.name
   const year = state.year
-  const status = statuses[state.status]
+  const status = statuses[state.status.toUpperCase()]
 
   useTitle(`${entity} ∙ ${status} ${year}`)
 }

@@ -145,7 +145,7 @@ const Navigation = ({ entity }: NavigationProps) => {
               {
                 key: "settings",
                 path: "settings",
-                label: isIndustry ? t("Société") : t("Options"),
+                label: t("Société"),
               },
 
               isIndustry && {

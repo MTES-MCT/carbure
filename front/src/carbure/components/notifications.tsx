@@ -149,7 +149,7 @@ function getNotificationText(notif: Notification) {
       })
 
     case NotificationType.LotsRejected:
-      return t("Votre client {{client}} a rejeté {{count}} lots", {
+      return t("Votre client {{client}} a refusé {{count}} lots", {
         count: notif.meta?.count ?? 0,
         client: notif.meta?.client,
       })

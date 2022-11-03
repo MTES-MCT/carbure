@@ -21,7 +21,6 @@ interface TicketFieldsProps {
   ticket: SafTicketDetails | undefined
 }
 export const TicketFields = ({ ticket }: TicketFieldsProps) => {
-  console.log("ticket:", ticket)
   const { t } = useTranslation()
 
   if (!ticket) return null

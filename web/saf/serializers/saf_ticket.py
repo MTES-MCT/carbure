@@ -84,11 +84,13 @@ class SafTicketDetailsSerializer(serializers.ModelSerializer):
     feedstock = FeedStockSerializer(read_only=True)
     biofuel = BiofuelSerializer(read_only=True)
     country_of_origin = CountrySerializer(read_only=True)
-    supplier = EntityPreviewSerializer(read_only=True)
-    client = EntityPreviewSerializer(read_only=True)
     carbure_producer = EntityPreviewSerializer(read_only=True)
     carbure_production_site = ProductionSiteSerializer(read_only=True)
     parent_ticket_source = SafTicketSourcePreviewSerializer(read_only=True)
+    supplier = serializers.SlugRelatedField(read_only=True, slug_field="name")
+    client = serializers.SlugRelatedField(read_only=True, slug_field="name")
+    # supplier = EntityPreviewSerializer(read_only=True)
+    # client = EntityPreviewSerializer(read_only=True)
 
 
 class SafTicketPreviewSerializer(serializers.ModelSerializer):
