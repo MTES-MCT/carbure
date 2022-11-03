@@ -2,39 +2,36 @@ import { useLocation } from "react-router-dom"
 
 import useEntity from "carbure/hooks/entity"
 
-import Alert from "common/components/alert"
-import { AlertCircle } from "common/components/icons"
+import HashRoute from "common/components/hash-route"
 import { SearchInput } from "common/components/input"
 import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { useMemo } from "react"
-import { useTranslation } from "react-i18next"
 import { useQueryParamsStore } from "saf/hooks/query-params-store"
 import { useSafQuery } from "saf/hooks/saf-query"
 import {
+  SafClientSnapshot,
   SafFilter,
-  SafFilterSelection,
   SafOperatorSnapshot,
   SafQuery,
   SafStates,
   SafTicket,
   SafTicketStatus,
 } from "saf/types"
-import { ResetButton } from "transactions/components/filters"
 import * as api from "../../api"
 import * as data from "../../__test__/data"
 import { Filters } from "../filters"
+import NoResult from "../no-result"
 import { useAutoStatus } from "../operator-tabs"
+import { ClientTicketDetails } from "../ticket-details/client"
+import { OperatorTicketDetails } from "../ticket-details/operator"
 import { StatusSwitcher } from "./status-switcher"
 import TicketsTable from "./table"
-import HashRoute from "common/components/hash-route"
-import TicketDetails from "../ticket-details"
-import NoResult from "../no-result"
 
 export interface TicketsProps {
   year: number
-  snapshot: SafOperatorSnapshot | undefined
+  snapshot?: SafOperatorSnapshot | SafClientSnapshot
 }
 
 export const Tickets = ({ year, snapshot }: TicketsProps) => {
@@ -50,8 +47,8 @@ export const Tickets = ({ year, snapshot }: TicketsProps) => {
     params: [query],
   })
 
-  const ticketsData = ticketsResponse.result?.data.data
-  // const ticketsData = data.safTicketsResponse //TO TEST with testing d:ata
+  // const ticketsData = ticketsResponse.result?.data.data
+  const ticketsData = data.safTicketsResponse //TO TEST with testing d:ata
   const ids = ticketsData?.ids ?? []
 
   const total = ticketsData?.total ?? 0
@@ -70,21 +67,21 @@ export const Tickets = ({ year, snapshot }: TicketsProps) => {
     <>
       <Bar>
         <Filters
-          filters={FILTERS}
+          filters={entity.isAirline ? CLIENT_FILTERS : OPERATOR_FILTERS}
           selected={state.filters}
           onSelect={actions.setFilters}
-          getFilterOptions={(filter) =>
-            api.getTicketSourceFilters(filter, query)
-          }
+          getFilterOptions={(filter) => api.getSafFilters(filter, query)}
         />
       </Bar>
       <section>
         <ActionBar>
-          <StatusSwitcher
-            onSwitch={actions.setStatus}
-            count={snapshot}
-            status={status as SafTicketStatus}
-          />
+          {entity.isOperator && (
+            <StatusSwitcher
+              onSwitch={actions.setStatus}
+              count={snapshot as SafOperatorSnapshot}
+              status={status as SafTicketStatus}
+            />
+          )}
 
           <SearchInput
             asideX
@@ -124,15 +121,31 @@ export const Tickets = ({ year, snapshot }: TicketsProps) => {
           />
         )}
       </section>
+
       <HashRoute
         path="ticket/:id"
-        element={<TicketDetails neighbors={ids} />}
+        element={
+          entity.isOperator ? (
+            <OperatorTicketDetails neighbors={ids} />
+          ) : (
+            <ClientTicketDetails neighbors={ids} />
+          )
+        }
       />
     </>
   )
 }
 
-const FILTERS = [SafFilter.Clients, SafFilter.Periods, SafFilter.Feedstocks]
+const OPERATOR_FILTERS = [
+  SafFilter.Clients,
+  SafFilter.Periods,
+  SafFilter.Feedstocks,
+]
+const CLIENT_FILTERS = [
+  SafFilter.Supplier,
+  SafFilter.Periods,
+  SafFilter.Feedstocks,
+]
 
 export default Tickets
 

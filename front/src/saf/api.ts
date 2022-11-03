@@ -15,7 +15,7 @@ export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/v5/saf/years", { params: { entity_id } })
 }
 
-export function getSafOperatorSnapshot(entity_id: number, year: number) {
+export function getSafSnapshot(entity_id: number, year: number) {
   return api.get<Api<SafOperatorSnapshot>>("/v5/saf/snapshot", {
     params: { entity_id, year },
   })
@@ -39,7 +39,7 @@ export function getSafTicketDetails(entity_id: number, ticket_id: number) {
   return api.get<Api<SafTicketDetails>>("/v5/saf/tickets/details", { params: { entity_id, ticket_id } })
 }
 
-export function getTicketSourceFilters(field: SafFilter, query: SafQuery) {
+export function getSafFilters(field: SafFilter, query: SafQuery) {
   const params = { field, ...query, ...QUERY_RESET }
 
   // TO TEST without data
@@ -79,6 +79,17 @@ export function cancelSafTicket(
   return api.post("/v5/saf/tickets/cancel", {
     entity_id,
     ticket_id
+  })
+}
+
+export function rejectSafTicket(
+  entity_id: number,
+  ticket_id: number,
+  comment: string
+) {
+  return api.post("/v5/saf/tickets/reject", {
+    entity_id,
+    comment
   })
 }
 

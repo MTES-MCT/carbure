@@ -2,9 +2,11 @@ import useEntity from "carbure/hooks/entity"
 import { Main } from "common/components/scaffold"
 import Select from "common/components/select"
 import { useQuery } from "common/hooks/async"
+import useYears from "common/hooks/years"
 import { useCallback } from "react"
 import { useTranslation } from "react-i18next"
 import {
+  Navigate,
   Route,
   Routes,
   useLocation,
@@ -16,6 +18,7 @@ import * as api from "./api"
 import OperatorTabs from "./components/operator-tabs"
 import TicketSources from "./components/ticket-sources"
 import Tickets from "./components/tickets"
+import { SafTicketSourceStatus, SafTicketStatus } from "./types"
 import { safOperatorSnapshot } from "./__test__/data"
 
 export const Saf = () => {
@@ -25,7 +28,7 @@ export const Saf = () => {
 
   const years = useYears("saf", api.getYears)
 
-  const snapshot = useQuery(api.getSafOperatorSnapshot, {
+  const snapshot = useQuery(api.getSafSnapshot, {
     key: "snapshot",
     params: [entity.id, years.selected],
   })
@@ -57,66 +60,46 @@ export const Saf = () => {
 
         <Routes>
           <Route
-            path="/ticket-sources/*"
+            path="ticket-sources/*"
             element={
               <TicketSources year={years.selected} snapshot={snapshotData} />
             }
           />
           <Route
-            path="/tickets/*"
+            path="ticket-sources"
+            element={
+              <Navigate
+                replace
+                to={SafTicketSourceStatus.Available.toLocaleLowerCase()}
+              />
+            }
+          />
+          <Route
+            path="tickets/*"
             element={<Tickets year={years.selected} snapshot={snapshotData} />}
+          />
+          <Route
+            path="tickets"
+            element={
+              <Navigate
+                replace
+                to={SafTicketStatus.Pending.toLocaleLowerCase()}
+              />
+            }
+          />
+          <Route
+            path="*"
+            element={
+              <Navigate
+                replace
+                to={`ticket-sources/${SafTicketSourceStatus.Available.toLocaleLowerCase()}`}
+              />
+            }
           />
         </Routes>
       </Main>
     </ImportArea>
   )
-}
-
-const currentYear = new Date().getFullYear()
-
-export function useYears(root: string, getYears: typeof api.getYears) {
-  const location = useLocation()
-  const params = useParams<"year">()
-  const navigate = useNavigate()
-
-  const entity = useEntity()
-
-  const selected = parseInt(params.year ?? "") || currentYear
-
-  const setYear = useCallback(
-    (year: number | undefined) => {
-      const rx = new RegExp(`${root}/[0-9]+`)
-      const replacement = `${root}/${year}`
-      const pathname = location.pathname.replace(rx, replacement)
-      navigate(pathname)
-    },
-    [root, location, navigate]
-  )
-
-  const years = useQuery(getYears, {
-    key: "years",
-    params: [entity.id],
-
-    // select the latest year if the selected one isn't available anymore
-    onSuccess: (res) => {
-      const years = listYears(res.data.data)
-      if (!years.includes(selected)) {
-        setYear(Math.max(...years))
-      }
-    },
-  })
-
-  return {
-    loading: years.loading,
-    options: listYears(years.result?.data.data),
-    selected,
-    setYear,
-  }
-}
-
-function listYears(years: number[] | undefined) {
-  if (years?.length) return years
-  else return [currentYear]
 }
 
 export default Saf

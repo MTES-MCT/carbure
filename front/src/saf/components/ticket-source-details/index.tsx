@@ -52,7 +52,7 @@ export const TicketSourceDetails = ({
 
   const handleTicketAssigned = (volume: number, clientName: string) => {
     notify(
-      t("{{volume}} litres ont bien été assignés à {{clientName}}.", {
+      t("{{volume}} litres ont bien été affectés à {{clientName}}.", {
         volume,
         clientName,
       }),
