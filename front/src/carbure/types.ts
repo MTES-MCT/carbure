@@ -148,6 +148,7 @@ export type ExternalAdminPages = "DCA" | "TIRIB"
 export enum EntityType {
   Producer = "Producteur",
   Operator = "Opérateur",
+  Airline = "Compagnie aérienne",
   Trader = "Trader",
   Administration = "Administration",
   Auditor = "Auditor",

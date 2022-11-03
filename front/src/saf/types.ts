@@ -16,6 +16,11 @@ export interface SafOperatorSnapshot {
   tickets_accepted: number,
 }
 
+export interface SafClientSnapshot {
+  tickets_pending: number,
+  tickets_accepted: number,
+}
+
 export interface SafTicketSource {
   id: number
   carbure_id: string
@@ -66,7 +71,7 @@ export interface SafTicket {
   year: number
   period: number
   created_at: string
-  supplier: Entity
+  supplier: string
   client: string
   volume: number
   feedstock: Feedstock
@@ -152,12 +157,12 @@ export interface SafStates { //old QueryParams
   year: number
   status: SafTicketSourceStatus | SafTicketStatus
   filters: SafFilterSelection
-  search: string | undefined
+  search?: string
   selection: number[]
   page: number
-  limit: number | undefined
-  order: Order | undefined
-  snapshot: SafOperatorSnapshot | undefined
+  limit?: number
+  order?: Order
+  snapshot?: SafOperatorSnapshot | SafClientSnapshot
 }
 
 export type SafFilterSelection = Partial<Record<SafFilter, string[]>>

@@ -1,6 +1,6 @@
 import { Biofuel, Country, Feedstock } from "carbure/types";
 import { company, operator, producer, productionSite } from "carbure/__test__/data";
-import { SafTicketSource, SafTicketSourceStatus, SafOperatorSnapshot, SafTicketSourcesResponse, SafTicketsResponse, SafTicket, SafTicketSourceDetails, LotPreview, SafTicketPreview, SafTicketStatus, SafTicketDetails } from "saf/types";
+import { SafTicketSource, SafTicketSourceStatus, SafOperatorSnapshot, SafTicketSourcesResponse, SafTicketsResponse, SafTicket, SafTicketSourceDetails, LotPreview, SafTicketPreview, SafTicketStatus, SafTicketDetails, SafClientSnapshot } from "saf/types";
 
 
 export const safOperatorSnapshot: SafOperatorSnapshot = {
@@ -11,6 +11,12 @@ export const safOperatorSnapshot: SafOperatorSnapshot = {
   tickets_rejected: 1,
   tickets_accepted: 1,
 }
+
+export const safClientSnapshot: SafClientSnapshot = {
+  tickets_pending: 2,
+  tickets_accepted: 1
+}
+
 
 export const safClientFilterOptions: string[] = [
   "Air France",
@@ -140,25 +146,25 @@ export const safTicket: SafTicket = {
   period: 202202,
   client: "Air France",
   created_at: '2022-01-10',
-  supplier: producer,
+  supplier: producer.name,
   volume: 2000,
   feedstock: feedstock1,
   biofuel: bioduel1,
   country_of_origin: country1,
   ghg_reduction: 74,
-  status: SafTicketStatus.Rejected,
+  status: SafTicketStatus.Pending,
 }
 
 
 export const safTicketDetails: SafTicketDetails = {
   id: 12343,
   carbure_id: "A22332",
-  status: SafTicketStatus.Rejected,
+  status: SafTicketStatus.Pending,
   year: 2022,
   period: 202202,
   client: "Air France",
   created_at: '2022-01-10',
-  supplier: producer,
+  supplier: producer.name,
   volume: 2000,
   feedstock: feedstock1,
   biofuel: bioduel1,

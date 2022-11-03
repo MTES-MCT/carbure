@@ -4,14 +4,14 @@ import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
 import useTitle from "common/hooks/title"
 import { useTranslation } from "react-i18next"
-import { SafFilterSelection, SafOperatorSnapshot, SafStates, SafTicketSourceStatus, SafTicketStatus } from "saf/types"
+import { SafClientSnapshot, SafFilterSelection, SafOperatorSnapshot, SafStates, SafTicketSourceStatus, SafTicketStatus } from "saf/types"
 import { useFilterSearchParams } from "./filter-search-params"
 
 export function useQueryParamsStore(
   entity: Entity,
   year: number,
   status: SafTicketSourceStatus | SafTicketStatus,
-  snapshot?: SafOperatorSnapshot | undefined
+  snapshot?: SafOperatorSnapshot | SafClientSnapshot
 ) {
 
   const [limit, saveLimit] = useLimit()
@@ -51,7 +51,7 @@ export function useQueryParamsStore(
         page: 0,
       }),
 
-      setSnapshot: (snapshot: SafOperatorSnapshot) => ({
+      setSnapshot: (snapshot: SafOperatorSnapshot | SafClientSnapshot) => ({
         snapshot,
         filters: filtersParams,
         invalid: false,
