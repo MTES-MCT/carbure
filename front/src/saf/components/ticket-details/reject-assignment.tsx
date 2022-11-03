@@ -35,7 +35,7 @@ export const RejectAssignment = ({
   const ticketRejected = () => {
     notify(
       t(
-        "Le ticket a été rejeté et la raison mentionnée a été communiquée au fournisseur."
+        "Le ticket a été refusé et la raison mentionnée a été communiquée au fournisseur."
       ),
       { variant: "success" }
     )

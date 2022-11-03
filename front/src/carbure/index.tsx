@@ -96,6 +96,7 @@ const Org = () => {
         {isAirline && (<>
           <Route path="saf/:year/*" element={<SafClient />} />
           <Route path="saf" element={<Navigate replace to={`${currentYear}/tickets`} />} />
+          {/* <Route path="registry" element={<Registry />} /> // TODO ? special SAF */}
         </>)} 
 
         {isAdmin && (<> 

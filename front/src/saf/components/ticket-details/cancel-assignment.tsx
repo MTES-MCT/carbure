@@ -24,11 +24,11 @@ export const CancelAssignment = ({
   const notify = useNotify()
 
   const cancelSafTicket = useMutation(api.cancelSafTicket, {
-    invalidates: ["ticket-source-details"],
+    invalidates: ["ticket-source-details", "tickets"],
   })
 
   const cancelTicket = async () => {
-    // await cancelSafTicket.execute(entity.id, ticket.id)
+    await cancelSafTicket.execute(entity.id, ticket.id)
     notify(
       t("Le ticket a été annulé et son volume peut être à nouveau affecté."),
       { variant: "success" }

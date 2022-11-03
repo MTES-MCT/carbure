@@ -55,17 +55,17 @@ def parse_ticket_source_query(query):
     status = query["status"]
     year = int(query["year"])
     search = query.get("search", None)
-    period = [int(p) for p in query.getlist("period")] if "period" in query else None
-    client = query.getlist("client") if "client" in query else None
-    feedstock = query.getlist("feedstock") if "feedstock" in query else None
+    periods = [int(p) for p in query.getlist("periods")] if "periods" in query else None
+    clients = query.getlist("clients") if "clients" in query else None
+    feedstocks = query.getlist("feedstocks") if "feedstocks" in query else None
 
     return {
         "entity_id": entity_id,
-        "year": year,
-        "period": period,
         "status": status,
-        "feedstock": feedstock,
-        "client": client,
+        "year": year,
+        "periods": periods,
+        "feedstocks": feedstocks,
+        "clients": clients,
         "search": search,
     }
 
@@ -83,14 +83,14 @@ def find_ticket_sources(**filters):
     if filters["year"] != None:
         ticket_sources = ticket_sources.filter(year=filters["year"])
 
-    if filters["period"] != None:
-        ticket_sources = ticket_sources.filter(period__in=filters["period"])
+    if filters["periods"] != None:
+        ticket_sources = ticket_sources.filter(period__in=filters["periods"])
 
-    if filters["feedstock"] != None:
-        ticket_sources = ticket_sources.filter(feedstock__code__in=filters["feedstock"])
+    if filters["feedstocks"] != None:
+        ticket_sources = ticket_sources.filter(feedstock__code__in=filters["feedstocks"])
 
-    if filters["client"] != None:
-        ticket_sources = ticket_sources.filter(saf_tickets__client__name__in=filters["client"])
+    if filters["clients"] != None:
+        ticket_sources = ticket_sources.filter(saf_tickets__client__name__in=filters["clients"])
 
     if filters["status"] == "available":
         ticket_sources = ticket_sources.filter(assigned_volume__lt=F("total_volume"))
@@ -106,7 +106,6 @@ def find_ticket_sources(**filters):
             | Q(feedstock__name__icontains=filters["search"])
             | Q(biofuel__name__icontains=filters["search"])
             | Q(country_of_origin__name__icontains=filters["search"])
-            | Q(agreement_reference__icontains=filters["search"])
             | Q(carbure_production_site__name__icontains=filters["search"])
             | Q(unknown_production_site__icontains=filters["search"])
         )

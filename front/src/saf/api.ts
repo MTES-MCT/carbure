@@ -22,6 +22,7 @@ export function getSafSnapshot(entity_id: number, year: number) {
 }
 
 export function getSafTicketSources(query: SafQuery) {
+
   return api.get<Api<SafTicketSourcesResponse>>("/v5/saf/ticket-sources", { params: query })
 }
 
@@ -39,16 +40,29 @@ export function getSafTicketDetails(entity_id: number, ticket_id: number) {
   return api.get<Api<SafTicketDetails>>("/v5/saf/tickets/details", { params: { entity_id, ticket_id } })
 }
 
-export function getSafFilters(field: SafFilter, query: SafQuery) {
-  const params = { field, ...query, ...QUERY_RESET }
+export function getSafTicketSourceFilters(field: SafFilter, query: SafQuery) {
+  const params = { filter: field, ...query, ...QUERY_RESET }
 
   // TO TEST without data
-  return new Promise<any[]>((resolve) => {
-    resolve(data.safClientFilterOptions)
-  })
+  // return new Promise<any[]>((resolve) => {
+  //   resolve(data.safClientFilterOptions)
+  // })
+
+  console.log('params:', params)
 
   return api
-    .get<Api<string[]>>("/v5/saf/tickets-sources/filters", { params })
+    .get<Api<string[]>>("/v5/saf/ticket-sources/filters", { params })
+    .then((res) => res.data.data ?? [])
+
+}
+
+export function getSafTicketFilters(field: SafFilter, query: SafQuery) {
+  const params = { filter: field, ...query, ...QUERY_RESET }
+
+  console.log('params:', params)
+
+  return api
+    .get<Api<string[]>>("/v5/saf/tickets/filters", { params })
     .then((res) => res.data.data ?? [])
 
 }
@@ -76,7 +90,7 @@ export function cancelSafTicket(
   entity_id: number,
   ticket_id: number,
 ) {
-  return api.post("/v5/saf/tickets/cancel", {
+  return api.post("/v5/saf/cancel-ticket", {
     entity_id,
     ticket_id
   })
@@ -87,9 +101,20 @@ export function rejectSafTicket(
   ticket_id: number,
   comment: string
 ) {
-  return api.post("/v5/saf/tickets/reject", {
+  return api.post("/v5/saf/reject-ticket", {
     entity_id,
-    comment
+    comment,
+    ticket_id
+  })
+}
+
+export function acceptSafTicket(
+  entity_id: number,
+  ticket_id: number,
+) {
+  return api.post("/v5/saf/accept-ticket", {
+    entity_id,
+    ticket_id
   })
 }
 

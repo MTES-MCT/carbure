@@ -22,7 +22,7 @@ class SafTicket(models.Model):
     year = models.IntegerField(blank=False, null=False)
     period = models.IntegerField(blank=False, null=False)
 
-    agreement_reference = models.CharField(max_length=64)
+    agreement_reference = models.CharField(max_length=64, null=True)
     agreement_date = models.DateField(null=True)
 
     volume = models.FloatField(blank=False, null=False)

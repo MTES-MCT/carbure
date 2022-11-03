@@ -19,7 +19,7 @@ export const NoResult = ({ loading, filters, onFilter }: NoResultProps) => {
   return (
     <Alert loading={loading} variant="warning" icon={AlertCircle}>
       <p>{t("Aucun résultat trouvé pour cette recherche")}</p>
-      {filters && onFilter && Object.keys(filters).length && (
+      {filters && onFilter && Object.keys(filters).length > 0 && (
         <ResetButton filters={filters} onFilter={onFilter} />
       )}
     </Alert>

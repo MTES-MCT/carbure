@@ -6,7 +6,7 @@ import { Cross } from "common/components/icons"
 import { useNotify } from "common/components/notifications"
 import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
-import { useQuery } from "common/hooks/async"
+import { useMutation, useQuery } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { SafTicketStatus } from "saf/types"
@@ -36,6 +36,10 @@ export const ClientTicketDetails = ({ neighbors }: TicketDetailsProps) => {
     params: [entity.id, parseInt(match?.params.id!)],
   })
 
+  const acceptSafTicket = useMutation(api.acceptSafTicket, {
+    invalidates: ["ticket-details"],
+  })
+
   // const ticket = ticketResponse.result?.data?.data
   const ticket = safTicketDetails //TO TEST
 
@@ -47,7 +51,8 @@ export const ClientTicketDetails = ({ neighbors }: TicketDetailsProps) => {
     navigate({ search: location.search, hash: "#" })
   }
 
-  const acceptTicket = () => {
+  const acceptTicket = async () => {
+    // await acceptSafTicket.execute(entity.id, ticket.id)
     closeDialog()
     notify(t("Le ticket a été accepté."), { variant: "success" })
   }

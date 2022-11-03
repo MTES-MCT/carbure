@@ -55,17 +55,17 @@ def parse_ticket_query(query):
     status = query["status"]
     year = int(query["year"])
     search = query.get("search", None)
-    period = [int(p) for p in query.getlist("period")] if "period" in query else None
-    client = query.getlist("client") if "client" in query else None
-    feedstock = query.getlist("feedstock") if "feedstock" in query else None
+    periods = [int(p) for p in query.getlist("periods")] if "periods" in query else None
+    clients = query.getlist("clients") if "clients" in query else None
+    feedstocks = query.getlist("feedstocks") if "feedstocks" in query else None
 
     return {
         "entity_id": entity_id,
-        "year": year,
-        "period": period,
         "status": status,
-        "feedstock": feedstock,
-        "client": client,
+        "year": year,
+        "periods": periods,
+        "feedstocks": feedstocks,
+        "clients": clients,
         "search": search,
     }
 
@@ -87,14 +87,14 @@ def find_tickets(**filters):
     if filters["year"] != None:
         tickets = tickets.filter(year=filters["year"])
 
-    if filters["period"] != None:
-        tickets = tickets.filter(period__in=filters["period"])
+    if filters["periods"] != None:
+        tickets = tickets.filter(period__in=filters["periods"])
 
-    if filters["feedstock"] != None:
-        tickets = tickets.filter(feedstock__code__in=filters["feedstock"])
+    if filters["feedstocks"] != None:
+        tickets = tickets.filter(feedstock__code__in=filters["feedstocks"])
 
-    if filters["client"] != None:
-        tickets = tickets.filter(client__name__in=filters["client"])
+    if filters["clients"] != None:
+        tickets = tickets.filter(client__name__in=filters["clients"])
 
     if filters["status"] == "pending":
         tickets = tickets.filter(status=SafTicket.PENDING)

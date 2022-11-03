@@ -38,11 +38,11 @@ def get_filter_values(tickets, filter):
     if not filter:
         raise Exception("No filter was specified")
 
-    if filter == "client":
+    if filter == "clients":
         column = "client__name"
-    elif filter == "period":
+    elif filter == "periods":
         column = "period"
-    elif filter == "feedstock":
+    elif filter == "feedstocks":
         column = "feedstock__code"
 
     values = tickets.values_list(column, flat=True).distinct()

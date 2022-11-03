@@ -203,6 +203,8 @@ export function getEntityTypeLabel(type: EntityType) {
       return i18next.t("Trader")
     case EntityType.ExternalAdmin:
       return i18next.t("Administration Externe")
+    case EntityType.Airline:
+      return i18next.t("Compagnie aérienne")
     case EntityType.Unknown:
     default:
       return i18next.t("Inconnu")
