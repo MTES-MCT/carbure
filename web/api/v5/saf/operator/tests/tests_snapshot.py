@@ -32,7 +32,7 @@ class SafSnapshotTest(TestCase):
         SafTicketFactory.create_batch(5, year=2022, supplier_id=self.entity.id, status=SafTicket.REJECTED)
 
     def test_saf_snapshot_simple(self):
-        response = self.client.get(reverse("api-v5-saf-snapshot"), {"entity_id": self.entity.id, "year": 2021})
+        response = self.client.get(reverse("api-v5-saf-operator-snapshot"), {"entity_id": self.entity.id, "year": 2021})
 
         expected = {
             "ticket_sources_available": 10,
@@ -47,7 +47,7 @@ class SafSnapshotTest(TestCase):
         self.assertEqual(response.json()["data"], expected)
 
     def test_saf_snapshot_complex(self):
-        response = self.client.get(reverse("api-v5-saf-snapshot"), {"entity_id": self.entity.id, "year": 2022})
+        response = self.client.get(reverse("api-v5-saf-operator-snapshot"), {"entity_id": self.entity.id, "year": 2022})
 
         expected = {
             "ticket_sources_available": 10,

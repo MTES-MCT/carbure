@@ -44,6 +44,8 @@ def get_filter_values(tickets, filter):
         column = "period"
     elif filter == "feedstocks":
         column = "feedstock__code"
+    else:  # return an empty list for unknown filters
+        return []
 
     values = tickets.values_list(column, flat=True).distinct()
     return [v for v in values if v]

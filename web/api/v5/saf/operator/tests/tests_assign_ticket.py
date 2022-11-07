@@ -40,7 +40,7 @@ class SafAssignTicketTest(TestCase):
 
         today = datetime.today()
 
-        response = self.client.post(reverse("api-v5-saf-assign-ticket"), query)
+        response = self.client.post(reverse("api-v5-saf-operator-assign-ticket"), query)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "success")
@@ -91,7 +91,7 @@ class SafAssignTicketTest(TestCase):
             "agreement_date": "2022-06-01",
         }
 
-        response = self.client.post(reverse("api-v5-saf-assign-ticket"), query)
+        response = self.client.post(reverse("api-v5-saf-operator-assign-ticket"), query)
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["error"], "VOLUME_TOO_BIG")
