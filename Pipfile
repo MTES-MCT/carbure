@@ -34,7 +34,7 @@ tzdata = "==2022.4"
 whitenoise = "==6.2.0"
 xlsxwriter = "==3.0.3"
 djangorestframework-stubs = {extras = ["compatible-mypy"], version = "*"}
-factory-boy = "*"
+pyjwt = "*"
 
 [dev-packages]
 black = "*"
@@ -46,6 +46,7 @@ types-requests = "*"
 pandas-stubs = "*"
 openpyxl-stubs = "*"
 types-factory-boy = "*"
+types-pyjwt = "*"
 
 [requires]
 python_version = "3.10"
