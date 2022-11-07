@@ -99,7 +99,7 @@ class SafTicketDetailsTest(TestCase):
 
     def test_saf_ticket_sources(self):
         query = {"entity_id": self.entity.id, "ticket_id": 4321}
-        response = self.client.get(reverse("api-v5-saf-ticket-details"), query)
+        response = self.client.get(reverse("api-v5-saf-operator-ticket-details"), query)
 
         self.assertEqual(response.status_code, 200)
 
@@ -118,16 +118,8 @@ class SafTicketDetailsTest(TestCase):
             "carbure_production_site": None,
             "unknown_production_site": "External Production Site",
             "production_site_commissioning_date": "2001-01-01",
-            "supplier": {
-                "id": self.entity.id,
-                "name": self.entity.name,
-                "entity_type": self.entity.entity_type,
-            },
-            "client": {
-                "id": self.ticket_client.id,
-                "name": self.ticket_client.name,
-                "entity_type": self.ticket_client.entity_type,
-            },
+            "supplier": self.entity.name,
+            "client": self.ticket_client.name,
             "feedstock": {
                 "name": "Huiles ou graisses animales  (catégorie I et/ou II )",
                 "name_en": "CI/CII Animal fat",
