@@ -6,15 +6,13 @@ import os
 import re
 import json
 from typing import Tuple, cast
-from xmlrpc.client import boolean
 import django
 import shutil
 import argparse
-import datetime
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
-from datetime import date  # Pour le nom du fichier sauvegardé
+from datetime import date, datetime  # Pour le nom du fichier sauvegardé
 from os import listdir
 from os.path import isfile
 from django.conf import settings
@@ -27,10 +25,9 @@ from core.utils import bulk_update_or_create
 from core.models import GenericCertificate
 
 
-today = datetime.date.today()
 ISCC_DATA_URL = "https://www.iscc-system.org/wp-admin/admin-ajax.php?action=get_wdtable&table_id=9"
 ISCC_CERT_PAGE = "https://www.iscc-system.org/certificates/all-certificates/"
-DESTINATION_FOLDER = "/tmp/"
+DESTINATION_FOLDER = "/tmp"
 HEADERS = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"}  # fmt: skip
 PAGELENGTH = 3000
 
@@ -95,6 +92,7 @@ def download_iscc_certificates(test: bool, latest: bool) -> None:
 
 
 def save_iscc_certificates(email: bool) -> Tuple[int, list]:
+    today = date.today()
     certificates = []
     filename = "%s/Certificates_%s.csv" % (DESTINATION_FOLDER, today.strftime("%Y-%m-%d"))
     df = pd.read_csv(filename, sep=",", quotechar='"', lineterminator="\n")
@@ -105,26 +103,26 @@ def save_iscc_certificates(email: bool) -> Tuple[int, list]:
             if "." in row["valid_from"]:
                 vf = row["valid_from"].split(".")
             elif "-" in row["valid_from"]:
-                valid_from = datetime.datetime.strptime(row["valid_from"], "%Y-%m-%d").date()
+                valid_from = datetime.strptime(row["valid_from"], "%Y-%m-%d").date()
             else:
                 print("Unrecognized date format [%s]" % (row["valid_from"]))
                 print(row)
-                valid_from = datetime.date(year=1970, month=1, day=1)
+                valid_from = date(year=1970, month=1, day=1)
         except:
-            valid_from = datetime.date(year=1970, month=1, day=1)
+            valid_from = date(year=1970, month=1, day=1)
 
         try:
             if "." in row["valid_until"]:
                 vu = row["valid_until"].split(".")
-                valid_until = datetime.date(year=2000 + int(vu[2]), month=int(vu[1]), day=int(vu[0]))
+                valid_until = date(year=2000 + int(vu[2]), month=int(vu[1]), day=int(vu[0]))
             elif "-" in row["valid_until"]:
-                valid_until = datetime.datetime.strptime(row["valid_until"], "%Y-%m-%d").date()
+                valid_until = datetime.strptime(row["valid_until"], "%Y-%m-%d").date()
             else:
                 print("Unrecognized date format [%s]" % (row["valid_until"]))
                 print(row)
-                valid_until = datetime.date(year=1970, month=1, day=1)
+                valid_until = date(year=1970, month=1, day=1)
         except:
-            valid_until = datetime.date(year=1970, month=1, day=1)
+            valid_until = date(year=1970, month=1, day=1)
 
         if "," in row["certificate_holder"]:
             holder = row["certificate_holder"].split(",")[0]
