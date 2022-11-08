@@ -38,6 +38,7 @@ env = environ.Env(
     EMAIL_HOST_USER=(str, ""),
     EMAIL_HOST_PASSWORD=(str, ""),
     EMAIL_USE_TLS=(str, ""),
+    METABASE_SECRET_KEY=(str, "")
 )
 
 # False if not in os.environ
@@ -261,3 +262,6 @@ if DEBUG:
 
 # CSP header configuration
 CSP_DEFAULT_SRC=("'self'", "stats.data.gouv.fr", "metabase.carbure.beta.gouv.fr")
+
+# Metabase API key
+METABASE_SECRET_KEY = env('METABASE_SECRET_KEY')
