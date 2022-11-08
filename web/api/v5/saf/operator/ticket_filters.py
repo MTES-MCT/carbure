@@ -1,4 +1,4 @@
-# /api/v5/saf/tickets/filters
+# /api/v5/saf/operator/tickets/filters
 
 import traceback
 from core.common import SuccessResponse, ErrorResponse
@@ -44,8 +44,8 @@ def get_filter_values(tickets, filter):
         column = "period"
     elif filter == "feedstocks":
         column = "feedstock__code"
-    else:  # return an empty list for unknown filters
-        return []
+    else:  # raise an error for unknown filters
+        raise Exception("Filter '%s' does not exist for tickets" % filter)
 
     values = tickets.values_list(column, flat=True).distinct()
     return [v for v in values if v]

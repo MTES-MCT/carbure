@@ -1,4 +1,4 @@
-# /api/v5/saf/tickets
+# /api/v5/saf/operator/clients
 
 import traceback
 from core.common import SuccessResponse, ErrorResponse
