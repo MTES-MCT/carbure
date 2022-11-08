@@ -1,4 +1,4 @@
-# /api/v5/saf/ticket-sources/details
+# /api/v5/saf/operator/ticket-sources/details
 
 import traceback
 
@@ -9,7 +9,7 @@ from saf.serializers import SafTicketSourceDetailsSerializer
 
 
 class SafTicketSourceDetailsError:
-    TICKET_SOURCE_LISTING_FAILED = "TICKET_SOURCE_LISTING_FAILED"
+    TICKET_SOURCE_DETAILS_FAILED = "TICKET_SOURCE_DETAILS_FAILED"
     MALFORMED_PARAMS = "MALFORMED_PARAMS"
 
 
@@ -33,4 +33,4 @@ def get_ticket_source_details(request, *args, **kwargs):
         return SuccessResponse(serialized.data)
     except Exception:
         traceback.print_exc()
-        return ErrorResponse(400, SafTicketSourceDetailsError.TICKET_SOURCE_LISTING_FAILED)
+        return ErrorResponse(400, SafTicketSourceDetailsError.TICKET_SOURCE_DETAILS_FAILED)

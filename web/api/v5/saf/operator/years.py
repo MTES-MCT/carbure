@@ -1,4 +1,4 @@
-# /api/v5/saf/years
+# /api/v5/saf/operator/years
 
 import traceback
 from core.common import SuccessResponse, ErrorResponse
