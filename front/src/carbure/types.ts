@@ -180,6 +180,10 @@ export enum NotificationType {
   DeclarationValidated = "DECLARATION_VALIDATED",
   DeclarationCancelled = "DECLARATION_CANCELLED",
   DeclarationReminder = "DECLARATION_REMINDER",
+
+  SafTicketReceived = "SAF_TICKET_RECEIVED",
+  SafTicketAccepted = "SAF_TICKET_ACCEPTED",
+  SafTicketRejected = "SAF_TICKET_REJECTED",
 }
 
 export enum DepotType {

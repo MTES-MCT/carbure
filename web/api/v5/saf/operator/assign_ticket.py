@@ -47,7 +47,7 @@ def assign_ticket(request, *args, **kwargs):
                 agreement_reference=agreement_reference,
             )
 
-            CarbureNotification.object.create(
+            CarbureNotification.objects.create(
                 type=CarbureNotification.SAF_TICKET_RECEIVED,
                 dest_id=client_id,
                 send_by_email=False,

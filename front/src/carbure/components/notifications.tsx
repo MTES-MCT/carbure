@@ -141,6 +141,7 @@ const normalizeNotification: Normalizer<Notification> = (notif) => ({
 })
 
 function getNotificationText(notif: Notification) {
+  console.log('notif:', notif)
   switch (notif.type) {
     case NotificationType.LotsReceived:
       return t("Vous avez reçu {{count}} lots de {{supplier}}", {
@@ -201,6 +202,21 @@ function getNotificationText(notif: Notification) {
         "La période {{period}} arrive à sa fin, pensez à valider votre déclaration.",
         { period: formatPeriod(notif.meta?.period ?? 0) }
       )
+    case NotificationType.SafTicketReceived:
+      return t(
+        "Vous avez reçu un ticket CAD de {{supplier}}.",
+        { supplier: notif.meta.supplier }
+      )
+    case NotificationType.SafTicketAccepted:
+      return t(
+        "Votre ticket a été accepté par {{client}}.",
+        { client: notif.meta.client }
+      )
+    case NotificationType.SafTicketRejected:
+      return t(
+        "Votre ticket a été refusé par {{client}}.",
+        { client: notif.meta.client }
+      )
 
     default:
       return ""
@@ -235,6 +251,15 @@ function getNotificationLink(notif: Notification) {
 
     case NotificationType.DeclarationReminder:
       return `#declaration/${notif.meta?.period}`
+
+    //TODO link SAF
+    // case NotificationType.SafTicketReceived:
+    //   return `/org/${notif.dest.id}/saf/${notif.meta?.year}/ticket/pending` //TODO #ticket/ + id
+    // case NotificationType.SafTicketAccepted:
+    //   return `/org/${notif.dest.id}/saf/${notif.meta?.year}/ticket/accepted`
+    // case NotificationType.SafTicketRejected:
+    //   return `/org/${notif.dest.id}/saf/${notif.meta?.year}/ticket/rejected`
+
 
     default:
       return "#"
