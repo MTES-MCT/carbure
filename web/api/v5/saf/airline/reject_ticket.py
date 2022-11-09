@@ -36,7 +36,7 @@ def reject_ticket(request, *args, **kwargs):
             ticket.client_comment = comment
             ticket.save()
 
-            CarbureNotification.object.create(
+            CarbureNotification.objects.create(
                 type=CarbureNotification.SAF_TICKET_REJECTED,
                 dest_id=ticket.supplier_id,
                 send_by_email=False,

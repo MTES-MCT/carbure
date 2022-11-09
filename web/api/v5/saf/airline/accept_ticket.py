@@ -34,7 +34,7 @@ def accept_ticket(request, *args, **kwargs):
             ticket.status = SafTicket.ACCEPTED
             ticket.save()
 
-            CarbureNotification.object.create(
+            CarbureNotification.objects.create(
                 type=CarbureNotification.SAF_TICKET_ACCEPTED,
                 dest_id=ticket.supplier_id,
                 send_by_email=False,
