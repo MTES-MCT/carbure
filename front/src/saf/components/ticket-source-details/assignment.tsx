@@ -101,6 +101,7 @@ export const TicketAssignment = ({
                 style={{ flex: 1 }}
                 max={remainingVolume}
                 min={0}
+                step={0.1}
                 type="number"
                 {...bind("volume")}
                 rightContent={

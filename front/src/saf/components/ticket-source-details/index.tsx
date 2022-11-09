@@ -74,7 +74,7 @@ export const TicketSourceDetails = ({
     <Portal onClose={closeDialog}>
       <Dialog onClose={closeDialog}>
         <header>
-          <TicketSourceTag ticketSource={ticketSource} />
+          <TicketSourceTag big ticketSource={ticketSource} />
           <h1>
             {t("Volume CAD n°")}
             {ticketSource?.carbure_id ?? "..."}
