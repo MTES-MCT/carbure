@@ -1,10 +1,11 @@
 # /api/v5/saf/airline/accept-ticket
 
 import traceback
+from django.db import transaction
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
 from saf.models import SafTicket
-from core.models import UserRights
+from core.models import UserRights, CarbureNotification
 
 
 class SafTicketAcceptError:
@@ -29,8 +30,16 @@ def accept_ticket(request, *args, **kwargs):
         return ErrorResponse(400, SafTicketAcceptError.TICKET_NOT_FOUND)
 
     try:
-        ticket.status = SafTicket.ACCEPTED
-        ticket.save()
+        with transaction.atomic():
+            ticket.status = SafTicket.ACCEPTED
+            ticket.save()
+
+            CarbureNotification.object.create(
+                type=CarbureNotification.SAF_TICKET_ACCEPTED,
+                dest_id=ticket.supplier_id,
+                send_by_email=False,
+                meta={"client": ticket.client.name},
+            )
 
         return SuccessResponse()
     except Exception:

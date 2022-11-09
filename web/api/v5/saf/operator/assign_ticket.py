@@ -5,7 +5,7 @@ from django.db import transaction
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
 from saf.models import SafTicketSource, create_ticket_from_source
-from core.models import UserRights
+from core.models import UserRights, CarbureNotification
 
 
 class SafTicketAssignError:
@@ -45,6 +45,13 @@ def assign_ticket(request, *args, **kwargs):
                 volume=volume,
                 agreement_date=agreement_date,
                 agreement_reference=agreement_reference,
+            )
+
+            CarbureNotification.object.create(
+                type=CarbureNotification.SAF_TICKET_RECEIVED,
+                dest_id=client_id,
+                send_by_email=False,
+                meta={"supplier": ticket.supplier.name},
             )
 
             ticket_source.assigned_volume += ticket.volume
