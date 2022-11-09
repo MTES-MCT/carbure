@@ -18,7 +18,7 @@ import Controls from "controls"
 import Entities from "companies"
 import Auth from "auth"
 import Saf from "saf/operator"
-import SafClient from "saf/client"
+import SafClient from "saf/airline"
 
 const Carbure = () => {
   const user = useUserManager()
@@ -79,7 +79,7 @@ const Org = () => {
       <Routes>
         <Route path="settings" element={<Settings />} />
 
-        {isIndustry && 
+        {isIndustry &&
           (<>
           <Route path="transactions/:year/*" element={<Transactions />} />
           <Route path="registry" element={<Registry />} />
@@ -87,31 +87,31 @@ const Org = () => {
           <Route path="*" element={<Navigate replace to="transactions" />} />
           </>
           )}
-        
+
         {has_saf && isOperator && (<>
           <Route path="saf/:year/*" element={<Saf />} />
           <Route path="saf" element={<Navigate replace to={`${currentYear}/ticket-sources`} />} />
-        </>)} 
+        </>)}
 
         {isAirline && (<>
           <Route path="saf/:year/*" element={<SafClient />} />
           <Route path="saf" element={<Navigate replace to={`${currentYear}/tickets`} />} />
           {/* <Route path="registry" element={<Registry />} /> // TODO ? special SAF */}
-        </>)} 
+          <Route path="*" element={<Navigate replace to="saf" />} />
+        </>)}
 
-        {isAdmin && (<> 
+        {isAdmin && (<>
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="*" element={<Navigate replace to="dashboard" />} />
           <Route path="entities/*" element={<Entities />} />
         </>)}
 
-        {(isAdmin || isAuditor) && (<> 
+        {(isAdmin || isAuditor) && (<>
           <Route path="controls/:year/*" element={<Controls />} />
           <Route path="controls" element={<Navigate replace to={`${currentYear}`} />} />
         </>)}
         {isAuditor && <Route path="*" element={<Navigate replace to="controls" />} />}
-        
-        
+
         {(isAdmin || hasDCA)  && <Route path="double-counting/*" element={<DoubleCounting />} />}
         {hasDCA && <Route path="*" element={<Navigate replace to="double-counting" />} />}
       </Routes>

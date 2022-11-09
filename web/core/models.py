@@ -54,7 +54,8 @@ class Entity(models.Model):
             'has_mac': self.has_mac, 'has_trading': self.has_trading, 'has_direct_deliveries': self.has_direct_deliveries, 'has_stocks': self.has_stocks,
             'legal_name': self.legal_name, 'registration_id': self.registration_id,
             'sustainability_officer': self.sustainability_officer, 'sustainability_officer_phone_number': self.sustainability_officer_phone_number,
-            'registered_address': self.registered_address, 'default_certificate': self.default_certificate, 'preferred_unit': self.preferred_unit}
+            'registered_address': self.registered_address, 'default_certificate': self.default_certificate, 'preferred_unit': self.preferred_unit,
+            'has_saf': self.has_saf}
         if self.entity_type == Entity.EXTERNAL_ADMIN:
             d['ext_admin_pages'] = [e.right for e in self.externaladminrights_set.all()]
         return d
@@ -1003,8 +1004,14 @@ class CarbureNotification(models.Model):
     DECLARATION_VALIDATED = "DECLARATION_VALIDATED"
     DECLARATION_CANCELLED = "DECLARATION_CANCELLED"
     DECLARATION_REMINDER = "DECLARATION_REMINDER"
+    SAF_TICKET_RECEIVED = "SAF_TICKET_RECEIVED"
+    SAF_TICKET_ACCEPTED = "SAF_TICKET_ACCEPTED"
+    SAF_TICKET_REJECTED = "SAF_TICKET_REJECTED"
 
-    NOTIFICATION_TYPES = [(CORRECTION_REQUEST, CORRECTION_REQUEST), (CORRECTION_DONE, CORRECTION_DONE), (LOTS_REJECTED, LOTS_REJECTED), (LOTS_RECEIVED, LOTS_RECEIVED), (LOTS_RECALLED, LOTS_RECALLED), (CERTIFICATE_EXPIRED, CERTIFICATE_EXPIRED), (DECLARATION_VALIDATED, DECLARATION_VALIDATED), (DECLARATION_CANCELLED, DECLARATION_CANCELLED), (DECLARATION_REMINDER, DECLARATION_REMINDER)]
+    NOTIFICATION_TYPES = [
+        (CORRECTION_REQUEST, CORRECTION_REQUEST), (CORRECTION_DONE, CORRECTION_DONE), (LOTS_REJECTED, LOTS_REJECTED), (LOTS_RECEIVED, LOTS_RECEIVED), (LOTS_RECALLED, LOTS_RECALLED), (CERTIFICATE_EXPIRED, CERTIFICATE_EXPIRED), (DECLARATION_VALIDATED, DECLARATION_VALIDATED), (DECLARATION_CANCELLED, DECLARATION_CANCELLED), (DECLARATION_REMINDER, DECLARATION_REMINDER),
+        (SAF_TICKET_REJECTED, SAF_TICKET_REJECTED), (SAF_TICKET_ACCEPTED, SAF_TICKET_ACCEPTED), (SAF_TICKET_RECEIVED, SAF_TICKET_RECEIVED)
+    ]
 
     dest = models.ForeignKey(Entity, blank=False, null=False, on_delete=models.CASCADE)
     datetime = models.DateTimeField(null=False, blank=False, auto_now_add=True)

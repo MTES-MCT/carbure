@@ -39,7 +39,11 @@ export const TicketAssignment = ({
   }
 
   const assignSafTicket = useMutation(api.assignSafTicket, {
-    invalidates: ["ticket-source-details", "ticket-sources"],
+    invalidates: [
+      "ticket-source-details",
+      "ticket-sources",
+      "operator-snapshot",
+    ],
   })
 
   const assignTicket = async () => {
@@ -97,6 +101,7 @@ export const TicketAssignment = ({
                 style={{ flex: 1 }}
                 max={remainingVolume}
                 min={0}
+                step={0.1}
                 type="number"
                 {...bind("volume")}
                 rightContent={

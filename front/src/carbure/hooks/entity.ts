@@ -42,7 +42,7 @@ export function useEntityManager(user: UserManager): EntityManager {
     has_direct_deliveries: entity?.has_direct_deliveries ?? false,
     preferred_unit: entity?.preferred_unit ?? "l",
     default_certificate: entity?.default_certificate ?? "",
-    has_saf: entity?.has_saf ?? true, // TODO replace true to false
+    has_saf: entity?.has_saf ?? false,
     ext_admin_pages: entity?.ext_admin_pages ?? [],
     isBlank: entityID === -1,
     isAdmin: type === EntityType.Administration,

@@ -24,10 +24,11 @@ import * as data from "../../__test__/data"
 import { Filters } from "../filters"
 import NoResult from "../no-result"
 import { useAutoStatus } from "../operator-tabs"
-import { ClientTicketDetails } from "../ticket-details/client"
-import { OperatorTicketDetails } from "../ticket-details/operator"
+import { ClientTicketDetails } from "../ticket-details/airline-details"
+import { OperatorTicketDetails } from "../ticket-details/operator-details"
 import { StatusSwitcher } from "./status-switcher"
 import TicketsTable from "./table"
+import { EntityType } from "carbure/types"
 
 export interface TicketsProps {
   year: number
@@ -42,7 +43,13 @@ export const Tickets = ({ year, snapshot }: TicketsProps) => {
   const [state, actions] = useQueryParamsStore(entity, year, status, snapshot)
   const query = useSafQuery(state)
 
-  const ticketsResponse = useQuery(api.getSafTickets, {
+  const apiGetTickets = (query: SafQuery) => {
+    return entity.entity_type === EntityType.Operator
+      ? api.getOperatorTickets(query)
+      : api.getSafAirlineTickets(query)
+  }
+
+  const ticketsResponse = useQuery(apiGetTickets, {
     key: "tickets",
     params: [query],
   })
@@ -63,6 +70,12 @@ export const Tickets = ({ year, snapshot }: TicketsProps) => {
     }
   }
 
+  const getTicketFilter = (filter: any) => {
+    return entity.entity_type === EntityType.Operator
+      ? api.getOperatorTicketFilters(filter, query)
+      : api.getAirlineTicketFilters(filter, query)
+  }
+
   return (
     <>
       <Bar>
@@ -70,7 +83,7 @@ export const Tickets = ({ year, snapshot }: TicketsProps) => {
           filters={entity.isAirline ? CLIENT_FILTERS : OPERATOR_FILTERS}
           selected={state.filters}
           onSelect={actions.setFilters}
-          getFilterOptions={(filter) => api.getSafTicketFilters(filter, query)}
+          getFilterOptions={getTicketFilter}
         />
       </Bar>
       <section>
