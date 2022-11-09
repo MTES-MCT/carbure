@@ -4,10 +4,9 @@ import { SafTicket, SafTicketSource, SafTicketStatus } from "saf/types"
 
 export interface TicketTagProps extends TagProps {
   status?: SafTicketStatus
-  small?: boolean
 }
 
-export const TicketTag = ({ status, small }: TicketTagProps) => {
+export const TicketTag = ({ status, small, big }: TicketTagProps) => {
   const { t } = useTranslation()
 
   let label
@@ -36,7 +35,7 @@ export const TicketTag = ({ status, small }: TicketTagProps) => {
   }
 
   return (
-    <Tag variant={variant} small={small}>
+    <Tag variant={variant} small={small} big={big}>
       {label}
     </Tag>
   )

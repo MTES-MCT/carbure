@@ -24,7 +24,12 @@ export const CancelAssignment = ({
   const notify = useNotify()
 
   const cancelSafTicket = useMutation(api.cancelSafTicket, {
-    invalidates: ["ticket-source-details", "tickets"],
+    invalidates: [
+      "ticket-source-details",
+      "tickets",
+      "operator-snapshot",
+      "ticket-sources",
+    ],
   })
 
   const cancelTicket = async () => {

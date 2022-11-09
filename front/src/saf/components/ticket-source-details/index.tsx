@@ -33,7 +33,7 @@ export const TicketSourceDetails = ({
   const match = useHashMatch("ticket-source/:id")
   const portal = usePortal()
 
-  const ticketSourceResponse = useQuery(api.getSafTicketSourceDetails, {
+  const ticketSourceResponse = useQuery(api.getOperatorTicketSourceDetails, {
     key: "ticket-source-details",
     params: [entity.id, parseInt(match?.params.id!)],
   })
@@ -74,7 +74,7 @@ export const TicketSourceDetails = ({
     <Portal onClose={closeDialog}>
       <Dialog onClose={closeDialog}>
         <header>
-          <TicketSourceTag ticketSource={ticketSource} />
+          <TicketSourceTag big ticketSource={ticketSource} />
           <h1>
             {t("Volume CAD n°")}
             {ticketSource?.carbure_id ?? "..."}

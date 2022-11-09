@@ -54,6 +54,7 @@ class SafTicket(models.Model):
     ghg_reference = models.FloatField(default=0.0)
     ghg_reduction = models.FloatField(default=0.0)
 
+    client_comment = models.TextField(blank=True, null=True, default=None)
     parent_ticket_source = models.ForeignKey("saf.SafTicketSource", null=True, on_delete=models.SET_NULL, related_name="saf_tickets")  # fmt: skip
 
     def generate_carbure_id(self):

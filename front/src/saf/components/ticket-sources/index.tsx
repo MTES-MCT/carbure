@@ -21,7 +21,7 @@ import * as data from "../../__test__/data"
 import { Filters } from "../filters"
 import NoResult from "../no-result"
 import { useAutoStatus } from "../operator-tabs"
-import { OperatorTicketDetails } from "../ticket-details/operator"
+import { OperatorTicketDetails } from "../ticket-details/operator-details"
 import TicketSourceDetail from "../ticket-source-details"
 import { StatusSwitcher } from "./status-switcher"
 import TicketSourcesTable from "./table"
@@ -39,7 +39,7 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
   const [state, actions] = useQueryParamsStore(entity, year, status, snapshot)
   const query = useSafQuery(state)
 
-  const ticketSourcesResponse = useQuery(api.getSafTicketSources, {
+  const ticketSourcesResponse = useQuery(api.getOperatorTicketSources, {
     key: "ticket-sources",
     params: [query],
   })
@@ -67,7 +67,9 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
           filters={FILTERS}
           selected={state.filters}
           onSelect={actions.setFilters}
-          getFilterOptions={(filter) => api.getSafTicketSourceFilters(filter, query)}
+          getFilterOptions={(filter) =>
+            api.getTicketSourceFilters(filter, query)
+          }
         />
       </Bar>
       <section>
