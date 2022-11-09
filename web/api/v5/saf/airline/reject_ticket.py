@@ -18,6 +18,7 @@ def reject_ticket(request, *args, **kwargs):
     try:
         entity_id = int(kwargs["context"]["entity_id"])
         ticket_id = int(request.POST.get("ticket_id"))
+        comment = request.POST.get("comment")
     except:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketRejectError.MALFORMED_PARAMS)
@@ -30,6 +31,7 @@ def reject_ticket(request, *args, **kwargs):
 
     try:
         ticket.status = SafTicket.REJECTED
+        ticket.client_comment = comment
         ticket.save()
 
         return SuccessResponse()
