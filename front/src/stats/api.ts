@@ -11,8 +11,5 @@ export function getEntityStats(entity_id: number) {
     {
       params: { entity_id },
     }
-  ).then(res => {
-    console.log(res)
-    return res.data.data
-  })
+  ).then(res => res.data.data)
 }

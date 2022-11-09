@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom"
 import { Trans, useTranslation } from "react-i18next"
 import IframeResizer from "iframe-resizer-react"
-import { Main, Panel } from "common/components/scaffold"
+import { LoaderOverlay, Main, Panel } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import api, { Api } from "common/services/api"
 import { Entity, EntityType } from "carbure/types"
@@ -11,9 +11,8 @@ import { getEntityStats } from "./api"
 
 const Stats = () => {
   const { t } = useTranslation()
-  useTitle(t("Statistiques"))
   const entity = useEntity()
-  console.log("entity:", entity)
+  useTitle(t("Statistiques") + " " + entity.name)
 
   const statsResponse = useQuery(getEntityStats, {
     key: "entities",
@@ -22,7 +21,9 @@ const Stats = () => {
 
   const statsData = statsResponse.result
 
-  return !statsData?.metabase_iframe_url ? null : (
+  return !statsData?.metabase_iframe_url ? (
+    <LoaderOverlay />
+  ) : (
     <Main>
       <header>
         <h1>
@@ -30,14 +31,7 @@ const Stats = () => {
         </h1>
       </header>
       <section>
-        {/* <iframe
-          src={statsData?.metabase_iframe_url}
-          frameBorder={0}
-          width={800}
-          height={600}
-          allowTransparency
-        ></iframe> */}
-        <IframeResizer //TODO make it works
+        <IframeResizer
           src={statsData?.metabase_iframe_url}
           frameBorder="0"
           allowTransparency
