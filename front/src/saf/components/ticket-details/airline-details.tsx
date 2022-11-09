@@ -31,17 +31,21 @@ export const ClientTicketDetails = ({ neighbors }: TicketDetailsProps) => {
   const match = useHashMatch("ticket/:id")
   const portal = usePortal()
 
-  const ticketResponse = useQuery(api.getSafTicketDetails, {
+  const ticketResponse = useQuery(api.getAirlineTicketDetails, {
     key: "ticket-details",
     params: [entity.id, parseInt(match?.params.id!)],
   })
 
   const acceptSafTicket = useMutation(api.acceptSafTicket, {
-    invalidates: ["ticket-details"],
+    invalidates: ["ticket-details", "tickets", "airline-snapshot"],
+    onSuccess: () => {
+      closeDialog()
+      notify(t("Le ticket a été accepté."), { variant: "success" })
+    },
   })
 
-  // const ticket = ticketResponse.result?.data?.data
-  const ticket = safTicketDetails //TO TEST
+  const ticket = ticketResponse.result?.data?.data
+  // const ticket = safTicketDetails //TO TEST
 
   const showRejectModal = () => {
     portal((close) => <RejectAssignment ticket={ticket!} onClose={close} />)
@@ -52,9 +56,7 @@ export const ClientTicketDetails = ({ neighbors }: TicketDetailsProps) => {
   }
 
   const acceptTicket = async () => {
-    // await acceptSafTicket.execute(entity.id, ticket.id)
-    closeDialog()
-    notify(t("Le ticket a été accepté."), { variant: "success" })
+    await acceptSafTicket.execute(entity.id, ticket!.id)
   }
 
   return (
