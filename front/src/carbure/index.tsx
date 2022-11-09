@@ -18,7 +18,7 @@ import Controls from "controls"
 import Entities from "companies"
 import Auth from "auth"
 import Saf from "saf/operator"
-import SafClient from "saf/client"
+import SafClient from "saf/airline"
 
 const Carbure = () => {
   const user = useUserManager()

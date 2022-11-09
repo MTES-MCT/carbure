@@ -32,7 +32,7 @@ export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
   const match = useHashMatch("ticket/:id")
   const portal = usePortal()
 
-  const ticketResponse = useQuery(api.getSafTicketDetails, {
+  const ticketResponse = useQuery(api.getOperatorTicketDetails, {
     key: "ticket-details",
     params: [entity.id, parseInt(match?.params.id!)],
   })
@@ -75,7 +75,9 @@ export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
         </main>
 
         <footer>
-          {ticket?.status === SafTicketStatus.Pending && (
+          {[SafTicketStatus.Pending, SafTicketStatus.Rejected].includes(
+            ticket?.status!
+          ) && (
             <Button
               icon={Cross}
               label={t("Annuler l'affectation")}

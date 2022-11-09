@@ -17,10 +17,10 @@ export const SafClient = () => {
 
   const entity = useEntity()
 
-  const years = useYears("saf", api.getYears)
+  const years = useYears("saf", api.getAirlineYears)
 
-  const snapshot = useQuery(api.getSafSnapshot, {
-    key: "snapshot",
+  const snapshot = useQuery(api.getAirlineSnapshot, {
+    key: "airline-snapshot",
     params: [entity.id, years.selected],
   })
   const snapshotData = snapshot.result?.data.data
