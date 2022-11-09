@@ -63,7 +63,7 @@ export const ClientTicketDetails = ({ neighbors }: TicketDetailsProps) => {
     <Portal onClose={closeDialog}>
       <Dialog onClose={closeDialog}>
         <header>
-          <TicketTag status={ticket?.status} />
+          <TicketTag big status={ticket?.status} />
           <h1>
             {t("Ticket n°")}
             {ticket?.carbure_id ?? "..."}

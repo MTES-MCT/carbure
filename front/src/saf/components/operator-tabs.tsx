@@ -6,10 +6,11 @@ import Tabs from "common/components/tabs"
 import { compact } from "common/utils/collection"
 import { formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import { useMatch, useParams } from "react-router-dom"
+import { useMatch } from "react-router-dom"
 import css from "./tabs.module.css"
 
 import {
+  SafClientSnapshot,
   SafOperatorSnapshot,
   SafTicketSourceStatus,
   SafTicketStatus,
@@ -136,16 +137,27 @@ const TicketRecap = ({
   )
 }
 
-export function useAutoStatus() {
+export function useAutoStatus(snapshot?: SafOperatorSnapshot) {
   const matchView = useMatch("/org/:entity/saf/:year/:view/*")
   const matchStatus = useMatch("/org/:entity/saf/:year/:view/:status")
 
-  if (matchView?.params.view === "ticket-sources") {
+  if (/*!snapshot ||*/ !matchView) {
+    return SafTicketSourceStatus.Available
+  }
+
+  if (matchView.params.view === "ticket-sources") {
+    //TODO afficher la categorie non vide en premier au chargement
+    // cf transactions/components/category.tsx -> useAutoCategory
+    // if (snapshot.ticket_sources_available > 0)
+    //   return SafTicketSourceStatus.Available
+    // else if (snapshot.ticket_sources_history > 0)
+    //   return SafTicketSourceStatus.History
+
     const status = matchStatus?.params.status as SafTicketSourceStatus
     return status ?? SafTicketSourceStatus.Available
   }
 
-  if (matchView?.params.view === "tickets") {
+  if (matchView.params.view === "tickets") {
     const status = matchStatus?.params.status as SafTicketStatus
     return status ?? SafTicketStatus.Pending
   }

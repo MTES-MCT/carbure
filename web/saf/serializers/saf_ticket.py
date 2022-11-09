@@ -9,11 +9,7 @@ from core.models import Entity
 class SafClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Entity
-        fields = [
-            "id",
-            "entity_type",
-            "name"
-        ]
+        fields = ["id", "entity_type", "name"]
 
 
 class SafTicketSerializer(serializers.ModelSerializer):
@@ -78,6 +74,7 @@ class SafTicketDetailsSerializer(serializers.ModelSerializer):
             "eee",
             "ghg_reduction",
             "ghg_total",
+            "client_comment",
             "parent_ticket_source",
         ]
 
@@ -96,14 +93,6 @@ class SafTicketDetailsSerializer(serializers.ModelSerializer):
 class SafTicketPreviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = SafTicket
-        fields = [
-            "id",
-            "carbure_id",
-            "client",
-            "agreement_date",
-            "volume",
-            "status",
-            "created_at"
-        ]
+        fields = ["id", "carbure_id", "client", "agreement_date", "volume", "status", "created_at"]
 
     client = serializers.SlugRelatedField(read_only=True, slug_field="name")

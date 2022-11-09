@@ -28,7 +28,7 @@ export const RejectAssignment = ({
   const [comment, setComment] = useState<string | undefined>()
 
   const rejectSafTicket = useMutation(api.rejectSafTicket, {
-    invalidates: ["ticket-details"],
+    invalidates: ["ticket-details", "airline-snapshot", "tickets"],
     onSuccess: () => ticketRejected(),
   })
 
@@ -45,7 +45,6 @@ export const RejectAssignment = ({
   const rejectTicket = async () => {
     //TO TEST comment below and add ticketRejected()
     await rejectSafTicket.execute(entity.id, ticket.id, comment!)
-    ticketRejected()
   }
 
   return (
