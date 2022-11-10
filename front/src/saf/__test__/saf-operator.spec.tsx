@@ -34,7 +34,7 @@ test("display the status tabs", async () => {
   await waitWhileLoading()
 
   screen.getByText("11")
-  screen.getByText("Volumes disponibles")
+  screen.getAllByText("Volumes disponibles")
   screen.getByText("Tickets affectés")
 })
 
