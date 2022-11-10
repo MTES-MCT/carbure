@@ -3,7 +3,7 @@ from rest_framework import serializers
 from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer
 from core.serializers import ProductionSiteSerializer, EntityPreviewSerializer
 from saf.models import SafTicketSource
-from web.core.serializers import CarbureLotPreviewSerializer
+from core.serializers import CarbureLotPreviewSerializer
 
 
 class SafTicketSourceSerializer(serializers.ModelSerializer):
