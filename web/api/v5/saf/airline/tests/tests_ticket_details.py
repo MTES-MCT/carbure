@@ -144,6 +144,7 @@ class SafTicketDetailsTest(TestCase):
             "eu": 1.0,
             "ghg_total": 1.0,
             "ghg_reduction": 65.0,
+            "client_comment": None,
             "parent_ticket_source": {
                 "id": 1234,
                 "carbure_id": "carbure-id-001",
