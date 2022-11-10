@@ -2,33 +2,44 @@ import { useCallback, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import Button from "common/components/button"
-import { ChevronLeft, ChevronRight } from "common/components/icons"
+import { ChevronLeft, ChevronRight, Return } from "common/components/icons"
 import { useHashMatch } from "common/components/hash-route"
+import { layout } from "common/components/scaffold"
+import cl from "clsx"
+import css from "./navigation.module.css"
 
 export interface NavigationProps {
   neighbors: number[]
+  closeAction?: () => void
 }
 
-export const NavigationButtons = ({ neighbors }: NavigationProps) => {
+export const NavigationButtons = ({
+  neighbors,
+  closeAction,
+}: NavigationProps) => {
   const { t } = useTranslation()
   const nav = useNavigation(neighbors)
 
   return (
-    <>
-      <Button
-        asideX
-        disabled={!nav.hasPrev}
-        icon={ChevronLeft}
-        label={t("Précédent")}
-        action={nav.prev}
-      />
-      <Button
-        disabled={!nav.hasNext}
-        icon={ChevronRight}
-        label={t("Suivant")}
-        action={nav.next}
-      />
-    </>
+    <div data-asidex={true} className={cl(css.navigation)}>
+      {neighbors.length > 1 && (
+        <>
+          <Button
+            disabled={!nav.hasPrev}
+            icon={ChevronLeft}
+            label={t("Précédent")}
+            action={nav.prev}
+          />
+          <Button
+            disabled={!nav.hasNext}
+            icon={ChevronRight}
+            label={t("Suivant")}
+            action={nav.next}
+          />
+        </>
+      )}
+      <Button icon={Return} label={t("Retour")} action={closeAction} />
+    </div>
   )
 }
 

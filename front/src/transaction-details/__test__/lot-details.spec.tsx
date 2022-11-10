@@ -233,17 +233,12 @@ test("check transaction errors", async () => {
 
   await screen.findByText("Brouillon")
 
-  const psite = screen.getByTitle("Le site de production n'est pas reconnu")
-  expect(psite.closest("svg")).toBeInTheDocument()
-  expect(psite.closest("[data-field]")).toHaveAttribute("data-error")
-
   const comdate = screen.getByTitle(
     "La date de mise en service du site de production est manquante"
   )
   expect(comdate.closest("[data-field]")).toHaveAttribute("data-error")
 
-  const errors = screen.getByText("Erreurs (2)")
-  await user.click(errors)
+  screen.getByText("Erreurs (2)")
 
   screen.getByText("Le site de production n'est pas reconnu", {
     selector: "li",
@@ -511,8 +506,6 @@ test("transaction details form as operator - operator self accepts lot", async (
   render(<LotDetailsWithRouter entity={operator} />)
 
   await waitWhileLoading()
-
-  // screen.debug(undefined, Infinity)
 
   await screen.findByDisplayValue("DAETEST")
 

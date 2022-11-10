@@ -30,6 +30,21 @@
   height: 24px;
 }
 
+.small {
+  font-size: 0.75em;
+  font-weight: normal;
+  height: inherit;
+  line-height: 1em;
+  border-radius: 2em;
+  padding: var(--spacing-xxs) var(--spacing-s);
+  box-shadow: none;
+}
+
+.small [data-icon] {
+  width: 14px;
+  height: 14px;
+}
+
 .info {
   background-color: var(--blue-light);
   color: var(--blue-dark);
@@ -38,6 +53,19 @@
 .success {
   background-color: var(--green-light);
   color: var(--green-dark);
+}
+
+.success.small{
+  border: 1px solid var(--green-medium);
+}
+.info.small{
+  border: 1px solid var(--blue-highlight);
+}
+.danger.small{
+  border: 1px solid var(--red-medium);
+}
+.none.small{
+  border: 1px solid var(--gray-medium);
 }
 
 .warning {

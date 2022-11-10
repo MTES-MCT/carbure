@@ -19,6 +19,7 @@ import {
   Certificate,
   EntityCertificate,
   EntityDepot,
+  EntityPreview,
 } from "carbure/types"
 import { formatPeriod } from "common/utils/formatters"
 
@@ -43,6 +44,14 @@ export const normalizeEntityOrUnknown: Normalizer<Entity | string> = (entity) =>
   else return normalizeEntity(entity)
 }
 
+export const normalizeEntityPreview: Normalizer<EntityPreview> = (entity) => ({
+  label: entity.name,
+  value: {
+    id: entity.id,
+    name: entity.name,
+    entity_type: entity.entity_type,
+  },
+})
 export const normalizeEntity: Normalizer<Entity> = (entity) => ({
   label: entity.name,
   value: {
@@ -194,6 +203,8 @@ export function getEntityTypeLabel(type: EntityType) {
       return i18next.t("Trader")
     case EntityType.ExternalAdmin:
       return i18next.t("Administration Externe")
+    case EntityType.Airline:
+      return i18next.t("Compagnie aérienne")
     case EntityType.Unknown:
     default:
       return i18next.t("Inconnu")

@@ -9,6 +9,7 @@ export interface EntityManager extends Entity {
   isExternal: boolean
   isAuditor: boolean
   isProducer: boolean
+  isAirline: boolean
   isOperator: boolean
   isTrader: boolean
   isIndustry: boolean
@@ -41,17 +42,17 @@ export function useEntityManager(user: UserManager): EntityManager {
     has_direct_deliveries: entity?.has_direct_deliveries ?? false,
     preferred_unit: entity?.preferred_unit ?? "l",
     default_certificate: entity?.default_certificate ?? "",
+    has_saf: entity?.has_saf ?? false,
     ext_admin_pages: entity?.ext_admin_pages ?? [],
-
     isBlank: entityID === -1,
     isAdmin: type === EntityType.Administration,
     isExternal: type === EntityType.ExternalAdmin,
     isAuditor: type === EntityType.Auditor,
+    isAirline: type === EntityType.Airline,
     isProducer: type === EntityType.Producer,
     isOperator: type === EntityType.Operator,
     isTrader: type === EntityType.Trader,
     isIndustry: isIndustry(type),
-
     canTrade: !!entity?.has_stocks || !!entity?.has_trading,
 
     hasPage: (page: ExternalAdminPages) =>

@@ -41,6 +41,9 @@ build-ci-image:
     - docker build -f ci/Dockerfile -t $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest .
     - docker push $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest
   only:
+    refs:
+      - dev
+      - master
     changes:
       - ci/Dockerfile
       - Pipfile
@@ -61,6 +64,9 @@ check-backend:
     - mypy web || true
     - TEST=1 python3 web/manage.py test web
   only:
+    refs:
+      - dev
+      - master
     changes:
       - web/**/*
 
@@ -72,6 +78,9 @@ check-frontend:
     - npx eslint --ext .ts,.tsx src/
     - npm test
   only:
+    refs:
+      - dev
+      - master
     changes:
       - front/**/*
 

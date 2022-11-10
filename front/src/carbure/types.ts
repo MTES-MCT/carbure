@@ -14,6 +14,13 @@ export interface Entity {
   preferred_unit?: Unit
   default_certificate?: string
   ext_admin_pages?: ExternalAdminPages[]
+  has_saf?: boolean
+}
+
+export interface EntityPreview {
+  id: number
+  name: string
+  entity_type: EntityType
 }
 
 export interface User {
@@ -141,6 +148,7 @@ export type ExternalAdminPages = "DCA" | "TIRIB"
 export enum EntityType {
   Producer = "Producteur",
   Operator = "Opérateur",
+  Airline = "Compagnie aérienne",
   Trader = "Trader",
   Administration = "Administration",
   Auditor = "Auditor",
@@ -172,6 +180,10 @@ export enum NotificationType {
   DeclarationValidated = "DECLARATION_VALIDATED",
   DeclarationCancelled = "DECLARATION_CANCELLED",
   DeclarationReminder = "DECLARATION_REMINDER",
+
+  SafTicketReceived = "SAF_TICKET_RECEIVED",
+  SafTicketAccepted = "SAF_TICKET_ACCEPTED",
+  SafTicketRejected = "SAF_TICKET_REJECTED",
 }
 
 export enum DepotType {

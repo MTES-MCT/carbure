@@ -42,7 +42,6 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
   const creator = stockData?.stock.carbure_client
 
   const closeDialog = () => {
-    invalidate("controls", "controls-snapshot", "controls-summary")
     navigate({ search: location.search, hash: "#" })
   }
 
@@ -77,8 +76,7 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
         </main>
 
         <footer>
-          <NavigationButtons neighbors={neighbors} />
-          <Button icon={Return} label={t("Retour")} action={closeDialog} />
+          <NavigationButtons neighbors={neighbors} closeAction={closeDialog} />
         </footer>
 
         {stock.loading && <LoaderOverlay />}

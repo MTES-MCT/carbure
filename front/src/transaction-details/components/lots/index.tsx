@@ -7,7 +7,7 @@ import { CorrectionStatus, Lot, LotStatus } from "transactions/types"
 import { useQuery, useMutation } from "common/hooks/async"
 import { useNotify } from "common/components/notifications"
 import useEntity from "carbure/hooks/entity"
-import { LoaderOverlay } from "common/components/scaffold"
+import { layout, LoaderOverlay } from "common/components/scaffold"
 import Dialog from "common/components/dialog"
 import Button from "common/components/button"
 import { Alarm, Return, Save } from "common/components/icons"
@@ -32,6 +32,7 @@ import Score from "../score"
 import Portal from "common/components/portal"
 import Flags from "flags.json"
 import { useHashMatch } from "common/components/hash-route"
+import useScrollToRef from "common/hooks/scroll-to-ref"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -71,6 +72,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const comments = lotData?.comments ?? []
   const changes = getLotChanges(lotData?.updates)
   const [errors, warnings] = separateAnomalies(lotData?.errors ?? [])
+  const { refToScroll } = useScrollToRef(errors.length > 0)
 
   const form = useLotForm(lotData?.lot, errors, certificates)
 
@@ -84,7 +86,6 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   )
 
   const closeDialog = () => {
-    invalidate("lots")
     navigate({ search: location.search, hash: "#" })
   }
 
@@ -127,7 +128,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
           </section>
 
           {errors.length > 0 && (
-            <section>
+            <section ref={refToScroll}>
               <BlockingAnomalies anomalies={errors} />
             </section>
           )}
@@ -177,9 +178,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
             <LotActions lot={lotData.lot} canSave={canSave} />
           )}
 
-          <NavigationButtons neighbors={neighbors} />
-
-          <Button icon={Return} label={t("Retour")} action={closeDialog} />
+          <NavigationButtons neighbors={neighbors} closeAction={closeDialog} />
         </footer>
 
         {lot.loading && <LoaderOverlay />}

@@ -285,17 +285,15 @@ export function useQueryParamsStore(
         page: 0,
       }),
 
-      setSnapshot: (snapshot: Snapshot) => (state) => {
-        return {
-          snapshot,
-          category: getDefaultCategory(state.status, snapshot),
-          filters: filtersParams,
-          invalid: false,
-          deadline: false,
-          selection: [],
-          page: 0,
-        }
-      },
+      setSnapshot: (snapshot: Snapshot) => (state) => ({
+        snapshot,
+        category: getDefaultCategory(state.status, snapshot),
+        filters: filtersParams,
+        invalid: false,
+        deadline: false,
+        selection: [],
+        page: 0,
+      }),
 
       setStatus: (status: Status) => (state) => ({
         status,

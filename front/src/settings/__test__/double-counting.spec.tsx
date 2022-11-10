@@ -78,8 +78,6 @@ test("check double counting upload with error display errors", async () => {
     "Production - Ligne 5 : La matière première Blé n’est pas comprise dans la liste des matières premières pouvant être double comptées."
   )
 
-  screen.debug(undefined, Infinity)
-
   //MP_BC_INCOHERENT
   await screen.getByText(
     "Production - Ligne 4 : La matière première Marc de raisin est incohérente avec le biocarburant B100."

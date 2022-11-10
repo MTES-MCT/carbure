@@ -1,4 +1,5 @@
 import unicodedata
+from django.db import transaction
 
 
 # transform a string into a standard form in lower case without accents
@@ -9,6 +10,7 @@ def normalize_string(input_str: str):
     return only_ascii
 
 
+@transaction.atomic
 def bulk_update_or_create(Model, id_field, rows):
     if len(rows) == 0:
         return

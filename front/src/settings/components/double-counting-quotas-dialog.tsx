@@ -2,7 +2,7 @@ import { Entity } from "carbure/types"
 import Table, { Cell, Column } from "common/components/table"
 import { useQuery } from "common/hooks/async"
 import { formatNumber } from "common/utils/formatters"
-import { DoubleCounting, QuotaDetails } from "doublecount/types"
+import { DoubleCounting, QuotaDetails } from "double-counting/types"
 import { useTranslation } from "react-i18next"
 import * as api from "../api/double-counting"
 

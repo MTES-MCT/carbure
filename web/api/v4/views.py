@@ -27,7 +27,7 @@ from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureL
 from core.notifications import notify_correction_done, notify_correction_request, notify_declaration_cancelled, notify_declaration_validated, notify_lots_recalled, notify_lots_received, notify_lots_rejected, notify_lots_recalled
 from core.serializers import CarbureLotPublicSerializer, CarbureLotReliabilityScoreSerializer, CarbureNotificationSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
 from core.xlsx_v3 import template_v4, template_v4_stocks
-from carbure.tasks import background_bulk_scoring
+from carbure.tasks import background_bulk_scoring, background_create_ticket_sources_from_lots
 
 
 @check_user_rights()
@@ -1596,33 +1596,43 @@ def validate_declaration(request, *args, **kwargs):
     pending_reception = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, lot_status=CarbureLot.PENDING).count()
     if pending_reception > 0:
         return JsonResponse({'status': 'error', 'message': 'Cannot validate declaration. Some lots are pending reception.'}, status=400)
+    
     pending_correction = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, lot_status__in=[CarbureLot.ACCEPTED], correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED]).count()
     if pending_correction > 0:
         return JsonResponse({'status': 'error', 'message': 'Cannot validate declaration. Some accepted lots need correction.'}, status=400)
+    
     lots_sent_rejected_or_drafts = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, lot_status=CarbureLot.REJECTED).count()
     if lots_sent_rejected_or_drafts > 0:
         return JsonResponse({'status': 'error', 'message': 'Cannot validate declaration. Some outgoing lots need your attention.'}, status=400)
+    
     lots_sent_to_fix = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, lot_status__in=[CarbureLot.ACCEPTED], correction_status__in=[CarbureLot.IN_CORRECTION]).count()
     if lots_sent_to_fix > 0:
         return JsonResponse({'status': 'error', 'message': 'Cannot validate declaration. Some outgoing lots need correction.'}, status=400)
-    lots_received = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int)
+    
+    lots_received = CarbureLot.objects.filter(lot_status__in=[CarbureLot.ACCEPTED], carbure_client=declaration.entity, period=period_int)
     lots_received.update(declared_by_client=True)
-    lots_sent = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int)
+
+    # create SAF ticket sources for declared received lots
+    background_create_ticket_sources_from_lots(lots_received)
+    
+    lots_sent = CarbureLot.objects.filter(lot_status__in=[CarbureLot.ACCEPTED], carbure_supplier=declaration.entity, period=period_int)
     lots_sent.update(declared_by_supplier=True)
+    
     bulk_events = []
     for lot in lots_received:
         bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLARED, lot=lot, user=request.user))
     for lot in lots_sent:
         bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLARED, lot=lot, user=request.user))
     CarbureLotEvent.objects.bulk_create(bulk_events)
+    
     # freeze lots
-    lots_to_freeze = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True)
-    lots_to_freeze.update(lot_status=CarbureLot.FROZEN)
-    background_bulk_scoring(lots_to_freeze)
+    lots_received_to_freeze = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True)
+    lots_received_to_freeze.update(lot_status=CarbureLot.FROZEN)
+    background_bulk_scoring(lots_received_to_freeze)
 
-    lots_to_freeze = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True)
-    lots_to_freeze.update(lot_status=CarbureLot.FROZEN)
-    background_bulk_scoring(lots_to_freeze)
+    lots_sent_to_freeze = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True)
+    lots_sent_to_freeze.update(lot_status=CarbureLot.FROZEN)
+    background_bulk_scoring(lots_sent_to_freeze)
 
     # mark declaration
     declaration.declared = True
