@@ -141,8 +141,8 @@ export function usePageTitle(state: SafStates) {
   const { t } = useTranslation()
 
   const statuses: any = {
-    [SafTicketSourceStatus.Available]: t("Volume disponibles"),
-    [SafTicketSourceStatus.History]: t("Volume historiques"),
+    [SafTicketSourceStatus.Available]: t("Volumes disponibles"),
+    [SafTicketSourceStatus.History]: t("Volumes historiques"),
     [SafTicketStatus.Accepted]: t("Tickets acceptés"),
     [SafTicketStatus.Pending]: t("Tickets en attente"),
     [SafTicketStatus.Rejected]: t("Tickets refusés")
