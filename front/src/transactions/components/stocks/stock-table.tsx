@@ -143,7 +143,7 @@ export function useStockColumns() {
         const reduction = isRedII(stock.delivery_date)
           ? stock.ghg_reduction_red_ii
           : stock.ghg_reduction
-        return <Cell text={`${reduction.toFixed(2)}%`} />
+        return <Cell text={`${reduction.toFixed(0)}%`} />
       },
     },
   }

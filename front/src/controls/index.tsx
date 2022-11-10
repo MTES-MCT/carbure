@@ -6,9 +6,10 @@ import { Main } from "common/components/scaffold"
 import Select from "common/components/select"
 import StatusTabs, { useStatus } from "./components/status"
 import Lots from "./components/lots"
-import { useYears } from "transactions"
+
 import pickApi from "./api"
 import Stocks from "./components/stocks"
+import useYears from "common/hooks/years"
 
 export const Controls = () => {
   const { t } = useTranslation()

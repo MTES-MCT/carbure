@@ -95,7 +95,9 @@ interface NavigationProps {
 
 const Navigation = ({ entity }: NavigationProps) => {
   const { t } = useTranslation()
-  const { isAdmin, isAuditor, isIndustry } = entity
+  const { isAdmin, isAuditor, isIndustry, isOperator, has_saf, isAirline } =
+    entity
+
   return (
     <Routes>
       <Route
@@ -122,6 +124,12 @@ const Navigation = ({ entity }: NavigationProps) => {
                 label: t("Transactions"),
               },
 
+              ((has_saf && isOperator) || isAirline) && {
+                key: "saf",
+                path: "saf",
+                label: t("Aviation"),
+              },
+
               isAdmin && {
                 key: "entities",
                 path: "entities",
@@ -137,7 +145,7 @@ const Navigation = ({ entity }: NavigationProps) => {
               {
                 key: "settings",
                 path: "settings",
-                label: isIndustry ? t("Société") : t("Options"),
+                label: t("Société"),
               },
 
               isIndustry && {

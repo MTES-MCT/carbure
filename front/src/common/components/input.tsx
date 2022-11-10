@@ -27,6 +27,7 @@ export interface Control extends Layout {
   placeholder?: string
   title?: string
   icon?: React.FunctionComponent | React.ReactNode
+  rightContent?: React.ReactNode
   domRef?: React.RefObject<HTMLElement>
 }
 
@@ -399,6 +400,7 @@ export const Field = ({
   error,
   label,
   icon: Icon,
+  rightContent,
   variant,
   title,
   className,
@@ -418,6 +420,8 @@ export const Field = ({
     ) : loading === false ? (
       <Placeholder />
     ) : null
+
+  if (error && icon) console.log({ error, icon })
 
   return (
     <div
@@ -458,6 +462,7 @@ export const Field = ({
         )}
 
         {icon && <div className={css.icon}>{icon}</div>}
+        {!!rightContent && rightContent}
       </div>
     </div>
   )

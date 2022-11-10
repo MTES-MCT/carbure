@@ -72,6 +72,7 @@ export interface FormManager<T> {
   errors: FormErrors<T>
   bind: Bind<T>
   setField: FieldSetter<T>
+  setFieldError: (name: keyof T, error: string | undefined) => void
   setValue: React.Dispatch<React.SetStateAction<T>>
 }
 
@@ -92,24 +93,41 @@ export function useForm<T>(
   options?: FormOptions<T>
 ): FormManager<T> {
   const [value, setValue] = useState(initialState)
-  const errors = options?.errors ?? EMPTY_ERRORS
+  const [_errors, setErrors] = useState(EMPTY_ERRORS)
+
+  const errors = options?.errors ?? _errors
   const mutate = options?.setValue ?? identity
 
   const setField = useCallback(
     (name: keyof T, value: T[keyof T]) => {
       setValue((form) => mutate({ ...form, [name]: value }, form))
+      setFieldError(name, undefined)
     },
     [mutate]
   )
 
+  const setFieldError = useCallback(
+    (name: keyof T, error: string | undefined) => {
+      setErrors((errors) => ({ ...errors, [name]: error }))
+    },
+    []
+  )
+
   const bind = useBindCallback(value, errors, setField)
 
-  return { value, errors, bind, setField, setValue }
+  return {
+    value,
+    errors,
+    setFieldError,
+    bind,
+    setField,
+    setValue,
+  }
 }
 
 export function useBind<T>() {
   const form = useFormContext<T>()
-  return useBindCallback<T>(form.value, form.errors, form.setField)
+  return form.bind
 }
 
 export function useBindCallback<T>(

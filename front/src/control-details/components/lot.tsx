@@ -67,7 +67,6 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const expiring = isExpiring(lotData?.lot)
 
   const closeDialog = () => {
-    invalidate("controls", "controls-snapshot", "controls-summary")
     navigate({ search: location.search, hash: "#" })
   }
 
@@ -150,8 +149,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
           {lotData && entity.isAuditor && (
             <SetOneConformityButton lot={lotData.lot} />
           )}
-          <NavigationButtons neighbors={neighbors} />
-          <Button icon={Return} label={t("Retour")} action={closeDialog} />
+          <NavigationButtons neighbors={neighbors} closeAction={closeDialog} />
         </footer>
 
         {lot.loading && <LoaderOverlay />}

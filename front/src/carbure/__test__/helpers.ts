@@ -56,3 +56,9 @@ export function getByTextContent(textContent: string) {
     return content === textContent || node?.textContent === textContent
   })
 }
+
+export function findByTextInNode(textContent: string, nodeName: string) {
+  return screen.findByText((content, node) => {
+    return content === textContent && node?.nodeName === nodeName
+  })
+}

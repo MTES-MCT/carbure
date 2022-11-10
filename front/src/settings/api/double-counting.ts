@@ -4,7 +4,7 @@ import {
   DoubleCountingDetails,
   DoubleCountingUploadErrors,
   QuotaDetails
-} from "doublecount/types"
+} from "double-counting/types"
 
 export function getDoubleCountingAgreements(entity_id: number) {
   return api.get<Api<DoubleCounting[]>>("/v3/doublecount/agreements", {
