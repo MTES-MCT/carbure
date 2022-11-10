@@ -10,7 +10,7 @@ import pandas as pd
 from typing import TYPE_CHECKING, Dict, List, Optional
 from pandas._typing import Scalar
 
-from web.core.utils import bulk_update_or_create
+from core.utils import bulk_update_or_create
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
