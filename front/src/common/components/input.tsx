@@ -74,10 +74,10 @@ export const NumberInput = ({
       !onChange
         ? undefined
         : (e) => {
-          const value = parseFloat(e.target.value)
-          const change = isNaN(value) ? undefined : value
-          onChange(change)
-        }
+            const value = parseFloat(e.target.value)
+            const change = isNaN(value) ? undefined : value
+            onChange(change)
+          }
     }
   />
 )
@@ -421,6 +421,8 @@ export const Field = ({
       <Placeholder />
     ) : null
 
+  if (error && icon) console.log({ error, icon })
+
   return (
     <div
       data-field
@@ -461,7 +463,6 @@ export const Field = ({
 
         {icon && <div className={css.icon}>{icon}</div>}
         {!!rightContent && rightContent}
-
       </div>
     </div>
   )

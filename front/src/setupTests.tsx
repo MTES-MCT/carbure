@@ -28,6 +28,9 @@ configure({
 // mock window.open (jsdom does not implement it)
 window.open = jest.fn()
 
+// mock scrollIntoView method
+Element.prototype.scrollIntoView = jest.fn()
+
 jest.setTimeout(30000)
 
 i18n.use(initReactI18next).init({

@@ -93,7 +93,9 @@ export function useForm<T>(
   options?: FormOptions<T>
 ): FormManager<T> {
   const [value, setValue] = useState(initialState)
-  const [errors, setErrors] = useState(EMPTY_ERRORS)
+  const [_errors, setErrors] = useState(EMPTY_ERRORS)
+
+  const errors = options?.errors ?? _errors
   const mutate = options?.setValue ?? identity
 
   const setField = useCallback(
@@ -106,19 +108,26 @@ export function useForm<T>(
 
   const setFieldError = useCallback(
     (name: keyof T, error: string | undefined) => {
-      setErrors(errors => ({ ...errors, [name]: error }))
+      setErrors((errors) => ({ ...errors, [name]: error }))
     },
     []
   )
 
   const bind = useBindCallback(value, errors, setField)
 
-  return { value, errors: options?.errors ?? errors, setFieldError, bind, setField, setValue }
+  return {
+    value,
+    errors,
+    setFieldError,
+    bind,
+    setField,
+    setValue,
+  }
 }
 
 export function useBind<T>() {
   const form = useFormContext<T>()
-  return useBindCallback<T>(form.value, form.errors, form.setField)
+  return form.bind
 }
 
 export function useBindCallback<T>(
