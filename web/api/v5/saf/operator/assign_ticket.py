@@ -21,7 +21,7 @@ def assign_ticket(request, *args, **kwargs):
         entity_id = int(kwargs["context"]["entity_id"])
         ticket_source_id = int(request.POST.get("ticket_source_id"))
         client_id = int(request.POST.get("client_id"))
-        volume = int(request.POST.get("volume"))
+        volume = float(request.POST.get("volume"))
         agreement_reference = request.POST.get("agreement_reference")
         agreement_date = request.POST.get("agreement_date")
     except:
@@ -51,7 +51,7 @@ def assign_ticket(request, *args, **kwargs):
                 type=CarbureNotification.SAF_TICKET_RECEIVED,
                 dest_id=client_id,
                 send_by_email=False,
-                meta={"supplier": ticket.supplier.name},
+                meta={"supplier": ticket.supplier.name, "ticket_id": ticket.id, "year": ticket.year},
             )
 
             ticket_source.assigned_volume += ticket.volume
