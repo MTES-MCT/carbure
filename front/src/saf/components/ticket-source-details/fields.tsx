@@ -66,7 +66,7 @@ export const TicketSourceFields = ({
           readOnly
         />
         <TextInput
-          label={t("Pays de Production")}
+          label={t("Pays de production")}
           value={
             ticketSource.carbure_production_site
               ? norm.normalizeCountry(ticketSource.country_of_origin).label

@@ -56,7 +56,7 @@ export function useColumns() {
     },
 
     availableVolume: {
-      header: t("Volume disponible"),
+      header: t("Volumes disponibles"),
       cell: (ticketSource: SafTicketSource) => (
         <Cell
           text={`${formatNumber(

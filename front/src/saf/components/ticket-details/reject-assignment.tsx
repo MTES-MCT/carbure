@@ -65,7 +65,7 @@ export const RejectAssignment = ({
                 {t("Pour quelle raison refusez-vous ce ticket ?")}
               </strong>{" "}
               {t(
-                "Cela entraînera la suppression du certificat. Le producteur sera notifié de votre refus."
+                "Cela entraînera la suppression du ticket. Le producteur sera notifié de votre refus."
               )}
             </p>
             <Form id="reject-ticket" onSubmit={rejectTicket}>
