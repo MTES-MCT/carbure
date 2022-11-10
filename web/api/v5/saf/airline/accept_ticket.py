@@ -38,7 +38,7 @@ def accept_ticket(request, *args, **kwargs):
                 type=CarbureNotification.SAF_TICKET_ACCEPTED,
                 dest_id=ticket.supplier_id,
                 send_by_email=False,
-                meta={"client": ticket.client.name},
+                meta={"client": ticket.client.name, "ticket_id": ticket.id, "year": ticket.year},
             )
 
         return SuccessResponse()

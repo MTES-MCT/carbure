@@ -141,7 +141,7 @@ const normalizeNotification: Normalizer<Notification> = (notif) => ({
 })
 
 function getNotificationText(notif: Notification) {
-  console.log('notif:', notif)
+  console.log("notif:", notif)
   switch (notif.type) {
     case NotificationType.LotsReceived:
       return t("Vous avez reçu {{count}} lots de {{supplier}}", {
@@ -203,20 +203,17 @@ function getNotificationText(notif: Notification) {
         { period: formatPeriod(notif.meta?.period ?? 0) }
       )
     case NotificationType.SafTicketReceived:
-      return t(
-        "Vous avez reçu un ticket CAD de {{supplier}}.",
-        { supplier: notif.meta.supplier }
-      )
+      return t("Vous avez reçu un ticket CAD de {{supplier}}.", {
+        supplier: notif.meta.supplier,
+      })
     case NotificationType.SafTicketAccepted:
-      return t(
-        "Votre ticket a été accepté par {{client}}.",
-        { client: notif.meta.client }
-      )
+      return t("Votre ticket a été accepté par {{client}}.", {
+        client: notif.meta.client,
+      })
     case NotificationType.SafTicketRejected:
-      return t(
-        "Votre ticket a été refusé par {{client}}.",
-        { client: notif.meta.client }
-      )
+      return t("Votre ticket a été refusé par {{client}}.", {
+        client: notif.meta.client,
+      })
 
     default:
       return ""
@@ -253,13 +250,12 @@ function getNotificationLink(notif: Notification) {
       return `#declaration/${notif.meta?.period}`
 
     //TODO link SAF
-    // case NotificationType.SafTicketReceived:
-    //   return `/org/${notif.dest.id}/saf/${notif.meta?.year}/ticket/pending` //TODO #ticket/ + id
-    // case NotificationType.SafTicketAccepted:
-    //   return `/org/${notif.dest.id}/saf/${notif.meta?.year}/ticket/accepted`
-    // case NotificationType.SafTicketRejected:
-    //   return `/org/${notif.dest.id}/saf/${notif.meta?.year}/ticket/rejected`
-
+    case NotificationType.SafTicketReceived:
+      return `/org/${notif.dest.id}/saf/${notif.meta?.year}/tickets/pending#ticket/${notif.meta?.ticket_id}`
+    case NotificationType.SafTicketAccepted:
+      return `/org/${notif.dest.id}/saf/${notif.meta?.year}/tickets/accepted#ticket/${notif.meta?.ticket_id}`
+    case NotificationType.SafTicketRejected:
+      return `/org/${notif.dest.id}/saf/${notif.meta?.year}/tickets/rejected#ticket/${notif.meta?.ticket_id}`
 
     default:
       return "#"
