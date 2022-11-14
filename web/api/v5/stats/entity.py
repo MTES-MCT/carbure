@@ -18,10 +18,14 @@ class StatsEntityError:
 
 
 def get_metabase_dashboard (type : str) :
-    if type == Entity.OPERATOR : 
-        return 205 
     if type == Entity.PRODUCER : 
         return 204
+    if type == Entity.OPERATOR : 
+        return 205 
+    if type == Entity.TRADER : 
+        return 206
+    return 0
+    
 
 
 @check_user_rights()
@@ -35,10 +39,15 @@ def get_entity(request, *args, **kwargs):
     try: 
         entity = Entity.objects.get(id=entity_id)
         dashboard_id = get_metabase_dashboard(entity.entity_type)
+
     except:
         traceback.print_exc()
         return ErrorResponse(400, StatsEntityError.STATS_DASHBOARD_TYPE_UNAVAILABLE)
 
+    if dashboard_id == 0 :
+        traceback.print_exc()
+        return ErrorResponse(400, StatsEntityError.STATS_DASHBOARD_TYPE_UNAVAILABLE)
+        
     try:
         payload = {
             "resource": {"dashboard": dashboard_id},
