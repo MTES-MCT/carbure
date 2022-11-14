@@ -19,11 +19,13 @@ class StatsEntityError:
 
 def get_metabase_dashboard (type : str) :
     if type == Entity.PRODUCER : 
-        return 204
+        return 207
     if type == Entity.OPERATOR : 
         return 205 
     if type == Entity.TRADER : 
-        return 206
+        return 211
+    if type == Entity.AUDITOR : 
+        return 210
     return 0
     
 
