@@ -22,10 +22,11 @@ def get_metabase_dashboard (type : str) :
         return 207
     if type == Entity.OPERATOR : 
         return 205 
-    if type == Entity.TRADER : 
-        return 211
-    if type == Entity.AUDITOR : 
-        return 210
+    # TODO add when ready   
+    # if type == Entity.TRADER : 
+    #     return 211
+    # if type == Entity.AUDITOR : 
+    #     return 210
     return 0
     
 

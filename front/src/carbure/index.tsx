@@ -70,6 +70,7 @@ const Org = () => {
     isExternal,
     isIndustry,
     isOperator,
+    isProducer,
     has_saf,
     isAirline,
   } = entity
@@ -107,7 +108,7 @@ const Org = () => {
           <Route path="entities/*" element={<Entities />} />
         </>)}
 
-        {isIndustry && <Route path="stats" element={<Stats /> } />}
+        {(isOperator || isProducer) && <Route path="stats" element={<Stats /> } />}
 
 
         {(isAdmin || isAuditor) && (<>
