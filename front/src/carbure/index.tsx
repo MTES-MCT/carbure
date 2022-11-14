@@ -19,6 +19,7 @@ import Entities from "companies"
 import Auth from "auth"
 import Saf from "saf/operator"
 import SafClient from "saf/airline"
+import Stats from "stats"
 
 const Carbure = () => {
   const user = useUserManager()
@@ -69,6 +70,7 @@ const Org = () => {
     isExternal,
     isIndustry,
     isOperator,
+    isProducer,
     has_saf,
     isAirline,
   } = entity
@@ -105,6 +107,9 @@ const Org = () => {
           <Route path="*" element={<Navigate replace to="dashboard" />} />
           <Route path="entities/*" element={<Entities />} />
         </>)}
+
+        {(isOperator || isProducer) && <Route path="stats" element={<Stats /> } />}
+
 
         {(isAdmin || isAuditor) && (<>
           <Route path="controls/:year/*" element={<Controls />} />
