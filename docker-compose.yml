@@ -67,6 +67,7 @@ services:
       AWS_S3_USE_SSL: ${AWS_S3_USE_SSL}
       SCALINGO_TOKEN: ${SCALINGO_TOKEN}
       SCALINGO_MYSQL_UUID: ${SCALINGO_MYSQL_UUID}
+      METABASE_SECRET_KEY: ${METABASE_SECRET_KEY}
     volumes:
       - ./web:/app/web
       - ./scripts:/app/scripts
