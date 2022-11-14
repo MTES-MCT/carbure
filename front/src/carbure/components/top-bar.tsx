@@ -138,12 +138,11 @@ const Navigation = ({ entity }: NavigationProps) => {
                 label: t("Aviation"),
               },
 
-              isIndustry &&
-                (isOperator || isProducer || isTrader) && {
-                  key: "stats",
-                  path: "stats",
-                  label: t("Stats"),
-                },
+              (isOperator || isProducer) && {
+                key: "stats",
+                path: "stats",
+                label: t("Stats"),
+              },
 
               isAdmin && {
                 key: "entities",
