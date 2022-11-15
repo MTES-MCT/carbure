@@ -2,7 +2,7 @@ import useEntity from "carbure/hooks/entity"
 import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import { useHashMatch } from "common/components/hash-route"
-import { Cross } from "common/components/icons"
+import { Check, Cross } from "common/components/icons"
 import { useNotify } from "common/components/notifications"
 import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
@@ -81,7 +81,7 @@ export const ClientTicketDetails = ({ neighbors }: TicketDetailsProps) => {
           {ticket?.status === SafTicketStatus.Pending && (
             <>
               <Button
-                icon={Cross}
+                icon={Check}
                 label={t("Accepter")}
                 variant="success"
                 disabled={!ticket}
