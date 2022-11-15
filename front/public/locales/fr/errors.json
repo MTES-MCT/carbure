@@ -1,6 +1,7 @@
 {
   "BC_NOT_CONFIGURED": "Le biocarburant n'est pas enregistré sur le site de production",
   "COULD_NOT_FIND_PRODUCTION_SITE": "Le site de production n'est pas configuré sur votre page société",
+  "DELIVERY_IN_THE_FUTURE": "La date de livraison est dans le futur",
   "DEPOT_NOT_CONFIGURED": "Ce site de livraison n'est pas associé à votre société. Veuillez vérifier vos paramètres",
   "DEPRECATED_MP": "Les résidus viniques vont disparaître au profit de deux nouvelles matières premières: Marc de raisin et Lies de vin. Merci de mettre à jour vos déclarations en conséquence.",
   "EEC_ANORMAL_HIGH": "Émissions GES liées à l'Extraction et la Culture anormalement élevées",
