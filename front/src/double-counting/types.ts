@@ -130,3 +130,15 @@ export interface QuotaDetails {
   biofuel: Biofuel
   nb_lots: number
 }
+
+
+export interface DoubleCountingFile {
+  createdAt: string
+  errors?: DoubleCountingUploadErrors
+  fileName: string
+}
+
+export interface CheckDoubleCountingFilesResponse {
+  dca_id: number,
+  files: DoubleCountingFile[]
+}

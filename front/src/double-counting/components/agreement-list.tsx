@@ -1,11 +1,11 @@
 import { Fragment, useState } from "react"
 import { useTranslation, Trans } from "react-i18next"
 import { DoubleCounting } from "../types"
-import { LoaderOverlay } from "common/components/scaffold"
+import { ActionBar, LoaderOverlay } from "common/components/scaffold"
 import Tabs from "common/components/tabs"
 import Table, { Column, Cell } from "common/components/table"
 import { Alert } from "common/components/alert"
-import { AlertCircle } from "common/components/icons"
+import { AlertCircle, Upload } from "common/components/icons"
 import { DoubleCountingDialog } from "./agreement-details"
 import { usePortal } from "common/components/portal"
 import { Entity } from "carbure/types"
@@ -13,6 +13,8 @@ import DoubleCountingStatus from "./dc-status"
 import * as api from "../api"
 import { useQuery } from "common/hooks/async"
 import { formatDate, formatDateYear } from "common/utils/formatters"
+import Button from "common/components/button"
+import DoubleCountingFilesCheckerDialog from "./files-checker/files-checker-dialog"
 
 type AgreementListProps = {
   entity: Entity
@@ -71,19 +73,32 @@ const AgreementList = ({ entity, year }: AgreementListProps) => {
     ))
   }
 
+  const showAgreementsChecker = () => {
+    portal((close) => <DoubleCountingFilesCheckerDialog onClose={close} />)
+  }
+
   return (
     <section>
-      <Tabs
-        focus={tab}
-        onFocus={setTab}
-        tabs={[
-          { key: "pending", label: t("En attente") },
-          { key: "accepted", label: t("Accepté") },
-          { key: "expired", label: t("Expiré") },
-          { key: "rejected", label: t("Refusé") },
-        ]}
-      />
+      <ActionBar>
+        <Tabs
+          focus={tab}
+          onFocus={setTab}
+          tabs={[
+            { key: "pending", label: t("En attente") },
+            { key: "accepted", label: t("Accepté") },
+            { key: "expired", label: t("Expiré") },
+            { key: "rejected", label: t("Refusé") },
+          ]}
+        />
 
+        <Button
+          asideX
+          variant="secondary"
+          icon={Upload}
+          label={t("Vérifier des dossiers")}
+          action={showAgreementsChecker}
+        />
+      </ActionBar>
       {tab === "pending" && (
         <Fragment>
           {allPendingCount === 0 && (
