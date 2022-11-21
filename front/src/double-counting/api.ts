@@ -79,13 +79,12 @@ export function uploadDoubleCountingDecision(dca_id: number, file: File) {
   return api.post("/v3/doublecount/admin/upload-decision", { file })
 }
 
-
-
-export function checkDoubleCountingAgreements(
-  files: File
-) {
-  const res = api.post<Api<CheckDoubleCountingFilesResponse>>("/v5/doublecount/check-dc-agreements", {
-    files,
-  })
+export function checkDoubleCountingFiles(files: File[]) {
+  const res = api.post<Api<CheckDoubleCountingFilesResponse>>(
+    "/v5/doublecount/check-dc-agreements",
+    {
+      files,
+    }
+  )
   return res
 }

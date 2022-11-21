@@ -131,14 +131,15 @@ export interface QuotaDetails {
   nb_lots: number
 }
 
-
-export interface DoubleCountingFile {
-  createdAt: string
+export interface DoubleCountingFileInfo {
   errors?: DoubleCountingUploadErrors
-  fileName: string
+  period: string
+  file_name: string
+  production_site: string
+  error_count: number
 }
 
 export interface CheckDoubleCountingFilesResponse {
-  dca_id: number,
-  files: DoubleCountingFile[]
+  files: DoubleCountingFileInfo[]
+  checked_at: string
 }
