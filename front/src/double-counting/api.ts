@@ -79,9 +79,10 @@ export function uploadDoubleCountingDecision(dca_id: number, file: File) {
   return api.post("/v3/doublecount/admin/upload-decision", { file })
 }
 
-export function checkDoubleCountingFiles(files: File[]) {
+export function checkDoubleCountingFiles(files: FileList) {
+  console.log('send files:', files)
   const res = api.post<Api<CheckDoubleCountingFilesResponse>>(
-    "/v5/doublecount/check-dc-agreements",
+    "/v5/doublecount/check-files",
     {
       files,
     }

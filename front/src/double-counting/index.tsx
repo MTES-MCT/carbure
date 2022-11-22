@@ -10,6 +10,7 @@ import QuotasList from "./components/dc-quotas"
 import * as api from "./api"
 import useTitle from "common/hooks/title"
 import Tabs from "common/components/tabs"
+import DoubleCountingFilesChecker from "./components/files-checker"
 
 const DoubleCounting = () => {
   const { t } = useTranslation()
@@ -63,6 +64,7 @@ const DoubleCounting = () => {
           element={<AgreementList entity={entity} year={year} />}
         />
         <Route path="quotas" element={<QuotasList year={year} />} />
+        <Route path="files-checker" element={<DoubleCountingFilesChecker />} />
         <Route path="*" element={<Navigate to="agreements" />} />
       </Routes>
     </Main>
