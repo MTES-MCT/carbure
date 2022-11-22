@@ -53,6 +53,9 @@ def get_tickets(request, *args, **kwargs):
 def parse_ticket_query(query):
     entity_id = int(query["entity_id"])
     status = query["status"]
+    print("******")
+    print(status)
+    print("******")
     year = int(query["year"])
     search = query.get("search", None)
     periods = [int(p) for p in query.getlist("periods")] if "periods" in query else None
@@ -95,9 +98,9 @@ def find_tickets(**filters):
     if filters["suppliers"] != None:
         tickets = tickets.filter(supplier__name__in=filters["suppliers"])
 
-    if filters["status"] == "pending":
+    if filters["status"] == SafTicket.PENDING:
         tickets = tickets.filter(status=SafTicket.PENDING)
-    elif filters["status"] == "accepted":
+    elif filters["status"] == SafTicket.ACCEPTED:
         tickets = tickets.filter(status=SafTicket.ACCEPTED)
     else:
         raise Exception("Status '%s' does not exist for tickets" % filters["status"])

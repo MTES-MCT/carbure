@@ -33,6 +33,7 @@ export function getAirlineTicketFilters(field: SafFilter, query: SafQuery) {
 }
 
 export function getSafAirlineTickets(query: SafQuery) {
+  console.log('query:', query)
   return api.get<Api<SafTicketsResponse>>("/v5/saf/airline/tickets", { params: query })
 }
 
@@ -87,6 +88,7 @@ export function getOperatorTicketFilters(field: SafFilter, query: SafQuery) {
 }
 
 export function getOperatorTickets(query: SafQuery) {
+  console.log('query:', query)
   return api.get<Api<SafTicketsResponse>>("/v5/saf/operator/tickets", { params: query })
 }
 

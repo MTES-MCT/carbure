@@ -92,9 +92,9 @@ def find_ticket_sources(**filters):
     if filters["clients"] != None:
         ticket_sources = ticket_sources.filter(saf_tickets__client__name__in=filters["clients"])
 
-    if filters["status"] == "available":
+    if filters["status"] == "AVAILABLE":
         ticket_sources = ticket_sources.filter(assigned_volume__lt=F("total_volume"))
-    elif filters["status"] == "history":
+    elif filters["status"] == "HISTORY":
         ticket_sources = ticket_sources.filter(assigned_volume__gte=F("total_volume"))
     else:
         raise Exception("Status '%s' does not exist for ticket sources" % filters["status"])
