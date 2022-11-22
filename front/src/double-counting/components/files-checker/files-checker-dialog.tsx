@@ -3,11 +3,11 @@ import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import { Form, useForm } from "common/components/form"
 import { Check, Return, Upload } from "common/components/icons"
-import { FileInput } from "common/components/input"
+import { FileListInput } from "common/components/input"
 import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import { CheckDoubleCountingFilesResponse } from "double-counting/types"
-import { Trans, useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next"
 import * as api from "../../api"
 
 type DoubleCountingFilesCheckerDialogProps = {
@@ -21,17 +21,17 @@ const DoubleCountingFilesCheckerDialog = ({
   const notify = useNotify()
 
   const { value, bind } = useForm({
-    doubleCountingFiles: undefined as File | undefined,
+    doubleCountingFiles: undefined as FileList | undefined | null,
   })
 
-  const uploadFiles = useMutation(api.checkDoubleCountingAgreements, {
+  const uploadFiles = useMutation(api.checkDoubleCountingFiles, {
     onError: (err) => {
       const error = (err as AxiosError<{ error: string }>).response?.data.error
       if (error === "DOUBLE_COUNTING_IMPORT_FAILED") {
-        const files = (
+        const response = (
           err as AxiosError<{ data: CheckDoubleCountingFilesResponse }>
-        ).response?.data?.data?.files
-        console.log("files:", files) //TODO Files to display in new window
+        ).response?.data?.data
+        console.log("dresponse:", response) //TODO Files to display in new window
       } else {
         notify(
           t(
@@ -47,7 +47,7 @@ const DoubleCountingFilesCheckerDialog = ({
 
   async function submitFiles() {
     if (!value.doubleCountingFiles) return
-    await uploadFiles.execute(value.doubleCountingFiles)
+    await uploadFiles.execute(value.doubleCountingFiles as FileList)
   }
 
   return (
@@ -65,7 +65,7 @@ const DoubleCountingFilesCheckerDialog = ({
               )}
             </p>
 
-            <FileInput
+            <FileListInput
               icon={value.doubleCountingFiles ? Check : Upload}
               label={t("Importer les fichiers excel à analyser")}
               {...bind("doubleCountingFiles")}
@@ -78,7 +78,7 @@ const DoubleCountingFilesCheckerDialog = ({
         <Button
           submit="dc-request"
           loading={uploadFiles.loading}
-          disabled={!!value.doubleCountingFiles}
+          disabled={!value.doubleCountingFiles}
           variant="primary"
           icon={Check}
           action={submitFiles}

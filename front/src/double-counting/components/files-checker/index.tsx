@@ -4,7 +4,7 @@ import { Main } from "common/components/scaffold"
 import Table, { Cell, Column } from "common/components/table"
 import Tabs from "common/components/tabs"
 import useTitle from "common/hooks/title"
-import { DoubleCountingFile } from "double-counting/types"
+import { DoubleCountingFileInfo } from "double-counting/types"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -13,11 +13,11 @@ const DoubleCountingFilesChecker = () => {
   useTitle(t("Vérification de fichiers de double comptage"))
   const [tab, setTab] = useState("accepted")
 
-  function showFileErrorsDialog(file: DoubleCountingFile) {
+  function showFileErrorsDialog(file: DoubleCountingFileInfo) {
     //TODO open FIle error detail dialog
   }
 
-  const columns: Column<DoubleCountingFile>[] = [
+  const columns: Column<DoubleCountingFileInfo>[] = [
     {
       header: t("Statut"),
       cell: (file) => <p>Tag</p>,
