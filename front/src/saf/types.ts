@@ -146,8 +146,8 @@ export interface SafTicketsResponse {
 }
 
 export enum SafTicketSourceStatus {
-  Available = "available",
-  History = "history",
+  Available = "AVAILABLE",
+  History = "HISTORY",
 }
 
 export interface SafStates { //old QueryParams
