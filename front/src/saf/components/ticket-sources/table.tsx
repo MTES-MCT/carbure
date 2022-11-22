@@ -1,11 +1,15 @@
+import useEntity from "carbure/hooks/entity"
+import Button from "common/components/button"
+import { Split } from "common/components/icons"
+import { usePortal } from "common/components/portal"
 import Table, { Cell, Order } from "common/components/table"
 import { compact } from "common/utils/collection"
 import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
 import { isRedII } from "lot-add/components/ghg-fields"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
-import { To } from "react-router-dom"
-import { SafTicketSource } from "saf/types"
+import { To, useLocation, useNavigate } from "react-router-dom"
+import { LotPreview, SafTicketSource } from "saf/types"
 import { TicketSourceTag } from "./tag"
 
 export interface TicketSourcesTableProps {
@@ -39,6 +43,7 @@ export const TicketSourcesTable = memo(
           columns.period,
           columns.feedstock,
           columns.ghgReduction,
+          columns.parentLot,
         ])}
       />
     )
@@ -111,7 +116,46 @@ export function useColumns() {
         return <Cell text={`${ticketSource.ghg_reduction.toFixed(0)}%`} />
       },
     },
+
+    parentLot: {
+      small: true,
+      key: "parent_lot",
+      header: t("Lot"),
+      cell: (ticketSource: SafTicketSource) => (
+        <ParentLotButton lotId={ticketSource.parent_lot?.id} />
+      ),
+    },
   }
 }
 
 export default TicketSourcesTable
+
+export interface ParentLotButtonProps {
+  lotId: number | undefined
+}
+
+export const ParentLotButton = ({ lotId }: ParentLotButtonProps) => {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  if (!lotId) return <Cell text={t("N/A")} />
+
+  const showLotDetails = () => {
+    navigate({
+      pathname: location.pathname,
+      search: location.search,
+      hash: `lot/${lotId}`,
+    })
+  }
+
+  return (
+    <Button
+      captive
+      variant={"secondary"}
+      icon={Split}
+      title={t("Lot initial")}
+      action={showLotDetails}
+    />
+  )
+}

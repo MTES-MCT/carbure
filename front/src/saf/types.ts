@@ -34,10 +34,11 @@ export interface SafTicketSource {
   country_of_origin: Country
   assigned_tickets: SafTicketPreview[]
   ghg_reduction: number // attention pour les lots c'etait ghg_reduction_red_ii
+  parent_lot?: LotPreview
+
 }
 
 export interface SafTicketSourceDetails extends SafTicketSource, SafProduction, SafDurability {
-  parent_lot?: LotPreview
   added_by: Entity,
 
 }
