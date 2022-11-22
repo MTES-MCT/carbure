@@ -49,11 +49,11 @@ export const SafClient = () => {
       <Routes>
         {/* //TODO comment merger les deux instructions si dessous  https://stackoverflow.com/questions/47369023/react-router-v4-allow-only-certain-parameters-in-url */}
         <Route
-          path="/tickets/pending/*"
+          path="/tickets/pending"
           element={<Tickets year={years.selected} snapshot={snapshotData} />}
         />
         <Route
-          path="/tickets/accepted/*"
+          path="/tickets/accepted"
           element={<Tickets year={years.selected} snapshot={snapshotData} />}
         />
 
@@ -62,7 +62,7 @@ export const SafClient = () => {
           element={
             <Navigate
               replace
-              to={`tickets/${SafTicketStatus.Pending.toLocaleLowerCase()}`}
+              to={`tickets/${SafTicketStatus.Pending.toLocaleLowerCase()}/`}
             />
           }
         />
