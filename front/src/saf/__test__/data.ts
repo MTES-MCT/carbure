@@ -171,8 +171,6 @@ export const safTicketDetails: SafTicketDetails = {
   country_of_origin: country1,
   client_comment: "C'eest vraiment n'importe quoi !",
   ghg_reduction: 74,
-  agreement_reference: 'Facture202201010',
-  agreement_date: '2022-01-10',
   carbure_producer: producer,
   unknown_producer: '',
   carbure_production_site: productionSite,

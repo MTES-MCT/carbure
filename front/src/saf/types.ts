@@ -83,8 +83,7 @@ export interface SafTicket {
 
 export interface SafTicketDetails extends SafTicket, SafProduction, SafDurability {
   // parent_ticket_source?: SafTicketSource TODO on a vraiment besoin de ça ? ce n'est pas visible sur les maquettes
-  agreement_reference: string
-  agreement_date: string
+  free_field?: string
   client_comment?: string
 }
 
@@ -113,8 +112,7 @@ export interface SafDurability {
 export interface SafTicketAssignementQuery {
   volume: number
   client_id: number
-  agreement_reference: string
-  agreement_date: string
+  free_field: string
 }
 
 export interface SafQuery {
