@@ -58,8 +58,7 @@ export const TicketAssignment = ({
       ticketSource.id,
       value.volume!,
       value.client!,
-      value.agreement_reference,
-      value.agreement_date
+      value.free_field!
     )
     onTicketAssigned(value.volume!, value.client!.name)
     onClose()
@@ -121,15 +120,7 @@ export const TicketAssignment = ({
                 {...bind("client")}
               />
 
-              <TextInput
-                label={t("N° de Contrat (facture ou bon de commande)")}
-                {...bind("agreement_reference")}
-              />
-
-              <DateInput
-                label={t("Date du contrat (facture ou du bon de commande )")}
-                {...bind("agreement_date")}
-              />
+              <TextInput label={t("Champ libre")} {...bind("free_field")} />
             </Form>
           </section>
         </main>
@@ -154,8 +145,7 @@ export default TicketAssignment
 const defaultAssignment = {
   volume: 0 as number | undefined,
   client: undefined as EntityPreview | undefined,
-  agreement_reference: undefined as string | undefined,
-  agreement_date: undefined as string | undefined,
+  free_field: "" as string | undefined,
 }
 
 export type AssignmentForm = typeof defaultAssignment

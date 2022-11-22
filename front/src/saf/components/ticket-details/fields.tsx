@@ -82,16 +82,13 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
       <Fieldset label={t("Affectation")}>
         <TextInput label={t("Fournisseur")} value={ticket.supplier} readOnly />
         <TextInput label={t("Client")} value={ticket.client} readOnly />
-        <TextInput
-          label={t("N° de contrat")}
-          value={ticket.agreement_reference ?? t("N/A")}
-          readOnly
-        />
-        <DateInput
-          label={t("Date du contrat")}
-          value={ticket.agreement_date ?? t("N/A")}
-          readOnly
-        />
+        {ticket.free_field && (
+          <TextInput
+            label={t("Champ libre")}
+            value={ticket.free_field}
+            readOnly
+          />
+        )}
       </Fieldset>
       <DurabilityFields durability={ticket} />
     </div>
