@@ -25,7 +25,7 @@ export interface SafTicketSource {
   id: number
   carbure_id: string
   year: number
-  period: number
+  delivery_period: number
   created_at: string
   total_volume: number
   assigned_volume: number
@@ -34,12 +34,16 @@ export interface SafTicketSource {
   country_of_origin: Country
   assigned_tickets: SafTicketPreview[]
   ghg_reduction: number // attention pour les lots c'etait ghg_reduction_red_ii
-  parent_lot?: LotPreview
+  parent_lot?: {
+    id: number
+    carbure_id: string
+  }
 
 }
 
 export interface SafTicketSourceDetails extends SafTicketSource, SafProduction, SafDurability {
   added_by: Entity,
+  parent_lot: LotPreview
 
 }
 
@@ -70,7 +74,7 @@ export interface SafTicket {
   id: number
   carbure_id: string
   year: number
-  period: number
+  assignment_period: number
   created_at: string
   supplier: string
   client: string

@@ -7,10 +7,19 @@ import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import Form, { useForm } from "common/components/form"
 import { Return, Send } from "common/components/icons"
-import { DateInput, NumberInput, TextInput } from "common/components/input"
+import {
+  DateInput,
+  Field,
+  Input,
+  NumberInput,
+  TextInput,
+} from "common/components/input"
 import Portal from "common/components/portal"
+import { Row } from "common/components/scaffold"
+import Select from "common/components/select"
 import { useMutation } from "common/hooks/async"
-import { formatNumber } from "common/utils/formatters"
+import { formatNumber, formatPeriod } from "common/utils/formatters"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { SafTicketSourceDetails } from "saf/types"
 import * as api from "../../api"
@@ -28,7 +37,7 @@ export const TicketAssignment = ({
   const { t } = useTranslation()
   const entity = useEntity()
 
-  const { value, errors, bind, setField, setFieldError } =
+  const { value, bind, setField, setFieldError } =
     useForm<AssignmentForm>(defaultAssignment)
 
   const remainingVolume =
@@ -57,6 +66,7 @@ export const TicketAssignment = ({
       entity.id,
       ticketSource.id,
       value.volume!,
+      value.assignment_period,
       value.client!,
       value.free_field!
     )
@@ -71,6 +81,10 @@ export const TicketAssignment = ({
   const findSafClient = (query: string) => {
     return api.findClients(query)
   }
+
+  //TODO get years and months
+  const years = [2022, 2023]
+  const months = [1]
 
   return (
     <Portal onClose={closeDialog}>
@@ -112,6 +126,13 @@ export const TicketAssignment = ({
                 }
               />
 
+              <PeriodSelect
+                //TODO Yar
+                years={years}
+                months={months}
+                {...bind("assignment_period")}
+              />
+
               <Autocomplete
                 required
                 label={t("Client")}
@@ -142,10 +163,72 @@ export const TicketAssignment = ({
 
 export default TicketAssignment
 
+const formatPeriodFromDate = (date: Date) => {
+  return date.getFullYear() * 100 + date.getMonth() + 1
+}
+
 const defaultAssignment = {
   volume: 0 as number | undefined,
   client: undefined as EntityPreview | undefined,
+  assignment_period: formatPeriodFromDate(new Date()),
   free_field: "" as string | undefined,
 }
 
 export type AssignmentForm = typeof defaultAssignment
+
+interface PeriodSelectProps {
+  months: number[]
+  years: number[]
+  value: number
+  onChange: (value: number) => void
+}
+
+interface Period {
+  month: number
+  year: number
+}
+
+const PeriodSelect = ({
+  months,
+  years,
+  value,
+  onChange,
+}: PeriodSelectProps) => {
+  const { t } = useTranslation()
+  const [timeline, _setTimeline] = useState<Period>({
+    month: value % 100,
+    year: Math.floor(value / 100),
+  })
+
+  const setTimeline = (value: Period) => {
+    _setTimeline(value)
+    onChange(value.year * 100 + value.month)
+  }
+
+  return (
+    //TODO voir si le composant Field est dispensable en concervant le design
+    <Field label={t("Periode d'affectation")} required>
+      <Row style={{ gap: "var(--spacing-s)" }}>
+        <Select
+          placeholder={t("Choisissez une année")}
+          value={timeline.year}
+          onChange={(year = timeline.year) =>
+            setTimeline({ ...timeline, year })
+          }
+          options={years}
+          sort={(v) => -v.value}
+          style={{ flex: 1 }}
+        />
+        <Select
+          placeholder={t("Choisissez un mois")}
+          value={timeline.month}
+          onChange={(period = timeline.year) =>
+            setTimeline({ ...timeline, month: period % 100 })
+          }
+          options={months}
+          style={{ flex: 2 }}
+        />
+      </Row>
+    </Field>
+  )
+}

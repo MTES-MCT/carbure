@@ -70,7 +70,15 @@ export function useColumns() {
     period: {
       key: "period",
       header: t("Période"),
-      cell: (ticket: SafTicket) => <Cell text={formatPeriod(ticket.period)} />,
+      cell: (ticket: SafTicket) => (
+        <Cell
+          text={
+            ticket.assignment_period
+              ? formatPeriod(ticket.assignment_period)
+              : t("N/A")
+          }
+        />
+      ),
     },
 
     feedstock: {
