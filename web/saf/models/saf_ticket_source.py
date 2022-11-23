@@ -49,7 +49,7 @@ class SafTicketSource(models.Model):
 
     def generate_carbure_id(self):
         self.carbure_id = "TS{period}-{country_of_production}-{id}".format(
-            period=self.period,
+            period=self.delivery_period,
             country_of_production=self.production_country.code_pays,
             id=self.id,
         )

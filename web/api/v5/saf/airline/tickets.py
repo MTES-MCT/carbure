@@ -53,9 +53,6 @@ def get_tickets(request, *args, **kwargs):
 def parse_ticket_query(query):
     entity_id = int(query["entity_id"])
     status = query["status"]
-    print("******")
-    print(status)
-    print("******")
     year = int(query["year"])
     search = query.get("search", None)
     periods = [int(p) for p in query.getlist("periods")] if "periods" in query else None
