@@ -15,7 +15,7 @@ class SafTicketSource(models.Model):
     added_by = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.SET_NULL, related_name="saf_source_owner")  # fmt: skip
 
     year = models.IntegerField(blank=False, null=False)
-    period = models.IntegerField(blank=False, null=False)
+    delivery_period = models.IntegerField(blank=False, null=False)
 
     total_volume = models.FloatField(blank=False, null=False)
     assigned_volume = models.FloatField(blank=False, null=False)
@@ -73,7 +73,7 @@ def create_ticket_sources_from_lots(lots):
                 "created_at": lot.created_at,
                 "added_by_id": lot.carbure_client_id,
                 "year": lot.year,
-                "period": lot.period,
+                "delivery_period": lot.period,
                 "total_volume": lot.volume,
                 "assigned_volume": 0,
                 "feedstock_id": lot.feedstock_id,

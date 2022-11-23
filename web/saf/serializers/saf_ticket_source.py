@@ -4,6 +4,16 @@ from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedSt
 from core.serializers import ProductionSiteSerializer, EntityPreviewSerializer
 from saf.models import SafTicketSource
 from core.serializers import CarbureLotPreviewSerializer
+from core.models import CarbureLot
+
+
+class SafTicketSourceParentLotSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CarbureLot
+        fields = [
+            "id",
+            "carbure_id",
+        ]
 
 
 class SafTicketSourceSerializer(serializers.ModelSerializer):
@@ -13,7 +23,7 @@ class SafTicketSourceSerializer(serializers.ModelSerializer):
             "id",
             "carbure_id",
             "year",
-            "period",
+            "delivery_period",
             "created_at",
             "total_volume",
             "assigned_volume",
@@ -22,12 +32,14 @@ class SafTicketSourceSerializer(serializers.ModelSerializer):
             "country_of_origin",
             "ghg_reduction",
             "assigned_tickets",
+            "parent_lot",
         ]
 
     feedstock = FeedStockSerializer(read_only=True)
     biofuel = BiofuelSerializer(read_only=True)
     country_of_origin = CountrySerializer(read_only=True)
     assigned_tickets = serializers.SerializerMethodField()
+    parent_lot = SafTicketSourceParentLotSerializer(read_only=True)
 
     def get_assigned_tickets(self, obj):
         from .saf_ticket import SafTicketPreviewSerializer
@@ -42,7 +54,7 @@ class SafTicketSourceDetailsSerializer(serializers.ModelSerializer):
             "id",
             "carbure_id",
             "year",
-            "period",
+            "delivery_period",
             "created_at",
             "added_by",
             "total_volume",
