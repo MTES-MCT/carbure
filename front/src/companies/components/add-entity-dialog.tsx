@@ -33,8 +33,11 @@ export const AddEntityDialog = ({
   })
 
   const addEntity = async () => {
-    // TO TEST uncomment below
-    // await addEntityRequest.execute(value.name, value.entity_type, value.has_saf)
+    await addEntityRequest.execute(
+      value.name!,
+      value.entity_type!,
+      value.has_saf
+    )
     onEntityAdded(value.name!)
     onClose()
   }
