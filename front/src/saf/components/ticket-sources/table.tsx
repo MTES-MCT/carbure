@@ -84,9 +84,14 @@ export function useColumns() {
       key: "delivery",
       header: t("Livraison"),
       cell: (ticketSource: SafTicketSource) => {
-        const deliveryDate = ticketSource.parent_lot?.delivery_date
         return (
-          <Cell text={deliveryDate ? formatPeriod(deliveryDate) : t("N/A")} />
+          <Cell
+            text={
+              ticketSource.delivery_period
+                ? formatPeriod(ticketSource.delivery_period)
+                : t("N/A")
+            }
+          />
         )
       },
     },
@@ -118,7 +123,7 @@ export function useColumns() {
       key: "parent_lot",
       header: t("Lot"),
       cell: (ticketSource: SafTicketSource) => (
-        <ParentLotButton lotId={ticketSource.parent_lot?.id} />
+        <ParentLotButton lot={ticketSource.parent_lot} />
       ),
     },
   }
@@ -127,21 +132,24 @@ export function useColumns() {
 export default TicketSourcesTable
 
 export interface ParentLotButtonProps {
-  lotId: number | undefined
+  lot?: {
+    id: number
+    carbure_id: string
+  }
 }
 
-export const ParentLotButton = ({ lotId }: ParentLotButtonProps) => {
+export const ParentLotButton = ({ lot }: ParentLotButtonProps) => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
 
-  if (!lotId) return <Cell text={t("N/A")} />
+  if (!lot) return <Cell text={t("N/A")} />
 
   const showLotDetails = () => {
     navigate({
       pathname: location.pathname,
       search: location.search,
-      hash: `lot/${lotId}`,
+      hash: `lot/${lot!.id}`,
     })
   }
 
@@ -150,7 +158,7 @@ export const ParentLotButton = ({ lotId }: ParentLotButtonProps) => {
       captive
       variant="link"
       title={t("Lot initial")}
-      label={`#${lotId}`}
+      label={`#${lot.carbure_id}`}
       action={showLotDetails}
     />
   )
