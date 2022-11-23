@@ -88,7 +88,7 @@ def find_tickets(**filters):
         tickets = tickets.filter(year=filters["year"])
 
     if filters["periods"] != None:
-        tickets = tickets.filter(period__in=filters["periods"])
+        tickets = tickets.filter(assignment_period__in=filters["periods"])
 
     if filters["feedstocks"] != None:
         tickets = tickets.filter(feedstock__code__in=filters["feedstocks"])
