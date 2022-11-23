@@ -84,7 +84,7 @@ def find_ticket_sources(**filters):
         ticket_sources = ticket_sources.filter(year=filters["year"])
 
     if filters["periods"] != None:
-        ticket_sources = ticket_sources.filter(period__in=filters["periods"])
+        ticket_sources = ticket_sources.filter(delivery_period__in=filters["periods"])
 
     if filters["feedstocks"] != None:
         ticket_sources = ticket_sources.filter(feedstock__code__in=filters["feedstocks"])
