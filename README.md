@@ -56,6 +56,9 @@ Lancer `sh scripts/database/restore_db.sh` pour télécharger un dump contenant 
 - Carbure demande d'entrer un code envoyé par email
 - Dans la version de dev ce code sera uniquement affiché dans les logs de django, visibles en tapant `docker logs carbure_app`
 
+# Effectuer une migration
+Lorsque des changement sont effectué sur la base de donnée :
+`docker exec carbure_app python3 web/manage.py migrate`
 
 ## Étapes spécifiques pour windows
 - setup wsl2: https://docs.microsoft.com/en-us/windows/wsl/install-win10
