@@ -154,12 +154,12 @@ export function useAutoStatus() {
     //   return SafTicketSourceStatus.History
 
     const status =
-      matchStatus?.params.status?.toUpperCase() as SafTicketSourceStatus
+      matchStatus?.params?.status?.toUpperCase() as SafTicketSourceStatus
     return status ?? SafTicketSourceStatus.Available
   }
 
   if (matchView.params.view === "tickets") {
-    const status = matchStatus?.params.status?.toUpperCase() as SafTicketStatus
+    const status = matchStatus?.params?.status?.toUpperCase() as SafTicketStatus
     return status ?? SafTicketStatus.Pending
   }
 

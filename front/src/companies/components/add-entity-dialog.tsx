@@ -24,10 +24,6 @@ export const AddEntityDialog = ({
 
   const { value, bind } = useForm<AddForm>(defaultEntity)
 
-  const closeDialog = () => {
-    onClose()
-  }
-
   const addEntityRequest = useMutation(api.addEntity, {
     invalidates: ["entities"],
   })
@@ -43,8 +39,8 @@ export const AddEntityDialog = ({
   }
 
   return (
-    <Portal onClose={closeDialog}>
-      <Dialog onClose={closeDialog}>
+    <Portal onClose={onClose}>
+      <Dialog onClose={onClose}>
         <header>
           <h1>{t("Ajouter une société")}</h1>
         </header>
@@ -87,7 +83,7 @@ export const AddEntityDialog = ({
             submit="add-entity"
           />
 
-          <Button icon={Return} label={t("Retour")} action={closeDialog} />
+          <Button icon={Return} label={t("Retour")} action={onClose} />
         </footer>
       </Dialog>
     </Portal>

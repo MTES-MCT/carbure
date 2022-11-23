@@ -43,10 +43,6 @@ export const TicketAssignment = ({
   const remainingVolume =
     ticketSource.total_volume - ticketSource.assigned_volume
 
-  const closeDialog = () => {
-    onClose()
-  }
-
   const assignSafTicket = useMutation(api.assignSafTicket, {
     invalidates: [
       "ticket-source-details",
@@ -87,8 +83,8 @@ export const TicketAssignment = ({
   const months = [1]
 
   return (
-    <Portal onClose={closeDialog}>
-      <Dialog onClose={closeDialog}>
+    <Portal onClose={onClose}>
+      <Dialog onClose={onClose}>
         <header>
           <h1>
             {t("Affecter le volume CAD n°")}
@@ -154,7 +150,7 @@ export const TicketAssignment = ({
             submit="assign-ticket"
           />
 
-          <Button icon={Return} label={t("Retour")} action={closeDialog} />
+          <Button icon={Return} label={t("Retour")} action={onClose} />
         </footer>
       </Dialog>
     </Portal>

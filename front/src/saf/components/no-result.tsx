@@ -19,7 +19,6 @@ export const NoResult = ({ loading, filters, onFilter }: NoResultProps) => {
   return (
     <Alert loading={loading} variant="warning" icon={AlertCircle}>
       <p>
-        {" "}
         {loading
           ? t("Chargement en cours...")
           : t("Aucun résultat trouvé pour cette recherche")}
