@@ -95,8 +95,8 @@ def create_ticket_sources_from_lots(lots):
                 "eccr": lot.eccr,
                 "eee": lot.eee,
                 "ghg_total": lot.ghg_total,
-                "ghg_reference": lot.ghg_reference,
-                "ghg_reduction": lot.ghg_reduction,
+                "ghg_reference": lot.ghg_reference_red_ii,
+                "ghg_reduction": lot.ghg_reduction_red_ii,
                 "parent_lot_id": lot.id,
             }
         )
