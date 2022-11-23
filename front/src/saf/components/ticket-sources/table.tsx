@@ -1,15 +1,11 @@
-import useEntity from "carbure/hooks/entity"
 import Button from "common/components/button"
-import { Split } from "common/components/icons"
-import { usePortal } from "common/components/portal"
 import Table, { Cell, Order } from "common/components/table"
 import { compact } from "common/utils/collection"
-import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
-import { isRedII } from "lot-add/components/ghg-fields"
+import { formatNumber, formatPeriod } from "common/utils/formatters"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import { To, useLocation, useNavigate } from "react-router-dom"
-import { LotPreview, SafTicketSource } from "saf/types"
+import { SafTicketSource } from "saf/types"
 import { TicketSourceTag } from "./tag"
 
 export interface TicketSourcesTableProps {
@@ -85,14 +81,14 @@ export function useColumns() {
     },
 
     period: {
-      key: "period",
-      header: t("Période"),
-      cell: (ticketSource: SafTicketSource) => (
-        <Cell
-          text={formatPeriod(ticketSource.period)}
-          sub={formatDate(ticketSource.created_at)}
-        />
-      ),
+      key: "delivery",
+      header: t("Livraison"),
+      cell: (ticketSource: SafTicketSource) => {
+        const deliveryDate = ticketSource.parent_lot?.delivery_date
+        return (
+          <Cell text={deliveryDate ? formatPeriod(deliveryDate) : t("N/A")} />
+        )
+      },
     },
 
     feedstock: {
@@ -152,9 +148,9 @@ export const ParentLotButton = ({ lotId }: ParentLotButtonProps) => {
   return (
     <Button
       captive
-      variant={"secondary"}
-      icon={Split}
+      variant="link"
       title={t("Lot initial")}
+      label={`#${lotId}`}
       action={showLotDetails}
     />
   )

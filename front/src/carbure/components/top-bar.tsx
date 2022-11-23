@@ -103,7 +103,6 @@ const Navigation = ({ entity }: NavigationProps) => {
     has_saf,
     isAirline,
     isProducer,
-    isTrader,
   } = entity
 
   return (
