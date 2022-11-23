@@ -63,9 +63,6 @@ SAF = ("HVOC", "HOC", "HCC")
 def create_ticket_sources_from_lots(lots):
     ticket_source_data = []
 
-    today = datetime.today()
-    period = today.year * 100 + today.month
-
     # make sure we only have declared lotsof SAF in the queryset
     saf_lots = lots.exclude(lot_status__in=("DRAFT", "PENDING", "DELETED")).filter(biofuel__code__in=SAF)
 
@@ -75,8 +72,8 @@ def create_ticket_sources_from_lots(lots):
                 "carbure_id": None,
                 "created_at": lot.created_at,
                 "added_by_id": lot.carbure_client_id,
-                "year": today.year,
-                "period": period,
+                "year": lot.year,
+                "period": lot.period,
                 "total_volume": lot.volume,
                 "assigned_volume": 0,
                 "feedstock_id": lot.feedstock_id,
