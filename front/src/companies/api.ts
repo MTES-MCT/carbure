@@ -19,7 +19,7 @@ export function addEntity(
   entity_type: EntityType,
   has_saf: boolean
 ) {
-  return api.post("/v5/admin/create_entity", {
+  return api.post("/v5/admin/create-entity", {
     name: name,
     entity_type: entity_type,
     has_saf: has_saf,
