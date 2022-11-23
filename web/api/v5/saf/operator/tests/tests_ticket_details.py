@@ -30,7 +30,7 @@ class SafTicketDetailsTest(TestCase):
             carbure_id="carbure-id-001",
             added_by=self.entity,
             year=2022,
-            period=202201,
+            delivery_period=202201,
             total_volume=30000,
             assigned_volume=0,
             feedstock=MatierePremiere.objects.get(code="HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"),
@@ -62,7 +62,7 @@ class SafTicketDetailsTest(TestCase):
             carbure_id="carbure-id-t-001",
             created_at=datetime(2022, 1, 1),
             year=2022,
-            period=202201,
+            assignment_period=202201,
             status=SafTicket.PENDING,
             volume=30000,
             feedstock=MatierePremiere.objects.get(code="HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"),
@@ -97,7 +97,7 @@ class SafTicketDetailsTest(TestCase):
         self.ticket.created_at = "2022-01-01T00:00:00.000000+00:00"
         self.ticket.save()
 
-    def test_saf_ticket_sources(self):
+    def test_saf_ticket_details(self):
         query = {"entity_id": self.entity.id, "ticket_id": 4321}
         response = self.client.get(reverse("api-v5-saf-operator-ticket-details"), query)
 
@@ -107,7 +107,7 @@ class SafTicketDetailsTest(TestCase):
             "id": 4321,
             "carbure_id": "carbure-id-t-001",
             "year": 2022,
-            "period": 202201,
+            "assignment_period": 202201,
             "created_at": "2022-01-01T01:00:00+01:00",
             "status": "PENDING",
             "volume": 30000.0,

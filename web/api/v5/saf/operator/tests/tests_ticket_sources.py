@@ -31,7 +31,7 @@ class SafTicketSourcesTest(TestCase):
             added_by=self.entity,
             created_at=datetime(2022, 1, 1),
             year=2022,
-            period=202201,
+            delivery_period=202201,
             total_volume=30000,
             assigned_volume=0,
             feedstock=MatierePremiere.objects.get(code="HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"),
@@ -69,7 +69,7 @@ class SafTicketSourcesTest(TestCase):
             carbure_id="carbure-id-t-001",
             created_at=datetime(2022, 1, 1),
             year=2022,
-            period=202201,
+            assignment_period=202201,
             status=SafTicket.PENDING,
             volume=30000,
             feedstock=MatierePremiere.objects.get(code="HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"),
@@ -100,7 +100,7 @@ class SafTicketSourcesTest(TestCase):
         )
 
     def test_saf_ticket_sources(self):
-        query = {"entity_id": self.entity.id, "year": 2022, "status": "available", "from_idx": 0, "limit": 1}
+        query = {"entity_id": self.entity.id, "year": 2022, "status": "AVAILABLE", "from_idx": 0, "limit": 1}
         response = self.client.get(reverse("api-v5-saf-operator-ticket-sources"), query)
 
         self.assertEqual(response.status_code, 200)
@@ -109,7 +109,7 @@ class SafTicketSourcesTest(TestCase):
             "id": 1234,
             "carbure_id": "carbure-id-001",
             "year": 2022,
-            "period": 202201,
+            "delivery_period": 202201,
             # "created_at": "2022-01-01T01:00:00+01:00",
             "total_volume": 30000.0,
             "assigned_volume": 0.0,
@@ -127,6 +127,7 @@ class SafTicketSourcesTest(TestCase):
             },
             "country_of_origin": {"name": "Espagne", "name_en": "Spain", "code_pays": "ES"},
             "ghg_reduction": 65.0,
+            "parent_lot": None,
             "assigned_tickets": [
                 {
                     "agreement_date": "2022-06-20",
