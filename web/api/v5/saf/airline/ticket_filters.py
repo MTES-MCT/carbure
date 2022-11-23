@@ -41,7 +41,7 @@ def get_filter_values(tickets, filter):
     if filter == "suppliers":
         column = "supplier__name"
     elif filter == "periods":
-        column = "period"
+        column = "assignment_period"
     elif filter == "feedstocks":
         column = "feedstock__code"
     else:  # raise an error for unknown filters

@@ -1,5 +1,5 @@
-from datetime import datetime
 from django.db import models
+from math import floor
 
 
 class SafTicket(models.Model):
@@ -20,7 +20,7 @@ class SafTicket(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     year = models.IntegerField(blank=False, null=False)
-    period = models.IntegerField(blank=False, null=False)
+    assignment_period = models.IntegerField(blank=False, null=False)
 
     agreement_reference = models.CharField(max_length=64, null=True)
     agreement_date = models.DateField(null=True)
@@ -59,15 +59,14 @@ class SafTicket(models.Model):
 
     def generate_carbure_id(self):
         self.carbure_id = "T{period}-{country_of_production}-{id}".format(
-            period=self.period,
+            period=self.assignment_period,
             country_of_production=self.production_country.code_pays,
             id=self.id,
         )
 
 
-def create_ticket_from_source(ticket_source, client_id, volume, agreement_date, agreement_reference):
-    today = datetime.today()
-    period = today.year * 100 + today.month
+def create_ticket_from_source(ticket_source, client_id, volume, agreement_date, agreement_reference, assignment_period):
+    year = floor(assignment_period / 100)
 
     ticket = SafTicket.objects.create(
         client_id=client_id,
@@ -76,8 +75,8 @@ def create_ticket_from_source(ticket_source, client_id, volume, agreement_date, 
         agreement_reference=agreement_reference,
         status=SafTicket.PENDING,
         created_at=ticket_source.created_at,
-        year=today.year,
-        period=period,
+        year=year,
+        assignment_period=assignment_period,
         biofuel=ticket_source.biofuel,
         feedstock=ticket_source.feedstock,
         country_of_origin=ticket_source.country_of_origin,
