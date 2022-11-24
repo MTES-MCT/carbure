@@ -80,12 +80,9 @@ export function uploadDoubleCountingDecision(dca_id: number, file: File) {
 }
 
 export function checkDoubleCountingFiles(files: FileList) {
-  console.log('send files:', files)
   const res = api.post<Api<CheckDoubleCountingFilesResponse>>(
-    "/v5/doublecount/check-files",
-    {
-      files,
-    }
+    "/v5/double-counting/check-files",
+    { files }
   )
   return res
 }
