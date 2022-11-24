@@ -3,6 +3,7 @@ import traceback
 import datetime
 import unicodedata
 
+from django.db import transaction
 from doublecount.models import DoubleCountingAgreement
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import is_admin
@@ -46,6 +47,7 @@ def check_files(request, *args, **kwargs):
         return ErrorResponse(400, CheckFilesError.FILE_CHECK_FAILED)
 
 
+@transaction.atomic
 def check_dc_file(file):
     try:
         directory = "/tmp"
