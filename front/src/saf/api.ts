@@ -104,6 +104,7 @@ export function assignSafTicket(
   client: EntityPreview,
   free_field?: string
 ) {
+  console.log('free_field:', free_field)
   return api.post("/v5/saf/operator/assign-ticket", {
     entity_id,
     ticket_source_id,
