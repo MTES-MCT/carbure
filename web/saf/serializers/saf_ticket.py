@@ -52,6 +52,7 @@ class SafTicketDetailsSerializer(serializers.ModelSerializer):
             "created_at",
             "supplier",
             "client",
+            "free_field",
             "agreement_date",
             "agreement_reference",
             "volume",

@@ -25,6 +25,7 @@ def assign_ticket(request, *args, **kwargs):
         volume = float(request.POST.get("volume"))
         agreement_reference = request.POST.get("agreement_reference")
         agreement_date = request.POST.get("agreement_date")
+        free_field = request.POST.get("free_field")
         assignment_period = int(request.POST.get("assignment_period"))
     except:
         traceback.print_exc()
@@ -51,6 +52,7 @@ def assign_ticket(request, *args, **kwargs):
                 agreement_date=agreement_date,
                 agreement_reference=agreement_reference,
                 assignment_period=assignment_period,
+                free_field=free_field
             )
 
             CarbureNotification.objects.create(

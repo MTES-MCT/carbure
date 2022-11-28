@@ -18,8 +18,14 @@ import Portal from "common/components/portal"
 import { Row } from "common/components/scaffold"
 import Select from "common/components/select"
 import { useMutation } from "common/hooks/async"
-import { formatNumber, formatPeriod } from "common/utils/formatters"
-import { useState } from "react"
+import {
+  capitalize,
+  formatDate,
+  formatNumber,
+  formatPeriod,
+} from "common/utils/formatters"
+import { Option } from "common/utils/normalize"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { SafTicketSourceDetails } from "saf/types"
 import * as api from "../../api"
@@ -123,9 +129,8 @@ export const TicketAssignment = ({
               />
 
               <PeriodSelect
-                //TODO Yar
-                years={years}
-                months={months}
+                //TODO
+                deliveryPeriod={ticketSource.delivery_period}
                 {...bind("assignment_period")}
               />
 
@@ -173,58 +178,50 @@ const defaultAssignment = {
 export type AssignmentForm = typeof defaultAssignment
 
 interface PeriodSelectProps {
-  months: number[]
-  years: number[]
-  value: number
+  deliveryPeriod: number
   onChange: (value: number) => void
 }
 
-interface Period {
-  month: number
-  year: number
-}
-
-const PeriodSelect = ({
-  months,
-  years,
-  value,
-  onChange,
-}: PeriodSelectProps) => {
+const PeriodSelect = ({ deliveryPeriod, onChange }: PeriodSelectProps) => {
   const { t } = useTranslation()
-  const [timeline, _setTimeline] = useState<Period>({
-    month: value % 100,
-    year: Math.floor(value / 100),
-  })
+  const [periodList, setPeriodList] = useState<Option<number>[]>()
+  const [period, _setPeriod] = useState<number>(deliveryPeriod)
 
-  const setTimeline = (value: Period) => {
-    _setTimeline(value)
-    onChange(value.year * 100 + value.month)
+  const setPeriod = (period: number) => {
+    _setPeriod(period)
+    onChange(period)
   }
 
+  useEffect(() => {
+    let month: number = deliveryPeriod % 100
+    let year: number = Math.floor(deliveryPeriod / 100)
+    const list: Option<number>[] = []
+    for (let i = year; i <= year + 1; i++) {
+      let j = i === year ? month : 1
+      for (; j <= 12; j++) {
+        const period = i * 100 + j
+        const date = formatPeriod(period) + "-01"
+        const periodString = formatDate(date, {
+          day: undefined,
+          year: "numeric",
+          month: "long",
+        })
+
+        list.push({
+          value: period,
+          label: capitalize(periodString),
+        })
+      }
+    }
+    setPeriodList(list)
+  }, [])
+
   return (
-    //TODO voir si le composant Field est dispensable en concervant le design
-    <Field label={t("Periode d'affectation")} required>
-      <Row style={{ gap: "var(--spacing-s)" }}>
-        <Select
-          placeholder={t("Choisissez une année")}
-          value={timeline.year}
-          onChange={(year = timeline.year) =>
-            setTimeline({ ...timeline, year })
-          }
-          options={years}
-          sort={(v) => -v.value}
-          style={{ flex: 1 }}
-        />
-        <Select
-          placeholder={t("Choisissez un mois")}
-          value={timeline.month}
-          onChange={(period = timeline.year) =>
-            setTimeline({ ...timeline, month: period % 100 })
-          }
-          options={months}
-          style={{ flex: 2 }}
-        />
-      </Row>
-    </Field>
+    <Select
+      placeholder={t("Choisissez une année")}
+      value={period}
+      onChange={(period) => setPeriod(period!)}
+      options={periodList}
+    />
   )
 }
