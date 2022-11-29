@@ -129,7 +129,6 @@ export const TicketAssignment = ({
               />
 
               <PeriodSelect
-                //TODO
                 deliveryPeriod={ticketSource.delivery_period}
                 {...bind("assignment_period")}
               />
@@ -196,10 +195,10 @@ const PeriodSelect = ({ deliveryPeriod, onChange }: PeriodSelectProps) => {
     let month: number = deliveryPeriod % 100
     let year: number = Math.floor(deliveryPeriod / 100)
     const list: Option<number>[] = []
-    for (let i = year; i <= year + 1; i++) {
-      let j = i === year ? month : 1
-      for (; j <= 12; j++) {
-        const period = i * 100 + j
+    for (let currentYear = year; currentYear <= year + 1; currentYear++) {
+      let currentMonth = currentYear === year ? month : 1
+      for (; currentMonth <= 12; currentMonth++) {
+        const period = currentYear * 100 + currentMonth
         const date = formatPeriod(period) + "-01"
         const periodString = formatDate(date, {
           day: undefined,
