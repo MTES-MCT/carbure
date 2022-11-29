@@ -15,7 +15,7 @@ class SafTicketSource(models.Model):
     added_by = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.SET_NULL, related_name="saf_source_owner")  # fmt: skip
 
     year = models.IntegerField(blank=False, null=False)
-    period = models.IntegerField(blank=False, null=False)
+    delivery_period = models.IntegerField(blank=False, null=False)
 
     total_volume = models.FloatField(blank=False, null=False)
     assigned_volume = models.FloatField(blank=False, null=False)
@@ -49,7 +49,7 @@ class SafTicketSource(models.Model):
 
     def generate_carbure_id(self):
         self.carbure_id = "TS{period}-{country_of_production}-{id}".format(
-            period=self.period,
+            period=self.delivery_period,
             country_of_production=self.production_country.code_pays,
             id=self.id,
         )
@@ -63,9 +63,6 @@ SAF = ("HVOC", "HOC", "HCC")
 def create_ticket_sources_from_lots(lots):
     ticket_source_data = []
 
-    today = datetime.today()
-    period = today.year * 100 + today.month
-
     # make sure we only have declared lotsof SAF in the queryset
     saf_lots = lots.exclude(lot_status__in=("DRAFT", "PENDING", "DELETED")).filter(biofuel__code__in=SAF)
 
@@ -75,8 +72,8 @@ def create_ticket_sources_from_lots(lots):
                 "carbure_id": None,
                 "created_at": lot.created_at,
                 "added_by_id": lot.carbure_client_id,
-                "year": today.year,
-                "period": period,
+                "year": lot.year,
+                "delivery_period": lot.period,
                 "total_volume": lot.volume,
                 "assigned_volume": 0,
                 "feedstock_id": lot.feedstock_id,
@@ -98,8 +95,8 @@ def create_ticket_sources_from_lots(lots):
                 "eccr": lot.eccr,
                 "eee": lot.eee,
                 "ghg_total": lot.ghg_total,
-                "ghg_reference": lot.ghg_reference,
-                "ghg_reduction": lot.ghg_reduction,
+                "ghg_reference": lot.ghg_reference_red_ii,
+                "ghg_reduction": lot.ghg_reduction_red_ii,
                 "parent_lot_id": lot.id,
             }
         )

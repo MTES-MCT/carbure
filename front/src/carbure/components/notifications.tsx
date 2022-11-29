@@ -141,7 +141,6 @@ const normalizeNotification: Normalizer<Notification> = (notif) => ({
 })
 
 function getNotificationText(notif: Notification) {
-  console.log("notif:", notif)
   switch (notif.type) {
     case NotificationType.LotsReceived:
       return t("Vous avez reçu {{count}} lots de {{supplier}}", {

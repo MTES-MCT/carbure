@@ -17,7 +17,7 @@ class SafTicketFactory(factory.django.DjangoModelFactory):
     status = random.choice((SafTicket.PENDING, SafTicket.ACCEPTED, SafTicket.REJECTED))
 
     year = datetime.today().year
-    period = factory.LazyAttribute(lambda obj: obj.year * 100 + random.randint(1, 12))
+    assignment_period = factory.LazyAttribute(lambda obj: obj.year * 100 + random.randint(1, 12))
 
     agreement_reference = factory.Faker("lexify", text="????????????")
     agreement_date = factory.Faker("date_this_year")

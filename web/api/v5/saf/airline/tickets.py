@@ -87,7 +87,7 @@ def find_tickets(**filters):
         tickets = tickets.filter(year=filters["year"])
 
     if filters["periods"] != None:
-        tickets = tickets.filter(period__in=filters["periods"])
+        tickets = tickets.filter(assignment_period__in=filters["periods"])
 
     if filters["feedstocks"] != None:
         tickets = tickets.filter(feedstock__code__in=filters["feedstocks"])
@@ -95,9 +95,9 @@ def find_tickets(**filters):
     if filters["suppliers"] != None:
         tickets = tickets.filter(supplier__name__in=filters["suppliers"])
 
-    if filters["status"] == "pending":
+    if filters["status"] == SafTicket.PENDING:
         tickets = tickets.filter(status=SafTicket.PENDING)
-    elif filters["status"] == "accepted":
+    elif filters["status"] == SafTicket.ACCEPTED:
         tickets = tickets.filter(status=SafTicket.ACCEPTED)
     else:
         raise Exception("Status '%s' does not exist for tickets" % filters["status"])

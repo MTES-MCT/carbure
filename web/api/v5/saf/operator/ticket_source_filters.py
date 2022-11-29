@@ -41,7 +41,7 @@ def get_filter_values(ticket_sources, filter):
     if filter == "clients":
         column = "saf_tickets__client__name"
     elif filter == "periods":
-        column = "period"
+        column = "delivery_period"
     elif filter == "feedstocks":
         column = "feedstock__code"
     else:  # raise an error for unknown filters

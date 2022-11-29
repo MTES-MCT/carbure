@@ -25,7 +25,7 @@ export interface SafTicketSource {
   id: number
   carbure_id: string
   year: number
-  period: number
+  delivery_period: number
   created_at: string
   total_volume: number
   assigned_volume: number
@@ -34,11 +34,16 @@ export interface SafTicketSource {
   country_of_origin: Country
   assigned_tickets: SafTicketPreview[]
   ghg_reduction: number // attention pour les lots c'etait ghg_reduction_red_ii
+  parent_lot?: {
+    id: number
+    carbure_id: string
+  }
+
 }
 
 export interface SafTicketSourceDetails extends SafTicketSource, SafProduction, SafDurability {
-  parent_lot?: LotPreview
   added_by: Entity,
+  parent_lot: LotPreview
 
 }
 
@@ -69,7 +74,7 @@ export interface SafTicket {
   id: number
   carbure_id: string
   year: number
-  period: number
+  assignment_period: number
   created_at: string
   supplier: string
   client: string
@@ -83,8 +88,7 @@ export interface SafTicket {
 
 export interface SafTicketDetails extends SafTicket, SafProduction, SafDurability {
   // parent_ticket_source?: SafTicketSource TODO on a vraiment besoin de ça ? ce n'est pas visible sur les maquettes
-  agreement_reference: string
-  agreement_date: string
+  free_field?: string
   client_comment?: string
 }
 
@@ -113,8 +117,7 @@ export interface SafDurability {
 export interface SafTicketAssignementQuery {
   volume: number
   client_id: number
-  agreement_reference: string
-  agreement_date: string
+  free_field: string
 }
 
 export interface SafQuery {
@@ -148,8 +151,8 @@ export interface SafTicketsResponse {
 }
 
 export enum SafTicketSourceStatus {
-  Available = "available",
-  History = "history",
+  Available = "AVAILABLE",
+  History = "HISTORY",
 }
 
 export interface SafStates { //old QueryParams

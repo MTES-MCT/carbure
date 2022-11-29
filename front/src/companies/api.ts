@@ -6,11 +6,24 @@ import {
   ProductionSiteDetails,
   EntityDepot,
   EntityCertificate,
+  EntityType,
 } from "carbure/types"
 import { EntityDetails } from "./types"
 
 export function getEntities() {
   return api.get<Api<EntityDetails[]>>("/v3/admin/entities")
+}
+
+export function addEntity(
+  name: string,
+  entity_type: EntityType,
+  has_saf: boolean
+) {
+  return api.post("/v5/admin/create-entity", {
+    name: name,
+    entity_type: entity_type,
+    has_saf: has_saf,
+  })
 }
 
 export function getEntityDetails(entity_id: number) {

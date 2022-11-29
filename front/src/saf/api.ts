@@ -100,17 +100,17 @@ export function assignSafTicket(
   entity_id: number,
   ticket_source_id: number,
   volume: number,
+  assignment_period: number,
   client: EntityPreview,
-  agreement_reference?: string,
-  agreement_date?: string,
+  free_field?: string
 ) {
   return api.post("/v5/saf/operator/assign-ticket", {
     entity_id,
     ticket_source_id,
+    assignment_period,
     volume,
     client_id: client.id,
-    agreement_reference,
-    agreement_date
+    free_field
   })
 }
 

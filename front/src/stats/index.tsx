@@ -20,7 +20,6 @@ const Stats = () => {
   })
 
   const statsData = statsResponse.result
-  console.log("statsData:", statsData)
 
   return !statsData?.metabase_iframe_url ? (
     <LoaderOverlay />
@@ -28,7 +27,7 @@ const Stats = () => {
     <Main>
       <header>
         <h1>
-          <Trans>{t("Statistiques")}</Trans>
+          <Trans>Statistiques</Trans>
         </h1>
       </header>
       <section>
