@@ -61,6 +61,12 @@ Lorsque des changement sont effectué sur la base de donnée :
 1 une fois les model ou champs ajouté, pour créer le fichier de migration - `docker exec carbure_app python3 web/manage.py makemigrations`
 2 pour appliquer la migration sur la DB - `docker exec carbure_app python3 web/manage.py migrate`
 
+# Lancer les tests backend
+- Run all the tests in the api.v5.saf module
+`docker exec carbure_app python3 web/manage.py api.v5.saf`
+- Run just one test
+`docker exec carbure_app python3 web/manage.py api.v5.saf.airline.tests.tests_ticket_details.SafTicketDetailsTest`
+
 ## Étapes spécifiques pour windows
 - setup wsl2: https://docs.microsoft.com/en-us/windows/wsl/install-win10
 - installer docker desktop avec les libs WSL extra
