@@ -119,9 +119,8 @@ export function useColumns() {
     },
 
     parentLot: {
-      small: true,
       key: "parent_lot",
-      header: t("Lot"),
+      header: t("Lot parent"),
       cell: (ticketSource: SafTicketSource) => (
         <ParentLotButton lot={ticketSource.parent_lot} />
       ),
