@@ -144,6 +144,7 @@ class SafTicketDetailsTest(TestCase):
             "eu": 1.0,
             "ghg_total": 1.0,
             "ghg_reduction": 65.0,
+            "free_field": None, 
             "client_comment": None,
             "parent_ticket_source": {
                 "id": 1234,

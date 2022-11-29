@@ -70,6 +70,7 @@ class SafTicketDetailsTest(TestCase):
             country_of_origin=Pays.objects.get(name="Espagne"),
             supplier=self.supplier,
             client=self.entity,
+            free_field= "Everything looks fine", 
             agreement_date="2022-06-20",
             agreement_reference="ABCD",
             carbure_producer=None,
@@ -120,6 +121,7 @@ class SafTicketDetailsTest(TestCase):
             "production_site_commissioning_date": "2001-01-01",
             "supplier": self.supplier.name,
             "client": self.entity.name,
+            "free_field": "Everything looks fine", 
             "feedstock": {
                 "name": "Huiles ou graisses animales  (catégorie I et/ou II )",
                 "name_en": "CI/CII Animal fat",

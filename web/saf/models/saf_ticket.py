@@ -32,7 +32,7 @@ class SafTicket(models.Model):
 
     supplier = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.SET_NULL, related_name="saf_owner")  # fmt: skip
     client = models.ForeignKey("core.Entity", null=True, blank=True, default=None, on_delete=models.SET_NULL)  # fmt: skip
-    free_field = models.CharField(max_length=64, null=True, blank=True, default=None)
+    free_field = models.TextField(null=True, blank=True, default=None)
 
     carbure_producer = models.ForeignKey("core.Entity", null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="saf_producer")  # fmt: skip
     unknown_producer = models.CharField(max_length=64, blank=True, null=True, default=None)
