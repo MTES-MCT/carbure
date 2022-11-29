@@ -5,6 +5,7 @@ import {
   formatGHG,
   formatNumber,
   formatPercentage,
+  formatPeriod,
 } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import {
@@ -83,15 +84,17 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
         <TextInput label={t("Fournisseur")} value={ticket.supplier} readOnly />
         <TextInput label={t("Client")} value={ticket.client} readOnly />
         <TextInput
-          label={t("N° de contrat")}
-          value={ticket.agreement_reference ?? t("N/A")}
+          label={t("Période d'affectation")}
+          value={formatPeriod(ticket.assignment_period)}
           readOnly
         />
-        <DateInput
-          label={t("Date du contrat")}
-          value={ticket.agreement_date ?? t("N/A")}
-          readOnly
-        />
+        {ticket.free_field && (
+          <TextInput
+            label={t("Champ libre")}
+            value={ticket.free_field}
+            readOnly
+          />
+        )}
       </Fieldset>
       <DurabilityFields durability={ticket} />
     </div>

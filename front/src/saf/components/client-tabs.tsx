@@ -29,8 +29,8 @@ export const ClientTabs = ({
       className={css.safTabs}
       tabs={compact([
         {
-          key: "pending",
-          path: "tickets/pending",
+          key: SafTicketStatus.Pending,
+          path: `tickets/${SafTicketStatus.Pending.toLowerCase()}`,
           label: (
             <Row>
               <Col>
@@ -51,8 +51,8 @@ export const ClientTabs = ({
           ),
         },
         {
-          key: "accepted",
-          path: "tickets/accepted",
+          key: SafTicketStatus.Accepted,
+          path: `tickets/${SafTicketStatus.Accepted.toLowerCase()}`,
           label: (
             <Row>
               <Col>

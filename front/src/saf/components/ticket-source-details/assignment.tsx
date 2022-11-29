@@ -7,10 +7,25 @@ import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import Form, { useForm } from "common/components/form"
 import { Return, Send } from "common/components/icons"
-import { DateInput, NumberInput, TextInput } from "common/components/input"
+import {
+  DateInput,
+  Field,
+  Input,
+  NumberInput,
+  TextInput,
+} from "common/components/input"
 import Portal from "common/components/portal"
+import { Row } from "common/components/scaffold"
+import Select from "common/components/select"
 import { useMutation } from "common/hooks/async"
-import { formatNumber } from "common/utils/formatters"
+import {
+  capitalize,
+  formatDate,
+  formatNumber,
+  formatPeriod,
+} from "common/utils/formatters"
+import { Option } from "common/utils/normalize"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { SafTicketSourceDetails } from "saf/types"
 import * as api from "../../api"
@@ -28,15 +43,11 @@ export const TicketAssignment = ({
   const { t } = useTranslation()
   const entity = useEntity()
 
-  const { value, errors, bind, setField, setFieldError } =
+  const { value, bind, setField, setFieldError } =
     useForm<AssignmentForm>(defaultAssignment)
 
   const remainingVolume =
     ticketSource.total_volume - ticketSource.assigned_volume
-
-  const closeDialog = () => {
-    onClose()
-  }
 
   const assignSafTicket = useMutation(api.assignSafTicket, {
     invalidates: [
@@ -57,9 +68,9 @@ export const TicketAssignment = ({
       entity.id,
       ticketSource.id,
       value.volume!,
+      value.assignment_period,
       value.client!,
-      value.agreement_reference,
-      value.agreement_date
+      value.free_field!
     )
     onTicketAssigned(value.volume!, value.client!.name)
     onClose()
@@ -73,9 +84,13 @@ export const TicketAssignment = ({
     return api.findClients(query)
   }
 
+  //TODO get years and months
+  const years = [2022, 2023]
+  const months = [1]
+
   return (
-    <Portal onClose={closeDialog}>
-      <Dialog onClose={closeDialog}>
+    <Portal onClose={onClose}>
+      <Dialog onClose={onClose}>
         <header>
           <h1>
             {t("Affecter le volume CAD n°")}
@@ -113,6 +128,11 @@ export const TicketAssignment = ({
                 }
               />
 
+              <PeriodSelect
+                deliveryPeriod={ticketSource.delivery_period}
+                {...bind("assignment_period")}
+              />
+
               <Autocomplete
                 required
                 label={t("Client")}
@@ -121,15 +141,7 @@ export const TicketAssignment = ({
                 {...bind("client")}
               />
 
-              <TextInput
-                label={t("N° de Contrat (facture ou bon de commande)")}
-                {...bind("agreement_reference")}
-              />
-
-              <DateInput
-                label={t("Date du contrat (facture ou du bon de commande )")}
-                {...bind("agreement_date")}
-              />
+              <TextInput label={t("Champ libre")} {...bind("free_field")} />
             </Form>
           </section>
         </main>
@@ -142,7 +154,7 @@ export const TicketAssignment = ({
             submit="assign-ticket"
           />
 
-          <Button icon={Return} label={t("Retour")} action={closeDialog} />
+          <Button icon={Return} label={t("Retour")} action={onClose} />
         </footer>
       </Dialog>
     </Portal>
@@ -151,11 +163,64 @@ export const TicketAssignment = ({
 
 export default TicketAssignment
 
+const formatPeriodFromDate = (date: Date) => {
+  return date.getFullYear() * 100 + date.getMonth() + 1
+}
+
 const defaultAssignment = {
   volume: 0 as number | undefined,
   client: undefined as EntityPreview | undefined,
-  agreement_reference: undefined as string | undefined,
-  agreement_date: undefined as string | undefined,
+  assignment_period: formatPeriodFromDate(new Date()),
+  free_field: "" as string | undefined,
 }
 
 export type AssignmentForm = typeof defaultAssignment
+
+interface PeriodSelectProps {
+  deliveryPeriod: number
+  onChange: (value: number) => void
+}
+
+const PeriodSelect = ({ deliveryPeriod, onChange }: PeriodSelectProps) => {
+  const { t } = useTranslation()
+  const [periodList, setPeriodList] = useState<Option<number>[]>()
+  const [period, _setPeriod] = useState<number>(deliveryPeriod)
+
+  const setPeriod = (period: number) => {
+    _setPeriod(period)
+    onChange(period)
+  }
+
+  useEffect(() => {
+    let month: number = deliveryPeriod % 100
+    let year: number = Math.floor(deliveryPeriod / 100)
+    const list: Option<number>[] = []
+    for (let currentYear = year; currentYear <= year + 1; currentYear++) {
+      let currentMonth = currentYear === year ? month : 1
+      for (; currentMonth <= 12; currentMonth++) {
+        const period = currentYear * 100 + currentMonth
+        const date = formatPeriod(period) + "-01"
+        const periodString = formatDate(date, {
+          day: undefined,
+          year: "numeric",
+          month: "long",
+        })
+
+        list.push({
+          value: period,
+          label: capitalize(periodString),
+        })
+      }
+    }
+    setPeriodList(list)
+  }, [])
+
+  return (
+    <Select
+      placeholder={t("Choisissez une année")}
+      value={period}
+      onChange={(period) => setPeriod(period!)}
+      options={periodList}
+    />
+  )
+}

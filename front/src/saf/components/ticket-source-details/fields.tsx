@@ -1,15 +1,11 @@
-import { Fieldset } from "common/components/form"
-import { DateInput, NumberInput, TextInput } from "common/components/input"
-import {
-  formatGHG,
-  formatNumber,
-  formatPercentage,
-} from "common/utils/formatters"
-import { useTranslation } from "react-i18next"
-import { SafDurability, SafTicketSourceDetails } from "../../types"
-import cl from "clsx"
-import css from "../../../common/components/form.module.css"
 import * as norm from "carbure/utils/normalizers"
+import cl from "clsx"
+import { Fieldset } from "common/components/form"
+import { DateInput, TextInput } from "common/components/input"
+import { formatDate, formatNumber } from "common/utils/formatters"
+import { useTranslation } from "react-i18next"
+import css from "../../../common/components/form.module.css"
+import { SafTicketSourceDetails } from "../../types"
 import DurabilityFields from "../durability-fields"
 
 interface TicketSourceFieldsProps {
@@ -43,6 +39,15 @@ export const TicketSourceFields = ({
         <TextInput
           label={t("Pays d'origine")}
           value={norm.normalizeCountry(ticketSource.country_of_origin).label}
+          readOnly
+        />
+        <TextInput
+          label={t("Date de livraison")}
+          value={
+            ticketSource.parent_lot?.delivery_date
+              ? formatDate(ticketSource.parent_lot?.delivery_date)
+              : t("N/A")
+          }
           readOnly
         />
       </Fieldset>

@@ -1,10 +1,10 @@
+import Button from "common/components/button"
 import Table, { Cell, Order } from "common/components/table"
 import { compact } from "common/utils/collection"
-import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
-import { isRedII } from "lot-add/components/ghg-fields"
+import { formatNumber, formatPeriod } from "common/utils/formatters"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
-import { To } from "react-router-dom"
+import { To, useLocation, useNavigate } from "react-router-dom"
 import { SafTicketSource } from "saf/types"
 import { TicketSourceTag } from "./tag"
 
@@ -39,6 +39,7 @@ export const TicketSourcesTable = memo(
           columns.period,
           columns.feedstock,
           columns.ghgReduction,
+          columns.parentLot,
         ])}
       />
     )
@@ -80,14 +81,19 @@ export function useColumns() {
     },
 
     period: {
-      key: "period",
-      header: t("Période"),
-      cell: (ticketSource: SafTicketSource) => (
-        <Cell
-          text={formatPeriod(ticketSource.period)}
-          sub={formatDate(ticketSource.created_at)}
-        />
-      ),
+      key: "delivery",
+      header: t("Livraison"),
+      cell: (ticketSource: SafTicketSource) => {
+        return (
+          <Cell
+            text={
+              ticketSource.delivery_period
+                ? formatPeriod(ticketSource.delivery_period)
+                : t("N/A")
+            }
+          />
+        )
+      },
     },
 
     feedstock: {
@@ -111,7 +117,48 @@ export function useColumns() {
         return <Cell text={`${ticketSource.ghg_reduction.toFixed(0)}%`} />
       },
     },
+
+    parentLot: {
+      key: "parent_lot",
+      header: t("Lot parent"),
+      cell: (ticketSource: SafTicketSource) => (
+        <ParentLotButton lot={ticketSource.parent_lot} />
+      ),
+    },
   }
 }
 
 export default TicketSourcesTable
+
+export interface ParentLotButtonProps {
+  lot?: {
+    id: number
+    carbure_id: string
+  }
+}
+
+export const ParentLotButton = ({ lot }: ParentLotButtonProps) => {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  if (!lot) return <Cell text={t("N/A")} />
+
+  const showLotDetails = () => {
+    navigate({
+      pathname: location.pathname,
+      search: location.search,
+      hash: `lot/${lot!.id}`,
+    })
+  }
+
+  return (
+    <Button
+      captive
+      variant="link"
+      title={t("Lot initial")}
+      label={`#${lot.carbure_id}`}
+      action={showLotDetails}
+    />
+  )
+}

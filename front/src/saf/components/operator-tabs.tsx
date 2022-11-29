@@ -137,11 +137,11 @@ const TicketRecap = ({
   )
 }
 
-export function useAutoStatus(snapshot?: SafOperatorSnapshot) {
+export function useAutoStatus() {
   const matchView = useMatch("/org/:entity/saf/:year/:view/*")
   const matchStatus = useMatch("/org/:entity/saf/:year/:view/:status")
 
-  if (/*!snapshot ||*/ !matchView) {
+  if (!matchView) {
     return SafTicketSourceStatus.Available
   }
 
@@ -153,12 +153,13 @@ export function useAutoStatus(snapshot?: SafOperatorSnapshot) {
     // else if (snapshot.ticket_sources_history > 0)
     //   return SafTicketSourceStatus.History
 
-    const status = matchStatus?.params.status as SafTicketSourceStatus
+    const status =
+      matchStatus?.params?.status?.toUpperCase() as SafTicketSourceStatus
     return status ?? SafTicketSourceStatus.Available
   }
 
   if (matchView.params.view === "tickets") {
-    const status = matchStatus?.params.status as SafTicketStatus
+    const status = matchStatus?.params?.status?.toUpperCase() as SafTicketStatus
     return status ?? SafTicketStatus.Pending
   }
 
