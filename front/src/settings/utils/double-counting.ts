@@ -4,11 +4,15 @@ import {
 } from "double-counting/types"
 import { t } from "i18next"
 
-export function getErrorText(error: DoubleCountingUploadError) {
-  let errorText =
-    (error.line_number ?? -1) >= 0
+export function getErrorText(error: DoubleCountingUploadError, showLine?: string) {
+  let errorText = ""
+
+  if (showLine) {
+    errorText += (error.line_number ?? -1) >= 0
       ? t("Ligne {{lineNumber}} : ", { lineNumber: error.line_number })
       : ""
+  }
+
 
   switch (error.error) {
     case DoubleCountingUploadErrorType.UnkownFeedstock:
