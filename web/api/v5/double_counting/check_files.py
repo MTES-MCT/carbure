@@ -39,7 +39,8 @@ def check_files(request, *args, **kwargs):
                     "production_site": "NOT_YET_IMPLEMENTED",
                 }
             )
-
+            print('*******')
+            print(file_errors)
         return SuccessResponse({"files": file_errors, "checked_at": datetime.datetime.now().isoformat()})
     except Exception:
         traceback.print_exc()

@@ -20,7 +20,6 @@ const Stats = () => {
   })
 
   const statsData = statsResponse.result
-  console.log("statsData:", statsData)
 
   return !statsData?.metabase_iframe_url ? (
     <LoaderOverlay />

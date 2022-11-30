@@ -1,17 +1,29 @@
 import Alert from "common/components/alert"
+import Button from "common/components/button"
 import { AlertCircle } from "common/components/icons"
 import { Main } from "common/components/scaffold"
 import Table, { Cell, Column } from "common/components/table"
 import Tabs from "common/components/tabs"
+import Tag from "common/components/tag"
 import useTitle from "common/hooks/title"
-import { DoubleCountingFileInfo } from "double-counting/types"
+import { formatPeriod } from "common/utils/formatters"
+import {
+  CheckDoubleCountingFilesResponse,
+  DoubleCountingFileInfo,
+} from "double-counting/types"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
+import { useLocation } from "react-router-dom"
+import FilesCheckerUploadButton from "./upload-button"
 
 const DoubleCountingFilesChecker = () => {
   const { t } = useTranslation()
+  const location = useLocation()
   useTitle(t("Vérification de fichiers de double comptage"))
-  const [tab, setTab] = useState("accepted")
+
+  const [tab, setTab] = useState("to-fix")
+
+  const checkedFiles = location.state as CheckDoubleCountingFilesResponse
 
   function showFileErrorsDialog(file: DoubleCountingFileInfo) {
     //TODO open FIle error detail dialog
@@ -20,74 +32,117 @@ const DoubleCountingFilesChecker = () => {
   const columns: Column<DoubleCountingFileInfo>[] = [
     {
       header: t("Statut"),
-      cell: (file) => <p>Tag</p>,
+      cell: (file) =>
+        file.error_count ? (
+          <Tag variant="warning">{t("A corriger")}</Tag>
+        ) : (
+          <Tag variant="success">{t("Valide")}</Tag>
+        ),
     },
     {
       header: t("Erreurs"),
-      cell: (file) => <Cell text={"Nombre d'erreurr"} />,
+      cell: (file) => (
+        <Cell
+          text={t("{{errorCount}} erreurs", { errorCount: file.error_count })}
+        />
+      ),
     },
     {
-      header: t("Producteur"),
-      cell: (file) => <Cell text={"nom du producteur"} />,
+      header: t("fichier"),
+      cell: (file) => <Cell text={file.file_name} />,
     },
     {
       header: t("Site de production"),
-      cell: (file) => <Cell text={"nom du site de prod"} />,
+      cell: (file) => <Cell text={file.production_site} />,
     },
     {
       header: t("Période de validité"),
-      cell: (a) => <Cell text={"Period de validité"} />,
+      cell: (file) => <Cell text={formatPeriod(file.period)} />,
     },
   ]
 
-  const checked = { count: 0, files: [] }
-  const toFix = { count: 0, files: [] }
+  const filesValid = checkedFiles?.files.filter((f) => !f.error_count) || []
+  const filesToFix = checkedFiles?.files.filter((f) => f.error_count > 0) || []
+  const valid = { count: filesValid.length, files: filesValid }
+  const toFix = { count: filesToFix.length, files: filesToFix }
+
   return (
     <Main>
       <header>
         <section>
-          <Tabs
-            variant="switcher"
-            onFocus={setTab}
-            tabs={[
-              { key: "checked", path: "checked", label: t("Valides") },
-              { key: "to-fix", path: "to-fix", label: t("À corriger") },
-            ]}
-          />
+          <h1>{t("Vérification de fichiers de double comptage")}</h1>
+          <FilesCheckerUploadButton />
         </section>
-      </header>
-
-      {tab === "checked" && (
-        <>
-          {checked.count === 0 && (
-            <Alert variant="warning" icon={AlertCircle}>
-              {t("Aucun dossier valide")}
-            </Alert>
-          )}
-
-          {checked.count > 0 && (
-            <Table columns={columns} rows={checked.files} />
-          )}
-        </>
-      )}
-
-      {tab === "to-fix" && (
-        <>
-          {toFix.count === 0 && (
-            <Alert variant="warning" icon={AlertCircle}>
-              {t("Aucun dossier à corriger !")}
-            </Alert>
-          )}
-
-          {toFix.count > 0 && (
-            <Table
-              columns={columns}
-              rows={toFix.files}
-              onAction={showFileErrorsDialog}
+        {checkedFiles && (
+          <section>
+            <Tabs
+              variant="switcher"
+              onFocus={setTab}
+              tabs={[
+                {
+                  key: "to-fix",
+                  label: t("À corriger ({{toFixCount}})", {
+                    toFixCount: toFix.count,
+                  }),
+                },
+                {
+                  key: "valid",
+                  label: t("Valides ({{validCount}})", {
+                    validCount: valid.count,
+                  }),
+                },
+              ]}
             />
-          )}
-        </>
-      )}
+          </section>
+        )}
+      </header>
+      <section>
+        {!checkedFiles && (
+          <Alert variant="warning" icon={AlertCircle}>
+            <p>
+              {t(
+                "Aucune données à vérifier. Merci d’envoyer de nouveaux fichiers."
+              )}
+            </p>
+          </Alert>
+        )}
+
+        {checkedFiles && (
+          <>
+            {tab === "valid" && (
+              <>
+                {valid.count === 0 && (
+                  <Alert variant="warning" icon={AlertCircle}>
+                    {t("Aucun dossier valide")}
+                  </Alert>
+                )}
+
+                {valid.count > 0 && (
+                  <Table columns={columns} rows={valid.files} />
+                )}
+              </>
+            )}
+
+            {tab === "to-fix" && (
+              <>
+                {toFix.count === 0 && (
+                  <Alert variant="warning" icon={AlertCircle}>
+                    {t("Aucun dossier à corriger !")}
+                  </Alert>
+                )}
+
+                {toFix.count > 0 && (
+                  <Table
+                    columns={columns}
+                    rows={toFix.files}
+                    onAction={showFileErrorsDialog}
+                  />
+                )}
+              </>
+            )}
+          </>
+        )}
+      </section>
     </Main>
   )
 }
