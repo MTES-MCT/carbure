@@ -15,6 +15,7 @@ import { useQuery } from "common/hooks/async"
 import { formatDate, formatDateYear } from "common/utils/formatters"
 import Button from "common/components/button"
 import DoubleCountingFilesCheckerDialog from "./files-checker/files-checker-dialog"
+import FilesCheckerUploadButton from "./files-checker/upload-button"
 
 type AgreementListProps = {
   entity: Entity
@@ -73,10 +74,6 @@ const AgreementList = ({ entity, year }: AgreementListProps) => {
     ))
   }
 
-  const showAgreementsChecker = () => {
-    portal((close) => <DoubleCountingFilesCheckerDialog onClose={close} />)
-  }
-
   return (
     <section>
       <ActionBar>
@@ -91,13 +88,7 @@ const AgreementList = ({ entity, year }: AgreementListProps) => {
           ]}
         />
 
-        <Button
-          asideX
-          variant="secondary"
-          icon={Upload}
-          label={t("Vérifier des dossiers")}
-          action={showAgreementsChecker}
-        />
+        <FilesCheckerUploadButton />
       </ActionBar>
       {tab === "pending" && (
         <Fragment>

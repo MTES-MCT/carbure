@@ -8,6 +8,7 @@ import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import { CheckDoubleCountingFilesResponse } from "double-counting/types"
 import { useTranslation } from "react-i18next"
+import { useNavigate } from "react-router-dom"
 import * as api from "../../api"
 
 type DoubleCountingFilesCheckerDialogProps = {
@@ -19,6 +20,7 @@ const DoubleCountingFilesCheckerDialog = ({
 }: DoubleCountingFilesCheckerDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const navigate = useNavigate()
 
   const { value, bind } = useForm({
     doubleCountingFiles: undefined as FileList | undefined | null,
@@ -31,7 +33,6 @@ const DoubleCountingFilesCheckerDialog = ({
         const response = (
           err as AxiosError<{ data: CheckDoubleCountingFilesResponse }>
         ).response?.data?.data
-        console.log("dresponse:", response) //TODO Files to display in new window
       } else {
         notify(
           t(
@@ -44,10 +45,21 @@ const DoubleCountingFilesCheckerDialog = ({
       }
     },
   })
+  // const filesData = uploadFiles.result?.data.data
+  // const filesData = checkDoubleCountingFilesResponse
 
   async function submitFiles() {
     if (!value.doubleCountingFiles) return
-    await uploadFiles.execute(value.doubleCountingFiles as FileList)
+    const resp = await uploadFiles.execute(
+      value.doubleCountingFiles as FileList
+    )
+    const checkData = resp.data.data
+    if (checkData) {
+      onClose()
+      navigate("/org/9/double-counting/files-checker", {
+        state: checkData,
+      })
+    }
   }
 
   return (
