@@ -1,6 +1,6 @@
 import Alert from "common/components/alert"
-import Button from "common/components/button"
 import { AlertCircle } from "common/components/icons"
+import { usePortal } from "common/components/portal"
 import { Main } from "common/components/scaffold"
 import Table, { Cell, Column } from "common/components/table"
 import Tabs from "common/components/tabs"
@@ -14,12 +14,14 @@ import {
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useLocation } from "react-router-dom"
+import ErrorsDetailsDialog from "./errors-details-dialog"
 import FilesCheckerUploadButton from "./upload-button"
 
 const DoubleCountingFilesChecker = () => {
   const { t } = useTranslation()
   const location = useLocation()
   useTitle(t("Vérification de fichiers de double comptage"))
+  const portal = usePortal()
 
   const [tab, setTab] = useState("to-fix")
 
@@ -27,6 +29,7 @@ const DoubleCountingFilesChecker = () => {
 
   function showFileErrorsDialog(file: DoubleCountingFileInfo) {
     //TODO open FIle error detail dialog
+    portal((close) => <ErrorsDetailsDialog file={file} onClose={close} />)
   }
 
   const columns: Column<DoubleCountingFileInfo>[] = [
@@ -101,7 +104,7 @@ const DoubleCountingFilesChecker = () => {
           <Alert variant="warning" icon={AlertCircle}>
             <p>
               {t(
-                "Aucune données à vérifier. Merci d’envoyer de nouveaux fichiers."
+                "Aucune données à vérifier. Merci d’envoyer de nouveaux fichiers à analyser."
               )}
             </p>
           </Alert>
