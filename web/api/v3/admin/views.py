@@ -6,10 +6,10 @@ import random
 import math
 
 from django.http import JsonResponse
-from core.decorators import is_admin
+from core.decorators import is_admin, is_admin_or_external_admin
 from django.contrib.auth import get_user_model
 from core.models import CarbureLot, Entity, UserRights, ProductionSite
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Value
 from django.core.mail import send_mail
 from django.conf import settings
 
@@ -38,7 +38,7 @@ def get_users(request):
     return JsonResponse({"status": "success", "data": users_sez})
 
 
-@is_admin
+@is_admin_or_external_admin
 def get_entity_details(request):
     entity_id = request.GET.get('entity_id', False)
 
@@ -99,20 +99,34 @@ def get_entity_certificates(request):
         print(err)
         return JsonResponse({"status": "error", "message": "Could not find entity certificates" }, status=400)
 
-@is_admin
+@is_admin_or_external_admin
 def get_entities(request):
     q = request.GET.get('q', False)
+    entity_id = request.GET.get('entity_id', None)
     has_requests = request.GET.get('has_requests', None)
 
-    entities = Entity.objects.all().order_by('name').prefetch_related('userrights_set', 'userrightsrequests_set', 'entitydepot_set', 'productionsite_set').annotate(
-        users=Count('userrights', distinct=True),
-        requests=Count('userrightsrequests', filter=Q(userrightsrequests__status='PENDING'), distinct=True),
-        depots=Count('entitydepot', distinct=True),
-        production_sites=Count('productionsite', distinct=True),
-        certificates=Count('entitycertificate', distinct=True),
-        double_counting=Count('doublecountingagreement', filter=Q(doublecountingagreement__status=DoubleCountingAgreement.ACCEPTED), distinct=True),
-        double_counting_requests=Count('doublecountingagreement', filter=Q(doublecountingagreement__status=DoubleCountingAgreement.PENDING), distinct=True),
-    )
+    entity = Entity.objects.get(id=entity_id)
+
+    if entity.entity_type == entity.ADMIN:
+        entities = Entity.objects.all().order_by('name').prefetch_related('userrights_set', 'userrightsrequests_set', 'entitydepot_set', 'productionsite_set').annotate(
+            users=Count('userrights', distinct=True),
+            requests=Count('userrightsrequests', filter=Q(userrightsrequests__status='PENDING'), distinct=True),
+            depots=Count('entitydepot', distinct=True),
+            production_sites=Count('productionsite', distinct=True),
+            certificates=Count('entitycertificate', distinct=True),
+            double_counting=Count('doublecountingagreement', filter=Q(doublecountingagreement__status=DoubleCountingAgreement.ACCEPTED), distinct=True),
+            double_counting_requests=Count('doublecountingagreement', filter=Q(doublecountingagreement__status=DoubleCountingAgreement.PENDING), distinct=True),
+        )
+    elif entity.has_external_admin_right("AIRLINE"):
+        entities = Entity.objects.all().order_by('name').filter(entity_type=Entity.AIRLINE).prefetch_related('userrights_set', 'userrightsrequests_set').annotate(
+            users=Count('userrights', distinct=True),
+            requests=Count('userrightsrequests', filter=Q(userrightsrequests__status='PENDING'), distinct=True),
+            depots=Value(0),
+            production_sites=Value(0),
+            certificates=Value(0),
+            double_counting=Value(0),
+            double_counting_requests=Value(0),
+        )
 
     if q:
         entities = entities.filter(name__icontains=q)
@@ -169,7 +183,7 @@ def delete_entity(request):
     return JsonResponse({"status": "success", "data": "success"})
 
 
-@is_admin
+@is_admin_or_external_admin
 def get_rights_requests(request):
     q = request.GET.get('q', False)
     statuses = request.GET.getlist('statuses', False)

@@ -10,8 +10,10 @@ import {
 } from "carbure/types"
 import { EntityDetails } from "./types"
 
-export function getEntities() {
-  return api.get<Api<EntityDetails[]>>("/v3/admin/entities")
+export function getEntities(entity_id: number) {
+  return api.get<Api<EntityDetails[]>>("/v3/admin/entities", {
+    params: { entity_id },
+  })
 }
 
 export function addEntity(

@@ -160,6 +160,8 @@ const UserRights = () => {
           ]}
         />
       )}
+
+      {rows.length === 0 && <footer />}
     </Panel>
   )
 }
