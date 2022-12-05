@@ -45,8 +45,6 @@ const DoubleCountingFilesCheckerDialog = ({
       }
     },
   })
-  // const filesData = uploadFiles.result?.data.data
-  // const filesData = checkDoubleCountingFilesResponse
 
   async function submitFiles() {
     if (!value.doubleCountingFiles) return
