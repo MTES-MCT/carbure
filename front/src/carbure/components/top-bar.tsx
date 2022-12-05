@@ -143,13 +143,13 @@ const Navigation = ({ entity }: NavigationProps) => {
                 label: t("Statistiques"),
               },
 
-              isAdmin && {
+              (isAdmin || entity.hasAdminRight("AIRLINE")) && {
                 key: "entities",
                 path: "entities",
                 label: t("Sociétés"),
               },
 
-              (isAdmin || entity.hasPage("DCA")) && {
+              (isAdmin || entity.hasAdminRight("DCA")) && {
                 key: "double-counting",
                 path: "double-counting",
                 label: t("Double comptage"),

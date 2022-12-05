@@ -1,3 +1,4 @@
+import useEntity, { useEntityManager } from "carbure/hooks/entity"
 import { EntityType } from "carbure/types"
 import * as norm from "carbure/utils/normalizers"
 import Autocomplete from "common/components/autocomplete"
@@ -21,6 +22,8 @@ export const AddEntityDialog = ({
   onEntityAdded,
 }: AddEntityDialogProps) => {
   const { t } = useTranslation()
+  const entity = useEntity()
+  const hasAirlineOnly = entity.isExternal && entity.hasAdminRight("AIRLINE")
 
   const { value, bind } = useForm<AddForm>(defaultEntity)
 
@@ -54,12 +57,18 @@ export const AddEntityDialog = ({
                 required
                 label={t("Type de société")}
                 normalize={norm.normalizeEntityType}
-                options={[
-                  EntityType.Operator,
-                  EntityType.Producer,
-                  EntityType.Trader,
-                  EntityType.Auditor,
-                ]}
+                options={
+                  hasAirlineOnly
+                    ? [EntityType.Airline]
+                    : [
+                        EntityType.Operator,
+                        EntityType.Producer,
+                        EntityType.Trader,
+                        EntityType.Auditor,
+                        EntityType.Airline,
+                        EntityType.ExternalAdmin,
+                      ]
+                }
                 {...bind("entity_type")}
               />
 

@@ -24,6 +24,7 @@ const EntityDetails = () => {
 
   const entityData = entity.result?.data.data
   const isProducer = entityData?.entity_type === EntityType.Producer
+  const isAirline = entityData?.entity_type === EntityType.Airline
 
   return (
     <Main>
@@ -42,15 +43,19 @@ const EntityDetails = () => {
         variant="sticky"
         tabs={compact([
           { key: "users", path: "#users", label: "Utilisateurs" },
-          { key: "depot", path: "#depot", label: "Depots" },
+          !isAirline && { key: "depot", path: "#depot", label: "Depots" },
           isProducer && { key: "production", path: "#production", label: "Sites de production" }, // prettier-ignore
-          { key: "certificates", path: "#certificates", label: "Certificats" },
+          !isAirline && {
+            key: "certificates",
+            path: "#certificates",
+            label: "Certificats",
+          },
         ])}
       />
 
       <section>
         <UserRights />
-        {entityData && (
+        {entityData && !isAirline && (
           <DeliverySitesSettings
             readOnly
             entity={entityData}
@@ -64,7 +69,7 @@ const EntityDetails = () => {
             getProductionSites={api.getEntityProductionSites}
           />
         )}
-        <Certificates entity={entityID} />
+        {!isAirline && <Certificates entity={entityID} />}
       </section>
     </Main>
   )
