@@ -888,12 +888,15 @@ def get_prefetched_data(entity=None):
     d['feedstocks'] = {m.code: m for m in MatierePremiere.objects.all()}
     d['depots'] = {d.depot_id: d for d in Depot.objects.all()}
     d['depotsbyname'] = {d.name.upper(): d for d in d['depots'].values()}
+
     if entity:
         # get only my production sites
         d['my_production_sites'] = {ps.name.upper(): ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').filter(producer=entity)}
         # get all my linked certificates
         d['my_vendor_certificates'] = [c.certificate.certificate_id for c in EntityCertificate.objects.filter(entity=entity)]
-
+    else:
+        d["my_production_sites"] = {}
+        d["my_vendor_certificates"] = []
 
     # MAPPING OF ENTITIES AND DELIVERY SITES
     # dict {'entity1': [depot1, depot2],
