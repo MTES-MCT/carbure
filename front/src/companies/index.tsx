@@ -13,6 +13,8 @@ import Button from "common/components/button"
 import { usePortal } from "common/components/portal"
 import AddEntityDialog from "./components/add-entity-dialog"
 import { useNotify } from "common/components/notifications"
+import { compact } from "common/utils/collection"
+import useEntity from "carbure/hooks/entity"
 
 const Entities = () => {
   const { t } = useTranslation()
@@ -32,6 +34,7 @@ const EntityList = () => {
   const [tab, setTab] = useState("entities")
   const portal = usePortal()
   const notify = useNotify()
+  const entity = useEntity()
 
   const handleEntityAdded = (name: string) => {
     notify(
@@ -66,10 +69,13 @@ const EntityList = () => {
         focus={tab}
         onFocus={setTab}
         variant="sticky"
-        tabs={[
+        tabs={compact([
           { key: "entities", label: t("Récapitulatif") },
-          { key: "certificates", label: t("Certificats") },
-        ]}
+          entity.isAdmin && {
+            key: "certificates",
+            label: t("Certificats"),
+          },
+        ])}
       />
       <section>
         <SearchInput
@@ -81,7 +87,9 @@ const EntityList = () => {
           onChange={setSearch}
         />
         {tab === "entities" && <EntitySummary search={search} />}
-        {tab === "certificates" && <Certificates search={search} />}
+        {entity.isAdmin && tab === "certificates" && (
+          <Certificates search={search} />
+        )}
       </section>
     </Main>
   )

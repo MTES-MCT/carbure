@@ -17,6 +17,7 @@ import {
   getEntityTypeLabel,
   normalizeEntityType,
 } from "carbure/utils/normalizers"
+import useEntity from "carbure/hooks/entity"
 
 type EntitySummaryProps = {
   search?: string
@@ -26,13 +27,17 @@ type Operation = "user" | "certificate" | "double-counting"
 
 export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
   const { t } = useTranslation()
+  const entity = useEntity()
+  const hasAirlineOnly = entity.isExternal && entity.hasAdminRight("AIRLINE")
 
   const entities = useQuery(api.getEntities, {
     key: "entities",
     params: [],
   })
 
-  const [types, setTypes] = useState<EntityType[] | undefined>(undefined)
+  const [types, setTypes] = useState<EntityType[] | undefined>(
+    hasAirlineOnly ? [EntityType.Airline] : undefined
+  )
   const [operation, setOperations] = useState<Operation | undefined>(undefined)
 
   const entityData = entities.result?.data.data ?? []
@@ -49,20 +54,23 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
   return (
     <>
       <Grid>
-        <MultiSelect
-          clear
-          value={types}
-          onChange={setTypes}
-          label={t("Types d'entité")}
-          placeholder="Choisissez un ou plusieurs types"
-          normalize={normalizeEntityType}
-          options={[
-            EntityType.Operator,
-            EntityType.Producer,
-            EntityType.Trader,
-            EntityType.Auditor,
-          ]}
-        />
+        {!hasAirlineOnly && (
+          <MultiSelect
+            clear
+            value={types}
+            onChange={setTypes}
+            label={t("Types d'entité")}
+            placeholder="Choisissez un ou plusieurs types"
+            normalize={normalizeEntityType}
+            options={[
+              EntityType.Operator,
+              EntityType.Producer,
+              EntityType.Trader,
+              EntityType.Auditor,
+              EntityType.Airline,
+            ]}
+          />
+        )}
         <Select
           clear
           value={operation}
