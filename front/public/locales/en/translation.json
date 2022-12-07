@@ -855,6 +855,7 @@
   "Les corrections ont bien été demandées !": "The corrections were requested!",
   "Voulez-vous demander une correction ?": "Do you want to request a correction?",
   "Voulez-vous demander des corrections pour les lots sélectionnés ?": "Do you want to request corrections for the selected batches?",
+  "Attention la plupart des caractéristiques de durabilité de ce lot ont été définies dans un lot parent et ne pourront pas être modifiées directement sur ce lot enfant.": "Please note that most of the sustainability characteristics of this batch have been defined in a parent batch and cannot be changed directly on this child batch.",
   "Demander correction": "Ask for correction",
   "Envoyer sélection": "Send selection",
   "Envoyer tout": "Send all",

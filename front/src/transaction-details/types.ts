@@ -5,6 +5,7 @@ export interface LotDetails {
   lot: Lot
   parent_lot: Lot | null
   parent_stock: Stock | null
+  has_parent_stock: boolean | null
   children_lot: Lot[]
   children_stock: Stock[]
   distance: Distance | null
