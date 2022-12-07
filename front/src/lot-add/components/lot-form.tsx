@@ -64,11 +64,6 @@ export function useLotForm(
       }
     }
 
-    // for traders
-    if (entity.isTrader) {
-      //
-    }
-
     // for operators
     if (entity.isOperator) {
       if (value.client === undefined) {
@@ -113,11 +108,19 @@ export function useLotForm(
   const form = useForm(setValue(value), { errors, setValue })
 
   // update the form when the loaded lot changes
-  const updateForm = form.setValue
+  const updateForm = (value: any) => {
+    form.setValue(value)
+  }
   useEffect(() => updateForm(value), [value, updateForm])
 
-  const setDisabledFieldsGroup = (fieldGroups: FieldGroup[]) => {
+  const setDisabledFieldsGroup = (
+    fieldGroups: FieldGroup[],
+    otherFields?: string[]
+  ) => {
     disabledFieldsGroup(form, fieldGroups)
+    if (otherFields) {
+      form.setDisabledFields(otherFields)
+    }
   }
 
   return {

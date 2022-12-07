@@ -99,14 +99,26 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   }, [lotData])
 
   const disabledFieldsInCorrection = () => {
-    if (lotData?.lot.correction_status === CorrectionStatus.InCorrection) {
-      if (
-        [DeliveryType.Trading, DeliveryType.Processing].includes(
-          lotData?.lot.delivery_type
-        )
-      ) {
-        form.setDisabledFieldsGroup(["batch", "production", "emissions"])
-      }
+    form.clearDisabledFields()
+    if (!lotData) return
+
+    if (
+      lotData.lot.correction_status === CorrectionStatus.InCorrection &&
+      (lotData.lot.delivery_type == DeliveryType.Trading ||
+        lotData.lot.delivery_type == DeliveryType.Processing)
+    ) {
+      form.setDisabledFieldsGroup(["batch", "production", "emissions"])
+    }
+
+    if (
+      lotData.parent_stock &&
+      (lotData.lot.correction_status === CorrectionStatus.InCorrection ||
+        lotData.lot.lot_status === LotStatus.Draft)
+    ) {
+      form.setDisabledFieldsGroup(
+        ["production", "emissions"],
+        ["biofuel", "feedstock", "country_of_origin", "free_field"]
+      )
     }
   }
 

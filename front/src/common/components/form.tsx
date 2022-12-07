@@ -74,6 +74,7 @@ export interface FormManager<T> {
   setField: FieldSetter<T>
   setFieldError: (name: keyof T, error: string | undefined) => void
   setDisabledFields: (fieldsNames: string[]) => void
+  clearDisabledFields: () => void
   setValue: React.Dispatch<React.SetStateAction<T>>
 }
 
@@ -118,6 +119,10 @@ export function useForm<T>(
     []
   )
 
+  const clearDisabledFields = useCallback(() => {
+    _setDisabledFields({})
+  }, [])
+
   const setDisabledFields = useCallback((fieldsNames: string[]) => {
     fieldsNames.map((name) => {
       disabledFields[name] = true
@@ -132,6 +137,7 @@ export function useForm<T>(
     errors,
     setFieldError,
     setDisabledFields,
+    clearDisabledFields,
     bind,
     setField,
     setValue,
