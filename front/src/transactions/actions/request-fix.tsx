@@ -46,11 +46,13 @@ export const RequestManyFixesButton = ({
 export interface RequestOneFixButtonProps {
   icon?: boolean
   lot: Lot
+  hasParentStock?: boolean
 }
 
 export const RequestOneFixButton = ({
   icon,
   lot,
+  hasParentStock,
 }: RequestOneFixButtonProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
@@ -64,7 +66,11 @@ export const RequestOneFixButton = ({
       label={t("Demander une correction")}
       action={() =>
         portal((close) => (
-          <RequestFixDialog selection={[lot.id]} onClose={close} />
+          <RequestFixDialog
+            selection={[lot.id]}
+            onClose={close}
+            hasParentStock={hasParentStock}
+          />
         ))
       }
     />
@@ -75,12 +81,14 @@ interface RequestFixDialogProps {
   summary?: boolean
   selection: number[]
   onClose: () => void
+  hasParentStock?: boolean
 }
 
 const RequestFixDialog = ({
   summary,
   selection,
   onClose,
+  hasParentStock,
 }: RequestFixDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
@@ -137,6 +145,13 @@ const RequestFixDialog = ({
             one: t("Voulez-vous demander une correction ?"),
             many: t("Voulez-vous demander des corrections pour les lots sélectionnés ?"), // prettier-ignore
           })}
+          {hasParentStock && (
+            <p>
+              {t(
+                "Attention la plupart des caractéristiques de durabilité de ce lot ont été définies dans un lot parent et ne pourront pas être modifiées directement sur ce lot enfant."
+              )}
+            </p>
+          )}
         </section>
         <section>
           <Form id="request-fix">
