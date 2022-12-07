@@ -1,9 +1,14 @@
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import * as api from "../../api"
 import { useMatomo } from "matomo"
-import { CorrectionStatus, Lot, LotStatus } from "transactions/types"
+import {
+  CorrectionStatus,
+  DeliveryType,
+  Lot,
+  LotStatus,
+} from "transactions/types"
 import { useQuery, useMutation } from "common/hooks/async"
 import { useNotify } from "common/components/notifications"
 import useEntity from "carbure/hooks/entity"
@@ -87,6 +92,22 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
 
   const closeDialog = () => {
     navigate({ search: location.search, hash: "#" })
+  }
+
+  useEffect(() => {
+    disabledFieldsInCorrection()
+  }, [lotData])
+
+  const disabledFieldsInCorrection = () => {
+    if (lotData?.lot.correction_status === CorrectionStatus.InCorrection) {
+      if (
+        [DeliveryType.Trading, DeliveryType.Processing].includes(
+          lotData?.lot.delivery_type
+        )
+      ) {
+        form.setDisabledFieldsGroup(["batch", "production", "emissions"])
+      }
+    }
   }
 
   return (

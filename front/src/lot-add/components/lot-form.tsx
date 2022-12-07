@@ -116,7 +116,73 @@ export function useLotForm(
   const updateForm = form.setValue
   useEffect(() => updateForm(value), [value, updateForm])
 
-  return form
+  const setDisabledFieldsGroup = (fieldGroups: FieldGroup[]) => {
+    disabledFieldsGroup(form, fieldGroups)
+  }
+
+  return {
+    setDisabledFieldsGroup,
+    ...form,
+  }
+}
+
+export type FieldGroup = "batch" | "production" | "delivery" | "emissions"
+const disabledFieldsGroup = (
+  form: FormManager<LotFormValue>,
+  fieldGroups: FieldGroup[]
+) => {
+  let values: string[] = []
+  if (fieldGroups.includes("batch")) {
+    values = [
+      ...values,
+      "volume",
+      "transport_document_reference",
+      "biofuel",
+      "feedstock",
+      "country_of_origin",
+      "free_field",
+    ]
+  }
+
+  if (fieldGroups.includes("production")) {
+    values = [
+      ...values,
+      "producer",
+      "production_site",
+      "production_site_certificate",
+      "production_country",
+      "production_site_commissioning_date",
+    ]
+  }
+
+  if (fieldGroups.includes("delivery")) {
+    values = [
+      ...values,
+      "supplier",
+      "supplier_certificate",
+      "client",
+      "delivery_type",
+      "delivery_site",
+      "delivery_site_country",
+      "delivery_date",
+    ]
+  }
+  if (fieldGroups.includes("emissions")) {
+    values = [
+      ...values,
+      "eccr",
+      "eccs",
+      "eec",
+      "eee",
+      "el",
+      "ep",
+      "esca",
+      "etd",
+      "eu",
+    ]
+  }
+
+  form.setDisabledFields(values)
 }
 
 function computeGHGTotal(value: LotFormValue) {

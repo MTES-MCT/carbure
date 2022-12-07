@@ -177,12 +177,12 @@ export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
   return (
     <Select
       clear
+      {...bind("delivery_type")}
       disabled={!isDraft && hasChildren}
       label={t("Type de livraison")}
       placeholder={t("Choisissez un type")}
       normalize={norm.normalizeDeliveryType}
       options={deliveryTypes}
-      {...bind("delivery_type")}
       {...props}
     />
   )
