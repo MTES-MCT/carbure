@@ -99,17 +99,16 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
 
   const disabledFields = () => {
     form.clearDisabledFields()
+
     if (!lotData) return
 
     const inCorrection =
       lotData.lot.correction_status === CorrectionStatus.InCorrection
-    const tradingOrProcessing =
-      lotData.lot.delivery_type == DeliveryType.Trading ||
-      lotData.lot.delivery_type == DeliveryType.Processing
+
     const inCorrectionOrDraft =
       inCorrection || lotData.lot.lot_status === LotStatus.Draft
 
-    if (inCorrection && tradingOrProcessing) {
+    if (inCorrection && !!lotData.parent_lot) {
       form.setDisabledFieldsGroup(["batch", "production", "emissions"])
     }
 
