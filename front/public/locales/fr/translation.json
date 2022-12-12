@@ -880,6 +880,7 @@
   "Les corrections ont bien été demandées !": "Les corrections ont bien été demandées !",
   "Voulez-vous demander une correction ?": "Voulez-vous demander une correction ?",
   "Voulez-vous demander des corrections pour les lots sélectionnés ?": "Voulez-vous demander des corrections pour les lots sélectionnés ?",
+  "Attention la plupart des caractéristiques de durabilité de ce lot ont été définies dans un lot parent et ne pourront pas être modifiées directement sur ce lot enfant.": "Attention la plupart des caractéristiques de durabilité de ce lot ont été définies dans un lot parent et ne pourront pas être modifiées directement sur ce lot enfant.",
   "Demander correction": "Demander correction",
   "Envoyer sélection": "Envoyer sélection",
   "Envoyer tout": "Envoyer tout",

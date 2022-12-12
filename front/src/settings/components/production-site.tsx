@@ -408,25 +408,25 @@ export const ProductionSiteDialog = ({
             <hr />
 
             <Checkbox
-              disabled
               label={t("Éligible double-comptage ?")}
               {...bind("eligible_dc")}
+              disabled
             />
             {value.eligible_dc && (
               <TextInput
-                disabled
                 label={t("Référence double-comptage")}
                 {...bind("dc_reference")}
+                disabled
               />
             )}
 
             <hr />
 
             <RadioGroup
-              disabled={readOnly}
               label={t("Options GES")}
               options={gesOptions}
               {...bind("ges_option")}
+              disabled={readOnly}
             />
 
             <hr />
