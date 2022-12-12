@@ -108,7 +108,7 @@ export function useLotForm(
   const form = useForm(setValue(value), { errors, setValue })
 
   // update the form when the loaded lot changes
-  const updateForm = (value: any) => {
+  const updateForm = (value: LotFormValue) => {
     form.setValue(value)
   }
   useEffect(() => updateForm(value), [value, updateForm])
@@ -129,61 +129,56 @@ export function useLotForm(
   }
 }
 
+const BATCH_VALUES = [
+  "volume",
+  "transport_document_reference",
+  "biofuel",
+  "feedstock",
+  "country_of_origin",
+  "free_field",
+]
+
+const BATCH_PRODUCTION = [
+  "producer",
+  "production_site",
+  "production_site_certificate",
+  "production_country",
+  "production_site_commissioning_date",
+]
+
+const BATCH_DELIVERY = [
+  "supplier",
+  "supplier_certificate",
+  "client",
+  "delivery_type",
+  "delivery_site",
+  "delivery_site_country",
+  "delivery_date",
+]
+
+const BATCH_EMISSIONS = [
+  "eccr",
+  "eccs",
+  "eec",
+  "eee",
+  "el",
+  "ep",
+  "esca",
+  "etd",
+  "eu",
+]
+
 export type FieldGroup = "batch" | "production" | "delivery" | "emissions"
 const disabledFieldsGroup = (
   form: FormManager<LotFormValue>,
   fieldGroups: FieldGroup[]
 ) => {
   let values: string[] = []
-  if (fieldGroups.includes("batch")) {
-    values = [
-      ...values,
-      "volume",
-      "transport_document_reference",
-      "biofuel",
-      "feedstock",
-      "country_of_origin",
-      "free_field",
-    ]
-  }
 
-  if (fieldGroups.includes("production")) {
-    values = [
-      ...values,
-      "producer",
-      "production_site",
-      "production_site_certificate",
-      "production_country",
-      "production_site_commissioning_date",
-    ]
-  }
-
-  if (fieldGroups.includes("delivery")) {
-    values = [
-      ...values,
-      "supplier",
-      "supplier_certificate",
-      "client",
-      "delivery_type",
-      "delivery_site",
-      "delivery_site_country",
-      "delivery_date",
-    ]
-  }
-  if (fieldGroups.includes("emissions")) {
-    values = [
-      ...values,
-      "eccr",
-      "eccs",
-      "eec",
-      "eee",
-      "el",
-      "ep",
-      "esca",
-      "etd",
-      "eu",
-    ]
-  }
+  if (fieldGroups.includes("batch")) values.push(...BATCH_VALUES)
+  if (fieldGroups.includes("production")) values.push(...BATCH_PRODUCTION)
+  if (fieldGroups.includes("delivery")) values.push(...BATCH_DELIVERY)
+  if (fieldGroups.includes("emissions")) values.push(...BATCH_EMISSIONS)
 
   form.setDisabledFields(values)
 }

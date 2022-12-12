@@ -120,11 +120,11 @@ export function useForm<T>(
   )
 
   const clearDisabledFields = useCallback(() => {
-    _setDisabledFields({})
+    _setDisabledFields(EMPTY_DISABLED_FIELDS)
   }, [])
 
   const setDisabledFields = useCallback((fieldsNames: string[]) => {
-    fieldsNames.map((name) => {
+    fieldsNames.forEach((name) => {
       disabledFields[name] = true
     })
     _setDisabledFields(disabledFields)
