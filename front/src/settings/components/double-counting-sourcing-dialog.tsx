@@ -107,17 +107,17 @@ const DoubleCountingSourcingDialog = ({
           <Form id="sourcing" onSubmit={saveSourcing}>
             <NumberInput
               autoFocus
-              disabled={!add}
               label={t("Année")}
               {...bind("year")}
+              disabled={!add}
             />
             <AutoComplete
-              disabled={!add}
               label={t("Matière première")}
               normalize={normalizeFeedstock}
               getOptions={(search) => findFeedstocks(search, true)}
               defaultOptions={compact([value.feedstock])}
               {...bind("feedstock")}
+              disabled={!add}
             />
             <NumberInput
               label={t("Poids en tonnes")}
@@ -125,28 +125,28 @@ const DoubleCountingSourcingDialog = ({
               {...bind("metric_tonnes")}
             />
             <AutoComplete
-              disabled={!add}
               label={t("Pays d'origine")}
               getOptions={findCountries}
               defaultOptions={compact([value.origin_country])}
               normalize={normalizeCountry}
               {...bind("origin_country")}
+              disabled={!add}
             />
             <AutoComplete
-              disabled={!add}
               label={t("Pays de transit")}
               getOptions={findCountries}
               defaultOptions={compact([value.transit_country])}
               normalize={normalizeCountry}
               {...bind("transit_country")}
+              disabled={!add}
             />
             <AutoComplete
-              disabled={!add}
               label={t("Pays d'approvisionnement")}
               getOptions={findCountries}
               defaultOptions={compact([value.supply_country])}
               normalize={normalizeCountry}
               {...bind("supply_country")}
+              disabled={!add}
             />
           </Form>
         </section>

@@ -56,7 +56,6 @@ export const SupplierField = (props: AutocompleteProps<Entity | string>) => {
 
   return (
     <Autocomplete
-      disabled={props.disabled || isLotProducer(entity, value)}
       label={t("Fournisseur")}
       value={supplier}
       icon={isKnown ? UserCheck : undefined}
@@ -66,6 +65,7 @@ export const SupplierField = (props: AutocompleteProps<Entity | string>) => {
       normalize={norm.normalizeEntityOrUnknown}
       {...bound}
       {...props}
+      disabled={props.disabled || isLotProducer(entity, value)}
     />
   )
 }
@@ -134,7 +134,6 @@ export const ClientField = (props: AutocompleteProps<Entity | string>) => {
   return (
     <Autocomplete
       required={!isExternalDelivery(value)}
-      disabled={entity.isOperator && !hasClients}
       label={t("Client")}
       icon={isKnown ? UserCheck : undefined}
       create={norm.identity}
@@ -143,6 +142,7 @@ export const ClientField = (props: AutocompleteProps<Entity | string>) => {
       normalize={norm.normalizeEntityOrUnknown}
       {...bound}
       {...props}
+      disabled={entity.isOperator && !hasClients}
     />
   )
 }
@@ -177,13 +177,13 @@ export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
   return (
     <Select
       clear
-      disabled={!isDraft && hasChildren}
+      {...bind("delivery_type")}
       label={t("Type de livraison")}
       placeholder={t("Choisissez un type")}
       normalize={norm.normalizeDeliveryType}
       options={deliveryTypes}
-      {...bind("delivery_type")}
       {...props}
+      disabled={!isDraft && hasChildren}
     />
   )
 }
