@@ -124,10 +124,11 @@ export function useForm<T>(
   }, [])
 
   const setDisabledFields = useCallback((fieldsNames: string[]) => {
+    const fields = { ...disabledFields }
     fieldsNames.forEach((name) => {
-      disabledFields[name] = true
+      fields[name] = true
     })
-    _setDisabledFields(disabledFields)
+    _setDisabledFields(fields)
   }, [])
 
   const bind = useBindCallback(value, errors, disabledFields, setField)

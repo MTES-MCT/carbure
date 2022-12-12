@@ -108,9 +108,7 @@ export function useLotForm(
   const form = useForm(setValue(value), { errors, setValue })
 
   // update the form when the loaded lot changes
-  const updateForm = (value: LotFormValue) => {
-    form.setValue(value)
-  }
+  const updateForm = form.setValue
   useEffect(() => updateForm(value), [value, updateForm])
 
   const setDisabledFieldsGroup = (
