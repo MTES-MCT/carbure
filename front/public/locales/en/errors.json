@@ -35,6 +35,7 @@
   "MP_NOT_CONFIGURED": "Feedstock is not specified in production site configuration",
   "DEPOT_NOT_CONFIGURED": "This delivery site is not associated to your company. Please check your settings.",
   "NOT_ALLOWED": "Insufficient access rights",
+  "NOT_ENOUGH_VOLUME_LEFT": "The quantity of the parent stock is not sufficient to extract this batch. The quantity has been reset",
   "PRODUCTION_SITE_COMDATE_FORMAT_INCORRECT": "Date of commissioning format is incorrect",
   "PROVENANCE_MP": "Feedstock origin seems unusual",
   "UNKNOWN_BIOFUEL": "Biofuel is not recognized",
