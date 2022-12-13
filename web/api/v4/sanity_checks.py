@@ -78,9 +78,7 @@ def bulk_sanity_checks(lots, prefetched_data=None):
             results.append(is_sane)
         except:
             traceback.print_exc()
-    GenericError.objects.bulk_create(errors, batch_size=1000)
-    return results
-
+    return GenericError.objects.bulk_create(errors, batch_size=1000)
 
 def bulk_scoring(lots, prefetched_data=None):
     if not prefetched_data:
@@ -248,15 +246,8 @@ def check_certificates(prefetched_data, lot, errors):
     return errors
 
 def sanity_check(lot, prefetched_data):
-    is_sane = True
-    errors = []
-
     # make sure all mandatory fields are set
-    valid, reqfielderrors = sanity_check_mandatory_fields(lot)
-    if not valid:
-        is_sane = False
-        errors += reqfielderrors
-        return is_sane, errors
+    is_sane, errors = sanity_check_mandatory_fields(lot)
 
     if lot.delivery_type == CarbureLot.RFC and lot.biofuel.code not in ['ED95', 'B100', 'ETH', 'EMHV', 'EMHU']:
         errors.append(generic_error(error=CarbureSanityCheckErrors.MAC_BC_WRONG, lot=lot, is_blocking=True, fields=['biofuel', 'delivery_type']))
@@ -356,6 +347,9 @@ def sanity_check(lot, prefetched_data):
     check_certificates(prefetched_data, lot, errors)
     # GHG STATS CHECK
     check_ghg_values(prefetched_data, lot, errors)
+
+    errors += check_integrity(lot, lot.added_by)
+
     for e in errors:
         if e.is_blocking:
             is_sane = False
@@ -419,3 +413,47 @@ def sanity_check_mandatory_fields(lot):
             is_valid = False
     return is_valid, errors
 
+
+
+
+
+
+
+def check_integrity(lot, entity):
+    errors = []
+
+    if entity.entity_type == Entity.PRODUCER:
+        if lot.carbure_producer and lot.carbure_producer != entity:
+            errors.append(
+                generic_error(
+                    error="FORBIDDEN_PRODUCER",
+                    lot=lot,
+                    is_blocking=True,
+                    display_to_creator=True,
+                    fields=["producer"],
+                )
+            )
+
+        if lot.carbure_production_site and lot.carbure_production_site.producer != entity:
+            errors.append(
+                generic_error(
+                    error="FORBIDDEN_PRODUCTION_SITE",
+                    lot=lot,
+                    is_blocking=True,
+                    display_to_creator=True,
+                    fields=["production_site"],
+                )
+            )
+
+    if lot.carbure_supplier and lot.carbure_supplier != entity:
+          errors.append(
+                generic_error(
+                    error="FORBIDDEN_SUPPLIER",
+                    lot=lot,
+                    is_blocking=True,
+                    display_to_creator=True,
+                    fields=["supplier"],
+                )
+            )
+
+    return errors

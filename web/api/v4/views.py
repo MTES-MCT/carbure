@@ -874,6 +874,8 @@ def lots_delete(request, *args, **kwargs):
                 event.user = None
                 event.metadata = {'message': 'child lot deleted. back to inbox.'}
                 event.save()
+        if lot.lot_status == CarbureLot.DRAFT:
+            lot.delete()
 
     return JsonResponse({'status': 'success'})
 

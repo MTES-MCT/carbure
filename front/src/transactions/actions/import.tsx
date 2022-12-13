@@ -150,7 +150,6 @@ function useImportLots(onClose?: () => void) {
 
     onError: () => {
       notify(t("Les lots n'ont pas pu être importés"), { variant: "danger" })
-      onClose?.()
     },
   })
 }

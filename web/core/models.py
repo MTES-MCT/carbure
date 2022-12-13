@@ -426,7 +426,7 @@ class CarbureLot(models.Model):
     DSP = "DSP"
     OTHER = "OTHER"
     TRANSPORT_DOCUMENT_TYPES = ((DAU, DAU), (DAE, DAE), (DSA, DSA), (DSAC, DSAC), (DSP, DSP), (OTHER, OTHER),)
-    transport_document_type = models.CharField(max_length=12, blank=False, null=False, choices=TRANSPORT_DOCUMENT_TYPES, default=DAE)
+    transport_document_type = models.CharField(max_length=12, blank=False, null=True, choices=TRANSPORT_DOCUMENT_TYPES, default=DAE)
     transport_document_reference = models.CharField(max_length=128, blank=True, null=True, default=None)
     carbure_client = models.ForeignKey(Entity, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name='carbure_client')
     unknown_client = models.CharField(max_length=64, blank=True, null=True, default=None)
