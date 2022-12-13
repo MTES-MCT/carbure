@@ -42,3 +42,4 @@ DPSC,Déchet de processus sucrier contaminé,1,0,0,0,1,OTHER
 GRAISSES_FLOTTATION,Graisses de flottation,0,1,1,0,1,ANN-IX-A
 SORGHO,Sorgho,1,0,0,0,1,CONV
 MELASSE,Mélasse,1,0,0,0,1,CONV
+CARINATA,Carinata,0,1,0,1,1,CONV
