@@ -25,6 +25,8 @@ import { OperatorTicketDetails } from "../ticket-details/operator-details"
 import TicketSourceDetail from "../ticket-source-details"
 import { StatusSwitcher } from "./status-switcher"
 import TicketSourcesTable from "./table"
+import { useState } from "react"
+import { TicketSourcesSummary } from "./summary"
 
 export interface TicketSourcesProps {
   year: number
@@ -37,6 +39,8 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
   const entity = useEntity()
   const status = useAutoStatus()
   const [state, actions] = useQueryParamsStore(entity, year, status, snapshot)
+  const [selection, setSelection] = useState<number[]>([])
+
   const query = useSafQuery(state)
 
   const ticketSourcesResponse = useQuery(api.getOperatorTicketSources, {
@@ -72,6 +76,7 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
           }
         />
       </Bar>
+
       <section>
         <ActionBar>
           <StatusSwitcher
@@ -89,6 +94,10 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
           />
         </ActionBar>
 
+        {selection.length > 0 && (
+          <TicketSourcesSummary query={query} selection={selection} />
+        )}
+
         {count > 0 && ticketSources ? (
           <>
             <TicketSourcesTable
@@ -96,6 +105,8 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
               order={state.order}
               ticketSources={ticketSources}
               rowLink={showTicketSourceDetail}
+              selected={selection}
+              onSelect={setSelection}
               onOrder={actions.setOrder}
             />
 

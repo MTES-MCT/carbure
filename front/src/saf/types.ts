@@ -41,6 +41,23 @@ export interface SafTicketSource {
 
 }
 
+export interface SafTicketSourceSummary extends SafTicketSource, SafProduction, SafDurability {
+  count: number
+  total_volume: number
+  ticket_sources: SafTicketSourceSummaryItem[]
+}
+
+export interface SafTicketSourceSummaryItem {
+  id: number
+  carbure_id: string
+  year: number
+  delivery_period: number
+  total_volume: number
+  feedstock: Feedstock
+  biofuel: Biofuel
+}
+
+
 export interface SafTicketSourceDetails extends SafTicketSource, SafProduction, SafDurability {
   added_by: Entity,
   parent_lot: LotPreview
