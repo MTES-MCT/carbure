@@ -10,7 +10,6 @@ import { useMatch } from "react-router-dom"
 import css from "./tabs.module.css"
 
 import {
-  SafClientSnapshot,
   SafOperatorSnapshot,
   SafTicketSourceStatus,
   SafTicketStatus,

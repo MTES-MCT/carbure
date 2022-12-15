@@ -1,5 +1,5 @@
 import Button from "common/components/button"
-import Table, { Cell, Order } from "common/components/table"
+import Table, { Cell, Order, selectionColumn } from "common/components/table"
 import { compact } from "common/utils/collection"
 import { formatNumber, formatPeriod } from "common/utils/formatters"
 import { memo } from "react"
@@ -14,6 +14,8 @@ export interface TicketSourcesTableProps {
   order: Order | undefined
   rowLink: (ticketSource: SafTicketSource) => To
   onOrder: (order: Order | undefined) => void
+  selected: number[]
+  onSelect: (selected: number[]) => void
 }
 
 export const TicketSourcesTable = memo(
@@ -23,6 +25,8 @@ export const TicketSourcesTable = memo(
     order,
     rowLink,
     onOrder,
+    selected,
+    onSelect,
   }: TicketSourcesTableProps) => {
     const columns = useColumns()
     return (
@@ -33,6 +37,12 @@ export const TicketSourcesTable = memo(
         rowLink={rowLink}
         rows={ticketSources}
         columns={compact([
+          selectionColumn(
+            ticketSources,
+            selected,
+            onSelect,
+            (ticketSource) => ticketSource.id
+          ),
           columns.status,
           columns.availableVolume,
           columns.clients,

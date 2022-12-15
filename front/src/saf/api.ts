@@ -1,7 +1,7 @@
 import { extract } from "carbure/api"
 import { Entity, EntityPreview } from "carbure/types"
 import { api, Api } from "common/services/api"
-import { SafFilter, SafOperatorSnapshot, SafQuery, SafTicketDetails, SafTicketSourceDetails, SafTicketSourcesResponse, SafTicketsResponse } from "./types"
+import { SafFilter, SafOperatorSnapshot, SafQuery, SafTicketDetails, SafTicketSourceDetails, SafTicketSourcesResponse, SafTicketSourceSummary, SafTicketsResponse } from "./types"
 
 import * as data from "./__test__/data"
 const QUERY_RESET: Partial<SafQuery> = {
@@ -69,6 +69,16 @@ export function getTicketSourceFilters(field: SafFilter, query: SafQuery) {
 
 export function getOperatorTicketSources(query: SafQuery) {
   return api.get<Api<SafTicketSourcesResponse>>("/v5/saf/operator/ticket-sources", { params: query })
+}
+
+
+export function getTicketSourcesSummary(
+  query: SafQuery,
+  selection: number[]
+) {
+  return api.get<Api<SafTicketSourceSummary>>("/v5/saf/operator/ticket-sources-summary", {
+    params: { ...query, selection, ...QUERY_RESET },
+  })
 }
 
 export function getOperatorTicketSourceDetails(entity_id: number, ticket_source_id: number) {
