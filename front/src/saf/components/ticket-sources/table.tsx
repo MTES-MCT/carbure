@@ -5,7 +5,7 @@ import { formatNumber, formatPeriod } from "common/utils/formatters"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import { To, useLocation, useNavigate } from "react-router-dom"
-import { SafTicketSource } from "saf/types"
+import { SafTicketSource, SafTicketSourceStatus } from "saf/types"
 import { TicketSourceTag } from "./tag"
 
 export interface TicketSourcesTableProps {
@@ -16,6 +16,7 @@ export interface TicketSourcesTableProps {
   onOrder: (order: Order | undefined) => void
   selected: number[]
   onSelect: (selected: number[]) => void
+  status: SafTicketSourceStatus
 }
 
 export const TicketSourcesTable = memo(
@@ -27,6 +28,7 @@ export const TicketSourcesTable = memo(
     onOrder,
     selected,
     onSelect,
+    status,
   }: TicketSourcesTableProps) => {
     const columns = useColumns()
     return (
@@ -37,12 +39,13 @@ export const TicketSourcesTable = memo(
         rowLink={rowLink}
         rows={ticketSources}
         columns={compact([
-          selectionColumn(
-            ticketSources,
-            selected,
-            onSelect,
-            (ticketSource) => ticketSource.id
-          ),
+          status === SafTicketSourceStatus.Available &&
+            selectionColumn(
+              ticketSources,
+              selected,
+              onSelect,
+              (ticketSource) => ticketSource.id
+            ),
           columns.status,
           columns.availableVolume,
           columns.clients,

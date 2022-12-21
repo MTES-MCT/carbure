@@ -94,7 +94,7 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
           />
         </ActionBar>
 
-        {selection.length > 0 && (
+        {selection.length > 0 && status === SafTicketSourceStatus.Available && (
           <TicketSourcesSummary query={query} selection={selection} />
         )}
 
@@ -108,6 +108,7 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
               selected={selection}
               onSelect={setSelection}
               onOrder={actions.setOrder}
+              status={status as SafTicketSourceStatus}
             />
 
             {(state.limit || 0) < total && (

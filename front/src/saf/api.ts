@@ -124,6 +124,26 @@ export function assignSafTicket(
   })
 }
 
+export function groupedAssignSafTicket(
+  entity_id: number,
+  ticket_sources_ids: number[],
+  volume: number,
+  assignment_period: number,
+  client: EntityPreview,
+  agreement_number: string,
+  free_field?: string
+) {
+  return api.post("/v5/saf/operator/grouped-assign-ticket", {
+    entity_id,
+    ticket_sources_ids,
+    assignment_period,
+    volume,
+    client_id: client.id,
+    free_field,
+    agreement_number
+  })
+}
+
 
 export function cancelSafTicket(
   entity_id: number,
