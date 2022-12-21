@@ -8,7 +8,7 @@ import {
 } from "carbure/types"
 
 // ENTITIES
-export const company: Entity = { //TODO à definir en fonction des types choisis pour les compagnies aeriennes
+export const company: Entity = {
   id: 0,
   name: "Compagnie Test",
   entity_type: EntityType.Producer,
