@@ -9,19 +9,22 @@ import { Return, Send } from "common/components/icons"
 import { TextInput } from "common/components/input"
 import Portal from "common/components/portal"
 import { useMutation } from "common/hooks/async"
+import { formatPeriodFromDate } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import { SafTicketSourceDetails } from "saf/types"
+import { SafTicketSource, SafTicketSourceDetails } from "saf/types"
 import * as api from "../../api"
 import { PeriodSelect } from "./period-select"
 import { VolumeInput } from "./volume-input"
 
 export interface TicketsGroupedAssignmentProps {
-  ticketSources: SafTicketSourceDetails[]
+  ticketSources: SafTicketSource[]
+  remainingVolume: number
   onClose: () => void
   onTicketsAssigned: (volume: number, clientName: string) => void
 }
 const TicketsGroupedAssignment = ({
   ticketSources,
+  remainingVolume,
   onClose,
   onTicketsAssigned,
 }: TicketsGroupedAssignmentProps) => {
@@ -29,17 +32,7 @@ const TicketsGroupedAssignment = ({
   const entity = useEntity()
 
   const { value, bind, setField, setFieldError } =
-    useForm<AssignmentForm>(defaultAssignment)
-
-  const remainingVolume =
-    ticketSources.reduce(
-      (sum, ticketSource) => sum + ticketSource.total_volume,
-      0
-    ) -
-    ticketSources.reduce(
-      (sum, ticketSource) => sum + ticketSource.assigned_volume,
-      0
-    )
+    useForm<GroupedAssignmentForm>(defaultAssignment)
 
   const groupedAssignSafTicket = useMutation(api.groupedAssignSafTicket, {
     invalidates: ["ticket-sources", "operator-snapshot"],
@@ -55,7 +48,7 @@ const TicketsGroupedAssignment = ({
       entity.id,
       ticketSources.map((ticketSource) => ticketSource.id),
       value.volume!,
-      value.assignment_period,
+      value.assignment_period!,
       value.client!,
       value.free_field!
     )
@@ -105,6 +98,12 @@ const TicketsGroupedAssignment = ({
                 {...bind("client")}
               />
 
+              <TextInput
+                required
+                label={t("N° du certificat d'acquisition")}
+                {...bind("agreement_reference")}
+              />
+
               <TextInput label={t("Champ libre")} {...bind("free_field")} />
             </Form>
           </section>
@@ -127,15 +126,12 @@ const TicketsGroupedAssignment = ({
 
 export default TicketsGroupedAssignment
 
-const formatPeriodFromDate = (date: Date) => {
-  return date.getFullYear() * 100 + date.getMonth() + 1
-}
-
 const defaultAssignment = {
   volume: 0 as number | undefined,
   client: undefined as EntityPreview | undefined,
   assignment_period: formatPeriodFromDate(new Date()),
   free_field: "" as string | undefined,
+  agreement_reference: "" as string | undefined,
 }
 
-export type AssignmentForm = typeof defaultAssignment
+export type GroupedAssignmentForm = typeof defaultAssignment

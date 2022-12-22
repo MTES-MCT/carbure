@@ -9,6 +9,7 @@ import { Return, Send } from "common/components/icons"
 import { TextInput } from "common/components/input"
 import Portal from "common/components/portal"
 import { useMutation } from "common/hooks/async"
+import { formatPeriodFromDate } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { SafTicketSourceDetails } from "saf/types"
 import * as api from "../../api"
@@ -126,10 +127,6 @@ export const TicketAssignment = ({
 }
 
 export default TicketAssignment
-
-const formatPeriodFromDate = (date: Date) => {
-  return date.getFullYear() * 100 + date.getMonth() + 1
-}
 
 const defaultAssignment = {
   volume: 0 as number | undefined,
