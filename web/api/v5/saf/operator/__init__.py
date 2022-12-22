@@ -26,6 +26,7 @@ urlpatterns = [
     path("tickets/details", get_ticket_details, name="api-v5-saf-operator-ticket-details"),
     # ticket actions
     path("assign-ticket", assign_ticket, name="api-v5-saf-operator-assign-ticket"),
+    path("grouped-assign-ticket", assign_ticket, name="api-v5-saf-operator-grouped-assign-ticket"),
     path("cancel-ticket", cancel_ticket, name="api-v5-saf-operator-cancel-ticket"),
     # autocomplete helpers
     path("clients", get_clients, name="api-v5-saf-operator-clients"),
