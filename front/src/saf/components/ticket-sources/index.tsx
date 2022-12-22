@@ -39,8 +39,6 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
   const entity = useEntity()
   const status = useAutoStatus()
   const [state, actions] = useQueryParamsStore(entity, year, status, snapshot)
-  console.log("state:", state.selection)
-  // const [selection, setSelection] = useState<number[]>([]) //TODO Tous l'object plutot que juste l'id afin d'afficher dans la popup d'affectation
 
   const query = useSafQuery(state)
 
@@ -50,13 +48,12 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
   })
 
   const ticketSoucesData = ticketSourcesResponse.result?.data.data
-  // const ticketSoucesData = data.safTicketSourcesResponse //TO TEST with testing d:ata
   const ids = ticketSoucesData?.ids ?? []
 
   const total = ticketSoucesData?.total ?? 0
   const count = ticketSoucesData?.returned ?? 0
   const ticketSources = ticketSoucesData?.saf_ticket_sources
-  console.log("ticketSources:", ticketSources)
+
   let selectedTicketSources
   if (state.selection?.length > 0 && ticketSources) {
     selectedTicketSources = state.selection.map(

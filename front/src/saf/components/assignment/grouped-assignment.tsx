@@ -3,13 +3,18 @@ import { EntityPreview } from "carbure/types"
 import * as norm from "carbure/utils/normalizers"
 import Autocomplete from "common/components/autocomplete"
 import Button from "common/components/button"
+import Collapse from "common/components/collapse"
 import Dialog from "common/components/dialog"
 import Form, { useForm } from "common/components/form"
-import { Return, Send } from "common/components/icons"
+import { Return, Send, Split } from "common/components/icons"
 import { TextInput } from "common/components/input"
 import Portal from "common/components/portal"
 import { useMutation } from "common/hooks/async"
-import { formatPeriodFromDate } from "common/utils/formatters"
+import {
+  formatNumber,
+  formatPeriod,
+  formatPeriodFromDate,
+} from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { SafTicketSource, SafTicketSourceDetails } from "saf/types"
 import * as api from "../../api"
@@ -20,7 +25,11 @@ export interface TicketsGroupedAssignmentProps {
   ticketSources: SafTicketSource[]
   remainingVolume: number
   onClose: () => void
-  onTicketsAssigned: (volume: number, clientName: string) => void
+  onTicketsAssigned: (
+    volume: number,
+    clientName: string,
+    assignedTicketsCount: number
+  ) => void
 }
 const TicketsGroupedAssignment = ({
   ticketSources,
@@ -44,7 +53,7 @@ const TicketsGroupedAssignment = ({
       return
     }
 
-    await groupedAssignSafTicket.execute(
+    const response = await groupedAssignSafTicket.execute(
       entity.id,
       ticketSources.map((ticketSource) => ticketSource.id),
       value.volume!,
@@ -52,8 +61,15 @@ const TicketsGroupedAssignment = ({
       value.client!,
       value.free_field!
     )
-    onTicketsAssigned(value.volume!, value.client!.name)
-    onClose()
+
+    if (response.data.data) {
+      onTicketsAssigned(
+        value.volume!,
+        value.client!.name,
+        response.data.data?.assignedTicketsCount
+      )
+      onClose()
+    }
   }
 
   const setMaximumVolume = () => {
@@ -63,6 +79,10 @@ const TicketsGroupedAssignment = ({
   const findSafClient = (query: string) => {
     return api.findClients(query)
   }
+
+  const lastDeliveryPeriod = ticketSources.sort(
+    (a, b) => b.delivery_period - a.delivery_period
+  )[0].delivery_period
 
   return (
     <Portal onClose={onClose}>
@@ -75,9 +95,44 @@ const TicketsGroupedAssignment = ({
           <section>
             <p>
               {t(
-                "Veuillez remplir le formulaire ci-dessous afin d’affecter une partie ou tout le volume du lot à un client et générer un ticket de Carburant Durable d'Aviation"
+                "Veuillez remplir le formulaire ci-dessous afin d’affecter une partie ou tout le volume des lots :"
               )}
             </p>
+
+            <Collapse
+              variant="info"
+              icon={Split}
+              label={t(
+                "{{volumeCount}} volumes sélectionnés pour un total de {{remainingVolume}} L",
+                {
+                  volumeCount: ticketSources.length,
+                  remainingVolume: formatNumber(remainingVolume),
+                }
+              )}
+            >
+              <section>
+                <ul>
+                  {ticketSources.map((ticketSource) => {
+                    return (
+                      <li key={ticketSource.id}>
+                        {" "}
+                        {t("{{volume}} L - {{period}} - {{feedstock}}", {
+                          volume: formatNumber(
+                            ticketSource.total_volume -
+                              ticketSource.assigned_volume
+                          ),
+                          period: formatPeriod(ticketSource.delivery_period),
+                          feedstock: t(ticketSource.feedstock?.code ?? "", {
+                            ns: "feedstocks",
+                          }),
+                        })}
+                      </li>
+                    )
+                  })}
+                </ul>
+              </section>
+              <footer></footer>
+            </Collapse>
 
             <Form id="assign-ticket" onSubmit={groupedAssignTicket}>
               <VolumeInput
@@ -86,7 +141,7 @@ const TicketsGroupedAssignment = ({
                 {...bind("volume")}
               />
               <PeriodSelect
-                deliveryPeriod={ticketSources[0].delivery_period} //TODO à partir de quel delivery period ?
+                deliveryPeriod={lastDeliveryPeriod}
                 {...bind("assignment_period")}
               />
 

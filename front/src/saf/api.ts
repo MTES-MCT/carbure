@@ -1,5 +1,5 @@
 import { extract } from "carbure/api"
-import { Entity, EntityPreview } from "carbure/types"
+import { EntityPreview } from "carbure/types"
 import { api, Api } from "common/services/api"
 import {
   SafFilter,
@@ -7,12 +7,9 @@ import {
   SafQuery,
   SafTicketDetails,
   SafTicketSourceDetails,
-  SafTicketSourcesResponse,
-  SafTicketSourceSummary,
-  SafTicketsResponse,
+  SafTicketSourcesResponse, SafTicketsResponse
 } from "./types"
 
-import * as data from "./__test__/data"
 const QUERY_RESET: Partial<SafQuery> = {
   limit: undefined,
   from_idx: undefined,
@@ -145,7 +142,7 @@ export function groupedAssignSafTicket(
   free_field?: string
 ) {
 
-  return api.post("/v5/saf/operator/grouped-assign-ticket", {
+  return api.post<Api<{ assignedTicketsCount: number }>>("/v5/saf/operator/grouped-assign-ticket", {
     entity_id,
     ticket_sources_ids,
     assignment_period,
