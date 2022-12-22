@@ -144,14 +144,15 @@ export function groupedAssignSafTicket(
   agreement_reference: string,
   free_field?: string
 ) {
+
   return api.post("/v5/saf/operator/grouped-assign-ticket", {
     entity_id,
     ticket_sources_ids,
     assignment_period,
     volume,
     client_id: client.id,
-    free_field,
     agreement_reference,
+    free_field,
   })
 }
 

@@ -57,6 +57,12 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
   const count = ticketSoucesData?.returned ?? 0
   const ticketSources = ticketSoucesData?.saf_ticket_sources
   console.log("ticketSources:", ticketSources)
+  let selectedTicketSources
+  if (state.selection?.length > 0 && ticketSources) {
+    selectedTicketSources = state.selection.map(
+      (id) => ticketSources.find((t) => t.id === id)!
+    )
+  }
 
   const showTicketSourceDetail = (ticketSource: SafTicketSource) => {
     return {
@@ -96,9 +102,9 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
           />
         </ActionBar>
 
-        {state.selection.length > 0 &&
+        {selectedTicketSources &&
           status === SafTicketSourceStatus.Available && (
-            <TicketSourcesSummary query={query} selection={state.selection} />
+            <TicketSourcesSummary ticketSources={selectedTicketSources} />
           )}
 
         {count > 0 && ticketSources ? (
