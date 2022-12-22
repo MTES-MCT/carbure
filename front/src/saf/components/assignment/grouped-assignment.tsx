@@ -15,16 +15,16 @@ import * as api from "../../api"
 import { PeriodSelect } from "./period-select"
 import { VolumeInput } from "./volume-input"
 
-export interface TicketAssignmentProps {
+export interface TicketsGroupedAssignmentProps {
   ticketSources: SafTicketSourceDetails[]
   onClose: () => void
   onTicketsAssigned: (volume: number, clientName: string) => void
 }
-export const TicketAssignment = ({
+const TicketsGroupedAssignment = ({
   ticketSources,
   onClose,
   onTicketsAssigned,
-}: TicketAssignmentProps) => {
+}: TicketsGroupedAssignmentProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
 
@@ -125,7 +125,7 @@ export const TicketAssignment = ({
   )
 }
 
-export default TicketAssignment
+export default TicketsGroupedAssignment
 
 const formatPeriodFromDate = (date: Date) => {
   return date.getFullYear() * 100 + date.getMonth() + 1

@@ -7,7 +7,6 @@ import { useQuery } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import { SafQuery } from "saf/types"
 import * as api from "../../api"
-import TicketAssignment from "../assignment"
 
 export interface TicketSourcesSummaryProps {
   query: SafQuery
@@ -35,10 +34,10 @@ export const TicketSourcesSummary = ({
   const showGroupedAssignement = () => {
     //TODO Grouped assignement modal
     // portal((close) => (
-    //   <TicketAssignment
-    //     ticketSource={ticketSource!}
+    //   <TicketsGroupedAssignment
+    //     ticketSources={}
     //     onClose={close}
-    //     onTicketAssigned={handleTicketAssigned}
+    //     onTicketsAssigned={() => console.log('TODO')}
     //   />
     // ))
   }

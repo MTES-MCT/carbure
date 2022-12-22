@@ -39,7 +39,8 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
   const entity = useEntity()
   const status = useAutoStatus()
   const [state, actions] = useQueryParamsStore(entity, year, status, snapshot)
-  const [selection, setSelection] = useState<number[]>([])
+  console.log("state:", state.selection)
+  // const [selection, setSelection] = useState<number[]>([]) //TODO Tous l'object plutot que juste l'id afin d'afficher dans la popup d'affectation
 
   const query = useSafQuery(state)
 
@@ -55,6 +56,7 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
   const total = ticketSoucesData?.total ?? 0
   const count = ticketSoucesData?.returned ?? 0
   const ticketSources = ticketSoucesData?.saf_ticket_sources
+  console.log("ticketSources:", ticketSources)
 
   const showTicketSourceDetail = (ticketSource: SafTicketSource) => {
     return {
@@ -94,9 +96,10 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
           />
         </ActionBar>
 
-        {selection.length > 0 && status === SafTicketSourceStatus.Available && (
-          <TicketSourcesSummary query={query} selection={selection} />
-        )}
+        {state.selection.length > 0 &&
+          status === SafTicketSourceStatus.Available && (
+            <TicketSourcesSummary query={query} selection={state.selection} />
+          )}
 
         {count > 0 && ticketSources ? (
           <>
@@ -105,8 +108,8 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
               order={state.order}
               ticketSources={ticketSources}
               rowLink={showTicketSourceDetail}
-              selected={selection}
-              onSelect={setSelection}
+              selected={state.selection}
+              onSelect={actions.setSelection}
               onOrder={actions.setOrder}
               status={status as SafTicketSourceStatus}
             />
