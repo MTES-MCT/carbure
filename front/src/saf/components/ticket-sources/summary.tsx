@@ -5,26 +5,26 @@ import { Filter } from "common/components/icons"
 import { usePortal } from "common/components/portal"
 import { useQuery } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
-import { SafQuery } from "saf/types"
+import { SafQuery, SafTicketSource } from "saf/types"
 import * as api from "../../api"
 
 export interface TicketSourcesSummaryProps {
   query: SafQuery
-  selection: number[]
+  ticketSources: SafTicketSource[]
 }
 
 export const TicketSourcesSummary = ({
   query,
-  selection,
+  ticketSources,
 }: TicketSourcesSummaryProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
   const entity = useEntity()
 
-  const summary = useQuery(api.getTicketSourcesSummary, {
-    key: "lots-summary",
-    params: [query, selection],
-  })
+  // const summary = useQuery(api.getTicketSourcesSummary, {
+  //   key: "lots-summary",
+  //   params: [query, selection],
+  // })
 
   const summaryData = summary.result?.data.data ?? {
     count: 0,
