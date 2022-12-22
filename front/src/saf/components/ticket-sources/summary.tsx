@@ -2,6 +2,7 @@ import useEntity from "carbure/hooks/entity"
 import Alert from "common/components/alert"
 import Button from "common/components/button"
 import { Filter } from "common/components/icons"
+import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { useQuery } from "common/hooks/async"
 import { formatNumber } from "common/utils/formatters"
@@ -19,42 +20,43 @@ export const TicketSourcesSummary = ({
 }: TicketSourcesSummaryProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
-  const entity = useEntity()
 
-  console.log("ticketSources:", ticketSources)
-  // const summary = useQuery(api.getTicketSourcesSummary, {
-  //   key: "lots-summary",
-  //   params: [query, selection],
-  // })
-
-  // const summaryData = summary.result?.data.data ?? {
-  //   count: 0,
-  //   total_volume: 0,
-  // }
-
+  const notify = useNotify()
   const totalVolume = ticketSources.reduce(
     (total, ticketSource) => total + ticketSource.total_volume,
     0
   )
-
   const assignedVolume = ticketSources.reduce(
     (total, ticketSource) => total + ticketSource.assigned_volume,
     0
   )
-  console.log("assignedVolume:", assignedVolume)
-
   const remainingVolume = totalVolume - assignedVolume
 
-  console.log("totalVolume:", totalVolume)
+  const handleTicketsAssigned = (
+    volume: number,
+    clientName: string,
+    assignedTicketsCount: number
+  ) => {
+    notify(
+      t(
+        "{{volume}} litres ont bien été affectés à {{clientName}}. {{assignedTicketsCount}} tickets ont été générés.",
+        {
+          volume,
+          clientName,
+          assignedTicketsCount,
+        }
+      ),
+      { variant: "success" }
+    )
+  }
 
   const showGroupedAssignement = () => {
-    //TODO Grouped assignement modal
     portal((close) => (
       <TicketsGroupedAssignment
         ticketSources={ticketSources}
         remainingVolume={remainingVolume}
         onClose={close}
-        onTicketsAssigned={() => console.log("TODO")}
+        onTicketsAssigned={handleTicketsAssigned}
       />
     ))
   }

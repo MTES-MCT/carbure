@@ -44,7 +44,7 @@ export const TicketSourcesTable = memo(
               ticketSources,
               selected,
               onSelect,
-              (ticketSource) => ticketSource.id //TODO return ticket Source ?
+              (ticketSource) => ticketSource.id
             ),
           columns.status,
           columns.availableVolume,

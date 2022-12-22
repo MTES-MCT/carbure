@@ -21,6 +21,7 @@ import ParentLot from "./parent-lot"
 export interface TicketSourceDetailsProps {
   neighbors: number[]
 }
+
 export const TicketSourceDetails = ({
   neighbors,
 }: TicketSourceDetailsProps) => {
@@ -39,7 +40,7 @@ export const TicketSourceDetails = ({
   })
 
   const ticketSource = ticketSourceResponse.result?.data?.data
-  // const ticketSource = safTicketSourceDetails //TO TEST
+
   const hasAssignements = ticketSource
     ? ticketSource?.assigned_tickets?.length > 0
     : false
