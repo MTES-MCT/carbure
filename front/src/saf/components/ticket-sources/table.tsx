@@ -70,6 +70,7 @@ export function useColumns() {
     },
 
     availableVolume: {
+      key: "volume",
       header: t("Volumes disponibles"),
       cell: (ticketSource: SafTicketSource) => (
         <Cell
@@ -82,7 +83,7 @@ export function useColumns() {
     },
 
     clients: {
-      key: "clients",
+      // key: "clients",
       header: t("Clients"),
       cell: (ticketSource: SafTicketSource) => {
         const value =
