@@ -21,7 +21,7 @@ class SafTicketGroupedAssignError:
 def grouped_assign_ticket(request, *args, **kwargs):
     try:
         entity_id = int(kwargs["context"]["entity_id"])
-        ticket_source_ids = [int(id) for id in request.POST.getlist("ticket_source_ids")]
+        ticket_sources_ids = [int(id) for id in request.POST.getlist("ticket_sources_ids")]
         client_id = int(request.POST.get("client_id"))
         volume = float(request.POST.get("volume"))
         agreement_reference = request.POST.get("agreement_reference")
@@ -33,7 +33,7 @@ def grouped_assign_ticket(request, *args, **kwargs):
         return ErrorResponse(400, SafTicketGroupedAssignError.MALFORMED_PARAMS)
 
     try:
-        ticket_sources = SafTicketSource.objects.filter(id__in=ticket_source_ids, added_by_id=entity_id).order_by("created_at")  # fmt:skip
+        ticket_sources = SafTicketSource.objects.filter(id__in=ticket_sources_ids, added_by_id=entity_id).order_by("created_at")  # fmt:skip
     except Exception:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketGroupedAssignError.TICKET_SOURCE_NOT_FOUND)
@@ -50,6 +50,7 @@ def grouped_assign_ticket(request, *args, **kwargs):
             return ErrorResponse(400, SafTicketGroupedAssignError.ASSIGNMENT_BEFORE_DELIVERY)
 
         with transaction.atomic():
+            assigned_tickets_count = 0
             remaining_volume_to_assign = volume
 
             for ticket_source in ticket_sources:
@@ -58,6 +59,10 @@ def grouped_assign_ticket(request, *args, **kwargs):
                 available_volume_in_source = ticket_source.total_volume - ticket_source.assigned_volume
                 # - and what's left in the amount asked by the user
                 ticket_volume = min(remaining_volume_to_assign, available_volume_in_source)
+
+                # do not
+                if ticket_volume <= 0:
+                    break
 
                 ticket = create_ticket_from_source(
                     ticket_source,
@@ -76,11 +81,12 @@ def grouped_assign_ticket(request, *args, **kwargs):
                     meta={"supplier": ticket.supplier.name, "ticket_id": ticket.id, "year": ticket.year},
                 )
 
+                assigned_tickets_count += 1
                 ticket_source.assigned_volume += ticket.volume
                 remaining_volume_to_assign -= ticket.volume
                 ticket_source.save()
 
-        return SuccessResponse()
+        return SuccessResponse({"assigned_tickets_count": assigned_tickets_count})
     except Exception:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketGroupedAssignError.TICKET_CREATION_FAILED)

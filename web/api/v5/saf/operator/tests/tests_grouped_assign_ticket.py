@@ -33,7 +33,7 @@ class SafGroupedAssignTicketTest(TestCase):
     def test_grouped_assign_saf_ticket_not_enough_volume(self):
         query = {
             "entity_id": self.entity.id,
-            "ticket_source_ids": [self.ticket_source1.id, self.ticket_source2.id],
+            "ticket_sources_ids": [self.ticket_source1.id, self.ticket_source2.id],
             "client_id": self.ticket_client.id,
             "volume": 55000,
             "agreement_reference": "AGREF",
@@ -50,7 +50,7 @@ class SafGroupedAssignTicketTest(TestCase):
     def test_grouped_assign_saf_ticket_too_early(self):
         query = {
             "entity_id": self.entity.id,
-            "ticket_source_ids": [self.ticket_source1.id, self.ticket_source2.id],
+            "ticket_sources_ids": [self.ticket_source1.id, self.ticket_source2.id],
             "client_id": self.ticket_client.id,
             "volume": 40000,
             "agreement_reference": "AGREF",
@@ -67,7 +67,7 @@ class SafGroupedAssignTicketTest(TestCase):
     def test_grouped_assign_saf_ticket_ok(self):
         query = {
             "entity_id": self.entity.id,
-            "ticket_source_ids": [self.ticket_source1.id, self.ticket_source2.id, self.ticket_source3.id],
+            "ticket_sources_ids": [self.ticket_source1.id, self.ticket_source2.id, self.ticket_source3.id],
             "client_id": self.ticket_client.id,
             "volume": 55000,
             "agreement_reference": "AGREF",
@@ -79,6 +79,7 @@ class SafGroupedAssignTicketTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "success")
+        self.assertEqual(response.json()["data"]["assigned_tickets_count"], 3)
 
         tickets = SafTicket.objects.all().order_by("created_at")
         self.assertEqual(tickets.count(), 3)
