@@ -2,13 +2,14 @@
 
 import traceback
 from django.db import transaction
+from django.db.models.aggregates import Sum, Max
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
 from saf.models import SafTicketSource, create_ticket_from_source
 from core.models import UserRights, CarbureNotification
 
 
-class SafTicketAssignError:
+class SafTicketGroupedAssignError:
     MALFORMED_PARAMS = "MALFORMED_PARAMS"
     VOLUME_TOO_BIG = "VOLUME_TOO_BIG"
     TICKET_CREATION_FAILED = "TICKET_CREATION_FAILED"
@@ -17,10 +18,10 @@ class SafTicketAssignError:
 
 
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
-def assign_ticket(request, *args, **kwargs):
+def grouped_assign_ticket(request, *args, **kwargs):
     try:
         entity_id = int(kwargs["context"]["entity_id"])
-        ticket_source_id = int(request.POST.get("ticket_source_id"))
+        ticket_source_ids = [int(id) for id in request.POST.getlist("ticket_source_ids")]
         client_id = int(request.POST.get("client_id"))
         volume = float(request.POST.get("volume"))
         agreement_reference = request.POST.get("agreement_reference")
@@ -29,43 +30,57 @@ def assign_ticket(request, *args, **kwargs):
         assignment_period = int(request.POST.get("assignment_period"))
     except:
         traceback.print_exc()
-        return ErrorResponse(400, SafTicketAssignError.MALFORMED_PARAMS)
+        return ErrorResponse(400, SafTicketGroupedAssignError.MALFORMED_PARAMS)
 
     try:
-        ticket_source = SafTicketSource.objects.get(id=ticket_source_id, added_by_id=entity_id)
+        ticket_sources = SafTicketSource.objects.filter(id__in=ticket_source_ids, added_by_id=entity_id).order_by("created_at")  # fmt:skip
     except Exception:
         traceback.print_exc()
-        return ErrorResponse(400, SafTicketAssignError.TICKET_SOURCE_NOT_FOUND)
-
-    if volume > (ticket_source.total_volume - ticket_source.assigned_volume):
-        return ErrorResponse(400, SafTicketAssignError.VOLUME_TOO_BIG)
-
-    if assignment_period < ticket_source.delivery_period:
-        return ErrorResponse(400, SafTicketAssignError.ASSIGNMENT_BEFORE_DELIVERY)
+        return ErrorResponse(400, SafTicketGroupedAssignError.TICKET_SOURCE_NOT_FOUND)
 
     try:
+        total_volume_in_selection = ticket_sources.aggregate(Sum("total_volume"))["total_volume__sum"]
+        assigned_volume_in_selection = ticket_sources.aggregate(Sum("assigned_volume"))["assigned_volume__sum"]
+        if volume > (total_volume_in_selection - assigned_volume_in_selection):
+            return ErrorResponse(400, SafTicketGroupedAssignError.VOLUME_TOO_BIG)
+
+        # use the most recent period of all the selected ticket sources to decide if the asked period is ok
+        most_recent_period = ticket_sources.aggregate(Max("delivery_period"))["delivery_period__max"]
+        if assignment_period < most_recent_period:
+            return ErrorResponse(400, SafTicketGroupedAssignError.ASSIGNMENT_BEFORE_DELIVERY)
+
         with transaction.atomic():
-            ticket = create_ticket_from_source(
-                ticket_source,
-                client_id=client_id,
-                volume=volume,
-                agreement_date=agreement_date,
-                agreement_reference=agreement_reference,
-                assignment_period=assignment_period,
-                free_field=free_field,
-            )
+            remaining_volume_to_assign = volume
 
-            CarbureNotification.objects.create(
-                type=CarbureNotification.SAF_TICKET_RECEIVED,
-                dest_id=client_id,
-                send_by_email=False,
-                meta={"supplier": ticket.supplier.name, "ticket_id": ticket.id, "year": ticket.year},
-            )
+            for ticket_source in ticket_sources:
+                # create a ticket with a volume taking into account:
+                # - what's left in the ticket source
+                available_volume_in_source = ticket_source.total_volume - ticket_source.assigned_volume
+                # - and what's left in the amount asked by the user
+                ticket_volume = min(remaining_volume_to_assign, available_volume_in_source)
 
-            ticket_source.assigned_volume += ticket.volume
-            ticket_source.save()
+                ticket = create_ticket_from_source(
+                    ticket_source,
+                    client_id=client_id,
+                    volume=ticket_volume,
+                    agreement_date=agreement_date,
+                    agreement_reference=agreement_reference,
+                    assignment_period=assignment_period,
+                    free_field=free_field,
+                )
+
+                CarbureNotification.objects.create(
+                    type=CarbureNotification.SAF_TICKET_RECEIVED,
+                    dest_id=client_id,
+                    send_by_email=False,
+                    meta={"supplier": ticket.supplier.name, "ticket_id": ticket.id, "year": ticket.year},
+                )
+
+                ticket_source.assigned_volume += ticket.volume
+                remaining_volume_to_assign -= ticket.volume
+                ticket_source.save()
 
         return SuccessResponse()
     except Exception:
         traceback.print_exc()
-        return ErrorResponse(400, SafTicketAssignError.TICKET_CREATION_FAILED)
+        return ErrorResponse(400, SafTicketGroupedAssignError.TICKET_CREATION_FAILED)
