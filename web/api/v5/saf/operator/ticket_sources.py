@@ -21,6 +21,8 @@ class SafTicketSourceError:
 def get_ticket_sources(request, *args, **kwargs):
     try:
         query = parse_ticket_source_query(request.GET)
+        sort_by = request.GET.get("sort_by")
+        order = request.GET.get("order")
         from_idx = int(request.GET.get("from_idx", 0))
         limit = int(request.GET.get("limit", 25))
     except:
@@ -28,6 +30,7 @@ def get_ticket_sources(request, *args, **kwargs):
 
     try:
         ticket_sources = find_ticket_sources(**query)
+        ticket_sources = sort_ticket_sources(ticket_sources, sort_by, order)
 
         paginator = Paginator(ticket_sources, limit)
         current_page = floor(from_idx / limit) + 1
@@ -111,3 +114,19 @@ def find_ticket_sources(**filters):
         )
 
     return ticket_sources
+
+
+def sort_ticket_sources(ticket_sources, sort_by, order):
+    sortable_columns = {
+        "volume": "total_volume",
+        "period": "delivery_period",
+        "feedstock": "feedstock__code",
+        "ghg_reduction": "ghg_reduction",
+    }
+
+    column = sortable_columns.get(sort_by, "created_at")
+
+    if order == "desc":
+        return ticket_sources.order_by("-%s" % column)
+    else:
+        return ticket_sources.order_by(column)
