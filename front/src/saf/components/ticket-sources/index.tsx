@@ -7,6 +7,7 @@ import { SearchInput } from "common/components/input"
 import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
+import { compact } from "common/utils/collection"
 import { useQueryParamsStore } from "saf/hooks/query-params-store"
 import { useSafQuery } from "saf/hooks/saf-query"
 import {
@@ -17,16 +18,14 @@ import {
 } from "saf/types"
 import LotDetails from "transaction-details/components/lots"
 import * as api from "../../api"
-import * as data from "../../__test__/data"
 import { Filters } from "../filters"
 import NoResult from "../no-result"
 import { useAutoStatus } from "../operator-tabs"
 import { OperatorTicketDetails } from "../ticket-details/operator-details"
 import TicketSourceDetail from "../ticket-source-details"
 import { StatusSwitcher } from "./status-switcher"
-import TicketSourcesTable from "./table"
-import { useState } from "react"
 import { TicketSourcesSummary } from "./summary"
+import TicketSourcesTable from "./table"
 
 export interface TicketSourcesProps {
   year: number
@@ -101,7 +100,9 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
 
         {selectedTicketSources &&
           status === SafTicketSourceStatus.Available && (
-            <TicketSourcesSummary ticketSources={selectedTicketSources} />
+            <TicketSourcesSummary
+              ticketSources={compact(selectedTicketSources)}
+            />
           )}
 
         {count > 0 && ticketSources ? (

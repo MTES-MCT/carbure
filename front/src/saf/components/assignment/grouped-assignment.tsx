@@ -16,7 +16,7 @@ import {
   formatPeriodFromDate,
 } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import { SafTicketSource, SafTicketSourceDetails } from "saf/types"
+import { SafTicketSource } from "saf/types"
 import * as api from "../../api"
 import { PeriodSelect } from "./period-select"
 import { VolumeInput } from "./volume-input"
@@ -28,7 +28,7 @@ export interface TicketsGroupedAssignmentProps {
   onTicketsAssigned: (
     volume: number,
     clientName: string,
-    assignedTicketsCount: number
+    assigned_tickets_count: number
   ) => void
 }
 const TicketsGroupedAssignment = ({
@@ -48,10 +48,7 @@ const TicketsGroupedAssignment = ({
   })
 
   const groupedAssignTicket = async () => {
-    if (value.volume! < 1) {
-      setFieldError("volume", t("Entrez un volume"))
-      return
-    }
+    if (value.volume! < 1) return setFieldError("volume", t("Entrez un volume"))
 
     const response = await groupedAssignSafTicket.execute(
       entity.id,
@@ -66,7 +63,7 @@ const TicketsGroupedAssignment = ({
       onTicketsAssigned(
         value.volume!,
         value.client!.name,
-        response.data.data?.assignedTicketsCount
+        response.data.data?.assigned_tickets_count
       )
       onClose()
     }
@@ -82,7 +79,7 @@ const TicketsGroupedAssignment = ({
 
   const lastDeliveryPeriod = ticketSources.sort(
     (a, b) => b.delivery_period - a.delivery_period
-  )[0].delivery_period
+  )[0]?.delivery_period
 
   return (
     <Portal onClose={onClose}>
@@ -153,11 +150,11 @@ const TicketsGroupedAssignment = ({
                 {...bind("client")}
               />
 
-              <TextInput
+              {/* <TextInput //TODO for transfer only
                 required
                 label={t("N° du certificat d'acquisition")}
                 {...bind("agreement_reference")}
-              />
+              /> */}
 
               <TextInput label={t("Champ libre")} {...bind("free_field")} />
             </Form>
@@ -186,7 +183,7 @@ const defaultAssignment = {
   client: undefined as EntityPreview | undefined,
   assignment_period: formatPeriodFromDate(new Date()),
   free_field: "" as string | undefined,
-  agreement_reference: "" as string | undefined,
+  agreement_reference: "" as string | undefined, //TODO for transfer only
 }
 
 export type GroupedAssignmentForm = typeof defaultAssignment

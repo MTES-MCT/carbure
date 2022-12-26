@@ -142,7 +142,7 @@ export function groupedAssignSafTicket(
   free_field?: string
 ) {
 
-  return api.post<Api<{ assignedTicketsCount: number }>>("/v5/saf/operator/grouped-assign-ticket", {
+  return api.post<Api<{ assigned_tickets_count: number }>>("/v5/saf/operator/grouped-assign-ticket", {
     entity_id,
     ticket_sources_ids,
     assignment_period,

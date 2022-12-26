@@ -1,14 +1,11 @@
-import useEntity from "carbure/hooks/entity"
 import Alert from "common/components/alert"
 import Button from "common/components/button"
 import { Filter } from "common/components/icons"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
-import { useQuery } from "common/hooks/async"
 import { formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import { SafQuery, SafTicketSource } from "saf/types"
-import * as api from "../../api"
+import { SafTicketSource } from "saf/types"
 import TicketsGroupedAssignment from "../assignment/grouped-assignment"
 
 export interface TicketSourcesSummaryProps {
