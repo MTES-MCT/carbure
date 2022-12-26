@@ -106,6 +106,12 @@ export const TicketAssignment = ({
                 {...bind("client")}
               />
 
+              {/* <TextInput //TODO for transfer only
+                required
+                label={t("N° du certificat d'acquisition")}
+                {...bind("agreement_reference")}
+              /> */}
+
               <TextInput label={t("Champ libre")} {...bind("free_field")} />
             </Form>
           </section>
@@ -132,6 +138,7 @@ const defaultAssignment = {
   volume: 0 as number | undefined,
   client: undefined as EntityPreview | undefined,
   assignment_period: formatPeriodFromDate(new Date()),
+  agreement_reference: "" as string | undefined, //TODO for transfer only
   free_field: "" as string | undefined,
 }
 
