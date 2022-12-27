@@ -60,14 +60,6 @@ export const TicketsTable = memo(
                 columns.ghgReduction,
               ])}
             />
-            {/* <TicketsTable
-            loading={false}
-            order={state.order}
-            status={status as SafTicketStatus}
-            tickets={tickets}
-            rowLink={showTicketDetail}
-            onOrder={actions.setOrder}
-          /> */}
 
             {(state.limit || 0) < total && (
               <Pagination

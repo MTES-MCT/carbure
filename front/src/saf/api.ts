@@ -103,7 +103,6 @@ export function getOperatorTicketFilters(field: SafFilter, query: SafQuery) {
 }
 
 export function getOperatorTickets(query: SafQuery) {
-  console.log('query:', query)
   return api.get<Api<SafTicketsResponse>>("/v5/saf/operator/tickets", {
     params: query,
   })
@@ -169,6 +168,16 @@ export function rejectSafTicket(
   return api.post("/v5/saf/airline/reject-ticket", {
     entity_id,
     comment,
+    ticket_id,
+  })
+}
+
+export function creditSafTicketSource(
+  entity_id: number,
+  ticket_id: number,
+) {
+  return api.post("/v5/saf/operator/credit-ticket-source", {
+    entity_id,
     ticket_id,
   })
 }

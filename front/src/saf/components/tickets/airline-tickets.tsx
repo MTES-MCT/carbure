@@ -72,14 +72,6 @@ export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
       </Bar>
       <section>
         <ActionBar>
-          {entity.isOperator && (
-            <StatusSwitcher
-              onSwitch={actions.setStatus}
-              count={snapshot as SafOperatorSnapshot}
-              status={status as SafTicketStatus}
-            />
-          )}
-
           <SearchInput
             asideX
             clear

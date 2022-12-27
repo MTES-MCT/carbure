@@ -4,38 +4,37 @@ import useEntity from "carbure/hooks/entity"
 
 import HashRoute from "common/components/hash-route"
 import { SearchInput } from "common/components/input"
-import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import { useMemo } from "react"
+import { compact } from "common/utils/collection"
 import { useQueryParamsStore } from "saf/hooks/query-params-store"
 import { useSafQuery } from "saf/hooks/saf-query"
 import {
-  SafClientSnapshot,
   SafFilter,
   SafOperatorSnapshot,
   SafQuery,
-  SafStates,
   SafTicket,
   SafTicketStatus,
 } from "saf/types"
 import * as api from "../../api"
-import * as data from "../../__test__/data"
 import { Filters } from "../filters"
-import NoResult from "../no-result"
 import { useAutoStatus } from "../operator-tabs"
-import { ClientTicketDetails } from "../ticket-details/airline-details"
 import { OperatorTicketDetails } from "../ticket-details/operator-details"
 import { StatusSwitcher } from "./status-switcher"
 import TicketsTable from "./table"
-import { EntityType } from "carbure/types"
+import TicketSourceDetails from "../ticket-source-details"
 
 export interface OperatorTicketsProps {
+  type: string
   year: number
   snapshot?: SafOperatorSnapshot
 }
 
-export const OperatorTickets = ({ year, snapshot }: OperatorTicketsProps) => {
+export const OperatorTickets = ({
+  type,
+  year,
+  snapshot,
+}: OperatorTicketsProps) => {
   const location = useLocation()
 
   const entity = useEntity()
@@ -77,13 +76,16 @@ export const OperatorTickets = ({ year, snapshot }: OperatorTicketsProps) => {
       </Bar>
       <section>
         <ActionBar>
-          {entity.isOperator && (
-            <StatusSwitcher
-              onSwitch={actions.setStatus}
-              count={snapshot as SafOperatorSnapshot}
-              status={status as SafTicketStatus}
-            />
-          )}
+          <StatusSwitcher
+            onSwitch={actions.setStatus}
+            displayedStatuses={compact([
+              SafTicketStatus.Pending,
+              type === "assigned" && SafTicketStatus.Rejected,
+              SafTicketStatus.Accepted,
+            ])}
+            count={snapshot as SafOperatorSnapshot}
+            status={status as SafTicketStatus}
+          />
 
           <SearchInput
             asideX
@@ -108,6 +110,10 @@ export const OperatorTickets = ({ year, snapshot }: OperatorTicketsProps) => {
       <HashRoute
         path="ticket/:id"
         element={<OperatorTicketDetails neighbors={ids} />}
+      />
+      <HashRoute
+        path="ticket-sources/:id"
+        element={<TicketSourceDetails neighbors={[]} />}
       />
     </>
   )
