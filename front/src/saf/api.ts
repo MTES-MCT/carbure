@@ -103,6 +103,7 @@ export function getOperatorTicketFilters(field: SafFilter, query: SafQuery) {
 }
 
 export function getOperatorTickets(query: SafQuery) {
+  console.log('query:', query)
   return api.get<Api<SafTicketsResponse>>("/v5/saf/operator/tickets", {
     params: query,
   })

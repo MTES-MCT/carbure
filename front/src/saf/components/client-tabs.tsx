@@ -1,12 +1,10 @@
-import useEntity from "carbure/hooks/entity"
-import cl from "clsx"
-import { Bell, Loader } from "common/components/icons"
+import { Loader } from "common/components/icons"
 import { Col, Row } from "common/components/scaffold"
 import Tabs from "common/components/tabs"
 import { compact } from "common/utils/collection"
 import { formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import { useMatch, useParams } from "react-router-dom"
+import { useMatch } from "react-router-dom"
 import css from "./tabs.module.css"
 
 import { SafClientSnapshot, SafTicketStatus } from "saf/types"
@@ -20,7 +18,6 @@ export const ClientTabs = ({
   loading,
   count = defaultCount,
 }: StatusTabsProps) => {
-  const entity = useEntity()
   const { t } = useTranslation()
 
   return (

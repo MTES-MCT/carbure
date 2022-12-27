@@ -190,6 +190,8 @@ export enum SafTicketStatus {
   Pending = "PENDING",
   Accepted = "ACCEPTED",
   Rejected = "REJECTED",
+  Assigned = "ASSIGNED",
+  Received = "RECEIVED",
 }
 
 export enum SafFilter {
