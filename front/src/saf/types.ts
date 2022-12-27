@@ -14,6 +14,7 @@ export interface SafOperatorSnapshot {
   tickets_pending: number,
   tickets_rejected: number,
   tickets_accepted: number,
+  tickets_received: number, //TO-UPDATE
 }
 
 export interface SafClientSnapshot {
@@ -61,7 +62,6 @@ export interface SafTicketSourceSummaryItem {
 export interface SafTicketSourceDetails extends SafTicketSource, SafProduction, SafDurability {
   added_by: Entity,
   parent_lot: LotPreview
-
 }
 
 export interface SafLot {
@@ -106,6 +106,7 @@ export interface SafTicket {
 export interface SafTicketDetails extends SafTicket, SafProduction, SafDurability {
   free_field?: string
   client_comment?: string
+  child_ticket_source?: SafTicketSourceSummaryItem //TO-UPDATE
 }
 
 export interface SafProduction {

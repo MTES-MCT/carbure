@@ -69,21 +69,29 @@ export const Saf = () => {
             <OperatorTickets year={years.selected} snapshot={snapshotData} />
           }
         /> */}
+
         <Route
-          path="tickets-assigned/*"
+          path="tickets-received/*"
           element={
-            <OperatorTickets year={years.selected} snapshot={snapshotData} />
+            <OperatorTickets
+              type="received"
+              year={years.selected}
+              snapshot={snapshotData}
+            />
           }
         />
 
-        {/* <Route
-          path="/tickets/pending"
-          element={<Tickets year={years.selected} snapshot={snapshotData} />}
-        />
         <Route
-          path="/tickets/accepted"
-          element={<Tickets year={years.selected} snapshot={snapshotData} />}
-        /> */}
+          path="tickets-assigned/*"
+          element={
+            <OperatorTickets
+              type="assigned"
+              year={years.selected}
+              snapshot={snapshotData}
+            />
+          }
+        />
+
         <Route
           path="*"
           element={

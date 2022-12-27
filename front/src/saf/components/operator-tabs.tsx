@@ -55,6 +55,28 @@ export const OperatorTabs = ({
           ),
         },
         {
+          key: "tickets-received",
+          path: "tickets-received",
+          label: (
+            <Row>
+              <Col>
+                <p>
+                  {loading ? (
+                    <Loader size={20} />
+                  ) : (
+                    formatNumber(count.tickets_received || 0) //TO-DO remove || 0
+                  )}
+                </p>
+                <strong>
+                  {t("Tickets reçus", {
+                    count: count.tickets_received || 0, //TO-DO remove || 0
+                  })}
+                </strong>
+              </Col>
+            </Row>
+          ),
+        },
+        {
           key: "tickets-assigned",
           path: "tickets-assigned",
           label: (
@@ -79,6 +101,7 @@ const defaultCount: SafOperatorSnapshot = {
   tickets_pending: 0,
   tickets_rejected: 0,
   tickets_accepted: 0,
+  tickets_received: 0,
 }
 
 interface TicketRecapProps {

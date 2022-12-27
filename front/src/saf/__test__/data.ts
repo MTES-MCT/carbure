@@ -1,6 +1,6 @@
 import { Biofuel, Country, Feedstock } from "carbure/types";
 import { company, operator, producer, productionSite } from "carbure/__test__/data";
-import { SafTicketSource, SafTicketSourceStatus, SafOperatorSnapshot, SafTicketSourcesResponse, SafTicketsResponse, SafTicket, SafTicketSourceDetails, LotPreview, SafTicketPreview, SafTicketStatus, SafTicketDetails, SafClientSnapshot } from "saf/types";
+import { SafTicketSource, SafTicketSourceStatus, SafOperatorSnapshot, SafTicketSourcesResponse, SafTicketsResponse, SafTicket, SafTicketSourceDetails, LotPreview, SafTicketPreview, SafTicketStatus, SafTicketDetails, SafClientSnapshot, SafTicketSourceSummaryItem } from "saf/types";
 
 
 export const safOperatorSnapshot: SafOperatorSnapshot = {
@@ -10,6 +10,7 @@ export const safOperatorSnapshot: SafOperatorSnapshot = {
   tickets_pending: 2,
   tickets_rejected: 1,
   tickets_accepted: 1,
+  tickets_received: 1,
 }
 
 export const safClientSnapshot: SafClientSnapshot = {
@@ -156,7 +157,7 @@ export const safTicket: SafTicket = {
 }
 
 
-export const safTicketDetails: SafTicketDetails = {
+export const safTicketAssignedDetails: SafTicketDetails = {
   id: 12343,
   carbure_id: "A22332",
   status: SafTicketStatus.Pending,
@@ -187,6 +188,26 @@ export const safTicketDetails: SafTicketDetails = {
   eee: 0,
   ghg_total: 23.5,
 }
+
+const safTicketSourceSummaryItem: SafTicketSourceSummaryItem = {
+  id: 123,
+  carbure_id: "1E2E2",
+  year: 2022,
+  delivery_period: 202202,
+  total_volume: 3000,
+  feedstock: feedstock1,
+  biofuel: bioduel1
+}
+
+
+export const safTicketReceivedDetails: SafTicketDetails = {
+  ...safTicketAssignedDetails,
+  status: SafTicketStatus.Accepted, // SafTicketStatus.Pending
+  client: "TERF SAF",
+  child_ticket_source: safTicketSourceSummaryItem
+
+}
+
 
 export const safTicketsResponse: SafTicketsResponse = {
   saf_tickets: [safTicket, safTicket],
