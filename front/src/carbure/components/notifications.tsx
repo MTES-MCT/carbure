@@ -248,7 +248,6 @@ function getNotificationLink(notif: Notification) {
     case NotificationType.DeclarationReminder:
       return `#declaration/${notif.meta?.period}`
 
-    //TODO link SAF
     case NotificationType.SafTicketReceived:
       return `/org/${notif.dest.id}/saf/${notif.meta?.year}/tickets/pending#ticket/${notif.meta?.ticket_id}`
     case NotificationType.SafTicketAccepted:

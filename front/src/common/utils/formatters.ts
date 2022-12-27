@@ -11,6 +11,10 @@ export function formatPeriod(period: number | string) {
   return `${Math.floor(num / 100)}-${("0" + (num % 100)).slice(-2)}`
 }
 
+export function formatPeriodFromDate(date: Date) {
+  return date.getFullYear() * 100 + date.getMonth() + 1
+}
+
 export function formatNumber(num: number) {
   return parseFloat(num.toFixed(2)).toLocaleString("fr-FR")
 }

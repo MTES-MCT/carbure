@@ -41,6 +41,23 @@ export interface SafTicketSource {
 
 }
 
+export interface SafTicketSourceSummary extends SafTicketSource, SafProduction, SafDurability {
+  count: number
+  total_volume: number
+  ticket_sources: SafTicketSourceSummaryItem[]
+}
+
+export interface SafTicketSourceSummaryItem {
+  id: number
+  carbure_id: string
+  year: number
+  delivery_period: number
+  total_volume: number
+  feedstock: Feedstock
+  biofuel: Biofuel
+}
+
+
 export interface SafTicketSourceDetails extends SafTicketSource, SafProduction, SafDurability {
   added_by: Entity,
   parent_lot: LotPreview
@@ -82,12 +99,11 @@ export interface SafTicket {
   feedstock: Feedstock
   biofuel: Biofuel
   country_of_origin: Country
-  ghg_reduction: number // attention pour les lots c'etait ghg_reduction_red_ii
+  ghg_reduction: number
   status: SafTicketStatus
 }
 
 export interface SafTicketDetails extends SafTicket, SafProduction, SafDurability {
-  // parent_ticket_source?: SafTicketSource TODO on a vraiment besoin de ça ? ce n'est pas visible sur les maquettes
   free_field?: string
   client_comment?: string
 }

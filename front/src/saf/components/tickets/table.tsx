@@ -51,6 +51,7 @@ export function useColumns() {
     },
 
     availableVolume: {
+      key: "volume",
       header: t("Volume"),
       cell: (ticket: SafTicket) => (
         <Cell text={`${formatNumber(ticket.volume)} L`} />
@@ -58,11 +59,13 @@ export function useColumns() {
     },
 
     client: {
+      key: "client",
       header: t("Client"),
       cell: (ticket: SafTicket) => <Cell text={ticket.client} />,
     },
 
     supplier: {
+      key: "supplier",
       header: t("Fournisseur"),
       cell: (ticket: SafTicket) => <Cell text={ticket.supplier} />,
     },
