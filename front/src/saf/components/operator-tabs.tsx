@@ -55,8 +55,8 @@ export const OperatorTabs = ({
           ),
         },
         {
-          key: "tickets",
-          path: "tickets",
+          key: "tickets-assigned",
+          path: "tickets-assigned",
           label: (
             <TicketRecap
               loading={loading}
@@ -157,7 +157,10 @@ export function useAutoStatus() {
     return status ?? SafTicketSourceStatus.Available
   }
 
-  if (matchView.params.view === "tickets") {
+  if (
+    matchView.params.view === "tickets-assigned" ||
+    matchView.params.view === "tickets"
+  ) {
     const status = matchStatus?.params?.status?.toUpperCase() as SafTicketStatus
     return status ?? SafTicketStatus.Pending
   }

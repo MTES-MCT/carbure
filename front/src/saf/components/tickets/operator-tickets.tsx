@@ -30,12 +30,12 @@ import { StatusSwitcher } from "./status-switcher"
 import TicketsTable from "./table"
 import { EntityType } from "carbure/types"
 
-export interface TicketsProps {
+export interface OperatorTicketsProps {
   year: number
-  snapshot?: SafOperatorSnapshot | SafClientSnapshot
+  snapshot?: SafOperatorSnapshot
 }
 
-export const Tickets = ({ year, snapshot }: TicketsProps) => {
+export const OperatorTickets = ({ year, snapshot }: OperatorTicketsProps) => {
   const location = useLocation()
 
   const entity = useEntity()
@@ -43,11 +43,7 @@ export const Tickets = ({ year, snapshot }: TicketsProps) => {
   const [state, actions] = useQueryParamsStore(entity, year, status, snapshot)
   const query = useSafQuery(state)
 
-  const apiGetTickets = (query: SafQuery) => {
-    return entity.entity_type === EntityType.Operator
-      ? api.getOperatorTickets(query)
-      : api.getSafAirlineTickets(query)
-  }
+  const apiGetTickets = (query: SafQuery) => api.getOperatorTickets(query)
 
   const ticketsResponse = useQuery(apiGetTickets, {
     key: "tickets",
@@ -58,10 +54,6 @@ export const Tickets = ({ year, snapshot }: TicketsProps) => {
   // const ticketsData = data.safTicketsResponse //TO TEST with testing d:ata
   const ids = ticketsData?.ids ?? []
 
-  const total = ticketsData?.total ?? 0
-  const count = ticketsData?.returned ?? 0
-  const tickets = ticketsData?.saf_tickets
-
   const showTicketDetail = (ticket: SafTicket) => {
     return {
       pathname: location.pathname,
@@ -70,17 +62,14 @@ export const Tickets = ({ year, snapshot }: TicketsProps) => {
     }
   }
 
-  const getTicketFilter = (filter: any) => {
-    return entity.entity_type === EntityType.Operator
-      ? api.getOperatorTicketFilters(filter, query)
-      : api.getAirlineTicketFilters(filter, query)
-  }
+  const getTicketFilter = (filter: any) =>
+    api.getOperatorTicketFilters(filter, query)
 
   return (
     <>
       <Bar>
         <Filters
-          filters={entity.isAirline ? CLIENT_FILTERS : OPERATOR_FILTERS}
+          filters={OPERATOR_FILTERS}
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={getTicketFilter}
@@ -105,45 +94,20 @@ export const Tickets = ({ year, snapshot }: TicketsProps) => {
           />
         </ActionBar>
 
-        {count > 0 && tickets ? (
-          <>
-            <TicketsTable
-              loading={false}
-              order={state.order}
-              status={status as SafTicketStatus}
-              tickets={tickets}
-              rowLink={showTicketDetail}
-              onOrder={actions.setOrder}
-            />
-
-            {(state.limit || 0) < total && (
-              <Pagination
-                page={state.page}
-                limit={state.limit}
-                total={total}
-                onPage={actions.setPage}
-                onLimit={actions.setLimit}
-              />
-            )}
-          </>
-        ) : (
-          <NoResult
-            loading={ticketsResponse.loading}
-            filters={state.filters}
-            onFilter={actions.setFilters}
-          />
-        )}
+        <TicketsTable
+          loading={false}
+          state={state}
+          actions={actions}
+          order={state.order}
+          status={status as SafTicketStatus}
+          ticketsData={ticketsData}
+          rowLink={showTicketDetail}
+        />
       </section>
 
       <HashRoute
         path="ticket/:id"
-        element={
-          entity.isOperator ? (
-            <OperatorTicketDetails neighbors={ids} />
-          ) : (
-            <ClientTicketDetails neighbors={ids} />
-          )
-        }
+        element={<OperatorTicketDetails neighbors={ids} />}
       />
     </>
   )
@@ -154,36 +118,5 @@ const OPERATOR_FILTERS = [
   SafFilter.Periods,
   SafFilter.Feedstocks,
 ]
-const CLIENT_FILTERS = [
-  SafFilter.Supplier,
-  SafFilter.Periods,
-  SafFilter.Feedstocks,
-]
 
-export default Tickets
-
-export function useTicketSourcesQuery({
-  entity,
-  status,
-  year,
-  search,
-  page = 0,
-  limit,
-  order,
-  filters,
-}: SafStates) {
-  return useMemo<SafQuery>(
-    () => ({
-      entity_id: entity.id,
-      year,
-      status,
-      search,
-      from_idx: page * (limit ?? 0),
-      limit: limit || undefined,
-      sort_by: order?.column,
-      order: order?.direction,
-      ...filters,
-    }),
-    [entity.id, year, status, search, limit, order, filters, page]
-  )
-}
+export default OperatorTickets
