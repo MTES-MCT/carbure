@@ -18,7 +18,6 @@ import {
   SafTicketStatus,
 } from "saf/types"
 import * as api from "../../api"
-import * as data from "../../__test__/data"
 import { Filters } from "../filters"
 import { useAutoStatus } from "../operator-tabs"
 import { OperatorTicketDetails } from "../ticket-details/operator-details"
@@ -56,8 +55,8 @@ export const OperatorTickets = ({
     params: [query],
   })
 
-  // const ticketsData = ticketsResponse.result?.data.data
-  const ticketsData = data.safTicketsResponse //TO TEST with testing d:ata
+  const ticketsData = ticketsResponse.result?.data.data
+  // const ticketsData = data.safTicketsResponse //TO TEST with testing d:ata
   const ids = ticketsData?.ids ?? []
 
   const showTicketDetail = (ticket: SafTicket) => {
