@@ -182,7 +182,7 @@ export function useAutoStatus() {
 
   if (
     matchView.params.view === "tickets-assigned" ||
-    matchView.params.view === "tickets"
+    matchView.params.view === "tickets-received"
   ) {
     const status = matchStatus?.params?.status?.toUpperCase() as SafTicketStatus
     return status ?? SafTicketStatus.Pending
