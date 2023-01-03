@@ -13,10 +13,12 @@ import {
   SafFilter,
   SafOperatorSnapshot,
   SafQuery,
+  SafQueryType,
   SafTicket,
   SafTicketStatus,
 } from "saf/types"
 import * as api from "../../api"
+import * as data from "../../__test__/data"
 import { Filters } from "../filters"
 import { useAutoStatus } from "../operator-tabs"
 import { OperatorTicketDetails } from "../ticket-details/operator-details"
@@ -25,7 +27,7 @@ import TicketsTable from "./table"
 import TicketSourceDetails from "../ticket-source-details"
 
 export interface OperatorTicketsProps {
-  type: string
+  type: SafQueryType
   year: number
   snapshot?: SafOperatorSnapshot
 }
@@ -39,9 +41,14 @@ export const OperatorTickets = ({
 
   const entity = useEntity()
   const status = useAutoStatus()
-  const [state, actions] = useQueryParamsStore(entity, year, status, snapshot)
+  const [state, actions] = useQueryParamsStore(
+    entity,
+    year,
+    status,
+    snapshot,
+    type
+  )
   const query = useSafQuery(state)
-
   const apiGetTickets = (query: SafQuery) => api.getOperatorTickets(query)
 
   const ticketsResponse = useQuery(apiGetTickets, {
@@ -49,8 +56,8 @@ export const OperatorTickets = ({
     params: [query],
   })
 
-  const ticketsData = ticketsResponse.result?.data.data
-  // const ticketsData = data.safTicketsResponse //TO TEST with testing d:ata
+  // const ticketsData = ticketsResponse.result?.data.data
+  const ticketsData = data.safTicketsResponse //TO TEST with testing d:ata
   const ids = ticketsData?.ids ?? []
 
   const showTicketDetail = (ticket: SafTicket) => {

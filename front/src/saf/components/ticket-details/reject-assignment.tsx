@@ -1,4 +1,5 @@
 import useEntity from "carbure/hooks/entity"
+import { EntityType } from "carbure/types"
 import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import Form from "common/components/form"
@@ -27,10 +28,15 @@ export const RejectAssignment = ({
   const notify = useNotify()
   const [comment, setComment] = useState<string | undefined>()
 
-  const rejectSafTicket = useMutation(api.rejectSafTicket, {
-    invalidates: ["ticket-details", "airline-snapshot", "tickets"],
-    onSuccess: () => ticketRejected(),
-  })
+  const rejectSafTicket = useMutation(
+    entity.entity_type === EntityType.Airline
+      ? api.rejectSafAirlineTicket
+      : api.rejectSafOperatorTicket,
+    {
+      invalidates: ["ticket-details", "airline-snapshot", "tickets"],
+      onSuccess: () => ticketRejected(),
+    }
+  )
 
   const ticketRejected = () => {
     notify(

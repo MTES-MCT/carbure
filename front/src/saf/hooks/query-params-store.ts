@@ -4,14 +4,17 @@ import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
 import useTitle from "common/hooks/title"
 import { useTranslation } from "react-i18next"
-import { SafClientSnapshot, SafFilterSelection, SafOperatorSnapshot, SafStates, SafTicketSourceStatus, SafTicketStatus } from "saf/types"
+import { SafClientSnapshot, SafFilterSelection, SafOperatorSnapshot, SafStates, SafTicketSourceStatus, SafTicketStatus, SafQueryType } from "saf/types"
 import { useFilterSearchParams } from "./filter-search-params"
+
+
 
 export function useQueryParamsStore(
   entity: Entity,
   year: number,
   status: SafTicketSourceStatus | SafTicketStatus,
-  snapshot?: SafOperatorSnapshot | SafClientSnapshot
+  snapshot?: SafOperatorSnapshot | SafClientSnapshot,
+  type? : SafQueryType,
 ) {
 
   const [limit, saveLimit] = useLimit()
@@ -31,6 +34,7 @@ export function useQueryParamsStore(
       selection: [],
       page: 0,
       limit,
+      type,
     } as SafStates,
     {
       setEntity: (entity: Entity) => ({
@@ -66,6 +70,15 @@ export function useQueryParamsStore(
           filters: filtersParams,
           invalid: false,
           deadline: false,
+          selection: [],
+          page: 0,
+        }
+      },
+
+      setType: (type: SafQueryType) => {
+        return {
+          type,
+          filters: filtersParams,
           selection: [],
           page: 0,
         }
@@ -132,6 +145,10 @@ export function useQueryParamsStore(
 
   if (snapshot && state.snapshot !== snapshot) {
     actions.setSnapshot(snapshot)
+  }
+
+  if (type && state.type !== type) {
+    actions.setType(type)
   }
 
   return [state, actions] as [typeof state, typeof actions]
