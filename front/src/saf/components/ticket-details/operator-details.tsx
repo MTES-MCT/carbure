@@ -42,8 +42,8 @@ export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
     params: [entity.id, parseInt(match?.params.id!)],
   })
 
-  const ticket = ticketResponse.result?.data?.data
-  // const ticket = safTicketReceivedDetails //TO TEST
+  // const ticket = ticketResponse.result?.data?.data
+  const ticket = safTicketReceivedDetails //TO TEST
 
   const showCancelModal = () => {
     portal((close) => (
