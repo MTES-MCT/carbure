@@ -56,6 +56,7 @@ def get_tickets(request, *args, **kwargs):
 def parse_ticket_query(query):
     entity_id = int(query["entity_id"])
     status = query["status"]
+    type = query["type"]
     year = int(query["year"])
     search = query.get("search", None)
     periods = [int(p) for p in query.getlist("periods")] if "periods" in query else None
@@ -65,6 +66,7 @@ def parse_ticket_query(query):
     return {
         "entity_id": entity_id,
         "status": status,
+        "type": type,
         "year": year,
         "periods": periods,
         "feedstocks": feedstocks,
@@ -85,7 +87,10 @@ def find_tickets(**filters):
     )
 
     if filters["entity_id"] != None:
-        tickets = tickets.filter(supplier_id=filters["entity_id"])
+        if filters["type"] == "assigned":
+            tickets = tickets.filter(supplier_id=filters["entity_id"])
+        elif filters["type"] == "received":
+            tickets = tickets.filter(client_id=filters["entity_id"])
 
     if filters["year"] != None:
         tickets = tickets.filter(year=filters["year"])
