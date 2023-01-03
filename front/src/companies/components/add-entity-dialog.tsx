@@ -1,4 +1,4 @@
-import useEntity, { useEntityManager } from "carbure/hooks/entity"
+import useEntity from "carbure/hooks/entity"
 import { EntityType } from "carbure/types"
 import * as norm from "carbure/utils/normalizers"
 import Autocomplete from "common/components/autocomplete"
@@ -33,6 +33,7 @@ export const AddEntityDialog = ({
 
   const addEntity = async () => {
     await addEntityRequest.execute(
+      entity.id,
       value.name!,
       value.entity_type!,
       value.has_saf

@@ -17,14 +17,16 @@ export function getEntities(entity_id: number) {
 }
 
 export function addEntity(
+  entity_id: number,
   name: string,
   entity_type: EntityType,
   has_saf: boolean
 ) {
   return api.post("/v5/admin/create-entity", {
-    name: name,
-    entity_type: entity_type,
-    has_saf: has_saf,
+    entity_id,
+    name,
+    entity_type,
+    has_saf,
   })
 }
 
