@@ -11,6 +11,7 @@ from .ticket_source_filters import get_ticket_source_filters
 from .ticket_filters import get_ticket_filters
 from .assign_ticket import assign_ticket
 from .grouped_assign_ticket import grouped_assign_ticket
+from .reject_ticket import reject_ticket
 from .cancel_ticket import cancel_ticket
 
 urlpatterns = [
@@ -29,6 +30,7 @@ urlpatterns = [
     path("assign-ticket", assign_ticket, name="api-v5-saf-operator-assign-ticket"),
     path("grouped-assign-ticket", grouped_assign_ticket, name="api-v5-saf-operator-grouped-assign-ticket"),
     path("cancel-ticket", cancel_ticket, name="api-v5-saf-operator-cancel-ticket"),
+    path("reject-ticket", reject_ticket, name="api-v5-saf-operator-reject-ticket"),
     # autocomplete helpers
     path("clients", get_clients, name="api-v5-saf-operator-clients"),
 ]
