@@ -41,6 +41,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
   const [operation, setOperations] = useState<Operation | undefined>(undefined)
 
   const entityData = entities.result?.data.data ?? []
+  console.log("entityData:", entityData)
 
   const matchedEntities = entityData.filter(
     (e) =>
@@ -79,14 +80,24 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
           placeholder="Choisissez une opération"
           options={compact([
             { value: "user", label: t("Utilisateurs à autoriser") },
-            entity.isAdmin && { value: "certificate", label: t("Certificats à valider") },
-            entity.isAdmin && { value: "double-counting", label: t("Dossiers double comptage") },
+            entity.isAdmin && {
+              value: "certificate",
+              label: t("Certificats à valider"),
+            },
+            entity.isAdmin && {
+              value: "double-counting",
+              label: t("Dossiers double comptage"),
+            },
           ])}
         />
       </Grid>
 
       {!hasResults && (
-        <Alert icon={AlertTriangle} variant="warning">
+        <Alert
+          icon={AlertTriangle}
+          variant="warning"
+          loading={entities.loading}
+        >
           Aucune société trouvée pour cette recherche.
         </Alert>
       )}

@@ -27,7 +27,7 @@ export const AddEntityDialog = ({
 
   const { value, bind } = useForm<AddForm>(defaultEntity)
 
-  const addEntityRequest = useMutation(api.addEntity, {
+  const addEntityRequest = useMutation(api.addCompany, {
     invalidates: ["entities"],
   })
 

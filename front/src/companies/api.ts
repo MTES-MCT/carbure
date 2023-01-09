@@ -16,7 +16,7 @@ export function getEntities(entity_id: number) {
   })
 }
 
-export function addEntity(
+export function addCompany(
   entity_id: number,
   name: string,
   entity_type: EntityType,
@@ -30,15 +30,15 @@ export function addEntity(
   })
 }
 
-export function getEntityDetails(entity_id: number) {
+export function getEntityDetails(entity_id: number, company_id: number) {
   return api.get<Api<Entity>>("/v3/admin/entities/details", {
-    params: { entity_id },
+    params: { entity_id, company_id },
   })
 }
 
-export function getEntityDepots(entity_id: number) {
+export function getEntityDepots(entity_id: number, company_id: number) {
   return api.get<Api<EntityDepot[]>>("/v3/admin/entities/depots", {
-    params: { entity_id },
+    params: { entity_id, company_id },
   })
 }
 
