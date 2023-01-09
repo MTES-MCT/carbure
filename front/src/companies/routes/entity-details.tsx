@@ -11,18 +11,20 @@ import { Main, Row } from "common/components/scaffold"
 import Tabs from "common/components/tabs"
 import { compact } from "common/utils/collection"
 import { useQuery } from "common/hooks/async"
+import useEntity from "carbure/hooks/entity"
 
 const EntityDetails = () => {
   const navigate = useNavigate()
+  const entity = useEntity()
   const { id = "" } = useParams<"id">()
-  const entityID = parseInt(id, 10)
+  const companyID = parseInt(id, 10)
 
-  const entity = useQuery(api.getEntityDetails, {
+  const company = useQuery(api.getEntityDetails, {
     key: "entity-details",
-    params: [entityID],
+    params: [entity.id, companyID],
   })
 
-  const entityData = entity.result?.data.data
+  const entityData = company.result?.data.data
   const isProducer = entityData?.entity_type === EntityType.Producer
   const isAirline = entityData?.entity_type === EntityType.Airline
 
@@ -69,7 +71,7 @@ const EntityDetails = () => {
             getProductionSites={api.getEntityProductionSites}
           />
         )}
-        {!isAirline && <Certificates entity={entityID} />}
+        {!isAirline && <Certificates entity={companyID} />}
       </section>
     </Main>
   )
