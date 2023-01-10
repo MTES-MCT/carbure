@@ -84,11 +84,7 @@ export const OperatorTickets = ({
         <ActionBar>
           <StatusSwitcher
             onSwitch={actions.setStatus}
-            displayedStatuses={compact([
-              SafTicketStatus.Pending,
-              type === "assigned" && SafTicketStatus.Rejected,
-              SafTicketStatus.Accepted,
-            ])}
+            type={type}
             count={snapshot as SafOperatorSnapshot}
             status={status as SafTicketStatus}
           />

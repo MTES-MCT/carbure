@@ -121,6 +121,7 @@ export const TicketAssignment = ({
 
         <footer>
           <Button
+            loading={assignSafTicket.loading}
             icon={Send}
             label={t("Affecter")}
             variant="primary"

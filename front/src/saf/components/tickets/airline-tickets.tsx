@@ -19,10 +19,8 @@ import {
 } from "saf/types"
 import * as api from "../../api"
 import { Filters } from "../filters"
-import NoResult from "../no-result"
-import { useAutoStatus } from "../operator-tabs"
+import { useAutoStatus } from "../client-tabs"
 import { ClientTicketDetails } from "../ticket-details/airline-details"
-import { StatusSwitcher } from "./status-switcher"
 import TicketsTable from "./table"
 
 export interface AirlineTicketsProps {

@@ -2,6 +2,7 @@ import { extract } from "carbure/api"
 import { EntityPreview } from "carbure/types"
 import { api, Api } from "common/services/api"
 import {
+  SafClientSnapshot,
   SafFilter,
   SafOperatorSnapshot,
   SafQuery,
@@ -27,7 +28,7 @@ export function getAirlineYears(entity_id: number) {
 }
 
 export function getAirlineSnapshot(entity_id: number, year: number) {
-  return api.get<Api<SafOperatorSnapshot>>("/v5/saf/airline/snapshot", {
+  return api.get<Api<SafClientSnapshot>>("/v5/saf/airline/snapshot", {
     params: { entity_id, year },
   })
 }

@@ -82,10 +82,10 @@ export const OperatorTabs = ({
           label: (
             <TicketRecap
               loading={loading}
-              count={count.tickets}
-              pending={count.tickets_pending}
-              rejected={count.tickets_rejected}
-              label={t("Tickets affectés", { count: count.tickets })}
+              count={count.tickets_assigned}
+              pending={count.tickets_assigned_pending}
+              rejected={count.tickets_assigned_rejected}
+              label={t("Tickets affectés", { count: count.tickets_assigned })}
             />
           ),
         },
@@ -98,10 +98,13 @@ const defaultCount: SafOperatorSnapshot = {
   ticket_sources_available: 0,
   ticket_sources_history: 0,
   tickets: 0,
-  tickets_pending: 0,
-  tickets_rejected: 0,
-  tickets_accepted: 0,
+  tickets_assigned: 0,
+  tickets_assigned_accepted: 0,
+  tickets_assigned_pending: 0,
+  tickets_assigned_rejected: 0,
   tickets_received: 0,
+  tickets_received_accepted: 0,
+  tickets_received_pending: 0,
 }
 
 interface TicketRecapProps {

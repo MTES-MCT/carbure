@@ -11,10 +11,13 @@ export interface SafOperatorSnapshot {
   ticket_sources_available: number
   ticket_sources_history: number
   tickets: number
-  tickets_pending: number
-  tickets_rejected: number
-  tickets_accepted: number
-  tickets_received: number //TO-UPDATE
+  tickets_assigned: number
+  tickets_assigned_accepted: number
+  tickets_assigned_pending: number
+  tickets_assigned_rejected: number
+  tickets_received: number
+  tickets_received_accepted: number
+  tickets_received_pending: number
 }
 
 export interface SafClientSnapshot {
@@ -43,8 +46,8 @@ export interface SafTicketSource {
 
 export interface SafTicketSourceSummary
   extends SafTicketSource,
-    SafProduction,
-    SafDurability {
+  SafProduction,
+  SafDurability {
   count: number
   total_volume: number
   ticket_sources: SafTicketSourceSummaryItem[]
@@ -62,8 +65,8 @@ export interface SafTicketSourceSummaryItem {
 
 export interface SafTicketSourceDetails
   extends SafTicketSource,
-    SafProduction,
-    SafDurability {
+  SafProduction,
+  SafDurability {
   added_by: Entity
   parent_lot: LotPreview
 }
@@ -109,8 +112,8 @@ export interface SafTicket {
 
 export interface SafTicketDetails
   extends SafTicket,
-    SafProduction,
-    SafDurability {
+  SafProduction,
+  SafDurability {
   free_field?: string
   client_comment?: string
   child_ticket_source?: {

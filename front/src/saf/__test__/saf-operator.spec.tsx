@@ -70,7 +70,7 @@ test("display ticket sources tab", async () => {
 })
 
 test("display tickets tab", async () => {
-  render(<SafWithRouter view="tickets" entity={operator} />)
+  render(<SafWithRouter view="tickets-assigned" entity={operator} />)
 
   await waitWhileLoading()
 
@@ -80,7 +80,7 @@ test("display tickets tab", async () => {
   screen.getByText("Périodes")
 
   //Status
-  screen.getByText("En attente (2)")
+  screen.getByText("En attente (1)")
   screen.getByText("Refusés (1)")
   screen.getByText("Acceptés (1)")
 
@@ -93,7 +93,7 @@ test("display tickets tab", async () => {
 })
 
 test("Select a status", async () => {
-  render(<SafWithRouter view="tickets" entity={operator} />)
+  render(<SafWithRouter view="tickets-assigned" entity={operator} />)
   const user = userEvent.setup()
   const statusButton = await screen.findByText("Refusés (1)")
   await user.click(statusButton)
