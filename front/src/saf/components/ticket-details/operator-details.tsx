@@ -67,7 +67,13 @@ export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
 
   const showAcceptModal = async () => {
     portal((close) => (
-      <CreditTicketSource ticket={ticket!} onClose={closeDialog} />
+      <CreditTicketSource
+        ticket={ticket!}
+        onClose={() => {
+          close()
+          closeDialog()
+        }}
+      />
     ))
   }
 

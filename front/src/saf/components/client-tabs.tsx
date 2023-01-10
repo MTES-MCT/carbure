@@ -78,9 +78,9 @@ const defaultCount: SafClientSnapshot = {
 }
 
 export function useAutoStatus() {
-  const matchStatus = useMatch("/org/:entity/saf/tickets/:status/*")
+  const matchStatus = useMatch("/org/:entity/saf/:year/tickets/:status/*")
   const status = matchStatus?.params.status as SafTicketStatus
-  return status ?? SafTicketStatus.Pending
+  return (status.toUpperCase() as SafTicketStatus) ?? SafTicketStatus.Pending
 }
 
 export default ClientTabs

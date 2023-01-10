@@ -7,10 +7,13 @@ export const safOperatorSnapshot: SafOperatorSnapshot = {
   ticket_sources_available: 11,
   ticket_sources_history: 3,
   tickets: 4,
-  tickets_pending: 2,
-  tickets_rejected: 1,
-  tickets_accepted: 1,
-  tickets_received: 1,
+  tickets_assigned: 2,
+  tickets_assigned_accepted: 1,
+  tickets_assigned_pending: 1,
+  tickets_assigned_rejected: 1,
+  tickets_received: 2,
+  tickets_received_accepted: 1,
+  tickets_received_pending: 1
 }
 
 export const safClientSnapshot: SafClientSnapshot = {
