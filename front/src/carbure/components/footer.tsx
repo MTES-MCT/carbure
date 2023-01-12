@@ -51,7 +51,7 @@ const CarbureFooter = () => {
               </MailTo>
             </li>
           )}
-          <li>
+          {/* <li>
             <a
               href="https://carbure-beta-gouv.slack.com/"
               target="_blank"
@@ -60,7 +60,7 @@ const CarbureFooter = () => {
               <Slack />
               <Trans>Slack</Trans>
             </a>
-          </li>
+          </li> */}
           <li>
             <a
               href="https://www.linkedin.com/company/carbure-minist%C3%A8re-de-la-transition-%C3%A9cologique/"
