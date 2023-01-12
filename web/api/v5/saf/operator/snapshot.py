@@ -21,15 +21,19 @@ def get_snapshot(request, *args, **kwargs):
         return ErrorResponse(400, SafSnapshotError.PARAMS_MALFORMED)
     try:
         sources = SafTicketSource.objects.filter(year=year, added_by_id=entity_id)
-        tickets = SafTicket.objects.filter(year=year, supplier_id=entity_id)
+        tickets_assigned = SafTicket.objects.filter(year=year, supplier_id=entity_id)
+        tickets_received = SafTicket.objects.filter(year=year, client_id=entity_id)
         return SuccessResponse(
             {
                 "ticket_sources_available": sources.filter(assigned_volume__lt=F("total_volume")).count(),
                 "ticket_sources_history": sources.filter(assigned_volume=F("total_volume")).count(),
-                "tickets": tickets.count(),
-                "tickets_pending": tickets.filter(status=SafTicket.PENDING).count(),
-                "tickets_accepted": tickets.filter(status=SafTicket.ACCEPTED).count(),
-                "tickets_rejected": tickets.filter(status=SafTicket.REJECTED).count(),
+                "tickets_assigned": tickets_assigned.count(),
+                "tickets_assigned_pending": tickets_assigned.filter(status=SafTicket.PENDING).count(),
+                "tickets_assigned_accepted": tickets_assigned.filter(status=SafTicket.ACCEPTED).count(),
+                "tickets_assigned_rejected": tickets_assigned.filter(status=SafTicket.REJECTED).count(),
+                "tickets_received": tickets_received.count(),
+                "tickets_received_pending": tickets_received.filter(status=SafTicket.PENDING).count(),
+                "tickets_received_accepted": tickets_received.filter(status=SafTicket.ACCEPTED).count(),
             }
         )
     except Exception:

@@ -14,7 +14,7 @@ import NavigationButtons from "transaction-details/components/lots/navigation"
 import * as api from "../../api"
 import TicketSourceTag from "../ticket-sources/tag"
 import AssignedTickets from "./assigned-tickets"
-import TicketAssignment from "../assignment"
+import TicketAssignment from "../assignment/simple-assignment"
 import TicketSourceFields from "./fields"
 import ParentLot from "./parent-lot"
 

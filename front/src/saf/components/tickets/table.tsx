@@ -1,42 +1,84 @@
 import useEntity from "carbure/hooks/entity"
+import Pagination from "common/components/pagination"
 import Table, { Cell, Order } from "common/components/table"
 import { compact } from "common/utils/collection"
 import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import { To } from "react-router-dom"
-import { SafTicket, SafTicketStatus } from "saf/types"
+import {
+  SafStates,
+  SafTicket,
+  SafTicketsResponse,
+  SafTicketStatus,
+} from "saf/types"
+import NoResult from "../no-result"
 import TicketTag from "./tag"
 
 export interface TicketsTableProps {
   loading: boolean
+  state: SafStates
+  actions: any
   status: SafTicketStatus
-  tickets: SafTicket[]
+  ticketsData?: SafTicketsResponse
   order: Order | undefined
   rowLink: (ticketSource: SafTicket) => To
-  onOrder: (order: Order | undefined) => void
 }
 
 export const TicketsTable = memo(
-  ({ loading, tickets, order, rowLink, onOrder }: TicketsTableProps) => {
+  ({
+    loading,
+    state,
+    actions,
+    ticketsData,
+    order,
+    rowLink,
+  }: TicketsTableProps) => {
     const { isAirline } = useEntity()
     const columns = useColumns()
+
+    const total = ticketsData?.total ?? 0
+    const count = ticketsData?.returned ?? 0
+    const tickets = ticketsData?.saf_tickets
+
     return (
-      <Table
-        loading={loading}
-        order={order}
-        onOrder={onOrder}
-        rowLink={rowLink}
-        rows={tickets}
-        columns={compact([
-          columns.status,
-          isAirline ? columns.supplier : columns.client,
-          columns.availableVolume,
-          columns.period,
-          columns.feedstock,
-          columns.ghgReduction,
-        ])}
-      />
+      <>
+        {count > 0 && tickets ? (
+          <>
+            <Table
+              loading={loading}
+              order={order}
+              onOrder={actions.setOrder}
+              rowLink={rowLink}
+              rows={tickets}
+              columns={compact([
+                columns.status,
+                isAirline ? columns.supplier : columns.client,
+                columns.availableVolume,
+                columns.period,
+                columns.feedstock,
+                columns.ghgReduction,
+              ])}
+            />
+
+            {(state.limit || 0) < total && (
+              <Pagination
+                page={state.page}
+                limit={state.limit}
+                total={total}
+                onPage={actions.setPage}
+                onLimit={actions.setLimit}
+              />
+            )}
+          </>
+        ) : (
+          <NoResult
+            loading={!ticketsData}
+            filters={state.filters}
+            onFilter={actions.setFilters}
+          />
+        )}
+      </>
     )
   }
 )
