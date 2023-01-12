@@ -11,14 +11,18 @@ export interface SafOperatorSnapshot {
   ticket_sources_available: number
   ticket_sources_history: number
   tickets: number
-  tickets_pending: number,
-  tickets_rejected: number,
-  tickets_accepted: number,
+  tickets_assigned: number
+  tickets_assigned_accepted: number
+  tickets_assigned_pending: number
+  tickets_assigned_rejected: number
+  tickets_received: number
+  tickets_received_accepted: number
+  tickets_received_pending: number
 }
 
 export interface SafClientSnapshot {
-  tickets_pending: number,
-  tickets_accepted: number,
+  tickets_pending: number
+  tickets_accepted: number
 }
 
 export interface SafTicketSource {
@@ -38,10 +42,12 @@ export interface SafTicketSource {
     id: number
     carbure_id: string
   }
-
 }
 
-export interface SafTicketSourceSummary extends SafTicketSource, SafProduction, SafDurability {
+export interface SafTicketSourceSummary
+  extends SafTicketSource,
+  SafProduction,
+  SafDurability {
   count: number
   total_volume: number
   ticket_sources: SafTicketSourceSummaryItem[]
@@ -57,11 +63,12 @@ export interface SafTicketSourceSummaryItem {
   biofuel: Biofuel
 }
 
-
-export interface SafTicketSourceDetails extends SafTicketSource, SafProduction, SafDurability {
-  added_by: Entity,
+export interface SafTicketSourceDetails
+  extends SafTicketSource,
+  SafProduction,
+  SafDurability {
+  added_by: Entity
   parent_lot: LotPreview
-
 }
 
 export interface SafLot {
@@ -103,9 +110,16 @@ export interface SafTicket {
   status: SafTicketStatus
 }
 
-export interface SafTicketDetails extends SafTicket, SafProduction, SafDurability {
+export interface SafTicketDetails
+  extends SafTicket,
+  SafProduction,
+  SafDurability {
   free_field?: string
   client_comment?: string
+  child_ticket_source?: {
+    id: number
+    carbure_id: string
+  }
 }
 
 export interface SafProduction {
@@ -136,20 +150,6 @@ export interface SafTicketAssignementQuery {
   free_field: string
 }
 
-export interface SafQuery {
-  entity_id: number
-  status?: string
-  year?: number
-  search?: string
-  order_by?: string
-  direction?: string
-  from_idx?: number
-  limit?: number
-  [SafFilter.Feedstocks]?: string[]
-  [SafFilter.Periods]?: string[]
-  [SafFilter.Clients]?: string[]
-}
-
 export interface SafTicketSourcesResponse {
   saf_ticket_sources: SafTicketSource[]
   from: number
@@ -171,7 +171,8 @@ export enum SafTicketSourceStatus {
   History = "HISTORY",
 }
 
-export interface SafStates { //old QueryParams
+export interface SafStates {
+  //old QueryParams
   entity: Entity
   year: number
   status: SafTicketSourceStatus | SafTicketStatus
@@ -182,6 +183,7 @@ export interface SafStates { //old QueryParams
   limit?: number
   order?: Order
   snapshot?: SafOperatorSnapshot | SafClientSnapshot
+  type?: SafQueryType
 }
 
 export type SafFilterSelection = Partial<Record<SafFilter, string[]>>
@@ -197,4 +199,21 @@ export enum SafFilter {
   Periods = "periods",
   Clients = "clients",
   Supplier = "suppliers",
+}
+
+export type SafQueryType = "assigned" | "received"
+
+export interface SafQuery {
+  entity_id: number
+  type?: SafQueryType
+  status?: string
+  year?: number
+  search?: string
+  order_by?: string
+  direction?: string
+  from_idx?: number
+  limit?: number
+  [SafFilter.Feedstocks]?: string[]
+  [SafFilter.Periods]?: string[]
+  [SafFilter.Clients]?: string[]
 }

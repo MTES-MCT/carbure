@@ -2,12 +2,14 @@ import { extract } from "carbure/api"
 import { EntityPreview } from "carbure/types"
 import { api, Api } from "common/services/api"
 import {
+  SafClientSnapshot,
   SafFilter,
   SafOperatorSnapshot,
   SafQuery,
   SafTicketDetails,
   SafTicketSourceDetails,
-  SafTicketSourcesResponse, SafTicketsResponse
+  SafTicketSourcesResponse,
+  SafTicketsResponse,
 } from "./types"
 
 const QUERY_RESET: Partial<SafQuery> = {
@@ -26,7 +28,7 @@ export function getAirlineYears(entity_id: number) {
 }
 
 export function getAirlineSnapshot(entity_id: number, year: number) {
-  return api.get<Api<SafOperatorSnapshot>>("/v5/saf/airline/snapshot", {
+  return api.get<Api<SafClientSnapshot>>("/v5/saf/airline/snapshot", {
     params: { entity_id, year },
   })
 }
@@ -141,16 +143,18 @@ export function groupedAssignSafTicket(
   agreement_reference: string,
   free_field?: string
 ) {
-
-  return api.post<Api<{ assigned_tickets_count: number }>>("/v5/saf/operator/grouped-assign-ticket", {
-    entity_id,
-    ticket_sources_ids,
-    assignment_period,
-    volume,
-    client_id: client.id,
-    agreement_reference,
-    free_field,
-  })
+  return api.post<Api<{ assigned_tickets_count: number }>>(
+    "/v5/saf/operator/grouped-assign-ticket",
+    {
+      entity_id,
+      ticket_sources_ids,
+      assignment_period,
+      volume,
+      client_id: client.id,
+      agreement_reference,
+      free_field,
+    }
+  )
 }
 
 export function cancelSafTicket(entity_id: number, ticket_id: number) {
@@ -160,7 +164,7 @@ export function cancelSafTicket(entity_id: number, ticket_id: number) {
   })
 }
 
-export function rejectSafTicket(
+export function rejectSafAirlineTicket(
   entity_id: number,
   ticket_id: number,
   comment: string
@@ -168,6 +172,25 @@ export function rejectSafTicket(
   return api.post("/v5/saf/airline/reject-ticket", {
     entity_id,
     comment,
+    ticket_id,
+  })
+}
+
+export function rejectSafOperatorTicket(
+  entity_id: number,
+  ticket_id: number,
+  comment: string
+) {
+  return api.post("/v5/saf/operator/reject-ticket", {
+    entity_id,
+    comment,
+    ticket_id,
+  })
+}
+
+export function creditSafTicketSource(entity_id: number, ticket_id: number) {
+  return api.post("/v5/saf/operator/credit-ticket-source", {
+    entity_id,
     ticket_id,
   })
 }

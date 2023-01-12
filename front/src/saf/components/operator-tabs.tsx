@@ -55,15 +55,37 @@ export const OperatorTabs = ({
           ),
         },
         {
-          key: "tickets",
-          path: "tickets",
+          key: "tickets-received",
+          path: "tickets-received",
+          label: (
+            <Row>
+              <Col>
+                <p>
+                  {loading ? (
+                    <Loader size={20} />
+                  ) : (
+                    formatNumber(count.tickets_received || 0) //TO-DO remove || 0
+                  )}
+                </p>
+                <strong>
+                  {t("Tickets reçus", {
+                    count: count.tickets_received || 0, //TO-DO remove || 0
+                  })}
+                </strong>
+              </Col>
+            </Row>
+          ),
+        },
+        {
+          key: "tickets-assigned",
+          path: "tickets-assigned",
           label: (
             <TicketRecap
               loading={loading}
-              count={count.tickets}
-              pending={count.tickets_pending}
-              rejected={count.tickets_rejected}
-              label={t("Tickets affectés", { count: count.tickets })}
+              count={count.tickets_assigned}
+              pending={count.tickets_assigned_pending}
+              rejected={count.tickets_assigned_rejected}
+              label={t("Tickets affectés", { count: count.tickets_assigned })}
             />
           ),
         },
@@ -76,9 +98,13 @@ const defaultCount: SafOperatorSnapshot = {
   ticket_sources_available: 0,
   ticket_sources_history: 0,
   tickets: 0,
-  tickets_pending: 0,
-  tickets_rejected: 0,
-  tickets_accepted: 0,
+  tickets_assigned: 0,
+  tickets_assigned_accepted: 0,
+  tickets_assigned_pending: 0,
+  tickets_assigned_rejected: 0,
+  tickets_received: 0,
+  tickets_received_accepted: 0,
+  tickets_received_pending: 0,
 }
 
 interface TicketRecapProps {
@@ -157,7 +183,10 @@ export function useAutoStatus() {
     return status ?? SafTicketSourceStatus.Available
   }
 
-  if (matchView.params.view === "tickets") {
+  if (
+    matchView.params.view === "tickets-assigned" ||
+    matchView.params.view === "tickets-received"
+  ) {
     const status = matchStatus?.params?.status?.toUpperCase() as SafTicketStatus
     return status ?? SafTicketStatus.Pending
   }

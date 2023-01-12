@@ -2,7 +2,7 @@ import useEntity from "carbure/hooks/entity"
 import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import { useHashMatch } from "common/components/hash-route"
-import { Cross, Return } from "common/components/icons"
+import { Check, Cross, Return } from "common/components/icons"
 import { useNotify } from "common/components/notifications"
 import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
@@ -11,20 +11,25 @@ import { useRef } from "react"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { SafTicketStatus } from "saf/types"
-import { safTicketDetails } from "saf/__test__/data"
+import {
+  safTicketAssignedDetails,
+  safTicketReceivedDetails,
+} from "saf/__test__/data"
 import NavigationButtons from "transaction-details/components/lots/navigation"
 import * as api from "../../api"
 import TicketTag from "../tickets/tag"
 import CancelAssignment from "./cancel-assignment"
+import ChildTicketSource from "./child-ticket-source"
 import ClientComment from "./client-comment"
+import CreditTicketSource from "./credit-ticket-source"
 import { TicketFields } from "./fields"
+import RejectAssignment from "./reject-assignment"
 
 export interface TicketDetailsProps {
   neighbors: number[]
 }
 export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
   const { t } = useTranslation()
-  const commentRef = useRef<HTMLElement>(null)
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -38,7 +43,7 @@ export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
   })
 
   const ticket = ticketResponse.result?.data?.data
-  // const ticket = safTicketDetails //TO TEST
+  // const ticket = safTicketReceivedDetails //TO TEST
 
   const showCancelModal = () => {
     portal((close) => (
@@ -54,6 +59,22 @@ export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
 
   const closeDialog = () => {
     navigate({ search: location.search, hash: "#" })
+  }
+
+  const showRejectModal = () => {
+    portal((close) => <RejectAssignment ticket={ticket!} onClose={close} />)
+  }
+
+  const showAcceptModal = async () => {
+    portal((close) => (
+      <CreditTicketSource
+        ticket={ticket!}
+        onClose={() => {
+          close()
+          closeDialog()
+        }}
+      />
+    ))
   }
 
   return (
@@ -72,20 +93,43 @@ export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
             <TicketFields ticket={ticket} />
           </section>
           <ClientComment ticket={ticket} />
+          {ticket?.client === entity.name &&
+            ticket?.status === SafTicketStatus.Accepted && (
+              <ChildTicketSource
+                child_ticket_source={ticket.child_ticket_source}
+              />
+            )}
         </main>
 
         <footer>
-          {[SafTicketStatus.Pending, SafTicketStatus.Rejected].includes(
-            ticket?.status!
-          ) && (
-            <Button
-              icon={Cross}
-              label={t("Annuler l'affectation")}
-              variant="danger"
-              disabled={!ticket}
-              action={showCancelModal}
-            />
+          {ticket?.client === entity.name && (
+            <>
+              <Button
+                icon={Check}
+                label={t("Accepter")}
+                variant="success"
+                action={showAcceptModal}
+              />
+              <Button
+                icon={Cross}
+                label={t("Refuser")}
+                variant="danger"
+                action={showRejectModal}
+              />
+            </>
           )}
+
+          {ticket?.client !== entity.name &&
+            [SafTicketStatus.Pending, SafTicketStatus.Rejected].includes(
+              ticket?.status!
+            ) && (
+              <Button
+                icon={Cross}
+                label={t("Annuler l'affectation")}
+                variant="danger"
+                action={showCancelModal}
+              />
+            )}
 
           <NavigationButtons neighbors={neighbors} closeAction={closeDialog} />
         </footer>

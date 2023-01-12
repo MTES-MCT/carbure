@@ -4,7 +4,7 @@ import traceback
 from django.db import transaction
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
-from saf.models import SafTicket
+from saf.models import SafTicket, create_source_from_ticket
 from core.models import UserRights, CarbureNotification
 
 
@@ -15,7 +15,7 @@ class SafTicketAcceptError:
 
 
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
-def accept_ticket(request, *args, **kwargs):
+def credit_ticket_source(request, *args, **kwargs):
     try:
         entity_id = int(request.POST.get("entity_id"))
         ticket_id = int(request.POST.get("ticket_id"))
@@ -33,6 +33,8 @@ def accept_ticket(request, *args, **kwargs):
         with transaction.atomic():
             ticket.status = SafTicket.ACCEPTED
             ticket.save()
+
+            create_source_from_ticket(ticket, entity_id)
 
             CarbureNotification.objects.create(
                 type=CarbureNotification.SAF_TICKET_ACCEPTED,

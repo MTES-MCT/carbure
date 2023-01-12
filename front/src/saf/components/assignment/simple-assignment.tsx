@@ -1,5 +1,5 @@
 import useEntity from "carbure/hooks/entity"
-import { EntityPreview } from "carbure/types"
+import { EntityPreview, EntityType } from "carbure/types"
 import * as norm from "carbure/utils/normalizers"
 import Autocomplete from "common/components/autocomplete"
 import Button from "common/components/button"
@@ -106,11 +106,13 @@ export const TicketAssignment = ({
                 {...bind("client")}
               />
 
-              {/* <TextInput //TODO for transfer only
-                required
-                label={t("N° du certificat d'acquisition")}
-                {...bind("agreement_reference")}
-              /> */}
+              {value.client?.entity_type === EntityType.Operator && (
+                <TextInput //TODO for transfer only
+                  required
+                  label={t("N° du certificat d'acquisition")}
+                  {...bind("agreement_reference")}
+                />
+              )}
 
               <TextInput label={t("Champ libre")} {...bind("free_field")} />
             </Form>
@@ -119,6 +121,7 @@ export const TicketAssignment = ({
 
         <footer>
           <Button
+            loading={assignSafTicket.loading}
             icon={Send}
             label={t("Affecter")}
             variant="primary"
