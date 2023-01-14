@@ -158,8 +158,6 @@ def get_entities(request):
 
 @ check_admin_rights(external_rights=[ExternalAdminRights.AIRLINE])
 def add_entity(request):
-    # TODO restreindre la creation pour les ExternalAdminRights.AIRLINE aux compagnies aeriennes uniquement
-    # TO DISCUSS renommer en add_company ? difficile à differencier lorsqu'on parle de l'entity de l'utilisateur en cours et l'entity ciblée (company)
     name = request.POST.get('name', False)
     entity_type = request.POST.get('category', False)
 
@@ -193,15 +191,15 @@ def delete_entity(request):
     return JsonResponse({"status": "success", "data": "success"})
 
 
-@is_admin_or_external_admin
+@ check_admin_rights(external_rights=[ExternalAdminRights.AIRLINE])
 def get_rights_requests(request):
     q = request.GET.get('q', False)
     statuses = request.GET.getlist('statuses', False)
-    entity_id = request.GET.get('entity_id', False)
+    company_id = request.GET.get('company_id', False)
     requests = UserRightsRequests.objects.all()
 
-    if entity_id:
-        requests = requests.filter(entity__id=entity_id)
+    if company_id:
+        requests = requests.filter(entity__id=company_id)
     if statuses:
         requests = requests.filter(status__in=statuses)
     if q:

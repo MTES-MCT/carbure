@@ -30,7 +30,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
   const entity = useEntity()
   const hasAirlineOnly = entity.isExternal && entity.hasAdminRight("AIRLINE")
 
-  const entities = useQuery(api.getEntities, {
+  const entities = useQuery(api.getCompanies, {
     key: "entities",
     params: [entity.id],
   })
@@ -41,7 +41,6 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
   const [operation, setOperations] = useState<Operation | undefined>(undefined)
 
   const entityData = entities.result?.data.data ?? []
-  console.log("entityData:", entityData)
 
   const matchedEntities = entityData.filter(
     (e) =>
