@@ -17,12 +17,16 @@ const EntityDetails = () => {
   const navigate = useNavigate()
   const entity = useEntity()
   const { id = "" } = useParams<"id">()
-  const companyID = parseInt(id, 10)
+  const company_id = parseInt(id, 10)
 
-  const company = useQuery(api.getEntityDetails, {
+  const company = useQuery(api.getCompanyDetails, {
     key: "entity-details",
-    params: [entity.id, companyID],
+    params: [entity.id, company_id],
   })
+
+  const getDepots = (company_id: number) => {
+    return api.getCompanyDepots(entity.id, company_id)
+  }
 
   const entityData = company.result?.data.data
   const isProducer = entityData?.entity_type === EntityType.Producer
@@ -61,17 +65,17 @@ const EntityDetails = () => {
           <DeliverySitesSettings
             readOnly
             entity={entityData}
-            getDepots={api.getEntityDepots}
+            getDepots={getDepots}
           />
         )}
         {entityData && isProducer && (
           <ProductionSitesSettings
             readOnly
             entity={entityData}
-            getProductionSites={api.getEntityProductionSites}
+            getProductionSites={api.getCompanyProductionSites}
           />
         )}
-        {!isAirline && <Certificates entity={companyID} />}
+        {!isAirline && <Certificates entity={company_id} />}
       </section>
     </Main>
   )
