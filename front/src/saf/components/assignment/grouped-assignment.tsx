@@ -74,7 +74,7 @@ const TicketsGroupedAssignment = ({
   }
 
   const findSafClient = (query: string) => {
-    return api.findClients(query)
+    return api.findClients(entity.id, query)
   }
 
   const lastDeliveryPeriod = ticketSources.sort(
