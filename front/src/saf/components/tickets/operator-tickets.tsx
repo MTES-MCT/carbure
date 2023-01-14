@@ -99,7 +99,7 @@ export const OperatorTickets = ({
         </ActionBar>
 
         <TicketsTable
-          loading={false}
+          loading={ticketsResponse.loading}
           state={state}
           actions={actions}
           order={state.order}

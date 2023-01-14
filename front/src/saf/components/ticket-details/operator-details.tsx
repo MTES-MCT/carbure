@@ -102,22 +102,23 @@ export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
         </main>
 
         <footer>
-          {ticket?.client === entity.name && (
-            <>
-              <Button
-                icon={Check}
-                label={t("Accepter")}
-                variant="success"
-                action={showAcceptModal}
-              />
-              <Button
-                icon={Cross}
-                label={t("Refuser")}
-                variant="danger"
-                action={showRejectModal}
-              />
-            </>
-          )}
+          {ticket?.status === SafTicketStatus.Pending &&
+            ticket?.client === entity.name && (
+              <>
+                <Button
+                  icon={Check}
+                  label={t("Accepter")}
+                  variant="success"
+                  action={showAcceptModal}
+                />
+                <Button
+                  icon={Cross}
+                  label={t("Refuser")}
+                  variant="danger"
+                  action={showRejectModal}
+                />
+              </>
+            )}
 
           {ticket?.client !== entity.name &&
             [SafTicketStatus.Pending, SafTicketStatus.Rejected].includes(

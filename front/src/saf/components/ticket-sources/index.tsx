@@ -108,7 +108,7 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
         {count > 0 && ticketSources ? (
           <>
             <TicketSourcesTable
-              loading={false}
+              loading={ticketSourcesResponse.loading}
               order={state.order}
               ticketSources={ticketSources}
               rowLink={showTicketSourceDetail}

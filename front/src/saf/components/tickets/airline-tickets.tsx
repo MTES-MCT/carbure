@@ -80,7 +80,7 @@ export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
         </ActionBar>
 
         <TicketsTable
-          loading={false}
+          loading={ticketsResponse.loading}
           state={state}
           actions={actions}
           order={state.order}
