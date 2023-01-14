@@ -22,7 +22,7 @@ def get_snapshot(request, *args, **kwargs):
     try:
         sources = SafTicketSource.objects.filter(year=year, added_by_id=entity_id)
         tickets_assigned = SafTicket.objects.filter(year=year, supplier_id=entity_id)
-        tickets_received = SafTicket.objects.filter(year=year, client_id=entity_id)
+        tickets_received = SafTicket.objects.filter(year=year, client_id=entity_id).exclude(status=SafTicket.REJECTED)
         return SuccessResponse(
             {
                 "ticket_sources_available": sources.filter(assigned_volume__lt=F("total_volume")).count(),

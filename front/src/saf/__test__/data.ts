@@ -207,7 +207,7 @@ export const safTicketReceivedDetails: SafTicketDetails = {
   ...safTicketAssignedDetails,
   status: SafTicketStatus.Accepted, // SafTicketStatus.Pending
   client: "TERF SAF",
-  child_ticket_source: safTicketSourceSummaryItem
+  child_ticket_source: { id: 2355, carbure_id: "adada" }
 
 }
 

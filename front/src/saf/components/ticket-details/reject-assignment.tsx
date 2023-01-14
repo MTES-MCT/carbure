@@ -33,7 +33,12 @@ export const RejectAssignment = ({
       ? api.rejectSafAirlineTicket
       : api.rejectSafOperatorTicket,
     {
-      invalidates: ["ticket-details", "airline-snapshot", "tickets"],
+      invalidates: [
+        "ticket-details",
+        "airline-snapshot",
+        "operator-snapshot",
+        "tickets",
+      ],
       onSuccess: () => ticketRejected(),
     }
   )
