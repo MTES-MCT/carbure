@@ -93,12 +93,13 @@ export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
             <TicketFields ticket={ticket} />
           </section>
           <ClientComment ticket={ticket} />
-          {ticket?.client === entity.name &&
+
+          {/* {ticket?.client === entity.name && TODO Add to api to display
             ticket?.status === SafTicketStatus.Accepted && (
               <ChildTicketSource
                 child_ticket_source={ticket.child_ticket_source}
               />
-            )}
+            )} */}
         </main>
 
         <footer>

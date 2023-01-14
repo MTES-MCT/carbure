@@ -66,7 +66,7 @@ export const TicketAssignment = ({
   }
 
   const findSafClient = (query: string) => {
-    return api.findClients(query)
+    return api.findClients(entity.id, query)
   }
 
   return (

@@ -202,10 +202,10 @@ export function acceptSafTicket(entity_id: number, ticket_id: number) {
   })
 }
 
-export async function findClients(query?: string) {
+export async function findClients(entity_id: number, query?: string,) {
   return api
     .get<Api<EntityPreview[]>>("/v5/saf/operator/clients", {
-      params: { query },
+      params: { entity_id, query },
     })
     .then(extract)
 }
