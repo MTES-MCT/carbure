@@ -18,3 +18,10 @@ export interface LotSummary {
   total_lhv_amount: number
   lots: SummaryItem[]
 }
+
+
+export interface LotUpdateManyQuery {
+  lots_ids: number[],
+  values: string[]
+  entities_to_notify: string[]
+}
