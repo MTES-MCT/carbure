@@ -9,7 +9,7 @@ import css from "./notifications.module.css"
 import Button from "common/components/button"
 import { useRef } from "react"
 import List from "common/components/list"
-import { Notification, NotificationType } from "carbure/types"
+import { EntityType, Notification, NotificationType } from "carbure/types"
 import { Normalizer } from "common/utils/normalize"
 import { t } from "i18next"
 import Radio from "common/components/radio"
@@ -248,13 +248,22 @@ function getNotificationLink(notif: Notification) {
     case NotificationType.DeclarationReminder:
       return `#declaration/${notif.meta?.period}`
 
-    //TODO link SAF
     case NotificationType.SafTicketReceived:
-      return `/org/${notif.dest.id}/saf/${notif.meta?.year}/tickets/pending#ticket/${notif.meta?.ticket_id}`
+      if (notif.dest.entity_type === EntityType.Operator)
+        return `/org/${notif.dest.id}/saf/${notif.meta?.year}/tickets-received/pending#ticket/${notif.meta?.ticket_id}`
+      else
+        return `/org/${notif.dest.id}/saf/${notif.meta?.year}/tickets/pending#ticket/${notif.meta?.ticket_id}`
+
     case NotificationType.SafTicketAccepted:
-      return `/org/${notif.dest.id}/saf/${notif.meta?.year}/tickets/accepted#ticket/${notif.meta?.ticket_id}`
+      if (notif.dest.entity_type === EntityType.Operator)
+        return `/org/${notif.dest.id}/saf/${notif.meta?.year}/tickets-assigned/accepted#ticket/${notif.meta?.ticket_id}`
+      else
+        return `/org/${notif.dest.id}/saf/${notif.meta?.year}/tickets/accepted#ticket/${notif.meta?.ticket_id}`
     case NotificationType.SafTicketRejected:
-      return `/org/${notif.dest.id}/saf/${notif.meta?.year}/tickets/rejected#ticket/${notif.meta?.ticket_id}`
+      if (notif.dest.entity_type === EntityType.Operator)
+        return `/org/${notif.dest.id}/saf/${notif.meta?.year}/tickets-assigned/rejected#ticket/${notif.meta?.ticket_id}`
+      else
+        return `/org/${notif.dest.id}/saf/${notif.meta?.year}/tickets/rejected#ticket/${notif.meta?.ticket_id}`
 
     default:
       return "#"

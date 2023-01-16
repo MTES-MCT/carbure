@@ -20,6 +20,8 @@ class SafTicketError:
 def get_tickets(request, *args, **kwargs):
     try:
         query = parse_ticket_query(request.GET)
+        sort_by = request.GET.get("sort_by")
+        order = request.GET.get("order")
         from_idx = int(request.GET.get("from_idx", 0))
         limit = int(request.GET.get("limit", 25))
     except:
@@ -28,6 +30,7 @@ def get_tickets(request, *args, **kwargs):
 
     try:
         tickets = find_tickets(**query)
+        tickets = sort_tickets(tickets, sort_by, order)
 
         paginator = Paginator(tickets, limit)
         current_page = floor(from_idx / limit) + 1
@@ -115,3 +118,20 @@ def find_tickets(**filters):
         )
 
     return tickets
+
+
+def sort_tickets(tickets, sort_by, order):
+    sortable_columns = {
+        "supplier": "supplier__name",
+        "volume": "volume",
+        "period": "assignment_period",
+        "feedstock": "feedstock__code",
+        "ghg_reduction": "ghg_reduction",
+    }
+
+    column = sortable_columns.get(sort_by, "created_at")
+
+    if order == "desc":
+        return tickets.order_by("-%s" % column)
+    else:
+        return tickets.order_by(column)
