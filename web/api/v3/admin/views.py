@@ -40,7 +40,7 @@ def get_users(request):
     return JsonResponse({"status": "success", "data": users_sez})
 
 
-@check_admin_rights(external_rights=[ExternalAdminRights.AIRLINE])
+@check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE])
 def get_entity_details(request):
     company_id = request.GET.get('company_id', False)
 
@@ -51,7 +51,7 @@ def get_entity_details(request):
         return JsonResponse({"status": "error", "message": "Could not find entity"}, status=400)
 
 
-@ is_admin
+@is_admin
 def get_entity_production_sites(request):
     entity_id = request.GET.get('entity_id', False)
 
@@ -79,7 +79,7 @@ def get_entity_production_sites(request):
         return JsonResponse({"status": "error", "message": "Could not find production sites"}, status=400)
 
 
-@ is_admin
+@is_admin
 def get_entity_depots(request):
     entity_id = request.GET.get('entity_id', False)
 
@@ -91,7 +91,7 @@ def get_entity_depots(request):
         return JsonResponse({"status": "error", "message": "Could not find Entity Depots"}, status=400)
 
 
-@ is_admin
+@is_admin
 def get_entity_certificates(request):
     entity_id = request.GET.get('entity_id', False)
 
@@ -105,7 +105,7 @@ def get_entity_certificates(request):
         return JsonResponse({"status": "error", "message": "Could not find entity certificates"}, status=400)
 
 
-@ check_admin_rights(external_rights=[ExternalAdminRights.AIRLINE])
+@check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE])
 def get_entities(request):
     q = request.GET.get('q', False)
     entity_id = request.GET.get('entity_id', None)
@@ -156,7 +156,7 @@ def get_entities(request):
     return JsonResponse({"status": "success", "data": entities_sez})
 
 
-@ check_admin_rights(external_rights=[ExternalAdminRights.AIRLINE])
+@check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE])
 def add_entity(request):
     name = request.POST.get('name', False)
     entity_type = request.POST.get('category', False)
@@ -191,7 +191,7 @@ def delete_entity(request):
     return JsonResponse({"status": "success", "data": "success"})
 
 
-@ check_admin_rights(external_rights=[ExternalAdminRights.AIRLINE])
+@check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE])
 def get_rights_requests(request):
     q = request.GET.get('q', False)
     statuses = request.GET.getlist('statuses', False)
