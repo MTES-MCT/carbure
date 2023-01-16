@@ -6,9 +6,10 @@ import random
 import math
 
 from django.http import JsonResponse
-from core.decorators import is_admin, is_admin_or_external_admin
+from core.decorators import is_admin, check_admin_rights, is_admin_or_external_admin
+
 from django.contrib.auth import get_user_model
-from core.models import CarbureLot, Entity, UserRights, ProductionSite
+from core.models import CarbureLot, Entity, UserRights, ProductionSite, ExternalAdminRights
 from django.db.models import Q, Count, Value
 from django.core.mail import send_mail
 from django.conf import settings
@@ -21,6 +22,7 @@ from api.v4.helpers import filter_lots
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
+
 
 @is_admin
 def get_users(request):
@@ -38,15 +40,16 @@ def get_users(request):
     return JsonResponse({"status": "success", "data": users_sez})
 
 
-@is_admin_or_external_admin
+@check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE])
 def get_entity_details(request):
-    entity_id = request.GET.get('entity_id', False)
+    company_id = request.GET.get('company_id', False)
 
     try:
-        e = Entity.objects.get(pk=entity_id)
+        e = Entity.objects.get(pk=company_id)
         return JsonResponse({"status": "success", "data": e.natural_key()})
     except Exception:
-        return JsonResponse({"status": "error", "message": "Could not find entity" }, status=400)
+        return JsonResponse({"status": "error", "message": "Could not find entity"}, status=400)
+
 
 @is_admin
 def get_entity_production_sites(request):
@@ -73,7 +76,8 @@ def get_entity_production_sites(request):
 
         return JsonResponse({'status': 'success', 'data': data})
     except Exception:
-        return JsonResponse({"status": "error", "message": "Could not find production sites" }, status=400)
+        return JsonResponse({"status": "error", "message": "Could not find production sites"}, status=400)
+
 
 @is_admin
 def get_entity_depots(request):
@@ -84,7 +88,8 @@ def get_entity_depots(request):
         data = [ps.natural_key() for ps in e.entitydepot_set.all()]
         return JsonResponse({"status": "success", "data": data})
     except Exception:
-        return JsonResponse({"status": "error", "message": "Could not find Entity Depots" }, status=400)
+        return JsonResponse({"status": "error", "message": "Could not find Entity Depots"}, status=400)
+
 
 @is_admin
 def get_entity_certificates(request):
@@ -97,9 +102,10 @@ def get_entity_certificates(request):
         return JsonResponse({"status": "success", "data": data})
     except Exception as err:
         print(err)
-        return JsonResponse({"status": "error", "message": "Could not find entity certificates" }, status=400)
+        return JsonResponse({"status": "error", "message": "Could not find entity certificates"}, status=400)
 
-@is_admin_or_external_admin
+
+@check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE])
 def get_entities(request):
     q = request.GET.get('q', False)
     entity_id = request.GET.get('entity_id', None)
@@ -114,8 +120,10 @@ def get_entities(request):
             depots=Count('entitydepot', distinct=True),
             production_sites=Count('productionsite', distinct=True),
             certificates=Count('entitycertificate', distinct=True),
-            double_counting=Count('doublecountingagreement', filter=Q(doublecountingagreement__status=DoubleCountingAgreement.ACCEPTED), distinct=True),
-            double_counting_requests=Count('doublecountingagreement', filter=Q(doublecountingagreement__status=DoubleCountingAgreement.PENDING), distinct=True),
+            double_counting=Count('doublecountingagreement', filter=Q(
+                doublecountingagreement__status=DoubleCountingAgreement.ACCEPTED), distinct=True),
+            double_counting_requests=Count('doublecountingagreement', filter=Q(
+                doublecountingagreement__status=DoubleCountingAgreement.PENDING), distinct=True),
         )
     elif entity.has_external_admin_right("AIRLINE"):
         entities = Entity.objects.all().order_by('name').filter(entity_type=Entity.AIRLINE).prefetch_related('userrights_set', 'userrightsrequests_set').annotate(
@@ -148,7 +156,7 @@ def get_entities(request):
     return JsonResponse({"status": "success", "data": entities_sez})
 
 
-@is_admin
+@check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE])
 def add_entity(request):
     name = request.POST.get('name', False)
     entity_type = request.POST.get('category', False)
@@ -183,15 +191,15 @@ def delete_entity(request):
     return JsonResponse({"status": "success", "data": "success"})
 
 
-@is_admin_or_external_admin
+@check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE])
 def get_rights_requests(request):
     q = request.GET.get('q', False)
     statuses = request.GET.getlist('statuses', False)
-    entity_id = request.GET.get('entity_id', False)
+    company_id = request.GET.get('company_id', False)
     requests = UserRightsRequests.objects.all()
 
-    if entity_id:
-        requests = requests.filter(entity__id=entity_id)
+    if company_id:
+        requests = requests.filter(entity__id=company_id)
     if statuses:
         requests = requests.filter(status__in=statuses)
     if q:
@@ -199,6 +207,7 @@ def get_rights_requests(request):
 
     requests_sez = [r.natural_key() for r in requests]
     return JsonResponse({"status": "success", "data": requests_sez})
+
 
 @is_admin
 def update_right_request(request):
@@ -218,7 +227,8 @@ def update_right_request(request):
     right_request.save()
 
     if status == 'ACCEPTED':
-        UserRights.objects.update_or_create(entity=right_request.entity, user=right_request.user, defaults={'role': right_request.role, 'expiration_date': right_request.expiration_date})
+        UserRights.objects.update_or_create(entity=right_request.entity, user=right_request.user, defaults={
+                                            'role': right_request.role, 'expiration_date': right_request.expiration_date})
         # send_mail
         email_subject = "Carbure - Demande acceptée"
         message = """
@@ -430,7 +440,6 @@ def update_right_request(request):
 #     return JsonResponse({'status': 'success'})
 
 
-
 # @is_admin
 # def highlight_alerts(request):
 #     alert_ids = request.POST.getlist('alert_ids', False)
@@ -529,22 +538,25 @@ def update_right_request(request):
 
 # not an api endpoint
 def couleur():
-    liste = ["#FF0040","#DF01A5","#BF00FF","#4000FF","#0040FF","#00BFFF",
-              "#00FFBF","#00FF40","#40FF00","#BFFF00","#FFBF00","#FF4000",
-              "#FA5858","#FAAC58","#F4FA58","#ACFA58","#58FA58","#58FAAC",
-              "#58FAF4","#58ACFA","#5858FA","#AC58FA","#FA58F4","#FA58AC",
-              "#B40404","#B45F04","#AEB404","#5FB404","#04B45F","#04B4AE",
-              "#045FB4","#0404B4","#5F04B4","#B404AE","#B4045F","#8A0829"]
+    liste = ["#FF0040", "#DF01A5", "#BF00FF", "#4000FF", "#0040FF", "#00BFFF",
+             "#00FFBF", "#00FF40", "#40FF00", "#BFFF00", "#FFBF00", "#FF4000",
+             "#FA5858", "#FAAC58", "#F4FA58", "#ACFA58", "#58FA58", "#58FAAC",
+             "#58FAF4", "#58ACFA", "#5858FA", "#AC58FA", "#FA58F4", "#FA58AC",
+             "#B40404", "#B45F04", "#AEB404", "#5FB404", "#04B45F", "#04B4AE",
+             "#045FB4", "#0404B4", "#5F04B4", "#B404AE", "#B4045F", "#8A0829"]
     return random.choice(liste)
 
 # not an api endpoint
+
+
 def grade(volume, min, max):
-    #print(volume, min, max)
+    # print(volume, min, max)
     weight = math.log(volume) / 5
-    #print(weight)
+    # print(weight)
     # 2 < x < 4
     # min < volume < max
     return weight
+
 
 @is_admin
 def map(request):
@@ -559,7 +571,8 @@ def map(request):
 
     # on veut: nom site de depart, gps depart, nom site arrivee, gps arrivee, volume
     lots = lots.filter(carbure_production_site__isnull=False, carbure_delivery_site__isnull=False)
-    values = lots.values('carbure_production_site__name', 'carbure_production_site__gps_coordinates', 'carbure_delivery_site__name', 'carbure_delivery_site__gps_coordinates').annotate(volume=Sum('volume'))
+    values = lots.values('carbure_production_site__name', 'carbure_production_site__gps_coordinates',
+                         'carbure_delivery_site__name', 'carbure_delivery_site__gps_coordinates').annotate(volume=Sum('volume'))
 
     volume_min = 999999
     volume_max = 0
@@ -581,8 +594,10 @@ def map(request):
             elat, elon = v['carbure_delivery_site__gps_coordinates'].split(',')
         except:
             print('Missing start or end gps coordinates')
-            print('Start %s : %s' % (v['carbure_production_site__name'].encode('utf-8'), v['carbure_production_site__gps_coordinates']))
-            print('End %s : %s' % (v['carbure_delivery_site__name'].encode('utf-8'), v['carbure_delivery_site__gps_coordinates']))
+            print('Start %s : %s' % (v['carbure_production_site__name'].encode(
+                'utf-8'), v['carbure_production_site__gps_coordinates']))
+            print('End %s : %s' % (v['carbure_delivery_site__name'].encode(
+                'utf-8'), v['carbure_delivery_site__gps_coordinates']))
             continue
 
         if v['carbure_production_site__gps_coordinates'] not in known_prod_sites:
@@ -592,7 +607,7 @@ def map(request):
                 radius=50e2,
                 location=[slat, slon],
                 popup=v['carbure_production_site__name'],
-                color= c,
+                color=c,
                 fill=True,
                 fill_opacity=1,
             ).add_to(m)
@@ -607,6 +622,6 @@ def map(request):
                 fill_opacity=1,
             ).add_to(m)
         volume = v['volume']
-        folium.PolyLine([(float(slat),float(slon)),(float(elat),float(elon))], color=c, weight=grade(volume, volume_min, volume_max), line_cap='round', opacity=0.7, popup=v['carbure_production_site__name']+' vers '+v['carbure_delivery_site__name']+' : \n'+str(volume)+' litres').add_to(m)
+        folium.PolyLine([(float(slat), float(slon)), (float(elat), float(elon))], color=c, weight=grade(volume, volume_min, volume_max), line_cap='round',
+                        opacity=0.7, popup=v['carbure_production_site__name']+' vers '+v['carbure_delivery_site__name']+' : \n'+str(volume)+' litres').add_to(m)
     return HttpResponse(m._repr_html_())
-

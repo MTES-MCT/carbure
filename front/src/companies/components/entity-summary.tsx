@@ -30,7 +30,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
   const entity = useEntity()
   const hasAirlineOnly = entity.isExternal && entity.hasAdminRight("AIRLINE")
 
-  const entities = useQuery(api.getEntities, {
+  const entities = useQuery(api.getCompanies, {
     key: "entities",
     params: [entity.id],
   })
@@ -79,14 +79,24 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
           placeholder="Choisissez une opération"
           options={compact([
             { value: "user", label: t("Utilisateurs à autoriser") },
-            entity.isAdmin && { value: "certificate", label: t("Certificats à valider") },
-            entity.isAdmin && { value: "double-counting", label: t("Dossiers double comptage") },
+            entity.isAdmin && {
+              value: "certificate",
+              label: t("Certificats à valider"),
+            },
+            entity.isAdmin && {
+              value: "double-counting",
+              label: t("Dossiers double comptage"),
+            },
           ])}
         />
       </Grid>
 
       {!hasResults && (
-        <Alert icon={AlertTriangle} variant="warning">
+        <Alert
+          icon={AlertTriangle}
+          variant="warning"
+          loading={entities.loading}
+        >
           Aucune société trouvée pour cette recherche.
         </Alert>
       )}
