@@ -10,7 +10,6 @@ import { useMatch } from "react-router-dom"
 import css from "./tabs.module.css"
 
 import {
-  SafClientSnapshot,
   SafOperatorSnapshot,
   SafTicketSourceStatus,
   SafTicketStatus,
@@ -56,15 +55,29 @@ export const OperatorTabs = ({
           ),
         },
         {
-          key: "tickets",
-          path: "tickets",
+          key: "tickets-received",
+          path: "tickets-received",
           label: (
-            <TicketRecap
+            <TicketReceived
               loading={loading}
-              count={count.tickets}
-              pending={count.tickets_pending}
-              rejected={count.tickets_rejected}
-              label={t("Tickets affectés", { count: count.tickets })}
+              count={count.tickets_received}
+              pending={count.tickets_received_pending}
+              label={t("Tickets reçus", { count: count.tickets_received })}
+            />
+          ),
+        },
+        {
+          key: "tickets-assigned",
+          path:
+            count.tickets_assigned_rejected > 0
+              ? "tickets-assigned/rejected"
+              : "tickets-assigned",
+          label: (
+            <TicketAssigned
+              loading={loading}
+              count={count.tickets_assigned}
+              rejected={count.tickets_assigned_rejected}
+              label={t("Tickets affectés", { count: count.tickets_assigned })}
             />
           ),
         },
@@ -77,25 +90,82 @@ const defaultCount: SafOperatorSnapshot = {
   ticket_sources_available: 0,
   ticket_sources_history: 0,
   tickets: 0,
-  tickets_pending: 0,
-  tickets_rejected: 0,
-  tickets_accepted: 0,
+  tickets_assigned: 0,
+  tickets_assigned_accepted: 0,
+  tickets_assigned_pending: 0,
+  tickets_assigned_rejected: 0,
+  tickets_received: 0,
+  tickets_received_accepted: 0,
+  tickets_received_pending: 0,
 }
 
-interface TicketRecapProps {
+interface TicketReceivedProps {
   loading: boolean
   count: number
   pending: number
+  label: string
+}
+
+const TicketReceived = ({
+  loading,
+  count = 0,
+  pending = 0,
+  label,
+}: TicketReceivedProps) => {
+  const { t } = useTranslation()
+  const hasAlert = pending > 0
+
+  return (
+    <>
+      <Row className={cl(hasAlert && css.recto)}>
+        <Col>
+          <p>{loading ? <Loader size={20} /> : formatNumber(count)}</p>
+          <strong>{label}</strong>
+        </Col>
+
+        {hasAlert && (
+          <Col
+            style={{
+              marginLeft: "auto",
+              alignItems: "flex-end",
+              justifyContent: "center",
+            }}
+          >
+            <Bell
+              size={32}
+              color="var(--orange-dark)"
+              style={{ transform: "rotate(45deg)" }}
+            />
+          </Col>
+        )}
+      </Row>
+      {hasAlert && (
+        <Col className={css.verso}>
+          {pending > 0 && (
+            <p>
+              <strong>{formatNumber(pending)}</strong>{" "}
+              {t("tickets en attente", { count: pending })}
+            </p>
+          )}
+        </Col>
+      )}
+    </>
+  )
+}
+
+interface TicketAssignedProps {
+  loading: boolean
+  count: number
   rejected: number
   label: string
 }
 
-const TicketRecap = ({
+const TicketAssigned = ({
   loading,
   count = 0,
   rejected = 0,
   label,
-}: TicketRecapProps) => {
+}: TicketAssignedProps) => {
   const { t } = useTranslation()
   const hasAlert = rejected > 0
 
@@ -158,7 +228,10 @@ export function useAutoStatus() {
     return status ?? SafTicketSourceStatus.Available
   }
 
-  if (matchView.params.view === "tickets") {
+  if (
+    matchView.params.view === "tickets-assigned" ||
+    matchView.params.view === "tickets-received"
+  ) {
     const status = matchStatus?.params?.status?.toUpperCase() as SafTicketStatus
     return status ?? SafTicketStatus.Pending
   }
