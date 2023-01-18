@@ -20,8 +20,8 @@ export interface LotSummary {
 }
 
 
-export interface LotUpdateManyQuery {
+export interface LotsUpdateQuery {
   lots_ids: number[],
   values: string[]
-  entities_to_notify: string[]
+  entities_ids_to_notify: number[]
 }
