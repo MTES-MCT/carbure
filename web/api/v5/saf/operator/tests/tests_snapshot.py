@@ -19,6 +19,7 @@ class SafSnapshotTest(TestCase):
 
     def setUp(self):
         self.entity = Entity.objects.filter(entity_type=Entity.OPERATOR)[0]
+        self.entity2 = Entity.objects.filter(entity_type=Entity.OPERATOR)[1]
         self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")])
 
         SafTicketSource.objects.all().delete()
@@ -27,9 +28,9 @@ class SafSnapshotTest(TestCase):
         SafTicketSourceFactory.create_batch(20, year=2022, added_by_id=self.entity.id, total_volume=30000, assigned_volume=30000)  # fmt:skip
 
         SafTicket.objects.all().delete()
-        SafTicketFactory.create_batch(15, year=2022, supplier_id=self.entity.id, status=SafTicket.PENDING)
-        SafTicketFactory.create_batch(10, year=2022, supplier_id=self.entity.id, status=SafTicket.ACCEPTED)
-        SafTicketFactory.create_batch(5, year=2022, supplier_id=self.entity.id, status=SafTicket.REJECTED)
+        SafTicketFactory.create_batch(15, year=2022, supplier_id=self.entity.id, client_id=self.entity2.id, status=SafTicket.PENDING)  # fmt:skip
+        SafTicketFactory.create_batch(10, year=2022, supplier_id=self.entity.id, client_id=self.entity2.id, status=SafTicket.ACCEPTED)  # fmt:skip
+        SafTicketFactory.create_batch(5, year=2022, supplier_id=self.entity.id, client_id=self.entity2.id, status=SafTicket.REJECTED)  # fmt:skip
 
     def test_saf_snapshot_simple(self):
         response = self.client.get(reverse("api-v5-saf-operator-snapshot"), {"entity_id": self.entity.id, "year": 2021})
@@ -37,10 +38,13 @@ class SafSnapshotTest(TestCase):
         expected = {
             "ticket_sources_available": 10,
             "ticket_sources_history": 0,
-            "tickets": 0,
-            "tickets_pending": 0,
-            "tickets_rejected": 0,
-            "tickets_accepted": 0,
+            "tickets_assigned": 0,
+            "tickets_assigned_pending": 0,
+            "tickets_assigned_rejected": 0,
+            "tickets_assigned_accepted": 0,
+            "tickets_received": 0,
+            "tickets_received_pending": 0,
+            "tickets_received_accepted": 0,
         }
 
         self.assertEqual(response.status_code, 200)
@@ -52,10 +56,13 @@ class SafSnapshotTest(TestCase):
         expected = {
             "ticket_sources_available": 10,
             "ticket_sources_history": 20,
-            "tickets": 30,
-            "tickets_pending": 15,
-            "tickets_accepted": 10,
-            "tickets_rejected": 5,
+            "tickets_assigned": 30,
+            "tickets_assigned_pending": 15,
+            "tickets_assigned_rejected": 5,
+            "tickets_assigned_accepted": 10,
+            "tickets_received": 0,
+            "tickets_received_pending": 0,
+            "tickets_received_accepted": 0,
         }
 
         self.assertEqual(response.status_code, 200)
