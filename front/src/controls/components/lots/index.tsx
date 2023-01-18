@@ -112,7 +112,6 @@ export const Lots = ({ entity, year }: LotsProps) => {
               filters={state.filters}
               onFilter={actions.setFilters}
             />
-            BLABLA
             <ControlTable
               loading={lots.loading}
               order={state.order}

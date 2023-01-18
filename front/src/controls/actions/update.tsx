@@ -2,9 +2,10 @@ import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import { Edit, Return } from "common/components/icons"
 import { usePortal } from "common/components/portal"
-import { LotUpdateManyQuery } from "controls/types"
+import LotForm, { useLotForm } from "lot-add/components/lot-form"
 import { useTranslation } from "react-i18next"
 import { Lot } from "transactions/types"
+import UpdateConfirmationDialog from "./update-confirmation"
 
 export interface UpdateManyButtonProps {
   disabled?: boolean
@@ -26,12 +27,9 @@ export const UpdateManyButton = ({
       disabled={disabled || selection.length === 0}
       variant="warning"
       icon={Edit}
-      label={t("Modifier la séléction") } // prettier-ignore
+      label={t("Modifier la séléction")}
       action={() =>
-        portal((close) => (
-          // update dialog
-          <UpdateDialog onClose={close} />
-        ))
+        portal((close) => <UpdateDialog onClose={close} lots={lots} />)
       }
     />
   )
@@ -39,81 +37,57 @@ export const UpdateManyButton = ({
 
 interface UpdateDialogProps {
   onClose: () => void
+  lots: Lot[]
 }
-const UpdateDialog = ({ onClose }: UpdateDialogProps) => {
+const UpdateDialog = ({ onClose, lots }: UpdateDialogProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
+  const form = useLotForm()
 
   const showValidation = () => {
-    const query = {
-      lots_ids: [],
-      values: [],
-      entities_to_notify: [],
-    }
+    // const editedValue = Object.keys(form.value).filter(
+    //   (key) => form.value?.[key] !== defaultLot[key]
+    // )
 
     portal((close) => (
-      // update dialog
-      <UpdateValidationDialog onClose={close} query={query} />
+      <UpdateConfirmationDialog onClose={close} lots={lots} value={"biofuel"} />
     ))
   }
 
   return (
     <Dialog onClose={onClose} fullscreen>
       <header>
-        <h1>Vous êtes en train de modifer 15 lots</h1>
+        <h1>
+          {t("Modification de {{lotCount}} lots", {
+            lotCount: lots.length,
+          })}
+        </h1>
       </header>
       <main>
         <section>
           <p>
-            Afin de modifier une valeur sur l’intégralité des lots sélectionnés,
-            remplissez le champs souhaité.
+            {t(
+              "Afin de modifier une valeur sur l’intégralité des lots sélectionnés, remplissez le champs souhaité."
+            )}
           </p>
+        </section>
+        <section>
+          <LotForm form={form} />
         </section>
       </main>
 
       <footer>
-        <Button variant="warning" icon={Edit} action={showValidation}>
+        <Button
+          variant="warning"
+          icon={Edit}
+          action={showValidation}
+          submit="lot-form"
+        >
           {t("Modifier")}
         </Button>
 
-        <Button icon={Return} action={onClose}>
+        <Button asideX icon={Return} action={onClose}>
           {t("Retour")}
-        </Button>
-      </footer>
-    </Dialog>
-  )
-}
-
-interface UpdateValidationDialogProps {
-  onClose: () => void
-  query: LotUpdateManyQuery
-}
-const UpdateValidationDialog = ({
-  onClose,
-  query,
-}: UpdateValidationDialogProps) => {
-  const { t } = useTranslation()
-
-  const showValidation = () => {}
-
-  return (
-    <Dialog onClose={onClose}>
-      <header>
-        <h1>15 lots vont être modifiés</h1>
-      </header>
-      <main>
-        <section>
-          <p>Êtes vous sûr ?</p>
-        </section>
-      </main>
-
-      <footer>
-        <Button variant="warning" icon={Edit} action={showValidation}>
-          {t("Modifier les 15 lots")}
-        </Button>
-
-        <Button icon={Return} action={onClose}>
-          {t("Annuler")}
         </Button>
       </footer>
     </Dialog>

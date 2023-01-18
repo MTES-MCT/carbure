@@ -1,6 +1,6 @@
 import { Api, api, download } from "common/services/api"
 import { Option } from "common/utils/normalize"
-import { LotSummary, Snapshot } from "../types"
+import { LotSummary, LotsUpdateQuery, Snapshot } from "../types"
 import {
   Filter,
   LotList,
@@ -109,5 +109,20 @@ export async function commentLots(
     is_visible_by_admin,
     is_visible_by_auditor,
     comment,
+  })
+}
+
+
+
+
+export function updateLots(
+  lots_ids: number[],
+  value: string,
+  entities_ids_to_notify: number[]
+) {
+  return api.post<Api<void>>("/v5/admin/lots/update-many", {
+    lots_ids,
+    value,
+    entities_ids_to_notify
   })
 }
