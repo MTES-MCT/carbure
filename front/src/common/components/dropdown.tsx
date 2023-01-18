@@ -5,7 +5,7 @@ import css from "./dropdown.module.css"
 import useControlledState from "../hooks/controlled-state"
 
 export interface Trigger {
-  anchor?: Anchor
+  anchor?: string
   onOpen?: () => void
   onClose?: () => void
   onToggle?: (open: boolean) => void
@@ -28,7 +28,7 @@ export const Dropdown = ({
   onOpen,
   onClose,
   onToggle,
-  anchor = Anchors.bottomLeft,
+  anchor = "bottom start",
 }: DropdownProps) => {
   const [open, _setOpen] = useControlledState(false, openControlled, onToggle)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -50,9 +50,13 @@ export const Dropdown = ({
     const trigger = triggerRef.current
     if (!dropdown || !trigger) return
 
-    const box = trigger.getBoundingClientRect()
-    Object.assign(dropdown.style, anchor(box))
-    dropdown.style.minWidth = `${box.width}px`
+    const triggerBox = trigger.getBoundingClientRect()
+    const dropdownBox = dropdown.getBoundingClientRect()
+
+    const position = computeAnchoredPosition(triggerBox, dropdownBox, anchor)
+    // Object.assign(dropdown.style, position)
+    dropdown!.style.transform = `translate3d(${position.left}px, ${position.top}px, 0)`;
+    dropdown.style.minWidth = `${triggerBox.width}px`
   })
 
   // automatically close the dropdown if a scroll is detected
@@ -207,5 +211,79 @@ export function isInside(
 }
 
 type CustomRenderer = (config: { close: () => void }) => React.ReactNode
+
+export function computeAnchoredPosition(
+  target: DOMRect,
+  sticky: DOMRect,
+  anchor: string
+): { top: number; left: number } {
+  let top = 0
+  let left = 0
+
+  const [side, align] = anchor.split(" ")
+
+  // top and bottom anchors
+  if (side === "top" || side === "bottom") {
+    const vertical = {
+      top: target.top - sticky.height,
+      bottom: target.bottom,
+      start: target.left,
+      center: target.left + target.width / 2 - sticky.width / 2,
+      end: target.right - sticky.width,
+    }
+
+    if (side === "top") {
+      top = vertical.top
+    } else if (side === "bottom") {
+      top = vertical.bottom
+    }
+
+    if (align === "start") {
+      left = vertical.start
+    } else if (align === "end") {
+      left = vertical.end
+    } else if (align === "center" || align === undefined) {
+      left = vertical.center
+    }
+
+    // try to fit overlay position to screen borders
+    if (top + sticky.height > window.innerHeight) top = vertical.top
+    if (top < 0) top = vertical.bottom
+    if (left + sticky.width > window.innerWidth) left = vertical.end
+    if (left < 0) left = vertical.start
+  }
+  // left and right anchors
+  else if (side === "left" || side === "right") {
+    const horizontal = {
+      left: target.left - sticky.width,
+      right: target.right,
+      start: target.top,
+      center: target.top + target.height / 2 - sticky.height / 2,
+      end: target.bottom - sticky.height,
+    }
+
+    if (side === "left") {
+      left = horizontal.left
+    } else if (side === "right") {
+      left = horizontal.right
+    }
+
+    if (align === "start") {
+      top = horizontal.start
+    } else if (align === "end") {
+      top = horizontal.end
+    } else if (align === "center" || align === undefined) {
+      top = horizontal.center
+    }
+
+    // try to fit overlay position to screen borders
+    if (left + sticky.width > window.innerWidth) left = horizontal.left
+    if (left < 0) left = horizontal.right
+    if (top + sticky.height > window.innerHeight) top = horizontal.end
+    if (top < 0) top = horizontal.start
+  }
+
+  return { top, left }
+}
 
 export default Dropdown

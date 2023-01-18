@@ -228,7 +228,7 @@ const UserMenu = ({ user, entity }: UserMenuProps) => {
         navigate(path)
       }}
       label={entity.isBlank ? t("Menu") : entity.name}
-      anchor={Anchors.bottomRight}
+      anchor="bottom end"
       items={[
         {
           label: t("Organisations"),
