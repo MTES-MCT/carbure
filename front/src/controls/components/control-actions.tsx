@@ -7,7 +7,7 @@ import DeliveryMapButton from "controls/actions/delivery-map"
 import useEntity from "carbure/hooks/entity"
 import { useStatus } from "./status"
 import { SetManyConformityButton } from "controls/actions/set-conformity"
-import UpdateManyButton from "controls/actions/update"
+import UpdateManyButton from "controls/actions/update-many"
 
 export interface ActionBarProps {
   count: number

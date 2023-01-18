@@ -1,4 +1,4 @@
-import { SummaryItem } from "transactions/types"
+import { LotError, SummaryItem } from "transactions/types"
 
 export type AdminStatus = "alerts" | "lots" | "stocks" | "unknown"
 
@@ -20,8 +20,12 @@ export interface LotSummary {
 }
 
 
-export interface LotsUpdateQuery {
-  lots_ids: number[],
-  values: string[]
-  entities_ids_to_notify: number[]
+export interface LotsUpdateError {
+    lot_id: number,
+    errors: LotError[]
 }
+
+export interface LotsUpdateErrors {
+  errors?: LotsUpdateError[]
+}
+
