@@ -54,6 +54,22 @@ export const SupplierField = (props: AutocompleteProps<Entity | string>) => {
     (v) => norm.normalizeEntityOrUnknown(v).label
   )
 
+  if (entity.isAdmin) {
+    return (
+      <Autocomplete
+        label={t("Fournisseur")}
+        value={supplier}
+        icon={isKnown ? UserCheck : undefined}
+        create={norm.identity}
+        defaultOptions={supplier ? [supplier] : undefined}
+        getOptions={api.findEntities}
+        normalize={norm.normalizeEntityOrUnknown}
+        {...bound}
+        {...props}
+      />
+    )
+  }
+
   return (
     <Autocomplete
       label={t("Fournisseur")}

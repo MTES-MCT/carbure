@@ -2,10 +2,10 @@ import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import { Edit, Return } from "common/components/icons"
 import { usePortal } from "common/components/portal"
-import LotForm, { useLotForm } from "lot-add/components/lot-form"
+import LotForm, { defaultLot, LotFormValue, useLotForm } from "lot-add/components/lot-form"
 import { useTranslation } from "react-i18next"
 import { Lot } from "transactions/types"
-import UpdateConfirmationDialog from "./update-confirmation"
+import UpdateConfirmationDialog from "./update-many-confirmation"
 
 export interface UpdateManyButtonProps {
   disabled?: boolean
@@ -44,13 +44,20 @@ const UpdateDialog = ({ onClose, lots }: UpdateDialogProps) => {
   const portal = usePortal()
   const form = useLotForm()
 
-  const showValidation = () => {
-    // const editedValue = Object.keys(form.value).filter(
-    //   (key) => form.value?.[key] !== defaultLot[key]
-    // )
+  let updatedValues: Partial<LotFormValue> = {} 
+  Object.keys(form.value).forEach(
+    (_key) => {
+      const key = _key as keyof LotFormValue
+      if (form.value[key] !== defaultLot[key]) {
+        (updatedValues as any)[key] = form.value[key]
+      }
+    }
+    )
 
+  const showValidation = () => {
+ 
     portal((close) => (
-      <UpdateConfirmationDialog onClose={close} lots={lots} value={"biofuel"} />
+      <UpdateConfirmationDialog onClose={() => {close(); onClose()}} lots={lots} updatedValues={updatedValues} />
     ))
   }
 
@@ -67,12 +74,12 @@ const UpdateDialog = ({ onClose, lots }: UpdateDialogProps) => {
         <section>
           <p>
             {t(
-              "Afin de modifier une valeur sur l’intégralité des lots sélectionnés, remplissez le champs souhaité."
+              "Remplissez les champs que vous souhaitez modifier sur l’intégralité des lots sélectionnés."
             )}
           </p>
         </section>
         <section>
-          <LotForm form={form} />
+          <LotForm form={form} novalidate />
         </section>
       </main>
 
@@ -82,6 +89,7 @@ const UpdateDialog = ({ onClose, lots }: UpdateDialogProps) => {
           icon={Edit}
           action={showValidation}
           submit="lot-form"
+          disabled={!Object.keys(updatedValues).length}
         >
           {t("Modifier")}
         </Button>

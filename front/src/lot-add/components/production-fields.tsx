@@ -43,6 +43,22 @@ export const ProducerField = (props: AutocompleteProps<Entity | string>) => {
   const { value: producer, ...bound } = bind("producer")
   const isKnown = producer instanceof Object
 
+  if (entity.isAdmin) {
+    return (
+      <Autocomplete
+        label={t("Producteur")}
+        value={producer}
+        icon={isKnown ? UserCheck : undefined}
+        create={norm.identity}
+        defaultOptions={producer ? [producer] : undefined}
+        getOptions={api.findProducers}
+        normalize={norm.normalizeEntityOrUnknown}
+        {...bound}
+        {...props}
+      />
+    )
+  }
+
   // for entities that aren't producers, only show a simple text input to type an unknown producer
   if (!entity.isProducer) {
     return (
@@ -157,9 +173,11 @@ export const ProductionSiteDoubleCountingCertificateField = (
 ) => {
   const { t } = useTranslation()
   const { value, bind } = useFormContext<LotFormValue>()
+  const entity = useEntity()
+  const isAdminEditing = value.lot === undefined && entity.isAdmin
 
   // hide field for non-DC feedstocks
-  if (!value.feedstock?.is_double_compte) {
+  if (!value.feedstock?.is_double_compte && !isAdminEditing) {
     return null
   }
 

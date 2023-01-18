@@ -1,15 +1,16 @@
 import { Api, api, download } from "common/services/api"
 import { Option } from "common/utils/normalize"
-import { LotSummary, LotsUpdateQuery, Snapshot } from "../types"
+import { lotFormToPayload, LotFormValue } from "lot-add/components/lot-form"
+import { selectionOrQuery } from "transactions/api"
 import {
   Filter,
   LotList,
   LotQuery,
   StockList,
   StockQuery,
-  StockSummary,
+  StockSummary
 } from "transactions/types"
-import { selectionOrQuery } from "transactions/api"
+import { LotSummary, LotsUpdateErrors, Snapshot } from "../types"
 
 const QUERY_RESET: Partial<LotQuery> = {
   limit: undefined,
@@ -117,12 +118,27 @@ export async function commentLots(
 
 export function updateLots(
   lots_ids: number[],
-  value: string,
-  entities_ids_to_notify: number[]
+  updated_values: Partial<LotFormValue>,
+  comment: string
 ) {
-  return api.post<Api<void>>("/v5/admin/lots/update-many", {
+  return api.post<Api<LotsUpdateErrors>>("/v5/admin/lots/update-many", {
     lots_ids,
-    value,
-    entities_ids_to_notify
+    comment,
+    ...lotFormToPayload(updated_values),
+  })
+}
+
+export function deleteLots(
+  lots_ids: number[],
+  comment: string,
+) {
+  return api.post<Api<{
+    errors?: {
+      lot_id : number
+      error: string
+    }[]
+  }>>("/v5/admin/lots/delete-many", {
+    lots_ids,
+    comment,
   })
 }

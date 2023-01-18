@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
-import useEntity from "carbure/hooks/entity"
+import useEntity, { EntityManager } from "carbure/hooks/entity"
 import { DeliveryType, Lot, LotError } from "transactions/types"
 import {
   Entity,
@@ -22,11 +22,12 @@ import { matches } from "common/utils/collection"
 export interface LotFormProps {
   readOnly?: boolean
   form: FormManager<LotFormValue>
+  novalidate?: boolean
   onSubmit?: (value?: LotFormValue) => void
 }
 
-export const LotForm = ({ form, onSubmit, ...props }: LotFormProps) => (
-  <Form id="lot-form" variant="columns" form={form} onSubmit={onSubmit}>
+export const LotForm = ({ form, onSubmit, novalidate,  ...props }: LotFormProps) => (
+  <Form id="lot-form" variant="columns" form={form} onSubmit={onSubmit} novalidate={novalidate}>
     <LotFields {...props} />
     <ProductionFields {...props} />
     <DeliveryFields {...props} />
@@ -51,6 +52,7 @@ export function useLotForm(
   const errors = useLotFieldErrors(lotErrors)
 
   function setValue(value: LotFormValue): LotFormValue {
+    if (entity.isAdmin) return value
     if (value.lot && value.lot.lot_status !== "DRAFT") return value
 
     // for producers
@@ -222,9 +224,9 @@ export const defaultLot = {
   certificates: undefined as LotCertificates | undefined,
 
   transport_document_reference: undefined as string | undefined,
-  volume: 0 as number | undefined,
-  weight: 0 as number | undefined,
-  lhv_amount: 0 as number | undefined,
+  volume: undefined as number | undefined,
+  weight: undefined as number | undefined,
+  lhv_amount: undefined as number | undefined,
   unit: "l" as Unit | undefined,
   biofuel: undefined as Biofuel | undefined,
   feedstock: undefined as Feedstock | undefined,
@@ -317,7 +319,7 @@ export const lotToFormValue: LotToFormValue = (lot, entity, certificates) => ({
   ghg_reduction_red_ii: lot?.ghg_reduction_red_ii ?? 0,
 })
 
-export function lotFormToPayload(lot: LotFormValue | undefined) {
+export function lotFormToPayload(lot: Partial<LotFormValue> | undefined) {
   if (lot === undefined) return {}
 
   const unit = lot.unit ?? "l"
