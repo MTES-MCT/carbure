@@ -63,7 +63,7 @@ const Notifications = () => {
       <Dropdown
         className={css.notificationMenu}
         triggerRef={triggerRef}
-        anchor={Anchors.bottomRight}
+        anchor="bottom end"
         onOpen={() => matomo.push(["trackEvent", "notifications", "open"])}
       >
         {({ close }) => (
