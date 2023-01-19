@@ -2,7 +2,11 @@ import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import { Edit, Return } from "common/components/icons"
 import { usePortal } from "common/components/portal"
-import LotForm, { defaultLot, LotFormValue, useLotForm } from "lot-add/components/lot-form"
+import LotForm, {
+  defaultLot,
+  LotFormValue,
+  useLotForm,
+} from "lot-add/components/lot-form"
 import { useTranslation } from "react-i18next"
 import { Lot } from "transactions/types"
 import UpdateConfirmationDialog from "./update-many-confirmation"
@@ -44,20 +48,24 @@ const UpdateDialog = ({ onClose, lots }: UpdateDialogProps) => {
   const portal = usePortal()
   const form = useLotForm()
 
-  let updatedValues: Partial<LotFormValue> = {} 
-  Object.keys(form.value).forEach(
-    (_key) => {
-      const key = _key as keyof LotFormValue
-      if (form.value[key] !== defaultLot[key]) {
-        (updatedValues as any)[key] = form.value[key]
-      }
+  let updatedValues: Partial<LotFormValue> = {}
+  Object.keys(form.value).forEach((_key) => {
+    const key = _key as keyof LotFormValue
+    if (form.value[key] !== defaultLot[key]) {
+      ;(updatedValues as any)[key] = form.value[key]
     }
-    )
+  })
 
   const showValidation = () => {
- 
     portal((close) => (
-      <UpdateConfirmationDialog onClose={() => {close(); onClose()}} lots={lots} updatedValues={updatedValues} />
+      <UpdateConfirmationDialog
+        onClose={() => {
+          close()
+          onClose()
+        }}
+        lots={lots}
+        updatedValues={updatedValues}
+      />
     ))
   }
 
@@ -65,8 +73,8 @@ const UpdateDialog = ({ onClose, lots }: UpdateDialogProps) => {
     <Dialog onClose={onClose} fullscreen>
       <header>
         <h1>
-          {t("Modification de {{lotCount}} lots", {
-            lotCount: lots.length,
+          {t("Modification de {{count}} lots", {
+            count: lots.length,
           })}
         </h1>
       </header>

@@ -10,7 +10,7 @@ import {
   StockQuery,
   StockSummary
 } from "transactions/types"
-import { LotSummary, LotsUpdateErrors, Snapshot } from "../types"
+import { LotSummary, LotsUpdateResponse, Snapshot } from "../types"
 
 const QUERY_RESET: Partial<LotQuery> = {
   limit: undefined,
@@ -121,7 +121,7 @@ export function updateLots(
   updated_values: Partial<LotFormValue>,
   comment: string
 ) {
-  return api.post<Api<LotsUpdateErrors>>("/v5/admin/lots/update-many", {
+  return api.post<Api<LotsUpdateResponse>>("/v5/admin/lots/update-many", {
     lots_ids,
     comment,
     ...lotFormToPayload(updated_values),
@@ -134,7 +134,7 @@ export function deleteLots(
 ) {
   return api.post<Api<{
     errors?: {
-      lot_id : number
+      lot_id: number
       error: string
     }[]
   }>>("/v5/admin/lots/delete-many", {
