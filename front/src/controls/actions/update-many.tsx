@@ -13,7 +13,6 @@ import UpdateConfirmationDialog from "./update-many-confirmation"
 
 export interface UpdateManyButtonProps {
   disabled?: boolean
-  pinned?: boolean
   selection: number[]
   lots: Lot[]
 }
@@ -59,7 +58,8 @@ const UpdateDialog = ({ onClose, lots }: UpdateDialogProps) => {
   const showValidation = () => {
     portal((close) => (
       <UpdateConfirmationDialog
-        onClose={() => {
+        onClose={close}
+        onSuccess={() => {
           close()
           onClose()
         }}

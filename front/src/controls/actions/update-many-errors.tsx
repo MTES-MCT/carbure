@@ -8,10 +8,12 @@ import { useTranslation } from "react-i18next"
 interface UpdateErrorsDialogProps {
   onClose: () => void
   errors: LotsUpdateError[]
+  method: "update" | "delete"
 }
 export const UpdateErrorsDialog = ({
   onClose,
   errors,
+  method,
 }: UpdateErrorsDialogProps) => {
   const { t } = useTranslation()
 
@@ -19,16 +21,22 @@ export const UpdateErrorsDialog = ({
     <Dialog onClose={onClose} fullscreen>
       <header>
         <h1>
-          {t("{{count}} lots vont être modifiés.", {
-            count: errors.length,
-          })}
+          {method === "update"
+            ? t("{{count}} lots n’ont pas pu être modifiés :", {
+                count: errors.length,
+              })
+            : t("{{count}} lots n’ont pas pu être supprimés :", {
+                count: errors.length,
+              })}
         </h1>
       </header>
       <main>
         <section>
           <p>
             <strong>
-              {t("Les lots ci dessous n’ont pas pu être modifiés : ")}
+              {method === "update"
+                ? t("Les lots ci-dessous n’ont pas pu être modifiés : ")
+                : t("Les lots ci-dessous n’ont pas pu être supprimés : ")}
             </strong>
           </p>
 

@@ -21,7 +21,7 @@ export interface LotSummary {
 
 
 export interface LotsUpdateError {
-  lot_id: number,
+  lot_id: string,
   errors: LotError[]
 }
 
