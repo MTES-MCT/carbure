@@ -21,11 +21,11 @@ export interface LotSummary {
 
 
 export interface LotsUpdateError {
-    lot_id: number,
-    errors: LotError[]
+  lot_id: number,
+  errors: LotError[]
 }
 
-export interface LotsUpdateErrors {
+export interface LotsUpdateResponse {
   errors?: LotsUpdateError[]
 }
 
