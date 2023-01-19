@@ -37,6 +37,9 @@ export function updateEntity(
   legal_name: string,
   registration_id: string,
   registered_address: string,
+  registered_zipcode: string,
+  registered_city: string,
+  registered_country: string,
   sustainability_officer: string,
   sustainability_officer_phone_number: string
 ) {
