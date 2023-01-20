@@ -63,6 +63,9 @@ class Entity(models.Model):
     def url_friendly_name(self):
         return self.name.replace(' ', '').upper()
 
+    def has_external_admin_right(self, right):
+        return self.entity_type == Entity.EXTERNAL_ADMIN and right in self.externaladminrights_set.values_list('right', flat=True)
+
     def save(self, *args, **kwargs):
         date_added = self.date_added
         if not date_added:
@@ -368,8 +371,9 @@ class ExternalAdminRights(models.Model):
     DOUBLE_COUNTING_AGREEMENT = "DCA"
     CUSTOM_STATS_AGRIMER = "AGRIMER"
     TIRIB_STATS = "TIRIB"
+    AIRLINE = "AIRLINE"
 
-    RIGHTS = ((DOUBLE_COUNTING_AGREEMENT, DOUBLE_COUNTING_AGREEMENT), (CUSTOM_STATS_AGRIMER, CUSTOM_STATS_AGRIMER), (TIRIB_STATS, TIRIB_STATS))
+    RIGHTS = ((DOUBLE_COUNTING_AGREEMENT, DOUBLE_COUNTING_AGREEMENT), (CUSTOM_STATS_AGRIMER, CUSTOM_STATS_AGRIMER), (TIRIB_STATS, TIRIB_STATS),  (AIRLINE, AIRLINE))
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     right = models.CharField(max_length=32, choices=RIGHTS, default='', blank=False, null=False)
 

@@ -103,7 +103,6 @@ const Navigation = ({ entity }: NavigationProps) => {
     has_saf,
     isAirline,
     isProducer,
-    isTrader,
   } = entity
 
   return (
@@ -141,16 +140,16 @@ const Navigation = ({ entity }: NavigationProps) => {
               (isOperator || isProducer) && {
                 key: "stats",
                 path: "stats",
-                label: t("Stats"),
+                label: t("Statistiques"),
               },
 
-              isAdmin && {
+              (isAdmin || entity.hasAdminRight("AIRLINE")) && {
                 key: "entities",
                 path: "entities",
                 label: t("Sociétés"),
               },
 
-              (isAdmin || entity.hasPage("DCA")) && {
+              (isAdmin || entity.hasAdminRight("DCA")) && {
                 key: "double-counting",
                 path: "double-counting",
                 label: t("Double comptage"),
@@ -229,7 +228,7 @@ const UserMenu = ({ user, entity }: UserMenuProps) => {
         navigate(path)
       }}
       label={entity.isBlank ? t("Menu") : entity.name}
-      anchor={Anchors.bottomRight}
+      anchor="bottom end"
       items={[
         {
           label: t("Organisations"),

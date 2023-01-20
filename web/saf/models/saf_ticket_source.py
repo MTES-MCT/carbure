@@ -15,7 +15,7 @@ class SafTicketSource(models.Model):
     added_by = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.SET_NULL, related_name="saf_source_owner")  # fmt: skip
 
     year = models.IntegerField(blank=False, null=False)
-    period = models.IntegerField(blank=False, null=False)
+    delivery_period = models.IntegerField(blank=False, null=False)
 
     total_volume = models.FloatField(blank=False, null=False)
     assigned_volume = models.FloatField(blank=False, null=False)
@@ -46,10 +46,11 @@ class SafTicketSource(models.Model):
     ghg_reduction = models.FloatField(default=0.0)
 
     parent_lot = models.ForeignKey("core.CarbureLot", null=True, blank=True, on_delete=models.CASCADE)
+    parent_ticket = models.ForeignKey("saf.SafTicket", null=True, blank=True, on_delete=models.CASCADE)
 
     def generate_carbure_id(self):
         self.carbure_id = "TS{period}-{country_of_production}-{id}".format(
-            period=self.period,
+            period=self.delivery_period,
             country_of_production=self.production_country.code_pays,
             id=self.id,
         )
@@ -63,9 +64,6 @@ SAF = ("HVOC", "HOC", "HCC")
 def create_ticket_sources_from_lots(lots):
     ticket_source_data = []
 
-    today = datetime.today()
-    period = today.year * 100 + today.month
-
     # make sure we only have declared lotsof SAF in the queryset
     saf_lots = lots.exclude(lot_status__in=("DRAFT", "PENDING", "DELETED")).filter(biofuel__code__in=SAF)
 
@@ -73,10 +71,9 @@ def create_ticket_sources_from_lots(lots):
         ticket_source_data.append(
             {
                 "carbure_id": None,
-                "created_at": lot.created_at,
                 "added_by_id": lot.carbure_client_id,
-                "year": today.year,
-                "period": period,
+                "year": lot.year,
+                "delivery_period": lot.period,
                 "total_volume": lot.volume,
                 "assigned_volume": 0,
                 "feedstock_id": lot.feedstock_id,
@@ -98,8 +95,8 @@ def create_ticket_sources_from_lots(lots):
                 "eccr": lot.eccr,
                 "eee": lot.eee,
                 "ghg_total": lot.ghg_total,
-                "ghg_reference": lot.ghg_reference,
-                "ghg_reduction": lot.ghg_reduction,
+                "ghg_reference": lot.ghg_reference_red_ii,
+                "ghg_reduction": lot.ghg_reduction_red_ii,
                 "parent_lot_id": lot.id,
             }
         )
@@ -115,3 +112,40 @@ def create_ticket_sources_from_lots(lots):
     SafTicketSource.objects.bulk_update(ticket_sources, ["carbure_id"])
 
     return ticket_sources
+
+
+def create_source_from_ticket(ticket, entity_id):
+    ticket_source = SafTicketSource.objects.create(
+        added_by_id=entity_id,
+        assigned_volume=0,
+        total_volume=ticket.volume,
+        year=ticket.year,
+        delivery_period=ticket.assignment_period,
+        biofuel=ticket.biofuel,
+        feedstock=ticket.feedstock,
+        country_of_origin=ticket.country_of_origin,
+        carbure_producer=ticket.carbure_producer,
+        unknown_producer=ticket.unknown_producer,
+        carbure_production_site=ticket.carbure_production_site,
+        unknown_production_site=ticket.unknown_production_site,
+        production_country=ticket.production_country,
+        production_site_commissioning_date=ticket.production_site_commissioning_date,
+        eec=ticket.eec,
+        el=ticket.el,
+        ep=ticket.ep,
+        etd=ticket.etd,
+        eu=ticket.eu,
+        esca=ticket.esca,
+        eccs=ticket.eccs,
+        eccr=ticket.eccr,
+        eee=ticket.eee,
+        ghg_total=ticket.ghg_total,
+        ghg_reference=ticket.ghg_reference,
+        ghg_reduction=ticket.ghg_reduction,
+        parent_ticket=ticket,
+    )
+
+    ticket_source.generate_carbure_id()
+    ticket_source.save()
+
+    return ticket_source

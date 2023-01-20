@@ -1,19 +1,20 @@
-import { findEntities } from "carbure/api"
 import useEntity from "carbure/hooks/entity"
-import { Entity, EntityPreview } from "carbure/types"
+import { EntityPreview, EntityType } from "carbure/types"
 import * as norm from "carbure/utils/normalizers"
 import Autocomplete from "common/components/autocomplete"
 import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import Form, { useForm } from "common/components/form"
 import { Return, Send } from "common/components/icons"
-import { DateInput, NumberInput, TextInput } from "common/components/input"
+import { TextInput } from "common/components/input"
 import Portal from "common/components/portal"
 import { useMutation } from "common/hooks/async"
-import { formatNumber } from "common/utils/formatters"
+import { formatPeriodFromDate } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { SafTicketSourceDetails } from "saf/types"
 import * as api from "../../api"
+import { PeriodSelect } from "./period-select"
+import { VolumeInput } from "./volume-input"
 
 export interface TicketAssignmentProps {
   ticketSource: SafTicketSourceDetails
@@ -28,15 +29,11 @@ export const TicketAssignment = ({
   const { t } = useTranslation()
   const entity = useEntity()
 
-  const { value, errors, bind, setField, setFieldError } =
+  const { value, bind, setField, setFieldError } =
     useForm<AssignmentForm>(defaultAssignment)
 
   const remainingVolume =
     ticketSource.total_volume - ticketSource.assigned_volume
-
-  const closeDialog = () => {
-    onClose()
-  }
 
   const assignSafTicket = useMutation(api.assignSafTicket, {
     invalidates: [
@@ -52,14 +49,13 @@ export const TicketAssignment = ({
       return
     }
 
-    // TO TEST uncomment below
     await assignSafTicket.execute(
       entity.id,
       ticketSource.id,
       value.volume!,
+      value.assignment_period,
       value.client!,
-      value.agreement_reference,
-      value.agreement_date
+      value.free_field!
     )
     onTicketAssigned(value.volume!, value.client!.name)
     onClose()
@@ -70,12 +66,12 @@ export const TicketAssignment = ({
   }
 
   const findSafClient = (query: string) => {
-    return api.findClients(query)
+    return api.findClients(entity.id, query)
   }
 
   return (
-    <Portal onClose={closeDialog}>
-      <Dialog onClose={closeDialog}>
+    <Portal onClose={onClose}>
+      <Dialog onClose={onClose}>
         <header>
           <h1>
             {t("Affecter le volume CAD n°")}
@@ -92,25 +88,14 @@ export const TicketAssignment = ({
             </p>
 
             <Form id="assign-ticket" onSubmit={assignTicket}>
-              <NumberInput
-                required
-                label={t("Volume ({{volume}} litres disponibles)", {
-                  count: remainingVolume,
-                  volume: formatNumber(remainingVolume),
-                })}
-                style={{ flex: 1 }}
-                max={remainingVolume}
-                min={0}
-                step={0.01}
-                type="number"
+              <VolumeInput
+                remainingVolume={remainingVolume}
+                onSetMaximumVolume={setMaximumVolume}
                 {...bind("volume")}
-                rightContent={
-                  <Button
-                    label={t("Maximum")}
-                    action={setMaximumVolume}
-                    variant="primary"
-                  />
-                }
+              />
+              <PeriodSelect
+                deliveryPeriod={ticketSource.delivery_period}
+                {...bind("assignment_period")}
               />
 
               <Autocomplete
@@ -121,28 +106,29 @@ export const TicketAssignment = ({
                 {...bind("client")}
               />
 
-              <TextInput
-                label={t("N° de Contrat (facture ou bon de commande)")}
-                {...bind("agreement_reference")}
-              />
+              {value.client?.entity_type === EntityType.Operator && (
+                <TextInput //TODO for transfer only
+                  required
+                  label={t("N° du certificat d'acquisition")}
+                  {...bind("agreement_reference")}
+                />
+              )}
 
-              <DateInput
-                label={t("Date du contrat (facture ou du bon de commande )")}
-                {...bind("agreement_date")}
-              />
+              <TextInput label={t("Champ libre")} {...bind("free_field")} />
             </Form>
           </section>
         </main>
 
         <footer>
           <Button
+            loading={assignSafTicket.loading}
             icon={Send}
             label={t("Affecter")}
             variant="primary"
             submit="assign-ticket"
           />
 
-          <Button icon={Return} label={t("Retour")} action={closeDialog} />
+          <Button icon={Return} label={t("Retour")} action={onClose} />
         </footer>
       </Dialog>
     </Portal>
@@ -154,8 +140,9 @@ export default TicketAssignment
 const defaultAssignment = {
   volume: 0 as number | undefined,
   client: undefined as EntityPreview | undefined,
-  agreement_reference: undefined as string | undefined,
-  agreement_date: undefined as string | undefined,
+  assignment_period: formatPeriodFromDate(new Date()),
+  agreement_reference: "" as string | undefined, //TODO for transfer only
+  free_field: "" as string | undefined,
 }
 
 export type AssignmentForm = typeof defaultAssignment

@@ -24,7 +24,7 @@ class SafAssignTicketTest(TestCase):
         self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")])
 
         SafTicketSource.objects.all().delete()
-        self.ticket_source = SafTicketSourceFactory.create(added_by_id=self.entity.id, total_volume=30000, assigned_volume=0)  # fmt:skip
+        self.ticket_source = SafTicketSourceFactory.create(added_by_id=self.entity.id, delivery_period=202202, total_volume=30000, assigned_volume=0)  # fmt:skip
 
         SafTicket.objects.all().delete()
 
@@ -36,6 +36,7 @@ class SafAssignTicketTest(TestCase):
             "volume": 10000,
             "agreement_reference": "AGREF",
             "agreement_date": "2022-06-01",
+            "assignment_period": 202203,
         }
 
         today = datetime.today()
@@ -53,11 +54,11 @@ class SafAssignTicketTest(TestCase):
         self.assertEqual(ticket.agreement_date.isoformat(), "2022-06-01")
         self.assertEqual(ticket.agreement_reference, "AGREF")
         self.assertEqual(ticket.status, "PENDING")
-        self.assertEqual(ticket.carbure_id, "T%d-%s-%d" % (ticket.period, self.ticket_source.production_country.code_pays, ticket.id))  # fmt:skip
+        self.assertEqual(ticket.carbure_id, "T%d-%s-%d" % (ticket.assignment_period, self.ticket_source.production_country.code_pays, ticket.id))  # fmt:skip
         self.assertEqual(ticket.client_id, self.ticket_client.id)
         self.assertEqual(ticket.volume, 10000)
-        self.assertEqual(ticket.year, today.year)
-        self.assertEqual(ticket.period, today.year * 100 + today.month)
+        self.assertEqual(ticket.year, 2022)
+        self.assertEqual(ticket.assignment_period, 202203)
         self.assertEqual(ticket.feedstock_id, self.ticket_source.feedstock_id)
         self.assertEqual(ticket.biofuel_id, self.ticket_source.biofuel_id)
         self.assertEqual(ticket.country_of_origin_id, self.ticket_source.country_of_origin_id)
@@ -89,9 +90,26 @@ class SafAssignTicketTest(TestCase):
             "volume": 100000,
             "agreement_reference": "AGREF",
             "agreement_date": "2022-06-01",
+            "assignment_period": 202203,
         }
 
         response = self.client.post(reverse("api-v5-saf-operator-assign-ticket"), query)
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["error"], "VOLUME_TOO_BIG")
+
+    def test_assign_saf_ticket_fail_if_too_early(self):
+        query = {
+            "entity_id": self.entity.id,
+            "ticket_source_id": self.ticket_source.id,
+            "client_id": self.ticket_client.id,
+            "volume": 1000,
+            "agreement_reference": "AGREF",
+            "agreement_date": "2022-06-01",
+            "assignment_period": 202201,
+        }
+
+        response = self.client.post(reverse("api-v5-saf-operator-assign-ticket"), query)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["error"], "ASSIGNMENT_BEFORE_DELIVERY")

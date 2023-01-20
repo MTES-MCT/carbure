@@ -20,6 +20,8 @@ class SafTicketError:
 def get_tickets(request, *args, **kwargs):
     try:
         query = parse_ticket_query(request.GET)
+        sort_by = request.GET.get("sort_by")
+        order = request.GET.get("order")
         from_idx = int(request.GET.get("from_idx", 0))
         limit = int(request.GET.get("limit", 25))
     except:
@@ -28,6 +30,7 @@ def get_tickets(request, *args, **kwargs):
 
     try:
         tickets = find_tickets(**query)
+        tickets = sort_tickets(tickets, sort_by, order)
 
         paginator = Paginator(tickets, limit)
         current_page = floor(from_idx / limit) + 1
@@ -87,7 +90,7 @@ def find_tickets(**filters):
         tickets = tickets.filter(year=filters["year"])
 
     if filters["periods"] != None:
-        tickets = tickets.filter(period__in=filters["periods"])
+        tickets = tickets.filter(assignment_period__in=filters["periods"])
 
     if filters["feedstocks"] != None:
         tickets = tickets.filter(feedstock__code__in=filters["feedstocks"])
@@ -95,9 +98,9 @@ def find_tickets(**filters):
     if filters["suppliers"] != None:
         tickets = tickets.filter(supplier__name__in=filters["suppliers"])
 
-    if filters["status"] == "pending":
+    if filters["status"] == SafTicket.PENDING:
         tickets = tickets.filter(status=SafTicket.PENDING)
-    elif filters["status"] == "accepted":
+    elif filters["status"] == SafTicket.ACCEPTED:
         tickets = tickets.filter(status=SafTicket.ACCEPTED)
     else:
         raise Exception("Status '%s' does not exist for tickets" % filters["status"])
@@ -115,3 +118,20 @@ def find_tickets(**filters):
         )
 
     return tickets
+
+
+def sort_tickets(tickets, sort_by, order):
+    sortable_columns = {
+        "supplier": "supplier__name",
+        "volume": "volume",
+        "period": "assignment_period",
+        "feedstock": "feedstock__code",
+        "ghg_reduction": "ghg_reduction",
+    }
+
+    column = sortable_columns.get(sort_by, "created_at")
+
+    if order == "desc":
+        return tickets.order_by("-%s" % column)
+    else:
+        return tickets.order_by(column)

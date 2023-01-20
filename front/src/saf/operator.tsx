@@ -8,8 +8,8 @@ import { Navigate, Route, Routes } from "react-router-dom"
 import * as api from "./api"
 import OperatorTabs from "./components/operator-tabs"
 import TicketSources from "./components/ticket-sources"
-import Tickets from "./components/tickets"
-import { SafTicketSourceStatus, SafTicketStatus } from "./types"
+import OperatorTickets from "./components/tickets/operator-tickets"
+import { SafTicketSourceStatus } from "./types"
 
 export const Saf = () => {
   const { t } = useTranslation()
@@ -63,19 +63,35 @@ export const Saf = () => {
             />
           }
         />
-        <Route
+        {/* <Route
           path="tickets/*"
-          element={<Tickets year={years.selected} snapshot={snapshotData} />}
-        />
-        <Route
-          path="tickets"
           element={
-            <Navigate
-              replace
-              to={SafTicketStatus.Pending.toLocaleLowerCase()}
+            <OperatorTickets year={years.selected} snapshot={snapshotData} />
+          }
+        /> */}
+
+        <Route
+          path="tickets-received/*"
+          element={
+            <OperatorTickets
+              type="received"
+              year={years.selected}
+              snapshot={snapshotData}
             />
           }
         />
+
+        <Route
+          path="tickets-assigned/*"
+          element={
+            <OperatorTickets
+              type="assigned"
+              year={years.selected}
+              snapshot={snapshotData}
+            />
+          }
+        />
+
         <Route
           path="*"
           element={

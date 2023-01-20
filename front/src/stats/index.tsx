@@ -27,7 +27,7 @@ const Stats = () => {
     <Main>
       <header>
         <h1>
-          <Trans>{t("Statistiques")}</Trans>
+          <Trans>Statistiques</Trans>
         </h1>
       </header>
       <section>

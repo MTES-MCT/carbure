@@ -13,6 +13,7 @@ class SafTicketAssignError:
     VOLUME_TOO_BIG = "VOLUME_TOO_BIG"
     TICKET_CREATION_FAILED = "TICKET_CREATION_FAILED"
     TICKET_SOURCE_NOT_FOUND = "TICKET_SOURCE_NOT_FOUND"
+    ASSIGNMENT_BEFORE_DELIVERY = "ASSIGNMENT_BEFORE_DELIVERY"
 
 
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
@@ -24,6 +25,8 @@ def assign_ticket(request, *args, **kwargs):
         volume = float(request.POST.get("volume"))
         agreement_reference = request.POST.get("agreement_reference")
         agreement_date = request.POST.get("agreement_date")
+        free_field = request.POST.get("free_field")
+        assignment_period = int(request.POST.get("assignment_period"))
     except:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketAssignError.MALFORMED_PARAMS)
@@ -37,6 +40,9 @@ def assign_ticket(request, *args, **kwargs):
     if volume > (ticket_source.total_volume - ticket_source.assigned_volume):
         return ErrorResponse(400, SafTicketAssignError.VOLUME_TOO_BIG)
 
+    if assignment_period < ticket_source.delivery_period:
+        return ErrorResponse(400, SafTicketAssignError.ASSIGNMENT_BEFORE_DELIVERY)
+
     try:
         with transaction.atomic():
             ticket = create_ticket_from_source(
@@ -45,6 +51,8 @@ def assign_ticket(request, *args, **kwargs):
                 volume=volume,
                 agreement_date=agreement_date,
                 agreement_reference=agreement_reference,
+                assignment_period=assignment_period,
+                free_field=free_field
             )
 
             CarbureNotification.objects.create(

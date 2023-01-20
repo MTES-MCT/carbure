@@ -6,26 +6,43 @@ import {
   ProductionSiteDetails,
   EntityDepot,
   EntityCertificate,
+  EntityType,
 } from "carbure/types"
 import { EntityDetails } from "./types"
 
-export function getEntities() {
-  return api.get<Api<EntityDetails[]>>("/v3/admin/entities")
+export function getCompanies(entity_id: number) {
+  return api.get<Api<EntityDetails[]>>("/v3/admin/entities", {
+    params: { entity_id },
+  })
 }
 
-export function getEntityDetails(entity_id: number) {
+export function addCompany(
+  entity_id: number,
+  name: string,
+  entity_type: EntityType,
+  has_saf: boolean
+) {
+  return api.post("/v5/admin/create-entity", {
+    entity_id,
+    name,
+    entity_type,
+    has_saf,
+  })
+}
+
+export function getCompanyDetails(entity_id: number, company_id: number) {
   return api.get<Api<Entity>>("/v3/admin/entities/details", {
-    params: { entity_id },
+    params: { entity_id, company_id },
   })
 }
 
-export function getEntityDepots(entity_id: number) {
+export function getCompanyDepots(entity_id: number, company_id: number) {
   return api.get<Api<EntityDepot[]>>("/v3/admin/entities/depots", {
-    params: { entity_id },
+    params: { entity_id, company_id },
   })
 }
 
-export function getEntityProductionSites(entity_id: number) {
+export function getCompanyProductionSites(entity_id: number) {
   return api.get<Api<ProductionSiteDetails[]>>(
     "/v3/admin/entities/production_sites",
     {
@@ -35,12 +52,13 @@ export function getEntityProductionSites(entity_id: number) {
 }
 
 export function getUsersRightRequests(
-  query: string,
   entity_id: number,
+  query: string,
+  company_id: number,
   statuses?: UserRightStatus[]
 ) {
   return api.get<Api<UserRightRequest[]>>("/v3/admin/users/rights-requests", {
-    params: { q: query, entity_id, statuses },
+    params: { entity_id, q: query, company_id, statuses },
   })
 }
 

@@ -118,25 +118,25 @@ const DoubleCountingProductionDialog = ({
           <Form id="dc-production" onSubmit={saveProduction}>
             <NumberInput
               autoFocus
-              disabled={!add}
               label={t("Année")}
               {...bind("year")}
+              disabled={!add}
             />
             <AutoComplete
-              disabled={!add}
               label={t("Matière première")}
               normalize={normalizeFeedstock}
               getOptions={(search) => findFeedstocks(search, true)}
               defaultOptions={compact([value.feedstock])}
               {...bind("feedstock")}
+              disabled={!add}
             />
             <AutoComplete
-              disabled={!add}
               label={t("Biocarburant")}
               getOptions={findBiofuels}
               defaultOptions={compact([value.biofuel])}
               normalize={normalizeBiofuel}
               {...bind("biofuel")}
+              disabled={!add}
             />
             <NumberInput
               label={t("Production maximale")}
