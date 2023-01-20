@@ -10,7 +10,6 @@ from datetime import date
 import os
 import django
 import csv
-import datetime
 import argparse
 import unicodedata
 from django.conf import settings
@@ -23,7 +22,6 @@ from core.utils import bulk_update_or_create
 from core.models import GenericCertificate
 
 
-today = datetime.date.today()
 DESTINATION_FOLDER = "/tmp"
 DBS_VALID_URL = "https://www.2bsvs.org/cert_valides.html"
 DBS_INVALID_URL = "https://www.2bsvs.org/cert_retires.html"
@@ -55,6 +53,7 @@ def download_certificates(url: str, valid: bool = True) -> None:
 
 
 def save_2bs_certificates(valid: bool = True) -> Tuple[int, list]:
+    today = date.today()
     certificates = []
     if valid:
         filename = "%s/Certificates2BS_%s.csv" % (DESTINATION_FOLDER, today.strftime("%Y-%m-%d"))
@@ -69,15 +68,15 @@ def save_2bs_certificates(valid: bool = True) -> Tuple[int, list]:
         # create certificate
         try:
             vf = row["Date originale de certification"].split("/")
-            valid_from = datetime.date(year=int(vf[2]), month=int(vf[1]), day=int(vf[0]))
+            valid_from = date(year=int(vf[2]), month=int(vf[1]), day=int(vf[0]))
         except:
-            valid_from = datetime.date(year=1970, month=1, day=1)
+            valid_from = date(year=1970, month=1, day=1)
 
         try:
             vu = row["Date de fin de validité du certificat"].split("/")
-            valid_until = datetime.date(year=int(vu[2]), month=int(vu[1]), day=int(vu[0]))
+            valid_until = date(year=int(vu[2]), month=int(vu[1]), day=int(vu[0]))
         except:
-            valid_until = datetime.date(year=1970, month=1, day=1)
+            valid_until = date(year=1970, month=1, day=1)
 
         certificates.append(
             {

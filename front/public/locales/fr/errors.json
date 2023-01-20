@@ -55,6 +55,7 @@
   "NO_SUPPLIER_CERT": "Certificat du fournisseur original absent",
   "NO_VENDOR_CERT": "Certificat du fournisseur absent",
   "NOT_ALLOWED": "Droits insuffisants",
+  "NOT_ENOUGH_VOLUME_LEFT": "La quantité du stock parent n'est pas suffisante pour extraire ce lot. La quantité a été réinitialisé",
   "POTENTIAL_DUPLICATE": "Doublon potentiel détecté",
   "PRODUCTION_SITE_COMDATE_FORMAT_INCORRECT": "Le format de la date de mise en service est incorrect",
   "PROVENANCE_MP": "La provenance de la matière première semble inhabituelle",

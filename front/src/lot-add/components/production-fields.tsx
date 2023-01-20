@@ -63,7 +63,6 @@ export const ProducerField = (props: AutocompleteProps<Entity | string>) => {
 
   return (
     <Autocomplete
-      disabled={!entity.has_trading && !entity.has_stocks}
       label={t("Producteur")}
       value={producer}
       icon={isKnown ? UserCheck : undefined}
@@ -72,6 +71,7 @@ export const ProducerField = (props: AutocompleteProps<Entity | string>) => {
       normalize={norm.normalizeEntityOrUnknown}
       {...bound}
       {...props}
+      disabled={!entity.has_trading && !entity.has_stocks}
     />
   )
 }

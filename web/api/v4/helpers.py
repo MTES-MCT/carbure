@@ -695,7 +695,6 @@ def get_transaction_distance(lot):
 
 def send_email_declaration_validated(declaration):
     email_subject = "Carbure - Votre Déclaration de Durabilité a été validée"
-    cc = ["carbure@beta.gouv.fr"]
     text_message = """
     Bonjour,
 
@@ -713,12 +712,11 @@ def send_email_declaration_validated(declaration):
         recipients = [r.user.email for r in UserRights.objects.filter(entity=declaration.entity, user__is_staff=False, user__is_superuser=False).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])]
 
     period = declaration.period.strftime('%Y-%m')
-    msg = EmailMultiAlternatives(subject=email_subject, body=text_message % (period), from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc)
+    msg = EmailMultiAlternatives(subject=email_subject, body=text_message % (period), from_email=settings.DEFAULT_FROM_EMAIL, to=recipients)
     msg.send()
 
 def send_email_declaration_invalidated(declaration):
     email_subject = "Carbure - Votre Déclaration de Durabilité a été annulée"
-    cc = ["carbure@beta.gouv.fr"]
     text_message = """
     Bonjour,
 
@@ -737,7 +735,7 @@ def send_email_declaration_invalidated(declaration):
         recipients = [r.user.email for r in UserRights.objects.filter(entity=declaration.entity, user__is_staff=False, user__is_superuser=False).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])]
 
     period = declaration.period.strftime('%Y-%m')
-    msg = EmailMultiAlternatives(subject=email_subject, body=text_message % (period), from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc)
+    msg = EmailMultiAlternatives(subject=email_subject, body=text_message % (period), from_email=settings.DEFAULT_FROM_EMAIL, to=recipients)
     msg.send()
 
 
@@ -890,12 +888,15 @@ def get_prefetched_data(entity=None):
     d['feedstocks'] = {m.code: m for m in MatierePremiere.objects.all()}
     d['depots'] = {d.depot_id: d for d in Depot.objects.all()}
     d['depotsbyname'] = {d.name.upper(): d for d in d['depots'].values()}
+
     if entity:
         # get only my production sites
         d['my_production_sites'] = {ps.name.upper(): ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').filter(producer=entity)}
         # get all my linked certificates
         d['my_vendor_certificates'] = [c.certificate.certificate_id for c in EntityCertificate.objects.filter(entity=entity)]
-
+    else:
+        d["my_production_sites"] = {}
+        d["my_vendor_certificates"] = []
 
     # MAPPING OF ENTITIES AND DELIVERY SITES
     # dict {'entity1': [depot1, depot2],

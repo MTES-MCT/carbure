@@ -8,6 +8,13 @@ import { SearchInput } from "common/components/input"
 import { EntitySummary } from "./components/entity-summary"
 import { Main } from "common/components/scaffold"
 import Tabs from "common/components/tabs"
+import { Plus } from "common/components/icons"
+import Button from "common/components/button"
+import { usePortal } from "common/components/portal"
+import AddEntityDialog from "./components/add-entity-dialog"
+import { useNotify } from "common/components/notifications"
+import { compact } from "common/utils/collection"
+import useEntity from "carbure/hooks/entity"
 
 const Entities = () => {
   const { t } = useTranslation()
@@ -25,20 +32,50 @@ const EntityList = () => {
   const { t } = useTranslation()
   const [search, setSearch] = useState<string | undefined>("")
   const [tab, setTab] = useState("entities")
+  const portal = usePortal()
+  const notify = useNotify()
+  const entity = useEntity()
+
+  const handleEntityAdded = (name: string) => {
+    notify(
+      t("La société {{name}} a bien été ajoutée.", {
+        name,
+      }),
+      { variant: "success" }
+    )
+  }
+
+  const showEntityDialog = () => {
+    portal((close) => (
+      <AddEntityDialog onClose={close} onEntityAdded={handleEntityAdded} />
+    ))
+  }
 
   return (
     <Main>
       <header>
-        <h1>Informations sur les sociétés</h1>
+        <section>
+          <h1>Informations sur les sociétés</h1>
+          <Button
+            asideX
+            variant="primary"
+            icon={Plus}
+            label={t("Ajouter une société")}
+            action={showEntityDialog}
+          />
+        </section>
       </header>
       <Tabs
         focus={tab}
         onFocus={setTab}
         variant="sticky"
-        tabs={[
+        tabs={compact([
           { key: "entities", label: t("Récapitulatif") },
-          { key: "certificates", label: t("Certificats") },
-        ]}
+          entity.isAdmin && {
+            key: "certificates",
+            label: t("Certificats"),
+          },
+        ])}
       />
       <section>
         <SearchInput
@@ -50,7 +87,9 @@ const EntityList = () => {
           onChange={setSearch}
         />
         {tab === "entities" && <EntitySummary search={search} />}
-        {tab === "certificates" && <Certificates search={search} />}
+        {entity.isAdmin && tab === "certificates" && (
+          <Certificates search={search} />
+        )}
       </section>
     </Main>
   )

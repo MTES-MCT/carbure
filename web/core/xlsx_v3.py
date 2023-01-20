@@ -281,13 +281,15 @@ def make_mps_sheet(workbook):
     bold = workbook.add_format({'bold': True})
     worksheet_mps.write('A1', 'code', bold)
     worksheet_mps.write('B1', 'name', bold)
-    worksheet_mps.write('C1', 'category', bold)
+    worksheet_mps.write('C1', 'name_en', bold)
+    worksheet_mps.write('D1', 'category', bold)
     # content
     row = 1
     for m in mps:
         worksheet_mps.write(row, 0, m.code)
         worksheet_mps.write(row, 1, m.name)
-        worksheet_mps.write(row, 2, m.category)
+        worksheet_mps.write(row, 2, m.name_en)
+        worksheet_mps.write(row, 3, m.category)
         row += 1
 
 
@@ -298,11 +300,13 @@ def make_biofuels_sheet(workbook):
     bold = workbook.add_format({'bold': True})
     worksheet_biocarburants.write('A1', 'code', bold)
     worksheet_biocarburants.write('B1', 'name', bold)
+    worksheet_biocarburants.write('C1', 'name_en', bold)
     # content
     row = 1
     for b in biocarburants:
         worksheet_biocarburants.write(row, 0, b.code)
         worksheet_biocarburants.write(row, 1, b.name)
+        worksheet_biocarburants.write(row, 2, b.name_en)
         row += 1
 
 

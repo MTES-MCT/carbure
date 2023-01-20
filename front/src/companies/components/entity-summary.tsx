@@ -9,7 +9,7 @@ import { Alert } from "common/components/alert"
 import { AlertTriangle } from "common/components/icons"
 import { Panel, LoaderOverlay, Grid } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import { matchesSearch } from "common/utils/collection"
+import { compact, matchesSearch } from "common/utils/collection"
 import MultiSelect from "common/components/multi-select"
 import Select from "common/components/select"
 import { EntityType } from "carbure/types"
@@ -17,6 +17,7 @@ import {
   getEntityTypeLabel,
   normalizeEntityType,
 } from "carbure/utils/normalizers"
+import useEntity from "carbure/hooks/entity"
 
 type EntitySummaryProps = {
   search?: string
@@ -26,13 +27,17 @@ type Operation = "user" | "certificate" | "double-counting"
 
 export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
   const { t } = useTranslation()
+  const entity = useEntity()
+  const hasAirlineOnly = entity.isExternal && entity.hasAdminRight("AIRLINE")
 
-  const entities = useQuery(api.getEntities, {
+  const entities = useQuery(api.getCompanies, {
     key: "entities",
-    params: [],
+    params: [entity.id],
   })
 
-  const [types, setTypes] = useState<EntityType[] | undefined>(undefined)
+  const [types, setTypes] = useState<EntityType[] | undefined>(
+    hasAirlineOnly ? [EntityType.Airline] : undefined
+  )
   const [operation, setOperations] = useState<Operation | undefined>(undefined)
 
   const entityData = entities.result?.data.data ?? []
@@ -49,36 +54,49 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
   return (
     <>
       <Grid>
-        <MultiSelect
-          clear
-          value={types}
-          onChange={setTypes}
-          label={t("Types d'entité")}
-          placeholder="Choisissez un ou plusieurs types"
-          normalize={normalizeEntityType}
-          options={[
-            EntityType.Operator,
-            EntityType.Producer,
-            EntityType.Trader,
-            EntityType.Auditor,
-          ]}
-        />
+        {!hasAirlineOnly && (
+          <MultiSelect
+            clear
+            value={types}
+            onChange={setTypes}
+            label={t("Types d'entité")}
+            placeholder="Choisissez un ou plusieurs types"
+            normalize={normalizeEntityType}
+            options={[
+              EntityType.Operator,
+              EntityType.Producer,
+              EntityType.Trader,
+              EntityType.Auditor,
+              EntityType.Airline,
+            ]}
+          />
+        )}
         <Select
           clear
           value={operation}
           onChange={setOperations}
           label={t("Opérations en attente")}
           placeholder="Choisissez une opération"
-          options={[
+          options={compact([
             { value: "user", label: t("Utilisateurs à autoriser") },
-            { value: "certificate", label: t("Certificats à valider") },
-            { value: "double-counting", label: t("Dossiers double comptage") },
-          ]}
+            entity.isAdmin && {
+              value: "certificate",
+              label: t("Certificats à valider"),
+            },
+            entity.isAdmin && {
+              value: "double-counting",
+              label: t("Dossiers double comptage"),
+            },
+          ])}
         />
       </Grid>
 
       {!hasResults && (
-        <Alert icon={AlertTriangle} variant="warning">
+        <Alert
+          icon={AlertTriangle}
+          variant="warning"
+          loading={entities.loading}
+        >
           Aucune société trouvée pour cette recherche.
         </Alert>
       )}
@@ -88,11 +106,11 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
           <header>
             <h1>Récapitulatif des sociétés</h1>
           </header>
-          <Table
+          <Table<EntityDetails>
             loading={entities.loading}
             rows={matchedEntities}
             rowLink={(e) => `${e.entity.id}`}
-            columns={[
+            columns={compact([
               {
                 key: "entities",
                 header: t("Société"),
@@ -104,7 +122,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                   />
                 ),
               },
-              {
+              entity.isAdmin && {
                 key: "factories",
                 header: t("Production / Stockage"),
                 orderBy: (e) => e.production_sites + e.depots,
@@ -123,7 +141,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                   />
                 ),
               },
-              {
+              entity.isAdmin && {
                 key: "certificates",
                 header: t("Certificats"),
                 orderBy: (e) => e.certificates,
@@ -143,7 +161,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                   />
                 ),
               },
-              {
+              entity.isAdmin && {
                 key: "double-counting",
                 header: t("Double comptage"),
                 orderBy: (e) => e.double_counting_requests * 1000 + e.double_counting, // prettier-ignore
@@ -183,7 +201,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                   />
                 ),
               },
-            ]}
+            ])}
           />
           {entities.loading && <LoaderOverlay />}
         </Panel>

@@ -15,9 +15,14 @@ export interface ActionBarProps {
   icon?: boolean
   canSave?: boolean
   lot: Lot
+  hasParentStock?: boolean
 }
 
-export const LotActions = ({ lot, canSave }: ActionBarProps) => {
+export const LotActions = ({
+  lot,
+  canSave,
+  hasParentStock,
+}: ActionBarProps) => {
   const entity = useEntity()
 
   const isCreator = lot.added_by?.id === entity.id
@@ -58,7 +63,7 @@ export const LotActions = ({ lot, canSave }: ActionBarProps) => {
         <Fragment>
           {correction === "FIXED" && <ApproveOneFixButton lot={lot} />}
           {["NO_PROBLEMO", "FIXED"].includes(correction) && (
-            <RequestOneFixButton lot={lot} />
+            <RequestOneFixButton lot={lot} hasParentStock={hasParentStock} />
           )}
         </Fragment>
       )}

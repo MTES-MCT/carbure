@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 import * as api from "./api"
 import ClientTabs from "./components/client-tabs"
-import Tickets from "./components/tickets"
+import AirlineTickets from "./components/tickets/airline-tickets"
 import { SafTicketStatus } from "./types"
 
 export const SafClient = () => {
@@ -47,16 +47,26 @@ export const SafClient = () => {
       </header>
 
       <Routes>
+        {/* //TODO comment merger les deux instructions si dessous  https://stackoverflow.com/questions/47369023/react-router-v4-allow-only-certain-parameters-in-url */}
         <Route
-          path="/tickets/*"
-          element={<Tickets year={years.selected} snapshot={snapshotData} />}
+          path="/tickets/pending"
+          element={
+            <AirlineTickets year={years.selected} snapshot={snapshotData} />
+          }
         />
+        <Route
+          path="/tickets/accepted"
+          element={
+            <AirlineTickets year={years.selected} snapshot={snapshotData} />
+          }
+        />
+
         <Route
           path="*"
           element={
             <Navigate
               replace
-              to={`tickets/${SafTicketStatus.Pending.toLocaleLowerCase()}`}
+              to={`tickets/${SafTicketStatus.Pending.toLocaleLowerCase()}/`}
             />
           }
         />

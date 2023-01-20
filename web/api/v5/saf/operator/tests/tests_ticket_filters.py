@@ -28,18 +28,30 @@ class SafTicketFiltersTest(TestCase):
 
         SafTicket.objects.all().delete()
 
-        SafTicketFactory.create(year=2022, period=202201, supplier_id=self.entity.id, client_id=self.client1.id, feedstock=self.hau, status=SafTicket.PENDING)  # fmt:skip
-        SafTicketFactory.create(year=2022, period=202202, supplier_id=self.entity.id, client_id=self.client2.id, feedstock=self.hau, status=SafTicket.ACCEPTED)  # fmt:skip
-        SafTicketFactory.create(year=2022, period=202202, supplier_id=self.entity.id, client_id=self.client2.id, feedstock=self.hga, status=SafTicket.PENDING)  # fmt:skip
+        SafTicketFactory.create(year=2022, assignment_period=202201, supplier_id=self.entity.id, client_id=self.client1.id, feedstock=self.hau, status=SafTicket.PENDING)  # fmt:skip
+        SafTicketFactory.create(year=2022, assignment_period=202202, supplier_id=self.entity.id, client_id=self.client2.id, feedstock=self.hau, status=SafTicket.ACCEPTED)  # fmt:skip
+        SafTicketFactory.create(year=2022, assignment_period=202202, supplier_id=self.entity.id, client_id=self.client2.id, feedstock=self.hga, status=SafTicket.PENDING)  # fmt:skip
 
     def test_empty_ticket_filters(self):
-        query = {"entity_id": self.entity.id, "year": 2021, "status": "pending", "filter": "feedstocks"}
+        query = {
+            "entity_id": self.entity.id,
+            "year": 2021,
+            "status": "PENDING",
+            "type": "assigned",
+            "filter": "feedstocks",
+        }
         response = self.client.get(reverse("api-v5-saf-operator-ticket-filters"), query)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["data"], [])
 
     def test_ticket_filters_feedstock(self):
-        query = {"entity_id": self.entity.id, "year": 2022, "status": "pending", "filter": "feedstocks"}
+        query = {
+            "entity_id": self.entity.id,
+            "year": 2022,
+            "status": "PENDING",
+            "type": "assigned",
+            "filter": "feedstocks",
+        }
         response = self.client.get(reverse("api-v5-saf-operator-ticket-filters"), query)
 
         self.assertEqual(response.status_code, 200)
@@ -52,7 +64,8 @@ class SafTicketFiltersTest(TestCase):
         query = {
             "entity_id": self.entity.id,
             "year": 2022,
-            "status": "pending",
+            "status": "PENDING",
+            "type": "assigned",
             "filter": "feedstocks",
             "periods": 202201,
         }
@@ -65,7 +78,13 @@ class SafTicketFiltersTest(TestCase):
         )
 
     def test_ticket_filters_period(self):
-        query = {"entity_id": self.entity.id, "year": 2022, "status": "pending", "filter": "periods"}
+        query = {
+            "entity_id": self.entity.id,
+            "year": 2022,
+            "status": "PENDING",
+            "type": "assigned",
+            "filter": "periods",
+        }
         response = self.client.get(reverse("api-v5-saf-operator-ticket-filters"), query)
 
         self.assertEqual(response.status_code, 200)
@@ -75,7 +94,13 @@ class SafTicketFiltersTest(TestCase):
         )
 
     def test_ticket_filters_client(self):
-        query = {"entity_id": self.entity.id, "year": 2022, "status": "pending", "filter": "clients"}
+        query = {
+            "entity_id": self.entity.id,
+            "year": 2022,
+            "status": "PENDING",
+            "type": "assigned",
+            "filter": "clients",
+        }
         response = self.client.get(reverse("api-v5-saf-operator-ticket-filters"), query)
 
         self.assertEqual(response.status_code, 200)

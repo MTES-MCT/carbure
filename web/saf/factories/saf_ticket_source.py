@@ -16,7 +16,7 @@ class SafTicketSourceFactory(factory.django.DjangoModelFactory):
     added_by = factory.Iterator(Entity.objects.all())
 
     year = datetime.today().year
-    period = factory.LazyAttribute(lambda obj: obj.year * 100 + random.randint(1, 12))
+    delivery_period = factory.LazyAttribute(lambda obj: obj.year * 100 + random.randint(1, 12))
 
     total_volume = factory.Faker("random_int", min=10000, max=500000)
     assigned_volume = factory.Faker("random_int", min=0, max=10000)

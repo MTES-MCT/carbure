@@ -1,38 +1,42 @@
-import { useMemo } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
-import { useTranslation } from "react-i18next"
-import * as api from "../../api"
-import { useMatomo } from "matomo"
-import { CorrectionStatus, Lot, LotStatus } from "transactions/types"
-import { useQuery, useMutation } from "common/hooks/async"
-import { useNotify } from "common/components/notifications"
 import useEntity from "carbure/hooks/entity"
-import { layout, LoaderOverlay } from "common/components/scaffold"
-import Dialog from "common/components/dialog"
+import { Entity, UserRole } from "carbure/types"
+import Alert from "common/components/alert"
 import Button from "common/components/button"
-import { Alarm, Return, Save } from "common/components/icons"
+import Dialog from "common/components/dialog"
+import { useHashMatch } from "common/components/hash-route"
+import { Alarm, Save } from "common/components/icons"
+import { useNotify } from "common/components/notifications"
+import Portal from "common/components/portal"
+import { LoaderOverlay } from "common/components/scaffold"
+import { useMutation, useQuery } from "common/hooks/async"
+import useScrollToRef from "common/hooks/scroll-to-ref"
+import { formatDate } from "common/utils/formatters"
+import Flags from "flags.json"
 import LotForm, { hasChange, useLotForm } from "lot-add/components/lot-form"
+import { useMatomo } from "matomo"
+import { useEffect, useMemo } from "react"
+import { useTranslation } from "react-i18next"
+import { useLocation, useNavigate } from "react-router-dom"
 import LotTag from "transactions/components/lots/lot-tag"
-import Comments from "./comments"
+import {
+  CorrectionStatus,
+  DeliveryType,
+  Lot,
+  LotStatus,
+} from "transactions/types"
+import { isExpiring } from "transactions/utils/deadline"
+import * as api from "../../api"
+import Score from "../score"
+import LotActions from "./actions"
 import {
   BlockingAnomalies,
   separateAnomalies,
   WarningAnomalies,
 } from "./anomalies"
+import Comments from "./comments"
 import { getLotChanges, LotHistory } from "./history"
-import { isExpiring } from "transactions/utils/deadline"
-import Alert from "common/components/alert"
-import NavigationButtons from "./navigation"
-import LotActions from "./actions"
-import { Entity, UserRole } from "carbure/types"
 import LotTraceability, { hasTraceability } from "./lot-traceability"
-import { invalidate } from "common/hooks/invalidate"
-import { formatDate } from "common/utils/formatters"
-import Score from "../score"
-import Portal from "common/components/portal"
-import Flags from "flags.json"
-import { useHashMatch } from "common/components/hash-route"
-import useScrollToRef from "common/hooks/scroll-to-ref"
+import NavigationButtons from "./navigation"
 
 export interface LotDetailsProps {
   neighbors: number[]
@@ -87,6 +91,33 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
 
   const closeDialog = () => {
     navigate({ search: location.search, hash: "#" })
+  }
+
+  useEffect(() => {
+    disabledFields()
+  }, [lotData])
+
+  const disabledFields = () => {
+    form.clearDisabledFields()
+
+    if (!lotData) return
+
+    const inCorrection =
+      lotData.lot.correction_status === CorrectionStatus.InCorrection
+
+    const inCorrectionOrDraft =
+      inCorrection || lotData.lot.lot_status === LotStatus.Draft
+
+    if (inCorrection && !!lotData.parent_lot) {
+      form.setDisabledFieldsGroup(["batch", "production", "emissions"])
+    }
+
+    if (lotData.parent_stock && inCorrectionOrDraft) {
+      form.setDisabledFieldsGroup(
+        ["production", "emissions"],
+        ["biofuel", "feedstock", "country_of_origin", "free_field"]
+      )
+    }
   }
 
   return (
@@ -175,7 +206,11 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
           )}
 
           {lotData && hasEditRights && (
-            <LotActions lot={lotData.lot} canSave={canSave} />
+            <LotActions
+              lot={lotData.lot}
+              canSave={canSave}
+              hasParentStock={!!lotData.has_parent_stock}
+            />
           )}
 
           <NavigationButtons neighbors={neighbors} closeAction={closeDialog} />

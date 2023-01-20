@@ -11,19 +11,26 @@ import { Main, Row } from "common/components/scaffold"
 import Tabs from "common/components/tabs"
 import { compact } from "common/utils/collection"
 import { useQuery } from "common/hooks/async"
+import useEntity from "carbure/hooks/entity"
 
 const EntityDetails = () => {
   const navigate = useNavigate()
+  const entity = useEntity()
   const { id = "" } = useParams<"id">()
-  const entityID = parseInt(id, 10)
+  const company_id = parseInt(id, 10)
 
-  const entity = useQuery(api.getEntityDetails, {
+  const company = useQuery(api.getCompanyDetails, {
     key: "entity-details",
-    params: [entityID],
+    params: [entity.id, company_id],
   })
 
-  const entityData = entity.result?.data.data
+  const getDepots = (company_id: number) => {
+    return api.getCompanyDepots(entity.id, company_id)
+  }
+
+  const entityData = company.result?.data.data
   const isProducer = entityData?.entity_type === EntityType.Producer
+  const isAirline = entityData?.entity_type === EntityType.Airline
 
   return (
     <Main>
@@ -42,29 +49,33 @@ const EntityDetails = () => {
         variant="sticky"
         tabs={compact([
           { key: "users", path: "#users", label: "Utilisateurs" },
-          { key: "depot", path: "#depot", label: "Depots" },
+          !isAirline && { key: "depot", path: "#depot", label: "Depots" },
           isProducer && { key: "production", path: "#production", label: "Sites de production" }, // prettier-ignore
-          { key: "certificates", path: "#certificates", label: "Certificats" },
+          !isAirline && {
+            key: "certificates",
+            path: "#certificates",
+            label: "Certificats",
+          },
         ])}
       />
 
       <section>
         <UserRights />
-        {entityData && (
+        {entityData && !isAirline && (
           <DeliverySitesSettings
             readOnly
             entity={entityData}
-            getDepots={api.getEntityDepots}
+            getDepots={getDepots}
           />
         )}
         {entityData && isProducer && (
           <ProductionSitesSettings
             readOnly
             entity={entityData}
-            getProductionSites={api.getEntityProductionSites}
+            getProductionSites={api.getCompanyProductionSites}
           />
         )}
-        <Certificates entity={entityID} />
+        {!isAirline && <Certificates entity={company_id} />}
       </section>
     </Main>
   )

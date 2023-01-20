@@ -76,6 +76,7 @@ export const lotDetails: LotDetails = {
   distance: null,
   parent_lot: null,
   parent_stock: null,
+  has_parent_stock: null,
   children_lot: [],
   children_stock: [],
   certificates: {

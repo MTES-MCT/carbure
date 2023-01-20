@@ -69,7 +69,7 @@ export const AcceptOneButton = ({ icon, lot }: AcceptOneButtonProps) => {
     <Menu
       variant={icon ? "icon" : "success"}
       icon={Check}
-      anchor={Anchors.topLeft}
+      anchor="top start"
       label={t("Accepter")}
       items={options}
     />

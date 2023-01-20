@@ -19,7 +19,12 @@ const ParentLot = ({ parent_lot }: { parent_lot?: LotPreview }) => {
   }
 
   return (
-    <Collapse isOpen={true} variant="info" icon={Split} label={"Lot Initial"}>
+    <Collapse
+      isOpen={true}
+      variant="info"
+      icon={Split}
+      label={t("Lot initial")}
+    >
       <section>
         <ul>
           <li>

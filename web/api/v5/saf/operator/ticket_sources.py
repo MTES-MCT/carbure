@@ -21,6 +21,8 @@ class SafTicketSourceError:
 def get_ticket_sources(request, *args, **kwargs):
     try:
         query = parse_ticket_source_query(request.GET)
+        sort_by = request.GET.get("sort_by")
+        order = request.GET.get("order")
         from_idx = int(request.GET.get("from_idx", 0))
         limit = int(request.GET.get("limit", 25))
     except:
@@ -28,6 +30,7 @@ def get_ticket_sources(request, *args, **kwargs):
 
     try:
         ticket_sources = find_ticket_sources(**query)
+        ticket_sources = sort_ticket_sources(ticket_sources, sort_by, order)
 
         paginator = Paginator(ticket_sources, limit)
         current_page = floor(from_idx / limit) + 1
@@ -84,7 +87,7 @@ def find_ticket_sources(**filters):
         ticket_sources = ticket_sources.filter(year=filters["year"])
 
     if filters["periods"] != None:
-        ticket_sources = ticket_sources.filter(period__in=filters["periods"])
+        ticket_sources = ticket_sources.filter(delivery_period__in=filters["periods"])
 
     if filters["feedstocks"] != None:
         ticket_sources = ticket_sources.filter(feedstock__code__in=filters["feedstocks"])
@@ -92,9 +95,9 @@ def find_ticket_sources(**filters):
     if filters["clients"] != None:
         ticket_sources = ticket_sources.filter(saf_tickets__client__name__in=filters["clients"])
 
-    if filters["status"] == "available":
+    if filters["status"] == "AVAILABLE":
         ticket_sources = ticket_sources.filter(assigned_volume__lt=F("total_volume"))
-    elif filters["status"] == "history":
+    elif filters["status"] == "HISTORY":
         ticket_sources = ticket_sources.filter(assigned_volume__gte=F("total_volume"))
     else:
         raise Exception("Status '%s' does not exist for ticket sources" % filters["status"])
@@ -111,3 +114,19 @@ def find_ticket_sources(**filters):
         )
 
     return ticket_sources
+
+
+def sort_ticket_sources(ticket_sources, sort_by, order):
+    sortable_columns = {
+        "volume": "total_volume",
+        "period": "delivery_period",
+        "feedstock": "feedstock__code",
+        "ghg_reduction": "ghg_reduction",
+    }
+
+    column = sortable_columns.get(sort_by, "created_at")
+
+    if order == "desc":
+        return ticket_sources.order_by("-%s" % column)
+    else:
+        return ticket_sources.order_by(column)

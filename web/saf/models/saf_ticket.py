@@ -1,5 +1,5 @@
-from datetime import datetime
 from django.db import models
+from math import floor
 
 
 class SafTicket(models.Model):
@@ -20,7 +20,7 @@ class SafTicket(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     year = models.IntegerField(blank=False, null=False)
-    period = models.IntegerField(blank=False, null=False)
+    assignment_period = models.IntegerField(blank=False, null=False)
 
     agreement_reference = models.CharField(max_length=64, null=True)
     agreement_date = models.DateField(null=True)
@@ -32,6 +32,7 @@ class SafTicket(models.Model):
 
     supplier = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.SET_NULL, related_name="saf_owner")  # fmt: skip
     client = models.ForeignKey("core.Entity", null=True, blank=True, default=None, on_delete=models.SET_NULL)  # fmt: skip
+    free_field = models.TextField(null=True, blank=True, default=None)
 
     carbure_producer = models.ForeignKey("core.Entity", null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="saf_producer")  # fmt: skip
     unknown_producer = models.CharField(max_length=64, blank=True, null=True, default=None)
@@ -59,15 +60,14 @@ class SafTicket(models.Model):
 
     def generate_carbure_id(self):
         self.carbure_id = "T{period}-{country_of_production}-{id}".format(
-            period=self.period,
+            period=self.assignment_period,
             country_of_production=self.production_country.code_pays,
             id=self.id,
         )
 
 
-def create_ticket_from_source(ticket_source, client_id, volume, agreement_date, agreement_reference):
-    today = datetime.today()
-    period = today.year * 100 + today.month
+def create_ticket_from_source(ticket_source, client_id, volume, agreement_date, agreement_reference, assignment_period, free_field):
+    year = floor(assignment_period / 100)
 
     ticket = SafTicket.objects.create(
         client_id=client_id,
@@ -76,10 +76,11 @@ def create_ticket_from_source(ticket_source, client_id, volume, agreement_date, 
         agreement_reference=agreement_reference,
         status=SafTicket.PENDING,
         created_at=ticket_source.created_at,
-        year=today.year,
-        period=period,
+        year=year,
+        assignment_period=assignment_period,
         biofuel=ticket_source.biofuel,
         feedstock=ticket_source.feedstock,
+        free_field=free_field,
         country_of_origin=ticket_source.country_of_origin,
         supplier_id=ticket_source.added_by_id,
         carbure_producer=ticket_source.carbure_producer,

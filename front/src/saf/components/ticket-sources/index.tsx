@@ -7,6 +7,7 @@ import { SearchInput } from "common/components/input"
 import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
+import { compact } from "common/utils/collection"
 import { useQueryParamsStore } from "saf/hooks/query-params-store"
 import { useSafQuery } from "saf/hooks/saf-query"
 import {
@@ -17,13 +18,13 @@ import {
 } from "saf/types"
 import LotDetails from "transaction-details/components/lots"
 import * as api from "../../api"
-import * as data from "../../__test__/data"
 import { Filters } from "../filters"
 import NoResult from "../no-result"
 import { useAutoStatus } from "../operator-tabs"
 import { OperatorTicketDetails } from "../ticket-details/operator-details"
 import TicketSourceDetail from "../ticket-source-details"
 import { StatusSwitcher } from "./status-switcher"
+import { TicketSourcesSummary } from "./summary"
 import TicketSourcesTable from "./table"
 
 export interface TicketSourcesProps {
@@ -37,6 +38,7 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
   const entity = useEntity()
   const status = useAutoStatus()
   const [state, actions] = useQueryParamsStore(entity, year, status, snapshot)
+
   const query = useSafQuery(state)
 
   const ticketSourcesResponse = useQuery(api.getOperatorTicketSources, {
@@ -45,12 +47,18 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
   })
 
   const ticketSoucesData = ticketSourcesResponse.result?.data.data
-  // const ticketSoucesData = data.safTicketSourcesResponse //TO TEST with testing d:ata
   const ids = ticketSoucesData?.ids ?? []
 
   const total = ticketSoucesData?.total ?? 0
   const count = ticketSoucesData?.returned ?? 0
   const ticketSources = ticketSoucesData?.saf_ticket_sources
+
+  let selectedTicketSources
+  if (state.selection?.length > 0 && ticketSources) {
+    selectedTicketSources = state.selection.map(
+      (id) => ticketSources.find((t) => t.id === id)!
+    )
+  }
 
   const showTicketSourceDetail = (ticketSource: SafTicketSource) => {
     return {
@@ -72,6 +80,7 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
           }
         />
       </Bar>
+
       <section>
         <ActionBar>
           <StatusSwitcher
@@ -89,14 +98,24 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
           />
         </ActionBar>
 
+        {selectedTicketSources &&
+          status === SafTicketSourceStatus.Available && (
+            <TicketSourcesSummary
+              ticketSources={compact(selectedTicketSources)}
+            />
+          )}
+
         {count > 0 && ticketSources ? (
           <>
             <TicketSourcesTable
-              loading={false}
+              loading={ticketSourcesResponse.loading}
               order={state.order}
               ticketSources={ticketSources}
               rowLink={showTicketSourceDetail}
+              selected={state.selection}
+              onSelect={actions.setSelection}
               onOrder={actions.setOrder}
+              status={status as SafTicketSourceStatus}
             />
 
             {(state.limit || 0) < total && (

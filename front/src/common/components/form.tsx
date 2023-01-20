@@ -73,11 +73,16 @@ export interface FormManager<T> {
   bind: Bind<T>
   setField: FieldSetter<T>
   setFieldError: (name: keyof T, error: string | undefined) => void
+  setDisabledFields: (fieldsNames: string[]) => void
+  clearDisabledFields: () => void
   setValue: React.Dispatch<React.SetStateAction<T>>
 }
 
 export type FormErrors<T> = Partial<Record<keyof T, string>>
+export type FormDisabledFields<T> = Partial<Record<keyof T, boolean>>
+
 const EMPTY_ERRORS: FormErrors<any> = {}
+const EMPTY_DISABLED_FIELDS: FormDisabledFields<any> = {}
 
 function identity<T>(value: T) {
   return value
@@ -94,6 +99,7 @@ export function useForm<T>(
 ): FormManager<T> {
   const [value, setValue] = useState(initialState)
   const [_errors, setErrors] = useState(EMPTY_ERRORS)
+  const [disabledFields, _setDisabledFields] = useState(EMPTY_DISABLED_FIELDS)
 
   const errors = options?.errors ?? _errors
   const mutate = options?.setValue ?? identity
@@ -113,12 +119,26 @@ export function useForm<T>(
     []
   )
 
-  const bind = useBindCallback(value, errors, setField)
+  const clearDisabledFields = useCallback(() => {
+    _setDisabledFields(EMPTY_DISABLED_FIELDS)
+  }, [])
+
+  const setDisabledFields = useCallback((fieldsNames: string[]) => {
+    const fields = { ...disabledFields }
+    fieldsNames.forEach((name) => {
+      fields[name] = true
+    })
+    _setDisabledFields(fields)
+  }, [])
+
+  const bind = useBindCallback(value, errors, disabledFields, setField)
 
   return {
     value,
     errors,
     setFieldError,
+    setDisabledFields,
+    clearDisabledFields,
     bind,
     setField,
     setValue,
@@ -133,12 +153,14 @@ export function useBind<T>() {
 export function useBindCallback<T>(
   value: T,
   errors: FormErrors<T>,
+  disabledFields: FormDisabledFields<T>,
   setField: (name: keyof T, value: T[keyof T]) => void
 ): Bind<T> {
   return useCallback(
     (name, option) => ({
       name,
       value: option ?? value[name],
+      disabled: disabledFields[name],
       checked: option ? option === value[name] : undefined,
       error: errors[name],
       onChange: (value) => setField(name, value),

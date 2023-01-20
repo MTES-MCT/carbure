@@ -62,7 +62,7 @@ class AdminAPITest(TestCase):
 
     def test_accessrights_as_admin(self):
         for url in urlpatterns:
-            response = self.client.get(reverse(url.name))
+            response = self.client.get(reverse(url.name), { "entity_id": self.entity3.id })
             self.assertNotEqual(response.status_code, 403)
 
 
@@ -78,11 +78,9 @@ class AdminAPITest(TestCase):
         response = self.client.post(reverse('api-v4-verify-otp'), {'otp_token': device.token})
         self.assertEqual(response.status_code, 200)
         for url in urlpatterns:
-            response = self.client.get(reverse(url.name))
+            response = self.client.get(reverse(url.name), {"entity_id": self.entity3.id})
             self.assertEqual(response.status_code, 403)
 
-
-            
 
     def test_get_users(self):
         response = self.client.get(reverse('api-v3-admin-get-users'))
@@ -104,13 +102,13 @@ class AdminAPITest(TestCase):
 
 
     def test_get_entities(self):
-        response = self.client.get(reverse('api-v3-admin-get-entities'))
+        response = self.client.get(reverse('api-v3-admin-get-entities'), { "entity_id": self.entity3.id })
         # api works
         self.assertEqual(response.status_code, 200)
         # and returns at least 5 entities
         self.assertGreaterEqual(len(response.json()['data']), 5)
         # check if querying works
-        response = self.client.get(reverse('api-v3-admin-get-entities') + '?q=prod')
+        response = self.client.get(reverse('api-v3-admin-get-entities'), { "q": "prod", "entity_id": self.entity3.id })
         # works
         self.assertEqual(response.status_code, 200)
         # and returns at least 2 entities
@@ -123,10 +121,10 @@ class AdminAPITest(TestCase):
 
 
     def test_create_entity(self):
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {'name': 'Société Test', 'category': 'Producteur'})
+        response = self.client.post(reverse('api-v3-admin-add-entity'), {"entity_id": self.entity3.id, 'name': 'Société Test', 'category': 'Producteur'})
         self.assertEquals(response.status_code, 200)
         # check if entity has been created actually exists
-        response = self.client.get(reverse('api-v3-admin-get-entities') + '?q=Test')
+        response = self.client.get(reverse('api-v3-admin-get-entities'), { "q": "Test", "entity_id": self.entity3.id })
         self.assertEqual(response.status_code, 200)
         # and returns 1 entity
         jc = response.json()['data'][0]['entity']
@@ -134,13 +132,13 @@ class AdminAPITest(TestCase):
         self.assertEqual(jc['entity_type'], 'Producteur')
 
         # make sure all categories are supported
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {'name': 'Opérateur Test', 'category': 'Opérateur'})
+        response = self.client.post(reverse('api-v3-admin-add-entity'), {"entity_id": self.entity3.id, 'name': 'Opérateur Test', 'category': 'Opérateur'})
         obj = Entity.objects.get(name='Opérateur Test')
         self.assertEquals(obj.entity_type, 'Opérateur')
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {'name': 'Trader Test', 'category': 'Trader'})
+        response = self.client.post(reverse('api-v3-admin-add-entity'), {"entity_id": self.entity3.id, 'name': 'Trader Test', 'category': 'Trader'})
         obj = Entity.objects.get(name='Trader Test')
         self.assertEquals(obj.entity_type, 'Trader')        
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {'name': 'Admin Test', 'category': 'Administration'})
+        response = self.client.post(reverse('api-v3-admin-add-entity'), {"entity_id": self.entity3.id, 'name': 'Admin Test', 'category': 'Administration'})
         obj = Entity.objects.get(name='Admin Test')
         self.assertEquals(obj.entity_type, 'Administration')
 
@@ -149,7 +147,7 @@ class AdminAPITest(TestCase):
         self.assertEqual(response.status_code, 400)
         response = self.client.post(reverse('api-v3-admin-add-entity'), {'category': 'Producteur'})
         self.assertEqual(response.status_code, 400)
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {'name': 'Jean-Claude Test'})
+        response = self.client.post(reverse('api-v3-admin-add-entity'), {"entity_id": self.entity3.id, 'name': 'Jean-Claude Test'})
         self.assertEqual(response.status_code, 400)
 
         # try to enter wrong data
@@ -158,11 +156,11 @@ class AdminAPITest(TestCase):
 
 
     def test_delete_entity(self):
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {'name': 'Société Test', 'category': 'Producteur'})
+        response = self.client.post(reverse('api-v3-admin-add-entity'), {"entity_id": self.entity3.id, 'name': 'Société Test', 'category': 'Producteur'})
         self.assertEquals(response.status_code, 200)
 
         # check if entity has been created
-        response = self.client.get(reverse('api-v3-admin-get-entities') + '?q=Test')
+        response = self.client.get(reverse('api-v3-admin-get-entities'), { "q": "Test", "entity_id": self.entity3.id })
         self.assertEqual(response.status_code, 200)
         # and returns 1 entity
         jc = response.json()['data'][0]['entity']
@@ -174,7 +172,7 @@ class AdminAPITest(TestCase):
         self.assertEqual(response.status_code, 200)        
 
         # check if entity is deleted
-        response = self.client.get(reverse('api-v3-admin-get-entities') + '?q=Test')
+        response = self.client.get(reverse('api-v3-admin-get-entities'), { "q": "Test", "entity_id": self.entity3.id })
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()['data']), 0)
     

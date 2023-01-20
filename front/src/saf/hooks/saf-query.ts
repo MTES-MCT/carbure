@@ -1,11 +1,5 @@
-
-
 import { useMemo } from "react"
-import {
-  SafQuery,
-  SafStates
-} from "saf/types"
-
+import { SafQuery, SafStates } from "saf/types"
 
 export function useSafQuery({
   entity,
@@ -16,6 +10,7 @@ export function useSafQuery({
   limit,
   order,
   filters,
+  type,
 }: SafStates) {
   return useMemo<SafQuery>(
     () => ({
@@ -27,8 +22,9 @@ export function useSafQuery({
       limit: limit || undefined,
       sort_by: order?.column,
       order: order?.direction,
+      type,
       ...filters,
     }),
-    [entity.id, year, status, search, limit, order, filters, page]
+    [entity.id, year, status, search, limit, order, filters, page, type]
   )
 }

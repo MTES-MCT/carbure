@@ -1,11 +1,11 @@
-import Table, { Cell, Order } from "common/components/table"
+import Button from "common/components/button"
+import Table, { Cell, Order, selectionColumn } from "common/components/table"
 import { compact } from "common/utils/collection"
-import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
-import { isRedII } from "lot-add/components/ghg-fields"
+import { formatNumber, formatPeriod } from "common/utils/formatters"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
-import { To } from "react-router-dom"
-import { SafTicketSource } from "saf/types"
+import { To, useLocation, useNavigate } from "react-router-dom"
+import { SafTicketSource, SafTicketSourceStatus } from "saf/types"
 import { TicketSourceTag } from "./tag"
 
 export interface TicketSourcesTableProps {
@@ -14,6 +14,9 @@ export interface TicketSourcesTableProps {
   order: Order | undefined
   rowLink: (ticketSource: SafTicketSource) => To
   onOrder: (order: Order | undefined) => void
+  selected: number[]
+  onSelect: (selected: number[]) => void
+  status: SafTicketSourceStatus
 }
 
 export const TicketSourcesTable = memo(
@@ -23,6 +26,9 @@ export const TicketSourcesTable = memo(
     order,
     rowLink,
     onOrder,
+    selected,
+    onSelect,
+    status,
   }: TicketSourcesTableProps) => {
     const columns = useColumns()
     return (
@@ -33,12 +39,20 @@ export const TicketSourcesTable = memo(
         rowLink={rowLink}
         rows={ticketSources}
         columns={compact([
+          status === SafTicketSourceStatus.Available &&
+            selectionColumn(
+              ticketSources,
+              selected,
+              onSelect,
+              (ticketSource) => ticketSource.id
+            ),
           columns.status,
           columns.availableVolume,
           columns.clients,
           columns.period,
           columns.feedstock,
           columns.ghgReduction,
+          columns.parentLot,
         ])}
       />
     )
@@ -56,6 +70,7 @@ export function useColumns() {
     },
 
     availableVolume: {
+      key: "volume",
       header: t("Volumes disponibles"),
       cell: (ticketSource: SafTicketSource) => (
         <Cell
@@ -68,7 +83,7 @@ export function useColumns() {
     },
 
     clients: {
-      key: "clients",
+      // key: "clients",
       header: t("Clients"),
       cell: (ticketSource: SafTicketSource) => {
         const value =
@@ -80,14 +95,19 @@ export function useColumns() {
     },
 
     period: {
-      key: "period",
-      header: t("Période"),
-      cell: (ticketSource: SafTicketSource) => (
-        <Cell
-          text={formatPeriod(ticketSource.period)}
-          sub={formatDate(ticketSource.created_at)}
-        />
-      ),
+      key: "delivery",
+      header: t("Livraison"),
+      cell: (ticketSource: SafTicketSource) => {
+        return (
+          <Cell
+            text={
+              ticketSource.delivery_period
+                ? formatPeriod(ticketSource.delivery_period)
+                : t("N/A")
+            }
+          />
+        )
+      },
     },
 
     feedstock: {
@@ -111,7 +131,48 @@ export function useColumns() {
         return <Cell text={`${ticketSource.ghg_reduction.toFixed(0)}%`} />
       },
     },
+
+    parentLot: {
+      key: "parent_lot",
+      header: t("Lot parent"),
+      cell: (ticketSource: SafTicketSource) => (
+        <ParentLotButton lot={ticketSource.parent_lot} />
+      ),
+    },
   }
 }
 
 export default TicketSourcesTable
+
+export interface ParentLotButtonProps {
+  lot?: {
+    id: number
+    carbure_id: string
+  }
+}
+
+export const ParentLotButton = ({ lot }: ParentLotButtonProps) => {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  if (!lot) return <Cell text={t("N/A")} />
+
+  const showLotDetails = () => {
+    navigate({
+      pathname: location.pathname,
+      search: location.search,
+      hash: `lot/${lot!.id}`,
+    })
+  }
+
+  return (
+    <Button
+      captive
+      variant="link"
+      title={t("Lot initial")}
+      label={`#${lot.carbure_id}`}
+      action={showLotDetails}
+    />
+  )
+}

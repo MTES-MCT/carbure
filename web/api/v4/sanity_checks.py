@@ -313,7 +313,7 @@ def sanity_check(lot, prefetched_data):
         if lot.biofuel.is_graisse:
             if lot.biofuel.code == 'EMHU' and lot.feedstock.code != 'HUILE_ALIMENTAIRE_USAGEE':
                 errors.append(generic_error(error=CarbureSanityCheckErrors.MP_BC_INCOHERENT, lot=lot, is_blocking=True, extra="%s doit être à base d'huiles alimentaires usagées" % (lot.biofuel.name), fields=['biofuel_code', 'feedstock_code']))
-            if lot.biofuel.code == 'EMHV' and lot.feedstock.code not in ['COLZA', 'TOURNESOL', 'SOJA', 'HUILE_PALME']:
+            if lot.biofuel.code == 'EMHV' and lot.feedstock.code not in ['COLZA', 'TOURNESOL', 'SOJA', 'HUILE_PALME', 'CARINATA']:
                 errors.append(generic_error(error=CarbureSanityCheckErrors.MP_BC_INCOHERENT,  lot=lot, is_blocking=True, extra="%s doit être à base de végétaux (Colza, Tournesol, Soja, Huile de Palme)" % (lot.biofuel.name), fields=['biofuel_code', 'feedstock_code']))
             if lot.biofuel.code == 'EMHA' and lot.feedstock.code not in ['HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2', 'HUILES_OU_GRAISSES_ANIMALES_CAT3']:
                 errors.append(generic_error(error=CarbureSanityCheckErrors.MP_BC_INCOHERENT, lot=lot, is_blocking=True, extra="%s doit être à base d'huiles ou graisses animales" % (lot.biofuel.name), fields=['biofuel_code', 'feedstock_code']))

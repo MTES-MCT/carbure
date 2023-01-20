@@ -64,11 +64,6 @@ export function useLotForm(
       }
     }
 
-    // for traders
-    if (entity.isTrader) {
-      //
-    }
-
     // for operators
     if (entity.isOperator) {
       if (value.client === undefined) {
@@ -116,7 +111,74 @@ export function useLotForm(
   const updateForm = form.setValue
   useEffect(() => updateForm(value), [value, updateForm])
 
-  return form
+  const setDisabledFieldsGroup = (
+    fieldGroups: FieldGroup[],
+    otherFields?: string[]
+  ) => {
+    disabledFieldsGroup(form, fieldGroups)
+    if (otherFields) {
+      form.setDisabledFields(otherFields)
+    }
+  }
+
+  return {
+    setDisabledFieldsGroup,
+    ...form,
+  }
+}
+
+const BATCH_VALUES = [
+  "volume",
+  "transport_document_reference",
+  "biofuel",
+  "feedstock",
+  "country_of_origin",
+  "free_field",
+]
+
+const BATCH_PRODUCTION = [
+  "producer",
+  "production_site",
+  "production_site_certificate",
+  "production_country",
+  "production_site_commissioning_date",
+]
+
+const BATCH_DELIVERY = [
+  "supplier",
+  "supplier_certificate",
+  "client",
+  "delivery_type",
+  "delivery_site",
+  "delivery_site_country",
+  "delivery_date",
+]
+
+const BATCH_EMISSIONS = [
+  "eccr",
+  "eccs",
+  "eec",
+  "eee",
+  "el",
+  "ep",
+  "esca",
+  "etd",
+  "eu",
+]
+
+export type FieldGroup = "batch" | "production" | "delivery" | "emissions"
+const disabledFieldsGroup = (
+  form: FormManager<LotFormValue>,
+  fieldGroups: FieldGroup[]
+) => {
+  let values: string[] = []
+
+  if (fieldGroups.includes("batch")) values.push(...BATCH_VALUES)
+  if (fieldGroups.includes("production")) values.push(...BATCH_PRODUCTION)
+  if (fieldGroups.includes("delivery")) values.push(...BATCH_DELIVERY)
+  if (fieldGroups.includes("emissions")) values.push(...BATCH_EMISSIONS)
+
+  form.setDisabledFields(values)
 }
 
 function computeGHGTotal(value: LotFormValue) {

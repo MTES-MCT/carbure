@@ -143,7 +143,7 @@ export interface EntityCertificate {
 
 export type Unit = "l" | "kg" | "MJ"
 
-export type ExternalAdminPages = "DCA" | "TIRIB"
+export type ExternalAdminPages = "DCA" | "TIRIB" | "AIRLINE"
 
 export enum EntityType {
   Producer = "Producteur",

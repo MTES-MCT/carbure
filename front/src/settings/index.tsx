@@ -54,15 +54,15 @@ const Settings = () => {
             key: "certificates",
             label: t("Certificats"),
           },
-          hasDepot && {
-            path: "#depot",
-            key: "depot",
-            label: t("Dépôts"),
-          },
           isProducer && {
             path: "#production",
             key: "production",
             label: t("Sites de production"),
+          },
+          hasDepot && {
+            path: "#depot",
+            key: "depot",
+            label: t("Dépôts"),
           },
           isProducer && {
             path: "#double-counting",

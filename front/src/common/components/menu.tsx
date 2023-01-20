@@ -13,7 +13,7 @@ export interface MenuProps extends ButtonProps {
   style?: React.CSSProperties
   items: MenuItem[]
   label?: string
-  anchor?: Anchor
+  anchor?: string
   onAction?: (key: string) => void
 }
 
