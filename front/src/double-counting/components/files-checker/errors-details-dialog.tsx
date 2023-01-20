@@ -21,7 +21,7 @@ export const ErrorsDetailsDialog = ({
 }: ErrorsDetailsDialogProps) => {
   const { t } = useTranslation()
 
-  const [focus, setFocus] = useState("sourcing")
+  const [focus, setFocus] = useState("sourcing_forecast")
 
   const focusedErrors = file.errors?.[
     focus as keyof typeof file.errors
@@ -54,9 +54,15 @@ export const ErrorsDetailsDialog = ({
             variant="switcher"
             tabs={[
               {
-                key: "sourcing",
+                key: "sourcing_forecast",
                 label: t("Approvisionnement ({{errorCount}})", {
-                  errorCount: file.errors?.sourcing?.length || 0,
+                  errorCount: file.errors?.sourcing_forecast?.length || 0,
+                }),
+              },
+              {
+                key: "sourcing_history",
+                label: t("Historique d'appro. ({{errorCount}})", {
+                  errorCount: file.errors?.sourcing_history?.length || 0,
                 }),
               },
               {
@@ -81,6 +87,7 @@ export const ErrorsDetailsDialog = ({
               <p>{t("Aucune erreur dans cet onglet")}</p>
             </Alert>
           )}
+
           {focusedErrors.length > 0 && <ErrorsTable errors={focusedErrors} />}
         </section>
       </main>
@@ -107,7 +114,11 @@ export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
       style: { width: 80, flex: "none" },
       cell: (error) => (
         <Cell
-          text={t("Ligne {{lineNumber}}", { lineNumber: error.line_number })}
+          text={
+            error.line_number! >= 0
+              ? t("Ligne {{lineNumber}}", { lineNumber: error.line_number })
+              : "-"
+          }
         />
       ),
     },

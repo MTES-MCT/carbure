@@ -6,7 +6,7 @@ import unicodedata
 from django.db import transaction
 from doublecount.models import DoubleCountingAgreement
 from core.common import SuccessResponse, ErrorResponse
-from core.decorators import is_admin
+from core.decorators import check_admin_rights
 from doublecount.dc_sanity_checks import check_dc_globally
 from doublecount.dc_parser import parse_dc_excel
 from doublecount.helpers import load_dc_sourcing_data, load_dc_production_data
@@ -18,7 +18,7 @@ class CheckFilesError:
     FILE_CHECK_FAILED = "FILE_CHECK_FAILED"
 
 
-@is_admin
+@check_admin_rights()
 def check_files(request, *args, **kwargs):
     files = request.FILES.getlist("files")
 
@@ -28,16 +28,21 @@ def check_files(request, *args, **kwargs):
     try:
         file_errors = []
         for file in files:
-            errors = check_dc_file(file)
-            error_count = len(errors["sourcing"]) + len(errors["production"]) + len(errors["global"])
+            info, errors = check_dc_file(file)
+            error_count = (
+                len(errors["sourcing_history"])
+                + len(errors["sourcing_forecast"])
+                + len(errors["production"])
+                + len(errors["global"])
+            )
 
             file_errors.append(
                 {
                     "file_name": file.name,
                     "errors": errors,
                     "error_count": error_count,
-                    "period": "NOT_YET_IMPLEMENTED",
-                    "production_site": "NOT_YET_IMPLEMENTED",
+                    "year": info["year"] or 0,
+                    "production_site": info["production_site"],
                 }
             )
 
@@ -61,10 +66,10 @@ def check_dc_file(file):
             for chunk in file.chunks():
                 destination.write(chunk)
 
-        sourcing_rows, production_rows = parse_dc_excel(filepath)
+        info, sourcing_history, sourcing_forecast, production = parse_dc_excel(filepath)
 
         # get dc period for upload
-        years = [sourcing["year"] for sourcing in sourcing_rows]
+        years = [sourcing["year"] for sourcing in sourcing_forecast]
         end_year = max(years)
         start = datetime.date(end_year - 1, 1, 1)
         end = datetime.date(end_year, 12, 31)
@@ -75,15 +80,25 @@ def check_dc_file(file):
             period_end=end,
         )
 
-        sourcing_errors = load_dc_sourcing_data(dca, sourcing_rows)
-        production_errors = load_dc_production_data(dca, production_rows)
+        sourcing_history_errors = load_dc_sourcing_data(dca, sourcing_history)
+        sourcing_forecast_errors = load_dc_sourcing_data(dca, sourcing_forecast)
+        production_errors = load_dc_production_data(dca, production)
         global_errors = check_dc_globally(dca)
 
         # remove the agreement with all associated data
         dca.delete()
 
-        return {"sourcing": sourcing_errors, "production": production_errors, "global": global_errors}
+        if not info["year"]:
+            info["year"] = end_year - 1
+
+        return info, {
+            "sourcing_history": sourcing_history_errors,
+            "sourcing_forecast": sourcing_forecast_errors,
+            "production": production_errors,
+            "global": global_errors,
+        }
     except:
         traceback.print_exc()
+        info = {"production_site": None, "year": 0}
         excel_error = {"error": "EXCEL_PARSING_ERROR", "is_blocking": True}
-        return {"sourcing": [], "production": [], "global": [excel_error]}
+        return info, {"sourcing_history": [], "sourcing_history": [], "production": [], "global": [excel_error]}
