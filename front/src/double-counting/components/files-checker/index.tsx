@@ -6,7 +6,6 @@ import Table, { Cell, Column } from "common/components/table"
 import Tabs from "common/components/tabs"
 import Tag from "common/components/tag"
 import useTitle from "common/hooks/title"
-import { formatPeriod } from "common/utils/formatters"
 import {
   CheckDoubleCountingFilesResponse,
   DoubleCountingFileInfo,
@@ -60,7 +59,7 @@ const DoubleCountingFilesChecker = () => {
     },
     {
       header: t("Période de validité"),
-      cell: (file) => <Cell text={formatPeriod(file.period)} />,
+      cell: (file) => <Cell text={`${file.year} - ${file.year + 1}`} />,
     },
   ]
 

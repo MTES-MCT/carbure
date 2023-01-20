@@ -79,7 +79,8 @@ export interface DoubleCountingUploadError {
 }
 
 export interface DoubleCountingUploadErrors extends DoubleCounting {
-  sourcing?: DoubleCountingUploadError[]
+  sourcing_history?: DoubleCountingUploadError[]
+  sourcing_forecast?: DoubleCountingUploadError[]
   production?: DoubleCountingUploadError[]
   global?: DoubleCountingUploadError[]
 }
@@ -133,7 +134,7 @@ export interface QuotaDetails {
 
 export interface DoubleCountingFileInfo {
   errors?: DoubleCountingUploadErrors
-  period: string
+  year: string
   file_name: string
   production_site: string
   error_count: number
