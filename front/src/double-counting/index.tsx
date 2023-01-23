@@ -19,13 +19,15 @@ const DoubleCounting = () => {
   const entity = useEntity()
   const location = useLocation()
 
-  const [year, setYear] = useState(new Date().getFullYear())
+  const currentYear = new Date().getFullYear()
+  const [year, setYear] = useState(currentYear)
+
   const snapshot = useQuery(api.getDoubleCountingSnapshot, {
     key: "dc-snapshot",
     params: [],
     onSuccess: (snapshot) => {
       const years = snapshot.data.data?.years ?? []
-      if (!years.includes(year)) setYear(years[0])
+      if (!years.includes(year)) setYear(years[0] ?? currentYear)
     },
   })
 
@@ -42,6 +44,7 @@ const DoubleCounting = () => {
               variant="inline"
               value={year}
               onChange={(v) => setYear(v as number)}
+              defaultOptions={[{ label: `${currentYear}`, value: currentYear }]}
               options={snapshotData?.years.map((year) => ({
                 label: `${year}`,
                 value: year,
