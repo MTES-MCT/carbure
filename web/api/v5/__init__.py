@@ -4,4 +4,5 @@ urlpatterns = [
     path("saf/", include("api.v5.saf")),
     path("stats/", include("api.v5.stats")),
     path("admin/", include("api.v5.admin")),
+    path("declarations/", include("api.v5.declarations")),
 ]
