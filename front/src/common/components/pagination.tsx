@@ -39,7 +39,7 @@ export const Pagination = ({
 
         <Select
           variant="solid"
-          anchor={Anchors.topLeft}
+          anchor="top start"
           placeholder={t("Choisir une page")}
           value={page}
           onChange={(page) => page !== undefined && onPage(page)}
@@ -50,7 +50,7 @@ export const Pagination = ({
 
         <Select
           variant="solid"
-          anchor={Anchors.topLeft}
+          anchor="top start"
           placeholder={t("Tous")}
           value={limit}
           onChange={onLimit}

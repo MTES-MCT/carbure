@@ -67,7 +67,15 @@ class SafTicketsTest(TestCase):
         self.second_ticket.save()
 
     def test_saf_tickets(self):
-        query = {"entity_id": self.entity.id, "year": 2022, "from_idx": 0, "limit": 1, "status": "PENDING"}
+        query = {
+            "entity_id": self.entity.id,
+            "year": 2022,
+            "from_idx": 0,
+            "limit": 1,
+            "status": "PENDING",
+            "type": "assigned",
+        }
+
         response = self.client.get(reverse("api-v5-saf-operator-tickets"), query)
 
         self.assertEqual(response.status_code, 200)
