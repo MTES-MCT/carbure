@@ -18,6 +18,9 @@ Traçabilité et durabilité des biocarburants, de la production à la distribut
 - créer un accès ssh à ton compte Scalingo (https://dashboard.scalingo.com/account/keys) et un API token (dans ton profile scalingo https://dashboard.scalingo.com/account/tokens)
 - remplir SCALINGO_TOKEN=le token que tu as créé dans tom compte
 
+Installation de pipenv :
+- ajouter `export PIPENV_VENV_IN_PROJECT=1` au ~/.bashrc (ou ~/zshrc, etc...)
+
 Ensuite, créez un environnement virtuel pour python 3.10:
 
 - `pipenv install`
@@ -26,11 +29,10 @@ Je recommande de créer un alias pour charger l'environnement de développement.
 par exemple :
 
 - `alias carbure='cd /path/du/repository; pipenv shell;'`
+- lancer l'alias ou `pipenv shell`
 
 Dans le dossier /front, téléchargez les modules
 - `npm install`
-
-
 
 
 Vous pouvez désormais builder les images docker et lancer le projet:
@@ -38,7 +40,8 @@ Vous pouvez désormais builder les images docker et lancer le projet:
 - `docker-compose up -d`
 
 ## Alimenter la base de données de dev
-Lancer `sh scripts/database/restore_db.sh` pour télécharger un dump contenant des données utilisables en local
+- se connecter à scalingo `scalingo login --api-token $SCALINGO_TOKEN` 
+- Lancer `sh scripts/database/restore_db.sh` pour télécharger un dump contenant des données utilisables en local
 
 
 ## Création d'un nom de domaine local personnalisé
