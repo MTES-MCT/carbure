@@ -5,6 +5,7 @@ import openpyxl
 import numpy as np
 import os
 from multiprocessing import Process
+from time import perf_counter
 
 import pandas as pd
 from pandas._typing import Scalar
@@ -256,3 +257,21 @@ def SuccessResponse(data=None):
     if data is not None:
         response_data['data'] = data
     return JsonResponse(response_data)
+
+
+# little helper to help measure elapsed time
+class Perf:
+    def __init__(self, message="Start"):
+        self.steps = []
+        self.step(message)
+
+    def step(self, message):
+        t = perf_counter()
+        self.steps.append((t, message))
+
+    def done(self, message="Done"):
+        self.step(message)
+        for i, (t, message) in enumerate(self.steps):
+            tLast = self.steps[i-1][0] if i > 0 else t
+            dt = t - tLast
+            print("[%f] %s" % (dt, message))
