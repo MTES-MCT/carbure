@@ -127,10 +127,12 @@ def update_many(request):
         # apply the update to the lot and save its previous state for diffing
         node.update(update)
 
-        # only save events and comments if something really changed on the lot after the update
+        # if the node changed, recursively apply the update to related nodes
         if len(node.diff) > 0:
-            # recursively apply the update to nodes connected to this one
             updated_nodes += node.propagate()
+
+        # @TODO run integrity checks to find out remaining issues in the chain
+        # errors = node.check_integrity()
 
     # get the list of lots modified by this update
     for node in updated_nodes:
@@ -170,6 +172,7 @@ def update_many(request):
 
     if not dry_run:
         pass
+        # @TODO actually apply the changes in the DB for all models
         # save everything in the database in one single transaction
         # with transaction.atomic():
         #     GenericError.objects.filter(lot__in=lots).delete()

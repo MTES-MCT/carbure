@@ -237,13 +237,13 @@ class TraceabilityTest(TestCase):
         self.assertEqual(root_node.data.esca, 2.0)
 
     def test_traceability_stock_volume_check(self):
-        # check that a stock with not enough volume throws an error
+        # @TODO check that a stock with not enough volume throws an error
         pass
 
     def test_traceability_ticket_source_volume_check(self):
-        # check that a stock with not enough volume throws an error
+        # @TODO check that a stock with not enough volume throws an error
         pass
 
     def test_traceability_different_owners(self):
-        # check how data is propagated between nodes of different owners
+        # @TODO check how data is propagated between nodes of different owners
         pass
