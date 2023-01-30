@@ -69,11 +69,11 @@ export function getDeclarations(entity_id: number, year: number) {
 }
 
 export function validateDeclaration(entity_id: number, period: number) {
-  return api.post<Api<void>>("/declarations/validate", { entity_id, period })
+  return api.post<Api<void>>("/v5/declarations/validate", { entity_id, period })
 }
 
 export function invalidateDeclaration(entity_id: number, period: number) {
-  return api.post<Api<void>>("/declarations/invalidate", { entity_id, period })
+  return api.post<Api<void>>("/v5/declarations/invalidate", { entity_id, period })
 }
 
 export function getLotFilters(field: Filter, query: LotQuery) {

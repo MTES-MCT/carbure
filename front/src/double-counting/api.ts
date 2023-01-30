@@ -5,6 +5,8 @@ import {
   AgreementsOverview,
   QuotaDetails,
   QuotaOverview,
+  DoubleCountingUploadErrors,
+  CheckDoubleCountingFilesResponse,
 } from "./types"
 
 export function getDoubleCountingSnapshot() {
@@ -74,5 +76,13 @@ export function getQuotaDetails(year: number, production_site_id: number) {
 }
 
 export function uploadDoubleCountingDecision(dca_id: number, file: File) {
-  return api.post("/v3/doublecount/admin/upload-decision", { dca_id, file })
+  return api.post("/v3/doublecount/admin/upload-decision", { file })
+}
+
+export function checkDoubleCountingFiles(entity_id: number, files: FileList) {
+  const res = api.post<Api<CheckDoubleCountingFilesResponse>>(
+    "/v5/double-counting/check-files",
+    { entity_id, files }
+  )
+  return res
 }

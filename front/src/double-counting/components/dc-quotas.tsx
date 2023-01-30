@@ -3,11 +3,12 @@ import { useQuery } from "common/hooks/async"
 import Table, { Cell, Column } from "common/components/table"
 import { Dialog } from "common/components/dialog"
 import { Button } from "common/components/button"
-import { Return } from "common/components/icons"
+import { AlertCircle, Return } from "common/components/icons"
 import { formatNumber } from "common/utils/formatters"
 import { QuotaOverview, QuotaDetails } from "../types"
 import * as api from "../api"
 import { usePortal } from "common/components/portal"
+import Alert from "common/components/alert"
 
 type QuotasListProps = {
   year: number
@@ -56,16 +57,24 @@ const QuotasList = ({ year }: QuotasListProps) => {
 
   return (
     <section>
-      <Table
-        loading={quotas.loading}
-        columns={columns}
-        rows={quotaRows}
-        onAction={(quota) =>
-          portal((close) => (
-            <QuotasDetailsDialog year={year} quota={quota} onClose={close} />
-          ))
-        }
-      />
+      {quotaRows.length > 0 && (
+        <Table
+          loading={quotas.loading}
+          columns={columns}
+          rows={quotaRows}
+          onAction={(quota) =>
+            portal((close) => (
+              <QuotasDetailsDialog year={year} quota={quota} onClose={close} />
+            ))
+          }
+        />
+      )}
+
+      {quotaRows.length === 0 && (
+        <Alert variant="warning" icon={AlertCircle} loading={quotas.loading}>
+          <Trans>Aucun quota disponible</Trans>
+        </Alert>
+      )}
     </section>
   )
 }

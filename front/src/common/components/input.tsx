@@ -102,6 +102,41 @@ export const DateInput = ({
   />
 )
 
+export interface FileListInputProps extends Control {
+  value?: FileList | null
+  onChange?: (value: FileList | undefined | null) => void
+}
+
+export const FileListInput = ({
+  clear,
+  placeholder = i18next.t("Select some files"),
+  value,
+  autoFocus,
+  onChange,
+  ...props
+}: FileListInputProps) => (
+  <Field
+    {...props}
+    type="file"
+    onClear={clear && value && onChange ? () => onChange(undefined) : undefined}
+  >
+    <label className={css.file}>
+      <input
+        autoFocus={autoFocus}
+        disabled={props.disabled}
+        readOnly={props.readOnly}
+        required={props.required}
+        multiple
+        name={props.name}
+        style={{ opacity: 0, position: "absolute" }}
+        type="file"
+        onChange={onChange ? (e) => onChange(e.target.files) : undefined}
+      />
+      {value?.[0]?.name ?? placeholder}
+    </label>
+  </Field>
+)
+
 export interface FileInputProps extends Control {
   value?: File | undefined
   onChange?: (value: File | undefined) => void
