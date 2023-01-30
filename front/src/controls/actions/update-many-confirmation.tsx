@@ -1,17 +1,19 @@
 import { AxiosError } from "axios"
 import useEntity from "carbure/hooks/entity"
+import Alert from "common/components/alert"
 import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import Form from "common/components/form"
-import { Edit, Return } from "common/components/icons"
+import { AlertCircle, Edit, Return } from "common/components/icons"
 import { TextInput } from "common/components/input"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
-import { useMutation } from "common/hooks/async"
+import { LoaderOverlay } from "common/components/scaffold"
+import { useMutation, useQuery } from "common/hooks/async"
 import { LotsUpdateError, LotsUpdateResponse } from "controls/types"
 import { LotFormValue } from "lot-add/components/lot-form"
-import { useState } from "react"
-import { useTranslation } from "react-i18next"
+import { useMemo, useState } from "react"
+import { Trans, useTranslation } from "react-i18next"
 import { Lot } from "transactions/types"
 import * as api from "../api/admin"
 import { UpdateErrorsDialog } from "./update-many-errors"
@@ -33,6 +35,14 @@ const UpdateManyConfirmationDialog = ({
   const entity = useEntity()
   const notify = useNotify()
   const portal = usePortal()
+
+  const lots_ids = useMemo(() => lots.map((l) => l.id), [lots])
+
+  const requestedUpdates = useQuery(api.updateLots, {
+    key: "check-updates",
+    params: [entity.id, lots_ids, updatedValues, "check", true],
+  })
+
   const updateLots = useMutation(api.updateLots, {
     invalidates: ["controls"],
     onSuccess: () => {
@@ -66,14 +76,18 @@ const UpdateManyConfirmationDialog = ({
   const submit = () => {
     return updateLots.execute(
       entity.id,
-      lots.map((l) => l.id),
+      lots_ids,
       updatedValues,
-      comment!
+      comment!,
+      true
     )
 
     //TOTEST uncomment below
     // showErrors(lotsUpdateErrorsResponse.errors!)
   }
+
+  const requestedUpdatesCount =
+    requestedUpdates.result?.data.data?.updates?.length ?? lots.length
 
   return (
     <Dialog onClose={onClose}>
@@ -96,6 +110,24 @@ const UpdateManyConfirmationDialog = ({
               "Une notification sera envoyée aux sociétés concernées avec votre commentaire."
             )}
           </p>
+        </section>
+
+        <section>
+          <Alert
+            loading={requestedUpdates.loading}
+            icon={AlertCircle}
+            variant="warning"
+          >
+            <span style={{ whiteSpace: "normal" }}>
+              <Trans
+                count={requestedUpdatesCount}
+                defaults="Un total de <b>{{count}} maillons</b> des chaînes de traçabilité dont font partie ces lots seront impactés par ces changements."
+              />
+            </span>
+          </Alert>
+        </section>
+
+        <section>
           <Form id="edit-lots" onSubmit={submit}>
             <TextInput
               value={comment}
@@ -116,13 +148,13 @@ const UpdateManyConfirmationDialog = ({
 
       <footer>
         <Button
-          loading={updateLots.loading}
+          loading={requestedUpdates.loading || updateLots.loading}
           variant="warning"
           icon={Edit}
           submit="edit-lots"
         >
-          {t("Modifier les {{count}} lots", {
-            count: lots.length,
+          {t("Modifier les {{count}} entrées", {
+            count: requestedUpdatesCount,
           })}
         </Button>
 

@@ -19,13 +19,12 @@ export interface LotSummary {
   lots: SummaryItem[]
 }
 
-
 export interface LotsUpdateError {
-  lot_id: string,
+  lot_id: string
   errors: LotError[]
 }
 
 export interface LotsUpdateResponse {
   errors?: LotsUpdateError[]
+  updates?: { node: any; diff: Record<string, [any, any]> }[]
 }
-
