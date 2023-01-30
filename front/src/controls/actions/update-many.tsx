@@ -50,7 +50,7 @@ const UpdateDialog = ({ onClose, lots }: UpdateDialogProps) => {
   let updatedValues: Partial<LotFormValue> = {}
   Object.keys(form.value).forEach((_key) => {
     const key = _key as keyof LotFormValue
-    if (form.value[key] !== defaultLot[key]) {
+    if (form.value[key] !== defaultLot[key] && form.value[key] !== "") {
       ;(updatedValues as any)[key] = form.value[key]
     }
   })
