@@ -5,7 +5,7 @@ from django.urls import reverse
 
 from core.tests_utils import setup_current_user
 from core.models import Entity, CarbureLot
-from lots.factory import CarbureLotFactory
+from transactions.factories import CarbureLotFactory
 
 
 class InvalidateDeclarationTest(TestCase):
