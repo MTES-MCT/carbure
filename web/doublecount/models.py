@@ -15,8 +15,8 @@ class DoubleCountingAgreement(models.Model):
 
     DCA_STATUS_CHOICES = ((PENDING, PENDING), (INPROGRESS, INPROGRESS), (REJECTED, REJECTED), (ACCEPTED, ACCEPTED), (LAPSED, LAPSED))
     
-    producer = models.ForeignKey(Entity, on_delete=models.CASCADE)
-    production_site = models.ForeignKey(ProductionSite, on_delete=models.CASCADE)
+    producer = models.ForeignKey(Entity, on_delete=models.CASCADE, null=True)
+    production_site = models.ForeignKey(ProductionSite, on_delete=models.CASCADE, null=True)
     producer_user = models.ForeignKey(usermodel, blank=True, null=True, on_delete=models.SET_NULL, related_name='producer_user')
     creation_date = models.DateTimeField(auto_now_add=True)
     period_start = models.DateField(null=False, blank=False)

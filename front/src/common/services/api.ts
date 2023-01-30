@@ -24,7 +24,9 @@ export function download(endpoint: string, params: any) {
 export function toFormData(obj: any): FormData {
   const formData = new FormData()
   for (const key in obj) {
-    if (Array.isArray(obj[key])) {
+    if (obj[key] instanceof FileList) {
+      Array.from(obj[key]).forEach((value: any) => formData.append(key, value))
+    } else if (Array.isArray(obj[key])) {
       obj[key].forEach((value: any) => formData.append(key, value.toString()))
     } else if (!isEmpty(obj[key])) {
       formData.append(key, obj[key])
