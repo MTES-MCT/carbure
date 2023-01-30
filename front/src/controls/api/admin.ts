@@ -117,12 +117,14 @@ export function updateLots(
   entity_id: number,
   lots_ids: number[],
   updated_values: Partial<LotFormValue>,
-  comment: string
+  comment: string,
+  dry_run?: boolean
 ) {
   return api.post<Api<LotsUpdateResponse>>("/v5/admin/lots/update-many", {
     entity_id,
     lots_ids,
     comment,
+    dry_run,
     ...lotFormToPayload(updated_values),
   })
 }
