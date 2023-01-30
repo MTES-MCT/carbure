@@ -337,7 +337,7 @@ export function lotFormToPayload(lot: Partial<LotFormValue> | undefined) {
     transport_document_type: undefined,
     transport_document_reference: lot.transport_document_reference,
     quantity: quantity,
-    unit: unit,
+    unit: quantity === undefined ? undefined : unit,
     biofuel_code: lot.biofuel?.code,
     feedstock_code: lot.feedstock?.code,
     country_code: lot.country_of_origin?.code_pays,

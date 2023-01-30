@@ -113,15 +113,14 @@ export async function commentLots(
   })
 }
 
-
-
-
 export function updateLots(
+  entity_id: number,
   lots_ids: number[],
   updated_values: Partial<LotFormValue>,
   comment: string
 ) {
   return api.post<Api<LotsUpdateResponse>>("/v5/admin/lots/update-many", {
+    entity_id,
     lots_ids,
     comment,
     ...lotFormToPayload(updated_values),

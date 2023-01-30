@@ -209,6 +209,18 @@ export function getDeliveryTypes(
   client: Entity | string | undefined,
   status: LotStatus = LotStatus.Draft
 ) {
+  if (entity.isAdmin) {
+    return [
+      DeliveryType.Blending,
+      DeliveryType.Exportation,
+      DeliveryType.RFC,
+      DeliveryType.Direct,
+      DeliveryType.Stock,
+      DeliveryType.Processing,
+      DeliveryType.Trading,
+    ]
+  }
+
   const {
     isOperator,
     has_stocks,

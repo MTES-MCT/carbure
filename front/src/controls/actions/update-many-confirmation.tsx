@@ -1,5 +1,5 @@
 import { AxiosError } from "axios"
-import { Entity } from "carbure/types"
+import useEntity from "carbure/hooks/entity"
 import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import Form from "common/components/form"
@@ -9,7 +9,6 @@ import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 import { LotsUpdateError, LotsUpdateResponse } from "controls/types"
-import { lotsUpdateErrorsResponse } from "controls/__test__/data"
 import { LotFormValue } from "lot-add/components/lot-form"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -31,6 +30,7 @@ const UpdateManyConfirmationDialog = ({
 }: UpdateManyConfirmationDialogProps) => {
   const { t } = useTranslation()
   const [comment, setComment] = useState<string | undefined>()
+  const entity = useEntity()
   const notify = useNotify()
   const portal = usePortal()
   const updateLots = useMutation(api.updateLots, {
@@ -51,7 +51,9 @@ const UpdateManyConfirmationDialog = ({
     },
   })
 
-  let updatedValuesNames = Object.keys(updatedValues).join(", ")
+  let updatedValuesNames = Object.keys(updatedValues)
+    .map((field) => t(field, { ns: "fields" }))
+    .join(", ")
 
   const entities_to_notify: string = getLotsEntitiesToNotify(lots)
 
@@ -63,6 +65,7 @@ const UpdateManyConfirmationDialog = ({
 
   const submit = () => {
     return updateLots.execute(
+      entity.id,
       lots.map((l) => l.id),
       updatedValues,
       comment!
@@ -112,7 +115,12 @@ const UpdateManyConfirmationDialog = ({
       </main>
 
       <footer>
-        <Button variant="warning" icon={Edit} submit="edit-lots">
+        <Button
+          loading={updateLots.loading}
+          variant="warning"
+          icon={Edit}
+          submit="edit-lots"
+        >
           {t("Modifier les {{count}} lots", {
             count: lots.length,
           })}
