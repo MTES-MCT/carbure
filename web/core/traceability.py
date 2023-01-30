@@ -75,6 +75,7 @@ class Node:
     def diff_with_child(self, child: "Node") -> dict[str, tuple]:
         return {}
 
+    # return a simple dict representation of the node's data
     def serialize(self) -> dict:
         return {}
 
@@ -238,9 +239,10 @@ class Node:
                 continue
 
             diff = child.diff_with_parent()
+            allowed_diff = child.get_allowed_diff(diff, entity_id)
 
-            if len(diff) > 0:
-                child.apply_diff(diff)
+            if len(allowed_diff) > 0:
+                child.apply_diff(allowed_diff)
                 changed += [child]
 
             changed += child.propagate_down(entity_id=entity_id)
