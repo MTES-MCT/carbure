@@ -2,7 +2,7 @@ import factory
 import random
 from datetime import datetime
 
-from core.models import CarbureLot, Entity, MatierePremiere, Biocarburant, Pays, Depot
+from core.models import CarbureLot, CarbureStock, Entity, MatierePremiere, Biocarburant, Pays, Depot
 from producers.models import ProductionSite
 
 
@@ -124,3 +124,36 @@ class CarbureLotFactory(factory.django.DjangoModelFactory):
     audit_status = CarbureLot.UNKNOWN
 
     data_reliability_score = "F"
+
+
+fields = [
+    # lot data
+    "feedstock",
+    "biofuel",
+    "country_of_origin",
+    # production data
+    "carbure_producer",
+    "unknown_producer",
+    "carbure_production_site",
+    "unknown_production_site",
+    "production_country",
+    "production_site_commissioning_date",
+    "production_site_certificate",
+    "production_site_certificate_type",
+    "production_site_double_counting_certificate",
+    # ghg
+    "eec",
+    "el",
+    "ep",
+    "etd",
+    "eu",
+    "esca",
+    "eccs",
+    "eccr",
+    "eee",
+    "ghg_total",
+    "ghg_reference",
+    "ghg_reduction",
+    "ghg_reference_red_ii",
+    "ghg_reduction_red_ii",
+]
