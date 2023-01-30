@@ -551,6 +551,8 @@ class CarbureLot(models.Model):
                    models.Index(fields=['year', 'period', 'lot_status']),
                    models.Index(fields=['year', 'period', 'carbure_client']),
                    models.Index(fields=['year', 'period', 'carbure_supplier']),
+                   models.Index(fields=['parent_lot']),
+                   models.Index(fields=['parent_stock']),
                   ]
         verbose_name = 'CarbureLot'
         verbose_name_plural = 'CarbureLots'
@@ -755,9 +757,13 @@ class CarbureStockTransformation(models.Model):
 
     class Meta:
         db_table = 'carbure_stock_transformations'
-        indexes = [models.Index(fields=['entity']),]
         verbose_name = 'CarbureStockTransformation'
         verbose_name_plural = 'CarbureStockTransformation'
+        indexes = [
+            models.Index(fields=['entity']),
+            models.Index(fields=['source_stock']),
+            models.Index(fields=['dest_stock']),
+        ]
 
 @receiver(pre_save, sender=CarbureLot)
 def lot_pre_save_gen_carbure_id(sender, instance, *args, **kwargs):
@@ -840,6 +846,8 @@ class CarbureStock(models.Model):
         indexes = [
             models.Index(fields=['carbure_client']),
             models.Index(fields=['carbure_client', 'depot']),
+            models.Index(fields=['parent_lot']),
+            models.Index(fields=['parent_transformation']),
         ]
         verbose_name = 'CarbureStock'
         verbose_name_plural = 'CarbureStocks'
@@ -892,6 +900,7 @@ def stock_pre_save_gen_carbure_id(sender, instance, *args, **kwargs):
 class CarbureLotEvent(models.Model):
     CREATED = "CREATED"
     UPDATED = "UPDATED"
+    UPDATED_BY_ADMIN = "UPDATED_BY_ADMIN"
     VALIDATED = "VALIDATED"
     FIX_REQUESTED = "FIX_REQUESTED"
     MARKED_AS_FIXED = "MARKED_AS_FIXED"
@@ -906,7 +915,7 @@ class CarbureLotEvent(models.Model):
     CANCELLED = "CANCELLED"
     EVENT_TYPES = ((CREATED, CREATED), (UPDATED, UPDATED), (VALIDATED, VALIDATED), (FIX_REQUESTED, FIX_REQUESTED), (MARKED_AS_FIXED, MARKED_AS_FIXED),
                     (FIX_ACCEPTED, FIX_ACCEPTED), (ACCEPTED, ACCEPTED), (REJECTED, REJECTED), (RECALLED, RECALLED), (DECLARED, DECLARED), (DELETED, DELETED), (DECLCANCEL, DECLCANCEL),
-                    (RESTORED, RESTORED),(CANCELLED, CANCELLED))
+                    (RESTORED, RESTORED),(CANCELLED, CANCELLED), (UPDATED_BY_ADMIN, UPDATED_BY_ADMIN))
     event_type = models.CharField(max_length=32, null=False, blank=False, choices=EVENT_TYPES)
     event_dt = models.DateTimeField(auto_now_add=True, null=False, blank=False)
     lot = models.ForeignKey(CarbureLot, null=False, blank=False, on_delete=models.CASCADE)

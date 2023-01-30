@@ -1,4 +1,3 @@
-from datetime import datetime
 from django.db import models, transaction
 from core.utils import bulk_update_or_create
 
@@ -9,6 +8,10 @@ class SafTicketSource(models.Model):
         verbose_name = "Tickets source SAF"
         verbose_name_plural = "Tickets source SAF"
         ordering = ["carbure_id"]
+        indexes = [
+            models.Index(fields=["parent_lot"]),
+            models.Index(fields=["parent_ticket"]),
+        ]
 
     carbure_id = models.CharField(max_length=64, null=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
