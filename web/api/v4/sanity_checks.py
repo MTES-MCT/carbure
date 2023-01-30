@@ -63,14 +63,18 @@ def generic_error(error, **kwargs):
     d.update(kwargs)
     return GenericError(**d)
 
-def bulk_sanity_checks(lots, prefetched_data=None):
+def bulk_sanity_checks(lots, prefetched_data=None, dry_run=False):
     if not prefetched_data:
         prefetched_data = get_prefetched_data()
+    
     results = []
     errors = []
+    
     # cleanup previous errors
-    lot_ids = [l.id for l in lots]
-    GenericError.objects.filter(lot_id__in=lot_ids).delete()
+    if not dry_run:
+        lot_ids = [l.id for l in lots]
+        GenericError.objects.filter(lot_id__in=lot_ids).delete()
+    
     for lot in lots:
         try:
             is_sane, sanity_errors = sanity_check(lot, prefetched_data)
@@ -78,8 +82,11 @@ def bulk_sanity_checks(lots, prefetched_data=None):
             results.append(is_sane)
         except:
             traceback.print_exc()
-    GenericError.objects.bulk_create(errors, batch_size=1000)
-    return results
+    
+    if not dry_run:
+        GenericError.objects.bulk_create(errors, batch_size=1000)
+    
+    return errors, results
 
 
 def bulk_scoring(lots, prefetched_data=None):
