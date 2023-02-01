@@ -220,7 +220,7 @@ def check_certificates(prefetched_data, lot, errors):
         else:
             # certificate is set and exists. is it valid?
             c = prefetched_data['certificates'][cert]
-            if c.valid_until < lot.delivery_date:
+            if c["valid_until"] < lot.delivery_date:
                  errors.append(generic_error(error=CarbureCertificatesErrors.EXPIRED_SUPPLIER_CERT, lot=lot, display_to_recipient=True, field='supplier_certificate'))
 
     # check if mapping of SUPPLIER CERT / ENTITY has been rejected by admin
