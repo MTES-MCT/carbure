@@ -147,3 +147,7 @@ dump.rdb
 web/static
 
 files
+
+# Script generated files
+integrity.json
+sanity_checks.json
