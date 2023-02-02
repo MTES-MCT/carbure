@@ -242,7 +242,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         lots_data.append(lot)
     return lots_data
 
-def ErrorResponse(status_code, error=None, data=None):
+def ErrorResponse(status_code=400, error=None, data=None):
     response_data = {}
     response_data['status'] = Carbure.ERROR
     if data is not None:
@@ -267,11 +267,10 @@ class Perf:
 
     def step(self, message):
         t = perf_counter()
-        self.steps.append((t, message))
+        tLast = self.steps[-1] if len(self.steps) > 0 else t
+        dt = t - tLast
+        self.steps.append(t)
+        print("[%f] %s" % (dt, message))
 
     def done(self, message="Done"):
         self.step(message)
-        for i, (t, message) in enumerate(self.steps):
-            tLast = self.steps[i-1][0] if i > 0 else t
-            dt = t - tLast
-            print("[%f] %s" % (dt, message))
