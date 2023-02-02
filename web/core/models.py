@@ -12,9 +12,13 @@ from numpy import deprecate
 
 usermodel = get_user_model()
 
+# patch to fix django-silk crashing if the é is read
+operator = "Operateur" if settings.DEBUG else "Opérateur"
+
+
 class Entity(models.Model):
     PRODUCER = 'Producteur'
-    OPERATOR = 'Opérateur'
+    OPERATOR = operator
     TRADER = 'Trader'
     ADMIN = 'Administration'
     AUDITOR = 'Auditor'
@@ -320,8 +324,8 @@ class SustainabilityDeclaration(models.Model):
         nextmonth = period_d + datetime.timedelta(days=31)
         (_, lastday) = monthrange(nextmonth.year, nextmonth.month)
         deadline = datetime.date(year=nextmonth.year, month=nextmonth.month, day=lastday)
-        
-        declaration, _ = SustainabilityDeclaration.objects.get_or_create(    
+
+        declaration, _ = SustainabilityDeclaration.objects.get_or_create(
             entity_id=entity_id,
             period=period_d,
             deadline=deadline,
