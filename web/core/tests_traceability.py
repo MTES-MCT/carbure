@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from api.v4.tests_utils import setup_current_user
-from core.traceability import LotNode, StockNode, StockTransformNode, TicketSourceNode, TicketNode
+from core.traceability_tree import LotNode, StockNode, StockTransformNode, TicketSourceNode, TicketNode
 from core.models import Entity, CarbureLot, CarbureStock, CarbureStockTransformation
 from saf.models import SafTicket, SafTicketSource
 from transactions.factories import CarbureLotFactory, CarbureStockFactory, CarbureStockTransformFactory
@@ -39,8 +39,8 @@ class TraceabilityTest(TestCase):
         self.assertEqual(lot.carbure_id, "ABCD")
 
     def test_traceability_lot_to_lot(self):
-        parent_lot = CarbureLotFactory.create()
-        CarbureLotFactory.create(parent_lot=parent_lot)
+        parent_lot = CarbureLotFactory.create(added_by=self.entity)
+        CarbureLotFactory.create(parent_lot=parent_lot, added_by=self.entity)
 
         parent_node = LotNode(parent_lot)
         child_node = parent_node.get_first(LotNode)
