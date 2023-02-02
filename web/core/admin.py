@@ -10,6 +10,7 @@ from django.utils.crypto import get_random_string
 from django_admin_listfilter_dropdown.filters import DropdownFilter, RelatedOnlyDropdownFilter
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Sum
+from django.db import transaction
 
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
@@ -223,17 +224,20 @@ class NameSortedRelatedOnlyDropdownFilter(RelatedOnlyDropdownFilter):
 
 @admin.register(CarbureLot)
 class CarbureLotAdmin(admin.ModelAdmin):
-    list_display = ['id', 'carbure_id', 'parent_lot', 'parent_stock', 'year', 'period', 'transport_document_reference', 'get_producer', 'get_production_site', 'get_supplier', 'get_client', 
+    list_display = ['id', 'carbure_id', 'parent_lot', 'parent_stock', 'year', 'period', 'transport_document_reference', 'get_producer', 'get_production_site', 'get_supplier', 'get_client',
     'delivery_date', 'get_delivery_site', 'get_biofuel', 'get_feedstock', 'volume', 'lot_status', 'correction_status', 'delivery_type',
     ]
     raw_id_fields = ['parent_lot', 'parent_stock']
-    list_filter = ('year', ('period', DropdownFilter), 'lot_status', 'correction_status', ('biofuel', NameSortedRelatedOnlyDropdownFilter), ('feedstock', NameSortedRelatedOnlyDropdownFilter), 
-                  ('carbure_supplier', NameSortedRelatedOnlyDropdownFilter), ('carbure_client', NameSortedRelatedOnlyDropdownFilter),  
+    list_filter = ('year', ('period', DropdownFilter), 'lot_status', 'correction_status', ('biofuel', NameSortedRelatedOnlyDropdownFilter), ('feedstock', NameSortedRelatedOnlyDropdownFilter),
+                  ('carbure_supplier', NameSortedRelatedOnlyDropdownFilter), ('carbure_client', NameSortedRelatedOnlyDropdownFilter),
                   'delivery_type', ('carbure_delivery_site', NameSortedRelatedOnlyDropdownFilter),
                   ('carbure_production_site', NameSortedRelatedOnlyDropdownFilter), ('carbure_client__entity_type', custom_titled_filter('Type de client')))
     search_fields = ('id', 'transport_document_reference', 'free_field', 'carbure_id', 'volume')
     readonly_fields = ('created_at',)
-    actions = ['regen_carbure_id', 'send_to_pending', 'send_to_draft', 'recalc_score']
+    actions = ['regen_carbure_id', 'send_to_pending', 'send_to_draft', 'recalc_score', "delete_lots"]
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
     def send_to_pending(self, request, queryset):
         for lot in queryset:
@@ -246,6 +250,13 @@ class CarbureLotAdmin(admin.ModelAdmin):
             lot.lot_status = CarbureLot.DRAFT
             lot.save()
     send_to_draft.short_description = "Renvoi en brouillons"
+
+    @transaction.atomic
+    def delete_lots(self, request, queryset):
+        queryset.update(lot_status="DELETED")
+        events = [CarbureLotEvent(lot=lot, user=request.user, event_type=CarbureLotEvent.DELETED_ADMIN) for lot in queryset]
+        CarbureLotEvent.objects.bulk_create(events)
+    delete_lots.short_description = "Changer le statut des lots en SUPRRIMÉ"
 
     def regen_carbure_id(self, request, queryset):
         for lot in queryset:
@@ -299,10 +310,10 @@ class CarbureLotAdmin(admin.ModelAdmin):
 class CarbureStockAdmin(admin.ModelAdmin):
     list_display = ['parent_lot', 'get_delivery_date', 'carbure_id', 'get_client', 'get_depot',  'get_biofuel', 'get_feedstock', 'get_orig_volume', 'remaining_volume', 'get_supplier']
     raw_id_fields = ['parent_lot', 'parent_transformation']
-    list_filter = (('parent_lot__period', DropdownFilter), ('biofuel', NameSortedRelatedOnlyDropdownFilter), ('feedstock', NameSortedRelatedOnlyDropdownFilter), 
-                  ('carbure_supplier', NameSortedRelatedOnlyDropdownFilter), ('carbure_client', NameSortedRelatedOnlyDropdownFilter),  
+    list_filter = (('parent_lot__period', DropdownFilter), ('biofuel', NameSortedRelatedOnlyDropdownFilter), ('feedstock', NameSortedRelatedOnlyDropdownFilter),
+                  ('carbure_supplier', NameSortedRelatedOnlyDropdownFilter), ('carbure_client', NameSortedRelatedOnlyDropdownFilter),
                   ('depot', NameSortedRelatedOnlyDropdownFilter),)
-    search_fields = ('id', 'parent_lot__transport_document_reference', 'parent_lot__free_field', 'parent_lot__carbure_id', 'carbure_id',)    
+    search_fields = ('id', 'parent_lot__transport_document_reference', 'parent_lot__free_field', 'parent_lot__carbure_id', 'carbure_id',)
     actions = ['regen_carbure_id', 'recalc_stock']
 
     def regen_carbure_id(self, request, queryset):
