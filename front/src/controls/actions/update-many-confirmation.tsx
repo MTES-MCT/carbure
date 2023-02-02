@@ -4,11 +4,15 @@ import Alert from "common/components/alert"
 import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import Form from "common/components/form"
-import { AlertCircle, Edit, Return } from "common/components/icons"
+import {
+  AlertCircle,
+  AlertTriangle,
+  Edit,
+  Return,
+} from "common/components/icons"
 import { TextInput } from "common/components/input"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
-import { LoaderOverlay } from "common/components/scaffold"
 import { useMutation, useQuery } from "common/hooks/async"
 import { LotsUpdateError, LotsUpdateResponse } from "controls/types"
 import { LotFormValue } from "lot-add/components/lot-form"
@@ -89,6 +93,10 @@ const UpdateManyConfirmationDialog = ({
   const requestedUpdatesCount =
     requestedUpdates.result?.data.data?.updates?.length ?? lots.length
 
+  const error = requestedUpdates.error as AxiosError<any> | undefined
+  const errorList = error?.response?.data?.data?.errors
+  const errorCount = Object.keys(errorList ?? {}).length
+
   return (
     <Dialog onClose={onClose}>
       <header>
@@ -144,10 +152,24 @@ const UpdateManyConfirmationDialog = ({
             {t("Sociétés concernées")} : <strong>{entities_to_notify}</strong>
           </p>
         </section>
+
+        {requestedUpdates.error && (
+          <section>
+            <Alert icon={AlertTriangle} variant="danger">
+              <span style={{ whiteSpace: "normal" }}>
+                <Trans
+                  count={errorCount}
+                  defaults="Cette mise à jour ne peut pas être appliquée car elle causerait au moins <b>{{count}} erreurs.</b>"
+                />
+              </span>
+            </Alert>
+          </section>
+        )}
       </main>
 
       <footer>
         <Button
+          disabled={!!requestedUpdates.error}
           loading={requestedUpdates.loading || updateLots.loading}
           variant="warning"
           icon={Edit}
