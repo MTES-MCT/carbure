@@ -34,7 +34,6 @@ class Node:
     @property
     def children(self) -> list["Node"]:
         if self._children is None:
-            parent_id = id(self.parent.data) if self.parent else None
             # cache query results
             self._children = self.get_children()
             if self._child is not None:
@@ -174,7 +173,7 @@ class Node:
         if allowed_fields is None:
             return diff
 
-        for (field, values) in diff.items():
+        for field, values in diff.items():
             if field in allowed_fields:
                 allowed_diff[field] = values
 
@@ -203,10 +202,11 @@ class Node:
                 self.diff[attr] = (new_value, old_value)
 
     # propagate the data of this node throughout the tree
-    def propagate(self) -> list["Node"]:
+    def propagate(self, entity_id=None) -> list["Node"]:
+        entity_id = entity_id or self.owner
         changed = [self]
-        changed += self.propagate_down(entity_id=self.owner)
-        changed += self.propagate_up(entity_id=self.owner)
+        changed += self.propagate_down(entity_id)
+        changed += self.propagate_up(entity_id)
         return changed
 
     # propagate the data of this node to its ancestors
@@ -224,8 +224,8 @@ class Node:
             self.parent.apply_diff(allowed_diff)
             changed += [self.parent]
 
-        changed += self.parent.propagate_down(entity_id=entity_id, skip=self)
-        changed += self.parent.propagate_up(entity_id=entity_id)
+        changed += self.parent.propagate_down(entity_id, skip=self)
+        changed += self.parent.propagate_up(entity_id)
 
         return changed
 
@@ -245,7 +245,7 @@ class Node:
                 child.apply_diff(allowed_diff)
                 changed += [child]
 
-            changed += child.propagate_down(entity_id=entity_id)
+            changed += child.propagate_down(entity_id)
 
         return changed
 
@@ -261,7 +261,7 @@ class Node:
             new_value = getattr(source, source_attr)
             old_value = getattr(self.data, self_attr)
 
-            if new_value != old_value:
+            if new_value and new_value != old_value:
                 diff[self_attr] = (new_value, old_value)
 
         return diff
@@ -402,6 +402,7 @@ class LotNode(Node):
             "carbure_id": self.data.carbure_id,
             "biofuel": self.data.biofuel.name,
             "volume": self.data.volume,
+            "period": self.data.period,
         }
 
     def get_owner(self):
@@ -437,7 +438,9 @@ class LotNode(Node):
             elif isinstance(self.parent.parent, StockTransformNode):
                 ancestor_lot = self.parent.parent.get_closest(LotNode)
                 # ignore the biofuel if the ancestor stock was transformed
-                return self.diff_data(ancestor_lot.data, {**LotNode.LOT_TO_DISTANT_LOT, "biofuel_id": None})
+                return self.diff_data(
+                    ancestor_lot.data, {**LotNode.LOT_TO_DISTANT_LOT, "biofuel_id": None, "carbure_supplier_id": None}
+                )
         return {}
 
     def diff_with_child(self, child: Node):
@@ -499,7 +502,10 @@ class StockNode(Node):
             return self.diff_data(self.parent.data, StockNode.LOT_TO_CHILD_STOCK)
         if isinstance(self.parent, StockTransformNode):
             ancestor_lot = self.parent.get_closest(LotNode)
-            return self.diff_data(ancestor_lot.data, {**StockNode.LOT_TO_CHILD_STOCK, "biofuel_id": None})
+            return self.diff_data(
+                ancestor_lot.data,
+                {**StockNode.LOT_TO_CHILD_STOCK, "biofuel_id": None, "carbure_supplier_id": None},
+            )
         return {}
 
     def diff_with_child(self, child: Node):
@@ -610,6 +616,7 @@ class TicketSourceNode(Node):
             "carbure_id": self.data.carbure_id,
             "biofuel": self.data.biofuel.name,
             "total_volume": self.data.total_volume,
+            "delivery_period": self.data.delivery_period,
         }
 
     def get_owner(self):
@@ -673,6 +680,7 @@ class TicketNode(Node):
             "carbure_id": self.data.carbure_id,
             "biofuel": self.data.biofuel.name,
             "volume": self.data.volume,
+            "assignment_period": self.data.assignment_period,
         }
 
     def get_owner(self):
