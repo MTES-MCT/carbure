@@ -1,4 +1,4 @@
-from core.models import CarbureLot
+from core.models import CarbureLot, Biocarburant
 
 
 class TraceabilityError:
@@ -13,6 +13,16 @@ class TraceabilityAccess:
     WRITE_STOCK_EXTRACT = "WRITE_STOCK_EXTRACT"  # dae, volume and delivery fields editable
     WRITE_DELIVERY = "WRITE_DELIVERY"  # only delivery fields editable
     READ_ONLY = "READ_ONLY"  # no fields editable
+
+
+ETHANOL = Biocarburant.objects.get(code="ETH").id
+ETBE = Biocarburant.objects.get(code="ETBE").id
+
+
+def get_stock_transform_biofuels(stock_transform):
+    if stock_transform.transformation_type == "ETH_ETBE":
+        return {"source": ETHANOL, "destination": ETBE}
+    return {}
 
 
 class Node:
@@ -193,13 +203,22 @@ class Node:
 
         return errors
 
-    # update the node's data and save the diff
-    def update(self, data):
+    # check if the node can be modified and apply the update
+    def update(self, data, entity_id=None):
+        diff = {}
+
         for attr, new_value in data.items():
             old_value = getattr(self.data, attr)
             if new_value != old_value:
-                setattr(self.data, attr, new_value)
-                self.diff[attr] = (new_value, old_value)
+                diff[attr] = (new_value, old_value)
+
+        entity_id = entity_id or self.owner
+        allowed_diff = self.get_allowed_diff(diff, entity_id)
+
+        if len(allowed_diff) != len(diff):
+            raise Exception("Cannot update requested fields")
+
+        return self.apply_diff(diff)
 
     # propagate the data of this node throughout the tree
     def propagate(self, entity_id=None) -> list["Node"]:
@@ -218,10 +237,10 @@ class Node:
         changed = []
 
         diff = self.parent.diff_with_child(self)
-        allowed_diff = self.parent.get_allowed_diff(diff, entity_id)
+        # allowed_diff = self.parent.get_allowed_diff(diff, entity_id)
 
-        if len(allowed_diff) > 0:
-            self.parent.apply_diff(allowed_diff)
+        if len(diff) > 0:
+            self.parent.apply_diff(diff)
             changed += [self.parent]
 
         changed += self.parent.propagate_down(entity_id, skip=self)
@@ -239,10 +258,10 @@ class Node:
                 continue
 
             diff = child.diff_with_parent()
-            allowed_diff = child.get_allowed_diff(diff, entity_id)
+            # allowed_diff = child.get_allowed_diff(diff, entity_id)
 
-            if len(allowed_diff) > 0:
-                child.apply_diff(allowed_diff)
+            if len(diff) > 0:
+                child.apply_diff(diff)
                 changed += [child]
 
             changed += child.propagate_down(entity_id)
@@ -251,12 +270,15 @@ class Node:
 
     # compare this node data with the given source data
     # the map param allows mapping fields of the source data with this node's data
-    def diff_data(self, source, map: dict):
+    def diff_data(self, map: dict, source):
         diff = {}
 
         for source_attr, self_attr in map.items():
-            if self_attr is None:
+            if not self_attr:
                 continue
+
+            # resolve the mapped field name
+            self_attr = source_attr if self_attr is True else self_attr
 
             new_value = getattr(source, source_attr)
             old_value = getattr(self.data, self_attr)
@@ -271,6 +293,7 @@ class Node:
         for attr, (new_value, old_value) in diff.items():
             setattr(self.data, attr, new_value)
             self.diff[attr] = (new_value, old_value)
+        return self.diff
 
     # check what access level an entity has over the current node
     def get_access_level(self, entity_id):
@@ -292,46 +315,81 @@ class Node:
 
 
 GHG_FIELDS = {
-    "eec": "eec",
-    "el": "el",
-    "ep": "ep",
-    "etd": "etd",
-    "eu": "eu",
-    "esca": "esca",
-    "eccs": "eccs",
-    "eccr": "eccr",
-    "eee": "eee",
+    "eec": True,
+    "el": True,
+    "ep": True,
+    "etd": True,
+    "eu": True,
+    "esca": True,
+    "eccs": True,
+    "eccr": True,
+    "eee": True,
 }
 
 
 class LotNode(Node):
-    LOT_TO_DISTANT_LOT = {
-        "feedstock_id": "feedstock_id",
-        "biofuel_id": "biofuel_id",
-        "country_of_origin_id": "country_of_origin_id",
-        "carbure_producer_id": "carbure_producer_id",
-        "unknown_producer": "unknown_producer",
-        "carbure_production_site_id": "carbure_production_site_id",
-        "unknown_production_site": "unknown_production_site",
-        "production_country_id": "production_country_id",
-        "production_site_commissioning_date": "production_site_commissioning_date",
-        "production_site_certificate": "production_site_certificate",
-        "production_site_double_counting_certificate": "production_site_double_counting_certificate",
-        "ghg_total": "ghg_total",
-        "ghg_reference": "ghg_reference",
-        "ghg_reduction": "ghg_reduction",
-        "ghg_reference_red_ii": "ghg_reference_red_ii",
-        "ghg_reduction_red_ii": "ghg_reduction_red_ii",
+    FROM_LOT = {
+        "country_of_origin_id": True,
+        "carbure_producer_id": True,
+        "unknown_producer": True,
+        "carbure_production_site_id": True,
+        "unknown_production_site": True,
+        "production_country_id": True,
+        "production_site_commissioning_date": True,
+        "production_site_certificate": True,
+        "production_site_double_counting_certificate": True,
+        "ghg_total": True,
+        "ghg_reference": True,
+        "ghg_reduction": True,
+        "ghg_reference_red_ii": True,
+        "ghg_reduction_red_ii": True,
         **GHG_FIELDS,
     }
 
-    LOT_TO_DIRECT_LOT = {
-        "volume": "volume",
-        "weight": "weight",
-        "lhv_amount": "lhv_amount",
-        "transport_document_type": "transport_document_type",
-        "transport_document_reference": "transport_document_reference",
-        **LOT_TO_DISTANT_LOT,
+    FROM_PARENT_LOT = {
+        "feedstock_id": True,
+        "biofuel_id": True,
+        "volume": True,
+        "weight": True,
+        "lhv_amount": True,
+        "transport_document_type": True,
+        "transport_document_reference": True,
+        **FROM_LOT,
+    }
+
+    FROM_CHILD_LOT = {
+        "feedstock_id": True,
+        "biofuel_id": True,
+        "volume": True,
+        "weight": True,
+        "lhv_amount": True,
+        "transport_document_type": True,
+        "transport_document_reference": True,
+        **FROM_LOT,
+    }
+
+    FROM_STOCK = {
+        "biofuel_id": True,
+        "feedstock_id": True,
+        "country_of_origin_id": True,
+        "carbure_production_site_id": True,
+        "unknown_production_site": True,
+        "production_country_id": True,
+        "ghg_reduction": True,
+        "ghg_reduction_red_ii": True,
+    }
+
+    FROM_PARENT_STOCK = {
+        "carbure_client_id": "carbure_supplier_id",
+        **FROM_STOCK,
+    }
+
+    FROM_CHILD_STOCK = {
+        "carbure_supplier_id": True,
+        "unknown_supplier": True,
+        "carbure_client_id": True,
+        "depot_id": "carbure_delivery_site_id",
+        **FROM_STOCK,
     }
 
     LOT_SUSTAINABILITY_FIELDS = [
@@ -375,23 +433,23 @@ class LotNode(Node):
     ]
 
     LOT_DELIVERY_FIELDS = [
-        "carbure_supplier_id"
-        "unknown_supplier"
-        "supplier_certificate"
-        "supplier_certificate_type"
-        "carbure_vendor_id"
-        "vendor_certificate"
-        "vendor_certificate_type"
-        "carbure_client_id"
-        "unknown_client"
-        "dispatch_date"
-        "carbure_dispatch_site_id"
-        "unknown_dispatch_site"
-        "dispatch_site_country"
-        "delivery_date"
-        "carbure_delivery_site_id"
-        "unknown_delivery_site"
-        "delivery_site_country"
+        "carbure_supplier_id",
+        "unknown_supplier",
+        "supplier_certificate",
+        "supplier_certificate_type",
+        "carbure_vendor_id",
+        "vendor_certificate",
+        "vendor_certificate_type",
+        "carbure_client_id",
+        "unknown_client",
+        "dispatch_date",
+        "carbure_dispatch_site_id",
+        "unknown_dispatch_site",
+        "dispatch_site_country",
+        "delivery_date",
+        "carbure_delivery_site_id",
+        "unknown_delivery_site",
+        "delivery_site_country",
         "delivery_type",
     ]
 
@@ -430,49 +488,75 @@ class LotNode(Node):
 
     def diff_with_parent(self):
         if isinstance(self.parent, LotNode):
-            return self.diff_data(self.parent.data, LotNode.LOT_TO_DIRECT_LOT)
+            return self.diff_data(LotNode.FROM_PARENT_LOT, self.parent.data)
         if isinstance(self.parent, StockNode):
-            if isinstance(self.parent.parent, LotNode):
-                ancestor_lot = self.parent.parent
-                return self.diff_data(ancestor_lot.data, LotNode.LOT_TO_DISTANT_LOT)
-            elif isinstance(self.parent.parent, StockTransformNode):
-                ancestor_lot = self.parent.parent.get_closest(LotNode)
-                # ignore the biofuel if the ancestor stock was transformed
-                return self.diff_data(
-                    ancestor_lot.data, {**LotNode.LOT_TO_DISTANT_LOT, "biofuel_id": None, "carbure_supplier_id": None}
-                )
+            # get diff with root lot sustainability data
+            root_lot = self.get_root()
+            root_diff = self.diff_data(LotNode.FROM_LOT, root_lot.data)
+            # get diff with stock info
+            stock_diff = self.diff_data(LotNode.FROM_PARENT_STOCK, self.parent.data)
+            # merge the results
+            return {**root_diff, **stock_diff}
+
         return {}
 
     def diff_with_child(self, child: Node):
         # we ignore ticket source children because they cannot be modified directly anyway
         if isinstance(child, LotNode):
-            return self.diff_data(child.data, LotNode.LOT_TO_DIRECT_LOT)
+            return self.diff_data(LotNode.FROM_CHILD_LOT, child.data)
         if isinstance(child, StockNode):
+            # get first descendant lot for sustainability data
             descendant_lot = child.get_first(LotNode)
-            return self.diff_data(descendant_lot.data, LotNode.LOT_TO_DISTANT_LOT)
+            descendant_diff = self.diff_data(LotNode.FROM_LOT, descendant_lot.data)
+            # get diff with stock info
+            stock_diff = self.diff_data(LotNode.FROM_CHILD_STOCK, child.data)
+            # merge the results
+            return {**descendant_diff, **stock_diff}
         return {}
 
 
 class StockNode(Node):
-    LOT_TO_PARENT_STOCK = {
-        "biofuel_id": "biofuel_id",
-        "feedstock_id": "feedstock_id",
-        "carbure_production_site_id": "carbure_production_site_id",
-        "unknown_production_site": "unknown_production_site",
-        "production_country_id": "production_country_id",
-        "ghg_reduction": "ghg_reduction",
-        "ghg_reduction_red_ii": "ghg_reduction_red_ii",
+    FROM_LOT = {
+        "biofuel_id": True,
+        "feedstock_id": True,
+        "carbure_production_site_id": True,
+        "unknown_production_site": True,
+        "production_country_id": True,
+        "ghg_reduction": True,
+        "ghg_reduction_red_ii": True,
     }
 
-    LOT_TO_CHILD_STOCK = {
-        **LOT_TO_PARENT_STOCK,
-        "carbure_supplier_id": "carbure_supplier_id",
-        "unknown_supplier": "unknown_supplier",
-        "carbure_client_id": "carbure_client_id",
+    FROM_PARENT_LOT = {
         "carbure_delivery_site_id": "depot_id",
+        "carbure_supplier_id": True,
+        "unknown_supplier": True,
+        "carbure_client_id": True,
+        **FROM_LOT,
     }
 
-    STOCK_TRANSFORM_TO_PARENT_STOCK = {}
+    FROM_CHILD_LOT = {
+        "carbure_supplier_id": "carbure_client_id",
+        **FROM_LOT,
+    }
+
+    FROM_STOCK = {
+        "feedstock_id": True,
+        "depot_id": True,
+        "carbure_client_id": True,
+        "carbure_production_site_id": True,
+        "unknown_production_site": True,
+        "production_country_id": True,
+        "ghg_reduction": True,
+        "ghg_reduction_red_ii": True,
+    }
+
+    FROM_PARENT_STOCK_TRANSFORM = {
+        "entity_id": "carbure_supplier_id",
+    }
+
+    FROM_CHILD_STOCK_TRANSFORM = {
+        "entity_id": "carbure_client_id",
+    }
 
     def serialize(self):
         return {
@@ -499,20 +583,34 @@ class StockNode(Node):
 
     def diff_with_parent(self):
         if isinstance(self.parent, LotNode):
-            return self.diff_data(self.parent.data, StockNode.LOT_TO_CHILD_STOCK)
+            return self.diff_data(StockNode.FROM_PARENT_LOT, self.parent.data)
         if isinstance(self.parent, StockTransformNode):
-            ancestor_lot = self.parent.get_closest(LotNode)
-            return self.diff_data(
-                ancestor_lot.data,
-                {**StockNode.LOT_TO_CHILD_STOCK, "biofuel_id": None, "carbure_supplier_id": None},
-            )
+            # get diff with closest stock
+            ancestor_stock = self.parent.get_closest(StockNode)
+            stock_diff = self.diff_data(StockNode.FROM_STOCK, ancestor_stock.data)
+            # get diff with transform node
+            transform_diff = self.diff_data(StockNode.FROM_PARENT_STOCK_TRANSFORM, self.parent.data)
+            # find out the biofuel source and dest of the parent transformation
+            biofuels = get_stock_transform_biofuels(self.parent.data)
+            biofuel_diff = {"biofuel_id": (biofuels["destination"], self.data.biofuel_id)}
+            # merge results
+            return {**stock_diff, **transform_diff, **biofuel_diff}
         return {}
 
     def diff_with_child(self, child: Node):
         if isinstance(child, LotNode):
-            return self.diff_data(child.data, StockNode.LOT_TO_PARENT_STOCK)
+            return self.diff_data(StockNode.FROM_CHILD_LOT, child.data)
         if isinstance(child, StockTransformNode):
-            return self.diff_data(child.data, StockNode.STOCK_TRANSFORM_TO_PARENT_STOCK)
+            # get diff with descendant stock info
+            descendant_stock = child.get_first(StockNode)
+            stock_diff = self.diff_data(StockNode.FROM_STOCK, descendant_stock.data)
+            # get diff with transform node
+            transform_diff = self.diff_data(StockNode.FROM_CHILD_STOCK_TRANSFORM, child.data)
+            # find out the biofuel source and dest of the parent transformation
+            biofuels = get_stock_transform_biofuels(child.data)
+            biofuel_diff = {"biofuel_id": (biofuels["source"], self.data.biofuel_id)}
+            # merge results
+            return {**stock_diff, **transform_diff, **biofuel_diff}
         return {}
 
     def validate(self):
@@ -540,8 +638,13 @@ class StockNode(Node):
 
 
 class StockTransformNode(Node):
-    STOCK_TO_CHILD_STOCK_TRANSFORM = {}
-    STOCK_TO_PARENT_STOCK_TRANSFORM = {}
+    FROM_PARENT_STOCK = {
+        "carbure_client_id": "entity_id",
+    }
+
+    FROM_CHILD_STOCK = {
+        "carbure_supplier_id": "entity_id",
+    }
 
     def serialize(self):
         return {
@@ -563,49 +666,52 @@ class StockTransformNode(Node):
 
     def diff_with_parent(self):
         if isinstance(self.parent, StockNode):
-            return self.diff_data(self.parent.data, StockTransformNode.STOCK_TO_CHILD_STOCK_TRANSFORM)
+            return self.diff_data(StockTransformNode.FROM_PARENT_STOCK, self.parent.data)
         return {}
 
     def diff_with_child(self, child: Node):
         if isinstance(child, StockNode):
-            return self.diff_data(child.data, StockTransformNode.STOCK_TO_PARENT_STOCK_TRANSFORM)
+            return self.diff_data(StockTransformNode.FROM_CHILD_STOCK, child.data)
         return {}
 
 
 class TicketSourceNode(Node):
-    LOT_TO_CHILD_TICKET_SOURCE = {
-        "year": "year",
+    FROM_PARENT_LOT = {
         "period": "delivery_period",
         "volume": "total_volume",
-        "feedstock_id": "feedstock_id",
-        "biofuel_id": "biofuel_id",
-        "country_of_origin_id": "country_of_origin_id",
-        "carbure_producer_id": "carbure_producer_id",
-        "unknown_producer": "unknown_producer",
-        "carbure_production_site_id": "carbure_production_site_id",
-        "unknown_production_site": "unknown_production_site",
-        "production_country_id": "production_country_id",
-        "production_site_commissioning_date": "production_site_commissioning_date",
-        "ghg_total": "ghg_total",
+        "carbure_client_id": "added_by_id",
         "ghg_reference_red_ii": "ghg_reference",
         "ghg_reduction_red_ii": "ghg_reduction",
+        "year": True,
+        "feedstock_id": True,
+        "biofuel_id": True,
+        "country_of_origin_id": True,
+        "carbure_producer_id": True,
+        "unknown_producer": True,
+        "carbure_production_site_id": True,
+        "unknown_production_site": True,
+        "production_country_id": True,
+        "production_site_commissioning_date": True,
+        "ghg_total": True,
         **GHG_FIELDS,
     }
 
-    TICKET_TO_CHILD_TICKET_SOURCE = {
+    FROM_PARENT_TICKET = {
         "volume": "total_volume",
-        "feedstock_id": "feedstock_id",
-        "biofuel_id": "biofuel_id",
-        "country_of_origin_id": "country_of_origin_id",
-        "carbure_producer_id": "carbure_producer_id",
-        "unknown_producer": "unknown_producer",
-        "carbure_production_site_id": "carbure_production_site_id",
-        "unknown_production_site": "unknown_production_site",
-        "production_country_id": "production_country_id",
-        "production_site_commissioning_date": "production_site_commissioning_date",
-        "ghg_total": "ghg_total",
-        "ghg_reference": "ghg_reference",
-        "ghg_reduction": "ghg_reduction",
+        "assignment_period": "delivery_period",
+        "year": True,
+        "feedstock_id": True,
+        "biofuel_id": True,
+        "country_of_origin_id": True,
+        "carbure_producer_id": True,
+        "unknown_producer": True,
+        "carbure_production_site_id": True,
+        "unknown_production_site": True,
+        "production_country_id": True,
+        "production_site_commissioning_date": True,
+        "ghg_total": True,
+        "ghg_reference": True,
+        "ghg_reduction": True,
         **GHG_FIELDS,
     }
 
@@ -633,9 +739,9 @@ class TicketSourceNode(Node):
 
     def diff_with_parent(self):
         if isinstance(self.parent, LotNode):
-            return self.diff_data(self.parent.data, TicketSourceNode.LOT_TO_CHILD_TICKET_SOURCE)
+            return self.diff_data(TicketSourceNode.FROM_PARENT_LOT, self.parent.data)
         elif isinstance(self.parent, TicketNode):
-            return self.diff_data(self.parent.data, TicketSourceNode.TICKET_TO_CHILD_TICKET_SOURCE)
+            return self.diff_data(TicketSourceNode.FROM_PARENT_TICKET, self.parent.data)
         return {}
 
     def validate(self):
@@ -656,20 +762,20 @@ class TicketSourceNode(Node):
 
 
 class TicketNode(Node):
-    TICKET_SOURCE_TO_CHILD_TICKET = {
+    FROM_PARENT_TICKET_SOURCE = {
         "added_by_id": "supplier_id",
-        "feedstock_id": "feedstock_id",
-        "biofuel_id": "biofuel_id",
-        "country_of_origin_id": "country_of_origin_id",
-        "carbure_producer_id": "carbure_producer_id",
-        "unknown_producer": "unknown_producer",
-        "carbure_production_site_id": "carbure_production_site_id",
-        "unknown_production_site": "unknown_production_site",
-        "production_country_id": "production_country_id",
-        "production_site_commissioning_date": "production_site_commissioning_date",
-        "ghg_total": "ghg_total",
-        "ghg_reference": "ghg_reference",
-        "ghg_reduction": "ghg_reduction",
+        "feedstock_id": True,
+        "biofuel_id": True,
+        "country_of_origin_id": True,
+        "carbure_producer_id": True,
+        "unknown_producer": True,
+        "carbure_production_site_id": True,
+        "unknown_production_site": True,
+        "production_country_id": True,
+        "production_site_commissioning_date": True,
+        "ghg_total": True,
+        "ghg_reference": True,
+        "ghg_reduction": True,
         **GHG_FIELDS,
     }
 
@@ -694,5 +800,5 @@ class TicketNode(Node):
 
     def diff_with_parent(self):
         if isinstance(self.parent, TicketSourceNode):
-            return self.diff_data(self.parent.data, TicketNode.TICKET_SOURCE_TO_CHILD_TICKET)
+            return self.diff_data(TicketNode.FROM_PARENT_TICKET_SOURCE, self.parent.data)
         return {}
