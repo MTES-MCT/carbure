@@ -149,5 +149,5 @@ web/static
 files
 
 # Script generated files
-integrity.json
+integrity_checks.json
 sanity_checks.json
