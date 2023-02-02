@@ -926,12 +926,11 @@ def get_prefetched_data(entity=None):
     # MAPPING OF PRODUCTION SITES AND THEIR INPUT/OUTPUTS
     production_sites = {}
     all_ps = ProductionSite.objects.all()
-
-    all_ps_inputs = list()
-    all_ps_outputs = list()
+    all_ps_inputs = ProductionSiteInput.objects.values('production_site_id', 'matiere_premiere_id')
+    all_ps_outputs = ProductionSiteOutput.objects.values('production_site_id', 'biocarburant_id')
 
     feedstock_by_ps = {}
-    for input in ProductionSiteInput.objects.values('production_site_id', 'matiere_premiere_id'):
+    for input in all_ps_inputs:
         production_site_id = input["production_site_id"]
         matiere_premiere_id = input["matiere_premiere_id"]
         if production_site_id not in feedstock_by_ps:
@@ -939,7 +938,7 @@ def get_prefetched_data(entity=None):
         feedstock_by_ps[production_site_id].append(matiere_premiere_id)
 
     biofuel_by_ps = {}
-    for output in ProductionSiteOutput.objects.values('production_site_id', 'biocarburant_id'):
+    for output in all_ps_outputs:
         production_site_id = output["production_site_id"]
         biocarburant_id = output["biocarburant_id"]
         if production_site_id not in biofuel_by_ps:

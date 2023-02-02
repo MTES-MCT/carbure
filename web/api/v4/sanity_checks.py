@@ -205,7 +205,7 @@ def check_certificates(prefetched_data, lot, errors):
         else:
             # certificate is set and exists. is it valid?
             c = prefetched_data['certificates'][cert]
-            if c.valid_until < lot.delivery_date:
+            if c["valid_until"] < lot.delivery_date:
                  errors.append(generic_error(error=CarbureCertificatesErrors.EXPIRED_PRODSITE_CERT, lot=lot, display_to_recipient=True, field='production_site_certificate'))
 
     # SUPPLIER CERT
@@ -374,6 +374,9 @@ def sanity_check_mandatory_fields(lot):
     is_valid = True
     today = datetime.date.today()
     errors = []
+
+    if lot.lot_status == CarbureLot.FLUSHED:
+        return True, []
 
     if not lot.volume:
         errors.append(generic_error(error=CarbureSanityCheckErrors.MISSING_VOLUME, lot=lot, field='volume', is_blocking=True))
