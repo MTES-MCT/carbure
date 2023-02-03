@@ -33,6 +33,7 @@ class Node:
         self._child = child  # cache original child from which this node has been created
         self._owner = None  # prepare cache for owner value
         self.diff = {}  # save the cumulative modifications applied to this node
+        self.changed_only = False  # flag to propagate only fields that were changed after an update
 
     @property
     def parent(self) -> "Node":
@@ -168,6 +169,119 @@ class Node:
     def get_depth(self) -> int:
         return len(self.get_ancestors())
 
+    # check if the node can be modified and apply the update
+    def update(self, data, entity_id=None) -> dict:
+        diff = {}
+
+        # generate a diff dict
+        for attr, new_value in data.items():
+            old_value = getattr(self.data, attr)
+            if new_value != old_value:
+                diff[attr] = (new_value, old_value)
+
+        # if an entity_id is specified, check if it has the right to apply the diff
+        if entity_id is not None:
+            allowed_diff = self.get_allowed_diff(diff, entity_id)
+            if len(allowed_diff) != len(diff):
+                raise Exception("Forbidden to update attributes")
+
+        # apply the diff if everything went fine
+        return self.apply_diff(diff)
+
+    # check if the data of this node is correctly propagated to all its descendants
+    # and returns a list of errors were problems were found
+    def check_integrity(self) -> list[tuple["Node", str, object]]:
+        # check all fields when diffing
+        self.changed_only = False
+
+        errors = self.validate()
+        diff = self.diff_with_parent()
+
+        if len(diff) > 0:
+            errors = [(self, TraceabilityError.NODE_HAS_DIFFERENCES_WITH_PARENT, diff)] + errors
+
+        for child in self.children:
+            errors += child.check_integrity()
+
+        return errors
+
+    # propagate the data of this node throughout the tree
+    def propagate(self, changed_only=False) -> list["Node"]:
+        # setup the changed_only flag
+        self.changed_only = changed_only
+
+        # propagate the node up and down and list the changed nodes
+        changed = [self]
+        changed += self.propagate_down()
+        changed += self.propagate_up()
+
+        return changed
+
+    # propagate the data of this node to its ancestors
+    # and repercute it to their own descendants (except this node)
+    def propagate_up(self) -> list["Node"]:
+        if not self.parent:
+            return []
+
+        self.parent.changed_only = self.changed_only
+        diff = self.parent.diff_with_child(self)
+
+        changed_nodes = []
+
+        if len(diff) > 0:
+            self.parent.apply_diff(diff)
+            changed_nodes += [self.parent]
+
+        changed_nodes += self.parent.propagate_down(skip=self)
+        changed_nodes += self.parent.propagate_up()
+
+        return changed_nodes
+
+    # propagate the data of this node to all its descendants
+    # you can skip a child in the loop by specifying it in the params
+    def propagate_down(self, skip: "Node" = None) -> list["Node"]:
+        changed = []
+
+        for child in self.children:
+            if child == skip:
+                continue
+
+            child.changed_only = self.changed_only
+            diff = child.diff_with_parent()
+
+            if len(diff) > 0:
+                child.apply_diff(diff)
+                changed += [child]
+
+            changed += child.propagate_down()
+
+        return changed
+
+    # compare this node data with the given source data
+    # the map param allows mapping fields of the source data with this node's data
+    def get_diff(self, map: dict, source: "Node"):
+        diff = {}
+
+        for source_attr, self_attr in map.items():
+            if not self_attr:
+                continue
+
+            # skip unchanged fields when changed_only mode is active
+            if self.changed_only and source_attr not in source.diff:
+                continue
+
+            # resolve the mapped field name
+            self_attr = source_attr if self_attr is True else self_attr
+
+            new_value = getattr(source.data, source_attr)
+            old_value = getattr(self.data, self_attr)
+
+            if new_value and new_value != old_value:
+                diff[self_attr] = (new_value, old_value)
+
+        return diff
+
+    # filter the diff by only allowing the list of fields editable by entity_id
     def get_allowed_diff(self, diff: dict, entity_id):
         access_level = self.get_access_level(entity_id)
 
@@ -188,105 +302,6 @@ class Node:
                 allowed_diff[field] = values
 
         return allowed_diff
-
-    # check if the data of this node is correctly propagated to all its descendants
-    # and returns a list of errors were problems were found
-    def check_integrity(self) -> list[tuple["Node", str, object]]:
-        errors = self.validate()
-        diff = self.diff_with_parent()
-
-        if len(diff) > 0:
-            errors = [(self, TraceabilityError.NODE_HAS_DIFFERENCES_WITH_PARENT, diff)] + errors
-
-        for child in self.children:
-            errors += child.check_integrity()
-
-        return errors
-
-    # check if the node can be modified and apply the update
-    def update(self, data, entity_id=None):
-        diff = {}
-
-        for attr, new_value in data.items():
-            old_value = getattr(self.data, attr)
-            if new_value != old_value:
-                diff[attr] = (new_value, old_value)
-
-        entity_id = entity_id or self.owner
-        allowed_diff = self.get_allowed_diff(diff, entity_id)
-
-        if len(allowed_diff) != len(diff):
-            raise Exception("Cannot update requested fields")
-
-        return self.apply_diff(diff)
-
-    # propagate the data of this node throughout the tree
-    def propagate(self, entity_id=None) -> list["Node"]:
-        entity_id = entity_id or self.owner
-        changed = [self]
-        changed += self.propagate_down(entity_id)
-        changed += self.propagate_up(entity_id)
-        return changed
-
-    # propagate the data of this node to its ancestors
-    # and repercute it to their own descendants (except this node)
-    def propagate_up(self, entity_id) -> list["Node"]:
-        if not self.parent:
-            return []
-
-        changed = []
-
-        diff = self.parent.diff_with_child(self)
-        # allowed_diff = self.parent.get_allowed_diff(diff, entity_id)
-
-        if len(diff) > 0:
-            self.parent.apply_diff(diff)
-            changed += [self.parent]
-
-        changed += self.parent.propagate_down(entity_id, skip=self)
-        changed += self.parent.propagate_up(entity_id)
-
-        return changed
-
-    # propagate the data of this node to all its descendants
-    # you can skip a child in the loop by specifying it in the params
-    def propagate_down(self, entity_id, skip: "Node" = None) -> list["Node"]:
-        changed = []
-
-        for child in self.children:
-            if child == skip:
-                continue
-
-            diff = child.diff_with_parent()
-            # allowed_diff = child.get_allowed_diff(diff, entity_id)
-
-            if len(diff) > 0:
-                child.apply_diff(diff)
-                changed += [child]
-
-            changed += child.propagate_down(entity_id)
-
-        return changed
-
-    # compare this node data with the given source data
-    # the map param allows mapping fields of the source data with this node's data
-    def diff_data(self, map: dict, source):
-        diff = {}
-
-        for source_attr, self_attr in map.items():
-            if not self_attr:
-                continue
-
-            # resolve the mapped field name
-            self_attr = source_attr if self_attr is True else self_attr
-
-            new_value = getattr(source, source_attr)
-            old_value = getattr(self.data, self_attr)
-
-            if new_value and new_value != old_value:
-                diff[self_attr] = (new_value, old_value)
-
-        return diff
 
     # apply the given diff to this node's data
     def apply_diff(self, diff: dict[str, tuple]):
@@ -338,6 +353,7 @@ class LotNode(Node):
         "production_site_commissioning_date": True,
         "production_site_certificate": True,
         "production_site_double_counting_certificate": True,
+        "delivery_date": True,
         "ghg_total": True,
         "ghg_reference": True,
         "ghg_reduction": True,
@@ -346,7 +362,7 @@ class LotNode(Node):
         **GHG_FIELDS,
     }
 
-    FROM_PARENT_LOT = {
+    FROM_DIRECT_LOT = {
         "feedstock_id": True,
         "biofuel_id": True,
         "volume": True,
@@ -354,18 +370,20 @@ class LotNode(Node):
         "lhv_amount": True,
         "transport_document_type": True,
         "transport_document_reference": True,
+        "carbure_delivery_site_id": True,
+        "unknown_delivery_site": True,
+        "delivery_site_country_id": True,
         **FROM_LOT,
     }
 
+    FROM_PARENT_LOT = {
+        "carbure_client_id": "carbure_supplier_id",
+        **FROM_DIRECT_LOT,
+    }
+
     FROM_CHILD_LOT = {
-        "feedstock_id": True,
-        "biofuel_id": True,
-        "volume": True,
-        "weight": True,
-        "lhv_amount": True,
-        "transport_document_type": True,
-        "transport_document_reference": True,
-        **FROM_LOT,
+        "carbure_supplier_id": "carbure_client_id",
+        **FROM_DIRECT_LOT,
     }
 
     FROM_STOCK = {
@@ -393,11 +411,9 @@ class LotNode(Node):
     }
 
     LOT_SUSTAINABILITY_FIELDS = [
-        # lot data
         "feedstock",
         "biofuel",
         "country_of_origin",
-        # production data
         "carbure_producer",
         "unknown_producer",
         "carbure_production_site",
@@ -407,7 +423,6 @@ class LotNode(Node):
         "production_site_certificate",
         "production_site_certificate_type",
         "production_site_double_counting_certificate",
-        # ghg
         "eec",
         "el",
         "ep",
@@ -488,28 +503,28 @@ class LotNode(Node):
 
     def diff_with_parent(self):
         if isinstance(self.parent, LotNode):
-            return self.diff_data(LotNode.FROM_PARENT_LOT, self.parent.data)
+            return self.get_diff(LotNode.FROM_PARENT_LOT, self.parent)
         if isinstance(self.parent, StockNode):
             # get diff with root lot sustainability data
-            root_lot = self.get_root()
-            root_diff = self.diff_data(LotNode.FROM_LOT, root_lot.data)
+            ancestor_lot = self.parent.get_closest(LotNode)
+            lot_diff = self.get_diff(LotNode.FROM_LOT, ancestor_lot)
             # get diff with stock info
-            stock_diff = self.diff_data(LotNode.FROM_PARENT_STOCK, self.parent.data)
+            stock_diff = self.get_diff(LotNode.FROM_PARENT_STOCK, self.parent)
             # merge the results
-            return {**root_diff, **stock_diff}
+            return {**lot_diff, **stock_diff}
 
         return {}
 
     def diff_with_child(self, child: Node):
         # we ignore ticket source children because they cannot be modified directly anyway
         if isinstance(child, LotNode):
-            return self.diff_data(LotNode.FROM_CHILD_LOT, child.data)
+            return self.get_diff(LotNode.FROM_CHILD_LOT, child)
         if isinstance(child, StockNode):
             # get first descendant lot for sustainability data
             descendant_lot = child.get_first(LotNode)
-            descendant_diff = self.diff_data(LotNode.FROM_LOT, descendant_lot.data)
+            descendant_diff = self.get_diff(LotNode.FROM_LOT, descendant_lot)
             # get diff with stock info
-            stock_diff = self.diff_data(LotNode.FROM_CHILD_STOCK, child.data)
+            stock_diff = self.get_diff(LotNode.FROM_CHILD_STOCK, child)
             # merge the results
             return {**descendant_diff, **stock_diff}
         return {}
@@ -583,13 +598,13 @@ class StockNode(Node):
 
     def diff_with_parent(self):
         if isinstance(self.parent, LotNode):
-            return self.diff_data(StockNode.FROM_PARENT_LOT, self.parent.data)
+            return self.get_diff(StockNode.FROM_PARENT_LOT, self.parent)
         if isinstance(self.parent, StockTransformNode):
             # get diff with closest stock
             ancestor_stock = self.parent.get_closest(StockNode)
-            stock_diff = self.diff_data(StockNode.FROM_STOCK, ancestor_stock.data)
+            stock_diff = self.get_diff(StockNode.FROM_STOCK, ancestor_stock)
             # get diff with transform node
-            transform_diff = self.diff_data(StockNode.FROM_PARENT_STOCK_TRANSFORM, self.parent.data)
+            transform_diff = self.get_diff(StockNode.FROM_PARENT_STOCK_TRANSFORM, self.parent)
             # find out the biofuel source and dest of the parent transformation
             biofuels = get_stock_transform_biofuels(self.parent.data)
             biofuel_diff = {"biofuel_id": (biofuels["destination"], self.data.biofuel_id)}
@@ -599,13 +614,13 @@ class StockNode(Node):
 
     def diff_with_child(self, child: Node):
         if isinstance(child, LotNode):
-            return self.diff_data(StockNode.FROM_CHILD_LOT, child.data)
+            return self.get_diff(StockNode.FROM_CHILD_LOT, child)
         if isinstance(child, StockTransformNode):
             # get diff with descendant stock info
             descendant_stock = child.get_first(StockNode)
-            stock_diff = self.diff_data(StockNode.FROM_STOCK, descendant_stock.data)
+            stock_diff = self.get_diff(StockNode.FROM_STOCK, descendant_stock)
             # get diff with transform node
-            transform_diff = self.diff_data(StockNode.FROM_CHILD_STOCK_TRANSFORM, child.data)
+            transform_diff = self.get_diff(StockNode.FROM_CHILD_STOCK_TRANSFORM, child)
             # find out the biofuel source and dest of the parent transformation
             biofuels = get_stock_transform_biofuels(child.data)
             biofuel_diff = {"biofuel_id": (biofuels["source"], self.data.biofuel_id)}
@@ -666,12 +681,12 @@ class StockTransformNode(Node):
 
     def diff_with_parent(self):
         if isinstance(self.parent, StockNode):
-            return self.diff_data(StockTransformNode.FROM_PARENT_STOCK, self.parent.data)
+            return self.get_diff(StockTransformNode.FROM_PARENT_STOCK, self.parent)
         return {}
 
     def diff_with_child(self, child: Node):
         if isinstance(child, StockNode):
-            return self.diff_data(StockTransformNode.FROM_CHILD_STOCK, child.data)
+            return self.get_diff(StockTransformNode.FROM_CHILD_STOCK, child)
         return {}
 
 
@@ -739,9 +754,9 @@ class TicketSourceNode(Node):
 
     def diff_with_parent(self):
         if isinstance(self.parent, LotNode):
-            return self.diff_data(TicketSourceNode.FROM_PARENT_LOT, self.parent.data)
+            return self.get_diff(TicketSourceNode.FROM_PARENT_LOT, self.parent)
         elif isinstance(self.parent, TicketNode):
-            return self.diff_data(TicketSourceNode.FROM_PARENT_TICKET, self.parent.data)
+            return self.get_diff(TicketSourceNode.FROM_PARENT_TICKET, self.parent)
         return {}
 
     def validate(self):
@@ -800,5 +815,5 @@ class TicketNode(Node):
 
     def diff_with_parent(self):
         if isinstance(self.parent, TicketSourceNode):
-            return self.diff_data(TicketNode.FROM_PARENT_TICKET_SOURCE, self.parent.data)
+            return self.get_diff(TicketNode.FROM_PARENT_TICKET_SOURCE, self.parent)
         return {}

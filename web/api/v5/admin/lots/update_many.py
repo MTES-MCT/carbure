@@ -124,15 +124,12 @@ def update_many(request):
             quantity = compute_lot_quantity(node.data, quantity_data)
             update = {**update, **quantity}
 
-        # apply the update to the lot and save its previous state for diffing
+        # apply the update to the lot
         node.update(update)
 
         # if the node changed, recursively apply the update to related nodes
         if len(node.diff) > 0:
-            updated_nodes += node.propagate(update_fields)
-
-        # @TODO run integrity checks to find out remaining issues in the chain
-        # errors = node.check_integrity()
+            updated_nodes += node.propagate(changed_only=True)
 
     # dedupe the nodes so we don't create duplicates
     updated_nodes = list(set(updated_nodes))
