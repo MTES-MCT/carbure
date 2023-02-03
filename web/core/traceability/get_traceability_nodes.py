@@ -16,10 +16,10 @@ def get_traceability_nodes(lots: list):
     rows = query_traceability_tree(original_lot_ids)
 
     # fetch all the models for the listed ids
-    models_by_type = get_models_by_type(rows)
+    models_by_type = query_models_by_type(rows)
 
     # connect all the models together through Nodes
-    lot_nodes = get_traceability_nodes(rows, models_by_type)
+    lot_nodes = connect_traceability_nodes(rows, models_by_type)
 
     # return only the nodes for the originally given lots
     return [lot_nodes[lot_id] for lot_id in original_lot_ids if lot_id in lot_nodes]
@@ -37,7 +37,7 @@ def query_traceability_tree(lot_ids: list[int]):
 
 
 # list all the models referenced in the rows, grouped by their types
-def get_models_by_type(rows):
+def query_models_by_type(rows):
     lot_ids: list[int] = []
     stock_ids: list[int] = []
     stock_transform_ids: list[int] = []
@@ -95,7 +95,7 @@ def get_models_by_type(rows):
 
 
 # create nodes for all the models and set the parent/child relations between them
-def get_traceability_nodes(rows, models_by_type):
+def connect_traceability_nodes(rows, models_by_type):
     lots, stocks, stock_transforms, ticket_sources, tickets = models_by_type
 
     # create individual nodes based on the results of the previous queries and index them by their type and id
