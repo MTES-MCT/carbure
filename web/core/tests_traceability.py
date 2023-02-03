@@ -1,11 +1,15 @@
 from django.test import TestCase
 
 from api.v4.tests_utils import setup_current_user
-from core.traceability_tree import LotNode, StockNode, StockTransformNode, TicketSourceNode, TicketNode, ETBE, ETHANOL
+
 from core.models import Entity, CarbureLot, CarbureStock, CarbureStockTransformation
 from saf.models import SafTicket, SafTicketSource
+
 from transactions.factories import CarbureLotFactory, CarbureStockFactory, CarbureStockTransformFactory
 from saf.factories import SafTicketSourceFactory, SafTicketFactory
+
+from core.traceability import LotNode, StockNode, StockTransformNode, TicketSourceNode, TicketNode
+from core.traceability.stock import ETHANOL, ETBE
 
 
 class TraceabilityTest(TestCase):
