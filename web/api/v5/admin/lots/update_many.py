@@ -73,7 +73,7 @@ def update_many(request):
     update_comments = []
 
     for node in updated_nodes:
-        if not isinstance(node, LotNode) or len(node.diff) > 0:
+        if not isinstance(node, LotNode) or len(node.diff) == 0:
             continue
 
         # save a lot event with the current modification
@@ -234,9 +234,9 @@ def group_errors_by_lot(errors) -> dict[int, list[dict]]:
     return errors_by_lot
 
 
-def diff_to_metadata(diff):
+def diff_to_metadata(diff: dict):
     metadata = {"added": [], "removed": [], "changed": []}
-    for field, (new_value, old_value) in diff:
+    for field, (new_value, old_value) in diff.items():
         metadata["changed"].append([field, old_value, new_value])
     return metadata
 
