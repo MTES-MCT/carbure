@@ -8,7 +8,7 @@ from core.traceability import LotNode, StockNode, StockTransformNode, TicketSour
 
 # use a recursive query to quickly fetch the whole families of the given lots
 # and build the traceability nodes and their relations based on the results
-def get_family_trees(lots: list):
+def get_traceability_nodes(lots: list):
     with connection.cursor() as cursor:
         lot_ids: list[int] = []
         stock_ids: list[int] = []
@@ -19,7 +19,7 @@ def get_family_trees(lots: list):
         # extract lots ids
         original_lot_ids = [lot.id for lot in lots]
 
-        with open("web/core/traceability/get_family_trees.sql") as query:
+        with open("web/core/traceability/get_traceability_trees.sql") as query:
             # recursively query for the whole family trees for the given lot ids
             cursor.execute(query.read(), [original_lot_ids])
 
@@ -85,17 +85,12 @@ def get_family_trees(lots: list):
             node = None
             parent_node = None
 
-            # extract data from the row
+            # extract node id from the row
             lot_id = row[0]
             stock_id = row[1]
             stock_transform_id = row[2]
             ticket_source_id = row[3]
             ticket_id = row[4]
-            parent_lot_id = row[5]
-            parent_stock_id = row[6]
-            parent_stock_transform_id = row[7]
-            parent_ticket_source_id = row[8]
-            parent_ticket_id = row[9]
 
             # grab the right node from the dicts
             if lot_id is not None:
@@ -108,6 +103,13 @@ def get_family_trees(lots: list):
                 node = ticket_source_nodes[ticket_source_id]
             if ticket_id is not None:
                 node = ticket_nodes[ticket_id]
+
+            # extract parent id from the row
+            parent_lot_id = row[5]
+            parent_stock_id = row[6]
+            parent_stock_transform_id = row[7]
+            parent_ticket_source_id = row[8]
+            parent_ticket_id = row[9]
 
             # grab the right parent node from the dicts
             if parent_lot_id is not None:
