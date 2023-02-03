@@ -78,13 +78,7 @@ const UpdateManyConfirmationDialog = ({
   }
 
   const submit = () => {
-    return updateLots.execute(
-      entity.id,
-      lots_ids,
-      updatedValues,
-      comment!,
-      true
-    )
+    return updateLots.execute(entity.id, lots_ids, updatedValues, comment!)
 
     //TOTEST uncomment below
     // showErrors(lotsUpdateErrorsResponse.errors!)
