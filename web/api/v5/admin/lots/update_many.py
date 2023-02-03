@@ -2,14 +2,11 @@ from django import forms
 from django.db import transaction
 from core.decorators import check_admin_rights
 from core.common import SuccessResponse, ErrorResponse
+from core.serializers import GenericErrorSerializer
 from core.carburetypes import CarbureUnit
 from producers.models import ProductionSite
-from core.serializers import GenericErrorSerializer
-from api.v4.sanity_checks import bulk_sanity_checks
 from api.v4.lots import compute_lot_quantity
-from core.traceability.get_family_trees import get_family_trees
-from core.traceability import LotNode, StockNode, StockTransformNode, TicketSourceNode, TicketNode
-
+from api.v4.sanity_checks import bulk_sanity_checks
 
 from core.models import (
     CarbureLot,
@@ -18,16 +15,116 @@ from core.models import (
     MatierePremiere,
     Depot,
     Pays,
-    GenericError,
     CarbureLotEvent,
     CarbureLotComment,
+    GenericError,
+)
+
+from core.traceability import (
+    LotNode,
+    get_traceability_nodes,
+    bulk_update_traceability_nodes,
 )
 
 
 class UpdateManyError:
     MALFORMED_PARAMS = "MALFORMED_PARAMS"
-    SANITY_CHECKS_NOT_PASSED = "SANITY_CHECKS_NOT_PASSED"
-    SOME_LOTS_HAVE_PARENTS = "SOME_LOTS_HAVE_PARENTS"
+    SANITY_CHECKS_FAILED = "SANITY_CHECKS_FAILED"
+    UPDATE_FAILED = "UPDATE_FAILED"
+
+
+@check_admin_rights()
+def update_many(request):
+    form = UpdateManyForm(request.POST)
+
+    if not form.is_valid():
+        return ErrorResponse(400, UpdateManyError.MALFORMED_PARAMS, form.errors)
+
+    entity_id = form.cleaned_data["entity_id"]
+    comment = form.cleaned_data["comment"]
+    dry_run = form.cleaned_data["dry_run"]
+    lots = form.cleaned_data["lots_ids"]
+
+    # query the database for all the traceability nodes related to these lots
+    nodes = get_traceability_nodes(lots)
+
+    # convert the form data to a dict that can be applied as lot update
+    update_data, quantity_data = get_update_data(form.cleaned_data)
+
+    # prepare a list to hold all the nodes modified by this update
+    updated_nodes = []
+
+    for node in nodes:
+        # compute the update content based on the current lot
+        update = {**update_data}
+        if len(quantity_data) > 0:
+            quantity = compute_lot_quantity(node.data, quantity_data)
+            update = {**update, **quantity}
+
+        # apply the update to the lot
+        node.update(update)
+
+        # if the node changed, recursively apply the update to related nodes
+        if len(node.diff) > 0:
+            updated_nodes += node.propagate(changed_only=True)
+
+    # prepare lot events and comments
+    update_events = []
+    update_comments = []
+
+    for node in updated_nodes:
+        if not isinstance(node, LotNode) or len(node.diff) > 0:
+            continue
+
+        # save a lot event with the current modification
+        update_events.append(
+            CarbureLotEvent(
+                event_type=CarbureLotEvent.UPDATED_BY_ADMIN,
+                lot=node.data,
+                user=request.user,
+                metadata=diff_to_metadata(node.diff),
+            )
+        )
+
+        # add a comment to the lot
+        update_comments.append(
+            CarbureLotComment(
+                entity_id=entity_id,
+                user=request.user,
+                lot=node.data,
+                comment=comment,
+                comment_type=CarbureLotComment.ADMIN,
+                is_visible_by_admin=True,
+                is_visible_by_auditor=True,
+            )
+        )
+
+    # list all the affected CarbureLots
+    updated_lots = [node.data for node in updated_nodes if isinstance(node, LotNode)]
+
+    # run sanity checks in memory so we don't modify the current errors
+    sanity_check_errors, _ = bulk_sanity_checks(updated_lots, dry_run=True)
+    blocking_errors = [error for error in sanity_check_errors if error.is_blocking]
+
+    # do not modify the database if there are any blocking errors in the modified lots
+    if len(blocking_errors) > 0:
+        errors_by_lot = group_errors_by_lot(blocking_errors)
+        return ErrorResponse(400, UpdateManyError.SANITY_CHECKS_FAILED, {"errors": errors_by_lot})
+
+    # save everything in the database in one single transaction
+    if not dry_run:
+        with transaction.atomic():
+            bulk_update_traceability_nodes(updated_nodes)
+            CarbureLotComment.objects.bulk_create(update_comments)
+            CarbureLotEvent.objects.bulk_create(update_events)
+            GenericError.objects.filter(lot__in=updated_lots).delete()
+            GenericError.objects.bulk_create(sanity_check_errors)
+
+    # prepare the response data
+    updates = [serialize_node(node) for node in updated_nodes]
+    errors_by_lot = group_errors_by_lot(sanity_check_errors)
+
+    return SuccessResponse({"updates": updates, "errors": errors_by_lot})
 
 
 class UpdateManyForm(forms.Form):
@@ -96,121 +193,11 @@ class UpdateManyForm(forms.Form):
     delivery_site_country_code = forms.ModelChoiceField(queryset=COUNTRIES, to_field_name="code_pays", required=False)
 
 
-@check_admin_rights()
-def update_many(request):
-    form = UpdateManyForm(request.POST)
-
-    if not form.is_valid():
-        return ErrorResponse(400, UpdateManyError.MALFORMED_PARAMS, form.errors)
-
-    entity_id = form.cleaned_data["entity_id"]
-    comment = form.cleaned_data["comment"]
-    dry_run = form.cleaned_data["dry_run"]
-    lots = form.cleaned_data["lots_ids"]
-
-    update_data, quantity_data, update_fields = get_update_data(form.cleaned_data)
-
-    updated_nodes = []
-    updated_lots = []
-    update_events = []
-    update_comments = []
-
-    nodes = get_family_trees(lots)
-
-    for node in nodes:
-        # compute the update content based on the current lot
-        update = {**update_data}
-        if len(quantity_data) > 0:
-            quantity = compute_lot_quantity(node.data, quantity_data)
-            update = {**update, **quantity}
-
-        # apply the update to the lot
-        node.update(update)
-
-        # if the node changed, recursively apply the update to related nodes
-        if len(node.diff) > 0:
-            updated_nodes += node.propagate(changed_only=True)
-
-    # dedupe the nodes so we don't create duplicates
-    updated_nodes = list(set(updated_nodes))
-
-    updated_lots = []
-    updated_stocks = []
-    updated_stock_transforms = []
-    updated_ticket_sources = []
-    updated_tickets = []
-
-    # get the list of lots modified by this update
-    for node in updated_nodes:
-        if isinstance(node, LotNode):
-            updated_lots.append(node.data)
-        if isinstance(node, StockNode):
-            updated_stocks.append(node.data)
-        if isinstance(node, StockTransformNode):
-            updated_stock_transforms.append(node.data)
-        if isinstance(node, TicketSourceNode):
-            updated_ticket_sources.append(node.data)
-        if isinstance(node, TicketNode):
-            updated_tickets.append(node.data)
-
-    for lot in updated_lots:
-        # save a lot event with the current modification
-        update_event = CarbureLotEvent(
-            event_type=CarbureLotEvent.UPDATED_BY_ADMIN,
-            lot=lot,
-            user=request.user,
-            metadata=node.diff,
-        )
-
-        # add a comment to the lot
-        update_comment = CarbureLotComment(
-            entity_id=entity_id,
-            user=request.user,
-            lot=lot,
-            comment=comment,
-            comment_type=CarbureLotComment.ADMIN,
-            is_visible_by_admin=True,
-            is_visible_by_auditor=True,
-        )
-
-        update_events.append(update_event)
-        update_comments.append(update_comment)
-
-    # run sanity checks in memory so we don't modify the current errors
-    sanity_check_errors, _ = bulk_sanity_checks(updated_lots, dry_run=True)
-    blocking_errors = [error for error in sanity_check_errors if error.is_blocking]
-
-    # # do not modify the database if there are any blocking errors in the modified lots
-    if len(blocking_errors) > 0:
-        errors_by_lot = group_errors_by_lot(blocking_errors)
-        return ErrorResponse(400, UpdateManyError.SANITY_CHECKS_NOT_PASSED, {"errors": errors_by_lot})
-
-    if not dry_run:
-        pass
-        # @TODO actually apply the changes in the DB for all models
-        # save everything in the database in one single transaction
-        # with transaction.atomic():
-        #     GenericError.objects.filter(lot__in=lots).delete()
-        #     GenericError.objects.bulk_create(sanity_check_errors)
-        #     CarbureLot.objects.bulk_update(lots, update_fields)
-        #     CarbureLotEvent.objects.bulk_create(update_events)
-        #     CarbureLotComment.objects.bulk_create(update_comments)
-
-    updates = []
-    errors_by_lot = group_errors_by_lot(sanity_check_errors)
-    for node in updated_nodes:
-        errors = errors_by_lot.get(node.data.id, [])
-        updates.append({"node": node.serialize(), "diff": node.diff, "owner": node.owner, "errors": errors})
-
-    return SuccessResponse({"updates": updates})
-
-
 # grab only the values that are defined on the form data
-# and return the list of CarbureLot fields that were changed
+# and transform them so they can be applied directly to a CarbureLot
 def get_update_data(form_data):
     update_data = {}
     quantity_data = {}
-    udpate_fields = []
 
     for field in form_data:
         if field in ("lots_ids", "comment", "entity_id", "dry_run"):
@@ -228,15 +215,15 @@ def get_update_data(form_data):
         else:
             update_data[field] = form_data[field]
 
-        if field == "quantity":
-            udpate_fields += ["volume", "weight", "lhv_amount"]
-        elif field != "unit":
-            udpate_fields += [field]
-
-    return update_data, quantity_data, udpate_fields
+    return update_data, quantity_data
 
 
-def group_errors_by_lot(errors):
+def serialize_node(node):
+    return {"node": node.serialize(), "owner": node.owner, "diff": node.diff}
+
+
+# group a list of GenericError by the id of their related CarbureLot
+def group_errors_by_lot(errors) -> dict[int, list[dict]]:
     errors_by_lot = {}
     for error in errors:
         if error.lot_id not in errors_by_lot:
@@ -245,6 +232,13 @@ def group_errors_by_lot(errors):
     for lot_id, errors in errors_by_lot.items():
         errors_by_lot[lot_id] = GenericErrorSerializer(errors_by_lot[lot_id], many=True).data
     return errors_by_lot
+
+
+def diff_to_metadata(diff):
+    metadata = {"added": [], "removed": [], "changed": []}
+    for field, (new_value, old_value) in diff:
+        metadata["changed"].append([field, old_value, new_value])
+    return metadata
 
 
 # map form fields to CarbureLot model fields
