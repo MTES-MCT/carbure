@@ -1,14 +1,14 @@
 from django import forms
 from django.db import transaction
-from core.carburetypes import CarbureUnit
 from core.decorators import check_admin_rights
-from core.serializers import GenericErrorSerializer
-from core.traceability_tree import LotNode, StockNode, StockTransformNode, TicketSourceNode, TicketNode
-from core.traceability_query import get_lots_family_trees
-from producers.models import ProductionSite
 from core.common import SuccessResponse, ErrorResponse
+from core.carburetypes import CarbureUnit
+from producers.models import ProductionSite
+from core.serializers import GenericErrorSerializer
 from api.v4.sanity_checks import bulk_sanity_checks
 from api.v4.lots import compute_lot_quantity
+from core.traceability.get_family_trees import get_family_trees
+from core.traceability import LotNode, StockNode, StockTransformNode, TicketSourceNode, TicketNode
 
 
 from core.models import (
@@ -115,7 +115,7 @@ def update_many(request):
     update_events = []
     update_comments = []
 
-    nodes = get_lots_family_trees(lots)
+    nodes = get_family_trees(lots)
 
     for node in nodes:
         # compute the update content based on the current lot

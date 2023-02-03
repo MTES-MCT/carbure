@@ -1,11 +1,14 @@
 from django.db import connection
 
 from core.models import CarbureLot, CarbureStock, CarbureStockTransformation
-from core.traceability_tree import LotNode, StockNode, StockTransformNode, TicketSourceNode, TicketNode
 from saf.models import SafTicket, SafTicketSource
 
+from core.traceability import LotNode, StockNode, StockTransformNode, TicketSourceNode, TicketNode
 
-def get_lots_family_trees(lots: list):
+
+# use a recursive query to quickly fetch the whole families of the given lots
+# and build the traceability nodes and their relations based on the results
+def get_family_trees(lots: list):
     with connection.cursor() as cursor:
         lot_ids: list[int] = []
         stock_ids: list[int] = []
@@ -16,8 +19,9 @@ def get_lots_family_trees(lots: list):
         # extract lots ids
         original_lot_ids = [lot.id for lot in lots]
 
-        # recursively query for the whole family trees for the given lot ids
-        cursor.execute(LOT_FAMILY_QUERY, [original_lot_ids])
+        with open("web/core/traceability/get_family_trees.sql") as query:
+            # recursively query for the whole family trees for the given lot ids
+            cursor.execute(query.read(), [original_lot_ids])
 
         # grab the list of results in the form of an array of tuples
         rows = cursor.fetchall()
@@ -134,188 +138,3 @@ def get_lots_family_trees(lots: list):
             parent_node._children.append(node)
 
         return [lot_nodes[lot_id] for lot_id in original_lot_ids if lot_id in lot_nodes]
-
-
-# this is a recursive query that starts by going up the tree
-# in order to find the root nodes for the given lots ids
-# and then goes down the tree to find all the nested children of these roots
-LOT_FAMILY_QUERY = """
-WITH RECURSIVE ancestors as (
-  SELECT id lot_id,
-    CAST(NULL AS SIGNED) stock_id,
-    CAST(NULL AS SIGNED) stock_transform_id,
-    CAST(NULL AS SIGNED) ticket_source_id,
-    CAST(NULL AS SIGNED) ticket_id,
-    parent_lot_id,
-    parent_stock_id,
-    CAST(NULL AS SIGNED) parent_transformation_id,
-    CAST(NULL AS SIGNED) parent_ticket_source_id,
-    CAST(NULL AS SIGNED) parent_ticket_id
-  FROM carbure_lots
-  WHERE id IN %s
-    AND lot_status != "DELETED"
-  UNION
-  --
-  SELECT lot.id lot_id,
-  NULL stock_id,
-  NULL stock_transform_id,
-  NULL ticket_source_id,
-  NULL ticket_id,
-  lot.parent_lot_id,
-  lot.parent_stock_id,
-  NULL parent_transformation_id,
-  NULL parent_ticket_source_id,
-  NULL parent_ticket_id
-  FROM ancestors child
-    JOIN carbure_lots lot ON (
-      child.parent_lot_id = lot.id
-      AND lot.lot_status != "DELETED"
-    )
-  UNION
-  --
-  SELECT NULL lot_id,
-  stock.id stock_id,
-  NULL stock_transform_id,
-  NULL ticket_source_id,
-  NULL ticket_id,
-  stock.parent_lot_id,
-  NULL parent_stock_id,
-  stock.parent_transformation_id,
-  NULL parent_ticket_source_id,
-  NULL parent_ticket_id
-  FROM ancestors child
-    JOIN carbure_stock stock ON child.parent_stock_id = stock.id
-  UNION
-  --
-  SELECT NULL lot_id,
-  NULL stock_id,
-  stock_transform.id stock_transform_id,
-  NULL ticket_source_id,
-  NULL ticket_id,
-  NULL parent_lot_id,
-  stock_transform.source_stock_id parent_stock_id,
-  NULL parent_transformation_id,
-  NULL parent_ticket_source_id,
-  NULL parent_ticket_id
-  FROM ancestors child
-    JOIN carbure_stock_transformations stock_transform ON child.parent_transformation_id = stock_transform.id
-  UNION
-  --
-  SELECT NULL lot_id,
-  NULL stock_id,
-  NULL stock_transform_id,
-  ticket_source.id ticket_source_id,
-  NULL ticket_id,
-  ticket_source.parent_lot_id,
-  NULL parent_stock_id,
-  NULL parent_transformation_id,
-  NULL parent_ticket_source_id,
-  ticket_source.parent_ticket_id
-  FROM ancestors child
-    JOIN saf_ticket_source ticket_source ON child.parent_ticket_source_id = ticket_source.id
-  UNION
-  --
-  SELECT NULL lot_id,
-  NULL stock_id,
-  NULL stock_transform_id,
-  NULL ticket_source_id,
-  ticket.id ticket_id,
-  NULL parent_lot_id,
-  NULL parent_stock_id,
-  NULL parent_transformation_id,
-  ticket.parent_ticket_source_id,
-  NULL parent_ticket_id
-  FROM ancestors child
-    JOIN saf_ticket ticket ON child.parent_ticket_id = ticket.id
-),
-descendants as (
-  SELECT *
-  FROM ancestors
-  WHERE parent_lot_id IS NULL
-    AND parent_stock_id IS NULL
-    AND parent_transformation_id IS NULL
-    AND parent_ticket_source_id IS NULL
-    AND parent_ticket_id IS NULL
-  UNION
-  --
-  SELECT lot.id lot_id,
-  NULL stock_id,
-  NULL stock_transform_id,
-  NULL ticket_source_id,
-  NULL ticket_id,
-  lot.parent_lot_id,
-  lot.parent_stock_id,
-  NULL parent_transformation_id,
-  NULL parent_ticket_source_id,
-  NULL parent_ticket_id
-  FROM descendants parent
-    JOIN carbure_lots lot ON (
-      (parent.lot_id = lot.parent_lot_id OR parent.stock_id = lot.parent_stock_id)
-      AND lot.lot_status != "DELETED"
-    )
-  UNION
-  --
-  SELECT NULL lot_id,
-  stock.id stock_id,
-  NULL stock_transform_id,
-  NULL ticket_source_id,
-  NULL ticket_id,
-  stock.parent_lot_id,
-  NULL parent_stock_id,
-  stock.parent_transformation_id,
-  NULL parent_ticket_source_id,
-  NULL parent_ticket_id
-  FROM descendants parent
-    JOIN carbure_stock stock ON (
-      parent.lot_id = stock.parent_lot_id
-      OR parent.stock_transform_id = stock.parent_transformation_id
-    )
-  UNION
-  --
-  SELECT NULL lot_id,
-  NULL stock_id,
-  stock_transform.id stock_transform_id,
-  NULL ticket_source_id,
-  NULL ticket_id,
-  NULL parent_lot_id,
-  stock_transform.source_stock_id parent_stock_id,
-  NULL parent_transformation_id,
-  NULL parent_ticket_source_id,
-  NULL parent_ticket_id
-  FROM descendants parent
-    JOIN carbure_stock_transformations stock_transform ON parent.stock_id = stock_transform.source_stock_id
-  UNION
-  --
-  SELECT NULL lot_id,
-  NULL stock_id,
-  NULL stock_transform_id,
-  ticket_source.id ticket_source_id,
-  NULL ticket_id,
-  ticket_source.parent_lot_id,
-  NULL parent_stock_id,
-  NULL parent_transformation_id,
-  NULL parent_ticket_source_id,
-  ticket_source.parent_ticket_id
-  FROM descendants parent
-    JOIN saf_ticket_source ticket_source ON (
-      parent.lot_id = ticket_source.parent_lot_id
-      OR parent.ticket_id = ticket_source.parent_ticket_id
-    )
-  UNION
-  --
-  SELECT NULL lot_id,
-  NULL stock_id,
-  NULL stock_transform_id,
-  NULL ticket_source_id,
-  ticket.id ticket_id,
-  NULL parent_lot_id,
-  NULL parent_stock_id,
-  NULL parent_transformation_id,
-  ticket.parent_ticket_source_id,
-  NULL parent_ticket_id
-  FROM descendants parent
-    JOIN saf_ticket ticket ON parent.ticket_source_id = ticket.parent_ticket_source_id
-)
-SELECT *
-FROM descendants
-"""
