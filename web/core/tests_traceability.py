@@ -19,8 +19,9 @@ class TraceabilityTest(TestCase):
     ]
 
     def setUp(self):
-        self.entity = Entity.objects.filter(entity_type=Entity.OPERATOR)[0]
-        self.entity2 = Entity.objects.filter(entity_type=Entity.OPERATOR)[1]
+        entities = Entity.objects.filter(entity_type=Entity.OPERATOR)
+        self.entity = entities[0]
+        self.entity2 = entities[1]
         self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")])
 
         CarbureLot.objects.all().delete()
@@ -54,16 +55,16 @@ class TraceabilityTest(TestCase):
         self.assertEqual(len(parent_node.children), 1)
         self.assertEqual(child_node.parent, parent_node)
 
-        parent_node.update({"transport_document_reference": "ABCD", "unknown_delivery_site": "UNKNOWN", "esca": 2.0})
+        parent_node.update({"transport_document_reference": "ABCD", "supplier_certificate": "CERT", "esca": 2.0})
         self.assertEqual(parent_node.data.transport_document_reference, "ABCD")
-        self.assertEqual(parent_node.data.unknown_delivery_site, "UNKNOWN")
+        self.assertEqual(parent_node.data.supplier_certificate, "CERT")
         self.assertEqual(parent_node.data.esca, 2.0)
 
-        original_child_unknown_delivery_site = child_node.data.unknown_delivery_site
+        original_child_supplier_cert = child_node.data.supplier_certificate
 
         parent_node.propagate()
         self.assertEqual(child_node.data.transport_document_reference, "ABCD")
-        self.assertEqual(child_node.data.unknown_delivery_site, original_child_unknown_delivery_site)
+        self.assertEqual(child_node.data.supplier_certificate, original_child_supplier_cert)
         self.assertEqual(child_node.data.esca, 2.0)
 
     def test_traceability_lot_to_stock_lot(self):
@@ -118,13 +119,13 @@ class TraceabilityTest(TestCase):
         source_stock_node = root_node.get_first(StockNode)
         stock_transform_node = source_stock_node.get_first(StockTransformNode)
         dest_stock_node = stock_transform_node.get_first(StockNode)
-        lot_node = dest_stock_node.get_first(LotNode)
+        child_node = dest_stock_node.get_first(LotNode)
 
         self.assertEqual(root_node.get_depth(), 0)
         self.assertEqual(source_stock_node.get_depth(), 1)
         self.assertEqual(stock_transform_node.get_depth(), 2)
         self.assertEqual(dest_stock_node.get_depth(), 3)
-        self.assertEqual(lot_node.get_depth(), 4)
+        self.assertEqual(child_node.get_depth(), 4)
 
         root_node.update({"transport_document_reference": "ABCD", "carbure_delivery_site_id": 13, "esca": 2.0})  # fmt:skip
         self.assertEqual(root_node.data.transport_document_reference, "ABCD")
@@ -132,8 +133,8 @@ class TraceabilityTest(TestCase):
         self.assertEqual(root_node.data.carbure_delivery_site_id, 13)
         self.assertEqual(root_node.data.esca, 2.0)
 
-        original_child_lot_transport_document_reference = lot_node.data.transport_document_reference
-        original_child_lot_carbure_delivery_site_id = lot_node.data.carbure_delivery_site_id
+        original_child_lot_transport_document_reference = child_node.data.transport_document_reference
+        original_child_lot_carbure_delivery_site_id = child_node.data.carbure_delivery_site_id
 
         root_node.propagate()
 
@@ -144,10 +145,10 @@ class TraceabilityTest(TestCase):
         self.assertEqual(dest_stock_node.data.depot_id, 13)
         self.assertEqual(dest_stock_node.data.biofuel_id, ETBE)
 
-        self.assertEqual(lot_node.data.transport_document_reference, original_child_lot_transport_document_reference)
-        self.assertEqual(lot_node.data.biofuel_id, ETBE)
-        self.assertEqual(lot_node.data.carbure_delivery_site_id, original_child_lot_carbure_delivery_site_id)
-        self.assertEqual(lot_node.data.esca, 2.0)
+        self.assertEqual(child_node.data.transport_document_reference, original_child_lot_transport_document_reference)
+        self.assertEqual(child_node.data.biofuel_id, ETBE)
+        self.assertEqual(child_node.data.carbure_delivery_site_id, original_child_lot_carbure_delivery_site_id)
+        self.assertEqual(child_node.data.esca, 2.0)
 
     def test_traceability_lot_to_ticket_source(self):
         parent_lot = CarbureLotFactory.create(lot_status="ACCEPTED", added_by=self.entity)
@@ -199,17 +200,17 @@ class TraceabilityTest(TestCase):
         self.assertEqual(parent_node.get_depth(), 0)
         self.assertEqual(child_node.get_depth(), 1)
 
-        child_node.update({"transport_document_reference": "ABCD", "unknown_delivery_site": "UNKNOWN", "esca": 2.0})
+        child_node.update({"transport_document_reference": "ABCD", "supplier_certificate": "CERT", "esca": 2.0})
         self.assertEqual(child_node.data.transport_document_reference, "ABCD")
-        self.assertEqual(child_node.data.unknown_delivery_site, "UNKNOWN")
+        self.assertEqual(child_node.data.supplier_certificate, "CERT")
         self.assertEqual(child_node.data.esca, 2.0)
 
-        original_parent_unknown_delivery_site = parent_node.data.unknown_delivery_site
+        original_parent_supplier_cert = parent_node.data.supplier_certificate
 
         child_node.propagate()
 
         self.assertEqual(parent_node.data.transport_document_reference, "ABCD")
-        self.assertEqual(parent_node.data.unknown_delivery_site, original_parent_unknown_delivery_site)
+        self.assertEqual(parent_node.data.supplier_certificate, original_parent_supplier_cert)
         self.assertEqual(parent_node.data.esca, 2.0)
 
     def test_traceability_stock_to_parent_lot(self):
@@ -257,18 +258,18 @@ class TraceabilityTest(TestCase):
         child_node = parent_node.children[0]
 
         # try to update the parent as entity1
-        expected_diff = {"esca": (0, 3)}
-        self.assertEqual(parent_node.update({"esca": 0}), expected_diff)
+        expected_diff = {"esca": (2, 3)}
+        self.assertEqual(parent_node.update({"esca": 2}, self.entity.id), expected_diff)
 
         # try to update the parent as entity2
-        self.assertRaises(Exception, parent_node.update, {"esca": 2}, self.entity2.id)
+        self.assertRaises(Exception, parent_node.update, {"esca": 1}, self.entity2.id)
 
         # try to update sustainability fields on the child as entity2
-        self.assertRaises(Exception, child_node.update, {"esca": 1})
+        self.assertRaises(Exception, child_node.update, {"esca": 0}, self.entity2.id)
 
         # try to update delivery fields on the child as entity2
         expected_diff = {"unknown_client": ("UNKNOWN", "SOMEBODY")}
-        self.assertEqual(child_node.update({"unknown_client": "UNKNOWN"}), expected_diff)
+        self.assertEqual(child_node.update({"unknown_client": "UNKNOWN"}, self.entity2.id), expected_diff)
 
     def test_traceability_stock_transform_to_parent_lot(self):
         # @TODO check that the correct values propagate up the chain
