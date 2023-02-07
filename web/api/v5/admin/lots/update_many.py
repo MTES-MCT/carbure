@@ -18,6 +18,7 @@ from core.models import (
     CarbureLotEvent,
     CarbureLotComment,
     GenericError,
+    CarbureNotification,
 )
 
 from core.traceability import (
@@ -43,10 +44,10 @@ def update_many(request):
     entity_id = form.cleaned_data["entity_id"]
     comment = form.cleaned_data["comment"]
     dry_run = form.cleaned_data["dry_run"]
-    lots = form.cleaned_data["lots_ids"]
+    updated = form.cleaned_data["lots_ids"]
 
     # query the database for all the traceability nodes related to these lots
-    nodes = get_traceability_nodes(lots)
+    nodes = get_traceability_nodes(updated)
 
     # convert the form data to a dict that can be applied as lot update
     update_data, quantity_data = get_update_data(form.cleaned_data)
@@ -112,12 +113,29 @@ def update_many(request):
         errors_by_lot = group_errors_by_lot(blocking_errors)
         return ErrorResponse(400, UpdateManyError.SANITY_CHECKS_FAILED, {"errors": errors_by_lot})
 
+    # prepare notifications to be sent to relevant entities
+    update_notifications = []
+
+    lots_by_entity = group_lots_by_entity(updated_lots)
+
+    for entity_id, updated in lots_by_entity.items():
+        update_notifications.append(
+            CarbureNotification(
+                dest_id=entity_id,
+                type=CarbureNotification.LOTS_UPDATED_BY_ADMIN,
+                acked=False,
+                email_sent=False,
+                meta={"updated": len(updated)},
+            )
+        )
+
     # save everything in the database in one single transaction
     if not dry_run:
         with transaction.atomic():
             bulk_update_traceability_nodes(updated_nodes)
             CarbureLotComment.objects.bulk_create(update_comments)
             CarbureLotEvent.objects.bulk_create(update_events)
+            CarbureNotification.objects.bulk_create(update_notifications)
             GenericError.objects.filter(lot__in=updated_lots).delete()
             GenericError.objects.bulk_create(sanity_check_errors)
 
@@ -223,6 +241,14 @@ def serialize_node(node):
     return {"node": node.serialize(), "owner": node.owner, "diff": node.diff}
 
 
+# transform the node diff into an dict that can be stored as the metadata of an update CarbureLotEvent
+def diff_to_metadata(diff: dict):
+    metadata = {"added": [], "removed": [], "changed": []}
+    for field, (new_value, old_value) in diff.items():
+        metadata["changed"].append([field, old_value, new_value])
+    return metadata
+
+
 # group a list of GenericError by the id of their related CarbureLot
 def group_errors_by_lot(errors) -> dict[int, list[dict]]:
     errors_by_lot = {}
@@ -235,11 +261,31 @@ def group_errors_by_lot(errors) -> dict[int, list[dict]]:
     return errors_by_lot
 
 
-def diff_to_metadata(diff: dict):
-    metadata = {"added": [], "removed": [], "changed": []}
-    for field, (new_value, old_value) in diff.items():
-        metadata["changed"].append([field, old_value, new_value])
-    return metadata
+# group lots by their owners and clients
+def group_lots_by_entity(lots):
+    lots_by_entity = {}
+
+    for lot in lots:
+        added_by = lot.added_by_id
+        client = lot.carbure_client_id
+
+        if added_by not in lots_by_entity:
+            lots_by_entity[added_by] = []
+
+        # the lot is linked to its owner entity
+        lots_by_entity[added_by].append(lot)
+
+        # skip the rest if there's not known client or the client is the owner
+        if not client or added_by == client:
+            continue
+
+        if client not in lots_by_entity:
+            lots_by_entity[client] = []
+
+        # and the lot is also linked to its client entity
+        lots_by_entity[client].append(lot)
+
+    return lots_by_entity
 
 
 # map form fields to CarbureLot model fields

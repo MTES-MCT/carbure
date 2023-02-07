@@ -7,6 +7,7 @@ from core.models import (
     CarbureLot,
     CarbureLotEvent,
     CarbureLotComment,
+    CarbureNotification,
 )
 
 from core.traceability import (
@@ -15,6 +16,8 @@ from core.traceability import (
     bulk_update_traceability_nodes,
     bulk_delete_traceability_nodes,
 )
+
+from .update_many import group_lots_by_entity, serialize_node
 
 
 class DeleteManyError:
@@ -48,8 +51,6 @@ def delete_many(request):
         deleted_nodes += deleted
         updated_nodes += updated
 
-    print("-- %s deleted and %s udpated" % (deleted_nodes, updated_nodes))
-
     # prepare lot events and comments
     update_events = []
     update_comments = []
@@ -80,6 +81,32 @@ def delete_many(request):
             )
         )
 
+    # prepare notifications to be sent to relevant entities
+    delete_notifications = []
+
+    deleted_lots = [node.data for node in deleted_nodes if isinstance(node, LotNode)]
+    updated_lots = [node.data for node in updated_nodes if isinstance(node, LotNode)]
+
+    deleted_by_entity = group_lots_by_entity(deleted_lots)
+    updated_by_entity = group_lots_by_entity(updated_lots)
+
+    # merge the two dicts to get all the entity_ids that should be notified
+    entity_ids = list({**deleted_by_entity, **updated_by_entity})
+
+    for entity_id in entity_ids:
+        deleted = deleted_by_entity.get(entity_id, [])
+        updated = updated_by_entity.get(entity_id, [])
+
+        delete_notifications.append(
+            CarbureNotification(
+                dest_id=entity_id,
+                type=CarbureNotification.LOTS_DELETED_BY_ADMIN,
+                acked=False,
+                email_sent=False,
+                meta={"deleted": len(deleted), "updated": len(updated)},
+            )
+        )
+
     # save everything in the database in one single transaction
     if not dry_run:
         with transaction.atomic():
@@ -87,6 +114,7 @@ def delete_many(request):
             bulk_delete_traceability_nodes(deleted_nodes)
             CarbureLotComment.objects.bulk_create(update_comments)
             CarbureLotEvent.objects.bulk_create(update_events)
+            CarbureNotification.objects.bulk_create(delete_notifications)
 
     # prepare the response data
     deletions = [serialize_node(node) for node in deleted_nodes]
@@ -104,7 +132,3 @@ class DeleteManyForm(forms.Form):
     lots_ids = forms.ModelMultipleChoiceField(queryset=LOTS)
     comment = forms.CharField()
     dry_run = forms.BooleanField(required=False)
-
-
-def serialize_node(node):
-    return {"node": node.serialize(), "owner": node.owner, "diff": node.diff}
