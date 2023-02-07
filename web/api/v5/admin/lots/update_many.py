@@ -69,12 +69,16 @@ def update_many(request):
             updated_nodes += node.propagate(changed_only=True)
 
     # prepare lot events and comments
+    updated_lots = []
     update_events = []
     update_comments = []
 
     for node in updated_nodes:
         if not isinstance(node, LotNode) or len(node.diff) == 0:
             continue
+
+        # list all the affected CarbureLots
+        updated_lots.append(node.data)
 
         # save a lot event with the current modification
         update_events.append(
@@ -98,9 +102,6 @@ def update_many(request):
                 is_visible_by_auditor=True,
             )
         )
-
-    # list all the affected CarbureLots
-    updated_lots = [node.data for node in updated_nodes if isinstance(node, LotNode)]
 
     # run sanity checks in memory so we don't modify the current errors
     sanity_check_errors, _ = bulk_sanity_checks(updated_lots, dry_run=True)

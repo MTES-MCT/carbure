@@ -77,6 +77,10 @@ class Node:
     def diff_with_child(self, child: "Node") -> dict[str, tuple]:
         return {}
 
+    # remove this node from the tree it belongs to
+    def remove_from_tree(self) -> list:
+        return []
+
     # return a simple dict representation of the node's data
     def serialize(self) -> dict:
         return {}
@@ -175,10 +179,26 @@ class Node:
         if entity_id is not None:
             allowed_diff = self.get_allowed_diff(diff, entity_id)
             if len(allowed_diff) != len(diff):
-                raise Exception("Forbidden to update attributes")
+                raise Exception("Forbidden to update some of the node's attributes")
 
         # apply the diff if everything went fine
         return self.apply_diff(diff)
+
+    # remove this node from the tree and list all the nodes that should be deleted or updated in consequence
+    def delete(self, entity_id=None) -> tuple[list["Node"], list["Node"]]:
+        # make a list of all the nodes that should be deleted with this one
+        deleted = [self] + self.get_descendants()
+
+        # if an entity_id is specified, check if it has the right to delete these nodes
+        if entity_id is not None:
+            for node in deleted:
+                if node.owner != entity_id:
+                    raise Exception("Forbidden to delete this node")
+
+        # apply updates caused by the deletion of this node to other nodes on the tree
+        updated = self.remove_from_tree()
+
+        return deleted, updated
 
     # check if the data of this node is correctly propagated to all its descendants
     # and returns a list of errors were problems were found

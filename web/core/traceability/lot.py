@@ -1,3 +1,4 @@
+from core.common import compute_quantities
 from core.models import CarbureLot
 from .node import Node, GHG_FIELDS
 
@@ -198,3 +199,21 @@ class LotNode(Node):
             # merge the results
             return {**descendant_diff, **stock_diff}
         return {}
+
+    def remove_from_tree(self):
+        from .stock import StockNode
+
+        # if the parent is a CarbureLot, put it back into PENDING mode
+        if isinstance(self.parent, LotNode):
+            self.parent.update({"lot_status": CarbureLot.PENDING, "delivery_type": CarbureLot.UNKNOWN})
+            return [self.parent]
+
+        # if the parent is a CarbureStock, credit back the extracted volume
+        if isinstance(self.parent, StockNode):
+            biofuel = self.parent.data.biofuel
+            remaining_volume = self.parent.data.remaining_volume + self.data.volume
+            volume, weight, lhv_amount = compute_quantities(biofuel, volume=remaining_volume)
+            self.parent.update({"remaining_volume": volume, "remaining_weight": weight, "remaining_lhv_amount": lhv_amount})  # fmt:skip
+            return [self.parent]
+
+        return []
