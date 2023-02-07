@@ -130,8 +130,10 @@ export function updateLots(
 }
 
 export function deleteLots(
+  entity_id: number,
   lots_ids: number[],
   comment: string,
+  dry_run: boolean = false
 ) {
   return api.post<Api<{
     errors?: {
@@ -139,7 +141,9 @@ export function deleteLots(
       error: string
     }[]
   }>>("/v5/admin/lots/delete-many", {
+    entity_id,
     lots_ids,
     comment,
+    dry_run
   })
 }

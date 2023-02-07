@@ -11,9 +11,9 @@ import pandas as pd
 from pandas._typing import Scalar
 from typing import List
 
-from core.carburetypes import Carbure
+from core.carburetypes import Carbure, CarbureUnit
 
-from core.models import CarbureLot, GenericCertificate,  GenericError
+from core.models import CarbureLot, GenericCertificate,  Biocarburant
 from core.models import TransactionDistance
 from core.ign_distance import get_distance
 
@@ -257,6 +257,41 @@ def SuccessResponse(data=None):
     if data is not None:
         response_data['data'] = data
     return JsonResponse(response_data)
+
+
+# based on a given biofuel, convert any quantity type into all others
+def compute_quantities(biofuel: Biocarburant, quantity=None, unit=None, volume=None, weight=None, lhv_amount=None):
+    # normalize the given data in the form of a (quantity, unit) couple
+    if quantity is not None:
+        quantity = round(float(quantity), 2)
+        unit = (unit or CarbureUnit.LITER).lower()
+    elif volume is not None:
+        quantity = round(float(volume), 2)
+        unit = CarbureUnit.LITER
+    elif weight is not None:
+        quantity = round(float(weight), 2)
+        unit = CarbureUnit.KILOGRAM
+    elif lhv_amount is not None:
+        quantity = round(float(lhv_amount), 2)
+        unit = CarbureUnit.LHV
+    else:
+        raise Exception("No quantity was specified")
+
+    # compute the different quantity values based on the previous config
+    if unit == CarbureUnit.LITER:
+        volume = quantity
+        weight = round(volume * biofuel.masse_volumique, 2)
+        lhv_amount = round(volume * biofuel.pci_litre, 2)
+    elif unit == CarbureUnit.KILOGRAM:
+        weight = quantity
+        volume = round(weight / biofuel.masse_volumique, 2)
+        lhv_amount = round(volume * biofuel.pci_litre, 2)
+    elif unit == CarbureUnit.LHV:
+        lhv_amount = quantity
+        volume = round(lhv_amount / biofuel.pci_litre, 2)
+        weight = round(volume * biofuel.masse_volumique, 2)
+
+    return volume, weight, lhv_amount
 
 
 # little helper to help measure elapsed time

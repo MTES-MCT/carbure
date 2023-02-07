@@ -1,4 +1,5 @@
 import { AxiosError } from "axios"
+import useEntity from "carbure/hooks/entity"
 import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import Form from "common/components/form"
@@ -8,7 +9,6 @@ import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 import { LotsUpdateError, LotsUpdateResponse } from "controls/types"
-import { lotsUpdateErrorsResponse } from "controls/__test__/data"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Lot } from "transactions/types"
@@ -55,6 +55,7 @@ const DeleteManyConfirmationDialog = ({
 }: DeleteManyConfirmationDialogProps) => {
   const { t } = useTranslation()
   const [comment, setComment] = useState<string | undefined>()
+  const entity = useEntity()
   const notify = useNotify()
   const portal = usePortal()
   const deleteLots = useMutation(api.deleteLots, {
@@ -84,6 +85,7 @@ const DeleteManyConfirmationDialog = ({
 
   const submit = () => {
     return deleteLots.execute(
+      entity.id,
       lots.map((l) => l.id),
       comment!
     )
