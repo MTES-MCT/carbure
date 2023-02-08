@@ -103,7 +103,7 @@ def delete_many(request):
                 type=CarbureNotification.LOTS_DELETED_BY_ADMIN,
                 acked=False,
                 email_sent=False,
-                meta={"deleted": len(deleted), "updated": len(updated)},
+                meta={"deleted": len(deleted), "updated": len(updated), "commnent": comment},
             )
         )
 
