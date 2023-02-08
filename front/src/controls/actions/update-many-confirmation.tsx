@@ -2,6 +2,7 @@ import { AxiosError } from "axios"
 import useEntity from "carbure/hooks/entity"
 import Alert from "common/components/alert"
 import Button from "common/components/button"
+import Collapse from "common/components/collapse"
 import Dialog from "common/components/dialog"
 import Form from "common/components/form"
 import {
@@ -89,6 +90,7 @@ const UpdateManyConfirmationDialog = ({
 
   const error = requestedUpdates.error as AxiosError<any> | undefined
   const errorList = error?.response?.data?.data?.errors
+  console.log("errorList:", errorList)
   const errorCount = Object.keys(errorList ?? {}).length
 
   return (
@@ -149,14 +151,25 @@ const UpdateManyConfirmationDialog = ({
 
         {requestedUpdates.error && (
           <section>
-            <Alert icon={AlertTriangle} variant="danger">
-              <span style={{ whiteSpace: "normal" }}>
-                <Trans
-                  count={errorCount}
-                  defaults="Cette mise à jour ne peut pas être appliquée car elle causerait au moins <b>{{count}} erreurs.</b>"
-                />
-              </span>
-            </Alert>
+            <Collapse
+              isOpen
+              icon={AlertTriangle}
+              variant="danger"
+              label={`${t("Modifications impossible")}`}
+            >
+              <section>
+                <span style={{ whiteSpace: "normal" }}>
+                  <Trans
+                    count={errorCount}
+                    defaults="Cette mise à jour ne peut pas être appliquée car elle causerait au moins <b>{{count}} erreurs.</b>"
+                  />
+                </span>
+                <Button variant="danger" action={() => showErrors(errorList)}>
+                  Voir les erreurs
+                </Button>
+              </section>
+              <footer></footer>
+            </Collapse>
           </section>
         )}
       </main>
