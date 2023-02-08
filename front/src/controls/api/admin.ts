@@ -10,7 +10,7 @@ import {
   StockQuery,
   StockSummary
 } from "transactions/types"
-import { LotSummary, LotsUpdateResponse, Snapshot } from "../types"
+import { LotsDeleteResponse, LotSummary, LotsUpdateResponse, Snapshot } from "../types"
 
 const QUERY_RESET: Partial<LotQuery> = {
   limit: undefined,
@@ -133,14 +133,9 @@ export function deleteLots(
   entity_id: number,
   lots_ids: number[],
   comment: string,
-  dry_run: boolean = false
+  dry_run?: boolean
 ) {
-  return api.post<Api<{
-    errors?: {
-      lot_id: number
-      error: string
-    }[]
-  }>>("/v5/admin/lots/delete-many", {
+  return api.post<Api<LotsDeleteResponse>>("/v5/admin/lots/delete-many", {
     entity_id,
     lots_ids,
     comment,

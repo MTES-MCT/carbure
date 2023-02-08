@@ -16,6 +16,7 @@ import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { useMutation, useQuery } from "common/hooks/async"
 import { LotsUpdateError, LotsUpdateResponse } from "controls/types"
+import { lotsUpdateErrorsResponse } from "controls/__test__/data"
 import { LotFormValue } from "lot-add/components/lot-form"
 import { useMemo, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
@@ -62,7 +63,7 @@ const UpdateManyConfirmationDialog = ({
     onError: (err) => {
       const errors = (err as AxiosError<LotsUpdateResponse>).response?.data
         .errors
-      errors && showErrors(errors!)
+      errors && showErrors()
     },
   })
 
@@ -72,7 +73,7 @@ const UpdateManyConfirmationDialog = ({
 
   const entities_to_notify: string = getLotsEntitiesToNotify(lots)
 
-  const showErrors = (errors: LotsUpdateError[]) => {
+  const showErrors = () => {
     portal((close) => (
       <UpdateErrorsDialog onClose={close} errors={errors} method="update" />
     ))
@@ -89,9 +90,8 @@ const UpdateManyConfirmationDialog = ({
     requestedUpdates.result?.data.data?.updates?.length ?? lots.length
 
   const error = requestedUpdates.error as AxiosError<any> | undefined
-  const errorList = error?.response?.data?.data?.errors
-  console.log("errorList:", errorList)
-  const errorCount = Object.keys(errorList ?? {}).length
+  const errors = error?.response?.data?.data?.errors
+  const errorCount = Object.keys(errors ?? {}).length
 
   return (
     <Dialog onClose={onClose}>
@@ -116,21 +116,22 @@ const UpdateManyConfirmationDialog = ({
           </p>
         </section>
 
-        <section>
-          <Alert
-            loading={requestedUpdates.loading}
-            icon={AlertCircle}
-            variant="warning"
-          >
-            <span style={{ whiteSpace: "normal" }}>
-              <Trans
-                count={requestedUpdatesCount}
-                defaults="Un total de <b>{{count}} maillons</b> des chaînes de traçabilité dont font partie ces lots seront impactés par ces changements."
-              />
-            </span>
-          </Alert>
-        </section>
-
+        {requestedUpdatesCount > lots.length && (
+          <section>
+            <Alert
+              loading={requestedUpdates.loading}
+              icon={AlertCircle}
+              variant="warning"
+            >
+              <span style={{ whiteSpace: "normal" }}>
+                <Trans
+                  count={requestedUpdatesCount}
+                  defaults="Un total de <b>{{count}} maillons</b> des chaînes de traçabilité dont font partie ces lots seront impactés par ces changements."
+                />
+              </span>
+            </Alert>
+          </section>
+        )}
         <section>
           <Form id="edit-lots" onSubmit={submit}>
             <TextInput
@@ -162,11 +163,11 @@ const UpdateManyConfirmationDialog = ({
                   <Trans
                     count={errorCount}
                     defaults="Cette mise à jour ne peut pas être appliquée car elle causerait au moins <b>{{count}} erreurs.</b>"
-                  />
+                  />{" "}
+                  <Button variant="link" action={showErrors}>
+                    Voir les erreurs
+                  </Button>
                 </span>
-                <Button variant="danger" action={() => showErrors(errorList)}>
-                  Voir les erreurs
-                </Button>
               </section>
               <footer></footer>
             </Collapse>
