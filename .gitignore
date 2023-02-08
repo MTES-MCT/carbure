@@ -153,4 +153,4 @@ integrity_checks.json
 sanity_checks.json
 
 # specific sql queries
-!get_family_trees.sql
+!get_traceability_nodes.sql
