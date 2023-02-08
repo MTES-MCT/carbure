@@ -24,7 +24,18 @@ export interface LotsUpdateError {
   errors: LotError[]
 }
 
+
+export interface UpdateInfo {
+  node: any
+  diff: Record<string, [any, any]>
+}
+
 export interface LotsUpdateResponse {
   errors?: LotsUpdateError[]
-  updates?: { node: any; diff: Record<string, [any, any]> }[]
+  updates?: UpdateInfo[]
+}
+
+export interface LotsDeleteResponse {
+  deleted?: UpdateInfo[]
+  updated?: UpdateInfo[]
 }

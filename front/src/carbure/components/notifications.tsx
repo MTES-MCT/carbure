@@ -213,6 +213,21 @@ function getNotificationText(notif: Notification) {
       return t("Votre ticket a été refusé par {{client}}.", {
         client: notif.meta.client,
       })
+    case NotificationType.LotsUpdatedByAdmin:
+      return t(
+        "{{count}} lots que vous avez déclarés ont été corrigé par l’administration avec le commentaire “{{comment}}”.",
+        {
+          count: notif.meta.updated,
+          comment: notif.meta.comment,
+        }
+      )
+    case NotificationType.LotsDeletedByAdmin:
+      return t(
+        "{{count}} lots que vous avez déclarés ont été supprimés par l’administration.",
+        {
+          count: notif.meta.deleted,
+        }
+      )
 
     default:
       return ""
