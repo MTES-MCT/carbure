@@ -261,8 +261,8 @@ export const Cell = ({
       className={cl(css.multiline, variant && css[variant], className)}
       style={style}
     >
-      <Tooltip>
-        <strong title={`${text}`}>
+      <Tooltip title={`${text || sub}`}>
+        <strong>
           {text || sub} {icon}
         </strong>
       </Tooltip>
