@@ -125,7 +125,7 @@ def update_many(request):
                 type=CarbureNotification.LOTS_UPDATED_BY_ADMIN,
                 acked=False,
                 email_sent=False,
-                meta={"updated": len(updated)},
+                meta={"updated": len(updated), "commnent": comment},
             )
         )
 
