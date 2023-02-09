@@ -136,7 +136,10 @@ function hasChange(entity: Partial<Entity>, formEntity: Partial<Entity>) {
     entity.sustainability_officer !== formEntity.sustainability_officer ||
     entity.sustainability_officer_phone_number !==
       formEntity.sustainability_officer_phone_number ||
-    entity.registered_address !== formEntity.registered_address
+    entity.registered_address !== formEntity.registered_address ||
+    entity.registered_city !== formEntity.registered_city ||
+    entity.registered_zipcode !== formEntity.registered_zipcode ||
+    entity.registered_country !== formEntity.registered_country
   )
 }
 
