@@ -238,7 +238,7 @@ def get_update_data(form_data):
 
 
 def serialize_node(node):
-    return {"node": node.serialize(), "owner": node.owner, "diff": node.diff}
+    return {"node": node.serialize(), "diff": node.diff}
 
 
 # transform the node diff into an dict that can be stored as the metadata of an update CarbureLotEvent

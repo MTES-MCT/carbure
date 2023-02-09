@@ -8,7 +8,7 @@ from saf.models import SafTicket, SafTicketSource
 from transactions.factories import CarbureLotFactory, CarbureStockFactory, CarbureStockTransformFactory
 from saf.factories import SafTicketSourceFactory, SafTicketFactory
 
-from core.traceability import LotNode, StockNode, StockTransformNode, TicketSourceNode, TicketNode
+from core.traceability import Node, LotNode, StockNode, StockTransformNode, TicketSourceNode, TicketNode
 from core.traceability.stock import ETHANOL, ETBE
 
 
@@ -51,7 +51,7 @@ class TraceabilityTest(TestCase):
         CarbureLotFactory.create(lot_status="ACCEPTED", parent_lot=parent_lot, added_by=self.entity)
 
         parent_node = LotNode(parent_lot)
-        child_node = parent_node.get_first(LotNode)
+        child_node = parent_node.get_first(Node.LOT)
 
         self.assertEqual(parent_node.get_depth(), 0)
         self.assertEqual(child_node.get_depth(), 1)
@@ -77,8 +77,8 @@ class TraceabilityTest(TestCase):
         CarbureLotFactory.create(lot_status="ACCEPTED", parent_stock=parent_stock, added_by=self.entity)
 
         root_node = LotNode(parent_lot)
-        stock_node = root_node.get_first(StockNode)
-        lot_node = stock_node.get_first(LotNode)
+        stock_node = root_node.get_first(Node.STOCK)
+        lot_node = stock_node.get_first(Node.LOT)
 
         self.assertEqual(root_node.get_depth(), 0)
         self.assertEqual(stock_node.get_depth(), 1)
@@ -120,10 +120,10 @@ class TraceabilityTest(TestCase):
         CarbureLotFactory.create(lot_status="ACCEPTED", parent_stock=dest_stock, added_by=self.entity)
 
         root_node = LotNode(root_lot)
-        source_stock_node = root_node.get_first(StockNode)
-        stock_transform_node = source_stock_node.get_first(StockTransformNode)
-        dest_stock_node = stock_transform_node.get_first(StockNode)
-        child_node = dest_stock_node.get_first(LotNode)
+        source_stock_node = root_node.get_first(Node.STOCK)
+        stock_transform_node = source_stock_node.get_first(Node.STOCK_TRANSFORM)
+        dest_stock_node = stock_transform_node.get_first(Node.STOCK)
+        child_node = dest_stock_node.get_first(Node.LOT)
 
         self.assertEqual(root_node.get_depth(), 0)
         self.assertEqual(source_stock_node.get_depth(), 1)
@@ -159,7 +159,7 @@ class TraceabilityTest(TestCase):
         SafTicketSourceFactory.create(parent_lot=parent_lot, added_by=self.entity)
 
         parent_node = LotNode(parent_lot)
-        ticket_source_node = parent_node.get_first(TicketSourceNode)
+        ticket_source_node = parent_node.get_first(Node.TICKET_SOURCE)
 
         parent_node.update({"biofuel_id": 12, "volume": 123456, "unknown_production_site": "UNKNOWN", "esca": 2.0})  # fmt:skip
         self.assertEqual(parent_node.data.biofuel_id, 12)
@@ -180,7 +180,7 @@ class TraceabilityTest(TestCase):
         SafTicketFactory.create(parent_ticket_source=parent_ticket_source, supplier=self.entity)
 
         parent_node = LotNode(parent_lot)
-        ticket_node = parent_node.get_first(TicketNode)
+        ticket_node = parent_node.get_first(Node.TICKET)
 
         parent_node.update({"biofuel_id": 12, "volume": 123456, "unknown_production_site": "UNKNOWN", "esca": 2.0})  # fmt:skip
         self.assertEqual(parent_node.data.biofuel_id, 12)

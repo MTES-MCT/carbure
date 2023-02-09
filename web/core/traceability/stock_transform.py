@@ -2,6 +2,8 @@ from .node import Node
 
 
 class StockTransformNode(Node):
+    type = Node.STOCK_TRANSFORM
+
     FROM_PARENT_STOCK = {
         "carbure_client_id": "entity_id",
     }
@@ -10,10 +12,8 @@ class StockTransformNode(Node):
         "carbure_supplier_id": "entity_id",
     }
 
-    def serialize(self):
+    def get_data(self):
         return {
-            "type": "STOCK_TRANSFORM",
-            "id": self.data.id,
             "transformation_type": self.data.transformation_type,
             "volume_deducted_from_source": self.data.volume_deducted_from_source,
             "volume_destination": self.data.volume_destination,
@@ -33,15 +33,11 @@ class StockTransformNode(Node):
         return [StockNode(stock, parent=self) for stock in self.data.carburestock_set.all()]
 
     def diff_with_parent(self):
-        from .stock import StockNode
-
-        if isinstance(self.parent, StockNode):
+        if self.parent.type == Node.STOCK:
             return self.get_diff(StockTransformNode.FROM_PARENT_STOCK, self.parent)
         return {}
 
     def diff_with_child(self, child: Node):
-        from .stock import StockNode
-
-        if isinstance(child, StockNode):
+        if child.type == Node.STOCK:
             return self.get_diff(StockTransformNode.FROM_CHILD_STOCK, child)
         return {}

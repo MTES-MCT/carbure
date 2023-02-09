@@ -18,6 +18,15 @@ GHG_FIELDS = {
 
 
 class Node:
+    LOT = "LOT"
+    STOCK = "STOCK"
+    STOCK_TRANSFORM = "STOCK_TRANSFORM"
+    TICKET_SOURCE = "TICKET_SOURCE"
+    TICKET = "TICKET"
+
+    # save the node's type so we can do checks on it
+    type = ""
+
     def __init__(self, data, parent: "Node" = None, children: list["Node"] = None, child: "Node" = None):
         self.data = data
         self._parent = parent  # cache original parent from which this node has been created
@@ -82,7 +91,7 @@ class Node:
         return []
 
     # return a simple dict representation of the node's data
-    def serialize(self) -> dict:
+    def get_data(self) -> dict:
         return {}
 
     # check if this node has errors
@@ -100,11 +109,18 @@ class Node:
                 return i
         return -1
 
+    def serialize(self):
+        return {
+            "id": self.data.id,
+            "type": self.type,
+            "owner": self.owner,
+            **self.get_data(),
+        }
+
     # return a serialized version of the tree
     def get_tree(self):
         return {
-            "owner": self.owner,
-            "data": self.serialize(),
+            "node": self.serialize(),
             "children": [child.get_tree() for child in self.children],
         }
 
@@ -117,27 +133,27 @@ class Node:
 
     # find the closest ancestor of this node matching the given class
     # an owner can be specified to limit results to nodes owned by this owner
-    def get_closest(self, NodeType, owner=None) -> "Node":
+    def get_closest(self, node_type, owner=None) -> "Node":
         if owner is not None and self.owner != owner:
             return None
-        if isinstance(self, NodeType):
+        if self.type == node_type:
             return self
         if self.parent is None:
             return None
 
-        return self.parent.get_closest(NodeType, owner)
+        return self.parent.get_closest(node_type, owner)
 
     # find the first child of this node matching the given class
     # an owner can be specified to limit results to nodes owned by this owner
-    def get_first(self, NodeType, owner=None) -> "Node":
+    def get_first(self, node_type, owner=None) -> "Node":
         for child in self.children:
             if owner and child.owner != owner:
                 continue
 
-            if isinstance(child, NodeType):
+            if child.type == node_type:
                 return child
 
-            first = child.get_first(NodeType, owner)
+            first = child.get_first(node_type, owner)
 
             if first is not None:
                 return first

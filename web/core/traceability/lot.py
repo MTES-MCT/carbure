@@ -4,6 +4,8 @@ from .node import Node, GHG_FIELDS
 
 
 class LotNode(Node):
+    type = Node.LOT
+
     FROM_LOT = {
         "country_of_origin_id": True,
         "carbure_producer_id": True,
@@ -120,10 +122,8 @@ class LotNode(Node):
         "ghg_reduction_red_ii",
     ]
 
-    def serialize(self):
+    def get_data(self):
         return {
-            "type": "LOT",
-            "id": self.data.id,
             "carbure_id": self.data.carbure_id,
             "biofuel": self.data.biofuel.name,
             "volume": self.data.volume,
@@ -151,13 +151,11 @@ class LotNode(Node):
         return children_lot + children_stock + children_ticket_source
 
     def get_allowed_fields(self, entity_id) -> list:
-        from .stock import StockNode
-
         allowed_fields = []
 
         root_lot = self.get_root()
-        has_no_ancestor_stock = self.get_closest(StockNode) is None
-        owns_ancestor_stock = self.get_closest(StockNode, owner=entity_id) is not None
+        has_no_ancestor_stock = self.get_closest(Node.STOCK) is None
+        owns_ancestor_stock = self.get_closest(Node.STOCK, owner=entity_id) is not None
 
         if self.owner == entity_id:
             allowed_fields += LotNode.TRANSACTION_FIELDS
@@ -169,13 +167,11 @@ class LotNode(Node):
         return allowed_fields
 
     def diff_with_parent(self):
-        from .stock import StockNode
-
-        if isinstance(self.parent, LotNode):
+        if self.parent.type == Node.LOT:
             return self.get_diff(LotNode.FROM_PARENT_LOT, self.parent)
-        if isinstance(self.parent, StockNode):
+        if self.parent.type == Node.STOCK:
             # get diff with root lot sustainability data
-            ancestor_lot = self.parent.get_closest(LotNode)
+            ancestor_lot = self.parent.get_closest(Node.LOT)
             lot_diff = self.get_diff(LotNode.FROM_LOT, ancestor_lot)
             # get diff with stock info
             stock_diff = self.get_diff(LotNode.FROM_PARENT_STOCK, self.parent)
@@ -185,14 +181,12 @@ class LotNode(Node):
         return {}
 
     def diff_with_child(self, child: Node):
-        from .stock import StockNode
-
         # we ignore ticket source children because they cannot be modified directly anyway
-        if isinstance(child, LotNode):
+        if child.type == Node.LOT:
             return self.get_diff(LotNode.FROM_CHILD_LOT, child)
-        if isinstance(child, StockNode):
+        if child.type == Node.STOCK:
             # get first descendant lot for sustainability data
-            descendant_lot = child.get_first(LotNode)
+            descendant_lot = child.get_first(Node.LOT)
             descendant_diff = self.get_diff(LotNode.FROM_LOT, descendant_lot)
             # get diff with stock info
             stock_diff = self.get_diff(LotNode.FROM_CHILD_STOCK, child)
@@ -201,15 +195,13 @@ class LotNode(Node):
         return {}
 
     def remove_from_tree(self):
-        from .stock import StockNode
-
         # if the parent is a CarbureLot, put it back into PENDING mode
-        if isinstance(self.parent, LotNode):
+        if self.parent.type == Node.LOT:
             self.parent.update({"lot_status": CarbureLot.PENDING, "delivery_type": CarbureLot.UNKNOWN})
             return [self.parent]
 
         # if the parent is a CarbureStock, credit back the extracted volume
-        if isinstance(self.parent, StockNode):
+        if self.parent.type == Node.STOCK:
             biofuel = self.parent.data.biofuel
             remaining_volume = self.parent.data.remaining_volume + self.data.volume
             volume, weight, lhv_amount = compute_quantities(biofuel, volume=remaining_volume)

@@ -2,6 +2,8 @@ from .node import Node, TraceabilityError, GHG_FIELDS
 
 
 class TicketSourceNode(Node):
+    type = Node.TICKET_SOURCE
+
     FROM_PARENT_LOT = {
         "period": "delivery_period",
         "volume": "total_volume",
@@ -41,10 +43,8 @@ class TicketSourceNode(Node):
         **GHG_FIELDS,
     }
 
-    def serialize(self):
+    def get_data(self):
         return {
-            "type": "TICKET_SOURCE",
-            "id": self.data.id,
             "carbure_id": self.data.carbure_id,
             "biofuel": self.data.biofuel.name,
             "total_volume": self.data.total_volume,
@@ -69,25 +69,20 @@ class TicketSourceNode(Node):
         return [TicketNode(ticket, parent=self) for ticket in self.data.saf_tickets.all()]
 
     def diff_with_parent(self):
-        from .lot import LotNode
-        from .ticket import TicketNode
-
-        if isinstance(self.parent, LotNode):
+        if self.parent.type == Node.LOT:
             return self.get_diff(TicketSourceNode.FROM_PARENT_LOT, self.parent)
-        elif isinstance(self.parent, TicketNode):
+        elif self.parent.type == Node.TICKET:
             return self.get_diff(TicketSourceNode.FROM_PARENT_TICKET, self.parent)
         return {}
 
     def validate(self):
-        from .ticket import TicketNode
-
         errors = []
 
         used_volume = 0
         available_volume = self.data.total_volume
 
         for child in self.children:
-            if isinstance(child, TicketNode):
+            if child.type == Node.TICKET:
                 used_volume += child.data.volume
 
         if used_volume > available_volume:
