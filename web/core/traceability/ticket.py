@@ -2,6 +2,8 @@ from .node import Node, GHG_FIELDS
 
 
 class TicketNode(Node):
+    type = Node.TICKET
+
     FROM_PARENT_TICKET_SOURCE = {
         "added_by_id": "supplier_id",
         "feedstock_id": True,
@@ -19,10 +21,8 @@ class TicketNode(Node):
         **GHG_FIELDS,
     }
 
-    def serialize(self):
+    def get_data(self):
         return {
-            "type": "TICKET",
-            "id": self.data.id,
             "carbure_id": self.data.carbure_id,
             "biofuel": self.data.biofuel.name,
             "volume": self.data.volume,
@@ -43,8 +43,6 @@ class TicketNode(Node):
         return [TicketSourceNode(ticket_source, parent=self) for ticket_source in self.data.safticketsource_set.all()]
 
     def diff_with_parent(self):
-        from .ticket_source import TicketSourceNode
-
-        if isinstance(self.parent, TicketSourceNode):
+        if self.parent.type == Node.TICKET_SOURCE:
             return self.get_diff(TicketNode.FROM_PARENT_TICKET_SOURCE, self.parent)
         return {}
