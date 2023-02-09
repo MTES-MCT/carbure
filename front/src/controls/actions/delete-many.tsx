@@ -9,7 +9,7 @@ import { TextInput } from "common/components/input"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { useMutation, useQuery } from "common/hooks/async"
-import { LotsUpdateError, LotsUpdateResponse } from "controls/types"
+import { LotsUpdateErrors, LotsUpdateResponse } from "controls/types"
 import { useMemo, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { Lot } from "transactions/types"
@@ -64,7 +64,7 @@ const DeleteManyConfirmationDialog = ({
 
   const requestedDeletions = useQuery(api.deleteLots, {
     key: "check-updates",
-    params: [entity.id, lots_ids, comment!, true],
+    params: [entity.id, lots_ids, "check", true],
   })
 
   const deleteLots = useMutation(api.deleteLots, {
@@ -78,32 +78,25 @@ const DeleteManyConfirmationDialog = ({
       )
       onClose()
     },
-    onError: (err) => {
-      const errors = (err as AxiosError<LotsUpdateResponse>).response?.data
-        .errors
-      errors && showErrors(errors!)
-    },
   })
 
   const entities_to_notify: string = getLotsEntitiesToNotify(lots)
-  const showErrors = (errors: LotsUpdateError[]) => {
-    portal((close) => (
-      <UpdateErrorsDialog onClose={close} errors={errors} method="delete" />
-    ))
-  }
+  // const showErrors = (errors: LotsUpdateErrors) => { //TODO si pas d'erreur possible, supprimer ce code
+  //   portal((close) => (
+  //     <UpdateErrorsDialog onClose={close} errors={errors} method="delete" />
+  //   ))
+  // }
 
   const submit = () => {
-    return deleteLots.execute(
-      entity.id,
-      lots.map((l) => l.id),
-      comment!
-    )
+    return deleteLots.execute(entity.id, lots_ids, comment!)
     //TOTEST uncomment below
     // showErrors(lotsUpdateErrorsResponse.errors!)
   }
 
   const requestedDeletionsCount =
-    requestedDeletions.result?.data.data?.deleted?.length ?? lots.length
+    requestedDeletions.result?.data.data?.deletions?.length ?? lots.length
+  const requestedUpdatesCount =
+    requestedDeletions.result?.data.data?.updates?.length ?? 0
 
   return (
     <Dialog onClose={onClose}>
@@ -136,8 +129,17 @@ const DeleteManyConfirmationDialog = ({
                 <span style={{ whiteSpace: "normal" }}>
                   <Trans
                     count={requestedDeletionsCount}
-                    defaults="Un total de <b>{{count}} maillons</b> des chaînes de traçabilité dont font partie ces lots seront egalement supprimés"
+                    defaults="Un total de <b>{{count}} maillons</b> des chaînes de traçabilité dont font partie ces lots seront également supprimés."
                   />
+                  {requestedUpdatesCount && (
+                    <>
+                      {" "}
+                      <Trans
+                        count={requestedUpdatesCount}
+                        defaults="Un total de <b>{{count}} maillons</b> vont être mis à jour."
+                      />
+                    </>
+                  )}
                 </span>
               </Alert>
             </section>
@@ -158,7 +160,12 @@ const DeleteManyConfirmationDialog = ({
       </main>
 
       <footer>
-        <Button variant="warning" icon={Edit} submit="delete-lots">
+        <Button
+          variant="warning"
+          icon={Edit}
+          submit="delete-lots"
+          disabled={requestedDeletions.loading}
+        >
           {t("Supprimer les {{count}} lots", {
             count: lots.length,
           })}

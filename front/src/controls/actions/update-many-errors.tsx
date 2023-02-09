@@ -2,12 +2,14 @@ import Button from "common/components/button"
 import Collapse from "common/components/collapse"
 import Dialog from "common/components/dialog"
 import { Edit } from "common/components/icons"
-import { LotsUpdateError } from "controls/types"
+import { LotsUpdateErrors } from "controls/types"
+import { LotError } from "../../transactions/types"
 import { useTranslation } from "react-i18next"
+import { getAnomalyText } from "transaction-details/components/lots/anomalies"
 
 interface UpdateErrorsDialogProps {
   onClose: () => void
-  errors: LotsUpdateError[]
+  errors: { [key: number]: LotError[] }
   method: "update" | "delete"
 }
 export const UpdateErrorsDialog = ({
@@ -17,16 +19,17 @@ export const UpdateErrorsDialog = ({
 }: UpdateErrorsDialogProps) => {
   const { t } = useTranslation()
 
+  const errorsKeys = Object.keys(errors)
   return (
     <Dialog onClose={onClose} fullscreen>
       <header>
         <h1>
           {method === "update"
             ? t("{{count}} lots n’ont pas pu être modifiés :", {
-                count: errors.length,
+                count: errorsKeys.length,
               })
             : t("{{count}} lots n’ont pas pu être supprimés :", {
-                count: errors.length,
+                count: errorsKeys.length,
               })}
         </h1>
       </header>
@@ -40,9 +43,17 @@ export const UpdateErrorsDialog = ({
             </strong>
           </p>
 
-          {errors.map((error) => (
-            <ErrorCollapse updateError={error} key={error.lot_id} />
-          ))}
+          {errorsKeys.map((lot_id) => {
+            const lot_id_number = Number(lot_id)
+            const lotErrors = errors[lot_id_number]
+            return (
+              <ErrorCollapse
+                errors={lotErrors}
+                key={lot_id}
+                lot_id={lot_id_number}
+              />
+            )
+          })}
         </section>
       </main>
 
@@ -55,7 +66,13 @@ export const UpdateErrorsDialog = ({
   )
 }
 
-const ErrorCollapse = ({ updateError }: { updateError: LotsUpdateError }) => {
+const ErrorCollapse = ({
+  errors,
+  lot_id,
+}: {
+  errors: LotError[]
+  lot_id: number
+}) => {
   const { t } = useTranslation()
 
   return (
@@ -63,13 +80,13 @@ const ErrorCollapse = ({ updateError }: { updateError: LotsUpdateError }) => {
       icon={Edit}
       variant="warning"
       label={t("Lot #{{lotId}}", {
-        lotId: updateError.lot_id,
+        lotId: lot_id,
       })}
       isOpen
     >
       <ul>
-        {updateError.errors.map((error, index) => {
-          return <li key={`${error.field}${index}`}>{error.error}</li>
+        {errors.map((error, index) => {
+          return <li key={`${error.field}${index}`}>{getAnomalyText(error)}</li>
         })}
       </ul>
       <footer></footer>

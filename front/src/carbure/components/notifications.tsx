@@ -215,7 +215,7 @@ function getNotificationText(notif: Notification) {
       })
     case NotificationType.LotsUpdatedByAdmin:
       return t(
-        "{{count}} lots que vous avez déclarés ont été corrigé par l’administration avec le commentaire “{{comment}}”.",
+        "{{count}} lots que vous avez déclarés ont été corrigés par l’administration avec le commentaire “{{comment}}”.",
         {
           count: notif.meta.updated,
           comment: notif.meta.comment,
