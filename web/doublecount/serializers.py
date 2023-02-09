@@ -11,7 +11,7 @@ class EntitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Entity
         fields = ['id', 'name', 'entity_type', 'has_mac', 'has_trading', 'has_direct_deliveries', 'has_stocks', 'preferred_unit',
-            'legal_name', 'registration_id', 'sustainability_officer_phone_number', 'sustainability_officer', 'registered_address']
+            'legal_name', 'registration_id', 'sustainability_officer_phone_number', 'sustainability_officer', 'registered_address', 'registered_zipcode', 'registered_city', 'registered_country']
 
 class FeedStockSerializer(serializers.ModelSerializer):
     class Meta:
