@@ -1,0 +1,34 @@
+.toolip_dropdown {
+  background: transparent;
+  border: none;
+  min-width: 20px !important;
+}
+
+.tooltip {
+  min-height: 32px;
+  padding: 6px 8px;
+  margin-bottom: 7px;
+  color: #fff;
+  text-align: start;
+  text-decoration: none;
+  word-wrap: break-word;
+  background-color: var(--black);
+  border-radius: 6px;
+  box-shadow:var(--shadow);
+   /* 0 6px 16px 0 rgb(0 0 0 / 8%), 0 3px 6px -4px rgb(0 0 0 / 12%), 0 9px 28px 8px rgb(0 0 0 / 5%); */
+}
+.tooltip:after {
+  content: "";
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  bottom: 7px;
+  inset-inline: 0;
+  margin: auto 20px;
+  border-radius: 0 0 2px 0;
+  transform: translateY(50%) rotate(-135deg);
+  box-shadow: 2px 2px 5px rgb(0 0 0 / 5%);
+  z-index: 0;
+  background-color: var(--black);
+}
+

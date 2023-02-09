@@ -1,6 +1,8 @@
 import { useAsyncList } from "common/hooks/async-list"
 import { matches } from "common/utils/collection"
 import { ReactNode, useEffect, useRef, useState } from "react"
+import cl from "clsx"
+import css from "./tooltip.module.css"
 import {
   defaultNormalizer,
   Normalizer,
@@ -50,8 +52,13 @@ function Tooltip<T, V>({
         {children}
       </div>
 
-      <Dropdown openOnHover={true} triggerRef={triggerRef} anchor="top start">
-        {title}
+      <Dropdown
+        openOnHover={true}
+        triggerRef={triggerRef}
+        anchor="top start"
+        className={cl(css.toolip_dropdown)}
+      >
+        <div className={cl(css.tooltip)}>{title}</div>
       </Dropdown>
     </>
   )
