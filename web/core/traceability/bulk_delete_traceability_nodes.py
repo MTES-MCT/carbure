@@ -9,8 +9,6 @@ from core.models import CarbureLot, CarbureStock, CarbureStockTransformation
 def bulk_delete_traceability_nodes(nodes):
     nodes_by_model = group_nodes_by_model(nodes)
 
-    print("----- %s" % nodes_by_model)
-
     if len(nodes_by_model["lots"]) > 0:
         lot_ids = [lot.id for lot in nodes_by_model["lots"]]
         CarbureLot.objects.filter(id__in=lot_ids).update(lot_status=CarbureLot.DELETED)

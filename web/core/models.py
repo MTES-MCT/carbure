@@ -517,8 +517,8 @@ class CarbureLot(models.Model):
     ghg_reduction_red_ii = models.FloatField(default=0.0)
 
     added_by = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
-    parent_lot = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
-    parent_stock = models.ForeignKey('CarbureStock', null=True, blank=True, on_delete=models.CASCADE)
+    parent_lot = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
+    parent_stock = models.ForeignKey('CarbureStock', null=True, blank=True, on_delete=models.SET_NULL)
 
     free_field = models.TextField(blank=True, null=True, default=None)
 
