@@ -109,7 +109,7 @@ export interface FileListInputProps extends Control {
 
 export const FileListInput = ({
   clear,
-  placeholder = i18next.t("Select some files"),
+  placeholder = i18next.t("Selectionner des fichiers"),
   value,
   autoFocus,
   onChange,
@@ -144,7 +144,7 @@ export interface FileInputProps extends Control {
 
 export const FileInput = ({
   clear,
-  placeholder = i18next.t("Select a file"),
+  placeholder = i18next.t("Selectionner un fichier"),
   value,
   autoFocus,
   onChange,

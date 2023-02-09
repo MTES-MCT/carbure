@@ -19,9 +19,8 @@ export interface LotSummary {
   lots: SummaryItem[]
 }
 
-export interface LotsUpdateError {
-  lot_id: string
-  errors: LotError[]
+export interface LotsUpdateErrors {
+  [key: number]: LotError[]
 }
 
 
@@ -31,11 +30,11 @@ export interface UpdateInfo {
 }
 
 export interface LotsUpdateResponse {
-  errors?: LotsUpdateError[]
+  errors?: LotsUpdateErrors
   updates?: UpdateInfo[]
 }
 
 export interface LotsDeleteResponse {
-  deleted?: UpdateInfo[]
-  updated?: UpdateInfo[]
+  deletions?: UpdateInfo[]
+  updates?: UpdateInfo[]
 }

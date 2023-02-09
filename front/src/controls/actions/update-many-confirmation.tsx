@@ -15,7 +15,7 @@ import { TextInput } from "common/components/input"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { useMutation, useQuery } from "common/hooks/async"
-import { LotsUpdateError, LotsUpdateResponse } from "controls/types"
+import { LotsUpdateErrors, LotsUpdateResponse } from "controls/types"
 import { lotsUpdateErrorsResponse } from "controls/__test__/data"
 import { LotFormValue } from "lot-add/components/lot-form"
 import { useMemo, useState } from "react"
@@ -53,9 +53,12 @@ const UpdateManyConfirmationDialog = ({
     invalidates: ["controls"],
     onSuccess: () => {
       notify(
-        t("Les {{count}} lots sélectionnés ont bien été modifiés.", {
-          count: lots.length,
-        }),
+        t(
+          "Les {{count}} lots sélectionnés ont bien été modifiés ainsi que les maillons dont font parti ces lots.",
+          {
+            count: lots.length,
+          }
+        ),
         { variant: "success" }
       )
       onSuccess()
@@ -156,13 +159,13 @@ const UpdateManyConfirmationDialog = ({
               isOpen
               icon={AlertTriangle}
               variant="danger"
-              label={`${t("Modifications impossible")}`}
+              label={`${t("Modifications impossibles")}`}
             >
               <section>
-                <span style={{ whiteSpace: "normal" }}>
+                <span>
                   <Trans
                     count={errorCount}
-                    defaults="Cette mise à jour ne peut pas être appliquée car elle causerait au moins <b>{{count}} erreurs.</b>"
+                    defaults="Ces modifications ne peuvent pas être appliquées car elle causeraient au moins <b>{{count}} erreurs.</b>"
                   />{" "}
                   <Button variant="link" action={showErrors}>
                     Voir les erreurs

@@ -212,9 +212,9 @@ const lotError: LotError = {
   acked_by_admin: false,
   acked_by_auditor: false,
 }
-const lotUpdateError1 = { lot_id: "L202301-FR-259-974200 ", errors: [lotError, lotError] }
-const lotUpdateError2 = { lot_id: "#WO02301-FR-259-974200 ", errors: [lotError] }
+const lotUpdateError1 = [lotError, lotError]
+const lotUpdateError2 = [lotError]
 export const lotsUpdateErrorsResponse: LotsUpdateResponse = {
-  errors: [lotUpdateError1, lotUpdateError2]
+  errors: { 287367: lotUpdateError1, 287368: lotUpdateError2 }
 }
 
