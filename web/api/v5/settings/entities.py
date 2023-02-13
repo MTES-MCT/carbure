@@ -1,5 +1,7 @@
 from django.urls import path, include
 import traceback
+from django import forms
+
 
 from core.decorators import check_user_rights
 from core.models import UserRights, Entity, ExternalAdminRights
@@ -11,15 +13,21 @@ class UpdateEntityError:
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def update_entity(request, *args, **kwargs):
+
+    form = UpdateEntityInfoForm(request.POST)
+    if not form.is_valid():
+        return ErrorResponse(400, UpdateEntityError.MALFORMED_PARAMS, form.errors)
+
     entity_id = kwargs['context']['entity_id']
-    legal_name = request.POST.get('legal_name', '')
-    registration_id = request.POST.get('registration_id', '')
-    sustainability_officer_phone_number = request.POST.get('sustainability_officer_phone_number', '')
-    sustainability_officer = request.POST.get('sustainability_officer', '')
-    registered_address = request.POST.get('registered_address', '')
-    registered_zipcode = request.POST.get('registered_zipcode', '')
-    registered_city = request.POST.get('registered_city', '')
-    registered_country = request.POST.get('registered_country', '')
+
+    legal_name = form.cleaned_data["legal_name"]
+    registration_id = form.cleaned_data["registration_id"]
+    sustainability_officer_phone_number = form.cleaned_data["sustainability_officer_phone_number"]
+    sustainability_officer = form.cleaned_data["sustainability_officer"]
+    registered_address = form.cleaned_data["registered_address"]
+    registered_zipcode = form.cleaned_data["registered_zipcode"]
+    registered_city = form.cleaned_data["registered_city"]
+    registered_country = form.cleaned_data["registered_country"]
 
     entity = Entity.objects.get(id=entity_id)
     entity.legal_name = legal_name
@@ -32,3 +40,17 @@ def update_entity(request, *args, **kwargs):
     entity.registered_country = registered_country
     entity.save()
     return SuccessResponse()
+
+
+class UpdateEntityInfoForm(forms.Form):
+
+    entity_id = forms.IntegerField()
+    legal_name = forms.CharField(max_length=128, required=False)
+    registration_id = forms.CharField(max_length=64, required=False)
+    sustainability_officer_phone_number = forms.CharField(max_length=32, required=False)
+    sustainability_officer = forms.CharField(max_length=256, required=False)
+    registered_address = forms.CharField(required=False)
+    registered_zipcode = forms.CharField(required=False)
+    registered_city = forms.CharField(required=False)
+    registered_country = forms.CharField(required=False)
+    
