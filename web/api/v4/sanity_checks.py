@@ -15,7 +15,6 @@ from django.db import transaction
 oct2015 = datetime.date(year=2015, month=10, day=5)
 jan2021 = datetime.date(year=2021, month=1, day=1)
 july1st2021 = datetime.date(year=2021, month=7, day=1)
-future = datetime.date.today() + datetime.timedelta(days=15) # docker containers are restarted everyday - not an issue
 dae_pattern = re.compile('^([a-zA-Z0-9/]+$)')
 
 rules = {}
@@ -349,7 +348,8 @@ def sanity_check(lot, prefetched_data):
             if lot.carbure_delivery_site and lot.carbure_delivery_site.depot_id not in prefetched_data['depotsbyentity'][lot.carbure_client.id]:
                 # this specific delivery site is not linked
                 errors.append(generic_error(error=CarbureSanityCheckErrors.DEPOT_NOT_CONFIGURED, lot=lot, display_to_recipient=True, display_to_creator=False, field='delivery_site'))
-    if lot.delivery_date > future:
+    in_two_weeks = datetime.date.today() + datetime.timedelta(days=15)
+    if lot.delivery_date > in_two_weeks:
         errors.append(GenericError(lot=lot, field='delivery_date', error=CarbureSanityCheckErrors.DELIVERY_IN_THE_FUTURE, extra="La date de livraison est dans le futur", value=lot.delivery_date, display_to_creator=True, is_blocking=True))
 
     # CERTIFICATES CHECK
