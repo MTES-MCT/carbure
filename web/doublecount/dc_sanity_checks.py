@@ -81,11 +81,14 @@ def check_production_row(production: DoubleCountingProduction, data: ProductionR
 
 
 # check rules that check sourcing and production
-def check_dc_globally(dca: DoubleCountingAgreement) -> List[DcError]:
+def check_dc_globally(
+    sourcing: list[DoubleCountingSourcing],
+    production: list[DoubleCountingProduction],
+) -> List[DcError]:
     errors: List[DcError] = []
 
-    sourcing = DoubleCountingSourcing.objects.filter(dca_id=dca.id)
-    production = DoubleCountingProduction.objects.filter(dca_id=dca.id)
+    # sourcing = DoubleCountingSourcing.objects.filter(dca_id=dca.id)
+    # production = DoubleCountingProduction.objects.filter(dca_id=dca.id)
 
     errors += check_sourcing_vs_production(sourcing, production)
     errors += check_pome_excess(production)
@@ -95,50 +98,69 @@ def check_dc_globally(dca: DoubleCountingAgreement) -> List[DcError]:
 
 # check that sourcing feedstock quantities match production biofuel quantities
 def check_sourcing_vs_production(
-    sourcing: QuerySet[DoubleCountingSourcing], production: QuerySet[DoubleCountingProduction]
+    sourcing: list[DoubleCountingSourcing], production: list[DoubleCountingProduction]
 ) -> List[DcError]:
     errors: List[DcError] = []
 
-    # group sourcing by feedstock and year, and sum the total quantity
-    sourcing_per_feedstock = (
-        sourcing.select_related("feedstock").values("feedstock__code", "year").annotate(quantity=Sum("metric_tonnes"))
-    )
+    # group sourcing by year and feedstock, and sum the total quantity
+    sourcing_by_year_by_feedstock = {}
+    for s in sourcing:
+        year = s.year
+        feedstock = s.feedstock.code if s.feedstock else "UNKNOWN"
+        if not year in sourcing_by_year_by_feedstock:
+            sourcing_by_year_by_feedstock[year] = {}
+        if not feedstock in sourcing_by_year_by_feedstock[year]:
+            sourcing_by_year_by_feedstock[year][feedstock] = 0
+        sourcing_by_year_by_feedstock[year][feedstock] += s.metric_tonnes or 0
 
-    # group production by feedstock and year, and sum the total quantity
-    production_per_feedstock = (
-        production.select_related("feedstock")
-        .values("feedstock__code", "year")
-        .annotate(quantity=Sum("estimated_production"))
-    )
+    # group production by year and feedstock and sum estimated production
+    production_by_year_by_feedstock = {}
+    for p in production:
+        year = p.year
+        feedstock = p.feedstock.code if p.feedstock else "UNKNOWN"
+        if not year in production_by_year_by_feedstock:
+            production_by_year_by_feedstock[year] = {}
+        if not feedstock in production_by_year_by_feedstock[year]:
+            production_by_year_by_feedstock[year][feedstock] = 0
+        production_by_year_by_feedstock[year][feedstock] += p.estimated_production or 0
 
-    for p in production_per_feedstock:
-        try:
-            # check that the sourced amount of feedstock roughly matches the total production generated with this feedstock
-            s = sourcing_per_feedstock.get(feedstock__code=p["feedstock__code"], year=p["year"])
-            if p["quantity"] > s["quantity"]:
-                meta = {"feedstock": p["feedstock__code"], "year": p["year"], "sourcing": s["quantity"], "production": p["quantity"]}  # fmt:skip
+    for year in production_by_year_by_feedstock:
+        for feedstock in production_by_year_by_feedstock[year]:
+            try:
+                production = production_by_year_by_feedstock[year].get(feedstock, 0)
+                sourcing = sourcing_by_year_by_feedstock.get(year, {}).get(feedstock, 0)
+                # check that the sourced amount of feedstock roughly matches the total production generated with this feedstock
+                if production > sourcing:
+                    meta = {"feedstock": feedstock, "year": year, "sourcing": sourcing, "production": production}  # fmt:skip
+                    errors.append(error(DoubleCountingError.PRODUCTION_MISMATCH_SOURCING, meta=meta))
+            except:
+                meta = {
+                    "feedstock": p["feedstock__code"],
+                    "year": p["year"],
+                    "sourcing": 0,
+                    "production": p["quantity"],
+                }
                 errors.append(error(DoubleCountingError.PRODUCTION_MISMATCH_SOURCING, meta=meta))
-        except:
-            meta = {"feedstock": p["feedstock__code"], "year": p["year"], "sourcing": 0, "production": p["quantity"]}
-            errors.append(error(DoubleCountingError.PRODUCTION_MISMATCH_SOURCING, meta=meta))
 
     return errors
 
 
 # check that biofuels made with POME (EFFLUENTS_HUILERIES_PALME_RAFLE) aren't produced for more than 2000 tonnes
-def check_pome_excess(production: QuerySet[DoubleCountingProduction]) -> List[DcError]:
+def check_pome_excess(production: list[DoubleCountingProduction]) -> List[DcError]:
     errors: List[DcError] = []
 
-    pome_production_per_year = (
-        production.select_related("feedstock")
-        .filter(feedstock__code="EFFLUENTS_HUILERIES_PALME_RAFLE")
-        .values("year")
-        .annotate(quantity=Sum("estimated_production"))
-    )
+    pome_production_by_year = {}
+    for p in production:
+        if p.feedstock.code != "EFFLUENTS_HUILERIES_PALME_RAFLE":
+            continue
+        if p.year not in pome_production_by_year:
+            pome_production_by_year[p.year] = 0
+        pome_production_by_year[p.year] += p.estimated_production or 0
 
-    for p in pome_production_per_year:
-        if p["quantity"] > 2000:
-            meta = {"year": p["year"], "production": p["quantity"]}
+    for year in pome_production_by_year:
+        estimated_production = pome_production_by_year[year]
+        if estimated_production > 2000:
+            meta = {"year": year, "production": estimated_production}
             errors.append(error(DoubleCountingError.POME_GT_2000, meta=meta))
 
     return errors

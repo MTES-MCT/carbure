@@ -263,6 +263,9 @@ CSP_DEFAULT_SRC=("'self'", "stats.data.gouv.fr", "metabase.carbure.beta.gouv.fr"
 # Metabase API key
 METABASE_SECRET_KEY = env('METABASE_SECRET_KEY')
 
+# Max upload size
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
+
 # Silky profiler config
 SILKY_PYTHON_PROFILER = True
 SILKY_ANALYZE_QUERIES = True

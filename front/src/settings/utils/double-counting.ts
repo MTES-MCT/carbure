@@ -76,7 +76,9 @@ export function getErrorText(
       break
 
     default:
-      errorText += t("Erreur de validation") + ` (${error.error})`
+      errorText +=
+        t("Erreur de validation") +
+        `: ${error.error}${error.meta ? " " + error.meta : ""}`
       break
   }
 
