@@ -13,7 +13,8 @@ services:
     networks:
       - carbure
     ports:
-      - 33060:3306
+      - 3306:3306
+      - 33060:33060
 
   carbure-redis:
     image: redis:latest

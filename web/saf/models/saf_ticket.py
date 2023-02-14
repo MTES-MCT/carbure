@@ -8,6 +8,9 @@ class SafTicket(models.Model):
         verbose_name = "Ticket SAF"
         verbose_name_plural = "Tickets SAF"
         ordering = ["carbure_id"]
+        indexes = [
+            models.Index(fields=["parent_ticket_source"]),
+        ]
 
     PENDING = "PENDING"
     ACCEPTED = "ACCEPTED"
@@ -66,7 +69,9 @@ class SafTicket(models.Model):
         )
 
 
-def create_ticket_from_source(ticket_source, client_id, volume, agreement_date, agreement_reference, assignment_period, free_field):
+def create_ticket_from_source(
+    ticket_source, client_id, volume, agreement_date, agreement_reference, assignment_period, free_field
+):
     year = floor(assignment_period / 100)
 
     ticket = SafTicket.objects.create(

@@ -266,6 +266,7 @@ def stock_flush(request, *args, **kwargs):
         lot.carbure_delivery_site = None
         lot.unknown_delivery_site = None
         lot.delivery_site_country = None
+        lot.parent_lot = None
         lot.parent_stock = stock
         if free_field:
             lot.free_field = free_field
@@ -1596,35 +1597,35 @@ def validate_declaration(request, *args, **kwargs):
     pending_reception = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, lot_status=CarbureLot.PENDING).count()
     if pending_reception > 0:
         return JsonResponse({'status': 'error', 'message': 'Cannot validate declaration. Some lots are pending reception.'}, status=400)
-    
+
     pending_correction = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, lot_status__in=[CarbureLot.ACCEPTED], correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED]).count()
     if pending_correction > 0:
         return JsonResponse({'status': 'error', 'message': 'Cannot validate declaration. Some accepted lots need correction.'}, status=400)
-    
+
     lots_sent_rejected_or_drafts = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, lot_status=CarbureLot.REJECTED).count()
     if lots_sent_rejected_or_drafts > 0:
         return JsonResponse({'status': 'error', 'message': 'Cannot validate declaration. Some outgoing lots need your attention.'}, status=400)
-    
+
     lots_sent_to_fix = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, lot_status__in=[CarbureLot.ACCEPTED], correction_status__in=[CarbureLot.IN_CORRECTION]).count()
     if lots_sent_to_fix > 0:
         return JsonResponse({'status': 'error', 'message': 'Cannot validate declaration. Some outgoing lots need correction.'}, status=400)
-    
+
     lots_received = CarbureLot.objects.filter(lot_status__in=[CarbureLot.ACCEPTED], carbure_client=declaration.entity, period=period_int)
     lots_received.update(declared_by_client=True)
 
     # create SAF ticket sources for declared received lots
     background_create_ticket_sources_from_lots(lots_received)
-    
+
     lots_sent = CarbureLot.objects.filter(lot_status__in=[CarbureLot.ACCEPTED], carbure_supplier=declaration.entity, period=period_int)
     lots_sent.update(declared_by_supplier=True)
-    
+
     bulk_events = []
     for lot in lots_received:
         bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLARED, lot=lot, user=request.user))
     for lot in lots_sent:
         bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLARED, lot=lot, user=request.user))
     CarbureLotEvent.objects.bulk_create(bulk_events)
-    
+
     # freeze lots
     lots_received_to_freeze = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True)
     lots_received_to_freeze.update(lot_status=CarbureLot.FROZEN)
