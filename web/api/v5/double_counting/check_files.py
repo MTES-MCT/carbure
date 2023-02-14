@@ -75,7 +75,7 @@ def check_dc_file(file):
         end = datetime.date(end_year, 12, 31)
 
         # create temporary agreement to hold all the data that will be parsed
-        dca = DoubleCountingAgreement.objects.create(
+        dca = DoubleCountingAgreement(
             period_start=start,
             period_end=end,
         )
@@ -84,9 +84,6 @@ def check_dc_file(file):
         sourcing_data, sourcing_forecast_errors = load_dc_sourcing_data(dca, sourcing_forecast)
         production_data, production_errors = load_dc_production_data(dca, production)
         global_errors = check_dc_globally(sourcing_data, production_data)
-
-        # remove the agreement with all associated data
-        dca.delete()
 
         if not info["year"]:
             info["year"] = end_year - 1
