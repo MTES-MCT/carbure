@@ -17,5 +17,5 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": "src"
   },
-  "include": ["src", "src/lot-add/components"]
+  "include": ["src"]
 }

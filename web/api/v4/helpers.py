@@ -21,7 +21,7 @@ from core.models import GenericError
 from core.serializers import CarbureLotAdminSerializer, CarbureLotCommentSerializer, CarbureLotEventSerializer, CarbureLotPublicSerializer, CarbureStockEventSerializer, CarbureStockPublicSerializer, GenericErrorAdminSerializer, GenericErrorSerializer
 from core.xlsx_v3 import export_carbure_lots, export_carbure_stock
 from ml.models import EECStats, EPStats, ETDStats
-from producers.models import ProductionSite
+from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
 
 
 sort_key_to_django_field = {'period': 'delivery_date',
@@ -918,23 +918,43 @@ def get_prefetched_data(entity=None):
     entity_certificates = {}
     certificates = EntityCertificate.objects.select_related('certificate').all()
     for entitycertificate in certificates.iterator():
-        if entitycertificate.entity.id not in entity_certificates:
-            entity_certificates[entitycertificate.entity.id] = {}
-        entity_certificates[entitycertificate.entity.id][entitycertificate.certificate.certificate_id] = entitycertificate
+        if entitycertificate.entity_id not in entity_certificates:
+            entity_certificates[entitycertificate.entity_id] = {}
+        entity_certificates[entitycertificate.entity_id][entitycertificate.certificate.certificate_id] = entitycertificate
     d['entity_certificates'] = entity_certificates
 
     # MAPPING OF PRODUCTION SITES AND THEIR INPUT/OUTPUTS
     production_sites = {}
-    all_ps = ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').all()
-    for psite in all_ps.iterator():
+    all_ps = ProductionSite.objects.all()
+    all_ps_inputs = ProductionSiteInput.objects.values('production_site_id', 'matiere_premiere_id')
+    all_ps_outputs = ProductionSiteOutput.objects.values('production_site_id', 'biocarburant_id')
+
+    feedstock_by_ps = {}
+    for input in all_ps_inputs:
+        production_site_id = input["production_site_id"]
+        matiere_premiere_id = input["matiere_premiere_id"]
+        if production_site_id not in feedstock_by_ps:
+            feedstock_by_ps[production_site_id] = []
+        feedstock_by_ps[production_site_id].append(matiere_premiere_id)
+
+    biofuel_by_ps = {}
+    for output in all_ps_outputs:
+        production_site_id = output["production_site_id"]
+        biocarburant_id = output["biocarburant_id"]
+        if production_site_id not in biofuel_by_ps:
+            biofuel_by_ps[production_site_id] = []
+        biofuel_by_ps[production_site_id].append(biocarburant_id)
+
+    for psite in list(all_ps):
         production_sites[psite.id] = {}
-        production_sites[psite.id]['feedstock_ids'] = [mp['matiere_premiere_id'] for mp in psite.productionsiteinput_set.all().values('matiere_premiere_id')]
-        production_sites[psite.id]['biofuel_ids'] = [bc['biocarburant_id'] for bc in psite.productionsiteoutput_set.all().values('biocarburant_id')]
+        production_sites[psite.id]['feedstock_ids'] = feedstock_by_ps.get(psite.id, []) #[mp['matiere_premiere_id'] for mp in psite.productionsiteinput_set.all().values('matiere_premiere_id')]
+        production_sites[psite.id]['biofuel_ids'] = biofuel_by_ps.get(psite.id, []) #[bc['biocarburant_id'] for bc in psite.productionsiteoutput_set.all().values('biocarburant_id')]
     d['production_sites'] = production_sites
 
-    d['clients'] = {c.id: c for c in Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.OPERATOR, Entity.TRADER])}
-    d['clientsbyname'] = {c.name.upper(): c for c in Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.OPERATOR, Entity.TRADER])}
-    d['certificates'] = {c.certificate_id.upper(): c for c in GenericCertificate.objects.filter(valid_until__gte=lastyear)}
+    client_entities = list(Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.OPERATOR, Entity.TRADER]))
+    d['clients'] = {c.id: c for c in client_entities}
+    d['clientsbyname'] = {c.name.upper(): c for c in client_entities}
+    d['certificates'] = {c["certificate_id"].upper(): c for c in GenericCertificate.objects.filter(valid_until__gte=lastyear).values('certificate_id', 'valid_until')}
     d['double_counting_certificates'] = {c.certificate_id: c for c in DoubleCountingRegistration.objects.all()}
     d['etd'] = {s.feedstock: s.default_value for s in ETDStats.objects.select_related('feedstock').all()}
     d['eec'] = {s.feedstock.code + s.origin.code_pays: s for s in EECStats.objects.select_related('feedstock', 'origin').all()}

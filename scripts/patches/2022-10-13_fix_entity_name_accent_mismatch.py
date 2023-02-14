@@ -1,5 +1,6 @@
 import os
 import django
+import argparse
 from django.db.models import Q
 from django.core.paginator import Paginator
 from tqdm import tqdm
@@ -11,8 +12,9 @@ from core.utils import normalize_string
 from core.models import CarbureLot, Entity, Depot
 from producers.models import ProductionSite
 
+
 # bruteforcey script that compares all the unknown lot fields with known objects of the database
-def fix_entity_name_accent_mismatch():
+def fix_entity_name_accent_mismatch(year, batch=1000):
     entities = {normalize_string(entity.name): entity for entity in Entity.objects.all()}
     normalized_entities = entities.keys()
 
@@ -22,7 +24,7 @@ def fix_entity_name_accent_mismatch():
     depots = {normalize_string(depot.name): depot for depot in Depot.objects.exclude(name="Anonymisé")}
     normalized_depots = depots.keys()
 
-    lots_with_unknown = CarbureLot.objects.filter(year=2022).exclude(
+    lots_with_unknown = CarbureLot.objects.filter(year=year).exclude(
         Q(unknown_producer="", unknown_producer__isnull=True)
         | Q(unknown_supplier="", unknown_supplier__isnull=True)
         | Q(unknown_client="", unknown_client__isnull=True)
@@ -30,7 +32,7 @@ def fix_entity_name_accent_mismatch():
         | Q(unknown_delivery_site="", unknown_delivery_site__isnull=True)
     )
 
-    paginator = Paginator(lots_with_unknown, 1000)
+    paginator = Paginator(lots_with_unknown, batch)
 
     lots_with_known_producer = {}
     lots_with_known_supplier = {}
@@ -104,4 +106,8 @@ def fix_entity_name_accent_mismatch():
 
 
 if __name__ == "__main__":
-    fix_entity_name_accent_mismatch()
+    parser = argparse.ArgumentParser(description="Load ISCC certificates in database")
+    parser.add_argument("--year", dest="year", action="store", default=None, help="Which year to focus on")
+    parser.add_argument("--batch", dest="batch", action="store", default=1000, help="Which year to focus on")
+    args = parser.parse_args()
+    fix_entity_name_accent_mismatch(args.year, args.batch)

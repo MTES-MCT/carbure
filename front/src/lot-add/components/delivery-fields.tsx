@@ -54,6 +54,22 @@ export const SupplierField = (props: AutocompleteProps<Entity | string>) => {
     (v) => norm.normalizeEntityOrUnknown(v).label
   )
 
+  if (entity.isAdmin) {
+    return (
+      <Autocomplete
+        label={t("Fournisseur")}
+        value={supplier}
+        icon={isKnown ? UserCheck : undefined}
+        create={norm.identity}
+        defaultOptions={supplier ? [supplier] : undefined}
+        getOptions={api.findEntities}
+        normalize={norm.normalizeEntityOrUnknown}
+        {...bound}
+        {...props}
+      />
+    )
+  }
+
   return (
     <Autocomplete
       label={t("Fournisseur")}
@@ -193,6 +209,18 @@ export function getDeliveryTypes(
   client: Entity | string | undefined,
   status: LotStatus = LotStatus.Draft
 ) {
+  if (entity.isAdmin) {
+    return [
+      DeliveryType.Blending,
+      DeliveryType.Exportation,
+      DeliveryType.RFC,
+      DeliveryType.Direct,
+      DeliveryType.Stock,
+      DeliveryType.Processing,
+      DeliveryType.Trading,
+    ]
+  }
+
   const {
     isOperator,
     has_stocks,

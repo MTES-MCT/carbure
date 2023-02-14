@@ -1,15 +1,16 @@
 import { Api, api, download } from "common/services/api"
 import { Option } from "common/utils/normalize"
-import { LotSummary, Snapshot } from "../types"
+import { lotFormToPayload, LotFormValue } from "lot-add/components/lot-form"
+import { selectionOrQuery } from "transactions/api"
 import {
   Filter,
   LotList,
   LotQuery,
   StockList,
   StockQuery,
-  StockSummary,
+  StockSummary
 } from "transactions/types"
-import { selectionOrQuery } from "transactions/api"
+import { LotsDeleteResponse, LotSummary, LotsUpdateResponse, Snapshot } from "../types"
 
 const QUERY_RESET: Partial<LotQuery> = {
   limit: undefined,
@@ -109,5 +110,35 @@ export async function commentLots(
     is_visible_by_admin,
     is_visible_by_auditor,
     comment,
+  })
+}
+
+export function updateLots(
+  entity_id: number,
+  lots_ids: number[],
+  updated_values: Partial<LotFormValue>,
+  comment: string,
+  dry_run?: boolean
+) {
+  return api.post<Api<LotsUpdateResponse>>("/v5/admin/lots/update-many", {
+    entity_id,
+    lots_ids,
+    comment,
+    dry_run,
+    ...lotFormToPayload(updated_values),
+  })
+}
+
+export function deleteLots(
+  entity_id: number,
+  lots_ids: number[],
+  comment: string,
+  dry_run?: boolean
+) {
+  return api.post<Api<LotsDeleteResponse>>("/v5/admin/lots/delete-many", {
+    entity_id,
+    lots_ids,
+    comment,
+    dry_run
   })
 }

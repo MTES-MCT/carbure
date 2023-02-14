@@ -65,7 +65,7 @@ def validate_declaration(request, *args, **kwargs):
         background_create_ticket_sources_from_lots(received_lots)
 
         # Freeze lots that are marked as declared by both supplier and client
-        declared_lots = sent_lots | received_lots
+        declared_lots = declaration_lots.filter(declared_by_supplier=True, declared_by_client=True)
         declared_lots.update(lot_status=CarbureLot.FROZEN)
 
         # Mark declaration as complete

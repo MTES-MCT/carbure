@@ -1,4 +1,4 @@
-import { SummaryItem } from "transactions/types"
+import { LotError, SummaryItem } from "transactions/types"
 
 export type AdminStatus = "alerts" | "lots" | "stocks" | "unknown"
 
@@ -17,4 +17,24 @@ export interface LotSummary {
   total_weight: number
   total_lhv_amount: number
   lots: SummaryItem[]
+}
+
+export interface LotsUpdateErrors {
+  [key: number]: LotError[]
+}
+
+
+export interface UpdateInfo {
+  node: any
+  diff: Record<string, [any, any]>
+}
+
+export interface LotsUpdateResponse {
+  errors?: LotsUpdateErrors
+  updates?: UpdateInfo[]
+}
+
+export interface LotsDeleteResponse {
+  deletions?: UpdateInfo[]
+  updates?: UpdateInfo[]
 }

@@ -7,6 +7,8 @@ import DeliveryMapButton from "controls/actions/delivery-map"
 import useEntity from "carbure/hooks/entity"
 import { useStatus } from "./status"
 import { SetManyConformityButton } from "controls/actions/set-conformity"
+import UpdateManyButton from "controls/actions/update-many"
+import { DeleteManyButton } from "controls/actions/delete-many"
 
 export interface ActionBarProps {
   count: number
@@ -36,6 +38,8 @@ export const ControlActions = ({
       {status !== "stocks" && (
         <>
           {selectedLots && <AlertManyButton {...props} lots={selectedLots} />}
+          {selectedLots && <UpdateManyButton {...props} lots={selectedLots} />}
+          {selectedLots && <DeleteManyButton {...props} lots={selectedLots} />}
           {entity.isAdmin && <DeliveryMapButton {...props} />}
           {entity.isAuditor && status === "alerts" && (
             <SetManyConformityButton {...props} />

@@ -15,12 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include, re_path
+from django.conf import settings
 from public import views as public_views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
     re_path("app/(.*)", public_views.redirect_app),
-    path('api/', include('api.urls')),
-    path('core/', include('core.urls')),
-    path('django_query_profiler/', include('django_query_profiler.client.urls'))
+    path("api/", include("api.urls")),
+    path("core/", include("core.urls")),
 ]
+
+if settings.DEBUG:
+    urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]

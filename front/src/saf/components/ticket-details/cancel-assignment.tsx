@@ -56,7 +56,6 @@ export const CancelAssignment = ({
           <section>
             <p>
               <strong>
-                {" "}
                 {t("Êtes-vous sûr de vouloir annuler ce ticket ?")}
               </strong>
             </p>

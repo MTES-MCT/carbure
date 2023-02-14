@@ -184,6 +184,9 @@ export enum NotificationType {
   SafTicketReceived = "SAF_TICKET_RECEIVED",
   SafTicketAccepted = "SAF_TICKET_ACCEPTED",
   SafTicketRejected = "SAF_TICKET_REJECTED",
+
+  LotsUpdatedByAdmin = "LOTS_UPDATED_BY_ADMIN",
+  LotsDeletedByAdmin = "LOTS_DELETED_BY_ADMIN"
 }
 
 export enum DepotType {
