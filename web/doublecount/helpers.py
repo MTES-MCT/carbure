@@ -13,13 +13,13 @@ today = datetime.date.today()
 
 def load_dc_sourcing_data(dca: DoubleCountingAgreement, sourcing_rows: List[SourcingRow]):
     # prepare error list
-    errors = []
+    sourcing_data = []
+    sourcing_errors = []
 
     # preload data
     feedstocks = {f.code: f for f in MatierePremiere.objects.all()}
     countries = {f.code_pays: f for f in Pays.objects.all()}
 
-    DoubleCountingSourcing.objects.filter(dca=dca).delete()
     for row in sourcing_rows:
         # skip rows that start empty
         if not row["year"]:
@@ -28,32 +28,31 @@ def load_dc_sourcing_data(dca: DoubleCountingAgreement, sourcing_rows: List[Sour
         origin_country = countries.get(row["origin_country"], None) if row["origin_country"] else None
         supply_country = countries.get(row["supply_country"], None) if row["supply_country"] else None
         transit_country = countries.get(row["transit_country"], None) if row["transit_country"] else None
-        dcs = DoubleCountingSourcing(dca=dca)
-        dcs.year = row["year"]
+        sourcing = DoubleCountingSourcing(dca=dca)
+        sourcing.year = row["year"]
         if feedstock:
-            dcs.feedstock = feedstock
+            sourcing.feedstock = feedstock
         if origin_country:
-            dcs.origin_country = origin_country
-        dcs.supply_country = supply_country
-        dcs.transit_country = transit_country
-        dcs.metric_tonnes = row["metric_tonnes"]
-        dcs_errors = check_sourcing_row(dcs, row)
-        errors += dcs_errors
-        if len(dcs_errors) == 0:
-            dcs.save()
+            sourcing.origin_country = origin_country
+        sourcing.supply_country = supply_country
+        sourcing.transit_country = transit_country
+        sourcing.metric_tonnes = row["metric_tonnes"]
+        errors = check_sourcing_row(sourcing, row)
+        sourcing_errors += errors
+        if len(errors) == 0:
+            sourcing_data.append(sourcing)
 
-    return errors
+    return sourcing_data, sourcing_errors
 
 
 def load_dc_production_data(dca: DoubleCountingAgreement, production_rows: List[ProductionRow]):
-    # prepare error list
-    errors = []
+    production_data = []
+    production_errors = []
 
     # preload data
     feedstocks = {f.code: f for f in MatierePremiere.objects.all()}
     biofuels = {f.code: f for f in Biocarburant.objects.all()}
 
-    DoubleCountingProduction.objects.filter(dca=dca).delete()
     for row in production_rows:
         # skip rows that start empty
         if not row["year"]:
@@ -61,19 +60,19 @@ def load_dc_production_data(dca: DoubleCountingAgreement, production_rows: List[
 
         feedstock = feedstocks.get(row["feedstock"], None)
         biofuel = biofuels.get(row["biofuel"], None)
-        dcp = DoubleCountingProduction(dca=dca)
-        dcp.year = row["year"]
-        dcp.feedstock = feedstock
-        dcp.biofuel = biofuel
-        dcp.max_production_capacity = row["max_production_capacity"]
-        dcp.estimated_production = row["estimated_production"]
-        dcp.requested_quota = row["requested_quota"]
-        dcp_errors = check_production_row(dcp, row)
-        errors += dcp_errors
-        if len(dcp_errors) == 0:
-            dcp.save()
+        production = DoubleCountingProduction(dca=dca)
+        production.year = row["year"]
+        production.feedstock = feedstock
+        production.biofuel = biofuel
+        production.max_production_capacity = row["max_production_capacity"]
+        production.estimated_production = row["estimated_production"]
+        production.requested_quota = row["requested_quota"]
+        errors = check_production_row(production, row)
+        production_errors += errors
+        if len(errors) == 0:
+            production_data.append(production)
 
-    return errors
+    return production_data, production_errors
 
 
 def load_dc_recognition_file(entity, psite_id, user, filepath):

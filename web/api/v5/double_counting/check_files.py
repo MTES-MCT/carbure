@@ -3,11 +3,11 @@ import traceback
 import datetime
 import unicodedata
 
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from doublecount.models import DoubleCountingAgreement
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_admin_rights
-from doublecount.dc_sanity_checks import check_dc_globally
+from doublecount.dc_sanity_checks import check_dc_globally, error
 from doublecount.dc_parser import parse_dc_excel
 from doublecount.helpers import load_dc_sourcing_data, load_dc_production_data
 
@@ -80,10 +80,10 @@ def check_dc_file(file):
             period_end=end,
         )
 
-        sourcing_history_errors = load_dc_sourcing_data(dca, sourcing_history)
-        sourcing_forecast_errors = load_dc_sourcing_data(dca, sourcing_forecast)
-        production_errors = load_dc_production_data(dca, production)
-        global_errors = check_dc_globally(dca)
+        _, sourcing_history_errors = load_dc_sourcing_data(dca, sourcing_history)
+        sourcing_data, sourcing_forecast_errors = load_dc_sourcing_data(dca, sourcing_forecast)
+        production_data, production_errors = load_dc_production_data(dca, production)
+        global_errors = check_dc_globally(sourcing_data, production_data)
 
         # remove the agreement with all associated data
         dca.delete()
@@ -97,8 +97,14 @@ def check_dc_file(file):
             "production": production_errors,
             "global": global_errors,
         }
-    except:
+
+    except Exception as e:
         traceback.print_exc()
         info = {"production_site": None, "year": 0}
-        excel_error = {"error": "EXCEL_PARSING_ERROR", "is_blocking": True}
-        return info, {"sourcing_history": [], "sourcing_history": [], "production": [], "global": [excel_error]}
+        excel_error = error("EXCEL_PARSING_ERROR", is_blocking=True, meta=str(e))
+        return info, {
+            "sourcing_forecast": [],
+            "sourcing_history": [],
+            "production": [],
+            "global": [excel_error],
+        }
