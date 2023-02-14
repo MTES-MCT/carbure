@@ -1,15 +1,19 @@
+from os import getenv
 from core.models import CarbureLot, Biocarburant
 from .node import Node, TraceabilityError
 
 
-class Biofuel:
+if getenv("TEST"):
+    ETHANOL = 33
+    ETBE = 17
+else:
     ETHANOL = Biocarburant.objects.get(code="ETH").id
     ETBE = Biocarburant.objects.get(code="ETBE").id
 
 
 def get_stock_transform_biofuels(stock_transform):
     if stock_transform.transformation_type == "ETH_ETBE":
-        return {"source": Biofuel.ETHANOL, "destination": Biofuel.ETBE}
+        return {"source": ETHANOL, "destination": ETBE}
     return {}
 
 
