@@ -9,7 +9,7 @@ from transactions.factories import CarbureLotFactory, CarbureStockFactory, Carbu
 from saf.factories import SafTicketSourceFactory, SafTicketFactory
 
 from core.traceability import Node, LotNode
-from core.traceability.stock import Biofuel
+from core.traceability.stock import ETHANOL, ETBE
 
 
 class TraceabilityTest(TestCase):
@@ -35,9 +35,7 @@ class TraceabilityTest(TestCase):
         SafTicket.objects.all().delete()
 
     def test_traceability_single_lot(self):
-        lot = CarbureLotFactory.create(
-            lot_status="ACCEPTED",
-        )
+        lot = CarbureLotFactory.create(lot_status="ACCEPTED")
         node = LotNode(lot)
 
         self.assertEqual(node.get_depth(), 0)
@@ -110,7 +108,7 @@ class TraceabilityTest(TestCase):
 
     def test_traceability_lot_to_stock_transform_lot(self):
         root_lot = CarbureLotFactory.create(
-            lot_status="ACCEPTED", added_by=self.entity, carbure_client=self.entity, biofuel_id=Biofuel.ETHANOL
+            lot_status="ACCEPTED", added_by=self.entity, carbure_client=self.entity, biofuel_id=ETHANOL
         )
         source_stock = CarbureStockFactory.create(parent_lot=root_lot, carbure_client=self.entity)
         dest_stock = CarbureStockFactory.create(carbure_client=self.entity)
@@ -133,7 +131,7 @@ class TraceabilityTest(TestCase):
 
         root_node.update({"transport_document_reference": "ABCD", "carbure_delivery_site_id": 13, "esca": 2.0})  # fmt:skip
         self.assertEqual(root_node.data.transport_document_reference, "ABCD")
-        self.assertEqual(root_node.data.biofuel_id, Biofuel.ETHANOL)
+        self.assertEqual(root_node.data.biofuel_id, ETHANOL)
         self.assertEqual(root_node.data.carbure_delivery_site_id, 13)
         self.assertEqual(root_node.data.esca, 2.0)
 
@@ -143,14 +141,14 @@ class TraceabilityTest(TestCase):
         root_node.propagate()
 
         self.assertEqual(source_stock_node.data.depot_id, 13)
-        self.assertEqual(source_stock_node.data.biofuel_id, Biofuel.ETHANOL)
+        self.assertEqual(source_stock_node.data.biofuel_id, ETHANOL)
 
         self.assertEqual(dest_stock_node.data.carbure_supplier_id, self.entity.id)
         self.assertEqual(dest_stock_node.data.depot_id, 13)
-        self.assertEqual(dest_stock_node.data.biofuel_id, Biofuel.ETBE)
+        self.assertEqual(dest_stock_node.data.biofuel_id, ETBE)
 
         self.assertEqual(child_node.data.transport_document_reference, original_child_lot_transport_document_reference)
-        self.assertEqual(child_node.data.biofuel_id, Biofuel.ETBE)
+        self.assertEqual(child_node.data.biofuel_id, ETBE)
         self.assertEqual(child_node.data.carbure_delivery_site_id, original_child_lot_carbure_delivery_site_id)
         self.assertEqual(child_node.data.esca, 2.0)
 
