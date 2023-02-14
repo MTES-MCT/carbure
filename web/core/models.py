@@ -661,8 +661,10 @@ class CarbureLot(models.Model):
                 config.meta['feedstock_registered'] = True
             if self.biofuel.id in prefetched_data['production_sites'][self.carbure_production_site.id]['biofuel_ids']:
                 config.meta['biofuel_registered'] = True
-        if self.carbure_delivery_site and self.carbure_client and self.carbure_client.id in prefetched_data['depotsbyentity'] and self.carbure_delivery_site.depot_id in prefetched_data['depotsbyentity'][self.carbure_client.id]:
-            config.meta['delivery_site_registered'] = True
+
+        if self.carbure_delivery_site and self.carbure_client:
+            if self.carbure_client.id in prefetched_data['depotsbyentity'] and self.carbure_delivery_site.depot_id in prefetched_data['depotsbyentity'][self.carbure_client.id]:
+                config.meta['delivery_site_registered'] = True
         if config.meta['feedstock_registered'] and config.meta['biofuel_registered'] and config.meta['delivery_site_registered']:
             config.score = 1
 
