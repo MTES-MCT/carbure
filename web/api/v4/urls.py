@@ -26,28 +26,28 @@ urlpatterns = [
 
     # POST
     ### Lot initial life
-    path('lots/add', views.add_lot, name='api-v4-add-lots'),
-    path('lots/add-excel', views.add_excel, name='api-v4-add-excel'),
-    path('lots/duplicate', views.duplicate_lot, name='api-v4-duplicate-lot'),
-    path('lots/update', views.update_lot, name='api-v4-update-lot'),
-    path('lots/send', views.lots_send, name='api-v4-send-lots'),
-    path('lots/delete', views.lots_delete, name='api-v4-delete-lots'),
+    path('lots/add', views.add_lot, name='api-v4-add-lots'), #TODO check year
+    path('lots/add-excel', views.add_excel, name='api-v4-add-excel'), #TODO check year
+    path('lots/duplicate', views.duplicate_lot, name='api-v4-duplicate-lot'),#TODO check year
+    path('lots/update', views.update_lot, name='api-v4-update-lot'),#TODO check year
+    path('lots/send', views.lots_send, name='api-v4-send-lots'),#TODO check year
+    path('lots/delete', views.lots_delete, name='api-v4-delete-lots'),#TODO check year
     ### Corrections
     path('lots/comment', views.add_comment, name='api-v4-comment-lots'),
-    path('lots/request-fix', views.request_fix, name='api-v4-request-fix'),
-    path('lots/mark-as-fixed', views.mark_as_fixed, name='api-v4-mark-as-fixed'),
-    path('lots/approve-fix', views.approve_fix, name='api-v4-approve-fix'),
-    path('lots/reject', views.reject_lot, name='api-v4-reject-lots'),
-    path('lots/recall', views.recall_lot, name='api-v4-recall-lots'),
+    path('lots/request-fix', views.request_fix, name='api-v4-request-fix'), #TODO check year
+    path('lots/mark-as-fixed', views.mark_as_fixed, name='api-v4-mark-as-fixed'),#TODO check year
+    path('lots/approve-fix', views.approve_fix, name='api-v4-approve-fix'),#TODO check year
+    path('lots/reject', views.reject_lot, name='api-v4-reject-lots'), #TODO check year
+    path('lots/recall', views.recall_lot, name='api-v4-recall-lots'), #TODO check year
     ### Approval
     path('lots/accept-release-for-consumption', views.accept_rfc, name='api-v4-accept-rfc'), ### is this necessary? MAC are tagged when they are sent usually
-    path('lots/accept-in-stock', views.accept_in_stock, name='api-v4-accept-in-stock'),
-    path('lots/accept-trading', views.accept_trading, name='api-v4-accept-trading'),
-    path('lots/accept-processing', views.accept_processing, name='api-v4-accept-processing'),
-    path('lots/accept-blending', views.accept_blending, name='api-v4-accept-blending'),
-    path('lots/accept-export', views.accept_export, name='api-v4-accept-export'),
-    path('lots/accept-direct-delivery', views.accept_direct_delivery, name='api-v4-accept-direct-delivery'),
-    path('lots/cancel-accept', views.cancel_accept_lots, name='api-v4-cancel-accept'),
+    path('lots/accept-in-stock', views.accept_in_stock, name='api-v4-accept-in-stock'),  #TODO check year
+    path('lots/accept-trading', views.accept_trading, name='api-v4-accept-trading'),  #TODO check year
+    path('lots/accept-processing', views.accept_processing, name='api-v4-accept-processing'),  #TODO check year
+    path('lots/accept-blending', views.accept_blending, name='api-v4-accept-blending'),  #TODO check year
+    path('lots/accept-export', views.accept_export, name='api-v4-accept-export'),  #TODO check year
+    path('lots/accept-direct-delivery', views.accept_direct_delivery, name='api-v4-accept-direct-delivery'),  #TODO check year
+    path('lots/cancel-accept', views.cancel_accept_lots, name='api-v4-cancel-accept'),  #TODO check year
     ### Warnings
     path('lots/toggle-warning', views.toggle_warning, name='api-v4-toggle-warning'),
     path('lots/recalc-score', views.recalc_score, name='api-v4-recalc-score'),
