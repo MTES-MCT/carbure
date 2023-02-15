@@ -30,7 +30,7 @@ const ParentLot = ({ parent_lot }: { parent_lot?: LotPreview }) => {
           <li>
             {parent_lot ? (
               <Button variant="link" action={showLotDetails}>
-                {parent_lot.carbure_id}
+                {`${t("Lot")} #${parent_lot.carbure_id}`}
               </Button>
             ) : (
               t("Inconnu")
