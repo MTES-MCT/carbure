@@ -1,7 +1,8 @@
-.toolip_dropdown {
+.dropdown {
   background: transparent;
   border: none;
   min-width: 20px !important;
+  top: -2px;
 }
 
 .tooltip {
@@ -14,17 +15,15 @@
   word-wrap: break-word;
   background-color: var(--black);
   border-radius: 6px;
-  box-shadow:var(--shadow);
-   /* 0 6px 16px 0 rgb(0 0 0 / 8%), 0 3px 6px -4px rgb(0 0 0 / 12%), 0 9px 28px 8px rgb(0 0 0 / 5%); */
 }
-.tooltip:after {
+.arrow {
   content: "";
   position: absolute;
   width: 9px;
   height: 9px;
-  bottom: 7px;
-  inset-inline: 0;
-  margin: auto 20px;
+  /* bottom: 50px; */
+  /* inset-inline: 0; */
+  margin: -17px 0 0 20px;
   border-radius: 0 0 2px 0;
   transform: translateY(50%) rotate(-135deg);
   box-shadow: 2px 2px 5px rgb(0 0 0 / 5%);
