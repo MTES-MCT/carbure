@@ -1,7 +1,9 @@
 # Carbure
+
 Traçabilité et durabilité des biocarburants, de la production à la distribution
 
 ## Prérequis
+
 - docker
 - docker-compose
 - python3
@@ -32,14 +34,14 @@ par exemple :
 - lancer l'alias ou `pipenv shell`
 
 Dans le dossier /front, téléchargez les modules
-- `npm install`
-
+ `npm install`
 
 Vous pouvez désormais builder les images docker et lancer le projet:
-- `docker-compose build`
-- `docker-compose up -d`
+ `docker-compose build`
+ `docker-compose up -d`
 
 ## Alimenter la base de données de dev
+
 - se connecter à scalingo `scalingo login --api-token $SCALINGO_TOKEN` 
 - Lancer `sh scripts/database/restore_db.sh` pour télécharger un dump contenant des données utilisables en local
 
