@@ -51,9 +51,9 @@ export const TicketSourceFields = ({
           readOnly
         />
       </Fieldset>
-      <Fieldset label={t("Producteur")}>
+      <Fieldset label={t("Production")}>
         <TextInput
-          label={t("Production")}
+          label={t("Producteur")}
           value={
             ticketSource.carbure_producer?.name ??
             ticketSource.unknown_producer ??
