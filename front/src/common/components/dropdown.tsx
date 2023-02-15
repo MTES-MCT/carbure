@@ -119,17 +119,15 @@ export const Dropdown = ({
     }
 
     function onHover(e: FocusEvent) {
+      if (open) return
       if (!isInside(dropdownRef.current, e.relatedTarget)) {
         setOpen(true)
       }
     }
-    function onHoverOut(e: FocusEvent) {
-      const isInsideTrigger = isInside(triggerRef.current, e.target)
-      const isInsideDropdown = isInside(dropdownRef.current, e.target)
 
-      // if (!isInsideDropdown && !isInsideTrigger) {
+    function onHoverOut(e: FocusEvent) {
+      if (!open) return
       setOpen(false)
-      // }
     }
 
     function onKeyDown(e: KeyboardEvent) {

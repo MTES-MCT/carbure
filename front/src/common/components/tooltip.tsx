@@ -1,18 +1,9 @@
-import { useAsyncList } from "common/hooks/async-list"
-import { matches } from "common/utils/collection"
-import { ReactNode, useEffect, useRef, useState } from "react"
 import cl from "clsx"
-import css from "./tooltip.module.css"
-import {
-  defaultNormalizer,
-  Normalizer,
-  normalizeItems,
-  denormalizeItems,
-  Sorter,
-} from "../utils/normalize"
+import { ReactNode, useRef, useState } from "react"
+import { defaultNormalizer, Normalizer, Sorter } from "../utils/normalize"
 import Dropdown, { Trigger } from "./dropdown"
-import { Control, TextInput } from "./input"
-import List, { createQueryFilter, defaultRenderer, Renderer } from "./list"
+import { Control } from "./input"
+import css from "./tooltip.module.css"
 
 export interface TooltipProps<T, V = T> extends Control, Trigger {
   children: ReactNode
@@ -45,18 +36,20 @@ function Tooltip<T, V>({
   ...props
 }: TooltipProps<T, V>) {
   const triggerRef = useRef<HTMLInputElement>(null)
-
+  const [isOpen, setIsOpen] = useState<boolean>()
   return (
     <>
-      <div title={title} ref={triggerRef}>
+      <div ref={triggerRef}>
+        {isOpen && <div className={cl(css.arrow)} style={{}}></div>}
         {children}
       </div>
-
       <Dropdown
         openOnHover={true}
         triggerRef={triggerRef}
         anchor="top start"
-        className={cl(css.toolip_dropdown)}
+        className={cl(css.dropdown)}
+        onOpen={() => setIsOpen(true)}
+        onClose={() => setIsOpen(false)}
       >
         <div className={cl(css.tooltip)}>{title}</div>
       </Dropdown>
