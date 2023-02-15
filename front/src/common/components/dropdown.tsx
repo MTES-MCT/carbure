@@ -34,7 +34,7 @@ export const Dropdown = ({
 }: DropdownProps) => {
   const [open, _setOpen] = useControlledState(false, openControlled, onToggle)
   const dropdownRef = useRef<HTMLDivElement>(null)
-
+  let isHoverTimeout: NodeJS.Timeout
   const setOpen = useCallback(
     (willOpen: boolean) => {
       if (willOpen !== open) {
@@ -117,15 +117,18 @@ export const Dropdown = ({
         setOpen(false)
       }
     }
-
-    function onHover(e: FocusEvent) {
+    let allow = false
+    function onHover(e: MouseEvent) {
       if (open) return
       if (!isInside(dropdownRef.current, e.relatedTarget)) {
-        setOpen(true)
+        isHoverTimeout = setTimeout(() => {
+          setOpen(true)
+        }, 150)
       }
     }
 
-    function onHoverOut(e: FocusEvent) {
+    function onHoverOut(e: MouseEvent) {
+      isHoverTimeout && clearTimeout(isHoverTimeout)
       if (!open) return
       setOpen(false)
     }
