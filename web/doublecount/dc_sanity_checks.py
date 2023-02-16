@@ -1,6 +1,5 @@
 from typing import List, TypedDict
-from django.db.models import Sum, QuerySet
-from doublecount.models import DoubleCountingAgreement, DoubleCountingProduction, DoubleCountingSourcing
+from doublecount.models import DoubleCountingProduction, DoubleCountingSourcing
 from core.models import Biocarburant, MatierePremiere
 from doublecount.dc_parser import ProductionRow, SourcingRow
 
@@ -87,9 +86,6 @@ def check_dc_globally(
 ) -> List[DcError]:
     errors: List[DcError] = []
 
-    # sourcing = DoubleCountingSourcing.objects.filter(dca_id=dca.id)
-    # production = DoubleCountingProduction.objects.filter(dca_id=dca.id)
-
     errors += check_sourcing_vs_production(sourcing, production)
     errors += check_pome_excess(production)
 
@@ -126,19 +122,15 @@ def check_sourcing_vs_production(
 
     for year in production_by_year_by_feedstock:
         for feedstock in production_by_year_by_feedstock[year]:
-            try:
-                production = production_by_year_by_feedstock[year].get(feedstock, 0)
-                sourcing = sourcing_by_year_by_feedstock.get(year, {}).get(feedstock, 0)
-                # check that the sourced amount of feedstock roughly matches the total production generated with this feedstock
-                if production > sourcing:
-                    meta = {"feedstock": feedstock, "year": year, "sourcing": sourcing, "production": production}  # fmt:skip
-                    errors.append(error(DoubleCountingError.PRODUCTION_MISMATCH_SOURCING, meta=meta))
-            except:
+            production = production_by_year_by_feedstock[year].get(feedstock, 0)
+            sourcing = sourcing_by_year_by_feedstock.get(year, {}).get(feedstock, 0)
+            # check that the sourced amount of feedstock roughly matches the total production generated with this feedstock
+            if production > sourcing:
                 meta = {
-                    "feedstock": p["feedstock__code"],
-                    "year": p["year"],
-                    "sourcing": 0,
-                    "production": p["quantity"],
+                    "feedstock": feedstock,
+                    "year": year,
+                    "sourcing": sourcing,
+                    "production": production,
                 }
                 errors.append(error(DoubleCountingError.PRODUCTION_MISMATCH_SOURCING, meta=meta))
 

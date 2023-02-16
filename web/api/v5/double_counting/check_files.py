@@ -66,11 +66,11 @@ def check_dc_file(file):
             for chunk in file.chunks():
                 destination.write(chunk)
 
-        info, sourcing_history, sourcing_forecast, production = parse_dc_excel(filepath)
+        info, sourcing_history, sourcing_forecast, production_forecast = parse_dc_excel(filepath)
 
         # get dc period for upload
-        years = [sourcing["year"] for sourcing in sourcing_forecast]
-        end_year = max(years)
+        years = [production["year"] for production in production_forecast]
+        end_year = max(years) if len(years) > 0 else info["year"] + 1
         start = datetime.date(end_year - 1, 1, 1)
         end = datetime.date(end_year, 12, 31)
 
@@ -80,13 +80,12 @@ def check_dc_file(file):
             period_end=end,
         )
 
-        _, sourcing_history_errors = load_dc_sourcing_data(dca, sourcing_history)
-        sourcing_data, sourcing_forecast_errors = load_dc_sourcing_data(dca, sourcing_forecast)
-        production_data, production_errors = load_dc_production_data(dca, production)
-        global_errors = check_dc_globally(sourcing_data, production_data)
+        sourcing_history_data, sourcing_history_errors = load_dc_sourcing_data(dca, sourcing_history)
+        sourcing_forecast_data, sourcing_forecast_errors = load_dc_sourcing_data(dca, sourcing_forecast)
+        production_data, production_errors = load_dc_production_data(dca, production_forecast)
 
-        if not info["year"]:
-            info["year"] = end_year - 1
+        sourcing_data = sourcing_history_data + sourcing_forecast_data
+        global_errors = check_dc_globally(sourcing_data, production_data)
 
         return info, {
             "sourcing_history": sourcing_history_errors,
