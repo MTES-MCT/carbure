@@ -73,6 +73,16 @@ Lorsque des changement sont effectué sur la base de donnée :
 `docker exec carbure_app python3 web/manage.py test api.v5.saf.airline.tests.tests_ticket_details.SafTicketDetailsTest`
 - Pour éviter de reconstruire la db de test à chaque fois, on peut ajouter l'option `--keepdb` à la fin de la commande
 
+# Utiliser la console scalingo
+`scalingo -a carbure-{prod|dev|staging} run bash`
+`python web/manage.py shell`
+
+example : 
+```
+>>> from core.models import Entity
+>>> entities = Entity.objects.filter(registered_address__isnull=False)
+>>> entities.count()
+```
 
 ## Étapes spécifiques pour windows
 - setup wsl2: https://docs.microsoft.com/en-us/windows/wsl/install-win10
