@@ -12,13 +12,10 @@ from numpy import deprecate
 
 usermodel = get_user_model()
 
-# patch to fix django-silk crashing if the é is read
-operator = "Operateur" if settings.DEBUG else "Opérateur"
-
 
 class Entity(models.Model):
     PRODUCER = 'Producteur'
-    OPERATOR = operator
+    OPERATOR = 'Opérateur'
     TRADER = 'Trader'
     ADMIN = 'Administration'
     AUDITOR = 'Auditor'
