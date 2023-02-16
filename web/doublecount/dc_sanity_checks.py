@@ -63,9 +63,6 @@ def check_production_row(production: DoubleCountingProduction, data: ProductionR
     elif not production.biofuel_id:
         errors.append(error(DoubleCountingError.UNKNOWN_BIOFUEL, line, {"biofuel": data["biofuel"]}))
 
-    if not production.estimated_production or not data["estimated_production"]:
-        errors.append(error(DoubleCountingError.MISSING_ESTIMATED_PRODUCTION, line))
-
     if production.feedstock_id and production.biofuel_id:
         incompatibilities = check_compatibility_feedstock_biofuel(production.feedstock, production.biofuel)
         meta = {"feedstock": production.feedstock.code, "biofuel": production.biofuel.code, "infos": incompatibilities}
