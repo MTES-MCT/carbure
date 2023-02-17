@@ -1,7 +1,9 @@
 # Carbure
+
 Traçabilité et durabilité des biocarburants, de la production à la distribution
 
 ## Prérequis
+
 - docker
 - docker-compose
 - python3
@@ -32,14 +34,14 @@ par exemple :
 - lancer l'alias ou `pipenv shell`
 
 Dans le dossier /front, téléchargez les modules
-- `npm install`
-
+ `npm install`
 
 Vous pouvez désormais builder les images docker et lancer le projet:
-- `docker-compose build`
-- `docker-compose up -d`
+ `docker-compose build`
+ `docker-compose up -d`
 
 ## Alimenter la base de données de dev
+
 - se connecter à scalingo `scalingo login --api-token $SCALINGO_TOKEN` 
 - Lancer `sh scripts/database/restore_db.sh` pour télécharger un dump contenant des données utilisables en local
 
@@ -57,7 +59,7 @@ Vous pouvez désormais builder les images docker et lancer le projet:
 - Ensuite aller sur http://carbure.local:8090/auth/login
 - Utiliser les informations renseignées à l'étape 1 puis valider l'authentification
 - Carbure demande d'entrer un code envoyé par email
-- Dans la version de dev ce code sera uniquement affiché dans les logs de django, visibles en tapant `docker logs carbure_app`
+- Dans la version de dev ce code sera uniquement affiché dans les logs de django, visibles en tapant `docker logs carbure_app`Run all the tests
 
 # Effectuer une migration
 Lorsque des changement sont effectué sur la base de donnée :
@@ -66,9 +68,21 @@ Lorsque des changement sont effectué sur la base de donnée :
 
 # Lancer les tests backend
 - Run all the tests in the api.v5.saf module
-`docker exec carbure_app python3 web/manage.py api.v5.saf`
+`docker exec carbure_app python3 web/manage.py test api.v5.saf`
 - Run just one test
-`docker exec carbure_app python3 web/manage.py api.v5.saf.airline.tests.tests_ticket_details.SafTicketDetailsTest`
+`docker exec carbure_app python3 web/manage.py test api.v5.saf.airline.tests.tests_ticket_details.SafTicketDetailsTest`
+- Pour éviter de reconstruire la db de test à chaque fois, on peut ajouter l'option `--keepdb` à la fin de la commande
+
+# Utiliser la console scalingo
+`scalingo -a carbure-{prod|dev|staging} run bash`
+`python web/manage.py shell`
+
+example : 
+```
+>>> from core.models import Entity
+>>> entities = Entity.objects.filter(registered_address__isnull=False)
+>>> entities.count()
+```
 
 ## Étapes spécifiques pour windows
 - setup wsl2: https://docs.microsoft.com/en-us/windows/wsl/install-win10

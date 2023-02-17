@@ -6,6 +6,7 @@ import { multipleSelection } from "../utils/selection"
 import css from "./table.module.css"
 import { Col, LoaderOverlay } from "./scaffold"
 import { ChevronRight } from "./icons"
+import Tooltip from "./tooltip"
 
 export type TableVariant = "spaced" | "compact"
 
@@ -260,9 +261,11 @@ export const Cell = ({
       className={cl(css.multiline, variant && css[variant], className)}
       style={style}
     >
-      <strong title={`${text}`}>
-        {text || sub} {icon}
-      </strong>
+      <Tooltip title={`${text || sub}`}>
+        <strong>
+          {text || sub} {icon}
+        </strong>
+      </Tooltip>
       {text && sub !== undefined && <small title={`${sub}`}>{sub}</small>}
     </Col>
   )
