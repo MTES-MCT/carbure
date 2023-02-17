@@ -7,6 +7,9 @@ export interface Entity {
   sustainability_officer_phone_number: string
   sustainability_officer: string
   registered_address: string
+  registered_city: string
+  registered_zipcode: string
+  registered_country: string
   has_mac: boolean
   has_trading: boolean
   has_stocks: boolean

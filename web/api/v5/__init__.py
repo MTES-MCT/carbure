@@ -5,5 +5,6 @@ urlpatterns = [
     path("stats/", include("api.v5.stats")),
     path("double-counting/", include("api.v5.double_counting")),
     path("admin/", include("api.v5.admin")),
+    path("settings/", include("api.v5.settings")),
     path("declarations/", include("api.v5.declarations")),
 ]
