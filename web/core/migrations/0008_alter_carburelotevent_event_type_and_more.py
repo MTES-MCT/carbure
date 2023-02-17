@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("core", "0007_alter_externaladminrights_right"),
+        ("core", "0008_entity_registered_city_entity_registered_country_and_more"),
     ]
 
     operations = [

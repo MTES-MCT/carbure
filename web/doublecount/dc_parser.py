@@ -123,8 +123,8 @@ def parse_production(excel_file: Workbook) -> List[ProductionRow]:
 
         biofuel_name = row[2].value
         feedstock_name = row[3].value
-        max_production_capacity = row[4].value
-        estimated_production = row[9].value
+        max_production_capacity = row[4].value or 0
+        estimated_production = row[9].value or 0
 
         if current_year == -1 or not feedstock_name or not biofuel_name:
             continue

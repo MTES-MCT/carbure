@@ -26,6 +26,9 @@ const CompanyInfo = () => {
       entity.sustainability_officer_phone_number as string | undefined,
     sustainability_officer: entity.sustainability_officer as string | undefined,
     registered_address: entity.registered_address as string | undefined,
+    registered_city: entity.registered_city as string | undefined,
+    registered_zipcode: entity.registered_zipcode as string | undefined,
+    registered_country: entity.registered_country as string | undefined,
   })
 
   const canSave = hasChange(entity, formEntity)
@@ -66,6 +69,9 @@ const CompanyInfo = () => {
                 formEntity.legal_name!,
                 formEntity.registration_id!,
                 formEntity.registered_address!,
+                formEntity.registered_zipcode!,
+                formEntity.registered_city!,
+                formEntity.registered_country!,
                 formEntity.sustainability_officer!,
                 formEntity.sustainability_officer_phone_number!
               )
@@ -84,8 +90,23 @@ const CompanyInfo = () => {
           />
           <TextInput
             readOnly={!canModify}
-            label={t("Addresse de la société")}
+            label={t("Adresse de la société (Numéro et rue)")}
             {...bind("registered_address")}
+          />
+          <TextInput
+            readOnly={!canModify}
+            label={t("Ville")}
+            {...bind("registered_city")}
+          />
+          <TextInput
+            readOnly={!canModify}
+            label={t("Code postal")}
+            {...bind("registered_zipcode")}
+          />
+          <TextInput
+            readOnly={!canModify}
+            label={t("Pays")}
+            {...bind("registered_country")}
           />
           <TextInput
             readOnly={!canModify}
@@ -115,7 +136,10 @@ function hasChange(entity: Partial<Entity>, formEntity: Partial<Entity>) {
     entity.sustainability_officer !== formEntity.sustainability_officer ||
     entity.sustainability_officer_phone_number !==
       formEntity.sustainability_officer_phone_number ||
-    entity.registered_address !== formEntity.registered_address
+    entity.registered_address !== formEntity.registered_address ||
+    entity.registered_city !== formEntity.registered_city ||
+    entity.registered_zipcode !== formEntity.registered_zipcode ||
+    entity.registered_country !== formEntity.registered_country
   )
 }
 

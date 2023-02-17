@@ -126,7 +126,7 @@ h2 + .table[data-headless] {
 }
 
 .header,
-.cell .multiline > * {
+.cell .multiline > *, .cell .multiline div > * {
   display: block;
   white-space: nowrap;
   text-overflow: ellipsis;

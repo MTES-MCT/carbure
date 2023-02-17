@@ -12,13 +12,10 @@ from numpy import deprecate
 
 usermodel = get_user_model()
 
-# patch to fix django-silk crashing if the é is read
-operator = "Operateur" if settings.DEBUG else "Opérateur"
-
 
 class Entity(models.Model):
     PRODUCER = 'Producteur'
-    OPERATOR = operator
+    OPERATOR = 'Opérateur'
     TRADER = 'Trader'
     ADMIN = 'Administration'
     AUDITOR = 'Auditor'
@@ -45,6 +42,9 @@ class Entity(models.Model):
     sustainability_officer_phone_number = models.CharField(max_length=32, blank=True, default='')
     sustainability_officer = models.CharField(max_length=256, blank=True, default='')
     registered_address = models.TextField(blank=True, default='')
+    registered_zipcode = models.TextField(blank=True, default='')
+    registered_city = models.TextField(blank=True, default='')
+    registered_country = models.TextField(blank=True, default='')
     hash = models.CharField(max_length=32, null=True, blank=True, default='')
     default_certificate = models.CharField(max_length=64, null=True, blank=True, default='')
     notifications_enabled = models.BooleanField(default=False)
@@ -59,7 +59,7 @@ class Entity(models.Model):
             'has_mac': self.has_mac, 'has_trading': self.has_trading, 'has_direct_deliveries': self.has_direct_deliveries, 'has_stocks': self.has_stocks,
             'legal_name': self.legal_name, 'registration_id': self.registration_id,
             'sustainability_officer': self.sustainability_officer, 'sustainability_officer_phone_number': self.sustainability_officer_phone_number,
-            'registered_address': self.registered_address, 'default_certificate': self.default_certificate, 'preferred_unit': self.preferred_unit,
+            'registered_address': self.registered_address,'registered_zipcode': self.registered_zipcode,'registered_city': self.registered_city,'registered_country': self.registered_country, 'default_certificate': self.default_certificate, 'preferred_unit': self.preferred_unit,
             'has_saf': self.has_saf}
         if self.entity_type == Entity.EXTERNAL_ADMIN:
             d['ext_admin_pages'] = [e.right for e in self.externaladminrights_set.all()]

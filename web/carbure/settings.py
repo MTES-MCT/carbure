@@ -138,9 +138,14 @@ DEFAULT_AUTO_FIELD='django.db.models.AutoField'
 # Load db setup from DATABASE_URL env variable
 DATABASES = {"default": env.db()}
 
+DATABASES["default"]["OPTIONS"] = {
+    "charset": "utf8mb4",
+}
+
 if env('TEST') == 1:
     print("DB TESTING MODE")
     DATABASES['default']['OPTIONS'] = {
+        **DATABASES['default']['OPTIONS'],
         'auth_plugin': 'mysql_native_password'
     }
 

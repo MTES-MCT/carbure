@@ -17,6 +17,7 @@ export interface DropdownProps extends Trigger {
   children: React.ReactNode | CustomRenderer
   className?: string
   style?: React.CSSProperties
+  openOnHover?: boolean
 }
 
 export const Dropdown = ({
@@ -29,10 +30,11 @@ export const Dropdown = ({
   onClose,
   onToggle,
   anchor = "bottom start",
+  openOnHover = false,
 }: DropdownProps) => {
   const [open, _setOpen] = useControlledState(false, openControlled, onToggle)
   const dropdownRef = useRef<HTMLDivElement>(null)
-
+  let isHoverTimeout: NodeJS.Timeout
   const setOpen = useCallback(
     (willOpen: boolean) => {
       if (willOpen !== open) {
@@ -55,7 +57,7 @@ export const Dropdown = ({
 
     const position = computeAnchoredPosition(triggerBox, dropdownBox, anchor)
     // Object.assign(dropdown.style, position)
-    dropdown!.style.transform = `translate3d(${position.left}px, ${position.top}px, 0)`;
+    dropdown!.style.transform = `translate3d(${position.left}px, ${position.top}px, 0)`
     dropdown.style.minWidth = `${triggerBox.width}px`
   })
 
@@ -115,6 +117,21 @@ export const Dropdown = ({
         setOpen(false)
       }
     }
+    let allow = false
+    function onHover(e: MouseEvent) {
+      if (open) return
+      if (!isInside(dropdownRef.current, e.relatedTarget)) {
+        isHoverTimeout = setTimeout(() => {
+          setOpen(true)
+        }, 150)
+      }
+    }
+
+    function onHoverOut(e: MouseEvent) {
+      isHoverTimeout && clearTimeout(isHoverTimeout)
+      if (!open) return
+      setOpen(false)
+    }
 
     function onKeyDown(e: KeyboardEvent) {
       switch (e.key) {
@@ -132,6 +149,11 @@ export const Dropdown = ({
       }
     }
 
+    if (openOnHover) {
+      trigger.addEventListener("mouseover", onHover)
+      trigger.addEventListener("mouseout", onHoverOut)
+    }
+
     window.addEventListener("click", onClickOustide)
     trigger.addEventListener("click", onClick)
     trigger.addEventListener("keydown", onKeyDown, true)
@@ -139,6 +161,12 @@ export const Dropdown = ({
 
     return () => {
       window.removeEventListener("click", onClickOustide)
+
+      if (openOnHover) {
+        trigger.removeEventListener("mouseover", onHover)
+        trigger.removeEventListener("mouseout", onHoverOut)
+      }
+
       trigger.removeEventListener("click", onClick)
       trigger.removeEventListener("keydown", onKeyDown, true)
       trigger.removeEventListener("blur", onBlur, true)
