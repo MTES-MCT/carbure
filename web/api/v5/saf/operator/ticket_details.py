@@ -26,7 +26,10 @@ def get_ticket_details(request, *args, **kwargs):
     try:
         ticket_filter = Q(id=ticket_id) & (Q(supplier_id=entity_id) | Q(client_id=entity_id))
         ticket = SafTicket.objects.select_related("parent_ticket_source").get(ticket_filter)
+        if ticket.supplier.id != entity_id:
+            ticket.parent_ticket_source = None
         serialized = SafTicketDetailsSerializer(ticket)
+
         return SuccessResponse(serialized.data)
     except Exception:
         traceback.print_exc()

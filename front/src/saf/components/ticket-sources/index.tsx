@@ -140,11 +140,8 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
         path="ticket-source/:id"
         element={<TicketSourceDetail neighbors={ids} />}
       />
-      <HashRoute path="lot/:id" element={<LotDetails neighbors={[]} />} />
-      <HashRoute
-        path="ticket/:id"
-        element={<OperatorTicketDetails neighbors={[]} />}
-      />
+      <HashRoute path="lot/:id" element={<LotDetails />} />
+      <HashRoute path="ticket/:id" element={<OperatorTicketDetails />} />
     </>
   )
 }
