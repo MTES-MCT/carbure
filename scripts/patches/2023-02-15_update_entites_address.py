@@ -93,10 +93,17 @@ def update_entites_address():
     entity.registered_country = "Spain"
     entity.save()
 
-    entity = Entity.objects.get(id=95)
-    entity.registered_address = "2 place Jean Millier - La Défense 6, 92400 Courbevoie, "
+    entity = Entity.objects.get(id=61)
+    entity.registered_address = "11 rue Pasteur "
     entity.registered_zipcode = "02390"
     entity.registered_city = "ORIGNY-SAINTE-BENOITE"
+    entity.registered_country = "France"
+    entity.save()
+
+    entity = Entity.objects.get(id=95)
+    entity.registered_address = "2 place Jean Millier - La Défense 6,"
+    entity.registered_zipcode = "92400"
+    entity.registered_city = "Courbevoie"
     entity.registered_country = "France"
     entity.save()
 
