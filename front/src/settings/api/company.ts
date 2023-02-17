@@ -37,14 +37,20 @@ export function updateEntity(
   legal_name: string,
   registration_id: string,
   registered_address: string,
+  registered_zipcode: string,
+  registered_city: string,
+  registered_country: string,
   sustainability_officer: string,
   sustainability_officer_phone_number: string
 ) {
-  return api.post("/update-entity", {
+  return api.post("/v5/settings/update-entity", {
     entity_id,
     legal_name,
     registration_id,
     registered_address,
+    registered_zipcode,
+    registered_city,
+    registered_country,
     sustainability_officer,
     sustainability_officer_phone_number,
   })
