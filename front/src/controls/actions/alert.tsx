@@ -1,24 +1,24 @@
-import { useMemo } from "react"
-import { useTranslation } from "react-i18next"
-import { Lot } from "transactions/types"
-import pickApi from "../api"
 import useEntity, { EntityManager } from "carbure/hooks/entity"
-import { useMutation } from "common/hooks/async"
-import { useNotify } from "common/components/notifications"
-import { variations } from "common/utils/formatters"
 import Button from "common/components/button"
+import Checkbox from "common/components/checkbox"
 import Dialog from "common/components/dialog"
+import Form, { useForm } from "common/components/form"
 import {
   AlertTriangle,
   AlertTriangleOff,
   Return,
 } from "common/components/icons"
-import { usePortal } from "common/components/portal"
-import { useStatus } from "../components/status"
 import { TextInput } from "common/components/input"
+import { useNotify } from "common/components/notifications"
+import { usePortal } from "common/components/portal"
+import { useMutation } from "common/hooks/async"
+import { variations } from "common/utils/formatters"
+import { useMemo } from "react"
+import { useTranslation } from "react-i18next"
+import { Lot } from "transactions/types"
+import pickApi from "../api"
 import { ControlLotSummary } from "../components/lots/control-lot-summary"
-import Checkbox from "common/components/checkbox"
-import Form, { useForm } from "common/components/form"
+import { useStatus } from "../components/status"
 
 export interface AlertManyButtonProps {
   disabled?: boolean

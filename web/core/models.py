@@ -5,11 +5,13 @@ from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 import hashlib
+from calendar import monthrange
 from django.db.models.signals import pre_delete, pre_save
 from django.dispatch import receiver
 from numpy import deprecate
 
 usermodel = get_user_model()
+
 
 class Entity(models.Model):
     PRODUCER = 'Producteur'
@@ -315,6 +317,23 @@ class SustainabilityDeclaration(models.Model):
     def natural_key(self):
         return {'id': self.id,'entity': self.entity.natural_key(), 'declared': self.declared, 'period': self.period, 'deadline': self.deadline, 'checked': self.checked, 'month': self.period.month, 'year': self.period.year, 'reminder_count': self.reminder_count}
 
+    def init_declaration(entity_id: int, period: int):
+        year = int(period / 100)
+        month = period % 100
+        period_d = datetime.date(year=year, month=month, day=1)
+        nextmonth = period_d + datetime.timedelta(days=31)
+        (_, lastday) = monthrange(nextmonth.year, nextmonth.month)
+        deadline = datetime.date(year=nextmonth.year, month=nextmonth.month, day=lastday)
+
+        declaration, _ = SustainabilityDeclaration.objects.get_or_create(
+            entity_id=entity_id,
+            period=period_d,
+            deadline=deadline,
+        )
+
+        return declaration
+
+
     class Meta:
         db_table = 'declarations'
         verbose_name = ' Déclaration de Durabilité'
@@ -498,8 +517,8 @@ class CarbureLot(models.Model):
     ghg_reduction_red_ii = models.FloatField(default=0.0)
 
     added_by = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
-    parent_lot = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
-    parent_stock = models.ForeignKey('CarbureStock', null=True, blank=True, on_delete=models.CASCADE)
+    parent_lot = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
+    parent_stock = models.ForeignKey('CarbureStock', null=True, blank=True, on_delete=models.SET_NULL)
 
     free_field = models.TextField(blank=True, null=True, default=None)
 
@@ -536,6 +555,8 @@ class CarbureLot(models.Model):
                    models.Index(fields=['year', 'period', 'lot_status']),
                    models.Index(fields=['year', 'period', 'carbure_client']),
                    models.Index(fields=['year', 'period', 'carbure_supplier']),
+                   models.Index(fields=['parent_lot']),
+                   models.Index(fields=['parent_stock']),
                   ]
         verbose_name = 'CarbureLot'
         verbose_name_plural = 'CarbureLots'
@@ -640,8 +661,10 @@ class CarbureLot(models.Model):
                 config.meta['feedstock_registered'] = True
             if self.biofuel.id in prefetched_data['production_sites'][self.carbure_production_site.id]['biofuel_ids']:
                 config.meta['biofuel_registered'] = True
-        if self.carbure_delivery_site and self.carbure_client and self.carbure_client.id in prefetched_data['depotsbyentity'] and self.carbure_delivery_site.depot_id in prefetched_data['depotsbyentity'][self.carbure_client.id]:
-            config.meta['delivery_site_registered'] = True
+
+        if self.carbure_delivery_site and self.carbure_client:
+            if self.carbure_client.id in prefetched_data['depotsbyentity'] and self.carbure_delivery_site.depot_id in prefetched_data['depotsbyentity'][self.carbure_client.id]:
+                config.meta['delivery_site_registered'] = True
         if config.meta['feedstock_registered'] and config.meta['biofuel_registered'] and config.meta['delivery_site_registered']:
             config.score = 1
 
@@ -740,9 +763,13 @@ class CarbureStockTransformation(models.Model):
 
     class Meta:
         db_table = 'carbure_stock_transformations'
-        indexes = [models.Index(fields=['entity']),]
         verbose_name = 'CarbureStockTransformation'
         verbose_name_plural = 'CarbureStockTransformation'
+        indexes = [
+            models.Index(fields=['entity']),
+            models.Index(fields=['source_stock']),
+            models.Index(fields=['dest_stock']),
+        ]
 
 @receiver(pre_save, sender=CarbureLot)
 def lot_pre_save_gen_carbure_id(sender, instance, *args, **kwargs):
@@ -825,6 +852,8 @@ class CarbureStock(models.Model):
         indexes = [
             models.Index(fields=['carbure_client']),
             models.Index(fields=['carbure_client', 'depot']),
+            models.Index(fields=['parent_lot']),
+            models.Index(fields=['parent_transformation']),
         ]
         verbose_name = 'CarbureStock'
         verbose_name_plural = 'CarbureStocks'
@@ -877,6 +906,7 @@ def stock_pre_save_gen_carbure_id(sender, instance, *args, **kwargs):
 class CarbureLotEvent(models.Model):
     CREATED = "CREATED"
     UPDATED = "UPDATED"
+    UPDATED_BY_ADMIN = "UPDATED_BY_ADMIN"
     VALIDATED = "VALIDATED"
     FIX_REQUESTED = "FIX_REQUESTED"
     MARKED_AS_FIXED = "MARKED_AS_FIXED"
@@ -887,11 +917,12 @@ class CarbureLotEvent(models.Model):
     DECLARED = "DECLARED"
     DECLCANCEL = "DECLCANCEL"
     DELETED = "DELETED"
+    DELETED_BY_ADMIN = "DELETED_BY_ADMIN"
     RESTORED = "RESTORED"
     CANCELLED = "CANCELLED"
     EVENT_TYPES = ((CREATED, CREATED), (UPDATED, UPDATED), (VALIDATED, VALIDATED), (FIX_REQUESTED, FIX_REQUESTED), (MARKED_AS_FIXED, MARKED_AS_FIXED),
                     (FIX_ACCEPTED, FIX_ACCEPTED), (ACCEPTED, ACCEPTED), (REJECTED, REJECTED), (RECALLED, RECALLED), (DECLARED, DECLARED), (DELETED, DELETED), (DECLCANCEL, DECLCANCEL),
-                    (RESTORED, RESTORED),(CANCELLED, CANCELLED))
+                    (RESTORED, RESTORED),(CANCELLED, CANCELLED), (UPDATED_BY_ADMIN, UPDATED_BY_ADMIN), (DELETED_BY_ADMIN, DELETED_BY_ADMIN))
     event_type = models.CharField(max_length=32, null=False, blank=False, choices=EVENT_TYPES)
     event_dt = models.DateTimeField(auto_now_add=True, null=False, blank=False)
     lot = models.ForeignKey(CarbureLot, null=False, blank=False, on_delete=models.CASCADE)
@@ -1014,10 +1045,12 @@ class CarbureNotification(models.Model):
     SAF_TICKET_RECEIVED = "SAF_TICKET_RECEIVED"
     SAF_TICKET_ACCEPTED = "SAF_TICKET_ACCEPTED"
     SAF_TICKET_REJECTED = "SAF_TICKET_REJECTED"
+    LOTS_UPDATED_BY_ADMIN = "LOTS_UPDATED_BY_ADMIN"
+    LOTS_DELETED_BY_ADMIN = "LOTS_DELETED_BY_ADMIN"
 
     NOTIFICATION_TYPES = [
         (CORRECTION_REQUEST, CORRECTION_REQUEST), (CORRECTION_DONE, CORRECTION_DONE), (LOTS_REJECTED, LOTS_REJECTED), (LOTS_RECEIVED, LOTS_RECEIVED), (LOTS_RECALLED, LOTS_RECALLED), (CERTIFICATE_EXPIRED, CERTIFICATE_EXPIRED), (DECLARATION_VALIDATED, DECLARATION_VALIDATED), (DECLARATION_CANCELLED, DECLARATION_CANCELLED), (DECLARATION_REMINDER, DECLARATION_REMINDER),
-        (SAF_TICKET_REJECTED, SAF_TICKET_REJECTED), (SAF_TICKET_ACCEPTED, SAF_TICKET_ACCEPTED), (SAF_TICKET_RECEIVED, SAF_TICKET_RECEIVED)
+        (SAF_TICKET_REJECTED, SAF_TICKET_REJECTED), (SAF_TICKET_ACCEPTED, SAF_TICKET_ACCEPTED), (SAF_TICKET_RECEIVED, SAF_TICKET_RECEIVED), (LOTS_UPDATED_BY_ADMIN, LOTS_UPDATED_BY_ADMIN), (LOTS_DELETED_BY_ADMIN, LOTS_DELETED_BY_ADMIN)
     ]
 
     dest = models.ForeignKey(Entity, blank=False, null=False, on_delete=models.CASCADE)

@@ -147,3 +147,10 @@ dump.rdb
 web/static
 
 files
+
+# Script generated files
+integrity_checks.json
+sanity_checks.json
+
+# specific sql queries
+!get_traceability_nodes.sql

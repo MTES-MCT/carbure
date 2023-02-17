@@ -171,15 +171,23 @@ def compute_lot_quantity(lot, data):
     weight = None
     lhv_amount = None
 
+    # normalize the given data in the form of a (quantity, unit) couple
     if data.get('quantity') is not None and data.get('unit') is not None:
         quantity = round(float(data.get('quantity')), 2)
         unit = data.get('unit', CarbureUnit.LITER).lower()
     elif data.get('volume') is not None:
         quantity = round(float(data.get('volume')), 2)
         unit = CarbureUnit.LITER
+    elif data.get('weight') is not None:
+        quantity = round(float(data.get('weight')), 2)
+        unit = CarbureUnit.KILOGRAM
+    elif data.get('lhv_amount') is not None:
+        quantity = round(float(data.get('lhv_amount')), 2)
+        unit = CarbureUnit.LHV
     else:
-        raise Exception("No quantity or volume was specified")
+        raise Exception("No quantity was specified")
 
+    # compute the different quantity values based on the previous config
     if unit == CarbureUnit.LITER:
         volume = quantity
         weight = round(volume * lot.biofuel.masse_volumique, 2)

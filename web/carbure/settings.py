@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
-from django_query_profiler.settings import *
 
 import environ
 env = environ.Env(
@@ -22,7 +21,6 @@ env = environ.Env(
     CARBURE_HOME=(str, ""),
     ALLOWED_HOSTS=(list, ["localhost"]),
     CSRF_TRUSTED_ORIGINS=(list, ["http://localhost:8000"]),
-    DJANGO_QUERY_PROFILER_REDIS_HOST=(str, "localhost"),
     DATABASE_URL=(str, ""),
     REDIS_URL=(str, ""),
     SENTRY_DSN=(str, ""),
@@ -140,9 +138,14 @@ DEFAULT_AUTO_FIELD='django.db.models.AutoField'
 # Load db setup from DATABASE_URL env variable
 DATABASES = {"default": env.db()}
 
+DATABASES["default"]["OPTIONS"] = {
+    "charset": "utf8mb4",
+}
+
 if env('TEST') == 1:
     print("DB TESTING MODE")
     DATABASES['default']['OPTIONS'] = {
+        **DATABASES['default']['OPTIONS'],
         'auth_plugin': 'mysql_native_password'
     }
 
@@ -253,11 +256,10 @@ HUEY = {
     'consumer': {'workers': 2}
 }
 
-
 if DEBUG:
-    INSTALLED_APPS += ['django_query_profiler']
-    DATABASES["default"]["ENGINE"] = "django_query_profiler." + DATABASES["default"]["ENGINE"]
-    MIDDLEWARE = ['django_query_profiler.client.middleware.QueryProfilerMiddleware'] + MIDDLEWARE
+    INSTALLED_APPS += ['silk']
+    MIDDLEWARE += ['silk.middleware.SilkyMiddleware']
+    MIDDLEWARE.remove("csp.middleware.CSPMiddleware")
 
 
 # CSP header configuration
@@ -265,3 +267,13 @@ CSP_DEFAULT_SRC=("'self'", "stats.data.gouv.fr", "metabase.carbure.beta.gouv.fr"
 
 # Metabase API key
 METABASE_SECRET_KEY = env('METABASE_SECRET_KEY')
+
+# Max upload size
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
+
+# Silky profiler config
+SILKY_PYTHON_PROFILER = True
+SILKY_ANALYZE_QUERIES = True
+SILKY_AUTHENTICATION = False
+SILKY_AUTHORISATION = True
+SILKY_PYTHON_PROFILER_BINARY = True

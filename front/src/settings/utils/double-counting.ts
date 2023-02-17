@@ -4,11 +4,18 @@ import {
 } from "double-counting/types"
 import { t } from "i18next"
 
-export function getErrorText(error: DoubleCountingUploadError) {
-  let errorText =
-    (error.line_number ?? -1) >= 0
-      ? t("Ligne {{lineNumber}} : ", { lineNumber: error.line_number })
-      : ""
+export function getErrorText(
+  error: DoubleCountingUploadError,
+  showLine?: string
+) {
+  let errorText = ""
+
+  if (showLine) {
+    errorText +=
+      (error.line_number ?? -1) >= 0
+        ? t("Ligne {{lineNumber}} : ", { lineNumber: error.line_number })
+        : ""
+  }
 
   switch (error.error) {
     case DoubleCountingUploadErrorType.UnkownFeedstock:
@@ -63,12 +70,15 @@ export function getErrorText(error: DoubleCountingUploadError) {
       break
     case DoubleCountingUploadErrorType.PomeGt2000:
       errorText += t(
-        "La production estimée de biocarburant à partir de EFFLUENTS_HUILERIES_PALME_RAFLE ne doit pas excéder 2000 tonnes par an pour une usine de production."
+        "En {{year}}, les biocarburants issus d'effluents d'huilerie de palme et rafles ne seront pas reconnus au double comptage au delà d'une production total de 2000 tonnes par unité de production.",
+        { year: error?.meta?.year }
       )
       break
 
     default:
-      errorText += t("Erreur de validation") + ` (${error.error})`
+      errorText +=
+        t("Erreur de validation") +
+        `: ${error.error}${error.meta ? " " + error.meta : ""}`
       break
   }
 

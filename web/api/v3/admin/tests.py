@@ -36,7 +36,7 @@ class AdminAPITest(TestCase):
         self.entity1, _ = Entity.objects.update_or_create(name='Le Super Producteur 1', entity_type='Producteur')
         self.entity2, _ = Entity.objects.update_or_create(name='Le Super Producteur 2', entity_type='Producteur')
         self.entity3, _ = Entity.objects.update_or_create(name='Le Super Administrateur 1', entity_type=Entity.ADMIN)
-        self.entity4, _ = Entity.objects.update_or_create(name='Le Super Operateur 1', entity_type='Opérateur')
+        self.entity4, _ = Entity.objects.update_or_create(name='Le Super Operateur 1', entity_type=Entity.OPERATOR)
         self.entity5, _ = Entity.objects.update_or_create(name='Le Super Trader 1', entity_type='Trader')        
 
         # some rights
@@ -132,9 +132,9 @@ class AdminAPITest(TestCase):
         self.assertEqual(jc['entity_type'], 'Producteur')
 
         # make sure all categories are supported
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {"entity_id": self.entity3.id, 'name': 'Opérateur Test', 'category': 'Opérateur'})
+        response = self.client.post(reverse('api-v3-admin-add-entity'), {"entity_id": self.entity3.id, 'name': 'Opérateur Test', 'category': Entity.OPERATOR})
         obj = Entity.objects.get(name='Opérateur Test')
-        self.assertEquals(obj.entity_type, 'Opérateur')
+        self.assertEquals(obj.entity_type, Entity.OPERATOR)
         response = self.client.post(reverse('api-v3-admin-add-entity'), {"entity_id": self.entity3.id, 'name': 'Trader Test', 'category': 'Trader'})
         obj = Entity.objects.get(name='Trader Test')
         self.assertEquals(obj.entity_type, 'Trader')        

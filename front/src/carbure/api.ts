@@ -53,6 +53,12 @@ export function findOperators(query?: string) {
     .then(extract)
 }
 
+export function findProducers(query?: string) {
+  return api
+    .get<Api<Entity[]>>("/v3/common/producers", { params: { query } })
+    .then(extract)
+}
+
 export function findProductionSites(query?: string, producer_id?: number) {
   return api
     .get<Api<ProductionSiteDetails[]>>("/v3/common/production-sites", {

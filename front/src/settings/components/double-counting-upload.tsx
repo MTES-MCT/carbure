@@ -93,7 +93,7 @@ const DoubleCountingUploadDialog = ({
         })
         onClose()
       }
-    } catch (error) { }
+    } catch (error) {}
   }
 
   return (
@@ -188,7 +188,7 @@ export interface BlockingErrorsProps {
 const BlockingErrors = ({ errors }: BlockingErrorsProps) => {
   const allErrors = [
     ...(errors?.global ?? []),
-    ...(errors?.sourcing ?? []),
+    ...(errors?.sourcing_history ?? []),
     ...(errors?.production ?? []),
   ]
   const { t } = useTranslation()
@@ -210,7 +210,7 @@ const BlockingErrors = ({ errors }: BlockingErrorsProps) => {
           {errors.global?.map((error, i) => (
             <li key={i}>{getErrorText(error)}</li>
           ))}
-          {errors.sourcing?.map((error, i) => (
+          {errors.sourcing_history?.map((error, i) => (
             <li key={i}>
               {t("Approvisionnement") + " - " + getErrorText(error)}
             </li>

@@ -112,7 +112,6 @@ export const Lots = ({ entity, year }: LotsProps) => {
               filters={state.filters}
               onFilter={actions.setFilters}
             />
-
             <ControlTable
               loading={lots.loading}
               order={state.order}
@@ -123,7 +122,6 @@ export const Lots = ({ entity, year }: LotsProps) => {
               onOrder={actions.setOrder}
               rowLink={showLotDetails}
             />
-
             <Pagination
               page={state.page}
               limit={state.limit}

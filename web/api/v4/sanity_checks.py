@@ -15,7 +15,6 @@ from django.db import transaction
 oct2015 = datetime.date(year=2015, month=10, day=5)
 jan2021 = datetime.date(year=2021, month=1, day=1)
 july1st2021 = datetime.date(year=2021, month=7, day=1)
-future = datetime.date.today() + datetime.timedelta(days=15) # docker containers are restarted everyday - not an issue
 dae_pattern = re.compile('^([a-zA-Z0-9/]+$)')
 
 rules = {}
@@ -63,14 +62,18 @@ def generic_error(error, **kwargs):
     d.update(kwargs)
     return GenericError(**d)
 
-def bulk_sanity_checks(lots, prefetched_data=None):
+def bulk_sanity_checks(lots, prefetched_data=None, dry_run=False):
     if not prefetched_data:
         prefetched_data = get_prefetched_data()
+    
     results = []
     errors = []
+    
     # cleanup previous errors
-    lot_ids = [l.id for l in lots]
-    GenericError.objects.filter(lot_id__in=lot_ids).delete()
+    if not dry_run:
+        lot_ids = [l.id for l in lots]
+        GenericError.objects.filter(lot_id__in=lot_ids).delete()
+    
     for lot in lots:
         try:
             is_sane, sanity_errors = sanity_check(lot, prefetched_data)
@@ -78,8 +81,11 @@ def bulk_sanity_checks(lots, prefetched_data=None):
             results.append(is_sane)
         except:
             traceback.print_exc()
-    GenericError.objects.bulk_create(errors, batch_size=1000)
-    return results
+    
+    if not dry_run:
+        GenericError.objects.bulk_create(errors, batch_size=1000)
+    
+    return errors, results
 
 
 def bulk_scoring(lots, prefetched_data=None):
@@ -198,7 +204,7 @@ def check_certificates(prefetched_data, lot, errors):
         else:
             # certificate is set and exists. is it valid?
             c = prefetched_data['certificates'][cert]
-            if c.valid_until < lot.delivery_date:
+            if c["valid_until"] < lot.delivery_date:
                  errors.append(generic_error(error=CarbureCertificatesErrors.EXPIRED_PRODSITE_CERT, lot=lot, display_to_recipient=True, field='production_site_certificate'))
 
     # SUPPLIER CERT
@@ -213,7 +219,7 @@ def check_certificates(prefetched_data, lot, errors):
         else:
             # certificate is set and exists. is it valid?
             c = prefetched_data['certificates'][cert]
-            if c.valid_until < lot.delivery_date:
+            if c["valid_until"] < lot.delivery_date:
                  errors.append(generic_error(error=CarbureCertificatesErrors.EXPIRED_SUPPLIER_CERT, lot=lot, display_to_recipient=True, field='supplier_certificate'))
 
     # check if mapping of SUPPLIER CERT / ENTITY has been rejected by admin
@@ -349,7 +355,8 @@ def sanity_check(lot, prefetched_data):
             if lot.carbure_delivery_site and lot.carbure_delivery_site.depot_id not in prefetched_data['depotsbyentity'][lot.carbure_client.id]:
                 # this specific delivery site is not linked
                 errors.append(generic_error(error=CarbureSanityCheckErrors.DEPOT_NOT_CONFIGURED, lot=lot, display_to_recipient=True, display_to_creator=False, field='delivery_site'))
-    if lot.delivery_date > future:
+    in_two_weeks = datetime.date.today() + datetime.timedelta(days=15)
+    if lot.delivery_date > in_two_weeks:
         errors.append(GenericError(lot=lot, field='delivery_date', error=CarbureSanityCheckErrors.DELIVERY_IN_THE_FUTURE, extra="La date de livraison est dans le futur", value=lot.delivery_date, display_to_creator=True, is_blocking=True))
 
     # CERTIFICATES CHECK
@@ -367,6 +374,9 @@ def sanity_check_mandatory_fields(lot):
     is_valid = True
     today = datetime.date.today()
     errors = []
+
+    if lot.lot_status == CarbureLot.FLUSHED:
+        return True, []
 
     if not lot.volume:
         errors.append(generic_error(error=CarbureSanityCheckErrors.MISSING_VOLUME, lot=lot, field='volume', is_blocking=True))

@@ -85,7 +85,7 @@ export function getLotChanges(updates: LotUpdate<any>[] = []): LotChange[] {
   return (
     updates
       // only show updates for the moment
-      .filter((u) => u.event_type === "UPDATED")
+      .filter((e) => e.event_type === "UPDATED" || e.event_type === "UPDATED_BY_ADMIN")
       // flatten the updates so we have one row per change
       .flatMap((u) => {
         if ("field" in u.metadata) {

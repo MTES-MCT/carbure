@@ -11,6 +11,7 @@ export interface SelectProps<T, V = T> extends Control, Trigger {
   search?: boolean
   value?: V | undefined
   options?: T[]
+  defaultOptions?: T[]
   placeholder?: string
   getOptions?: () => Promise<T[]>
   onChange?: (value: V | undefined) => void
@@ -24,6 +25,7 @@ export function Select<T, V>({
   value,
   placeholder = "Select an option",
   options,
+  defaultOptions,
   loading,
   getOptions,
   onChange,
@@ -40,6 +42,7 @@ export function Select<T, V>({
   const asyncOptions = useAsyncList({
     selectedValue: value,
     items: options,
+    defaultItems: defaultOptions,
     getItems: getOptions,
     normalize,
   })
