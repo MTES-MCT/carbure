@@ -39,7 +39,7 @@ import LotTraceability, { hasTraceability } from "./lot-traceability"
 import NavigationButtons from "./navigation"
 
 export interface LotDetailsProps {
-  neighbors: number[]
+  neighbors?: number[]
 }
 
 export const LotDetails = ({ neighbors }: LotDetailsProps) => {
@@ -212,8 +212,12 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
               hasParentStock={!!lotData.has_parent_stock}
             />
           )}
-
-          <NavigationButtons neighbors={neighbors} closeAction={closeDialog} />
+          {neighbors && (
+            <NavigationButtons
+              neighbors={neighbors}
+              closeAction={closeDialog}
+            />
+          )}
         </footer>
 
         {lot.loading && <LoaderOverlay />}

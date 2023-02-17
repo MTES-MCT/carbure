@@ -113,10 +113,7 @@ export const OperatorTickets = ({
         path="ticket/:id"
         element={<OperatorTicketDetails neighbors={ids} />}
       />
-      <HashRoute
-        path="ticket-sources/:id"
-        element={<TicketSourceDetails neighbors={[]} />}
-      />
+      <HashRoute path="ticket-source/:id" element={<TicketSourceDetails />} />
     </>
   )
 }

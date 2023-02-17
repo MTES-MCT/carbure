@@ -16,10 +16,11 @@ import TicketSourceTag from "../ticket-sources/tag"
 import AssignedTickets from "./assigned-tickets"
 import TicketAssignment from "../assignment/simple-assignment"
 import TicketSourceFields from "./fields"
-import ParentLot from "./parent-lot"
+import ParentLot from "../parent-lot"
+import { safTicketSourceDetails } from "saf/__test__/data"
 
 export interface TicketSourceDetailsProps {
-  neighbors: number[]
+  neighbors?: number[]
 }
 
 export const TicketSourceDetails = ({
@@ -40,6 +41,7 @@ export const TicketSourceDetails = ({
   })
 
   const ticketSource = ticketSourceResponse.result?.data?.data
+  // const ticketSource = safTicketSourceDetails //TO TEST
 
   const hasAssignements = ticketSource
     ? ticketSource?.assigned_tickets?.length > 0
@@ -107,7 +109,12 @@ export const TicketSourceDetails = ({
             }
             action={showAssignement}
           />
-          <NavigationButtons neighbors={neighbors} closeAction={closeDialog} />
+          {neighbors && (
+            <NavigationButtons
+              neighbors={neighbors}
+              closeAction={closeDialog}
+            />
+          )}
         </footer>
 
         {ticketSourceResponse.loading && <LoaderOverlay />}
