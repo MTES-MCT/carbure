@@ -1,3 +1,6 @@
+import { LotsUpdateResponse } from "controls/types"
+import { LotError } from "transactions/types"
+
 export const lotSummary = {
   count: 3,
   total_volume: 3743403.2,
@@ -195,3 +198,23 @@ export const lot = {
 }
 
 export const lots = [lot, lot, lot]
+
+
+const lotError: LotError = {
+  error: "NOT_GOOD_VALUE",
+  is_blocking: true,
+  field: "biofuel",
+  fields: null,
+  value: null,
+  extra: null,
+  acked_by_creator: false,
+  acked_by_recipient: false,
+  acked_by_admin: false,
+  acked_by_auditor: false,
+}
+const lotUpdateError1 = [lotError, lotError]
+const lotUpdateError2 = [lotError]
+export const lotsUpdateErrorsResponse: LotsUpdateResponse = {
+  errors: { 287367: lotUpdateError1, 287368: lotUpdateError2 }
+}
+

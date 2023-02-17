@@ -1,2 +1,3 @@
-web: sh web/entrypoint.sh
+web: gunicorn --chdir ./web carbure.wsgi --log-file -
 worker: python3 web/manage.py run_huey --simple
+postdeploy: bash web/setup.sh

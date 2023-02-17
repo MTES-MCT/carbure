@@ -11,6 +11,7 @@ export interface FormProps<T> {
   children: React.ReactNode
   variant?: FormVariant
   form?: FormManager<T>
+  novalidate?: boolean
   onSubmit?: (
     value: T | undefined,
     e?: React.FormEvent<HTMLFormElement>
@@ -25,6 +26,7 @@ export function Form<T>({
   form,
   children,
   onSubmit,
+  novalidate
 }: FormProps<T>) {
   return (
     <FormContext.Provider value={form}>
@@ -32,6 +34,8 @@ export function Form<T>({
         id={id}
         className={cl(css.form, variant && css[variant], className)}
         style={style}
+
+        noValidate={novalidate}
         onSubmit={(e) => {
           e.preventDefault()
           onSubmit?.(form?.value, e)

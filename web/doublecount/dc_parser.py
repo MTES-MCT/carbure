@@ -1,3 +1,5 @@
+import re
+import traceback
 from typing import List, TypedDict, Tuple
 from openpyxl import Workbook, load_workbook
 
@@ -27,26 +29,52 @@ def parse_dc_excel(
 ) -> Tuple[List[SourcingRow], List[ProductionRow]]:
     excel_file = load_workbook(filename, data_only=True)
 
-    # sourcing_history = parse_sourcing(excel_file, "Historique dapprovisionnement")
+    info = parse_info(excel_file)
+    sourcing_history = parse_sourcing(excel_file, "Historique d'approvisionnement")
     sourcing_forecast = parse_sourcing(excel_file, "Approvisionnement prévisionnel")
     production_forecast = parse_production(excel_file)
 
-    return sourcing_forecast, production_forecast
+    return info, sourcing_history, sourcing_forecast, production_forecast
+
+
+def parse_info(excel_file: Workbook):
+    try:
+        presentation = excel_file["Présentation"]
+        application = excel_file["Reconnaissance double comptage"]
+
+        production_site = presentation[5][2].value
+
+        try:
+            # loop through reconaissance sheet to find the base year defined in it
+            year_row_index = 0
+            for i, row in enumerate(application.iter_rows()):
+                year_row_index = i
+                if row[6].value == "Première année de reconnaissance":
+                    break
+            year = int(application[year_row_index + 2][6].value)
+        except:
+            year = 0
+
+        return {
+            "production_site": production_site,
+            "year": year,
+        }
+    except:
+        traceback.print_exc()
+        return {"production_site": None, "year": 0}
 
 
 def parse_sourcing(excel_file: Workbook, sheet_name: str) -> List[SourcingRow]:
-    sourcing_sheeet = excel_file[sheet_name]
+    if sheet_name not in excel_file:
+        return []
+
+    sourcing_sheet = excel_file[sheet_name]
     sourcing_rows: List[SourcingRow] = []
 
     current_year = -1
 
-    for line, row in enumerate(sourcing_sheeet.iter_rows()):
-        try:
-            year = int(row[1].value)
-            if year != current_year:
-                current_year = year
-        except Exception:
-            pass
+    for line, row in enumerate(sourcing_sheet.iter_rows()):
+        current_year = extract_year(row[1].value, current_year)
 
         feedstock_name = row[2].value
         origin_country_cell = row[3].value
@@ -54,10 +82,10 @@ def parse_sourcing(excel_file: Workbook, sheet_name: str) -> List[SourcingRow]:
         transit_country_cell = row[5].value
 
         # skip row if no year or feedstock is defined
-        if current_year == -1 or not feedstock_name or not origin_country_cell:
+        if current_year == -1 or not feedstock_name or not origin_country_cell or feedstock_name == origin_country_cell:
             continue
 
-        feedstock = dc_feedstock_to_carbure_feedstock.get(feedstock_name, None)
+        feedstock = dc_feedstock_to_carbure_feedstock.get(feedstock_name.strip(), None)
         origin_country = extract_country_code(origin_country_cell)
         supply_country = extract_country_code(supply_country_cell)
         transit_country = extract_country_code(transit_country_cell)
@@ -74,10 +102,10 @@ def parse_sourcing(excel_file: Workbook, sheet_name: str) -> List[SourcingRow]:
 
         if sheet_name == "Approvisionnement prévisionnel":
             sourcing["metric_tonnes"] = row[6].value
-        elif sheet_name == "Historique dapprovisionnement":
+        elif sheet_name == "Historique d'approvisionnement":
             sourcing["metric_tonnes"] = row[8].value
-            # sourcing.supplier_name = row[6].value
-            # sourcing.supplier_certificate = row[7].value
+            # sourcing["supplier_name"] = row[6].value
+            # sourcing["supplier_certificate"] = row[7].value
 
         sourcing_rows.append(sourcing)
 
@@ -91,17 +119,12 @@ def parse_production(excel_file: Workbook) -> List[ProductionRow]:
     production_sheet = excel_file["Production"]
 
     for line, row in enumerate(production_sheet.iter_rows()):
-        try:
-            year = int(row[1].value)
-            if year != current_year:
-                current_year = year
-        except Exception:
-            pass
+        current_year = extract_year(row[1].value, current_year)
 
         biofuel_name = row[2].value
         feedstock_name = row[3].value
-        max_production_capacity = row[4].value
-        estimated_production = row[9].value
+        max_production_capacity = row[4].value or 0
+        estimated_production = row[9].value or 0
 
         if current_year == -1 or not feedstock_name or not biofuel_name:
             continue
@@ -125,12 +148,7 @@ def parse_production(excel_file: Workbook) -> List[ProductionRow]:
     quota_sheet = excel_file["Reconnaissance double comptage"]
 
     for row in quota_sheet.iter_rows():
-        try:
-            year = int(row[1].value)
-            if year != current_year:
-                current_year = year
-        except Exception:
-            pass
+        current_year = extract_year(row[1].value, current_year)
 
         biofuel_name = row[2].value
         feedstock_name = row[3].value
@@ -153,6 +171,15 @@ def parse_production(excel_file: Workbook) -> List[ProductionRow]:
                 production["requested_quota"] = requested_quota
 
     return production_rows
+
+
+def extract_year(year_str: str, current_year: int):
+    try:
+        match = re.search("([0-9]{4})", str(year_str))
+        year = match.group(0)
+        return int(year)
+    except:
+        return current_year
 
 
 def extract_country_code(country_str: str) -> str | None:
@@ -199,7 +226,7 @@ dc_feedstock_to_carbure_feedstock: dict[str, str | None] = {
     "Paille": "PAILLE",
     "Râpes": "RAPES",
     "Seigle": "SEIGLE",
-    "Soja ": "SOJA",
+    "Soja": "SOJA",
     "Tallol": "TALLOL",
     "Tournesol ": "TOURNESOL",
     "Triticale": "TRITICALE",

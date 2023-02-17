@@ -15,6 +15,7 @@
     "workbench.colorCustomizations": {
       "titleBar.activeBackground": "#000092",
       "titleBar.activeForeground": "#000092"
-    }
+    },
+    "git.openRepositoryInParentFolders": "always"
   }
 }
