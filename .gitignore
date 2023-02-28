@@ -152,5 +152,5 @@ files
 integrity_checks.json
 sanity_checks.json
 
-# specific sql queries
+# do not ignore specific sql queries
 !get_traceability_nodes.sql

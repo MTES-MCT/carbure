@@ -33,8 +33,9 @@ tzdata = "==2022.4"
 whitenoise = "==6.2.0"
 xlsxwriter = "==3.0.3"
 pyjwt = "==2.6.0"
-django-silk = "*"
-redis = "*"
+django-silk = "5.0.3"
+redis = "4.5.1"
+factory-boy = "3.2.1"
 
 [dev-packages]
 black = "*"
