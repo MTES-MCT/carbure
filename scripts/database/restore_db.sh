@@ -25,6 +25,11 @@ scalingo --app carbure-prod --addon $SCALINGO_MYSQL_UUID backups-download --outp
 echo "Decompressing backup..."
 tar -xzf /tmp/backups/*.tar.gz -C /tmp/backups
 
+if [ $? -ne 0 ]; then
+  echo "Failed to download backup file"
+  exit 1
+fi
+
 # remove lines mentionning production database
 echo "Cleaning SQL..."
 grep -vE "(carbure_pro_)" /tmp/backups/*.sql > /tmp/backups/backup.sql
