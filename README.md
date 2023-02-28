@@ -54,8 +54,9 @@ Vous pouvez désormais builder les images docker et lancer le projet:
 
 ## Configurer l'accès à la base de donnée depuis le terminal
 
-- Dans le fichier `.env`, éditer la variable `DATABASE_URL` et y mettre une valeur qui pointe vers le container MySQL
+- Dans le fichier `.env`, éditer les variables `DATABASE_URL` et `REDIS_URL` et y mettre une valeur qui pointe vers les containers MySQL et Redis
 - `DATABASE_URL=mysql://{root_user}:{root_password}@0.0.0.0:3306/carbure-db`
+- `REDIS_URL=redis://0.0.0.0:6379`
 - Une fois le container MySQL lancé, dans le `pipenv shell`, exécuter `python web/manage.py dbshell`
 - S'il n'y a pas d'erreur, c'est ok
 - Si cette étape ne marche pas du tout, on peut passer par le container Django pour exécuter `manage.py`
