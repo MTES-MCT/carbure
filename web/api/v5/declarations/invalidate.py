@@ -44,12 +44,20 @@ def invalidate_declaration(request, *args, **kwargs):
         sent_lots = declaration_lots.filter(carbure_supplier_id=entity_id)
         sent_lots.update(declared_by_supplier=False)
 
+        # if the client on some sent lots is unknown, mark them as not declared by the client
+        unknown_client_lots = sent_lots.filter(carbure_client=None)
+        unknown_client_lots.update(declared_by_client=False)
+
         # Mark the received lots of this declaration as declared by the client
         received_lots = declaration_lots.filter(carbure_client_id=entity_id)
         received_lots.update(declared_by_client=False)
 
+        # if the supplier on some received lots is unknown, mark them as not declared by the supplier
+        unknown_supplier_lots = received_lots.filter(carbure_supplier=None)
+        unknown_supplier_lots.update(declared_by_supplier=False)
+
         # Unfreeze all the lots of this declaration
-        undeclared_lots = sent_lots | received_lots
+        undeclared_lots = declaration_lots.filter(Q(declared_by_supplier=False) | Q(declared_by_client=False))
         undeclared_lots.update(lot_status=CarbureLot.ACCEPTED)
 
         # Create cancel declaration events for all these lots
