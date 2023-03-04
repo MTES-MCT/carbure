@@ -6,6 +6,7 @@ django.setup()
 
 from tqdm import tqdm
 from django.db import transaction
+from django.db.models import Q
 from core.models import CarbureLot, SustainabilityDeclaration
 
 
@@ -41,7 +42,7 @@ def sync_declarations_with_lot_status():
     declared_lots = lots.filter(declared_by_supplier=True, declared_by_client=True)
     declared_lots.update(lot_status=CarbureLot.FROZEN)
 
-    undeclared_lots = lots.filter(lot_status=CarbureLot.FROZEN).exclude(declared_by_supplier=True, declared_by_client=True)  # fmt:skip
+    undeclared_lots = lots.filter(lot_status=CarbureLot.FROZEN).filter(Q(declared_by_supplier=False) | Q(declared_by_client=False))  # fmt:skip
     undeclared_lots.update(lot_status=CarbureLot.ACCEPTED)
 
     print("> Done")
