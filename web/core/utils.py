@@ -1,5 +1,8 @@
+import os
 import unicodedata
 from django.db import transaction
+import xlsxwriter
+from core.xlsx_v3 import make_carbure_lots_sheet
 
 
 # transform a string into a standard form in lower case without accents
@@ -44,3 +47,39 @@ def bulk_update_or_create(Model, id_field, rows):
     Model.objects.bulk_create(new_objects, 1000)
 
     return existing_objects, new_objects
+
+
+def generate_reports(name, entity_lots):
+    os.makedirs("/tmp/reports", exist_ok=True)
+
+    lots_by_entity = {}
+
+    for lot in entity_lots:
+        added_by = lot.added_by.name if lot.added_by else None
+        carbure_supplier = lot.carbure_supplier.name if lot.carbure_supplier else None
+        carbure_client = lot.carbure_client.name if lot.carbure_client else None
+
+        if added_by is not None:
+            if added_by not in lots_by_entity:
+                lots_by_entity[added_by] = {}
+            lots_by_entity[added_by][lot.id] = lot
+
+        if carbure_supplier is not None:
+            if carbure_supplier not in lots_by_entity:
+                lots_by_entity[carbure_supplier] = {}
+            lots_by_entity[carbure_supplier][lot.id] = lot
+
+        if carbure_client is not None:
+            if carbure_client not in lots_by_entity:
+                lots_by_entity[carbure_client] = {}
+            lots_by_entity[carbure_client][lot.id] = lot
+
+    print("> Impacted entities: %d" % len(lots_by_entity))
+
+    for entity in lots_by_entity:
+        location = "/tmp/reports/%s_%s.xlsx" % (name, entity)
+        entity_lots = sorted(lots_by_entity[entity].values(), key=lambda l: l.delivery_date)
+        print("> %d lots for %s: '%s'" % (len(entity_lots), entity, location))
+        workbook = xlsxwriter.Workbook(location)
+        make_carbure_lots_sheet(workbook, None, entity_lots)
+        workbook.close()
