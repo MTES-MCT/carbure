@@ -57,9 +57,17 @@ def validate_declaration(request, *args, **kwargs):
         sent_lots = declaration_lots.filter(carbure_supplier_id=entity_id)
         sent_lots.update(declared_by_supplier=True)
 
+        # if the client on some sent lots is unknown, mark them as declared by the client
+        unknown_client_lots = sent_lots.filter(carbure_client=None)
+        unknown_client_lots.update(declared_by_client=True)
+
         # Mark the received lots of this declaration as declared by the client
         received_lots = declaration_lots.filter(carbure_client_id=entity_id)
         received_lots.update(declared_by_client=True)
+
+        # if the supplier on some received lots is unknown, mark them as declared by the supplier
+        unknown_supplier_lots = received_lots.filter(carbure_supplier=None)
+        unknown_supplier_lots.update(declared_by_supplier=True)
 
         # Create SAF ticket sources for declared received lots
         background_create_ticket_sources_from_lots(received_lots)

@@ -70,13 +70,13 @@ class InvalidateDeclarationTest(TestCase):
 
         undeclared_sent_lots = sent_lots.filter(
             declared_by_supplier=False,
-            declared_by_client=True,
+            declared_by_client=False,
         )
 
         self.assertEqual(undeclared_sent_lots.count(), 50)
 
         undeclared_received_lots = received_lots.filter(
-            declared_by_supplier=True,
+            declared_by_supplier=False,
             declared_by_client=False,
         )
 

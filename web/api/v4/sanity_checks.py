@@ -99,9 +99,12 @@ def bulk_scoring(lots, prefetched_data=None):
     # bulk update lots
     with transaction.atomic():
         for l in lots:
-            clrs_entries = l.recalc_reliability_score(prefetched_data)
-            clrs += clrs_entries
-            l.save()
+            try:
+                clrs_entries = l.recalc_reliability_score(prefetched_data)
+                clrs += clrs_entries
+                l.save()
+            except:
+                pass
     # bulk create score entries
     CarbureLotReliabilityScore.objects.bulk_create(clrs)
     #print('end background bulk_scoring %s' % (datetime.datetime.now()))
