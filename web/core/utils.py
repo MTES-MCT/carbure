@@ -1,6 +1,7 @@
 import os
 import unicodedata
-from django.db import transaction
+from django.db import connection, transaction
+from django.conf import settings
 import xlsxwriter
 from core.xlsx_v3 import make_carbure_lots_sheet
 
@@ -83,3 +84,18 @@ def generate_reports(name, entity_lots):
         workbook = xlsxwriter.Workbook(location)
         make_carbure_lots_sheet(workbook, None, entity_lots)
         workbook.close()
+
+
+def run_query(query_path, *args):
+    """Read a query SQL from a file and run it on the database"""
+
+    full_query_path = os.path.join(settings.BASE_DIR, query_path)
+    with open(full_query_path, "r", encoding="utf-8") as query_file:
+        query_sql = query_file.read().replace("\n", " ").replace("--", "")
+        query_sql = " ".join(query_sql.split())
+
+        with connection.cursor() as cursor:
+            # recursively query for the whole family trees for the given lot ids
+            cursor.execute(query_sql, args)
+            # grab the list of results in the form of an array of tuples
+            return cursor.fetchall()
