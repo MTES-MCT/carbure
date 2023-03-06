@@ -74,9 +74,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
     <Portal onClose={closeDialog}>
       <Dialog onClose={closeDialog}>
         <header>
-          {Flags.scoring && lotData && (
-            <Score big lot={lotData.lot} details={lotData.score} />
-          )}
+          {lotData && <Score big lot={lotData.lot} details={lotData.score} />}
           {lotData && <LotTag big lot={lotData.lot} />}
           <h1>
             {t("Lot")} #{lotData?.lot.carbure_id || lotData?.lot.id}
