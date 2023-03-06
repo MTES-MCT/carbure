@@ -46,7 +46,7 @@ export const ControlTable = memo(
         columns={compact([
           markerColumn<Lot>((lot) => getLotMarker(lot, errors)),
           selectionColumn(lots, selected, onSelect, (lot) => lot.id),
-          Flags.scoring && columns.score,
+          columns.score,
           columns.status,
           columns.period,
           columns.document,
