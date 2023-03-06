@@ -1,4 +1,7 @@
+import os
+
 from django.db import connection
+from django.conf import settings
 
 from core.models import CarbureLot, CarbureStock, CarbureStockTransformation
 from saf.models import SafTicket, SafTicketSource
@@ -27,8 +30,10 @@ def get_traceability_nodes(lots: list):
 
 # read the sql file and run the traceability tree query on the database
 def query_traceability_tree(lot_ids: list[int]):
+    sql_file_path = os.path.join(settings.BASE_DIR, "core/traceability/get_traceability_nodes.sql")
+
     with connection.cursor() as cursor:
-        with open("web/core/traceability/get_traceability_nodes.sql") as query:
+        with open(sql_file_path) as query:
             # recursively query for the whole family trees for the given lot ids
             cursor.execute(query.read(), [lot_ids])
 
