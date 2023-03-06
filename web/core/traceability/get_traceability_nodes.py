@@ -1,8 +1,4 @@
-import os
-
-from django.db import connection
-from django.conf import settings
-
+from core.utils import run_query
 from core.models import CarbureLot, CarbureStock, CarbureStockTransformation
 from saf.models import SafTicket, SafTicketSource
 
@@ -16,7 +12,7 @@ def get_traceability_nodes(lots: list):
     original_lot_ids = [lot.id for lot in lots]
 
     # query the database for all the nodes related to these lots
-    rows = query_traceability_tree(original_lot_ids)
+    rows = run_query("core/traceability/get_traceability_nodes.sql", original_lot_ids)
 
     # fetch all the models for the listed ids
     models_by_type = query_models_by_type(rows)
@@ -26,19 +22,6 @@ def get_traceability_nodes(lots: list):
 
     # return only the nodes for the originally given lots
     return [lot_nodes[lot_id] for lot_id in original_lot_ids if lot_id in lot_nodes]
-
-
-# read the sql file and run the traceability tree query on the database
-def query_traceability_tree(lot_ids: list[int]):
-    sql_file_path = os.path.join(settings.BASE_DIR, "core/traceability/get_traceability_nodes.sql")
-
-    with connection.cursor() as cursor:
-        with open(sql_file_path) as query:
-            # recursively query for the whole family trees for the given lot ids
-            cursor.execute(query.read(), [lot_ids])
-
-            # grab the list of results in the form of an array of tuples
-            return cursor.fetchall()
 
 
 # list all the models referenced in the rows, grouped by their types
