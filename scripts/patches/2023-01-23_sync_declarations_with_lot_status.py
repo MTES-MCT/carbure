@@ -7,43 +7,67 @@ django.setup()
 from tqdm import tqdm
 from django.db import transaction
 from django.db.models import Q
+from django.core.paginator import Paginator
 from core.models import CarbureLot, SustainabilityDeclaration
 
 
 @transaction.atomic
-def sync_declarations_with_lot_status():
-    print("> Set lot declaration state according to period declaration state")
-    for declaration in tqdm(SustainabilityDeclaration.objects.all()):
+def sync_declarations_with_lot_status(batch_size=1000):
+    print("> List all declarations, validated and unvalidated")
+    declarations = SustainabilityDeclaration.objects.filter(period__year__gte=2021)
+
+    print("> Found %d declarations" % declarations.count())
+
+    declarations_by_entity = {}
+    for declaration in declarations:
         entity_id = declaration.entity_id
         period = declaration.period.year * 100 + declaration.period.month
 
-        period_lots = CarbureLot.objects.filter(period=period).exclude(lot_status__in=(CarbureLot.DRAFT, CarbureLot.DELETED))  # fmt:skip
+        if entity_id not in declarations_by_entity:
+            declarations_by_entity[entity_id] = {}
 
-        sent_lots = period_lots.filter(carbure_supplier_id=entity_id)
-        sent_lots_with_unknown_client = sent_lots.filter(carbure_client=None)
+        declarations_by_entity[entity_id][period] = declaration
 
-        received_lots = period_lots.filter(carbure_client_id=entity_id)
-        received_lots_with_unknown_supplier = received_lots.filter(carbure_supplier=None)
+    # only treat lots that are already accepted or declared starting from 2021
+    lots = (
+        CarbureLot.objects.filter(year__gte=2021)
+        .filter(lot_status__in=(CarbureLot.ACCEPTED, CarbureLot.FROZEN))
+        .order_by("delivery_date")
+    )
 
-        if declaration.declared:
-            sent_lots.update(declared_by_supplier=True)
-            sent_lots_with_unknown_client.update(declared_by_client=True)
-            received_lots.update(declared_by_client=True)
-            received_lots_with_unknown_supplier.update(declared_by_supplier=True)
-        else:
-            sent_lots.update(declared_by_supplier=False)
-            sent_lots_with_unknown_client.update(declared_by_client=False)
-            received_lots.update(declared_by_client=False)
-            received_lots_with_unknown_supplier.update(declared_by_supplier=False)
+    paginator = Paginator(lots, batch_size)
 
-    print("> Set lot status according to lot declaration state")
-    lots = CarbureLot.objects.exclude(lot_status__in=(CarbureLot.DRAFT, CarbureLot.DELETED))
+    print("> Set lot declaration state according to period declaration state")
 
-    declared_lots = lots.filter(declared_by_supplier=True, declared_by_client=True)
-    declared_lots.update(lot_status=CarbureLot.FROZEN)
+    for page_number in tqdm(paginator.page_range):
+        page = paginator.page(page_number)
+        page_lots = page.object_list
 
-    undeclared_lots = lots.filter(lot_status=CarbureLot.FROZEN).filter(Q(declared_by_supplier=False) | Q(declared_by_client=False))  # fmt:skip
-    undeclared_lots.update(lot_status=CarbureLot.ACCEPTED)
+        for lot in page_lots:
+            # find the declarations
+            supplier_declaration = declarations_by_entity.get(lot.carbure_supplier_id, {}).get(lot.period, None)
+            client_declaration = declarations_by_entity.get(lot.carbure_client_id, {}).get(lot.period, None)
+
+            # set the lot declaration status according to the related declaration status
+            if supplier_declaration:
+                lot.declared_by_supplier = supplier_declaration.declared
+
+            if client_declaration:
+                lot.declared_by_client = client_declaration.declared
+
+            # handle the case of lots with unknown clients or suppliers
+            if not lot.carbure_client_id:
+                lot.declared_by_client = lot.declared_by_supplier
+
+            if not lot.carbure_supplier_id:
+                lot.declared_by_supplier = lot.declared_by_client
+
+            if lot.declared_by_supplier and lot.declared_by_client:
+                lot.lot_status = CarbureLot.FROZEN
+            else:
+                lot.lot_status = CarbureLot.ACCEPTED
+
+        CarbureLot.objects.bulk_update(page_lots, ["lot_status", "declared_by_supplier", "declared_by_client"])
 
     print("> Done")
 
