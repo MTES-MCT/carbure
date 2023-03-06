@@ -67,8 +67,8 @@ SAF = ("HVOC", "HOC", "HCC")
 def create_ticket_sources_from_lots(lots):
     ticket_source_data = []
 
-    # make sure we only have declared lotsof SAF in the queryset
-    saf_lots = lots.exclude(lot_status__in=("DRAFT", "PENDING", "DELETED")).filter(biofuel__code__in=SAF)
+    # make sure we only have declared lots of SAF in the queryset
+    saf_lots = lots.filter(lot_status__in=("ACCEPTED", "FROZEN")).filter(biofuel__code__in=SAF)
 
     for lot in saf_lots.iterator():
         ticket_source_data.append(
