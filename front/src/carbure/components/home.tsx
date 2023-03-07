@@ -20,6 +20,7 @@ import {
 } from "common/components/icons"
 import { Button } from "common/components/button"
 import useTitle from "common/hooks/title"
+import { formatNumber } from "common/utils/formatters"
 
 interface HomeStats {
   total_volume: number
@@ -138,7 +139,7 @@ const Home = () => {
             {stats.loading ? (
               <Loader />
             ) : (
-              Math.round(statsData?.total_volume ?? 0).toLocaleString("fr")
+              formatNumber(Math.round(statsData?.total_volume ?? 0))
             )}
             {" m³"}
           </h1>
