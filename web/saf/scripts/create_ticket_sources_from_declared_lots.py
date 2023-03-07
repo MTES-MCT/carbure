@@ -10,9 +10,7 @@ from saf.models.saf_ticket_source import create_ticket_sources_from_lots
 
 
 def create_ticket_sources_from_declared_lots(year):
-    lots = CarbureLot.objects.select_related("biofuel").filter(
-        lot_status=CarbureLot.FROZEN, year=year, carbure_client_id__isnull=False
-    )
+    lots = CarbureLot.objects.select_related("biofuel").filter(year=year, carbure_client_id__isnull=False)
 
     ticket_sources = create_ticket_sources_from_lots(lots)
     entities = lots.values_list("carbure_client__name", flat=True).distinct()

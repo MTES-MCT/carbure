@@ -223,10 +223,11 @@ class Node:
         self.changed_only = False
 
         errors = self.validate()
-        diff = self.diff_with_parent()
 
-        if len(diff) > 0:
-            errors = [(self, TraceabilityError.NODE_HAS_DIFFERENCES_WITH_PARENT, diff)] + errors
+        if self.parent:
+            diff = self.diff_with_parent()
+            if len(diff) > 0:
+                errors = [(self, TraceabilityError.NODE_HAS_DIFFERENCES_WITH_PARENT, diff)] + errors
 
         for child in self.children:
             errors += child.check_integrity()

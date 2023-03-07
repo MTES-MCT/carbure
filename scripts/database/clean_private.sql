@@ -1,0 +1,23 @@
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE carbure_lots;
+TRUNCATE TABLE carbure_lots_events;
+TRUNCATE TABLE carbure_lots_comments;
+TRUNCATE TABLE carbure_lots_scores;
+TRUNCATE TABLE carbure_stock;
+TRUNCATE TABLE carbure_stock_events;
+TRUNCATE TABLE carbure_stock_events;
+TRUNCATE TABLE carbure_stock_transformations;
+TRUNCATE TABLE carbure_notifications;
+TRUNCATE TABLE declarations;
+TRUNCATE TABLE double_counting_agreements;
+TRUNCATE TABLE double_counting_doc_files;
+TRUNCATE TABLE double_counting_production;
+TRUNCATE TABLE double_counting_sourcing;
+TRUNCATE TABLE generic_errors;
+TRUNCATE TABLE ml_eec_stats;
+TRUNCATE TABLE ml_ep_stats;
+TRUNCATE TABLE ml_etd_stats;
+TRUNCATE TABLE transaction_distances;
+TRUNCATE TABLE saf_ticket_source;
+TRUNCATE TABLE saf_ticket;
+SET FOREIGN_KEY_CHECKS = 1

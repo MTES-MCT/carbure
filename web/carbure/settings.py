@@ -139,9 +139,14 @@ DEFAULT_AUTO_FIELD='django.db.models.AutoField'
 # Load db setup from DATABASE_URL env variable
 DATABASES = {"default": env.db()}
 
+DATABASES["default"]["OPTIONS"] = {
+    "charset": "utf8mb4",
+}
+
 if env('TEST') == 1:
     print("DB TESTING MODE")
     DATABASES['default']['OPTIONS'] = {
+        **DATABASES['default']['OPTIONS'],
         'auth_plugin': 'mysql_native_password'
     }
 
@@ -273,3 +278,4 @@ SILKY_ANALYZE_QUERIES = True
 SILKY_AUTHENTICATION = False
 SILKY_AUTHORISATION = True
 SILKY_PYTHON_PROFILER_BINARY = True
+SILKY_PYTHON_PROFILER_RESULT_PATH = "/tmp"

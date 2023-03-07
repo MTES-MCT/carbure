@@ -5,8 +5,7 @@ import { useQuery } from "common/hooks/async"
 import useEntity from "carbure/hooks/entity"
 import { LoaderOverlay } from "common/components/scaffold"
 import Dialog from "common/components/dialog"
-import Button from "common/components/button"
-import { Alarm, Return } from "common/components/icons"
+import { Alarm } from "common/components/icons"
 import LotForm, { useLotForm } from "lot-add/components/lot-form"
 import LotTag from "transactions/components/lots/lot-tag"
 import Comments from "transaction-details/components/lots/comments"
@@ -25,14 +24,12 @@ import LotTraceability, {
   hasTraceability,
 } from "transaction-details/components/lots/lot-traceability"
 import { WarningAnomalies } from "./warnings"
-import { invalidate } from "common/hooks/invalidate"
 import { AlertOneButton } from "controls/actions/alert"
 import ControlComments from "./control-comments"
 import { formatDate } from "common/utils/formatters"
 import Score from "transaction-details/components/score"
 import { SetOneConformityButton } from "controls/actions/set-conformity"
 import Portal from "common/components/portal"
-import Flags from "flags.json"
 import { useHashMatch } from "common/components/hash-route"
 
 export interface LotDetailsProps {
@@ -74,9 +71,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
     <Portal onClose={closeDialog}>
       <Dialog onClose={closeDialog}>
         <header>
-          {Flags.scoring && lotData && (
-            <Score big lot={lotData.lot} details={lotData.score} />
-          )}
+          {lotData && <Score big lot={lotData.lot} details={lotData.score} />}
           {lotData && <LotTag big lot={lotData.lot} />}
           <h1>
             {t("Lot")} #{lotData?.lot.carbure_id || lotData?.lot.id}

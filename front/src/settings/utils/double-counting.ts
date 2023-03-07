@@ -70,7 +70,7 @@ export function getErrorText(
       break
     case DoubleCountingUploadErrorType.PomeGt2000:
       errorText += t(
-        "En {{year}}, la production estimée de biocarburant à partir d'Effluents d'huileries de palme et rafles ne doit pas excéder 2000 tonnes par an pour une usine de production.",
+        "En {{year}}, les biocarburants issus d'effluents d'huilerie de palme et rafles ne seront pas reconnus au double comptage au delà d'une production total de 2000 tonnes par unité de production.",
         { year: error?.meta?.year }
       )
       break

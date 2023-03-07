@@ -53,9 +53,11 @@ export interface SafTicketSourceSummary
   ticket_sources: SafTicketSourceSummaryItem[]
 }
 
-export interface SafTicketSourceSummaryItem {
+export interface SafTicketSourcePreview {
   id: number
   carbure_id: string
+}
+export interface SafTicketSourceSummaryItem extends SafTicketSourcePreview {
   year: number
   delivery_period: number
   total_volume: number
@@ -110,16 +112,18 @@ export interface SafTicket {
   status: SafTicketStatus
 }
 
+
 export interface SafTicketDetails
   extends SafTicket,
   SafProduction,
   SafDurability {
   free_field?: string
   client_comment?: string
-  child_ticket_source?: {
-    id: number
-    carbure_id: string
-  }
+  // child_ticket_source?: {
+  //   id: number
+  //   carbure_id: string
+  // },
+  parent_ticket_source?: SafTicketSourcePreview
 }
 
 export interface SafProduction {

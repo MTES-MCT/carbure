@@ -12,7 +12,6 @@ import StockTag from "./stock-tag"
 import { isRedII } from "lot-add/components/ghg-fields"
 import { To } from "react-router-dom"
 import useEntity from "carbure/hooks/entity"
-import Flags from "flags.json"
 import { compact } from "common/utils/collection"
 
 export interface StockTableProps {
@@ -50,8 +49,7 @@ export const StockTable = memo(
           selectionColumn(stocks, selected, onSelect, (s: Stock) => s.id),
           columns.status,
           columns.period,
-          !Flags.preferred_unit && columns.biofuel,
-          Flags.preferred_unit && columns.quantity,
+          columns.quantity,
           columns.feedstock,
           columns.supplier,
           columns.productionSite,

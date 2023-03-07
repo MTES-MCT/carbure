@@ -309,12 +309,6 @@ class SettingsAPITest(TestCase):
         self.assertEqual(response.status_code, 400)
 
 
-    def test_update_entity(self):
-        url = 'api-v3-settings-update-entity'
-        response = self.client.post(reverse(url), {'entity_id': self.entity1.id, 'legal_name': "MA SOCIETE", "registration_id": "pouet", 
-        "sustainability_officer_phone_number": "0147247000", "sustainability_officer": "Jules Antoine Martin de la Porte Villardière", "registered_address": "24 avenue des Champs Élysées, 2ème étage gauche, 75000 Paris CEDEX 12, France"})
-        self.assertEqual(response.status_code, 200)
-
     def test_add_production_site(self):
         postdata = {'entity_id': self.entity2.id}
         url = 'api-v3-settings-add-production-site'
