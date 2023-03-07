@@ -1,9 +1,9 @@
-import { useTranslation } from "react-i18next"
-import isAfter from "date-fns/isAfter"
 import { Fieldset, useFormContext } from "common/components/form"
 import { NumberInput, TextInput } from "common/components/input"
+import { formatGHG, formatPercentage } from "common/utils/formatters"
+import isAfter from "date-fns/isAfter"
+import { useTranslation } from "react-i18next"
 import { LotFormValue } from "./lot-form"
-import { formatPercentage, formatGHG } from "common/utils/formatters"
 
 interface GHGFieldsProps {
   readOnly?: boolean
@@ -18,12 +18,14 @@ export const EmissionFields = (props: GHGFieldsProps) => {
       <NumberInput
         required={value.feedstock?.category === "CONV"}
         label="EEC"
+        hasTooltip
         title={t("Émissions résultant de l'extraction ou de la culture des matières premières")} // prettier-ignore
         {...bind("eec")}
         {...props}
       />
       <NumberInput
         label="EL"
+        hasTooltip
         title={t("Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l'affectation des sols")} // prettier-ignore
         {...bind("el")}
         {...props}
@@ -31,19 +33,22 @@ export const EmissionFields = (props: GHGFieldsProps) => {
       <NumberInput
         required
         label="EP"
-        title={t("Émissions résultant dela transformation")}
+        hasTooltip
+        title={t("Émissions résultant de la transformation")}
         {...bind("ep")}
         {...props}
       />
       <NumberInput
         required
         label="ETD"
+        hasTooltip
         title={t("Émissions résultant du transport et de la distribution")}
         {...bind("etd")}
         {...props}
       />
       <NumberInput
         label="EU"
+        hasTooltip
         title={t("Émissions résultant du carburant à l'usage")}
         {...bind("eu")}
         {...props}
@@ -66,24 +71,28 @@ export const ReductionFields = (props: GHGFieldsProps) => {
     <Fieldset small label={t("Réductions")}>
       <NumberInput
         label="ESCA"
+        hasTooltip
         title={t("Réductions d'émissions dues à l'accumulation du carbone dans les sols grâce à une meilleure gestion agricole")} // prettier-ignore
         {...bind("esca")}
         {...props}
       />
       <NumberInput
         label="ECCS"
+        hasTooltip
         title={t("Réductions d'émissions dues au piégeage et au stockage géologique du carbone")} // prettier-ignore
         {...bind("eccs")}
         {...props}
       />
       <NumberInput
         label="ECCR"
+        hasTooltip
         title={t("Réductions d'émissions dues au piégeage et à la substitution du carbone")} // prettier-ignore
         {...bind("eccr")}
         {...props}
       />
       <NumberInput
         label="EEE"
+        hasTooltip
         title={t("Réductions d'émissions dues à la production excédentaire d'électricité dans le cadre de la cogénération")} // prettier-ignore
         {...bind("eee")}
         {...props}

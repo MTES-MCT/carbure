@@ -36,7 +36,7 @@ export const Data = {
 
 export function getField(label: any) {
   const rx = new RegExp(`^${label}`)
-  const field = screen.getByText(rx).parentElement?.querySelector("input")
+  const field = screen.getByText(rx).closest("[data-field]")?.querySelector("input")
   if (!field) throw new Error(`Cannot find field with label like ${label}`)
   return field
 }
