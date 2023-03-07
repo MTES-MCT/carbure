@@ -264,7 +264,7 @@ const normalizeDeclaration: Normalizer<DeclarationSummary, number> = (
   declaration
 ) => {
   const date = formatPeriod(declaration.period) + "-01"
-  const localized = formatDate(date, { day: undefined, year: undefined, month: 'long' }) // prettier-ignore
+  const localized = formatDate(date, "MMMM") // prettier-ignore
   const extra = i18next.t("{{count}} lots", { count: declaration.lots })
   const ok = declaration.declaration?.declared ? " ✔" : ""
 
