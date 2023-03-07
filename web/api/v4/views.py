@@ -24,6 +24,7 @@ from api.v4.lots import construct_carbure_lot, bulk_insert_lots, try_get_date
 from api.v4.sanity_checks import sanity_check, bulk_sanity_checks
 
 from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureLotReliabilityScore, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, Entity, GenericError, Pays, SustainabilityDeclaration, UserRights
+from transactions.models import LockedYear
 from core.notifications import notify_correction_done, notify_correction_request, notify_declaration_cancelled, notify_declaration_validated, notify_lots_recalled, notify_lots_received, notify_lots_rejected, notify_lots_recalled
 from core.serializers import CarbureLotPublicSerializer, CarbureLotReliabilityScoreSerializer, CarbureNotificationSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
 from core.xlsx_v3 import template_v4, template_v4_stocks
@@ -513,10 +514,12 @@ def add_lot(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
     entity = Entity.objects.get(pk=entity_id)
+
     d = get_prefetched_data(entity)
     lot_obj, errors = construct_carbure_lot(d, entity, request.POST.dict())
     if not lot_obj:
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=400)
+    
     # run sanity checks, insert lot and errors
     lots_created = bulk_insert_lots(entity, [lot_obj], [errors], d)
     if len(lots_created) == 0:
@@ -528,6 +531,22 @@ def add_lot(request, *args, **kwargs):
     e.user = request.user
     e.metadata = {'source': 'MANUAL'}
     e.save()
+
+
+    current_year = e.lot.year
+    print(current_year)
+    locked_year = LockedYear.objects.get(year=2020)
+    print("******CURRENT*****")
+    print(locked_year)
+
+    # if(locked_year.locked) 
+        
+    # print(locked_year)
+    
+    # if has_current_year :
+    #     print("l'annee existe") 
+
+    
     data = CarbureLotPublicSerializer(e.lot).data
     return JsonResponse({'status': 'success', 'data': data})
 

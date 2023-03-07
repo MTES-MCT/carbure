@@ -23,6 +23,8 @@ services:
       - carbureredis:/data
     networks:
       - carbure
+    ports:
+      - 6379:6379
 
   carbure-frontend:
     image: carbure_frontend:local
@@ -46,7 +48,7 @@ services:
     environment:
       IMAGE_TAG: ${IMAGE_TAG}
       DATABASE_URL: mysql://root:$MYSQL_ROOT_PASSWORD@carbure-mariadb:3306/$MYSQL_DATABASE
-      REDIS_URL: ${REDIS_URL}
+      REDIS_URL: redis://carbure-redis:6379
       SECRET_KEY: ${SECRET_KEY}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS}
       CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS}
