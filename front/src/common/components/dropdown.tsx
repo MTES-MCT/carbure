@@ -34,7 +34,7 @@ export const Dropdown = ({
 }: DropdownProps) => {
   const [open, _setOpen] = useControlledState(false, openControlled, onToggle)
   const dropdownRef = useRef<HTMLDivElement>(null)
-  let isHoverTimeout: NodeJS.Timeout
+  const isHoverTimeout = useRef<NodeJS.Timeout>()
   const setOpen = useCallback(
     (willOpen: boolean) => {
       if (willOpen !== open) {
@@ -117,20 +117,19 @@ export const Dropdown = ({
         setOpen(false)
       }
     }
-    let allow = false
+
     function onHover(e: MouseEvent) {
       if (open) return
       if (!isInside(dropdownRef.current, e.relatedTarget)) {
-        isHoverTimeout = setTimeout(() => {
+        isHoverTimeout.current = setTimeout(() => {
           setOpen(true)
         }, 150)
       }
     }
 
     function onHoverOut(e: MouseEvent) {
-      isHoverTimeout && clearTimeout(isHoverTimeout)
-      if (!open) return
-      setOpen(false)
+      if (isHoverTimeout.current) clearTimeout(isHoverTimeout.current)
+      if (open) setOpen(false)
     }
 
     function onKeyDown(e: KeyboardEvent) {
@@ -170,8 +169,10 @@ export const Dropdown = ({
       trigger.removeEventListener("click", onClick)
       trigger.removeEventListener("keydown", onKeyDown, true)
       trigger.removeEventListener("blur", onBlur, true)
+
+      if (isHoverTimeout.current) clearTimeout(isHoverTimeout.current)
     }
-  }, [triggerRef, dropdownRef, open, setOpen])
+  }, [triggerRef, dropdownRef, open, setOpen, openOnHover])
 
   function onFocus() {
     setOpen(true)
