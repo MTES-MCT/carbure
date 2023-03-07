@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
-import useEntity, { EntityManager } from "carbure/hooks/entity"
+import useEntity from "carbure/hooks/entity"
 import { DeliveryType, Lot, LotError } from "transactions/types"
 import {
   Entity,

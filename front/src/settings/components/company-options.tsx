@@ -8,7 +8,6 @@ import Checkbox from "common/components/checkbox"
 import { Calculator } from "common/components/icons"
 import Select from "common/components/select"
 import * as api from "../api/company"
-import Flags from "flags.json"
 
 const CompanyOptions = () => {
   const { t } = useTranslation()

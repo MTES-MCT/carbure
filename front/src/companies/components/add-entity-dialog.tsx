@@ -1,3 +1,4 @@
+import { AxiosError } from "axios"
 import useEntity from "carbure/hooks/entity"
 import { EntityType } from "carbure/types"
 import * as norm from "carbure/utils/normalizers"
@@ -29,6 +30,12 @@ export const AddEntityDialog = ({
 
   const addEntityRequest = useMutation(api.addCompany, {
     invalidates: ["entities"],
+    onError: (err) => {
+      const error = (err as AxiosError<{ error: string }>).response?.data.error
+      if (error === "ENTITY_EXISTS") {
+        alert("La société existe déjà")
+      }
+    },
   })
 
   const addEntity = async () => {
@@ -91,6 +98,7 @@ export const AddEntityDialog = ({
             label={t("Ajouter")}
             variant="primary"
             submit="add-entity"
+            disabled={addEntityRequest.loading}
           />
 
           <Button icon={Return} label={t("Retour")} action={onClose} />

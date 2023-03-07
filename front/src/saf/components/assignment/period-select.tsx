@@ -31,11 +31,7 @@ export const PeriodSelect = ({
       for (; currentMonth <= 12; currentMonth++) {
         const period = currentYear * 100 + currentMonth
         const date = formatPeriod(period) + "-01"
-        const periodString = formatDate(date, {
-          day: undefined,
-          year: "numeric",
-          month: "long",
-        })
+        const periodString = formatDate(date, "MMMM yyyy")
 
         list.push({
           value: period,

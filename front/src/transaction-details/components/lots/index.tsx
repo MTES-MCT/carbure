@@ -18,12 +18,7 @@ import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import LotTag from "transactions/components/lots/lot-tag"
-import {
-  CorrectionStatus,
-  DeliveryType,
-  Lot,
-  LotStatus,
-} from "transactions/types"
+import { CorrectionStatus, Lot, LotStatus } from "transactions/types"
 import { isExpiring } from "transactions/utils/deadline"
 import * as api from "../../api"
 import Score from "../score"
@@ -39,7 +34,7 @@ import LotTraceability, { hasTraceability } from "./lot-traceability"
 import NavigationButtons from "./navigation"
 
 export interface LotDetailsProps {
-  neighbors: number[]
+  neighbors?: number[]
 }
 
 export const LotDetails = ({ neighbors }: LotDetailsProps) => {
@@ -212,8 +207,12 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
               hasParentStock={!!lotData.has_parent_stock}
             />
           )}
-
-          <NavigationButtons neighbors={neighbors} closeAction={closeDialog} />
+          {neighbors && (
+            <NavigationButtons
+              neighbors={neighbors}
+              closeAction={closeDialog}
+            />
+          )}
         </footer>
 
         {lot.loading && <LoaderOverlay />}

@@ -20,7 +20,6 @@ import { FilterManager, ResetButton } from "../filters"
 import NoResult from "../no-result"
 import { compact } from "common/utils/collection"
 import useEntity from "carbure/hooks/entity"
-import Flags from "flags.json"
 
 export interface LotSummaryBarProps extends Partial<FilterManager> {
   query: LotQuery
@@ -52,7 +51,7 @@ export const LotSummaryBar = ({
     MJ: "total_lhv_amount" as "total_lhv_amount",
   }
 
-  const unit = !Flags.preferred_unit ? "l" : entity.preferred_unit ?? "l"
+  const unit = entity.preferred_unit ?? "l"
   const field = unitToField[unit]
 
   const summaryData = summary.result?.data.data ?? {
@@ -171,7 +170,7 @@ export const LotSummary = ({
     MJ: "lhv_amount_sum" as "lhv_amount_sum",
   }
 
-  const unit = !Flags.preferred_unit ? "l" : entity.preferred_unit ?? "l"
+  const unit = entity.preferred_unit ?? "l"
   const field = unitToField[unit]
 
   const input = summaryData?.in ?? []
@@ -206,8 +205,7 @@ export const LotSummary = ({
               columns.supplier,
               columns.delivery,
               columns.biofuel,
-              !Flags.preferred_unit && columns.volume,
-              Flags.preferred_unit && columns.quantity,
+              columns.quantity,
               pending ? columns.countWithPending : columns.count,
               columns.ghgReduction,
               pending && columns.shortcutInput,
@@ -232,8 +230,7 @@ export const LotSummary = ({
               columns.client,
               columns.delivery,
               columns.biofuel,
-              !Flags.preferred_unit && columns.volume,
-              Flags.preferred_unit && columns.quantity,
+              columns.quantity,
               pending ? columns.countWithPending : columns.count,
               columns.ghgReduction,
               pending && columns.shortcutOutput,

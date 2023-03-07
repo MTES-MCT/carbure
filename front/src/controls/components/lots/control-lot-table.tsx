@@ -11,7 +11,6 @@ import {
   useLotColumns,
 } from "transactions/components/lots/lot-table"
 import { compact } from "common/utils/collection"
-import Flags from "flags.json"
 
 export interface ControlTableProps {
   loading: boolean
@@ -46,12 +45,11 @@ export const ControlTable = memo(
         columns={compact([
           markerColumn<Lot>((lot) => getLotMarker(lot, errors)),
           selectionColumn(lots, selected, onSelect, (lot) => lot.id),
-          Flags.scoring && columns.score,
+          columns.score,
           columns.status,
           columns.period,
           columns.document,
-          !Flags.preferred_unit && columns.volume,
-          Flags.preferred_unit && columns.quantity,
+          columns.quantity,
           columns.feedstock,
           columns.supplier,
           columns.client,

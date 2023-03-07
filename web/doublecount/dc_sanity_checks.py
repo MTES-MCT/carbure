@@ -1,6 +1,5 @@
 from typing import List, TypedDict
-from django.db.models import Sum, QuerySet
-from doublecount.models import DoubleCountingAgreement, DoubleCountingProduction, DoubleCountingSourcing
+from doublecount.models import DoubleCountingProduction, DoubleCountingSourcing
 from core.models import Biocarburant, MatierePremiere
 from doublecount.dc_parser import ProductionRow, SourcingRow
 
@@ -64,9 +63,6 @@ def check_production_row(production: DoubleCountingProduction, data: ProductionR
     elif not production.biofuel_id:
         errors.append(error(DoubleCountingError.UNKNOWN_BIOFUEL, line, {"biofuel": data["biofuel"]}))
 
-    if not production.estimated_production or not data["estimated_production"]:
-        errors.append(error(DoubleCountingError.MISSING_ESTIMATED_PRODUCTION, line))
-
     if production.feedstock_id and production.biofuel_id:
         incompatibilities = check_compatibility_feedstock_biofuel(production.feedstock, production.biofuel)
         meta = {"feedstock": production.feedstock.code, "biofuel": production.biofuel.code, "infos": incompatibilities}
@@ -86,9 +82,6 @@ def check_dc_globally(
     production: list[DoubleCountingProduction],
 ) -> List[DcError]:
     errors: List[DcError] = []
-
-    # sourcing = DoubleCountingSourcing.objects.filter(dca_id=dca.id)
-    # production = DoubleCountingProduction.objects.filter(dca_id=dca.id)
 
     errors += check_sourcing_vs_production(sourcing, production)
     errors += check_pome_excess(production)
@@ -126,19 +119,15 @@ def check_sourcing_vs_production(
 
     for year in production_by_year_by_feedstock:
         for feedstock in production_by_year_by_feedstock[year]:
-            try:
-                production = production_by_year_by_feedstock[year].get(feedstock, 0)
-                sourcing = sourcing_by_year_by_feedstock.get(year, {}).get(feedstock, 0)
-                # check that the sourced amount of feedstock roughly matches the total production generated with this feedstock
-                if production > sourcing:
-                    meta = {"feedstock": feedstock, "year": year, "sourcing": sourcing, "production": production}  # fmt:skip
-                    errors.append(error(DoubleCountingError.PRODUCTION_MISMATCH_SOURCING, meta=meta))
-            except:
+            production = production_by_year_by_feedstock[year].get(feedstock, 0)
+            sourcing = sourcing_by_year_by_feedstock.get(year, {}).get(feedstock, 0)
+            # check that the sourced amount of feedstock roughly matches the total production generated with this feedstock
+            if production > sourcing:
                 meta = {
-                    "feedstock": p["feedstock__code"],
-                    "year": p["year"],
-                    "sourcing": 0,
-                    "production": p["quantity"],
+                    "feedstock": feedstock,
+                    "year": year,
+                    "sourcing": sourcing,
+                    "production": production,
                 }
                 errors.append(error(DoubleCountingError.PRODUCTION_MISMATCH_SOURCING, meta=meta))
 

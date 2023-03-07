@@ -196,12 +196,12 @@ class LotNode(Node):
 
     def remove_from_tree(self):
         # if the parent is a CarbureLot, put it back into PENDING mode
-        if self.parent.type == Node.LOT:
+        if self.parent and self.parent.type == Node.LOT:
             self.parent.update({"lot_status": CarbureLot.PENDING, "delivery_type": CarbureLot.UNKNOWN})
             return [self.parent]
 
         # if the parent is a CarbureStock, credit back the extracted volume
-        if self.parent.type == Node.STOCK:
+        if self.parent and self.parent.type == Node.STOCK:
             biofuel = self.parent.data.biofuel
             remaining_volume = self.parent.data.remaining_volume + self.data.volume
             volume, weight, lhv_amount = compute_quantities(biofuel, volume=remaining_volume)

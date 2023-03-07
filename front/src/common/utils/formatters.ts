@@ -1,5 +1,5 @@
 import i18n from "i18n"
-import format from "date-fns/intlFormat"
+import formatTime from "date-fns/format"
 import formatDistanceToNow from "date-fns/formatDistanceToNow"
 import fr from "date-fns/locale/fr"
 import en from "date-fns/locale/en-GB"
@@ -16,7 +16,17 @@ export function formatPeriodFromDate(date: Date) {
 }
 
 export function formatNumber(num: number) {
-  return parseFloat(num.toFixed(2)).toLocaleString("fr-FR")
+  const integer = Math.floor(num).toFixed(0)
+  const decimal = num % 1
+
+  let numStr = chunk(integer, 3).join(" ")
+
+  if (decimal !== 0) {
+    const decimalStr = (num % 1).toFixed(2).slice(2, 4)
+    numStr += "," + decimalStr
+  }
+
+  return numStr
 }
 
 export function formatPercentage(num: number) {
@@ -39,22 +49,18 @@ export function formatGHG(num: number) {
 
 export function formatDate(
   date: Date | string | null,
-  options: Parameters<typeof format>[1] = {}
+  format: string = "dd/MM/yyyy"
 ) {
   if (date === null) {
     return "N/A"
   }
 
   try {
-    const formatted = format(
+    const formatted = formatTime(
       new Date(date),
-      {
-        year: "numeric",
-        month: "numeric",
-        day: "numeric",
-        ...options,
-      },
-      { locale: i18n.language === "en" ? "en-GB" : "fr" }
+      format,
+      // @ts-ignore it says it only want strings but it actually doesn't
+      { locale: i18n.language === "fr" ? fr : en }
     )
 
     return formatted
@@ -64,14 +70,11 @@ export function formatDate(
 }
 
 export function formatDateYear(date: Date | string | null) {
-  return formatDate(date, { month: undefined, day: undefined })
+  return formatDate(date, "yyyy")
 }
 
 export function formatDateTime(date: Date | string | null) {
-  return formatDate(date, {
-    hour: "2-digit",
-    minute: "2-digit",
-  })
+  return formatDate(date, "dd/MM/yyyy HH:mm")
 }
 
 export function formatElapsedTime(date: Date | string | null) {
@@ -79,12 +82,12 @@ export function formatElapsedTime(date: Date | string | null) {
 
   return formatDistanceToNow(new Date(date), {
     addSuffix: true,
-    locale: i18n.language === "en" ? en : fr,
+    locale: i18n.language === "fr" ? fr : en,
   })
 }
 
 export function formatDeadline(deadline: Date | string | null) {
-  return formatDate(deadline, { month: "long", year: undefined })
+  return formatDate(deadline, "dd MMMM")
 }
 
 // prepare string for comparison by putting it to lowercase and removing accents
@@ -107,4 +110,21 @@ export function variations(count: number) {
     if (count > 1) return labels.many
     else return ""
   }
+}
+
+export function chunk(str: string, size: number): string[] {
+  const chunks: string[] = []
+  let chunk = ""
+
+  for (let i = 1; i <= str.length; i++) {
+    const char = str[str.length - i]
+    chunk = char + chunk
+
+    if (i % size === 0 || i === str.length) {
+      chunks.push(chunk)
+      chunk = ""
+    }
+  }
+
+  return chunks.reverse()
 }

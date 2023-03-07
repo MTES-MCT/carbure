@@ -19,14 +19,14 @@ import NavigationButtons from "transaction-details/components/lots/navigation"
 import * as api from "../../api"
 import TicketTag from "../tickets/tag"
 import CancelAssignment from "./cancel-assignment"
-import ChildTicketSource from "./child-ticket-source"
+import LinkedTicketSource from "./linked-ticket-source"
 import ClientComment from "./client-comment"
 import CreditTicketSource from "./credit-ticket-source"
 import { TicketFields } from "./fields"
 import RejectAssignment from "./reject-assignment"
 
 export interface TicketDetailsProps {
-  neighbors: number[]
+  neighbors?: number[]
 }
 export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
   const { t } = useTranslation()
@@ -94,12 +94,12 @@ export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
           </section>
           <ClientComment ticket={ticket} />
 
-          {/* {ticket?.client === entity.name && TODO Add to api to display
-            ticket?.status === SafTicketStatus.Accepted && (
-              <ChildTicketSource
-                child_ticket_source={ticket.child_ticket_source}
-              />
-            )} */}
+          {ticket?.supplier === entity.name && (
+            <LinkedTicketSource
+              ticket_source={ticket.parent_ticket_source}
+              title={t("Volume parent")}
+            />
+          )}
         </main>
 
         <footer>
@@ -132,8 +132,12 @@ export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
                 action={showCancelModal}
               />
             )}
-
-          <NavigationButtons neighbors={neighbors} closeAction={closeDialog} />
+          {neighbors && (
+            <NavigationButtons
+              neighbors={neighbors}
+              closeAction={closeDialog}
+            />
+          )}
         </footer>
 
         {ticketResponse.loading && <LoaderOverlay />}

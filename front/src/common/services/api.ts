@@ -10,7 +10,9 @@ export interface Api<T> {
 
 export const api = axios.create({
   baseURL: API_ROOT,
-  paramsSerializer: (params) => toSearchParams(params).toString(),
+  paramsSerializer: {
+    serialize: (params) => toSearchParams(params).toString(),
+  },
   transformRequest: (data) => toFormData(data),
   xsrfCookieName: "csrftoken",
   xsrfHeaderName: "X-CSRFTOKEN",

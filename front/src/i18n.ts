@@ -31,4 +31,11 @@ i18n
     },
   })
 
+// tell TS that the i18next.t() function will never return null
+declare module "i18next" {
+  interface CustomTypeOptions {
+    returnNull: false
+  }
+}
+
 export default i18n

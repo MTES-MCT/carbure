@@ -1800,25 +1800,6 @@ def get_stats(request):
         return JsonResponse({'status': 'error', 'message': 'Could not compute statistics'})
 
 
-@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
-def update_entity(request, *args, **kwargs):
-    context = kwargs['context']
-    entity_id = context['entity_id']
-    legal_name = request.POST.get('legal_name', '')
-    registration_id = request.POST.get('registration_id', '')
-    sustainability_officer_phone_number = request.POST.get('sustainability_officer_phone_number', '')
-    sustainability_officer = request.POST.get('sustainability_officer', '')
-    registered_address = request.POST.get('registered_address', '')
-    entity = Entity.objects.get(id=entity_id)
-    entity.legal_name = legal_name
-    entity.sustainability_officer_phone_number = sustainability_officer_phone_number
-    entity.registration_id = registration_id
-    entity.sustainability_officer = sustainability_officer
-    entity.registered_address = registered_address
-    entity.save()
-    return JsonResponse({'status': 'success'})
-
-
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
 def set_entity_preferred_unit(request, *args, **kwargs):
     entity_id = kwargs['context']['entity_id']
