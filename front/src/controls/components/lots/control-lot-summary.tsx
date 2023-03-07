@@ -12,7 +12,6 @@ import {
   useSummaryColumns,
 } from "transactions/components/lots/lot-summary"
 import useEntity from "carbure/hooks/entity"
-import Flags from "flags.json"
 import { compact } from "common/utils/collection"
 
 export const ControlLotSummaryBar = (props: LotSummaryBarProps) => {
@@ -51,7 +50,7 @@ export const ControlLotSummary = ({
     MJ: "lhv_amount_sum" as "lhv_amount_sum",
   }
 
-  const unit = !Flags.preferred_unit ? "l" : entity.preferred_unit ?? "l"
+  const unit = entity.preferred_unit ?? "l"
   const field = unitToField[unit]
 
   const lots = summaryData?.lots ?? []
@@ -86,8 +85,7 @@ export const ControlLotSummary = ({
               columns.client,
               columns.delivery,
               columns.biofuel,
-              !Flags.preferred_unit && columns.volume,
-              Flags.preferred_unit && columns.quantity,
+              columns.quantity,
               columns.count,
               columns.ghgReduction,
             ])}
