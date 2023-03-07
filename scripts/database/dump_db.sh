@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # clean up any previous local backup
-rm -r /tmp/backups
+rm -rf /tmp/backups
 mkdir -p /tmp/backups
 
 # extract DATABASE_URL parts
@@ -17,6 +17,6 @@ alias carbure-mysqldump="mysqldump --user=$MYSQL_USER --password=$MYSQL_PASSWORD
 
 carbure-mysqldump $MYSQL_DATABASE > /tmp/backups/backup-$(date +\%F).sql
 
-tar -czf /tmp/backups/backup-$(date +\%F).tgz /tmp/backups/backup-$(date +\%F).sql
+tar -czf /tmp/backups/backup-$(date +\%F).tar.gz -C /tmp/backups backup-$(date +\%F).sql
 
 echo "OK"
