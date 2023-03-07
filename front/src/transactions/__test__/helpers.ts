@@ -1,5 +1,5 @@
 import { screen } from "@testing-library/react"
-import { UserEvent } from "@testing-library/user-event/dist/types/setup"
+import { UserEvent } from "@testing-library/user-event/dist/types/setup/setup"
 
 export async function clickOnCheckboxesAndConfirm(user: UserEvent) {
   await user.click(
