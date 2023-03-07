@@ -10,6 +10,7 @@ from saf.factories import SafTicketSourceFactory, SafTicketFactory
 
 from core.traceability import Node, LotNode
 
+
 class TraceabilityTest(TestCase):
     fixtures = [
         "json/biofuels.json",
@@ -248,13 +249,18 @@ class TraceabilityTest(TestCase):
         self.assertEqual(root_node.data.esca, 2.0)
 
     def test_traceability_different_owners(self):
-        parent_lot = CarbureLotFactory.create(lot_status="ACCEPTED", added_by=self.entity, esca=3)
+        parent_lot = CarbureLotFactory.create(
+            lot_status="ACCEPTED",
+            added_by=self.entity,
+            esca=3,
+        )
 
         CarbureLotFactory.create(
             lot_status="ACCEPTED",
             parent_lot=parent_lot,
             added_by=self.entity2,
             unknown_client="SOMEBODY",
+            esca=10,
         )
 
         parent_node = LotNode(parent_lot)
@@ -262,7 +268,12 @@ class TraceabilityTest(TestCase):
 
         # try to update the parent as entity1
         expected_diff = {"esca": (2, 3)}
-        self.assertEqual(parent_node.update({"esca": 2}, self.entity.id), expected_diff)
+        result = parent_node.update({"esca": 2}, self.entity.id)
+        self.assertEqual(result, expected_diff)
+
+        parent_node.propagate()
+        self.assertEqual(parent_node.data.esca, 2)
+        self.assertEqual(child_node.data.esca, 2)
 
         # try to update the parent as entity2
         self.assertRaises(Exception, parent_node.update, {"esca": 1}, self.entity2.id)
@@ -271,8 +282,9 @@ class TraceabilityTest(TestCase):
         self.assertRaises(Exception, child_node.update, {"esca": 0}, self.entity2.id)
 
         # try to update delivery fields on the child as entity2
-        expected_diff = {"unknown_client": ("UNKNOWN", "SOMEBODY")}
-        self.assertEqual(child_node.update({"unknown_client": "UNKNOWN"}, self.entity2.id), expected_diff)
+        expected_diff = ("UNKNOWN", "SOMEBODY")
+        result = child_node.update({"unknown_client": "UNKNOWN"}, self.entity2.id)
+        self.assertEqual(result["unknown_client"], expected_diff)
 
     def test_traceability_stock_transform_to_parent_lot(self):
         # @TODO check that the correct values propagate up the chain
