@@ -1,7 +1,8 @@
 # forked from https://github.com/metakermit/django-spa/blob/master/spa/storage.py
 
 from django.contrib.staticfiles.storage import ManifestStaticFilesStorage
-from whitenoise.storage import HelpfulExceptionMixin, CompressedStaticFilesMixin
+from whitenoise.storage import CompressedStaticFilesStorage
+
 
 class PatchedManifestStaticFilesStorage(ManifestStaticFilesStorage):
     """
@@ -26,5 +27,6 @@ class PatchedManifestStaticFilesStorage(ManifestStaticFilesStorage):
 
         return converter
 
-class SPAStaticFilesStorage(HelpfulExceptionMixin, CompressedStaticFilesMixin, PatchedManifestStaticFilesStorage):
+
+class SPAStaticFilesStorage(CompressedStaticFilesStorage, PatchedManifestStaticFilesStorage):
     pass

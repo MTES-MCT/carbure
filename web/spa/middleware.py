@@ -3,7 +3,6 @@ import os
 
 from django.conf import settings
 from django.urls import is_valid_path
-from django.urls.exceptions import Resolver404
 from whitenoise.middleware import WhiteNoiseMiddleware
 
 
@@ -11,7 +10,8 @@ class SPAMiddleware(WhiteNoiseMiddleware):
     """Adds support for serving a single-page app (SPA)
     with frontend routing on /
     """
-    index_name = os.path.join(settings.STATIC_URL, 'index.html')
+
+    index_name = os.path.join(settings.STATIC_URL, "index.html")
 
     def process_request(self, request):
         # First try to serve the static files (on /static/ and on /)
@@ -29,11 +29,14 @@ class SPAMiddleware(WhiteNoiseMiddleware):
             # (e.g. a template or the Djangoadmin)
             # so we'll let Django handle this
             # (just return and let the normal middleware take its course)
-            urlconf = getattr(request, 'urlconf', None)
+            urlconf = getattr(request, "urlconf", None)
             if is_valid_path(request.path_info, urlconf):
                 return
-            if (settings.APPEND_SLASH and not request.path_info.endswith('/') and
-                is_valid_path('%s/' % request.path_info, urlconf)):
+            if (
+                settings.APPEND_SLASH
+                and not request.path_info.endswith("/")
+                and is_valid_path("%s/" % request.path_info, urlconf)
+            ):
                 return
 
             # 2) the url is handled by frontend routing
@@ -41,15 +44,15 @@ class SPAMiddleware(WhiteNoiseMiddleware):
             try:
                 return self.serve(self.spa_root, request)
             except AttributeError:  # no SPA page stored yet
-                self.spa_root = self.find_file('/')
+                self.spa_root = self.find_file("/")
                 if self.spa_root:
                     return self.serve(self.spa_root, request)
                 # TODO: else return a Django 404 (maybe?)
 
     def update_files_dictionary(self, *args):
         super(SPAMiddleware, self).update_files_dictionary(*args)
-        relative_index_name = self.index_name.strip('/')
-        index_page_suffix = '/' + relative_index_name
+        relative_index_name = self.index_name.strip("/")
+        index_page_suffix = "/" + relative_index_name
         index_name_length = len(relative_index_name)
         static_prefix_length = len(settings.STATIC_URL) - 1
         directory_indexes = {}
@@ -77,13 +80,13 @@ class SPAMiddleware(WhiteNoiseMiddleware):
         # we append the index filename so that will be served if present.
         # TODO: handle the trailing slash for the case of e.g. /welcome/
         # (should be frontend-routed)
-        if url.endswith('/'):
-            url += self.index_name.strip('/')
+        if url.endswith("/"):
+            url += self.index_name.strip("/")
             self.spa_root = super(SPAMiddleware, self).find_file(url)
             return self.spa_root
         else:
             # also serve static files on /
             # e.g. when /my/file.png is requested, serve /static/my/file.png
-            if (not url.startswith(settings.STATIC_URL)):
+            if not url.startswith(settings.STATIC_URL):
                 url = os.path.join(settings.STATIC_URL, url[1:])
             return super(SPAMiddleware, self).find_file(url)
