@@ -1,12 +1,20 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import cl from "clsx"
 import Button from "./button"
-import { AlertTriangle, Cross, Loader, Search, Placeholder } from "./icons"
+import {
+  AlertTriangle,
+  Cross,
+  Loader,
+  Search,
+  Placeholder,
+  InfoCircle,
+} from "./icons"
 import { Col, layout, Layout, Overlay } from "./scaffold"
 import { isInside } from "./dropdown"
 import css from "./input.module.css"
 import i18next from "i18next"
+import Tooltip from "./tooltip"
 
 export type FieldVariant = "outline" | "solid" | "inline" | "text"
 
@@ -28,6 +36,7 @@ export interface Control extends Layout {
   title?: string
   icon?: React.FunctionComponent | React.ReactNode
   rightContent?: React.ReactNode
+  hasTooltip?: boolean
   domRef?: React.RefObject<HTMLElement>
 }
 
@@ -442,6 +451,7 @@ export const Field = ({
   style,
   children,
   onClear,
+  hasTooltip,
 }: FieldProps) => {
   const icon =
     loading === true ? (
@@ -456,6 +466,25 @@ export const Field = ({
       <Placeholder />
     ) : null
 
+  const TooltipWrapper = ({ children }: { children: React.ReactNode }) => {
+    if (hasTooltip) {
+      return (
+        <Tooltip title={title ?? label!}>
+          {children}
+          <InfoCircle
+            color="#6A6A6A"
+            size={18}
+            style={{
+              margin: "5px 0px 0 2px",
+              position: "absolute",
+            }}
+          />
+        </Tooltip>
+      )
+    }
+    return <>{children}</>
+  }
+
   return (
     <div
       data-field
@@ -463,16 +492,18 @@ export const Field = ({
       data-readonly={readOnly ? true : undefined}
       data-loading={loading ? true : undefined}
       data-error={error ? true : undefined}
-      title={title}
+      title={hasTooltip ? "" : title}
       style={style}
       className={cl(css.field, variant && css[variant], className)}
       {...layout({ asideX, asideY, spread })}
     >
       {label && (
-        <label className={css.label} title={title ?? label}>
-          {label}
-          {required && !(disabled || readOnly) && " *"}
-        </label>
+        <TooltipWrapper>
+          <label className={css.label} title={hasTooltip ? "" : title ?? label}>
+            {label}
+            {required && !(disabled || readOnly) && " *"}
+          </label>
+        </TooltipWrapper>
       )}
 
       <div

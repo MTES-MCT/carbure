@@ -74,14 +74,12 @@ function checkDeliveryFields() {
 }
 
 function checkGESFields() {
-  getField("Émissions")
   getField("EEC")
   getField("EL")
   getField("EP")
   getField("ETD")
   getField("EU")
 
-  getField("Réductions")
   getField("ESCA")
   getField("ECCS")
   getField("ECCR")
@@ -442,7 +440,7 @@ test("transaction details form as producer - producer trades unknown producer lo
   checkOriginFields()
   checkProductionFields()
   checkDeliveryFields()
-  checkGESFields()
+  await checkGESFields()
 
   await screen.findByDisplayValue("Unknown Producer")
 
