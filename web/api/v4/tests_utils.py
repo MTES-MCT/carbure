@@ -14,6 +14,8 @@ def get_lot(entity):
     clients = Entity.objects.filter(entity_type__in=[Entity.OPERATOR])
 
     psite = random.choice(psites)
+    print("******")
+    print(depots)
     depot = random.choice(depots)
     client = random.choice(clients)
     data = {

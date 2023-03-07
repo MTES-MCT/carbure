@@ -70,6 +70,8 @@ Lorsque des changement sont effectué sur la base de donnée :
 - Run just one test
 `docker exec carbure_app python3 web/manage.py api.v5.saf.airline.tests.tests_ticket_details.SafTicketDetailsTest`
 
+-for v4 `docker exec -e TEST=1 carbure_app python3 web/manage.py test api.v4.tests_lots_flow`
+
 ## Étapes spécifiques pour windows
 - setup wsl2: https://docs.microsoft.com/en-us/windows/wsl/install-win10
 - installer docker desktop avec les libs WSL extra

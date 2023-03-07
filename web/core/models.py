@@ -303,16 +303,7 @@ class EntityDepot(models.Model):
         verbose_name_plural = 'Dépôts Entité'
 
 
-from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
-
-class LockedYear(models.Model):
-    year = models.CharField(max_length=4, null=False, blank=False)
-    locked = models.BooleanField(default=True)
-
-    class Meta:
-            db_table = 'locked_years'
-            verbose_name = 'Locked Year'
-            verbose_name_plural = 'Locked Years'
+from producers.models import ProductionSite
 
 class SustainabilityDeclaration(models.Model):
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
