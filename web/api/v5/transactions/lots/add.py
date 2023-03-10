@@ -16,6 +16,11 @@ def add_lot(request, *args, **kwargs):
     lot_obj, errors = construct_carbure_lot(d, entity, request.POST.dict())
     if not lot_obj:
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=400)
+        
+    # print("************")
+    # print(lot_obj.year)
+    # if check_locked_year(lot_obj.year): 
+    #     return ErrorResponse(400, "YEAR_LOCKED")
     
     # run sanity checks, insert lot and errors
     lots_created = bulk_insert_lots(entity, [lot_obj], [errors], d)
@@ -29,18 +34,7 @@ def add_lot(request, *args, **kwargs):
     e.metadata = {'source': 'MANUAL'}
     e.save()
 
-
-    print("******CURRENT*****")
-    # current_year = e.lot.year
-    # print(current_year)
-    # locked_year = LockedYear.objects.get(year=current_year)
-    # if(locked_year.locked) 
-        
-    # print(locked_year)
-    
-    # if has_current_year :
-    #     print("l'annee existe") 
-
     print(e.lot.year)
     data = CarbureLotPublicSerializer(e.lot).data
     return JsonResponse({'status': 'success', 'data': data})
+
