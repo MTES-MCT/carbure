@@ -4,9 +4,12 @@ from django.db.models import Count
 from django.test import TestCase
 from django.urls import reverse
 from django_otp.plugins.otp_email.models import EmailDevice
+from transactions.models import LockedYear
 
 from django.contrib.auth import get_user_model
 
+
+#python web/manage.py test api.v5.transactions.lots.tests  --keepdb 
 
 class LotsCreateDraft(TestCase):
     fixtures = [
@@ -15,13 +18,12 @@ class LotsCreateDraft(TestCase):
         "json/countries.json",
         "json/entities.json",
         'json/depots.json',
-
         "json/productionsites.json",
     ]
 
     def setUp(self):
-        self.entity = Entity.objects.filter(entity_type=Entity.PRODUCER)[0]
         self.producer = Entity.objects.filter(entity_type=Entity.PRODUCER).annotate(psites=Count('productionsite')).filter(psites__gt=0)[0]
+        self.entity = self.producer 
         self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")])
         
         
@@ -53,31 +55,22 @@ class LotsCreateDraft(TestCase):
     
 
     def test_create_draft(self):
+        LockedYear.objects.create(year=2018, locked=True)
+
+        lot = get_lot(self.producer)
+        print("***")
+        print(lot)
+        # lot.update(kwargs)
+        response = self.client.post(reverse('api-v4-add-lots'), lot)
+        # response = self.client.post(reverse('api-v5-transactions-lots-add'), lot)
         
-        # query = {
-        #     "entity_id": self.entity.id,
-        #     "ticket_id": self.ticket.id,
-        # }
-        lot = self.create_draft()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["status"], "success")
+        data = response.json()['data']
+        lot_id = data['id']
+        lot = CarbureLot.objects.get(id=lot_id)
         
-        # self.assertEqual(lot.lot_status, CarbureLot.DRAFT)
+        self.assertEqual(lot.lot_status, CarbureLot.DRAFT)
 
 
-        # response = self.client.post(reverse("api-v5-saf-airline-accept-ticket"), query)
-
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response.json()["status"], "success")
-
-        # self.assertEqual(SafTicket.objects.get(id=self.ticket.id).status, SafTicket.ACCEPTED)
-
-    def create_draft(self, lot=None):
-        if lot is None:
-            lot = get_lot(self.producer)
-        # # lot.update(kwargs)
-        # response = self.client.post(reverse('api-v4-add-lots'), lot)
-        # self.assertEqual(response.status_code, 200)
-        # data = response.json()['data']
-        # lot_id = data['id']
-        # lot = CarbureLot.objects.get(id=lot_id)
-        return lot
     

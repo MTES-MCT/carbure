@@ -48,9 +48,6 @@ class LotsFlowTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def create_draft(self, lot=None, **kwargs):
-        LockedYear.objects.create(year=2018, locked=True)
- 
-
         if lot is None:
             lot = get_lot(self.producer)
         lot.update(kwargs)
@@ -68,8 +65,18 @@ class LotsFlowTest(TestCase):
         return lot
 
     def test_create_draft(self, **kwargs):
+        LockedYear.objects.create(year=2018, locked=True)
         lot = self.create_draft(**kwargs)
         self.assertEqual(lot.lot_status, CarbureLot.DRAFT)
+
+    def test_create_draft_on_locked_year(self, **kwargs):
+        LockedYear.objects.create(year=2021, locked=True)        
+        lot = get_lot(self.producer)
+        lot.update(kwargs)
+        response = self.client.post(reverse('api-v4-add-lots'), lot)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["status"], "error")
+        self.assertEqual(response.json()["error"], "YEAR_LOCKED")
 
     def test_update_lot(self):
         lotdata = get_lot(entity=self.producer)
