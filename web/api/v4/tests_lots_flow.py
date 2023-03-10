@@ -1,13 +1,15 @@
 import datetime
+
+from api.v3.common.urls import urlpatterns
+from api.v4.tests_utils import get_lot
+from core.models import (CarbureLot, CarbureStock, Entity,
+                         UserRights)
+from transactions.models import LockedYear
+from django.contrib.auth import get_user_model
+from django.db.models import Count
 from django.test import TestCase
 from django.urls import reverse
-from django.db.models import Count
-from django.contrib.auth import get_user_model
-
-from core.models import CarbureLot, CarbureStock, MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot, UserRights
-from api.v3.common.urls import urlpatterns
 from django_otp.plugins.otp_email.models import EmailDevice
-from api.v4.tests_utils import get_lot
 
 
 class LotsFlowTest(TestCase):
@@ -46,6 +48,9 @@ class LotsFlowTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def create_draft(self, lot=None, **kwargs):
+        LockedYear.objects.create(year=2018, locked=True)
+ 
+
         if lot is None:
             lot = get_lot(self.producer)
         lot.update(kwargs)
