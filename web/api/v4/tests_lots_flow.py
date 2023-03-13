@@ -10,7 +10,7 @@ from django.db.models import Count
 from django.test import TestCase
 from django.urls import reverse
 from django_otp.plugins.otp_email.models import EmailDevice
-
+from core.carburetypes import CarbureError
 
 class LotsFlowTest(TestCase):
     fixtures = [
@@ -65,7 +65,7 @@ class LotsFlowTest(TestCase):
         return lot
 
     def test_create_draft(self, **kwargs):
-        LockedYear.objects.create(year=2018, locked=True)
+        LockedYear.objects.create(year=2018, locked=True) #2021 is the right year
         lot = self.create_draft(**kwargs)
         self.assertEqual(lot.lot_status, CarbureLot.DRAFT)
 
@@ -76,7 +76,7 @@ class LotsFlowTest(TestCase):
         response = self.client.post(reverse('api-v4-add-lots'), lot)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["status"], "error")
-        self.assertEqual(response.json()["error"], "YEAR_LOCKED")
+        self.assertEqual(response.json()["error"], CarbureError.YEAR_LOCKED)
 
     def test_update_lot(self):
         lotdata = get_lot(entity=self.producer)

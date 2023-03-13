@@ -29,7 +29,7 @@ from core.notifications import notify_correction_done, notify_correction_request
 from core.serializers import CarbureLotPublicSerializer, CarbureLotReliabilityScoreSerializer, CarbureNotificationSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
 from core.xlsx_v3 import template_v4, template_v4_stocks
 from carbure.tasks import background_bulk_scoring, background_create_ticket_sources_from_lots
-
+from core.carburetypes import CarbureError
 
 @check_user_rights()
 def get_years(request, *args, **kwargs):
@@ -521,7 +521,7 @@ def add_lot(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=400)
     
     if check_locked_year(lot_obj.year): 
-        return ErrorResponse(400, "YEAR_LOCKED")
+        return ErrorResponse(400, CarbureError.YEAR_LOCKED)
     
     # run sanity checks, insert lot and errors
     lots_created = bulk_insert_lots(entity, [lot_obj], [errors], d)
