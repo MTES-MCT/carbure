@@ -4,6 +4,7 @@ from django.db import connection, transaction
 from django.conf import settings
 import xlsxwriter
 from core.xlsx_v3 import make_carbure_lots_sheet
+from core.models import Entity, UserRights
 
 
 # transform a string into a standard form in lower case without accents
@@ -50,40 +51,68 @@ def bulk_update_or_create(Model, id_field, rows):
     return existing_objects, new_objects
 
 
-def generate_reports(name, entity_lots):
+def generate_reports(name, entity_lots, include_partners=False):
     os.makedirs("/tmp/reports", exist_ok=True)
 
     lots_by_entity = {}
 
     for lot in entity_lots:
-        added_by = lot.added_by.name if lot.added_by else None
-        carbure_supplier = lot.carbure_supplier.name if lot.carbure_supplier else None
-        carbure_client = lot.carbure_client.name if lot.carbure_client else None
+        added_by = lot.added_by_id if lot.added_by else None
+        carbure_supplier = lot.carbure_supplier_id if lot.carbure_supplier else None
+        carbure_client = lot.carbure_client_id if lot.carbure_client else None
 
         if added_by is not None:
             if added_by not in lots_by_entity:
                 lots_by_entity[added_by] = {}
             lots_by_entity[added_by][lot.id] = lot
 
-        if carbure_supplier is not None:
-            if carbure_supplier not in lots_by_entity:
-                lots_by_entity[carbure_supplier] = {}
-            lots_by_entity[carbure_supplier][lot.id] = lot
+        if include_partners:
+            if carbure_supplier is not None:
+                if carbure_supplier not in lots_by_entity:
+                    lots_by_entity[carbure_supplier] = {}
+                lots_by_entity[carbure_supplier][lot.id] = lot
 
-        if carbure_client is not None:
-            if carbure_client not in lots_by_entity:
-                lots_by_entity[carbure_client] = {}
-            lots_by_entity[carbure_client][lot.id] = lot
+            if carbure_client is not None:
+                if carbure_client not in lots_by_entity:
+                    lots_by_entity[carbure_client] = {}
+                lots_by_entity[carbure_client][lot.id] = lot
 
     print("> Impacted entities: %d" % len(lots_by_entity))
 
-    for entity in lots_by_entity:
-        location = "/tmp/reports/%s_%s.xlsx" % (name, entity)
-        entity_lots = sorted(lots_by_entity[entity].values(), key=lambda l: l.delivery_date)
-        print("> %d lots for %s: '%s'" % (len(entity_lots), entity, location))
+    entities = Entity.objects.filter(id__in=list(lots_by_entity))
+    entities_by_id = {entity.id: entity for entity in entities}
+
+    users_by_entity = get_entities_users(entities)
+
+    for entity_id in lots_by_entity:
+        entity = entities_by_id[entity_id]
+        location = f"/tmp/reports/{name}_{entity.name}.xlsx"
+        entity_lots = sorted(lots_by_entity[entity_id].values(), key=lambda l: l.delivery_date)
+        entity_users = users_by_entity.get(entity_id, [])
+        emails = ", ".join([user.email for user in entity_users])
+        print(f"> {len(entity_lots)} lots for {entity.name} ({emails})")
         workbook = xlsxwriter.Workbook(location)
         make_carbure_lots_sheet(workbook, None, entity_lots)
         workbook.close()
+
+
+def get_entities_users(entities):
+    users_by_entity = {}
+    user_rights_by_entity = {}
+    user_rights = UserRights.objects.filter(entity__in=entities, user__is_staff=False)
+
+    for user_right in user_rights:
+        if user_right.entity_id not in user_rights_by_entity:
+            user_rights_by_entity[user_right.entity_id] = []
+        user_rights_by_entity[user_right.entity_id].append(user_right)
+
+    for entity_id in user_rights_by_entity:
+        user_rights = user_rights_by_entity[entity_id]
+        admins = [user_right.user for user_right in user_rights if user_right.role == UserRights.ADMIN]
+        users = [user_right.user for user_right in user_rights if user_right.role == UserRights.RW]
+        users_by_entity[entity_id] = admins if len(admins) > 0 else users
+
+    return users_by_entity
 
 
 def run_query(query_path, *args):
