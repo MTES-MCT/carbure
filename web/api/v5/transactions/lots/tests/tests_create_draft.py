@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django_otp.plugins.otp_email.models import EmailDevice
 from transactions.models import LockedYear
+from core.carburetypes import CarbureError
 
 from django.contrib.auth import get_user_model
 
@@ -58,11 +59,7 @@ class LotsCreateDraft(TestCase):
         LockedYear.objects.create(year=2018, locked=True)
 
         lot = get_lot(self.producer)
-        print("***")
-        print(lot)
-        # lot.update(kwargs)
-        response = self.client.post(reverse('api-v4-add-lots'), lot)
-        # response = self.client.post(reverse('api-v5-transactions-lots-add'), lot)
+        response = self.client.post(reverse('api-v5-transactions-lots-add'), lot)
         
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "success")
@@ -73,4 +70,11 @@ class LotsCreateDraft(TestCase):
         self.assertEqual(lot.lot_status, CarbureLot.DRAFT)
 
 
-    
+
+    def test_create_draft_on_locked_year(self):
+        LockedYear.objects.create(year=2021, locked=True)        
+        lot = get_lot(self.producer)
+        response = self.client.post(reverse('api-v5-transactions-lots-add'), lot)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["status"], "error")
+        self.assertEqual(response.json()["error"], CarbureError.YEAR_LOCKED)

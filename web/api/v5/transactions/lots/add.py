@@ -5,6 +5,9 @@ from api.v4.lots import construct_carbure_lot, bulk_insert_lots
 from django.http.response import JsonResponse
 from carbure.tasks import background_bulk_scoring
 from core.serializers import CarbureLotPublicSerializer
+from core.common import ErrorResponse
+from core.carburetypes import CarbureError
+from transactions.helpers import check_locked_year
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def add_lot(request, *args, **kwargs):
@@ -17,10 +20,8 @@ def add_lot(request, *args, **kwargs):
     if not lot_obj:
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=400)
         
-    # print("************")
-    # print(lot_obj.year)
-    # if check_locked_year(lot_obj.year): 
-    #     return ErrorResponse(400, "YEAR_LOCKED")
+    if check_locked_year(lot_obj.year): 
+        return ErrorResponse(400, CarbureError.YEAR_LOCKED)
     
     # run sanity checks, insert lot and errors
     lots_created = bulk_insert_lots(entity, [lot_obj], [errors], d)
