@@ -15,7 +15,7 @@ urlpatterns = [
 
 
     # GET
-    path('years', views.get_years, name='api-v4-get-years'), #TODO add locked year to block UI
+    path('years', views.get_years, name='api-v4-get-years'),
     path('snapshot', views.get_snapshot, name='api-v4-get-snapshot'),
     path('lots', views.get_lots, name='api-v4-get-lots'),
     path('lots/summary', views.get_lots_summary, name='api-v4-get-lots-summary'),
@@ -26,10 +26,10 @@ urlpatterns = [
 
     # POST
     ### Lot initial life
-    path('lots/add', views.add_lot, name='api-v4-add-lots'), #DONE check year
-    path('lots/add-excel', views.add_excel, name='api-v4-add-excel'), #TODO check year block all
-    path('lots/duplicate', views.duplicate_lot, name='api-v4-duplicate-lot'),#TODO check year 
-    path('lots/update', views.update_lot, name='api-v4-update-lot'),#DONE check year 
+    path('lots/add', views.add_lot, name='api-v4-add-lots'), #TODO sanity_check
+    path('lots/add-excel', views.add_excel, name='api-v4-add-excel'), #TODO sanity_check
+    path('lots/duplicate', views.duplicate_lot, name='api-v4-duplicate-lot'),
+    path('lots/update', views.update_lot, name='api-v4-update-lot'),#TODO sanity_check
     path('lots/send', views.lots_send, name='api-v4-send-lots'),
     path('lots/delete', views.lots_delete, name='api-v4-delete-lots'),
     ### Corrections
@@ -41,13 +41,13 @@ urlpatterns = [
     path('lots/recall', views.recall_lot, name='api-v4-recall-lots'), #TODO check year
     ### Approval
     path('lots/accept-release-for-consumption', views.accept_rfc, name='api-v4-accept-rfc'), ### is this necessary? MAC are tagged when they are sent usually
-    path('lots/accept-in-stock', views.accept_in_stock, name='api-v4-accept-in-stock'),  #TODO check year ? 
-    path('lots/accept-trading', views.accept_trading, name='api-v4-accept-trading'),  #TODO check year ?
-    path('lots/accept-processing', views.accept_processing, name='api-v4-accept-processing'),  #TODO check year ?
-    path('lots/accept-blending', views.accept_blending, name='api-v4-accept-blending'),  #TODO check year ?
-    path('lots/accept-export', views.accept_export, name='api-v4-accept-export'),  #TODO check year ?
-    path('lots/accept-direct-delivery', views.accept_direct_delivery, name='api-v4-accept-direct-delivery'),  #TODO check year ?
-    path('lots/cancel-accept', views.cancel_accept_lots, name='api-v4-cancel-accept'),  #TODO check year
+    path('lots/accept-in-stock', views.accept_in_stock, name='api-v4-accept-in-stock'),  
+    path('lots/accept-trading', views.accept_trading, name='api-v4-accept-trading'),  
+    path('lots/accept-processing', views.accept_processing, name='api-v4-accept-processing'),  
+    path('lots/accept-blending', views.accept_blending, name='api-v4-accept-blending'), 
+    path('lots/accept-export', views.accept_export, name='api-v4-accept-export'),  
+    path('lots/accept-direct-delivery', views.accept_direct_delivery, name='api-v4-accept-direct-delivery'), 
+    path('lots/cancel-accept', views.cancel_accept_lots, name='api-v4-cancel-accept'), 
     ### Warnings
     path('lots/toggle-warning', views.toggle_warning, name='api-v4-toggle-warning'),
     path('lots/recalc-score', views.recalc_score, name='api-v4-recalc-score'),
@@ -57,7 +57,7 @@ urlpatterns = [
     path('stocks/summary', views.get_stocks_summary, name='api-v4-get-stock-summary'),
     path('stocks/details', views.get_stock_details, name='api-v4-get-stock-details'),
     path('stocks/cancel-transformation', views.stock_cancel_transformation, name='api-v4-cancel-transformation'),
-    path('stocks/split', views.stock_split, name='api-v4-stock-split'), #TODO check year
+    path('stocks/split', views.stock_split, name='api-v4-stock-split'), #TODO sanity_check
     path('stocks/transform', views.stock_transform, name='api-v4-stock-transform'), 
     path('stocks/flush', views.stock_flush, name='api-v4-stock-flush'), 
     path('stocks/filters', views.get_stock_filters, name='api-v4-get-stock-filters'), 

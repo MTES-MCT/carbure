@@ -26,7 +26,7 @@ import LotActions from "./actions"
 import {
   BlockingAnomalies,
   separateAnomalies,
-  WarningAnomalies,
+  WarningAnomalies
 } from "./anomalies"
 import Comments from "./comments"
 import { getLotChanges, LotHistory } from "./history"
@@ -61,7 +61,20 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
     },
 
     onError: (err) => {
-      console.log("err:", err)
+      // const error = (err as AxiosError<{ error: string }>).response?.data
+      // const errorCode = error?.error
+      // if (errorCode === "YEAR_LOCKED") {
+      //   notify(
+      //     t(
+      //       "Les lots ayant une date de livraison en {{year}} ne peuvent plus être modifiés",
+      //       {
+      //         year: error.data.year,
+      //       }
+      //     ),
+      //     { variant: "danger" }
+      //   )
+      //   return
+      // }
 
       notify(t("La mise à jour du lot a échoué"), { variant: "danger" })
     },
