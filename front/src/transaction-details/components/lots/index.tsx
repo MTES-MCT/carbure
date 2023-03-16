@@ -60,7 +60,9 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
       notify(t("Le lot a bien été mis à jour"), { variant: "success" })
     },
 
-    onError: () => {
+    onError: (err) => {
+      console.log("err:", err)
+
       notify(t("La mise à jour du lot a échoué"), { variant: "danger" })
     },
   })

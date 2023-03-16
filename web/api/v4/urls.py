@@ -26,10 +26,10 @@ urlpatterns = [
 
     # POST
     ### Lot initial life
-    path('lots/add', views.add_lot, name='api-v4-add-lots'), #TODO check year
+    path('lots/add', views.add_lot, name='api-v4-add-lots'), #DONE check year
     path('lots/add-excel', views.add_excel, name='api-v4-add-excel'), #TODO check year block all
     path('lots/duplicate', views.duplicate_lot, name='api-v4-duplicate-lot'),#TODO check year 
-    path('lots/update', views.update_lot, name='api-v4-update-lot'),#TODO check year 
+    path('lots/update', views.update_lot, name='api-v4-update-lot'),#DONE check year 
     path('lots/send', views.lots_send, name='api-v4-send-lots'),
     path('lots/delete', views.lots_delete, name='api-v4-delete-lots'),
     ### Corrections
