@@ -520,8 +520,8 @@ def add_lot(request, *args, **kwargs):
     if not lot_obj:
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=400)
     
-    if check_locked_year(lot_obj.year): 
-        return ErrorResponse(400, CarbureError.YEAR_LOCKED)
+    # if check_locked_year(lot_obj.year): 
+    #     return ErrorResponse(400, CarbureError.YEAR_LOCKED)
     
     # run sanity checks, insert lot and errors
     lots_created = bulk_insert_lots(entity, [lot_obj], [errors], d)
@@ -619,8 +619,8 @@ def update_lot(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=400)
     # run sanity checks, insert lot and errors
     
-    if check_locked_year(updated_lot.year): 
-        return ErrorResponse(400, CarbureError.YEAR_LOCKED)
+    # if check_locked_year(updated_lot.year): 
+    #     return ErrorResponse(400, CarbureError.YEAR_LOCKED)
 
     updated_lot.save()
     for e in errors:
