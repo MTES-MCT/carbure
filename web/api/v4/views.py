@@ -520,6 +520,8 @@ def add_lot(request, *args, **kwargs):
     if not lot_obj:
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=400)
     
+    print("*********")
+    print( check_locked_year(lot_obj.year))
     if check_locked_year(lot_obj.year): 
         return ErrorResponse(400, CarbureError.YEAR_LOCKED)
     
