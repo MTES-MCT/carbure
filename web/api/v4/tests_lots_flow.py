@@ -75,16 +75,16 @@ class LotsFlowTest(TestCase):
         self.assertEqual(lot.lot_status, CarbureLot.DRAFT)
 
     def test_create_draft_on_locked_year(self, **kwargs):
-        #TODO
-        LockedYear.objects.create(year=2020, locked=True) 
+        LockedYear.objects.create(year=2021, locked=True) 
         lot = get_lot(self.producer)
         lot.update(kwargs)
         response = self.client.post(reverse('api-v4-add-lots'), lot)   
         self.assertEqual(response.status_code, 200)
-        print("_______")
-        print(response.json()["data"])
-        # self.assertEqual(response.json()["status"], "error")
-        # self.assertEqual(response.json()["error"], CarbureError.YEAR_LOCKED)
+        lot_id = response.json()['data']['id']
+
+        response = self.client.get(reverse('api-v4-get-lot-details'), {'lot_id': lot_id, 'entity_id': self.producer.id})   
+        errors = response.json()["data"]["errors"] 
+        self.assertEqual(errors[0]["error"], CarbureError.YEAR_LOCKED)
 
     def test_update_lot(self):
         LockedYear.objects.create(year=2018, locked=True)        
@@ -99,20 +99,6 @@ class LotsFlowTest(TestCase):
         self.assertEqual(lot.volume, 42000)
         self.assertEqual(lot.year, 2022)
 
-    def test_update_lot_on_locked_year(self):
-        #TODO
-        LockedYear.objects.create(year=2018, locked=True)        
-        lotdata = get_lot(entity=self.producer)
-        lot = self.create_draft(lot=lotdata)
-        lotdata['lot_id'] = lot.id
-        lotdata['delivery_date'] = "01/01/2018"
-        response = self.client.post(reverse('api-v4-update-lot'), lotdata)
-        self.assertEqual(response.status_code, 200)
-
-        print("_______")
-        print(response.json()["data"])
-        # self.assertEqual(response.json()["status"], "error")
-        # self.assertEqual(response.json()["error"], CarbureError.YEAR_LOCKED)
 
     def test_delete_lot(self):
         lot = self.create_draft()

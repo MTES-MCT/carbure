@@ -8,7 +8,8 @@ from core.models import CarbureLot, CarbureStock, MatierePremiere, Biocarburant,
 from api.v3.common.urls import urlpatterns
 from django_otp.plugins.otp_email.models import EmailDevice
 from api.v4.tests_utils import get_lot
-
+from transactions.models import LockedYear
+from core.carburetypes import CarbureError
 
 class LotsFlowTest(TestCase):
     fixtures = [
@@ -86,6 +87,8 @@ class LotsFlowTest(TestCase):
         self.assertEqual(lot.volume, 42000)
 
     def test_simple_correction(self):
+        LockedYear.objects.create(year=2020, locked=True) 
+
         lotdata = get_lot(entity=self.producer)
         lot = self.create_draft(lot=lotdata, carbure_client_id=self.trader.id)
         lot = self.send_lot(lot)
@@ -122,6 +125,16 @@ class LotsFlowTest(TestCase):
         self.assertEqual(lot.correction_status, CarbureLot.NO_PROBLEMO)
         self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)
 
+    def test_simple_correction_on_locked_year(self):
+        lotdata = get_lot(entity=self.producer)
+        lot = self.create_draft(lot=lotdata, carbure_client_id=self.trader.id)
+        lot = self.send_lot(lot)
+        # # client requests correction
+        LockedYear.objects.create(year=2021, locked=True) 
+        response = self.client.post(reverse('api-v4-request-fix'), {'entity_id': self.trader.id, 'lot_ids': [lot.id]})
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["status"], "error")
+        self.assertEqual(response.json()["error"], CarbureError.YEAR_LOCKED)
 
     def test_cascading_correction_trading(self):
         pass

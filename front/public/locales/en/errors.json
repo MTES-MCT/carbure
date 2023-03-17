@@ -76,5 +76,6 @@
   "EEC_ANORMAL_LOW": "Extraction and Culture GHG emissions abnormally high",
   "EEC_ANORMAL_HIGH": "Extraction and Culture GHG emissions abnormally low",
   "EP_ANORMAL_LOW": "Transformation GHG emissions abnormally low",
-  "EP_ANORMAL_HIGH": "Transformation GHG emissions abnormally high"
+  "EP_ANORMAL_HIGH": "Transformation GHG emissions abnormally high",
+  "YEAR_LOCKED": "Batches with this delivery year can no longer be changed"
 }

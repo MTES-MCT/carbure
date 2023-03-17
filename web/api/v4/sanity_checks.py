@@ -240,8 +240,8 @@ def sanity_check(lot, prefetched_data):
         errors.append(generic_error(error=CarbureSanityCheckErrors.VOLUME_FAIBLE, lot=lot, field='volume'))
 
     #check year 
-    if check_locked_year(lot.year, prefetched_data["locked_years"]) :
-        errors.append(generic_error(error=CarbureSanityCheckErrors.YEAR_LOCKED, lot=lot, field='delivery_date'))
+    if lot.year in prefetched_data["locked_years"] :
+        errors.append(generic_error(error=CarbureSanityCheckErrors.YEAR_LOCKED, lot=lot, field='delivery_date', is_blocking=True) ) #TODO passer des variables pour custom les messages d'erreur fields = {"year":lot.year} 
 
     # provenance des matieres premieres
     if lot.feedstock and lot.country_of_origin:

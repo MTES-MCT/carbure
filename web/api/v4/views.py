@@ -520,9 +520,6 @@ def add_lot(request, *args, **kwargs):
     if not lot_obj:
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=400)
     
-    # if check_locked_year(lot_obj.year): 
-    #     return ErrorResponse(400, CarbureError.YEAR_LOCKED)
-    
     # run sanity checks, insert lot and errors
     lots_created = bulk_insert_lots(entity, [lot_obj], [errors], d)
     if len(lots_created) == 0:
@@ -619,9 +616,6 @@ def update_lot(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=400)
     # run sanity checks, insert lot and errors
     
-    # if check_locked_year(updated_lot.year): 
-    #     return ErrorResponse(400, CarbureError.YEAR_LOCKED)
-
     updated_lot.save()
     for e in errors:
         e.lot = updated_lot
@@ -1009,6 +1003,12 @@ def request_fix(request, *args, **kwargs):
     except:
         return JsonResponse({'status': 'error', 'message': 'Could not find lots'}, status=400)
     for lot in lots.iterator():
+        print("==>> lot: ", lot)
+        
+        if check_locked_year(lot.year): 
+            print("---YEARRRR LOOOOCK %", lot.year)
+            return ErrorResponse(400, CarbureError.YEAR_LOCKED)
+            
         if lot.lot_status == CarbureLot.FROZEN:
             return JsonResponse({'status': 'error', 'message': 'Lot is already declared, now in read-only mode.'}, status=400)
 
