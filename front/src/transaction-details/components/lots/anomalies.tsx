@@ -74,7 +74,6 @@ export const WarningAnomalies = ({ lot, anomalies }: WarningAnomaliesProps) => {
 
   const hasEditRights = entity.hasRights(UserRole.Admin, UserRole.ReadWrite)
   const isAllChecked = anomalies.every((a) => checked?.includes(a.error))
-  console.log("anomalies:", anomalies)
 
   return (
     <Collapse
