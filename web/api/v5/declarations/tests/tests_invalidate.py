@@ -1,11 +1,12 @@
 import traceback
 
+from core.carburetypes import CarbureError
+from core.models import CarbureLot, Entity
+from core.tests_utils import setup_current_user
 from django.test import TestCase
 from django.urls import reverse
-
-from core.tests_utils import setup_current_user
-from core.models import Entity, CarbureLot
 from transactions.factories import CarbureLotFactory
+from transactions.models import LockedYear
 
 
 class InvalidateDeclarationTest(TestCase):
@@ -56,6 +57,8 @@ class InvalidateDeclarationTest(TestCase):
         return sent_lots, received_lots
 
     def test_invalidate_declaration(self):
+        LockedYear.objects.create(year=2021, locked=True) 
+
         query = {
             "entity_id": self.entity.id,
             "period": 202201,
@@ -81,3 +84,17 @@ class InvalidateDeclarationTest(TestCase):
         )
 
         self.assertEqual(undeclared_received_lots.count(), 50)
+
+
+    def test_invalidate_declaration_on_locked_year(self):
+        LockedYear.objects.create(year=2021, locked=True) 
+
+        query = {
+            "entity_id": self.entity.id,
+            "period": 202101,
+        }
+
+        response = self.client.post(reverse("api-v5-declaration-invalidate"), query)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["status"], "error")
+        self.assertEqual(response.json()["error"], CarbureError.YEAR_LOCKED)

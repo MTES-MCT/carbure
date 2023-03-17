@@ -1003,10 +1003,8 @@ def request_fix(request, *args, **kwargs):
     except:
         return JsonResponse({'status': 'error', 'message': 'Could not find lots'}, status=400)
     for lot in lots.iterator():
-        print("==>> lot: ", lot)
         
         if check_locked_year(lot.year): 
-            print("---YEARRRR LOOOOCK %", lot.year)
             return ErrorResponse(400, CarbureError.YEAR_LOCKED)
             
         if lot.lot_status == CarbureLot.FROZEN:
@@ -1605,6 +1603,8 @@ def validate_declaration(request, *args, **kwargs):
         declaration, _ = SustainabilityDeclaration.objects.get_or_create(entity_id=entity_id, period=period_d, deadline=deadline)
     except:
         return JsonResponse({'status': 'error', 'message': 'Could not parse period.'}, status=400)
+
+
 
     # ensure everything is in order
     pending_reception = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, lot_status=CarbureLot.PENDING).count()
