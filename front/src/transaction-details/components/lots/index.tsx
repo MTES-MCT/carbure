@@ -61,22 +61,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
       notify(t("Le lot a bien été mis à jour"), { variant: "success" })
     },
 
-    onError: (err) => {
-      // const error = (err as AxiosError<{ error: string }>).response?.data
-      // const errorCode = error?.error
-      // if (errorCode === "YEAR_LOCKED") {
-      //   notify(
-      //     t(
-      //       "Les lots ayant une date de livraison en {{year}} ne peuvent plus être modifiés",
-      //       {
-      //         year: error.data.year,
-      //       }
-      //     ),
-      //     { variant: "danger" }
-      //   )
-      //   return
-      // }
-
+    onError: () => {
       notify(t("La mise à jour du lot a échoué"), { variant: "danger" })
     },
   })

@@ -26,19 +26,19 @@ urlpatterns = [
 
     # POST
     ### Lot initial life
-    path('lots/add', views.add_lot, name='api-v4-add-lots'), #TODO sanity_check
-    path('lots/add-excel', views.add_excel, name='api-v4-add-excel'), #TODO sanity_check
+    path('lots/add', views.add_lot, name='api-v4-add-lots'), 
+    path('lots/add-excel', views.add_excel, name='api-v4-add-excel'), 
     path('lots/duplicate', views.duplicate_lot, name='api-v4-duplicate-lot'),
-    path('lots/update', views.update_lot, name='api-v4-update-lot'),#TODO sanity_check
+    path('lots/update', views.update_lot, name='api-v4-update-lot'),
     path('lots/send', views.lots_send, name='api-v4-send-lots'),
     path('lots/delete', views.lots_delete, name='api-v4-delete-lots'),
     ### Corrections
     path('lots/comment', views.add_comment, name='api-v4-comment-lots'),
-    path('lots/request-fix', views.request_fix, name='api-v4-request-fix'), #TODO check year
+    path('lots/request-fix', views.request_fix, name='api-v4-request-fix'),
     path('lots/mark-as-fixed', views.mark_as_fixed, name='api-v4-mark-as-fixed'),
     path('lots/approve-fix', views.approve_fix, name='api-v4-approve-fix'),
     path('lots/reject', views.reject_lot, name='api-v4-reject-lots'), 
-    path('lots/recall', views.recall_lot, name='api-v4-recall-lots'), #TODO check year
+    path('lots/recall', views.recall_lot, name='api-v4-recall-lots'), 
     ### Approval
     path('lots/accept-release-for-consumption', views.accept_rfc, name='api-v4-accept-rfc'), ### is this necessary? MAC are tagged when they are sent usually
     path('lots/accept-in-stock', views.accept_in_stock, name='api-v4-accept-in-stock'),  
@@ -57,15 +57,13 @@ urlpatterns = [
     path('stocks/summary', views.get_stocks_summary, name='api-v4-get-stock-summary'),
     path('stocks/details', views.get_stock_details, name='api-v4-get-stock-details'),
     path('stocks/cancel-transformation', views.stock_cancel_transformation, name='api-v4-cancel-transformation'),
-    path('stocks/split', views.stock_split, name='api-v4-stock-split'), #TODO sanity_check
+    path('stocks/split', views.stock_split, name='api-v4-stock-split'),
     path('stocks/transform', views.stock_transform, name='api-v4-stock-transform'), 
     path('stocks/flush', views.stock_flush, name='api-v4-stock-flush'), 
     path('stocks/filters', views.get_stock_filters, name='api-v4-get-stock-filters'), 
 
     # DECLARATIONS
     path('declarations', views.get_declarations, name='api-v4-get-declarations'), 
-    path('declarations/validate', views.validate_declaration, name='api-v4-validate-declaration'), #TODO check year
-    path('declarations/invalidate', views.invalidate_declaration, name='api-v4-invalidate-declaration'), #TODO check year
 
     path('download-template', views.get_template, name='api-v4-get-template'), 
     path('download-template-stock', views.get_template_stock, name='api-v4-get-template-stock'),

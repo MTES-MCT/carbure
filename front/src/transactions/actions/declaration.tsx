@@ -51,6 +51,7 @@ export const DeclarationDialog = () => {
   const navigate = useNavigate()
   const notify = useNotify()
   const location = useLocation()
+  const notifyError = useNotifyError()
 
   const matomo = useMatomo()
   const entity = useEntity()
@@ -79,7 +80,6 @@ export const DeclarationDialog = () => {
     params: [entity.id, timeline.year],
   })
 
-  const notifyError = useNotifyError()
   const validateDeclaration = useMutation(api.validateDeclaration, {
     invalidates: ["declarations"],
 
