@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { DeclarationSummary, LotQuery } from "../types"
 import { Normalizer } from "common/utils/normalize"
 import useEntity from "carbure/hooks/entity"
-import { useNotify } from "common/components/notifications"
+import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation, useQuery } from "common/hooks/async"
 import Portal from "common/components/portal"
 import * as api from "../api"
@@ -79,6 +79,7 @@ export const DeclarationDialog = () => {
     params: [entity.id, timeline.year],
   })
 
+  const notifyError = useNotifyError()
   const validateDeclaration = useMutation(api.validateDeclaration, {
     invalidates: ["declarations"],
 
@@ -86,11 +87,8 @@ export const DeclarationDialog = () => {
       notify(t("La déclaration a bien été validée !"), { variant: "success" })
     },
 
-    onError: () => {
-      notify(t("La déclaration n'a pas pu être validée !"), {
-        variant: "danger",
-      })
-    },
+    onError: (err) =>
+      notifyError(err, t("La déclaration n'a pas pu être validée !")),
   })
 
   const invalidateDeclaration = useMutation(api.invalidateDeclaration, {
@@ -100,11 +98,8 @@ export const DeclarationDialog = () => {
       notify(t("La déclaration a bien été annulée !"), { variant: "success" })
     },
 
-    onError: () => {
-      notify(t("La déclaration n'a pas pu être annulée !"), {
-        variant: "danger",
-      })
-    },
+    onError: (err) =>
+      notifyError(err, t("La déclaration n'a pas pu être annulée !")),
   })
 
   const yearsData = years.result?.data.data ?? [initialYear]
