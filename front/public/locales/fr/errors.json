@@ -77,5 +77,6 @@
   "VOLUME_LTE_0": "Le volume est nul",
   "WRONG_DELIVERY_DATE": "La date de livraison est incorrecte",
   "WRONG_FORMAT": "Le format est incorrect",
-  "WRONG_PRODUCTION_SITE_COUNTRY": "Le site de production est incorrect"
+  "WRONG_PRODUCTION_SITE_COUNTRY": "Le site de production est incorrect",
+  "YEAR_LOCKED": "Les lots ayant avec cette année de livraison ne peuvent plus être modifiés"
 }

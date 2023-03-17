@@ -1,3 +1,4 @@
+import { AxiosError } from "axios"
 import useEntity from "carbure/hooks/entity"
 import { Entity, UserRole } from "carbure/types"
 import Alert from "common/components/alert"
@@ -26,7 +27,7 @@ import LotActions from "./actions"
 import {
   BlockingAnomalies,
   separateAnomalies,
-  WarningAnomalies
+  WarningAnomalies,
 } from "./anomalies"
 import Comments from "./comments"
 import { getLotChanges, LotHistory } from "./history"

@@ -889,7 +889,7 @@ def get_prefetched_data(entity=None):
     d['feedstocks'] = {m.code: m for m in MatierePremiere.objects.all()}
     d['depots'] = {d.depot_id: d for d in Depot.objects.all()}
     d['depotsbyname'] = {d.name.upper(): d for d in d['depots'].values()}
-    d['locked_years'] = LockedYear.objects.filter(locked = True)
+    d['locked_years'] = [locked_year.year for locked_year in LockedYear.objects.filter(locked = True)]
 
  
 
