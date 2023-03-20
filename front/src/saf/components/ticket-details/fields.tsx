@@ -26,6 +26,10 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
 
   if (!ticket) return null
 
+  console.log(
+    "norm.normalizeBiofuel(ticket.biofuel).label:",
+    norm.normalizeBiofuel(ticket.biofuel)
+  )
   return (
     <div className={cl(css.form, css.columns)}>
       <Fieldset label={t("Lot")}>
@@ -36,12 +40,12 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
         />
         <TextInput
           label={t("Biocarburant")}
-          value={ticket.biofuel.code}
+          value={norm.normalizeBiofuel(ticket.biofuel).label}
           readOnly
         />
         <TextInput
           label={t("Matière première")}
-          value={ticket.feedstock.name}
+          value={norm.normalizeFeedstock(ticket.feedstock).label}
           readOnly
         />
         <TextInput
