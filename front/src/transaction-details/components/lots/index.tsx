@@ -18,12 +18,7 @@ import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import LotTag from "transactions/components/lots/lot-tag"
-import {
-  CorrectionStatus,
-  DeliveryType,
-  Lot,
-  LotStatus,
-} from "transactions/types"
+import { CorrectionStatus, Lot, LotStatus } from "transactions/types"
 import { isExpiring } from "transactions/utils/deadline"
 import * as api from "../../api"
 import Score from "../score"
@@ -115,7 +110,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
     if (lotData.parent_stock && inCorrectionOrDraft) {
       form.setDisabledFieldsGroup(
         ["production", "emissions"],
-        ["biofuel", "feedstock", "country_of_origin", "free_field"]
+        ["biofuel", "feedstock", "country_of_origin"]
       )
     }
   }

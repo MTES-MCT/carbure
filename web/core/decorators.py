@@ -139,6 +139,7 @@ class AdminRightsError:
     USER_HAS_NO_RIGHT = "USER_HAS_NO_RIGHT"
 
 
+#TODO sur les endpoints accessibles par des external admin, il faut en plus verifier qu'il n'agissent que sur les types d'entités autorisées (ex : DGAC sur companies aeriennes uniquement, cf get_entities) 
 def check_admin_rights(allow_external=[], allow_role=None):
     def decorator(function_to_decorate):
         @wraps(function_to_decorate)

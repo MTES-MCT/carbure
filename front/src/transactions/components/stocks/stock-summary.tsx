@@ -14,7 +14,6 @@ import { FilterManager, ResetButton } from "../filters"
 import NoResult from "../no-result"
 import { useSummaryColumns } from "../lots/lot-summary"
 import useEntity from "carbure/hooks/entity"
-import Flags from "flags.json"
 import { compact } from "common/utils/collection"
 
 export interface StockSummaryBarProps extends Partial<FilterManager> {
@@ -54,7 +53,7 @@ export const StockSummaryBar = ({
     MJ: "total_remaining_lhv_amount" as "total_remaining_lhv_amount",
   }
 
-  const unit = !Flags.preferred_unit ? "l" : entity.preferred_unit ?? "l"
+  const unit = entity.preferred_unit ?? "l"
   const field = unitToField[unit]
 
   return (
@@ -162,7 +161,7 @@ export const StockSummary = ({
     MJ: "remaining_lhv_amount_sum" as "remaining_lhv_amount_sum",
   }
 
-  const unit = !Flags.preferred_unit ? "l" : entity.preferred_unit ?? "l"
+  const unit = entity.preferred_unit ?? "l"
   const field = unitToField[unit]
 
   const stock = summaryData?.stock ?? []
@@ -194,8 +193,7 @@ export const StockSummary = ({
             columns={compact([
               columns.supplier,
               columns.biofuel,
-              !Flags.preferred_unit && columns.remainingVolume,
-              Flags.preferred_unit && columns.remainingQuantity,
+              columns.remainingQuantity,
               columns.count,
               columns.ghgReduction,
             ])}

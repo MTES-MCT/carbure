@@ -7,7 +7,6 @@ __pycache__/
 .*~
 *~
 # SQL files
-*.sql
 
 # C extensions
 *.so
@@ -151,6 +150,3 @@ files
 # Script generated files
 integrity_checks.json
 sanity_checks.json
-
-# do not ignore specific sql queries
-!get_traceability_nodes.sql

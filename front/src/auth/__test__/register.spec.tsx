@@ -47,7 +47,8 @@ test("resend activation link", async () => {
   render(<AuthWithRouter />)
   const user = userEvent.setup()
   await user.click(await screen.findByText("Je n'ai pas reçu le lien d'activation")) // prettier-ignore
+  await screen.findByText(/Veuillez renseigner votre adresse email/)
   await user.type(getField("Adresse email du compte"), "test@company.com")
   await user.click(await screen.findByText("Renvoyer le lien d'activation"))
-  await screen.findByText(/Veuillez renseigner votre adresse email/)
+  await screen.findByText(/Votre demande d'inscription a bien été envoyée/)
 })

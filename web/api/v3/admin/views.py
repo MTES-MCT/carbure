@@ -209,7 +209,7 @@ def get_rights_requests(request):
     return JsonResponse({"status": "success", "data": requests_sez})
 
 
-@is_admin
+@check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE])
 def update_right_request(request):
     urr_id = request.POST.get('id', False)
     status = request.POST.get('status', False)

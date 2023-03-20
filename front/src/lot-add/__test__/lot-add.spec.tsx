@@ -4,12 +4,11 @@ import userEvent from "@testing-library/user-event"
 import { Route } from "react-router-dom"
 
 import { operator, producer, trader } from "carbure/__test__/data"
-import { getField, waitWhileLoading } from "carbure/__test__/helpers"
+import { getField } from "carbure/__test__/helpers"
 import LotAdd from "../index"
 
 import { setEntity } from "settings/__test__/api"
 import server from "./api"
-import Flags from "flags.json"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 afterEach(() => server.resetHandlers())
@@ -33,7 +32,7 @@ const TransactionAddWithRouter = ({
 
 function checkLotFields() {
   getField("N° document d'accompagnement")
-  getField(Flags.preferred_unit ? "Quantité" : "Volume en litres")
+  getField("Quantité")
   getField("Biocarburant")
   getField("Matière première")
   getField("Pays d'origine de la matière première")
@@ -155,7 +154,7 @@ test("check the form fields are working", async () => {
   await screen.findByText("Créer un nouveau lot")
 
   await user.type(getField("N° document d'accompagnement"), "DAETEST") // prettier-ignore
-  await user.type(getField(Flags.preferred_unit ? "Quantité" : "Volume en litres"), "10000") // prettier-ignore
+  await user.type(getField("Quantité"), "10000") // prettier-ignore
 
   await user.type(getField("Biocarburant"), "EM")
   await user.click(await screen.findByText("EMHV"))

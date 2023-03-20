@@ -20,7 +20,6 @@ import {
   rejectedDetails,
   sentDetails,
 } from "./data"
-import Flags from "flags.json"
 import HashRoute from "common/components/hash-route"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
@@ -45,7 +44,7 @@ const LotDetailsWithRouter = ({ entity }: { entity: Entity }) => {
 
 function checkLotFields() {
   getField("N° document d'accompagnement")
-  getField(Flags.preferred_unit ? "Quantité" : "Volume en litres")
+  getField("Quantité")
   getField("Biocarburant")
   getField("Matière première")
   getField("Pays d'origine de la matière première")
@@ -130,7 +129,7 @@ test("edit transaction details", async () => {
   await user.clear(dae)
   await user.type(dae, "DAETEST")
 
-  const vol = getField(Flags.preferred_unit ? "Quantité" : "Volume en litres")
+  const vol = getField("Quantité")
   await user.clear(vol)
   await user.type(vol, "20000")
 

@@ -81,11 +81,15 @@ export interface LotChange {
   valueAfter: string
 }
 
+function isUpdate(e: LotUpdate<any>) {
+  return e.event_type === "UPDATED" || e.event_type === "UPDATED_BY_ADMIN"
+}
+
 export function getLotChanges(updates: LotUpdate<any>[] = []): LotChange[] {
   return (
     updates
-      // only show updates for the moment
-      .filter((e) => e.event_type === "UPDATED" || e.event_type === "UPDATED_BY_ADMIN")
+      // only show updates in the history
+      .filter(isUpdate)
       // flatten the updates so we have one row per change
       .flatMap((u) => {
         if ("field" in u.metadata) {
@@ -103,7 +107,7 @@ export function getLotChanges(updates: LotUpdate<any>[] = []): LotChange[] {
               field,
               user: u.user,
               date: u.event_dt,
-              label: i18next.t(field, { ns: "fields" }),
+              label: i18next.t(field.replace(/_id$/, ""), { ns: "fields" }),
               valueBefore: getFieldValue(valueBefore),
               valueAfter: getFieldValue(valueAfter),
             })
