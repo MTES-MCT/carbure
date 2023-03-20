@@ -472,7 +472,7 @@ export const ProductionSiteDialog = ({
             variant="primary"
             submit="production-site"
             icon={Save}
-            disabled={!canSave || addProdSite.loading || updateProdSite.loading}
+            disabled={!canSave || updateProdSite.loading}
             label={t("Sauvegarder")}
           />
         )}
