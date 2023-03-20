@@ -58,7 +58,7 @@ const UserRights = () => {
         confirm={t("Confirmer")}
         variant="primary"
         onClose={close}
-        onConfirm={async () => updateRight.execute(user, status)}
+        onConfirm={async () => updateRight.execute(user, entity.id, status)}
       />
     ))
   }
