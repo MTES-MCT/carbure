@@ -200,6 +200,7 @@
   "Selectionner un fichier": "Select a file",
   "Rechercher...": "Search...",
   "Aucune entrée trouvée": "No entry found",
+  "La demande a échoué. Réessayez ou contactez carbure@beta.gouv.fr": "The request failed. Retry or contact carbure@beta.gouv.fr",
   "Page": "Page",
   "Choisir une page": "Pick a page",
   "sur {{ pageCount }},": "of {{ pageCount }},",

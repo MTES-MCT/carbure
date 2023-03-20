@@ -1,9 +1,11 @@
-import React, { useEffect, useRef } from "react"
+import React, { useCallback, useEffect, useRef } from "react"
 import cl from "clsx"
 import { Cross } from "./icons"
 import Button from "./button"
 import { usePortal } from "./portal"
 import css from "./notifications.module.css"
+import { AxiosError } from "axios"
+import { useTranslation } from "react-i18next"
 
 export type Notifier = (
   content: React.ReactNode,
@@ -20,6 +22,27 @@ export function useNotify(): Notifier {
     portal((close) => (
       <Notification content={content} options={options} onClose={close} />
     ))
+}
+
+export function useNotifyError() {
+  const { t } = useTranslation()
+  const notify = useNotify()
+
+  const getErrorText = (error: Error, defaultMessage?: string) => {
+    const errorCode = (error as AxiosError<{ error: string }>).response?.data
+      .error
+    let errorText = errorCode
+      ? t(errorCode, { ns: "errors-api" })
+      : defaultMessage ||
+      t("La demande a échoué. Réessayez ou contactez carbure@beta.gouv.fr")
+    return errorText
+  }
+
+  const notifyError = useCallback((error: Error, defaultMessage?: string) => {
+    return notify(getErrorText(error, defaultMessage), { variant: "danger" })
+  }, [])
+
+  return notifyError
 }
 
 export type NotificationVariant = "info" | "success" | "warning" | "danger"

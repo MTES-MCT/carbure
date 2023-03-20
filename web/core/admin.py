@@ -20,6 +20,7 @@ from core.models import Depot, GenericError
 from core.models import SustainabilityDeclaration, EntityDepot
 from core.models import TransactionDistance
 from core.models import CarbureNotification
+from transactions.models import LockedYear
 
 def custom_titled_filter(title):
     class Wrapper(admin.FieldListFilter):
@@ -55,8 +56,6 @@ class BiocarburantAdmin(admin.ModelAdmin):
     search_fields = ('name', )
     readonly_fields = ('code', )
     list_filter = ('is_alcool', 'is_graisse', 'is_displayed')
-
-
 class MatierePremiereAdmin(admin.ModelAdmin):
     list_display = ('code', 'name', 'description', 'compatible_alcool', 'compatible_graisse', 'is_double_compte', 'is_huile_vegetale', 'is_displayed')
     search_fields = ('name', )

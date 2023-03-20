@@ -24,11 +24,12 @@ from api.v4.lots import construct_carbure_lot, bulk_insert_lots, try_get_date
 from api.v4.sanity_checks import sanity_check, bulk_sanity_checks
 
 from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureLotReliabilityScore, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, Entity, GenericError, Pays, SustainabilityDeclaration, UserRights
+from transactions.helpers import check_locked_year
 from core.notifications import notify_correction_done, notify_correction_request, notify_declaration_cancelled, notify_declaration_validated, notify_lots_recalled, notify_lots_received, notify_lots_rejected, notify_lots_recalled
 from core.serializers import CarbureLotPublicSerializer, CarbureLotReliabilityScoreSerializer, CarbureNotificationSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
 from core.xlsx_v3 import template_v4, template_v4_stocks
 from carbure.tasks import background_bulk_scoring, background_create_ticket_sources_from_lots
-
+from core.carburetypes import CarbureError
 
 @check_user_rights()
 def get_years(request, *args, **kwargs):
@@ -513,10 +514,12 @@ def add_lot(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
     entity = Entity.objects.get(pk=entity_id)
+
     d = get_prefetched_data(entity)
     lot_obj, errors = construct_carbure_lot(d, entity, request.POST.dict())
     if not lot_obj:
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=400)
+    
     # run sanity checks, insert lot and errors
     lots_created = bulk_insert_lots(entity, [lot_obj], [errors], d)
     if len(lots_created) == 0:
@@ -528,6 +531,8 @@ def add_lot(request, *args, **kwargs):
     e.user = request.user
     e.metadata = {'source': 'MANUAL'}
     e.save()
+
+
     data = CarbureLotPublicSerializer(e.lot).data
     return JsonResponse({'status': 'success', 'data': data})
 
@@ -589,7 +594,7 @@ def add_excel(request, *args, **kwargs):
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
-def update_lot(request, *args, **kwargs):
+def update_lot(request, *args, **kwargs): 
     context = kwargs['context']
     entity_id = context['entity_id']
     lot_id = request.POST.get('lot_id', None)
@@ -602,6 +607,7 @@ def update_lot(request, *args, **kwargs):
     except:
         return JsonResponse({'status': 'error', 'message': 'Could not find lot'}, status=400)
 
+
     previous = CarbureLotPublicSerializer(existing_lot).data
     # prefetch some data
     d = get_prefetched_data(entity)
@@ -609,6 +615,7 @@ def update_lot(request, *args, **kwargs):
     if not updated_lot:
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=400)
     # run sanity checks, insert lot and errors
+    
     updated_lot.save()
     for e in errors:
         e.lot = updated_lot
@@ -996,6 +1003,10 @@ def request_fix(request, *args, **kwargs):
     except:
         return JsonResponse({'status': 'error', 'message': 'Could not find lots'}, status=400)
     for lot in lots.iterator():
+        
+        if check_locked_year(lot.year): 
+            return ErrorResponse(400, CarbureError.YEAR_LOCKED)
+            
         if lot.lot_status == CarbureLot.FROZEN:
             return JsonResponse({'status': 'error', 'message': 'Lot is already declared, now in read-only mode.'}, status=400)
 
@@ -1575,119 +1586,6 @@ def accept_trading(request, *args, **kwargs):
         event.save()
     return JsonResponse({'status': 'success'})
 
-@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
-def validate_declaration(request, *args, **kwargs):
-    context = kwargs['context']
-    entity_id = context['entity_id']
-    period = request.POST.get('period', False)
-
-    try:
-        period_int = int(period)
-        year = int(period_int / 100)
-        month = period_int % 100
-        period_d = datetime.date(year=year, month=month, day=1)
-        nextmonth = period_d + datetime.timedelta(days=31)
-        (weekday, lastday) = monthrange(nextmonth.year, nextmonth.month)
-        deadline = datetime.date(year=nextmonth.year, month=nextmonth.month, day=lastday)
-        declaration, _ = SustainabilityDeclaration.objects.get_or_create(entity_id=entity_id, period=period_d, deadline=deadline)
-    except:
-        return JsonResponse({'status': 'error', 'message': 'Could not parse period.'}, status=400)
-
-    # ensure everything is in order
-    pending_reception = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, lot_status=CarbureLot.PENDING).count()
-    if pending_reception > 0:
-        return JsonResponse({'status': 'error', 'message': 'Cannot validate declaration. Some lots are pending reception.'}, status=400)
-
-    pending_correction = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, lot_status__in=[CarbureLot.ACCEPTED], correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED]).count()
-    if pending_correction > 0:
-        return JsonResponse({'status': 'error', 'message': 'Cannot validate declaration. Some accepted lots need correction.'}, status=400)
-
-    lots_sent_rejected_or_drafts = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, lot_status=CarbureLot.REJECTED).count()
-    if lots_sent_rejected_or_drafts > 0:
-        return JsonResponse({'status': 'error', 'message': 'Cannot validate declaration. Some outgoing lots need your attention.'}, status=400)
-
-    lots_sent_to_fix = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, lot_status__in=[CarbureLot.ACCEPTED], correction_status__in=[CarbureLot.IN_CORRECTION]).count()
-    if lots_sent_to_fix > 0:
-        return JsonResponse({'status': 'error', 'message': 'Cannot validate declaration. Some outgoing lots need correction.'}, status=400)
-
-    lots_received = CarbureLot.objects.filter(lot_status__in=[CarbureLot.ACCEPTED], carbure_client=declaration.entity, period=period_int)
-    lots_received.update(declared_by_client=True)
-
-    # create SAF ticket sources for declared received lots
-    background_create_ticket_sources_from_lots(lots_received)
-
-    lots_sent = CarbureLot.objects.filter(lot_status__in=[CarbureLot.ACCEPTED], carbure_supplier=declaration.entity, period=period_int)
-    lots_sent.update(declared_by_supplier=True)
-
-    bulk_events = []
-    for lot in lots_received:
-        bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLARED, lot=lot, user=request.user))
-    for lot in lots_sent:
-        bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLARED, lot=lot, user=request.user))
-    CarbureLotEvent.objects.bulk_create(bulk_events)
-
-    # freeze lots
-    lots_received_to_freeze = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True)
-    lots_received_to_freeze.update(lot_status=CarbureLot.FROZEN)
-    background_bulk_scoring(lots_received_to_freeze)
-
-    lots_sent_to_freeze = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True)
-    lots_sent_to_freeze.update(lot_status=CarbureLot.FROZEN)
-    background_bulk_scoring(lots_sent_to_freeze)
-
-    # mark declaration
-    declaration.declared = True
-    declaration.save()
-    # send email
-    notify_declaration_validated(declaration)
-    send_email_declaration_validated(declaration)
-    return JsonResponse({'status': 'success'})
-
-
-@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
-def invalidate_declaration(request, *args, **kwargs):
-    context = kwargs['context']
-    entity_id = context['entity_id']
-    period = request.POST.get('period', False)
-
-    try:
-        period_int = int(period)
-        year = int(period_int / 100)
-        month = period_int % 100
-        period_d = datetime.date(year=year, month=month, day=1)
-        nextmonth = period_d + datetime.timedelta(days=31)
-        (weekday, lastday) = monthrange(nextmonth.year, nextmonth.month)
-        deadline = datetime.date(year=nextmonth.year, month=nextmonth.month, day=lastday)
-        declaration, _ = SustainabilityDeclaration.objects.get_or_create(entity_id=entity_id, period=period_d, deadline=deadline)
-        declaration.declared = False
-        declaration.checked = False
-        declaration.save()
-    except:
-        return JsonResponse({'status': 'error', 'message': 'Could not parse period.'}, status=400)
-
-    lots_received = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int)
-    lots_received.update(declared_by_client=False)
-    lots_sent = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int)
-    lots_sent.update(declared_by_supplier=False)
-    bulk_events = []
-    for lot in lots_received:
-        bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLCANCEL, lot=lot, user=request.user))
-    for lot in lots_sent:
-        bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLCANCEL, lot=lot, user=request.user))
-    CarbureLotEvent.objects.bulk_create(bulk_events)
-    # unfreeze lots
-    lots_to_unfreeze = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True, lot_status=CarbureLot.FROZEN)
-    lots_to_unfreeze.update(lot_status=CarbureLot.ACCEPTED)
-    lots_to_unfreeze_second_batch = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True, lot_status=CarbureLot.FROZEN)
-    lots_to_unfreeze_second_batch.update(lot_status=CarbureLot.ACCEPTED)
-
-    background_bulk_scoring(lots_to_unfreeze)
-    background_bulk_scoring(lots_to_unfreeze_second_batch)
-
-    # send email
-    notify_declaration_cancelled(declaration)
-    send_email_declaration_invalidated(declaration)
-    return JsonResponse({'status': 'success'})
 
 @check_user_rights()
 def get_template(request, *args, **kwargs):

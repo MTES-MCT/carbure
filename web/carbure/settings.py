@@ -92,6 +92,7 @@ INSTALLED_APPS = [
     'doublecount',
     'ml',
     'saf',
+    'transactions',
 ]
 
 AUTH_USER_MODEL = 'authtools.User'

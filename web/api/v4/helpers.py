@@ -18,6 +18,7 @@ from core.common import try_get_certificate, try_get_double_counting_certificate
 from core.ign_distance import get_distance
 from core.models import Biocarburant, CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, Entity, EntityCertificate, EntityDepot, GenericCertificate, MatierePremiere, Pays, TransactionDistance, UserRights
 from core.models import GenericError
+from transactions.models import LockedYear
 from core.serializers import CarbureLotAdminSerializer, CarbureLotCommentSerializer, CarbureLotEventSerializer, CarbureLotPublicSerializer, CarbureStockEventSerializer, CarbureStockPublicSerializer, GenericErrorAdminSerializer, GenericErrorSerializer
 from core.xlsx_v3 import export_carbure_lots, export_carbure_stock
 from ml.models import EECStats, EPStats, ETDStats
@@ -888,6 +889,9 @@ def get_prefetched_data(entity=None):
     d['feedstocks'] = {m.code: m for m in MatierePremiere.objects.all()}
     d['depots'] = {d.depot_id: d for d in Depot.objects.all()}
     d['depotsbyname'] = {d.name.upper(): d for d in d['depots'].values()}
+    d['locked_years'] = [locked_year.year for locked_year in LockedYear.objects.filter(locked = True)]
+
+ 
 
     if entity:
         # get only my production sites

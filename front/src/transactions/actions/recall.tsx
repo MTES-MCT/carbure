@@ -4,7 +4,7 @@ import { Lot } from "../types"
 import * as api from "../api"
 import useEntity from "carbure/hooks/entity"
 import { useMutation } from "common/hooks/async"
-import { useNotify } from "common/components/notifications"
+import { useNotify, useNotifyError } from "common/components/notifications"
 import { variations } from "common/utils/formatters"
 import Button from "common/components/button"
 import Dialog from "common/components/dialog"
@@ -74,10 +74,11 @@ interface RecallDialogProps {
 
 const RecallDialog = ({ summary, selection, onClose }: RecallDialogProps) => {
   const { t } = useTranslation()
-  const notify = useNotify()
   const matomo = useMatomo()
   const status = useStatus()
   const entity = useEntity()
+  const notify = useNotify()
+  const notifyError = useNotifyError()
 
   const v = variations(selection.length)
 
@@ -96,13 +97,13 @@ const RecallDialog = ({ summary, selection, onClose }: RecallDialogProps) => {
       onClose()
     },
 
-    onError: () => {
+    onError: (err) => {
       const text = v({
         one: t("La demande de correction a échoué !"),
         many: t("Les demandes de correction ont échoué !"),
       })
 
-      notify(text, { variant: "danger" })
+      notifyError(err, text)
       onClose()
     },
   })

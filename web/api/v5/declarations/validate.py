@@ -1,13 +1,17 @@
 import traceback
-from django.db.models import Q
-from django.db import transaction
-from core.common import SuccessResponse, ErrorResponse
-from core.decorators import check_user_rights
-from carbure.tasks import background_bulk_scoring, background_create_ticket_sources_from_lots
-from core.notifications import notify_declaration_validated
-from api.v4.helpers import send_email_declaration_validated
 
-from core.models import UserRights, SustainabilityDeclaration, CarbureLot, CarbureLotEvent
+from api.v4.helpers import send_email_declaration_validated
+from carbure.tasks import (background_bulk_scoring,
+                           background_create_ticket_sources_from_lots)
+from core.carburetypes import CarbureError
+from core.common import ErrorResponse, SuccessResponse
+from core.decorators import check_user_rights
+from core.models import (CarbureLot, CarbureLotEvent,
+                         SustainabilityDeclaration, UserRights)
+from core.notifications import notify_declaration_validated
+from django.db import transaction
+from django.db.models import Q
+from transactions.helpers import check_locked_year
 
 
 class ValidateDeclarationError:
@@ -27,12 +31,17 @@ def validate_declaration(request, *args, **kwargs):
         traceback.print_exc()
         return ErrorResponse(400, ValidateDeclarationError.MALFORMED_PARAMS)
 
+    year = int(period / 100)
+    if check_locked_year(year): 
+        return ErrorResponse(400, CarbureError.YEAR_LOCKED)
+    
     try:
         declaration = SustainabilityDeclaration.init_declaration(entity_id, period)
     except:
         traceback.print_exc()
         return ErrorResponse(400, ValidateDeclarationError.DECLARATION_CANNOT_BE_CREATED)
 
+    
     # grab the list of all the lots related to this declaration
     declaration_lots = (
         CarbureLot.objects.exclude(lot_status__in=(CarbureLot.DRAFT, CarbureLot.DELETED))

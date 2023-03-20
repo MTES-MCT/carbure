@@ -242,7 +242,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         lots_data.append(lot)
     return lots_data
 
-def ErrorResponse(status_code, error=None, data=None):
+def ErrorResponse(status_code, error=None, data=None): 
     response_data = {}
     response_data['status'] = Carbure.ERROR
     if data is not None:

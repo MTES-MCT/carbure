@@ -303,8 +303,7 @@ class EntityDepot(models.Model):
         verbose_name_plural = 'Dépôts Entité'
 
 
-from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
-
+from producers.models import ProductionSite
 
 class SustainabilityDeclaration(models.Model):
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)

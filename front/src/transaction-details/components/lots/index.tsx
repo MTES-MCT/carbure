@@ -1,3 +1,4 @@
+import { AxiosError } from "axios"
 import useEntity from "carbure/hooks/entity"
 import { Entity, UserRole } from "carbure/types"
 import Alert from "common/components/alert"
