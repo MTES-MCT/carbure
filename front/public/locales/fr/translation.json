@@ -207,6 +207,7 @@
   "Selectionner un fichier": "Selectionner un fichier",
   "Rechercher...": "Rechercher...",
   "Aucune entrée trouvée": "Aucune entrée trouvée",
+  "La demande a échoué. Réessayez ou contactez carbure@beta.gouv.fr": "",
   "Page": "Page",
   "Choisir une page": "Choisir une page",
   "sur {{ pageCount }},": "sur {{ pageCount }},",

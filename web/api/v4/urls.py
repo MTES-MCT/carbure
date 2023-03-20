@@ -26,8 +26,8 @@ urlpatterns = [
 
     # POST
     ### Lot initial life
-    path('lots/add', views.add_lot, name='api-v4-add-lots'),
-    path('lots/add-excel', views.add_excel, name='api-v4-add-excel'),
+    path('lots/add', views.add_lot, name='api-v4-add-lots'), 
+    path('lots/add-excel', views.add_excel, name='api-v4-add-excel'), 
     path('lots/duplicate', views.duplicate_lot, name='api-v4-duplicate-lot'),
     path('lots/update', views.update_lot, name='api-v4-update-lot'),
     path('lots/send', views.lots_send, name='api-v4-send-lots'),
@@ -37,17 +37,17 @@ urlpatterns = [
     path('lots/request-fix', views.request_fix, name='api-v4-request-fix'),
     path('lots/mark-as-fixed', views.mark_as_fixed, name='api-v4-mark-as-fixed'),
     path('lots/approve-fix', views.approve_fix, name='api-v4-approve-fix'),
-    path('lots/reject', views.reject_lot, name='api-v4-reject-lots'),
-    path('lots/recall', views.recall_lot, name='api-v4-recall-lots'),
+    path('lots/reject', views.reject_lot, name='api-v4-reject-lots'), 
+    path('lots/recall', views.recall_lot, name='api-v4-recall-lots'), 
     ### Approval
     path('lots/accept-release-for-consumption', views.accept_rfc, name='api-v4-accept-rfc'), ### is this necessary? MAC are tagged when they are sent usually
-    path('lots/accept-in-stock', views.accept_in_stock, name='api-v4-accept-in-stock'),
-    path('lots/accept-trading', views.accept_trading, name='api-v4-accept-trading'),
-    path('lots/accept-processing', views.accept_processing, name='api-v4-accept-processing'),
-    path('lots/accept-blending', views.accept_blending, name='api-v4-accept-blending'),
-    path('lots/accept-export', views.accept_export, name='api-v4-accept-export'),
-    path('lots/accept-direct-delivery', views.accept_direct_delivery, name='api-v4-accept-direct-delivery'),
-    path('lots/cancel-accept', views.cancel_accept_lots, name='api-v4-cancel-accept'),
+    path('lots/accept-in-stock', views.accept_in_stock, name='api-v4-accept-in-stock'),  
+    path('lots/accept-trading', views.accept_trading, name='api-v4-accept-trading'),  
+    path('lots/accept-processing', views.accept_processing, name='api-v4-accept-processing'),  
+    path('lots/accept-blending', views.accept_blending, name='api-v4-accept-blending'), 
+    path('lots/accept-export', views.accept_export, name='api-v4-accept-export'),  
+    path('lots/accept-direct-delivery', views.accept_direct_delivery, name='api-v4-accept-direct-delivery'), 
+    path('lots/cancel-accept', views.cancel_accept_lots, name='api-v4-cancel-accept'), 
     ### Warnings
     path('lots/toggle-warning', views.toggle_warning, name='api-v4-toggle-warning'),
     path('lots/recalc-score', views.recalc_score, name='api-v4-recalc-score'),
@@ -58,16 +58,14 @@ urlpatterns = [
     path('stocks/details', views.get_stock_details, name='api-v4-get-stock-details'),
     path('stocks/cancel-transformation', views.stock_cancel_transformation, name='api-v4-cancel-transformation'),
     path('stocks/split', views.stock_split, name='api-v4-stock-split'),
-    path('stocks/transform', views.stock_transform, name='api-v4-stock-transform'),
-    path('stocks/flush', views.stock_flush, name='api-v4-stock-flush'),
-    path('stocks/filters', views.get_stock_filters, name='api-v4-get-stock-filters'),
+    path('stocks/transform', views.stock_transform, name='api-v4-stock-transform'), 
+    path('stocks/flush', views.stock_flush, name='api-v4-stock-flush'), 
+    path('stocks/filters', views.get_stock_filters, name='api-v4-get-stock-filters'), 
 
     # DECLARATIONS
-    path('declarations', views.get_declarations, name='api-v4-get-declarations'),
-    path('declarations/validate', views.validate_declaration, name='api-v4-validate-declaration'),
-    path('declarations/invalidate', views.invalidate_declaration, name='api-v4-invalidate-declaration'),
+    path('declarations', views.get_declarations, name='api-v4-get-declarations'), 
 
-    path('download-template', views.get_template, name='api-v4-get-template'),
+    path('download-template', views.get_template, name='api-v4-get-template'), 
     path('download-template-stock', views.get_template_stock, name='api-v4-get-template-stock'),
 
     # STATS

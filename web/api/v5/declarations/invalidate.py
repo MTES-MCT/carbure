@@ -1,13 +1,16 @@
 import traceback
-from django.db.models import Q
-from django.db import transaction
-from core.common import SuccessResponse, ErrorResponse
-from core.decorators import check_user_rights
-from carbure.tasks import background_bulk_scoring
-from core.notifications import notify_declaration_cancelled
-from api.v4.helpers import send_email_declaration_invalidated
 
-from core.models import UserRights, SustainabilityDeclaration, CarbureLot, CarbureLotEvent
+from api.v4.helpers import send_email_declaration_invalidated
+from carbure.tasks import background_bulk_scoring
+from core.carburetypes import CarbureError
+from core.common import ErrorResponse, SuccessResponse
+from core.decorators import check_user_rights
+from core.models import (CarbureLot, CarbureLotEvent,
+                         SustainabilityDeclaration, UserRights)
+from core.notifications import notify_declaration_cancelled
+from django.db import transaction
+from django.db.models import Q
+from transactions.helpers import check_locked_year
 
 
 class InvalidateDeclarationError:
@@ -24,8 +27,12 @@ def invalidate_declaration(request, *args, **kwargs):
         traceback.print_exc()
         return ErrorResponse(400, InvalidateDeclarationError.MALFORMED_PARAMS)
 
-    # 2. get or create a declaration entry for the given period and entity and mark it as undeclared
 
+    year = int(period / 100)
+    if check_locked_year(year): 
+        return ErrorResponse(400, CarbureError.YEAR_LOCKED)
+
+    # 2. get or create a declaration entry for the given period and entity and mark it as undeclared
     try:
         declaration = SustainabilityDeclaration.init_declaration(entity_id, period)
     except:

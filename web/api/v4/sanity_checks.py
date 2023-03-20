@@ -9,6 +9,7 @@ from api.v4.helpers import get_prefetched_data
 from core.models import CarbureLot, CarbureLotReliabilityScore, GenericError, Entity
 from core.carburetypes import CarbureCertificatesErrors, CarbureMLGHGErrors, CarbureSanityCheckErrors
 from django.db import transaction
+from transactions.helpers import check_locked_year
 
 # definitions
 
@@ -16,39 +17,6 @@ oct2015 = datetime.date(year=2015, month=10, day=5)
 jan2021 = datetime.date(year=2021, month=1, day=1)
 july1st2021 = datetime.date(year=2021, month=7, day=1)
 dae_pattern = re.compile('^([a-zA-Z0-9/]+$)')
-
-rules = {}
-rules['GHG_REDUC_INF_50'] = "La réduction de gaz à effet de serre est inférieure à 50%, il n'est pas possible d'enregistrer ce lot dans CarbuRe"
-rules['GHG_REDUC_SUP_100'] = "La réduction de gaz à effet de serre est supérieure à 100%"
-rules['GHG_REDUC_SUP_99'] = "La réduction de gaz à effet de serre est supérieure à 99%"
-rules['PROVENANCE_MP'] = "La provenance de la matière première est inhabituelle"
-rules['MP_BC_INCOHERENT'] = "Matière Première incohérente avec le Biocarburant"
-rules['GHG_REDUC_INF_60'] = "La réduction de gaz à effet de serre est inférieure à 60% pour une usine dont la date de mise en service est ultérieure au 5 Octobre 2015. Il n'est pas possible d'enregistrer ce lot dans CarbuRe"
-rules['GHG_REDUC_INF_65'] = "La réduction de gaz à effet de serre est inférieure à 65% pour une usine dont la date de mise en service est ultérieure au 1er Janvier 2021. Il n'est pas possible d'enregistrer ce lot dans CarbuRe"
-rules['MISSING_REF_DBL_COUNTING'] = "Numéro d'enregistrement Double Compte manquant"
-rules['VOLUME_FAIBLE'] = "Volume inhabituellement faible."
-rules['MAC_BC_WRONG'] = "Biocarburant incompatible avec un mise à consommation (seuls ED95 ou B100 sont autorisés)"
-rules['GHG_ETD_0'] = "Émissions GES liées au Transport et à la Distribution nulles"
-rules['GHG_EP_0'] = "Émissions GES liées à la Transformation de la matière première nulles"
-rules['GHG_EEC_0'] = "Émissions GES liées à l'Extraction et la Culture nulles"
-rules['GHG_EL_NEG'] = "Émissions GES liées à l'Affectation des terres Négatives"
-rules['MP_NOT_CONFIGURED'] = "Matière Première non enregistrée sur votre Site de Production"
-rules['BC_NOT_CONFIGURED'] = "Biocarburant non enregistré sur votre Site de Production"
-rules['DEPOT_NOT_CONFIGURED'] = "Ce site de livraison n'est pas rattaché à votre société"
-rules['UNKNOWN_CLIENT'] = "Le client n'est pas enregistré sur Carbure"
-rules['UNKNOWN_DELIVERY_SITE'] = "Livraison en France - Dépôt Inconnu"
-rules['NOT_ALLOWED'] = "Vous ne pouvez pas ajouter les lots d'un producteur inscrit sur CarbuRe"
-rules['DEPRECATED_MP'] = "Les résidus viniques vont disparaître au profit de deux nouvelles matières premières: Marc de raisin et Lies de vin. Merci de mettre à jour vos déclarations en conséquence."
-rules['UNKNOWN_PRODSITE_CERT'] = "Certificat de site de production inconnu"
-rules['EXPIRED_PRODSITE_CERT'] = "Certificat du site de production expiré"
-rules['NO_SUPPLIER_CERT'] = "Certificat du fournisseur original absent"
-rules['UNKNOWN_SUPPLIER_CERT'] = "Certificat de fournisseur inconnu"
-rules['EXPIRED_SUPPLIER_CERT'] = "Certificat du fournisseur expiré"
-rules['UNKNOWN_DAE_FORMAT'] = "Le format du numéro douanier semble incorrect"
-rules['UNKNOWN_DOUBLE_COUNTING_CERTIFICATE'] = "Le certificat double compte est inconnu"
-rules['EXPIRED_DOUBLE_COUNTING_CERTIFICATE'] = "Le certificat double n'est plus valide"
-rules['POTENTIAL_DUPLICATE'] = "Doublon potentiel détecté. Un autre lot avec le même numéro douanier, biocarburant, matière première, volume et caractéristiques GES existe."
-rules['EEC_WITH_RESIDUE'] = "Émissions GES liées à l'Extraction et la Culture non nulles sur Feedstock non-conventionnel"
 
 
 
@@ -267,10 +235,13 @@ def sanity_check(lot, prefetched_data):
 
     if lot.delivery_type == CarbureLot.RFC and lot.carbure_delivery_site and lot.carbure_delivery_site.depot_type != 'EFPE':
         errors.append(generic_error(error=CarbureSanityCheckErrors.MAC_NOT_EFPE, lot=lot, fields=['delivery_type']))
-
     # check volume
     if lot.volume < 2000 and lot.delivery_type not in [CarbureLot.RFC, CarbureLot.FLUSHED]:
         errors.append(generic_error(error=CarbureSanityCheckErrors.VOLUME_FAIBLE, lot=lot, field='volume'))
+
+    #check year 
+    if lot.year in prefetched_data["locked_years"] :
+        errors.append(generic_error(error=CarbureSanityCheckErrors.YEAR_LOCKED, lot=lot, field='delivery_date', is_blocking=True) ) #TODO passer des variables pour custom les messages d'erreur fields = {"year":lot.year} 
 
     # provenance des matieres premieres
     if lot.feedstock and lot.country_of_origin:

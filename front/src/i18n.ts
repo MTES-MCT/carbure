@@ -9,6 +9,7 @@ i18n
     ns: [
       "translation",
       "errors",
+      "errors-api",
       "fields",
       "feedstocks",
       "biofuels",

@@ -93,6 +93,8 @@ example :
 >>> entities.count()
 ```
 
+-for v4 `docker exec -e TEST=1 carbure_app python3 web/manage.py test api.v4.tests_lots_flow`
+
 ## Étapes spécifiques pour windows
 - setup wsl2: https://docs.microsoft.com/en-us/windows/wsl/install-win10
 - installer docker desktop avec les libs WSL extra
