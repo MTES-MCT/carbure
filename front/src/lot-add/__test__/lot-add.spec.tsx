@@ -61,14 +61,12 @@ function checkDeliveryFields() {
 }
 
 function checkGESFields() {
-  getField("Émissions")
   getField("EEC")
   getField("EL")
   getField("EP")
   getField("ETD")
   getField("EU")
 
-  getField("Réductions")
   getField("ESCA")
   getField("ECCS")
   getField("ECCR")

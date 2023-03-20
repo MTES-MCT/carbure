@@ -8,21 +8,18 @@ if [ "$IMAGE_TAG" = "dev" ] || [ "$IMAGE_TAG" = "staging" ] || [ "$IMAGE_TAG" = 
   install-scalingo-cli && scalingo login --api-token $SCALINGO_TOKEN
 fi
 
-# clean up any previous local backup
-rm -rf /tmp/backups
-mkdir -p /tmp/backups
+if [ "$1" != "local" ]; then
+  # clean up any previous local backup
+  rm -rf /tmp/backups
+  mkdir -p /tmp/backups
 
-# download latest backup
-scalingo --app carbure-prod --addon $SCALINGO_MYSQL_UUID backups-download --output /tmp/backups
+  # download latest backup
+  scalingo --app carbure-prod --addon $SCALINGO_MYSQL_UUID backups-download --output /tmp/backups
+fi
 
 # decompress backup
 echo "> Decompressing backup..."
 tar -xzf /tmp/backups/*.tar.gz -C /tmp/backups
-
-if [ $? -ne 0 ]; then
-  echo "> Failed to download backup file"
-  exit 1
-fi
 
 # remove lines mentionning production database
 echo "> Cleaning SQL..."
@@ -50,11 +47,6 @@ carbure-mysql $MYSQL_DATABASE < /tmp/backups/backup.sql
 
 echo "> Applying latest migrations..."
 python web/manage.py migrate
-
-if [ $1 = "--dev" ]; then
-  echo "> [DEV] Remove private data"
-  carbure-mysql $MYSQL_DATABASE < scripts/database/clean_private.sql
-fi
 
 # Cleanup
 echo "> Cleaning up..."

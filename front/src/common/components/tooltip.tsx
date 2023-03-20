@@ -1,6 +1,6 @@
 import cl from "clsx"
 import { ReactNode, useRef, useState } from "react"
-import { defaultNormalizer, Normalizer, Sorter } from "../utils/normalize"
+import { Normalizer, Sorter } from "../utils/normalize"
 import Dropdown, { Trigger } from "./dropdown"
 import { Control } from "./input"
 import css from "./tooltip.module.css"
@@ -19,22 +19,7 @@ export interface TooltipProps<T, V = T> extends Control, Trigger {
   sort?: Sorter<T, V>
 }
 
-function Tooltip<T, V>({
-  children,
-  title,
-  loading,
-  value,
-  options,
-  defaultOptions,
-  getOptions,
-  onChange,
-  onQuery,
-  create,
-  anchor,
-  normalize = defaultNormalizer,
-  sort,
-  ...props
-}: TooltipProps<T, V>) {
+function Tooltip<T, V>({ children, title, style }: TooltipProps<T, V>) {
   const triggerRef = useRef<HTMLInputElement>(null)
   const [isOpen, setIsOpen] = useState<boolean>()
   return (

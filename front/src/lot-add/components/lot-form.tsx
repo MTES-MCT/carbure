@@ -26,8 +26,19 @@ export interface LotFormProps {
   onSubmit?: (value?: LotFormValue) => void
 }
 
-export const LotForm = ({ form, onSubmit, novalidate,  ...props }: LotFormProps) => (
-  <Form id="lot-form" variant="columns" form={form} onSubmit={onSubmit} novalidate={novalidate}>
+export const LotForm = ({
+  form,
+  onSubmit,
+  novalidate,
+  ...props
+}: LotFormProps) => (
+  <Form
+    id="lot-form"
+    variant="columns"
+    form={form}
+    onSubmit={onSubmit}
+    novalidate={novalidate}
+  >
     <LotFields {...props} />
     <ProductionFields {...props} />
     <DeliveryFields {...props} />
@@ -135,7 +146,6 @@ const BATCH_VALUES = [
   "biofuel",
   "feedstock",
   "country_of_origin",
-  "free_field",
 ]
 
 const BATCH_PRODUCTION = [
