@@ -2,12 +2,9 @@ import { screen, waitForElementToBeRemoved } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
 export async function waitWhileLoading() {
-  try {
-    await screen.findAllByTestId("loader")
-    await waitForElementToBeRemoved(() => screen.queryAllByTestId("loader"), { timeout: 60000 }) // prettier-ignore
-  } catch {
-    console.log("Loader timing based error, completely flaked, can (mostly) safely be ignored.") // prettier-ignore
-  }
+  const loaders = screen.queryAllByTestId("loader")
+  if (loaders.length === 0) return
+  await waitForElementToBeRemoved(() => screen.queryAllByTestId("loader"), { timeout: 5000 }) // prettier-ignore
 }
 
 export function clone(data: any) {

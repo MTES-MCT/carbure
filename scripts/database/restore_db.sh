@@ -1,37 +1,28 @@
 #!/bin/bash
 
-# check environment
-if [ "$IMAGE_TAG" != "local" ] && [ "$IMAGE_TAG" != "staging" ]
-then
-  echo "This script can only be run in local or staging"
-  exit 1
-fi
+set -e
 
-# setup scalingo on staging
-if [ "$IMAGE_TAG" == "staging" ]
-then
+# setup scalingo on servers
+if [ "$IMAGE_TAG" = "dev" ] || [ "$IMAGE_TAG" = "staging" ] || [ "$IMAGE_TAG" = "staging" ]; then
   dbclient-fetcher mysql 8
   install-scalingo-cli && scalingo login --api-token $SCALINGO_TOKEN
 fi
 
-# clean up any previous local backup
-rm -r /tmp/backups
-mkdir -p /tmp/backups
+if [ "$1" != "local" ]; then
+  # clean up any previous local backup
+  rm -rf /tmp/backups
+  mkdir -p /tmp/backups
 
-# download latest backup
-scalingo --app carbure-prod --addon $SCALINGO_MYSQL_UUID backups-download --output /tmp/backups
-
-# decompress backup
-echo "Decompressing backup..."
-tar -xzf /tmp/backups/*.tar.gz -C /tmp/backups
-
-if [ $? -ne 0 ]; then
-  echo "Failed to download backup file"
-  exit 1
+  # download latest backup
+  scalingo --app carbure-prod --addon $SCALINGO_MYSQL_UUID backups-download --output /tmp/backups
 fi
 
+# decompress backup
+echo "> Decompressing backup..."
+tar -xzf /tmp/backups/*.tar.gz -C /tmp/backups
+
 # remove lines mentionning production database
-echo "Cleaning SQL..."
+echo "> Cleaning SQL..."
 grep -vE "(carbure_pro_)" /tmp/backups/*.sql > /tmp/backups/backup.sql
 
 # extract DATABASE_URL parts
@@ -46,16 +37,19 @@ shopt -s expand_aliases # allow aliases inside script
 alias carbure-mysql="mysql --user=$MYSQL_USER --password=$MYSQL_PASSWORD --host=$MYSQL_HOST --port=$MYSQL_PORT --protocol=tcp"
 
 # Clean up old database
-echo "Cleaning previous database '$MYSQL_DATABASE'..."
+echo "> Cleaning previous database '$MYSQL_DATABASE'..."
 carbure-mysql -e "DROP DATABASE \`$MYSQL_DATABASE\`;"
 carbure-mysql -e "CREATE DATABASE \`$MYSQL_DATABASE\`;"
 
 # Restore the backup
-echo "Restoring backup in database..."
+echo "> Restoring backup in database..."
 carbure-mysql $MYSQL_DATABASE < /tmp/backups/backup.sql
 
+echo "> Applying latest migrations..."
+python web/manage.py migrate
+
 # Cleanup
-echo "Cleaning up..."
+echo "> Cleaning up..."
 rm -r /tmp/backups
 
-echo "OK"
+echo "> DONE"

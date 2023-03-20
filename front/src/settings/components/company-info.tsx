@@ -9,11 +9,16 @@ import { TextInput } from "common/components/input"
 import Button from "common/components/button"
 import { Save } from "common/components/icons"
 
-const CompanyInfo = () => {
-  const { t } = useTranslation()
-  const entity = useEntity()
+type CompanyInfoProps = {
+  defaultEntity?: Entity
+}
 
-  const canModify = entity.hasRights(UserRole.Admin, UserRole.ReadWrite)
+const CompanyInfo = ({ defaultEntity }: CompanyInfoProps) => {
+  const { t } = useTranslation()
+  const loggedEntity = useEntity()
+
+  const entity = defaultEntity || loggedEntity
+  const canModify = loggedEntity.hasRights(UserRole.Admin, UserRole.ReadWrite)
 
   const updateEntity = useMutation(api.updateEntity, {
     invalidates: ["user-settings"],

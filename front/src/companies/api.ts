@@ -62,10 +62,11 @@ export function getUsersRightRequests(
   })
 }
 
-export function updateUsersRights(user_id: number, status?: UserRightStatus) {
+export function updateUsersRights(user_id: number, entity_id: number, status?: UserRightStatus,) {
   return api.post("/v3/admin/users/update-right-request", {
     id: user_id,
-    status,
+    entity_id,
+    status
   })
 }
 

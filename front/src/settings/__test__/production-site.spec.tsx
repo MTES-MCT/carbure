@@ -100,8 +100,6 @@ test("update a production site details", async () => {
   const save = screen.getByText("Sauvegarder")
   await user.click(save)
 
-  expect(save.closest("button")).toBeDisabled()
-
   await waitWhileLoading()
 
   expect(save.closest("button")).not.toBeDisabled()

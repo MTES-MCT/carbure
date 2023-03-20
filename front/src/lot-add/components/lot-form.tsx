@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
-import useEntity, { EntityManager } from "carbure/hooks/entity"
+import useEntity from "carbure/hooks/entity"
 import { DeliveryType, Lot, LotError } from "transactions/types"
 import {
   Entity,
@@ -26,8 +26,19 @@ export interface LotFormProps {
   onSubmit?: (value?: LotFormValue) => void
 }
 
-export const LotForm = ({ form, onSubmit, novalidate,  ...props }: LotFormProps) => (
-  <Form id="lot-form" variant="columns" form={form} onSubmit={onSubmit} novalidate={novalidate}>
+export const LotForm = ({
+  form,
+  onSubmit,
+  novalidate,
+  ...props
+}: LotFormProps) => (
+  <Form
+    id="lot-form"
+    variant="columns"
+    form={form}
+    onSubmit={onSubmit}
+    novalidate={novalidate}
+  >
     <LotFields {...props} />
     <ProductionFields {...props} />
     <DeliveryFields {...props} />
@@ -135,7 +146,6 @@ const BATCH_VALUES = [
   "biofuel",
   "feedstock",
   "country_of_origin",
-  "free_field",
 ]
 
 const BATCH_PRODUCTION = [
