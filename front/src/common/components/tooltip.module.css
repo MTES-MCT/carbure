@@ -16,13 +16,12 @@
   background-color: var(--black);
   border-radius: 6px;
 }
+
 .arrow {
   content: "";
   position: absolute;
   width: 9px;
   height: 9px;
-  /* bottom: 50px; */
-  /* inset-inline: 0; */
   margin: -17px 0 0 20px;
   border-radius: 0 0 2px 0;
   transform: translateY(50%) rotate(-135deg);
