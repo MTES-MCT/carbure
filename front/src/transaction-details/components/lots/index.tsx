@@ -111,7 +111,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
     if (lotData.parent_stock && inCorrectionOrDraft) {
       form.setDisabledFieldsGroup(
         ["production", "emissions"],
-        ["biofuel", "feedstock", "country_of_origin", "free_field"]
+        ["biofuel", "feedstock", "country_of_origin"]
       )
     }
   }

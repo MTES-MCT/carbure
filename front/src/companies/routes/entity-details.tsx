@@ -12,12 +12,15 @@ import Tabs from "common/components/tabs"
 import { compact } from "common/utils/collection"
 import { useQuery } from "common/hooks/async"
 import useEntity from "carbure/hooks/entity"
+import CompanyInfo from "settings/components/company-info"
+import { useTranslation } from "react-i18next"
 
 const EntityDetails = () => {
   const navigate = useNavigate()
   const entity = useEntity()
   const { id = "" } = useParams<"id">()
   const company_id = parseInt(id, 10)
+  const { t } = useTranslation()
 
   const company = useQuery(api.getCompanyDetails, {
     key: "entity-details",
@@ -48,19 +51,25 @@ const EntityDetails = () => {
       <Tabs
         variant="sticky"
         tabs={compact([
-          { key: "users", path: "#users", label: "Utilisateurs" },
+          { key: "users", path: "#users", label: t("Utilisateurs") },
+          {
+            path: "#info",
+            key: "info",
+            label: t("Informations"),
+          },
           !isAirline && { key: "depot", path: "#depot", label: "Depots" },
-          isProducer && { key: "production", path: "#production", label: "Sites de production" }, // prettier-ignore
+          isProducer && { key: "production", path: "#production", label: t("Sites de production") }, // prettier-ignore
           !isAirline && {
             key: "certificates",
             path: "#certificates",
-            label: "Certificats",
+            label: t("Certificats"),
           },
         ])}
       />
 
       <section>
         <UserRights />
+        {entityData && <CompanyInfo defaultEntity={entityData} />}
         {entityData && !isAirline && (
           <DeliverySitesSettings
             readOnly

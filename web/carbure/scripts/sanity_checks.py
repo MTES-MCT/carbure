@@ -76,23 +76,6 @@ def cleanup_sanity_checks(year, batch, apply):
 
     print("> Found %d errors and %d warnings" % (len(all_errors), len(all_warnings)))
 
-    errors_by_lot = {}
-    for error in all_errors + all_warnings:
-        if error.lot.id not in errors_by_lot:
-            errors_by_lot[error.lot_id] = {
-                "node": {
-                    "id": error.lot.id,
-                    "carbure_id": error.lot.carbure_id,
-                    "owner_id": error.lot.added_by_id,
-                },
-                "errors": [],
-            }
-
-        errors_by_lot[error.lot.id]["errors"].append({"error": error.error, "is_blocking": error.is_blocking})
-
-    print("> Results:")
-    print(json.dumps(errors_by_lot, indent=2, default=str))
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run sanity checks on all the lots of a given year")
