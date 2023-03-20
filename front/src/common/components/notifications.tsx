@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react"
+import React, { useCallback, useEffect, useRef } from "react"
 import cl from "clsx"
 import { Cross } from "./icons"
 import Button from "./button"
@@ -25,24 +25,23 @@ export function useNotify(): Notifier {
 }
 
 export function useNotifyError() {
-  const portal = usePortal(notifications)
   const { t } = useTranslation()
+  const notify = useNotify()
 
-  const notifyError = (error: Error, defaultMessage?: string) => {
+  const getErrorText = (error: Error, defaultMessage?: string) => {
     const errorCode = (error as AxiosError<{ error: string }>).response?.data
       .error
-    let content = errorCode
+    let errorText = errorCode
       ? t(errorCode, { ns: "errors-api" })
       : defaultMessage ||
-        t("La demande a échoué. Réessayez ou contactez carbure@beta.gouv.fr")
-    return portal((close) => (
-      <Notification
-        content={content}
-        options={{ variant: "danger" }}
-        onClose={close}
-      />
-    ))
+      t("La demande a échoué. Réessayez ou contactez carbure@beta.gouv.fr")
+    return errorText
   }
+
+  const notifyError = useCallback((error: Error, defaultMessage?: string) => {
+    return notify(getErrorText(error, defaultMessage), { variant: "danger" })
+  }, [])
+
   return notifyError
 }
 
