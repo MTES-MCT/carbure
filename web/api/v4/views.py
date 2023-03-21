@@ -1178,6 +1178,9 @@ def recall_lot(request, *args, **kwargs):
     except:
         return JsonResponse({'status': 'error', 'message': 'Could not find lots'}, status=400)
     for lot in lots.iterator():
+        if check_locked_year(lot.year):
+            return ErrorResponse(400, CarbureError.YEAR_LOCKED)
+
         if lot.carbure_supplier != entity and lot.added_by != entity:
             return JsonResponse({'status': 'forbidden', 'message': 'Only the vendor can recall the lot'}, status=403)
 
