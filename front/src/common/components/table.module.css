@@ -126,14 +126,15 @@ h2 + .table[data-headless] {
 }
 
 .header,
-.cell .multiline > *, .cell .multiline div > * {
+.cell .multiline > *,
+.cell .multiline div > * {
   display: block;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
 }
 
-.cell .multiline > strong > svg {
+.cell .multiline strong > svg {
   margin-bottom: -5px;
 }
 
