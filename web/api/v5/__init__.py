@@ -7,5 +7,5 @@ urlpatterns = [
     path("admin/", include("api.v5.admin")),
     path("settings/", include("api.v5.settings")),
     path("declarations/", include("api.v5.declarations")),
-    path("transactions/", include("api.v5.transactions")),
+    # path("transactions/", include("api.v5.transactions")),
 ]
