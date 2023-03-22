@@ -60,7 +60,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
             value={types}
             onChange={setTypes}
             label={t("Types d'entité")}
-            placeholder="Choisissez un ou plusieurs types"
+            placeholder={t("Choisissez un ou plusieurs types")}
             normalize={normalizeEntityType}
             options={[
               EntityType.Operator,
@@ -76,7 +76,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
           value={operation}
           onChange={setOperations}
           label={t("Opérations en attente")}
-          placeholder="Choisissez une opération"
+          placeholder={t("Choisissez une opération")}
           options={compact([
             { value: "user", label: t("Utilisateurs à autoriser") },
             entity.isAdmin && {
@@ -104,7 +104,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
       {hasResults && (
         <Panel>
           <header>
-            <h1>Récapitulatif des sociétés</h1>
+            <h1>{t("Récapitulatif des sociétés")}</h1>
           </header>
           <Table<EntityDetails>
             loading={entities.loading}

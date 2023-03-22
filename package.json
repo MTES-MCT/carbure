@@ -4,7 +4,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "(cd front; npm install; npm run build)"
+    "build": "(cd front; npm install; npm run build)",
+    "test": "python web/manage.py test api --keepdb"
   },
   "engines": {
     "node": "16.16.0",

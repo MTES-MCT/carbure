@@ -84,7 +84,7 @@ const EntityDetails = () => {
             getProductionSites={api.getCompanyProductionSites}
           />
         )}
-        {!isAirline && <Certificates entity={company_id} />}
+        {!isAirline && <Certificates entity_id={company_id} />}
       </section>
     </Main>
   )

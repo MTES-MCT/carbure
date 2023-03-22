@@ -81,8 +81,8 @@ const EntityList = () => {
         <SearchInput
           clear
           debounce={250}
-          label="Recherche"
-          placeholder="Entrez du texte pour filtrer les résultats..."
+          label={t("Recherche")}
+          placeholder={t("Entrez du texte pour filtrer les résultats...")}
           value={search}
           onChange={setSearch}
         />
