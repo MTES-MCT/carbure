@@ -26,10 +26,6 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
 
   if (!ticket) return null
 
-  console.log(
-    "norm.normalizeBiofuel(ticket.biofuel).label:",
-    norm.normalizeBiofuel(ticket.biofuel)
-  )
   return (
     <div className={cl(css.form, css.columns)}>
       <Fieldset label={t("Lot")}>
