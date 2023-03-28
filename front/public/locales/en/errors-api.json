@@ -1,3 +1,3 @@
 {
-  "YEAR_LOCKED": "Batches with this delivery year can no longer be changed"
+  "YEAR_LOCKED": "The delivery date is too old. It is no longer possible to declare on this period."
 }
