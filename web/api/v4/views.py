@@ -21,14 +21,14 @@ from api.v4.helpers import filter_lots, filter_stock, get_entity_lots_by_status,
 from api.v4.helpers import get_prefetched_data, get_stock_events, get_stock_with_metadata, get_stock_filters_data, get_stocks_summary_data, get_transaction_distance, handle_eth_to_etbe_transformation, get_known_certificates
 from api.v4.helpers import send_email_declaration_invalidated, send_email_declaration_validated
 from api.v4.lots import construct_carbure_lot, bulk_insert_lots, try_get_date
-from api.v4.sanity_checks import sanity_check, bulk_sanity_checks
+from api.v4.sanity_checks import sanity_check, bulk_sanity_checks, bulk_scoring
 
 from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureLotReliabilityScore, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, Entity, GenericError, Pays, SustainabilityDeclaration, UserRights
 from transactions.helpers import check_locked_year
 from core.notifications import notify_correction_done, notify_correction_request, notify_declaration_cancelled, notify_declaration_validated, notify_lots_recalled, notify_lots_received, notify_lots_rejected, notify_lots_recalled
 from core.serializers import CarbureLotPublicSerializer, CarbureLotReliabilityScoreSerializer, CarbureNotificationSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
 from core.xlsx_v3 import template_v4, template_v4_stocks
-from carbure.tasks import background_bulk_scoring, background_create_ticket_sources_from_lots
+from carbure.tasks import background_bulk_scoring, background_bulk_sanity_checks
 from core.carburetypes import CarbureError
 
 @check_user_rights()
@@ -311,7 +311,7 @@ def stock_split(request, *args, **kwargs):
     if not isinstance(unserialized, list):
         return JsonResponse({'status': 'error', 'message': 'Parsed JSON is not a list'}, status=400)
 
-    new_lot_ids = []
+    new_lots = []
     for entry in unserialized:
         # check minimum fields
         required_fields = ['stock_id', 'volume', 'delivery_date']
@@ -398,6 +398,7 @@ def stock_split(request, *args, **kwargs):
             return JsonResponse({'status': 'error', 'message': 'Not enough stock available Available [%.2f] Requested [%.2f]' % (stock.remaining_volume, rounded_volume)}, status=400)
 
         lot.save()
+        new_lots.append(lot)
         stock.remaining_volume = round(stock.remaining_volume - rounded_volume, 2)
         stock.remaining_weight = stock.get_weight()
         stock.remaining_lhv_amount = stock.get_lhv_amount()
@@ -408,15 +409,15 @@ def stock_split(request, *args, **kwargs):
         event.user = request.user
         event.metadata = {'message': 'Envoi lot.', 'volume_to_deduct': lot.volume}
         event.save()
-        new_lot_ids.append(lot.id)
-        bulk_sanity_checks([lot], prefetched_data)
         # create events
         e = CarbureLotEvent()
         e.event_type = CarbureLotEvent.CREATED
         e.lot = lot
         e.user = request.user
         e.save()
-    return JsonResponse({'status': 'success', 'data': new_lot_ids})
+    background_bulk_sanity_checks(new_lots, prefetched_data)
+    background_bulk_scoring(new_lots, prefetched_data)
+    return JsonResponse({'status': 'success', 'data': [l.id for l in new_lots]})
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
@@ -615,12 +616,13 @@ def update_lot(request, *args, **kwargs):
     if not updated_lot:
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=400)
     # run sanity checks, insert lot and errors
-    
+
     updated_lot.save()
     for e in errors:
         e.lot = updated_lot
     GenericError.objects.bulk_create(errors, batch_size=100)
     bulk_sanity_checks([updated_lot], d)
+    background_bulk_scoring([updated_lot], d)
     data = CarbureLotPublicSerializer(updated_lot).data
     diff = dictdiffer.diff(previous, data)
     added = []
@@ -698,6 +700,9 @@ def duplicate_lot(request, *args, **kwargs):
             else:
                 setattr(lot, f, '')
     lot.save()
+    data = get_prefetched_data(Entity.objects.get(id=entity_id))
+    bulk_sanity_checks([lot], data)
+    bulk_scoring([lot], data)
     return JsonResponse({'status': 'success'})
 
 
@@ -714,7 +719,8 @@ def lots_send(request, *args, **kwargs):
     nb_rejected = 0
     nb_ignored = 0
     nb_auto_accepted = 0
-    trading_lots = []
+    lot_ids = [lot.id for lot in filtered_lots]
+    created_lot_ids = []
     prefetched_data = get_prefetched_data(entity)
     for lot in filtered_lots:
         if lot.added_by != entity:
@@ -772,7 +778,7 @@ def lots_send(request, *args, **kwargs):
             lot.lot_status = CarbureLot.PENDING
             lot.delivery_type = CarbureLot.UNKNOWN
             lot.save()
-            trading_lots.append(lot)
+            created_lot_ids.append(lot.id)
             event = CarbureLotEvent()
             event.event_type = CarbureLotEvent.ACCEPTED
             event.lot = lot
@@ -826,9 +832,10 @@ def lots_send(request, *args, **kwargs):
         lot.save()
     if nb_sent == 0:
         return JsonResponse({'status': 'success', 'data': {'submitted': nb_lots, 'sent': nb_sent, 'auto-accepted': nb_auto_accepted, 'ignored': nb_ignored, 'rejected': nb_rejected}}, status=400)
-    ids = [i.id for i in filtered_lots] + [i.id for i in trading_lots]
-    notif_lots = CarbureLot.objects.filter(id__in=ids)
-    notify_lots_received(notif_lots)
+    sent_lots = CarbureLot.objects.filter(id__in=lot_ids + created_lot_ids)
+    background_bulk_sanity_checks(sent_lots, prefetched_data)
+    background_bulk_scoring(sent_lots, prefetched_data)
+    notify_lots_received(sent_lots)
     return JsonResponse({'status': 'success', 'data': {'submitted': nb_lots, 'sent': nb_sent, 'auto-accepted': nb_auto_accepted, 'ignored': nb_ignored, 'rejected': nb_rejected}})
 
 
@@ -1003,10 +1010,10 @@ def request_fix(request, *args, **kwargs):
     except:
         return JsonResponse({'status': 'error', 'message': 'Could not find lots'}, status=400)
     for lot in lots.iterator():
-        
-        if check_locked_year(lot.year): 
+
+        if check_locked_year(lot.year):
             return ErrorResponse(400, CarbureError.YEAR_LOCKED)
-            
+
         if lot.lot_status == CarbureLot.FROZEN:
             return JsonResponse({'status': 'error', 'message': 'Lot is already declared, now in read-only mode.'}, status=400)
 
@@ -1448,6 +1455,9 @@ def accept_processing(request, *args, **kwargs):
     lots = get_entity_lots_by_status(entity, status)
     lots = filter_lots(lots, request.POST, entity, will_aggregate=True)
 
+    accepted_lot_ids = []
+    processed_lot_ids = []
+
     for lot in lots.iterator():
         if int(entity_id) != lot.carbure_client_id:
             return JsonResponse({'status': 'forbidden', 'message': 'Only the client can accept the lot'}, status=403)
@@ -1470,6 +1480,8 @@ def accept_processing(request, *args, **kwargs):
         lot.lot_status = CarbureLot.ACCEPTED
         lot.delivery_type = CarbureLot.PROCESSING
         lot.save()
+        accepted_lot_ids.append(lot.id)
+
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.ACCEPTED
         event.lot = lot
@@ -1492,11 +1504,18 @@ def accept_processing(request, *args, **kwargs):
         child_lot.parent_lot_id = parent_lot_id
         child_lot.parent_stock_id = None
         child_lot.save()
+        processed_lot_ids.append(child_lot.id)
+
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.CREATED
         event.lot = child_lot
         event.user = request.user
         event.save()
+
+    updated_lots = CarbureLot.objects.filter(id__in=accepted_lot_ids + processed_lot_ids)
+    background_bulk_sanity_checks(updated_lots)
+    background_bulk_scoring(updated_lots)
+
     return JsonResponse({'status': 'success'})
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
@@ -1526,6 +1545,9 @@ def accept_trading(request, *args, **kwargs):
     else:
         client_entity = None
 
+    accepted_lot_ids = []
+    transferred_lot_ids = []
+
     for lot in lots.iterator():
         if int(entity_id) != lot.carbure_client_id:
             return JsonResponse({'status': 'forbidden', 'message': 'Only the client can accept the lot'}, status=403)
@@ -1548,6 +1570,8 @@ def accept_trading(request, *args, **kwargs):
         lot.lot_status = CarbureLot.ACCEPTED
         lot.delivery_type = CarbureLot.TRADING
         lot.save()
+        accepted_lot_ids.append(lot.id)
+
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.ACCEPTED
         event.lot = lot
@@ -1577,6 +1601,8 @@ def accept_trading(request, *args, **kwargs):
         child_lot.parent_lot_id = parent_lot_id
         child_lot.parent_stock_id = None
         child_lot.save()
+        transferred_lot_ids.append(child_lot.id)
+
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.CREATED
         event.lot = child_lot
@@ -1587,6 +1613,12 @@ def accept_trading(request, *args, **kwargs):
         event.lot = child_lot
         event.user = request.user
         event.save()
+
+    updated_lots = CarbureLot.objects.filter(id__in=accepted_lot_ids + transferred_lot_ids)
+    prefetched_data = get_prefetched_data(entity)
+    background_bulk_sanity_checks(updated_lots, prefetched_data)
+    background_bulk_scoring(updated_lots, prefetched_data)
+
     return JsonResponse({'status': 'success'})
 
 
