@@ -472,10 +472,10 @@ export const Field = ({
         <Tooltip title={title ?? label!}>
           {children}
           <InfoCircle
-            color="#6A6A6A"
-            size={18}
+            color="#a4a4a4"
+            size={13}
             style={{
-              margin: "5px 0px 0 2px",
+              margin: "7px 0px 0 2px",
               position: "absolute",
             }}
           />
