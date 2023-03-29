@@ -9,33 +9,33 @@ from core.common import ErrorResponse
 from core.carburetypes import CarbureError
 from transactions.helpers import check_locked_year
 
+
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def add_lot(request, *args, **kwargs):
-    context = kwargs['context']
-    entity_id = context['entity_id']
+    context = kwargs["context"]
+    entity_id = context["entity_id"]
     entity = Entity.objects.get(pk=entity_id)
 
     d = get_prefetched_data(entity)
     lot_obj, errors = construct_carbure_lot(d, entity, request.POST.dict())
     if not lot_obj:
-        return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=400)
-        
-    if check_locked_year(lot_obj.year): 
+        return JsonResponse({"status": "error", "message": "Something went wrong"}, status=400)
+
+    if check_locked_year(lot_obj.year):
         return ErrorResponse(400, CarbureError.YEAR_LOCKED)
-    
+
     # run sanity checks, insert lot and errors
     lots_created = bulk_insert_lots(entity, [lot_obj], [errors], d)
     if len(lots_created) == 0:
-        return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=500)
+        return JsonResponse({"status": "error", "message": "Something went wrong"}, status=500)
     background_bulk_scoring(lots_created)
     e = CarbureLotEvent()
     e.event_type = CarbureLotEvent.CREATED
     e.lot_id = lots_created[0].id
     e.user = request.user
-    e.metadata = {'source': 'MANUAL'}
+    e.metadata = {"source": "MANUAL"}
     e.save()
 
     print(e.lot.year)
     data = CarbureLotPublicSerializer(e.lot).data
-    return JsonResponse({'status': 'success', 'data': data})
-
+    return JsonResponse({"status": "success", "data": data})
