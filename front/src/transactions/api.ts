@@ -212,11 +212,11 @@ export function selectionOrQuery(query: LotQuery, selection?: number[]) {
 // ENDPOINTS FOR STOCKS
 
 export function getStocks(query: StockQuery) {
-  return api.get<Api<StockList>>("/stocks", { params: query })
+  return api.get<Api<StockList>>("/v5/transactions/stocks", { params: query })
 }
 
 export function downloadStocks(query: StockQuery, selection: number[]) {
-  return download("/stocks", {
+  return download("/v5/transactions/stocks", {
     ...selectionOrQuery(
       { ...query, from_idx: undefined, limit: undefined },
       selection
