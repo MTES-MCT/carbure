@@ -126,61 +126,6 @@ def get_lots_summary(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Could not get lots summary"}, status=400)
 
 
-
-@check_user_rights()
-def get_stock_details(request, *args, **kwargs):
-    context = kwargs['context']
-    entity_id = context['entity_id']
-    stock_id = request.GET.get('stock_id', False)
-    if not stock_id:
-        return JsonResponse({'status': 'error', 'message': 'Missing stock_id'}, status=400)
-
-    stock = CarbureStock.objects.get(pk=stock_id)
-    if str(stock.carbure_client_id) != entity_id:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
-
-    data = {}
-    data['stock'] = CarbureStockPublicSerializer(stock).data
-    data['parent_lot'] = CarbureLotPublicSerializer(stock.parent_lot).data if stock.parent_lot else None
-    data['parent_transformation'] = CarbureStockTransformationPublicSerializer(stock.parent_transformation).data if stock.parent_transformation else None
-    children = CarbureLot.objects.filter(parent_stock=stock).exclude(lot_status=CarbureLot.DELETED)
-    data['children_lot'] = CarbureLotPublicSerializer(children, many=True).data
-    data['children_transformation'] = CarbureStockTransformationPublicSerializer(CarbureStockTransformation.objects.filter(source_stock=stock), many=True).data
-    data['events'] = get_stock_events(stock.parent_lot, entity_id)
-    data['updates'] = get_lot_updates(stock.parent_lot, entity_id)
-    data['comments'] = get_lot_comments(stock.parent_lot, entity_id)
-    return JsonResponse({'status': 'success', 'data': data})
-
-@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
-def stock_cancel_transformation(request, *args, **kwargs):
-    context = kwargs['context']
-    entity_id = context['entity_id']
-    stock_ids = request.POST.getlist('stock_ids', False)
-    if not stock_ids:
-        return JsonResponse({'status': 'error', 'message': 'Missing stock_ids'}, status=400)
-
-    try:
-        stocks = CarbureStock.objects.filter(pk__in=stock_ids)
-    except:
-        return JsonResponse({'status': 'error', 'message': 'Could not find stock'}, status=400)
-
-    for stock in stocks:
-        if stock.carbure_client_id != int(entity_id):
-            return JsonResponse({'status': 'forbidden', 'message': 'Stock does not belong to you'}, status=403)
-
-        if stock.parent_transformation_id is None:
-            return JsonResponse({'status': 'error', 'message': 'Stock does not come from a transformation'}, status=400)
-
-        # all good
-        # delete of transformation should trigger a cascading delete of child_lots + recredit volume to the parent_stock
-        event = CarbureStockEvent()
-        event.stock = stock.parent_transformation.source_stock
-        event.event_type = CarbureStockEvent.UNTRANSFORMED
-        event.user = request.user
-        event.save()
-        stock.parent_transformation.delete()
-    return JsonResponse({'status': 'success'})
-
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def stock_flush(request, *args, **kwargs):
     context = kwargs['context']
@@ -385,47 +330,6 @@ def stock_split(request, *args, **kwargs):
     background_bulk_sanity_checks(new_lots, prefetched_data)
     background_bulk_scoring(new_lots, prefetched_data)
     return JsonResponse({'status': 'success', 'data': [l.id for l in new_lots]})
-
-
-@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
-def stock_transform(request, *args, **kwargs):
-    context = kwargs['context']
-    entity_id = context['entity_id']
-    entity = Entity.objects.get(pk=entity_id)
-    payload = request.POST.get('payload', False)
-    if not payload:
-        return JsonResponse({'status': 'error', 'message': 'Missing payload'}, status=400)
-
-    try:
-        unserialized = json.loads(payload)
-        # expected format: [{stock_id: 12344, transformation_type: 'ETBE', otherfields}]
-    except:
-        return JsonResponse({'status': 'error', 'message': 'Cannot parse payload into JSON'}, status=400)
-
-    if not isinstance(unserialized, list):
-        return JsonResponse({'status': 'error', 'message': 'Parsed JSON is not a list'}, status=400)
-
-    for entry in unserialized:
-        # check minimum fields
-        required_fields = ['stock_id', 'transformation_type']
-        for field in required_fields:
-            if field not in entry:
-                return JsonResponse({'status': 'error', 'message': 'Missing field %s in json object'}, status=400)
-
-        try:
-            stock = CarbureStock.objects.get(pk=entry['stock_id'])
-        except:
-            return JsonResponse({'status': 'error', 'message': 'Could not find stock'}, status=400)
-
-        if stock.carbure_client != entity:
-            return JsonResponse({'status': 'forbidden', 'message': 'Stock does not belong to you'}, status=403)
-
-        ttype = entry['transformation_type']
-        if ttype == CarbureStockTransformation.ETH_ETBE:
-            error = handle_eth_to_etbe_transformation(request.user, stock, entry)
-            if error:
-                return error
-    return JsonResponse({'status': 'success'})
 
 
 @check_user_rights()

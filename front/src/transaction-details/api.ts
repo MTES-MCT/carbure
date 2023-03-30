@@ -31,7 +31,7 @@ export function toggleWarning(
 }
 
 export function getStockDetails(entity_id: number, stock_id: number) {
-  return api.get<Api<StockDetails>>("/stocks/details", {
+  return api.get<Api<StockDetails>>("/v5/transactions/stocks/details", {
     params: { entity_id, stock_id },
   })
 }

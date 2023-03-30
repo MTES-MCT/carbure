@@ -253,14 +253,14 @@ export function transformETBE(
   entity_id: number,
   payload: TransformETBEPayload[]
 ) {
-  return api.post("/stocks/transform", {
+  return api.post("/v5/transactions/stocks/transform", {
     entity_id,
     payload: JSON.stringify(payload),
   })
 }
 
 export function cancelTransformations(entity_id: number, stock_ids: number[]) {
-  return api.post("/stocks/cancel-transformation", { entity_id, stock_ids })
+  return api.post("/v5/transactions/stocks/cancel-transformation", { entity_id, stock_ids })
 }
 
 export function flushStocks(
