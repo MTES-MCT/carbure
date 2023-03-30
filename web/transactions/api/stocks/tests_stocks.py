@@ -55,3 +55,11 @@ class StocksFlowTest(TestCase):
         response = self.client.get(reverse("transactions-stocks-summary"), query)
         summary_data = response.json()["data"]
         self.assertEqual(summary_data["total_remaining_volume"], 1000)
+
+    def test_get_stocks_details(self):
+        parent_lot = CarbureLotFactory.create()
+        stock = CarbureStockFactory.create(parent_lot=parent_lot, carbure_client=self.producer, remaining_volume=1000)
+        query = {"entity_id": self.producer.id, "stock_id": stock.id}
+        response = self.client.get(reverse("transactions-stocks-details"), query)
+        stock_data = response.json()["data"]["stock"]
+        self.assertEqual(stock_data["remaining_volume"], 1000)
