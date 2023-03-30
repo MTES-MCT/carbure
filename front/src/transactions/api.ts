@@ -243,7 +243,7 @@ export function getStockFilters(field: Filter, query: StockQuery) {
 }
 
 export function splitStock(entity_id: number, payload: StockPayload[]) {
-  return api.post("/stocks/split", {
+  return api.post("/v5/transactions/stocks/split", {
     entity_id,
     payload: JSON.stringify(payload),
   })
