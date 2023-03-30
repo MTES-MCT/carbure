@@ -1,11 +1,7 @@
-from calendar import calendar, monthrange
 import datetime
-from json.encoder import py_encode_basestring_ascii
 import unicodedata
-from webbrowser import get
 import dictdiffer
 import json
-import time
 import traceback
 from django.db.models.aggregates import Count, Sum
 from django.db.models.fields import NOT_PROVIDED
@@ -13,19 +9,16 @@ from django.db import transaction
 
 from django.http.response import HttpResponse, JsonResponse
 from django.db.models.query_utils import Q
-from django.shortcuts import get_object_or_404
-from api.v4.certificates import get_certificates
 from core.common import ErrorResponse, SuccessResponse, convert_template_row_to_formdata, get_uploaded_files_directory
 from core.decorators import check_user_rights
 from api.v4.helpers import filter_lots, filter_stock, get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock
-from api.v4.helpers import get_prefetched_data, get_stock_events, get_stock_with_metadata, get_stock_filters_data, get_stocks_summary_data, get_transaction_distance, handle_eth_to_etbe_transformation, get_known_certificates
-from api.v4.helpers import send_email_declaration_invalidated, send_email_declaration_validated
+from api.v4.helpers import get_prefetched_data, get_stock_events, get_stock_filters_data, get_transaction_distance, handle_eth_to_etbe_transformation, get_known_certificates
 from api.v4.lots import construct_carbure_lot, bulk_insert_lots, try_get_date
 from api.v4.sanity_checks import sanity_check, bulk_sanity_checks, bulk_scoring
 
-from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureLotReliabilityScore, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, Entity, GenericError, Pays, SustainabilityDeclaration, UserRights
+from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, Entity, GenericError, Pays, SustainabilityDeclaration, UserRights
 from transactions.helpers import check_locked_year
-from core.notifications import notify_correction_done, notify_correction_request, notify_declaration_cancelled, notify_declaration_validated, notify_lots_recalled, notify_lots_received, notify_lots_rejected, notify_lots_recalled
+from core.notifications import notify_correction_done, notify_correction_request, notify_lots_recalled, notify_lots_received, notify_lots_rejected, notify_lots_recalled
 from core.serializers import CarbureLotPublicSerializer, CarbureLotReliabilityScoreSerializer, CarbureNotificationSerializer, CarbureStockPublicSerializer, CarbureStockTransformationPublicSerializer
 from core.xlsx_v3 import template_v4, template_v4_stocks
 from carbure.tasks import background_bulk_scoring, background_bulk_sanity_checks
@@ -132,20 +125,6 @@ def get_lots_summary(request, *args, **kwargs):
         traceback.print_exc()
         return JsonResponse({'status': 'error', 'message': "Could not get lots summary"}, status=400)
 
-
-@check_user_rights()
-def get_stocks_summary(request, *args, **kwargs):
-    context = kwargs['context']
-    entity_id = context['entity_id']
-    short = request.GET.get('short', False)
-    try:
-        stock = get_entity_stock(entity_id)
-        stock = filter_stock(stock, request.GET, entity_id)
-        summary = get_stocks_summary_data(stock, entity_id, short == 'true')
-        return JsonResponse({'status': 'success', 'data': summary})
-    except Exception:
-        traceback.print_exc()
-        return JsonResponse({'status': 'error', 'message': "Could not get stock summary"}, status=400)
 
 
 @check_user_rights()

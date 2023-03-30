@@ -70,7 +70,7 @@ urlpatterns = [
     path("lots/recalc-score", views.recalc_score, name="api-v4-recalc-score"),
     # STOCKS
     # path("stocks", views.get_stock, name="api-v4-get-stock"),
-    path("stocks/summary", views.get_stocks_summary, name="api-v4-get-stock-summary"),
+    # path("stocks/summary", views.get_stocks_summary, name="api-v4-get-stock-summary"),
     path("stocks/details", views.get_stock_details, name="api-v4-get-stock-details"),
     path(
         "stocks/cancel-transformation",

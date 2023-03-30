@@ -230,7 +230,7 @@ export function getStockSummary(
   selection: number[],
   short?: boolean
 ) {
-  return api.get<Api<StockSummary>>("/stocks/summary", {
+  return api.get<Api<StockSummary>>("/v5/transactions/stocks/summary", {
     params: { ...query, selection, ...QUERY_RESET, short },
   })
 }
