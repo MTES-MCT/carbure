@@ -6,9 +6,8 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 import hashlib
 from calendar import monthrange
-from django.db.models.signals import pre_delete, pre_save
+from django.db.models.signals import pre_delete, pre_save, post_save
 from django.dispatch import receiver
-from numpy import deprecate
 
 usermodel = get_user_model()
 
@@ -771,13 +770,21 @@ class CarbureStockTransformation(models.Model):
         ]
 
 @receiver(pre_save, sender=CarbureLot)
-def lot_pre_save_gen_carbure_id(sender, instance, *args, **kwargs):
-    instance.generate_carbure_id()
+def lot_pre_save_update_quantities(sender, instance, *args, **kwargs):
+    if instance.volume == 0:
+        instance.volume = instance.get_volume()
     if instance.weight == 0:
         instance.weight = instance.get_weight()
     if instance.lhv_amount == 0:
         instance.lhv_amount = instance.get_lhv_amount()
 
+@receiver(post_save, sender=CarbureLot)
+def lot_post_save_gen_carbure_id(sender, instance, created, update_fields={}, *args, **kwargs):
+    old_carbure_id = instance.carbure_id
+    instance.generate_carbure_id()
+
+    if instance.carbure_id != old_carbure_id and instance.lot_status in ("PENDING", "ACCEPTED", "FROZEN"):
+        instance.save(update_fields=["carbure_id"])
 
 @receiver(pre_delete, sender=CarbureStockTransformation, dispatch_uid='stock_transformation_delete_signal')
 def delete_stock_transformation(sender, instance, using, **kwargs):
@@ -898,9 +905,13 @@ class CarbureStock(models.Model):
             period = parent_lot.period
         self.carbure_id = 'S{period}-{country_of_production}-{delivery_site_id}-{id}'.format(period=period, country_of_production=country_of_production, delivery_site_id=delivery_site_id, id=self.id)
 
-@receiver(pre_save, sender=CarbureStock)
-def stock_pre_save_gen_carbure_id(sender, instance, *args, **kwargs):
+@receiver(post_save, sender=CarbureStock)
+def stock_post_save_gen_carbure_id(sender, instance, created, *args, **kwargs):
+    old_carbure_id = instance.carbure_id
     instance.generate_carbure_id()
+
+    if instance.carbure_id != old_carbure_id:
+        instance.save(update_fields=["carbure_id"])
 
 class CarbureLotEvent(models.Model):
     CREATED = "CREATED"
