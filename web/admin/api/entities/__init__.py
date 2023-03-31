@@ -9,7 +9,6 @@ from .production_sites import get_entity_production_sites
 urlpatterns = [
     path("", get_entities, name="admin-entities"),
     path("details", get_entity_details, name="admin-entities-details"),
-    # path("delete", delete_entity, name="admin-entities-delete"), #TODO jamais appelé, on suppr ?
     path("depots", get_entity_depots, name="admin-entities-depots"),
     path("production_sites", get_entity_production_sites, name="admin-entities-production-sites"),
 ]
