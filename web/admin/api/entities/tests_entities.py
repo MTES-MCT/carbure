@@ -56,19 +56,3 @@ class AdminEntitiesTest(TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()["data"]
         self.assertEqual(data["name"], "MTE - DGEC")
-
-
-# TODO beacuse error {"status": "forbidden", "message": "User not admin"}'
-# def test_delete_entity(self):
-#     producer = (
-#         Entity.objects.filter(entity_type=Entity.PRODUCER)
-#         .annotate(psites=Count("productionsite"))
-#         .filter(psites__gt=0)[0]
-#     )
-
-#     # delete entity
-#     response = self.client.post(reverse("admin-entities-delete"), {"entity_id": producer.id})
-#     self.assertEqual(response.status_code, 200)
-
-#     exists = Entity.objects.get(id=producer.id)
-#     print("==>> exists: ", exists)
