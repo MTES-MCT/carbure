@@ -238,7 +238,7 @@ export function getStockSummary(
 export function getStockFilters(field: Filter, query: StockQuery) {
   const params = { field, ...query, ...QUERY_RESET }
   return api
-    .get<Api<Option[]>>("/stocks/filters", { params })
+    .get<Api<Option[]>>("/v5/transactions/stocks/filters", { params })
     .then((res) => res.data.data ?? [])
 }
 
@@ -268,7 +268,7 @@ export function flushStocks(
   stock_ids: number[],
   free_field: string
 ) {
-  return api.post("/stocks/flush", {
+  return api.post("/v5/transactions/stocks/flush", {
     entity_id,
     stock_ids,
     free_field,

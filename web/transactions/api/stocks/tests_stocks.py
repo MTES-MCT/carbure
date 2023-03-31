@@ -103,6 +103,7 @@ class StocksFlowTest(TestCase):
             volume=500000,
             delivery_type=CarbureLot.STOCK,
             lot_status="ACCEPTED",
+            carbure_producer=self.producer,
         )
 
         self.assertEqual(parent_lot.lot_status, CarbureLot.ACCEPTED)
@@ -201,7 +202,7 @@ class StocksFlowTest(TestCase):
         data = {
             "lot_id": lot.id,
             "volume": 9000,
-            "entity_id": self.producer.id,  # OLD VALUE lot.carbure_producer.id ?? je ne sais pas pourquoi si c'etait important. Avec self.producer.id ça fonctionne
+            "entity_id": lot.carbure_producer.id,
             "delivery_date": today,
             "delivery_site_country_id": "DE",
             "transport_document_reference": "FR-UPDATED-DAE",
@@ -231,3 +232,27 @@ class StocksFlowTest(TestCase):
         self.assertEqual(response.status_code, 200)
         stock = CarbureStock.objects.get(parent_lot=parent_lot)
         self.assertEqual(stock.remaining_volume, 10000)
+
+    def test_stock_flush(self):
+        parent_lot = CarbureLotFactory.create(
+            carbure_client_id=self.producer.id,
+            volume=100000,
+            delivery_type=CarbureLot.STOCK,
+            lot_status="ACCEPTED",
+        )
+
+        # Flush
+        stock = CarbureStockFactory.create(parent_lot=parent_lot, carbure_client=self.producer, remaining_volume=1000)
+        stock.save()  # HACK to avoid `generate_carbure_id` later
+        query = {"entity_id": self.producer.id, "stock_ids": [stock.id]}
+        response = self.client.post(reverse("transactions-stocks-flush"), query)
+        status = response.json()["status"]
+        self.assertEqual(status, "success")
+
+        # Cannot flush a stock with a remaining volume greater than 1% => 5% in deed
+        stock = CarbureStockFactory.create(parent_lot=parent_lot, carbure_client=self.producer, remaining_volume=5001)
+        stock.save()  # HACK to avoid `generate_carbure_id` later
+        query = {"entity_id": self.producer.id, "stock_ids": [stock.id]}
+        response = self.client.post(reverse("transactions-stocks-flush"), query)
+        status = response.json()["status"]
+        self.assertEqual(status, "error")
