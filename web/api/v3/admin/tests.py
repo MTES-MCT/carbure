@@ -10,34 +10,44 @@ from api.v3.admin.urls import urlpatterns
 class AdminAPITest(TestCase):
     def setUp(self):
         user_model = get_user_model()
-        self.admin_email = 'superadmin@carbure.beta.gouv.fr'
-        self.admin_password = 'toto'
-        self.fake_admin_email = 'fakeadmin@carbure.beta.gouv.fr'
-        self.fake_admin_password = 'toto'
+        self.admin_email = "superadmin@carbure.beta.gouv.fr"
+        self.admin_password = "toto"
+        self.fake_admin_email = "fakeadmin@carbure.beta.gouv.fr"
+        self.fake_admin_password = "toto"
 
-        self.admin_user = user_model.objects.create_user(email=self.admin_email, name='Super Admin', password=self.admin_password, is_staff=True)
-        self.fake_admin_user = user_model.objects.create_user(email=self.fake_admin_email, name='Super Admin', password=self.fake_admin_password)
+        self.admin_user = user_model.objects.create_user(
+            email=self.admin_email, name="Super Admin", password=self.admin_password, is_staff=True
+        )
+        self.fake_admin_user = user_model.objects.create_user(
+            email=self.fake_admin_email, name="Super Admin", password=self.fake_admin_password
+        )
 
         # create OTP devices
         for user in [self.admin_user, self.fake_admin_user]:
             email_otp = EmailDevice()
             email_otp.user = user
-            email_otp.name = 'email'
+            email_otp.name = "email"
             email_otp.confirmed = True
             email_otp.email = user.email
             email_otp.save()
 
         # let's create a few users
-        self.user1 = user_model.objects.create_user(email='testuser1@toto.com', name='Le Super Testeur 1', password=self.fake_admin_password)
-        self.user2 = user_model.objects.create_user(email='testuser2@toto.com', name='Le Super Testeur 2', password=self.fake_admin_password)
-        self.user3 = user_model.objects.create_user(email='testuser3@toto.com', name='Testeur 3', password=self.fake_admin_password)
+        self.user1 = user_model.objects.create_user(
+            email="testuser1@toto.com", name="Le Super Testeur 1", password=self.fake_admin_password
+        )
+        self.user2 = user_model.objects.create_user(
+            email="testuser2@toto.com", name="Le Super Testeur 2", password=self.fake_admin_password
+        )
+        self.user3 = user_model.objects.create_user(
+            email="testuser3@toto.com", name="Testeur 3", password=self.fake_admin_password
+        )
 
         # a few entities
-        self.entity1, _ = Entity.objects.update_or_create(name='Le Super Producteur 1', entity_type='Producteur')
-        self.entity2, _ = Entity.objects.update_or_create(name='Le Super Producteur 2', entity_type='Producteur')
-        self.entity3, _ = Entity.objects.update_or_create(name='Le Super Administrateur 1', entity_type=Entity.ADMIN)
-        self.entity4, _ = Entity.objects.update_or_create(name='Le Super Operateur 1', entity_type=Entity.OPERATOR)
-        self.entity5, _ = Entity.objects.update_or_create(name='Le Super Trader 1', entity_type='Trader')        
+        self.entity1, _ = Entity.objects.update_or_create(name="Le Super Producteur 1", entity_type="Producteur")
+        self.entity2, _ = Entity.objects.update_or_create(name="Le Super Producteur 2", entity_type="Producteur")
+        self.entity3, _ = Entity.objects.update_or_create(name="Le Super Administrateur 1", entity_type=Entity.ADMIN)
+        self.entity4, _ = Entity.objects.update_or_create(name="Le Super Operateur 1", entity_type=Entity.OPERATOR)
+        self.entity5, _ = Entity.objects.update_or_create(name="Le Super Trader 1", entity_type="Trader")
 
         # some rights
         UserRights.objects.update_or_create(user=self.user1, entity=self.entity1)
@@ -50,129 +60,99 @@ class AdminAPITest(TestCase):
         # login as an admin
         loggedin = self.client.login(username=self.admin_email, password=self.admin_password)
         self.assertTrue(loggedin)
-        # pass otp        
+        # pass otp
         usermodel = get_user_model()
         user = usermodel.objects.get(email=self.admin_email)
-        response = self.client.post(reverse('api-v4-request-otp'))
+        response = self.client.post(reverse("api-v4-request-otp"))
         self.assertEqual(response.status_code, 200)
         device, created = EmailDevice.objects.get_or_create(user=user)
-        response = self.client.post(reverse('api-v4-verify-otp'), {'otp_token': device.token})
+        response = self.client.post(reverse("api-v4-verify-otp"), {"otp_token": device.token})
         self.assertEqual(response.status_code, 200)
-
 
     def test_accessrights_as_admin(self):
         for url in urlpatterns:
-            response = self.client.get(reverse(url.name), { "entity_id": self.entity3.id })
+            response = self.client.get(reverse(url.name), {"entity_id": self.entity3.id})
             self.assertNotEqual(response.status_code, 403)
-
 
     def test_accessrights(self):
         loggedin = self.client.login(username=self.fake_admin_email, password=self.fake_admin_password)
         self.assertTrue(loggedin)
-        # pass otp        
+        # pass otp
         usermodel = get_user_model()
         user = usermodel.objects.get(email=self.fake_admin_email)
-        response = self.client.post(reverse('api-v4-request-otp'))
+        response = self.client.post(reverse("api-v4-request-otp"))
         self.assertEqual(response.status_code, 200)
         device, created = EmailDevice.objects.get_or_create(user=user)
-        response = self.client.post(reverse('api-v4-verify-otp'), {'otp_token': device.token})
+        response = self.client.post(reverse("api-v4-verify-otp"), {"otp_token": device.token})
         self.assertEqual(response.status_code, 200)
         for url in urlpatterns:
             response = self.client.get(reverse(url.name), {"entity_id": self.entity3.id})
             self.assertEqual(response.status_code, 403)
 
-
     def test_get_users(self):
-        response = self.client.get(reverse('api-v3-admin-get-users'))
+        response = self.client.get(reverse("api-v3-admin-get-users"))
         # api works
         self.assertEqual(response.status_code, 200)
         # and returns at least 3 users
-        self.assertGreaterEqual(len(response.json()['data']), 3)
+        self.assertGreaterEqual(len(response.json()["data"]), 3)
         # check if querying works
-        response = self.client.get(reverse('api-v3-admin-get-users') + '?q=super')
+        response = self.client.get(reverse("api-v3-admin-get-users") + "?q=super")
         # works
         self.assertEqual(response.status_code, 200)
         # and returns at least 2 users
-        data = response.json()['data']
+        data = response.json()["data"]
         self.assertGreaterEqual(len(data), 2)
         # check if the content is correct
         random_user = data[0]
-        self.assertIn('email', random_user)
-        self.assertIn('name', random_user)
-
-
-    def test_get_entities(self):
-        response = self.client.get(reverse('api-v3-admin-get-entities'), { "entity_id": self.entity3.id })
-        # api works
-        self.assertEqual(response.status_code, 200)
-        # and returns at least 5 entities
-        self.assertGreaterEqual(len(response.json()['data']), 5)
-        # check if querying works
-        response = self.client.get(reverse('api-v3-admin-get-entities'), { "q": "prod", "entity_id": self.entity3.id })
-        # works
-        self.assertEqual(response.status_code, 200)
-        # and returns at least 2 entities
-        data = response.json()['data']
-        self.assertGreaterEqual(len(data), 2)
-        # check if the content is correct
-        random_entity = data[0]['entity']
-        self.assertIn('entity_type', random_entity)
-        self.assertIn('name', random_entity)
-
+        self.assertIn("email", random_user)
+        self.assertIn("name", random_user)
 
     def test_create_entity(self):
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {"entity_id": self.entity3.id, 'name': 'Société Test', 'category': 'Producteur'})
+        response = self.client.post(
+            reverse("api-v3-admin-add-entity"),
+            {"entity_id": self.entity3.id, "name": "Société Test", "category": "Producteur"},
+        )
         self.assertEquals(response.status_code, 200)
         # check if entity has been created actually exists
-        response = self.client.get(reverse('api-v3-admin-get-entities'), { "q": "Test", "entity_id": self.entity3.id })
+        response = self.client.get(reverse("admin-entities"), {"q": "Test", "entity_id": self.entity3.id})
         self.assertEqual(response.status_code, 200)
         # and returns 1 entity
-        jc = response.json()['data'][0]['entity']
-        self.assertEqual(jc['name'], 'Société Test')
-        self.assertEqual(jc['entity_type'], 'Producteur')
+        jc = response.json()["data"][0]["entity"]
+        self.assertEqual(jc["name"], "Société Test")
+        self.assertEqual(jc["entity_type"], "Producteur")
 
         # make sure all categories are supported
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {"entity_id": self.entity3.id, 'name': 'Opérateur Test', 'category': Entity.OPERATOR})
-        obj = Entity.objects.get(name='Opérateur Test')
+        response = self.client.post(
+            reverse("api-v3-admin-add-entity"),
+            {"entity_id": self.entity3.id, "name": "Opérateur Test", "category": Entity.OPERATOR},
+        )
+        obj = Entity.objects.get(name="Opérateur Test")
         self.assertEquals(obj.entity_type, Entity.OPERATOR)
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {"entity_id": self.entity3.id, 'name': 'Trader Test', 'category': 'Trader'})
-        obj = Entity.objects.get(name='Trader Test')
-        self.assertEquals(obj.entity_type, 'Trader')        
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {"entity_id": self.entity3.id, 'name': 'Admin Test', 'category': 'Administration'})
-        obj = Entity.objects.get(name='Admin Test')
-        self.assertEquals(obj.entity_type, 'Administration')
+        response = self.client.post(
+            reverse("api-v3-admin-add-entity"),
+            {"entity_id": self.entity3.id, "name": "Trader Test", "category": "Trader"},
+        )
+        obj = Entity.objects.get(name="Trader Test")
+        self.assertEquals(obj.entity_type, "Trader")
+        response = self.client.post(
+            reverse("api-v3-admin-add-entity"),
+            {"entity_id": self.entity3.id, "name": "Admin Test", "category": "Administration"},
+        )
+        obj = Entity.objects.get(name="Admin Test")
+        self.assertEquals(obj.entity_type, "Administration")
 
         # try to create with missing data
-        response = self.client.post(reverse('api-v3-admin-add-entity'))
+        response = self.client.post(reverse("api-v3-admin-add-entity"))
         self.assertEqual(response.status_code, 400)
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {'category': 'Producteur'})
+        response = self.client.post(reverse("api-v3-admin-add-entity"), {"category": "Producteur"})
         self.assertEqual(response.status_code, 400)
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {"entity_id": self.entity3.id, 'name': 'Jean-Claude Test'})
+        response = self.client.post(
+            reverse("api-v3-admin-add-entity"), {"entity_id": self.entity3.id, "name": "Jean-Claude Test"}
+        )
         self.assertEqual(response.status_code, 400)
 
         # try to enter wrong data
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {'category': 'Boucher', 'name': 'Boucherie du Marais'})
+        response = self.client.post(
+            reverse("api-v3-admin-add-entity"), {"category": "Boucher", "name": "Boucherie du Marais"}
+        )
         self.assertEqual(response.status_code, 400)
-
-
-    def test_delete_entity(self):
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {"entity_id": self.entity3.id, 'name': 'Société Test', 'category': 'Producteur'})
-        self.assertEquals(response.status_code, 200)
-
-        # check if entity has been created
-        response = self.client.get(reverse('api-v3-admin-get-entities'), { "q": "Test", "entity_id": self.entity3.id })
-        self.assertEqual(response.status_code, 200)
-        # and returns 1 entity
-        jc = response.json()['data'][0]['entity']
-        self.assertEqual(jc['name'], 'Société Test')
-        entity_id = jc['id']
-
-        # delete entity
-        response = self.client.post(reverse('api-v3-admin-delete-entity'), {'entity_id': entity_id})
-        self.assertEqual(response.status_code, 200)        
-
-        # check if entity is deleted
-        response = self.client.get(reverse('api-v3-admin-get-entities'), { "q": "Test", "entity_id": self.entity3.id })
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.json()['data']), 0)
-    

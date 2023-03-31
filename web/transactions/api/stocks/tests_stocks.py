@@ -3,17 +3,11 @@ import json
 import random
 
 from api.v4.tests_utils import setup_current_user
-from core.models import Entity, GenericError
+from core.models import Entity
 from django.db.models import Count
 from django.test import TestCase
 from django.urls import reverse
-from transactions.factories import CarbureLot, CarbureLotFactory, CarbureStockFactory, Depot, CarbureStock
-
-
-def debug_errors(lot):
-    errors = GenericError.objects.filter(lot=lot)
-    for e in errors:
-        print(e.error, e.field, e.value, e.extra)
+from transactions.factories import CarbureLot, CarbureLotFactory, CarbureStock, CarbureStockFactory, Depot
 
 
 class StocksFlowTest(TestCase):

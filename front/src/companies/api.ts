@@ -11,7 +11,7 @@ import {
 import { EntityDetails } from "./types"
 
 export function getCompanies(entity_id: number) {
-  return api.get<Api<EntityDetails[]>>("/v3/admin/entities", {
+  return api.get<Api<EntityDetails[]>>("/v5/admin/entities", {
     params: { entity_id },
   })
 }
@@ -31,7 +31,7 @@ export function addCompany(
 }
 
 export function getCompanyDetails(entity_id: number, company_id: number) {
-  return api.get<Api<Entity>>("/v3/admin/entities/details", {
+  return api.get<Api<Entity>>("/v5/admin/entities/details", {
     params: { entity_id, company_id },
   })
 }
@@ -44,7 +44,7 @@ export function getCompanyDepots(entity_id: number, company_id: number) {
 
 export function getCompanyProductionSites(entity_id: number) {
   return api.get<Api<ProductionSiteDetails[]>>(
-    "/v3/admin/entities/production_sites",
+    "/v5/admin/entities/production_sites",
     {
       params: { entity_id },
     }
