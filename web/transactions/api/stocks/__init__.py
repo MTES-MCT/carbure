@@ -5,6 +5,9 @@ from .details import get_stock_details
 from .transform import stock_transform
 from .cancel_transformation import stock_cancel_transformation
 from .split import stock_split
+from .flush import stock_flush
+from .filters import get_stock_filters
+
 
 urlpatterns = [
     path("", get_stocks, name="transactions-stocks"),
@@ -13,4 +16,6 @@ urlpatterns = [
     path("transform", stock_transform, name="transactions-stocks-transform"),
     path("cancel-transformation", stock_cancel_transformation, name="transactions-stocks-cancel-transformation"),
     path("split", stock_split, name="transactions-stocks-split"),
+    path("flush", stock_flush, name="transactions-stocks-flush"),
+    path("filters", get_stock_filters, name="transactions-stocks-filters"),
 ]

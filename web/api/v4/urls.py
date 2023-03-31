@@ -68,19 +68,6 @@ urlpatterns = [
     ### Warnings
     path("lots/toggle-warning", views.toggle_warning, name="api-v4-toggle-warning"),
     path("lots/recalc-score", views.recalc_score, name="api-v4-recalc-score"),
-    # STOCKS
-    # path("stocks", views.get_stock, name="api-v4-get-stock"),
-    # path("stocks/summary", views.get_stocks_summary, name="api-v4-get-stock-summary"),
-    # path("stocks/details", views.get_stock_details, name="api-v4-get-stock-details"),
-    # path(
-    #     "stocks/cancel-transformation",
-    #     views.stock_cancel_transformation,
-    #     name="api-v4-cancel-transformation",
-    # ),
-    # path("stocks/split", views.stock_split, name="api-v4-stock-split"),
-    # path("stocks/transform", views.stock_transform, name="api-v4-stock-transform"),
-    path("stocks/flush", views.stock_flush, name="api-v4-stock-flush"),
-    path("stocks/filters", views.get_stock_filters, name="api-v4-get-stock-filters"),
     # DECLARATIONS
     path("declarations", views.get_declarations, name="api-v4-get-declarations"),
     path("download-template", views.get_template, name="api-v4-get-template"),
