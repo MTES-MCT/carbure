@@ -141,7 +141,7 @@ urlpatterns = [
     ),
     path("admin/lots/pin", admin.toggle_pin, name="api-v4-admin-pin-lots"),
     path("admin/lots/comment", admin.add_comment, name="api-v4-admin-add-comment"),
-    path("admin/map", admin.map, name="api-v4-admin-map"),
+    # path("admin/map", admin.map, name="api-v4-admin-map"),
     path(
         "admin/dashboard/declarations",
         admin.get_declarations,
