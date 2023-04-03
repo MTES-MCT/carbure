@@ -1,0 +1,31 @@
+from django.http import JsonResponse
+from core.decorators import is_admin
+from core.models import ProductionSite
+
+
+@is_admin
+def get_entity_production_sites(request):
+    entity_id = request.GET.get("entity_id", False)
+
+    try:
+        psites = ProductionSite.objects.filter(producer__id=entity_id)
+        psitesbyid = {p.id: p for p in psites}
+        for k, v in psitesbyid.items():
+            v.inputs = []
+            v.outputs = []
+
+        data = []
+
+        for ps in psites:
+            psite_data = ps.natural_key()
+            psite_data["inputs"] = [i.natural_key() for i in ps.productionsiteinput_set.all()]
+            psite_data["outputs"] = [o.natural_key() for o in ps.productionsiteoutput_set.all()]
+            certificates = []
+            for pc in ps.productionsitecertificate_set.all():
+                certificates.append(pc.natural_key())
+            psite_data["certificates"] = certificates
+            data.append(psite_data)
+
+        return JsonResponse({"status": "success", "data": data})
+    except Exception:
+        return JsonResponse({"status": "error", "message": "Could not find production sites"}, status=400)

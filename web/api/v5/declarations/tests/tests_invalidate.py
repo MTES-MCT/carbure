@@ -57,7 +57,7 @@ class InvalidateDeclarationTest(TestCase):
         return sent_lots, received_lots
 
     def test_invalidate_declaration(self):
-        LockedYear.objects.create(year=2021, locked=True) 
+        LockedYear.objects.create(year=2021, locked=True)
 
         query = {
             "entity_id": self.entity.id,
@@ -85,9 +85,8 @@ class InvalidateDeclarationTest(TestCase):
 
         self.assertEqual(undeclared_received_lots.count(), 50)
 
-
     def test_invalidate_declaration_on_locked_year(self):
-        LockedYear.objects.create(year=2021, locked=True) 
+        LockedYear.objects.create(year=2021, locked=True)
 
         query = {
             "entity_id": self.entity.id,
