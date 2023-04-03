@@ -30,7 +30,7 @@ def stock_flush(request, *args, **kwargs):
 
         if volume_to_flush > initial_volume * 0.05:
             return JsonResponse(
-                {"status": "error", "message": "Cannot flush a stock with a remaining volume greater than 1%"},
+                {"status": "error", "message": "Cannot flush a stock with a remaining volume greater than 5%"},
                 status=400,
             )
 

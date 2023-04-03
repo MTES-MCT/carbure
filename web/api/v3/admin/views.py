@@ -9,7 +9,7 @@ from django.http import JsonResponse
 from core.decorators import is_admin, check_admin_rights, is_admin_or_external_admin
 
 from django.contrib.auth import get_user_model
-from core.models import CarbureLot, Entity, UserRights, ProductionSite, ExternalAdminRights
+from core.models import CarbureLot, Entity, UserRights, ProductionSite, ExternalAdminRights, EntityDepot
 from django.db.models import Q, Count, Value
 from django.core.mail import send_mail
 from django.conf import settings
@@ -68,13 +68,13 @@ def get_entity_production_sites(request):
         return JsonResponse({"status": "error", "message": "Could not find production sites"}, status=400)
 
 
-@is_admin
+@check_admin_rights()
 def get_entity_depots(request):
-    entity_id = request.GET.get("entity_id", False)
+    company_id = request.GET.get("company_id", False)
 
     try:
-        e = Entity.objects.get(pk=entity_id)
-        data = [ps.natural_key() for ps in e.entitydepot_set.all()]
+        ds = EntityDepot.objects.filter(entity_id=company_id)
+        data = [d.natural_key() for d in ds]
         return JsonResponse({"status": "success", "data": data})
     except Exception:
         return JsonResponse({"status": "error", "message": "Could not find Entity Depots"}, status=400)
