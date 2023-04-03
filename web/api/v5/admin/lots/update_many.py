@@ -6,7 +6,8 @@ from core.serializers import GenericErrorSerializer
 from core.carburetypes import CarbureUnit
 from producers.models import ProductionSite
 from api.v4.lots import compute_lot_quantity
-from api.v4.sanity_checks import bulk_sanity_checks
+from api.v4.sanity_checks import bulk_sanity_checks, get_prefetched_data
+from carbure.tasks import background_bulk_scoring
 
 from core.models import (
     CarbureLot,
@@ -45,6 +46,8 @@ def update_many(request):
     comment = form.cleaned_data["comment"]
     dry_run = form.cleaned_data["dry_run"]
     updated = form.cleaned_data["lots_ids"]
+
+    prefetched_data = get_prefetched_data()
 
     # query the database for all the traceability nodes related to these lots
     nodes = get_traceability_nodes(updated)
@@ -105,7 +108,7 @@ def update_many(request):
         )
 
     # run sanity checks in memory so we don't modify the current errors
-    sanity_check_errors, _ = bulk_sanity_checks(updated_lots, dry_run=True)
+    sanity_check_errors, _ = bulk_sanity_checks(updated_lots, prefetched_data, dry_run=True)
     blocking_errors = [error for error in sanity_check_errors if error.is_blocking]
 
     # do not modify the database if there are any blocking errors in the modified lots
@@ -131,6 +134,8 @@ def update_many(request):
 
     # save everything in the database in one single transaction
     if not dry_run:
+        background_bulk_scoring(updated_lots, prefetched_data)
+
         with transaction.atomic():
             bulk_update_traceability_nodes(updated_nodes)
             CarbureLotComment.objects.bulk_create(update_comments)
