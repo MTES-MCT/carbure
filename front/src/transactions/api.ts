@@ -212,11 +212,11 @@ export function selectionOrQuery(query: LotQuery, selection?: number[]) {
 // ENDPOINTS FOR STOCKS
 
 export function getStocks(query: StockQuery) {
-  return api.get<Api<StockList>>("/stocks", { params: query })
+  return api.get<Api<StockList>>("/v5/transactions/stocks", { params: query })
 }
 
 export function downloadStocks(query: StockQuery, selection: number[]) {
-  return download("/stocks", {
+  return download("/v5/transactions/stocks", {
     ...selectionOrQuery(
       { ...query, from_idx: undefined, limit: undefined },
       selection
@@ -230,7 +230,7 @@ export function getStockSummary(
   selection: number[],
   short?: boolean
 ) {
-  return api.get<Api<StockSummary>>("/stocks/summary", {
+  return api.get<Api<StockSummary>>("/v5/transactions/stocks/summary", {
     params: { ...query, selection, ...QUERY_RESET, short },
   })
 }
@@ -238,12 +238,12 @@ export function getStockSummary(
 export function getStockFilters(field: Filter, query: StockQuery) {
   const params = { field, ...query, ...QUERY_RESET }
   return api
-    .get<Api<Option[]>>("/stocks/filters", { params })
+    .get<Api<Option[]>>("/v5/transactions/stocks/filters", { params })
     .then((res) => res.data.data ?? [])
 }
 
 export function splitStock(entity_id: number, payload: StockPayload[]) {
-  return api.post("/stocks/split", {
+  return api.post("/v5/transactions/stocks/split", {
     entity_id,
     payload: JSON.stringify(payload),
   })
@@ -253,14 +253,14 @@ export function transformETBE(
   entity_id: number,
   payload: TransformETBEPayload[]
 ) {
-  return api.post("/stocks/transform", {
+  return api.post("/v5/transactions/stocks/transform", {
     entity_id,
     payload: JSON.stringify(payload),
   })
 }
 
 export function cancelTransformations(entity_id: number, stock_ids: number[]) {
-  return api.post("/stocks/cancel-transformation", { entity_id, stock_ids })
+  return api.post("/v5/transactions/stocks/cancel-transformation", { entity_id, stock_ids })
 }
 
 export function flushStocks(
@@ -268,7 +268,7 @@ export function flushStocks(
   stock_ids: number[],
   free_field: string
 ) {
-  return api.post("/stocks/flush", {
+  return api.post("/v5/transactions/stocks/flush", {
     entity_id,
     stock_ids,
     free_field,
