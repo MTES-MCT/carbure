@@ -61,6 +61,7 @@
   "UNKNOWN_DAE_FORMAT": "Customs ID format incorrect",
   "UNKNOWN_DOUBLE_COUNTING_CERTIFICATE": "Unknown double counting certificate",
   "EXPIRED_DOUBLE_COUNTING_CERTIFICATE": "Double counting certificate expired",
+  "INVALID_DOUBLE_COUNTING_CERTIFICATE": "Invalid double account certificate for this delivery date",
   "POTENTIAL_DUPLICATE": "Potential duplicate found",
   "MISSING_DELIVERY_SITE_COUNTRY": "Delivery site country is missing",
   "COULD_NOT_FIND_PRODUCTION_SITE": "The production site is not configured on your company page",
