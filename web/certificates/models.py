@@ -1,6 +1,8 @@
 from django.db import models
 from core.models import Biocarburant, Entity, EntityCertificate, MatierePremiere, Pays
 from producers.models import ProductionSite
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class ProductionSiteCertificate(models.Model):
@@ -41,6 +43,17 @@ class DoubleCountingRegistration(models.Model):
         db_table = "double_counting_registrations"
         verbose_name = "Certificat Double Compte"
         verbose_name_plural = "Certificats Double Compte"
+
+
+@receiver(post_save, sender=DoubleCountingRegistration)
+def dc_registration_post_update_production_site(sender, instance, created, update_fields={}, *args, **kwargs):
+    production_site_id = instance.production_site_id
+    try:
+        production_site = ProductionSite.objects.get(pk=production_site_id)
+        production_site.dc_reference = instance.certificate_id
+        production_site.save()
+    except:
+        print("Production Site not found")
 
 
 class DoubleCountingRegistrationInputOutput(models.Model):

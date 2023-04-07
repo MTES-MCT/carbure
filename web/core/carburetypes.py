@@ -2,6 +2,7 @@ class Carbure:
     SUCCESS = "success"
     ERROR = "error"
 
+
 class CarbureError:
     INVALID_REGISTRATION_FORM = "Invalid registration form"
     INVALID_LOGIN_CREDENTIALS = "Invalid login or password"
@@ -14,10 +15,11 @@ class CarbureError:
     PASSWORD_RESET_USER_NOT_FOUND = "User not found"
     PASSWORD_RESET_INVALID_FORM = "Password reset invalid form"
     PASSWORD_RESET_MISMATCH = "Passwords do not match"
-    ACTIVATION_LINK_ERROR = "Could not send activation link" 
+    ACTIVATION_LINK_ERROR = "Could not send activation link"
     ACTIVATION_LINK_INVALID_FORM = "Activation link invalid form"
     ACTIVATION_COULD_NOT_ACTIVATE_USER = "Could not activate user account"
-    YEAR_LOCKED= "YEAR_LOCKED"
+    YEAR_LOCKED = "YEAR_LOCKED"
+
 
 class CarbureMLGHGErrors:
     EEC_ANORMAL_LOW = "EEC_ANORMAL_LOW"
@@ -39,7 +41,9 @@ class CarbureCertificatesErrors:
     MISSING_REF_DBL_COUNTING = "MISSING_REF_DBL_COUNTING"
     UNKNOWN_DOUBLE_COUNTING_CERTIFICATE = "UNKNOWN_DOUBLE_COUNTING_CERTIFICATE"
     EXPIRED_DOUBLE_COUNTING_CERTIFICATE = "EXPIRED_DOUBLE_COUNTING_CERTIFICATE"
+    INVALID_DOUBLE_COUNTING_CERTIFICATE = "INVALID_DOUBLE_COUNTING_CERTIFICATE"
     MISSING_SUPPLIER_CERTIFICATE = "MISSING_SUPPLIER_CERTIFICATE"
+
 
 class CarbureSanityCheckErrors:
     GHG_REDUC_SUP_100 = "GHG_REDUC_SUP_100"
@@ -54,7 +58,7 @@ class CarbureSanityCheckErrors:
     EEC_WITH_RESIDUE = "EEC_WITH_RESIDUE"
 
     MAC_BC_WRONG = "MAC_BC_WRONG"
-    MAC_NOT_EFPE = "MAC_NOT_EFPE"    
+    MAC_NOT_EFPE = "MAC_NOT_EFPE"
     VOLUME_FAIBLE = "VOLUME_FAIBLE"
     PROVENANCE_MP = "PROVENANCE_MP"
     DEPRECATED_MP = "DEPRECATED_MP"
@@ -79,9 +83,11 @@ class CarbureSanityCheckErrors:
     MISSING_DELIVERY_SITE_COUNTRY = "MISSING_DELIVERY_SITE_COUNTRY"
     MISSING_FEEDSTOCK_COUNTRY_OF_ORIGIN = "MISSING_FEEDSTOCK_COUNTRY_OF_ORIGIN"
 
+
 class CarbureStockErrors:
     NOT_ENOUGH_VOLUME_LEFT = "NOT_ENOUGH_VOLUME_LEFT"
-    
+
+
 class CarbureUnit:
     KILOGRAM = "kg"
     LITER = "l"
