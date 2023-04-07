@@ -380,7 +380,10 @@ def check_certificates(prefetched_data, lot, errors):
                 )
             elif not lot.parent_lot and not lot.parent_stock:
                 dcc = prefetched_data["double_counting_certificates"][dc_cert]
+
                 dcc_period = dcc.valid_until.year * 100 + dcc.valid_until.month  # ex 202012
+
+                # certificat expiré
                 if dcc_period < lot.period:
                     # 2022-03-22: GC requests that expired dc certificates are blocking after the next declaration.
                     # Ex: a certificate expiring at the beginning of June is valid for the June declaration
@@ -392,12 +395,23 @@ def check_certificates(prefetched_data, lot, errors):
                             lot=lot,
                         )
                     )
+                # certificat a expiré dans le mois en cours (donc invalide au mois suivant )
                 elif dcc.valid_until < lot.delivery_date:
                     # Non blocking
                     errors.append(
                         generic_error(
                             error=CarbureCertificatesErrors.EXPIRED_DOUBLE_COUNTING_CERTIFICATE,
                             display_to_recipient=True,
+                            lot=lot,
+                        )
+                    )
+                # certificat pas encore valide
+                elif dcc.valid_from > lot.delivery_date:
+                    errors.append(
+                        generic_error(
+                            error=CarbureCertificatesErrors.INVALID_DOUBLE_COUNTING_CERTIFICATE,
+                            display_to_recipient=True,
+                            is_blocking=True,
                             lot=lot,
                         )
                     )
