@@ -126,18 +126,19 @@ def fill_production_info(lot, data, entity, prefetched_data):
             # si il y a un certificat DC renseigné, on recupere et verifie la validité des certificats associés à ce site de production
             if lot.carbure_production_site.dc_reference:
                 delivery_date = data.get("delivery_date")
-                pd_certificates = DoubleCountingRegistration.objects.filter(
-                    production_site_id=lot.carbure_production_site.id,
-                    valid_from__lt=delivery_date,
-                    valid_until__gte=delivery_date,
-                )
-
-                current_certificate = pd_certificates.first()
-                if current_certificate:
-                    lot.production_site_double_counting_certificate = current_certificate.certificate_id
-                else:  # le certificat renseigné sur le site de production est mis par defaut
+                try:
+                    pd_certificates = DoubleCountingRegistration.objects.filter(
+                        production_site_id=lot.carbure_production_site.id,
+                        valid_from__lt=delivery_date,
+                        valid_until__gte=delivery_date,
+                    )
+                    current_certificate = pd_certificates.first()
+                    if current_certificate:
+                        lot.production_site_double_counting_certificate = current_certificate.certificate_id
+                    else:  # le certificat renseigné sur le site de production est mis par defaut
+                        lot.production_site_double_counting_certificate = lot.carbure_production_site.dc_reference
+                except:
                     lot.production_site_double_counting_certificate = lot.carbure_production_site.dc_reference
-
             else:
                 lot.production_site_double_counting_certificate = None
 
