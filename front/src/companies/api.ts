@@ -42,11 +42,11 @@ export function getCompanyDepots(entity_id: number, company_id: number) {
   })
 }
 
-export function getCompanyProductionSites(entity_id: number) {
+export function getCompanyProductionSites(entity_id: number, company_id: number) {
   return api.get<Api<ProductionSiteDetails[]>>(
     "/v5/admin/entities/production_sites",
     {
-      params: { entity_id },
+      params: { entity_id, company_id },
     }
   )
 }
@@ -57,13 +57,13 @@ export function getUsersRightRequests(
   company_id: number,
   statuses?: UserRightStatus[]
 ) {
-  return api.get<Api<UserRightRequest[]>>("/v3/admin/users/rights-requests", {
+  return api.get<Api<UserRightRequest[]>>("/v5/admin/entities/users/rights-requests", {
     params: { entity_id, q: query, company_id, statuses },
   })
 }
 
 export function updateUsersRights(user_id: number, entity_id: number, status?: UserRightStatus,) {
-  return api.post("/v3/admin/users/update-right-request", {
+  return api.post("/v5/admin/entities/users/update-right-request", {
     id: user_id,
     entity_id,
     status

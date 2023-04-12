@@ -2,9 +2,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("users", views.get_users, name="api-v3-admin-get-users"),
-    path("users/rights-requests", views.get_rights_requests, name="api-v3-admin-get-rights-requests"),
-    path("users/update-right-request", views.update_right_request, name="api-v3-admin-update-right-request"),
+    # path("users", views.get_users, name="api-v3-admin-get-users"),#never used > a supp ?
+    # path("users/rights-requests", views.get_rights_requests, name="api-v3-admin-get-rights-requests"),
+    # path("users/update-right-request", views.update_right_request, name="api-v3-admin-update-right-request"),
     # path("entities", views.get_entities, name="api-v3-admin-get-entities"),
     # path("entities/details", views.get_entity_details, name="api-v3-admin-get-entity-details"),
     path("entities/add", views.add_entity, name="api-v3-admin-add-entity"),

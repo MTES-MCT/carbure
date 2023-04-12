@@ -89,24 +89,6 @@ class AdminAPITest(TestCase):
             response = self.client.get(reverse(url.name), {"entity_id": self.entity3.id})
             self.assertEqual(response.status_code, 403)
 
-    def test_get_users(self):
-        response = self.client.get(reverse("api-v3-admin-get-users"))
-        # api works
-        self.assertEqual(response.status_code, 200)
-        # and returns at least 3 users
-        self.assertGreaterEqual(len(response.json()["data"]), 3)
-        # check if querying works
-        response = self.client.get(reverse("api-v3-admin-get-users") + "?q=super")
-        # works
-        self.assertEqual(response.status_code, 200)
-        # and returns at least 2 users
-        data = response.json()["data"]
-        self.assertGreaterEqual(len(data), 2)
-        # check if the content is correct
-        random_user = data[0]
-        self.assertIn("email", random_user)
-        self.assertIn("name", random_user)
-
     def test_create_entity(self):
         response = self.client.post(
             reverse("api-v3-admin-add-entity"),

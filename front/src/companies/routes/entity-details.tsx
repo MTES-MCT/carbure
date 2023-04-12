@@ -81,7 +81,9 @@ const EntityDetails = () => {
           <ProductionSitesSettings
             readOnly
             entity={entityData}
-            getProductionSites={api.getCompanyProductionSites}
+            getProductionSites={(company_id) =>
+              api.getCompanyProductionSites(entity.id, company_id)
+            }
           />
         )}
         {!isAirline && <Certificates entity_id={company_id} />}

@@ -5,10 +5,10 @@ from core.models import ProductionSite
 
 @check_admin_rights()
 def get_entity_production_sites(request):
-    entity_id = request.GET.get("entity_id", False)
+    company_id = request.GET.get("company_id", False)
 
     try:
-        psites = ProductionSite.objects.filter(producer__id=entity_id)
+        psites = ProductionSite.objects.filter(producer__id=company_id)
         psitesbyid = {p.id: p for p in psites}
         for k, v in psitesbyid.items():
             v.inputs = []
