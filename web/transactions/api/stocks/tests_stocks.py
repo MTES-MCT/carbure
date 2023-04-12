@@ -127,7 +127,6 @@ class StocksFlowTest(TestCase):
             "delivery_site_country_id": "FR",
             "delivery_type": "RFC",
         }
-        print("==>> payload: ", payload)
         lot = self.stock_split([payload])
         self.assertEqual(lot.lot_status, CarbureLot.DRAFT)
         self.assertEqual(lot.delivery_type, CarbureLot.RFC)

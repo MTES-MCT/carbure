@@ -147,21 +147,21 @@ urlpatterns = [
     #     admin.get_declarations,
     #     name="api-v4-admin-get-declarations",
     # ),
-    path(
-        "admin/entity-certificates",
-        admin.get_entity_certificates,
-        name="api-v4-admin-get-entity-certificates",
-    ),
-    path(
-        "admin/entity-certificates/check",
-        admin.check_entity_certificate,
-        name="api-v4-admin-check-entity-certificate",
-    ),
-    path(
-        "admin/entity-certificates/reject",
-        admin.reject_entity_certificate,
-        name="api-v4-admin-reject-entity-certificate",
-    ),
+    # path(
+    #     "admin/entity-certificates",
+    #     admin.get_entity_certificates,
+    #     name="api-v4-admin-get-entity-certificates",
+    # ),
+    # path(
+    #     "admin/entity-certificates/check",
+    #     admin.check_entity_certificate,
+    #     name="api-v4-admin-check-entity-certificate",
+    # ),
+    # path(
+    #     "admin/entity-certificates/reject",
+    #     admin.reject_entity_certificate,
+    #     name="api-v4-admin-reject-entity-certificate",
+    # ),
     path("admin/stocks", admin.get_stocks, name="api-v4-admin-get-stocks"),
     path(
         "admin/stocks/details",

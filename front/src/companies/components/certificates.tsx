@@ -14,6 +14,7 @@ import { compact, matchesSearch } from "common/utils/collection"
 import Select from "common/components/select"
 import { useState } from "react"
 import useEntity from "carbure/hooks/entity"
+import { useParams } from "react-router-dom"
 
 type CertificatesProps = {
   search?: string
@@ -31,7 +32,7 @@ const Certificates = ({ search = "", entity_id }: CertificatesProps) => {
 
   const certificates = useQuery(api.getEntityCertificates, {
     key: "entity-certificates",
-    params: [entity_id],
+    params: [entity.id, entity_id],
   })
 
   const certData = (certificates.result?.data?.data ?? []).filter(
@@ -157,6 +158,7 @@ const CheckCertificate = ({ certificate }: ActionProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
   const notify = useNotify()
+  const entity = useEntity()
 
   const checkCertificate = useMutation(api.checkEntityCertificate, {
     invalidates: ["entity-certificates"],
@@ -182,7 +184,9 @@ const CheckCertificate = ({ certificate }: ActionProps) => {
             variant="success"
             confirm={t("Valider")}
             onClose={close}
-            onConfirm={() => checkCertificate.execute(certificate.id)}
+            onConfirm={() =>
+              checkCertificate.execute(entity.id, certificate.id)
+            }
           />
         ))
       }
@@ -194,6 +198,7 @@ const RejectCertificate = ({ certificate }: ActionProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
   const notify = useNotify()
+  const entity = useEntity()
 
   const rejectCertificate = useMutation(api.rejectEntityCertificate, {
     invalidates: ["entity-certificates"],
@@ -221,7 +226,7 @@ const RejectCertificate = ({ certificate }: ActionProps) => {
             icon={Cross}
             onClose={close}
             onConfirm={() =>
-              rejectCertificate.execute(certificate.id).then(close)
+              rejectCertificate.execute(entity.id, certificate.id).then(close)
             }
           />
         ))
