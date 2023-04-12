@@ -1,43 +1,19 @@
 import logging
-from django.db.models.aggregates import Sum
-from django.http.response import HttpResponse
-import folium
-import random
 import math
+import random
 
-from django.http import JsonResponse
-from core.decorators import is_admin, check_admin_rights, is_admin_or_external_admin
-
-from django.contrib.auth import get_user_model
-from core.models import CarbureLot, Entity, UserRights, ProductionSite, ExternalAdminRights, EntityDepot
-from django.db.models import Q, Count, Value
-from django.core.mail import send_mail
-from django.conf import settings
-
-from core.models import UserRightsRequests
-from core.common import get_transaction_distance
-from core.serializers import GenericCertificateSerializer
-from doublecount.models import DoubleCountingAgreement
+import folium
 from api.v4.helpers import filter_lots
+from core.common import get_transaction_distance
+from core.decorators import check_admin_rights, is_admin, is_admin_or_external_admin
+from core.models import CarbureLot, Entity, EntityDepot, ExternalAdminRights, ProductionSite, UserRights
+from core.serializers import GenericCertificateSerializer
+from django.db.models.aggregates import Sum
+from django.http import JsonResponse
+from django.http.response import HttpResponse
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
-
-
-@is_admin
-def get_users(request):
-    q = request.GET.get("q", False)
-    entity_id = request.GET.get("entity_id", False)
-    user_model = get_user_model()
-    users = user_model.objects.all()
-
-    if q:
-        users = users.filter(Q(email__icontains=q) | Q(name__icontains=q))
-    if entity_id:
-        users = users.filter(userrights__entity__id=entity_id)
-
-    users_sez = [{"email": u.email, "name": u.name, "id": u.id} for u in users]
-    return JsonResponse({"status": "success", "data": users_sez})
 
 
 @is_admin
@@ -114,70 +90,6 @@ def add_entity(request):
             {"status": "error", "message": "Unknown error. Please contact an administrator"}, status=400
         )
     return JsonResponse({"status": "success", "data": "Entity created"})
-
-
-@check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE])
-def get_rights_requests(request):
-    q = request.GET.get("q", False)
-    statuses = request.GET.getlist("statuses", False)
-    company_id = request.GET.get("company_id", False)
-    requests = UserRightsRequests.objects.all()
-
-    if company_id:
-        requests = requests.filter(entity__id=company_id)
-    if statuses:
-        requests = requests.filter(status__in=statuses)
-    if q:
-        requests = requests.filter(Q(user__email__icontains=q) | Q(entity__name__icontains=q))
-
-    requests_sez = [r.natural_key() for r in requests]
-    return JsonResponse({"status": "success", "data": requests_sez})
-
-
-@check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE])
-def update_right_request(request):
-    urr_id = request.POST.get("id", False)
-    status = request.POST.get("status", False)
-    if not urr_id:
-        return JsonResponse({"status": "error", "message": "Please provide an id"}, status=400)
-    if not status:
-        return JsonResponse({"status": "error", "message": "Please provide a status"}, status=400)
-
-    try:
-        right_request = UserRightsRequests.objects.get(id=urr_id)
-    except:
-        return JsonResponse({"status": "error", "message": "Could not find request"}, status=400)
-
-    right_request.status = status
-    right_request.save()
-
-    if status == "ACCEPTED":
-        UserRights.objects.update_or_create(
-            entity=right_request.entity,
-            user=right_request.user,
-            defaults={"role": right_request.role, "expiration_date": right_request.expiration_date},
-        )
-        # send_mail
-        email_subject = "Carbure - Demande acceptée"
-        message = """
-        Bonjour,
-
-        Votre demande d'accès à la Société %s vient d'être validée par l'administration.
-
-        """ % (
-            right_request.entity.name
-        )
-
-        send_mail(
-            subject=email_subject,
-            message=message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[right_request.user.email],
-            fail_silently=False,
-        )
-    else:
-        UserRights.objects.filter(entity=right_request.entity, user=request.user).delete()
-    return JsonResponse({"status": "success"})
 
 
 # def init_declaration(entity, declarations):
