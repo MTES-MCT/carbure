@@ -70,16 +70,16 @@ export function updateUsersRights(user_id: number, entity_id: number, status?: U
   })
 }
 
-export function getEntityCertificates(entity_id?: number) {
-  return api.get<Api<EntityCertificate[]>>("/admin/entity-certificates", {
-    params: { entity_id },
+export function getEntityCertificates(entity_id: number, company_id?: number) {
+  return api.get<Api<EntityCertificate[]>>("/v5/admin/entities/certificates", {
+    params: { entity_id, company_id },
   })
 }
 
-export function checkEntityCertificate(entity_certificate_id: number) {
-  return api.post("admin/entity-certificates/check", { entity_certificate_id })
+export function checkEntityCertificate(entity_id: number, entity_certificate_id: number) {
+  return api.post("v5/admin/entities/certificates/check", { entity_id, entity_certificate_id })
 }
 
-export function rejectEntityCertificate(entity_certificate_id: number) {
-  return api.post("admin/entity-certificates/reject", { entity_certificate_id })
+export function rejectEntityCertificate(entity_id: number, entity_certificate_id: number) {
+  return api.post("v5/admin/entities/certificates/reject", { entity_id, entity_certificate_id })
 }

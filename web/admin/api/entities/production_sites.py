@@ -1,9 +1,9 @@
 from django.http import JsonResponse
-from core.decorators import is_admin
+from core.decorators import check_admin_rights
 from core.models import ProductionSite
 
 
-@is_admin
+@check_admin_rights()
 def get_entity_production_sites(request):
     entity_id = request.GET.get("entity_id", False)
 
