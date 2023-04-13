@@ -27,8 +27,6 @@ urlpatterns = [
     path("lots/summary", views.get_lots_summary, name="api-v4-get-lots-summary"),
     path("lots/details", views.get_lot_details, name="api-v4-get-lot-details"),
     path("lots/filters", views.get_lots_filters, name="api-v4-get-lots-filters"),
-    path("notifications", views.get_notifications, name="api-v4-get-notifications"),
-    path("notifications/ack", views.ack_notifications, name="api-v4-ack-notifications"),
     # POST
     ### Lot initial life
     path("lots/add", views.add_lot, name="api-v4-add-lots"),
