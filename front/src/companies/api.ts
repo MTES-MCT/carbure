@@ -37,7 +37,7 @@ export function getCompanyDetails(entity_id: number, company_id: number) {
 }
 
 export function getCompanyDepots(entity_id: number, company_id: number) {
-  return api.get<Api<EntityDepot[]>>("/v3/admin/entities/depots", {
+  return api.get<Api<EntityDepot[]>>("/v5/admin/entities/depots", {
     params: { entity_id, company_id },
   })
 }

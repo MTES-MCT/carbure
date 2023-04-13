@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path
 from api.v4 import views, auth_views, certificates, admin, auditor, settings
 
 urlpatterns = [
@@ -141,27 +141,6 @@ urlpatterns = [
     ),
     path("admin/lots/pin", admin.toggle_pin, name="api-v4-admin-pin-lots"),
     path("admin/lots/comment", admin.add_comment, name="api-v4-admin-add-comment"),
-    # path("admin/map", admin.map, name="api-v4-admin-map"),
-    # path(
-    #     "admin/dashboard/declarations",
-    #     admin.get_declarations,
-    #     name="api-v4-admin-get-declarations",
-    # ),
-    # path(
-    #     "admin/entity-certificates",
-    #     admin.get_entity_certificates,
-    #     name="api-v4-admin-get-entity-certificates",
-    # ),
-    # path(
-    #     "admin/entity-certificates/check",
-    #     admin.check_entity_certificate,
-    #     name="api-v4-admin-check-entity-certificate",
-    # ),
-    # path(
-    #     "admin/entity-certificates/reject",
-    #     admin.reject_entity_certificate,
-    #     name="api-v4-admin-reject-entity-certificate",
-    # ),
     path("admin/stocks", admin.get_stocks, name="api-v4-admin-get-stocks"),
     path(
         "admin/stocks/details",
