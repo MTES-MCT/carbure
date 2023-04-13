@@ -74,8 +74,6 @@ urlpatterns = [
         views.get_template_stock,
         name="api-v4-get-template-stock",
     ),
-    # STATS
-    path("stats", views.get_stats, name="api-v4-get-stats"),
     # SETTINGS
     path(
         "get-certificates",
