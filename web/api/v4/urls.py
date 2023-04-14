@@ -1,25 +1,7 @@
 from django.urls import path
-from api.v4 import views, auth_views, certificates, admin, auditor, settings
+from api.v4 import views, certificates, admin, auditor, settings
 
 urlpatterns = [
-    #### AUTH
-    path("auth/register", auth_views.register, name="api-v4-register"),
-    path("auth/login", auth_views.user_login, name="api-v4-login"),
-    path("auth/logout", auth_views.user_logout, name="api-v4-logout"),
-    path("auth/request-otp", auth_views.request_otp, name="api-v4-request-otp"),
-    path("auth/verify-otp", auth_views.verify_otp, name="api-v4-verify-otp"),
-    path(
-        "auth/request-password-reset",
-        auth_views.request_password_reset,
-        name="api-v4-request-password-reset",
-    ),
-    path("auth/reset-password", auth_views.reset_password, name="api-v4-reset-password"),
-    path(
-        "auth/request-activation-link",
-        auth_views.request_activation_link,
-        name="api-v4-request-activation-link",
-    ),
-    path("auth/activate", auth_views.activate, name="api-v4-activate"),
     # GET
     path("years", views.get_years, name="api-v4-get-years"),
     path("snapshot", views.get_snapshot, name="api-v4-get-snapshot"),
