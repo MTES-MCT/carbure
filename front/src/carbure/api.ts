@@ -14,7 +14,7 @@ import {
 } from "./types"
 
 export function getUserSettings() {
-  return api.get<Api<User>>("/v3/settings")
+  return api.get<Api<User>>("/v5/user")
 }
 
 export function extract<T>(res: AxiosResponse<Api<T[]>>) {

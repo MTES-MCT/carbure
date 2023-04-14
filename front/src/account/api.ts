@@ -6,7 +6,7 @@ export function requestAccess(
   role: UserRole,
   comment: string = ""
 ) {
-  return api.post("/v3/settings/request-entity-access", {
+  return api.post("/v5/user/request-access", {
     entity_id,
     comment,
     role,
@@ -14,5 +14,5 @@ export function requestAccess(
 }
 
 export function revokeMyself(entity_id: number) {
-  return api.post("/v3/settings/revoke-myself", { entity_id })
+  return api.post("/v5/user/revoke-access", { entity_id })
 }
