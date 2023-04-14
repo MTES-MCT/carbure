@@ -9,35 +9,43 @@ from core.models import Entity, UserRights
 
 
 class AuditorAPITest(TestCase):
-    home = os.environ['CARBURE_HOME']
-    fixtures = ['{home}/web/fixtures/json/countries.json'.format(home=home),
-    '{home}/web/fixtures/json/feedstock.json'.format(home=home),
-    '{home}/web/fixtures/json/biofuels.json'.format(home=home),
-    '{home}/web/fixtures/json/depots.json'.format(home=home)]
+    home = os.environ["CARBURE_HOME"]
+    fixtures = [
+        "{home}/web/fixtures/json/countries.json".format(home=home),
+        "{home}/web/fixtures/json/feedstock.json".format(home=home),
+        "{home}/web/fixtures/json/biofuels.json".format(home=home),
+        "{home}/web/fixtures/json/depots.json".format(home=home),
+    ]
 
     def setUp(self):
         user_model = get_user_model()
-        self.admin_email = 'superadmin@carbure.beta.gouv.fr'
-        self.admin_password = 'toto'
-        self.auditor_email = 'auditor@carbure.beta.gouv.fr'
-        self.auditor_password = 'toto2'
-        self.admin_user = user_model.objects.create_user(email=self.admin_email, name='Super Admin', password=self.admin_password, is_staff=True)
-        self.auditor_user = user_model.objects.create_user(email=self.auditor_email, name='Super Auditor', password=self.auditor_password)
+        self.admin_email = "superadmin@carbure.beta.gouv.fr"
+        self.admin_password = "toto"
+        self.auditor_email = "auditor@carbure.beta.gouv.fr"
+        self.auditor_password = "toto2"
+        self.admin_user = user_model.objects.create_user(
+            email=self.admin_email, name="Super Admin", password=self.admin_password, is_staff=True
+        )
+        self.auditor_user = user_model.objects.create_user(
+            email=self.auditor_email, name="Super Auditor", password=self.auditor_password
+        )
         # create OTP devices
         for user in [self.admin_user, self.auditor_user]:
             email_otp = EmailDevice()
             email_otp.user = user
-            email_otp.name = 'email'
+            email_otp.name = "email"
             email_otp.confirmed = True
             email_otp.email = user.email
             email_otp.save()
 
         # let's create a few users
-        self.user1_email = 'testuser1@toto.com'
-        self.user1_password = 'toto3'
-        self.user1 = user_model.objects.create_user(email=self.user1_email, name='Le Super Testeur 1', password=self.user1_password)
+        self.user1_email = "testuser1@toto.com"
+        self.user1_password = "toto3"
+        self.user1 = user_model.objects.create_user(
+            email=self.user1_email, name="Le Super Testeur 1", password=self.user1_password
+        )
         # a few entities
-        self.entity1, _ = Entity.objects.update_or_create(name='Le Super Producteur 1', entity_type='Producteur')
+        self.entity1, _ = Entity.objects.update_or_create(name="Le Super Producteur 1", entity_type="Producteur")
         # some rights
         UserRights.objects.update_or_create(user=self.user1, entity=self.entity1, role=UserRights.RW)
         UserRights.objects.update_or_create(user=self.auditor_user, entity=self.entity1, role=UserRights.AUDITOR)
@@ -47,10 +55,10 @@ class AuditorAPITest(TestCase):
         # pass otp
         usermodel = get_user_model()
         user = usermodel.objects.get(email=self.admin_email)
-        response = self.client.post(reverse('api-v4-request-otp'))
+        response = self.client.post(reverse("auth-request-otp"))
         self.assertEqual(response.status_code, 200)
         device, created = EmailDevice.objects.get_or_create(user=user)
-        response = self.client.post(reverse('api-v4-verify-otp'), {'otp_token': device.token})
+        response = self.client.post(reverse("auth-verify-otp"), {"otp_token": device.token})
         self.assertEqual(response.status_code, 200)
 
     def login_and_pass_otp(self, email, password):
@@ -58,10 +66,10 @@ class AuditorAPITest(TestCase):
         self.assertTrue(loggedin)
         usermodel = get_user_model()
         user = usermodel.objects.get(email=email)
-        response = self.client.post(reverse('api-v4-request-otp'))
+        response = self.client.post(reverse("auth-request-otp"))
         self.assertEqual(response.status_code, 200)
         device, created = EmailDevice.objects.get_or_create(user=user)
-        response = self.client.post(reverse('api-v4-verify-otp'), {'otp_token': device.token})
+        response = self.client.post(reverse("auth-verify-otp"), {"otp_token": device.token})
         self.assertEqual(response.status_code, 200)
 
     # def test_auditor_comments(self):

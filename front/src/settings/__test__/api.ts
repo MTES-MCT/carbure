@@ -35,7 +35,7 @@ export function setProductionSites(nextProductionSites: any[]) {
   productionSites = clone(nextProductionSites)
 }
 
-export const okSettings = rest.get("/api/v3/settings", (req, res, ctx) => {
+export const okSettings = rest.get("/api/v5/user", (req, res, ctx) => {
   const entity = Data.get("entity")
   return res(
     ctx.json({
@@ -55,7 +55,7 @@ export const okSettings = rest.get("/api/v3/settings", (req, res, ctx) => {
   )
 })
 
-export const okEmptySettings = rest.get("/api/v3/settings", (req, res, ctx) => {
+export const okEmptySettings = rest.get("/api/v5/user", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -69,7 +69,7 @@ export const okEmptySettings = rest.get("/api/v3/settings", (req, res, ctx) => {
 })
 
 export const okDynamicSettings = rest.get(
-  "/api/v3/settings",
+  "/api/v5/user",
   (req, res, ctx) => {
     const entity = Data.get("entity")
 
