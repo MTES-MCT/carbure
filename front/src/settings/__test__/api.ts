@@ -135,7 +135,7 @@ export const okDisableTrading = rest.post(
 )
 
 export const okDeliverySites = rest.get(
-  "/api/v3/settings/get-delivery-sites",
+  "/api/v5/entity/depots",
   (req, res, ctx) => {
     return res(
       ctx.json({
@@ -147,7 +147,7 @@ export const okDeliverySites = rest.get(
 )
 
 export const okAddDeliverySite = rest.post(
-  "/api/v3/settings/add-delivery-site",
+  "/api/v5/entity/depots/add",
   (req, res, ctx) => {
     setDeliverySites([deliverySite])
     return res(ctx.json({ status: "success" }))
@@ -155,7 +155,7 @@ export const okAddDeliverySite = rest.post(
 )
 
 export const okDeleteDeliverySite = rest.post(
-  "/api/v3/settings/delete-delivery-site",
+  "/api/v5/entity/depots/delete",
   (req, res, ctx) => {
     setDeliverySites([])
     return res(ctx.json({ status: "success" }))
