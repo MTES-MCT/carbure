@@ -23,7 +23,7 @@ export function extract<T>(res: AxiosResponse<Api<T[]>>) {
 
 export function findFeedstocks(query: string, double_count_only?: boolean) {
   return api
-    .get<Api<Feedstock[]>>("/v3/common/matieres-premieres", {
+    .get<Api<Feedstock[]>>("/v5/resources/feedstocks", {
       params: { query, double_count_only },
     })
     .then(extract)
@@ -31,37 +31,37 @@ export function findFeedstocks(query: string, double_count_only?: boolean) {
 
 export function findBiofuels(query: string) {
   return api
-    .get<Api<Biofuel[]>>("/v3/common/biocarburants", { params: { query } })
+    .get<Api<Biofuel[]>>("/v5/resources/biofuels", { params: { query } })
     .then(extract)
 }
 
 export function findCountries(query: string) {
   return api
-    .get<Api<Country[]>>("/v3/common/countries", { params: { query } })
+    .get<Api<Country[]>>("/v5/resources/countries", { params: { query } })
     .then(extract)
 }
 
 export function findEntities(query?: string) {
   return api
-    .get<Api<Entity[]>>("/v3/common/entities", { params: { query } })
+    .get<Api<Entity[]>>("/v5/resources/entities", { params: { query } })
     .then(extract)
 }
 
 export function findOperators(query?: string) {
   return api
-    .get<Api<Entity[]>>("/v3/common/operators", { params: { query } })
+    .get<Api<Entity[]>>("/v5/resources/operators", { params: { query } })
     .then(extract)
 }
 
 export function findProducers(query?: string) {
   return api
-    .get<Api<Entity[]>>("/v3/common/producers", { params: { query } })
+    .get<Api<Entity[]>>("/v5/resources/producers", { params: { query } })
     .then(extract)
 }
 
 export function findProductionSites(query?: string, producer_id?: number) {
   return api
-    .get<Api<ProductionSiteDetails[]>>("/v3/common/production-sites", {
+    .get<Api<ProductionSiteDetails[]>>("/v5/resources/production-sites", {
       params: { query, producer_id },
     })
     .then(extract)
@@ -69,7 +69,7 @@ export function findProductionSites(query?: string, producer_id?: number) {
 
 export function findDepots(query?: string, public_only?: boolean) {
   return api
-    .get<Api<Depot[]>>("/v3/common/delivery-sites", {
+    .get<Api<Depot[]>>("/v5/resources/depots", {
       params: { query, public_only },
     })
     .then(extract)
@@ -77,7 +77,7 @@ export function findDepots(query?: string, public_only?: boolean) {
 
 export function findCertificates(query: string) {
   return api
-    .get<Api<Certificate[]>>("/get-certificates", { params: { query } })
+    .get<Api<Certificate[]>>("/v5/resources/certificates", { params: { query } })
     .then(extract)
     .then((certificates) => certificates.map((c) => c.certificate_id))
 }

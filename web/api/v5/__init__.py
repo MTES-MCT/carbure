@@ -8,6 +8,7 @@ urlpatterns = [
     path("double-counting/", include("api.v5.double_counting")),
     path("notifications/", include("notifications.api")),
     path("saf/", include("api.v5.saf")),
+    path("resources/", include("resources.api")),
     path("settings/", include("api.v5.settings")),
     path("stats/", include("api.v5.stats")),
     path("stats/", include("stats.api")),

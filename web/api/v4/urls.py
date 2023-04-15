@@ -58,11 +58,6 @@ urlpatterns = [
     ),
     # SETTINGS
     path(
-        "get-certificates",
-        certificates.get_certificates,
-        name="api-v4-settings-get-certificates",
-    ),
-    path(
         "add-certificate",
         certificates.add_certificate,
         name="api-v4-settings-add-certificate",
