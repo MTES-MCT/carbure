@@ -2,7 +2,7 @@ import api, { Api } from "common/services/api"
 import { Entity, EntityDepot, OwnershipType } from "carbure/types"
 
 export function getDeliverySites(entity_id: number) {
-  return api.get<Api<EntityDepot[]>>("/v3/settings/get-delivery-sites", {
+  return api.get<Api<EntityDepot[]>>("/v5/entity/depots", {
     params: { entity_id },
   })
 }
@@ -14,7 +14,7 @@ export function addDeliverySite(
   blending_outsourced: boolean,
   blending_entity: Entity | undefined
 ) {
-  return api.post("/v3/settings/add-delivery-site", {
+  return api.post("/v5/entity/depots/add", {
     entity_id,
     delivery_site_id,
     ownership_type,
@@ -27,7 +27,7 @@ export function deleteDeliverySite(
   entity_id: number,
   delivery_site_id: string
 ) {
-  return api.post("/v3/settings/delete-delivery-site", {
+  return api.post("/v5/entity/depots/delete", {
     entity_id,
     delivery_site_id,
   })

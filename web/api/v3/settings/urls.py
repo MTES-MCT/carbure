@@ -26,9 +26,9 @@ urlpatterns = [
         views.set_production_site_bc,
         name="api-v3-settings-set-production-site-biocarburants",
     ),
-    path("get-delivery-sites", views.get_delivery_sites, name="api-v3-settings-get-delivery-sites"),
-    path("add-delivery-site", views.add_delivery_site, name="api-v3-settings-add-delivery-site"),
-    path("delete-delivery-site", views.delete_delivery_site, name="api-v3-settings-delete-delivery-site"),
+    # path("get-delivery-sites", views.get_delivery_sites, name="api-v3-settings-get-delivery-sites"),
+    # path("add-delivery-site", views.add_delivery_site, name="api-v3-settings-add-delivery-site"),
+    # path("delete-delivery-site", views.delete_delivery_site, name="api-v3-settings-delete-delivery-site"),
     # rights
     path("get-entity-rights", views.get_entity_rights, name="api-v3-settings-get-entity-rights"),
     path("invite-user", views.invite_user, name="api-v3-settings-invite-user"),
