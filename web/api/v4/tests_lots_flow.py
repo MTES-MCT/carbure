@@ -1,6 +1,3 @@
-import datetime
-
-from api.v3.common.urls import urlpatterns
 from api.v4.tests_utils import get_lot
 from core.models import CarbureLot, CarbureStock, Entity, UserRights
 from transactions.models import LockedYear

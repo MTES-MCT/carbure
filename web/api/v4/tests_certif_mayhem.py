@@ -5,7 +5,6 @@ from django.db.models import Count
 from django.contrib.auth import get_user_model
 
 from core.models import CarbureLot, Entity, UserRights
-from api.v3.common.urls import urlpatterns
 from django_otp.plugins.otp_email.models import EmailDevice
 from api.v4.tests_utils import get_lot
 

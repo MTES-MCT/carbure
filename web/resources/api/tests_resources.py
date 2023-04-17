@@ -1,6 +1,5 @@
 import datetime
 
-from api.v3.common.urls import urlpatterns
 from api.v4.tests_utils import setup_current_user
 from core.models import Biocarburant, Depot, Entity, MatierePremiere, Pays, ProductionSite
 from django.test import TestCase
