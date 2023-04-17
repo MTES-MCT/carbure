@@ -12,7 +12,7 @@ import { getFilter } from "transactions/__test__/data"
 import { lotSummary } from "./data"
 import { lots } from "./data"
 
-export const okAdminSettings = rest.get("/api/v3/settings", (req, res, ctx) => {
+export const okAdminSettings = rest.get("/api/v5/user", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",

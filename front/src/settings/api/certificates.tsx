@@ -2,7 +2,7 @@ import { api, Api } from "common/services/api"
 import { Certificate, CertificateType, EntityCertificate } from "carbure/types"
 
 export function getCertificates(query: string) {
-  return api.get<Api<Certificate[]>>("/get-certificates", {
+  return api.get<Api<Certificate[]>>("/v5/resources/certificates", {
     params: { query },
   })
 }
