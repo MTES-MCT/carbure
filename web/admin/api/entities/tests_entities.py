@@ -44,25 +44,3 @@ class AdminEntitiesTest(TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()["data"]
         self.assertEqual(data["name"], "MTE - DGEC")
-
-    def test_get_users(self):
-        response = self.client.get(reverse("admin-entities-users"), {"entity_id": self.admin.id})
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["data"][0]["email"], "tester@carbure.local")
-
-        # check if querying works
-        response = self.client.get(reverse("admin-entities-users") + "?q=tester", {"entity_id": self.admin.id})
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["data"][0]["name"], "Tester")
-
-        # check if querying one company
-        params = {"entity_id": self.admin.id, "company_id": self.admin.id}
-        response = self.client.get(reverse("admin-entities-users"), params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["data"][0]["email"], "tester@carbure.local")
-
-        # check if querying one wrong company
-        params = {"entity_id": self.admin.id, "company_id": self.admin.id + 1}
-        response = self.client.get(reverse("admin-entities-users"), params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.json()["data"]), 0)

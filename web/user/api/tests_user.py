@@ -16,7 +16,9 @@ class UserTest(TestCase):
 
     def setUp(self):
         self.admin = Entity.objects.filter(entity_type=Entity.ADMIN)[0]
-        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True)
+        self.user = setup_current_user(
+            self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], is_staff=True
+        )
 
     def test_get_settings(self):
         response = self.client.get(reverse("user"))

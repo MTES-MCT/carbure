@@ -5,7 +5,6 @@ from django.contrib.auth import get_user_model
 
 from core.models import Entity, UserRights, Pays, MatierePremiere, Biocarburant, Depot
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
-from api.v3.admin.urls import urlpatterns
 from django_otp.plugins.otp_email.models import EmailDevice
 
 
