@@ -1,11 +1,6 @@
 import traceback
-from django.db.models.aggregates import Count, Sum
-from django.db.models.expressions import F
-from django.db.models import Case, Value, When
-from django.db.models.functions.comparison import Coalesce
-from django.http.response import JsonResponse
-from django.db.models.query_utils import Q
-from core.decorators import is_admin
+
+from admin.helpers import get_admin_lots_by_status
 from api.v4.helpers import (
     filter_lots,
     filter_stock,
@@ -14,16 +9,15 @@ from api.v4.helpers import (
     get_lot_comments,
     get_lot_errors,
     get_lot_updates,
-    get_lots_with_metadata,
     get_lots_filters_data,
+    get_lots_with_metadata,
     get_stock_events,
     get_stock_filters_data,
     get_stock_with_metadata,
     get_stocks_summary_data,
+    get_transaction_distance,
 )
-from api.v4.helpers import get_transaction_distance
-from admin.helpers import get_admin_lots_by_status
-
+from core.decorators import is_admin
 from core.models import (
     CarbureLot,
     CarbureLotComment,
@@ -40,9 +34,13 @@ from core.serializers import (
     CarbureLotReliabilityScoreSerializer,
     CarbureStockPublicSerializer,
     CarbureStockTransformationPublicSerializer,
-    EntityCertificateSerializer,
 )
-from carbure.tasks import background_bulk_scoring
+from django.db.models import Case, Value, When
+from django.db.models.aggregates import Count, Sum
+from django.db.models.expressions import F
+from django.db.models.functions.comparison import Coalesce
+from django.db.models.query_utils import Q
+from django.http.response import JsonResponse
 
 
 @is_admin
@@ -327,58 +325,3 @@ def get_admin_lot_comments(lot):
         return []
     comments = lot.carburelotcomment_set.filter(Q(comment_type=CarbureLotComment.ADMIN) | Q(is_visible_by_admin=True))
     return CarbureLotCommentSerializer(comments, many=True).data
-
-
-@is_admin
-def get_entity_certificates(request, *args, **kwargs):
-    entity_id = request.GET.get("entity_id", False)
-    ec = EntityCertificate.objects.order_by("-added_dt", "checked_by_admin").select_related("entity", "certificate")
-    if entity_id:
-        ec = ec.filter(entity_id=entity_id)
-
-    serializer = EntityCertificateSerializer(ec, many=True)
-    return JsonResponse({"status": "success", "data": serializer.data})
-
-
-@is_admin
-def check_entity_certificate(request, *args, **kwargs):
-    entity_certificate_id = request.POST.get("entity_certificate_id", False)
-    if not entity_certificate_id:
-        return JsonResponse({"status": "error", "message": "Missing entity_certificate_id"}, status=400)
-    try:
-        ec = EntityCertificate.objects.get(id=entity_certificate_id)
-        ec.checked_by_admin = True
-        ec.rejected_by_admin = False
-        ec.save()
-        slots = CarbureLot.objects.filter(
-            carbure_supplier=ec.entity, supplier_certificate=ec.certificate.certificate_id
-        )
-        plots = CarbureLot.objects.filter(
-            carbure_producer=ec.entity, production_site_certificate=ec.certificate.certificate_id
-        )
-        background_bulk_scoring(list(slots) + list(plots))
-        return JsonResponse({"status": "success"})
-    except:
-        return JsonResponse({"status": "error", "message": "Could not mark certificate as checked"}, status=500)
-
-
-@is_admin
-def reject_entity_certificate(request, *args, **kwargs):
-    entity_certificate_id = request.POST.get("entity_certificate_id", False)
-    if not entity_certificate_id:
-        return JsonResponse({"status": "error", "message": "Missing entity_certificate_id"}, status=400)
-    try:
-        ec = EntityCertificate.objects.get(id=entity_certificate_id)
-        ec.checked_by_admin = False
-        ec.rejected_by_admin = True
-        ec.save()
-        slots = CarbureLot.objects.filter(
-            carbure_supplier=ec.entity, supplier_certificate=ec.certificate.certificate_id
-        )
-        plots = CarbureLot.objects.filter(
-            carbure_producer=ec.entity, production_site_certificate=ec.certificate.certificate_id
-        )
-        background_bulk_scoring(list(slots) + list(plots))
-        return JsonResponse({"status": "success"})
-    except:
-        return JsonResponse({"status": "error", "message": "Could not mark certificate as checked"}, status=500)

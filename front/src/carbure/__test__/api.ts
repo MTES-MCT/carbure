@@ -45,7 +45,7 @@ export const okNotifications = rest.get(
 )
 
 export const okEntitySearch = rest.get(
-  "/api/v3/common/entities",
+  "/api/v5/resources/entities",
   (req, res, ctx) => {
     return res(
       ctx.json({
@@ -57,7 +57,7 @@ export const okEntitySearch = rest.get(
 )
 
 export const okCountrySearch = rest.get(
-  "/api/v3/common/countries",
+  "/api/v5/resources/countries",
   (req, res, ctx) => {
     return res(
       ctx.json({
@@ -69,7 +69,7 @@ export const okCountrySearch = rest.get(
 )
 
 export const okBiocarburantsSearch = rest.get(
-  "/api/v3/common/biocarburants",
+  "/api/v5/resources/biofuels",
   (req, res, ctx) => {
     return res(
       ctx.json({
@@ -81,7 +81,7 @@ export const okBiocarburantsSearch = rest.get(
 )
 
 export const okMatierePremiereSearch = rest.get(
-  "/api/v3/common/matieres-premieres",
+  "/api/v5/resources/feedstocks",
   (req, res, ctx) => {
     return res(
       ctx.json({
@@ -93,7 +93,7 @@ export const okMatierePremiereSearch = rest.get(
 )
 
 export const okProductionSitesSearch = rest.get(
-  "/api/v3/common/production-sites",
+  "/api/v5/resources/production-sites",
   (req, res, ctx) => {
     return res(
       ctx.json({
@@ -105,7 +105,7 @@ export const okProductionSitesSearch = rest.get(
 )
 
 export const okDeliverySitesSearch = rest.get(
-  "/api/v3/common/delivery-sites",
+  "/api/v5/resources/depots",
   (req, res, ctx) => {
     return res(
       ctx.json({

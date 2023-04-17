@@ -1,4 +1,3 @@
-import { AxiosError } from "axios"
 import useEntity from "carbure/hooks/entity"
 import Alert from "common/components/alert"
 import Button from "common/components/button"
@@ -9,13 +8,11 @@ import { TextInput } from "common/components/input"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { useMutation, useQuery } from "common/hooks/async"
-import { LotsUpdateErrors, LotsUpdateResponse } from "controls/types"
 import { useMemo, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { Lot } from "transactions/types"
 import * as api from "../api/admin"
 import { getLotsEntitiesToNotify } from "./update-many-confirmation"
-import { UpdateErrorsDialog } from "./update-many-errors"
 
 export interface DeleteManyButtonProps {
   disabled?: boolean

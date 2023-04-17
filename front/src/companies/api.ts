@@ -37,16 +37,16 @@ export function getCompanyDetails(entity_id: number, company_id: number) {
 }
 
 export function getCompanyDepots(entity_id: number, company_id: number) {
-  return api.get<Api<EntityDepot[]>>("/v3/admin/entities/depots", {
+  return api.get<Api<EntityDepot[]>>("/v5/admin/entities/depots", {
     params: { entity_id, company_id },
   })
 }
 
-export function getCompanyProductionSites(entity_id: number) {
+export function getCompanyProductionSites(entity_id: number, company_id: number) {
   return api.get<Api<ProductionSiteDetails[]>>(
     "/v5/admin/entities/production_sites",
     {
-      params: { entity_id },
+      params: { entity_id, company_id },
     }
   )
 }
@@ -57,29 +57,29 @@ export function getUsersRightRequests(
   company_id: number,
   statuses?: UserRightStatus[]
 ) {
-  return api.get<Api<UserRightRequest[]>>("/v3/admin/users/rights-requests", {
+  return api.get<Api<UserRightRequest[]>>("/v5/admin/entities/users/rights-requests", {
     params: { entity_id, q: query, company_id, statuses },
   })
 }
 
 export function updateUsersRights(user_id: number, entity_id: number, status?: UserRightStatus,) {
-  return api.post("/v3/admin/users/update-right-request", {
+  return api.post("/v5/admin/entities/users/update-right-request", {
     id: user_id,
     entity_id,
     status
   })
 }
 
-export function getEntityCertificates(entity_id?: number) {
-  return api.get<Api<EntityCertificate[]>>("/admin/entity-certificates", {
-    params: { entity_id },
+export function getEntityCertificates(entity_id: number, company_id?: number) {
+  return api.get<Api<EntityCertificate[]>>("/v5/admin/entities/certificates", {
+    params: { entity_id, company_id },
   })
 }
 
-export function checkEntityCertificate(entity_certificate_id: number) {
-  return api.post("admin/entity-certificates/check", { entity_certificate_id })
+export function checkEntityCertificate(entity_id: number, entity_certificate_id: number) {
+  return api.post("v5/admin/entities/certificates/check", { entity_id, entity_certificate_id })
 }
 
-export function rejectEntityCertificate(entity_certificate_id: number) {
-  return api.post("admin/entity-certificates/reject", { entity_certificate_id })
+export function rejectEntityCertificate(entity_id: number, entity_certificate_id: number) {
+  return api.post("v5/admin/entities/certificates/reject", { entity_id, entity_certificate_id })
 }
