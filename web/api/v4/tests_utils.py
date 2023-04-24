@@ -36,9 +36,9 @@ def get_lot(entity):
     return data
 
 
-def setup_current_user(test, email, name, password, entity_rights=[]):
+def setup_current_user(test, email, name, password, entity_rights=[], is_staff=False):
     User = get_user_model()
-    user = User.objects.create_user(email=email, name=name, password=password)
+    user = User.objects.create_user(email=email, name=name, password=password, is_staff=is_staff)
     loggedin = test.client.login(username=user.email, password=password)
     test.assertTrue(loggedin)
 
@@ -46,12 +46,10 @@ def setup_current_user(test, email, name, password, entity_rights=[]):
         UserRights.objects.update_or_create(entity=entity, user=user, role=role)
         UserRightsRequests.objects.update_or_create(entity=entity, user=user, role=role)
 
-    response = test.client.post(reverse("api-v4-request-otp"))
+    response = test.client.post(reverse("auth-request-otp"))
     test.assertEqual(response.status_code, 200)
     device, _ = EmailDevice.objects.get_or_create(user=user)
-    response = test.client.post(
-        reverse("api-v4-verify-otp"), {"otp_token": device.token}
-    )
+    response = test.client.post(reverse("auth-verify-otp"), {"otp_token": device.token})
     test.assertEqual(response.status_code, 200)
 
     return user

@@ -14,6 +14,7 @@
   "ETD_HIGHER_THAN_DEFAULT": "Émissions GES liées au Transport et à la Distribution supérieures à la valeur par défaut",
   "ETD_NO_EU_TOO_LOW": "Émissions GES liées au Transport et à la Distribution inférieures à la valeur par défaut",
   "EXPIRED_DOUBLE_COUNTING_CERTIFICATE": "Certificat double compte expiré",
+  "INVALID_DOUBLE_COUNTING_CERTIFICATE": "Certificat double compte invalide pour cette date de livraison",
   "EXPIRED_PRODSITE_CERT": "Certificat du site de production expiré",
   "EXPIRED_SUPPLIER_CERT": "Certificat du fournisseur expiré",
   "EXPIRED_VENDOR_CERT": "Certificat du fournisseur expiré",
@@ -78,5 +79,6 @@
   "WRONG_DELIVERY_DATE": "La date de livraison est incorrecte",
   "WRONG_FORMAT": "Le format est incorrect",
   "WRONG_PRODUCTION_SITE_COUNTRY": "Le site de production est incorrect",
-  "YEAR_LOCKED": "La date de livraison est trop ancienne. Il n'est plus possible de déclarer sur cette période."
+  "YEAR_LOCKED": "La date de livraison est trop ancienne. Il n'est plus possible de déclarer sur cette période.",
+  "MAC_NOT_EFPE": "Les mises à la consommations doivent être effectuées depuis un site EFPE."
 }
