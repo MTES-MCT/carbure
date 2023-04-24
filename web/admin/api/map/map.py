@@ -1,14 +1,15 @@
+import math
+import random
+
+import folium
+from admin.helpers import get_admin_lots_by_status
+from api.v4.helpers import filter_lots
+from core.decorators import is_admin
+from core.models import Entity
+from csp.decorators import csp_exempt
 from django.db.models.aggregates import Sum
 from django.http import HttpResponse
 from django.views.decorators.clickjacking import xframe_options_sameorigin
-
-from csp.decorators import csp_exempt
-import folium
-from api.v3.admin.views import couleur, grade
-from core.decorators import is_admin
-from api.v4.helpers import filter_lots
-from admin.helpers import get_admin_lots_by_status
-from core.models import Entity
 
 
 @is_admin
@@ -116,3 +117,58 @@ def map(request):
     )
 
     return HttpResponse(html)
+
+
+# not an api endpoint
+def couleur():
+    liste = [
+        "#FF0040",
+        "#DF01A5",
+        "#BF00FF",
+        "#4000FF",
+        "#0040FF",
+        "#00BFFF",
+        "#00FFBF",
+        "#00FF40",
+        "#40FF00",
+        "#BFFF00",
+        "#FFBF00",
+        "#FF4000",
+        "#FA5858",
+        "#FAAC58",
+        "#F4FA58",
+        "#ACFA58",
+        "#58FA58",
+        "#58FAAC",
+        "#58FAF4",
+        "#58ACFA",
+        "#5858FA",
+        "#AC58FA",
+        "#FA58F4",
+        "#FA58AC",
+        "#B40404",
+        "#B45F04",
+        "#AEB404",
+        "#5FB404",
+        "#04B45F",
+        "#04B4AE",
+        "#045FB4",
+        "#0404B4",
+        "#5F04B4",
+        "#B404AE",
+        "#B4045F",
+        "#8A0829",
+    ]
+    return random.choice(liste)
+
+
+# not an api endpoint
+
+
+def grade(volume, min, max):
+    # print(volume, min, max)
+    weight = math.log(volume) / 5
+    # print(weight)
+    # 2 < x < 4
+    # min < volume < max
+    return weight

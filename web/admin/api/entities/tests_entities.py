@@ -1,10 +1,5 @@
-import datetime
-import json
-import random
-
 from api.v4.tests_utils import setup_current_user
-from core.models import Entity, GenericError
-from django.db.models import Count
+from core.models import Entity
 from django.test import TestCase
 from django.urls import reverse
 
@@ -21,14 +16,7 @@ class AdminEntitiesTest(TestCase):
 
     def setUp(self):
         self.admin = Entity.objects.filter(entity_type=Entity.ADMIN)[0]
-
-        self.user = setup_current_user(
-            self,
-            "tester@carbure.local",
-            "Tester",
-            "gogogo",
-            [(self.admin, "RW")],
-        )
+        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True)
 
     def test_get_entities(self):
         response = self.client.get(reverse("admin-entities"), {"entity_id": self.admin.id})

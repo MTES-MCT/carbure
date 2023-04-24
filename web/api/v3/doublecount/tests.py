@@ -58,10 +58,10 @@ class DCAAPITest(TransactionTestCase):
         loggedin = self.client.login(username=self.user_email, password=self.user_password)
         self.assertTrue(loggedin)
         # pass otp verification
-        response = self.client.post(reverse("api-v4-request-otp"))
+        response = self.client.post(reverse("auth-request-otp"))
         self.assertEqual(response.status_code, 200)
         device, created = EmailDevice.objects.get_or_create(user=self.user1)
-        response = self.client.post(reverse("api-v4-verify-otp"), {"otp_token": device.token})
+        response = self.client.post(reverse("auth-verify-otp"), {"otp_token": device.token})
         self.assertEqual(response.status_code, 200)
 
     def test_dca_sourcing(self):

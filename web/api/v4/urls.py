@@ -1,25 +1,7 @@
-from django.urls import path, include
-from api.v4 import views, auth_views, certificates, admin, auditor, settings
+from django.urls import path
+from api.v4 import views, certificates, admin, auditor, settings
 
 urlpatterns = [
-    #### AUTH
-    path("auth/register", auth_views.register, name="api-v4-register"),
-    path("auth/login", auth_views.user_login, name="api-v4-login"),
-    path("auth/logout", auth_views.user_logout, name="api-v4-logout"),
-    path("auth/request-otp", auth_views.request_otp, name="api-v4-request-otp"),
-    path("auth/verify-otp", auth_views.verify_otp, name="api-v4-verify-otp"),
-    path(
-        "auth/request-password-reset",
-        auth_views.request_password_reset,
-        name="api-v4-request-password-reset",
-    ),
-    path("auth/reset-password", auth_views.reset_password, name="api-v4-reset-password"),
-    path(
-        "auth/request-activation-link",
-        auth_views.request_activation_link,
-        name="api-v4-request-activation-link",
-    ),
-    path("auth/activate", auth_views.activate, name="api-v4-activate"),
     # GET
     path("years", views.get_years, name="api-v4-get-years"),
     path("snapshot", views.get_snapshot, name="api-v4-get-snapshot"),
@@ -27,8 +9,6 @@ urlpatterns = [
     path("lots/summary", views.get_lots_summary, name="api-v4-get-lots-summary"),
     path("lots/details", views.get_lot_details, name="api-v4-get-lot-details"),
     path("lots/filters", views.get_lots_filters, name="api-v4-get-lots-filters"),
-    path("notifications", views.get_notifications, name="api-v4-get-notifications"),
-    path("notifications/ack", views.ack_notifications, name="api-v4-ack-notifications"),
     # POST
     ### Lot initial life
     path("lots/add", views.add_lot, name="api-v4-add-lots"),
@@ -76,14 +56,7 @@ urlpatterns = [
         views.get_template_stock,
         name="api-v4-get-template-stock",
     ),
-    # STATS
-    path("stats", views.get_stats, name="api-v4-get-stats"),
     # SETTINGS
-    path(
-        "get-certificates",
-        certificates.get_certificates,
-        name="api-v4-settings-get-certificates",
-    ),
     path(
         "add-certificate",
         certificates.add_certificate,
@@ -141,27 +114,6 @@ urlpatterns = [
     ),
     path("admin/lots/pin", admin.toggle_pin, name="api-v4-admin-pin-lots"),
     path("admin/lots/comment", admin.add_comment, name="api-v4-admin-add-comment"),
-    # path("admin/map", admin.map, name="api-v4-admin-map"),
-    # path(
-    #     "admin/dashboard/declarations",
-    #     admin.get_declarations,
-    #     name="api-v4-admin-get-declarations",
-    # ),
-    path(
-        "admin/entity-certificates",
-        admin.get_entity_certificates,
-        name="api-v4-admin-get-entity-certificates",
-    ),
-    path(
-        "admin/entity-certificates/check",
-        admin.check_entity_certificate,
-        name="api-v4-admin-check-entity-certificate",
-    ),
-    path(
-        "admin/entity-certificates/reject",
-        admin.reject_entity_certificate,
-        name="api-v4-admin-reject-entity-certificate",
-    ),
     path("admin/stocks", admin.get_stocks, name="api-v4-admin-get-stocks"),
     path(
         "admin/stocks/details",

@@ -95,6 +95,12 @@ example :
 
 -for v4 `docker exec -e TEST=1 carbure_app python3 web/manage.py test api.v4.tests_lots_flow`
 
+## Executer un patch (script)
+-Créer un fichier xxx.py dans le dossier `scripts/batches/` puis entrer dans le shell :
+`python web/manage.py shell`
+-et copier le code du script
+
+
 ## Étapes spécifiques pour windows
 - setup wsl2: https://docs.microsoft.com/en-us/windows/wsl/install-win10
 - installer docker desktop avec les libs WSL extra
