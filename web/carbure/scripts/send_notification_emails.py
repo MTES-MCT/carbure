@@ -68,7 +68,7 @@ def send_notification_emails(test: bool = False) -> None:
         lots_rejected = notifs.filter(type=CarbureNotification.LOTS_REJECTED)
         lots_received = notifs.filter(type=CarbureNotification.LOTS_RECEIVED)
         lots_recalled = notifs.filter(type=CarbureNotification.LOTS_RECALLED)
-        certificate_exp = notifs.filter(type=CarbureNotification.CERTIFICATE_EXPIRED)
+        certificate_rejected = notifs.filter(type=CarbureNotification.CERTIFICATE_REJECTED)
 
         email_context = {
             "entity": entity,
@@ -79,7 +79,7 @@ def send_notification_emails(test: bool = False) -> None:
             "lots_rejected": lots_rejected,
             "lots_received": lots_received,
             "lots_recalled": lots_recalled,
-            "certificate_exp": certificate_exp,
+            "certificate_rejected": certificate_rejected,
         }
 
         html_message = loader.render_to_string("emails/notifications.v3.html", email_context)
