@@ -19,11 +19,7 @@ urlpatterns = [
     path("lots/delete", views.lots_delete, name="api-v4-delete-lots"),
     ### Corrections
     path("lots/comment", views.add_comment, name="api-v4-comment-lots"),
-    path("lots/request-fix", views.request_fix, name="api-v4-request-fix"),
-    path("lots/mark-as-fixed", views.mark_as_fixed, name="api-v4-mark-as-fixed"),
-    path("lots/approve-fix", views.approve_fix, name="api-v4-approve-fix"),
     path("lots/reject", views.reject_lot, name="api-v4-reject-lots"),
-    path("lots/recall", views.recall_lot, name="api-v4-recall-lots"),
     ### Approval
     path(
         "lots/accept-release-for-consumption",
