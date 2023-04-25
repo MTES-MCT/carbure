@@ -75,19 +75,24 @@ class LotNode(Node):
 
     TRANSACTION_FIELDS = [
         "carbure_supplier_id",
+        "carbure_supplier",
         "unknown_supplier",
         "supplier_certificate",
         "carbure_client_id",
+        "carbure_client",
         "unknown_client",
         "delivery_type",
     ]
 
-    DELIVERY_FIELDS = [
+    TRANSPORT_FIELDS = [
         "transport_document_reference",
         "transport_document_type",
         "volume",
         "weight",
         "lhv_amount",
+    ]
+
+    DELIVERY_FIELDS = [
         "delivery_date",
         "carbure_delivery_site_id",
         "unknown_delivery_site",
@@ -98,9 +103,13 @@ class LotNode(Node):
         "feedstock",
         "biofuel",
         "country_of_origin",
+        "producer",
         "carbure_producer",
+        "carbure_producer_id",
         "unknown_producer",
+        "production_site",
         "carbure_production_site",
+        "carbure_production_site_id",
         "unknown_production_site",
         "production_country",
         "production_site_commissioning_date",
@@ -159,12 +168,25 @@ class LotNode(Node):
 
         if self.owner == entity_id:
             allowed_fields += LotNode.TRANSACTION_FIELDS
-        if has_no_ancestor_stock or owns_ancestor_stock:
-            allowed_fields += LotNode.DELIVERY_FIELDS
+            if has_no_ancestor_stock or owns_ancestor_stock:
+                allowed_fields += LotNode.DELIVERY_FIELDS
+            if self.parent is None or self.parent.owner == entity_id:
+                allowed_fields += LotNode.TRANSPORT_FIELDS
         if root_lot.owner == entity_id:
             allowed_fields += LotNode.SUSTAINABILITY_FIELDS
 
         return allowed_fields
+
+    def get_disabled_fields(self, entity_id) -> list[str]:
+        all_fields = (
+            LotNode.TRANSACTION_FIELDS
+            + LotNode.DELIVERY_FIELDS
+            + LotNode.TRANSPORT_FIELDS
+            + LotNode.SUSTAINABILITY_FIELDS
+        )
+
+        allowed_fields = self.get_allowed_fields(entity_id)
+        return list(set(all_fields) - set(allowed_fields))
 
     def diff_with_parent(self):
         if self.parent.type == Node.LOT:
