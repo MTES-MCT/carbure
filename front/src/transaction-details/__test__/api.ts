@@ -42,7 +42,7 @@ export const okDeleteLot = rest.post("/api/lots/delete", (req, res, ctx) => {
 })
 
 export const okRequestFix = rest.post(
-  "/api/lots/request-fix",
+  "/api/v5/transactions/lots/request-fix",
   (req, res, ctx) => {
     Data.set("lot-details", (details: LotDetails) => {
       details.lot.correction_status = CorrectionStatus.InCorrection
@@ -52,7 +52,7 @@ export const okRequestFix = rest.post(
 )
 
 export const okMarkAsFixed = rest.post(
-  "/api/lots/mark-as-fixed",
+  "/api/v5/transactions/lots/submit-fix",
   (req, res, ctx) => {
     Data.set("lot-details", (details: LotDetails) => {
       details.lot.correction_status = CorrectionStatus.Fixed
