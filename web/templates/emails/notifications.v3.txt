@@ -31,6 +31,13 @@ Lots rappelés par vos fournisseurs:
 Fournisseur {{cr.meta.supplier}} Lots concernés: {{cr.meta.count}} Lien https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/in/pending
 {% endfor %}
 {% endif %}
+
+{% if certificate_rejected|length > 0 %}
+{% for cr in certificate_rejected %}
+L'administration a rejeté votre certificat : {{cr.meta.certificate}} <a href="https://{{ domain }}/app/org/{{entity.id}}/settings#certificates">Voir</a>
+{% endfor %}
+{% endif %}
+
 Bonne journée,
 L'équipe CarbuRe
 

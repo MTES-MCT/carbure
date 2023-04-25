@@ -1,6 +1,6 @@
 from carbure.tasks import background_bulk_scoring
 from core.decorators import check_admin_rights
-from core.models import CarbureLot, EntityCertificate
+from core.models import CarbureLot, EntityCertificate, CarbureNotification
 from django.http import JsonResponse
 
 
@@ -20,6 +20,14 @@ def reject_entity_certificate(request):
         plots = CarbureLot.objects.filter(
             carbure_producer=ec.entity, production_site_certificate=ec.certificate.certificate_id
         )
+
+        CarbureNotification.objects.create(
+            type=CarbureNotification.CERTIFICATE_REJECTED,
+            dest_id=ec.entity.id,
+            send_by_email=True,
+            meta={"certificate": ec.certificate.certificate_id},
+        )
+
         background_bulk_scoring(list(slots) + list(plots))
         return JsonResponse({"status": "success"})
     except:
