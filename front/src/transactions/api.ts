@@ -186,7 +186,10 @@ export function requestFix(entity_id: number, lot_ids: number[]) {
 }
 
 export function markAsFixed(entity_id: number, lot_ids: number[]) {
-  return api.post<Api<void>>("/lots/mark-as-fixed", { entity_id, lot_ids })
+  return api.post<Api<void>>("/v5/transactions/lots/submit-fix", {
+    entity_id,
+    lot_ids,
+  })
 }
 
 export function approveFix(entity_id: number, lot_ids: number[]) {
@@ -194,7 +197,10 @@ export function approveFix(entity_id: number, lot_ids: number[]) {
 }
 
 export function recallLots(entity_id: number, lot_ids: number[]) {
-  return api.post<Api<void>>("/lots/recall", { entity_id, lot_ids })
+  return api.post<Api<void>>("/v5/transactions/lots/request-fix", {
+    entity_id,
+    lot_ids,
+  })
 }
 
 export async function commentLots(

@@ -86,6 +86,7 @@ export const lotDetails: LotDetails = {
     vendor_certificate: null,
   },
   score: [],
+  disabled_fields: [],
 }
 
 export const errors: LotError[] = [

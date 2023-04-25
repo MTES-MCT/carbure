@@ -55,6 +55,7 @@ from core.serializers import (
 from core.xlsx_v3 import template_v4, template_v4_stocks
 from carbure.tasks import background_bulk_scoring, background_bulk_sanity_checks
 from core.carburetypes import CarbureError
+from core.traceability import LotNode
 
 
 @check_user_rights()
@@ -192,6 +193,7 @@ def get_lot_details(request, *args, **kwargs):
     data["updates"] = get_lot_updates(lot, entity)
     data["comments"] = get_lot_comments(lot, entity)
     data["score"] = CarbureLotReliabilityScoreSerializer(lot.carburelotreliabilityscore_set.all(), many=True).data
+    data["disabled_fields"] = LotNode(lot).get_disabled_fields(entity_id)
     return JsonResponse({"status": "success", "data": data})
 
 

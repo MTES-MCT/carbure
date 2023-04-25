@@ -26,7 +26,7 @@ export function Form<T>({
   form,
   children,
   onSubmit,
-  novalidate
+  novalidate,
 }: FormProps<T>) {
   return (
     <FormContext.Provider value={form}>
@@ -34,7 +34,6 @@ export function Form<T>({
         id={id}
         className={cl(css.form, variant && css[variant], className)}
         style={style}
-
         noValidate={novalidate}
         onSubmit={(e) => {
           e.preventDefault()
@@ -127,13 +126,16 @@ export function useForm<T>(
     _setDisabledFields(EMPTY_DISABLED_FIELDS)
   }, [])
 
-  const setDisabledFields = useCallback((fieldsNames: string[]) => {
-    const fields = { ...disabledFields }
-    fieldsNames.forEach((name) => {
-      fields[name] = true
-    })
-    _setDisabledFields(fields)
-  }, [])
+  const setDisabledFields = useCallback(
+    (fieldsNames: string[]) => {
+      const fields = { ...disabledFields }
+      fieldsNames.forEach((name) => {
+        fields[name] = true
+      })
+      _setDisabledFields(fields)
+    },
+    [disabledFields]
+  )
 
   const bind = useBindCallback(value, errors, disabledFields, setField)
 
@@ -169,7 +171,7 @@ export function useBindCallback<T>(
       error: errors[name],
       onChange: (value) => setField(name, value),
     }),
-    [value, errors, setField]
+    [value, errors, setField, disabledFields]
   )
 }
 
