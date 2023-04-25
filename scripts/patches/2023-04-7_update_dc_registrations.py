@@ -12,7 +12,7 @@ from certificates.models import DoubleCountingRegistration
 
 @transaction.atomic
 def update_dc_registrations():
-    dc_production_sites = ProductionSite.objects.filter(dc_reference__isnull=False, dc_reference__regex=r"\S+")
+    dc_production_sites = ProductionSite.objects.filter(eligible_dc=True)
     for production_site in dc_production_sites:
         certificate_id = production_site.dc_reference
         try:
