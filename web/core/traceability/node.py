@@ -136,10 +136,10 @@ class Node:
     def get_closest(self, node_type, owner=None) -> "Node":
         if owner is not None and self.owner != owner:
             return None
-        if self.type == node_type:
-            return self
         if self.parent is None:
             return None
+        if self.parent.type == node_type:
+            return self.parent
 
         return self.parent.get_closest(node_type, owner)
 

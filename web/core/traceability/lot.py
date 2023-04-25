@@ -170,8 +170,12 @@ class LotNode(Node):
             allowed_fields += LotNode.TRANSACTION_FIELDS
             if has_no_ancestor_stock or owns_ancestor_stock:
                 allowed_fields += LotNode.DELIVERY_FIELDS
-            if self.parent is None or self.parent.owner == entity_id:
+
+            closest_lot = self.get_closest(Node.LOT, owner=entity_id)
+            owns_ancestor_lot = closest_lot is not None and (closest_lot.parent is None or closest_lot.parent.owner == entity_id)  # fmt:skip
+            if self.parent is None or owns_ancestor_lot or owns_ancestor_stock:
                 allowed_fields += LotNode.TRANSPORT_FIELDS
+
         if root_lot.owner == entity_id:
             allowed_fields += LotNode.SUSTAINABILITY_FIELDS
 
