@@ -117,13 +117,15 @@ class LotCorrectionTest(TestCase):
         self.assertEqual(lot.volume, 42000)
         # and mark as fixed
         response = self.client.post(
-            reverse("api-v4-mark-as-fixed"), {"entity_id": self.producer.id, "lot_ids": [lot.id]}
+            reverse("api-v5-transactions-lots-submit-fix"), {"entity_id": self.producer.id, "lot_ids": [lot.id]}
         )
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)
         self.assertEqual(lot.correction_status, CarbureLot.FIXED)
         # as client, accept fix
-        response = self.client.post(reverse("api-v4-approve-fix"), {"entity_id": self.trader.id, "lot_ids": [lot.id]})
+        response = self.client.post(
+            reverse("api-v5-transactions-lots-approve-fix"), {"entity_id": self.trader.id, "lot_ids": [lot.id]}
+        )
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)
         self.assertEqual(lot.correction_status, CarbureLot.NO_PROBLEMO)
