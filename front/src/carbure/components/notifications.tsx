@@ -186,6 +186,14 @@ function getNotificationText(notif: Notification) {
         certificate: notif.meta?.certificate,
       })
 
+    case NotificationType.CertificateRejected:
+      return t(
+        "Votre certificat {{certificate}} a été refusé par l'administration",
+        {
+          certificate: notif.meta?.certificate,
+        }
+      )
+
     case NotificationType.DeclarationValidated:
       return t("Votre déclaration pour la période {{period}} a été validée", {
         period: formatPeriod(notif.meta?.period ?? 0),
@@ -252,6 +260,9 @@ function getNotificationLink(notif: Notification) {
       return `/org/${notif.dest.id}/transactions/${notif.meta?.year}/in/correction?suppliers=${notif.meta?.supplier}`
 
     case NotificationType.CertificateExpired:
+      return `/org/${notif.dest.id}/settings#certificates`
+
+    case NotificationType.CertificateRejected:
       return `/org/${notif.dest.id}/settings#certificates`
 
     case NotificationType.DeclarationValidated:

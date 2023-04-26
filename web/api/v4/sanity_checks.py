@@ -467,7 +467,7 @@ def sanity_check(lot, prefetched_data):
         errors.append(generic_error(error=CarbureSanityCheckErrors.VOLUME_FAIBLE, lot=lot, field="volume"))
 
     # check year
-    if lot.year in prefetched_data["locked_years"]:
+    if lot.year in prefetched_data["locked_years"] or lot.year <= 2015:
         errors.append(
             generic_error(
                 error=CarbureSanityCheckErrors.YEAR_LOCKED,
