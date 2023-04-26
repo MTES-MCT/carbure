@@ -95,7 +95,7 @@ example :
 
 -for v4 `docker exec -e TEST=1 carbure_app python3 web/manage.py test api.v4.tests_lots_flow`
 
-## Executer un patch (script)
+## Executer un patch en local (script)
 -Créer un fichier xxx.py dans le dossier `scripts/batches/` puis entrer dans le shell :
 `python web/manage.py shell`
 -et copier le code du script
