@@ -1,0 +1,34 @@
+{
+  "folders": [
+    {
+      "path": "./"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "front": true,
+      "cron": true,
+      "ci": true,
+      "gateway": true,
+      "files": true,
+      ".vscode": true,
+      ".venv": true
+    },
+    "editor.formatOnSave": true,
+    "[javascript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "workbench.colorCustomizations": {
+      "titleBar.activeBackground": "#000000",
+      "titleBar.activeForeground": "#000000"
+    },
+    "git.openRepositoryInParentFolders": "always",
+    "[python]": {
+      "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "python.formatting.provider": "none"
+  }
+}
