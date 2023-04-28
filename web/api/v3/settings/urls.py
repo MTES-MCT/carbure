@@ -12,20 +12,20 @@ urlpatterns = [
     path(
         "disable-direct-deliveries", views.disable_direct_deliveries, name="api-v3-settings-disable-direct-deliveries"
     ),
-    path("get-production-sites", views.get_production_sites, name="api-v3-settings-get-production-sites"),
-    path("add-production-site", views.add_production_site, name="api-v3-settings-add-production-site"),
-    path("delete-production-site", views.delete_production_site, name="api-v3-settings-delete-production-site"),
-    path("update-production-site", views.update_production_site, name="api-v3-settings-update-production-site"),
-    path(
-        "set-production-site-matieres-premieres",
-        views.set_production_site_mp,
-        name="api-v3-settings-set-production-site-matieres-premieres",
-    ),
-    path(
-        "set-production-site-biocarburants",
-        views.set_production_site_bc,
-        name="api-v3-settings-set-production-site-biocarburants",
-    ),
+    # path("get-production-sites", views.get_production_sites, name="api-v3-settings-get-production-sites"),
+    # path("add-production-site", views.add_production_site, name="api-v3-settings-add-production-site"),
+    # path("delete-production-site", views.delete_production_site, name="api-v3-settings-delete-production-site"),
+    # path("update-production-site", views.update_production_site, name="api-v3-settings-update-production-site"),
+    # path(
+    #     "set-production-site-matieres-premieres",
+    #     views.set_production_site_mp,
+    #     name="api-v3-settings-set-production-site-matieres-premieres",
+    # ),
+    # path(
+    #     "set-production-site-biocarburants",
+    #     views.set_production_site_bc,
+    #     name="api-v3-settings-set-production-site-biocarburants",
+    # ),
     # path("get-delivery-sites", views.get_delivery_sites, name="api-v3-settings-get-delivery-sites"),
     # path("add-delivery-site", views.add_delivery_site, name="api-v3-settings-add-delivery-site"),
     # path("delete-delivery-site", views.delete_delivery_site, name="api-v3-settings-delete-delivery-site"),

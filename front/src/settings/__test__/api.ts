@@ -163,7 +163,7 @@ export const okDeleteDeliverySite = rest.post(
 )
 
 export const okProductionSites = rest.get(
-  "/api/v3/settings/get-production-sites",
+  "/api/v5/entity/production-sites",
   (req, res, ctx) => {
     return res(
       ctx.json({
@@ -175,7 +175,7 @@ export const okProductionSites = rest.get(
 )
 
 export const okAddProductionSite = rest.post(
-  "/api/v3/settings/add-production-site",
+  "/api/v5/entity/production-sites/add",
   (req, res, ctx) => {
     // @ts-ignore
     const body = req._body as FormData
@@ -194,7 +194,7 @@ export const okAddProductionSite = rest.post(
 )
 
 export const okUpdateProductionSite = rest.post(
-  "/api/v3/settings/update-production-site",
+  "/api/v5/entity/production-sites/update",
   (req, res, ctx) => {
     // @ts-ignore
     const body = req._body as FormData
@@ -211,7 +211,7 @@ export const okUpdateProductionSite = rest.post(
 )
 
 export const okDeleteProductionSite = rest.post(
-  "/api/v3/settings/delete-production-site",
+  "/api/v5/entity/production-sites/delete",
   (req, res, ctx) => {
     setProductionSites([])
     return res(ctx.json({ status: "success" }))
@@ -219,17 +219,17 @@ export const okDeleteProductionSite = rest.post(
 )
 
 export const okSetBiocarburant = rest.post(
-  "/api/v3/settings/set-production-site-biocarburants",
+  "/api/v5/entity/production-sites/set-biofuels",
   (req, res, ctx) => res(ctx.json({ status: "success" }))
 )
 
 export const okSetMatierePremiere = rest.post(
-  "/api/v3/settings/set-production-site-matieres-premieres",
+  "/api/v5/entity/production-sites/set-feedstocks",
   (req, res, ctx) => res(ctx.json({ status: "success" }))
 )
 
 export const okSetCertificates = rest.post(
-  "/api/set-production-site-certificates",
+  "/api/v5/entity/production-sites/set-certificates",
   (req, res, ctx) => res(ctx.json({ status: "success" }))
 )
 
