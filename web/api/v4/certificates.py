@@ -1,17 +1,12 @@
-import datetime
 import traceback
-from dateutil.relativedelta import relativedelta
-from django.db.models.fields.related import create_many_to_many_intermediary_model
-from django.db.models.query_utils import Q
-from django.http.response import JsonResponse
-from rest_framework import serializers
+
+from carbure.tasks import background_bulk_sanity_checks
 from certificates.models import ProductionSiteCertificate
 from core.decorators import check_user_rights
-from core.models import Entity, EntityCertificate, GenericCertificate, UserRights
-from core.serializers import EntityCertificateSerializer, GenericCertificateSerializer
-from producers.models import ProductionSite
-from core.models import CarbureLot
-from carbure.tasks import background_bulk_sanity_checks
+from core.models import CarbureLot, Entity, EntityCertificate, GenericCertificate, UserRights
+from core.serializers import EntityCertificateSerializer
+from django.db.models.query_utils import Q
+from django.http.response import JsonResponse
 
 
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
@@ -106,36 +101,6 @@ def get_my_certificates(request, *args, **kwargs):
         certificates = [l.certificate for l in links]
     serializer = EntityCertificateSerializer(certificates, many=True)
     return JsonResponse({"status": "success", "data": serializer.data})
-
-
-@check_user_rights()
-def set_production_site_certificates(request, *args, **kwargs):
-    context = kwargs["context"]
-    entity_id = context["entity_id"]
-    certificate_ids = request.POST.getlist("certificate_ids", [])
-    production_site_id = request.POST.get("production_site_id", False)
-    entity = Entity.objects.get(id=entity_id)
-    if not production_site_id:
-        return JsonResponse({"status": "error", "message": "Please provide a production_site_id"}, status=400)
-    try:
-        production_site = ProductionSite.objects.get(producer=entity, id=production_site_id)
-    except:
-        traceback.print_exc()
-        return JsonResponse({"status": "error", "message": "Production site not found"}, status=400)
-
-    ProductionSiteCertificate.objects.filter(entity=entity, production_site=production_site).delete()
-    for certificate_id in certificate_ids:
-        try:
-            link = EntityCertificate.objects.get(entity_id=entity_id, certificate__certificate_id=certificate_id)
-        except:
-            return JsonResponse(
-                {"status": "error", "message": "Certificate %s is not associated with your entity" % (certificate_id)},
-                status=400,
-            )
-        ProductionSiteCertificate.objects.update_or_create(
-            entity=entity, production_site=production_site, certificate=link
-        )
-    return JsonResponse({"status": "success"})
 
 
 @check_user_rights()

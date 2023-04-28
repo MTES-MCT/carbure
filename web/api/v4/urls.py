@@ -1,5 +1,5 @@
+from api.v4 import admin, auditor, certificates, settings, views
 from django.urls import path
-from api.v4 import views, certificates, admin, auditor, settings
 
 urlpatterns = [
     # GET
@@ -76,11 +76,6 @@ urlpatterns = [
         "get-my-certificates",
         certificates.get_my_certificates,
         name="api-v4-settings-get-my-certificates",
-    ),
-    path(
-        "set-production-site-certificates",
-        certificates.set_production_site_certificates,
-        name="api-v4-settings-set-production-site-certificates",
     ),
     path(
         "set-default-certificate",
