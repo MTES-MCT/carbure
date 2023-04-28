@@ -1,4 +1,4 @@
-from api.v4 import admin, auditor, certificates, settings, views
+from api.v4 import admin, auditor, settings, views
 from django.urls import path
 
 urlpatterns = [
@@ -57,31 +57,31 @@ urlpatterns = [
         name="api-v4-get-template-stock",
     ),
     # SETTINGS
-    path(
-        "add-certificate",
-        certificates.add_certificate,
-        name="api-v4-settings-add-certificate",
-    ),
-    path(
-        "delete-certificate",
-        certificates.delete_certificate,
-        name="api-v4-settings-delete-certificate",
-    ),
-    path(
-        "update-certificate",
-        certificates.update_certificate,
-        name="api-v4-settings-update-certificate",
-    ),
-    path(
-        "get-my-certificates",
-        certificates.get_my_certificates,
-        name="api-v4-settings-get-my-certificates",
-    ),
-    path(
-        "set-default-certificate",
-        certificates.set_default_certificate,
-        name="api-v4-settings-set-default-certificate",
-    ),
+    # path(
+    #     "add-certificate",
+    #     certificates.add_certificate,
+    #     name="api-v4-settings-add-certificate",
+    # ),
+    # path(
+    #     "delete-certificate",
+    #     certificates.delete_certificate,
+    #     name="api-v4-settings-delete-certificate",
+    # ),
+    # path(
+    #     "update-certificate",
+    #     certificates.update_certificate,
+    #     name="api-v4-settings-update-certificate",
+    # ),
+    # # path(
+    # #     "get-my-certificates",
+    # #     certificates.get_my_certificates,
+    # #     name="api-v4-settings-get-my-certificates",
+    # # ),
+    # path(
+    #     "set-default-certificate",
+    #     certificates.set_default_certificate,
+    #     name="api-v4-settings-set-default-certificate",
+    # ),
     path(
         "set-preferred-unit",
         views.set_entity_preferred_unit,
