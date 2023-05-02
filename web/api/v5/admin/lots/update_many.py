@@ -3,30 +3,12 @@ from django.db import transaction
 from core.decorators import check_admin_rights
 from core.common import SuccessResponse, ErrorResponse
 from core.serializers import GenericErrorSerializer
-from core.carburetypes import CarbureUnit
-from producers.models import ProductionSite
+from core.models import CarbureLotEvent, CarbureLotComment, GenericError, CarbureNotification
+from core.traceability import LotNode, get_traceability_nodes, bulk_update_traceability_nodes
 from api.v4.lots import compute_lot_quantity
 from api.v4.sanity_checks import bulk_sanity_checks, get_prefetched_data
 from carbure.tasks import background_bulk_scoring
-
-from core.models import (
-    CarbureLot,
-    Entity,
-    Biocarburant,
-    MatierePremiere,
-    Depot,
-    Pays,
-    CarbureLotEvent,
-    CarbureLotComment,
-    GenericError,
-    CarbureNotification,
-)
-
-from core.traceability import (
-    LotNode,
-    get_traceability_nodes,
-    bulk_update_traceability_nodes,
-)
+from transactions.forms import LotForm
 
 
 class UpdateManyError:
@@ -35,17 +17,25 @@ class UpdateManyError:
     UPDATE_FAILED = "UPDATE_FAILED"
 
 
+class UpdateManyForm(forms.Form):
+    entity_id = forms.IntegerField()
+    lots_ids = forms.ModelMultipleChoiceField(queryset=LotForm.LOTS)
+    comment = forms.CharField()
+    dry_run = forms.BooleanField(required=False)
+
+
 @check_admin_rights()
 def update_many(request):
-    form = UpdateManyForm(request.POST)
+    params_form = UpdateManyForm(request.POST)
+    lot_form = LotForm(request.POST)
 
-    if not form.is_valid():
-        return ErrorResponse(400, UpdateManyError.MALFORMED_PARAMS, form.errors)
+    if not params_form.is_valid():
+        return ErrorResponse(400, UpdateManyError.MALFORMED_PARAMS, {**params_form.errors})
 
-    entity_id = form.cleaned_data["entity_id"]
-    comment = form.cleaned_data["comment"]
-    dry_run = form.cleaned_data["dry_run"]
-    updated = form.cleaned_data["lots_ids"]
+    entity_id = params_form.cleaned_data["entity_id"]
+    comment = params_form.cleaned_data["comment"]
+    dry_run = params_form.cleaned_data["dry_run"]
+    updated = params_form.cleaned_data["lots_ids"]
 
     prefetched_data = get_prefetched_data()
 
@@ -53,7 +43,7 @@ def update_many(request):
     nodes = get_traceability_nodes(updated)
 
     # convert the form data to a dict that can be applied as lot update
-    update_data, quantity_data = get_update_data(form.cleaned_data)
+    update_data, quantity_data = lot_form.get_lot_data(ignore_empty=True)
 
     # prepare a list to hold all the nodes modified by this update
     updated_nodes = []
@@ -151,97 +141,6 @@ def update_many(request):
     return SuccessResponse({"updates": updates, "errors": errors_by_lot})
 
 
-class UpdateManyForm(forms.Form):
-    # choices
-    UNITS = ((CarbureUnit.LITER, "l"), (CarbureUnit.KILOGRAM, "kg"), (CarbureUnit.LHV, "pci"))
-    LOTS = CarbureLot.objects.all()
-    ENTITIES = Entity.objects.all()
-    PRODUCERS = Entity.objects.filter(entity_type=Entity.PRODUCER)
-    BIOFUELS = Biocarburant.objects.all()
-    FEEDSTOCKS = MatierePremiere.objects.all()
-    COUNTRIES = Pays.objects.all()
-    PRODUCTION_SITES = ProductionSite.objects.all()
-    DEPOTS = Depot.objects.all()
-
-    # config fields
-    entity_id = forms.IntegerField()
-    lots_ids = forms.ModelMultipleChoiceField(queryset=LOTS)
-    comment = forms.CharField()
-    dry_run = forms.BooleanField(required=False)
-
-    # lot fields
-    transport_document_type = forms.CharField(required=False)
-    transport_document_reference = forms.CharField(required=False)
-
-    quantity = forms.FloatField(min_value=0, required=False)
-    unit = forms.ChoiceField(choices=UNITS, required=False)
-
-    biofuel_code = forms.ModelChoiceField(queryset=BIOFUELS, to_field_name="code", required=False)
-    feedstock_code = forms.ModelChoiceField(queryset=FEEDSTOCKS, to_field_name="code", required=False)
-    country_code = forms.ModelChoiceField(queryset=COUNTRIES, to_field_name="code_pays", required=False)
-
-    free_field = forms.CharField(required=False)
-
-    eec = forms.FloatField(required=False)
-    el = forms.FloatField(required=False)
-    ep = forms.FloatField(required=False)
-    etd = forms.FloatField(required=False)
-    eu = forms.FloatField(required=False)
-    esca = forms.FloatField(required=False)
-    eccs = forms.FloatField(required=False)
-    eccr = forms.FloatField(required=False)
-    eee = forms.FloatField(required=False)
-
-    carbure_producer_id = forms.ModelChoiceField(queryset=PRODUCERS, required=False)
-    unknown_producer = forms.CharField(required=False)
-    carbure_production_site = forms.ModelChoiceField(queryset=PRODUCTION_SITES, required=False)
-    unknown_production_site = forms.CharField(required=False)
-    production_site_certificate = forms.CharField(required=False)
-    production_site_certificate_type = forms.CharField(required=False)
-    production_country_code = forms.CharField(required=False)
-    production_site_commissioning_date = forms.DateField(required=False)
-    production_site_double_counting_certificate = forms.CharField(required=False)
-
-    carbure_supplier_id = forms.ModelChoiceField(queryset=ENTITIES, required=False)
-    unknown_supplier = forms.CharField(required=False)
-    supplier_certificate = forms.CharField(required=False)
-    supplier_certificate_type = forms.CharField(required=False)
-    vendor_certificate = forms.CharField(required=False)
-    vendor_certificate_type = forms.CharField(required=False)
-    delivery_type = forms.CharField(required=False)
-    delivery_date = forms.DateField(required=False)
-    carbure_client_id = forms.ModelChoiceField(queryset=ENTITIES, required=False)
-    unknown_client = forms.CharField(required=False)
-    carbure_delivery_site_depot_id = forms.ModelChoiceField(queryset=DEPOTS, to_field_name="depot_id", required=False)
-    unknown_delivery_site = forms.CharField(required=False)
-    delivery_site_country_code = forms.ModelChoiceField(queryset=COUNTRIES, to_field_name="code_pays", required=False)
-
-
-# grab only the values that are defined on the form data
-# and transform them so they can be applied directly to a CarbureLot
-def get_update_data(form_data):
-    update_data = {}
-    quantity_data = {}
-
-    for field in form_data:
-        if field in ("lots_ids", "comment", "entity_id", "dry_run"):
-            continue
-
-        if form_data[field] in ("", None):
-            continue
-
-        lot_field = FORM_TO_LOT_FIELD.get(field, field)
-
-        if field in ("quantity", "unit", "volume", "weight", "lhv_amount"):
-            quantity_data[field] = form_data[field]
-        elif field in FORM_TO_LOT_FIELD:
-            update_data[lot_field] = form_data[field].id
-        else:
-            update_data[field] = form_data[field]
-
-    return update_data, quantity_data
-
-
 def serialize_node(node):
     return {"node": node.serialize(), "diff": node.diff}
 
@@ -291,17 +190,3 @@ def group_lots_by_entity(lots):
         lots_by_entity[client].append(lot)
 
     return lots_by_entity
-
-
-# map form fields to CarbureLot model fields
-FORM_TO_LOT_FIELD = {
-    "biofuel_code": "biofuel_id",
-    "feedstock_code": "feedstock_id",
-    "country_code": "country_of_origin_id",
-    "carbure_producer_id": "carbure_producer_id",
-    "production_country_code": "production_country_id",
-    "carbure_supplier_id": "carbure_supplier_id",
-    "carbure_client_id": "carbure_client_id",
-    "carbure_delivery_site_depot_id": "carbure_delivery_site_id",
-    "delivery_site_country_code": "delivery_site_country_id",
-}
