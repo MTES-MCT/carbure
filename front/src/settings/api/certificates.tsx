@@ -11,7 +11,7 @@ export function getMyCertificates(
   entity_id: number,
   production_site_id?: number
 ) {
-  return api.get<Api<EntityCertificate[]>>("/get-my-certificates", {
+  return api.get<Api<EntityCertificate[]>>("/v5/entity/certificates", {
     params: {
       entity_id,
       production_site_id,
@@ -24,7 +24,7 @@ export function addCertificate(
   certificate_id: string,
   certificate_type: CertificateType
 ) {
-  return api.post("/add-certificate", {
+  return api.post("/v5/entity/certificates/add", {
     entity_id: entityID,
     certificate_id: certificate_id,
     certificate_type: certificate_type,
@@ -36,7 +36,7 @@ export function deleteCertificate(
   certificate_id: string,
   certificate_type: CertificateType
 ) {
-  return api.post("/delete-certificate", {
+  return api.post("/v5/entity/certificates/delete", {
     entity_id: entityID,
     certificate_id: certificate_id,
     certificate_type: certificate_type,
@@ -50,7 +50,7 @@ export function updateCertificate(
   new_certificate_id: string,
   new_certificate_type: CertificateType
 ) {
-  return api.post("/update-certificate", {
+  return api.post("/v5/entity/certificates/update", {
     entity_id,
     old_certificate_id,
     old_certificate_type,
@@ -63,7 +63,7 @@ export function setDefaultCertificate(
   entity_id: number,
   certificate_id: string
 ) {
-  return api.post("/set-default-certificate", {
+  return api.post("/v5/entity/certificates/set-default", {
     entity_id,
     certificate_id,
   })
