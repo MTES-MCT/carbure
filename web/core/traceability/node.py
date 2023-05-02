@@ -259,11 +259,6 @@ class Node:
         self.parent.changed_only = self.changed_only
         diff = self.parent.diff_with_child(self)
 
-        print("--------------------")
-        print("DIFF WITH CHILD")
-        print(diff)
-        print("--------------------")
-
         changed_nodes = []
 
         if len(diff) > 0:
@@ -286,11 +281,6 @@ class Node:
 
             child.changed_only = self.changed_only
             diff = child.diff_with_parent()
-
-            print("--------------------")
-            print("DIFF WITH PARENT")
-            print(diff)
-            print("--------------------")
 
             if len(diff) > 0:
                 child.apply_diff(diff)
