@@ -4,7 +4,7 @@ from django.db.models import Q
 
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
-from core.models import UserRights, CarbureLot, CarbureLotEvent
+from core.models import UserRights, CarbureLot, CarbureLotEvent, GenericError
 from core.notifications import notify_correction_done
 from core.traceability import get_traceability_nodes, bulk_update_traceability_nodes
 
@@ -13,6 +13,7 @@ class SubmitFixError:
     MALFORMED_PARAMS = "MALFORMED_PARAMS"
     FROZEN_LOT = "FROZEN_LOT"
     UNAUTHORIZED_ENTITY = "UNAUTHORIZED_ENTITY"
+    BLOCKING_SANITY_CHECK = "BLOCKING_SANITY_CHECK"
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
@@ -33,6 +34,9 @@ def submit_fix(request, context):
 
         if lot.added_by_id != entity_id:
             return ErrorResponse(400, SubmitFixError.UNAUTHORIZED_ENTITY)
+
+        if GenericError.objects.filter(lot=lot, is_blocking=True).count() > 0:
+            return ErrorResponse(400, SubmitFixError.BLOCKING_SANITY_CHECK)
 
         event = CarbureLotEvent(event_type=CarbureLotEvent.MARKED_AS_FIXED, lot=lot, user=request.user)
         submit_fix_events.append(event)
