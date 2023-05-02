@@ -2,34 +2,26 @@ import { Unit } from "carbure/types"
 import { api } from "common/services/api"
 
 export function toggleMAC(entity_id: number, shouldEnable: boolean) {
-  const endpoint = shouldEnable
-    ? "/v3/settings/enable-mac"
-    : "/v3/settings/disable-mac"
-  return api.post(endpoint, { entity_id })
+  const endpoint = "/v3/settings/rfc"
+  return api.post(endpoint, { entity_id, has_mac: shouldEnable })
 }
 
 export function toggleTrading(entity_id: number, shouldEnable: boolean) {
-  const endpoint = shouldEnable
-    ? "/v3/settings/enable-trading"
-    : "/v3/settings/disable-trading"
-  return api.post(endpoint, { entity_id })
+  const endpoint = "/v3/settings/trading"
+  return api.post(endpoint, { entity_id, has_trading: shouldEnable })
 }
 
 export function toggleStocks(entity_id: number, shouldEnable: boolean) {
-  const endpoint = shouldEnable
-    ? "/v3/settings/enable-stocks"
-    : "/v3/settings/disable-stocks"
-  return api.post(endpoint, { entity_id })
+  const endpoint = "/v3/settings/stocks"
+  return api.post(endpoint, { entity_id, has_stocks: shouldEnable })
 }
 
 export function toggleDirectDeliveries(
   entity_id: number,
   shouldEnable: boolean
 ) {
-  const endpoint = shouldEnable
-    ? "/v3/settings/enable-direct-deliveries"
-    : "/v3/settings/disable-direct-deliveries"
-  return api.post(endpoint, { entity_id })
+  const endpoint = "/v3/settings/direct-deliveries"
+  return api.post(endpoint, { entity_id, has_direct_deliveries: shouldEnable })
 }
 
 export function updateEntity(

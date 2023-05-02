@@ -42,88 +42,86 @@ class SettingsAPITest(TestCase):
         fr, _ = Pays.objects.get_or_create(code_pays="FR", name="France")
 
     def test_mac_option(self):
-        url_enable = "api-v3-settings-enable-mac"
-        url_disable = "api-v3-settings-disable-mac"
+        url = "api-v3-settings-rfc"
 
         # wrongly formatted
-        response = self.client.post(reverse(url_enable), {"entity_id": "blablabla"})
+        response = self.client.post(reverse(url), {"entity_id": "blablabla", "has_mac": "true"})
         self.assertEqual(response.status_code, 400)
         # no entity_id
-        response = self.client.post(reverse(url_enable))
+        response = self.client.post(reverse(url), {"has_mac": "true"})
         self.assertEqual(response.status_code, 400)
         # entity I do not belong to
-        response = self.client.post(reverse(url_enable), {"entity_id": self.entity3.id})
+        response = self.client.post(reverse(url), {"entity_id": self.entity3.id, "has_mac": "true"})
         self.assertEqual(response.status_code, 403)
         # rights RW, mac option OK
-        response = self.client.post(reverse(url_enable), {"entity_id": self.entity2.id})
+        response = self.client.post(reverse(url), {"entity_id": self.entity2.id, "has_mac": "true"})
         self.assertEqual(response.status_code, 200)
         entity = Entity.objects.get(id=self.entity2.id)
         self.assertEqual(entity.has_mac, True)
         # should pass
-        response = self.client.post(reverse(url_enable), {"entity_id": self.entity1.id})
+        response = self.client.post(reverse(url), {"entity_id": self.entity1.id, "has_mac": "true"})
         self.assertEqual(response.status_code, 200)
         entity = Entity.objects.get(id=self.entity1.id)
         self.assertEqual(entity.has_mac, True)
 
         # disable:
         # wrongly formatted
-        response = self.client.post(reverse(url_disable), {"entity_id": "blablabla"})
+        response = self.client.post(reverse(url), {"entity_id": "blablabla", "has_mac": "false"})
         self.assertEqual(response.status_code, 400)
         # no entity_id
-        response = self.client.post(reverse(url_disable))
+        response = self.client.post(reverse(url), {"has_mac": "false"})
         self.assertEqual(response.status_code, 400)
         # entity I do not belong to
-        response = self.client.post(reverse(url_disable), {"entity_id": self.entity3.id})
+        response = self.client.post(reverse(url), {"entity_id": self.entity3.id, "has_mac": "false"})
         self.assertEqual(response.status_code, 403)
         # should pass
-        response = self.client.post(reverse(url_disable), {"entity_id": self.entity1.id})
+        response = self.client.post(reverse(url), {"entity_id": self.entity1.id, "has_mac": "false"})
         self.assertEqual(response.status_code, 200)
         entity = Entity.objects.get(id=self.entity1.id)
         self.assertEqual(entity.has_mac, False)
 
         # revert
-        response = self.client.post(reverse(url_enable), {"entity_id": self.entity1.id})
+        response = self.client.post(reverse(url), {"entity_id": self.entity1.id, "has_mac": "true"})
         self.assertEqual(response.status_code, 200)
         entity = Entity.objects.get(id=self.entity1.id)
         self.assertEqual(entity.has_mac, True)
 
     def test_trading_option(self):
-        url_enable = "api-v3-settings-enable-trading"
-        url_disable = "api-v3-settings-disable-trading"
+        url = "api-v3-settings-trading"
 
         # wrongly formatted
-        response = self.client.post(reverse(url_enable), {"entity_id": "blablabla"})
+        response = self.client.post(reverse(url), {"entity_id": "blablabla", "has_trading": "true"})
         self.assertEqual(response.status_code, 400)
         # no entity_id
-        response = self.client.post(reverse(url_enable))
+        response = self.client.post(reverse(url), {"has_trading": "true"})
         self.assertEqual(response.status_code, 400)
         # entity I do not belong to
-        response = self.client.post(reverse(url_enable), {"entity_id": self.entity3.id})
+        response = self.client.post(reverse(url), {"entity_id": self.entity3.id, "has_trading": "true"})
         self.assertEqual(response.status_code, 403)
         # should pass
-        response = self.client.post(reverse(url_enable), {"entity_id": self.entity1.id})
+        response = self.client.post(reverse(url), {"entity_id": self.entity1.id, "has_trading": "true"})
         self.assertEqual(response.status_code, 200)
         entity = Entity.objects.get(id=self.entity1.id)
         self.assertEqual(entity.has_trading, True)
 
         # disable:
         # wrongly formatted
-        response = self.client.post(reverse(url_disable), {"entity_id": "blablabla"})
+        response = self.client.post(reverse(url), {"entity_id": "blablabla", "has_trading": "false"})
         self.assertEqual(response.status_code, 400)
         # no entity_id
-        response = self.client.post(reverse(url_disable))
+        response = self.client.post(reverse(url), {"has_trading": "false"})
         self.assertEqual(response.status_code, 400)
         # entity I do not belong to
-        response = self.client.post(reverse(url_disable), {"entity_id": self.entity3.id})
+        response = self.client.post(reverse(url), {"entity_id": self.entity3.id, "has_trading": "false"})
         self.assertEqual(response.status_code, 403)
         # should pass
-        response = self.client.post(reverse(url_disable), {"entity_id": self.entity1.id})
+        response = self.client.post(reverse(url), {"entity_id": self.entity1.id, "has_trading": "false"})
         self.assertEqual(response.status_code, 200)
         entity = Entity.objects.get(id=self.entity1.id)
         self.assertEqual(entity.has_trading, False)
 
         # revert
-        response = self.client.post(reverse(url_enable), {"entity_id": self.entity1.id})
+        response = self.client.post(reverse(url), {"entity_id": self.entity1.id, "has_trading": "true"})
         self.assertEqual(response.status_code, 200)
         entity = Entity.objects.get(id=self.entity1.id)
         self.assertEqual(entity.has_trading, True)
