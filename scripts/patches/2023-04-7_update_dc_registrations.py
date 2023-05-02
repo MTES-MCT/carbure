@@ -29,7 +29,6 @@ def update_dc_registrations():
             if dc_cert.production_site != dc_production_site:
                 dc_cert.production_site = dc_production_site
                 dc_cert.save()
-                print(f"==>> Production site updated : {dc_cert_id}")
         except:
             print(f"DC Certificate not found for lot {dc_lot} {dc_lot.delivery_date} {dc_lot.carbure_producer} ")
             dc_certificate_not_found += 1
@@ -45,7 +44,6 @@ def update_dc_registrations():
             if dc_lot.production_site_double_counting_certificate != valid_certificate.certificate_id:
                 dc_lot.production_site_double_counting_certificate = valid_certificate.certificate_id
                 dc_lot.save()
-                print(f"==>> Certificat updated : {valid_certificate.certificate_id}")
         except:
             print(f"not valid certificate found for {dc_lot}")
             lot_without_valid_dc_certificate += 1
@@ -62,6 +60,3 @@ def update_dc_registrations():
             print("DC Certificate not found")
 
     bulk_sanity_checks(dc_lots)
-    print(f"==>> Found {len(dc_lots)} lots with a DC certificate")
-    print(f"==>> dc_certificate_not_found: {dc_certificate_not_found}")
-    print(f"==>> lot_without_valid_dc_certificate: {lot_without_valid_dc_certificate}")
