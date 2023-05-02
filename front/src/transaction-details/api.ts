@@ -9,7 +9,7 @@ export function getLotDetails(entity_id: number, lot_id: number) {
 }
 
 export function updateLot(entity_id: number, form: LotFormValue) {
-  return api.post<Api<any>>("/lots/update", {
+  return api.post<Api<any>>("/v5/transactions/lots/update", {
     entity_id,
     lot_id: form.lot?.id,
     ...lotFormToPayload(form),

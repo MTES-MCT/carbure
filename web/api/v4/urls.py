@@ -14,7 +14,6 @@ urlpatterns = [
     path("lots/add", views.add_lot, name="api-v4-add-lots"),
     path("lots/add-excel", views.add_excel, name="api-v4-add-excel"),
     path("lots/duplicate", views.duplicate_lot, name="api-v4-duplicate-lot"),
-    path("lots/update", views.update_lot, name="api-v4-update-lot"),
     path("lots/send", views.lots_send, name="api-v4-send-lots"),
     path("lots/delete", views.lots_delete, name="api-v4-delete-lots"),
     ### Corrections
