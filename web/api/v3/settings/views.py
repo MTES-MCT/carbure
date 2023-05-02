@@ -1,48 +1,7 @@
 from core.decorators import check_rights, otp_or_403
-from core.models import CarbureStock, UserRights, UserRightsRequests
+from core.models import UserRights, UserRightsRequests
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
-
-
-@check_rights("entity_id", role=[UserRights.ADMIN, UserRights.RW])
-def toggle_rfc(request, *args, **kwargs):
-    has_mac = request.POST.get("has_mac", "false")
-    entity = kwargs["context"]["entity"]
-    entity.has_mac = True if has_mac == "true" else False
-    entity.save()
-    return JsonResponse({"status": "success"})
-
-
-@check_rights("entity_id", role=[UserRights.ADMIN, UserRights.RW])
-def toggle_trading(request, *args, **kwargs):
-    entity = kwargs["context"]["entity"]
-    has_trading = request.POST.get("has_trading", "false")
-    entity.has_trading = True if has_trading == "true" else False
-    entity.save()
-    return JsonResponse({"status": "success"})
-
-
-@check_rights("entity_id", role=[UserRights.ADMIN, UserRights.RW])
-def toggle_stocks(request, *args, **kwargs):
-    entity = kwargs["context"]["entity"]
-    has_stocks = request.POST.get("has_stocks", "false")
-    if has_stocks == "false":
-        stocks = CarbureStock.objects.filter(carbure_client=entity)
-        if stocks.count() > 0:
-            return JsonResponse({"status": "error", "message": "Cannot disable stocks if you have stocks"}, status=400)
-
-    entity.has_stocks = True if has_stocks == "true" else False
-    entity.save()
-    return JsonResponse({"status": "success"})
-
-
-@check_rights("entity_id", role=[UserRights.ADMIN, UserRights.RW])
-def toggle_direct_deliveries(request, *args, **kwargs):
-    entity = kwargs["context"]["entity"]
-    has_direct_deliveries = request.POST.get("has_direct_deliveries", "false")
-    entity.has_direct_deliveries = True if has_direct_deliveries == "true" else False
-    entity.save()
-    return JsonResponse({"status": "success"})
 
 
 @otp_or_403

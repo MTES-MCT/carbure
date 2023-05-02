@@ -1474,16 +1474,6 @@ def recalc_score(request, *args, **kwargs):
     return SuccessResponse()
 
 
-@check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
-def set_entity_preferred_unit(request, *args, **kwargs):
-    entity_id = kwargs["context"]["entity_id"]
-    unit = request.POST.get("unit", "l")
-    entity = Entity.objects.get(id=entity_id)
-    entity.preferred_unit = unit
-    entity.save()
-    return JsonResponse({"status": "success"})
-
-
 class CancelErrors:
     MISSING_LOT_IDS = "MISSING_LOT_IDS"
     CANCEL_ACCEPT_NOT_ALLOWED = "CANCEL_ACCEPT_NOT_ALLOWED"

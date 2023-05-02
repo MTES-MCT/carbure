@@ -56,37 +56,6 @@ urlpatterns = [
         views.get_template_stock,
         name="api-v4-get-template-stock",
     ),
-    # SETTINGS
-    # path(
-    #     "add-certificate",
-    #     certificates.add_certificate,
-    #     name="api-v4-settings-add-certificate",
-    # ),
-    # path(
-    #     "delete-certificate",
-    #     certificates.delete_certificate,
-    #     name="api-v4-settings-delete-certificate",
-    # ),
-    # path(
-    #     "update-certificate",
-    #     certificates.update_certificate,
-    #     name="api-v4-settings-update-certificate",
-    # ),
-    # # path(
-    # #     "get-my-certificates",
-    # #     certificates.get_my_certificates,
-    # #     name="api-v4-settings-get-my-certificates",
-    # # ),
-    # path(
-    #     "set-default-certificate",
-    #     certificates.set_default_certificate,
-    #     name="api-v4-settings-set-default-certificate",
-    # ),
-    path(
-        "set-preferred-unit",
-        views.set_entity_preferred_unit,
-        name="api-v3-settings-preferred-unit",
-    ),
     # ADMIN
     path("admin/years", admin.get_years, name="api-v4-admin-get-years"),
     path("admin/snapshot", admin.get_snapshot, name="api-v4-admin-get-snapshot"),

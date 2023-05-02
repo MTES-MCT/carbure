@@ -2,17 +2,17 @@ import { Unit } from "carbure/types"
 import { api } from "common/services/api"
 
 export function toggleMAC(entity_id: number, shouldEnable: boolean) {
-  const endpoint = "/v3/settings/rfc"
+  const endpoint = "/v5/entity/options/rfc"
   return api.post(endpoint, { entity_id, has_mac: shouldEnable })
 }
 
 export function toggleTrading(entity_id: number, shouldEnable: boolean) {
-  const endpoint = "/v3/settings/trading"
+  const endpoint = "/v5/entity/options/trading"
   return api.post(endpoint, { entity_id, has_trading: shouldEnable })
 }
 
 export function toggleStocks(entity_id: number, shouldEnable: boolean) {
-  const endpoint = "/v3/settings/stocks"
+  const endpoint = "/v5/entity/options/stocks"
   return api.post(endpoint, { entity_id, has_stocks: shouldEnable })
 }
 
@@ -20,7 +20,7 @@ export function toggleDirectDeliveries(
   entity_id: number,
   shouldEnable: boolean
 ) {
-  const endpoint = "/v3/settings/direct-deliveries"
+  const endpoint = "/v5/entity/options/direct-deliveries"
   return api.post(endpoint, { entity_id, has_direct_deliveries: shouldEnable })
 }
 
@@ -49,5 +49,5 @@ export function updateEntity(
 }
 
 export function setEntityPreferredUnit(entity_id: number, unit: Unit) {
-  return api.post("/set-preferred-unit", { entity_id, unit })
+  return api.post("/v5/entity/options/unit", { entity_id, unit })
 }
