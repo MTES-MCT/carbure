@@ -4,6 +4,7 @@ from .node import Node, TraceabilityError
 ETHANOL = -1
 ETBE = -1
 
+
 def get_stock_transform_biofuels(stock_transform):
     if stock_transform.transformation_type == "ETH_ETBE":
         global ETHANOL, ETBE
@@ -20,6 +21,7 @@ class StockNode(Node):
     FROM_LOT = {
         "biofuel_id": True,
         "feedstock_id": True,
+        "country_of_origin_id": True,
         "carbure_production_site_id": True,
         "unknown_production_site": True,
         "production_country_id": True,
