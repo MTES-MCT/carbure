@@ -195,7 +195,8 @@ class Node:
         if entity_id is not None:
             allowed_diff = self.get_allowed_diff(diff, entity_id)
             if len(allowed_diff) != len(diff):
-                raise Exception("Forbidden to update some of the node's attributes")
+                forbidden_fields = list(set(diff) - set(allowed_diff))
+                raise Exception(f"Forbidden to update the following attributes: {', '.join(forbidden_fields)}")
 
         # apply the diff if everything went fine
         return self.apply_diff(diff)
@@ -255,6 +256,11 @@ class Node:
         self.parent.changed_only = self.changed_only
         diff = self.parent.diff_with_child(self)
 
+        print("--------------------")
+        print("DIFF WITH CHILD")
+        print(diff)
+        print("--------------------")
+
         changed_nodes = []
 
         if len(diff) > 0:
@@ -277,6 +283,11 @@ class Node:
 
             child.changed_only = self.changed_only
             diff = child.diff_with_parent()
+
+            print("--------------------")
+            print("DIFF WITH PARENT")
+            print(diff)
+            print("--------------------")
 
             if len(diff) > 0:
                 child.apply_diff(diff)
@@ -305,7 +316,7 @@ class Node:
             new_value = getattr(source.data, source_attr)
             old_value = getattr(self.data, self_attr)
 
-            if new_value and new_value != old_value:
+            if new_value != old_value:
                 diff[self_attr] = (new_value, old_value)
 
         return diff

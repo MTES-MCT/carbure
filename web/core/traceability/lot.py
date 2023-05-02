@@ -77,11 +77,17 @@ class LotNode(Node):
         "carbure_supplier_id",
         "carbure_supplier",
         "unknown_supplier",
+        "supplier",
         "supplier_certificate",
+        "supplier_certificate_type",
+        "vendor_certificate",
+        "vendor_certificate_type",
         "carbure_client_id",
         "carbure_client",
         "unknown_client",
+        "client",
         "delivery_type",
+        "free_field",
     ]
 
     TRANSPORT_FIELDS = [
@@ -94,6 +100,8 @@ class LotNode(Node):
 
     DELIVERY_FIELDS = [
         "delivery_date",
+        "delivery_site",
+        "carbure_delivery_site",
         "carbure_delivery_site_id",
         "unknown_delivery_site",
         "delivery_site_country",
@@ -101,8 +109,11 @@ class LotNode(Node):
 
     SUSTAINABILITY_FIELDS = [
         "feedstock",
+        "feedstock_id",
         "biofuel",
+        "biofuel_id",
         "country_of_origin",
+        "country_of_origin_id",
         "producer",
         "carbure_producer",
         "carbure_producer_id",
@@ -112,6 +123,7 @@ class LotNode(Node):
         "carbure_production_site_id",
         "unknown_production_site",
         "production_country",
+        "production_country_id",
         "production_site_commissioning_date",
         "production_site_certificate",
         "production_site_double_counting_certificate",
@@ -160,7 +172,7 @@ class LotNode(Node):
         return children_lot + children_stock + children_ticket_source
 
     def get_allowed_fields(self, entity_id) -> list:
-        allowed_fields = []
+        allowed_fields = ["production_site_certificate_type"]
 
         root_lot = self.get_root()
         has_no_ancestor_stock = self.get_closest(Node.STOCK) is None
