@@ -4,7 +4,7 @@ from core.decorators import check_admin_rights
 from core.common import SuccessResponse, ErrorResponse
 from core.serializers import GenericErrorSerializer
 from core.models import CarbureLotEvent, CarbureLotComment, GenericError, CarbureNotification
-from core.traceability import LotNode, get_traceability_nodes, bulk_update_traceability_nodes
+from core.traceability import LotNode, get_traceability_nodes, bulk_update_traceability_nodes, diff_to_metadata
 from api.v4.lots import compute_lot_quantity
 from api.v4.sanity_checks import bulk_sanity_checks, get_prefetched_data
 from carbure.tasks import background_bulk_scoring
@@ -143,14 +143,6 @@ def update_many(request):
 
 def serialize_node(node):
     return {"node": node.serialize(), "diff": node.diff}
-
-
-# transform the node diff into an dict that can be stored as the metadata of an update CarbureLotEvent
-def diff_to_metadata(diff: dict):
-    metadata = {"added": [], "removed": [], "changed": []}
-    for field, (new_value, old_value) in diff.items():
-        metadata["changed"].append([field, old_value, new_value])
-    return metadata
 
 
 # group a list of GenericError by the id of their related CarbureLot
