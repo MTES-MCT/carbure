@@ -5,68 +5,42 @@ from django.http import JsonResponse
 
 
 @check_rights("entity_id", role=[UserRights.ADMIN, UserRights.RW])
-def enable_mac(request, *args, **kwargs):
+def toggle_rfc(request, *args, **kwargs):
+    has_mac = request.POST.get("has_mac", "false")
     entity = kwargs["context"]["entity"]
-    entity.has_mac = True
+    entity.has_mac = True if has_mac == "true" else False
     entity.save()
     return JsonResponse({"status": "success"})
 
 
 @check_rights("entity_id", role=[UserRights.ADMIN, UserRights.RW])
-def disable_mac(request, *args, **kwargs):
+def toggle_trading(request, *args, **kwargs):
     entity = kwargs["context"]["entity"]
-    entity.has_mac = False
+    has_trading = request.POST.get("has_trading", "false")
+    entity.has_trading = True if has_trading == "true" else False
     entity.save()
     return JsonResponse({"status": "success"})
 
 
 @check_rights("entity_id", role=[UserRights.ADMIN, UserRights.RW])
-def enable_trading(request, *args, **kwargs):
+def toggle_stocks(request, *args, **kwargs):
     entity = kwargs["context"]["entity"]
-    entity.has_trading = True
+    has_stocks = request.POST.get("has_stocks", "false")
+    if has_stocks == "false":
+        stocks = CarbureStock.objects.filter(carbure_client=entity)
+        if stocks.count() > 0:
+            return JsonResponse({"status": "error", "message": "Cannot disable stocks if you have stocks"}, status=400)
+
+    entity.has_stocks = True if has_stocks == "true" else False
     entity.save()
     return JsonResponse({"status": "success"})
 
 
 @check_rights("entity_id", role=[UserRights.ADMIN, UserRights.RW])
-def disable_trading(request, *args, **kwargs):
+def toggle_direct_deliveries(request, *args, **kwargs):
     entity = kwargs["context"]["entity"]
-    entity.has_trading = False
-    entity.save()
-    return JsonResponse({"status": "success"})
-
-
-@check_rights("entity_id", role=[UserRights.ADMIN, UserRights.RW])
-def enable_stocks(request, *args, **kwargs):
-    entity = kwargs["context"]["entity"]
-    entity.has_stocks = True
-    entity.save()
-    return JsonResponse({"status": "success"})
-
-
-@check_rights("entity_id", role=[UserRights.ADMIN, UserRights.RW])
-def disable_stocks(request, *args, **kwargs):
-    entity = kwargs["context"]["entity"]
-    stocks = CarbureStock.objects.filter(carbure_client=entity)
-    if stocks.count() > 0:
-        return JsonResponse({"status": "error", "message": "Cannot disable stocks if you have stocks"}, status=400)
-    entity.has_stocks = False
-    entity.save()
-    return JsonResponse({"status": "success"})
-
-
-@check_rights("entity_id", role=[UserRights.ADMIN, UserRights.RW])
-def enable_direct_deliveries(request, *args, **kwargs):
-    entity = kwargs["context"]["entity"]
-    entity.has_direct_deliveries = True
-    entity.save()
-    return JsonResponse({"status": "success"})
-
-
-@check_rights("entity_id", role=[UserRights.ADMIN, UserRights.RW])
-def disable_direct_deliveries(request, *args, **kwargs):
-    entity = kwargs["context"]["entity"]
-    entity.has_direct_deliveries = False
+    has_direct_deliveries = request.POST.get("has_direct_deliveries", "false")
+    entity.has_direct_deliveries = True if has_direct_deliveries == "true" else False
     entity.save()
     return JsonResponse({"status": "success"})
 

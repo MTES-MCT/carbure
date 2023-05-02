@@ -5,7 +5,14 @@ import { Route } from "react-router-dom"
 
 import { admin, operator, producer, trader } from "carbure/__test__/data"
 import Settings from "../index"
-import server, { okDynamicSettings, setEntity } from "./api"
+import server, {
+  okDisableMac,
+  okDisableTrading,
+  okDynamicSettings,
+  okEnableMac,
+  okEnableTrading,
+  setEntity,
+} from "./api"
 import { waitWhileLoading } from "carbure/__test__/helpers"
 
 const SettingsWithHooks = ({ entityID }: { entityID?: number }) => {
@@ -40,18 +47,22 @@ test("check the company section of the settings for a producer", async () => {
   expect(mac).toBeChecked()
   expect(trading).toBeChecked()
 
+  server.use(okDisableMac)
   await user.click(mac)
   // await waitWhileLoading()
   expect(mac).not.toBeChecked()
 
+  server.use(okDisableTrading)
   await user.click(trading)
   // await waitWhileLoading()
   expect(trading).not.toBeChecked()
 
+  server.use(okEnableMac)
   await user.click(mac)
   // await waitWhileLoading()
   expect(mac).toBeChecked()
 
+  server.use(okEnableTrading)
   await user.click(trading)
   // await waitWhileLoading()
   expect(trading).toBeChecked()
@@ -69,8 +80,8 @@ test("check the company section of the settings for a trader", async () => {
 
   expect(mac).toBeChecked()
 
+  server.use(okDisableMac)
   await user.click(mac)
-
   await waitFor(() => expect(mac).not.toBeChecked())
 })
 
@@ -86,8 +97,8 @@ test("check the company section of the settings for an operator", async () => {
 
   expect(mac).toBeChecked()
 
+  server.use(okDisableMac)
   await user.click(mac)
-
   await waitFor(() => {
     expect(mac).not.toBeChecked()
   })

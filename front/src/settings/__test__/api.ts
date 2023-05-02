@@ -87,7 +87,7 @@ export const okDynamicSettings = rest.get(
 )
 
 export const okEnableMac = rest.post(
-  "/api/v3/settings/enable-mac",
+  "/api/v3/settings/rfc",
   (req, res, ctx) => {
     const entity = Data.get("entity")
     setEntity({
@@ -99,7 +99,7 @@ export const okEnableMac = rest.post(
 )
 
 export const okDisableMac = rest.post(
-  "/api/v3/settings/disable-mac",
+  "/api/v3/settings/rfc",
   (req, res, ctx) => {
     const entity = Data.get("entity")
     setEntity({
@@ -111,7 +111,7 @@ export const okDisableMac = rest.post(
 )
 
 export const okEnableTrading = rest.post(
-  "/api/v3/settings/enable-trading",
+  "/api/v3/settings/trading",
   (req, res, ctx) => {
     const entity = Data.get("entity")
     setEntity({
@@ -123,7 +123,7 @@ export const okEnableTrading = rest.post(
 )
 
 export const okDisableTrading = rest.post(
-  "/api/v3/settings/disable-trading",
+  "/api/v3/settings/trading",
   (req, res, ctx) => {
     const entity = Data.get("entity")
     setEntity({
