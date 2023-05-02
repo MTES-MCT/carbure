@@ -1,3 +1,6 @@
+import datetime
+
+
 class TraceabilityError:
     NODE_HAS_DIFFERENCES_WITH_PARENT = "NODE_HAS_DIFFERENCES_WITH_PARENT"
     NOT_ENOUGH_STOCK_FOR_CHILDREN = "NOT_ENOUGH_STOCK_FOR_CHILDREN"
@@ -342,3 +345,15 @@ class Node:
             setattr(self.data, attr, new_value)
             self.diff[attr] = (new_value, old_value)
         return self.diff
+
+
+# transform the node diff into an dict that can be stored as the metadata of an update CarbureLotEvent
+def diff_to_metadata(diff: dict):
+    metadata = {"added": [], "removed": [], "changed": []}
+    for field, (new_value, old_value) in diff.items():
+        if isinstance(new_value, datetime.date):
+            new_value = new_value.strftime("%Y-%m-%d")
+        if isinstance(old_value, datetime.date):
+            old_value = old_value.strftime("%Y-%m-%d")
+        metadata["changed"].append([field, old_value, new_value])
+    return metadata
