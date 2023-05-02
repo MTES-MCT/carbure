@@ -1,12 +1,11 @@
-import datetime
-from django.test import TestCase
-from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.db.models import Count
+from django.test import TestCase
+from django.urls import reverse
 
+from api.v4.tests_utils import get_lot, setup_current_user
 from core.models import CarbureLot, Entity, UserRights
 from django_otp.plugins.otp_email.models import EmailDevice
-from api.v4.tests_utils import get_lot
 from transactions.models import LockedYear
 from core.carburetypes import CarbureError
 
@@ -22,15 +21,6 @@ class LotCorrectionTest(TestCase):
     ]
 
     def setUp(self):
-        user_model = get_user_model()
-        # let's create a user
-        self.password = "totopouet"
-        self.user1 = user_model.objects.create_user(
-            email="testuser1@toto.com", name="Le Super Testeur 1", password=self.password
-        )
-        loggedin = self.client.login(username=self.user1.email, password=self.password)
-        self.assertTrue(loggedin)
-
         self.producer = (
             Entity.objects.filter(entity_type=Entity.PRODUCER)
             .annotate(psites=Count("productionsite"))
@@ -40,54 +30,78 @@ class LotCorrectionTest(TestCase):
         self.trader.default_certificate = "TRADER_CERTIFICATE"
         self.trader.save()
         self.operator = Entity.objects.filter(entity_type=Entity.OPERATOR)[0]
-        UserRights.objects.update_or_create(entity=self.producer, user=self.user1, role=UserRights.RW)
-        UserRights.objects.update_or_create(entity=self.trader, user=self.user1, role=UserRights.RW)
-        UserRights.objects.update_or_create(entity=self.operator, user=self.user1, role=UserRights.RW)
 
-        # pass otp verification
-        response = self.client.post(reverse("auth-request-otp"))
-        self.assertEqual(response.status_code, 200)
-        device, created = EmailDevice.objects.get_or_create(user=self.user1)
-        response = self.client.post(reverse("auth-verify-otp"), {"otp_token": device.token})
-        self.assertEqual(response.status_code, 200)
+        self.user = setup_current_user(
+            self,
+            "tester@carbure.local",
+            "Tester",
+            "gogogo",
+            [(self.producer, "ADMIN"), (self.trader, "ADMIN"), (self.operator, "ADMIN")],
+        )
 
-    def create_draft(self, lot=None, **kwargs):
-        if lot is None:
-            lot = get_lot(self.producer)
-        lot.update(kwargs)
-        response = self.client.post(reverse("api-v4-add-lots"), lot)
-        self.assertEqual(response.status_code, 200)
-        data = response.json()["data"]
-        lot_id = data["id"]
-        lot = CarbureLot.objects.get(id=lot_id)
-        return lot
+    def prepare_lot(self, supplier, client=None):
+        lot_data = get_lot(supplier)
+        lot_data["carbure_supplier_id"] = supplier.id
+        lot_data["carbure_client_id"] = client.id if client else self.trader.id
 
-    def send_lot(self, lot):
-        response = self.client.post(reverse("api-v4-send-lots"), {"entity_id": self.producer.id, "selection": [lot.id]})
+        add_response = self.client.post(reverse("api-v4-add-lots"), lot_data)
+        self.assertEqual(add_response.status_code, 200)
+
+        lot_id = add_response.json()["data"]["id"]
+
+        send_response = self.client.post(reverse("api-v4-send-lots"), {"entity_id": supplier.id, "selection": [lot_id]})
+        self.assertEqual(send_response.status_code, 200)
+
+        return CarbureLot.objects.get(id=lot_id)
+
+    def send_lot(self, lot, entity):
+        response = self.client.post(
+            reverse("api-v4-send-lots"),
+            {"entity_id": entity.id, "selection": [lot.id]},
+        )
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)
         return lot
 
-    def recall_lot(self, lot):
+    def request_fix(self, lot, entity):
         response = self.client.post(
-            reverse("api-v5-transactions-lots-request-fix"), {"entity_id": self.producer.id, "lot_ids": [lot.id]}
+            reverse("api-v5-transactions-lots-request-fix"),
+            {"entity_id": entity.id, "lot_ids": [lot.id]},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        lot = CarbureLot.objects.get(id=lot.id)
+        return lot
+
+    def submit_fix(self, lot, entity):
+        response = self.client.post(
+            reverse("api-v5-transactions-lots-submit-fix"),
+            {"entity_id": entity.id, "lot_ids": [lot.id]},
+        )
+        self.assertEqual(response.status_code, 200)
+        lot = CarbureLot.objects.get(id=lot.id)
+        return lot
+
+    def approve_fix(self, lot, entity):
+        response = self.client.post(
+            reverse("api-v5-transactions-lots-approve-fix"),
+            {"entity_id": entity.id, "lot_ids": [lot.id]},
         )
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)
         return lot
 
     def test_recall_and_update(self):
-        lotdata = get_lot(entity=self.producer)
-        lot = self.create_draft(lot=lotdata)
-        lot = self.send_lot(lot)
+        lot = self.prepare_lot(self.producer)
         self.assertEqual(lot.correction_status, CarbureLot.NO_PROBLEMO)
         self.assertEqual(lot.lot_status, CarbureLot.PENDING)
-        lot = self.recall_lot(lot)
+        lot = self.request_fix(lot, self.producer)
         self.assertEqual(lot.correction_status, CarbureLot.IN_CORRECTION)
         self.assertEqual(lot.lot_status, CarbureLot.PENDING)
-        lotdata["lot_id"] = lot.id
-        lotdata["volume"] = 42000
-        response = self.client.post(reverse("api-v4-update-lot"), lotdata)
+        response = self.client.post(
+            reverse("api-v5-transactions-lots-update"),
+            {"entity_id": self.producer.id, "lot_id": lot.id, "volume": 42000},
+        )
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)
         self.assertEqual(lot.volume, 42000)
@@ -95,65 +109,80 @@ class LotCorrectionTest(TestCase):
     def test_simple_correction(self):
         LockedYear.objects.create(year=2020, locked=True)
 
-        lotdata = get_lot(entity=self.producer)
-        lot = self.create_draft(lot=lotdata, carbure_client_id=self.trader.id)
-        lot = self.send_lot(lot)
+        lot = self.prepare_lot(self.producer, self.trader)
         self.assertEqual(lot.lot_status, CarbureLot.PENDING)
         self.assertEqual(lot.correction_status, CarbureLot.NO_PROBLEMO)
+
         # client requests correction
-        response = self.client.post(
-            reverse("api-v5-transactions-lots-request-fix"), {"entity_id": self.trader.id, "lot_ids": [lot.id]}
-        )
-        self.assertEqual(response.status_code, 200)
-        lot = CarbureLot.objects.get(id=lot.id)
+        response = self.request_fix(lot, self.trader)
         self.assertEqual(lot.lot_status, CarbureLot.PENDING)
         self.assertEqual(lot.correction_status, CarbureLot.IN_CORRECTION)
+
         # we update
-        lotdata["lot_id"] = lot.id
-        lotdata["volume"] = 42000
-        response = self.client.post(reverse("api-v4-update-lot"), lotdata)
+        response = self.client.post(
+            reverse("api-v5-transactions-lots-update"),
+            {"lot_id": lot.id, "volume": 42000},
+        )
         self.assertEqual(response.status_code, 200)
+
         lot = CarbureLot.objects.get(id=lot.id)
         self.assertEqual(lot.volume, 42000)
+
         # and mark as fixed
-        response = self.client.post(
-            reverse("api-v5-transactions-lots-submit-fix"), {"entity_id": self.producer.id, "lot_ids": [lot.id]}
-        )
-        self.assertEqual(response.status_code, 200)
-        lot = CarbureLot.objects.get(id=lot.id)
+        lot = self.submit_fix(lot, self.producer)
         self.assertEqual(lot.correction_status, CarbureLot.FIXED)
+
         # as client, accept fix
-        response = self.client.post(
-            reverse("api-v5-transactions-lots-approve-fix"), {"entity_id": self.trader.id, "lot_ids": [lot.id]}
-        )
-        self.assertEqual(response.status_code, 200)
-        lot = CarbureLot.objects.get(id=lot.id)
+        lot = self.approve_fix(lot, self.trader)
         self.assertEqual(lot.correction_status, CarbureLot.NO_PROBLEMO)
         self.assertEqual(lot.lot_status, CarbureLot.PENDING)
+
         # finally, accept lot
         response = self.client.post(
-            reverse("api-v4-accept-in-stock"), {"entity_id": self.trader.id, "selection": [lot.id]}
+            reverse("api-v4-accept-in-stock"),
+            {"entity_id": self.trader.id, "selection": [lot.id]},
         )
         self.assertEqual(response.status_code, 200)
+
         lot = CarbureLot.objects.get(id=lot.id)
         self.assertEqual(lot.correction_status, CarbureLot.NO_PROBLEMO)
         self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)
 
     def test_simple_correction_on_locked_year(self):
-        lotdata = get_lot(entity=self.producer)
-        lot = self.create_draft(lot=lotdata, carbure_client_id=self.trader.id)
-        lot = self.send_lot(lot)
-        # # client requests correction
         LockedYear.objects.create(year=2021, locked=True)
+
+        lot = self.prepare_lot(self.producer, self.trader)
+        lot = self.send_lot(lot, self.producer)
+
+        # client requests correction
         response = self.client.post(
-            reverse("api-v5-transactions-lots-request-fix"), {"entity_id": self.trader.id, "lot_ids": [lot.id]}
+            reverse("api-v5-transactions-lots-request-fix"),
+            {"entity_id": self.producer.id, "lot_ids": [lot.id]},
         )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["status"], "error")
         self.assertEqual(response.json()["error"], CarbureError.YEAR_LOCKED)
 
-    def test_cascading_correction_trading(self):
+    # check that the owner can edit everything on a root lot
+    def test_full_owner_correction(self):
         pass
 
-    def test_cascading_correction_stock(self):
+    # check that an entity can update durability info on a lot which's root owner is also this entity
+    def test_ancestor_owner_correction(self):
+        pass
+
+    # check that the client cannot edit anything on a lot they didn't create
+    def test_client_correction(self):
+        pass
+
+    # check that an entity can only update delivery info on a received lot they transferred
+    def test_transfer_correction(self):
+        pass
+
+    # check that an entity can update everything on a lot duplicated for trading purpose
+    def test_auto_trading_correction(self):
+        pass
+
+    # check that an entity can update transport fields on a lot extracted from owned stock
+    def test_stock_correction(self):
         pass
