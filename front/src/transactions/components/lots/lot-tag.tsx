@@ -31,6 +31,9 @@ export const LotTag = ({ lot, ...props }: LotTagProps) => {
   } else if (status === LotStatus.Rejected) {
     label = t("Refusé")
     variant = "danger"
+  } else if (status === LotStatus.Deleted) {
+    label = t("Supprimé")
+    variant = "danger"
   } else if (correction === CorrectionStatus.InCorrection) {
     label = t("En correction")
     variant = "warning"
@@ -40,9 +43,6 @@ export const LotTag = ({ lot, ...props }: LotTagProps) => {
   } else if (status === LotStatus.Pending) {
     label = t("En attente")
     variant = "info"
-  } else if (status === LotStatus.Deleted) {
-    label = t("Supprimé")
-    variant = "danger"
   } else if (knowsDelivery) {
     variant = "success"
     if (delivery === DeliveryType.Blending) {
