@@ -29,8 +29,8 @@ def update_many(request):
     params_form = UpdateManyForm(request.POST)
     lot_form = LotForm(request.POST)
 
-    if not params_form.is_valid():
-        return ErrorResponse(400, UpdateManyError.MALFORMED_PARAMS, {**params_form.errors})
+    if not params_form.is_valid() or not lot_form.is_valid():
+        return ErrorResponse(400, UpdateManyError.MALFORMED_PARAMS, {**params_form.errors, **lot_form.errors})
 
     entity_id = params_form.cleaned_data["entity_id"]
     comment = params_form.cleaned_data["comment"]
@@ -54,6 +54,10 @@ def update_many(request):
         if len(quantity_data) > 0:
             quantity = compute_lot_quantity(node.data, quantity_data)
             update = {**update, **quantity}
+
+        print("-------------------")
+        print(update)
+        print("-------------------")
 
         # apply the update to the lot
         node.update(update)
@@ -145,7 +149,7 @@ def update_many(request):
 
 
 def serialize_node(node):
-    return {"node": node.serialize(), "diff": node.diff}
+    return {"node": node.serialize(), "diff": diff_to_metadata(node.diff)}
 
 
 # group a list of GenericError by the id of their related CarbureLot
