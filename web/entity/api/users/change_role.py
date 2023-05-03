@@ -7,16 +7,17 @@ User = get_user_model()
 
 
 class ChangeUserRoleError:
-    MISSING_PARAMS = 'MISSING_PARAMS'
-    MISSING_USER = 'MISSING_USER'
-    NO_PRIOR_RIGHTS = 'NO_PRIOR_RIGHTS'
-    UPDATE_FAILED = 'UPDATE_FAILED'
+    MISSING_PARAMS = "MISSING_PARAMS"
+    MISSING_USER = "MISSING_USER"
+    NO_PRIOR_RIGHTS = "NO_PRIOR_RIGHTS"
+    UPDATE_FAILED = "UPDATE_FAILED"
+
 
 @check_user_rights(role=[UserRights.ADMIN])
 def change_user_role(request, *args, **kwargs):
-    entity_id = request.POST.get('entity_id')
-    email = request.POST.get('email')
-    role = request.POST.get('role')
+    entity_id = request.POST.get("entity_id")
+    email = request.POST.get("email")
+    role = request.POST.get("role")
 
     if not email or not role:
         return ErrorResponse(400, ChangeUserRoleError.MISSING_PARAMS)

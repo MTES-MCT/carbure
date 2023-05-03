@@ -87,7 +87,7 @@ export const okDynamicSettings = rest.get(
 )
 
 export const okEnableMac = rest.post(
-  "/api/v5/entity/options/rfc",
+  "/api/v5/entity/options/release-for-consumption",
   (req, res, ctx) => {
     const entity = Data.get("entity")
     setEntity({
@@ -99,7 +99,7 @@ export const okEnableMac = rest.post(
 )
 
 export const okDisableMac = rest.post(
-  "/api/v5/entity/options/rfc",
+  "/api/v5/entity/options/release-for-consumption",
   (req, res, ctx) => {
     const entity = Data.get("entity")
     setEntity({
@@ -234,7 +234,7 @@ export const okSetCertificates = rest.post(
 )
 
 export const okEntityRights = rest.get(
-  "http://localhost/api/v3/settings/get-entity-rights",
+  "http://localhost/api/v5/entity/users",
   (req, res, ctx) => {
     return res(ctx.json({ status: "success", data: entityRights }))
   }
