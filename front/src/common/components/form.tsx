@@ -195,6 +195,7 @@ export interface BindProps<T, N extends keyof T> {
   value: T[N]
   error: string | undefined
   checked: boolean | undefined
+  disabled: boolean | undefined
   onChange: (value: T[N]) => void
 }
 
