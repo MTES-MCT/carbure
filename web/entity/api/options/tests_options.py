@@ -28,7 +28,7 @@ class EntityProductionSiteTest(TestCase):
         UserRights.objects.update_or_create(user=self.user, entity=self.entity2, defaults={"role": UserRights.ADMIN})
 
     def test_mac_option(self):
-        url = "entity-options-rfc"
+        url = "entity-options-release-for-consumption"
 
         # wrongly formatted
         response = self.client.post(reverse(url), {"entity_id": "blablabla", "has_mac": "true"})
