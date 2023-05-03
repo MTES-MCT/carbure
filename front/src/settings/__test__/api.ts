@@ -5,13 +5,20 @@ import { OwnershipType } from "carbure/types"
 
 import {
   okCountrySearch,
-  okDeliverySitesSearch, okErrorsTranslations,
-  okFieldsTranslations, okProductionSitesSearch, okTranslations
+  okDeliverySitesSearch,
+  okErrorsTranslations,
+  okFieldsTranslations,
+  okProductionSitesSearch,
+  okTranslations,
 } from "carbure/__test__/api"
 import {
-  deliverySite, entityRequest, entityRight, entityRights, operator,
+  deliverySite,
+  entityRequest,
+  entityRight,
+  entityRights,
+  operator,
   producer,
-  productionSite
+  productionSite,
 } from "carbure/__test__/data"
 import { clone, Data } from "carbure/__test__/helpers"
 import { dcApplicationErrors } from "./data"
@@ -68,23 +75,20 @@ export const okEmptySettings = rest.get("/api/v5/user", (req, res, ctx) => {
   )
 })
 
-export const okDynamicSettings = rest.get(
-  "/api/v5/user",
-  (req, res, ctx) => {
-    const entity = Data.get("entity")
+export const okDynamicSettings = rest.get("/api/v5/user", (req, res, ctx) => {
+  const entity = Data.get("entity")
 
-    return res(
-      ctx.json({
-        status: "success",
-        data: {
-          email: "producer@test.com",
-          rights: [{ ...entityRight, entity }],
-          requests: [],
-        },
-      })
-    )
-  }
-)
+  return res(
+    ctx.json({
+      status: "success",
+      data: {
+        email: "producer@test.com",
+        rights: [{ ...entityRight, entity }],
+        requests: [],
+      },
+    })
+  )
+})
 
 export const okEnableMac = rest.post(
   "/api/v5/entity/options/release-for-consumption",
@@ -241,7 +245,7 @@ export const okEntityRights = rest.get(
 )
 
 export const okSelfCertificates = rest.get(
-  "http://localhost/api/get-my-certificates",
+  "/api/v5/entity/certificates",
   (req, res, ctx) => {
     return res(ctx.json({ status: "success", data: [] }))
   }
@@ -260,7 +264,7 @@ export const okDoubleCountUploadApplication = rest.post(
     return res(
       ctx.json({
         status: "success",
-        data: { dca_id: 142332 }
+        data: { dca_id: 142332 },
       })
     )
   }
@@ -272,7 +276,7 @@ export const okDoubleCountUploadDocumentation = rest.post(
     return res(
       ctx.json({
         status: "success",
-        data: { dca_id: 142332 }
+        data: { dca_id: 142332 },
       })
     )
   }
@@ -291,7 +295,6 @@ export const koDoubleCountUploadApplication = rest.post(
     )
   }
 )
-
 
 export default setupServer(
   koDoubleCountUploadApplication,
