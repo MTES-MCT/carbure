@@ -188,6 +188,9 @@ class Node:
     def update(self, data, entity_id=None) -> dict:
         diff = {}
 
+        derived = self.derive_fields(data)
+        data.update(derived)
+
         # generate a diff dict
         for attr, new_value in data.items():
             old_value = getattr(self.data, attr)
@@ -331,10 +334,13 @@ class Node:
 
     # apply the given diff to this node's data
     def apply_diff(self, diff: dict[str, tuple]):
-        for attr, (new_value, old_value) in diff.items():
-            setattr(self.data, attr, new_value)
-            self.diff[attr] = (new_value, old_value)
+        for field, (new_value, old_value) in diff.items():
+            setattr(self.data, field, new_value)
+            self.diff[field] = (new_value, old_value)
         return self.diff
+
+    def derive_fields(self, update):
+        return {}
 
 
 # transform the node diff into an dict that can be stored as the metadata of an update CarbureLotEvent
@@ -345,5 +351,9 @@ def diff_to_metadata(diff: dict):
             new_value = new_value.strftime("%Y-%m-%d")
         if isinstance(old_value, datetime.date):
             old_value = old_value.strftime("%Y-%m-%d")
+        if hasattr(new_value, "name"):
+            new_value = new_value.name
+        if hasattr(old_value, "name"):
+            old_value = old_value.name
         metadata["changed"].append([field, old_value, new_value])
     return metadata

@@ -99,6 +99,8 @@ class LotNode(Node):
     ]
 
     DELIVERY_FIELDS = [
+        "year",
+        "period",
         "delivery_date",
         "delivery_site",
         "carbure_delivery_site",
@@ -247,3 +249,16 @@ class LotNode(Node):
             return [self.parent]
 
         return []
+
+    def derive_fields(self, update):
+        derived_fields = {}
+        for field, value in update.items():
+            if field == "delivery_date":
+                derived_fields["year"] = value.year
+                derived_fields["period"] = value.year * 100 + value.month
+            if field == "carbure_production_site" and value:
+                derived_fields["production_country"] = value.country
+                derived_fields["production_site_commissioning_date"] = value.date_mise_en_service
+            if field == "carbure_delivery_site" and value:
+                derived_fields["delivery_site_country"] = value.country
+        return derived_fields
