@@ -44,6 +44,7 @@ class StockNode(Node):
 
     FROM_STOCK = {
         "feedstock_id": True,
+        "country_of_origin_id": True,
         "depot_id": True,
         "carbure_client_id": True,
         "carbure_production_site_id": True,

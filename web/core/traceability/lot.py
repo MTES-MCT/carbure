@@ -16,7 +16,6 @@ class LotNode(Node):
         "production_site_commissioning_date": True,
         "production_site_certificate": True,
         "production_site_double_counting_certificate": True,
-        "delivery_date": True,
         "ghg_total": True,
         "ghg_reference": True,
         "ghg_reduction": True,
@@ -36,6 +35,7 @@ class LotNode(Node):
         "carbure_delivery_site_id": True,
         "unknown_delivery_site": True,
         "delivery_site_country_id": True,
+        "delivery_date": True,
         **FROM_LOT,
     }
 
