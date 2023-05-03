@@ -87,7 +87,7 @@ export const ProducerField = (props: AutocompleteProps<Entity | string>) => {
       normalize={norm.normalizeEntityOrUnknown}
       {...bound}
       {...props}
-      disabled={!entity.has_trading && !entity.has_stocks}
+      disabled={(!entity.has_trading && !entity.has_stocks) || bound.disabled}
     />
   )
 }
