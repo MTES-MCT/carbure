@@ -23,12 +23,15 @@ export const okLotDetails = rest.get("/api/lots/details", (req, res, ctx) => {
   )
 })
 
-export const okUpdateLot = rest.post("/api/lots/update", (req, res, ctx) => {
-  const details = Data.get("lot-details")
-  details.lot.transport_document_reference = "DAETEST UPDATED"
-  Data.set("lot-details", details)
-  return res(ctx.json({ status: "success" }))
-})
+export const okUpdateLot = rest.post(
+  "/api/v5/transactions/lots/update",
+  (req, res, ctx) => {
+    const details = Data.get("lot-details")
+    details.lot.transport_document_reference = "DAETEST UPDATED"
+    Data.set("lot-details", details)
+    return res(ctx.json({ status: "success" }))
+  }
+)
 
 export const okSendLot = rest.post("/api/lots/send", (req, res, ctx) => {
   Data.set("lot-details", (details: LotDetails) => {
