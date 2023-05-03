@@ -39,8 +39,8 @@ class LotCorrectionTest(TestCase):
             [(self.producer, "ADMIN"), (self.trader, "ADMIN"), (self.operator, "ADMIN")],
         )
 
-    def prepare_lot(self, supplier, client=None):
-        lot_data = get_lot(supplier)
+    def prepare_lot(self, supplier, client=None, **kwargs):
+        lot_data = get_lot(supplier, **kwargs)
         lot_data["carbure_supplier_id"] = supplier.id
         lot_data["carbure_client_id"] = client.id if client else self.trader.id
 
@@ -53,15 +53,6 @@ class LotCorrectionTest(TestCase):
         self.assertEqual(send_response.status_code, 200)
 
         return CarbureLot.objects.get(id=lot_id)
-
-    def send_lot(self, lot, entity):
-        response = self.client.post(
-            reverse("api-v4-send-lots"),
-            {"entity_id": entity.id, "selection": [lot.id]},
-        )
-        self.assertEqual(response.status_code, 200)
-        lot = CarbureLot.objects.get(id=lot.id)
-        return lot
 
     def request_fix(self, lot, entity):
         response = self.client.post(
@@ -114,14 +105,14 @@ class LotCorrectionTest(TestCase):
         self.assertEqual(lot.correction_status, CarbureLot.NO_PROBLEMO)
 
         # client requests correction
-        response = self.request_fix(lot, self.trader)
+        lot = self.request_fix(lot, self.trader)
         self.assertEqual(lot.lot_status, CarbureLot.PENDING)
         self.assertEqual(lot.correction_status, CarbureLot.IN_CORRECTION)
 
         # we update
         response = self.client.post(
             reverse("api-v5-transactions-lots-update"),
-            {"lot_id": lot.id, "volume": 42000},
+            {"entity_id": self.producer.id, "lot_id": lot.id, "volume": 42000},
         )
         self.assertEqual(response.status_code, 200)
 
@@ -149,10 +140,9 @@ class LotCorrectionTest(TestCase):
         self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)
 
     def test_simple_correction_on_locked_year(self):
-        LockedYear.objects.create(year=2021, locked=True)
-
         lot = self.prepare_lot(self.producer, self.trader)
-        lot = self.send_lot(lot, self.producer)
+
+        LockedYear.objects.create(year=2021, locked=True)
 
         # client requests correction
         response = self.client.post(
