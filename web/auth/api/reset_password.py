@@ -1,4 +1,4 @@
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.auth import get_user_model
@@ -12,7 +12,7 @@ def reset_password(request):
     uidb64 = request.POST.get("uidb64", "")
     token = request.POST.get("token", "")
     try:
-        uid = force_text(urlsafe_base64_decode(uidb64))
+        uid = force_str(urlsafe_base64_decode(uidb64))
         user_model = get_user_model()
         user = user_model.objects.get(pk=uid)
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
