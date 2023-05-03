@@ -74,6 +74,9 @@ def update_many(request):
         # list all the affected CarbureLots
         updated_lots.append(node.data)
 
+        # recompute the GHG values in case something changed
+        node.data.update_ghg()
+
         # save a lot event with the current modification
         update_events.append(
             CarbureLotEvent(
