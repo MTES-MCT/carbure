@@ -5,7 +5,7 @@ from django.http import JsonResponse
 
 
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
-def toggle_rfc(request, *args, **kwargs):
+def toggle_release_for_consumption(request, *args, **kwargs):
     has_mac = request.POST.get("has_mac", "false")
     entity_id = kwargs["context"]["entity_id"]
     entity = Entity.objects.get(id=entity_id)

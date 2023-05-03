@@ -1,4 +1,4 @@
-from api.v4 import admin, auditor, settings, views
+from api.v4 import admin, auditor, views
 from django.urls import path
 
 urlpatterns = [
@@ -145,11 +145,5 @@ urlpatterns = [
         "auditor/lots/mark-as-nonconform",
         auditor.mark_nonconform,
         name="api-v4-auditor-mark-as-nonconform",
-    ),
-    # SETTINGS
-    path(
-        "settings/change-user-role",
-        settings.change_user_role,
-        name="api-v4-settings-change-user-role",
     ),
 ]

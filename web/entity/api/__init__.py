@@ -6,4 +6,5 @@ urlpatterns = [
     path("users/", include("entity.api.users")),
     path("certificates/", include("entity.api.certificates")),
     path("options/", include("entity.api.options")),
+    path("notifications/", include("entity.api.notifications")),
 ]

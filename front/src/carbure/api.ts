@@ -101,7 +101,7 @@ export function findMyCertificates(
 
 export async function getNotifications(entity_id: number) {
   if (entity_id === -1) return
-  return api.get<Api<Notification[]>>("/v5/notifications", {
+  return api.get<Api<Notification[]>>("/v5/entity/notifications", {
     params: { entity_id },
   })
 }
@@ -110,7 +110,7 @@ export function ackNotifications(
   entity_id: number,
   notification_ids: number[]
 ) {
-  return api.post("/v5/notifications/ack", {
+  return api.post("/v5/entity/notifications/ack", {
     entity_id,
     notification_ids,
   })
