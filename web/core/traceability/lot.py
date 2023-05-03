@@ -7,12 +7,12 @@ class LotNode(Node):
     type = Node.LOT
 
     FROM_LOT = {
-        "country_of_origin_id": True,
-        "carbure_producer_id": True,
+        "country_of_origin": True,
+        "carbure_producer": True,
         "unknown_producer": True,
-        "carbure_production_site_id": True,
+        "carbure_production_site": True,
         "unknown_production_site": True,
-        "production_country_id": True,
+        "production_country": True,
         "production_site_commissioning_date": True,
         "production_site_certificate": True,
         "production_site_double_counting_certificate": True,
@@ -25,51 +25,51 @@ class LotNode(Node):
     }
 
     FROM_DIRECT_LOT = {
-        "feedstock_id": True,
-        "biofuel_id": True,
+        "feedstock": True,
+        "biofuel": True,
         "volume": True,
         "weight": True,
         "lhv_amount": True,
         "transport_document_type": True,
         "transport_document_reference": True,
-        "carbure_delivery_site_id": True,
+        "carbure_delivery_site": True,
         "unknown_delivery_site": True,
-        "delivery_site_country_id": True,
+        "delivery_site_country": True,
         "delivery_date": True,
         **FROM_LOT,
     }
 
     FROM_PARENT_LOT = {
-        "carbure_client_id": "carbure_supplier_id",
+        "carbure_client": "carbure_supplier",
         **FROM_DIRECT_LOT,
     }
 
     FROM_CHILD_LOT = {
-        "carbure_supplier_id": "carbure_client_id",
+        "carbure_supplier": "carbure_client",
         **FROM_DIRECT_LOT,
     }
 
     FROM_STOCK = {
-        "biofuel_id": True,
-        "feedstock_id": True,
-        "country_of_origin_id": True,
-        "carbure_production_site_id": True,
+        "biofuel": True,
+        "feedstock": True,
+        "country_of_origin": True,
+        "carbure_production_site": True,
         "unknown_production_site": True,
-        "production_country_id": True,
+        "production_country": True,
         "ghg_reduction": True,
         "ghg_reduction_red_ii": True,
     }
 
     FROM_PARENT_STOCK = {
-        "carbure_client_id": "carbure_supplier_id",
+        "carbure_client": "carbure_supplier",
         **FROM_STOCK,
     }
 
     FROM_CHILD_STOCK = {
-        "carbure_supplier_id": True,
+        "carbure_supplier": True,
         "unknown_supplier": True,
-        "carbure_client_id": True,
-        "depot_id": "carbure_delivery_site_id",
+        "carbure_client": True,
+        "depot": "carbure_delivery_site",
         **FROM_STOCK,
     }
 
