@@ -18,6 +18,7 @@ class UpdateLotError:
     LOT_NOT_FOUND = "LOT_NOT_FOUND"
     LOT_UPDATE_FAILED = "LOT_UPDATE_FAILED"
     FIELD_UPDATE_FORBIDDEN = "FIELD_UPDATE_FORBIDDEN"
+    INTEGRITY_ERROR = "INTEGRITY_ERROR"
 
 
 class UpdateLotForm(forms.Form):
@@ -46,25 +47,35 @@ def update_lot(request, *args, **kwargs):
     # convert the form data to a dict that can be applied as lot update
     update_data, quantity_data = lot_form.get_lot_data()
 
+    update = {**update_data}
+    if len(quantity_data) > 0:
+        quantity = compute_lot_quantity(updated_lot, quantity_data)
+        update = {**update_data, **quantity}
+
     # query the database for all the traceability nodes related to these lots
     nodes = get_traceability_nodes([updated_lot])
     lot_node = nodes[0]
 
-    # compute the lot quantity and check if it goes over the available stock if any
-    quantity, is_over_stock_limit = get_lot_quantity(updated_lot, quantity_data)
+    stock_update, stock_error = enforce_stock_integrity(lot_node, update)
 
-    update = {**update_data, **quantity}
+    if stock_update is not None:
+        update.update(stock_update)
 
     try:
         # apply the update to the lot and check if the given entity can actually apply it
         lot_node.update(update, entity_id)
+        lot_node.data.update_ghg()
     except Exception as e:
         return ErrorResponse(400, UpdateLotError.FIELD_UPDATE_FORBIDDEN, {"message": str(e)})
 
     with transaction.atomic():
         lot_node.data.save()
+
         bulk_sanity_checks([updated_lot], prefetched_data)
         background_bulk_scoring([updated_lot], prefetched_data)
+
+        if stock_error is not None:
+            stock_error.save()
 
         if len(lot_node.diff) > 0:
             CarbureLotEvent.objects.create(
@@ -74,33 +85,36 @@ def update_lot(request, *args, **kwargs):
                 metadata=diff_to_metadata(lot_node.diff),
             )
 
-        if is_over_stock_limit:
-            GenericError.objects.create(
-                lot=lot_node.data,
-                field="quantity",
-                error=CarbureStockErrors.NOT_ENOUGH_VOLUME_LEFT,
-                display_to_creator=True,
-            )
-
     return SuccessResponse()
 
 
-def get_lot_quantity(lot, quantity_update):
-    quantity = {}
-    is_over_stock_limit = False
+# before applying an update, check that if the lot comes from a stock
+# the stock has enough volume left to allow the update
+def enforce_stock_integrity(lot_node: LotNode, update: dict):
+    ancestor_stock_node = lot_node.get_closest(LotNode.STOCK)
 
-    if len(quantity_update) > 0:
-        quantity = compute_lot_quantity(lot, quantity_update)
+    if ancestor_stock_node is None:
+        return None, None
 
-        # check that the new quantity can be extracted from a parent stock if any
-        ancestor_stock = LotNode(lot).get_closest(LotNode.STOCK)
+    ancestor_stock = ancestor_stock_node.data
+    volume_before_update = lot_node.data.volume
+    volume_change = round(update["volume"] - volume_before_update, 2)
 
-        if ancestor_stock:
-            volume_before_update = lot.volume
-            volume_change = round(quantity["volume"] - volume_before_update, 2)
+    # if the volume is above the allowed limit, reset it and create an error to explain why
+    if volume_change > 0 and ancestor_stock.remaining_volume < volume_change:
+        reset_quantity = compute_lot_quantity(lot_node.data, {"volume": volume_before_update})
+        error = GenericError(
+            lot=lot_node.data,
+            field="quantity",
+            error=CarbureStockErrors.NOT_ENOUGH_VOLUME_LEFT,
+            display_to_creator=True,
+        )
+        return reset_quantity, error
 
-            if volume_change > 0 and ancestor_stock.data.remaining_volume < volume_change:
-                is_over_stock_limit = True
-                quantity = compute_lot_quantity(lot, {"volume": volume_before_update})
+    # otherwise, update the parent stock volume to match the new reality
+    ancestor_stock.remaining_volume = round(ancestor_stock.remaining_volume - volume_change, 2)
+    ancestor_stock.remaining_weight = ancestor_stock.get_weight()
+    ancestor_stock.remaining_lhv_amount = ancestor_stock.get_lhv_amount()
+    ancestor_stock.save()
 
-    return quantity, is_over_stock_limit
+    return None, None
