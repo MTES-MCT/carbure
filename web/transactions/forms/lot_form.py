@@ -75,6 +75,10 @@ class LotForm(forms.Form):
         quantity_data = {}
 
         for field in form_data:
+            # ignore fields that were not send as part of the request
+            if field not in self.data:
+                continue
+            # if the option is enabled, skip empty fields
             if ignore_empty and form_data[field] in ("", None):
                 continue
 
@@ -83,7 +87,7 @@ class LotForm(forms.Form):
             if field in ("quantity", "unit", "volume", "weight", "lhv_amount"):
                 quantity_data[field] = form_data[field]
             elif field in FORM_TO_LOT_FIELD:
-                lot_data[lot_field] = form_data[field].id if form_data[field] else None
+                lot_data[lot_field] = form_data[field]
             else:
                 lot_data[field] = form_data[field]
 
@@ -92,14 +96,14 @@ class LotForm(forms.Form):
 
 # map form fields to CarbureLot model fields
 FORM_TO_LOT_FIELD = {
-    "biofuel_code": "biofuel_id",
-    "feedstock_code": "feedstock_id",
-    "country_code": "country_of_origin_id",
-    "carbure_producer_id": "carbure_producer_id",
-    "carbure_production_site": "carbure_production_site_id",
-    "production_country_code": "production_country_id",
-    "carbure_supplier_id": "carbure_supplier_id",
-    "carbure_client_id": "carbure_client_id",
-    "carbure_delivery_site_depot_id": "carbure_delivery_site_id",
-    "delivery_site_country_code": "delivery_site_country_id",
+    "biofuel_code": "biofuel",
+    "feedstock_code": "feedstock",
+    "country_code": "country_of_origin",
+    "carbure_producer_id": "carbure_producer",
+    "carbure_production_site": "carbure_production_site",
+    "production_country_code": "production_country",
+    "carbure_supplier_id": "carbure_supplier",
+    "carbure_client_id": "carbure_client",
+    "carbure_delivery_site_depot_id": "carbure_delivery_site",
+    "delivery_site_country_code": "delivery_site_country",
 }
