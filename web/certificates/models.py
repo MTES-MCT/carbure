@@ -50,7 +50,10 @@ def dc_registration_post_update_production_site(sender, instance, created, updat
     production_site_id = instance.production_site_id
     try:
         production_site = ProductionSite.objects.get(pk=production_site_id)
+
         production_site.dc_reference = instance.certificate_id
+        production_site.eligible_dc = True
+
         production_site.save()
     except:
         print("Production Site not found")
