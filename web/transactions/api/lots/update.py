@@ -71,15 +71,15 @@ def update_lot(request, *args, **kwargs):
     with transaction.atomic():
         lot_node.data.save()
 
-        bulk_sanity_checks([updated_lot], prefetched_data)
-        background_bulk_scoring([updated_lot], prefetched_data)
+        bulk_sanity_checks([lot_node.data], prefetched_data)
+        background_bulk_scoring([lot_node.data], prefetched_data)
 
         if stock_error is not None:
             stock_error.save()
 
         if len(lot_node.diff) > 0:
             CarbureLotEvent.objects.create(
-                event_type=CarbureLotEvent.UPDATED_BY_ADMIN,
+                event_type=CarbureLotEvent.UPDATED,
                 lot=lot_node.data,
                 user=request.user,
                 metadata=diff_to_metadata(lot_node.diff),
