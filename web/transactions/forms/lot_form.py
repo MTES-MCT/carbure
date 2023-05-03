@@ -43,7 +43,12 @@ class LotForm(forms.Form):
 
     carbure_producer_id = forms.ModelChoiceField(queryset=PRODUCERS, required=False)
     unknown_producer = forms.CharField(required=False)
-    carbure_production_site = forms.ModelChoiceField(queryset=PRODUCTION_SITES, to_field_name="name", required=False)
+
+    # multiple choice field to handle duplicate production sites
+    carbure_production_site = forms.ModelMultipleChoiceField(
+        queryset=PRODUCTION_SITES, to_field_name="name", required=False
+    )
+
     unknown_production_site = forms.CharField(required=False)
     production_site_certificate = forms.CharField(required=False)
     production_site_certificate_type = forms.CharField(required=False)
@@ -86,6 +91,10 @@ class LotForm(forms.Form):
 
             if field in ("quantity", "unit", "volume", "weight", "lhv_amount"):
                 quantity_data[field] = form_data[field]
+            elif field == "carbure_production_site":
+                producer = form_data["carbure_producer_id"]
+                if producer:
+                    lot_data["carbure_production_site"] = form_data[field].filter(producer=producer).first()
             elif field in FORM_TO_LOT_FIELD:
                 lot_data[lot_field] = form_data[field]
             else:
@@ -100,7 +109,6 @@ FORM_TO_LOT_FIELD = {
     "feedstock_code": "feedstock",
     "country_code": "country_of_origin",
     "carbure_producer_id": "carbure_producer",
-    "carbure_production_site": "carbure_production_site",
     "production_country_code": "production_country",
     "carbure_supplier_id": "carbure_supplier",
     "carbure_client_id": "carbure_client",
