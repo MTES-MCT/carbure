@@ -77,7 +77,9 @@ export function findDepots(query?: string, public_only?: boolean) {
 
 export function findCertificates(query: string) {
   return api
-    .get<Api<Certificate[]>>("/v5/resources/certificates", { params: { query } })
+    .get<Api<Certificate[]>>("/v5/resources/certificates", {
+      params: { query },
+    })
     .then(extract)
     .then((certificates) => certificates.map((c) => c.certificate_id))
 }
@@ -90,7 +92,7 @@ export function findMyCertificates(
   }
 ) {
   return api
-    .get<Api<EntityCertificate[]>>("/get-my-certificates", {
+    .get<Api<EntityCertificate[]>>("/v5/entity/certificates", {
       params: { query, ...options },
     })
     .then(extract)
