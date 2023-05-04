@@ -1,4 +1,4 @@
-from .node import Node
+from .node import Node, diff_to_metadata
 from .lot import LotNode
 from .stock import StockNode
 from .stock_transform import StockTransformNode

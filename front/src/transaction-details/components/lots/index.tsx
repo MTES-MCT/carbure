@@ -98,22 +98,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
 
     if (!lotData) return
 
-    const inCorrection =
-      lotData.lot.correction_status === CorrectionStatus.InCorrection
-
-    const inCorrectionOrDraft =
-      inCorrection || lotData.lot.lot_status === LotStatus.Draft
-
-    if (inCorrection && !!lotData.parent_lot) {
-      form.setDisabledFieldsGroup(["batch", "production", "emissions"])
-    }
-
-    if (lotData.parent_stock && inCorrectionOrDraft) {
-      form.setDisabledFieldsGroup(
-        ["production", "emissions"],
-        ["biofuel", "feedstock", "country_of_origin"]
-      )
-    }
+    form.setDisabledFields(lotData.disabled_fields)
   }
 
   return (

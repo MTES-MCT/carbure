@@ -1,3 +1,6 @@
+import datetime
+
+
 class TraceabilityError:
     NODE_HAS_DIFFERENCES_WITH_PARENT = "NODE_HAS_DIFFERENCES_WITH_PARENT"
     NOT_ENOUGH_STOCK_FOR_CHILDREN = "NOT_ENOUGH_STOCK_FOR_CHILDREN"
@@ -136,10 +139,10 @@ class Node:
     def get_closest(self, node_type, owner=None) -> "Node":
         if owner is not None and self.owner != owner:
             return None
-        if self.type == node_type:
-            return self
         if self.parent is None:
             return None
+        if self.parent.type == node_type:
+            return self.parent
 
         return self.parent.get_closest(node_type, owner)
 
@@ -185,6 +188,9 @@ class Node:
     def update(self, data, entity_id=None) -> dict:
         diff = {}
 
+        derived = self.derive_fields(data)
+        data.update(derived)
+
         # generate a diff dict
         for attr, new_value in data.items():
             old_value = getattr(self.data, attr)
@@ -195,7 +201,8 @@ class Node:
         if entity_id is not None:
             allowed_diff = self.get_allowed_diff(diff, entity_id)
             if len(allowed_diff) != len(diff):
-                raise Exception("Forbidden to update some of the node's attributes")
+                forbidden_fields = list(set(diff) - set(allowed_diff))
+                raise Exception(f"Forbidden to update the following attributes: {', '.join(forbidden_fields)}")
 
         # apply the diff if everything went fine
         return self.apply_diff(diff)
@@ -305,7 +312,7 @@ class Node:
             new_value = getattr(source.data, source_attr)
             old_value = getattr(self.data, self_attr)
 
-            if new_value and new_value != old_value:
+            if new_value != old_value:
                 diff[self_attr] = (new_value, old_value)
 
         return diff
@@ -327,7 +334,26 @@ class Node:
 
     # apply the given diff to this node's data
     def apply_diff(self, diff: dict[str, tuple]):
-        for attr, (new_value, old_value) in diff.items():
-            setattr(self.data, attr, new_value)
-            self.diff[attr] = (new_value, old_value)
+        for field, (new_value, old_value) in diff.items():
+            setattr(self.data, field, new_value)
+            self.diff[field] = (new_value, old_value)
         return self.diff
+
+    def derive_fields(self, update):
+        return {}
+
+
+# transform the node diff into an dict that can be stored as the metadata of an update CarbureLotEvent
+def diff_to_metadata(diff: dict):
+    metadata = {"added": [], "removed": [], "changed": []}
+    for field, (new_value, old_value) in diff.items():
+        if isinstance(new_value, datetime.date):
+            new_value = new_value.strftime("%Y-%m-%d")
+        if isinstance(old_value, datetime.date):
+            old_value = old_value.strftime("%Y-%m-%d")
+        if hasattr(new_value, "name"):
+            new_value = new_value.name
+        if hasattr(old_value, "name"):
+            old_value = old_value.name
+        metadata["changed"].append([field, old_value, new_value])
+    return metadata
