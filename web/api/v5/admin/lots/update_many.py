@@ -4,15 +4,23 @@ from core.decorators import check_admin_rights
 from core.common import SuccessResponse, ErrorResponse
 from core.serializers import GenericErrorSerializer
 from core.models import CarbureLotEvent, CarbureLotComment, GenericError, CarbureNotification
-from core.traceability import LotNode, get_traceability_nodes, bulk_update_traceability_nodes, diff_to_metadata
 from api.v4.lots import compute_lot_quantity
 from api.v4.sanity_checks import bulk_sanity_checks, get_prefetched_data
 from carbure.tasks import background_bulk_scoring
 from transactions.forms import LotForm
 
+from core.traceability import (
+    LotNode,
+    get_traceability_nodes,
+    bulk_update_traceability_nodes,
+    diff_to_metadata,
+    serialize_integrity_errors,
+)
+
 
 class UpdateManyError:
     MALFORMED_PARAMS = "MALFORMED_PARAMS"
+    INTEGRITY_CHECKS_FAILED = "INTEGRITY_CHECKS_FAILED"
     SANITY_CHECKS_FAILED = "SANITY_CHECKS_FAILED"
     UPDATE_FAILED = "UPDATE_FAILED"
 
@@ -48,6 +56,9 @@ def update_many(request):
     # prepare a list to hold all the nodes modified by this update
     updated_nodes = []
 
+    # list integrity errors per selected lot
+    integrity_errors = {}
+
     for node in nodes:
         # compute the update content based on the current lot
         update = {**update_data}
@@ -55,16 +66,21 @@ def update_many(request):
             quantity = compute_lot_quantity(node.data, quantity_data)
             update = {**update, **quantity}
 
-        print("-------------------")
-        print(update)
-        print("-------------------")
-
         # apply the update to the lot
         node.update(update)
+
+        # check if the new values of the node can be applied in the current state
+        node_errors = node.check_integrity(ignore_diff=True)
+        if len(node_errors) > 0:
+            integrity_errors[node.data.id] = node_errors
 
         # if the node changed, recursively apply the update to related nodes
         if len(node.diff) > 0:
             updated_nodes += node.propagate(changed_only=True)
+
+    if len(integrity_errors) > 0:
+        errors = {lot_id: serialize_integrity_errors(errors) for lot_id, errors in integrity_errors.items()}
+        return ErrorResponse(400, UpdateManyError.INTEGRITY_CHECKS_FAILED, {"errors": errors})
 
     # prepare lot events and comments
     updated_lots = []

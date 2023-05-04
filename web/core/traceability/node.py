@@ -1,4 +1,8 @@
 import datetime
+import json
+
+from core.models import GenericError
+from core.serializers import GenericErrorSerializer
 
 
 class TraceabilityError:
@@ -225,7 +229,7 @@ class Node:
 
     # check if the data of this node is correctly propagated to all its descendants
     # and returns a list of errors were problems were found
-    def check_integrity(self) -> list[tuple["Node", str, object]]:
+    def check_integrity(self, ignore_diff=False) -> list[tuple["Node", str, object]]:
         # check all fields when diffing
         self.changed_only = False
 
@@ -233,11 +237,11 @@ class Node:
 
         if self.parent:
             diff = self.diff_with_parent()
-            if len(diff) > 0:
+            if not ignore_diff and len(diff) > 0:
                 errors = [(self, TraceabilityError.NODE_HAS_DIFFERENCES_WITH_PARENT, diff)] + errors
 
         for child in self.children:
-            errors += child.check_integrity()
+            errors += child.check_integrity(ignore_diff)
 
         return errors
 
@@ -357,3 +361,20 @@ def diff_to_metadata(diff: dict):
             old_value = old_value.name
         metadata["changed"].append([field, old_value, new_value])
     return metadata
+
+
+def serialize_integrity_errors(integrity_errors):
+    errors = []
+
+    for node, error_type, error_data in integrity_errors:
+        lot_node = node.data if node.type == Node.LOT else node.get_closest(Node.LOT)
+        if lot_node:
+            error = GenericError(
+                error=error_type,
+                lot=lot_node.data,
+                is_blocking=True,
+                extra=json.dumps(error_data),
+            )
+            errors.append(error)
+
+    return GenericErrorSerializer(errors, many=True).data
