@@ -5,15 +5,15 @@ class TicketNode(Node):
     type = Node.TICKET
 
     FROM_PARENT_TICKET_SOURCE = {
-        "added_by_id": "supplier_id",
-        "feedstock_id": True,
-        "biofuel_id": True,
-        "country_of_origin_id": True,
-        "carbure_producer_id": True,
+        "added_by": "supplier",
+        "feedstock": True,
+        "biofuel": True,
+        "country_of_origin": True,
+        "carbure_producer": True,
         "unknown_producer": True,
-        "carbure_production_site_id": True,
+        "carbure_production_site": True,
         "unknown_production_site": True,
-        "production_country_id": True,
+        "production_country": True,
         "production_site_commissioning_date": True,
         "ghg_total": True,
         "ghg_reference": True,

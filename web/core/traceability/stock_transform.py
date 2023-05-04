@@ -5,11 +5,11 @@ class StockTransformNode(Node):
     type = Node.STOCK_TRANSFORM
 
     FROM_PARENT_STOCK = {
-        "carbure_client_id": "entity_id",
+        "carbure_client": "entity",
     }
 
     FROM_CHILD_STOCK = {
-        "carbure_supplier_id": "entity_id",
+        "carbure_supplier": "entity",
     }
 
     def get_data(self):

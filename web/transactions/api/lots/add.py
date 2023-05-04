@@ -36,6 +36,5 @@ def add_lot(request, *args, **kwargs):
     e.metadata = {"source": "MANUAL"}
     e.save()
 
-    print(e.lot.year)
     data = CarbureLotPublicSerializer(e.lot).data
     return JsonResponse({"status": "success", "data": data})

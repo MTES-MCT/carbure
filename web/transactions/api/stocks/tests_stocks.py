@@ -38,7 +38,11 @@ class StocksFlowTest(TestCase):
     def test_get_stocks(self):
         parent_lot = CarbureLotFactory.create(
             lot_status="ACCEPTED",
+            carbure_producer=self.producer,
+            carbure_supplier=self.producer,
+            added_by=self.producer,
         )
+
         CarbureStockFactory.create(
             parent_lot=parent_lot,
             carbure_client=self.producer,
@@ -103,7 +107,6 @@ class StocksFlowTest(TestCase):
         self.assertEqual(parent_lot.lot_status, CarbureLot.ACCEPTED)
         self.assertEqual(parent_lot.delivery_type, CarbureLot.STOCK)
         stock = CarbureStockFactory.create(parent_lot=parent_lot, carbure_client=self.producer, remaining_volume=50000)
-        stock.save()  # HACK to avoid `generate_carbure_id` later
 
         today = datetime.date.today().strftime("%d/%m/%Y")
 
@@ -195,13 +198,13 @@ class StocksFlowTest(TestCase):
         data = {
             "lot_id": lot.id,
             "volume": 9000,
-            "entity_id": lot.carbure_producer.id,
+            "entity_id": self.producer.id,
             "delivery_date": today,
             "delivery_site_country_id": "DE",
             "transport_document_reference": "FR-UPDATED-DAE",
             "unknown_client": "FOREIGN CLIENT",
         }
-        response = self.client.post(reverse("api-v4-update-lot"), data)
+        response = self.client.post(reverse("api-v5-transactions-lots-update"), data)
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)
         self.assertEqual(lot.volume, 9000)  # volume updated
@@ -211,7 +214,7 @@ class StocksFlowTest(TestCase):
 
         # 8 update a draft with more than volume left, ensure lot and stock are not updated
         data["volume"] = 11000
-        response = self.client.post(reverse("api-v4-update-lot"), data)
+        response = self.client.post(reverse("api-v5-transactions-lots-update"), data)
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)
         self.assertEqual(lot.volume, 9000)  # volume NOT updated

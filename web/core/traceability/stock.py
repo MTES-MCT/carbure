@@ -4,6 +4,7 @@ from .node import Node, TraceabilityError
 ETHANOL = -1
 ETBE = -1
 
+
 def get_stock_transform_biofuels(stock_transform):
     if stock_transform.transformation_type == "ETH_ETBE":
         global ETHANOL, ETBE
@@ -18,45 +19,47 @@ class StockNode(Node):
     type = Node.STOCK
 
     FROM_LOT = {
-        "biofuel_id": True,
-        "feedstock_id": True,
-        "carbure_production_site_id": True,
+        "biofuel": True,
+        "feedstock": True,
+        "country_of_origin": True,
+        "carbure_production_site": True,
         "unknown_production_site": True,
-        "production_country_id": True,
+        "production_country": True,
         "ghg_reduction": True,
         "ghg_reduction_red_ii": True,
     }
 
     FROM_PARENT_LOT = {
-        "carbure_delivery_site_id": "depot_id",
-        "carbure_supplier_id": True,
+        "carbure_delivery_site": "depot",
+        "carbure_supplier": True,
         "unknown_supplier": True,
-        "carbure_client_id": True,
+        "carbure_client": True,
         **FROM_LOT,
     }
 
     FROM_CHILD_LOT = {
-        "carbure_supplier_id": "carbure_client_id",
+        "carbure_supplier": "carbure_client",
         **FROM_LOT,
     }
 
     FROM_STOCK = {
-        "feedstock_id": True,
-        "depot_id": True,
-        "carbure_client_id": True,
-        "carbure_production_site_id": True,
+        "feedstock": True,
+        "country_of_origin": True,
+        "depot": True,
+        "carbure_client": True,
+        "carbure_production_site": True,
         "unknown_production_site": True,
-        "production_country_id": True,
+        "production_country": True,
         "ghg_reduction": True,
         "ghg_reduction_red_ii": True,
     }
 
     FROM_PARENT_STOCK_TRANSFORM = {
-        "entity_id": "carbure_supplier_id",
+        "entity": "carbure_supplier",
     }
 
     FROM_CHILD_STOCK_TRANSFORM = {
-        "entity_id": "carbure_client_id",
+        "entity": "carbure_client",
     }
 
     def get_data(self):

@@ -23,12 +23,15 @@ export const okLotDetails = rest.get("/api/lots/details", (req, res, ctx) => {
   )
 })
 
-export const okUpdateLot = rest.post("/api/lots/update", (req, res, ctx) => {
-  const details = Data.get("lot-details")
-  details.lot.transport_document_reference = "DAETEST UPDATED"
-  Data.set("lot-details", details)
-  return res(ctx.json({ status: "success" }))
-})
+export const okUpdateLot = rest.post(
+  "/api/v5/transactions/lots/update",
+  (req, res, ctx) => {
+    const details = Data.get("lot-details")
+    details.lot.transport_document_reference = "DAETEST UPDATED"
+    Data.set("lot-details", details)
+    return res(ctx.json({ status: "success" }))
+  }
+)
 
 export const okSendLot = rest.post("/api/lots/send", (req, res, ctx) => {
   Data.set("lot-details", (details: LotDetails) => {
@@ -42,7 +45,7 @@ export const okDeleteLot = rest.post("/api/lots/delete", (req, res, ctx) => {
 })
 
 export const okRequestFix = rest.post(
-  "/api/lots/request-fix",
+  "/api/v5/transactions/lots/request-fix",
   (req, res, ctx) => {
     Data.set("lot-details", (details: LotDetails) => {
       details.lot.correction_status = CorrectionStatus.InCorrection
@@ -52,7 +55,7 @@ export const okRequestFix = rest.post(
 )
 
 export const okMarkAsFixed = rest.post(
-  "/api/lots/mark-as-fixed",
+  "/api/v5/transactions/lots/submit-fix",
   (req, res, ctx) => {
     Data.set("lot-details", (details: LotDetails) => {
       details.lot.correction_status = CorrectionStatus.Fixed

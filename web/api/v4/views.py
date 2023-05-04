@@ -55,6 +55,7 @@ from core.serializers import (
 from core.xlsx_v3 import template_v4, template_v4_stocks
 from carbure.tasks import background_bulk_scoring, background_bulk_sanity_checks
 from core.carburetypes import CarbureError
+from core.traceability import LotNode
 
 
 @check_user_rights()
@@ -175,24 +176,99 @@ def get_lot_details(request, *args, **kwargs):
     data = {}
     data["lot"] = CarbureLotPublicSerializer(lot).data
     entity = Entity.objects.get(id=entity_id)
-    if entity.entity_type == Entity.ADMIN or (
-        lot.added_by == entity or (lot.parent_lot and lot.parent_lot.carbure_client == entity)
-    ):
-        data["parent_lot"] = CarbureLotPublicSerializer(lot.parent_lot).data if lot.parent_lot else None
-        data["parent_stock"] = CarbureStockPublicSerializer(lot.parent_stock).data if lot.parent_stock else None
-    else:
-        data["parent_lot"] = None
-        data["parent_stock"] = None
-    children = CarbureLot.objects.filter(parent_lot=lot).exclude(lot_status=CarbureLot.DELETED)
-    data["children_lot"] = CarbureLotPublicSerializer(children, many=True).data
-    data["children_stock"] = CarbureStockPublicSerializer(CarbureStock.objects.filter(parent_lot=lot), many=True).data
+    parents = get_lot_parents(lot, entity)
+    children = get_lot_children(lot, entity)
+    data.update(parents)
+    data.update(children)
     data["distance"] = get_transaction_distance(lot)
     data["errors"] = get_lot_errors(lot, entity)
     data["certificates"] = get_known_certificates(lot)
     data["updates"] = get_lot_updates(lot, entity)
     data["comments"] = get_lot_comments(lot, entity)
     data["score"] = CarbureLotReliabilityScoreSerializer(lot.carburelotreliabilityscore_set.all(), many=True).data
+    data["disabled_fields"] = LotNode(lot).get_disabled_fields(entity_id)
     return JsonResponse({"status": "success", "data": data})
+
+
+def get_lot_parents(lot, entity):
+    parents = {"parent_lot": None, "parent_stock": None}
+    if lot.parent_lot and (
+        lot.parent_lot.added_by == entity
+        or lot.parent_lot.carbure_supplier == entity
+        or lot.parent_lot.carbure_client == entity
+    ):
+        parents["parent_lot"] = CarbureLotPublicSerializer(lot.parent_lot).data
+    if lot.parent_stock and (lot.parent_stock.carbure_client == entity):
+        parents["parent_stock"] = CarbureStockPublicSerializer(lot.parent_stock).data
+    return parents
+
+
+def get_lot_children(lot, entity):
+    children = {"children_lot": [], "children_stock": []}
+
+    can_access_lot = Q(added_by=entity) | Q(carbure_supplier=entity) | Q(carbure_client=entity)
+    children_lot = (
+        CarbureLot.objects.filter(parent_lot=lot)
+        .exclude(lot_status=CarbureLot.DELETED)
+        .filter(can_access_lot)
+        .select_related(
+            "carbure_producer",
+            "carbure_supplier",
+            "carbure_client",
+            "added_by",
+            "carbure_vendor",
+            "carbure_production_site",
+            "carbure_production_site__producer",
+            "carbure_production_site__country",
+            "production_country",
+            "carbure_dispatch_site",
+            "carbure_dispatch_site__country",
+            "dispatch_site_country",
+            "carbure_delivery_site",
+            "carbure_delivery_site__country",
+            "delivery_site_country",
+            "feedstock",
+            "biofuel",
+            "country_of_origin",
+            "parent_lot",
+            "parent_stock",
+            "parent_stock__carbure_client",
+            "parent_stock__carbure_supplier",
+            "parent_stock__feedstock",
+            "parent_stock__biofuel",
+            "parent_stock__depot",
+            "parent_stock__country_of_origin",
+            "parent_stock__production_country",
+        )
+    )
+
+    if children_lot.count() > 0:
+        children["children_lot"] = CarbureLotPublicSerializer(children_lot, many=True).data
+
+    can_access_stock = Q(carbure_client=entity)
+    children_stock = (
+        CarbureStock.objects.filter(parent_lot=lot)
+        .filter(can_access_stock)
+        .select_related(
+            "parent_lot",
+            "parent_transformation",
+            "biofuel",
+            "feedstock",
+            "country_of_origin",
+            "depot",
+            "depot__country",
+            "carbure_production_site",
+            "carbure_production_site__country",
+            "production_country",
+            "carbure_client",
+            "carbure_supplier",
+        )
+    )
+
+    if children_stock.count() > 0:
+        children["children_stock"] = CarbureStockPublicSerializer(children_stock, many=True).data
+
+    return children
 
 
 @check_user_rights()
@@ -296,93 +372,6 @@ def add_excel(request, *args, **kwargs):
                 event.metadata = {"message": "Envoi lot.", "volume_to_deduct": lot.volume}
                 event.save()
     return JsonResponse({"status": "success", "data": {"lots": nb_total, "valid": nb_valid, "invalid": nb_invalid}})
-
-
-@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
-def update_lot(request, *args, **kwargs):
-    context = kwargs["context"]
-    entity_id = context["entity_id"]
-    lot_id = request.POST.get("lot_id", None)
-    if not lot_id:
-        return JsonResponse({"status": "error", "message": "Missing lot_id"}, status=400)
-    entity = Entity.objects.get(pk=entity_id)
-
-    try:
-        existing_lot = CarbureLot.objects.get(id=lot_id, added_by=entity)
-    except:
-        return JsonResponse({"status": "error", "message": "Could not find lot"}, status=400)
-
-    previous = CarbureLotPublicSerializer(existing_lot).data
-    # prefetch some data
-    d = get_prefetched_data(entity)
-    updated_lot, errors = construct_carbure_lot(d, entity, request.POST.dict(), existing_lot)
-    if not updated_lot:
-        return JsonResponse({"status": "error", "message": "Something went wrong"}, status=400)
-    # run sanity checks, insert lot and errors
-
-    updated_lot.save()
-    for e in errors:
-        e.lot = updated_lot
-    GenericError.objects.bulk_create(errors, batch_size=100)
-    bulk_sanity_checks([updated_lot], d)
-    background_bulk_scoring([updated_lot], d)
-    data = CarbureLotPublicSerializer(updated_lot).data
-    diff = dictdiffer.diff(previous, data)
-    added = []
-    removed = []
-    changed = []
-    foreign_key_to_field_mapping = {
-        "carbure_production_site": "name",
-        "carbure_delivery_site": "depot_id",
-        "carbure_client": "name",
-        "delivery_site_country": "code_pays",
-        "country_of_origin": "code_pays",
-        "biofuel": "code",
-        "feedstock": "code",
-    }
-    fields_to_ignore = ["lhv_amount", "weight"]
-    for d in diff:
-        action, field, data = d
-        if field in fields_to_ignore:
-            continue
-        if action == "change":
-            if "." in field:
-                s = field.split(".")
-                mainfield = s[0]
-                subfield = s[1]
-                if mainfield in foreign_key_to_field_mapping:
-                    subfield_to_record = foreign_key_to_field_mapping[mainfield]
-                    if subfield != subfield_to_record:
-                        continue
-                field = mainfield
-            changed.append((field, data[0], data[1]))
-        if action == "add":
-            if isinstance(data, tuple):
-                added.append((field, data))
-            if isinstance(data, list):
-                if field in foreign_key_to_field_mapping:
-                    subfield_to_record = foreign_key_to_field_mapping[field]
-                    for subfield, value in data:
-                        if subfield != subfield_to_record:
-                            continue
-                        added.append((field, value))
-        if action == "remove":
-            if isinstance(data, tuple):
-                removed.append((field, data))
-            if isinstance(data, list):
-                if field in foreign_key_to_field_mapping:
-                    subfield_to_record = foreign_key_to_field_mapping[field]
-                    for subfield, value in data:
-                        if subfield != subfield_to_record:
-                            continue
-                        removed.append((field, value))
-    e = CarbureLotEvent()
-    e.event_type = CarbureLotEvent.UPDATED
-    e.lot = updated_lot
-    e.user = request.user
-    e.metadata = {"added": added, "removed": removed, "changed": changed}
-    e.save()
-    return JsonResponse({"status": "success", "data": data})
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
@@ -747,152 +736,6 @@ def add_comment(request, *args, **kwargs):
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
-def request_fix(request, *args, **kwargs):
-    context = kwargs["context"]
-    entity_id = context["entity_id"]
-    lot_ids = request.POST.getlist("lot_ids", False)
-    if not lot_ids:
-        return JsonResponse({"status": "error", "message": "Missing lot_ids"}, status=400)
-
-    entity = Entity.objects.get(pk=entity_id)
-    try:
-        lots = CarbureLot.objects.filter(pk__in=lot_ids)
-    except:
-        return JsonResponse({"status": "error", "message": "Could not find lots"}, status=400)
-    for lot in lots.iterator():
-        if check_locked_year(lot.year):
-            return ErrorResponse(400, CarbureError.YEAR_LOCKED)
-
-        if lot.lot_status == CarbureLot.FROZEN:
-            return JsonResponse(
-                {"status": "error", "message": "Lot is already declared, now in read-only mode."}, status=400
-            )
-
-        if lot.carbure_client != entity:
-            return JsonResponse(
-                {"status": "forbidden", "message": "Entity not authorized to change this lot"}, status=403
-            )
-        lot.correction_status = CarbureLot.IN_CORRECTION
-        lot.save()
-        event = CarbureLotEvent()
-        event.event_type = CarbureLotEvent.FIX_REQUESTED
-        event.lot = lot
-        event.user = request.user
-        event.save()
-    notify_correction_request(lots)
-    return JsonResponse({"status": "success"})
-
-
-@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
-def mark_as_fixed(request, *args, **kwargs):
-    context = kwargs["context"]
-    entity_id = context["entity_id"]
-    lot_ids = request.POST.getlist("lot_ids", False)
-    if not lot_ids:
-        return JsonResponse({"status": "error", "message": "Missing lot_ids"}, status=400)
-
-    entity = Entity.objects.get(pk=entity_id)
-    try:
-        lots = CarbureLot.objects.filter(pk__in=lot_ids)
-    except:
-        return JsonResponse({"status": "error", "message": "Could not find lots"}, status=400)
-    for lot in lots.iterator():
-        if lot.added_by != entity and lot.carbure_supplier != entity and lot.carbure_client != entity:
-            return JsonResponse(
-                {"status": "forbidden", "message": "Entity not authorized to change this lot"}, status=403
-            )
-
-        if lot.lot_status == CarbureLot.REJECTED:
-            lot.lot_status = CarbureLot.PENDING
-            lot.correction_status = CarbureLot.NO_PROBLEMO
-        elif lot.added_by == entity and (lot.carbure_client == entity or lot.carbure_client is None):
-            lot.correction_status = CarbureLot.NO_PROBLEMO
-        else:
-            lot.correction_status = CarbureLot.FIXED
-        lot.save()
-        child = CarbureLot.objects.filter(parent_lot=lot)
-        for c in child:
-            c.copy_sustainability_data(lot)
-            # also copy transaction detail
-            c.volume = lot.volume
-            c.weight = lot.weight
-            c.lhv_amount = lot.lhv_amount
-            c.transport_document_type = lot.transport_document_type
-            c.transport_document_reference = lot.transport_document_reference
-            c.delivery_date = lot.delivery_date
-            c.carbure_delivery_site = lot.carbure_delivery_site
-            c.unknown_delivery_site = lot.unknown_delivery_site
-            c.delivery_site_country = lot.delivery_site_country
-            c.carbure_producer = lot.carbure_producer
-            c.unknown_producer = lot.unknown_producer
-            c.carbure_production_site = lot.carbure_production_site
-            c.unknown_production_site = lot.unknown_production_site
-            c.save()
-        event = CarbureLotEvent()
-        event.event_type = CarbureLotEvent.MARKED_AS_FIXED
-        event.lot = lot
-        event.user = request.user
-        event.save()
-    notify_correction_done(lots)
-    return JsonResponse({"status": "success"})
-
-
-@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
-def approve_fix(request, *args, **kwargs):
-    context = kwargs["context"]
-    entity_id = context["entity_id"]
-    lot_ids = request.POST.getlist("lot_ids", False)
-    if not lot_ids:
-        return JsonResponse({"status": "error", "message": "Missing lot_ids"}, status=400)
-
-    entity = Entity.objects.get(pk=entity_id)
-    for lot_id in lot_ids:
-        try:
-            lot = CarbureLot.objects.get(pk=lot_id)
-        except:
-            return JsonResponse({"status": "error", "message": "Could not find lot id %d" % (lot_id)}, status=400)
-
-        if lot.carbure_supplier != entity and lot.carbure_client != entity:
-            return JsonResponse(
-                {"status": "forbidden", "message": "Entity not authorized to change this lot"}, status=403
-            )
-        lot.correction_status = CarbureLot.NO_PROBLEMO
-        lot.save()
-        # CASCADING CORRECTIONS
-        if lot.delivery_type == CarbureLot.STOCK:
-            stocks = CarbureStock.objects.filter(parent_lot=lot)
-            children = CarbureLot.objects.filter(parent_stock__in=stocks)
-            for c in children:
-                c.copy_sustainability_data(lot)
-                c.save()
-                event = CarbureLotEvent()
-                event.event_type = CarbureLotEvent.UPDATED
-                event.lot = lot
-                event.user = request.user
-                event.metadata = {"comment": "Cascading update of sustainability data"}
-                event.save()
-            transformations = CarbureStockTransformation.objects.filter(source_stock__in=stocks)
-            for t in transformations:
-                new_stock = t.dest_stock
-                child = CarbureLot.objects.filter(parent_stock=new_stock)
-                for c in child:
-                    c.copy_sustainability_data(lot)
-                    c.save()
-                    event = CarbureLotEvent()
-                    event.event_type = CarbureLotEvent.UPDATED
-                    event.lot = lot
-                    event.user = request.user
-                    event.metadata = {"comment": "Cascading update of sustainability data"}
-                    event.save()
-        event = CarbureLotEvent()
-        event.event_type = CarbureLotEvent.FIX_ACCEPTED
-        event.lot = lot
-        event.user = request.user
-        event.save()
-    return JsonResponse({"status": "success"})
-
-
-@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def reject_lot(request, *args, **kwargs):
     context = kwargs["context"]
     entity_id = context["entity_id"]
@@ -932,57 +775,6 @@ def reject_lot(request, *args, **kwargs):
         event.user = request.user
         event.save()
     notify_lots_rejected(lots)
-    return JsonResponse({"status": "success"})
-
-
-@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
-def recall_lot(request, *args, **kwargs):
-    context = kwargs["context"]
-    entity_id = context["entity_id"]
-    lot_ids = request.POST.getlist("lot_ids", False)
-    if not lot_ids:
-        return JsonResponse({"status": "error", "message": "Missing lot_ids"}, status=400)
-
-    entity = Entity.objects.get(pk=entity_id)
-    try:
-        lots = CarbureLot.objects.filter(pk__in=lot_ids)
-    except:
-        return JsonResponse({"status": "error", "message": "Could not find lots"}, status=400)
-    for lot in lots.iterator():
-        if check_locked_year(lot.year):
-            return ErrorResponse(400, CarbureError.YEAR_LOCKED)
-
-        if lot.carbure_supplier != entity and lot.added_by != entity:
-            return JsonResponse({"status": "forbidden", "message": "Only the vendor can recall the lot"}, status=403)
-
-        if lot.lot_status == CarbureLot.DRAFT:
-            return JsonResponse({"status": "error", "message": "Cannot recall DRAFT"}, status=400)
-        elif lot.lot_status == CarbureLot.PENDING:
-            # ok no problem
-            pass
-        elif lot.lot_status == CarbureLot.REJECTED:
-            return JsonResponse(
-                {"status": "error", "message": "Lot is already rejected. Recall has no effect"}, status=400
-            )
-        elif lot.lot_status == CarbureLot.ACCEPTED:
-            # ok but will send a notification to the client
-            notify_client = True
-        elif lot.lot_status == CarbureLot.FROZEN:
-            return JsonResponse(
-                {"status": "error", "message": "Lot is Frozen. Cannot recall. Please invalidate declaration first."},
-                status=400,
-            )
-        elif lot.lot_status == CarbureLot.DELETED:
-            return JsonResponse({"status": "error", "message": "Lot is deleted. Cannot recall"}, status=400)
-
-        lot.correction_status = CarbureLot.IN_CORRECTION
-        lot.save()
-        event = CarbureLotEvent()
-        event.event_type = CarbureLotEvent.RECALLED
-        event.lot = lot
-        event.user = request.user
-        event.save()
-    notify_lots_recalled(lots)
     return JsonResponse({"status": "success"})
 
 

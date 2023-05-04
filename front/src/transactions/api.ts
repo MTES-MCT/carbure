@@ -73,7 +73,10 @@ export function validateDeclaration(entity_id: number, period: number) {
 }
 
 export function invalidateDeclaration(entity_id: number, period: number) {
-  return api.post<Api<void>>("/v5/declarations/invalidate", { entity_id, period })
+  return api.post<Api<void>>("/v5/declarations/invalidate", {
+    entity_id,
+    period,
+  })
 }
 
 export function getLotFilters(field: Filter, query: LotQuery) {
@@ -176,11 +179,17 @@ export function rejectLots(query: LotQuery, selection?: number[]) {
 }
 
 export function requestFix(entity_id: number, lot_ids: number[]) {
-  return api.post<Api<void>>("/lots/request-fix", { entity_id, lot_ids })
+  return api.post<Api<void>>("/v5/transactions/lots/request-fix", {
+    entity_id,
+    lot_ids,
+  })
 }
 
 export function markAsFixed(entity_id: number, lot_ids: number[]) {
-  return api.post<Api<void>>("/lots/mark-as-fixed", { entity_id, lot_ids })
+  return api.post<Api<void>>("/v5/transactions/lots/submit-fix", {
+    entity_id,
+    lot_ids,
+  })
 }
 
 export function approveFix(entity_id: number, lot_ids: number[]) {
@@ -188,7 +197,10 @@ export function approveFix(entity_id: number, lot_ids: number[]) {
 }
 
 export function recallLots(entity_id: number, lot_ids: number[]) {
-  return api.post<Api<void>>("/lots/recall", { entity_id, lot_ids })
+  return api.post<Api<void>>("/v5/transactions/lots/request-fix", {
+    entity_id,
+    lot_ids,
+  })
 }
 
 export async function commentLots(
@@ -260,7 +272,10 @@ export function transformETBE(
 }
 
 export function cancelTransformations(entity_id: number, stock_ids: number[]) {
-  return api.post("/v5/transactions/stocks/cancel-transformation", { entity_id, stock_ids })
+  return api.post("/v5/transactions/stocks/cancel-transformation", {
+    entity_id,
+    stock_ids,
+  })
 }
 
 export function flushStocks(
