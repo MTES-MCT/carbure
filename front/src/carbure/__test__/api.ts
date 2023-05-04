@@ -33,7 +33,7 @@ export const okStats = rest.get("/api/v5/stats", (req, res, ctx) => {
 })
 
 export const okNotifications = rest.get(
-  "/api/v5/notifications",
+  "/api/v5/entity/notifications",
   (req, res, ctx) => {
     return res(
       ctx.json({
