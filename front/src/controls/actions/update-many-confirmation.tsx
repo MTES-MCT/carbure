@@ -75,17 +75,20 @@ const UpdateManyConfirmationDialog = ({
 
   const entities_to_notify: string = getLotsEntitiesToNotify(lots)
 
-  const showErrors = () => {
+  const showErrors = (err = errors) => {
     portal((close) => (
-      <UpdateErrorsDialog onClose={close} errors={errors} method="update" />
+      <UpdateErrorsDialog onClose={close} errors={err} method="update" />
     ))
   }
 
-  const submit = () => {
-    return updateLots.execute(entity.id, lots_ids, updatedValues, comment!)
-
-    //TOTEST uncomment below
-    // showErrors(lotsUpdateErrorsResponse.errors!)
+  const submit = async () => {
+    try {
+      await updateLots.execute(entity.id, lots_ids, updatedValues, comment!)
+    } catch (e) {
+      const error = e as AxiosError<any> | undefined
+      const errors = error?.response?.data?.data?.errors
+      showErrors(errors)
+    }
   }
 
   const requestedUpdatesCount =

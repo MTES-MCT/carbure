@@ -6,7 +6,7 @@ from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
 from core.carburetypes import CarbureStockErrors
 from core.models import UserRights, CarbureLotEvent, Entity, GenericError
-from core.traceability import LotNode, get_traceability_nodes, diff_to_metadata
+from core.traceability import LotNode, get_traceability_nodes, diff_to_metadata, serialize_integrity_errors
 from api.v4.lots import compute_lot_quantity
 from api.v4.sanity_checks import get_prefetched_data, bulk_sanity_checks
 from transactions.forms import LotForm
@@ -18,7 +18,7 @@ class UpdateLotError:
     LOT_NOT_FOUND = "LOT_NOT_FOUND"
     LOT_UPDATE_FAILED = "LOT_UPDATE_FAILED"
     FIELD_UPDATE_FORBIDDEN = "FIELD_UPDATE_FORBIDDEN"
-    INTEGRITY_ERROR = "INTEGRITY_ERROR"
+    INTEGRITY_CHECKS_FAILED = "INTEGRITY_CHECKS_FAILED"
 
 
 class UpdateLotForm(forms.Form):
@@ -65,6 +65,12 @@ def update_lot(request, *args, **kwargs):
         # apply the update to the lot and check if the given entity can actually apply it
         lot_node.update(update, entity_id)
         lot_node.data.update_ghg()
+
+        integrity_errors = lot_node.check_integrity(ignore_diff=True)
+        if len(integrity_errors) > 0:
+            errors = serialize_integrity_errors(integrity_errors)
+            return ErrorResponse(400, UpdateLotError.INTEGRITY_CHECKS_FAILED, {"errors": errors})
+
     except Exception as e:
         return ErrorResponse(400, UpdateLotError.FIELD_UPDATE_FORBIDDEN, {"message": str(e)})
 
