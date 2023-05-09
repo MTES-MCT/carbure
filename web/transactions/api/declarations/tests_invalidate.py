@@ -64,7 +64,7 @@ class InvalidateDeclarationTest(TestCase):
             "period": 202201,
         }
 
-        response = self.client.post(reverse("api-v5-declaration-invalidate"), query)
+        response = self.client.post(reverse("transactions-declarations-invalidate"), query)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "success")
@@ -93,7 +93,7 @@ class InvalidateDeclarationTest(TestCase):
             "period": 202101,
         }
 
-        response = self.client.post(reverse("api-v5-declaration-invalidate"), query)
+        response = self.client.post(reverse("transactions-declarations-invalidate"), query)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["status"], "error")
         self.assertEqual(response.json()["error"], CarbureError.YEAR_LOCKED)
