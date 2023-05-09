@@ -27,7 +27,7 @@ import { Snapshot, LotList } from "transactions/types"
 Data.set("snapshot", data.emptySnapshot)
 Data.set("lots", data.lots)
 
-export const okSnapshot = rest.get("/api/snapshot", (req, res, ctx) => {
+export const okSnapshot = rest.get("/api/v5/transactions/snapshot", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -45,7 +45,7 @@ export const okLots = rest.get("/api/lots", (req, res, ctx) => {
   )
 })
 
-export const okYears = rest.get("/api/years", (req, res, ctx) => {
+export const okYears = rest.get("/api/v5/transactions/years", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -54,7 +54,7 @@ export const okYears = rest.get("/api/years", (req, res, ctx) => {
   )
 })
 
-export const okDeclarations = rest.get("/api/declarations", (req, res, ctx) => {
+export const okDeclarations = rest.get("/api/v5/transactions/declarations", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",

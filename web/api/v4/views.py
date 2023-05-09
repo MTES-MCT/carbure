@@ -59,72 +59,6 @@ from core.traceability import LotNode
 
 
 @check_user_rights()
-def get_years(request, *args, **kwargs):
-    entity_id = int(kwargs["context"]["entity_id"])
-    data_lots = (
-        CarbureLot.objects.filter(
-            Q(carbure_client_id=entity_id) | Q(carbure_supplier_id=entity_id) | Q(added_by_id=entity_id)
-        )
-        .values_list("year", flat=True)
-        .distinct()
-    )
-    data_transforms = (
-        CarbureStockTransformation.objects.filter(entity_id=entity_id)
-        .values_list("transformation_dt__year", flat=True)
-        .distinct()
-    )
-    data = set(list(data_transforms) + list(data_lots))
-    return JsonResponse({"status": "success", "data": list(data)})
-
-
-@check_user_rights()
-def get_snapshot(request, *args, **kwargs):
-    context = kwargs["context"]
-    entity_id = context["entity_id"]
-    year = request.GET.get("year", False)
-    if year:
-        try:
-            year = int(year)
-        except Exception:
-            return JsonResponse({"status": "error", "message": "Incorrect format for year. Expected YYYY"}, status=400)
-    else:
-        return JsonResponse({"status": "error", "message": "Missing year"}, status=400)
-
-    data = {}
-    lots = CarbureLot.objects.filter(year=year)
-
-    drafts = lots.filter(added_by_id=entity_id, lot_status=CarbureLot.DRAFT)
-    drafts_imported = drafts.exclude(parent_stock__isnull=False)
-    drafts_stocks = drafts.filter(parent_stock__isnull=False)
-
-    lots_in = lots.filter(carbure_client_id=entity_id).exclude(lot_status__in=[CarbureLot.DELETED, CarbureLot.DRAFT])
-    lots_in_pending = lots_in.filter(lot_status=CarbureLot.PENDING)
-    lots_in_tofix = lots_in.exclude(correction_status=CarbureLot.NO_PROBLEMO)
-
-    stock = CarbureStock.objects.filter(carbure_client_id=entity_id)
-    stock_not_empty = stock.filter(remaining_volume__gt=0)
-
-    lots_out = lots.filter(carbure_supplier_id=entity_id).exclude(lot_status__in=[CarbureLot.DELETED, CarbureLot.DRAFT])
-    lots_out_pending = lots_out.filter(lot_status=CarbureLot.PENDING)
-    lots_out_tofix = lots_out.exclude(correction_status=CarbureLot.NO_PROBLEMO)
-
-    data["lots"] = {
-        "draft": drafts.count(),
-        "in_total": lots_in.count(),
-        "in_pending": lots_in_pending.count(),
-        "in_tofix": lots_in_tofix.count(),
-        "stock": stock_not_empty.count(),
-        "stock_total": stock.count(),
-        "out_total": lots_out.count(),
-        "out_pending": lots_out_pending.count(),
-        "out_tofix": lots_out_tofix.count(),
-        "draft_imported": drafts_imported.count(),
-        "draft_stocks": drafts_stocks.count(),
-    }
-    return JsonResponse({"status": "success", "data": data})
-
-
-@check_user_rights()
 def get_lots(request, *args, **kwargs):
     context = kwargs["context"]
     entity_id = context["entity_id"]
@@ -631,65 +565,6 @@ def lots_delete(request, *args, **kwargs):
                 event.save()
 
     return JsonResponse({"status": "success"})
-
-
-@check_user_rights()
-def get_declarations(request, *args, **kwargs):
-    context = kwargs["context"]
-    entity_id = context["entity_id"]
-    year = request.GET.get("year", False)
-    try:
-        year = int(year)
-    except Exception:
-        return JsonResponse({"status": "error", "message": "Missing year"}, status=400)
-
-    periods = [str(year * 100 + i) for i in range(1, 13)]
-    period_dates = [datetime.datetime(year, i, 1) for i in range(1, 13)]
-
-    period_lots = (
-        CarbureLot.objects.filter(period__in=periods)
-        .filter(Q(carbure_client_id=entity_id) | Q(carbure_supplier_id=entity_id))
-        .exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
-        .values("period")
-        .annotate(count=Count("id", distinct=True))
-    )
-    lots_by_period = {}
-    for period_lot in period_lots:
-        lots_by_period[str(period_lot["period"])] = period_lot["count"]
-
-    pending_period_lots = (
-        CarbureLot.objects.filter(period__in=periods)
-        .filter(Q(carbure_client_id=entity_id) | Q(carbure_supplier_id=entity_id))
-        .exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
-        .filter(
-            Q(lot_status__in=[CarbureLot.PENDING, CarbureLot.REJECTED])
-            | Q(correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED])
-        )
-        .values("period")
-        .annotate(count=Count("id", distinct=True))
-    )
-    pending_by_period = {}
-    for period_lot in pending_period_lots:
-        pending_by_period[str(period_lot["period"])] = period_lot["count"]
-
-    declarations = SustainabilityDeclaration.objects.filter(entity_id=entity_id, period__in=period_dates)
-    declarations_by_period = {}
-    for declaration in declarations:
-        period = declaration.period.strftime("%Y%m")
-        declarations_by_period[period] = declaration.natural_key()
-
-    data = []
-    for period in periods:
-        data.append(
-            {
-                "period": int(period),
-                "lots": lots_by_period[period] if period in lots_by_period else 0,
-                "pending": pending_by_period[period] if period in pending_by_period else 0,
-                "declaration": declarations_by_period[period] if period in declarations_by_period else None,
-            }
-        )
-
-    return JsonResponse({"status": "success", "data": data})
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
