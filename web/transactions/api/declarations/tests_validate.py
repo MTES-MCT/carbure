@@ -57,14 +57,14 @@ class ValidateDeclarationTest(TestCase):
         return sent_lots, received_lots
 
     def test_validate_declaration(self):
-        LockedYear.objects.create(year=2021, locked=True) 
+        LockedYear.objects.create(year=2021, locked=True)
 
         query = {
             "entity_id": self.entity.id,
             "period": 202201,
         }
 
-        response = self.client.post(reverse("api-v5-declaration-validate"), query)
+        response = self.client.post(reverse("transactions-declarations-validate"), query)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "success")
@@ -88,14 +88,14 @@ class ValidateDeclarationTest(TestCase):
         self.assertEqual(declared_received_lots.count(), 50)
 
     def test_validate_declaration_on_locked_year(self):
-        LockedYear.objects.create(year=2022, locked=True) 
+        LockedYear.objects.create(year=2022, locked=True)
 
         query = {
             "entity_id": self.entity.id,
             "period": 202201,
         }
 
-        response = self.client.post(reverse("api-v5-declaration-validate"), query)
+        response = self.client.post(reverse("transactions-declarations-validate"), query)
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["status"], "error")
