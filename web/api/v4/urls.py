@@ -3,8 +3,8 @@ from django.urls import path
 
 urlpatterns = [
     # GET
-    path("years", views.get_years, name="api-v4-get-years"),
-    path("snapshot", views.get_snapshot, name="api-v4-get-snapshot"),
+    # path("years", views.get_years, name="api-v4-get-years"),
+    # path("snapshot", views.get_snapshot, name="api-v4-get-snapshot"),
     path("lots", views.get_lots, name="api-v4-get-lots"),
     path("lots/summary", views.get_lots_summary, name="api-v4-get-lots-summary"),
     path("lots/details", views.get_lot_details, name="api-v4-get-lot-details"),
@@ -43,8 +43,6 @@ urlpatterns = [
     ### Warnings
     path("lots/toggle-warning", views.toggle_warning, name="api-v4-toggle-warning"),
     path("lots/recalc-score", views.recalc_score, name="api-v4-recalc-score"),
-    # DECLARATIONS
-    path("declarations", views.get_declarations, name="api-v4-get-declarations"),
     path("download-template", views.get_template, name="api-v4-get-template"),
     path(
         "download-template-stock",

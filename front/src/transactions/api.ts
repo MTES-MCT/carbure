@@ -23,11 +23,11 @@ const QUERY_RESET: Partial<LotQuery> = {
 }
 
 export function getYears(entity_id: number) {
-  return api.get<Api<number[]>>("/years", { params: { entity_id } })
+  return api.get<Api<number[]>>("/v5/transactions/years", { params: { entity_id } })
 }
 
 export function getSnapshot(entity_id: number, year: number) {
-  return api.get<Api<Snapshot>>("/snapshot", {
+  return api.get<Api<Snapshot>>("/v5/transactions/snapshot", {
     params: { entity_id, year },
   })
 }
@@ -63,17 +63,17 @@ export function getLotsSummary(
 }
 
 export function getDeclarations(entity_id: number, year: number) {
-  return api.get<Api<DeclarationSummary[]>>("/declarations", {
+  return api.get<Api<DeclarationSummary[]>>("/v5/transactions/declarations", {
     params: { entity_id, year },
   })
 }
 
 export function validateDeclaration(entity_id: number, period: number) {
-  return api.post<Api<void>>("/v5/declarations/validate", { entity_id, period })
+  return api.post<Api<void>>("/v5/transactions/declarations/validate", { entity_id, period })
 }
 
 export function invalidateDeclaration(entity_id: number, period: number) {
-  return api.post<Api<void>>("/v5/declarations/invalidate", {
+  return api.post<Api<void>>("/v5/transactions/declarations/invalidate", {
     entity_id,
     period,
   })
