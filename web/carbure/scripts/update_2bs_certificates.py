@@ -23,8 +23,14 @@ from core.models import GenericCertificate
 
 
 DESTINATION_FOLDER = "/tmp"
+
 DBS_VALID_URL = "https://www.2bsvs.org/cert_valides.html"
 DBS_INVALID_URL = "https://www.2bsvs.org/cert_retires.html"
+
+DBS_NUMBER_KEY = "Numéro de Certificat 2BS"
+DBS_COMPANY_NAME_KEY = "Nom de l’opérateur économique"
+DBS_ADDRESS_KEY = "Adresse"
+DBS_COUNTRY_KEY = "Pays"
 
 
 def update_2bs_certificates(email: bool = False) -> None:
@@ -43,7 +49,7 @@ def download_certificates(url: str, valid: bool = True) -> None:
     soup = BeautifulSoup(html_content, "lxml")
     table = soup.find_all("table")
     df = pd.read_html(str(table))[0]
-    df = df[~df["Numéro 2BS"].isnull()]  # Pour une raison inconnue, la ligne de coordonnées est dupliquée
+    df = df[~df[DBS_NUMBER_KEY].isnull()]  # Pour une raison inconnue, la ligne de coordonnées est dupliquée
     if valid:
         pd.DataFrame.to_csv(df, "%s/Certificates2BS_%s.csv" % (DESTINATION_FOLDER, str(date.today())), index=False)
     else:
@@ -64,7 +70,7 @@ def save_2bs_certificates(valid: bool = True) -> Tuple[int, list]:
     i = 0
     for row in reader:
         i += 1
-        # valid: Nom,Coordonnées,Pays,Type de certification,Numéro 2BS,Date originale de certification,Date de fin de validité du certificat,Certificat
+        # valid: Nom,Coordonnées,Pays,Type de certification,Numéro de Certificat 2BS,Date originale de certification,Date de fin de validité du certificat,Certificat
         # create certificate
         try:
             vf = row["Date originale de certification"].split("/")
@@ -80,15 +86,15 @@ def save_2bs_certificates(valid: bool = True) -> Tuple[int, list]:
 
         certificates.append(
             {
-                "certificate_id": row["Numéro 2BS"],
+                "certificate_id": row[DBS_NUMBER_KEY],
                 "certificate_type": GenericCertificate.DBS,
-                "certificate_holder": unicodedata.normalize("NFKD", row["Nom"]),
+                "certificate_holder": unicodedata.normalize("NFKD", row[DBS_COMPANY_NAME_KEY]),
                 "certificate_issuer": "",
-                "address": unicodedata.normalize("NFKD", "%s - %s" % (row["Coordonnées"], row["Pays"])),
+                "address": unicodedata.normalize("NFKD", "%s - %s" % (row[DBS_ADDRESS_KEY], row[DBS_COUNTRY_KEY])),
                 "valid_from": valid_from,
                 "valid_until": valid_until,
                 "download_link": "https://www.2bsvs.org/scripts/telecharger_certificat.php?certificat=%s"
-                % (row["Numéro 2BS"]),
+                % (row[DBS_NUMBER_KEY]),
                 "scope": "%s" % (row["Type de certification"]),
                 "input": None,
                 "output": None,
