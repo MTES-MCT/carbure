@@ -24,8 +24,7 @@ django.setup()
 from core.utils import bulk_update_or_create
 from core.models import GenericCertificate
 
-
-ISCC_DATA_URL = "https://www.iscc-system.org/wp-admin/admin-ajax.php?action=get_wdtable&table_id=9"
+ISCC_DATA_URL = "https://www.iscc-system.org/wp-admin/admin-ajax.php?action=get_wdtable&table_id=2"
 ISCC_CERT_PAGE = "https://www.iscc-system.org/certificates/all-certificates/"
 DESTINATION_FOLDER = "/tmp"
 HEADERS = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"}  # fmt: skip
@@ -187,7 +186,7 @@ def send_email_summary(nb: int, new: list, email: bool) -> None:
 def get_wdtNonce() -> str:
     html_content = requests.get(ISCC_CERT_PAGE, headers=HEADERS).text
     soup = BeautifulSoup(html_content, "lxml")
-    wdtNonceTag = soup.find("input", attrs={"name": "wdtNonceFrontendEdit_9"}).attrs
+    wdtNonceTag = soup.find("input", attrs={"name": "wdtNonceFrontendEdit_2"}).attrs
     wdtNonce: str = wdtNonceTag["value"]
     print("wdtNonce:", wdtNonce)
     return wdtNonce
