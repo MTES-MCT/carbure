@@ -12,9 +12,12 @@ class DoubleCountingError:
     MP_BC_INCOHERENT = "MP_BC_INCOHERENT"
     UNKNOWN_FEEDSTOCK = "UNKNOWN_FEEDSTOCK"
     UNKNOWN_BIOFUEL = "UNKNOWN_BIOFUEL"
+    LINE_FEEDSTOCKS_INCOHERENT = "LINE_FEEDSTOCKS_INCOHERENT"
     MISSING_FEEDSTOCK = "MISSING_FEEDSTOCK"
     MISSING_BIOFUEL = "MISSING_BIOFUEL"
     MISSING_ESTIMATED_PRODUCTION = "MISSING_ESTIMATED_PRODUCTION"
+    EXCEL_PARSING_ERROR = "EXCEL_PARSING_ERROR"
+    UNKNOW_YEAR = "UNKNOW_YEAR"
 
 
 class DcError(TypedDict):
@@ -69,8 +72,12 @@ def check_production_row(production: DoubleCountingProduction, data: ProductionR
         if len(incompatibilities) > 0:
             errors.append(error(DoubleCountingError.MP_BC_INCOHERENT, line, meta))
 
+    # check lines in the two table has the same order
+    if data["feedstock"] != data["feedstock_check"]:
+        errors.append(error(DoubleCountingError.LINE_FEEDSTOCKS_INCOHERENT, line))
+
     # check that requested quotas aren't bigger than estimated production
-    if (production.requested_quota or 0) > (production.estimated_production or 0):
+    elif (production.requested_quota or 0) > (production.estimated_production or 0):
         errors.append(error(DoubleCountingError.PRODUCTION_MISMATCH_QUOTA, line))
 
     return errors

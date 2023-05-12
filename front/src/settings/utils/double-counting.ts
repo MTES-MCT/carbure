@@ -74,6 +74,21 @@ export function getErrorText(
         { year: error?.meta?.year }
       )
       break
+    case DoubleCountingUploadErrorType.ProductionMismatchQuota:
+      errorText += t(
+        "Le quota demandé ne peut pas être supérieure à la production prévisionelle renseignée.",
+      )
+      break
+    case DoubleCountingUploadErrorType.LineFeedstocksIncoherent:
+      errorText += t(
+        "Les matières premières renseignées sur la même ligne doivent être identiques.",
+      )
+      break
+    case DoubleCountingUploadErrorType.UnknownYear:
+      errorText += t(
+        "Les années doivent être renseignées",
+      )
+      break
 
     default:
       errorText +=
