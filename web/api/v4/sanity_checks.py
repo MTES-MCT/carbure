@@ -1,10 +1,6 @@
 import datetime
-from email.policy import default
-from inspect import trace
-from multiprocessing.dummy import Process
 import re
 import traceback
-from django import db
 from api.v4.helpers import get_prefetched_data
 from core.models import CarbureLot, CarbureLotReliabilityScore, GenericError, Entity
 from core.carburetypes import (
@@ -13,7 +9,7 @@ from core.carburetypes import (
     CarbureSanityCheckErrors,
 )
 from django.db import transaction
-from transactions.helpers import check_locked_year
+from core.common import find_normalized
 
 # definitions
 
@@ -357,16 +353,7 @@ def check_certificates(prefetched_data, lot, errors):
     if lot.feedstock and lot.feedstock.is_double_compte:
         # identify where the certificate is (attached to prod site or attached to lot)
         dc_cert = lot.production_site_double_counting_certificate
-        if not dc_cert:
-            errors.append(
-                generic_error(
-                    error=CarbureCertificatesErrors.MISSING_REF_DBL_COUNTING,
-                    lot=lot,
-                    display_to_recipient=True,
-                    field="dc_reference",
-                )
-            )
-        else:
+        if dc_cert:
             if dc_cert not in prefetched_data["double_counting_certificates"]:
                 # 2022-03-22: GC requests that this is a blocking error
                 errors.append(
@@ -421,15 +408,7 @@ def check_certificates(prefetched_data, lot, errors):
 
 
 def sanity_check(lot, prefetched_data):
-    is_sane = True
-    errors = []
-
-    # make sure all mandatory fields are set
-    valid, reqfielderrors = sanity_check_mandatory_fields(lot)
-    if not valid:
-        is_sane = False
-        errors += reqfielderrors
-        return is_sane, errors
+    is_sane, errors = sanity_check_mandatory_fields(lot)
 
     if lot.delivery_type == CarbureLot.RFC and lot.biofuel.code not in [
         "ED95",
@@ -581,9 +560,7 @@ def sanity_check(lot, prefetched_data):
         # double comptage, cas specifiques
         if lot.feedstock.is_double_compte:
             in_carbure_without_dc = lot.carbure_production_site and not lot.carbure_production_site.dc_reference
-            not_in_carbure_without_dc = (
-                lot.unknown_production_site and not lot.production_site_double_counting_certificate
-            )
+            not_in_carbure_without_dc = lot.unknown_production_site and not lot.production_site_double_counting_certificate  # fmt:skip
             if in_carbure_without_dc or not_in_carbure_without_dc:
                 errors.append(
                     generic_error(
@@ -715,13 +692,9 @@ def sanity_check(lot, prefetched_data):
 
     # configuration
     if lot.feedstock and lot.carbure_production_site:
-        if lot.carbure_production_site.name in prefetched_data["my_production_sites"]:
-            mps = [
-                psi.matiere_premiere
-                for psi in prefetched_data["my_production_sites"][
-                    lot.carbure_production_site.name
-                ].productionsiteinput_set.all()
-            ]
+        production_site = find_normalized(lot.carbure_production_site.name, prefetched_data["my_production_sites"])
+        if production_site:
+            mps = [psi.matiere_premiere for psi in production_site.productionsiteinput_set.all()]
             if lot.feedstock not in mps:
                 errors.append(
                     generic_error(
@@ -732,13 +705,9 @@ def sanity_check(lot, prefetched_data):
                     )
                 )
     if lot.biofuel and lot.carbure_production_site:
-        if lot.carbure_production_site.name in prefetched_data["my_production_sites"]:
-            bcs = [
-                pso.biocarburant
-                for pso in prefetched_data["my_production_sites"][
-                    lot.carbure_production_site.name
-                ].productionsiteoutput_set.all()
-            ]
+        production_site = find_normalized(lot.carbure_production_site.name, prefetched_data["my_production_sites"])
+        if production_site:
+            bcs = [pso.biocarburant for pso in production_site.productionsiteoutput_set.all()]
             if lot.biofuel not in bcs:
                 errors.append(
                     generic_error(
@@ -860,7 +829,7 @@ def sanity_check_mandatory_fields(lot):
         )
         is_valid = False
 
-    if lot.delivery_type not in [CarbureLot.RFC, CarbureLot.FLUSHED] and lot.transport_document_reference is None:
+    if lot.delivery_type not in [CarbureLot.RFC, CarbureLot.FLUSHED] and not lot.transport_document_reference:
         errors.append(
             generic_error(
                 error=CarbureSanityCheckErrors.MISSING_TRANSPORT_DOCUMENT_REFERENCE,

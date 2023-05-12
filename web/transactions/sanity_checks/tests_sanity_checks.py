@@ -3,12 +3,13 @@ from django.test import TestCase
 
 from api.v4.tests_utils import setup_current_user
 from core.carburetypes import CarbureSanityCheckErrors, CarbureCertificatesErrors, CarbureMLGHGErrors
-from core.models import Entity, CarbureLot, MatierePremiere, Biocarburant, Depot, Pays
+from core.models import Entity, CarbureLot, MatierePremiere, Biocarburant, Depot, EntityDepot, Pays
 from ml.models import ETDStats, EECStats, EPStats
 from api.v4.sanity_checks import sanity_check, get_prefetched_data, july1st2021, oct2015, jan2021
 from transactions.factories import CarbureLotFactory
 from transactions.models import LockedYear
-from producers.models import ProductionSite
+from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
+from resources.factories import ProductionSiteFactory
 
 
 class SanityChecksTest(TestCase):
@@ -28,8 +29,8 @@ class SanityChecksTest(TestCase):
 
         self.prefetched_data = get_prefetched_data()
 
-    def run_checks(self, lot):
-        _, errors = sanity_check(lot, self.prefetched_data)
+    def run_checks(self, lot, prefetched_data=None):
+        _, errors = sanity_check(lot, prefetched_data or self.prefetched_data)
         return errors
 
     def create_lot(self, **kwargs):
@@ -339,7 +340,11 @@ class SanityChecksTest(TestCase):
         dc_feedstock = MatierePremiere.objects.filter(is_double_compte=True).first()
         other_feedstock = MatierePremiere.objects.exclude(is_double_compte=True).first()
 
-        lot = self.create_lot(feedstock=other_feedstock, production_site_double_counting_certificate="")
+        lot = self.create_lot(
+            feedstock=other_feedstock,
+            carbure_production_site=None,
+            production_site_double_counting_certificate="",
+        )
 
         error_list = self.run_checks(lot)
         self.assertFalse(has_error(error, error_list))
@@ -354,17 +359,87 @@ class SanityChecksTest(TestCase):
         error_list = self.run_checks(lot)
         self.assertFalse(has_error(error, error_list))
 
-    def x_test_mp_not_configured(self):
+        lot.production_site_double_counting_certificate = ""
+        lot.unknown_production_site = None
+        lot.carbure_production_site = ProductionSiteFactory.create(eligible_dc=True, dc_reference="FR_123_2023")
+
+        error_list = self.run_checks(lot)
+        self.assertFalse(has_error(error, error_list))
+
+    def test_mp_not_configured(self):
         error = CarbureSanityCheckErrors.MP_NOT_CONFIGURED
-        pass
 
-    def x_test_bc_not_configured(self):
+        feedstock = MatierePremiere.objects.first()
+        other_feedstock = MatierePremiere.objects.last()
+        production_site = ProductionSiteFactory.create(producer=self.producer)
+
+        ProductionSiteInput.objects.create(production_site=production_site, matiere_premiere=feedstock)
+
+        lot = self.create_lot(
+            added_by=self.producer,
+            feedstock=other_feedstock,
+            carbure_production_site=production_site,
+        )
+
+        prefetched_data = get_prefetched_data(self.producer)
+
+        error_list = self.run_checks(lot, prefetched_data)
+        self.assertTrue(has_error(error, error_list))
+
+        lot.feedstock = feedstock
+
+        error_list = self.run_checks(lot, prefetched_data)
+        self.assertFalse(has_error(error, error_list))
+
+    def test_bc_not_configured(self):
         error = CarbureSanityCheckErrors.BC_NOT_CONFIGURED
-        pass
 
-    def x_test_depot_not_configured(self):
+        biofuel = Biocarburant.objects.first()
+        other_biofuel = Biocarburant.objects.last()
+        production_site = ProductionSiteFactory.create(producer=self.producer)
+
+        ProductionSiteOutput.objects.create(production_site=production_site, biocarburant=biofuel)
+
+        lot = self.create_lot(
+            added_by=self.producer,
+            biofuel=other_biofuel,
+            carbure_production_site=production_site,
+        )
+
+        prefetched_data = get_prefetched_data(self.producer)
+
+        error_list = self.run_checks(lot, prefetched_data)
+        self.assertTrue(has_error(error, error_list))
+
+        lot.biofuel = biofuel
+
+        error_list = self.run_checks(lot, prefetched_data)
+        self.assertFalse(has_error(error, error_list))
+
+    def test_depot_not_configured(self):
         error = CarbureSanityCheckErrors.DEPOT_NOT_CONFIGURED
-        pass
+
+        depot = Depot.objects.first()
+        other_depot = Depot.objects.last()
+
+        lot = self.create_lot(
+            added_by=self.producer,
+            carbure_client=self.producer,
+            carbure_delivery_site=other_depot,
+            delivery_type=CarbureLot.BLENDING,
+        )
+
+        EntityDepot.objects.create(entity=self.producer, depot=depot)
+
+        prefetched_data = get_prefetched_data(self.producer)
+
+        error_list = self.run_checks(lot, prefetched_data)
+        self.assertTrue(has_error(error, error_list))
+
+        lot.carbure_delivery_site = depot
+
+        error_list = self.run_checks(lot, prefetched_data)
+        self.assertFalse(has_error(error, error_list))
 
     def test_missing_volume(self):
         error = CarbureSanityCheckErrors.MISSING_VOLUME
@@ -453,7 +528,11 @@ class SanityChecksTest(TestCase):
     def test_missing_carbure_delivery_site(self):
         error = CarbureSanityCheckErrors.MISSING_CARBURE_DELIVERY_SITE
 
-        lot = self.create_lot(delivery_type=CarbureLot.RFC, carbure_delivery_site=None)
+        lot = self.create_lot(
+            delivery_type=CarbureLot.RFC,
+            carbure_delivery_site=None,
+            delivery_site_country=Pays.objects.get(code_pays="FR"),
+        )
 
         error_list = self.run_checks(lot)
         self.assertFalse(has_error(error, error_list))
@@ -471,7 +550,11 @@ class SanityChecksTest(TestCase):
     def test_missing_carbure_client(self):
         error = CarbureSanityCheckErrors.MISSING_CARBURE_CLIENT
 
-        lot = self.create_lot(delivery_type=CarbureLot.RFC, carbure_client=None)
+        lot = self.create_lot(
+            delivery_type=CarbureLot.RFC,
+            carbure_client=None,
+            delivery_site_country=Pays.objects.get(code_pays="FR"),
+        )
 
         error_list = self.run_checks(lot)
         self.assertFalse(has_error(error, error_list))
@@ -491,7 +574,7 @@ class SanityChecksTest(TestCase):
 
         # @TODO testing delivery_date=None actually breaks other sanity checks, fix that
 
-        # lot = self.create_lot(delivery_date=datetime.date(0, 0, 0))
+        # lot = self.create_lot(delivery_date=None)
 
         # error_list = self.run_checks(lot)
         # self.assertTrue(has_error(error, error_list))
@@ -522,26 +605,115 @@ class SanityChecksTest(TestCase):
     def test_missing_delivery_site_country(self):
         error = CarbureSanityCheckErrors.MISSING_DELIVERY_SITE_COUNTRY
 
-    def x_test_missing_feedstock_country_of_origin(self):
+        lot = self.create_lot(delivery_site_country=None)
+
+        error_list = self.run_checks(lot)
+        self.assertTrue(has_error(error, error_list))
+
+        lot.delivery_site_country = Pays.objects.first()
+
+        error_list = self.run_checks(lot)
+        self.assertFalse(has_error(error, error_list))
+
+    def test_missing_feedstock_country_of_origin(self):
         error = CarbureSanityCheckErrors.MISSING_FEEDSTOCK_COUNTRY_OF_ORIGIN
 
-    def x_test_unknown_prodsite_cert(self):
+        country = Pays.objects.filter(is_in_europe=True).first()
+
+        lot = self.create_lot(country_of_origin=None, delivery_site_country=country)
+
+        error_list = self.run_checks(lot)
+        self.assertTrue(has_error(error, error_list))
+
+        lot.country_of_origin = country
+
+        error_list = self.run_checks(lot)
+        self.assertFalse(has_error(error, error_list))
+
+    def test_unknown_prodsite_cert(self):
         error = CarbureCertificatesErrors.UNKNOWN_PRODSITE_CERT
 
-    def x_test_expired_prodsite_cert(self):
+        lot = self.create_lot(production_site_certificate="RANDOM")
+
+        error_list = self.run_checks(lot)
+        self.assertTrue(has_error(error, error_list))
+
+        self.prefetched_data["certificates"]["RANDOM"] = {"valid_until": datetime.date.today()}
+
+        error_list = self.run_checks(lot)
+        self.assertFalse(has_error(error, error_list))
+
+    def test_expired_prodsite_cert(self):
         error = CarbureCertificatesErrors.EXPIRED_PRODSITE_CERT
 
-    def x_test_no_supplier_cert(self):
+        lot = self.create_lot()
+
+        expired_cert = {"valid_until": lot.delivery_date - datetime.timedelta(days=15)}
+        valid_cert = {"valid_until": lot.delivery_date + datetime.timedelta(days=15)}
+
+        self.prefetched_data["certificates"]["EXPIRED_CERT"] = expired_cert
+        self.prefetched_data["certificates"]["VALID_CERT"] = valid_cert
+
+        lot.production_site_certificate = "EXPIRED_CERT"
+
+        error_list = self.run_checks(lot)
+        self.assertTrue(has_error(error, error_list))
+
+        lot.production_site_certificate = "VALID_CERT"
+
+        error_list = self.run_checks(lot)
+        self.assertFalse(has_error(error, error_list))
+
+    def test_no_supplier_cert(self):
         error = CarbureCertificatesErrors.NO_SUPPLIER_CERT
 
-    def x_test_unknown_supplier_cert(self):
+        lot = self.create_lot(supplier_certificate="")
+
+        error_list = self.run_checks(lot)
+        self.assertTrue(has_error(error, error_list))
+
+        lot.supplier_certificate = "RANDOM"
+
+        error_list = self.run_checks(lot)
+        self.assertFalse(has_error(error, error_list))
+
+    def test_unknown_supplier_cert(self):
         error = CarbureCertificatesErrors.UNKNOWN_SUPPLIER_CERT
 
-    def x_test_expired_supplier_cert(self):
+        lot = self.create_lot(supplier_certificate="RANDOM")
+
+        error_list = self.run_checks(lot)
+        self.assertTrue(has_error(error, error_list))
+
+        self.prefetched_data["certificates"]["RANDOM"] = {"valid_until": datetime.date.today()}
+
+        error_list = self.run_checks(lot)
+        self.assertFalse(has_error(error, error_list))
+
+    def test_expired_supplier_cert(self):
         error = CarbureCertificatesErrors.EXPIRED_SUPPLIER_CERT
+
+        lot = self.create_lot()
+
+        expired_cert = {"valid_until": lot.delivery_date - datetime.timedelta(days=15)}
+        valid_cert = {"valid_until": lot.delivery_date + datetime.timedelta(days=15)}
+
+        self.prefetched_data["certificates"]["EXPIRED_CERT"] = expired_cert
+        self.prefetched_data["certificates"]["VALID_CERT"] = valid_cert
+
+        lot.supplier_certificate = "EXPIRED_CERT"
+
+        error_list = self.run_checks(lot)
+        self.assertTrue(has_error(error, error_list))
+
+        lot.supplier_certificate = "VALID_CERT"
+
+        error_list = self.run_checks(lot)
+        self.assertFalse(has_error(error, error_list))
 
     def x_test_rejected_supplier_certificate(self):
         error = CarbureCertificatesErrors.REJECTED_SUPPLIER_CERTIFICATE
+        pass
 
     def x_test_unknown_double_counting_certificate(self):
         error = CarbureCertificatesErrors.UNKNOWN_DOUBLE_COUNTING_CERTIFICATE
@@ -569,7 +741,7 @@ class SanityChecksTest(TestCase):
 
         self.assertTrue(has_error(error, error_list))
 
-    def x_test_etd_no_eu_too_low(self):
+    def test_etd_no_eu_too_low(self):
         error = CarbureMLGHGErrors.ETD_NO_EU_TOO_LOW
 
     def x_test_etd_eu_default_value(self):
