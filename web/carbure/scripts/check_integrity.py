@@ -10,7 +10,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 from core.models import CarbureLot
-from core.traceability_query import get_lots_family_trees
+from core.traceability import get_traceability_nodes
 
 
 def check_integrity(year, batch=1000):
@@ -58,7 +58,7 @@ def check_integrity(year, batch=1000):
     for page_number in tqdm(paginator.page_range):
         page = paginator.page(page_number)
         page_lots = page.object_list
-        nodes = get_lots_family_trees(page_lots)
+        nodes = get_traceability_nodes(page_lots)
         errors = [error for node in nodes for error in node.check_integrity()]
         all_errors += errors
         error_count += len(errors)
