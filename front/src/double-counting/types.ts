@@ -69,6 +69,10 @@ export enum DoubleCountingUploadErrorType {
   PomeGt2000 = "POME_GT_2000",
   MissingEstimatedProduction = "MISSING_ESTIMATED_PRODUCTION",
   MissingFeedstock = "MISSING_FEEDSTOCK",
+  ProductionMismatchQuota = "PRODUCTION_MISMATCH_QUOTA",
+  LineFeedstocksIncoherent = "LINE_FEEDSTOCKS_INCOHERENT",
+  UnknownYear = "UNKNOW_YEAR"
+
 }
 
 export interface DoubleCountingUploadError {
