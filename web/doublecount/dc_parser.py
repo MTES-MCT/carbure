@@ -18,6 +18,7 @@ class ProductionRow(TypedDict):
     line: int
     year: int
     feedstock: str | None
+    feedstock_check: str | None
     biofuel: str | None
     max_production_capacity: int
     estimated_production: int
@@ -123,19 +124,23 @@ def parse_production(excel_file: Workbook) -> List[ProductionRow]:
 
         biofuel_name = row[2].value
         feedstock_name = row[3].value
+        feedstock_name_check = row[8].value
         max_production_capacity = row[4].value or 0
+
         estimated_production = row[9].value or 0
 
         if current_year == -1 or not feedstock_name or not biofuel_name:
             continue
 
         feedstock = dc_feedstock_to_carbure_feedstock.get(feedstock_name.strip(), None)
+        feedstock_check = feedstock if feedstock_name == feedstock_name_check else ""
         biofuel = dc_biofuel_to_carbure_biofuel.get(biofuel_name.strip(), None)
 
         production: ProductionRow = {
             "line": line + 1,
             "year": current_year,
             "feedstock": feedstock,
+            "feedstock_check": feedstock_check,
             "biofuel": biofuel,
             "max_production_capacity": max_production_capacity,
             "estimated_production": estimated_production,
