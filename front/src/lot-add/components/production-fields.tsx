@@ -182,11 +182,10 @@ export const ProductionSiteDoubleCountingCertificateField = (
   }
 
   const bound = bind("production_site_double_counting_certificate")
-
   // if the production site is known, use its DC data instead of expecting manual input
   const dcProps =
     value.production_site instanceof Object
-      ? { ...props, disabled: true, error: bound.error, value: value.production_site_double_counting_certificate } // prettier-ignore
+      ? { ...props, disabled: true, error: bound.error, value: value.production_site_double_counting_certificate || value.production_site.dc_reference || t("détection...")} // prettier-ignore
       : { ...props, ...bound }
 
   const certificate =
