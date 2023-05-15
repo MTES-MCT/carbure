@@ -41,7 +41,7 @@ class SafGroupedAssignTicketTest(TestCase):
             "assignment_period": 202204,
         }
 
-        response = self.client.post(reverse("api-v5-saf-operator-grouped-assign-ticket"), query)
+        response = self.client.post(reverse("saf-operator-grouped-assign-ticket"), query)
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["status"], "error")
@@ -58,7 +58,7 @@ class SafGroupedAssignTicketTest(TestCase):
             "assignment_period": 202202,
         }
 
-        response = self.client.post(reverse("api-v5-saf-operator-grouped-assign-ticket"), query)
+        response = self.client.post(reverse("saf-operator-grouped-assign-ticket"), query)
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["status"], "error")
@@ -75,7 +75,7 @@ class SafGroupedAssignTicketTest(TestCase):
             "assignment_period": 202206,
         }
 
-        response = self.client.post(reverse("api-v5-saf-operator-grouped-assign-ticket"), query)
+        response = self.client.post(reverse("saf-operator-grouped-assign-ticket"), query)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "success")

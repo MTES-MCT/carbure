@@ -56,7 +56,7 @@ class LotCorrectionTest(TestCase):
 
     def request_fix(self, lot, entity):
         response = self.client.post(
-            reverse("api-v5-transactions-lots-request-fix"),
+            reverse("transactions-lots-request-fix"),
             {"entity_id": entity.id, "lot_ids": [lot.id]},
         )
 
@@ -66,7 +66,7 @@ class LotCorrectionTest(TestCase):
 
     def submit_fix(self, lot, entity):
         response = self.client.post(
-            reverse("api-v5-transactions-lots-submit-fix"),
+            reverse("transactions-lots-submit-fix"),
             {"entity_id": entity.id, "lot_ids": [lot.id]},
         )
         self.assertEqual(response.status_code, 200)
@@ -75,7 +75,7 @@ class LotCorrectionTest(TestCase):
 
     def approve_fix(self, lot, entity):
         response = self.client.post(
-            reverse("api-v5-transactions-lots-approve-fix"),
+            reverse("transactions-lots-approve-fix"),
             {"entity_id": entity.id, "lot_ids": [lot.id]},
         )
         self.assertEqual(response.status_code, 200)
@@ -90,7 +90,7 @@ class LotCorrectionTest(TestCase):
         self.assertEqual(lot.correction_status, CarbureLot.IN_CORRECTION)
         self.assertEqual(lot.lot_status, CarbureLot.PENDING)
         response = self.client.post(
-            reverse("api-v5-transactions-lots-update"),
+            reverse("transactions-lots-update"),
             {"entity_id": self.producer.id, "lot_id": lot.id, "volume": 42000},
         )
         self.assertEqual(response.status_code, 200)
@@ -111,7 +111,7 @@ class LotCorrectionTest(TestCase):
 
         # we update
         response = self.client.post(
-            reverse("api-v5-transactions-lots-update"),
+            reverse("transactions-lots-update"),
             {"entity_id": self.producer.id, "lot_id": lot.id, "volume": 42000},
         )
         self.assertEqual(response.status_code, 200)
@@ -146,7 +146,7 @@ class LotCorrectionTest(TestCase):
 
         # client requests correction
         response = self.client.post(
-            reverse("api-v5-transactions-lots-request-fix"),
+            reverse("transactions-lots-request-fix"),
             {"entity_id": self.producer.id, "lot_ids": [lot.id]},
         )
         self.assertEqual(response.status_code, 400)

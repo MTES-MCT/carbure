@@ -99,7 +99,7 @@ class SafTicketDetailsTest(TestCase):
 
     def test_saf_ticket_details(self):
         query = {"entity_id": self.entity.id, "ticket_id": 4321}
-        response = self.client.get(reverse("api-v5-saf-operator-ticket-details"), query)
+        response = self.client.get(reverse("saf-operator-ticket-details"), query)
 
         self.assertEqual(response.status_code, 200)
 
@@ -144,7 +144,7 @@ class SafTicketDetailsTest(TestCase):
             "eu": 1.0,
             "ghg_total": 1.0,
             "ghg_reduction": 65.0,
-            "free_field": None, 
+            "free_field": None,
             "client_comment": None,
             "parent_ticket_source": {
                 "id": 1234,

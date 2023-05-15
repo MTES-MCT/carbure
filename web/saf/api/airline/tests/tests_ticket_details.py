@@ -70,7 +70,7 @@ class SafTicketDetailsTest(TestCase):
             country_of_origin=Pays.objects.get(name="Espagne"),
             supplier=self.supplier,
             client=self.entity,
-            free_field= "Everything looks fine", 
+            free_field="Everything looks fine",
             agreement_date="2022-06-20",
             agreement_reference="ABCD",
             carbure_producer=None,
@@ -100,7 +100,7 @@ class SafTicketDetailsTest(TestCase):
 
     def test_saf_ticket_sources(self):
         query = {"entity_id": self.entity.id, "ticket_id": 4321}
-        response = self.client.get(reverse("api-v5-saf-airline-ticket-details"), query)
+        response = self.client.get(reverse("saf-airline-ticket-details"), query)
 
         self.assertEqual(response.status_code, 200)
 
@@ -121,7 +121,7 @@ class SafTicketDetailsTest(TestCase):
             "production_site_commissioning_date": "2001-01-01",
             "supplier": self.supplier.name,
             "client": self.entity.name,
-            "free_field": "Everything looks fine", 
+            "free_field": "Everything looks fine",
             "feedstock": {
                 "name": "Huiles ou graisses animales  (catégorie I et/ou II )",
                 "name_en": "CI/CII Animal fat",

@@ -27,7 +27,7 @@ class SafSnapshotTest(TestCase):
         SafTicketFactory.create_batch(5, year=2022, client_id=self.entity.id, status=SafTicket.REJECTED)
 
     def test_saf_snapshot_empty(self):
-        response = self.client.get(reverse("api-v5-saf-airline-snapshot"), {"entity_id": self.entity.id, "year": 2021})
+        response = self.client.get(reverse("saf-airline-snapshot"), {"entity_id": self.entity.id, "year": 2021})
 
         expected = {
             "tickets_pending": 0,
@@ -38,7 +38,7 @@ class SafSnapshotTest(TestCase):
         self.assertEqual(response.json()["data"], expected)
 
     def test_saf_snapshot(self):
-        response = self.client.get(reverse("api-v5-saf-airline-snapshot"), {"entity_id": self.entity.id, "year": 2022})
+        response = self.client.get(reverse("saf-airline-snapshot"), {"entity_id": self.entity.id, "year": 2022})
 
         expected = {
             "tickets_pending": 15,

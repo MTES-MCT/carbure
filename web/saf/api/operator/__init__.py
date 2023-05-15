@@ -17,22 +17,22 @@ from .credit_ticket_source import credit_ticket_source
 
 urlpatterns = [
     # overview
-    path("years", get_years, name="api-v5-saf-operator-years"),
-    path("snapshot", get_snapshot, name="api-v5-saf-operator-snapshot"),
+    path("years", get_years, name="saf-operator-years"),
+    path("snapshot", get_snapshot, name="saf-operator-snapshot"),
     # ticket sources
-    path("ticket-sources", get_ticket_sources, name="api-v5-saf-operator-ticket-sources"),
-    path("ticket-sources/filters", get_ticket_source_filters, name="api-v5-saf-operator-ticket-source-filters"),
-    path("ticket-sources/details", get_ticket_source_details, name="api-v5-saf-operator-ticket-source-details"),
+    path("ticket-sources", get_ticket_sources, name="saf-operator-ticket-sources"),
+    path("ticket-sources/filters", get_ticket_source_filters, name="saf-operator-ticket-source-filters"),
+    path("ticket-sources/details", get_ticket_source_details, name="saf-operator-ticket-source-details"),
     # tickets
-    path("tickets", get_tickets, name="api-v5-saf-operator-tickets"),
-    path("tickets/filters", get_ticket_filters, name="api-v5-saf-operator-ticket-filters"),
-    path("tickets/details", get_ticket_details, name="api-v5-saf-operator-ticket-details"),
+    path("tickets", get_tickets, name="saf-operator-tickets"),
+    path("tickets/filters", get_ticket_filters, name="saf-operator-ticket-filters"),
+    path("tickets/details", get_ticket_details, name="saf-operator-ticket-details"),
     # ticket actions
-    path("assign-ticket", assign_ticket, name="api-v5-saf-operator-assign-ticket"),
-    path("grouped-assign-ticket", grouped_assign_ticket, name="api-v5-saf-operator-grouped-assign-ticket"),
-    path("cancel-ticket", cancel_ticket, name="api-v5-saf-operator-cancel-ticket"),
-    path("reject-ticket", reject_ticket, name="api-v5-saf-operator-reject-ticket"),
-    path("credit-ticket-source", credit_ticket_source, name="api-v5-saf-operator-credit-ticket-source"),
+    path("assign-ticket", assign_ticket, name="saf-operator-assign-ticket"),
+    path("grouped-assign-ticket", grouped_assign_ticket, name="saf-operator-grouped-assign-ticket"),
+    path("cancel-ticket", cancel_ticket, name="saf-operator-cancel-ticket"),
+    path("reject-ticket", reject_ticket, name="saf-operator-reject-ticket"),
+    path("credit-ticket-source", credit_ticket_source, name="saf-operator-credit-ticket-source"),
     # autocomplete helpers
-    path("clients", get_clients, name="api-v5-saf-operator-clients"),
+    path("clients", get_clients, name="saf-operator-clients"),
 ]

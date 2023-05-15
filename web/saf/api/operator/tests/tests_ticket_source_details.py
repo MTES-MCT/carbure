@@ -98,7 +98,7 @@ class SafTicketSourceDetailsTest(TestCase):
 
     def test_saf_ticket_sources(self):
         query = {"entity_id": self.entity.id, "ticket_source_id": 1234}
-        response = self.client.get(reverse("api-v5-saf-operator-ticket-source-details"), query)
+        response = self.client.get(reverse("saf-operator-ticket-source-details"), query)
 
         self.assertEqual(response.status_code, 200)
 

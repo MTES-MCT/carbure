@@ -26,6 +26,6 @@ class SafYearsTest(TestCase):
         SafTicketFactory.create_batch(5, year=2022, client_id=self.entity.id)
 
     def test_saf_years(self):
-        response = self.client.get(reverse("api-v5-saf-airline-years"), {"entity_id": self.entity.id})
+        response = self.client.get(reverse("saf-airline-years"), {"entity_id": self.entity.id})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["data"], [2021, 2022])
