@@ -16,12 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.conf import settings
-from public import views as public_views
+from carbure.api import redirect_app
 
 urlpatterns = [
+    re_path("app/(.*)", redirect_app),
     path("admin/", admin.site.urls),
-    re_path("app/(.*)", public_views.redirect_app),
-    path("api/", include("api.urls")),
+    path("api/", include("carbure.api")),
     path("core/", include("core.urls")),
 ]
 
