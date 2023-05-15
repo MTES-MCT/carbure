@@ -79,6 +79,7 @@ export interface DoubleCountingUploadError {
   error: string
   is_blocking: boolean
   line_number: number | null
+  line_merged?: string
   meta?: null | any
 }
 

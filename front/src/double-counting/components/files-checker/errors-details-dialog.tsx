@@ -107,19 +107,20 @@ type ErrorsTableProps = {
 
 export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
   const { t } = useTranslation()
+  const errorFiltered = errors //mergeErrors(errors)
 
   const columns: Column<DoubleCountingUploadError>[] = [
     {
       header: t("Ligne"),
-      style: { width: 80, flex: "none" },
+      style: { width: 120, flex: "none" },
       cell: (error) => (
-        <Cell
-          text={
-            error.line_number! >= 0
-              ? t("Ligne {{lineNumber}}", { lineNumber: error.line_number })
-              : "-"
-          }
-        />
+        <p>
+          {error.line_number! >= 0
+            ? t("Ligne {{lineNumber}}", {
+                lineNumber: error.line_merged || error.line_number,
+              })
+            : "-"}
+        </p>
       ),
     },
     {
@@ -128,7 +129,29 @@ export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
     },
   ]
 
-  return <Table columns={columns} rows={errors} />
+  return <Table columns={columns} rows={errorFiltered} />
+}
+
+const mergeErrors = (errors: DoubleCountingUploadError[]) => {
+  const errorsMergedByError: DoubleCountingUploadError[] = []
+  errors
+    .sort((a, b) => a.error.localeCompare(b.error))
+    .forEach((error, index) => {
+      if (index === 0) {
+        error.line_merged = error.line_number?.toString() || ""
+        errorsMergedByError.push(error)
+        return
+      }
+      const prevError = errorsMergedByError[errorsMergedByError.length - 1]
+
+      if (error.error === prevError.error) {
+        prevError.line_merged = prevError.line_merged + ", " + error.line_number
+        return
+      }
+      error.line_merged = error.line_number?.toString() || ""
+      errorsMergedByError.push(error)
+    })
+  return errorsMergedByError
 }
 
 export default ErrorsDetailsDialog
