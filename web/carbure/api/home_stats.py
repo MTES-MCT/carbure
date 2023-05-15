@@ -6,7 +6,7 @@ from django.db.models.aggregates import Count, Sum
 from django.http.response import JsonResponse
 
 
-def get_stats(request):
+def get_home_stats(request):
     try:
         today = datetime.date.today()
         lots = CarbureLot.objects.filter(
