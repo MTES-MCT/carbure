@@ -34,7 +34,7 @@ export function getErrorText(
       errorText += t("Le biocarburant est manquant.")
       break
     case DoubleCountingUploadErrorType.MissingFeedstock:
-      errorText += t("La matière première est manquante.")
+      errorText += t("La matière première est manquante ou non reconnue. Merci de verifier la syntaxe dans la liste de matières premières qui est incluse dans le fichier excel.")
       break
     case DoubleCountingUploadErrorType.MissingEstimatedProduction:
       errorText += t("La production estimée est manquante.")
@@ -72,6 +72,27 @@ export function getErrorText(
       errorText += t(
         "En {{year}}, les biocarburants issus d'effluents d'huilerie de palme et rafles ne seront pas reconnus au double comptage au delà d'une production total de 2000 tonnes par unité de production.",
         { year: error?.meta?.year }
+      )
+      break
+    case DoubleCountingUploadErrorType.BadWorksheetName:
+      errorText += t(
+        "La feuille \"{{tabName}}\" n'a pas été trouvé dans le fichier. Vérifiez que la feuille n'est pas été renommée.",
+        { tabName: error?.meta }
+      )
+      break
+    case DoubleCountingUploadErrorType.ProductionMismatchQuota:
+      errorText += t(
+        "Le quota demandé dans l'onglet \"Reconnaissance double comptage\" ne peut pas être supérieur à la production prévisionelle renseignée ici.",
+      )
+      break
+    case DoubleCountingUploadErrorType.LineFeedstocksIncoherent:
+      errorText += t(
+        "Les matières premières renseignées sur la même ligne doivent être identiques.",
+      )
+      break
+    case DoubleCountingUploadErrorType.UnknownYear:
+      errorText += t(
+        "Les années doivent être renseignées",
       )
       break
 

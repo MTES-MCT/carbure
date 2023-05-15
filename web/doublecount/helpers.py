@@ -67,6 +67,7 @@ def load_dc_production_data(dca: DoubleCountingAgreement, production_rows: List[
         production.max_production_capacity = row["max_production_capacity"]
         production.estimated_production = row["estimated_production"]
         production.requested_quota = row["requested_quota"]
+
         errors = check_production_row(production, row)
         production_errors += errors
         if len(errors) == 0:
