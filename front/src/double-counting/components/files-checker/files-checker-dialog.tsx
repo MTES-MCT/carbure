@@ -30,8 +30,18 @@ const DoubleCountingFilesCheckerDialog = ({
 
   const uploadFiles = useMutation(api.checkDoubleCountingFiles, {
     onError: (err) => {
-      const error = (err as AxiosError<{ error: string }>).response?.data.error
-      if (error === "DOUBLE_COUNTING_IMPORT_FAILED") {
+      const response = (err as AxiosError<{ error: string }>).response
+      if (response?.status === 413) {
+        notify(
+          t(
+            "La taille des fichiers selectionnés est trop importante pour être analysée (5mo maximum)."
+          ),
+          {
+            variant: "danger",
+          }
+        )
+      } else if (response?.data?.error === "DOUBLE_COUNTING_IMPORT_FAILED") {
+        alert("DOUBLE_COUNTING_IMPORT_FAILED")
         const response = (
           err as AxiosError<{ data: CheckDoubleCountingFilesResponse }>
         ).response?.data?.data

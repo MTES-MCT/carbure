@@ -34,7 +34,7 @@ export function getErrorText(
       errorText += t("Le biocarburant est manquant.")
       break
     case DoubleCountingUploadErrorType.MissingFeedstock:
-      errorText += t("La matière première est manquante.")
+      errorText += t("La matière première est manquante ou non reconnue. Merci de verifier la syntaxe dans la liste de matières premières qui est incluse dans le fichier excel.")
       break
     case DoubleCountingUploadErrorType.MissingEstimatedProduction:
       errorText += t("La production estimée est manquante.")
@@ -82,7 +82,7 @@ export function getErrorText(
       break
     case DoubleCountingUploadErrorType.ProductionMismatchQuota:
       errorText += t(
-        "Le quota demandé ne peut pas être supérieur à la production prévisionelle renseignée.",
+        "Le quota demandé dans l'onglet \"Reconnaissance double comptage\" ne peut pas être supérieur à la production prévisionelle renseignée ici.",
       )
       break
     case DoubleCountingUploadErrorType.LineFeedstocksIncoherent:
