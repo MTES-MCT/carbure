@@ -2,7 +2,7 @@
 import traceback
 import datetime
 import unicodedata
-
+import re
 from django.db import transaction, IntegrityError
 from doublecount.models import DoubleCountingAgreement
 from core.common import SuccessResponse, ErrorResponse
@@ -97,10 +97,18 @@ def check_dc_file(file):
     except Exception as e:
         traceback.print_exc()
         info = {"production_site": None, "year": 0}
-        if str(e) == "year 0 is out of range":
+
+        # bad tab name
+        tabNameRegexp = r"'Worksheet (.*) does not exist.'"
+        matchedTab = re.match(tabNameRegexp, str(e))
+        if matchedTab:
+            tabName = matchedTab[1]
+            excel_error = error(DoubleCountingError.BAD_WORKSHEET_NAME, is_blocking=True, meta=tabName)
+        elif str(e) == "year 0 is out of range":
             excel_error = error(DoubleCountingError.UNKNOW_YEAR, is_blocking=True)
         else:
             excel_error = error(DoubleCountingError.EXCEL_PARSING_ERROR, is_blocking=True, meta=str(e))
+
         return info, {
             "sourcing_forecast": [],
             "sourcing_history": [],

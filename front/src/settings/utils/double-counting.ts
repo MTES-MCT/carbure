@@ -74,9 +74,15 @@ export function getErrorText(
         { year: error?.meta?.year }
       )
       break
+    case DoubleCountingUploadErrorType.BadWorksheetName:
+      errorText += t(
+        "La feuille \"{{tabName}}\" n'a pas été trouvé dans le fichier. Vérifiez que la feuille n'est pas été renommée.",
+        { tabName: error?.meta }
+      )
+      break
     case DoubleCountingUploadErrorType.ProductionMismatchQuota:
       errorText += t(
-        "Le quota demandé ne peut pas être supérieure à la production prévisionelle renseignée.",
+        "Le quota demandé ne peut pas être supérieur à la production prévisionelle renseignée.",
       )
       break
     case DoubleCountingUploadErrorType.LineFeedstocksIncoherent:
