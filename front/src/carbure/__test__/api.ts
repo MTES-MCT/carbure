@@ -16,7 +16,7 @@ import {
   productionSite,
 } from "./data"
 
-export const okStats = rest.get("/api/v5/stats", (req, res, ctx) => {
+export const okStats = rest.get("/api/v5/home-stats", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
