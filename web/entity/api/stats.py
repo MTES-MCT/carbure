@@ -17,29 +17,28 @@ class StatsEntityError:
     STATS_DASHBOARD_TYPE_UNAVAILABLE = "STATS_DASHBOARD_TYPE_UNAVAILABLE"
 
 
-def get_metabase_dashboard (type : str) :
-    if type == Entity.PRODUCER : 
+def get_metabase_dashboard(type: str):
+    if type == Entity.PRODUCER:
         return 207
-    if type == Entity.OPERATOR : 
-        return 205 
-    # TODO add when ready   
-    # if type == Entity.TRADER : 
+    if type == Entity.OPERATOR:
+        return 205
+    # TODO add when ready
+    # if type == Entity.TRADER :
     #     return 211
-    # if type == Entity.AUDITOR : 
+    # if type == Entity.AUDITOR :
     #     return 210
     return 0
-    
 
 
 @check_user_rights()
-def get_entity(request, *args, **kwargs):
+def get_entity_stats(request, *args, **kwargs):
     try:
         entity_id = int(kwargs["context"]["entity_id"])
     except:
         traceback.print_exc()
         return ErrorResponse(400, StatsEntityError.MALFORMED_PARAMS)
 
-    try: 
+    try:
         entity = Entity.objects.get(id=entity_id)
         dashboard_id = get_metabase_dashboard(entity.entity_type)
 
@@ -47,10 +46,10 @@ def get_entity(request, *args, **kwargs):
         traceback.print_exc()
         return ErrorResponse(400, StatsEntityError.STATS_DASHBOARD_TYPE_UNAVAILABLE)
 
-    if dashboard_id == 0 :
+    if dashboard_id == 0:
         traceback.print_exc()
         return ErrorResponse(400, StatsEntityError.STATS_DASHBOARD_TYPE_UNAVAILABLE)
-        
+
     try:
         payload = {
             "resource": {"dashboard": dashboard_id},
