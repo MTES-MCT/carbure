@@ -95,7 +95,7 @@ class LotsFlowTest(TestCase):
         lotdata["lot_id"] = lot.id
         lotdata["volume"] = 42000
         lotdata["delivery_date"] = "01/01/2022"
-        response = self.client.post(reverse("api-v5-transactions-lots-update"), lotdata)
+        response = self.client.post(reverse("transactions-lots-update"), lotdata)
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)
         self.assertEqual(lot.volume, 42000)

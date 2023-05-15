@@ -59,13 +59,13 @@ class SafTicketSourceFiltersTest(TestCase):
 
     def test_empty_ticket_source_filters(self):
         query = {"entity_id": self.entity.id, "year": 2021, "status": "AVAILABLE", "filter": "feedstocks"}
-        response = self.client.get(reverse("api-v5-saf-operator-ticket-source-filters"), query)
+        response = self.client.get(reverse("saf-operator-ticket-source-filters"), query)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["data"], [])
 
     def test_ticket_source_filters_feedstock(self):
         query = {"entity_id": self.entity.id, "year": 2022, "status": "AVAILABLE", "filter": "feedstocks"}
-        response = self.client.get(reverse("api-v5-saf-operator-ticket-source-filters"), query)
+        response = self.client.get(reverse("saf-operator-ticket-source-filters"), query)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -81,7 +81,7 @@ class SafTicketSourceFiltersTest(TestCase):
             "filter": "feedstocks",
             "periods": 202202,
         }
-        response = self.client.get(reverse("api-v5-saf-operator-ticket-source-filters"), query)
+        response = self.client.get(reverse("saf-operator-ticket-source-filters"), query)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -91,7 +91,7 @@ class SafTicketSourceFiltersTest(TestCase):
 
     def test_ticket_source_filters_period(self):
         query = {"entity_id": self.entity.id, "year": 2022, "status": "AVAILABLE", "filter": "periods"}
-        response = self.client.get(reverse("api-v5-saf-operator-ticket-source-filters"), query)
+        response = self.client.get(reverse("saf-operator-ticket-source-filters"), query)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -101,7 +101,7 @@ class SafTicketSourceFiltersTest(TestCase):
 
     def test_ticket_source_filters_client(self):
         query = {"entity_id": self.entity.id, "year": 2022, "status": "AVAILABLE", "filter": "clients"}
-        response = self.client.get(reverse("api-v5-saf-operator-ticket-source-filters"), query)
+        response = self.client.get(reverse("saf-operator-ticket-source-filters"), query)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(

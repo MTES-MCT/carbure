@@ -40,7 +40,7 @@ class SafTicketFiltersTest(TestCase):
             "type": "assigned",
             "filter": "feedstocks",
         }
-        response = self.client.get(reverse("api-v5-saf-operator-ticket-filters"), query)
+        response = self.client.get(reverse("saf-operator-ticket-filters"), query)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["data"], [])
 
@@ -52,7 +52,7 @@ class SafTicketFiltersTest(TestCase):
             "type": "assigned",
             "filter": "feedstocks",
         }
-        response = self.client.get(reverse("api-v5-saf-operator-ticket-filters"), query)
+        response = self.client.get(reverse("saf-operator-ticket-filters"), query)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -69,7 +69,7 @@ class SafTicketFiltersTest(TestCase):
             "filter": "feedstocks",
             "periods": 202201,
         }
-        response = self.client.get(reverse("api-v5-saf-operator-ticket-filters"), query)
+        response = self.client.get(reverse("saf-operator-ticket-filters"), query)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -85,7 +85,7 @@ class SafTicketFiltersTest(TestCase):
             "type": "assigned",
             "filter": "periods",
         }
-        response = self.client.get(reverse("api-v5-saf-operator-ticket-filters"), query)
+        response = self.client.get(reverse("saf-operator-ticket-filters"), query)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -101,7 +101,7 @@ class SafTicketFiltersTest(TestCase):
             "type": "assigned",
             "filter": "clients",
         }
-        response = self.client.get(reverse("api-v5-saf-operator-ticket-filters"), query)
+        response = self.client.get(reverse("saf-operator-ticket-filters"), query)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(

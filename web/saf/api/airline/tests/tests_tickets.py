@@ -68,7 +68,7 @@ class SafTicketsTest(TestCase):
 
     def test_saf_tickets(self):
         query = {"entity_id": self.entity.id, "year": 2022, "from_idx": 0, "limit": 1, "status": "PENDING"}
-        response = self.client.get(reverse("api-v5-saf-airline-tickets"), query)
+        response = self.client.get(reverse("saf-airline-tickets"), query)
 
         self.assertEqual(response.status_code, 200)
 

@@ -76,7 +76,7 @@ class SafTicketsTest(TestCase):
             "type": "assigned",
         }
 
-        response = self.client.get(reverse("api-v5-saf-operator-tickets"), query)
+        response = self.client.get(reverse("saf-operator-tickets"), query)
 
         self.assertEqual(response.status_code, 200)
 

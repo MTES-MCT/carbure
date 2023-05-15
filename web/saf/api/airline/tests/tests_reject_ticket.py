@@ -33,7 +33,7 @@ class SafTicketRejectTest(TestCase):
             "ticket_id": self.ticket.id,
         }
 
-        response = self.client.post(reverse("api-v5-saf-airline-reject-ticket"), query)
+        response = self.client.post(reverse("saf-airline-reject-ticket"), query)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "success")

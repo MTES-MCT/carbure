@@ -40,7 +40,7 @@ class SafCancelTicketTest(TestCase):
             "ticket_id": self.ticket.id,
         }
 
-        response = self.client.post(reverse("api-v5-saf-operator-cancel-ticket"), query)
+        response = self.client.post(reverse("saf-operator-cancel-ticket"), query)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "success")

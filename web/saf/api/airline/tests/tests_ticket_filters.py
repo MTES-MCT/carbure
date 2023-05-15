@@ -34,13 +34,13 @@ class SafTicketFiltersTest(TestCase):
 
     def test_empty_ticket_filters(self):
         query = {"entity_id": self.entity.id, "year": 2021, "status": "PENDING", "filter": "feedstocks"}
-        response = self.client.get(reverse("api-v5-saf-airline-ticket-filters"), query)
+        response = self.client.get(reverse("saf-airline-ticket-filters"), query)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["data"], [])
 
     def test_ticket_filters_feedstock(self):
         query = {"entity_id": self.entity.id, "year": 2022, "status": "PENDING", "filter": "feedstocks"}
-        response = self.client.get(reverse("api-v5-saf-airline-ticket-filters"), query)
+        response = self.client.get(reverse("saf-airline-ticket-filters"), query)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -56,7 +56,7 @@ class SafTicketFiltersTest(TestCase):
             "filter": "feedstocks",
             "periods": 202201,
         }
-        response = self.client.get(reverse("api-v5-saf-airline-ticket-filters"), query)
+        response = self.client.get(reverse("saf-airline-ticket-filters"), query)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -66,7 +66,7 @@ class SafTicketFiltersTest(TestCase):
 
     def test_ticket_filters_period(self):
         query = {"entity_id": self.entity.id, "year": 2022, "status": "PENDING", "filter": "periods"}
-        response = self.client.get(reverse("api-v5-saf-airline-ticket-filters"), query)
+        response = self.client.get(reverse("saf-airline-ticket-filters"), query)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -76,7 +76,7 @@ class SafTicketFiltersTest(TestCase):
 
     def test_ticket_filters_supplier(self):
         query = {"entity_id": self.entity.id, "year": 2022, "status": "PENDING", "filter": "suppliers"}
-        response = self.client.get(reverse("api-v5-saf-airline-ticket-filters"), query)
+        response = self.client.get(reverse("saf-airline-ticket-filters"), query)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
