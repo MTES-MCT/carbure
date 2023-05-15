@@ -34,7 +34,7 @@ export function getErrorText(
       errorText += t("Le biocarburant est manquant.")
       break
     case DoubleCountingUploadErrorType.MissingFeedstock:
-      errorText += t("La matière première est manquante ou non reconnue. Merci de verifier la syntaxe dans la liste de matières premières qui est incluse dans le fichier excel.")
+      errorText += t("La matière première est manquante ou non reconnue (Verifiez la syntaxe dans la liste de matières premières qui est incluse dans le fichier excel).")
       break
     case DoubleCountingUploadErrorType.MissingEstimatedProduction:
       errorText += t("La production estimée est manquante.")
@@ -87,7 +87,7 @@ export function getErrorText(
       break
     case DoubleCountingUploadErrorType.LineFeedstocksIncoherent:
       errorText += t(
-        "Les matières premières renseignées sur la même ligne doivent être identiques.",
+        "Les matières premières renseignées sur la même ligne doivent être identiques dans les deux tableaux.",
       )
       break
     case DoubleCountingUploadErrorType.UnknownYear:
