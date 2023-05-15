@@ -66,7 +66,9 @@ class LotForm(forms.Form):
     delivery_date = forms.DateField(required=False)
     carbure_client_id = forms.ModelChoiceField(queryset=ENTITIES, required=False)
     unknown_client = forms.CharField(required=False)
-    carbure_delivery_site_depot_id = forms.ModelChoiceField(queryset=DEPOTS, to_field_name="depot_id", required=False)
+    carbure_delivery_site_depot_id = forms.ModelMultipleChoiceField(
+        queryset=DEPOTS, to_field_name="depot_id", required=False
+    )
     unknown_delivery_site = forms.CharField(required=False)
     delivery_site_country_code = forms.ModelChoiceField(queryset=COUNTRIES, to_field_name="code_pays", required=False)
 
@@ -95,6 +97,8 @@ class LotForm(forms.Form):
                 producer = form_data["carbure_producer_id"]
                 if producer:
                     lot_data["carbure_production_site"] = form_data[field].filter(producer=producer).first()
+            elif field == "carbure_delivery_site":
+                lot_data["carbure_delivery_site"] = form_data[field].first()
             elif field in FORM_TO_LOT_FIELD:
                 lot_data[lot_field] = form_data[field]
             else:
