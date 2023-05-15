@@ -75,9 +75,11 @@ def parse_sourcing(excel_file: Workbook, sheet_name: str) -> List[SourcingRow]:
     current_year = -1
 
     for line, row in enumerate(sourcing_sheet.iter_rows()):
+        print(f"****>> line: {line}")
         current_year = extract_year(row[1].value, current_year)
 
         feedstock_name = row[2].value
+        print(f"==>> feedstock_name: {feedstock_name}")
         origin_country_cell = row[3].value
         supply_country_cell = row[4].value
         transit_country_cell = row[5].value
@@ -86,7 +88,9 @@ def parse_sourcing(excel_file: Workbook, sheet_name: str) -> List[SourcingRow]:
         if current_year == -1 or not feedstock_name or not origin_country_cell or feedstock_name == origin_country_cell:
             continue
 
+        print(f"==>> feedstock_name.strip(): {feedstock_name.strip()}")
         feedstock = dc_feedstock_to_carbure_feedstock.get(feedstock_name.strip(), None)
+        print(f"==>> feedstock: {feedstock}")
         origin_country = extract_country_code(origin_country_cell)
         supply_country = extract_country_code(supply_country_cell)
         transit_country = extract_country_code(transit_country_cell)
@@ -127,19 +131,13 @@ def parse_production(excel_file: Workbook) -> List[ProductionRow]:
     production_sheet = excel_file["Production"]
 
     for line, row in enumerate(production_sheet.iter_rows()):
-        print(f"==>> line: {line}")
         current_year = extract_year(row[1].value, current_year)
 
         biofuel_name = row[2].value
         feedstock_name = row[3].value
-        print(f"==>> feedstock_name: {feedstock_name}")
         feedstock_name_check = row[8].value
         max_production_capacity = intOrZero(row[4].value)
-
         estimated_production = intOrZero(row[9].value)
-
-        print(f"==>> estimated_production: {estimated_production}")
-        print(f" ")
 
         if current_year == -1 or not feedstock_name or not biofuel_name:
             continue
@@ -212,7 +210,7 @@ dc_feedstock_to_carbure_feedstock: dict[str, str | None] = {
     "Balles (enveloppes)": "BALLES",
     "Betterave": "BETTERAVE",
     "Blé": "BLE",
-    "Boues de stations d’épuration": "BOUES_EPURATION",
+    "Boues de stations d'épuration": "BOUES_EPURATION",
     "Brai de tallol": "BRAI_TALLOL",
     "Canne à sucre": "CANNE_A_SUCRE",
     "Captage de carbone": None,
@@ -223,7 +221,7 @@ dc_feedstock_to_carbure_feedstock: dict[str, str | None] = {
     "Déchets municipaux en mélange (Hors déchets ménagers triés)": "DECHETS_MUNICIPAUX_MELANGE",
     "Déchets organiques ménagers": "DECHETS_ORGANIQUES_MENAGERS",
     "Distillat d'acide gras de palme": None,
-    "Effluents d’huileries de palme et rafles": "EFFLUENTS_HUILERIES_PALME_RAFLE",
+    "Effluents d'huileries de palme et rafles": "EFFLUENTS_HUILERIES_PALME_RAFLE",
     "Egouts Pauvres de 2e Extractions": "EP2",
     "Fumier humide": "FUMIER_HUMIDE",
     "Fumier sec": "FUMIER_SEC",
@@ -237,7 +235,7 @@ dc_feedstock_to_carbure_feedstock: dict[str, str | None] = {
     "Lies de vin": "LIES_DE_VIN",
     "Maïs": "MAIS",
     "Marcs de raisin": "MARC_DE_RAISIN",
-    "Mat. cellulosiques d’origine non alimentaire": "MAT_CELLULOSIQUE_NON_ALIMENTAIRE",
+    "Mat. cellulosiques d'origine non alimentaire": "MAT_CELLULOSIQUE_NON_ALIMENTAIRE",
     "Mat. ligno-cellulosiques (Hors grumes de sciage & de placage)": "MAT_LIGNO_CELLULOSIQUE",
     "Orge": "ORGE",
     "Paille": "PAILLE",
