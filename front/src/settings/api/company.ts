@@ -35,7 +35,7 @@ export function updateEntity(
   sustainability_officer: string,
   sustainability_officer_phone_number: string
 ) {
-  return api.post("/v5/settings/update-entity", {
+  return api.post("/v5/entity/update-info", {
     entity_id,
     legal_name,
     registration_id,

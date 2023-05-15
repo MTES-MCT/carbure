@@ -1,24 +1,22 @@
-from django.urls import path, include
-import traceback
 from django import forms
 
-
 from core.decorators import check_user_rights
-from core.models import UserRights, Entity, ExternalAdminRights
+from core.models import UserRights, Entity
 from core.common import SuccessResponse, ErrorResponse
+
 
 class UpdateEntityError:
     MALFORMED_PARAMS = "MALFORMED_PARAMS"
     ENTITY_CREATION_FAILED = "ENTITY_CREATION_FAILED"
 
-@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
-def update_entity(request, *args, **kwargs):
 
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
+def update_entity_info(request, *args, **kwargs):
     form = UpdateEntityInfoForm(request.POST)
     if not form.is_valid():
         return ErrorResponse(400, UpdateEntityError.MALFORMED_PARAMS, form.errors)
 
-    entity_id = kwargs['context']['entity_id']
+    entity_id = kwargs["context"]["entity_id"]
 
     legal_name = form.cleaned_data["legal_name"]
     registration_id = form.cleaned_data["registration_id"]
@@ -43,7 +41,6 @@ def update_entity(request, *args, **kwargs):
 
 
 class UpdateEntityInfoForm(forms.Form):
-
     entity_id = forms.IntegerField()
     legal_name = forms.CharField(max_length=128, required=False)
     registration_id = forms.CharField(max_length=64, required=False)
@@ -53,4 +50,3 @@ class UpdateEntityInfoForm(forms.Form):
     registered_zipcode = forms.CharField(required=False)
     registered_city = forms.CharField(required=False)
     registered_country = forms.CharField(required=False)
-    
