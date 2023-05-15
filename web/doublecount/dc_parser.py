@@ -113,6 +113,13 @@ def parse_sourcing(excel_file: Workbook, sheet_name: str) -> List[SourcingRow]:
     return sourcing_rows
 
 
+def intOrZero(value):
+    try:
+        return int(value)
+    except:
+        return 0
+
+
 def parse_production(excel_file: Workbook) -> List[ProductionRow]:
     production_rows: List[ProductionRow] = []
 
@@ -120,14 +127,19 @@ def parse_production(excel_file: Workbook) -> List[ProductionRow]:
     production_sheet = excel_file["Production"]
 
     for line, row in enumerate(production_sheet.iter_rows()):
+        print(f"==>> line: {line}")
         current_year = extract_year(row[1].value, current_year)
 
         biofuel_name = row[2].value
         feedstock_name = row[3].value
+        print(f"==>> feedstock_name: {feedstock_name}")
         feedstock_name_check = row[8].value
-        max_production_capacity = row[4].value or 0
+        max_production_capacity = intOrZero(row[4].value)
 
-        estimated_production = row[9].value or 0
+        estimated_production = intOrZero(row[9].value)
+
+        print(f"==>> estimated_production: {estimated_production}")
+        print(f" ")
 
         if current_year == -1 or not feedstock_name or not biofuel_name:
             continue

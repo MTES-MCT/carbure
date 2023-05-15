@@ -71,8 +71,8 @@ export enum DoubleCountingUploadErrorType {
   MissingFeedstock = "MISSING_FEEDSTOCK",
   ProductionMismatchQuota = "PRODUCTION_MISMATCH_QUOTA",
   LineFeedstocksIncoherent = "LINE_FEEDSTOCKS_INCOHERENT",
-  UnknownYear = "UNKNOW_YEAR"
-
+  UnknownYear = "UNKNOW_YEAR",
+  BadWorksheetName = "BAD_WORKSHEET_NAME"
 }
 
 export interface DoubleCountingUploadError {
