@@ -1,14 +1,15 @@
 from core.models import CarbureLot, GenericError
 from .mandatory import *
 from .ghg import *
+from .certificates import *
 
 
 def sanity_checks(lot: CarbureLot, prefetched_data):
     if lot.lot_status == CarbureLot.FLUSHED:
         return []
 
-    errors: list[GenericError] = [
-        # mandatory fields
+    errors: list[GenericError | None] = [
+        # mandatory fields errors
         check_missing_volume(lot),
         check_missing_biofuel(lot),
         check_missing_feedstock(lot),
@@ -37,6 +38,10 @@ def sanity_checks(lot: CarbureLot, prefetched_data):
         check_eec_with_residue(lot),
         check_ghg_reduc(lot),
         check_ghg_reduc_for_production_site(lot),
+        # certificate errors
+        check_unknown_double_counting_certificate(lot, prefetched_data),
+        check_expired_double_counting_certificate(lot, prefetched_data),
+        check_invalid_double_counting_certificate(lot, prefetched_data),
     ]
 
     # remove empty values from error list
