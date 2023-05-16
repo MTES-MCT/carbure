@@ -85,7 +85,12 @@ def parse_sourcing(excel_file: Workbook, sheet_name: str) -> List[SourcingRow]:
         transit_country_cell = row[5].value
 
         # skip row if no year or feedstock is defined
-        if current_year == -1 or not feedstock_name or not origin_country_cell or feedstock_name == origin_country_cell:
+        if (
+            current_year == -1
+            or not feedstock_name
+            or not origin_country_cell
+            or feedstock_name == origin_country_cell
+        ):
             continue
 
         print(f"==>> feedstock_name.strip(): {feedstock_name.strip()}")
@@ -131,9 +136,11 @@ def parse_production(excel_file: Workbook) -> List[ProductionRow]:
     production_sheet = excel_file["Production"]
 
     for line, row in enumerate(production_sheet.iter_rows()):
+        print("******>line", line)
         current_year = extract_year(row[1].value, current_year)
 
         biofuel_name = row[2].value
+        print(f"==>> biofuel_name: {biofuel_name}")
         feedstock_name = row[3].value
         feedstock_name_check = row[8].value
         max_production_capacity = intOrZero(row[4].value)
@@ -142,10 +149,13 @@ def parse_production(excel_file: Workbook) -> List[ProductionRow]:
         if current_year == -1 or not feedstock_name or not biofuel_name:
             continue
 
+        print("=====>feedstock_name", feedstock_name)
         feedstock = dc_feedstock_to_carbure_feedstock.get(feedstock_name.strip(), None)
+        print("feedstock", feedstock)
         feedstock_check = feedstock if feedstock_name == feedstock_name_check else ""
         biofuel = dc_biofuel_to_carbure_biofuel.get(biofuel_name.strip(), None)
-
+        print(f"==>> biofuel: {biofuel}")
+        print(" ")
         production: ProductionRow = {
             "line": line + 1,
             "year": current_year,
@@ -222,6 +232,7 @@ dc_feedstock_to_carbure_feedstock: dict[str, str | None] = {
     "Déchets organiques ménagers": "DECHETS_ORGANIQUES_MENAGERS",
     "Distillat d'acide gras de palme": None,
     "Effluents d'huileries de palme et rafles": "EFFLUENTS_HUILERIES_PALME_RAFLE",
+    "Effluents d’huileries de palme et rafles (POME)": "EFFLUENTS_HUILERIES_PALME_RAFLE",
     "Egouts Pauvres de 2e Extractions": "EP2",
     "Fumier humide": "FUMIER_HUMIDE",
     "Fumier sec": "FUMIER_SEC",
