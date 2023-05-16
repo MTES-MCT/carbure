@@ -96,6 +96,9 @@ def check_missing_delivery_date(lot: CarbureLot):
 
 
 def check_wrong_delivery_date(lot: CarbureLot):
+    if not lot.delivery_date:
+        return
+
     today = datetime.date.today()
     time_to_delivery = lot.delivery_date - today
     in_ten_years = datetime.timedelta(days=3650)
