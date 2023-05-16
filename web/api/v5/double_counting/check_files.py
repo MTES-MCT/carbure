@@ -105,7 +105,7 @@ def check_dc_file(file):
             tabName = matchedTab[1]
             excel_error = error(DoubleCountingError.BAD_WORKSHEET_NAME, is_blocking=True, meta=tabName)
         elif str(e) == "year 0 is out of range":
-            excel_error = error(DoubleCountingError.UNKNOW_YEAR, is_blocking=True)
+            excel_error = error(DoubleCountingError.UNKNOWN_YEAR, is_blocking=True)
         else:
             excel_error = error(DoubleCountingError.EXCEL_PARSING_ERROR, is_blocking=True, meta=str(e))
 
