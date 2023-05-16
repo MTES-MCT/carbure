@@ -1,6 +1,10 @@
+import datetime
 from core.models import CarbureLot, GenericError
 
+july1st2021 = datetime.date(year=2021, month=7, day=1)
 
+
+# quickly create a lot error
 def generic_error(error, **kwargs):
     d = {
         "display_to_creator": True,
@@ -12,6 +16,12 @@ def generic_error(error, **kwargs):
     return GenericError(**d)
 
 
+# check if the lot is bound to RED II rules
+def is_red_ii(lot: CarbureLot):
+    return lot.delivery_date >= july1st2021
+
+
+# check if the lot is a delivery to france
 def is_french_delivery(lot: CarbureLot):
     return (
         lot.delivery_type
@@ -27,6 +37,15 @@ def is_french_delivery(lot: CarbureLot):
     )
 
 
+# check if the given error is found in the list
+def has_error(error, error_list):
+    for e in error_list:
+        if e.error == error:
+            return True
+    return False
+
+
+# select data related to a lot to speed up sanity checks
 def enrich_lot(lot):
     queryset = CarbureLot.objects.filter(id=lot.id).select_related(
         "carbure_producer",

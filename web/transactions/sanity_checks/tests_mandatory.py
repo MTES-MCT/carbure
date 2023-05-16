@@ -1,8 +1,8 @@
 import datetime
 from django.test import TestCase
 
-from core.carburetypes import CarbureSanityCheckErrors, CarbureCertificatesErrors, CarbureMLGHGErrors
-from core.models import Entity, CarbureLot, MatierePremiere, Biocarburant, Depot, EntityDepot, Pays
+from core.carburetypes import CarbureSanityCheckErrors, CarbureCertificatesErrors
+from core.models import Entity, CarbureLot, MatierePremiere, Biocarburant, Depot, Pays
 from api.v4.sanity_checks import get_prefetched_data
 from transactions.factories import CarbureLotFactory
 from transactions.models import LockedYear
@@ -11,7 +11,7 @@ from .helpers import enrich_lot
 from .sanity_checks import sanity_checks
 
 
-class SanityChecksTest(TestCase):
+class MandatorySanityChecksTest(TestCase):
     fixtures = [
         "json/biofuels.json",
         "json/feedstock.json",
