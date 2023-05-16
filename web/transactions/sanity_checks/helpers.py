@@ -18,6 +18,8 @@ def generic_error(error, **kwargs):
 
 # check if the lot is bound to RED II rules
 def is_red_ii(lot: CarbureLot):
+    if not lot.delivery_date:
+        return True
     return lot.delivery_date >= july1st2021
 
 
@@ -68,4 +70,4 @@ def enrich_lot(lot):
         "parent_stock",
         "parent_lot",
     )
-    return queryset.first()
+    return queryset.get()
