@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "build": "(cd front; npm install; npm run build)",
-    "test": "python web/manage.py test api --keepdb"
+    "test": "python web/manage.py test api --keepdb",
+    "migrate": "python web/manage.py makemigrations && python web/manage.py migrate"
   },
   "engines": {
     "node": "16.16.0",
