@@ -108,6 +108,7 @@ type ErrorsTableProps = {
 export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
   const { t } = useTranslation()
   const errorFiltered = errors //mergeErrors(errors)
+  console.log('errorFiltered:', errorFiltered)
 
   const columns: Column<DoubleCountingUploadError>[] = [
     {
