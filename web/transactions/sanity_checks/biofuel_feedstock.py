@@ -34,7 +34,6 @@ def check_provenance_mp(lot: CarbureLot):
         yield generic_error(
             error=CarbureSanityCheckErrors.PROVENANCE_MP,
             lot=lot,
-            is_blocking=True,
             extra=error,
             fields=["feedstock", "country_of_origin"],
         )
