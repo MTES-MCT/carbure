@@ -82,7 +82,7 @@ def check_ep_anormal_low(lot: CarbureLot, prefetched_data):
     if ep is None:
         return
 
-    if lot.ep < 0.8 * ep.average:
+    if lot.ep < 0.7 * ep.average:
         return generic_error(
             error=CarbureMLGHGErrors.EP_ANORMAL_LOW,
             lot=lot,
@@ -96,7 +96,7 @@ def check_ep_anormal_high(lot: CarbureLot, prefetched_data):
     if ep is None:
         return
 
-    if lot.ep > 1.2 * ep.default_value_max_ep:
+    if lot.ep > 1.3 * ep.default_value_max_ep:
         return generic_error(
             error=CarbureMLGHGErrors.EP_ANORMAL_HIGH,
             lot=lot,
