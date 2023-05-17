@@ -1,6 +1,18 @@
-from core.carburetypes import CarbureCertificatesErrors
+from core.carburetypes import CarbureCertificatesErrors, CarbureSanityCheckErrors
 from core.models import CarbureLot
 from .helpers import generic_error
+
+
+def check_missing_ref_dbl_counting(lot: CarbureLot):
+    if lot.feedstock and lot.feedstock.is_double_compte:
+        if not lot.production_site_double_counting_certificate:
+            return generic_error(
+                error=CarbureSanityCheckErrors.MISSING_REF_DBL_COUNTING,
+                lot=lot,
+                is_blocking=True,
+                extra="%s de %s" % (lot.biofuel, lot.feedstock),
+                field="production_site_double_counting_certificate",
+            )
 
 
 def check_unknown_double_counting_certificate(lot: CarbureLot, prefetched_data):
@@ -12,7 +24,7 @@ def check_unknown_double_counting_certificate(lot: CarbureLot, prefetched_data):
             lot=lot,
             is_blocking=True,
             display_to_recipient=True,
-            field="dc_reference",
+            field="production_site_double_counting_certificate",
         )
 
 
@@ -31,6 +43,7 @@ def check_expired_double_counting_certificate(lot: CarbureLot, prefetched_data):
             display_to_recipient=True,
             is_blocking=True,
             lot=lot,
+            field="production_site_double_counting_certificate",
         )
     elif certificate.valid_until < lot.delivery_date:
         # Non blocking
@@ -38,6 +51,7 @@ def check_expired_double_counting_certificate(lot: CarbureLot, prefetched_data):
             error=CarbureCertificatesErrors.EXPIRED_DOUBLE_COUNTING_CERTIFICATE,
             display_to_recipient=True,
             lot=lot,
+            field="production_site_double_counting_certificate",
         )
 
 
