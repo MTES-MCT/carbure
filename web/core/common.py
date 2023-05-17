@@ -270,7 +270,14 @@ def SuccessResponse(data=None):
 
 
 # based on a given biofuel, convert any quantity type into all others
-def compute_quantities(biofuel: Biocarburant, quantity=None, unit=None, volume=None, weight=None, lhv_amount=None):
+def compute_quantities(
+    biofuel: Biocarburant,
+    quantity=None,
+    unit=None,
+    volume=None,
+    weight=None,
+    lhv_amount=None,
+):
     # normalize the given data in the form of a (quantity, unit) couple
     if quantity is not None:
         quantity = round(float(quantity), 2)
@@ -341,3 +348,13 @@ class Perf:
 
     def done(self, message="Done"):
         self.step(message)
+
+
+class CarbureException(Exception):
+    def __init__(self, error, meta=None):
+        self.error = error
+        self.meta = meta or {}
+        super().__init__()
+
+    def __str__(self):
+        return f"CarbureException: Error code {self.error}. Meta: {self.meta}"
