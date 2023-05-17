@@ -3,12 +3,12 @@ from django.test import TestCase
 
 from core.carburetypes import CarbureSanityCheckErrors
 from core.models import Entity, CarbureLot, MatierePremiere, Biocarburant, Depot, EntityDepot
-from api.v4.sanity_checks import sanity_check, get_prefetched_data
 from transactions.factories import CarbureLotFactory
 from transactions.models import LockedYear
 from producers.models import ProductionSiteInput, ProductionSiteOutput
 from resources.factories import ProductionSiteFactory
-from ..helpers import enrich_lot, has_error
+from ..sanity_checks import sanity_checks
+from ..helpers import enrich_lot, has_error, get_prefetched_data
 
 
 class GeneralSanityChecksTest(TestCase):
@@ -24,12 +24,10 @@ class GeneralSanityChecksTest(TestCase):
 
     def setUp(self):
         self.producer = Entity.objects.filter(entity_type=Entity.PRODUCER).first()
-        LockedYear.objects.create(year=2016, locked=True)
         self.prefetched_data = get_prefetched_data()
 
     def run_checks(self, lot, prefetched_data=None):
-        _, errors = sanity_check(lot, prefetched_data or self.prefetched_data)
-        return errors
+        return sanity_checks(lot, prefetched_data or self.prefetched_data)
 
     def create_lot(self, **kwargs):
         lot = CarbureLotFactory.create(**kwargs)
@@ -98,12 +96,15 @@ class GeneralSanityChecksTest(TestCase):
         error_list = self.run_checks(lot)
         self.assertFalse(has_error(error, error_list))
 
-        lot.year = 2016
+        LockedYear.objects.create(year=2017, locked=True)
+        prefetched_data = get_prefetched_data()
 
-        error_list = self.run_checks(lot)
+        lot.year = 2017
+
+        error_list = self.run_checks(lot, prefetched_data)
         self.assertTrue(has_error(error, error_list))
 
-        lot.year = 2015
+        lot.year = 2010
 
         error_list = self.run_checks(lot)
         self.assertTrue(has_error(error, error_list))

@@ -3,11 +3,10 @@ from django.test import TestCase
 
 from core.carburetypes import CarbureSanityCheckErrors, CarbureCertificatesErrors
 from core.models import Entity, CarbureLot, MatierePremiere, Biocarburant, Depot, Pays
-from api.v4.sanity_checks import get_prefetched_data
 from transactions.factories import CarbureLotFactory
 from transactions.models import LockedYear
 from producers.models import ProductionSite
-from ..helpers import enrich_lot, has_error
+from ..helpers import enrich_lot, has_error, get_prefetched_data
 from ..sanity_checks import sanity_checks
 
 
@@ -24,8 +23,6 @@ class MandatorySanityChecksTest(TestCase):
 
     def setUp(self):
         self.producer = Entity.objects.filter(entity_type=Entity.PRODUCER).first()
-        LockedYear.objects.create(year=2016, locked=True)
-
         self.prefetched_data = get_prefetched_data()
 
     def run_checks(self, lot, prefetched_data=None):
