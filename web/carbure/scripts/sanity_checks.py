@@ -70,7 +70,7 @@ def cleanup_sanity_checks(year, batch, apply):
     for page_number in tqdm(paginator.page_range):
         page = paginator.page(page_number)
         page_lots = page.object_list
-        errors, _ = bulk_sanity_checks(page_lots, prefetched_data, dry_run=not apply)
+        errors = bulk_sanity_checks(page_lots, prefetched_data, dry_run=not apply)
         all_warnings += [warning for warning in errors if not warning.is_blocking]
         all_errors += [error for error in errors if error.is_blocking]
 

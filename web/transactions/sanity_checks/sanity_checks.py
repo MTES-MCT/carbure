@@ -1,4 +1,7 @@
+import traceback
+
 from core.models import CarbureLot, GenericError
+from .helpers import get_prefetched_data
 from .mandatory import *
 from .ghg import *
 from .general import *
@@ -62,3 +65,26 @@ def sanity_checks(lot: CarbureLot, prefetched_data):
 
     # remove empty values from error list
     return [error for error in errors if error]
+
+
+def bulk_sanity_checks(lots, prefetched_data=None, dry_run=False):
+    if prefetched_data is None:
+        prefetched_data = get_prefetched_data()
+
+    errors = []
+
+    # cleanup previous errors
+    if not dry_run:
+        GenericError.objects.filter(lot_id__in=[l.id for l in lots]).delete()
+
+    for lot in lots:
+        try:
+            errors += sanity_checks(lot, prefetched_data)
+        except:
+            traceback.print_exc()
+
+    # save new errors
+    if not dry_run:
+        GenericError.objects.bulk_create(errors, batch_size=1000)
+
+    return errors
