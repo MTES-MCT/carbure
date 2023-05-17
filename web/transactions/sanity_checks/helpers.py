@@ -31,6 +31,14 @@ def generic_error(error, **kwargs):
     return GenericError(**d)
 
 
+# check if there are some blocking errors in the given list
+def has_blocking_errors(errors: list[GenericError]):
+    for e in errors:
+        if e.is_blocking:
+            return True
+    return False
+
+
 # check if the lot is bound to RED II rules
 def is_red_ii(lot: CarbureLot):
     if not lot.delivery_date:
