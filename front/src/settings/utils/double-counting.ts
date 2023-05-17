@@ -70,14 +70,14 @@ export function getErrorText(
       break
     case DoubleCountingUploadErrorType.PomeGt2000:
       errorText += t(
-        "En {{year}}, les biocarburants issus d'effluents d'huilerie de palme et rafles ne seront pas reconnus au double comptage au delà d'une production total de 2000 tonnes par unité de production.",
+        "En {{year}}, les biocarburants issus d'effluents d'huilerie de palme et rafles (POME) ne peuvent pas être reconnus au double comptage au delà de 2000 tonnes par unité de production et par an.",
         { year: error?.meta?.year }
       )
       break
     case DoubleCountingUploadErrorType.BadWorksheetName:
       errorText += t(
-        "La feuille \"{{tabName}}\" n'a pas été trouvé dans le fichier. Vérifiez que la feuille n'est pas été renommée.",
-        { tabName: error?.meta }
+        "La feuille \"{{sheetName}}\" n'a pas été trouvé dans le fichier. Vérifiez que la feuille n'est pas été renommée.",
+        { sheetName: error?.meta.sheet_name }
       )
       break
     case DoubleCountingUploadErrorType.ProductionMismatchQuota:
@@ -92,7 +92,7 @@ export function getErrorText(
       break
     case DoubleCountingUploadErrorType.UnknownYear:
       errorText += t(
-        "Les années doivent être renseignées",
+        "Les années doivent être renseignées.",
       )
       break
 
