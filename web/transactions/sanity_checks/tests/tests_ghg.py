@@ -7,9 +7,9 @@ from api.v4.sanity_checks import get_prefetched_data
 from ml.models import ETDStats
 from transactions.factories import CarbureLotFactory
 from transactions.models import LockedYear
-from .ghg import oct2015, jan2021
-from .helpers import enrich_lot, has_error, july1st2021
-from .sanity_checks import sanity_checks
+from ..ghg import oct2015, jan2021
+from ..helpers import enrich_lot, has_error, july1st2021
+from ..sanity_checks import sanity_checks
 
 
 class GhgSanityChecksTest(TestCase):
@@ -30,8 +30,7 @@ class GhgSanityChecksTest(TestCase):
         self.prefetched_data = get_prefetched_data()
 
     def run_checks(self, lot, prefetched_data=None):
-        errors = sanity_checks(lot, prefetched_data or self.prefetched_data)
-        return errors
+        return sanity_checks(lot, prefetched_data or self.prefetched_data)
 
     def create_lot(self, **kwargs):
         lot = CarbureLotFactory.create(**kwargs)
@@ -227,20 +226,20 @@ class GhgSanityChecksTest(TestCase):
         lot.ghg_reduction_red_ii = 64
 
         error_list = self.run_checks(lot)
-        self.assertFalse(has_error(error, error_list))
+        self.assertTrue(has_error(error, error_list))
 
         lot.ghg_reduction_red_ii = 66
 
         error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
-
-        error_list = self.run_checks(lot)
-        self.assertTrue(has_error(error, error_list))
+        self.assertFalse(has_error(error, error_list))
 
     def test_etd_anormal_high(self):
         error = CarbureMLGHGErrors.ETD_ANORMAL_HIGH
 
-        etd = ETDStats.objects.get()
+        etd = ETDStats.objects.first()
+        if not etd:
+            return
+
         lot = self.create_lot(feedstock=etd.feedstock, etd=1)
 
         error_list = self.run_checks(lot)

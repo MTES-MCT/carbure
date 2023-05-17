@@ -8,16 +8,16 @@ jan2021 = datetime.date(year=2021, month=1, day=1)
 
 
 def check_etd_anormal_high(lot: CarbureLot, prefetched_data):
-    etd_default_value = get_etd(lot, prefetched_data)
-
-    if etd_default_value is None:
+    etd = get_etd(lot, prefetched_data)
+    if etd is None:
         return
 
-    if lot.etd > 2 * etd_default_value and lot.etd > 5:
+    if lot.etd > 2 * etd and lot.etd > 5:
         return generic_error(
             error=CarbureMLGHGErrors.ETD_ANORMAL_HIGH,
             lot=lot,
             display_to_creator=False,
+            field="etd",
         )
 
 
@@ -31,6 +31,7 @@ def check_etd_no_eu_too_low(lot: CarbureLot, prefetched_data):
             error=CarbureMLGHGErrors.ETD_NO_EU_TOO_LOW,
             lot=lot,
             display_to_creator=False,
+            field="etd",
         )
 
 
@@ -44,6 +45,7 @@ def check_etd_eu_default_value(lot: CarbureLot, prefetched_data):
             error=CarbureMLGHGErrors.ETD_EU_DEFAULT_VALUE,
             lot=lot,
             display_to_creator=False,
+            field="etd",
         )
 
 
@@ -57,6 +59,7 @@ def check_eec_anormal_low(lot: CarbureLot, prefetched_data):
             error=CarbureMLGHGErrors.EEC_ANORMAL_LOW,
             lot=lot,
             display_to_creator=False,
+            field="eec",
         )
 
 
@@ -70,6 +73,7 @@ def check_eec_anormal_high(lot: CarbureLot, prefetched_data):
             error=CarbureMLGHGErrors.EEC_ANORMAL_HIGH,
             lot=lot,
             display_to_creator=False,
+            field="eec",
         )
 
 
@@ -83,6 +87,7 @@ def check_ep_anormal_low(lot: CarbureLot, prefetched_data):
             error=CarbureMLGHGErrors.EP_ANORMAL_LOW,
             lot=lot,
             display_to_creator=False,
+            field="ep",
         )
 
 
@@ -96,6 +101,7 @@ def check_ep_anormal_high(lot: CarbureLot, prefetched_data):
             error=CarbureMLGHGErrors.EP_ANORMAL_HIGH,
             lot=lot,
             display_to_creator=False,
+            field="ep",
         )
 
 
@@ -178,7 +184,7 @@ def check_ghg_reduc_for_production_site(lot: CarbureLot):
                 lot=lot,
                 is_blocking=True,
             )
-        elif commissioning_date >= jan2021 and lot.ghg_reduction_red_ii < 65:
+        if commissioning_date >= jan2021 and lot.ghg_reduction_red_ii < 65:
             return generic_error(
                 error=CarbureSanityCheckErrors.GHG_REDUC_INF_65,
                 lot=lot,
@@ -204,8 +210,7 @@ def get_etd(lot: CarbureLot, prefetched_data):
         return None
 
     etd = prefetched_data["etd"]
-    key = str(lot.feedstock)
-    return etd.get(key)
+    return etd.get(lot.feedstock)
 
 
 def get_eec(lot: CarbureLot, prefetched_data):
