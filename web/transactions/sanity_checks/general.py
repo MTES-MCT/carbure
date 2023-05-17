@@ -17,9 +17,9 @@ def check_volume_faible(lot: CarbureLot):
         )
 
 
-def check_locked_year(lot: CarbureLot, prefetched_data):
+def check_year_locked(lot: CarbureLot, prefetched_data):
     if lot.year in prefetched_data["locked_years"] or lot.year <= 2015:
-        generic_error(
+        return generic_error(
             error=CarbureSanityCheckErrors.YEAR_LOCKED,
             lot=lot,
             field="delivery_date",

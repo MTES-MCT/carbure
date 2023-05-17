@@ -51,7 +51,7 @@ def sanity_checks(lot: CarbureLot, prefetched_data):
         check_ghg_reduc_for_production_site(lot),
         # general errors
         check_volume_faible(lot),
-        check_locked_year(lot, prefetched_data),
+        check_year_locked(lot, prefetched_data),
         check_mac_bc_wrong(lot),
         check_mac_not_efpe(lot),
         check_delivery_in_the_future(lot),
