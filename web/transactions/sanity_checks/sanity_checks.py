@@ -1,7 +1,9 @@
 from core.models import CarbureLot, GenericError
 from .mandatory import *
 from .ghg import *
-from .certificates import *
+from .general import *
+from .double_counting import *
+from .biofuel_feedstock import *
 
 
 def sanity_checks(lot: CarbureLot, prefetched_data):
@@ -23,6 +25,15 @@ def sanity_checks(lot: CarbureLot, prefetched_data):
         check_missing_delivery_site_country(lot),
         check_missing_feedstock_country_of_origin(lot),
         check_missing_supplier_certificate(lot),
+        # double counting errors
+        check_missing_ref_dbl_counting(lot),
+        check_unknown_double_counting_certificate(lot, prefetched_data),
+        check_expired_double_counting_certificate(lot, prefetched_data),
+        check_invalid_double_counting_certificate(lot, prefetched_data),
+        # biofuel/feedstock errors
+        *check_mp_bc_incoherent(lot),  # this one generates a list of errors so we flatten it with *
+        *check_provenance_mp(lot),  # same here
+        check_deprecated_mp(lot),
         # ghg errors
         check_etd_anormal_high(lot, prefetched_data),
         check_etd_no_eu_too_low(lot, prefetched_data),
@@ -38,10 +49,15 @@ def sanity_checks(lot: CarbureLot, prefetched_data):
         check_eec_with_residue(lot),
         check_ghg_reduc(lot),
         check_ghg_reduc_for_production_site(lot),
-        # certificate errors
-        check_unknown_double_counting_certificate(lot, prefetched_data),
-        check_expired_double_counting_certificate(lot, prefetched_data),
-        check_invalid_double_counting_certificate(lot, prefetched_data),
+        # general errors
+        check_volume_faible(lot),
+        check_locked_year(lot, prefetched_data),
+        check_mac_bc_wrong(lot),
+        check_mac_not_efpe(lot),
+        check_delivery_in_the_future(lot),
+        check_mp_not_configured(lot, prefetched_data),
+        check_bc_not_configured(lot, prefetched_data),
+        check_depot_not_configured(lot, prefetched_data),
     ]
 
     # remove empty values from error list
