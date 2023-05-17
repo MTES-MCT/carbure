@@ -19,7 +19,7 @@ def check_missing_biofuel(lot: CarbureLot):
         return generic_error(
             error=CarbureSanityCheckErrors.MISSING_BIOFUEL,
             lot=lot,
-            field="biofuel_code",
+            field="biofuel",
             is_blocking=True,
         )
 
@@ -29,7 +29,7 @@ def check_missing_feedstock(lot: CarbureLot):
         return generic_error(
             error=CarbureSanityCheckErrors.MISSING_FEEDSTOCK,
             lot=lot,
-            field="feedstock_code",
+            field="feedstock",
             is_blocking=True,
         )
 
@@ -39,7 +39,7 @@ def check_unkown_production_site(lot: CarbureLot):
         return generic_error(
             error=CarbureSanityCheckErrors.UNKNOWN_PRODUCTION_SITE,
             lot=lot,
-            field="carbure_production_site",
+            field="production_site",
             is_blocking=True,
         )
 
@@ -70,7 +70,7 @@ def check_missing_carbure_delivery_site(lot: CarbureLot):
         return generic_error(
             error=CarbureSanityCheckErrors.MISSING_CARBURE_DELIVERY_SITE,
             lot=lot,
-            field="carbure_delivery_site",
+            field="delivery_site",
             is_blocking=True,
         )
 
@@ -80,7 +80,7 @@ def check_missing_carbure_client(lot: CarbureLot):
         return generic_error(
             error=CarbureSanityCheckErrors.MISSING_CARBURE_CLIENT,
             lot=lot,
-            field="carbure_client",
+            field="client",
             is_blocking=True,
         )
 

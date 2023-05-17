@@ -7,8 +7,8 @@ from api.v4.sanity_checks import get_prefetched_data
 from transactions.factories import CarbureLotFactory
 from transactions.models import LockedYear
 from producers.models import ProductionSite
-from .helpers import enrich_lot
-from .sanity_checks import sanity_checks
+from ..helpers import enrich_lot, has_error
+from ..sanity_checks import sanity_checks
 
 
 class MandatorySanityChecksTest(TestCase):
@@ -29,8 +29,7 @@ class MandatorySanityChecksTest(TestCase):
         self.prefetched_data = get_prefetched_data()
 
     def run_checks(self, lot, prefetched_data=None):
-        errors = sanity_checks(lot)
-        return errors
+        return sanity_checks(lot, prefetched_data or self.prefetched_data)
 
     def create_lot(self, **kwargs):
         lot = CarbureLotFactory.create(**kwargs)
@@ -227,10 +226,3 @@ class MandatorySanityChecksTest(TestCase):
 
     def x_test_missing_supplier_certificate(self):
         error = CarbureCertificatesErrors.MISSING_SUPPLIER_CERTIFICATE
-
-
-def has_error(error, error_list):
-    for e in error_list:
-        if e.error == error:
-            return True
-    return False
