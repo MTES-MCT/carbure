@@ -85,11 +85,11 @@ def get_feedstock_origin_incompatibilities(feedstock: MatierePremiere, country: 
     if feedstock.code == "COLZA" and not country.is_in_europe and country.code_pays not in colza_countries:
         yield f"{feedstock} de {country}"
 
-    sugarcane_countries = ("BR", "BO")
+    sugarcane_countries = ("BO", "BR", "CR", "GT", "PE")
     if feedstock.code == "CANNE_A_SUCRE" and country.code_pays not in sugarcane_countries:
         yield f"{feedstock} de {country}"
 
-    mais_countries = ("US", "UA")
+    mais_countries = ("US", "UA", "CA", "BR", "PY", "AR")
     if feedstock.code == "MAIS" and not country.is_in_europe and country.code_pays not in mais_countries:
         yield f"{feedstock} de {country}"
 
