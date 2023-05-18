@@ -40,7 +40,7 @@ def sanity_checks(lot: CarbureLot, prefetched_data):
         # ghg errors
         check_etd_anormal_high(lot, prefetched_data),
         check_etd_no_eu_too_low(lot, prefetched_data),
-        check_etd_eu_default_value(lot, prefetched_data),
+        # check_etd_eu_default_value(lot, prefetched_data),
         check_eec_anormal_low(lot, prefetched_data),
         check_eec_anormal_high(lot, prefetched_data),
         check_ep_anormal_low(lot, prefetched_data),
