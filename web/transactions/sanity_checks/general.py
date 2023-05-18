@@ -76,6 +76,8 @@ def check_mp_not_configured(lot: CarbureLot, prefetched_data):
                     error=CarbureSanityCheckErrors.MP_NOT_CONFIGURED,
                     lot=lot,
                     display_to_recipient=False,
+                    display_to_admin=False,
+                    display_to_auditor=False,
                     field="feedstock_code",
                 )
 
@@ -90,6 +92,8 @@ def check_bc_not_configured(lot: CarbureLot, prefetched_data):
                     error=CarbureSanityCheckErrors.BC_NOT_CONFIGURED,
                     lot=lot,
                     display_to_recipient=False,
+                    display_to_admin=False,
+                    display_to_auditor=False,
                     field="biofuel_code",
                 )
 
@@ -106,5 +110,7 @@ def check_depot_not_configured(lot: CarbureLot, prefetched_data):
                 lot=lot,
                 display_to_recipient=True,
                 display_to_creator=False,
+                display_to_admin=False,
+                display_to_auditor=False,
                 field="delivery_site",
             )
