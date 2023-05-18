@@ -490,6 +490,8 @@ const errorsToFields: Record<string, (keyof LotFormValue)[]> = {
   MISSING_UNKNOWN_CLIENT: ['client'],
   MISSING_UNKNOWN_DELIVERY_SITE: ['delivery_site'],
   MISSING_UNKNOWN_DELIVERY_SITE_COUNTRY: ['delivery_site_country'],
+  MISSING_DELIVERY_SITE_COUNTRY: ['delivery_site_country'],
+  MISSING_TRANSPORT_DOCUMENT_REFERENCE: ["transport_document_reference"],
   MISSING_VOLUME: ['volume'],
   MP_BC_INCOHERENT: ['feedstock', 'biofuel'],
   MP_NOT_CONFIGURED: ['feedstock'],
