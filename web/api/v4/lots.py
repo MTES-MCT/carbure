@@ -58,7 +58,6 @@ def fill_delivery_date(lot, data):
     errors = []
     today = datetime.date.today()
     # default: today
-    lot.delivery_date = today
     try:
         delivery_date = data.get("delivery_date", "")
         dd = try_get_date(delivery_date)
@@ -69,11 +68,13 @@ def fill_delivery_date(lot, data):
                 lot=lot,
                 field="delivery_date",
                 error=INCORRECT_FORMAT_DELIVERY_DATE,
-                value=delivery_date,
+                value=data.get("delivery_date", ""),
                 display_to_creator=True,
                 is_blocking=True,
             )
         )
+    if lot.delivery_date is None:
+        lot.delivery_date = today
     lot.period = lot.delivery_date.year * 100 + lot.delivery_date.month
     lot.year = lot.delivery_date.year
     return errors
