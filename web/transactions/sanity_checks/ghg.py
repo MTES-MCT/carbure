@@ -54,7 +54,7 @@ def check_eec_anormal_low(lot: CarbureLot, prefetched_data):
     if eec is None:
         return
 
-    if lot.eec < 0.8 * min(eec.default_value, eec.average):
+    if lot.eec < 0.7 * min(eec.default_value, eec.average):
         return generic_error(
             error=CarbureMLGHGErrors.EEC_ANORMAL_LOW,
             lot=lot,
@@ -68,7 +68,7 @@ def check_eec_anormal_high(lot: CarbureLot, prefetched_data):
     if eec is None:
         return
 
-    if lot.eec > 1.2 * max(eec.default_value, eec.average):
+    if lot.eec > 1.3 * max(eec.default_value, eec.average):
         return generic_error(
             error=CarbureMLGHGErrors.EEC_ANORMAL_HIGH,
             lot=lot,
@@ -82,7 +82,7 @@ def check_ep_anormal_low(lot: CarbureLot, prefetched_data):
     if ep is None:
         return
 
-    if lot.ep < 0.7 * ep.average:
+    if lot.ep < 0.5 * min(ep.average, ep.default_value_min_ep):
         return generic_error(
             error=CarbureMLGHGErrors.EP_ANORMAL_LOW,
             lot=lot,
@@ -96,7 +96,7 @@ def check_ep_anormal_high(lot: CarbureLot, prefetched_data):
     if ep is None:
         return
 
-    if lot.ep > 1.3 * ep.default_value_max_ep:
+    if lot.ep > 1.5 * max(ep.average, ep.default_value_max_ep):
         return generic_error(
             error=CarbureMLGHGErrors.EP_ANORMAL_HIGH,
             lot=lot,
