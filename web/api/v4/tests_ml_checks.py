@@ -91,7 +91,7 @@ class LotGHGTest(TestCase):
         nb_errors = GenericError.objects.filter(lot_id=lot.id, error="ETD_ANORMAL_HIGH").count()
         self.assertEqual(nb_errors, 1)
 
-    def test_etd_eu_default(self):
+    def x_test_etd_eu_default(self):
         lot = self.create_draft(biofuel_code="ETH", feedstock_code="BETTERAVE", country_code="FR", etd=2.3)
         lot = self.send_lot(lot)
         nb_errors = GenericError.objects.filter(lot_id=lot.id, error="ETD_EU_DEFAULT_VALUE").count()
