@@ -52,7 +52,7 @@ const DoubleCountingSettings = () => {
         <h1>
           <Trans>Dossiers double comptage</Trans>
         </h1>
-        {canModify && (
+        {/* {canModify && (
           <Button
             asideX
             variant="primary"
@@ -60,7 +60,7 @@ const DoubleCountingSettings = () => {
             action={showUploadDialog}
             label={t("Ajouter un dossier double comptage")}
           />
-        )}
+        )} */}
       </header>
 
       {isEmpty && (

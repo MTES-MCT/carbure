@@ -96,7 +96,7 @@ def parse_sourcing(excel_file: Workbook, sheet_name: str) -> List[SourcingRow]:
         ):
             continue
 
-        feedstock = dc_feedstock_to_carbure_feedstock.get(feedstock_name.strip(), None)
+        feedstock = get_feedstock_from_dc_feedstock(feedstock_name)
 
         # this allow to accept row without year but only when feedstock recognized
         if current_year == -1 and feedstock is None:
@@ -153,7 +153,7 @@ def parse_production(excel_file: Workbook) -> List[ProductionRow]:
         if current_year == -1 or not feedstock_name or not biofuel_name:
             continue
 
-        feedstock = dc_feedstock_to_carbure_feedstock.get(feedstock_name.strip(), None)
+        feedstock = get_feedstock_from_dc_feedstock(feedstock_name)
         feedstock_check = feedstock if feedstock_name == feedstock_name_check else ""
         biofuel = dc_biofuel_to_carbure_biofuel.get(biofuel_name.strip(), None)
         production: ProductionRow = {
@@ -183,7 +183,7 @@ def parse_production(excel_file: Workbook) -> List[ProductionRow]:
             continue
 
         biofuel = dc_biofuel_to_carbure_biofuel.get(biofuel_name.strip(), None)
-        feedstock = dc_feedstock_to_carbure_feedstock.get(feedstock_name.strip(), None)
+        feedstock = get_feedstock_from_dc_feedstock(feedstock_name)
 
         for production in production_rows:
             if (
@@ -214,6 +214,11 @@ def extract_country_code(country_str: str) -> str | None:
         return None
 
 
+def get_feedstock_from_dc_feedstock(feedstock_name: str) -> str | None:
+    feedstock_name = feedstock_name.replace("’", "'")
+    return dc_feedstock_to_carbure_feedstock.get(feedstock_name.strip(), None)
+
+
 dc_feedstock_to_carbure_feedstock: dict[str, str | None] = {
     "Algues": "ALGUES",
     "Bagasse": "BAGASSE",
@@ -221,7 +226,6 @@ dc_feedstock_to_carbure_feedstock: dict[str, str | None] = {
     "Betterave": "BETTERAVE",
     "Blé": "BLE",
     "Boues de stations d'épuration": "BOUES_EPURATION",
-    "Boues de stations d’épuration": "BOUES_EPURATION",
     "Brai de tallol": "BRAI_TALLOL",
     "Canne à sucre": "CANNE_A_SUCRE",
     "Captage de carbone": None,
@@ -232,11 +236,8 @@ dc_feedstock_to_carbure_feedstock: dict[str, str | None] = {
     "Déchets municipaux en mélange (Hors déchets ménagers triés)": "DECHETS_MUNICIPAUX_MELANGE",
     "Déchets organiques ménagers": "DECHETS_ORGANIQUES_MENAGERS",
     "Distillat d'acide gras de palme": None,
-    "Distillat d’acide gras de palme": None,
     "Effluents d'huileries de palme et rafles": "EFFLUENTS_HUILERIES_PALME_RAFLE",
-    "Effluents d’huileries de palme et rafles": "EFFLUENTS_HUILERIES_PALME_RAFLE",
     "Effluents d'huileries de palme et rafles (POME)": "EFFLUENTS_HUILERIES_PALME_RAFLE",
-    "Effluents d’huileries de palme et rafles (POME)": "EFFLUENTS_HUILERIES_PALME_RAFLE",
     "Egouts Pauvres de 2e Extractions": "EP2",
     "Fumier humide": "FUMIER_HUMIDE",
     "Fumier sec": "FUMIER_SEC",
@@ -250,7 +251,6 @@ dc_feedstock_to_carbure_feedstock: dict[str, str | None] = {
     "Lies de vin": "LIES_DE_VIN",
     "Maïs": "MAIS",
     "Marcs de raisin": "MARC_DE_RAISIN",
-    "Mat. cellulosiques d’origine non alimentaire": "MAT_CELLULOSIQUE_NON_ALIMENTAIRE",
     "Mat. cellulosiques d'origine non alimentaire": "MAT_CELLULOSIQUE_NON_ALIMENTAIRE",
     "Mat. ligno-cellulosiques (Hors grumes de sciage & de placage)": "MAT_LIGNO_CELLULOSIQUE",
     "Orge": "ORGE",
