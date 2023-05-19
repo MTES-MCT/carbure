@@ -31,7 +31,7 @@ export function getErrorText(
       )
       break
     case DoubleCountingUploadErrorType.MissingBiofuel:
-      errorText += t("Le biocarburant est manquant.")
+      errorText += t("Le biocarburant est manquant ou non reconnu.")
       break
     case DoubleCountingUploadErrorType.MissingFeedstock:
       errorText += t("La matière première est manquante ou non reconnue (Verifiez la syntaxe dans la liste de matières premières qui est incluse dans le fichier excel).")
