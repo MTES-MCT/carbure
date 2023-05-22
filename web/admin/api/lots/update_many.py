@@ -121,7 +121,7 @@ def update_many(request):
         )
 
     # run sanity checks in memory so we don't modify the current errors
-    sanity_check_errors, _ = bulk_sanity_checks(updated_lots, prefetched_data, dry_run=True)
+    sanity_check_errors = bulk_sanity_checks(updated_lots, prefetched_data, dry_run=True)
     blocking_errors = [error for error in sanity_check_errors if error.is_blocking]
 
     # do not modify the database if there are any blocking errors in the modified lots

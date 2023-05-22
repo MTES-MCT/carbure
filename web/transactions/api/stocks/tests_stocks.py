@@ -3,11 +3,11 @@ import json
 import random
 
 from api.v4.tests_utils import setup_current_user
-from core.models import Entity
+from core.models import CarbureLot, CarbureStock, Depot, Entity
 from django.db.models import Count
 from django.test import TestCase
 from django.urls import reverse
-from transactions.factories import CarbureLot, CarbureLotFactory, CarbureStock, CarbureStockFactory, Depot
+from transactions.factories import CarbureLotFactory, CarbureStockFactory
 
 
 class StocksFlowTest(TestCase):

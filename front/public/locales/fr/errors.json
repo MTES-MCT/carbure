@@ -36,7 +36,7 @@
   "MISSING_CARBURE_DELIVERY_SITE": "Le site de livraison est manquant",
   "MISSING_COUNTRY_OF_ORIGIN": "Le pays d'origine de la matière première est manquant",
   "MISSING_COUNTRY": "Le pays de livraison est manquant",
-  "MISSING_DAE": "Le DAE (ou équivalent) est manquant",
+  "MISSING_TRANSPORT_DOCUMENT_REFERENCE": "Le DAE (ou équivalent) est manquant",
   "MISSING_DELIVERY_DATE": "La date de livraison est manquante",
   "MISSING_DELIVERY_SITE_COUNTRY": "Le pays de livraison est manquant",
   "MISSING_DELIVERY_SITE": "Le site de livraison est manquant",

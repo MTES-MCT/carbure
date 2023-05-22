@@ -22,7 +22,8 @@ from api.v4.helpers import (
 )
 from api.v4.helpers import get_prefetched_data, get_transaction_distance, get_known_certificates
 from api.v4.lots import construct_carbure_lot, bulk_insert_lots
-from api.v4.sanity_checks import sanity_check, bulk_sanity_checks, bulk_scoring
+from api.v4.sanity_checks import bulk_scoring
+from transactions.sanity_checks import sanity_checks, bulk_sanity_checks, has_blocking_errors
 
 from core.models import (
     CarbureLot,
@@ -379,8 +380,8 @@ def lots_send(request, *args, **kwargs):
             continue
 
         # sanity check !!!
-        is_sane, errors = sanity_check(lot, prefetched_data)
-        if not is_sane:
+        errors = sanity_checks(lot, prefetched_data)
+        if has_blocking_errors(errors):
             nb_rejected += 1
             continue
         nb_sent += 1
