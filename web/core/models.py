@@ -21,6 +21,7 @@ class Entity(models.Model):
     EXTERNAL_ADMIN = "Administration Externe"
     AIRLINE = "Compagnie aérienne"
     UNKNOWN = "Unknown"
+    CPO = "Charge Point Operator"
     ENTITY_TYPES = (
         (PRODUCER, "Producteur"),
         (OPERATOR, "Opérateur"),
@@ -30,6 +31,7 @@ class Entity(models.Model):
         (EXTERNAL_ADMIN, EXTERNAL_ADMIN),
         (AIRLINE, AIRLINE),
         (UNKNOWN, "Unknown"),
+        (CPO, CPO)
     )
 
     name = models.CharField(max_length=64, unique=True)
