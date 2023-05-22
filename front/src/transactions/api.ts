@@ -193,7 +193,7 @@ export function markAsFixed(entity_id: number, lot_ids: number[]) {
 }
 
 export function approveFix(entity_id: number, lot_ids: number[]) {
-  return api.post<Api<void>>("/lots/approve-fix", { entity_id, lot_ids })
+  return api.post<Api<void>>("/v5/transactions/lots/approve-fix", { entity_id, lot_ids })
 }
 
 export function recallLots(entity_id: number, lot_ids: number[]) {
