@@ -1,5 +1,5 @@
 import datetime
-from urllib import response
+import unicodedata
 from django.http import JsonResponse
 import openpyxl
 import numpy as np
@@ -88,23 +88,11 @@ def get_uploaded_files_directory():
 
 
 def calculate_ghg(lot, tx=None):
-    lot.ghg_total = (
-        lot.eec
-        + lot.el
-        + lot.ep
-        + lot.etd
-        + lot.eu
-        - lot.esca
-        - lot.eccs
-        - lot.eccr
-        - lot.eee
-    )
+    lot.ghg_total = lot.eec + lot.el + lot.ep + lot.etd + lot.eu - lot.esca - lot.eccs - lot.eccr - lot.eee
     lot.ghg_reference = 83.8
     lot.ghg_reduction = round((1.0 - (lot.ghg_total / lot.ghg_reference)) * 100.0, 2)
     lot.ghg_reference_red_ii = 94.0
-    lot.ghg_reduction_red_ii = round(
-        (1.0 - (lot.ghg_total / lot.ghg_reference_red_ii)) * 100.0, 2
-    )
+    lot.ghg_reduction_red_ii = round((1.0 - (lot.ghg_total / lot.ghg_reference_red_ii)) * 100.0, 2)
 
 
 def convert_cell(cell, convert_float: bool) -> Scalar:
@@ -134,12 +122,7 @@ def get_sheet_data(sheet, convert_float: bool) -> List[List[Scalar]]:
     data: List[List[Scalar]] = []
     for row in sheet.rows:
         data.append(
-            [
-                convert_cell(cell, convert_float)
-                if isinstance(cell, openpyxl.cell.cell.Cell)
-                else ""
-                for cell in row
-            ]
+            [convert_cell(cell, convert_float) if isinstance(cell, openpyxl.cell.cell.Cell) else "" for cell in row]
         )
     return data
 
@@ -164,9 +147,7 @@ def get_transaction_distance(tx):
         res["error"] = "DELIVERY_SITE_COORDINATES_NOT_IN_CARBURE"
         return res
     try:
-        td = TransactionDistance.objects.get(
-            starting_point=starting_point, delivery_point=delivery_point
-        )
+        td = TransactionDistance.objects.get(starting_point=starting_point, delivery_point=delivery_point)
         res["link"] = url_link % (starting_point, delivery_point)
         res["distance"] = td.distance
         res["source"] = "DB"
@@ -192,9 +173,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
     for row in df.iterrows():
         lot_row = row[1]
         lot = {}
-        if lot_row.get("volume", "") == "" and (
-            lot_row.get("unit", "") == "" or lot_row.get("quantity", "") == ""
-        ):
+        if lot_row.get("volume", "") == "" and (lot_row.get("unit", "") == "" or lot_row.get("quantity", "") == ""):
             # ignore rows with no volume or no unit+quantity
             # this is mostly done to ignore entirely empty rows read in the excel/csv file
             # without this, we can receive dozens of empty rows...
@@ -219,9 +198,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         producer = lot_row.get("producer", "").strip()
         production_site = lot_row.get("production_site", "").strip()
         if (
-            producer is None
-            or producer == ""
-            or producer.upper() == entity.name.upper()
+            producer is None or producer == "" or producer.upper() == entity.name.upper()
         ) and production_site.upper() in prefetched_data["my_production_sites"]:
             # I am the producer
             lot["carbure_production_site"] = production_site
@@ -230,19 +207,11 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
             # I am not the producer
             lot["unknown_producer"] = producer
             lot["unknown_production_site"] = production_site
-            lot["production_country_code"] = lot_row.get(
-                "production_site_country", None
-            )
-            lot["production_site_commissioning_date"] = lot_row.get(
-                "production_site_commissioning_date", ""
-            )
+            lot["production_country_code"] = lot_row.get("production_site_country", None)
+            lot["production_site_commissioning_date"] = lot_row.get("production_site_commissioning_date", "")
             lot["unknown_supplier"] = lot_row.get("supplier", "")
-        lot["production_site_certificate"] = lot_row.get(
-            "production_site_reference", ""
-        )
-        lot["production_site_double_counting_certificate"] = lot_row.get(
-            "double_counting_registration", ""
-        )
+        lot["production_site_certificate"] = lot_row.get("production_site_reference", "")
+        lot["production_site_double_counting_certificate"] = lot_row.get("double_counting_registration", "")
         lot["vendor_certificate"] = lot_row.get("vendor_certificate", "")
         lot["supplier_certificate"] = lot_row.get("supplier_certificate", "")
         lot["volume"] = lot_row.get("volume", 0)
@@ -275,13 +244,9 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         lot["delivery_date"] = lot_row.get("delivery_date", "")
         delivery_site = str(lot_row.get("delivery_site", ""))
         if delivery_site.upper() in prefetched_data["depots"]:
-            lot["carbure_delivery_site_depot_id"] = prefetched_data["depots"][
-                delivery_site.upper()
-            ].depot_id
+            lot["carbure_delivery_site_depot_id"] = prefetched_data["depots"][delivery_site.upper()].depot_id
         elif delivery_site.upper() in prefetched_data["depotsbyname"]:
-            lot["carbure_delivery_site_depot_id"] = prefetched_data["depotsbyname"][
-                delivery_site.upper()
-            ].depot_id
+            lot["carbure_delivery_site_depot_id"] = prefetched_data["depotsbyname"][delivery_site.upper()].depot_id
         else:
             lot["unknown_delivery_site"] = delivery_site
             delivery_site_country = lot_row.get("delivery_site_country", "")
@@ -353,6 +318,28 @@ def compute_quantities(
         weight = round(volume * biofuel.masse_volumique, 2)
 
     return volume, weight, lhv_amount
+
+
+def normalize(text: str):
+    return unicodedata.normalize("NFKD", text.strip()).encode("ascii", "ignore").decode("utf-8").lower()
+
+
+# if searching in a dict, return the value for the first key that matches the given text
+# if searching in a list, return the real value that matches the given text
+def find_normalized(text: str, collection: dict | list):
+    normalized_text = normalize(text)
+
+    if isinstance(collection, dict):
+        for key, value in collection.items():
+            if normalized_text == normalize(key):
+                return value
+
+    elif isinstance(collection, list):
+        for value in collection:
+            if normalized_text == normalize(value):
+                return value
+
+    return None
 
 
 # little helper to help measure elapsed time

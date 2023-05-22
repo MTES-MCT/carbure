@@ -33,7 +33,7 @@ class CarbureLotFactory(factory.django.DjangoModelFactory):
     carbure_production_site = factory.Iterator(ProductionSite.objects.all())
     unknown_production_site = factory.Faker("company")
     production_country = factory.Iterator(Pays.objects.all())
-    production_site_commissioning_date = factory.Faker("date_time_this_year")
+    production_site_commissioning_date = factory.Faker("date_this_year")
     production_site_certificate = factory.Faker("lexify", text="????????????")
     production_site_certificate_type = factory.Faker("lexify", text="????????????")
     production_site_double_counting_certificate = factory.Faker("lexify", text="????????????")
@@ -51,12 +51,12 @@ class CarbureLotFactory(factory.django.DjangoModelFactory):
     carbure_client = factory.Iterator(Entity.objects.all())
     unknown_client = factory.Faker("company")
 
-    dispatch_date = factory.Faker("date_time_this_year")
+    dispatch_date = factory.Faker("date_this_year")
     carbure_dispatch_site = None
     unknown_dispatch_site = None
     dispatch_site_country = None
 
-    delivery_date = factory.Faker("date_time_this_year")
+    delivery_date = factory.Faker("date_this_year")
     carbure_delivery_site = factory.Iterator(Depot.objects.all())
     unknown_delivery_site = factory.Faker("company")
     delivery_site_country = factory.Iterator(Pays.objects.all())

@@ -1,3 +1,3 @@
-from .carbure_lot import *
-from .carbure_stock import *
-from .carbure_stock_transform import *
+from .carbure_lot import CarbureLotFactory
+from .carbure_stock import CarbureStockFactory
+from .carbure_stock_transform import CarbureStockTransformFactory

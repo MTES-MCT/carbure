@@ -18,7 +18,7 @@
   "MISSING_CARBURE_CLIENT": "Client is missing",
   "MISSING_CARBURE_DELIVERY_SITE": "Delivery site is missing",
   "MISSING_COUNTRY": "Delivery country is missing",
-  "MISSING_DAE": "Customs ID is missing",
+  "MISSING_TRANSPORT_DOCUMENT_REFERENCE": "Customs ID is missing",
   "MISSING_DELIVERY_DATE": "Delivery date is missing",
   "MISSING_DELIVERY_SITE": "Delivery site is missing",
   "MISSING_FEEDSTOCK": "Feedstock is missing",
