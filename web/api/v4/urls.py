@@ -58,7 +58,9 @@ urlpatterns = [
         admin.get_lots_summary,
         name="api-v4-admin-get-lots-summary",
     ),
-    path("admin/lots/details", admin.get_lot_details, name="api-v4-admin-get-lot-details"),
+    path(
+        "admin/lots/details", admin.get_lot_details, name="api-v4-admin-get-lot-details"
+    ),
     path(
         "admin/lots/filters",
         admin.get_lots_filters,
@@ -88,7 +90,7 @@ urlpatterns = [
         name="api-v4-admin-get-stock-filters",
     ),
     # AUDITOR
-    path("auditor/years", auditor.get_years, name="api-v4-auditor-get-years"),
+    # path("auditor/years", auditor.get_years, name="api-v4-auditor-get-years"),
     path("auditor/snapshot", auditor.get_snapshot, name="api-v4-auditor-get-snapshot"),
     path("auditor/lots", auditor.get_lots, name="api-v4-auditor-get-lots"),
     path(
@@ -112,7 +114,9 @@ urlpatterns = [
         name="api-v4-auditor-toggle-warning",
     ),
     path("auditor/lots/pin", auditor.toggle_pin, name="api-v4-auditor-pin-lots"),
-    path("auditor/lots/comment", auditor.add_comment, name="api-v4-auditor-add-comment"),
+    path(
+        "auditor/lots/comment", auditor.add_comment, name="api-v4-auditor-add-comment"
+    ),
     path("auditor/stocks", auditor.get_stocks, name="api-v4-auditor-get-stocks"),
     path(
         "auditor/stocks/details",

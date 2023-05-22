@@ -84,7 +84,7 @@ export const okStocks = rest.get("/api/admin/stocks", (req, res, ctx) => {
   )
 })
 
-export const okYears = rest.get("/api/admin/years", (req, res, ctx) => {
+export const okYears = rest.get("/api/v5/controls/years", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",

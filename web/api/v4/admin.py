@@ -46,7 +46,9 @@ from django.http.response import JsonResponse
 @is_admin
 def get_years(request, *args, **kwargs):
     data_lots = CarbureLot.objects.values_list("year", flat=True).distinct()
-    data_transforms = CarbureStockTransformation.objects.values_list("transformation_dt__year", flat=True).distinct()
+    data_transforms = CarbureStockTransformation.objects.values_list(
+        "transformation_dt__year", flat=True
+    ).distinct()
     data = set(list(data_transforms) + list(data_lots))
     return JsonResponse({"status": "success", "data": list(data)})
 
@@ -58,16 +60,32 @@ def get_snapshot(request, *args, **kwargs):
         try:
             year = int(year)
         except Exception:
-            return JsonResponse({"status": "error", "message": "Incorrect format for year. Expected YYYY"}, status=400)
+            return JsonResponse(
+                {
+                    "status": "error",
+                    "message": "Incorrect format for year. Expected YYYY",
+                },
+                status=400,
+            )
     else:
         return JsonResponse({"status": "error", "message": "Missing year"}, status=400)
 
-    lots = CarbureLot.objects.filter(year=year).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
+    lots = CarbureLot.objects.filter(year=year).exclude(
+        lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED]
+    )
     stock = CarbureStock.objects.filter(remaining_volume__gt=0)
-    alerts = lots.filter(Q(highlighted_by_admin=True) | Q(random_control_requested=True) | Q(ml_control_requested=True))
+    alerts = lots.filter(
+        Q(highlighted_by_admin=True)
+        | Q(random_control_requested=True)
+        | Q(ml_control_requested=True)
+    )
     data = {}
 
-    data["lots"] = {"alerts": alerts.count(), "lots": lots.count(), "stocks": stock.count()}
+    data["lots"] = {
+        "alerts": alerts.count(),
+        "lots": lots.count(),
+        "stocks": stock.count(),
+    }
     return JsonResponse({"status": "success", "data": data})
 
 
@@ -78,14 +96,18 @@ def get_lots(request, *args, **kwargs):
     entity_id = request.GET.get("entity_id", False)
     export = request.GET.get("export", False)
     if not status and not selection:
-        return JsonResponse({"status": "error", "message": "Missing status"}, status=400)
+        return JsonResponse(
+            {"status": "error", "message": "Missing status"}, status=400
+        )
     try:
         entity = Entity.objects.get(id=entity_id)
         lots = get_admin_lots_by_status(entity, status, export)
         return get_lots_with_metadata(lots, entity, request.GET)
     except Exception:
         traceback.print_exc()
-        return JsonResponse({"status": "error", "message": "Could not get lots"}, status=400)
+        return JsonResponse(
+            {"status": "error", "message": "Could not get lots"}, status=400
+        )
 
 
 @is_admin
@@ -94,7 +116,9 @@ def get_lots_summary(request, *args, **kwargs):
     short = request.GET.get("short", False)
     entity_id = request.GET.get("entity_id", False)
     if not status:
-        return JsonResponse({"status": "error", "message": "Missing status"}, status=400)
+        return JsonResponse(
+            {"status": "error", "message": "Missing status"}, status=400
+        )
     try:
         entity = Entity.objects.get(id=entity_id)
         lots = get_admin_lots_by_status(entity, status)
@@ -103,7 +127,9 @@ def get_lots_summary(request, *args, **kwargs):
         return JsonResponse({"status": "success", "data": summary})
     except Exception:
         traceback.print_exc()
-        return JsonResponse({"status": "error", "message": "Could not get lots summary"}, status=400)
+        return JsonResponse(
+            {"status": "error", "message": "Could not get lots summary"}, status=400
+        )
 
 
 @is_admin
@@ -111,24 +137,38 @@ def get_lot_details(request, *args, **kwargs):
     lot_id = request.GET.get("lot_id", False)
     entity_id = request.GET.get("entity_id", False)
     if not lot_id:
-        return JsonResponse({"status": "error", "message": "Missing lot_id"}, status=400)
+        return JsonResponse(
+            {"status": "error", "message": "Missing lot_id"}, status=400
+        )
 
     entity = Entity.objects.get(id=entity_id)
     lot = CarbureLot.objects.get(pk=lot_id)
 
     data = {}
     data["lot"] = CarbureLotAdminSerializer(lot).data
-    data["parent_lot"] = CarbureLotAdminSerializer(lot.parent_lot).data if lot.parent_lot else None
-    data["parent_stock"] = CarbureStockPublicSerializer(lot.parent_stock).data if lot.parent_stock else None
-    data["children_lot"] = CarbureLotAdminSerializer(CarbureLot.objects.filter(parent_lot=lot), many=True).data
-    data["children_stock"] = CarbureStockPublicSerializer(CarbureStock.objects.filter(parent_lot=lot), many=True).data
+    data["parent_lot"] = (
+        CarbureLotAdminSerializer(lot.parent_lot).data if lot.parent_lot else None
+    )
+    data["parent_stock"] = (
+        CarbureStockPublicSerializer(lot.parent_stock).data
+        if lot.parent_stock
+        else None
+    )
+    data["children_lot"] = CarbureLotAdminSerializer(
+        CarbureLot.objects.filter(parent_lot=lot), many=True
+    ).data
+    data["children_stock"] = CarbureStockPublicSerializer(
+        CarbureStock.objects.filter(parent_lot=lot), many=True
+    ).data
     data["distance"] = get_transaction_distance(lot)
     data["errors"] = get_lot_errors(lot, entity)
     data["certificates"] = get_known_certificates(lot)
     data["updates"] = get_lot_updates(lot)
     data["comments"] = get_lot_comments(lot)
     data["control_comments"] = get_admin_lot_comments(lot)
-    data["score"] = CarbureLotReliabilityScoreSerializer(lot.carburelotreliabilityscore_set.all(), many=True).data
+    data["score"] = CarbureLotReliabilityScoreSerializer(
+        lot.carburelotreliabilityscore_set.all(), many=True
+    ).data
     return JsonResponse({"status": "success", "data": data})
 
 
@@ -140,7 +180,9 @@ def get_stocks(request, *args, **kwargs):
         return get_stock_with_metadata(stock, request.GET)
     except Exception:
         traceback.print_exc()
-        return JsonResponse({"status": "error", "message": "Could not get stock"}, status=400)
+        return JsonResponse(
+            {"status": "error", "message": "Could not get stock"}, status=400
+        )
 
 
 @is_admin
@@ -153,7 +195,9 @@ def get_stocks_summary(request, *args, **kwargs):
         return JsonResponse({"status": "success", "data": summary})
     except Exception:
         traceback.print_exc()
-        return JsonResponse({"status": "error", "message": "Could not get stock summary"}, status=400)
+        return JsonResponse(
+            {"status": "error", "message": "Could not get stock summary"}, status=400
+        )
 
 
 @is_admin
@@ -161,12 +205,19 @@ def get_stock_filters(request, *args, **kwargs):
     field = request.GET.get("field", False)
     if not field:
         return JsonResponse(
-            {"status": "error", "message": "Please specify the field for which you want the filters"}, status=400
+            {
+                "status": "error",
+                "message": "Please specify the field for which you want the filters",
+            },
+            status=400,
         )
     txs = get_all_stock()
     data = get_stock_filters_data(txs, request.GET, field)
     if data is None:
-        return JsonResponse({"status": "error", "message": "Could not find specified filter"}, status=400)
+        return JsonResponse(
+            {"status": "error", "message": "Could not find specified filter"},
+            status=400,
+        )
     else:
         return JsonResponse({"status": "success", "data": data})
 
@@ -175,19 +226,25 @@ def get_stock_filters(request, *args, **kwargs):
 def get_stock_details(request, *args, **kwargs):
     stock_id = request.GET.get("stock_id", False)
     if not stock_id:
-        return JsonResponse({"status": "error", "message": "Missing stock_id"}, status=400)
+        return JsonResponse(
+            {"status": "error", "message": "Missing stock_id"}, status=400
+        )
 
     stock = CarbureStock.objects.get(pk=stock_id)
 
     data = {}
     data["stock"] = CarbureStockPublicSerializer(stock).data
-    data["parent_lot"] = CarbureLotPublicSerializer(stock.parent_lot).data if stock.parent_lot else None
+    data["parent_lot"] = (
+        CarbureLotPublicSerializer(stock.parent_lot).data if stock.parent_lot else None
+    )
     data["parent_transformation"] = (
         CarbureStockTransformationPublicSerializer(stock.parent_transformation).data
         if stock.parent_transformation
         else None
     )
-    children = CarbureLot.objects.filter(parent_stock=stock).exclude(lot_status=CarbureLot.DELETED)
+    children = CarbureLot.objects.filter(parent_stock=stock).exclude(
+        lot_status=CarbureLot.DELETED
+    )
     data["children_lot"] = CarbureLotPublicSerializer(children, many=True).data
     data["children_transformation"] = CarbureStockTransformationPublicSerializer(
         CarbureStockTransformation.objects.filter(source_stock=stock), many=True
@@ -205,13 +262,20 @@ def get_lots_filters(request, *args, **kwargs):
     entity_id = request.GET.get("entity_id", False)
     if not field:
         return JsonResponse(
-            {"status": "error", "message": "Please specify the field for which you want the filters"}, status=400
+            {
+                "status": "error",
+                "message": "Please specify the field for which you want the filters",
+            },
+            status=400,
         )
     entity = Entity.objects.get(id=entity_id)
     lots = get_admin_lots_by_status(entity, status)
     data = get_lots_filters_data(lots, request.GET, entity, field)
     if data is None:
-        return JsonResponse({"status": "error", "message": "Could not find specified filter"}, status=400)
+        return JsonResponse(
+            {"status": "error", "message": "Could not find specified filter"},
+            status=400,
+        )
     else:
         return JsonResponse({"status": "success", "data": data})
 
@@ -227,13 +291,21 @@ def toggle_warning(request, *args, **kwargs):
                 lot_error = GenericError.objects.get(lot_id=lot_id, error=error)
             except:
                 traceback.print_exc()
-                return JsonResponse({"status": "error", "message": "Could not locate wanted lot or error"}, status=404)
+                return JsonResponse(
+                    {
+                        "status": "error",
+                        "message": "Could not locate wanted lot or error",
+                    },
+                    status=404,
+                )
             lot_error.acked_by_admin = checked
             lot_error.save()
         return JsonResponse({"status": "success"})
     except:
         traceback.print_exc()
-        return JsonResponse({"status": "error", "message": "Could not update warning"}, status=500)
+        return JsonResponse(
+            {"status": "error", "message": "Could not update warning"}, status=500
+        )
 
 
 @is_admin
@@ -253,7 +325,9 @@ def toggle_pin(request, *args, **kwargs):
         return JsonResponse({"status": "success"})
     except:
         traceback.print_exc()
-        return JsonResponse({"status": "error", "message": "Could not pin lots"}, status=500)
+        return JsonResponse(
+            {"status": "error", "message": "Could not pin lots"}, status=500
+        )
 
 
 @is_admin
@@ -264,7 +338,9 @@ def add_comment(request, *args, **kwargs):
     is_visible_by_auditor = request.POST.get("is_visible_by_auditor") == "true"
 
     if not comment:
-        return JsonResponse({"status": "error", "message": "Missing comment"}, status=400)
+        return JsonResponse(
+            {"status": "error", "message": "Missing comment"}, status=400
+        )
 
     entity = Entity.objects.get(id=entity_id)
     lots = CarbureLot.objects.filter(id__in=selection)
@@ -308,7 +384,8 @@ def get_admin_summary_data(lots, short=False):
             volume_sum=Sum("volume"),
             weight_sum=Sum("weight"),
             lhv_amount_sum=Sum("lhv_amount"),
-            avg_ghg_reduction=Sum(F("volume") * F("ghg_reduction_red_ii")) / Sum("volume"),
+            avg_ghg_reduction=Sum(F("volume") * F("ghg_reduction_red_ii"))
+            / Sum("volume"),
             total=Count("id"),
             pending=Count("id", filter=pending_filter),
         )
@@ -323,5 +400,7 @@ def get_admin_summary_data(lots, short=False):
 def get_admin_lot_comments(lot):
     if lot is None:
         return []
-    comments = lot.carburelotcomment_set.filter(Q(comment_type=CarbureLotComment.ADMIN) | Q(is_visible_by_admin=True))
+    comments = lot.carburelotcomment_set.filter(
+        Q(comment_type=CarbureLotComment.ADMIN) | Q(is_visible_by_admin=True)
+    )
     return CarbureLotCommentSerializer(comments, many=True).data
