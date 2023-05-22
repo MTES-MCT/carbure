@@ -19,7 +19,7 @@ const QUERY_RESET: Partial<LotQuery> = {
 }
 
 export function getYears(entity_id: number) {
-  return api.get<Api<number[]>>("/auditor/years", { params: { entity_id } })
+  return api.get<Api<number[]>>("/v5/audit/years", { params: { entity_id } })
 }
 
 export function getSnapshot(entity_id: number, year: number) {
