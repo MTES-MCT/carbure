@@ -25,7 +25,7 @@ class ProductionSiteCertificate(models.Model):
 class DoubleCountingRegistration(models.Model):
     certificate_id = models.CharField(max_length=64)
     certificate_holder = models.CharField(max_length=256)
-    production_site = models.ForeignKey(ProductionSite, on_delete=models.CASCADE, null=True)
+    production_site = models.ForeignKey(ProductionSite, on_delete=models.CASCADE, null=True, blank=True)
     registered_address = models.TextField()
     valid_from = models.DateField()
     valid_until = models.DateField()
