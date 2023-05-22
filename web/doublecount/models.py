@@ -15,8 +15,8 @@ class DoubleCountingAgreement(models.Model):
 
     DCA_STATUS_CHOICES = ((PENDING, PENDING), (INPROGRESS, INPROGRESS), (REJECTED, REJECTED), (ACCEPTED, ACCEPTED), (LAPSED, LAPSED))
     
-    producer = models.ForeignKey(Entity, on_delete=models.CASCADE, null=True)
-    production_site = models.ForeignKey(ProductionSite, on_delete=models.CASCADE, null=True)
+    producer = models.ForeignKey(Entity, on_delete=models.CASCADE, null=True, blank=True)
+    production_site = models.ForeignKey(ProductionSite, on_delete=models.CASCADE, null=True, blank=True)
     producer_user = models.ForeignKey(usermodel, blank=True, null=True, on_delete=models.SET_NULL, related_name='producer_user')
     creation_date = models.DateTimeField(auto_now_add=True)
     period_start = models.DateField(null=False, blank=False)
@@ -36,10 +36,13 @@ class DoubleCountingAgreement(models.Model):
     dgpe_validated_dt = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return '%s %d - %d' % (self.producer.name, self.period_start.year, self.period_end.year)
+        producer = self.producer.name if self.producer else ""
+        return '%s %d - %d' % (producer, self.period_start.year, self.period_end.year)
 
     def natural_key(self):
-        return {'producer': self.producer.name, 'production_site': self.production_site.name, 
+        producer = self.producer.name if self.producer else ""
+        production_site = self.production_site.name if self.production_site else ""
+        return {'producer': producer, 'production_site': production_site, 
         'period_end': self.period_end, 'period_start': self.period_start,
         'status': self.status}
 
