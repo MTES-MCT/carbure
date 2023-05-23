@@ -29,7 +29,7 @@ export function getSnapshot(entity_id: number, year: number) {
 }
 
 export function getLots(query: LotQuery) {
-  return api.get<Api<LotList>>("/auditor/lots", { params: query })
+  return api.get<Api<LotList>>("/v5/audit/lots", { params: query })
 }
 
 export function getStocks(query: StockQuery) {
@@ -37,7 +37,7 @@ export function getStocks(query: StockQuery) {
 }
 
 export function downloadLots(query: LotQuery, selection: number[]) {
-  return download("/auditor/lots", {
+  return download("/v5/audit/lots", {
     ...selectionOrQuery(
       { ...query, from_idx: undefined, limit: undefined },
       selection
@@ -51,7 +51,7 @@ export function getLotsSummary(
   selection: number[],
   short?: boolean
 ) {
-  return api.get<Api<LotSummary>>("/auditor/lots/summary", {
+  return api.get<Api<LotSummary>>("/v5/audit/lots/summary", {
     params: { ...query, selection, ...QUERY_RESET, short },
   })
 }
@@ -69,7 +69,7 @@ export function getStocksSummary(
 export function getLotFilters(field: Filter, query: LotQuery) {
   const params = { field, ...query, ...QUERY_RESET }
   return api
-    .get<Api<Option[]>>("/auditor/lots/filters", { params })
+    .get<Api<Option[]>>("/v5/audit/lots/filters", { params })
     .then((res) => res.data.data ?? [])
 }
 
@@ -86,7 +86,7 @@ export function pinLots(
   notify_admin?: boolean,
   notify_auditor?: boolean
 ) {
-  return api.post("/auditor/lots/pin", {
+  return api.post("/v5/audit/lots/pin", {
     entity_id,
     selection,
     notify_admin,
@@ -103,7 +103,7 @@ export async function commentLots(
 ) {
   if (!comment) return
 
-  return api.post<Api<void>>("/auditor/lots/comment", {
+  return api.post<Api<void>>("/v5/audit/lots/comment", {
     entity_id: query.entity_id,
     selection,
     is_visible_by_admin,
@@ -113,14 +113,14 @@ export async function commentLots(
 }
 
 export async function markAsConform(entity_id: number, selection: number[]) {
-  return api.post<Api<void>>("/auditor/lots/mark-as-conform", {
+  return api.post<Api<void>>("/v5/audit/lots/mark-as-conform", {
     entity_id,
     selection,
   })
 }
 
 export async function markAsNonConform(entity_id: number, selection: number[]) {
-  return api.post<Api<void>>("/auditor/lots/mark-as-nonconform", {
+  return api.post<Api<void>>("/v5/audit/lots/mark-as-nonconform", {
     entity_id,
     selection,
   })
