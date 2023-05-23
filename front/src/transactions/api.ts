@@ -39,11 +39,11 @@ export function getLots(query: LotQuery) {
 }
 
 export function importLots(entity_id: number, file: File) {
-  return api.post<Api<void>>("/lots/add-excel", { entity_id, file })
+  return api.post<Api<void>>("/v5/transactions/lots/add-excel", { entity_id, file })
 }
 
 export function downloadLots(query: LotQuery, selection: number[]) {
-  return download("/lots", {
+  return download("/v5/transactions/lots", {
     ...selectionOrQuery(
       { ...query, limit: undefined, from_idx: undefined },
       selection
@@ -87,11 +87,11 @@ export function getLotFilters(field: Filter, query: LotQuery) {
 }
 
 export function duplicateLots(entity_id: number, lot_id: number) {
-  return api.post<Api<void>>("/lots/duplicate", { entity_id, lot_id })
+  return api.post<Api<void>>("/v5/transactions/lots/duplicate", { entity_id, lot_id })
 }
 
 export function sendLots(query: LotQuery, selection?: number[]) {
-  return api.post<Api<void>>("/lots/send", selectionOrQuery(query, selection))
+  return api.post<Api<void>>("/v5/transactions/lots/send", selectionOrQuery(query, selection))
 }
 
 export function acceptReleaseForConsumption(
@@ -171,7 +171,7 @@ export function acceptForExport(
 }
 
 export function deleteLots(query: LotQuery, selection?: number[]) {
-  return api.post<Api<void>>("/lots/delete", selectionOrQuery(query, selection))
+  return api.post<Api<void>>("/v5/transactions/lots/delete", selectionOrQuery(query, selection))
 }
 
 export function rejectLots(query: LotQuery, selection?: number[]) {

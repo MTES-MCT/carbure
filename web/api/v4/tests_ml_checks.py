@@ -63,7 +63,7 @@ class LotGHGTest(TestCase):
 
     def send_lot(self, lot):
         response = self.client.post(
-            reverse("api-v4-send-lots"),
+            reverse("transactions-lots-send"),
             {"entity_id": self.producer.id, "selection": [lot.id]},
         )
         self.assertEqual(response.status_code, 200)

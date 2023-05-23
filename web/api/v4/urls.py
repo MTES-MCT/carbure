@@ -10,10 +10,10 @@ urlpatterns = [
     # POST
     ### Lot initial life
     # path("lots/add", views.add_lot, name="transactions-lots-add"),
-    path("lots/add-excel", views.add_excel, name="api-v4-add-excel"),
-    path("lots/duplicate", views.duplicate_lot, name="api-v4-duplicate-lot"),
-    path("lots/send", views.lots_send, name="api-v4-send-lots"),
-    path("lots/delete", views.lots_delete, name="api-v4-delete-lots"),
+    # path("lots/add-excel", views.add_excel, name="api-v4-add-excel"),
+    # path("lots/duplicate", views.duplicate_lot, name="transactions-lots-duplicate"),
+    # path("lots/send", views.lots_send, name="transactions-lots-send"),
+    # path("lots/delete", views.lots_delete, name="transactions-lots-delete"),
     ### Corrections
     path("lots/comment", views.add_comment, name="api-v4-comment-lots"),
     path("lots/reject", views.reject_lot, name="api-v4-reject-lots"),

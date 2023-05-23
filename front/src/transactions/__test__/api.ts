@@ -98,7 +98,7 @@ export const okSummary = rest.get("/api/v5/transactions/lots/summary", (req, res
   )
 })
 
-export const okSendLot = rest.post("/api/lots/send", (req, res, ctx) => {
+export const okSendLot = rest.post("/api/v5/transactions/lots/send", (req, res, ctx) => {
   Data.set("lots", (lots: LotList) => {
     lots.lots = []
     lots.ids = []
