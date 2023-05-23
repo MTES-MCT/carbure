@@ -7,6 +7,7 @@ urlpatterns = [
     path("v3/doublecount/", include("doublecount.api.urls")),
     path("v5/admin/", include("admin.api")),
     path("v5/auth/", include("auth.api")),
+    path("v5/audit/", include("audit.api")),
     path("v5/double-counting/", include("doublecount.api")),
     path("v5/entity/", include("entity.api")),
     path("v5/saf/", include("saf.api")),

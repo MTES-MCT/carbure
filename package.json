@@ -6,7 +6,8 @@
   "scripts": {
     "build": "(cd front; npm install; npm run build)",
     "test": "python web/manage.py test api --keepdb",
-    "migrate": "python web/manage.py makemigrations && python web/manage.py migrate"
+    "migrate": "python web/manage.py makemigrations && python web/manage.py migrate",
+    "restart": "docker-compose down && docker-compose up -d"
   },
   "engines": {
     "node": "16.16.0",
