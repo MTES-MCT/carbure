@@ -54,7 +54,7 @@ class LotCorrectionTest(TestCase):
         lot_id = add_response.json()["data"]["id"]
 
         send_response = self.client.post(
-            reverse("api-v4-send-lots"),
+            reverse("transactions-lots-send"),
             {"entity_id": supplier.id, "selection": [lot_id]},
         )
         self.assertEqual(send_response.status_code, 200)

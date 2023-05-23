@@ -77,7 +77,7 @@ class LotsFlowTest(TestCase):
 
     def send_lot(self, lot):
         response = self.client.post(
-            reverse("api-v4-send-lots"),
+            reverse("transactions-lots-send"),
             {"entity_id": self.producer.id, "selection": [lot.id]},
         )
         self.assertEqual(response.status_code, 200)
@@ -120,7 +120,7 @@ class LotsFlowTest(TestCase):
     def test_delete_lot(self):
         lot = self.create_draft()
         response = self.client.post(
-            reverse("api-v4-delete-lots"),
+            reverse("transactions-lots-delete"),
             {"entity_id": self.producer.id, "selection": [lot.id]},
         )
         self.assertEqual(response.status_code, 200)
@@ -129,14 +129,14 @@ class LotsFlowTest(TestCase):
 
         lot = self.send_lot(self.create_draft())
         response = self.client.post(
-            reverse("api-v4-delete-lots"),
+            reverse("transactions-lots-delete"),
             {"entity_id": self.producer.id, "selection": [lot.id]},
         )  # cannot delete a lot not in draft
         self.assertEqual(response.status_code, 400)
 
         lot = self.create_draft()
         response = self.client.post(
-            reverse("api-v4-delete-lots"),
+            reverse("transactions-lots-delete"),
             {"entity_id": self.trader.id, "selection": [lot.id]},
         )  # cannot delete someone else's lot
         self.assertEqual(response.status_code, 400)
@@ -144,12 +144,12 @@ class LotsFlowTest(TestCase):
     def test_duplicate_lot(self):
         lot = self.create_draft()
         response = self.client.post(
-            reverse("api-v4-duplicate-lot"),
+            reverse("transactions-lots-duplicate"),
             {"entity_id": self.producer.id, "lot_id": lot.id},
         )
         self.assertEqual(response.status_code, 200)
         response = self.client.post(
-            reverse("api-v4-duplicate-lot"),
+            reverse("transactions-lots-duplicate"),
             {"entity_id": self.trader.id, "lot_id": lot.id},
         )
         self.assertEqual(response.status_code, 403)

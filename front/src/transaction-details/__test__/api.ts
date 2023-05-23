@@ -33,14 +33,14 @@ export const okUpdateLot = rest.post(
   }
 )
 
-export const okSendLot = rest.post("/api/lots/send", (req, res, ctx) => {
+export const okSendLot = rest.post("/api/v5/transactions/lots/send", (req, res, ctx) => {
   Data.set("lot-details", (details: LotDetails) => {
     details.lot.lot_status = LotStatus.Pending
   })
   return res(ctx.json({ status: "success" }))
 })
 
-export const okDeleteLot = rest.post("/api/lots/delete", (req, res, ctx) => {
+export const okDeleteLot = rest.post("/api/v5/transactions/lots/delete", (req, res, ctx) => {
   return res(ctx.json({ status: "success" }))
 })
 

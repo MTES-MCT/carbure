@@ -79,7 +79,7 @@ class LotsCertifMayhemTest(TestCase):
 
     def send_lot(self, lot, expected_status=200):
         response = self.client.post(
-            reverse("api-v4-send-lots"),
+            reverse("transactions-lots-send"),
             {"entity_id": self.producer.id, "selection": [lot.id]},
         )
         if response.status_code != 200:
