@@ -33,7 +33,7 @@ export function getLots(query: LotQuery) {
 }
 
 export function getStocks(query: StockQuery) {
-  return api.get<Api<StockList>>("/auditor/stocks", { params: query })
+  return api.get<Api<StockList>>("/v5/audit/stocks", { params: query })
 }
 
 export function downloadLots(query: LotQuery, selection: number[]) {
@@ -61,7 +61,7 @@ export function getStocksSummary(
   selection: number[],
   short?: boolean
 ) {
-  return api.get<Api<StockSummary>>("/auditor/stocks/summary", {
+  return api.get<Api<StockSummary>>("/v5/audit/stocks/summary", {
     params: { ...query, selection, ...QUERY_RESET, short },
   })
 }
@@ -76,7 +76,7 @@ export function getLotFilters(field: Filter, query: LotQuery) {
 export function getStockFilters(field: Filter, query: StockQuery) {
   const params = { field, ...query, ...QUERY_RESET }
   return api
-    .get<Api<Option[]>>("/auditor/stocks/filters", { params })
+    .get<Api<Option[]>>("/v5/audit/stocks/filters", { params })
     .then((res) => res.data.data ?? [])
 }
 

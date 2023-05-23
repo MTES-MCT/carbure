@@ -6,4 +6,5 @@ urlpatterns = [
     path("years", get_years, name="audit-years"),
     path("snapshot", get_snapshot, name="audit-snapshot"),
     path("lots/", include("audit.api.lots")),
+    path("stocks/", include("audit.api.stocks")),
 ]
