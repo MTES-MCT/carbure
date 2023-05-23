@@ -2,8 +2,10 @@ from django.db.models.query_utils import Q
 
 from core.models import (
     CarbureLot,
+    CarbureLotComment,
     UserRights,
 )
+from core.serializers import CarbureLotCommentSerializer
 
 
 def get_auditor_lots(request):
@@ -49,3 +51,25 @@ def get_auditor_lots(request):
         | Q(carbure_supplier__in=allowed_entities)
         | Q(added_by__in=allowed_entities)
     )
+
+
+def get_auditor_lots_by_status(entity, status, request):
+    lots = get_auditor_lots(request)
+    if status == "ALERTS":
+        lots = lots.filter(
+            Q(highlighted_by_auditor=True)
+            | Q(random_control_requested=True)
+            | Q(ml_control_requested=True)
+        )
+    elif status == "LOTS":
+        lots = lots.exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
+    return lots
+
+
+def get_auditor_lot_comments(lot):
+    if lot is None:
+        return []
+    comments = lot.carburelotcomment_set.filter(
+        Q(comment_type=CarbureLotComment.AUDITOR) | Q(is_visible_by_auditor=True)
+    )
+    return CarbureLotCommentSerializer(comments, many=True).data
