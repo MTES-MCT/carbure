@@ -2,6 +2,10 @@ code,description_fr,PCI_kg,PCI_Litre,Masse_volumique,is_alcool,is_graisse,is_dis
 BG,Biogaz,50,0,0,0,0,0,0,0
 BGS,Biogazole de synthèse (Hors HVO),44,34,0.773,0,0,0,0,1
 BT,Butanol,33,27,0.818,0,0,0,0,0
+EEHA,EEHA,38,34,0.895,0,1,0,0,1
+EEHU,EEHU,38,34,0.895,0,1,0,0,1
+EEHV,EEHV,38,34,0.895,0,1,0,0,1
+TAME,TAME,36,28,0.777,0,1,0,0,1
 EMHA,EMHA,37,33,0.892,0,1,1,0,1
 EMHU,EMHU,37,33,0.892,0,1,1,0,1
 EMHV,EMHV,37,33,0.892,0,1,1,0,1
