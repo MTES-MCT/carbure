@@ -47,7 +47,6 @@ from core.serializers import (
     CarbureStockPublicSerializer,
     CarbureStockTransformationPublicSerializer,
 )
-from api.v4.admin import get_admin_summary_data
 
 
 @check_user_rights()

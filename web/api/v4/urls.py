@@ -1,10 +1,8 @@
-from api.v4 import admin, auditor, views
+from api.v4 import views
 from django.urls import path
 
 urlpatterns = [
     # GET
-    # path("years", views.get_years, name="api-v4-get-years"),
-    # path("snapshot", views.get_snapshot, name="api-v4-get-snapshot"),
     path("lots", views.get_lots, name="api-v4-get-lots"),
     path("lots/summary", views.get_lots_summary, name="api-v4-get-lots-summary"),
     path("lots/details", views.get_lot_details, name="api-v4-get-lot-details"),
@@ -50,43 +48,43 @@ urlpatterns = [
         name="api-v4-get-template-stock",
     ),
     # ADMIN
-    path("admin/years", admin.get_years, name="api-v4-admin-get-years"),
-    path("admin/snapshot", admin.get_snapshot, name="api-v4-admin-get-snapshot"),
-    path("admin/lots", admin.get_lots, name="api-v4-admin-get-lots"),
-    path(
-        "admin/lots/summary",
-        admin.get_lots_summary,
-        name="api-v4-admin-get-lots-summary",
-    ),
-    path(
-        "admin/lots/details", admin.get_lot_details, name="api-v4-admin-get-lot-details"
-    ),
-    path(
-        "admin/lots/filters",
-        admin.get_lots_filters,
-        name="api-v4-admin-get-lots-filters",
-    ),
-    path(
-        "admin/lots/toggle-warning",
-        admin.toggle_warning,
-        name="api-v4-admin-toggle-warning",
-    ),
-    path("admin/lots/pin", admin.toggle_pin, name="api-v4-admin-pin-lots"),
-    path("admin/lots/comment", admin.add_comment, name="api-v4-admin-add-comment"),
-    path("admin/stocks", admin.get_stocks, name="api-v4-admin-get-stocks"),
-    path(
-        "admin/stocks/details",
-        admin.get_stock_details,
-        name="api-v4-admin-get-stock-details",
-    ),
-    path(
-        "admin/stocks/summary",
-        admin.get_stocks_summary,
-        name="api-v4-admin-get-stock-summary",
-    ),
-    path(
-        "admin/stocks/filters",
-        admin.get_stock_filters,
-        name="api-v4-admin-get-stock-filters",
-    ),
+    # path("admin/years", admin.get_years, name="api-v4-admin-get-years"),
+    # path("admin/snapshot", admin.get_snapshot, name="api-v4-admin-get-snapshot"),
+    # path("admin/lots", admin.get_lots, name="api-v4-admin-get-lots"),
+    # path(
+    #     "admin/lots/summary",
+    #     admin.get_lots_summary,
+    #     name="api-v4-admin-get-lots-summary",
+    # ),
+    # path(
+    #     "admin/lots/details", admin.get_lot_details, name="api-v4-admin-get-lot-details"
+    # ),
+    # path(
+    #     "admin/lots/filters",
+    #     admin.get_lots_filters,
+    #     name="api-v4-admin-get-lots-filters",
+    # ),
+    # path(
+    #     "admin/lots/toggle-warning",
+    #     admin.toggle_warning,
+    #     name="api-v4-admin-toggle-warning",
+    # ),
+    # path("admin/lots/pin", admin.toggle_pin, name="api-v4-admin-pin-lots"),
+    # path("admin/lots/comment", admin.add_comment, name="api-v4-admin-add-comment"),
+    # path("admin/stocks", admin.get_stocks, name="api-v4-admin-get-stocks"),
+    # path(
+    #     "admin/stocks/details",
+    #     admin.get_stock_details,
+    #     name="api-v4-admin-get-stock-details",
+    # ),
+    # path(
+    #     "admin/stocks/summary",
+    #     admin.get_stocks_summary,
+    #     name="api-v4-admin-get-stock-summary",
+    # ),
+    # path(
+    #     "admin/stocks/filters",
+    #     admin.get_stock_filters,
+    #     name="api-v4-admin-get-stock-filters",
+    # ),
 ]
