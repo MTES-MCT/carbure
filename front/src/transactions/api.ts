@@ -35,7 +35,7 @@ export function getSnapshot(entity_id: number, year: number) {
 // ENDPOINTS FOR LOTS
 
 export function getLots(query: LotQuery) {
-  return api.get<Api<LotList>>("/lots", { params: query })
+  return api.get<Api<LotList>>("/v5/transactions/lots", { params: query })
 }
 
 export function importLots(entity_id: number, file: File) {
@@ -57,7 +57,7 @@ export function getLotsSummary(
   selection: number[],
   short?: boolean
 ) {
-  return api.get<Api<LotSummary>>("/lots/summary", {
+  return api.get<Api<LotSummary>>("/v5/transactions/lots/summary", {
     params: { ...query, selection, ...QUERY_RESET, short },
   })
 }
@@ -82,7 +82,7 @@ export function invalidateDeclaration(entity_id: number, period: number) {
 export function getLotFilters(field: Filter, query: LotQuery) {
   const params = { field, ...query, ...QUERY_RESET }
   return api
-    .get<Api<string[]>>("/lots/filters", { params })
+    .get<Api<string[]>>("/v5/transactions/lots/filters", { params })
     .then((res) => res.data.data ?? [])
 }
 
