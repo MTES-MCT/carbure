@@ -1,21 +1,18 @@
 import traceback
-
-from django.http.response import JsonResponse
 from admin.api.controls.helpers import get_admin_summary_data
-from audit.helpers import get_auditor_lots_by_status
 
-from core.decorators import check_user_rights, is_auditor
+from admin.helpers import get_admin_lots_by_status
 from api.v4.helpers import (
     filter_lots,
 )
-
+from core.decorators import is_admin
 from core.models import (
     Entity,
 )
+from django.http.response import JsonResponse
 
 
-@check_user_rights()
-@is_auditor
+@is_admin
 def get_lots_summary(request, *args, **kwargs):
     status = request.GET.get("status", False)
     short = request.GET.get("short", False)
@@ -26,7 +23,7 @@ def get_lots_summary(request, *args, **kwargs):
         )
     try:
         entity = Entity.objects.get(id=entity_id)
-        lots = get_auditor_lots_by_status(entity, status, request)
+        lots = get_admin_lots_by_status(entity, status)
         lots = filter_lots(lots, request.GET, entity, will_aggregate=True)
         summary = get_admin_summary_data(lots, short == "true")
         return JsonResponse({"status": "success", "data": summary})
