@@ -23,7 +23,7 @@ export function getYears(entity_id: number) {
 }
 
 export function getSnapshot(entity_id: number, year: number) {
-  return api.get<Api<Snapshot>>("/auditor/snapshot", {
+  return api.get<Api<Snapshot>>("/v5/audit/snapshot", {
     params: { entity_id, year },
   })
 }

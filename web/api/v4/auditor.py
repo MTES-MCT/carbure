@@ -52,46 +52,6 @@ from api.v4.admin import get_admin_summary_data
 
 @check_user_rights()
 @is_auditor
-def get_snapshot(request, *args, **kwargs):
-    year = request.GET.get("year", False)
-    if year:
-        try:
-            year = int(year)
-        except Exception:
-            return JsonResponse(
-                {
-                    "status": "error",
-                    "message": "Incorrect format for year. Expected YYYY",
-                },
-                status=400,
-            )
-    else:
-        return JsonResponse({"status": "error", "message": "Missing year"}, status=400)
-
-    auditor_lots = get_auditor_lots(request).filter(year=year)
-    lots = auditor_lots.filter(year=year).exclude(
-        lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED]
-    )
-    alerts = lots.filter(
-        Q(highlighted_by_auditor=True)
-        | Q(random_control_requested=True)
-        | Q(ml_control_requested=True)
-    )
-
-    auditor_stock = get_auditor_stock(request.user)
-    stock = auditor_stock.filter(remaining_volume__gt=0)
-
-    data = {}
-    data["lots"] = {
-        "alerts": alerts.count(),
-        "lots": lots.count(),
-        "stocks": stock.count(),
-    }
-    return JsonResponse({"status": "success", "data": data})
-
-
-@check_user_rights()
-@is_auditor
 def get_lots(request, *args, **kwargs):
     status = request.GET.get("status", False)
     selection = request.GET.get("selection", False)
