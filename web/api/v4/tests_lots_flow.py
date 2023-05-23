@@ -164,7 +164,7 @@ class LotsFlowTest(TestCase):
         lot = self.send_lot(lot)
 
         response = self.client.post(
-            reverse("api-v4-accept-in-stock"),
+            reverse("transactions-lots-accept-in-stock"),
             {"entity_id": self.trader.id, "selection": [lot.id]},
         )
         self.assertEqual(response.status_code, 200)
@@ -180,7 +180,7 @@ class LotsFlowTest(TestCase):
         self.assertEqual(lot.lot_status, CarbureLot.PENDING)
         self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
         response = self.client.post(
-            reverse("api-v4-accept-rfc"),
+            reverse("transactions-lots-accept-release-for-consumption"),
             {"entity_id": self.operator.id, "selection": [lot.id]},
         )
         self.assertEqual(response.status_code, 200)
@@ -203,7 +203,7 @@ class LotsFlowTest(TestCase):
         self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
 
         response = self.client.post(
-            reverse("api-v4-accept-trading"),
+            reverse("transactions-lots-accept-trading"),
             {
                 "entity_id": self.trader.id,
                 "selection": [lot.id],
@@ -225,7 +225,7 @@ class LotsFlowTest(TestCase):
         self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
 
         response = self.client.post(
-            reverse("api-v4-accept-trading"),
+            reverse("transactions-lots-accept-trading"),
             {
                 "entity_id": self.trader.id,
                 "selection": [lot.id],
@@ -247,7 +247,7 @@ class LotsFlowTest(TestCase):
         self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
 
         response = self.client.post(
-            reverse("api-v4-accept-processing"),
+            reverse("transactions-lots-accept-processing"),
             {
                 "entity_id": self.trader.id,
                 "selection": [lot.id],
@@ -268,7 +268,7 @@ class LotsFlowTest(TestCase):
         self.assertEqual(lot.lot_status, CarbureLot.PENDING)
         self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
         response = self.client.post(
-            reverse("api-v4-accept-blending"),
+            reverse("transactions-lots-accept-blending"),
             {"entity_id": self.operator.id, "selection": [lot.id]},
         )
         self.assertEqual(response.status_code, 200)
@@ -282,7 +282,7 @@ class LotsFlowTest(TestCase):
         self.assertEqual(lot.lot_status, CarbureLot.PENDING)
         self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
         response = self.client.post(
-            reverse("api-v4-accept-export"),
+            reverse("transactions-lots-accept-export"),
             {"entity_id": self.operator.id, "selection": [lot.id]},
         )
         self.assertEqual(response.status_code, 200)
@@ -296,7 +296,7 @@ class LotsFlowTest(TestCase):
         self.assertEqual(lot.lot_status, CarbureLot.PENDING)
         self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
         response = self.client.post(
-            reverse("api-v4-accept-direct-delivery"),
+            reverse("transactions-lots-accept-direct-delivery"),
             {"entity_id": self.operator.id, "selection": [lot.id]},
         )
         self.assertEqual(response.status_code, 200)
