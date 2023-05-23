@@ -120,7 +120,7 @@ export function updateLots(
   comment: string,
   dry_run?: boolean
 ) {
-  return api.post<Api<LotsUpdateResponse>>("/v5/admin/lots/update-many", {
+  return api.post<Api<LotsUpdateResponse>>("/v5/admin/controls/lots/update-many", {
     entity_id,
     lots_ids,
     comment,
@@ -135,7 +135,7 @@ export function deleteLots(
   comment: string,
   dry_run?: boolean
 ) {
-  return api.post<Api<LotsDeleteResponse>>("/v5/admin/lots/delete-many", {
+  return api.post<Api<LotsDeleteResponse>>("/v5/admin/controls/lots/delete-many", {
     entity_id,
     lots_ids,
     comment,

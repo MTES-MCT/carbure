@@ -6,6 +6,8 @@ from .details import get_lot_details
 from .toggle_warning import toggle_warning
 from .pin import toggle_pin
 from .comment import add_comment
+from .delete_many import delete_many
+from .update_many import update_many
 
 
 urlpatterns = [
@@ -16,4 +18,6 @@ urlpatterns = [
     path("toggle-warning", toggle_warning, name="admin-controls-lots-toggle-warning"),
     path("pin", toggle_pin, name="admin-controls-lots-pin"),
     path("comment", add_comment, name="admin-controls-lots-comment"),
+    path("delete-many", delete_many, name="admin-controls-lots-delete-many"),
+    path("update-many", update_many, name="admin-controls-lots-update-many"),
 ]
