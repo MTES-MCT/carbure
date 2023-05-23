@@ -91,7 +91,7 @@ urlpatterns = [
     ),
     # AUDITOR
     # path("auditor/years", auditor.get_years, name="api-v4-auditor-get-years"),
-    path("auditor/snapshot", auditor.get_snapshot, name="api-v4-auditor-get-snapshot"),
+    # path("auditor/snapshot", auditor.get_snapshot, name="api-v4-auditor-get-snapshot"),
     path("auditor/lots", auditor.get_lots, name="api-v4-auditor-get-lots"),
     path(
         "auditor/lots/summary",
