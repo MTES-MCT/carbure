@@ -36,7 +36,7 @@ export const okSnapshot = rest.get("/api/v5/transactions/snapshot", (req, res, c
   )
 })
 
-export const okLots = rest.get("/api/lots", (req, res, ctx) => {
+export const okLots = rest.get("/api/v5/transactions/lots", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -80,7 +80,7 @@ export const okDeclarations = rest.get("/api/v5/transactions/declarations", (req
   )
 })
 
-export const okFilters = rest.get("/api/lots/filters", (req, res, ctx) => {
+export const okFilters = rest.get("/api/v5/transactions/lots/filters", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -89,7 +89,7 @@ export const okFilters = rest.get("/api/lots/filters", (req, res, ctx) => {
   )
 })
 
-export const okSummary = rest.get("/api/lots/summary", (req, res, ctx) => {
+export const okSummary = rest.get("/api/v5/transactions/lots/summary", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",

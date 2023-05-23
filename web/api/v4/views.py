@@ -1,14 +1,17 @@
 import datetime
 import unicodedata
-import dictdiffer
 import traceback
-from django.db.models.aggregates import Count, Sum
 from django.db.models.fields import NOT_PROVIDED
 from django.db import transaction
 
 from django.http.response import HttpResponse, JsonResponse
 from django.db.models.query_utils import Q
-from core.common import ErrorResponse, SuccessResponse, convert_template_row_to_formdata, get_uploaded_files_directory
+from core.common import (
+    ErrorResponse,
+    SuccessResponse,
+    convert_template_row_to_formdata,
+    get_uploaded_files_directory,
+)
 from core.decorators import check_user_rights
 from api.v4.helpers import (
     filter_lots,
@@ -20,236 +23,44 @@ from api.v4.helpers import (
     get_lots_with_metadata,
     get_lots_filters_data,
 )
-from api.v4.helpers import get_prefetched_data, get_transaction_distance, get_known_certificates
+from api.v4.helpers import (
+    get_prefetched_data,
+    get_transaction_distance,
+    get_known_certificates,
+)
 from api.v4.lots import construct_carbure_lot, bulk_insert_lots
 from api.v4.sanity_checks import bulk_scoring
-from transactions.sanity_checks import sanity_checks, bulk_sanity_checks, has_blocking_errors
+from transactions.sanity_checks import (
+    sanity_checks,
+    bulk_sanity_checks,
+    has_blocking_errors,
+)
 
 from core.models import (
     CarbureLot,
     CarbureLotComment,
     CarbureLotEvent,
-    CarbureNotification,
     CarbureStock,
     CarbureStockEvent,
     CarbureStockTransformation,
     Entity,
     GenericError,
-    SustainabilityDeclaration,
     UserRights,
 )
-from transactions.helpers import check_locked_year
 from core.notifications import (
-    notify_correction_done,
-    notify_correction_request,
-    notify_lots_recalled,
     notify_lots_received,
     notify_lots_rejected,
-    notify_lots_recalled,
 )
 from core.serializers import (
     CarbureLotPublicSerializer,
     CarbureLotReliabilityScoreSerializer,
-    CarbureNotificationSerializer,
     CarbureStockPublicSerializer,
 )
 from core.xlsx_v3 import template_v4, template_v4_stocks
 from carbure.tasks import background_bulk_scoring, background_bulk_sanity_checks
-from core.carburetypes import CarbureError
 from core.traceability import LotNode
 
 
-@check_user_rights()
-def get_lots(request, *args, **kwargs):
-    context = kwargs["context"]
-    entity_id = context["entity_id"]
-    status = request.GET.get("status", False)
-    selection = request.GET.get("selection", False)
-    export = request.GET.get("export", False)
-    if not status and not selection:
-        return JsonResponse({"status": "error", "message": "Missing status"}, status=400)
-    try:
-        entity = Entity.objects.get(id=entity_id)
-        lots = get_entity_lots_by_status(entity, status, export)
-        return get_lots_with_metadata(lots, entity, request.GET)
-    except Exception:
-        traceback.print_exc()
-        return JsonResponse({"status": "error", "message": "Could not get lots"}, status=400)
-
-
-@check_user_rights()
-def get_lots_summary(request, *args, **kwargs):
-    context = kwargs["context"]
-    entity_id = context["entity_id"]
-    status = request.GET.get("status", False)
-    short = request.GET.get("short", False) == "true"
-    if not status:
-        return JsonResponse({"status": "error", "message": "Missing status"}, status=400)
-    try:
-        entity = Entity.objects.get(id=entity_id)
-        lots = get_entity_lots_by_status(entity, status)
-        lots = filter_lots(lots, request.GET, entity, will_aggregate=True)
-        summary = get_lots_summary_data(lots, entity, short)
-        return JsonResponse({"status": "success", "data": summary})
-    except Exception:
-        traceback.print_exc()
-        return JsonResponse({"status": "error", "message": "Could not get lots summary"}, status=400)
-
-
-@check_user_rights()
-def get_lot_details(request, *args, **kwargs):
-    context = kwargs["context"]
-    entity_id = int(context["entity_id"])
-    lot_id = request.GET.get("lot_id", False)
-    if not lot_id:
-        return JsonResponse({"status": "error", "message": "Missing lot_id"}, status=400)
-
-    lot = CarbureLot.objects.get(pk=lot_id)
-    if lot.carbure_client_id != entity_id and lot.carbure_supplier_id != entity_id and lot.added_by_id != entity_id:
-        return JsonResponse({"status": "forbidden", "message": "User not allowed"}, status=403)
-
-    data = {}
-    data["lot"] = CarbureLotPublicSerializer(lot).data
-    entity = Entity.objects.get(id=entity_id)
-    parents = get_lot_parents(lot, entity)
-    children = get_lot_children(lot, entity)
-    data.update(parents)
-    data.update(children)
-    data["distance"] = get_transaction_distance(lot)
-    data["errors"] = get_lot_errors(lot, entity)
-    data["certificates"] = get_known_certificates(lot)
-    data["updates"] = get_lot_updates(lot, entity)
-    data["comments"] = get_lot_comments(lot, entity)
-    data["score"] = CarbureLotReliabilityScoreSerializer(lot.carburelotreliabilityscore_set.all(), many=True).data
-    data["disabled_fields"] = LotNode(lot).get_disabled_fields(entity_id)
-    return JsonResponse({"status": "success", "data": data})
-
-
-def get_lot_parents(lot, entity):
-    parents = {"parent_lot": None, "parent_stock": None}
-    if lot.parent_lot and (
-        lot.parent_lot.added_by == entity
-        or lot.parent_lot.carbure_supplier == entity
-        or lot.parent_lot.carbure_client == entity
-    ):
-        parents["parent_lot"] = CarbureLotPublicSerializer(lot.parent_lot).data
-    if lot.parent_stock and (lot.parent_stock.carbure_client == entity):
-        parents["parent_stock"] = CarbureStockPublicSerializer(lot.parent_stock).data
-    return parents
-
-
-def get_lot_children(lot, entity):
-    children = {"children_lot": [], "children_stock": []}
-
-    can_access_lot = Q(added_by=entity) | Q(carbure_supplier=entity) | Q(carbure_client=entity)
-    children_lot = (
-        CarbureLot.objects.filter(parent_lot=lot)
-        .exclude(lot_status=CarbureLot.DELETED)
-        .filter(can_access_lot)
-        .select_related(
-            "carbure_producer",
-            "carbure_supplier",
-            "carbure_client",
-            "added_by",
-            "carbure_vendor",
-            "carbure_production_site",
-            "carbure_production_site__producer",
-            "carbure_production_site__country",
-            "production_country",
-            "carbure_dispatch_site",
-            "carbure_dispatch_site__country",
-            "dispatch_site_country",
-            "carbure_delivery_site",
-            "carbure_delivery_site__country",
-            "delivery_site_country",
-            "feedstock",
-            "biofuel",
-            "country_of_origin",
-            "parent_lot",
-            "parent_stock",
-            "parent_stock__carbure_client",
-            "parent_stock__carbure_supplier",
-            "parent_stock__feedstock",
-            "parent_stock__biofuel",
-            "parent_stock__depot",
-            "parent_stock__country_of_origin",
-            "parent_stock__production_country",
-        )
-    )
-
-    if children_lot.count() > 0:
-        children["children_lot"] = CarbureLotPublicSerializer(children_lot, many=True).data
-
-    can_access_stock = Q(carbure_client=entity)
-    children_stock = (
-        CarbureStock.objects.filter(parent_lot=lot)
-        .filter(can_access_stock)
-        .select_related(
-            "parent_lot",
-            "parent_transformation",
-            "biofuel",
-            "feedstock",
-            "country_of_origin",
-            "depot",
-            "depot__country",
-            "carbure_production_site",
-            "carbure_production_site__country",
-            "production_country",
-            "carbure_client",
-            "carbure_supplier",
-        )
-    )
-
-    if children_stock.count() > 0:
-        children["children_stock"] = CarbureStockPublicSerializer(children_stock, many=True).data
-
-    return children
-
-
-@check_user_rights()
-def get_lots_filters(request, *args, **kwargs):
-    context = kwargs["context"]
-    entity_id = context["entity_id"]
-    status = request.GET.get("status", False)
-    field = request.GET.get("field", False)
-    if not field:
-        return JsonResponse(
-            {"status": "error", "message": "Please specify the field for which you want the filters"}, status=400
-        )
-    entity = Entity.objects.get(id=entity_id)
-    txs = get_entity_lots_by_status(entity, status)
-    data = get_lots_filters_data(txs, request.GET, entity, field)
-    if data is None:
-        return JsonResponse({"status": "error", "message": "Could not find specified filter"}, status=400)
-    else:
-        return JsonResponse({"status": "success", "data": data})
-
-
-@check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
-def add_lot(request, *args, **kwargs):
-    context = kwargs["context"]
-    entity_id = context["entity_id"]
-    entity = Entity.objects.get(pk=entity_id)
-
-    d = get_prefetched_data(entity)
-    lot_obj, errors = construct_carbure_lot(d, entity, request.POST.dict())
-    if not lot_obj:
-        return JsonResponse({"status": "error", "message": "Something went wrong"}, status=400)
-
-    # run sanity checks, insert lot and errors
-    lots_created = bulk_insert_lots(entity, [lot_obj], [errors], d)
-    if len(lots_created) == 0:
-        return JsonResponse({"status": "error", "message": "Something went wrong"}, status=500)
-    background_bulk_scoring(lots_created)
-    e = CarbureLotEvent()
-    e.event_type = CarbureLotEvent.CREATED
-    e.lot_id = lots_created[0].id
-    e.user = request.user
-    e.metadata = {"source": "MANUAL"}
-    e.save()
-
-    data = CarbureLotPublicSerializer(e.lot).data
-    return JsonResponse({"status": "success", "data": data})
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
@@ -267,7 +78,13 @@ def add_excel(request, *args, **kwargs):
     directory = get_uploaded_files_directory()
     now = datetime.datetime.now()
     filename = "%s_%s.xlsx" % (now.strftime("%Y%m%d.%H%M%S"), entity.name.upper())
-    filename = "".join((c for c in unicodedata.normalize("NFD", filename) if unicodedata.category(c) != "Mn"))
+    filename = "".join(
+        (
+            c
+            for c in unicodedata.normalize("NFD", filename)
+            if unicodedata.category(c) != "Mn"
+        )
+    )
     filepath = "%s/%s" % (directory, filename)
     with open(filepath, "wb+") as destination:
         for chunk in f.chunks():
@@ -290,7 +107,9 @@ def add_excel(request, *args, **kwargs):
             lots_errors.append(errors)
         lots_created = bulk_insert_lots(entity, lots, lots_errors, d)
         if len(lots_created) == 0:
-            return JsonResponse({"status": "error", "message": "Something went wrong"}, status=500)
+            return JsonResponse(
+                {"status": "error", "message": "Something went wrong"}, status=500
+            )
         background_bulk_scoring(lots_created)
         for lot in lots_created:
             e = CarbureLotEvent()
@@ -304,9 +123,17 @@ def add_excel(request, *args, **kwargs):
                 event.event_type = CarbureStockEvent.SPLIT
                 event.stock = lot.parent_stock
                 event.user = request.user
-                event.metadata = {"message": "Envoi lot.", "volume_to_deduct": lot.volume}
+                event.metadata = {
+                    "message": "Envoi lot.",
+                    "volume_to_deduct": lot.volume,
+                }
                 event.save()
-    return JsonResponse({"status": "success", "data": {"lots": nb_total, "valid": nb_valid, "invalid": nb_invalid}})
+    return JsonResponse(
+        {
+            "status": "success",
+            "data": {"lots": nb_total, "valid": nb_valid, "invalid": nb_invalid},
+        }
+    )
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
@@ -317,10 +144,14 @@ def duplicate_lot(request, *args, **kwargs):
     try:
         lot = CarbureLot.objects.get(id=lot_id)
     except Exception:
-        return JsonResponse({"status": "error", "message": "Unknown Lot %s" % (lot_id)}, status=400)
+        return JsonResponse(
+            {"status": "error", "message": "Unknown Lot %s" % (lot_id)}, status=400
+        )
 
     if lot.added_by_id != int(entity_id):
-        return JsonResponse({"status": "forbidden", "message": "User not allowed"}, status=403)
+        return JsonResponse(
+            {"status": "forbidden", "message": "User not allowed"}, status=403
+        )
 
     lot.pk = None
     lot.parent_stock = None
@@ -369,10 +200,16 @@ def lots_send(request, *args, **kwargs):
     for lot in filtered_lots:
         if lot.added_by != entity:
             return JsonResponse(
-                {"status": "forbidden", "message": "Entity not authorized to send this lot"}, status=403
+                {
+                    "status": "forbidden",
+                    "message": "Entity not authorized to send this lot",
+                },
+                status=403,
             )
         if lot.lot_status != CarbureLot.DRAFT:
-            return JsonResponse({"status": "error", "message": "Lot is not a draft"}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot is not a draft"}, status=400
+            )
 
         if lot.lot_status in [CarbureLot.ACCEPTED, CarbureLot.FROZEN]:
             # ignore, lot already accepted
@@ -439,7 +276,10 @@ def lots_send(request, *args, **kwargs):
             event.lot = lot
             event.user = request.user
             event.save()
-        elif lot.carbure_client == entity and lot.delivery_type not in (CarbureLot.UNKNOWN, None):
+        elif lot.carbure_client == entity and lot.delivery_type not in (
+            CarbureLot.UNKNOWN,
+            None,
+        ):
             lot.lot_status = CarbureLot.ACCEPTED
             lot.save()
             event = CarbureLotEvent()
@@ -454,7 +294,11 @@ def lots_send(request, *args, **kwargs):
                     lot.lot_status = CarbureLot.DRAFT
                     lot.save()
                     return JsonResponse(
-                        {"status": "error", "message": "Cannot add stock into unknown Depot"}, status=400
+                        {
+                            "status": "error",
+                            "message": "Cannot add stock into unknown Depot",
+                        },
+                        status=400,
                     )
                 stock.depot = lot.carbure_delivery_site
                 stock.carbure_client = lot.carbure_client
@@ -518,11 +362,17 @@ def lots_delete(request, *args, **kwargs):
     lots = get_entity_lots_by_status(entity, status)
     filtered_lots = filter_lots(lots, request.POST, entity)
     if filtered_lots.count() == 0:
-        return JsonResponse({"status": "error", "message": "Could not find lots to delete"}, status=400)
+        return JsonResponse(
+            {"status": "error", "message": "Could not find lots to delete"}, status=400
+        )
     for lot in filtered_lots:
         if lot.added_by != entity:
             return JsonResponse(
-                {"status": "forbidden", "message": "Entity not authorized to delete this lot"}, status=403
+                {
+                    "status": "forbidden",
+                    "message": "Entity not authorized to delete this lot",
+                },
+                status=403,
             )
 
         if lot.lot_status not in [CarbureLot.DRAFT, CarbureLot.REJECTED] and not (
@@ -530,7 +380,9 @@ def lots_delete(request, *args, **kwargs):
             and lot.correction_status == CarbureLot.IN_CORRECTION
         ):
             # cannot delete lot accepted / frozen or already deleted
-            return JsonResponse({"status": "error", "message": "Cannot delete lot"}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Cannot delete lot"}, status=400
+            )
 
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.DELETED
@@ -540,7 +392,9 @@ def lots_delete(request, *args, **kwargs):
         lot.lot_status = CarbureLot.DELETED
         lot.save()
         if lot.parent_stock is not None:
-            stock = CarbureStock.objects.get(id=lot.parent_stock.id)  # force refresh from db
+            stock = CarbureStock.objects.get(
+                id=lot.parent_stock.id
+            )  # force refresh from db
             stock.remaining_volume = round(stock.remaining_volume + lot.volume, 2)
             stock.remaining_weight = stock.get_weight()
             stock.remaining_lhv_amount = stock.get_lhv_amount()
@@ -550,10 +404,16 @@ def lots_delete(request, *args, **kwargs):
             event.event_type = CarbureStockEvent.UNSPLIT
             event.stock = lot.parent_stock
             event.user = None
-            event.metadata = {"message": "child lot deleted. recredit volume.", "volume_to_credit": lot.volume}
+            event.metadata = {
+                "message": "child lot deleted. recredit volume.",
+                "volume_to_credit": lot.volume,
+            }
             event.save()
         if lot.parent_lot:
-            if lot.parent_lot.delivery_type in [CarbureLot.PROCESSING, CarbureLot.TRADING]:
+            if lot.parent_lot.delivery_type in [
+                CarbureLot.PROCESSING,
+                CarbureLot.TRADING,
+            ]:
                 lot.parent_lot.lot_status = CarbureLot.PENDING
                 lot.parent_lot.delivery_type = CarbureLot.OTHER
                 lot.parent_lot.save()
@@ -575,7 +435,9 @@ def add_comment(request, *args, **kwargs):
     status = request.POST.get("status", False)
     comment = request.POST.get("comment", False)
     if not comment:
-        return JsonResponse({"status": "error", "message": "Missing comment"}, status=400)
+        return JsonResponse(
+            {"status": "error", "message": "Missing comment"}, status=400
+        )
     is_visible_by_admin = request.POST.get("is_visible_by_admin", False)
     is_visible_by_auditor = request.POST.get("is_visible_by_auditor", False)
     entity = Entity.objects.get(id=entity_id)
@@ -589,7 +451,11 @@ def add_comment(request, *args, **kwargs):
             and entity.entity_type not in [Entity.AUDITOR, Entity.ADMIN]
         ):
             return JsonResponse(
-                {"status": "forbidden", "message": "Entity not authorized to comment on this lot"}, status=403
+                {
+                    "status": "forbidden",
+                    "message": "Entity not authorized to comment on this lot",
+                },
+                status=403,
             )
 
         lot_comment = CarbureLotComment()
@@ -623,23 +489,39 @@ def reject_lot(request, *args, **kwargs):
 
     for lot in lots.iterator():
         if lot.carbure_client != entity:
-            return JsonResponse({"status": "forbidden", "message": "Only the client can reject this lot"}, status=403)
+            return JsonResponse(
+                {
+                    "status": "forbidden",
+                    "message": "Only the client can reject this lot",
+                },
+                status=403,
+            )
 
         if lot.lot_status == CarbureLot.DRAFT:
-            return JsonResponse({"status": "error", "message": "Cannot reject DRAFT"}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Cannot reject DRAFT"}, status=400
+            )
         elif lot.lot_status == CarbureLot.PENDING:
             pass
         elif lot.lot_status == CarbureLot.REJECTED:
-            return JsonResponse({"status": "error", "message": "Lot is already rejected."}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot is already rejected."}, status=400
+            )
         elif lot.lot_status == CarbureLot.ACCEPTED:
             pass
         elif lot.lot_status == CarbureLot.FROZEN:
             return JsonResponse(
-                {"status": "error", "message": "Lot is Frozen. Cannot reject. Please invalidate declaration first."},
+                {
+                    "status": "error",
+                    "message": "Lot is Frozen. Cannot reject. Please invalidate declaration first.",
+                },
                 status=400,
             )
         elif lot.lot_status == CarbureLot.DELETED:
-            return JsonResponse({"status": "error", "message": "Lot is deleted. Cannot reject"}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot is deleted. Cannot reject"},
+                status=400,
+            )
 
         lot.lot_status = CarbureLot.REJECTED
         lot.correction_status = CarbureLot.IN_CORRECTION
@@ -666,10 +548,18 @@ def accept_rfc(request, *args, **kwargs):
 
     for lot in lots.iterator():
         if int(entity_id) != lot.carbure_client_id:
-            return JsonResponse({"status": "forbidden", "message": "Only the client can accept the lot"}, status=403)
+            return JsonResponse(
+                {
+                    "status": "forbidden",
+                    "message": "Only the client can accept the lot",
+                },
+                status=403,
+            )
 
         if lot.lot_status == CarbureLot.DRAFT:
-            return JsonResponse({"status": "error", "message": "Cannot accept DRAFT"}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Cannot accept DRAFT"}, status=400
+            )
         elif lot.lot_status == CarbureLot.PENDING:
             # ok no problem
             pass
@@ -677,11 +567,17 @@ def accept_rfc(request, *args, **kwargs):
             # the client changed his mind, ok
             pass
         elif lot.lot_status == CarbureLot.ACCEPTED:
-            return JsonResponse({"status": "error", "message": "Lot already accepted."}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot already accepted."}, status=400
+            )
         elif lot.lot_status == CarbureLot.FROZEN:
-            return JsonResponse({"status": "error", "message": "Lot is Frozen."}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot is Frozen."}, status=400
+            )
         elif lot.lot_status == CarbureLot.DELETED:
-            return JsonResponse({"status": "error", "message": "Lot is deleted."}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot is deleted."}, status=400
+            )
 
         lot.lot_status = CarbureLot.ACCEPTED
         lot.delivery_type = CarbureLot.RFC
@@ -705,14 +601,25 @@ def accept_in_stock(request, *args, **kwargs):
     lots = filter_lots(lots, request.POST, entity, will_aggregate=True)
 
     if entity.entity_type == Entity.OPERATOR:
-        return JsonResponse({"status": "error", "message": "Stock unavailable for Operators"}, status=400)
+        return JsonResponse(
+            {"status": "error", "message": "Stock unavailable for Operators"},
+            status=400,
+        )
 
     for lot in lots.iterator():
         if entity != lot.carbure_client:
-            return JsonResponse({"status": "forbidden", "message": "Only the client can accept the lot"}, status=403)
+            return JsonResponse(
+                {
+                    "status": "forbidden",
+                    "message": "Only the client can accept the lot",
+                },
+                status=403,
+            )
 
         if lot.lot_status == CarbureLot.DRAFT:
-            return JsonResponse({"status": "error", "message": "Cannot accept DRAFT"}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Cannot accept DRAFT"}, status=400
+            )
         elif lot.lot_status == CarbureLot.PENDING:
             # ok no problem
             pass
@@ -720,11 +627,17 @@ def accept_in_stock(request, *args, **kwargs):
             # the client changed his mind, ok
             pass
         elif lot.lot_status == CarbureLot.ACCEPTED:
-            return JsonResponse({"status": "error", "message": "Lot already accepted."}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot already accepted."}, status=400
+            )
         elif lot.lot_status == CarbureLot.FROZEN:
-            return JsonResponse({"status": "error", "message": "Lot is Frozen."}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot is Frozen."}, status=400
+            )
         elif lot.lot_status == CarbureLot.DELETED:
-            return JsonResponse({"status": "error", "message": "Lot is deleted."}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot is deleted."}, status=400
+            )
 
         lot.lot_status = CarbureLot.ACCEPTED
         lot.delivery_type = CarbureLot.STOCK
@@ -740,7 +653,10 @@ def accept_in_stock(request, *args, **kwargs):
             lot.lot_status = CarbureLot.PENDING
             lot.delivery_type = CarbureLot.UNKNOWN
             lot.save()
-            return JsonResponse({"status": "error", "message": "Cannot add stock for unknown Depot"}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Cannot add stock for unknown Depot"},
+                status=400,
+            )
         stock.depot = lot.carbure_delivery_site
         stock.carbure_client = lot.carbure_client
         stock.remaining_volume = lot.volume
@@ -774,10 +690,18 @@ def accept_blending(request, *args, **kwargs):
 
     for lot in lots.iterator():
         if int(entity_id) != lot.carbure_client_id:
-            return JsonResponse({"status": "forbidden", "message": "Only the client can accept the lot"}, status=403)
+            return JsonResponse(
+                {
+                    "status": "forbidden",
+                    "message": "Only the client can accept the lot",
+                },
+                status=403,
+            )
 
         if lot.lot_status == CarbureLot.DRAFT:
-            return JsonResponse({"status": "error", "message": "Cannot accept DRAFT"}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Cannot accept DRAFT"}, status=400
+            )
         elif lot.lot_status == CarbureLot.PENDING:
             # ok no problem
             pass
@@ -785,11 +709,17 @@ def accept_blending(request, *args, **kwargs):
             # the client changed his mind, ok
             pass
         elif lot.lot_status == CarbureLot.ACCEPTED:
-            return JsonResponse({"status": "error", "message": "Lot already accepted."}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot already accepted."}, status=400
+            )
         elif lot.lot_status == CarbureLot.FROZEN:
-            return JsonResponse({"status": "error", "message": "Lot is Frozen."}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot is Frozen."}, status=400
+            )
         elif lot.lot_status == CarbureLot.DELETED:
-            return JsonResponse({"status": "error", "message": "Lot is deleted."}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot is deleted."}, status=400
+            )
 
         lot.lot_status = CarbureLot.ACCEPTED
         lot.delivery_type = CarbureLot.BLENDING
@@ -814,10 +744,18 @@ def accept_export(request, *args, **kwargs):
 
     for lot in lots.iterator():
         if int(entity_id) != lot.carbure_client_id:
-            return JsonResponse({"status": "forbidden", "message": "Only the client can accept the lot"}, status=403)
+            return JsonResponse(
+                {
+                    "status": "forbidden",
+                    "message": "Only the client can accept the lot",
+                },
+                status=403,
+            )
 
         if lot.lot_status == CarbureLot.DRAFT:
-            return JsonResponse({"status": "error", "message": "Cannot accept DRAFT"}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Cannot accept DRAFT"}, status=400
+            )
         elif lot.lot_status == CarbureLot.PENDING:
             # ok no problem
             pass
@@ -825,11 +763,17 @@ def accept_export(request, *args, **kwargs):
             # the client changed his mind, ok
             pass
         elif lot.lot_status == CarbureLot.ACCEPTED:
-            return JsonResponse({"status": "error", "message": "Lot already accepted."}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot already accepted."}, status=400
+            )
         elif lot.lot_status == CarbureLot.FROZEN:
-            return JsonResponse({"status": "error", "message": "Lot is Frozen."}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot is Frozen."}, status=400
+            )
         elif lot.lot_status == CarbureLot.DELETED:
-            return JsonResponse({"status": "error", "message": "Lot is deleted."}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot is deleted."}, status=400
+            )
 
         lot.lot_status = CarbureLot.ACCEPTED
         lot.delivery_type = CarbureLot.EXPORT
@@ -854,10 +798,18 @@ def accept_direct_delivery(request, *args, **kwargs):
 
     for lot in lots.iterator():
         if int(entity_id) != lot.carbure_client_id:
-            return JsonResponse({"status": "forbidden", "message": "Only the client can accept the lot"}, status=403)
+            return JsonResponse(
+                {
+                    "status": "forbidden",
+                    "message": "Only the client can accept the lot",
+                },
+                status=403,
+            )
 
         if lot.lot_status == CarbureLot.DRAFT:
-            return JsonResponse({"status": "error", "message": "Cannot accept DRAFT"}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Cannot accept DRAFT"}, status=400
+            )
         elif lot.lot_status == CarbureLot.PENDING:
             # ok no problem
             pass
@@ -865,11 +817,17 @@ def accept_direct_delivery(request, *args, **kwargs):
             # the client changed his mind, ok
             pass
         elif lot.lot_status == CarbureLot.ACCEPTED:
-            return JsonResponse({"status": "error", "message": "Lot already accepted."}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot already accepted."}, status=400
+            )
         elif lot.lot_status == CarbureLot.FROZEN:
-            return JsonResponse({"status": "error", "message": "Lot is Frozen."}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot is Frozen."}, status=400
+            )
         elif lot.lot_status == CarbureLot.DELETED:
-            return JsonResponse({"status": "error", "message": "Lot is deleted."}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot is deleted."}, status=400
+            )
 
         lot.lot_status = CarbureLot.ACCEPTED
         lot.delivery_type = CarbureLot.DIRECT
@@ -900,10 +858,18 @@ def accept_processing(request, *args, **kwargs):
 
     for lot in lots.iterator():
         if int(entity_id) != lot.carbure_client_id:
-            return JsonResponse({"status": "forbidden", "message": "Only the client can accept the lot"}, status=403)
+            return JsonResponse(
+                {
+                    "status": "forbidden",
+                    "message": "Only the client can accept the lot",
+                },
+                status=403,
+            )
 
         if lot.lot_status == CarbureLot.DRAFT:
-            return JsonResponse({"status": "error", "message": "Cannot accept DRAFT"}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Cannot accept DRAFT"}, status=400
+            )
         elif lot.lot_status == CarbureLot.PENDING:
             # ok no problem
             pass
@@ -911,11 +877,17 @@ def accept_processing(request, *args, **kwargs):
             # the client changed his mind, ok
             pass
         elif lot.lot_status == CarbureLot.ACCEPTED:
-            return JsonResponse({"status": "error", "message": "Lot already accepted."}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot already accepted."}, status=400
+            )
         elif lot.lot_status == CarbureLot.FROZEN:
-            return JsonResponse({"status": "error", "message": "Lot is Frozen."}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot is Frozen."}, status=400
+            )
         elif lot.lot_status == CarbureLot.DELETED:
-            return JsonResponse({"status": "error", "message": "Lot is deleted."}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot is deleted."}, status=400
+            )
 
         lot.lot_status = CarbureLot.ACCEPTED
         lot.delivery_type = CarbureLot.PROCESSING
@@ -952,7 +924,9 @@ def accept_processing(request, *args, **kwargs):
         event.user = request.user
         event.save()
 
-    updated_lots = CarbureLot.objects.filter(id__in=accepted_lot_ids + processed_lot_ids)
+    updated_lots = CarbureLot.objects.filter(
+        id__in=accepted_lot_ids + processed_lot_ids
+    )
     background_bulk_sanity_checks(updated_lots)
     background_bulk_scoring(updated_lots)
 
@@ -971,11 +945,17 @@ def accept_trading(request, *args, **kwargs):
 
     if not client_entity_id and not unknown_client:
         return JsonResponse(
-            {"status": "error", "message": "Please specify either client_entity_id or unknown_client"}, status=400
+            {
+                "status": "error",
+                "message": "Please specify either client_entity_id or unknown_client",
+            },
+            status=400,
         )
 
     if not certificate and entity.default_certificate == "":
-        return JsonResponse({"status": "error", "message": "Please specify a certificate"}, status=400)
+        return JsonResponse(
+            {"status": "error", "message": "Please specify a certificate"}, status=400
+        )
 
     lots = get_entity_lots_by_status(entity, status)
     lots = filter_lots(lots, request.POST, entity, will_aggregate=True)
@@ -984,7 +964,10 @@ def accept_trading(request, *args, **kwargs):
         try:
             client_entity = Entity.objects.get(pk=client_entity_id)
         except:
-            return JsonResponse({"status": "error", "message": "Could not find client entity"}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Could not find client entity"},
+                status=400,
+            )
     else:
         client_entity = None
 
@@ -993,10 +976,18 @@ def accept_trading(request, *args, **kwargs):
 
     for lot in lots.iterator():
         if int(entity_id) != lot.carbure_client_id:
-            return JsonResponse({"status": "forbidden", "message": "Only the client can accept the lot"}, status=403)
+            return JsonResponse(
+                {
+                    "status": "forbidden",
+                    "message": "Only the client can accept the lot",
+                },
+                status=403,
+            )
 
         if lot.lot_status == CarbureLot.DRAFT:
-            return JsonResponse({"status": "error", "message": "Cannot accept DRAFT"}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Cannot accept DRAFT"}, status=400
+            )
         elif lot.lot_status == CarbureLot.PENDING:
             # ok no problem
             pass
@@ -1004,11 +995,17 @@ def accept_trading(request, *args, **kwargs):
             # the client changed his mind, ok
             pass
         elif lot.lot_status == CarbureLot.ACCEPTED:
-            return JsonResponse({"status": "error", "message": "Lot already accepted."}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot already accepted."}, status=400
+            )
         elif lot.lot_status == CarbureLot.FROZEN:
-            return JsonResponse({"status": "error", "message": "Lot is Frozen."}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot is Frozen."}, status=400
+            )
         elif lot.lot_status == CarbureLot.DELETED:
-            return JsonResponse({"status": "error", "message": "Lot is deleted."}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Lot is deleted."}, status=400
+            )
 
         lot.lot_status = CarbureLot.ACCEPTED
         lot.delivery_type = CarbureLot.TRADING
@@ -1057,7 +1054,9 @@ def accept_trading(request, *args, **kwargs):
         event.user = request.user
         event.save()
 
-    updated_lots = CarbureLot.objects.filter(id__in=accepted_lot_ids + transferred_lot_ids)
+    updated_lots = CarbureLot.objects.filter(
+        id__in=accepted_lot_ids + transferred_lot_ids
+    )
     prefetched_data = get_prefetched_data(entity)
     background_bulk_sanity_checks(updated_lots, prefetched_data)
     background_bulk_scoring(updated_lots, prefetched_data)
@@ -1076,10 +1075,14 @@ def get_template(request, *args, **kwargs):
             file_data = f.read()
             # sending response
             response = HttpResponse(file_data, content_type="application/vnd.ms-excel")
-            response["Content-Disposition"] = 'attachment; filename="carbure_template.xlsx"'
+            response[
+                "Content-Disposition"
+            ] = 'attachment; filename="carbure_template.xlsx"'
             return response
     except Exception:
-        return JsonResponse({"status": "error", "message": "Error creating template file"}, status=500)
+        return JsonResponse(
+            {"status": "error", "message": "Error creating template file"}, status=500
+        )
 
 
 @check_user_rights()
@@ -1093,10 +1096,14 @@ def get_template_stock(request, *args, **kwargs):
             file_data = f.read()
             # sending response
             response = HttpResponse(file_data, content_type="application/vnd.ms-excel")
-            response["Content-Disposition"] = 'attachment; filename="carbure_template_stocks.xlsx"'
+            response[
+                "Content-Disposition"
+            ] = 'attachment; filename="carbure_template_stocks.xlsx"'
             return response
     except Exception:
-        return JsonResponse({"status": "error", "message": "Error creating template file"}, status=500)
+        return JsonResponse(
+            {"status": "error", "message": "Error creating template file"}, status=500
+        )
 
 
 @check_user_rights()
@@ -1113,7 +1120,13 @@ def toggle_warning(request, *args, **kwargs):
                 lot_error = GenericError.objects.get(lot_id=lot_id, error=error)
             except:
                 traceback.print_exc()
-                return JsonResponse({"status": "error", "message": "Could not locate wanted lot or error"}, status=404)
+                return JsonResponse(
+                    {
+                        "status": "error",
+                        "message": "Could not locate wanted lot or error",
+                    },
+                    status=404,
+                )
             # is creator
             if lot.added_by_id == int(entity_id):
                 lot_error.acked_by_creator = checked
@@ -1124,7 +1137,9 @@ def toggle_warning(request, *args, **kwargs):
         return JsonResponse({"status": "success"})
     except:
         traceback.print_exc()
-        return JsonResponse({"status": "error", "message": "Could not update warning"}, status=500)
+        return JsonResponse(
+            {"status": "error", "message": "Could not update warning"}, status=500
+        )
 
 
 @check_user_rights()
@@ -1175,9 +1190,16 @@ def cancel_accept_lots(request, *args, **kwargs):
 
         # delete new lots created when the lot was accepted
         if lot.delivery_type in (CarbureLot.PROCESSING, CarbureLot.TRADING):
-            children_lots = CarbureLot.objects.filter(parent_lot=lot).exclude(lot_status__in=(CarbureLot.DELETED))
+            children_lots = CarbureLot.objects.filter(parent_lot=lot).exclude(
+                lot_status__in=(CarbureLot.DELETED)
+            )
             # do not do anything if the children lots are already used
-            if children_lots.filter(lot_status__in=(CarbureLot.ACCEPTED, CarbureLot.FROZEN)).count() > 0:
+            if (
+                children_lots.filter(
+                    lot_status__in=(CarbureLot.ACCEPTED, CarbureLot.FROZEN)
+                ).count()
+                > 0
+            ):
                 return ErrorResponse(400, CancelErrors.CHILDREN_IN_USE)
             else:
                 children_lots.delete()
@@ -1185,12 +1207,17 @@ def cancel_accept_lots(request, *args, **kwargs):
         # delete new stocks created when the lot was accepted
         if lot.delivery_type == CarbureLot.STOCK:
             children_stocks = CarbureStock.objects.filter(parent_lot=lot)
-            children_stocks_children_lots = CarbureLot.objects.filter(parent_stock__in=children_stocks).exclude(
-                lot_status=CarbureLot.DELETED
+            children_stocks_children_lots = CarbureLot.objects.filter(
+                parent_stock__in=children_stocks
+            ).exclude(lot_status=CarbureLot.DELETED)
+            children_stocks_children_trans = CarbureStockTransformation.objects.filter(
+                source_stock__in=children_stocks
             )
-            children_stocks_children_trans = CarbureStockTransformation.objects.filter(source_stock__in=children_stocks)
             # do not do anything if the children stocks are already used
-            if children_stocks_children_lots.count() > 0 or children_stocks_children_trans.count() > 0:
+            if (
+                children_stocks_children_lots.count() > 0
+                or children_stocks_children_trans.count() > 0
+            ):
                 return ErrorResponse(400, CancelErrors.CHILDREN_IN_USE)
             else:
                 children_stocks.delete()

@@ -36,7 +36,11 @@ class LotCorrectionTest(TestCase):
             "tester@carbure.local",
             "Tester",
             "gogogo",
-            [(self.producer, "ADMIN"), (self.trader, "ADMIN"), (self.operator, "ADMIN")],
+            [
+                (self.producer, "ADMIN"),
+                (self.trader, "ADMIN"),
+                (self.operator, "ADMIN"),
+            ],
         )
 
     def prepare_lot(self, supplier, client=None, **kwargs):
@@ -44,12 +48,15 @@ class LotCorrectionTest(TestCase):
         lot_data["carbure_supplier_id"] = supplier.id
         lot_data["carbure_client_id"] = client.id if client else self.trader.id
 
-        add_response = self.client.post(reverse("api-v4-add-lots"), lot_data)
+        add_response = self.client.post(reverse("transactions-lots-add"), lot_data)
         self.assertEqual(add_response.status_code, 200)
 
         lot_id = add_response.json()["data"]["id"]
 
-        send_response = self.client.post(reverse("api-v4-send-lots"), {"entity_id": supplier.id, "selection": [lot_id]})
+        send_response = self.client.post(
+            reverse("api-v4-send-lots"),
+            {"entity_id": supplier.id, "selection": [lot_id]},
+        )
         self.assertEqual(send_response.status_code, 200)
 
         return CarbureLot.objects.get(id=lot_id)

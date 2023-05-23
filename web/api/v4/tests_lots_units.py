@@ -22,7 +22,9 @@ class LotsTestUnits(TestCase):
         # let's create a user
         self.password = "totopouet"
         self.user1 = user_model.objects.create_user(
-            email="testuser1@toto.com", name="Le Super Testeur 1", password=self.password
+            email="testuser1@toto.com",
+            name="Le Super Testeur 1",
+            password=self.password,
         )
         loggedin = self.client.login(username=self.user1.email, password=self.password)
         self.assertTrue(loggedin)
@@ -36,15 +38,23 @@ class LotsTestUnits(TestCase):
         self.trader.default_certificate = "TRADER_CERTIFICATE"
         self.trader.save()
         self.operator = Entity.objects.filter(entity_type=Entity.OPERATOR)[0]
-        UserRights.objects.update_or_create(entity=self.producer, user=self.user1, role=UserRights.RW)
-        UserRights.objects.update_or_create(entity=self.trader, user=self.user1, role=UserRights.RW)
-        UserRights.objects.update_or_create(entity=self.operator, user=self.user1, role=UserRights.RW)
+        UserRights.objects.update_or_create(
+            entity=self.producer, user=self.user1, role=UserRights.RW
+        )
+        UserRights.objects.update_or_create(
+            entity=self.trader, user=self.user1, role=UserRights.RW
+        )
+        UserRights.objects.update_or_create(
+            entity=self.operator, user=self.user1, role=UserRights.RW
+        )
 
         # pass otp verification
         response = self.client.post(reverse("auth-request-otp"))
         self.assertEqual(response.status_code, 200)
         device, created = EmailDevice.objects.get_or_create(user=self.user1)
-        response = self.client.post(reverse("auth-verify-otp"), {"otp_token": device.token})
+        response = self.client.post(
+            reverse("auth-verify-otp"), {"otp_token": device.token}
+        )
         self.assertEqual(response.status_code, 200)
 
     def create_draft(self, lot=None, **kwargs):
@@ -52,7 +62,7 @@ class LotsTestUnits(TestCase):
             lot = get_lot(self.producer)
             del lot["volume"]
         lot.update(kwargs)
-        response = self.client.post(reverse("api-v4-add-lots"), lot)
+        response = self.client.post(reverse("transactions-lots-add"), lot)
         self.assertEqual(response.status_code, 200)
         data = response.json()["data"]
         lot_id = data["id"]

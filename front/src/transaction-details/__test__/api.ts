@@ -14,7 +14,7 @@ import {
 } from "carbure/__test__/api"
 import { producer } from "carbure/__test__/data"
 
-export const okLotDetails = rest.get("/api/lots/details", (req, res, ctx) => {
+export const okLotDetails = rest.get("/api/v5/transactions/lots/details", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",

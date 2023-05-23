@@ -3,7 +3,7 @@ import { lotFormToPayload, LotFormValue } from "lot-add/components/lot-form"
 import { LotDetails, StockDetails } from "./types"
 
 export function getLotDetails(entity_id: number, lot_id: number) {
-  return api.get<Api<LotDetails>>("/lots/details", {
+  return api.get<Api<LotDetails>>("/v5/transactions/lots/details", {
     params: { entity_id, lot_id },
   })
 }

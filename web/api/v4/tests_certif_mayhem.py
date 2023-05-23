@@ -24,7 +24,9 @@ class LotsCertifMayhemTest(TestCase):
         # let's create a user
         self.password = "totopouet"
         self.user1 = user_model.objects.create_user(
-            email="testuser1@toto.com", name="Le Super Testeur 1", password=self.password
+            email="testuser1@toto.com",
+            name="Le Super Testeur 1",
+            password=self.password,
         )
         loggedin = self.client.login(username=self.user1.email, password=self.password)
         self.assertTrue(loggedin)
@@ -37,26 +39,38 @@ class LotsCertifMayhemTest(TestCase):
         self.producer.default_certificate = "PRODUCER_CERTIFICATE"
         self.producer.save()
 
-        self.trader = Entity.objects.get(pk=18)  #  .filter(entity_type=Entity.TRADER)[0]
+        self.trader = Entity.objects.get(
+            pk=18
+        )  #  .filter(entity_type=Entity.TRADER)[0]
         self.trader.default_certificate = "TRADER_CERTIFICATE"
         self.trader.save()
-        self.operator = Entity.objects.get(pk=1)  # .filter(entity_type=Entity.OPERATOR)[0]
-        UserRights.objects.update_or_create(entity=self.producer, user=self.user1, role=UserRights.RW)
-        UserRights.objects.update_or_create(entity=self.trader, user=self.user1, role=UserRights.RW)
-        UserRights.objects.update_or_create(entity=self.operator, user=self.user1, role=UserRights.RW)
+        self.operator = Entity.objects.get(
+            pk=1
+        )  # .filter(entity_type=Entity.OPERATOR)[0]
+        UserRights.objects.update_or_create(
+            entity=self.producer, user=self.user1, role=UserRights.RW
+        )
+        UserRights.objects.update_or_create(
+            entity=self.trader, user=self.user1, role=UserRights.RW
+        )
+        UserRights.objects.update_or_create(
+            entity=self.operator, user=self.user1, role=UserRights.RW
+        )
 
         # pass otp verification
         response = self.client.post(reverse("auth-request-otp"))
         self.assertEqual(response.status_code, 200)
         device, created = EmailDevice.objects.get_or_create(user=self.user1)
-        response = self.client.post(reverse("auth-verify-otp"), {"otp_token": device.token})
+        response = self.client.post(
+            reverse("auth-verify-otp"), {"otp_token": device.token}
+        )
         self.assertEqual(response.status_code, 200)
 
     def create_draft(self, lot=None, **kwargs):
         if lot is None:
             lot = get_lot(self.producer)
         lot.update(kwargs)
-        response = self.client.post(reverse("api-v4-add-lots"), lot)
+        response = self.client.post(reverse("transactions-lots-add"), lot)
         self.assertEqual(response.status_code, 200)
         data = response.json()["data"]
         lot_id = data["id"]
@@ -64,7 +78,10 @@ class LotsCertifMayhemTest(TestCase):
         return lot
 
     def send_lot(self, lot, expected_status=200):
-        response = self.client.post(reverse("api-v4-send-lots"), {"entity_id": self.producer.id, "selection": [lot.id]})
+        response = self.client.post(
+            reverse("api-v4-send-lots"),
+            {"entity_id": self.producer.id, "selection": [lot.id]},
+        )
         if response.status_code != 200:
             print(response.json())
         self.assertEqual(response.status_code, expected_status)
