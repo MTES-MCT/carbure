@@ -137,7 +137,7 @@ class LotCorrectionTest(TestCase):
 
         # finally, accept lot
         response = self.client.post(
-            reverse("api-v4-accept-in-stock"),
+            reverse("transactions-lots-accept-in-stock"),
             {"entity_id": self.trader.id, "selection": [lot.id]},
         )
         self.assertEqual(response.status_code, 200)

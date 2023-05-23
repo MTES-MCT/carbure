@@ -22,7 +22,7 @@ export function toggleWarning(
   errors: string[],
   checked: boolean
 ) {
-  return api.post("/lots/toggle-warning", {
+  return api.post("/v5/transactions/lots/toggle-warning", {
     entity_id,
     lot_id,
     errors,

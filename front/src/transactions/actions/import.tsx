@@ -14,7 +14,7 @@ import { useMatomo } from "matomo"
 import Form from "common/components/form"
 
 const FAQ_URL = "https://carbure-1.gitbook.io/faq/"
-const TEMPLATE_URL = "/api/download-template"
+const TEMPLATE_URL = "/api/v5/transactions/lots/template"
 
 export const ImportButton = () => {
   const { t } = useTranslation()

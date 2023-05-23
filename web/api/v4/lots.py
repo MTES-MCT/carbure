@@ -301,7 +301,6 @@ def compute_lot_quantity(lot, data):
         raise Exception("No quantity was specified")
 
     # compute the different quantity values based on the previous config
-    print(">>>>lot.biofuel: ", lot.biofuel)
     if unit == CarbureUnit.LITER:
         volume = quantity
         weight = round(volume * lot.biofuel.masse_volumique, 2)

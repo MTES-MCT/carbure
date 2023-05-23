@@ -99,14 +99,14 @@ export function acceptReleaseForConsumption(
   selection?: number[]
 ) {
   return api.post<Api<void>>(
-    "/lots/accept-release-for-consumption",
+    "/v5/transactions/lots/accept-release-for-consumption",
     selectionOrQuery(query, selection)
   )
 }
 
 export function acceptInStock(query: LotQuery, selection?: number[]) {
   return api.post<Api<void>>(
-    "/lots/accept-in-stock",
+    "/v5/transactions/lots/accept-in-stock",
     selectionOrQuery(query, selection)
   )
 }
@@ -122,7 +122,7 @@ export function acceptForTrading(
       ? { client_entity_id: client.id }
       : { unknown_client: client }
 
-  return api.post<Api<void>>("/lots/accept-trading", {
+  return api.post<Api<void>>("/v5/transactions/lots/accept-trading", {
     ...selectionOrQuery(query, selection),
     ...params,
     certificate,
@@ -134,7 +134,7 @@ export function acceptForProcessing(
   selection: number[] | undefined,
   processing_entity_id: number
 ) {
-  return api.post<Api<void>>("/lots/accept-processing", {
+  return api.post<Api<void>>("/v5/transactions/lots/accept-processing", {
     ...selectionOrQuery(query, selection),
     processing_entity_id,
   })
@@ -145,7 +145,7 @@ export function acceptForBlending(
   selection: number[] | undefined
 ) {
   return api.post<Api<void>>(
-    "/lots/accept-blending",
+    "/v5/transactions/lots/accept-blending",
     selectionOrQuery(query, selection)
   )
 }
@@ -155,7 +155,7 @@ export function acceptForDirectDelivery(
   selection: number[] | undefined
 ) {
   return api.post<Api<void>>(
-    "/lots/accept-direct-delivery",
+    "/v5/transactions/lots/accept-direct-delivery",
     selectionOrQuery(query, selection)
   )
 }
@@ -165,7 +165,7 @@ export function acceptForExport(
   selection: number[] | undefined
 ) {
   return api.post<Api<void>>(
-    "/lots/accept-export",
+    "/v5/transactions/lots/accept-export",
     selectionOrQuery(query, selection)
   )
 }
@@ -175,7 +175,7 @@ export function deleteLots(query: LotQuery, selection?: number[]) {
 }
 
 export function rejectLots(query: LotQuery, selection?: number[]) {
-  return api.post<Api<void>>("/lots/reject", selectionOrQuery(query, selection))
+  return api.post<Api<void>>("/v5/transactions/lots/reject", selectionOrQuery(query, selection))
 }
 
 export function requestFix(entity_id: number, lot_ids: number[]) {
@@ -210,7 +210,7 @@ export async function commentLots(
 ) {
   if (!comment) return
 
-  return api.post<Api<void>>("/lots/comment", {
+  return api.post<Api<void>>("/v5/transactions/lots/comment", {
     ...selectionOrQuery(query, selection),
     comment,
   })
@@ -291,5 +291,5 @@ export function flushStocks(
 }
 
 export function cancelAcceptLots(entity_id: number, lot_ids: number[]) {
-  return api.post("/lots/cancel-accept", { entity_id, lot_ids })
+  return api.post("/v5/transactions/lots/cancel-accept", { entity_id, lot_ids })
 }

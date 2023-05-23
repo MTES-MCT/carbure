@@ -13,7 +13,7 @@ import { useMatomo } from "matomo"
 import Form from "common/components/form"
 
 const FAQ_URL = "https://carbure-1.gitbook.io/faq/gerer-mes-lots-1/producteur-trader-ajouter-des-lots/ajout-de-lot-via-fichier-excel" // prettier-ignore
-const TEMPLATE_URL = "/api/download-template-stock"
+const TEMPLATE_URL = "/api/v5/transactions/stocks/template"
 
 export const StockExcelButton = () => {
   const { t } = useTranslation()

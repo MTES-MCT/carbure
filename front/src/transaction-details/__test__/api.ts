@@ -64,7 +64,7 @@ export const okMarkAsFixed = rest.post(
   }
 )
 
-export const okRejectLot = rest.post("/api/lots/reject", (req, res, ctx) => {
+export const okRejectLot = rest.post("/api/v5/transactions/lots/reject", (req, res, ctx) => {
   Data.set("lot-details", (details: LotDetails) => {
     details.lot.lot_status = LotStatus.Rejected
     details.lot.correction_status = CorrectionStatus.NoProblem
@@ -73,7 +73,7 @@ export const okRejectLot = rest.post("/api/lots/reject", (req, res, ctx) => {
 })
 
 export const okAcceptBlending = rest.post(
-  "/api/lots/accept-blending",
+  "/api/v5/transactions/lots/accept-blending",
   (req, res, ctx) => {
     Data.set("lot-details", (details: LotDetails) => {
       details.lot.lot_status = LotStatus.Accepted
@@ -83,7 +83,7 @@ export const okAcceptBlending = rest.post(
   }
 )
 
-export const okCommentLot = rest.post("/api/lots/comment", (req, res, ctx) => {
+export const okCommentLot = rest.post("/api/v5/transactions/lots/comment", (req, res, ctx) => {
   Data.set("lot-details", (details: LotDetails) => {
     details.comments.push({
       entity: producer,
