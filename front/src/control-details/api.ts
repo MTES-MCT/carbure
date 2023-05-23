@@ -38,7 +38,7 @@ const auditor = {
   },
 
   getStockDetails(entity_id: number, stock_id: number) {
-    return api.get<Api<StockDetails>>("/auditor/stocks/details", {
+    return api.get<Api<StockDetails>>("/v5/audit/stocks/details", {
       params: { entity_id, stock_id },
     })
   },

@@ -89,21 +89,4 @@ urlpatterns = [
         admin.get_stock_filters,
         name="api-v4-admin-get-stock-filters",
     ),
-    # AUDITOR
-    path("auditor/stocks", auditor.get_stocks, name="api-v4-auditor-get-stocks"),
-    path(
-        "auditor/stocks/details",
-        auditor.get_stock_details,
-        name="api-v4-auditor-get-stock-details",
-    ),
-    path(
-        "auditor/stocks/summary",
-        auditor.get_stocks_summary,
-        name="api-v4-auditor-get-stock-summary",
-    ),
-    path(
-        "auditor/stocks/filters",
-        auditor.get_stock_filters,
-        name="api-v4-auditor-get-stock-filters",
-    ),
 ]
