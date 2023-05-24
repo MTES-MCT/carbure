@@ -35,11 +35,18 @@ def get_lot_details(request, *args, **kwargs):
 
     auditor = Entity.objects.get(id=entity_id)
     lot = CarbureLot.objects.get(pk=lot_id)
+    owner_id = str(lot.added_by_id)
     client_id = str(lot.carbure_client_id)
     supplier_id = str(lot.carbure_supplier_id)
 
+    has_right_to_audit_owner = False
     has_right_to_audit_client = False
     has_right_to_audit_supplier = False
+    if (
+        owner_id in request.session["rights"]
+        and request.session["rights"][owner_id] == UserRights.AUDITOR
+    ):
+        has_right_to_audit_client = True
     if (
         client_id in request.session["rights"]
         and request.session["rights"][client_id] == UserRights.AUDITOR
