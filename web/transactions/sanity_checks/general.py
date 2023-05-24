@@ -18,6 +18,10 @@ def check_volume_faible(lot: CarbureLot):
 
 
 def check_year_locked(lot: CarbureLot, prefetched_data):
+    # don't run this check on lots that aren't being edited
+    if lot.lot_status != CarbureLot.DRAFT and lot.correction_status != CarbureLot.IN_CORRECTION:
+        return
+
     if lot.year in prefetched_data["locked_years"] or lot.year <= 2015:
         return generic_error(
             error=CarbureSanityCheckErrors.YEAR_LOCKED,
@@ -54,11 +58,7 @@ def check_mac_bc_wrong(lot: CarbureLot):
 
 
 def check_mac_not_efpe(lot: CarbureLot):
-    if (
-        lot.delivery_type == CarbureLot.RFC
-        and lot.carbure_delivery_site
-        and lot.carbure_delivery_site.depot_type != "EFPE"
-    ):
+    if lot.delivery_type == CarbureLot.RFC and lot.carbure_delivery_site and lot.carbure_delivery_site.depot_type != "EFPE":
         return generic_error(
             error=CarbureSanityCheckErrors.MAC_NOT_EFPE,
             lot=lot,

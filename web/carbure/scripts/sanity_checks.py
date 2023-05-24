@@ -20,6 +20,8 @@ from core.helpers import get_prefetched_data
 def cleanup_sanity_checks(year, batch, apply):
     print("> Load all the declared lots of the year %s" % year)
 
+    batch = int(batch)
+
     previous_errors = GenericError.objects.filter(lot__year=year)
     previous_warnings = previous_errors.filter(is_blocking=False)
     previous_errors = previous_errors.filter(is_blocking=True)
@@ -33,9 +35,7 @@ def cleanup_sanity_checks(year, batch, apply):
 
     lots = (
         CarbureLot.objects.filter(year=year)
-        .filter(
-            lot_status__in=(CarbureLot.ACCEPTED, CarbureLot.FROZEN, CarbureLot.PENDING)
-        )
+        .filter(lot_status__in=(CarbureLot.DRAFT, CarbureLot.ACCEPTED, CarbureLot.FROZEN, CarbureLot.PENDING))
         .order_by("id")
         .select_related(
             "carbure_producer",
@@ -102,12 +102,8 @@ def show_error_details(errors: Iterable[GenericError], type: str):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Run sanity checks on all the lots of a given year"
-    )
-    parser.add_argument(
-        "--year", dest="year", action="store", default=None, help="Year to check"
-    )
+    parser = argparse.ArgumentParser(description="Run sanity checks on all the lots of a given year")
+    parser.add_argument("--year", dest="year", action="store", default=None, help="Year to check")
     parser.add_argument(
         "--batch",
         dest="batch",
