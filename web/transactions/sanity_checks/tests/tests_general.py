@@ -91,7 +91,7 @@ class GeneralSanityChecksTest(TestCase):
     def test_year_locked(self):
         error = CarbureSanityCheckErrors.YEAR_LOCKED
 
-        lot = self.create_lot(year=2023)
+        lot = self.create_lot(lot_status=CarbureLot.PENDING, year=2023)
 
         error_list = self.run_checks(lot)
         self.assertFalse(has_error(error, error_list))
@@ -100,6 +100,11 @@ class GeneralSanityChecksTest(TestCase):
         prefetched_data = get_prefetched_data()
 
         lot.year = 2017
+
+        error_list = self.run_checks(lot, prefetched_data)
+        self.assertFalse(has_error(error, error_list))
+
+        lot.correction_status = CarbureLot.IN_CORRECTION
 
         error_list = self.run_checks(lot, prefetched_data)
         self.assertTrue(has_error(error, error_list))

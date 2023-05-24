@@ -13,7 +13,7 @@ from core.models import CarbureLot, CarbureLotReliabilityScore, GenericError
 from django.db import transaction
 
 
-def sanity_checks(lot: CarbureLot, prefetched_data):
+def sanity_checks(lot: CarbureLot, prefetched_data) -> list[GenericError]:
     if lot.lot_status == CarbureLot.FLUSHED:
         return []
 
@@ -38,9 +38,7 @@ def sanity_checks(lot: CarbureLot, prefetched_data):
         check_expired_double_counting_certificate(lot, prefetched_data),
         check_invalid_double_counting_certificate(lot, prefetched_data),
         # biofuel/feedstock errors
-        *check_mp_bc_incoherent(
-            lot
-        ),  # this one generates a list of errors so we flatten it with *
+        *check_mp_bc_incoherent(lot),  # this one generates a list of errors so we flatten it with *
         *check_provenance_mp(lot),  # same here
         check_deprecated_mp(lot),
         # ghg errors
