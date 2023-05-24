@@ -1,6 +1,5 @@
 from django.urls import path, include
 from .home_stats import get_home_stats
-from .redirect_app import redirect_app
 
 urlpatterns = [
     path("v3/doublecount/", include("doublecount.api.urls")),
