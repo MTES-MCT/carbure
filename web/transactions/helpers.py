@@ -411,7 +411,7 @@ def fill_supplier_info(lot, data, entity):
     lot.supplier_certificate = str(data.get("supplier_certificate", "")).strip()
 
     # I AM THE SUPPLIER
-    if data.get("carbure_supplier_id") == str(entity.id):
+    if str(data.get("carbure_supplier_id")) == str(entity.id):
         lot.carbure_supplier = entity
         lot.supplier_certificate = data.get(
             "supplier_certificate", entity.default_certificate
