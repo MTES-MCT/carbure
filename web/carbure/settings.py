@@ -88,7 +88,6 @@ INSTALLED_APPS = [
     'core',
     'producers',
     'certificates',
-    'api',
     'doublecount',
     'ml',
     'saf',
