@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.conf import settings
-from carbure.api import redirect_app
+from carbure.api.redirect_app import redirect_app
 
 urlpatterns = [
     re_path("app/(.*)", redirect_app),
