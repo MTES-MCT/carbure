@@ -59,12 +59,12 @@ export const ErrorsDetailsDialog = ({
                   errorCount: file.errors?.sourcing_forecast?.length || 0,
                 }),
               },
-              {
-                key: "sourcing_history",
-                label: t("Historique d'appro. ({{errorCount}})", {
-                  errorCount: file.errors?.sourcing_history?.length || 0,
-                }),
-              },
+              // {
+              //   key: "sourcing_history",
+              //   label: t("Historique d'appro. ({{errorCount}})", {
+              //     errorCount: file.errors?.sourcing_history?.length || 0,
+              //   }),
+              // },
               {
                 key: "production",
                 label: t("Production ({{errorCount}})", {

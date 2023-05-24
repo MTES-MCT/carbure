@@ -35,11 +35,12 @@ def parse_dc_excel(
     excel_file = load_workbook(filename, data_only=True)
 
     info = parse_info(excel_file)
-    sourcing_history = parse_sourcing(excel_file, "Historique d'approvisionnement")
+    # sourcing_history = parse_sourcing(excel_file, "Historique d'approvisionnement")
     sourcing_forecast = parse_sourcing(excel_file, "Approvisionnement prévisionnel")
-    production_forecast = parse_production(excel_file)
+    production_forecast = parse_production(excel_file, requested_year=info["year"])
 
-    return info, sourcing_history, sourcing_forecast, production_forecast
+    # return info, sourcing_history, sourcing_forecast, production_forecast
+    return info, sourcing_forecast, production_forecast
 
 
 def parse_info(excel_file: Workbook):
@@ -71,9 +72,7 @@ def parse_info(excel_file: Workbook):
 
 def parse_sourcing(excel_file: Workbook, sheet_name: str) -> List[SourcingRow]:
     if sheet_name not in excel_file:
-        raise CarbureException(
-            DoubleCountingError.BAD_WORKSHEET_NAME, {"sheet_name": sheet_name}
-        )
+        raise CarbureException(DoubleCountingError.BAD_WORKSHEET_NAME, {"sheet_name": sheet_name})
 
     sourcing_sheet = excel_file[sheet_name]
     sourcing_rows: List[SourcingRow] = []
@@ -89,14 +88,15 @@ def parse_sourcing(excel_file: Workbook, sheet_name: str) -> List[SourcingRow]:
         transit_country_cell = row[5].value
 
         # skip row if no year or feedstock is defined
-        if (
-            not feedstock_name
-            or not origin_country_cell
-            or feedstock_name == origin_country_cell
-        ):
+        # TO DELETE : if not feedstock_name or not origin_country_cell or feedstock_name == origin_country_cell:
+        if not feedstock_name or feedstock_name == origin_country_cell:
             continue
 
         feedstock = get_feedstock_from_dc_feedstock(feedstock_name)
+
+        # skip row if no feedstock is recognized and no origin country is defined
+        if not feedstock and not origin_country_cell:
+            continue
 
         # this allow to accept row without year but only when feedstock recognized
         if current_year == -1 and feedstock is None:
@@ -135,7 +135,7 @@ def intOrZero(value):
         return 0
 
 
-def parse_production(excel_file: Workbook) -> List[ProductionRow]:
+def parse_production(excel_file: Workbook, requested_year) -> List[ProductionRow]:
     production_rows: List[ProductionRow] = []
 
     current_year = -1
@@ -144,6 +144,8 @@ def parse_production(excel_file: Workbook) -> List[ProductionRow]:
     for line, row in enumerate(production_sheet.iter_rows()):
         current_year = extract_year(row[1].value, current_year)
 
+        if current_year < requested_year:
+            continue
         biofuel_name = row[2].value
         feedstock_name = row[3].value
         feedstock_name_check = row[8].value
@@ -261,6 +263,7 @@ dc_feedstock_to_carbure_feedstock: dict[str, str | None] = {
     "Tallol": "TALLOL",
     "Tournesol ": "TOURNESOL",
     "Triticale": "TRITICALE",
+    "Distillat d'acide gras de palme": None,
 }
 
 dc_biofuel_to_carbure_biofuel: dict[str, str | None] = {
