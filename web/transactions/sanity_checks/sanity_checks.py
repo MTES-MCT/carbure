@@ -7,6 +7,10 @@ from .ghg import *
 from .general import *
 from .double_counting import *
 from .biofuel_feedstock import *
+from core.helpers import get_prefetched_data
+from core.models import CarbureLot, CarbureLotReliabilityScore, GenericError
+
+from django.db import transaction
 
 
 def sanity_checks(lot: CarbureLot, prefetched_data):
@@ -34,7 +38,9 @@ def sanity_checks(lot: CarbureLot, prefetched_data):
         check_expired_double_counting_certificate(lot, prefetched_data),
         check_invalid_double_counting_certificate(lot, prefetched_data),
         # biofuel/feedstock errors
-        *check_mp_bc_incoherent(lot),  # this one generates a list of errors so we flatten it with *
+        *check_mp_bc_incoherent(
+            lot
+        ),  # this one generates a list of errors so we flatten it with *
         *check_provenance_mp(lot),  # same here
         check_deprecated_mp(lot),
         # ghg errors
@@ -88,3 +94,20 @@ def bulk_sanity_checks(lots, prefetched_data=None, dry_run=False):
         GenericError.objects.bulk_create(errors, batch_size=1000)
 
     return errors
+
+
+def bulk_scoring(lots, prefetched_data=None):
+    if not prefetched_data:
+        prefetched_data = get_prefetched_data()
+    # delete scoring entries for the lots
+    lotids = [l.id for l in lots]
+    CarbureLotReliabilityScore.objects.filter(lot_id__in=lotids).delete()
+    # recalc score
+    clrs = []
+    # bulk update lots
+    with transaction.atomic():
+        for l in lots:
+            clrs_entries = l.recalc_reliability_score(prefetched_data)
+            clrs += clrs_entries
+        CarbureLot.objects.bulk_update(lots, ["data_reliability_score"])
+        CarbureLotReliabilityScore.objects.bulk_create(clrs)

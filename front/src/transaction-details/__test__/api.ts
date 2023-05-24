@@ -14,7 +14,7 @@ import {
 } from "carbure/__test__/api"
 import { producer } from "carbure/__test__/data"
 
-export const okLotDetails = rest.get("/api/lots/details", (req, res, ctx) => {
+export const okLotDetails = rest.get("/api/v5/transactions/lots/details", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -33,14 +33,14 @@ export const okUpdateLot = rest.post(
   }
 )
 
-export const okSendLot = rest.post("/api/lots/send", (req, res, ctx) => {
+export const okSendLot = rest.post("/api/v5/transactions/lots/send", (req, res, ctx) => {
   Data.set("lot-details", (details: LotDetails) => {
     details.lot.lot_status = LotStatus.Pending
   })
   return res(ctx.json({ status: "success" }))
 })
 
-export const okDeleteLot = rest.post("/api/lots/delete", (req, res, ctx) => {
+export const okDeleteLot = rest.post("/api/v5/transactions/lots/delete", (req, res, ctx) => {
   return res(ctx.json({ status: "success" }))
 })
 
@@ -64,7 +64,7 @@ export const okMarkAsFixed = rest.post(
   }
 )
 
-export const okRejectLot = rest.post("/api/lots/reject", (req, res, ctx) => {
+export const okRejectLot = rest.post("/api/v5/transactions/lots/reject", (req, res, ctx) => {
   Data.set("lot-details", (details: LotDetails) => {
     details.lot.lot_status = LotStatus.Rejected
     details.lot.correction_status = CorrectionStatus.NoProblem
@@ -73,7 +73,7 @@ export const okRejectLot = rest.post("/api/lots/reject", (req, res, ctx) => {
 })
 
 export const okAcceptBlending = rest.post(
-  "/api/lots/accept-blending",
+  "/api/v5/transactions/lots/accept-blending",
   (req, res, ctx) => {
     Data.set("lot-details", (details: LotDetails) => {
       details.lot.lot_status = LotStatus.Accepted
@@ -83,7 +83,7 @@ export const okAcceptBlending = rest.post(
   }
 )
 
-export const okCommentLot = rest.post("/api/lots/comment", (req, res, ctx) => {
+export const okCommentLot = rest.post("/api/v5/transactions/lots/comment", (req, res, ctx) => {
   Data.set("lot-details", (details: LotDetails) => {
     details.comments.push({
       entity: producer,

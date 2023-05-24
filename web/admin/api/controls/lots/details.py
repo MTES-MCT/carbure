@@ -1,5 +1,5 @@
 from admin.api.controls.helpers import get_admin_lot_comments
-from api.v4.helpers import (
+from core.helpers import (
     get_known_certificates,
     get_lot_comments,
     get_lot_errors,

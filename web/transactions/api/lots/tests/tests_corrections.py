@@ -3,7 +3,8 @@ from django.db.models import Count
 from django.test import TestCase
 from django.urls import reverse
 
-from api.v4.tests_utils import get_lot, setup_current_user
+from transactions.api.lots.tests.tests_utils import get_lot
+from core.tests_utils import setup_current_user
 from core.models import CarbureLot, Entity, UserRights
 from django_otp.plugins.otp_email.models import EmailDevice
 from transactions.models import LockedYear
@@ -36,7 +37,11 @@ class LotCorrectionTest(TestCase):
             "tester@carbure.local",
             "Tester",
             "gogogo",
-            [(self.producer, "ADMIN"), (self.trader, "ADMIN"), (self.operator, "ADMIN")],
+            [
+                (self.producer, "ADMIN"),
+                (self.trader, "ADMIN"),
+                (self.operator, "ADMIN"),
+            ],
         )
 
     def prepare_lot(self, supplier, client=None, **kwargs):
@@ -44,12 +49,15 @@ class LotCorrectionTest(TestCase):
         lot_data["carbure_supplier_id"] = supplier.id
         lot_data["carbure_client_id"] = client.id if client else self.trader.id
 
-        add_response = self.client.post(reverse("api-v4-add-lots"), lot_data)
+        add_response = self.client.post(reverse("transactions-lots-add"), lot_data)
         self.assertEqual(add_response.status_code, 200)
 
         lot_id = add_response.json()["data"]["id"]
 
-        send_response = self.client.post(reverse("api-v4-send-lots"), {"entity_id": supplier.id, "selection": [lot_id]})
+        send_response = self.client.post(
+            reverse("transactions-lots-send"),
+            {"entity_id": supplier.id, "selection": [lot_id]},
+        )
         self.assertEqual(send_response.status_code, 200)
 
         return CarbureLot.objects.get(id=lot_id)
@@ -130,7 +138,7 @@ class LotCorrectionTest(TestCase):
 
         # finally, accept lot
         response = self.client.post(
-            reverse("api-v4-accept-in-stock"),
+            reverse("transactions-lots-accept-in-stock"),
             {"entity_id": self.trader.id, "selection": [lot.id]},
         )
         self.assertEqual(response.status_code, 200)

@@ -3,7 +3,7 @@ import { lotFormToPayload, LotFormValue } from "lot-add/components/lot-form"
 import { LotDetails, StockDetails } from "./types"
 
 export function getLotDetails(entity_id: number, lot_id: number) {
-  return api.get<Api<LotDetails>>("/lots/details", {
+  return api.get<Api<LotDetails>>("/v5/transactions/lots/details", {
     params: { entity_id, lot_id },
   })
 }
@@ -22,7 +22,7 @@ export function toggleWarning(
   errors: string[],
   checked: boolean
 ) {
-  return api.post("/lots/toggle-warning", {
+  return api.post("/v5/transactions/lots/toggle-warning", {
     entity_id,
     lot_id,
     errors,

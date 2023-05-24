@@ -2,7 +2,7 @@ import datetime
 import json
 import random
 
-from api.v4.tests_utils import setup_current_user
+from core.tests_utils import setup_current_user
 from core.models import CarbureLot, CarbureStock, Depot, Entity
 from django.db.models import Count
 from django.test import TestCase
@@ -53,7 +53,9 @@ class StocksFlowTest(TestCase):
         response = self.client.get(reverse("transactions-stocks"), query)
         stocks_data = response.json()["data"]
         self.assertEqual(len(stocks_data["stocks"]), 1)
-        self.assertEqual(stocks_data["stocks"][0]["carbure_client"]["id"], self.producer.id)
+        self.assertEqual(
+            stocks_data["stocks"][0]["carbure_client"]["id"], self.producer.id
+        )
 
     def test_get_stocks_summary(self):
         parent_lot = CarbureLotFactory.create(lot_status="ACCEPTED")
@@ -83,7 +85,8 @@ class StocksFlowTest(TestCase):
 
     def stock_split(self, payload, fail=False):
         response = self.client.post(
-            reverse("transactions-stocks-split"), {"entity_id": self.producer.id, "payload": json.dumps(payload)}
+            reverse("transactions-stocks-split"),
+            {"entity_id": self.producer.id, "payload": json.dumps(payload)},
         )
         if not fail:
             self.assertEqual(response.status_code, 200)
@@ -106,7 +109,9 @@ class StocksFlowTest(TestCase):
 
         self.assertEqual(parent_lot.lot_status, CarbureLot.ACCEPTED)
         self.assertEqual(parent_lot.delivery_type, CarbureLot.STOCK)
-        stock = CarbureStockFactory.create(parent_lot=parent_lot, carbure_client=self.producer, remaining_volume=50000)
+        stock = CarbureStockFactory.create(
+            parent_lot=parent_lot, carbure_client=self.producer, remaining_volume=50000
+        )
 
         today = datetime.date.today().strftime("%d/%m/%Y")
 
@@ -223,7 +228,8 @@ class StocksFlowTest(TestCase):
 
         # 9: delete a draft, check that volume is correctly re-credited
         response = self.client.post(
-            reverse("api-v4-delete-lots"), {"entity_id": self.producer.id, "selection": [lot.id]}
+            reverse("transactions-lots-delete"),
+            {"entity_id": self.producer.id, "selection": [lot.id]},
         )
         self.assertEqual(response.status_code, 200)
         stock = CarbureStock.objects.get(parent_lot=parent_lot)
@@ -238,7 +244,9 @@ class StocksFlowTest(TestCase):
         )
 
         # Flush
-        stock = CarbureStockFactory.create(parent_lot=parent_lot, carbure_client=self.producer, remaining_volume=1000)
+        stock = CarbureStockFactory.create(
+            parent_lot=parent_lot, carbure_client=self.producer, remaining_volume=1000
+        )
         stock.save()  # HACK to avoid `generate_carbure_id` later
         query = {"entity_id": self.producer.id, "stock_ids": [stock.id]}
         response = self.client.post(reverse("transactions-stocks-flush"), query)
@@ -246,7 +254,9 @@ class StocksFlowTest(TestCase):
         self.assertEqual(status, "success")
 
         # Cannot flush a stock with a remaining volume greater than 1% => 5% in deed
-        stock = CarbureStockFactory.create(parent_lot=parent_lot, carbure_client=self.producer, remaining_volume=5001)
+        stock = CarbureStockFactory.create(
+            parent_lot=parent_lot, carbure_client=self.producer, remaining_volume=5001
+        )
         stock.save()  # HACK to avoid `generate_carbure_id` later
         query = {"entity_id": self.producer.id, "stock_ids": [stock.id]}
         response = self.client.post(reverse("transactions-stocks-flush"), query)

@@ -1,4 +1,4 @@
-from api.v4.tests_utils import get_lot
+from transactions.api.lots.tests.tests_utils import get_lot
 from core.models import CarbureLot, CarbureStock, Entity, UserRights
 from transactions.models import LockedYear
 from django.contrib.auth import get_user_model
@@ -24,7 +24,9 @@ class LotsFlowTest(TestCase):
         # let's create a user
         self.password = "totopouet"
         self.user1 = user_model.objects.create_user(
-            email="testuser1@toto.com", name="Le Super Testeur 1", password=self.password
+            email="testuser1@toto.com",
+            name="Le Super Testeur 1",
+            password=self.password,
         )
         loggedin = self.client.login(username=self.user1.email, password=self.password)
         self.assertTrue(loggedin)
@@ -38,27 +40,35 @@ class LotsFlowTest(TestCase):
         self.trader.default_certificate = "TRADER_CERTIFICATE"
         self.trader.save()
         self.operator = Entity.objects.filter(entity_type=Entity.OPERATOR)[0]
-        UserRights.objects.update_or_create(entity=self.producer, user=self.user1, role=UserRights.RW)
-        UserRights.objects.update_or_create(entity=self.trader, user=self.user1, role=UserRights.RW)
-        UserRights.objects.update_or_create(entity=self.operator, user=self.user1, role=UserRights.RW)
+        UserRights.objects.update_or_create(
+            entity=self.producer, user=self.user1, role=UserRights.RW
+        )
+        UserRights.objects.update_or_create(
+            entity=self.trader, user=self.user1, role=UserRights.RW
+        )
+        UserRights.objects.update_or_create(
+            entity=self.operator, user=self.user1, role=UserRights.RW
+        )
 
         # pass otp verification
         response = self.client.post(reverse("auth-request-otp"))
         self.assertEqual(response.status_code, 200)
         device, created = EmailDevice.objects.get_or_create(user=self.user1)
-        response = self.client.post(reverse("auth-verify-otp"), {"otp_token": device.token})
+        response = self.client.post(
+            reverse("auth-verify-otp"), {"otp_token": device.token}
+        )
         self.assertEqual(response.status_code, 200)
 
     def create_draft_v2(self, **kwargs):
         lot = get_lot(self.producer)
         lot.update(kwargs)
-        return self.client.post(reverse("api-v4-add-lots"), lot)
+        return self.client.post(reverse("transactions-lots-add"), lot)
 
     def create_draft(self, lot=None, **kwargs):
         if lot is None:
             lot = get_lot(self.producer)
         lot.update(kwargs)
-        response = self.client.post(reverse("api-v4-add-lots"), lot)
+        response = self.client.post(reverse("transactions-lots-add"), lot)
         self.assertEqual(response.status_code, 200)
         data = response.json()["data"]
         lot_id = data["id"]
@@ -66,7 +76,10 @@ class LotsFlowTest(TestCase):
         return lot
 
     def send_lot(self, lot):
-        response = self.client.post(reverse("api-v4-send-lots"), {"entity_id": self.producer.id, "selection": [lot.id]})
+        response = self.client.post(
+            reverse("transactions-lots-send"),
+            {"entity_id": self.producer.id, "selection": [lot.id]},
+        )
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)
         return lot
@@ -80,11 +93,14 @@ class LotsFlowTest(TestCase):
         LockedYear.objects.create(year=2021, locked=True)
         lot = get_lot(self.producer)
         lot.update(kwargs)
-        response = self.client.post(reverse("api-v4-add-lots"), lot)
+        response = self.client.post(reverse("transactions-lots-add"), lot)
         self.assertEqual(response.status_code, 200)
         lot_id = response.json()["data"]["id"]
 
-        response = self.client.get(reverse("api-v4-get-lot-details"), {"lot_id": lot_id, "entity_id": self.producer.id})
+        response = self.client.get(
+            reverse("transactions-lots-details"),
+            {"lot_id": lot_id, "entity_id": self.producer.id},
+        )
         errors = response.json()["data"]["errors"]
         self.assertEqual(errors[0]["error"], CarbureError.YEAR_LOCKED)
 
@@ -104,7 +120,8 @@ class LotsFlowTest(TestCase):
     def test_delete_lot(self):
         lot = self.create_draft()
         response = self.client.post(
-            reverse("api-v4-delete-lots"), {"entity_id": self.producer.id, "selection": [lot.id]}
+            reverse("transactions-lots-delete"),
+            {"entity_id": self.producer.id, "selection": [lot.id]},
         )
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)
@@ -112,21 +129,29 @@ class LotsFlowTest(TestCase):
 
         lot = self.send_lot(self.create_draft())
         response = self.client.post(
-            reverse("api-v4-delete-lots"), {"entity_id": self.producer.id, "selection": [lot.id]}
+            reverse("transactions-lots-delete"),
+            {"entity_id": self.producer.id, "selection": [lot.id]},
         )  # cannot delete a lot not in draft
         self.assertEqual(response.status_code, 400)
 
         lot = self.create_draft()
         response = self.client.post(
-            reverse("api-v4-delete-lots"), {"entity_id": self.trader.id, "selection": [lot.id]}
+            reverse("transactions-lots-delete"),
+            {"entity_id": self.trader.id, "selection": [lot.id]},
         )  # cannot delete someone else's lot
         self.assertEqual(response.status_code, 400)
 
     def test_duplicate_lot(self):
         lot = self.create_draft()
-        response = self.client.post(reverse("api-v4-duplicate-lot"), {"entity_id": self.producer.id, "lot_id": lot.id})
+        response = self.client.post(
+            reverse("transactions-lots-duplicate"),
+            {"entity_id": self.producer.id, "lot_id": lot.id},
+        )
         self.assertEqual(response.status_code, 200)
-        response = self.client.post(reverse("api-v4-duplicate-lot"), {"entity_id": self.trader.id, "lot_id": lot.id})
+        response = self.client.post(
+            reverse("transactions-lots-duplicate"),
+            {"entity_id": self.trader.id, "lot_id": lot.id},
+        )
         self.assertEqual(response.status_code, 403)
 
     def test_send(self):
@@ -139,7 +164,8 @@ class LotsFlowTest(TestCase):
         lot = self.send_lot(lot)
 
         response = self.client.post(
-            reverse("api-v4-accept-in-stock"), {"entity_id": self.trader.id, "selection": [lot.id]}
+            reverse("transactions-lots-accept-in-stock"),
+            {"entity_id": self.trader.id, "selection": [lot.id]},
         )
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)
@@ -154,7 +180,8 @@ class LotsFlowTest(TestCase):
         self.assertEqual(lot.lot_status, CarbureLot.PENDING)
         self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
         response = self.client.post(
-            reverse("api-v4-accept-rfc"), {"entity_id": self.operator.id, "selection": [lot.id]}
+            reverse("transactions-lots-accept-release-for-consumption"),
+            {"entity_id": self.operator.id, "selection": [lot.id]},
         )
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)
@@ -162,7 +189,9 @@ class LotsFlowTest(TestCase):
         self.assertEqual(lot.delivery_type, CarbureLot.RFC)
 
     def test_send_rfc(self):
-        lot = self.create_draft(unknown_client="CLIENT MAC", delivery_type="RFC", carbure_client_id="")
+        lot = self.create_draft(
+            unknown_client="CLIENT MAC", delivery_type="RFC", carbure_client_id=""
+        )
         lot = self.send_lot(lot)
         self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)
         self.assertEqual(lot.delivery_type, CarbureLot.RFC)
@@ -174,8 +203,12 @@ class LotsFlowTest(TestCase):
         self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
 
         response = self.client.post(
-            reverse("api-v4-accept-trading"),
-            {"entity_id": self.trader.id, "selection": [lot.id], "client_entity_id": self.operator.id},
+            reverse("transactions-lots-accept-trading"),
+            {
+                "entity_id": self.trader.id,
+                "selection": [lot.id],
+                "client_entity_id": self.operator.id,
+            },
         )
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)
@@ -192,8 +225,12 @@ class LotsFlowTest(TestCase):
         self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
 
         response = self.client.post(
-            reverse("api-v4-accept-trading"),
-            {"entity_id": self.trader.id, "selection": [lot.id], "unknown_client": "TRADER CLIENT"},
+            reverse("transactions-lots-accept-trading"),
+            {
+                "entity_id": self.trader.id,
+                "selection": [lot.id],
+                "unknown_client": "TRADER CLIENT",
+            },
         )
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)
@@ -210,8 +247,12 @@ class LotsFlowTest(TestCase):
         self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
 
         response = self.client.post(
-            reverse("api-v4-accept-processing"),
-            {"entity_id": self.trader.id, "selection": [lot.id], "processing_entity_id": self.operator.id},
+            reverse("transactions-lots-accept-processing"),
+            {
+                "entity_id": self.trader.id,
+                "selection": [lot.id],
+                "processing_entity_id": self.operator.id,
+            },
         )
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)
@@ -227,7 +268,8 @@ class LotsFlowTest(TestCase):
         self.assertEqual(lot.lot_status, CarbureLot.PENDING)
         self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
         response = self.client.post(
-            reverse("api-v4-accept-blending"), {"entity_id": self.operator.id, "selection": [lot.id]}
+            reverse("transactions-lots-accept-blending"),
+            {"entity_id": self.operator.id, "selection": [lot.id]},
         )
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)
@@ -240,7 +282,8 @@ class LotsFlowTest(TestCase):
         self.assertEqual(lot.lot_status, CarbureLot.PENDING)
         self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
         response = self.client.post(
-            reverse("api-v4-accept-export"), {"entity_id": self.operator.id, "selection": [lot.id]}
+            reverse("transactions-lots-accept-export"),
+            {"entity_id": self.operator.id, "selection": [lot.id]},
         )
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)
@@ -253,7 +296,8 @@ class LotsFlowTest(TestCase):
         self.assertEqual(lot.lot_status, CarbureLot.PENDING)
         self.assertEqual(lot.delivery_type, CarbureLot.UNKNOWN)
         response = self.client.post(
-            reverse("api-v4-accept-direct-delivery"), {"entity_id": self.operator.id, "selection": [lot.id]}
+            reverse("transactions-lots-accept-direct-delivery"),
+            {"entity_id": self.operator.id, "selection": [lot.id]},
         )
         self.assertEqual(response.status_code, 200)
         lot = CarbureLot.objects.get(id=lot.id)

@@ -1,4 +1,4 @@
-from api.v4.helpers import (
+from core.helpers import (
     get_lot_comments,
     get_lot_updates,
     get_stock_events,

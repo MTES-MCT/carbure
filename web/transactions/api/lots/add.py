@@ -1,13 +1,10 @@
 from core.models import CarbureLotEvent, Entity, UserRights
 from core.decorators import check_user_rights
-from api.v4.helpers import get_prefetched_data
-from api.v4.lots import construct_carbure_lot, bulk_insert_lots
+from core.helpers import get_prefetched_data
+from transactions.helpers import construct_carbure_lot, bulk_insert_lots
 from django.http.response import JsonResponse
 from carbure.tasks import background_bulk_scoring
 from core.serializers import CarbureLotPublicSerializer
-from core.common import ErrorResponse
-from core.carburetypes import CarbureError
-from transactions.helpers import check_locked_year
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
@@ -19,15 +16,16 @@ def add_lot(request, *args, **kwargs):
     d = get_prefetched_data(entity)
     lot_obj, errors = construct_carbure_lot(d, entity, request.POST.dict())
     if not lot_obj:
-        return JsonResponse({"status": "error", "message": "Something went wrong"}, status=400)
-
-    if check_locked_year(lot_obj.year):
-        return ErrorResponse(400, CarbureError.YEAR_LOCKED)
+        return JsonResponse(
+            {"status": "error", "message": "Something went wrong"}, status=400
+        )
 
     # run sanity checks, insert lot and errors
     lots_created = bulk_insert_lots(entity, [lot_obj], [errors], d)
     if len(lots_created) == 0:
-        return JsonResponse({"status": "error", "message": "Something went wrong"}, status=500)
+        return JsonResponse(
+            {"status": "error", "message": "Something went wrong"}, status=500
+        )
     background_bulk_scoring(lots_created)
     e = CarbureLotEvent()
     e.event_type = CarbureLotEvent.CREATED

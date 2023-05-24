@@ -11,7 +11,7 @@ from audit.helpers import get_auditor_lots
 
 from core.common import SuccessResponse
 from core.decorators import check_user_rights, is_auditor
-from api.v4.helpers import (
+from core.helpers import (
     filter_lots,
     filter_stock,
     get_auditor_stock,
@@ -28,7 +28,7 @@ from api.v4.helpers import (
     get_stock_with_metadata,
     get_stocks_summary_data,
 )
-from api.v4.helpers import get_transaction_distance
+from core.helpers import get_transaction_distance
 
 from core.models import (
     CarbureLot,

@@ -44,7 +44,7 @@ export const okFilters = rest.get(
   }
 )
 
-export const okSnapshot = rest.get("/api/v5/admin/snapshot", (req, res, ctx) => {
+export const okSnapshot = rest.get("/api/v5/admin/controls/snapshot", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -84,7 +84,7 @@ export const okStocks = rest.get("/api/v5/admin/controls/stocks", (req, res, ctx
   )
 })
 
-export const okYears = rest.get("/api/v5/controls/years", (req, res, ctx) => {
+export const okYears = rest.get("/api/v5/admin/controls/years", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
