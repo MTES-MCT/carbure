@@ -18,7 +18,7 @@ const CompanyInfo = ({ defaultEntity }: CompanyInfoProps) => {
   const loggedEntity = useEntity()
 
   const entity = defaultEntity || loggedEntity
-  const canModify = loggedEntity.hasRights(UserRole.Admin, UserRole.ReadWrite)
+  const canModify = !defaultEntity && loggedEntity.hasRights(UserRole.Admin, UserRole.ReadWrite)
 
   const updateEntity = useMutation(api.updateEntity, {
     invalidates: ["user-settings"],
