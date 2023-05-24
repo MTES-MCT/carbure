@@ -7,16 +7,15 @@ class LotNode(Node):
     type = Node.LOT
 
     FROM_LOT = {
-        "country_of_origin_id": True,
-        "carbure_producer_id": True,
+        "country_of_origin": True,
+        "carbure_producer": True,
         "unknown_producer": True,
-        "carbure_production_site_id": True,
+        "carbure_production_site": True,
         "unknown_production_site": True,
-        "production_country_id": True,
+        "production_country": True,
         "production_site_commissioning_date": True,
         "production_site_certificate": True,
         "production_site_double_counting_certificate": True,
-        "delivery_date": True,
         "ghg_total": True,
         "ghg_reference": True,
         "ghg_reduction": True,
@@ -26,69 +25,85 @@ class LotNode(Node):
     }
 
     FROM_DIRECT_LOT = {
-        "feedstock_id": True,
-        "biofuel_id": True,
+        "feedstock": True,
+        "biofuel": True,
         "volume": True,
         "weight": True,
         "lhv_amount": True,
         "transport_document_type": True,
         "transport_document_reference": True,
-        "carbure_delivery_site_id": True,
+        "carbure_delivery_site": True,
         "unknown_delivery_site": True,
-        "delivery_site_country_id": True,
+        "delivery_site_country": True,
+        "delivery_date": True,
         **FROM_LOT,
     }
 
     FROM_PARENT_LOT = {
-        "carbure_client_id": "carbure_supplier_id",
+        "carbure_client": "carbure_supplier",
         **FROM_DIRECT_LOT,
     }
 
     FROM_CHILD_LOT = {
-        "carbure_supplier_id": "carbure_client_id",
+        "carbure_supplier": "carbure_client",
         **FROM_DIRECT_LOT,
     }
 
     FROM_STOCK = {
-        "biofuel_id": True,
-        "feedstock_id": True,
-        "country_of_origin_id": True,
-        "carbure_production_site_id": True,
+        "biofuel": True,
+        "feedstock": True,
+        "country_of_origin": True,
+        "carbure_production_site": True,
         "unknown_production_site": True,
-        "production_country_id": True,
+        "production_country": True,
         "ghg_reduction": True,
         "ghg_reduction_red_ii": True,
     }
 
     FROM_PARENT_STOCK = {
-        "carbure_client_id": "carbure_supplier_id",
+        "carbure_client": "carbure_supplier",
         **FROM_STOCK,
     }
 
     FROM_CHILD_STOCK = {
-        "carbure_supplier_id": True,
+        "carbure_supplier": True,
         "unknown_supplier": True,
-        "carbure_client_id": True,
-        "depot_id": "carbure_delivery_site_id",
+        "carbure_client": True,
+        "depot": "carbure_delivery_site",
         **FROM_STOCK,
     }
 
     TRANSACTION_FIELDS = [
         "carbure_supplier_id",
+        "carbure_supplier",
         "unknown_supplier",
+        "supplier",
         "supplier_certificate",
+        "supplier_certificate_type",
+        "vendor_certificate",
+        "vendor_certificate_type",
         "carbure_client_id",
+        "carbure_client",
         "unknown_client",
+        "client",
         "delivery_type",
+        "free_field",
     ]
 
-    DELIVERY_FIELDS = [
+    TRANSPORT_FIELDS = [
         "transport_document_reference",
         "transport_document_type",
         "volume",
         "weight",
         "lhv_amount",
+    ]
+
+    DELIVERY_FIELDS = [
+        "year",
+        "period",
         "delivery_date",
+        "delivery_site",
+        "carbure_delivery_site",
         "carbure_delivery_site_id",
         "unknown_delivery_site",
         "delivery_site_country",
@@ -96,13 +111,21 @@ class LotNode(Node):
 
     SUSTAINABILITY_FIELDS = [
         "feedstock",
+        "feedstock_id",
         "biofuel",
+        "biofuel_id",
         "country_of_origin",
+        "country_of_origin_id",
+        "producer",
         "carbure_producer",
+        "carbure_producer_id",
         "unknown_producer",
+        "production_site",
         "carbure_production_site",
+        "carbure_production_site_id",
         "unknown_production_site",
         "production_country",
+        "production_country_id",
         "production_site_commissioning_date",
         "production_site_certificate",
         "production_site_double_counting_certificate",
@@ -151,7 +174,7 @@ class LotNode(Node):
         return children_lot + children_stock + children_ticket_source
 
     def get_allowed_fields(self, entity_id) -> list:
-        allowed_fields = []
+        allowed_fields = ["production_site_certificate_type"]
 
         root_lot = self.get_root()
         has_no_ancestor_stock = self.get_closest(Node.STOCK) is None
@@ -159,12 +182,29 @@ class LotNode(Node):
 
         if self.owner == entity_id:
             allowed_fields += LotNode.TRANSACTION_FIELDS
-        if has_no_ancestor_stock or owns_ancestor_stock:
-            allowed_fields += LotNode.DELIVERY_FIELDS
+            if has_no_ancestor_stock or owns_ancestor_stock:
+                allowed_fields += LotNode.DELIVERY_FIELDS
+
+            closest_lot = self.get_closest(Node.LOT, owner=entity_id)
+            owns_ancestor_lot = closest_lot is not None and (closest_lot.parent is None or closest_lot.parent.owner == entity_id)  # fmt:skip
+            if self.parent is None or owns_ancestor_lot or owns_ancestor_stock:
+                allowed_fields += LotNode.TRANSPORT_FIELDS
+
         if root_lot.owner == entity_id:
             allowed_fields += LotNode.SUSTAINABILITY_FIELDS
 
         return allowed_fields
+
+    def get_disabled_fields(self, entity_id) -> list[str]:
+        all_fields = (
+            LotNode.TRANSACTION_FIELDS
+            + LotNode.DELIVERY_FIELDS
+            + LotNode.TRANSPORT_FIELDS
+            + LotNode.SUSTAINABILITY_FIELDS
+        )
+
+        allowed_fields = self.get_allowed_fields(entity_id)
+        return list(set(all_fields) - set(allowed_fields))
 
     def diff_with_parent(self):
         if self.parent.type == Node.LOT:
@@ -209,3 +249,16 @@ class LotNode(Node):
             return [self.parent]
 
         return []
+
+    def derive_fields(self, update):
+        derived_fields = {}
+        for field, value in update.items():
+            if field == "delivery_date":
+                derived_fields["year"] = value.year
+                derived_fields["period"] = value.year * 100 + value.month
+            if field == "carbure_production_site" and value:
+                derived_fields["production_country"] = value.country
+                derived_fields["production_site_commissioning_date"] = value.date_mise_en_service
+            if field == "carbure_delivery_site" and value:
+                derived_fields["delivery_site_country"] = value.country
+        return derived_fields

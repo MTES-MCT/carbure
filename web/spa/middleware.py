@@ -71,7 +71,6 @@ class SPAMiddleware(WhiteNoiseMiddleware):
                 # also serve static files on /
                 # e.g. when /my/file.png is requested, serve /static/my/file.png
                 directory_indexes[url[static_prefix_length:]] = static_file
-        print(directory_indexes)
         self.files.update(directory_indexes)
 
     def find_file(self, url):

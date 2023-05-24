@@ -1,4 +1,4 @@
-from accounts.tokens import account_activation_token
+from auth.tokens import account_activation_token
 from authtools.forms import UserCreationForm
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse

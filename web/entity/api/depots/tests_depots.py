@@ -1,4 +1,4 @@
-from api.v4.tests_utils import setup_current_user
+from core.tests_utils import setup_current_user
 from core.models import Entity, Pays, Depot
 from django.test import TestCase
 from django.urls import reverse
@@ -16,7 +16,9 @@ class EntityDepotsTest(TestCase):
 
     def setUp(self):
         self.admin = Entity.objects.filter(entity_type=Entity.ADMIN)[0]
-        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True)
+        self.user = setup_current_user(
+            self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True
+        )
         # self.entity1, _ = Entity.objects.update_or_create(name="Le Super Producteur 1", entity_type="Producteur")
 
     def test_depots(self):
@@ -30,8 +32,14 @@ class EntityDepotsTest(TestCase):
         self.assertEqual(len(data), 0)
         # add
         france, _ = Pays.objects.update_or_create(code_pays="FR", name="France")
-        depot, _ = Depot.objects.update_or_create(depot_id="TEST", name="toto", city="paris", country=france)
-        postdata = {"entity_id": self.admin.id, "delivery_site_id": depot.depot_id, "ownership_type": "OWN"}
+        depot, _ = Depot.objects.update_or_create(
+            depot_id="TEST", name="toto", city="paris", country=france
+        )
+        postdata = {
+            "entity_id": self.admin.id,
+            "delivery_site_id": depot.depot_id,
+            "ownership_type": "OWN",
+        }
         response = self.client.post(reverse(url_add), postdata)
         self.assertEqual(response.status_code, 200)
         # get 1

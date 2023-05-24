@@ -31,10 +31,10 @@ export function getErrorText(
       )
       break
     case DoubleCountingUploadErrorType.MissingBiofuel:
-      errorText += t("Le biocarburant est manquant.")
+      errorText += t("Le biocarburant est manquant ou non reconnu.")
       break
     case DoubleCountingUploadErrorType.MissingFeedstock:
-      errorText += t("La matière première est manquante.")
+      errorText += t("La matière première est manquante ou non reconnue (Verifiez la syntaxe dans la liste de matières premières qui est incluse dans le fichier excel).")
       break
     case DoubleCountingUploadErrorType.MissingEstimatedProduction:
       errorText += t("La production estimée est manquante.")
@@ -70,8 +70,29 @@ export function getErrorText(
       break
     case DoubleCountingUploadErrorType.PomeGt2000:
       errorText += t(
-        "En {{year}}, les biocarburants issus d'effluents d'huilerie de palme et rafles ne seront pas reconnus au double comptage au delà d'une production total de 2000 tonnes par unité de production.",
+        "En {{year}}, les biocarburants issus d'effluents d'huilerie de palme et rafles (POME) ne peuvent pas être reconnus au double comptage au delà de 2000 tonnes par unité de production et par an.",
         { year: error?.meta?.year }
+      )
+      break
+    case DoubleCountingUploadErrorType.BadWorksheetName:
+      errorText += t(
+        "La feuille \"{{sheetName}}\" n'a pas été trouvé dans le fichier. Vérifiez que la feuille n'est pas été renommée.",
+        { sheetName: error?.meta.sheet_name }
+      )
+      break
+    case DoubleCountingUploadErrorType.ProductionMismatchQuota:
+      errorText += t(
+        "Le quota demandé dans l'onglet \"Reconnaissance double comptage\" ne peut pas être supérieur à la production prévisionelle renseignée ici.",
+      )
+      break
+    case DoubleCountingUploadErrorType.LineFeedstocksIncoherent:
+      errorText += t(
+        "Les matières premières renseignées sur la même ligne doivent être identiques dans les deux tableaux.",
+      )
+      break
+    case DoubleCountingUploadErrorType.UnknownYear:
+      errorText += t(
+        "Les années doivent être renseignées.",
       )
       break
 

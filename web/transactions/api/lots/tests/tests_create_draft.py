@@ -1,4 +1,4 @@
-# from api.v4.tests_utils import get_lot, setup_current_user
+# from transactions.api.lots.tests.tests_utils import get_lot, setup_current_user
 # from core.models import CarbureLot, Entity, UserRights
 # from django.db.models import Count
 # from django.test import TestCase
@@ -58,7 +58,7 @@
 #         LockedYear.objects.create(year=2018, locked=True)
 
 #         lot = get_lot(self.producer)
-#         response = self.client.post(reverse('api-v5-transactions-lots-add'), lot)
+#         response = self.client.post(reverse('transactions-lots-add'), lot)
 
 #         self.assertEqual(response.status_code, 200)
 #         self.assertEqual(response.json()["status"], "success")
@@ -72,7 +72,7 @@
 #     def test_create_draft_on_locked_year(self):
 #         LockedYear.objects.create(year=2021, locked=True)
 #         lot = get_lot(self.producer)
-#         response = self.client.post(reverse('api-v5-transactions-lots-add'), lot)
+#         response = self.client.post(reverse('transactions-lots-add'), lot)
 #         self.assertEqual(response.status_code, 400)
 #         self.assertEqual(response.json()["status"], "error")
 #         self.assertEqual(response.json()["error"], CarbureError.YEAR_LOCKED)

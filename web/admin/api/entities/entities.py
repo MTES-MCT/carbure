@@ -5,7 +5,7 @@ from django.db.models import Q, Count, Value
 
 
 from doublecount.models import DoubleCountingAgreement
-from api.v4.helpers import filter_lots
+from core.helpers import filter_lots
 
 
 @check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE])
@@ -20,21 +20,34 @@ def get_entities(request):
         entities = (
             Entity.objects.all()
             .order_by("name")
-            .prefetch_related("userrights_set", "userrightsrequests_set", "entitydepot_set", "productionsite_set")
+            .prefetch_related(
+                "userrights_set",
+                "userrightsrequests_set",
+                "entitydepot_set",
+                "productionsite_set",
+            )
             .annotate(
                 users=Count("userrights", distinct=True),
-                requests=Count("userrightsrequests", filter=Q(userrightsrequests__status="PENDING"), distinct=True),
+                requests=Count(
+                    "userrightsrequests",
+                    filter=Q(userrightsrequests__status="PENDING"),
+                    distinct=True,
+                ),
                 depots=Count("entitydepot", distinct=True),
                 production_sites=Count("productionsite", distinct=True),
                 certificates=Count("entitycertificate", distinct=True),
                 double_counting=Count(
                     "doublecountingagreement",
-                    filter=Q(doublecountingagreement__status=DoubleCountingAgreement.ACCEPTED),
+                    filter=Q(
+                        doublecountingagreement__status=DoubleCountingAgreement.ACCEPTED
+                    ),
                     distinct=True,
                 ),
                 double_counting_requests=Count(
                     "doublecountingagreement",
-                    filter=Q(doublecountingagreement__status=DoubleCountingAgreement.PENDING),
+                    filter=Q(
+                        doublecountingagreement__status=DoubleCountingAgreement.PENDING
+                    ),
                     distinct=True,
                 ),
             )
@@ -47,7 +60,11 @@ def get_entities(request):
             .prefetch_related("userrights_set", "userrightsrequests_set")
             .annotate(
                 users=Count("userrights", distinct=True),
-                requests=Count("userrightsrequests", filter=Q(userrightsrequests__status="PENDING"), distinct=True),
+                requests=Count(
+                    "userrightsrequests",
+                    filter=Q(userrightsrequests__status="PENDING"),
+                    distinct=True,
+                ),
                 depots=Value(0),
                 production_sites=Value(0),
                 certificates=Value(0),

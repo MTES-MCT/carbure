@@ -1,4 +1,4 @@
-from api.v4.tests_utils import setup_current_user
+from core.tests_utils import setup_current_user
 from core.models import Entity
 from django.test import TestCase
 from django.urls import reverse
@@ -16,17 +16,23 @@ class AdminEntitiesTest(TestCase):
 
     def setUp(self):
         self.admin = Entity.objects.filter(entity_type=Entity.ADMIN)[0]
-        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True)
+        self.user = setup_current_user(
+            self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True
+        )
 
     def test_get_entities(self):
-        response = self.client.get(reverse("admin-entities"), {"entity_id": self.admin.id})
+        response = self.client.get(
+            reverse("admin-entities"), {"entity_id": self.admin.id}
+        )
         # api works
         self.assertEqual(response.status_code, 200)
         # and returns at least 5 entities
         self.assertGreaterEqual(len(response.json()["data"]), 5)
 
         # check if querying works
-        response = self.client.get(reverse("admin-entities"), {"q": "prod", "entity_id": self.admin.id})
+        response = self.client.get(
+            reverse("admin-entities"), {"q": "prod", "entity_id": self.admin.id}
+        )
         # works
         self.assertEqual(response.status_code, 200)
         # and returns at least 2 entities
@@ -39,7 +45,8 @@ class AdminEntitiesTest(TestCase):
 
     def test_get_entities_details(self):
         response = self.client.get(
-            reverse("admin-entities-details"), {"entity_id": self.admin.id, "company_id": self.admin.id}
+            reverse("admin-entities-details"),
+            {"entity_id": self.admin.id, "company_id": self.admin.id},
         )
         self.assertEqual(response.status_code, 200)
         data = response.json()["data"]

@@ -1,6 +1,6 @@
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
-from accounts.tokens import account_activation_token
+from auth.tokens import account_activation_token
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.contrib.auth import login
@@ -12,7 +12,7 @@ def activate(request):
     uidb64 = request.POST.get("uidb64", "")
     token = request.POST.get("token", "")
     try:
-        uid = force_text(urlsafe_base64_decode(uidb64))
+        uid = force_str(urlsafe_base64_decode(uidb64))
         user_model = get_user_model()
         user = user_model.objects.get(pk=uid)
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):

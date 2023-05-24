@@ -25,7 +25,7 @@ class ProductionSiteCertificate(models.Model):
 class DoubleCountingRegistration(models.Model):
     certificate_id = models.CharField(max_length=64)
     certificate_holder = models.CharField(max_length=256)
-    production_site = models.ForeignKey(ProductionSite, on_delete=models.CASCADE, null=True)
+    production_site = models.ForeignKey(ProductionSite, on_delete=models.CASCADE, null=True, blank=True)
     registered_address = models.TextField()
     valid_from = models.DateField()
     valid_until = models.DateField()
@@ -50,7 +50,10 @@ def dc_registration_post_update_production_site(sender, instance, created, updat
     production_site_id = instance.production_site_id
     try:
         production_site = ProductionSite.objects.get(pk=production_site_id)
+
         production_site.dc_reference = instance.certificate_id
+        production_site.eligible_dc = True
+
         production_site.save()
     except:
         print("Production Site not found")
