@@ -1,9 +1,18 @@
 from core.decorators import check_user_rights
 from django.http.response import JsonResponse
-from api.v4.helpers import get_prefetched_data
-from api.v4.lots import try_get_date
+from core.helpers import get_prefetched_data
+from transactions.helpers import try_get_date
 from carbure.tasks import background_bulk_scoring, background_bulk_sanity_checks
-from core.models import CarbureLot, CarbureLotEvent, CarbureStock, CarbureStockEvent, Depot, Entity, Pays, UserRights
+from core.models import (
+    CarbureLot,
+    CarbureLotEvent,
+    CarbureStock,
+    CarbureStockEvent,
+    Depot,
+    Entity,
+    Pays,
+    UserRights,
+)
 import json
 
 
@@ -13,7 +22,9 @@ def stock_split(request, *args, **kwargs):
     entity_id = context["entity_id"]
     payload = request.POST.get("payload", False)
     if not payload:
-        return JsonResponse({"status": "error", "message": "Missing payload"}, status=400)
+        return JsonResponse(
+            {"status": "error", "message": "Missing payload"}, status=400
+        )
     entity = Entity.objects.get(id=entity_id)
     prefetched_data = get_prefetched_data(entity)
 
@@ -23,10 +34,14 @@ def stock_split(request, *args, **kwargs):
         # dispatch_date: '2021-05-11', carbure_delivery_site_id: None, unknown_delivery_site: "SomeUnknownDepot", delivery_site_country_id: 120,
         # delivery_type: 'EXPORT', carbure_client_id: 12, unknown_client: None, supplier_certificate: "MON_CERTIFICAT"}]
     except:
-        return JsonResponse({"status": "error", "message": "Cannot parse payload into JSON"}, status=400)
+        return JsonResponse(
+            {"status": "error", "message": "Cannot parse payload into JSON"}, status=400
+        )
 
     if not isinstance(unserialized, list):
-        return JsonResponse({"status": "error", "message": "Parsed JSON is not a list"}, status=400)
+        return JsonResponse(
+            {"status": "error", "message": "Parsed JSON is not a list"}, status=400
+        )
 
     new_lots = []
     for entry in unserialized:
@@ -35,21 +50,32 @@ def stock_split(request, *args, **kwargs):
         for field in required_fields:
             if field not in entry:
                 return JsonResponse(
-                    {"status": "error", "message": "Missing field %s in json object" % (field)}, status=400
+                    {
+                        "status": "error",
+                        "message": "Missing field %s in json object" % (field),
+                    },
+                    status=400,
                 )
 
         try:
             stock = CarbureStock.objects.get(carbure_id=entry["stock_id"])
         except Exception as e:
-            return JsonResponse({"status": "error", "message": "Could not find stock"}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Could not find stock"}, status=400
+            )
 
         if stock.carbure_client_id != int(entity_id):
-            return JsonResponse({"status": "forbidden", "message": "Stock does not belong to you"}, status=403)
+            return JsonResponse(
+                {"status": "forbidden", "message": "Stock does not belong to you"},
+                status=403,
+            )
 
         try:
             volume = float(entry["volume"])
         except:
-            return JsonResponse({"status": "error", "message": "Could not parse volume"}, status=400)
+            return JsonResponse(
+                {"status": "error", "message": "Could not parse volume"}, status=400
+            )
 
         # create child lot
         rounded_volume = round(volume, 2)
@@ -74,9 +100,13 @@ def stock_split(request, *args, **kwargs):
         lot.year = lot.delivery_date.year
         lot.period = lot.delivery_date.year * 100 + lot.delivery_date.month
         lot.carbure_dispatch_site = stock.depot
-        lot.dispatch_site_country = lot.carbure_dispatch_site.country if lot.carbure_dispatch_site else None
+        lot.dispatch_site_country = (
+            lot.carbure_dispatch_site.country if lot.carbure_dispatch_site else None
+        )
         lot.carbure_supplier_id = entity_id
-        lot.supplier_certificate = entry.get("supplier_certificate", entity.default_certificate)
+        lot.supplier_certificate = entry.get(
+            "supplier_certificate", entity.default_certificate
+        )
         lot.added_by_id = entity_id
         lot.dispatch_date = entry.get("dispatch_date", None)
         lot.unknown_client = entry.get("unknown_client", None)
@@ -87,9 +117,13 @@ def stock_split(request, *args, **kwargs):
                 lot.delivery_site_country = Pays.objects.get(code_pays=country_code)
             except:
                 lot.delivery_site_country = None
-        lot.transport_document_type = entry.get("transport_document_type", CarbureLot.OTHER)
+        lot.transport_document_type = entry.get(
+            "transport_document_type", CarbureLot.OTHER
+        )
         lot.delivery_type = entry.get("delivery_type", CarbureLot.UNKNOWN)
-        lot.transport_document_reference = entry.get("transport_document_reference", lot.delivery_type)
+        lot.transport_document_reference = entry.get(
+            "transport_document_reference", lot.delivery_type
+        )
         delivery_site_id = entry.get("carbure_delivery_site_id", None)
         try:
             delivery_site = Depot.objects.get(depot_id=delivery_site_id)
@@ -98,19 +132,40 @@ def stock_split(request, *args, **kwargs):
         except:
             pass
         try:
-            lot.carbure_client = Entity.objects.get(id=entry.get("carbure_client_id", None))
+            lot.carbure_client = Entity.objects.get(
+                id=entry.get("carbure_client_id", None)
+            )
         except:
             lot.carbure_client = None
-        if lot.delivery_type in [CarbureLot.BLENDING, CarbureLot.DIRECT, CarbureLot.PROCESSING]:
+        if lot.delivery_type in [
+            CarbureLot.BLENDING,
+            CarbureLot.DIRECT,
+            CarbureLot.PROCESSING,
+        ]:
             if lot.transport_document_reference is None:
-                return JsonResponse({"status": "error", "message": "Missing transport_document_reference"}, status=400)
+                return JsonResponse(
+                    {
+                        "status": "error",
+                        "message": "Missing transport_document_reference",
+                    },
+                    status=400,
+                )
             if lot.carbure_client is None:
-                return JsonResponse({"status": "error", "message": "Mandatory carbure_client_id"}, status=400)
+                return JsonResponse(
+                    {"status": "error", "message": "Mandatory carbure_client_id"},
+                    status=400,
+                )
             if lot.carbure_delivery_site is None:
-                return JsonResponse({"status": "error", "message": "Mandatory carbure_delivery_site"}, status=400)
+                return JsonResponse(
+                    {"status": "error", "message": "Mandatory carbure_delivery_site"},
+                    status=400,
+                )
         else:
             if lot.delivery_site_country is None:
-                return JsonResponse({"status": "error", "message": "Mandatory delivery_site_country"}, status=400)
+                return JsonResponse(
+                    {"status": "error", "message": "Mandatory delivery_site_country"},
+                    status=400,
+                )
 
         # check if the stock has enough volume and update it
         if rounded_volume > stock.remaining_volume:

@@ -3,7 +3,7 @@ import random
 
 import folium
 from admin.helpers import get_admin_lots_by_status
-from api.v4.helpers import filter_lots
+from core.helpers import filter_lots
 from core.decorators import is_admin
 from core.models import Entity
 from csp.decorators import csp_exempt
@@ -23,7 +23,9 @@ def map(request):
     lots = filter_lots(lots, request.GET, entity)
 
     # on veut: nom site de depart, gps depart, nom site arrivee, gps arrivee, volume
-    lots = lots.filter(carbure_production_site__isnull=False, carbure_delivery_site__isnull=False)
+    lots = lots.filter(
+        carbure_production_site__isnull=False, carbure_delivery_site__isnull=False
+    )
     values = lots.values(
         "carbure_production_site__name",
         "carbure_production_site__gps_coordinates",
@@ -53,11 +55,17 @@ def map(request):
             print("Missing start or end gps coordinates")
             print(
                 "Start %s : %s"
-                % (v["carbure_production_site__name"].encode("utf-8"), v["carbure_production_site__gps_coordinates"])
+                % (
+                    v["carbure_production_site__name"].encode("utf-8"),
+                    v["carbure_production_site__gps_coordinates"],
+                )
             )
             print(
                 "End %s : %s"
-                % (v["carbure_delivery_site__name"].encode("utf-8"), v["carbure_delivery_site__gps_coordinates"])
+                % (
+                    v["carbure_delivery_site__name"].encode("utf-8"),
+                    v["carbure_delivery_site__gps_coordinates"],
+                )
             )
             continue
 

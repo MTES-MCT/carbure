@@ -1,4 +1,4 @@
-# from api.v4.tests_utils import get_lot, setup_current_user
+# from transactions.api.lots.tests.tests_utils import get_lot, setup_current_user
 # from core.models import CarbureLot, Entity, UserRights
 # from django.db.models import Count
 # from django.test import TestCase

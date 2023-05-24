@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 
-from api.v4.tests_utils import setup_current_user
+from core.tests_utils import setup_current_user
 from core.models import Entity, MatierePremiere, Biocarburant, Pays
 from saf.models import SafTicketSource, SafTicket
 
@@ -20,7 +20,9 @@ class SafTicketSourcesTest(TestCase):
     def setUp(self):
         self.entity = Entity.objects.filter(entity_type=Entity.OPERATOR)[0]
         self.ticket_client = Entity.objects.filter(entity_type=Entity.OPERATOR)[1]
-        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")])
+        self.user = setup_current_user(
+            self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")]
+        )
 
         SafTicketSource.objects.all().delete()
         SafTicket.objects.all().delete()
@@ -34,7 +36,9 @@ class SafTicketSourcesTest(TestCase):
             delivery_period=202201,
             total_volume=30000,
             assigned_volume=0,
-            feedstock=MatierePremiere.objects.get(code="HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"),
+            feedstock=MatierePremiere.objects.get(
+                code="HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"
+            ),
             biofuel=Biocarburant.objects.get(code="HCC"),
             country_of_origin=Pays.objects.get(name="Espagne"),
             carbure_producer=None,
@@ -72,7 +76,9 @@ class SafTicketSourcesTest(TestCase):
             assignment_period=202201,
             status=SafTicket.PENDING,
             volume=30000,
-            feedstock=MatierePremiere.objects.get(code="HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"),
+            feedstock=MatierePremiere.objects.get(
+                code="HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"
+            ),
             biofuel=Biocarburant.objects.get(code="HCC"),
             country_of_origin=Pays.objects.get(name="Espagne"),
             supplier=self.entity,
@@ -100,7 +106,13 @@ class SafTicketSourcesTest(TestCase):
         )
 
     def test_saf_ticket_sources(self):
-        query = {"entity_id": self.entity.id, "year": 2022, "status": "AVAILABLE", "from_idx": 0, "limit": 1}
+        query = {
+            "entity_id": self.entity.id,
+            "year": 2022,
+            "status": "AVAILABLE",
+            "from_idx": 0,
+            "limit": 1,
+        }
         response = self.client.get(reverse("saf-operator-ticket-sources"), query)
 
         self.assertEqual(response.status_code, 200)
@@ -125,7 +137,11 @@ class SafTicketSourcesTest(TestCase):
                 "name_en": "Co-processed oil - jet",
                 "code": "HCC",
             },
-            "country_of_origin": {"name": "Espagne", "name_en": "Spain", "code_pays": "ES"},
+            "country_of_origin": {
+                "name": "Espagne",
+                "name_en": "Spain",
+                "code_pays": "ES",
+            },
             "ghg_reduction": 65.0,
             "parent_lot": None,
             "assigned_tickets": [

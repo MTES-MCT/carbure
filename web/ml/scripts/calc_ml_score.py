@@ -7,22 +7,26 @@ import datetime
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from api.v4.helpers import get_prefetched_data
+from core.helpers import get_prefetched_data
 from core.models import CarbureLot
 from ml.models import EECStats, EPStats, ETDStats
 
-DATE_BEGIN = datetime.date.today() - datetime.timedelta(days=540) # approx 18 months
+DATE_BEGIN = datetime.date.today() - datetime.timedelta(days=540)  # approx 18 months
+
 
 def calc_ml_score(year=None, period=None):
     data = get_prefetched_data()
     # {s.feedstock: s.default_value for s in ETDStats.objects.select_related('feedstock').all()}
-    etd = data['etd']
-    #{s.feedstock.code + s.origin.code_pays: s for s in EECStats.objects.select_related('feedstock', 'origin').all()}
-    eec = data['eec']
+    etd = data["etd"]
+    # {s.feedstock.code + s.origin.code_pays: s for s in EECStats.objects.select_related('feedstock', 'origin').all()}
+    eec = data["eec"]
     # {s.feedstock.code + s.biofuel.code: s for s in EPStats.objects.select_related('feedstock', 'biofuel').all()}
-    ep = data['ep']
+    ep = data["ep"]
 
-    lots = CarbureLot.objects.select_related('feedstock', 'country_of_origin').filter(created_at__gt=DATE_BEGIN, lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN])
+    lots = CarbureLot.objects.select_related("feedstock", "country_of_origin").filter(
+        created_at__gt=DATE_BEGIN,
+        lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN],
+    )
     if year:
         lots = lots.filter(year=year)
     if period:
@@ -36,17 +40,28 @@ def calc_ml_score(year=None, period=None):
             if key in eec:
                 entry = eec[key]
                 if l.eec < 0.8 * min(entry.default_value, entry.average):
-                    score += ((min(entry.default_value, entry.average) - l.eec) / min(entry.default_value, entry.average))**2
+                    score += (
+                        (min(entry.default_value, entry.average) - l.eec)
+                        / min(entry.default_value, entry.average)
+                    ) ** 2
                 if l.eec > 1.2 * max(entry.default_value, entry.average):
-                    score += ((l.eec - max(entry.default_value, entry.average)) / max(entry.default_value, entry.average))**2
+                    score += (
+                        (l.eec - max(entry.default_value, entry.average))
+                        / max(entry.default_value, entry.average)
+                    ) ** 2
         # ep penalisation
         key = l.feedstock.code + l.biofuel.code
         if key in ep:
             entry = ep[key]
             if l.ep < 0.8 * entry.average:
-                score += ((entry.average - l.ep) / entry.average)**2
-            if entry.default_value_max_ep > 0 and l.ep > 1.2 * entry.default_value_max_ep:
-                score += ((l.ep - entry.default_value_max_ep) / entry.default_value_max_ep)**2
+                score += ((entry.average - l.ep) / entry.average) ** 2
+            if (
+                entry.default_value_max_ep > 0
+                and l.ep > 1.2 * entry.default_value_max_ep
+            ):
+                score += (
+                    (l.ep - entry.default_value_max_ep) / entry.default_value_max_ep
+                ) ** 2
 
         # etd penalisation ###### NOT INCLUDED FOR NOW - fausse les resultats - trop de faux positifs, trop different du premier check
         # if l.feedstock in etd:
@@ -63,13 +78,15 @@ def calc_ml_score(year=None, period=None):
             l.ml_control_requested = True
         l.save()
 
+
 def main():
-    parser = argparse.ArgumentParser(description='Calculate machine learning score')
-    parser.add_argument('--year', dest='year', action='store', help='year')
-    parser.add_argument('--period', dest='period', action='store', help='period')
+    parser = argparse.ArgumentParser(description="Calculate machine learning score")
+    parser.add_argument("--year", dest="year", action="store", help="year")
+    parser.add_argument("--period", dest="period", action="store", help="period")
     args = parser.parse_args()
 
     calc_ml_score(args.year, args.period)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

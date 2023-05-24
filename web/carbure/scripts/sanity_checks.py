@@ -12,8 +12,8 @@ from django.db import transaction
 from tqdm import tqdm
 
 from core.models import CarbureLot, GenericError
-from api.v4.sanity_checks import bulk_sanity_checks
-from api.v4.helpers import get_prefetched_data
+from transactions.sanity_checks.sanity_checks import bulk_sanity_checks
+from core.helpers import get_prefetched_data
 
 
 @transaction.atomic
@@ -33,7 +33,9 @@ def cleanup_sanity_checks(year, batch, apply):
 
     lots = (
         CarbureLot.objects.filter(year=year)
-        .filter(lot_status__in=(CarbureLot.ACCEPTED, CarbureLot.FROZEN, CarbureLot.PENDING))
+        .filter(
+            lot_status__in=(CarbureLot.ACCEPTED, CarbureLot.FROZEN, CarbureLot.PENDING)
+        )
         .order_by("id")
         .select_related(
             "carbure_producer",
@@ -100,9 +102,25 @@ def show_error_details(errors: Iterable[GenericError], type: str):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run sanity checks on all the lots of a given year")
-    parser.add_argument("--year", dest="year", action="store", default=None, help="Year to check")
-    parser.add_argument("--batch", dest="batch", action="store", default=1000, help="Size of the db batches")
-    parser.add_argument("--apply", dest="apply", action="store_true", default=False, help="Save the changes to the db")
+    parser = argparse.ArgumentParser(
+        description="Run sanity checks on all the lots of a given year"
+    )
+    parser.add_argument(
+        "--year", dest="year", action="store", default=None, help="Year to check"
+    )
+    parser.add_argument(
+        "--batch",
+        dest="batch",
+        action="store",
+        default=1000,
+        help="Size of the db batches",
+    )
+    parser.add_argument(
+        "--apply",
+        dest="apply",
+        action="store_true",
+        default=False,
+        help="Save the changes to the db",
+    )
     args = parser.parse_args()
     cleanup_sanity_checks(args.year, args.batch, args.apply)
