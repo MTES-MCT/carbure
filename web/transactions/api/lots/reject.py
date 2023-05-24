@@ -13,7 +13,7 @@ from core.common import (
     get_uploaded_files_directory,
 )
 from core.decorators import check_user_rights
-from api.v4.helpers import (
+from core.helpers import (
     filter_lots,
     get_entity_lots_by_status,
     get_lot_comments,
@@ -23,13 +23,13 @@ from api.v4.helpers import (
     get_lots_with_metadata,
     get_lots_filters_data,
 )
-from api.v4.helpers import (
+from core.helpers import (
     get_prefetched_data,
     get_transaction_distance,
     get_known_certificates,
 )
-from api.v4.lots import construct_carbure_lot, bulk_insert_lots
-from api.v4.sanity_checks import bulk_scoring
+from transactions.helpers import construct_carbure_lot, bulk_insert_lots
+from transactions.sanity_checks.sanity_checks import bulk_scoring
 from transactions.sanity_checks import (
     sanity_checks,
     bulk_sanity_checks,

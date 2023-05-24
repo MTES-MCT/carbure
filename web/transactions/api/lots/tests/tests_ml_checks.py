@@ -6,7 +6,7 @@ from django.db.models import Count
 
 from core.models import CarbureLot, GenericError, Entity, UserRights
 from django_otp.plugins.otp_email.models import EmailDevice
-from api.v4.tests_utils import get_lot
+from transactions.api.lots.tests.tests_utils import get_lot
 
 
 class LotGHGTest(TestCase):

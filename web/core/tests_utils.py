@@ -5,9 +5,11 @@ from django_otp.plugins.otp_email.models import EmailDevice
 from core.models import UserRights, UserRightsRequests
 
 
-def setup_current_user(test, email, name, password, entity_rights=[]):
+def setup_current_user(test, email, name, password, entity_rights=[], is_staff=False):
     User = get_user_model()
-    user = User.objects.create_user(email=email, name=name, password=password)
+    user = User.objects.create_user(
+        email=email, name=name, password=password, is_staff=is_staff
+    )
     loggedin = test.client.login(username=user.email, password=password)
     test.assertTrue(loggedin)
 

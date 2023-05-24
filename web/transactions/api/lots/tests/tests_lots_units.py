@@ -1,4 +1,4 @@
-from api.v4.tests_utils import get_lot
+from transactions.api.lots.tests.tests_utils import get_lot
 from core.models import CarbureLot, Entity, UserRights
 from django.contrib.auth import get_user_model
 from django.db.models import Count

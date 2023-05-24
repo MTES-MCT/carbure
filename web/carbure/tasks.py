@@ -5,7 +5,7 @@ from huey import crontab
 from huey.contrib.djhuey import periodic_task, db_periodic_task, db_task
 from django.db.models.query import QuerySet
 
-from api.v4.sanity_checks import bulk_sanity_checks, bulk_scoring
+from transactions.sanity_checks.sanity_checks import bulk_sanity_checks, bulk_scoring
 from ml.scripts.calc_ml_score import calc_ml_score
 from ml.scripts.load_data import load_ml_data
 from carbure.scripts.create_declaration_reminder import create_declaration_reminder
@@ -17,12 +17,16 @@ from saf.models.saf_ticket_source import create_ticket_sources_from_lots
 
 
 @db_task()
-def background_bulk_sanity_checks(lots: QuerySet, prefetched_data: dict | None = None) -> None:
+def background_bulk_sanity_checks(
+    lots: QuerySet, prefetched_data: dict | None = None
+) -> None:
     bulk_sanity_checks(lots, prefetched_data)
 
 
 @db_task()
-def background_bulk_scoring(lots: QuerySet, prefetched_data: dict | None = None) -> None:
+def background_bulk_scoring(
+    lots: QuerySet, prefetched_data: dict | None = None
+) -> None:
     bulk_scoring(lots, prefetched_data)
 
 

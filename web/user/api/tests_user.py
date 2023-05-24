@@ -1,4 +1,4 @@
-from api.v4.tests_utils import setup_current_user
+from core.tests_utils import setup_current_user
 from core.models import Entity
 from django.test import TestCase
 from django.urls import reverse
@@ -17,7 +17,12 @@ class UserTest(TestCase):
     def setUp(self):
         self.admin = Entity.objects.filter(entity_type=Entity.ADMIN)[0]
         self.user = setup_current_user(
-            self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], is_staff=True
+            self,
+            "tester@carbure.local",
+            "Tester",
+            "gogogo",
+            [(self.admin, "RW")],
+            is_staff=True,
         )
 
     def test_get_settings(self):
@@ -38,7 +43,9 @@ class UserTest(TestCase):
         self.assertIn("requests", data)
         prev_len = len(data["requests"])
 
-        e, _ = Entity.objects.update_or_create(name="Entity test", entity_type="Producteur")
+        e, _ = Entity.objects.update_or_create(
+            name="Entity test", entity_type="Producteur"
+        )
         postdata = {"entity_id": e.id, "comment": "", "role": "RO"}
         response = self.client.post(reverse("user-request-access"), postdata)
         self.assertEqual(response.status_code, 200)

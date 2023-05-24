@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from api.v4.tests_utils import setup_current_user
+from core.tests_utils import setup_current_user
 from core.models import Entity
 
 
@@ -16,7 +16,9 @@ class SettingUpdateEntityTest(TestCase):
 
     def setUp(self):
         self.entity = Entity.objects.all()[0]
-        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")])
+        self.user = setup_current_user(
+            self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")]
+        )
 
     def test_update_entity_info(self):
         query = {
@@ -41,9 +43,12 @@ class SettingUpdateEntityTest(TestCase):
         self.assertEqual(updated_entity.legal_name, query["legal_name"])
         self.assertEqual(updated_entity.registration_id, query["registration_id"])
         self.assertEqual(
-            updated_entity.sustainability_officer_phone_number, query["sustainability_officer_phone_number"]
+            updated_entity.sustainability_officer_phone_number,
+            query["sustainability_officer_phone_number"],
         )
-        self.assertEqual(updated_entity.sustainability_officer, query["sustainability_officer"])
+        self.assertEqual(
+            updated_entity.sustainability_officer, query["sustainability_officer"]
+        )
         self.assertEqual(updated_entity.registered_address, query["registered_address"])
         self.assertEqual(updated_entity.registered_zipcode, query["registered_zipcode"])
         self.assertEqual(updated_entity.registered_city, query["registered_city"])

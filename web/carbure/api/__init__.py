@@ -3,7 +3,6 @@ from .home_stats import get_home_stats
 from .redirect_app import redirect_app
 
 urlpatterns = [
-    path("", include("api.v4.urls")),
     path("v3/doublecount/", include("doublecount.api.urls")),
     path("v5/admin/", include("admin.api")),
     path("v5/auth/", include("auth.api")),

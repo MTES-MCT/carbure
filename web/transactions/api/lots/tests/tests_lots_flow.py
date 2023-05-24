@@ -1,4 +1,4 @@
-from api.v4.tests_utils import get_lot
+from transactions.api.lots.tests.tests_utils import get_lot
 from core.models import CarbureLot, CarbureStock, Entity, UserRights
 from transactions.models import LockedYear
 from django.contrib.auth import get_user_model

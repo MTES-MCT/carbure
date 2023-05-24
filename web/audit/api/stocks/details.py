@@ -1,7 +1,7 @@
 from django.http.response import JsonResponse
 
 from core.decorators import check_user_rights, is_auditor
-from api.v4.helpers import (
+from core.helpers import (
     get_lot_comments,
     get_lot_updates,
     get_stock_events,

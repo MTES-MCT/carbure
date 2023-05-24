@@ -8,10 +8,10 @@ from core.common import (
     get_uploaded_files_directory,
 )
 from core.decorators import check_user_rights
-from api.v4.helpers import (
+from core.helpers import (
     get_prefetched_data,
 )
-from api.v4.lots import construct_carbure_lot, bulk_insert_lots
+from transactions.helpers import construct_carbure_lot, bulk_insert_lots
 
 from core.models import (
     CarbureLotEvent,

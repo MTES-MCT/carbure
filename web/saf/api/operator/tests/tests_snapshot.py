@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 
-from api.v4.tests_utils import setup_current_user
+from core.tests_utils import setup_current_user
 from core.models import Entity
 from saf.factories import SafTicketSourceFactory, SafTicketFactory
 from saf.models import SafTicketSource, SafTicket
@@ -20,11 +20,17 @@ class SafSnapshotTest(TestCase):
     def setUp(self):
         self.entity = Entity.objects.filter(entity_type=Entity.OPERATOR)[0]
         self.entity2 = Entity.objects.filter(entity_type=Entity.OPERATOR)[1]
-        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")])
+        self.user = setup_current_user(
+            self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")]
+        )
 
         SafTicketSource.objects.all().delete()
-        SafTicketSourceFactory.create_batch(10, year=2021, added_by_id=self.entity.id, assigned_volume=0)
-        SafTicketSourceFactory.create_batch(10, year=2022, added_by_id=self.entity.id, assigned_volume=0)
+        SafTicketSourceFactory.create_batch(
+            10, year=2021, added_by_id=self.entity.id, assigned_volume=0
+        )
+        SafTicketSourceFactory.create_batch(
+            10, year=2022, added_by_id=self.entity.id, assigned_volume=0
+        )
         SafTicketSourceFactory.create_batch(20, year=2022, added_by_id=self.entity.id, total_volume=30000, assigned_volume=30000)  # fmt:skip
 
         SafTicket.objects.all().delete()
@@ -33,7 +39,10 @@ class SafSnapshotTest(TestCase):
         SafTicketFactory.create_batch(5, year=2022, supplier_id=self.entity.id, client_id=self.entity2.id, status=SafTicket.REJECTED)  # fmt:skip
 
     def test_saf_snapshot_simple(self):
-        response = self.client.get(reverse("saf-operator-snapshot"), {"entity_id": self.entity.id, "year": 2021})
+        response = self.client.get(
+            reverse("saf-operator-snapshot"),
+            {"entity_id": self.entity.id, "year": 2021},
+        )
 
         expected = {
             "ticket_sources_available": 10,
@@ -51,7 +60,10 @@ class SafSnapshotTest(TestCase):
         self.assertEqual(response.json()["data"], expected)
 
     def test_saf_snapshot_complex(self):
-        response = self.client.get(reverse("saf-operator-snapshot"), {"entity_id": self.entity.id, "year": 2022})
+        response = self.client.get(
+            reverse("saf-operator-snapshot"),
+            {"entity_id": self.entity.id, "year": 2022},
+        )
 
         expected = {
             "ticket_sources_available": 10,
