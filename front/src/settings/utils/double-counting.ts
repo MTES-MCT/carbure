@@ -95,6 +95,11 @@ export function getErrorText(
         "Les années doivent être renseignées.",
       )
       break
+    case DoubleCountingUploadErrorType.MissingCountryOfOrigin:
+      errorText += t(
+        "Le pays d'origine de la matière première doit être renseigné.",
+      )
+      break
 
     default:
       errorText +=

@@ -1,4 +1,5 @@
 import datetime
+from math import e
 from typing import List
 from django.http import JsonResponse
 from core.models import Pays, Biocarburant, MatierePremiere
@@ -11,9 +12,7 @@ from doublecount.errors import DoubleCountingError, error
 today = datetime.date.today()
 
 
-def load_dc_sourcing_data(
-    dca: DoubleCountingAgreement, sourcing_rows: List[SourcingRow]
-):
+def load_dc_sourcing_data(dca: DoubleCountingAgreement, sourcing_rows: List[SourcingRow]):
     # prepare error list
     sourcing_data = []
     sourcing_errors = []
@@ -28,28 +27,14 @@ def load_dc_sourcing_data(
             continue
 
         if row["year"] == -1:
-            sourcing_errors.append(
-                error(DoubleCountingError.UNKNOWN_YEAR, line=row["line"])
-            )
+            sourcing_errors.append(error(DoubleCountingError.UNKNOWN_YEAR, line=row["line"]))
             continue
 
         feedstock = feedstocks.get(row["feedstock"], None) if row["feedstock"] else None
 
-        origin_country = (
-            countries.get(row["origin_country"], None)
-            if row["origin_country"]
-            else None
-        )
-        supply_country = (
-            countries.get(row["supply_country"], None)
-            if row["supply_country"]
-            else None
-        )
-        transit_country = (
-            countries.get(row["transit_country"], None)
-            if row["transit_country"]
-            else None
-        )
+        origin_country = countries.get(row["origin_country"], None) if row["origin_country"] else None
+        supply_country = countries.get(row["supply_country"], None) if row["supply_country"] else None
+        transit_country = countries.get(row["transit_country"], None) if row["transit_country"] else None
         sourcing = DoubleCountingSourcing(dca=dca)
         sourcing.year = row["year"]
         if feedstock:
@@ -67,9 +52,7 @@ def load_dc_sourcing_data(
     return sourcing_data, sourcing_errors
 
 
-def load_dc_production_data(
-    dca: DoubleCountingAgreement, production_rows: List[ProductionRow]
-):
+def load_dc_production_data(dca: DoubleCountingAgreement, production_rows: List[ProductionRow]):
     production_data = []
     production_errors = []
 

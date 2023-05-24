@@ -30,8 +30,8 @@ def check_files(request, *args, **kwargs):
         for file in files:
             info, errors = check_dc_file(file)
             error_count = (
-                len(errors["sourcing_history"])
-                + len(errors["sourcing_forecast"])
+                # len(errors["sourcing_history"])
+                +len(errors["sourcing_forecast"])
                 + len(errors["production"])
                 + len(errors["global"])
             )
@@ -46,9 +46,7 @@ def check_files(request, *args, **kwargs):
                 }
             )
 
-        return SuccessResponse(
-            {"files": file_errors, "checked_at": datetime.datetime.now().isoformat()}
-        )
+        return SuccessResponse({"files": file_errors, "checked_at": datetime.datetime.now().isoformat()})
     except Exception:
         traceback.print_exc()
         return ErrorResponse(400, CheckFilesError.FILE_CHECK_FAILED)
@@ -60,13 +58,7 @@ def check_dc_file(file):
         directory = "/tmp"
         now = datetime.datetime.now()
         filename = "%s_%s.xlsx" % (now.strftime("%Y%m%d.%H%M%S"), file.name.upper())
-        filename = "".join(
-            (
-                c
-                for c in unicodedata.normalize("NFD", filename)
-                if unicodedata.category(c) != "Mn"
-            )
-        )
+        filename = "".join((c for c in unicodedata.normalize("NFD", filename) if unicodedata.category(c) != "Mn"))
         filepath = "%s/%s" % (directory, filename)
 
         # save file
@@ -74,9 +66,8 @@ def check_dc_file(file):
             for chunk in file.chunks():
                 destination.write(chunk)
 
-        info, sourcing_history, sourcing_forecast, production_forecast = parse_dc_excel(
-            filepath
-        )
+        info, sourcing_forecast, production_forecast = parse_dc_excel(filepath)
+        # info, sourcing_history, sourcing_forecast, production_forecast = parse_dc_excel(filepath)
 
         # get dc period for upload
         years = [production["year"] for production in production_forecast]
@@ -90,21 +81,18 @@ def check_dc_file(file):
             period_end=end,
         )
 
-        sourcing_history_data, sourcing_history_errors = load_dc_sourcing_data(
-            dca, sourcing_history
-        )
-        sourcing_forecast_data, sourcing_forecast_errors = load_dc_sourcing_data(
-            dca, sourcing_forecast
-        )
-        production_data, production_errors = load_dc_production_data(
-            dca, production_forecast
-        )
+        # sourcing_history_data, sourcing_history_errors = load_dc_sourcing_data(
+        #     dca, sourcing_history
+        # )
+        sourcing_forecast_data, sourcing_forecast_errors = load_dc_sourcing_data(dca, sourcing_forecast)
+        production_data, production_errors = load_dc_production_data(dca, production_forecast)
 
-        sourcing_data = sourcing_history_data + sourcing_forecast_data
+        sourcing_data = sourcing_forecast_data
+        # sourcing_data = sourcing_history_data + sourcing_forecast_data
         global_errors = check_dc_globally(sourcing_data, production_data)
 
         return info, {
-            "sourcing_history": sourcing_history_errors,
+            # "sourcing_history": sourcing_history_errors,
             "sourcing_forecast": sourcing_forecast_errors,
             "production": production_errors,
             "global": global_errors,
@@ -112,9 +100,7 @@ def check_dc_file(file):
 
     except CarbureException as e:
         if e.error == DoubleCountingError.BAD_WORKSHEET_NAME:
-            excel_error = error(
-                DoubleCountingError.BAD_WORKSHEET_NAME, is_blocking=True, meta=e.meta
-            )
+            excel_error = error(DoubleCountingError.BAD_WORKSHEET_NAME, is_blocking=True, meta=e.meta)
 
     except Exception as e:
         traceback.print_exc()
@@ -132,14 +118,12 @@ def check_dc_file(file):
         elif str(e) == "year 0 is out of range":
             excel_error = error(DoubleCountingError.UNKNOWN_YEAR, is_blocking=True)
         else:
-            excel_error = error(
-                DoubleCountingError.EXCEL_PARSING_ERROR, is_blocking=True, meta=str(e)
-            )
+            excel_error = error(DoubleCountingError.EXCEL_PARSING_ERROR, is_blocking=True, meta=str(e))
 
     info = {"production_site": None, "year": 0}
     return info, {
         "sourcing_forecast": [],
-        "sourcing_history": [],
+        # "sourcing_history": [],
         "production": [],
         "global": [excel_error],
     }
