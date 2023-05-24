@@ -1,3 +1,10 @@
+import datetime
+import json
+
+from core.models import GenericError
+from core.serializers import GenericErrorSerializer
+
+
 class TraceabilityError:
     NODE_HAS_DIFFERENCES_WITH_PARENT = "NODE_HAS_DIFFERENCES_WITH_PARENT"
     NOT_ENOUGH_STOCK_FOR_CHILDREN = "NOT_ENOUGH_STOCK_FOR_CHILDREN"
@@ -136,10 +143,10 @@ class Node:
     def get_closest(self, node_type, owner=None) -> "Node":
         if owner is not None and self.owner != owner:
             return None
-        if self.type == node_type:
-            return self
         if self.parent is None:
             return None
+        if self.parent.type == node_type:
+            return self.parent
 
         return self.parent.get_closest(node_type, owner)
 
@@ -185,6 +192,9 @@ class Node:
     def update(self, data, entity_id=None) -> dict:
         diff = {}
 
+        derived = self.derive_fields(data)
+        data.update(derived)
+
         # generate a diff dict
         for attr, new_value in data.items():
             old_value = getattr(self.data, attr)
@@ -195,7 +205,8 @@ class Node:
         if entity_id is not None:
             allowed_diff = self.get_allowed_diff(diff, entity_id)
             if len(allowed_diff) != len(diff):
-                raise Exception("Forbidden to update some of the node's attributes")
+                forbidden_fields = list(set(diff) - set(allowed_diff))
+                raise Exception(f"Forbidden to update the following attributes: {', '.join(forbidden_fields)}")
 
         # apply the diff if everything went fine
         return self.apply_diff(diff)
@@ -218,7 +229,7 @@ class Node:
 
     # check if the data of this node is correctly propagated to all its descendants
     # and returns a list of errors were problems were found
-    def check_integrity(self) -> list[tuple["Node", str, object]]:
+    def check_integrity(self, ignore_diff=False) -> list[tuple["Node", str, object]]:
         # check all fields when diffing
         self.changed_only = False
 
@@ -226,11 +237,11 @@ class Node:
 
         if self.parent:
             diff = self.diff_with_parent()
-            if len(diff) > 0:
+            if not ignore_diff and len(diff) > 0:
                 errors = [(self, TraceabilityError.NODE_HAS_DIFFERENCES_WITH_PARENT, diff)] + errors
 
         for child in self.children:
-            errors += child.check_integrity()
+            errors += child.check_integrity(ignore_diff)
 
         return errors
 
@@ -305,7 +316,7 @@ class Node:
             new_value = getattr(source.data, source_attr)
             old_value = getattr(self.data, self_attr)
 
-            if new_value and new_value != old_value:
+            if new_value != old_value:
                 diff[self_attr] = (new_value, old_value)
 
         return diff
@@ -327,7 +338,43 @@ class Node:
 
     # apply the given diff to this node's data
     def apply_diff(self, diff: dict[str, tuple]):
-        for attr, (new_value, old_value) in diff.items():
-            setattr(self.data, attr, new_value)
-            self.diff[attr] = (new_value, old_value)
+        for field, (new_value, old_value) in diff.items():
+            setattr(self.data, field, new_value)
+            self.diff[field] = (new_value, old_value)
         return self.diff
+
+    def derive_fields(self, update):
+        return {}
+
+
+# transform the node diff into an dict that can be stored as the metadata of an update CarbureLotEvent
+def diff_to_metadata(diff: dict):
+    metadata = {"added": [], "removed": [], "changed": []}
+    for field, (new_value, old_value) in diff.items():
+        if isinstance(new_value, datetime.date):
+            new_value = new_value.strftime("%Y-%m-%d")
+        if isinstance(old_value, datetime.date):
+            old_value = old_value.strftime("%Y-%m-%d")
+        if hasattr(new_value, "name"):
+            new_value = new_value.name
+        if hasattr(old_value, "name"):
+            old_value = old_value.name
+        metadata["changed"].append([field, old_value, new_value])
+    return metadata
+
+
+def serialize_integrity_errors(integrity_errors):
+    errors = []
+
+    for node, error_type, error_data in integrity_errors:
+        lot_node = node.data if node.type == Node.LOT else node.get_closest(Node.LOT)
+        if lot_node:
+            error = GenericError(
+                error=error_type,
+                lot=lot_node.data,
+                is_blocking=True,
+                extra=json.dumps(error_data),
+            )
+            errors.append(error)
+
+    return GenericErrorSerializer(errors, many=True).data

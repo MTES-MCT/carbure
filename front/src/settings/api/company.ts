@@ -2,7 +2,7 @@ import { Unit } from "carbure/types"
 import { api } from "common/services/api"
 
 export function toggleMAC(entity_id: number, shouldEnable: boolean) {
-  const endpoint = "/v5/entity/options/rfc"
+  const endpoint = "/v5/entity/options/release-for-consumption"
   return api.post(endpoint, { entity_id, has_mac: shouldEnable })
 }
 
@@ -35,7 +35,7 @@ export function updateEntity(
   sustainability_officer: string,
   sustainability_officer_phone_number: string
 ) {
-  return api.post("/v5/settings/update-entity", {
+  return api.post("/v5/entity/update-info", {
     entity_id,
     legal_name,
     registration_id,

@@ -1,14 +1,12 @@
+from django import forms
+from django.core.validators import RegexValidator
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from django_otp import user_has_device
+from django_otp import user_has_device, login as login_with_device
 from django_otp.plugins.otp_email.models import EmailDevice
-from core.common import SuccessResponse
-from accounts.forms import OTPForm
-from django_otp import login as login_with_device
-
-from core.carburetypes import CarbureError
 
 from core.common import ErrorResponse, SuccessResponse
+from core.carburetypes import CarbureError
 
 
 @login_required
@@ -46,3 +44,25 @@ def verify_otp(request):
                 return ErrorResponse(400, CarbureError.OTP_UNKNOWN_ERROR)
     # return JsonResponse({'status': 'error', 'message': 'Invalid Form'}, status=400)
     return ErrorResponse(400, CarbureError.OTP_INVALID_FORM)
+
+
+class OTPForm(forms.Form):
+    """
+    A form for submitting the OTP sent via email. Includes otp_token field only
+    """
+
+    otp_token = forms.CharField(
+        max_length=6,
+        min_length=6,
+        validators=[RegexValidator(r"^\d{6}$")],
+        label=f"Entrez le code à 6 chiffres reçu par email",
+        widget=forms.TextInput(attrs={"autocomplete": "off"}),
+    )
+
+    def __init__(self, user, *args, **kwargs):
+        super(OTPForm, self).__init__(*args, **kwargs)
+        self.user = user
+
+    def clean_otp_token(self):
+        otp_token = self.cleaned_data["otp_token"]
+        return otp_token

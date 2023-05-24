@@ -15,6 +15,7 @@ export interface LotDetails {
   errors: LotError[]
   certificates: LotCertificates
   score: LotScore[]
+  disabled_fields: string[]
 }
 
 export interface Distance {

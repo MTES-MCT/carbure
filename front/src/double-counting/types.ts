@@ -69,12 +69,17 @@ export enum DoubleCountingUploadErrorType {
   PomeGt2000 = "POME_GT_2000",
   MissingEstimatedProduction = "MISSING_ESTIMATED_PRODUCTION",
   MissingFeedstock = "MISSING_FEEDSTOCK",
+  ProductionMismatchQuota = "PRODUCTION_MISMATCH_QUOTA",
+  LineFeedstocksIncoherent = "LINE_FEEDSTOCKS_INCOHERENT",
+  UnknownYear = "UNKNOWN_YEAR",
+  BadWorksheetName = "BAD_WORKSHEET_NAME"
 }
 
 export interface DoubleCountingUploadError {
   error: string
   is_blocking: boolean
   line_number: number | null
+  line_merged?: string
   meta?: null | any
 }
 

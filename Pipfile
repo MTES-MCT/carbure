@@ -40,7 +40,6 @@ xlsxwriter = "==3.0.8"
 [dev-packages]
 black = "*"
 django-stubs = "*"
-mypy = "*"
 types-python-dateutil = "*"
 types-pytz = "*"
 types-requests = "*"
@@ -49,6 +48,7 @@ openpyxl-stubs = "*"
 types-factory-boy = "*"
 types-pyjwt = "*"
 djangorestframework-stubs = {extras = ["compatible-mypy"], version = "*"}
+types-six = "*"
 
 [requires]
 python_version = "3.10"

@@ -22,7 +22,7 @@ export function addCompany(
   entity_type: EntityType,
   has_saf: boolean
 ) {
-  return api.post("/v5/admin/create-entity", {
+  return api.post("/v5/admin/entities/create", {
     entity_id,
     name,
     entity_type,
@@ -42,7 +42,10 @@ export function getCompanyDepots(entity_id: number, company_id: number) {
   })
 }
 
-export function getCompanyProductionSites(entity_id: number, company_id: number) {
+export function getCompanyProductionSites(
+  entity_id: number,
+  company_id: number
+) {
   return api.get<Api<ProductionSiteDetails[]>>(
     "/v5/admin/entities/production_sites",
     {
@@ -57,16 +60,23 @@ export function getUsersRightRequests(
   company_id: number,
   statuses?: UserRightStatus[]
 ) {
-  return api.get<Api<UserRightRequest[]>>("/v5/admin/entities/users/rights-requests", {
-    params: { entity_id, q: query, company_id, statuses },
-  })
+  return api.get<Api<UserRightRequest[]>>(
+    "/v5/admin/entities/users/rights-requests",
+    {
+      params: { entity_id, q: query, company_id, statuses },
+    }
+  )
 }
 
-export function updateUsersRights(user_id: number, entity_id: number, status?: UserRightStatus,) {
+export function updateUsersRights(
+  user_id: number,
+  entity_id: number,
+  status?: UserRightStatus
+) {
   return api.post("/v5/admin/entities/users/update-right-request", {
     id: user_id,
     entity_id,
-    status
+    status,
   })
 }
 
@@ -76,10 +86,22 @@ export function getEntityCertificates(entity_id: number, company_id?: number) {
   })
 }
 
-export function checkEntityCertificate(entity_id: number, entity_certificate_id: number) {
-  return api.post("v5/admin/entities/certificates/check", { entity_id, entity_certificate_id })
+export function checkEntityCertificate(
+  entity_id: number,
+  entity_certificate_id: number
+) {
+  return api.post("v5/admin/entities/certificates/check", {
+    entity_id,
+    entity_certificate_id,
+  })
 }
 
-export function rejectEntityCertificate(entity_id: number, entity_certificate_id: number) {
-  return api.post("v5/admin/entities/certificates/reject", { entity_id, entity_certificate_id })
+export function rejectEntityCertificate(
+  entity_id: number,
+  entity_certificate_id: number
+) {
+  return api.post("v5/admin/entities/certificates/reject", {
+    entity_id,
+    entity_certificate_id,
+  })
 }
