@@ -1,7 +1,7 @@
 from core.models import CarbureLotEvent, Entity, UserRights
 from core.decorators import check_user_rights
-from api.v4.helpers import get_prefetched_data
-from api.v4.lots import construct_carbure_lot, bulk_insert_lots
+from core.helpers import get_prefetched_data
+from transactions.helpers import construct_carbure_lot, bulk_insert_lots
 from django.http.response import JsonResponse
 from carbure.tasks import background_bulk_scoring
 from core.serializers import CarbureLotPublicSerializer

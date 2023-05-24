@@ -8,7 +8,7 @@ from django.db import transaction
 from django.db.models import Q
 from core.models import ProductionSite, CarbureLot
 from certificates.models import DoubleCountingRegistration
-from api.v4.sanity_checks import bulk_sanity_checks
+from transactions.sanity_checks.sanity_checks import bulk_sanity_checks
 
 
 @transaction.atomic

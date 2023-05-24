@@ -2,7 +2,7 @@ import datetime
 import json
 import random
 
-from api.v4.tests_utils import setup_current_user
+from core.tests_utils import setup_current_user
 from core.models import CarbureLot, CarbureStock, Depot, Entity
 from django.db.models import Count
 from django.test import TestCase

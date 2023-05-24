@@ -2,13 +2,13 @@ from django.http.response import JsonResponse
 from audit.helpers import get_auditor_lot_comments
 
 from core.decorators import check_user_rights, is_auditor
-from api.v4.helpers import (
+from core.helpers import (
     get_known_certificates,
     get_lot_comments,
     get_lot_errors,
     get_lot_updates,
 )
-from api.v4.helpers import get_transaction_distance
+from core.helpers import get_transaction_distance
 
 from core.models import (
     CarbureLot,

@@ -6,9 +6,17 @@ from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
 from core.carburetypes import CarbureStockErrors
 from core.models import UserRights, CarbureLotEvent, Entity, GenericError
-from core.traceability import LotNode, get_traceability_nodes, diff_to_metadata, serialize_integrity_errors
-from api.v4.lots import compute_lot_quantity
-from api.v4.sanity_checks import get_prefetched_data, bulk_sanity_checks
+from core.traceability import (
+    LotNode,
+    get_traceability_nodes,
+    diff_to_metadata,
+    serialize_integrity_errors,
+)
+from transactions.helpers import compute_lot_quantity
+from transactions.sanity_checks.sanity_checks import (
+    get_prefetched_data,
+    bulk_sanity_checks,
+)
 from transactions.forms import LotForm
 
 
@@ -32,7 +40,11 @@ def update_lot(request, *args, **kwargs):
     lot_form = LotForm(request.POST)
 
     if not params_form.is_valid() or not lot_form.is_valid():
-        return ErrorResponse(400, UpdateLotError.MALFORMED_PARAMS, {**params_form.errors, **lot_form.errors})
+        return ErrorResponse(
+            400,
+            UpdateLotError.MALFORMED_PARAMS,
+            {**params_form.errors, **lot_form.errors},
+        )
 
     entity_id = params_form.cleaned_data["entity_id"]
     updated_lot = params_form.cleaned_data["lot_id"]
@@ -69,10 +81,14 @@ def update_lot(request, *args, **kwargs):
         integrity_errors = lot_node.check_integrity(ignore_diff=True)
         if len(integrity_errors) > 0:
             errors = serialize_integrity_errors(integrity_errors)
-            return ErrorResponse(400, UpdateLotError.INTEGRITY_CHECKS_FAILED, {"errors": errors})
+            return ErrorResponse(
+                400, UpdateLotError.INTEGRITY_CHECKS_FAILED, {"errors": errors}
+            )
 
     except Exception as e:
-        return ErrorResponse(400, UpdateLotError.FIELD_UPDATE_FORBIDDEN, {"message": str(e)})
+        return ErrorResponse(
+            400, UpdateLotError.FIELD_UPDATE_FORBIDDEN, {"message": str(e)}
+        )
 
     with transaction.atomic():
         lot_node.data.save()
@@ -108,7 +124,9 @@ def enforce_stock_integrity(lot_node: LotNode, update: dict):
 
     # if the volume is above the allowed limit, reset it and create an error to explain why
     if volume_change > 0 and ancestor_stock.remaining_volume < volume_change:
-        reset_quantity = compute_lot_quantity(lot_node.data, {"volume": volume_before_update})
+        reset_quantity = compute_lot_quantity(
+            lot_node.data, {"volume": volume_before_update}
+        )
         error = GenericError(
             lot=lot_node.data,
             field="quantity",
@@ -118,7 +136,9 @@ def enforce_stock_integrity(lot_node: LotNode, update: dict):
         return reset_quantity, error
 
     # otherwise, update the parent stock volume to match the new reality
-    ancestor_stock.remaining_volume = round(ancestor_stock.remaining_volume - volume_change, 2)
+    ancestor_stock.remaining_volume = round(
+        ancestor_stock.remaining_volume - volume_change, 2
+    )
     ancestor_stock.remaining_weight = ancestor_stock.get_weight()
     ancestor_stock.remaining_lhv_amount = ancestor_stock.get_lhv_amount()
     ancestor_stock.save()

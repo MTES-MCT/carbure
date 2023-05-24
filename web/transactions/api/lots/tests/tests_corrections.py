@@ -3,7 +3,8 @@ from django.db.models import Count
 from django.test import TestCase
 from django.urls import reverse
 
-from api.v4.tests_utils import get_lot, setup_current_user
+from transactions.api.lots.tests.tests_utils import get_lot
+from core.tests_utils import setup_current_user
 from core.models import CarbureLot, Entity, UserRights
 from django_otp.plugins.otp_email.models import EmailDevice
 from transactions.models import LockedYear

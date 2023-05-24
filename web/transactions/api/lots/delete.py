@@ -1,6 +1,6 @@
 from django.http.response import JsonResponse
 from core.decorators import check_user_rights
-from api.v4.helpers import (
+from core.helpers import (
     filter_lots,
     get_entity_lots_by_status,
 )

@@ -3,7 +3,7 @@ import traceback
 from django.http.response import JsonResponse
 
 from core.decorators import check_user_rights, is_auditor
-from api.v4.helpers import (
+from core.helpers import (
     get_auditor_stock,
     get_stock_with_metadata,
 )

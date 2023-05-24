@@ -1,12 +1,12 @@
 from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
 from core.decorators import check_user_rights
-from api.v4.helpers import (
+from core.helpers import (
     get_lot_comments,
     get_lot_errors,
     get_lot_updates,
 )
-from api.v4.helpers import (
+from core.helpers import (
     get_transaction_distance,
     get_known_certificates,
 )

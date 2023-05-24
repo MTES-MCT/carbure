@@ -1,11 +1,21 @@
 from django.test import TestCase
 
-from api.v4.tests_utils import setup_current_user
+from core.tests_utils import setup_current_user
 
-from core.models import Entity, Biocarburant, CarbureLot, CarbureStock, CarbureStockTransformation
+from core.models import (
+    Entity,
+    Biocarburant,
+    CarbureLot,
+    CarbureStock,
+    CarbureStockTransformation,
+)
 from saf.models import SafTicket, SafTicketSource
 
-from transactions.factories import CarbureLotFactory, CarbureStockFactory, CarbureStockTransformFactory
+from transactions.factories import (
+    CarbureLotFactory,
+    CarbureStockFactory,
+    CarbureStockTransformFactory,
+)
 from saf.factories import SafTicketSourceFactory, SafTicketFactory
 
 from core.traceability import Node, LotNode
@@ -28,7 +38,9 @@ class TraceabilityTest(TestCase):
         entities = Entity.objects.filter(entity_type=Entity.OPERATOR)
         self.entity = entities[0]
         self.entity2 = entities[1]
-        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")])
+        self.user = setup_current_user(
+            self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")]
+        )
 
         CarbureLot.objects.all().delete()
         CarbureStock.objects.all().delete()
@@ -47,8 +59,12 @@ class TraceabilityTest(TestCase):
         self.assertEqual(lot.carbure_id, "ABCD")
 
     def test_traceability_lot_to_lot(self):
-        parent_lot = CarbureLotFactory.create(lot_status="ACCEPTED", added_by=self.entity)
-        CarbureLotFactory.create(lot_status="ACCEPTED", parent_lot=parent_lot, added_by=self.entity)
+        parent_lot = CarbureLotFactory.create(
+            lot_status="ACCEPTED", added_by=self.entity
+        )
+        CarbureLotFactory.create(
+            lot_status="ACCEPTED", parent_lot=parent_lot, added_by=self.entity
+        )
 
         parent_node = LotNode(parent_lot)
         child_node = parent_node.get_first(Node.LOT)
@@ -59,7 +75,13 @@ class TraceabilityTest(TestCase):
         self.assertEqual(len(parent_node.children), 1)
         self.assertEqual(child_node.parent, parent_node)
 
-        parent_node.update({"transport_document_reference": "ABCD", "supplier_certificate": "CERT", "esca": 2.0})
+        parent_node.update(
+            {
+                "transport_document_reference": "ABCD",
+                "supplier_certificate": "CERT",
+                "esca": 2.0,
+            }
+        )
         self.assertEqual(parent_node.data.transport_document_reference, "ABCD")
         self.assertEqual(parent_node.data.supplier_certificate, "CERT")
         self.assertEqual(parent_node.data.esca, 2.0)
@@ -68,13 +90,21 @@ class TraceabilityTest(TestCase):
 
         parent_node.propagate()
         self.assertEqual(child_node.data.transport_document_reference, "ABCD")
-        self.assertEqual(child_node.data.supplier_certificate, original_child_supplier_cert)
+        self.assertEqual(
+            child_node.data.supplier_certificate, original_child_supplier_cert
+        )
         self.assertEqual(child_node.data.esca, 2.0)
 
     def test_traceability_lot_to_stock_lot(self):
-        parent_lot = CarbureLotFactory.create(lot_status="ACCEPTED", added_by=self.entity, carbure_client=self.entity)
-        parent_stock = CarbureStockFactory.create(parent_lot=parent_lot, carbure_client=self.entity)
-        CarbureLotFactory.create(lot_status="ACCEPTED", parent_stock=parent_stock, added_by=self.entity)
+        parent_lot = CarbureLotFactory.create(
+            lot_status="ACCEPTED", added_by=self.entity, carbure_client=self.entity
+        )
+        parent_stock = CarbureStockFactory.create(
+            parent_lot=parent_lot, carbure_client=self.entity
+        )
+        CarbureLotFactory.create(
+            lot_status="ACCEPTED", parent_stock=parent_stock, added_by=self.entity
+        )
 
         root_node = LotNode(parent_lot)
         stock_node = root_node.get_first(Node.STOCK)
@@ -96,28 +126,43 @@ class TraceabilityTest(TestCase):
         self.assertEqual(root_node.data.unknown_delivery_site, "UNKNOWN")
         self.assertEqual(root_node.data.esca, 2.0)
 
-        original_child_lot_transport_document_reference = lot_node.data.transport_document_reference
+        original_child_lot_transport_document_reference = (
+            lot_node.data.transport_document_reference
+        )
         original_child_lot_unknown_delivery_site = lot_node.data.unknown_delivery_site
 
         root_node.propagate()
 
         self.assertEqual(stock_node.data.biofuel_id, 12)
 
-        self.assertEqual(lot_node.data.transport_document_reference, original_child_lot_transport_document_reference)
+        self.assertEqual(
+            lot_node.data.transport_document_reference,
+            original_child_lot_transport_document_reference,
+        )
         self.assertEqual(lot_node.data.biofuel_id, 12)
-        self.assertEqual(lot_node.data.unknown_delivery_site, original_child_lot_unknown_delivery_site)
+        self.assertEqual(
+            lot_node.data.unknown_delivery_site,
+            original_child_lot_unknown_delivery_site,
+        )
         self.assertEqual(lot_node.data.esca, 2.0)
 
     def test_traceability_lot_to_stock_transform_lot(self):
         root_lot = CarbureLotFactory.create(
-            lot_status="ACCEPTED", added_by=self.entity, carbure_client=self.entity, biofuel_id=self.eth
+            lot_status="ACCEPTED",
+            added_by=self.entity,
+            carbure_client=self.entity,
+            biofuel_id=self.eth,
         )
-        source_stock = CarbureStockFactory.create(parent_lot=root_lot, carbure_client=self.entity)
+        source_stock = CarbureStockFactory.create(
+            parent_lot=root_lot, carbure_client=self.entity
+        )
         dest_stock = CarbureStockFactory.create(carbure_client=self.entity)
         parent_transformation = CarbureStockTransformFactory.create(source_stock=source_stock, dest_stock=dest_stock, entity=self.entity)  # fmt:skip
         dest_stock.parent_transformation = parent_transformation
         dest_stock.save()
-        CarbureLotFactory.create(lot_status="ACCEPTED", parent_stock=dest_stock, added_by=self.entity)
+        CarbureLotFactory.create(
+            lot_status="ACCEPTED", parent_stock=dest_stock, added_by=self.entity
+        )
 
         root_node = LotNode(root_lot)
         source_stock_node = root_node.get_first(Node.STOCK)
@@ -137,8 +182,12 @@ class TraceabilityTest(TestCase):
         self.assertEqual(root_node.data.carbure_delivery_site_id, 13)
         self.assertEqual(root_node.data.esca, 2.0)
 
-        original_child_lot_transport_document_reference = child_node.data.transport_document_reference
-        original_child_lot_carbure_delivery_site_id = child_node.data.carbure_delivery_site_id
+        original_child_lot_transport_document_reference = (
+            child_node.data.transport_document_reference
+        )
+        original_child_lot_carbure_delivery_site_id = (
+            child_node.data.carbure_delivery_site_id
+        )
 
         root_node.propagate()
 
@@ -149,13 +198,21 @@ class TraceabilityTest(TestCase):
         self.assertEqual(dest_stock_node.data.depot_id, 13)
         self.assertEqual(dest_stock_node.data.biofuel_id, self.etbe)
 
-        self.assertEqual(child_node.data.transport_document_reference, original_child_lot_transport_document_reference)
+        self.assertEqual(
+            child_node.data.transport_document_reference,
+            original_child_lot_transport_document_reference,
+        )
         self.assertEqual(child_node.data.biofuel_id, self.etbe)
-        self.assertEqual(child_node.data.carbure_delivery_site_id, original_child_lot_carbure_delivery_site_id)
+        self.assertEqual(
+            child_node.data.carbure_delivery_site_id,
+            original_child_lot_carbure_delivery_site_id,
+        )
         self.assertEqual(child_node.data.esca, 2.0)
 
     def test_traceability_lot_to_ticket_source(self):
-        parent_lot = CarbureLotFactory.create(lot_status="ACCEPTED", added_by=self.entity)
+        parent_lot = CarbureLotFactory.create(
+            lot_status="ACCEPTED", added_by=self.entity
+        )
         SafTicketSourceFactory.create(parent_lot=parent_lot, added_by=self.entity)
 
         parent_node = LotNode(parent_lot)
@@ -175,9 +232,15 @@ class TraceabilityTest(TestCase):
         self.assertEqual(ticket_source_node.data.esca, 2.0)
 
     def test_traceability_lot_to_ticket(self):
-        parent_lot = CarbureLotFactory.create(lot_status="ACCEPTED", added_by=self.entity)
-        parent_ticket_source = SafTicketSourceFactory.create(parent_lot=parent_lot, added_by=self.entity)
-        SafTicketFactory.create(parent_ticket_source=parent_ticket_source, supplier=self.entity)
+        parent_lot = CarbureLotFactory.create(
+            lot_status="ACCEPTED", added_by=self.entity
+        )
+        parent_ticket_source = SafTicketSourceFactory.create(
+            parent_lot=parent_lot, added_by=self.entity
+        )
+        SafTicketFactory.create(
+            parent_ticket_source=parent_ticket_source, supplier=self.entity
+        )
 
         parent_node = LotNode(parent_lot)
         ticket_node = parent_node.get_first(Node.TICKET)
@@ -195,8 +258,12 @@ class TraceabilityTest(TestCase):
         self.assertEqual(ticket_node.data.esca, 2.0)
 
     def test_traceability_lot_to_parent_lot(self):
-        parent_lot = CarbureLotFactory.create(lot_status="ACCEPTED", added_by=self.entity)
-        child_lot = CarbureLotFactory.create(lot_status="ACCEPTED", parent_lot=parent_lot, added_by=self.entity)
+        parent_lot = CarbureLotFactory.create(
+            lot_status="ACCEPTED", added_by=self.entity
+        )
+        child_lot = CarbureLotFactory.create(
+            lot_status="ACCEPTED", parent_lot=parent_lot, added_by=self.entity
+        )
 
         child_node = LotNode(child_lot)
         parent_node = child_node.parent
@@ -204,7 +271,13 @@ class TraceabilityTest(TestCase):
         self.assertEqual(parent_node.get_depth(), 0)
         self.assertEqual(child_node.get_depth(), 1)
 
-        child_node.update({"transport_document_reference": "ABCD", "supplier_certificate": "CERT", "esca": 2.0})
+        child_node.update(
+            {
+                "transport_document_reference": "ABCD",
+                "supplier_certificate": "CERT",
+                "esca": 2.0,
+            }
+        )
         self.assertEqual(child_node.data.transport_document_reference, "ABCD")
         self.assertEqual(child_node.data.supplier_certificate, "CERT")
         self.assertEqual(child_node.data.esca, 2.0)
@@ -214,13 +287,19 @@ class TraceabilityTest(TestCase):
         child_node.propagate()
 
         self.assertEqual(parent_node.data.transport_document_reference, "ABCD")
-        self.assertEqual(parent_node.data.supplier_certificate, original_parent_supplier_cert)
+        self.assertEqual(
+            parent_node.data.supplier_certificate, original_parent_supplier_cert
+        )
         self.assertEqual(parent_node.data.esca, 2.0)
 
     def test_traceability_stock_to_parent_lot(self):
         root_lot = CarbureLotFactory.create(lot_status="ACCEPTED", added_by=self.entity, carbure_client=self.entity, carbure_delivery_site_id=1)  # fmt:skip
-        child_stock = CarbureStockFactory.create(parent_lot=root_lot, carbure_client=self.entity, depot_id=10)
-        child_lot = CarbureLotFactory.create(lot_status="ACCEPTED", parent_stock=child_stock, added_by=self.entity)
+        child_stock = CarbureStockFactory.create(
+            parent_lot=root_lot, carbure_client=self.entity, depot_id=10
+        )
+        child_lot = CarbureLotFactory.create(
+            lot_status="ACCEPTED", parent_stock=child_stock, added_by=self.entity
+        )
 
         child_node = LotNode(child_lot)
         stock_node = child_node.parent
@@ -244,8 +323,12 @@ class TraceabilityTest(TestCase):
         self.assertEqual(stock_node.data.depot_id, original_parent_depot_id)
 
         self.assertEqual(root_node.data.biofuel_id, 12)
-        self.assertEqual(root_node.data.transport_document_reference, original_parent_dae)
-        self.assertEqual(root_node.data.carbure_delivery_site_id, original_parent_depot_id)
+        self.assertEqual(
+            root_node.data.transport_document_reference, original_parent_dae
+        )
+        self.assertEqual(
+            root_node.data.carbure_delivery_site_id, original_parent_depot_id
+        )
         self.assertEqual(root_node.data.esca, 2.0)
 
     def test_traceability_different_owners(self):

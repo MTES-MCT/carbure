@@ -11,8 +11,8 @@ from django.db import transaction
 from tqdm import tqdm
 
 from core.models import CarbureLot, GenericError
-from api.v4.sanity_checks import bulk_scoring
-from api.v4.helpers import get_prefetched_data
+from transactions.sanity_checks.sanity_checks import bulk_scoring
+from core.helpers import get_prefetched_data
 
 
 @transaction.atomic
@@ -59,8 +59,18 @@ def data_reliability_scoring(year, batch):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run sanity checks on all the lots of a given year")
-    parser.add_argument("--year", dest="year", action="store", default=None, help="Year to check")
-    parser.add_argument("--batch", dest="batch", action="store", default=1000, help="Size of the db batches")
+    parser = argparse.ArgumentParser(
+        description="Run sanity checks on all the lots of a given year"
+    )
+    parser.add_argument(
+        "--year", dest="year", action="store", default=None, help="Year to check"
+    )
+    parser.add_argument(
+        "--batch",
+        dest="batch",
+        action="store",
+        default=1000,
+        help="Size of the db batches",
+    )
     args = parser.parse_args()
     data_reliability_scoring(args.year, args.batch)

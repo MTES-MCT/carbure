@@ -3,9 +3,17 @@ from django.db import transaction
 from core.decorators import check_admin_rights
 from core.common import SuccessResponse, ErrorResponse
 from core.serializers import GenericErrorSerializer
-from core.models import CarbureLotEvent, CarbureLotComment, GenericError, CarbureNotification
-from api.v4.lots import compute_lot_quantity
-from api.v4.sanity_checks import bulk_sanity_checks, get_prefetched_data
+from core.models import (
+    CarbureLotEvent,
+    CarbureLotComment,
+    GenericError,
+    CarbureNotification,
+)
+from transactions.helpers import compute_lot_quantity
+from transactions.sanity_checks.sanity_checks import (
+    bulk_sanity_checks,
+    get_prefetched_data,
+)
 from carbure.tasks import background_bulk_scoring
 from transactions.forms import LotForm
 
@@ -38,7 +46,11 @@ def update_many(request):
     lot_form = LotForm(request.POST)
 
     if not params_form.is_valid() or not lot_form.is_valid():
-        return ErrorResponse(400, UpdateManyError.MALFORMED_PARAMS, {**params_form.errors, **lot_form.errors})
+        return ErrorResponse(
+            400,
+            UpdateManyError.MALFORMED_PARAMS,
+            {**params_form.errors, **lot_form.errors},
+        )
 
     entity_id = params_form.cleaned_data["entity_id"]
     comment = params_form.cleaned_data["comment"]
@@ -79,8 +91,13 @@ def update_many(request):
             updated_nodes += node.propagate(changed_only=True)
 
     if len(integrity_errors) > 0:
-        errors = {lot_id: serialize_integrity_errors(errors) for lot_id, errors in integrity_errors.items()}
-        return ErrorResponse(400, UpdateManyError.INTEGRITY_CHECKS_FAILED, {"errors": errors})
+        errors = {
+            lot_id: serialize_integrity_errors(errors)
+            for lot_id, errors in integrity_errors.items()
+        }
+        return ErrorResponse(
+            400, UpdateManyError.INTEGRITY_CHECKS_FAILED, {"errors": errors}
+        )
 
     # prepare lot events and comments
     updated_lots = []
@@ -121,13 +138,17 @@ def update_many(request):
         )
 
     # run sanity checks in memory so we don't modify the current errors
-    sanity_check_errors = bulk_sanity_checks(updated_lots, prefetched_data, dry_run=True)
+    sanity_check_errors = bulk_sanity_checks(
+        updated_lots, prefetched_data, dry_run=True
+    )
     blocking_errors = [error for error in sanity_check_errors if error.is_blocking]
 
     # do not modify the database if there are any blocking errors in the modified lots
     if len(blocking_errors) > 0:
         errors_by_lot = group_errors_by_lot(blocking_errors)
-        return ErrorResponse(400, UpdateManyError.SANITY_CHECKS_FAILED, {"errors": errors_by_lot})
+        return ErrorResponse(
+            400, UpdateManyError.SANITY_CHECKS_FAILED, {"errors": errors_by_lot}
+        )
 
     # prepare notifications to be sent to relevant entities
     update_notifications = []
@@ -176,7 +197,9 @@ def group_errors_by_lot(errors) -> dict[int, list[dict]]:
             errors_by_lot[error.lot_id] = []
         errors_by_lot[error.lot_id].append(error)
     for lot_id, errors in errors_by_lot.items():
-        errors_by_lot[lot_id] = GenericErrorSerializer(errors_by_lot[lot_id], many=True).data
+        errors_by_lot[lot_id] = GenericErrorSerializer(
+            errors_by_lot[lot_id], many=True
+        ).data
     return errors_by_lot
 
 
