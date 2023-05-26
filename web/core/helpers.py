@@ -868,7 +868,18 @@ def get_lots_errors(lots, entity):
 def get_lot_updates(lot, entity=None):
     if lot is None:
         return []
-    return CarbureLotEventSerializer(lot.carburelotevent_set.all(), many=True).data
+    
+    context = {"visible_users": None}
+
+    # list the only users email addresses that should be sent to the frontend
+    if entity is not None:
+        context["visible_users"] = (
+            UserRights.objects.filter(entity__in=(lot.added_by, lot.carbure_supplier, lot.carbure_client))
+            .values_list("user__email", flat=True)
+            .distinct()
+        )
+
+    return CarbureLotEventSerializer(lot.carburelotevent_set.all(), many=True, context=context).data
 
 
 def get_stock_events(lot, entity=None):

@@ -30,19 +30,13 @@ def get_lot_details(request, *args, **kwargs):
     entity_id = int(context["entity_id"])
     lot_id = request.GET.get("lot_id", False)
     if not lot_id:
-        return JsonResponse(
-            {"status": "error", "message": "Missing lot_id"}, status=400
-        )
+        return JsonResponse({"status": "error", "message": "Missing lot_id"}, status=400)
 
     lot = CarbureLot.objects.get(pk=lot_id)
-    if (
-        lot.carbure_client_id != entity_id
-        and lot.carbure_supplier_id != entity_id
-        and lot.added_by_id != entity_id
-    ):
-        return JsonResponse(
-            {"status": "forbidden", "message": "User not allowed"}, status=403
-        )
+    if lot.carbure_client_id != entity_id and lot.carbure_supplier_id != entity_id and lot.added_by_id != entity_id:
+        return JsonResponse({"status": "forbidden", "message": "User not allowed"}, status=403)
+
+    is_read_only, disabled_fields = LotNode(lot).get_disabled_fields(entity_id)
 
     data = {}
     data["lot"] = CarbureLotPublicSerializer(lot).data
@@ -56,10 +50,9 @@ def get_lot_details(request, *args, **kwargs):
     data["certificates"] = get_known_certificates(lot)
     data["updates"] = get_lot_updates(lot, entity)
     data["comments"] = get_lot_comments(lot, entity)
-    data["score"] = CarbureLotReliabilityScoreSerializer(
-        lot.carburelotreliabilityscore_set.all(), many=True
-    ).data
-    data["disabled_fields"] = LotNode(lot).get_disabled_fields(entity_id)
+    data["score"] = CarbureLotReliabilityScoreSerializer(lot.carburelotreliabilityscore_set.all(), many=True).data
+    data["is_read_only"] = is_read_only
+    data["disabled_fields"] = disabled_fields
     return JsonResponse({"status": "success", "data": data})
 
 
@@ -79,9 +72,7 @@ def get_lot_parents(lot, entity):
 def get_lot_children(lot, entity):
     children = {"children_lot": [], "children_stock": []}
 
-    can_access_lot = (
-        Q(added_by=entity) | Q(carbure_supplier=entity) | Q(carbure_client=entity)
-    )
+    can_access_lot = Q(added_by=entity) | Q(carbure_supplier=entity) | Q(carbure_client=entity)
     children_lot = (
         CarbureLot.objects.filter(parent_lot=lot)
         .exclude(lot_status=CarbureLot.DELETED)
@@ -118,9 +109,7 @@ def get_lot_children(lot, entity):
     )
 
     if children_lot.count() > 0:
-        children["children_lot"] = CarbureLotPublicSerializer(
-            children_lot, many=True
-        ).data
+        children["children_lot"] = CarbureLotPublicSerializer(children_lot, many=True).data
 
     can_access_stock = Q(carbure_client=entity)
     children_stock = (
@@ -143,8 +132,6 @@ def get_lot_children(lot, entity):
     )
 
     if children_stock.count() > 0:
-        children["children_stock"] = CarbureStockPublicSerializer(
-            children_stock, many=True
-        ).data
+        children["children_stock"] = CarbureStockPublicSerializer(children_stock, many=True).data
 
     return children
