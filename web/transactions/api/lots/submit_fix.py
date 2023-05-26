@@ -6,7 +6,7 @@ from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
 from core.models import UserRights, CarbureLot, CarbureLotEvent, GenericError
 from core.notifications import notify_correction_done
-from core.traceability import get_traceability_nodes, bulk_update_traceability_nodes
+from core.traceability import Node, get_traceability_nodes, bulk_update_traceability_nodes, diff_to_metadata
 
 
 class SubmitFixError:
@@ -53,6 +53,23 @@ def submit_fix(request, context):
         # propagate the corrections to any other connected model
         updated_nodes += node.propagate()
 
+    # prepare a list of update events so we know how lots were updated after propagation
+    updated_lots = []
+    update_events = []
+    for node in updated_nodes:
+        if node.type == Node.LOT:
+            updated_lots.append(node)
+
+            if len(node.diff) > 0:
+                update_events.append(
+                    CarbureLotEvent(
+                        event_type=CarbureLotEvent.UPDATED,
+                        lot=node.data,
+                        user=request.user,
+                        metadata=diff_to_metadata(node.diff),
+                    )
+                )
+
     with transaction.atomic():
         rejected_lots.update(lot_status=CarbureLot.PENDING, correction_status=CarbureLot.NO_PROBLEMO)
         fix_lots.update(correction_status=CarbureLot.FIXED)
@@ -61,6 +78,7 @@ def submit_fix(request, context):
         bulk_update_traceability_nodes(updated_nodes)
 
         CarbureLotEvent.objects.bulk_create(submit_fix_events)
+        CarbureLotEvent.objects.bulk_create(update_events)
         notify_correction_done(lots.exclude(carbure_client_id=entity_id))
 
     return SuccessResponse()
