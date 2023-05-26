@@ -37,7 +37,15 @@ class GenericErrorAdminSerializer(serializers.ModelSerializer):
         fields = ['error', 'is_blocking', 'field', 'value', 'extra', 'fields', 'acked_by_admin', 'acked_by_auditor']
 
 class CarbureLotEventSerializer(serializers.ModelSerializer):
-    user = serializers.SlugRelatedField(read_only=True, slug_field='email')
+    user = serializers.SerializerMethodField()
+
+    def get_user(self, obj):
+        visible_users = self.context.get("visible_users")
+        if visible_users is not None and obj.user.email not in visible_users:
+            return "******"
+        else:
+            return obj.user.email
+
     class Meta:
         model = CarbureLotEvent
         fields = ['user', 'event_type', 'event_dt', 'metadata']
