@@ -15,6 +15,7 @@ class LotNode(Node):
         "production_country": True,
         "production_site_commissioning_date": True,
         "production_site_certificate": True,
+        "production_site_certificate_type": True,
         "production_site_double_counting_certificate": True,
         "ghg_total": True,
         "ghg_reference": True,
@@ -37,6 +38,10 @@ class LotNode(Node):
         "delivery_site_country": True,
         "delivery_date": True,
         **FROM_LOT,
+    }
+
+    FROM_PROCESSING_LOT = {
+        "supplier_certificate": True,
     }
 
     FROM_PARENT_LOT = {
@@ -78,8 +83,6 @@ class LotNode(Node):
         "carbure_supplier",
         "unknown_supplier",
         "supplier",
-        "supplier_certificate",
-        "supplier_certificate_type",
         "vendor_certificate",
         "vendor_certificate_type",
         "carbure_client_id",
@@ -90,15 +93,17 @@ class LotNode(Node):
         "free_field",
     ]
 
-    TRANSPORT_FIELDS = [
+    TRADING_FIELDS = [
+        "supplier_certificate",
+        "supplier_certificate_type",
+    ]
+
+    DELIVERY_FIELDS = [
         "transport_document_reference",
         "transport_document_type",
         "volume",
         "weight",
         "lhv_amount",
-    ]
-
-    DELIVERY_FIELDS = [
         "year",
         "period",
         "delivery_date",
@@ -174,41 +179,45 @@ class LotNode(Node):
         return children_lot + children_stock + children_ticket_source
 
     def get_allowed_fields(self, entity_id) -> list:
-        allowed_fields = ["production_site_certificate_type"]
+        allowed_fields = []
 
         root_lot = self.get_root()
-        has_no_ancestor_stock = self.get_closest(Node.STOCK) is None
-        owns_ancestor_stock = self.get_closest(Node.STOCK, owner=entity_id) is not None
 
         if self.owner == entity_id:
-            allowed_fields += LotNode.TRANSACTION_FIELDS
-            if has_no_ancestor_stock or owns_ancestor_stock:
-                allowed_fields += LotNode.DELIVERY_FIELDS
+            closest_owned_lot = self.get_closest(Node.LOT, owner=entity_id)
+            owns_ancestor_lot = closest_owned_lot is not None
 
-            closest_lot = self.get_closest(Node.LOT, owner=entity_id)
-            owns_ancestor_lot = closest_lot is not None and (closest_lot.parent is None or closest_lot.parent.owner == entity_id)  # fmt:skip
+            closest_owned_stock = self.get_closest(Node.STOCK, owner=entity_id)
+            owns_ancestor_stock = closest_owned_stock is not None
+
+            allowed_fields += LotNode.TRANSACTION_FIELDS
+
+            if self.parent is None or (self.parent.type == Node.LOT and self.parent.data.delivery_type != CarbureLot.PROCESSING):  # fmt: skip
+                allowed_fields += LotNode.TRADING_FIELDS
+
             if self.parent is None or owns_ancestor_lot or owns_ancestor_stock:
-                allowed_fields += LotNode.TRANSPORT_FIELDS
+                allowed_fields += LotNode.DELIVERY_FIELDS
 
         if root_lot.owner == entity_id:
             allowed_fields += LotNode.SUSTAINABILITY_FIELDS
 
         return allowed_fields
 
-    def get_disabled_fields(self, entity_id) -> list[str]:
+    def get_disabled_fields(self, entity_id) -> tuple[bool, list[str]]:
         all_fields = (
-            LotNode.TRANSACTION_FIELDS
-            + LotNode.DELIVERY_FIELDS
-            + LotNode.TRANSPORT_FIELDS
-            + LotNode.SUSTAINABILITY_FIELDS
+            LotNode.TRANSACTION_FIELDS + LotNode.TRADING_FIELDS + LotNode.DELIVERY_FIELDS + LotNode.SUSTAINABILITY_FIELDS
         )
 
         allowed_fields = self.get_allowed_fields(entity_id)
-        return list(set(all_fields) - set(allowed_fields))
+        is_read_only = len(allowed_fields) == 0
+        return is_read_only, list(set(all_fields) - set(allowed_fields))
 
     def diff_with_parent(self):
         if self.parent.type == Node.LOT:
-            return self.get_diff(LotNode.FROM_PARENT_LOT, self.parent)
+            mapping = LotNode.FROM_PARENT_LOT
+            if self.parent.data.delivery_type == CarbureLot.PROCESSING:
+                mapping.update(LotNode.FROM_PROCESSING_LOT)
+            return self.get_diff(mapping, self.parent)
         if self.parent.type == Node.STOCK:
             # get diff with root lot sustainability data
             ancestor_lot = self.parent.get_closest(Node.LOT)
@@ -223,7 +232,10 @@ class LotNode(Node):
     def diff_with_child(self, child: Node):
         # we ignore ticket source children because they cannot be modified directly anyway
         if child.type == Node.LOT:
-            return self.get_diff(LotNode.FROM_CHILD_LOT, child)
+            mapping = LotNode.FROM_CHILD_LOT
+            if self.data.delivery_type == CarbureLot.PROCESSING:
+                mapping.update(LotNode.FROM_PROCESSING_LOT)
+            return self.get_diff(mapping, child)
         if child.type == Node.STOCK:
             # get first descendant lot for sustainability data
             descendant_lot = child.get_first(Node.LOT)

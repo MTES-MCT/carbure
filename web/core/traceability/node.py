@@ -141,12 +141,12 @@ class Node:
     # find the closest ancestor of this node matching the given class
     # an owner can be specified to limit results to nodes owned by this owner
     def get_closest(self, node_type, owner=None) -> "Node":
-        if owner is not None and self.owner != owner:
-            return None
         if self.parent is None:
             return None
+
         if self.parent.type == node_type:
-            return self.parent
+            if owner is None or self.parent.owner == owner:
+                return self.parent
 
         return self.parent.get_closest(node_type, owner)
 
