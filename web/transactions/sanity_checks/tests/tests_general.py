@@ -91,7 +91,11 @@ class GeneralSanityChecksTest(TestCase):
     def test_year_locked(self):
         error = CarbureSanityCheckErrors.YEAR_LOCKED
 
-        lot = self.create_lot(lot_status=CarbureLot.PENDING, year=2023)
+        lot = self.create_lot(
+            lot_status=CarbureLot.PENDING,
+            correction_status=CarbureLot.NO_PROBLEMO,
+            year=2023,
+        )
 
         error_list = self.run_checks(lot)
         self.assertFalse(has_error(error, error_list))

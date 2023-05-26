@@ -51,7 +51,7 @@ def update_lot(request, *args, **kwargs):
 
     entity = Entity.objects.get(pk=entity_id)
 
-    if not updated_lot or updated_lot.added_by != entity:
+    if not updated_lot:  # or updated_lot.added_by != entity:
         return ErrorResponse(400, UpdateLotError.LOT_NOT_FOUND)
 
     prefetched_data = get_prefetched_data(entity)
@@ -68,6 +68,7 @@ def update_lot(request, *args, **kwargs):
     nodes = get_traceability_nodes([updated_lot])
     lot_node = nodes[0]
 
+    # make sure updating this lot doesn't cause any volume problem if any parent stock exists
     stock_update, stock_error = enforce_stock_integrity(lot_node, update)
 
     if stock_update is not None:
@@ -81,14 +82,10 @@ def update_lot(request, *args, **kwargs):
         integrity_errors = lot_node.check_integrity(ignore_diff=True)
         if len(integrity_errors) > 0:
             errors = serialize_integrity_errors(integrity_errors)
-            return ErrorResponse(
-                400, UpdateLotError.INTEGRITY_CHECKS_FAILED, {"errors": errors}
-            )
+            return ErrorResponse(400, UpdateLotError.INTEGRITY_CHECKS_FAILED, {"errors": errors})
 
     except Exception as e:
-        return ErrorResponse(
-            400, UpdateLotError.FIELD_UPDATE_FORBIDDEN, {"message": str(e)}
-        )
+        return ErrorResponse(400, UpdateLotError.FIELD_UPDATE_FORBIDDEN, {"message": str(e)})
 
     with transaction.atomic():
         lot_node.data.save()
@@ -124,9 +121,7 @@ def enforce_stock_integrity(lot_node: LotNode, update: dict):
 
     # if the volume is above the allowed limit, reset it and create an error to explain why
     if volume_change > 0 and ancestor_stock.remaining_volume < volume_change:
-        reset_quantity = compute_lot_quantity(
-            lot_node.data, {"volume": volume_before_update}
-        )
+        reset_quantity = compute_lot_quantity(lot_node.data, {"volume": volume_before_update})
         error = GenericError(
             lot=lot_node.data,
             field="quantity",
@@ -136,9 +131,7 @@ def enforce_stock_integrity(lot_node: LotNode, update: dict):
         return reset_quantity, error
 
     # otherwise, update the parent stock volume to match the new reality
-    ancestor_stock.remaining_volume = round(
-        ancestor_stock.remaining_volume - volume_change, 2
-    )
+    ancestor_stock.remaining_volume = round(ancestor_stock.remaining_volume - volume_change, 2)
     ancestor_stock.remaining_weight = ancestor_stock.get_weight()
     ancestor_stock.remaining_lhv_amount = ancestor_stock.get_lhv_amount()
     ancestor_stock.save()
