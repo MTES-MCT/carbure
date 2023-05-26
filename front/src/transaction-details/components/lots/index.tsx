@@ -19,7 +19,7 @@ import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import LotTag from "transactions/components/lots/lot-tag"
-import { CorrectionStatus, Lot, LotStatus } from "transactions/types"
+import { CorrectionStatus, LotStatus } from "transactions/types"
 import { isExpiring } from "transactions/utils/deadline"
 import * as api from "../../api"
 import Score from "../score"
@@ -33,6 +33,7 @@ import Comments from "./comments"
 import { getLotChanges, LotHistory } from "./history"
 import LotTraceability, { hasTraceability } from "./lot-traceability"
 import NavigationButtons from "./navigation"
+import { LotDetails as LotData } from "transaction-details/types"
 
 export interface LotDetailsProps {
   neighbors?: number[]
@@ -76,7 +77,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
 
   const form = useLotForm(lotData?.lot, errors, certificates)
 
-  const editable = isEditable(lotData?.lot, entity)
+  const editable = isEditable(lotData, entity)
   const hasEditRights = entity.hasRights(UserRole.Admin, UserRole.ReadWrite)
   const expiring = isExpiring(lotData?.lot)
 
@@ -90,16 +91,12 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   }
 
   useEffect(() => {
-    disabledFields()
+    if (lotData) {
+      form.setDisabledFields(lotData.disabled_fields)
+    } else {
+      form.setDisabledFields([])
+    }
   }, [lotData])
-
-  const disabledFields = () => {
-    form.clearDisabledFields()
-
-    if (!lotData) return
-
-    form.setDisabledFields(lotData.disabled_fields)
-  }
 
   return (
     <Portal onClose={closeDialog}>
@@ -207,14 +204,16 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   )
 }
 
-function isEditable(lot: Lot | undefined, entity: Entity) {
-  if (lot === undefined) return false
+function isEditable(lotData: LotData | undefined, entity: Entity) {
+  if (lotData === undefined) return false
+  if (lotData.is_read_only) return false
+  if (lotData.lot.added_by.id !== entity.id) return false // entity not owner
 
-  const isCreator = lot.added_by?.id === entity.id
-  return (
-    [LotStatus.Draft, LotStatus.Rejected].includes(lot.lot_status) ||
-    (isCreator && lot.correction_status === CorrectionStatus.InCorrection)
-  )
+  const isDraft = lotData.lot.lot_status === LotStatus.Draft
+  const isRejected = lotData.lot.lot_status === LotStatus.Rejected
+  const isCorrection = lotData.lot.correction_status === CorrectionStatus.InCorrection // prettier-ignore
+
+  return isDraft || isRejected || isCorrection
 }
 
 export default LotDetails

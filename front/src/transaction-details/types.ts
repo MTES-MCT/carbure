@@ -15,6 +15,7 @@ export interface LotDetails {
   errors: LotError[]
   certificates: LotCertificates
   score: LotScore[]
+  is_read_only: boolean
   disabled_fields: string[]
 }
 

@@ -81,7 +81,9 @@ export const SupplierField = (props: AutocompleteProps<Entity | string>) => {
       normalize={norm.normalizeEntityOrUnknown}
       {...bound}
       {...props}
-      disabled={props.disabled || isLotProducer(entity, value)}
+      disabled={
+        props.disabled || bound.disabled || isLotProducer(entity, value)
+      }
     />
   )
 }
@@ -158,7 +160,9 @@ export const ClientField = (props: AutocompleteProps<Entity | string>) => {
       normalize={norm.normalizeEntityOrUnknown}
       {...bound}
       {...props}
-      disabled={entity.isOperator && !hasClients}
+      disabled={
+        (entity.isOperator && !hasClients) || props.disabled || bound.disabled
+      }
     />
   )
 }
@@ -190,16 +194,18 @@ export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
       DeliveryType.Trading,
     ].includes(value.delivery_type)
 
+  const bound = bind("delivery_type")
+
   return (
     <Select
       clear
-      {...bind("delivery_type")}
+      {...bound}
       label={t("Type de livraison")}
       placeholder={t("Choisissez un type")}
       normalize={norm.normalizeDeliveryType}
       options={deliveryTypes}
       {...props}
-      disabled={!isDraft && hasChildren}
+      disabled={(!isDraft && hasChildren) || props.disabled || bound.disabled}
     />
   )
 }

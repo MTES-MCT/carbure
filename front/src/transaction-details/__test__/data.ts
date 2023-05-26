@@ -86,6 +86,7 @@ export const lotDetails: LotDetails = {
     vendor_certificate: null,
   },
   score: [],
+  is_read_only: false,
   disabled_fields: [],
 }
 

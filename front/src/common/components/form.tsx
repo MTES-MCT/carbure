@@ -75,6 +75,7 @@ export interface FormManager<T> {
   errors: FormErrors<T>
   bind: Bind<T>
   setField: FieldSetter<T>
+  disabledFields: FormDisabledFields<T>
   setFieldError: (name: keyof T, error: string | undefined) => void
   setDisabledFields: (fieldsNames: string[]) => void
   clearDisabledFields: () => void
@@ -126,16 +127,13 @@ export function useForm<T>(
     _setDisabledFields(EMPTY_DISABLED_FIELDS)
   }, [])
 
-  const setDisabledFields = useCallback(
-    (fieldsNames: string[]) => {
-      const fields = { ...disabledFields }
-      fieldsNames.forEach((name) => {
-        fields[name] = true
-      })
-      _setDisabledFields(fields)
-    },
-    [disabledFields]
-  )
+  const setDisabledFields = useCallback((fieldsNames: string[]) => {
+    const fields: FormDisabledFields<T> = {}
+    fieldsNames.forEach((name) => {
+      fields[name as keyof T] = true
+    })
+    _setDisabledFields(fields)
+  }, [])
 
   const bind = useBindCallback(value, errors, disabledFields, setField)
 
@@ -143,6 +141,7 @@ export function useForm<T>(
     value,
     errors,
     setFieldError,
+    disabledFields,
     setDisabledFields,
     clearDisabledFields,
     bind,
