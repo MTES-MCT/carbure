@@ -168,10 +168,10 @@ def check_compatibility_feedstock_biofuel(feedstock: MatierePremiere, biofuel: B
         errors.append("Matière première (%s) incompatible avec Esthers Méthyliques" % (feedstock.name))
 
     if biofuel.is_graisse:
-        if biofuel.code == "EMHU" and feedstock.code != "HUILE_ALIMENTAIRE_USAGEE":
+        if (biofuel.code == "EMHU" or biofuel.code == "EEHU") and feedstock.code != "HUILE_ALIMENTAIRE_USAGEE":
             errors.append("%s doit être à base d'huiles alimentaires usagées" % (biofuel.name))
 
-        if biofuel.code == "EMHV" and feedstock.code not in [
+        if (biofuel.code == "EMHV" or biofuel.code == "EEHV") and feedstock.code not in [
             "COLZA",
             "TOURNESOL",
             "SOJA",
@@ -181,7 +181,7 @@ def check_compatibility_feedstock_biofuel(feedstock: MatierePremiere, biofuel: B
                 "%s doit être à base de végétaux (Colza, Tournesol, Soja, Huile de Palme)" % (biofuel.name),
             )
 
-        if biofuel.code == "EMHA" and feedstock.code not in [
+        if (biofuel.code == "EMHA" or biofuel.code == "EEHA") and feedstock.code not in [
             "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2",
             "HUILES_OU_GRAISSES_ANIMALES_CAT3",
         ]:
@@ -192,6 +192,7 @@ def check_compatibility_feedstock_biofuel(feedstock: MatierePremiere, biofuel: B
         "HUILES_OU_GRAISSES_ANIMALES_CAT3",
     ] and biofuel.code not in [
         "EMHA",
+        "EEHA",
         "HOE",
         "HOG",
         "HOC",
@@ -200,10 +201,11 @@ def check_compatibility_feedstock_biofuel(feedstock: MatierePremiere, biofuel: B
         "HCE",
         "B100",
     ]:
-        errors.append("Des huiles ou graisses animales ne peuvent donner que des EMHA ou HOG/HOE/HOC")
+        errors.append("Des huiles ou graisses animales ne peuvent donner que des EMHA/EEHA ou HOG/HOE/HOC")
 
     if feedstock.code == "HUILE_ALIMENTAIRE_USAGEE" and biofuel.code not in [
         "EMHU",
+        "EEHU",
         "HOE",
         "HOG",
         "HOC",
@@ -211,7 +213,7 @@ def check_compatibility_feedstock_biofuel(feedstock: MatierePremiere, biofuel: B
         "HCG",
         "HCE",
     ]:
-        errors.append("Des huiles alimentaires usagées ne peuvent donner que des EMHU ou HOG/HOE/HOC")
+        errors.append("Des huiles alimentaires usagées ne peuvent donner que des EMHU/EEHU ou HOG/HOE/HOC")
 
     if feedstock.code in [
         "MAIS",
@@ -224,7 +226,7 @@ def check_compatibility_feedstock_biofuel(feedstock: MatierePremiere, biofuel: B
     ] and biofuel.code not in ["ETH", "ETBE", "ED95"]:
         errors.append("Maïs, Blé, Betterave, Canne à Sucre ou Résidus Viniques ne peuvent créer que de l'Éthanol ou ETBE")
 
-    if not feedstock.is_huile_vegetale and biofuel.code in ["HVOE", "HVOG", "HVOC"]:
+    if not feedstock.is_huile_vegetale and biofuel.code in ["HVOE", "HVOG", "HVOC", "HCC", "HCG", "HCE"]:
         errors.append(
             "Un HVO doit provenir d'huiles végétales uniquement. Pour les autres huiles hydrotraitées, voir la nomenclature"
             " HOE/HOG/HOC"

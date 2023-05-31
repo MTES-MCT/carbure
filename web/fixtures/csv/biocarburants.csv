@@ -1,7 +1,7 @@
 code,description_fr,PCI_kg,PCI_Litre,Masse_volumique,is_alcool,is_graisse,is_displayed,compatible_essence,compatible_diesel
 BG,Biogaz,50,0,0,0,0,0,0,0
 BGS,Biogazole de synthèse (Hors HVO),44,34,0.773,0,0,0,0,1
-BT,Butanol,33,27,0.818,0,0,0,0,0
+BT,Butanol,33,27,0.818,1,0,0,1,0
 EEHA,EEHA,38,34,0.895,0,1,0,0,1
 EEHU,EEHU,38,34,0.895,0,1,0,0,1
 EEHV,EEHV,38,34,0.895,0,1,0,0,1
@@ -17,6 +17,9 @@ HOC,Autres Huiles Hydrotraitées - Kérosène,44,34,0.8,0,1,1,0,0
 HVOG,Huiles Végétales Hydrotraitées - Gazole,44,34,0.845,0,1,1,0,1
 HVOE,Huiles Végétales Hydrotraitées - Essence,45,30,0.755,0,1,1,1,0
 HVOC,Huiles Végétales Hydrotraitées - Kérosène,44,34,0.8,0,1,1,0,0
+HCG,Huiles co-traitées - Gazole,44,34,0.845,0,1,1,0,1
+HCE,Huiles co-traitées - Essence,45,30,0.755,0,1,1,1,0
+HCC,Huiles co-traitées - Kérosène,44,34,0.8,0,1,1,0,0
 MTBE,MTBE,35,26,0.743,1,0,1,1,0
 MT,Méthanol,20,16,0.8,1,0,0,1,0
 TAEE,TAEE,38,29,0.763,0,0,1,0,0
