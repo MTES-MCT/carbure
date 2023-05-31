@@ -261,10 +261,11 @@ dc_feedstock_to_carbure_feedstock: dict[str, str | None] = {
     "Seigle": "SEIGLE",
     "Soja": "SOJA",
     "Tallol": "TALLOL",
-    "Tournesol ": "TOURNESOL",
+    "Tournesol": "TOURNESOL",
     "Triticale": "TRITICALE",
     "Distillat d'acide gras de palme": None,
 }
+
 
 dc_biofuel_to_carbure_biofuel: dict[str, str | None] = {
     "Bio Iso-Butène": None,
@@ -287,6 +288,9 @@ dc_biofuel_to_carbure_biofuel: dict[str, str | None] = {
     "HVO-C": "HVOC",
     "HVO-E": "HVOE",
     "HVO-G": "HVOG",
+    "HC-C": "HCC",
+    "HC-E": "HCE",
+    "HC-G": "HCG",
     "Méthanol": "MT",
     "MTBE": "MTBE",
     "TAEE": "TAEE",

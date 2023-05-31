@@ -49,12 +49,21 @@ def get_biofuel_feedstock_incompatibilities(biofuel: Biocarburant, feedstock: Ma
     if biofuel.code == "EMHU" and feedstock.code != "HUILE_ALIMENTAIRE_USAGEE":
         yield f"{biofuel} doit être à base d'huiles alimentaires usagées"
 
+    if biofuel.code == "EEHU" and feedstock.code != "HUILE_ALIMENTAIRE_USAGEE":
+        yield f"{biofuel} doit être à base d'huiles alimentaires usagées"
+
     emhv_feedstocks = ("COLZA", "TOURNESOL", "SOJA", "HUILE_PALME", "CARINATA")
     if biofuel.code == "EMHV" and feedstock.code not in emhv_feedstocks:
         yield f"{biofuel} doit être à base de végétaux (Colza, Tournesol, Soja, Huile de Palme)"
 
+    if biofuel.code == "EEHV" and feedstock.code not in emhv_feedstocks:
+        yield f"{biofuel} doit être à base de végétaux (Colza, Tournesol, Soja, Huile de Palme)"
+
     emha_feedstocks = ("HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2", "HUILES_OU_GRAISSES_ANIMALES_CAT3")
     if biofuel.code == "EMHA" and feedstock.code not in emha_feedstocks:
+        yield f"{biofuel} doit être à base d'huiles ou graisses animales"
+
+    if biofuel.code == "EEHA" and feedstock.code not in emha_feedstocks:
         yield f"{biofuel} doit être à base d'huiles ou graisses animales"
 
     fats = ("HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2", "HUILES_OU_GRAISSES_ANIMALES_CAT3")
@@ -70,6 +79,20 @@ def get_biofuel_feedstock_incompatibilities(biofuel: Biocarburant, feedstock: Ma
     hvos = ("HVOE", "HVOG", "HVOC")
     if biofuel.code in hvos and not feedstock.is_huile_vegetale:
         yield "Un HVO doit provenir d'huiles végétales uniquement. Pour les autres huiles hydrotraitées, voir la nomenclature HOE/HOG/HOC"
+
+    hcs = ("HCE", "HCG", "HCC")
+    hc_feedstocks = (
+        "COLZA",
+        "TOURNESOL",
+        "SOJA",
+        "HUILE_PALME",
+        "CARINATA",
+        "HUILE_ALIMENTAIRE_USAGEE",
+        "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2",
+        "HUILES_OU_GRAISSES_ANIMALES_CAT3",
+    )
+    if biofuel.code in hcs and biofuel.code not in hc_feedstocks:
+        yield "Une huile Co-traitées doit provenir d'huiles végétales, d'huiles usagées ou de graisses animales uniquement."
 
 
 def get_feedstock_origin_incompatibilities(feedstock: MatierePremiere, country: Pays):
