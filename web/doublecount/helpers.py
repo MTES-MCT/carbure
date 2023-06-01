@@ -19,7 +19,7 @@ def load_dc_sourcing_data(dca: DoubleCountingAgreement, sourcing_rows: List[Sour
 
     # preload data
     feedstocks = MatierePremiere.objects.all()
-    countries = {f.code_pays: f for f in Pays.objects.all()}
+    countries = Pays.objects.all()
 
     for row in sourcing_rows:
         # skip rows that start empty
@@ -30,11 +30,26 @@ def load_dc_sourcing_data(dca: DoubleCountingAgreement, sourcing_rows: List[Sour
             sourcing_errors.append(error(DoubleCountingError.UNKNOWN_YEAR, line=row["line"]))
             continue
 
-        feedstock = feedstocks.get(code=row["feedstock"]) if row["feedstock"] else None
+        try:
+            feedstock = feedstocks.get(code=row["feedstock"].strip()) if row["feedstock"] else None
+        except:
+            feedstock = None
 
-        origin_country = countries.get(row["origin_country"], None) if row["origin_country"] else None
-        supply_country = countries.get(row["supply_country"], None) if row["supply_country"] else None
-        transit_country = countries.get(row["transit_country"], None) if row["transit_country"] else None
+        try:
+            origin_country = countries.get(code_pays=row["origin_country"].strip()) if row["origin_country"] else None
+        except:
+            origin_country = None
+
+        try:
+            supply_country = countries.get(code_pays=row["supply_country"].strip()) if row["supply_country"] else None
+        except:
+            supply_country = None
+
+        try:
+            transit_country = countries.get(code_pays=row["transit_country"].strip()) if row["transit_country"] else None
+        except:
+            transit_country = None
+
         sourcing = DoubleCountingSourcing(dca=dca)
         sourcing.year = row["year"]
         if feedstock:

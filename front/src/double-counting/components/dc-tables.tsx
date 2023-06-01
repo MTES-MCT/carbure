@@ -39,23 +39,26 @@ export const SourcingTable = ({ sourcing }: SourcingTableProps) => {
     {
       header: t("Origine"),
       cell: (s) => (
+        s.origin_country?.code_pays ? ( 
         <Cell text={t(s.origin_country.code_pays, { ns: "countries" })} />
+        )
+        : null
       ),
     },
-    {
-      header: t("Approvisionnement"),
-      cell: (s) =>
-        s.supply_country && (
-          <Cell text={t(s.supply_country.code_pays, { ns: "countries" })} />
-        ),
-    },
-    {
-      header: t("Transit"),
-      cell: (s) =>
-        s.transit_country && (
-          <Cell text={t(s.transit_country.code_pays, { ns: "countries" })} />
-        ),
-    },
+    // {
+    //   header: t("Approvisionnement"),
+    //   cell: (s) =>
+    //     s.supply_country && (
+    //       <Cell text={t(s.supply_country.code_pays, { ns: "countries" })} />
+    //     ),
+    // },
+    // {
+    //   header: t("Transit"),
+    //   cell: (s) =>
+    //     s.transit_country && (
+    //       <Cell text={t(s.transit_country.code_pays, { ns: "countries" })} />
+    //     ),
+    // },
   ]
 
   return <YearTable columns={columns} rows={sourcing} />
@@ -90,10 +93,10 @@ export const SourcingAggregationTable = ({
 
 type ProductionTableProps = {
   done?: boolean
-  entity: Entity
-  quotas: Record<string, number>
+  entity?: Entity
+  quotas?: Record<string, number>
   production: DoubleCountingProduction[]
-  setQuotas: (quotas: Record<string, number>) => void
+  setQuotas?: (quotas: Record<string, number>) => void
 }
 
 export const ProductionTable = ({
@@ -126,6 +129,9 @@ export const ProductionTable = ({
       header: t("Quota demandé"),
       cell: (p) => <Cell text={formatNumber(p.requested_quota)} />,
     },
+  
+  ]
+  quotas && setQuotas && productionColumns?.push(
     {
       header: t("Quota approuvé"),
       cell: (p) => {
@@ -144,12 +150,10 @@ export const ProductionTable = ({
             }
           />
         )
-      },
-    },
-  ]
-
-  return <YearTable columns={productionColumns} rows={production} />
-}
+          }
+      })
+    return <YearTable columns={productionColumns} rows={production} />
+  }
 
 type StatusTableProps = {
   agreement: DoubleCountingDetails | undefined
