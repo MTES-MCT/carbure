@@ -144,6 +144,8 @@ export interface DoubleCountingFileInfo {
   file_name: string
   production_site: string
   error_count: number
+  production: DoubleCountingProduction[]
+  sourcing: DoubleCountingSourcing[]
 }
 
 export interface CheckDoubleCountingFilesResponse {

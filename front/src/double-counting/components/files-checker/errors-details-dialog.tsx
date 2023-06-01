@@ -9,6 +9,7 @@ import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { getErrorText } from "settings/utils/double-counting"
 import { DoubleCountingFileInfo, DoubleCountingUploadError } from "../../types"
+import { ProductionTable, SourcingTable } from "../dc-tables"
 
 export type ErrorsDetailsDialogProps = {
   file: DoubleCountingFileInfo
@@ -89,7 +90,25 @@ export const ErrorsDetailsDialog = ({
           )}
 
           {focusedErrors.length > 0 && <ErrorsTable errors={focusedErrors} />}
+
         </section>
+
+        {focus === "sourcing_forecast" &&
+          <section>
+            <SourcingTable
+              sourcing={file.sourcing ?? []}
+            />
+          </section>
+        }
+
+
+        {focus === "production" &&
+          <section>
+            <ProductionTable
+              production={file.production ?? []}
+            />
+          </section>
+        }
       </main>
 
       <footer>
@@ -117,8 +136,8 @@ export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
         <p>
           {error.line_number! >= 0
             ? t("Ligne {{lineNumber}}", {
-                lineNumber: error.line_merged || error.line_number,
-              })
+              lineNumber: error.line_merged || error.line_number,
+            })
             : "-"}
         </p>
       ),
@@ -132,26 +151,26 @@ export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
   return <Table columns={columns} rows={errorFiltered} />
 }
 
-const mergeErrors = (errors: DoubleCountingUploadError[]) => {
-  const errorsMergedByError: DoubleCountingUploadError[] = []
-  errors
-    .sort((a, b) => a.error.localeCompare(b.error))
-    .forEach((error, index) => {
-      if (index === 0) {
-        error.line_merged = error.line_number?.toString() || ""
-        errorsMergedByError.push(error)
-        return
-      }
-      const prevError = errorsMergedByError[errorsMergedByError.length - 1]
+// const mergeErrors = (errors: DoubleCountingUploadError[]) => {
+//   const errorsMergedByError: DoubleCountingUploadError[] = []
+//   errors
+//     .sort((a, b) => a.error.localeCompare(b.error))
+//     .forEach((error, index) => {
+//       if (index === 0) {
+//         error.line_merged = error.line_number?.toString() || ""
+//         errorsMergedByError.push(error)
+//         return
+//       }
+//       const prevError = errorsMergedByError[errorsMergedByError.length - 1]
 
-      if (error.error === prevError.error) {
-        prevError.line_merged = prevError.line_merged + ", " + error.line_number
-        return
-      }
-      error.line_merged = error.line_number?.toString() || ""
-      errorsMergedByError.push(error)
-    })
-  return errorsMergedByError
-}
+//       if (error.error === prevError.error) {
+//         prevError.line_merged = prevError.line_merged + ", " + error.line_number
+//         return
+//       }
+//       error.line_merged = error.line_number?.toString() || ""
+//       errorsMergedByError.push(error)
+//     })
+//   return errorsMergedByError
+// }
 
 export default ErrorsDetailsDialog
