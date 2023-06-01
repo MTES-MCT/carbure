@@ -18,7 +18,7 @@ def load_dc_sourcing_data(dca: DoubleCountingAgreement, sourcing_rows: List[Sour
     sourcing_errors = []
 
     # preload data
-    feedstocks = {f.code: f for f in MatierePremiere.objects.all()}
+    feedstocks = MatierePremiere.objects.all()
     countries = {f.code_pays: f for f in Pays.objects.all()}
 
     for row in sourcing_rows:
@@ -30,7 +30,7 @@ def load_dc_sourcing_data(dca: DoubleCountingAgreement, sourcing_rows: List[Sour
             sourcing_errors.append(error(DoubleCountingError.UNKNOWN_YEAR, line=row["line"]))
             continue
 
-        feedstock = feedstocks.get(row["feedstock"], None) if row["feedstock"] else None
+        feedstock = feedstocks.get(code=row["feedstock"]) if row["feedstock"] else None
 
         origin_country = countries.get(row["origin_country"], None) if row["origin_country"] else None
         supply_country = countries.get(row["supply_country"], None) if row["supply_country"] else None

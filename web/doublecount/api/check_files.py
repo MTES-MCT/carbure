@@ -10,6 +10,7 @@ from core.decorators import check_admin_rights
 from doublecount.dc_sanity_checks import check_dc_globally, error, DoubleCountingError
 from doublecount.dc_parser import parse_dc_excel
 from doublecount.helpers import load_dc_sourcing_data, load_dc_production_data
+from doublecount.serializers import DoubleCountingProductionSerializer, DoubleCountingSourcingSerializer
 
 
 class CheckFilesError:
@@ -28,7 +29,7 @@ def check_files(request, *args, **kwargs):
     try:
         file_errors = []
         for file in files:
-            info, errors = check_dc_file(file)
+            info, errors, sourcing_data, production_data = check_dc_file(file)
             error_count = (
                 # len(errors["sourcing_history"])
                 +len(errors["sourcing_forecast"])
@@ -43,6 +44,8 @@ def check_files(request, *args, **kwargs):
                     "error_count": error_count,
                     "year": info["year"] or 0,
                     "production_site": info["production_site"],
+                    "production": production_data,
+                    "sourcing": sourcing_data,
                 }
             )
 
@@ -88,15 +91,21 @@ def check_dc_file(file):
         production_data, production_errors = load_dc_production_data(dca, production_forecast)
 
         sourcing_data = sourcing_forecast_data
+
         # sourcing_data = sourcing_history_data + sourcing_forecast_data
         global_errors = check_dc_globally(sourcing_data, production_data)
 
-        return info, {
-            # "sourcing_history": sourcing_history_errors,
-            "sourcing_forecast": sourcing_forecast_errors,
-            "production": production_errors,
-            "global": global_errors,
-        }
+        return (
+            info,
+            {
+                # "sourcing_history": sourcing_history_errors,
+                "sourcing_forecast": sourcing_forecast_errors,
+                "production": production_errors,
+                "global": global_errors,
+            },
+            DoubleCountingSourcingSerializer(sourcing_data, many=True).data,
+            DoubleCountingProductionSerializer(production_data, many=True).data,
+        )
 
     except CarbureException as e:
         if e.error == DoubleCountingError.BAD_WORKSHEET_NAME:
@@ -121,9 +130,14 @@ def check_dc_file(file):
             excel_error = error(DoubleCountingError.EXCEL_PARSING_ERROR, is_blocking=True, meta=str(e))
 
     info = {"production_site": None, "year": 0}
-    return info, {
-        "sourcing_forecast": [],
-        # "sourcing_history": [],
-        "production": [],
-        "global": [excel_error],
-    }
+    return (
+        info,
+        {
+            "sourcing_forecast": [],
+            # "sourcing_history": [],
+            "production": [],
+            "global": [excel_error],
+        },
+        None,
+        None,
+    )
