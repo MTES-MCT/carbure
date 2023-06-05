@@ -21,6 +21,7 @@ class Entity(models.Model):
     EXTERNAL_ADMIN = "Administration Externe"
     AIRLINE = "Compagnie aérienne"
     UNKNOWN = "Unknown"
+    CPO = "Charge Point Operator"
     ENTITY_TYPES = (
         (PRODUCER, "Producteur"),
         (OPERATOR, "Opérateur"),
@@ -30,6 +31,7 @@ class Entity(models.Model):
         (EXTERNAL_ADMIN, EXTERNAL_ADMIN),
         (AIRLINE, AIRLINE),
         (UNKNOWN, "Unknown"),
+        (CPO, CPO)
     )
 
     name = models.CharField(max_length=64, unique=True)
@@ -41,6 +43,7 @@ class Entity(models.Model):
     has_trading = models.BooleanField(default=False)
     has_stocks = models.BooleanField(default=False)
     has_direct_deliveries = models.BooleanField(default=False)
+    has_elec = models.BooleanField(default=False)
 
     legal_name = models.CharField(max_length=128, blank=True, default="")
     registration_id = models.CharField(max_length=64, blank=True, default="")
