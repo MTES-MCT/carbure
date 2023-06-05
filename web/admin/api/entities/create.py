@@ -18,6 +18,7 @@ def create_entity(request, *args, **kwargs):
         name = request.POST.get("name")
         entity_type = request.POST.get("entity_type")
         has_saf = request.POST.get("has_saf") == "true"
+        has_elec = request.POST.get("has_elec") == "true"
     except:
         traceback.print_exc()
         return ErrorResponse(400, CreateEntityError.MALFORMED_PARAMS)
@@ -27,7 +28,7 @@ def create_entity(request, *args, **kwargs):
         return ErrorResponse(400, CreateEntityError.ENTITY_EXISTS)
 
     try:
-        Entity.objects.create(name=name, entity_type=entity_type, has_saf=has_saf)
+        Entity.objects.create(name=name, entity_type=entity_type, has_saf=has_saf, has_elec=has_elec)
 
         return SuccessResponse()
     except Exception:
