@@ -43,6 +43,7 @@ class Entity(models.Model):
     has_trading = models.BooleanField(default=False)
     has_stocks = models.BooleanField(default=False)
     has_direct_deliveries = models.BooleanField(default=False)
+    has_elec = models.BooleanField(default=False)
 
     legal_name = models.CharField(max_length=128, blank=True, default="")
     registration_id = models.CharField(max_length=64, blank=True, default="")
