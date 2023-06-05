@@ -1,15 +1,17 @@
 import { Alert } from "common/components/alert"
 import { Button } from "common/components/button"
 import { Dialog } from "common/components/dialog"
-import { AlertCircle, Return } from "common/components/icons"
-import Table, { Cell, Column } from "common/components/table"
+import { AlertCircle, Plus, Return } from "common/components/icons"
 import Tabs from "common/components/tabs"
 import Tag from "common/components/tag"
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { getErrorText } from "settings/utils/double-counting"
-import { DoubleCountingFileInfo, DoubleCountingUploadError } from "../../types"
-import { ProductionTable, SourcingTable } from "../dc-tables"
+import { DoubleCountingFileInfo, DoubleCountingSourcing, DoubleCountingSourcingAggregation, DoubleCountingUploadError } from "../../types"
+import { ProductionTable, SourcingAggregationTable, SourcingTable } from "../dc-tables"
+import Collapse from "common/components/collapse"
+import Checkbox from "common/components/checkbox"
+import { t } from "i18next"
 
 export type ErrorsDetailsDialogProps = {
   file: DoubleCountingFileInfo
@@ -42,11 +44,28 @@ export const ErrorsDetailsDialog = ({
           <p>
             <Trans
               values={{
-                fileName: file.file_name,
                 productionSite: file.production_site,
               }}
-              defaults="Voici la liste des erreurs identifiées dans le fichier <b>{{fileName}}</b> pour le site de production <b>{{productionSite}}</>."
+              defaults={`Pour le site de production <b>{{productionSite}}</b> par `}
+            /><a href={`mailto:${file.producer_email}`}>{file.producer_email}</a>.
+          </p>
+          <p>
+            <Trans
+              values={{
+                fileName: file.file_name,
+              }}
+              defaults="Fichier excel téléchargé : <b>{{fileName}}</b>"
             />
+          </p>
+          <p>
+            <Trans
+              values={{
+                period: `${file.year} - ${file.year + 1}`,
+              }}
+              defaults="Période demandée : <b>{{period}}</b>"
+            />
+
+
           </p>
         </section>
 
@@ -95,7 +114,7 @@ export const ErrorsDetailsDialog = ({
 
         {focus === "sourcing_forecast" &&
           <section>
-            <SourcingTable
+            <SourcingFullTable
               sourcing={file.sourcing ?? []}
             />
           </section>
@@ -112,12 +131,64 @@ export const ErrorsDetailsDialog = ({
       </main>
 
       <footer>
-        <Button icon={Return} action={onClose}>
-          <Trans>Retour</Trans>
-        </Button>
+        <Button
+          icon={Plus}
+          label={t("Ajouter le dossier")}
+          variant="primary"
+          disabled={true}
+        />
+
+        <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
       </footer>
+
     </Dialog>
   )
+}
+
+const SourcingFullTable = ({ sourcing }: { sourcing: DoubleCountingSourcing[] }) => {
+
+  const [aggregateSourcing, setAggregateSourcing] = useState(true);
+
+  const aggregateDoubleCountingSourcing = (data: DoubleCountingSourcing[]): DoubleCountingSourcingAggregation[] => {
+    const aggregationMap = new Map<string, DoubleCountingSourcingAggregation>();
+    for (const item of data) {
+      const key = `${item.feedstock.code}_${item.year}`;
+      const aggregation = aggregationMap.get(key);
+
+      if (aggregation) {
+        aggregation.sum += item.metric_tonnes;
+        aggregation.count += 1;
+      } else {
+        aggregationMap.set(key, {
+          year: item.year,
+          sum: item.metric_tonnes,
+          count: 1,
+          feedstock: item.feedstock
+        });
+      }
+    }
+
+    return Array.from(aggregationMap.values());
+  }
+
+  const aggregated_sourcing: DoubleCountingSourcingAggregation[] = aggregateDoubleCountingSourcing(sourcing);
+
+  return <>
+
+    <Checkbox readOnly value={aggregateSourcing} onChange={() => setAggregateSourcing(!aggregateSourcing)}>
+      {t("Agréger les données d’approvisionnement par matière première ")}
+    </Checkbox>
+    {!aggregateSourcing &&
+      <SourcingTable
+        sourcing={sourcing ?? []}
+      />
+    }
+    {aggregateSourcing &&
+      <SourcingAggregationTable
+        sourcing={aggregated_sourcing ?? []}
+      />
+    }
+  </>
 }
 
 type ErrorsTableProps = {
@@ -128,27 +199,50 @@ export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
   const { t } = useTranslation()
   const errorFiltered = errors //mergeErrors(errors)
 
-  const columns: Column<DoubleCountingUploadError>[] = [
-    {
-      header: t("Ligne"),
-      style: { width: 120, flex: "none" },
-      cell: (error) => (
-        <p>
-          {error.line_number! >= 0
-            ? t("Ligne {{lineNumber}}", {
-              lineNumber: error.line_merged || error.line_number,
-            })
-            : "-"}
-        </p>
-      ),
-    },
-    {
-      header: t("Erreur"),
-      cell: (error) => <p>{getErrorText(error)}</p>,
-    },
-  ]
+  // const columns: Column<DoubleCountingUploadError>[] = [
+  //   {
+  //     header: t("Ligne"),
+  //     style: { width: 120, flex: "none" },
+  //     cell: (error) => (
+  //       <p>
+  //         {error.line_number! >= 0
+  //           ? t("Ligne {{lineNumber}}", {
+  //             lineNumber: error.line_merged || error.line_number,
+  //           })
+  //           : "-"}
+  //       </p>
+  //     ),
+  //   },
+  //   {
+  //     header: t("Erreur"),
+  //     cell: (error) => <p>{getErrorText(error)}</p>,
+  //   },
+  // ]
+  // return <Table columns={columns} rows={errorFiltered} />
 
-  return <Table columns={columns} rows={errorFiltered} />
+  return <Collapse
+    icon={AlertCircle}
+    variant="warning"
+    label={t("{{errorCount}} erreurs", {
+      errorCount: errors.length,
+    })}
+    isOpen
+  >
+    <section>
+      <ul>
+        {errors.map((error, index) => {
+          return <li key={`error-${index}`}>
+            {error.line_number! >= 0
+              && t("Ligne {{lineNumber}} : ", {
+                lineNumber: error.line_merged || error.line_number,
+              })}
+            {getErrorText(error)}</li>
+        })}
+      </ul>
+    </section>
+    <footer></footer>
+  </Collapse>
+
 }
 
 // const mergeErrors = (errors: DoubleCountingUploadError[]) => {

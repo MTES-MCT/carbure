@@ -49,7 +49,7 @@ def parse_info(excel_file: Workbook):
         application = excel_file["Reconnaissance double comptage"]
 
         production_site = presentation[5][2].value
-
+        producer_email = presentation[16][2].value
         try:
             # loop through reconaissance sheet to find the base year defined in it
             year_row_index = 0
@@ -63,6 +63,7 @@ def parse_info(excel_file: Workbook):
 
         return {
             "production_site": production_site,
+            "producer_email": producer_email,
             "year": year,
         }
     except:

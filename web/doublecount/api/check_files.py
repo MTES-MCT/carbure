@@ -44,6 +44,7 @@ def check_files(request, *args, **kwargs):
                     "error_count": error_count,
                     "year": info["year"] or 0,
                     "production_site": info["production_site"],
+                    "producer_email": info["producer_email"],
                     "production": production_data,
                     "sourcing": sourcing_data,
                 }
