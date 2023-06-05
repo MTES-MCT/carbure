@@ -25,6 +25,7 @@ type SourcingTableProps = {
 }
 
 export const SourcingTable = ({ sourcing }: SourcingTableProps) => {
+  console.log('sourcing:', sourcing)
   const { t } = useTranslation()
 
   const columns: Column<DoubleCountingSourcing>[] = [
@@ -39,26 +40,26 @@ export const SourcingTable = ({ sourcing }: SourcingTableProps) => {
     {
       header: t("Origine"),
       cell: (s) => (
-        s.origin_country?.code_pays ? ( 
-        <Cell text={t(s.origin_country.code_pays, { ns: "countries" })} />
+        s.origin_country?.code_pays ? (
+          <Cell text={t(s.origin_country.code_pays, { ns: "countries" })} />
         )
-        : null
+          : null
       ),
     },
-    // {
-    //   header: t("Approvisionnement"),
-    //   cell: (s) =>
-    //     s.supply_country && (
-    //       <Cell text={t(s.supply_country.code_pays, { ns: "countries" })} />
-    //     ),
-    // },
-    // {
-    //   header: t("Transit"),
-    //   cell: (s) =>
-    //     s.transit_country && (
-    //       <Cell text={t(s.transit_country.code_pays, { ns: "countries" })} />
-    //     ),
-    // },
+    {
+      header: t("Approvisionnement"),
+      cell: (s) =>
+        s.supply_country && (
+          <Cell text={t(s.supply_country.code_pays, { ns: "countries" })} />
+        ),
+    },
+    {
+      header: t("Transit"),
+      cell: (s) =>
+        s.transit_country && (
+          <Cell text={t(s.transit_country.code_pays, { ns: "countries" })} />
+        ),
+    },
   ]
 
   return <YearTable columns={columns} rows={sourcing} />
@@ -129,7 +130,7 @@ export const ProductionTable = ({
       header: t("Quota demandé"),
       cell: (p) => <Cell text={formatNumber(p.requested_quota)} />,
     },
-  
+
   ]
   quotas && setQuotas && productionColumns?.push(
     {
@@ -150,10 +151,10 @@ export const ProductionTable = ({
             }
           />
         )
-          }
-      })
-    return <YearTable columns={productionColumns} rows={production} />
-  }
+      }
+    })
+  return <YearTable columns={productionColumns} rows={production} />
+}
 
 type StatusTableProps = {
   agreement: DoubleCountingDetails | undefined
@@ -175,8 +176,8 @@ export const StatusTable = ({ agreement }: StatusTableProps) => {
             !s.approved && s.user
               ? t("Refusé")
               : s.approved
-              ? t("Accepté")
-              : t("En attente")
+                ? t("Accepté")
+                : t("En attente")
           }
         />
       ),

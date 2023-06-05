@@ -142,6 +142,7 @@ export interface DoubleCountingFileInfo {
   errors?: DoubleCountingUploadErrors
   year: string
   file_name: string
+  producer_email: string
   production_site: string
   error_count: number
   production: DoubleCountingProduction[]
