@@ -11,6 +11,8 @@ import Table, { Column, Cell } from "common/components/table"
 import { NumberInput } from "common/components/input"
 import YearTable from "./year-table"
 import { formatDate, formatNumber } from "common/utils/formatters"
+import Checkbox from "common/components/checkbox"
+import { useState } from "react"
 
 type ValidationStatus = {
   approved: boolean
@@ -89,6 +91,54 @@ export const SourcingAggregationTable = ({
   ]
 
   return <YearTable columns={columns} rows={sourcing} />
+}
+
+
+export const SourcingFullTable = ({ sourcing }: { sourcing: DoubleCountingSourcing[] }) => {
+
+  const [aggregateSourcing, setAggregateSourcing] = useState(true);
+  const { t } = useTranslation()
+
+  const aggregateDoubleCountingSourcing = (data: DoubleCountingSourcing[]): DoubleCountingSourcingAggregation[] => {
+    const aggregationMap = new Map<string, DoubleCountingSourcingAggregation>();
+    for (const item of data) {
+      const key = `${item.feedstock.code}_${item.year}`;
+      const aggregation = aggregationMap.get(key);
+
+      if (aggregation) {
+        aggregation.sum += item.metric_tonnes;
+        aggregation.count += 1;
+      } else {
+        aggregationMap.set(key, {
+          year: item.year,
+          sum: item.metric_tonnes,
+          count: 1,
+          feedstock: item.feedstock
+        });
+      }
+    }
+
+    return Array.from(aggregationMap.values());
+  }
+
+  const aggregated_sourcing: DoubleCountingSourcingAggregation[] = aggregateDoubleCountingSourcing(sourcing);
+
+  return <>
+
+    <Checkbox readOnly value={aggregateSourcing} onChange={() => setAggregateSourcing(!aggregateSourcing)}>
+      {t("Agréger les données d’approvisionnement par matière première ")}
+    </Checkbox>
+    {!aggregateSourcing &&
+      <SourcingTable
+        sourcing={sourcing ?? []}
+      />
+    }
+    {aggregateSourcing &&
+      <SourcingAggregationTable
+        sourcing={aggregated_sourcing ?? []}
+      />
+    }
+  </>
 }
 
 type ProductionTableProps = {

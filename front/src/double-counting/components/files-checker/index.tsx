@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next"
 import { useLocation } from "react-router-dom"
 import ErrorsDetailsDialog from "./errors-details-dialog"
 import FilesCheckerUploadButton from "./upload-button"
+import ValidDetailsDialog from "./valid-details-dialog"
 
 const DoubleCountingFilesChecker = () => {
   const { t } = useTranslation()
@@ -27,8 +28,11 @@ const DoubleCountingFilesChecker = () => {
   const checkedFiles = location.state as CheckDoubleCountingFilesResponse
 
   function showFileErrorsDialog(file: DoubleCountingFileInfo) {
-    //TODO open FIle error detail dialog
     portal((close) => <ErrorsDetailsDialog file={file} onClose={close} />)
+  }
+
+  function showFileValidDialog(file: DoubleCountingFileInfo) {
+    portal((close) => <ValidDetailsDialog file={file} onClose={close} />)
   }
 
   const columns: Column<DoubleCountingFileInfo>[] = [
@@ -120,7 +124,7 @@ const DoubleCountingFilesChecker = () => {
                 )}
 
                 {valid.count > 0 && (
-                  <Table columns={columns} rows={valid.files} />
+                  <Table columns={columns} rows={valid.files} onAction={showFileValidDialog} />
                 )}
               </>
             )}
