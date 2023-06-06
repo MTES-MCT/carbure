@@ -57,7 +57,7 @@ const DoubleCounting = () => {
               variant="main"
               tabs={[
                 { key: "agreements", path: "agreements", label: t("Dossiers") },
-                { key: "quotas", path: "quotas", label: t("Quotas") },
+                { key: "quotas", path: "quotas", label: t("Agréements") },
               ]}
             />
           </section>

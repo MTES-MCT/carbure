@@ -25,7 +25,6 @@ type SourcingTableProps = {
 }
 
 export const SourcingTable = ({ sourcing }: SourcingTableProps) => {
-  console.log('sourcing:', sourcing)
   const { t } = useTranslation()
 
   const columns: Column<DoubleCountingSourcing>[] = [
