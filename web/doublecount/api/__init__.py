@@ -1,6 +1,3 @@
-from django.urls import path
-from .check_files import check_files
+from django.urls import path, include
 
-urlpatterns = [
-    path("check-files", check_files, name="double-counting-check-files"),
-]
+urlpatterns = []
