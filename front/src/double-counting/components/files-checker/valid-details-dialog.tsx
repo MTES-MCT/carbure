@@ -8,6 +8,10 @@ import { useTranslation } from "react-i18next"
 import { DoubleCountingFileInfo } from "../../types"
 import ApplicationInfo from "../application/application-info"
 import { ProductionTable, SourcingFullTable } from "../dc-tables"
+import { usePortal } from "common/components/portal"
+import Autocomplete from "common/components/autocomplete"
+import { ProductionSiteField } from "lot-add/components/production-fields"
+import { findProductionSites } from "carbure/api"
 
 export type ValidDetailsDialogProps = {
   file: DoubleCountingFileInfo
@@ -19,12 +23,15 @@ export const ValidDetailsDialog = ({
   onClose,
 }: ValidDetailsDialogProps) => {
   const { t } = useTranslation()
+  const portal = usePortal()
 
   const [focus, setFocus] = useState("sourcing_forecast")
 
-  const saveApplication = () => {
-    console.log("saveApplication")
+
+  function showProductionSiteDialog() {
+    portal((close) => <ProductionSiteDialog file={file} onClose={close} />)
   }
+
   return (
     <Dialog fullscreen onClose={onClose}>
       <header>
@@ -80,7 +87,7 @@ export const ValidDetailsDialog = ({
           icon={Plus}
           label={t("Ajouter le dossier")}
           variant="primary"
-          action={saveApplication}
+          action={showProductionSiteDialog}
         />
 
         <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
@@ -91,4 +98,59 @@ export const ValidDetailsDialog = ({
 }
 
 
+export const ProductionSiteDialog = ({
+  file,
+  onClose,
+}: ValidDetailsDialogProps) => {
+  const { t } = useTranslation()
+
+  const saveApplication = () => {
+    console.log("saveApplication")
+  }
+
+
+  return (
+    <Dialog onClose={onClose}>
+      <header>
+        <h1>{t("Ajout du dossier double comptage")}</h1>
+      </header>
+
+      <main>
+
+        <ApplicationInfo file={file} />
+
+        {/* Choix du producteur  */}
+        {/* 
+        Choix du site de production
+        <Autocomplete
+      required
+      label={t("Site de production")}
+      value={productionSite}
+      icon={isKnown ? UserCheck : undefined}
+      defaultOptions={isKnown ? [productionSite] : undefined}
+      getOptions={(query) => findProductionSites(query, producer)}
+      normalize={norm.normalizeProductionSiteOrUnknown}
+      {...bound}
+      {...props}
+    /> */}
+
+      </main>
+
+      <footer>
+        <Button
+          icon={Plus}
+          label={t("Ajouter le dossier")}
+          variant="primary"
+          action={saveApplication}
+        />
+
+        <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
+      </footer>
+
+    </Dialog>
+  )
+}
+
 export default ValidDetailsDialog
+
+
