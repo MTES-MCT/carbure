@@ -86,3 +86,19 @@ export function checkDoubleCountingFiles(entity_id: number, files: FileList) {
   )
   return res
 }
+
+export function addDoubleCountingApplication(
+  entity_id: number,
+  production_site_id: number,
+  file: File
+) {
+  const res = api.post<Api<{
+    dca_id: number,
+    errors?: DoubleCountingUploadErrors
+  }>>("/v5/doublecounting/application/add", {
+    entity_id,
+    production_site_id,
+    file,
+  })
+  return res
+}
