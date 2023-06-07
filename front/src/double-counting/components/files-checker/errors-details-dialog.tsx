@@ -72,7 +72,7 @@ export const ErrorsDetailsDialog = ({
 
         </section>
 
-        {focus === "sourcing_forecast" &&
+        {focusedErrors.length === 0 && focus === "sourcing_forecast" &&
           <section>
             <SourcingFullTable
               sourcing={file.sourcing ?? []}
@@ -81,7 +81,7 @@ export const ErrorsDetailsDialog = ({
         }
 
 
-        {focus === "production" &&
+        {focusedErrors.length === 0 && focus === "production" &&
           <section>
             <ProductionTable
               production={file.production ?? []}

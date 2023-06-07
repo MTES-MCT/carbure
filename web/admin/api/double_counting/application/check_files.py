@@ -27,7 +27,7 @@ def check_files(request, *args, **kwargs):
         return ErrorResponse(400, CheckFilesError.MISSING_FILES)
 
     try:
-        file_errors = []
+        file_infos = []
         for file in files:
             info, errors, sourcing_data, production_data = check_dc_file(file)
             error_count = (
@@ -37,7 +37,7 @@ def check_files(request, *args, **kwargs):
                 + len(errors["global"])
             )
 
-            file_errors.append(
+            file_infos.append(
                 {
                     "file_name": file.name,
                     "errors": errors,
@@ -50,7 +50,7 @@ def check_files(request, *args, **kwargs):
                 }
             )
 
-        return SuccessResponse({"files": file_errors, "checked_at": datetime.datetime.now().isoformat()})
+        return SuccessResponse({"files": file_infos, "checked_at": datetime.datetime.now().isoformat()})
     except Exception:
         traceback.print_exc()
         return ErrorResponse(400, CheckFilesError.FILE_CHECK_FAILED)
