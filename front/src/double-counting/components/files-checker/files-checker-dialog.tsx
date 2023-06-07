@@ -76,7 +76,7 @@ const DoubleCountingFilesCheckerDialog = ({
   return (
     <Dialog onClose={onClose}>
       <header>
-        <h1>{t("Vérification de dossiers de double comptage")}</h1>
+        <h1>{t("Validation de dossiers de double comptage")}</h1>
       </header>
 
       <main>
