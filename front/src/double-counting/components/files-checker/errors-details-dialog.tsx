@@ -13,20 +13,20 @@ import ApplicationInfo from "../application/application-info"
 import { ProductionTable, SourcingFullTable } from "../dc-tables"
 
 export type ErrorsDetailsDialogProps = {
-  file: DoubleCountingFileInfo
+  fileData: DoubleCountingFileInfo
   onClose: () => void
 }
 
 export const ErrorsDetailsDialog = ({
-  file,
+  fileData,
   onClose,
 }: ErrorsDetailsDialogProps) => {
   const { t } = useTranslation()
 
   const [focus, setFocus] = useState("sourcing_forecast")
 
-  const focusedErrors = file.errors?.[
-    focus as keyof typeof file.errors
+  const focusedErrors = fileData.errors?.[
+    focus as keyof typeof fileData.errors
   ] as DoubleCountingUploadError[]
 
   return (
@@ -40,22 +40,22 @@ export const ErrorsDetailsDialog = ({
 
       <main>
 
-        <ApplicationInfo file={file} />
+        <ApplicationInfo fileData={fileData} />
         <section>
           <Tabs
             variant="switcher"
             tabs={[
               {
                 key: "sourcing_forecast",
-                label: `${t("Approvisionnement")} (${file.errors?.sourcing_forecast?.length || 0})`,
+                label: `${t("Approvisionnement")} (${fileData.errors?.sourcing_forecast?.length || 0})`,
               },
               {
                 key: "production",
-                label: `${t("Production")} (${file.errors?.production?.length || 0})`,
+                label: `${t("Production")} (${fileData.errors?.production?.length || 0})`,
               },
               {
                 key: "global",
-                label: `${t("Global")} (${file.errors?.global?.length || 0})`,
+                label: `${t("Global")} (${fileData.errors?.global?.length || 0})`,
               },
             ]}
             focus={focus}
@@ -75,7 +75,7 @@ export const ErrorsDetailsDialog = ({
         {focusedErrors.length === 0 && focus === "sourcing_forecast" &&
           <section>
             <SourcingFullTable
-              sourcing={file.sourcing ?? []}
+              sourcing={fileData.sourcing ?? []}
             />
           </section>
         }
@@ -84,7 +84,7 @@ export const ErrorsDetailsDialog = ({
         {focusedErrors.length === 0 && focus === "production" &&
           <section>
             <ProductionTable
-              production={file.production ?? []}
+              production={fileData.production ?? []}
             />
           </section>
         }
