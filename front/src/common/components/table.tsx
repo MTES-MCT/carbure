@@ -45,7 +45,7 @@ export function Table<T>({
   return (
     <div
       data-list
-      data-headless={headless ? "" : undefined}
+      // data-headless={headless ? "" : undefined} //TODO check if this not cause trouble / I remove to avoid overlap gap in table
       className={cl(css.table, variant && css[variant], className)}
       style={style}
     >
