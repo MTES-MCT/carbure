@@ -18,6 +18,7 @@ import { useForm } from "common/components/form"
 import useEntity from "carbure/hooks/entity"
 import { Entity, EntityPreview, ProductionSite } from "carbure/types"
 import * as norm from "carbure/utils/normalizers"
+import { useNotify } from "common/components/notifications"
 
 export type ValidDetailsDialogProps = {
   file: File
@@ -37,7 +38,7 @@ export const ValidDetailsDialog = ({
 
 
   function showProductionSiteDialog() {
-    portal((close) => <ProductionSiteDialog fileData={fileData} onClose={close} file={file} />)
+    portal((close) => <ProductionSiteDialog fileData={fileData} onClose={() => { close(); onClose() }} file={file} />)
   }
 
   return (
@@ -127,6 +128,7 @@ export const ProductionSiteDialog = ({
 
   const { value, bind } =
     useForm<ProductionForm>(defaultProductionForm)
+  const notify = useNotify()
 
 
   const addApplication = useMutation(addDoubleCountingApplication, {
@@ -136,14 +138,18 @@ export const ProductionSiteDialog = ({
   const saveApplication = async () => {
     if (!value.productionSite || !value.producer) return
 
-    await addApplication.execute(
-      entity.id,
-      value.productionSite.id,
-      value.producer.id,
-      file
-    )
-    onClose()
-
+    try {
+      await addApplication.execute(
+        entity.id,
+        value.productionSite.id,
+        value.producer.id,
+        file
+      )
+      onClose()
+      notify(t("Dossier ajouté avec succès"), { variant: "success" })
+    } catch (err) {
+      notify(t("Impossible d'ajouter le dossier"), { variant: "warning" })
+    }
 
   }
   const producer = value.producer instanceof Object ? value.producer.id : undefined // prettier-ignore
