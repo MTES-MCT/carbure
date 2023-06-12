@@ -50,6 +50,7 @@ def parse_info(excel_file: Workbook):
 
         production_site = presentation[5][2].value
         producer_email = presentation[16][2].value
+        print(">>>producer_email: ", producer_email)
         try:
             # loop through reconaissance sheet to find the base year defined in it
             year_row_index = 0
@@ -68,7 +69,7 @@ def parse_info(excel_file: Workbook):
         }
     except:
         traceback.print_exc()
-        return {"production_site": None, "year": 0}
+        return {"production_site": None, "year": 0, "producer_email": None}
 
 
 def parse_sourcing(excel_file: Workbook, sheet_name: str) -> List[SourcingRow]:

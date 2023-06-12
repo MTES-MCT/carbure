@@ -25,14 +25,18 @@ const DoubleCountingFilesChecker = () => {
 
   const [tab, setTab] = useState("to-fix")
 
-  const checkedFiles = location.state as CheckDoubleCountingFilesResponse
+  const checkedFiles: CheckDoubleCountingFilesResponse = location.state?.checkedFiles
+  const files: FileList = location.state?.files
 
-  function showFileErrorsDialog(file: DoubleCountingFileInfo) {
-    portal((close) => <ErrorsDetailsDialog file={file} onClose={close} />)
+  function showFileErrorsDialog(fileData: DoubleCountingFileInfo) {
+    portal((close) => <ErrorsDetailsDialog fileData={fileData} onClose={close} />)
   }
 
-  function showFileValidDialog(file: DoubleCountingFileInfo) {
-    portal((close) => <ValidDetailsDialog file={file} onClose={close} />)
+  function showFileValidDialog(fileData: DoubleCountingFileInfo, index: number) {
+
+    const file = Array.from(files).find((f) => f.name === fileData.file_name)
+    if (!file) return
+    portal((close) => <ValidDetailsDialog fileData={fileData} onClose={close} file={file} />)
   }
 
   const columns: Column<DoubleCountingFileInfo>[] = [

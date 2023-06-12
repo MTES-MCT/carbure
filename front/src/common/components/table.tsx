@@ -20,7 +20,7 @@ export interface TableProps<T> {
   rows: T[]
   order?: Order
   onOrder?: (order: Order | undefined) => void
-  onAction?: (value: T) => void
+  onAction?: (value: T, index: number) => void
   rowProps?: (row: T, i?: number) => JSX.IntrinsicElements["li"]
   rowLink?: (row: T) => To
 }
@@ -100,7 +100,7 @@ export function Table<T>({
               {...props}
               className={cl(link && css.rowLink)}
               data-interactive={onAction ? true : undefined}
-              onClick={onAction ? () => onAction(row) : undefined}
+              onClick={onAction ? () => onAction(row, i) : undefined}
             >
               {link ? <Link to={link}>{cells}</Link> : cells}
             </li>
