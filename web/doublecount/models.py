@@ -32,7 +32,7 @@ class DoubleCountingAgreement(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
     period_start = models.DateField(null=False, blank=False)
     period_end = models.DateField(null=False, blank=False)
-    agreement_id = models.CharField(max_length=16, blank=True, unique=True)
+    agreement_id = models.CharField(max_length=16, unique=True)
     status = models.CharField(max_length=32, choices=DCA_STATUS_CHOICES, default=PENDING)
 
     dgec_validated = models.BooleanField(default=False)
