@@ -68,7 +68,7 @@ def parse_info(excel_file: Workbook):
         }
     except:
         traceback.print_exc()
-        return {"production_site": None, "year": 0}
+        return {"production_site": None, "year": 0, "producer_email": None}
 
 
 def parse_sourcing(excel_file: Workbook, sheet_name: str) -> List[SourcingRow]:

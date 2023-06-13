@@ -11,15 +11,24 @@ import { ProductionTable, SourcingFullTable } from "../dc-tables"
 import { usePortal } from "common/components/portal"
 import Autocomplete from "common/components/autocomplete"
 import { ProductionSiteField } from "lot-add/components/production-fields"
-import { findProductionSites } from "carbure/api"
+import { findProducers, findProductionSites } from "carbure/api"
+import { useMutation } from "common/hooks/async"
+import { addDoubleCountingApplication } from "double-counting/api"
+import { useForm } from "common/components/form"
+import useEntity from "carbure/hooks/entity"
+import { Entity, EntityPreview, ProductionSite } from "carbure/types"
+import * as norm from "carbure/utils/normalizers"
+import { useNotify } from "common/components/notifications"
 
 export type ValidDetailsDialogProps = {
-  file: DoubleCountingFileInfo
+  file: File
+  fileData: DoubleCountingFileInfo
   onClose: () => void
 }
 
 export const ValidDetailsDialog = ({
   file,
+  fileData,
   onClose,
 }: ValidDetailsDialogProps) => {
   const { t } = useTranslation()
@@ -29,7 +38,7 @@ export const ValidDetailsDialog = ({
 
 
   function showProductionSiteDialog() {
-    portal((close) => <ProductionSiteDialog file={file} onClose={close} />)
+    portal((close) => <ProductionSiteDialog fileData={fileData} onClose={() => { close(); onClose() }} file={file} />)
   }
 
   return (
@@ -43,7 +52,7 @@ export const ValidDetailsDialog = ({
 
       <main>
 
-        <ApplicationInfo file={file} />
+        <ApplicationInfo fileData={fileData} />
         <section>
           <Tabs
             variant="switcher"
@@ -67,7 +76,7 @@ export const ValidDetailsDialog = ({
         {focus === "sourcing_forecast" &&
           <section>
             <SourcingFullTable
-              sourcing={file.sourcing ?? []}
+              sourcing={fileData.sourcing ?? []}
             />
           </section>
         }
@@ -76,7 +85,7 @@ export const ValidDetailsDialog = ({
         {focus === "production" &&
           <section>
             <ProductionTable
-              production={file.production ?? []}
+              production={fileData.production ?? []}
             />
           </section>
         }
@@ -96,17 +105,54 @@ export const ValidDetailsDialog = ({
     </Dialog>
   )
 }
+const defaultProductionForm = {
+  productionSite: undefined as ProductionSite | undefined,
+  producer: undefined as Entity | undefined,
+}
 
+type ProductionForm = typeof defaultProductionForm
+
+export type ProductionSiteDialogProps = {
+  file: File
+  fileData: DoubleCountingFileInfo
+  onClose: () => void
+}
 
 export const ProductionSiteDialog = ({
   file,
+  fileData,
   onClose,
-}: ValidDetailsDialogProps) => {
+}: ProductionSiteDialogProps) => {
   const { t } = useTranslation()
+  const entity = useEntity()
 
-  const saveApplication = () => {
-    console.log("saveApplication")
+  const { value, bind } =
+    useForm<ProductionForm>(defaultProductionForm)
+  const notify = useNotify()
+
+
+  const addApplication = useMutation(addDoubleCountingApplication, {
+    invalidates: [],
+  })
+
+  const saveApplication = async () => {
+    if (!value.productionSite || !value.producer) return
+
+    try {
+      await addApplication.execute(
+        entity.id,
+        value.productionSite.id,
+        value.producer.id,
+        file
+      )
+      onClose()
+      notify(t("Dossier ajouté avec succès"), { variant: "success" })
+    } catch (err) {
+      notify(t("Impossible d'ajouter le dossier"), { variant: "warning" })
+    }
+
   }
+  const producer = value.producer instanceof Object ? value.producer.id : undefined // prettier-ignore
 
 
   return (
@@ -116,24 +162,23 @@ export const ProductionSiteDialog = ({
       </header>
 
       <main>
-
-        <ApplicationInfo file={file} />
-
-        {/* Choix du producteur  */}
-        {/* 
-        Choix du site de production
-        <Autocomplete
-      required
-      label={t("Site de production")}
-      value={productionSite}
-      icon={isKnown ? UserCheck : undefined}
-      defaultOptions={isKnown ? [productionSite] : undefined}
-      getOptions={(query) => findProductionSites(query, producer)}
-      normalize={norm.normalizeProductionSiteOrUnknown}
-      {...bound}
-      {...props}
-    /> */}
-
+        <ApplicationInfo fileData={fileData} />
+        <section>
+          <Autocomplete
+            required
+            label={t("Producteur")}
+            getOptions={findProducers}
+            normalize={norm.normalizeEntity}
+            {...bind("producer")}
+          />
+          <Autocomplete
+            required
+            label={t("Site de production")}
+            getOptions={(query) => findProductionSites(query, producer)}
+            normalize={norm.normalizeProductionSite}
+            {...bind("productionSite")}
+          />
+        </section>
       </main>
 
       <footer>
@@ -141,6 +186,7 @@ export const ProductionSiteDialog = ({
           icon={Plus}
           label={t("Ajouter le dossier")}
           variant="primary"
+          disabled={addApplication.loading || !value.productionSite || !value.producer}
           action={saveApplication}
         />
 
@@ -150,6 +196,8 @@ export const ProductionSiteDialog = ({
     </Dialog>
   )
 }
+
+
 
 export default ValidDetailsDialog
 
