@@ -13,21 +13,21 @@ import Collapse from "common/components/collapse"
 import Checkbox from "common/components/checkbox"
 import { t } from "i18next"
 
-const ApplicationInfo = ({ file }: { file: DoubleCountingFileInfo }) => {
+const ApplicationInfo = ({ fileData }: { fileData: DoubleCountingFileInfo }) => {
 
     return <section>
         <p>
             <Trans
                 values={{
-                    productionSite: file.production_site,
+                    productionSite: fileData.production_site,
                 }}
                 defaults={`Pour le site de production <b>{{productionSite}}</b> par `}
-            /><a href={`mailto:${file.producer_email}`}>{file.producer_email}</a>.
+            /><a href={`mailto:${fileData.producer_email}`}>{fileData.producer_email}</a>.
         </p>
         <p>
             <Trans
                 values={{
-                    fileName: file.file_name,
+                    fileName: fileData.file_name,
                 }}
                 defaults="Fichier excel téléchargé : <b>{{fileName}}</b>"
             />
@@ -35,7 +35,7 @@ const ApplicationInfo = ({ file }: { file: DoubleCountingFileInfo }) => {
         <p>
             <Trans
                 values={{
-                    period: `${file.year} - ${file.year + 1}`,
+                    period: `${fileData.year} - ${fileData.year + 1}`,
                 }}
                 defaults="Période demandée : <b>{{period}}</b>"
             />

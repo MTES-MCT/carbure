@@ -292,9 +292,7 @@ def upload_complex_file(request, *args, **kwargs):
 
     try:
         sourcing_errors = new_load_dc_sourcing(dca, sourcing_rows)
-        print("sourcing_errors:")
         print(sourcing_errors)
-        print("production_data:")
         print(production_rows)
         production_errors = new_load_dc_prod(dca, production_rows)
 
