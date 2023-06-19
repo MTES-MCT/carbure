@@ -1,24 +1,24 @@
-import { Button } from "common/components/button"
+import { findProducers, findProductionSites } from "carbure/api"
+import useEntity from "carbure/hooks/entity"
+import { Entity, ProductionSite } from "carbure/types"
+import * as norm from "carbure/utils/normalizers"
+import Autocomplete from "common/components/autocomplete"
+import { Button, MailTo } from "common/components/button"
 import { Dialog } from "common/components/dialog"
+import { useForm } from "common/components/form"
 import { Plus, Return } from "common/components/icons"
+import { useNotify } from "common/components/notifications"
+import { usePortal } from "common/components/portal"
 import Tabs from "common/components/tabs"
 import Tag from "common/components/tag"
+import { useMutation } from "common/hooks/async"
+import { addDoubleCountingApplication } from "double-counting/api"
 import { useState } from "react"
-import { useTranslation } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
+import { useMatch } from "react-router-dom"
 import { DoubleCountingFileInfo } from "../../types"
 import ApplicationInfo from "../application/application-info"
 import { ProductionTable, SourcingFullTable } from "../dc-tables"
-import { usePortal } from "common/components/portal"
-import Autocomplete from "common/components/autocomplete"
-import { ProductionSiteField } from "lot-add/components/production-fields"
-import { findProducers, findProductionSites } from "carbure/api"
-import { useMutation } from "common/hooks/async"
-import { addDoubleCountingApplication } from "double-counting/api"
-import { useForm } from "common/components/form"
-import useEntity from "carbure/hooks/entity"
-import { Entity, EntityPreview, ProductionSite } from "carbure/types"
-import * as norm from "carbure/utils/normalizers"
-import { useNotify } from "common/components/notifications"
 
 export type ValidDetailsDialogProps = {
   file: File
@@ -33,12 +33,15 @@ export const ValidDetailsDialog = ({
 }: ValidDetailsDialogProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
-
+  const isProducerMatch = useMatch("/org/:entity/settings*")
   const [focus, setFocus] = useState("sourcing_forecast")
 
-
   function showProductionSiteDialog() {
-    portal((close) => <ProductionSiteDialog fileData={fileData} onClose={() => { close(); onClose() }} file={file} />)
+    if (isProducerMatch) {
+      portal((close) => <MailToDialog onClose={() => { close(); onClose() }} />)
+    } else {
+      portal((close) => <ProductionSiteAdminDialog fileData={fileData} onClose={() => { close(); onClose() }} file={file} />)
+    }
   }
 
   return (
@@ -94,7 +97,7 @@ export const ValidDetailsDialog = ({
       <footer>
         <Button
           icon={Plus}
-          label={t("Ajouter le dossier")}
+          label={isProducerMatch ? t("Envoyer le dossier") : t("Ajouter le dossier")}
           variant="primary"
           action={showProductionSiteDialog}
         />
@@ -118,7 +121,7 @@ export type ProductionSiteDialogProps = {
   onClose: () => void
 }
 
-export const ProductionSiteDialog = ({
+export const ProductionSiteAdminDialog = ({
   file,
   fileData,
   onClose,
@@ -137,7 +140,6 @@ export const ProductionSiteDialog = ({
 
   const saveApplication = async () => {
     if (!value.productionSite || !value.producer) return
-
     try {
       await addApplication.execute(
         entity.id,
@@ -150,7 +152,6 @@ export const ProductionSiteDialog = ({
     } catch (err) {
       notify(t("Impossible d'ajouter le dossier"), { variant: "warning" })
     }
-
   }
   const producer = value.producer instanceof Object ? value.producer.id : undefined // prettier-ignore
 
@@ -190,6 +191,45 @@ export const ProductionSiteDialog = ({
           action={saveApplication}
         />
 
+        <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
+      </footer>
+
+    </Dialog>
+  )
+}
+
+
+
+export const MailToDialog = ({
+  onClose,
+}: { onClose: () => void }) => {
+  const { t } = useTranslation()
+
+
+  const onMailto = async () => {
+
+  }
+
+
+  return (
+    <Dialog onClose={onClose}>
+      <header>
+        <h1>{t("Envoi du dossier double comptage")}</h1>
+      </header>
+
+      <main>
+        <section>
+          <p style={{ textAlign: 'left' }}>
+            {t("Votre fichier est valide. Vous pouvez le transmettre par email à la DGEC pour une vérification approfondie à l'adresse doublecount@carbure.beta.gouv.fr en cliquant ci-dessous : ")}
+          </p>
+          <MailTo user="doublecompte" host="beta.gouv.fr">
+            <Trans>Envoyer l'email</Trans>
+          </MailTo>
+
+        </section>
+      </main>
+
+      <footer>
         <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
       </footer>
 

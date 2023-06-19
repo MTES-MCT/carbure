@@ -1,7 +1,7 @@
 import { Alert } from "common/components/alert"
 import { Button } from "common/components/button"
 import { Dialog } from "common/components/dialog"
-import { AlertCircle, Plus, Return } from "common/components/icons"
+import { AlertCircle, InfoCircle, Plus, Return } from "common/components/icons"
 import Tabs from "common/components/tabs"
 import Tag from "common/components/tag"
 import { useState } from "react"
@@ -12,6 +12,7 @@ import { ProductionTable, SourcingAggregationTable, SourcingTable } from "../dc-
 import Collapse from "common/components/collapse"
 import Checkbox from "common/components/checkbox"
 import { t } from "i18next"
+import Tooltip from "common/components/tooltip"
 
 const ApplicationInfo = ({ fileData }: { fileData: DoubleCountingFileInfo }) => {
 
@@ -33,12 +34,22 @@ const ApplicationInfo = ({ fileData }: { fileData: DoubleCountingFileInfo }) => 
             />
         </p>
         <p>
-            <Trans
-                values={{
-                    period: `${fileData.year} - ${fileData.year + 1}`,
-                }}
-                defaults="Période demandée : <b>{{period}}</b>"
-            />
+            <Tooltip title={t(`L'année détectée est renseignée en bas de l'onglet "Reconnaissance double comptage" du fichier excel.`)}>
+                <Trans
+                    values={{
+                        period: `${fileData.year} - ${fileData.year + 1}`,
+                    }}
+                    defaults="Période demandée : <b>{{period}}</b>"
+                />
+                <InfoCircle
+                    color="#a4a4a4"
+                    size={15}
+                    style={{
+                        margin: "7px 0px 0 2px",
+                        position: "absolute",
+                    }}
+                />
+            </Tooltip>
 
 
         </p>

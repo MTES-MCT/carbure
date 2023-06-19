@@ -1,51 +1,49 @@
 import { AxiosError } from "axios"
-import { findProductionSites } from "carbure/api"
-import { Entity, ProductionSite } from "carbure/types"
-import { normalizeProductionSite } from "carbure/utils/normalizers"
-import AutoComplete from "common/components/autocomplete"
-import Button from "common/components/button"
-import Collapse from "common/components/collapse"
+import useEntity from "carbure/hooks/entity"
+import Button, { ExternalLink } from "common/components/button"
 import Dialog from "common/components/dialog"
 import { Form, useForm } from "common/components/form"
-import { AlertOctagon, Check, Return, Upload } from "common/components/icons"
-import { FileInput } from "common/components/input"
+import { Check, Return, Upload } from "common/components/icons"
+import { FileInput, FileListInput } from "common/components/input"
 import { useNotify } from "common/components/notifications"
+import { usePortal } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
-import useScrollToRef from "common/hooks/scroll-to-ref"
-import { DoubleCountingUploadErrors } from "double-counting/types"
-import { useState } from "react"
+import ErrorsDetailsDialog from "double-counting/components/files-checker/errors-details-dialog"
+import ValidDetailsDialog from "double-counting/components/files-checker/valid-details-dialog"
+import { CheckDoubleCountingFilesResponse, DoubleCountingFileInfo } from "double-counting/types"
 import { Trans, useTranslation } from "react-i18next"
-import { getErrorText } from "settings/utils/double-counting"
-import * as api from "../api/double-counting"
+import { useNavigate } from "react-router-dom"
+import { checkDoubleCountingApplication } from "settings/api/double-counting"
 
-type DoubleCountingUploadDialogProps = {
-  entity: Entity
+type DoubleCountingFileCheckerDialogProps = {
   onClose: () => void
 }
 
-const DoubleCountingUploadDialog = ({
-  entity,
+const DoubleCountingFilesCheckerDialog = ({
   onClose,
-}: DoubleCountingUploadDialogProps) => {
+}: DoubleCountingFileCheckerDialogProps) => {
   const { t } = useTranslation()
-  const [errors, setErrors] = useState<DoubleCountingUploadErrors>()
   const notify = useNotify()
-  const { refToScroll } = useScrollToRef(!!errors)
+  const navigate = useNavigate()
+  const entity = useEntity()
+  const portal = usePortal()
 
   const { value, bind } = useForm({
-    productionSite: undefined as ProductionSite | undefined,
     doubleCountingFile: undefined as File | undefined,
-    documentationFile: undefined as File | undefined,
   })
 
-  const uploadFile = useMutation(api.uploadDoubleCountingFile, {
+  const uploadFile = useMutation(checkDoubleCountingApplication, {
     onError: (err) => {
-      const error = (err as AxiosError<{ error: string }>).response?.data.error
-      if (error === "DOUBLE_COUNTING_IMPORT_FAILED") {
-        const errors = (
-          err as AxiosError<{ data: { errors: DoubleCountingUploadErrors } }>
-        ).response?.data?.data?.errors
-        setErrors(errors)
+      const response = (err as AxiosError<{ error: string }>).response
+      if (response?.status === 413) {
+        notify(
+          t(
+            "La taille des fichiers selectionnés est trop importante pour être analysée (5mo maximum)."
+          ),
+          {
+            variant: "danger",
+          }
+        )
       } else {
         notify(
           t(
@@ -59,119 +57,68 @@ const DoubleCountingUploadDialog = ({
     },
   })
 
-  const uploadDocFile = useMutation(api.uploadDoubleCountingDescriptionFile)
-
-  const disabled =
-    !value.productionSite ||
-    !value.doubleCountingFile ||
-    !value.documentationFile
-
-  async function submitAgreement() {
-    if (
-      !entity ||
-      !value.productionSite ||
-      !value.doubleCountingFile ||
-      !value.documentationFile
+  async function submitFile() {
+    if (!value.doubleCountingFile) return
+    const resp = await uploadFile.execute(
+      entity.id,
+      value.doubleCountingFile as File
     )
-      return
+    const checkedFile = resp.data.data?.file
 
-    try {
-      const res = await uploadFile.execute(
-        entity.id,
-        value.productionSite.id,
-        value.doubleCountingFile
-      )
-
-      if (res.data.data) {
-        await uploadDocFile.execute(
-          entity.id,
-          res.data.data.dca_id,
-          value.documentationFile
-        )
-        notify(t("Votre dossier double comptage a bien été envoyé !"), {
-          variant: "success",
-        })
-        onClose()
+    if (checkedFile) {
+      onClose()
+      if (checkedFile.error_count) {
+        portal((close) => <ErrorsDetailsDialog fileData={checkedFile} onClose={close} />)
+      } else {
+        portal((close) => <ValidDetailsDialog fileData={checkedFile} onClose={close} file={value.doubleCountingFile as File} />)
       }
-    } catch (error) { }
+    }
   }
 
   return (
-    <Dialog onClose={onClose} fullscreen>
+    <Dialog onClose={onClose}>
       <header>
-        <h1>{t("Création dossier double comptage")}</h1>
+        <h1>{t("Vérification de dossier de double comptage")}</h1>
       </header>
 
       <main>
         <section>
-          <Form id="dc-request">
+          <Form id="dc-checker">
+            <p>
+              {t(
+                "Cet outil vous permet de vérifier le dossier au format Excel avant de l'envoyer à la DGEC."
+              )}
+            </p>
             <p>
               <Trans>
-                Dans un premier temps, renseignez le site de production concerné
-                par votre demande.
+                Le modèle Excel à remplir est disponible {" "}
+                <ExternalLink href={"https://www.ecologie.gouv.fr/sites/default/files/Dossier%20de%20demande%20de%20reconnaissance%20au%20double%20comptage%202020.xlsx"}>
+                  sur ce lien
+                </ExternalLink>
+                .
               </Trans>
             </p>
-
-            <AutoComplete
-              autoFocus
-              label={t("Site de production")}
-              placeholder={t("Rechercher un site de production")}
-              getOptions={(search) => findProductionSites(search, entity.id)}
-              normalize={normalizeProductionSite}
-              {...bind("productionSite")}
-            />
-
-            <p>
-              <a href="/api/v3/doublecount/get-template">
-                <Trans>Téléchargez le modèle depuis ce lien</Trans>
-              </a>{" "}
-              <Trans>
-                puis remplissez les <b>deux premiers onglets</b> afin de
-                détailler vos approvisionnements et productions sujets au double
-                comptage. Ensuite, importez ce fichier avec le bouton ci-dessous
-                :
-              </Trans>
-            </p>
-
             <FileInput
+              loading={uploadFile.loading}
               icon={value.doubleCountingFile ? Check : Upload}
-              label={t("Importer les informations double comptage")}
+              label={t("Importer le fichier excel à analyser")}
+              placeholder={value.doubleCountingFile ? value.doubleCountingFile.name : t("Choisir un fichier")}
+
               {...bind("doubleCountingFile")}
             />
-
-            <p>
-              <Trans>
-                Finalement, veuillez importer un fichier texte contenant la
-                description de vos méthodes d'approvisionnement et de production
-                ayant trait au double comptage.
-              </Trans>
-            </p>
-
-            <FileInput
-              icon={value.documentationFile ? Check : Upload}
-              label={t("Importer la description")}
-              {...bind("documentationFile")}
-            />
-
-            {errors && (
-              <section ref={refToScroll}>
-                <BlockingErrors errors={errors} />
-              </section>
-            )}
           </Form>
         </section>
       </main>
 
       <footer>
         <Button
-          asideX
           submit="dc-request"
-          loading={uploadFile.loading || uploadDocFile.loading}
-          disabled={disabled}
+          loading={uploadFile.loading}
+          disabled={!value.doubleCountingFile}
           variant="primary"
           icon={Check}
-          action={submitAgreement}
-          label={t("Soumettre le dossier")}
+          action={submitFile}
+          label={t("Vérifier le fichier")}
         />
         <Button icon={Return} action={onClose} label={t("Annuler")} />
       </footer>
@@ -179,47 +126,4 @@ const DoubleCountingUploadDialog = ({
   )
 }
 
-export default DoubleCountingUploadDialog
-
-export interface BlockingErrorsProps {
-  errors: DoubleCountingUploadErrors
-}
-
-const BlockingErrors = ({ errors }: BlockingErrorsProps) => {
-  const allErrors = [
-    ...(errors?.global ?? []),
-    // ...(errors?.sourcing_history ?? []),
-    ...(errors?.production ?? []),
-  ]
-  const { t } = useTranslation()
-  return (
-    <Collapse
-      isOpen={true}
-      variant="danger"
-      icon={AlertOctagon}
-      label={`${t("Erreurs")} (${allErrors.length})`}
-    >
-      <section>
-        {t(
-          "Vous ne pouvez pas valider ce dossier tant que les problèmes suivants n'ont pas été corrigés. Merci de modifiez le fichier excel et resoumettez-le."
-        )}
-      </section>
-
-      <footer>
-        <ul>
-          {errors.global?.map((error, i) => (
-            <li key={i}>{getErrorText(error)}</li>
-          ))}
-          {/* {errors.sourcing_history?.map((error, i) => (
-            <li key={i}>
-              {t("Approvisionnement") + " - " + getErrorText(error)}
-            </li>
-          ))} */}
-          {errors.production?.map((error, i) => (
-            <li key={i}>{t("Production") + " - " + getErrorText(error)}</li>
-          ))}
-        </ul>
-      </footer>
-    </Collapse>
-  )
-}
+export default DoubleCountingFilesCheckerDialog

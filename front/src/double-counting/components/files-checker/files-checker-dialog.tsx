@@ -40,11 +40,6 @@ const DoubleCountingFilesCheckerDialog = ({
             variant: "danger",
           }
         )
-      } else if (response?.data?.error === "DOUBLE_COUNTING_IMPORT_FAILED") {
-        alert("DOUBLE_COUNTING_IMPORT_FAILED")
-        const response = (
-          err as AxiosError<{ data: CheckDoubleCountingFilesResponse }>
-        ).response?.data?.data
       } else {
         notify(
           t(
