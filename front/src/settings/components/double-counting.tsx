@@ -1,7 +1,7 @@
 import useEntity, { useRights } from "carbure/hooks/entity"
 import { UserRole } from "carbure/types"
 import { Alert } from "common/components/alert"
-import { AlertCircle } from "common/components/icons"
+import { AlertCircle, Plus } from "common/components/icons"
 import { usePortal } from "common/components/portal"
 import { LoaderOverlay, Panel } from "common/components/scaffold"
 import Table, { Cell } from "common/components/table"
@@ -13,6 +13,7 @@ import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api/double-counting"
 import DoubleCountingDialog from "./double-counting-dialog"
 import DoubleCountingUploadDialog from "./double-counting-upload"
+import Button from "common/components/button"
 
 const DoubleCountingSettings = () => {
   const { t } = useTranslation()
@@ -41,7 +42,7 @@ const DoubleCountingSettings = () => {
 
   function showUploadDialog() {
     portal((resolve) => (
-      <DoubleCountingUploadDialog entity={entity} onClose={resolve} />
+      <DoubleCountingUploadDialog onClose={resolve} />
     ))
   }
 
@@ -51,15 +52,15 @@ const DoubleCountingSettings = () => {
         <h1>
           <Trans>Dossiers double comptage</Trans>
         </h1>
-        {/* {canModify && (
+        {canModify && (
           <Button
             asideX
             variant="primary"
             icon={Plus}
             action={showUploadDialog}
-            label={t("Ajouter un dossier double comptage")}
+            label={t("Envoyer un dossier double comptage")}
           />
-        )} */}
+        )}
       </header>
 
       {isEmpty && (
