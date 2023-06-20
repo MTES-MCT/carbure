@@ -61,7 +61,6 @@ const DoubleCountingSettings = () => {
             label={t("Envoyer un dossier double comptage")}
           />
         )}
-        -
       </header>
 
       {isEmpty && (
