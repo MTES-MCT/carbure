@@ -66,7 +66,14 @@ def update_lot(request, *args, **kwargs):
         quantity = compute_lot_quantity(updated_lot, quantity_data)
         update = {**update_data, **quantity}
 
-    update["production_site_double_counting_certificate"] = get_lot_dc_agreement(updated_lot)
+    dc_agreement = get_lot_dc_agreement(
+        update.get("feedstock"),
+        update.get("delivery_date"),
+        update.get("carbure_production_site"),
+    )
+
+    if dc_agreement:
+        update["production_site_double_counting_certificate"] = dc_agreement
 
     # query the database for all the traceability nodes related to these lots
     nodes = get_traceability_nodes([updated_lot])

@@ -5,6 +5,7 @@ import traceback
 import dateutil
 from typing import List
 from django.db.models.query import QuerySet
+from django.forms import model_to_dict
 from core.carburetypes import CarbureUnit, CarbureStockErrors
 from core.models import CarbureLot, CarbureStock, Entity, GenericError
 from transactions.sanity_checks.sanity_checks import bulk_sanity_checks
@@ -139,7 +140,9 @@ def fill_production_info(lot, data, entity, prefetched_data):
             # si il y a un certificat DC renseigné, on recupere et verifie la validité des certificats associés à ce site de production
             from doublecount.helpers import get_lot_dc_agreement
 
-            lot.production_site_double_counting_certificate = get_lot_dc_agreement(lot)
+            dc_agreement = get_lot_dc_agreement(lot.feedstock, lot.delivery_date, lot.carbure_production_site)
+            if dc_agreement:
+                lot.production_site_double_counting_certificate = dc_agreement
 
         # CASE 3
         else:
@@ -567,8 +570,8 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
         lot.biofuel = parent_stock.biofuel
     else:
         # FILL sustainability data from excel file
-        errors += fill_production_info(lot, data, entity, prefetched_data)
         errors += fill_basic_info(lot, data, prefetched_data)
+        errors += fill_production_info(lot, data, entity, prefetched_data)
         errors += fill_ghg_info(lot, data)
 
     # common data

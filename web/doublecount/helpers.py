@@ -201,13 +201,15 @@ def check_dc_file(file):
     )
 
 
-def get_lot_dc_agreement(lot_data):
+def get_lot_dc_agreement(feedstock, delivery_date, production_site):
+    if not feedstock:
+        return None
+
     dc_certificate = ""
-    if lot_data.carbure_production_site.dc_reference:
-        delivery_date = lot_data.delivery_date  # updated_lot.get("delivery_date")
+    if feedstock and feedstock.is_double_compte and production_site.dc_reference:
         try:
             pd_certificates = DoubleCountingRegistration.objects.filter(
-                production_site_id=lot_data.carbure_production_site.id,
+                production_site_id=production_site.id,
                 valid_from__lt=delivery_date,
                 valid_until__gte=delivery_date,
             )
@@ -215,9 +217,9 @@ def get_lot_dc_agreement(lot_data):
             if current_certificate:
                 dc_certificate = current_certificate.certificate_id
             else:  # le certificat renseigné sur le site de production est mis par defaut
-                dc_certificate = lot_data.carbure_production_site.dc_reference
+                dc_certificate = production_site.dc_reference
         except:
-            dc_certificate = lot_data.carbure_production_site.dc_reference
+            dc_certificate = production_site.dc_reference
     else:
         dc_certificate = None
     return dc_certificate
