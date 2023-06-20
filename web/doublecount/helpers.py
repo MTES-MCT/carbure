@@ -5,6 +5,7 @@ import traceback
 import unicodedata
 import re
 from django.db import transaction
+from certificates.models import DoubleCountingRegistration
 from core.models import Pays, Biocarburant, MatierePremiere
 from doublecount.models import DoubleCountingSourcing, DoubleCountingProduction
 from doublecount.dc_sanity_checks import check_production_row, check_sourcing_row
@@ -198,3 +199,25 @@ def check_dc_file(file):
         None,
         None,
     )
+
+
+def get_lot_dc_agreement(lot_data):
+    dc_certificate = ""
+    if lot_data.carbure_production_site.dc_reference:
+        delivery_date = lot_data.delivery_date  # updated_lot.get("delivery_date")
+        try:
+            pd_certificates = DoubleCountingRegistration.objects.filter(
+                production_site_id=lot_data.carbure_production_site.id,
+                valid_from__lt=delivery_date,
+                valid_until__gte=delivery_date,
+            )
+            current_certificate = pd_certificates.first()
+            if current_certificate:
+                dc_certificate = current_certificate.certificate_id
+            else:  # le certificat renseigné sur le site de production est mis par defaut
+                dc_certificate = lot_data.carbure_production_site.dc_reference
+        except:
+            dc_certificate = lot_data.carbure_production_site.dc_reference
+    else:
+        dc_certificate = None
+    return dc_certificate
