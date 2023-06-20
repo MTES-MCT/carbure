@@ -17,7 +17,7 @@ const FilesCheckerUploadButton = () => {
       asideX
       variant="secondary"
       icon={Upload}
-      label={t("Vérifier des dossiers")}
+      label={t("Ajouter des dossiers")}
       action={showAgreementsChecker}
     />
   )

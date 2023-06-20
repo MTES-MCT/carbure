@@ -16,7 +16,7 @@ export function getDoubleCountingSnapshot() {
 }
 
 export function getAllDoubleCountingAgreements(year: number) {
-  return api.get<Api<AgreementsOverview>>("/v3/doublecount/admin/agreements", {
+  return api.get<Api<AgreementsOverview>>("/v5/admin/double-counting/agreements", {
     params: { year },
   })
 }
@@ -81,8 +81,22 @@ export function uploadDoubleCountingDecision(dca_id: number, file: File) {
 
 export function checkDoubleCountingFiles(entity_id: number, files: FileList) {
   const res = api.post<Api<CheckDoubleCountingFilesResponse>>(
-    "/v5/double-counting/check-files",
+    "/v5/admin/double-counting/application/check-files",
     { entity_id, files }
   )
   return res
+}
+
+export function addDoubleCountingApplication(
+  entity_id: number,
+  production_site_id: number,
+  producer_id: number,
+  file: File
+) {
+  return api.post("/v5/admin/double-counting/application/add", {
+    entity_id,
+    production_site_id,
+    producer_id,
+    file,
+  })
 }
