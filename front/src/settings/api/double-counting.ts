@@ -2,6 +2,7 @@ import api, { Api } from "common/services/api"
 import {
   DoubleCounting,
   DoubleCountingDetails,
+  DoubleCountingFileInfo,
   DoubleCountingUploadErrors,
   QuotaDetails
 } from "double-counting/types"
@@ -16,6 +17,14 @@ export function getDoubleCountingDetails(entity_id: number, dca_id: number) {
   return api.get<Api<DoubleCountingDetails>>("/v3/doublecount/agreement", {
     params: { entity_id, dca_id },
   })
+}
+
+export function checkDoubleCountingApplication(entity_id: number, file: File) {
+  const res = api.post<Api<{ file: DoubleCountingFileInfo }>>(
+    "/v5/double-counting/application/check-file",
+    { entity_id, file }
+  )
+  return res
 }
 
 export function uploadDoubleCountingFile(

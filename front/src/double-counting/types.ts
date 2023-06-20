@@ -72,7 +72,8 @@ export enum DoubleCountingUploadErrorType {
   ProductionMismatchQuota = "PRODUCTION_MISMATCH_QUOTA",
   LineFeedstocksIncoherent = "LINE_FEEDSTOCKS_INCOHERENT",
   UnknownYear = "UNKNOWN_YEAR",
-  BadWorksheetName = "BAD_WORKSHEET_NAME"
+  BadWorksheetName = "BAD_WORKSHEET_NAME",
+  MissingCountryOfOrigin = "MISSING_COUNTRY_OF_ORIGIN",
 }
 
 export interface DoubleCountingUploadError {
@@ -84,7 +85,7 @@ export interface DoubleCountingUploadError {
 }
 
 export interface DoubleCountingUploadErrors extends DoubleCounting {
-  sourcing_history?: DoubleCountingUploadError[]
+  // sourcing_history?: DoubleCountingUploadError[]
   sourcing_forecast?: DoubleCountingUploadError[]
   production?: DoubleCountingUploadError[]
   global?: DoubleCountingUploadError[]
@@ -141,8 +142,11 @@ export interface DoubleCountingFileInfo {
   errors?: DoubleCountingUploadErrors
   year: string
   file_name: string
+  producer_email: string
   production_site: string
   error_count: number
+  production: DoubleCountingProduction[]
+  sourcing: DoubleCountingSourcing[]
 }
 
 export interface CheckDoubleCountingFilesResponse {

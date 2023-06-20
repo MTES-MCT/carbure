@@ -1,5 +1,7 @@
 from typing import TypedDict
 
+from transactions.helpers import MISSING_COUNTRY_OF_ORIGIN
+
 
 class DoubleCountingError:
     BAD_WORKSHEET_NAME = "BAD_WORKSHEET_NAME"
@@ -8,6 +10,7 @@ class DoubleCountingError:
     MISSING_BIOFUEL = "MISSING_BIOFUEL"
     MISSING_ESTIMATED_PRODUCTION = "MISSING_ESTIMATED_PRODUCTION"
     MISSING_FEEDSTOCK = "MISSING_FEEDSTOCK"
+    MISSING_COUNTRY_OF_ORIGIN = "MISSING_COUNTRY_OF_ORIGIN"
     MP_BC_INCOHERENT = "MP_BC_INCOHERENT"
     NOT_DC_FEEDSTOCK = "NOT_DC_FEEDSTOCK"
     POME_GT_2000 = "POME_GT_2000"
@@ -25,9 +28,7 @@ class DcError(TypedDict):
     meta: dict
 
 
-def error(
-    type: str, line: int = -1, meta: dict = {}, is_blocking: bool = True
-) -> DcError:
+def error(type: str, line: int = -1, meta: dict = {}, is_blocking: bool = True) -> DcError:
     return {
         "error": type,
         "line_number": line,

@@ -40,11 +40,6 @@ const DoubleCountingFilesCheckerDialog = ({
             variant: "danger",
           }
         )
-      } else if (response?.data?.error === "DOUBLE_COUNTING_IMPORT_FAILED") {
-        alert("DOUBLE_COUNTING_IMPORT_FAILED")
-        const response = (
-          err as AxiosError<{ data: CheckDoubleCountingFilesResponse }>
-        ).response?.data?.data
       } else {
         notify(
           t(
@@ -64,11 +59,14 @@ const DoubleCountingFilesCheckerDialog = ({
       entity.id,
       value.doubleCountingFiles as FileList
     )
-    const checkData = resp.data.data
-    if (checkData) {
+    const checkedFiles = resp.data.data
+    if (checkedFiles) {
       onClose()
       navigate("/org/9/double-counting/files-checker", {
-        state: checkData,
+        state: {
+          checkedFiles,
+          files: value.doubleCountingFiles
+        }
       })
     }
   }
@@ -76,7 +74,7 @@ const DoubleCountingFilesCheckerDialog = ({
   return (
     <Dialog onClose={onClose}>
       <header>
-        <h1>{t("Vérification de dossiers de double comptage")}</h1>
+        <h1>{t("Validation de dossiers de double comptage")}</h1>
       </header>
 
       <main>

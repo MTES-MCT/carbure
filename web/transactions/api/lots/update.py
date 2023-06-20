@@ -2,6 +2,7 @@ from django.db import transaction
 from django import forms
 
 from carbure.tasks import background_bulk_scoring
+from certificates.models import DoubleCountingRegistration
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
 from core.carburetypes import CarbureStockErrors
@@ -12,6 +13,7 @@ from core.traceability import (
     diff_to_metadata,
     serialize_integrity_errors,
 )
+from doublecount.helpers import get_lot_dc_agreement
 from transactions.helpers import compute_lot_quantity
 from transactions.sanity_checks.sanity_checks import (
     get_prefetched_data,
@@ -63,6 +65,15 @@ def update_lot(request, *args, **kwargs):
     if len(quantity_data) > 0:
         quantity = compute_lot_quantity(updated_lot, quantity_data)
         update = {**update_data, **quantity}
+
+    dc_agreement = get_lot_dc_agreement(
+        update.get("feedstock"),
+        update.get("delivery_date"),
+        update.get("carbure_production_site"),
+    )
+
+    if dc_agreement:
+        update["production_site_double_counting_certificate"] = dc_agreement
 
     # query the database for all the traceability nodes related to these lots
     nodes = get_traceability_nodes([updated_lot])

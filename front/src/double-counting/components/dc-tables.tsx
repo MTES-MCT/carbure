@@ -11,6 +11,8 @@ import Table, { Column, Cell } from "common/components/table"
 import { NumberInput } from "common/components/input"
 import YearTable from "./year-table"
 import { formatDate, formatNumber } from "common/utils/formatters"
+import Checkbox from "common/components/checkbox"
+import { useState } from "react"
 
 type ValidationStatus = {
   approved: boolean
@@ -39,7 +41,10 @@ export const SourcingTable = ({ sourcing }: SourcingTableProps) => {
     {
       header: t("Origine"),
       cell: (s) => (
-        <Cell text={t(s.origin_country.code_pays, { ns: "countries" })} />
+        s.origin_country?.code_pays ? (
+          <Cell text={t(s.origin_country.code_pays, { ns: "countries" })} />
+        )
+          : null
       ),
     },
     {
@@ -88,12 +93,60 @@ export const SourcingAggregationTable = ({
   return <YearTable columns={columns} rows={sourcing} />
 }
 
+
+export const SourcingFullTable = ({ sourcing }: { sourcing: DoubleCountingSourcing[] }) => {
+
+  const [aggregateSourcing, setAggregateSourcing] = useState(true);
+  const { t } = useTranslation()
+
+  const aggregateDoubleCountingSourcing = (data: DoubleCountingSourcing[]): DoubleCountingSourcingAggregation[] => {
+    const aggregationMap = new Map<string, DoubleCountingSourcingAggregation>();
+    for (const item of data) {
+      const key = `${item.feedstock.code}_${item.year}`;
+      const aggregation = aggregationMap.get(key);
+
+      if (aggregation) {
+        aggregation.sum += item.metric_tonnes;
+        aggregation.count += 1;
+      } else {
+        aggregationMap.set(key, {
+          year: item.year,
+          sum: item.metric_tonnes,
+          count: 1,
+          feedstock: item.feedstock
+        });
+      }
+    }
+
+    return Array.from(aggregationMap.values());
+  }
+
+  const aggregated_sourcing: DoubleCountingSourcingAggregation[] = aggregateDoubleCountingSourcing(sourcing);
+
+  return <>
+
+    <Checkbox readOnly value={aggregateSourcing} onChange={() => setAggregateSourcing(!aggregateSourcing)}>
+      {t("Agréger les données d’approvisionnement par matière première ")}
+    </Checkbox>
+    {!aggregateSourcing &&
+      <SourcingTable
+        sourcing={sourcing ?? []}
+      />
+    }
+    {aggregateSourcing &&
+      <SourcingAggregationTable
+        sourcing={aggregated_sourcing ?? []}
+      />
+    }
+  </>
+}
+
 type ProductionTableProps = {
   done?: boolean
-  entity: Entity
-  quotas: Record<string, number>
+  entity?: Entity
+  quotas?: Record<string, number>
   production: DoubleCountingProduction[]
-  setQuotas: (quotas: Record<string, number>) => void
+  setQuotas?: (quotas: Record<string, number>) => void
 }
 
 export const ProductionTable = ({
@@ -126,6 +179,9 @@ export const ProductionTable = ({
       header: t("Quota demandé"),
       cell: (p) => <Cell text={formatNumber(p.requested_quota)} />,
     },
+
+  ]
+  quotas && setQuotas && productionColumns?.push(
     {
       header: t("Quota approuvé"),
       cell: (p) => {
@@ -144,10 +200,8 @@ export const ProductionTable = ({
             }
           />
         )
-      },
-    },
-  ]
-
+      }
+    })
   return <YearTable columns={productionColumns} rows={production} />
 }
 
@@ -171,8 +225,8 @@ export const StatusTable = ({ agreement }: StatusTableProps) => {
             !s.approved && s.user
               ? t("Refusé")
               : s.approved
-              ? t("Accepté")
-              : t("En attente")
+                ? t("Accepté")
+                : t("En attente")
           }
         />
       ),

@@ -5,9 +5,9 @@ import traceback
 import dateutil
 from typing import List
 from django.db.models.query import QuerySet
+from django.forms import model_to_dict
 from core.carburetypes import CarbureUnit, CarbureStockErrors
 from core.models import CarbureLot, CarbureStock, Entity, GenericError
-from certificates.models import DoubleCountingRegistration
 from transactions.sanity_checks.sanity_checks import bulk_sanity_checks
 
 
@@ -47,9 +47,7 @@ def try_get_date(dd):
     if dd is None:
         return dd
     if isinstance(dd, int):
-        return datetime.datetime.fromordinal(
-            datetime.datetime(1900, 1, 1).toordinal() + dd - 2
-        )
+        return datetime.datetime.fromordinal(datetime.datetime(1900, 1, 1).toordinal() + dd - 2)
     if isinstance(dd, datetime.datetime):
         return dd.date()
     if isinstance(dd, datetime.date):
@@ -113,18 +111,14 @@ def fill_production_info(lot, data, entity, prefetched_data):
     else:
         # NEW LOT
         lot.production_site_certificate = data.get("production_site_certificate", None)
-        lot.production_site_certificate_type = data.get(
-            "production_site_certificate_type", None
-        )
+        lot.production_site_certificate_type = data.get("production_site_certificate_type", None)
         carbure_production_site = data.get("carbure_production_site", "").upper()
         # CASE 2
         if carbure_production_site and entity.entity_type == Entity.PRODUCER:
             lot.carbure_producer = entity
             lot.unknown_producer = None
             if carbure_production_site in prefetched_data["my_production_sites"]:
-                lot.carbure_production_site = prefetched_data["my_production_sites"][
-                    carbure_production_site
-                ]
+                lot.carbure_production_site = prefetched_data["my_production_sites"][carbure_production_site]
             else:
                 lot.carbure_production_site = None
                 errors.append(
@@ -138,41 +132,17 @@ def fill_production_info(lot, data, entity, prefetched_data):
                     )
                 )
             lot.unknown_production_site = None
-            lot.production_country = (
-                lot.carbure_production_site.country
-                if lot.carbure_production_site
-                else None
-            )
+            lot.production_country = lot.carbure_production_site.country if lot.carbure_production_site else None
             lot.production_site_commissioning_date = (
-                lot.carbure_production_site.date_mise_en_service
-                if lot.carbure_production_site
-                else None
+                lot.carbure_production_site.date_mise_en_service if lot.carbure_production_site else None
             )
 
             # si il y a un certificat DC renseigné, on recupere et verifie la validité des certificats associés à ce site de production
-            if lot.carbure_production_site.dc_reference:
-                delivery_date = data.get("delivery_date")
-                try:
-                    pd_certificates = DoubleCountingRegistration.objects.filter(
-                        production_site_id=lot.carbure_production_site.id,
-                        valid_from__lt=delivery_date,
-                        valid_until__gte=delivery_date,
-                    )
-                    current_certificate = pd_certificates.first()
-                    if current_certificate:
-                        lot.production_site_double_counting_certificate = (
-                            current_certificate.certificate_id
-                        )
-                    else:  # le certificat renseigné sur le site de production est mis par defaut
-                        lot.production_site_double_counting_certificate = (
-                            lot.carbure_production_site.dc_reference
-                        )
-                except:
-                    lot.production_site_double_counting_certificate = (
-                        lot.carbure_production_site.dc_reference
-                    )
-            else:
-                lot.production_site_double_counting_certificate = None
+            from doublecount.helpers import get_lot_dc_agreement
+
+            dc_agreement = get_lot_dc_agreement(lot.feedstock, lot.delivery_date, lot.carbure_production_site)
+            if dc_agreement:
+                lot.production_site_double_counting_certificate = dc_agreement
 
         # CASE 3
         else:
@@ -185,12 +155,8 @@ def fill_production_info(lot, data, entity, prefetched_data):
                 lot.production_country = None
             else:
                 lot.production_country = prefetched_data["countries"][pcc]
-            lot.production_site_commissioning_date = try_get_date(
-                data.get("production_site_commissioning_date", None)
-            )
-            lot.production_site_double_counting_certificate = data.get(
-                "production_site_double_counting_certificate", None
-            )
+            lot.production_site_commissioning_date = try_get_date(data.get("production_site_commissioning_date", None))
+            lot.production_site_double_counting_certificate = data.get("production_site_double_counting_certificate", None)
     return errors
 
 
@@ -355,13 +321,9 @@ def fill_volume_info(lot, data):
                 lot.volume = quantity["volume"]
                 lot.weight = quantity["weight"]
                 lot.lhv_amount = quantity["lhv_amount"]
-                lot.parent_stock.remaining_volume = round(
-                    lot.parent_stock.remaining_volume + diff, 2
-                )
+                lot.parent_stock.remaining_volume = round(lot.parent_stock.remaining_volume + diff, 2)
                 lot.parent_stock.remaining_weight = lot.parent_stock.get_weight()
-                lot.parent_stock.remaining_lhv_amount = (
-                    lot.parent_stock.get_lhv_amount()
-                )
+                lot.parent_stock.remaining_lhv_amount = lot.parent_stock.get_lhv_amount()
                 lot.parent_stock.save()
         except Exception:
             errors.append(
@@ -413,21 +375,13 @@ def fill_supplier_info(lot, data, entity):
     # I AM THE SUPPLIER
     if str(data.get("carbure_supplier_id")) == str(entity.id):
         lot.carbure_supplier = entity
-        lot.supplier_certificate = data.get(
-            "supplier_certificate", entity.default_certificate
-        )
+        lot.supplier_certificate = data.get("supplier_certificate", entity.default_certificate)
     # LOT FROM STOCK
     if lot.parent_stock:
         lot.carbure_supplier = entity
-        lot.supplier_certificate = data.get(
-            "supplier_certificate", entity.default_certificate
-        )
+        lot.supplier_certificate = data.get("supplier_certificate", entity.default_certificate)
     # EXCEL: NO SUPPLIER IS SPECIFIED AND I AM THE PRODUCER
-    if (
-        lot.carbure_producer
-        and lot.carbure_producer.id == entity.id
-        and not lot.carbure_supplier
-    ):
+    if lot.carbure_producer and lot.carbure_producer.id == entity.id and not lot.carbure_supplier:
         lot.carbure_supplier = entity
         if not lot.supplier_certificate:
             lot.supplier_certificate = entity.default_certificate
@@ -439,9 +393,7 @@ def fill_vendor_data(lot, data, entity):
     # I AM NEITHER THE PRODUCER NOR THE CLIENT - TRADING - OVERRIDE SOME FIELDS
     if entity != lot.carbure_supplier and entity != lot.carbure_client:
         lot.carbure_vendor = entity  # this will flag the transaction when it is validated in order to create 2 transactions (unknown_supplier -> vendor and vendor -> client)
-        lot.vendor_certificate = data.get(
-            "vendor_certificate", entity.default_certificate
-        )
+        lot.vendor_certificate = data.get("vendor_certificate", entity.default_certificate)
     else:
         lot.vendor_certificate = None
         lot.carbure_vendor = None
@@ -456,75 +408,39 @@ def fill_ghg_info(lot, data):
     try:
         lot.eec = abs(float(data.get("eec", 0)))
     except:
-        errors.append(
-            GenericError(
-                lot=lot, field="eec", error=WRONG_FLOAT_FORMAT, display_to_creator=True
-            )
-        )
+        errors.append(GenericError(lot=lot, field="eec", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.el = float(data.get("el", 0))
     except:
-        errors.append(
-            GenericError(
-                lot=lot, field="el", error=WRONG_FLOAT_FORMAT, display_to_creator=True
-            )
-        )
+        errors.append(GenericError(lot=lot, field="el", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.ep = abs(float(data.get("ep", 0)))
     except:
-        errors.append(
-            GenericError(
-                lot=lot, field="ep", error=WRONG_FLOAT_FORMAT, display_to_creator=True
-            )
-        )
+        errors.append(GenericError(lot=lot, field="ep", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.etd = abs(float(data.get("etd", 0)))
     except:
-        errors.append(
-            GenericError(
-                lot=lot, field="etd", error=WRONG_FLOAT_FORMAT, display_to_creator=True
-            )
-        )
+        errors.append(GenericError(lot=lot, field="etd", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.eu = abs(float(data.get("eu", 0)))
     except:
-        errors.append(
-            GenericError(
-                lot=lot, field="eu", error=WRONG_FLOAT_FORMAT, display_to_creator=True
-            )
-        )
+        errors.append(GenericError(lot=lot, field="eu", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.esca = abs(float(data.get("esca", 0)))
     except:
-        errors.append(
-            GenericError(
-                lot=lot, field="esca", error=WRONG_FLOAT_FORMAT, display_to_creator=True
-            )
-        )
+        errors.append(GenericError(lot=lot, field="esca", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.eccs = abs(float(data.get("eccs", 0)))
     except:
-        errors.append(
-            GenericError(
-                lot=lot, field="eccs", error=WRONG_FLOAT_FORMAT, display_to_creator=True
-            )
-        )
+        errors.append(GenericError(lot=lot, field="eccs", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.eccr = abs(float(data.get("eccr", 0)))
     except:
-        errors.append(
-            GenericError(
-                lot=lot, field="eccr", error=WRONG_FLOAT_FORMAT, display_to_creator=True
-            )
-        )
+        errors.append(GenericError(lot=lot, field="eccr", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     try:
         lot.eee = abs(float(data.get("eee", 0)))
     except:
-        errors.append(
-            GenericError(
-                lot=lot, field="eee", error=WRONG_FLOAT_FORMAT, display_to_creator=True
-            )
-        )
+        errors.append(GenericError(lot=lot, field="eee", error=WRONG_FLOAT_FORMAT, display_to_creator=True))
     lot.update_ghg()
     return errors
 
@@ -575,15 +491,9 @@ def fill_delivery_data(lot, data, entity, prefetched_data):
         lot.unknown_delivery_site = data.get("unknown_delivery_site", None)
         delivery_country_code = data.get("delivery_site_country_code", None)
         if delivery_country_code in prefetched_data["countries"]:
-            lot.delivery_site_country = prefetched_data["countries"][
-                delivery_country_code
-            ]
+            lot.delivery_site_country = prefetched_data["countries"][delivery_country_code]
 
-    if (
-        entity.entity_type == Entity.OPERATOR
-        and lot.carbure_client == entity
-        and lot.delivery_type == CarbureLot.UNKNOWN
-    ):
+    if entity.entity_type == Entity.OPERATOR and lot.carbure_client == entity and lot.delivery_type == CarbureLot.UNKNOWN:
         lot.delivery_type = CarbureLot.BLENDING
     return errors
 
@@ -591,11 +501,7 @@ def fill_delivery_data(lot, data, entity, prefetched_data):
 def fill_client_data(lot, data, entity, prefetched_data):
     errors = []
     carbure_client_id = data.get("carbure_client_id", None)
-    if (
-        entity.entity_type == Entity.OPERATOR
-        and carbure_client_id is None
-        and lot.delivery_type == CarbureLot.UNKNOWN
-    ):
+    if entity.entity_type == Entity.OPERATOR and carbure_client_id is None and lot.delivery_type == CarbureLot.UNKNOWN:
         lot.carbure_client = entity
 
     try:
@@ -664,8 +570,8 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
         lot.biofuel = parent_stock.biofuel
     else:
         # FILL sustainability data from excel file
-        errors += fill_production_info(lot, data, entity, prefetched_data)
         errors += fill_basic_info(lot, data, prefetched_data)
+        errors += fill_production_info(lot, data, entity, prefetched_data)
         errors += fill_ghg_info(lot, data)
 
     # common data
@@ -729,7 +635,5 @@ def bulk_insert_lots(
         for e in lot_errors:
             e.lot_id = lot.id
     bulk_sanity_checks(inserted_lots, prefetched_data)
-    GenericError.objects.bulk_create(
-        [error for lot_errors in errors for error in lot_errors], batch_size=100
-    )
+    GenericError.objects.bulk_create([error for lot_errors in errors for error in lot_errors], batch_size=100)
     return inserted_lots
