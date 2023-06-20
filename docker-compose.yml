@@ -93,6 +93,48 @@ services:
     ports:
       - 8090:80
 
+
+  carbure-udb-blue:
+    image: carbure_udb:local
+    container_name: carbure_udb_blue
+    depends_on:
+      - carbure-mariadb
+    build:
+      context: ./udb
+    environment:
+      MYSQL_DATABASE: domibus_blue
+      MYSQL_USER: edelivery_blue
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ./udb/migrate.sh:/app/migrate.sh
+      - ./udb/setenv.sh:/app/domibus/bin/setenv.sh
+      - ./udb/domibus-blue.properties:/app/domibus/conf/domibus/domibus.properties
+    networks:
+      - carbure
+    ports:
+      - 8080:8080
+
+  carbure-udb-red:
+    image: carbure_udb:local
+    container_name: carbure_udb_red
+    depends_on:
+      - carbure-mariadb
+    build:
+      context: ./udb
+    environment:
+      MYSQL_DATABASE: domibus_red
+      MYSQL_USER: edelivery_red
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ./udb/migrate.sh:/app/migrate.sh
+      - ./udb/setenv.sh:/app/domibus/bin/setenv.sh
+      - ./udb/domibus-red.properties:/app/domibus/conf/domibus/domibus.properties
+    networks:
+      - carbure
+    ports:
+      - 8081:8080
+
+
 volumes:
   carburedb:
     name: carbure_carburedb
