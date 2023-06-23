@@ -67,7 +67,7 @@ const DoubleCountingFilesChecker = () => {
     },
     {
       header: t("Période de validité"),
-      cell: (file) => <Cell text={`${file.year} - ${file.year + 1}`} />,
+      cell: (file) => <Cell text={`${file.start_year} - ${file.start_year + 1}`} />,
     },
   ]
 

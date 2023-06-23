@@ -68,10 +68,14 @@ export enum DoubleCountingUploadErrorType {
   ProductionMismatchSourcing = "PRODUCTION_MISMATCH_SOURCING",
   PomeGt2000 = "POME_GT_2000",
   MissingEstimatedProduction = "MISSING_ESTIMATED_PRODUCTION",
+  MissingMaxProductionCapacity = "MISSING_MAX_PRODUCTION_CAPACITY",
   MissingFeedstock = "MISSING_FEEDSTOCK",
+  MissingData = "MISSING_DATA",
   ProductionMismatchQuota = "PRODUCTION_MISMATCH_QUOTA",
   LineFeedstocksIncoherent = "LINE_FEEDSTOCKS_INCOHERENT",
   UnknownYear = "UNKNOWN_YEAR",
+  InvalidYear = "INVALID_YEAR",
+  MissingPeriod = "MISSING_PERIOD",
   BadWorksheetName = "BAD_WORKSHEET_NAME",
   MissingCountryOfOrigin = "MISSING_COUNTRY_OF_ORIGIN",
 }
@@ -140,7 +144,7 @@ export interface QuotaDetails {
 
 export interface DoubleCountingFileInfo {
   errors?: DoubleCountingUploadErrors
-  year: string
+  start_year: string
   file_name: string
   producer_email: string
   production_site: string

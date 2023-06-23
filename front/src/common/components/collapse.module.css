@@ -9,7 +9,7 @@
   overflow: hidden;
 }
 
-.collapse > header {
+.collapse>header {
   display: flex;
   gap: var(--spacing-m);
   cursor: pointer;
@@ -19,6 +19,12 @@
 
 .collapse .indicator {
   margin-left: auto;
+}
+
+.collapse ul {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 .collapse [data-icon] {

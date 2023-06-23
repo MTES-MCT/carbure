@@ -194,7 +194,7 @@ const DoubleCountingDialog = ({
             <Trans>
               Pour toute question concernant l'évolution de votre dossier,
               contactez-nous à l'adresse{" "}
-              <MailTo user="doublecompte" host="beta.gouv.fr">
+              <MailTo user="carbure" host="beta.gouv.fr">
                 disponible sur ce lien
               </MailTo>
             </Trans>
@@ -267,15 +267,15 @@ const DoubleCountingDialog = ({
                     ),
                 },
                 !isFinal &&
-                  actionColumn((s) => [
-                    <Button
-                      captive
-                      variant="icon"
-                      icon={Cross}
-                      action={() => removeSourcingRow(s.id)}
-                      title={t("Supprimer approvisionnement")}
-                    />,
-                  ]),
+                actionColumn((s) => [
+                  <Button
+                    captive
+                    variant="icon"
+                    icon={Cross}
+                    action={() => removeSourcingRow(s.id)}
+                    title={t("Supprimer approvisionnement")}
+                  />,
+                ]),
               ])}
             />
 
@@ -336,15 +336,15 @@ const DoubleCountingDialog = ({
                     ),
                 },
                 !isFinal &&
-                  actionColumn((s) => [
-                    <Button
-                      captive
-                      variant="icon"
-                      icon={Cross}
-                      action={() => removeProductionRow(s.id)}
-                      title={t("Supprimer production")}
-                    />,
-                  ]),
+                actionColumn((s) => [
+                  <Button
+                    captive
+                    variant="icon"
+                    icon={Cross}
+                    action={() => removeProductionRow(s.id)}
+                    title={t("Supprimer production")}
+                  />,
+                ]),
               ])}
             />
 

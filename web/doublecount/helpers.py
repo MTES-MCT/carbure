@@ -40,14 +40,6 @@ def load_dc_sourcing_data(dca: DoubleCountingAgreement, sourcing_rows: List[Sour
     countries = Pays.objects.all()
 
     for row in sourcing_rows:
-        # skip rows that start empty
-        if not row["year"]:
-            continue
-
-        if row["year"] == -1:
-            sourcing_errors.append(error(DoubleCountingError.UNKNOWN_YEAR, line=row["line"]))
-            continue
-
         try:
             feedstock = feedstocks.get(code=row["feedstock"].strip()) if row["feedstock"] else None
         except:
@@ -99,71 +91,88 @@ def load_dc_production_data(
     biofuels = {f.code: f for f in Biocarburant.objects.all()}
 
     # check rows integrity
-    for index, production_base_row in enumerate([production_max_rows, production_forecast_rows, requested_quota_rows]):
+    for index, production_base_rows in enumerate([production_max_rows, production_forecast_rows, requested_quota_rows]):
         tabName = ["Capacité maximale de production", "Production prévisionelle", "Reconnaissance double comptage"][index]
-        for row in production_base_row:
-            feedstock = feedstocks.get(row["feedstock"], None)
-            biofuel = biofuels.get(row["biofuel"], None)
-            errors = check_production_row_integrity(feedstock, biofuel, row, tabName)
+
+        if len(production_base_rows) < 2:
+            production_errors.append(
+                error(
+                    DoubleCountingError.MISSING_DATA,
+                    meta={"tabName": tabName},
+                )
+            )
+            continue
+
+        for req_quota_row in production_base_rows:
+            feedstock = feedstocks.get(req_quota_row["feedstock"], None)
+            biofuel = biofuels.get(req_quota_row["biofuel"], None)
+            errors = check_production_row_integrity(feedstock, biofuel, req_quota_row, tabName, dca)
             production_errors += errors
 
     if len(production_errors) > 0:
         return production_data, production_errors
 
-    # VERIFIER EN PARTANT DES REQUESTED QUOTA
-    # ET DESCENDRE POUR VERIFIER LA CORRESPONDANCE AVEC L'ONGLET PRODUCTION
-    # for row in requested_quota_rows:
-    #     # skip rows that start empty
-    #     if not row["year"]:
-    #         continue
+    # check data consistency from requested_quota
+    for req_quota_row in requested_quota_rows:
+        production = DoubleCountingProduction(dca=dca)
+        for prod_forecast_row in production_forecast_rows:
+            if (
+                prod_forecast_row["year"] == req_quota_row["year"]
+                and prod_forecast_row["feedstock"] == req_quota_row["feedstock"]
+                and prod_forecast_row["biofuel"] == req_quota_row["biofuel"]
+            ):
+                production.estimated_production = prod_forecast_row["estimated_production"]
+                break
 
-    #     feedstock = feedstocks.get(row["feedstock"], None)
-    #     biofuel = biofuels.get(row["biofuel"], None)
+        if not production.estimated_production:
+            production_errors.append(
+                error(
+                    DoubleCountingError.MISSING_ESTIMATED_PRODUCTION,
+                    line=req_quota_row["line"],
+                    meta={
+                        "year": req_quota_row["year"],
+                        "feedstock": req_quota_row["feedstock"],
+                        "biofuel": req_quota_row["biofuel"],
+                        "tabName": "Reconnaissance double comptage",
+                    },
+                )
+            )
 
-    #     production = DoubleCountingProduction(dca=dca)
-    #     production.year = row["year"]
-    #     production.feedstock = feedstock
-    #     production.biofuel = biofuel
+        # check in production_max_rows if there is a corresponding row
+        for prod_max_row in production_max_rows:
+            if (
+                prod_max_row["year"] == req_quota_row["year"]
+                and prod_max_row["feedstock"] == req_quota_row["feedstock"]
+                and prod_max_row["biofuel"] == req_quota_row["biofuel"]
+            ):
+                production.max_production_capacity = prod_max_row["max_production_capacity"]
+                break
+        if not production.max_production_capacity:
+            production_errors.append(
+                error(
+                    DoubleCountingError.MISSING_MAX_PRODUCTION_CAPACITY,
+                    line=req_quota_row["line"],
+                    meta={
+                        "year": req_quota_row["year"],
+                        "feedstock": req_quota_row["feedstock"],
+                        "biofuel": req_quota_row["biofuel"],
+                        "tabName": tabName,
+                    },
+                )
+            )
 
-    #     errors = check_production_row_integrity(production, row)
-    #     production_errors += errors
-    #     if len(errors) == 0:
-    #         production_data.append(production)
+        production.year = req_quota_row["year"]
+        production.feedstock = feedstocks.get(req_quota_row["feedstock"], None)
+        production.biofuel = biofuels.get(req_quota_row["biofuel"], None)
+        production.requested_quota = req_quota_row["requested_quota"]
+
+        if len(production_errors) > 0:
+            return production_data, production_errors
+
+        production_errors += check_production_row(production, req_quota_row)
+        production_data.append(production)
 
     return production_data, production_errors
-
-
-# def load_dc_production_data(dca: DoubleCountingAgreement, production_rows: List[ProductionRow]):
-#     print(" ")
-#     print("dca.period_start: ", dca.period_start)
-#     production_data = []
-#     production_errors = []
-
-#     # preload data
-#     feedstocks = {f.code: f for f in MatierePremiere.objects.all()}
-#     biofuels = {f.code: f for f in Biocarburant.objects.all()}
-
-#     for row in production_rows:
-#         # skip rows that start empty
-#         if not row["year"]:
-#             continue
-
-#         feedstock = feedstocks.get(row["feedstock"], None)
-#         biofuel = biofuels.get(row["biofuel"], None)
-#         production = DoubleCountingProduction(dca=dca)
-#         production.year = row["year"]
-#         production.feedstock = feedstock
-#         production.biofuel = biofuel
-#         production.max_production_capacity = row["max_production_capacity"]
-#         production.estimated_production = row["estimated_production"]
-#         production.requested_quota = row["requested_quota"]
-
-#         errors = check_production_row(production, row)
-#         production_errors += errors
-#         if len(errors) == 0:
-#             production_data.append(production)
-
-#     return production_data, production_errors
 
 
 def load_dc_recognition_file(entity, psite_id, user, filepath):
@@ -184,50 +193,52 @@ def load_dc_filepath(file):
     return filepath
 
 
-def load_dc_period(info, requested_quota_rows):
-    years = [production["year"] for production in requested_quota_rows]
-    end_year = max(years) if len(years) > 0 else info["year"] + 1
+def load_dc_period(start_year):
+    errors = []
+    if start_year == 0:
+        errors.append(
+            error(
+                DoubleCountingError.MISSING_PERIOD,
+            )
+        )
+
+    end_year = start_year + 1
     start = datetime.date(end_year - 1, 1, 1)
     end = datetime.date(end_year, 12, 31)
-    return start, end
+    return start, end, errors
 
 
 @transaction.atomic
 def check_dc_file(file):
     try:
         filepath = load_dc_filepath(file)
-        # info, sourcing_forecast_rows, production_rows = parse_dc_excel(filepath)
         info, sourcing_forecast_rows, production_max_rows, production_forecast_rows, requested_quota_rows = parse_dc_excel(
             filepath
         )
-        start, end = load_dc_period(info, requested_quota_rows)
-        # start, end = load_dc_period(info, production_rows)
+        start, end, global_errors = load_dc_period(info["start_year"])
 
         # create temporary agreement to hold all the data that will be parsed
         dca = DoubleCountingAgreement(
             period_start=start,
             period_end=end,
         )
+
         sourcing_forecast_data, sourcing_forecast_errors = load_dc_sourcing_data(dca, sourcing_forecast_rows)
-        # production_data, production_errors = load_dc_production_data(dca, production_rows)
+
         production_data, production_errors = load_dc_production_data(
             dca, production_max_rows, production_forecast_rows, requested_quota_rows
         )
 
-        sourcing_data = sourcing_forecast_data
-
-        # sourcing_data = sourcing_history_data + sourcing_forecast_data
-        global_errors = check_dc_globally(sourcing_data, production_data)
+        global_errors += check_dc_globally(sourcing_forecast_data, production_data) if len(production_errors) == 0 else []
 
         return (
             info,
             {
-                # "sourcing_history": sourcing_history_errors,
                 "sourcing_forecast": sourcing_forecast_errors,
                 "production": production_errors,
                 "global": global_errors,
             },
-            DoubleCountingSourcingSerializer(sourcing_data, many=True).data,
+            DoubleCountingSourcingSerializer(sourcing_forecast_data, many=True).data,
             DoubleCountingProductionSerializer(production_data, many=True).data,
         )
 
@@ -253,7 +264,7 @@ def check_dc_file(file):
         else:
             excel_error = error(DoubleCountingError.EXCEL_PARSING_ERROR, is_blocking=True, meta=str(e))
 
-    info = {"production_site": None, "year": 0, "producer_email": None}
+    info = {"production_site": None, "start_year": 0, "producer_email": None}
     return (
         info,
         {
