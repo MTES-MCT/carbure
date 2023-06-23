@@ -220,9 +220,9 @@ export const MailToDialog = ({
       <main>
         <section>
           <p style={{ textAlign: 'left' }}>
-            {t("Votre fichier est valide. Vous pouvez le transmettre par email à la DGEC pour une vérification approfondie à l'adresse doublecount@carbure.beta.gouv.fr en cliquant ci-dessous : ")}
+            {t("Votre fichier est valide. Vous pouvez le transmettre par email à la DGEC pour une vérification approfondie à l'adresse carbure@beta.gouv.fr en cliquant ci-dessous : ")}
           </p>
-          <MailTo user="doublecompte" host="beta.gouv.fr">
+          <MailTo user="carbure" host="beta.gouv.fr">
             <Trans>Envoyer l'email</Trans>
           </MailTo>
 

@@ -50,19 +50,21 @@ class ProductionMaxRow(ProductionBaseRow):
 
 def parse_dc_excel(
     filename: str,
-) -> Tuple[List[SourcingRow], List[ProductionRow]]:
+) -> Tuple[dict[str], List[SourcingRow], List[ProductionMaxRow], List[ProductionForecastRow], List[RequestedQuotaRow]]:
     excel_file = load_workbook(filename, data_only=True)
 
     info = parse_info(excel_file)
+    requested_quota_rows = parse_requested_quota(excel_file)
 
-    sourcing_forecast_rows = parse_sourcing(excel_file, "Approvisionnement prévisionnel")
-    # production_rows = parse_production(excel_file, requested_year=info["year"])
-    production_max_rows = parse_production_max(excel_file, requested_year=info["year"])
-    production_forecast_rows = parse_production_forecast(excel_file, requested_year=info["year"])
-    requested_quota_rows = parse_requested_quota(excel_file, requested_year=info["year"])
+    years = [production_row["year"] for production_row in requested_quota_rows]
+    start_year = max(years) - 1 if len(years) > 0 else info["start_year"] + 1 if info["start_year"] else 0
 
+    sourcing_forecast_rows = parse_sourcing_forecast(excel_file, requested_year=start_year)
+    production_max_rows = parse_production_max(excel_file, requested_year=start_year)
+    production_forecast_rows = parse_production_forecast(excel_file, requested_year=start_year)
+
+    info["start_year"] = start_year
     return info, sourcing_forecast_rows, production_max_rows, production_forecast_rows, requested_quota_rows
-    # return info, sourcing_forecast_rows, production_rows
 
 
 def parse_info(excel_file: Workbook):
@@ -79,31 +81,30 @@ def parse_info(excel_file: Workbook):
                 year_row_index = i
                 if row[6].value == "Première année de reconnaissance":
                     break
-            year = int(application[year_row_index + 2][6].value)
+            start_year = int(application[year_row_index + 2][6].value)
         except:
-            year = 0
+            start_year = 0
 
         return {
             "production_site": production_site,
             "producer_email": producer_email,
-            "year": year,
+            "start_year": start_year,
         }
     except:
         traceback.print_exc()
-        return {"production_site": None, "year": 0, "producer_email": None}
+        return {"production_site": None, "producer_email": None, "start_year": 0}
 
 
-def parse_sourcing(excel_file: Workbook, sheet_name: str) -> List[SourcingRow]:
-    if sheet_name not in excel_file:
-        raise CarbureException(DoubleCountingError.BAD_WORKSHEET_NAME, {"sheet_name": sheet_name})
-
-    sourcing_sheet = excel_file[sheet_name]
+def parse_sourcing_forecast(excel_file: Workbook, requested_year: int) -> List[SourcingRow]:
+    sourcing_sheet = excel_file["Approvisionnement prévisionnel"]
     sourcing_rows: List[SourcingRow] = []
 
     current_year = -1
 
     for line, row in enumerate(sourcing_sheet.iter_rows()):
         current_year = extract_year(row[1].value, current_year)
+        if current_year < requested_year:
+            continue
 
         feedstock_name = row[2].value
         origin_country_cell = row[3].value
@@ -139,12 +140,7 @@ def parse_sourcing(excel_file: Workbook, sheet_name: str) -> List[SourcingRow]:
             "metric_tonnes": 0,
         }
 
-        if sheet_name == "Approvisionnement prévisionnel":
-            sourcing["metric_tonnes"] = row[6].value
-        elif sheet_name == "Historique d'approvisionnement":
-            sourcing["metric_tonnes"] = row[8].value
-            # sourcing["supplier_name"] = row[6].value
-            # sourcing["supplier_certificate"] = row[7].value
+        sourcing["metric_tonnes"] = row[6].value
 
         sourcing_rows.append(sourcing)
 
@@ -223,7 +219,7 @@ def parse_production_forecast(excel_file: Workbook, requested_year) -> List[Prod
     return production_forecast_rows
 
 
-def parse_requested_quota(excel_file: Workbook, requested_year) -> List[RequestedQuotaRow]:
+def parse_requested_quota(excel_file: Workbook) -> List[RequestedQuotaRow]:
     requested_quota_rows: List[RequestedQuotaRow] = []
 
     current_year = -1
@@ -231,9 +227,6 @@ def parse_requested_quota(excel_file: Workbook, requested_year) -> List[Requeste
 
     for line, row in enumerate(production_sheet.iter_rows()):
         current_year = extract_year(row[1].value, current_year)
-
-        if current_year < requested_year:
-            continue
 
         biofuel_name = None if "SOMME :" == row[2].value else row[2].value
         feedstock_name = row[3].value
@@ -362,71 +355,3 @@ dc_biofuel_to_carbure_biofuel: dict[str, str | None] = {
     "TAEE": "TAEE",
     "TAME": "TAME",
 }
-
-
-def parse_production(excel_file: Workbook, requested_year) -> List[ProductionRow]:
-    production_rows: List[ProductionRow] = []
-
-    current_year = -1
-    production_sheet = excel_file["Production"]
-
-    # Estimated Production
-    for line, row in enumerate(production_sheet.iter_rows()):
-        current_year = extract_year(row[1].value, current_year)
-
-        if current_year < requested_year:
-            continue
-        biofuel_name = row[2].value
-        feedstock_name = row[3].value
-        feedstock_name_check = row[8].value
-        max_production_capacity = intOrZero(row[4].value)
-        estimated_production = intOrZero(row[9].value)
-
-        if current_year == -1 or not feedstock_name or not biofuel_name:
-            continue
-
-        feedstock = get_feedstock_from_dc_feedstock(feedstock_name)
-        feedstock_check = feedstock if feedstock_name == feedstock_name_check else ""
-        biofuel = dc_biofuel_to_carbure_biofuel.get(biofuel_name.strip(), None)
-        production: ProductionRow = {
-            "line": line + 1,
-            "year": current_year,
-            "feedstock": feedstock,
-            "feedstock_check": feedstock_check,
-            "biofuel": biofuel,
-            "max_production_capacity": max_production_capacity,
-            "estimated_production": estimated_production,
-            "requested_quota": 0,
-        }
-
-        production_rows.append(production)
-
-    current_year = -1
-    quota_sheet = excel_file["Reconnaissance double comptage"]
-    # Max production
-
-    # Requested Quota
-    for row in quota_sheet.iter_rows():
-        current_year = extract_year(row[1].value, current_year)
-
-        biofuel_name = row[2].value
-        feedstock_name = row[3].value
-        requested_quota = row[4].value
-
-        if current_year == -1 or not feedstock_name or not biofuel_name:
-            continue
-
-        biofuel = get_biofuel_from_dc_biofuel(biofuel_name)
-        feedstock = get_feedstock_from_dc_feedstock(feedstock_name)
-
-        for production in production_rows:
-            if (
-                biofuel
-                and feedstock
-                and current_year == production["year"]
-                and biofuel == production["biofuel"]
-                and feedstock == production["feedstock"]
-            ):
-                production["requested_quota"] = requested_quota
-
-    return production_rows

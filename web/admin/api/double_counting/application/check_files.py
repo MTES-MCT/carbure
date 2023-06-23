@@ -23,19 +23,14 @@ def check_files(request, *args, **kwargs):
         file_infos = []
         for file in files:
             info, errors, sourcing_data, production_data = check_dc_file(file)
-            error_count = (
-                # len(errors["sourcing_history"])
-                +len(errors["sourcing_forecast"])
-                + len(errors["production"])
-                + len(errors["global"])
-            )
+            error_count = +len(errors["sourcing_forecast"]) + len(errors["production"]) + len(errors["global"])
 
             file_infos.append(
                 {
                     "file_name": file.name,
                     "errors": errors,
                     "error_count": error_count,
-                    "year": info["year"] or 0,
+                    "start_year": info["start_year"] or 0,
                     "production_site": info["production_site"],
                     "producer_email": info["producer_email"],
                     "production": production_data,

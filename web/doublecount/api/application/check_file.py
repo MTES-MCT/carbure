@@ -2,7 +2,7 @@
 import traceback
 import datetime
 from core.common import SuccessResponse, ErrorResponse
-from core.decorators import check_admin_rights, check_user_rights
+from core.decorators import check_user_rights
 from core.models import UserRights
 from doublecount.helpers import check_dc_file
 
@@ -33,7 +33,7 @@ def check_file(request, *args, **kwargs):
             "file_name": file.name,
             "errors": errors,
             "error_count": error_count,
-            "year": info["year"] or 0,
+            "start_year": info["start_year"] or 0,
             "production_site": info["production_site"],
             "producer_email": info["producer_email"],
             "production": production_data,

@@ -3,24 +3,34 @@ import {
   DoubleCountingUploadErrorType,
 } from "double-counting/types"
 import { t } from "i18next"
+import { c } from "msw/lib/glossary-de6278a9"
 
 export function getErrorText(
   error: DoubleCountingUploadError,
-  showLine?: string
+  showLine: boolean = true
 ) {
   let errorText = ""
 
-  if (showLine) {
-    errorText +=
-      (error.line_number ?? -1) >= 0
-        ? t("Ligne {{lineNumber}} : ", { lineNumber: error.line_number })
-        : ""
+  if (showLine && (error.line_number ?? -1) >= 0) {
+    errorText += t("Ligne {{lineNumber}}", { lineNumber: error.line_merged || error.line_number })
   }
+  if (error.meta.tabName) {
+    errorText += ` (${error.meta.tabName})`
+  }
+
+  if (errorText.length > 0)
+    errorText += " : "
 
   switch (error.error) {
     case DoubleCountingUploadErrorType.UnkownFeedstock:
       errorText += t(
         "La matière première {{feedstock}} n'est pas reconnue. Vérifiez la syntaxe de ce code.",
+        { feedstock: t(error.meta?.feedstock, { ns: "feedstocks" }) }
+      )
+      break
+    case DoubleCountingUploadErrorType.MissingData:
+      errorText += t(
+        "Les données n'ont pas étaient trouvées. Vérifiez que les données ont bien été renseignées.",
         { feedstock: t(error.meta?.feedstock, { ns: "feedstocks" }) }
       )
       break
@@ -34,10 +44,22 @@ export function getErrorText(
       errorText += t("Le biocarburant est manquant ou non reconnu.")
       break
     case DoubleCountingUploadErrorType.MissingFeedstock:
-      errorText += t("La matière première est manquante ou non reconnue (Verifiez la syntaxe dans la liste de matières premières qui est incluse dans le fichier excel).")
+      errorText += t("En {{year}}, la matière première est manquante ou non reconnue (Verifiez la syntaxe dans la liste de matières premières qui est incluse dans le fichier excel).",
+        { year: error.meta?.year })
       break
     case DoubleCountingUploadErrorType.MissingEstimatedProduction:
-      errorText += t("La production estimée est manquante.")
+      errorText += t("En {{year}}, la production prévisionelle correspondante au couple \"{{biofuel}} / {{feedstock}}\" est manquante.", {
+        year: error.meta?.year,
+        feedstock: t(error.meta?.feedstock, { ns: "feedstocks" }),
+        biofuel: t(error.meta?.biofuel, { ns: "biofuels" }),
+      })
+      break
+    case DoubleCountingUploadErrorType.MissingMaxProductionCapacity:
+      errorText += t("En {{year}}, la capacité de production maximale correspondante au couple \"{{biofuel}} / {{feedstock}}\" est manquante.", {
+        year: error.meta?.year,
+        feedstock: t(error.meta?.feedstock, { ns: "feedstocks" }),
+        biofuel: t(error.meta?.biofuel, { ns: "biofuels" }),
+      })
       break
     case DoubleCountingUploadErrorType.NotDcFeedstock:
       errorText += t(
@@ -82,12 +104,31 @@ export function getErrorText(
       break
     case DoubleCountingUploadErrorType.ProductionMismatchQuota:
       errorText += t(
-        "Le quota demandé dans l'onglet \"Reconnaissance double comptage\" ne peut pas être supérieur à la production prévisionelle renseignée ici.",
+        "En {{year}}, le quota demandé ({{requested_quota}} tonnes de {{biofuel}}) ne peut pas être supérieur à la production prévisionelle renseignée ({{estimated_production}} tonnes).",
+        {
+          year: error?.meta?.year,
+          requested_quota: error?.meta?.requested_quota,
+          biofuel: t(error.meta?.biofuel, { ns: "biofuels" }),
+          estimated_production: error?.meta?.estimated_production
+        }
+
       )
       break
     case DoubleCountingUploadErrorType.LineFeedstocksIncoherent:
       errorText += t(
         "Les matières premières renseignées sur la même ligne doivent être identiques dans les deux tableaux.",
+      )
+      break
+    case DoubleCountingUploadErrorType.InvalidYear:
+      errorText += t(
+        "L'année renseignée ({{year}}) ne correspond pas à la période demandée. Vérifiez les années renseignées dans l'onglet \"Reconnaissance double comptage\".",
+        { year: error?.meta.year }
+      )
+      break
+    case DoubleCountingUploadErrorType.MissingPeriod:
+      errorText += t(
+        "La période de la demande n'a pas pu être trouvée sur le fichier. Vérifiez la première année de reconnaissance entrée en bas de l'onglet \"Reconnaissance double comptage\".",
+        { year: error?.meta.year }
       )
       break
     case DoubleCountingUploadErrorType.UnknownYear:
@@ -97,7 +138,8 @@ export function getErrorText(
       break
     case DoubleCountingUploadErrorType.MissingCountryOfOrigin:
       errorText += t(
-        "Le pays d'origine de la matière première doit être renseigné.",
+        "Le pays d'origine de la matière première {{feedstock}} doit être renseigné.",
+        { feedstock: t(error.meta?.feedstock, { ns: "feedstocks" }) }
       )
       break
 

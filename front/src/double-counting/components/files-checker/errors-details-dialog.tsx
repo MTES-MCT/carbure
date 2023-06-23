@@ -28,7 +28,6 @@ export const ErrorsDetailsDialog = ({
   const focusedErrors = fileData.errors?.[
     focus as keyof typeof fileData.errors
   ] as DoubleCountingUploadError[]
-  console.log('focusedErrors:', focusedErrors)
 
   return (
     <Dialog fullscreen onClose={onClose}>
@@ -114,7 +113,6 @@ type ErrorsTableProps = {
 
 export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
   const { t } = useTranslation()
-  const errorFiltered = errors
 
   return <Collapse
     icon={AlertCircle}
@@ -128,11 +126,6 @@ export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
       <ul>
         {errors.map((error, index) => {
           return <li key={`error-${index}`}>
-            {error.line_number! >= 0
-              && t("Ligne {{lineNumber}} : ", {
-                lineNumber: error.line_merged || error.line_number,
-              })}
-            {error.meta.tabName && <span>{error.meta.tabName} - </span>}
             {getErrorText(error)}</li>
         })}
       </ul>

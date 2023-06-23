@@ -1,56 +1,20 @@
-import datetime
-from email import message
-import os
-import traceback
-import unicodedata
-import boto3
-from django.conf import settings
-from django.core.mail import send_mail
-from django.core.mail import EmailMessage
-import json
-from django.db.models.aggregates import Count, Sum
-from django.db.models.query_utils import Q
-
-import xlsxwriter
-from django.http import JsonResponse, HttpResponse
-from core.decorators import check_admin_rights, check_rights, is_admin, is_admin_or_external_admin
-import pytz
-import traceback
-import pandas as pd
+from core.decorators import check_admin_rights
 
 from producers.models import ProductionSite
 from doublecount.models import (
     DoubleCountingAgreement,
-    DoubleCountingDocFile,
     DoubleCountingSourcing,
     DoubleCountingProduction,
 )
-from doublecount.serializers import DoubleCountingAgreementFullSerializer, DoubleCountingAgreementPartialSerializer
-from doublecount.serializers import (
-    DoubleCountingAgreementFullSerializerWithForeignKeys,
-    DoubleCountingAgreementPartialSerializerWithForeignKeys,
-)
 from doublecount.helpers import (
-    check_dc_file,
     load_dc_filepath,
     load_dc_period,
     load_dc_sourcing_data,
     load_dc_production_data,
 )
-from core.models import Entity, UserRights, MatierePremiere, Pays, Biocarburant, CarbureLot
-from core.xlsx_v3 import (
-    export_dca,
-    make_biofuels_sheet,
-    make_dc_mps_sheet,
-    make_countries_sheet,
-    make_dc_production_sheet,
-    make_dc_sourcing_sheet,
-)
-from carbure.storage_backends import AWSStorage
-from django.core.files.storage import FileSystemStorage
+from core.models import Entity
 
 from core.common import ErrorResponse, SuccessResponse
-from doublecount.dc_sanity_checks import check_dc_globally
 from doublecount.dc_parser import parse_dc_excel
 
 from django.db import transaction
@@ -87,7 +51,7 @@ def add_application(request, *args, **kwargs):
 
     filepath = load_dc_filepath(file)
     info, sourcing_forecast, production_forecast = parse_dc_excel(filepath)
-    start, end = load_dc_period(info, production_forecast)
+    start, end = load_dc_period(info["start_year"])
 
     dca, _ = DoubleCountingAgreement.objects.get_or_create(
         producer=producer,
