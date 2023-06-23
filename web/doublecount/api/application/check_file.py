@@ -21,7 +21,6 @@ def check_file(request, *args, **kwargs):
         return ErrorResponse(400, CheckFileError.MISSING_FILE)
 
     try:
-        file_infos = []
         info, errors, sourcing_data, production_data = check_dc_file(file)
         error_count = (
             # len(errors["sourcing_history"])

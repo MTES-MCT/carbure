@@ -2,7 +2,7 @@ from typing import List, TypedDict
 from doublecount.errors import DcError, DoubleCountingError, error
 from doublecount.models import DoubleCountingProduction, DoubleCountingSourcing
 from core.models import Biocarburant, MatierePremiere
-from doublecount.dc_parser import ProductionRow, SourcingRow
+from doublecount.dc_parser import ProductionBaseRow, ProductionRow, SourcingRow
 
 
 # check a line in the sourcing section of an imported dc excel file
@@ -72,6 +72,44 @@ def check_production_row(production: DoubleCountingProduction, data: ProductionR
     # check that requested quotas aren't bigger than estimated production
     elif (production.requested_quota or 0) > (production.estimated_production or 0):
         errors.append(error(DoubleCountingError.PRODUCTION_MISMATCH_QUOTA, line))
+
+    return errors
+
+
+# check a line in the production section of an imported dc excel file
+def check_production_row_integrity(
+    feedstock: MatierePremiere, biofuel: Biocarburant, data: ProductionBaseRow, tabName: str
+) -> List[DcError]:
+    errors: List[DcError] = []
+    line = data["line"]
+    meta = {"tabName": tabName}
+
+    if not data["feedstock"]:
+        errors.append(error(DoubleCountingError.MISSING_FEEDSTOCK, line, meta))
+    elif not feedstock:
+        errors.append(
+            error(
+                DoubleCountingError.UNKNOWN_FEEDSTOCK,
+                line,
+                {"feedstock": data["feedstock"]},
+            )
+        )
+
+    if not data["biofuel"]:
+        errors.append(error(DoubleCountingError.MISSING_BIOFUEL, line, meta))
+    elif not biofuel:
+        errors.append(error(DoubleCountingError.UNKNOWN_BIOFUEL, line, {"biofuel": data["biofuel"]}))
+
+    if feedstock and biofuel:
+        incompatibilities = check_compatibility_feedstock_biofuel(feedstock, biofuel)
+        meta = {
+            "feedstock": feedstock.code,
+            "biofuel": biofuel.code,
+            "infos": incompatibilities,
+            "tabName": tabName,
+        }
+        if len(incompatibilities) > 0:
+            errors.append(error(DoubleCountingError.MP_BC_INCOHERENT, line, meta))
 
     return errors
 

@@ -81,7 +81,7 @@ const DoubleCountingFilesChecker = () => {
       <header>
         <section>
           <h1>{t("Vérification de fichiers de double comptage")}</h1>
-          <FilesCheckerUploadButton />
+          <FilesCheckerUploadButton label="Vérifier d'autres dossiers" />
         </section>
         {checkedFiles && (
           <section>

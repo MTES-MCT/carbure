@@ -29,18 +29,40 @@ class ProductionRow(TypedDict):
     requested_quota: int
 
 
+class ProductionBaseRow(TypedDict):
+    line: int
+    year: int
+    feedstock: str | None
+    biofuel: str | None
+
+
+class RequestedQuotaRow(ProductionBaseRow):
+    requested_quota: int
+
+
+class ProductionForecastRow(ProductionBaseRow):
+    estimated_production: int
+
+
+class ProductionMaxRow(ProductionBaseRow):
+    max_production_capacity: int
+
+
 def parse_dc_excel(
     filename: str,
 ) -> Tuple[List[SourcingRow], List[ProductionRow]]:
     excel_file = load_workbook(filename, data_only=True)
 
     info = parse_info(excel_file)
-    # sourcing_history = parse_sourcing(excel_file, "Historique d'approvisionnement")
-    sourcing_forecast = parse_sourcing(excel_file, "Approvisionnement prévisionnel")
-    production_forecast = parse_production(excel_file, requested_year=info["year"])
 
-    # return info, sourcing_history, sourcing_forecast, production_forecast
-    return info, sourcing_forecast, production_forecast
+    sourcing_forecast_rows = parse_sourcing(excel_file, "Approvisionnement prévisionnel")
+    # production_rows = parse_production(excel_file, requested_year=info["year"])
+    production_max_rows = parse_production_max(excel_file, requested_year=info["year"])
+    production_forecast_rows = parse_production_forecast(excel_file, requested_year=info["year"])
+    requested_quota_rows = parse_requested_quota(excel_file, requested_year=info["year"])
+
+    return info, sourcing_forecast_rows, production_max_rows, production_forecast_rows, requested_quota_rows
+    # return info, sourcing_forecast_rows, production_rows
 
 
 def parse_info(excel_file: Workbook):
@@ -136,69 +158,103 @@ def intOrZero(value):
         return 0
 
 
-def parse_production(excel_file: Workbook, requested_year) -> List[ProductionRow]:
-    production_rows: List[ProductionRow] = []
+def parse_production_max(excel_file: Workbook, requested_year) -> List[ProductionMaxRow]:
+    production_max_rows: List[ProductionMaxRow] = []
+    current_year = -1
+    production_sheet = excel_file["Production"]
+    for line, row in enumerate(production_sheet.iter_rows()):
+        current_year = extract_year(row[1].value, current_year)
+        if current_year < requested_year:
+            continue
+
+        biofuel_name = None if "SOMME :" == row[2].value else row[2].value
+        feedstock_name = row[3].value
+
+        if current_year == -1 or (not feedstock_name and not biofuel_name):
+            continue
+        feedstock = get_feedstock_from_dc_feedstock(feedstock_name)
+        biofuel = get_biofuel_from_dc_biofuel(biofuel_name)
+
+        max_production_capacity = intOrZero(row[4].value)
+        production: ProductionMaxRow = {
+            "line": line + 1,
+            "year": current_year,
+            "feedstock": feedstock,
+            "biofuel": biofuel,
+            "max_production_capacity": max_production_capacity,
+        }
+
+        production_max_rows.append(production)
+
+    return production_max_rows
+
+
+def parse_production_forecast(excel_file: Workbook, requested_year) -> List[ProductionForecastRow]:
+    production_forecast_rows: List[ProductionForecastRow] = []
 
     current_year = -1
     production_sheet = excel_file["Production"]
+
+    for line, row in enumerate(production_sheet.iter_rows()):
+        current_year = extract_year(row[6].value, current_year)
+
+        if current_year < requested_year:
+            continue
+        biofuel_name = None if "SOMME :" == row[7].value else row[7].value
+        feedstock_name = row[8].value
+
+        if current_year == -1 or (not feedstock_name and not biofuel_name):
+            continue
+
+        feedstock = get_feedstock_from_dc_feedstock(feedstock_name)
+        biofuel = get_biofuel_from_dc_biofuel(biofuel_name)
+        estimated_production = intOrZero(row[9].value)
+
+        production: ProductionForecastRow = {
+            "line": line + 1,
+            "year": current_year,
+            "feedstock": feedstock,
+            "biofuel": biofuel,
+            "estimated_production": estimated_production,
+        }
+
+        production_forecast_rows.append(production)
+
+    return production_forecast_rows
+
+
+def parse_requested_quota(excel_file: Workbook, requested_year) -> List[RequestedQuotaRow]:
+    requested_quota_rows: List[RequestedQuotaRow] = []
+
+    current_year = -1
+    production_sheet = excel_file["Reconnaissance double comptage"]
 
     for line, row in enumerate(production_sheet.iter_rows()):
         current_year = extract_year(row[1].value, current_year)
 
         if current_year < requested_year:
             continue
-        biofuel_name = row[2].value
-        feedstock_name = row[3].value
-        feedstock_name_check = row[8].value
-        max_production_capacity = intOrZero(row[4].value)
-        estimated_production = intOrZero(row[9].value)
 
-        if current_year == -1 or not feedstock_name or not biofuel_name:
-            continue
-
-        feedstock = get_feedstock_from_dc_feedstock(feedstock_name)
-        feedstock_check = feedstock if feedstock_name == feedstock_name_check else ""
-        biofuel = dc_biofuel_to_carbure_biofuel.get(biofuel_name.strip(), None)
-        production: ProductionRow = {
-            "line": line + 1,
-            "year": current_year,
-            "feedstock": feedstock,
-            "feedstock_check": feedstock_check,
-            "biofuel": biofuel,
-            "max_production_capacity": max_production_capacity,
-            "estimated_production": estimated_production,
-            "requested_quota": 0,
-        }
-
-        production_rows.append(production)
-
-    current_year = -1
-    quota_sheet = excel_file["Reconnaissance double comptage"]
-
-    for row in quota_sheet.iter_rows():
-        current_year = extract_year(row[1].value, current_year)
-
-        biofuel_name = row[2].value
+        biofuel_name = None if "SOMME :" == row[2].value else row[2].value
         feedstock_name = row[3].value
         requested_quota = row[4].value
 
-        if current_year == -1 or not feedstock_name or not biofuel_name:
+        if current_year == -1 or not requested_quota or (not feedstock_name and not biofuel_name):
             continue
 
-        biofuel = dc_biofuel_to_carbure_biofuel.get(biofuel_name.strip(), None)
         feedstock = get_feedstock_from_dc_feedstock(feedstock_name)
+        biofuel = get_biofuel_from_dc_biofuel(biofuel_name)
+        production: RequestedQuotaRow = {
+            "line": line + 1,
+            "year": current_year,
+            "feedstock": feedstock,
+            "biofuel": biofuel,
+            "requested_quota": requested_quota,
+        }
 
-        for production in production_rows:
-            if (
-                biofuel
-                and feedstock
-                and current_year == production["year"]
-                and biofuel == production["biofuel"]
-                and feedstock == production["feedstock"]
-            ):
-                production["requested_quota"] = requested_quota
+        requested_quota_rows.append(production)
 
-    return production_rows
+    return requested_quota_rows
 
 
 def extract_year(year_str: str, current_year: int):
@@ -218,8 +274,17 @@ def extract_country_code(country_str: str) -> str | None:
 
 
 def get_feedstock_from_dc_feedstock(feedstock_name: str) -> str | None:
-    feedstock_name = feedstock_name.replace("’", "'")
-    return dc_feedstock_to_carbure_feedstock.get(feedstock_name.strip(), None)
+    if not feedstock_name:
+        return None
+    feedstock_name = feedstock_name.replace("’", "'").strip()
+    return dc_feedstock_to_carbure_feedstock.get(feedstock_name, None)
+
+
+def get_biofuel_from_dc_biofuel(biofuel_name: str) -> str | None:
+    if not biofuel_name:
+        return None
+    biofuel_name = biofuel_name.replace("’", "'").strip()
+    return dc_biofuel_to_carbure_biofuel.get(biofuel_name, None)
 
 
 dc_feedstock_to_carbure_feedstock: dict[str, str | None] = {
@@ -297,3 +362,71 @@ dc_biofuel_to_carbure_biofuel: dict[str, str | None] = {
     "TAEE": "TAEE",
     "TAME": "TAME",
 }
+
+
+def parse_production(excel_file: Workbook, requested_year) -> List[ProductionRow]:
+    production_rows: List[ProductionRow] = []
+
+    current_year = -1
+    production_sheet = excel_file["Production"]
+
+    # Estimated Production
+    for line, row in enumerate(production_sheet.iter_rows()):
+        current_year = extract_year(row[1].value, current_year)
+
+        if current_year < requested_year:
+            continue
+        biofuel_name = row[2].value
+        feedstock_name = row[3].value
+        feedstock_name_check = row[8].value
+        max_production_capacity = intOrZero(row[4].value)
+        estimated_production = intOrZero(row[9].value)
+
+        if current_year == -1 or not feedstock_name or not biofuel_name:
+            continue
+
+        feedstock = get_feedstock_from_dc_feedstock(feedstock_name)
+        feedstock_check = feedstock if feedstock_name == feedstock_name_check else ""
+        biofuel = dc_biofuel_to_carbure_biofuel.get(biofuel_name.strip(), None)
+        production: ProductionRow = {
+            "line": line + 1,
+            "year": current_year,
+            "feedstock": feedstock,
+            "feedstock_check": feedstock_check,
+            "biofuel": biofuel,
+            "max_production_capacity": max_production_capacity,
+            "estimated_production": estimated_production,
+            "requested_quota": 0,
+        }
+
+        production_rows.append(production)
+
+    current_year = -1
+    quota_sheet = excel_file["Reconnaissance double comptage"]
+    # Max production
+
+    # Requested Quota
+    for row in quota_sheet.iter_rows():
+        current_year = extract_year(row[1].value, current_year)
+
+        biofuel_name = row[2].value
+        feedstock_name = row[3].value
+        requested_quota = row[4].value
+
+        if current_year == -1 or not feedstock_name or not biofuel_name:
+            continue
+
+        biofuel = get_biofuel_from_dc_biofuel(biofuel_name)
+        feedstock = get_feedstock_from_dc_feedstock(feedstock_name)
+
+        for production in production_rows:
+            if (
+                biofuel
+                and feedstock
+                and current_year == production["year"]
+                and biofuel == production["biofuel"]
+                and feedstock == production["feedstock"]
+            ):
+                production["requested_quota"] = requested_quota
+
+    return production_rows
