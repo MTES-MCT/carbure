@@ -2,6 +2,7 @@ import os
 import unicodedata
 from django.db import connection, transaction
 from django.conf import settings
+from django.core.paginator import Paginator
 import xlsxwriter
 from core.xlsx_v3 import make_carbure_lots_sheet
 from core.models import Entity, UserRights
@@ -16,37 +17,43 @@ def normalize_string(input_str: str):
 
 
 @transaction.atomic
-def bulk_update_or_create(Model, id_field, rows):
+def bulk_update_or_create(Model, id_field, rows, batch=1000):
     if len(rows) == 0:
         return
 
-    row_ids = [row[id_field] for row in rows]
-    update_keys = [key for key in rows[0].keys() if key != id_field]
+    paginator = Paginator(rows, batch)
 
-    # first get the list of existing objects matching the given rows
-    id__in = "%s__in" % id_field
-    existing_objects_dict = {getattr(obj, id_field): obj for obj in Model.objects.filter(**{id__in: row_ids})}
-    existing_ids = existing_objects_dict.keys()
+    for page_number in paginator.page_range:
+        page = paginator.page(page_number)
+        page_rows = page.object_list
 
-    existing_objects = []
-    new_objects = []
+        row_ids = [row[id_field] for row in rows]
+        update_keys = [key for key in rows[0].keys() if key != id_field]
 
-    for row in rows:
-        id = row[id_field]
-        if id in existing_ids:
-            existing = existing_objects_dict[id]
-            # update the existing models with the new data, but without saving yet
-            for key in row:
-                setattr(existing, key, row[key])
-            # put is aside in order to update everything all at once later
-            existing_objects.append(existing)
-        else:
-            # create a new model instance and save it to bulk_create later
-            new = Model(**row)
-            new_objects.append(new)
+        # first get the list of existing objects matching the given rows
+        id__in = "%s__in" % id_field
+        existing_objects_dict = {getattr(obj, id_field): obj for obj in Model.objects.filter(**{id__in: row_ids})}
+        existing_ids = existing_objects_dict.keys()
 
-    Model.objects.bulk_update(existing_objects, update_keys, 1000)
-    Model.objects.bulk_create(new_objects, 1000)
+        existing_objects = []
+        new_objects = []
+
+        for row in page_rows:
+            id = row[id_field]
+            if id in existing_ids:
+                existing = existing_objects_dict[id]
+                # update the existing models with the new data, but without saving yet
+                for key in row:
+                    setattr(existing, key, row[key])
+                # put is aside in order to update everything all at once later
+                existing_objects.append(existing)
+            else:
+                # create a new model instance and save it to bulk_create later
+                new = Model(**row)
+                new_objects.append(new)
+
+        Model.objects.bulk_update(existing_objects, update_keys)
+        Model.objects.bulk_create(new_objects)
 
     return existing_objects, new_objects
 

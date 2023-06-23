@@ -2,7 +2,6 @@ import argparse
 from typing import Iterable
 import django
 import os
-import json
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()

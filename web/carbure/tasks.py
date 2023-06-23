@@ -17,16 +17,12 @@ from saf.models.saf_ticket_source import create_ticket_sources_from_lots
 
 
 @db_task()
-def background_bulk_sanity_checks(
-    lots: QuerySet, prefetched_data: dict | None = None
-) -> None:
+def background_bulk_sanity_checks(lots: QuerySet, prefetched_data: dict | None = None) -> None:
     bulk_sanity_checks(lots, prefetched_data)
 
 
 @db_task()
-def background_bulk_scoring(
-    lots: QuerySet, prefetched_data: dict | None = None
-) -> None:
+def background_bulk_scoring(lots: QuerySet, prefetched_data: dict | None = None) -> None:
     bulk_scoring(lots, prefetched_data)
 
 
@@ -47,7 +43,7 @@ if env.get("IMAGE_TAG") == "prod":
 
     @db_periodic_task(crontab(day_of_week=7, hour=4, minute=0))
     def periodic_update_iscc_certificates() -> None:
-        update_iscc_certificates(email=True)
+        update_iscc_certificates(email=True, latest=True)
 
     @db_periodic_task(crontab(day_of_week=7, hour=5, minute=0))
     def periodic_update_redcert_certificates() -> None:

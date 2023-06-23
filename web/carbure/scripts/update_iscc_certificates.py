@@ -3,10 +3,14 @@
 
 # Extraction des certificats ISCC https://www.iscc-system.org/certificates/all-certificates/
 import os
+import django
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
+django.setup()
+
 import re
 import json
 from typing import Tuple, cast
-import django
 import shutil
 import argparse
 import requests
@@ -17,10 +21,7 @@ from os import listdir
 from os.path import isfile
 from django.conf import settings
 from django.core.mail import send_mail, get_connection
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
-django.setup()
-
+from core.common import Perf
 from core.utils import bulk_update_or_create
 from core.models import GenericCertificate
 
@@ -32,9 +33,9 @@ PAGELENGTH = 3000
 
 
 # Download ISCC certificates and save them to the database
-def update_iscc_certificates(email: bool = False, test: bool = False, latest: bool = False) -> None:
+def update_iscc_certificates(email: bool = False, test: bool = False, latest: bool = False, batch: int = 1000) -> None:
     download_iscc_certificates(test, latest)
-    i, new = save_iscc_certificates(email)
+    i, new = save_iscc_certificates(email, batch)
     send_email_summary(i, new, email)
 
 
@@ -45,12 +46,14 @@ def download_iscc_certificates(test: bool, latest: bool) -> None:
     # Nombre de requêtes
     r = requests.post(ISCC_DATA_URL, data={"length": 1, "start": 0, "draw": 1, "wdtNonce": nonce}, headers=HEADERS)
     recordsTotal = int(json.loads(r.content.decode("utf-8"))["recordsTotal"])
-    print("# of certificates: " + str(recordsTotal))
+    print(f"> Found {recordsTotal} ISCC certificates")
 
     # Récupération du contenu
-    data = get_certificate_data(nonce, recordsTotal, test, latest)
+    data = fetch_certificate_data(nonce, recordsTotal, test, latest)
+
     # On retire les balises html pour ne garder que le contenu
     cleaned_data = clean_certificate_data(data)
+
     # Sauvegarde
     filename = "%s/Certificates_%s.csv" % (DESTINATION_FOLDER, str(date.today()))
     pd.DataFrame.to_csv(cleaned_data, filename, index=False)
@@ -90,7 +93,7 @@ def download_iscc_certificates(test: bool, latest: bool) -> None:
     pd.DataFrame.to_csv(dup, "%s/Duplicates_%s.csv" % (DESTINATION_FOLDER, str(date.today())), index=False)
 
 
-def save_iscc_certificates(email: bool) -> Tuple[int, list]:
+def save_iscc_certificates(email: bool, batch: int) -> Tuple[int, list]:
     today = date.today()
     certificates = []
     filename = "%s/Certificates_%s.csv" % (DESTINATION_FOLDER, today.strftime("%Y-%m-%d"))
@@ -104,7 +107,7 @@ def save_iscc_certificates(email: bool) -> Tuple[int, list]:
             elif "-" in row["valid_from"]:
                 valid_from = datetime.strptime(row["valid_from"], "%Y-%m-%d").date()
             else:
-                print("Unrecognized date format [%s]" % (row["valid_from"]))
+                print("* Unrecognized date format [%s]" % (row["valid_from"]))
                 print(row)
                 valid_from = date(year=1970, month=1, day=1)
         except:
@@ -117,7 +120,7 @@ def save_iscc_certificates(email: bool) -> Tuple[int, list]:
             elif "-" in row["valid_until"]:
                 valid_until = datetime.strptime(row["valid_until"], "%Y-%m-%d").date()
             else:
-                print("Unrecognized date format [%s]" % (row["valid_until"]))
+                print("* Unrecognized date format [%s]" % (row["valid_until"]))
                 print(row)
                 valid_until = date(year=1970, month=1, day=1)
         except:
@@ -144,7 +147,8 @@ def save_iscc_certificates(email: bool) -> Tuple[int, list]:
             }
         )
 
-    existing, new = bulk_update_or_create(GenericCertificate, "certificate_id", certificates)
+    existing, new = bulk_update_or_create(GenericCertificate, "certificate_id", certificates, batch)
+
     print("[ISCC Certificates] %d updated, %d created" % (len(existing), len(new)))
     return len(certificates), new
 
@@ -192,7 +196,7 @@ def get_wdtNonce() -> str:
     return wdtNonce
 
 
-def get_certificate_data(nonce: str, recordsTotal: int, test: bool, latest: bool) -> list:
+def fetch_certificate_data(nonce: str, recordsTotal: int, test: bool, latest: bool) -> list:
     # On parcourt le tableau de résultats, en incrémentant de 1000 à chaque fois.
     # On stocke le tableau dans une liste de tableau
     allData: list = []
@@ -201,14 +205,18 @@ def get_certificate_data(nonce: str, recordsTotal: int, test: bool, latest: bool
         start = recordsTotal - PAGELENGTH
     if test:
         recordsTotal = PAGELENGTH
+    page = 1
+    pages_total = recordsTotal / PAGELENGTH
+    print(f"> Loading {pages_total} pages of {PAGELENGTH} items")
     while start < recordsTotal:
-        print(start)
+        print(f"> From page {page} at index {start}")
         data = {"length": PAGELENGTH, "start": start, "draw": 1, "wdtNonce": nonce}
         r = requests.post(ISCC_DATA_URL, data=data, headers=HEADERS)
         certificates: dict = json.loads(r.content.decode("utf-8"))
         dataframe = pd.DataFrame.from_dict(certificates["data"])
         allData.append(dataframe)
         start = start + PAGELENGTH
+        page += 1
     return allData
 
 
@@ -251,13 +259,13 @@ def clean_certificate_data(data: list) -> pd.DataFrame:
     ]
 
     # extraction de la balise HTML
-    allData["certificate_holder"] = allData["certificate_holder"].str.replace('.*title="(.*)">.*', "\\1")
-    allData["scope"] = allData["scope"].str.replace('.*title="(.*)">.*', "\\1")
-    allData["raw_material"] = allData["raw_material"].str.replace('.*title="(.*)">.*', "\\1")
-    allData["issuing_cb"] = allData["issuing_cb"].str.replace('.*title="(.*)">.*', "\\1")
-    allData["map"] = allData["map"].str.replace('.*href="(.*)">.*', "\\1")
-    allData["certificate_report"] = allData["certificate_report"].str.replace('.*href="(.*)">.*', "\\1")
-    allData["audit_report"] = allData["audit_report"].str.replace('.*href="(.*)">.*', "\\1")
+    allData["certificate_holder"] = allData["certificate_holder"].str.replace('.*title="(.*)">.*', "\\1", regex=True)
+    allData["scope"] = allData["scope"].str.replace('.*title="(.*)">.*', "\\1", regex=True)
+    allData["raw_material"] = allData["raw_material"].str.replace('.*title="(.*)">.*', "\\1", regex=True)
+    allData["issuing_cb"] = allData["issuing_cb"].str.replace('.*title="(.*)">.*', "\\1", regex=True)
+    allData["map"] = allData["map"].str.replace('.*href="(.*)">.*', "\\1", regex=True)
+    allData["certificate_report"] = allData["certificate_report"].str.replace('.*href="(.*)">.*', "\\1", regex=True)
+    allData["audit_report"] = allData["audit_report"].str.replace('.*href="(.*)">.*', "\\1", regex=True)
     return cast(pd.DataFrame, allData)
 
 
@@ -266,6 +274,7 @@ if __name__ == "__main__":
     parser.add_argument("--email", dest="email", action="store_true", default=False, help="Send a summary email")
     parser.add_argument("--latest", dest="latest", action="store_true", default=False, help="fetch latest certificates")
     parser.add_argument("--test", dest="test", action="store_true", default=False, help="Test mode")
+    parser.add_argument("--batch", dest="batch", action="store", default=1000, help="Batch insert/update to database")
     args = parser.parse_args()
 
-    update_iscc_certificates(args.email, args.test, args.latest)
+    update_iscc_certificates(args.email, args.test, args.latest, args.batch)
