@@ -4,7 +4,7 @@ import { usePortal } from "common/components/portal"
 import { useTranslation } from "react-i18next"
 import DoubleCountingFilesCheckerDialog from "./files-checker-dialog"
 
-const FilesCheckerUploadButton = () => {
+const FilesCheckerUploadButton = ({ label }: { label?: string }) => {
   const portal = usePortal()
   const { t } = useTranslation()
 
@@ -17,7 +17,7 @@ const FilesCheckerUploadButton = () => {
       asideX
       variant="secondary"
       icon={Upload}
-      label={t("Ajouter des dossiers")}
+      label={label || t("Ajouter des dossiers")}
       action={showAgreementsChecker}
     />
   )

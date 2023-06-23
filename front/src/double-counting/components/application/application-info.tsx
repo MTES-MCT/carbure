@@ -45,8 +45,10 @@ const ApplicationInfo = ({ fileData }: { fileData: DoubleCountingFileInfo }) => 
                     color="#a4a4a4"
                     size={15}
                     style={{
-                        margin: "7px 0px 0 2px",
-                        position: "absolute",
+                        margin: "0px 0px 0 2px",
+                        position: "relative",
+                        top: "2px"
+
                     }}
                 />
             </Tooltip>
