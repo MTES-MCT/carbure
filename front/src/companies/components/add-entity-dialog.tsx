@@ -43,7 +43,8 @@ export const AddEntityDialog = ({
       entity.id,
       value.name!,
       value.entity_type!,
-      value.has_saf
+      value.has_saf,
+      value.has_elec
     )
     onEntityAdded(value.name!)
     onClose()
@@ -88,6 +89,15 @@ export const AddEntityDialog = ({
                   {...bind("has_saf")}
                 />
               )}
+
+              {value.entity_type === EntityType.Operator && (
+                <Checkbox
+                  label={t(
+                    "Ajouter la gestion de la cession d'Energie Electrique"
+                  )}
+                  {...bind("has_elec")}
+                />
+              )}
             </Form>
           </section>
         </main>
@@ -114,6 +124,7 @@ const defaultEntity = {
   name: "" as string | undefined,
   entity_type: EntityType.Unknown as EntityType | undefined,
   has_saf: false as boolean,
+  has_elec: false as boolean,
 }
 
 export type AddForm = typeof defaultEntity
