@@ -1,4 +1,5 @@
 from core.decorators import check_admin_rights
+from doublecount.parser.dc_parser import parse_dc_excel
 
 from producers.models import ProductionSite
 from doublecount.models import (
@@ -15,7 +16,6 @@ from doublecount.helpers import (
 from core.models import Entity
 
 from core.common import ErrorResponse, SuccessResponse
-from doublecount.dc_parser import parse_dc_excel
 
 from django.db import transaction
 
@@ -50,8 +50,11 @@ def add_application(request, *args, **kwargs):
     # load dc Data
 
     filepath = load_dc_filepath(file)
-    info, sourcing_forecast, production_forecast = parse_dc_excel(filepath)
-    start, end = load_dc_period(info["start_year"])
+    info, sourcing_forecast_rows, production_max_rows, production_forecast_rows, requested_quota_rows = parse_dc_excel(
+        filepath
+    )
+
+    start, end, _ = load_dc_period(info["start_year"])
 
     dca, _ = DoubleCountingAgreement.objects.get_or_create(
         producer=producer,
@@ -62,8 +65,8 @@ def add_application(request, *args, **kwargs):
     )
 
     # save all production_data DoubleCountingProduction in db
-    sourcing_forecast_data, _ = load_dc_sourcing_data(dca, sourcing_forecast)
-    production_data, _ = load_dc_production_data(dca, production_forecast)
+    sourcing_forecast_data, _ = load_dc_sourcing_data(dca, sourcing_forecast_rows)
+    production_data, _ = load_dc_production_data(dca, production_max_rows, production_forecast_rows, requested_quota_rows)
     DoubleCountingSourcing.objects.filter(dca=dca).delete()
     for sourcing in sourcing_forecast_data:
         sourcing.save()

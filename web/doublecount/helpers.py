@@ -5,26 +5,23 @@ import traceback
 import unicodedata
 import re
 from django.db import transaction
-from requests import Request
 from certificates.models import DoubleCountingRegistration
 from core.models import Pays, Biocarburant, MatierePremiere
 from doublecount.models import DoubleCountingSourcing, DoubleCountingProduction
 from doublecount.dc_sanity_checks import check_production_row, check_production_row_integrity, check_sourcing_row
 from doublecount.models import DoubleCountingAgreement
-from doublecount.dc_parser import (
-    ProductionBaseRow,
+from doublecount.parser.dc_parser import (
     ProductionForecastRow,
     ProductionMaxRow,
     RequestedQuotaRow,
     SourcingRow,
-    ProductionRow,
+    parse_dc_excel,
 )
 from doublecount.errors import DoubleCountingError, error
 
 
 from core.common import CarbureException
 from doublecount.dc_sanity_checks import check_dc_globally, error, DoubleCountingError
-from doublecount.dc_parser import parse_dc_excel
 from doublecount.serializers import DoubleCountingProductionSerializer, DoubleCountingSourcingSerializer
 
 today = datetime.date.today()
