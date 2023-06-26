@@ -3,7 +3,7 @@ from typing import List, TypedDict
 from doublecount.errors import DcError, DoubleCountingError, error
 from doublecount.models import DoubleCountingAgreement, DoubleCountingProduction, DoubleCountingSourcing
 from core.models import Biocarburant, MatierePremiere
-from doublecount.dc_parser import ProductionBaseRow, ProductionRow, SourcingRow
+from doublecount.parser.types import ProductionBaseRow, ProductionRow, SourcingRow
 
 
 # check a line in the sourcing section of an imported dc excel file
