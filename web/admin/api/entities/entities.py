@@ -7,7 +7,7 @@ from django.db.models import Q, Count, Value
 from doublecount.models import DoubleCountingApplication
 
 
-@check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE])
+@check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC])
 def get_entities(request):
     q = request.GET.get("q", False)
     entity_id = request.GET.get("entity_id", None)
@@ -71,6 +71,26 @@ def get_entities(request):
                 double_counting=Value(0),
                 double_counting_requests=Value(0),
                 certificates_pending=Value(0),
+            )
+        )
+    elif entity.has_external_admin_right("ELEC"):
+        entities = (
+            Entity.objects.all()
+            .order_by("name")
+            .filter(Q(entity_type=Entity.CPO) | Q(entity_type=Entity.OPERATOR, has_elec=True))
+            .prefetch_related("userrights_set", "userrightsrequests_set")
+            .annotate(
+                users=Count("userrights", distinct=True),
+                requests=Count(
+                    "userrightsrequests",
+                    filter=Q(userrightsrequests__status="PENDING"),
+                    distinct=True,
+                ),
+                depots=Value(0),
+                production_sites=Value(0),
+                certificates=Value(0),
+                double_counting=Value(0),
+                double_counting_requests=Value(0),
             )
         )
 
