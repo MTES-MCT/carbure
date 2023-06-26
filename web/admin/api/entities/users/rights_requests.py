@@ -6,7 +6,7 @@ from core.models import ExternalAdminRights
 from core.models import UserRightsRequests
 
 
-@check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE])
+@check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC])
 def get_rights_requests(request):
     q = request.GET.get("q", False)
     statuses = request.GET.getlist("statuses", False)

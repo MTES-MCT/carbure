@@ -6,7 +6,6 @@ import { UserManager, useUser } from "carbure/hooks/user"
 import useLocalStorage from "common/hooks/storage"
 import { useMatomo } from "matomo"
 import Menu from "common/components/menu"
-import { Anchors } from "common/components/dropdown"
 import { Header, Row } from "common/components/scaffold"
 import Button from "common/components/button"
 import Tabs from "common/components/tabs"
@@ -143,7 +142,9 @@ const Navigation = ({ entity }: NavigationProps) => {
                 label: t("Statistiques"),
               },
 
-              (isAdmin || entity.hasAdminRight("AIRLINE")) && {
+              (isAdmin ||
+                entity.hasAdminRight("AIRLINE") ||
+                entity.hasAdminRight("ELEC")) && {
                 key: "entities",
                 path: "entities",
                 label: t("Sociétés"),

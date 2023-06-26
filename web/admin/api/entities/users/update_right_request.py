@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 
 
-@check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE])
+@check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC])
 def update_right_request(request):
     urr_id = request.POST.get("id", False)
     status = request.POST.get("status", False)
