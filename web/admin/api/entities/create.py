@@ -12,7 +12,7 @@ class CreateEntityError:
     ENTITY_CREATION_FAILED = "ENTITY_CREATION_FAILED"
 
 
-@check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE])
+@check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC])
 def create_entity(request, *args, **kwargs):
     try:
         name = request.POST.get("name")
