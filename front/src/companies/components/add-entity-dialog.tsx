@@ -76,6 +76,7 @@ export const AddEntityDialog = ({
                         EntityType.Auditor,
                         EntityType.Airline,
                         EntityType.ExternalAdmin,
+                        EntityType.CPO,
                       ]
                 }
                 {...bind("entity_type")}
