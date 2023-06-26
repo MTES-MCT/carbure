@@ -157,6 +157,7 @@ export enum EntityType {
   Administration = "Administration",
   Auditor = "Auditor",
   ExternalAdmin = "Administration Externe",
+  CPO = "Charge Point Operator",
   Unknown = "Unknown",
 }
 
