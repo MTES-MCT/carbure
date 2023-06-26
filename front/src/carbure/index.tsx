@@ -76,6 +76,7 @@ const Org = () => {
   } = entity
   const hasDCA = isExternal && entity.hasAdminRight("DCA")
   const hasAirline = isExternal && entity.hasAdminRight("AIRLINE")
+  const hasElec = isExternal && entity.hasAdminRight("ELEC")
 
   // prettier-ignore
   return (
@@ -120,7 +121,7 @@ const Org = () => {
       {(isAdmin || hasDCA) && <Route path="double-counting/*" element={<DoubleCounting />} />}
       {hasDCA && <Route path="*" element={<Navigate replace to="double-counting" />} />}
 
-      {(isAdmin || hasAirline) &&
+      {(isAdmin || hasAirline || hasElec) &&
         <Route path="entities/*" element={<Entities />} />
       }
       {hasAirline && <Route path="*" element={<Navigate replace to="entities" />} />}

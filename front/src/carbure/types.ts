@@ -147,7 +147,7 @@ export interface EntityCertificate {
 
 export type Unit = "l" | "kg" | "MJ"
 
-export type ExternalAdminPages = "DCA" | "TIRIB" | "AIRLINE"
+export type ExternalAdminPages = "DCA" | "TIRIB" | "AIRLINE" | "ELEC"
 
 export enum EntityType {
   Producer = "Producteur",
@@ -192,7 +192,7 @@ export enum NotificationType {
   SafTicketRejected = "SAF_TICKET_REJECTED",
 
   LotsUpdatedByAdmin = "LOTS_UPDATED_BY_ADMIN",
-  LotsDeletedByAdmin = "LOTS_DELETED_BY_ADMIN"
+  LotsDeletedByAdmin = "LOTS_DELETED_BY_ADMIN",
 }
 
 export enum DepotType {
