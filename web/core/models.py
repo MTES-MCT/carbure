@@ -480,12 +480,14 @@ class ExternalAdminRights(models.Model):
     CUSTOM_STATS_AGRIMER = "AGRIMER"
     TIRIB_STATS = "TIRIB"
     AIRLINE = "AIRLINE"
+    ELEC = "ELEC"
 
     RIGHTS = (
         (DOUBLE_COUNTING_APPLICATION, DOUBLE_COUNTING_APPLICATION),
         (CUSTOM_STATS_AGRIMER, CUSTOM_STATS_AGRIMER),
         (TIRIB_STATS, TIRIB_STATS),
         (AIRLINE, AIRLINE),
+        (ELEC, ELEC)
     )
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     right = models.CharField(max_length=32, choices=RIGHTS, default="", blank=False, null=False)
