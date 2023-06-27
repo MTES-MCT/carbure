@@ -114,11 +114,7 @@ export function getErrorText(
 
       )
       break
-    case DoubleCountingUploadErrorType.LineFeedstocksIncoherent:
-      errorText += t(
-        "Les matières premières renseignées sur la même ligne doivent être identiques dans les deux tableaux.",
-      )
-      break
+
     case DoubleCountingUploadErrorType.InvalidYear:
       errorText += t(
         "L'année renseignée ({{year}}) ne correspond pas à la période demandée. Vérifiez les années renseignées dans l'onglet \"Reconnaissance double comptage\".",

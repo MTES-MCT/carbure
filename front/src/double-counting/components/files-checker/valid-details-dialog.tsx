@@ -43,7 +43,6 @@ export const ValidDetailsDialog = ({
       portal((close) => <ProductionSiteAdminDialog fileData={fileData} onClose={() => { close(); onClose() }} file={file} />)
     }
   }
-  console.log('fileData:', fileData)
 
   return (
     <Dialog fullscreen onClose={onClose}>
