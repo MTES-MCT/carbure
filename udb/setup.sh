@@ -12,4 +12,11 @@ rm *.zip
 
 chmod +x ./domibus/bin/*.sh
 
+# bind properties file with env vars and move it to domibus
+bash properties.sh
+mv carbure-domibus.properties ./domibus/conf/domibus/domibus.properties
+
+# add the setenv.sh file
+mv setenv.sh ./domibus/bin/setenv.sh
+
 bash ./domibus/bin/catalina.sh run
