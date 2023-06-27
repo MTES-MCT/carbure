@@ -1,4 +1,4 @@
-# test with python web/manage.py test doublecount.api.application.tests_application --keepdb
+# test with : python web/manage.py test doublecount.api.application.tests_application --keepdb
 import os
 from core.tests_utils import setup_current_user
 from core.models import Entity, UserRights
@@ -33,25 +33,30 @@ class DoubleCountApplicationTest(TestCase):
         self.producer, _ = Entity.objects.update_or_create(name="Le Super Producteur 1", entity_type="Producteur")
         UserRights.objects.update_or_create(user=self.user, entity=self.producer, defaults={"role": UserRights.ADMIN})
 
-    # def test_valid_file(self):
-    #     # upload template
-    #     filepath = "%s/web/fixtures/csv/test_data/dc_agreement_application.xlsx" % (os.environ["CARBURE_HOME"])
-    #     fh = open(filepath, "rb")
-    #     data = fh.read()
-    #     fh.close()
-    #     f = SimpleUploadedFile("dca.xlsx", data)
-    #     response = self.client.post(
-    #         reverse("doublecount-application-check-file"),
-    #         {"entity_id": self.producer.id, "file": f},
-    #     )
-    #     if response.status_code != 200:
-    #         print("Failed to upload %s" % (filepath))
-    #     self.assertEqual(response.status_code, 200)
+    def test_valid_file(self):
+        # upload template
+        filepath = "%s/web/fixtures/csv/test_data/dc_agreement_application.xlsx" % (os.environ["CARBURE_HOME"])
+        fh = open(filepath, "rb")
+        data = fh.read()
+        fh.close()
+        f = SimpleUploadedFile("dca.xlsx", data)
+        response = self.client.post(
+            reverse("doublecount-application-check-file"),
+            {"entity_id": self.producer.id, "file": f},
+        )
+        if response.status_code != 200:
+            print("Failed to upload %s" % (filepath))
+        self.assertEqual(response.status_code, 200)
 
-    #     data = response.json()["data"]
-    #     error_count = data["file"]["error_count"]
-    #     self.assertEqual(error_count, 0)
+        data = response.json()["data"]
+        file_data = data["file"]
+        error_count = file_data["error_count"]
+        self.assertEqual(error_count, 0)
 
-    # check production data
+        # check sourcing data
+        sourcing = file_data["sourcing"]
+        self.assertEqual(len(sourcing), 8)
 
-    # check sourcing data
+        # check production data
+        production = file_data["production"]
+        self.assertEqual(len(production), 4)
