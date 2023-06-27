@@ -66,21 +66,21 @@ def get_biofuel_feedstock_incompatibilities(biofuel: Biocarburant, feedstock: Ma
     if biofuel.code == "EEHA" and feedstock.code not in emha_feedstocks:
         yield f"{biofuel} doit être à base d'huiles ou graisses animales"
 
-    fats = ("HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2", "HUILES_OU_GRAISSES_ANIMALES_CAT3")
-    fats_biofuels = ("EMHA", "HOE", "HOG", "HOC", "HCC", "HCG", "HCE", "B100")
-    if feedstock.code in fats and biofuel.code not in fats_biofuels:
+    fat_biofuels = ("EMHA", "HOE", "HOG", "HOC", "HCC", "HCG", "HCE", "B100")
+    fat_feedstocks = ("HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2", "HUILES_OU_GRAISSES_ANIMALES_CAT3")
+    if feedstock.code in fat_feedstocks and biofuel.code not in fat_biofuels:
         yield "Des huiles ou graisses animales ne peuvent donner que des EMHA, B100 ou HOG/HOE/HOC"
 
-    sugars = ("MAIS", "BLE", "BETTERAVE", "CANNE_A_SUCRE", "RESIDUS_VINIQUES", "LIES_DE_VIN", "MARC_DE_RAISIN")
+    sugar_feedstocks = ("MAIS", "BLE", "BETTERAVE", "CANNE_A_SUCRE", "RESIDUS_VINIQUES", "LIES_DE_VIN", "MARC_DE_RAISIN")
     sugar_biofuels = ("ETH", "ETBE", "ED95")
-    if feedstock.code in sugars and biofuel.code not in sugar_biofuels:
+    if feedstock.code in sugar_feedstocks and biofuel.code not in sugar_biofuels:
         yield "Maïs, Blé, Betterave, Canne à Sucre ou Résidus Viniques ne peuvent créer que de l'Éthanol ou ETBE"
 
-    hvos = ("HVOE", "HVOG", "HVOC")
-    if biofuel.code in hvos and not feedstock.is_huile_vegetale:
+    hvo_biofuels = ("HVOE", "HVOG", "HVOC")
+    if biofuel.code in hvo_biofuels and not feedstock.is_huile_vegetale:
         yield "Un HVO doit provenir d'huiles végétales uniquement. Pour les autres huiles hydrotraitées, voir la nomenclature HOE/HOG/HOC"
 
-    hcs = ("HCE", "HCG", "HCC")
+    hc_biofuels = ("HCE", "HCG", "HCC")
     hc_feedstocks = (
         "COLZA",
         "TOURNESOL",
@@ -91,7 +91,7 @@ def get_biofuel_feedstock_incompatibilities(biofuel: Biocarburant, feedstock: Ma
         "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2",
         "HUILES_OU_GRAISSES_ANIMALES_CAT3",
     )
-    if biofuel.code in hcs and biofuel.code not in hc_feedstocks:
+    if biofuel.code in hc_biofuels and feedstock.code not in hc_feedstocks:
         yield "Une huile Co-traitées doit provenir d'huiles végétales, d'huiles usagées ou de graisses animales uniquement."
 
 
