@@ -36,7 +36,6 @@ class LotNode(Node):
         "carbure_delivery_site": True,
         "unknown_delivery_site": True,
         "delivery_site_country": True,
-        "delivery_date": True,
         **FROM_LOT,
     }
 
@@ -96,6 +95,9 @@ class LotNode(Node):
     TRADING_FIELDS = [
         "supplier_certificate",
         "supplier_certificate_type",
+        "year",
+        "period",
+        "delivery_date",
     ]
 
     DELIVERY_FIELDS = [
@@ -104,9 +106,6 @@ class LotNode(Node):
         "volume",
         "weight",
         "lhv_amount",
-        "year",
-        "period",
-        "delivery_date",
         "delivery_site",
         "carbure_delivery_site",
         "carbure_delivery_site_id",
@@ -192,7 +191,7 @@ class LotNode(Node):
 
             allowed_fields += LotNode.TRANSACTION_FIELDS
 
-            if self.parent is None or (self.parent.type == Node.LOT and self.parent.data.delivery_type != CarbureLot.PROCESSING):  # fmt: skip
+            if self.parent is None or (self.parent.type == Node.LOT and self.parent.data.delivery_type == CarbureLot.TRADING):  # fmt: skip
                 allowed_fields += LotNode.TRADING_FIELDS
 
             if self.parent is None or owns_ancestor_lot or owns_ancestor_stock:
