@@ -82,6 +82,7 @@ class Entity(models.Model):
             "default_certificate": self.default_certificate,
             "preferred_unit": self.preferred_unit,
             "has_saf": self.has_saf,
+            "has_elec": self.has_elec,
         }
         if self.entity_type == Entity.EXTERNAL_ADMIN:
             d["ext_admin_pages"] = [e.right for e in self.externaladminrights_set.all()]
