@@ -12,5 +12,6 @@ urlpatterns = [
     path("v5/resources/", include("resources.api")),
     path("v5/transactions/", include("transactions.api")),
     path("v5/user/", include("user.api")),
+    path("v5/elec/", include("elec.api")),
     path("v5/home-stats", get_home_stats, name="carbure-home-stats"),
 ]
