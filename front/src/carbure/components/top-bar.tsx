@@ -102,6 +102,8 @@ const Navigation = ({ entity }: NavigationProps) => {
     has_saf,
     isAirline,
     isProducer,
+    isCPO,
+    has_elec,
   } = entity
 
   return (
@@ -134,6 +136,12 @@ const Navigation = ({ entity }: NavigationProps) => {
                 key: "saf",
                 path: "saf",
                 label: t("Aviation"),
+              },
+
+              ((has_elec && isOperator) || isCPO) && {
+                key: "elec",
+                path: "elec",
+                label: t("Electricité"),
               },
 
               (isOperator || isProducer) && {

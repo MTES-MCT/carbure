@@ -13,6 +13,7 @@ export interface EntityManager extends Entity {
   isOperator: boolean
   isTrader: boolean
   isIndustry: boolean
+  isCPO: boolean
   canTrade: boolean
   hasAdminRight: (page: ExternalAdminPages) => boolean
   hasRights: (...roles: UserRole[]) => boolean
@@ -46,6 +47,7 @@ export function useEntityManager(user: UserManager): EntityManager {
     preferred_unit: entity?.preferred_unit ?? "l",
     default_certificate: entity?.default_certificate ?? "",
     has_saf: entity?.has_saf ?? false,
+    has_elec: entity?.has_elec ?? false,
     ext_admin_pages: entity?.ext_admin_pages ?? [],
     isBlank: entityID === -1,
     isAdmin: type === EntityType.Administration,
@@ -55,6 +57,7 @@ export function useEntityManager(user: UserManager): EntityManager {
     isProducer: type === EntityType.Producer,
     isOperator: type === EntityType.Operator,
     isTrader: type === EntityType.Trader,
+    isCPO: type === EntityType.CPO,
     isIndustry: isIndustry(type),
     canTrade: !!entity?.has_stocks || !!entity?.has_trading,
 

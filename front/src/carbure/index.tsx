@@ -20,6 +20,7 @@ import Auth from "auth"
 import Saf from "saf/operator"
 import SafClient from "saf/airline"
 import Stats from "stats"
+import Elec from "elec"
 
 const Carbure = () => {
   const user = useUserManager()
@@ -71,8 +72,10 @@ const Org = () => {
     isIndustry,
     isOperator,
     isProducer,
-    has_saf,
     isAirline,
+    isCPO,
+    has_saf,
+    has_elec,
   } = entity
   const hasDCA = isExternal && entity.hasAdminRight("DCA")
   const hasAirline = isExternal && entity.hasAdminRight("AIRLINE")
@@ -111,6 +114,10 @@ const Org = () => {
 
       {(isOperator || isProducer) && <Route path="stats" element={<Stats />} />}
 
+      {(isCPO || (isOperator && has_elec)) && (<>
+          <Route path="elec/:year/*" element={<Elec />} />
+          <Route path="elec" element={<Navigate replace to={`${currentYear}`} />} />
+      </>)}
 
       {(isAdmin || isAuditor) && (<>
         <Route path="controls/:year/*" element={<Controls />} />
