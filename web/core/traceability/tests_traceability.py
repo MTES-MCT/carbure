@@ -58,7 +58,7 @@ class TraceabilityTest(TestCase):
 
     def test_traceability_lot_to_lot(self):
         parent_lot = CarbureLotFactory.create(lot_status="ACCEPTED", added_by=self.entity, delivery_type=CarbureLot.TRADING)
-        CarbureLotFactory.create(lot_status="ACCEPTED", parent_lot=parent_lot, added_by=self.entity)
+        CarbureLotFactory.create(lot_status="ACCEPTED", parent_lot=parent_lot, added_by=self.entity, delivery_type=CarbureLot.BLENDING)  # fmt:skip
 
         parent_node = LotNode(parent_lot)
         child_node = parent_node.get_first(Node.LOT)
