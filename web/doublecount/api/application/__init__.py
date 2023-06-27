@@ -3,5 +3,5 @@ from .check_file import check_file
 
 
 urlpatterns = [
-    path("check-file", check_file, name="admin-double-counting-application-check-files"),
+    path("check-file", check_file, name="doublecount-application-check-file"),
 ]
