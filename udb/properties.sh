@@ -1,9 +1,0 @@
-sed -i -e "s/\$DOMIBUS_SECURITY_KEYSTORE_PASSWORD/$DOMIBUS_SECURITY_KEYSTORE_PASSWORD/" carbure-domibus.properties
-sed -i -e "s/\$DOMIBUS_SECURITY_KEY_PRIVATE_ALIAS/$DOMIBUS_SECURITY_KEY_PRIVATE_ALIAS/" carbure-domibus.properties
-sed -i -e "s/\$DOMIBUS_SECURITY_KEY_PRIVATE_PASSWORD/$DOMIBUS_SECURITY_KEY_PRIVATE_PASSWORD/" carbure-domibus.properties
-sed -i -e "s/\$DOMIBUS_SECURITY_TRUST_PASSWORD/$DOMIBUS_SECURITY_TRUST_PASSWORD/" carbure-domibus.properties
-sed -i -e "s/\$DOMIBUS_DATABASE_SERVERNAME/$DOMIBUS_DATABASE_SERVERNAME/" carbure-domibus.properties
-sed -i -e "s/\$DOMIBUS_DATABASE_PORT/$DOMIBUS_DATABASE_PORT/" carbure-domibus.properties
-sed -i -e "s/\$DOMIBUS_DATABASE_SCHEMA/$DOMIBUS_DATABASE_SCHEMA/" carbure-domibus.properties
-sed -i -e "s/\$DOMIBUS_DATASOURCE_USER/$DOMIBUS_DATASOURCE_USER/" carbure-domibus.properties
-sed -i -e "s/\$DOMIBUS_DATASOURCE_PASSWORD/$DOMIBUS_DATASOURCE_PASSWORD/" carbure-domibus.properties

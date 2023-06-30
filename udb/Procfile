@@ -1,1 +1,2 @@
-web: bash ./setup.sh
+web: sh ./entrypoint_procfile.sh
+postdeploy: sh ./migrate_database.sh

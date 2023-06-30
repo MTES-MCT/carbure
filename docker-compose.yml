@@ -102,9 +102,17 @@ services:
     build:
       context: ./udb
     environment:
-      MYSQL_DATABASE: domibus_blue
-      MYSQL_USER: edelivery_blue
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      DOMIBUS_DATABASE_SCHEMA: domibus_blue
+      DOMIBUS_DATASOURCE_USER: edelivery_blue
+      DOMIBUS_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      DOMIBUS_SECURITY_KEYSTORE_PASSWORD: ${MYSQL_PASSWORD}
+      DOMIBUS_SECURITY_KEY_PRIVATE_ALIAS: blue_dw
+      DOMIBUS_SECURITY_KEY_PRIVATE_PASSWORD: ${MYSQL_PASSWORD}
+      DOMIBUS_SECURITY_TRUST_PASSWORD: ${MYSQL_PASSWORD}
+      DOMIBUS_DATABASE_SERVERNAME: carbure-mariadb
+      DOMIBUS_DATABASE_PORT: 3306
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
       - ./udb/migrate.sh:/app/migrate.sh
       - ./udb/setenv.sh:/app/domibus/bin/setenv.sh
@@ -122,9 +130,17 @@ services:
     build:
       context: ./udb
     environment:
-      MYSQL_DATABASE: domibus_red
-      MYSQL_USER: edelivery_red
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      DOMIBUS_DATABASE_SCHEMA: domibus_red
+      DOMIBUS_DATASOURCE_USER: edelivery_red
+      DOMIBUS_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      DOMIBUS_SECURITY_KEYSTORE_PASSWORD: ${MYSQL_PASSWORD}
+      DOMIBUS_SECURITY_KEY_PRIVATE_ALIAS: red_dw
+      DOMIBUS_SECURITY_KEY_PRIVATE_PASSWORD: ${MYSQL_PASSWORD}
+      DOMIBUS_SECURITY_TRUST_PASSWORD: ${MYSQL_PASSWORD}
+      DOMIBUS_DATABASE_SERVERNAME: carbure-mariadb
+      DOMIBUS_DATABASE_PORT: 3306
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
       - ./udb/migrate.sh:/app/migrate.sh
       - ./udb/setenv.sh:/app/domibus/bin/setenv.sh
