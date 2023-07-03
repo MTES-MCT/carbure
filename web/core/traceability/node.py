@@ -146,7 +146,8 @@ class Node:
         if callable(node_type) and node_type(self):
             return self
 
-        return self.parent.get_closest(node_type)
+        if self.parent is not None:
+            return self.parent.get_closest(node_type)
 
     # find the first child of this node matching the given query
     def get_first(self, node_type) -> "Node":
