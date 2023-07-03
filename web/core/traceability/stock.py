@@ -138,6 +138,9 @@ class StockNode(Node):
             if child.type == Node.STOCK_TRANSFORM:
                 used_volume += child.data.volume_deducted_from_source
 
+        used_volume = round(used_volume)
+        available_volume = round(available_volume)
+
         if used_volume > available_volume:
             info = {"available_volume": available_volume, "used_volume": used_volume}
             errors += [(self, TraceabilityError.NOT_ENOUGH_STOCK_FOR_CHILDREN, info)]
