@@ -195,12 +195,12 @@ class LotNode(Node):
                 allowed_fields += LotNode.TRADING_FIELDS
 
             if self.parent is None or owns_ancestor_lot or owns_ancestor_stock:
-                allowed_fields += LotNode.DELIVERY_FIELDS
+                allowed_fields += LotNode.DELIVERY_FIELDS + LotNode.TRADING_FIELDS
 
         if root_lot.owner == entity_id:
             allowed_fields += LotNode.SUSTAINABILITY_FIELDS
 
-        return allowed_fields
+        return list(set(allowed_fields))
 
     def get_disabled_fields(self, entity_id) -> tuple[bool, list[str]]:
         all_fields = (
