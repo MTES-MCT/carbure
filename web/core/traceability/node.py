@@ -138,29 +138,26 @@ class Node:
 
         return self.parent.get_root()
 
-    # find the closest ancestor of this node matching the given class
-    # an owner can be specified to limit results to nodes owned by this owner
-    def get_closest(self, node_type, owner=None) -> "Node":
-        if self.parent is None:
-            return None
+    # find the closest ancestor of this node matching the given query
+    def get_closest(self, node_type) -> "Node":
+        if self.type == node_type:
+            return self
 
-        if self.parent.type == node_type:
-            if owner is None or self.parent.owner == owner:
-                return self.parent
+        if callable(node_type) and node_type(self):
+            return self
 
-        return self.parent.get_closest(node_type, owner)
+        return self.parent.get_closest(node_type)
 
-    # find the first child of this node matching the given class
-    # an owner can be specified to limit results to nodes owned by this owner
-    def get_first(self, node_type, owner=None) -> "Node":
+    # find the first child of this node matching the given query
+    def get_first(self, node_type) -> "Node":
         for child in self.children:
-            if owner and child.owner != owner:
-                continue
-
             if child.type == node_type:
                 return child
 
-            first = child.get_first(node_type, owner)
+            if callable(node_type) and node_type(child):
+                return child
+
+            first = child.get_first(node_type)
 
             if first is not None:
                 return first
@@ -367,7 +364,7 @@ def serialize_integrity_errors(integrity_errors):
     errors = []
 
     for node, error_type, error_data in integrity_errors:
-        lot_node = node.data if node.type == Node.LOT else node.get_closest(Node.LOT)
+        lot_node = node.get_closest(Node.LOT)
         if lot_node:
             error = GenericError(
                 error=error_type,

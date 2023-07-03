@@ -6,6 +6,7 @@ from .node import Node, GHG_FIELDS
 class LotNode(Node):
     type = Node.LOT
 
+    # data to copy from a related lot
     FROM_LOT = {
         "country_of_origin": True,
         "carbure_producer": True,
@@ -25,6 +26,7 @@ class LotNode(Node):
         **GHG_FIELDS,
     }
 
+    # data to copy from a directly related lot
     FROM_DIRECT_LOT = {
         "feedstock": True,
         "biofuel": True,
@@ -39,20 +41,24 @@ class LotNode(Node):
         **FROM_LOT,
     }
 
+    # data to copy only from a related processing lot
     FROM_PROCESSING_LOT = {
         "supplier_certificate": True,
     }
 
+    # data to copy only from a direct parent lot
     FROM_PARENT_LOT = {
         "carbure_client": "carbure_supplier",
         **FROM_DIRECT_LOT,
     }
 
+    # data to copy only from a direct child lot
     FROM_CHILD_LOT = {
         "carbure_supplier": "carbure_client",
         **FROM_DIRECT_LOT,
     }
 
+    # data to copy only from a related stock
     FROM_STOCK = {
         "biofuel": True,
         "feedstock": True,
@@ -64,11 +70,13 @@ class LotNode(Node):
         "ghg_reduction_red_ii": True,
     }
 
+    # data to copy only from a direct parent stock
     FROM_PARENT_STOCK = {
         "carbure_client": "carbure_supplier",
         **FROM_STOCK,
     }
 
+    # data to copy only from a direct child stock
     FROM_CHILD_STOCK = {
         "carbure_supplier": True,
         "unknown_supplier": True,
@@ -77,6 +85,7 @@ class LotNode(Node):
         **FROM_STOCK,
     }
 
+    # fields that are always allowed for a lot owner (the one who added the lot, either from drafts or trading or processing)
     TRANSACTION_FIELDS = [
         "carbure_supplier_id",
         "carbure_supplier",
@@ -92,6 +101,7 @@ class LotNode(Node):
         "free_field",
     ]
 
+    # fields only available for lots created after trading (with or without stock)
     TRADING_FIELDS = [
         "supplier_certificate",
         "supplier_certificate_type",
@@ -100,6 +110,7 @@ class LotNode(Node):
         "delivery_date",
     ]
 
+    # fields only available for stock extracts
     DELIVERY_FIELDS = [
         "transport_document_reference",
         "transport_document_type",
@@ -113,6 +124,7 @@ class LotNode(Node):
         "delivery_site_country",
     ]
 
+    # fields only available to the root owner (the one who input the data first on carbure)
     SUSTAINABILITY_FIELDS = [
         "feedstock",
         "feedstock_id",
@@ -178,38 +190,47 @@ class LotNode(Node):
         return children_lot + children_stock + children_ticket_source
 
     def get_allowed_fields(self, entity_id) -> list:
-        allowed_fields = []
+        # only allow owner to update a lot directly
+        if self.owner != entity_id:
+            return []
 
-        root_lot = self.get_root()
+        # if the lot has no parent, allow all fields
+        if self.parent is None:
+            return LotNode.TRANSACTION_FIELDS + LotNode.TRADING_FIELDS + LotNode.DELIVERY_FIELDS + LotNode.SUSTAINABILITY_FIELDS  # fmt:skip
 
-        if self.owner == entity_id:
-            closest_owned_lot = self.get_closest(Node.LOT, owner=entity_id)
-            owns_ancestor_lot = closest_owned_lot is not None
+        # find the first lot of the current traceability chain
+        sustainability_root = self.get_root()
 
-            closest_owned_stock = self.get_closest(Node.STOCK, owner=entity_id)
-            owns_ancestor_stock = closest_owned_stock is not None
+        # find the closest node in which delivery fields were defined (= closest lot with a parent stock, or the global root)
+        delivery_root = self.get_closest(is_delivery_root)
 
-            allowed_fields += LotNode.TRANSACTION_FIELDS
+        # find out if the current lot came from trading another lot
+        is_parent_trading = self.parent.type == Node.LOT and self.parent.data.delivery_type == CarbureLot.TRADING
 
-            if self.parent is None or (self.parent.type == Node.LOT and self.parent.data.delivery_type == CarbureLot.TRADING):  # fmt: skip
-                allowed_fields += LotNode.TRADING_FIELDS
+        # by default, the owner can change all transaction fields
+        allowed_fields = [*LotNode.TRANSACTION_FIELDS]
 
-            if self.parent is None or owns_ancestor_lot or owns_ancestor_stock:
-                allowed_fields += LotNode.DELIVERY_FIELDS + LotNode.TRADING_FIELDS
-
-        if root_lot.owner == entity_id:
+        # if the entity also owns the root lot of this chain, allow sustainability fields
+        if sustainability_root.owner == entity_id:
             allowed_fields += LotNode.SUSTAINABILITY_FIELDS
 
-        return list(set(allowed_fields))
+        # if the lot came from a stock owned by the current entity, allow delivery and trading fields
+        if delivery_root.owner == entity_id:
+            allowed_fields += LotNode.DELIVERY_FIELDS + LotNode.TRADING_FIELDS
+        # otherwise if the lot comes from trading, allow trading fields
+        elif is_parent_trading:
+            allowed_fields += LotNode.TRADING_FIELDS
+
+        return allowed_fields
 
     def get_disabled_fields(self, entity_id) -> tuple[bool, list[str]]:
-        all_fields = (
-            LotNode.TRANSACTION_FIELDS + LotNode.TRADING_FIELDS + LotNode.DELIVERY_FIELDS + LotNode.SUSTAINABILITY_FIELDS
-        )
+        all_fields = LotNode.TRANSACTION_FIELDS + LotNode.TRADING_FIELDS + LotNode.DELIVERY_FIELDS + LotNode.SUSTAINABILITY_FIELDS  # fmt:skip
 
         allowed_fields = self.get_allowed_fields(entity_id)
+        disabled_fields = list(set(all_fields) - set(allowed_fields))
+
         is_read_only = len(allowed_fields) == 0
-        return is_read_only, list(set(all_fields) - set(allowed_fields))
+        return is_read_only, disabled_fields
 
     def diff_with_parent(self):
         if self.parent.type == Node.LOT:
@@ -273,3 +294,16 @@ class LotNode(Node):
             if field == "carbure_delivery_site" and value:
                 derived_fields["delivery_site_country"] = value.country
         return derived_fields
+
+
+# function to check if a given node can be considered a root for DELIVERY_FIELDS data
+# looks up for the first lot in the chain that comes from a stock
+# otherwise, accepts the root node of the chain
+def is_delivery_root(node: Node):
+    if node.parent is None:
+        return True
+
+    is_lot = node.type == Node.LOT
+    has_parent_stock = node.parent.type == Node.STOCK
+
+    return is_lot and has_parent_stock
