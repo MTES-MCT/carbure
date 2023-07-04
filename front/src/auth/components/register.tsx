@@ -8,6 +8,8 @@ import { Container, Switcher } from "./login"
 import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import * as api from "../api"
+import { AxiosError } from "axios"
+import { Api } from "common/services/api"
 
 export const Register = () => {
   const { t } = useTranslation()
@@ -27,8 +29,30 @@ export const Register = () => {
       navigate("../register-pending")
     },
 
-    onError: () => {
-      notify(t("Le compte n'a pas pu être créé !"), { variant: "danger" })
+    onError: (error) => {
+      const errors = []
+      const errorData =
+        (error as AxiosError<Api<any>>).response?.data?.data ?? {}
+
+      for (const field in errorData) {
+        const fieldErrors = errorData[field]
+        errors.push(...fieldErrors)
+      }
+
+      const content = (
+        <>
+          <div style={{ marginBottom: 8 }}>
+            {t("Le compte n'a pas pu être créé !")}
+          </div>
+          <ul>
+            {errors.map((err, i) => (
+              <li key={i}>{err}</li>
+            ))}
+          </ul>
+        </>
+      )
+
+      notify(content, { variant: "danger" })
     },
   })
 
