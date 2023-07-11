@@ -19,6 +19,27 @@ class SafTicketSourceError:
     MALFORMED_PARAMS = "MALFORMED_PARAMS"
 
 
+class TicketSourceFilterForm(forms.Form):
+    entity_id = forms.IntegerField()
+    status = forms.CharField()
+    year = forms.IntegerField()
+    periods = MultipleValueField(coerce=int, required=False)
+    feedstocks = MultipleValueField(coerce=str, required=False)
+    clients = MultipleValueField(coerce=str, required=False)
+    suppliers = MultipleValueField(coerce=str, required=False)
+    countries_of_origin = MultipleValueField(coerce=str, required=False)
+    production_sites = MultipleValueField(coerce=str, required=False)
+    delivery_sites = MultipleValueField(coerce=str, required=False)
+    search = forms.CharField(required=False)
+
+
+class TicketSourceSortForm(forms.Form):
+    sort_by = forms.CharField(required=False)
+    order = forms.CharField(required=False)
+    from_idx = forms.IntegerField(initial=0)
+    limit = forms.IntegerField(initial=25)
+
+
 @check_user_rights()
 def get_ticket_sources(request, *args, **kwargs):
     filter_form = TicketSourceFilterForm(request.GET)
@@ -57,27 +78,6 @@ def get_ticket_sources(request, *args, **kwargs):
         return ErrorResponse(400, SafTicketSourceError.TICKET_SOURCE_LISTING_FAILED)
 
 
-class TicketSourceFilterForm(forms.Form):
-    entity_id = forms.IntegerField()
-    status = forms.CharField()
-    year = forms.IntegerField()
-    periods = MultipleValueField(coerce=int, required=False)
-    feedstocks = MultipleValueField(coerce=str, required=False)
-    clients = MultipleValueField(coerce=str, required=False)
-    suppliers = MultipleValueField(coerce=str, required=False)
-    countries_of_origin = MultipleValueField(coerce=str, required=False)
-    production_sites = MultipleValueField(coerce=str, required=False)
-    delivery_sites = MultipleValueField(coerce=str, required=False)
-    search = forms.CharField(required=False)
-
-
-class TicketSourceSortForm(forms.Form):
-    sort_by = forms.CharField(required=False)
-    order = forms.CharField(required=False)
-    from_idx = forms.IntegerField(initial=0)
-    limit = forms.IntegerField(initial=25)
-
-
 def find_ticket_sources(**filters):
     ticket_sources = (
         SafTicketSource.objects.select_related(
@@ -114,7 +114,7 @@ def find_ticket_sources(**filters):
         )
 
     if filters["countries_of_origin"]:
-        ticket_sources = ticket_sources.filter(country_of_origin__in=filters["countries_of_origin"])
+        ticket_sources = ticket_sources.filter(country_of_origin__code_pays__in=filters["countries_of_origin"])
 
     if filters["production_sites"]:
         ticket_sources = ticket_sources.filter(carbure_production_site__name__in=filters["production_sites"])
