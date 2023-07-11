@@ -98,7 +98,7 @@ export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
 }
 
 const CLIENT_FILTERS = [
-  SafFilter.Supplier,
+  SafFilter.Suppliers,
   SafFilter.Periods,
   SafFilter.Feedstocks,
 ]

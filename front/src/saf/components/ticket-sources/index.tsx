@@ -146,6 +146,14 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
   )
 }
 
-const FILTERS = [SafFilter.Clients, SafFilter.Periods, SafFilter.Feedstocks]
+const FILTERS = [
+  SafFilter.Suppliers,
+  SafFilter.Clients,
+  SafFilter.Periods,
+  SafFilter.Feedstocks,
+  SafFilter.CountriesOfOrigin,
+  SafFilter.ProductionSites,
+  SafFilter.DeliverySites,
+]
 
 export default TicketSources

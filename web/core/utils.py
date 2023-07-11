@@ -1,5 +1,6 @@
 import os
 import unicodedata
+from django import forms
 from django.db import connection, transaction
 from django.conf import settings
 from django.core.paginator import Paginator
@@ -135,3 +136,10 @@ def run_query(query_path, *args):
             cursor.execute(query_sql, args)
             # grab the list of results in the form of an array of tuples
             return cursor.fetchall()
+
+
+class MultipleValueField(forms.TypedMultipleChoiceField):
+    # def __init__(self, *args, **kwargs):
+    #     super(MultipleValueField, self).__init__(*args, **kwargs)
+    def valid_value(self, value):
+        return True

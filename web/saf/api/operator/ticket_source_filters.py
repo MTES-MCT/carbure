@@ -1,9 +1,10 @@
 # /api/v5/saf/operator/ticket-sources/filters
 
 import traceback
+from django.db.models.functions import Coalesce
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
-from .ticket_sources import parse_ticket_source_query, find_ticket_sources
+from .ticket_sources import TicketSourceFilterForm, find_ticket_sources
 
 
 class SafTicketSourceFiltersError:
@@ -13,12 +14,13 @@ class SafTicketSourceFiltersError:
 
 @check_user_rights()
 def get_ticket_source_filters(request, *args, **kwargs):
-    try:
-        query = parse_ticket_source_query(request.GET)
-        filter = request.GET.get("filter")
-    except:
-        traceback.print_exc()
-        return ErrorResponse(400, SafTicketSourceFiltersError.MALFORMED_PARAMS)
+    filter_form = TicketSourceFilterForm(request.GET)
+
+    if not filter_form.is_valid():
+        return ErrorResponse(400, SafTicketSourceFiltersError.MALFORMED_PARAMS, filter_form.errors)
+
+    filter = request.GET.get("filter")
+    query = filter_form.cleaned_data
 
     try:
         # do not apply the filter we are listing so we can get all its possible values in the current context
@@ -44,8 +46,25 @@ def get_filter_values(ticket_sources, filter):
         column = "delivery_period"
     elif filter == "feedstocks":
         column = "feedstock__code"
+    elif filter == "countries_of_origin":
+        column = "country_of_origin__code_pays"
+    elif filter == "production_sites":
+        column = "carbure_production_site__name"
+    elif filter == "delivery_sites":
+        column = "parent_lot__carbure_delivery_site__name"
+    elif filter == "suppliers":
+        column = "parent_supplier"
+
     else:  # raise an error for unknown filters
         raise Exception("Filter '%s' does not exist for ticket sources" % filter)
+
+    ticket_sources = ticket_sources.annotate(
+        parent_supplier=Coalesce(
+            "parent_lot__carbure_supplier__name",
+            "parent_lot__unknown_supplier",
+            "parent_ticket__supplier__name",
+        )
+    )
 
     values = ticket_sources.values_list(column, flat=True).distinct()
     return [v for v in values if v]

@@ -24,7 +24,10 @@ export function Filters({
     [SafFilter.Periods]: t("Périodes"),
     [SafFilter.Feedstocks]: t("Matières Premières"),
     [SafFilter.Clients]: t("Clients"),
-    [SafFilter.Supplier]: t("Fournisseur"),
+    [SafFilter.Suppliers]: t("Fournisseur"),
+    [SafFilter.CountriesOfOrigin]: t("Pays d'origine"),
+    [SafFilter.ProductionSites]: t("Sites de production"),
+    [SafFilter.DeliverySites]: t("Sites de livraison"),
   }
 
   return (
@@ -71,6 +74,10 @@ const filterNormalizers: FilterNormalizers = {
   [SafFilter.Feedstocks]: norm.normalizeFeedstockFilter,
   [SafFilter.Periods]: norm.normalizePeriodFilter,
   [SafFilter.Clients]: norm.normalizeUnknownFilter,
+  [SafFilter.Suppliers]: norm.normalizeUnknownFilter,
+  [SafFilter.CountriesOfOrigin]: norm.normalizeCountryFilter,
+  [SafFilter.ProductionSites]: norm.normalizeUnknownFilter,
+  [SafFilter.DeliverySites]: norm.normalizeUnknownFilter,
 }
 
 export default Filters
