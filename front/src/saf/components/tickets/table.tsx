@@ -22,6 +22,7 @@ export interface TicketsTableProps {
   status: SafTicketStatus
   ticketsData?: SafTicketsResponse
   order: Order | undefined
+  client?: boolean
   rowLink: (ticketSource: SafTicket) => To
 }
 
@@ -32,9 +33,9 @@ export const TicketsTable = memo(
     actions,
     ticketsData,
     order,
+    client,
     rowLink,
   }: TicketsTableProps) => {
-    const { isAirline } = useEntity()
     const columns = useColumns()
 
     const total = ticketsData?.total ?? 0
@@ -53,7 +54,7 @@ export const TicketsTable = memo(
               rows={tickets}
               columns={compact([
                 columns.status,
-                isAirline ? columns.supplier : columns.client,
+                client ? columns.supplier : columns.client,
                 columns.availableVolume,
                 columns.period,
                 columns.feedstock,

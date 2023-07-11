@@ -4,7 +4,6 @@ import useEntity from "carbure/hooks/entity"
 
 import HashRoute from "common/components/hash-route"
 import { SearchInput } from "common/components/input"
-import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { useQueryParamsStore } from "saf/hooks/query-params-store"
@@ -12,7 +11,6 @@ import { useSafQuery } from "saf/hooks/saf-query"
 import {
   SafClientSnapshot,
   SafFilter,
-  SafOperatorSnapshot,
   SafQuery,
   SafTicket,
   SafTicketStatus,
@@ -80,6 +78,7 @@ export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
         </ActionBar>
 
         <TicketsTable
+          client
           loading={ticketsResponse.loading}
           state={state}
           actions={actions}
