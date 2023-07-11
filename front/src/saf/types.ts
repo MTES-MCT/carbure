@@ -46,8 +46,8 @@ export interface SafTicketSource {
 
 export interface SafTicketSourceSummary
   extends SafTicketSource,
-  SafProduction,
-  SafDurability {
+    SafProduction,
+    SafDurability {
   count: number
   total_volume: number
   ticket_sources: SafTicketSourceSummaryItem[]
@@ -67,8 +67,8 @@ export interface SafTicketSourceSummaryItem extends SafTicketSourcePreview {
 
 export interface SafTicketSourceDetails
   extends SafTicketSource,
-  SafProduction,
-  SafDurability {
+    SafProduction,
+    SafDurability {
   added_by: Entity
   parent_lot: LotPreview
 }
@@ -112,11 +112,10 @@ export interface SafTicket {
   status: SafTicketStatus
 }
 
-
 export interface SafTicketDetails
   extends SafTicket,
-  SafProduction,
-  SafDurability {
+    SafProduction,
+    SafDurability {
   free_field?: string
   client_comment?: string
   // child_ticket_source?: {
@@ -202,7 +201,10 @@ export enum SafFilter {
   Feedstocks = "feedstocks",
   Periods = "periods",
   Clients = "clients",
-  Supplier = "suppliers",
+  Suppliers = "suppliers",
+  CountriesOfOrigin = "countries_of_origin",
+  ProductionSites = "production_sites",
+  DeliverySites = "delivery_sites",
 }
 
 export type SafQueryType = "assigned" | "received"

@@ -2,12 +2,14 @@
 
 from math import floor
 import traceback
+from django import forms
 from django.core.paginator import Paginator
 from django.db.models.expressions import F
 from django.db.models import Q
 
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
+from core.utils import MultipleValueField
 from saf.models import SafTicketSource
 from saf.serializers import SafTicketSourceSerializer
 
@@ -19,17 +21,19 @@ class SafTicketSourceError:
 
 @check_user_rights()
 def get_ticket_sources(request, *args, **kwargs):
-    try:
-        query = parse_ticket_source_query(request.GET)
-        sort_by = request.GET.get("sort_by")
-        order = request.GET.get("order")
-        from_idx = int(request.GET.get("from_idx", 0))
-        limit = int(request.GET.get("limit", 25))
-    except:
-        return ErrorResponse(400, SafTicketSourceError.MALFORMED_PARAMS)
+    filter_form = TicketSourceFilterForm(request.GET)
+    sort_form = TicketSourceSortForm(request.GET)
+
+    if not filter_form.is_valid() or not sort_form.is_valid():
+        return ErrorResponse(400, SafTicketSourceError.MALFORMED_PARAMS, {**filter_form.errors, **sort_form.errors})
+
+    sort_by = sort_form.cleaned_data["sort_by"]
+    order = sort_form.cleaned_data["order"]
+    from_idx = sort_form.cleaned_data["from_idx"]
+    limit = sort_form.cleaned_data["limit"]
 
     try:
-        ticket_sources = find_ticket_sources(**query)
+        ticket_sources = find_ticket_sources(**filter_form.cleaned_data)
         ticket_sources = sort_ticket_sources(ticket_sources, sort_by, order)
 
         paginator = Paginator(ticket_sources, limit)
@@ -53,47 +57,70 @@ def get_ticket_sources(request, *args, **kwargs):
         return ErrorResponse(400, SafTicketSourceError.TICKET_SOURCE_LISTING_FAILED)
 
 
-def parse_ticket_source_query(query):
-    entity_id = int(query["entity_id"])
-    status = query["status"]
-    year = int(query["year"])
-    search = query.get("search", None)
-    periods = [int(p) for p in query.getlist("periods")] if "periods" in query else None
-    clients = query.getlist("clients") if "clients" in query else None
-    feedstocks = query.getlist("feedstocks") if "feedstocks" in query else None
+class TicketSourceFilterForm(forms.Form):
+    entity_id = forms.IntegerField()
+    status = forms.CharField()
+    year = forms.IntegerField()
+    periods = MultipleValueField(coerce=int, required=False)
+    feedstocks = MultipleValueField(coerce=str, required=False)
+    clients = MultipleValueField(coerce=str, required=False)
+    suppliers = MultipleValueField(coerce=str, required=False)
+    countries_of_origin = MultipleValueField(coerce=str, required=False)
+    production_sites = MultipleValueField(coerce=str, required=False)
+    delivery_sites = MultipleValueField(coerce=str, required=False)
+    search = forms.CharField(required=False)
 
-    return {
-        "entity_id": entity_id,
-        "status": status,
-        "year": year,
-        "periods": periods,
-        "feedstocks": feedstocks,
-        "clients": clients,
-        "search": search,
-    }
+
+class TicketSourceSortForm(forms.Form):
+    sort_by = forms.CharField(required=False)
+    order = forms.CharField(required=False)
+    from_idx = forms.IntegerField(initial=0)
+    limit = forms.IntegerField(initial=25)
 
 
 def find_ticket_sources(**filters):
     ticket_sources = (
-        SafTicketSource.objects.select_related("feedstock", "biofuel", "country_of_origin", "carbure_production_site")
+        SafTicketSource.objects.select_related(
+            "feedstock",
+            "biofuel",
+            "country_of_origin",
+            "carbure_production_site",
+        )
         .prefetch_related("saf_tickets")
         .prefetch_related("saf_tickets__client")
     )
 
-    if filters["entity_id"] != None:
+    if filters["entity_id"]:
         ticket_sources = ticket_sources.filter(added_by_id=filters["entity_id"])
 
-    if filters["year"] != None:
+    if filters["year"]:
         ticket_sources = ticket_sources.filter(year=filters["year"])
 
-    if filters["periods"] != None:
+    if filters["periods"]:
         ticket_sources = ticket_sources.filter(delivery_period__in=filters["periods"])
 
-    if filters["feedstocks"] != None:
+    if filters["feedstocks"]:
         ticket_sources = ticket_sources.filter(feedstock__code__in=filters["feedstocks"])
 
-    if filters["clients"] != None:
+    if filters["clients"]:
         ticket_sources = ticket_sources.filter(saf_tickets__client__name__in=filters["clients"])
+
+    if filters["suppliers"]:
+        suppliers = filters["suppliers"]
+        ticket_sources = ticket_sources.filter(
+            Q(parent_lot__carbure_supplier__name__in=suppliers)
+            | Q(parent_lot__unknown_supplier__in=suppliers)
+            | Q(parent_ticket__supplier__name__in=suppliers)
+        )
+
+    if filters["countries_of_origin"]:
+        ticket_sources = ticket_sources.filter(country_of_origin__in=filters["countries_of_origin"])
+
+    if filters["production_sites"]:
+        ticket_sources = ticket_sources.filter(carbure_production_site__name__in=filters["production_sites"])
+
+    if filters["delivery_sites"]:
+        ticket_sources = ticket_sources.filter(parent_lot__carbure_delivery_site__name__in=filters["delivery_sites"])
 
     if filters["status"] == "AVAILABLE":
         ticket_sources = ticket_sources.filter(assigned_volume__lt=F("total_volume"))
