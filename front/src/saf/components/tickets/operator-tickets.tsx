@@ -6,7 +6,6 @@ import HashRoute from "common/components/hash-route"
 import { SearchInput } from "common/components/input"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import { compact } from "common/utils/collection"
 import { useQueryParamsStore } from "saf/hooks/query-params-store"
 import { useSafQuery } from "saf/hooks/saf-query"
 import {
@@ -56,7 +55,6 @@ export const OperatorTickets = ({
   })
 
   const ticketsData = ticketsResponse.result?.data.data
-  // const ticketsData = data.safTicketsResponse //TO TEST with testing d:ata
   const ids = ticketsData?.ids ?? []
 
   const showTicketDetail = (ticket: SafTicket) => {
@@ -105,6 +103,7 @@ export const OperatorTickets = ({
           order={state.order}
           status={status as SafTicketStatus}
           ticketsData={ticketsData}
+          client={type === "received"}
           rowLink={showTicketDetail}
         />
       </section>

@@ -1,12 +1,10 @@
 import useEntity from "carbure/hooks/entity"
-import HashRoute from "common/components/hash-route"
 import { Main } from "common/components/scaffold"
 import Select from "common/components/select"
 import { useQuery } from "common/hooks/async"
 import useYears from "common/hooks/years"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
-import LotDetails from "transaction-details/components/lots"
 import * as api from "./api"
 import OperatorTabs from "./components/operator-tabs"
 import TicketSources from "./components/ticket-sources"
@@ -24,8 +22,8 @@ export const Saf = () => {
     key: "operator-snapshot",
     params: [entity.id, years.selected],
   })
+
   const snapshotData = snapshot.result?.data.data
-  // const snapshotData = safOperatorSnapshot //TO TEST with testing data
 
   return (
     <Main>
@@ -65,12 +63,6 @@ export const Saf = () => {
             />
           }
         />
-        {/* <Route
-          path="tickets/*"
-          element={
-            <OperatorTickets year={years.selected} snapshot={snapshotData} />
-          }
-        /> */}
 
         <Route
           path="tickets-received/*"
@@ -103,7 +95,6 @@ export const Saf = () => {
             />
           }
         />
-        {/* <HashRoute path="lot/:id" element={<LotDetails />} /> */}
       </Routes>
     </Main>
   )
