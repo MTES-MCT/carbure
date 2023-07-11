@@ -2,11 +2,13 @@
 
 from math import floor
 import traceback
+from django import forms
 from django.core.paginator import Paginator
 from django.db.models import Q
 
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
+from core.utils import MultipleValueField
 from saf.models import SafTicket
 from saf.serializers import SafTicketSerializer
 
@@ -16,20 +18,42 @@ class SafTicketError:
     MALFORMED_PARAMS = "MALFORMED_PARAMS"
 
 
+class TicketFilterForm(forms.Form):
+    entity_id = forms.IntegerField()
+    type = forms.CharField()
+    status = forms.CharField()
+    year = forms.IntegerField()
+    periods = MultipleValueField(coerce=int, required=False)
+    feedstocks = MultipleValueField(coerce=str, required=False)
+    clients = MultipleValueField(coerce=str, required=False)
+    suppliers = MultipleValueField(coerce=str, required=False)
+    countries_of_origin = MultipleValueField(coerce=str, required=False)
+    production_sites = MultipleValueField(coerce=str, required=False)
+    search = forms.CharField(required=False)
+
+
+class TicketSortForm(forms.Form):
+    sort_by = forms.CharField(required=False)
+    order = forms.CharField(required=False)
+    from_idx = forms.IntegerField(initial=0)
+    limit = forms.IntegerField(initial=25)
+
+
 @check_user_rights()
 def get_tickets(request, *args, **kwargs):
-    try:
-        query = parse_ticket_query(request.GET)
-        sort_by = request.GET.get("sort_by")
-        order = request.GET.get("order")
-        from_idx = int(request.GET.get("from_idx", 0))
-        limit = int(request.GET.get("limit", 25))
-    except:
-        traceback.print_exc()
-        return ErrorResponse(400, SafTicketError.MALFORMED_PARAMS)
+    filter_form = TicketFilterForm(request.GET)
+    sort_form = TicketSortForm(request.GET)
+
+    if not filter_form.is_valid() or not sort_form.is_valid():
+        return ErrorResponse(400, SafTicketError.MALFORMED_PARAMS, {**filter_form.errors, **sort_form.errors})
+
+    sort_by = sort_form.cleaned_data["sort_by"]
+    order = sort_form.cleaned_data["order"]
+    from_idx = sort_form.cleaned_data["from_idx"]
+    limit = sort_form.cleaned_data["limit"]
 
     try:
-        tickets = find_tickets(**query)
+        tickets = find_tickets(**filter_form.cleaned_data)
         tickets = sort_tickets(tickets, sort_by, order)
 
         paginator = Paginator(tickets, limit)
@@ -53,28 +77,6 @@ def get_tickets(request, *args, **kwargs):
         return ErrorResponse(400, SafTicketError.TICKET_LISTING_FAILED)
 
 
-def parse_ticket_query(query):
-    entity_id = int(query["entity_id"])
-    status = query["status"]
-    type = query["type"]
-    year = int(query["year"])
-    search = query.get("search", None)
-    periods = [int(p) for p in query.getlist("periods")] if "periods" in query else None
-    clients = query.getlist("clients") if "clients" in query else None
-    feedstocks = query.getlist("feedstocks") if "feedstocks" in query else None
-
-    return {
-        "entity_id": entity_id,
-        "status": status,
-        "type": type,
-        "year": year,
-        "periods": periods,
-        "feedstocks": feedstocks,
-        "clients": clients,
-        "search": search,
-    }
-
-
 def find_tickets(**filters):
     tickets = SafTicket.objects.select_related(
         "parent_ticket_source",
@@ -86,23 +88,32 @@ def find_tickets(**filters):
         "client",
     )
 
-    if filters["entity_id"] != None:
+    if filters["entity_id"]:
         if filters["type"] == "assigned":
             tickets = tickets.filter(supplier_id=filters["entity_id"])
         elif filters["type"] == "received":
             tickets = tickets.filter(client_id=filters["entity_id"])
 
-    if filters["year"] != None:
+    if filters["year"]:
         tickets = tickets.filter(year=filters["year"])
 
-    if filters["periods"] != None:
+    if filters["periods"]:
         tickets = tickets.filter(assignment_period__in=filters["periods"])
 
-    if filters["feedstocks"] != None:
+    if filters["feedstocks"]:
         tickets = tickets.filter(feedstock__code__in=filters["feedstocks"])
 
-    if filters["clients"] != None:
+    if filters["clients"]:
         tickets = tickets.filter(client__name__in=filters["clients"])
+
+    if filters["suppliers"]:
+        tickets = tickets.filter(supplier__name__in=filters["suppliers"])
+
+    if filters["countries_of_origin"]:
+        tickets = tickets.filter(country_of_origin__code_pays__in=filters["countries_of_origin"])
+
+    if filters["production_sites"]:
+        tickets = tickets.filter(carbure_production_site__name__in=filters["production_sites"])
 
     if filters["status"] == SafTicket.PENDING:
         tickets = tickets.filter(status=SafTicket.PENDING)

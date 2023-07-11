@@ -3,7 +3,7 @@
 import traceback
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
-from .tickets import parse_ticket_query, find_tickets
+from .tickets import TicketFilterForm, find_tickets
 
 
 class SafTicketFiltersError:
@@ -13,12 +13,13 @@ class SafTicketFiltersError:
 
 @check_user_rights()
 def get_ticket_filters(request, *args, **kwargs):
-    try:
-        query = parse_ticket_query(request.GET)
-        filter = request.GET.get("filter")
-    except:
-        traceback.print_exc()
+    filter_form = TicketFilterForm(request.GET)
+
+    if not filter_form.is_valid():
         return ErrorResponse(400, SafTicketFiltersError.MALFORMED_PARAMS)
+
+    query = filter_form.cleaned_data
+    filter = request.GET.get("filter")
 
     try:
         # do not apply the filter we are listing so we can get all its possible values in the current context
@@ -44,6 +45,12 @@ def get_filter_values(tickets, filter):
         column = "assignment_period"
     elif filter == "feedstocks":
         column = "feedstock__code"
+    elif filter == "countries_of_origin":
+        column = "country_of_origin__code_pays"
+    elif filter == "suppliers":
+        column = "supplier__name"
+    elif filter == "production_sites":
+        column = "carbure_production_site__name"
     else:  # raise an error for unknown filters
         raise Exception("Filter '%s' does not exist for tickets" % filter)
 

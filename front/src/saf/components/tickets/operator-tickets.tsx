@@ -68,11 +68,16 @@ export const OperatorTickets = ({
   const getTicketFilter = (filter: any) =>
     api.getOperatorTicketFilters(filter, query)
 
+  const filters =
+    type === "received"
+      ? OPERATOR_RECEIVED_FILTERS //
+      : OPERATOR_ASSIGNED_FILTERS
+
   return (
     <>
       <Bar>
         <Filters
-          filters={OPERATOR_FILTERS}
+          filters={filters}
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={getTicketFilter}
@@ -117,10 +122,20 @@ export const OperatorTickets = ({
   )
 }
 
-const OPERATOR_FILTERS = [
+const OPERATOR_RECEIVED_FILTERS = [
+  SafFilter.Suppliers,
+  SafFilter.Periods,
+  SafFilter.Feedstocks,
+  SafFilter.CountriesOfOrigin,
+  SafFilter.ProductionSites,
+]
+
+const OPERATOR_ASSIGNED_FILTERS = [
   SafFilter.Clients,
   SafFilter.Periods,
   SafFilter.Feedstocks,
+  SafFilter.CountriesOfOrigin,
+  SafFilter.ProductionSites,
 ]
 
 export default OperatorTickets
