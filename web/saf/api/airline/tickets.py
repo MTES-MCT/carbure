@@ -7,8 +7,10 @@ from django.db.models import Q
 
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
+from core.excel import ExcelResponse
 from saf.models import SafTicket
 from saf.serializers import SafTicketSerializer
+from saf.serializers.saf_ticket import export_tickets_to_excel
 
 
 class SafTicketError:
@@ -24,12 +26,18 @@ def get_tickets(request, *args, **kwargs):
         order = request.GET.get("order")
         from_idx = int(request.GET.get("from_idx", 0))
         limit = int(request.GET.get("limit", 25))
+        export = "export" in request.GET
     except:
         traceback.print_exc()
         return ErrorResponse(400, SafTicketError.MALFORMED_PARAMS)
 
     try:
         tickets = find_tickets(**query)
+
+        if export:
+            file = export_tickets_to_excel(tickets)
+            return ExcelResponse(file)
+
         tickets = sort_tickets(tickets, sort_by, order)
 
         paginator = Paginator(tickets, limit)

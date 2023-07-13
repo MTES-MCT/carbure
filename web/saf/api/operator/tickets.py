@@ -8,9 +8,11 @@ from django.db.models import Q
 
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
+from core.excel import ExcelResponse, export_to_excel
 from core.utils import MultipleValueField
 from saf.models import SafTicket
 from saf.serializers import SafTicketSerializer
+from saf.serializers.saf_ticket import SafTicketDetailsSerializer, export_tickets_to_excel
 
 
 class SafTicketError:
@@ -47,6 +49,8 @@ def get_tickets(request, *args, **kwargs):
     if not filter_form.is_valid() or not sort_form.is_valid():
         return ErrorResponse(400, SafTicketError.MALFORMED_PARAMS, {**filter_form.errors, **sort_form.errors})
 
+    export = "export" in request.GET
+
     sort_by = sort_form.cleaned_data["sort_by"]
     order = sort_form.cleaned_data["order"]
     from_idx = sort_form.cleaned_data["from_idx"]
@@ -54,6 +58,11 @@ def get_tickets(request, *args, **kwargs):
 
     try:
         tickets = find_tickets(**filter_form.cleaned_data)
+
+        if export:
+            file = export_tickets_to_excel(tickets)
+            return ExcelResponse(file)
+
         tickets = sort_tickets(tickets, sort_by, order)
 
         paginator = Paginator(tickets, limit)
