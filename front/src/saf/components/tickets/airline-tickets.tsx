@@ -20,6 +20,7 @@ import { Filters } from "../filters"
 import { useAutoStatus } from "../client-tabs"
 import { ClientTicketDetails } from "../ticket-details/airline-details"
 import TicketsTable from "./table"
+import { ExportTicketsButton } from "./export"
 
 export interface AirlineTicketsProps {
   year: number
@@ -68,6 +69,10 @@ export const AirlineTickets = ({ year, snapshot }: AirlineTicketsProps) => {
       </Bar>
       <section>
         <ActionBar>
+          <ExportTicketsButton
+            query={query}
+            getTickets={api.downloadSafAirlineTickets}
+          />
           <SearchInput
             asideX
             clear
