@@ -23,7 +23,7 @@ import { OperatorTicketDetails } from "../ticket-details/operator-details"
 import { StatusSwitcher } from "./status-switcher"
 import TicketsTable from "./table"
 import TicketSourceDetails from "../ticket-source-details"
-import { ExportTicketsButton } from "./export"
+import { ExportButton } from "../export"
 
 export interface OperatorTicketsProps {
   type: SafQueryType
@@ -93,10 +93,10 @@ export const OperatorTickets = ({
             status={status as SafTicketStatus}
           />
 
-          <ExportTicketsButton
+          <ExportButton
             asideX
             query={query}
-            getTickets={api.downloadOperatorTickets}
+            download={api.downloadOperatorTickets}
           />
           <SearchInput
             clear

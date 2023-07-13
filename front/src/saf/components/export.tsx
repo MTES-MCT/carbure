@@ -3,24 +3,24 @@ import { Download } from "common/components/icons"
 import { useTranslation } from "react-i18next"
 import { SafQuery } from "saf/types"
 
-export interface ExportTicketsButtonProps {
+export interface ExportButtonProps {
   asideX?: boolean
   query: SafQuery
-  getTickets: Function
+  download: Function
 }
 
-export const ExportTicketsButton = ({
+export const ExportButton = ({
   asideX,
   query,
-  getTickets,
-}: ExportTicketsButtonProps) => {
+  download,
+}: ExportButtonProps) => {
   const { t } = useTranslation()
   return (
     <Button
       asideX={asideX}
       icon={Download}
       label={t("Exporter vers Excel")}
-      action={() => getTickets(query)}
+      action={() => download(query)}
     />
   )
 }
