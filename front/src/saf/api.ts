@@ -1,6 +1,6 @@
 import { extract } from "carbure/api"
 import { EntityPreview } from "carbure/types"
-import { api, Api } from "common/services/api"
+import { api, Api, download } from "common/services/api"
 import {
   SafClientSnapshot,
   SafFilter,
@@ -44,6 +44,10 @@ export function getSafAirlineTickets(query: SafQuery) {
   return api.get<Api<SafTicketsResponse>>("/v5/saf/airline/tickets", {
     params: query,
   })
+}
+
+export function downloadSafAirlineTickets(query: SafQuery) {
+  return download("/v5/saf/airline/tickets", { ...query, export: true })
 }
 
 export function getAirlineTicketDetails(entity_id: number, ticket_id: number) {
@@ -108,6 +112,10 @@ export function getOperatorTickets(query: SafQuery) {
   return api.get<Api<SafTicketsResponse>>("/v5/saf/operator/tickets", {
     params: query,
   })
+}
+
+export function downloadOperatorTickets(query: SafQuery) {
+  return download("/v5/saf/operator/tickets", { ...query, export: true })
 }
 
 export function getOperatorTicketDetails(entity_id: number, ticket_id: number) {
@@ -202,7 +210,7 @@ export function acceptSafTicket(entity_id: number, ticket_id: number) {
   })
 }
 
-export async function findClients(entity_id: number, query?: string,) {
+export async function findClients(entity_id: number, query?: string) {
   return api
     .get<Api<EntityPreview[]>>("/v5/saf/operator/clients", {
       params: { entity_id, query },
