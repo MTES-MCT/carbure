@@ -89,6 +89,10 @@ export function getOperatorTicketSources(query: SafQuery) {
   )
 }
 
+export function downloadOperatorTicketSources(query: SafQuery) {
+  return download("/v5/saf/operator/ticket-sources", { ...query, export: true })
+}
+
 export function getOperatorTicketSourceDetails(
   entity_id: number,
   ticket_source_id: number

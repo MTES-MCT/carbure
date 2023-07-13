@@ -1,9 +1,10 @@
+import datetime
 from rest_framework import serializers
+from core.excel import export_to_excel, get_nested_value
 
 from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer
-from core.serializers import ProductionSiteSerializer, EntityPreviewSerializer
+from core.serializers import CarbureLotPublicSerializer, ProductionSiteSerializer, EntityPreviewSerializer
 from saf.models import SafTicketSource
-from core.serializers import CarbureLotPreviewSerializer
 from core.models import CarbureLot
 
 
@@ -89,7 +90,7 @@ class SafTicketSourceDetailsSerializer(serializers.ModelSerializer):
     carbure_producer = EntityPreviewSerializer(read_only=True)
     carbure_production_site = ProductionSiteSerializer(read_only=True)
     assigned_tickets = serializers.SerializerMethodField()
-    parent_lot = CarbureLotPreviewSerializer()
+    parent_lot = CarbureLotPublicSerializer()
 
     def get_assigned_tickets(self, obj):
         from .saf_ticket import SafTicketPreviewSerializer
@@ -106,3 +107,59 @@ class SafTicketSourcePreviewSerializer(serializers.ModelSerializer):
             "total_volume",
             "assigned_volume",
         ]
+
+
+def export_ticket_sources_to_excel(tickets):
+    today = datetime.datetime.today()
+    location = "/tmp/carbure_saf_ticket_sources_%s.xlsx" % (today.strftime("%Y%m%d_%H%M"))
+
+    return export_to_excel(
+        location,
+        [
+            {
+                "label": "tickets",
+                "rows": SafTicketSourceDetailsSerializer(tickets, many=True).data,
+                "columns": [
+                    {"label": "carbure_id", "value": "carbure_id"},
+                    {"label": "year", "value": "year"},
+                    {"label": "delivery_period", "value": "delivery_period"},
+                    {"label": "total_volume", "value": "total_volume"},
+                    {"label": "assigned_volume", "value": "assigned_volume"},
+                    {"label": "biofuel", "value": "biofuel.name"},
+                    {"label": "feedstock", "value": "feedstock.name"},
+                    {"label": "country_of_origin", "value": "country_of_origin.name"},
+                    {"label": "producer", "value": get_producer},
+                    {"label": "production_site", "value": get_production_site},
+                    {"label": "production_site_commissioning_date", "value": "production_site_commissioning_date"},
+                    {"label": "supplier", "value": "parent_lot.carbure_supplier.name"},
+                    {"label": "delivery_site", "value": "parent_lot.carbure_delivery_site.name"},
+                    {"label": "eec", "value": "eec"},
+                    {"label": "el", "value": "el"},
+                    {"label": "ep", "value": "ep"},
+                    {"label": "etd", "value": "etd"},
+                    {"label": "eu", "value": "eu"},
+                    {"label": "esca", "value": "esca"},
+                    {"label": "eccs", "value": "eccs"},
+                    {"label": "eccr", "value": "eccr"},
+                    {"label": "eee", "value": "eee"},
+                    {"label": "ghg_total", "value": "ghg_total"},
+                    {"label": "ghg_reference", "value": "ghg_reference"},
+                    {"label": "ghg_reduction", "value": "ghg_reduction"},
+                ],
+            }
+        ],
+    )
+
+
+def get_producer(obj):
+    if "carbure_producer" in obj:
+        return obj["carbure_producer"]["name"]
+    elif "unknown_producer" in obj:
+        return obj["unknown_producer"]
+
+
+def get_production_site(obj):
+    if "carbure_production_site" in obj:
+        return obj["carbure_production_site"]["name"]
+    elif "unknown_production_site" in obj:
+        return obj["unknown_production_site"]

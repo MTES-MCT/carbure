@@ -26,6 +26,7 @@ import TicketSourceDetail from "../ticket-source-details"
 import { StatusSwitcher } from "./status-switcher"
 import { TicketSourcesSummary } from "./summary"
 import TicketSourcesTable from "./table"
+import { ExportButton } from "../export"
 
 export interface TicketSourcesProps {
   year: number
@@ -89,8 +90,12 @@ export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
             status={status as SafTicketSourceStatus}
           />
 
-          <SearchInput
+          <ExportButton
             asideX
+            query={query}
+            download={api.downloadOperatorTicketSources}
+          />
+          <SearchInput
             clear
             debounce={250}
             value={state.search}
