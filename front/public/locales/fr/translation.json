@@ -481,6 +481,7 @@
   "Valide": "Valide",
   "Erreurs": "Erreurs",
   "fichier": "fichier",
+  "Vérifier d'autres dossiers": "Vérifier d'autres dossiers",
   "À corriger ({{toFixCount}})": "À corriger ({{toFixCount}})",
   "Valides ({{validCount}})": "Valides ({{validCount}})",
   "Aucune données à vérifier. Merci d’envoyer de nouveaux fichiers à analyser.": "Aucune données à vérifier. Merci d’envoyer de nouveaux fichiers à analyser.",

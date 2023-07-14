@@ -14,17 +14,10 @@ def check_sourcing_row(sourcing: DoubleCountingSourcing, data: SourcingRow) -> L
 
     if not data["feedstock"]:
         errors.append(error(DoubleCountingError.MISSING_FEEDSTOCK, line, meta))
-    meta["feedstock"] = data["feedstock"]
+
     if not data["origin_country"]:
+        meta["feedstock"] = data["feedstock"]
         errors.append(error(DoubleCountingError.MISSING_COUNTRY_OF_ORIGIN, line, meta))
-    elif not sourcing.feedstock_id:
-        errors.append(
-            error(
-                DoubleCountingError.UNKNOWN_FEEDSTOCK,
-                line,
-                meta,
-            )
-        )
 
     return errors
 
@@ -249,52 +242,3 @@ def check_compatibility_feedstock_biofuel(feedstock: MatierePremiere, biofuel: B
         )
 
     return errors
-
-
-# def check_production_row(production: DoubleCountingProduction, data: ProductionRow) -> List[DcError]:
-#     errors: List[DcError] = []
-#     line = data["line"]
-
-#     if not data["feedstock"]:
-#         errors.append(error(DoubleCountingError.MISSING_FEEDSTOCK, line))
-#     elif not production.feedstock_id:
-#         errors.append(
-#             error(
-#                 DoubleCountingError.UNKNOWN_FEEDSTOCK,
-#                 line,
-#                 {"feedstock": data["feedstock"]},
-#             )
-#         )
-#     elif (production.requested_quota or 0) > 0 and not production.feedstock.is_double_compte:
-#         errors.append(
-#             error(
-#                 DoubleCountingError.NOT_DC_FEEDSTOCK,
-#                 line,
-#                 {"feedstock": production.feedstock.code},
-#             )
-#         )
-
-#     if not data["biofuel"]:
-#         errors.append(error(DoubleCountingError.MISSING_BIOFUEL, line))
-#     elif not production.biofuel_id:
-#         errors.append(error(DoubleCountingError.UNKNOWN_BIOFUEL, line, {"biofuel": data["biofuel"]}))
-
-#     if production.feedstock_id and production.biofuel_id:
-#         incompatibilities = check_compatibility_feedstock_biofuel(production.feedstock, production.biofuel)
-#         meta = {
-#             "feedstock": production.feedstock.code,
-#             "biofuel": production.biofuel.code,
-#             "infos": incompatibilities,
-#         }
-#         if len(incompatibilities) > 0:
-#             errors.append(error(DoubleCountingError.MP_BC_INCOHERENT, line, meta))
-
-#     # check lines in the two table has the same order
-#     if data["feedstock"] != data["feedstock_check"] and (data["feedstock_check"] != "" and data["feedstock"] != ""):
-#         errors.append(error(DoubleCountingError.LINE_FEEDSTOCKS_INCOHERENT, line))
-
-#     # check that requested quotas aren't bigger than estimated production
-#     elif (production.requested_quota or 0) > (production.estimated_production or 0):
-#         errors.append(error(DoubleCountingError.PRODUCTION_MISMATCH_QUOTA, line))
-
-#     return errors
