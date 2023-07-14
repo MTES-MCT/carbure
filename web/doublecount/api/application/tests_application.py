@@ -1,4 +1,5 @@
 # test with : python web/manage.py test doublecount.api.application.tests_application --keepdb
+from math import prod
 import os
 from core.tests_utils import setup_current_user
 from core.models import Entity, UserRights
@@ -80,3 +81,82 @@ class DoubleCountApplicationTest(TestCase):
 
         error = errors["global"][0]
         self.assertEqual(error["error"], DoubleCountingError.BAD_WORKSHEET_NAME)
+
+    def test_sourcing_row(self):
+        response = self.check_file("dc_agreement_application_errors_sourcing.xlsx")
+
+        data = response.json()["data"]
+        file_data = data["file"]
+
+        error_count = file_data["error_count"]
+        self.assertEqual(error_count, 3)
+        errors = file_data["errors"]
+
+        # sourcing
+        sourcing_errors = errors["sourcing_forecast"]
+        self.assertEqual(len(sourcing_errors), 2)
+
+        error1 = sourcing_errors[0]
+        self.assertEqual(error1["error"], DoubleCountingError.MISSING_FEEDSTOCK)
+        self.assertEqual(error1["line_number"], 8)
+
+        error2 = sourcing_errors[1]
+        self.assertEqual(error2["error"], DoubleCountingError.MISSING_COUNTRY_OF_ORIGIN)
+        self.assertEqual(error2["line_number"], 12)
+
+        # global
+        prod_errors = errors["production"]
+        self.assertEqual(len(prod_errors), 1)
+
+        error1 = prod_errors[0]
+        self.assertEqual(error1["error"], DoubleCountingError.PRODUCTION_MISMATCH_QUOTA)
+        self.assertEqual(error1["line_number"], 12)
+        self.assertEqual(error1["meta"]["feedstock"], "Huile alimentaire usagée")
+        self.assertEqual(error1["meta"]["estimated_production"], 10500)
+        self.assertEqual(error1["meta"]["requested_quota"], 20500)
+
+    def test_production_integrity(self):
+        response = self.check_file("dc_agreement_application_errors_prod_integrity.xlsx")
+
+        data = response.json()["data"]
+        file_data = data["file"]
+        error_count = file_data["error_count"]
+        self.assertEqual(error_count, 4)
+        errors = file_data["errors"]
+
+        error1 = errors["production"][0]
+        self.assertEqual(error1["error"], DoubleCountingError.MISSING_BIOFUEL)
+        self.assertEqual(error1["line_number"], 19)
+
+        error2 = errors["production"][1]
+        self.assertEqual(error2["error"], DoubleCountingError.MISSING_BIOFUEL)
+        self.assertEqual(error2["line_number"], 20)
+
+        error3 = errors["production"][2]
+        self.assertEqual(error3["error"], DoubleCountingError.MP_BC_INCOHERENT)
+        self.assertEqual(error3["line_number"], 26)
+        self.assertEqual(error3["meta"]["biofuel"], "EMHU")
+        self.assertEqual(error3["meta"]["feedstock"], "DECHETS_INDUSTRIELS")
+
+        error4 = errors["production"][3]
+        self.assertEqual(error4["error"], DoubleCountingError.MISSING_FEEDSTOCK)
+        self.assertEqual(error4["line_number"], 27)
+
+    def test_production_global(self):
+        response = self.check_file("dc_agreement_application_errors_global.xlsx")
+
+        data = response.json()["data"]
+        file_data = data["file"]
+        error_count = file_data["error_count"]
+        self.assertEqual(error_count, 2)
+        errors = file_data["errors"]
+
+        error1 = errors["global"][0]
+        self.assertEqual(error1["error"], DoubleCountingError.PRODUCTION_MISMATCH_SOURCING)
+        self.assertEqual(error1["meta"]["feedstock"], "HUILE_ALIMENTAIRE_USAGEE")
+        self.assertEqual(error1["meta"]["production"], 20500)
+        self.assertEqual(error1["meta"]["sourcing"], 13410)
+
+        error2 = errors["global"][1]
+        self.assertEqual(error2["error"], DoubleCountingError.POME_GT_2000)
+        self.assertEqual(error2["meta"]["requested_production"], 8200)
