@@ -74,7 +74,6 @@ export enum DoubleCountingUploadErrorType {
   ProductionMismatchQuota = "PRODUCTION_MISMATCH_QUOTA",
   UnknownYear = "UNKNOWN_YEAR",
   InvalidYear = "INVALID_YEAR",
-  MissingPeriod = "MISSING_PERIOD",
   BadWorksheetName = "BAD_WORKSHEET_NAME",
   MissingCountryOfOrigin = "MISSING_COUNTRY_OF_ORIGIN",
 }

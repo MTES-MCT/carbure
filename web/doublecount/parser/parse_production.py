@@ -26,7 +26,7 @@ def parse_production_forecast(excel_file: Workbook, start_year) -> List[Producti
         excel_file=excel_file,
         sheet_name="Production",
         start_year=start_year,
-        year_index=1,
+        year_index=6,
         biofuel_index=7,
         feedstock_index=8,
         other_name="estimated_production",

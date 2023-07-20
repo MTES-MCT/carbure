@@ -121,15 +121,9 @@ export function getErrorText(
         { year: error?.meta.year }
       )
       break
-    case DoubleCountingUploadErrorType.MissingPeriod:
-      errorText += t(
-        "La période de la demande n'a pas pu être trouvée sur le fichier. Vérifiez la première année de reconnaissance entrée en bas de l'onglet \"Reconnaissance double comptage\".",
-        { year: error?.meta.year }
-      )
-      break
     case DoubleCountingUploadErrorType.UnknownYear:
       errorText += t(
-        "Les années doivent être renseignées.",
+        "Les années doivent être renseignées. Vérifiez que la première année de reconnaissance soit entrée en bas de l'onglet \"Reconnaissance double comptage\". ",
       )
       break
     case DoubleCountingUploadErrorType.MissingCountryOfOrigin:

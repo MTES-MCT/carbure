@@ -1,4 +1,4 @@
-# test with : python web/manage.py test doublecount.api.application.tests_application --keepdb
+# test with : python web/manage.py test doublecount.api.application.tests_application.DoubleCountApplicationTest.test_production_integrity --keepdb
 from math import prod
 import os
 from core.tests_utils import setup_current_user
@@ -142,7 +142,24 @@ class DoubleCountApplicationTest(TestCase):
         self.assertEqual(error4["error"], DoubleCountingError.MISSING_FEEDSTOCK)
         self.assertEqual(error4["line_number"], 27)
 
-    def test_production_global(self):
+    def test_production(self):
+        response = self.check_file("dc_agreement_application_errors_production.xlsx")
+
+        data = response.json()["data"]
+        file_data = data["file"]
+        error_count = file_data["error_count"]
+        self.assertEqual(error_count, 2)
+        errors = file_data["errors"]
+
+        error1 = errors["production"][0]
+        self.assertEqual(error1["error"], DoubleCountingError.MISSING_ESTIMATED_PRODUCTION)
+        self.assertEqual(error1["line_number"], 13)
+
+        error2 = errors["production"][1]
+        self.assertEqual(error2["error"], DoubleCountingError.MISSING_MAX_PRODUCTION_CAPACITY)
+        self.assertEqual(error2["line_number"], 13)
+
+    def test_global(self):
         response = self.check_file("dc_agreement_application_errors_global.xlsx")
 
         data = response.json()["data"]
@@ -160,3 +177,20 @@ class DoubleCountApplicationTest(TestCase):
         error2 = errors["global"][1]
         self.assertEqual(error2["error"], DoubleCountingError.POME_GT_2000)
         self.assertEqual(error2["meta"]["requested_production"], 8200)
+
+    def test_invalid_year(self):
+        response = self.check_file("dc_agreement_application_errors_invalid_year.xlsx")
+
+        data = response.json()["data"]
+        file_data = data["file"]
+        error_count = file_data["error_count"]
+        self.assertEqual(error_count, 2)
+        errors = file_data["errors"]
+
+        error1 = errors["production"][0]
+        self.assertEqual(error1["error"], DoubleCountingError.INVALID_YEAR)
+        self.assertEqual(error1["line_number"], 26)
+
+        error2 = errors["production"][1]
+        self.assertEqual(error2["error"], DoubleCountingError.INVALID_YEAR)
+        self.assertEqual(error2["line_number"], 27)
