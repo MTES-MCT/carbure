@@ -192,12 +192,12 @@ def load_dc_filepath(file):
 
 def load_dc_period(start_year):
     errors = []
-    if start_year == 0:
-        errors.append(
-            error(
-                DoubleCountingError.MISSING_PERIOD,
-            )
-        )
+    # if start_year == 0:
+    #     errors.append(
+    #         error(
+    #             DoubleCountingError.MISSING_PERIOD,
+    #         )
+    #     )
 
     end_year = start_year + 1
     start = datetime.date(end_year - 1, 1, 1)
