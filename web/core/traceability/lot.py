@@ -236,7 +236,7 @@ class LotNode(Node):
         if self.parent.type == Node.LOT:
             mapping = LotNode.FROM_PARENT_LOT
             if self.parent.data.delivery_type == CarbureLot.PROCESSING:
-                mapping.update(LotNode.FROM_PROCESSING_LOT)
+                mapping = {**mapping, **LotNode.FROM_PROCESSING_LOT}
             return self.get_diff(mapping, self.parent)
         if self.parent.type == Node.STOCK:
             # get diff with root lot sustainability data
@@ -254,7 +254,7 @@ class LotNode(Node):
         if child.type == Node.LOT:
             mapping = LotNode.FROM_CHILD_LOT
             if self.data.delivery_type == CarbureLot.PROCESSING:
-                mapping.update(LotNode.FROM_PROCESSING_LOT)
+                mapping = {**mapping, **LotNode.FROM_PROCESSING_LOT}
             return self.get_diff(mapping, child)
         if child.type == Node.STOCK:
             # get first descendant lot for sustainability data
