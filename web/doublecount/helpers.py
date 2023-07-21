@@ -276,7 +276,7 @@ def check_dc_file(file):
 
 
 def get_lot_dc_agreement(feedstock, delivery_date, production_site):
-    if not feedstock:
+    if not feedstock or not production_site:
         return None
 
     dc_certificate = ""
