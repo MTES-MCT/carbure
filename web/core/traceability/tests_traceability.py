@@ -68,6 +68,7 @@ class TraceabilityTest(TestCase):
 
         self.assertEqual(len(parent_node.children), 1)
         self.assertEqual(child_node.parent, parent_node)
+        self.assertEqual(parent_node.children[0], child_node)
 
         parent_node.update(
             {
@@ -82,7 +83,7 @@ class TraceabilityTest(TestCase):
 
         original_child_supplier_cert = child_node.data.supplier_certificate
 
-        parent_node.propagate()
+        parent_node.propagate(changed_only=True)
         self.assertEqual(child_node.data.transport_document_reference, "ABCD")
         self.assertEqual(child_node.data.supplier_certificate, original_child_supplier_cert)
         self.assertEqual(child_node.data.esca, 2.0)
