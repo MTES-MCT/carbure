@@ -89,13 +89,13 @@ def load_dc_production_data(
 
     # check rows integrity
     for index, production_base_rows in enumerate([production_max_rows, production_forecast_rows, requested_quota_rows]):
-        tabName = ["Capacité maximale de production", "Production prévisionelle", "Reconnaissance double comptage"][index]
+        tab_name = ["Capacité maximale de production", "Production prévisionelle", "Reconnaissance double comptage"][index]
 
         if len(production_base_rows) < 2:
             production_errors.append(
                 error(
                     DoubleCountingError.MISSING_DATA,
-                    meta={"tabName": tabName},
+                    meta={"tab_name": tab_name},
                 )
             )
             continue
@@ -103,7 +103,7 @@ def load_dc_production_data(
         for req_quota_row in production_base_rows:
             feedstock = feedstocks.get(req_quota_row["feedstock"], None)
             biofuel = biofuels.get(req_quota_row["biofuel"], None)
-            errors = check_production_row_integrity(feedstock, biofuel, req_quota_row, tabName, dca)
+            errors = check_production_row_integrity(feedstock, biofuel, req_quota_row, tab_name, dca)
             production_errors += errors
 
     if len(production_errors) > 0:
@@ -130,7 +130,7 @@ def load_dc_production_data(
                         "year": req_quota_row["year"],
                         "feedstock": req_quota_row["feedstock"],
                         "biofuel": req_quota_row["biofuel"],
-                        "tabName": "Reconnaissance double comptage",
+                        "tab_name": "Reconnaissance double comptage",
                     },
                 )
             )
@@ -153,7 +153,7 @@ def load_dc_production_data(
                         "year": req_quota_row["year"],
                         "feedstock": req_quota_row["feedstock"],
                         "biofuel": req_quota_row["biofuel"],
-                        "tabName": tabName,
+                        "tab_name": tab_name,
                     },
                 )
             )

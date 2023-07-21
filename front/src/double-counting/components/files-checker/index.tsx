@@ -26,6 +26,8 @@ const DoubleCountingFilesChecker = () => {
   const [tab, setTab] = useState("to-fix")
 
   const checkedFiles: CheckDoubleCountingFilesResponse = location.state?.checkedFiles
+
+
   const files: FileList = location.state?.files
 
   function showFileErrorsDialog(fileData: DoubleCountingFileInfo) {
@@ -67,7 +69,7 @@ const DoubleCountingFilesChecker = () => {
     },
     {
       header: t("Période de validité"),
-      cell: (file) => <Cell text={`${file.start_year} - ${file.start_year + 1}`} />,
+      cell: (file) => <Cell text={file.start_year ? `${file.start_year} - ${file.start_year + 1}` : t("Non reconnue")} />,
     },
   ]
 

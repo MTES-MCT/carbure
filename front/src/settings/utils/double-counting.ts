@@ -14,30 +14,19 @@ export function getErrorText(
   if (showLine && (error.line_number ?? -1) >= 0) {
     errorText += t("Ligne {{lineNumber}}", { lineNumber: error.line_merged || error.line_number })
   }
-  if (error.meta.tabName) {
-    errorText += ` (${error.meta.tabName})`
+  if (error.meta.tab_name) {
+    errorText += ` (${error.meta.tab_name})`
   }
 
   if (errorText.length > 0)
     errorText += " : "
 
   switch (error.error) {
-    case DoubleCountingUploadErrorType.UnkownFeedstock:
-      errorText += t(
-        "La matière première {{feedstock}} n'est pas reconnue. Vérifiez la syntaxe de ce code.",
-        { feedstock: t(error.meta?.feedstock, { ns: "feedstocks" }) }
-      )
-      break
+
     case DoubleCountingUploadErrorType.MissingData:
       errorText += t(
         "Les données n'ont pas étaient trouvées. Vérifiez que les données ont bien été renseignées.",
         { feedstock: t(error.meta?.feedstock, { ns: "feedstocks" }) }
-      )
-      break
-    case DoubleCountingUploadErrorType.UnkownBiofuel:
-      errorText += t(
-        "Le biocarburant {{biofuel}} n'est pas reconnu. Vérifiez la syntaxe de ce code.",
-        { biofuel: t(error.meta?.biofuel, { ns: "biofuels" }) }
       )
       break
     case DoubleCountingUploadErrorType.MissingBiofuel:
@@ -123,7 +112,7 @@ export function getErrorText(
       break
     case DoubleCountingUploadErrorType.UnknownYear:
       errorText += t(
-        "Les années doivent être renseignées. Vérifiez que la première année de reconnaissance soit entrée en bas de l'onglet \"Reconnaissance double comptage\". ",
+        "Les années doivent être renseignées. Vérifiez que la première année de reconnaissance soit entrée en bas de l'onglet \"Reconnaissance double comptage\".",
       )
       break
     case DoubleCountingUploadErrorType.MissingCountryOfOrigin:

@@ -26,7 +26,7 @@ def check_sourcing_row(sourcing: DoubleCountingSourcing, data: SourcingRow) -> L
 def check_production_row(production: DoubleCountingProduction, data: ProductionRow) -> List[DcError]:
     errors: List[DcError] = []
     line = data["line"]
-    tabName = "Reconnaissance double comptage"
+    tab_name = "Reconnaissance double comptage"
 
     # check that requested quotas aren't bigger than estimated production
     if (production.requested_quota or 0) > (production.estimated_production or 0):
@@ -35,7 +35,7 @@ def check_production_row(production: DoubleCountingProduction, data: ProductionR
             "biofuel": production.biofuel.name,
             "estimated_production": production.estimated_production,
             "requested_quota": production.requested_quota,
-            "tabName": tabName,
+            "tab_name": tab_name,
             "year": data["year"],
         }
         errors.append(error(DoubleCountingError.PRODUCTION_MISMATCH_QUOTA, line, meta))
@@ -45,31 +45,21 @@ def check_production_row(production: DoubleCountingProduction, data: ProductionR
 
 # check a line in the production section of an imported dc excel file
 def check_production_row_integrity(
-    feedstock: MatierePremiere, biofuel: Biocarburant, data: ProductionBaseRow, tabName: str, dca: DoubleCountingAgreement
+    feedstock: MatierePremiere, biofuel: Biocarburant, data: ProductionBaseRow, tab_name: str, dca: DoubleCountingAgreement
 ) -> List[DcError]:
     errors: List[DcError] = []
     line = data["line"]
     year = data["year"]
-    meta = {"tabName": tabName, "year": year}
+    meta = {"tab_name": tab_name, "year": year}
 
     if not year in [dca.period_start.year, dca.period_end.year]:
         errors.append(error(DoubleCountingError.INVALID_YEAR, line, meta))
 
     if not data["feedstock"]:
         errors.append(error(DoubleCountingError.MISSING_FEEDSTOCK, line, meta))
-    elif not feedstock:
-        errors.append(
-            error(
-                DoubleCountingError.UNKNOWN_FEEDSTOCK,
-                line,
-                {"feedstock": data["feedstock"]},
-            )
-        )
 
     if not data["biofuel"]:
         errors.append(error(DoubleCountingError.MISSING_BIOFUEL, line, meta))
-    elif not biofuel:
-        errors.append(error(DoubleCountingError.UNKNOWN_BIOFUEL, line, {"biofuel": data["biofuel"]}))
 
     if feedstock and biofuel:
         incompatibilities = check_compatibility_feedstock_biofuel(feedstock, biofuel)
@@ -77,7 +67,7 @@ def check_production_row_integrity(
             "feedstock": feedstock.code,
             "biofuel": biofuel.code,
             "infos": incompatibilities,
-            "tabName": tabName,
+            "tab_name": tab_name,
         }
         if len(incompatibilities) > 0:
             errors.append(error(DoubleCountingError.MP_BC_INCOHERENT, line, meta))

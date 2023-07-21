@@ -28,7 +28,6 @@ export const ErrorsDetailsDialog = ({
   const focusedErrors = fileData.errors?.[
     focus as keyof typeof fileData.errors
   ] as DoubleCountingUploadError[]
-  console.log('fileData:', fileData)
 
   return (
     <Dialog fullscreen onClose={onClose}>
