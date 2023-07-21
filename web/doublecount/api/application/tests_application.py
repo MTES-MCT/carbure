@@ -178,13 +178,25 @@ class DoubleCountApplicationTest(TestCase):
         self.assertEqual(error2["error"], DoubleCountingError.POME_GT_2000)
         self.assertEqual(error2["meta"]["requested_production"], 8200)
 
-    def test_invalid_year(self):
-        response = self.check_file("dc_agreement_application_errors_invalid_year.xlsx")
+    def test_unknow_year(self):
+        response = self.check_file("dc_agreement_application_errors_unknow_year.xlsx")
 
         data = response.json()["data"]
         file_data = data["file"]
         error_count = file_data["error_count"]
-        self.assertEqual(error_count, 2)
+        self.assertEqual(error_count, 1)
+        errors = file_data["errors"]
+
+        error1 = errors["global"][0]
+        self.assertEqual(error1["error"], DoubleCountingError.UNKNOWN_YEAR)
+
+    def test_invalid_year_and_missing_data(self):
+        response = self.check_file("dc_agreement_application_errors_invalid_year_and_missing_data.xlsx")
+
+        data = response.json()["data"]
+        file_data = data["file"]
+        error_count = file_data["error_count"]
+        self.assertEqual(error_count, 3)
         errors = file_data["errors"]
 
         error1 = errors["production"][0]
@@ -194,3 +206,7 @@ class DoubleCountApplicationTest(TestCase):
         error2 = errors["production"][1]
         self.assertEqual(error2["error"], DoubleCountingError.INVALID_YEAR)
         self.assertEqual(error2["line_number"], 27)
+
+        error3 = errors["production"][2]
+        self.assertEqual(error3["error"], DoubleCountingError.MISSING_DATA)
+        self.assertEqual(error3["meta"]["tab_name"], "Production prévisionelle")

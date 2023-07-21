@@ -37,9 +37,9 @@ const ApplicationInfo = ({ fileData }: { fileData: DoubleCountingFileInfo }) => 
             <Tooltip title={t(`L'année détectée est renseignée en bas de l'onglet "Reconnaissance double comptage" du fichier excel.`)}>
                 <Trans
                     values={{
-                        period: `${fileData.start_year} - ${fileData.start_year + 1}`,
+                        period: fileData.start_year ? `${fileData.start_year} - ${fileData.start_year + 1}` : t("Non reconnue"),
                     }}
-                    defaults="Période demandée : <b>{{period}}</b>"
+                    defaults="Période demandée : <b>{{ period }}</b>"
                 />
                 <InfoCircle
                     color="#a4a4a4"

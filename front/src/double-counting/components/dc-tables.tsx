@@ -125,9 +125,11 @@ export const SourcingFullTable = ({ sourcing }: { sourcing: DoubleCountingSourci
 
   return <>
 
-    <Checkbox readOnly value={aggregateSourcing} onChange={() => setAggregateSourcing(!aggregateSourcing)}>
-      {t("Agréger les données d’approvisionnement par matière première")}
-    </Checkbox>
+    {sourcing?.length > 0 &&
+      <Checkbox readOnly value={aggregateSourcing} onChange={() => setAggregateSourcing(!aggregateSourcing)}>
+        {t("Agréger les données d’approvisionnement par matière première")}
+      </Checkbox>
+    }
     {!aggregateSourcing &&
       <SourcingTable
         sourcing={sourcing ?? []}
