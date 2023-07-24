@@ -51,7 +51,7 @@ def try_get_certificate(certificate):
     return d
 
 
-def try_get_double_counting_certificate(cert):
+def try_get_double_counting_certificate(cert, production_site):
     d = {
         "holder": "",
         "valid_until": "",
@@ -61,7 +61,7 @@ def try_get_double_counting_certificate(cert):
         "certificate_type": "DC",
         "certificate_id": cert,
     }
-    matches = DoubleCountingRegistration.objects.filter(certificate_id=cert)
+    matches = DoubleCountingRegistration.objects.filter(certificate_id=cert, production_site=production_site)
     count = matches.count()
     d["matches"] = count
     if count == 0:

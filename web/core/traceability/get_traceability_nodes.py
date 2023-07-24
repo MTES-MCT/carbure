@@ -1,3 +1,4 @@
+from typing import Iterable
 from core.utils import run_query
 from core.models import CarbureLot, CarbureStock, CarbureStockTransformation
 from saf.models import SafTicket, SafTicketSource
@@ -7,7 +8,10 @@ from core.traceability import LotNode, StockNode, StockTransformNode, TicketSour
 
 # use a recursive query to quickly fetch the whole families of the given lots
 # and build the traceability nodes and their relations based on the results
-def get_traceability_nodes(lots: list):
+def get_traceability_nodes(lots: Iterable):
+    if len(lots) == 0:
+        return []
+
     # extract lots ids
     original_lot_ids = [lot.id for lot in lots]
 
