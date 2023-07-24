@@ -1,16 +1,8 @@
 from django.http.response import JsonResponse
 from core.decorators import check_user_rights
-from core.helpers import (
-    filter_lots,
-    get_entity_lots_by_status,
-)
-from core.helpers import (
-    get_prefetched_data,
-)
-from transactions.sanity_checks import (
-    sanity_checks,
-    has_blocking_errors,
-)
+from core.helpers import filter_lots, get_entity_lots_by_status
+
+from transactions.sanity_checks import sanity_checks, has_blocking_errors, get_prefetched_data
 
 from core.models import (
     CarbureLot,
@@ -19,9 +11,7 @@ from core.models import (
     Entity,
     UserRights,
 )
-from core.notifications import (
-    notify_lots_received,
-)
+from core.notifications import notify_lots_received
 from carbure.tasks import background_bulk_scoring, background_bulk_sanity_checks
 
 
@@ -51,9 +41,7 @@ def lots_send(request, *args, **kwargs):
                 status=403,
             )
         if lot.lot_status != CarbureLot.DRAFT:
-            return JsonResponse(
-                {"status": "error", "message": "Lot is not a draft"}, status=400
-            )
+            return JsonResponse({"status": "error", "message": "Lot is not a draft"}, status=400)
 
         if lot.lot_status in [CarbureLot.ACCEPTED, CarbureLot.FROZEN]:
             # ignore, lot already accepted

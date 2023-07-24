@@ -4,9 +4,7 @@ from core.helpers import (
     filter_lots,
     get_entity_lots_by_status,
 )
-from core.helpers import (
-    get_prefetched_data,
-)
+
 
 from core.models import (
     CarbureLot,
@@ -15,6 +13,7 @@ from core.models import (
     UserRights,
 )
 from carbure.tasks import background_bulk_scoring, background_bulk_sanity_checks
+from transactions.sanity_checks.helpers import get_prefetched_data
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
@@ -37,9 +36,7 @@ def accept_trading(request, *args, **kwargs):
         )
 
     if not certificate and entity.default_certificate == "":
-        return JsonResponse(
-            {"status": "error", "message": "Please specify a certificate"}, status=400
-        )
+        return JsonResponse({"status": "error", "message": "Please specify a certificate"}, status=400)
 
     lots = get_entity_lots_by_status(entity, status)
     lots = filter_lots(lots, request.POST, entity, will_aggregate=True)
@@ -69,9 +66,7 @@ def accept_trading(request, *args, **kwargs):
             )
 
         if lot.lot_status == CarbureLot.DRAFT:
-            return JsonResponse(
-                {"status": "error", "message": "Cannot accept DRAFT"}, status=400
-            )
+            return JsonResponse({"status": "error", "message": "Cannot accept DRAFT"}, status=400)
         elif lot.lot_status == CarbureLot.PENDING:
             # ok no problem
             pass
@@ -79,17 +74,11 @@ def accept_trading(request, *args, **kwargs):
             # the client changed his mind, ok
             pass
         elif lot.lot_status == CarbureLot.ACCEPTED:
-            return JsonResponse(
-                {"status": "error", "message": "Lot already accepted."}, status=400
-            )
+            return JsonResponse({"status": "error", "message": "Lot already accepted."}, status=400)
         elif lot.lot_status == CarbureLot.FROZEN:
-            return JsonResponse(
-                {"status": "error", "message": "Lot is Frozen."}, status=400
-            )
+            return JsonResponse({"status": "error", "message": "Lot is Frozen."}, status=400)
         elif lot.lot_status == CarbureLot.DELETED:
-            return JsonResponse(
-                {"status": "error", "message": "Lot is deleted."}, status=400
-            )
+            return JsonResponse({"status": "error", "message": "Lot is deleted."}, status=400)
 
         lot.lot_status = CarbureLot.ACCEPTED
         lot.delivery_type = CarbureLot.TRADING
@@ -138,9 +127,7 @@ def accept_trading(request, *args, **kwargs):
         event.user = request.user
         event.save()
 
-    updated_lots = CarbureLot.objects.filter(
-        id__in=accepted_lot_ids + transferred_lot_ids
-    )
+    updated_lots = CarbureLot.objects.filter(id__in=accepted_lot_ids + transferred_lot_ids)
     prefetched_data = get_prefetched_data(entity)
     background_bulk_sanity_checks(updated_lots, prefetched_data)
     background_bulk_scoring(updated_lots, prefetched_data)
