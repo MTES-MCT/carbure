@@ -50,6 +50,8 @@ def check_file(request, *args, **kwargs):
 
 
 def check_has_dechets_industriels(production_data):
+    if production_data is None:
+        return False
     for row in production_data:
         if row["feedstock"]["code"] == "DECHETS_INDUSTRIELS":
             return True
