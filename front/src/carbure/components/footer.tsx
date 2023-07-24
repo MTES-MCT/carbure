@@ -46,6 +46,7 @@ const CarbureFooter = () => {
           {user.isAuthenticated() && (
             <li>
               <MailTo user="carbure" host="beta.gouv.fr">
+
                 <Mail />
                 <Trans>Email</Trans>
               </MailTo>
