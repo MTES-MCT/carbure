@@ -2,7 +2,7 @@ import { Alert } from "common/components/alert"
 import { Button } from "common/components/button"
 import Collapse from "common/components/collapse"
 import { Dialog } from "common/components/dialog"
-import { AlertCircle, Plus, Return } from "common/components/icons"
+import { AlertCircle, AlertTriangle, Plus, Return } from "common/components/icons"
 import Tabs from "common/components/tabs"
 import Tag from "common/components/tag"
 import { useState } from "react"
@@ -41,6 +41,14 @@ export const ErrorsDetailsDialog = ({
       <main>
 
         <ApplicationInfo fileData={fileData} />
+
+        <section>
+          <Alert variant="warning" icon={AlertTriangle}>
+            {t(`{{count}} erreurs ont été trouvées dans les différents onglets de votre fichier Excel. Merci de corriger le fichier et envoyez-le à nouveau.`,
+              { count: fileData.error_count })}
+
+          </Alert>
+        </section>
         <section>
           <Tabs
             variant="switcher"

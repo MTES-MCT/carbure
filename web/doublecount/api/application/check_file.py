@@ -29,7 +29,10 @@ def check_file(request, *args, **kwargs):
             + len(errors["global"])
         )
 
+        has_dechets_industriels = check_has_dechets_industriels(production_data)
+
         file_info = {
+            "has_dechets_industriels": has_dechets_industriels,
             "file_name": file.name,
             "errors": errors,
             "error_count": error_count,
@@ -44,3 +47,10 @@ def check_file(request, *args, **kwargs):
     except Exception:
         traceback.print_exc()
         return ErrorResponse(400, CheckFileError.FILE_CHECK_FAILED)
+
+
+def check_has_dechets_industriels(production_data):
+    for row in production_data:
+        if row["feedstock"]["code"] == "DECHETS_INDUSTRIELS":
+            return True
+    return False

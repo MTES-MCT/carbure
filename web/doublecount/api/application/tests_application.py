@@ -1,4 +1,4 @@
-# test with : python web/manage.py test doublecount.api.application.tests_application.DoubleCountApplicationTest.test_production_integrity --keepdb
+# test with : python web/manage.py test doublecount.api.application.tests_application.DoubleCountApplicationTest.test_has_dechets_industriels --keepdb
 from math import prod
 import os
 from core.tests_utils import setup_current_user
@@ -69,6 +69,15 @@ class DoubleCountApplicationTest(TestCase):
         # check production data
         production = file_data["production"]
         self.assertEqual(len(production), 4)
+
+    def test_has_dechets_industriels(self):
+        response = self.check_file("dc_agreement_application_valid.xlsx")
+        self.assertEqual(response.status_code, 200)
+
+        data = response.json()["data"]
+        file_data = data["file"]
+        has_dechets_industriels = file_data["has_dechets_industriels"]
+        self.assertEqual(has_dechets_industriels, True)
 
     def test_missing_sheet(self):
         response = self.check_file("dc_agreement_application_errors_missing_sheet.xlsx")

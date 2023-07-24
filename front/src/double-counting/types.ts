@@ -140,6 +140,7 @@ export interface QuotaDetails {
 }
 
 export interface DoubleCountingFileInfo {
+  has_dechets_industriels: boolean
   errors?: DoubleCountingUploadErrors
   start_year: string
   file_name: string

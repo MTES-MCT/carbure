@@ -47,7 +47,9 @@ export const Alert = ({
       )}
     >
       {loading ? <Loader /> : icon}
-      {label ?? child}
+      <p>
+        {label ?? child}
+      </p>
     </div>
   )
 }
