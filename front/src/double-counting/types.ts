@@ -22,6 +22,7 @@ export enum DoubleCountingStatus {
 
 export interface DoubleCounting {
   id: number
+  agreement_id: string
   producer: Entity
   production_site: string
   period_start: string

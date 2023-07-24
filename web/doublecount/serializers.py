@@ -102,6 +102,7 @@ class DoubleCountingAgreementFullSerializer(serializers.ModelSerializer):
         model = DoubleCountingAgreement
         fields = [
             "id",
+            "agreement_id",
             "creation_date",
             "producer",
             "producer_user",

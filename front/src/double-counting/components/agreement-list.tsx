@@ -38,6 +38,7 @@ const AgreementList = ({ entity, year }: AgreementListProps) => {
       cell: (a) => <DoubleCountingStatus status={a.status} />,
     },
     { header: t("Producteur"), cell: (a) => <Cell text={a.producer.name} /> },
+    { header: t("N° d'agrément"), cell: (a) => <Cell text={a.agreement_id} /> },
     {
       header: t("Site de production"),
       cell: (a) => <Cell text={a.production_site} />,

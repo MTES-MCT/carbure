@@ -47,9 +47,9 @@ def add_application(request, *args, **kwargs):
     if file is None:
         return ErrorResponse(400, DoubleCountingAddError.MALFORMED_PARAMS)
 
-    # load dc Data
-
+    # 1 - load dc Data
     filepath = load_dc_filepath(file)
+
     info, sourcing_forecast_rows, production_max_rows, production_forecast_rows, requested_quota_rows = parse_dc_excel(
         filepath
     )
@@ -63,8 +63,9 @@ def add_application(request, *args, **kwargs):
         period_end=end,
         defaults={"producer_user": request.user},
     )
+    print("dca: ", dca.agreement_id)
 
-    # save all production_data DoubleCountingProduction in db
+    # 2 - save all production_data DoubleCountingProduction in db
     sourcing_forecast_data, _ = load_dc_sourcing_data(dca, sourcing_forecast_rows)
     production_data, _ = load_dc_production_data(dca, production_max_rows, production_forecast_rows, requested_quota_rows)
     DoubleCountingSourcing.objects.filter(dca=dca).delete()
