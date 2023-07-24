@@ -7,18 +7,10 @@ from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
 from core.carburetypes import CarbureStockErrors
 from core.models import UserRights, CarbureLotEvent, Entity, GenericError
-from core.traceability import (
-    LotNode,
-    get_traceability_nodes,
-    diff_to_metadata,
-    serialize_integrity_errors,
-)
+from core.traceability import LotNode, get_traceability_nodes, diff_to_metadata, serialize_integrity_errors
 from doublecount.helpers import get_lot_dc_agreement
 from transactions.helpers import compute_lot_quantity
-from transactions.sanity_checks.sanity_checks import (
-    get_prefetched_data,
-    bulk_sanity_checks,
-)
+from transactions.sanity_checks.sanity_checks import get_prefetched_data, bulk_sanity_checks
 from transactions.forms import LotForm
 
 

@@ -80,7 +80,6 @@ def get_dc(lot: CarbureLot, prefetched_data):
     # we append the production site id to differentiate certificates
     # for the specific case of duplicated production sites for Ryssen and BAE
     if lot.carbure_production_site:
-        dc_cert += "_" + lot.carbure_production_site.pk
+        dc_cert = f"{dc_cert}_{lot.carbure_production_site.pk}"
 
-    double_counting_certificates = prefetched_data["double_counting_certificates"]
-    return is_dc, double_counting_certificates.get(dc_cert)
+    return is_dc, prefetched_data["double_counting_certificates"].get(dc_cert)

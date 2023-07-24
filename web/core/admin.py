@@ -17,7 +17,6 @@ from django.db import transaction
 
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
-from core.helpers import get_prefetched_data
 from core.models import (
     CarbureLot,
     CarbureLotComment,
@@ -40,6 +39,7 @@ from core.models import SustainabilityDeclaration, EntityDepot
 from core.models import TransactionDistance
 from core.models import CarbureNotification
 from transactions.models import LockedYear
+from transactions.sanity_checks.helpers import get_prefetched_data
 
 
 def custom_titled_filter(title):
@@ -164,11 +164,8 @@ class SustainabilityDeclarationAdmin(admin.ModelAdmin):
         for declaration in queryset:
             period = declaration.period.year * 100 + declaration.period.month
             CarbureLot.objects.filter(period=period).filter(
-                Q(carbure_client=declaration.entity)
-                | Q(carbure_supplier=declaration.entity)
-            ).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED]).update(
-                lot_status=CarbureLot.FROZEN
-            )
+                Q(carbure_client=declaration.entity) | Q(carbure_supplier=declaration.entity)
+            ).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED]).update(lot_status=CarbureLot.FROZEN)
             declaration.declared = True
             declaration.save()
 
@@ -178,8 +175,7 @@ class SustainabilityDeclarationAdmin(admin.ModelAdmin):
         for declaration in queryset:
             period = declaration.period.year * 100 + declaration.period.month
             CarbureLot.objects.filter(period=period).filter(
-                Q(carbure_client=declaration.entity)
-                | Q(carbure_supplier=declaration.entity),
+                Q(carbure_client=declaration.entity) | Q(carbure_supplier=declaration.entity),
                 lot_status=CarbureLot.FROZEN,
             ).update(lot_status=CarbureLot.ACCEPTED)
             declaration.declared = False
@@ -401,12 +397,7 @@ class CarbureLotAdmin(admin.ModelAdmin):
     @transaction.atomic
     def delete_lots(self, request, queryset):
         queryset.update(lot_status="DELETED")
-        events = [
-            CarbureLotEvent(
-                lot=lot, user=request.user, event_type=CarbureLotEvent.DELETED_ADMIN
-            )
-            for lot in queryset
-        ]
+        events = [CarbureLotEvent(lot=lot, user=request.user, event_type=CarbureLotEvent.DELETED_ADMIN) for lot in queryset]
         CarbureLotEvent.objects.bulk_create(events)
 
     delete_lots.short_description = "Changer le statut des lots en SUPRRIMÉ"
@@ -427,51 +418,31 @@ class CarbureLotAdmin(admin.ModelAdmin):
     recalc_score.short_description = "Recalculer Note"
 
     def get_producer(self, obj):
-        return (
-            obj.carbure_producer.name
-            if obj.carbure_producer
-            else "U - " + str(obj.unknown_producer)
-        )
+        return obj.carbure_producer.name if obj.carbure_producer else "U - " + str(obj.unknown_producer)
 
     get_producer.admin_order_field = "carbure_producer__name"
     get_producer.short_description = "Producer"
 
     def get_production_site(self, obj):
-        return (
-            obj.carbure_production_site.name
-            if obj.carbure_production_site
-            else "U - %s" % (obj.unknown_production_site)
-        )
+        return obj.carbure_production_site.name if obj.carbure_production_site else "U - %s" % (obj.unknown_production_site)
 
     get_production_site.admin_order_field = "carbure_production_site__name"
     get_production_site.short_description = "Production Site"
 
     def get_supplier(self, obj):
-        return (
-            obj.carbure_supplier.name
-            if obj.carbure_supplier
-            else "U - %s" % (obj.unknown_supplier)
-        )
+        return obj.carbure_supplier.name if obj.carbure_supplier else "U - %s" % (obj.unknown_supplier)
 
     get_supplier.admin_order_field = "carbure_supplier__name"
     get_supplier.short_description = "Supplier"
 
     def get_client(self, obj):
-        return (
-            obj.carbure_client.name
-            if obj.carbure_client
-            else "U - %s" % (obj.unknown_client)
-        )
+        return obj.carbure_client.name if obj.carbure_client else "U - %s" % (obj.unknown_client)
 
     get_client.admin_order_field = "carbure_client__name"
     get_client.short_description = "Client"
 
     def get_delivery_site(self, obj):
-        return (
-            obj.carbure_delivery_site.name
-            if obj.carbure_delivery_site
-            else "U - %s" % (obj.unknown_delivery_site)
-        )
+        return obj.carbure_delivery_site.name if obj.carbure_delivery_site else "U - %s" % (obj.unknown_delivery_site)
 
     get_delivery_site.admin_order_field = "carbure_delivery_site__name"
     get_delivery_site.short_description = "Delivery Site"
@@ -538,16 +509,12 @@ class CarbureStockAdmin(admin.ModelAdmin):
             vol = child_volume["child_volume"]
             if vol is None:
                 vol = 0
-            transformations_volume = CarbureStockTransformation.objects.filter(
-                source_stock=stock
-            ).aggregate(vol=Sum("volume_deducted_from_source"))
+            transformations_volume = CarbureStockTransformation.objects.filter(source_stock=stock).aggregate(
+                vol=Sum("volume_deducted_from_source")
+            )
             if transformations_volume["vol"] is not None:
                 vol += transformations_volume["vol"]
-            initial_volume = (
-                stock.parent_lot.volume
-                if stock.parent_lot
-                else stock.parent_transformation.volume_destination
-            )
+            initial_volume = stock.parent_lot.volume if stock.parent_lot else stock.parent_transformation.volume_destination
             theo_remaining = initial_volume - vol
             diff = stock.remaining_volume - theo_remaining
             if abs(diff) > 0.1:
@@ -564,21 +531,13 @@ class CarbureStockAdmin(admin.ModelAdmin):
     get_delivery_date.short_description = "Delivery Date"
 
     def get_supplier(self, obj):
-        return (
-            obj.carbure_supplier.name
-            if obj.carbure_supplier
-            else "U - %s" % (obj.unknown_supplier)
-        )
+        return obj.carbure_supplier.name if obj.carbure_supplier else "U - %s" % (obj.unknown_supplier)
 
     get_supplier.admin_order_field = "carbure_supplier__name"
     get_supplier.short_description = "Supplier"
 
     def get_client(self, obj):
-        return (
-            obj.carbure_client.name
-            if obj.carbure_client
-            else "U - %s" % (obj.unknown_client)
-        )
+        return obj.carbure_client.name if obj.carbure_client else "U - %s" % (obj.unknown_client)
 
     get_client.admin_order_field = "carbure_client__name"
     get_client.short_description = "Client"
@@ -602,11 +561,7 @@ class CarbureStockAdmin(admin.ModelAdmin):
     get_feedstock.short_description = "Feedstock"
 
     def get_orig_volume(self, obj):
-        return (
-            obj.parent_lot.volume
-            if obj.parent_lot
-            else obj.parent_transformation.volume_destination
-        )
+        return obj.parent_lot.volume if obj.parent_lot else obj.parent_transformation.volume_destination
 
     get_orig_volume.admin_order_field = "parent_lot__volume"
     get_orig_volume.short_description = "Initial Volume"

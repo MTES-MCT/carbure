@@ -2,19 +2,9 @@ from django.db.models.fields import NOT_PROVIDED
 
 from django.http.response import JsonResponse
 from core.decorators import check_user_rights
-from core.helpers import (
-    get_prefetched_data,
-)
-from transactions.sanity_checks.sanity_checks import bulk_scoring
-from transactions.sanity_checks import (
-    bulk_sanity_checks,
-)
+from transactions.sanity_checks import bulk_sanity_checks, bulk_scoring, get_prefetched_data
 
-from core.models import (
-    CarbureLot,
-    Entity,
-    UserRights,
-)
+from core.models import CarbureLot, Entity, UserRights
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
@@ -25,14 +15,10 @@ def duplicate_lot(request, *args, **kwargs):
     try:
         lot = CarbureLot.objects.get(id=lot_id)
     except Exception:
-        return JsonResponse(
-            {"status": "error", "message": "Unknown Lot %s" % (lot_id)}, status=400
-        )
+        return JsonResponse({"status": "error", "message": "Unknown Lot %s" % (lot_id)}, status=400)
 
     if lot.added_by_id != int(entity_id):
-        return JsonResponse(
-            {"status": "forbidden", "message": "User not allowed"}, status=403
-        )
+        return JsonResponse({"status": "forbidden", "message": "User not allowed"}, status=403)
 
     lot.pk = None
     lot.parent_stock = None
