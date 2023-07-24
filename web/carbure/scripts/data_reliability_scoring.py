@@ -3,6 +3,8 @@ import django
 import os
 import json
 
+from transactions.sanity_checks.helpers import get_prefetched_data
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
@@ -12,7 +14,6 @@ from tqdm import tqdm
 
 from core.models import CarbureLot, GenericError
 from transactions.sanity_checks.sanity_checks import bulk_scoring
-from core.helpers import get_prefetched_data
 
 
 @transaction.atomic
@@ -59,12 +60,8 @@ def data_reliability_scoring(year, batch):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Run sanity checks on all the lots of a given year"
-    )
-    parser.add_argument(
-        "--year", dest="year", action="store", default=None, help="Year to check"
-    )
+    parser = argparse.ArgumentParser(description="Run sanity checks on all the lots of a given year")
+    parser.add_argument("--year", dest="year", action="store", default=None, help="Year to check")
     parser.add_argument(
         "--batch",
         dest="batch",

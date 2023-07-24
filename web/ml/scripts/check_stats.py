@@ -9,16 +9,13 @@ import matplotlib.pyplot as plt
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.helpers import get_prefetched_data
 from core.models import CarbureLot
 from ml.models import EECStats, EPStats, ETDStats
 
 
 def check_ml_score():
     lots = (
-        CarbureLot.objects.select_related(
-            "feedstock", "country_of_origin", "carbure_supplier"
-        )
+        CarbureLot.objects.select_related("feedstock", "country_of_origin", "carbure_supplier")
         .filter(
             year__gt=2021,
             lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN],

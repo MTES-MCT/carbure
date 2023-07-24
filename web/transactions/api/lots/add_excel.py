@@ -8,9 +8,7 @@ from core.common import (
     get_uploaded_files_directory,
 )
 from core.decorators import check_user_rights
-from core.helpers import (
-    get_prefetched_data,
-)
+
 from transactions.helpers import construct_carbure_lot, bulk_insert_lots
 
 from core.models import (
@@ -20,6 +18,7 @@ from core.models import (
     UserRights,
 )
 from carbure.tasks import background_bulk_scoring
+from transactions.sanity_checks.helpers import get_prefetched_data
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
@@ -37,13 +36,7 @@ def add_excel(request, *args, **kwargs):
     directory = get_uploaded_files_directory()
     now = datetime.datetime.now()
     filename = "%s_%s.xlsx" % (now.strftime("%Y%m%d.%H%M%S"), entity.name.upper())
-    filename = "".join(
-        (
-            c
-            for c in unicodedata.normalize("NFD", filename)
-            if unicodedata.category(c) != "Mn"
-        )
-    )
+    filename = "".join((c for c in unicodedata.normalize("NFD", filename) if unicodedata.category(c) != "Mn"))
     filepath = "%s/%s" % (directory, filename)
     with open(filepath, "wb+") as destination:
         for chunk in f.chunks():
@@ -66,9 +59,7 @@ def add_excel(request, *args, **kwargs):
             lots_errors.append(errors)
         lots_created = bulk_insert_lots(entity, lots, lots_errors, d)
         if len(lots_created) == 0:
-            return JsonResponse(
-                {"status": "error", "message": "Something went wrong"}, status=500
-            )
+            return JsonResponse({"status": "error", "message": "Something went wrong"}, status=500)
         background_bulk_scoring(lots_created)
         for lot in lots_created:
             e = CarbureLotEvent()

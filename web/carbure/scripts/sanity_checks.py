@@ -3,6 +3,8 @@ from typing import Iterable
 import django
 import os
 
+from transactions.sanity_checks.helpers import get_prefetched_data
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
@@ -12,7 +14,6 @@ from tqdm import tqdm
 
 from core.models import CarbureLot, GenericError
 from transactions.sanity_checks.sanity_checks import bulk_sanity_checks
-from core.helpers import get_prefetched_data
 
 
 @transaction.atomic
