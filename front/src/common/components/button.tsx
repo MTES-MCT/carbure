@@ -4,6 +4,7 @@ import css from "./button.module.css"
 import { Layout, layout } from "./scaffold"
 import { Link, To } from "react-router-dom"
 import { ExternalLink as ExternalLinkIcon } from "common/components/icons"
+import { sub } from "date-fns"
 
 export type ButtonVariant =
   | "primary"
@@ -156,6 +157,8 @@ export const ExternalLink = ({
 export type MailtoProps = JSX.IntrinsicElements["a"] & {
   user: string
   host: string
+  subject?: string
+  body?: string
 }
 
 export const MailTo = ({
@@ -163,10 +166,17 @@ export const MailTo = ({
   host,
   className,
   children,
+  subject,
+  body, //use https://mailtolink.me/ to convert body message
   ...props
-}: MailtoProps) => (
-  <a
-    href={`mailto:${user}@${host}`}
+}: MailtoProps) => {
+
+
+  let href = `mailto:${user}@${host}`
+  href += `?subject=${subject ? encodeURIComponent(subject) : ""}`
+  href += `&body=${body || ""}`
+  return <a
+    href={href}
     target="_blank"
     rel="noreferrer"
     className={cl(css.mailto, className)}
@@ -174,7 +184,8 @@ export const MailTo = ({
   >
     {children}
   </a>
-)
+}
+
 
 export const DownloadLink = ({
   href: url,

@@ -21,6 +21,8 @@
   "Lecture/écriture (création et gestion des lots)": "Read/write (creation and management of transactions)",
   "Administration (contrôle complet de la société sur CarbuRe)": "Administration (complete control over the company on CarbuRe)",
   "Audit (accès spécial pour auditeurs)": "Audit (special access for auditors)",
+  "[CarbuRe - Société] Je souhaite ajouter une société": "",
+  "Ajouter%20une%20soci%C3%A9t%C3%A9&body=Bonjour%2C%0D%0AJe%20souhaiterais%20ajouter%20la%20soci%C3%A9t%C3%A9%20suivante%0D%0A%0D%0A1%20-%20nom%20de%20la%20soci%C3%A9t%C3%A9%20%3A%0D%0A%0D%0A2%20-%20description%20de%20l'activit%C3%A9%20(obligatoire)%20%3A%0D%0A%0D%0A3%20-%20ci-joint%20%C3%A0%20l'email%20le%20certificat%20correspondant%20(obligatoire)%0D%0A%0D%0AMerci%20beaucoup%0D%0ABien%20cordialement": "Dear%20Carbure%2C%0D%0AI%20would%20like%20to%20add%20the%20following%20company%0D%0A%0D%0A1%20-%20company%20name%3A%0D%0A%0D%0A2%20-%20description%20of%20the%20activity%20(mandatory)%3A%0D%0A%0D%0A3%20-%20Attached%20to%20the%20email%20the%20corresponding%20certificate%20(mandatory)%0D%0A%0D%0AThank%20you%20so%20much%0D%0ABest%20regards",
   "Ma société n'est pas enregistrée sur CarbuRe.": "My company is not registered on CarbuRe.",
   "Demander l'accès": "Request access",
   "Retour": "Back",
