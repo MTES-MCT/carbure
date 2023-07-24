@@ -7,7 +7,6 @@ from .ghg import *
 from .general import *
 from .double_counting import *
 from .biofuel_feedstock import *
-from core.helpers import get_prefetched_data
 from core.models import CarbureLot, CarbureLotReliabilityScore, GenericError
 
 from django.db import transaction

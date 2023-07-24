@@ -199,7 +199,7 @@ def get_prefetched_data(entity=None):
     for cert in dc_certs:
         dc_cert = cert.certificate_id
         if cert.production_site:
-            dc_cert += "_" + cert.production_site.pk
+            dc_cert = f"{dc_cert}_{cert.production_site.pk}"
         data["double_counting_certificates"][dc_cert] = cert
 
     # ML STATS

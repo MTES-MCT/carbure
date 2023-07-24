@@ -7,7 +7,7 @@ import datetime
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.helpers import get_prefetched_data
+from transactions.sanity_checks.helpers import get_prefetched_data
 from core.models import CarbureLot
 from ml.models import EECStats, EPStats, ETDStats
 
@@ -41,13 +41,11 @@ def calc_ml_score(year=None, period=None):
                 entry = eec[key]
                 if l.eec < 0.8 * min(entry.default_value, entry.average):
                     score += (
-                        (min(entry.default_value, entry.average) - l.eec)
-                        / min(entry.default_value, entry.average)
+                        (min(entry.default_value, entry.average) - l.eec) / min(entry.default_value, entry.average)
                     ) ** 2
                 if l.eec > 1.2 * max(entry.default_value, entry.average):
                     score += (
-                        (l.eec - max(entry.default_value, entry.average))
-                        / max(entry.default_value, entry.average)
+                        (l.eec - max(entry.default_value, entry.average)) / max(entry.default_value, entry.average)
                     ) ** 2
         # ep penalisation
         key = l.feedstock.code + l.biofuel.code
@@ -55,13 +53,8 @@ def calc_ml_score(year=None, period=None):
             entry = ep[key]
             if l.ep < 0.8 * entry.average:
                 score += ((entry.average - l.ep) / entry.average) ** 2
-            if (
-                entry.default_value_max_ep > 0
-                and l.ep > 1.2 * entry.default_value_max_ep
-            ):
-                score += (
-                    (l.ep - entry.default_value_max_ep) / entry.default_value_max_ep
-                ) ** 2
+            if entry.default_value_max_ep > 0 and l.ep > 1.2 * entry.default_value_max_ep:
+                score += ((l.ep - entry.default_value_max_ep) / entry.default_value_max_ep) ** 2
 
         # etd penalisation ###### NOT INCLUDED FOR NOW - fausse les resultats - trop de faux positifs, trop different du premier check
         # if l.feedstock in etd:
