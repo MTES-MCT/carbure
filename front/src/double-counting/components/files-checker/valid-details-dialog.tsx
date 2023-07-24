@@ -3,10 +3,10 @@ import useEntity from "carbure/hooks/entity"
 import { Entity, ProductionSite } from "carbure/types"
 import * as norm from "carbure/utils/normalizers"
 import Autocomplete from "common/components/autocomplete"
-import { Button, MailTo } from "common/components/button"
+import { Button, ExternalLink, MailTo } from "common/components/button"
 import { Dialog } from "common/components/dialog"
 import { useForm } from "common/components/form"
-import { Plus, Return } from "common/components/icons"
+import { AlertTriangle, Plus, Return } from "common/components/icons"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import Tabs from "common/components/tabs"
@@ -19,6 +19,7 @@ import { useMatch } from "react-router-dom"
 import { DoubleCountingFileInfo } from "../../types"
 import ApplicationInfo from "../application/application-info"
 import { ProductionTable, SourcingFullTable } from "../dc-tables"
+import Alert from "common/components/alert"
 
 export type ValidDetailsDialogProps = {
   file: File
@@ -38,7 +39,7 @@ export const ValidDetailsDialog = ({
 
   function showProductionSiteDialog() {
     if (isProducerMatch) {
-      portal((close) => <MailToDialog onClose={() => { close(); onClose() }} />)
+      portal((close) => <MailToDialog onClose={() => { close(); onClose() }} fileData={fileData} />)
     } else {
       portal((close) => <ProductionSiteAdminDialog fileData={fileData} onClose={() => { close(); onClose() }} file={file} />)
     }
@@ -56,6 +57,11 @@ export const ValidDetailsDialog = ({
       <main>
 
         <ApplicationInfo fileData={fileData} />
+        <section>
+          {fileData.has_dechets_industriels &&
+            <DechetIndustrielAlert />
+          }
+        </section>
         <section>
           <Tabs
             variant="switcher"
@@ -199,17 +205,27 @@ export const ProductionSiteAdminDialog = ({
 }
 
 
+const DechetIndustrielAlert = () => {
+  return <Alert variant="warning" icon={AlertTriangle}>
+    <Trans>
+      Spécifité "Déchets industriels" : Une demande concernant des déchets industriels doit être accompagnée du questionnaire de processus de validation pour ces matières premieres{" "}
+      {/* <a href="./templates/test.docx" target="_blank" rel="noopener noreferrer">disponible ici</a>. */}
+      <ExternalLink href={"https://www.ecologie.gouv.fr/sites/default/files/Processus%20de%20validation%20de%20mati%C3%A8res%20premi%C3%A8res.pdf"}>
+        disponible ici
+      </ExternalLink>
+      . Merci de le joindre à votre demande par email.
+    </Trans>
+  </Alert>
+}
 
 export const MailToDialog = ({
   onClose,
-}: { onClose: () => void }) => {
+  fileData,
+}: { onClose: () => void, fileData: DoubleCountingFileInfo }) => {
   const { t } = useTranslation()
-
-
-  const onMailto = async () => {
-
-  }
-
+  const entity = useEntity()
+  const dechetsIndustrielMessage = fileData.has_dechets_industriels ? "%0D%0A-%20le%20questionnaire%20de%20processus%20de%20validation%20des%20mati%C3%A8res%20premieres%20rempli%20pour%20les%20d%C3%A9chets%20industriels%20mentionn%C3%A9s" : ""
+  const bodyMessage = `Mesdames%2C%20Messieurs%2C%0D%0A%0D%0AJe%20vous%20faire%20parvenir%20le%20dossier%20de%20demande%20de%20reconnaissance%20au%20Double%20Comptage%20pour%20notre%20soci%C3%A9t%C3%A9.%0D%0AJ'ai%20joint%20%20%3A%0D%0A-%20le%20fichier%20Excel%20apr%C3%A8s%20validation%20avec%20la%20plateforme%20CarbuRe${dechetsIndustrielMessage}%0D%0A%0D%0ABien%20cordialement`
 
   return (
     <Dialog onClose={onClose}>
@@ -222,8 +238,14 @@ export const MailToDialog = ({
           <p style={{ textAlign: 'left' }}>
             {t("Votre fichier est valide. Vous pouvez le transmettre par email à la DGEC pour une vérification approfondie à l'adresse carbure@beta.gouv.fr en cliquant ci-dessous : ")}
           </p>
-          <MailTo user="carbure" host="beta.gouv.fr">
-            <Trans>Envoyer l'email</Trans>
+          {fileData.has_dechets_industriels &&
+            <DechetIndustrielAlert />
+          }
+          <MailTo user="carbure" host="beta.gouv.fr"
+            subject={`[CarbuRe - Double comptage] Demande de ${entity.name}`}
+            body={bodyMessage}
+          >
+            <Trans>Envoyer la demande par email</Trans>
           </MailTo>
 
         </section>
