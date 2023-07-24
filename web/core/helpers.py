@@ -1341,6 +1341,7 @@ def get_known_certificates(lot):
         d[
             "production_site_double_counting_certificate"
         ] = try_get_double_counting_certificate(
-            lot.production_site_double_counting_certificate
+            lot.production_site_double_counting_certificate,
+            lot.carbure_production_site
         )
     return d
