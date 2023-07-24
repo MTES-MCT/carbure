@@ -549,6 +549,9 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
     lot.free_field = data.get("free_field", None)
     lot.added_by = entity
     carbure_stock_id = data.get("carbure_stock_id", False)
+
+    errors += fill_delivery_date(lot, data)
+
     if carbure_stock_id or lot.parent_stock_id:
         # Lot is extracted from STOCK.
         # FILL sustainability data from parent_stock
@@ -578,7 +581,6 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
     fill_delivery_type(lot, data)
     errors += fill_client_data(lot, data, entity, prefetched_data)
     errors += fill_volume_info(lot, data)
-    errors += fill_delivery_date(lot, data)
     errors += fill_supplier_info(lot, data, entity)
     errors += fill_delivery_data(lot, data, entity, prefetched_data)
     fill_vendor_data(lot, data, entity)

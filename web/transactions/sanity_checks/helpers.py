@@ -152,9 +152,7 @@ def get_prefetched_data(entity=None):
     for entitycertificate in certificates.iterator():
         if entitycertificate.entity.pk not in entity_certificates:
             entity_certificates[entitycertificate.entity.pk] = {}
-        entity_certificates[entitycertificate.entity.pk][
-            entitycertificate.certificate.certificate_id
-        ] = entitycertificate
+        entity_certificates[entitycertificate.entity.pk][entitycertificate.certificate.certificate_id] = entitycertificate
     data["entity_certificates"] = entity_certificates
 
     # MAPPING OF PRODUCTION SITES AND THEIR INPUT/OUTPUTS
@@ -198,7 +196,11 @@ def get_prefetched_data(entity=None):
     data["certificates"] = {c["certificate_id"].upper(): c for c in certs}
 
     dc_certs = DoubleCountingRegistration.objects.all()
-    data["double_counting_certificates"] = {c.certificate_id: c for c in dc_certs}
+    for cert in dc_certs:
+        dc_cert = cert.certificate_id
+        if cert.production_site:
+            dc_cert += "_" + cert.production_site.pk
+        data["double_counting_certificates"][dc_cert] = cert
 
     # ML STATS
     etds = ETDStats.objects.select_related("feedstock").all()
