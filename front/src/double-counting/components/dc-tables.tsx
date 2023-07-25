@@ -83,11 +83,7 @@ export const SourcingAggregationTable = ({
     {
       header: t("Poids total en tonnes"),
       cell: (s) => <Cell text={formatNumber(s.sum)} />,
-    },
-    {
-      header: t("Pays d'origine"),
-      cell: (s) => <Cell text={s.count} />,
-    },
+    }
   ]
 
   return <YearTable columns={columns} rows={sourcing} />
