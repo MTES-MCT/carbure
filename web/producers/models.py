@@ -11,7 +11,7 @@ class ProductionSite(models.Model):
     date_mise_en_service = models.DateField(null=False, blank=False)
     ges_option = models.CharField(max_length=12, choices=GES_OPTIONS, default="Default")
     eligible_dc = models.BooleanField(default=False)
-    dc_number = models.CharField(max_length=64, null=True, blank=True, default="")  # TODO should be an integer
+    dc_number = models.CharField(max_length=5, null=True, blank=True, default="")
     dc_reference = models.CharField(max_length=64, null=True, blank=True, default="")
 
     site_id = models.CharField(max_length=64, blank=True)
