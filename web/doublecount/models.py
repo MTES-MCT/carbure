@@ -76,7 +76,14 @@ class DoubleCountingAgreement(models.Model):
 
 @receiver(pre_save, sender=DoubleCountingAgreement)
 def set_agreement_id(sender, instance, **kwargs):
+    # generer un dc_number si jamais été reconnu comme eligible
+    if not instance.production_site.dc_reference:
+        dc_number = int(instance.production_site.id) + 1000
+        instance.production_site.dc_number = str(dc_number)
+
     instance.agreement_id = "FR_" + instance.production_site.dc_number + "_" + instance.period_end.strftime("%Y")
+    instance.production_site.dc_reference = instance.agreement_id
+    instance.production_site.save()
 
 
 class DoubleCountingSourcing(models.Model):

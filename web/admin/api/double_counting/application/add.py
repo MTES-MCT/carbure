@@ -1,5 +1,7 @@
+from math import prod
 from core.decorators import check_admin_rights
 from doublecount.parser.dc_parser import parse_dc_excel
+from datetime import datetime
 
 from producers.models import ProductionSite
 from doublecount.models import (
@@ -24,6 +26,8 @@ class DoubleCountingAddError:
     MALFORMED_PARAMS = "MALFORMED_PARAMS"
     PRODUCER_NOT_FOUND = "PRODUCER_NOT_FOUND"
     PRODUCTION_SITE_NOT_FOUND = "PRODUCTION_SITE_NOT_FOUND"
+    PRODUCTION_SITE_ADDRESS_UNDEFINED = "PRODUCTION_SITE_ADDRESS_UNDEFINED"
+    AGREEMENT_ALREADY_EXISTS = "AGREEMENT_ALREADY_EXISTS"
 
 
 @check_admin_rights()
@@ -41,8 +45,13 @@ def add_application(request, *args, **kwargs):
     except:
         return ErrorResponse(400, DoubleCountingAddError.PRODUCER_NOT_FOUND)
 
-    if not ProductionSite.objects.filter(producer_id=producer_id, id=production_site_id).exists():
+    try:
+        production_site = ProductionSite.objects.get(producer_id=producer_id, id=production_site_id)
+    except:
         return ErrorResponse(400, DoubleCountingAddError.PRODUCTION_SITE_NOT_FOUND)
+
+    if not production_site.address:
+        return ErrorResponse(400, DoubleCountingAddError.PRODUCTION_SITE_ADDRESS_UNDEFINED)
 
     if file is None:
         return ErrorResponse(400, DoubleCountingAddError.MALFORMED_PARAMS)
@@ -56,6 +65,14 @@ def add_application(request, *args, **kwargs):
 
     start, end, _ = load_dc_period(info["start_year"])
 
+    # check if agreement not rejected exists
+    if DoubleCountingAgreement.objects.filter(
+        producer=producer,
+        period_start__year=start.year,
+        status__in=[DoubleCountingAgreement.PENDING, DoubleCountingAgreement.REJECTED],
+    ).exists():
+        return ErrorResponse(400, DoubleCountingAddError.AGREEMENT_ALREADY_EXISTS)
+
     dca, _ = DoubleCountingAgreement.objects.get_or_create(
         producer=producer,
         production_site_id=production_site_id,
@@ -63,6 +80,7 @@ def add_application(request, *args, **kwargs):
         period_end=end,
         defaults={"producer_user": request.user},
     )
+    print("dca: ", dca)
     print("dca: ", dca.agreement_id)
 
     # 2 - save all production_data DoubleCountingProduction in db
@@ -81,3 +99,8 @@ def add_application(request, *args, **kwargs):
     #     print("email send error")
     #     traceback.print_exc()
     return SuccessResponse()
+
+
+# def agreement_is_expired (dca) :
+#     current_year = datetime.now().year
+#     return dca.period_end < current_year
