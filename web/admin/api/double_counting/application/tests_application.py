@@ -108,14 +108,14 @@ class AdminDoubleCountApplicationTest(TestCase):
             producer=self.production_site.producer,
             period_start__year=self.requested_start_year,
         )
-        agreement.status = DoubleCountingAgreement.PENDING
+        agreement.status = DoubleCountingAgreement.ACCEPTED
         agreement.save()
 
         response = self.add_file("dc_agreement_application_valid.xlsx")
         self.assertEqual(response.status_code, 400)
 
         error = response.json()["error"]
-        self.assertEqual(error, DoubleCountingAddError.AGREEMENT_ALREADY_EXISTS)
+        self.assertEqual(error, DoubleCountingAddError.APPLICATION_ALREADY_EXISTS)
 
     # TODO la fonction check_dc_file ne renvoie pas d'erreur si le fichier n'est pas valide.'
     # def test_failed_file(self):

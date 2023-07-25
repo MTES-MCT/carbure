@@ -1,4 +1,10 @@
+from django.core.mail import EmailMessage
+from django.db.models import Q
+
 from math import prod
+import traceback
+import os
+from carbure import settings
 from core.decorators import check_admin_rights
 from doublecount.parser.dc_parser import parse_dc_excel
 from datetime import datetime
@@ -15,7 +21,7 @@ from doublecount.helpers import (
     load_dc_sourcing_data,
     load_dc_production_data,
 )
-from core.models import Entity
+from core.models import Entity, UserRights
 
 from core.common import ErrorResponse, SuccessResponse
 
@@ -27,7 +33,7 @@ class DoubleCountingAddError:
     PRODUCER_NOT_FOUND = "PRODUCER_NOT_FOUND"
     PRODUCTION_SITE_NOT_FOUND = "PRODUCTION_SITE_NOT_FOUND"
     PRODUCTION_SITE_ADDRESS_UNDEFINED = "PRODUCTION_SITE_ADDRESS_UNDEFINED"
-    AGREEMENT_ALREADY_EXISTS = "AGREEMENT_ALREADY_EXISTS"
+    APPLICATION_ALREADY_EXISTS = "APPLICATION_ALREADY_EXISTS"
 
 
 @check_admin_rights()
@@ -67,11 +73,11 @@ def add_application(request, *args, **kwargs):
 
     # check if agreement not rejected exists
     if DoubleCountingAgreement.objects.filter(
-        producer=producer,
-        period_start__year=start.year,
-        status__in=[DoubleCountingAgreement.PENDING, DoubleCountingAgreement.REJECTED],
+        Q(producer=producer)
+        & Q(period_start__year=start.year)
+        & ~Q(status__in=[DoubleCountingAgreement.PENDING, DoubleCountingAgreement.REJECTED]),
     ).exists():
-        return ErrorResponse(400, DoubleCountingAddError.AGREEMENT_ALREADY_EXISTS)
+        return ErrorResponse(400, DoubleCountingAddError.APPLICATION_ALREADY_EXISTS)
 
     dca, _ = DoubleCountingAgreement.objects.get_or_create(
         producer=producer,
@@ -80,8 +86,6 @@ def add_application(request, *args, **kwargs):
         period_end=end,
         defaults={"producer_user": request.user},
     )
-    print("dca: ", dca)
-    print("dca: ", dca.agreement_id)
 
     # 2 - save all production_data DoubleCountingProduction in db
     sourcing_forecast_data, _ = load_dc_sourcing_data(dca, sourcing_forecast_rows)
@@ -93,14 +97,44 @@ def add_application(request, *args, **kwargs):
     for production in production_data:
         production.save()
 
-    # try:
-    #     send_dca_confirmation_email(dca)
-    # except:
-    #     print("email send error")
-    #     traceback.print_exc()
+    try:
+        send_dca_confirmation_email(dca)
+    except:
+        print("email send error")
+        traceback.print_exc()
     return SuccessResponse()
 
 
 # def agreement_is_expired (dca) :
 #     current_year = datetime.now().year
 #     return dca.period_end < current_year
+
+
+def send_dca_confirmation_email(dca):
+    text_message = """
+    Bonjour,
+
+    Nous vous confirmons la réception de votre dossier de demande d'agrément au double-comptage.
+
+    Bonne journée,
+    L'équipe CarbuRe
+    """
+    email_subject = "Carbure - Dossier Double Comptage"
+    cc = None
+    if os.getenv("IMAGE_TAG", "dev") != "prod":
+        # send only to staff / superuser
+        recipients = ["carbure@beta.gouv.fr"]
+    else:
+        # PROD
+        recipients = [
+            r.user.email
+            for r in UserRights.objects.filter(entity=dca.producer, user__is_staff=False, user__is_superuser=False).exclude(
+                role__in=[UserRights.AUDITOR, UserRights.RO]
+            )
+        ]
+        cc = "carbure@beta.gouv.fr"
+
+    email = EmailMessage(
+        subject=email_subject, body=text_message, from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc
+    )
+    email.send(fail_silently=False)
