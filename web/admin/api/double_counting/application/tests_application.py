@@ -3,6 +3,7 @@ from math import prod
 import os
 from datetime import datetime
 from admin.api.double_counting import agreements
+from admin.api.double_counting.application.add import DoubleCountingAddError
 
 from core.tests_utils import setup_current_user
 from core.models import Entity, UserRights
@@ -12,6 +13,7 @@ from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from doublecount.errors import DoubleCountingError
+from doublecount.models import DoubleCountingAgreement
 from producers.models import ProductionSite
 
 
@@ -41,6 +43,9 @@ class AdminDoubleCountApplicationTest(TestCase):
         UserRights.objects.update_or_create(user=self.user, entity=self.producer, defaults={"role": UserRights.ADMIN})
 
         self.production_site = ProductionSite.objects.first()
+        self.production_site.address = "1 rue de la Paix"
+        self.production_site.save()
+        self.requested_start_year = 2023
 
     def add_file(self, file_name: str):
         # upload template
@@ -59,28 +64,58 @@ class AdminDoubleCountApplicationTest(TestCase):
                 "file": f,
             },
         )
+
         return response
 
-    def test_valid_file(self):
+    def test_production_site_address_mandatory(self):
+        self.production_site.address = ""
+        self.production_site.save()
         response = self.add_file("dc_agreement_application_valid.xlsx")
-        current_year = datetime.now().year
+        self.assertEqual(response.status_code, 400)
+
+        error = response.json()["error"]
+        self.assertEqual(error, DoubleCountingAddError.PRODUCTION_SITE_ADDRESS_UNDEFINED)
+
+    def test_list_agreements(self):
+        response = self.add_file("dc_agreement_application_valid.xlsx")
         self.assertEqual(response.status_code, 200)
+
         response = self.client.get(
             reverse("admin-double-counting-agreements"),
-            {"entity_id": self.admin.id, "year": current_year},
+            {"entity_id": self.admin.id, "year": self.requested_start_year},
         )
 
         data = response.json()["data"]
         pending = data["pending"]
         agreement = pending["agreements"][0]
 
-        print("data: ", agreement)
         self.assertEqual(agreement["producer"]["id"], self.production_site.producer.id)
 
-        # file_data = data["file"]
-        # error_count = file_data["error_count"]
-        # self.assertEqual(error_count, 4)
-        # errors = file_data["errors"]
+    def test_dc_number_generation(self):
+        self.add_file("dc_agreement_application_valid.xlsx")
+
+        agreement = DoubleCountingAgreement.objects.get(
+            producer=self.production_site.producer, period_start__year=self.requested_start_year
+        )
+
+        self.assertEqual(agreement.production_site.dc_number, str(1000 + int(agreement.production_site.id)))
+        self.assertEqual(agreement.agreement_id, f"FR_{agreement.production_site.dc_number}_{self.requested_start_year + 1}")
+        self.assertEqual(agreement.production_site.dc_reference, agreement.agreement_id)
+
+    def test_already_existing_agreement(self):
+        self.add_file("dc_agreement_application_valid.xlsx")
+        agreement = DoubleCountingAgreement.objects.get(
+            producer=self.production_site.producer,
+            period_start__year=self.requested_start_year,
+        )
+        agreement.status = DoubleCountingAgreement.PENDING
+        agreement.save()
+
+        response = self.add_file("dc_agreement_application_valid.xlsx")
+        self.assertEqual(response.status_code, 400)
+
+        error = response.json()["error"]
+        self.assertEqual(error, DoubleCountingAddError.AGREEMENT_ALREADY_EXISTS)
 
     # TODO la fonction check_dc_file ne renvoie pas d'erreur si le fichier n'est pas valide.'
     # def test_failed_file(self):
