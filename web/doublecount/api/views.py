@@ -116,36 +116,6 @@ def get_agreement_admin(request, *args, **kwargs):
         return response
 
 
-def send_dca_confirmation_email(dca):
-    text_message = """
-    Bonjour,
-
-    Nous vous confirmons la réception de votre dossier de demande d'agrément au double-comptage.
-
-    Bonne journée,
-    L'équipe CarbuRe
-    """
-    email_subject = "Carbure - Dossier Double Comptage"
-    cc = None
-    if os.getenv("IMAGE_TAG", "dev") != "prod":
-        # send only to staff / superuser
-        recipients = ["carbure@beta.gouv.fr"]
-    else:
-        # PROD
-        recipients = [
-            r.user.email
-            for r in UserRights.objects.filter(entity=dca.producer, user__is_staff=False, user__is_superuser=False).exclude(
-                role__in=[UserRights.AUDITOR, UserRights.RO]
-            )
-        ]
-        cc = "carbure@beta.gouv.fr"
-
-    email = EmailMessage(
-        subject=email_subject, body=text_message, from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc
-    )
-    email.send(fail_silently=False)
-
-
 def send_dca_status_email(dca):
     if dca.status == DoubleCountingAgreement.ACCEPTED:
         text_message = """

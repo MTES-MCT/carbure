@@ -7,7 +7,7 @@ import { Button, ExternalLink, MailTo } from "common/components/button"
 import { Dialog } from "common/components/dialog"
 import { useForm } from "common/components/form"
 import { AlertTriangle, Plus, Return } from "common/components/icons"
-import { useNotify } from "common/components/notifications"
+import { useNotify, useNotifyError } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import Tabs from "common/components/tabs"
 import Tag from "common/components/tag"
@@ -44,7 +44,6 @@ export const ValidDetailsDialog = ({
       portal((close) => <ProductionSiteAdminDialog fileData={fileData} onClose={() => { close(); onClose() }} file={file} />)
     }
   }
-  console.log('fileData:', fileData)
 
   return (
     <Dialog fullscreen onClose={onClose}>
@@ -139,26 +138,29 @@ export const ProductionSiteAdminDialog = ({
   const { value, bind } =
     useForm<ProductionForm>(defaultProductionForm)
   const notify = useNotify()
-
+  const notifyError = useNotifyError()
 
   const addApplication = useMutation(addDoubleCountingApplication, {
     invalidates: [],
+    onSuccess() {
+      notify(t("Le dossier a été envoyé !"), { variant: "success" })
+    },
+    onError(err) {
+      console.log('err:', err)
+      notifyError(err, t("Impossible d'ajouter le dossier"))
+    },
   })
 
   const saveApplication = async () => {
     if (!value.productionSite || !value.producer) return
-    try {
-      await addApplication.execute(
-        entity.id,
-        value.productionSite.id,
-        value.producer.id,
-        file
-      )
-      onClose()
-      notify(t("Dossier ajouté avec succès"), { variant: "success" })
-    } catch (err) {
-      notify(t("Impossible d'ajouter le dossier"), { variant: "warning" })
-    }
+    await addApplication.execute(
+      entity.id,
+      value.productionSite.id,
+      value.producer.id,
+      file
+    )
+    onClose()
+
   }
   const producer = value.producer instanceof Object ? value.producer.id : undefined // prettier-ignore
 
@@ -191,6 +193,7 @@ export const ProductionSiteAdminDialog = ({
 
       <footer>
         <Button
+          loading={addApplication.loading}
           icon={Plus}
           label={t("Ajouter le dossier")}
           variant="primary"

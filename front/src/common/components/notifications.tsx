@@ -29,10 +29,12 @@ export function useNotifyError() {
   const notify = useNotify()
 
   const getErrorText = (error: Error, defaultMessage?: string) => {
+    console.log('error:', error)
     const errorCode = (error as AxiosError<{ error: string }>).response?.data
       .error
+    console.log('errorCode:', errorCode)
     let errorText = errorCode
-      ? t(errorCode, { ns: "errors-api" })
+      ? t(errorCode, { ns: "errors" })
       : defaultMessage ||
       t("La demande a échoué. Réessayez ou contactez carbure@beta.gouv.fr")
     return errorText
