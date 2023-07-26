@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from elec.models.elec_provision_certificate import ElecProvisionCertificate
+from elec.models import ElecProvisionCertificate, ElecTransferCertificate
 
 
 @admin.register(ElecProvisionCertificate)
@@ -18,4 +18,21 @@ class ElecProvisionCertificateAdmin(admin.ModelAdmin):
         "quarter",
         "year",
         "operating_unit",
+    )
+
+
+@admin.register(ElecTransferCertificate)
+class ElecTransferCertificateAdmin(admin.ModelAdmin):
+    list_display = (
+        "certificate_id",
+        "status",
+        "supplier",
+        "client",
+        "transfer_date",
+        "energy_amount",
+    )
+    list_filter = (
+        "status",
+        "supplier",
+        "client",
     )

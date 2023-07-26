@@ -1,1 +1,2 @@
 from .elec_provision_certificate import ElecProvisionCertificate
+from .elec_transfer_certificate import ElecTransferCertificate
