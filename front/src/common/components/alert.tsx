@@ -47,9 +47,9 @@ export const Alert = ({
       )}
     >
       {loading ? <Loader /> : icon}
-      <p>
-        {label ?? child}
-      </p>
+      {/* ne pas rajouter de markup ici, ça casse le styling */}
+      {/* si vraiment besoin, passer le markup dans les children */}
+      {label ?? child}
     </div>
   )
 }

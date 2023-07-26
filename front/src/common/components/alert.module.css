@@ -5,7 +5,7 @@
   background-color: var(--gray-highlight);
   border: 1px solid var(--gray-medium);
   border-radius: var(--border-radius);
-  /* white-space: nowrap; */
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
