@@ -195,12 +195,14 @@ def get_prefetched_data(entity=None):
     certs = GenericCertificate.objects.filter(valid_until__gte=lastyear).values("certificate_id", "valid_until")
     data["certificates"] = {c["certificate_id"].upper(): c for c in certs}
 
+    # for each different DC agreement id, we store a list of agreements
+    # this allows dealing with duplicated DC agreements (Ryssen + BAE)
     dc_certs = DoubleCountingRegistration.objects.all()
-    for cert in dc_certs:
-        dc_cert = cert.certificate_id
-        if cert.production_site:
-            dc_cert = f"{dc_cert}_{cert.production_site.pk}"
-        data["double_counting_certificates"][dc_cert] = cert
+    for dc_cert in dc_certs:
+        dc_cert_id = dc_cert.certificate_id
+        if dc_cert_id not in data["double_counting_certificates"]:
+            data["double_counting_certificates"][dc_cert_id] = []
+        data["double_counting_certificates"][dc_cert_id].append(dc_cert)
 
     # ML STATS
     etds = ETDStats.objects.select_related("feedstock").all()

@@ -61,19 +61,31 @@ def try_get_double_counting_certificate(cert, production_site):
         "certificate_type": "DC",
         "certificate_id": cert,
     }
-    matches = DoubleCountingRegistration.objects.filter(certificate_id=cert, production_site=production_site)
+
+    match = None
+
+    matches = DoubleCountingRegistration.objects.filter(certificate_id=cert)
     count = matches.count()
-    d["matches"] = count
+
     if count == 0:
         return d
-    elif count > 1:
+
+    psite_matches = matches.filter(production_site=production_site)
+    psite_count = psite_matches.count()
+
+    if psite_count > 0:
+        match = psite_matches[0]
+    elif count > 0:
+        match = matches[0]
+
+    if not match:
         return d
-    else:
-        c = matches[0]
-        d["found"] = True
-        d["holder"] = c.certificate_holder
-        d["valid_from"] = c.valid_from
-        d["valid_until"] = c.valid_until
+
+    d["found"] = True
+    d["matches"] = psite_count or count
+    d["holder"] = match.certificate_holder
+    d["valid_from"] = match.valid_from
+    d["valid_until"] = match.valid_until
     return d
 
 
@@ -121,9 +133,7 @@ def convert_cell(cell, convert_float: bool) -> Scalar:
 def get_sheet_data(sheet, convert_float: bool) -> List[List[Scalar]]:
     data: List[List[Scalar]] = []
     for row in sheet.rows:
-        data.append(
-            [convert_cell(cell, convert_float) if isinstance(cell, openpyxl.cell.cell.Cell) else "" for cell in row]
-        )
+        data.append([convert_cell(cell, convert_float) if isinstance(cell, openpyxl.cell.cell.Cell) else "" for cell in row])
     return data
 
 
@@ -205,28 +215,28 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
             # carbure_supplier and carbure_producer will be set to entity in construct_carbure_lot
         else:
             # I am not the producer
-            lot['unknown_producer'] = producer
-            lot['unknown_production_site'] = production_site
-            lot['production_country_code'] = lot_row.get('production_site_country', None)
-            lot['production_site_commissioning_date'] = lot_row.get('production_site_commissioning_date', '')
-            supplier = lot_row.get('supplier', '').upper()
+            lot["unknown_producer"] = producer
+            lot["unknown_production_site"] = production_site
+            lot["production_country_code"] = lot_row.get("production_site_country", None)
+            lot["production_site_commissioning_date"] = lot_row.get("production_site_commissioning_date", "")
+            supplier = lot_row.get("supplier", "").upper()
             if supplier in prefetched_data["clientsbyname"]:
-                lot['carbure_supplier_id'] = prefetched_data["clientsbyname"][supplier].id
+                lot["carbure_supplier_id"] = prefetched_data["clientsbyname"][supplier].id
             else:
                 lot["unknown_supplier"] = supplier
 
-        lot['production_site_certificate'] = lot_row.get('production_site_reference', '')
-        lot['production_site_double_counting_certificate'] = lot_row.get('double_counting_registration', '')
-        lot['vendor_certificate'] = lot_row.get('vendor_certificate', '')
-        lot['supplier_certificate'] = lot_row.get('supplier_certificate', '')
-        lot['volume'] = lot_row.get('volume', 0)
-        lot['quantity'] = lot_row.get('quantity', 0)
-        lot['unit'] = lot_row.get('unit', None)
-        lot['feedstock_code'] = lot_row.get('matiere_premiere_code', '').strip()
-        lot['biofuel_code'] = lot_row.get('biocarburant_code', '').strip()
-        lot['country_code'] = lot_row.get('pays_origine_code', '').strip()
-        lot['delivery_type'] = lot_row.get('delivery_type', CarbureLot.UNKNOWN)
-        for key in ['el']: # negative value allowed
+        lot["production_site_certificate"] = lot_row.get("production_site_reference", "")
+        lot["production_site_double_counting_certificate"] = lot_row.get("double_counting_registration", None)
+        lot["vendor_certificate"] = lot_row.get("vendor_certificate", "")
+        lot["supplier_certificate"] = lot_row.get("supplier_certificate", "")
+        lot["volume"] = lot_row.get("volume", 0)
+        lot["quantity"] = lot_row.get("quantity", 0)
+        lot["unit"] = lot_row.get("unit", None)
+        lot["feedstock_code"] = lot_row.get("matiere_premiere_code", "").strip()
+        lot["biofuel_code"] = lot_row.get("biocarburant_code", "").strip()
+        lot["country_code"] = lot_row.get("pays_origine_code", "").strip()
+        lot["delivery_type"] = lot_row.get("delivery_type", CarbureLot.UNKNOWN)
+        for key in ["el"]:  # negative value allowed
             try:
                 lot[key] = float(lot_row.get(key, 0))
             except:
