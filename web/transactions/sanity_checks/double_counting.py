@@ -84,7 +84,11 @@ def get_dc(lot: CarbureLot, prefetched_data):
 
     # pick the DC certificate matching the lot production site
     for dc_cert in dc_cert_variations:
-        if not lot.carbure_production_site or dc_cert.production_site == lot.carbure_production_site:
+        if (
+            not lot.carbure_production_site
+            or not dc_cert.production_site
+            or dc_cert.production_site == lot.carbure_production_site
+        ):
             return is_dc, dc_cert
 
     return is_dc, None

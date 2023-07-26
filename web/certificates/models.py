@@ -56,7 +56,8 @@ def dc_registration_post_update_production_site(sender, instance, created, updat
 
         production_site.save()
     except:
-        print("Production Site not found")
+        # print("Production Site not found")
+        pass
 
 
 class DoubleCountingRegistrationInputOutput(models.Model):
