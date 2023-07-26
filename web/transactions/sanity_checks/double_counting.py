@@ -75,11 +75,16 @@ def get_dc(lot: CarbureLot, prefetched_data):
         return False, None
 
     is_dc = lot.feedstock and lot.feedstock.is_double_compte
-    dc_cert = lot.production_site_double_counting_certificate
+    dc_cert_id = lot.production_site_double_counting_certificate
 
-    # we append the production site id to differentiate certificates
-    # for the specific case of duplicated production sites for Ryssen and BAE
-    if lot.carbure_production_site:
-        dc_cert = f"{dc_cert}_{lot.carbure_production_site.pk}"
+    dc_cert_variations = prefetched_data["double_counting_certificates"].get(dc_cert_id, [])
 
-    return is_dc, prefetched_data["double_counting_certificates"].get(dc_cert)
+    if len(dc_cert_variations) == 0:
+        return is_dc, None
+
+    # pick the DC certificate matching the lot production site
+    for dc_cert in dc_cert_variations:
+        if not lot.carbure_production_site or dc_cert.production_site == lot.carbure_production_site:
+            return is_dc, dc_cert
+
+    return is_dc, None

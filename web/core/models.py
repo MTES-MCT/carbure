@@ -496,14 +496,6 @@ class ExternalAdminRights(models.Model):
         verbose_name_plural = "External Admin Rights"
 
 
-from django.db import models
-from django.contrib.auth import get_user_model
-
-from core.models import Entity, Depot, ProductionSite, MatierePremiere, Pays, Biocarburant
-
-usermodel = get_user_model()
-
-
 class CarbureLot(models.Model):
     period = models.IntegerField(blank=False, null=False)  # index
     year = models.IntegerField(blank=False, null=False)  # index

@@ -31,6 +31,8 @@ DBS_NUMBER_KEY = "Numéro de Certificat 2BS"
 DBS_COMPANY_NAME_KEY = "Nom de l’opérateur économique"
 DBS_ADDRESS_KEY = "Adresse"
 DBS_COUNTRY_KEY = "Pays"
+DBS_VALID_FROM_KEY = "Date de début de validité du certificat"
+DBS_VALID_UNTIL_KEY = "Date de fin de validité du certificat"
 
 
 def update_2bs_certificates(email: bool = False) -> None:
@@ -53,9 +55,7 @@ def download_certificates(url: str, valid: bool = True) -> None:
     if valid:
         pd.DataFrame.to_csv(df, "%s/Certificates2BS_%s.csv" % (DESTINATION_FOLDER, str(date.today())), index=False)
     else:
-        pd.DataFrame.to_csv(
-            df, "%s/Certificates2BS_invalid_%s.csv" % (DESTINATION_FOLDER, str(date.today())), index=False
-        )
+        pd.DataFrame.to_csv(df, "%s/Certificates2BS_invalid_%s.csv" % (DESTINATION_FOLDER, str(date.today())), index=False)
 
 
 def save_2bs_certificates(valid: bool = True) -> Tuple[int, list]:
@@ -70,16 +70,16 @@ def save_2bs_certificates(valid: bool = True) -> Tuple[int, list]:
     i = 0
     for row in reader:
         i += 1
-        # valid: Nom,Coordonnées,Pays,Type de certification,Numéro de Certificat 2BS,Date originale de certification,Date de fin de validité du certificat,Certificat
+        # valid: Nom,Coordonnées,Pays,Type de certification,Numéro de Certificat 2BS,Date de début de validité du certificat,Date de fin de validité du certificat,Certificat
         # create certificate
         try:
-            vf = row["Date originale de certification"].split("/")
+            vf = row[DBS_VALID_FROM_KEY].split("/")
             valid_from = date(year=int(vf[2]), month=int(vf[1]), day=int(vf[0]))
         except:
             valid_from = date(year=1970, month=1, day=1)
 
         try:
-            vu = row["Date de fin de validité du certificat"].split("/")
+            vu = row[DBS_VALID_UNTIL_KEY].split("/")
             valid_until = date(year=int(vu[2]), month=int(vu[1]), day=int(vu[0]))
         except:
             valid_until = date(year=1970, month=1, day=1)
