@@ -59,6 +59,13 @@ class DoubleCountingSanityChecksTest(TestCase):
             valid_until=datetime.date(2024, 12, 31),
         )
 
+        self.free_dc_cert = DoubleCountingRegistration.objects.create(
+            certificate_id="FR_99999_2023",
+            production_site=None,
+            valid_from=datetime.date(2023, 1, 1),
+            valid_until=datetime.date(2024, 12, 31),
+        )
+
         self.prefetched_data = get_prefetched_data()
 
     def run_checks(self, lot, prefetched_data=None):
@@ -129,6 +136,11 @@ class DoubleCountingSanityChecksTest(TestCase):
 
         # case 3: known production site + known DC cert of right psite => ok
         lot.production_site_double_counting_certificate = self.dc_cert.certificate_id
+        error_list = self.run_checks(lot)
+        self.assertFalse(has_error(error, error_list))
+
+        # case 4: known production site + known DC cert without linked prod site => ok
+        lot.production_site_double_counting_certificate = self.free_dc_cert.certificate_id
         error_list = self.run_checks(lot)
         self.assertFalse(has_error(error, error_list))
 
