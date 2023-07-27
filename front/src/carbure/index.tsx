@@ -21,6 +21,7 @@ import Saf from "saf/operator"
 import SafClient from "saf/airline"
 import Stats from "stats"
 import Elec from "elec"
+import ElecAdmin from "elec-admin"
 
 const Carbure = () => {
   const user = useUserManager()
@@ -79,7 +80,7 @@ const Org = () => {
   } = entity
   const hasDCA = isExternal && entity.hasAdminRight("DCA")
   const hasAirline = isExternal && entity.hasAdminRight("AIRLINE")
-  const hasElec = isExternal && entity.hasAdminRight("ELEC")
+  const isElecAdmin = isExternal && entity.hasAdminRight("ELEC")
 
   // prettier-ignore
   return (
@@ -128,8 +129,11 @@ const Org = () => {
       {(isAdmin || hasDCA) && <Route path="double-counting/*" element={<DoubleCounting />} />}
       {hasDCA && <Route path="*" element={<Navigate replace to="double-counting" />} />}
 
-      {(isAdmin || hasAirline || hasElec) &&
+      {(isAdmin || hasAirline || isElecAdmin) &&
         <Route path="entities/*" element={<Entities />} />
+      }
+      {(isAdmin || isElecAdmin) &&
+        <Route path="elec-admin/*" element={<ElecAdmin />} />
       }
       {hasAirline && <Route path="*" element={<Navigate replace to="entities" />} />}
     </Routes>

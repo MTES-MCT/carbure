@@ -6,6 +6,7 @@ class ElecProvisionCertificate(models.Model):
         db_table = "elec_provision_certificate"
         verbose_name = "Certificat de Fourniture (elec)"
         verbose_name_plural = "Certificats de Fourniture (elec)"
+        unique_together = ("entity", "quarter", "year", "operating_unit")
 
     QUARTERS = (
         (1, "T1"),

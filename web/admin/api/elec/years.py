@@ -18,7 +18,7 @@ def get_years(request):
 
         years = list(set(list(provision_years) + list(transfer_years)))
 
-        return SuccessResponse({"years": years})
+        return SuccessResponse(years)
     except Exception:
         traceback.print_exc()
         return ErrorResponse(400, ElecSnapshotError.YEAR_FAILED)
