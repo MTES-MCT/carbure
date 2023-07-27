@@ -30,14 +30,14 @@ import { usePortal } from "common/components/portal"
 import { formatDate } from "common/utils/formatters"
 
 export type DoubleCountingDialogProps = {
-  agreementID: number
+  applicationID: number
   entity: Entity
   onClose: () => void
 }
 
 export const DoubleCountingDialog = ({
   entity,
-  agreementID,
+  applicationID,
   onClose,
 }: DoubleCountingDialogProps) => {
   const { t } = useTranslation()
@@ -47,20 +47,20 @@ export const DoubleCountingDialog = ({
   const [focus, setFocus] = useState("aggregated_sourcing")
   const [quotas, setQuotas] = useState<Record<string, number>>({})
 
-  const agreement = useQuery(api.getDoubleCountingAgreement, {
-    key: "dc-agreement",
-    params: [agreementID],
+  const application = useQuery(api.getDoubleCountingApplication, {
+    key: "dc-application",
+    params: [applicationID],
 
-    onSuccess: (agreement) => {
-      const agreementData = agreement.data.data
-      if (agreementData === undefined) {
+    onSuccess: (application) => {
+      const applicationData = application.data.data
+      if (applicationData === undefined) {
         setQuotas({})
         return
       }
 
       // automatically set the quotas to the asked value the first time the dossier is opened
       const quotas: Record<string, number> = {}
-      agreementData.production.forEach((prod) => {
+      applicationData.production.forEach((prod) => {
         quotas[prod.id] =
           prod.approved_quota >= 0 ? prod.approved_quota : prod.requested_quota
       })
@@ -69,72 +69,70 @@ export const DoubleCountingDialog = ({
   })
 
   const approveQuotas = useMutation(api.approveDoubleCountingQuotas, {
-    invalidates: ["dc-agreement"],
+    invalidates: ["dc-application"],
   })
 
-  const approveAgreement = useMutation(api.approveDoubleCountingAgreement, {
-    invalidates: ["dc-agreement"],
+  const approveApplication = useMutation(api.approveDoubleCountingApplication, {
+    invalidates: ["dc-application"],
   })
 
-  const rejectAgreement = useMutation(api.rejectDoubleCountingAgreement, {
-    invalidates: ["dc-agreement"],
+  const rejectApplication = useMutation(api.rejectDoubleCountingApplication, {
+    invalidates: ["dc-application"],
   })
 
   const uploadDecision = useMutation(api.uploadDoubleCountingDecision, {
-    invalidates: ["dc-agreement"],
+    invalidates: ["dc-application"],
   })
 
-  const agreementData = agreement.result?.data.data
-  const dcaStatus = agreementData?.status ?? DCStatus.Pending
+  const applicationData = application.result?.data.data
+  const dcaStatus = applicationData?.status ?? DCStatus.Pending
 
   let approved = false
   if (entity?.name === Admin.DGEC) {
-    approved = agreementData?.dgec_validated ?? false
+    approved = applicationData?.dgec_validated ?? false
   } else if (entity?.name === Admin.DGDDI) {
-    approved = agreementData?.dgddi_validated ?? false
+    approved = applicationData?.dgddi_validated ?? false
   } else if (entity?.name === Admin.DGPE) {
-    approved = agreementData?.dgpe_validated ?? false
+    approved = applicationData?.dgpe_validated ?? false
   }
 
   const isAdmin = entity?.entity_type === EntityType.Administration
   const isAccepted = dcaStatus === DCStatus.Accepted
   const isDone = approved || dcaStatus === DCStatus.Rejected
-  const hasQuotas = !agreementData?.production.some(
+  const hasQuotas = !applicationData?.production.some(
     (p) => p.approved_quota === -1
   )
-  const isReady = isAdmin ? true : agreementData?.dgec_validated
+  const isReady = isAdmin ? true : applicationData?.dgec_validated
 
-  const productionSite = agreementData?.production_site ?? "N/A"
-  const producer = agreementData?.producer.name ?? "N/A"
-  const user = agreementData?.producer_user ?? "N/A"
-  const creationDate = agreementData?.creation_date
-    ? formatDate(agreementData.creation_date)
+  const productionSite = applicationData?.production_site ?? "N/A"
+  const producer = applicationData?.producer.name ?? "N/A"
+  const user = applicationData?.producer_user ?? "N/A"
+  const creationDate = applicationData?.creation_date
+    ? formatDate(applicationData.creation_date)
     : "N/A"
 
-  const documentationFile = agreementData?.documents.find(
+  const documentationFile = applicationData?.documents.find(
     (doc) => doc.file_type === "SOURCING"
   )
-  const decisionFile = agreementData?.documents.find(
+  const decisionFile = applicationData?.documents.find(
     (doc) => doc.file_type === "DECISION"
   )
 
   const excelURL =
-    agreementData &&
-    `/api/v3/doublecount/admin/agreement?dca_id=${agreementData.id}&export=true`
+    applicationData &&
+    `/api/v3/doublecount/admin/application?dca_id=${applicationData.id}&export=true`
   const documentationURL =
     documentationFile &&
-    `/api/v3/doublecount/admin/download-documentation?dca_id=${
-      agreementData!.id
+    `/api/v3/doublecount/admin/download-documentation?dca_id=${applicationData!.id
     }&file_id=${documentationFile.id}`
   const decisionURL =
     decisionFile &&
-    `/api/v3/doublecount/admin/download-decision?dca_id=${
-      agreementData!.id
+    `/api/v3/doublecount/admin/download-decision?dca_id=${applicationData!.id
     }&file_id=${decisionFile.id}`
 
   async function submitQuotas() {
     if (
-      !agreementData ||
+      !applicationData ||
       !entity ||
       entity?.entity_type !== EntityType.Administration
     ) {
@@ -142,7 +140,7 @@ export const DoubleCountingDialog = ({
     }
 
     const done = await approveQuotas.execute(
-      agreementData.id,
+      applicationData.id,
       Object.keys(quotas).map((id) => [parseInt(id), quotas[id]])
     )
 
@@ -165,8 +163,8 @@ export const DoubleCountingDialog = ({
         icon={Check}
         onClose={close}
         onConfirm={async () => {
-          if (agreementData) {
-            await approveAgreement.execute(entity.id, agreementData.id)
+          if (applicationData) {
+            await approveApplication.execute(entity.id, applicationData.id)
           }
         }}
       />
@@ -183,8 +181,8 @@ export const DoubleCountingDialog = ({
         icon={Cross}
         onClose={close}
         onConfirm={async () => {
-          if (agreementData) {
-            await rejectAgreement.execute(entity.id, agreementData.id)
+          if (applicationData) {
+            await rejectApplication.execute(entity.id, applicationData.id)
           }
         }}
       />
@@ -193,7 +191,7 @@ export const DoubleCountingDialog = ({
 
   async function submitDecision(decision: File | undefined) {
     if (decision) {
-      await uploadDecision.execute(agreementID, decision)
+      await uploadDecision.execute(applicationID, decision)
     }
   }
 
@@ -237,25 +235,25 @@ export const DoubleCountingDialog = ({
 
         {focus === "aggregated_sourcing" && (
           <SourcingAggregationTable
-            sourcing={agreementData?.aggregated_sourcing ?? []}
+            sourcing={applicationData?.aggregated_sourcing ?? []}
           />
         )}
 
         {focus === "sourcing" && (
-          <SourcingTable sourcing={agreementData?.sourcing ?? []} />
+          <SourcingTable sourcing={applicationData?.sourcing ?? []} />
         )}
 
         {focus === "production" && (
           <ProductionTable
             done={isDone}
-            production={agreementData?.production ?? []}
+            production={applicationData?.production ?? []}
             entity={entity}
             quotas={quotas}
             setQuotas={setQuotas}
           />
         )}
 
-        {focus === "status" && <StatusTable agreement={agreementData} />}
+        {focus === "status" && <StatusTable application={applicationData} />}
       </main>
 
       <footer>
@@ -286,7 +284,7 @@ export const DoubleCountingDialog = ({
           />
         )}
 
-        {!isDone && !agreement.loading && (
+        {!isDone && !application.loading && (
           <Fragment>
             {isAdmin && (
               <Button
@@ -309,7 +307,7 @@ export const DoubleCountingDialog = ({
               <Trans>Accepter</Trans>
             </Button>
             <Button
-              loading={rejectAgreement.loading}
+              loading={rejectApplication.loading}
               disabled={!isReady}
               variant="danger"
               icon={Cross}
@@ -324,7 +322,7 @@ export const DoubleCountingDialog = ({
         </Button>
       </footer>
 
-      {agreement.loading && <LoaderOverlay />}
+      {application.loading && <LoaderOverlay />}
     </Dialog>
   )
 }

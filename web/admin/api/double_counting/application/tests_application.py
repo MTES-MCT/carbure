@@ -1,8 +1,5 @@
 # test with : python web/manage.py test admin.api.double_counting.application.tests_application.AdminDoubleCountApplicationTest.test_valid_file --keepdb
-from math import prod
 import os
-from datetime import datetime
-from admin.api.double_counting import agreements
 from admin.api.double_counting.application.add import DoubleCountingAddError
 
 from core.tests_utils import setup_current_user
@@ -12,8 +9,7 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from doublecount.errors import DoubleCountingError
-from doublecount.models import DoubleCountingAgreement
+from doublecount.models import DoubleCountingApplication
 from producers.models import ProductionSite
 
 
@@ -76,40 +72,42 @@ class AdminDoubleCountApplicationTest(TestCase):
         error = response.json()["error"]
         self.assertEqual(error, DoubleCountingAddError.PRODUCTION_SITE_ADDRESS_UNDEFINED)
 
-    def test_list_agreements(self):
+    def test_list_applications(self):
         response = self.add_file("dc_agreement_application_valid.xlsx")
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get(
-            reverse("admin-double-counting-agreements"),
+            reverse("admin-double-counting-applications"),
             {"entity_id": self.admin.id, "year": self.requested_start_year},
         )
 
         data = response.json()["data"]
         pending = data["pending"]
-        agreement = pending["agreements"][0]
+        application = pending["applications"][0]
 
-        self.assertEqual(agreement["producer"]["id"], self.production_site.producer.id)
+        self.assertEqual(application["producer"]["id"], self.production_site.producer.id)
 
     def test_dc_number_generation(self):
         self.add_file("dc_agreement_application_valid.xlsx")
 
-        agreement = DoubleCountingAgreement.objects.get(
+        application = DoubleCountingApplication.objects.get(
             producer=self.production_site.producer, period_start__year=self.requested_start_year
         )
 
-        self.assertEqual(agreement.production_site.dc_number, str(1000 + int(agreement.production_site.id)))
-        self.assertEqual(agreement.agreement_id, f"FR_{agreement.production_site.dc_number}_{self.requested_start_year + 1}")
-        self.assertEqual(agreement.production_site.dc_reference, agreement.agreement_id)
+        self.assertEqual(application.production_site.dc_number, str(1000 + int(application.production_site.id)))
+        self.assertEqual(
+            application.agreement_id, f"FR_{application.production_site.dc_number}_{self.requested_start_year + 1}"
+        )
+        self.assertEqual(application.production_site.dc_reference, application.agreement_id)
 
-    def test_already_existing_agreement(self):
+    def test_already_existing_application(self):
         self.add_file("dc_agreement_application_valid.xlsx")
-        agreement = DoubleCountingAgreement.objects.get(
+        application = DoubleCountingApplication.objects.get(
             producer=self.production_site.producer,
             period_start__year=self.requested_start_year,
         )
-        agreement.status = DoubleCountingAgreement.ACCEPTED
-        agreement.save()
+        application.status = DoubleCountingApplication.ACCEPTED
+        application.save()
 
         response = self.add_file("dc_agreement_application_valid.xlsx")
         self.assertEqual(response.status_code, 400)

@@ -20,7 +20,7 @@ export enum DoubleCountingStatus {
   Lapsed = "LAPSED",
 }
 
-export interface DoubleCounting {
+export interface DoubleCountingApplication {
   id: number
   agreement_id: string
   producer: Entity
@@ -86,14 +86,14 @@ export interface DoubleCountingUploadError {
   meta?: null | any
 }
 
-export interface DoubleCountingUploadErrors extends DoubleCounting {
+export interface DoubleCountingUploadErrors extends DoubleCountingApplication {
   // sourcing_history?: DoubleCountingUploadError[]
   sourcing_forecast?: DoubleCountingUploadError[]
   production?: DoubleCountingUploadError[]
   global?: DoubleCountingUploadError[]
 }
 
-export interface DoubleCountingDetails extends DoubleCounting {
+export interface DoubleCountingDetails extends DoubleCountingApplication {
   sourcing: DoubleCountingSourcing[]
   production: DoubleCountingProduction[]
   aggregated_sourcing: DoubleCountingSourcingAggregation[]
@@ -109,16 +109,16 @@ export interface DoubleCountingDetails extends DoubleCounting {
   dgpe_validated_dt: string | null
 }
 
-export interface AgreementSnapshot {
+export interface ApplicationSnapshot {
   years: number[]
 }
 
-export interface AgreementsOverview {
-  accepted: { count: number; agreements: DoubleCounting[] }
-  rejected: { count: number; agreements: DoubleCounting[] }
-  expired: { count: number; agreements: DoubleCounting[] }
-  pending: { count: number; agreements: DoubleCounting[] }
-  progress: { count: number; agreements: DoubleCounting[] }
+export interface ApplicationsOverview {
+  accepted: { count: number; applications: DoubleCountingApplication[] }
+  rejected: { count: number; applications: DoubleCountingApplication[] }
+  expired: { count: number; applications: DoubleCountingApplication[] }
+  pending: { count: number; applications: DoubleCountingApplication[] }
+  progress: { count: number; applications: DoubleCountingApplication[] }
 }
 
 export interface QuotaOverview {

@@ -4,7 +4,7 @@ from django.db.models.fields import related_descriptors
 from numpy.lib.twodim_base import triu_indices_from
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
-from .models import DoubleCountingAgreement, DoubleCountingProduction, DoubleCountingSourcing, DoubleCountingDocFile
+from .models import DoubleCountingApplication, DoubleCountingProduction, DoubleCountingSourcing, DoubleCountingDocFile
 from core.models import Entity, MatierePremiere, Biocarburant, Pays
 
 
@@ -90,7 +90,7 @@ class DoubleCountingAggregatedSourcingSerializer(serializers.ModelSerializer):
         fields = ["year", "feedstock", "sum"]
 
 
-class DoubleCountingAgreementFullSerializer(serializers.ModelSerializer):
+class DoubleCountingApplicationFullSerializer(serializers.ModelSerializer):
     production_site = serializers.SlugRelatedField(read_only=True, slug_field="name")
     producer_user = serializers.SlugRelatedField(read_only=True, slug_field="email")
     dgec_validator = serializers.SlugRelatedField(read_only=True, slug_field="name")
@@ -99,7 +99,7 @@ class DoubleCountingAgreementFullSerializer(serializers.ModelSerializer):
     producer = EntitySerializer(read_only=True)
 
     class Meta:
-        model = DoubleCountingAgreement
+        model = DoubleCountingApplication
         fields = [
             "id",
             "agreement_id",
@@ -128,7 +128,7 @@ class DoubleCountingDocFileSerializer(serializers.ModelSerializer):
         fields = ["id", "file_name", "file_type"]
 
 
-class DoubleCountingAgreementFullSerializerWithForeignKeys(serializers.ModelSerializer):
+class DoubleCountingApplicationFullSerializerWithForeignKeys(serializers.ModelSerializer):
     production_site = serializers.SlugRelatedField(read_only=True, slug_field="name")
     producer_user = serializers.SlugRelatedField(read_only=True, slug_field="email")
     dgec_validator = serializers.SlugRelatedField(read_only=True, slug_field="name")
@@ -150,7 +150,7 @@ class DoubleCountingAgreementFullSerializerWithForeignKeys(serializers.ModelSeri
         return [a for a in agg]
 
     class Meta:
-        model = DoubleCountingAgreement
+        model = DoubleCountingApplication
         fields = [
             "id",
             "creation_date",
@@ -176,15 +176,15 @@ class DoubleCountingAgreementFullSerializerWithForeignKeys(serializers.ModelSeri
         ]
 
 
-class DoubleCountingAgreementPartialSerializer(serializers.ModelSerializer):
+class DoubleCountingApplicationPartialSerializer(serializers.ModelSerializer):
     production_site = serializers.SlugRelatedField(read_only=True, slug_field="name")
 
     class Meta:
-        model = DoubleCountingAgreement
+        model = DoubleCountingApplication
         fields = ["id", "creation_date", "producer", "production_site", "period_start", "period_end", "status"]
 
 
-class DoubleCountingAgreementPartialSerializerWithForeignKeys(serializers.ModelSerializer):
+class DoubleCountingApplicationPartialSerializerWithForeignKeys(serializers.ModelSerializer):
     production_site = serializers.SlugRelatedField(read_only=True, slug_field="name")
     producer = EntitySerializer(read_only=True)
     production = DoubleCountingProductionSerializer(many=True, read_only=True)
@@ -202,7 +202,7 @@ class DoubleCountingAgreementPartialSerializerWithForeignKeys(serializers.ModelS
         return [a for a in agg]
 
     class Meta:
-        model = DoubleCountingAgreement
+        model = DoubleCountingApplication
         fields = [
             "id",
             "creation_date",

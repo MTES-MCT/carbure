@@ -1,12 +1,12 @@
 import { Fragment, useState } from "react"
 import { useTranslation, Trans } from "react-i18next"
-import { DoubleCounting } from "../types"
+import { DoubleCountingApplication } from "../types"
 import { ActionBar, LoaderOverlay } from "common/components/scaffold"
 import Tabs from "common/components/tabs"
 import Table, { Column, Cell } from "common/components/table"
 import { Alert } from "common/components/alert"
 import { AlertCircle, Upload } from "common/components/icons"
-import { DoubleCountingDialog } from "./agreement-details"
+import { DoubleCountingDialog } from "./application-details"
 import { usePortal } from "common/components/portal"
 import { Entity } from "carbure/types"
 import DoubleCountingStatus from "./dc-status"
@@ -17,22 +17,22 @@ import Button from "common/components/button"
 import DoubleCountingFilesCheckerDialog from "./files-checker/files-checker-dialog"
 import FilesCheckerUploadButton from "./files-checker/upload-button"
 
-type AgreementListProps = {
+type ApplicationListProps = {
   entity: Entity
   year: number
 }
 
-const AgreementList = ({ entity, year }: AgreementListProps) => {
+const ApplicationList = ({ entity, year }: ApplicationListProps) => {
   const { t } = useTranslation()
   const [tab, setTab] = useState("pending")
   const portal = usePortal()
 
-  const agreements = useQuery(api.getAllDoubleCountingAgreements, {
-    key: "dc-agreements",
+  const applications = useQuery(api.getAllDoubleCountingApplications, {
+    key: "dc-applications",
     params: [year],
   })
 
-  const columns: Column<DoubleCounting>[] = [
+  const columns: Column<DoubleCountingApplication>[] = [
     {
       header: t("Statut"),
       cell: (a) => <DoubleCountingStatus status={a.status} />,
@@ -57,19 +57,19 @@ const AgreementList = ({ entity, year }: AgreementListProps) => {
     },
   ]
 
-  const agreementsData = agreements.result?.data.data
-  if (agreementsData === undefined) return <LoaderOverlay />
+  const applicationsData = applications.result?.data.data
+  if (applicationsData === undefined) return <LoaderOverlay />
 
-  const { pending, progress, accepted, expired, rejected } = agreementsData
+  const { pending, progress, accepted, expired, rejected } = applicationsData
 
   const allPendingCount = pending.count + progress.count
-  const allPending = progress.agreements.concat(pending.agreements)
+  const allPending = progress.applications.concat(pending.applications)
 
-  function showAgreementDialog(agreement: DoubleCounting) {
+  function showApplicationDialog(application: DoubleCountingApplication) {
     portal((close) => (
       <DoubleCountingDialog
         entity={entity}
-        agreementID={agreement.id}
+        applicationID={application.id}
         onClose={close}
       />
     ))
@@ -97,7 +97,7 @@ const AgreementList = ({ entity, year }: AgreementListProps) => {
             <Alert
               variant="warning"
               icon={AlertCircle}
-              loading={agreements.loading}
+              loading={applications.loading}
             >
               <Trans>Aucun dossier en attente trouvé</Trans>
             </Alert>
@@ -105,10 +105,10 @@ const AgreementList = ({ entity, year }: AgreementListProps) => {
 
           {allPendingCount > 0 && (
             <Table
-              loading={agreements.loading}
+              loading={applications.loading}
               columns={columns}
               rows={allPending}
-              onAction={showAgreementDialog}
+              onAction={showApplicationDialog}
             />
           )}
         </Fragment>
@@ -120,7 +120,7 @@ const AgreementList = ({ entity, year }: AgreementListProps) => {
             <Alert
               variant="warning"
               icon={AlertCircle}
-              loading={agreements.loading}
+              loading={applications.loading}
             >
               <Trans>Aucun dossier accepté trouvé</Trans>
             </Alert>
@@ -128,10 +128,10 @@ const AgreementList = ({ entity, year }: AgreementListProps) => {
 
           {accepted.count > 0 && (
             <Table
-              loading={agreements.loading}
+              loading={applications.loading}
               columns={columns}
-              rows={accepted.agreements}
-              onAction={showAgreementDialog}
+              rows={accepted.applications}
+              onAction={showApplicationDialog}
             />
           )}
         </Fragment>
@@ -143,7 +143,7 @@ const AgreementList = ({ entity, year }: AgreementListProps) => {
             <Alert
               variant="warning"
               icon={AlertCircle}
-              loading={agreements.loading}
+              loading={applications.loading}
             >
               <Trans>Aucun dossier expiré trouvé</Trans>
             </Alert>
@@ -151,10 +151,10 @@ const AgreementList = ({ entity, year }: AgreementListProps) => {
 
           {expired.count > 0 && (
             <Table
-              loading={agreements.loading}
+              loading={applications.loading}
               columns={columns}
-              rows={expired.agreements}
-              onAction={showAgreementDialog}
+              rows={expired.applications}
+              onAction={showApplicationDialog}
             />
           )}
         </Fragment>
@@ -166,7 +166,7 @@ const AgreementList = ({ entity, year }: AgreementListProps) => {
             <Alert
               variant="warning"
               icon={AlertCircle}
-              loading={agreements.loading}
+              loading={applications.loading}
             >
               <Trans>Aucun dossier refusé trouvé</Trans>
             </Alert>
@@ -174,10 +174,10 @@ const AgreementList = ({ entity, year }: AgreementListProps) => {
 
           {rejected.count > 0 && (
             <Table
-              loading={agreements.loading}
+              loading={applications.loading}
               columns={columns}
-              rows={rejected.agreements}
-              onAction={showAgreementDialog}
+              rows={rejected.applications}
+              onAction={showApplicationDialog}
             />
           )}
         </Fragment>
@@ -186,4 +186,4 @@ const AgreementList = ({ entity, year }: AgreementListProps) => {
   )
 }
 
-export default AgreementList
+export default ApplicationList

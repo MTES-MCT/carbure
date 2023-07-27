@@ -2,11 +2,11 @@
 # allows a manual user creation by an admin, without setting a password
 
 from django.contrib import admin
-from .models import DoubleCountingAgreement, DoubleCountingDocFile, DoubleCountingSourcing, DoubleCountingProduction
+from .models import DoubleCountingApplication, DoubleCountingDocFile, DoubleCountingSourcing, DoubleCountingProduction
 
 
-@admin.register(DoubleCountingAgreement)
-class DoubleCountingAgreementAdmin(admin.ModelAdmin):
+@admin.register(DoubleCountingApplication)
+class DoubleCountingApplicationAdmin(admin.ModelAdmin):
     list_display = (
         "producer",
         "production_site",

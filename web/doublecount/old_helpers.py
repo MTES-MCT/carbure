@@ -1,9 +1,9 @@
 import datetime
 import openpyxl
 import pandas as pd
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from core.models import Pays, Biocarburant, MatierePremiere
-from doublecount.models import DoubleCountingAgreement, DoubleCountingSourcing, DoubleCountingProduction
+from doublecount.models import DoubleCountingSourcing, DoubleCountingProduction
 from core.common import get_sheet_data
 
 today = datetime.date.today()
@@ -17,14 +17,14 @@ def load_dc_file(filepath):
     sourcing_column_names = sourcing_data[0]
     sourcing_data = sourcing_data[1:]
     sourcing_df = pd.DataFrame(sourcing_data, columns=sourcing_column_names)
-    sourcing_df.fillna('', inplace=True)
+    sourcing_df.fillna("", inplace=True)
 
     production_sheet = wb["production"]
     production_data = get_sheet_data(production_sheet, convert_float=True)
     production_column_names = production_data[0]
     production_data = production_data[1:]
     production_df = pd.DataFrame(production_data, columns=production_column_names)
-    production_df.fillna('', inplace=True)
+    production_df.fillna("", inplace=True)
 
     return sourcing_df, production_df
 
@@ -69,4 +69,4 @@ def load_dc_production_data(dca, production_data):
 
 
 def load_dc_recognition_file(entity, psite_id, user, filepath):
-    return JsonResponse({'status': 'error', 'message': 'not implemented'}, status=400)
+    return JsonResponse({"status": "error", "message": "not implemented"}, status=400)

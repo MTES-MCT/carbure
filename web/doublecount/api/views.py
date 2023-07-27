@@ -13,6 +13,7 @@ from django.db.models.query_utils import Q
 
 import xlsxwriter
 from django.http import JsonResponse, HttpResponse
+from admin.api.double_counting.application.add import send_dca_confirmation_email
 from core.decorators import check_rights, is_admin, is_admin_or_external_admin
 import pytz
 import traceback
@@ -20,15 +21,15 @@ import pandas as pd
 
 from producers.models import ProductionSite
 from doublecount.models import (
-    DoubleCountingAgreement,
+    DoubleCountingApplication,
     DoubleCountingDocFile,
     DoubleCountingSourcing,
     DoubleCountingProduction,
 )
-from doublecount.serializers import DoubleCountingAgreementFullSerializer, DoubleCountingAgreementPartialSerializer
+from doublecount.serializers import DoubleCountingApplicationFullSerializer, DoubleCountingApplicationPartialSerializer
 from doublecount.serializers import (
-    DoubleCountingAgreementFullSerializerWithForeignKeys,
-    DoubleCountingAgreementPartialSerializerWithForeignKeys,
+    DoubleCountingApplicationFullSerializerWithForeignKeys,
+    DoubleCountingApplicationPartialSerializerWithForeignKeys,
 )
 from doublecount.helpers import load_dc_sourcing_data as new_load_dc_sourcing, load_dc_production_data as new_load_dc_prod
 from core.models import Entity, UserRights, MatierePremiere, Pays, Biocarburant, CarbureLot
@@ -50,40 +51,40 @@ from doublecount.old_helpers import load_dc_file, load_dc_sourcing_data, load_dc
 
 
 @check_rights("entity_id")
-def get_agreements(request, *args, **kwargs):
+def get_applications(request, *args, **kwargs):
     entity = kwargs["context"]["entity"]
-    agreements = DoubleCountingAgreement.objects.filter(producer=entity)
-    serializer = DoubleCountingAgreementPartialSerializer(agreements, many=True)
+    applications = DoubleCountingApplication.objects.filter(producer=entity)
+    serializer = DoubleCountingApplicationPartialSerializer(applications, many=True)
     return JsonResponse({"status": "success", "data": serializer.data})
 
 
 @is_admin_or_external_admin
-def get_agreements_snapshot_admin(request):
-    years1 = [y["period_start__year"] for y in DoubleCountingAgreement.objects.values("period_start__year").distinct()]
-    years2 = [y["period_end__year"] for y in DoubleCountingAgreement.objects.values("period_end__year").distinct()]
+def get_applications_snapshot_admin(request):
+    years1 = [y["period_start__year"] for y in DoubleCountingApplication.objects.values("period_start__year").distinct()]
+    years2 = [y["period_end__year"] for y in DoubleCountingApplication.objects.values("period_end__year").distinct()]
     years = list(set(years1 + years2))
     data = {"years": years}
     return JsonResponse({"status": "success", "data": data})
 
 
 @check_rights("entity_id")
-def get_agreement(request, *args, **kwargs):
+def get_application(request, *args, **kwargs):
     entity = kwargs["context"]["entity"]
-    agreement_id = request.GET.get("dca_id", None)
+    application_id = request.GET.get("dca_id", None)
     export = request.GET.get("export", False)
 
-    if not agreement_id:
+    if not application_id:
         return JsonResponse({"status": "error", "message": "Missing dca_id"}, status=400)
     try:
-        agreement = DoubleCountingAgreement.objects.get(producer=entity, id=agreement_id)
+        application = DoubleCountingApplication.objects.get(producer=entity, id=application_id)
     except:
-        return JsonResponse({"status": "error", "message": "Could not find DCA agreement"}, status=400)
-    serializer = DoubleCountingAgreementPartialSerializerWithForeignKeys(agreement)
+        return JsonResponse({"status": "error", "message": "Could not find DCA application"}, status=400)
+    serializer = DoubleCountingApplicationPartialSerializerWithForeignKeys(application)
 
     if not export:
         return JsonResponse({"status": "success", "data": serializer.data})
     else:
-        file_location = export_dca(agreement)
+        file_location = export_dca(application)
         with open(file_location, "rb") as excel:
             data = excel.read()
             ctype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -93,21 +94,21 @@ def get_agreement(request, *args, **kwargs):
 
 
 @is_admin_or_external_admin
-def get_agreement_admin(request, *args, **kwargs):
-    agreement_id = request.GET.get("dca_id", None)
+def get_application_admin(request, *args, **kwargs):
+    application_id = request.GET.get("dca_id", None)
     export = request.GET.get("export", False)
 
-    if not agreement_id:
+    if not application_id:
         return JsonResponse({"status": "error", "message": "Missing dca_id"}, status=400)
     try:
-        agreement = DoubleCountingAgreement.objects.get(id=agreement_id)
+        application = DoubleCountingApplication.objects.get(id=application_id)
     except:
-        return JsonResponse({"status": "error", "message": "Could not find DCA agreement"}, status=400)
-    serializer = DoubleCountingAgreementFullSerializerWithForeignKeys(agreement)
+        return JsonResponse({"status": "error", "message": "Could not find DCA application"}, status=400)
+    serializer = DoubleCountingApplicationFullSerializerWithForeignKeys(application)
     if not export:
         return JsonResponse({"status": "success", "data": serializer.data})
     else:
-        file_location = export_dca(agreement)
+        file_location = export_dca(application)
         with open(file_location, "rb") as excel:
             data = excel.read()
             ctype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -117,7 +118,7 @@ def get_agreement_admin(request, *args, **kwargs):
 
 
 def send_dca_status_email(dca):
-    if dca.status == DoubleCountingAgreement.ACCEPTED:
+    if dca.status == DoubleCountingApplication.ACCEPTED:
         text_message = """
         Bonjour,
 
@@ -128,7 +129,7 @@ def send_dca_status_email(dca):
         """ % (
             dca.production_site.name
         )
-    elif dca.status == DoubleCountingAgreement.REJECTED:
+    elif dca.status == DoubleCountingApplication.REJECTED:
         text_message = """
         Bonjour,
 
@@ -195,7 +196,7 @@ def upload_file(request, *args, **kwargs):
     start = datetime.date(end_year - 1, 1, 1)
     end = datetime.date(end_year, 12, 31)
 
-    dca, created = DoubleCountingAgreement.objects.get_or_create(
+    dca, created = DoubleCountingApplication.objects.get_or_create(
         producer=entity,
         production_site_id=production_site_id,
         period_start=start,
@@ -226,7 +227,7 @@ def upload_documentation(request, *args, **kwargs):
     if not dca_id:
         return JsonResponse({"status": "error", "message": "Missing dca_id"}, status=400)
     try:
-        dca = DoubleCountingAgreement.objects.get(producer=entity, id=dca_id)
+        dca = DoubleCountingApplication.objects.get(producer=entity, id=dca_id)
     except:
         return JsonResponse({"status": "forbidden", "message": "Forbidden"}, status=403)
 
@@ -264,7 +265,7 @@ def download_documentation(request, *args, **kwargs):
     if not dca_id:
         return JsonResponse({"status": "error", "message": "Missing dca_id"}, status=400)
     try:
-        dca = DoubleCountingAgreement.objects.get(producer=entity, id=dca_id)
+        dca = DoubleCountingApplication.objects.get(producer=entity, id=dca_id)
     except:
         return JsonResponse({"status": "forbidden", "message": "Forbidden"}, status=403)
 
@@ -304,7 +305,7 @@ def download_admin_decision(request, *args, **kwargs):
     if not dca_id:
         return JsonResponse({"status": "error", "message": "Missing dca_id"}, status=400)
     try:
-        dca = DoubleCountingAgreement.objects.get(producer=entity, id=dca_id)
+        dca = DoubleCountingApplication.objects.get(producer=entity, id=dca_id)
     except:
         return JsonResponse({"status": "forbidden", "message": "Forbidden"}, status=403)
 
@@ -342,7 +343,7 @@ def admin_download_admin_decision(request):
     if not dca_id:
         return JsonResponse({"status": "error", "message": "Missing dca_id"}, status=400)
     try:
-        dca = DoubleCountingAgreement.objects.get(id=dca_id)
+        dca = DoubleCountingApplication.objects.get(id=dca_id)
     except:
         return JsonResponse({"status": "forbidden", "message": "Forbidden"}, status=403)
 
@@ -382,7 +383,7 @@ def admin_download_documentation(request, *args, **kwargs):
     if not dca_id:
         return JsonResponse({"status": "error", "message": "Missing dca_id"}, status=400)
     try:
-        dca = DoubleCountingAgreement.objects.get(id=dca_id)
+        dca = DoubleCountingApplication.objects.get(id=dca_id)
     except:
         return JsonResponse({"status": "forbidden", "message": "Forbidden"}, status=403)
 
@@ -507,7 +508,7 @@ def upload_decision_admin(request):
     if not dca_id:
         return JsonResponse({"status": "error", "message": "Missing dca_id"}, status=400)
     try:
-        dca = DoubleCountingAgreement.objects.get(id=dca_id)
+        dca = DoubleCountingApplication.objects.get(id=dca_id)
     except:
         return JsonResponse({"status": "error", "message": "Could not find DCA"}, status=400)
 
@@ -627,7 +628,7 @@ def get_production_site_quotas(request, *args, **kwargs):
     feedstocks = {m.id: m for m in MatierePremiere.objects.filter(is_double_compte=True)}
 
     try:
-        dca = DoubleCountingAgreement.objects.get(id=dca_id, producer=entity)
+        dca = DoubleCountingApplication.objects.get(id=dca_id, producer=entity)
     except:
         return JsonResponse({"status": "error", "message": "Not authorised"}, status=403)
 
@@ -671,7 +672,7 @@ def approve_dca(request, *args, **kwargs):
         return JsonResponse({"status": "error", "message": "Not authorised"}, status=403)
 
     try:
-        dca = DoubleCountingAgreement.objects.get(id=dca_id)
+        dca = DoubleCountingApplication.objects.get(id=dca_id)
     except:
         return JsonResponse({"status": "error", "message": "Could not find DCA"}, status=400)
 
@@ -681,13 +682,13 @@ def approve_dca(request, *args, **kwargs):
         return JsonResponse({"status": "error", "message": "Some quotas have not been approved"}, status=400)
 
     if entity.name == "DGPE":
-        if not dca.status == DoubleCountingAgreement.INPROGRESS:
+        if not dca.status == DoubleCountingApplication.INPROGRESS:
             return JsonResponse({"status": "error", "message": "La DGEC doit valider le dossier en premier"}, status=400)
         dca.dgpe_validated = True
         dca.dgpe_validator = request.user
         dca.dgpe_validated_dt = pytz.utc.localize(datetime.datetime.now())
     elif entity.name == "DGDDI":
-        if not dca.status == DoubleCountingAgreement.INPROGRESS:
+        if not dca.status == DoubleCountingApplication.INPROGRESS:
             return JsonResponse({"status": "error", "message": "La DGEC doit valider le dossier en premier"}, status=400)
         dca.dgddi_validated = True
         dca.dgddi_validator = request.user
@@ -696,12 +697,12 @@ def approve_dca(request, *args, **kwargs):
         dca.dgec_validated = True
         dca.dgec_validator = request.user
         dca.dgec_validated_dt = pytz.utc.localize(datetime.datetime.now())
-        dca.status = DoubleCountingAgreement.INPROGRESS
+        dca.status = DoubleCountingApplication.INPROGRESS
     else:
         return JsonResponse({"status": "error", "message": "Unknown entity"}, status=400)
     dca.save()
     if dca.dgpe_validated and dca.dgddi_validated and dca.dgec_validated:
-        dca.status = DoubleCountingAgreement.ACCEPTED
+        dca.status = DoubleCountingApplication.ACCEPTED
         dca.save()  # save before sending email, just in case
         send_dca_status_email(dca)
     return JsonResponse({"status": "success"})
@@ -719,7 +720,7 @@ def reject_dca(request, *args, **kwargs):
         return JsonResponse({"status": "error", "message": "Not authorised"}, status=403)
 
     try:
-        dca = DoubleCountingAgreement.objects.get(id=dca_id)
+        dca = DoubleCountingApplication.objects.get(id=dca_id)
     except:
         return JsonResponse({"status": "error", "message": "Could not find DCA"}, status=400)
 
@@ -737,7 +738,7 @@ def reject_dca(request, *args, **kwargs):
         dca.dgec_validated_dt = pytz.utc.localize(datetime.datetime.now())
     else:
         return JsonResponse({"status": "error", "message": "Unknown entity"}, status=400)
-    dca.status = DoubleCountingAgreement.REJECTED
+    dca.status = DoubleCountingApplication.REJECTED
     send_dca_status_email(dca)
     dca.save()
     return JsonResponse({"status": "success"})
@@ -754,10 +755,10 @@ def remove_sourcing(request, *args, **kwargs):
 
     try:
         to_delete = DoubleCountingSourcing.objects.get(dca__producer=entity, id=dca_sourcing_id)
-        if to_delete.dca.status == DoubleCountingAgreement.PENDING:
+        if to_delete.dca.status == DoubleCountingApplication.PENDING:
             to_delete.delete()
         else:
-            return JsonResponse({"status": "forbidden", "message": "Agreement cannot be updated"}, status=403)
+            return JsonResponse({"status": "forbidden", "message": "Application cannot be updated"}, status=403)
     except:
         return JsonResponse({"status": "error", "message": "Could not find Sourcing Line"}, status=400)
     return JsonResponse({"status": "success"})
@@ -774,10 +775,10 @@ def remove_production(request, *args, **kwargs):
 
     try:
         to_delete = DoubleCountingProduction.objects.get(dca__producer=entity, id=dca_production_id)
-        if to_delete.dca.status == DoubleCountingAgreement.PENDING:
+        if to_delete.dca.status == DoubleCountingApplication.PENDING:
             to_delete.delete()
         else:
-            return JsonResponse({"status": "forbidden", "message": "Agreement cannot be updated"}, status=403)
+            return JsonResponse({"status": "forbidden", "message": "Application cannot be updated"}, status=403)
     except:
         return JsonResponse({"status": "error", "message": "Could not find Production Line"}, status=400)
     return JsonResponse({"status": "success"})
@@ -811,12 +812,12 @@ def add_sourcing(request, *args, **kwargs):
         return JsonResponse({"status": "error", "message": "Missing transit_country_code"}, status=400)
 
     try:
-        dca = DoubleCountingAgreement.objects.get(producer=entity, id=dca_id, status=DoubleCountingAgreement.PENDING)
+        dca = DoubleCountingApplication.objects.get(producer=entity, id=dca_id, status=DoubleCountingApplication.PENDING)
     except:
         return JsonResponse({"status": "forbidden", "message": "Could not find DCA"}, status=403)
 
-    if dca.status != DoubleCountingAgreement.PENDING:
-        return JsonResponse({"status": "forbidden", "message": "Agreement cannot be updated"}, status=403)
+    if dca.status != DoubleCountingApplication.PENDING:
+        return JsonResponse({"status": "forbidden", "message": "application cannot be updated"}, status=403)
 
     dcs = DoubleCountingSourcing()
     dcs.dca = dca
@@ -876,12 +877,12 @@ def add_production(request, *args, **kwargs):
         return JsonResponse({"status": "error", "message": "Missing requested_quota"}, status=400)
 
     try:
-        dca = DoubleCountingAgreement.objects.get(producer=entity, id=dca_id, status=DoubleCountingAgreement.PENDING)
+        dca = DoubleCountingApplication.objects.get(producer=entity, id=dca_id, status=DoubleCountingApplication.PENDING)
     except:
         return JsonResponse({"status": "forbidden", "message": "Could not find DCA"}, status=403)
 
-    if dca.status != DoubleCountingAgreement.PENDING:
-        return JsonResponse({"status": "forbidden", "message": "Agreement cannot be updated"}, status=403)
+    if dca.status != DoubleCountingApplication.PENDING:
+        return JsonResponse({"status": "forbidden", "message": "application cannot be updated"}, status=403)
 
     dcp = DoubleCountingProduction()
     dcp.dca = dca
@@ -923,8 +924,8 @@ def update_sourcing(request, *args, **kwargs):
         to_update = DoubleCountingSourcing.objects.get(dca__producer=entity, id=dca_sourcing_id)
     except:
         return JsonResponse({"status": "error", "message": "Could not find Sourcing Line"}, status=400)
-    if to_update.dca.status != DoubleCountingAgreement.PENDING:
-        return JsonResponse({"status": "forbidden", "message": "Agreement cannot be updated"}, status=403)
+    if to_update.dca.status != DoubleCountingApplication.PENDING:
+        return JsonResponse({"status": "forbidden", "message": "application cannot be updated"}, status=403)
 
     to_update.metric_tonnes = metric_tonnes
     try:
@@ -950,8 +951,8 @@ def update_production(request, *args, **kwargs):
         to_update = DoubleCountingProduction.objects.get(dca__producer=entity, id=dca_production_id)
     except:
         return JsonResponse({"status": "error", "message": "Could not find Production Line"}, status=400)
-    if to_update.dca.status != DoubleCountingAgreement.PENDING:
-        return JsonResponse({"status": "forbidden", "message": "Agreement cannot be updated"}, status=403)
+    if to_update.dca.status != DoubleCountingApplication.PENDING:
+        return JsonResponse({"status": "forbidden", "message": "application cannot be updated"}, status=403)
     if max_production_capacity:
         to_update.max_production_capacity = max_production_capacity
     if estimated_production:

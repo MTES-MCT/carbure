@@ -1,17 +1,15 @@
 from django.core.mail import EmailMessage
 from django.db.models import Q
 
-from math import prod
 import traceback
 import os
 from carbure import settings
 from core.decorators import check_admin_rights
 from doublecount.parser.dc_parser import parse_dc_excel
-from datetime import datetime
 
 from producers.models import ProductionSite
 from doublecount.models import (
-    DoubleCountingAgreement,
+    DoubleCountingApplication,
     DoubleCountingSourcing,
     DoubleCountingProduction,
 )
@@ -71,15 +69,15 @@ def add_application(request, *args, **kwargs):
 
     start, end, _ = load_dc_period(info["start_year"])
 
-    # check if agreement not rejected exists
-    if DoubleCountingAgreement.objects.filter(
+    # check if application not rejected exists
+    if DoubleCountingApplication.objects.filter(
         Q(producer=producer)
         & Q(period_start__year=start.year)
-        & ~Q(status__in=[DoubleCountingAgreement.PENDING, DoubleCountingAgreement.REJECTED]),
+        & ~Q(status__in=[DoubleCountingApplication.PENDING, DoubleCountingApplication.REJECTED]),
     ).exists():
         return ErrorResponse(400, DoubleCountingAddError.APPLICATION_ALREADY_EXISTS)
 
-    dca, _ = DoubleCountingAgreement.objects.get_or_create(
+    dca, _ = DoubleCountingApplication.objects.get_or_create(
         producer=producer,
         production_site_id=production_site_id,
         period_start=start,
@@ -105,7 +103,7 @@ def add_application(request, *args, **kwargs):
     return SuccessResponse()
 
 
-# def agreement_is_expired (dca) :
+# def application_is_expired (dca) :
 #     current_year = datetime.now().year
 #     return dca.period_end < current_year
 

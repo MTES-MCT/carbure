@@ -8,7 +8,7 @@ const FilesCheckerUploadButton = ({ label }: { label?: string }) => {
   const portal = usePortal()
   const { t } = useTranslation()
 
-  const showAgreementsChecker = () => {
+  const showApplicationsChecker = () => {
     portal((close) => <DoubleCountingFilesCheckerDialog onClose={close} />)
   }
 
@@ -18,7 +18,7 @@ const FilesCheckerUploadButton = ({ label }: { label?: string }) => {
       variant="secondary"
       icon={Upload}
       label={label || t("Ajouter des dossiers")}
-      action={showAgreementsChecker}
+      action={showApplicationsChecker}
     />
   )
 }

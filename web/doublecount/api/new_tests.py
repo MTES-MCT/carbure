@@ -11,7 +11,7 @@ from django.contrib.auth import get_user_model
 from core.models import Entity, Pays, Biocarburant, MatierePremiere, Depot, UserRights
 from producers.models import ProductionSite
 from doublecount.models import (
-    DoubleCountingAgreement,
+    DoubleCountingApplication,
     DoubleCountingDocFile,
     DoubleCountingSourcing,
     DoubleCountingProduction,
@@ -50,9 +50,7 @@ class DCAAPITest(TransactionTestCase):
             "manager_phone": "",
             "manager_email": "",
         }
-        self.production_site, _ = ProductionSite.objects.update_or_create(
-            producer=self.producer, name="PSITE1", defaults=d
-        )
+        self.production_site, _ = ProductionSite.objects.update_or_create(producer=self.producer, name="PSITE1", defaults=d)
         Depot.objects.update_or_create(name="Depot Test", depot_id="001", country=france)
 
         loggedin = self.client.login(username=self.user_email, password=self.user_password)
@@ -82,12 +80,12 @@ class DCAAPITest(TransactionTestCase):
             print("Failed to upload %s" % (filepath))
         self.assertEqual(response.status_code, 200)
         # check if it matches expectations
-        dca = DoubleCountingAgreement.objects.get(producer=self.producer, production_site=self.production_site)
+        dca = DoubleCountingApplication.objects.get(producer=self.producer, production_site=self.production_site)
         self.assertEqual(8, DoubleCountingSourcing.objects.filter(dca=dca).count())
         self.assertEqual(4, DoubleCountingProduction.objects.filter(dca=dca).count())
 
     def test_dca_upload_document(self):
-        dca, created = DoubleCountingAgreement.objects.get_or_create(
+        dca, created = DoubleCountingApplication.objects.get_or_create(
             producer=self.producer,
             production_site=self.production_site,
             period_start=datetime.date(2022, 1, 1),
