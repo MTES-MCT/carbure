@@ -9,7 +9,7 @@ from certificates.models import DoubleCountingRegistration
 from core.models import Pays, Biocarburant, MatierePremiere
 from doublecount.models import DoubleCountingSourcing, DoubleCountingProduction
 from doublecount.dc_sanity_checks import check_production_row, check_production_row_integrity, check_sourcing_row
-from doublecount.models import DoubleCountingAgreement
+from doublecount.models import DoubleCountingApplication
 from doublecount.parser.dc_parser import (
     ProductionForecastRow,
     ProductionMaxRow,
@@ -27,7 +27,7 @@ from doublecount.serializers import DoubleCountingProductionSerializer, DoubleCo
 today = datetime.date.today()
 
 
-def load_dc_sourcing_data(dca: DoubleCountingAgreement, sourcing_rows: List[SourcingRow]):
+def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[SourcingRow]):
     # prepare error list
     sourcing_data = []
     sourcing_errors = []
@@ -75,7 +75,7 @@ def load_dc_sourcing_data(dca: DoubleCountingAgreement, sourcing_rows: List[Sour
 
 
 def load_dc_production_data(
-    dca: DoubleCountingAgreement,
+    dca: DoubleCountingApplication,
     production_max_rows: List[ProductionMaxRow],
     production_forecast_rows: List[ProductionForecastRow],
     requested_quota_rows: List[RequestedQuotaRow],
@@ -215,7 +215,7 @@ def check_dc_file(file):
         start, end, global_errors = load_dc_period(info["start_year"])
 
         # create temporary agreement to hold all the data that will be parsed
-        dca = DoubleCountingAgreement(
+        dca = DoubleCountingApplication(
             period_start=start,
             period_end=end,
         )

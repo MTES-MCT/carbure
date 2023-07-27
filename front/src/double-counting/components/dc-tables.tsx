@@ -204,10 +204,10 @@ export const ProductionTable = ({
 }
 
 type StatusTableProps = {
-  agreement: DoubleCountingDetails | undefined
+  application: DoubleCountingDetails | undefined
 }
 
-export const StatusTable = ({ agreement }: StatusTableProps) => {
+export const StatusTable = ({ application: application }: StatusTableProps) => {
   const { t } = useTranslation()
 
   const statusColumns: Column<ValidationStatus>[] = [
@@ -241,21 +241,21 @@ export const StatusTable = ({ agreement }: StatusTableProps) => {
 
   const statusRows: ValidationStatus[] = [
     {
-      approved: agreement?.dgec_validated ?? false,
-      date: agreement?.dgec_validated_dt ?? "",
-      user: agreement?.dgec_validator ?? "",
+      approved: application?.dgec_validated ?? false,
+      date: application?.dgec_validated_dt ?? "",
+      user: application?.dgec_validator ?? "",
       entity: Admin.DGEC,
     },
     {
-      approved: agreement?.dgddi_validated ?? false,
-      date: agreement?.dgddi_validated_dt ?? "",
-      user: agreement?.dgddi_validator ?? "",
+      approved: application?.dgddi_validated ?? false,
+      date: application?.dgddi_validated_dt ?? "",
+      user: application?.dgddi_validator ?? "",
       entity: Admin.DGDDI,
     },
     {
-      approved: agreement?.dgpe_validated ?? false,
-      date: agreement?.dgpe_validated_dt ?? "",
-      user: agreement?.dgpe_validator ?? "",
+      approved: application?.dgpe_validated ?? false,
+      date: application?.dgpe_validated_dt ?? "",
+      user: application?.dgpe_validator ?? "",
       entity: Admin.DGPE,
     },
   ]

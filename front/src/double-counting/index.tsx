@@ -5,7 +5,7 @@ import useEntity from "carbure/hooks/entity"
 import { useQuery } from "common/hooks/async"
 import { Main } from "common/components/scaffold"
 import Select from "common/components/select"
-import AgreementList from "./components/agreement-list"
+import ApplicationList from "./components/application-list"
 import QuotasList from "./components/dc-quotas"
 import * as api from "./api"
 import useTitle from "common/hooks/title"
@@ -56,7 +56,7 @@ const DoubleCounting = () => {
             <Tabs
               variant="main"
               tabs={[
-                { key: "agreements", path: "agreements", label: t("Dossiers") },
+                { key: "applications", path: "applications", label: t("Dossiers") },
                 { key: "quotas", path: "quotas", label: t("Agréments") },
               ]}
             />
@@ -65,15 +65,15 @@ const DoubleCounting = () => {
       )}
       <Routes>
         <Route
-          path="agreements"
-          element={<AgreementList entity={entity} year={year} />}
+          path="applications"
+          element={<ApplicationList entity={entity} year={year} />}
         />
         <Route path="quotas" element={<QuotasList year={year} />} />
         <Route
           path="files-checker/*"
           element={<DoubleCountingFilesChecker />}
         />
-        <Route path="*" element={<Navigate to="agreements" />} />
+        <Route path="*" element={<Navigate to="applications" />} />
       </Routes>
     </Main>
   )
