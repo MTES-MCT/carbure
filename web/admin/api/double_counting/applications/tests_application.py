@@ -1,15 +1,15 @@
-# test with : python web/manage.py test admin.api.double_counting.applications.tests_application.AdminDoubleCountApplicationTest.test_valid_file --keepdb
+# test with : python web/manage.py test admin.api.double_counting.applications.tests_application.AdminDoubleCountApplicationTest.test_uploaded_file --keepdb
 import os
 from admin.api.double_counting.applications.add import DoubleCountingAddError
 
 from core.tests_utils import setup_current_user
-from core.models import Entity, UserRights
+from core.models import Entity, Pays, UserRights
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from doublecount.models import DoubleCountingApplication
+from doublecount.models import DoubleCountingApplication, DoubleCountingDocFile
 from producers.models import ProductionSite
 
 
@@ -40,6 +40,11 @@ class AdminDoubleCountApplicationTest(TestCase):
 
         self.production_site = ProductionSite.objects.first()
         self.production_site.address = "1 rue de la Paix"
+
+        france, _ = Pays.objects.update_or_create(code_pays="FR", name="France")
+        self.production_site.country = france
+        self.production_site.city = "Paris"
+        self.production_site.postal_code = "75000"
         self.production_site.save()
         self.requested_start_year = 2023
 
@@ -62,6 +67,18 @@ class AdminDoubleCountApplicationTest(TestCase):
         )
 
         return response
+
+    def test_uploaded_file(self):
+        self.production_site.save()
+        self.add_file("dc_agreement_application_valid.xlsx")
+
+        application = DoubleCountingApplication.objects.get(
+            producer=self.production_site.producer, period_start__year=self.requested_start_year
+        )
+
+        docFile = DoubleCountingDocFile.objects.filter(agreement_id=application.agreement_id).first()
+        self.assertEqual(docFile.file_name, "dca.xlsx")
+        self.assertEqual(docFile.agreement_id, application.agreement_id)
 
     def test_production_site_address_mandatory(self):
         self.production_site.address = ""

@@ -93,8 +93,7 @@ export function addDoubleCountingApplication(
   producer_id: number,
   file: File
 ) {
-  console.log('producer_id:', producer_id)
-  console.log('production_site_id:', production_site_id)
+
   return api.post("/v5/admin/double-counting/applications/add", {
     entity_id,
     production_site_id,
