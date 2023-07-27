@@ -91,7 +91,8 @@ export function addDoubleCountingApplication(
   entity_id: number,
   production_site_id: number,
   producer_id: number,
-  file: File
+  file: File,
+  should_replace: boolean = false
 ) {
 
   return api.post("/v5/admin/double-counting/applications/add", {
@@ -99,5 +100,6 @@ export function addDoubleCountingApplication(
     production_site_id,
     producer_id,
     file,
+    should_replace
   })
 }

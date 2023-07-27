@@ -97,7 +97,7 @@ const DoubleCountingSettings = () => {
             },
             {
               header: t("Date de soumission"),
-              cell: (dc) => <Cell text={formatDate(dc.creation_date)} />,
+              cell: (dc) => <Cell text={formatDate(dc.created_at)} />,
             },
           ]}
         />

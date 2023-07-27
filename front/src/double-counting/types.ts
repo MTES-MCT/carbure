@@ -29,7 +29,7 @@ export interface DoubleCountingApplication {
   period_end: string
   status: DoubleCountingStatus
   producer_user: string
-  creation_date: string
+  created_at: string
 }
 
 export interface DoubleCountingSourcingAggregation {

@@ -48,7 +48,7 @@ class AdminDoubleCountApplicationTest(TestCase):
         self.production_site.save()
         self.requested_start_year = 2023
 
-    def add_file(self, file_name: str):
+    def add_file(self, file_name: str, additional_data=None):
         # upload template
         carbure_home = os.environ["CARBURE_HOME"]
         filepath = f"{carbure_home}/web/fixtures/csv/test_data/{file_name}"
@@ -56,29 +56,55 @@ class AdminDoubleCountApplicationTest(TestCase):
         data = fh.read()
         fh.close()
         f = SimpleUploadedFile("dca.xlsx", data)
-        response = self.client.post(
-            reverse("admin-double-counting-application-add"),
-            {
-                "entity_id": self.admin.id,
-                "producer_id": self.production_site.producer.id,
-                "production_site_id": self.production_site.id,
-                "file": f,
-            },
-        )
+
+        # Add data properties to the post data if provided
+        post_data = {
+            "entity_id": self.admin.id,
+            "producer_id": self.production_site.producer.id,
+            "production_site_id": self.production_site.id,
+            "file": f,
+        }
+        if additional_data is not None:
+            post_data.update(additional_data)
+
+        response = self.client.post(reverse("admin-double-counting-application-add"), post_data)
 
         return response
 
-    def test_uploaded_file(self):
-        self.production_site.save()
-        self.add_file("dc_agreement_application_valid.xlsx")
-
+    def test_add_application(self):
+        # 1 - test add file
+        response = self.add_file("dc_agreement_application_valid.xlsx")
+        self.assertEqual(response.status_code, 200)
         application = DoubleCountingApplication.objects.get(
             producer=self.production_site.producer, period_start__year=self.requested_start_year
         )
+        created_at = application.created_at
 
+        # 2 - test if file uploaded
         docFile = DoubleCountingDocFile.objects.filter(agreement_id=application.agreement_id).first()
         self.assertEqual(docFile.file_name, "dca.xlsx")
         self.assertEqual(docFile.agreement_id, application.agreement_id)
+
+        # 3 - test upload twice
+        response = self.add_file("dc_agreement_application_valid.xlsx")
+        self.assertEqual(response.status_code, 400)
+        error = response.json()["error"]
+        self.assertEqual(error, DoubleCountingAddError.APPLICATION_ALREADY_EXISTS)
+
+        # 4 - test should replace
+        response = self.add_file("dc_agreement_application_valid.xlsx", {"should_replace": True})
+        application = DoubleCountingApplication.objects.get(
+            producer=self.production_site.producer, period_start__year=self.requested_start_year
+        )
+        self.assertNotEqual(application.created_at, created_at)
+
+        # 5 - cannot be replaced if already accepted
+        application.status = DoubleCountingApplication.ACCEPTED
+        application.save()
+        response = self.add_file("dc_agreement_application_valid.xlsx", {"should_replace": True})
+        self.assertEqual(response.status_code, 400)
+        error = response.json()["error"]
+        self.assertEqual(error, DoubleCountingAddError.APPLICATION_ALREADY_RECEIVED)
 
     def test_production_site_address_mandatory(self):
         self.production_site.address = ""
@@ -116,21 +142,6 @@ class AdminDoubleCountApplicationTest(TestCase):
             application.agreement_id, f"FR_{application.production_site.dc_number}_{self.requested_start_year + 1}"
         )
         self.assertEqual(application.production_site.dc_reference, application.agreement_id)
-
-    def test_already_existing_application(self):
-        self.add_file("dc_agreement_application_valid.xlsx")
-        application = DoubleCountingApplication.objects.get(
-            producer=self.production_site.producer,
-            period_start__year=self.requested_start_year,
-        )
-        application.status = DoubleCountingApplication.ACCEPTED
-        application.save()
-
-        response = self.add_file("dc_agreement_application_valid.xlsx")
-        self.assertEqual(response.status_code, 400)
-
-        error = response.json()["error"]
-        self.assertEqual(error, DoubleCountingAddError.APPLICATION_ALREADY_EXISTS)
 
     # TODO la fonction check_dc_file ne renvoie pas d'erreur si le fichier n'est pas valide.'
     # def test_failed_file(self):
