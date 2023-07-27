@@ -125,6 +125,7 @@ class DoubleCountingDocFile(models.Model):
     FILE_TYPE = ((SOURCING, SOURCING), (DECISION, DECISION))
 
     url = models.TextField()
+    agreement_id = models.CharField(max_length=16, default="")
     file_name = models.CharField(max_length=128, default="")
     file_type = models.CharField(max_length=128, choices=FILE_TYPE, default=SOURCING)
     dca = models.ForeignKey(DoubleCountingApplication, on_delete=models.CASCADE, related_name="documents")
