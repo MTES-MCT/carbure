@@ -1,6 +1,6 @@
-# test with : python web/manage.py test admin.api.double_counting.application.tests_application.AdminDoubleCountApplicationTest.test_valid_file --keepdb
+# test with : python web/manage.py test admin.api.double_counting.applications.tests_application.AdminDoubleCountApplicationTest.test_valid_file --keepdb
 import os
-from admin.api.double_counting.application.add import DoubleCountingAddError
+from admin.api.double_counting.applications.add import DoubleCountingAddError
 
 from core.tests_utils import setup_current_user
 from core.models import Entity, UserRights
