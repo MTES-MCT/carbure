@@ -81,7 +81,7 @@ export function uploadDoubleCountingDecision(dca_id: number, file: File) {
 
 export function checkDoubleCountingFiles(entity_id: number, files: FileList) {
   const res = api.post<Api<CheckDoubleCountingFilesResponse>>(
-    "/v5/admin/double-counting/application/check-files",
+    "/v5/admin/double-counting/applications/check-files",
     { entity_id, files }
   )
   return res
@@ -93,7 +93,9 @@ export function addDoubleCountingApplication(
   producer_id: number,
   file: File
 ) {
-  return api.post("/v5/admin/double-counting/application/add", {
+  console.log('producer_id:', producer_id)
+  console.log('production_site_id:', production_site_id)
+  return api.post("/v5/admin/double-counting/applications/add", {
     entity_id,
     production_site_id,
     producer_id,

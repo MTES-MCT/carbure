@@ -13,7 +13,7 @@ from django.db.models.query_utils import Q
 
 import xlsxwriter
 from django.http import JsonResponse, HttpResponse
-from admin.api.double_counting.application.add import send_dca_confirmation_email
+from admin.api.double_counting.applications.add import send_dca_confirmation_email
 from core.decorators import check_rights, is_admin, is_admin_or_external_admin
 import pytz
 import traceback
