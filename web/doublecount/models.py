@@ -29,7 +29,9 @@ class DoubleCountingApplication(models.Model):
     producer_user = models.ForeignKey(
         usermodel, blank=True, null=True, on_delete=models.SET_NULL, related_name="producer_user"
     )
-    creation_date = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    # edited_at = models.DateTimeField(auto_now=True)
+
     period_start = models.DateField(null=False, blank=False)
     period_end = models.DateField(null=False, blank=False)
     agreement_id = models.CharField(max_length=16)  # FR_123456789_2020
@@ -130,6 +132,7 @@ class DoubleCountingDocFile(models.Model):
     file_type = models.CharField(max_length=128, choices=FILE_TYPE, default=SOURCING)
     dca = models.ForeignKey(DoubleCountingApplication, on_delete=models.CASCADE, related_name="documents")
     link_expiry_dt = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     class Meta:
         db_table = "double_counting_doc_files"

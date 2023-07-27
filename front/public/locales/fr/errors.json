@@ -82,5 +82,5 @@
   "YEAR_LOCKED": "La date de livraison est trop ancienne. Il n'est plus possible de déclarer sur cette période.",
   "MAC_NOT_EFPE": "Les mises à la consommations doivent être effectuées depuis un site EFPE.",
   "PRODUCTION_SITE_ADDRESS_UNDEFINED": "L'adresse du site de production n'est pas renseignée. Veuillez l'ajouter dans les informations liées à la société.",
-  "APPLICATION_ALREADY_EXISTS": "Un dossier double compte pour la même année existe déjà ou est en cours de validation."
+  "APPLICATION_ALREADY_RECEIVED": "Un dossier double compte pour la même année existe déjà ou est en cours de validation."
 }

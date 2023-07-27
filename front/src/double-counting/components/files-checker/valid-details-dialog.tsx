@@ -20,6 +20,7 @@ import { DoubleCountingFileInfo } from "../../types"
 import ApplicationInfo from "../application/application-info"
 import { ProductionTable, SourcingFullTable } from "../dc-tables"
 import Alert from "common/components/alert"
+import { AxiosError } from "axios"
 
 export type ValidDetailsDialogProps = {
   file: File
@@ -51,7 +52,7 @@ export const ValidDetailsDialog = ({
         <Tag big variant="success">
           {t("Valide")}
         </Tag>
-        <h1>{t("Ajout du dossier double comptage")}</h1>
+        <h1>{t("Dossier double comptage")}</h1>
       </header>
 
       <main>
@@ -134,6 +135,7 @@ export const ProductionSiteAdminDialog = ({
 }: ProductionSiteDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
+  const portal = usePortal()
 
   const { value, bind } =
     useForm<ProductionForm>(defaultProductionForm)
@@ -143,27 +145,32 @@ export const ProductionSiteAdminDialog = ({
   const addApplication = useMutation(addDoubleCountingApplication, {
     invalidates: [],
     onSuccess() {
+      onClose()
       notify(t("Le dossier a été envoyé !"), { variant: "success" })
     },
     onError(err) {
-      console.log('err:', err)
-      notifyError(err, t("Impossible d'ajouter le dossier"))
+      const errorCode = (err as AxiosError<{ error: string }>).response?.data
+        .error
+      if (errorCode === 'APPLICATION_ALREADY_EXISTS') {
+        portal((close) => <ReplaceApplicationDialog onReplace={saveApplication} onClose={close} />)
+      } else {
+        notifyError(err, t("Impossible d'ajouter le dossier"))
+      }
     },
   })
 
-  const saveApplication = async () => {
+  const saveApplication = async (shouldReplace = false) => {
     if (!value.productionSite || !value.producer) return
-    await addApplication.execute(
+    addApplication.execute(
       entity.id,
       value.productionSite.id,
       value.producer.id,
-      file
+      file,
+      shouldReplace
     )
-    onClose()
-
   }
-  const producer = value.producer instanceof Object ? value.producer.id : undefined // prettier-ignore
 
+  const producer = value.producer instanceof Object ? value.producer.id : undefined // prettier-ignore
 
   return (
     <Dialog onClose={onClose}>
@@ -202,6 +209,51 @@ export const ProductionSiteAdminDialog = ({
         />
 
         <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
+      </footer>
+
+    </Dialog>
+  )
+}
+
+
+export type ReplaceApplicationDialogProps = {
+  onClose: () => void
+  onReplace: (shouldReplace: boolean) => void
+  loading?: boolean
+}
+
+export const ReplaceApplicationDialog = ({
+  onReplace,
+  onClose, }: ReplaceApplicationDialogProps) => {
+  const { t } = useTranslation()
+
+  const replaceApplication = async () => {
+    onReplace(true)
+    onClose()
+  }
+
+
+  return (
+    <Dialog onClose={onClose}>
+      <header>
+        <h1>{t("Remplacer le dossier existant")}</h1>
+      </header>
+
+      <main>
+        <p>
+          {t("Le dossier que vous souhaitez ajouter existe déjà. Voulez-vous le remplacer ?")}
+        </p>
+      </main>
+
+      <footer>
+        <Button
+          icon={Plus}
+          label={t("Remplacer le dossier")}
+          variant="primary"
+          action={replaceApplication}
+        />
+
+        <Button icon={Return} label={t("Annuler")} action={onClose} asideX />
       </footer>
 
     </Dialog>

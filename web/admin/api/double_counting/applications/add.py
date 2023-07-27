@@ -39,6 +39,7 @@ class DoubleCountingAddError:
     PRODUCER_NOT_FOUND = "PRODUCER_NOT_FOUND"
     PRODUCTION_SITE_NOT_FOUND = "PRODUCTION_SITE_NOT_FOUND"
     PRODUCTION_SITE_ADDRESS_UNDEFINED = "PRODUCTION_SITE_ADDRESS_UNDEFINED"
+    APPLICATION_ALREADY_RECEIVED = "APPLICATION_ALREADY_RECEIVED"
     APPLICATION_ALREADY_EXISTS = "APPLICATION_ALREADY_EXISTS"
     MISSING_FILE = "MISSING_FILE"
 
@@ -47,6 +48,7 @@ class DoubleCountingAddError:
 @transaction.atomic
 def add_application(request, *args, **kwargs):
     producer_id = request.POST.get("producer_id", None)
+    should_replace = request.POST.get("should_replace") == "true"
     production_site_id = request.POST.get("production_site_id", None)
     file = request.FILES.get("file")
 
@@ -78,21 +80,28 @@ def add_application(request, *args, **kwargs):
 
     start, end, _ = load_dc_period(info["start_year"])
 
-    # check if application not rejected exists
-    if DoubleCountingApplication.objects.filter(
+    identical_replacable_application = DoubleCountingApplication.objects.filter(
         Q(producer=producer)
         & Q(period_start__year=start.year)
-        & ~Q(status__in=[DoubleCountingApplication.PENDING, DoubleCountingApplication.REJECTED]),
-    ).exists():
-        return ErrorResponse(400, DoubleCountingAddError.APPLICATION_ALREADY_EXISTS)
+        & Q(status__in=[DoubleCountingApplication.PENDING, DoubleCountingApplication.REJECTED]),
+    )
 
-    dca, _ = DoubleCountingApplication.objects.get_or_create(
+    if identical_replacable_application.exists():
+        if should_replace:
+            identical_replacable_application.delete()
+        else:
+            return ErrorResponse(400, DoubleCountingAddError.APPLICATION_ALREADY_EXISTS)
+
+    dca, created = DoubleCountingApplication.objects.get_or_create(
         producer=producer,
         production_site_id=production_site_id,
         period_start=start,
         period_end=end,
         defaults={"producer_user": request.user},
     )
+
+    if not created:
+        return ErrorResponse(400, DoubleCountingAddError.APPLICATION_ALREADY_RECEIVED)
 
     # 2 - save all production_data DoubleCountingProduction in db
     sourcing_forecast_data, _ = load_dc_sourcing_data(dca, sourcing_forecast_rows)

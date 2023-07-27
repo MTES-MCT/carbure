@@ -67,8 +67,8 @@ const DoubleCountingDialog = ({
   const productionRows = applicationData?.production ?? []
 
   const productionSite = applicationData?.production_site ?? "N/A"
-  const creationDate = applicationData?.creation_date
-    ? formatDate(applicationData.creation_date)
+  const creationDate = applicationData?.created_at
+    ? formatDate(applicationData.created_at)
     : "N/A"
 
   const documentationFile = applicationData?.documents.find(

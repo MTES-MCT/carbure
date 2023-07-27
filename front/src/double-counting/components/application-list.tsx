@@ -53,7 +53,7 @@ const ApplicationList = ({ entity, year }: ApplicationListProps) => {
     },
     {
       header: t("Date de soumission"),
-      cell: (a) => formatDate(a.creation_date),
+      cell: (a) => formatDate(a.created_at),
     },
   ]
 
