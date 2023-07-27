@@ -1,0 +1,5 @@
+entity_id,quarter,year,operating_unit,energy_amount
+10,1,2023,FRIONE,200000
+11,1,2023,FROEO,400000
+60,2,2023,FROEO,1000000
+64,4,2023,FROEO,40000
