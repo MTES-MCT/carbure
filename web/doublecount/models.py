@@ -14,14 +14,14 @@ class DoubleCountingApplication(models.Model):
     INPROGRESS = "INPROGRESS"
     REJECTED = "REJECTED"
     ACCEPTED = "ACCEPTED"
-    LAPSED = "LAPSED"
+    # LAPSED = "LAPSED"
 
     DCA_STATUS_CHOICES = (
         (PENDING, PENDING),
         (INPROGRESS, INPROGRESS),
         (REJECTED, REJECTED),
         (ACCEPTED, ACCEPTED),
-        (LAPSED, LAPSED),
+        # (LAPSED, LAPSED),
     )
 
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE, null=True, blank=True)

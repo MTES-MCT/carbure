@@ -9,11 +9,11 @@ urlpatterns = [
     path("application", views.get_application, name="api-v3-doublecount-get-application"),
     path("admin/application", views.get_application_admin, name="api-v3-doublecount-get-application-admin"),
     # path("admin/applications", get_applications_admin, name="api-v3-doublecount-get-applications-admin"),
-    path(
-        "admin/applications-snapshot",
-        views.get_applications_snapshot_admin,
-        name="api-v3-doublecount-get-applications-snapshot-admin",
-    ),
+    # path(
+    #     "admin/applications-snapshot",
+    #     views.get_applications_snapshot_admin,
+    #     name="api-v3-doublecount-get-applications-snapshot-admin",
+    # ),
     path("admin/quotas", views.get_production_site_quotas_admin, name="api-v3-doublecount-get-quotas-admin"),
     path("admin/quotas-snapshot", views.get_quotas_snapshot_admin, name="api-v3-doublecount-get-quotas-snapshot-admin"),
     path("admin/upload-decision", views.upload_decision_admin, name="api-v3-doublecount-upload-decision-admin"),

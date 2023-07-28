@@ -27,6 +27,7 @@ export function getYears(entity_id: number) {
 }
 
 export function getSnapshot(entity_id: number, year: number) {
+  console.log('year:', year)
   return api.get<Api<Snapshot>>("/v5/transactions/snapshot", {
     params: { entity_id, year },
   })
