@@ -1,6 +1,6 @@
 import { Fragment, useState } from "react"
 import { useTranslation, Trans } from "react-i18next"
-import { DoubleCountingApplication } from "../types"
+import { ApplicationSnapshot, DoubleCountingApplication } from "../types"
 import { ActionBar, LoaderOverlay } from "common/components/scaffold"
 import Tabs from "common/components/tabs"
 import Table, { Column, Cell } from "common/components/table"
@@ -19,17 +19,17 @@ import FilesCheckerUploadButton from "./files-checker/upload-button"
 
 type ApplicationListProps = {
   entity: Entity
-  year: number
+  snapshot: ApplicationSnapshot | undefined
 }
 
-const ApplicationList = ({ entity, year }: ApplicationListProps) => {
+const ApplicationList = ({ entity, snapshot = defaultCount }: ApplicationListProps) => {
   const { t } = useTranslation()
   const [tab, setTab] = useState("pending")
   const portal = usePortal()
 
   const applications = useQuery(api.getAllDoubleCountingApplications, {
     key: "dc-applications",
-    params: [year],
+    params: [],
   })
 
   const columns: Column<DoubleCountingApplication>[] = [
@@ -37,33 +37,28 @@ const ApplicationList = ({ entity, year }: ApplicationListProps) => {
       header: t("Statut"),
       cell: (a) => <DoubleCountingStatus status={a.status} />,
     },
-    { header: t("Producteur"), cell: (a) => <Cell text={a.producer.name} /> },
     { header: t("N° d'agrément"), cell: (a) => <Cell text={a.agreement_id} /> },
+    { header: t("Producteur"), cell: (a) => <Cell text={a.producer.name} /> },
     {
       header: t("Site de production"),
       cell: (a) => <Cell text={a.production_site} />,
     },
     {
-      header: t("Période de validité"),
+      header: t("Date de soumission"),
       cell: (a) => (
         <Cell
-          text={`${formatDateYear(a.period_start)} - ${formatDateYear(a.period_end)}`} // prettier-ignore
+          text={formatDateYear(a.created_at)}
         />
       ),
-    },
-    {
-      header: t("Date de soumission"),
-      cell: (a) => formatDate(a.created_at),
-    },
+    }
   ]
 
   const applicationsData = applications.result?.data.data
   if (applicationsData === undefined) return <LoaderOverlay />
 
-  const { pending, progress, accepted, expired, rejected } = applicationsData
+  const { pending, inprogress, rejected } = applicationsData
 
-  const allPendingCount = pending.count + progress.count
-  const allPending = progress.applications.concat(pending.applications)
+  const allPending = inprogress.applications.concat(pending.applications)
 
   function showApplicationDialog(application: DoubleCountingApplication) {
     portal((close) => (
@@ -80,12 +75,15 @@ const ApplicationList = ({ entity, year }: ApplicationListProps) => {
       <ActionBar>
         <Tabs
           focus={tab}
+          variant="switcher"
           onFocus={setTab}
           tabs={[
-            { key: "pending", label: t("En attente") },
-            { key: "accepted", label: t("Accepté") },
-            { key: "expired", label: t("Expiré") },
-            { key: "rejected", label: t("Refusé") },
+            { key: "pending", label: t("En attente ({{count}})", { count: snapshot?.applications_pending }) },
+            {
+              key: "rejected", label: t("Refusé ({{ count }})",
+                { count: snapshot?.applications_rejected }
+              )
+            },
           ]}
         />
 
@@ -93,7 +91,7 @@ const ApplicationList = ({ entity, year }: ApplicationListProps) => {
       </ActionBar>
       {tab === "pending" && (
         <Fragment>
-          {allPendingCount === 0 && (
+          {snapshot.applications_pending === 0 && (
             <Alert
               variant="warning"
               icon={AlertCircle}
@@ -103,7 +101,7 @@ const ApplicationList = ({ entity, year }: ApplicationListProps) => {
             </Alert>
           )}
 
-          {allPendingCount > 0 && (
+          {snapshot.applications_pending > 0 && (
             <Table
               loading={applications.loading}
               columns={columns}
@@ -114,51 +112,6 @@ const ApplicationList = ({ entity, year }: ApplicationListProps) => {
         </Fragment>
       )}
 
-      {tab === "accepted" && (
-        <Fragment>
-          {accepted.count === 0 && (
-            <Alert
-              variant="warning"
-              icon={AlertCircle}
-              loading={applications.loading}
-            >
-              <Trans>Aucun dossier accepté trouvé</Trans>
-            </Alert>
-          )}
-
-          {accepted.count > 0 && (
-            <Table
-              loading={applications.loading}
-              columns={columns}
-              rows={accepted.applications}
-              onAction={showApplicationDialog}
-            />
-          )}
-        </Fragment>
-      )}
-
-      {tab === "expired" && (
-        <Fragment>
-          {expired.count === 0 && (
-            <Alert
-              variant="warning"
-              icon={AlertCircle}
-              loading={applications.loading}
-            >
-              <Trans>Aucun dossier expiré trouvé</Trans>
-            </Alert>
-          )}
-
-          {expired.count > 0 && (
-            <Table
-              loading={applications.loading}
-              columns={columns}
-              rows={expired.applications}
-              onAction={showApplicationDialog}
-            />
-          )}
-        </Fragment>
-      )}
 
       {tab === "rejected" && (
         <Fragment>
@@ -187,3 +140,8 @@ const ApplicationList = ({ entity, year }: ApplicationListProps) => {
 }
 
 export default ApplicationList
+
+const defaultCount = {
+  applications_pending: 0,
+  applications_rejected: 0
+}

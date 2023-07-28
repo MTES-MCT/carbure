@@ -7,18 +7,31 @@ import {
   QuotaOverview,
   DoubleCountingUploadErrors,
   CheckDoubleCountingFilesResponse,
+  DoubleCountingSnapshot,
 } from "./types"
 
-export function getDoubleCountingSnapshot() {
-  return api.get<Api<ApplicationSnapshot>>(
-    "/v3/doublecount/admin/applications-snapshot"
-  )
+
+export function getYears(entity_id: number) {
+  return api.get<Api<number[]>>("/v5/admin/double-counting/years", {
+    params: { entity_id },
+  })
 }
 
-export function getAllDoubleCountingApplications(year: number) {
-  return api.get<Api<ApplicationsOverview>>("/v5/admin/double-counting/applications", {
-    params: { year },
+
+
+export function getSnapshot(entity_id: number) {
+  return api.get<Api<DoubleCountingSnapshot>>("/v5/admin/double-counting/snapshot", {
+    params: { entity_id },
   })
+}
+// export function getDoubleCountingSnapshot() {
+//   return api.get<Api<ApplicationSnapshot>>(
+//     "/v3/doublecount/admin/applications-snapshot"
+//   )
+// }
+
+export function getAllDoubleCountingApplications() {
+  return api.get<Api<ApplicationsOverview>>("/v5/admin/double-counting/applications")
 }
 
 export function getDoubleCountingApplication(dca_id: number) {
@@ -60,12 +73,9 @@ export function rejectDoubleCountingApplication(
   })
 }
 
-export function getQuotasSnapshot(year: number) {
+export function getQuotasSnapshot() {
   return api.get<Api<QuotaOverview[]>>(
-    "/v3/doublecount/admin/quotas-snapshot",
-    {
-      params: { year },
-    }
+    "/v3/doublecount/admin/quotas-snapshot"
   )
 }
 

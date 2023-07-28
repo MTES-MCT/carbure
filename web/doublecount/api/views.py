@@ -58,13 +58,13 @@ def get_applications(request, *args, **kwargs):
     return JsonResponse({"status": "success", "data": serializer.data})
 
 
-@is_admin_or_external_admin
-def get_applications_snapshot_admin(request):
-    years1 = [y["period_start__year"] for y in DoubleCountingApplication.objects.values("period_start__year").distinct()]
-    years2 = [y["period_end__year"] for y in DoubleCountingApplication.objects.values("period_end__year").distinct()]
-    years = list(set(years1 + years2))
-    data = {"years": years}
-    return JsonResponse({"status": "success", "data": data})
+# @is_admin_or_external_admin
+# def get_applications_snapshot_admin(request):
+#     years1 = [y["period_start__year"] for y in DoubleCountingApplication.objects.values("period_start__year").distinct()]
+#     years2 = [y["period_end__year"] for y in DoubleCountingApplication.objects.values("period_end__year").distinct()]
+#     years = list(set(years1 + years2))
+#     data = {"years": years}
+#     return JsonResponse({"status": "success", "data": data})
 
 
 @check_rights("entity_id")

@@ -108,17 +108,23 @@ export interface DoubleCountingDetails extends DoubleCountingApplication {
   dgpe_validator: string | null
   dgpe_validated_dt: string | null
 }
-
 export interface ApplicationSnapshot {
-  years: number[]
+  applications_pending: number
+  applications_rejected: number
 }
 
+export interface AgreementsSnapshot {
+  agreements_active: number
+  agreements_expired: number
+  agreements_incoming: number
+}
+
+export interface DoubleCountingSnapshot extends AgreementsSnapshot, ApplicationSnapshot { }
+
 export interface ApplicationsOverview {
-  accepted: { count: number; applications: DoubleCountingApplication[] }
   rejected: { count: number; applications: DoubleCountingApplication[] }
-  expired: { count: number; applications: DoubleCountingApplication[] }
   pending: { count: number; applications: DoubleCountingApplication[] }
-  progress: { count: number; applications: DoubleCountingApplication[] }
+  inprogress: { count: number; applications: DoubleCountingApplication[] }
 }
 
 export interface QuotaOverview {
