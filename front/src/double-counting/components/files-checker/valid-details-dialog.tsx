@@ -21,6 +21,7 @@ import ApplicationInfo from "./application-info"
 import { ProductionTable, SourcingFullTable } from "../dc-tables"
 import Alert from "common/components/alert"
 import { AxiosError } from "axios"
+import ApplicationDetails from "../application-details"
 
 export type ValidDetailsDialogProps = {
   file: File
@@ -36,7 +37,6 @@ export const ValidDetailsDialog = ({
   const { t } = useTranslation()
   const portal = usePortal()
   const isProducerMatch = useMatch("/org/:entity/settings*")
-  const [focus, setFocus] = useState("sourcing_forecast")
 
   function showProductionSiteDialog() {
     if (isProducerMatch) {
@@ -63,42 +63,7 @@ export const ValidDetailsDialog = ({
             <DechetIndustrielAlert />
           }
         </section>
-        <section>
-          <Tabs
-            variant="switcher"
-            tabs={[
-              {
-                key: "sourcing_forecast",
-                label: t("Approvisionnement"),
-              },
-              {
-                key: "production",
-                label: t("Production"),
-              }
-
-            ]}
-            focus={focus}
-            onFocus={setFocus}
-          />
-
-        </section>
-
-        {focus === "sourcing_forecast" &&
-          <section>
-            <SourcingFullTable
-              sourcing={fileData.sourcing ?? []}
-            />
-          </section>
-        }
-
-
-        {focus === "production" &&
-          <section>
-            <ProductionTable
-              production={fileData.production ?? []}
-            />
-          </section>
-        }
+        <ApplicationDetails fileData={fileData} />
       </main>
 
       <footer>
@@ -115,6 +80,7 @@ export const ValidDetailsDialog = ({
     </Dialog>
   )
 }
+
 const defaultProductionForm = {
   productionSite: undefined as ProductionSite | undefined,
   producer: undefined as Entity | undefined,
