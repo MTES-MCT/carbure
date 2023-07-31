@@ -46,6 +46,8 @@ def add_production_site(request, *args, **kwargs):
         return JsonResponse({"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_MISSING_MANAGER_EMAIL"}, status=400)
     if city is None:
         return JsonResponse({"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_MISSING_CITY"}, status=400)
+    if address is None:
+        return JsonResponse({"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_MISSING_ADDRESS"}, status=400)
 
     try:
         date_mise_en_service = datetime.datetime.strptime(date_mise_en_service, "%Y-%m-%d")

@@ -40,7 +40,6 @@ class AdminDoubleCountApplicationTest(TestCase):
 
         self.production_site = ProductionSite.objects.first()
         self.production_site.address = "1 rue de la Paix"
-
         france, _ = Pays.objects.update_or_create(code_pays="FR", name="France")
         self.production_site.country = france
         self.production_site.city = "Paris"
@@ -92,7 +91,8 @@ class AdminDoubleCountApplicationTest(TestCase):
         self.assertEqual(error, DoubleCountingAddError.APPLICATION_ALREADY_EXISTS)
 
         # 4 - test should replace
-        response = self.add_file("dc_agreement_application_valid.xlsx", {"should_replace": True})
+        response = self.add_file("dc_agreement_application_valid.xlsx", {"should_replace": "true"})
+        self.assertEqual(response.status_code, 200)
         application = DoubleCountingApplication.objects.get(
             producer=self.production_site.producer, period_start__year=self.requested_start_year
         )
@@ -101,7 +101,7 @@ class AdminDoubleCountApplicationTest(TestCase):
         # 5 - cannot be replaced if already accepted
         application.status = DoubleCountingApplication.ACCEPTED
         application.save()
-        response = self.add_file("dc_agreement_application_valid.xlsx", {"should_replace": True})
+        response = self.add_file("dc_agreement_application_valid.xlsx", {"should_replace": "true"})
         self.assertEqual(response.status_code, 400)
         error = response.json()["error"]
         self.assertEqual(error, DoubleCountingAddError.APPLICATION_ALREADY_RECEIVED)

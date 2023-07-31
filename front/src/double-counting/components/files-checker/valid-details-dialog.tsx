@@ -1,7 +1,9 @@
+import { AxiosError } from "axios"
 import { findProducers, findProductionSites } from "carbure/api"
 import useEntity from "carbure/hooks/entity"
 import { Entity, ProductionSite } from "carbure/types"
 import * as norm from "carbure/utils/normalizers"
+import Alert from "common/components/alert"
 import Autocomplete from "common/components/autocomplete"
 import { Button, ExternalLink, MailTo } from "common/components/button"
 import { Dialog } from "common/components/dialog"
@@ -9,19 +11,15 @@ import { useForm } from "common/components/form"
 import { AlertTriangle, Plus, Return } from "common/components/icons"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
-import Tabs from "common/components/tabs"
 import Tag from "common/components/tag"
 import { useMutation } from "common/hooks/async"
 import { addDoubleCountingApplication } from "double-counting/api"
-import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useMatch } from "react-router-dom"
 import { DoubleCountingFileInfo } from "../../types"
-import ApplicationInfo from "./application-info"
-import { ProductionTable, SourcingFullTable } from "../dc-tables"
-import Alert from "common/components/alert"
-import { AxiosError } from "axios"
 import ApplicationDetails from "../application-details"
+import ApplicationInfo from "./application-info"
+import React, { useState } from "react"
 
 export type ValidDetailsDialogProps = {
   file: File
@@ -102,7 +100,7 @@ export const ProductionSiteAdminDialog = ({
   const { t } = useTranslation()
   const entity = useEntity()
   const portal = usePortal()
-
+  const [error, setError] = useState<React.ReactNode | undefined>(undefined)
   const { value, bind } =
     useForm<ProductionForm>(defaultProductionForm)
   const notify = useNotify()
@@ -119,7 +117,13 @@ export const ProductionSiteAdminDialog = ({
         .error
       if (errorCode === 'APPLICATION_ALREADY_EXISTS') {
         portal((close) => <ReplaceApplicationDialog onReplace={saveApplication} onClose={close} />)
-      } else {
+      } else if (errorCode === 'PRODUCTION_SITE_ADDRESS_UNDEFINED') {
+        let message = <>
+
+        </>
+        setError(message)
+      }
+      else {
         notifyError(err, t("Impossible d'ajouter le dossier"))
       }
     },
@@ -127,6 +131,7 @@ export const ProductionSiteAdminDialog = ({
 
   const saveApplication = async (shouldReplace = false) => {
     if (!value.productionSite || !value.producer) return
+    setError(undefined)
     addApplication.execute(
       entity.id,
       value.productionSite.id,
@@ -162,7 +167,17 @@ export const ProductionSiteAdminDialog = ({
             {...bind("productionSite")}
           />
         </section>
+        {error &&
+          <section>
+            <Alert variant="warning" icon={AlertTriangle}>
+              {t("PRODUCTION_SITE_ADDRESS_UNDEFINED", { ns: "errors" })}
+              <ExternalLink href={`/admin/producers/productionsite/${value.productionSite?.id}/change`}>
+                Editer le site de production
+              </ExternalLink>
+            </Alert>
+          </section>}
       </main>
+
 
       <footer>
         <Button

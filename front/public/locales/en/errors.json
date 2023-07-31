@@ -79,6 +79,6 @@
   "EP_ANORMAL_LOW": "Transformation GHG emissions abnormally low",
   "EP_ANORMAL_HIGH": "Transformation GHG emissions abnormally high",
   "YEAR_LOCKED": "The delivery date is too old. It is no longer possible to declare on this period.",
-  "PRODUCTION_SITE_ADDRESS_UNDEFINED": "The address of the production site is not completed.Please add it to information related to the company.",
+  "PRODUCTION_SITE_ADDRESS_UNDEFINED": "The address, the city or the zipcode of the production site is not completed. Please add it to information related to the company.",
   "APPLICATION_ALREADY_RECEIVED": "An equivalent double counting application already exists or is being validated."
 }
