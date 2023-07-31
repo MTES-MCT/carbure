@@ -19,6 +19,7 @@ def add_production_site(request, *args, **kwargs):
     dc_reference = request.POST.get("dc_reference")
 
     site_id = request.POST.get("site_id")
+    address = request.POST.get("address")
     city = request.POST.get("city")
     postal_code = request.POST.get("postal_code")
     manager_name = request.POST.get("manager_name")
@@ -26,42 +27,30 @@ def add_production_site(request, *args, **kwargs):
     manager_email = request.POST.get("manager_email")
 
     if country is None:
-        return JsonResponse(
-            {"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_MISSING_COUNTRY_CODE"}, status=400
-        )
+        return JsonResponse({"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_MISSING_COUNTRY_CODE"}, status=400)
     if name is None:
         return JsonResponse({"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_MISSING_NAME"}, status=400)
     if date_mise_en_service is None:
         return JsonResponse({"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_MISSING_COM_DATE"}, status=400)
     if ges_option is None:
-        return JsonResponse(
-            {"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_MISSING_GHG_OPTION"}, status=400
-        )
+        return JsonResponse({"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_MISSING_GHG_OPTION"}, status=400)
     if site_id is None:
         return JsonResponse({"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_MISSING_ID"}, status=400)
     if postal_code is None:
         return JsonResponse({"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_MISSING_ZIP_CODE"}, status=400)
     if manager_name is None:
-        return JsonResponse(
-            {"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_MISSING_MANAGER_NAME"}, status=400
-        )
+        return JsonResponse({"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_MISSING_MANAGER_NAME"}, status=400)
     if manager_phone is None:
-        return JsonResponse(
-            {"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_MISSING_MANAGER_PHONE"}, status=400
-        )
+        return JsonResponse({"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_MISSING_MANAGER_PHONE"}, status=400)
     if manager_email is None:
-        return JsonResponse(
-            {"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_MISSING_MANAGER_EMAIL"}, status=400
-        )
+        return JsonResponse({"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_MISSING_MANAGER_EMAIL"}, status=400)
     if city is None:
         return JsonResponse({"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_MISSING_CITY"}, status=400)
 
     try:
         date_mise_en_service = datetime.datetime.strptime(date_mise_en_service, "%Y-%m-%d")
     except Exception:
-        return JsonResponse(
-            {"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_COM_DATE_WRONG_FORMAT"}, status=400
-        )
+        return JsonResponse({"status": "error", "message": "SETTINGS_ADD_PRODUCTION_SITE_COM_DATE_WRONG_FORMAT"}, status=400)
 
     try:
         country = Pays.objects.get(code_pays=country)
@@ -80,11 +69,12 @@ def add_production_site(request, *args, **kwargs):
         )
 
     try:
-        obj, created = ProductionSite.objects.update_or_create(
+        obj, _ = ProductionSite.objects.update_or_create(
             producer=producer,
             country=country,
             name=name,
             city=city,
+            address=address,
             postal_code=postal_code,
             eligible_dc=eligible_dc,
             dc_reference=dc_reference,
