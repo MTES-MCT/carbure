@@ -11,7 +11,7 @@ import { Fragment, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api"
 import { ApplicationSnapshot, DoubleCountingApplication } from "../types"
-import { DoubleCountingDialog } from "./application-details"
+import { DoubleCountingDialog } from "./application-details-dialog"
 import DoubleCountingStatus from "./dc-status"
 import FilesCheckerUploadButton from "./files-checker/upload-button"
 
