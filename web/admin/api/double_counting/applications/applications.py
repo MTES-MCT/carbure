@@ -12,20 +12,17 @@ from doublecount.serializers import DoubleCountingApplicationFullSerializer
 @is_admin_or_external_admin
 def get_applications_admin(request):
     applications = DoubleCountingApplication.objects.filter(~Q(status__in=[DoubleCountingApplication.ACCEPTED]))
-    # accepted = applications.filter(status=DoubleCountingApplication.ACCEPTED)
-    # accepted_count = accepted.count()
+
     rejected_data = applications.filter(status=DoubleCountingApplication.REJECTED)
-    pending_data = applications.filter(status__in=[DoubleCountingApplication.PENDING])
-    inprogress_data = applications.filter(status=DoubleCountingApplication.INPROGRESS)
-    # accepted_s = DoubleCountingApplicationFullSerializer(accepted, many=True)
+
+    pending_data = applications.filter(
+        ~Q(status__in=[DoubleCountingApplication.ACCEPTED, DoubleCountingApplication.REJECTED])
+    )
     rejected = DoubleCountingApplicationFullSerializer(rejected_data, many=True)
     pending = DoubleCountingApplicationFullSerializer(pending_data, many=True)
-    inprogress = DoubleCountingApplicationFullSerializer(inprogress_data, many=True)
 
     data = {
-        # "accepted": {"count": accepted_count, "applications": accepted_s.data},
         "rejected": {"count": rejected_data.count(), "applications": rejected.data},
         "pending": {"count": pending_data.count(), "applications": pending.data},
-        "inprogress": {"count": inprogress_data.count(), "applications": inprogress.data},
     }
     return JsonResponse({"status": "success", "data": data})

@@ -1,17 +1,15 @@
-import { useState } from "react"
-import { Route, Routes, Navigate, useLocation } from "react-router-dom"
-import { useTranslation } from "react-i18next"
 import useEntity from "carbure/hooks/entity"
-import { useQuery } from "common/hooks/async"
+import { Loader } from "common/components/icons"
 import { Col, Main, Row } from "common/components/scaffold"
-import Select from "common/components/select"
+import Tabs from "common/components/tabs"
+import { useQuery } from "common/hooks/async"
+import useTitle from "common/hooks/title"
+import { useTranslation } from "react-i18next"
+import { Navigate, Route, Routes, useLocation } from "react-router-dom"
+import * as api from "./api"
 import ApplicationList from "./components/application-list"
 import QuotasList from "./components/dc-quotas"
-import * as api from "./api"
-import useTitle from "common/hooks/title"
-import Tabs from "common/components/tabs"
 import DoubleCountingFilesChecker from "./components/files-checker"
-import { Loader } from "common/components/icons"
 import { AgreementsSnapshot, ApplicationSnapshot } from "./types"
 
 const DoubleCounting = () => {
@@ -27,7 +25,6 @@ const DoubleCounting = () => {
   })
   const snapshot = snapshotResponse.result?.data.data
 
-  console.log('snapshotData:', snapshot)
 
   return (
     <Main>
@@ -49,7 +46,7 @@ const DoubleCounting = () => {
                           }
                         </p>
                         <strong>
-                          {t("Dossiers en cours")}
+                          {t("Dossiers en attente")}
                         </strong>
                       </Col>
                     </Row>

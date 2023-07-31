@@ -1,20 +1,18 @@
-import { Fragment, useState } from "react"
-import { useTranslation, Trans } from "react-i18next"
-import { ApplicationSnapshot, DoubleCountingApplication } from "../types"
-import { ActionBar, LoaderOverlay } from "common/components/scaffold"
-import Tabs from "common/components/tabs"
-import Table, { Column, Cell } from "common/components/table"
-import { Alert } from "common/components/alert"
-import { AlertCircle, Upload } from "common/components/icons"
-import { DoubleCountingDialog } from "./application-details"
-import { usePortal } from "common/components/portal"
 import { Entity } from "carbure/types"
-import DoubleCountingStatus from "./dc-status"
-import * as api from "../api"
+import { Alert } from "common/components/alert"
+import { AlertCircle } from "common/components/icons"
+import { usePortal } from "common/components/portal"
+import { ActionBar, LoaderOverlay } from "common/components/scaffold"
+import Table, { Cell, Column } from "common/components/table"
+import Tabs from "common/components/tabs"
 import { useQuery } from "common/hooks/async"
-import { formatDate, formatDateYear } from "common/utils/formatters"
-import Button from "common/components/button"
-import DoubleCountingFilesCheckerDialog from "./files-checker/files-checker-dialog"
+import { formatDate } from "common/utils/formatters"
+import { Fragment, useState } from "react"
+import { Trans, useTranslation } from "react-i18next"
+import * as api from "../api"
+import { ApplicationSnapshot, DoubleCountingApplication } from "../types"
+import { DoubleCountingDialog } from "./application-details"
+import DoubleCountingStatus from "./dc-status"
 import FilesCheckerUploadButton from "./files-checker/upload-button"
 
 type ApplicationListProps = {
@@ -47,7 +45,7 @@ const ApplicationList = ({ entity, snapshot = defaultCount }: ApplicationListPro
       header: t("Date de soumission"),
       cell: (a) => (
         <Cell
-          text={formatDateYear(a.created_at)}
+          text={formatDate(a.created_at)}
         />
       ),
     }
@@ -56,9 +54,8 @@ const ApplicationList = ({ entity, snapshot = defaultCount }: ApplicationListPro
   const applicationsData = applications.result?.data.data
   if (applicationsData === undefined) return <LoaderOverlay />
 
-  const { pending, inprogress, rejected } = applicationsData
+  const { pending, rejected } = applicationsData
 
-  const allPending = inprogress.applications.concat(pending.applications)
 
   function showApplicationDialog(application: DoubleCountingApplication) {
     portal((close) => (
@@ -105,7 +102,7 @@ const ApplicationList = ({ entity, snapshot = defaultCount }: ApplicationListPro
             <Table
               loading={applications.loading}
               columns={columns}
-              rows={allPending}
+              rows={pending.applications}
               onAction={showApplicationDialog}
             />
           )}

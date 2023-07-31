@@ -21,9 +21,8 @@ def get_snapshot(request, *args, **kwargs):
     current_year = datetime.now().year
 
     try:
-        applications = DoubleCountingApplication.objects.filter(
-            (Q(period_start__year=current_year) | Q(period_end__year=current_year))
-        )
+        applications = DoubleCountingApplication.objects.filter()
+
         applications_pending = applications.filter(
             ~Q(status__in=[DoubleCountingApplication.ACCEPTED, DoubleCountingApplication.REJECTED])
         )

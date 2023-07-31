@@ -124,7 +124,6 @@ export interface DoubleCountingSnapshot extends AgreementsSnapshot, ApplicationS
 export interface ApplicationsOverview {
   rejected: { count: number; applications: DoubleCountingApplication[] }
   pending: { count: number; applications: DoubleCountingApplication[] }
-  inprogress: { count: number; applications: DoubleCountingApplication[] }
 }
 
 export interface QuotaOverview {
