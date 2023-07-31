@@ -65,7 +65,7 @@ def add_application(request, *args, **kwargs):
     except:
         return ErrorResponse(400, DoubleCountingAddError.PRODUCTION_SITE_NOT_FOUND)
 
-    if not production_site.address:
+    if not production_site.address or not production_site.city or not production_site.postal_code:
         return ErrorResponse(400, DoubleCountingAddError.PRODUCTION_SITE_ADDRESS_UNDEFINED)
 
     if file is None:
