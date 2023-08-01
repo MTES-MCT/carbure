@@ -33,9 +33,9 @@ urlpatterns = [
     path("admin/download-documentation", views.admin_download_documentation, name="api-v3-doublecount-admin-download-doc"),
     path("admin/approve", views.approve_dca, name="api-v3-doublecount-approve-dca"),
     path("admin/reject", views.reject_dca, name="api-v3-doublecount-reject-dca"),
-    path(
-        "admin/application/update-approved-quotas",
-        views.admin_update_approved_quotas,
-        name="api-v3-doublecount-admin-update-approved-quotas",
-    ),
+    # path(
+    #     "admin/application/update-approved-quotas",
+    #     views.admin_update_approved_quotas,
+    #     name="api-v3-doublecount-admin-update-approved-quotas",
+    # ),
 ]

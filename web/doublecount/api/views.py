@@ -31,7 +31,11 @@ from doublecount.serializers import (
     DoubleCountingApplicationFullSerializerWithForeignKeys,
     DoubleCountingApplicationPartialSerializerWithForeignKeys,
 )
-from doublecount.helpers import load_dc_sourcing_data as new_load_dc_sourcing, load_dc_production_data as new_load_dc_prod
+from doublecount.helpers import (
+    load_dc_sourcing_data as new_load_dc_sourcing,
+    load_dc_production_data as new_load_dc_prod,
+    send_dca_status_email,
+)
 from core.models import Entity, UserRights, MatierePremiere, Pays, Biocarburant, CarbureLot
 from core.xlsx_v3 import (
     export_dca,
@@ -91,52 +95,6 @@ def get_application(request, *args, **kwargs):
             response = HttpResponse(content=data, content_type=ctype)
             response["Content-Disposition"] = 'attachment; filename="%s"' % (file_location)
         return response
-
-
-def send_dca_status_email(dca):
-    if dca.status == DoubleCountingApplication.ACCEPTED:
-        text_message = """
-        Bonjour,
-
-        Votre dossier de demande d'agrément au double-comptage pour le site de production %s a été accepté.
-
-        Bonne journée,
-        L'équipe CarbuRe
-        """ % (
-            dca.production_site.name
-        )
-    elif dca.status == DoubleCountingApplication.REJECTED:
-        text_message = """
-        Bonjour,
-
-        Votre dossier de demande d'agrément au double-comptage pour le site de production %s a été accepté.
-
-        Bonne journée,
-        L'équipe CarbuRe
-        """ % (
-            dca.production_site.name
-        )
-    else:
-        # no mail to send
-        return
-    email_subject = "Carbure - Dossier Double Comptage"
-    cc = None
-    if os.getenv("IMAGE_TAG", "dev") != "prod":
-        # send only to staff / superuser
-        recipients = ["carbure@beta.gouv.fr"]
-    else:
-        # PROD
-        recipients = [
-            r.user.email
-            for r in UserRights.objects.filter(entity=dca.producer, user__is_staff=False, user__is_superuser=False).exclude(
-                role__in=[UserRights.AUDITOR, UserRights.RO]
-            )
-        ]
-        cc = "carbure@beta.gouv.fr"
-    email = EmailMessage(
-        subject=email_subject, body=text_message, from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc
-    )
-    email.send(fail_silently=False)
 
 
 @check_rights("entity_id", role=[UserRights.ADMIN, UserRights.RW])
@@ -939,20 +897,4 @@ def update_production(request, *args, **kwargs):
         to_update.save()
     except:
         return JsonResponse({"status": "error", "message": "Could not update Production line"}, status=400)
-    return JsonResponse({"status": "success"})
-
-
-@is_admin
-def admin_update_approved_quotas(request):
-    approved_quotas = request.POST.get("approved_quotas", False)
-    if not approved_quotas:
-        return JsonResponse({"status": "error", "message": "Missing approved_quotas POST parameter"}, status=400)
-    unpacked = json.loads(approved_quotas)
-    for dca_production_id, approved_quota in unpacked:
-        try:
-            to_update = DoubleCountingProduction.objects.get(id=dca_production_id)
-            to_update.approved_quota = approved_quota
-            to_update.save()
-        except:
-            return JsonResponse({"status": "error", "message": "Could not find Production Line"}, status=400)
     return JsonResponse({"status": "success"})

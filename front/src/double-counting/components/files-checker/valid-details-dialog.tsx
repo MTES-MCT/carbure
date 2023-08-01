@@ -61,7 +61,7 @@ export const ValidDetailsDialog = ({
             <DechetIndustrielAlert />
           }
         </section>
-        <ApplicationDetails fileData={fileData} />
+        <ApplicationDetails sourcing={fileData.sourcing} production={fileData.production} />
       </main>
 
       <footer>

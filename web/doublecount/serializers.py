@@ -131,23 +131,10 @@ class DoubleCountingDocFileSerializer(serializers.ModelSerializer):
 class DoubleCountingApplicationFullSerializerWithForeignKeys(serializers.ModelSerializer):
     production_site = serializers.SlugRelatedField(read_only=True, slug_field="name")
     producer_user = serializers.SlugRelatedField(read_only=True, slug_field="email")
-    dgec_validator = serializers.SlugRelatedField(read_only=True, slug_field="name")
-    dgpe_validator = serializers.SlugRelatedField(read_only=True, slug_field="name")
-    dgddi_validator = serializers.SlugRelatedField(read_only=True, slug_field="name")
     sourcing = DoubleCountingSourcingSerializer(many=True, read_only=True)
-    aggregated_sourcing = serializers.SerializerMethodField()
     production = DoubleCountingProductionSerializer(many=True, read_only=True)
     producer = EntitySerializer(read_only=True)
     documents = DoubleCountingDocFileSerializer(many=True, read_only=True)
-
-    def get_aggregated_sourcing(self, dca):
-        agg = dca.sourcing.all().values("year", "feedstock").annotate(sum=Sum("metric_tonnes"), count=Count("metric_tonnes"))
-        feedstock_ids = set(list([a["feedstock"] for a in agg]))
-        feedstocks = {f.id: f for f in MatierePremiere.objects.filter(id__in=feedstock_ids)}
-        for a in agg:
-            s = FeedStockSerializer(feedstocks[a["feedstock"]])
-            a["feedstock"] = s.data
-        return [a for a in agg]
 
     class Meta:
         model = DoubleCountingApplication
@@ -160,17 +147,7 @@ class DoubleCountingApplicationFullSerializerWithForeignKeys(serializers.ModelSe
             "period_start",
             "period_end",
             "status",
-            "dgec_validated",
-            "dgec_validator",
-            "dgec_validated_dt",
-            "dgddi_validated",
-            "dgddi_validator",
-            "dgddi_validated_dt",
-            "dgpe_validated",
-            "dgpe_validator",
-            "dgpe_validated_dt",
             "sourcing",
-            "aggregated_sourcing",
             "production",
             "documents",
         ]

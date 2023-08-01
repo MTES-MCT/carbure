@@ -258,13 +258,13 @@ const DoubleCountingApplicationDialog = ({
                 {
                   header: t("Transit"),
                   cell: (s) =>
-                    s.transit_country && (
+                    s.transit_country ? (
                       <Cell
                         text={t(s.transit_country.code_pays, {
                           ns: "countries",
                         })}
                       />
-                    ),
+                    ) : "-",
                 },
                 !isFinal &&
                 actionColumn((s) => [
