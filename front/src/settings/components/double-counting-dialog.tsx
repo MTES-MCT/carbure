@@ -24,34 +24,34 @@ import DoubleCountingProductionDialog from "./double-counting-production-dialog"
 import QuotasTable from "./double-counting-quotas-dialog"
 import DoubleCountingSourcingDialog from "./double-counting-sourcing-dialog"
 
-type DoubleCountingDialogProps = {
+type DoubleCountingApplicationDialogProps = {
   entity: Entity
   applicationID: number
   onClose: () => void
 }
 
-const DoubleCountingDialog = ({
+const DoubleCountingApplicationDialog = ({
   entity,
   applicationID: applicationID,
   onClose,
-}: DoubleCountingDialogProps) => {
+}: DoubleCountingApplicationDialogProps) => {
   const { t } = useTranslation()
   const entityID = entity?.id
   const portal = usePortal()
 
   const [focus, setFocus] = useState("aggregated_sourcing")
 
-  const application = useQuery(api.getDoubleCountingDetails, {
-    key: "dc-details",
+  const application = useQuery(api.getDoubleCountingApplicationDetails, {
+    key: "dc-application-details",
     params: [entityID, applicationID],
   })
 
   const deleteSourcing = useMutation(api.deleteDoubleCountingSourcing, {
-    invalidates: ["dc-details"],
+    invalidates: ["dc-application-details"],
   })
 
   const deleteProduction = useMutation(api.deleteDoubleCountingProduction, {
-    invalidates: ["dc-details"],
+    invalidates: ["dc-application-details"],
   })
 
   const dcaID = application.result?.data.data?.id ?? -1
@@ -393,4 +393,4 @@ const DoubleCountingDialog = ({
   )
 }
 
-export default DoubleCountingDialog
+export default DoubleCountingApplicationDialog

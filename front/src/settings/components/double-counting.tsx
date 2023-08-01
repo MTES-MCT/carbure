@@ -11,7 +11,7 @@ import DoubleCountingStatus from "double-counting/components/dc-status"
 import { DoubleCountingApplication } from "double-counting/types"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api/double-counting"
-import DoubleCountingDialog from "./double-counting-dialog"
+import DoubleCountingApplicationDialog from "./double-counting-dialog"
 import DoubleCountingUploadDialog from "./double-counting-upload"
 import Button from "common/components/button"
 
@@ -32,7 +32,7 @@ const DoubleCountingSettings = () => {
 
   function showApplicationDialog(dc: DoubleCountingApplication) {
     portal((resolve) => (
-      <DoubleCountingDialog
+      <DoubleCountingApplicationDialog
         entity={entity}
         applicationID={dc.id}
         onClose={resolve}

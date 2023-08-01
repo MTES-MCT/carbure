@@ -36,7 +36,7 @@ export function getAllDoubleCountingApplications() {
 
 export function getDoubleCountingApplication(dca_id: number) {
   return api.get<Api<DoubleCountingDetails>>(
-    "/v3/doublecount/admin/application",
+    "/v5/admin/double-counting/applications/details",
     {
       params: { dca_id },
     }

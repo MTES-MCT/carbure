@@ -49,12 +49,12 @@ const DoubleCountingProductionDialog = ({
   )
 
   const addProduction = useMutation(api.addDoubleCountingProduction, {
-    invalidates: ["dc-details"],
+    invalidates: ["dc-application-details"],
     onSuccess: () => onClose(),
   })
 
   const updateProduction = useMutation(api.updateDoubleCountingProduction, {
-    invalidates: ["dc-details"],
+    invalidates: ["dc-application-details"],
   })
 
   async function saveProduction() {
