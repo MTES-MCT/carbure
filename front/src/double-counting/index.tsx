@@ -23,7 +23,7 @@ const DoubleCounting = () => {
   const location = useLocation()
 
   const snapshotResponse = useQuery(api.getSnapshot, {
-    key: "operator-snapshot",
+    key: "dc-snapshot",
     params: [entity.id],
   })
   const snapshot = snapshotResponse.result?.data.data

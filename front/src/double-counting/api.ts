@@ -44,10 +44,12 @@ export function getDoubleCountingApplication(dca_id: number) {
 }
 
 export function approveDoubleCountingQuotas(
+  entity_id: number,
   dca_id: number,
   approved_quotas: number[][]
 ) {
-  return api.post("/v3/doublecount/admin/application/update-approved-quotas", {
+  return api.post("/v5/admin/double-counting/applications/update-quotas", {
+    entity_id,
     dca_id,
     approved_quotas: JSON.stringify(approved_quotas),
   })
@@ -64,11 +66,11 @@ export function approveDoubleCountingApplication(
 }
 
 export function rejectDoubleCountingApplication(
-  validator_entity_id: number | undefined,
+  entity_id: number,
   dca_id: number
 ) {
-  return api.post("/v3/doublecount/admin/reject", {
-    validator_entity_id: validator_entity_id,
+  return api.post("/v5/admin/double-counting/applications/reject", {
+    entity_id,
     dca_id: dca_id,
   })
 }

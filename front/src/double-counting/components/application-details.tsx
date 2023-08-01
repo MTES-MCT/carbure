@@ -1,10 +1,15 @@
 import Tabs from "common/components/tabs"
-import { DoubleCountingFileInfo } from "double-counting/types"
+import { DoubleCountingProduction, DoubleCountingSourcing } from "double-counting/types"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { ProductionTable, SourcingFullTable } from "./dc-tables"
 
-const ApplicationDetails = ({ fileData }: { fileData: DoubleCountingFileInfo }) => {
+interface ApplicationDetailsProps {
+    production?: DoubleCountingProduction[]
+    sourcing?: DoubleCountingSourcing[]
+}
+
+const ApplicationDetails = ({ production, sourcing }: ApplicationDetailsProps) => {
     const [focus, setFocus] = useState("sourcing_forecast")
     const { t } = useTranslation()
 
@@ -32,7 +37,7 @@ const ApplicationDetails = ({ fileData }: { fileData: DoubleCountingFileInfo }) 
         {focus === "sourcing_forecast" &&
             <section>
                 <SourcingFullTable
-                    sourcing={fileData.sourcing ?? []}
+                    sourcing={sourcing ?? []}
                 />
             </section>
         }
@@ -41,7 +46,7 @@ const ApplicationDetails = ({ fileData }: { fileData: DoubleCountingFileInfo }) 
         {focus === "production" &&
             <section>
                 <ProductionTable
-                    production={fileData.production ?? []}
+                    production={production ?? []}
                 />
             </section>
         }
