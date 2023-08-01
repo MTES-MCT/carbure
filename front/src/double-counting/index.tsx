@@ -11,6 +11,9 @@ import ApplicationList from "./components/application-list"
 import QuotasList from "./components/dc-quotas"
 import DoubleCountingFilesChecker from "./components/files-checker"
 import { AgreementsSnapshot, ApplicationSnapshot } from "./types"
+import HashRoute from "common/components/hash-route"
+import { DoubleCountingApplicationDialog } from "./components/application-details-dialog"
+
 
 const DoubleCounting = () => {
   const { t } = useTranslation()
@@ -75,12 +78,14 @@ const DoubleCounting = () => {
           path="applications"
           element={<ApplicationList entity={entity} snapshot={snapshot as ApplicationSnapshot} />}
         />
+
         <Route path="quotas" element={<QuotasList snapshot={snapshot as AgreementsSnapshot} />} />
         <Route
           path="files-checker/*"
           element={<DoubleCountingFilesChecker />}
         />
         <Route path="*" element={<Navigate to="applications" />} />
+
       </Routes>
     </Main>
   )

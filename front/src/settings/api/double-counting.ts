@@ -13,7 +13,7 @@ export function getDoubleCountingApplications(entity_id: number) {
   })
 }
 
-export function getDoubleCountingDetails(entity_id: number, dca_id: number) {
+export function getDoubleCountingApplicationDetails(entity_id: number, dca_id: number) {
   return api.get<Api<DoubleCountingDetails>>("/v3/doublecount/application", {
     params: { entity_id, dca_id },
   })

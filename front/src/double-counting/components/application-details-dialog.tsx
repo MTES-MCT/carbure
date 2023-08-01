@@ -26,30 +26,29 @@ import {
 } from "./dc-tables"
 import { FileInput } from "common/components/input"
 import { useMutation, useQuery } from "common/hooks/async"
-import { usePortal } from "common/components/portal"
+import Portal, { usePortal } from "common/components/portal"
 import { formatDate } from "common/utils/formatters"
+import useEntity from "carbure/hooks/entity"
+import { useHashMatch } from "common/components/hash-route"
+import { useLocation, useNavigate } from "react-router-dom"
 
-export type DoubleCountingDialogProps = {
-  applicationID: number
-  entity: Entity
-  onClose: () => void
-}
 
-export const DoubleCountingDialog = ({
-  entity,
-  applicationID,
-  onClose,
-}: DoubleCountingDialogProps) => {
+export const DoubleCountingApplicationDialog = () => {
   const { t } = useTranslation()
   const notify = useNotify()
   const portal = usePortal()
+  const navigate = useNavigate()
+  const location = useLocation()
 
+  const entity = useEntity()
   const [focus, setFocus] = useState("aggregated_sourcing")
   const [quotas, setQuotas] = useState<Record<string, number>>({})
+  const match = useHashMatch("application/:id")
+
 
   const application = useQuery(api.getDoubleCountingApplication, {
     key: "dc-application",
-    params: [applicationID],
+    params: [parseInt(match?.params.id!)],
 
     onSuccess: (application) => {
       const applicationData = application.data.data
@@ -120,7 +119,7 @@ export const DoubleCountingDialog = ({
 
   const excelURL =
     applicationData &&
-    `/api/v3/doublecount/admin/application?dca_id=${applicationData.id}&export=true`
+    `/api/v5/admin/double-counting/applications/details?dca_id=${applicationData.id}&export=true`
   const documentationURL =
     documentationFile &&
     `/api/v3/doublecount/admin/download-documentation?dca_id=${applicationData!.id
@@ -191,138 +190,141 @@ export const DoubleCountingDialog = ({
 
   async function submitDecision(decision: File | undefined) {
     if (decision) {
-      await uploadDecision.execute(applicationID, decision)
+      await uploadDecision.execute(parseInt(match?.params.id!), decision)
     }
   }
 
+  const closeDialog = () => {
+    navigate({ search: location.search, hash: "#" })
+  }
+
   return (
-    <Dialog fullscreen onClose={onClose}>
-      <header>
-        <DoubleCountingStatus big status={dcaStatus} />
-        <h1>{t("Dossier double comptage")} </h1>
-      </header>
+    <Portal onClose={closeDialog}>
+      <Dialog fullscreen onClose={closeDialog}>
+        <header>
+          <DoubleCountingStatus big status={dcaStatus} />
+          <h1>{t("Dossier double comptage")} </h1>
+        </header>
 
-      <main>
-        <section>
-          <p>
-            <Trans
-              values={{ producer, productionSite, creationDate, user }}
-              defaults="Pour le site de production <b>{{ productionSite }}</b> de <b>{{ producer }}</b>, soumis par <b>{{ user }}</b> le <b>{{ creationDate }}</b>"
-            />
-          </p>
-        </section>
-
-        {!isReady && (
+        <main>
           <section>
-            <Alert variant="warning" icon={AlertCircle}>
-              <Trans>Dossier en attente de validation par la DGEC</Trans>
-            </Alert>
+            <p>
+              <Trans
+                values={{ producer, productionSite, creationDate, user }}
+                defaults="Pour le site de production <b>{{ productionSite }}</b> de <b>{{ producer }}</b>, soumis par <b>{{ user }}</b> le <b>{{ creationDate }}</b>"
+              />
+            </p>
           </section>
-        )}
 
-        <section>
-          <Tabs
-            tabs={[
-              { key: "aggregated_sourcing", label: t("Approvisionnement") },
-              { key: "sourcing", label: t("Approvisionnement (détaillé)") },
-              { key: "production", label: t("Production") },
-              { key: "status", label: t("Statut") },
-            ]}
-            focus={focus}
-            onFocus={setFocus}
-          />
-        </section>
+          {!isReady && (
+            <section>
+              <Alert variant="warning" icon={AlertCircle}>
+                <Trans>Dossier en attente de validation par la DGEC</Trans>
+              </Alert>
+            </section>
+          )}
 
-        {focus === "aggregated_sourcing" && (
-          <SourcingAggregationTable
-            sourcing={applicationData?.aggregated_sourcing ?? []}
-          />
-        )}
+          <section>
+            <Tabs
+              tabs={[
+                { key: "aggregated_sourcing", label: t("Approvisionnement") },
+                { key: "sourcing", label: t("Approvisionnement (détaillé)") },
+                { key: "production", label: t("Production") },
+                { key: "status", label: t("Statut") },
+              ]}
+              focus={focus}
+              onFocus={setFocus}
+            />
+          </section>
 
-        {focus === "sourcing" && (
-          <SourcingTable sourcing={applicationData?.sourcing ?? []} />
-        )}
+          {focus === "aggregated_sourcing" && (
+            <SourcingAggregationTable
+              sourcing={applicationData?.aggregated_sourcing ?? []}
+            />
+          )}
 
-        {focus === "production" && (
-          <ProductionTable
-            done={isDone}
-            production={applicationData?.production ?? []}
-            entity={entity}
-            quotas={quotas}
-            setQuotas={setQuotas}
-          />
-        )}
+          {focus === "sourcing" && (
+            <SourcingTable sourcing={applicationData?.sourcing ?? []} />
+          )}
 
-        {focus === "status" && <StatusTable application={applicationData} />}
-      </main>
+          {focus === "production" && (
+            <ProductionTable
+              done={isDone}
+              production={applicationData?.production ?? []}
+              entity={entity}
+              quotas={quotas}
+              setQuotas={setQuotas}
+            />
+          )}
 
-      <footer>
-        <Col style={{ gap: "var(--spacing-xs)", marginRight: "auto" }}>
-          <DownloadLink
-            href={excelURL ?? "#"}
-            label={t("Télécharger le dossier au format excel")}
-          />
-          <DownloadLink
-            href={documentationURL ?? "#"}
-            label={t("Télécharger la description de l'activité")}
-          />
-          {decisionURL && (
+          {focus === "status" && <StatusTable application={applicationData} />}
+        </main>
+
+        <footer>
+          <Col style={{ gap: "var(--spacing-xs)", marginRight: "auto" }}>
+            <DownloadLink
+              href={excelURL ?? "#"}
+              label={t("Télécharger le dossier au format excel")}
+            />
+
+            {/* {decisionURL && (
             <DownloadLink
               href={decisionURL ?? "#"}
               label={t("Télécharger la décision de l'administration")}
             />
+          )} */}
+          </Col>
+
+          {isAdmin && isAccepted && !decisionFile && (
+            <FileInput
+              loading={uploadDecision.loading}
+              icon={Download}
+              value={undefined}
+              onChange={submitDecision}
+              placeholder={t("Mettre en ligne la décision")}
+            />
           )}
-        </Col>
 
-        {isAdmin && isAccepted && !decisionFile && (
-          <FileInput
-            loading={uploadDecision.loading}
-            icon={Download}
-            value={undefined}
-            onChange={submitDecision}
-            placeholder={t("Mettre en ligne la décision")}
-          />
-        )}
+          {!isDone && !application.loading && (
+            <Fragment>
+              {isAdmin && (
+                <Button
+                  loading={approveQuotas.loading}
+                  variant="primary"
+                  icon={Save}
+                  action={submitQuotas}
+                >
+                  <Trans>Enregistrer</Trans>
+                </Button>
+              )}
 
-        {!isDone && !application.loading && (
-          <Fragment>
-            {isAdmin && (
               <Button
                 loading={approveQuotas.loading}
-                variant="primary"
-                icon={Save}
-                action={submitQuotas}
+                disabled={!isReady || !hasQuotas}
+                variant="success"
+                icon={Check}
+                action={submitAccept}
               >
-                <Trans>Enregistrer</Trans>
+                <Trans>Accepter</Trans>
               </Button>
-            )}
+              <Button
+                loading={rejectApplication.loading}
+                disabled={!isReady}
+                variant="danger"
+                icon={Cross}
+                action={submitReject}
+              >
+                <Trans>Refuser</Trans>
+              </Button>
+            </Fragment>
+          )}
+          <Button icon={Return} action={closeDialog}>
+            <Trans>Retour</Trans>
+          </Button>
+        </footer>
 
-            <Button
-              loading={approveQuotas.loading}
-              disabled={!isReady || !hasQuotas}
-              variant="success"
-              icon={Check}
-              action={submitAccept}
-            >
-              <Trans>Accepter</Trans>
-            </Button>
-            <Button
-              loading={rejectApplication.loading}
-              disabled={!isReady}
-              variant="danger"
-              icon={Cross}
-              action={submitReject}
-            >
-              <Trans>Refuser</Trans>
-            </Button>
-          </Fragment>
-        )}
-        <Button icon={Return} action={onClose}>
-          <Trans>Retour</Trans>
-        </Button>
-      </footer>
-
-      {application.loading && <LoaderOverlay />}
-    </Dialog>
+        {application.loading && <LoaderOverlay />}
+      </Dialog>
+    </Portal>
   )
 }

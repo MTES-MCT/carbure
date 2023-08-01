@@ -1,13 +1,12 @@
 from django.urls import path
 
-from admin.api.double_counting.applications.applications import get_applications_admin
 from . import views
 
 urlpatterns = [
     # GET
     path("applications", views.get_applications, name="api-v3-doublecount-get-applications"),
     path("application", views.get_application, name="api-v3-doublecount-get-application"),
-    path("admin/application", views.get_application_admin, name="api-v3-doublecount-get-application-admin"),
+    # path("admin/application", views.get_application_admin, name="api-v3-doublecount-get-application-admin"),
     # path("admin/applications", get_applications_admin, name="api-v3-doublecount-get-applications-admin"),
     # path(
     #     "admin/applications-snapshot",

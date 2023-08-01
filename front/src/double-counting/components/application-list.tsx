@@ -11,9 +11,11 @@ import { Fragment, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api"
 import { ApplicationSnapshot, DoubleCountingApplication } from "../types"
-import { DoubleCountingDialog } from "./application-details-dialog"
+import { DoubleCountingApplicationDialog } from "./application-details-dialog"
 import DoubleCountingStatus from "./dc-status"
 import FilesCheckerUploadButton from "./files-checker/upload-button"
+import HashRoute from "common/components/hash-route"
+import { useLocation, useNavigate } from "react-router-dom"
 
 type ApplicationListProps = {
   entity: Entity
@@ -23,7 +25,8 @@ type ApplicationListProps = {
 const ApplicationList = ({ entity, snapshot = defaultCount }: ApplicationListProps) => {
   const { t } = useTranslation()
   const [tab, setTab] = useState("pending")
-  const portal = usePortal()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const applications = useQuery(api.getAllDoubleCountingApplications, {
     key: "dc-applications",
@@ -56,18 +59,14 @@ const ApplicationList = ({ entity, snapshot = defaultCount }: ApplicationListPro
 
   const { pending, rejected } = applicationsData
 
-
   function showApplicationDialog(application: DoubleCountingApplication) {
-    portal((close) => (
-      <DoubleCountingDialog
-        entity={entity}
-        applicationID={application.id}
-        onClose={close}
-      />
-    ))
+    navigate({
+      pathname: location.pathname,
+      hash: `application/${application.id}`,
+    })
   }
 
-  return (
+  return (<>
     <section>
       <ActionBar>
         <Tabs
@@ -133,6 +132,12 @@ const ApplicationList = ({ entity, snapshot = defaultCount }: ApplicationListPro
         </Fragment>
       )}
     </section>
+    <HashRoute
+      path="application/:id"
+      element={<DoubleCountingApplicationDialog />}
+    />
+
+  </>
   )
 }
 
