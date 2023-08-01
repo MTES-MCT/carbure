@@ -6,7 +6,7 @@ class ElecProvisionCertificate(models.Model):
         db_table = "elec_provision_certificate"
         verbose_name = "Certificat de Fourniture (elec)"
         verbose_name_plural = "Certificats de Fourniture (elec)"
-        unique_together = ("entity", "quarter", "year", "operating_unit")
+        unique_together = ("cpo", "quarter", "year", "operating_unit")
 
     QUARTERS = (
         (1, "T1"),
@@ -15,7 +15,7 @@ class ElecProvisionCertificate(models.Model):
         (4, "T4"),
     )
 
-    entity = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.CASCADE)
+    cpo = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.CASCADE)
     quarter = models.IntegerField(choices=QUARTERS)
     year = models.IntegerField()
     operating_unit = models.CharField(max_length=64)
