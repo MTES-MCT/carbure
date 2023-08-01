@@ -6,7 +6,7 @@ from elec.models import ElecProvisionCertificate, ElecTransferCertificate
 @admin.register(ElecProvisionCertificate)
 class ElecProvisionCertificateAdmin(admin.ModelAdmin):
     list_display = (
-        "entity",
+        "cpo",
         "quarter",
         "year",
         "operating_unit",
@@ -14,7 +14,7 @@ class ElecProvisionCertificateAdmin(admin.ModelAdmin):
         "remaining_energy_amount",
     )
     list_filter = (
-        "entity",
+        "cpo",
         "quarter",
         "year",
         "operating_unit",
