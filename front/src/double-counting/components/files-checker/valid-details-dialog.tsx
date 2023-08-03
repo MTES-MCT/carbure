@@ -15,7 +15,7 @@ import Tag from "common/components/tag"
 import { useMutation } from "common/hooks/async"
 import { addDoubleCountingApplication } from "double-counting/api"
 import { Trans, useTranslation } from "react-i18next"
-import { useMatch } from "react-router-dom"
+import { useLocation, useMatch, useNavigate } from "react-router-dom"
 import { DoubleCountingFileInfo } from "../../types"
 import ApplicationDetails from "../application-details"
 import ApplicationInfo from "./application-info"
@@ -105,12 +105,17 @@ export const ProductionSiteAdminDialog = ({
     useForm<ProductionForm>(defaultProductionForm)
   const notify = useNotify()
   const notifyError = useNotifyError()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const addApplication = useMutation(addDoubleCountingApplication, {
     invalidates: [],
     onSuccess() {
       onClose()
       notify(t("Le dossier a été envoyé !"), { variant: "success" })
+      navigate({
+        pathname: '/org/9/double-counting',
+      })
     },
     onError(err) {
       const errorCode = (err as AxiosError<{ error: string }>).response?.data
@@ -132,6 +137,7 @@ export const ProductionSiteAdminDialog = ({
   const saveApplication = async (shouldReplace = false) => {
     if (!value.productionSite || !value.producer) return
     setError(undefined)
+
     addApplication.execute(
       entity.id,
       value.productionSite.id,
