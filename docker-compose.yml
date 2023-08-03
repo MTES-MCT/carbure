@@ -93,7 +93,6 @@ services:
     ports:
       - 8090:80
 
-
   carbure-udb-blue:
     image: carbure_udb:local
     container_name: carbure_udb_blue
@@ -113,10 +112,6 @@ services:
       DOMIBUS_DATABASE_PORT: 3306
       MYSQL_USER: root
       MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-    volumes:
-      - ./udb/migrate.sh:/app/migrate.sh
-      - ./udb/setenv.sh:/app/domibus/bin/setenv.sh
-      - ./udb/domibus-blue.properties:/app/domibus/conf/domibus/domibus.properties
     networks:
       - carbure
     ports:
@@ -141,15 +136,10 @@ services:
       DOMIBUS_DATABASE_PORT: 3306
       MYSQL_USER: root
       MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-    volumes:
-      - ./udb/migrate.sh:/app/migrate.sh
-      - ./udb/setenv.sh:/app/domibus/bin/setenv.sh
-      - ./udb/domibus-red.properties:/app/domibus/conf/domibus/domibus.properties
     networks:
       - carbure
     ports:
       - 8081:8080
-
 
 volumes:
   carburedb:
