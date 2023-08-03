@@ -13,6 +13,7 @@ import YearTable from "./year-table"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import Checkbox from "common/components/checkbox"
 import { useState } from "react"
+import Button from "common/components/button"
 
 type ValidationStatus = {
   approved: boolean
@@ -57,9 +58,9 @@ export const SourcingTable = ({ sourcing }: SourcingTableProps) => {
     {
       header: t("Transit"),
       cell: (s) =>
-        s.transit_country && (
+        s.transit_country ? (
           <Cell text={t(s.transit_country.code_pays, { ns: "countries" })} />
-        ),
+        ) : "-",
     },
   ]
 
@@ -182,32 +183,54 @@ export const ProductionTable = ({
   quotas && setQuotas && productionColumns?.push(
     {
       header: t("Quota approuvé"),
-      cell: (p) => {
-        if (done || entity?.entity_type !== EntityType.Administration) {
-          return p.approved_quota >= 0 ? p.approved_quota : p.requested_quota
-        }
-
-        return (
-          <NumberInput
-            value={quotas[p.id]}
-            onChange={(value) =>
-              setQuotas({
-                ...quotas,
-                [p.id]: value,
-              })
-            }
-          />
-        )
-      }
+      cell: (p) => <ApprovedQuotasCell production={p} quotas={quotas} setQuotas={setQuotas} />,
     })
   return <YearTable columns={productionColumns} rows={production} />
 }
 
-type StatusTableProps = {
-  agreement: DoubleCountingDetails | undefined
+interface ApprovedQuotasCellProps {
+  production: DoubleCountingProduction
+  quotas: Record<string, number>
+  setQuotas: (quotas: Record<string, number>) => void
+}
+const ApprovedQuotasCell = ({ production, quotas, setQuotas }: ApprovedQuotasCellProps) => {
+  const { t } = useTranslation()
+  // const [approvedQuota, setApprovedQuota] = useState(production.approved_quota)
+
+  const onSetMaximumVolume = () => {
+    // setApprovedQuota(production.requested_quota)
+    setQuotas({
+      ...quotas,
+      [production.id]: production.requested_quota,
+    })
+  }
+
+  return (
+    <NumberInput
+      value={quotas[production.id]}
+      onChange={(value) => {
+        // setApprovedQuota(value)
+        setQuotas({
+          ...quotas,
+          [production.id]: value,
+        })
+      }}
+      rightContent={
+        <Button
+          label={t("Max")}
+          action={onSetMaximumVolume}
+          variant="primary"
+        />
+      }
+    />
+  )
 }
 
-export const StatusTable = ({ agreement }: StatusTableProps) => {
+type StatusTableProps = {
+  application: DoubleCountingDetails | undefined
+}
+
+export const StatusTable = ({ application: application }: StatusTableProps) => {
   const { t } = useTranslation()
 
   const statusColumns: Column<ValidationStatus>[] = [
@@ -241,21 +264,21 @@ export const StatusTable = ({ agreement }: StatusTableProps) => {
 
   const statusRows: ValidationStatus[] = [
     {
-      approved: agreement?.dgec_validated ?? false,
-      date: agreement?.dgec_validated_dt ?? "",
-      user: agreement?.dgec_validator ?? "",
+      approved: application?.dgec_validated ?? false,
+      date: application?.dgec_validated_dt ?? "",
+      user: application?.dgec_validator ?? "",
       entity: Admin.DGEC,
     },
     {
-      approved: agreement?.dgddi_validated ?? false,
-      date: agreement?.dgddi_validated_dt ?? "",
-      user: agreement?.dgddi_validator ?? "",
+      approved: application?.dgddi_validated ?? false,
+      date: application?.dgddi_validated_dt ?? "",
+      user: application?.dgddi_validator ?? "",
       entity: Admin.DGDDI,
     },
     {
-      approved: agreement?.dgpe_validated ?? false,
-      date: agreement?.dgpe_validated_dt ?? "",
-      user: agreement?.dgpe_validator ?? "",
+      approved: application?.dgpe_validated ?? false,
+      date: application?.dgpe_validated_dt ?? "",
+      user: application?.dgpe_validator ?? "",
       entity: Admin.DGPE,
     },
   ]

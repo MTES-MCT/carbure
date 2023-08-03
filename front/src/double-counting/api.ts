@@ -1,29 +1,42 @@
 import api, { Api } from "common/services/api"
 import {
   DoubleCountingDetails,
-  AgreementSnapshot,
-  AgreementsOverview,
+  ApplicationSnapshot,
+  ApplicationsOverview,
   QuotaDetails,
   QuotaOverview,
   DoubleCountingUploadErrors,
   CheckDoubleCountingFilesResponse,
+  DoubleCountingSnapshot,
 } from "./types"
 
-export function getDoubleCountingSnapshot() {
-  return api.get<Api<AgreementSnapshot>>(
-    "/v3/doublecount/admin/agreements-snapshot"
-  )
-}
 
-export function getAllDoubleCountingAgreements(year: number) {
-  return api.get<Api<AgreementsOverview>>("/v5/admin/double-counting/agreements", {
-    params: { year },
+export function getYears(entity_id: number) {
+  return api.get<Api<number[]>>("/v5/admin/double-counting/years", {
+    params: { entity_id },
   })
 }
 
-export function getDoubleCountingAgreement(dca_id: number) {
+
+
+export function getSnapshot(entity_id: number) {
+  return api.get<Api<DoubleCountingSnapshot>>("/v5/admin/double-counting/snapshot", {
+    params: { entity_id },
+  })
+}
+// export function getDoubleCountingSnapshot() {
+//   return api.get<Api<ApplicationSnapshot>>(
+//     "/v3/doublecount/admin/applications-snapshot"
+//   )
+// }
+
+export function getAllDoubleCountingApplications() {
+  return api.get<Api<ApplicationsOverview>>("/v5/admin/double-counting/applications")
+}
+
+export function getDoubleCountingApplication(dca_id: number) {
   return api.get<Api<DoubleCountingDetails>>(
-    "/v3/doublecount/admin/agreement",
+    "/v5/admin/double-counting/applications/details",
     {
       params: { dca_id },
     }
@@ -31,16 +44,18 @@ export function getDoubleCountingAgreement(dca_id: number) {
 }
 
 export function approveDoubleCountingQuotas(
+  entity_id: number,
   dca_id: number,
   approved_quotas: number[][]
 ) {
-  return api.post("/v3/doublecount/admin/agreement/update-approved-quotas", {
+  return api.post("/v5/admin/double-counting/applications/update-quotas", {
+    entity_id,
     dca_id,
     approved_quotas: JSON.stringify(approved_quotas),
   })
 }
 
-export function approveDoubleCountingAgreement(
+export function approveDoubleCountingApplication(
   validator_entity_id: number | undefined,
   dca_id: number
 ) {
@@ -50,22 +65,19 @@ export function approveDoubleCountingAgreement(
   })
 }
 
-export function rejectDoubleCountingAgreement(
-  validator_entity_id: number | undefined,
+export function rejectDoubleCountingApplication(
+  entity_id: number,
   dca_id: number
 ) {
-  return api.post("/v3/doublecount/admin/reject", {
-    validator_entity_id: validator_entity_id,
+  return api.post("/v5/admin/double-counting/applications/reject", {
+    entity_id,
     dca_id: dca_id,
   })
 }
 
-export function getQuotasSnapshot(year: number) {
+export function getQuotasSnapshot() {
   return api.get<Api<QuotaOverview[]>>(
-    "/v3/doublecount/admin/quotas-snapshot",
-    {
-      params: { year },
-    }
+    "/v3/doublecount/admin/quotas-snapshot"
   )
 }
 
@@ -81,7 +93,7 @@ export function uploadDoubleCountingDecision(dca_id: number, file: File) {
 
 export function checkDoubleCountingFiles(entity_id: number, files: FileList) {
   const res = api.post<Api<CheckDoubleCountingFilesResponse>>(
-    "/v5/admin/double-counting/application/check-files",
+    "/v5/admin/double-counting/applications/check-files",
     { entity_id, files }
   )
   return res
@@ -91,12 +103,15 @@ export function addDoubleCountingApplication(
   entity_id: number,
   production_site_id: number,
   producer_id: number,
-  file: File
+  file: File,
+  should_replace: boolean = false
 ) {
-  return api.post("/v5/admin/double-counting/application/add", {
+
+  return api.post("/v5/admin/double-counting/applications/add", {
     entity_id,
     production_site_id,
     producer_id,
     file,
+    should_replace
   })
 }

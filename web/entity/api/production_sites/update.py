@@ -27,6 +27,7 @@ def update_production_site(request, *args, **kwargs):
 
     site_id = request.POST.get("site_id")
     city = request.POST.get("city")
+    address = request.POST.get("address")
     postal_code = request.POST.get("postal_code")
     manager_name = request.POST.get("manager_name")
     manager_phone = request.POST.get("manager_phone")
@@ -46,6 +47,8 @@ def update_production_site(request, *args, **kwargs):
         psite.site_id = site_id
     if city:
         psite.city = city
+    if address:
+        psite.address = address
     if postal_code:
         psite.postal_code = postal_code
     if manager_name:

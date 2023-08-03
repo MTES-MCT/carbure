@@ -9,19 +9,19 @@ from django.db.models.signals import pre_save
 usermodel = get_user_model()
 
 
-class DoubleCountingAgreement(models.Model):
+class DoubleCountingApplication(models.Model):
     PENDING = "PENDING"
     INPROGRESS = "INPROGRESS"
     REJECTED = "REJECTED"
     ACCEPTED = "ACCEPTED"
-    LAPSED = "LAPSED"
+    # LAPSED = "LAPSED"
 
     DCA_STATUS_CHOICES = (
         (PENDING, PENDING),
         (INPROGRESS, INPROGRESS),
         (REJECTED, REJECTED),
         (ACCEPTED, ACCEPTED),
-        (LAPSED, LAPSED),
+        # (LAPSED, LAPSED),
     )
 
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE, null=True, blank=True)
@@ -29,7 +29,9 @@ class DoubleCountingAgreement(models.Model):
     producer_user = models.ForeignKey(
         usermodel, blank=True, null=True, on_delete=models.SET_NULL, related_name="producer_user"
     )
-    creation_date = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    # edited_at = models.DateTimeField(auto_now=True)
+
     period_start = models.DateField(null=False, blank=False)
     period_end = models.DateField(null=False, blank=False)
     agreement_id = models.CharField(max_length=16)  # FR_123456789_2020
@@ -69,12 +71,12 @@ class DoubleCountingAgreement(models.Model):
         }
 
     class Meta:
-        db_table = "double_counting_agreements"
+        db_table = "double_counting_applications"
         verbose_name = "Dossier Double Compte"
         verbose_name_plural = "Dossiers Double Compte"
 
 
-@receiver(pre_save, sender=DoubleCountingAgreement)
+@receiver(pre_save, sender=DoubleCountingApplication)
 def set_agreement_id(sender, instance, **kwargs):
     # generer un dc_number si jamais été reconnu comme eligible
     if not instance.production_site.dc_reference:
@@ -87,7 +89,7 @@ def set_agreement_id(sender, instance, **kwargs):
 
 
 class DoubleCountingSourcing(models.Model):
-    dca = models.ForeignKey(DoubleCountingAgreement, on_delete=models.CASCADE, related_name="sourcing")
+    dca = models.ForeignKey(DoubleCountingApplication, on_delete=models.CASCADE, related_name="sourcing")
     year = models.IntegerField(blank=False, null=False)
     feedstock = models.ForeignKey(MatierePremiere, on_delete=models.CASCADE)
     origin_country = models.ForeignKey(Pays, on_delete=models.CASCADE, related_name="origin_country")
@@ -104,7 +106,7 @@ class DoubleCountingSourcing(models.Model):
 
 
 class DoubleCountingProduction(models.Model):
-    dca = models.ForeignKey(DoubleCountingAgreement, on_delete=models.CASCADE, related_name="production")
+    dca = models.ForeignKey(DoubleCountingApplication, on_delete=models.CASCADE, related_name="production")
     year = models.IntegerField(blank=False, null=False)
     biofuel = models.ForeignKey(Biocarburant, on_delete=models.CASCADE)
     feedstock = models.ForeignKey(MatierePremiere, on_delete=models.CASCADE)
@@ -125,10 +127,12 @@ class DoubleCountingDocFile(models.Model):
     FILE_TYPE = ((SOURCING, SOURCING), (DECISION, DECISION))
 
     url = models.TextField()
+    agreement_id = models.CharField(max_length=16, default="")
     file_name = models.CharField(max_length=128, default="")
     file_type = models.CharField(max_length=128, choices=FILE_TYPE, default=SOURCING)
-    dca = models.ForeignKey(DoubleCountingAgreement, on_delete=models.CASCADE, related_name="documents")
+    dca = models.ForeignKey(DoubleCountingApplication, on_delete=models.CASCADE, related_name="documents")
     link_expiry_dt = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     class Meta:
         db_table = "double_counting_doc_files"

@@ -5,23 +5,26 @@ import { Dialog } from "common/components/dialog"
 import { Button } from "common/components/button"
 import { AlertCircle, Return } from "common/components/icons"
 import { formatNumber } from "common/utils/formatters"
-import { QuotaOverview, QuotaDetails } from "../types"
+import { QuotaOverview, QuotaDetails, AgreementsSnapshot } from "../types"
 import * as api from "../api"
 import { usePortal } from "common/components/portal"
 import Alert from "common/components/alert"
+import { useState } from "react"
+import { ActionBar } from "common/components/scaffold"
+import Tabs from "common/components/tabs"
 
-type QuotasListProps = {
-  year: number
-}
 
-const QuotasList = ({ year }: QuotasListProps) => {
+const QuotasList = ({ snapshot = defaultCount }: { snapshot: AgreementsSnapshot | undefined }) => {
   const { t } = useTranslation()
   const portal = usePortal()
+  const year = new Date().getFullYear()
+  const [tab, setTab] = useState("active")
 
   const quotas = useQuery(api.getQuotasSnapshot, {
     key: "dc-quotas-snapshot",
-    params: [year],
+    params: [],
   })
+
 
   const columns: Column<QuotaOverview>[] = [
     { header: t("Producteur"), cell: (a) => <Cell text={a.producer.name} /> },
@@ -57,6 +60,27 @@ const QuotasList = ({ year }: QuotasListProps) => {
 
   return (
     <section>
+      <ActionBar>
+        <Tabs
+          focus={tab}
+          variant="switcher"
+          onFocus={setTab}
+          tabs={[
+            { key: "active", label: t("Actifs ({{count}})", { count: snapshot?.agreements_active }) },
+            {
+              key: "expired", label: t("Expirés ({{ count }})",
+                { count: snapshot?.agreements_expired }
+              )
+            },
+            {
+              key: "incoming", label: t("À venir ({{ count }})",
+                { count: snapshot?.agreements_incoming }
+              )
+            },
+          ]}
+        />
+
+      </ActionBar>
       {quotaRows.length > 0 && (
         <Table
           loading={quotas.loading}
@@ -72,7 +96,10 @@ const QuotasList = ({ year }: QuotasListProps) => {
 
       {quotaRows.length === 0 && (
         <Alert variant="warning" icon={AlertCircle} loading={quotas.loading}>
-          <Trans>Aucun quota disponible</Trans>
+          {quotas.loading ?
+            <Trans>Chargement en cours...</Trans>
+            : <Trans>Aucun quota disponible</Trans>}
+
         </Alert>
       )}
     </section>
@@ -163,3 +190,9 @@ const QuotasDetailsDialog = ({
 }
 
 export default QuotasList
+
+const defaultCount = {
+  agreements_active: 0,
+  agreements_expired: 0,
+  agreements_incoming: 0
+}
