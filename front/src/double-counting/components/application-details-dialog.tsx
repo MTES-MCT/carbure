@@ -44,7 +44,6 @@ export const DoubleCountingApplicationDialog = () => {
   const entity = useEntity()
   const [focus, setFocus] = useState("aggregated_sourcing")
   const [quotas, setQuotas] = useState<Record<string, number>>({})
-  console.log('quotas:', quotas)
   const match = useHashMatch("application/:id")
 
 
@@ -70,27 +69,25 @@ export const DoubleCountingApplicationDialog = () => {
   })
 
   const approveQuotas = useMutation(api.approveDoubleCountingQuotas, {
-    invalidates: ["dc-application", "dc-snapshot"],
+    invalidates: ["dc-applications", "dc-snapshot"],
   })
 
   const approveApplication = useMutation(api.approveDoubleCountingApplication, {
-    invalidates: ["dc-application", "dc-snapshot"],
+    invalidates: ["dc-applications", "dc-snapshot"],
   })
 
   const rejectApplication = useMutation(api.rejectDoubleCountingApplication, {
-    invalidates: ["dc-application", "dc-snapshot"],
+    invalidates: ["dc-applications", "dc-snapshot"],
     onSuccess: () => {
       navigate({
         pathname: location.pathname,
       })
       notify(t("Le dossier a bien été refusé."), { variant: "success" })
-
     }
   })
 
 
   const applicationData = application.result?.data.data
-  console.log('applicationData:', applicationData)
   const dcaStatus = applicationData?.status ?? DCStatus.Pending
 
 
