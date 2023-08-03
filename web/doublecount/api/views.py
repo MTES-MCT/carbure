@@ -642,42 +642,6 @@ def approve_dca(request, *args, **kwargs):
     return JsonResponse({"status": "success"})
 
 
-@check_rights("validator_entity_id", role=[UserRights.ADMIN, UserRights.RW])
-def reject_dca(request, *args, **kwargs):
-    context = kwargs["context"]
-    entity = context["entity"]
-    dca_id = request.POST.get("dca_id", False)
-    if not dca_id:
-        return JsonResponse({"status": "error", "message": "Missing dca_id"}, status=400)
-
-    if entity.entity_type not in [Entity.ADMIN, Entity.EXTERNAL_ADMIN]:
-        return JsonResponse({"status": "error", "message": "Not authorised"}, status=403)
-
-    try:
-        dca = DoubleCountingApplication.objects.get(id=dca_id)
-    except:
-        return JsonResponse({"status": "error", "message": "Could not find DCA"}, status=400)
-
-    if entity.name == "DGPE":
-        dca.dgpe_validated = False
-        dca.dgpe_validator = request.user
-        dca.dgpe_validated_dt = pytz.utc.localize(datetime.datetime.now())
-    elif entity.name == "DGDDI":
-        dca.dgddi_validated = False
-        dca.dgddi_validator = request.user
-        dca.dgddi_validated_dt = pytz.utc.localize(datetime.datetime.now())
-    elif entity.entity_type == Entity.ADMIN:
-        dca.dgec_validated = False
-        dca.dgec_validator = request.user
-        dca.dgec_validated_dt = pytz.utc.localize(datetime.datetime.now())
-    else:
-        return JsonResponse({"status": "error", "message": "Unknown entity"}, status=400)
-    dca.status = DoubleCountingApplication.REJECTED
-    send_dca_status_email(dca)
-    dca.save()
-    return JsonResponse({"status": "success"})
-
-
 @check_rights("entity_id", role=[UserRights.ADMIN, UserRights.RW])
 def remove_sourcing(request, *args, **kwargs):
     context = kwargs["context"]
