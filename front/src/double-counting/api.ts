@@ -56,12 +56,12 @@ export function approveDoubleCountingQuotas(
 }
 
 export function approveDoubleCountingApplication(
-  validator_entity_id: number | undefined,
+  entity_id: number | undefined,
   dca_id: number
 ) {
-  return api.post("/v3/doublecount/admin/approve", {
-    validator_entity_id: validator_entity_id,
-    dca_id: dca_id,
+  return api.post("/v5/admin/double-counting/applications/approve", {
+    entity_id,
+    dca_id,
   })
 }
 

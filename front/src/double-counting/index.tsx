@@ -55,7 +55,7 @@ const DoubleCounting = () => {
                     </Row>
                 },
                 {
-                  key: "quotas", path: "quotas", label:
+                  key: "agreements", path: "agreements", label:
                     <Row><Col>
                       <p>
                         {snapshotResponse.loading ? (
@@ -79,7 +79,7 @@ const DoubleCounting = () => {
           element={<ApplicationList entity={entity} snapshot={snapshot as ApplicationSnapshot} />}
         />
 
-        <Route path="quotas" element={<QuotasList snapshot={snapshot as AgreementsSnapshot} />} />
+        <Route path="agreements" element={<QuotasList snapshot={snapshot as AgreementsSnapshot} />} />
         <Route
           path="files-checker/*"
           element={<DoubleCountingFilesChecker />}
