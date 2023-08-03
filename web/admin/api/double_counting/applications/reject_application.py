@@ -1,8 +1,5 @@
-import datetime
-
 from django.http import JsonResponse
-from core.decorators import check_admin_rights, check_rights
-import pytz
+from core.decorators import check_admin_rights
 
 from doublecount.models import (
     DoubleCountingApplication,
@@ -10,7 +7,6 @@ from doublecount.models import (
 from doublecount.helpers import (
     send_dca_status_email,
 )
-from core.models import Entity, UserRights
 
 
 @check_admin_rights()

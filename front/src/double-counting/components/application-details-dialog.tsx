@@ -32,6 +32,7 @@ import { formatDate } from "common/utils/formatters"
 import useEntity from "carbure/hooks/entity"
 import { useHashMatch } from "common/components/hash-route"
 import { useLocation, useNavigate } from "react-router-dom"
+import { set } from "date-fns"
 
 
 export const DoubleCountingApplicationDialog = () => {
@@ -42,7 +43,7 @@ export const DoubleCountingApplicationDialog = () => {
   const location = useLocation()
 
   const entity = useEntity()
-  const [focus, setFocus] = useState("aggregated_sourcing")
+  const [quotasIsUpdated, setQuotasIsUpdated] = useState(false)
   const [quotas, setQuotas] = useState<Record<string, number>>({})
   const match = useHashMatch("application/:id")
 
@@ -70,10 +71,17 @@ export const DoubleCountingApplicationDialog = () => {
 
   const approveQuotas = useMutation(api.approveDoubleCountingQuotas, {
     invalidates: ["dc-applications", "dc-snapshot"],
+    onSuccess: () => {
+      setQuotasIsUpdated(false)
+    }
   })
 
   const approveApplication = useMutation(api.approveDoubleCountingApplication, {
-    invalidates: ["dc-applications", "dc-snapshot"],
+    invalidates: ["dc-applications", "dc-snapshot", "dc-agreements"],
+    onSuccess: () => {
+      navigate("org/9/double-counting/agreements")
+      notify(t("Le dossier a été accepté."), { variant: "success" })
+    }
   })
 
   const rejectApplication = useMutation(api.rejectDoubleCountingApplication, {
@@ -82,7 +90,7 @@ export const DoubleCountingApplicationDialog = () => {
       navigate({
         pathname: location.pathname,
       })
-      notify(t("Le dossier a bien été refusé."), { variant: "success" })
+      notify(t("Le dossier a été refusé."), { variant: "success" })
     }
   })
 
@@ -96,7 +104,8 @@ export const DoubleCountingApplicationDialog = () => {
   const hasQuotas = !applicationData?.production.some(
     (p) => p.approved_quota === -1
   )
-  const isReady = isAdmin ? true : applicationData?.dgec_validated
+  console.log('hasQuotas:', hasQuotas)
+
 
   const productionSite = applicationData?.production_site ?? "N/A"
   const producer = applicationData?.producer.name ?? "N/A"
@@ -105,15 +114,14 @@ export const DoubleCountingApplicationDialog = () => {
     ? formatDate(applicationData.created_at)
     : "N/A"
 
-  const documentationFile = applicationData?.documents.find(
-    (doc) => doc.file_type === "SOURCING"
-  )
-
-
   const excelURL =
     applicationData &&
     `/api/v5/admin/double-counting/applications/details?dca_id=${applicationData.id}&export=true`
 
+  const onUpdateQuotas = (quotas: Record<string, number>) => {
+    setQuotasIsUpdated(true)
+    setQuotas(quotas)
+  }
   async function submitQuotas() {
     if (
       !applicationData ||
@@ -197,7 +205,7 @@ export const DoubleCountingApplicationDialog = () => {
             </p>
           </section>
 
-          <ApplicationDetails sourcing={applicationData?.sourcing} production={applicationData?.production} quotas={quotas} setQuotas={setQuotas} />
+          <ApplicationDetails sourcing={applicationData?.sourcing} production={applicationData?.production} quotas={quotas} setQuotas={onUpdateQuotas} />
 
         </main>
 
@@ -215,6 +223,7 @@ export const DoubleCountingApplicationDialog = () => {
               {isAdmin && (
                 <Button
                   loading={approveQuotas.loading}
+                  disabled={!quotasIsUpdated}
                   variant="primary"
                   icon={Save}
                   action={submitQuotas}
@@ -225,8 +234,8 @@ export const DoubleCountingApplicationDialog = () => {
 
               <Button
                 loading={approveQuotas.loading}
-                // disabled={!isReady || !hasQuotas}
-                disabled={true}
+                disabled={application.loading || !hasQuotas}
+
 
                 variant="success"
                 icon={Check}
@@ -236,7 +245,7 @@ export const DoubleCountingApplicationDialog = () => {
               </Button>
               <Button
                 loading={rejectApplication.loading}
-                disabled={!isReady}
+                disabled={application.loading}
                 variant="danger"
                 icon={Cross}
                 action={submitReject}
