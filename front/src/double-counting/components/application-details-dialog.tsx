@@ -122,6 +122,7 @@ export const DoubleCountingApplicationDialog = () => {
     setQuotasIsUpdated(true)
     setQuotas(quotas)
   }
+
   async function submitQuotas() {
     if (
       !applicationData ||
@@ -131,10 +132,11 @@ export const DoubleCountingApplicationDialog = () => {
       return
     }
 
+    const updatedQuotas = Object.keys(quotas).map((id) => [parseInt(id), quotas[id]])
     const done = await approveQuotas.execute(
       entity.id,
       applicationData.id,
-      Object.keys(quotas).map((id) => [parseInt(id), quotas[id]])
+      updatedQuotas
     )
 
     if (done) {
