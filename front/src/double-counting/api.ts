@@ -48,6 +48,7 @@ export function approveDoubleCountingQuotas(
   dca_id: number,
   approved_quotas: number[][]
 ) {
+  console.log('approved_quotas:', approved_quotas)
   return api.post("/v5/admin/double-counting/applications/update-quotas", {
     entity_id,
     dca_id,

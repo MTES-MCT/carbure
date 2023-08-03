@@ -48,29 +48,36 @@ from core.xlsx_v3 import (
 from carbure.storage_backends import AWSStorage
 from django.core.files.storage import FileSystemStorage
 
-from core.common import ErrorResponse
+from core.common import ErrorResponse, SuccessResponse
 from doublecount.dc_sanity_checks import check_dc_globally
 from doublecount.parser.dc_parser import parse_dc_excel
 from doublecount.old_helpers import load_dc_file, load_dc_sourcing_data, load_dc_production_data
+
+
+class DoubleCountingApplicationApproveError:
+    MALFORMED_PARAMS = "MALFORMED_PARAMS"
+    APPLICATION_NOT_FOUND = "APPLICATION_NOT_FOUND"
+    QUOTAS_NOT_APPROVED = "QUOTAS_NOT_APPROVED"
 
 
 @check_admin_rights()
 def approve_dca(request, *args, **kwargs):
     dca_id = request.POST.get("dca_id", False)
     if not dca_id:
-        return JsonResponse({"status": "error", "message": "Missing dca_id"}, status=400)
+        return ErrorResponse(400, DoubleCountingApplicationApproveError.MALFORMED_PARAMS)
 
     try:
         dca = DoubleCountingApplication.objects.get(id=dca_id)
     except:
-        return JsonResponse({"status": "error", "message": "Could not find DCA"}, status=400)
+        return ErrorResponse(400, DoubleCountingApplicationApproveError.APPLICATION_NOT_FOUND)
 
     # ensure all quotas have been validated
     remaining_quotas_to_check = DoubleCountingProduction.objects.filter(dca=dca, approved_quota=-1).count()
+    print("remaining_quotas_to_check: ", remaining_quotas_to_check)
     if remaining_quotas_to_check > 0:
-        return JsonResponse({"status": "error", "message": "Some quotas have not been approved"}, status=400)
+        return ErrorResponse(400, DoubleCountingApplicationApproveError.QUOTAS_NOT_APPROVED)
 
     dca.status = DoubleCountingApplication.ACCEPTED
     dca.save()  # save before sending email, just in case
     send_dca_status_email(dca)
-    return JsonResponse({"status": "success"})
+    return SuccessResponse()
