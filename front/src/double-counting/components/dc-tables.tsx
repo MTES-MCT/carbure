@@ -156,7 +156,6 @@ export const ProductionTable = ({
   setQuotas,
 }: ProductionTableProps) => {
   const { t } = useTranslation()
-  console.log('production:', production)
 
   const productionColumns: Column<DoubleCountingProduction>[] = [
     {

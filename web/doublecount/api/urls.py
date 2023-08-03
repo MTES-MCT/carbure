@@ -23,6 +23,5 @@ urlpatterns = [
     path("upload-documentation", views.upload_documentation, name="api-v3-doublecount-upload-doc"),
     path("download-documentation", views.download_documentation, name="api-v3-doublecount-download-doc"),
     path("download-admin-decision", views.download_admin_decision, name="api-v3-doublecount-download-admin-decision"),
-    path("admin/download-documentation", views.admin_download_documentation, name="api-v3-doublecount-admin-download-doc"),
     path("admin/approve", views.approve_dca, name="api-v3-doublecount-approve-dca"),
 ]

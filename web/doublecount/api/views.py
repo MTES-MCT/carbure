@@ -311,45 +311,6 @@ def admin_download_admin_decision(request):
     return response
 
 
-@is_admin_or_external_admin
-def admin_download_documentation(request, *args, **kwargs):
-    dca_id = request.GET.get("dca_id", None)
-    if not dca_id:
-        return JsonResponse({"status": "error", "message": "Missing dca_id"}, status=400)
-    try:
-        dca = DoubleCountingApplication.objects.get(id=dca_id)
-    except:
-        return JsonResponse({"status": "forbidden", "message": "Forbidden"}, status=403)
-
-    file_id = request.GET.get("file_id", None)
-    if not file_id:
-        return JsonResponse({"status": "error", "message": "Missing file_id"}, status=400)
-    try:
-        f = DoubleCountingDocFile.objects.get(id=file_id, dca=dca)
-    except:
-        return JsonResponse({"status": "forbidden", "message": "Forbidden"}, status=403)
-    s3 = boto3.client(
-        "s3",
-        aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
-        aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
-        region_name=os.environ["AWS_S3_REGION_NAME"],
-        endpoint_url=os.environ["AWS_S3_ENDPOINT_URL"],
-        use_ssl=os.environ["AWS_S3_USE_SSL"],
-    )
-    filepath = "/tmp/%s" % (f.file_name)
-    s3filepath = "{year}/{entity}/{filename}".format(
-        year=dca.period_start.year, entity=dca.producer.name, filename=f.file_name
-    )
-    with open(filepath, "wb") as file:
-        s3.download_fileobj(os.environ["AWS_DCDOCS_STORAGE_BUCKET_NAME"], s3filepath, file)
-    with open(filepath, "rb") as file:
-        data = file.read()
-        ctype = "application/force-download"
-        response = HttpResponse(content=data, content_type=ctype)
-        response["Content-Disposition"] = 'attachment; filename="%s"' % (f.file_name)
-    return response
-
-
 def get_template(request):
     location = "/tmp/carbure_template_DC.xlsx"
     workbook = xlsxwriter.Workbook(location)

@@ -88,6 +88,7 @@ export const DoubleCountingApplicationDialog = () => {
 
 
   const applicationData = application.result?.data.data
+  console.log('applicationData:', applicationData)
   const dcaStatus = applicationData?.status ?? DCStatus.Pending
 
 
@@ -202,10 +203,10 @@ export const DoubleCountingApplicationDialog = () => {
 
         <footer>
           <Col style={{ gap: "var(--spacing-xs)", marginRight: "auto" }}>
-            {/* <DownloadLink
+            <DownloadLink
               href={excelURL ?? "#"}
               label={t("Télécharger le dossier au format excel")}
-            /> */}
+            />
           </Col>
 
 
