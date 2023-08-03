@@ -9,7 +9,7 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { getErrorText } from "settings/utils/double-counting"
 import { DoubleCountingFileInfo, DoubleCountingUploadError } from "../../types"
-import ApplicationInfo from "../application/application-info"
+import ApplicationInfo from "./application-info"
 import { ProductionTable, SourcingFullTable } from "../dc-tables"
 
 export type ErrorsDetailsDialogProps = {

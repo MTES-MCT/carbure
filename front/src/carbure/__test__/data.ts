@@ -138,6 +138,7 @@ export const productionSite: ProductionSiteDetails = {
   id: 2,
   date_mise_en_service: "2000-01-31",
   site_id: "123456",
+  address: "",
   postal_code: "64430",
   manager_name: "Bob",
   manager_phone: "012345678",

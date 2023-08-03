@@ -42,12 +42,12 @@ const DoubleCountingSourcingDialog = ({
   )
 
   const addSourcing = useMutation(api.addDoubleCountingSourcing, {
-    invalidates: ["dc-details"],
+    invalidates: ["dc-application-details"],
     onSuccess: () => onClose(),
   })
 
   const updateSourcing = useMutation(api.updateDoubleCountingSourcing, {
-    invalidates: ["dc-details"],
+    invalidates: ["dc-application-details"],
   })
 
   async function saveSourcing() {

@@ -96,6 +96,7 @@ export interface ProductionSiteDetails extends ProductionSite {
   inputs: Feedstock[]
   outputs: Biofuel[]
   site_id: string
+  address: string
   postal_code: string
   city: string
   manager_name: string

@@ -29,10 +29,8 @@ export function useNotifyError() {
   const notify = useNotify()
 
   const getErrorText = (error: Error, defaultMessage?: string) => {
-    console.log('error:', error)
     const errorCode = (error as AxiosError<{ error: string }>).response?.data
       .error
-    console.log('errorCode:', errorCode)
     let errorText = errorCode
       ? t(errorCode, { ns: "errors" })
       : defaultMessage ||

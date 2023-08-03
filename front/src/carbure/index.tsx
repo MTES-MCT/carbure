@@ -79,52 +79,52 @@ const Org = () => {
 
   // prettier-ignore
   return (
-      <Routes>
-        <Route path="settings" element={<Settings />} />
+    <Routes>
+      <Route path="settings" element={<Settings />} />
 
-        {isIndustry &&
-          (<>
+      {isIndustry &&
+        (<>
           <Route path="transactions/:year/*" element={<Transactions />} />
           <Route path="registry" element={<Registry />} />
           <Route path="transactions" element={<Navigate replace to={`${currentYear}`} />} />
           <Route path="*" element={<Navigate replace to="transactions" />} />
-          </>
-          )}
+        </>
+        )}
 
-        {has_saf && isOperator && (<>
-          <Route path="saf/:year/*" element={<Saf />} />
-          <Route path="saf" element={<Navigate replace to={`${currentYear}/ticket-sources`} />} />
-        </>)}
+      {has_saf && isOperator && (<>
+        <Route path="saf/:year/*" element={<Saf />} />
+        <Route path="saf" element={<Navigate replace to={`${currentYear}/ticket-sources`} />} />
+      </>)}
 
-        {isAirline && (<>
-          <Route path="saf/:year/*" element={<SafClient />} />
-          <Route path="saf" element={<Navigate replace to={`${currentYear}/tickets`} />} />
-          <Route path="*" element={<Navigate replace to="saf" />} />
-        </>)}
+      {isAirline && (<>
+        <Route path="saf/:year/*" element={<SafClient />} />
+        <Route path="saf" element={<Navigate replace to={`${currentYear}/tickets`} />} />
+        <Route path="*" element={<Navigate replace to="saf" />} />
+      </>)}
 
-        {isAdmin && (<>
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="*" element={<Navigate replace to="dashboard" />} />
-        </>)}
-      
-
-        {(isOperator || isProducer) && <Route path="stats" element={<Stats /> } />}
+      {isAdmin && (<>
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="*" element={<Navigate replace to="dashboard" />} />
+      </>)}
 
 
-        {(isAdmin || isAuditor) && (<>
-          <Route path="controls/:year/*" element={<Controls />} />
-          <Route path="controls" element={<Navigate replace to={`${currentYear}`} />} />
-        </>)}
-        {isAuditor && <Route path="*" element={<Navigate replace to="controls" />} />}
+      {(isOperator || isProducer) && <Route path="stats" element={<Stats />} />}
 
-        {(isAdmin || hasDCA)  && <Route path="double-counting/*" element={<DoubleCounting />} />}
-        {hasDCA && <Route path="*" element={<Navigate replace to="double-counting" />} />}
 
-        {(isAdmin || hasAirline) &&
-          <Route path="entities/*" element={<Entities />} />
-        }
-        {hasAirline && <Route path="*" element={<Navigate replace to="entities" />} />}
-      </Routes>
+      {(isAdmin || isAuditor) && (<>
+        <Route path="controls/:year/*" element={<Controls />} />
+        <Route path="controls" element={<Navigate replace to={`${currentYear}`} />} />
+      </>)}
+      {isAuditor && <Route path="*" element={<Navigate replace to="controls" />} />}
+
+      {(isAdmin || hasDCA) && <Route path="double-counting/*" element={<DoubleCounting />} />}
+      {hasDCA && <Route path="*" element={<Navigate replace to="double-counting" />} />}
+
+      {(isAdmin || hasAirline) &&
+        <Route path="entities/*" element={<Entities />} />
+      }
+      {hasAirline && <Route path="*" element={<Navigate replace to="entities" />} />}
+    </Routes>
   )
 }
 

@@ -15,6 +15,7 @@ export function addProductionSite(
   country_code: string,
   ges_option: GESOption,
   site_id: string,
+  address: string,
   city: string,
   postal_code: string,
   eligible_dc: boolean,
@@ -32,6 +33,7 @@ export function addProductionSite(
       ges_option: ges_option,
       country_code: country_code,
       site_id,
+      address,
       city,
       postal_code,
       eligible_dc,
@@ -51,6 +53,7 @@ export function updateProductionSite(
   country_code: string,
   ges_option: GESOption,
   site_id: string,
+  address: string,
   city: string,
   postal_code: string,
   eligible_dc: boolean,
@@ -59,6 +62,7 @@ export function updateProductionSite(
   manager_phone: string,
   manager_email: string
 ) {
+
   return api.post("/v5/entity/production-sites/update", {
     entity_id,
     production_site_id,
@@ -67,6 +71,7 @@ export function updateProductionSite(
     ges_option,
     country_code,
     site_id,
+    address,
     city,
     postal_code,
     eligible_dc,

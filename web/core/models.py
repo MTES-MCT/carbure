@@ -31,7 +31,7 @@ class Entity(models.Model):
         (EXTERNAL_ADMIN, EXTERNAL_ADMIN),
         (AIRLINE, AIRLINE),
         (UNKNOWN, "Unknown"),
-        (CPO, CPO)
+        (CPO, CPO),
     )
 
     name = models.CharField(max_length=64, unique=True)
@@ -476,13 +476,13 @@ class TransactionDistance(models.Model):
 
 
 class ExternalAdminRights(models.Model):
-    DOUBLE_COUNTING_AGREEMENT = "DCA"
+    DOUBLE_COUNTING_APPLICATION = "DCA"
     CUSTOM_STATS_AGRIMER = "AGRIMER"
     TIRIB_STATS = "TIRIB"
     AIRLINE = "AIRLINE"
 
     RIGHTS = (
-        (DOUBLE_COUNTING_AGREEMENT, DOUBLE_COUNTING_AGREEMENT),
+        (DOUBLE_COUNTING_APPLICATION, DOUBLE_COUNTING_APPLICATION),
         (CUSTOM_STATS_AGRIMER, CUSTOM_STATS_AGRIMER),
         (TIRIB_STATS, TIRIB_STATS),
         (AIRLINE, AIRLINE),
@@ -800,9 +800,7 @@ class CarbureLot(models.Model):
             self.carbure_supplier
             and self.carbure_supplier.id in prefetched_data["entity_certificates"]
             and self.supplier_certificate in prefetched_data["entity_certificates"][self.carbure_supplier.id]
-            and prefetched_data["entity_certificates"][self.carbure_supplier.id][
-                self.supplier_certificate
-            ].checked_by_admin
+            and prefetched_data["entity_certificates"][self.carbure_supplier.id][self.supplier_certificate].checked_by_admin
         ):
             certificates_validated.meta["supplier_certificate_checked"] = True
             certificates_validated.score += 1
@@ -816,10 +814,7 @@ class CarbureLot(models.Model):
             meta={"feedstock_registered": False, "biofuel_registered": False, "delivery_site_registered": False},
         )
         if self.carbure_production_site and self.carbure_production_site.id in prefetched_data["production_sites"]:
-            if (
-                self.feedstock.id
-                in prefetched_data["production_sites"][self.carbure_production_site.id]["feedstock_ids"]
-            ):
+            if self.feedstock.id in prefetched_data["production_sites"][self.carbure_production_site.id]["feedstock_ids"]:
                 config.meta["feedstock_registered"] = True
             if self.biofuel.id in prefetched_data["production_sites"][self.carbure_production_site.id]["biofuel_ids"]:
                 config.meta["biofuel_registered"] = True
@@ -1051,9 +1046,7 @@ def delete_lot(sender, instance, using, **kwargs):
 
 class CarbureStock(models.Model):
     parent_lot = models.ForeignKey(CarbureLot, null=True, blank=True, on_delete=models.CASCADE)
-    parent_transformation = models.ForeignKey(
-        CarbureStockTransformation, null=True, blank=True, on_delete=models.CASCADE
-    )
+    parent_transformation = models.ForeignKey(CarbureStockTransformation, null=True, blank=True, on_delete=models.CASCADE)
     carbure_id = models.CharField(max_length=64, blank=False, null=False, default="")
     depot = models.ForeignKey(Depot, null=True, blank=True, on_delete=models.SET_NULL)
     carbure_client = models.ForeignKey(
@@ -1064,9 +1057,7 @@ class CarbureStock(models.Model):
     remaining_lhv_amount = models.FloatField(default=0.0)
     feedstock = models.ForeignKey(MatierePremiere, null=True, on_delete=models.SET_NULL)
     biofuel = models.ForeignKey(Biocarburant, null=True, on_delete=models.SET_NULL)
-    country_of_origin = models.ForeignKey(
-        Pays, null=True, on_delete=models.SET_NULL, related_name="stock_country_of_origin"
-    )
+    country_of_origin = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL, related_name="stock_country_of_origin")
     carbure_production_site = models.ForeignKey(ProductionSite, null=True, blank=True, on_delete=models.SET_NULL)
     unknown_production_site = models.CharField(max_length=64, blank=True, null=True, default=None)
     production_country = models.ForeignKey(

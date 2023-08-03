@@ -1,7 +1,6 @@
-from curses import meta
-from typing import List, TypedDict
+from typing import List
 from doublecount.errors import DcError, DoubleCountingError, error
-from doublecount.models import DoubleCountingAgreement, DoubleCountingProduction, DoubleCountingSourcing
+from doublecount.models import DoubleCountingApplication, DoubleCountingProduction, DoubleCountingSourcing
 from core.models import Biocarburant, MatierePremiere
 from doublecount.parser.types import ProductionBaseRow, ProductionRow, SourcingRow
 
@@ -45,7 +44,7 @@ def check_production_row(production: DoubleCountingProduction, data: ProductionR
 
 # check a line in the production section of an imported dc excel file
 def check_production_row_integrity(
-    feedstock: MatierePremiere, biofuel: Biocarburant, data: ProductionBaseRow, tab_name: str, dca: DoubleCountingAgreement
+    feedstock: MatierePremiere, biofuel: Biocarburant, data: ProductionBaseRow, tab_name: str, dca: DoubleCountingApplication
 ) -> List[DcError]:
     errors: List[DcError] = []
     line = data["line"]

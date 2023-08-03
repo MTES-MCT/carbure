@@ -382,7 +382,8 @@
                       <p>
                         Demandes de corrections: <br />
                         {% for cr in correction_requests %}
-                        Client {{cr.meta.client}} Lots concernés: {{cr.meta.count}} <a href="https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/out/correction">Voir</a>
+                        Client {{cr.meta.client}} Lots concernés: {{cr.meta.count}} <a
+                          href="https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/out/correction">Voir</a>
                         {% endfor %}
                       </p>
                       {% endif %}
@@ -390,7 +391,8 @@
                       <p>
                         Lots corrigés par vos fournisseurs: <br />
                         {% for cr in correction_done %}
-                        Fournisseur {{cr.meta.supplier}} Lots concernés: {{cr.meta.count}} <a href="https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/in/correction">Voir</a>
+                        Fournisseur {{cr.meta.supplier}} Lots concernés: {{cr.meta.count}} <a
+                          href="https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/in/correction">Voir</a>
                         {% endfor %}
                       </p>
                       {% endif %}
@@ -398,7 +400,8 @@
                       <p>
                         Lots refusés par vos clients: <br />
                         {% for cr in lots_rejected %}
-                        Client {{cr.meta.client}} Lots concernés: {{cr.meta.count}} <a href="https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/out/correction">Voir</a>
+                        Client {{cr.meta.client}} Lots concernés: {{cr.meta.count}} <a
+                          href="https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/out/correction">Voir</a>
                         {% endfor %}
                       </p>
                       {% endif %}
@@ -406,7 +409,8 @@
                       <p>
                         Lots reçus: <br />
                         {% for cr in lots_received %}
-                        Fournisseur {{cr.meta.supplier}} Lots concernés: {{cr.meta.count}} <a href="https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/in/pending">Voir</a>
+                        Fournisseur {{cr.meta.supplier}} Lots concernés: {{cr.meta.count}} <a
+                          href="https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/in/pending">Voir</a>
                         {% endfor %}
                       </p>
                       {% endif %}
@@ -414,7 +418,8 @@
                       <p>
                         Lots rappelés par vos fournisseurs: <br />
                         {% for cr in lots_recalled %}
-                        Fournisseur {{cr.meta.supplier}} Lots concernés: {{cr.meta.count}} Lien <a href="https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/in/pending">Voir</a>
+                        Fournisseur {{cr.meta.supplier}} Lots concernés: {{cr.meta.count}} Lien <a
+                          href="https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/in/pending">Voir</a>
                         {% endfor %}
                       </p>
                       {% endif %}
@@ -422,11 +427,11 @@
                       {% if certificate_rejected|length > 0 %}
                       <p>
                         {% for cr in certificate_rejected %}
-                        L'administration a rejeté votre certificat : {{cr.meta.certificate}} <a href="https://{{ domain }}/app/org/{{entity.id}}/settings#certificates">Voir</a>
+                        L'administration a rejeté votre certificat : {{cr.meta.certificate}} <a
+                          href="https://{{ domain }}/app/org/{{entity.id}}/settings#certificates">Voir</a>
                         {% endfor %}
                       </p>
                       {% endif %}
-                      dazdaz
                       <p>Bonne journée,</p>
                       <p>L'équipe CarbuRe</p>
                     </td>

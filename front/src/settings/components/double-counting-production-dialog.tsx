@@ -13,7 +13,7 @@ import { useMutation, useQuery } from "common/hooks/async"
 import { compact } from "common/utils/collection"
 import { formatNumber } from "common/utils/formatters"
 import {
-  DoubleCounting,
+  DoubleCountingApplication,
   DoubleCountingProduction,
   QuotaDetails,
 } from "double-counting/types"
@@ -49,12 +49,12 @@ const DoubleCountingProductionDialog = ({
   )
 
   const addProduction = useMutation(api.addDoubleCountingProduction, {
-    invalidates: ["dc-details"],
+    invalidates: ["dc-application-details"],
     onSuccess: () => onClose(),
   })
 
   const updateProduction = useMutation(api.updateDoubleCountingProduction, {
-    invalidates: ["dc-details"],
+    invalidates: ["dc-application-details"],
   })
 
   async function saveProduction() {
@@ -179,14 +179,14 @@ const DoubleCountingProductionDialog = ({
 
 type QuotasTableProps = {
   entity: Entity
-  agreement: DoubleCounting | undefined
+  application: DoubleCountingApplication | undefined
 }
 
-const QuotasTable = ({ entity, agreement }: QuotasTableProps) => {
+const QuotasTable = ({ entity, application }: QuotasTableProps) => {
   const { t } = useTranslation()
 
   const entityID = entity?.id ?? -1
-  const dcaID = agreement?.id ?? -1
+  const dcaID = application?.id ?? -1
 
   const details = useQuery(api.getQuotaDetails, {
     key: "quota-details",
