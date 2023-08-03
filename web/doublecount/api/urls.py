@@ -6,13 +6,6 @@ urlpatterns = [
     # GET
     path("applications", views.get_applications, name="api-v3-doublecount-get-applications"),
     path("application", views.get_application, name="api-v3-doublecount-get-application"),
-    # path("admin/application", views.get_application_admin, name="api-v3-doublecount-get-application-admin"),
-    # path("admin/applications", get_applications_admin, name="api-v3-doublecount-get-applications-admin"),
-    # path(
-    #     "admin/applications-snapshot",
-    #     views.get_applications_snapshot_admin,
-    #     name="api-v3-doublecount-get-applications-snapshot-admin",
-    # ),
     path("admin/quotas", views.get_production_site_quotas_admin, name="api-v3-doublecount-get-quotas-admin"),
     path("admin/quotas-snapshot", views.get_quotas_snapshot_admin, name="api-v3-doublecount-get-quotas-snapshot-admin"),
     path("admin/upload-decision", views.upload_decision_admin, name="api-v3-doublecount-upload-decision-admin"),
@@ -32,10 +25,4 @@ urlpatterns = [
     path("download-admin-decision", views.download_admin_decision, name="api-v3-doublecount-download-admin-decision"),
     path("admin/download-documentation", views.admin_download_documentation, name="api-v3-doublecount-admin-download-doc"),
     path("admin/approve", views.approve_dca, name="api-v3-doublecount-approve-dca"),
-    path("admin/reject", views.reject_dca, name="api-v3-doublecount-reject-dca"),
-    # path(
-    #     "admin/application/update-approved-quotas",
-    #     views.admin_update_approved_quotas,
-    #     name="api-v3-doublecount-admin-update-approved-quotas",
-    # ),
 ]

@@ -79,6 +79,13 @@ export const DoubleCountingApplicationDialog = () => {
 
   const rejectApplication = useMutation(api.rejectDoubleCountingApplication, {
     invalidates: ["dc-application", "dc-snapshot"],
+    onSuccess: () => {
+      navigate({
+        pathname: location.pathname,
+      })
+      notify(t("Le dossier a bien été refusé."), { variant: "success" })
+
+    }
   })
 
 
@@ -198,10 +205,10 @@ export const DoubleCountingApplicationDialog = () => {
 
         <footer>
           <Col style={{ gap: "var(--spacing-xs)", marginRight: "auto" }}>
-            <DownloadLink
+            {/* <DownloadLink
               href={excelURL ?? "#"}
               label={t("Télécharger le dossier au format excel")}
-            />
+            /> */}
           </Col>
 
 
@@ -220,7 +227,9 @@ export const DoubleCountingApplicationDialog = () => {
 
               <Button
                 loading={approveQuotas.loading}
-                disabled={!isReady || !hasQuotas}
+                // disabled={!isReady || !hasQuotas}
+                disabled={true}
+
                 variant="success"
                 icon={Check}
                 action={submitAccept}
