@@ -1,8 +1,11 @@
 # test with : python web/manage.py test admin.api.double_counting.applications.tests_application.AdminDoubleCountApplicationTest.test_uploaded_file --keepdb
+from datetime import date
 import json
+from nis import cat
 import os
 from admin.api.double_counting.applications.add import DoubleCountingAddError
 from admin.api.double_counting.applications.approve_application import DoubleCountingApplicationApproveError
+from certificates.models import DoubleCountingRegistration
 
 from core.tests_utils import setup_current_user
 from core.models import Entity, Pays, UserRights
@@ -197,3 +200,10 @@ class AdminDoubleCountApplicationTest(TestCase):
             producer=self.production_site.producer, period_start__year=self.requested_start_year
         )
         self.assertEqual(application.status, DoubleCountingApplication.ACCEPTED)
+
+        # test agreement generation
+        agreement = DoubleCountingRegistration.objects.get(certificate_id=application.agreement_id)
+        self.assertEqual(agreement.valid_from, date(2023, 1, 1))
+        self.assertEqual(agreement.valid_until, date(2024, 12, 31))
+        self.assertEqual(agreement.production_site, application.production_site)
+        self.assertEqual(agreement.certificate_id, application.agreement_id)
