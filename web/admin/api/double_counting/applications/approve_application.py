@@ -94,7 +94,7 @@ def approve_dca(request, *args, **kwargs):
         + application.production_site.country.name
     )
     try:
-        DoubleCountingRegistration.objects.update_or_create(
+        agrement, _ = DoubleCountingRegistration.objects.update_or_create(
             certificate_id=application.agreement_id,
             certificate_holder=application.producer.name,
             production_site=application.production_site,

@@ -49,7 +49,9 @@ const DoubleCounting = () => {
                           }
                         </p>
                         <strong>
-                          {t("Dossiers en attente")}
+                          {t("Dossiers en attente", {
+                            count: snapshot?.applications_pending,
+                          })}
                         </strong>
                       </Col>
                     </Row>
@@ -64,7 +66,9 @@ const DoubleCounting = () => {
                         }
                       </p>
                       <strong>
-                        {t("Agréments actifs")}
+                        {t("Agréments actifs", {
+                          count: snapshot?.agreements_active,
+                        })}
                       </strong>
                     </Col>
                     </Row>
