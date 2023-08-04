@@ -1,38 +1,30 @@
-import { Fragment, useState } from "react"
-import { useTranslation, Trans } from "react-i18next"
-import { Admin, DoubleCountingStatus as DCStatus, DoubleCountingProduction, DoubleCountingSourcing } from "../types"
-import { Col, LoaderOverlay } from "common/components/scaffold"
-import Tabs from "common/components/tabs"
+import useEntity from "carbure/hooks/entity"
+import { EntityType } from "carbure/types"
 import { Button, DownloadLink } from "common/components/button"
-import * as api from "../api"
 import { Confirm, Dialog } from "common/components/dialog"
-import { Entity, EntityType } from "carbure/types"
+import { useHashMatch } from "common/components/hash-route"
 import {
-  Return,
-  Download,
   Check,
   Cross,
-  Save,
-  AlertCircle,
+  Return,
+  Save
 } from "common/components/icons"
-import { Alert } from "common/components/alert"
 import { useNotify } from "common/components/notifications"
+import Portal, { usePortal } from "common/components/portal"
+import { Col, LoaderOverlay } from "common/components/scaffold"
+import Tabs from "common/components/tabs"
+import { useMutation, useQuery } from "common/hooks/async"
+import { formatDate } from "common/utils/formatters"
+import { useState } from "react"
+import { Trans, useTranslation } from "react-i18next"
+import { useLocation, useNavigate } from "react-router-dom"
+import * as api from "../api"
+import { DoubleCountingStatus as DCStatus, DoubleCountingProduction, DoubleCountingSourcing } from "../types"
 import DoubleCountingStatus from "./dc-status"
 import {
-  SourcingAggregationTable,
-  SourcingTable,
   ProductionTable,
-  StatusTable,
-  SourcingFullTable,
+  SourcingFullTable
 } from "./dc-tables"
-import { FileInput } from "common/components/input"
-import { useMutation, useQuery } from "common/hooks/async"
-import Portal, { usePortal } from "common/components/portal"
-import { formatDate } from "common/utils/formatters"
-import useEntity from "carbure/hooks/entity"
-import { useHashMatch } from "common/components/hash-route"
-import { useLocation, useNavigate } from "react-router-dom"
-import { set } from "date-fns"
 
 
 export const DoubleCountingApplicationDialog = () => {
@@ -79,7 +71,7 @@ export const DoubleCountingApplicationDialog = () => {
   const approveApplication = useMutation(api.approveDoubleCountingApplication, {
     invalidates: ["dc-applications", "dc-snapshot", "dc-agreements"],
     onSuccess: () => {
-      navigate("org/9/double-counting/agreements")
+      navigate("/org/9/double-counting/agreements")
       notify(t("Le dossier a été accepté."), { variant: "success" })
     }
   })
@@ -96,7 +88,6 @@ export const DoubleCountingApplicationDialog = () => {
 
 
   const applicationData = application.result?.data.data
-  console.log('applicationData:', applicationData)
   const dcaStatus = applicationData?.status ?? DCStatus.Pending
 
 
@@ -104,7 +95,6 @@ export const DoubleCountingApplicationDialog = () => {
   const hasQuotas = !applicationData?.production.some(
     (p) => p.approved_quota === -1
   )
-  console.log('hasQuotas:', hasQuotas)
 
 
   const productionSite = applicationData?.production_site ?? "N/A"
@@ -153,7 +143,7 @@ export const DoubleCountingApplicationDialog = () => {
       <Confirm
         variant="success"
         title={t("Accepter dossier")}
-        description={t("Voulez-vous vraiment accepter ce dossier double comptage")} // prettier-ignore
+        description={t("Voulez-vous vraiment accepter ce dossier double comptage ? Une fois accepté, vous retrouverez l’agrément correspondant dans la liste des agréments actifs.")} // prettier-ignore
         confirm={t("Accepter")}
         icon={Check}
         onClose={close}

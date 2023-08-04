@@ -109,10 +109,10 @@ export const ProductionSiteAdminDialog = ({
   const location = useLocation()
 
   const addApplication = useMutation(addDoubleCountingApplication, {
-    invalidates: [],
+    invalidates: ["dc-applications"],
     onSuccess() {
       onClose()
-      notify(t("Le dossier a été envoyé !"), { variant: "success" })
+      notify(t("Le dossier a été ajouté !"), { variant: "success" })
       navigate({
         pathname: '/org/9/double-counting',
       })
@@ -176,7 +176,7 @@ export const ProductionSiteAdminDialog = ({
         {error &&
           <section>
             <Alert variant="warning" icon={AlertTriangle}>
-              {t("PRODUCTION_SITE_ADDRESS_UNDEFINED", { ns: "errors" })}
+              {t("L'adresse, la ville ou le code postal du site de production n'est pas renseignée. Veuillez l'ajouter dans les informations liées à la société.")}
               <ExternalLink href={`/admin/producers/productionsite/${value.productionSite?.id}/change`}>
                 Editer le site de production
               </ExternalLink>
