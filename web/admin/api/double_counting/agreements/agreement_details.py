@@ -15,6 +15,7 @@ from django.http import JsonResponse, HttpResponse
 from admin.api.double_counting.applications.add import send_dca_confirmation_email
 from certificates.models import DoubleCountingRegistration
 from certificates.serializers import DoubleCountingRegistrationSerializer
+from core.common import ErrorResponse
 from core.decorators import check_admin_rights, check_rights, is_admin, is_admin_or_external_admin
 import pytz
 import traceback
@@ -46,23 +47,18 @@ from django.core.files.storage import FileSystemStorage
 from doublecount.old_helpers import load_dc_file, load_dc_sourcing_data, load_dc_production_data
 
 
+class DoubleCountingAgreementError:
+    MALFORMED_PARAMS = "MALFORMED_PARAMS"
+    APPLICATION_NOT_FOUND = "APPLICATION_NOT_FOUND"
+
+
 @check_admin_rights()
-def get_agreements(request, *args, **kwargs):
-    current_year = datetime.now().year
+def get_agreement_details(request, *args, **kwargs):
+    agreement_id = request.GET.get("agreement_id", None)
 
-    agreements_active = DoubleCountingRegistration.objects.filter(
-        Q(valid_from__year__lte=current_year) & Q(valid_until__year__gte=current_year)
-    ).select_related("production_site")
-    agreements_incoming = DoubleCountingRegistration.objects.filter(Q(valid_from__year__gt=current_year)).select_related(
-        "production_site"
-    )
-    agreements_expired = DoubleCountingRegistration.objects.filter(Q(valid_until__year__lt=current_year)).select_related(
-        "production_site"
-    )
+    if not agreement_id:
+        return ErrorResponse(400, DoubleCountingAgreementError.MALFORMED_PARAMS)
 
-    data = {
-        "active": DoubleCountingRegistrationSerializer(agreements_active, many=True).data,
-        "incoming": DoubleCountingRegistrationSerializer(agreements_incoming, many=True).data,
-        "expired": DoubleCountingRegistrationSerializer(agreements_expired, many=True).data,
-    }
-    return JsonResponse({"status": "success", "data": data})
+    agreement = DoubleCountingRegistration.objects.get(id=agreement_id)
+
+    return JsonResponse({"status": "success", "data": DoubleCountingRegistrationSerializer(agreement, many=False).data})

@@ -76,9 +76,18 @@ export function rejectDoubleCountingApplication(
   })
 }
 
-export function getAgreementList() {
+export function getAgreementList(entity_id: number) {
   return api.get<Api<AgreementsOverview>>(
     "/v5/admin/double-counting/agreements"
+    , { params: { entity_id } })
+}
+
+export function getDoubleCountingAgreement(entity_id: number, agreement_id: number) {
+  return api.get<Api<DoubleCountingDetails>>(
+    "/v5/admin/double-counting/agreements/details",
+    {
+      params: { entity_id, agreement_id },
+    }
   )
 }
 

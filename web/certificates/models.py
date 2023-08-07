@@ -1,5 +1,7 @@
+from email.mime import application
 from django.db import models
 from core.models import Biocarburant, Entity, EntityCertificate, MatierePremiere, Pays
+from doublecount.models import DoubleCountingApplication
 from producers.models import ProductionSite
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -43,6 +45,7 @@ class DoubleCountingRegistration(models.Model):
     registered_address = models.TextField()
     valid_from = models.DateField()
     valid_until = models.DateField()
+    application = models.ForeignKey(DoubleCountingApplication, on_delete=models.SET_NULL, null=True, blank=True)
 
     def natural_key(self):
         return {

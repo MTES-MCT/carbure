@@ -4,13 +4,17 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { ProductionTable, SourcingFullTable } from "./dc-tables"
 
+
+
 interface ApplicationDetailsProps {
     production?: DoubleCountingProduction[]
     sourcing?: DoubleCountingSourcing[]
+    quotas?: Record<string, number>
+    setQuotas?: (quotas: Record<string, number>) => void
 }
 
-const ApplicationDetails = ({ production, sourcing }: ApplicationDetailsProps) => {
-    const [focus, setFocus] = useState("sourcing_forecast")
+const ApplicationTabs = ({ production, sourcing, quotas, setQuotas }: ApplicationDetailsProps) => {
+    const [focus, setFocus] = useState("production")
     const { t } = useTranslation()
 
     return <>
@@ -47,9 +51,11 @@ const ApplicationDetails = ({ production, sourcing }: ApplicationDetailsProps) =
             <section>
                 <ProductionTable
                     production={production ?? []}
+                    quotas={quotas ?? {}}
+                    setQuotas={setQuotas}
                 />
             </section>
         }
     </>
 }
-export default ApplicationDetails
+export default ApplicationTabs

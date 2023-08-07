@@ -130,6 +130,7 @@ export interface AgreementsOverview {
   expired: AgreementOverview[]
 }
 export interface AgreementOverview {
+  id: number
   producer: Entity
   production_site: ProductionSite
   certificate_id: string

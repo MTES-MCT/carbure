@@ -17,7 +17,7 @@ import { addDoubleCountingApplication } from "double-counting/api"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useMatch, useNavigate } from "react-router-dom"
 import { DoubleCountingFileInfo } from "../../types"
-import ApplicationDetails from "../application-details"
+import ApplicationTabs from "../application-tabs"
 import ApplicationInfo from "./application-info"
 import React, { useState } from "react"
 
@@ -61,7 +61,7 @@ export const ValidDetailsDialog = ({
             <DechetIndustrielAlert />
           }
         </section>
-        <ApplicationDetails sourcing={fileData.sourcing} production={fileData.production} />
+        <ApplicationTabs sourcing={fileData.sourcing} production={fileData.production} />
       </main>
 
       <footer>
