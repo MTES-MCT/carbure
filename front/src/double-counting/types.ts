@@ -20,6 +20,13 @@ export enum DoubleCountingStatus {
   Lapsed = "LAPSED",
 }
 
+export enum AgreementStatus {
+  Active = "ACTIVE",
+  Expired = "EXPIRED",
+  ExpiresSoon = "EXPIRES_SOON",
+  Incoming = "INCOMING",
+}
+
 export interface DoubleCountingApplication {
   id: number
   agreement_id: string
@@ -113,18 +120,22 @@ export interface AgreementsSnapshot {
 export interface DoubleCountingSnapshot extends AgreementsSnapshot, ApplicationSnapshot { }
 
 export interface ApplicationsOverview {
-  rejected: { count: number; applications: DoubleCountingApplication[] }
-  pending: { count: number; applications: DoubleCountingApplication[] }
+  rejected: DoubleCountingApplication[]
+  pending: DoubleCountingApplication[]
 }
 
-export interface QuotaOverview {
+export interface AgreementsOverview {
+  active: AgreementOverview[]
+  incoming: AgreementOverview[]
+  expired: AgreementOverview[]
+}
+export interface AgreementOverview {
   producer: Entity
   production_site: ProductionSite
-  approved_quota_weight_sum: number
-  current_production_weight_sum: number
-  nb_quotas: number
-  nb_full_quotas: number
-  nb_breached_quotas: number
+  certificate_id: string
+  valid_from: Date
+  valid_until: Date
+  status: AgreementStatus
 }
 
 export interface QuotaDetails {

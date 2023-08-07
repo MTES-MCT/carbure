@@ -136,7 +136,7 @@ class AdminDoubleCountApplicationTest(TestCase):
 
         data = response.json()["data"]
         pending = data["pending"]
-        application = pending["applications"][0]
+        application = pending[0]
 
         self.assertEqual(application["producer"]["id"], self.production_site.producer.id)
 

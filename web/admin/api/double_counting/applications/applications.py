@@ -22,7 +22,7 @@ def get_applications_admin(request):
     pending = DoubleCountingApplicationFullSerializer(pending_data, many=True)
 
     data = {
-        "rejected": {"count": rejected_data.count(), "applications": rejected.data},
-        "pending": {"count": pending_data.count(), "applications": pending.data},
+        "rejected": rejected.data,
+        "pending": pending.data,
     }
     return JsonResponse({"status": "success", "data": data})
