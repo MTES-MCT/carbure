@@ -109,7 +109,7 @@ export const ProductionSiteAdminDialog = ({
   const location = useLocation()
 
   const addApplication = useMutation(addDoubleCountingApplication, {
-    invalidates: ["dc-applications"],
+    invalidates: ["dc-applications", "dc-snapshot"],
     onSuccess() {
       onClose()
       notify(t("Le dossier a été ajouté !"), { variant: "success" })
