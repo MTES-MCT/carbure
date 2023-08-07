@@ -86,11 +86,11 @@ def approve_dca(request, *args, **kwargs):
 
     production_site_address = (
         application.production_site.address
-        + ""
+        + " "
         + application.production_site.city
-        + ""
+        + " "
         + application.production_site.postal_code
-        + ""
+        + " "
         + application.production_site.country.name
     )
     try:

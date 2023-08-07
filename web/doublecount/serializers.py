@@ -93,9 +93,6 @@ class DoubleCountingAggregatedSourcingSerializer(serializers.ModelSerializer):
 class DoubleCountingApplicationFullSerializer(serializers.ModelSerializer):
     production_site = serializers.SlugRelatedField(read_only=True, slug_field="name")
     producer_user = serializers.SlugRelatedField(read_only=True, slug_field="email")
-    dgec_validator = serializers.SlugRelatedField(read_only=True, slug_field="name")
-    dgpe_validator = serializers.SlugRelatedField(read_only=True, slug_field="name")
-    dgddi_validator = serializers.SlugRelatedField(read_only=True, slug_field="name")
     producer = EntitySerializer(read_only=True)
 
     class Meta:
@@ -110,15 +107,6 @@ class DoubleCountingApplicationFullSerializer(serializers.ModelSerializer):
             "period_start",
             "period_end",
             "status",
-            "dgec_validated",
-            "dgec_validator",
-            "dgec_validated_dt",
-            "dgddi_validated",
-            "dgddi_validator",
-            "dgddi_validated_dt",
-            "dgpe_validated",
-            "dgpe_validator",
-            "dgpe_validated_dt",
         ]
 
 

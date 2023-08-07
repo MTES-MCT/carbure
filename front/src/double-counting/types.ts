@@ -98,15 +98,6 @@ export interface DoubleCountingDetails extends DoubleCountingApplication {
   production: DoubleCountingProduction[]
   aggregated_sourcing: DoubleCountingSourcingAggregation[]
   documents: { id: number; url: string; file_type: "DECISION" | "SOURCING" }[]
-  dgec_validated: boolean
-  dgec_validator: string | null
-  dgec_validated_dt: string | null
-  dgddi_validated: boolean
-  dgddi_validator: string | null
-  dgddi_validated_dt: string | null
-  dgpe_validated: boolean
-  dgpe_validator: string | null
-  dgpe_validated_dt: string | null
 }
 export interface ApplicationSnapshot {
   applications_pending: number
