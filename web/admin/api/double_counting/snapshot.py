@@ -31,7 +31,7 @@ def get_snapshot(request, *args, **kwargs):
         # agreements_expired_soon = DoubleCountingRegistration.objects.filter(
         #     Q(valid_from__year__lte=current_year) & Q(valid_until__year__gte=current_year)
         # )
-        agreements_incoming = DoubleCountingRegistration.objects.filter(Q(valid_from__year__lt=current_year))
+        agreements_incoming = DoubleCountingRegistration.objects.filter(Q(valid_from__year__gt=current_year))
         agreements_active = DoubleCountingRegistration.objects.filter(
             Q(valid_from__year__lte=current_year) & Q(valid_until__year__gte=current_year)
         )

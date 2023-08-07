@@ -62,7 +62,7 @@ export const DoubleCountingApplicationDialog = () => {
   })
 
   const approveQuotas = useMutation(api.approveDoubleCountingQuotas, {
-    invalidates: ["dc-applications", "dc-snapshot"],
+    invalidates: ["dc-application", "dc-snapshot"],
     onSuccess: () => {
       setQuotasIsUpdated(false)
     }
@@ -95,7 +95,6 @@ export const DoubleCountingApplicationDialog = () => {
   const hasQuotas = !applicationData?.production.some(
     (p) => p.approved_quota === -1
   )
-
 
   const productionSite = applicationData?.production_site ?? "N/A"
   const producer = applicationData?.producer.name ?? "N/A"
