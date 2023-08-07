@@ -207,3 +207,4 @@ class AdminDoubleCountApplicationTest(TestCase):
         self.assertEqual(agreement.valid_until, date(2024, 12, 31))
         self.assertEqual(agreement.production_site, application.production_site)
         self.assertEqual(agreement.certificate_id, application.agreement_id)
+        self.assertEqual(agreement.application.id, application.id)

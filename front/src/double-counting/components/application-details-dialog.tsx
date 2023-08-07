@@ -12,19 +12,15 @@ import {
 import { useNotify } from "common/components/notifications"
 import Portal, { usePortal } from "common/components/portal"
 import { Col, LoaderOverlay } from "common/components/scaffold"
-import Tabs from "common/components/tabs"
 import { useMutation, useQuery } from "common/hooks/async"
 import { formatDate } from "common/utils/formatters"
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../api"
-import { DoubleCountingStatus as DCStatus, DoubleCountingProduction, DoubleCountingSourcing } from "../types"
+import { DoubleCountingStatus as DCStatus } from "../types"
 import ApplicationStatus from "./application-status"
-import {
-  ProductionTable,
-  SourcingFullTable
-} from "./dc-tables"
+import ApplicationTabs from "./application-tabs"
 
 
 export const ApplicationDetailsDialog = () => {
@@ -196,7 +192,7 @@ export const ApplicationDetailsDialog = () => {
             </p>
           </section>
 
-          <ApplicationDetails sourcing={applicationData?.sourcing} production={applicationData?.production} quotas={quotas} setQuotas={onUpdateQuotas} />
+          <ApplicationTabs sourcing={applicationData?.sourcing} production={applicationData?.production} quotas={quotas} setQuotas={onUpdateQuotas} />
 
         </main>
 
@@ -257,56 +253,3 @@ export const ApplicationDetailsDialog = () => {
 }
 
 
-
-interface ApplicationDetailsProps {
-  production?: DoubleCountingProduction[]
-  sourcing?: DoubleCountingSourcing[]
-  quotas?: Record<string, number>
-  setQuotas?: (quotas: Record<string, number>) => void
-}
-
-const ApplicationDetails = ({ production, sourcing, quotas, setQuotas }: ApplicationDetailsProps) => {
-  const [focus, setFocus] = useState("production")
-  const { t } = useTranslation()
-
-  return <>
-    <section>
-      <Tabs
-        variant="switcher"
-        tabs={[
-          {
-            key: "sourcing_forecast",
-            label: t("Approvisionnement"),
-          },
-          {
-            key: "production",
-            label: t("Production"),
-          }
-
-        ]}
-        focus={focus}
-        onFocus={setFocus}
-      />
-
-    </section>
-
-    {focus === "sourcing_forecast" &&
-      <section>
-        <SourcingFullTable
-          sourcing={sourcing ?? []}
-        />
-      </section>
-    }
-
-
-    {focus === "production" &&
-      <section>
-        <ProductionTable
-          production={production ?? []}
-          quotas={quotas ?? {}}
-          setQuotas={setQuotas}
-        />
-      </section>
-    }
-  </>
-}

@@ -56,6 +56,7 @@ def approve_dca(request, *args, **kwargs):
             registered_address=production_site_address,
             valid_from=application.period_start,
             valid_until=application.period_end,
+            application=application,
         )
     except:
         return ErrorResponse(400, "Error while creating Agreement")

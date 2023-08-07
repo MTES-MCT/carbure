@@ -17,7 +17,7 @@ class DoubleCountingApplicationError:
 
 
 @is_admin_or_external_admin
-def get_application(request, *args, **kwargs):
+def get_application_details(request, *args, **kwargs):
     application_id = request.GET.get("dca_id", None)
     export = request.GET.get("export", False)
 

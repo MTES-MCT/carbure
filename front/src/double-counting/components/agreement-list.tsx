@@ -15,8 +15,11 @@ import Tabs from "common/components/tabs"
 import Tag, { TagVariant } from "common/components/tag"
 import AgreementStatusTag from "./agreement-status"
 import { ApplicationDetailsDialog } from "./application-details-dialog"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { ta } from "date-fns/locale"
+import useEntity from "carbure/hooks/entity"
+import { AgreementDetailsDialog } from "./agreement-details-dialog"
+import HashRoute from "common/components/hash-route"
 
 
 const AgreementList = ({ snapshot = defaultCount }: { snapshot: AgreementsSnapshot | undefined }) => {
@@ -24,11 +27,13 @@ const AgreementList = ({ snapshot = defaultCount }: { snapshot: AgreementsSnapsh
   const portal = usePortal()
   const year = new Date().getFullYear()
   const [tab, setTab] = useState("active")
+  const entity = useEntity()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const agreementsResponse = useQuery(api.getAgreementList, {
     key: "dc-agreements",
-    params: [],
+    params: [entity.id],
   })
 
 
@@ -58,10 +63,10 @@ const AgreementList = ({ snapshot = defaultCount }: { snapshot: AgreementsSnapsh
   ]
 
   function showApplicationDialog(agreement: AgreementOverview) {
-    // navigate({
-    //   pathname: location.pathname,
-    //   hash: `application/${application.id}`,
-    // })
+    navigate({
+      pathname: location.pathname,
+      hash: `agreement/${agreement.id}`,
+    })
   }
 
   const agreements = agreementsResponse.result?.data.data
@@ -69,50 +74,56 @@ const AgreementList = ({ snapshot = defaultCount }: { snapshot: AgreementsSnapsh
   console.log('agreements:', agreements)
 
   return (
-    <section>
-      <ActionBar>
-        <Tabs
-          focus={tab}
-          variant="switcher"
-          onFocus={setTab}
-          tabs={[
-            { key: "active", label: t("Actifs ({{count}})", { count: snapshot?.agreements_active }) },
-            {
-              key: "expired", label: t("Expirés ({{ count }})",
-                { count: snapshot?.agreements_expired }
-              )
-            },
-            {
-              key: "incoming", label: t("À venir ({{ count }})",
-                { count: snapshot?.agreements_incoming }
-              )
-            },
-          ]}
-        />
-
-      </ActionBar>
-
-      {agreements.active.length > 0 && (
-        <>
-          <Table
-            loading={agreementsResponse.loading}
-            columns={columns}
-            rows={tab === "active" ? agreements.active : tab === "expired" ? agreements.expired : agreements.incoming}
-            onAction={showApplicationDialog}
+    <>
+      <section>
+        <ActionBar>
+          <Tabs
+            focus={tab}
+            variant="switcher"
+            onFocus={setTab}
+            tabs={[
+              { key: "active", label: t("Actifs ({{count}})", { count: snapshot?.agreements_active }) },
+              {
+                key: "expired", label: t("Expirés ({{ count }})",
+                  { count: snapshot?.agreements_expired }
+                )
+              },
+              {
+                key: "incoming", label: t("À venir ({{ count }})",
+                  { count: snapshot?.agreements_incoming }
+                )
+              },
+            ]}
           />
-        </>
 
-      )}
+        </ActionBar>
 
-      {agreements.active.length === 0 && (
-        <Alert variant="warning" icon={AlertCircle} loading={agreementsResponse.loading}>
-          {agreementsResponse.loading ?
-            <Trans>Chargement en cours...</Trans>
-            : <Trans>Aucun quota disponible</Trans>}
+        {agreements.active.length > 0 && (
+          <>
+            <Table
+              loading={agreementsResponse.loading}
+              columns={columns}
+              rows={tab === "active" ? agreements.active : tab === "expired" ? agreements.expired : agreements.incoming}
+              onAction={showApplicationDialog}
+            />
+          </>
 
-        </Alert>
-      )}
-    </section>
+        )}
+
+        {agreements.active.length === 0 && (
+          <Alert variant="warning" icon={AlertCircle} loading={agreementsResponse.loading}>
+            {agreementsResponse.loading ?
+              <Trans>Chargement en cours...</Trans>
+              : <Trans>Aucun quota disponible</Trans>}
+
+          </Alert>
+        )}
+      </section>
+      <HashRoute
+        path="agreement/:id"
+        element={<AgreementDetailsDialog />}
+      />
+    </>
   )
 }
 
