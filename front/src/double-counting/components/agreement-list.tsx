@@ -14,6 +14,9 @@ import { ActionBar, LoaderOverlay } from "common/components/scaffold"
 import Tabs from "common/components/tabs"
 import Tag, { TagVariant } from "common/components/tag"
 import AgreementStatusTag from "./agreement-status"
+import { ApplicationDetailsDialog } from "./application-details-dialog"
+import { useNavigate } from "react-router-dom"
+import { ta } from "date-fns/locale"
 
 
 const AgreementList = ({ snapshot = defaultCount }: { snapshot: AgreementsSnapshot | undefined }) => {
@@ -21,6 +24,7 @@ const AgreementList = ({ snapshot = defaultCount }: { snapshot: AgreementsSnapsh
   const portal = usePortal()
   const year = new Date().getFullYear()
   const [tab, setTab] = useState("active")
+  const navigate = useNavigate()
 
   const agreementsResponse = useQuery(api.getAgreementList, {
     key: "dc-agreements",
@@ -53,6 +57,13 @@ const AgreementList = ({ snapshot = defaultCount }: { snapshot: AgreementsSnapsh
 
   ]
 
+  function showApplicationDialog(agreement: AgreementOverview) {
+    // navigate({
+    //   pathname: location.pathname,
+    //   hash: `application/${application.id}`,
+    // })
+  }
+
   const agreements = agreementsResponse.result?.data.data
   if (agreements === undefined) return <LoaderOverlay />
   console.log('agreements:', agreements)
@@ -82,16 +93,15 @@ const AgreementList = ({ snapshot = defaultCount }: { snapshot: AgreementsSnapsh
       </ActionBar>
 
       {agreements.active.length > 0 && (
-        <Table
-          loading={agreementsResponse.loading}
-          columns={columns}
-          rows={agreements.active}
-          onAction={(quota) =>
-            portal((close) => (
-              <QuotasDetailsDialog year={year} quota={quota} onClose={close} />
-            ))
-          }
-        />
+        <>
+          <Table
+            loading={agreementsResponse.loading}
+            columns={columns}
+            rows={tab === "active" ? agreements.active : tab === "expired" ? agreements.expired : agreements.incoming}
+            onAction={showApplicationDialog}
+          />
+        </>
+
       )}
 
       {agreements.active.length === 0 && (
@@ -103,90 +113,6 @@ const AgreementList = ({ snapshot = defaultCount }: { snapshot: AgreementsSnapsh
         </Alert>
       )}
     </section>
-  )
-}
-
-
-type QuotasDetailsDialogProps = {
-  year: number
-  quota: AgreementOverview
-  onClose: () => void
-}
-
-const QuotasDetailsDialog = ({
-  year,
-  quota,
-  onClose,
-}: QuotasDetailsDialogProps) => {
-  const { t } = useTranslation()
-  const quotaDetails = useQuery(api.getQuotaDetails, {
-    key: "dc-quota-details",
-    params: [year, quota.production_site.id],
-  })
-
-  const columns: Column<QuotaDetails>[] = [
-    {
-      header: t("Biocarburant"),
-      cell: (d) => <Cell text={d.biofuel.name} />,
-    },
-    {
-      header: t("Matière première"),
-      cell: (d) => <Cell text={d.feedstock.name} />,
-    },
-    { header: t("Nombre de lots"), cell: (d) => <Cell text={d.nb_lots} /> },
-    {
-      header: t("Volume produit"),
-      cell: (d) => (
-        <Cell
-          text={`${formatNumber(d.volume)} L`}
-          sub={`${d.current_production_weight_sum_tonnes} t`}
-        />
-      ),
-    },
-    {
-      header: t("Quota approuvé"),
-      cell: (d) => <Cell text={formatNumber(d.approved_quota)} />,
-    },
-    {
-      header: t("Progression des quotas"),
-      cell: (d) => (
-        <progress
-          max={d.approved_quota}
-          value={d.current_production_weight_sum_tonnes}
-          title={`${d.current_production_weight_sum_tonnes} / ${d.approved_quota}`}
-        />
-      ),
-    },
-  ]
-
-  const producer = quota.producer.name
-  const productionSite = quota.production_site.name
-
-  const rows = quotaDetails.result?.data.data ?? []
-
-  return (
-    <Dialog fullscreen onClose={onClose}>
-      <header>
-        <h1>{t("Détails des quotas")}</h1>
-      </header>
-
-      <main>
-        <section>
-          <p>
-            <Trans
-              values={{ productionSite, producer, year }}
-              defaults="Voici les détail de l'évolution des quotas pour le site de production <b>{{ productionSite }}</b> de <b>{{ producer }}</b> en <b>{{ year }}</b>"
-            />
-          </p>
-        </section>
-
-        <Table loading={quotaDetails.loading} columns={columns} rows={rows} />
-      </main>
-
-      <footer>
-        <Button asideX icon={Return} action={onClose} label={t("Retour")} />
-      </footer>
-    </Dialog>
   )
 }
 

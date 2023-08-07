@@ -27,7 +27,7 @@ import {
 } from "./dc-tables"
 
 
-export const DoubleCountingApplicationDialog = () => {
+export const ApplicationDetailsDialog = () => {
   const { t } = useTranslation()
   const notify = useNotify()
   const portal = usePortal()
