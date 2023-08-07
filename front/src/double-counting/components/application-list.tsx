@@ -11,7 +11,7 @@ import { Fragment, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api"
 import { ApplicationSnapshot, DoubleCountingApplication } from "../types"
-import { DoubleCountingApplicationDialog } from "./application-details-dialog"
+import { ApplicationDetailsDialog } from "./application-details-dialog"
 import ApplicationStatus from "./application-status"
 import FilesCheckerUploadButton from "./files-checker/upload-button"
 import HashRoute from "common/components/hash-route"
@@ -134,7 +134,7 @@ const ApplicationList = ({ entity, snapshot = defaultCount }: ApplicationListPro
     </section>
     <HashRoute
       path="application/:id"
-      element={<DoubleCountingApplicationDialog />}
+      element={<ApplicationDetailsDialog />}
     />
 
   </>
