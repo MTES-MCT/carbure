@@ -6,7 +6,7 @@ urlpatterns = [
     # GET
     path("applications", views.get_applications, name="api-v3-doublecount-get-applications"),
     path("application", views.get_application, name="api-v3-doublecount-get-application"),
-    path("admin/quotas", views.get_production_site_quotas_admin, name="api-v3-doublecount-get-quotas-admin"),
+    # path("admin/quotas", views.get_production_site_quotas_admin, name="api-v3-doublecount-get-quotas-admin"),
     path("admin/quotas-snapshot", views.get_quotas_snapshot_admin, name="api-v3-doublecount-get-quotas-snapshot-admin"),
     path("admin/upload-decision", views.upload_decision_admin, name="api-v3-doublecount-upload-decision-admin"),
     path("admin/download-decision", views.admin_download_admin_decision, name="api-v3-doublecount-download-decision-admin"),
@@ -23,5 +23,4 @@ urlpatterns = [
     path("upload-documentation", views.upload_documentation, name="api-v3-doublecount-upload-doc"),
     path("download-documentation", views.download_documentation, name="api-v3-doublecount-download-doc"),
     path("download-admin-decision", views.download_admin_decision, name="api-v3-doublecount-download-admin-decision"),
-    # path("admin/approve", views.approve_dca, name="api-v3-doublecount-approve-dca"),
 ]

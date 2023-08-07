@@ -9,7 +9,7 @@ import Tabs from "common/components/tabs"
 import { useMutation, useQuery } from "common/hooks/async"
 import { compact } from "common/utils/collection"
 import { formatDate, formatNumber } from "common/utils/formatters"
-import DoubleCountingStatus from "double-counting/components/dc-status"
+import ApplicationStatus from "double-counting/components/application-status"
 import { SourcingAggregationTable } from "double-counting/components/dc-tables"
 import YearTable from "double-counting/components/year-table"
 import {
@@ -177,7 +177,7 @@ const DoubleCountingApplicationDialog = ({
   return (
     <Dialog fullscreen onClose={onClose}>
       <header>
-        <DoubleCountingStatus big status={dcaStatus} />
+        <ApplicationStatus big status={dcaStatus} />
         <h1>{t("Dossier double comptage")}</h1>
       </header>
 

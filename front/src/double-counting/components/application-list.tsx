@@ -12,7 +12,7 @@ import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api"
 import { ApplicationSnapshot, DoubleCountingApplication } from "../types"
 import { DoubleCountingApplicationDialog } from "./application-details-dialog"
-import DoubleCountingStatus from "./dc-status"
+import ApplicationStatus from "./application-status"
 import FilesCheckerUploadButton from "./files-checker/upload-button"
 import HashRoute from "common/components/hash-route"
 import { useLocation, useNavigate } from "react-router-dom"
@@ -36,7 +36,7 @@ const ApplicationList = ({ entity, snapshot = defaultCount }: ApplicationListPro
   const columns: Column<DoubleCountingApplication>[] = [
     {
       header: t("Statut"),
-      cell: (a) => <DoubleCountingStatus status={a.status} />,
+      cell: (a) => <ApplicationStatus status={a.status} />,
     },
     { header: t("N° d'agrément"), cell: (a) => <Cell text={a.agreement_id} /> },
     { header: t("Producteur"), cell: (a) => <Cell text={a.producer.name} /> },
@@ -101,7 +101,7 @@ const ApplicationList = ({ entity, snapshot = defaultCount }: ApplicationListPro
             <Table
               loading={applications.loading}
               columns={columns}
-              rows={pending.applications}
+              rows={pending}
               onAction={showApplicationDialog}
             />
           )}
@@ -111,7 +111,7 @@ const ApplicationList = ({ entity, snapshot = defaultCount }: ApplicationListPro
 
       {tab === "rejected" && (
         <Fragment>
-          {rejected.count === 0 && (
+          {rejected.length === 0 && (
             <Alert
               variant="warning"
               icon={AlertCircle}
@@ -121,11 +121,11 @@ const ApplicationList = ({ entity, snapshot = defaultCount }: ApplicationListPro
             </Alert>
           )}
 
-          {rejected.count > 0 && (
+          {rejected.length > 0 && (
             <Table
               loading={applications.loading}
               columns={columns}
-              rows={rejected.applications}
+              rows={rejected}
               onAction={showApplicationDialog}
             />
           )}

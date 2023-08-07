@@ -4,10 +4,11 @@ import {
   ApplicationSnapshot,
   ApplicationsOverview,
   QuotaDetails,
-  QuotaOverview,
+  AgreementOverview,
   DoubleCountingUploadErrors,
   CheckDoubleCountingFilesResponse,
   DoubleCountingSnapshot,
+  AgreementsOverview,
 } from "./types"
 
 
@@ -48,7 +49,6 @@ export function approveDoubleCountingQuotas(
   dca_id: number,
   approved_quotas: number[][]
 ) {
-  console.log('approved_quotas:', approved_quotas)
   return api.post("/v5/admin/double-counting/applications/update-quotas", {
     entity_id,
     dca_id,
@@ -76,9 +76,9 @@ export function rejectDoubleCountingApplication(
   })
 }
 
-export function getQuotasSnapshot() {
-  return api.get<Api<QuotaOverview[]>>(
-    "/v3/doublecount/admin/quotas-snapshot"
+export function getAgreementList() {
+  return api.get<Api<AgreementsOverview>>(
+    "/v5/admin/double-counting/agreements"
   )
 }
 

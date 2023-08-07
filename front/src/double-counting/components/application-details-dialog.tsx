@@ -20,7 +20,7 @@ import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../api"
 import { DoubleCountingStatus as DCStatus, DoubleCountingProduction, DoubleCountingSourcing } from "../types"
-import DoubleCountingStatus from "./dc-status"
+import ApplicationStatus from "./application-status"
 import {
   ProductionTable,
   SourcingFullTable
@@ -181,7 +181,7 @@ export const DoubleCountingApplicationDialog = () => {
     <Portal onClose={closeDialog}>
       <Dialog fullscreen onClose={closeDialog}>
         <header>
-          <DoubleCountingStatus big status={dcaStatus} />
+          <ApplicationStatus big status={dcaStatus} />
           <h1>{t("Dossier double comptage")} </h1>
         </header>
 

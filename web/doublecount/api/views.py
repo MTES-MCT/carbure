@@ -461,46 +461,6 @@ def upload_decision_admin(request):
     return JsonResponse({"status": "success"})
 
 
-@is_admin_or_external_admin
-def get_production_site_quotas_admin(request, *args, **kwargs):
-    year = request.GET.get("year", False)  # mandatory
-    production_site_id = request.GET.get("production_site_id", False)
-    if not year:
-        return JsonResponse({"status": "error", "message": "Missing year"}, status=400)
-
-    biofuels = {p.id: p for p in Biocarburant.objects.all()}
-    feedstocks = {m.id: m for m in MatierePremiere.objects.filter(is_double_compte=True)}
-
-    detailed_quotas = DoubleCountingProduction.objects.values("biofuel", "feedstock", "approved_quota").filter(
-        year=year, dca__production_site_id=production_site_id
-    )
-    production = (
-        CarbureLot.objects.filter(
-            lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN], carbure_production_site_id=production_site_id, year=year
-        )
-        .values("feedstock", "biofuel", "biofuel__masse_volumique")
-        .filter(feedstock_id__in=feedstocks.keys())
-        .annotate(volume=Sum("volume"), nb_lots=Count("id"))
-    )
-
-    # Merge both datasets
-    df1 = pd.DataFrame(columns={"biofuel", "feedstock", "approved_quota"}, data=detailed_quotas).rename(
-        columns={"biofuel": "biofuel_id", "feedstock": "feedstock_id"}
-    )
-    df2 = pd.DataFrame(
-        columns={"feedstock", "biofuel", "volume", "nb_lots", "biofuel__masse_volumique"}, data=production
-    ).rename(columns={"feedstock": "feedstock_id", "biofuel": "biofuel_id", "biofuel__masse_volumique": "masse_volumique"})
-    df1.set_index(["biofuel_id", "feedstock_id"], inplace=True)
-    df2.set_index(["biofuel_id", "feedstock_id"], inplace=True)
-    res = df1.merge(df2, how="outer", left_index=True, right_index=True).fillna(0).reset_index()
-    res["feedstock"] = res["feedstock_id"].apply(lambda x: feedstocks[x].natural_key())
-    res["biofuel"] = res["biofuel_id"].apply(lambda x: biofuels[x].natural_key())
-    res["current_production_weight_sum_tonnes"] = (res["volume"] * res["masse_volumique"] / 1000).apply(
-        lambda x: round(x, 2)
-    )
-    return JsonResponse({"status": "success", "data": res.to_dict("records")})
-
-
 @check_rights("entity_id")
 def get_production_site_quotas(request, *args, **kwargs):
     context = kwargs["context"]

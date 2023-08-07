@@ -1,12 +1,10 @@
 # /api/v5/saf/operator/snapshot
 
 import traceback
-from django.db.models.expressions import F
 from certificates.models import DoubleCountingRegistration
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
 from doublecount.models import DoubleCountingApplication
-from saf.models import SafTicketSource, SafTicket
 from django.db.models.query_utils import Q
 from datetime import datetime
 
