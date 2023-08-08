@@ -7,8 +7,8 @@ import { LoaderOverlay, Panel } from "common/components/scaffold"
 import Table, { Cell } from "common/components/table"
 import { useQuery } from "common/hooks/async"
 import { formatDate, formatDateYear } from "common/utils/formatters"
-import DoubleCountingStatus from "double-counting/components/dc-status"
-import { DoubleCountingApplication } from "double-counting/types"
+import ApplicationStatus from "double-counting/components/application-status"
+import { DoubleCountingApplicationOverview } from "double-counting/types"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api/double-counting"
 import DoubleCountingApplicationDialog from "./double-counting-dialog"
@@ -30,7 +30,7 @@ const DoubleCountingSettings = () => {
   const isEmpty = applicationsData.length === 0
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
 
-  function showApplicationDialog(dc: DoubleCountingApplication) {
+  function showApplicationDialog(dc: DoubleCountingApplicationOverview) {
     portal((resolve) => (
       <DoubleCountingApplicationDialog
         entity={entity}
@@ -81,7 +81,7 @@ const DoubleCountingSettings = () => {
           columns={[
             {
               header: t("Statut"),
-              cell: (dc) => <DoubleCountingStatus status={dc.status} />,
+              cell: (dc) => <ApplicationStatus status={dc.status} />,
             },
             {
               header: t("Site de production"),

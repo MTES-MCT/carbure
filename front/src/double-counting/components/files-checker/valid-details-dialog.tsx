@@ -17,8 +17,8 @@ import { addDoubleCountingApplication } from "double-counting/api"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useMatch, useNavigate } from "react-router-dom"
 import { DoubleCountingFileInfo } from "../../types"
-import ApplicationDetails from "../application-details"
-import ApplicationInfo from "./application-info"
+import ApplicationTabs from "../application-tabs"
+import FileApplicationInfo from "./file-application-info"
 import React, { useState } from "react"
 
 export type ValidDetailsDialogProps = {
@@ -55,13 +55,13 @@ export const ValidDetailsDialog = ({
 
       <main>
 
-        <ApplicationInfo fileData={fileData} />
+        <FileApplicationInfo fileData={fileData} />
         <section>
           {fileData.has_dechets_industriels &&
             <DechetIndustrielAlert />
           }
         </section>
-        <ApplicationDetails sourcing={fileData.sourcing} production={fileData.production} />
+        <ApplicationTabs sourcing={fileData.sourcing} production={fileData.production} />
       </main>
 
       <footer>
@@ -109,10 +109,10 @@ export const ProductionSiteAdminDialog = ({
   const location = useLocation()
 
   const addApplication = useMutation(addDoubleCountingApplication, {
-    invalidates: [],
+    invalidates: ["dc-applications", "dc-snapshot"],
     onSuccess() {
       onClose()
-      notify(t("Le dossier a été envoyé !"), { variant: "success" })
+      notify(t("Le dossier a été ajouté !"), { variant: "success" })
       navigate({
         pathname: '/org/9/double-counting',
       })
@@ -156,7 +156,7 @@ export const ProductionSiteAdminDialog = ({
       </header>
 
       <main>
-        <ApplicationInfo fileData={fileData} />
+        <FileApplicationInfo fileData={fileData} />
         <section>
           <Autocomplete
             required
@@ -176,7 +176,7 @@ export const ProductionSiteAdminDialog = ({
         {error &&
           <section>
             <Alert variant="warning" icon={AlertTriangle}>
-              {t("PRODUCTION_SITE_ADDRESS_UNDEFINED", { ns: "errors" })}
+              {t("L'adresse, la ville ou le code postal du site de production n'est pas renseignée. Veuillez l'ajouter dans les informations liées à la société.")}
               <ExternalLink href={`/admin/producers/productionsite/${value.productionSite?.id}/change`}>
                 Editer le site de production
               </ExternalLink>

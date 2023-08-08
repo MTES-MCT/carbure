@@ -1,15 +1,11 @@
 import datetime
-from email import message
 import os
 import traceback
 import unicodedata
 import boto3
 from django.conf import settings
-from django.core.mail import send_mail
 from django.core.mail import EmailMessage
-import json
 from django.db.models.aggregates import Count, Sum
-from django.db.models.query_utils import Q
 
 import xlsxwriter
 from django.http import JsonResponse, HttpResponse
@@ -26,15 +22,9 @@ from doublecount.models import (
     DoubleCountingSourcing,
     DoubleCountingProduction,
 )
-from doublecount.serializers import DoubleCountingApplicationFullSerializer, DoubleCountingApplicationPartialSerializer
+from doublecount.serializers import DoubleCountingApplicationPartialSerializer
 from doublecount.serializers import (
-    DoubleCountingApplicationFullSerializerWithForeignKeys,
     DoubleCountingApplicationPartialSerializerWithForeignKeys,
-)
-from doublecount.helpers import (
-    load_dc_sourcing_data as new_load_dc_sourcing,
-    load_dc_production_data as new_load_dc_prod,
-    send_dca_status_email,
 )
 from core.models import Entity, UserRights, MatierePremiere, Pays, Biocarburant, CarbureLot
 from core.xlsx_v3 import (
@@ -48,9 +38,6 @@ from core.xlsx_v3 import (
 from carbure.storage_backends import AWSStorage
 from django.core.files.storage import FileSystemStorage
 
-from core.common import ErrorResponse
-from doublecount.dc_sanity_checks import check_dc_globally
-from doublecount.parser.dc_parser import parse_dc_excel
 from doublecount.old_helpers import load_dc_file, load_dc_sourcing_data, load_dc_production_data
 
 
@@ -474,46 +461,6 @@ def upload_decision_admin(request):
     return JsonResponse({"status": "success"})
 
 
-@is_admin_or_external_admin
-def get_production_site_quotas_admin(request, *args, **kwargs):
-    year = request.GET.get("year", False)  # mandatory
-    production_site_id = request.GET.get("production_site_id", False)
-    if not year:
-        return JsonResponse({"status": "error", "message": "Missing year"}, status=400)
-
-    biofuels = {p.id: p for p in Biocarburant.objects.all()}
-    feedstocks = {m.id: m for m in MatierePremiere.objects.filter(is_double_compte=True)}
-
-    detailed_quotas = DoubleCountingProduction.objects.values("biofuel", "feedstock", "approved_quota").filter(
-        year=year, dca__production_site_id=production_site_id
-    )
-    production = (
-        CarbureLot.objects.filter(
-            lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN], carbure_production_site_id=production_site_id, year=year
-        )
-        .values("feedstock", "biofuel", "biofuel__masse_volumique")
-        .filter(feedstock_id__in=feedstocks.keys())
-        .annotate(volume=Sum("volume"), nb_lots=Count("id"))
-    )
-
-    # Merge both datasets
-    df1 = pd.DataFrame(columns={"biofuel", "feedstock", "approved_quota"}, data=detailed_quotas).rename(
-        columns={"biofuel": "biofuel_id", "feedstock": "feedstock_id"}
-    )
-    df2 = pd.DataFrame(
-        columns={"feedstock", "biofuel", "volume", "nb_lots", "biofuel__masse_volumique"}, data=production
-    ).rename(columns={"feedstock": "feedstock_id", "biofuel": "biofuel_id", "biofuel__masse_volumique": "masse_volumique"})
-    df1.set_index(["biofuel_id", "feedstock_id"], inplace=True)
-    df2.set_index(["biofuel_id", "feedstock_id"], inplace=True)
-    res = df1.merge(df2, how="outer", left_index=True, right_index=True).fillna(0).reset_index()
-    res["feedstock"] = res["feedstock_id"].apply(lambda x: feedstocks[x].natural_key())
-    res["biofuel"] = res["biofuel_id"].apply(lambda x: biofuels[x].natural_key())
-    res["current_production_weight_sum_tonnes"] = (res["volume"] * res["masse_volumique"] / 1000).apply(
-        lambda x: round(x, 2)
-    )
-    return JsonResponse({"status": "success", "data": res.to_dict("records")})
-
-
 @check_rights("entity_id")
 def get_production_site_quotas(request, *args, **kwargs):
     context = kwargs["context"]
@@ -553,54 +500,6 @@ def get_production_site_quotas(request, *args, **kwargs):
         lambda x: round(x, 2)
     )
     return JsonResponse({"status": "success", "data": res.to_dict("records")})
-
-
-@check_rights("validator_entity_id", role=[UserRights.ADMIN, UserRights.RW])
-def approve_dca(request, *args, **kwargs):
-    context = kwargs["context"]
-    entity = context["entity"]
-    dca_id = request.POST.get("dca_id", False)
-    if not dca_id:
-        return JsonResponse({"status": "error", "message": "Missing dca_id"}, status=400)
-
-    if entity.entity_type not in [Entity.ADMIN, Entity.EXTERNAL_ADMIN]:
-        return JsonResponse({"status": "error", "message": "Not authorised"}, status=403)
-
-    try:
-        dca = DoubleCountingApplication.objects.get(id=dca_id)
-    except:
-        return JsonResponse({"status": "error", "message": "Could not find DCA"}, status=400)
-
-    # ensure all quotas have been validated
-    remaining_quotas_to_check = DoubleCountingProduction.objects.filter(dca=dca, approved_quota=-1).count()
-    if remaining_quotas_to_check > 0:
-        return JsonResponse({"status": "error", "message": "Some quotas have not been approved"}, status=400)
-
-    if entity.name == "DGPE":
-        if not dca.status == DoubleCountingApplication.INPROGRESS:
-            return JsonResponse({"status": "error", "message": "La DGEC doit valider le dossier en premier"}, status=400)
-        dca.dgpe_validated = True
-        dca.dgpe_validator = request.user
-        dca.dgpe_validated_dt = pytz.utc.localize(datetime.datetime.now())
-    elif entity.name == "DGDDI":
-        if not dca.status == DoubleCountingApplication.INPROGRESS:
-            return JsonResponse({"status": "error", "message": "La DGEC doit valider le dossier en premier"}, status=400)
-        dca.dgddi_validated = True
-        dca.dgddi_validator = request.user
-        dca.dgddi_validated_dt = pytz.utc.localize(datetime.datetime.now())
-    elif entity.entity_type == Entity.ADMIN:
-        dca.dgec_validated = True
-        dca.dgec_validator = request.user
-        dca.dgec_validated_dt = pytz.utc.localize(datetime.datetime.now())
-        dca.status = DoubleCountingApplication.INPROGRESS
-    else:
-        return JsonResponse({"status": "error", "message": "Unknown entity"}, status=400)
-    dca.save()
-    if dca.dgpe_validated and dca.dgddi_validated and dca.dgec_validated:
-        dca.status = DoubleCountingApplication.ACCEPTED
-        dca.save()  # save before sending email, just in case
-        send_dca_status_email(dca)
-    return JsonResponse({"status": "success"})
 
 
 @check_rights("entity_id", role=[UserRights.ADMIN, UserRights.RW])

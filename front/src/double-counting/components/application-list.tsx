@@ -1,7 +1,7 @@
 import { Entity } from "carbure/types"
 import { Alert } from "common/components/alert"
+import HashRoute from "common/components/hash-route"
 import { AlertCircle } from "common/components/icons"
-import { usePortal } from "common/components/portal"
 import { ActionBar, LoaderOverlay } from "common/components/scaffold"
 import Table, { Cell, Column } from "common/components/table"
 import Tabs from "common/components/tabs"
@@ -9,34 +9,34 @@ import { useQuery } from "common/hooks/async"
 import { formatDate } from "common/utils/formatters"
 import { Fragment, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
-import * as api from "../api"
-import { ApplicationSnapshot, DoubleCountingApplication } from "../types"
-import { DoubleCountingApplicationDialog } from "./application-details-dialog"
-import DoubleCountingStatus from "./dc-status"
-import FilesCheckerUploadButton from "./files-checker/upload-button"
-import HashRoute from "common/components/hash-route"
 import { useLocation, useNavigate } from "react-router-dom"
+import * as api from "../api"
+import { DoubleCountingApplicationSnapshot, DoubleCountingApplicationOverview } from "../types"
+import { ApplicationDetailsDialog } from "./application-details-dialog"
+import ApplicationStatus from "./application-status"
+import FilesCheckerUploadButton from "./files-checker/upload-button"
+import NoResult from "common/components/no-result"
+import useEntity from "carbure/hooks/entity"
 
 type ApplicationListProps = {
-  entity: Entity
-  snapshot: ApplicationSnapshot | undefined
+  snapshot: DoubleCountingApplicationSnapshot | undefined
 }
 
-const ApplicationList = ({ entity, snapshot = defaultCount }: ApplicationListProps) => {
+const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
   const { t } = useTranslation()
   const [tab, setTab] = useState("pending")
   const navigate = useNavigate()
   const location = useLocation()
-
+  const entity = useEntity()
   const applications = useQuery(api.getAllDoubleCountingApplications, {
     key: "dc-applications",
-    params: [],
+    params: [entity.id],
   })
 
-  const columns: Column<DoubleCountingApplication>[] = [
+  const columns: Column<DoubleCountingApplicationOverview>[] = [
     {
       header: t("Statut"),
-      cell: (a) => <DoubleCountingStatus status={a.status} />,
+      cell: (a) => <ApplicationStatus status={a.status} />,
     },
     { header: t("N° d'agrément"), cell: (a) => <Cell text={a.agreement_id} /> },
     { header: t("Producteur"), cell: (a) => <Cell text={a.producer.name} /> },
@@ -55,11 +55,11 @@ const ApplicationList = ({ entity, snapshot = defaultCount }: ApplicationListPro
   ]
 
   const applicationsData = applications.result?.data.data
-  if (applicationsData === undefined) return <LoaderOverlay />
+  // if (applicationsData === undefined) return <LoaderOverlay />
 
-  const { pending, rejected } = applicationsData
+  // const { pending, rejected } = applicationsData
 
-  function showApplicationDialog(application: DoubleCountingApplication) {
+  function showApplicationDialog(application: DoubleCountingApplicationOverview) {
     navigate({
       pathname: location.pathname,
       hash: `application/${application.id}`,
@@ -87,54 +87,44 @@ const ApplicationList = ({ entity, snapshot = defaultCount }: ApplicationListPro
       </ActionBar>
       {tab === "pending" && (
         <Fragment>
-          {snapshot.applications_pending === 0 && (
-            <Alert
-              variant="warning"
-              icon={AlertCircle}
-              loading={applications.loading}
-            >
-              <Trans>Aucun dossier en attente trouvé</Trans>
-            </Alert>
+          {!applicationsData && (
+            <NoResult label={t("Aucun dossier en attente trouvé")} loading={applications.loading} />
           )}
 
-          {snapshot.applications_pending > 0 && (
+          {applicationsData &&
             <Table
               loading={applications.loading}
               columns={columns}
-              rows={pending.applications}
+              rows={applicationsData?.pending || []}
               onAction={showApplicationDialog}
             />
-          )}
+          }
+
         </Fragment>
       )}
 
 
       {tab === "rejected" && (
         <Fragment>
-          {rejected.count === 0 && (
-            <Alert
-              variant="warning"
-              icon={AlertCircle}
-              loading={applications.loading}
-            >
-              <Trans>Aucun dossier refusé trouvé</Trans>
-            </Alert>
+
+          {!applicationsData && (
+            <NoResult label={t("Aucun dossier refusé trouvé")} loading={applications.loading} />
           )}
 
-          {rejected.count > 0 && (
-            <Table
-              loading={applications.loading}
-              columns={columns}
-              rows={rejected.applications}
-              onAction={showApplicationDialog}
-            />
-          )}
+
+          <Table
+            loading={applications.loading}
+            columns={columns}
+            rows={applicationsData?.rejected || []}
+            onAction={showApplicationDialog}
+          />
+
         </Fragment>
       )}
     </section>
     <HashRoute
       path="application/:id"
-      element={<DoubleCountingApplicationDialog />}
+      element={<ApplicationDetailsDialog />}
     />
 
   </>

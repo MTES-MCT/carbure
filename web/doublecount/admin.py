@@ -12,9 +12,7 @@ class DoubleCountingApplicationAdmin(admin.ModelAdmin):
         "production_site",
         "period_start",
         "period_end",
-        "dgec_validated",
-        "dgddi_validated",
-        "dgpe_validated",
+        "status",
     )
     list_filter = (
         "producer",

@@ -5,4 +5,5 @@ urlpatterns = [
     # overview
     path("snapshot", get_snapshot, name="admin.api.double_counting.snapshot"),
     path("applications/", include("admin.api.double_counting.applications")),
+    path("agreements/", include("admin.api.double_counting.agreements")),
 ]

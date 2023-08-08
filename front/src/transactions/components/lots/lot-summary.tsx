@@ -17,7 +17,7 @@ import Dialog from "common/components/dialog"
 import Table, { Cell } from "common/components/table"
 import { Filter, Return } from "common/components/icons"
 import { FilterManager, ResetButton } from "../filters"
-import NoResult from "../no-result"
+import NoResult from "../../../common/components/no-result"
 import { compact } from "common/utils/collection"
 import useEntity from "carbure/hooks/entity"
 

@@ -7,12 +7,10 @@ import useTitle from "common/hooks/title"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes, useLocation } from "react-router-dom"
 import * as api from "./api"
+import AgreementList from "./components/agreement-list"
 import ApplicationList from "./components/application-list"
-import QuotasList from "./components/dc-quotas"
 import DoubleCountingFilesChecker from "./components/files-checker"
-import { AgreementsSnapshot, ApplicationSnapshot } from "./types"
-import HashRoute from "common/components/hash-route"
-import { DoubleCountingApplicationDialog } from "./components/application-details-dialog"
+import { DoubleCountingAgreementsSnapshot, DoubleCountingApplicationSnapshot } from "./types"
 
 
 const DoubleCounting = () => {
@@ -49,13 +47,15 @@ const DoubleCounting = () => {
                           }
                         </p>
                         <strong>
-                          {t("Dossiers en attente")}
+                          {t("Dossiers en attente", {
+                            count: snapshot?.applications_pending,
+                          })}
                         </strong>
                       </Col>
                     </Row>
                 },
                 {
-                  key: "quotas", path: "quotas", label:
+                  key: "agreements", path: "agreements", label:
                     <Row><Col>
                       <p>
                         {snapshotResponse.loading ? (
@@ -64,7 +64,9 @@ const DoubleCounting = () => {
                         }
                       </p>
                       <strong>
-                        {t("Agréments actifs")}
+                        {t("Agréments actifs", {
+                          count: snapshot?.agreements_active,
+                        })}
                       </strong>
                     </Col>
                     </Row>
@@ -76,10 +78,10 @@ const DoubleCounting = () => {
       <Routes>
         <Route
           path="applications"
-          element={<ApplicationList entity={entity} snapshot={snapshot as ApplicationSnapshot} />}
+          element={<ApplicationList snapshot={snapshot as DoubleCountingApplicationSnapshot} />}
         />
 
-        <Route path="quotas" element={<QuotasList snapshot={snapshot as AgreementsSnapshot} />} />
+        <Route path="agreements" element={<AgreementList snapshot={snapshot as DoubleCountingAgreementsSnapshot} />} />
         <Route
           path="files-checker/*"
           element={<DoubleCountingFilesChecker />}

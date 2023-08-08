@@ -1,17 +1,13 @@
-from django.http import JsonResponse, HttpResponse
+from django.http import HttpResponse
 from core.common import ErrorResponse, SuccessResponse
-from core.decorators import check_rights, is_admin_or_external_admin
+from core.decorators import check_admin_rights, is_admin_or_external_admin
 import boto3
 import os
 from doublecount.models import (
     DoubleCountingApplication,
 )
-from doublecount.serializers import DoubleCountingApplicationPartialSerializer
 from doublecount.serializers import (
     DoubleCountingApplicationFullSerializerWithForeignKeys,
-)
-from core.xlsx_v3 import (
-    export_dca,
 )
 
 
@@ -20,8 +16,8 @@ class DoubleCountingApplicationError:
     APPLICATION_NOT_FOUND = "APPLICATION_NOT_FOUND"
 
 
-@is_admin_or_external_admin
-def get_application(request, *args, **kwargs):
+@check_admin_rights()
+def get_application_details(request, *args, **kwargs):
     application_id = request.GET.get("dca_id", None)
     export = request.GET.get("export", False)
 

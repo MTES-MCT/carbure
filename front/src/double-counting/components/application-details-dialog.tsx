@@ -1,40 +1,30 @@
-import { Fragment, useState } from "react"
-import { useTranslation, Trans } from "react-i18next"
-import { Admin, DoubleCountingStatus as DCStatus, DoubleCountingProduction, DoubleCountingSourcing } from "../types"
-import { Col, LoaderOverlay } from "common/components/scaffold"
-import Tabs from "common/components/tabs"
+import useEntity from "carbure/hooks/entity"
+import { EntityType } from "carbure/types"
 import { Button, DownloadLink } from "common/components/button"
-import * as api from "../api"
 import { Confirm, Dialog } from "common/components/dialog"
-import { Entity, EntityType } from "carbure/types"
+import { useHashMatch } from "common/components/hash-route"
 import {
-  Return,
-  Download,
   Check,
   Cross,
-  Save,
-  AlertCircle,
+  Return,
+  Save
 } from "common/components/icons"
-import { Alert } from "common/components/alert"
 import { useNotify } from "common/components/notifications"
-import DoubleCountingStatus from "./dc-status"
-import {
-  SourcingAggregationTable,
-  SourcingTable,
-  ProductionTable,
-  StatusTable,
-  SourcingFullTable,
-} from "./dc-tables"
-import { FileInput } from "common/components/input"
-import { useMutation, useQuery } from "common/hooks/async"
 import Portal, { usePortal } from "common/components/portal"
+import { Col, LoaderOverlay } from "common/components/scaffold"
+import { useMutation, useQuery } from "common/hooks/async"
 import { formatDate } from "common/utils/formatters"
-import useEntity from "carbure/hooks/entity"
-import { useHashMatch } from "common/components/hash-route"
+import { useState } from "react"
+import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
+import * as api from "../api"
+import { DoubleCountingStatus as DCStatus, DoubleCountingApplicationDetails } from "../types"
+import ApplicationStatus from "./application-status"
+import ApplicationTabs from "./application-tabs"
+import { ApplicationInfo } from "./application-info"
 
 
-export const DoubleCountingApplicationDialog = () => {
+export const ApplicationDetailsDialog = () => {
   const { t } = useTranslation()
   const notify = useNotify()
   const portal = usePortal()
@@ -42,14 +32,14 @@ export const DoubleCountingApplicationDialog = () => {
   const location = useLocation()
 
   const entity = useEntity()
-  const [focus, setFocus] = useState("aggregated_sourcing")
+  const [quotasIsUpdated, setQuotasIsUpdated] = useState(false)
   const [quotas, setQuotas] = useState<Record<string, number>>({})
   const match = useHashMatch("application/:id")
 
 
-  const application = useQuery(api.getDoubleCountingApplication, {
+  const applicationResponse = useQuery(api.getDoubleCountingApplication, {
     key: "dc-application",
-    params: [parseInt(match?.params.id!)],
+    params: [entity.id, parseInt(match?.params.id!)],
 
     onSuccess: (application) => {
       const applicationData = application.data.data
@@ -69,11 +59,18 @@ export const DoubleCountingApplicationDialog = () => {
   })
 
   const approveQuotas = useMutation(api.approveDoubleCountingQuotas, {
-    invalidates: ["dc-applications", "dc-snapshot"],
+    invalidates: ["dc-application", "dc-snapshot"],
+    onSuccess: () => {
+      setQuotasIsUpdated(false)
+    }
   })
 
   const approveApplication = useMutation(api.approveDoubleCountingApplication, {
-    invalidates: ["dc-applications", "dc-snapshot"],
+    invalidates: ["dc-applications", "dc-snapshot", "dc-agreements"],
+    onSuccess: () => {
+      navigate("/org/9/double-counting/agreements")
+      notify(t("Le dossier a été accepté."), { variant: "success" })
+    }
   })
 
   const rejectApplication = useMutation(api.rejectDoubleCountingApplication, {
@@ -82,51 +79,44 @@ export const DoubleCountingApplicationDialog = () => {
       navigate({
         pathname: location.pathname,
       })
-      notify(t("Le dossier a bien été refusé."), { variant: "success" })
+      notify(t("Le dossier a été refusé."), { variant: "success" })
     }
   })
 
 
-  const applicationData = application.result?.data.data
-  console.log('applicationData:', applicationData)
-  const dcaStatus = applicationData?.status ?? DCStatus.Pending
+  const application = applicationResponse.result?.data.data
+  const dcaStatus = application?.status ?? DCStatus.Pending
 
 
   const isAdmin = entity?.entity_type === EntityType.Administration
-  const hasQuotas = !applicationData?.production.some(
+  const hasQuotas = !application?.production.some(
     (p) => p.approved_quota === -1
-  )
-  const isReady = isAdmin ? true : applicationData?.dgec_validated
-
-  const productionSite = applicationData?.production_site ?? "N/A"
-  const producer = applicationData?.producer.name ?? "N/A"
-  const user = applicationData?.producer_user ?? "N/A"
-  const creationDate = applicationData?.created_at
-    ? formatDate(applicationData.created_at)
-    : "N/A"
-
-  const documentationFile = applicationData?.documents.find(
-    (doc) => doc.file_type === "SOURCING"
   )
 
 
   const excelURL =
-    applicationData &&
-    `/api/v5/admin/double-counting/applications/details?dca_id=${applicationData.id}&export=true`
+    application &&
+    `/api/v5/admin/double-counting/applications/details?dca_id=${application.id}&export=true`
+
+  const onUpdateQuotas = (quotas: Record<string, number>) => {
+    setQuotasIsUpdated(true)
+    setQuotas(quotas)
+  }
 
   async function submitQuotas() {
     if (
-      !applicationData ||
+      !application ||
       !entity ||
       entity?.entity_type !== EntityType.Administration
     ) {
       return
     }
 
+    const updatedQuotas = Object.keys(quotas).map((id) => [parseInt(id), quotas[id]])
     const done = await approveQuotas.execute(
       entity.id,
-      applicationData.id,
-      Object.keys(quotas).map((id) => [parseInt(id), quotas[id]])
+      application.id,
+      updatedQuotas
     )
 
     if (done) {
@@ -143,13 +133,13 @@ export const DoubleCountingApplicationDialog = () => {
       <Confirm
         variant="success"
         title={t("Accepter dossier")}
-        description={t("Voulez-vous vraiment accepter ce dossier double comptage")} // prettier-ignore
+        description={t("Voulez-vous vraiment accepter ce dossier double comptage ? Une fois accepté, vous retrouverez l’agrément correspondant dans la liste des agréments actifs.")} // prettier-ignore
         confirm={t("Accepter")}
         icon={Check}
         onClose={close}
         onConfirm={async () => {
-          if (applicationData) {
-            await approveApplication.execute(entity.id, applicationData.id)
+          if (application) {
+            await approveApplication.execute(entity.id, application.id)
           }
         }}
       />
@@ -166,8 +156,8 @@ export const DoubleCountingApplicationDialog = () => {
         icon={Cross}
         onClose={close}
         onConfirm={async () => {
-          if (applicationData) {
-            await rejectApplication.execute(entity.id, applicationData.id)
+          if (application) {
+            await rejectApplication.execute(entity.id, application.id)
           }
         }}
       />
@@ -182,22 +172,15 @@ export const DoubleCountingApplicationDialog = () => {
     <Portal onClose={closeDialog}>
       <Dialog fullscreen onClose={closeDialog}>
         <header>
-          <DoubleCountingStatus big status={dcaStatus} />
+          <ApplicationStatus big status={dcaStatus} />
           <h1>{t("Dossier double comptage")} </h1>
         </header>
 
         <main>
 
-          <section>
-            <p>
-              <Trans
-                values={{ producer, productionSite, creationDate, user }}
-                defaults="Pour le site de production <b>{{ productionSite }}</b> de <b>{{ producer }}</b>, soumis par <b>{{ user }}</b> le <b>{{ creationDate }}</b>"
-              />
-            </p>
-          </section>
+          <ApplicationInfo application={application} />
 
-          <ApplicationDetails sourcing={applicationData?.sourcing} production={applicationData?.production} quotas={quotas} setQuotas={setQuotas} />
+          <ApplicationTabs sourcing={application?.sourcing} production={application?.production} quotas={quotas} setQuotas={onUpdateQuotas} />
 
         </main>
 
@@ -210,11 +193,12 @@ export const DoubleCountingApplicationDialog = () => {
           </Col>
 
 
-          {!application.loading && (
+          {!applicationResponse.loading && (
             <>
               {isAdmin && (
                 <Button
                   loading={approveQuotas.loading}
+                  disabled={!quotasIsUpdated}
                   variant="primary"
                   icon={Save}
                   action={submitQuotas}
@@ -225,8 +209,8 @@ export const DoubleCountingApplicationDialog = () => {
 
               <Button
                 loading={approveQuotas.loading}
-                // disabled={!isReady || !hasQuotas}
-                disabled={true}
+                disabled={applicationResponse.loading || !hasQuotas}
+
 
                 variant="success"
                 icon={Check}
@@ -236,7 +220,7 @@ export const DoubleCountingApplicationDialog = () => {
               </Button>
               <Button
                 loading={rejectApplication.loading}
-                disabled={!isReady}
+                disabled={applicationResponse.loading}
                 variant="danger"
                 icon={Cross}
                 action={submitReject}
@@ -250,63 +234,9 @@ export const DoubleCountingApplicationDialog = () => {
           </Button>
         </footer>
 
-        {application.loading && <LoaderOverlay />}
+        {applicationResponse.loading && <LoaderOverlay />}
       </Dialog>
     </Portal>
   )
 }
 
-
-
-interface ApplicationDetailsProps {
-  production?: DoubleCountingProduction[]
-  sourcing?: DoubleCountingSourcing[]
-  quotas?: Record<string, number>
-  setQuotas?: (quotas: Record<string, number>) => void
-}
-
-const ApplicationDetails = ({ production, sourcing, quotas, setQuotas }: ApplicationDetailsProps) => {
-  const [focus, setFocus] = useState("production")
-  const { t } = useTranslation()
-
-  return <>
-    <section>
-      <Tabs
-        variant="switcher"
-        tabs={[
-          {
-            key: "sourcing_forecast",
-            label: t("Approvisionnement"),
-          },
-          {
-            key: "production",
-            label: t("Production"),
-          }
-
-        ]}
-        focus={focus}
-        onFocus={setFocus}
-      />
-
-    </section>
-
-    {focus === "sourcing_forecast" &&
-      <section>
-        <SourcingFullTable
-          sourcing={sourcing ?? []}
-        />
-      </section>
-    }
-
-
-    {focus === "production" &&
-      <section>
-        <ProductionTable
-          production={production ?? []}
-          quotas={quotas ?? {}}
-          setQuotas={setQuotas}
-        />
-      </section>
-    }
-  </>
-}

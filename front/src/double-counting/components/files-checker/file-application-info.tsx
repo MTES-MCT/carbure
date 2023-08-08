@@ -1,20 +1,10 @@
-import { Alert } from "common/components/alert"
-import { Button } from "common/components/button"
-import { Dialog } from "common/components/dialog"
-import { AlertCircle, InfoCircle, Plus, Return } from "common/components/icons"
-import Tabs from "common/components/tabs"
-import Tag from "common/components/tag"
-import { useState } from "react"
-import { Trans, useTranslation } from "react-i18next"
-import { getErrorText } from "settings/utils/double-counting"
-import { DoubleCountingFileInfo, DoubleCountingSourcing, DoubleCountingSourcingAggregation, DoubleCountingUploadError } from "../../types"
-import { ProductionTable, SourcingAggregationTable, SourcingTable } from "../dc-tables"
-import Collapse from "common/components/collapse"
-import Checkbox from "common/components/checkbox"
-import { t } from "i18next"
+import { InfoCircle } from "common/components/icons"
 import Tooltip from "common/components/tooltip"
+import { t } from "i18next"
+import { Trans } from "react-i18next"
+import { DoubleCountingFileInfo } from "../../types"
 
-const ApplicationInfo = ({ fileData }: { fileData: DoubleCountingFileInfo }) => {
+const FileApplicationInfo = ({ fileData }: { fileData: DoubleCountingFileInfo }) => {
 
     return <section>
         <p>
@@ -57,4 +47,4 @@ const ApplicationInfo = ({ fileData }: { fileData: DoubleCountingFileInfo }) => 
         </p>
     </section>
 }
-export default ApplicationInfo
+export default FileApplicationInfo

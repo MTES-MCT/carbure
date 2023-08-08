@@ -2,7 +2,6 @@ from django.db import transaction
 from django import forms
 
 from carbure.tasks import background_bulk_scoring
-from certificates.models import DoubleCountingRegistration
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
 from core.carburetypes import CarbureStockErrors
