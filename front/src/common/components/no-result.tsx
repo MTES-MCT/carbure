@@ -1,19 +1,14 @@
+import { useTranslation } from "react-i18next"
 import Alert from "common/components/alert"
 import { AlertCircle } from "common/components/icons"
-import { useTranslation } from "react-i18next"
-import { SafFilterSelection } from "saf/types"
-import { ResetButton } from "transactions/components/filters"
-
-export interface FilterManager {
-  filters: SafFilterSelection
-  onFilter: (filters: SafFilterSelection) => void
-}
+import { FilterManager, ResetButton } from "../../transactions/components/filters"
 
 interface NoResultProps extends Partial<FilterManager> {
   loading?: boolean
+  label?: string
 }
 
-export const NoResult = ({ loading, filters, onFilter }: NoResultProps) => {
+export const NoResult = ({ loading, filters, onFilter, label }: NoResultProps) => {
   const { t } = useTranslation()
 
   return (
@@ -21,9 +16,9 @@ export const NoResult = ({ loading, filters, onFilter }: NoResultProps) => {
       <p>
         {loading
           ? t("Chargement en cours...")
-          : t("Aucun résultat trouvé pour cette recherche")}
+          : label || t("Aucun résultat trouvé pour cette recherche")}
       </p>
-      {filters && onFilter && Object.keys(filters).length > 0 && (
+      {filters && onFilter && (
         <ResetButton filters={filters} onFilter={onFilter} />
       )}
     </Alert>

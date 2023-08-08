@@ -3,6 +3,7 @@ import { getEntityTypeLabel } from "carbure/utils/normalizers"
 import { Alert } from "common/components/alert"
 import { AlertCircle } from "common/components/icons"
 import { SearchInput } from "common/components/input"
+import NoResult from "common/components/no-result"
 import Table from "common/components/table"
 import { useQuery } from "common/hooks/async"
 import { Fragment, useState } from "react"
@@ -30,9 +31,7 @@ const Companies = () => {
       />
 
       {isEmpty && (
-        <Alert loading={entities.loading} icon={AlertCircle} variant="warning">
-          <Trans>Aucune société trouvée pour cette recherche</Trans>
-        </Alert>
+        <NoResult label={t("Aucune société trouvée pour cette recherche")} loading={entities.loading} />
       )}
 
       {!isEmpty && (

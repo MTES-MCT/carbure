@@ -10,7 +10,6 @@ from django.db.models.query_utils import Q
 from django.http.response import HttpResponse, JsonResponse
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
-from certificates.models import DoubleCountingRegistration
 from core.common import try_get_certificate, try_get_double_counting_certificate
 
 from core.ign_distance import get_distance
@@ -23,16 +22,12 @@ from core.models import (
     CarbureStockTransformation,
     Depot,
     Entity,
-    EntityCertificate,
-    EntityDepot,
-    GenericCertificate,
     MatierePremiere,
     Pays,
     TransactionDistance,
     UserRights,
 )
 from core.models import GenericError
-from transactions.models import LockedYear
 from core.serializers import (
     CarbureLotAdminSerializer,
     CarbureLotCommentSerializer,
@@ -44,8 +39,6 @@ from core.serializers import (
     GenericErrorSerializer,
 )
 from core.xlsx_v3 import export_carbure_lots, export_carbure_stock
-from ml.models import EECStats, EPStats, ETDStats
-from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
 
 
 sort_key_to_django_field = {
@@ -150,27 +143,19 @@ def get_entity_lots_by_status(entity, status=None, export=False):
         "parent_stock__production_country",
     )
     if not export:
-        lots = lots.prefetch_related(
-            "genericerror_set", "carbure_production_site__productionsitecertificate_set"
-        )
+        lots = lots.prefetch_related("genericerror_set", "carbure_production_site__productionsitecertificate_set")
     if status == "DRAFTS":
         lots = lots.filter(added_by=entity, lot_status=CarbureLot.DRAFT)
     elif status == "IN":
-        lots = lots.filter(carbure_client=entity).exclude(
-            lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED]
-        )
+        lots = lots.filter(carbure_client=entity).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
     elif status == "OUT":
-        lots = lots.filter(carbure_supplier=entity).exclude(
+        lots = lots.filter(carbure_supplier=entity).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
+    elif status == "DECLARATION":
+        lots = lots.filter(Q(carbure_supplier=entity) | Q(carbure_client=entity)).exclude(
             lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED]
         )
-    elif status == "DECLARATION":
-        lots = lots.filter(
-            Q(carbure_supplier=entity) | Q(carbure_client=entity)
-        ).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
     else:
-        lots = lots.filter(
-            Q(added_by=entity) | Q(carbure_supplier=entity) | Q(carbure_client=entity)
-        )
+        lots = lots.filter(Q(added_by=entity) | Q(carbure_supplier=entity) | Q(carbure_client=entity))
     return lots
 
 
@@ -190,9 +175,7 @@ def get_lots_with_metadata(lots, entity, query):
             data = excel.read()
             ctype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             response = HttpResponse(content=data, content_type=ctype)
-            response["Content-Disposition"] = 'attachment; filename="%s"' % (
-                file_location
-            )
+            response["Content-Disposition"] = 'attachment; filename="%s"' % (file_location)
         return response
 
     # pagination
@@ -237,12 +220,7 @@ def get_stock_with_errors(stock, entity_id=None):
             Q(parent_lot__added_by_id=entity_id, display_to_creator=True)
             | Q(parent_lot__carbure_client_id=entity_id, display_to_recipient=True)
         )
-    tx_errors = (
-        GenericError.objects.filter(filter)
-        .values("lot")
-        .annotate(errors=Count("id"))
-        .values("errors")
-    )
+    tx_errors = GenericError.objects.filter(filter).values("lot").annotate(errors=Count("id")).values("errors")
     return stock.annotate(errors=Subquery(tx_errors)).filter(errors__gt=0)
 
 
@@ -255,23 +233,17 @@ def get_lots_with_errors(lots, entity, will_aggregate=False):
         elif entity.entity_type == Entity.AUDITOR:
             filter = Q(display_to_auditor=True, acked_by_auditor=False)
         else:
-            filter = Q(
-                lot__added_by=entity, display_to_creator=True, acked_by_creator=False
-            ) | Q(
+            filter = Q(lot__added_by=entity, display_to_creator=True, acked_by_creator=False) | Q(
                 lot__carbure_client=entity,
                 display_to_recipient=True,
                 acked_by_recipient=False,
             )
         tx_errors = tx_errors.filter(filter)
-        tx_errors = (
-            tx_errors.values("lot").annotate(errors=Count("id")).values("errors")
-        )
+        tx_errors = tx_errors.values("lot").annotate(errors=Count("id")).values("errors")
         return lots.annotate(errors=Subquery(tx_errors)).filter(errors__gt=0)
     else:
         if entity.entity_type == Entity.ADMIN:
-            filter = Q(
-                genericerror__display_to_admin=True, genericerror__acked_by_admin=False
-            )
+            filter = Q(genericerror__display_to_admin=True, genericerror__acked_by_admin=False)
             counter = Count("genericerror", filter=filter)
         elif entity.entity_type == Entity.AUDITOR:
             filter = Q(
@@ -333,8 +305,7 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
 
     if correction == "true":
         lots = lots.filter(
-            Q(correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED])
-            | Q(lot_status=CarbureLot.REJECTED)
+            Q(correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED]) | Q(lot_status=CarbureLot.REJECTED)
         )
     elif history != "true" and entity.entity_type not in (Entity.ADMIN, Entity.AUDITOR):
         lots = lots.exclude(lot_status__in=[CarbureLot.FROZEN, CarbureLot.ACCEPTED])
@@ -366,13 +337,12 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
         pass
 
     if len(production_sites) > 0 and "production_sites" not in blacklist:
-        production_site_filter = Q(
-            carbure_production_site__name__in=production_sites
-        ) | Q(unknown_production_site__in=production_sites)
+        production_site_filter = Q(carbure_production_site__name__in=production_sites) | Q(
+            unknown_production_site__in=production_sites
+        )
         if "UNKNOWN" in production_sites:
             production_site_filter = production_site_filter | (
-                Q(carbure_production_site__isnull=True)
-                & (Q(unknown_production_site=None) | Q(unknown_production_site=""))
+                Q(carbure_production_site__isnull=True) & (Q(unknown_production_site=None) | Q(unknown_production_site=""))
             )
         lots = lots.filter(production_site_filter)
 
@@ -382,30 +352,23 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
         )
         if "UNKNOWN" in delivery_sites:
             delivery_site_filter = delivery_site_filter | (
-                Q(carbure_delivery_site__isnull=True)
-                & (Q(unknown_delivery_site=None) | Q(unknown_delivery_site=""))
+                Q(carbure_delivery_site__isnull=True) & (Q(unknown_delivery_site=None) | Q(unknown_delivery_site=""))
             )
         lots = lots.filter(delivery_site_filter)
 
     if len(clients) > 0 and "clients" not in blacklist:
-        client_filter = Q(carbure_client__name__in=clients) | Q(
-            unknown_client__in=clients
-        )
+        client_filter = Q(carbure_client__name__in=clients) | Q(unknown_client__in=clients)
         if "UNKNOWN" in clients:
             client_filter = client_filter | (
-                Q(carbure_client__isnull=True)
-                & (Q(unknown_client=None) | Q(unknown_client=""))
+                Q(carbure_client__isnull=True) & (Q(unknown_client=None) | Q(unknown_client=""))
             )
         lots = lots.filter(client_filter)
 
     if len(suppliers) > 0 and "suppliers" not in blacklist:
-        supplier_filter = Q(carbure_supplier__name__in=suppliers) | Q(
-            unknown_supplier__in=suppliers
-        )
+        supplier_filter = Q(carbure_supplier__name__in=suppliers) | Q(unknown_supplier__in=suppliers)
         if "UNKNOWN" in suppliers:
             supplier_filter = supplier_filter | (
-                Q(carbure_supplier__isnull=True)
-                & (Q(unknown_supplier=None) | Q(unknown_supplier=""))
+                Q(carbure_supplier__isnull=True) & (Q(unknown_supplier=None) | Q(unknown_supplier=""))
             )
         lots = lots.filter(supplier_filter)
 
@@ -487,9 +450,7 @@ def sort_lots(lots, query):
         else:
             lots = lots.order_by("client")
     elif sort_by == "supplier":
-        lots = lots.annotate(
-            vendor=Coalesce("carbure_supplier__name", "unknown_supplier")
-        )
+        lots = lots.annotate(vendor=Coalesce("carbure_supplier__name", "unknown_supplier"))
         if order == "desc":
             lots = lots.order_by("-supplier")
         else:
@@ -514,16 +475,12 @@ def get_lots_filters_data(lots, query, entity, field):
 
     if field == "biofuels":
         lot_biofuels = lots.values("biofuel__id").distinct()
-        biofuels = Biocarburant.objects.filter(id__in=lot_biofuels).values_list(
-            "code", flat=True
-        )
+        biofuels = Biocarburant.objects.filter(id__in=lot_biofuels).values_list("code", flat=True)
         return prepare_filters(biofuels)
 
     if field == "countries_of_origin":
         lot_countries = lots.values("country_of_origin").distinct()
-        countries = Pays.objects.filter(id__in=lot_countries).values_list(
-            "code_pays", flat=True
-        )
+        countries = Pays.objects.filter(id__in=lot_countries).values_list("code_pays", flat=True)
         return prepare_filters(countries)
 
     if field == "periods":
@@ -531,11 +488,7 @@ def get_lots_filters_data(lots, query, entity, field):
         return prepare_filters(periods)
 
     if field == "errors":
-        generic_errors = (
-            lots.values_list("genericerror__error", flat=True)
-            .exclude(genericerror__error=None)
-            .distinct()
-        )
+        generic_errors = lots.values_list("genericerror__error", flat=True).exclude(genericerror__error=None).distinct()
         return prepare_filters(generic_errors)
 
     if field == "added_by":
@@ -553,11 +506,7 @@ def get_lots_filters_data(lots, query, entity, field):
     if field == "production_sites":
         production_sites = []
         for item in (
-            lots.annotate(
-                production_site=Coalesce(
-                    "carbure_production_site__name", "unknown_production_site"
-                )
-            )
+            lots.annotate(production_site=Coalesce("carbure_production_site__name", "unknown_production_site"))
             .values("production_site")
             .distinct()
         ):
@@ -567,11 +516,7 @@ def get_lots_filters_data(lots, query, entity, field):
     if field == "delivery_sites":
         delivery_sites = []
         for item in (
-            lots.annotate(
-                delivery_site=Coalesce(
-                    "carbure_delivery_site__name", "unknown_delivery_site"
-                )
-            )
+            lots.annotate(delivery_site=Coalesce("carbure_delivery_site__name", "unknown_delivery_site"))
             .values("delivery_site")
             .distinct()
         ):
@@ -581,22 +526,14 @@ def get_lots_filters_data(lots, query, entity, field):
     if field == "suppliers":
         suppliers = []
         for item in (
-            lots.annotate(
-                supplier=Coalesce("carbure_supplier__name", "unknown_supplier")
-            )
-            .values("supplier")
-            .distinct()
+            lots.annotate(supplier=Coalesce("carbure_supplier__name", "unknown_supplier")).values("supplier").distinct()
         ):
             suppliers.append(item["supplier"] or UNKNOWN_VALUE)
         return prepare_filters(suppliers)
 
     if field == "clients":
         clients = []
-        for item in (
-            lots.annotate(client=Coalesce("carbure_client__name", "unknown_client"))
-            .values("client")
-            .distinct()
-        ):
+        for item in lots.annotate(client=Coalesce("carbure_client__name", "unknown_client")).values("client").distinct():
             clients.append(item["client"] or UNKNOWN_VALUE)
         return prepare_filters(clients)
 
@@ -627,31 +564,21 @@ def get_stock_filters_data(stock, query, field):
 
     if field == "feedstocks":
         stock_feedstocks = stock.values("feedstock__id").distinct()
-        feedstocks = MatierePremiere.objects.filter(
-            id__in=stock_feedstocks
-        ).values_list("code", flat=True)
+        feedstocks = MatierePremiere.objects.filter(id__in=stock_feedstocks).values_list("code", flat=True)
         return prepare_filters(feedstocks)
 
     if field == "biofuels":
         stock_biofuels = stock.values("biofuel__id").distinct()
-        biofuels = Biocarburant.objects.filter(id__in=stock_biofuels).values_list(
-            "code"
-        )
+        biofuels = Biocarburant.objects.filter(id__in=stock_biofuels).values_list("code")
         return prepare_filters(biofuels)
 
     if field == "countries_of_origin":
         stock_countries = stock.values("country_of_origin").distinct()
-        countries = Pays.objects.filter(id__in=stock_countries).values_list(
-            "code_pays", flat=True
-        )
+        countries = Pays.objects.filter(id__in=stock_countries).values_list("code_pays", flat=True)
         return prepare_filters(countries)
 
     if field == "periods":
-        set1 = (
-            stock.filter(parent_lot__isnull=False)
-            .values("parent_lot__period")
-            .distinct()
-        )
+        set1 = stock.filter(parent_lot__isnull=False).values("parent_lot__period").distinct()
         set2 = (
             stock.filter(parent_transformation__isnull=False)
             .values("parent_transformation__source_stock__parent_lot__period")
@@ -664,24 +591,16 @@ def get_stock_filters_data(stock, query, field):
 
     if field == "depots":
         stock_depots = stock.values("depot__id").distinct()
-        depots = Depot.objects.filter(id__in=stock_depots).values_list(
-            "name", flat=True
-        )
+        depots = Depot.objects.filter(id__in=stock_depots).values_list("name", flat=True)
         return prepare_filters(depots)
 
     if field == "clients":
-        clients = (
-            stock.filter(carbure_client__isnull=False)
-            .values_list("carbure_client__name", flat=True)
-            .distinct()
-        )
+        clients = stock.filter(carbure_client__isnull=False).values_list("carbure_client__name", flat=True).distinct()
         return prepare_filters(clients)
 
     if field == "suppliers":
         suppliers = []
-        for item in stock.values(
-            "carbure_supplier__name", "unknown_supplier"
-        ).distinct():
+        for item in stock.values("carbure_supplier__name", "unknown_supplier").distinct():
             if item["carbure_supplier__name"] not in ("", None):
                 suppliers.append(item["carbure_supplier__name"])
             elif item["unknown_supplier"] not in ("", None):
@@ -690,9 +609,7 @@ def get_stock_filters_data(stock, query, field):
 
     if field == "production_sites":
         production_sites = []
-        for item in stock.values(
-            "carbure_production_site__name", "unknown_production_site"
-        ).distinct():
+        for item in stock.values("carbure_production_site__name", "unknown_production_site").distinct():
             if item["carbure_production_site__name"] not in ("", None):
                 production_sites.append(item["carbure_production_site__name"])
             elif item["unknown_production_site"] not in ("", None):
@@ -734,9 +651,7 @@ def get_stock_with_metadata(stock, query):
             data = excel.read()
             ctype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             response = HttpResponse(content=data, content_type=ctype)
-            response["Content-Disposition"] = 'attachment; filename="%s"' % (
-                file_location
-            )
+            response["Content-Disposition"] = 'attachment; filename="%s"' % (file_location)
         return response
 
 
@@ -759,8 +674,7 @@ def filter_stock(stock, query, blacklist=[]):
         stock = stock.filter(pk__in=selection)
     if len(periods) > 0 and "periods" not in blacklist:
         stock = stock.filter(
-            Q(parent_lot__period__in=periods)
-            | Q(parent_transformation__source_stock__parent_lot__period__in=periods)
+            Q(parent_lot__period__in=periods) | Q(parent_transformation__source_stock__parent_lot__period__in=periods)
         )
     if len(feedstocks) > 0 and "feedstocks" not in blacklist:
         stock = stock.filter(feedstock__code__in=feedstocks)
@@ -771,13 +685,10 @@ def filter_stock(stock, query, blacklist=[]):
     if len(depots) > 0 and "depots" not in blacklist:
         stock = stock.filter(depot__name__in=depots)
     if len(suppliers) > 0 and "suppliers" not in blacklist:
-        stock = stock.filter(
-            Q(carbure_supplier__name__in=suppliers) | Q(unknown_supplier__in=suppliers)
-        )
+        stock = stock.filter(Q(carbure_supplier__name__in=suppliers) | Q(unknown_supplier__in=suppliers))
     if len(production_sites) > 0 and "production_sites" not in blacklist:
         stock = stock.filter(
-            Q(carbure_production_site__name__in=production_sites)
-            | Q(unknown_production_site__in=production_sites)
+            Q(carbure_production_site__name__in=production_sites) | Q(unknown_production_site__in=production_sites)
         )
     if len(clients):
         stock = stock.filter(carbure_client__name__in=clients)
@@ -812,9 +723,7 @@ def sort_stock(stock, query):
         else:
             stock = stock.order_by("biofuel__name", "remaining_volume")
     elif sort_by == "vendor":
-        stock = stock.annotate(
-            vendor=Coalesce("carbure_supplier__name", "unknown_supplier")
-        )
+        stock = stock.annotate(vendor=Coalesce("carbure_supplier__name", "unknown_supplier"))
         if order == "desc":
             stock = stock.order_by("-vendor")
         else:
@@ -833,8 +742,7 @@ def get_lot_errors(lot, entity=None):
     else:
         errors = GenericError.objects.filter(lot_id=lot.id)
         errors = errors.filter(
-            Q(lot__added_by=entity, display_to_creator=True)
-            | Q(lot__carbure_client=entity, display_to_recipient=True)
+            Q(lot__added_by=entity, display_to_creator=True) | Q(lot__carbure_client=entity, display_to_recipient=True)
         )
         return GenericErrorSerializer(errors, many=True, read_only=True).data
 
@@ -856,9 +764,7 @@ def get_lots_errors(lots, entity):
             )
         )
     data = {}
-    for error in errors.values(
-        "lot_id", "error", "is_blocking", "field", "value", "extra", "fields"
-    ).iterator():
+    for error in errors.values("lot_id", "error", "is_blocking", "field", "value", "extra", "fields").iterator():
         if error["lot_id"] not in data:
             data[error["lot_id"]] = []
         data[error["lot_id"]].append(GenericErrorSerializer(error).data)
@@ -868,7 +774,7 @@ def get_lots_errors(lots, entity):
 def get_lot_updates(lot, entity=None):
     if lot is None:
         return []
-    
+
     context = {"visible_users": None}
 
     # list the only users email addresses that should be sent to the frontend
@@ -914,9 +820,7 @@ def get_transaction_distance(lot):
         res["error"] = "DELIVERY_SITE_COORDINATES_NOT_IN_CARBURE"
         return res
     try:
-        td = TransactionDistance.objects.get(
-            starting_point=starting_point, delivery_point=delivery_point
-        )
+        td = TransactionDistance.objects.get(starting_point=starting_point, delivery_point=delivery_point)
         res["link"] = url_link % (starting_point, delivery_point)
         res["distance"] = td.distance
         res["source"] = "DB"
@@ -942,12 +846,7 @@ def send_email_declaration_validated(declaration):
     env = os.getenv("IMAGE_TAG", False)
     if env != "prod":
         # send only to staff / superuser
-        recipients = [
-            r.user.email
-            for r in UserRights.objects.filter(
-                entity=declaration.entity, user__is_staff=True
-            )
-        ]
+        recipients = [r.user.email for r in UserRights.objects.filter(entity=declaration.entity, user__is_staff=True)]
     else:
         # PROD
         recipients = [
@@ -983,12 +882,7 @@ def send_email_declaration_invalidated(declaration):
     env = os.getenv("IMAGE_TAG", False)
     if env != "prod":
         # send only to staff / superuser
-        recipients = [
-            r.user.email
-            for r in UserRights.objects.filter(
-                entity=declaration.entity, user__is_staff=True
-            )
-        ]
+        recipients = [r.user.email for r in UserRights.objects.filter(entity=declaration.entity, user__is_staff=True)]
     else:
         # PROD
         recipients = [
@@ -1036,8 +930,7 @@ def get_lots_summary_data(lots, entity, short=False):
             volume_sum=Sum("volume"),
             weight_sum=Sum("weight"),
             lhv_amount_sum=Sum("lhv_amount"),
-            avg_ghg_reduction=Sum(F("volume") * F("ghg_reduction_red_ii"))
-            / Sum("volume"),
+            avg_ghg_reduction=Sum(F("volume") * F("ghg_reduction_red_ii")) / Sum("volume"),
             total=Count("id"),
             pending=Count("id", filter=pending_filter),
         )
@@ -1056,8 +949,7 @@ def get_lots_summary_data(lots, entity, short=False):
             volume_sum=Sum("volume"),
             weight_sum=Sum("weight"),
             lhv_amount_sum=Sum("lhv_amount"),
-            avg_ghg_reduction=Sum(F("volume") * F("ghg_reduction_red_ii"))
-            / Sum("volume"),
+            avg_ghg_reduction=Sum(F("volume") * F("ghg_reduction_red_ii")) / Sum("volume"),
             total=Count("id"),
             pending=Count("id", filter=pending_filter),
         )
@@ -1072,18 +964,9 @@ def get_lots_summary_data(lots, entity, short=False):
 def get_stocks_summary_data(stocks, entity_id=None, short=False):
     data = {
         "count": stocks.count(),
-        "total_remaining_volume": stocks.aggregate(Sum("remaining_volume"))[
-            "remaining_volume__sum"
-        ]
-        or 0,
-        "total_remaining_weight": stocks.aggregate(Sum("remaining_weight"))[
-            "remaining_weight__sum"
-        ]
-        or 0,
-        "total_remaining_lhv_amount": stocks.aggregate(Sum("remaining_lhv_amount"))[
-            "remaining_lhv_amount__sum"
-        ]
-        or 0,
+        "total_remaining_volume": stocks.aggregate(Sum("remaining_volume"))["remaining_volume__sum"] or 0,
+        "total_remaining_weight": stocks.aggregate(Sum("remaining_weight"))["remaining_weight__sum"] or 0,
+        "total_remaining_lhv_amount": stocks.aggregate(Sum("remaining_lhv_amount"))["remaining_lhv_amount__sum"] or 0,
     }
 
     if short:
@@ -1100,8 +983,7 @@ def get_stocks_summary_data(stocks, entity_id=None, short=False):
             remaining_volume_sum=Sum("remaining_volume"),
             remaining_weight_sum=Sum("remaining_weight"),
             remaining_lhv_amount_sum=Sum("remaining_lhv_amount"),
-            avg_ghg_reduction=Sum(F("remaining_volume") * F("ghg_reduction_red_ii"))
-            / Sum("remaining_volume"),
+            avg_ghg_reduction=Sum(F("remaining_volume") * F("ghg_reduction_red_ii")) / Sum("remaining_volume"),
             total=Count("id"),
         )
         .order_by()
@@ -1132,9 +1014,7 @@ def handle_eth_to_etbe_transformation(user, stock, transformation):
 
     # check if source stock is Ethanol
     if stock.biofuel.code != "ETH":
-        return JsonResponse(
-            {"status": "error", "message": "Source stock is not Ethanol"}, status=400
-        )
+        return JsonResponse({"status": "error", "message": "Source stock is not Ethanol"}, status=400)
 
     volume_ethanol = round(float(volume_ethanol), 2)
     volume_etbe = round(float(volume_etbe), 2)
@@ -1201,18 +1081,13 @@ def get_known_certificates(lot):
     }
     # production site certificate
     if lot.production_site_certificate:
-        d["production_site_certificate"] = try_get_certificate(
-            lot.production_site_certificate
-        )
+        d["production_site_certificate"] = try_get_certificate(lot.production_site_certificate)
     if lot.supplier_certificate:
         d["supplier_certificate"] = try_get_certificate(lot.supplier_certificate)
     if lot.vendor_certificate:
         d["vendor_certificate"] = try_get_certificate(lot.vendor_certificate)
     if lot.production_site_double_counting_certificate:
-        d[
-            "production_site_double_counting_certificate"
-        ] = try_get_double_counting_certificate(
-            lot.production_site_double_counting_certificate,
-            lot.carbure_production_site
+        d["production_site_double_counting_certificate"] = try_get_double_counting_certificate(
+            lot.production_site_double_counting_certificate, lot.carbure_production_site
         )
     return d

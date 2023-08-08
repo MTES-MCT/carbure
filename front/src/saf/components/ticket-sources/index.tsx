@@ -19,7 +19,6 @@ import {
 import LotDetails from "transaction-details/components/lots"
 import * as api from "../../api"
 import { Filters } from "../filters"
-import NoResult from "../no-result"
 import { useAutoStatus } from "../operator-tabs"
 import { OperatorTicketDetails } from "../ticket-details/operator-details"
 import TicketSourceDetail from "../ticket-source-details"
@@ -27,6 +26,7 @@ import { StatusSwitcher } from "./status-switcher"
 import { TicketSourcesSummary } from "./summary"
 import TicketSourcesTable from "./table"
 import { ExportButton } from "../export"
+import NoResult from "common/components/no-result"
 
 export interface TicketSourcesProps {
   year: number

@@ -1,20 +1,20 @@
 import api, { Api } from "common/services/api"
 import {
-  DoubleCountingApplication,
-  DoubleCountingDetails,
+  DoubleCountingApplicationOverview,
+  DoubleCountingApplicationDetails,
   DoubleCountingFileInfo,
   DoubleCountingUploadErrors,
   QuotaDetails
 } from "double-counting/types"
 
 export function getDoubleCountingApplications(entity_id: number) {
-  return api.get<Api<DoubleCountingApplication[]>>("/v3/doublecount/applications", {
+  return api.get<Api<DoubleCountingApplicationOverview[]>>("/v3/doublecount/applications", {
     params: { entity_id },
   })
 }
 
 export function getDoubleCountingApplicationDetails(entity_id: number, dca_id: number) {
-  return api.get<Api<DoubleCountingDetails>>("/v3/doublecount/application", {
+  return api.get<Api<DoubleCountingApplicationDetails>>("/v3/doublecount/application", {
     params: { entity_id, dca_id },
   })
 }

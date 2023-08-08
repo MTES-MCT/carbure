@@ -13,7 +13,7 @@ import { useMutation, useQuery } from "common/hooks/async"
 import { compact } from "common/utils/collection"
 import { formatNumber } from "common/utils/formatters"
 import {
-  DoubleCountingApplication,
+  DoubleCountingApplicationOverview,
   DoubleCountingProduction,
   QuotaDetails,
 } from "double-counting/types"
@@ -179,7 +179,7 @@ const DoubleCountingProductionDialog = ({
 
 type QuotasTableProps = {
   entity: Entity
-  application: DoubleCountingApplication | undefined
+  application: DoubleCountingApplicationOverview | undefined
 }
 
 const QuotasTable = ({ entity, application }: QuotasTableProps) => {

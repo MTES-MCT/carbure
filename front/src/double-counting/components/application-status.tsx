@@ -10,7 +10,7 @@ const statusToVariant: Record<DCStatus, TagVariant> = {
   [DCStatus.Lapsed]: "warning",
 }
 
-const DoubleCountingStatus = ({
+const ApplicationStatus = ({
   big,
   status,
 }: {
@@ -34,4 +34,4 @@ const DoubleCountingStatus = ({
   )
 }
 
-export default DoubleCountingStatus
+export default ApplicationStatus

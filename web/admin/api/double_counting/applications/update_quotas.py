@@ -53,6 +53,7 @@ from doublecount.old_helpers import load_dc_file, load_dc_sourcing_data, load_dc
 @check_admin_rights()
 def update_quotas(request):
     approved_quotas = request.POST.get("approved_quotas", False)
+
     if not approved_quotas:
         return JsonResponse({"status": "error", "message": "Missing approved_quotas POST parameter"}, status=400)
     unpacked = json.loads(approved_quotas)

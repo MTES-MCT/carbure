@@ -14,14 +14,12 @@ class DoubleCountingApplication(models.Model):
     INPROGRESS = "INPROGRESS"
     REJECTED = "REJECTED"
     ACCEPTED = "ACCEPTED"
-    # LAPSED = "LAPSED"
 
     DCA_STATUS_CHOICES = (
         (PENDING, PENDING),
         (INPROGRESS, INPROGRESS),
         (REJECTED, REJECTED),
         (ACCEPTED, ACCEPTED),
-        # (LAPSED, LAPSED),
     )
 
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE, null=True, blank=True)
@@ -36,24 +34,6 @@ class DoubleCountingApplication(models.Model):
     period_end = models.DateField(null=False, blank=False)
     agreement_id = models.CharField(max_length=16)  # FR_123456789_2020
     status = models.CharField(max_length=32, choices=DCA_STATUS_CHOICES, default=PENDING)
-
-    dgec_validated = models.BooleanField(default=False)
-    dgec_validator = models.ForeignKey(
-        usermodel, blank=True, null=True, on_delete=models.SET_NULL, related_name="dgec_validator"
-    )
-    dgec_validated_dt = models.DateTimeField(null=True, blank=True)
-
-    dgddi_validated = models.BooleanField(default=False)
-    dgddi_validator = models.ForeignKey(
-        usermodel, blank=True, null=True, on_delete=models.SET_NULL, related_name="dgddi_validator"
-    )
-    dgddi_validated_dt = models.DateTimeField(null=True, blank=True)
-
-    dgpe_validated = models.BooleanField(default=False)
-    dgpe_validator = models.ForeignKey(
-        usermodel, blank=True, null=True, on_delete=models.SET_NULL, related_name="dgpe_validator"
-    )
-    dgpe_validated_dt = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         producer = self.producer.name if self.producer else ""

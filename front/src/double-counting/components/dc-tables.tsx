@@ -4,7 +4,7 @@ import {
   Admin,
   DoubleCountingSourcing,
   DoubleCountingProduction,
-  DoubleCountingDetails,
+  DoubleCountingApplicationDetails,
   DoubleCountingSourcingAggregation,
 } from "../types"
 import Table, { Column, Cell } from "common/components/table"
@@ -141,16 +141,16 @@ export const SourcingFullTable = ({ sourcing }: { sourcing: DoubleCountingSourci
 }
 
 type ProductionTableProps = {
-  done?: boolean
-  entity?: Entity
+  hasAgreement?: boolean
+
   quotas?: Record<string, number>
   production: DoubleCountingProduction[]
   setQuotas?: (quotas: Record<string, number>) => void
 }
 
 export const ProductionTable = ({
-  done,
-  entity,
+  hasAgreement,
+
   quotas,
   production,
   setQuotas,
@@ -177,9 +177,14 @@ export const ProductionTable = ({
     {
       header: t("Quota demandé"),
       cell: (p) => <Cell text={formatNumber(p.requested_quota)} />,
-    },
-
+    }
   ]
+
+  hasAgreement && productionColumns?.push({
+    header: t("Quota approuvé"),
+    cell: (p) => <Cell text={formatNumber(p.approved_quota)} />,
+  })
+
   quotas && setQuotas && productionColumns?.push(
     {
       header: t("Quota approuvé"),
@@ -224,64 +229,4 @@ const ApprovedQuotasCell = ({ production, quotas, setQuotas }: ApprovedQuotasCel
       }
     />
   )
-}
-
-type StatusTableProps = {
-  application: DoubleCountingDetails | undefined
-}
-
-export const StatusTable = ({ application: application }: StatusTableProps) => {
-  const { t } = useTranslation()
-
-  const statusColumns: Column<ValidationStatus>[] = [
-    {
-      header: t("Administration"),
-      cell: (s) => <Cell text={s.entity} />,
-    },
-    {
-      header: t("Statut"),
-      cell: (s) => (
-        <Cell
-          text={
-            !s.approved && s.user
-              ? t("Refusé")
-              : s.approved
-                ? t("Accepté")
-                : t("En attente")
-          }
-        />
-      ),
-    },
-    {
-      header: t("Validateur"),
-      cell: (s) => <Cell text={s.user} />,
-    },
-    {
-      header: t("Date"),
-      cell: (s) => <Cell text={formatDate(s.date)} />,
-    },
-  ]
-
-  const statusRows: ValidationStatus[] = [
-    {
-      approved: application?.dgec_validated ?? false,
-      date: application?.dgec_validated_dt ?? "",
-      user: application?.dgec_validator ?? "",
-      entity: Admin.DGEC,
-    },
-    {
-      approved: application?.dgddi_validated ?? false,
-      date: application?.dgddi_validated_dt ?? "",
-      user: application?.dgddi_validator ?? "",
-      entity: Admin.DGDDI,
-    },
-    {
-      approved: application?.dgpe_validated ?? false,
-      date: application?.dgpe_validated_dt ?? "",
-      user: application?.dgpe_validator ?? "",
-      entity: Admin.DGPE,
-    },
-  ]
-
-  return <Table columns={statusColumns} rows={statusRows} />
 }

@@ -20,7 +20,14 @@ export enum DoubleCountingStatus {
   Lapsed = "LAPSED",
 }
 
-export interface DoubleCountingApplication {
+export enum AgreementStatus {
+  Active = "ACTIVE",
+  Expired = "EXPIRED",
+  ExpiresSoon = "EXPIRES_SOON",
+  Incoming = "INCOMING",
+}
+
+export interface DoubleCountingApplicationOverview {
   id: number
   agreement_id: string
   producer: Entity
@@ -86,54 +93,54 @@ export interface DoubleCountingUploadError {
   meta?: null | any
 }
 
-export interface DoubleCountingUploadErrors extends DoubleCountingApplication {
+export interface DoubleCountingUploadErrors extends DoubleCountingApplicationOverview {
   // sourcing_history?: DoubleCountingUploadError[]
   sourcing_forecast?: DoubleCountingUploadError[]
   production?: DoubleCountingUploadError[]
   global?: DoubleCountingUploadError[]
 }
 
-export interface DoubleCountingDetails extends DoubleCountingApplication {
+export interface DoubleCountingApplicationDetails extends DoubleCountingApplicationOverview {
   sourcing: DoubleCountingSourcing[]
   production: DoubleCountingProduction[]
   aggregated_sourcing: DoubleCountingSourcingAggregation[]
   documents: { id: number; url: string; file_type: "DECISION" | "SOURCING" }[]
-  dgec_validated: boolean
-  dgec_validator: string | null
-  dgec_validated_dt: string | null
-  dgddi_validated: boolean
-  dgddi_validator: string | null
-  dgddi_validated_dt: string | null
-  dgpe_validated: boolean
-  dgpe_validator: string | null
-  dgpe_validated_dt: string | null
 }
-export interface ApplicationSnapshot {
+export interface DoubleCountingApplicationSnapshot {
   applications_pending: number
   applications_rejected: number
 }
 
-export interface AgreementsSnapshot {
+export interface DoubleCountingAgreementsSnapshot {
   agreements_active: number
   agreements_expired: number
   agreements_incoming: number
 }
 
-export interface DoubleCountingSnapshot extends AgreementsSnapshot, ApplicationSnapshot { }
+export interface DoubleCountingSnapshot extends DoubleCountingAgreementsSnapshot, DoubleCountingApplicationSnapshot { }
 
-export interface ApplicationsOverview {
-  rejected: { count: number; applications: DoubleCountingApplication[] }
-  pending: { count: number; applications: DoubleCountingApplication[] }
+export interface DoubleCountingApplicationsOverview {
+  rejected: DoubleCountingApplicationOverview[]
+  pending: DoubleCountingApplicationOverview[]
 }
 
-export interface QuotaOverview {
+export interface DoubleCountingAgreementsOverview {
+  active: DoubleCountingAgreementOverview[]
+  incoming: DoubleCountingAgreementOverview[]
+  expired: DoubleCountingAgreementOverview[]
+}
+export interface DoubleCountingAgreementOverview {
+  id: number
   producer: Entity
   production_site: ProductionSite
-  approved_quota_weight_sum: number
-  current_production_weight_sum: number
-  nb_quotas: number
-  nb_full_quotas: number
-  nb_breached_quotas: number
+  certificate_id: string
+  valid_from: Date
+  valid_until: Date
+  status: AgreementStatus
+}
+
+export interface AgreementDetails extends DoubleCountingAgreementOverview {
+  application: DoubleCountingApplicationDetails
 }
 
 export interface QuotaDetails {

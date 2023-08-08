@@ -200,7 +200,7 @@ export const ProductionSiteDialog = ({
 
             <TextInput
               readOnly={readOnly}
-              label={t("Addresse postale")}
+              label={t("Adresse postale")}
               {...bind("address")}
             />
             <Row style={{ gap: "var(--spacing-m)" }}>
