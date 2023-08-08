@@ -1,0 +1,12 @@
+{
+  "Aucune déclaration trouvée pour cette période.": "No declaration found for this period.",
+  "Quotas remplis": "Filled quotas",
+  "Quotas dépassés": "Breached quotas",
+  "Aucun quota disponible": "No quota available",
+  "Détails des quotas": "Quotas details",
+  "Voici les détail de l'évolution des quotas pour le site de production <b>{{ productionSite }}</b> de <b>{{ producer }}</b> en <b>{{ year }}</b>": "Here are the details of the quotas evolution for the production site <b>{{productionSite}}</b> of <b>{{producer}}</b> in <b>{{year}}</b>",
+  "Validateur": "Validator",
+  "Validation de dossiers de double comptage": "Validation of double counting applications",
+  "Cet outil vous permet de faire remonter les erreurs de fichiers reçus. ": "This tool allows you to detect errors from application files. ",
+  "Vérifier les fichiers": "Check the files"
+}
