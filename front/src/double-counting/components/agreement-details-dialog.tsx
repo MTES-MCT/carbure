@@ -1,28 +1,20 @@
 import useEntity from "carbure/hooks/entity"
-import { EntityType } from "carbure/types"
-import { Button, DownloadLink } from "common/components/button"
-import { Confirm, Dialog } from "common/components/dialog"
+import { Button } from "common/components/button"
+import { Dialog } from "common/components/dialog"
 import { useHashMatch } from "common/components/hash-route"
 import {
-  Check,
-  Cross,
-  Return,
-  Save
+  Return
 } from "common/components/icons"
-import { useNotify } from "common/components/notifications"
-import Portal, { usePortal } from "common/components/portal"
-import { Col, LoaderOverlay } from "common/components/scaffold"
-import { useMutation, useQuery } from "common/hooks/async"
-import { formatDate } from "common/utils/formatters"
-import { useState } from "react"
+import Portal from "common/components/portal"
+import { LoaderOverlay } from "common/components/scaffold"
+import { useQuery } from "common/hooks/async"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../api"
-import { AgreementDetails, DoubleCountingStatus as DCStatus, DoubleCountingApplicationDetails } from "../types"
-import ApplicationStatus from "./application-status"
-import ApplicationTabs from "./application-tabs"
+import { AgreementDetails } from "../types"
 import AgreementStatusTag from "./agreement-status"
-import { ApplicationInfo } from "./application-info"
+import { ApplicationDownloadButton } from "./application-download-button"
+import ApplicationTabs from "./application-tabs"
 
 
 export const AgreementDetailsDialog = () => {
@@ -86,52 +78,10 @@ export const AgreementDetailsDialog = () => {
         </main>
 
         <footer>
-          <Col style={{ gap: "var(--spacing-xs)", marginRight: "auto" }}>
-            {application &&
-              <DownloadLink
-                href={applicationExcelURL ?? "#"}
-                label={t("Télécharger le dossier au format excel")}
-              />
-            }
-          </Col>
+          {application &&
+            <ApplicationDownloadButton application={application} />
+          }
 
-
-          {/* {!application.loading && (
-            <>
-              {isAdmin && (
-                <Button
-                  loading={approveQuotas.loading}
-                  disabled={!quotasIsUpdated}
-                  variant="primary"
-                  icon={Save}
-                  action={submitQuotas}
-                >
-                  <Trans>Enregistrer</Trans>
-                </Button>
-              )}
-
-              <Button
-                loading={approveQuotas.loading}
-                disabled={application.loading || !hasQuotas}
-
-
-                variant="success"
-                icon={Check}
-                action={submitAccept}
-              >
-                <Trans>Valider les quotas</Trans>
-              </Button>
-              <Button
-                loading={rejectApplication.loading}
-                disabled={application.loading}
-                variant="danger"
-                icon={Cross}
-                action={submitReject}
-              >
-                <Trans>Refuser</Trans>
-              </Button>
-            </>
-          )} */}
           <Button icon={Return} action={closeDialog}>
             <Trans>Retour</Trans>
           </Button>

@@ -1,6 +1,6 @@
 import useEntity from "carbure/hooks/entity"
 import { EntityType } from "carbure/types"
-import { Button, DownloadLink } from "common/components/button"
+import { Button } from "common/components/button"
 import { Confirm, Dialog } from "common/components/dialog"
 import { useHashMatch } from "common/components/hash-route"
 import {
@@ -11,17 +11,17 @@ import {
 } from "common/components/icons"
 import { useNotify } from "common/components/notifications"
 import Portal, { usePortal } from "common/components/portal"
-import { Col, LoaderOverlay } from "common/components/scaffold"
+import { LoaderOverlay } from "common/components/scaffold"
 import { useMutation, useQuery } from "common/hooks/async"
-import { formatDate } from "common/utils/formatters"
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../api"
-import { DoubleCountingStatus as DCStatus, DoubleCountingApplicationDetails } from "../types"
+import { DoubleCountingStatus as DCStatus } from "../types"
+import { ApplicationDownloadButton } from "./application-download-button"
+import { ApplicationInfo } from "./application-info"
 import ApplicationStatus from "./application-status"
 import ApplicationTabs from "./application-tabs"
-import { ApplicationInfo } from "./application-info"
 
 
 export const ApplicationDetailsDialog = () => {
@@ -94,9 +94,6 @@ export const ApplicationDetailsDialog = () => {
   )
 
 
-  const excelURL =
-    application &&
-    `/api/v5/admin/double-counting/applications/details?dca_id=${application.id}&export=true`
 
   const onUpdateQuotas = (quotas: Record<string, number>) => {
     setQuotasIsUpdated(true)
@@ -185,14 +182,9 @@ export const ApplicationDetailsDialog = () => {
         </main>
 
         <footer>
-          <Col style={{ gap: "var(--spacing-xs)", marginRight: "auto" }}>
-            <DownloadLink
-              href={excelURL ?? "#"}
-              label={t("Télécharger le dossier au format excel")}
-            />
-          </Col>
-
-
+          {application &&
+            <ApplicationDownloadButton application={application} />
+          }
           {!applicationResponse.loading && (
             <>
               {isAdmin && (
