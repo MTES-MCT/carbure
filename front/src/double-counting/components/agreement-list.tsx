@@ -98,21 +98,15 @@ const AgreementList = ({ snapshot = defaultCount }: { snapshot: DoubleCountingAg
         </ActionBar>
 
 
-        {!agreements &&
+        {!agreements || (tab === "active" && agreements[tab].length === 0) || (tab === "expired" && agreements.expired.length === 0) || (tab === "incoming" && agreements.incoming.length === 0) ?
           <NoResult label={t("Aucun agrément")} loading={agreementsResponse.loading} />
+          : <Table
+            loading={agreementsResponse.loading}
+            columns={columns}
+            rows={tab === "active" ? agreements.active : tab === "expired" ? agreements.expired : agreements.incoming}
+            onAction={showApplicationDialog}
+          />
         }
-
-        {agreements && (
-          <>
-            <Table
-              loading={agreementsResponse.loading}
-              columns={columns}
-              rows={tab === "active" ? agreements.active : tab === "expired" ? agreements.expired : agreements.incoming}
-              onAction={showApplicationDialog}
-            />
-          </>
-
-        )}
 
 
       </section>
