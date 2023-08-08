@@ -12,6 +12,7 @@ import {
   AgreementDetails,
 } from "./types"
 
+// GLOBAL
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/v5/admin/double-counting/years", {
@@ -32,18 +33,42 @@ export function getSnapshot(entity_id: number) {
 //   )
 // }
 
-export function getAllDoubleCountingApplications() {
-  return api.get<Api<DoubleCountingApplicationsOverview>>("/v5/admin/double-counting/applications")
+// APPLICATIONS
+
+
+export function getAllDoubleCountingApplications(entity_id: number) {
+  return api.get<Api<DoubleCountingApplicationsOverview>>("/v5/admin/double-counting/applications", {
+    params: { entity_id },
+  })
 }
 
-export function getDoubleCountingApplication(dca_id: number) {
+export function getDoubleCountingApplication(entity_id: number, dca_id: number) {
   return api.get<Api<DoubleCountingApplicationDetails>>(
     "/v5/admin/double-counting/applications/details",
     {
-      params: { dca_id },
+      params: { entity_id, dca_id },
     }
   )
 }
+
+
+export function addDoubleCountingApplication(
+  entity_id: number,
+  production_site_id: number,
+  producer_id: number,
+  file: File,
+  should_replace: boolean = false
+) {
+
+  return api.post("/v5/admin/double-counting/applications/add", {
+    entity_id,
+    production_site_id,
+    producer_id,
+    file,
+    should_replace
+  })
+}
+
 
 export function approveDoubleCountingQuotas(
   entity_id: number,
@@ -77,6 +102,8 @@ export function rejectDoubleCountingApplication(
   })
 }
 
+// AGREEMENTS
+
 export function getAgreementList(entity_id: number) {
   return api.get<Api<DoubleCountingAgreementsOverview>>(
     "/v5/admin/double-counting/agreements"
@@ -108,21 +135,4 @@ export function checkDoubleCountingFiles(entity_id: number, files: FileList) {
     { entity_id, files }
   )
   return res
-}
-
-export function addDoubleCountingApplication(
-  entity_id: number,
-  production_site_id: number,
-  producer_id: number,
-  file: File,
-  should_replace: boolean = false
-) {
-
-  return api.post("/v5/admin/double-counting/applications/add", {
-    entity_id,
-    production_site_id,
-    producer_id,
-    file,
-    should_replace
-  })
 }

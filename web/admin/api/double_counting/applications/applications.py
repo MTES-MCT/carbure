@@ -1,7 +1,7 @@
 from django.db.models.query_utils import Q
 
 from django.http import JsonResponse
-from core.decorators import is_admin_or_external_admin
+from core.decorators import check_admin_rights, is_admin_or_external_admin
 
 from doublecount.models import (
     DoubleCountingApplication,
@@ -9,7 +9,7 @@ from doublecount.models import (
 from doublecount.serializers import DoubleCountingApplicationFullSerializer
 
 
-@is_admin_or_external_admin
+@check_admin_rights()
 def get_applications_admin(request):
     applications = DoubleCountingApplication.objects.filter(~Q(status__in=[DoubleCountingApplication.ACCEPTED]))
 

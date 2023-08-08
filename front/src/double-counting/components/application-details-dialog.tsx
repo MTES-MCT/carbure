@@ -39,7 +39,7 @@ export const ApplicationDetailsDialog = () => {
 
   const applicationResponse = useQuery(api.getDoubleCountingApplication, {
     key: "dc-application",
-    params: [parseInt(match?.params.id!)],
+    params: [entity.id, parseInt(match?.params.id!)],
 
     onSuccess: (application) => {
       const applicationData = application.data.data
