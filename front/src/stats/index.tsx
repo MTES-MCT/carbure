@@ -8,11 +8,14 @@ import { Entity, EntityType } from "carbure/types"
 import useTitle from "common/hooks/title"
 import useEntity from "carbure/hooks/entity"
 import { getEntityStats } from "./api"
+import { Loader } from "common/components/icons"
+import { useState } from "react"
 
 const Stats = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   useTitle(t("Statistiques") + " " + entity.name)
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const statsResponse = useQuery(getEntityStats, {
     key: "entities",
@@ -32,12 +35,16 @@ const Stats = () => {
       </header>
       <section>
         <IframeResizer
+          onResized={() => setIsLoaded(true)}
           src={statsData?.metabase_iframe_url}
           frameBorder="0"
           allowTransparency
           style={{ boxShadow: "var(--shadow)" }}
         />
       </section>
+      {!isLoaded &&
+        <section style={{ alignItems: "center" }}>  <Loader color="var(--black)" size={32} /></section>
+      }
     </Main>
   )
 }
