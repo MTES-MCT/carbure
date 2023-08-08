@@ -16,6 +16,7 @@ import Button from "common/components/button"
 import { compact } from "common/utils/collection"
 import { formatDate } from "common/utils/formatters"
 import useEntity from "carbure/hooks/entity"
+import Select from "common/components/select"
 
 const ROLE_LABELS = {
   [UserRole.ReadOnly]: "Lecture seule",
@@ -50,7 +51,11 @@ const UserRights = () => {
     invalidates: ["user-right-requests"],
   })
 
-  async function updateRightRequest(user: number, status: UserRightStatus) {
+  const updateRole = useMutation(api.updateUserRole, {
+    invalidates: ["user-right-requests"],
+  })
+
+  async function updateRightRequest(rightId: number, status: UserRightStatus) {
     portal((close) => (
       <Confirm
         title={t("Modifier droits d'accès")}
@@ -58,7 +63,20 @@ const UserRights = () => {
         confirm={t("Confirmer")}
         variant="primary"
         onClose={close}
-        onConfirm={async () => updateRight.execute(user, entity.id, status)}
+        onConfirm={async () => updateRight.execute(rightId, entity.id, status)}
+      />
+    ))
+  }
+
+  async function updateUserRole(rightId: number, role: UserRole) {
+    portal((close) => (
+      <Confirm
+        title={t("Modifier le rôle")}
+        description={t(`Voulez vous changer le rôle de cet utilisateur en "{{role}}" ?`, { role: ROLE_LABELS[role] })} // prettier-ignore
+        confirm={t("Confirmer")}
+        variant="primary"
+        onClose={close}
+        onConfirm={async () => updateRole.execute(rightId, entity.id, role)}
       />
     ))
   }
@@ -109,7 +127,16 @@ const UserRights = () => {
               key: "role",
               header: "Droits",
               orderBy: (r) => ROLE_LABELS[r.role],
-              cell: (r) => ROLE_LABELS[r.role],
+              cell: (r) => (
+                <Select
+                  variant="text"
+                  value={r.role}
+                  style={{ width: "180px" }}
+                  options={Object.keys(ROLE_LABELS) as UserRole[]}
+                  normalize={(role) => ({ value: role, label: ROLE_LABELS[role] })} // prettier-ignore
+                  onChange={(role) => updateUserRole(r.id, role!)}
+                />
+              ),
             },
             {
               small: true,

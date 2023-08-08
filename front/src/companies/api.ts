@@ -7,6 +7,7 @@ import {
   EntityDepot,
   EntityCertificate,
   EntityType,
+  UserRole,
 } from "carbure/types"
 import { EntityDetails } from "./types"
 
@@ -69,14 +70,25 @@ export function getUsersRightRequests(
 }
 
 export function updateUsersRights(
-  user_id: number,
+  right_id: number,
   entity_id: number,
   status?: UserRightStatus
 ) {
   return api.post("/v5/admin/entities/users/update-right-request", {
-    id: user_id,
+    id: right_id,
     entity_id,
     status,
+  })
+}
+export function updateUserRole(
+  right_id: number,
+  entity_id: number,
+  role: UserRole
+) {
+  return api.post("/v5/admin/entities/users/update-user-role", {
+    id: right_id,
+    entity_id,
+    role,
   })
 }
 
