@@ -18,9 +18,10 @@ import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../api"
-import { DoubleCountingStatus as DCStatus } from "../types"
+import { DoubleCountingStatus as DCStatus, DoubleCountingApplicationDetails } from "../types"
 import ApplicationStatus from "./application-status"
 import ApplicationTabs from "./application-tabs"
+import { ApplicationInfo } from "./application-info"
 
 
 export const ApplicationDetailsDialog = () => {
@@ -36,7 +37,7 @@ export const ApplicationDetailsDialog = () => {
   const match = useHashMatch("application/:id")
 
 
-  const application = useQuery(api.getDoubleCountingApplication, {
+  const applicationResponse = useQuery(api.getDoubleCountingApplication, {
     key: "dc-application",
     params: [parseInt(match?.params.id!)],
 
@@ -83,25 +84,19 @@ export const ApplicationDetailsDialog = () => {
   })
 
 
-  const applicationData = application.result?.data.data
-  const dcaStatus = applicationData?.status ?? DCStatus.Pending
+  const application = applicationResponse.result?.data.data
+  const dcaStatus = application?.status ?? DCStatus.Pending
 
 
   const isAdmin = entity?.entity_type === EntityType.Administration
-  const hasQuotas = !applicationData?.production.some(
+  const hasQuotas = !application?.production.some(
     (p) => p.approved_quota === -1
   )
 
-  const productionSite = applicationData?.production_site ?? "N/A"
-  const producer = applicationData?.producer.name ?? "N/A"
-  const user = applicationData?.producer_user ?? "N/A"
-  const creationDate = applicationData?.created_at
-    ? formatDate(applicationData.created_at)
-    : "N/A"
 
   const excelURL =
-    applicationData &&
-    `/api/v5/admin/double-counting/applications/details?dca_id=${applicationData.id}&export=true`
+    application &&
+    `/api/v5/admin/double-counting/applications/details?dca_id=${application.id}&export=true`
 
   const onUpdateQuotas = (quotas: Record<string, number>) => {
     setQuotasIsUpdated(true)
@@ -110,7 +105,7 @@ export const ApplicationDetailsDialog = () => {
 
   async function submitQuotas() {
     if (
-      !applicationData ||
+      !application ||
       !entity ||
       entity?.entity_type !== EntityType.Administration
     ) {
@@ -120,7 +115,7 @@ export const ApplicationDetailsDialog = () => {
     const updatedQuotas = Object.keys(quotas).map((id) => [parseInt(id), quotas[id]])
     const done = await approveQuotas.execute(
       entity.id,
-      applicationData.id,
+      application.id,
       updatedQuotas
     )
 
@@ -143,8 +138,8 @@ export const ApplicationDetailsDialog = () => {
         icon={Check}
         onClose={close}
         onConfirm={async () => {
-          if (applicationData) {
-            await approveApplication.execute(entity.id, applicationData.id)
+          if (application) {
+            await approveApplication.execute(entity.id, application.id)
           }
         }}
       />
@@ -161,8 +156,8 @@ export const ApplicationDetailsDialog = () => {
         icon={Cross}
         onClose={close}
         onConfirm={async () => {
-          if (applicationData) {
-            await rejectApplication.execute(entity.id, applicationData.id)
+          if (application) {
+            await rejectApplication.execute(entity.id, application.id)
           }
         }}
       />
@@ -183,16 +178,9 @@ export const ApplicationDetailsDialog = () => {
 
         <main>
 
-          <section>
-            <p>
-              <Trans
-                values={{ producer, productionSite, creationDate, user }}
-                defaults="Pour le site de production <b>{{ productionSite }}</b> de <b>{{ producer }}</b>, soumis par <b>{{ user }}</b> le <b>{{ creationDate }}</b>"
-              />
-            </p>
-          </section>
+          <ApplicationInfo application={application} />
 
-          <ApplicationTabs sourcing={applicationData?.sourcing} production={applicationData?.production} quotas={quotas} setQuotas={onUpdateQuotas} />
+          <ApplicationTabs sourcing={application?.sourcing} production={application?.production} quotas={quotas} setQuotas={onUpdateQuotas} />
 
         </main>
 
@@ -205,7 +193,7 @@ export const ApplicationDetailsDialog = () => {
           </Col>
 
 
-          {!application.loading && (
+          {!applicationResponse.loading && (
             <>
               {isAdmin && (
                 <Button
@@ -221,7 +209,7 @@ export const ApplicationDetailsDialog = () => {
 
               <Button
                 loading={approveQuotas.loading}
-                disabled={application.loading || !hasQuotas}
+                disabled={applicationResponse.loading || !hasQuotas}
 
 
                 variant="success"
@@ -232,7 +220,7 @@ export const ApplicationDetailsDialog = () => {
               </Button>
               <Button
                 loading={rejectApplication.loading}
-                disabled={application.loading}
+                disabled={applicationResponse.loading}
                 variant="danger"
                 icon={Cross}
                 action={submitReject}
@@ -246,10 +234,9 @@ export const ApplicationDetailsDialog = () => {
           </Button>
         </footer>
 
-        {application.loading && <LoaderOverlay />}
+        {applicationResponse.loading && <LoaderOverlay />}
       </Dialog>
     </Portal>
   )
 }
-
 

@@ -18,7 +18,7 @@ import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useMatch, useNavigate } from "react-router-dom"
 import { DoubleCountingFileInfo } from "../../types"
 import ApplicationTabs from "../application-tabs"
-import ApplicationInfo from "./application-info"
+import FileApplicationInfo from "./file-application-info"
 import React, { useState } from "react"
 
 export type ValidDetailsDialogProps = {
@@ -55,7 +55,7 @@ export const ValidDetailsDialog = ({
 
       <main>
 
-        <ApplicationInfo fileData={fileData} />
+        <FileApplicationInfo fileData={fileData} />
         <section>
           {fileData.has_dechets_industriels &&
             <DechetIndustrielAlert />
@@ -156,7 +156,7 @@ export const ProductionSiteAdminDialog = ({
       </header>
 
       <main>
-        <ApplicationInfo fileData={fileData} />
+        <FileApplicationInfo fileData={fileData} />
         <section>
           <Autocomplete
             required

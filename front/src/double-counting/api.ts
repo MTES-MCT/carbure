@@ -1,14 +1,15 @@
 import api, { Api } from "common/services/api"
 import {
-  DoubleCountingDetails,
-  ApplicationSnapshot,
-  ApplicationsOverview,
+  DoubleCountingApplicationDetails,
+  DoubleCountingApplicationSnapshot,
+  DoubleCountingApplicationsOverview,
   QuotaDetails,
-  AgreementOverview,
+  DoubleCountingAgreementOverview,
   DoubleCountingUploadErrors,
   CheckDoubleCountingFilesResponse,
   DoubleCountingSnapshot,
-  AgreementsOverview,
+  DoubleCountingAgreementsOverview,
+  AgreementDetails,
 } from "./types"
 
 
@@ -32,11 +33,11 @@ export function getSnapshot(entity_id: number) {
 // }
 
 export function getAllDoubleCountingApplications() {
-  return api.get<Api<ApplicationsOverview>>("/v5/admin/double-counting/applications")
+  return api.get<Api<DoubleCountingApplicationsOverview>>("/v5/admin/double-counting/applications")
 }
 
 export function getDoubleCountingApplication(dca_id: number) {
-  return api.get<Api<DoubleCountingDetails>>(
+  return api.get<Api<DoubleCountingApplicationDetails>>(
     "/v5/admin/double-counting/applications/details",
     {
       params: { dca_id },
@@ -77,13 +78,13 @@ export function rejectDoubleCountingApplication(
 }
 
 export function getAgreementList(entity_id: number) {
-  return api.get<Api<AgreementsOverview>>(
+  return api.get<Api<DoubleCountingAgreementsOverview>>(
     "/v5/admin/double-counting/agreements"
     , { params: { entity_id } })
 }
 
 export function getDoubleCountingAgreement(entity_id: number, agreement_id: number) {
-  return api.get<Api<DoubleCountingDetails>>(
+  return api.get<Api<AgreementDetails>>(
     "/v5/admin/double-counting/agreements/details",
     {
       params: { entity_id, agreement_id },

@@ -27,7 +27,7 @@ export enum AgreementStatus {
   Incoming = "INCOMING",
 }
 
-export interface DoubleCountingApplication {
+export interface DoubleCountingApplicationOverview {
   id: number
   agreement_id: string
   producer: Entity
@@ -93,43 +93,43 @@ export interface DoubleCountingUploadError {
   meta?: null | any
 }
 
-export interface DoubleCountingUploadErrors extends DoubleCountingApplication {
+export interface DoubleCountingUploadErrors extends DoubleCountingApplicationOverview {
   // sourcing_history?: DoubleCountingUploadError[]
   sourcing_forecast?: DoubleCountingUploadError[]
   production?: DoubleCountingUploadError[]
   global?: DoubleCountingUploadError[]
 }
 
-export interface DoubleCountingDetails extends DoubleCountingApplication {
+export interface DoubleCountingApplicationDetails extends DoubleCountingApplicationOverview {
   sourcing: DoubleCountingSourcing[]
   production: DoubleCountingProduction[]
   aggregated_sourcing: DoubleCountingSourcingAggregation[]
   documents: { id: number; url: string; file_type: "DECISION" | "SOURCING" }[]
 }
-export interface ApplicationSnapshot {
+export interface DoubleCountingApplicationSnapshot {
   applications_pending: number
   applications_rejected: number
 }
 
-export interface AgreementsSnapshot {
+export interface DoubleCountingAgreementsSnapshot {
   agreements_active: number
   agreements_expired: number
   agreements_incoming: number
 }
 
-export interface DoubleCountingSnapshot extends AgreementsSnapshot, ApplicationSnapshot { }
+export interface DoubleCountingSnapshot extends DoubleCountingAgreementsSnapshot, DoubleCountingApplicationSnapshot { }
 
-export interface ApplicationsOverview {
-  rejected: DoubleCountingApplication[]
-  pending: DoubleCountingApplication[]
+export interface DoubleCountingApplicationsOverview {
+  rejected: DoubleCountingApplicationOverview[]
+  pending: DoubleCountingApplicationOverview[]
 }
 
-export interface AgreementsOverview {
-  active: AgreementOverview[]
-  incoming: AgreementOverview[]
-  expired: AgreementOverview[]
+export interface DoubleCountingAgreementsOverview {
+  active: DoubleCountingAgreementOverview[]
+  incoming: DoubleCountingAgreementOverview[]
+  expired: DoubleCountingAgreementOverview[]
 }
-export interface AgreementOverview {
+export interface DoubleCountingAgreementOverview {
   id: number
   producer: Entity
   production_site: ProductionSite
@@ -137,6 +137,10 @@ export interface AgreementOverview {
   valid_from: Date
   valid_until: Date
   status: AgreementStatus
+}
+
+export interface AgreementDetails extends DoubleCountingAgreementOverview {
+  application: DoubleCountingApplicationDetails
 }
 
 export interface QuotaDetails {

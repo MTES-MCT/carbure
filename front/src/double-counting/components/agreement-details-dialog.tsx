@@ -18,9 +18,11 @@ import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../api"
-import { DoubleCountingStatus as DCStatus } from "../types"
+import { AgreementDetails, DoubleCountingStatus as DCStatus, DoubleCountingApplicationDetails } from "../types"
 import ApplicationStatus from "./application-status"
 import ApplicationTabs from "./application-tabs"
+import AgreementStatusTag from "./agreement-status"
+import { ApplicationInfo } from "./application-info"
 
 
 export const AgreementDetailsDialog = () => {
@@ -30,21 +32,20 @@ export const AgreementDetailsDialog = () => {
   const entity = useEntity()
   const match = useHashMatch("agreement/:id")
 
-  const application = useQuery(api.getDoubleCountingAgreement, {
+  const applicationResponse = useQuery(api.getDoubleCountingAgreement, {
     key: "dc-agreement",
     params: [entity.id, parseInt(match?.params.id!)]
   })
 
 
 
-  const applicationData = application.result?.data.data
-  console.log('applicationData:', applicationData)
-  const dcaStatus = applicationData?.status ?? DCStatus.Pending
+  const agreement: AgreementDetails | undefined = applicationResponse.result?.data.data
 
+  const application = agreement?.application
 
-  const excelURL =
-    applicationData &&
-    `/api/v5/admin/double-counting/applications/details?dca_id=${applicationData.id}&export=true`
+  const applicationExcelURL =
+    application &&
+    `/api/v5/admin/double-counting/applications/details?dca_id=${application.id}&export=true`
 
 
   const closeDialog = () => {
@@ -55,31 +56,43 @@ export const AgreementDetailsDialog = () => {
     <Portal onClose={closeDialog}>
       <Dialog fullscreen onClose={closeDialog}>
         <header>
-          <ApplicationStatus big status={dcaStatus} />
-          <h1>{t("Agrément double comptage")} </h1>
+          <AgreementStatusTag status={agreement?.status} />
+          <h1>{t("Agrément double comptage n°{{dcNumber}}", { dcNumber: agreement?.certificate_id || "FR_XXX_XXXX" })} </h1>
         </header>
-        {/* 
+
         <main>
 
           <section>
             <p>
               <Trans
-                values={{ producer, productionSite, creationDate, user }}
-                defaults="Pour le site de production <b>{{ productionSite }}</b> de <b>{{ producer }}</b>, soumis par <b>{{ user }}</b> le <b>{{ creationDate }}</b>"
+                values={{
+                  producer: agreement?.producer ?? "N/A",
+                  productionSite: agreement?.production_site ?? "N/A",
+                }}
+                defaults="Pour le site de production <b>{{ productionSite }}</b> de <b>{{ producer }}</b>"
               />
             </p>
           </section>
 
-          <ApplicationTabs sourcing={applicationData?.sourcing} production={applicationData?.production} quotas={quotas} setQuotas={onUpdateQuotas} />
-
-        </main> */}
+          {!application && !applicationResponse.loading && (
+            <section>
+              <p><Trans>Aucun dossier de demande n'a été associé.</Trans></p>
+            </section>
+          )}
+          {application && <>
+            <ApplicationTabs sourcing={application.sourcing} production={application.production} hasAgreement={true} />
+          </>
+          }
+        </main>
 
         <footer>
           <Col style={{ gap: "var(--spacing-xs)", marginRight: "auto" }}>
-            <DownloadLink
-              href={excelURL ?? "#"}
-              label={t("Télécharger le dossier au format excel")}
-            />
+            {application &&
+              <DownloadLink
+                href={applicationExcelURL ?? "#"}
+                label={t("Télécharger le dossier au format excel")}
+              />
+            }
           </Col>
 
 
@@ -124,7 +137,7 @@ export const AgreementDetailsDialog = () => {
           </Button>
         </footer>
 
-        {application.loading && <LoaderOverlay />}
+        {applicationResponse.loading && <LoaderOverlay />}
       </Dialog>
     </Portal>
   )

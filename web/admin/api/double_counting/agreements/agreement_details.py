@@ -14,7 +14,7 @@ import xlsxwriter
 from django.http import JsonResponse, HttpResponse
 from admin.api.double_counting.applications.add import send_dca_confirmation_email
 from certificates.models import DoubleCountingRegistration
-from certificates.serializers import DoubleCountingRegistrationSerializer
+from certificates.serializers import DoubleCountingRegistrationDetailsSerializer, DoubleCountingRegistrationSerializer
 from core.common import ErrorResponse
 from core.decorators import check_admin_rights, check_rights, is_admin, is_admin_or_external_admin
 import pytz
@@ -61,4 +61,6 @@ def get_agreement_details(request, *args, **kwargs):
 
     agreement = DoubleCountingRegistration.objects.get(id=agreement_id)
 
-    return JsonResponse({"status": "success", "data": DoubleCountingRegistrationSerializer(agreement, many=False).data})
+    return JsonResponse(
+        {"status": "success", "data": DoubleCountingRegistrationDetailsSerializer(agreement, many=False).data}
+    )
