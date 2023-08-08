@@ -70,24 +70,24 @@ export function getUsersRightRequests(
 }
 
 export function updateUsersRights(
-  right_id: number,
+  request_id: number,
   entity_id: number,
   status?: UserRightStatus
 ) {
   return api.post("/v5/admin/entities/users/update-right-request", {
-    id: right_id,
+    id: request_id,
     entity_id,
     status,
   })
 }
 export function updateUserRole(
-  right_id: number,
+  request_id: number,
   entity_id: number,
   role: UserRole
 ) {
   return api.post("/v5/admin/entities/users/update-user-role", {
-    id: right_id,
     entity_id,
+    request_id,
     role,
   })
 }
