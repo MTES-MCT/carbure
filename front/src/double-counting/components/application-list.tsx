@@ -28,7 +28,7 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
   const navigate = useNavigate()
   const location = useLocation()
   const entity = useEntity()
-  const applications = useQuery(api.getAllDoubleCountingApplications, {
+  const applicationsResponse = useQuery(api.getAllDoubleCountingApplications, {
     key: "dc-applications",
     params: [entity.id],
   })
@@ -54,10 +54,7 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
     }
   ]
 
-  const applicationsData = applications.result?.data.data
-  // if (applicationsData === undefined) return <LoaderOverlay />
-
-  // const { pending, rejected } = applicationsData
+  const applications = applicationsResponse.result?.data.data
 
   function showApplicationDialog(application: DoubleCountingApplicationOverview) {
     navigate({
@@ -85,42 +82,24 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
 
         <FilesCheckerUploadButton />
       </ActionBar>
-      {tab === "pending" && (
-        <Fragment>
-          {!applicationsData && (
-            <NoResult label={t("Aucun dossier en attente trouvé")} loading={applications.loading} />
-          )}
 
-          {applicationsData &&
-            <Table
-              loading={applications.loading}
-              columns={columns}
-              rows={applicationsData?.pending || []}
-              onAction={showApplicationDialog}
-            />
-          }
-
-        </Fragment>
-      )}
-
-
-      {tab === "rejected" && (
-        <Fragment>
-
-          {!applicationsData && (
-            <NoResult label={t("Aucun dossier refusé trouvé")} loading={applications.loading} />
-          )}
-
-
-          <Table
-            loading={applications.loading}
+      <Fragment>
+        {!applications || (tab === "pending" && applications.pending.length === 0) || (tab === "rejected" && applications.rejected.length === 0)
+          ?
+          <NoResult label={t("Aucun dossier trouvé")} loading={applicationsResponse.loading} />
+          : <Table
+            loading={applicationsResponse.loading}
             columns={columns}
-            rows={applicationsData?.rejected || []}
+            rows={tab === "pending" ? applications?.pending : applications?.rejected}
             onAction={showApplicationDialog}
           />
+        }
 
-        </Fragment>
-      )}
+      </Fragment>
+
+
+
+
     </section>
     <HashRoute
       path="application/:id"
