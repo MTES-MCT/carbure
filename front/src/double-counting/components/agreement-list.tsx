@@ -3,7 +3,7 @@ import { useQuery } from "common/hooks/async"
 import Table, { Cell, Column } from "common/components/table"
 import { Dialog } from "common/components/dialog"
 import { Button } from "common/components/button"
-import { AlertCircle, Return } from "common/components/icons"
+import { AlertCircle, Download, Return } from "common/components/icons"
 import { formatDateYear, formatNumber } from "common/utils/formatters"
 import { DoubleCountingAgreementOverview, QuotaDetails, DoubleCountingAgreementsSnapshot, AgreementStatus } from "../types"
 import * as api from "../api"
@@ -32,7 +32,7 @@ const AgreementList = ({ snapshot = defaultCount }: { snapshot: DoubleCountingAg
   const navigate = useNavigate()
   const location = useLocation()
 
-  const agreementsResponse = useQuery(api.getAgreementList, {
+  const agreementsResponse = useQuery(api.getDoubleCountingAgreementList, {
     key: "dc-agreements",
     params: [entity.id],
   })
@@ -94,7 +94,10 @@ const AgreementList = ({ snapshot = defaultCount }: { snapshot: DoubleCountingAg
               },
             ]}
           />
+          {tab === "active" && agreements && agreements.active.length > 0 &&
 
+            <ExportAgreementsButton />
+          }
         </ActionBar>
 
 
@@ -124,4 +127,22 @@ const defaultCount = {
   agreements_active: 0,
   agreements_expired: 0,
   agreements_incoming: 0
+}
+
+
+
+
+
+export const ExportAgreementsButton = () => {
+  const { t } = useTranslation()
+  const entity = useEntity()
+  return (
+    <Button
+      asideX={true}
+      icon={Download}
+      label={t("Exporter les agréments")}
+      action={() => api.downloadDoubleCountingAgreementList(entity.id)
+      }
+    />
+  )
 }

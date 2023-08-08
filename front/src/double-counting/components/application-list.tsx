@@ -25,7 +25,7 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
   const navigate = useNavigate()
   const location = useLocation()
   const entity = useEntity()
-  const applicationsResponse = useQuery(api.getAllDoubleCountingApplications, {
+  const applicationsResponse = useQuery(api.getDoubleCountingApplicationList, {
     key: "dc-applications",
     params: [entity.id],
   })

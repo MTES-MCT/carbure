@@ -1,4 +1,4 @@
-import api, { Api } from "common/services/api"
+import api, { Api, download } from "common/services/api"
 import {
   DoubleCountingApplicationDetails,
   DoubleCountingApplicationSnapshot,
@@ -36,7 +36,7 @@ export function getSnapshot(entity_id: number) {
 // APPLICATIONS
 
 
-export function getAllDoubleCountingApplications(entity_id: number) {
+export function getDoubleCountingApplicationList(entity_id: number) {
   return api.get<Api<DoubleCountingApplicationsOverview>>("/v5/admin/double-counting/applications", {
     params: { entity_id },
   })
@@ -104,10 +104,14 @@ export function rejectDoubleCountingApplication(
 
 // AGREEMENTS
 
-export function getAgreementList(entity_id: number) {
+export function downloadDoubleCountingAgreementList(entity_id: number) {
+  return download("/v5/admin/double-counting/agreements", { entity_id, as_excel_file: true })
+}
+
+export function getDoubleCountingAgreementList(entity_id: number, as_excel_file?: boolean) {
   return api.get<Api<DoubleCountingAgreementsOverview>>(
     "/v5/admin/double-counting/agreements"
-    , { params: { entity_id } })
+    , { params: { entity_id, as_excel_file } })
 }
 
 export function getDoubleCountingAgreement(entity_id: number, agreement_id: number) {

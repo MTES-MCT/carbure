@@ -1,4 +1,4 @@
-# test with : python web/manage.py test admin.api.double_counting.applications.tests_application.AdminDoubleCountApplicationTest.test_uploaded_file --keepdb
+# test with : python web/manage.py test admin.api.double_counting.tests_double_counting.AdminDoubleCountTest --keepdb
 from datetime import date
 import json
 from nis import cat
@@ -25,7 +25,7 @@ class Endpoint:
 User = get_user_model()
 
 
-class AdminDoubleCountApplicationTest(TestCase):
+class AdminDoubleCountTest(TestCase):
     fixtures = [
         "json/biofuels.json",
         "json/feedstock.json",
@@ -208,3 +208,18 @@ class AdminDoubleCountApplicationTest(TestCase):
         self.assertEqual(agreement.production_site, application.production_site)
         self.assertEqual(agreement.certificate_id, application.agreement_id)
         self.assertEqual(agreement.application.id, application.id)
+
+        # list agreement
+        response = self.client.get(reverse("admin-double-counting-agreements"), {"entity_id": self.admin.id})
+        self.assertEqual(response.status_code, 200)
+        data = response.json()["data"]
+        active = data["active"]
+        agreement = active[0]
+        self.assertEqual(agreement["certificate_id"], application.agreement_id)
+
+        # test that the response is an excel file
+        response = self.client.get(
+            reverse("admin-double-counting-agreements"), {"entity_id": self.admin.id, "as_excel_file": "true"}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
