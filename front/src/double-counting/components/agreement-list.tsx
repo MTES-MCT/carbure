@@ -5,7 +5,7 @@ import { Dialog } from "common/components/dialog"
 import { Button } from "common/components/button"
 import { AlertCircle, Return } from "common/components/icons"
 import { formatDateYear, formatNumber } from "common/utils/formatters"
-import { AgreementOverview, QuotaDetails, AgreementsSnapshot, AgreementStatus } from "../types"
+import { DoubleCountingAgreementOverview, QuotaDetails, DoubleCountingAgreementsSnapshot, AgreementStatus } from "../types"
 import * as api from "../api"
 import { usePortal } from "common/components/portal"
 import Alert from "common/components/alert"
@@ -22,7 +22,7 @@ import { AgreementDetailsDialog } from "./agreement-details-dialog"
 import HashRoute from "common/components/hash-route"
 
 
-const AgreementList = ({ snapshot = defaultCount }: { snapshot: AgreementsSnapshot | undefined }) => {
+const AgreementList = ({ snapshot = defaultCount }: { snapshot: DoubleCountingAgreementsSnapshot | undefined }) => {
   const { t } = useTranslation()
   const portal = usePortal()
   const year = new Date().getFullYear()
@@ -37,7 +37,7 @@ const AgreementList = ({ snapshot = defaultCount }: { snapshot: AgreementsSnapsh
   })
 
 
-  const columns: Column<AgreementOverview>[] = [
+  const columns: Column<DoubleCountingAgreementOverview>[] = [
     {
       header: t("Statut"),
       cell: (a) => <AgreementStatusTag status={a.status} />,
@@ -62,7 +62,7 @@ const AgreementList = ({ snapshot = defaultCount }: { snapshot: AgreementsSnapsh
 
   ]
 
-  function showApplicationDialog(agreement: AgreementOverview) {
+  function showApplicationDialog(agreement: DoubleCountingAgreementOverview) {
     navigate({
       pathname: location.pathname,
       hash: `agreement/${agreement.id}`,
@@ -71,7 +71,6 @@ const AgreementList = ({ snapshot = defaultCount }: { snapshot: AgreementsSnapsh
 
   const agreements = agreementsResponse.result?.data.data
   if (agreements === undefined) return <LoaderOverlay />
-  console.log('agreements:', agreements)
 
   return (
     <>

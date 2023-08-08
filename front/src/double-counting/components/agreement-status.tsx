@@ -14,7 +14,7 @@ const AgreementStatusTag = ({
   status,
 }: {
   big?: boolean
-  status: AgreementStatus
+  status?: AgreementStatus
 }) => {
   const { t } = useTranslation()
 
@@ -22,13 +22,13 @@ const AgreementStatusTag = ({
     [AgreementStatus.Active]: t("En cours"),
     [AgreementStatus.ExpiresSoon]: t("À renouveler"),
     [AgreementStatus.Expired]: t("Expiré"),
-    [AgreementStatus.Incoming]: t("À venir")
+    [AgreementStatus.Incoming]: t("À venir"),
   }
 
 
   return (
-    <Tag big={big} variant={statusToVariant[status]}>
-      {statusLabels[status]}
+    <Tag big={big} variant={!status ? "none" : statusToVariant[status]}>
+      {!status ? "..." : statusLabels[status]}
     </Tag>
   )
 }

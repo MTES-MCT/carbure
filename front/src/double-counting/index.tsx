@@ -10,7 +10,7 @@ import * as api from "./api"
 import AgreementList from "./components/agreement-list"
 import ApplicationList from "./components/application-list"
 import DoubleCountingFilesChecker from "./components/files-checker"
-import { AgreementsSnapshot, ApplicationSnapshot } from "./types"
+import { DoubleCountingAgreementsSnapshot, DoubleCountingApplicationSnapshot } from "./types"
 
 
 const DoubleCounting = () => {
@@ -78,10 +78,10 @@ const DoubleCounting = () => {
       <Routes>
         <Route
           path="applications"
-          element={<ApplicationList entity={entity} snapshot={snapshot as ApplicationSnapshot} />}
+          element={<ApplicationList entity={entity} snapshot={snapshot as DoubleCountingApplicationSnapshot} />}
         />
 
-        <Route path="agreements" element={<AgreementList snapshot={snapshot as AgreementsSnapshot} />} />
+        <Route path="agreements" element={<AgreementList snapshot={snapshot as DoubleCountingAgreementsSnapshot} />} />
         <Route
           path="files-checker/*"
           element={<DoubleCountingFilesChecker />}

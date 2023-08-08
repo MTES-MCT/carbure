@@ -9,7 +9,7 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { getErrorText } from "settings/utils/double-counting"
 import { DoubleCountingFileInfo, DoubleCountingUploadError } from "../../types"
-import ApplicationInfo from "./application-info"
+import FileApplicationInfo from "./file-application-info"
 import { ProductionTable, SourcingFullTable } from "../dc-tables"
 
 export type ErrorsDetailsDialogProps = {
@@ -40,7 +40,7 @@ export const ErrorsDetailsDialog = ({
 
       <main>
 
-        <ApplicationInfo fileData={fileData} />
+        <FileApplicationInfo fileData={fileData} />
 
         <section>
           <Alert variant="warning" icon={AlertTriangle}>

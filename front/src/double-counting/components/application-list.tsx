@@ -11,7 +11,7 @@ import { Fragment, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../api"
-import { ApplicationSnapshot, DoubleCountingApplication } from "../types"
+import { DoubleCountingApplicationSnapshot, DoubleCountingApplicationOverview } from "../types"
 import { ApplicationDetailsDialog } from "./application-details-dialog"
 import ApplicationStatus from "./application-status"
 import FilesCheckerUploadButton from "./files-checker/upload-button"
@@ -19,7 +19,7 @@ import NoResult from "common/components/no-result"
 
 type ApplicationListProps = {
   entity: Entity
-  snapshot: ApplicationSnapshot | undefined
+  snapshot: DoubleCountingApplicationSnapshot | undefined
 }
 
 const ApplicationList = ({ entity, snapshot = defaultCount }: ApplicationListProps) => {
@@ -33,7 +33,7 @@ const ApplicationList = ({ entity, snapshot = defaultCount }: ApplicationListPro
     params: [],
   })
 
-  const columns: Column<DoubleCountingApplication>[] = [
+  const columns: Column<DoubleCountingApplicationOverview>[] = [
     {
       header: t("Statut"),
       cell: (a) => <ApplicationStatus status={a.status} />,
@@ -59,7 +59,7 @@ const ApplicationList = ({ entity, snapshot = defaultCount }: ApplicationListPro
 
   // const { pending, rejected } = applicationsData
 
-  function showApplicationDialog(application: DoubleCountingApplication) {
+  function showApplicationDialog(application: DoubleCountingApplicationOverview) {
     navigate({
       pathname: location.pathname,
       hash: `application/${application.id}`,

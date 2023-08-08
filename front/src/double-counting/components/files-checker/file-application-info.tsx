@@ -4,7 +4,7 @@ import { t } from "i18next"
 import { Trans } from "react-i18next"
 import { DoubleCountingFileInfo } from "../../types"
 
-const ApplicationInfo = ({ fileData }: { fileData: DoubleCountingFileInfo }) => {
+const FileApplicationInfo = ({ fileData }: { fileData: DoubleCountingFileInfo }) => {
 
     return <section>
         <p>
@@ -47,4 +47,4 @@ const ApplicationInfo = ({ fileData }: { fileData: DoubleCountingFileInfo }) => 
         </p>
     </section>
 }
-export default ApplicationInfo
+export default FileApplicationInfo

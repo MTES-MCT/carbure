@@ -11,9 +11,10 @@ interface ApplicationDetailsProps {
     sourcing?: DoubleCountingSourcing[]
     quotas?: Record<string, number>
     setQuotas?: (quotas: Record<string, number>) => void
+    hasAgreement?: boolean
 }
 
-const ApplicationTabs = ({ production, sourcing, quotas, setQuotas }: ApplicationDetailsProps) => {
+const ApplicationTabs = ({ production, sourcing, quotas, setQuotas, hasAgreement }: ApplicationDetailsProps) => {
     const [focus, setFocus] = useState("production")
     const { t } = useTranslation()
 
@@ -53,6 +54,7 @@ const ApplicationTabs = ({ production, sourcing, quotas, setQuotas }: Applicatio
                     production={production ?? []}
                     quotas={quotas ?? {}}
                     setQuotas={setQuotas}
+                    hasAgreement={hasAgreement}
                 />
             </section>
         }

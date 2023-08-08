@@ -4,7 +4,7 @@ import {
   Admin,
   DoubleCountingSourcing,
   DoubleCountingProduction,
-  DoubleCountingDetails,
+  DoubleCountingApplicationDetails,
   DoubleCountingSourcingAggregation,
 } from "../types"
 import Table, { Column, Cell } from "common/components/table"
@@ -141,16 +141,16 @@ export const SourcingFullTable = ({ sourcing }: { sourcing: DoubleCountingSourci
 }
 
 type ProductionTableProps = {
-  done?: boolean
-  entity?: Entity
+  hasAgreement?: boolean
+
   quotas?: Record<string, number>
   production: DoubleCountingProduction[]
   setQuotas?: (quotas: Record<string, number>) => void
 }
 
 export const ProductionTable = ({
-  done,
-  entity,
+  hasAgreement,
+
   quotas,
   production,
   setQuotas,
@@ -177,9 +177,14 @@ export const ProductionTable = ({
     {
       header: t("Quota demandé"),
       cell: (p) => <Cell text={formatNumber(p.requested_quota)} />,
-    },
-
+    }
   ]
+
+  hasAgreement && productionColumns?.push({
+    header: t("Quota approuvé"),
+    cell: (p) => <Cell text={formatNumber(p.approved_quota)} />,
+  })
+
   quotas && setQuotas && productionColumns?.push(
     {
       header: t("Quota approuvé"),
