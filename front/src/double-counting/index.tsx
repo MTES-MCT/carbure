@@ -78,7 +78,7 @@ const DoubleCounting = () => {
       <Routes>
         <Route
           path="applications"
-          element={<ApplicationList entity={entity} snapshot={snapshot as DoubleCountingApplicationSnapshot} />}
+          element={<ApplicationList snapshot={snapshot as DoubleCountingApplicationSnapshot} />}
         />
 
         <Route path="agreements" element={<AgreementList snapshot={snapshot as DoubleCountingAgreementsSnapshot} />} />

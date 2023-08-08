@@ -16,21 +16,21 @@ import { ApplicationDetailsDialog } from "./application-details-dialog"
 import ApplicationStatus from "./application-status"
 import FilesCheckerUploadButton from "./files-checker/upload-button"
 import NoResult from "common/components/no-result"
+import useEntity from "carbure/hooks/entity"
 
 type ApplicationListProps = {
-  entity: Entity
   snapshot: DoubleCountingApplicationSnapshot | undefined
 }
 
-const ApplicationList = ({ entity, snapshot = defaultCount }: ApplicationListProps) => {
+const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
   const { t } = useTranslation()
   const [tab, setTab] = useState("pending")
   const navigate = useNavigate()
   const location = useLocation()
-
+  const entity = useEntity()
   const applications = useQuery(api.getAllDoubleCountingApplications, {
     key: "dc-applications",
-    params: [],
+    params: [entity.id],
   })
 
   const columns: Column<DoubleCountingApplicationOverview>[] = [
@@ -91,12 +91,14 @@ const ApplicationList = ({ entity, snapshot = defaultCount }: ApplicationListPro
             <NoResult label={t("Aucun dossier en attente trouvé")} loading={applications.loading} />
           )}
 
-          <Table
-            loading={applications.loading}
-            columns={columns}
-            rows={applicationsData?.pending || []}
-            onAction={showApplicationDialog}
-          />
+          {applicationsData &&
+            <Table
+              loading={applications.loading}
+              columns={columns}
+              rows={applicationsData?.pending || []}
+              onAction={showApplicationDialog}
+            />
+          }
 
         </Fragment>
       )}

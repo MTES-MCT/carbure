@@ -20,6 +20,7 @@ import { ta } from "date-fns/locale"
 import useEntity from "carbure/hooks/entity"
 import { AgreementDetailsDialog } from "./agreement-details-dialog"
 import HashRoute from "common/components/hash-route"
+import NoResult from "common/components/no-result"
 
 
 const AgreementList = ({ snapshot = defaultCount }: { snapshot: DoubleCountingAgreementsSnapshot | undefined }) => {
@@ -70,7 +71,6 @@ const AgreementList = ({ snapshot = defaultCount }: { snapshot: DoubleCountingAg
   }
 
   const agreements = agreementsResponse.result?.data.data
-  if (agreements === undefined) return <LoaderOverlay />
 
   return (
     <>
@@ -97,7 +97,12 @@ const AgreementList = ({ snapshot = defaultCount }: { snapshot: DoubleCountingAg
 
         </ActionBar>
 
-        {agreements.active.length > 0 && (
+
+        {!agreements &&
+          <NoResult label={t("Aucun agrément")} loading={agreementsResponse.loading} />
+        }
+
+        {agreements && (
           <>
             <Table
               loading={agreementsResponse.loading}
@@ -109,14 +114,7 @@ const AgreementList = ({ snapshot = defaultCount }: { snapshot: DoubleCountingAg
 
         )}
 
-        {agreements.active.length === 0 && (
-          <Alert variant="warning" icon={AlertCircle} loading={agreementsResponse.loading}>
-            {agreementsResponse.loading ?
-              <Trans>Chargement en cours...</Trans>
-              : <Trans>Aucun quota disponible</Trans>}
 
-          </Alert>
-        )}
       </section>
       <HashRoute
         path="agreement/:id"
