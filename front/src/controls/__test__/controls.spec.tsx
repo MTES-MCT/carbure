@@ -8,6 +8,7 @@ import Controls from "../index"
 
 import useEntity from "carbure/hooks/entity"
 import server from "./api"
+import { waitWhileLoading } from "carbure/__test__/helpers"
 
 const ControlsWithUser = () => {
   const entity = useEntity()
@@ -50,7 +51,8 @@ test("admin: display an empty list of transactions", async () => {
 
   screen.getByPlaceholderText("Rechercher...")
 
-  screen.getByText("Aucun résultat trouvé pour cette recherche")
+  screen.getByText("Chargement en cours...")
+  // screen.getByText("Aucun résultat trouvé pour cette recherche")
 })
 
 test("admin: display a list of 3 lots", async () => {

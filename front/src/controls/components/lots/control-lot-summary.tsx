@@ -4,7 +4,7 @@ import pickApi from "../../api"
 import { formatUnit } from "common/utils/formatters"
 import { LoaderOverlay } from "common/components/scaffold"
 import Table from "common/components/table"
-import NoResult from "transactions/components/no-result"
+import NoResult from "common/components/no-result"
 import {
   LotSummaryBar,
   LotSummaryBarProps,
