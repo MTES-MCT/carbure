@@ -23,7 +23,7 @@ def generate_dc_number():
         print("dc_number géné ré: ", dc_number)
         # enregistrer le dc_number dans la base de données
         production_site.dc_number = dc_number
-        # production_site.save()
+        production_site.save()
 
 
 generate_dc_number()
