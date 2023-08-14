@@ -1,4 +1,5 @@
 from typing import List
+from django import forms
 from django.db.models.query_utils import Q
 from datetime import datetime
 from django.http.response import HttpResponse, JsonResponse
@@ -7,14 +8,25 @@ import xlsxwriter
 from django.http import JsonResponse
 from certificates.models import DoubleCountingRegistration
 from certificates.serializers import DoubleCountingRegistrationSerializer
+from core.common import ErrorResponse
 from core.decorators import check_admin_rights
 from producers.models import ProductionSiteInput, ProductionSiteOutput
 
 
+class AgreementError:
+    MALFORMED_PARAMS = "MALFORMED_PARAMS"
+
+
 @check_admin_rights()
 def get_agreements(request, *args, **kwargs):
+    sort_form = AgreementSortForm(request.GET)
     as_excel_file = request.GET.get("as_excel_file") == "true"
-    print("as_excel_file: ", as_excel_file)
+
+    if not sort_form.is_valid():
+        return ErrorResponse(400, AgreementError.MALFORMED_PARAMS, {**sort_form.errors})
+
+    order_by = sort_form.cleaned_data["order_by"]
+    direction = sort_form.cleaned_data["direction"]
 
     current_year = datetime.now().year
 
@@ -22,9 +34,10 @@ def get_agreements(request, *args, **kwargs):
         Q(valid_from__year__lte=current_year) & Q(valid_until__year__gte=current_year)
     ).select_related("production_site")
 
+    agreements_active = sort_agreements(agreements_active, order_by, direction)
+
     if as_excel_file:
         file_location = export_agreements(agreements_active)
-        print("file_location: ", file_location)
         with open(file_location, "rb") as excel:
             data = excel.read()
             ctype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -45,6 +58,25 @@ def get_agreements(request, *args, **kwargs):
             "expired": DoubleCountingRegistrationSerializer(agreements_expired, many=True).data,
         }
         return JsonResponse({"status": "success", "data": data})
+
+
+class AgreementSortForm(forms.Form):
+    order_by = forms.CharField(required=False)
+    direction = forms.CharField(required=False)
+
+
+def sort_agreements(agreements, order_by, direction):
+    sortable_columns = {
+        "production_site": "production_site__name",
+        "valid_until": "valid_until",
+    }
+
+    column = sortable_columns.get(order_by, "production_site__name")
+
+    if direction == "desc":
+        return agreements.order_by("-%s" % column)
+    else:
+        return agreements.order_by(column)
 
 
 def export_agreements(agreements: List[DoubleCountingRegistration]):

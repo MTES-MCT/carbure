@@ -108,10 +108,12 @@ export function downloadDoubleCountingAgreementList(entity_id: number) {
   return download("/v5/admin/double-counting/agreements", { entity_id, as_excel_file: true })
 }
 
-export function getDoubleCountingAgreementList(entity_id: number, as_excel_file?: boolean) {
+export function getDoubleCountingAgreementList(entity_id: number, order_by?: string,
+  direction?: string) {
+
   return api.get<Api<DoubleCountingAgreementsOverview>>(
     "/v5/admin/double-counting/agreements"
-    , { params: { entity_id, as_excel_file } })
+    , { params: { entity_id, order_by, direction } })
 }
 
 export function getDoubleCountingAgreement(entity_id: number, agreement_id: number) {

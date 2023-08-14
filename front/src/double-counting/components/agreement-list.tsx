@@ -1,40 +1,34 @@
-import { Trans, useTranslation } from "react-i18next"
-import { useQuery } from "common/hooks/async"
-import Table, { Cell, Column } from "common/components/table"
-import { Dialog } from "common/components/dialog"
-import { Button } from "common/components/button"
-import { AlertCircle, Download, Return } from "common/components/icons"
-import { formatDateYear, formatNumber } from "common/utils/formatters"
-import { DoubleCountingAgreementOverview, QuotaDetails, DoubleCountingAgreementsSnapshot, AgreementStatus } from "../types"
-import * as api from "../api"
-import { usePortal } from "common/components/portal"
-import Alert from "common/components/alert"
-import { useState } from "react"
-import { ActionBar, LoaderOverlay } from "common/components/scaffold"
-import Tabs from "common/components/tabs"
-import Tag, { TagVariant } from "common/components/tag"
-import AgreementStatusTag from "./agreement-status"
-import { ApplicationDetailsDialog } from "./application-details-dialog"
-import { useLocation, useNavigate } from "react-router-dom"
-import { ta } from "date-fns/locale"
 import useEntity from "carbure/hooks/entity"
-import { AgreementDetailsDialog } from "./agreement-details-dialog"
+import { Button } from "common/components/button"
 import HashRoute from "common/components/hash-route"
+import { Download } from "common/components/icons"
 import NoResult from "common/components/no-result"
+import { ActionBar } from "common/components/scaffold"
+import Table, { Cell, Column, Order } from "common/components/table"
+import Tabs from "common/components/tabs"
+import { useQuery } from "common/hooks/async"
+import { formatDateYear } from "common/utils/formatters"
+import { useState } from "react"
+import { useTranslation } from "react-i18next"
+import { useLocation, useNavigate } from "react-router-dom"
+import * as api from "../api"
+import { DoubleCountingAgreementOverview, DoubleCountingAgreementsSnapshot } from "../types"
+import { AgreementDetailsDialog } from "./agreement-details-dialog"
+import AgreementStatusTag from "./agreement-status"
+import { set } from "date-fns"
 
 
 const AgreementList = ({ snapshot = defaultCount }: { snapshot: DoubleCountingAgreementsSnapshot | undefined }) => {
   const { t } = useTranslation()
-  const portal = usePortal()
-  const year = new Date().getFullYear()
   const [tab, setTab] = useState("active")
   const entity = useEntity()
   const navigate = useNavigate()
   const location = useLocation()
+  const [order, setOrder] = useState<Order | undefined>(undefined)
 
   const agreementsResponse = useQuery(api.getDoubleCountingAgreementList, {
     key: "dc-agreements",
-    params: [entity.id],
+    params: [entity.id, order?.column, order?.direction],
   })
 
 
@@ -51,13 +45,14 @@ const AgreementList = ({ snapshot = defaultCount }: { snapshot: DoubleCountingAg
         </span>
       ),
     },
-    { header: t("Producteur"), cell: (a) => <Cell text={a.producer} /> },
+    { header: t("Producteur"), key: "production_site", cell: (a) => <Cell text={a.producer} /> },
     {
       header: t("Site de production"),
       cell: (a) => <Cell text={a.production_site || "-"} />,
     },
     {
       header: t("Validité"),
+      key: "valid_until",
       cell: (a) => <Cell text={`${formatDateYear(a.valid_from)}-${formatDateYear(a.valid_until)}`} />,
     },
 
@@ -108,6 +103,8 @@ const AgreementList = ({ snapshot = defaultCount }: { snapshot: DoubleCountingAg
             columns={columns}
             rows={tab === "active" ? agreements.active : tab === "expired" ? agreements.expired : agreements.incoming}
             onAction={showApplicationDialog}
+            order={order}
+            onOrder={setOrder}
           />
         }
 
