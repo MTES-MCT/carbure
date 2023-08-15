@@ -29,16 +29,9 @@ export const AgreementDetailsDialog = () => {
     params: [entity.id, parseInt(match?.params.id!)]
   })
 
-
-
   const agreement: AgreementDetails | undefined = applicationResponse.result?.data.data
 
   const application = agreement?.application
-
-  const applicationExcelURL =
-    application &&
-    `/api/v5/admin/double-counting/applications/details?dca_id=${application.id}&export=true`
-
 
   const closeDialog = () => {
     navigate({ search: location.search, hash: "#" })

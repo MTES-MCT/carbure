@@ -3,6 +3,9 @@ import { DoubleCountingProduction, DoubleCountingSourcing } from "double-countin
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { ProductionTable, SourcingFullTable } from "./dc-tables"
+import { ProductionSiteAdminDialog } from "./files-checker/valid-details-dialog"
+import { ProductionSiteDialog } from "settings/components/production-site-dialog"
+import { ProductionSiteDetails } from "carbure/types"
 
 
 
@@ -12,10 +15,11 @@ interface ApplicationDetailsProps {
     quotas?: Record<string, number>
     setQuotas?: (quotas: Record<string, number>) => void
     hasAgreement?: boolean
+    productionSite?: ProductionSiteDetails
 }
 
-const ApplicationTabs = ({ production, sourcing, quotas, setQuotas, hasAgreement }: ApplicationDetailsProps) => {
-    const [focus, setFocus] = useState("production")
+const ApplicationTabs = ({ productionSite, production, sourcing, quotas, setQuotas, hasAgreement }: ApplicationDetailsProps) => {
+    const [focus, setFocus] = useState("production_site")
     const { t } = useTranslation()
 
     return <>
@@ -23,6 +27,10 @@ const ApplicationTabs = ({ production, sourcing, quotas, setQuotas, hasAgreement
             <Tabs
                 variant="switcher"
                 tabs={[
+                    {
+                        key: "production_site",
+                        label: t("Site de production")
+                    },
                     {
                         key: "sourcing_forecast",
                         label: t("Approvisionnement"),
@@ -38,6 +46,16 @@ const ApplicationTabs = ({ production, sourcing, quotas, setQuotas, hasAgreement
             />
 
         </section>
+        {focus === "production_site" && productionSite &&
+            <section>
+                <ProductionSiteDialog
+                    readOnly
+                    dispolayFormOnly={true}
+                    title={t("Détails du site de production")}
+                    productionSite={productionSite} />
+            </section>
+        }
+
 
         {focus === "sourcing_forecast" &&
             <section>

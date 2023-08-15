@@ -67,7 +67,6 @@ const ProductionSitesSettings = ({
       <ProductionSiteDialog
         readOnly
         title={t("Détails du site de production")}
-        entity={entity}
         productionSite={prodSite}
         onClose={close}
       />
@@ -77,7 +76,6 @@ const ProductionSitesSettings = ({
   function createProductionSite() {
     portal((close) => (
       <ProductionSiteDialog
-        entity={entity}
         title={t("Ajout site de production")}
         description={t("Veuillez entrer les informations de votre nouveau site de production.")} // prettier-ignore
         onClose={close}
@@ -89,7 +87,6 @@ const ProductionSitesSettings = ({
     portal((close) => (
       <ProductionSiteDialog
         title={t("Détails du site de production")}
-        entity={entity}
         productionSite={prodSite}
         readOnly={!canModify}
         onClose={close}

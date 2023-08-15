@@ -4,7 +4,7 @@ import { DoubleCountingApplicationDetails } from "../types"
 
 
 export const ApplicationInfo = ({ application }: { application?: DoubleCountingApplicationDetails }) => {
-  const productionSite = application?.production_site ?? "N/A"
+  const productionSite = application?.production_site.name ?? "N/A"
   const producer = application?.producer.name ?? "N/A"
   const user = application?.producer_user ?? "N/A"
   const creationDate = application?.created_at

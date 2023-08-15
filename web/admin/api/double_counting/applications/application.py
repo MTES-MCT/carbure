@@ -7,7 +7,7 @@ from doublecount.models import (
     DoubleCountingApplication,
 )
 from doublecount.serializers import (
-    DoubleCountingApplicationFullSerializerWithForeignKeys,
+    DoubleCountingApplicationSerializer,
 )
 
 
@@ -28,7 +28,8 @@ def get_application_details(request, *args, **kwargs):
     except:
         return ErrorResponse(400, DoubleCountingApplicationError.APPLICATION_NOT_FOUND)
 
-    serializer = DoubleCountingApplicationFullSerializerWithForeignKeys(application)
+    serializer = DoubleCountingApplicationSerializer(application)
+
     if not export:
         return SuccessResponse(serializer.data)
     else:
