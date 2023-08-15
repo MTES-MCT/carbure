@@ -64,7 +64,7 @@ class ProductionSiteCertificateSerializer(serializers.ModelSerializer):
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Pays
-        fields = ["name", "name_en", "code_pays"]
+        fields = ["name", "name_en", "code_pays", "is_in_europe"]
 
 
 class DoubleCountingProductionSiteSerializer(serializers.ModelSerializer):

@@ -177,13 +177,14 @@ export const ApplicationDetailsDialog = () => {
 
           <ApplicationInfo application={application} />
 
-          <ApplicationTabs
-            productionSite={application?.production_site}
-            sourcing={application?.sourcing}
-            production={application?.production}
-            quotas={quotas}
-            setQuotas={onUpdateQuotas} />
-
+          {application &&
+            <ApplicationTabs
+              productionSite={application.production_site}
+              sourcing={application.sourcing}
+              production={application.production}
+              quotas={quotas}
+              setQuotas={onUpdateQuotas} />
+          }
         </main>
 
         <footer>

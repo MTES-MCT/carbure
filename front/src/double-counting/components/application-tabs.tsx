@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { ProductionTable, SourcingFullTable } from "./dc-tables"
 import { ProductionSiteAdminDialog } from "./files-checker/valid-details-dialog"
-import { ProductionSiteDialog } from "settings/components/production-site-dialog"
+import { ProductionSiteDialog, ProductionSiteForm } from "settings/components/production-site-dialog"
 import { ProductionSiteDetails } from "carbure/types"
 import { compact } from "common/utils/collection"
 
@@ -49,10 +49,8 @@ const ApplicationTabs = ({ productionSite, production, sourcing, quotas, setQuot
         </section>
         {focus === "production_site" && productionSite &&
             <section>
-                <ProductionSiteDialog
+                <ProductionSiteForm
                     readOnly
-                    dispolayFormOnly={true}
-                    title={t("Détails du site de production")}
                     productionSite={productionSite} />
             </section>
         }
