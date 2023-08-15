@@ -212,9 +212,14 @@ def load_dc_period(start_year):
 def check_dc_file(file):
     try:
         filepath = load_dc_filepath(file)
-        info, sourcing_forecast_rows, production_max_rows, production_forecast_rows, requested_quota_rows = parse_dc_excel(
-            filepath
-        )
+        (
+            info,
+            sourcing_forecast_rows,
+            production_max_rows,
+            production_forecast_rows,
+            requested_quota_rows,
+            tracability,
+        ) = parse_dc_excel(filepath)
         start, end, global_errors = load_dc_period(info["start_year"])
 
         # create temporary agreement to hold all the data that will be parsed

@@ -6,6 +6,7 @@ import { ProductionTable, SourcingFullTable } from "./dc-tables"
 import { ProductionSiteAdminDialog } from "./files-checker/valid-details-dialog"
 import { ProductionSiteDialog } from "settings/components/production-site-dialog"
 import { ProductionSiteDetails } from "carbure/types"
+import { compact } from "common/utils/collection"
 
 
 
@@ -19,15 +20,15 @@ interface ApplicationDetailsProps {
 }
 
 const ApplicationTabs = ({ productionSite, production, sourcing, quotas, setQuotas, hasAgreement }: ApplicationDetailsProps) => {
-    const [focus, setFocus] = useState("production_site")
+    const [focus, setFocus] = useState(productionSite ? "production_site" : "sourcing_forecast")
     const { t } = useTranslation()
 
     return <>
         <section>
             <Tabs
                 variant="switcher"
-                tabs={[
-                    {
+                tabs={compact([
+                    productionSite && {
                         key: "production_site",
                         label: t("Site de production")
                     },
@@ -40,7 +41,7 @@ const ApplicationTabs = ({ productionSite, production, sourcing, quotas, setQuot
                         label: t("Production"),
                     }
 
-                ]}
+                ])}
                 focus={focus}
                 onFocus={setFocus}
             />

@@ -1,4 +1,4 @@
-# test with : python web/manage.py test doublecount.api.application.tests_application.DoubleCountApplicationTest.test_has_dechets_industriels --keepdb
+# test with : python web/manage.py test doublecount.api.application.tests_application.DoubleCountApplicationTest.test_missing_traceability --keepdb
 from math import prod
 import os
 from core.tests_utils import setup_current_user
@@ -219,3 +219,15 @@ class DoubleCountApplicationTest(TestCase):
         error3 = errors["production"][2]
         self.assertEqual(error3["error"], DoubleCountingError.MISSING_DATA)
         self.assertEqual(error3["meta"]["tab_name"], "Production prévisionelle")
+
+    # def test_missing_traceability(self):
+    #     response = self.check_file("dc_agreement_application_valid.xlsx")
+
+    #     data = response.json()["data"]
+    #     file_data = data["file"]
+    #     error_count = file_data["error_count"]
+    #     self.assertEqual(error_count, 1)
+    #     errors = file_data["errors"]
+
+    #     error1 = errors["traceablity"][0]
+    #     self.assertEqual(error1["error"], DoubleCountingError.MISSING_TRACEABILITY)
