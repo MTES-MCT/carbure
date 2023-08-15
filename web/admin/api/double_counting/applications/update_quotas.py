@@ -9,7 +9,7 @@ from doublecount.models import (
 
 
 @check_admin_rights()
-def update_quotas(request):
+def update_approved_quotas(request):
     approved_quotas = request.POST.get("approved_quotas", False)
 
     if not approved_quotas:

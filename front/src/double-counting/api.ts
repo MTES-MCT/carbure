@@ -75,7 +75,7 @@ export function approveDoubleCountingQuotas(
   dca_id: number,
   approved_quotas: number[][]
 ) {
-  return api.post("/v5/admin/double-counting/applications/update-quotas", {
+  return api.post("/v5/admin/double-counting/applications/update-approved-quotas", {
     entity_id,
     dca_id,
     approved_quotas: JSON.stringify(approved_quotas),
