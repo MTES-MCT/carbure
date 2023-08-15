@@ -13,6 +13,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
+from doublecount.factories.application import DoubleCountingApplicationFactory
 
 from doublecount.models import DoubleCountingApplication, DoubleCountingDocFile, DoubleCountingProduction
 from producers.models import ProductionSite
@@ -142,6 +143,9 @@ class AdminDoubleCountTest(TestCase):
         self.assertEqual(application["producer"]["id"], self.production_site.producer.id)
 
     def test_application_details(self):
+        app = DoubleCountingApplicationFactory.create()
+        print("app: ", app)
+
         response = self.add_file("dc_agreement_application_valid.xlsx")
         self.assertEqual(response.status_code, 200)
 

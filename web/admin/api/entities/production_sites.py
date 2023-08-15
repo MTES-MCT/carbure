@@ -6,9 +6,11 @@ from core.models import ProductionSite
 @check_admin_rights()
 def get_entity_production_sites(request):
     company_id = request.GET.get("company_id", False)
+    print("company_id: ", company_id)
 
     try:
         psites = ProductionSite.objects.filter(producer__id=company_id)
+        print("psites: ", psites)
         psitesbyid = {p.id: p for p in psites}
         for k, v in psitesbyid.items():
             v.inputs = []

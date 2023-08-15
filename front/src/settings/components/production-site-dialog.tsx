@@ -31,7 +31,7 @@ import { useMutation } from "common/hooks/async"
 import * as api from "../api/production-sites"
 import useEntity from "carbure/hooks/entity"
 
-interface ProductionSiteForm {
+interface ProductionSiteFormValue {
   displayInDialog?: boolean
   site_id: string | undefined
   name: string | undefined
@@ -52,6 +52,8 @@ interface ProductionSiteForm {
 }
 
 
+
+
 type ProductionSiteDialogProps = {
   title: string
   description?: string
@@ -61,8 +63,6 @@ type ProductionSiteDialogProps = {
   dispolayFormOnly?: boolean
 }
 
-
-
 export const ProductionSiteDialog = ({
   title,
   description,
@@ -71,6 +71,36 @@ export const ProductionSiteDialog = ({
   onClose,
   dispolayFormOnly,
 }: ProductionSiteDialogProps) => {
+
+  return (
+    <Dialog onClose={() => onClose && onClose()}>
+      {!dispolayFormOnly &&
+        <header>
+          <h1>{title}</h1>
+        </header>
+      }
+
+      <ProductionSiteForm productionSite={productionSite} readOnly={readOnly} onClose={onClose} description={description} />
+
+    </Dialog>)
+}
+
+
+
+
+type ProductionSiteFormDialogProps = {
+  productionSite?: ProductionSiteDetails
+  readOnly?: boolean
+  onClose?: () => void
+  description?: string
+}
+
+export const ProductionSiteForm = ({
+  productionSite,
+  readOnly,
+  onClose,
+  description
+}: ProductionSiteFormDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
   const entity = useEntity()
@@ -107,7 +137,7 @@ export const ProductionSiteDialog = ({
     },
   })
 
-  const { value, bind } = useForm<ProductionSiteForm>({
+  const { value, bind } = useForm<ProductionSiteFormValue>({
     site_id: productionSite?.site_id ?? "",
     name: productionSite?.name ?? "",
     date_mise_en_service: productionSite?.date_mise_en_service ?? "",
@@ -161,13 +191,7 @@ export const ProductionSiteDialog = ({
     }
   }
 
-
-  const form = <>
-    {!dispolayFormOnly &&
-      <header>
-        <h1>{title}</h1>
-      </header>
-    }
+  return <>
     <main>
       {description && (
         <section>
@@ -321,20 +345,18 @@ export const ProductionSiteDialog = ({
           label={t("Sauvegarder")}
         />
       )}
-      <Button asideX={readOnly} icon={Return} action={() => onClose && onClose()}>
-        <Trans>Retour</Trans>
-      </Button>
+      {onClose &&
+        <Button asideX={readOnly} icon={Return} action={onClose}>
+          <Trans>Retour</Trans>
+        </Button>
+      }
     </footer>
   </>
 
-  return dispolayFormOnly ?
-    form
-    : <Dialog onClose={() => onClose && onClose()}>{form}
-    </Dialog>
 }
 
 
-async function addProductionSite(entity: Entity, form: ProductionSiteForm) {
+async function addProductionSite(entity: Entity, form: ProductionSiteFormValue) {
   const res = await api.addProductionSite(
     entity.id,
     form.name!,
@@ -367,7 +389,7 @@ async function addProductionSite(entity: Entity, form: ProductionSiteForm) {
 async function updateProductionSite(
   entity: Entity,
   psite: ProductionSiteDetails,
-  form: ProductionSiteForm
+  form: ProductionSiteFormValue
 ) {
   await api.updateProductionSite(
     entity.id,
