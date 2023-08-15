@@ -213,6 +213,7 @@ const ApprovedQuotasCell = ({ production, quotas, setQuotas }: ApprovedQuotasCel
   return (
     <NumberInput
       value={quotas[production.id]}
+      max={production.requested_quota}
       onChange={(value) => {
         // setApprovedQuota(value)
         setQuotas({

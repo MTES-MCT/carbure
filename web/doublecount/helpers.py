@@ -218,7 +218,6 @@ def check_dc_file(file):
             production_max_rows,
             production_forecast_rows,
             requested_quota_rows,
-            tracability,
         ) = parse_dc_excel(filepath)
         start, end, global_errors = load_dc_period(info["start_year"])
 
