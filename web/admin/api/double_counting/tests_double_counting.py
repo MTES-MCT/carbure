@@ -8,16 +8,19 @@ from admin.api.double_counting.applications.approve_application import DoubleCou
 from certificates.models import DoubleCountingRegistration
 
 from core.tests_utils import setup_current_user
-from core.models import Entity, Pays, UserRights
+from core.models import Entity, MatierePremiere, Pays, UserRights
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from doublecount.factories.application import DoubleCountingApplicationFactory
+from doublecount.factories import (
+    DoubleCountingApplicationFactory,
+    DoubleCountingProductionFactory,
+    DoubleCountingSourcingFactory,
+)
 
 from doublecount.models import DoubleCountingApplication, DoubleCountingDocFile, DoubleCountingProduction
 from producers.models import ProductionSite
-from resources.factories import production_site
 
 
 class Endpoint:
@@ -143,21 +146,22 @@ class AdminDoubleCountTest(TestCase):
         self.assertEqual(application["producer"]["id"], self.production_site.producer.id)
 
     def test_application_details(self):
-        app = DoubleCountingApplicationFactory.create()
-        print("app: ", app)
-
-        response = self.add_file("dc_agreement_application_valid.xlsx")
-        self.assertEqual(response.status_code, 200)
-
-        saved_application = DoubleCountingApplication.objects.get(
-            producer=self.production_site.producer, period_start__year=self.requested_start_year
+        app = DoubleCountingApplicationFactory.create(
+            production_site=self.production_site, period_start__year=self.requested_start_year
         )
+        sourcing = DoubleCountingSourcingFactory.create(dca=app)
+        production = DoubleCountingProductionFactory.create(dca=app, feedstock=sourcing.feedstock)
+
         response = self.client.get(
             reverse("admin-double-counting-application-details"),
-            {"entity_id": self.admin.id, "dca_id": saved_application.id},
+            {"entity_id": self.admin.id, "dca_id": app.id},
         )
 
         application = response.json()["data"]
+
+        self.assertEqual(application["sourcing"][0]["id"], sourcing.id)
+        self.assertEqual(application["production"][0]["id"], production.id)
+
         production_site = application["production_site"]
         self.assertEqual(production_site["id"], self.production_site.id)
         self.assertEqual(production_site["inputs"], [])
@@ -203,7 +207,7 @@ class AdminDoubleCountTest(TestCase):
             [productions[3].id, 1],
         ]
         response = self.client.post(
-            reverse("admin-double-counting-application-update-quotas"),
+            reverse("admin-double-counting-application-update-approved-quotas"),
             {"entity_id": self.admin.id, "approved_quotas": json.dumps(updated_quotas), "dca_id": application.id},
         )
         self.assertEqual(response.status_code, 200)

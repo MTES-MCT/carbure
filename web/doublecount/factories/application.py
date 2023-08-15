@@ -18,7 +18,7 @@ class DoubleCountingApplicationFactory(factory.django.DjangoModelFactory):
     # producer_user = factory.Iterator(Entity.objects.filter(entity_type=Entity.PRODUCER))
 
     period_start = date(datetime.today().year, 12, 31)
-    period_end = date(datetime.today().year + 1, 12, 31)
+    period_end = date(period_start.year + 1, 12, 31)
 
     agreement_id = factory.Faker("lexify", text="????????????")
 
