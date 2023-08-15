@@ -163,10 +163,11 @@ export const ProductionSiteDialog = ({
 
 
   const form = <>
-    <header>
-      <h1>{title}</h1>
-    </header>
-
+    {!dispolayFormOnly &&
+      <header>
+        <h1>{title}</h1>
+      </header>
+    }
     <main>
       {description && (
         <section>
