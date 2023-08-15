@@ -4,6 +4,7 @@ import {
   Entity,
   Feedstock,
   ProductionSite,
+  ProductionSiteDetails,
 } from "carbure/types"
 
 export enum Admin {
@@ -31,7 +32,7 @@ export interface DoubleCountingApplicationOverview {
   id: number
   agreement_id: string
   producer: Entity
-  production_site: string
+  production_site: ProductionSiteDetails
   period_start: string
   period_end: string
   status: DoubleCountingStatus

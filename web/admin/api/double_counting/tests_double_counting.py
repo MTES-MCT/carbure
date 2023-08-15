@@ -16,6 +16,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 
 from doublecount.models import DoubleCountingApplication, DoubleCountingDocFile, DoubleCountingProduction
 from producers.models import ProductionSite
+from resources.factories import production_site
 
 
 class Endpoint:
@@ -139,6 +140,24 @@ class AdminDoubleCountTest(TestCase):
         application = pending[0]
 
         self.assertEqual(application["producer"]["id"], self.production_site.producer.id)
+
+    def test_application_details(self):
+        response = self.add_file("dc_agreement_application_valid.xlsx")
+        self.assertEqual(response.status_code, 200)
+
+        saved_application = DoubleCountingApplication.objects.get(
+            producer=self.production_site.producer, period_start__year=self.requested_start_year
+        )
+        response = self.client.get(
+            reverse("admin-double-counting-application-details"),
+            {"entity_id": self.admin.id, "dca_id": saved_application.id},
+        )
+
+        application = response.json()["data"]
+        production_site = application["production_site"]
+        self.assertEqual(production_site["id"], self.production_site.id)
+        self.assertEqual(production_site["inputs"], [])
+        self.assertEqual(production_site["certificates"], [])
 
     def test_dc_number_generation(self):
         self.add_file("dc_agreement_application_valid.xlsx")

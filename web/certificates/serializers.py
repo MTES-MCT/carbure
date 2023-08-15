@@ -1,10 +1,6 @@
-from email.mime import application
-from math import e
 from rest_framework import serializers
 from doublecount.serializers import (
-    DoubleCountingApplicationFullSerializer,
-    DoubleCountingApplicationFullSerializerWithForeignKeys,
-    EntitySerializer,
+    DoubleCountingApplicationSerializer,
 )
 
 from .models import (
@@ -36,7 +32,7 @@ class DoubleCountingRegistrationSerializer(serializers.ModelSerializer):
 
 
 class DoubleCountingRegistrationDetailsSerializer(serializers.ModelSerializer):
-    application = DoubleCountingApplicationFullSerializerWithForeignKeys()
+    application = DoubleCountingApplicationSerializer()
     production_site = serializers.SerializerMethodField()
     producer = serializers.SerializerMethodField()
 

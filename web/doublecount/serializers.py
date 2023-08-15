@@ -1,11 +1,11 @@
-from os import read
 from django.db.models.aggregates import Count, Sum
-from django.db.models.fields import related_descriptors
-from numpy.lib.twodim_base import triu_indices_from
 from rest_framework import serializers
-from rest_framework.fields import SerializerMethodField
+from certificates.models import ProductionSiteCertificate
+
+from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
+
 from .models import DoubleCountingApplication, DoubleCountingProduction, DoubleCountingSourcing, DoubleCountingDocFile
-from core.models import Entity, MatierePremiere, Biocarburant, Pays
+from core.models import Entity, GenericCertificate, MatierePremiere, Biocarburant, Pays
 
 
 class EntitySerializer(serializers.ModelSerializer):
@@ -43,10 +43,74 @@ class BiofuelSerializer(serializers.ModelSerializer):
         fields = ["name", "name_en", "code"]
 
 
+class ProductionSiteCertificateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GenericCertificate
+        fields = [
+            "certificate_id",
+            "certificate_type",
+            "certificate_holder",
+            "certificate_issuer",
+            "address",
+            "valid_from",
+            "valid_until",
+            "download_link",
+            "scope",
+            "input",
+            "output",
+        ]
+
+
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Pays
         fields = ["name", "name_en", "code_pays"]
+
+
+class DoubleCountingProductionSiteSerializer(serializers.ModelSerializer):
+    country = CountrySerializer(read_only=True)
+    inputs = serializers.SerializerMethodField()
+    outputs = serializers.SerializerMethodField()
+    certificates = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProductionSite
+        fields = [
+            "id",
+            "producer",
+            "name",
+            "country",
+            "date_mise_en_service",
+            "ges_option",
+            "eligible_dc",
+            "dc_reference",
+            "site_id",
+            "address",
+            "city",
+            "postal_code",
+            "gps_coordinates",
+            "manager_name",
+            "manager_phone",
+            "manager_email",
+            "inputs",
+            "outputs",
+            "certificates",
+        ]
+
+    def get_certificates(self, obj):
+        ps_certificates = ProductionSiteCertificate.objects.filter(production_site=obj)
+        certificates = [ps_certificate.certificate.certificate for ps_certificate in ps_certificates]
+        return ProductionSiteCertificateSerializer(certificates, many=True).data
+
+    def get_inputs(self, obj):
+        inputs = ProductionSiteInput.objects.filter(production_site=obj)
+        feedstocks = [input.matiere_premiere for input in inputs]
+        return FeedStockSerializer(feedstocks, many=True).data
+
+    def get_outputs(self, obj):
+        inputs = ProductionSiteOutput.objects.filter(production_site=obj)
+        biofuels = [input.biocarburant for input in inputs]
+        return BiofuelSerializer(biofuels, many=True).data
 
 
 class DoubleCountingProductionSerializer(serializers.ModelSerializer):
@@ -116,8 +180,8 @@ class DoubleCountingDocFileSerializer(serializers.ModelSerializer):
         fields = ["id", "file_name", "file_type"]
 
 
-class DoubleCountingApplicationFullSerializerWithForeignKeys(serializers.ModelSerializer):
-    production_site = serializers.SlugRelatedField(read_only=True, slug_field="name")
+class DoubleCountingApplicationSerializer(serializers.ModelSerializer):
+    production_site = DoubleCountingProductionSiteSerializer(read_only=True)
     producer_user = serializers.SlugRelatedField(read_only=True, slug_field="email")
     sourcing = DoubleCountingSourcingSerializer(many=True, read_only=True)
     production = DoubleCountingProductionSerializer(many=True, read_only=True)
