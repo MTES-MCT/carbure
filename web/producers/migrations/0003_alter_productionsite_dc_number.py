@@ -12,6 +12,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="productionsite",
             name="dc_number",
-            field=models.CharField(blank=True, default="", max_length=5, null=True),
+            field=models.CharField(blank=True, default="", max_length=64, null=True),
         ),
     ]
