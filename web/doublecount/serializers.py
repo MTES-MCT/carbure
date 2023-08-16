@@ -1,11 +1,11 @@
-from os import read
 from django.db.models.aggregates import Count, Sum
-from django.db.models.fields import related_descriptors
-from numpy.lib.twodim_base import triu_indices_from
 from rest_framework import serializers
-from rest_framework.fields import SerializerMethodField
-from .models import DoubleCountingAgreement, DoubleCountingProduction, DoubleCountingSourcing, DoubleCountingDocFile
-from core.models import Entity, MatierePremiere, Biocarburant, Pays
+from certificates.models import ProductionSiteCertificate
+
+from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
+
+from .models import DoubleCountingApplication, DoubleCountingProduction, DoubleCountingSourcing, DoubleCountingDocFile
+from core.models import Entity, GenericCertificate, MatierePremiere, Biocarburant, Pays
 
 
 class EntitySerializer(serializers.ModelSerializer):
@@ -43,10 +43,74 @@ class BiofuelSerializer(serializers.ModelSerializer):
         fields = ["name", "name_en", "code"]
 
 
+class ProductionSiteCertificateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GenericCertificate
+        fields = [
+            "certificate_id",
+            "certificate_type",
+            "certificate_holder",
+            "certificate_issuer",
+            "address",
+            "valid_from",
+            "valid_until",
+            "download_link",
+            "scope",
+            "input",
+            "output",
+        ]
+
+
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Pays
-        fields = ["name", "name_en", "code_pays"]
+        fields = ["name", "name_en", "code_pays", "is_in_europe"]
+
+
+class DoubleCountingProductionSiteSerializer(serializers.ModelSerializer):
+    country = CountrySerializer(read_only=True)
+    inputs = serializers.SerializerMethodField()
+    outputs = serializers.SerializerMethodField()
+    certificates = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProductionSite
+        fields = [
+            "id",
+            "producer",
+            "name",
+            "country",
+            "date_mise_en_service",
+            "ges_option",
+            "eligible_dc",
+            "dc_reference",
+            "site_id",
+            "address",
+            "city",
+            "postal_code",
+            "gps_coordinates",
+            "manager_name",
+            "manager_phone",
+            "manager_email",
+            "inputs",
+            "outputs",
+            "certificates",
+        ]
+
+    def get_certificates(self, obj):
+        ps_certificates = ProductionSiteCertificate.objects.filter(production_site=obj)
+        certificates = [ps_certificate.certificate.certificate for ps_certificate in ps_certificates]
+        return ProductionSiteCertificateSerializer(certificates, many=True).data
+
+    def get_inputs(self, obj):
+        inputs = ProductionSiteInput.objects.filter(production_site=obj)
+        feedstocks = [input.matiere_premiere for input in inputs]
+        return FeedStockSerializer(feedstocks, many=True).data
+
+    def get_outputs(self, obj):
+        inputs = ProductionSiteOutput.objects.filter(production_site=obj)
+        biofuels = [input.biocarburant for input in inputs]
+        return BiofuelSerializer(biofuels, many=True).data
 
 
 class DoubleCountingProductionSerializer(serializers.ModelSerializer):
@@ -90,35 +154,23 @@ class DoubleCountingAggregatedSourcingSerializer(serializers.ModelSerializer):
         fields = ["year", "feedstock", "sum"]
 
 
-class DoubleCountingAgreementFullSerializer(serializers.ModelSerializer):
+class DoubleCountingApplicationFullSerializer(serializers.ModelSerializer):
     production_site = serializers.SlugRelatedField(read_only=True, slug_field="name")
     producer_user = serializers.SlugRelatedField(read_only=True, slug_field="email")
-    dgec_validator = serializers.SlugRelatedField(read_only=True, slug_field="name")
-    dgpe_validator = serializers.SlugRelatedField(read_only=True, slug_field="name")
-    dgddi_validator = serializers.SlugRelatedField(read_only=True, slug_field="name")
     producer = EntitySerializer(read_only=True)
 
     class Meta:
-        model = DoubleCountingAgreement
+        model = DoubleCountingApplication
         fields = [
             "id",
             "agreement_id",
-            "creation_date",
+            "created_at",
             "producer",
             "producer_user",
             "production_site",
             "period_start",
             "period_end",
             "status",
-            "dgec_validated",
-            "dgec_validator",
-            "dgec_validated_dt",
-            "dgddi_validated",
-            "dgddi_validator",
-            "dgddi_validated_dt",
-            "dgpe_validated",
-            "dgpe_validator",
-            "dgpe_validated_dt",
         ]
 
 
@@ -128,63 +180,40 @@ class DoubleCountingDocFileSerializer(serializers.ModelSerializer):
         fields = ["id", "file_name", "file_type"]
 
 
-class DoubleCountingAgreementFullSerializerWithForeignKeys(serializers.ModelSerializer):
-    production_site = serializers.SlugRelatedField(read_only=True, slug_field="name")
+class DoubleCountingApplicationSerializer(serializers.ModelSerializer):
+    production_site = DoubleCountingProductionSiteSerializer(read_only=True)
     producer_user = serializers.SlugRelatedField(read_only=True, slug_field="email")
-    dgec_validator = serializers.SlugRelatedField(read_only=True, slug_field="name")
-    dgpe_validator = serializers.SlugRelatedField(read_only=True, slug_field="name")
-    dgddi_validator = serializers.SlugRelatedField(read_only=True, slug_field="name")
     sourcing = DoubleCountingSourcingSerializer(many=True, read_only=True)
-    aggregated_sourcing = serializers.SerializerMethodField()
     production = DoubleCountingProductionSerializer(many=True, read_only=True)
     producer = EntitySerializer(read_only=True)
     documents = DoubleCountingDocFileSerializer(many=True, read_only=True)
 
-    def get_aggregated_sourcing(self, dca):
-        agg = dca.sourcing.all().values("year", "feedstock").annotate(sum=Sum("metric_tonnes"), count=Count("metric_tonnes"))
-        feedstock_ids = set(list([a["feedstock"] for a in agg]))
-        feedstocks = {f.id: f for f in MatierePremiere.objects.filter(id__in=feedstock_ids)}
-        for a in agg:
-            s = FeedStockSerializer(feedstocks[a["feedstock"]])
-            a["feedstock"] = s.data
-        return [a for a in agg]
-
     class Meta:
-        model = DoubleCountingAgreement
+        model = DoubleCountingApplication
         fields = [
             "id",
-            "creation_date",
+            "created_at",
             "producer",
             "producer_user",
             "production_site",
             "period_start",
             "period_end",
             "status",
-            "dgec_validated",
-            "dgec_validator",
-            "dgec_validated_dt",
-            "dgddi_validated",
-            "dgddi_validator",
-            "dgddi_validated_dt",
-            "dgpe_validated",
-            "dgpe_validator",
-            "dgpe_validated_dt",
             "sourcing",
-            "aggregated_sourcing",
             "production",
             "documents",
         ]
 
 
-class DoubleCountingAgreementPartialSerializer(serializers.ModelSerializer):
+class DoubleCountingApplicationPartialSerializer(serializers.ModelSerializer):
     production_site = serializers.SlugRelatedField(read_only=True, slug_field="name")
 
     class Meta:
-        model = DoubleCountingAgreement
-        fields = ["id", "creation_date", "producer", "production_site", "period_start", "period_end", "status"]
+        model = DoubleCountingApplication
+        fields = ["id", "created_at", "producer", "production_site", "period_start", "period_end", "status"]
 
 
-class DoubleCountingAgreementPartialSerializerWithForeignKeys(serializers.ModelSerializer):
+class DoubleCountingApplicationPartialSerializerWithForeignKeys(serializers.ModelSerializer):
     production_site = serializers.SlugRelatedField(read_only=True, slug_field="name")
     producer = EntitySerializer(read_only=True)
     production = DoubleCountingProductionSerializer(many=True, read_only=True)
@@ -202,10 +231,10 @@ class DoubleCountingAgreementPartialSerializerWithForeignKeys(serializers.ModelS
         return [a for a in agg]
 
     class Meta:
-        model = DoubleCountingAgreement
+        model = DoubleCountingApplication
         fields = [
             "id",
-            "creation_date",
+            "created_at",
             "producer",
             "production_site",
             "period_start",

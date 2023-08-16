@@ -1,20 +1,20 @@
 import api, { Api } from "common/services/api"
 import {
-  DoubleCounting,
-  DoubleCountingDetails,
+  DoubleCountingApplicationOverview,
+  DoubleCountingApplicationDetails,
   DoubleCountingFileInfo,
   DoubleCountingUploadErrors,
   QuotaDetails
 } from "double-counting/types"
 
-export function getDoubleCountingAgreements(entity_id: number) {
-  return api.get<Api<DoubleCounting[]>>("/v3/doublecount/agreements", {
+export function getDoubleCountingApplications(entity_id: number) {
+  return api.get<Api<DoubleCountingApplicationOverview[]>>("/v3/doublecount/applications", {
     params: { entity_id },
   })
 }
 
-export function getDoubleCountingDetails(entity_id: number, dca_id: number) {
-  return api.get<Api<DoubleCountingDetails>>("/v3/doublecount/agreement", {
+export function getDoubleCountingApplicationDetails(entity_id: number, dca_id: number) {
+  return api.get<Api<DoubleCountingApplicationDetails>>("/v3/doublecount/application", {
     params: { entity_id, dca_id },
   })
 }
@@ -65,7 +65,7 @@ export function addDoubleCountingSourcing(
   supply_country_code: string,
   transit_country_code: string
 ) {
-  return api.post("/v3/doublecount/agreement/add-sourcing", {
+  return api.post("/v3/doublecount/application/add-sourcing", {
     entity_id,
     dca_id,
     year,
@@ -82,7 +82,7 @@ export function updateDoubleCountingSourcing(
   dca_sourcing_id: number,
   metric_tonnes: number
 ) {
-  return api.post("/v3/doublecount/agreement/update-sourcing", {
+  return api.post("/v3/doublecount/application/update-sourcing", {
     entity_id,
     dca_sourcing_id,
     metric_tonnes,
@@ -93,7 +93,7 @@ export function deleteDoubleCountingSourcing(
   entity_id: number,
   dca_sourcing_id: number
 ) {
-  return api.post("/v3/doublecount/agreement/remove-sourcing", {
+  return api.post("/v3/doublecount/application/remove-sourcing", {
     entity_id,
     dca_sourcing_id,
   })
@@ -109,7 +109,7 @@ export function addDoubleCountingProduction(
   max_production_capacity: number,
   requested_quota: number
 ) {
-  return api.post("/v3/doublecount/agreement/add-production", {
+  return api.post("/v3/doublecount/application/add-production", {
     entity_id,
     dca_id,
     year,
@@ -128,7 +128,7 @@ export function updateDoubleCountingProduction(
   max_production_capacity: number,
   requested_quota: number
 ) {
-  return api.post("/v3/doublecount/agreement/update-production", {
+  return api.post("/v3/doublecount/application/update-production", {
     entity_id,
     dca_production_id,
     estimated_production,
@@ -141,7 +141,7 @@ export function deleteDoubleCountingProduction(
   entity_id: number,
   dca_production_id: number
 ) {
-  return api.post("/v3/doublecount/agreement/remove-production", {
+  return api.post("/v3/doublecount/application/remove-production", {
     entity_id,
     dca_production_id,
   })

@@ -96,7 +96,8 @@ export function useAsyncList<T, V>({
       }
 
       // filter items matching the selection
-      const isSelected: Filter<T, V> = (item) => values.includes(item.value)
+      const keys = values.map(sortedStringify)
+      const isSelected: Filter<T, V> = (item) => keys.includes(sortedStringify(item.value)) // prettier-ignore
       const normItems = normalizeItems(availableItems, normalize, isSelected)
       return denormalizeItems(normItems)
     },
@@ -112,4 +113,19 @@ export function useAsyncList<T, V>({
     label: labelize(asyncSelectedItems.result ?? [], normalize),
     execute: asyncItems.execute,
   }
+}
+
+// make sure that when an object is stringified, its keys are always sorted in alphabetical order
+// this allows easy deep comparison between two objects, even with nested data
+function sortedStringify(jsonLike: any) {
+  return JSON.stringify(jsonLike, (_, value) => {
+    if (value instanceof Array || !(value instanceof Object)) return value
+
+    return Object.keys(value)
+      .sort()
+      .reduce((sorted, key) => {
+        sorted[key] = value[key]
+        return sorted
+      }, {} as Record<string, any>)
+  })
 }

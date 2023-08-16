@@ -7,11 +7,11 @@ import { LoaderOverlay, Panel } from "common/components/scaffold"
 import Table, { Cell } from "common/components/table"
 import { useQuery } from "common/hooks/async"
 import { formatDate, formatDateYear } from "common/utils/formatters"
-import DoubleCountingStatus from "double-counting/components/dc-status"
-import { DoubleCounting } from "double-counting/types"
+import ApplicationStatus from "double-counting/components/application-status"
+import { DoubleCountingApplicationOverview } from "double-counting/types"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api/double-counting"
-import DoubleCountingDialog from "./double-counting-dialog"
+import DoubleCountingApplicationDialog from "./double-counting-dialog"
 import DoubleCountingUploadDialog from "./double-counting-upload"
 import Button from "common/components/button"
 
@@ -21,20 +21,20 @@ const DoubleCountingSettings = () => {
   const entity = useEntity()
   const portal = usePortal()
 
-  const agreements = useQuery(api.getDoubleCountingAgreements, {
-    key: "dc-agreements",
+  const applications = useQuery(api.getDoubleCountingApplications, {
+    key: "dc-applications",
     params: [entity.id],
   })
 
-  const agreementsData = agreements.result?.data.data ?? []
-  const isEmpty = agreementsData.length === 0
+  const applicationsData = applications.result?.data.data ?? []
+  const isEmpty = applicationsData.length === 0
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
 
-  function showAgreementDialog(dc: DoubleCounting) {
+  function showApplicationDialog(dc: DoubleCountingApplicationOverview) {
     portal((resolve) => (
-      <DoubleCountingDialog
+      <DoubleCountingApplicationDialog
         entity={entity}
-        agreementID={dc.id}
+        applicationID={dc.id}
         onClose={resolve}
       />
     ))
@@ -76,12 +76,12 @@ const DoubleCountingSettings = () => {
 
       {!isEmpty && (
         <Table
-          rows={agreementsData}
-          onAction={showAgreementDialog}
+          rows={applicationsData}
+          onAction={showApplicationDialog}
           columns={[
             {
               header: t("Statut"),
-              cell: (dc) => <DoubleCountingStatus status={dc.status} />,
+              cell: (dc) => <ApplicationStatus status={dc.status} />,
             },
             {
               header: t("Site de production"),
@@ -97,13 +97,13 @@ const DoubleCountingSettings = () => {
             },
             {
               header: t("Date de soumission"),
-              cell: (dc) => <Cell text={formatDate(dc.creation_date)} />,
+              cell: (dc) => <Cell text={formatDate(dc.created_at)} />,
             },
           ]}
         />
       )}
 
-      {agreements.loading && <LoaderOverlay />}
+      {applications.loading && <LoaderOverlay />}
     </Panel>
   )
 }

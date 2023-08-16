@@ -1,7 +1,9 @@
+import { AxiosError } from "axios"
 import { findProducers, findProductionSites } from "carbure/api"
 import useEntity from "carbure/hooks/entity"
 import { Entity, ProductionSite } from "carbure/types"
 import * as norm from "carbure/utils/normalizers"
+import Alert from "common/components/alert"
 import Autocomplete from "common/components/autocomplete"
 import { Button, ExternalLink, MailTo } from "common/components/button"
 import { Dialog } from "common/components/dialog"
@@ -9,17 +11,15 @@ import { useForm } from "common/components/form"
 import { AlertTriangle, Plus, Return } from "common/components/icons"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
-import Tabs from "common/components/tabs"
 import Tag from "common/components/tag"
 import { useMutation } from "common/hooks/async"
 import { addDoubleCountingApplication } from "double-counting/api"
-import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
-import { useMatch } from "react-router-dom"
+import { useLocation, useMatch, useNavigate } from "react-router-dom"
 import { DoubleCountingFileInfo } from "../../types"
-import ApplicationInfo from "../application/application-info"
-import { ProductionTable, SourcingFullTable } from "../dc-tables"
-import Alert from "common/components/alert"
+import ApplicationTabs from "../application-tabs"
+import FileApplicationInfo from "./file-application-info"
+import React, { useState } from "react"
 
 export type ValidDetailsDialogProps = {
   file: File
@@ -35,7 +35,6 @@ export const ValidDetailsDialog = ({
   const { t } = useTranslation()
   const portal = usePortal()
   const isProducerMatch = useMatch("/org/:entity/settings*")
-  const [focus, setFocus] = useState("sourcing_forecast")
 
   function showProductionSiteDialog() {
     if (isProducerMatch) {
@@ -51,53 +50,18 @@ export const ValidDetailsDialog = ({
         <Tag big variant="success">
           {t("Valide")}
         </Tag>
-        <h1>{t("Ajout du dossier double comptage")}</h1>
+        <h1>{t("Dossier double comptage")}</h1>
       </header>
 
       <main>
 
-        <ApplicationInfo fileData={fileData} />
+        <FileApplicationInfo fileData={fileData} />
         <section>
           {fileData.has_dechets_industriels &&
             <DechetIndustrielAlert />
           }
         </section>
-        <section>
-          <Tabs
-            variant="switcher"
-            tabs={[
-              {
-                key: "sourcing_forecast",
-                label: t("Approvisionnement"),
-              },
-              {
-                key: "production",
-                label: t("Production"),
-              }
-
-            ]}
-            focus={focus}
-            onFocus={setFocus}
-          />
-
-        </section>
-
-        {focus === "sourcing_forecast" &&
-          <section>
-            <SourcingFullTable
-              sourcing={fileData.sourcing ?? []}
-            />
-          </section>
-        }
-
-
-        {focus === "production" &&
-          <section>
-            <ProductionTable
-              production={fileData.production ?? []}
-            />
-          </section>
-        }
+        <ApplicationTabs sourcing={fileData.sourcing} production={fileData.production} />
       </main>
 
       <footer>
@@ -114,6 +78,7 @@ export const ValidDetailsDialog = ({
     </Dialog>
   )
 }
+
 const defaultProductionForm = {
   productionSite: undefined as ProductionSite | undefined,
   producer: undefined as Entity | undefined,
@@ -134,36 +99,55 @@ export const ProductionSiteAdminDialog = ({
 }: ProductionSiteDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
-
+  const portal = usePortal()
+  const [error, setError] = useState<React.ReactNode | undefined>(undefined)
   const { value, bind } =
     useForm<ProductionForm>(defaultProductionForm)
   const notify = useNotify()
   const notifyError = useNotifyError()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const addApplication = useMutation(addDoubleCountingApplication, {
-    invalidates: [],
+    invalidates: ["dc-applications", "dc-snapshot"],
     onSuccess() {
-      notify(t("Le dossier a été envoyé !"), { variant: "success" })
+      onClose()
+      notify(t("Le dossier a été ajouté !"), { variant: "success" })
+      navigate({
+        pathname: '/org/9/double-counting',
+      })
     },
     onError(err) {
-      console.log('err:', err)
-      notifyError(err, t("Impossible d'ajouter le dossier"))
+      const errorCode = (err as AxiosError<{ error: string }>).response?.data
+        .error
+      if (errorCode === 'APPLICATION_ALREADY_EXISTS') {
+        portal((close) => <ReplaceApplicationDialog onReplace={saveApplication} onClose={close} />)
+      } else if (errorCode === 'PRODUCTION_SITE_ADDRESS_UNDEFINED') {
+        let message = <>
+
+        </>
+        setError(message)
+      }
+      else {
+        notifyError(err, t("Impossible d'ajouter le dossier"))
+      }
     },
   })
 
-  const saveApplication = async () => {
+  const saveApplication = async (shouldReplace = false) => {
     if (!value.productionSite || !value.producer) return
-    await addApplication.execute(
+    setError(undefined)
+
+    addApplication.execute(
       entity.id,
       value.productionSite.id,
       value.producer.id,
-      file
+      file,
+      shouldReplace
     )
-    onClose()
-
   }
-  const producer = value.producer instanceof Object ? value.producer.id : undefined // prettier-ignore
 
+  const producer = value.producer instanceof Object ? value.producer.id : undefined // prettier-ignore
 
   return (
     <Dialog onClose={onClose}>
@@ -172,7 +156,7 @@ export const ProductionSiteAdminDialog = ({
       </header>
 
       <main>
-        <ApplicationInfo fileData={fileData} />
+        <FileApplicationInfo fileData={fileData} />
         <section>
           <Autocomplete
             required
@@ -189,7 +173,17 @@ export const ProductionSiteAdminDialog = ({
             {...bind("productionSite")}
           />
         </section>
+        {error &&
+          <section>
+            <Alert variant="warning" icon={AlertTriangle}>
+              {t("L'adresse, la ville ou le code postal du site de production n'est pas renseignée. Veuillez l'ajouter dans les informations liées à la société.")}
+              <ExternalLink href={`/admin/producers/productionsite/${value.productionSite?.id}/change`}>
+                Editer le site de production
+              </ExternalLink>
+            </Alert>
+          </section>}
       </main>
+
 
       <footer>
         <Button
@@ -209,16 +203,64 @@ export const ProductionSiteAdminDialog = ({
 }
 
 
+export type ReplaceApplicationDialogProps = {
+  onClose: () => void
+  onReplace: (shouldReplace: boolean) => void
+  loading?: boolean
+}
+
+export const ReplaceApplicationDialog = ({
+  onReplace,
+  onClose, }: ReplaceApplicationDialogProps) => {
+  const { t } = useTranslation()
+
+  const replaceApplication = async () => {
+    onReplace(true)
+    onClose()
+  }
+
+
+  return (
+    <Dialog onClose={onClose}>
+      <header>
+        <h1>{t("Remplacer le dossier existant")}</h1>
+      </header>
+
+      <main>
+        <p>
+          {t("Le dossier que vous souhaitez ajouter existe déjà. Voulez-vous le remplacer ?")}
+        </p>
+      </main>
+
+      <footer>
+        <Button
+          icon={Plus}
+          label={t("Remplacer le dossier")}
+          variant="primary"
+          action={replaceApplication}
+        />
+
+        <Button icon={Return} label={t("Annuler")} action={onClose} asideX />
+      </footer>
+
+    </Dialog>
+  )
+}
+
+
 const DechetIndustrielAlert = () => {
   return <Alert variant="warning" icon={AlertTriangle}>
-    <Trans>
-      Spécifité "Déchets industriels" : Une demande concernant des déchets industriels doit être accompagnée du questionnaire de processus de validation pour ces matières premieres{" "}
+    <p>
+      <Trans>
+        Spécifité "Déchets industriels" : Une demande concernant des déchets industriels doit être accompagnée du questionnaire de processus de validation pour ces matières premieres</Trans>
+      {" "}
       {/* <a href="./templates/test.docx" target="_blank" rel="noopener noreferrer">disponible ici</a>. */}
       <ExternalLink href={"https://www.ecologie.gouv.fr/sites/default/files/Processus%20de%20validation%20de%20mati%C3%A8res%20premi%C3%A8res.pdf"}>
-        disponible ici
+        <Trans>disponible ici</Trans>
       </ExternalLink>
-      . Merci de le joindre à votre demande par email.
-    </Trans>
+      .  <Trans>Merci de le joindre à votre demande par email.</Trans>
+
+    </p>
   </Alert>
 }
 

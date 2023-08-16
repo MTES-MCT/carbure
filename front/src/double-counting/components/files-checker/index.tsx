@@ -23,10 +23,14 @@ const DoubleCountingFilesChecker = () => {
   useTitle(t("Vérification de fichiers de double comptage"))
   const portal = usePortal()
 
-  const [tab, setTab] = useState("to-fix")
 
   const checkedFiles: CheckDoubleCountingFilesResponse = location.state?.checkedFiles
 
+  const filesValid = checkedFiles?.files.filter((f) => !f.error_count) || []
+  const filesToFix = checkedFiles?.files.filter((f) => f.error_count > 0) || []
+  const valid = { count: filesValid.length, files: filesValid }
+  const toFix = { count: filesToFix.length, files: filesToFix }
+  const [tab, setTab] = useState(filesToFix.length > 0 ? "to-fix" : "valid")
 
   const files: FileList = location.state?.files
 
@@ -73,10 +77,6 @@ const DoubleCountingFilesChecker = () => {
     },
   ]
 
-  const filesValid = checkedFiles?.files.filter((f) => !f.error_count) || []
-  const filesToFix = checkedFiles?.files.filter((f) => f.error_count > 0) || []
-  const valid = { count: filesValid.length, files: filesValid }
-  const toFix = { count: filesToFix.length, files: filesToFix }
 
   return (
     <Main>
@@ -90,6 +90,7 @@ const DoubleCountingFilesChecker = () => {
             <Tabs
               variant="switcher"
               onFocus={setTab}
+              focus={tab}
               tabs={[
                 {
                   key: "to-fix",

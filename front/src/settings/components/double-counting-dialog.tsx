@@ -9,7 +9,7 @@ import Tabs from "common/components/tabs"
 import { useMutation, useQuery } from "common/hooks/async"
 import { compact } from "common/utils/collection"
 import { formatDate, formatNumber } from "common/utils/formatters"
-import DoubleCountingStatus from "double-counting/components/dc-status"
+import ApplicationStatus from "double-counting/components/application-status"
 import { SourcingAggregationTable } from "double-counting/components/dc-tables"
 import YearTable from "double-counting/components/year-table"
 import {
@@ -24,63 +24,63 @@ import DoubleCountingProductionDialog from "./double-counting-production-dialog"
 import QuotasTable from "./double-counting-quotas-dialog"
 import DoubleCountingSourcingDialog from "./double-counting-sourcing-dialog"
 
-type DoubleCountingDialogProps = {
+type DoubleCountingApplicationDialogProps = {
   entity: Entity
-  agreementID: number
+  applicationID: number
   onClose: () => void
 }
 
-const DoubleCountingDialog = ({
+const DoubleCountingApplicationDialog = ({
   entity,
-  agreementID,
+  applicationID: applicationID,
   onClose,
-}: DoubleCountingDialogProps) => {
+}: DoubleCountingApplicationDialogProps) => {
   const { t } = useTranslation()
   const entityID = entity?.id
   const portal = usePortal()
 
   const [focus, setFocus] = useState("aggregated_sourcing")
 
-  const agreement = useQuery(api.getDoubleCountingDetails, {
-    key: "dc-details",
-    params: [entityID, agreementID],
+  const application = useQuery(api.getDoubleCountingApplicationDetails, {
+    key: "dc-application-details",
+    params: [entityID, applicationID],
   })
 
   const deleteSourcing = useMutation(api.deleteDoubleCountingSourcing, {
-    invalidates: ["dc-details"],
+    invalidates: ["dc-application-details"],
   })
 
   const deleteProduction = useMutation(api.deleteDoubleCountingProduction, {
-    invalidates: ["dc-details"],
+    invalidates: ["dc-application-details"],
   })
 
-  const dcaID = agreement.result?.data.data?.id ?? -1
-  const dcaStatus = agreement.result?.data.data?.status ?? DCStatus.Pending
+  const dcaID = application.result?.data.data?.id ?? -1
+  const dcaStatus = application.result?.data.data?.status ?? DCStatus.Pending
 
   const isAccepted = dcaStatus === DCStatus.Accepted
   const isFinal = dcaStatus !== DCStatus.Pending
 
   const sourcingRows: DoubleCountingSourcing[] =
-    agreement.result?.data.data?.sourcing ?? []
+    application.result?.data.data?.sourcing ?? []
 
-  const agreementData = agreement.result?.data.data
-  const productionRows = agreementData?.production ?? []
+  const applicationData = application.result?.data.data
+  const productionRows = applicationData?.production ?? []
 
-  const productionSite = agreementData?.production_site ?? "N/A"
-  const creationDate = agreementData?.creation_date
-    ? formatDate(agreementData.creation_date)
+  const productionSite = applicationData?.production_site ?? "N/A"
+  const creationDate = applicationData?.created_at
+    ? formatDate(applicationData.created_at)
     : "N/A"
 
-  const documentationFile = agreementData?.documents.find(
+  const documentationFile = applicationData?.documents.find(
     (doc) => doc.file_type === "SOURCING"
   )
-  const decisionFile = agreementData?.documents.find(
+  const decisionFile = applicationData?.documents.find(
     (doc) => doc.file_type === "DECISION"
   )
 
   const excelURL =
-    agreementData &&
-    `/api/v3/doublecount/agreement?dca_id=${dcaID}&entity_id=${entity?.id}&export=true`
+    applicationData &&
+    `/api/v3/doublecount/application?dca_id=${dcaID}&entity_id=${entity?.id}&export=true`
   const documentationURL =
     entity &&
     documentationFile &&
@@ -177,7 +177,7 @@ const DoubleCountingDialog = ({
   return (
     <Dialog fullscreen onClose={onClose}>
       <header>
-        <DoubleCountingStatus big status={dcaStatus} />
+        <ApplicationStatus big status={dcaStatus} />
         <h1>{t("Dossier double comptage")}</h1>
       </header>
 
@@ -216,7 +216,7 @@ const DoubleCountingDialog = ({
 
         {focus === "aggregated_sourcing" && (
           <SourcingAggregationTable
-            sourcing={agreementData?.aggregated_sourcing ?? []}
+            sourcing={applicationData?.aggregated_sourcing ?? []}
           />
         )}
 
@@ -258,13 +258,13 @@ const DoubleCountingDialog = ({
                 {
                   header: t("Transit"),
                   cell: (s) =>
-                    s.transit_country && (
+                    s.transit_country ? (
                       <Cell
                         text={t(s.transit_country.code_pays, {
                           ns: "countries",
                         })}
                       />
-                    ),
+                    ) : "-",
                 },
                 !isFinal &&
                 actionColumn((s) => [
@@ -362,7 +362,7 @@ const DoubleCountingDialog = ({
         )}
 
         {focus === "quotas" && (
-          <QuotasTable entity={entity} agreement={agreementData} />
+          <QuotasTable entity={entity} application={applicationData} />
         )}
       </main>
       <footer>
@@ -388,9 +388,9 @@ const DoubleCountingDialog = ({
         </Button>
       </footer>
 
-      {agreement.loading && <LoaderOverlay />}
+      {application.loading && <LoaderOverlay />}
     </Dialog>
   )
 }
 
-export default DoubleCountingDialog
+export default DoubleCountingApplicationDialog

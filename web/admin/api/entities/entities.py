@@ -4,8 +4,7 @@ from core.models import Entity, ExternalAdminRights
 from django.db.models import Q, Count, Value
 
 
-from doublecount.models import DoubleCountingAgreement
-from core.helpers import filter_lots
+from doublecount.models import DoubleCountingApplication
 
 
 @check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE])
@@ -37,17 +36,13 @@ def get_entities(request):
                 production_sites=Count("productionsite", distinct=True),
                 certificates=Count("entitycertificate", distinct=True),
                 double_counting=Count(
-                    "doublecountingagreement",
-                    filter=Q(
-                        doublecountingagreement__status=DoubleCountingAgreement.ACCEPTED
-                    ),
+                    "doublecountingapplication",
+                    filter=Q(doublecountingapplication__status=DoubleCountingApplication.ACCEPTED),
                     distinct=True,
                 ),
                 double_counting_requests=Count(
-                    "doublecountingagreement",
-                    filter=Q(
-                        doublecountingagreement__status=DoubleCountingAgreement.PENDING
-                    ),
+                    "doublecountingapplication",
+                    filter=Q(doublecountingapplication__status=DoubleCountingApplication.PENDING),
                     distinct=True,
                 ),
             )

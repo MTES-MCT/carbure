@@ -4,13 +4,13 @@ import Tag, { TagVariant } from "common/components/tag"
 
 const statusToVariant: Record<DCStatus, TagVariant> = {
   [DCStatus.Accepted]: "success",
-  [DCStatus.InProgress]: "warning",
+  [DCStatus.InProgress]: "info",
   [DCStatus.Pending]: "info",
   [DCStatus.Rejected]: "danger",
   [DCStatus.Lapsed]: "warning",
 }
 
-const DoubleCountingStatus = ({
+const ApplicationStatus = ({
   big,
   status,
 }: {
@@ -21,7 +21,7 @@ const DoubleCountingStatus = ({
 
   const statusLabels = {
     [DCStatus.Pending]: t("En attente"),
-    [DCStatus.InProgress]: t("En cours"),
+    [DCStatus.InProgress]: t("En attente"),
     [DCStatus.Accepted]: t("Accepté"),
     [DCStatus.Rejected]: t("Refusé"),
     [DCStatus.Lapsed]: t("Expiré"),
@@ -34,4 +34,4 @@ const DoubleCountingStatus = ({
   )
 }
 
-export default DoubleCountingStatus
+export default ApplicationStatus

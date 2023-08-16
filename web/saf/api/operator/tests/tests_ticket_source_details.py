@@ -20,9 +20,7 @@ class SafTicketSourceDetailsTest(TestCase):
     def setUp(self):
         self.entity = Entity.objects.filter(entity_type=Entity.OPERATOR)[0]
         self.ticket_client = Entity.objects.filter(entity_type=Entity.OPERATOR)[1]
-        self.user = setup_current_user(
-            self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")]
-        )
+        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")])
 
         SafTicketSource.objects.all().delete()
         SafTicket.objects.all().delete()
@@ -35,9 +33,7 @@ class SafTicketSourceDetailsTest(TestCase):
             delivery_period=202201,
             total_volume=30000,
             assigned_volume=0,
-            feedstock=MatierePremiere.objects.get(
-                code="HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"
-            ),
+            feedstock=MatierePremiere.objects.get(code="HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"),
             biofuel=Biocarburant.objects.get(code="HCC"),
             country_of_origin=Pays.objects.get(name="Espagne"),
             carbure_producer=None,
@@ -73,9 +69,7 @@ class SafTicketSourceDetailsTest(TestCase):
             assignment_period=202201,
             status=SafTicket.PENDING,
             volume=30000,
-            feedstock=MatierePremiere.objects.get(
-                code="HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"
-            ),
+            feedstock=MatierePremiere.objects.get(code="HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"),
             biofuel=Biocarburant.objects.get(code="HCC"),
             country_of_origin=Pays.objects.get(name="Espagne"),
             supplier=self.entity,
@@ -141,6 +135,7 @@ class SafTicketSourceDetailsTest(TestCase):
                 "name": "Espagne",
                 "name_en": "Spain",
                 "code_pays": "ES",
+                "is_in_europe": True,
             },
             "eccr": 1.0,
             "eccs": 1.0,

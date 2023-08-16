@@ -29,6 +29,7 @@ class ProductionSite(models.Model):
 
     def natural_key(self):
         return {
+            "address": self.address,
             "name": self.name,
             "country": self.country.natural_key(),
             "id": self.id,

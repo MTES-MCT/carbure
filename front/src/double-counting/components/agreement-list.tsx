@@ -1,189 +1,145 @@
-import { Fragment, useState } from "react"
-import { useTranslation, Trans } from "react-i18next"
-import { DoubleCounting } from "../types"
-import { ActionBar, LoaderOverlay } from "common/components/scaffold"
+import useEntity from "carbure/hooks/entity"
+import { Button } from "common/components/button"
+import HashRoute from "common/components/hash-route"
+import { Download } from "common/components/icons"
+import NoResult from "common/components/no-result"
+import { ActionBar } from "common/components/scaffold"
+import Table, { Cell, Column, Order } from "common/components/table"
 import Tabs from "common/components/tabs"
-import Table, { Column, Cell } from "common/components/table"
-import { Alert } from "common/components/alert"
-import { AlertCircle, Upload } from "common/components/icons"
-import { DoubleCountingDialog } from "./agreement-details"
-import { usePortal } from "common/components/portal"
-import { Entity } from "carbure/types"
-import DoubleCountingStatus from "./dc-status"
-import * as api from "../api"
 import { useQuery } from "common/hooks/async"
-import { formatDate, formatDateYear } from "common/utils/formatters"
-import Button from "common/components/button"
-import DoubleCountingFilesCheckerDialog from "./files-checker/files-checker-dialog"
-import FilesCheckerUploadButton from "./files-checker/upload-button"
+import { formatDateYear } from "common/utils/formatters"
+import { useState } from "react"
+import { useTranslation } from "react-i18next"
+import { useLocation, useNavigate } from "react-router-dom"
+import * as api from "../api"
+import { DoubleCountingAgreementOverview, DoubleCountingAgreementsSnapshot } from "../types"
+import { AgreementDetailsDialog } from "./agreement-details-dialog"
+import AgreementStatusTag from "./agreement-status"
+import { set } from "date-fns"
 
-type AgreementListProps = {
-  entity: Entity
-  year: number
-}
 
-const AgreementList = ({ entity, year }: AgreementListProps) => {
+const AgreementList = ({ snapshot = defaultCount }: { snapshot: DoubleCountingAgreementsSnapshot | undefined }) => {
   const { t } = useTranslation()
-  const [tab, setTab] = useState("pending")
-  const portal = usePortal()
+  const [tab, setTab] = useState("active")
+  const entity = useEntity()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [order, setOrder] = useState<Order | undefined>(undefined)
 
-  const agreements = useQuery(api.getAllDoubleCountingAgreements, {
+  const agreementsResponse = useQuery(api.getDoubleCountingAgreementList, {
     key: "dc-agreements",
-    params: [year],
+    params: [entity.id, order?.column, order?.direction],
   })
 
-  const columns: Column<DoubleCounting>[] = [
+
+  const columns: Column<DoubleCountingAgreementOverview>[] = [
     {
       header: t("Statut"),
-      cell: (a) => <DoubleCountingStatus status={a.status} />,
-    },
-    { header: t("Producteur"), cell: (a) => <Cell text={a.producer.name} /> },
-    { header: t("N° d'agrément"), cell: (a) => <Cell text={a.agreement_id} /> },
-    {
-      header: t("Site de production"),
-      cell: (a) => <Cell text={a.production_site} />,
+      cell: (a) => <AgreementStatusTag status={a.status} />,
     },
     {
-      header: t("Période de validité"),
+      header: t("N° d'agrément"),
       cell: (a) => (
-        <Cell
-          text={`${formatDateYear(a.period_start)} - ${formatDateYear(a.period_end)}`} // prettier-ignore
-        />
+        <span>
+          {a.certificate_id}
+        </span>
       ),
     },
+    { header: t("Producteur"), key: "production_site", cell: (a) => <Cell text={a.producer} /> },
     {
-      header: t("Date de soumission"),
-      cell: (a) => formatDate(a.creation_date),
+      header: t("Site de production"),
+      cell: (a) => <Cell text={a.production_site || "-"} />,
     },
+    {
+      header: t("Validité"),
+      key: "valid_until",
+      cell: (a) => <Cell text={`${formatDateYear(a.valid_from)}-${formatDateYear(a.valid_until)}`} />,
+    },
+
   ]
 
-  const agreementsData = agreements.result?.data.data
-  if (agreementsData === undefined) return <LoaderOverlay />
-
-  const { pending, progress, accepted, expired, rejected } = agreementsData
-
-  const allPendingCount = pending.count + progress.count
-  const allPending = progress.agreements.concat(pending.agreements)
-
-  function showAgreementDialog(agreement: DoubleCounting) {
-    portal((close) => (
-      <DoubleCountingDialog
-        entity={entity}
-        agreementID={agreement.id}
-        onClose={close}
-      />
-    ))
+  function showApplicationDialog(agreement: DoubleCountingAgreementOverview) {
+    navigate({
+      pathname: location.pathname,
+      hash: `agreement/${agreement.id}`,
+    })
   }
 
+  const agreements = agreementsResponse.result?.data.data
+
   return (
-    <section>
-      <ActionBar>
-        <Tabs
-          focus={tab}
-          onFocus={setTab}
-          tabs={[
-            { key: "pending", label: t("En attente") },
-            { key: "accepted", label: t("Accepté") },
-            { key: "expired", label: t("Expiré") },
-            { key: "rejected", label: t("Refusé") },
-          ]}
-        />
+    <>
+      <section>
+        <ActionBar>
+          <Tabs
+            focus={tab}
+            variant="switcher"
+            onFocus={setTab}
+            tabs={[
+              { key: "active", label: t("Actifs ({{count}})", { count: snapshot?.agreements_active }) },
+              {
+                key: "expired", label: t("Expirés ({{ count }})",
+                  { count: snapshot?.agreements_expired }
+                )
+              },
+              {
+                key: "incoming", label: t("À venir ({{ count }})",
+                  { count: snapshot?.agreements_incoming }
+                )
+              },
+            ]}
+          />
+          {tab === "active" && agreements && agreements.active.length > 0 &&
 
-        <FilesCheckerUploadButton />
-      </ActionBar>
-      {tab === "pending" && (
-        <Fragment>
-          {allPendingCount === 0 && (
-            <Alert
-              variant="warning"
-              icon={AlertCircle}
-              loading={agreements.loading}
-            >
-              <Trans>Aucun dossier en attente trouvé</Trans>
-            </Alert>
-          )}
+            <ExportAgreementsButton />
+          }
+        </ActionBar>
 
-          {allPendingCount > 0 && (
-            <Table
-              loading={agreements.loading}
-              columns={columns}
-              rows={allPending}
-              onAction={showAgreementDialog}
-            />
-          )}
-        </Fragment>
-      )}
 
-      {tab === "accepted" && (
-        <Fragment>
-          {accepted.count === 0 && (
-            <Alert
-              variant="warning"
-              icon={AlertCircle}
-              loading={agreements.loading}
-            >
-              <Trans>Aucun dossier accepté trouvé</Trans>
-            </Alert>
-          )}
+        {!agreements || (tab === "active" && agreements["active"].length === 0) || (tab === "expired" && agreements.expired.length === 0) || (tab === "incoming" && agreements.incoming.length === 0) ?
+          <NoResult label={t("Aucun agrément trouvé")} loading={agreementsResponse.loading} />
+          : <Table
+            loading={agreementsResponse.loading}
+            columns={columns}
+            rows={tab === "active" ? agreements.active : tab === "expired" ? agreements.expired : agreements.incoming}
+            onAction={showApplicationDialog}
+            order={order}
+            onOrder={setOrder}
+          />
+        }
 
-          {accepted.count > 0 && (
-            <Table
-              loading={agreements.loading}
-              columns={columns}
-              rows={accepted.agreements}
-              onAction={showAgreementDialog}
-            />
-          )}
-        </Fragment>
-      )}
 
-      {tab === "expired" && (
-        <Fragment>
-          {expired.count === 0 && (
-            <Alert
-              variant="warning"
-              icon={AlertCircle}
-              loading={agreements.loading}
-            >
-              <Trans>Aucun dossier expiré trouvé</Trans>
-            </Alert>
-          )}
-
-          {expired.count > 0 && (
-            <Table
-              loading={agreements.loading}
-              columns={columns}
-              rows={expired.agreements}
-              onAction={showAgreementDialog}
-            />
-          )}
-        </Fragment>
-      )}
-
-      {tab === "rejected" && (
-        <Fragment>
-          {rejected.count === 0 && (
-            <Alert
-              variant="warning"
-              icon={AlertCircle}
-              loading={agreements.loading}
-            >
-              <Trans>Aucun dossier refusé trouvé</Trans>
-            </Alert>
-          )}
-
-          {rejected.count > 0 && (
-            <Table
-              loading={agreements.loading}
-              columns={columns}
-              rows={rejected.agreements}
-              onAction={showAgreementDialog}
-            />
-          )}
-        </Fragment>
-      )}
-    </section>
+      </section>
+      <HashRoute
+        path="agreement/:id"
+        element={<AgreementDetailsDialog />}
+      />
+    </>
   )
 }
 
 export default AgreementList
+
+const defaultCount = {
+  agreements_active: 0,
+  agreements_expired: 0,
+  agreements_incoming: 0
+}
+
+
+
+
+
+export const ExportAgreementsButton = () => {
+  const { t } = useTranslation()
+  const entity = useEntity()
+  return (
+    <Button
+      asideX={true}
+      icon={Download}
+      label={t("Exporter les agréments")}
+      action={() => api.downloadDoubleCountingAgreementList(entity.id)
+      }
+    />
+  )
+}
