@@ -2,20 +2,20 @@ import { Entity } from "carbure/types"
 import Table, { Cell, Column } from "common/components/table"
 import { useQuery } from "common/hooks/async"
 import { formatNumber } from "common/utils/formatters"
-import { DoubleCounting, QuotaDetails } from "double-counting/types"
+import { DoubleCountingApplicationOverview, QuotaDetails } from "double-counting/types"
 import { useTranslation } from "react-i18next"
 import * as api from "../api/double-counting"
 
 type QuotasTableProps = {
   entity: Entity
-  agreement: DoubleCounting | undefined
+  application: DoubleCountingApplicationOverview | undefined
 }
 
-const QuotasTable = ({ entity, agreement }: QuotasTableProps) => {
+const QuotasTable = ({ entity, application: application }: QuotasTableProps) => {
   const { t } = useTranslation()
 
   const entityID = entity?.id ?? -1
-  const dcaID = agreement?.id ?? -1
+  const dcaID = application?.id ?? -1
 
   const details = useQuery(api.getQuotaDetails, {
     key: "quota-details",

@@ -22,6 +22,7 @@ import { formatPeriod } from "common/utils/formatters"
 import i18next from "i18next"
 import { Link } from "react-router-dom"
 import { normalizePeriod } from "carbure/utils/normalizers"
+import NoResult from "common/components/no-result"
 
 const date = new Date()
 const currentPeriod = `${date.getFullYear() * 100 + date.getMonth() + 1}`
@@ -136,12 +137,7 @@ const DeclarationTable = ({
     return (
       <>
         <section>
-          <Alert
-            loading={loading}
-            icon={AlertCircle}
-            variant="warning"
-            label={t("Aucune déclaration trouvée pour cette période.")}
-          />
+          <NoResult label={t("Aucune déclaration pour cette période")} loading={loading} />
         </section>
         <footer />
       </>
@@ -227,8 +223,8 @@ function getDeclarationDashboardColumns(period: string) {
               lotCount === 0
                 ? undefined
                 : declaration?.declared
-                ? "var(--blue-dark)"
-                : "var(--orange-medium)",
+                  ? "var(--blue-dark)"
+                  : "var(--orange-medium)",
           }}
         />
       )

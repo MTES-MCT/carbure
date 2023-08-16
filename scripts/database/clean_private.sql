@@ -9,7 +9,7 @@ TRUNCATE TABLE carbure_stock_events;
 TRUNCATE TABLE carbure_stock_transformations;
 TRUNCATE TABLE carbure_notifications;
 TRUNCATE TABLE declarations;
-TRUNCATE TABLE double_counting_agreements;
+TRUNCATE TABLE double_counting_applications;
 TRUNCATE TABLE double_counting_doc_files;
 TRUNCATE TABLE double_counting_production;
 TRUNCATE TABLE double_counting_sourcing;

@@ -18,7 +18,7 @@ from core.models import TransactionDistance
 from core.ign_distance import get_distance
 
 from certificates.models import DoubleCountingRegistration
-from certificates.models import DoubleCountingRegistration
+
 
 july1st2021 = datetime.date(year=2021, month=7, day=1)
 

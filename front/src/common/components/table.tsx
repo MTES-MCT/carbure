@@ -66,8 +66,8 @@ export function Table<T>({
                 column.small && css.small
               )}
             >
-              {order && column.key === order.column && (
-                <span>{order.direction === "asc" ? " ▼" : " ▲"}</span>
+              {column.key && (
+                <span className={cl(column.key != order?.column && css.sortable)} >{column.key != order?.column || order?.direction === "asc" ? " ▲" : " ▼"}</span>
               )}{" "}
               {column.header}
             </div>

@@ -74,7 +74,7 @@ const DoubleCountingFilesCheckerDialog = ({
   return (
     <Dialog onClose={onClose}>
       <header>
-        <h1>{t("Validation de dossiers de double comptage")}</h1>
+        <h1>{t("Vérification de dossiers")}</h1>
       </header>
 
       <main>
@@ -82,7 +82,7 @@ const DoubleCountingFilesCheckerDialog = ({
           <Form id="dc-checker">
             <p>
               {t(
-                "Cet outil vous permet de faire remonter les erreurs de fichiers reçus. "
+                "Cet outil vous permet de faire remonter les erreurs de fichiers double comptage reçus. "
               )}
             </p>
 
@@ -103,7 +103,7 @@ const DoubleCountingFilesCheckerDialog = ({
           variant="primary"
           icon={Check}
           action={submitFiles}
-          label={t("Vérifier les fichiers")}
+          label={t("Vérifier les dossiers")}
         />
         <Button icon={Return} action={onClose} label={t("Annuler")} />
       </footer>

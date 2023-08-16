@@ -1,16 +1,17 @@
-import { useState } from "react"
-import { Route, Routes, Navigate, useLocation } from "react-router-dom"
-import { useTranslation } from "react-i18next"
 import useEntity from "carbure/hooks/entity"
-import { useQuery } from "common/hooks/async"
-import { Main } from "common/components/scaffold"
-import Select from "common/components/select"
-import AgreementList from "./components/agreement-list"
-import QuotasList from "./components/dc-quotas"
-import * as api from "./api"
-import useTitle from "common/hooks/title"
+import { Loader } from "common/components/icons"
+import { Col, Main, Row } from "common/components/scaffold"
 import Tabs from "common/components/tabs"
+import { useQuery } from "common/hooks/async"
+import useTitle from "common/hooks/title"
+import { useTranslation } from "react-i18next"
+import { Navigate, Route, Routes, useLocation } from "react-router-dom"
+import * as api from "./api"
+import AgreementList from "./components/agreement-list"
+import ApplicationList from "./components/application-list"
 import DoubleCountingFilesChecker from "./components/files-checker"
+import { DoubleCountingAgreementsSnapshot, DoubleCountingApplicationSnapshot } from "./types"
+
 
 const DoubleCounting = () => {
   const { t } = useTranslation()
@@ -19,61 +20,74 @@ const DoubleCounting = () => {
   const entity = useEntity()
   const location = useLocation()
 
-  const currentYear = new Date().getFullYear()
-  const [year, setYear] = useState(currentYear)
-
-  const snapshot = useQuery(api.getDoubleCountingSnapshot, {
+  const snapshotResponse = useQuery(api.getSnapshot, {
     key: "dc-snapshot",
-    params: [],
-    onSuccess: (snapshot) => {
-      const years = snapshot.data.data?.years ?? []
-      if (!years.includes(year)) setYear(years[0] ?? currentYear)
-    },
+    params: [entity.id],
   })
+  const snapshot = snapshotResponse.result?.data.data
 
-  const snapshotData = snapshot.result?.data.data
 
   return (
     <Main>
       {!location.pathname.includes("/files-checker") && (
         <header>
-          <section>
-            <h1>{t("Double comptage")}</h1>
-
-            <Select
-              variant="inline"
-              value={year}
-              onChange={(v) => setYear(v as number)}
-              defaultOptions={[{ label: `${currentYear}`, value: currentYear }]}
-              options={snapshotData?.years.map((year) => ({
-                label: `${year}`,
-                value: year,
-              }))}
-            />
-          </section>
 
           <section>
             <Tabs
               variant="main"
               tabs={[
-                { key: "agreements", path: "agreements", label: t("Dossiers") },
-                { key: "quotas", path: "quotas", label: t("Agréments") },
-              ]}
+                {
+                  key: "applications", path: "applications", label:
+                    <Row>
+                      <Col>
+                        <p>
+                          {snapshotResponse.loading ? (
+                            <Loader size={20} />
+                          ) : snapshot?.applications_pending
+                          }
+                        </p>
+                        <strong>
+                          {t("Dossiers en attente", {
+                            count: snapshot?.applications_pending,
+                          })}
+                        </strong>
+                      </Col>
+                    </Row>
+                },
+                {
+                  key: "agreements", path: "agreements", label:
+                    <Row><Col>
+                      <p>
+                        {snapshotResponse.loading ? (
+                          <Loader size={20} />
+                        ) : snapshot?.agreements_active
+                        }
+                      </p>
+                      <strong>
+                        {t("Agréments actifs", {
+                          count: snapshot?.agreements_active,
+                        })}
+                      </strong>
+                    </Col>
+                    </Row>
+                }]}
             />
           </section>
         </header>
       )}
       <Routes>
         <Route
-          path="agreements"
-          element={<AgreementList entity={entity} year={year} />}
+          path="applications"
+          element={<ApplicationList snapshot={snapshot as DoubleCountingApplicationSnapshot} />}
         />
-        <Route path="quotas" element={<QuotasList year={year} />} />
+
+        <Route path="agreements" element={<AgreementList snapshot={snapshot as DoubleCountingAgreementsSnapshot} />} />
         <Route
           path="files-checker/*"
           element={<DoubleCountingFilesChecker />}
         />
-        <Route path="*" element={<Navigate to="agreements" />} />
+        <Route path="*" element={<Navigate to="applications" />} />
+
       </Routes>
     </Main>
   )

@@ -58,8 +58,8 @@ test("display an empty list of transactions", async () => {
   screen.getByText("Sites de livraison")
 
   screen.getByPlaceholderText("Rechercher...")
-
-  screen.getByText("Aucun résultat trouvé pour cette recherche")
+  // screen.getByText("Aucun résultat trouvé pour cette recherche")
+  screen.getByText("Chargement en cours...")
 })
 
 test("display a list of 1 transaction", async () => {

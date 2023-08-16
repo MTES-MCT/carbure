@@ -12,8 +12,8 @@ import {
   SafTicketsResponse,
   SafTicketStatus,
 } from "saf/types"
-import NoResult from "../no-result"
 import TicketTag from "./tag"
+import NoResult from "common/components/no-result"
 
 export interface TicketsTableProps {
   loading: boolean
