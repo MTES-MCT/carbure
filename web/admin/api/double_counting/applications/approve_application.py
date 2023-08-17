@@ -49,7 +49,7 @@ def approve_dca(request, *args, **kwargs):
         + application.production_site.country.name
     )
     try:
-        agrement, _ = DoubleCountingRegistration.objects.update_or_create(
+        DoubleCountingRegistration.objects.update_or_create(
             certificate_id=application.agreement_id,
             certificate_holder=application.producer.name,
             production_site=application.production_site,
@@ -61,5 +61,5 @@ def approve_dca(request, *args, **kwargs):
     except:
         return ErrorResponse(400, "Error while creating Agreement")
 
-    send_dca_status_email(application)
+    # send_dca_status_email(application) TODO: uncomment when email is ready
     return SuccessResponse()
