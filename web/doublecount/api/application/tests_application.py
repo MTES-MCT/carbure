@@ -34,7 +34,9 @@ class DoubleCountApplicationTest(TestCase):
         self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True)
 
         self.producer, _ = Entity.objects.update_or_create(name="Le Super Producteur 1", entity_type="Producteur")
-        UserRights.objects.update_or_create(user=self.user, entity=self.producer, defaults={"role": UserRights.ADMIN})
+        UserRights.objects.update_or_create(
+            user=self.user, entity=self.producer, defaults={"role": UserRights.ADMIN, "status": UserRights.ACCEPTED}
+        )
 
     def check_file(self, file_name: str):
         # upload template

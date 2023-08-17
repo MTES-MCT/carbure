@@ -33,7 +33,7 @@ class DCAAPITest(TransactionTestCase):
             email=self.user_email, name="Le Super Testeur 1", password=self.user_password
         )
         self.producer, _ = Entity.objects.update_or_create(name="Le Super Producteur 1", entity_type="Producteur")
-        UserRights.objects.update_or_create(user=self.user1, entity=self.producer, role="RW")
+        UserRights.objects.update_or_create(user=self.user1, entity=self.producer, role="RW", status=UserRights.ACCEPTED)
         france = Pays.objects.get(code_pays="FR")
         today = datetime.date.today()
         d = {

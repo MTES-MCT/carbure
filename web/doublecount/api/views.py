@@ -436,7 +436,10 @@ def upload_decision_admin(request):
         s3.download_fileobj(os.environ["AWS_DCDOCS_STORAGE_BUCKET_NAME"], s3filepath, file)
     f = open(filepath, "rb")
     # send an email
-    recipients = [u.user.email for u in UserRights.objects.filter(entity=dca.producer, role=UserRights.ADMIN)]
+    recipients = [
+        u.user.email
+        for u in UserRights.objects.filter(entity=dca.producer, role=UserRights.ADMIN, status=UserRights.ACCEPTED)
+    ]
     subject = "CarbuRe - Agrément Double Compte"
     body = """
     Bonjour,
