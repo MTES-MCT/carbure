@@ -82,7 +82,7 @@ def check_dc_globally(
     errors: List[DcError] = []
 
     errors += check_sourcing_vs_production(sourcing, production)
-    errors += check_pome_excess(production)
+    # errors += check_pome_excess(production) TODO : decommenter ça et les tests POME_GT_2000 quand l'outil sera mis à disposition de producteur, pour l'instant ça empeche Emilien de valider les dossiers rapidement (sinon doit contacter le producteur)
 
     return errors
 
