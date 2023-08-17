@@ -5,7 +5,7 @@ import { AlertCircle, Check, Cross } from "common/components/icons"
 import { Input } from "common/components/input"
 import Table, { actionColumn, Cell } from "common/components/table"
 import { useQuery, useMutation } from "common/hooks/async"
-import { UserRightRequest, UserRightStatus, UserRole } from "carbure/types"
+import { UserRight, UserRightStatus, UserRole } from "carbure/types"
 import { useState } from "react"
 import { useParams } from "react-router-dom"
 import * as api from "../api"
@@ -114,13 +114,13 @@ const UserRights = () => {
               key: "status",
               header: "Statut",
               orderBy: (r) => RIGHTS_ORDER[r.status],
-              cell: (r: UserRightRequest) => <RightStatus status={r.status} />,
+              cell: (r: UserRight) => <RightStatus status={r.status} />,
             },
             {
               key: "user",
               header: "Utilisateur",
-              orderBy: (r) => r.user[0] ?? "",
-              cell: (r) => <Cell text={r.user[0] ?? ""} />,
+              orderBy: (r) => r.user ?? "",
+              cell: (r) => <Cell text={r.user ?? ""} />,
             },
             {
               small: true,
@@ -152,7 +152,7 @@ const UserRights = () => {
                   : dateRequested
               },
             },
-            actionColumn<UserRightRequest>((right) =>
+            actionColumn<UserRight>((right) =>
               compact([
                 right.status === UserRightStatus.Accepted && (
                   <Button

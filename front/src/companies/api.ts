@@ -1,7 +1,7 @@
 import api, { Api } from "common/services/api"
 import {
   Entity,
-  UserRightRequest,
+  UserRight,
   UserRightStatus,
   ProductionSiteDetails,
   EntityDepot,
@@ -61,12 +61,9 @@ export function getUsersRightRequests(
   company_id: number,
   statuses?: UserRightStatus[]
 ) {
-  return api.get<Api<UserRightRequest[]>>(
-    "/v5/admin/entities/users/rights-requests",
-    {
-      params: { entity_id, q: query, company_id, statuses },
-    }
-  )
+  return api.get<Api<UserRight[]>>("/v5/admin/entities/users/rights-requests", {
+    params: { entity_id, q: query, company_id, statuses },
+  })
 }
 
 export function updateUsersRights(
