@@ -6,7 +6,6 @@ import { UserManager, useUser } from "carbure/hooks/user"
 import useLocalStorage from "common/hooks/storage"
 import { useMatomo } from "matomo"
 import Menu from "common/components/menu"
-import { Anchors } from "common/components/dropdown"
 import { Header, Row } from "common/components/scaffold"
 import Button from "common/components/button"
 import Tabs from "common/components/tabs"
@@ -18,6 +17,7 @@ import css from "./top-bar.module.css"
 import { compact } from "common/utils/collection"
 import Notifications from "./notifications"
 import DevBanner from "./dev-banner"
+import { UserRightStatus } from "carbure/types"
 
 const Topbar = () => {
   const entity = useEntity()
@@ -232,10 +232,12 @@ const UserMenu = ({ user, entity }: UserMenuProps) => {
       items={[
         {
           label: t("Organisations"),
-          children: user.rights.map((right) => ({
-            label: right.entity.name,
-            path: changeOrg(location.pathname, right.entity.id),
-          })),
+          children: user.rights
+            .filter((right) => right.status === UserRightStatus.Accepted)
+            .map((right) => ({
+              label: right.entity.name,
+              path: changeOrg(location.pathname, right.entity.id),
+            })),
         },
         {
           label: user.email,

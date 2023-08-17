@@ -29,25 +29,16 @@ export interface EntityPreview {
 export interface User {
   email: string
   rights: UserRight[]
-  requests: UserRightRequest[]
 }
 
 export interface UserRight {
-  entity: Entity
-  date_added: string
-  expiration_date: string
-  role: UserRole
-}
-
-export interface UserRightRequest {
   id: number
-  user: [string]
   entity: Entity
+  user: string
   status: UserRightStatus
-  date_requested: string
-  expiration_date: string
-  comment: string
   role: UserRole
+  date_requested: string
+  expiration_date?: string
 }
 
 export interface Notification {
@@ -192,7 +183,7 @@ export enum NotificationType {
   SafTicketRejected = "SAF_TICKET_REJECTED",
 
   LotsUpdatedByAdmin = "LOTS_UPDATED_BY_ADMIN",
-  LotsDeletedByAdmin = "LOTS_DELETED_BY_ADMIN"
+  LotsDeletedByAdmin = "LOTS_DELETED_BY_ADMIN",
 }
 
 export enum DepotType {

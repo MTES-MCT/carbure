@@ -1,13 +1,12 @@
 import { createContext, useContext } from "react"
 import { useQuery } from "common/hooks/async"
-import { Entity, UserRight, UserRightRequest } from "../types"
+import { Entity, UserRight, UserRightStatus } from "../types"
 import * as api from "../api"
 
 export interface UserManager {
   loading: boolean
   email: string
   rights: UserRight[]
-  requests: UserRightRequest[]
   isAuthenticated: () => boolean
   getRights: (entityID: number) => UserRight | null
   hasEntity: (entityID: number) => boolean
@@ -24,10 +23,13 @@ export function useUserManager(): UserManager {
   const res = settings.result?.data.data
   const email = res?.email ?? ""
   const rights = res?.rights ?? []
-  const requests = res?.requests ?? []
 
   function getRights(entityID: number) {
-    return rights?.find((r) => r.entity.id === entityID) ?? null
+    return (
+      rights?.find(
+        (r) => r.entity.id === entityID && r.status === UserRightStatus.Accepted
+      ) ?? null
+    )
   }
 
   function hasEntity(entityID: number) {
@@ -35,7 +37,9 @@ export function useUserManager(): UserManager {
   }
 
   function hasEntities() {
-    return rights.length > 0
+    return (
+      rights.filter((r) => r.status === UserRightStatus.Accepted).length > 0
+    )
   }
 
   function getFirstEntity() {
@@ -50,7 +54,6 @@ export function useUserManager(): UserManager {
     loading: settings.loading,
     email,
     rights,
-    requests,
     isAuthenticated,
     getRights,
     hasEntity,

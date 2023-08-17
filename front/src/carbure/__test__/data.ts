@@ -5,6 +5,8 @@ import {
   DepotType,
   GESOption,
   ProductionSiteDetails,
+  UserRight,
+  UserRightStatus,
 } from "carbure/types"
 
 // ENTITIES
@@ -27,7 +29,6 @@ export const company: Entity = {
   sustainability_officer_phone_number: "",
   preferred_unit: "l",
 }
-
 
 export const producer: Entity = {
   id: 0,
@@ -167,29 +168,18 @@ export const biocarburant = {
   name: "EMHV",
 }
 
-export const entityRight = {
-  name: "User",
-  email: "user@company.com",
-  entity: producer,
-  role: UserRole.Admin,
-  expiration_date: null,
-}
-
-export const entityRequest = {
+export const entityRight: UserRight = {
   id: 1,
-  user: ["user@company.com"],
+  user: "user@company.com",
   entity: producer,
   date_requested: "2020-12-22T16:18:27.233Z",
-  status: "ACCEPTED",
-  comment: "",
+  status: UserRightStatus.Accepted,
   role: UserRole.Admin,
-  expiration_date: null,
 }
 
 export const entityRights = {
   status: "success",
   data: {
     rights: [entityRight],
-    requests: [entityRequest],
   },
 }
