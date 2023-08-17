@@ -27,9 +27,9 @@ def change_user_role(request, *args, **kwargs):
     except:
         return ErrorResponse(400, ChangeUserRoleError.MISSING_USER)
 
-    rights = UserRights.objects.filter(user=user, entity_id=entity_id).first()
-
-    if not rights:
+    try:
+        rights = UserRights.objects.get(user=user, entity_id=entity_id, status=UserRights.ACCEPTED)
+    except:
         return ErrorResponse(400, ChangeUserRoleError.NO_PRIOR_RIGHTS)
 
     try:

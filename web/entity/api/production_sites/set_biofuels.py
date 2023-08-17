@@ -26,7 +26,7 @@ def set_production_site_biofuels(request, *args, **kwargs):
         return JsonResponse({"status": "error", "message": "Unknown Production Site"}, status=400)
 
     # we have all the data, make sure we are allowed to delete it
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+    rights = [r.entity for r in UserRights.objects.filter(user=request.user, status=UserRights.ACCEPTED)]
     if ps.producer not in rights:
         return JsonResponse(
             {"status": "forbidden", "message": "User not allowed to edit production site %s" % (site)}, status=403

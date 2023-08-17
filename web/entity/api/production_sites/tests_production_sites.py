@@ -27,14 +27,18 @@ class EntityProductionSiteTest(TestCase):
         self.admin = Entity.objects.filter(entity_type=Entity.ADMIN)[0]
         self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True)
         self.entity1, _ = Entity.objects.update_or_create(name="Le Super Producteur 1", entity_type="Producteur")
-        UserRights.objects.update_or_create(user=self.user, entity=self.entity1, defaults={"role": UserRights.ADMIN})
+        UserRights.objects.update_or_create(
+            user=self.user, entity=self.entity1, status=UserRights.ACCEPTED, defaults={"role": UserRights.ADMIN}
+        )
 
         user_model = get_user_model()
         self.user2 = user_model.objects.create_user(
             email="testuser1@toto.com", name="Le Super Testeur 1", password="totopouet"
         )
         self.entity2, _ = Entity.objects.update_or_create(name="Le Super Operateur 1", entity_type="Opérateur")
-        UserRights.objects.update_or_create(user=self.user, entity=self.entity2, defaults={"role": UserRights.RW})
+        UserRights.objects.update_or_create(
+            user=self.user, entity=self.entity2, status=UserRights.ACCEPTED, defaults={"role": UserRights.RW}
+        )
 
     def test_production_sites_settings(self):
         url_get = "entity-production-sites"

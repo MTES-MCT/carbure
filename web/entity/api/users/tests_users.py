@@ -25,27 +25,21 @@ class EntityProductionSiteTest(TestCase):
     def setUp(self):
         self.admin = Entity.objects.filter(entity_type=Entity.ADMIN)[0]
 
-        self.user = setup_current_user(
-            self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True
-        )
+        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True)
 
         user_model = get_user_model()
         self.user2 = user_model.objects.create_user(
             email="testuser2@toto.com", name="Le Super Testeur 2", password="totopouet"
         )
 
-        self.entity1, _ = Entity.objects.update_or_create(
-            name="Le Super Producteur 1", entity_type="Producteur"
-        )
+        self.entity1, _ = Entity.objects.update_or_create(name="Le Super Producteur 1", entity_type="Producteur")
         UserRights.objects.update_or_create(
-            user=self.user, entity=self.entity1, defaults={"role": UserRights.ADMIN}
+            user=self.user, entity=self.entity1, status=UserRights.ACCEPTED, defaults={"role": UserRights.ADMIN}
         )
 
-        self.trader = Entity.objects.create(
-            name="Test entity", entity_type=Entity.TRADER
-        )
+        self.trader = Entity.objects.create(name="Test entity", entity_type=Entity.TRADER)
         UserRights.objects.update_or_create(
-            user=self.user, entity=self.trader, defaults={"role": UserRights.ADMIN}
+            user=self.user, entity=self.trader, status=UserRights.ACCEPTED, defaults={"role": UserRights.ADMIN}
         )
 
     def test_revoke_access(self):
@@ -55,9 +49,7 @@ class EntityProductionSiteTest(TestCase):
         right.save()
 
         url = "entity-users-revoke-access"
-        response = self.client.post(
-            reverse(url), {"entity_id": self.entity1.id, "email": self.user2.email}
-        )
+        response = self.client.post(reverse(url), {"entity_id": self.entity1.id, "email": self.user2.email})
         self.assertEqual(response.status_code, 403)
 
     def test_change_user_role_missing_params(self):
@@ -83,9 +75,7 @@ class EntityProductionSiteTest(TestCase):
         self.assertEqual(data["error"], "MISSING_USER")
 
     def test_change_user_role_no_prior_rights(self):
-        other_user = User.objects.create(
-            email="other@carbure.test", name="Other", password="other"
-        )
+        other_user = User.objects.create(email="other@carbure.test", name="Other", password="other")
         res = self.client.post(
             Endpoint.change_user_role,
             {"email": other_user.email, "entity_id": self.trader.id, "role": "RW"},
