@@ -16,9 +16,4 @@ def revoke_myself(request, *args, **kwargs):
     except:
         pass
 
-    try:
-        rr = UserRights.objects.get(user=request.user, entity_id=entity_id)
-        rr.delete()
-    except Exception:
-        pass
     return JsonResponse({"status": "success"})
