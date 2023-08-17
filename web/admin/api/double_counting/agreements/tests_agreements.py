@@ -71,15 +71,16 @@ class AdminDoubleCountAgreementsTest(TestCase):
     def test_get_agreements(self):
         agreement1 = self.create_agreement()
         self.create_agreement()
-        # application, sourcing1, production1, sourcing2, production2 = self.create_application()
 
-        # list agreement
         response = self.client.get(reverse("admin-double-counting-agreements"), {"entity_id": self.admin.id})
         self.assertEqual(response.status_code, 200)
         data = response.json()["data"]
         active_agreements = data["active"]
         self.assertEqual(active_agreements[0]["certificate_id"], agreement1.certificate_id)
         self.assertEqual(len(active_agreements), 2)
+
+    def test_export_agreements(self):
+        self.create_agreement()
 
         # test that the response is an excel file
         response = self.client.get(
