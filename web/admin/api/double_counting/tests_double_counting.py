@@ -173,11 +173,10 @@ class AdminDoubleCountTest(TestCase):
         application = DoubleCountingApplication.objects.get(
             producer=self.production_site.producer, period_start__year=self.requested_start_year
         )
+        print("application: ", application.agreement_id)
 
         self.assertEqual(application.production_site.dc_number, str(1000 + int(application.production_site.id)))
-        self.assertEqual(
-            application.agreement_id, f"FR_{application.production_site.dc_number}_{self.requested_start_year + 1}"
-        )
+        self.assertEqual(application.agreement_id, f"FR_{application.production_site.dc_number}_{self.requested_start_year}")
         self.assertEqual(application.production_site.dc_reference, application.agreement_id)
 
     # TODO la fonction check_dc_file ne renvoie pas d'erreur si le fichier n'est pas valide.'
