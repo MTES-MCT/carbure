@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
-from core.models import UserRights, UserRightsRequests
+from core.models import UserRights
 
 User = get_user_model()
 
@@ -28,18 +28,13 @@ def change_user_role(request, *args, **kwargs):
         return ErrorResponse(400, ChangeUserRoleError.MISSING_USER)
 
     rights = UserRights.objects.filter(user=user, entity_id=entity_id).first()
-    rights_request = UserRightsRequests.objects.filter(user=user, entity_id=entity_id).first()
 
-    if not rights and not rights_request:
+    if not rights:
         return ErrorResponse(400, ChangeUserRoleError.NO_PRIOR_RIGHTS)
 
     try:
-        if rights:
-            rights.role = role
-            rights.save()
-        if rights_request:
-            rights_request.role = role
-            rights_request.save()
+        rights.role = role
+        rights.save()
     except:
         return ErrorResponse(400, ChangeUserRoleError.UPDATE_FAILED)
 

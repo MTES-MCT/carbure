@@ -1,6 +1,5 @@
-from core.decorators import check_user_rights, otp_or_403
-from core.models import Entity, UserRights, UserRightsRequests
-from django.contrib.auth import get_user_model
+from core.decorators import check_user_rights
+from core.models import Entity, UserRights
 from django.http import JsonResponse
 
 
