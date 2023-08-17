@@ -159,10 +159,13 @@ class UserRights(models.Model):
 
     def natural_key(self):
         return {
-            "name": self.user.name,
+            "id": self.id,
             "email": self.user.email,
+            "user": self.user.natural_key(),
             "entity": self.entity.natural_key(),
+            "status": self.status,
             "role": self.role,
+            "date_requested": self.date_added,
             "expiration_date": self.expiration_date,
         }
 
