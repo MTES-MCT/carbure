@@ -26,15 +26,12 @@ def update_user_role(request):
     role = form.cleaned_data["role"]
 
     try:
-        rights_request = UserRights.objects.get(id=request_id)
+        rights = UserRights.objects.get(id=request_id)
     except:
         return ErrorResponse(400, UpdateRoleErrors.RIGHTS_NOT_FOUND)
 
     with transaction.atomic():
-        rights_request.role = role
-        rights_request.save()
-
-        rights = UserRights.objects.filter(entity_id=rights_request.entity_id, user_id=rights_request.user_id)
-        rights.update(role=role)
+        rights.role = role
+        rights.save()
 
     return SuccessResponse()

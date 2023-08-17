@@ -17,12 +17,12 @@ def update_right_request(request):
         return JsonResponse({"status": "error", "message": "Please provide a status"}, status=400)
 
     try:
-        right_request = UserRights.objects.get(id=urr_id)
+        rights = UserRights.objects.get(id=urr_id)
     except:
         return JsonResponse({"status": "error", "message": "Could not find request"}, status=400)
 
-    right_request.status = status
-    right_request.save()
+    rights.status = status
+    rights.save()
 
     if status == "ACCEPTED":
         # send_mail
@@ -33,16 +33,14 @@ def update_right_request(request):
         Votre demande d'accès à la Société %s vient d'être validée par l'administration.
 
         """ % (
-            right_request.entity.name
+            rights.entity.name
         )
 
         send_mail(
             subject=email_subject,
             message=message,
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[right_request.user.email],
+            recipient_list=[rights.user.email],
             fail_silently=False,
         )
-    else:
-        UserRights.objects.filter(entity=right_request.entity, user=request.user).delete()
     return JsonResponse({"status": "success"})

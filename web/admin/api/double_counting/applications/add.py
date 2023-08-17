@@ -190,9 +190,9 @@ def send_dca_confirmation_email(dca):
         # PROD
         recipients = [
             r.user.email
-            for r in UserRights.objects.filter(entity=dca.producer, user__is_staff=False, user__is_superuser=False).exclude(
-                role__in=[UserRights.AUDITOR, UserRights.RO]
-            )
+            for r in UserRights.objects.filter(
+                entity=dca.producer, user__is_staff=False, user__is_superuser=False, status=UserRights.ACCEPTED
+            ).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])
         ]
         cc = "carbure@beta.gouv.fr"
 
