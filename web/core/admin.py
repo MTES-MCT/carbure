@@ -32,7 +32,6 @@ from core.models import (
     Biocarburant,
     MatierePremiere,
     Pays,
-    UserRightsRequests,
 )
 from core.models import Depot, GenericError
 from core.models import SustainabilityDeclaration, EntityDepot
@@ -61,11 +60,6 @@ class EntityAdmin(admin.ModelAdmin):
 class UserRightsAdmin(admin.ModelAdmin):
     list_display = ("user", "entity", "role")
     search_fields = ("user__name", "entity__name")
-
-
-class UserRightsRequestsAdmin(admin.ModelAdmin):
-    list_display = ("user", "entity", "status", "role")
-    search_fields = ("user__name", "entity__name", "status")
 
 
 class UserPreferencesAdmin(admin.ModelAdmin):
@@ -208,7 +202,6 @@ class TransactionDistanceAdmin(admin.ModelAdmin):
 
 admin.site.register(Entity, EntityAdmin)
 admin.site.register(UserRights, UserRightsAdmin)
-admin.site.register(UserRightsRequests, UserRightsRequestsAdmin)
 admin.site.register(UserPreferences, UserPreferencesAdmin)
 admin.site.register(Biocarburant, BiocarburantAdmin)
 admin.site.register(MatierePremiere, MatierePremiereAdmin)
