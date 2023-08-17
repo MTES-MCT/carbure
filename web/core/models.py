@@ -129,12 +129,29 @@ class UserRights(models.Model):
     RW = "RW"
     ADMIN = "ADMIN"
     AUDITOR = "AUDITOR"
-    ROLES = ((RO, "Lecture Seule"), (RW, "Lecture/Écriture"), (ADMIN, "Administrateur"), (AUDITOR, "Auditeur"))
+    ROLES = (
+        (RO, "Lecture Seule"),
+        (RW, "Lecture/Écriture"),
+        (ADMIN, "Administrateur"),
+        (AUDITOR, "Auditeur"),
+    )
+
+    PENDING = "PENDING"
+    ACCEPTED = "ACCEPTED"
+    REJECTED = "REJECTED"
+    REVOKED = "REVOKED"
+    STATUS_TYPES = (
+        (PENDING, "En attente de validation"),
+        (ACCEPTED, "Accepté"),
+        (REJECTED, "Refusé"),
+        (REVOKED, "Révoqué"),
+    )
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     date_added = models.DateTimeField(auto_now_add=True)
     role = models.CharField(max_length=32, choices=ROLES, default=RO)
+    status = models.CharField(max_length=32, choices=STATUS_TYPES, default=PENDING)
     expiration_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
