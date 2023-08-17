@@ -23,12 +23,18 @@ def request_entity_access(request):
         return JsonResponse({"status": "error", "message": "Could not find entity"}, status=400)
 
     if request.user.is_staff:
-        rr, created = UserRights.objects.update_or_create(
-            user=request.user, entity=entity, defaults={"role": role, "status": UserRights.ACCEPTED}
+        UserRights.objects.update_or_create(
+            user=request.user,
+            entity=entity,
+            status=UserRights.ACCEPTED,
+            role=role,
         )
     else:
         UserRights.objects.update_or_create(
-            user=request.user, entity=entity, defaults={"role": role, "status": UserRights.PENDING}
+            user=request.user,
+            entity=entity,
+            status=UserRights.PENDING,
+            role=role,
         )
 
         email_subject = "Carbure - Demande d'accès"
