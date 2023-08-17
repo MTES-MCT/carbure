@@ -63,7 +63,7 @@ def set_agreement_id(sender, instance, **kwargs):
         dc_number = int(instance.production_site.id) + 1000
         instance.production_site.dc_number = str(dc_number)
 
-    instance.agreement_id = "FR_" + instance.production_site.dc_number + "_" + instance.period_end.strftime("%Y")
+    instance.agreement_id = "FR_" + instance.production_site.dc_number + "_" + instance.period_start.strftime("%Y")
     instance.production_site.dc_reference = instance.agreement_id
     instance.production_site.save()
 
