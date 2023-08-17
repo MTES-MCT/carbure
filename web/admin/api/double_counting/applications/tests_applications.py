@@ -3,6 +3,7 @@ from datetime import date
 import json
 from nis import cat
 import os
+import stat
 from admin.api.double_counting.applications.add import DoubleCountingAddError
 from admin.api.double_counting.applications.approve_application import DoubleCountingApplicationApproveError
 from certificates.models import DoubleCountingRegistration
@@ -17,6 +18,7 @@ from doublecount.factories import (
     DoubleCountingApplicationFactory,
     DoubleCountingProductionFactory,
     DoubleCountingSourcingFactory,
+    production,
 )
 
 from doublecount.models import DoubleCountingApplication, DoubleCountingDocFile, DoubleCountingProduction
@@ -30,7 +32,7 @@ class Endpoint:
 User = get_user_model()
 
 
-class AdminDoubleCountTest(TestCase):
+class AdminDoubleCountApplicationsTest(TestCase):
     fixtures = [
         "json/biofuels.json",
         "json/feedstock.json",
@@ -80,6 +82,25 @@ class AdminDoubleCountTest(TestCase):
 
         return response
 
+    def create_application(self):
+        app = DoubleCountingApplicationFactory.create(
+            producer=self.production_site.producer,
+            production_site=self.production_site,
+            period_start__year=self.requested_start_year,
+            status=DoubleCountingApplication.PENDING,
+        )
+
+        sourcing1 = DoubleCountingSourcingFactory.create(dca=app, year=self.requested_start_year)
+        sourcing2 = DoubleCountingSourcingFactory.create(dca=app, year=self.requested_start_year)
+        production1 = DoubleCountingProductionFactory.create(
+            dca=app, feedstock=sourcing2.feedstock, year=self.requested_start_year + 1, approved_quota=-1
+        )
+        production2 = DoubleCountingProductionFactory.create(
+            dca=app, feedstock=sourcing2.feedstock, year=self.requested_start_year + 1, approved_quota=-1
+        )
+
+        return app, sourcing1, production1, sourcing1, production2
+
     def test_add_application(self):
         # 1 - test add file
         response = self.add_file("dc_agreement_application_valid.xlsx")
@@ -89,10 +110,22 @@ class AdminDoubleCountTest(TestCase):
         )
         created_at = application.created_at
 
-        # 1.1 - test production requested
+        # 1.1 - status should be PENDING
+        self.assertEqual(application.status, DoubleCountingApplication.PENDING)
+
+        # 1.2 - test production requested
         productions = DoubleCountingProduction.objects.filter(dca_id=application.id, year=2023)
         self.assertEqual(productions[0].requested_quota, 20500)
         self.assertEqual(productions[1].requested_quota, 8200)
+
+        # 1.3  test_dc_number_generation
+        self.assertEqual(application.production_site.dc_number, str(1000 + int(application.production_site.id)))
+        self.assertEqual(application.agreement_id, f"FR_{application.production_site.dc_number}_{self.requested_start_year}")
+        self.assertEqual(application.production_site.dc_reference, application.agreement_id)
+
+        # 1.2 - check period_start and period_end
+        self.assertEqual(application.period_start, date(self.requested_start_year, 1, 1))
+        self.assertEqual(application.period_end, date(self.requested_start_year + 1, 12, 31))
 
         # 2 - test if file uploaded
         docFile = DoubleCountingDocFile.objects.filter(agreement_id=application.agreement_id).first()
@@ -131,8 +164,7 @@ class AdminDoubleCountTest(TestCase):
         self.assertEqual(error, DoubleCountingAddError.PRODUCTION_SITE_ADDRESS_UNDEFINED)
 
     def test_list_applications(self):
-        response = self.add_file("dc_agreement_application_valid.xlsx")
-        self.assertEqual(response.status_code, 200)
+        self.create_application()
 
         response = self.client.get(
             reverse("admin-double-counting-applications"),
@@ -146,11 +178,7 @@ class AdminDoubleCountTest(TestCase):
         self.assertEqual(application["producer"]["id"], self.production_site.producer.id)
 
     def test_application_details(self):
-        app = DoubleCountingApplicationFactory.create(
-            production_site=self.production_site, period_start__year=self.requested_start_year
-        )
-        sourcing = DoubleCountingSourcingFactory.create(dca=app)
-        production = DoubleCountingProductionFactory.create(dca=app, feedstock=sourcing.feedstock)
+        app, sourcing, production, _, _ = self.create_application()
 
         response = self.client.get(
             reverse("admin-double-counting-application-details"),
@@ -167,44 +195,18 @@ class AdminDoubleCountTest(TestCase):
         self.assertEqual(production_site["inputs"], [])
         self.assertEqual(production_site["certificates"], [])
 
-    def test_dc_number_generation(self):
-        self.add_file("dc_agreement_application_valid.xlsx")
-
-        application = DoubleCountingApplication.objects.get(
-            producer=self.production_site.producer, period_start__year=self.requested_start_year
-        )
-        print("application: ", application.agreement_id)
-
-        self.assertEqual(application.production_site.dc_number, str(1000 + int(application.production_site.id)))
-        self.assertEqual(application.agreement_id, f"FR_{application.production_site.dc_number}_{self.requested_start_year}")
-        self.assertEqual(application.production_site.dc_reference, application.agreement_id)
-
-    # TODO la fonction check_dc_file ne renvoie pas d'erreur si le fichier n'est pas valide.'
-    # def test_failed_file(self):
-    #     response = self.add_file("dc_agreement_application_errors_prod_integrity.xlsx")
-    #     self.assertEqual(response.status_code, 400)
-
     def test_approve_application(self):
-        self.add_file("dc_agreement_application_valid.xlsx")
-
-        application = DoubleCountingApplication.objects.get(
-            producer=self.production_site.producer, period_start__year=self.requested_start_year
-        )
-        productions = DoubleCountingProduction.objects.filter(dca_id=application.id)
+        application, sourcing1, production1, sourcing2, production2 = self.create_application()
 
         # test approve without quotas
         params = {"dca_id": application.id, "entity_id": self.admin.id}
         response = self.client.post(reverse("admin-double-counting-application-approve"), params)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["error"], DoubleCountingApplicationApproveError.QUOTAS_NOT_APPROVED)
+        self.assertEqual(application.status, DoubleCountingApplication.PENDING)
 
         # update quotas
-        updated_quotas = [
-            [productions[0].id, 20500],
-            [productions[1].id, 8200],
-            [productions[2].id, 1],
-            [productions[3].id, 1],
-        ]
+        updated_quotas = [[production1.id, 20500], [production2.id, 8200]]
         response = self.client.post(
             reverse("admin-double-counting-application-update-approved-quotas"),
             {"entity_id": self.admin.id, "approved_quotas": json.dumps(updated_quotas), "dca_id": application.id},
@@ -213,7 +215,7 @@ class AdminDoubleCountTest(TestCase):
 
         productions = DoubleCountingProduction.objects.filter(dca_id=application.id)
         self.assertEqual(productions[0].approved_quota, 20500)
-        self.assertEqual(productions[3].approved_quota, 1)
+        self.assertEqual(productions[1].approved_quota, 8200)
 
         application = DoubleCountingApplication.objects.get(
             producer=self.production_site.producer, period_start__year=self.requested_start_year
@@ -234,18 +236,3 @@ class AdminDoubleCountTest(TestCase):
         self.assertEqual(agreement.production_site, application.production_site)
         self.assertEqual(agreement.certificate_id, application.agreement_id)
         self.assertEqual(agreement.application.id, application.id)
-
-        # list agreement
-        response = self.client.get(reverse("admin-double-counting-agreements"), {"entity_id": self.admin.id})
-        self.assertEqual(response.status_code, 200)
-        data = response.json()["data"]
-        active = data["active"]
-        agreement = active[0]
-        self.assertEqual(agreement["certificate_id"], application.agreement_id)
-
-        # test that the response is an excel file
-        response = self.client.get(
-            reverse("admin-double-counting-agreements"), {"entity_id": self.admin.id, "as_excel_file": "true"}
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["Content-Type"], "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
