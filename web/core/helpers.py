@@ -94,7 +94,7 @@ def get_all_stock():
 
 
 def get_auditor_stock(auditor):
-    rights = UserRights.objects.filter(user=auditor, role=UserRights.AUDITOR)
+    rights = UserRights.objects.filter(user=auditor, role=UserRights.AUDITOR, status=UserRights.ACCEPTED)
     entities = [r.entity_id for r in rights]
     return CarbureStock.objects.filter(carbure_client__in=entities).select_related(
         "parent_lot",
@@ -780,7 +780,9 @@ def get_lot_updates(lot, entity=None):
     # list the only users email addresses that should be sent to the frontend
     if entity is not None:
         context["visible_users"] = (
-            UserRights.objects.filter(entity__in=(lot.added_by, lot.carbure_supplier, lot.carbure_client))
+            UserRights.objects.filter(
+                entity__in=(lot.added_by, lot.carbure_supplier, lot.carbure_client), status=UserRights.ACCEPTED
+            )
             .values_list("user__email", flat=True)
             .distinct()
         )
@@ -855,6 +857,7 @@ def send_email_declaration_validated(declaration):
                 entity=declaration.entity,
                 user__is_staff=False,
                 user__is_superuser=False,
+                status=UserRights.ACCEPTED,
             ).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])
         ]
 
@@ -888,9 +891,7 @@ def send_email_declaration_invalidated(declaration):
         recipients = [
             r.user.email
             for r in UserRights.objects.filter(
-                entity=declaration.entity,
-                user__is_staff=False,
-                user__is_superuser=False,
+                entity=declaration.entity, user__is_staff=False, user__is_superuser=False, status=UserRights.ACCEPTED
             ).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])
         ]
 

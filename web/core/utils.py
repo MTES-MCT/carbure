@@ -107,7 +107,7 @@ def generate_reports(name, entity_lots, include_partners=False):
 def get_entities_users(entities):
     users_by_entity = {}
     user_rights_by_entity = {}
-    user_rights = UserRights.objects.filter(entity__in=entities, user__is_staff=False)
+    user_rights = UserRights.objects.filter(entity__in=entities, user__is_staff=False, status=UserRights.ACCEPTED)
 
     for user_right in user_rights:
         if user_right.entity_id not in user_rights_by_entity:

@@ -96,7 +96,7 @@ def send_notification_emails(test: bool = False) -> None:
             recipients = [
                 r.user.email
                 for r in UserRights.objects.filter(
-                    entity=entity, user__is_staff=False, user__is_superuser=False
+                    entity=entity, user__is_staff=False, user__is_superuser=False, status=UserRights.ACCEPTED
                 ).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])
             ]
             if notifs.filter(notify_administrator=True).count() > 0:
