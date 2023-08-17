@@ -21,15 +21,18 @@ def get_entities(request):
             .order_by("name")
             .prefetch_related(
                 "userrights_set",
-                "userrightsrequests_set",
                 "entitydepot_set",
                 "productionsite_set",
             )
             .annotate(
-                users=Count("userrights", distinct=True),
                 requests=Count(
-                    "userrightsrequests",
-                    filter=Q(userrightsrequests__status="PENDING"),
+                    "userrights",
+                    filter=Q(userrights__status="ACCEPTED"),
+                    distinct=True,
+                ),
+                requests=Count(
+                    "userrights",
+                    filter=Q(userrights__status="PENDING"),
                     distinct=True,
                 ),
                 depots=Count("entitydepot", distinct=True),
@@ -52,12 +55,16 @@ def get_entities(request):
             Entity.objects.all()
             .order_by("name")
             .filter(entity_type=Entity.AIRLINE)
-            .prefetch_related("userrights_set", "userrightsrequests_set")
+            .prefetch_related("userrights_set")
             .annotate(
-                users=Count("userrights", distinct=True),
+                users=Count(
+                    "userrights",
+                    filter=Q(userrights__status="ACCEPTED"),
+                    distinct=True,
+                ),
                 requests=Count(
-                    "userrightsrequests",
-                    filter=Q(userrightsrequests__status="PENDING"),
+                    "userrights",
+                    filter=Q(userrights__status="PENDING"),
                     distinct=True,
                 ),
                 depots=Value(0),
