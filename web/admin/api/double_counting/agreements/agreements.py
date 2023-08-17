@@ -30,9 +30,13 @@ def get_agreements(request, *args, **kwargs):
 
     current_year = datetime.now().year
 
-    agreements_active = DoubleCountingRegistration.objects.filter(
-        Q(valid_from__year__lte=current_year) & Q(valid_until__year__gte=current_year)
-    ).select_related("production_site")
+    agreements_active = (
+        DoubleCountingRegistration.objects.filter(
+            Q(valid_from__year__lte=current_year) & Q(valid_until__year__gte=current_year)
+        )
+        .select_related("production_site")
+        .order_by("production_site__name")
+    )
 
     agreements_active = sort_agreements(agreements_active, order_by, direction)
 
@@ -88,47 +92,61 @@ def export_agreements(agreements: List[DoubleCountingRegistration]):
     # header
     title1 = "Liste des unités de production de biocarburants reconnues au titre du décret n° 2019-570 du 7 juin 2019 portant sur la taxe incitative relative à l'incorporation des biocarburants"
     title_format = workbook.add_format({"align": "center", "valign": "vcenter", "bold": True, "border": 1})
-    worksheet.merge_range("A1:F1", title1, title_format)
+    worksheet.merge_range("A1:H1", title1, title_format)
 
     title2 = "Dernière mise à jour : le " + today.strftime("%d/%m/%Y")
-    worksheet.merge_range("A2:F2", title2, title_format)
+    worksheet.merge_range("A2:H2", title2, title_format)
 
-    header_data = [
-        "Unité de production de biocarburant",
-        "Adresse",
-        "Numéro d'enregistrement",
-        "Date de validité de la décision de reconnaissance",
-        "Biocarburants reconnus",
-        "Matières premières concernées",
-    ]
     wrap_format = workbook.add_format({"text_wrap": True, "align": "center", "valign": "vcenter", "border": 1})
-    worksheet.set_column("A:A", 30, cell_format=wrap_format)
-    worksheet.set_column("B:B", 60, cell_format=wrap_format)
-    worksheet.set_column("C:C", 15, cell_format=wrap_format)
-    worksheet.set_column("D:D", 15, cell_format=wrap_format)
-    worksheet.set_column("E:E", 20, cell_format=wrap_format)
-    worksheet.set_column("F:F", 20, cell_format=wrap_format)
+    worksheet.set_column("A:A", 30, cell_format=wrap_format)  # site de production
 
-    worksheet.write_row("A3", header_data)
+    worksheet.set_column("B:B", 30, cell_format=wrap_format)  # address
+    worksheet.set_column("C:C", 10, cell_format=wrap_format)  # address
+    worksheet.set_column("D:D", 10, cell_format=wrap_format)  # city
+    worksheet.set_column("E:E", 10, cell_format=wrap_format)  # postal code
+
+    worksheet.set_column("F:F", 15, cell_format=wrap_format)  # registration number
+    worksheet.set_column("G:G", 20, cell_format=wrap_format)  # validity date
+    worksheet.set_column("H:H", 30, cell_format=wrap_format)  # biofuels
+
+    worksheet.merge_range("A3:A4", "Unité de production de biocarburant", cell_format=wrap_format)
+    worksheet.merge_range("B3:E3", "Adresse", cell_format=wrap_format)
+    worksheet.write_row(
+        "B4:E4",
+        [
+            "Adresse",
+            "Ville",
+            "Code postal",
+            "Pays",
+        ],
+        cell_format=wrap_format,
+    )
+    worksheet.merge_range("F3:F4", "Numéro d'enregistrement")
+    worksheet.merge_range("G3:G4", "Date de validité de la décision de reconnaissance")
+    worksheet.merge_range("H3:H4", "Biocarburants reconnus")
 
     # content
-    row = 4
+    row = 5
     for a in agreements:
-        worksheet.write(row, 0, a.production_site.name if a.production_site else a.certificate_holder)
-        worksheet.write(row, 1, a.registered_address)
-        worksheet.write(row, 2, a.certificate_id)
-        worksheet.write(row, 3, "Du " + a.valid_from.strftime("%d/%m/%Y") + " au " + a.valid_until.strftime("%d/%m/%Y"))
+        worksheet.write(row, 0, a.production_site.name if a.production_site else "SITE DE PROD MANQUANT")
+        worksheet.write(row, 5, a.certificate_id)
 
         if a.production_site:
             # feedstock
 
+            worksheet.write(row, 1, a.production_site.address)
+            worksheet.write(row, 2, a.production_site.city)
+            worksheet.write(row, 3, a.production_site.postal_code)
+            worksheet.write(row, 4, a.production_site.country.name)
+            worksheet.write(row, 6, a.valid_from.strftime("%Y-%m-%d") + "-" + a.valid_until.strftime("%Y-%m-%d"))
+
             production_site_output = ProductionSiteOutput.objects.filter(production_site=a.production_site)
             biofuel_list = ", ".join([str(psi) for psi in production_site_output])
-            worksheet.write(row, 4, biofuel_list)
+            worksheet.write(row, 7, biofuel_list)
 
-            production_site_input = ProductionSiteInput.objects.filter(production_site=a.production_site)
-            feedstock_list = ", ".join([str(f) for f in production_site_input])
-            worksheet.write(row, 5, feedstock_list)
+            # production_site_input = ProductionSiteInput.objects.filter(production_site=a.production_site)
+            # feedstock_list = ", ".join([str(f) for f in production_site_input])
+            # worksheet.write(row, 5, feedstock_list)
 
         row += 1
 

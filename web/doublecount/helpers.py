@@ -322,7 +322,7 @@ def send_dca_status_email(dca):
         text_message = """
         Bonjour,
 
-        Votre dossier de demande d'agrément au double-comptage pour le site de production %s a été accepté.
+        Votre dossier de demande d'agrément au double-comptage pour le site de production %s a été rejeté.
 
         Bonne journée,
         L'équipe CarbuRe
