@@ -2,7 +2,7 @@ from core.decorators import check_admin_rights
 from django.http import JsonResponse
 from core.models import ExternalAdminRights, UserRights
 
-from core.models import UserRightsRequests
+from core.models import UserRights
 from django.conf import settings
 from django.core.mail import send_mail
 
@@ -17,7 +17,7 @@ def update_right_request(request):
         return JsonResponse({"status": "error", "message": "Please provide a status"}, status=400)
 
     try:
-        right_request = UserRightsRequests.objects.get(id=urr_id)
+        right_request = UserRights.objects.get(id=urr_id)
     except:
         return JsonResponse({"status": "error", "message": "Could not find request"}, status=400)
 
@@ -25,11 +25,6 @@ def update_right_request(request):
     right_request.save()
 
     if status == "ACCEPTED":
-        UserRights.objects.update_or_create(
-            entity=right_request.entity,
-            user=right_request.user,
-            defaults={"role": right_request.role, "expiration_date": right_request.expiration_date},
-        )
         # send_mail
         email_subject = "Carbure - Demande acceptée"
         message = """

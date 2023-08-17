@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.db.models import Q
 from core.models import ExternalAdminRights
 
-from core.models import UserRightsRequests
+from core.models import UserRights
 
 
 @check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE])
@@ -11,7 +11,7 @@ def get_rights_requests(request):
     q = request.GET.get("q", False)
     statuses = request.GET.getlist("statuses", False)
     company_id = request.GET.get("company_id", False)
-    requests = UserRightsRequests.objects.all()
+    requests = UserRights.objects.all()
 
     if company_id:
         requests = requests.filter(entity__id=company_id)

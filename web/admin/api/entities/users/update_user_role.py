@@ -2,7 +2,7 @@ from django import forms
 from django.db import transaction
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
-from core.models import ExternalAdminRights, UserRights, UserRightsRequests
+from core.models import ExternalAdminRights, UserRights
 
 
 class UpdateRoleErrors:
@@ -26,7 +26,7 @@ def update_user_role(request):
     role = form.cleaned_data["role"]
 
     try:
-        rights_request = UserRightsRequests.objects.get(id=request_id)
+        rights_request = UserRights.objects.get(id=request_id)
     except:
         return ErrorResponse(400, UpdateRoleErrors.RIGHTS_NOT_FOUND)
 
