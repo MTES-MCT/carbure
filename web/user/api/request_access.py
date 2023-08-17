@@ -24,11 +24,11 @@ def request_entity_access(request):
 
     if request.user.is_staff:
         rr, created = UserRights.objects.update_or_create(
-            user=request.user, entity=entity, defaults={"comment": comment, "role": role, "status": UserRights.ACCEPTED}
+            user=request.user, entity=entity, defaults={"role": role, "status": UserRights.ACCEPTED}
         )
     else:
         UserRights.objects.update_or_create(
-            user=request.user, entity=entity, defaults={"comment": comment, "role": role, "status": UserRights.PENDING}
+            user=request.user, entity=entity, defaults={"role": role, "status": UserRights.PENDING}
         )
 
         email_subject = "Carbure - Demande d'accès"

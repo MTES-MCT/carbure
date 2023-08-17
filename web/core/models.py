@@ -161,7 +161,6 @@ class UserRights(models.Model):
         return {
             "id": self.id,
             "email": self.user.email,
-            "user": self.user.natural_key(),
             "entity": self.entity.natural_key(),
             "status": self.status,
             "role": self.role,

@@ -32,7 +32,6 @@ class UserTest(TestCase):
         data = response.json()["data"]
         self.assertIn("rights", data)
         self.assertIn("email", data)
-        self.assertIn("requests", data)
 
     def test_entity_access_request(self):
         # get settings - 0 pending requests
@@ -40,18 +39,16 @@ class UserTest(TestCase):
         response = self.client.get(reverse(url))
         self.assertEqual(response.status_code, 200)
         data = response.json()["data"]
-        self.assertIn("requests", data)
-        prev_len = len(data["requests"])
+        self.assertIn("rights", data)
+        prev_len = len(data["rights"])
 
-        e, _ = Entity.objects.update_or_create(
-            name="Entity test", entity_type="Producteur"
-        )
-        postdata = {"entity_id": e.id, "comment": "", "role": "RO"}
+        e, _ = Entity.objects.update_or_create(name="Entity test", entity_type="Producteur")
+        postdata = {"entity_id": e.id, "role": "RO"}
         response = self.client.post(reverse("user-request-access"), postdata)
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get(reverse(url))
         self.assertEqual(response.status_code, 200)
         data = response.json()["data"]
-        new_len = len(data["requests"])
+        new_len = len(data["rights"])
         self.assertEqual(prev_len + 1, new_len)
