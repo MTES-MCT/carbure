@@ -43,6 +43,7 @@ build-ci-image:
   only:
     refs:
       - dev
+      - preview
       - master
     changes:
       - ci/Dockerfile
@@ -65,6 +66,7 @@ check-backend:
   only:
     refs:
       - dev
+      - preview
       - master
     changes:
       - web/**/*
@@ -79,6 +81,7 @@ check-frontend:
   only:
     refs:
       - dev
+      - preview
       - master
     changes:
       - front/**/*
@@ -88,6 +91,7 @@ deploy-dev:
   extends: .scalingo
   only:
     - dev
+    - preview
   script:
     - git push scalingo-dev $CI_COMMIT_BRANCH:master -f
 

@@ -8,7 +8,8 @@
     "test": "python web/manage.py test web --noinput",
     "test-f": "python web/manage.py test $f --keepdb",
     "migrate": "python web/manage.py makemigrations && python web/manage.py migrate",
-    "restart": "docker-compose down && docker-compose up -d"
+    "restart": "docker-compose down && docker-compose up -d",
+    "deploy-preview": "git push origin $branch:preview --force"
   },
   "engines": {
     "node": "16.16.0",
