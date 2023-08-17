@@ -25,7 +25,7 @@ def get_entities(request):
                 "productionsite_set",
             )
             .annotate(
-                requests=Count(
+                users=Count(
                     "userrights",
                     filter=Q(userrights__status="ACCEPTED"),
                     distinct=True,
