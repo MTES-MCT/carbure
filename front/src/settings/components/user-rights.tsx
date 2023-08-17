@@ -3,10 +3,16 @@ import { Trans, useTranslation } from "react-i18next"
 import { RightStatus } from "account/components/access-rights"
 import { Alert } from "common/components/alert"
 import Dialog, { Confirm } from "common/components/dialog"
-import { AlertCircle, Check, Cross, Edit, Return } from "common/components/icons"
+import {
+  AlertCircle,
+  Check,
+  Cross,
+  Edit,
+  Return,
+} from "common/components/icons"
 import Table, { actionColumn, Cell } from "common/components/table"
 import { useQuery, useMutation } from "common/hooks/async"
-import { UserRightRequest, UserRightStatus, UserRole } from "carbure/types"
+import { UserRight, UserRightStatus, UserRole } from "carbure/types"
 import * as api from "../api/user-rights"
 import { getUserRoleLabel } from "carbure/utils/normalizers"
 import { Panel } from "common/components/scaffold"
@@ -15,9 +21,9 @@ import { compact } from "common/utils/collection"
 import Button from "common/components/button"
 import { usePortal } from "common/components/portal"
 import { formatDate } from "common/utils/formatters"
-import { useState } from 'react';
-import { Form } from 'common/components/form';
-import { RadioGroup } from 'common/components/radio';
+import { useState } from "react"
+import { Form } from "common/components/form"
+import { RadioGroup } from "common/components/radio"
 import { useNotify } from "common/components/notifications"
 
 const RIGHTS_ORDER = {
@@ -36,7 +42,7 @@ const EntityUserRights = () => {
     params: [entity.id],
   })
 
-  const rows = rights.result?.data.data?.requests ?? []
+  const rows = rights.result?.data.data?.rights ?? []
 
   return (
     <Panel id="users">
@@ -72,8 +78,8 @@ const EntityUserRights = () => {
             {
               key: "user",
               header: t("Utilisateur"),
-              orderBy: (r) => r.user[0] ?? "",
-              cell: (r) => <Cell text={r.user[0] ?? ""} />,
+              orderBy: (r) => r.user ?? "",
+              cell: (r) => <Cell text={r.user ?? ""} />,
             },
             {
               small: true,
@@ -96,19 +102,19 @@ const EntityUserRights = () => {
                   : dateRequested
               },
             },
-            actionColumn<UserRightRequest>((request) =>
+            actionColumn<UserRight>((right) =>
               compact([
-                request.status === UserRightStatus.Accepted && (
-                  <EditUserRightsButton request={request} />
+                right.status === UserRightStatus.Accepted && (
+                  <EditUserRightsButton right={right} />
                 ),
-                request.status !== UserRightStatus.Accepted && (
-                  <AcceptUserButton request={request} />
-                  ),
-                  request.status !== UserRightStatus.Accepted && (
-                  <RejectUserButton request={request} />
+                right.status !== UserRightStatus.Accepted && (
+                  <AcceptUserButton right={right} />
                 ),
-                request.status === UserRightStatus.Accepted && (
-                  <RevokeUserButton request={request} />
+                right.status !== UserRightStatus.Accepted && (
+                  <RejectUserButton right={right} />
+                ),
+                right.status === UserRightStatus.Accepted && (
+                  <RevokeUserButton right={right} />
                 ),
               ])
             ),
@@ -120,10 +126,10 @@ const EntityUserRights = () => {
 }
 
 interface UserActionButton {
-  request: UserRightRequest
+  right: UserRight
 }
 
-const AcceptUserButton = ({ request }: UserActionButton) => {
+const AcceptUserButton = ({ right }: UserActionButton) => {
   const { t } = useTranslation()
   const portal = usePortal()
   const entity = useEntity()
@@ -132,7 +138,7 @@ const AcceptUserButton = ({ request }: UserActionButton) => {
     invalidates: ["entity-rights"],
   })
 
-  const user = request.user[0]
+  const user = right.user
 
   return (
     <Button
@@ -148,7 +154,7 @@ const AcceptUserButton = ({ request }: UserActionButton) => {
             confirm={t("Accepter")}
             icon={Check}
             variant="success"
-            onConfirm={() => acceptRight.execute(entity.id, request.id)}
+            onConfirm={() => acceptRight.execute(entity.id, right.id)}
             onClose={close}
           />
         ))
@@ -157,7 +163,7 @@ const AcceptUserButton = ({ request }: UserActionButton) => {
   )
 }
 
-const RejectUserButton = ({ request }: UserActionButton) => {
+const RejectUserButton = ({ right: request }: UserActionButton) => {
   const { t } = useTranslation()
   const portal = usePortal()
   const entity = useEntity()
@@ -166,7 +172,7 @@ const RejectUserButton = ({ request }: UserActionButton) => {
     invalidates: ["entity-rights"],
   })
 
-  const user = request.user[0]
+  const user = request.user
 
   return (
     <Button
@@ -191,7 +197,7 @@ const RejectUserButton = ({ request }: UserActionButton) => {
   )
 }
 
-const RevokeUserButton = ({ request }: UserActionButton) => {
+const RevokeUserButton = ({ right: request }: UserActionButton) => {
   const { t } = useTranslation()
   const portal = usePortal()
   const entity = useEntity()
@@ -200,7 +206,7 @@ const RevokeUserButton = ({ request }: UserActionButton) => {
     invalidates: ["entity-rights"],
   })
 
-  const user = request.user[0]
+  const user = request.user
 
   return (
     <Button
@@ -225,8 +231,7 @@ const RevokeUserButton = ({ request }: UserActionButton) => {
   )
 }
 
-
-const EditUserRightsButton = ({ request }: UserActionButton) => {
+const EditUserRightsButton = ({ right: request }: UserActionButton) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
@@ -236,15 +241,16 @@ const EditUserRightsButton = ({ request }: UserActionButton) => {
       variant="icon"
       icon={Edit}
       title={t("Modifier le rôle")}
-      action={() => portal((close) => <UserRoleDialog onClose={close} request={request} />)}
+      action={() =>
+        portal((close) => <UserRoleDialog onClose={close} request={request} />)
+      }
     />
   )
 }
 
-
 export interface UserRightsProps {
-  onClose: () => void,
-  request: UserRightRequest
+  onClose: () => void
+  request: UserRight
 }
 
 export const UserRoleDialog = ({ onClose, request }: UserRightsProps) => {
@@ -252,18 +258,22 @@ export const UserRoleDialog = ({ onClose, request }: UserRightsProps) => {
   const notify = useNotify()
   const entity = useEntity()
   const [role, setRole] = useState<UserRole | undefined>(request.role)
-  const userEmail = request.user[0]
+  const userEmail = request.user
 
   const changeUserRole = useMutation(api.changeUserRole, {
     invalidates: ["entity-rights"],
 
     onSuccess: () => {
-      notify(t("Le rôle de l'utilisateur a été modifié !"), { variant: "success" })
+      notify(t("Le rôle de l'utilisateur a été modifié !"), {
+        variant: "success",
+      })
       onClose()
     },
     onError: () => {
-      notify(t("Le rôle de l'utilisateur n'a pas pu être modifié !"), { variant: "danger" })
-    }
+      notify(t("Le rôle de l'utilisateur n'a pas pu être modifié !"), {
+        variant: "danger",
+      })
+    },
   })
 
   const handleSubmit = async () => {
@@ -276,17 +286,13 @@ export const UserRoleDialog = ({ onClose, request }: UserRightsProps) => {
         <h1>{t("Modifier le rôle")}</h1>
       </header>
       <main>
-      <section> 
-          {t(
-            "Modifier le rôle de l'utilisateur {{userEmail}} ?",
-            { userEmail }
-          )}
+        <section>
+          {t("Modifier le rôle de l'utilisateur {{userEmail}} ?", {
+            userEmail,
+          })}
         </section>
         <section>
-          <Form
-            id="access-right"
-            onSubmit={handleSubmit}
-          >
+          <Form id="access-right" onSubmit={handleSubmit}>
             <RadioGroup
               label={t("Rôle")}
               name="role"
@@ -304,12 +310,11 @@ export const UserRoleDialog = ({ onClose, request }: UserRightsProps) => {
                 {
                   value: UserRole.Admin,
                   label: t("Administration (contrôle complet de la société sur CarbuRe)"), // prettier-ignore
-                }  
+                },
               ]}
             />
           </Form>
         </section>
-       
       </main>
       <footer>
         <Button
