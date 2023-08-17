@@ -23,7 +23,7 @@ def check_rights(entity_id_field, role=None):
                 return JsonResponse({"status": "error", "message": "Unknown Entity id %s" % (entity_id)}, status=400)
 
             try:
-                rights = UserRights.objects.get(user=request.user, entity=entity)
+                rights = UserRights.objects.get(user=request.user, entity=entity, status=UserRights.ACCEPTED)
                 if role is not None:
                     if isinstance(role, list):
                         if rights.role not in role:
@@ -67,7 +67,9 @@ def is_admin_or_external_admin(function):
         if not request.user.is_verified():
             return JsonResponse({"status": "forbidden", "message": "User not verified"}, status=403)
         ext_admins = Entity.objects.filter(entity_type=Entity.EXTERNAL_ADMIN)
-        has_rights_to_ext_admin = UserRights.objects.filter(entity__in=ext_admins, user=request.user).count()
+        has_rights_to_ext_admin = UserRights.objects.filter(
+            entity__in=ext_admins, user=request.user, status=UserRights.ACCEPTED
+        ).count()
         if not request.user.is_staff and has_rights_to_ext_admin == 0:
             return JsonResponse({"status": "forbidden", "message": "User not admin"}, status=403)
         return function(request, *args, **kwargs)
@@ -98,7 +100,10 @@ def check_user_rights(role=None):
             # check if we have data in the SESSION
             rights = request.session.get("rights", False)
             if not rights:
-                rights = {str(ur.entity.id): ur.role for ur in UserRights.objects.filter(user=request.user)}
+                rights = {
+                    str(ur.entity.id): ur.role
+                    for ur in UserRights.objects.filter(user=request.user, status=UserRights.ACCEPTED)
+                }
                 request.session["rights"] = rights
 
             if entity_id not in rights:
@@ -182,9 +187,9 @@ def check_admin_rights(allow_external=[], allow_role=None):
             try:
                 # check that user has access to entity and refine by role if specified
                 if allow_role is not None:
-                    UserRights.objects.get(entity=entity, user=request.user, role__in=allow_role)
+                    UserRights.objects.get(entity=entity, user=request.user, role__in=allow_role, status=UserRights.ACCEPTED)
                 else:
-                    UserRights.objects.get(entity=entity, user=request.user)
+                    UserRights.objects.get(entity=entity, user=request.user, status=UserRights.ACCEPTED)
             except:
                 return ErrorResponse(403, AdminRightsError.USER_HAS_NO_RIGHT)
 

@@ -9,7 +9,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 def get_settings(request):
     # user-rights
     rights = UserRights.objects.filter(user=request.user).select_related("user", "entity")
-    request.session["rights"] = {ur.entity.id: ur.role for ur in rights}
+    request.session["rights"] = {ur.entity.id: ur.role for ur in rights if ur.status == UserRights.ACCEPTED}
     rights_sez = [r.natural_key() for r in rights]
     # requests
     return JsonResponse({"status": "success", "data": {"rights": rights_sez, "email": request.user.email}})
