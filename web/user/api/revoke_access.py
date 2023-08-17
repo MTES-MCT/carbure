@@ -1,5 +1,5 @@
 from core.decorators import otp_or_403
-from core.models import UserRights, UserRightsRequests
+from core.models import UserRights
 from django.http import JsonResponse
 
 
@@ -17,7 +17,7 @@ def revoke_myself(request, *args, **kwargs):
         pass
 
     try:
-        rr = UserRightsRequests.objects.get(user=request.user, entity_id=entity_id)
+        rr = UserRights.objects.get(user=request.user, entity_id=entity_id)
         rr.delete()
     except Exception:
         pass

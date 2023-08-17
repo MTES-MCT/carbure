@@ -1,5 +1,5 @@
 from core.decorators import otp_or_403
-from core.models import Entity, UserRights, UserRightsRequests
+from core.models import Entity, UserRights
 from django.conf import settings
 from django.core.mail import send_mail
 from django.http import JsonResponse
@@ -23,15 +23,12 @@ def request_entity_access(request):
         return JsonResponse({"status": "error", "message": "Could not find entity"}, status=400)
 
     if request.user.is_staff:
-        rr, created = UserRightsRequests.objects.update_or_create(
-            user=request.user, entity=entity, defaults={"comment": comment, "role": role, "status": "ACCEPTED"}
-        )
-        UserRights.objects.update_or_create(
-            user=rr.user, entity=entity, defaults={"role": rr.role, "expiration_date": rr.expiration_date}
+        rr, created = UserRights.objects.update_or_create(
+            user=request.user, entity=entity, defaults={"comment": comment, "role": role, "status": UserRights.ACCEPTED}
         )
     else:
-        UserRightsRequests.objects.update_or_create(
-            user=request.user, entity=entity, defaults={"comment": comment, "role": role, "status": "PENDING"}
+        UserRights.objects.update_or_create(
+            user=request.user, entity=entity, defaults={"comment": comment, "role": role, "status": UserRights.PENDING}
         )
 
         email_subject = "Carbure - Demande d'accès"
