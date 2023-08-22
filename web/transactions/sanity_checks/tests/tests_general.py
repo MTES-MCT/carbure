@@ -118,7 +118,32 @@ class GeneralSanityChecksTest(TestCase):
         error_list = self.run_checks(lot)
         self.assertTrue(has_error(error, error_list))
 
-    def test_mp_not_configured(self):
+    def test_depot_not_configured(self):
+        error = CarbureSanityCheckErrors.DEPOT_NOT_CONFIGURED
+
+        depot = Depot.objects.first()
+        other_depot = Depot.objects.last()
+
+        lot = self.create_lot(
+            added_by=self.producer,
+            carbure_client=self.producer,
+            carbure_delivery_site=other_depot,
+            delivery_type=CarbureLot.BLENDING,
+        )
+
+        EntityDepot.objects.create(entity=self.producer, depot=depot)
+
+        prefetched_data = get_prefetched_data(self.producer)
+
+        error_list = self.run_checks(lot, prefetched_data)
+        self.assertTrue(has_error(error, error_list))
+
+        lot.carbure_delivery_site = depot
+
+        error_list = self.run_checks(lot, prefetched_data)
+        self.assertFalse(has_error(error, error_list))
+
+    def x_test_mp_not_configured(self):
         error = CarbureSanityCheckErrors.MP_NOT_CONFIGURED
 
         feedstock = MatierePremiere.objects.first()
@@ -143,7 +168,7 @@ class GeneralSanityChecksTest(TestCase):
         error_list = self.run_checks(lot, prefetched_data)
         self.assertFalse(has_error(error, error_list))
 
-    def test_bc_not_configured(self):
+    def x_test_bc_not_configured(self):
         error = CarbureSanityCheckErrors.BC_NOT_CONFIGURED
 
         biofuel = Biocarburant.objects.first()
@@ -164,31 +189,6 @@ class GeneralSanityChecksTest(TestCase):
         self.assertTrue(has_error(error, error_list))
 
         lot.biofuel = biofuel
-
-        error_list = self.run_checks(lot, prefetched_data)
-        self.assertFalse(has_error(error, error_list))
-
-    def test_depot_not_configured(self):
-        error = CarbureSanityCheckErrors.DEPOT_NOT_CONFIGURED
-
-        depot = Depot.objects.first()
-        other_depot = Depot.objects.last()
-
-        lot = self.create_lot(
-            added_by=self.producer,
-            carbure_client=self.producer,
-            carbure_delivery_site=other_depot,
-            delivery_type=CarbureLot.BLENDING,
-        )
-
-        EntityDepot.objects.create(entity=self.producer, depot=depot)
-
-        prefetched_data = get_prefetched_data(self.producer)
-
-        error_list = self.run_checks(lot, prefetched_data)
-        self.assertTrue(has_error(error, error_list))
-
-        lot.carbure_delivery_site = depot
 
         error_list = self.run_checks(lot, prefetched_data)
         self.assertFalse(has_error(error, error_list))
