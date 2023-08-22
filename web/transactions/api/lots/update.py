@@ -54,7 +54,8 @@ def update_lot(request, *args, **kwargs):
 
     update = {**update_data}
     if len(quantity_data) > 0:
-        quantity = compute_lot_quantity(updated_lot, quantity_data)
+        biofuel = update.get("biofuel") or updated_lot.biofuel
+        quantity = compute_lot_quantity(biofuel, quantity_data)
         update = {**update_data, **quantity}
 
     dc_agreement = get_lot_dc_agreement(
@@ -123,7 +124,8 @@ def enforce_stock_integrity(lot_node: LotNode, update: dict):
 
     # if the volume is above the allowed limit, reset it and create an error to explain why
     if volume_change > 0 and ancestor_stock.remaining_volume < volume_change:
-        reset_quantity = compute_lot_quantity(lot_node.data, {"volume": volume_before_update})
+        biofuel = update.get("biofuel") or lot_node.data.biofuel
+        reset_quantity = compute_lot_quantity(biofuel, {"volume": volume_before_update})
         error = GenericError(
             lot=lot_node.data,
             field="quantity",
