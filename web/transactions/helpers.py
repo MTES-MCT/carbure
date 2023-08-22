@@ -258,7 +258,7 @@ def fill_basic_info(lot, data, prefetched_data):
     return errors
 
 
-def compute_lot_quantity(lot, data):
+def compute_lot_quantity(biofuel, data):
     volume = None
     weight = None
     lhv_amount = None
@@ -282,16 +282,16 @@ def compute_lot_quantity(lot, data):
     # compute the different quantity values based on the previous config
     if unit == CarbureUnit.LITER:
         volume = quantity
-        weight = round(volume * lot.biofuel.masse_volumique, 2)
-        lhv_amount = round(volume * lot.biofuel.pci_litre, 2)
+        weight = round(volume * biofuel.masse_volumique, 2)
+        lhv_amount = round(volume * biofuel.pci_litre, 2)
     elif unit == CarbureUnit.KILOGRAM:
         weight = quantity
-        volume = round(weight / lot.biofuel.masse_volumique, 2)
-        lhv_amount = round(volume * lot.biofuel.pci_litre, 2)
+        volume = round(weight / biofuel.masse_volumique, 2)
+        lhv_amount = round(volume * biofuel.pci_litre, 2)
     elif unit == CarbureUnit.LHV:
         lhv_amount = quantity
-        volume = round(lhv_amount / lot.biofuel.pci_litre, 2)
-        weight = round(volume * lot.biofuel.masse_volumique, 2)
+        volume = round(lhv_amount / biofuel.pci_litre, 2)
+        weight = round(volume * biofuel.masse_volumique, 2)
 
     return {"volume": volume, "weight": weight, "lhv_amount": lhv_amount}
 
@@ -303,7 +303,7 @@ def fill_volume_info(lot, data):
         # UPDATING VOLUME OF A LOT COMING FROM A STOCK SPLIT
         # 1) check volume diff
         try:
-            quantity = compute_lot_quantity(lot, data)
+            quantity = compute_lot_quantity(lot.biofuel, data)
             diff = round(lot.volume - quantity["volume"], 2)
             # 2) if new volume > old volume, ensure we have enough stock
             if diff < 0 and lot.parent_stock.remaining_volume < abs(diff):
@@ -338,7 +338,7 @@ def fill_volume_info(lot, data):
 
     elif lot.parent_lot is None:
         try:
-            quantity = compute_lot_quantity(lot, data)
+            quantity = compute_lot_quantity(lot.biofuel, data)
             lot.volume = quantity["volume"]
             lot.weight = quantity["weight"]
             lot.lhv_amount = quantity["lhv_amount"]

@@ -71,8 +71,9 @@ def update_many(request):
     for node in nodes:
         # compute the update content based on the current lot
         update = {**update_data}
+        biofuel = update.get("biofuel") or node.data.biofuel
         if len(quantity_data) > 0:
-            quantity = compute_lot_quantity(node.data, quantity_data)
+            quantity = compute_lot_quantity(biofuel, quantity_data)
             update = {**update, **quantity}
 
         # apply the update to the lot
