@@ -61,8 +61,8 @@ def sanity_checks(lot: CarbureLot, prefetched_data) -> list[GenericError]:
         check_mac_bc_wrong(lot),
         check_mac_not_efpe(lot),
         check_delivery_in_the_future(lot),
-        check_mp_not_configured(lot, prefetched_data),
-        check_bc_not_configured(lot, prefetched_data),
+        # check_mp_not_configured(lot, prefetched_data),
+        # check_bc_not_configured(lot, prefetched_data),
         check_depot_not_configured(lot, prefetched_data),
     ]
 
