@@ -13,7 +13,6 @@ import {
 } from "carbure/__test__/api"
 import {
   deliverySite,
-  entityRequest,
   entityRight,
   entityRights,
   operator,
@@ -52,10 +51,6 @@ export const okSettings = rest.get("/api/v5/user", (req, res, ctx) => {
         rights: [
           { ...entityRight, entity },
           { ...entityRight, entity: operator },
-        ],
-        requests: [
-          { ...entityRight, entity },
-          { ...entityRequest, entity: operator },
         ],
       },
     })

@@ -2,29 +2,27 @@ import { Trans, useTranslation } from "react-i18next"
 
 import { RightStatus } from "account/components/access-rights"
 import { Alert } from "common/components/alert"
-import Dialog, { Confirm } from "common/components/dialog"
-import {
-  AlertCircle,
-  Check,
-  Cross,
-  Edit,
-  Return,
-} from "common/components/icons"
+import { Confirm } from "common/components/dialog"
+import { AlertCircle, Check, Cross } from "common/components/icons"
 import Table, { actionColumn, Cell } from "common/components/table"
 import { useQuery, useMutation } from "common/hooks/async"
 import { UserRight, UserRightStatus, UserRole } from "carbure/types"
 import * as api from "../api/user-rights"
-import { getUserRoleLabel } from "carbure/utils/normalizers"
 import { Panel } from "common/components/scaffold"
 import useEntity from "carbure/hooks/entity"
 import { compact } from "common/utils/collection"
 import Button from "common/components/button"
 import { usePortal } from "common/components/portal"
 import { formatDate } from "common/utils/formatters"
-import { useState } from "react"
-import { Form } from "common/components/form"
-import { RadioGroup } from "common/components/radio"
 import { useNotify } from "common/components/notifications"
+import Select from "common/components/select"
+
+const ROLE_LABELS = {
+  [UserRole.ReadOnly]: "Lecture seule",
+  [UserRole.ReadWrite]: "Lecture/écriture",
+  [UserRole.Admin]: "Administration",
+  [UserRole.Auditor]: "Audit",
+}
 
 const RIGHTS_ORDER = {
   [UserRightStatus.Pending]: 0,
@@ -36,6 +34,7 @@ const RIGHTS_ORDER = {
 const EntityUserRights = () => {
   const { t } = useTranslation()
   const entity = useEntity()
+  const portal = usePortal()
 
   const rights = useQuery(api.getEntityRights, {
     key: "entity-rights",
@@ -84,9 +83,26 @@ const EntityUserRights = () => {
             {
               small: true,
               key: "role",
-              header: t("Droits"),
-              orderBy: (r) => getUserRoleLabel(r.role),
-              cell: (r) => getUserRoleLabel(r.role),
+              header: "Droits",
+              orderBy: (r) => ROLE_LABELS[r.role],
+              cell: (r) => (
+                <Select
+                  variant="text"
+                  value={r.role}
+                  style={{ width: "180px" }}
+                  options={Object.keys(ROLE_LABELS) as UserRole[]}
+                  normalize={(role) => ({ value: role, label: ROLE_LABELS[role] })} // prettier-ignore
+                  onChange={(role) =>
+                    portal((close) => (
+                      <UserRoleDialog
+                        request={r}
+                        role={role!}
+                        onClose={close}
+                      />
+                    ))
+                  }
+                />
+              ),
             },
             {
               small: true,
@@ -104,9 +120,6 @@ const EntityUserRights = () => {
             },
             actionColumn<UserRight>((right) =>
               compact([
-                right.status === UserRightStatus.Accepted && (
-                  <EditUserRightsButton right={right} />
-                ),
                 right.status !== UserRightStatus.Accepted && (
                   <AcceptUserButton right={right} />
                 ),
@@ -231,34 +244,16 @@ const RevokeUserButton = ({ right: request }: UserActionButton) => {
   )
 }
 
-const EditUserRightsButton = ({ right: request }: UserActionButton) => {
-  const { t } = useTranslation()
-  const portal = usePortal()
-
-  return (
-    <Button
-      captive
-      variant="icon"
-      icon={Edit}
-      title={t("Modifier le rôle")}
-      action={() =>
-        portal((close) => <UserRoleDialog onClose={close} request={request} />)
-      }
-    />
-  )
-}
-
 export interface UserRightsProps {
   onClose: () => void
+  role: UserRole
   request: UserRight
 }
 
-export const UserRoleDialog = ({ onClose, request }: UserRightsProps) => {
+export const UserRoleDialog = ({ onClose, role, request }: UserRightsProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
   const entity = useEntity()
-  const [role, setRole] = useState<UserRole | undefined>(request.role)
-  const userEmail = request.user
 
   const changeUserRole = useMutation(api.changeUserRole, {
     invalidates: ["entity-rights"],
@@ -276,58 +271,17 @@ export const UserRoleDialog = ({ onClose, request }: UserRightsProps) => {
     },
   })
 
-  const handleSubmit = async () => {
-    await changeUserRole.execute(entity.id, userEmail, role!)
-  }
-
   return (
-    <Dialog onClose={onClose}>
-      <header>
-        <h1>{t("Modifier le rôle")}</h1>
-      </header>
-      <main>
-        <section>
-          {t("Modifier le rôle de l'utilisateur {{userEmail}} ?", {
-            userEmail,
-          })}
-        </section>
-        <section>
-          <Form id="access-right" onSubmit={handleSubmit}>
-            <RadioGroup
-              label={t("Rôle")}
-              name="role"
-              value={role}
-              onChange={setRole}
-              options={[
-                {
-                  value: UserRole.ReadOnly,
-                  label: t("Lecture seule (consultation des lots uniquement)"),
-                },
-                {
-                  value: UserRole.ReadWrite,
-                  label: t("Lecture/écriture (création et gestion des lots)"),
-                },
-                {
-                  value: UserRole.Admin,
-                  label: t("Administration (contrôle complet de la société sur CarbuRe)"), // prettier-ignore
-                },
-              ]}
-            />
-          </Form>
-        </section>
-      </main>
-      <footer>
-        <Button
-          variant="primary"
-          loading={changeUserRole.loading}
-          icon={Edit}
-          label={t("Modifier le rôle")}
-          disabled={!entity || !role}
-          submit="access-right"
-        />
-        <Button asideX icon={Return} action={onClose} label={t("Retour")} />
-      </footer>
-    </Dialog>
+    <Confirm
+      title={t("Modifier le rôle")}
+      description={t(`Voulez vous changer le rôle de cet utilisateur en "{{role}}" ?`, { role: ROLE_LABELS[role] })} // prettier-ignore
+      confirm={t("Confirmer")}
+      variant="primary"
+      onClose={onClose}
+      onConfirm={async () =>
+        changeUserRole.execute(entity.id, request.user, role!)
+      }
+    />
   )
 }
 
