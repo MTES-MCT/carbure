@@ -84,10 +84,10 @@ def find_provision_certificates(**filters):
         provision_certificate = provision_certificate.filter(year=filters["year"])
 
     if filters["quarter"]:
-        provision_certificate = provision_certificate.filter(delivery_period__in=filters["quarter"])
+        provision_certificate = provision_certificate.filter(quarter__in=filters["quarter"])
 
     if filters["cpo"]:
-        provision_certificate = provision_certificate.filter(saf_tickets__client__name__in=filters["clients"])
+        provision_certificate = provision_certificate.filter(cpo__name__in=filters["cpo"])
 
     if filters["status"]:
         status_filter = Q()
