@@ -2,7 +2,6 @@ from math import floor
 import traceback
 
 from django import forms
-from django.db.models import Q, F
 from django.core.paginator import Paginator
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
