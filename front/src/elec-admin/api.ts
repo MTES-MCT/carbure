@@ -14,5 +14,8 @@ export function getSnapshot(entity_id: number, year: number) {
 }
 
 export function importCertificates(entity_id: number, file: File) {
-  return api.post("/v5/admin/elec/import-certificates", { entity_id, file })
+  return api.post("/v5/admin/elec/import-provision-certificates", {
+    entity_id,
+    file,
+  })
 }
