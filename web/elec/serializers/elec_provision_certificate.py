@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from core.serializers import EntityPreviewSerializer
 from elec.models import ElecProvisionCertificate
 
 
@@ -13,3 +14,6 @@ class ElecProvisionCertificateSerializer(serializers.ModelSerializer):
             "energy_amount",
             "remaining_energy_amount",
         ]
+
+    cpo = EntityPreviewSerializer(read_only=True)
+    
