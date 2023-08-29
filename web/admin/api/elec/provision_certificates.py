@@ -10,7 +10,6 @@ from core.models import ExternalAdminRights
 from core.utils import MultipleValueField
 from elec.models.elec_provision_certificate import ElecProvisionCertificate
 from elec.serializers.elec_provision_certificate import ElecProvisionCertificateSerializer
-import pandas as pd
 
 
 class ProvisionCertificatesError:
@@ -23,6 +22,7 @@ class ProvisionCertificatesFilterForm(forms.Form):
     status = MultipleValueField(coerce=str, required=False)
     quarter = MultipleValueField(coerce=int, required=False)
     cpo = MultipleValueField(coerce=str, required=False)
+    operating_unit = MultipleValueField(coerce=str, required=False)
     search = forms.CharField(required=False)
 
 
