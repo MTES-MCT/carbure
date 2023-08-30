@@ -1,7 +1,6 @@
-from django.urls import path
-from .snapshot import get_snapshot
+from django.urls import include, path
 
 urlpatterns = [
-    # overview
-    path("snapshot", get_snapshot, name="elec-snapshot"),
+    path("cpo", include("elec.api.cpo")),
+    path("operator", include("elec.api.operator")),
 ]
