@@ -6,6 +6,8 @@ import datetime
 from django.db.models import Count
 from django.db.models import F, Q, When
 
+from elec.models.elec_transfer_certificate import ElecTransferCertificate
+
 def notify_correction_request(lots):
     lots_by_supplier = lots.select_related('carbure_client').filter(carbure_supplier__isnull=False)\
         .values('year', 'carbure_client__name', 'carbure_supplier')\
@@ -112,4 +114,13 @@ def notify_declaration_validated(declaration):
     notif.notify_administrator = False
     period = declaration.period.year * 100 + declaration.period.month
     notif.meta = {'period': period}
+    notif.save()
+
+def notify_elec_transfer_certificate(transfer_certificate: ElecTransferCertificate):
+    notif = CarbureNotification()
+    notif.type = CarbureNotification.DECLARATION_VALIDATED
+    notif.dest = transfer_certificate.client
+    notif.send_by_email = True
+    notif.notify_administrator = False
+    notif.meta = {'supplier': transfer_certificate.supplier.name}
     notif.save()
