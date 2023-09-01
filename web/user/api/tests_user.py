@@ -1,7 +1,8 @@
 from core.tests_utils import setup_current_user
-from core.models import Entity
+from core.models import Entity, UserRights
 from django.test import TestCase
 from django.urls import reverse
+from django.contrib.auth import get_user_model
 
 
 class UserTest(TestCase):
@@ -18,7 +19,7 @@ class UserTest(TestCase):
         self.admin = Entity.objects.filter(entity_type=Entity.ADMIN)[0]
         self.user = setup_current_user(
             self,
-            "tester@carbure.local",
+            "admin@carbure.local",
             "Tester",
             "gogogo",
             [(self.admin, "RW")],
@@ -35,6 +36,15 @@ class UserTest(TestCase):
         self.assertIn("requests", data)
 
     def test_entity_access_request(self):
+        producer, _ = Entity.objects.update_or_create(name="Le Super Producteur 1", entity_type="Producteur")
+        #admin
+        User = get_user_model()
+        user_admin = User.objects.create_user( email="tester@carbure.local", name="Requestor", password="gogogo"    )
+        UserRights.objects.update_or_create(user=user_admin, entity=producer, defaults={"role": UserRights.ADMIN})
+
+        #requester
+        setup_current_user(self, "tester-requesting@carbure.local", "Tester", "gogogo", [])
+
         # get settings - 0 pending requests
         url = "user"
         response = self.client.get(reverse(url))
@@ -43,13 +53,12 @@ class UserTest(TestCase):
         self.assertIn("requests", data)
         prev_len = len(data["requests"])
 
-        e, _ = Entity.objects.update_or_create(
-            name="Entity test", entity_type="Producteur"
-        )
-        postdata = {"entity_id": e.id, "comment": "", "role": "RO"}
+        # request access
+        postdata = {"entity_id": producer.id, "comment": "", "role": "RO"}
         response = self.client.post(reverse("user-request-access"), postdata)
         self.assertEqual(response.status_code, 200)
-
+ 
+        # get settings - 1 pending request
         response = self.client.get(reverse(url))
         self.assertEqual(response.status_code, 200)
         data = response.json()["data"]

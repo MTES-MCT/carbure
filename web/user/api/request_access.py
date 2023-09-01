@@ -23,6 +23,7 @@ def request_entity_access(request):
         return JsonResponse({"status": "error", "message": "Could not find entity"}, status=400)
 
     if request.user.is_staff:
+        
         rr, created = UserRightsRequests.objects.update_or_create(
             user=request.user, entity=entity, defaults={"comment": comment, "role": role, "status": "ACCEPTED"}
         )
@@ -48,11 +49,16 @@ def request_entity_access(request):
             comment,
         )
 
+        #get all user admins for tthe entity 
+        admins = UserRights.objects.filter(entity=entity, role=UserRights.ADMIN).values_list('user__email', flat=True)
+        recipient_list = list(admins)
+        recipient_list.append('carbure@beta.gouv.fr')        
+
         send_mail(
             subject=email_subject,
             message=message,
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=["carbure@beta.gouv.fr"],
+            recipient_list=recipient_list,
             fail_silently=False,
         )
     return JsonResponse({"status": "success"})
