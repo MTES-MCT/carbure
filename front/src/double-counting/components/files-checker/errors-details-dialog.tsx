@@ -44,7 +44,7 @@ export const ErrorsDetailsDialog = ({
 
         <section>
           <Alert variant="warning" icon={AlertTriangle}>
-            {t(`{{count}} erreurs ont été trouvées dans les différents onglets de votre fichier Excel. Merci de corriger le fichier et envoyez-le à nouveau.`,
+            {t(`{{count}} erreurs ont été détectées dans le fichier Excel source. Merci de corriger le fichier et envoyez-le à nouveau.`,
               { count: fileData.error_count })}
 
           </Alert>
