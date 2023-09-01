@@ -1,5 +1,6 @@
-# test with : python web/manage.py test admin.api.double_counting.tests_double_counting.AdminDoubleCountTest --keepdb
+# test with : python web/manage.py test admin.api.double_counting.agreements.tests_agreements.AdminDoubleCountAgreementsTest --keepdb
 from datetime import date
+from email.mime import application
 
 from core.tests_utils import setup_current_user
 from core.models import Entity, Pays, UserRights
@@ -7,6 +8,10 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from doublecount.factories.agreement import DoubleCountingRegistrationFactory
+from doublecount.factories.application import DoubleCountingApplicationFactory
+from doublecount.factories.production import DoubleCountingProductionFactory
+from doublecount.factories.sourcing import DoubleCountingSourcingFactory
+from doublecount.models import DoubleCountingApplication
 
 from producers.models import ProductionSite
 
@@ -46,9 +51,26 @@ class AdminDoubleCountAgreementsTest(TestCase):
         self.requested_start_year = 2023
 
     def create_agreement(self):
-        agreement = DoubleCountingRegistrationFactory.create(
-            production_site=self.production_site, valid_from=date(self.requested_start_year, 1, 1)
+        app = DoubleCountingApplicationFactory.create(
+            producer=self.production_site.producer,
+            production_site=self.production_site,
+            period_start__year=self.requested_start_year,
+            status=DoubleCountingApplication.PENDING,
+    )
+        sourcing1 = DoubleCountingSourcingFactory.create(dca=app, year=self.requested_start_year)
+        sourcing2 = DoubleCountingSourcingFactory.create(dca=app, year=self.requested_start_year)
+        production1 = DoubleCountingProductionFactory.create(
+            dca=app, feedstock=sourcing2.feedstock, year=self.requested_start_year , approved_quota=1000
         )
+        production2 = DoubleCountingProductionFactory.create(
+            dca=app, feedstock=sourcing2.feedstock, year=self.requested_start_year + 1, approved_quota=-1
+        )
+        agreement = DoubleCountingRegistrationFactory.create(
+            production_site=self.production_site, 
+            valid_from=date(self.requested_start_year, 1, 1),
+            application=app,
+        )
+    
         return agreement
 
     def test_get_agreements(self):

@@ -10,6 +10,7 @@ from certificates.models import DoubleCountingRegistration
 from certificates.serializers import DoubleCountingRegistrationSerializer
 from core.common import ErrorResponse
 from core.decorators import check_admin_rights
+from doublecount.models import DoubleCountingProduction
 from producers.models import ProductionSiteOutput
 
 
@@ -132,7 +133,6 @@ def export_agreements(agreements: List[DoubleCountingRegistration]):
         worksheet.write(row, 5, a.certificate_id)
 
         if a.production_site:
-            # feedstock
 
             worksheet.write(row, 1, a.production_site.address)
             worksheet.write(row, 2, a.production_site.city)
@@ -140,13 +140,14 @@ def export_agreements(agreements: List[DoubleCountingRegistration]):
             worksheet.write(row, 4, a.production_site.country.name)
             worksheet.write(row, 6, a.valid_from.strftime("%Y-%m-%d") + "-" + a.valid_until.strftime("%Y-%m-%d"))
 
-            production_site_output = ProductionSiteOutput.objects.filter(production_site=a.production_site)
-            biofuel_list = ", ".join([str(psi) for psi in production_site_output])
+            if not a.application : 
+                biofuel_list = "NC"
+            else :
+                productions = DoubleCountingProduction.objects.filter(dca=a.application, approved_quota__gt=0, year=a.valid_from.year)
+                biofuel_list = ", ".join([production.biofuel.name + " (" + production.feedstock.name+ ")" for production in productions])
+
             worksheet.write(row, 7, biofuel_list)
 
-            # production_site_input = ProductionSiteInput.objects.filter(production_site=a.production_site)
-            # feedstock_list = ", ".join([str(f) for f in production_site_input])
-            # worksheet.write(row, 5, feedstock_list)
 
         row += 1
 
