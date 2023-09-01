@@ -10,7 +10,7 @@ from certificates.models import DoubleCountingRegistration
 from certificates.serializers import DoubleCountingRegistrationSerializer
 from core.common import ErrorResponse
 from core.decorators import check_admin_rights
-from producers.models import ProductionSiteInput, ProductionSiteOutput
+from producers.models import ProductionSiteOutput
 
 
 class AgreementError:

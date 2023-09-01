@@ -9,7 +9,9 @@ import pytz
 from carbure import settings
 import unicodedata
 import boto3
+from certificates.models import DoubleCountingRegistration
 from core.decorators import check_admin_rights
+from doublecount.factories import agreement
 from doublecount.parser.dc_parser import parse_dc_excel
 
 from producers.models import ProductionSite
@@ -41,6 +43,7 @@ class DoubleCountingAddError:
     PRODUCTION_SITE_ADDRESS_UNDEFINED = "PRODUCTION_SITE_ADDRESS_UNDEFINED"
     APPLICATION_ALREADY_RECEIVED = "APPLICATION_ALREADY_RECEIVED"
     APPLICATION_ALREADY_EXISTS = "APPLICATION_ALREADY_EXISTS"
+    AGREEMENT_NOT_FOUND = "AGREEMENT_NOT_FOUND"
     MISSING_FILE = "MISSING_FILE"
 
 
@@ -50,6 +53,7 @@ def add_application(request, *args, **kwargs):
     producer_id = request.POST.get("producer_id", None)
     should_replace = request.POST.get("should_replace") == "true"
     production_site_id = request.POST.get("production_site_id", None)
+    agreement_id = request.POST.get("agreement_id", None)
     file = request.FILES.get("file")
 
     if not production_site_id:
@@ -80,6 +84,7 @@ def add_application(request, *args, **kwargs):
 
     start, end, _ = load_dc_period(info["start_year"])
 
+    # check if an application already exists for this producer, this period and is not accepted
     identical_replacable_application = DoubleCountingApplication.objects.filter(
         Q(producer=producer)
         & Q(period_start__year=start.year)
@@ -92,6 +97,15 @@ def add_application(request, *args, **kwargs):
         else:
             return ErrorResponse(400, DoubleCountingAddError.APPLICATION_ALREADY_EXISTS)
 
+    # check if the agreement to link already exists
+    if agreement_id:
+        try :
+            agreement = DoubleCountingRegistration.objects.get(certificate_id = agreement_id)
+            print('agreement ID: ', agreement.certificate_id)
+        except :
+            return ErrorResponse(400, DoubleCountingAddError.AGREEMENT_NOT_FOUND)
+        
+
     dca, created = DoubleCountingApplication.objects.get_or_create(
         producer=producer,
         production_site_id=production_site_id,
@@ -102,6 +116,12 @@ def add_application(request, *args, **kwargs):
 
     if not created:
         return ErrorResponse(400, DoubleCountingAddError.APPLICATION_ALREADY_RECEIVED)
+
+    if agreement_id:
+        dca.agreement_id = agreement_id
+        dca.save()
+        agreement.application = dca
+        agreement.save()
 
     # 2 - save all production_data DoubleCountingProduction in db
     sourcing_forecast_data, _ = load_dc_sourcing_data(dca, sourcing_forecast_rows)
