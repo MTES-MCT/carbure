@@ -135,7 +135,9 @@ export const ProductionSiteAdminDialog = ({
       if (errorCode === 'APPLICATION_ALREADY_EXISTS') {
         portal((close) => <ReplaceApplicationDialog onReplace={saveApplication} onClose={close} />)
       } else if (errorCode === 'AGREEMENT_ALREADY_EXISTS') {
-        setError(t("Un agrément correspond à cette periode existe déjà."))
+        setError(t("Un agrément existe déjà sur cette periode et pour ce site de production."))
+      } else if (errorCode === 'AGREEMENT_NOT_FOUND') {
+        setError(t("Le numéro \"{{agreementId}}\" ne correspond à aucun agrément actif.", { agreementId: value.agreement_id }))
       } else if (errorCode === 'PRODUCTION_SITE_ADDRESS_UNDEFINED') {
         setError(<MissingAddress productionSiteId={value.productionSite?.id} />)
       }
