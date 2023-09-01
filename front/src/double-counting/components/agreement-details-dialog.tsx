@@ -61,7 +61,7 @@ export const AgreementDetailsDialog = () => {
 
           {!application && !applicationResponse.loading && (
             <section>
-              <p><Trans>Aucun dossier de demande n'a été associé.</Trans></p>
+              <p><Trans>Aucun dossier de demande n'a été associé. Pour afficher les quotas approuvés, ajouter le dossier associé à cet agrément dans l'onglet "dossiers en attente".</Trans></p>
             </section>
           )}
           {application && <>
