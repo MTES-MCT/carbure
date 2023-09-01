@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from core.decorators import check_admin_rights
-from core.models import Entity, ExternalAdminRights
+from core.models import Entity, EntityCertificate, ExternalAdminRights
 from django.db.models import Q, Count, Value
 
 
@@ -35,6 +35,11 @@ def get_entities(request):
                 depots=Count("entitydepot", distinct=True),
                 production_sites=Count("productionsite", distinct=True),
                 certificates=Count("entitycertificate", distinct=True),
+                certificates_pending=Count(
+                    "entitycertificate",
+                    filter=Q(entitycertificate__checked_by_admin=False),
+                    distinct=True,
+                ),
                 double_counting=Count(
                     "doublecountingapplication",
                     filter=Q(doublecountingapplication__status=DoubleCountingApplication.ACCEPTED),
@@ -65,6 +70,7 @@ def get_entities(request):
                 certificates=Value(0),
                 double_counting=Value(0),
                 double_counting_requests=Value(0),
+                certificates_pending=Value(0),
             )
         )
 
@@ -85,6 +91,7 @@ def get_entities(request):
                 "certificates": e.certificates,
                 "double_counting": e.double_counting,
                 "double_counting_requests": e.double_counting_requests,
+                "certificates_pending": e.certificates_pending,
             }
         )
     return JsonResponse({"status": "success", "data": entities_sez})
