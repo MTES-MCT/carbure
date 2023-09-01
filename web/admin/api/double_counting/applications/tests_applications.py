@@ -1,4 +1,4 @@
-# test with : python web/manage.py test admin.api.double_counting.tests_double_counting.AdminDoubleCountTest --keepdb
+# test with : python web/manage.py test admin.api.double_counting.applications.tests_applications.AdminDoubleCountApplicationsTest --keepdb
 from datetime import date
 import json
 from nis import cat
@@ -20,6 +20,8 @@ from doublecount.factories import (
     DoubleCountingSourcingFactory,
     production,
 )
+from doublecount.factories import agreement
+from doublecount.factories.agreement import DoubleCountingRegistrationFactory
 
 from doublecount.models import DoubleCountingApplication, DoubleCountingDocFile, DoubleCountingProduction
 from producers.models import ProductionSite
@@ -153,6 +155,35 @@ class AdminDoubleCountApplicationsTest(TestCase):
         self.assertEqual(response.status_code, 400)
         error = response.json()["error"]
         self.assertEqual(error, DoubleCountingAddError.APPLICATION_ALREADY_RECEIVED)
+
+    def test_add_application_to_existing_agreement(self):
+        agreement_id = "FR_28_2023"
+        # agreement not existing
+        response = self.add_file("dc_agreement_application_valid.xlsx", {"agreement_id": agreement_id})
+        self.assertEqual(response.status_code, 400)
+        error = response.json()["error"]
+        self.assertEqual(error, DoubleCountingAddError.AGREEMENT_NOT_FOUND)
+
+        # agreement existing
+        _ =DoubleCountingRegistrationFactory.create(
+            certificate_id=agreement_id,
+            production_site=self.production_site, 
+            valid_from=date(self.requested_start_year, 1, 1)
+        )
+        response = self.add_file("dc_agreement_application_valid.xlsx", {"agreement_id": agreement_id})
+        self.assertEqual(response.status_code, 200)
+
+
+        # agreement should be linked to the application
+        application = DoubleCountingApplication.objects.get(
+            producer=self.production_site.producer, period_start__year=self.requested_start_year
+        )
+        self.assertEqual(application.agreement_id, agreement_id)    
+        agreement = DoubleCountingRegistration.objects.get(certificate_id=agreement_id)
+        self.assertEqual(agreement.application.id, application.id)
+
+        
+
 
     def test_production_site_address_mandatory(self):
         self.production_site.address = ""
