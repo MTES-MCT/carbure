@@ -252,9 +252,8 @@ const DechetIndustrielAlert = () => {
   return <Alert variant="warning" icon={AlertTriangle}>
     <p>
       <Trans>
-        Spécifité "Déchets industriels" : Une demande concernant des déchets industriels doit être accompagnée du questionnaire de processus de validation pour ces matières premieres</Trans>
+        Spécifité "Déchets industriels" : Une demande concernant des déchets industriels doit être accompagnée du questionnaire de processus de validation</Trans>
       {" "}
-      {/* <a href="./templates/test.docx" target="_blank" rel="noopener noreferrer">disponible ici</a>. */}
       <ExternalLink href={"https://www.ecologie.gouv.fr/sites/default/files/Processus%20de%20validation%20de%20mati%C3%A8res%20premi%C3%A8res.pdf"}>
         <Trans>disponible ici</Trans>
       </ExternalLink>
