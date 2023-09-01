@@ -43,6 +43,7 @@ class DoubleCountingAddError:
     PRODUCTION_SITE_ADDRESS_UNDEFINED = "PRODUCTION_SITE_ADDRESS_UNDEFINED"
     APPLICATION_ALREADY_RECEIVED = "APPLICATION_ALREADY_RECEIVED"
     APPLICATION_ALREADY_EXISTS = "APPLICATION_ALREADY_EXISTS"
+    AGREEMENT_ALREADY_EXISTS = "AGREEMENT_ALREADY_EXISTS"
     AGREEMENT_NOT_FOUND = "AGREEMENT_NOT_FOUND"
     MISSING_FILE = "MISSING_FILE"
 
@@ -53,7 +54,7 @@ def add_application(request, *args, **kwargs):
     producer_id = request.POST.get("producer_id", None)
     should_replace = request.POST.get("should_replace") == "true"
     production_site_id = request.POST.get("production_site_id", None)
-    agreement_id = request.POST.get("agreement_id", None)
+    agreement_id_to_link = request.POST.get("agreement_id", None)
     file = request.FILES.get("file")
 
     if not production_site_id:
@@ -98,14 +99,22 @@ def add_application(request, *args, **kwargs):
             return ErrorResponse(400, DoubleCountingAddError.APPLICATION_ALREADY_EXISTS)
 
     # check if the agreement to link already exists
-    if agreement_id:
+    if agreement_id_to_link:
         try :
-            agreement = DoubleCountingRegistration.objects.get(certificate_id = agreement_id)
-            print('agreement ID: ', agreement.certificate_id)
+            agreement = DoubleCountingRegistration.objects.get(certificate_id = agreement_id_to_link)
         except :
             return ErrorResponse(400, DoubleCountingAddError.AGREEMENT_NOT_FOUND)
-        
+    else :  
+        try:
+            agreement = DoubleCountingRegistration.objects.get(
+                production_site=production_site, 
+                valid_from=start,
+            )
+            return ErrorResponse(400, DoubleCountingAddError.AGREEMENT_ALREADY_EXISTS)
+        except:
+            agreement = None  
 
+    # create application
     dca, created = DoubleCountingApplication.objects.get_or_create(
         producer=producer,
         production_site_id=production_site_id,
@@ -117,8 +126,8 @@ def add_application(request, *args, **kwargs):
     if not created:
         return ErrorResponse(400, DoubleCountingAddError.APPLICATION_ALREADY_RECEIVED)
 
-    if agreement_id:
-        dca.agreement_id = agreement_id
+    if agreement_id_to_link:
+        dca.agreement_id = agreement_id_to_link
         dca.save()
         agreement.application = dca
         agreement.save()

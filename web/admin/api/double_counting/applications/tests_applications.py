@@ -170,6 +170,12 @@ class AdminDoubleCountApplicationsTest(TestCase):
             production_site=self.production_site, 
             valid_from=date(self.requested_start_year, 1, 1)
         )
+        
+        response = self.add_file("dc_agreement_application_valid.xlsx")
+        self.assertEqual(response.status_code, 400)
+        error = response.json()["error"]
+        self.assertEqual(error, DoubleCountingAddError.AGREEMENT_ALREADY_EXISTS)
+
         response = self.add_file("dc_agreement_application_valid.xlsx", {"agreement_id": agreement_id})
         self.assertEqual(response.status_code, 200)
 
@@ -181,8 +187,6 @@ class AdminDoubleCountApplicationsTest(TestCase):
         self.assertEqual(application.agreement_id, agreement_id)    
         agreement = DoubleCountingRegistration.objects.get(certificate_id=agreement_id)
         self.assertEqual(agreement.application.id, application.id)
-
-        
 
 
     def test_production_site_address_mandatory(self):

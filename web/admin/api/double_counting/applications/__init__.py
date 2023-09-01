@@ -13,7 +13,7 @@ urlpatterns = [
     path("details", get_application_details, name="admin-double-counting-application-details"),
     path("check-files", check_files, name="admin-double-counting-application-check-files"),
     path("add", add_application, name="admin-double-counting-application-add"),
-    path("update-quotas", update_approved_quotas, name="admin-double-counting-application-update-approved-quotas"),
+    path("update-approved-quotas", update_approved_quotas, name="admin-double-counting-application-update-approved-quotas"),
     path("approve", approve_dca, name="admin-double-counting-application-approve"),
     path("reject", reject_dca, name="admin-double-counting-application-reject"),
 ]

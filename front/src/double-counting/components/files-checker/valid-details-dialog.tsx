@@ -14,12 +14,13 @@ import { usePortal } from "common/components/portal"
 import Tag from "common/components/tag"
 import { useMutation } from "common/hooks/async"
 import { addDoubleCountingApplication } from "double-counting/api"
+import React, { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
-import { useLocation, useMatch, useNavigate } from "react-router-dom"
+import { useMatch, useNavigate } from "react-router-dom"
 import { DoubleCountingFileInfo } from "../../types"
 import ApplicationTabs from "../application-tabs"
 import FileApplicationInfo from "./file-application-info"
-import React, { useState } from "react"
+import { TextInput } from "common/components/input"
 
 export type ValidDetailsDialogProps = {
   file: File
@@ -82,6 +83,7 @@ export const ValidDetailsDialog = ({
 const defaultProductionForm = {
   productionSite: undefined as ProductionSite | undefined,
   producer: undefined as Entity | undefined,
+  agreement_id: undefined as string | undefined,
 }
 
 type ProductionForm = typeof defaultProductionForm
@@ -91,6 +93,18 @@ export type ProductionSiteDialogProps = {
   fileData: DoubleCountingFileInfo
   onClose: () => void
 }
+
+
+function MissingAddress({ productionSiteId }: { productionSiteId: number | undefined }) {
+  const { t } = useTranslation()
+  return (
+    <>
+      {t("L'adresse, la ville ou le code postal du site de production n'est pas renseignée. Veuillez l'ajouter dans les informations liées à la société.")}
+      <ExternalLink href={`/admin/producers/productionsite/${productionSiteId}/change`}>
+        Editer le site de production
+      </ExternalLink></>);
+}
+
 
 export const ProductionSiteAdminDialog = ({
   file,
@@ -106,7 +120,6 @@ export const ProductionSiteAdminDialog = ({
   const notify = useNotify()
   const notifyError = useNotifyError()
   const navigate = useNavigate()
-  const location = useLocation()
 
   const addApplication = useMutation(addDoubleCountingApplication, {
     invalidates: ["dc-applications", "dc-snapshot"],
@@ -118,15 +131,13 @@ export const ProductionSiteAdminDialog = ({
       })
     },
     onError(err) {
-      const errorCode = (err as AxiosError<{ error: string }>).response?.data
-        .error
+      const errorCode = (err as AxiosError<{ error: string }>).response?.data.error
       if (errorCode === 'APPLICATION_ALREADY_EXISTS') {
         portal((close) => <ReplaceApplicationDialog onReplace={saveApplication} onClose={close} />)
+      } else if (errorCode === 'AGREEMENT_ALREADY_EXISTS') {
+        setError(t("Un agrément correspond à cette periode existe déjà."))
       } else if (errorCode === 'PRODUCTION_SITE_ADDRESS_UNDEFINED') {
-        let message = <>
-
-        </>
-        setError(message)
+        setError(<MissingAddress productionSiteId={value.productionSite?.id} />)
       }
       else {
         notifyError(err, t("Impossible d'ajouter le dossier"))
@@ -143,6 +154,7 @@ export const ProductionSiteAdminDialog = ({
       value.productionSite.id,
       value.producer.id,
       file,
+      value.agreement_id,
       shouldReplace
     )
   }
@@ -172,14 +184,16 @@ export const ProductionSiteAdminDialog = ({
             normalize={norm.normalizeProductionSite}
             {...bind("productionSite")}
           />
+          <TextInput
+            label={t("N° d’agrément lié à ce dossier")}
+            placeholder={t("Laisser vide si nouvelle demande")}
+            {...bind("agreement_id")}
+          />
         </section>
         {error &&
           <section>
-            <Alert variant="warning" icon={AlertTriangle}>
-              {t("L'adresse, la ville ou le code postal du site de production n'est pas renseignée. Veuillez l'ajouter dans les informations liées à la société.")}
-              <ExternalLink href={`/admin/producers/productionsite/${value.productionSite?.id}/change`}>
-                Editer le site de production
-              </ExternalLink>
+            <Alert variant="warning" icon={AlertTriangle} style={{ display: "inline-block" }}>
+              {error}
             </Alert>
           </section>}
       </main>
