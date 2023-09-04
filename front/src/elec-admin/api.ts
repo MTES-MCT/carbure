@@ -1,5 +1,5 @@
 import { api, Api } from "common/services/api"
-import { ElecSnapshot } from "./types"
+import { ElecAdminSnapshot } from "./types"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/v5/admin/elec/years", {
@@ -8,7 +8,7 @@ export function getYears(entity_id: number) {
 }
 
 export function getSnapshot(entity_id: number, year: number) {
-  return api.get<Api<ElecSnapshot>>("/v5/admin/elec/snapshot", {
+  return api.get<Api<ElecAdminSnapshot>>("/v5/admin/elec/snapshot", {
     params: { entity_id, year },
   })
 }
