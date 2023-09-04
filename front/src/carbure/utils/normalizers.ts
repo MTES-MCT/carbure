@@ -209,7 +209,7 @@ export function getEntityTypeLabel(type: EntityType) {
     case EntityType.Airline:
       return i18next.t("Compagnie aérienne")
     case EntityType.CPO:
-      return i18next.t("Opérateur de bornes électriques")
+      return i18next.t("Aménageur de bornes électriques")
     case EntityType.Unknown:
     default:
       return i18next.t("Inconnu")
