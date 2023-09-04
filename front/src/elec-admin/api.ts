@@ -13,7 +13,8 @@ export function getSnapshot(entity_id: number, year: number) {
   })
 }
 
-export function importCertificates(entity_id: number, file: File) {
+export function importProvisionCertificates(entity_id: number, file: File) {
+  console.log('entity_id:', entity_id)
   return api.post("/v5/admin/elec/import-provision-certificates", {
     entity_id,
     file,

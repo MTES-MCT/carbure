@@ -39,39 +39,34 @@ export const ElecAdmin = () => {
   })
 
   // const snapshot = snapshotResponse.result?.data.data ?? defaultElecAdminSnapshot
-  const snapshot = elecAdminSnapshot ?? defaultElecAdminSnapshot //TO TEST with testing data
-
-  const importCertificates = useMutation(api.importCertificates)
+  const snapshot = elecAdminSnapshot ?? defaultElecAdminSnapshot //TODO TEST with testing data
 
   return (
-    <FileArea
-      icon={Upload}
-      label={t("Importer le fichier\nsur la plateforme")}
-      onChange={(file) => file && importCertificates.execute(entity.id, file)}
-    >
-      <Main>
-        <header>
-          <section>
-            <h1>{t("Électricité")}</h1>
-          </section>
 
-          <section>
-            <ElecAdminTabs loading={snapshotResponse.loading} snapshot={snapshot} />
-          </section>
-        </header>
+    <Main>
+      <header>
+        <section>
+          <h1>{t("Électricité")}</h1>
+        </section>
+
+        <section>
+          <ElecAdminTabs loading={snapshotResponse.loading} snapshot={snapshot} />
+        </section>
+      </header>
 
 
-        <Routes>
-          <Route
-            path="provision/*"
-            element={
-              <ProvisionList snapshot={snapshot} />
-            }
-          />
+      <Routes>
+        <Route
+          path="provision/*"
+          element={
+            <ProvisionList snapshot={snapshot} />
+          }
+        />
 
-        </Routes>
-      </Main>
-    </FileArea>
+      </Routes>
+    </Main>
+
+
   )
 }
 
