@@ -1,22 +1,16 @@
 import useEntity from "carbure/hooks/entity"
-import { Col, Main, Row } from "common/components/scaffold"
+import { Main } from "common/components/scaffold"
 import Select from "common/components/select"
-import { useMutation, useQuery } from "common/hooks/async"
+import { useQuery } from "common/hooks/async"
 import useYears from "common/hooks/years"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
-// import OperatorTabs from "./components/operator-tabs"
-// import TicketSources from "./components/ticket-sources"
-// import OperatorTickets from "./components/tickets/operator-tickets"
-import * as api from "./api"
-import Button from "common/components/button"
-import { FileArea } from "common/components/input"
-import { Loader, Upload } from "common/components/icons"
+import { Loader } from "common/components/icons"
 import Tabs from "common/components/tabs"
-import { elecAdminSnapshot } from "./__test__/data"
 import { formatNumber } from "common/utils/formatters"
-import { ElecAdminSnapshot } from "./types"
+import * as api from "./api"
 import ProvisionList from "./components/provisionList"
+import { ElecAdminProvisionCertificateStatus, ElecAdminSnapshot } from "./types"
 
 
 const defaultElecAdminSnapshot: ElecAdminSnapshot = {
@@ -32,14 +26,14 @@ export const ElecAdmin = () => {
   const entity = useEntity()
 
   const years = useYears("elec-admin", api.getYears)
-
   const snapshotResponse = useQuery(api.getSnapshot, {
     key: "elec-admin-snapshot",
     params: [entity.id, years.selected],
   })
 
-  // const snapshot = snapshotResponse.result?.data.data ?? defaultElecAdminSnapshot
-  const snapshot = elecAdminSnapshot ?? defaultElecAdminSnapshot //TODO TEST with testing data
+  const snapshot = snapshotResponse.result?.data.data ?? defaultElecAdminSnapshot
+
+  // const snapshot = elecAdminSnapshot ?? defaultElecAdminSnapshot //TODO TEST with testing data
 
   return (
 
@@ -47,6 +41,16 @@ export const ElecAdmin = () => {
       <header>
         <section>
           <h1>{t("Électricité")}</h1>
+
+          <Select
+            loading={years.loading}
+            variant="inline"
+            placeholder={t("Choisir une année")}
+            value={years.selected}
+            onChange={years.setYear}
+            options={years.options}
+            sort={(year) => -year.value}
+          />
         </section>
 
         <section>
@@ -59,7 +63,18 @@ export const ElecAdmin = () => {
         <Route
           path="provision/*"
           element={
-            <ProvisionList snapshot={snapshot} />
+            <ProvisionList snapshot={snapshot} year={years.selected} />
+          }
+        />
+
+
+        <Route
+          path="*"
+          element={
+            <Navigate
+              replace
+              to={`provision/${ElecAdminProvisionCertificateStatus.Available.toLocaleLowerCase()}`}
+            />
           }
         />
 
@@ -93,7 +108,7 @@ function ElecAdminTabs({
       <p style={{
         fontWeight: "normal"
       }}>
-        {loading ? <Loader size={20} /> : formatNumber(snapshot?.provided_energy)}
+        {loading ? <Loader size={20} /> : formatNumber(snapshot?.provided_energy)} MWh
       </p>
       <strong>
         {t("Énergie attribuée")}
@@ -106,7 +121,7 @@ function ElecAdminTabs({
       <p style={{
         fontWeight: "normal"
       }}>
-        {loading ? <Loader size={20} /> : formatNumber(snapshot?.transfered_energy)}
+        {loading ? <Loader size={20} /> : formatNumber(snapshot?.transfered_energy)} MWh
       </p>
       <strong>
         {t("Énergie cédée")}
@@ -114,4 +129,5 @@ function ElecAdminTabs({
     </>
   }]} />);
 }
+
 

@@ -100,19 +100,19 @@ def add_application(request, *args, **kwargs):
 
     # check if the agreement to link already exists
     if agreement_id_to_link:
-        try :
-            agreement = DoubleCountingRegistration.objects.get(certificate_id = agreement_id_to_link)
-        except :
+        try:
+            agreement = DoubleCountingRegistration.objects.get(certificate_id=agreement_id_to_link)
+        except:
             return ErrorResponse(400, DoubleCountingAddError.AGREEMENT_NOT_FOUND)
-    else :  
+    else:
         try:
             agreement = DoubleCountingRegistration.objects.get(
-                production_site=production_site, 
+                production_site=production_site,
                 valid_from=start,
             )
             return ErrorResponse(400, DoubleCountingAddError.AGREEMENT_ALREADY_EXISTS)
         except:
-            agreement = None  
+            agreement = None
 
     # create application
     dca, created = DoubleCountingApplication.objects.get_or_create(
@@ -137,9 +137,12 @@ def add_application(request, *args, **kwargs):
     production_data, _ = load_dc_production_data(dca, production_max_rows, production_forecast_rows, requested_quota_rows)
     DoubleCountingSourcing.objects.filter(dca=dca).delete()
     for sourcing in sourcing_forecast_data:
+        print("sourcing.feedstock: ", sourcing.feedstock)
+        print("sourcing.metric_tonnes: ", sourcing.metric_tonnes)
         sourcing.save()
     DoubleCountingProduction.objects.filter(dca=dca).delete()
     for production in production_data:
+        print("production: ", production)
         production.save()
 
     try:

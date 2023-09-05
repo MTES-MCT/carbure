@@ -1,5 +1,5 @@
 import { api, Api } from "common/services/api"
-import { ElecAdminSnapshot } from "./types"
+import { ElecAdminProvisionCertificateQuery, ElecAdminSnapshot } from "./types"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/v5/admin/elec/years", {
@@ -14,9 +14,14 @@ export function getSnapshot(entity_id: number, year: number) {
 }
 
 export function importProvisionCertificates(entity_id: number, file: File) {
-  console.log('entity_id:', entity_id)
   return api.post("/v5/admin/elec/import-provision-certificates", {
     entity_id,
     file,
+  })
+}
+
+export function getProvisionCertificates(query: ElecAdminProvisionCertificateQuery) {
+  return api.get("/v5/admin/elec/provision-certificates", {
+    params: query,
   })
 }

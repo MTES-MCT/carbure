@@ -94,7 +94,7 @@ def find_provision_certificates(**filters):
         if "FULL" in filters["status"]:
             status_filter = status_filter | Q(remaining_energy_amount=F("energy_amount"))
         if "AVAILABLE" in filters["status"]:
-            status_filter = status_filter | Q(remaining_energy_amount__gt=0, remaining_energy_amount__lt=F("energy_amount"))
+            status_filter = status_filter | Q(remaining_energy_amount__gt=0, remaining_energy_amount__lte=F("energy_amount"))
         if "EMPTY" in filters["status"]:
             status_filter = status_filter | Q(remaining_energy_amount=0)
         provision_certificate = provision_certificate.filter(status_filter)
