@@ -1,3 +1,4 @@
+import datetime
 from core.tests_utils import setup_current_user
 from core.models import Entity
 from django.test import TestCase
@@ -55,8 +56,6 @@ class ElecCPOTest(TestCase):
         )
 
     def test_transfer_provision_certificate_pile_poil(self):
-        ElecTransferCertificate.objects.all().delete()
-
         self.client.post(
             reverse("elec-cpo-transfer-provision-certificate"),
             {
@@ -80,8 +79,6 @@ class ElecCPOTest(TestCase):
         self.assertEqual(transfer_cert.client_id, self.operator.id)
 
     def test_transfer_provision_certificate_multiple(self):
-        ElecTransferCertificate.objects.all().delete()
-
         self.client.post(
             reverse("elec-cpo-transfer-provision-certificate"),
             {
@@ -105,8 +102,6 @@ class ElecCPOTest(TestCase):
         self.assertEqual(transfer_cert.client_id, self.operator.id)
 
     def test_transfer_provision_certificate_too_much(self):
-        ElecTransferCertificate.objects.all().delete()
-
         response = self.client.post(
             reverse("elec-cpo-transfer-provision-certificate"),
             {
@@ -129,3 +124,34 @@ class ElecCPOTest(TestCase):
 
         transfer_cert_count = ElecTransferCertificate.objects.count()
         self.assertEqual(transfer_cert_count, 0)
+
+    def test_cancel_transfer_certificate(self):
+        self.client.post(
+            reverse("elec-cpo-transfer-provision-certificate"),
+            {
+                "entity_id": self.cpo.id,
+                "energy_mwh": 1500,
+                "client_id": self.operator.id,
+            },
+        )
+
+        transfer = ElecTransferCertificate.objects.last()
+        self.assertEqual(transfer.energy_amount, 1500)
+
+        response = self.client.post(
+            reverse("elec-cpo-cancel-transfer-certificate"),
+            {
+                "entity_id": self.cpo.id,
+                "transfer_certificate_id": transfer.id,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        prov1 = ElecProvisionCertificate.objects.get(pk=self.prov1.id)
+        prov2 = ElecProvisionCertificate.objects.get(pk=self.prov2.id)
+        prov3 = ElecProvisionCertificate.objects.get(pk=self.prov3.id)
+
+        self.assertEqual(prov1.remaining_energy_amount, 0)
+        self.assertEqual(prov2.remaining_energy_amount, 500)
+        self.assertEqual(prov3.remaining_energy_amount, 2000)

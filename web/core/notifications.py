@@ -122,5 +122,5 @@ def notify_elec_transfer_certificate(transfer_certificate: ElecTransferCertifica
     notif.dest = transfer_certificate.client
     notif.send_by_email = True
     notif.notify_administrator = False
-    notif.meta = {'supplier': transfer_certificate.supplier.name}
+    notif.meta = {'supplier': transfer_certificate.supplier.name, 'transfer_certificate_id': transfer_certificate.id}
     notif.save()
