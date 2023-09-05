@@ -33,13 +33,14 @@ def get_snapshot(request, *args, **kwargs):
     try:
         provision_certificates = ElecProvisionCertificate.objects.filter(year=year, cpo_id=entity_id)
         transfer_certificates = ElecTransferCertificate.objects.filter(year=year, supplier_id=entity_id)
-        
+
         return SuccessResponse(
             {
+                "provisioned_energy": provision_certificates.aggregate(Sum("energy_amount"))["energy_amount__sum"] or 0,  # fmt:skip
                 "remaining_energy": provision_certificates.aggregate(Sum("remaining_energy_amount"))["remaining_energy_amount__sum"] or 0,  # fmt:skip
                 "provision_cert_available": provision_certificates.filter(remaining_energy_amount__gt=0).count(),
                 "provision_cert_history": provision_certificates.filter(remaining_energy_amount=0).count(),
-                "transfer_certificates": transfer_certificates.count(),
+                "transferred_energy": transfer_certificates.aggregate(Sum("energy_amount"))["energy_amount__sum"] or 0,  # fmt:skip
                 "transfer_certificates_pending": transfer_certificates.filter(status=ElecTransferCertificate.PENDING).count(),
                 "transfer_certificates_accepted": transfer_certificates.filter(status=ElecTransferCertificate.ACCEPTED).count(),
                 "transfer_certificates_rejected": transfer_certificates.filter(status=ElecTransferCertificate.REJECTED).count(),
