@@ -8,7 +8,7 @@ export interface ElecAdminProvisionCertificateTableProps {
     loading: boolean
     provisionCertificates: ElecProvisionCertificatePreview[]
     order: Order | undefined
-    rowLink: (provisionCertificate: ElecProvisionCertificatePreview) => To
+    rowLink?: (provisionCertificate: ElecProvisionCertificatePreview) => To
     onOrder: (order: Order | undefined) => void
     selected: number[]
     onSelect: (selected: number[]) => void

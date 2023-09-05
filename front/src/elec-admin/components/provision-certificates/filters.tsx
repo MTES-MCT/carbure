@@ -1,7 +1,7 @@
 import * as norm from "carbure/utils/normalizers"
 import { MultiSelect, MultiSelectProps } from "common/components/multi-select"; // prettier-ignore
 import { Grid } from "common/components/scaffold"
-import { Normalizer } from "common/utils/normalize"
+import { Normalizer, defaultNormalizer } from "common/utils/normalize"
 import { useTranslation } from "react-i18next"
 import { ElecAdminProvisionCertificateFilter } from "elec-admin/types";
 
@@ -28,8 +28,8 @@ export function ProvisionCertificateFilters({
 
     return (
         <Grid>
-            {filters.map((filter) => (
-                <FilterSelect
+            {filters.map((filter) => {
+                return <FilterSelect
                     key={filter}
                     field={filter}
                     placeholder={filterLabels[filter]}
@@ -37,7 +37,8 @@ export function ProvisionCertificateFilters({
                     onChange={(value) => onSelect({ ...selected, [filter]: value ?? [] })}
                     getOptions={() => getFilterOptions(filter)}
                 />
-            ))}
+            }
+            )}
         </Grid>
     )
 }
@@ -73,7 +74,7 @@ export const FilterSelect = ({
         variant="solid"
         value={value}
         onChange={onChange}
-        normalize={filterNormalizers[field]}
+        normalize={defaultNormalizer}
         sort={(item) => (item.value === "UNKNOWN" ? "" : item.label)}
     />
 )

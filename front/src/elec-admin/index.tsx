@@ -16,8 +16,8 @@ import { ElecAdminProvisionCertificateStatus, ElecAdminSnapshot } from "./types"
 const defaultElecAdminSnapshot: ElecAdminSnapshot = {
   provision_certificates: 0,
   transfer_certificates: 0,
-  provided_energy: 0,
-  transfered_energy: 0
+  provisioned_energy: 0,
+  transferred_energy: 0
 }
 
 export const ElecAdmin = () => {
@@ -108,10 +108,12 @@ function ElecAdminTabs({
       <p style={{
         fontWeight: "normal"
       }}>
-        {loading ? <Loader size={20} /> : formatNumber(snapshot?.provided_energy)} MWh
+        {loading ? <Loader size={20} /> : snapshot?.provision_certificates}
+        {/* {loading ? <Loader size={20} /> : formatNumber(snapshot?.provisioned_energy)} MWh */}
       </p>
       <strong>
-        {t("Énergie attribuée")}
+        {/* {t("Énergie attribuée")} */}
+        {t("Certificats de founiture")}
       </strong>
     </>
   }, {
@@ -121,10 +123,12 @@ function ElecAdminTabs({
       <p style={{
         fontWeight: "normal"
       }}>
-        {loading ? <Loader size={20} /> : formatNumber(snapshot?.transfered_energy)} MWh
+        {loading ? <Loader size={20} /> : snapshot?.transfer_certificates}
+        {/* {loading ? <Loader size={20} /> : formatNumber(snapshot?.transferred_energy)} MWh */}
       </p>
       <strong>
         {t("Énergie cédée")}
+        {/* {t("Énergie cédée")} */}
       </strong>
     </>
   }]} />);

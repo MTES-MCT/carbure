@@ -5,8 +5,8 @@ import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { useProvistionCertificateQueryParamsStore } from "elec-admin/hooks/provision-certificate-query-params-store"
 import { useProvisionCertificatesQuery } from "elec-admin/hooks/provision-certificates-query"
-import { ElecAdminProvisionCertificateFilter, ElecAdminProvisionCertificateStatus, ElecAdminSnapshot, ElecProvisionCertificatePreview } from "elec-admin/types"
-import { useLocation, useMatch } from "react-router-dom"
+import { ElecAdminProvisionCertificateFilter, ElecAdminProvisionCertificateStatus, ElecAdminSnapshot } from "elec-admin/types"
+import { useMatch } from "react-router-dom"
 import * as api from "../../api"
 import ProvisionImporButton from "./Import-button"
 import ProvisionCertificateFilters from "./filters"
@@ -20,7 +20,6 @@ type ProvisionListProps = {
 
 const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
 
-  const location = useLocation()
   const entity = useEntity()
   const status = useAutoStatus()
   const [state, actions] = useProvistionCertificateQueryParamsStore(entity, year, status, snapshot)
@@ -31,17 +30,16 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
     params: [query],
   })
 
-  const showProvisionCertificateDetails = (provisionCertificate: ElecProvisionCertificatePreview) => {
-    //TODO: fix this
-    return {
-      pathname: location.pathname,
-      search: location.search,
-      hash: `provision-certificate/${provisionCertificate.id}`,
-    }
-  }
+  // const showProvisionCertificateDetails = (provisionCertificate: ElecProvisionCertificatePreview) => {
+  //   return {
+  //     pathname: location.pathname,
+  //     search: location.search,
+  //     hash: `provision-certificate/${provisionCertificate.id}`,
+  //   }
+  // }
 
   const provisionCertificatesData = provisionCertificatesResponse.result?.data.data
-  const ids = provisionCertificatesData?.ids ?? []
+  // const ids = provisionCertificatesData?.ids ?? []
 
   const total = provisionCertificatesData?.total ?? 0
   const count = provisionCertificatesData?.returned ?? 0
@@ -52,7 +50,7 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
             label={t("Importer le fichier\nsur la plateforme")}
             onChange={(file) => file && importCertificates.execute(entity.id, file)}
         > */}
-      {/* <Bar>
+      <Bar>
         <ProvisionCertificateFilters
           filters={FILTERS}
           selected={state.filters}
@@ -61,7 +59,7 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
             api.getProvisionCertificateFilters(filter, query)
           }
         />
-      </Bar> */}
+      </Bar>
       <section>
 
 
@@ -82,7 +80,7 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
               loading={provisionCertificatesResponse.loading}
               order={state.order}
               provisionCertificates={provisionCertificatesData.elec_provision_certificates}
-              rowLink={showProvisionCertificateDetails}
+              // rowLink={showProvisionCertificateDetails}
               selected={state.selection}
               onSelect={actions.setSelection}
               onOrder={actions.setOrder}

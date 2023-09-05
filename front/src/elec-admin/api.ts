@@ -25,18 +25,17 @@ const QUERY_RESET: Partial<ElecAdminProvisionCertificateQuery> = {
   sort_by: undefined,
   order: undefined,
 }
-export function getProvisionCertificateFilters(field: ElecAdminProvisionCertificateFilter, query: ElecAdminProvisionCertificateQuery) {
-  // const params = { filter: field }
+export async function getProvisionCertificateFilters(field: ElecAdminProvisionCertificateFilter, query: ElecAdminProvisionCertificateQuery) {
   const params = { filter: field, ...query, ...QUERY_RESET }
 
   return api
-    .get<Api<string[]>>("/v5/admin/elec/provision-certificate-filters", { params })
-    .then((res) => res.data.data ?? [])
+    .get<Api<{ filter_values: string[] }>>("/v5/admin/elec/provision-certificate-filters", { params })
+    .then((res) => res.data.data?.filter_values ?? [])
+
 }
 
 
 export function getProvisionCertificates(query: ElecAdminProvisionCertificateQuery) {
-  console.log('query:', query)
   return api.get<Api<ElecProvisionCertificatesData>>("/v5/admin/elec/provision-certificates", {
     params: query,
   })

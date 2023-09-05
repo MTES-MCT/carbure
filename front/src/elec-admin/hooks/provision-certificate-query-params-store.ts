@@ -141,7 +141,6 @@ export function useProvistionCertificateQueryParamsStore(
   // // sync store state with status set in the route
   if (state.status !== status) {
     actions.setStatus(status)
-    console.log('setStatus:', status)
   }
 
   if (snapshot && state.snapshot !== snapshot) {
