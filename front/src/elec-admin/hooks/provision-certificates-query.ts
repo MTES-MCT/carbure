@@ -10,7 +10,7 @@ export function useProvisionCertificatesQuery({
   page = 0,
   limit,
   order,
-  // filters,
+  filters,
 }: ElecAdminProvisionCertificateStates) {
   return useMemo<ElecAdminProvisionCertificateQuery>(
     () => ({
@@ -22,9 +22,8 @@ export function useProvisionCertificatesQuery({
       limit: limit || undefined,
       sort_by: order?.column,
       order: order?.direction,
-      // ...filters,
+      ...filters,
     }),
-    [entity.id, year, status, search, limit, order, page]
-    // [entity.id, status, search, limit, order, filters, page]
+    [entity.id, status, search, limit, order, filters, page]
   )
 }
