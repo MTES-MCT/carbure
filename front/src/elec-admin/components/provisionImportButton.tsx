@@ -2,7 +2,7 @@
 import { AxiosError } from "axios"
 import useEntity from "carbure/hooks/entity"
 import Alert from "common/components/alert"
-import Button from "common/components/button"
+import Button, { ExternalLink } from "common/components/button"
 import Dialog from "common/components/dialog"
 import { Form, useForm } from "common/components/form"
 import { AlertTriangle, Check, Return, Upload } from "common/components/icons"
@@ -47,9 +47,7 @@ const ProvisionImportDialog = ({
     const notify = useNotify()
     const entity = useEntity()
 
-    const [missingCPO, setMissingCPO] = useState<string[] | undefined>(["Electron",
-        "Pessimistron",
-        "Full - Elec"]) //TODO add test
+    const [missingCPO, setMissingCPO] = useState<string[] | undefined>(undefined) //TODO add test
 
     const { value, bind } = useForm({
         provisionCertificatesFile: undefined as File | undefined,
@@ -65,12 +63,17 @@ const ProvisionImportDialog = ({
             } else {
                 notify(t("L'import excel a échoué"), { variant: "danger" })
             }
+        },
+        onSuccess: () => {
+            notify(t("L'import excel a réussi"), { variant: "success" })
+            onClose()
         }
     })
 
-    async function submitFiles() {
+    function submitFiles() {
         if (!value.provisionCertificatesFile) return
-        const resp = await importProvisionCertificates.execute(
+        setMissingCPO(undefined)
+        importProvisionCertificates.execute(
             entity.id,
             value.provisionCertificatesFile as File
         )
@@ -110,6 +113,11 @@ const ProvisionImportDialog = ({
                                         {missingCPO.map((cpo) => <li key={cpo}>{cpo}</li>)}
                                     </ul>
                                     {t("Veuillez créer les entités ci-dessus sur CarbuRe dans l’interface d’aministrateur et ajouter à nouveau votre fichier d’énergie à céder.")}
+                                    {" "}
+                                    <ExternalLink href="/org/9/entities">
+                                        Ajouter des sociétés
+                                    </ExternalLink>
+
                                 </section>
                             </Alert>
                         }

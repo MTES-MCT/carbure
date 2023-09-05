@@ -70,14 +70,14 @@ export const AddEntityDialog = ({
                   hasAirlineOnly
                     ? [EntityType.Airline]
                     : [
-                        EntityType.Operator,
-                        EntityType.Producer,
-                        EntityType.Trader,
-                        EntityType.Auditor,
-                        EntityType.Airline,
-                        EntityType.ExternalAdmin,
-                        EntityType.CPO,
-                      ]
+                      EntityType.Operator,
+                      EntityType.Producer,
+                      EntityType.Trader,
+                      EntityType.Auditor,
+                      EntityType.Airline,
+                      EntityType.ExternalAdmin,
+                      EntityType.CPO,
+                    ]
                 }
                 {...bind("entity_type")}
               />
@@ -109,6 +109,7 @@ export const AddEntityDialog = ({
             label={t("Ajouter")}
             variant="primary"
             submit="add-entity"
+            loading={addEntityRequest.loading}
             disabled={addEntityRequest.loading}
           />
 
