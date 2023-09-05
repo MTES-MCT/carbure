@@ -3,9 +3,11 @@ import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
 import useTitle from "common/hooks/title"
-import { ElecAdminProvisionCertificateStatus, ElecAdminSnapshot, ElecAdminProvisionCertificateStates } from "elec-admin/types"
+import { ElecAdminProvisionCertificateFilterSelection } from "elec-admin/components/provision-certificates/filters"
+import { ElecAdminProvisionCertificateStates, ElecAdminProvisionCertificateStatus, ElecAdminSnapshot } from "elec-admin/types"
 import { useTranslation } from "react-i18next"
-import { SafClientSnapshot, SafOperatorSnapshot, SafQueryType, SafStates, SafTicketSourceStatus } from "saf/types"
+import { SafQueryType, SafTicketSourceStatus } from "saf/types"
+import { useFilterSearchParams } from "./provision-certificate-filter-search-params"
 
 
 
@@ -17,7 +19,7 @@ export function useProvistionCertificateQueryParamsStore(
 ) {
 
   const [limit, saveLimit] = useLimit()
-  //   const [filtersParams, setFiltersParams] = useFilterSearchParams()
+  const [filtersParams, setFiltersParams] = useFilterSearchParams()
 
   const [state, actions] = useStore(
     {
@@ -25,7 +27,7 @@ export function useProvistionCertificateQueryParamsStore(
       year,
       snapshot,
       status,
-      //   filters: filtersParams,
+      filters: filtersParams,
       // search: undefined,
       // invalid: false,
       // deadline: false,
@@ -37,7 +39,7 @@ export function useProvistionCertificateQueryParamsStore(
     {
       setEntity: (entity: Entity) => ({
         entity,
-        // filters: filtersParams,
+        filters: filtersParams,
         // invalid: false,
         // deadline: false,
         selection: [],
@@ -46,7 +48,7 @@ export function useProvistionCertificateQueryParamsStore(
 
       setYear: (year: number) => ({
         year,
-        // filters: filtersParams,
+        filters: filtersParams,
         // invalid: false,
         // deadline: false,
         selection: [],
@@ -55,7 +57,7 @@ export function useProvistionCertificateQueryParamsStore(
 
       setSnapshot: (snapshot: ElecAdminSnapshot) => ({
         snapshot,
-        // filters: filtersParams,
+        filters: filtersParams,
         // invalid: false,
         // deadline: false,
         selection: [],
@@ -65,7 +67,7 @@ export function useProvistionCertificateQueryParamsStore(
       setStatus: (status: ElecAdminProvisionCertificateStatus) => {
         return {
           status,
-          // filters: filtersParams,
+          filters: filtersParams,
           // invalid: false,
           // deadline: false,
           selection: [],
@@ -76,22 +78,22 @@ export function useProvistionCertificateQueryParamsStore(
       setType: (type: SafQueryType) => {
         return {
           type,
-          // filters: filtersParams,
+          filters: filtersParams,
           selection: [],
           page: 0,
         }
       },
 
-      // setFilters: (filters: SafFilterSelection) => {
-      //   setTimeout(() => {
-      //     setFiltersParams(filters)
-      //   })
-      //   return {
-      //     filters,
-      //     selection: [],
-      //     page: 0,
-      //   }
-      // },
+      setFilters: (filters: ElecAdminProvisionCertificateFilterSelection) => {
+        setTimeout(() => {
+          setFiltersParams(filters)
+        })
+        return {
+          filters,
+          selection: [],
+          page: 0,
+        }
+      },
 
       setSearch: (search: string | undefined) => ({
         search,
@@ -142,9 +144,9 @@ export function useProvistionCertificateQueryParamsStore(
     console.log('setStatus:', status)
   }
 
-  // if (snapshot && state.snapshot !== snapshot) {
-  //   actions.setSnapshot(snapshot)
-  // }
+  if (snapshot && state.snapshot !== snapshot) {
+    actions.setSnapshot(snapshot)
+  }
 
 
   return [state, actions] as [typeof state, typeof actions]

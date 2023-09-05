@@ -1,5 +1,5 @@
 import { api, Api } from "common/services/api"
-import { ElecAdminProvisionCertificateQuery, ElecAdminSnapshot } from "./types"
+import { ElecAdminProvisionCertificateFilter, ElecAdminProvisionCertificateQuery, ElecAdminSnapshot, ElecProvisionCertificatesData } from "./types"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/v5/admin/elec/years", {
@@ -19,9 +19,25 @@ export function importProvisionCertificates(entity_id: number, file: File) {
     file,
   })
 }
+const QUERY_RESET: Partial<ElecAdminProvisionCertificateQuery> = {
+  limit: undefined,
+  from_idx: undefined,
+  sort_by: undefined,
+  order: undefined,
+}
+export function getProvisionCertificateFilters(field: ElecAdminProvisionCertificateFilter, query: ElecAdminProvisionCertificateQuery) {
+  // const params = { filter: field }
+  const params = { filter: field, ...query, ...QUERY_RESET }
+
+  return api
+    .get<Api<string[]>>("/v5/admin/elec/provision-certificate-filters", { params })
+    .then((res) => res.data.data ?? [])
+}
+
 
 export function getProvisionCertificates(query: ElecAdminProvisionCertificateQuery) {
-  return api.get("/v5/admin/elec/provision-certificates", {
+  console.log('query:', query)
+  return api.get<Api<ElecProvisionCertificatesData>>("/v5/admin/elec/provision-certificates", {
     params: query,
   })
 }

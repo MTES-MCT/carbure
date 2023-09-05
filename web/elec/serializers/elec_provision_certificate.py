@@ -7,6 +7,7 @@ class ElecProvisionCertificateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ElecProvisionCertificate
         fields = [
+            "id",
             "cpo",
             "quarter",
             "year",
@@ -16,4 +17,3 @@ class ElecProvisionCertificateSerializer(serializers.ModelSerializer):
         ]
 
     cpo = EntityPreviewSerializer(read_only=True)
-    

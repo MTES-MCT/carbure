@@ -5,14 +5,14 @@ import Alert from "common/components/alert"
 import Button, { ExternalLink } from "common/components/button"
 import Dialog from "common/components/dialog"
 import { Form, useForm } from "common/components/form"
-import { AlertTriangle, Check, Return, Upload } from "common/components/icons"
+import { AlertTriangle, Check, Plus, Return, Upload } from "common/components/icons"
 import { FileInput } from "common/components/input"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import * as api from "../api"
+import * as api from "../../api"
 
 
 
@@ -27,8 +27,8 @@ const ProvisionImporButton = () => {
     return (
         <Button
             asideX
-            variant="secondary"
-            icon={Upload}
+            variant="primary"
+            icon={Plus}
             label={t("Importer l’énergie à céder")}
             action={showApplicationsChecker}
         />
@@ -54,12 +54,16 @@ const ProvisionImportDialog = ({
     })
 
     const importProvisionCertificates = useMutation(api.importProvisionCertificates, {
+        invalidates: ["provision-certificates"],
         onError: (err) => {
             const error = (err as AxiosError<{ error: string }>).response?.data
             if (error?.error === "MISSING_CPO") {
                 setMissingCPO(["Electron",
                     "Pessimistron",
                     "Full - Elec"])
+            } else if (error?.error === "DB_INSERTION_ERROR") {
+                notify(t("L'import excel a échoué. Assurez vous que certaines données n'aient pas déjà été importées."), { variant: "danger" })
+
             } else {
                 notify(t("L'import excel a échoué"), { variant: "danger" })
             }
