@@ -1,5 +1,7 @@
-import { Entity } from "carbure/types"
+import { Entity, EntityType } from "carbure/types"
 import { Order } from "common/components/table"
+import { n } from "msw/lib/glossary-de6278a9"
+import { ElecAdminProvisionCertificateFilterSelection } from "./components/provision-certificates/filters"
 
 export interface ElecAdminSnapshot {
   provision_certificates: number
@@ -15,11 +17,10 @@ export enum ElecAdminProvisionCertificateStatus {
 }
 
 export interface ElecAdminProvisionCertificateStates {
-  //old QueryParams
   entity: Entity
   year: number
   status: ElecAdminProvisionCertificateStatus
-  // filters: SafFilterSelection
+  filters: ElecAdminProvisionCertificateFilterSelection
   search?: string
   selection: number[]
   page: number
@@ -28,10 +29,15 @@ export interface ElecAdminProvisionCertificateStates {
   snapshot?: ElecAdminSnapshot
 }
 
+export enum ElecAdminProvisionCertificateFilter {
+  Quarter = "quarter",
+  OperatingUnit = "operating_unit",
+  Cpo = "cpo",
+
+}
 
 export interface ElecAdminProvisionCertificateQuery {
   entity_id: number
-
   status?: string
   year?: number
   search?: string
@@ -39,8 +45,31 @@ export interface ElecAdminProvisionCertificateQuery {
   order?: string
   from_idx?: number
   limit?: number
-  // [SafFilter.Feedstocks]?: string[]
-  // [SafFilter.Periods]?: string[]
-  // [SafFilter.Clients]?: string[]
+  [ElecAdminProvisionCertificateFilter.Cpo]?: string[]
+  [ElecAdminProvisionCertificateFilter.OperatingUnit]?: string[]
+  [ElecAdminProvisionCertificateFilter.Quarter]?: string[]
 }
 
+
+export interface ElecProvisionCertificatesData {
+  elec_provision_certificates: ElecProvisionCertificatePreview[]
+  from: number
+  ids: number[]
+  returned: number
+  total: 7
+}
+
+export interface ElecProvisionCertificateCPOPreview {
+  id: number,
+  name: string,
+  entity_type: EntityType
+}
+export interface ElecProvisionCertificatePreview {
+  id: number
+  cpo: ElecProvisionCertificateCPOPreview
+  energy_amount: number
+  operating_unit: string
+  quarter: number
+  remaining_energy_amount: number
+  year: number
+}

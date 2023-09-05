@@ -9,7 +9,7 @@ import { Loader } from "common/components/icons"
 import Tabs from "common/components/tabs"
 import { formatNumber } from "common/utils/formatters"
 import * as api from "./api"
-import ProvisionList from "./components/provisionList"
+import ProvisionList from "./components/provision-certificates"
 import { ElecAdminProvisionCertificateStatus, ElecAdminSnapshot } from "./types"
 
 
