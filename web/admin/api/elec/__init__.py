@@ -1,12 +1,11 @@
 from django.urls import path, include
 
-from admin.api.elec.provision_certificate_filters import get_provision_certificate_filters
-
 
 from .years import get_years
 from .snapshot import get_snapshot
 from .import_provision_certificates import import_provision_certificate_excel
 from .provision_certificates import get_provision_certificates
+from .provision_certificate_filters import get_provision_certificate_filters
 from .transfer_certificates import get_transfer_certificates
 from .transfer_certificate_filters import get_transfer_certificate_filters
 
