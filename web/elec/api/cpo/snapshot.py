@@ -3,6 +3,7 @@
 import traceback
 
 from django import forms
+from django.views.decorators.http import require_GET
 from django.db.models import Sum
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
@@ -20,6 +21,7 @@ class ElecSnapshotForm(forms.Form):
     year = forms.IntegerField()
 
 
+@require_GET
 @check_user_rights()
 def get_snapshot(request, *args, **kwargs):
     snapshot_form = ElecSnapshotForm(request.GET)
