@@ -51,8 +51,8 @@ def get_provision_certificates(request):
     limit = prov_certif_sort_form.cleaned_data["limit"]
 
     try:
-        provision_certificates = find_provision_certificates(**prov_certif_filter_form.cleaned_data)
-
+        provision_certificates = ElecProvisionCertificate.objects.all()
+        provision_certificates = find_provision_certificates(provision_certificates, **prov_certif_filter_form.cleaned_data)
         provision_certificates = sort_provision_certificates(provision_certificates, sort_by, order)
 
         paginator = Paginator(provision_certificates, limit)
@@ -77,17 +77,17 @@ def get_provision_certificates(request):
         return ErrorResponse(400, ProvisionCertificatesError.PROVISION_CERTIFICATES_LISTING_FAILED)
 
 
-def find_provision_certificates(**filters):
-    provision_certificate = ElecProvisionCertificate.objects.select_related("cpo")
+def find_provision_certificates(provision_certificates, **filters):
+    provision_certificates = provision_certificates.select_related("cpo")
 
     if filters["year"]:
-        provision_certificate = provision_certificate.filter(year=filters["year"])
+        provision_certificates = provision_certificates.filter(year=filters["year"])
 
     if filters["quarter"]:
-        provision_certificate = provision_certificate.filter(quarter__in=filters["quarter"])
+        provision_certificates = provision_certificates.filter(quarter__in=filters["quarter"])
 
     if filters["cpo"]:
-        provision_certificate = provision_certificate.filter(cpo__name__in=filters["cpo"])
+        provision_certificates = provision_certificates.filter(cpo__name__in=filters["cpo"])
 
     if filters["status"]:
         status_filter = Q()
@@ -97,14 +97,14 @@ def find_provision_certificates(**filters):
             status_filter = status_filter | Q(remaining_energy_amount__gt=0, remaining_energy_amount__lte=F("energy_amount"))
         if "EMPTY" in filters["status"]:
             status_filter = status_filter | Q(remaining_energy_amount=0)
-        provision_certificate = provision_certificate.filter(status_filter)
+        provision_certificates = provision_certificates.filter(status_filter)
 
     if filters["search"] != None:
-        provision_certificate = provision_certificate.filter(
+        provision_certificates = provision_certificates.filter(
             Q(cpo__name__icontains=filters["search"]) | Q(operating_unit__icontains=filters["search"])
         )
 
-    return provision_certificate
+    return provision_certificates
 
 
 def sort_provision_certificates(provision_certificates, sort_by, order):
