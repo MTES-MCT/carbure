@@ -21,6 +21,7 @@ class ElecTransferCertificate(models.Model):
     transfer_date = models.DateField()
     accepted_date = models.DateField(null=True, blank=True)
     energy_amount = models.IntegerField()
+    comment = models.CharField(max_length=256, null=True, blank=True)
 
     def generate_certificate_id(self):
         self.certificate_id = f"E{self.transfer_date.year}{self.transfer_date.month}-FR-{self.id}"
