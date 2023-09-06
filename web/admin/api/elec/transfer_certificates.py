@@ -49,8 +49,8 @@ def get_transfer_certificates(request):
     limit = transf_certif_sort_form.cleaned_data["limit"]
 
     try:
-        transfer_certificates = find_transfer_certificates(**transf_certif_filter_form.cleaned_data)
-
+        transfer_certificates = ElecTransferCertificate.objects.all()
+        transfer_certificates = find_transfer_certificates(transfer_certificates, **transf_certif_filter_form.cleaned_data)
         transfer_certificates = sort_transfer_certificates(transfer_certificates, sort_by, order)
 
         paginator = Paginator(transfer_certificates, limit)
@@ -75,12 +75,13 @@ def get_transfer_certificates(request):
         return ErrorResponse(400, TransferCertificatesError.TRANSFER_CERTIFICATES_LISTING_FAILED)
 
 
-def find_transfer_certificates(**filters):
-    transfer_certificate = ElecTransferCertificate.objects.select_related("supplier", "client")
+def find_transfer_certificates(transfer_certificates, **filters):
+    transfer_certificate = transfer_certificates.select_related("supplier", "client")
 
     if filters["year"]:
         transfer_certificate = transfer_certificate.filter(transfer_date__year=filters["year"])
 
+    # @TODO create logic for quarter filtering
     # if filters["quarter"]:
     #     transfer_certificate = transfer_certificate.filter(transfer_date=filters["quarter"])
 
