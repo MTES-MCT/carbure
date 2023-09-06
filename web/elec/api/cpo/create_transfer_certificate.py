@@ -30,7 +30,7 @@ class ElecTransferForm(forms.Form):
 
 @require_POST
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
-def transfer_provision_certificate(request, *args, **kwargs):
+def create_transfer_certificate(request, *args, **kwargs):
     transfer_form = ElecTransferForm(request.POST)
 
     if not transfer_form.is_valid():
@@ -91,5 +91,3 @@ def transfer_provision_certificate(request, *args, **kwargs):
         except:
             traceback.print_exc()
             return ErrorResponse(400, ElecTransferError.CREATION_FAILED)
-
-
