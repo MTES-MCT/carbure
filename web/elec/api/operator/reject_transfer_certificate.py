@@ -24,6 +24,7 @@ class ElecRejectError:
 class ElecTransferForm(forms.Form):
     entity_id = forms.IntegerField()
     transfer_certificate_id = forms.ModelChoiceField(queryset=ElecTransferCertificate.objects.all(), required=False)
+    comment = forms.CharField()
 
 
 @require_POST
@@ -35,12 +36,14 @@ def reject_transfer_certificate(request, *args, **kwargs):
         return ErrorResponse(400, ElecRejectError.MALFORMED_PARAMS, transfer_form.errors)
 
     transfer_certificate = transfer_form.cleaned_data["transfer_certificate_id"]
+    comment = transfer_form.cleaned_data["comment"]
 
     if transfer_certificate.status == ElecTransferCertificate.ACCEPTED:
         return ErrorResponse(400, ElecRejectError.ALREADY_ACCEPTED)
 
     try:
         transfer_certificate.status = ElecTransferCertificate.REJECTED
+        transfer_certificate.comment = comment
         transfer_certificate.save()
         return SuccessResponse()
     except:
