@@ -32,3 +32,17 @@ export function getProvisionCertificates(query: ElecCPOProvisionCertificateQuery
     params: query,
   })
 }
+
+
+
+export function transferEnergy(
+  entity_id: number,
+  energy_mwh: number,
+  client_id: number,
+) {
+  return api.post("/v5/elec/cpo/create-transfer-certificate", {
+    entity_id,
+    energy_mwh,
+    client_id
+  })
+}

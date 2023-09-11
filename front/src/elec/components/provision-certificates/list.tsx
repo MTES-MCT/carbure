@@ -12,6 +12,7 @@ import { useProvisionCertificatesQuery } from "elec/hooks/provision-certificates
 import { StatusSwitcher } from "./status-switcher"
 import { elecAdminProvisionCertificateList } from "elec/__test__/data"
 import { ElecCPOProvisionCertificateTable } from "./table"
+import { EnergyTransferSummary } from "./transfer-summary"
 
 
 type ProvisionCertificateListProps = {
@@ -71,6 +72,7 @@ const ProvisionCertificateList = ({ snapshot, year }: ProvisionCertificateListPr
                     />
 
                 </ActionBar>
+                <EnergyTransferSummary remainingVolume={snapshot.remaining_energy} />
 
                 {count > 0 && provisionCertificatesData ? (
                     <>
