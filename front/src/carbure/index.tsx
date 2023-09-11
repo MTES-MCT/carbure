@@ -116,8 +116,8 @@ const Org = () => {
       {(isOperator || isProducer) && <Route path="stats" element={<Stats />} />}
 
       {(isCPO || (isOperator && has_elec)) && (<>
-          <Route path="elec/:year/*" element={<Elec />} />
-          <Route path="elec" element={<Navigate replace to={`${currentYear}`} />} />
+        <Route path="elec/:year/*" element={<Elec />} />
+        <Route path="elec" element={<Navigate replace to={`${currentYear}`} />} />
       </>)}
 
       {(isAdmin || isAuditor) && (<>

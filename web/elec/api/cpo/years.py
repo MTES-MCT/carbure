@@ -13,7 +13,7 @@ class ElecSnapshotError:
 
 @require_GET
 @check_user_rights()
-def get_years(request):
+def get_years(request, *args, **kwargs):
     try:
         entity_id = request.GET.get("entity_id")
 

@@ -25,16 +25,18 @@ class ElecSnapshotForm(forms.Form):
 @check_user_rights()
 def get_snapshot(request, *args, **kwargs):
     snapshot_form = ElecSnapshotForm(request.GET)
+    print('snapshot_form: ', snapshot_form)
 
     if not snapshot_form.is_valid():
         return ErrorResponse(400, ElecSnapshotError.MALFORMED_PARAMS, snapshot_form.errors)
 
     entity_id = snapshot_form.cleaned_data["entity_id"]
     year = snapshot_form.cleaned_data["year"]
+    print('year: ', year)
 
     try:
         provision_certificates = ElecProvisionCertificate.objects.filter(year=year, cpo_id=entity_id)
-        transfer_certificates = ElecTransferCertificate.objects.filter(year=year, supplier_id=entity_id)
+        # transfer_certificates = ElecTransferCertificate.objects.filter(year=year, supplier_id=entity_id)
 
         return SuccessResponse(
             {
@@ -42,10 +44,10 @@ def get_snapshot(request, *args, **kwargs):
                 "remaining_energy": provision_certificates.aggregate(Sum("remaining_energy_amount"))["remaining_energy_amount__sum"] or 0,  # fmt:skip
                 "provision_cert_available": provision_certificates.filter(remaining_energy_amount__gt=0).count(),
                 "provision_cert_history": provision_certificates.filter(remaining_energy_amount=0).count(),
-                "transferred_energy": transfer_certificates.aggregate(Sum("energy_amount"))["energy_amount__sum"] or 0,  # fmt:skip
-                "transfer_certificates_pending": transfer_certificates.filter(status=ElecTransferCertificate.PENDING).count(),
-                "transfer_certificates_accepted": transfer_certificates.filter(status=ElecTransferCertificate.ACCEPTED).count(),
-                "transfer_certificates_rejected": transfer_certificates.filter(status=ElecTransferCertificate.REJECTED).count(),
+                # "transferred_energy": transfer_certificates.aggregate(Sum("energy_amount"))["energy_amount__sum"] or 0,  # fmt:skip
+                # "transfer_certificates_pending": transfer_certificates.filter(status=ElecTransferCertificate.PENDING).count(),
+                # "transfer_certificates_accepted": transfer_certificates.filter(status=ElecTransferCertificate.ACCEPTED).count(),
+                # "transfer_certificates_rejected": transfer_certificates.filter(status=ElecTransferCertificate.REJECTED).count(),
             }
         )
     except Exception:
