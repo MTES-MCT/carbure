@@ -5,10 +5,24 @@ import { useQuery } from "common/hooks/async"
 import useYears from "common/hooks/years"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
-// import OperatorTabs from "./components/operator-tabs"
-// import TicketSources from "./components/ticket-sources"
-// import OperatorTickets from "./components/tickets/operator-tickets"
+import { Loader } from "common/components/icons"
+import Tabs from "common/components/tabs"
+import { formatNumber } from "common/utils/formatters"
 import * as api from "./api"
+import { ElecSnapshot } from "./types"
+
+
+
+const defaultElecSnapshot: ElecSnapshot = {
+  provisioned_energy: 0,
+  remaining_energy: 0,
+  provision_cert_available: 0,
+  provision_cert_history: 0,
+  transferred_energy: 0,
+  transfer_certificates_pending: 0,
+  transfer_certificates_accepted: 0,
+  transfer_certificates_rejected: 0,
+}
 
 export const Elec = () => {
   const { t } = useTranslation()
@@ -16,19 +30,24 @@ export const Elec = () => {
   const entity = useEntity()
 
   const years = useYears("elec", api.getYears)
-
-  const snapshot = useQuery(api.getSnapshot, {
+  console.log('years:', years)
+  const snapshotResponse = useQuery(api.getSnapshot, {
     key: "elec-snapshot",
     params: [entity.id, years.selected],
   })
-  const snapshotData = snapshot.result?.data.data
-  // const snapshotData = safOperatorSnapshot //TO TEST with testing data
+
+  const snapshot = snapshotResponse.result?.data.data ?? defaultElecSnapshot
+  console.log('snapshot:', snapshot)
+
+
+  // const snapshot = elecAdminSnapshot ?? defaultElecAdminSnapshot //TODO TEST with testing data
 
   return (
+
     <Main>
       <header>
         <section>
-          <h1>{t("Certificats de fournitures et de cession - ELEC")}</h1>
+          <h1>{t("Électricité")}</h1>
 
           <Select
             loading={years.loading}
@@ -42,66 +61,84 @@ export const Elec = () => {
         </section>
 
         <section>
-          {/* <OperatorTabs loading={snapshot.loading} count={snapshotData} /> */}
+          {/* <ElecAdminTabs loading={snapshotResponse.loading} snapshot={snapshot} /> */}
         </section>
       </header>
-    </Main>
-  )
-  /* <Routes>
-        <Route
-          path="ticket-sources/*"
-          element={
-            <TicketSources year={years.selected} snapshot={snapshotData} />
-          }
-        />
-        <Route
-          path="ticket-sources"
-          element={
-            <Navigate
-              replace
-              to={SafTicketSourceStatus.Available.toLocaleLowerCase()}
-            />
-          }
-        />
-       <Route
-          path="tickets/*"
-          element={
-            <OperatorTickets year={years.selected} snapshot={snapshotData} />
-          }
-        />
 
-        <Route
-          path="tickets-received/*"
-          element={
-            <OperatorTickets
-              type="received"
-              year={years.selected}
-              snapshot={snapshotData}
-            />
-          }
-        />
 
-        <Route
-          path="tickets-assigned/*"
+      <Routes>
+        {/* <Route
+          path="provision/*"
           element={
-            <OperatorTickets
-              type="assigned"
-              year={years.selected}
-              snapshot={snapshotData}
-            />
+            <ProvisionList snapshot={snapshot} year={years.selected} />
           }
-        />
+        /> */}
 
-        <Route
+
+        {/* <Route
           path="*"
           element={
             <Navigate
               replace
-              to={`ticket-sources/${SafTicketSourceStatus.Available.toLocaleLowerCase()}`}
+              to={`provision/${ElecAdminProvisionCertificateStatus.Available.toLocaleLowerCase()}`}
             />
           }
-        />
-      </Routes> */
+        /> */}
+
+      </Routes>
+    </Main>
+
+
+  )
 }
 
 export default Elec
+
+
+
+// interface ElecAdminTabsProps {
+//   loading: boolean
+//   snapshot: ElecAdminSnapshot
+// }
+
+
+// function ElecAdminTabs({
+//   loading,
+//   snapshot
+// }: ElecAdminTabsProps) {
+//   const { t } = useTranslation()
+
+//   return (<Tabs variant="main" tabs={[{
+//     key: "provision",
+//     path: "provision",
+//     label: <>
+//       <p style={{
+//         fontWeight: "normal"
+//       }}>
+//         {loading ? <Loader size={20} /> : snapshot?.provision_certificates}
+//         {/* {loading ? <Loader size={20} /> : formatNumber(snapshot?.provisioned_energy)} MWh */}
+//       </p>
+//       <strong>
+//         {/* {t("Énergie attribuée")} */}
+//         {t("Certificats de founiture")}
+//       </strong>
+//     </>
+//   }, {
+//     key: "transfer",
+//     path: "transfer",
+//     label: <>
+//       <p style={{
+//         fontWeight: "normal"
+//       }}>
+//         {loading ? <Loader size={20} /> : snapshot?.transfer_certificates}
+//         {/* {loading ? <Loader size={20} /> : formatNumber(snapshot?.transferred_energy)} MWh */}
+//       </p>
+//       <strong>
+//         {t("Énergie cédée")}
+//         {/* {t("Énergie cédée")} */}
+//       </strong>
+//     </>
+//   }]} />);
+// }
+
+
