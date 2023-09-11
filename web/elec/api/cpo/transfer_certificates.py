@@ -20,7 +20,7 @@ from admin.api.elec.transfer_certificates import (
 
 @require_GET
 @check_user_rights()
-def get_transfer_certificates(request):
+def get_transfer_certificates(request, *args, **kwargs):
     transf_certif_filter_form = TransferCertificatesFilterForm(request.GET)
     transf_certif_sort_form = TransferCertificatesSortForm(request.GET)
 

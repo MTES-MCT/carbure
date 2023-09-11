@@ -57,7 +57,7 @@ class ElecCPOTest(TestCase):
 
     def test_transfer_provision_certificate_pile_poil(self):
         self.client.post(
-            reverse("elec-cpo-transfer-provision-certificate"),
+            reverse("elec-cpo-create-transfer-certificate"),
             {
                 "entity_id": self.cpo.id,
                 "energy_mwh": 500,
@@ -80,7 +80,7 @@ class ElecCPOTest(TestCase):
 
     def test_transfer_provision_certificate_multiple(self):
         self.client.post(
-            reverse("elec-cpo-transfer-provision-certificate"),
+            reverse("elec-cpo-create-transfer-certificate"),
             {
                 "entity_id": self.cpo.id,
                 "energy_mwh": 1500,
@@ -103,7 +103,7 @@ class ElecCPOTest(TestCase):
 
     def test_transfer_provision_certificate_too_much(self):
         response = self.client.post(
-            reverse("elec-cpo-transfer-provision-certificate"),
+            reverse("elec-cpo-create-transfer-certificate"),
             {
                 "entity_id": self.cpo.id,
                 "energy_mwh": 10000,
@@ -127,7 +127,7 @@ class ElecCPOTest(TestCase):
 
     def test_cancel_transfer_certificate(self):
         self.client.post(
-            reverse("elec-cpo-transfer-provision-certificate"),
+            reverse("elec-cpo-create-transfer-certificate"),
             {
                 "entity_id": self.cpo.id,
                 "energy_mwh": 1500,
@@ -155,3 +155,136 @@ class ElecCPOTest(TestCase):
         self.assertEqual(prov1.remaining_energy_amount, 0)
         self.assertEqual(prov2.remaining_energy_amount, 500)
         self.assertEqual(prov3.remaining_energy_amount, 2000)
+
+    def test_years(self):
+        response = self.client.get(
+            reverse("elec-cpo-years"),
+            {
+                "entity_id": self.cpo.id,
+            },
+        )
+
+        json = response.json()
+        self.assertEqual(json["data"], [2022, 2023])
+
+    def test_provision_certificate_filter(self):
+        response = self.client.get(
+            reverse("elec-cpo-provision-certificate-filters"),
+            {
+                "entity_id": self.cpo.id,
+                "year": 2022,
+                "filter": "operating_unit",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        json = response.json()
+
+        self.assertEqual(json["data"]["filter_values"], ["XYZ"])
+
+        response = self.client.get(
+            reverse("elec-cpo-provision-certificate-filters"),
+            {
+                "entity_id": self.cpo.id,
+                "year": 2023,
+                "filter": "operating_unit",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        json = response.json()
+
+        self.assertEqual(json["data"]["filter_values"], ["ABCD", "DCBA"])
+
+    def test_provision_certificates(self):
+        response = self.client.get(
+            reverse("elec-cpo-get-provision-certificates"),
+            {
+                "entity_id": self.cpo.id,
+                "year": 2022,
+                "operating_unit": "XYZ",
+                "from_idx": 0,
+                "limit": 10,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        json = response.json()
+
+        self.assertEqual(json["data"]["returned"], 1)
+        self.assertEqual(json["data"]["elec_provision_certificates"][0]["operating_unit"], "XYZ")
+
+    def test_transfer_certificate_filter(self):
+        ElecTransferCertificate.objects.create(
+            supplier=self.cpo,
+            client=self.operator,
+            energy_amount=1000,
+            transfer_date=datetime.datetime(year=2023, month=6, day=2),
+        )
+
+        response = self.client.get(
+            reverse("elec-cpo-get-transfer-certificate-filters"),
+            {
+                "entity_id": self.cpo.id,
+                "year": 2023,
+                "filter": "cpo",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        json = response.json()
+
+        self.assertEqual(json["data"]["filter_values"], [self.cpo.name])
+
+        response = self.client.get(
+            reverse("elec-cpo-get-transfer-certificate-filters"),
+            {
+                "entity_id": self.cpo.id,
+                "year": 2023,
+                "filter": "operator",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        json = response.json()
+
+        self.assertEqual(json["data"]["filter_values"], [self.operator.name])
+
+    def test_transfer_certificates(self):
+        ElecTransferCertificate.objects.create(
+            supplier=self.cpo,
+            client=self.operator,
+            energy_amount=1000,
+            transfer_date=datetime.datetime(year=2023, month=6, day=2),
+        )
+
+        response = self.client.get(
+            reverse("elec-cpo-get-transfer-certificates"),
+            {
+                "entity_id": self.cpo.id,
+                "year": 2022,
+                "from_idx": 0,
+                "limit": 10,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        json = response.json()
+
+        self.assertEqual(json["data"]["returned"], 0)
+
+        response = self.client.get(
+            reverse("elec-cpo-get-transfer-certificates"),
+            {
+                "entity_id": self.cpo.id,
+                "year": 2023,
+                "from_idx": 0,
+                "limit": 10,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        json = response.json()
+
+        self.assertEqual(json["data"]["returned"], 1)
+        self.assertEqual(json["data"]["elec_transfer_certificates"][0]["supplier"]["name"], self.cpo.name)

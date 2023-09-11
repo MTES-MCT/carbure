@@ -18,12 +18,12 @@ def get_provision_certificate_filters(request, *args, **kwargs):
     current_filter = request.GET.get("filter")
 
     if current_filter == "status":
-        return SuccessResponse({"filter_values": ["FULL", "AVAILABLE", "EMPTY"]})
+        return SuccessResponse({"filter_values": ["FULL", "HISTORY"]})
 
     filters.cleaned_data[current_filter] = None
 
     provision_certificates = ElecProvisionCertificate.objects.filter(cpo_id=entity_id)
-    provision_certificates = find_provision_certificates(**filters.cleaned_data)
+    provision_certificates = find_provision_certificates(provision_certificates, **filters.cleaned_data)
 
     remaining_filter_values = provision_certificates.values_list(filter_to_column[current_filter], flat=True).distinct()
 
