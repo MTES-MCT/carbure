@@ -1,4 +1,4 @@
-import { ElecAdminProvisionCertificateQuery, ElecAdminProvisionCertificateStates } from "elec-admin/types"
+import { ElecCPOProvisionCertificateQuery, ElecCPOProvisionCertificateStates } from "elec/types"
 import { useMemo } from "react"
 
 export function useProvisionCertificatesQuery({
@@ -10,8 +10,8 @@ export function useProvisionCertificatesQuery({
   limit,
   order,
   filters,
-}: ElecAdminProvisionCertificateStates) {
-  return useMemo<ElecAdminProvisionCertificateQuery>(
+}: ElecCPOProvisionCertificateStates) {
+  return useMemo<ElecCPOProvisionCertificateQuery>(
     () => ({
       entity_id: entity.id,
       year,

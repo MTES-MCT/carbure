@@ -1,7 +1,5 @@
-import { Entity, EntityType } from "carbure/types"
+import { Entity } from "carbure/types"
 import { Order } from "common/components/table"
-import { n } from "msw/lib/glossary-de6278a9"
-import { ElecAdminProvisionCertificateFilterSelection } from "./components/provision-certificates/filters"
 
 export interface ElecAdminSnapshot {
   provision_certificates: number
@@ -15,6 +13,8 @@ export enum ElecAdminProvisionCertificateStatus {
   Available = "AVAILABLE",
   History = "HISTORY",
 }
+
+export type ElecAdminProvisionCertificateFilterSelection = Partial<Record<ElecAdminProvisionCertificateFilter, string[]>>
 
 export interface ElecAdminProvisionCertificateStates {
   entity: Entity
@@ -50,26 +50,3 @@ export interface ElecAdminProvisionCertificateQuery {
   [ElecAdminProvisionCertificateFilter.Quarter]?: string[]
 }
 
-
-export interface ElecProvisionCertificatesData {
-  elec_provision_certificates: ElecProvisionCertificatePreview[]
-  from: number
-  ids: number[]
-  returned: number
-  total: 7
-}
-
-export interface ElecProvisionCertificateCPOPreview {
-  id: number,
-  name: string,
-  entity_type: EntityType
-}
-export interface ElecProvisionCertificatePreview {
-  id: number
-  cpo: ElecProvisionCertificateCPOPreview
-  energy_amount: number
-  operating_unit: string
-  quarter: number
-  remaining_energy_amount: number
-  year: number
-}

@@ -7,3 +7,4 @@ export const elecAdminSnapshot: ElecAdminSnapshot = {
     provisioned_energy: 35000,
     transferred_energy: 20000
 }
+
