@@ -18,7 +18,7 @@ def get_provision_certificate_filters(request):
         return ErrorResponse(400, CertificateFilterError.BAD_FILTER, filters.errors)
 
     if current_filter == "status":
-        return SuccessResponse({"filter_values": ["FULL", "AVAILABLE", "EMPTY"]})
+        return SuccessResponse({"filter_values": ["AVAILABLE", "HISTORY"]})
 
     filters.cleaned_data[current_filter] = None
 
