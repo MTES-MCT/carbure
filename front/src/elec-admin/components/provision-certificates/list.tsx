@@ -10,8 +10,9 @@ import { useMatch } from "react-router-dom"
 import * as api from "../../api"
 import ProvisionImporButton from "./Import-button"
 import ProvisionCertificateFilters from "./filters"
-import { StatusSwitcher } from "./status-switch"
+import { StatusSwitcher } from "./status-switcher"
 import ElecAdminProvisionCertificateTable from "./table"
+import { elecAdminProvisionCertificateList } from "elec/__test__/data"
 
 type ProvisionListProps = {
   snapshot: ElecAdminSnapshot
@@ -38,18 +39,14 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
   //   }
   // }
 
-  const provisionCertificatesData = provisionCertificatesResponse.result?.data.data
-  // const ids = provisionCertificatesData?.ids ?? []
+  // const provisionCertificatesData = provisionCertificatesResponse.result?.data.data
+  const provisionCertificatesData = elecAdminProvisionCertificateList //TOTEST  
 
   const total = provisionCertificatesData?.total ?? 0
   const count = provisionCertificatesData?.returned ?? 0
   return (
     <>
-      {/* <FileArea
-            icon={Upload}
-            label={t("Importer le fichier\nsur la plateforme")}
-            onChange={(file) => file && importCertificates.execute(entity.id, file)}
-        > */}
+
       <Bar>
         <ProvisionCertificateFilters
           filters={FILTERS}
@@ -108,7 +105,6 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
 
 
 
-      {/* </FileArea > */}
     </>
   )
 }

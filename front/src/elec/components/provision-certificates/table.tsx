@@ -1,11 +1,10 @@
 import Table, { Cell, Order } from "common/components/table"
-import { ElecAdminProvisionCertificateStatus } from "elec-admin/types"
-import { ElecProvisionCertificatePreview } from "elec/types"
+import { ElecCPOProvisionCertificateStatus, ElecProvisionCertificatePreview } from "elec/types"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import { To } from "react-router-dom"
 
-export interface ElecAdminProvisionCertificateTableProps {
+export interface ElecCPOProvisionCertificateTableProps {
     loading: boolean
     provisionCertificates: ElecProvisionCertificatePreview[]
     order: Order | undefined
@@ -13,10 +12,10 @@ export interface ElecAdminProvisionCertificateTableProps {
     onOrder: (order: Order | undefined) => void
     selected: number[]
     onSelect: (selected: number[]) => void
-    status: ElecAdminProvisionCertificateStatus
+    status: ElecCPOProvisionCertificateStatus
 }
 
-export const ElecAdminProvisionCertificateTable = memo(
+export const ElecCPOProvisionCertificateTable = memo(
     ({
         loading,
         provisionCertificates,
@@ -26,7 +25,7 @@ export const ElecAdminProvisionCertificateTable = memo(
         selected,
         onSelect,
         status,
-    }: ElecAdminProvisionCertificateTableProps) => {
+    }: ElecCPOProvisionCertificateTableProps) => {
         const columns = useColumns()
         return (
             <Table
@@ -36,7 +35,6 @@ export const ElecAdminProvisionCertificateTable = memo(
                 rowLink={rowLink}
                 rows={provisionCertificates}
                 columns={[
-                    columns.cpo,
                     columns.quarter,
                     columns.operating_unit,
                     columns.energy_amount,
@@ -49,16 +47,6 @@ export const ElecAdminProvisionCertificateTable = memo(
 export function useColumns() {
     const { t } = useTranslation()
     return {
-
-        cpo: {
-            key: "cpo",
-            header: t("Aménageur"),
-            cell: (provisionCertificate: ElecProvisionCertificatePreview) => {
-                const value =
-                    provisionCertificate.cpo.name
-                return <Cell text={value} />
-            },
-        },
 
         quarter: {
             key: "quarter",
@@ -103,4 +91,4 @@ export function useColumns() {
     }
 }
 
-export default ElecAdminProvisionCertificateTable
+export default ElecCPOProvisionCertificateTable

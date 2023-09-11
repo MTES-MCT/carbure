@@ -8,7 +8,7 @@ from .provision_certificates import ProvisionCertificatesFilterForm, find_provis
 
 @require_GET
 @check_user_rights()
-def get_provision_certificate_filters(request):
+def get_provision_certificate_filters(request, *args, **kwargs):
     filters = ProvisionCertificatesFilterForm(request.GET)
 
     if not filters.is_valid():

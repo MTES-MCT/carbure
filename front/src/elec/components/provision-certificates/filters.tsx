@@ -3,13 +3,13 @@ import { MultiSelect, MultiSelectProps } from "common/components/multi-select"; 
 import { Grid } from "common/components/scaffold"
 import { Normalizer, defaultNormalizer } from "common/utils/normalize"
 import { useTranslation } from "react-i18next"
-import { ElecAdminProvisionCertificateFilter, ElecAdminProvisionCertificateFilterSelection } from "elec-admin/types";
+import { ElecCPOProvisionCertificateFilter, ElecCPOProvisionCertificateFilterSelection } from "elec/types";
 
 export interface FiltersProps {
-    filters: ElecAdminProvisionCertificateFilter[]
-    selected: ElecAdminProvisionCertificateFilterSelection
-    onSelect: (filters: ElecAdminProvisionCertificateFilterSelection) => void
-    getFilterOptions: (filter: ElecAdminProvisionCertificateFilter) => Promise<any[]>
+    filters: ElecCPOProvisionCertificateFilter[]
+    selected: ElecCPOProvisionCertificateFilterSelection
+    onSelect: (filters: ElecCPOProvisionCertificateFilterSelection) => void
+    getFilterOptions: (filter: ElecCPOProvisionCertificateFilter) => Promise<any[]>
 }
 
 export function ProvisionCertificateFilters({
@@ -21,9 +21,8 @@ export function ProvisionCertificateFilters({
     const { t } = useTranslation()
 
     const filterLabels = {
-        [ElecAdminProvisionCertificateFilter.Cpo]: t("Aménageur"),
-        [ElecAdminProvisionCertificateFilter.Quarter]: t("Trimestre"),
-        [ElecAdminProvisionCertificateFilter.OperatingUnit]: t("Unité d'exploitation"),
+        [ElecCPOProvisionCertificateFilter.Quarter]: t("Trimestre"),
+        [ElecCPOProvisionCertificateFilter.OperatingUnit]: t("Unité d'exploitation"),
     }
 
     return (
@@ -43,16 +42,15 @@ export function ProvisionCertificateFilters({
     )
 }
 
-export type FilterSelectProps = { field: ElecAdminProvisionCertificateFilter } & Omit<
+export type FilterSelectProps = { field: ElecCPOProvisionCertificateFilter } & Omit<
     MultiSelectProps<string>,
     "options"
 >
 
 
 const filterNormalizers: FilterNormalizers = {
-    [ElecAdminProvisionCertificateFilter.Cpo]: norm.normalizeFeedstockFilter,
-    [ElecAdminProvisionCertificateFilter.Quarter]: norm.normalizePeriodFilter,
-    [ElecAdminProvisionCertificateFilter.OperatingUnit]: norm.normalizeUnknownFilter,
+    [ElecCPOProvisionCertificateFilter.Quarter]: norm.normalizePeriodFilter,
+    [ElecCPOProvisionCertificateFilter.OperatingUnit]: norm.normalizeUnknownFilter,
 }
 
 export default ProvisionCertificateFilters
@@ -77,4 +75,4 @@ export const FilterSelect = ({
         sort={(item) => (item.value === "UNKNOWN" ? "" : item.label)}
     />
 )
-type FilterNormalizers = Partial<Record<ElecAdminProvisionCertificateFilter, Normalizer<any>>> // prettier-ignore
+type FilterNormalizers = Partial<Record<ElecCPOProvisionCertificateFilter, Normalizer<any>>> // prettier-ignore

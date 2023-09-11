@@ -9,31 +9,34 @@ import { Loader } from "common/components/icons"
 import Tabs from "common/components/tabs"
 import { formatNumber } from "common/utils/formatters"
 import * as api from "./api"
-import ProvisionList from "./components/provision-certificates/list"
-import { ElecAdminProvisionCertificateStatus, ElecAdminSnapshot } from "./types"
+import { ElecCPOProvisionCertificateStatus, ElecCPOSnapshot } from "./types"
+import ProvisionCertificateList from "./components/provision-certificates/list"
 
 
-const defaultElecAdminSnapshot: ElecAdminSnapshot = {
-  provision_certificates: 0,
-  transfer_certificates: 0,
+
+const defaultElecSnapshot: ElecCPOSnapshot = {
   provisioned_energy: 0,
-  transferred_energy: 0
+  remaining_energy: 0,
+  provision_cert_available: 0,
+  provision_cert_history: 0,
+  transferred_energy: 0,
+  transfer_certificates_pending: 0,
+  transfer_certificates_accepted: 0,
+  transfer_certificates_rejected: 0,
 }
 
-export const ElecAdmin = () => {
+export const ElecCPO = () => {
   const { t } = useTranslation()
 
   const entity = useEntity()
 
-  const years = useYears("elec-admin", api.getYears)
+  const years = useYears("elec", api.getYears)
   const snapshotResponse = useQuery(api.getSnapshot, {
-    key: "elec-admin-snapshot",
+    key: "elec-snapshot",
     params: [entity.id, years.selected],
   })
 
-  const snapshot = snapshotResponse.result?.data.data ?? defaultElecAdminSnapshot
-
-  // const snapshot = elecAdminSnapshot ?? defaultElecAdminSnapshot //TODO TEST with testing data
+  const snapshot = snapshotResponse.result?.data.data ?? defaultElecSnapshot
 
   return (
 
@@ -54,16 +57,16 @@ export const ElecAdmin = () => {
         </section>
 
         <section>
-          <ElecAdminTabs loading={snapshotResponse.loading} snapshot={snapshot} />
+          <ElecTabs loading={snapshotResponse.loading} snapshot={snapshot} />
         </section>
       </header>
 
 
       <Routes>
         <Route
-          path="provision/*"
+          path="provisioned/*"
           element={
-            <ProvisionList snapshot={snapshot} year={years.selected} />
+            <ProvisionCertificateList snapshot={snapshot} year={years.selected} />
           }
         />
 
@@ -73,7 +76,7 @@ export const ElecAdmin = () => {
           element={
             <Navigate
               replace
-              to={`provision/${ElecAdminProvisionCertificateStatus.Available.toLocaleLowerCase()}`}
+              to={`provisioned/${ElecCPOProvisionCertificateStatus.Available.toLocaleLowerCase()}`}
             />
           }
         />
@@ -85,50 +88,48 @@ export const ElecAdmin = () => {
   )
 }
 
-export default ElecAdmin
+export default ElecCPO
 
 
 
-interface ElecAdminTabsProps {
+interface ElecTabsProps {
   loading: boolean
-  snapshot: ElecAdminSnapshot
+  snapshot: ElecCPOSnapshot
 }
 
 
-function ElecAdminTabs({
+function ElecTabs({
   loading,
   snapshot
-}: ElecAdminTabsProps) {
+}: ElecTabsProps) {
   const { t } = useTranslation()
 
   return (<Tabs variant="main" tabs={[{
-    key: "provision",
-    path: "provision",
+    key: "provisioned",
+    path: "provisioned",
     label: <>
       <p style={{
         fontWeight: "normal"
       }}>
-        {loading ? <Loader size={20} /> : snapshot?.provision_certificates}
-        {/* {loading ? <Loader size={20} /> : formatNumber(snapshot?.provisioned_energy)} MWh */}
+
+        {loading ? <Loader size={20} /> : formatNumber(snapshot?.provisioned_energy)} MWh
       </p>
       <strong>
-        {/* {t("Énergie attribuée")} */}
-        {t("Certificats de founiture")}
+        {t("Énergie attribuée")}
+
       </strong>
     </>
   }, {
-    key: "transfer",
-    path: "transfer",
+    key: "transferred",
+    path: "transferred",
     label: <>
       <p style={{
         fontWeight: "normal"
       }}>
-        {loading ? <Loader size={20} /> : snapshot?.transfer_certificates}
-        {/* {loading ? <Loader size={20} /> : formatNumber(snapshot?.transferred_energy)} MWh */}
+        {loading ? <Loader size={20} /> : formatNumber(snapshot?.transferred_energy)} MWh
       </p>
       <strong>
         {t("Énergie cédée")}
-        {/* {t("Énergie cédée")} */}
       </strong>
     </>
   }]} />);

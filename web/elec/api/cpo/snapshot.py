@@ -25,7 +25,6 @@ class ElecSnapshotForm(forms.Form):
 @check_user_rights()
 def get_snapshot(request, *args, **kwargs):
     snapshot_form = ElecSnapshotForm(request.GET)
-    print('snapshot_form: ', snapshot_form)
 
     if not snapshot_form.is_valid():
         return ErrorResponse(400, ElecSnapshotError.MALFORMED_PARAMS, snapshot_form.errors)
@@ -48,6 +47,11 @@ def get_snapshot(request, *args, **kwargs):
                 # "transfer_certificates_pending": transfer_certificates.filter(status=ElecTransferCertificate.PENDING).count(),
                 # "transfer_certificates_accepted": transfer_certificates.filter(status=ElecTransferCertificate.ACCEPTED).count(),
                 # "transfer_certificates_rejected": transfer_certificates.filter(status=ElecTransferCertificate.REJECTED).count(),
+                "transferred_energy": 0,
+                "transfer_certificates_pending": 0,
+                "transfer_certificates_accepted": 0,
+                "transfer_certificates_rejected": 0,
+                
             }
         )
     except Exception:
