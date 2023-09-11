@@ -20,7 +20,6 @@ from admin.api.elec.provision_certificates import (
 @require_GET
 @check_user_rights()
 def get_provision_certificates(request, *args, **kwargs):
-    print("OKKKKK")
     prov_certif_filter_form = ProvisionCertificatesFilterForm(request.GET)
     prov_certif_sort_form = ProvisionCertificatesSortForm(request.GET)
 
@@ -39,7 +38,7 @@ def get_provision_certificates(request, *args, **kwargs):
 
     try:
         provision_certificates = ElecProvisionCertificate.objects.filter(cpo_id=entity_id)
-        provision_certificates = find_provision_certificates(**prov_certif_filter_form.cleaned_data)
+        provision_certificates = find_provision_certificates(provision_certificates, **prov_certif_filter_form.cleaned_data)
         provision_certificates = sort_provision_certificates(provision_certificates, sort_by, order)
 
         paginator = Paginator(provision_certificates, limit)

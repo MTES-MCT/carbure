@@ -4,13 +4,12 @@ import traceback
 import datetime
 
 from django import forms
-from django.db.models import Sum, F
+from django.db.models import F
 from django.db import transaction
 from django.views.decorators.http import require_POST
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
-from core.models import CarbureNotification, Entity, UserRights
-from core.notifications import notify_elec_transfer_certificate
+from core.models import CarbureNotification, UserRights
 from elec.models import ElecProvisionCertificate, ElecTransferCertificate
 
 from elec.serializers.elec_transfer_certificate import ElecTransferCertificateSerializer

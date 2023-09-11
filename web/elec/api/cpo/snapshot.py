@@ -51,7 +51,6 @@ def get_snapshot(request, *args, **kwargs):
                 "transfer_certificates_pending": 0,
                 "transfer_certificates_accepted": 0,
                 "transfer_certificates_rejected": 0,
-                
             }
         )
     except Exception:
