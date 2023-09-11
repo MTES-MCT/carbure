@@ -1,14 +1,14 @@
 from django.views.decorators.http import require_GET
 from admin.api.elec.transfer_certificate_filters import CertificateFilterError
 from core.common import ErrorResponse, SuccessResponse
-from core.decorators import check_user_rights
+from core.decorators import check_admin_rights, check_user_rights
 from core.models import ExternalAdminRights
 from elec.models.elec_transfer_certificate import ElecTransferCertificate
 from .transfer_certificates import TransferCertificatesFilterForm, find_transfer_certificates
 
 
 @require_GET
-@check_user_rights(allow_external=[ExternalAdminRights.ELEC])
+@check_admin_rights(allow_external=[ExternalAdminRights.ELEC])
 def get_transfer_certificate_filters(request):
     filters = TransferCertificatesFilterForm(request.GET)
 
