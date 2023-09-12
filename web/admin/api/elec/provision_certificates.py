@@ -1,11 +1,15 @@
-from math import floor
+import datetime
+import csv
 import traceback
+from math import floor
 
 from django import forms
-from django.db.models import Q, F
+from django.db.models import Q
 from django.core.paginator import Paginator
+from django.http import HttpResponse
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
+
 from core.models import ExternalAdminRights
 from core.utils import MultipleValueField
 from elec.models.elec_provision_certificate import ElecProvisionCertificate
@@ -45,6 +49,8 @@ def get_provision_certificates(request):
             {**prov_certif_filter_form.errors, **prov_certif_sort_form.errors},
         )
 
+    export = "export" in request.GET
+
     sort_by = prov_certif_sort_form.cleaned_data["sort_by"]
     order = prov_certif_sort_form.cleaned_data["order"]
     from_idx = prov_certif_sort_form.cleaned_data["from_idx"] or 0
@@ -54,6 +60,9 @@ def get_provision_certificates(request):
         provision_certificates = ElecProvisionCertificate.objects.all()
         provision_certificates = find_provision_certificates(provision_certificates, **prov_certif_filter_form.cleaned_data)
         provision_certificates = sort_provision_certificates(provision_certificates, sort_by, order)
+
+        if export:
+            return export_provision_certificate_to_csv(provision_certificates)
 
         paginator = Paginator(provision_certificates, limit)
         current_page = floor(from_idx / limit) + 1
@@ -122,3 +131,32 @@ def sort_provision_certificates(provision_certificates, sort_by, order):
         return provision_certificates.order_by("-%s" % column)
     else:
         return provision_certificates.order_by(column)
+
+
+def export_provision_certificate_to_csv(provision_certificates):
+    today = datetime.date.today()
+    file = "carbure_elec_provision_certificate_%s.csv" % (today.strftime("%Y%m%d_%H%M"))
+
+    response = HttpResponse(
+        content_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="{file}"'},
+    )
+
+    writer = csv.writer(response)
+
+    columns = ["id", "cpo", "quarter", "year", "operating_unit", "energy_amount", "remaining_energy_amount"]
+    writer.writerow(columns)
+
+    for pc in provision_certificates:
+        serialized = [
+            pc.id,
+            pc.cpo.name,
+            pc.quarter,
+            pc.year,
+            pc.operating_unit,
+            pc.energy_amount,
+            pc.remaining_energy_amount,
+        ]
+        writer.writerow(serialized)
+
+    return response
