@@ -91,6 +91,7 @@ def get_entities(request):
                 certificates=Value(0),
                 double_counting=Value(0),
                 double_counting_requests=Value(0),
+                certificates_pending=Value(0),
             )
         )
 
