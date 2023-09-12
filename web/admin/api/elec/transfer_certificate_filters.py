@@ -7,6 +7,7 @@ from .transfer_certificates import TransferCertificatesFilterForm, find_transfer
 
 class CertificateFilterError:
     BAD_FILTER = "BAD_FILTER"
+    MISSING_FILTER = "MISSING_FILTER"
 
 
 @check_admin_rights(allow_external=[ExternalAdminRights.ELEC])

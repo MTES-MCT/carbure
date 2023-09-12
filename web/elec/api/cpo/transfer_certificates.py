@@ -34,8 +34,8 @@ def get_transfer_certificates(request, *args, **kwargs):
     entity_id = request.GET.get("entity_id")
     sort_by = transf_certif_sort_form.cleaned_data["sort_by"]
     order = transf_certif_sort_form.cleaned_data["order"]
-    from_idx = transf_certif_sort_form.cleaned_data["from_idx"]
-    limit = transf_certif_sort_form.cleaned_data["limit"]
+    from_idx = transf_certif_sort_form.cleaned_data["from_idx"] or 0
+    limit = transf_certif_sort_form.cleaned_data["limit"] or 25
 
     try:
         transfer_certificates = ElecTransferCertificate.objects.filter(supplier_id=entity_id)

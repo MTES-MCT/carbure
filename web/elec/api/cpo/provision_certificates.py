@@ -33,8 +33,8 @@ def get_provision_certificates(request, *args, **kwargs):
     entity_id = request.GET.get("entity_id")
     sort_by = prov_certif_sort_form.cleaned_data["sort_by"]
     order = prov_certif_sort_form.cleaned_data["order"]
-    from_idx = prov_certif_sort_form.cleaned_data["from_idx"]
-    limit = prov_certif_sort_form.cleaned_data["limit"]
+    from_idx = prov_certif_sort_form.cleaned_data["from_idx"] or 0
+    limit = prov_certif_sort_form.cleaned_data["limit"] or 25
 
     try:
         provision_certificates = ElecProvisionCertificate.objects.filter(cpo_id=entity_id)
