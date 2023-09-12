@@ -1,7 +1,8 @@
 import traceback
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
-from core.models import ExternalAdminRights
+from core.models import Entity, ExternalAdminRights
+from core.utils import normalize_string
 from elec.models.elec_provision_certificate import ElecProvisionCertificate
 import pandas as pd
 
@@ -33,9 +34,12 @@ def import_provision_certificate_excel(request):
     except:
         return ErrorResponse(400, CertificateImportError.CSV_PARSE_ERROR)
 
+    cpos = Entity.objects.filter(entity_type=Entity.CPO)
+    cpos_by_name = {normalize_string(cpo.name): cpo for cpo in cpos}
+
     certificate_model_instances = [
         ElecProvisionCertificate(
-            cpo_id=record["cpo_id"],
+            cpo=cpos_by_name.get(normalize_string(record["cpo"])),
             quarter=record["quarter"],
             year=record["year"],
             operating_unit=record["operating_unit"],
