@@ -3,10 +3,9 @@
 import traceback
 
 from django import forms
-from django.db.models import Sum
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
-from elec.models import ElecProvisionCertificate
+from elec.models import ElecTransferCertificate
 
 
 class ElecOperatorSnapshotError:
@@ -30,11 +29,11 @@ def get_snapshot(request, *args, **kwargs):
     year = snapshot_form.cleaned_data["year"]
 
     try:
-        provision_certificates = ElecProvisionCertificate.objects.filter(year=year, entity_id=entity_id)
+        transfer_certificates = ElecTransferCertificate.objects.filter(transfer_date__year=year, client_id=entity_id)
         return SuccessResponse(
             {
-                "provision_cert_available": provision_certificates.filter(remaining_energy_amount__gt=0).count(),
-                "provision_cert_history": provision_certificates.filter(remaining_energy_amount=0).count(),
+                "transfer_cert_pending": transfer_certificates.filter(status=ElecTransferCertificate.PENDING).count(),
+                "transfer_cert_accepted": transfer_certificates.filter(status=ElecTransferCertificate.ACCEPTED).count(),
             }
         )
     except Exception:
