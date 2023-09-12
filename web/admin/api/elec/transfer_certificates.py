@@ -1,8 +1,11 @@
+import csv
+import datetime
 from math import floor
 import traceback
 
 from django import forms
 from django.core.paginator import Paginator
+from django.http import HttpResponse
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
 from core.models import ExternalAdminRights
@@ -43,6 +46,8 @@ def get_transfer_certificates(request):
             {**transf_certif_filter_form.errors, **transf_certif_sort_form.errors},
         )
 
+    export = "export" in request.GET
+
     sort_by = transf_certif_sort_form.cleaned_data["sort_by"]
     order = transf_certif_sort_form.cleaned_data["order"]
     from_idx = transf_certif_sort_form.cleaned_data["from_idx"] or 0
@@ -52,6 +57,9 @@ def get_transfer_certificates(request):
         transfer_certificates = ElecTransferCertificate.objects.all()
         transfer_certificates = find_transfer_certificates(transfer_certificates, **transf_certif_filter_form.cleaned_data)
         transfer_certificates = sort_transfer_certificates(transfer_certificates, sort_by, order)
+
+        if export:
+            return export_transfer_certificate_to_csv(transfer_certificates)
 
         paginator = Paginator(transfer_certificates, limit)
         current_page = floor(from_idx / limit) + 1
@@ -107,3 +115,31 @@ def sort_transfer_certificates(transfer_certificates, sort_by, order):
         return transfer_certificates.order_by("-%s" % column)
     else:
         return transfer_certificates.order_by(column)
+
+
+def export_transfer_certificate_to_csv(transfer_certificates):
+    today = datetime.date.today()
+    file = "carbure_elec_transfer_certificate_%s.csv" % (today.strftime("%Y%m%d_%H%M"))
+
+    response = HttpResponse(
+        content_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="{file}"'},
+    )
+
+    writer = csv.writer(response)
+
+    columns = ["certificate_id", "status", "supplier", "client", "transfer_date", "energy_amount"]
+    writer.writerow(columns)
+
+    for pc in transfer_certificates:
+        serialized = [
+            pc.certificate_id,
+            pc.status,
+            pc.supplier.name,
+            pc.client.name,
+            pc.transfer_date,
+            pc.energy_amount,
+        ]
+        writer.writerow(serialized)
+
+    return response
