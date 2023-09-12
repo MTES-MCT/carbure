@@ -8,6 +8,7 @@ from .provision_certificates import get_provision_certificates
 from .provision_certificate_filters import get_provision_certificate_filters
 from .transfer_certificates import get_transfer_certificates
 from .transfer_certificate_filters import get_transfer_certificate_filters
+from .clients import get_clients
 
 urlpatterns = [
     # overview
@@ -19,4 +20,5 @@ urlpatterns = [
     path("provision-certificate-filters", get_provision_certificate_filters, name="elec-cpo-provision-certificate-filters"),
     path("transfer-certificates", get_transfer_certificates, name="elec-cpo-get-transfer-certificates"),
     path("transfer-certificate-filters", get_transfer_certificate_filters, name="elec-cpo-get-transfer-certificate-filters"),
+    path("clients", get_clients, name="elec-cpo-clients"),
 ]
