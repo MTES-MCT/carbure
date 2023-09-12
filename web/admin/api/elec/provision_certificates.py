@@ -29,8 +29,8 @@ class ProvisionCertificatesFilterForm(forms.Form):
 class ProvisionCertificatesSortForm(forms.Form):
     sort_by = forms.CharField(required=False)
     order = forms.CharField(required=False)
-    from_idx = forms.IntegerField(initial=0)
-    limit = forms.IntegerField(initial=25)
+    from_idx = forms.IntegerField(required=False)
+    limit = forms.IntegerField(required=False)
 
 
 @check_admin_rights(allow_external=[ExternalAdminRights.ELEC])
@@ -47,8 +47,8 @@ def get_provision_certificates(request):
 
     sort_by = prov_certif_sort_form.cleaned_data["sort_by"]
     order = prov_certif_sort_form.cleaned_data["order"]
-    from_idx = prov_certif_sort_form.cleaned_data["from_idx"]
-    limit = prov_certif_sort_form.cleaned_data["limit"]
+    from_idx = prov_certif_sort_form.cleaned_data["from_idx"] or 0
+    limit = prov_certif_sort_form.cleaned_data["limit"] or 25
 
     try:
         provision_certificates = ElecProvisionCertificate.objects.all()

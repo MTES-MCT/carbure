@@ -27,8 +27,8 @@ class TransferCertificatesFilterForm(forms.Form):
 class TransferCertificatesSortForm(forms.Form):
     sort_by = forms.CharField(required=False)
     order = forms.CharField(required=False)
-    from_idx = forms.IntegerField(initial=0)
-    limit = forms.IntegerField(initial=25)
+    from_idx = forms.IntegerField(required=False)
+    limit = forms.IntegerField(required=False)
 
 
 @check_admin_rights(allow_external=[ExternalAdminRights.ELEC])
@@ -45,8 +45,8 @@ def get_transfer_certificates(request):
 
     sort_by = transf_certif_sort_form.cleaned_data["sort_by"]
     order = transf_certif_sort_form.cleaned_data["order"]
-    from_idx = transf_certif_sort_form.cleaned_data["from_idx"]
-    limit = transf_certif_sort_form.cleaned_data["limit"]
+    from_idx = transf_certif_sort_form.cleaned_data["from_idx"] or 0
+    limit = transf_certif_sort_form.cleaned_data["limit"] or 25
 
     try:
         transfer_certificates = ElecTransferCertificate.objects.all()
