@@ -18,7 +18,7 @@ class TransferCertificatesError:
 
 class TransferCertificatesFilterForm(forms.Form):
     year = forms.IntegerField()
-    quarter = MultipleValueField(coerce=int, required=False)
+    transfer_date = MultipleValueField(coerce=str, required=False)
     cpo = MultipleValueField(coerce=str, required=False)
     operator = MultipleValueField(coerce=str, required=False)
     certificate_id = MultipleValueField(coerce=str, required=False)
@@ -81,9 +81,8 @@ def find_transfer_certificates(transfer_certificates, **filters):
     if filters["year"]:
         transfer_certificate = transfer_certificate.filter(transfer_date__year=filters["year"])
 
-    # @TODO create logic for quarter filtering
-    # if filters["quarter"]:
-    #     transfer_certificate = transfer_certificate.filter(transfer_date=filters["quarter"])
+    if filters["transfer_date"]:
+        transfer_certificate = transfer_certificate.filter(transfer_date__in=filters["transfer_date"])
 
     if filters["cpo"]:
         transfer_certificate = transfer_certificate.filter(supplier__name__in=filters["cpo"])
@@ -96,7 +95,7 @@ def find_transfer_certificates(transfer_certificates, **filters):
 
 def sort_transfer_certificates(transfer_certificates, sort_by, order):
     sortable_columns = {
-        "quarter": "transfer_date",
+        "transfer_date": "transfer_date",
         "energy_amount": "energy_amount",
         "cpo": "supplier__name",
         "operator": "client__name",

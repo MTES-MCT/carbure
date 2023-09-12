@@ -89,6 +89,9 @@ def find_provision_certificates(provision_certificates, **filters):
     if filters["cpo"]:
         provision_certificates = provision_certificates.filter(cpo__name__in=filters["cpo"])
 
+    if filters["operating_unit"]:
+        provision_certificates = provision_certificates.filter(operating_unit__in=filters["operating_unit"])
+
     if filters["status"]:
         status_filter = Q()
         if "AVAILABLE" in filters["status"]:
