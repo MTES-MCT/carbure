@@ -9,11 +9,11 @@ import { formatDate } from "common/utils/formatters"
 import { Fragment, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
-import * as api from "../api"
-import { DoubleCountingApplicationOverview, DoubleCountingApplicationSnapshot } from "../types"
+import * as api from "../../api"
+import { DoubleCountingApplicationOverview, DoubleCountingApplicationSnapshot } from "../../types"
 import { ApplicationDetailsDialog } from "./application-details-dialog"
 import ApplicationStatus from "./application-status"
-import FilesCheckerUploadButton from "./files-checker/upload-button"
+import FilesCheckerUploadButton from "../files-checker/upload-button"
 
 type ApplicationListProps = {
   snapshot: DoubleCountingApplicationSnapshot | undefined

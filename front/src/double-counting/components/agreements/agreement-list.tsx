@@ -11,11 +11,10 @@ import { formatDateYear } from "common/utils/formatters"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
-import * as api from "../api"
-import { DoubleCountingAgreementOverview, DoubleCountingAgreementsSnapshot } from "../types"
+import * as api from "../../api"
+import { DoubleCountingAgreementOverview, DoubleCountingAgreementsSnapshot } from "../../types"
 import { AgreementDetailsDialog } from "./agreement-details-dialog"
 import AgreementStatusTag from "./agreement-status"
-import { set } from "date-fns"
 
 
 const AgreementList = ({ snapshot = defaultCount }: { snapshot: DoubleCountingAgreementsSnapshot | undefined }) => {
@@ -45,9 +44,10 @@ const AgreementList = ({ snapshot = defaultCount }: { snapshot: DoubleCountingAg
         </span>
       ),
     },
-    { header: t("Producteur"), key: "production_site", cell: (a) => <Cell text={a.producer} /> },
+    { header: t("Producteur"), cell: (a) => <Cell text={a.producer} /> },
     {
       header: t("Site de production"),
+      key: "production_site",
       cell: (a) => <Cell text={a.production_site || "-"} />,
     },
     {
