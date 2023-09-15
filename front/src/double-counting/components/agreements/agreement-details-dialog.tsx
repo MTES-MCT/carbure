@@ -10,11 +10,11 @@ import { LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
-import * as api from "../api"
-import { AgreementDetails } from "../types"
+import * as api from "../../api"
+import { AgreementDetails } from "../../types"
 import AgreementStatusTag from "./agreement-status"
-import { ApplicationDownloadButton } from "./application-download-button"
-import ApplicationTabs from "./application-tabs"
+import { ApplicationDownloadButton } from "../applications/application-download-button"
+import ApplicationTabs from "../applications/application-tabs"
 
 
 export const AgreementDetailsDialog = () => {
