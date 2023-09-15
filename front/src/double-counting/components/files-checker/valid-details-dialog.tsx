@@ -18,7 +18,7 @@ import React, { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useMatch, useNavigate } from "react-router-dom"
 import { DoubleCountingFileInfo } from "../../types"
-import ApplicationTabs from "../application-tabs"
+import ApplicationTabs from "../applications/application-tabs"
 import FileApplicationInfo from "./file-application-info"
 import { TextInput } from "common/components/input"
 

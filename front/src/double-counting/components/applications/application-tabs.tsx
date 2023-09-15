@@ -1,12 +1,11 @@
+import { ProductionSiteDetails } from "carbure/types"
 import Tabs from "common/components/tabs"
+import { compact } from "common/utils/collection"
 import { DoubleCountingProduction, DoubleCountingSourcing } from "double-counting/types"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { ProductionTable, SourcingFullTable } from "./dc-tables"
-import { ProductionSiteAdminDialog } from "./files-checker/valid-details-dialog"
-import { ProductionSiteDialog, ProductionSiteForm } from "settings/components/production-site-dialog"
-import { ProductionSiteDetails } from "carbure/types"
-import { compact } from "common/utils/collection"
+import { ProductionSiteForm } from "settings/components/production-site-dialog"
+import { ProductionTable, SourcingFullTable } from "../dc-tables"
 
 
 
