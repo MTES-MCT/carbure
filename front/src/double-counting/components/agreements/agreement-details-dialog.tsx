@@ -11,7 +11,7 @@ import { useQuery } from "common/hooks/async"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../../api"
-import { AgreementDetails } from "../../types"
+import { AgreementDetails, DoubleCountingStatus } from "../../types"
 import AgreementStatusTag from "./agreement-status"
 import { ApplicationDownloadButton } from "../applications/application-download-button"
 import ApplicationTabs from "../applications/application-tabs"
@@ -64,7 +64,21 @@ export const AgreementDetailsDialog = () => {
               <p><Trans>Aucun dossier de demande n'a été associé. Pour afficher les quotas approuvés, ajouter le dossier associé à cet agrément dans l'onglet "dossiers en attente".</Trans></p>
             </section>
           )}
-          {application && <>
+          {application && application.status != DoubleCountingStatus.Accepted &&
+            <section>
+              <p>Le dossier est en cours de validation...</p>
+              <Button
+                variant="link"
+
+                asideY
+                action={() => navigate(`/org/${entity.id}/double-counting/applications#application/${application.id}`)}>
+                {("Voir le dossier à valider")}
+
+              </Button>
+
+            </section>
+          }
+          {application && application.status === DoubleCountingStatus.Accepted && <>
             <ApplicationTabs sourcing={application.sourcing} production={application.production} hasAgreement={true} />
           </>
           }
@@ -82,7 +96,7 @@ export const AgreementDetailsDialog = () => {
 
         {applicationResponse.loading && <LoaderOverlay />}
       </Dialog>
-    </Portal>
+    </Portal >
   )
 }
 
