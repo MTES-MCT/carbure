@@ -1,5 +1,7 @@
 import { api, Api } from "common/services/api"
 import { ElecCPOProvisionCertificateFilter, ElecCPOProvisionCertificateQuery, ElecCPOSnapshot, ElecProvisionCertificatesData } from "./types"
+import { EntityPreview } from "carbure/types"
+import { extract } from "carbure/api"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/v5/elec/cpo/years", { params: { entity_id } })
@@ -31,6 +33,12 @@ export function getProvisionCertificates(query: ElecCPOProvisionCertificateQuery
   return api.get<Api<ElecProvisionCertificatesData>>("/v5/elec/cpo/provision-certificates", {
     params: query,
   })
+}
+
+export function findClients(query?: string) {
+  return api.get<Api<EntityPreview[]>>("/v5/elec/cpo/clients", {
+    params: { query },
+  }).then(extract)
 }
 
 
