@@ -26,14 +26,14 @@ export const ElecAdmin = () => {
   const entity = useEntity()
 
   const years = useYears("elec-admin", api.getYears)
-  const snapshotResponse = useQuery(api.getSnapshot, {
+  const elecAdminSnapshot = useQuery(api.getSnapshot, {
     key: "elec-admin-snapshot",
     params: [entity.id, years.selected],
   })
 
-  const snapshot = snapshotResponse.result?.data.data ?? defaultElecAdminSnapshot
+  // const snapshot = snapshotResponse.result?.data.data ?? defaultElecAdminSnapshot
 
-  // const snapshot = elecAdminSnapshot ?? defaultElecAdminSnapshot //TODO TEST with testing data
+  const snapshot = elecAdminSnapshot.result?.data.data ?? defaultElecAdminSnapshot //TODO TEST with testing data
 
   return (
 
@@ -54,7 +54,7 @@ export const ElecAdmin = () => {
         </section>
 
         <section>
-          <ElecAdminTabs loading={snapshotResponse.loading} snapshot={snapshot} />
+          <ElecAdminTabs loading={elecAdminSnapshot.loading} snapshot={snapshot} />
         </section>
       </header>
 

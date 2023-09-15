@@ -13,7 +13,7 @@ class ElecClientsError:
 
 
 class ElecClientsForm(forms.Form):
-    q = forms.CharField(required=False)
+    query = forms.CharField(required=False)
 
 
 @login_required
@@ -23,11 +23,12 @@ def get_clients(request, *args, **kwargs):
     if not clients_form.is_valid():
         return ErrorResponse(400, ElecClientsError.MALFORMED_PARAMS, clients_form.errors)
 
-    q = clients_form.cleaned_data["q"]
+    query = clients_form.cleaned_data["query"]
+    print("query: ", query)
 
     entities = Entity.objects.filter(entity_type=Entity.OPERATOR, has_elec=True)
-    if q:
-        entities = entities.filter(name__icontains=q)
+    if query:
+        entities = entities.filter(name__icontains=query)
 
     try:
         serialized = EntityPreviewSerializer(entities, many=True)

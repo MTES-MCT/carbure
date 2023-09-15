@@ -1,19 +1,18 @@
 import useEntity from "carbure/hooks/entity"
-import { Entity, EntityType } from "carbure/types"
+import { useUser } from "carbure/hooks/user"
+import { EntityPreview } from "carbure/types"
 import * as norm from "carbure/utils/normalizers"
+import Alert from "common/components/alert"
 import Autocomplete from "common/components/autocomplete"
 import Button, { MailTo } from "common/components/button"
 import Dialog from "common/components/dialog"
 import Form, { useForm } from "common/components/form"
 import { AlertTriangle, ExternalLink, Message, Return, Send } from "common/components/icons"
-import { NumberInput, TextInput } from "common/components/input"
-import Portal from "common/components/portal"
+import { NumberInput } from "common/components/input"
 import { useMutation } from "common/hooks/async"
 import { formatNumber } from "common/utils/formatters"
-import { useTranslation } from "react-i18next"
 import * as api from "elec/api"
-import Alert from "common/components/alert"
-import { useUser } from "carbure/hooks/user"
+import { useTranslation } from "react-i18next"
 
 export interface EnergyTransferDialogProps {
     onClose: () => void
@@ -62,8 +61,8 @@ export const EnergyTransferDialog = ({
         setField("energy_mwh", remainingEnergy)
     }
 
-    const findCOPClient = (query: string) => {
-        // return api.findClients(entity.id, query)
+    const findCPOClient = (query: string) => {
+        return api.findClients(query)
     }
 
     return (
@@ -92,18 +91,18 @@ export const EnergyTransferDialog = ({
                         />
                         <p>{t("Les volumes d’énergie sont consommés de manière chronologique (les plus anciens sont vidés en premier).")}</p>
 
-                        {/* <Autocomplete
-                required
-                label={t("Redevable")}
-                getOptions={findSafClien}
-                normalize={norm.normalizeEntityPreview}
-                {...bind("client")}
-              /> */}
+                        <Autocomplete
+                            required
+                            label={t("Redevable")}
+                            getOptions={findCPOClient}
+                            normalize={norm.normalizeEntityPreview}
+                            {...bind("client")}
+                        />
 
                     </Form>
 
-                    <Alert variant="info" icon={AlertTriangle}>
-                        {t('Si vous ne trouver pas le redevable concerné par la cession d’énergie dans notre base, veuillez')}
+                    <Alert variant="info" icon={AlertTriangle} style={{ display: "inline-block" }}>
+                        {t('Si vous ne trouver pas le redevable concerné par la cession d’énergie dans notre base, veuillez')} {" "}
                         <AddElecOperatorMail clientName={value.client?.name} />
                     </Alert>
                     <Alert variant="info" icon={Message}>
@@ -137,7 +136,7 @@ const AddElecOperatorMail = ({ clientName = "[Nom du redevable]" }: { clientName
 
     return <MailTo user="valorisation-recharge" host="developpement-durable.gouv.fr"
         subject={t("[CarbuRe - Elec] Je ne trouve pas mon redevable")}
-        body={t("Bonjour%2C%E2%80%A8%E2%80%A8%0D%0AEn%20tant%20que%20{{cpoName}}%2C%E2%80%A8%E2%80%A8%0D%0AJe%20souhaite%20que%20la%20soci%C3%A9t%C3%A9%20{{clientName}}%20soit%20ajout%C3%A9e%20%C3%A0%20la%20base%20de%20donn%C3%A9e%20CarbuRe%20afin%20de%20pouvoir%20lui%20c%C3%A9der%20un%20volume%20d%E2%80%99%C3%A9nergie.%0D%0ABien%20cordialement%0D%0A{{userEmail}}",
+        body={t("Bonjour%2C%E2%80%A8%E2%80%A8%0D%0AEn%20tant%20que%20{{cpoName}}%2C%0D%0AJe%20souhaite%20que%20la%20soci%C3%A9t%C3%A9%20{{clientName}}%20soit%20ajout%C3%A9e%20%C3%A0%20la%20base%20de%20donn%C3%A9e%20CarbuRe%20afin%20de%20pouvoir%20lui%20c%C3%A9der%20un%20volume%20d%E2%80%99%C3%A9nergie.%0D%0ABien%20cordialement%0D%0A{{userEmail}}",
             // {cpoName: entity.name, clientName, userName: user.email, userFirstname: "Prénom", userEmail: user.email)}
             { cpoName: entity.name, clientName, userEmail: user.email })
         }
@@ -151,7 +150,7 @@ const AddElecOperatorMail = ({ clientName = "[Nom du redevable]" }: { clientName
 
 const defaultTransfer = {
     energy_mwh: 0 as number | undefined,
-    client: undefined as Entity | undefined,
+    client: undefined as EntityPreview | undefined,
 }
 
 export type TransferForm = typeof defaultTransfer
