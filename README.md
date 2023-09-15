@@ -83,7 +83,8 @@ Lorsque des changement sont effectué sur la base de donnée :
 - Pour éviter de reconstruire la db de test à chaque fois, on peut ajouter l'option `--keepdb` à la fin de la commande
 
 # Utiliser la console scalingo
-`scalingo -a carbure-dev run bash`
+`scalingo -a carbure-[dev/prod/staging] run bash`
+`scalingo -a carbure-prod run bash`
 `python web/manage.py shell`
 
 example :
