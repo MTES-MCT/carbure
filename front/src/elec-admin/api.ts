@@ -1,5 +1,5 @@
 import { api, Api } from "common/services/api"
-import { ElecAdminProvisionCertificateFilter, ElecAdminProvisionCertificateQuery, ElecAdminSnapshot } from "./types"
+import { ElecAdminProvisionCertificateFilter, ElecAdminProvisionCertificateQuery, ElecAdminSnapshot, ElecAdminTransferCertificateQuery } from "./types"
 import { ElecProvisionCertificatesData } from "elec/types"
 
 export function getYears(entity_id: number) {
@@ -41,3 +41,9 @@ export function getProvisionCertificates(query: ElecAdminProvisionCertificateQue
     params: query,
   })
 }
+
+// export function getTransferCertificates(query: ElecAdminTransferCertificateQuery) {
+//   return api.get<Api<ElecProvisionCertificatesData>>("/v5/admin/elec/transfer-certificates", {
+//     params: query,
+//   })
+// }

@@ -48,7 +48,6 @@ export const EnergyTransferDialog = ({
             setFieldError("energy_mwh", t("Entrez une quantité d’énergie"))
             return
         }
-
         await transferEnergyRequest.execute(
             entity.id,
             value.energy_mwh!,
