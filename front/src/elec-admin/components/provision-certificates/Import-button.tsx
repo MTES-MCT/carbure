@@ -56,11 +56,9 @@ const ProvisionImportDialog = ({
     const importProvisionCertificates = useMutation(api.importProvisionCertificates, {
         invalidates: ["provision-certificates"],
         onError: (err) => {
-            const error = (err as AxiosError<{ error: string }>).response?.data
+            const error = (err as AxiosError<{ error: string, data: string[] }>).response?.data
             if (error?.error === "MISSING_CPO") {
-                setMissingCPO(["Electron",
-                    "Pessimistron",
-                    "Full - Elec"])
+                setMissingCPO(error.data)
             } else if (error?.error === "DB_INSERTION_ERROR") {
                 notify(t("L'import excel a échoué. Assurez vous que certaines données n'aient pas déjà été importées."), { variant: "danger" })
 
