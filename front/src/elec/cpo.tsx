@@ -17,8 +17,8 @@ import ProvisionCertificateList from "./components/provision-certificates/list"
 const defaultElecSnapshot: ElecCPOSnapshot = {
   provisioned_energy: 0,
   remaining_energy: 0,
-  provision_cert_available: 0,
-  provision_cert_history: 0,
+  provision_certificates_available: 0,
+  provision_certificates_history: 0,
   transferred_energy: 0,
   transfer_certificates_pending: 0,
   transfer_certificates_accepted: 0,
@@ -112,10 +112,10 @@ function ElecTabs({
         fontWeight: "normal"
       }}>
 
-        {loading ? <Loader size={20} /> : formatNumber(snapshot?.provisioned_energy)} MWh
+        {loading ? <Loader size={20} /> : formatNumber(snapshot?.remaining_energy)} MWh
       </p>
       <strong>
-        {t("Énergie attribuée")}
+        {t("Énergie disponible")}
 
       </strong>
     </>

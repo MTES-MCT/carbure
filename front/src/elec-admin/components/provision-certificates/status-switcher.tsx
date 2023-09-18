@@ -23,12 +23,12 @@ export const StatusSwitcher = ({
                 {
                     key: ElecAdminProvisionCertificateStatus.Available,
                     path: ElecAdminProvisionCertificateStatus.Available.toLowerCase(),
-                    label: t("Disponible ({{count}})", { count: snapshot?.provision_certificates })
+                    label: t("Disponible ({{count}})", { count: snapshot?.provision_certificates_available })
                 },
                 {
                     key: ElecAdminProvisionCertificateStatus.History,
                     path: ElecAdminProvisionCertificateStatus.History.toLowerCase(),
-                    label: t("Historique ({{ count }})", { count: snapshot?.transfer_certificates })
+                    label: t("Historique ({{ count }})", { count: snapshot?.provision_certificates_history })
                 },
             ]}
         />

@@ -31,26 +31,21 @@ def get_snapshot(request, *args, **kwargs):
 
     entity_id = snapshot_form.cleaned_data["entity_id"]
     year = snapshot_form.cleaned_data["year"]
-    print('year: ', year)
 
     try:
         provision_certificates = ElecProvisionCertificate.objects.filter(year=year, cpo_id=entity_id)
-        # transfer_certificates = ElecTransferCertificate.objects.filter(year=year, supplier_id=entity_id)
+        transfer_certificates = ElecTransferCertificate.objects.filter(transfer_date__year=year, supplier_id=entity_id)
 
         return SuccessResponse(
             {
                 "provisioned_energy": provision_certificates.aggregate(Sum("energy_amount"))["energy_amount__sum"] or 0,  # fmt:skip
                 "remaining_energy": provision_certificates.aggregate(Sum("remaining_energy_amount"))["remaining_energy_amount__sum"] or 0,  # fmt:skip
-                "provision_cert_available": provision_certificates.filter(remaining_energy_amount__gt=0).count(),
-                "provision_cert_history": provision_certificates.filter(remaining_energy_amount=0).count(),
-                # "transferred_energy": transfer_certificates.aggregate(Sum("energy_amount"))["energy_amount__sum"] or 0,  # fmt:skip
-                # "transfer_certificates_pending": transfer_certificates.filter(status=ElecTransferCertificate.PENDING).count(),
-                # "transfer_certificates_accepted": transfer_certificates.filter(status=ElecTransferCertificate.ACCEPTED).count(),
-                # "transfer_certificates_rejected": transfer_certificates.filter(status=ElecTransferCertificate.REJECTED).count(),
-                "transferred_energy": 0,
-                "transfer_certificates_pending": 0,
-                "transfer_certificates_accepted": 0,
-                "transfer_certificates_rejected": 0,
+                "provision_certificates_available": provision_certificates.filter(remaining_energy_amount__gt=0).count(),
+                "provision_certificates_history": provision_certificates.filter(remaining_energy_amount=0).count(),
+                "transferred_energy": transfer_certificates.aggregate(Sum("energy_amount"))["energy_amount__sum"] or 0,  # fmt:skip
+                "transfer_certificates_pending": transfer_certificates.filter(status=ElecTransferCertificate.PENDING).count(),
+                "transfer_certificates_accepted": transfer_certificates.filter(status=ElecTransferCertificate.ACCEPTED).count(),
+                "transfer_certificates_rejected": transfer_certificates.filter(status=ElecTransferCertificate.REJECTED).count(),
             }
         )
     except Exception:
