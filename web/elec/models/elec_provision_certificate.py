@@ -15,7 +15,7 @@ class ElecProvisionCertificate(models.Model):
         (4, "T4"),
     )
 
-    cpo = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.CASCADE)
+    cpo = models.ForeignKey("core.Entity", on_delete=models.CASCADE)
     quarter = models.IntegerField(choices=QUARTERS)
     year = models.IntegerField()
     operating_unit = models.CharField(max_length=64)

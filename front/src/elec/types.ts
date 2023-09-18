@@ -61,6 +61,13 @@ export interface ElecProvisionCertificatesData {
   returned: number
   total: number
 }
+// export interface ElecTransferCertificatesData {
+//   elec_provision_certificates: ElecTransferCertificatePreview[]
+//   from: number
+//   ids: number[]
+//   returned: number
+//   total: number
+// }
 
 export interface ElecProvisionCertificateCPOPreview {
   id: number,

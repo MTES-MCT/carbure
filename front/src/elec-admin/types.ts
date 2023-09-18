@@ -33,7 +33,12 @@ export enum ElecAdminProvisionCertificateFilter {
   Quarter = "quarter",
   OperatingUnit = "operating_unit",
   Cpo = "cpo",
-
+}
+export enum ElecAdminTransferCertificateFilter {
+  transfer_date = "transfer_date",
+  cpo = "cpo",
+  operator = "operator",
+  certificate_id = "certificate_id",
 }
 
 export interface ElecAdminProvisionCertificateQuery {
@@ -50,3 +55,17 @@ export interface ElecAdminProvisionCertificateQuery {
   [ElecAdminProvisionCertificateFilter.Quarter]?: string[]
 }
 
+
+export interface ElecAdminTransferCertificateQuery {
+  entity_id: number
+  status?: string
+  year?: number
+  search?: string
+  sort_by?: string
+  order?: string
+  from_idx?: number
+  limit?: number
+  [ElecAdminProvisionCertificateFilter.Cpo]?: string[]
+  [ElecAdminProvisionCertificateFilter.OperatingUnit]?: string[]
+  [ElecAdminProvisionCertificateFilter.Quarter]?: string[]
+}
