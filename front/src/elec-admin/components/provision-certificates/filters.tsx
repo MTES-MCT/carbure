@@ -49,11 +49,11 @@ export type FilterSelectProps = { field: ElecAdminProvisionCertificateFilter } &
 >
 
 
-const filterNormalizers: FilterNormalizers = {
-    [ElecAdminProvisionCertificateFilter.Cpo]: norm.normalizeFeedstockFilter,
-    [ElecAdminProvisionCertificateFilter.Quarter]: norm.normalizePeriodFilter,
-    [ElecAdminProvisionCertificateFilter.OperatingUnit]: norm.normalizeUnknownFilter,
-}
+// const filterNormalizers: FilterNormalizers = {
+//     [ElecAdminProvisionCertificateFilter.Cpo]: norm.normalizeFeedstockFilter,
+//     [ElecAdminProvisionCertificateFilter.Quarter]: norm.normalizePeriodFilter,
+//     [ElecAdminProvisionCertificateFilter.OperatingUnit]: norm.normalizeUnknownFilter,
+// }
 
 export default ProvisionCertificateFilters
 

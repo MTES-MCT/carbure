@@ -7,6 +7,7 @@ class ElecTransferCertificateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ElecTransferCertificate
         fields = [
+            "id",
             "supplier",
             "client",
             "transfer_date",

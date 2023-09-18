@@ -1,9 +1,9 @@
-import { EntityType } from "carbure/types";
-import { ElecProvisionCertificateCPOPreview, ElecProvisionCertificatePreview, ElecProvisionCertificatesData } from "elec/types";
+import { EntityPreview, EntityType } from "carbure/types";
+import { ElecProvisionCertificatePreview, ElecProvisionCertificatesData } from "elec/types";
 
 
 
-export const elecProvisionCertificateCPOPreview: ElecProvisionCertificateCPOPreview = {
+export const elecProvisionCertificateCPOPreview: EntityPreview = {
     id: 10,
     name: "Producteur Test MTES",
     entity_type: EntityType.Producer

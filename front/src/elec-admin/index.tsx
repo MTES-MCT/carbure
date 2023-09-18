@@ -11,6 +11,7 @@ import { formatNumber } from "common/utils/formatters"
 import * as api from "./api"
 import ProvisionList from "./components/provision-certificates/list"
 import { ElecAdminProvisionCertificateStatus, ElecAdminSnapshot } from "./types"
+import TransferList from "./components/transfer-certificate/list"
 
 
 const defaultElecAdminSnapshot: ElecAdminSnapshot = {
@@ -68,6 +69,12 @@ export const ElecAdmin = () => {
             <ProvisionList snapshot={snapshot} year={years.selected} />
           }
         />
+        <Route
+          path="transfer/*"
+          element={
+            <TransferList snapshot={snapshot} year={years.selected} />
+          }
+        />
 
 
         <Route
@@ -105,7 +112,7 @@ function ElecAdminTabs({
 
   return (<Tabs variant="main" tabs={[{
     key: "provision",
-    path: "provision",
+    path: "provision/available",
     label: <>
       <p style={{
         fontWeight: "normal"

@@ -1,4 +1,4 @@
-import { Entity, EntityType } from "carbure/types"
+import { Entity, EntityPreview, EntityType } from "carbure/types"
 import { Order } from "common/components/table"
 
 export interface ElecCPOSnapshot {
@@ -61,25 +61,30 @@ export interface ElecProvisionCertificatesData {
   returned: number
   total: number
 }
-// export interface ElecTransferCertificatesData {
-//   elec_provision_certificates: ElecTransferCertificatePreview[]
-//   from: number
-//   ids: number[]
-//   returned: number
-//   total: number
-// }
-
-export interface ElecProvisionCertificateCPOPreview {
-  id: number,
-  name: string,
-  entity_type: EntityType
+export interface ElecTransferCertificatesData {
+  elec_transfer_certificates: ElecTransferCertificatePreview[]
+  from: number
+  ids: number[]
+  returned: number
+  total: number
 }
+
+
 export interface ElecProvisionCertificatePreview {
   id: number
-  cpo: ElecProvisionCertificateCPOPreview
+  cpo: EntityPreview
   energy_amount: number
   operating_unit: string
   quarter: number
   remaining_energy_amount: number
   year: number
+}
+export interface ElecTransferCertificatePreview {
+  id: number
+  supplier: EntityPreview
+  client: EntityPreview
+  transfer_date: string
+  energy_amount: number
+  // status: number
+  certificate_id: number
 }
