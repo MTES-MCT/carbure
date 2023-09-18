@@ -1,6 +1,6 @@
 import { api, Api } from "common/services/api"
-import { ElecAdminProvisionCertificateFilter, ElecAdminProvisionCertificateQuery, ElecAdminSnapshot, ElecAdminTransferCertificateQuery } from "./types"
-import { ElecProvisionCertificatesData } from "elec/types"
+import { ElecAdminProvisionCertificateFilter, ElecAdminProvisionCertificateQuery, ElecAdminSnapshot, ElecAdminTransferCertificateFilter, ElecAdminTransferCertificateQuery } from "./types"
+import { ElecProvisionCertificatesData, ElecTransferCertificatesData } from "elec/types"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/v5/admin/elec/years", {
@@ -42,8 +42,17 @@ export function getProvisionCertificates(query: ElecAdminProvisionCertificateQue
   })
 }
 
-// export function getTransferCertificates(query: ElecAdminTransferCertificateQuery) {
-//   return api.get<Api<ElecProvisionCertificatesData>>("/v5/admin/elec/transfer-certificates", {
-//     params: query,
-//   })
-// }
+export function getTransferCertificates(query: ElecAdminTransferCertificateQuery) {
+  return api.get<Api<ElecTransferCertificatesData>>("/v5/admin/elec/transfer-certificates", {
+    params: query,
+  })
+}
+
+export async function getTransferCertificateFilters(field: ElecAdminTransferCertificateFilter, query: ElecAdminTransferCertificateQuery) {
+  const params = { filter: field, ...query, ...QUERY_RESET }
+
+  return api
+    .get<Api<{ filter_values: string[] }>>("/v5/admin/elec/transfer-certificate-filters", { params })
+    .then((res) => res.data.data?.filter_values ?? [])
+
+}

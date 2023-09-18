@@ -36,12 +36,7 @@ export enum ElecAdminProvisionCertificateFilter {
   OperatingUnit = "operating_unit",
   Cpo = "cpo",
 }
-export enum ElecAdminTransferCertificateFilter {
-  transfer_date = "transfer_date",
-  cpo = "cpo",
-  operator = "operator",
-  certificate_id = "certificate_id",
-}
+
 
 export interface ElecAdminProvisionCertificateQuery {
   entity_id: number
@@ -57,7 +52,14 @@ export interface ElecAdminProvisionCertificateQuery {
   [ElecAdminProvisionCertificateFilter.Quarter]?: string[]
 }
 
+// TRANSFER
 
+export enum ElecAdminTransferCertificateFilter {
+  TransferDate = "transfer_date",
+  Cpo = "cpo",
+  Operator = "operator",
+  CertificateId = "certificate_id",
+}
 export interface ElecAdminTransferCertificateQuery {
   entity_id: number
   status?: string
@@ -70,4 +72,18 @@ export interface ElecAdminTransferCertificateQuery {
   [ElecAdminProvisionCertificateFilter.Cpo]?: string[]
   [ElecAdminProvisionCertificateFilter.OperatingUnit]?: string[]
   [ElecAdminProvisionCertificateFilter.Quarter]?: string[]
+}
+
+export type ElecAdminTransferCertificateFilterSelection = Partial<Record<ElecAdminTransferCertificateFilter, string[]>>
+
+export interface ElecAdminTransferCertificateStates {
+  entity: Entity
+  year: number
+  filters: ElecAdminTransferCertificateFilterSelection
+  search?: string
+  selection: number[]
+  page: number
+  limit?: number
+  order?: Order
+  snapshot?: ElecAdminSnapshot
 }

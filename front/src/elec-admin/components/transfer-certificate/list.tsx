@@ -1,33 +1,30 @@
 import useEntity from "carbure/hooks/entity"
 import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
-import { ActionBar, Bar } from "common/components/scaffold"
+import { Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { useProvistionCertificateQueryParamsStore } from "elec-admin/hooks/provision-certificate-query-params-store"
 import { useProvisionCertificatesQuery } from "elec-admin/hooks/provision-certificates-query"
-import { ElecAdminProvisionCertificateFilter, ElecAdminProvisionCertificateStatus, ElecAdminSnapshot } from "elec-admin/types"
+import { ElecAdminProvisionCertificateStatus, ElecAdminSnapshot, ElecAdminTransferCertificateFilter } from "elec-admin/types"
 import { useMatch } from "react-router-dom"
 import * as api from "../../api"
-import ProvisionImporButton from "../provision-certificates/Import-button"
-import ProvisionCertificateFilters from "../provision-certificates/filters"
-import { StatusSwitcher } from "../provision-certificates/status-switcher"
-import ElecAdminProvisionCertificateTable from "../provision-certificates/table"
-import { elecAdminProvisionCertificateList } from "elec/__test__/data"
+import TransferCertificateFilters from "./filters"
+import ElecAdminTransferCertificateTable from "./table"
 
-type ProvisionListProps = {
+type TransferListProps = {
   snapshot: ElecAdminSnapshot
   year: number
 }
 
-const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
+const TransferList = ({ snapshot, year }: TransferListProps) => {
 
   const entity = useEntity()
   const status = useAutoStatus()
   const [state, actions] = useProvistionCertificateQueryParamsStore(entity, year, status, snapshot)
   const query = useProvisionCertificatesQuery(state)
 
-  const provisionCertificatesResponse = useQuery(api.getProvisionCertificates, {
-    key: "transfert-certificates",
+  const transferCertificatesResponse = useQuery(api.getTransferCertificates, {
+    key: "transfer-certificates",
     params: [query],
   })
 
@@ -39,28 +36,29 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
   //   }
   // }
 
-  const provisionCertificatesData = provisionCertificatesResponse.result?.data.data
-  // const provisionCertificatesData = elecAdminProvisionCertificateList //TOTEST  
+  const transferCertificatesData = transferCertificatesResponse.result?.data.data
 
-  const total = provisionCertificatesData?.total ?? 0
-  const count = provisionCertificatesData?.returned ?? 0
+
+
+  const total = transferCertificatesData?.total ?? 0
+  const count = transferCertificatesData?.returned ?? 0
   return (
     <>
 
       <Bar>
-        <ProvisionCertificateFilters
+        <TransferCertificateFilters
           filters={FILTERS}
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={(filter) =>
-            api.getProvisionCertificateFilters(filter, query)
+            api.getTransferCertificateFilters(filter, query)
           }
         />
       </Bar>
       <section>
 
 
-        <ActionBar>
+        {/* <ActionBar>
 
           <StatusSwitcher
             status={status}
@@ -69,19 +67,19 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
           />
 
           <ProvisionImporButton />
-        </ActionBar>
+        </ActionBar> */}
 
-        {count > 0 && provisionCertificatesData ? (
+        {count > 0 && transferCertificatesData ? (
           <>
-            <ElecAdminProvisionCertificateTable
-              loading={provisionCertificatesResponse.loading}
+            <ElecAdminTransferCertificateTable
+              loading={transferCertificatesResponse.loading}
               order={state.order}
-              provisionCertificates={provisionCertificatesData.elec_provision_certificates}
+              transferCertificates={transferCertificatesData.elec_transfer_certificates}
               // rowLink={showProvisionCertificateDetails}
               selected={state.selection}
               onSelect={actions.setSelection}
               onOrder={actions.setOrder}
-              status={status}
+            // status={status}
             />
 
             {(state.limit || 0) < total && (
@@ -96,7 +94,7 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
           </>
         ) : (
           <NoResult
-            loading={provisionCertificatesResponse.loading}
+            loading={transferCertificatesResponse.loading}
           // filters={state.filters}
           // onFilter={actions.setFilters}
           />
@@ -108,13 +106,14 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
     </>
   )
 }
-export default ProvisionList
+export default TransferList
 
 
 const FILTERS = [
-  ElecAdminProvisionCertificateFilter.Cpo,
-  ElecAdminProvisionCertificateFilter.Quarter,
-  ElecAdminProvisionCertificateFilter.OperatingUnit,
+  ElecAdminTransferCertificateFilter.Cpo,
+  ElecAdminTransferCertificateFilter.Operator,
+  ElecAdminTransferCertificateFilter.TransferDate,
+  ElecAdminTransferCertificateFilter.CertificateId
 ]
 
 
