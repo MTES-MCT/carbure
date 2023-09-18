@@ -15,6 +15,8 @@ import { ElecAdminProvisionCertificateStatus, ElecAdminSnapshot } from "./types"
 
 const defaultElecAdminSnapshot: ElecAdminSnapshot = {
   provision_certificates: 0,
+  provision_certificates_available: 0,
+  provision_certificates_history: 0,
   transfer_certificates: 0,
   provisioned_energy: 0,
   transferred_energy: 0

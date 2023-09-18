@@ -3,6 +3,8 @@ import { Order } from "common/components/table"
 
 export interface ElecAdminSnapshot {
   provision_certificates: number
+  provision_certificates_available: number
+  provision_certificates_history: number
   transfer_certificates: number
   provisioned_energy: number
   transferred_energy: number
