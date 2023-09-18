@@ -12,6 +12,7 @@ class CertificateImportError:
     CSV_WRITE_ERROR = "CSV_WRITE_ERROR"
     DB_INSERTION_ERROR = "DB_INSERTION_ERROR"
     CSV_PARSE_ERROR = "CSV_PARSE_ERROR"
+    MISSING_CPO = "MISSING_CPO"
 
 
 @check_admin_rights(allow_external=[ExternalAdminRights.ELEC])
@@ -36,6 +37,14 @@ def import_provision_certificate_excel(request):
 
     cpos = Entity.objects.filter(entity_type=Entity.CPO)
     cpos_by_name = {normalize_string(cpo.name): cpo for cpo in cpos}
+
+    missing_cpos = []
+    for certificate in certificate_df.to_dict("records"):
+        if normalize_string(certificate["cpo"]) not in cpos_by_name:
+            missing_cpos.append(certificate["cpo"])
+
+    if len(missing_cpos) > 0:
+        return ErrorResponse(400, CertificateImportError.MISSING_CPO, missing_cpos)
 
     certificate_model_instances = [
         ElecProvisionCertificate(
