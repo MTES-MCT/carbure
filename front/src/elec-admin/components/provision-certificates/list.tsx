@@ -8,11 +8,10 @@ import { useProvisionCertificatesQuery } from "elec-admin/hooks/provision-certif
 import { ElecAdminProvisionCertificateFilter, ElecAdminProvisionCertificateStatus, ElecAdminSnapshot } from "elec-admin/types"
 import { useMatch } from "react-router-dom"
 import * as api from "../../api"
-import ProvisionImporButton from "./Import-button"
+import ProvisionImporButton from "./Import"
 import ProvisionCertificateFilters from "./filters"
 import { StatusSwitcher } from "./status-switcher"
 import ElecAdminProvisionCertificateTable from "./table"
-import { elecAdminProvisionCertificateList } from "elec/__test__/data"
 
 type ProvisionListProps = {
   snapshot: ElecAdminSnapshot
@@ -27,7 +26,7 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
   const query = useProvisionCertificatesQuery(state)
 
   const provisionCertificatesResponse = useQuery(api.getProvisionCertificates, {
-    key: "provision-certificates",
+    key: "elec-admin-provision-certificates",
     params: [query],
   })
 

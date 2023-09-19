@@ -69,14 +69,13 @@ export const ElecAdmin = () => {
             <ProvisionList snapshot={snapshot} year={years.selected} />
           }
         />
+
         <Route
           path="transfer/*"
           element={
             <TransferList snapshot={snapshot} year={years.selected} />
           }
         />
-
-
         <Route
           path="*"
           element={

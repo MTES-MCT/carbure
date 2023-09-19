@@ -54,7 +54,7 @@ const ProvisionImportDialog = ({
     })
 
     const importProvisionCertificates = useMutation(api.importProvisionCertificates, {
-        invalidates: ["provision-certificates"],
+        invalidates: ["elec-admin-provision-certificates"],
         onError: (err) => {
             const error = (err as AxiosError<{ error: string, data: string[] }>).response?.data
             if (error?.error === "MISSING_CPO") {
@@ -92,7 +92,7 @@ const ProvisionImportDialog = ({
                     <Form id="dc-checker">
                         <p>
                             {t(
-                                "En tant qu’administrateur DGEC, vous pouvez importer ici des volumes d’énergie à céder, classé par trimestre et par aménageurs."
+                                "En tant qu’administrateur DGEC, vous pouvez importer ici des volumes d’énergie à céder, classés par trimestre et par aménageurs."
                             )}
                         </p>
 

@@ -32,7 +32,7 @@ export const ElecCPO = () => {
 
   const years = useYears("elec", api.getYears)
   const snapshotResponse = useQuery(api.getSnapshot, {
-    key: "elec-snapshot",
+    key: "elec-cpo-snapshot",
     params: [entity.id, years.selected],
   })
 
