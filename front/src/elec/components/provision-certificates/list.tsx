@@ -28,7 +28,7 @@ const ProvisionCertificateList = ({ snapshot, year }: ProvisionCertificateListPr
     const query = useProvisionCertificatesQuery(state)
 
     const provisionCertificatesResponse = useQuery(api.getProvisionCertificates, {
-        key: "provision-certificates",
+        key: "elec-provision-certificates",
         params: [query],
     })
 

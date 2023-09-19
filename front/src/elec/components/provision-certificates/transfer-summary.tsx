@@ -19,10 +19,13 @@ export const EnergyTransferSummary = ({
 
     const notify = useNotify()
 
+    const onEnergyTransferred = (volume: number, clientName: string) => {
+        notify(t("{{volume}} MWh ont bien été au redevable {{clientName}}", { volume: formatNumber(volume), clientName }), { variant: "success" })
+    }
 
     const showEnergyTransferModal = () => {
         portal((close) => (
-            <EnergyTransferDialog onClose={close} remainingEnergy={remainingVolume} />
+            <EnergyTransferDialog onClose={close} remainingEnergy={remainingVolume} onEnergyTransferred={onEnergyTransferred} />
         ))
     }
 

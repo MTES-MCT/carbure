@@ -141,13 +141,13 @@ const Navigation = ({ entity }: NavigationProps) => {
               ((has_elec && isOperator) || isCPO) && {
                 key: "elec",
                 path: "elec",
-                label: t("Electricité"),
+                label: t("Éllectricité"),
               },
 
               (isAdmin || entity.hasAdminRight("ELEC")) && {
                 key: "elec-admin",
                 path: "elec-admin",
-                label: t("Electricité"),
+                label: t("Électricité"),
               },
 
               (isOperator || isProducer) && {

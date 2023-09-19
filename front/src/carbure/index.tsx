@@ -104,7 +104,6 @@ const Org = () => {
       {isAirline && (<>
         <Route path="saf/:year/*" element={<SafClient />} />
         <Route path="saf" element={<Navigate replace to={`${currentYear}/tickets`} />} />
-        <Route path="*" element={<Navigate replace to="saf" />} />
       </>)}
 
       {isAdmin && (<>
@@ -118,7 +117,6 @@ const Org = () => {
       {isCPO && (<>
         <Route path="elec/:year/*" element={<ElecCPO />} />
         <Route path="elec" element={<Navigate replace to={`${currentYear}/provisioned`} />} />
-        <Route path="*" element={<Navigate replace to="elec" />} />
 
       </>)}
       {/* {((isOperator && has_elec)) && (<>
@@ -139,7 +137,10 @@ const Org = () => {
         <Route path="entities/*" element={<Entities />} />
       }
       {(isAdmin || isElecAdmin) &&
-        <Route path="elec-admin/*" element={<ElecAdmin />} />
+        <>
+          <Route path="elec-admin/:year/*" element={<ElecAdmin />} />
+          <Route path="elec-admin" element={<Navigate replace to={`${currentYear}/provisioned`} />} />
+        </>
       }
       {hasAirline && <Route path="*" element={<Navigate replace to="entities" />} />}
     </Routes>
