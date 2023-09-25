@@ -88,3 +88,53 @@ export interface ElecTransferCertificatePreview {
   // status: number
   certificate_id: number
 }
+
+
+export enum ElecCPOTransferCertificateStatus {
+  Pending = "PENDING",
+  Accepted = "ACCEPTED",
+  Rejected = "REJECTED",
+}
+
+export enum ElecCPOTransferCertificateFilter {
+  TransferDate = "transfer_date",
+  Operator = "operator",
+  CertificateId = "certificate_id",
+}
+export interface ElecCPOTransferCertificateQuery {
+  entity_id: number
+  status?: string
+  year?: number
+  search?: string
+  sort_by?: string
+  order?: string
+  from_idx?: number
+  limit?: number
+  [ElecCPOProvisionCertificateFilter.OperatingUnit]?: string[]
+  [ElecCPOProvisionCertificateFilter.Quarter]?: string[]
+}
+
+
+
+export interface ElecTransferCertificatesData {
+  elec_provision_certificates: ElecTransferCertificatePreview[]
+  from: number
+  ids: number[]
+  returned: number
+  total: number
+}
+
+export type ElecCPOTransferCertificateFilterSelection = Partial<Record<ElecCPOTransferCertificateFilter, string[]>>
+
+export interface ElecCPOTransferCertificateStates {
+  entity: Entity
+  year: number
+  status: ElecCPOTransferCertificateStatus
+  filters: ElecCPOTransferCertificateFilterSelection
+  search?: string
+  selection: number[]
+  page: number
+  limit?: number
+  order?: Order
+  snapshot?: ElecCPOSnapshot
+}
