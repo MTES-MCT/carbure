@@ -118,7 +118,7 @@ const FILTERS = [
 
 
 export function useAutoStatus() {
-  const matchStatus = useMatch("/org/:entity/elec-admin/:year/:status/*")
+  const matchStatus = useMatch("/org/:entity/elec-admin/:year/:view/:status/*")
   const status = matchStatus?.params?.status?.toUpperCase() as ElecAdminProvisionCertificateStatus
   return status ?? ElecAdminProvisionCertificateStatus.Available
 }
