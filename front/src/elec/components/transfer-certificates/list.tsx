@@ -37,7 +37,6 @@ const TransferCertificateList = ({ snapshot, year }: TransferCertificateListProp
         portal((close) => <ElectTransferDetailsDialog
             onClose={close}
             onTransferCancelled={() => console.log("ok")}
-            status={status}
             transfer_certificate={transferCertificate} />)
 
     }

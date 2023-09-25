@@ -1,18 +1,19 @@
 import useEntity from "carbure/hooks/entity"
 import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
-import { Bar } from "common/components/scaffold"
-import { useQuery } from "common/hooks/async"
-import { useProvistionCertificateQueryParamsStore } from "elec-admin/hooks/provision-certificate-query-params-store"
-import { useProvisionCertificatesQuery } from "elec-admin/hooks/provision-certificates-query"
-import { ElecAdminProvisionCertificateStatus, ElecAdminSnapshot, ElecAdminTransferCertificateFilter } from "elec-admin/types"
-import { useLocation, useMatch } from "react-router-dom"
-import * as api from "../../api"
-import TransferCertificateFilters from "./filters"
-import ElecAdminTransferCertificateTable from "./table"
-import { ElecTransferCertificatePreview } from "elec/types"
-import ElectTransferDetailsDialog from "./details"
 import { usePortal } from "common/components/portal"
+import { ActionBar, Bar } from "common/components/scaffold"
+import { useQuery } from "common/hooks/async"
+import { useAdminTransferCertificateQueryParamsStore } from "elec-admin/hooks/transfer-certificate-query-params-store"
+import { useAdminTransferCertificatesQuery } from "elec-admin/hooks/transfer-certificates-query"
+import { ElecAdminSnapshot, ElecAdminTransferCertificateFilter } from "elec-admin/types"
+import { ElecCPOTransferCertificateStatus, ElecTransferCertificatePreview } from "elec/types"
+import { useMatch } from "react-router-dom"
+import * as api from "../../api"
+import ElectTransferDetailsDialog from "./details"
+import TransferCertificateFilters from "./filters"
+import { StatusSwitcher } from "./status-switcher"
+import ElecAdminTransferCertificateTable from "./table"
 
 type TransferListProps = {
   snapshot: ElecAdminSnapshot
@@ -23,17 +24,20 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
 
   const entity = useEntity()
   const status = useAutoStatus()
-  const location = useLocation()
   const portal = usePortal()
 
-  const [state, actions] = useProvistionCertificateQueryParamsStore(entity, year, status, snapshot)
-  const query = useProvisionCertificatesQuery(state)
+  const [state, actions] = useAdminTransferCertificateQueryParamsStore(entity, year, status, snapshot)
+  const query = useAdminTransferCertificatesQuery(state)
   const transferCertificatesResponse = useQuery(api.getTransferCertificates, {
     key: "transfer-certificates",
     params: [query],
   })
 
   const showTransferCertificateDetails = (transferCertificate: ElecTransferCertificatePreview) => {
+    portal((close) => <ElectTransferDetailsDialog
+      onClose={close}
+      onTransferCancelled={() => console.log("ok")}
+      transfer_certificate={transferCertificate} />)
 
   }
 
@@ -58,17 +62,14 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
       </Bar>
       <section>
 
-
-        {/* <ActionBar>
-
+        <ActionBar>
           <StatusSwitcher
             status={status}
             onSwitch={actions.setStatus}
             snapshot={snapshot}
           />
 
-          <ProvisionImporButton />
-        </ActionBar> */}
+        </ActionBar>
 
         {count > 0 && transferCertificatesData ? (
           <>
@@ -118,7 +119,7 @@ const FILTERS = [
 
 
 export function useAutoStatus() {
-  const matchStatus = useMatch("/org/:entity/elec-admin/:year/:status/*")
-  const status = matchStatus?.params?.status?.toUpperCase() as ElecAdminProvisionCertificateStatus
-  return status ?? ElecAdminProvisionCertificateStatus.Available
+  const matchStatus = useMatch("/org/:entity/elec-admin/:year/:view/:status/*")
+  const status = matchStatus?.params?.status?.toUpperCase() as ElecCPOTransferCertificateStatus
+  return status ?? ElecCPOTransferCertificateStatus.Pending
 }

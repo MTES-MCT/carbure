@@ -19,6 +19,9 @@ const defaultElecAdminSnapshot: ElecAdminSnapshot = {
   provision_certificates_available: 0,
   provision_certificates_history: 0,
   transfer_certificates: 0,
+  transfer_certificates_accepted: 0,
+  transfer_certificates_pending: 0,
+  transfer_certificates_rejected: 0,
   provisioned_energy: 0,
   transferred_energy: 0
 }

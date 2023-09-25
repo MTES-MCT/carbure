@@ -1,25 +1,23 @@
 import useEntity from "carbure/hooks/entity"
 import Button from "common/components/button"
 import Dialog from "common/components/dialog"
-import { Cross, Return, Send } from "common/components/icons"
+import { Cross, Return } from "common/components/icons"
 import { TextInput } from "common/components/input"
 import { useMutation } from "common/hooks/async"
 import { formatDate } from "common/utils/formatters"
 import * as api from "elec/api"
-import { ElecCPOTransferCertificateStatus, ElecTransferCertificatePreview } from "elec/types"
+import { ElecTransferCertificatePreview } from "elec/types"
 import { useTranslation } from "react-i18next"
 import TransferCertificateTag from "./tag"
 
 export interface ElectTransferDetailsDialogProps {
   onClose: () => void
   transfer_certificate: ElecTransferCertificatePreview
-  status: ElecCPOTransferCertificateStatus
   onTransferCancelled: (volume: number, clientName: string) => void
 }
 export const ElectTransferDetailsDialog = ({
   onClose,
   transfer_certificate,
-  status,
   onTransferCancelled
 }: ElectTransferDetailsDialogProps) => {
   const { t } = useTranslation()
@@ -48,7 +46,7 @@ export const ElectTransferDetailsDialog = ({
 
     <Dialog onClose={onClose} >
       <header>
-        <TransferCertificateTag status={status} big />
+        <TransferCertificateTag status={transfer_certificate.status} big />
         <h1>
           {t("Certificat de cession n°{{id}}", { id: transfer_certificate.certificate_id })}
         </h1>
