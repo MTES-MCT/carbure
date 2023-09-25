@@ -31,6 +31,7 @@ def get_transfer_certificate_filters(request):
 filter_to_column = {
     "year": "transfer_date__year",
     "transfer_date": "transfer_date",
+    "status": "status",
     "cpo": "supplier__name",
     "operator": "client__name",
     "certificate_id": "certificate_id",

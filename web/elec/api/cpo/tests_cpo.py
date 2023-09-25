@@ -253,6 +253,7 @@ class ElecCPOTest(TestCase):
     def test_transfer_certificates(self):
         ElecTransferCertificate.objects.create(
             supplier=self.cpo,
+            status="PENDING",
             client=self.operator,
             energy_amount=1000,
             transfer_date=datetime.datetime(year=2023, month=6, day=2),
@@ -278,6 +279,7 @@ class ElecCPOTest(TestCase):
             {
                 "entity_id": self.cpo.id,
                 "year": 2023,
+                "status": "PENDING",
                 "from_idx": 0,
                 "limit": 10,
             },

@@ -32,7 +32,6 @@ def get_provision_certificate_filters(request):
 
 filter_to_column = {
     "year": "year",
-    "status": "status",
     "quarter": "quarter",
     "cpo": "cpo__name",
     "operating_unit": "operating_unit",

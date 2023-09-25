@@ -21,6 +21,7 @@ class TransferCertificatesError:
 
 class TransferCertificatesFilterForm(forms.Form):
     year = forms.IntegerField()
+    status = MultipleValueField(coerce=str, required=False)
     transfer_date = MultipleValueField(coerce=str, required=False)
     cpo = MultipleValueField(coerce=str, required=False)
     operator = MultipleValueField(coerce=str, required=False)
@@ -84,21 +85,24 @@ def get_transfer_certificates(request):
 
 
 def find_transfer_certificates(transfer_certificates, **filters):
-    transfer_certificate = transfer_certificates.select_related("supplier", "client")
+    transfer_certificates = transfer_certificates.select_related("supplier", "client")
 
     if filters["year"]:
-        transfer_certificate = transfer_certificate.filter(transfer_date__year=filters["year"])
+        transfer_certificates = transfer_certificates.filter(transfer_date__year=filters["year"])
+
+    if filters["status"]:
+        transfer_certificates = transfer_certificates.filter(status__in=filters["status"])
 
     if filters["transfer_date"]:
-        transfer_certificate = transfer_certificate.filter(transfer_date__in=filters["transfer_date"])
+        transfer_certificates = transfer_certificates.filter(transfer_date__in=filters["transfer_date"])
 
     if filters["cpo"]:
-        transfer_certificate = transfer_certificate.filter(supplier__name__in=filters["cpo"])
+        transfer_certificates = transfer_certificates.filter(supplier__name__in=filters["cpo"])
 
     if filters["operator"]:
-        transfer_certificate = transfer_certificate.filter(client__name__in=filters["operator"])
+        transfer_certificates = transfer_certificates.filter(client__name__in=filters["operator"])
 
-    return transfer_certificate
+    return transfer_certificates
 
 
 def sort_transfer_certificates(transfer_certificates, sort_by, order):
