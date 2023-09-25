@@ -40,8 +40,8 @@ const ProvisionCertificateList = ({ snapshot, year }: ProvisionCertificateListPr
     //   }
     // }
 
-    // const provisionCertificatesData = provisionCertificatesResponse.result?.data.data
-    const provisionCertificatesData = elecAdminProvisionCertificateList //TOTEST  
+    const provisionCertificatesData = provisionCertificatesResponse.result?.data.data
+    // const provisionCertificatesData = elecAdminProvisionCertificateList //TOTEST  
 
 
     // const ids = provisionCertificatesData?.ids ?? []

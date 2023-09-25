@@ -37,7 +37,6 @@ export async function getProvisionCertificateFilters(field: ElecAdminProvisionCe
 
 
 export function getProvisionCertificates(query: ElecAdminProvisionCertificateQuery) {
-  console.log('getProvisionCertificates')
   return api.get<Api<ElecProvisionCertificatesData>>("/v5/admin/elec/provision-certificates", {
     params: query,
   })
