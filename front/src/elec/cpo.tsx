@@ -11,6 +11,7 @@ import { formatNumber } from "common/utils/formatters"
 import * as api from "./api"
 import { ElecCPOProvisionCertificateStatus, ElecCPOSnapshot } from "./types"
 import ProvisionCertificateList from "./components/provision-certificates/list"
+import TransferCertificateList from "./components/transfer-certificates/list"
 
 
 
@@ -67,6 +68,12 @@ export const ElecCPO = () => {
           path="provisioned/*"
           element={
             <ProvisionCertificateList snapshot={snapshot} year={years.selected} />
+          }
+        />
+        <Route
+          path="transferred/*"
+          element={
+            <TransferCertificateList snapshot={snapshot} year={years.selected} />
           }
         />
 

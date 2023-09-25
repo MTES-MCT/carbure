@@ -3,16 +3,16 @@ import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
 import useTitle from "common/hooks/title"
-import { ElecCPOProvisionCertificateFilterSelection, ElecCPOProvisionCertificateStates, ElecCPOProvisionCertificateStatus, ElecCPOSnapshot } from "elec/types"
+import { ElecCPOSnapshot, ElecCPOTransferCertificateFilterSelection, ElecCPOTransferCertificateStates, ElecCPOTransferCertificateStatus } from "elec/types"
 import { useTranslation } from "react-i18next"
-import { useFilterSearchParams } from "./provision-certificate-filter-search-params"
+import { useFilterSearchParams } from "./transfer-certificate-filter-search-params"
 
 
 
-export function useProvistionCertificateQueryParamsStore(
+export function useTransferCertificateQueryParamsStore(
   entity: Entity,
   year: number,
-  status: ElecCPOProvisionCertificateStatus,
+  status: ElecCPOTransferCertificateStatus,
   snapshot?: ElecCPOSnapshot,
 ) {
 
@@ -33,7 +33,7 @@ export function useProvistionCertificateQueryParamsStore(
       selection: [],
       page: 0,
       limit,
-    } as ElecCPOProvisionCertificateStates,
+    } as ElecCPOTransferCertificateStates,
     {
       setEntity: (entity: Entity) => ({
         entity,
@@ -62,7 +62,7 @@ export function useProvistionCertificateQueryParamsStore(
         page: 0,
       }),
 
-      setStatus: (status: ElecCPOProvisionCertificateStatus) => {
+      setStatus: (status: ElecCPOTransferCertificateStatus) => {
         return {
           status,
           filters: filtersParams,
@@ -73,7 +73,16 @@ export function useProvistionCertificateQueryParamsStore(
         }
       },
 
-      setFilters: (filters: ElecCPOProvisionCertificateFilterSelection) => {
+      // setType: (type: ElecCPOQ) => {
+      //   return {
+      //     type,
+      //     filters: filtersParams,
+      //     selection: [],
+      //     page: 0,
+      //   }
+      // },
+
+      setFilters: (filters: ElecCPOTransferCertificateFilterSelection) => {
         setTimeout(() => {
           setFiltersParams(filters)
         })
@@ -140,12 +149,13 @@ export function useProvistionCertificateQueryParamsStore(
   return [state, actions] as [typeof state, typeof actions]
 }
 
-export function usePageTitle(state: ElecCPOProvisionCertificateStates) {
+export function usePageTitle(state: ElecCPOTransferCertificateStates) {
   const { t } = useTranslation()
 
   const statuses: any = {
-    [ElecCPOProvisionCertificateStatus.Available]: t("Énergie attribuée") + " " + t("disponible"),
-    [ElecCPOProvisionCertificateStatus.History]: t("Énergie attribuée") + " " + t("historique"),
+    [ElecCPOTransferCertificateStatus.Pending]: t("Énergie cédée") + " " + t("en attente"),
+    [ElecCPOTransferCertificateStatus.Accepted]: t("Énergie cédée") + " " + t("acceptée"),
+    [ElecCPOTransferCertificateStatus.Rejected]: t("Énergie cédée") + " " + t("rejetée"),
   }
   const entity = state.entity.name
   const year = state.year

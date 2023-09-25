@@ -1,5 +1,5 @@
 import { api, Api } from "common/services/api"
-import { ElecCPOProvisionCertificateFilter, ElecCPOProvisionCertificateQuery, ElecCPOSnapshot, ElecProvisionCertificatesData } from "./types"
+import { ElecCPOProvisionCertificateFilter, ElecCPOProvisionCertificateQuery, ElecCPOSnapshot, ElecCPOTransferCertificateFilter, ElecCPOTransferCertificateQuery, ElecProvisionCertificatesData, ElecTransferCertificatesData } from "./types"
 import { EntityPreview } from "carbure/types"
 import { extract } from "carbure/api"
 
@@ -53,4 +53,21 @@ export function transferEnergy(
     energy_mwh,
     client_id
   })
+}
+
+
+export function getTransferCertificates(query: ElecCPOTransferCertificateQuery) {
+  return api.get<Api<ElecTransferCertificatesData>>("/v5/elec/cpo/transfer-certificates", {
+    params: query,
+  })
+}
+
+
+export async function getTransferCertificateFilters(field: ElecCPOTransferCertificateFilter, query: ElecCPOTransferCertificateQuery) {
+  const params = { filter: field, ...query, ...QUERY_RESET }
+
+  return api
+    .get<Api<{ filter_values: string[] }>>("/v5/elec/cpo/transfer-certificate-filters", { params })
+    .then((res) => res.data.data?.filter_values ?? [])
+
 }
