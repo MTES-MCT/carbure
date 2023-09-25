@@ -85,7 +85,7 @@ export interface ElecTransferCertificatePreview {
   client: EntityPreview
   transfer_date: string
   energy_amount: number
-  // status: number
+  status: ElecCPOTransferCertificateStatus
   certificate_id: number
 }
 

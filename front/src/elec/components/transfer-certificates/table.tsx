@@ -1,5 +1,6 @@
 import Table, { Cell, Order } from "common/components/table"
 import { formatDate } from "common/utils/formatters"
+import TransferCertificateTag from "elec-admin/components/transfer-certificate/tag"
 import { ElecCPOTransferCertificateStatus, ElecTransferCertificatePreview } from "elec/types"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
@@ -7,25 +8,23 @@ import { To } from "react-router-dom"
 
 export interface ElecCPOTransferCertificateTableProps {
     loading: boolean
-    provisionCertificates: ElecTransferCertificatePreview[]
+    transferCertificates: ElecTransferCertificatePreview[]
     order: Order | undefined
-    rowLink?: (provisionCertificate: ElecTransferCertificatePreview) => To
+    onAction?: (transferCertificate: ElecTransferCertificatePreview) => void
     onOrder: (order: Order | undefined) => void
     selected: number[]
     onSelect: (selected: number[]) => void
-    status: ElecCPOTransferCertificateStatus
 }
 
 export const ElecCPOTransferCertificateTable = memo(
     ({
         loading,
-        provisionCertificates,
+        transferCertificates,
         order,
-        rowLink,
+        onAction,
         onOrder,
         selected,
         onSelect,
-        status,
     }: ElecCPOTransferCertificateTableProps) => {
         const columns = useColumns()
         return (
@@ -33,9 +32,10 @@ export const ElecCPOTransferCertificateTable = memo(
                 loading={loading}
                 order={order}
                 onOrder={onOrder}
-                rowLink={rowLink}
-                rows={provisionCertificates}
+                onAction={onAction}
+                rows={transferCertificates}
                 columns={[
+                    columns.status,
                     columns.operator,
                     columns.transfer_date,
                     columns.energy_amount,
@@ -49,13 +49,22 @@ export const ElecCPOTransferCertificateTable = memo(
 export function useColumns() {
     const { t } = useTranslation()
     return {
+        status: {
+            key: "status",
+            header: t("Statut"),
+            cell: (transferCertificate: ElecTransferCertificatePreview) => {
+                return (
+                    <TransferCertificateTag status={transferCertificate.status} />
+                )
+            },
+        },
 
         operator: {
             key: "operator",
             header: t("Redevable"),
-            cell: (provisionCertificate: ElecTransferCertificatePreview) => {
+            cell: (transferCertificate: ElecTransferCertificatePreview) => {
                 const value =
-                    provisionCertificate.client.name
+                    transferCertificate.client.name
                 return <Cell text={value} />
             },
         },
@@ -63,19 +72,19 @@ export function useColumns() {
         transfer_date: {
             key: "transfer_date",
             header: t("Date d'émission"),
-            cell: (provisionCertificate: ElecTransferCertificatePreview) => {
+            cell: (transferCertificate: ElecTransferCertificatePreview) => {
                 const value =
-                    formatDate(provisionCertificate.transfer_date)
+                    formatDate(transferCertificate.transfer_date)
                 return <Cell text={value} />
             },
         },
         energy_amount: {
             key: "energy_amount",
             header: t("MWh"),
-            cell: (provisionCertificate: ElecTransferCertificatePreview) => {
+            cell: (transferCertificate: ElecTransferCertificatePreview) => {
                 return (
                     <Cell
-                        text={provisionCertificate.energy_amount}
+                        text={transferCertificate.energy_amount + " MWh"}
                     />
                 )
             },
@@ -83,10 +92,10 @@ export function useColumns() {
         certificate_id: {
             key: "certificate_id",
             header: t("Numéro"),
-            cell: (provisionCertificate: ElecTransferCertificatePreview) => {
+            cell: (transferCertificate: ElecTransferCertificatePreview) => {
                 return (
                     <Cell
-                        text={provisionCertificate.certificate_id}
+                        text={transferCertificate.certificate_id}
                     />
                 )
             },

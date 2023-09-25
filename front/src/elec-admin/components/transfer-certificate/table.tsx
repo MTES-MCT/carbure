@@ -1,20 +1,20 @@
 import Table, { Cell, Order } from "common/components/table"
 import { formatDate } from "common/utils/formatters"
-import { ElecTransferCertificatePreview } from "elec/types"
+import { ElecCPOTransferCertificateStatus, ElecTransferCertificatePreview } from "elec/types"
 
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import { To } from "react-router-dom"
+import TransferCertificateTag from "./tag"
 
 export interface ElecAdminTransferCertificateTableProps {
     loading: boolean
     transferCertificates: ElecTransferCertificatePreview[]
     order: Order | undefined
-    rowLink?: (provisionCertificate: ElecTransferCertificatePreview) => To
+    onAction?: (transferCertificate: ElecTransferCertificatePreview, index: number) => void
     onOrder: (order: Order | undefined) => void
     selected: number[]
     onSelect: (selected: number[]) => void
-    // status: ElecAdminTransferCertificateStatu
 }
 
 export const ElecAdminTransferCertificateTable = memo(
@@ -22,11 +22,10 @@ export const ElecAdminTransferCertificateTable = memo(
         loading,
         transferCertificates,
         order,
-        rowLink,
         onOrder,
+        onAction,
         selected,
         onSelect,
-        // status,
     }: ElecAdminTransferCertificateTableProps) => {
         const columns = useColumns()
         return (
@@ -34,9 +33,10 @@ export const ElecAdminTransferCertificateTable = memo(
                 loading={loading}
                 order={order}
                 onOrder={onOrder}
-                rowLink={rowLink}
+                onAction={onAction}
                 rows={transferCertificates}
                 columns={[
+                    columns.status,
                     columns.cpo,
                     columns.transfer_date,
                     columns.operator,
@@ -51,21 +51,30 @@ export const ElecAdminTransferCertificateTable = memo(
 export function useColumns() {
     const { t } = useTranslation()
     return {
+        status: {
+            key: "status",
+            header: t("Statut"),
+            cell: (transferCertificate: ElecTransferCertificatePreview) => {
+                return (
+                    <TransferCertificateTag status={transferCertificate.status} />
+                )
+            },
+        },
         cpo: {
             key: "cpo",
             header: t("Aménageur"),
-            cell: (provisionCertificate: ElecTransferCertificatePreview) => {
+            cell: (transferCertificate: ElecTransferCertificatePreview) => {
                 const value =
-                    provisionCertificate.supplier.name
+                    transferCertificate.supplier.name
                 return <Cell text={value} />
             },
         },
         operator: {
             key: "operator",
             header: t("Redevable"),
-            cell: (provisionCertificate: ElecTransferCertificatePreview) => {
+            cell: (transferCertificate: ElecTransferCertificatePreview) => {
                 const value =
-                    provisionCertificate.client.name
+                    transferCertificate.client.name
                 return <Cell text={value} />
             },
         },
@@ -73,19 +82,19 @@ export function useColumns() {
         transfer_date: {
             key: "transfer_date",
             header: t("Date d'émission"),
-            cell: (provisionCertificate: ElecTransferCertificatePreview) => {
+            cell: (transferCertificate: ElecTransferCertificatePreview) => {
                 const value =
-                    formatDate(provisionCertificate.transfer_date)
+                    formatDate(transferCertificate.transfer_date)
                 return <Cell text={value} />
             },
         },
         energy_amount: {
             key: "energy_amount",
             header: t("MWh"),
-            cell: (provisionCertificate: ElecTransferCertificatePreview) => {
+            cell: (transferCertificate: ElecTransferCertificatePreview) => {
                 return (
                     <Cell
-                        text={provisionCertificate.energy_amount}
+                        text={transferCertificate.energy_amount}
                     />
                 )
             },
@@ -93,10 +102,10 @@ export function useColumns() {
         certificate_id: {
             key: "certificate_id",
             header: t("Numéro"),
-            cell: (provisionCertificate: ElecTransferCertificatePreview) => {
+            cell: (transferCertificate: ElecTransferCertificatePreview) => {
                 return (
                     <Cell
-                        text={provisionCertificate.certificate_id}
+                        text={transferCertificate.certificate_id}
                     />
                 )
             },
