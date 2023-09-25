@@ -6,10 +6,13 @@ import { useQuery } from "common/hooks/async"
 import { useProvistionCertificateQueryParamsStore } from "elec-admin/hooks/provision-certificate-query-params-store"
 import { useProvisionCertificatesQuery } from "elec-admin/hooks/provision-certificates-query"
 import { ElecAdminProvisionCertificateStatus, ElecAdminSnapshot, ElecAdminTransferCertificateFilter } from "elec-admin/types"
-import { useMatch } from "react-router-dom"
+import { useLocation, useMatch } from "react-router-dom"
 import * as api from "../../api"
 import TransferCertificateFilters from "./filters"
 import ElecAdminTransferCertificateTable from "./table"
+import { ElecTransferCertificatePreview } from "elec/types"
+import ElectTransferDetailsDialog from "./details"
+import { usePortal } from "common/components/portal"
 
 type TransferListProps = {
   snapshot: ElecAdminSnapshot
@@ -20,21 +23,19 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
 
   const entity = useEntity()
   const status = useAutoStatus()
+  const location = useLocation()
+  const portal = usePortal()
+
   const [state, actions] = useProvistionCertificateQueryParamsStore(entity, year, status, snapshot)
   const query = useProvisionCertificatesQuery(state)
-
   const transferCertificatesResponse = useQuery(api.getTransferCertificates, {
     key: "transfer-certificates",
     params: [query],
   })
 
-  // const showProvisionCertificateDetails = (provisionCertificate: ElecProvisionCertificatePreview) => {
-  //   return {
-  //     pathname: location.pathname,
-  //     search: location.search,
-  //     hash: `provision-certificate/${provisionCertificate.id}`,
-  //   }
-  // }
+  const showTransferCertificateDetails = (transferCertificate: ElecTransferCertificatePreview) => {
+
+  }
 
   const transferCertificatesData = transferCertificatesResponse.result?.data.data
 
@@ -75,11 +76,10 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
               loading={transferCertificatesResponse.loading}
               order={state.order}
               transferCertificates={transferCertificatesData.elec_transfer_certificates}
-              // rowLink={showProvisionCertificateDetails}
+              onAction={showTransferCertificateDetails}
               selected={state.selection}
               onSelect={actions.setSelection}
               onOrder={actions.setOrder}
-            // status={status}
             />
 
             {(state.limit || 0) < total && (

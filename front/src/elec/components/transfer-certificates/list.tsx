@@ -5,12 +5,14 @@ import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { useTransferCertificateQueryParamsStore } from "elec/hooks/transfer-certificate-query-params-store"
 import { useTransferCertificatesQuery } from "elec/hooks/transfer-certificates-query"
-import { ElecCPOSnapshot, ElecCPOTransferCertificateFilter, ElecCPOTransferCertificateStatus } from "elec/types"
+import { ElecCPOSnapshot, ElecCPOTransferCertificateFilter, ElecCPOTransferCertificateStatus, ElecTransferCertificatePreview } from "elec/types"
 import { useMatch } from "react-router-dom"
 import * as api from "../../api"
 import TransferCertificateFilters from "./filters"
 import { StatusSwitcher } from "./status-switcher"
 import ElecCPOTransferCertificateTable from "./table"
+import ElectTransferDetailsDialog from "elec-admin/components/transfer-certificate/details"
+import { usePortal } from "common/components/portal"
 
 
 type TransferCertificateListProps = {
@@ -24,21 +26,24 @@ const TransferCertificateList = ({ snapshot, year }: TransferCertificateListProp
     const status = useAutoStatus()
     const [state, actions] = useTransferCertificateQueryParamsStore(entity, year, status, snapshot)
     const query = useTransferCertificatesQuery(state)
+    const portal = usePortal()
 
     const transferCertificatesResponse = useQuery(api.getTransferCertificates, {
         key: "elec-transfer-certificates",
         params: [query],
     })
 
-    // const showTransferCertificateDetails = (provisionCertificate: ElecTransferCertificatePreview) => {
-    //   return {
-    //     pathname: location.pathname,
-    //     search: location.search,
-    //     hash: `provision-certificate/${provisionCertificate.id}`,
-    //   }
-    // }
+    const showTransferCertificateDetails = (transferCertificate: ElecTransferCertificatePreview) => {
+        portal((close) => <ElectTransferDetailsDialog
+            onClose={close}
+            onTransferCancelled={() => console.log("ok")}
+            status={status}
+            transfer_certificate={transferCertificate} />)
+
+    }
 
     const transferCertificatesData = transferCertificatesResponse.result?.data.data
+
     // const provisionCertificatesData = elecAdminTransferCertificateList //TOTEST  
 
 
@@ -77,12 +82,11 @@ const TransferCertificateList = ({ snapshot, year }: TransferCertificateListProp
                         <ElecCPOTransferCertificateTable
                             loading={transferCertificatesResponse.loading}
                             order={state.order}
-                            provisionCertificates={transferCertificatesData.elec_transfer_certificates}
-                            // rowLink={showTransferCertificateDetails}
+                            transferCertificates={transferCertificatesData.elec_transfer_certificates}
+                            onAction={showTransferCertificateDetails}
                             selected={state.selection}
                             onSelect={actions.setSelection}
                             onOrder={actions.setOrder}
-                            status={status}
                         />
 
                         {(state.limit || 0) < total && (

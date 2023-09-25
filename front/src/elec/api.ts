@@ -71,3 +71,13 @@ export async function getTransferCertificateFilters(field: ElecCPOTransferCertif
     .then((res) => res.data.data?.filter_values ?? [])
 
 }
+
+export function cancelTransferCertificate(
+  entity_id: number,
+  transfer_certificate_id: number,
+) {
+  return api.post("/v5/elec/cpo/cancel-transfer-certificate", {
+    entity_id,
+    transfer_certificate_id,
+  })
+}
