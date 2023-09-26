@@ -38,8 +38,12 @@ export const ControlActions = ({
       {status !== "stocks" && (
         <>
           {selectedLots && <AlertManyButton {...props} lots={selectedLots} />}
-          {selectedLots && <UpdateManyButton {...props} lots={selectedLots} />}
-          {selectedLots && <DeleteManyButton {...props} lots={selectedLots} />}
+          {entity.isAdmin && selectedLots && (
+            <UpdateManyButton {...props} lots={selectedLots} />
+          )}
+          {entity.isAdmin && selectedLots && (
+            <DeleteManyButton {...props} lots={selectedLots} />
+          )}
           {entity.isAdmin && <DeliveryMapButton {...props} />}
           {entity.isAuditor && status === "alerts" && (
             <SetManyConformityButton {...props} />
