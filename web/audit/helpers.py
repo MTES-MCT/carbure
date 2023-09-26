@@ -56,7 +56,7 @@ def get_auditor_lots(request):
 def get_auditor_lots_by_status(entity, status, request):
     lots = get_auditor_lots(request)
     if status == "ALERTS":
-        lots = lots.filter(
+        lots = lots.exclude(audit_status=CarbureLot.CONFORM).filter(
             Q(highlighted_by_auditor=True)
             | Q(random_control_requested=True)
             | Q(ml_control_requested=True)
