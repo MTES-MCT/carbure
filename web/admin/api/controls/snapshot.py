@@ -28,7 +28,7 @@ def get_snapshot(request, *args, **kwargs):
         lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED]
     )
     stock = CarbureStock.objects.filter(remaining_volume__gt=0)
-    alerts = lots.filter(
+    alerts = lots.exclude(audit_status=CarbureLot.CONFORM).filter(
         Q(highlighted_by_admin=True)
         | Q(random_control_requested=True)
         | Q(ml_control_requested=True)
