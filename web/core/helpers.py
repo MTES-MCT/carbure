@@ -388,10 +388,12 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=[]):
         lots = lots.filter(audit_status__in=conformity)
 
     if ml and "ml_scoring" not in blacklist:
-        if ml == "KO":
-            lots = lots.filter(ml_scoring_requested=True)
-        else:
-            lots = lots.filter(ml_scoring_requested=False)
+        ml_filter = Q()
+        if "OK" in ml:
+            ml_filter = ml_filter | Q(ml_control_requested=False)
+        if "KO" in ml:
+            ml_filter = ml_filter | Q(ml_control_requested=True)
+        lots = lots.filter(ml_filter)
 
     if search and "query" not in blacklist:
         lots = lots.filter(
