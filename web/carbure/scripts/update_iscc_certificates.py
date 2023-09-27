@@ -74,10 +74,10 @@ def download_iscc_certificates(test: bool, latest: bool) -> None:
     files = [f for f in listdir(DESTINATION_FOLDER) if isfile("%s/%s" % (DESTINATION_FOLDER, f))]
     files.sort()
     histoFiles = [f for f in files if re.match("History_[0-9]{4}-[0-9]{2}-[0-9]{2}.csv", f)]
-    histo = pd.read_csv("%s/%s" % (DESTINATION_FOLDER, histoFiles[-1]))
+    histo = pd.read_csv(f"{DESTINATION_FOLDER}/{histoFiles[-1]}", sep=",", quotechar='"', lineterminator="\n")
     histo["date"] = str(re.sub("History_([0-9]{4}-[0-9]{2}-[0-9]{2}).csv", "\\1", histoFiles[-1]))
 
-    certificates = pd.read_csv("%s/%s" % (DESTINATION_FOLDER, certificatesFiles[-1]))
+    certificates = pd.read_csv(f"{DESTINATION_FOLDER}/{certificatesFiles[-1]}", sep=",", quotechar='"', lineterminator="\n")
     certificates["date"] = str(re.sub("Certificates_([0-9]{4}-[0-9]{2}-[0-9]{2}).csv", "\\1", certificatesFiles[-1]))
 
     # On concatène l'historique et les certificats du jour
@@ -206,7 +206,7 @@ def fetch_certificate_data(nonce: str, recordsTotal: int, test: bool, latest: bo
     if test:
         recordsTotal = PAGELENGTH
     page = 1
-    pages_total = recordsTotal / PAGELENGTH
+    pages_total = round(recordsTotal / PAGELENGTH)
     print(f"> Loading {pages_total} pages of {PAGELENGTH} items")
     while start < recordsTotal:
         print(f"> From page {page} at index {start}")
