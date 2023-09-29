@@ -1,13 +1,18 @@
 import useEntity from "carbure/hooks/entity"
 import Button from "common/components/button"
 import Dialog from "common/components/dialog"
-import { Return } from "common/components/icons"
+import { Check, Cross, Message, Return } from "common/components/icons"
 import { TextInput } from "common/components/input"
 import { formatDate } from "common/utils/formatters"
 import { ElecTransferCertificatePreview } from "elec/types"
 import { useTranslation } from "react-i18next"
-import TransferCertificateTag from "../../../elec-admin/components/transfer-certificate/tag"
+import TransferCertificateTag from "./tag"
 import { ElecCancelTransferButton } from "./cancel"
+import { ElecOperatorStatus } from "elec/types-operator"
+import { RejectTransfer } from "./reject"
+import { usePortal } from "common/components/portal"
+import { AcceptTransfer } from "./accept"
+import Alert from "common/components/alert"
 
 export interface ElecTransferDetailsDialogProps {
   onClose: () => void
@@ -21,8 +26,18 @@ export const ElecTransferDetailsDialog = ({
 }: ElecTransferDetailsDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
+  const portal = usePortal()
 
 
+
+  const showRejectModal = () => {
+    portal((close) => <RejectTransfer transfer_certificate={transfer_certificate} onClose={close} onRejected={onClose} />)
+  }
+
+  const showAcceptModal = async () => {
+    portal((close) => <AcceptTransfer transfer_certificate={transfer_certificate} onClose={close} onAccepted={onClose} />)
+
+  }
   return (
 
     <Dialog onClose={onClose} >
@@ -62,12 +77,33 @@ export const ElecTransferDetailsDialog = ({
             value={transfer_certificate.energy_amount + " MWh"}
 
           />
-
-
+          {transfer_certificate.status === ElecOperatorStatus.Accepted &&
+            <Alert variant="info" icon={Message}>
+              {t("L’identifiant est à reporter sur le certificat d'acquisition à intégrer dans votre comptabilité matière pour le compte des douanes.")}
+            </Alert>
+          }
         </section>
+
       </main>
 
       <footer>
+        {transfer_certificate?.status === ElecOperatorStatus.Pending &&
+          transfer_certificate?.client.id === entity.id && (
+            <>
+              <Button
+                icon={Check}
+                label={t("Accepter")}
+                variant="success"
+                action={showAcceptModal}
+              />
+              <Button
+                icon={Cross}
+                label={t("Refuser")}
+                variant="danger"
+                action={showRejectModal}
+              />
+            </>
+          )}
         {entity.id === transfer_certificate.supplier.id &&
           <ElecCancelTransferButton
             transfer_certificate={transfer_certificate}

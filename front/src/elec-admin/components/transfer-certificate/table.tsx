@@ -4,7 +4,7 @@ import { ElecTransferCertificatePreview } from "elec/types"
 
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
-import TransferCertificateTag from "./tag"
+import TransferCertificateTag from "../../../elec/components/transfer-certificates/tag"
 
 export interface ElecAdminTransferCertificateTableProps {
     loading: boolean
