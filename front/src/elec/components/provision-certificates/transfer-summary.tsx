@@ -1,6 +1,6 @@
 import Alert from "common/components/alert"
 import Button from "common/components/button"
-import { Bolt, Filter } from "common/components/icons"
+import { Bolt } from "common/components/icons"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { formatNumber } from "common/utils/formatters"
