@@ -1,5 +1,6 @@
 import { EntityPreview, EntityType } from "carbure/types";
-import { ElecProvisionCertificatePreview, ElecProvisionCertificatesData } from "elec/types";
+import { ElecProvisionCertificatePreview } from "elec/types";
+import { ElecProvisionCertificatesData } from "elec/types-cpo";
 
 
 

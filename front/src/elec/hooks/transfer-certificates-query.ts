@@ -1,4 +1,4 @@
-import { ElecCPOTransferCertificateQuery, ElecCPOTransferCertificateStates } from "elec/types"
+import { ElecCPOTransferCertificateQuery, ElecCPOTransferCertificateStates } from "elec/types-cpo"
 import { useMemo } from "react"
 
 export function useTransferCertificatesQuery({

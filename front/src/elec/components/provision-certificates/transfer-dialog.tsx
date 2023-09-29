@@ -11,7 +11,7 @@ import { AlertTriangle, ExternalLink, Message, Return, Send } from "common/compo
 import { NumberInput } from "common/components/input"
 import { useMutation } from "common/hooks/async"
 import { formatNumber } from "common/utils/formatters"
-import * as api from "elec/api"
+import * as api from "elec/api-cpo"
 import { useTranslation } from "react-i18next"
 
 export interface EnergyTransferDialogProps {

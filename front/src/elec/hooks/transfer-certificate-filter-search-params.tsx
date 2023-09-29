@@ -1,5 +1,5 @@
 import { ElecAdminTransferCertificateFilter, ElecAdminTransferCertificateFilterSelection } from "elec-admin/types"
-import { ElecCPOTransferCertificateFilter, ElecCPOTransferCertificateFilterSelection } from "elec/types"
+import { ElecCPOTransferCertificateFilter, ElecCPOTransferCertificateFilterSelection } from "elec/types-cpo"
 import { useMemo } from "react"
 import { useSearchParams } from "react-router-dom"
 

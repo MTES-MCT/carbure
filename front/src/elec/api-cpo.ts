@@ -1,5 +1,5 @@
 import { api, Api } from "common/services/api"
-import { ElecCPOProvisionCertificateFilter, ElecCPOProvisionCertificateQuery, ElecCPOSnapshot, ElecCPOTransferCertificateFilter, ElecCPOTransferCertificateQuery, ElecProvisionCertificatesData, ElecTransferCertificatesData } from "./types"
+import { ElecCPOProvisionCertificateFilter, ElecCPOProvisionCertificateQuery, ElecCPOSnapshot, ElecCPOTransferCertificateFilter, ElecCPOTransferCertificateQuery, ElecProvisionCertificatesData, ElecTransferCertificatesData } from "./types-cpo"
 import { EntityPreview } from "carbure/types"
 import { extract } from "carbure/api"
 

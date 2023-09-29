@@ -1,10 +1,9 @@
 import Table, { Cell, Order } from "common/components/table"
 import { formatDate } from "common/utils/formatters"
 import TransferCertificateTag from "elec-admin/components/transfer-certificate/tag"
-import { ElecCPOTransferCertificateStatus, ElecTransferCertificatePreview } from "elec/types"
+import { ElecTransferCertificatePreview } from "elec/types"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
-import { To } from "react-router-dom"
 
 export interface ElecCPOTransferCertificateTableProps {
     loading: boolean
