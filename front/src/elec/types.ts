@@ -1,5 +1,6 @@
 import { EntityPreview } from "carbure/types"
 import { ElecCPOProvisionCertificateQuery, ElecCPOTransferCertificateStatus } from "./types-cpo"
+import { ElecOperatorStatus } from "./types-operator"
 
 export interface ElecProvisionCertificatePreview {
   id: number
@@ -16,7 +17,7 @@ export interface ElecTransferCertificatePreview {
   client: EntityPreview
   transfer_date: string
   energy_amount: number
-  status: ElecCPOTransferCertificateStatus
+  status: ElecCPOTransferCertificateStatus | ElecOperatorStatus
   certificate_id: number
 }
 

@@ -1,7 +1,7 @@
 import Table, { Cell, Order } from "common/components/table"
 import { compact } from "common/utils/collection"
 import { formatDate } from "common/utils/formatters"
-import TransferCertificateTag from "elec-admin/components/transfer-certificate/tag"
+import TransferCertificateTag from "elec/components/transfer-certificates/tag"
 import { ElecTransferCertificatePreview } from "elec/types"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"

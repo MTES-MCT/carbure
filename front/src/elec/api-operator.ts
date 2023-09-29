@@ -27,3 +27,23 @@ export async function getTransferCertificateFilters(field: ElecTransferCertifica
     .then((res) => res.data.data?.filter_values ?? [])
 
 }
+
+export function rejectTransfer(
+  entity_id: number,
+  transfer_certificate_id: number,
+  comment: string
+) {
+  return api.post("/v5/elec/operator/reject-transfer-certificate", {
+    entity_id,
+    comment,
+    transfer_certificate_id,
+  })
+}
+
+
+export function acceptTransfer(entity_id: number, transfer_certificate_id: number) {
+  return api.post("/v5/elec/operator/accept-transfer-certificate", {
+    entity_id,
+    transfer_certificate_id,
+  })
+}

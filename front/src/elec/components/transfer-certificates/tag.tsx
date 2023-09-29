@@ -1,9 +1,10 @@
 import { Tag, TagProps, TagVariant } from "common/components/tag"
 import { ElecCPOTransferCertificateStatus } from "elec/types-cpo"
+import { ElecOperatorStatus } from "elec/types-operator"
 import { useTranslation } from "react-i18next"
 
 export interface TransferCertificateTagProps extends TagProps {
-  status: ElecCPOTransferCertificateStatus | undefined
+  status: ElecCPOTransferCertificateStatus | ElecOperatorStatus | undefined
 }
 
 export const TransferCertificateTag = ({
@@ -15,15 +16,19 @@ export const TransferCertificateTag = ({
   let label: string = ""
   let variant: TagVariant = "none"
   switch (status) {
-    case ElecCPOTransferCertificateStatus.Accepted:
+    case ElecCPOTransferCertificateStatus.Accepted || ElecOperatorStatus.Accepted:
       variant = "success"
       label = t("Accepté")
       break
     case ElecCPOTransferCertificateStatus.Rejected:
       variant = "warning"
-      label = t("Rejeté")
+      label = t("Refusé")
       break
     case ElecCPOTransferCertificateStatus.Pending:
+      variant = "info"
+      label = t("En attente")
+      break
+    case ElecOperatorStatus.Pending:
       variant = "info"
       label = t("En attente")
       break
