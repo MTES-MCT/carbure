@@ -10,7 +10,7 @@ import { ElecAdminSnapshot, ElecAdminTransferCertificateFilter } from "elec-admi
 import { ElecCPOTransferCertificateStatus, ElecTransferCertificatePreview } from "elec/types"
 import { useMatch } from "react-router-dom"
 import * as api from "../../api"
-import ElectTransferDetailsDialog from "./details"
+import ElectTransferDetailsDialog from "../../../elec/components/transfer-certificates/details"
 import TransferCertificateFilters from "./filters"
 import { StatusSwitcher } from "./status-switcher"
 import ElecAdminTransferCertificateTable from "./table"
@@ -36,7 +36,6 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
   const showTransferCertificateDetails = (transferCertificate: ElecTransferCertificatePreview) => {
     portal((close) => <ElectTransferDetailsDialog
       onClose={close}
-      onTransferCancelled={() => console.log("ok")}
       transfer_certificate={transferCertificate} />)
 
   }

@@ -11,7 +11,7 @@ import * as api from "../../api"
 import TransferCertificateFilters from "./filters"
 import { StatusSwitcher } from "./status-switcher"
 import ElecCPOTransferCertificateTable from "./table"
-import ElectTransferDetailsDialog from "elec-admin/components/transfer-certificate/details"
+import ElectTransferDetailsDialog from "elec/components/transfer-certificates/details"
 import { usePortal } from "common/components/portal"
 
 
@@ -36,7 +36,6 @@ const TransferCertificateList = ({ snapshot, year }: TransferCertificateListProp
     const showTransferCertificateDetails = (transferCertificate: ElecTransferCertificatePreview) => {
         portal((close) => <ElectTransferDetailsDialog
             onClose={close}
-            onTransferCancelled={() => console.log("ok")}
             transfer_certificate={transferCertificate} />)
 
     }
