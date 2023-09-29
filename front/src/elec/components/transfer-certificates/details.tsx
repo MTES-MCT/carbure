@@ -9,14 +9,16 @@ import { useTranslation } from "react-i18next"
 import TransferCertificateTag from "../../../elec-admin/components/transfer-certificate/tag"
 import { ElecCancelTransferButton } from "./cancel"
 
-export interface ElectTransferDetailsDialogProps {
+export interface ElecTransferDetailsDialogProps {
   onClose: () => void
+  displayCpo?: boolean
   transfer_certificate: ElecTransferCertificatePreview
 }
-export const ElectTransferDetailsDialog = ({
+export const ElecTransferDetailsDialog = ({
   onClose,
+  displayCpo,
   transfer_certificate,
-}: ElectTransferDetailsDialogProps) => {
+}: ElecTransferDetailsDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
 
@@ -39,12 +41,21 @@ export const ElectTransferDetailsDialog = ({
             value={formatDate(transfer_certificate.transfer_date)}
 
           />
-          <TextInput
-            readOnly
-            label={t("Redevable")}
-            value={transfer_certificate.client.name}
+          {displayCpo ?
+            <TextInput
+              readOnly
+              label={t("Aménageur")}
+              value={transfer_certificate.supplier.name}
 
-          />
+            />
+            : <TextInput
+              readOnly
+              label={t("Redevable")}
+              value={transfer_certificate.client.name}
+
+            />
+          }
+
           <TextInput
             readOnly
             label={t("MWh")}
@@ -70,4 +81,4 @@ export const ElectTransferDetailsDialog = ({
   )
 }
 
-export default ElectTransferDetailsDialog
+export default ElecTransferDetailsDialog

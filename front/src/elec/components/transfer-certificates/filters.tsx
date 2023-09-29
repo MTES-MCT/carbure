@@ -2,15 +2,16 @@ import * as norm from "carbure/utils/normalizers"
 import { MultiSelect, MultiSelectProps } from "common/components/multi-select"; // prettier-ignore
 import { Grid } from "common/components/scaffold"
 import { Normalizer, defaultNormalizer } from "common/utils/normalize"
-import { ElecCPOTransferCertificateFilter, ElecCPOTransferCertificateFilterSelection } from "elec/types-cpo";
+import { ElecTransferCertificateFilter } from "elec/types";
+import { ElecTransferCertificateFilterSelection } from "elec/types-cpo";
 import { useTranslation } from "react-i18next"
 
 
 export interface FiltersProps {
-    filters: ElecCPOTransferCertificateFilter[]
-    selected: ElecCPOTransferCertificateFilterSelection
-    onSelect: (filters: ElecCPOTransferCertificateFilterSelection) => void
-    getFilterOptions: (filter: ElecCPOTransferCertificateFilter) => Promise<any[]>
+    filters: ElecTransferCertificateFilter[]
+    selected: ElecTransferCertificateFilterSelection
+    onSelect: (filters: ElecTransferCertificateFilterSelection) => void
+    getFilterOptions: (filter: ElecTransferCertificateFilter) => Promise<any[]>
 }
 
 export function TransferCertificateFilters({
@@ -22,9 +23,10 @@ export function TransferCertificateFilters({
     const { t } = useTranslation()
 
     const filterLabels = {
-        [ElecCPOTransferCertificateFilter.Operator]: t("Redevable"),
-        [ElecCPOTransferCertificateFilter.TransferDate]: t("Date d’émission"),
-        [ElecCPOTransferCertificateFilter.CertificateId]: t("Numéro"),
+        [ElecTransferCertificateFilter.Operator]: t("Redevable"),
+        [ElecTransferCertificateFilter.Cpo]: t("Aménageur"),
+        [ElecTransferCertificateFilter.TransferDate]: t("Date d’émission"),
+        [ElecTransferCertificateFilter.CertificateId]: t("Numéro"),
     }
 
     return (
@@ -44,7 +46,7 @@ export function TransferCertificateFilters({
     )
 }
 
-export type FilterSelectProps = { field: ElecCPOTransferCertificateFilter } & Omit<
+export type FilterSelectProps = { field: ElecTransferCertificateFilter } & Omit<
     MultiSelectProps<string>,
     "options"
 >

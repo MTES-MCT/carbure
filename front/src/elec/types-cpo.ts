@@ -1,6 +1,7 @@
 import { Entity } from "carbure/types"
 import { Order } from "common/components/table"
-import { ElecProvisionCertificatePreview, ElecTransferCertificatePreview } from "./types"
+import { ElecProvisionCertificatePreview, ElecTransferCertificateFilter, ElecTransferCertificatePreview } from "./types"
+import { ElecOperatorSnapshot, ElecOperatorStatus } from "./types-operator"
 
 
 
@@ -80,12 +81,26 @@ export enum ElecCPOTransferCertificateStatus {
   Rejected = "REJECTED",
 }
 
-export enum ElecCPOTransferCertificateFilter {
-  TransferDate = "transfer_date",
-  Operator = "operator",
-  CertificateId = "certificate_id",
+
+
+
+export type ElecTransferCertificateFilterSelection = Partial<Record<ElecTransferCertificateFilter, string[]>>
+
+export interface ElecTransferCertificateStates {
+  entity: Entity
+  year: number
+  status: ElecCPOTransferCertificateStatus | ElecOperatorStatus
+  filters: ElecTransferCertificateFilterSelection
+  search?: string
+  selection: number[]
+  page: number
+  limit?: number
+  order?: Order
+  snapshot?: ElecCPOSnapshot | ElecOperatorSnapshot
 }
-export interface ElecCPOTransferCertificateQuery {
+
+
+export interface ElecTransferCertificateQuery {
   entity_id: number
   status?: string
   year?: number
@@ -94,22 +109,6 @@ export interface ElecCPOTransferCertificateQuery {
   order?: string
   from_idx?: number
   limit?: number
-  [ElecCPOProvisionCertificateFilter.OperatingUnit]?: string[]
-  [ElecCPOProvisionCertificateFilter.Quarter]?: string[]
-}
-
-
-export type ElecCPOTransferCertificateFilterSelection = Partial<Record<ElecCPOTransferCertificateFilter, string[]>>
-
-export interface ElecCPOTransferCertificateStates {
-  entity: Entity
-  year: number
-  status: ElecCPOTransferCertificateStatus
-  filters: ElecCPOTransferCertificateFilterSelection
-  search?: string
-  selection: number[]
-  page: number
-  limit?: number
-  order?: Order
-  snapshot?: ElecCPOSnapshot
+  // [ElecCPOTransferCertificateFilter.CertificateId]?: string[]
+  // [ElecTransferCertificateFilter.CertificateId]?: string[]
 }

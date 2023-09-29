@@ -8,36 +8,31 @@ import { Navigate, Route, Routes } from "react-router-dom"
 import { Loader } from "common/components/icons"
 import Tabs from "common/components/tabs"
 import { formatNumber } from "common/utils/formatters"
-import * as api from "./api-cpo"
+import * as api from "./api-operator"
 import { ElecCPOProvisionCertificateStatus, ElecCPOSnapshot } from "./types-cpo"
-import ProvisionCertificateList from "./components/provision-certificates/list"
-import CPOTransferCertificateList from "./components/transfer-certificates/list-cpo"
+import { ElecOperatorSnapshot, ElecOperatorStatus } from "./types-operator"
+import OperatorTransferCertificateList from "./components/transfer-certificates/list-operator"
 
 
 
-const defaultElecSnapshot: ElecCPOSnapshot = {
-  provisioned_energy: 0,
-  remaining_energy: 0,
-  provision_certificates_available: 0,
-  provision_certificates_history: 0,
-  transferred_energy: 0,
-  transfer_certificates_pending: 0,
-  transfer_certificates_accepted: 0,
-  transfer_certificates_rejected: 0,
+const defaultSnapshot: ElecOperatorSnapshot = {
+  transfer_cert_pending: 0,
+  transfer_cert_accepted: 0
+
 }
 
-export const ElecCPO = () => {
+export const ElecOperator = () => {
   const { t } = useTranslation()
 
   const entity = useEntity()
 
-  const years = useYears("elec", api.getYears)
-  const snapshotResponse = useQuery(api.getSnapshot, {
-    key: "elec-cpo-snapshot",
+  const years = useYears("elec", api.getOperatorYears)
+  const snapshotResponse = useQuery(api.getOperatorSnapshot, {
+    key: "elec-operator-snapshot",
     params: [entity.id, years.selected],
   })
 
-  const snapshot = snapshotResponse.result?.data.data ?? defaultElecSnapshot
+  const snapshot = snapshotResponse.result?.data.data ?? defaultSnapshot
 
   return (
 
@@ -64,16 +59,18 @@ export const ElecCPO = () => {
 
 
       <Routes>
+
         <Route
-          path="provisioned/*"
+          path="pending/*"
           element={
-            <ProvisionCertificateList snapshot={snapshot} year={years.selected} />
+            <OperatorTransferCertificateList snapshot={snapshot} year={years.selected} />
           }
         />
+
         <Route
-          path="transferred/*"
+          path="accepted/*"
           element={
-            <CPOTransferCertificateList snapshot={snapshot} year={years.selected} />
+            <OperatorTransferCertificateList snapshot={snapshot} year={years.selected} />
           }
         />
 
@@ -83,7 +80,7 @@ export const ElecCPO = () => {
           element={
             <Navigate
               replace
-              to={`provisioned/${ElecCPOProvisionCertificateStatus.Available.toLocaleLowerCase()}`}
+              to={`${ElecOperatorStatus.Pending.toLocaleLowerCase()}`}
             />
           }
         />
@@ -95,13 +92,12 @@ export const ElecCPO = () => {
   )
 }
 
-export default ElecCPO
 
 
 
 interface ElecTabsProps {
   loading: boolean
-  snapshot: ElecCPOSnapshot
+  snapshot: ElecOperatorSnapshot
 }
 
 
@@ -112,31 +108,31 @@ function ElecTabs({
   const { t } = useTranslation()
 
   return (<Tabs variant="main" tabs={[{
-    key: "provisioned",
-    path: "provisioned",
+    key: "pending",
+    path: "pending",
     label: <>
       <p style={{
         fontWeight: "normal"
       }}>
 
-        {loading ? <Loader size={20} /> : formatNumber(snapshot?.remaining_energy)} MWh
+        {loading ? <Loader size={20} /> : formatNumber(snapshot?.transfer_cert_pending)}
       </p>
       <strong>
-        {t("Énergie disponible")}
+        {t("Certificats en attente")}
 
       </strong>
     </>
   }, {
-    key: "transferred",
-    path: "transferred",
+    key: "accepted",
+    path: "accepted",
     label: <>
       <p style={{
         fontWeight: "normal"
       }}>
-        {loading ? <Loader size={20} /> : formatNumber(snapshot?.transferred_energy)} MWh
+        {loading ? <Loader size={20} /> : formatNumber(snapshot?.transfer_cert_accepted)}
       </p>
       <strong>
-        {t("Énergie cédée")}
+        {t("Certificats acceptés")}
       </strong>
     </>
   }]} />);

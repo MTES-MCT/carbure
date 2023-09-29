@@ -3,17 +3,18 @@ import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
 import useTitle from "common/hooks/title"
-import { ElecCPOSnapshot, ElecCPOTransferCertificateFilterSelection, ElecCPOTransferCertificateStates, ElecCPOTransferCertificateStatus } from "elec/types-cpo"
+import { ElecCPOSnapshot, ElecTransferCertificateFilterSelection, ElecTransferCertificateStates, ElecCPOTransferCertificateStatus } from "elec/types-cpo"
 import { useTranslation } from "react-i18next"
 import { useFilterSearchParams } from "./transfer-certificate-filter-search-params"
+import { ElecOperatorSnapshot, ElecOperatorStatus } from "elec/types-operator"
 
 
 
 export function useTransferCertificateQueryParamsStore(
   entity: Entity,
   year: number,
-  status: ElecCPOTransferCertificateStatus,
-  snapshot?: ElecCPOSnapshot,
+  status: ElecCPOTransferCertificateStatus | ElecOperatorStatus,
+  snapshot?: ElecCPOSnapshot | ElecOperatorSnapshot,
 ) {
 
   const [limit, saveLimit] = useLimit()
@@ -26,20 +27,17 @@ export function useTransferCertificateQueryParamsStore(
       snapshot,
       status,
       filters: filtersParams,
-      // search: undefined,
-      // invalid: false,
-      // deadline: false,
+
       order: undefined,
       selection: [],
       page: 0,
       limit,
-    } as ElecCPOTransferCertificateStates,
+    } as ElecTransferCertificateStates,
     {
       setEntity: (entity: Entity) => ({
         entity,
         filters: filtersParams,
-        // invalid: false,
-        // deadline: false,
+
         selection: [],
         page: 0,
       }),
@@ -47,42 +45,31 @@ export function useTransferCertificateQueryParamsStore(
       setYear: (year: number) => ({
         year,
         filters: filtersParams,
-        // invalid: false,
-        // deadline: false,
+
         selection: [],
         page: 0,
       }),
 
-      setSnapshot: (snapshot: ElecCPOSnapshot) => ({
+      setSnapshot: (snapshot: ElecCPOSnapshot | ElecOperatorSnapshot) => ({
         snapshot,
         filters: filtersParams,
-        // invalid: false,
-        // deadline: false,
+
         selection: [],
         page: 0,
       }),
 
-      setStatus: (status: ElecCPOTransferCertificateStatus) => {
+      setStatus: (status: ElecCPOTransferCertificateStatus | ElecOperatorStatus) => {
         return {
           status,
           filters: filtersParams,
-          // invalid: false,
-          // deadline: false,
+
           selection: [],
           page: 0,
         }
       },
 
-      // setType: (type: ElecCPOQ) => {
-      //   return {
-      //     type,
-      //     filters: filtersParams,
-      //     selection: [],
-      //     page: 0,
-      //   }
-      // },
 
-      setFilters: (filters: ElecCPOTransferCertificateFilterSelection) => {
+      setFilters: (filters: ElecTransferCertificateFilterSelection) => {
         setTimeout(() => {
           setFiltersParams(filters)
         })
@@ -149,7 +136,7 @@ export function useTransferCertificateQueryParamsStore(
   return [state, actions] as [typeof state, typeof actions]
 }
 
-export function usePageTitle(state: ElecCPOTransferCertificateStates) {
+export function usePageTitle(state: ElecTransferCertificateStates) {
   const { t } = useTranslation()
 
   const statuses: any = {

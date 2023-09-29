@@ -1,7 +1,8 @@
 import { api, Api } from "common/services/api"
-import { ElecCPOProvisionCertificateFilter, ElecCPOProvisionCertificateQuery, ElecCPOSnapshot, ElecCPOTransferCertificateFilter, ElecCPOTransferCertificateQuery, ElecProvisionCertificatesData, ElecTransferCertificatesData } from "./types-cpo"
+import { ElecCPOProvisionCertificateFilter, ElecCPOProvisionCertificateQuery, ElecCPOSnapshot, ElecTransferCertificateQuery, ElecProvisionCertificatesData, ElecTransferCertificatesData } from "./types-cpo"
 import { EntityPreview } from "carbure/types"
 import { extract } from "carbure/api"
+import { ElecTransferCertificateFilter, QUERY_RESET } from "./types"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/v5/elec/cpo/years", { params: { entity_id } })
@@ -13,12 +14,7 @@ export function getSnapshot(entity_id: number, year: number) {
   })
 }
 
-const QUERY_RESET: Partial<ElecCPOProvisionCertificateQuery> = {
-  limit: undefined,
-  from_idx: undefined,
-  sort_by: undefined,
-  order: undefined,
-}
+
 
 export async function getProvisionCertificateFilters(field: ElecCPOProvisionCertificateFilter, query: ElecCPOProvisionCertificateQuery) {
   const params = { filter: field, ...query, ...QUERY_RESET }
@@ -56,14 +52,14 @@ export function transferEnergy(
 }
 
 
-export function getTransferCertificates(query: ElecCPOTransferCertificateQuery) {
+export function getTransferCertificates(query: ElecTransferCertificateQuery) {
   return api.get<Api<ElecTransferCertificatesData>>("/v5/elec/cpo/transfer-certificates", {
     params: query,
   })
 }
 
 
-export async function getTransferCertificateFilters(field: ElecCPOTransferCertificateFilter, query: ElecCPOTransferCertificateQuery) {
+export async function getTransferCertificateFilters(field: ElecTransferCertificateFilter, query: ElecTransferCertificateQuery) {
   const params = { filter: field, ...query, ...QUERY_RESET }
 
   return api
