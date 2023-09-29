@@ -65,7 +65,7 @@ def lots_delete(request, *args, **kwargs):
             event = CarbureStockEvent()
             event.event_type = CarbureStockEvent.UNSPLIT
             event.stock = lot.parent_stock
-            event.user = None
+            event.user = request.user
             event.metadata = {
                 "message": "child lot deleted. recredit volume.",
                 "volume_to_credit": lot.volume,
@@ -83,7 +83,7 @@ def lots_delete(request, *args, **kwargs):
                 event = CarbureLotEvent()
                 event.event_type = CarbureLotEvent.RECALLED
                 event.lot = lot.parent_lot
-                event.user = None
+                event.user = request.user
                 event.metadata = {"message": "child lot deleted. back to inbox."}
                 event.save()
 

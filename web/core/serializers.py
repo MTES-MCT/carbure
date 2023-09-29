@@ -92,7 +92,9 @@ class CarbureLotEventSerializer(serializers.ModelSerializer):
 
     def get_user(self, obj):
         visible_users = self.context.get("visible_users")
-        if visible_users is not None and obj.user.email not in visible_users:
+        if visible_users is None or obj.user is None:
+            return "******"
+        elif obj.user.email not in visible_users:
             return "******"
         else:
             return obj.user.email
