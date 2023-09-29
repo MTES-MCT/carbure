@@ -1,11 +1,13 @@
 import Table, { Cell, Order } from "common/components/table"
+import { compact } from "common/utils/collection"
 import { formatDate } from "common/utils/formatters"
 import TransferCertificateTag from "elec-admin/components/transfer-certificate/tag"
 import { ElecTransferCertificatePreview } from "elec/types"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
 
-export interface ElecCPOTransferCertificateTableProps {
+export interface ElecTransferCertificateTableProps {
+    displayCpo?: boolean
     loading: boolean
     transferCertificates: ElecTransferCertificatePreview[]
     order: Order | undefined
@@ -15,16 +17,15 @@ export interface ElecCPOTransferCertificateTableProps {
     onSelect: (selected: number[]) => void
 }
 
-export const ElecCPOTransferCertificateTable = memo(
+export const ElecTransferCertificateTable = memo(
     ({
         loading,
         transferCertificates,
         order,
         onAction,
         onOrder,
-        selected,
-        onSelect,
-    }: ElecCPOTransferCertificateTableProps) => {
+        displayCpo = false,
+    }: ElecTransferCertificateTableProps) => {
         const columns = useColumns()
         return (
             <Table
@@ -33,13 +34,13 @@ export const ElecCPOTransferCertificateTable = memo(
                 onOrder={onOrder}
                 onAction={onAction}
                 rows={transferCertificates}
-                columns={[
+                columns={compact([
                     columns.status,
-                    columns.operator,
+                    displayCpo ? columns.cpo : columns.operator,
                     columns.transfer_date,
                     columns.energy_amount,
                     columns.certificate_id,
-                ]}
+                ])}
             />
         )
     }
@@ -64,6 +65,16 @@ export function useColumns() {
             cell: (transferCertificate: ElecTransferCertificatePreview) => {
                 const value =
                     transferCertificate.client.name
+                return <Cell text={value} />
+            },
+        },
+
+        cpo: {
+            key: "cpo",
+            header: t("Aménegeur"),
+            cell: (transferCertificate: ElecTransferCertificatePreview) => {
+                const value =
+                    transferCertificate.supplier.name
                 return <Cell text={value} />
             },
         },
@@ -102,4 +113,4 @@ export function useColumns() {
     }
 }
 
-export default ElecCPOTransferCertificateTable
+export default ElecTransferCertificateTable

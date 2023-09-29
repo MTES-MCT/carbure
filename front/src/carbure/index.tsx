@@ -22,6 +22,7 @@ import SafClient from "saf/airline"
 import Stats from "stats"
 import ElecCPO from "elec/cpo"
 import ElecAdmin from "elec-admin"
+import { ElecOperator } from "elec/operator"
 
 const Carbure = () => {
   const user = useUserManager()
@@ -119,10 +120,12 @@ const Org = () => {
         <Route path="elec" element={<Navigate replace to={`${currentYear}/provisioned`} />} />
         <Route path="*" element={<Navigate replace to={`elec/${currentYear}/provisioned`} />} />
       </>)}
-      {/* {((isOperator && has_elec)) && (<>
-        <Route path="elec/:year/*" element={<ElecCPO />} />
+      {((isOperator && has_elec)) && (<>
+        <Route path="elec/:year/*" element={<ElecOperator />} />
         <Route path="elec" element={<Navigate replace to={`${currentYear}`} />} />
-      </>)} */}
+        <Route path="*" element={<Navigate replace to={`elec/${currentYear}/pending`} />} />
+
+      </>)}
 
       {(isAdmin || isAuditor) && (<>
         <Route path="controls/:year/*" element={<Controls />} />

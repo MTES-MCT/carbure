@@ -1,27 +1,27 @@
 import useEntity from "carbure/hooks/entity"
 import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
-import { ActionBar, Bar } from "common/components/scaffold"
+import { usePortal } from "common/components/portal"
+import { Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
+import ElectTransferDetailsDialog from "elec/components/transfer-certificates/details"
 import { useTransferCertificateQueryParamsStore } from "elec/hooks/transfer-certificate-query-params-store"
 import { useTransferCertificatesQuery } from "elec/hooks/transfer-certificates-query"
-import { ElecCPOSnapshot, ElecCPOTransferCertificateFilter, ElecCPOTransferCertificateStatus } from "elec/types-cpo"
+import { ElecTransferCertificateFilter, ElecTransferCertificatePreview } from "elec/types"
+import { ElecCPOTransferCertificateStatus } from "elec/types-cpo"
+import { ElecOperatorSnapshot, ElecOperatorStatus } from "elec/types-operator"
 import { useMatch } from "react-router-dom"
-import * as api from "../../api-cpo"
+import * as api from "../../api-operator"
 import TransferCertificateFilters from "./filters"
-import { StatusSwitcher } from "./status-switcher"
-import ElecCPOTransferCertificateTable from "./table"
-import ElectTransferDetailsDialog from "elec/components/transfer-certificates/details"
-import { usePortal } from "common/components/portal"
-import { ElecTransferCertificatePreview } from "elec/types"
+import ElecTransferCertificateTable from "./table"
 
 
-type TransferCertificateListProps = {
-    snapshot: ElecCPOSnapshot
+type OperatorTransferCertificateListProps = {
+    snapshot: ElecOperatorSnapshot
     year: number
 }
 
-const TransferCertificateList = ({ snapshot, year }: TransferCertificateListProps) => {
+const OperatorTransferCertificateList = ({ snapshot, year }: OperatorTransferCertificateListProps) => {
 
     const entity = useEntity()
     const status = useAutoStatus()
@@ -36,17 +36,13 @@ const TransferCertificateList = ({ snapshot, year }: TransferCertificateListProp
 
     const showTransferCertificateDetails = (transferCertificate: ElecTransferCertificatePreview) => {
         portal((close) => <ElectTransferDetailsDialog
+            displayCpo={true}
             onClose={close}
             transfer_certificate={transferCertificate} />)
 
     }
 
     const transferCertificatesData = transferCertificatesResponse.result?.data.data
-
-    // const provisionCertificatesData = elecAdminTransferCertificateList //TOTEST  
-
-
-    // const ids = provisionCertificatesData?.ids ?? []
 
     const total = transferCertificatesData?.total ?? 0
     const count = transferCertificatesData?.returned ?? 0
@@ -65,20 +61,10 @@ const TransferCertificateList = ({ snapshot, year }: TransferCertificateListProp
             </Bar>
             <section>
 
-
-                <ActionBar>
-                    <StatusSwitcher
-                        status={status}
-                        onSwitch={actions.setStatus}
-                        snapshot={snapshot}
-                    />
-
-                </ActionBar>
-                {/* <EnergyTransferSummary remainingVolume={snapshot.remaining_energy} /> */}
-
                 {count > 0 && transferCertificatesData ? (
                     <>
-                        <ElecCPOTransferCertificateTable
+                        <ElecTransferCertificateTable
+                            displayCpo={true}
                             loading={transferCertificatesResponse.loading}
                             order={state.order}
                             transferCertificates={transferCertificatesData.elec_transfer_certificates}
@@ -101,8 +87,6 @@ const TransferCertificateList = ({ snapshot, year }: TransferCertificateListProp
                 ) : (
                     <NoResult
                         loading={transferCertificatesResponse.loading}
-                    // filters={state.filters}
-                    // onFilter={actions.setFilters}
                     />
                 )}
 
@@ -113,18 +97,18 @@ const TransferCertificateList = ({ snapshot, year }: TransferCertificateListProp
         </>
     )
 }
-export default TransferCertificateList
+export default OperatorTransferCertificateList
 
 
 
 const FILTERS = [
-    ElecCPOTransferCertificateFilter.Operator,
-    ElecCPOTransferCertificateFilter.TransferDate,
-    ElecCPOTransferCertificateFilter.CertificateId
+    ElecTransferCertificateFilter.TransferDate,
+    ElecTransferCertificateFilter.Cpo,
+    ElecTransferCertificateFilter.CertificateId
 ]
 
 export function useAutoStatus() {
-    const matchStatus = useMatch("/org/:entity/elec/:year/:view/:status/*")
-    const status = matchStatus?.params?.status?.toUpperCase() as ElecCPOTransferCertificateStatus
-    return status ?? ElecCPOTransferCertificateStatus.Pending
+    const matchStatus = useMatch("/org/:entity/elec/:year/:status/*")
+    const status = matchStatus?.params?.status?.toUpperCase() as ElecOperatorStatus
+    return status ?? ElecOperatorStatus.Pending
 }
