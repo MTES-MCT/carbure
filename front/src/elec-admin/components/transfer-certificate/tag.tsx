@@ -1,5 +1,5 @@
 import { Tag, TagProps, TagVariant } from "common/components/tag"
-import { ElecCPOTransferCertificateStatus } from "elec/types"
+import { ElecCPOTransferCertificateStatus } from "elec/types-cpo"
 import { useTranslation } from "react-i18next"
 
 export interface TransferCertificateTagProps extends TagProps {

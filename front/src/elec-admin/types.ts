@@ -1,6 +1,6 @@
 import { Entity } from "carbure/types"
 import { Order } from "common/components/table"
-import { ElecCPOTransferCertificateStates } from "elec/types"
+import { ElecCPOTransferCertificateStates } from "elec/types-cpo"
 
 export interface ElecAdminSnapshot {
   provision_certificates: number

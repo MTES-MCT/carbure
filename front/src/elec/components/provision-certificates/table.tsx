@@ -1,5 +1,6 @@
 import Table, { Cell, Order } from "common/components/table"
-import { ElecCPOProvisionCertificateStatus, ElecProvisionCertificatePreview } from "elec/types"
+import { ElecProvisionCertificatePreview } from "elec/types"
+import { ElecCPOProvisionCertificateStatus } from "elec/types-cpo"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import { To } from "react-router-dom"

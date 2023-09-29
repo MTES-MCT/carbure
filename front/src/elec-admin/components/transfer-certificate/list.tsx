@@ -7,13 +7,14 @@ import { useQuery } from "common/hooks/async"
 import { useAdminTransferCertificateQueryParamsStore } from "elec-admin/hooks/transfer-certificate-query-params-store"
 import { useAdminTransferCertificatesQuery } from "elec-admin/hooks/transfer-certificates-query"
 import { ElecAdminSnapshot, ElecAdminTransferCertificateFilter } from "elec-admin/types"
-import { ElecCPOTransferCertificateStatus, ElecTransferCertificatePreview } from "elec/types"
+import { ElecCPOTransferCertificateStatus } from "elec/types-cpo"
 import { useMatch } from "react-router-dom"
 import * as api from "../../api"
 import ElectTransferDetailsDialog from "../../../elec/components/transfer-certificates/details"
 import TransferCertificateFilters from "./filters"
 import { StatusSwitcher } from "./status-switcher"
 import ElecAdminTransferCertificateTable from "./table"
+import { ElecTransferCertificatePreview } from "elec/types"
 
 type TransferListProps = {
   snapshot: ElecAdminSnapshot

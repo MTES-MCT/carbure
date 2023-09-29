@@ -2,7 +2,7 @@ import * as norm from "carbure/utils/normalizers"
 import { MultiSelect, MultiSelectProps } from "common/components/multi-select"; // prettier-ignore
 import { Grid } from "common/components/scaffold"
 import { Normalizer, defaultNormalizer } from "common/utils/normalize"
-import { ElecCPOTransferCertificateFilter, ElecCPOTransferCertificateFilterSelection } from "elec/types";
+import { ElecCPOTransferCertificateFilter, ElecCPOTransferCertificateFilterSelection } from "elec/types-cpo";
 import { useTranslation } from "react-i18next"
 
 

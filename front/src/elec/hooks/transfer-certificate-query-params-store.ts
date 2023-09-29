@@ -3,7 +3,7 @@ import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
 import useTitle from "common/hooks/title"
-import { ElecCPOSnapshot, ElecCPOTransferCertificateFilterSelection, ElecCPOTransferCertificateStates, ElecCPOTransferCertificateStatus } from "elec/types"
+import { ElecCPOSnapshot, ElecCPOTransferCertificateFilterSelection, ElecCPOTransferCertificateStates, ElecCPOTransferCertificateStatus } from "elec/types-cpo"
 import { useTranslation } from "react-i18next"
 import { useFilterSearchParams } from "./transfer-certificate-filter-search-params"
 

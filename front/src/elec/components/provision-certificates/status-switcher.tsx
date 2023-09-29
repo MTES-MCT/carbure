@@ -1,5 +1,5 @@
 import Tabs from "common/components/tabs"
-import { ElecCPOProvisionCertificateStatus, ElecCPOSnapshot } from "elec/types"
+import { ElecCPOProvisionCertificateStatus, ElecCPOSnapshot } from "elec/types-cpo"
 import { useTranslation } from "react-i18next"
 
 interface StatusSwitcherProps {

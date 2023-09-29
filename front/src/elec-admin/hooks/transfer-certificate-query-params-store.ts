@@ -4,7 +4,7 @@ import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
 import useTitle from "common/hooks/title"
 import { ElecAdminSnapshot, ElecAdminTransferCertificateFilterSelection, ElecAdminTransferCertificateStates } from "elec-admin/types"
-import { ElecCPOTransferCertificateStatus } from "elec/types"
+import { ElecCPOTransferCertificateStatus } from "elec/types-cpo"
 import { useTranslation } from "react-i18next"
 import { useFilterSearchParams } from "./provision-certificate-filter-search-params"
 

@@ -3,7 +3,7 @@ import { MultiSelect, MultiSelectProps } from "common/components/multi-select"; 
 import { Grid } from "common/components/scaffold"
 import { Normalizer, defaultNormalizer } from "common/utils/normalize"
 import { useTranslation } from "react-i18next"
-import { ElecCPOProvisionCertificateFilter, ElecCPOProvisionCertificateFilterSelection } from "elec/types";
+import { ElecCPOProvisionCertificateFilter, ElecCPOProvisionCertificateFilterSelection } from "elec/types-cpo";
 
 export interface FiltersProps {
     filters: ElecCPOProvisionCertificateFilter[]

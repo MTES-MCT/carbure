@@ -5,7 +5,7 @@ import { Cross, Return } from "common/components/icons"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
-import * as api from "elec/api"
+import * as api from "elec/api-cpo"
 import { ElecTransferCertificatePreview } from "elec/types"
 import { useTranslation } from "react-i18next"
 
@@ -22,7 +22,7 @@ export const ElecCancelTransferButton = ({ transfer_certificate, onClose }: Elec
   const notify = useNotify()
 
   const onTransferCancelledSuccess = (volume: number, clientName: string) => {
-    notify(t("{{volume}} MWh initalement envoyé à {{clientName}} vous ont bien été restitués", { volume, clientName }), { variant: "success" })
+    notify(t("{{volume}} MWh initalement envoyés à {{clientName}} vous ont bien été restitués", { volume, clientName }), { variant: "success" })
     onClose()
   }
 

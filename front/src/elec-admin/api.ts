@@ -1,6 +1,6 @@
 import { api, Api } from "common/services/api"
 import { ElecAdminProvisionCertificateFilter, ElecAdminProvisionCertificateQuery, ElecAdminSnapshot, ElecAdminTransferCertificateFilter, ElecAdminTransferCertificateQuery } from "./types"
-import { ElecProvisionCertificatesData, ElecTransferCertificatesData } from "elec/types"
+import { ElecProvisionCertificatesData, ElecTransferCertificatesData } from "elec/types-cpo"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/v5/admin/elec/years", {

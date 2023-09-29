@@ -5,14 +5,15 @@ import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { useTransferCertificateQueryParamsStore } from "elec/hooks/transfer-certificate-query-params-store"
 import { useTransferCertificatesQuery } from "elec/hooks/transfer-certificates-query"
-import { ElecCPOSnapshot, ElecCPOTransferCertificateFilter, ElecCPOTransferCertificateStatus, ElecTransferCertificatePreview } from "elec/types"
+import { ElecCPOSnapshot, ElecCPOTransferCertificateFilter, ElecCPOTransferCertificateStatus } from "elec/types-cpo"
 import { useMatch } from "react-router-dom"
-import * as api from "../../api"
+import * as api from "../../api-cpo"
 import TransferCertificateFilters from "./filters"
 import { StatusSwitcher } from "./status-switcher"
 import ElecCPOTransferCertificateTable from "./table"
 import ElectTransferDetailsDialog from "elec/components/transfer-certificates/details"
 import { usePortal } from "common/components/portal"
+import { ElecTransferCertificatePreview } from "elec/types"
 
 
 type TransferCertificateListProps = {
