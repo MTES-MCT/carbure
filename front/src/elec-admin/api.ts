@@ -1,4 +1,4 @@
-import { api, Api } from "common/services/api"
+import { api, Api, download } from "common/services/api"
 import { ElecAdminProvisionCertificateFilter, ElecAdminProvisionCertificateQuery, ElecAdminSnapshot, ElecAdminTransferCertificateFilter, ElecAdminTransferCertificateQuery } from "./types"
 import { ElecProvisionCertificatesData, ElecTransferCertificatesData } from "elec/types-cpo"
 
@@ -36,16 +36,24 @@ export async function getProvisionCertificateFilters(field: ElecAdminProvisionCe
 }
 
 
+
+
 export function getProvisionCertificates(query: ElecAdminProvisionCertificateQuery) {
   return api.get<Api<ElecProvisionCertificatesData>>("/v5/admin/elec/provision-certificates", {
     params: query,
   })
 }
 
+
+
 export function getTransferCertificates(query: ElecAdminTransferCertificateQuery) {
   return api.get<Api<ElecTransferCertificatesData>>("/v5/admin/elec/transfer-certificates", {
     params: query,
   })
+}
+
+export function downloadTransferCertificates(query: ElecAdminTransferCertificateQuery) {
+  return download("/v5/admin/elec/transfer-certificates", { ...query, export: true })
 }
 
 export async function getTransferCertificateFilters(field: ElecAdminTransferCertificateFilter, query: ElecAdminTransferCertificateQuery) {

@@ -77,7 +77,7 @@ export const ElecTransferDetailsDialog = ({
             value={transfer_certificate.energy_amount + " MWh"}
 
           />
-          {transfer_certificate.status === ElecOperatorStatus.Accepted &&
+          {transfer_certificate.status === ElecOperatorStatus.Accepted && entity.id === transfer_certificate.client.id &&
             <Alert variant="info" icon={Message}>
               {t("L’identifiant est à reporter sur le certificat d'acquisition à intégrer dans votre comptabilité matière pour le compte des douanes.")}
             </Alert>
