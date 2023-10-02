@@ -1,4 +1,4 @@
-import { api, Api } from "common/services/api"
+import { api, Api, download } from "common/services/api"
 import { ElecOperatorSnapshot } from "./types-operator"
 import { ElecTransferCertificateQuery } from "./types-cpo"
 import { ElecTransferCertificateFilter, ElecTransferCertificatesData, QUERY_RESET } from "./types"
@@ -16,6 +16,10 @@ export function getTransferCertificates(query: ElecTransferCertificateQuery) {
   return api.get<Api<ElecTransferCertificatesData>>("/v5/elec/operator/transfer-certificates", {
     params: query,
   })
+}
+
+export function downloadTransferCertificates(query: ElecTransferCertificateQuery) {
+  return download("/v5/elec/operator/transfer-certificates", { ...query, export: true })
 }
 
 

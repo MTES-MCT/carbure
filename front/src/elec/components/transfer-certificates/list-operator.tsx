@@ -2,7 +2,7 @@ import useEntity from "carbure/hooks/entity"
 import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
 import { usePortal } from "common/components/portal"
-import { Bar } from "common/components/scaffold"
+import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import ElectTransferDetailsDialog from "elec/components/transfer-certificates/details"
 import { useTransferCertificateQueryParamsStore } from "elec/hooks/transfer-certificate-query-params-store"
@@ -14,6 +14,9 @@ import { useMatch } from "react-router-dom"
 import * as api from "../../api-operator"
 import TransferCertificateFilters from "./filters"
 import ElecTransferCertificateTable from "./table"
+import Button from "common/components/button"
+import { Download } from "common/components/icons"
+import { useTranslation } from "react-i18next"
 
 
 type OperatorTransferCertificateListProps = {
@@ -28,6 +31,7 @@ const OperatorTransferCertificateList = ({ snapshot, year }: OperatorTransferCer
     const [state, actions] = useTransferCertificateQueryParamsStore(entity, year, status, snapshot)
     const query = useTransferCertificatesQuery(state)
     const portal = usePortal()
+    const { t } = useTranslation()
 
     const transferCertificatesResponse = useQuery(api.getTransferCertificates, {
         key: "elec-transfer-certificates",
@@ -39,7 +43,6 @@ const OperatorTransferCertificateList = ({ snapshot, year }: OperatorTransferCer
             displayCpo={true}
             onClose={close}
             transfer_certificate={transferCertificate} />)
-
     }
 
     const transferCertificatesData = transferCertificatesResponse.result?.data.data
@@ -60,6 +63,21 @@ const OperatorTransferCertificateList = ({ snapshot, year }: OperatorTransferCer
                 />
             </Bar>
             <section>
+                <ActionBar>
+
+
+                    {count > 0 && state.status === ElecOperatorStatus.Accepted &&
+
+                        <Button
+                            asideX={true}
+                            icon={Download}
+                            label={t("Exporter vers Excel")}
+                            action={() => api.downloadTransferCertificates(query)
+                            }
+                        />
+                    }
+
+                </ActionBar>
 
                 {count > 0 && transferCertificatesData ? (
                     <>
