@@ -71,7 +71,7 @@ export function useColumns() {
 
         cpo: {
             key: "cpo",
-            header: t("Aménegeur"),
+            header: t("Aménageur"),
             cell: (transferCertificate: ElecTransferCertificatePreview) => {
                 const value =
                     transferCertificate.supplier.name
