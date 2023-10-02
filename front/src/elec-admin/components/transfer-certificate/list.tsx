@@ -15,6 +15,9 @@ import TransferCertificateFilters from "./filters"
 import { StatusSwitcher } from "./status-switcher"
 import ElecAdminTransferCertificateTable from "./table"
 import { ElecTransferCertificatePreview } from "elec/types"
+import { Download } from "common/components/icons"
+import Button from "common/components/button"
+import { useTranslation } from "react-i18next"
 
 type TransferListProps = {
   snapshot: ElecAdminSnapshot
@@ -26,6 +29,7 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
   const entity = useEntity()
   const status = useAutoStatus()
   const portal = usePortal()
+  const { t } = useTranslation()
 
   const [state, actions] = useAdminTransferCertificateQueryParamsStore(entity, year, status, snapshot)
   const query = useAdminTransferCertificatesQuery(state)
@@ -68,6 +72,17 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
             onSwitch={actions.setStatus}
             snapshot={snapshot}
           />
+
+          {count > 0 &&
+
+            <Button
+              asideX={true}
+              icon={Download}
+              label={t("Exporter vers Excel")}
+              action={() => api.downloadTransferCertificates(query)
+              }
+            />
+          }
 
         </ActionBar>
 

@@ -1,15 +1,12 @@
 import api, { Api, download } from "common/services/api"
 import {
-  DoubleCountingApplicationDetails,
-  DoubleCountingApplicationSnapshot,
-  DoubleCountingApplicationsOverview,
-  QuotaDetails,
-  DoubleCountingAgreementOverview,
-  DoubleCountingUploadErrors,
-  CheckDoubleCountingFilesResponse,
-  DoubleCountingSnapshot,
-  DoubleCountingAgreementsOverview,
   AgreementDetails,
+  CheckDoubleCountingFilesResponse,
+  DoubleCountingAgreementsOverview,
+  DoubleCountingApplicationDetails,
+  DoubleCountingApplicationsOverview,
+  DoubleCountingSnapshot,
+  QuotaDetails
 } from "./types"
 
 // GLOBAL
