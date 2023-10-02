@@ -55,7 +55,7 @@ export const AcceptTransfer = ({
         <TransferCertificateTag status={transfer_certificate.status} />
 
         <h1>
-          {t("Accpter le certificat de cession n°")}
+          {t("Accepter le certificat de cession n°")}
           {transfer_certificate?.certificate_id ?? "..."}
         </h1>
       </header>

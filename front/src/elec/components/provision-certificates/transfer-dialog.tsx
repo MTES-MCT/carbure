@@ -47,7 +47,7 @@ export const EnergyTransferDialog = ({
             return
         }
         if (value.energy_mwh! < 1) {
-            setFieldError("energy_mwh", t("Entrez une quantité d’énergie"))
+            setFieldError("energy_mwh", t("Entrez un volume d'énergie"))
             return
         }
         await transferEnergyRequest.execute(
@@ -71,7 +71,7 @@ export const EnergyTransferDialog = ({
         <Dialog onClose={onClose}>
             <header>
                 <h1>
-                    {t("Cession d’un volume d’énergie")}
+                    {t("Cession d'un volume d'énergie")}
                 </h1>
             </header>
 
@@ -79,7 +79,7 @@ export const EnergyTransferDialog = ({
                 <section>
                     <p>
                         {t(
-                            "En cédant un volume d’énergie à un redevable, cela donnera lieu à l’édition d’un certificat de cession."
+                            "En cédant un volume d'énergie à un redevable, cela donnera lieu à l'édition d’un certificat de cession."
                         )}
                     </p>
 
@@ -90,7 +90,7 @@ export const EnergyTransferDialog = ({
                             setMaximumEnergy={setMaximumEnergy}
                             {...bind("energy_mwh")}
                         />
-                        <p>{t("Les volumes d’énergie sont consommés de manière chronologique (les plus anciens sont vidés en premier).")}</p>
+                        <p>{t("Les volumes d'énergie sont consommés de manière chronologique (les plus anciens sont vidés en premier).")}</p>
 
                         <Autocomplete
                             required
@@ -103,11 +103,11 @@ export const EnergyTransferDialog = ({
                     </Form>
 
                     <Alert variant="info" icon={AlertTriangle} style={{ display: "inline-block" }}>
-                        {t('Si vous ne trouver pas le redevable concerné par la cession d’énergie dans notre base, veuillez')} {" "}
-                        <AddElecOperatorMail clientName={value.client?.name} />
+                        {t("Si vous ne trouver pas le redevable concerné par la cession d'énergie dans notre base, veuillez")} {" "}
+                        < AddElecOperatorMail clientName={value.client?.name} />
                     </Alert>
                     <Alert variant="info" icon={Message}>
-                        {t('Une fois le certificat de cession édité et aloué à un redevable, celui-ci pourra l’accepter ou le refuser, en laissant un commentaire.')}
+                        {t("Une fois le certificat de cession édité et aloué à un redevable, celui-ci pourra l'accepter ou le refuser, en laissant un commentaire.")}
                     </Alert>
                 </section>
             </main>
@@ -173,7 +173,7 @@ export const EnergyInput = ({
     return (
         <NumberInput
             required
-            label={t("Quantité ({{quantity}} MWh restants)", {
+            label={t("Volume ({{quantity}} MWh restants)", {
                 count: remainingEnergy,
                 quantity: formatNumber(remainingEnergy),
             })}

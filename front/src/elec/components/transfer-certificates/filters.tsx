@@ -25,7 +25,7 @@ export function TransferCertificateFilters({
     const filterLabels = {
         [ElecTransferCertificateFilter.Operator]: t("Redevable"),
         [ElecTransferCertificateFilter.Cpo]: t("Aménageur"),
-        [ElecTransferCertificateFilter.TransferDate]: t("Date d’émission"),
+        [ElecTransferCertificateFilter.TransferDate]: t("Date d'émission"),
         [ElecTransferCertificateFilter.CertificateId]: t("Numéro"),
     }
 

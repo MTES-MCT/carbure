@@ -22,7 +22,7 @@ export function TransferCertificateFilters({
     const filterLabels = {
         [ElecAdminTransferCertificateFilter.Cpo]: t("Aménageur"),
         [ElecAdminTransferCertificateFilter.Operator]: t("Redevable"),
-        [ElecAdminTransferCertificateFilter.TransferDate]: t("Date d’émission"),
+        [ElecAdminTransferCertificateFilter.TransferDate]: t("Date d'émission"),
         [ElecAdminTransferCertificateFilter.CertificateId]: t("Numéro"),
 
     }

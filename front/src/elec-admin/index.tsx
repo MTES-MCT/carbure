@@ -46,7 +46,7 @@ export const ElecAdmin = () => {
     <Main>
       <header>
         <section>
-          <h1>{t("Électricité")}</h1>
+          <h1>{t("Électricité renouvelable")}</h1>
 
           <Select
             loading={years.loading}
