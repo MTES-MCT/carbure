@@ -20,6 +20,7 @@ from doublecount.parser.dc_parser import (
     SourcingRow,
     parse_dc_excel,
 )
+from pprint import pprint
 from doublecount.errors import DoubleCountingError, error
 
 
@@ -56,7 +57,9 @@ def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[So
             supply_country = None
 
         try:
-            transit_country = countries.get(code_pays=row["transit_country"].strip()) if row["transit_country"] else None
+            transit_country = (
+                countries.get(code_pays=row["transit_country"].strip()) if row["transit_country"] else None
+            )
         except:
             transit_country = None
 
@@ -92,7 +95,9 @@ def load_dc_production_data(
 
     # check rows integrity
     for index, production_base_rows in enumerate([production_max_rows, production_forecast_rows, requested_quota_rows]):
-        tab_name = ["Capacité maximale de production", "Production prévisionelle", "Reconnaissance double comptage"][index]
+        tab_name = ["Capacité maximale de production", "Production prévisionelle", "Reconnaissance double comptage"][
+            index
+        ]
 
         if len(production_base_rows) < 2:
             production_errors.append(
@@ -228,12 +233,16 @@ def check_dc_file(file):
         )
 
         sourcing_forecast_data, sourcing_forecast_errors = load_dc_sourcing_data(dca, sourcing_forecast_rows)
+        pprint(sourcing_forecast_data, depth=10)
 
         production_data, production_errors = load_dc_production_data(
             dca, production_max_rows, production_forecast_rows, requested_quota_rows
         )
+        pprint(production_data, depth=10)
 
-        global_errors += check_dc_globally(sourcing_forecast_data, production_data) if len(production_errors) == 0 else []
+        global_errors += (
+            check_dc_globally(sourcing_forecast_data, production_data) if len(production_errors) == 0 else []
+        )
 
         return (
             info,
@@ -341,9 +350,9 @@ def send_dca_status_email(dca):
         # PROD
         recipients = [
             r.user.email
-            for r in UserRights.objects.filter(entity=dca.producer, user__is_staff=False, user__is_superuser=False).exclude(
-                role__in=[UserRights.AUDITOR, UserRights.RO]
-            )
+            for r in UserRights.objects.filter(
+                entity=dca.producer, user__is_staff=False, user__is_superuser=False
+            ).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])
         ]
         cc = "carbure@beta.gouv.fr"
     email = EmailMessage(

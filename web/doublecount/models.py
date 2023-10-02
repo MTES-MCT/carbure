@@ -74,11 +74,23 @@ class DoubleCountingSourcing(models.Model):
     year = models.IntegerField(blank=False, null=False)
     feedstock = models.ForeignKey(MatierePremiere, on_delete=models.CASCADE)
     origin_country = models.ForeignKey(Pays, on_delete=models.CASCADE, related_name="origin_country")
-    supply_country = models.ForeignKey(Pays, blank=True, null=True, on_delete=models.CASCADE, related_name="supply_country")
+    supply_country = models.ForeignKey(
+        Pays, blank=True, null=True, on_delete=models.CASCADE, related_name="supply_country"
+    )
     transit_country = models.ForeignKey(
         Pays, blank=True, null=True, on_delete=models.CASCADE, related_name="transit_country"
     )
     metric_tonnes = models.IntegerField(blank=False, null=False)
+
+    def __str__(self):
+        return "%s - %s - %st %s - %s - %s" % (
+            self.dca,
+            self.feedstock,
+            self.metric_tonnes,
+            self.feedstock.name,
+            self.origin_country,
+            self.supply_country,
+        )
 
     class Meta:
         db_table = "double_counting_sourcing"
@@ -95,6 +107,16 @@ class DoubleCountingProduction(models.Model):
     estimated_production = models.IntegerField(blank=False, null=False, default=0)
     requested_quota = models.IntegerField(blank=False, null=False, default=0)
     approved_quota = models.IntegerField(blank=False, null=False, default=-1)
+
+    def __str__(self):
+        return "%s - %s / %s - %st estimées (%st max) - %st demandées" % (
+            self.year,
+            self.feedstock,
+            self.biofuel,
+            self.estimated_production,
+            self.max_production_capacity,
+            self.requested_quota,
+        )
 
     class Meta:
         db_table = "double_counting_production"
