@@ -1,6 +1,8 @@
 import Table, { Cell, Order } from "common/components/table"
+import { formatNumber } from "common/utils/formatters"
 import { ElecProvisionCertificatePreview } from "elec/types"
 import { ElecCPOProvisionCertificateStatus } from "elec/types-cpo"
+import { format } from "path"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import { To } from "react-router-dom"
@@ -84,7 +86,7 @@ export function useColumns() {
             cell: (provisionCertificate: ElecProvisionCertificatePreview) => {
                 return (
                     <Cell
-                        text={provisionCertificate.energy_amount}
+                        text={formatNumber(provisionCertificate.energy_amount)}
                     />
                 )
             },

@@ -12,6 +12,7 @@ import * as api from "./api-cpo"
 import { ElecCPOProvisionCertificateStatus, ElecCPOSnapshot } from "./types-cpo"
 import ProvisionCertificateList from "./components/provision-certificates/list"
 import CPOTransferCertificateList from "./components/transfer-certificates/list-cpo"
+import { elecSnapshot } from "./__test__/data"
 
 
 
@@ -38,6 +39,7 @@ export const ElecCPO = () => {
   })
 
   const snapshot = snapshotResponse.result?.data.data ?? defaultElecSnapshot
+  // const snapshot = elecSnapshot //TODO TEST with testing data
 
   return (
 

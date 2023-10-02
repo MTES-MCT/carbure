@@ -12,6 +12,7 @@ import ProvisionCertificateFilters from "./filters"
 import { StatusSwitcher } from "./status-switcher"
 import { ElecCPOProvisionCertificateTable } from "./table"
 import { EnergyTransferSummary } from "./transfer-summary"
+import { elecAdminProvisionCertificateList } from "elec/__test__/data"
 
 
 type ProvisionCertificateListProps = {
