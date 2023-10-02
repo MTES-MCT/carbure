@@ -29,7 +29,7 @@ const ProvisionImporButton = () => {
             asideX
             variant="primary"
             icon={Plus}
-            label={t("Importer l’énergie à céder")}
+            label={t("Importer l'énergie à céder")}
             action={showApplicationsChecker}
         />
     )
@@ -84,7 +84,7 @@ const ProvisionImportDialog = ({
     return (
         <Dialog onClose={onClose}>
             <header>
-                <h1>{t("Importer l’énergie à céder")}</h1>
+                <h1>{t("Importer l'énergie à céder")}</h1>
             </header>
 
             <main>
@@ -92,7 +92,7 @@ const ProvisionImportDialog = ({
                     <Form id="dc-checker">
                         <p>
                             {t(
-                                "En tant qu’administrateur DGEC, vous pouvez importer ici des volumes d’énergie à céder, classés par trimestre et par aménageurs."
+                                "En tant qu'administrateur DGEC, vous pouvez importer ici des volumes d'énergie à céder, classés par trimestre et par aménageurs."
                             )}
                         </p>
 
@@ -114,7 +114,7 @@ const ProvisionImportDialog = ({
                                     <ul>
                                         {missingCPO.map((cpo) => <li key={cpo}>{cpo}</li>)}
                                     </ul>
-                                    {t("Veuillez créer les entités ci-dessus sur CarbuRe dans l’interface d’aministrateur et ajouter à nouveau votre fichier d’énergie à céder.")}
+                                    {t("Veuillez créer les entités ci-dessus sur CarbuRe dans l'interface d'aministrateur et ajouter à nouveau votre fichier d'énergie à céder.")}
                                     {" "}
                                     <ExternalLink href="/org/9/entities">
                                         Ajouter des sociétés

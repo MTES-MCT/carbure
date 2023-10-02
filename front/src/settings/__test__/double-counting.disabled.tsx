@@ -75,7 +75,7 @@ test.skip("check double counting upload with error display errors", async () => 
 
   //NOT_DC_FEEDSTOCK
   await screen.getByText(
-    "Production - Ligne 5 : La matière première Blé n’est pas comprise dans la liste des matières premières pouvant être double comptées."
+    "Production - Ligne 5 : La matière première Blé n'est pas comprise dans la liste des matières premières pouvant être double comptées."
   )
 
   //MP_BC_INCOHERENT

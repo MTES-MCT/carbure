@@ -51,7 +51,7 @@ const UpdateDialog = ({ onClose, lots }: UpdateDialogProps) => {
   Object.keys(form.value).forEach((_key) => {
     const key = _key as keyof LotFormValue
     if (form.value[key] !== defaultLot[key] && form.value[key] !== "") {
-      ;(updatedValues as any)[key] = form.value[key]
+      ; (updatedValues as any)[key] = form.value[key]
     }
   })
 
@@ -82,7 +82,7 @@ const UpdateDialog = ({ onClose, lots }: UpdateDialogProps) => {
         <section>
           <p>
             {t(
-              "Remplissez les champs que vous souhaitez modifier sur l’intégralité des lots sélectionnés."
+              "Remplissez les champs que vous souhaitez modifier sur l'intégralité des lots sélectionnés."
             )}
           </p>
         </section>

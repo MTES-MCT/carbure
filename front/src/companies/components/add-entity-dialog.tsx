@@ -85,7 +85,7 @@ export const AddEntityDialog = ({
               {value.entity_type === EntityType.Operator && (
                 <Checkbox
                   label={t(
-                    "Ajouter la gestion du Carburant Durable d’Aviation"
+                    "Ajouter la gestion du Carburant Durable d'Aviation"
                   )}
                   {...bind("has_saf")}
                 />

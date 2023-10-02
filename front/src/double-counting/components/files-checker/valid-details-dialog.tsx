@@ -187,7 +187,7 @@ export const ProductionSiteAdminDialog = ({
             {...bind("productionSite")}
           />
           <TextInput
-            label={t("N° d’agrément lié à ce dossier")}
+            label={t("N° d'agrément lié à ce dossier")}
             placeholder={t("Laisser vide si nouvelle demande")}
             {...bind("agreement_id")}
           />

@@ -52,7 +52,7 @@ export function getErrorText(
       break
     case DoubleCountingUploadErrorType.NotDcFeedstock:
       errorText += t(
-        "La matière première {{feedstock}} n’est pas comprise dans la liste des matières premières pouvant être double comptées.",
+        "La matière première {{feedstock}} n'est pas comprise dans la liste des matières premières pouvant être double comptées.",
         { feedstock: t(error.meta?.feedstock, { ns: "feedstocks" }) }
       )
       break

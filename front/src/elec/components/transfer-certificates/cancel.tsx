@@ -95,7 +95,7 @@ export const ElecCancelTransferConfirmDialog = ({
           <p>
             <strong>Êtes-vous sûr de vouloir annuler ce certificat de cession ?</strong>
           </p>
-          <p>Cela entrainera sa suppression et son volume en MWh sera à nouveau disponible dans votre stock d’énergie global.</p>
+          <p>Cela entrainera sa suppression et son volume en MWh sera à nouveau disponible dans votre stock d'énergie global.</p>
 
 
 
