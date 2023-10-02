@@ -64,8 +64,8 @@ const Home = () => {
 
           <h2>
             <Trans>
-              Transmettre des données fiables pour assurer l’essor des
-              carburants alternatifs vertueux pour l’environnement.
+              Transmettre des données fiables pour assurer l'essor des
+              carburants alternatifs vertueux pour l'environnement.
             </Trans>
           </h2>
 
@@ -85,7 +85,7 @@ const Home = () => {
             target="_blank"
             rel="noreferrer"
           >
-            <Trans>Plus d’informations sur les biocarburants</Trans>
+            <Trans>Plus d'informations sur les biocarburants</Trans>
             <ChevronRight />
           </a>
         </div>

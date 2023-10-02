@@ -52,7 +52,7 @@ export const CreditTicketSource = ({
           <section>
             <p>
               {t(
-                "En acceptant ce ticket, vous déverserez le volume de ce ticket parmi vos volumes disponibles de Carburant d’Aviation Durable, afin de pouvoir l’affecter à un autre client. Ce ticket restera visible dans votre historique."
+                "En acceptant ce ticket, vous déverserez le volume de ce ticket parmi vos volumes disponibles de Carburant d'Aviation Durable, afin de pouvoir l'affecter à un autre client. Ce ticket restera visible dans votre historique."
               )}
             </p>
           </section>

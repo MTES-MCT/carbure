@@ -87,9 +87,9 @@ const CarbureFooter = () => {
         <div className={styles.footerTexts}>
           <p className={styles.footerDescription}>
             <Trans>
-              CarbuRe est un service numérique de l’État incubé à la Fabrique
+              CarbuRe est un service numérique de l'État incubé à la Fabrique
               numérique du Ministère de la Transition Écologique, membre du
-              réseau d’incubateurs{" "}
+              réseau d'incubateurs{" "}
               <a href="http://beta.gouv.fr">beta.gouv.fr</a>
             </Trans>
           </p>
