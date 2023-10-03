@@ -6,6 +6,7 @@ from core.decorators import check_user_rights
 
 from core.common import ErrorResponse, SuccessResponse
 from django.views.decorators.http import require_GET
+from core.excel import ExcelResponse
 from elec.models.elec_transfer_certificate import ElecTransferCertificate
 from elec.serializers.elec_transfer_certificate import ElecTransferCertificateSerializer
 
@@ -13,6 +14,7 @@ from admin.api.elec.transfer_certificates import (
     TransferCertificatesError,
     TransferCertificatesFilterForm,
     TransferCertificatesSortForm,
+    export_transfer_certificate_to_excel,
     find_transfer_certificates,
     sort_transfer_certificates,
 )
@@ -31,6 +33,8 @@ def get_transfer_certificates(request, *args, **kwargs):
             {**transf_certif_filter_form.errors, **transf_certif_sort_form.errors},
         )
 
+    export = "export" in request.GET
+
     entity_id = request.GET.get("entity_id")
     sort_by = transf_certif_sort_form.cleaned_data["sort_by"]
     order = transf_certif_sort_form.cleaned_data["order"]
@@ -41,6 +45,10 @@ def get_transfer_certificates(request, *args, **kwargs):
         transfer_certificates = ElecTransferCertificate.objects.filter(client_id=entity_id)
         transfer_certificates = find_transfer_certificates(transfer_certificates, **transf_certif_filter_form.cleaned_data)
         transfer_certificates = sort_transfer_certificates(transfer_certificates, sort_by, order)
+
+        if export:
+            file = export_transfer_certificate_to_excel(transfer_certificates)
+            return ExcelResponse(file)
 
         paginator = Paginator(transfer_certificates, limit)
         current_page = floor(from_idx / limit) + 1
