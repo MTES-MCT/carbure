@@ -12,7 +12,7 @@ from elec.serializers.elec_provision_certificate import ElecProvisionCertificate
 
 class ProvisionCertificatesError:
     MALFORMED_PARAMS = "MALFORMED_PARAMS"
-    PROVISION_CERTIFICATES_LISTING_FAILED = "PROVISION_CERTIFICATES_LISTING_FAILED"
+    PROVISION_CERTIFICATE_LOADING_FAILED = "PROVISION_CERTIFICATE_LOADING_FAILED"
 
 
 class ProvisionCertificateDetailsForm(forms.Form):
@@ -34,10 +34,10 @@ def get_provision_certificate_details(request):
 
         return SuccessResponse(
             {
-                "elec_Provision_certificate": serialized.data,
+                "elec_provision_certificate": serialized.data,
             }
         )
 
     except Exception:
         traceback.print_exc()
-        return ErrorResponse(400, ProvisionCertificatesError.Provision_CERTIFICATES_LISTING_FAILED)
+        return ErrorResponse(400, ProvisionCertificatesError.Provision_CERTIFICATE_LOADING_FAILED)
