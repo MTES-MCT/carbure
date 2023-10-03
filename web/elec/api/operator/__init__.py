@@ -6,6 +6,7 @@ from .accept_transfer_certificate import accept_transfer_certificate
 from .reject_transfer_certificate import reject_transfer_certificate
 from .transfer_certificates import get_transfer_certificates
 from .transfer_certificate_filters import get_transfer_certificate_filters
+from .transfer_certificate_details import get_transfer_certificate_details
 
 urlpatterns = [
     # overview
@@ -18,5 +19,10 @@ urlpatterns = [
         "transfer-certificate-filters",
         get_transfer_certificate_filters,
         name="elec-operator-get-transfer-certificate-filters",
+    ),
+    path(
+        "transfer-certificate-details",
+        get_transfer_certificate_details,
+        name="elec-operator-get-transfer-certificate-details",
     ),
 ]
