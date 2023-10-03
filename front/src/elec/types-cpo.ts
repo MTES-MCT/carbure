@@ -66,11 +66,6 @@ export interface ElecProvisionCertificatesData {
   returned: number
   total: number
 }
-
-export interface ElecProvisionCertificatesDetails {
-  elec_provision_certificate: ElecProvisionCertificatePreview
-}
-
 export interface ElecTransferCertificatesData {
   elec_transfer_certificates: ElecTransferCertificatePreview[]
   from: number
@@ -79,9 +74,6 @@ export interface ElecTransferCertificatesData {
   total: number
 }
 
-export interface ElecTransferCertificatesDetails {
-  elec_transfer_certificate: ElecTransferCertificate
-}
 
 export enum ElecCPOTransferCertificateStatus {
   Pending = "PENDING",

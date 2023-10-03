@@ -1,4 +1,7 @@
 import useEntity from "carbure/hooks/entity"
+import Button from "common/components/button"
+import HashRoute from "common/components/hash-route"
+import { Download } from "common/components/icons"
 import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
 import { usePortal } from "common/components/portal"
@@ -7,19 +10,15 @@ import { useQuery } from "common/hooks/async"
 import { useAdminTransferCertificateQueryParamsStore } from "elec-admin/hooks/transfer-certificate-query-params-store"
 import { useAdminTransferCertificatesQuery } from "elec-admin/hooks/transfer-certificates-query"
 import { ElecAdminSnapshot, ElecAdminTransferCertificateFilter } from "elec-admin/types"
+import { ElecTransferCertificatePreview } from "elec/types"
 import { ElecCPOTransferCertificateStatus } from "elec/types-cpo"
+import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
 import * as api from "../../api"
-import ElecTransferDetailsDialog from "../../../elec/components/transfer-certificates/details"
+import ElecAdminTransferDetailsDialog from "./details"
 import TransferCertificateFilters from "./filters"
 import { StatusSwitcher } from "./status-switcher"
 import ElecAdminTransferCertificateTable from "./table"
-import { ElecTransferCertificatePreview } from "elec/types"
-import { Download } from "common/components/icons"
-import Button from "common/components/button"
-import { useTranslation } from "react-i18next"
-import HashRoute from "common/components/hash-route"
-import ElecAdminTransferDetailsDialog from "./details"
 
 type TransferListProps = {
   snapshot: ElecAdminSnapshot
@@ -30,7 +29,6 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
 
   const entity = useEntity()
   const status = useAutoStatus()
-  const portal = usePortal()
   const { t } = useTranslation()
   const location = useLocation()
 

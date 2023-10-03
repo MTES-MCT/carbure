@@ -4,7 +4,7 @@ import Pagination from "common/components/pagination"
 import { usePortal } from "common/components/portal"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import ElectTransferDetailsDialog from "elec/components/transfer-certificates/details"
+import ElectTransferDetailsDialog, { ElecTransferDetailsDialog } from "elec/components/transfer-certificates/details"
 import { useTransferCertificateQueryParamsStore } from "elec/hooks/transfer-certificate-query-params-store"
 import { useTransferCertificatesQuery } from "elec/hooks/transfer-certificates-query"
 import {
@@ -12,7 +12,7 @@ import {
   ElecTransferCertificatePreview,
 } from "elec/types"
 import { ElecOperatorSnapshot, ElecOperatorStatus } from "elec/types-operator"
-import { useMatch } from "react-router-dom"
+import { useLocation, useMatch } from "react-router-dom"
 import * as api from "../../api-operator"
 import TransferCertificateFilters from "./filters"
 import ElecTransferCertificateTable from "./table"
@@ -20,6 +20,7 @@ import Button from "common/components/button"
 import Alert from "common/components/alert"
 import { Download, Bolt } from "common/components/icons"
 import { useTranslation } from "react-i18next"
+import HashRoute from "common/components/hash-route"
 
 type OperatorTransferCertificateListProps = {
   snapshot: ElecOperatorSnapshot
@@ -39,24 +40,20 @@ const OperatorTransferCertificateList = ({
     snapshot
   )
   const query = useTransferCertificatesQuery(state)
-  const portal = usePortal()
   const { t } = useTranslation()
+  const location = useLocation()
 
   const transferCertificatesResponse = useQuery(api.getTransferCertificates, {
     key: "elec-transfer-certificates",
     params: [query],
   })
 
-  const showTransferCertificateDetails = (
-    transferCertificate: ElecTransferCertificatePreview
-  ) => {
-    portal((close) => (
-      <ElectTransferDetailsDialog
-        displayCpo={true}
-        onClose={close}
-        transfer_certificate={transferCertificate}
-      />
-    ))
+  const showTransferCertificateDetails = (transferCertificate: ElecTransferCertificatePreview) => {
+    return {
+      pathname: location.pathname,
+      search: location.search,
+      hash: `transfer-certificate/${transferCertificate.id}`,
+    }
   }
 
   const transferCertificatesData =
@@ -103,7 +100,7 @@ const OperatorTransferCertificateList = ({
               transferCertificates={
                 transferCertificatesData.elec_transfer_certificates
               }
-              onAction={showTransferCertificateDetails}
+              rowLink={showTransferCertificateDetails}
               selected={state.selection}
               onSelect={actions.setSelection}
               onOrder={actions.setOrder}
@@ -123,6 +120,8 @@ const OperatorTransferCertificateList = ({
           <NoResult loading={transferCertificatesResponse.loading} />
         )}
       </section>
+      <HashRoute path="transfer-certificate/:id" element={<ElecTransferDetailsDialog displayCpo={true} />} />
+
     </>
   )
 }

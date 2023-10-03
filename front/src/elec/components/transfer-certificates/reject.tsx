@@ -7,18 +7,18 @@ import { TextInput } from "common/components/input"
 import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import TransferCertificateTag from "elec/components/transfer-certificates/tag"
-import { ElecTransferCertificatePreview } from "elec/types"
+import { ElecTransferCertificatesDetails } from "elec/types"
 import { useTranslation } from "react-i18next"
 import * as api from "../../api-operator"
 
 interface RejectTransferProps {
-  transfer_certificate: ElecTransferCertificatePreview
+  transferCertificate?: ElecTransferCertificatesDetails
   onClose: () => void
   onRejected: () => void
 }
 
 export const RejectTransfer = ({
-  transfer_certificate,
+  transferCertificate,
   onClose,
   onRejected,
 }: RejectTransferProps) => {
@@ -50,18 +50,17 @@ export const RejectTransfer = ({
 
 
   const onRejectTransfer = async () => {
-
-    await rejectTransfer.execute(entity.id, transfer_certificate.id, value.comment!)
+    await rejectTransfer.execute(entity.id, transferCertificate!.id, value.comment!)
   }
 
   return (
     <Dialog onClose={onClose}>
       <header>
-        <TransferCertificateTag status={transfer_certificate.status} />
+        <TransferCertificateTag status={transferCertificate?.status} />
 
         <h1>
           {t("Refuser le certificat de cession n°")}
-          {transfer_certificate?.certificate_id ?? "..."}
+          {transferCertificate?.certificate_id ?? "..."}
         </h1>
       </header>
 
@@ -91,6 +90,7 @@ export const RejectTransfer = ({
           icon={Cross}
           label={t("Refuser")}
           variant="danger"
+          disabled={!value.comment}
           submit="reject-transfer"
         />
 

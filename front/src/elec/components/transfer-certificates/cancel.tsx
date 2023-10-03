@@ -11,11 +11,11 @@ import { useTranslation } from "react-i18next"
 
 
 interface ElecCancelTransferButtonProps {
-  transfer_certificate: ElecTransferCertificatePreview
+  transferCertificate: ElecTransferCertificatePreview
   onClose: () => void
 }
 
-export const ElecCancelTransferButton = ({ transfer_certificate, onClose }: ElecCancelTransferButtonProps) => {
+export const ElecCancelTransferButton = ({ transferCertificate, onClose }: ElecCancelTransferButtonProps) => {
   const entity = useEntity()
   const { t } = useTranslation()
   const portal = usePortal()
@@ -28,7 +28,7 @@ export const ElecCancelTransferButton = ({ transfer_certificate, onClose }: Elec
 
 
   const confirmCancelTransferCertificate = async () => {
-    portal((close) => <ElecCancelTransferConfirmDialog onClose={close} onTransferCancelled={onTransferCancelledSuccess} transfer_certificate={transfer_certificate} />)
+    portal((close) => <ElecCancelTransferConfirmDialog onClose={close} onTransferCancelled={onTransferCancelledSuccess} transfer_certificate={transferCertificate} />)
   }
 
   return (
