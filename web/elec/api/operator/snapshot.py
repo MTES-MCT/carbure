@@ -3,6 +3,7 @@
 import traceback
 
 from django import forms
+from django.db.models import Sum
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
 from elec.models import ElecTransferCertificate
@@ -30,10 +31,13 @@ def get_snapshot(request, *args, **kwargs):
 
     try:
         transfer_certificates = ElecTransferCertificate.objects.filter(transfer_date__year=year, client_id=entity_id)
+        accepted_transfer_certificates = transfer_certificates.filter(status=ElecTransferCertificate.ACCEPTED)
+
         return SuccessResponse(
             {
                 "transfer_cert_pending": transfer_certificates.filter(status=ElecTransferCertificate.PENDING).count(),
-                "transfer_cert_accepted": transfer_certificates.filter(status=ElecTransferCertificate.ACCEPTED).count(),
+                "transfer_cert_accepted": accepted_transfer_certificates.count(),
+                "acquired_energy": accepted_transfer_certificates.aggregate(Sum("energy_amount"))["energy_amount__sum"] or 0,
             }
         )
     except Exception:
