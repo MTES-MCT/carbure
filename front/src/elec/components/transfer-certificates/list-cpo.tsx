@@ -5,15 +5,15 @@ import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { useTransferCertificateQueryParamsStore } from "elec/hooks/transfer-certificate-query-params-store"
 import { useTransferCertificatesQuery } from "elec/hooks/transfer-certificates-query"
-import { ElecCPOSnapshot, ElecCPOTransferCertificateStatus } from "elec/types-cpo"
-import { useMatch } from "react-router-dom"
-import * as api from "../../api-cpo"
-import TransferCertificateFilters from "./filters"
-import { StatusSwitcher } from "./cpo-status-switcher"
-import ElecTransferCertificateTable from "./table"
-import ElectTransferDetailsDialog from "elec/components/transfer-certificates/details"
-import { usePortal } from "common/components/portal"
 import { ElecTransferCertificateFilter, ElecTransferCertificatePreview } from "elec/types"
+import { ElecCPOSnapshot, ElecCPOTransferCertificateStatus } from "elec/types-cpo"
+import { useLocation, useMatch } from "react-router-dom"
+import * as api from "../../api-cpo"
+import { StatusSwitcher } from "./cpo-status-switcher"
+import TransferCertificateFilters from "./filters"
+import ElecTransferCertificateTable from "./table"
+import HashRoute from "common/components/hash-route"
+import ElecTransferDetailsDialog from "./details"
 
 
 type CPOTransferCertificateListProps = {
@@ -27,7 +27,7 @@ const CPOTransferCertificateList = ({ snapshot, year }: CPOTransferCertificateLi
     const status = useAutoStatus()
     const [state, actions] = useTransferCertificateQueryParamsStore(entity, year, status, snapshot)
     const query = useTransferCertificatesQuery(state)
-    const portal = usePortal()
+    const location = useLocation()
 
     const transferCertificatesResponse = useQuery(api.getTransferCertificates, {
         key: "elec-transfer-certificates",
@@ -35,10 +35,11 @@ const CPOTransferCertificateList = ({ snapshot, year }: CPOTransferCertificateLi
     })
 
     const showTransferCertificateDetails = (transferCertificate: ElecTransferCertificatePreview) => {
-        portal((close) => <ElectTransferDetailsDialog
-            onClose={close}
-            transfer_certificate={transferCertificate} />)
-
+        return {
+            pathname: location.pathname,
+            search: location.search,
+            hash: `transfer-certificate/${transferCertificate.id}`,
+        }
     }
 
     const transferCertificatesData = transferCertificatesResponse.result?.data.data
@@ -77,7 +78,7 @@ const CPOTransferCertificateList = ({ snapshot, year }: CPOTransferCertificateLi
                             loading={transferCertificatesResponse.loading}
                             order={state.order}
                             transferCertificates={transferCertificatesData.elec_transfer_certificates}
-                            onAction={showTransferCertificateDetails}
+                            rowLink={showTransferCertificateDetails}
                             selected={state.selection}
                             onSelect={actions.setSelection}
                             onOrder={actions.setOrder}
@@ -100,6 +101,7 @@ const CPOTransferCertificateList = ({ snapshot, year }: CPOTransferCertificateLi
                 )}
 
             </section >
+            <HashRoute path="transfer-certificate/:id" element={<ElecTransferDetailsDialog />} />
 
 
 

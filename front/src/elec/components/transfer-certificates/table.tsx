@@ -5,13 +5,14 @@ import TransferCertificateTag from "elec/components/transfer-certificates/tag"
 import { ElecTransferCertificatePreview } from "elec/types"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
+import { To } from "react-router-dom"
 
 export interface ElecTransferCertificateTableProps {
     displayCpo?: boolean
     loading: boolean
     transferCertificates: ElecTransferCertificatePreview[]
     order: Order | undefined
-    onAction?: (transferCertificate: ElecTransferCertificatePreview) => void
+    rowLink: (row: ElecTransferCertificatePreview) => To
     onOrder: (order: Order | undefined) => void
     selected: number[]
     onSelect: (selected: number[]) => void
@@ -22,7 +23,7 @@ export const ElecTransferCertificateTable = memo(
         loading,
         transferCertificates,
         order,
-        onAction,
+        rowLink,
         onOrder,
         displayCpo = false,
     }: ElecTransferCertificateTableProps) => {
@@ -32,7 +33,7 @@ export const ElecTransferCertificateTable = memo(
                 loading={loading}
                 order={order}
                 onOrder={onOrder}
-                onAction={onAction}
+                rowLink={rowLink}
                 rows={transferCertificates}
                 columns={compact([
                     columns.status,

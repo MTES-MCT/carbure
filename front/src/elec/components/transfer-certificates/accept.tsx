@@ -5,18 +5,18 @@ import { Cross, Return } from "common/components/icons"
 import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import TransferCertificateTag from "elec/components/transfer-certificates/tag"
-import { ElecTransferCertificatePreview } from "elec/types"
+import { ElecTransferCertificatesDetails } from "elec/types"
 import { useTranslation } from "react-i18next"
 import * as api from "../../api-operator"
 
 interface AcceptTransferProps {
-  transfer_certificate: ElecTransferCertificatePreview
+  transferCertificate?: ElecTransferCertificatesDetails
   onClose: () => void
   onAccepted: () => void
 }
 
 export const AcceptTransfer = ({
-  transfer_certificate,
+  transferCertificate,
   onClose,
   onAccepted,
 }: AcceptTransferProps) => {
@@ -45,18 +45,17 @@ export const AcceptTransfer = ({
 
 
   const onAcceptTransfer = async () => {
-
-    await acceptTransfer.execute(entity.id, transfer_certificate.id)
+    await acceptTransfer.execute(entity.id, transferCertificate!.id)
   }
 
   return (
     <Dialog onClose={onClose}>
       <header>
-        <TransferCertificateTag status={transfer_certificate.status} />
+        <TransferCertificateTag status={transferCertificate?.status} />
 
         <h1>
           {t("Accepter le certificat de cession n°")}
-          {transfer_certificate?.certificate_id ?? "..."}
+          {transferCertificate?.certificate_id ?? "..."}
         </h1>
       </header>
 
@@ -76,6 +75,7 @@ export const AcceptTransfer = ({
           icon={Cross}
           label={t("Accepter")}
           variant="primary"
+          disabled={!transferCertificate}
           action={onAcceptTransfer}
         />
 

@@ -1,8 +1,8 @@
 import { api, Api } from "common/services/api"
-import { ElecCPOProvisionCertificateFilter, ElecCPOProvisionCertificateQuery, ElecCPOSnapshot, ElecTransferCertificateQuery, ElecProvisionCertificatesData, ElecTransferCertificatesData, ElecProvisionCertificatesDetails, ElecTransferCertificatesDetails } from "./types-cpo"
+import { ElecCPOProvisionCertificateFilter, ElecCPOProvisionCertificateQuery, ElecCPOSnapshot, ElecTransferCertificateQuery, ElecProvisionCertificatesData, ElecTransferCertificatesData } from "./types-cpo"
 import { EntityPreview } from "carbure/types"
 import { extract } from "carbure/api"
-import { ElecTransferCertificateFilter, QUERY_RESET } from "./types"
+import { ElecProvisionCertificatesDetails, ElecTransferCertificateFilter, ElecTransferCertificatesDetails, QUERY_RESET } from "./types"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/v5/elec/cpo/years", { params: { entity_id } })
@@ -35,7 +35,7 @@ export function getProvisionCertificateDetails(
   entity_id: number,
   provision_certificate_id: number
 ) {
-  return api.get<Api<ElecProvisionCertificatesDetails>>("/v5/elec/cpo/provision-certificate-details", {
+  return api.get<Api<{ elec_transfer_certificate: ElecProvisionCertificatesDetails }>>("/v5/elec/cpo/provision-certificate-details", {
     params: { entity_id, provision_certificate_id },
   })
 }
@@ -71,7 +71,7 @@ export function getTransferCertificateDetails(
   entity_id: number,
   transfer_certificate_id: number
 ) {
-  return api.get<Api<ElecTransferCertificatesDetails>>("/v5/elec/cpo/transfer-certificate-details", {
+  return api.get<Api<{ elec_transfer_certificate: ElecTransferCertificatesDetails }>>("/v5/elec/cpo/transfer-certificate-details", {
     params: { entity_id, transfer_certificate_id },
   })
 }
