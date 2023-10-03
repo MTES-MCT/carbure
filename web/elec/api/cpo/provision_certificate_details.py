@@ -20,7 +20,7 @@ class ProvisionCertificateDetailsForm(forms.Form):
 
 @require_GET
 @check_user_rights()
-def get_provision_certificate_details(request):
+def get_provision_certificate_details(request, *args, **kwargs):
     provision_certif_form = ProvisionCertificateDetailsForm(request.GET)
 
     if not provision_certif_form.is_valid():
