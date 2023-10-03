@@ -50,3 +50,10 @@ export const QUERY_RESET: Partial<ElecCPOProvisionCertificateQuery> = {
   sort_by: undefined,
   order: undefined,
 }
+
+export interface ElecTransferCertificatesDetails extends ElecTransferCertificatePreview {
+  comment: string
+}
+export interface ElecProvisionCertificatesDetails extends ElecProvisionCertificatePreview {
+
+}

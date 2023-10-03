@@ -8,7 +8,7 @@ import { useAdminTransferCertificateQueryParamsStore } from "elec-admin/hooks/tr
 import { useAdminTransferCertificatesQuery } from "elec-admin/hooks/transfer-certificates-query"
 import { ElecAdminSnapshot, ElecAdminTransferCertificateFilter } from "elec-admin/types"
 import { ElecCPOTransferCertificateStatus } from "elec/types-cpo"
-import { useMatch } from "react-router-dom"
+import { useLocation, useMatch } from "react-router-dom"
 import * as api from "../../api"
 import ElecTransferDetailsDialog from "../../../elec/components/transfer-certificates/details"
 import TransferCertificateFilters from "./filters"
@@ -18,6 +18,8 @@ import { ElecTransferCertificatePreview } from "elec/types"
 import { Download } from "common/components/icons"
 import Button from "common/components/button"
 import { useTranslation } from "react-i18next"
+import HashRoute from "common/components/hash-route"
+import ElecAdminTransferDetailsDialog from "./details"
 
 type TransferListProps = {
   snapshot: ElecAdminSnapshot
@@ -30,6 +32,7 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
   const status = useAutoStatus()
   const portal = usePortal()
   const { t } = useTranslation()
+  const location = useLocation()
 
   const [state, actions] = useAdminTransferCertificateQueryParamsStore(entity, year, status, snapshot)
   const query = useAdminTransferCertificatesQuery(state)
@@ -39,9 +42,11 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
   })
 
   const showTransferCertificateDetails = (transferCertificate: ElecTransferCertificatePreview) => {
-    portal((close) => <ElecTransferDetailsDialog
-      onClose={close}
-      transfer_certificate={transferCertificate} />)
+    return {
+      pathname: location.pathname,
+      search: location.search,
+      hash: `transfer-certificate/${transferCertificate.id}`,
+    }
 
   }
 
@@ -92,7 +97,7 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
               loading={transferCertificatesResponse.loading}
               order={state.order}
               transferCertificates={transferCertificatesData.elec_transfer_certificates}
-              onAction={showTransferCertificateDetails}
+              rowLink={showTransferCertificateDetails}
               selected={state.selection}
               onSelect={actions.setSelection}
               onOrder={actions.setOrder}
@@ -118,7 +123,7 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
       </section >
 
 
-
+      <HashRoute path="transfer-certificate/:id" element={<ElecAdminTransferDetailsDialog />} />
     </>
   )
 }

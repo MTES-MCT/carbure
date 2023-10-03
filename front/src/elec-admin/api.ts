@@ -1,6 +1,7 @@
 import { api, Api, download } from "common/services/api"
 import { ElecAdminProvisionCertificateFilter, ElecAdminProvisionCertificateQuery, ElecAdminSnapshot, ElecAdminTransferCertificateFilter, ElecAdminTransferCertificateQuery } from "./types"
-import { ElecProvisionCertificatesData, ElecProvisionCertificatesDetails, ElecTransferCertificatesData, ElecTransferCertificatesDetails } from "elec/types-cpo"
+import { ElecProvisionCertificatesData, ElecTransferCertificatesData } from "elec/types-cpo"
+import { ElecProvisionCertificatesDetails, ElecTransferCertificatesDetails } from "elec/types"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/v5/admin/elec/years", {
@@ -39,7 +40,7 @@ export function getProvisionCertificateDetails(
   entity_id: number,
   provision_certificate_id: number
 ) {
-  return api.get<Api<ElecProvisionCertificatesDetails>>("/v5/admin/elec/provision-certificate-details", {
+  return api.get<Api<{ elec_provision_certificate: ElecProvisionCertificatesDetails }>>("/v5/admin/elec/provision-certificate-details", {
     params: { entity_id, provision_certificate_id },
   })
 }
@@ -60,7 +61,7 @@ export function getTransferCertificateDetails(
   entity_id: number,
   transfer_certificate_id: number
 ) {
-  return api.get<Api<ElecTransferCertificatesDetails>>("/v5/admin/elec/transfer-certificate-details", {
+  return api.get<Api<{ elec_transfer_certificate: ElecTransferCertificatesDetails }>>("/v5/admin/elec/transfer-certificate-details", {
     params: { entity_id, transfer_certificate_id },
   })
 }
