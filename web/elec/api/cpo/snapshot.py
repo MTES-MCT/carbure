@@ -33,15 +33,17 @@ def get_snapshot(request, *args, **kwargs):
     year = snapshot_form.cleaned_data["year"]
 
     try:
-        provision_certificates = ElecProvisionCertificate.objects.filter(year=year, cpo_id=entity_id)
+        provision_certificates = ElecProvisionCertificate.objects.filter(cpo_id=entity_id)
+        provision_certificates_of_year = provision_certificates.filter(year=year)
+
         transfer_certificates = ElecTransferCertificate.objects.filter(transfer_date__year=year, supplier_id=entity_id)
 
         return SuccessResponse(
             {
                 "provisioned_energy": provision_certificates.aggregate(Sum("energy_amount"))["energy_amount__sum"] or 0,  # fmt:skip
                 "remaining_energy": provision_certificates.aggregate(Sum("remaining_energy_amount"))["remaining_energy_amount__sum"] or 0,  # fmt:skip
-                "provision_certificates_available": provision_certificates.filter(remaining_energy_amount__gt=0).count(),
-                "provision_certificates_history": provision_certificates.filter(remaining_energy_amount=0).count(),
+                "provision_certificates_available": provision_certificates_of_year.filter(remaining_energy_amount__gt=0).count(),
+                "provision_certificates_history": provision_certificates_of_year.filter(remaining_energy_amount=0).count(),
                 "transferred_energy": transfer_certificates.aggregate(Sum("energy_amount"))["energy_amount__sum"] or 0,  # fmt:skip
                 "transfer_certificates_pending": transfer_certificates.filter(status=ElecTransferCertificate.PENDING).count(),
                 "transfer_certificates_accepted": transfer_certificates.filter(status=ElecTransferCertificate.ACCEPTED).count(),
