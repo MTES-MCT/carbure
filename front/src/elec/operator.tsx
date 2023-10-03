@@ -9,16 +9,13 @@ import { Loader } from "common/components/icons"
 import Tabs from "common/components/tabs"
 import { formatNumber } from "common/utils/formatters"
 import * as api from "./api-operator"
-import { ElecCPOProvisionCertificateStatus, ElecCPOSnapshot } from "./types-cpo"
 import { ElecOperatorSnapshot, ElecOperatorStatus } from "./types-operator"
 import OperatorTransferCertificateList from "./components/transfer-certificates/list-operator"
 
-
-
 const defaultSnapshot: ElecOperatorSnapshot = {
   transfer_cert_pending: 0,
-  transfer_cert_accepted: 0
-
+  transfer_cert_accepted: 0,
+  acquired_energy: 0,
 }
 
 export const ElecOperator = () => {
@@ -35,7 +32,6 @@ export const ElecOperator = () => {
   const snapshot = snapshotResponse.result?.data.data ?? defaultSnapshot
 
   return (
-
     <Main>
       <header>
         <section>
@@ -57,23 +53,26 @@ export const ElecOperator = () => {
         </section>
       </header>
 
-
       <Routes>
-
         <Route
           path="pending/*"
           element={
-            <OperatorTransferCertificateList snapshot={snapshot} year={years.selected} />
+            <OperatorTransferCertificateList
+              snapshot={snapshot}
+              year={years.selected}
+            />
           }
         />
 
         <Route
           path="accepted/*"
           element={
-            <OperatorTransferCertificateList snapshot={snapshot} year={years.selected} />
+            <OperatorTransferCertificateList
+              snapshot={snapshot}
+              year={years.selected}
+            />
           }
         />
-
 
         <Route
           path="*"
@@ -84,58 +83,64 @@ export const ElecOperator = () => {
             />
           }
         />
-
       </Routes>
     </Main>
-
-
   )
 }
-
-
-
 
 interface ElecTabsProps {
   loading: boolean
   snapshot: ElecOperatorSnapshot
 }
 
-
-function ElecTabs({
-  loading,
-  snapshot
-}: ElecTabsProps) {
+function ElecTabs({ loading, snapshot }: ElecTabsProps) {
   const { t } = useTranslation()
 
-  return (<Tabs variant="main" tabs={[{
-    key: "pending",
-    path: "pending",
-    label: <>
-      <p style={{
-        fontWeight: "normal"
-      }}>
-
-        {loading ? <Loader size={20} /> : formatNumber(snapshot?.transfer_cert_pending)}
-      </p>
-      <strong>
-        {t("Certificats en attente")}
-
-      </strong>
-    </>
-  }, {
-    key: "accepted",
-    path: "accepted",
-    label: <>
-      <p style={{
-        fontWeight: "normal"
-      }}>
-        {loading ? <Loader size={20} /> : formatNumber(snapshot?.transfer_cert_accepted)}
-      </p>
-      <strong>
-        {t("Certificats acceptés")}
-      </strong>
-    </>
-  }]} />);
+  return (
+    <Tabs
+      variant="main"
+      tabs={[
+        {
+          key: "pending",
+          path: "pending",
+          label: (
+            <>
+              <p
+                style={{
+                  fontWeight: "normal",
+                }}
+              >
+                {loading ? (
+                  <Loader size={20} />
+                ) : (
+                  formatNumber(snapshot?.transfer_cert_pending)
+                )}
+              </p>
+              <strong>{t("Certificats en attente")}</strong>
+            </>
+          ),
+        },
+        {
+          key: "accepted",
+          path: "accepted",
+          label: (
+            <>
+              <p
+                style={{
+                  fontWeight: "normal",
+                }}
+              >
+                {loading ? (
+                  <Loader size={20} />
+                ) : (
+                  formatNumber(snapshot?.transfer_cert_accepted)
+                )}
+              </p>
+              <strong>{t("Certificats acceptés")}</strong>
+            </>
+          ),
+        },
+      ]}
+    />
+  )
 }
-
-
