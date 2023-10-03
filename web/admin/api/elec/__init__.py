@@ -19,6 +19,9 @@ urlpatterns = [
     path(
         "provision-certificate-filters", get_provision_certificate_filters, name="admin-elec-provision-certificate-filters"
     ),
+    path(
+        "transfer-certificate-details", get_transfer_certificate_details, name="admin-elec-get-transfer-certificate-details"
+    ),
     path("transfer-certificates", get_transfer_certificates, name="admin-elec-get-transfer-certificates"),
     path(
         "transfer-certificate-filters", get_transfer_certificate_filters, name="admin-elec-get-transfer-certificate-filters"
