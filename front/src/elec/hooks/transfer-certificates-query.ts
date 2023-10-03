@@ -1,4 +1,7 @@
-import { ElecTransferCertificateQuery, ElecTransferCertificateStates } from "elec/types-cpo"
+import {
+  ElecTransferCertificateQuery,
+  ElecTransferCertificateStates,
+} from "elec/types-cpo"
 import { useMemo } from "react"
 
 export function useTransferCertificatesQuery({
@@ -23,6 +26,6 @@ export function useTransferCertificatesQuery({
       order: order?.direction,
       ...filters,
     }),
-    [entity.id, status, search, limit, order, filters, page]
+    [entity.id, year, status, search, limit, order, filters, page]
   )
 }
