@@ -11,7 +11,7 @@ import { useAdminTransferCertificateQueryParamsStore } from "elec-admin/hooks/tr
 import { useAdminTransferCertificatesQuery } from "elec-admin/hooks/transfer-certificates-query"
 import { ElecAdminSnapshot, ElecAdminTransferCertificateFilter } from "elec-admin/types"
 import { ElecTransferCertificatePreview } from "elec/types"
-import { ElecCPOTransferCertificateStatus } from "elec/types-cpo"
+import { ElecTransferCertificateStatus } from "elec/types-cpo"
 import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
 import * as api from "../../api"
@@ -138,6 +138,6 @@ const FILTERS = [
 
 export function useAutoStatus() {
   const matchStatus = useMatch("/org/:entity/elec-admin/:year/:view/:status/*")
-  const status = matchStatus?.params?.status?.toUpperCase() as ElecCPOTransferCertificateStatus
-  return status ?? ElecCPOTransferCertificateStatus.Pending
+  const status = matchStatus?.params?.status?.toUpperCase() as ElecTransferCertificateStatus
+  return status ?? ElecTransferCertificateStatus.Pending
 }
