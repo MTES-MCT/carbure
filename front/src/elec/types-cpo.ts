@@ -1,6 +1,6 @@
 import { Entity } from "carbure/types"
 import { Order } from "common/components/table"
-import { ElecProvisionCertificatePreview, ElecTransferCertificateFilter, ElecTransferCertificatePreview } from "./types"
+import { ElecProvisionCertificatePreview, ElecTransferCertificate, ElecTransferCertificateFilter, ElecTransferCertificatePreview } from "./types"
 import { ElecOperatorSnapshot, ElecOperatorStatus } from "./types-operator"
 
 
@@ -66,6 +66,11 @@ export interface ElecProvisionCertificatesData {
   returned: number
   total: number
 }
+
+export interface ElecProvisionCertificatesDetails {
+  elec_provision_certificate: ElecProvisionCertificatePreview
+}
+
 export interface ElecTransferCertificatesData {
   elec_transfer_certificates: ElecTransferCertificatePreview[]
   from: number
@@ -74,15 +79,15 @@ export interface ElecTransferCertificatesData {
   total: number
 }
 
+export interface ElecTransferCertificatesDetails {
+  elec_transfer_certificate: ElecTransferCertificate
+}
 
 export enum ElecCPOTransferCertificateStatus {
   Pending = "PENDING",
   Accepted = "ACCEPTED",
   Rejected = "REJECTED",
 }
-
-
-
 
 export type ElecTransferCertificateFilterSelection = Partial<Record<ElecTransferCertificateFilter, string[]>>
 
