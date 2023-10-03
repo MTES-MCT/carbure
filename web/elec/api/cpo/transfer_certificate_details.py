@@ -20,7 +20,7 @@ class TransferCertificateDetailsForm(forms.Form):
 
 @require_GET
 @check_user_rights()
-def get_transfer_certificate_details(request):
+def get_transfer_certificate_details(request, *args, **kwargs):
     transf_certif_form = TransferCertificateDetailsForm(request.GET)
 
     if not transf_certif_form.is_valid():
