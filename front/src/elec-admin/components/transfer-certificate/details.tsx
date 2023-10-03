@@ -2,7 +2,7 @@ import useEntity from "carbure/hooks/entity"
 import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import { useHashMatch } from "common/components/hash-route"
-import { Return } from "common/components/icons"
+import { Message, Return } from "common/components/icons"
 import { TextInput } from "common/components/input"
 import Portal from "common/components/portal"
 import { useQuery } from "common/hooks/async"
@@ -11,6 +11,8 @@ import TransferCertificateTag from "elec/components/transfer-certificates/tag"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../../api"
+import { ElecTransferCertificateStatus } from "elec/types-cpo"
+import Alert from "common/components/alert"
 
 
 export const ElecAdminTransferDetailsDialog = () => {
@@ -70,8 +72,12 @@ export const ElecAdminTransferDetailsDialog = () => {
 
             />
 
+            {transferCertificate?.status === ElecTransferCertificateStatus.Rejected &&
+              <Alert variant="info" icon={Message}>
+                {transferCertificate.comment}
+              </Alert>
+            }
           </section>
-
         </main>
 
         <footer>
