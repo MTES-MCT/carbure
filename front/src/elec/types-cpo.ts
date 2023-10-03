@@ -75,7 +75,7 @@ export interface ElecTransferCertificatesData {
 }
 
 
-export enum ElecCPOTransferCertificateStatus {
+export enum ElecTransferCertificateStatus {
   Pending = "PENDING",
   Accepted = "ACCEPTED",
   Rejected = "REJECTED",
@@ -86,7 +86,7 @@ export type ElecTransferCertificateFilterSelection = Partial<Record<ElecTransfer
 export interface ElecTransferCertificateStates {
   entity: Entity
   year: number
-  status: ElecCPOTransferCertificateStatus | ElecOperatorStatus
+  status: ElecTransferCertificateStatus | ElecOperatorStatus
   filters: ElecTransferCertificateFilterSelection
   search?: string
   selection: number[]

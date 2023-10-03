@@ -18,6 +18,7 @@ import { useHashMatch } from "common/components/hash-route"
 import { useQuery } from "common/hooks/async"
 import * as apiOperator from "../../api-operator"
 import * as apiCPO from "../../api-cpo"
+import { ElecTransferCertificateStatus } from "elec/types-cpo"
 export interface ElecTransferDetailsDialogProps {
   displayCpo?: boolean
 }
@@ -91,9 +92,14 @@ export const ElecTransferDetailsDialog = ({
               value={transferCertificate?.energy_amount + " MWh"}
 
             />
-            {transferCertificate?.status === ElecOperatorStatus.Accepted && entity.id === transferCertificate?.client.id &&
+            {transferCertificate?.status === ElecTransferCertificateStatus.Accepted && entity.id === transferCertificate?.client.id &&
               <Alert variant="info" icon={Message}>
                 {t("L'identifiant est à reporter sur le certificat d'acquisition à intégrer dans votre comptabilité matière pour le compte des douanes.")}
+              </Alert>
+            }
+            {transferCertificate?.status === ElecTransferCertificateStatus.Rejected &&
+              <Alert variant="info" icon={Message}>
+                {transferCertificate.comment}
               </Alert>
             }
           </section>
@@ -101,7 +107,7 @@ export const ElecTransferDetailsDialog = ({
         </main>
 
         <footer>
-          {transferCertificate?.status === ElecOperatorStatus.Pending &&
+          {transferCertificate?.status === ElecTransferCertificateStatus.Pending &&
             transferCertificate?.client.id === entity.id && (
               <>
                 <Button
@@ -118,7 +124,7 @@ export const ElecTransferDetailsDialog = ({
                 />
               </>
             )}
-          {entity.id === transferCertificate?.supplier.id &&
+          {entity.id === transferCertificate?.supplier.id && transferCertificate?.status != ElecTransferCertificateStatus.Accepted &&
             <ElecCancelTransferButton
               transferCertificate={transferCertificate}
               onClose={closeDialog}

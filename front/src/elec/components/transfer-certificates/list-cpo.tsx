@@ -6,7 +6,7 @@ import { useQuery } from "common/hooks/async"
 import { useTransferCertificateQueryParamsStore } from "elec/hooks/transfer-certificate-query-params-store"
 import { useTransferCertificatesQuery } from "elec/hooks/transfer-certificates-query"
 import { ElecTransferCertificateFilter, ElecTransferCertificatePreview } from "elec/types"
-import { ElecCPOSnapshot, ElecCPOTransferCertificateStatus } from "elec/types-cpo"
+import { ElecCPOSnapshot, ElecTransferCertificateStatus } from "elec/types-cpo"
 import { useLocation, useMatch } from "react-router-dom"
 import * as api from "../../api-cpo"
 import { StatusSwitcher } from "./cpo-status-switcher"
@@ -120,6 +120,6 @@ const FILTERS = [
 
 export function useAutoStatus() {
     const matchStatus = useMatch("/org/:entity/elec/:year/:view/:status/*")
-    const status = matchStatus?.params?.status?.toUpperCase() as ElecCPOTransferCertificateStatus
-    return status ?? ElecCPOTransferCertificateStatus.Pending
+    const status = matchStatus?.params?.status?.toUpperCase() as ElecTransferCertificateStatus
+    return status ?? ElecTransferCertificateStatus.Pending
 }

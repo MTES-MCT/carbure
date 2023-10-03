@@ -3,7 +3,7 @@ import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
 import useTitle from "common/hooks/title"
-import { ElecCPOSnapshot, ElecTransferCertificateFilterSelection, ElecTransferCertificateStates, ElecCPOTransferCertificateStatus } from "elec/types-cpo"
+import { ElecCPOSnapshot, ElecTransferCertificateFilterSelection, ElecTransferCertificateStates, ElecTransferCertificateStatus } from "elec/types-cpo"
 import { useTranslation } from "react-i18next"
 import { useFilterSearchParams } from "./transfer-certificate-filter-search-params"
 import { ElecOperatorSnapshot, ElecOperatorStatus } from "elec/types-operator"
@@ -13,7 +13,7 @@ import { ElecOperatorSnapshot, ElecOperatorStatus } from "elec/types-operator"
 export function useTransferCertificateQueryParamsStore(
   entity: Entity,
   year: number,
-  status: ElecCPOTransferCertificateStatus | ElecOperatorStatus,
+  status: ElecTransferCertificateStatus | ElecOperatorStatus,
   snapshot?: ElecCPOSnapshot | ElecOperatorSnapshot,
 ) {
 
@@ -58,7 +58,7 @@ export function useTransferCertificateQueryParamsStore(
         page: 0,
       }),
 
-      setStatus: (status: ElecCPOTransferCertificateStatus | ElecOperatorStatus) => {
+      setStatus: (status: ElecTransferCertificateStatus | ElecOperatorStatus) => {
         return {
           status,
           filters: filtersParams,
@@ -140,9 +140,9 @@ export function usePageTitle(state: ElecTransferCertificateStates) {
   const { t } = useTranslation()
 
   const statuses: any = {
-    [ElecCPOTransferCertificateStatus.Pending]: t("Énergie cédée") + " " + t("en attente"),
-    [ElecCPOTransferCertificateStatus.Accepted]: t("Énergie cédée") + " " + t("acceptée"),
-    [ElecCPOTransferCertificateStatus.Rejected]: t("Énergie cédée") + " " + t("rejetée"),
+    [ElecTransferCertificateStatus.Pending]: t("Énergie cédée") + " " + t("en attente"),
+    [ElecTransferCertificateStatus.Accepted]: t("Énergie cédée") + " " + t("acceptée"),
+    [ElecTransferCertificateStatus.Rejected]: t("Énergie cédée") + " " + t("rejetée"),
   }
   const entity = state.entity.name
   const year = state.year
