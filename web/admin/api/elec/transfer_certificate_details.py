@@ -7,12 +7,12 @@ from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
 from core.models import ExternalAdminRights
 from elec.models.elec_transfer_certificate import ElecTransferCertificate
-from elec.serializers.elec_transfer_certificate import ElecTransferCertificateSerializer
+from elec.serializers.elec_transfer_certificate import ElecTransferCertificateDetailsSerializer
 
 
 class TransferCertificatesError:
     MALFORMED_PARAMS = "MALFORMED_PARAMS"
-    TRANSFER_CERTIFICATES_LISTING_FAILED = "TRANSFER_CERTIFICATES_LISTING_FAILED"
+    TRANSFER_CERTIFICATE_LOADING_FAILED = "TRANSFER_CERTIFICATE_LOADING_FAILED"
 
 
 class TransferCertificateDetailsForm(forms.Form):
@@ -30,7 +30,7 @@ def get_transfer_certificate_details(request):
 
     try:
         transfer_certificates = ElecTransferCertificate.objects.get(id=transfer_certificate_id)
-        serialized = ElecTransferCertificateSerializer(transfer_certificates)
+        serialized = ElecTransferCertificateDetailsSerializer(transfer_certificates)
 
         return SuccessResponse(
             {
@@ -40,4 +40,4 @@ def get_transfer_certificate_details(request):
 
     except Exception:
         traceback.print_exc()
-        return ErrorResponse(400, TransferCertificatesError.TRANSFER_CERTIFICATES_LISTING_FAILED)
+        return ErrorResponse(400, TransferCertificatesError.TRANSFER_CERTIFICATE_LOADING_FAILED)
