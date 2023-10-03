@@ -1,5 +1,8 @@
 import { EntityPreview } from "carbure/types"
-import { ElecCPOProvisionCertificateQuery, ElecCPOTransferCertificateStatus } from "./types-cpo"
+import {
+  ElecCPOProvisionCertificateQuery,
+  ElecCPOTransferCertificateStatus,
+} from "./types-cpo"
 import { ElecOperatorStatus } from "./types-operator"
 
 export interface ElecProvisionCertificatePreview {
@@ -21,6 +24,10 @@ export interface ElecTransferCertificatePreview {
   certificate_id: number
 }
 
+export interface ElecTransferCertificate
+  extends ElecTransferCertificatePreview {
+  comment: string
+}
 
 export interface ElecTransferCertificatesData {
   elec_transfer_certificates: ElecTransferCertificatePreview[]
@@ -29,8 +36,6 @@ export interface ElecTransferCertificatesData {
   returned: number
   total: number
 }
-
-
 
 export enum ElecTransferCertificateFilter {
   TransferDate = "transfer_date",

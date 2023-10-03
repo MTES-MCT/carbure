@@ -1,6 +1,6 @@
 import { api, Api, download } from "common/services/api"
 import { ElecOperatorSnapshot } from "./types-operator"
-import { ElecTransferCertificateQuery } from "./types-cpo"
+import { ElecTransferCertificateQuery, ElecTransferCertificatesDetails } from "./types-cpo"
 import { ElecTransferCertificateFilter, ElecTransferCertificatesData, QUERY_RESET } from "./types"
 
 export function getOperatorYears(entity_id: number) {
@@ -15,6 +15,15 @@ export function getOperatorSnapshot(entity_id: number, year: number) {
 export function getTransferCertificates(query: ElecTransferCertificateQuery) {
   return api.get<Api<ElecTransferCertificatesData>>("/v5/elec/operator/transfer-certificates", {
     params: query,
+  })
+}
+
+export function getTransferCertificateDetails(
+  entity_id: number,
+  transfer_certificate_id: number
+) {
+  return api.get<Api<ElecTransferCertificatesDetails>>("/v5/elec/operator/transfer-certificate-details", {
+    params: { entity_id, transfer_certificate_id },
   })
 }
 

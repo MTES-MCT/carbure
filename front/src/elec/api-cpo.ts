@@ -1,5 +1,5 @@
 import { api, Api } from "common/services/api"
-import { ElecCPOProvisionCertificateFilter, ElecCPOProvisionCertificateQuery, ElecCPOSnapshot, ElecTransferCertificateQuery, ElecProvisionCertificatesData, ElecTransferCertificatesData } from "./types-cpo"
+import { ElecCPOProvisionCertificateFilter, ElecCPOProvisionCertificateQuery, ElecCPOSnapshot, ElecTransferCertificateQuery, ElecProvisionCertificatesData, ElecTransferCertificatesData, ElecProvisionCertificatesDetails, ElecTransferCertificatesDetails } from "./types-cpo"
 import { EntityPreview } from "carbure/types"
 import { extract } from "carbure/api"
 import { ElecTransferCertificateFilter, QUERY_RESET } from "./types"
@@ -31,6 +31,15 @@ export function getProvisionCertificates(query: ElecCPOProvisionCertificateQuery
   })
 }
 
+export function getProvisionCertificateDetails(
+  entity_id: number,
+  provision_certificate_id: number
+) {
+  return api.get<Api<ElecProvisionCertificatesDetails>>("/v5/elec/cpo/provision-certificate-details", {
+    params: { entity_id, provision_certificate_id },
+  })
+}
+
 export function findClients(query?: string) {
   return api.get<Api<EntityPreview[]>>("/v5/elec/cpo/clients", {
     params: { query },
@@ -55,6 +64,15 @@ export function transferEnergy(
 export function getTransferCertificates(query: ElecTransferCertificateQuery) {
   return api.get<Api<ElecTransferCertificatesData>>("/v5/elec/cpo/transfer-certificates", {
     params: query,
+  })
+}
+
+export function getTransferCertificateDetails(
+  entity_id: number,
+  transfer_certificate_id: number
+) {
+  return api.get<Api<ElecTransferCertificatesDetails>>("/v5/elec/cpo/transfer-certificate-details", {
+    params: { entity_id, transfer_certificate_id },
   })
 }
 
