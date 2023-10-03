@@ -8,6 +8,7 @@ from django.core.paginator import Paginator
 from django.http import HttpResponse
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
+from core.excel import export_to_excel
 from core.models import ExternalAdminRights
 from core.utils import MultipleValueField
 from elec.models.elec_transfer_certificate import ElecTransferCertificate
@@ -147,3 +148,25 @@ def export_transfer_certificate_to_csv(transfer_certificates):
         writer.writerow(serialized)
 
     return response
+
+
+def export_transfer_certificate_to_excel(transfer_certificates):
+    today = datetime.date.today()
+    file = "carbure_elec_transfer_certificate_%s.xlsx" % (today.strftime("%Y%m%d_%H%M"))
+
+    return export_to_excel(
+        file,
+        [
+            {
+                "label": "tickets",
+                "rows": ElecTransferCertificateSerializer(transfer_certificates, many=True).data,
+                "columns": [
+                    {"label": "certificate_id", "value": "certificate_id"},
+                    {"label": "supplier", "value": "supplier.name"},
+                    {"label": "client", "value": "client.name"},
+                    {"label": "transfer_date", "value": "transfer_date"},
+                    {"label": "energy_amount", "value": "energy_amount"},
+                ],
+            }
+        ],
+    )
