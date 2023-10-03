@@ -1,10 +1,9 @@
-import * as norm from "carbure/utils/normalizers"
 import { MultiSelect, MultiSelectProps } from "common/components/multi-select"; // prettier-ignore
-import { Grid } from "common/components/scaffold"
-import { Normalizer, defaultNormalizer } from "common/utils/normalize"
+import { Grid } from "common/components/scaffold";
+import { defaultNormalizer } from "common/utils/normalize";
 import { ElecTransferCertificateFilter } from "elec/types";
 import { ElecTransferCertificateFilterSelection } from "elec/types-cpo";
-import { useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next";
 
 
 export interface FiltersProps {
