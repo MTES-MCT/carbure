@@ -40,15 +40,11 @@ def invalidate_declaration(request, *args, **kwargs):
         declaration = SustainabilityDeclaration.init_declaration(entity_id, period)
     except:
         traceback.print_exc()
-        return ErrorResponse(
-            400, InvalidateDeclarationError.DECLARATION_CANNOT_BE_CREATED
-        )
+        return ErrorResponse(400, InvalidateDeclarationError.DECLARATION_CANNOT_BE_CREATED)
 
     # grab the list of all the lots related to this declaration
     declaration_lots = (
-        CarbureLot.objects.exclude(
-            lot_status__in=(CarbureLot.DRAFT, CarbureLot.DELETED)
-        )
+        CarbureLot.objects.exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
         .filter(period=period)
         .filter(Q(carbure_supplier_id=entity_id) | Q(carbure_client_id=entity_id))
     )
@@ -71,19 +67,13 @@ def invalidate_declaration(request, *args, **kwargs):
         unknown_supplier_lots.update(declared_by_supplier=False)
 
         # Unfreeze all the lots of this declaration
-        undeclared_lots = declaration_lots.filter(
-            Q(declared_by_supplier=False) | Q(declared_by_client=False)
-        )
+        undeclared_lots = declaration_lots.filter(Q(declared_by_supplier=False) | Q(declared_by_client=False))
         undeclared_lots.update(lot_status=CarbureLot.ACCEPTED)
 
         # Create cancel declaration events for all these lots
         bulk_events = []
         for lot in undeclared_lots:
-            bulk_events.append(
-                CarbureLotEvent(
-                    event_type=CarbureLotEvent.DECLCANCEL, lot=lot, user=request.user
-                )
-            )
+            bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLCANCEL, lot=lot, user=request.user))
         CarbureLotEvent.objects.bulk_create(bulk_events)
 
         background_bulk_scoring(undeclared_lots)

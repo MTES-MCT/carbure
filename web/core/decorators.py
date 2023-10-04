@@ -175,7 +175,7 @@ def check_admin_rights(allow_external=[], allow_role=None):
 
             try:
                 # check that entity exists and is admin
-                entity = Entity.objects.get(id=entity_id, entity_type__in=(Entity.ADMIN, Entity.EXTERNAL_ADMIN))
+                entity = Entity.objects.get(id=entity_id, entity_type__in=[Entity.ADMIN, Entity.EXTERNAL_ADMIN])
             except:
                 return ErrorResponse(404, AdminRightsError.ENTITY_NOT_FOUND)
 
