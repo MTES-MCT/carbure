@@ -6,13 +6,16 @@ import { useQuery } from "common/hooks/async"
 import { useProvistionCertificateQueryParamsStore } from "elec/hooks/provision-certificate-query-params-store"
 import { useProvisionCertificatesQuery } from "elec/hooks/provision-certificates-query"
 import { ElecCPOProvisionCertificateFilter, ElecCPOProvisionCertificateStatus, ElecCPOSnapshot } from "elec/types-cpo"
-import { useMatch } from "react-router-dom"
+import { useLocation, useMatch } from "react-router-dom"
 import * as api from "../../api-cpo"
 import ProvisionCertificateFilters from "./filters"
 import { StatusSwitcher } from "./status-switcher"
 import { ElecCPOProvisionCertificateTable } from "./table"
 import { EnergyTransferSummary } from "./transfer-summary"
 import { elecAdminProvisionCertificateList } from "elec/__test__/data"
+import { ElecProvisionCertificatePreview } from "elec/types"
+import HashRoute from "common/components/hash-route"
+import ElecProvisionDetailsDialog from "./details"
 
 
 type ProvisionCertificateListProps = {
@@ -26,19 +29,19 @@ const ProvisionCertificateList = ({ snapshot, year }: ProvisionCertificateListPr
     const status = useAutoStatus()
     const [state, actions] = useProvistionCertificateQueryParamsStore(entity, year, status, snapshot)
     const query = useProvisionCertificatesQuery(state)
-
+    const location = useLocation()
     const provisionCertificatesResponse = useQuery(api.getProvisionCertificates, {
         key: "elec-provision-certificates",
         params: [query],
     })
 
-    // const showProvisionCertificateDetails = (provisionCertificate: ElecProvisionCertificatePreview) => {
-    //   return {
-    //     pathname: location.pathname,
-    //     search: location.search,
-    //     hash: `provision-certificate/${provisionCertificate.id}`,
-    //   }
-    // }
+    const showProvisionCertificateDetails = (provisionCertificate: ElecProvisionCertificatePreview) => {
+        return {
+            pathname: location.pathname,
+            search: location.search,
+            hash: `provision-certificate/${provisionCertificate.id}`,
+        }
+    }
 
     const provisionCertificatesData = provisionCertificatesResponse.result?.data.data
     // const provisionCertificatesData = elecAdminProvisionCertificateList //TOTEST  
@@ -80,7 +83,7 @@ const ProvisionCertificateList = ({ snapshot, year }: ProvisionCertificateListPr
                             loading={provisionCertificatesResponse.loading}
                             order={state.order}
                             provisionCertificates={provisionCertificatesData.elec_provision_certificates}
-                            // rowLink={showProvisionCertificateDetails}
+                            rowLink={showProvisionCertificateDetails}
                             selected={state.selection}
                             onSelect={actions.setSelection}
                             onOrder={actions.setOrder}
@@ -100,12 +103,12 @@ const ProvisionCertificateList = ({ snapshot, year }: ProvisionCertificateListPr
                 ) : (
                     <NoResult
                         loading={provisionCertificatesResponse.loading}
-                    // filters={state.filters}
-                    // onFilter={actions.setFilters}
+
                     />
                 )}
             </section >
 
+            <HashRoute path="provision-certificate/:id" element={<ElecProvisionDetailsDialog />} />
 
 
         </>

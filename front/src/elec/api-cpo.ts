@@ -35,7 +35,7 @@ export function getProvisionCertificateDetails(
   entity_id: number,
   provision_certificate_id: number
 ) {
-  return api.get<Api<{ elec_transfer_certificate: ElecProvisionCertificatesDetails }>>("/v5/elec/cpo/provision-certificate-details", {
+  return api.get<Api<{ elec_provision_certificate: ElecProvisionCertificatesDetails }>>("/v5/elec/cpo/provision-certificate-details", {
     params: { entity_id, provision_certificate_id },
   })
 }

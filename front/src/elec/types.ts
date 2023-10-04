@@ -3,7 +3,6 @@ import {
   ElecCPOProvisionCertificateQuery,
   ElecTransferCertificateStatus,
 } from "./types-cpo"
-import { ElecOperatorStatus } from "./types-operator"
 
 export interface ElecProvisionCertificatePreview {
   id: number

@@ -35,7 +35,7 @@ def get_provision_certificate_details(request, *args, **kwargs):
 
         return SuccessResponse(
             {
-                "elec_Provision_certificate": serialized.data,
+                "elec_provision_certificate": serialized.data,
             }
         )
 

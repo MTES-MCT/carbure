@@ -1,4 +1,5 @@
 import Table, { Cell, Order } from "common/components/table"
+import { formatNumber } from "common/utils/formatters"
 import { ElecAdminProvisionCertificateStatus } from "elec-admin/types"
 import { ElecProvisionCertificatePreview } from "elec/types"
 import { memo } from "react"
@@ -95,7 +96,7 @@ export function useColumns() {
             cell: (provisionCertificate: ElecProvisionCertificatePreview) => {
                 return (
                     <Cell
-                        text={provisionCertificate.energy_amount}
+                        text={"+ " + formatNumber(provisionCertificate.energy_amount)}
                     />
                 )
             },

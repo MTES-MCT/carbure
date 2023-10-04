@@ -1,4 +1,5 @@
 import useEntity from "carbure/hooks/entity"
+import HashRoute from "common/components/hash-route"
 import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
@@ -6,15 +7,14 @@ import { useQuery } from "common/hooks/async"
 import { useProvistionCertificateQueryParamsStore } from "elec-admin/hooks/provision-certificate-query-params-store"
 import { useProvisionCertificatesQuery } from "elec-admin/hooks/provision-certificates-query"
 import { ElecAdminProvisionCertificateFilter, ElecAdminProvisionCertificateStatus, ElecAdminSnapshot } from "elec-admin/types"
-import { useMatch } from "react-router-dom"
+import { ElecProvisionCertificatePreview } from "elec/types"
+import { useLocation, useMatch } from "react-router-dom"
 import * as api from "../../api"
 import ProvisionImporButton from "./Import"
+import ElecAdminProvisionDetailsDialog from "./details"
 import ProvisionCertificateFilters from "./filters"
 import { StatusSwitcher } from "./status-switcher"
 import ElecAdminProvisionCertificateTable from "./table"
-import { useTranslation } from "react-i18next"
-import { Download } from "common/components/icons"
-import Button from "common/components/button"
 
 type ProvisionListProps = {
   snapshot: ElecAdminSnapshot
@@ -27,19 +27,20 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
   const status = useAutoStatus()
   const [state, actions] = useProvistionCertificateQueryParamsStore(entity, year, status, snapshot)
   const query = useProvisionCertificatesQuery(state)
+  const location = useLocation()
 
   const provisionCertificatesResponse = useQuery(api.getProvisionCertificates, {
     key: "elec-admin-provision-certificates",
     params: [query],
   })
 
-  // const showProvisionCertificateDetails = (provisionCertificate: ElecProvisionCertificatePreview) => {
-  //   return {
-  //     pathname: location.pathname,
-  //     search: location.search,
-  //     hash: `provision-certificate/${provisionCertificate.id}`,
-  //   }
-  // }
+  const showProvisionCertificateDetails = (provisionCertificate: ElecProvisionCertificatePreview) => {
+    return {
+      pathname: location.pathname,
+      search: location.search,
+      hash: `provision-certificate/${provisionCertificate.id}`,
+    }
+  }
 
   const provisionCertificatesData = provisionCertificatesResponse.result?.data.data
   // const provisionCertificatesData = elecAdminProvisionCertificateList //TOTEST  
@@ -79,7 +80,7 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
               loading={provisionCertificatesResponse.loading}
               order={state.order}
               provisionCertificates={provisionCertificatesData.elec_provision_certificates}
-              // rowLink={showProvisionCertificateDetails}
+              rowLink={showProvisionCertificateDetails}
               selected={state.selection}
               onSelect={actions.setSelection}
               onOrder={actions.setOrder}
@@ -99,14 +100,10 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
         ) : (
           <NoResult
             loading={provisionCertificatesResponse.loading}
-          // filters={state.filters}
-          // onFilter={actions.setFilters}
           />
         )}
       </section >
-
-
-
+      <HashRoute path="provision-certificate/:id" element={<ElecAdminProvisionDetailsDialog />} />
     </>
   )
 }
