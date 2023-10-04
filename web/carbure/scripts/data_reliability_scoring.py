@@ -22,7 +22,7 @@ def data_reliability_scoring(year, batch):
 
     lots = (
         CarbureLot.objects.filter(year=year)
-        .exclude(lot_status__in=(CarbureLot.DRAFT, CarbureLot.DELETED))
+        .exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
         .order_by("id")
         .select_related(
             "carbure_producer",

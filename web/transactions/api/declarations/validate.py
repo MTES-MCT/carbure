@@ -45,15 +45,11 @@ def validate_declaration(request, *args, **kwargs):
         declaration = SustainabilityDeclaration.init_declaration(entity_id, period)
     except:
         traceback.print_exc()
-        return ErrorResponse(
-            400, ValidateDeclarationError.DECLARATION_CANNOT_BE_CREATED
-        )
+        return ErrorResponse(400, ValidateDeclarationError.DECLARATION_CANNOT_BE_CREATED)
 
     # grab the list of all the lots related to this declaration
     declaration_lots = (
-        CarbureLot.objects.exclude(
-            lot_status__in=(CarbureLot.DRAFT, CarbureLot.DELETED)
-        )
+        CarbureLot.objects.exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
         .filter(period=period)
         .filter(Q(carbure_supplier_id=entity_id) | Q(carbure_client_id=entity_id))
     )
@@ -62,9 +58,7 @@ def validate_declaration(request, *args, **kwargs):
     if pending_lots.count() > 0:
         return ErrorResponse(400, ValidateDeclarationError.SOME_LOTS_ARE_PENDING)
 
-    in_correction_lots = declaration_lots.filter(
-        correction_status__in=(CarbureLot.IN_CORRECTION, CarbureLot.FIXED)
-    )
+    in_correction_lots = declaration_lots.filter(correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED])
     if in_correction_lots.count() > 0:
         return ErrorResponse(400, ValidateDeclarationError.SOME_LOTS_ARE_IN_CORRECTION)
 
@@ -93,9 +87,7 @@ def validate_declaration(request, *args, **kwargs):
         background_create_ticket_sources_from_lots(received_lots)
 
         # Freeze lots that are marked as declared by both supplier and client
-        declared_lots = declaration_lots.filter(
-            declared_by_supplier=True, declared_by_client=True
-        )
+        declared_lots = declaration_lots.filter(declared_by_supplier=True, declared_by_client=True)
         declared_lots.update(lot_status=CarbureLot.FROZEN)
 
         # Mark declaration as complete
@@ -105,11 +97,7 @@ def validate_declaration(request, *args, **kwargs):
         # Create declaration events for all these lots
         bulk_events = []
         for lot in declared_lots:
-            bulk_events.append(
-                CarbureLotEvent(
-                    event_type=CarbureLotEvent.DECLARED, lot=lot, user=request.user
-                )
-            )
+            bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLARED, lot=lot, user=request.user))
         CarbureLotEvent.objects.bulk_create(bulk_events)
 
         background_bulk_scoring(declared_lots)
