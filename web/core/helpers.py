@@ -782,7 +782,7 @@ def get_lot_updates(lot, entity=None):
     # list the only users email addresses that should be sent to the frontend
     if entity is not None:
         context["visible_users"] = (
-            UserRights.objects.filter(entity__in=(lot.added_by, lot.carbure_supplier, lot.carbure_client))
+            UserRights.objects.filter(entity__in=[lot.added_by, lot.carbure_supplier, lot.carbure_client])
             .values_list("user__email", flat=True)
             .distinct()
         )

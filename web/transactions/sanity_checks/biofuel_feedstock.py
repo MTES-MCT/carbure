@@ -87,6 +87,7 @@ def get_biofuel_feedstock_incompatibilities(biofuel: Biocarburant, feedstock: Ma
         "SOJA",
         "HUILE_PALME",
         "CARINATA",
+        "EFFLUENTS_HUILERIES_PALME_RAFLE",
         "HUILE_ALIMENTAIRE_USAGEE",
         "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2",
         "HUILES_OU_GRAISSES_ANIMALES_CAT3",
