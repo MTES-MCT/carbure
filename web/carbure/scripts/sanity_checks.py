@@ -35,7 +35,7 @@ def cleanup_sanity_checks(year, batch, apply):
 
     lots = (
         CarbureLot.objects.filter(year=year)
-        .filter(lot_status__in=(CarbureLot.DRAFT, CarbureLot.ACCEPTED, CarbureLot.FROZEN, CarbureLot.PENDING))
+        .filter(lot_status__in=[CarbureLot.DRAFT, CarbureLot.ACCEPTED, CarbureLot.FROZEN, CarbureLot.PENDING])
         .order_by("id")
         .select_related(
             "carbure_producer",
