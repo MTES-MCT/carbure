@@ -1,17 +1,14 @@
+from uu import Error
 from django.http.response import JsonResponse
+from django.db import transaction
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
-from core.helpers import (
-    filter_lots,
-    get_entity_lots_by_status,
-)
+from core.helpers import filter_lots, get_entity_lots_by_status
+from core.models import CarbureLot, CarbureLotEvent, CarbureStock, Entity, UserRights
 
-from core.models import (
-    CarbureLot,
-    CarbureLotEvent,
-    CarbureStock,
-    Entity,
-    UserRights,
-)
+
+class AcceptStockError:
+    STOCK_CREATION_FAILED = "STOCK_CREATION_FAILED"
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
@@ -24,63 +21,46 @@ def accept_in_stock(request, *args, **kwargs):
     lots = get_entity_lots_by_status(entity, status)
     lots = filter_lots(lots, request.POST, entity, will_aggregate=True)
 
-    if entity.entity_type == Entity.OPERATOR:
-        return JsonResponse(
-            {"status": "error", "message": "Stock unavailable for Operators"},
-            status=400,
-        )
+    errors = {}
+
+    updated_lots = []
+    created_events = []
+    created_stocks = []
 
     for lot in lots.iterator():
+        lot_errors = []
+
         if entity != lot.carbure_client:
-            return JsonResponse(
-                {
-                    "status": "forbidden",
-                    "message": "Only the client can accept the lot",
-                },
-                status=403,
-            )
+            lot_errors.push("Only the client can accept the lot")
 
         if lot.lot_status == CarbureLot.DRAFT:
-            return JsonResponse(
-                {"status": "error", "message": "Cannot accept DRAFT"}, status=400
-            )
+            lot_errors.push("Cannot accept drafts.")
         elif lot.lot_status == CarbureLot.PENDING:
-            # ok no problem
-            pass
+            pass  # ok no problem
         elif lot.lot_status == CarbureLot.REJECTED:
-            # the client changed his mind, ok
-            pass
+            pass  # the client changed his mind, ok
         elif lot.lot_status == CarbureLot.ACCEPTED:
-            return JsonResponse(
-                {"status": "error", "message": "Lot already accepted."}, status=400
-            )
+            lot_errors.push("Lot is already accepted.")
         elif lot.lot_status == CarbureLot.FROZEN:
-            return JsonResponse(
-                {"status": "error", "message": "Lot is Frozen."}, status=400
-            )
+            lot_errors.push("Lot is frozen.")
         elif lot.lot_status == CarbureLot.DELETED:
-            return JsonResponse(
-                {"status": "error", "message": "Lot is deleted."}, status=400
-            )
+            lot_errors.push("Lot is deleted.")
 
         lot.lot_status = CarbureLot.ACCEPTED
         lot.delivery_type = CarbureLot.STOCK
-        lot.save()
+
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.ACCEPTED
         event.lot = lot
         event.user = request.user
-        event.save()
-        stock = CarbureStock()
-        stock.parent_lot = lot
+
         if lot.carbure_delivery_site is None:
             lot.lot_status = CarbureLot.PENDING
             lot.delivery_type = CarbureLot.UNKNOWN
-            lot.save()
-            return JsonResponse(
-                {"status": "error", "message": "Cannot add stock for unknown Depot"},
-                status=400,
-            )
+            lot_errors.push("Cannot add stock for unknown Depot")
+
+        stock = CarbureStock()
+        stock.parent_lot = lot
         stock.depot = lot.carbure_delivery_site
         stock.carbure_client = lot.carbure_client
         stock.remaining_volume = lot.volume
@@ -96,7 +76,30 @@ def accept_in_stock(request, *args, **kwargs):
         stock.unknown_supplier = lot.unknown_supplier
         stock.ghg_reduction = lot.ghg_reduction
         stock.ghg_reduction_red_ii = lot.ghg_reduction_red_ii
-        stock.save()
-        stock.carbure_id = "%sS%d" % (lot.carbure_id, stock.id)
-        stock.save()
-    return JsonResponse({"status": "success"})
+
+        if len(lot_errors) > 0:
+            errors[lot.id] = lot_errors
+        else:
+            updated_lots.append(lot)
+            created_events.append(event)
+            created_stocks.append(stock)
+
+    if len(errors) > 0:
+        return ErrorResponse(400, AcceptStockError.STOCK_CREATION_FAILED, errors)
+
+    with transaction.atomic():
+        CarbureLot.objects.bulk_update(updated_lots, ["lot_status", "delivery_type"])
+        CarbureLotEvent.objects.bulk_create(created_events)
+        bulk_create_stocks(created_stocks)
+
+    return SuccessResponse()
+
+
+@transaction.atomic()
+def bulk_create_stocks(stocks):
+    # create the stock rows, then generate carbure_id for all of them
+    CarbureStock.objects.bulk_create(stocks)
+    new_stocks = CarbureStock.objects.order_by("-id")[0 : len(stocks)]
+    [stock.generate_carbure_id() for stock in new_stocks]
+    CarbureStock.objects.bulk_update(new_stocks, ["carbure_id"])
+    return new_stocks
