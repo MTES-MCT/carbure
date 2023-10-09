@@ -18,7 +18,7 @@ export interface Entity {
   default_certificate?: string
   ext_admin_pages?: ExternalAdminPages[]
   has_saf?: boolean
-  has_elec?: boolean
+  has_elec: boolean
 }
 
 export interface EntityPreview {
