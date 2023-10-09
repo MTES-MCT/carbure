@@ -24,6 +24,10 @@ const CompanyOptions = () => {
     (toggle: boolean) => api.toggleTrading(entity.id, toggle),
     { invalidates: ["user-settings"] }
   )
+  const toggleElec = useMutation(
+    (toggle: boolean) => api.toggleElec(entity.id, toggle),
+    { invalidates: ["user-settings"] }
+  )
 
   const toggleStocks = useMutation(
     (toggle: boolean) => api.toggleStocks(entity.id, toggle),
@@ -107,6 +111,15 @@ const CompanyOptions = () => {
           value={entity.has_direct_deliveries}
           onChange={toggleDirectDeliveries.execute}
         />
+        {entity.isOperator &&
+          <Checkbox
+            disabled={!canModify}
+            label={t("Ma société accepte des volumes d'electricité")}
+            value={entity.has_elec}
+            onChange={toggleElec.execute}
+          />
+        }
+
       </section>
 
       <footer />
