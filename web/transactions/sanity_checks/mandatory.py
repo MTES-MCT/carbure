@@ -137,10 +137,21 @@ def check_missing_supplier_certificate(lot: CarbureLot):
     if lot.carbure_client and lot.carbure_client.entity_type == Entity.OPERATOR:
         # client is an operator
         # make sure we have a certificate
-        if not lot.supplier_certificate and not lot.vendor_certificate:
+        if not lot.supplier_certificate:
             return generic_error(
                 error=CarbureCertificatesErrors.MISSING_SUPPLIER_CERTIFICATE,
                 lot=lot,
                 field="supplier_certificate",
+                is_blocking=True,
+            )
+
+
+def check_missing_vendor_certificate(lot: CarbureLot):
+    if lot.carbure_client != lot.added_by and lot.carbure_supplier != lot.added_by:
+        if not lot.vendor_certificate:
+            return generic_error(
+                error=CarbureCertificatesErrors.MISSING_VENDOR_CERTIFICATE,
+                lot=lot,
+                field="vendor_certificate",
                 is_blocking=True,
             )
