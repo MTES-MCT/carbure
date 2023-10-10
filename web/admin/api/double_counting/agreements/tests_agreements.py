@@ -1,9 +1,11 @@
-# test with : python web/manage.py test admin.api.double_counting.agreements.tests_agreements.AdminDoubleCountAgreementsTest --keepdb
+# test with : python web/manage.py test admin.api.double_counting.agreements.tests_agreements.AdminDoubleCountAgreementsTest.test_get_agreement_details --keepdb
 from datetime import date
 from email.mime import application
+from pprint import pprint
+from certificates.models import DoubleCountingRegistration
 
 from core.tests_utils import setup_current_user
-from core.models import Entity, Pays, UserRights
+from core.models import CarbureLot, Entity, MatierePremiere, Pays, UserRights
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -14,6 +16,7 @@ from doublecount.factories.sourcing import DoubleCountingSourcingFactory
 from doublecount.models import DoubleCountingApplication
 
 from producers.models import ProductionSite
+from transactions.factories.carbure_lot import CarbureLotFactory
 
 
 class Endpoint:
@@ -50,27 +53,27 @@ class AdminDoubleCountAgreementsTest(TestCase):
         self.production_site.save()
         self.requested_start_year = 2023
 
-    def create_agreement(self):
+    def create_agreement(self) -> DoubleCountingRegistration:
         app = DoubleCountingApplicationFactory.create(
             producer=self.production_site.producer,
             production_site=self.production_site,
             period_start__year=self.requested_start_year,
             status=DoubleCountingApplication.PENDING,
-    )
+        )
         sourcing1 = DoubleCountingSourcingFactory.create(dca=app, year=self.requested_start_year)
         sourcing2 = DoubleCountingSourcingFactory.create(dca=app, year=self.requested_start_year)
         production1 = DoubleCountingProductionFactory.create(
-            dca=app, feedstock=sourcing2.feedstock, year=self.requested_start_year , approved_quota=1000
+            dca=app, feedstock=sourcing2.feedstock, year=self.requested_start_year, approved_quota=1000
         )
         production2 = DoubleCountingProductionFactory.create(
             dca=app, feedstock=sourcing2.feedstock, year=self.requested_start_year + 1, approved_quota=-1
         )
         agreement = DoubleCountingRegistrationFactory.create(
-            production_site=self.production_site, 
+            production_site=self.production_site,
             valid_from=date(self.requested_start_year, 1, 1),
             application=app,
         )
-    
+
         return agreement
 
     def test_get_agreements(self):
@@ -93,3 +96,27 @@ class AdminDoubleCountAgreementsTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+    def test_get_agreement_details(self):
+        agreement = self.create_agreement()
+        agreement_id = agreement.id
+
+        feedstocks = MatierePremiere.objects.filter(is_double_compte=True)[:5]
+
+        for feedstock in feedstocks:
+            CarbureLotFactory.create(
+                feedstock=feedstock,
+                lot_status=CarbureLot.ACCEPTED,
+                year=agreement.valid_from.year,
+                production_site_double_counting_certificate=agreement.certificate_id,
+                carbure_production_site=self.production_site,
+            )
+
+        response = self.client.get(
+            reverse("admin-double-counting-agreements-details"),
+            {"entity_id": self.admin.id, "agreement_id": agreement_id},
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()["data"]
+
+        self.assertEqual(data["id"], agreement.id)
