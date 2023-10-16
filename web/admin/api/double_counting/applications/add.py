@@ -137,12 +137,9 @@ def add_application(request, *args, **kwargs):
     production_data, _ = load_dc_production_data(dca, production_max_rows, production_forecast_rows, requested_quota_rows)
     DoubleCountingSourcing.objects.filter(dca=dca).delete()
     for sourcing in sourcing_forecast_data:
-        print("sourcing.feedstock: ", sourcing.feedstock)
-        print("sourcing.metric_tonnes: ", sourcing.metric_tonnes)
         sourcing.save()
     DoubleCountingProduction.objects.filter(dca=dca).delete()
     for production in production_data:
-        print("production: ", production)
         production.save()
 
     try:

@@ -3,6 +3,7 @@ from datetime import date
 import json
 from nis import cat
 import os
+from pprint import pprint
 import stat
 from admin.api.double_counting.applications.add import DoubleCountingAddError
 from admin.api.double_counting.applications.approve_application import DoubleCountingApplicationApproveError
@@ -22,6 +23,7 @@ from doublecount.factories import (
 )
 from doublecount.factories import agreement
 from doublecount.factories.agreement import DoubleCountingRegistrationFactory
+from doublecount.factories.doc_file import DoubleCountingDocFileFactory
 
 from doublecount.models import DoubleCountingApplication, DoubleCountingDocFile, DoubleCountingProduction
 from producers.models import ProductionSite
@@ -132,6 +134,8 @@ class AdminDoubleCountApplicationsTest(TestCase):
         self.assertEqual(application.period_end, date(self.requested_start_year + 1, 12, 31))
 
         # 2 - test if file uploaded
+        DoubleCountingDocFileFactory.create(agreement_id=application.agreement_id, file_name="dca.xlsx")
+        pprint(DoubleCountingDocFile.objects.all())
         docFile = DoubleCountingDocFile.objects.filter(agreement_id=application.agreement_id).first()
         self.assertEqual(docFile.file_name, "dca.xlsx")
         self.assertEqual(docFile.agreement_id, application.agreement_id)
