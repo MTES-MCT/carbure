@@ -3,7 +3,7 @@ from datetime import date
 from email.mime import application
 
 from core.tests_utils import setup_current_user
-from core.models import Entity, Pays, UserRights
+from core.models import CarbureLot, Entity, MatierePremiere, Pays, UserRights
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -14,6 +14,7 @@ from doublecount.factories.sourcing import DoubleCountingSourcingFactory
 from doublecount.models import DoubleCountingApplication
 
 from producers.models import ProductionSite
+from transactions.factories.carbure_lot import CarbureLotFactory
 
 
 class Endpoint:
@@ -93,3 +94,27 @@ class AdminDoubleCountAgreementsTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+    # def test_get_agreement_details(self):
+    #     agreement = self.create_agreement()
+    #     agreement_id = agreement.id
+
+    #     feedstocks = MatierePremiere.objects.filter(is_double_compte=True)[:5]
+
+    #     for feedstock in feedstocks:
+    #         CarbureLotFactory.create(
+    #             feedstock=feedstock,
+    #             lot_status=CarbureLot.ACCEPTED,
+    #             year=agreement.valid_from.year,
+    #             production_site_double_counting_certificate=agreement.certificate_id,
+    #             carbure_production_site=self.production_site,
+    #         )
+
+    #     response = self.client.get(
+    #         reverse("admin-double-counting-agreements-details"),
+    #         {"entity_id": self.admin.id, "agreement_id": agreement_id},
+    #     )
+    #     self.assertEqual(response.status_code, 200)
+    #     data = response.json()["data"]
+
+    #     self.assertEqual(data["id"], agreement.id)
