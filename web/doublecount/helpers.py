@@ -33,6 +33,7 @@ today = datetime.date.today()
 def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[SourcingRow]):
     # prepare error list
     sourcing_data = []
+    sourcing_by_feedstock = {}
     sourcing_errors = []
 
     # preload data
@@ -56,7 +57,9 @@ def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[So
             supply_country = None
 
         try:
-            transit_country = countries.get(code_pays=row["transit_country"].strip()) if row["transit_country"] else None
+            transit_country = (
+                countries.get(code_pays=row["transit_country"].strip()) if row["transit_country"] else None
+            )
         except:
             transit_country = None
 
@@ -92,7 +95,9 @@ def load_dc_production_data(
 
     # check rows integrity
     for index, production_base_rows in enumerate([production_max_rows, production_forecast_rows, requested_quota_rows]):
-        tab_name = ["Capacité maximale de production", "Production prévisionelle", "Reconnaissance double comptage"][index]
+        tab_name = ["Capacité maximale de production", "Production prévisionelle", "Reconnaissance double comptage"][
+            index
+        ]
 
         if len(production_base_rows) < 2:
             production_errors.append(
@@ -112,14 +117,31 @@ def load_dc_production_data(
     if len(production_errors) > 0:
         return production_data, production_errors
 
+    # merge rows
+
+    requested_quota_rows = merge_rows(requested_quota_rows, "requested_quota")
+    production_forecast_rows = merge_rows(production_forecast_rows, "estimated_production")
+    production_max_rows = merge_rows(production_max_rows, "max_production_capacity")
+
     # check data consistency from requested_quota
     for req_quota_row in requested_quota_rows:
+        year = req_quota_row["year"]
+        feedstock = req_quota_row["feedstock"]
+        biofuel = req_quota_row["biofuel"]
+        requested_quota = req_quota_row["requested_quota"]
+
         production = DoubleCountingProduction(dca=dca)
+        production.year = year
+        production.feedstock = feedstocks.get(feedstock, None)
+        production.biofuel = biofuels.get(biofuel, None)
+        production.requested_quota = requested_quota
+
+        # set estimated_production
         for prod_forecast_row in production_forecast_rows:
             if (
-                prod_forecast_row["year"] == req_quota_row["year"]
-                and prod_forecast_row["feedstock"] == req_quota_row["feedstock"]
-                and prod_forecast_row["biofuel"] == req_quota_row["biofuel"]
+                prod_forecast_row["year"] == year
+                and prod_forecast_row["feedstock"] == feedstock
+                and prod_forecast_row["biofuel"] == biofuel
             ):
                 production.estimated_production = prod_forecast_row["estimated_production"]
                 break
@@ -130,15 +152,16 @@ def load_dc_production_data(
                     DoubleCountingError.MISSING_ESTIMATED_PRODUCTION,
                     line=req_quota_row["line"],
                     meta={
-                        "year": req_quota_row["year"],
-                        "feedstock": req_quota_row["feedstock"],
-                        "biofuel": req_quota_row["biofuel"],
+                        "year": year,
+                        "feedstock": feedstock,
+                        "biofuel": biofuel,
                         "tab_name": "Reconnaissance double comptage",
                     },
                 )
             )
 
         # check in production_max_rows if there is a corresponding row
+        # set max_production_capacity
         for prod_max_row in production_max_rows:
             if (
                 prod_max_row["year"] == req_quota_row["year"]
@@ -153,18 +176,13 @@ def load_dc_production_data(
                     DoubleCountingError.MISSING_MAX_PRODUCTION_CAPACITY,
                     line=req_quota_row["line"],
                     meta={
-                        "year": req_quota_row["year"],
-                        "feedstock": req_quota_row["feedstock"],
-                        "biofuel": req_quota_row["biofuel"],
+                        "year": year,
+                        "feedstock": feedstock,
+                        "biofuel": biofuel,
                         "tab_name": tab_name,
                     },
                 )
             )
-
-        production.year = req_quota_row["year"]
-        production.feedstock = feedstocks.get(req_quota_row["feedstock"], None)
-        production.biofuel = biofuels.get(req_quota_row["biofuel"], None)
-        production.requested_quota = req_quota_row["requested_quota"]
 
         if len(production_errors) > 0:
             return production_data, production_errors
@@ -173,6 +191,17 @@ def load_dc_production_data(
         production_data.append(production)
 
     return production_data, production_errors
+
+
+def merge_rows(rows, key_to_merge):
+    merged_data = {}
+    for row in rows:
+        key = (row["year"], row["biofuel"], row["feedstock"])
+        if key in merged_data:
+            merged_data[key][key_to_merge] += row[key_to_merge]
+        else:
+            merged_data[key] = row
+    return list(merged_data.values())
 
 
 def load_dc_recognition_file(entity, psite_id, user, filepath):
@@ -233,7 +262,9 @@ def check_dc_file(file):
             dca, production_max_rows, production_forecast_rows, requested_quota_rows
         )
 
-        global_errors += check_dc_globally(sourcing_forecast_data, production_data) if len(production_errors) == 0 else []
+        global_errors += (
+            check_dc_globally(sourcing_forecast_data, production_data) if len(production_errors) == 0 else []
+        )
 
         return (
             info,
@@ -341,9 +372,9 @@ def send_dca_status_email(dca):
         # PROD
         recipients = [
             r.user.email
-            for r in UserRights.objects.filter(entity=dca.producer, user__is_staff=False, user__is_superuser=False).exclude(
-                role__in=[UserRights.AUDITOR, UserRights.RO]
-            )
+            for r in UserRights.objects.filter(
+                entity=dca.producer, user__is_staff=False, user__is_superuser=False
+            ).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])
         ]
         cc = "carbure@beta.gouv.fr"
     email = EmailMessage(

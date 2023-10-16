@@ -68,6 +68,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
               EntityType.Trader,
               EntityType.Auditor,
               EntityType.Airline,
+              EntityType.CPO,
             ]}
           />
         )}

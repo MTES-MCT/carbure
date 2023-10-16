@@ -1,4 +1,4 @@
-# test with : python web/manage.py test doublecount.api.application.tests_application.DoubleCountApplicationTest.test_missing_traceability --keepdb
+# test with : python web/manage.py test doublecount.api.application.tests_application.DoubleCountApplicationTest.test_valid_file --keepdb
 from math import prod
 import os
 from core.tests_utils import setup_current_user

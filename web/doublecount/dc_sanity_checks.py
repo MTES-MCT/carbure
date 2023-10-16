@@ -45,7 +45,11 @@ def check_production_row(production: DoubleCountingProduction, data: ProductionR
 
 # check a line in the production section of an imported dc excel file
 def check_production_row_integrity(
-    feedstock: MatierePremiere, biofuel: Biocarburant, data: ProductionBaseRow, tab_name: str, dca: DoubleCountingApplication
+    feedstock: MatierePremiere,
+    biofuel: Biocarburant,
+    data: ProductionBaseRow,
+    tab_name: str,
+    dca: DoubleCountingApplication,
 ) -> List[DcError]:
     errors: List[DcError] = []
     line = data["line"]
@@ -67,8 +71,6 @@ def check_production_row_integrity(
         # TODO use get_biofuel_feedstock_incompatibilities instead and add a double-ounting mode
         for e in check_compatibility_feedstock_biofuel(biofuel, feedstock):
             incompatibilities.append(e)
-
-        print("incompatibilities: ", incompatibilities)
 
         meta = {
             "feedstock": feedstock.code,

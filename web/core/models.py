@@ -82,6 +82,7 @@ class Entity(models.Model):
             "default_certificate": self.default_certificate,
             "preferred_unit": self.preferred_unit,
             "has_saf": self.has_saf,
+            "has_elec": self.has_elec,
         }
         if self.entity_type == Entity.EXTERNAL_ADMIN:
             d["ext_admin_pages"] = [e.right for e in self.externaladminrights_set.all()]
@@ -480,12 +481,14 @@ class ExternalAdminRights(models.Model):
     CUSTOM_STATS_AGRIMER = "AGRIMER"
     TIRIB_STATS = "TIRIB"
     AIRLINE = "AIRLINE"
+    ELEC = "ELEC"
 
     RIGHTS = (
         (DOUBLE_COUNTING_APPLICATION, DOUBLE_COUNTING_APPLICATION),
         (CUSTOM_STATS_AGRIMER, CUSTOM_STATS_AGRIMER),
         (TIRIB_STATS, TIRIB_STATS),
         (AIRLINE, AIRLINE),
+        (ELEC, ELEC)
     )
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     right = models.CharField(max_length=32, choices=RIGHTS, default="", blank=False, null=False)
@@ -1304,6 +1307,7 @@ class CarbureNotification(models.Model):
     SAF_TICKET_REJECTED = "SAF_TICKET_REJECTED"
     LOTS_UPDATED_BY_ADMIN = "LOTS_UPDATED_BY_ADMIN"
     LOTS_DELETED_BY_ADMIN = "LOTS_DELETED_BY_ADMIN"
+    ELEC_TRANSFER_CERTIFICATE = "ELEC_TRANSFER_CERTIFICATE"
 
     NOTIFICATION_TYPES = [
         (CORRECTION_REQUEST, CORRECTION_REQUEST),
@@ -1321,6 +1325,7 @@ class CarbureNotification(models.Model):
         (SAF_TICKET_RECEIVED, SAF_TICKET_RECEIVED),
         (LOTS_UPDATED_BY_ADMIN, LOTS_UPDATED_BY_ADMIN),
         (LOTS_DELETED_BY_ADMIN, LOTS_DELETED_BY_ADMIN),
+        (ELEC_TRANSFER_CERTIFICATE, ELEC_TRANSFER_CERTIFICATE),
     ]
 
     dest = models.ForeignKey(Entity, blank=False, null=False, on_delete=models.CASCADE)

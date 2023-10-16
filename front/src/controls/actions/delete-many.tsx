@@ -109,7 +109,7 @@ const DeleteManyConfirmationDialog = ({
           <p>
             <strong>
               {t(
-                "Êtes-vous sûr de vouloir supprimer l’integralité de ces lots ?"
+                "Êtes-vous sûr de vouloir supprimer l'integralité de ces lots ?"
               )}
             </strong>{" "}
             {t(

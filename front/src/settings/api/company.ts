@@ -10,6 +10,10 @@ export function toggleTrading(entity_id: number, shouldEnable: boolean) {
   const endpoint = "/v5/entity/options/trading"
   return api.post(endpoint, { entity_id, has_trading: shouldEnable })
 }
+export function toggleElec(entity_id: number, shouldEnable: boolean) {
+  const endpoint = "/v5/entity/options/elec"
+  return api.post(endpoint, { entity_id, has_elec: shouldEnable })
+}
 
 export function toggleStocks(entity_id: number, shouldEnable: boolean) {
   const endpoint = "/v5/entity/options/stocks"

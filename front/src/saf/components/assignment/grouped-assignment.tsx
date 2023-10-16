@@ -92,7 +92,7 @@ const TicketsGroupedAssignment = ({
           <section>
             <p>
               {t(
-                "Veuillez remplir le formulaire ci-dessous afin d’affecter une partie ou tout le volume des lots :"
+                "Veuillez remplir le formulaire ci-dessous afin d'affecter une partie ou tout le volume des lots :"
               )}
             </p>
 
@@ -116,7 +116,7 @@ const TicketsGroupedAssignment = ({
                         {t("{{volume}} L - {{period}} - {{feedstock}}", {
                           volume: formatNumber(
                             ticketSource.total_volume -
-                              ticketSource.assigned_volume
+                            ticketSource.assigned_volume
                           ),
                           period: formatPeriod(ticketSource.delivery_period),
                           feedstock: t(ticketSource.feedstock?.code ?? "", {

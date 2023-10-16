@@ -103,7 +103,6 @@ const DoubleCountingFilesCheckerDialog = ({
               icon={value.doubleCountingFile ? Check : Upload}
               label={t("Importer le fichier excel à analyser")}
               placeholder={value.doubleCountingFile ? value.doubleCountingFile.name : t("Choisir un fichier")}
-
               {...bind("doubleCountingFile")}
             />
           </Form>
