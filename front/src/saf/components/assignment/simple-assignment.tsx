@@ -83,7 +83,7 @@ export const TicketAssignment = ({
           <section>
             <p>
               {t(
-                "Veuillez remplir le formulaire ci-dessous afin d’affecter une partie ou tout le volume du lot à un client et générer un ticket de Carburant Durable d'Aviation"
+                "Veuillez remplir le formulaire ci-dessous afin d'affecter une partie ou tout le volume du lot à un client et générer un ticket de Carburant Durable d'Aviation"
               )}
             </p>
 

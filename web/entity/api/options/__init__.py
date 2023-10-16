@@ -4,6 +4,7 @@ from .trading import toggle_trading
 from .stocks import toggle_stocks
 from .direct_deliveries import toggle_direct_deliveries
 from .unit import set_preferred_unit
+from .electricity import toggle_elec
 
 urlpatterns = [
     path("release-for-consumption", toggle_release_for_consumption, name="entity-options-release-for-consumption"),
@@ -11,4 +12,5 @@ urlpatterns = [
     path("stocks", toggle_stocks, name="entity-options-stocks"),
     path("direct-deliveries", toggle_direct_deliveries, name="entity-options-direct-deliveries"),
     path("unit", set_preferred_unit, name="entity-options-unit"),
+    path("elec", toggle_elec, name="entity-options-elec"),
 ]

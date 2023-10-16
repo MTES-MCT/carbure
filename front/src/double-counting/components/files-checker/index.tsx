@@ -114,7 +114,7 @@ const DoubleCountingFilesChecker = () => {
           <Alert variant="warning" icon={AlertCircle}>
             <p>
               {t(
-                "Aucune données à vérifier. Merci d’envoyer de nouveaux fichiers à analyser."
+                "Aucune données à vérifier. Merci d'envoyer de nouveaux fichiers à analyser."
               )}
             </p>
           </Alert>

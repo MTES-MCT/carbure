@@ -20,6 +20,9 @@ import Auth from "auth"
 import Saf from "saf/operator"
 import SafClient from "saf/airline"
 import Stats from "stats"
+import ElecCPO from "elec/cpo"
+import ElecAdmin from "elec-admin"
+import { ElecOperator } from "elec/operator"
 
 const Carbure = () => {
   const user = useUserManager()
@@ -71,11 +74,14 @@ const Org = () => {
     isIndustry,
     isOperator,
     isProducer,
-    has_saf,
     isAirline,
+    isCPO,
+    has_saf,
+    has_elec,
   } = entity
   const hasDCA = isExternal && entity.hasAdminRight("DCA")
   const hasAirline = isExternal && entity.hasAdminRight("AIRLINE")
+  const isElecAdmin = isExternal && entity.hasAdminRight("ELEC")
 
   // prettier-ignore
   return (
@@ -94,12 +100,14 @@ const Org = () => {
       {has_saf && isOperator && (<>
         <Route path="saf/:year/*" element={<Saf />} />
         <Route path="saf" element={<Navigate replace to={`${currentYear}/ticket-sources`} />} />
+        <Route path="*" element={<Navigate replace to={`saf/${currentYear}/tickets-sources`} />} />
+
       </>)}
 
       {isAirline && (<>
         <Route path="saf/:year/*" element={<SafClient />} />
         <Route path="saf" element={<Navigate replace to={`${currentYear}/tickets`} />} />
-        <Route path="*" element={<Navigate replace to="saf" />} />
+        <Route path="*" element={<Navigate replace to={`saf/${currentYear}/tickets`} />} />
       </>)}
 
       {isAdmin && (<>
@@ -110,6 +118,17 @@ const Org = () => {
 
       {(isOperator || isProducer) && <Route path="stats" element={<Stats />} />}
 
+      {isCPO && (<>
+        <Route path="elec/:year/*" element={<ElecCPO />} />
+        <Route path="elec" element={<Navigate replace to={`${currentYear}/provisioned`} />} />
+        <Route path="*" element={<Navigate replace to={`elec/${currentYear}/provisioned`} />} />
+      </>)}
+      {((isOperator && has_elec)) && (<>
+        <Route path="elec/:year/*" element={<ElecOperator />} />
+        <Route path="elec" element={<Navigate replace to={`${currentYear}`} />} />
+        <Route path="*" element={<Navigate replace to={`elec/${currentYear}/pending`} />} />
+
+      </>)}
 
       {(isAdmin || isAuditor) && (<>
         <Route path="controls/:year/*" element={<Controls />} />
@@ -120,8 +139,14 @@ const Org = () => {
       {(isAdmin || hasDCA) && <Route path="double-counting/*" element={<DoubleCounting />} />}
       {hasDCA && <Route path="*" element={<Navigate replace to="double-counting" />} />}
 
-      {(isAdmin || hasAirline) &&
+      {(isAdmin || hasAirline || isElecAdmin) &&
         <Route path="entities/*" element={<Entities />} />
+      }
+      {(isAdmin || isElecAdmin) &&
+        <>
+          <Route path="elec-admin/:year/*" element={<ElecAdmin />} />
+          <Route path="elec-admin" element={<Navigate replace to={`${currentYear}/provisioned`} />} />
+        </>
       }
       {hasAirline && <Route path="*" element={<Navigate replace to="entities" />} />}
     </Routes>

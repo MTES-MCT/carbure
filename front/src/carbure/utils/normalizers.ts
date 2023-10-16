@@ -62,6 +62,7 @@ export const normalizeEntity: Normalizer<Entity> = (entity) => ({
     has_trading: entity.has_trading,
     has_direct_deliveries: entity.has_direct_deliveries,
     has_stocks: entity.has_stocks,
+    has_elec: entity.has_elec,
     legal_name: entity.legal_name,
     registered_address: entity.registered_address,
     registered_country: entity.registered_country,
@@ -208,6 +209,8 @@ export function getEntityTypeLabel(type: EntityType) {
       return i18next.t("Administration Externe")
     case EntityType.Airline:
       return i18next.t("Compagnie aérienne")
+    case EntityType.CPO:
+      return i18next.t("Aménageur de bornes électriques")
     case EntityType.Unknown:
     default:
       return i18next.t("Inconnu")

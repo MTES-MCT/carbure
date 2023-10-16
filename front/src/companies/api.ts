@@ -21,13 +21,15 @@ export function addCompany(
   entity_id: number,
   name: string,
   entity_type: EntityType,
-  has_saf: boolean
+  has_saf: boolean,
+  has_elec: boolean
 ) {
   return api.post("/v5/admin/entities/create", {
     entity_id,
     name,
     entity_type,
     has_saf,
+    has_elec,
   })
 }
 

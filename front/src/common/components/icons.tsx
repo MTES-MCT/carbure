@@ -213,6 +213,12 @@ export const Filter = ({ className, ...props }: IconProps) => (
   </Icon>
 )
 
+export const Bolt = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("filter", className)}>
+    <path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11" />
+  </Icon>
+)
+
 export const Alarm = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("alarm", className)}>
     <circle cx="12" cy="13" r="7" />

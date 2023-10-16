@@ -6,7 +6,6 @@ import { UserManager, useUser } from "carbure/hooks/user"
 import useLocalStorage from "common/hooks/storage"
 import { useMatomo } from "matomo"
 import Menu from "common/components/menu"
-import { Anchors } from "common/components/dropdown"
 import { Header, Row } from "common/components/scaffold"
 import Button from "common/components/button"
 import Tabs from "common/components/tabs"
@@ -18,6 +17,7 @@ import css from "./top-bar.module.css"
 import { compact } from "common/utils/collection"
 import Notifications from "./notifications"
 import DevBanner from "./dev-banner"
+import { UserRole } from "carbure/types"
 
 const Topbar = () => {
   const entity = useEntity()
@@ -103,8 +103,9 @@ const Navigation = ({ entity }: NavigationProps) => {
     has_saf,
     isAirline,
     isProducer,
+    isCPO,
+    has_elec,
   } = entity
-
   return (
     <Routes>
       <Route
@@ -137,13 +138,27 @@ const Navigation = ({ entity }: NavigationProps) => {
                 label: t("Aviation"),
               },
 
+              ((has_elec && isOperator) || isCPO) && {
+                key: "elec",
+                path: "elec",
+                label: t("Électricité"),
+              },
+
+              (isAdmin || entity.hasAdminRight("ELEC")) && {
+                key: "elec-admin",
+                path: "elec-admin",
+                label: t("Électricité"),
+              },
+
               (isOperator || isProducer) && {
                 key: "stats",
                 path: "stats",
                 label: t("Statistiques"),
               },
 
-              (isAdmin || entity.hasAdminRight("AIRLINE")) && {
+              (isAdmin ||
+                entity.hasAdminRight("AIRLINE") ||
+                entity.hasAdminRight("ELEC")) && {
                 key: "entities",
                 path: "entities",
                 label: t("Sociétés"),
@@ -155,7 +170,7 @@ const Navigation = ({ entity }: NavigationProps) => {
                 label: t("Double comptage"),
               },
 
-              {
+              !(isAirline && !entity.hasRights(UserRole.Admin)) && {
                 key: "settings",
                 path: "settings",
                 label: t("Société"),

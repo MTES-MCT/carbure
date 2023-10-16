@@ -130,7 +130,7 @@ export const ApplicationDetailsDialog = () => {
       <Confirm
         variant="success"
         title={t("Accepter dossier")}
-        description={t("Voulez-vous vraiment accepter ce dossier double comptage ? Une fois accepté, vous retrouverez l’agrément correspondant dans la liste des agréments actifs.")} // prettier-ignore
+        description={t("Voulez-vous vraiment accepter ce dossier double comptage ? Une fois accepté, vous retrouverez l'agrément correspondant dans la liste des agréments actifs.")} // prettier-ignore
         confirm={t("Accepter")}
         icon={Check}
         onClose={close}
