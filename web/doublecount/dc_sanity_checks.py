@@ -223,6 +223,9 @@ def check_compatibility_feedstock_biofuel(
         "HCG",
         "HCE",
         "B100",
+        "HVOE",
+        "HVOG",
+        "HVOC",
     ]:
         yield "Des huiles ou graisses animales (cat 3) ne peuvent donner que des EMHA/EEHA ou des HOG/HOE/HOC."
 
