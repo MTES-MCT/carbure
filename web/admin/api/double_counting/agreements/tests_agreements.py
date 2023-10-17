@@ -39,7 +39,7 @@ class AdminDoubleCountAgreementsTest(TestCase):
 
         self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True)
 
-        self.producer, _ = Entity.objects.update_or_create(name="Le Super Producteur 1", entity_type="Producteur")
+        self.producer = Entity.objects.filter(entity_type=Entity.PRODUCER).first()
         UserRights.objects.update_or_create(user=self.user, entity=self.producer, defaults={"role": UserRights.ADMIN})
 
         self.production_site = ProductionSite.objects.first()
@@ -95,26 +95,26 @@ class AdminDoubleCountAgreementsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
-    # def test_get_agreement_details(self):
-    #     agreement = self.create_agreement()
-    #     agreement_id = agreement.id
+    def test_get_agreement_details(self):
+        agreement = self.create_agreement()
+        agreement_id = agreement.id
 
-    #     feedstocks = MatierePremiere.objects.filter(is_double_compte=True)[:5]
+        feedstocks = MatierePremiere.objects.filter(is_double_compte=True)[:5]
 
-    #     for feedstock in feedstocks:
-    #         CarbureLotFactory.create(
-    #             feedstock=feedstock,
-    #             lot_status=CarbureLot.ACCEPTED,
-    #             year=agreement.valid_from.year,
-    #             production_site_double_counting_certificate=agreement.certificate_id,
-    #             carbure_production_site=self.production_site,
-    #         )
+        for feedstock in feedstocks:
+            CarbureLotFactory.create(
+                feedstock=feedstock,
+                lot_status=CarbureLot.ACCEPTED,
+                year=agreement.valid_from.year,
+                production_site_double_counting_certificate=agreement.certificate_id,
+                carbure_production_site=self.production_site,
+            )
 
-    #     response = self.client.get(
-    #         reverse("admin-double-counting-agreements-details"),
-    #         {"entity_id": self.admin.id, "agreement_id": agreement_id},
-    #     )
-    #     self.assertEqual(response.status_code, 200)
-    #     data = response.json()["data"]
+        response = self.client.get(
+            reverse("admin-double-counting-agreements-details"),
+            {"entity_id": self.admin.id, "agreement_id": agreement_id},
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()["data"]
 
-    #     self.assertEqual(data["id"], agreement.id)
+        self.assertEqual(data["id"], agreement.id)
