@@ -14,7 +14,6 @@ def parse_sourcing_forecast(excel_file: Workbook, start_year: int) -> List[Sourc
     current_year = -1
 
     for line, row in enumerate(sourcing_sheet.iter_rows()):
-        print('line: ', line)
         current_year = extract_year(row[1].value, current_year)
         if current_year < start_year:
             continue
