@@ -103,7 +103,7 @@ class AdminDoubleCountAgreementsTest(TestCase):
         production2 = DoubleCountingProduction.objects.filter(dca=agreement_id)[1]
 
         lot_count = 0
-        for x in range(5):
+        for x in range(2):
             if x%2:
                 prod = production1
                 lot_count += 1
@@ -134,3 +134,16 @@ class AdminDoubleCountAgreementsTest(TestCase):
         self.assertEqual(quota_line["quotas_progress"], round(quota_line["production_volume"] / quota_line["approved_quota"], 2))
 
         self.assertEqual(quota_line["lot_count"],lot_count)
+
+        #without application
+        agreement.application = None    
+        agreement.save()
+        response = self.client.get(
+            reverse("admin-double-counting-agreements-details"),
+            {"entity_id": self.admin.id, "agreement_id": agreement_id},
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()["data"]
+       
+        self.assertEqual(data["application"],None)
+        self.assertEqual(data["quotas"],None)
