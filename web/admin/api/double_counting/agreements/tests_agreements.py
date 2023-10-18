@@ -11,7 +11,7 @@ from doublecount.factories.agreement import DoubleCountingRegistrationFactory
 from doublecount.factories.application import DoubleCountingApplicationFactory
 from doublecount.factories.production import DoubleCountingProductionFactory
 from doublecount.factories.sourcing import DoubleCountingSourcingFactory
-from doublecount.models import DoubleCountingApplication
+from doublecount.models import DoubleCountingApplication, DoubleCountingProduction
 
 from producers.models import ProductionSite
 from transactions.factories.carbure_lot import CarbureLotFactory
@@ -61,7 +61,7 @@ class AdminDoubleCountAgreementsTest(TestCase):
         sourcing1 = DoubleCountingSourcingFactory.create(dca=app, year=self.requested_start_year)
         sourcing2 = DoubleCountingSourcingFactory.create(dca=app, year=self.requested_start_year)
         production1 = DoubleCountingProductionFactory.create(
-            dca=app, feedstock=sourcing2.feedstock, year=self.requested_start_year , approved_quota=1000
+            dca=app, feedstock=sourcing1.feedstock, year=self.requested_start_year , approved_quota=1000
         )
         production2 = DoubleCountingProductionFactory.create(
             dca=app, feedstock=sourcing2.feedstock, year=self.requested_start_year + 1, approved_quota=-1
@@ -99,11 +99,20 @@ class AdminDoubleCountAgreementsTest(TestCase):
         agreement = self.create_agreement()
         agreement_id = agreement.id
 
-        feedstocks = MatierePremiere.objects.filter(is_double_compte=True)[:5]
+        production1 = DoubleCountingProduction.objects.filter(dca=agreement_id)[0]
+        production2 = DoubleCountingProduction.objects.filter(dca=agreement_id)[1]
 
-        for feedstock in feedstocks:
+        lot_count = 0
+        for x in range(5):
+            if x%2:
+                prod = production1
+                lot_count += 1
+            else:
+                prod = production2
+            
             CarbureLotFactory.create(
-                feedstock=feedstock,
+                feedstock=prod.feedstock,
+                biofuel=prod.biofuel,
                 lot_status=CarbureLot.ACCEPTED,
                 year=agreement.valid_from.year,
                 production_site_double_counting_certificate=agreement.certificate_id,
@@ -116,5 +125,12 @@ class AdminDoubleCountAgreementsTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         data = response.json()["data"]
+        application = data["application"]
+        quotas = data["quotas"]    
+        self.assertEqual(application["id"], agreement.id)
+        self.assertEqual(len(quotas),1)
 
-        self.assertEqual(data["id"], agreement.id)
+        quota_line = quotas[0]
+        self.assertEqual(quota_line["quotas_progress"], round(quota_line["production_volume"] / quota_line["approved_quota"], 2))
+
+        self.assertEqual(quota_line["lot_count"],lot_count)
