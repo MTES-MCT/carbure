@@ -51,12 +51,12 @@ class AdminDoubleCountAgreementsTest(TestCase):
         self.production_site.save()
         self.requested_start_year = 2023
 
-    def create_agreement(self):
+    def create_agreement(self, status=DoubleCountingApplication.PENDING):
         app = DoubleCountingApplicationFactory.create(
             producer=self.production_site.producer,
             production_site=self.production_site,
             period_start__year=self.requested_start_year,
-            status=DoubleCountingApplication.PENDING,
+            status=status,
     )
         sourcing1 = DoubleCountingSourcingFactory.create(dca=app, year=self.requested_start_year)
         sourcing2 = DoubleCountingSourcingFactory.create(dca=app, year=self.requested_start_year)
@@ -96,14 +96,14 @@ class AdminDoubleCountAgreementsTest(TestCase):
         self.assertEqual(response["Content-Type"], "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
     def test_get_agreement_details(self):
-        agreement = self.create_agreement()
+        agreement = self.create_agreement(status=DoubleCountingApplication.ACCEPTED)
         agreement_id = agreement.id
 
         production1 = DoubleCountingProduction.objects.filter(dca=agreement_id)[0]
         production2 = DoubleCountingProduction.objects.filter(dca=agreement_id)[1]
 
         lot_count = 0
-        for x in range(2):
+        for x in range(5):
             if x%2:
                 prod = production1
                 lot_count += 1
@@ -135,7 +135,7 @@ class AdminDoubleCountAgreementsTest(TestCase):
 
         self.assertEqual(quota_line["lot_count"],lot_count)
 
-        #without application
+        #without
         agreement.application = None    
         agreement.save()
         response = self.client.get(
