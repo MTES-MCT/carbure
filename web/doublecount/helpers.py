@@ -33,7 +33,6 @@ today = datetime.date.today()
 def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[SourcingRow]):
     # prepare error list
     sourcing_data = []
-    sourcing_by_feedstock = {}
     sourcing_errors = []
 
     # preload data
@@ -41,6 +40,8 @@ def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[So
     countries = Pays.objects.all()
 
     for row in sourcing_rows:
+        metric_tonnes = row["metric_tonnes"]
+        if not metric_tonnes: continue
         try:
             feedstock = feedstocks.get(code=row["feedstock"].strip()) if row["feedstock"] else None
         except:

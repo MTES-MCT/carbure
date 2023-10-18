@@ -1,3 +1,6 @@
+
+DC_FEEDSTOCK_UNRECOGNIZED ="__unrecognized__"
+
 dc_feedstock_to_carbure_feedstock = {
     "algues": "ALGUES",
     "bagasse": "BAGASSE",
@@ -7,14 +10,14 @@ dc_feedstock_to_carbure_feedstock = {
     "boues de stations d'épuration": "BOUES_EPURATION",
     "brai de tallol": "BRAI_TALLOL",
     "canne à sucre": "CANNE_A_SUCRE",
-    "captage de carbone": None,
+    "captage de carbone": DC_FEEDSTOCK_UNRECOGNIZED,
     "colza": "COLZA",
     "coques": "COQUES",
     "déchets de bois": "DECHETS_BOIS",
     "déchets industriels": "DECHETS_INDUSTRIELS",
     "déchets municipaux en mélange (hors déchets ménagers triés)": "DECHETS_MUNICIPAUX_MELANGE",
     "déchets organiques ménagers": "DECHETS_ORGANIQUES_MENAGERS",
-    "distillat d'acide gras de palme": None,
+    "distillat d'acide gras de palme": DC_FEEDSTOCK_UNRECOGNIZED,
     "effluents d'huileries de palme et rafles": "EFFLUENTS_HUILERIES_PALME_RAFLE",
     "effluents d'huileries de palme et rafles (pome)": "EFFLUENTS_HUILERIES_PALME_RAFLE",
     "egouts pauvres de 2e extractions": "EP2",
@@ -40,7 +43,7 @@ dc_feedstock_to_carbure_feedstock = {
     "tallol": "TALLOL",
     "tournesol": "TOURNESOL",
     "triticale": "TRITICALE",
-    "distillat d'acide gras de palme": None,
+    "distillat d'acide gras de palme": DC_FEEDSTOCK_UNRECOGNIZED,
 }
 
 
