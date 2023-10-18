@@ -7,7 +7,7 @@ from core.decorators import check_admin_rights
 from core.models import Biocarburant, CarbureLot, MatierePremiere
 from django.db.models.aggregates import Count, Sum
 
-from doublecount.models import DoubleCountingProduction
+from doublecount.models import DoubleCountingApplication, DoubleCountingProduction
 from doublecount.serializers import BiofuelSerializer, FeedStockSerializer
 
 
@@ -25,23 +25,22 @@ def get_agreement_details(request, *args, **kwargs):
 
     agreement = DoubleCountingRegistration.objects.get(id=agreement_id)
 
-    # production = get_production_site_double_counting_production(agreement.production_site.id, agreement.valid_from.year)
-
     # return JsonResponse(
     #     {"status": "success", "data": DoubleCountingRegistrationDetailsSerializer(agreement, many=False).data}
     # )
 
-    quotas =  get_quotas_info(agreement)
-
-    return SuccessResponse({ 
-        "application" :DoubleCountingRegistrationDetailsSerializer(agreement, many=False).data,
-        "quotas" : get_quotas_info(agreement)
-    })
+    result =  DoubleCountingRegistrationDetailsSerializer(agreement, many=False).data
+    result["quotas"] = get_quotas_info(agreement)
+                              
+    return SuccessResponse(result)
 
 
 
 def get_quotas_info(agreement: DoubleCountingRegistration):
+
     application = agreement.application
+    if not application or application.status != DoubleCountingApplication.ACCEPTED:
+        return None
     # production = get_production_site_double_counting_production(agreement.production_site.id, agreement.valid_from.year)
 
     biofuels = {p.id: p for p in Biocarburant.objects.all()}
@@ -49,7 +48,7 @@ def get_quotas_info(agreement: DoubleCountingRegistration):
 
     #tous les couples BC / MP pour le site de production sur une année
     detailed_quotas = DoubleCountingProduction.objects.values("biofuel", "feedstock", "approved_quota").filter(dca_id=application.id,approved_quota__gt=0)
-
+ 
     #tous les lots pour des MP double compté pour le site de production regroupé par couple et par année
     production_lots = (
         CarbureLot.objects.filter(
@@ -69,6 +68,8 @@ def get_quotas_info(agreement: DoubleCountingRegistration):
     # crée un dataframe pour le résumé des lots par couple et par année
     # production_lots_df = pd.DataFrame(production_lots).rename(columns={"feedstock": "feedstock_id", "biofuel": "biofuel_id", "biofuel__masse_volumique": "masse_volumique"})
     production_lots_df = pd.DataFrame(production_lots).rename(columns={"feedstock": "feedstock_id", "biofuel": "biofuel_id"})
+
+
 
     #merge les deux dataframes
     quotas_df.set_index(["biofuel_id", "feedstock_id"], inplace=True)
