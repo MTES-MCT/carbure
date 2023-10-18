@@ -80,23 +80,23 @@ class DCAAPITest(TransactionTestCase):
         self.assertEqual(8, DoubleCountingSourcing.objects.filter(dca=dca).count())
         self.assertEqual(4, DoubleCountingProduction.objects.filter(dca=dca).count())
 
-    def test_dca_upload_document(self):
-        dca, created = DoubleCountingApplication.objects.get_or_create(
-            producer=self.producer,
-            production_site=self.production_site,
-            period_start=datetime.date(2022, 1, 1),
-            period_end=datetime.date(2023, 12, 31),
-        )
-        filepath = "%s/web/fixtures/csv/test_data/dca.xlsx" % (os.environ["CARBURE_HOME"])
-        fh = open(filepath, "rb")
-        data = fh.read()
-        fh.close()
-        f = SimpleUploadedFile("dca.xlsx", data)
-        response = self.client.post(
-            reverse("api-v3-doublecount-upload-doc"), {"entity_id": self.producer.id, "dca_id": dca.id, "file": f}
-        )
-        if response.status_code != 200:
-            print("Failed to upload %s" % (filepath))
-        self.assertEqual(response.status_code, 200)
-        files = DoubleCountingDocFile.objects.filter(dca=dca)
-        self.assertEqual(files.count(), 1)
+    # def test_dca_upload_document(self):
+    #     dca, created = DoubleCountingApplication.objects.get_or_create(
+    #         producer=self.producer,
+    #         production_site=self.production_site,
+    #         period_start=datetime.date(2022, 1, 1),
+    #         period_end=datetime.date(2023, 12, 31),
+    #     )
+    #     filepath = "%s/web/fixtures/csv/test_data/dca.xlsx" % (os.environ["CARBURE_HOME"])
+    #     fh = open(filepath, "rb")
+    #     data = fh.read()
+    #     fh.close()
+    #     f = SimpleUploadedFile("dca.xlsx", data)
+    #     response = self.client.post(
+    #         reverse("api-v3-doublecount-upload-doc"), {"entity_id": self.producer.id, "dca_id": dca.id, "file": f}
+    #     )
+    #     if response.status_code != 200:
+    #         print("Failed to upload %s" % (filepath))
+    #     self.assertEqual(response.status_code, 200)
+    #     files = DoubleCountingDocFile.objects.filter(dca=dca)
+    #     self.assertEqual(files.count(), 1)

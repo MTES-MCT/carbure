@@ -20,7 +20,7 @@ dc_feedstock_to_carbure_feedstock = {
     "egouts pauvres de 2e extractions": "EP2",
     "fumier humide": "FUMIER_HUMIDE",
     "fumier sec": "FUMIER_SEC",
-    "glycérine brute": "FUMIER_HUMIDE",
+    "glycérine brute": "GLYCERINE_BRUTE",
     "graisses de flotation": "GRAISSES_FLOTTATION",
     "huile alimentaire usagée": "HUILE_ALIMENTAIRE_USAGEE",
     "huile de palme": "HUILE_PALME",
