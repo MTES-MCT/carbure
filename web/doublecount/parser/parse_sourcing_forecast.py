@@ -4,7 +4,7 @@ from openpyxl import Workbook
 from doublecount.parser.helpers import extract_year
 
 from doublecount.parser.types import SourcingRow
-from doublecount.parser.excel_to_carbure_convertor import get_feedstock_from_dc_feedstock
+from doublecount.parser.excel_to_carbure_convertor import DC_FEEDSTOCK_UNRECOGNIZED, get_feedstock_from_dc_feedstock
 
 
 def parse_sourcing_forecast(excel_file: Workbook, start_year: int) -> List[SourcingRow]:
@@ -30,6 +30,8 @@ def parse_sourcing_forecast(excel_file: Workbook, start_year: int) -> List[Sourc
 
         feedstock = get_feedstock_from_dc_feedstock(feedstock_name)
 
+        if feedstock == DC_FEEDSTOCK_UNRECOGNIZED:
+            continue
         # skip row if no feedstock is recognized and no origin country is defined
         if not feedstock and not origin_country_cell:
             continue
