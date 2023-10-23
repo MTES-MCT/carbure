@@ -1,7 +1,10 @@
+from email.policy import default
 
-DC_FEEDSTOCK_UNRECOGNIZED ="__unrecognized__"
+
+DC_FEEDSTOCK_UNRECOGNIZED = "__unrecognized__"
 
 dc_feedstock_to_carbure_feedstock = {
+    "alcool pur de marc de raisin": "ALCOOL_PUR_MARC_RAISIN",
     "algues": "ALGUES",
     "bagasse": "BAGASSE",
     "balles (enveloppes)": "BALLES",
@@ -10,14 +13,13 @@ dc_feedstock_to_carbure_feedstock = {
     "boues de stations d'épuration": "BOUES_EPURATION",
     "brai de tallol": "BRAI_TALLOL",
     "canne à sucre": "CANNE_A_SUCRE",
-    "captage de carbone": DC_FEEDSTOCK_UNRECOGNIZED,
     "colza": "COLZA",
     "coques": "COQUES",
     "déchets de bois": "DECHETS_BOIS",
     "déchets industriels": "DECHETS_INDUSTRIELS",
     "déchets municipaux en mélange (hors déchets ménagers triés)": "DECHETS_MUNICIPAUX_MELANGE",
     "déchets organiques ménagers": "DECHETS_ORGANIQUES_MENAGERS",
-    "distillat d'acide gras de palme": DC_FEEDSTOCK_UNRECOGNIZED,
+    "distillat d'acide gras de palme": "DISTILLAT_ACIDE_GRAS_PALME",
     "effluents d'huileries de palme et rafles": "EFFLUENTS_HUILERIES_PALME_RAFLE",
     "effluents d'huileries de palme et rafles (pome)": "EFFLUENTS_HUILERIES_PALME_RAFLE",
     "egouts pauvres de 2e extractions": "EP2",
@@ -43,15 +45,14 @@ dc_feedstock_to_carbure_feedstock = {
     "tallol": "TALLOL",
     "tournesol": "TOURNESOL",
     "triticale": "TRITICALE",
-    "distillat d'acide gras de palme": DC_FEEDSTOCK_UNRECOGNIZED,
 }
 
 
 dc_biofuel_to_carbure_biofuel = {
-    "bio iso-butène": None,
-    "bio iso-octane": None,
-    "bio-essence de synthèse": None,
-    "bio-etbe": "ETBE",
+    "bio isobutène": None,
+    "bio isooctane": None,
+    "bioessence de synthèse": None,
+    "bioetbe": "ETBE",
     "biogazole de synthèse": "BG",
     "eeha": "EEHA",
     "eehu": "EEHU",
@@ -65,18 +66,17 @@ dc_biofuel_to_carbure_biofuel = {
     "ethanol d'ep2": "ETH",
     "ethanol pour ed95": "ED95",
     "ethanol": "ETH",
-    "hvo-c": "HVOC",
-    "hvo-e": "HVOE",
-    "hvo-g": "HVOG",
-    "hc-c": "HCC",
-    "hc-e": "HCE",
-    "hc-g": "HCG",
+    "hvoc": "HVOC",
+    "hvoe": "HVOE",
+    "hvog": "HVOG",
+    "hcc": "HCC",
+    "hce": "HCE",
+    "hcg": "HCG",
     "méthanol": "MT",
     "mtbe": "MTBE",
     "taee": "TAEE",
     "tame": "TAME",
 }
-
 
 
 def get_feedstock_from_dc_feedstock(feedstock_name: str) -> str | None:
@@ -89,5 +89,5 @@ def get_feedstock_from_dc_feedstock(feedstock_name: str) -> str | None:
 def get_biofuel_from_dc_biofuel(biofuel_name: str) -> str | None:
     if not biofuel_name:
         return None
-    biofuel_name = biofuel_name.replace("’", "'").strip().lower()
+    biofuel_name = biofuel_name.replace("’", "'").replace("-", "").strip().lower()
     return dc_biofuel_to_carbure_biofuel.get(biofuel_name, None)
