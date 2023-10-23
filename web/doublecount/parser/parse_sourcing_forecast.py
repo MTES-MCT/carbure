@@ -1,6 +1,7 @@
 import re
 from typing import List
 from openpyxl import Workbook
+from core.models import MatierePremiere
 from doublecount.parser.helpers import extract_year
 
 from doublecount.parser.types import SourcingRow
@@ -10,6 +11,7 @@ from doublecount.parser.excel_to_carbure_convertor import DC_FEEDSTOCK_UNRECOGNI
 def parse_sourcing_forecast(excel_file: Workbook, start_year: int) -> List[SourcingRow]:
     sourcing_sheet = excel_file["Approvisionnement prévisionnel"]
     sourcing_rows: List[SourcingRow] = []
+    dc_feedstocks = {f.code: f for f in MatierePremiere.objects.filter(is_double_compte=True)}
 
     current_year = -1
 
@@ -30,8 +32,6 @@ def parse_sourcing_forecast(excel_file: Workbook, start_year: int) -> List[Sourc
 
         feedstock = get_feedstock_from_dc_feedstock(feedstock_name)
 
-        if feedstock == DC_FEEDSTOCK_UNRECOGNIZED:
-            continue
         # skip row if no feedstock is recognized and no origin country is defined
         if not feedstock and not origin_country_cell:
             continue
