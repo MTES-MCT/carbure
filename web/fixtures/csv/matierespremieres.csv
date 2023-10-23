@@ -1,4 +1,5 @@
 code,nom,fermentescible,graisse,is_double_compte,makes_huile_vegetale,is_displayed,category
+ALCOOL_PUR_MARC_RAISIN,Alcool pur de marc de raisin,1,0,1,0,1,ANN-IX-A
 BETTERAVE,Betterave,1,0,0,0,1,CONV
 BLE,Blé,1,0,0,0,1,CONV
 CANNE_A_SUCRE,Canne à sucre,1,0,0,0,1,CONV
