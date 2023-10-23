@@ -50,12 +50,13 @@ export function getErrorText(
         biofuel: t(error.meta?.biofuel, { ns: "biofuels" }),
       })
       break
-    case DoubleCountingUploadErrorType.NotDcFeedstock:
+    case DoubleCountingUploadErrorType.FeedstockNotDoubleCounting:
       errorText += t(
         "La matière première {{feedstock}} n'est pas comprise dans la liste des matières premières pouvant être double comptées.",
         { feedstock: t(error.meta?.feedstock, { ns: "feedstocks" }) }
       )
       break
+
     case DoubleCountingUploadErrorType.MpBcIncoherent:
       errorText += t(
         "La matière première {{feedstock}} est incohérente avec le biocarburant {{biofuel}}.",
