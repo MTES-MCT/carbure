@@ -7,7 +7,7 @@ from transactions.sanity_checks.biofuel_feedstock import get_biofuel_feedstock_i
 
 
 # check a line in the sourcing section of an imported dc excel file
-def check_sourcing_row(sourcing: DoubleCountingSourcing, data: SourcingRow) -> List[DcError]:
+def check_sourcing_row(data: SourcingRow) -> List[DcError]:
     errors: List[DcError] = []
     line = data["line"]
     meta = {"year": data["year"]}
@@ -59,11 +59,17 @@ def check_production_row_integrity(
     if not year in [dca.period_start.year, dca.period_end.year]:
         errors.append(error(DoubleCountingError.INVALID_YEAR, line, meta))
 
-    if not data["feedstock"]:
-        errors.append(error(DoubleCountingError.MISSING_FEEDSTOCK, line, meta))
+    # if not data["biofuel"]:
+    #     errors.append(error(DoubleCountingError.MISSING_BIOFUEL, line, meta))
 
-    if not data["biofuel"]:
+    # if not data["feedstock"]:
+    #     errors.append(error(DoubleCountingError.MISSING_FEEDSTOCK, line, meta))
+
+    if not biofuel:
         errors.append(error(DoubleCountingError.MISSING_BIOFUEL, line, meta))
+
+    if not feedstock:
+        errors.append(error(DoubleCountingError.MISSING_FEEDSTOCK, line, meta))
 
     if feedstock and biofuel:
         incompatibilities: List[str] = []

@@ -1,45 +1,47 @@
 code,nom,fermentescible,graisse,is_double_compte,makes_huile_vegetale,is_displayed,category
+ALCOOL_PUR_MARC_RAISIN,Alcool pur de marc de raisin,1,0,1,0,1,ANN-IX-A
+ALGUES,Algues,1,1,1,0,1,ANN-IX-A
+AMIDON_RESIDUEL,Amidon résiduel,1,0,0,0,1,OTHER
+BAGASSE,Bagasse,1,0,1,0,1,ANN-IX-A
+BALLES,Balles (enveloppes),1,0,1,0,0,ANN-IX-A
 BETTERAVE,Betterave,1,0,0,0,1,CONV
 BLE,Blé,1,0,0,0,1,CONV
+BOUES_EPURATION,Boues d'épuration,1,1,1,0,1,ANN-IX-A
+BRAI_TALLOL,Brai de tallol,0,1,1,0,1,ANN-IX-A
 CANNE_A_SUCRE,Canne à sucre,1,0,0,0,1,CONV
+CARINATA,Carinata,0,1,0,1,1,CONV
 COLZA,Colza,0,1,0,1,1,CONV
-DECHETS_ORGANIQUES_MENAGERS,Déchets organiques ménagers,1,1,1,0,0,ANN-IX-A
-FUMIER_HUMIDE,Fumier humide,1,0,1,0,0,ANN-IX-A
-FUMIER_SEC,Fumier sec,1,0,1,0,0,ANN-IX-A
-HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2,Huiles ou graisses animales  (catégorie I et/ou II ),0,1,1,0,1,ANN-IX-B
-HUILES_OU_GRAISSES_ANIMALES_CAT3,Huiles ou graisses animales  (catégorie III),0,1,0,0,1,OTHER
-HUILE_PALME,Huile de palme,0,1,0,0,1,CONV
-HUILE_ALIMENTAIRE_USAGEE,Huile alimentaire usagée,0,1,1,0,1,ANN-IX-B
-MAIS,Maïs,1,0,0,0,1,CONV
-RESIDUS_VINIQUES,Résidus viniques,1,0,1,0,1,ANN-IX-A
-SOJA,Soja,0,1,0,1,1,CONV
-TOURNESOL,Tournesol,0,1,0,1,1,CONV
-GLYCERINE_BRUTE,Glycérine brute,1,1,1,0,1,ANN-IX-A
+COQUES,Coques,1,0,1,0,0,ANN-IX-A
 DECHETS_BOIS,Déchets de bois,1,1,1,0,1,ANN-IX-A
 DECHETS_INDUSTRIELS,Déchets industriels,1,1,1,0,1,ANN-IX-A
-ALGUES,Algues,1,1,1,0,1,ANN-IX-A
-PAILLE,Paille,1,0,1,0,1,ANN-IX-A
-BOUES_EPURATION,Boues d'épuration,1,1,1,0,1,ANN-IX-A
-EFFLUENTS_HUILERIES_PALME_RAFLE,Effluents d'huileries de palme et rafles,0,1,1,0,1,ANN-IX-A
-BRAI_TALLOL,Brai de tallol,0,1,1,0,1,ANN-IX-A
-TALLOL,Tallol,0,1,0,0,1,TALLOL
-BAGASSE,Bagasse,1,0,1,0,1,ANN-IX-A
-COQUES,Coques,1,0,1,0,0,ANN-IX-A
-BALLES,Balles (enveloppes),1,0,1,0,0,ANN-IX-A
-RAPES,Râpes,1,0,1,0,1,ANN-IX-A
 DECHETS_MUNICIPAUX_MELANGE,Déchets municipaux en mélange (Hors déchets ménagers triés),1,1,1,0,0,ANN-IX-A
+DECHETS_ORGANIQUES_MENAGERS,Déchets organiques ménagers,1,1,1,0,0,ANN-IX-A
+DISTILLAT_ACIDE_GRAS_PALME,Distillat d'acide gras de palme,0,1,0,1,1,CONV
+DPSC,Déchet de processus sucrier contaminé,1,0,0,0,1,OTHER
+EFFLUENTS_HUILERIES_PALME_RAFLE,Effluents d'huileries de palme et rafles,0,1,1,0,1,ANN-IX-A
+EP2,Égouts pauvres de 2ème extraction,1,0,0,0,1,OTHER
+FUMIER_HUMIDE,Fumier humide,1,0,1,0,0,ANN-IX-A
+FUMIER_SEC,Fumier sec,1,0,1,0,0,ANN-IX-A
+GLYCERINE_BRUTE,Glycérine brute,1,1,1,0,1,ANN-IX-A
+GRAISSES_FLOTTATION,Graisses de flottation,0,1,1,0,1,ANN-IX-A
+HUILE_ALIMENTAIRE_USAGEE,Huile alimentaire usagée,0,1,1,0,1,ANN-IX-B
+HUILE_PALME,Huile de palme,0,1,0,0,1,CONV
+HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2,Huiles ou graisses animales  (catégorie I et/ou II ),0,1,1,0,1,ANN-IX-B
+HUILES_OU_GRAISSES_ANIMALES_CAT3,Huiles ou graisses animales  (catégorie III),0,1,0,0,1,OTHER
+LIES_DE_VIN,Lies de vin,1,0,1,0,1,ANN-IX-A
+MAIS,Maïs,1,0,0,0,1,CONV
+MARC_DE_RAISIN,Marc de raisin,1,0,1,0,1,ANN-IX-A
 MAT_CELLULOSIQUE_NON_ALIMENTAIRE,Matières cellulosiques d'origine non alimentaire,1,0,1,0,0,ANN-IX-A
 MAT_LIGNO_CELLULOSIQUE,Matières ligno-cellulosiques (Hors grumes de sciage & de placage),1,0,1,0,0,ANN-IX-A
-EP2,Égouts pauvres de 2ème extraction,1,0,0,0,1,OTHER
-AMIDON_RESIDUEL,Amidon résiduel,1,0,0,0,1,OTHER
-SEIGLE,Seigle,1,0,0,0,1,CONV
-ORGE,Orge,1,0,0,0,1,CONV
-TRITICALE,Triticale,1,0,0,0,1,CONV
-RESIDUS_DE_BIERE,Résidus de bière,1,0,0,0,1,OTHER
-MARC_DE_RAISIN,Marc de raisin,1,0,1,0,1,ANN-IX-A
-LIES_DE_VIN,Lies de vin,1,0,1,0,1,ANN-IX-A
-DPSC,Déchet de processus sucrier contaminé,1,0,0,0,1,OTHER
-GRAISSES_FLOTTATION,Graisses de flottation,0,1,1,0,1,ANN-IX-A
-SORGHO,Sorgho,1,0,0,0,1,CONV
 MELASSE,Mélasse,1,0,0,0,1,CONV
-CARINATA,Carinata,0,1,0,1,1,CONV
+ORGE,Orge,1,0,0,0,1,CONV
+PAILLE,Paille,1,0,1,0,1,ANN-IX-A
+RAPES,Râpes,1,0,1,0,1,ANN-IX-A
+RESIDUS_DE_BIERE,Résidus de bière,1,0,0,0,1,OTHER
+RESIDUS_VINIQUES,Résidus viniques,1,0,1,0,1,ANN-IX-A
+SEIGLE,Seigle,1,0,0,0,1,CONV
+SOJA,Soja,0,1,0,1,1,CONV
+SORGHO,Sorgho,1,0,0,0,1,CONV
+TALLOL,Tallol,0,1,0,0,1,TALLOL
+TOURNESOL,Tournesol,0,1,0,1,1,CONV
+TRITICALE,Triticale,1,0,0,0,1,CONV

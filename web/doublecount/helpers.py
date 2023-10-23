@@ -1,3 +1,4 @@
+from calendar import c
 import datetime
 from django.core.mail import EmailMessage
 import os
@@ -41,11 +42,15 @@ def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[So
 
     for row in sourcing_rows:
         metric_tonnes = row["metric_tonnes"]
-        if not metric_tonnes: continue
+        if not metric_tonnes:
+            continue
         try:
             feedstock = feedstocks.get(code=row["feedstock"].strip()) if row["feedstock"] else None
         except:
             feedstock = None
+
+        if feedstock and not feedstock.is_double_compte:
+            continue
 
         try:
             origin_country = countries.get(code_pays=row["origin_country"].strip()) if row["origin_country"] else None
@@ -58,9 +63,7 @@ def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[So
             supply_country = None
 
         try:
-            transit_country = (
-                countries.get(code_pays=row["transit_country"].strip()) if row["transit_country"] else None
-            )
+            transit_country = countries.get(code_pays=row["transit_country"].strip()) if row["transit_country"] else None
         except:
             transit_country = None
 
@@ -73,7 +76,7 @@ def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[So
         sourcing.supply_country = supply_country
         sourcing.transit_country = transit_country
         sourcing.metric_tonnes = row["metric_tonnes"]
-        errors = check_sourcing_row(sourcing, row)
+        errors = check_sourcing_row(row)
         sourcing_errors += errors
         if len(errors) == 0:
             sourcing_data.append(sourcing)
@@ -91,14 +94,12 @@ def load_dc_production_data(
     production_errors = []
 
     # preload data
-    feedstocks = {f.code: f for f in MatierePremiere.objects.all()}
-    biofuels = {f.code: f for f in Biocarburant.objects.all()}
+    feedstocks = MatierePremiere.objects.all()
+    biofuels = Biocarburant.objects.all()
 
     # check rows integrity
     for index, production_base_rows in enumerate([production_max_rows, production_forecast_rows, requested_quota_rows]):
-        tab_name = ["Capacité maximale de production", "Production prévisionelle", "Reconnaissance double comptage"][
-            index
-        ]
+        tab_name = ["Capacité maximale de production", "Production prévisionelle", "Reconnaissance double comptage"][index]
 
         if len(production_base_rows) < 2:
             production_errors.append(
@@ -110,8 +111,8 @@ def load_dc_production_data(
             continue
 
         for req_quota_row in production_base_rows:
-            feedstock = feedstocks.get(req_quota_row["feedstock"], None)
-            biofuel = biofuels.get(req_quota_row["biofuel"], None)
+            feedstock = get_material(req_quota_row["feedstock"], feedstocks)
+            biofuel = get_material(req_quota_row["biofuel"], biofuels)
             errors = check_production_row_integrity(feedstock, biofuel, req_quota_row, tab_name, dca)
             production_errors += errors
 
@@ -127,22 +128,38 @@ def load_dc_production_data(
     # check data consistency from requested_quota
     for req_quota_row in requested_quota_rows:
         year = req_quota_row["year"]
-        feedstock = req_quota_row["feedstock"]
-        biofuel = req_quota_row["biofuel"]
+        feedstock_code = req_quota_row["feedstock"]
+        biofuel_code = req_quota_row["biofuel"]
         requested_quota = req_quota_row["requested_quota"]
 
         production = DoubleCountingProduction(dca=dca)
         production.year = year
-        production.feedstock = feedstocks.get(feedstock, None)
-        production.biofuel = biofuels.get(biofuel, None)
+        production.feedstock = get_material(feedstock_code, feedstocks)
+
+        # check if feedstock is double compting
+        if not production.feedstock.is_double_compte:
+            production_errors.append(
+                error(
+                    DoubleCountingError.FEEDSTOCK_NOT_DOUBLE_COUNTING,
+                    line=req_quota_row["line"],
+                    meta={
+                        "year": year,
+                        "feedstock": feedstock_code,
+                        "biofuel": biofuel_code,
+                        "tab_name": "Reconnaissance double comptage",
+                    },
+                )
+            )
+
+        production.biofuel = get_material(biofuel_code, biofuels)
         production.requested_quota = requested_quota
 
         # set estimated_production
         for prod_forecast_row in production_forecast_rows:
             if (
                 prod_forecast_row["year"] == year
-                and prod_forecast_row["feedstock"] == feedstock
-                and prod_forecast_row["biofuel"] == biofuel
+                and prod_forecast_row["feedstock"] == feedstock_code
+                and prod_forecast_row["biofuel"] == biofuel_code
             ):
                 production.estimated_production = prod_forecast_row["estimated_production"]
                 break
@@ -154,8 +171,8 @@ def load_dc_production_data(
                     line=req_quota_row["line"],
                     meta={
                         "year": year,
-                        "feedstock": feedstock,
-                        "biofuel": biofuel,
+                        "feedstock": feedstock_code,
+                        "biofuel": biofuel_code,
                         "tab_name": "Reconnaissance double comptage",
                     },
                 )
@@ -178,20 +195,28 @@ def load_dc_production_data(
                     line=req_quota_row["line"],
                     meta={
                         "year": year,
-                        "feedstock": feedstock,
-                        "biofuel": biofuel,
+                        "feedstock": feedstock_code,
+                        "biofuel": biofuel_code,
                         "tab_name": tab_name,
                     },
                 )
             )
 
         if len(production_errors) > 0:
-            return production_data, production_errors
+            continue
 
         production_errors += check_production_row(production, req_quota_row)
-        production_data.append(production)
+        if len(production_errors) == 0:
+            production_data.append(production)
 
     return production_data, production_errors
+
+
+def get_material(code, list):
+    try:
+        return list.get(code=code)
+    except:
+        return None
 
 
 def merge_rows(rows, key_to_merge):
@@ -263,9 +288,7 @@ def check_dc_file(file):
             dca, production_max_rows, production_forecast_rows, requested_quota_rows
         )
 
-        global_errors += (
-            check_dc_globally(sourcing_forecast_data, production_data) if len(production_errors) == 0 else []
-        )
+        global_errors += check_dc_globally(sourcing_forecast_data, production_data) if len(production_errors) == 0 else []
 
         return (
             info,
@@ -373,9 +396,9 @@ def send_dca_status_email(dca):
         # PROD
         recipients = [
             r.user.email
-            for r in UserRights.objects.filter(
-                entity=dca.producer, user__is_staff=False, user__is_superuser=False
-            ).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])
+            for r in UserRights.objects.filter(entity=dca.producer, user__is_staff=False, user__is_superuser=False).exclude(
+                role__in=[UserRights.AUDITOR, UserRights.RO]
+            )
         ]
         cc = "carbure@beta.gouv.fr"
     email = EmailMessage(
