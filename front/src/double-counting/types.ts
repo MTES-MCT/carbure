@@ -68,6 +68,19 @@ export interface DoubleCountingProduction {
   approved_quota: number
 }
 
+
+export interface DoubleCountingQuota {
+  approved_quota: number
+  biofuel: Biofuel
+  feedstock: Feedstock
+  id: number
+  lot_count: number
+  production_volume: number
+  quotas_progression: number
+  requested_quota: number
+  year: number
+}
+
 export enum DoubleCountingUploadErrorType {
   UnkownBiofuel = "UNKNOWN_BIOFUEL",
   MissingBiofuel = "MISSING_BIOFUEL",
@@ -142,6 +155,7 @@ export interface DoubleCountingAgreementOverview {
 
 export interface AgreementDetails extends DoubleCountingAgreementOverview {
   application: DoubleCountingApplicationDetails
+  quotas: DoubleCountingQuota[]
 }
 
 export interface QuotaDetails {

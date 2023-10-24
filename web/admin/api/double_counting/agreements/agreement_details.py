@@ -29,65 +29,72 @@ def get_agreement_details(request, *args, **kwargs):
     #     {"status": "success", "data": DoubleCountingRegistrationDetailsSerializer(agreement, many=False).data}
     # )
 
-    result =  DoubleCountingRegistrationDetailsSerializer(agreement, many=False).data
+    result = DoubleCountingRegistrationDetailsSerializer(agreement, many=False).data
     result["quotas"] = get_quotas_info(agreement)
-                              
+
     return SuccessResponse(result)
 
 
-
 def get_quotas_info(agreement: DoubleCountingRegistration):
-
     application = agreement.application
     if not application or application.status != DoubleCountingApplication.ACCEPTED:
         return None
-    # production = get_production_site_double_counting_production(agreement.production_site.id, agreement.valid_from.year)
 
     biofuels = {p.id: p for p in Biocarburant.objects.all()}
     feedstocks = {m.id: m for m in MatierePremiere.objects.filter(is_double_compte=True)}
 
-    #tous les couples BC / MP pour le site de production sur une année
-    detailed_quotas = DoubleCountingProduction.objects.values("biofuel", "feedstock", "approved_quota").filter(dca_id=application.id,approved_quota__gt=0)
- 
-    #tous les lots pour des MP double compté pour le site de production regroupé par couple et par année
+    # tous les couples BC / MP pour le site de production sur une année
+    detailed_quotas = DoubleCountingProduction.objects.values("biofuel", "feedstock", "approved_quota").filter(
+        dca_id=application.id, approved_quota__gt=0
+    )
+
+    # tous les lots pour des MP double compté pour le site de production regroupé par couple et par année
     production_lots = (
         CarbureLot.objects.filter(
             lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN],
             carbure_production_site_id=application.production_site,
         )
-        .values("year", "feedstock", "biofuel")
-        # .values("year", "feedstock", "biofuel", "biofuel__masse_volumique")
-        .filter(feedstock_id__in=feedstocks.keys())
+        .values("year", "feedstock", "biofuel", "biofuel__masse_volumique")
+        .filter(feedstock_id__in=feedstocks.keys(), year__in=[agreement.valid_from.year, agreement.valid_from.year + 1])
         .annotate(production_volume=Sum("volume"), lot_count=Count("id"))
     )
 
     # crée un dataframe pour les quotas par couple et par année
-    # application_data = pd.DataFrame(detailed_quotas.values('biofuel', 'feedstock'))
     quotas_df = pd.DataFrame(detailed_quotas).rename(columns={"biofuel": "biofuel_id", "feedstock": "feedstock_id"})
 
     # crée un dataframe pour le résumé des lots par couple et par année
-    # production_lots_df = pd.DataFrame(production_lots).rename(columns={"feedstock": "feedstock_id", "biofuel": "biofuel_id", "biofuel__masse_volumique": "masse_volumique"})
-    production_lots_df = pd.DataFrame(production_lots).rename(columns={"feedstock": "feedstock_id", "biofuel": "biofuel_id"})
+    production_lots_df = pd.DataFrame(production_lots).rename(
+        columns={"feedstock": "feedstock_id", "biofuel": "biofuel_id", "biofuel__masse_volumique": "masse_volumique"}
+    )
 
+    quotas_df["feedstock"] = quotas_df["feedstock_id"].apply(lambda id: FeedStockSerializer(feedstocks[id]).data)
+    quotas_df["biofuel"] = quotas_df["biofuel_id"].apply(lambda id: BiofuelSerializer(biofuels[id]).data)
 
-
-    #merge les deux dataframes
+    # merge les deux dataframes
     quotas_df.set_index(["biofuel_id", "feedstock_id"], inplace=True)
-    production_lots_df.set_index(["biofuel_id", "feedstock_id"], inplace=True)
 
-    result_df = quotas_df.merge(production_lots_df, how="outer", left_index=True, right_index=True).fillna(0).reset_index()
-    result_df = result_df.loc[result_df['approved_quota'] > 0]
+    if len(production_lots_df) == 0:
+        quotas_df["lot_count"] = 0
+        quotas_df["production_volume"] = 0
+    else:
+        production_lots_df.set_index(["biofuel_id", "feedstock_id"], inplace=True)
+        quotas_df = (
+            quotas_df.merge(production_lots_df, how="outer", left_index=True, right_index=True).fillna(0).reset_index()
+        )
 
-    result_df["feedstock"] = result_df["feedstock_id"].apply(lambda id: FeedStockSerializer(feedstocks[id]).data)
-    result_df["biofuel"] = result_df["biofuel_id"].apply(lambda id: BiofuelSerializer(biofuels[id]).data)
-    result_df["quotas_progress"] = round(result_df["production_volume"] / result_df["approved_quota"],2)
-    # result_df["current_production_weight_sum_tonnes"] = (res["volume"] * res["masse_volumique"] / 1000).apply(
-    #     lambda x: round(x, 2)
-    # )
+        quotas_df = quotas_df.loc[quotas_df["approved_quota"] > 0]
 
+        quotas_df["production_volume"] = round((quotas_df["production_volume"] * quotas_df["masse_volumique"] / 1000))
+        quotas_df["quotas_progression"] = round(quotas_df["production_volume"] / quotas_df["approved_quota"], 2)
 
+        del quotas_df["masse_volumique"]
 
-    return result_df.to_dict("records")
+    print("result_df: ", quotas_df)
+
+    del quotas_df["feedstock_id"]
+    del quotas_df["biofuel_id"]
+    # print("result_df: ", quotas_df.to_dict("records"))
+    return quotas_df.to_dict("records")
 
 
 def get_production_site_double_counting_production(production_site_id, first_year):
