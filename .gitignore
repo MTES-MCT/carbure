@@ -150,3 +150,6 @@ files
 # Script generated files
 integrity_checks.json
 sanity_checks.json
+
+# udb downloaded files
+udb/downloads
