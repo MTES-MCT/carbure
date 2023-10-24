@@ -4,4 +4,5 @@
 sh ./domibus_properties.sh
 mv ./domibus.properties ./domibus/conf/domibus/domibus.properties
 
-bash ./domibus/bin/catalina.sh run
+bash ./domibus/bin/catalina.sh run .
+# bash ./domibus/bin/startup.sh
