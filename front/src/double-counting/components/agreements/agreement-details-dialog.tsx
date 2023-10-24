@@ -15,6 +15,12 @@ import { AgreementDetails, DoubleCountingStatus } from "../../types"
 import AgreementStatusTag from "./agreement-status"
 import { ApplicationDownloadButton } from "../applications/application-download-button"
 import ApplicationTabs from "../applications/application-tabs"
+import { QuotasTable } from "../quotas-table"
+import { useState } from "react"
+import { compact } from "common/utils/collection"
+import { SourcingFullTable } from "../sourcing-table"
+import { ProductionTable } from "../production-table"
+import Tabs from "common/components/tabs"
 
 
 export const AgreementDetailsDialog = () => {
@@ -30,8 +36,7 @@ export const AgreementDetailsDialog = () => {
   })
 
   const agreement: AgreementDetails | undefined = applicationResponse.result?.data.data
-  console.log('agreement:', agreement)
-
+  console.log('quotas:', agreement?.quotas)
 
   const application = agreement?.application
 
@@ -80,8 +85,9 @@ export const AgreementDetailsDialog = () => {
 
             </section>
           }
+
           {application && application.status === DoubleCountingStatus.Accepted && <>
-            <ApplicationTabs sourcing={application.sourcing} production={application.production} hasAgreement={true} />
+            <AgreementTabs agreement={agreement} />
           </>
           }
         </main>
@@ -102,4 +108,61 @@ export const AgreementDetailsDialog = () => {
   )
 }
 
+const AgreementTabs = ({ agreement }: { agreement: AgreementDetails }) => {
+  const [focus, setFocus] = useState("quotas")
+  const { t } = useTranslation()
 
+  return <>
+    <section>
+      <Tabs
+        variant="switcher"
+        tabs={compact([
+
+          {
+            key: "quotas",
+            label: t("Quotas"),
+          },
+          {
+            key: "sourcing_forecast",
+            label: t("Approvisionnement"),
+          },
+          {
+            key: "production",
+            label: t("Production"),
+          }
+
+        ])}
+        focus={focus}
+        onFocus={setFocus}
+      />
+
+    </section>
+
+    {focus === "quotas" &&
+      <section>
+        <QuotasTable
+          quotas={agreement.quotas}
+        />
+      </section>
+    }
+
+    {focus === "sourcing_forecast" &&
+      <section>
+        <SourcingFullTable
+          sourcing={agreement.application.sourcing ?? []}
+        />
+      </section>
+    }
+
+
+    {focus === "production" &&
+      <section>
+        <ProductionTable
+          production={agreement.application.production ?? []}
+
+          hasAgreement={true}
+        />
+      </section>
+    }
+  </>
+}

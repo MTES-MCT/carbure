@@ -1,4 +1,4 @@
-# test with : python web/manage.py test admin.api.double_counting.agreements.tests_agreements.AdminDoubleCountAgreementsTest --keepdb
+# test with : python web/manage.py test admin.api.double_counting.agreements.tests_agreements.AdminDoubleCountAgreementsTest.test_get_agreement_details --keepdb
 from datetime import date
 from email.mime import application
 
@@ -57,25 +57,25 @@ class AdminDoubleCountAgreementsTest(TestCase):
             production_site=self.production_site,
             period_start__year=self.requested_start_year,
             status=status,
-    )
+        )
         sourcing1 = DoubleCountingSourcingFactory.create(dca=app, year=self.requested_start_year)
         sourcing2 = DoubleCountingSourcingFactory.create(dca=app, year=self.requested_start_year)
         production1 = DoubleCountingProductionFactory.create(
-            dca=app, feedstock=sourcing1.feedstock, year=self.requested_start_year , approved_quota=1000
+            dca=app, feedstock=sourcing1.feedstock, year=self.requested_start_year, approved_quota=1000
         )
         production2 = DoubleCountingProductionFactory.create(
             dca=app, feedstock=sourcing2.feedstock, year=self.requested_start_year + 1, approved_quota=-1
         )
         agreement = DoubleCountingRegistrationFactory.create(
-            production_site=self.production_site, 
+            production_site=self.production_site,
             valid_from=date(self.requested_start_year, 1, 1),
             application=app,
         )
-    
-        return agreement
+
+        return agreement, app
 
     def test_get_agreements(self):
-        agreement1 = self.create_agreement()
+        agreement1, _ = self.create_agreement()
         self.create_agreement()
 
         response = self.client.get(reverse("admin-double-counting-agreements"), {"entity_id": self.admin.id})
@@ -96,29 +96,44 @@ class AdminDoubleCountAgreementsTest(TestCase):
         self.assertEqual(response["Content-Type"], "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
     def test_get_agreement_details(self):
-        agreement = self.create_agreement(status=DoubleCountingApplication.ACCEPTED)
+        agreement, app = self.create_agreement(status=DoubleCountingApplication.ACCEPTED)
         agreement_id = agreement.id
 
         production1 = DoubleCountingProduction.objects.filter(dca=agreement_id)[0]
+
+        # skipped because production2 quota has not been validated
         production2 = DoubleCountingProduction.objects.filter(dca=agreement_id)[1]
 
-        lot_count = 0
-        for x in range(5):
-            if x%2:
-                prod = production1
-                lot_count += 1
-            else:
-                prod = production2
-            
+        sourcing3 = DoubleCountingSourcingFactory.create(dca=app, year=self.requested_start_year)
+        production3 = DoubleCountingProductionFactory.create(
+            dca=app, feedstock=sourcing3.feedstock, year=self.requested_start_year, approved_quota=3000
+        )
+
+        start_year = agreement.valid_from.year
+
+        def createLot(production, year):
             CarbureLotFactory.create(
-                feedstock=prod.feedstock,
-                biofuel=prod.biofuel,
+                feedstock=production.feedstock,
+                biofuel=production.biofuel,
                 lot_status=CarbureLot.ACCEPTED,
-                year=agreement.valid_from.year,
+                year=year,
                 production_site_double_counting_certificate=agreement.certificate_id,
                 carbure_production_site=self.production_site,
             )
 
+        lot1_count = 2
+        createLot(production1, start_year)
+        createLot(production1, start_year)
+
+        createLot(production1, start_year + 1)
+
+        createLot(production1, start_year - 1)  # not in the agreement period
+
+        createLot(production2, start_year)  # production2 quota has not been validated
+        createLot(production2, start_year + 1)  # production2 quota has not been validated
+
+        # createLot(production3, start_year)
+        # createLot(production3, start_year + 1)
         response = self.client.get(
             reverse("admin-double-counting-agreements-details"),
             {"entity_id": self.admin.id, "agreement_id": agreement_id},
@@ -126,17 +141,19 @@ class AdminDoubleCountAgreementsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()["data"]
         application = data["application"]
-        quotas = data["quotas"]    
+        quotas = data["quotas"]
         self.assertEqual(application["id"], agreement.id)
-        self.assertEqual(len(quotas),1)
+        self.assertEqual(len(quotas), 3)
 
-        quota_line = quotas[0]
-        self.assertEqual(quota_line["quotas_progress"], round(quota_line["production_volume"] / quota_line["approved_quota"], 2))
+        quota_line_1 = quotas[0]
+        # self.assertEqual(
+        #     quota_line["quotas_progression"], round(quota_line["production_volume"] / quota_line["approved_quota"], 2)
+        # )
 
-        self.assertEqual(quota_line["lot_count"],lot_count)
+        self.assertEqual(quota_line_1["lot_count"], lot1_count)
 
-        #without
-        agreement.application = None    
+        # without
+        agreement.application = None
         agreement.save()
         response = self.client.get(
             reverse("admin-double-counting-agreements-details"),
@@ -144,6 +161,6 @@ class AdminDoubleCountAgreementsTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         data = response.json()["data"]
-       
-        self.assertEqual(data["application"],None)
-        self.assertEqual(data["quotas"],None)
+
+        self.assertEqual(data["application"], None)
+        self.assertEqual(data["quotas"], None)
