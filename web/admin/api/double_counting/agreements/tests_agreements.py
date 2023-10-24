@@ -132,8 +132,6 @@ class AdminDoubleCountAgreementsTest(TestCase):
         createLot(production2, start_year)  # production2 quota has not been validated
         createLot(production2, start_year + 1)  # production2 quota has not been validated
 
-        # createLot(production3, start_year)
-        # createLot(production3, start_year + 1)
         response = self.client.get(
             reverse("admin-double-counting-agreements-details"),
             {"entity_id": self.admin.id, "agreement_id": agreement_id},

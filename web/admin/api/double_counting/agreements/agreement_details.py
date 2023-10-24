@@ -44,9 +44,10 @@ def get_quotas_info(agreement: DoubleCountingRegistration):
     feedstocks = {m.id: m for m in MatierePremiere.objects.filter(is_double_compte=True)}
 
     # tous les couples BC / MP pour le site de production sur une année
-    detailed_quotas = DoubleCountingProduction.objects.values("biofuel", "feedstock", "approved_quota").filter(
+    detailed_quotas = DoubleCountingProduction.objects.values("biofuel", "feedstock", "approved_quota", "year").filter(
         dca_id=application.id, approved_quota__gt=0
     )
+    print("detailed_quotas: ", detailed_quotas)
 
     # tous les lots pour des MP double compté pour le site de production regroupé par couple et par année
     production_lots = (
@@ -67,29 +68,25 @@ def get_quotas_info(agreement: DoubleCountingRegistration):
         columns={"feedstock": "feedstock_id", "biofuel": "biofuel_id", "biofuel__masse_volumique": "masse_volumique"}
     )
 
-    quotas_df["feedstock"] = quotas_df["feedstock_id"].apply(lambda id: FeedStockSerializer(feedstocks[id]).data)
-    quotas_df["biofuel"] = quotas_df["biofuel_id"].apply(lambda id: BiofuelSerializer(biofuels[id]).data)
-
     # merge les deux dataframes
-    quotas_df.set_index(["biofuel_id", "feedstock_id"], inplace=True)
+    quotas_df.set_index(["biofuel_id", "feedstock_id", "year"], inplace=True)
 
     if len(production_lots_df) == 0:
         quotas_df["lot_count"] = 0
         quotas_df["production_volume"] = 0
     else:
-        production_lots_df.set_index(["biofuel_id", "feedstock_id"], inplace=True)
+        production_lots_df.set_index(["biofuel_id", "feedstock_id", "year"], inplace=True)
         quotas_df = (
             quotas_df.merge(production_lots_df, how="outer", left_index=True, right_index=True).fillna(0).reset_index()
         )
-
         quotas_df = quotas_df.loc[quotas_df["approved_quota"] > 0]
-
         quotas_df["production_volume"] = round((quotas_df["production_volume"] * quotas_df["masse_volumique"] / 1000))
         quotas_df["quotas_progression"] = round(quotas_df["production_volume"] / quotas_df["approved_quota"], 2)
-
         del quotas_df["masse_volumique"]
 
     print("result_df: ", quotas_df)
+    quotas_df["feedstock"] = quotas_df["feedstock_id"].apply(lambda id: FeedStockSerializer(feedstocks[id]).data)
+    quotas_df["biofuel"] = quotas_df["biofuel_id"].apply(lambda id: BiofuelSerializer(biofuels[id]).data)
 
     del quotas_df["feedstock_id"]
     del quotas_df["biofuel_id"]
