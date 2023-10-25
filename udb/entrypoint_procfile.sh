@@ -9,7 +9,7 @@ sh ./domibus_properties.sh
 mv ./domibus.properties ./domibus/conf/domibus/domibus.properties
 
 # set the port of the server
-sed -i 's/port="8080"/port="80"/' ./domibus/conf/server.xml
+sed -i "s/port=\"8080\"/port=\"$PORT\"/" ./domibus/conf/server.xml
 
 # add the setenv.sh file
 mv setenv.sh ./domibus/bin/setenv.sh
