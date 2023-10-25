@@ -2,7 +2,7 @@
 # Download domibus binary and run config
 
 # download and decompress domibus
-sh ./download_domibus.sh
+# sh ./download_domibus.sh
 
 # bind properties file with env vars and move it to domibus
 sh ./domibus_properties.sh
