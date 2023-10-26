@@ -60,10 +60,10 @@ class AdminDoubleCountAgreementsTest(TestCase):
         )
         sourcing1 = DoubleCountingSourcingFactory.create(dca=app, year=self.requested_start_year)
         sourcing2 = DoubleCountingSourcingFactory.create(dca=app, year=self.requested_start_year)
-        production1 = DoubleCountingProductionFactory.create(
+        DoubleCountingProductionFactory.create(
             dca=app, feedstock=sourcing1.feedstock, year=self.requested_start_year, approved_quota=1000
         )
-        production2 = DoubleCountingProductionFactory.create(
+        DoubleCountingProductionFactory.create(
             dca=app, feedstock=sourcing2.feedstock, year=self.requested_start_year + 1, approved_quota=-1
         )
         agreement = DoubleCountingRegistrationFactory.create(
@@ -85,7 +85,7 @@ class AdminDoubleCountAgreementsTest(TestCase):
         self.assertEqual(active_agreements[0]["certificate_id"], agreement1.certificate_id)
         self.assertEqual(len(active_agreements), 2)
 
-    def test_export_agreements(self):
+    def test_get_agreements_excel(self):
         self.create_agreement()
 
         # test that the response is an excel file
@@ -99,20 +99,20 @@ class AdminDoubleCountAgreementsTest(TestCase):
         agreement, app = self.create_agreement(status=DoubleCountingApplication.ACCEPTED)
         agreement_id = agreement.id
 
-        production1 = DoubleCountingProduction.objects.filter(dca=agreement_id)[0]
+        production1 = DoubleCountingProduction.objects.filter(dca=agreement_id)[0]  # YEAR
 
-        # skipped because production2 quota has not been validated
-        production2 = DoubleCountingProduction.objects.filter(dca=agreement_id)[1]
+        # production2 skipped because quota has not been validated
+        production2 = DoubleCountingProduction.objects.filter(dca=agreement_id)[1]  # YEAR +1
 
         sourcing3 = DoubleCountingSourcingFactory.create(dca=app, year=self.requested_start_year)
-        production3 = DoubleCountingProductionFactory.create(
+        production3 = DoubleCountingProductionFactory.create(  # YEAR
             dca=app, feedstock=sourcing3.feedstock, year=self.requested_start_year, approved_quota=3000
         )
 
         start_year = agreement.valid_from.year
 
-        def createLot(production, year):
-            CarbureLotFactory.create(
+        def createLot(production, year) -> CarbureLot:
+            return CarbureLotFactory.create(
                 feedstock=production.feedstock,
                 biofuel=production.biofuel,
                 lot_status=CarbureLot.ACCEPTED,
@@ -121,14 +121,15 @@ class AdminDoubleCountAgreementsTest(TestCase):
                 carbure_production_site=self.production_site,
             )
 
-        lot1_count = 2
-        createLot(production1, start_year)
-        createLot(production1, start_year)
+        lot_prod1_count = 2
+        lot1 = createLot(production1, start_year)
+        lot2 = createLot(production1, start_year)
 
         createLot(production1, start_year + 1)
 
         createLot(production1, start_year - 1)  # not in the agreement period
 
+        # production 2 skipped because quota has not been validated
         createLot(production2, start_year)  # production2 quota has not been validated
         createLot(production2, start_year + 1)  # production2 quota has not been validated
 
@@ -141,14 +142,16 @@ class AdminDoubleCountAgreementsTest(TestCase):
         application = data["application"]
         quotas = data["quotas"]
         self.assertEqual(application["id"], agreement.id)
-        self.assertEqual(len(quotas), 3)
+        self.assertEqual(len(quotas), 2)  # production 1 +production 3
 
-        quota_line_1 = quotas[0]
-        # self.assertEqual(
-        #     quota_line["quotas_progression"], round(quota_line["production_volume"] / quota_line["approved_quota"], 2)
-        # )
+        quota_line_2 = quotas[0]
+        self.assertEqual(quota_line_2["year"], start_year)
+        self.assertEqual(quota_line_2["feedstock"]["name"], lot2.feedstock.name)
 
-        self.assertEqual(quota_line_1["lot_count"], lot1_count)
+        prod1_tonnes = (lot1.weight + lot2.weight) / 1000
+
+        self.assertEqual(quota_line_2["production_tonnes"], round(prod1_tonnes))
+        self.assertEqual(quota_line_2["lot_count"], lot_prod1_count)
 
         # without
         agreement.application = None

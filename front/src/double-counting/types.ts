@@ -75,7 +75,7 @@ export interface DoubleCountingQuota {
   feedstock: Feedstock
   id: number
   lot_count: number
-  production_volume: number
+  production_tonnes: number
   quotas_progression: number
   requested_quota: number
   year: number

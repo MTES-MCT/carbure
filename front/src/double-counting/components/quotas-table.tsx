@@ -34,7 +34,7 @@ export const QuotasTable = ({
     },
     {
       header: t("Volume produit"),
-      cell: (p) => <Cell text={formatNumber(p.production_volume)} />,
+      cell: (p) => <Cell text={formatNumber(p.production_tonnes)} />,
     },
     {
       header: t("Progression"),
