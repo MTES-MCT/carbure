@@ -143,12 +143,6 @@ def add_application(request, *args, **kwargs):
         production.save()
 
     try:
-        upload_file(dca, file)
-    except:
-        print("upload error")
-        traceback.print_exc()
-
-    try:
         send_dca_confirmation_email(dca)
     except:
         print("email send error")

@@ -5,7 +5,8 @@ import { DoubleCountingProduction, DoubleCountingSourcing } from "double-countin
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { ProductionSiteForm } from "settings/components/production-site-dialog"
-import { ProductionTable, SourcingFullTable } from "../dc-tables"
+import { SourcingFullTable } from "../sourcing-table"
+import { ProductionTable } from "../production-table"
 
 
 
