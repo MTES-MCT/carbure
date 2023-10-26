@@ -10,7 +10,8 @@ import { useTranslation } from "react-i18next"
 import { getErrorText } from "settings/utils/double-counting"
 import { DoubleCountingFileInfo, DoubleCountingUploadError } from "../../types"
 import FileApplicationInfo from "./file-application-info"
-import { ProductionTable, SourcingFullTable } from "../dc-tables"
+import { SourcingFullTable } from "../sourcing-table"
+import { ProductionTable } from "../production-table"
 
 export type ErrorsDetailsDialogProps = {
   fileData: DoubleCountingFileInfo

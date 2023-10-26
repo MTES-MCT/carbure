@@ -10,7 +10,7 @@ import { useMutation, useQuery } from "common/hooks/async"
 import { compact } from "common/utils/collection"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import ApplicationStatus from "double-counting/components/applications/application-status"
-import { SourcingAggregationTable } from "double-counting/components/dc-tables"
+import { SourcingAggregationTable } from "double-counting/components/sourcing-table"
 import YearTable from "double-counting/components/year-table"
 import {
   DoubleCountingProduction,
