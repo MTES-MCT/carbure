@@ -122,6 +122,12 @@ export function getErrorText(
         { feedstock: t(error.meta?.feedstock, { ns: "feedstocks" }) }
       )
       break
+    case DoubleCountingUploadErrorType.UnknownCountryOfOrigin:
+      errorText += t(
+        "Le pays d'origine de la matière première {{feedstock}} n'est pas reconnue. Merci de verifier la syntaxe dans la liste des pays d'origine qui est incluse dans le fichier excel",
+        { feedstock: t(error.meta?.feedstock, { ns: "feedstocks" }) }
+      )
+      break
 
     default:
       errorText +=

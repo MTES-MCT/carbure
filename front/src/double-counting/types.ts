@@ -68,6 +68,19 @@ export interface DoubleCountingProduction {
   approved_quota: number
 }
 
+
+export interface DoubleCountingQuota {
+  approved_quota: number
+  biofuel: Biofuel
+  feedstock: Feedstock
+  id: number
+  lot_count: number
+  production_tonnes: number
+  quotas_progression: number
+  requested_quota: number
+  year: number
+}
+
 export enum DoubleCountingUploadErrorType {
   UnkownBiofuel = "UNKNOWN_BIOFUEL",
   MissingBiofuel = "MISSING_BIOFUEL",
@@ -84,6 +97,7 @@ export enum DoubleCountingUploadErrorType {
   InvalidYear = "INVALID_YEAR",
   BadWorksheetName = "BAD_WORKSHEET_NAME",
   MissingCountryOfOrigin = "MISSING_COUNTRY_OF_ORIGIN",
+  UnknownCountryOfOrigin = "UNKNOWN_COUNTRY_OF_ORIGIN",
 }
 
 export interface DoubleCountingUploadError {
@@ -142,6 +156,7 @@ export interface DoubleCountingAgreementOverview {
 
 export interface AgreementDetails extends DoubleCountingAgreementOverview {
   application: DoubleCountingApplicationDetails
+  quotas: DoubleCountingQuota[]
 }
 
 export interface QuotaDetails {
