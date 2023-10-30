@@ -41,9 +41,24 @@ def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[So
     countries = Pays.objects.all()
 
     for row in sourcing_rows:
+        line = row["line"]
+        meta = {"year": row["year"]}
         metric_tonnes = row["metric_tonnes"]
+
         if not metric_tonnes:
             continue
+
+        errors = check_sourcing_row(row)
+        if len(errors) > 0:
+            sourcing_errors += errors
+            continue
+
+        # CREATE SOURCING
+        sourcing = DoubleCountingSourcing(dca=dca)
+        sourcing.year = row["year"]
+        sourcing.metric_tonnes = row["metric_tonnes"]
+
+        # Feedstock
         try:
             feedstock = feedstocks.get(code=row["feedstock"].strip()) if row["feedstock"] else None
         except:
@@ -51,37 +66,47 @@ def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[So
 
         if feedstock and not feedstock.is_double_compte:
             continue
-
-        try:
-            origin_country = countries.get(code_pays=row["origin_country"].strip()) if row["origin_country"] else None
-        except:
-            origin_country = None
-
-        try:
-            supply_country = countries.get(code_pays=row["supply_country"].strip()) if row["supply_country"] else None
-        except:
-            supply_country = None
-
-        try:
-            transit_country = countries.get(code_pays=row["transit_country"].strip()) if row["transit_country"] else None
-        except:
-            transit_country = None
-
-        sourcing = DoubleCountingSourcing(dca=dca)
-        sourcing.year = row["year"]
         if feedstock:
             sourcing.feedstock = feedstock
+
+        # Origin country
+        origin_country = get_country(row["origin_country"], countries)
         if origin_country:
             sourcing.origin_country = origin_country
-        sourcing.supply_country = supply_country
-        sourcing.transit_country = transit_country
-        sourcing.metric_tonnes = row["metric_tonnes"]
-        errors = check_sourcing_row(row)
+        else:
+            errors.append(
+                error(
+                    DoubleCountingError.UNKNOWN_COUNTRY_OF_ORIGIN,
+                    line=line,
+                    meta=meta,
+                )
+            )
+
+        sourcing.supply_country = get_country(row["supply_country"], countries)
+        sourcing.transit_country = get_country(row["transit_country"], countries)
+
         sourcing_errors += errors
         if len(errors) == 0:
             sourcing_data.append(sourcing)
 
     return sourcing_data, sourcing_errors
+
+
+def get_country(string, countries):
+    if not string:
+        return None
+
+    country_string = string.strip()
+    try:
+        country = countries.get(code_pays=country_string)
+    except:
+        country = None
+        try:
+            country = countries.get(name=country_string)
+        except:
+            country = None
+
+    return country
 
 
 def load_dc_production_data(
