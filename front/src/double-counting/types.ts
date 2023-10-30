@@ -97,6 +97,7 @@ export enum DoubleCountingUploadErrorType {
   InvalidYear = "INVALID_YEAR",
   BadWorksheetName = "BAD_WORKSHEET_NAME",
   MissingCountryOfOrigin = "MISSING_COUNTRY_OF_ORIGIN",
+  UnknownCountryOfOrigin = "UNKNOWN_COUNTRY_OF_ORIGIN",
 }
 
 export interface DoubleCountingUploadError {

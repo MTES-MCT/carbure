@@ -74,9 +74,7 @@ class DoubleCountingSourcing(models.Model):
     year = models.IntegerField(blank=False, null=False)
     feedstock = models.ForeignKey(MatierePremiere, on_delete=models.CASCADE)
     origin_country = models.ForeignKey(Pays, on_delete=models.CASCADE, related_name="origin_country")
-    supply_country = models.ForeignKey(
-        Pays, blank=True, null=True, on_delete=models.CASCADE, related_name="supply_country"
-    )
+    supply_country = models.ForeignKey(Pays, blank=True, null=True, on_delete=models.CASCADE, related_name="supply_country")
     transit_country = models.ForeignKey(
         Pays, blank=True, null=True, on_delete=models.CASCADE, related_name="transit_country"
     )
