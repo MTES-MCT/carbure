@@ -63,6 +63,6 @@ def parse_sourcing_forecast(excel_file: Workbook, start_year: int) -> List[Sourc
 
 def extract_country_code(country_str: str) -> str | None:
     if country_str:
-        return (country_str or "").split("-")[0].strip()
+        return (country_str or "").split(" - ")[0].strip()
     else:
         return None

@@ -1,4 +1,4 @@
-# test with : python web/manage.py test doublecount.api.application.tests_application.DoubleCountApplicationTest.test_valid_file --keepdb
+# test with : python web/manage.py test doublecount.api.application.tests_application.DoubleCountApplicationTest.test_sourcing_row --keepdb
 from math import prod
 import os
 from core.tests_utils import setup_current_user
@@ -98,12 +98,12 @@ class DoubleCountApplicationTest(TestCase):
         file_data = data["file"]
 
         error_count = file_data["error_count"]
-        self.assertEqual(error_count, 3)
+        self.assertEqual(error_count, 4)
         errors = file_data["errors"]
 
         # sourcing
         sourcing_errors = errors["sourcing_forecast"]
-        self.assertEqual(len(sourcing_errors), 2)
+        self.assertEqual(len(sourcing_errors), 3)
 
         error1 = sourcing_errors[0]
         self.assertEqual(error1["error"], DoubleCountingError.MISSING_FEEDSTOCK)
@@ -112,6 +112,10 @@ class DoubleCountApplicationTest(TestCase):
         error2 = sourcing_errors[1]
         self.assertEqual(error2["error"], DoubleCountingError.MISSING_COUNTRY_OF_ORIGIN)
         self.assertEqual(error2["line_number"], 12)
+
+        error3 = sourcing_errors[2]
+        self.assertEqual(error3["error"], DoubleCountingError.UNKNOWN_COUNTRY_OF_ORIGIN)
+        self.assertEqual(error3["line_number"], 15)
 
         # global
         prod_errors = errors["production"]
