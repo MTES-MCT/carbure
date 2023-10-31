@@ -6,14 +6,23 @@
 - Construire le nouveau container docker pour `blue` : `docker-compose build carbure-udb-blue`
 - Répéter pour `red` : `docker-compose build carbure-udb-red`
 - Redémarrer l'env docker : `docker-compose down && docker-compose up -d`
-- Lancer les migrations sur la db pour `blue`: `docker exec -it carbure_udb_blue bash migrate.sh`
-- Répéter pour `red` : `docker exec -it carbure_udb_red bash migrate.sh`
-- Redémarrer le container domibus: `docker-compose restart carbure-udb-blue carbure-udb-red`
+- Installer la configuration d'exemple `docker exec -it carbure_udb_blue bash setup/install_domibus_sample.sh`
+- Répéter pour red : `docker exec -it carbure_udb_red bash setup/install_domibus_sample.sh`
+- Lancer les migrations sur la db pour `blue`: `docker exec -it carbure_udb_blue bash database/domibus_migration.sh`
+- Répéter pour `red` : `docker exec -it carbure_udb_red bash database/domibus_migration.sh`
+- Redémarrer les containers domibus: `docker-compose restart carbure-udb-blue carbure-udb-red`
 - Aller dans les logs de `carbure-udb-blue` et `carbure-udb-red` et trouver la ligne mentionnant "Default password for user [admin] is ***"
 - Dans un navigateur, aller sur la page `http://localhost:8080/domibus` pour `blue` (ou `http://localhost:8081/domibus` pour `red`) et utiliser le mot de passe obtenu avec le username `admin`
-- On vous invitera à changer de mot de passe
-- Pour `red` et `blue` aller dans leur console d'administration Menu 'PMode' et uploader les fichiers `domibus-gw-sample-pmode-*.xml` correspondants.
+- Domibus vous invite à changer de mot de passe
+- Pour `red` et `blue` aller dans leur console d'administration Menu 'PMode' et uploader les fichiers `domibus-gw-sample-pmode-*.xml` obtenus après l'exécution de `install_domibus_sample.sh`.
 
+# Builpack pour Scalingo
+
+Pour pouvoir installer Domibus sur Scalingo, un buildpack spécial a été créé, disponible à l'adresse [https://github.com/jfalxa/carbure-domibus-buildpack]().
+
+Il n'est malheureusement pas possible d'enregistrer le buildpack directement à l'intérieur du monorepo Carbure, Scalingo n'étant pas capable d'utiliser un sous-dossier comme buildpack.
+
+Ce buildpack réalise des opérations similaires à ce qui se passe lors de la création de l'image Docker utilisée en dev local, c'est à dire télécharger la dernière version de Domibus et préparer les fichiers pour pouvoir lancer le serveur.
 
 # Préparation de la base de données pour scalingo
 
