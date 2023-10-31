@@ -101,6 +101,7 @@ services:
     build:
       context: ./udb
     environment:
+      DOMIBUS_PATH: /app/domibus
       DOMIBUS_DATABASE_SCHEMA: domibus_blue
       DOMIBUS_DATASOURCE_USER: user_blue
       DOMIBUS_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
@@ -128,6 +129,7 @@ services:
     build:
       context: ./udb
     environment:
+      DOMIBUS_PATH: /app/domibus
       DOMIBUS_DATABASE_SCHEMA: domibus_red
       DOMIBUS_DATASOURCE_USER: user_red
       DOMIBUS_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
