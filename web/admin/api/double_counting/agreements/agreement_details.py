@@ -79,7 +79,7 @@ def get_quotas_info(agreement: DoubleCountingRegistration):
         )
         quotas_df = quotas_df.loc[quotas_df["approved_quota"] > 0]
         quotas_df["production_tonnes"] = round(quotas_df["production_kg"] / 1000)
-        quotas_df["quotas_progression"] = round((quotas_df["production_tonnes"] / quotas_df["approved_quota"]) * 100, 2)
+        quotas_df["quotas_progression"] = round((quotas_df["production_tonnes"] / quotas_df["approved_quota"]), 2)
 
     quotas_df["feedstock"] = quotas_df["feedstock_id"].apply(lambda id: FeedStockSerializer(feedstocks[id]).data)
     quotas_df["biofuel"] = quotas_df["biofuel_id"].apply(lambda id: BiofuelSerializer(biofuels[id]).data)

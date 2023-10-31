@@ -26,7 +26,7 @@ export const QuotasTable = ({
     },
     {
       header: t("Quota approuvé"),
-      cell: (p) => <Cell text={formatNumber(p.approved_quota ?? 0)} />,
+      cell: (p) => <Cell text={formatNumber(p.approved_quota ?? 0) + "t"} />,
     },
     {
       header: t("Nombre de lots"),
@@ -34,11 +34,11 @@ export const QuotasTable = ({
     },
     {
       header: t("Volume produit"),
-      cell: (p) => <Cell text={formatNumber(p.production_tonnes)} />,
+      cell: (p) => <Cell text={formatNumber(p.production_tonnes) + "t"} />,
     },
     {
       header: t("Progression"),
-      cell: (p) => <Cell text={Math.round(p.quotas_progression) + "%"} />,
+      cell: (p) => <Cell text={Math.round(p.quotas_progression * 100) + "%"} />,
     }
   ]
 
