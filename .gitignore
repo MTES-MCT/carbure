@@ -153,3 +153,5 @@ sanity_checks.json
 
 # udb downloaded files
 udb/downloads
+udb/domibus
+udb/sql-scripts

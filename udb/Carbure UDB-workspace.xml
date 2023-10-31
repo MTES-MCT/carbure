@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<con:soapui-workspace name="Carbure UDB" soapui-version="5.7.0" xmlns:con="http://eviware.com/soapui/config">
-  <con:settings/>
-  <con:project name="AS4_test_guide">/Users/falxa/Dev/la-fabrique-numerique/carbure/udb/AS4-test-guide-soapui-project.xml</con:project>
-</con:soapui-workspace>
