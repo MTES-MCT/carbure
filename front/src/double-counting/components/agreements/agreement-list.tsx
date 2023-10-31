@@ -15,6 +15,7 @@ import * as api from "../../api"
 import { DoubleCountingAgreementOverview, DoubleCountingAgreementsSnapshot } from "../../types"
 import { AgreementDetailsDialog } from "./agreement-details-dialog"
 import AgreementStatusTag from "./agreement-status"
+import { compact } from "common/utils/collection"
 
 
 const AgreementList = ({ snapshot = defaultCount }: { snapshot: DoubleCountingAgreementsSnapshot | undefined }) => {
@@ -24,6 +25,7 @@ const AgreementList = ({ snapshot = defaultCount }: { snapshot: DoubleCountingAg
   const navigate = useNavigate()
   const location = useLocation()
   const [order, setOrder] = useState<Order | undefined>(undefined)
+  const currentYear = new Date().getFullYear()
 
   const agreementsResponse = useQuery(api.getDoubleCountingAgreementList, {
     key: "dc-agreements",
@@ -31,7 +33,7 @@ const AgreementList = ({ snapshot = defaultCount }: { snapshot: DoubleCountingAg
   })
 
 
-  const columns: Column<DoubleCountingAgreementOverview>[] = [
+  const columns: Column<DoubleCountingAgreementOverview>[] = compact([
     {
       header: t("Statut"),
       cell: (a) => <AgreementStatusTag status={a.status} />,
@@ -55,8 +57,11 @@ const AgreementList = ({ snapshot = defaultCount }: { snapshot: DoubleCountingAg
       key: "valid_until",
       cell: (a) => <Cell text={`${formatDateYear(a.valid_from)}-${formatDateYear(a.valid_until)}`} />,
     },
-
-  ]
+    tab === "active" && {
+      header: t("Quotas") + " " + currentYear,
+      cell: (a) => <Cell text={`${Math.round(a.quotas_progression * 100)} %`} />,
+    }
+  ])
 
   function showApplicationDialog(agreement: DoubleCountingAgreementOverview) {
     navigate({

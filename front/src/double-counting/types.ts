@@ -152,6 +152,7 @@ export interface DoubleCountingAgreementOverview {
   valid_from: Date
   valid_until: Date
   status: AgreementStatus
+  quotas_progression: number
 }
 
 export interface AgreementDetails extends DoubleCountingAgreementOverview {
