@@ -51,7 +51,7 @@ class AdminDoubleCountAgreementsTest(TestCase):
         self.production_site.save()
         self.requested_start_year = 2023
 
-    def create_agreement(self, status=DoubleCountingApplication.PENDING):
+    def create_agreement(self, status=DoubleCountingApplication.ACCEPTED):
         app = DoubleCountingApplicationFactory.create(
             producer=self.production_site.producer,
             production_site=self.production_site,
@@ -60,21 +60,27 @@ class AdminDoubleCountAgreementsTest(TestCase):
         )
         sourcing1 = DoubleCountingSourcingFactory.create(dca=app, year=self.requested_start_year)
         sourcing2 = DoubleCountingSourcingFactory.create(dca=app, year=self.requested_start_year)
+        sourcing3 = DoubleCountingSourcingFactory.create(dca=app, year=self.requested_start_year)
+
         prod1 = DoubleCountingProductionFactory.create(
-            dca=app, feedstock=sourcing1.feedstock, year=self.requested_start_year, approved_quota=1000
+            dca=app, feedstock=sourcing1.feedstock, year=self.requested_start_year, approved_quota=20
         )
         prod2 = DoubleCountingProductionFactory.create(
             dca=app, feedstock=sourcing2.feedstock, year=self.requested_start_year + 1, approved_quota=-1
+        )
+        prod3 = DoubleCountingProductionFactory.create(  # YEAR
+            dca=app, feedstock=sourcing3.feedstock, year=self.requested_start_year, approved_quota=30
         )
         agreement = DoubleCountingRegistrationFactory.create(
             production_site=self.production_site,
             valid_from=date(self.requested_start_year, 1, 1),
             application=app,
+            certificate_id=app.agreement_id,
         )
 
-        return agreement, app, prod1, prod2
+        return agreement, app, prod1, prod2, prod3
 
-    def create_lots(self, agreement, production1, production2):
+    def create_lots(self, agreement, production1, production2, production3):
         start_year = agreement.valid_from.year
 
         def createLot(production, year) -> CarbureLot:
@@ -85,40 +91,47 @@ class AdminDoubleCountAgreementsTest(TestCase):
                 year=year,
                 production_site_double_counting_certificate=agreement.certificate_id,
                 carbure_production_site=self.production_site,
+                carbure_producer=self.production_site.producer,
             )
 
+        # production 1 (2 lots en 2023 et 1 lot en 2024)
         lot1 = createLot(production1, start_year)
         lot2 = createLot(production1, start_year)
 
         createLot(production1, start_year + 1)
-
         createLot(production1, start_year - 1)  # not in the agreement period
 
         # production 2 skipped because quota has not been validated
         createLot(production2, start_year)  # production2 quota has not been validated
         createLot(production2, start_year + 1)  # production2 quota has not been validated
         prod1_tonnes = round((lot1.weight + lot2.weight) / 1000)
-        prod1_progression = round((prod1_tonnes / production1.approved_quota) * 100, 2)
+        prod1_progression = round(prod1_tonnes / production1.approved_quota, 2)
+        # production 3 (1 lot en 2023)
+        lot3 = createLot(production3, start_year)
+        prod3_progression = round(round(lot3.weight / 1000) / production3.approved_quota, 2)
 
-        return lot1, lot2, prod1_tonnes, prod1_progression
+        return lot1, lot2, prod1_tonnes, prod1_progression, lot3, prod3_progression
 
     def test_get_agreements(self):
-        agreement1, _, production1, production2 = self.create_agreement()
-        _, _, _, prod1_progression = self.create_lots(agreement1, production1, production2)
+        agreement1, _, production1, production2, production3 = self.create_agreement()
+        _, _, _, prod1_progression, _, prod3_progression = self.create_lots(
+            agreement1, production1, production2, production3
+        )
 
-        self.create_agreement()
+        # self.create_agreement()
 
         response = self.client.get(reverse("admin-double-counting-agreements"), {"entity_id": self.admin.id})
         self.assertEqual(response.status_code, 200)
         data = response.json()["data"]
         active_agreements = data["active"]
-        self.assertEqual(len(active_agreements), 2)
+        self.assertEqual(len(active_agreements), 1)
 
         active_agreement1 = active_agreements[0]
         self.assertEqual(active_agreement1["certificate_id"], agreement1.certificate_id)
 
         # quotas
-        # self.assertEqual(active_agreement1["quota"], prod1_progression)
+        total_progression = (prod3_progression + prod1_progression) / 2
+        self.assertEqual(active_agreement1["quotas_progression"], round(total_progression, 2))
 
     def test_get_agreements_excel(self):
         self.create_agreement()
@@ -131,17 +144,14 @@ class AdminDoubleCountAgreementsTest(TestCase):
         self.assertEqual(response["Content-Type"], "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
     def test_get_agreement_details(self):
-        agreement, app, production1, production2 = self.create_agreement(status=DoubleCountingApplication.ACCEPTED)
+        agreement, app, production1, production2, production3 = self.create_agreement()
         agreement_id = agreement.id
-
-        sourcing3 = DoubleCountingSourcingFactory.create(dca=app, year=self.requested_start_year)
-        production3 = DoubleCountingProductionFactory.create(  # YEAR
-            dca=app, feedstock=sourcing3.feedstock, year=self.requested_start_year, approved_quota=3000
-        )
 
         start_year = agreement.valid_from.year
 
-        _, lot2, prod1_tonnes, prod1_progression = self.create_lots(agreement, production1, production2)
+        _, lot2, prod1_tonnes, prod1_progression, lot3, _ = self.create_lots(
+            agreement, production1, production2, production3
+        )
 
         response = self.client.get(
             reverse("admin-double-counting-agreements-details"),
@@ -151,16 +161,19 @@ class AdminDoubleCountAgreementsTest(TestCase):
         data = response.json()["data"]
         application = data["application"]
         quotas = data["quotas"]
+
         self.assertEqual(application["id"], agreement.id)
         self.assertEqual(len(quotas), 2)  # production 1 +production 3
 
-        quota_line_2 = quotas[0]
-        self.assertEqual(quota_line_2["year"], start_year)
-        self.assertEqual(quota_line_2["feedstock"]["name"], lot2.feedstock.name)
-        self.assertEqual(quota_line_2["production_tonnes"], prod1_tonnes)
-        self.assertEqual(quota_line_2["lot_count"], 2)  # 2 lots created in create_lots()
-        self.assertEqual(quota_line_2["quotas_progression"], prod1_progression)
+        quota_line_1 = quotas[0]
+        self.assertEqual(quota_line_1["year"], start_year)
+        self.assertEqual(quota_line_1["feedstock"]["name"], lot2.feedstock.name)
+        self.assertEqual(quota_line_1["production_tonnes"], round(prod1_tonnes))
+        self.assertEqual(quota_line_1["lot_count"], 2)  # 2 lots created in create_lots()
+        self.assertEqual(quota_line_1["quotas_progression"], round(prod1_progression, 2))
 
+        quota_line_2 = quotas[1]
+        self.assertEqual(quota_line_2["production_tonnes"], round(lot3.weight / 1000))
         # without
         agreement.application = None
         agreement.save()
