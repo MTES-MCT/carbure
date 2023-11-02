@@ -37,6 +37,7 @@ def sanity_checks(lot: CarbureLot, prefetched_data) -> list[GenericError]:
         check_unknown_double_counting_certificate(lot, prefetched_data),
         check_expired_double_counting_certificate(lot, prefetched_data),
         check_invalid_double_counting_certificate(lot, prefetched_data),
+        check_double_counting_quotas(lot, prefetched_data),
         # biofuel/feedstock errors
         *check_mp_bc_incoherent(lot),  # this one generates a list of errors so we flatten it with *
         *check_provenance_mp(lot),  # same here

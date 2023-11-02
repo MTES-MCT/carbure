@@ -183,3 +183,22 @@ class DoubleCountingSanityChecksTest(TestCase):
         lot.production_site_double_counting_certificate = self.dc_cert.certificate_id
         error_list = self.run_checks(lot)
         self.assertFalse(has_error(error, error_list))
+
+    def test_valid_double_counting_quotas(self):
+        ### Prerequis
+        # on crée un dossier double comptage pour le producteur
+
+        # on defini un quota pour un couple feedstock/biofuel pour le producteur
+
+        # on crée l'agrement double comptage pour le producteur
+
+        ### Test
+        # ajouter un lot avec ce couple feedstock/biofuel sur le producteur avec un volume inferieur au quota
+
+        # on verifie que le lot passe sans warning
+
+        # ajouter un autre lot qui depasse le quota
+
+        # on verifie que le lot renvoie le warning CarbureSanityCheckErrors.EXCEEDED_DOUBLE_COUNTING_QUOTAS
+
+        print("test")
