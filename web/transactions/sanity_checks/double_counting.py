@@ -95,5 +95,11 @@ def get_dc(lot: CarbureLot, prefetched_data):
 
 
 def check_double_counting_quotas(lot: CarbureLot, prefetched_data):
+    is_dc, certificate = get_dc(lot, prefetched_data)
+    if not is_dc or certificate is None:
+        return
+
+    # quotas = get_quotas_info(certificate)
+    # print("quotas: ", quotas)
     print("check_double_counting_quotas")
     return None
