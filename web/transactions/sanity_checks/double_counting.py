@@ -1,6 +1,11 @@
+from certificates.models import DoubleCountingRegistration
 from core.carburetypes import CarbureCertificatesErrors, CarbureSanityCheckErrors
 from core.models import CarbureLot
+from doublecount.factories import production
+from doublecount.models import DoubleCountingApplication, DoubleCountingProduction
 from .helpers import generic_error
+from django.db.models.aggregates import Count, Sum
+import pandas as pd
 
 
 def check_missing_ref_dbl_counting(lot: CarbureLot):
@@ -99,7 +104,40 @@ def check_double_counting_quotas(lot: CarbureLot, prefetched_data):
     if not is_dc or certificate is None:
         return
 
-    # quotas = get_quotas_info(certificate)
-    # print("quotas: ", quotas)
-    print("check_double_counting_quotas")
-    return None
+    quotas_is_excedeed = check_excedeed_quotas(lot, certificate)
+    if quotas_is_excedeed:
+        return generic_error(
+            error=CarbureSanityCheckErrors.EXCEEDED_DOUBLE_COUNTING_QUOTAS,
+            lot=lot,
+            fields=["production_site_double_counting_certificate"],
+        )
+
+
+def check_excedeed_quotas(lot: CarbureLot, agreement: DoubleCountingRegistration):
+    application = agreement.application
+    if not application or application.status != DoubleCountingApplication.ACCEPTED:
+        return None
+
+    # tous les couples BC / MP pour le site de production sur une année
+    targeted_quotas = DoubleCountingProduction.objects.values("approved_quota").get(
+        dca_id=application.id, approved_quota__gt=0, feedstock_id=lot.feedstock_id, biofuel_id=lot.biofuel_id, year=lot.year
+    )
+
+    # tous les lots pour des MP double compté pour le site de production regroupé par couple et par année
+    production_lots = (
+        CarbureLot.objects.filter(
+            lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN],
+            carbure_production_site_id=application.production_site,
+        )
+        .values("weight")
+        .filter(
+            feedstock_id=lot.feedstock_id,
+            biofuel_id=lot.biofuel_id,
+            year=lot.year,
+        )
+    )
+
+    production_kg = int(production_lots.aggregate(total_weight=Sum("weight"))["total_weight"])
+    max_production = targeted_quotas["approved_quota"]
+
+    return production_kg > max_production

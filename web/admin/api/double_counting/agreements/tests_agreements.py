@@ -1,9 +1,8 @@
-# test with : python web/manage.py test admin.api.double_counting.agreements.tests_agreements.AdminDoubleCountAgreementsTest.test_get_agreement_details --keepdb
+# test with : python web/manage.py test admin.api.double_counting.agreements.tests_agreements.AdminDoubleCountAgreementsTest --keepdb
 from datetime import date
-from email.mime import application
 
 from core.tests_utils import setup_current_user
-from core.models import CarbureLot, Entity, MatierePremiere, Pays, UserRights
+from core.models import CarbureLot, Entity, Pays, UserRights
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -11,7 +10,7 @@ from doublecount.factories.agreement import DoubleCountingRegistrationFactory
 from doublecount.factories.application import DoubleCountingApplicationFactory
 from doublecount.factories.production import DoubleCountingProductionFactory
 from doublecount.factories.sourcing import DoubleCountingSourcingFactory
-from doublecount.models import DoubleCountingApplication, DoubleCountingProduction
+from doublecount.models import DoubleCountingApplication
 
 from producers.models import ProductionSite
 from transactions.factories.carbure_lot import CarbureLotFactory
@@ -162,7 +161,7 @@ class AdminDoubleCountAgreementsTest(TestCase):
         application = data["application"]
         quotas = data["quotas"]
 
-        self.assertEqual(application["id"], agreement.id)
+        self.assertEqual(application["id"], app.id)
         self.assertEqual(len(quotas), 2)  # production 1 +production 3
 
         quota_line_1 = quotas[0]

@@ -7,7 +7,7 @@ from django.test import TestCase
 from certificates.models import DoubleCountingRegistration
 
 from core.carburetypes import CarbureCertificatesErrors, CarbureSanityCheckErrors
-from core.models import Entity, MatierePremiere
+from core.models import CarbureLot, Entity, MatierePremiere
 from doublecount.factories.agreement import DoubleCountingRegistrationFactory
 from doublecount.factories.application import DoubleCountingApplicationFactory
 from doublecount.factories.production import DoubleCountingProductionFactory
@@ -196,7 +196,7 @@ class DoubleCountingSanityChecksTest(TestCase):
     def test_valid_double_counting_quotas(self):
         ### Prerequis
         requested_start_year = 2023
-        approved_quota = 10000
+        approved_quota = 15000
 
         # on crée un dossier double comptage pour le producteur à partir de l'agrement
         app = DoubleCountingApplicationFactory.create(
@@ -206,33 +206,48 @@ class DoubleCountingSanityChecksTest(TestCase):
             status=DoubleCountingApplication.ACCEPTED,
             agreement_id=self.dc_cert.certificate_id,
         )
+        self.dc_cert.application = app
+        self.dc_cert.save()
+        self.prefetched_data = get_prefetched_data()
 
         # on defini un quota pour un couple feedstock/biofuel pour le producteur
         sourcing = DoubleCountingSourcingFactory.create(dca=app, year=requested_start_year)
 
         production = DoubleCountingProductionFactory.create(
-            dca=app, feedstock=sourcing.feedstock, year=requested_start_year, approved_quota=approved_quota
+            dca=app,
+            feedstock=sourcing.feedstock,
+            year=requested_start_year,
+            approved_quota=approved_quota,
         )
 
         ### Test
         error = CarbureSanityCheckErrors.EXCEEDED_DOUBLE_COUNTING_QUOTAS
 
+        def create_dc_lot(weight):
+            return self.create_lot(
+                feedstock=production.feedstock,
+                biofuel=production.biofuel,
+                weight=weight,
+                carbure_producer=self.producer,
+                carbure_production_site=self.production_site,
+                delivery_date=datetime.date(requested_start_year, 7, 1),
+                production_site_double_counting_certificate=self.dc_cert.certificate_id,
+                lot_status=CarbureLot.ACCEPTED,
+            )
+
         # ajouter un lot avec ce couple feedstock/biofuel sur le producteur avec un volume inferieur au quota
-        lot = self.create_lot(
-            feedstock=sourcing.feedstock,
-            weight=approved_quota - 1000,
-            carbure_producer=self.producer,
-            carbure_production_site=self.production_site,
-            delivery_date=datetime.date(requested_start_year, 7, 1),
-            production_site_double_counting_certificate=self.dc_cert.certificate_id,
-        )
+        lot1 = create_dc_lot(weight=approved_quota - 1000)
+
         # on verifie que le lot passe sans warning
-        error_list = self.run_checks(lot)
-        # pprint(error_list, indent=4)
-        # for err in error_list:
-        #     print(err.error)
+        error_list = self.run_checks(lot1)
         self.assertFalse(has_error(error, error_list))
 
         # ajouter un autre lot qui depasse le quota
+        lot2 = create_dc_lot(weight=5000)
 
         # on verifie que le lot renvoie le warning CarbureSanityCheckErrors.EXCEEDED_DOUBLE_COUNTING_QUOTAS
+        error_list = self.run_checks(lot2)
+        for err in error_list:
+            print(err.error)
+
+        self.assertTrue(has_error(error, error_list))
