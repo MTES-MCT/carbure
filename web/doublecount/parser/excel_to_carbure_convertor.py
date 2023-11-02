@@ -5,6 +5,7 @@ DC_FEEDSTOCK_UNRECOGNIZED = "__unrecognized__"
 
 dc_feedstock_to_carbure_feedstock = {
     "alcool pur de marc de raisin": "ALCOOL_PUR_MARC_RAISIN",
+    "alcool pur de lie de vin": "ALCOOL_PUR_LIE_VIN",
     "algues": "ALGUES",
     "bagasse": "BAGASSE",
     "balles (enveloppes)": "BALLES",
