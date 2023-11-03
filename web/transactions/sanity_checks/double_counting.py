@@ -129,15 +129,20 @@ def check_excedeed_quotas(lot: CarbureLot, agreement: DoubleCountingRegistration
             lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN],
             carbure_production_site_id=application.production_site,
         )
-        .values("weight")
+        .values("weight", "id")
         .filter(
             feedstock_id=lot.feedstock_id,
             biofuel_id=lot.biofuel_id,
             year=lot.year,
         )
+        .exclude(id=lot.id)
     )
 
-    production_kg = int(production_lots.aggregate(total_weight=Sum("weight"))["total_weight"])
     max_production = targeted_quotas["approved_quota"]
+
+    if len(production_lots) == 0:
+        production_kg = lot.weight
+    else:
+        production_kg = int(production_lots.aggregate(total_weight=Sum("weight"))["total_weight"]) + lot.weight
 
     return production_kg > max_production

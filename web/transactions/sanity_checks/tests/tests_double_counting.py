@@ -247,7 +247,4 @@ class DoubleCountingSanityChecksTest(TestCase):
 
         # on verifie que le lot renvoie le warning CarbureSanityCheckErrors.EXCEEDED_DOUBLE_COUNTING_QUOTAS
         error_list = self.run_checks(lot2)
-        for err in error_list:
-            print(err.error)
-
         self.assertTrue(has_error(error, error_list))
