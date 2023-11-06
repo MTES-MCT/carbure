@@ -100,7 +100,7 @@ Lorsque des changement sont effectué sur la base de donnée :
 Lorsqu'un endpoint de l'API est lent, c'est 9 fois sur 10 à cause de problèmes avec la base de données: trop de requêtes successives, trop de résultats en une seule fois, etc.
 
 Pour pouvoir analyser ces problèmes, l'outil `silk` a été mis en place sur le serveur.
-On peut y accéder uniquement en local à l'adresse <http://carbure.local:8090>.
+On peut y accéder uniquement en local à l'adresse <http://carbure.local:8090/silk>.
 
 La dashboard à cette adresse liste toutes les requêtes envoyées au serveur, et tout une série de métriques comprenant les différentes requêtes envoyées à la base de données ainsi que leur performance.
 
