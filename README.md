@@ -57,7 +57,7 @@ Ensuite, créez un environnement virtuel pour python 3.10:
 ## Se placer dans l'environnement python dédié au projet
 
 - Lancer `pipenv shell` pour vous placer dans l'environnement python dédié au projet
-  
+
 Raccourci : Je recommande de créer un alias pour charger l'environnement de développement : `alias carbure='cd /path/du/repository; pipenv shell;'`
 
 ## Alimenter la base de données de dev
@@ -94,6 +94,17 @@ Raccourci : Je recommande de créer un alias pour charger l'environnement de dé
 Lorsque des changement sont effectué sur la base de donnée :
 1 une fois les model ou champs ajouté, pour créer le fichier de migration - `python web/manage.py makemigrations`
 2 pour appliquer la migration sur la DB - `python web/manage.py migrate`
+
+# Analyser les performances des requêtes
+
+Lorsqu'un endpoint de l'API est lent, c'est 9 fois sur 10 à cause de problèmes avec la base de données: trop de requêtes successives, trop de résultats en une seule fois, etc.
+
+Pour pouvoir analyser ces problèmes, l'outil `silk` a été mis en place sur le serveur.
+On peut y accéder uniquement en local à l'adresse [http://carbure.local:8090]().
+
+La dashboard à cette adresse liste toutes les requêtes envoyées au serveur, et tout une série de métriques comprenant les différentes requêtes envoyées à la base de données ainsi que leur performance.
+
+Pour plus d'information sur `silk`, une documentation est disponible à l'adresse [https://github.com/jazzband/django-silk]()
 
 # Lancer les tests backend
 
