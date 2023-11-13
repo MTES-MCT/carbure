@@ -74,8 +74,7 @@ def check_production_row_integrity(
     if feedstock and biofuel:
         incompatibilities: List[str] = []
 
-        # TODO use get_biofuel_feedstock_incompatibilities instead and add a double-ounting mode
-        for e in check_compatibility_feedstock_biofuel(biofuel, feedstock):
+        for e in get_biofuel_feedstock_incompatibilities(biofuel, feedstock):
             incompatibilities.append(e)
 
         meta = {
