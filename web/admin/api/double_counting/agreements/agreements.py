@@ -93,6 +93,7 @@ def add_quotas_to_agreements(year: int, agreements):
     production_lots = (
         CarbureLot.objects.filter(
             lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN],
+            delivery_type__in=[CarbureLot.DIRECT, CarbureLot.RFC, CarbureLot.BLENDING],
             carbure_producer__in=producers.keys(),
             carbure_production_site__in=production_sites.keys(),
             year=year,

@@ -52,6 +52,7 @@ def get_quotas_info(agreement: DoubleCountingRegistration):
     production_lots = (
         CarbureLot.objects.filter(
             lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN],
+            delivery_type__in=[CarbureLot.DIRECT, CarbureLot.RFC, CarbureLot.BLENDING],
             carbure_production_site_id=application.production_site,
         )
         .values("year", "feedstock", "biofuel")
