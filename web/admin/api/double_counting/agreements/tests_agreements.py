@@ -83,11 +83,12 @@ class AdminDoubleCountAgreementsTest(TestCase):
     def create_lots(self, agreement, production1, production2, production3):
         start_year = agreement.valid_from.year
 
-        def createLot(production, year) -> CarbureLot:
+        def createLot(production, year, delivery_type=CarbureLot.BLENDING) -> CarbureLot:
             return CarbureLotFactory.create(
                 feedstock=production.feedstock,
                 biofuel=production.biofuel,
                 lot_status=CarbureLot.ACCEPTED,
+                delivery_type=delivery_type,
                 year=year,
                 production_site_double_counting_certificate=agreement.certificate_id,
                 carbure_production_site=self.production_site,
@@ -97,6 +98,7 @@ class AdminDoubleCountAgreementsTest(TestCase):
         # production 1 (2 lots en 2023 et 1 lot en 2024)
         lot1 = createLot(production1, start_year)
         lot2 = createLot(production1, start_year)
+        lot3 = createLot(production1, start_year, delivery_type=CarbureLot.STOCK)
 
         createLot(production1, start_year + 1)
         createLot(production1, start_year - 1)  # not in the agreement period
