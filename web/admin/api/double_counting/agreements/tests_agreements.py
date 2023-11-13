@@ -162,7 +162,7 @@ class AdminDoubleCountAgreementsTest(TestCase):
         application = data["application"]
         quotas = data["quotas"]
 
-        self.assertEqual(application["id"], agreement.id)
+        self.assertEqual(application["id"], app.id)
         self.assertEqual(len(quotas), 2)  # production 1 +production 3
 
         quota_line_1 = quotas[0]
