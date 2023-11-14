@@ -8,7 +8,7 @@ import Table, { Cell } from "common/components/table"
 import { useQuery } from "common/hooks/async"
 import { formatDate, formatDateYear } from "common/utils/formatters"
 import ApplicationStatus from "double-counting/components/applications/application-status"
-import { DoubleCountingApplicationOverview } from "double-counting/types"
+import { DoubleCountingApplicationOverview, DoubleCountingStatus } from "double-counting/types"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api/double-counting"
 import DoubleCountingApplicationDialog from "./double-counting-dialog"
@@ -21,13 +21,15 @@ const DoubleCountingSettings = () => {
   const entity = useEntity()
   const portal = usePortal()
 
-  const applications = useQuery(api.getDoubleCountingApplications, {
-    key: "dc-applications",
+  const applicationsData = useQuery(api.getDoubleCountingAgreements, {
+
+    key: "dc-agreements",
     params: [entity.id],
   })
 
-  const applicationsData = applications.result?.data.data ?? []
-  const isEmpty = applicationsData.length === 0
+  const applications = applicationsData.result?.data.data ?? []
+  console.log('applications:', applications)
+  const isEmpty = applications.length === 0
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
 
   function showApplicationDialog(dc: DoubleCountingApplicationOverview) {
@@ -50,7 +52,7 @@ const DoubleCountingSettings = () => {
     <Panel id="double-counting">
       <header>
         <h1>
-          <Trans>Dossiers double comptage</Trans>
+          <Trans>Agréments double comptage</Trans>
         </h1>
         {canModify && (
           <Button
@@ -58,7 +60,7 @@ const DoubleCountingSettings = () => {
             variant="primary"
             icon={Plus}
             action={showUploadDialog}
-            label={t("Envoyer un dossier double comptage")}
+            label={t("Envoyer une demande d'agrément")}
           />
         )}
       </header>
@@ -67,7 +69,7 @@ const DoubleCountingSettings = () => {
         <>
           <section>
             <Alert icon={AlertCircle} variant="warning">
-              <Trans>Aucun dossier double comptage trouvé</Trans>
+              <Trans>Aucun agrément double comptage trouvé</Trans>
             </Alert>
           </section>
           <footer />
@@ -76,7 +78,7 @@ const DoubleCountingSettings = () => {
 
       {!isEmpty && (
         <Table
-          rows={applicationsData}
+          rows={applications}
           onAction={showApplicationDialog}
           columns={[
             {
@@ -96,14 +98,34 @@ const DoubleCountingSettings = () => {
               ),
             },
             {
-              header: t("Date de soumission"),
-              cell: (dc) => <Cell text={formatDate(dc.created_at)} />,
+              header: t("N° d'agrément"),
+              cell: (dc) => (
+                <span>
+                  {dc.status === DoubleCountingStatus.Rejected && (
+                    <>-</>
+                  )}
+                  {dc.status === DoubleCountingStatus.Pending && t("En cours de traitement...")}
+
+                  {dc.status === DoubleCountingStatus.Accepted && (
+                    <>{dc.agreement_id}</>
+                  )}
+
+                </span>
+              ),
             },
+            {
+              header: t("Quotas"),
+              cell: (dc) => <Cell text={dc.quotas_progression ? Math.round(dc.quotas_progression * 100) + "%" : "-"} />,
+            }
+            // {
+            //   header: t("Date de soumission"),
+            //   cell: (dc) => <Cell text={formatDate(dc.created_at)} />,
+            // },
           ]}
         />
       )}
 
-      {applications.loading && <LoaderOverlay />}
+      {applicationsData.loading && <LoaderOverlay />}
     </Panel>
   )
 }
