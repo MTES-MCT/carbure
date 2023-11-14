@@ -17,13 +17,6 @@ from producers.models import ProductionSite
 from transactions.factories.carbure_lot import CarbureLotFactory
 
 
-class Endpoint:
-    change_user_role = reverse("entity-users-change-role")
-
-
-User = get_user_model()
-
-
 class AdminDoubleCountAgreementsTest(TestCase):
     fixtures = [
         "json/biofuels.json",
@@ -120,13 +113,13 @@ class AdminDoubleCountAgreementsTest(TestCase):
             agreement1, production1, production2, production3
         )
 
-        # self.create_agreement()
+        self.create_agreement()
 
         response = self.client.get(reverse("admin-double-counting-agreements"), {"entity_id": self.admin.id})
         self.assertEqual(response.status_code, 200)
         data = response.json()["data"]
         active_agreements = data["active"]
-        self.assertEqual(len(active_agreements), 1)
+        self.assertEqual(len(active_agreements), 2)
 
         active_agreement1 = active_agreements[0]
         self.assertEqual(active_agreement1["certificate_id"], agreement1.certificate_id)
