@@ -13,6 +13,7 @@ from core.common import ErrorResponse
 from core.decorators import check_admin_rights
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere
 from core.serializers import ProductionSiteSerializer
+from doublecount.helpers import get_quotas
 from doublecount.models import DoubleCountingApplication, DoubleCountingProduction
 from doublecount.serializers import BiofuelSerializer, EntitySerializer, FeedStockSerializer
 from producers.models import ProductionSite, ProductionSiteOutput
@@ -79,79 +80,7 @@ def get_agreements(request, *args, **kwargs):
 
 
 def add_quotas_to_agreements(year: int, agreements):
-    producers = {p.id: p for p in Entity.objects.filter(entity_type=Entity.PRODUCER)}
-    production_sites = {p.id: p for p in ProductionSite.objects.all()}
-    biofuels = {p.id: p for p in Biocarburant.objects.all()}
-    feedstocks = {m.id: m for m in MatierePremiere.objects.filter(is_double_compte=True)}
-
-    # tous les couples BC / MP pour sur une année
-    detailed_quotas = DoubleCountingProduction.objects.values(
-        "year", "dca__producer", "dca__production_site", "biofuel", "feedstock", "approved_quota", "dca__agreement_id"
-    ).filter(year=year, feedstock_id__in=feedstocks.keys(), approved_quota__gt=0)
-
-    # tous les lots pour des MP double compté groupé par couple et par année
-    production_lots = (
-        CarbureLot.objects.filter(
-            lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN],
-            delivery_type__in=[CarbureLot.DIRECT, CarbureLot.RFC, CarbureLot.BLENDING],
-            carbure_producer__in=producers.keys(),
-            carbure_production_site__in=production_sites.keys(),
-            year=year,
-            feedstock_id__in=feedstocks.keys(),
-            biofuel_id__in=biofuels.keys(),
-        )
-        .values("year", "carbure_producer", "carbure_production_site", "feedstock", "biofuel")
-        .annotate(production_kg=Sum("weight"), lot_count=Count("id"))
-    )
-
-    # crée un dataframe pour les quotas par couple et par année
-    quotas_df = pd.DataFrame(detailed_quotas).rename(
-        columns={
-            "biofuel": "biofuel_id",
-            "feedstock": "feedstock_id",
-            "dca__producer": "producer_id",
-            "dca__production_site": "production_site_id",
-            "dca__agreement_id": "agreement_id",
-        }
-    )
-
-    # crée un dataframe pour le résumé des lots par couple et par année
-    production_lots_df = pd.DataFrame(production_lots).rename(
-        columns={
-            "carbure_producer": "producer_id",
-            "carbure_production_site": "production_site_id",
-            "feedstock": "feedstock_id",
-            "biofuel": "biofuel_id",
-        }
-    )
-
-    # merge les deux dataframes
-    if len(production_lots_df) == 0:
-        grouped = []
-        quotas_df["quotas_progression"] = 0
-        # grouped["lot_count"] = 0
-        # quotas_df["production_tonnes"] = 0
-        # quotas_df["production_site"] = None
-        # quotas_df["producer"] = None
-    else:
-        quotas_df.set_index(["biofuel_id", "feedstock_id", "year", "producer_id", "production_site_id"], inplace=True)
-        production_lots_df.set_index(
-            ["biofuel_id", "feedstock_id", "year", "producer_id", "production_site_id"],
-            inplace=True,
-        )
-        quotas_df = (
-            quotas_df.merge(production_lots_df, how="outer", left_index=True, right_index=True).fillna(0).reset_index()
-        )
-        quotas_df = quotas_df.loc[quotas_df["approved_quota"] > 0]
-        quotas_df["production_tonnes"] = round(quotas_df["production_kg"] / 1000)
-        quotas_df["quotas_progression"] = round((quotas_df["production_tonnes"] / quotas_df["approved_quota"]), 2)
-
-        grouped = quotas_df.groupby(["year", "producer_id", "production_site_id", "agreement_id"]).agg(
-            quotas_progression=("quotas_progression", "mean"),
-        )
-        grouped.reset_index(inplace=True)
-
-    quotas = grouped.to_dict("records")
+    quotas = get_quotas(year)
     # add quotas to active agreements
     for agreement in agreements:
         found_quotas = [q for q in quotas if q["agreement_id"] == agreement["certificate_id"]]
