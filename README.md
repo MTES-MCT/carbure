@@ -95,6 +95,11 @@ Lorsque des changement sont effectué sur la base de donnée :
 1 une fois les model ou champs ajouté, pour créer le fichier de migration - `python web/manage.py makemigrations`
 2 pour appliquer la migration sur la DB - `python web/manage.py migrate`
 
+# Annuler une migration
+
+il faut revenir à la migration precedent. Par exemple si veux annuler doublecount.0014_change_something
+`python web/manage.py migrate doublecount 0013_remove_doublecountingapplication_dgddi_validated_and_more`
+
 # Analyser les performances des requêtes
 
 Lorsqu'un endpoint de l'API est lent, c'est 9 fois sur 10 à cause de problèmes avec la base de données: trop de requêtes successives, trop de résultats en une seule fois, etc.

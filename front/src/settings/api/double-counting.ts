@@ -7,11 +7,16 @@ import {
   QuotaDetails
 } from "double-counting/types"
 
-export function getDoubleCountingApplications(entity_id: number) {
-  return api.get<Api<DoubleCountingApplicationOverview[]>>("/v3/doublecount/applications", {
+export function getDoubleCountingAgreements(entity_id: number) {
+  return api.get<Api<DoubleCountingApplicationOverview[]>>("/v5/double-counting/agreements", {
     params: { entity_id },
   })
 }
+// export function getDoubleCountingApplications(entity_id: number) {
+//   return api.get<Api<DoubleCountingApplicationOverview[]>>("/v3/doublecount/applications", {
+//     params: { entity_id },
+//   })
+// }
 
 export function getDoubleCountingApplicationDetails(entity_id: number, dca_id: number) {
   return api.get<Api<DoubleCountingApplicationDetails>>("/v3/doublecount/application", {
