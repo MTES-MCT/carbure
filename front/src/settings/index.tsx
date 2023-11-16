@@ -15,6 +15,7 @@ import CompanyInfo from "./components/company-info"
 import CompanyOptions from "./components/company-options"
 import DoubleCountingSettings from "./components/double-counting"
 import EntityUserRights from "./components/user-rights"
+import ElecSettings from "./components/elec"
 
 const Settings = () => {
   const { t } = useTranslation()
@@ -22,7 +23,8 @@ const Settings = () => {
   const entity = useEntity()
   useTitle(`${entity.name} · ${t("Société")}`)
 
-  const { isProducer, isTrader, isOperator } = entity
+  const { isProducer, isTrader, isOperator, isCPO } = entity
+
 
   const hasCertificates = isProducer || isTrader || isOperator
   const hasDepot = isProducer || isOperator || isTrader
@@ -49,6 +51,7 @@ const Settings = () => {
             key: "info",
             label: t("Informations"),
           },
+
           hasCertificates && {
             path: "#certificates",
             key: "certificates",
@@ -69,6 +72,11 @@ const Settings = () => {
             key: "double-counting",
             label: t("Double comptage"),
           },
+          isCPO && {
+            path: "#elec-charging-points",
+            key: "elec-charging-points",
+            label: t("Points de recharge"),
+          },
           entity.hasRights(UserRole.Admin) && {
             path: "#users",
             key: "users",
@@ -83,6 +91,7 @@ const Settings = () => {
         {hasDepot && <DeliverySitesSettings entity={entity} />}
         {isProducer && <ProductionSitesSettings entity={entity} />}
         {isProducer && <DoubleCountingSettings />}
+        {isCPO && <ElecSettings />}
         {entity.hasRights(UserRole.Admin) && <EntityUserRights />}
       </section>
     </Main>

@@ -56,3 +56,19 @@ export interface ElecTransferCertificatesDetails extends ElecTransferCertificate
 export interface ElecProvisionCertificatesDetails extends ElecProvisionCertificatePreview {
 
 }
+
+
+export enum ElecChargingPointsApplicationStatus {
+  Pending = "PENDING",
+  Accepted = "ACCEPTED",
+  Rejected = "REJECTED",
+}
+
+export interface ElecChargingPointsApplication {
+  id: number
+  station_count: number
+  charging_point_count: number
+  power_total: number
+  date: string
+  status: ElecChargingPointsApplicationStatus
+}
