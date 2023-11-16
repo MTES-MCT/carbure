@@ -11,6 +11,7 @@ import ApplicationStatus from "elec/components/charging-points/application-statu
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api/elec"
 import { ElecChargingPointsApplication, ElecChargingPointsSnapshot } from "elec/types"
+import ElecChargingPointsFileUpload from "elec/components/charging-points/upload"
 
 const ElecSettings = () => {
   const { t } = useTranslation()
@@ -18,12 +19,12 @@ const ElecSettings = () => {
   const entity = useEntity()
   const portal = usePortal()
 
-  const applicationsData = useQuery(api.getChargingPointsApplications, {
+  const applicationsResponse = useQuery(api.getChargingPointsApplications, {
     key: "elec-charging-points",
     params: [entity.id],
   })
 
-  const applications = applicationsData.result ?? []
+  const applications = applicationsResponse.result ?? []
   const applicationsSnapshot: ElecChargingPointsSnapshot = {
     station_count: applications.reduce((acc, app) => acc + app.station_count, 0),
     charging_point_count: applications.reduce((acc, app) => acc + app.charging_point_count, 0),
@@ -43,9 +44,9 @@ const ElecSettings = () => {
   }
 
   function showUploadDialog() {
-    // portal((resolve) => (
-    //   <DoubleCountingUploadDialog onClose={resolve} />
-    // ))
+    portal((resolve) => (
+      <ElecChargingPointsFileUpload onClose={resolve} />
+    ))
   }
 
   return (
@@ -120,7 +121,7 @@ const ElecSettings = () => {
         />
       )}
 
-      {applicationsData.loading && <LoaderOverlay />}
+      {applicationsResponse.loading && <LoaderOverlay />}
     </Panel>
   )
 }
