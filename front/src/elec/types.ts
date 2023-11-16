@@ -72,3 +72,8 @@ export interface ElecChargingPointsApplication {
   date: string
   status: ElecChargingPointsApplicationStatus
 }
+export interface ElecChargingPointsSnapshot {
+  station_count: number
+  charging_point_count: number
+  power_total: number
+}

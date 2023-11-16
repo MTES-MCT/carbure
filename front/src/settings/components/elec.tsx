@@ -10,7 +10,7 @@ import { formatDate, formatNumber } from "common/utils/formatters"
 import ApplicationStatus from "elec/components/charging-points/application-status"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api/elec"
-import { ElecChargingPointsApplication } from "elec/types"
+import { ElecChargingPointsApplication, ElecChargingPointsSnapshot } from "elec/types"
 
 const ElecSettings = () => {
   const { t } = useTranslation()
@@ -19,12 +19,16 @@ const ElecSettings = () => {
   const portal = usePortal()
 
   const applicationsData = useQuery(api.getChargingPointsApplications, {
-
     key: "elec-charging-points",
     params: [entity.id],
   })
 
   const applications = applicationsData.result ?? []
+  const applicationsSnapshot: ElecChargingPointsSnapshot = {
+    station_count: applications.reduce((acc, app) => acc + app.station_count, 0),
+    charging_point_count: applications.reduce((acc, app) => acc + app.charging_point_count, 0),
+    power_total: applications.reduce((acc, app) => acc + app.power_total, 0),
+  }
   console.log('applications:', applications)
   const isEmpty = applications.length === 0
 
@@ -88,7 +92,7 @@ const ElecSettings = () => {
               ),
             },
             {
-              header: t("Puissance cumulée"),
+              header: applicationsSnapshot.power_total + " kW " + t("cumulé"),
               cell: (application) => (
                 <Cell
                   text={`${formatNumber(application.power_total)}` + " kW"}
@@ -96,7 +100,7 @@ const ElecSettings = () => {
               ),
             },
             {
-              header: t("Stations"),
+              header: applicationsSnapshot.station_count + " " + t("Stations"),
               cell: (application) => (
                 <Cell
                   text={`${formatNumber(application.station_count)}`}
@@ -104,7 +108,7 @@ const ElecSettings = () => {
               ),
             },
             {
-              header: t("Points de recharge"),
+              header: applicationsSnapshot.charging_point_count + " " + t("Points de recharge"),
               cell: (application) => (
                 <Cell
                   text={`${formatNumber(application.charging_point_count)}`}
