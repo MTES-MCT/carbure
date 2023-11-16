@@ -1,5 +1,5 @@
 import { EntityPreview, EntityType } from "carbure/types";
-import { ElecProvisionCertificatePreview } from "elec/types";
+import { ElecChargingPointsApplication, ElecChargingPointsApplicationStatus, ElecProvisionCertificatePreview } from "elec/types";
 import { ElecCPOSnapshot, ElecProvisionCertificatesData } from "elec/types-cpo";
 
 export const elecSnapshot: ElecCPOSnapshot = {
@@ -47,3 +47,36 @@ export const elecAdminProvisionCertificateList: ElecProvisionCertificatesData = 
     returned: 10,
     total: 11
 }
+
+
+const elecChargingPointApplication1: ElecChargingPointsApplication = {
+    id: 1,
+    station_count: 4,
+    charging_point_count: 90,
+    power_total: 8,
+    date: "2023-10-12",
+    status: ElecChargingPointsApplicationStatus.Pending,
+}
+
+const elecChargingPointApplication2: ElecChargingPointsApplication = {
+    id: 1,
+    station_count: 19,
+    charging_point_count: 987,
+    power_total: 30000,
+    date: "2023-11-13",
+    status: ElecChargingPointsApplicationStatus.Accepted,
+}
+const elecChargingPointApplication3: ElecChargingPointsApplication = {
+    id: 1,
+    station_count: 1,
+    charging_point_count: 5,
+    power_total: 1000,
+    date: "2023-09-01",
+    status: ElecChargingPointsApplicationStatus.Rejected,
+}
+
+export const elecChargingPointsApplications: ElecChargingPointsApplication[] = [
+    elecChargingPointApplication1,
+    elecChargingPointApplication2,
+    elecChargingPointApplication3
+]
