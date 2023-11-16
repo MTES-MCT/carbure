@@ -1,5 +1,5 @@
 import { EntityPreview, EntityType } from "carbure/types";
-import { ElecChargingPointsApplication, ElecChargingPointsApplicationStatus, ElecProvisionCertificatePreview } from "elec/types";
+import { ChargingPointsApplicationError, ElecChargingPointsApplication, ElecChargingPointsApplicationCheckInfo, ElecChargingPointsApplicationStatus, ElecProvisionCertificatePreview } from "elec/types";
 import { ElecCPOSnapshot, ElecProvisionCertificatesData } from "elec/types-cpo";
 
 export const elecSnapshot: ElecCPOSnapshot = {
@@ -80,3 +80,22 @@ export const elecChargingPointsApplications: ElecChargingPointsApplication[] = [
     elecChargingPointApplication2,
     elecChargingPointApplication3
 ]
+
+
+export const chargingPointsApplicationError: ChargingPointsApplicationError = {
+    error: "MISSING_CHARGING_POINT_IN_DATAGOUV",
+    meta: {
+        charging_points: ["8U7Y", "8U7Y"]
+    }
+}
+export const elecChargingPointsApplicationCheckResponseFailed: ElecChargingPointsApplicationCheckInfo = {
+    file_name: "test.csv",
+    error_count: 2,
+    errors: [chargingPointsApplicationError, chargingPointsApplicationError
+    ]
+}
+
+export const elecChargingPointsApplicationCheckResponseSucceed: ElecChargingPointsApplicationCheckInfo = {
+    file_name: "test.csv",
+    error_count: 0,
+}

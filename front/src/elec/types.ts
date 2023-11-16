@@ -77,3 +77,14 @@ export interface ElecChargingPointsSnapshot {
   charging_point_count: number
   power_total: number
 }
+
+export interface ElecChargingPointsApplicationCheckInfo {
+  errors?: ChargingPointsApplicationError[]
+  file_name: string
+  error_count: number
+}
+
+export interface ChargingPointsApplicationError {
+  error: string
+  meta?: null | any
+}
