@@ -91,6 +91,7 @@ export const chargingPointsApplicationError: ChargingPointsApplicationError = {
 export const elecChargingPointsApplicationCheckResponseFailed: ElecChargingPointsApplicationCheckInfo = {
     file_name: "test.csv",
     error_count: 2,
+    charging_points_count: 0,
     errors: [chargingPointsApplicationError, chargingPointsApplicationError
     ]
 }
@@ -98,4 +99,5 @@ export const elecChargingPointsApplicationCheckResponseFailed: ElecChargingPoint
 export const elecChargingPointsApplicationCheckResponseSucceed: ElecChargingPointsApplicationCheckInfo = {
     file_name: "test.csv",
     error_count: 0,
+    charging_points_count: 90
 }

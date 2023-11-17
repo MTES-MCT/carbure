@@ -5,7 +5,7 @@ import { Dialog } from "common/components/dialog"
 import { AlertCircle, AlertTriangle, Plus, Return } from "common/components/icons"
 import Tag from "common/components/tag"
 import { ChargingPointsApplicationError, ElecChargingPointsApplicationCheckInfo } from "elec/types"
-import { useTranslation } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import { getErrorText } from "settings/utils/double-counting"
 
 export type ErrorsDetailsDialogProps = {
@@ -35,7 +35,9 @@ export const ErrorsDetailsDialog = ({
 
         <section>
           <p style={{ textAlign: 'left' }}>
-            {t("Le fichier {{fileName}} comporte {{count}} incohérences.  Veuillez les corriger puis recharger à nouveau votre fichier.", { fileName: fileData.file_name, count: fileData.error_count })}
+            `dzadza
+            <Trans defaults="Le fichier <b>{{fileName}}</b> comporte {{count}} incohérences.  Veuillez les corriger puis recharger à nouveau votre fichier."
+              fileName={fileData.file_name} count={fileData.error_count} />
           </p>
         </section>
         <section>

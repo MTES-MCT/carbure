@@ -12,9 +12,12 @@ import { useMutation } from "common/hooks/async"
 import { Trans, useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { checkDoubleCountingApplication } from "settings/api/double-counting"
-import { checkChargingPointsApplication } from "settings/api/elec"
+import { checkChargingPointsSubscription } from "settings/api/elec"
 import ErrorsDetailsDialog from "./errors-dialog"
 import ValidDetailsDialog from "./valid-dialog"
+
+// L'URL complète du fichier
+
 
 type ElecChargingPointsFileUploadProps = {
   onClose: () => void
@@ -33,7 +36,7 @@ const ElecChargingPointsFileUpload = ({
     chargingPointsFile: undefined as File | undefined,
   })
 
-  const uploadFile = useMutation(checkChargingPointsApplication, {
+  const uploadFile = useMutation(checkChargingPointsSubscription, {
     onError: (err) => {
       const response = (err as AxiosError<{ error: string }>).response
       if (response?.status === 413) {
@@ -48,7 +51,7 @@ const ElecChargingPointsFileUpload = ({
       } else {
         notify(
           t(
-            "L'envoi de votre inscription des points de charge a échoué. Merci de contacter l'équipe Carbure"
+            "L'envoi de votre inscription des points de recharge a échoué. Merci de contacter l'équipe Carbure"
           ),
           {
             variant: "danger",
@@ -60,24 +63,23 @@ const ElecChargingPointsFileUpload = ({
 
   async function submitFile() {
     if (!value.chargingPointsFile) return
+
     const response = await uploadFile.execute(
       entity.id,
       value.chargingPointsFile as File
     )
     const checkedFile = response
-    console.log('checkedFile:', checkedFile)
-
 
     if (checkedFile) {
       onClose()
       if (checkedFile.error_count) {
         portal((close) => <ErrorsDetailsDialog fileData={checkedFile} onClose={close} />)
       } else {
-        portal((close) => <ValidDetailsDialog fileData={checkedFile} onClose={close} />)
+        portal((close) => <ValidDetailsDialog fileData={checkedFile} onClose={close} file={value.chargingPointsFile!} />)
       }
     }
   }
-
+  const filePath = '/templates/points-de-recharge-inscription.xlsx';
   return (
     <Dialog onClose={onClose}>
       <header>
@@ -95,7 +97,7 @@ const ElecChargingPointsFileUpload = ({
             <p>
               <Trans>
                 Le modèle Excel à remplir est disponible {" "}
-                <ExternalLink href={""}>
+                <ExternalLink href={filePath}>
                   sur ce lien
                 </ExternalLink>
                 .
