@@ -17,7 +17,13 @@ export function getChargingPointsApplications(entity_id: number) {
 }
 
 
-export function checkChargingPointsApplication(entity_id: number, file: File) {
+export function checkChargingPointsSubscription(entity_id: number, file: File) {
+
+  // const res = api.post<Api<ElecChargingPointsApplicationCheckResponse>>(
+  //   "/v5/elec/charging-points/check-application",
+  //   { entity_id, file }
+  // )
+  // return res
 
   // TO TEST errors
   // return new Promise<ElecChargingPointsApplicationCheckInfo>((resolve) => {
@@ -29,21 +35,28 @@ export function checkChargingPointsApplication(entity_id: number, file: File) {
     resolve(elecChargingPointsApplicationCheckResponseSucceed)
   })
 
-  // const res = api.post<Api<ElecChargingPointsApplicationCheckResponse>>(
-  //   "/v5/elec/charging-points/check-file",
-  //   { entity_id, file }
-  // )
-  // return res
+
 }
 
 
-export function addChargingPointsApplication(
+export function subscribeChargingPointsApplication(
   entity_id: number,
   file: File,
 ) {
 
-  return api.post("/v5/elec/charging-points/add", {
-    entity_id,
-    file
+
+  // // TO TEST success
+  return new Promise((resolve) => {
+    resolve(true)
   })
+
+  // // TO TEST error
+  // return new Promise((resolve, reject) => {
+  //   reject(true)
+  // })
+
+  // return api.post("/v5/elec/charging-points/subscription", {
+  //   entity_id,
+  //   file
+  // })
 }

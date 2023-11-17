@@ -3,46 +3,47 @@ import { Dialog } from "common/components/dialog"
 import { Plus, Return } from "common/components/icons"
 import { usePortal } from "common/components/portal"
 import Tag from "common/components/tag"
-import { useTranslation } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import { useMatch } from "react-router-dom"
 import FileApplicationInfo from "../../../double-counting/components/files-checker/file-application-info"
 import { DoubleCountingFileInfo } from "../../../double-counting/types"
 import { ElecChargingPointsApplicationCheckInfo } from "elec/types"
-import { addChargingPointsApplication } from "settings/api/elec"
+import { subscribeChargingPointsApplication } from "settings/api/elec"
 import { useMutation } from "common/hooks/async"
+import useEntity from "carbure/hooks/entity"
+import { useNotify, useNotifyError } from "common/components/notifications"
 
 export type ValidDetailsDialogProps = {
   fileData: ElecChargingPointsApplicationCheckInfo
   onClose: () => void
+  file: File
 }
 
 export const ValidDetailsDialog = ({
   fileData,
   onClose,
+  file
 }: ValidDetailsDialogProps) => {
   const { t } = useTranslation()
-  const portal = usePortal()
-  const isProducerMatch = useMatch("/org/:entity/settings*")
+  const entity = useEntity()
+  const notify = useNotify()
+  const notifyError = useNotifyError()
 
-  const addApplication = useMutation(addChargingPointsApplication, {
+  const subscribeChargingPoints = useMutation(subscribeChargingPointsApplication, {
     invalidates: ["dc-applications", "dc-snapshot"],
     onSuccess() {
       onClose()
-      // notify(t("Le dossier a été ajouté !"), { variant: "success" })
-      // navigate({
-      //   pathname: '/org/9/double-counting',
-      // })
+      notify(t("Les {{count}} points de recharge ont été ajoutés !", { count: fileData.charging_points_count }), { variant: "success" })
+
     },
     onError(err) {
-      // const errorCode = (err as AxiosError<{ error: string }>).response?.data.error
-      // if (errorCode === 'APPLICATION_ALREADY_EXISTS') {
-      //   portal((close) => <ReplaceApplicationDialog onReplace={saveApplication} onClose={close} />)
-      // } 
-      // else {
-      //   notifyError(err, t("Impossible d'ajouter le dossier"))
-      // }
+      notifyError(err, t("Impossible d'inscrire les points de recharge"))
     },
   })
+
+  const submitChargingPointsSubscription = () => {
+    subscribeChargingPoints.execute(entity.id, file)
+  }
 
   return (
     <Dialog fullscreen onClose={onClose}>
@@ -57,11 +58,20 @@ export const ValidDetailsDialog = ({
 
         <section>
           <p style={{ textAlign: 'left' }}>
-            {t("Votre fichier {{fileName}}, ne comporte aucune erreur.", { fileName: fileData.file_name })}
+            <Trans
+              values={{
+                fileName: fileData.file_name,
+              }}
+              defaults="Votre fichier <b>{{fileName}}</b> ne comporte aucune erreur." />
           </p>
           <p>
-            Les 90 points de recharge ont été importés dans votre espace CarbuRe.
-            Un échantillon de points de recharge vous sera transmis directement par e-mail de notre part dans le but de réaliser un audit.
+            <Trans
+              count={fileData.charging_points_count}
+              defaults="Les <b>{{count}} points de recharge</b> peuvent être inscrits à votre espace CarbuRe." />
+
+          </p>
+          <p>
+            <Trans>Un échantillon de points de recharge vous sera transmis directement par e-mail de notre part dans le but de réaliser un audit.</Trans>
           </p>
         </section>
       </main>
@@ -69,9 +79,10 @@ export const ValidDetailsDialog = ({
       <footer>
         <Button
           icon={Plus}
+          loading={subscribeChargingPoints.loading}
           label={t("Envoyer la demande d'inscription")}
           variant="primary"
-          action={() => { }}
+          action={submitChargingPointsSubscription}
         />
 
         <Button icon={Return} label={t("Fermer")} action={onClose} asideX />

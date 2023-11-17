@@ -82,6 +82,7 @@ export interface ElecChargingPointsApplicationCheckInfo {
   errors?: ChargingPointsApplicationError[]
   file_name: string
   error_count: number
+  charging_points_count: number
 }
 
 export interface ChargingPointsApplicationError {
