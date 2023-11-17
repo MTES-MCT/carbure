@@ -1,3 +1,4 @@
+import { AxiosResponse } from "axios"
 import api, { Api } from "common/services/api"
 import { elecChargingPointsSubscriptionCheckResponseFailed, elecChargingPointsSubscriptionCheckResponseSucceed, elecChargingPointsSubscriptions } from "elec/__test__/data"
 import { ElecChargingPointsSubscription, ElecChargingPointsSubscriptionCheckInfo } from "elec/types"
@@ -6,13 +7,8 @@ import { ElecChargingPointsSubscription, ElecChargingPointsSubscriptionCheckInfo
 
 export function getChargingPointsSubscriptions(entity_id: number) {
 
-  // return api.get<Api<ElecChargingPointsSubscription[]>>("/v5/elec/charging-points/subscription", {
-  //   params: { entity_id },
-  // })
-
-  // TO TEST without data
-  return new Promise<ElecChargingPointsSubscription[]>((resolve) => {
-    resolve(elecChargingPointsSubscriptions)
+  return api.get<Api<ElecChargingPointsSubscription[]>>("/v5/elec/charging-points/subscriptions", {
+    params: { entity_id },
   })
 
 }

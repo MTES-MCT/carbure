@@ -22,6 +22,7 @@ import {
 } from "carbure/__test__/data"
 import { clone, Data } from "carbure/__test__/helpers"
 import { dcApplicationErrors } from "./data"
+import { elecChargingPointsSubscriptions } from "elec/__test__/data"
 
 let deliverySites: any[] = []
 let productionSites: any[] = []
@@ -296,6 +297,25 @@ export const koDoubleCountUploadApplication = rest.post(
   }
 )
 
+
+export const okChargingPointsSubscriptions = rest.get("/api/v5/elec/charging-points/subscriptions", (req, res, ctx) => {
+  return res(
+    ctx.json({
+      status: "success",
+      data: elecChargingPointsSubscriptions,
+    })
+  )
+})
+
+export const okChargingPointsSubscriptionsEmpty = rest.get("/api/v5/elec/charging-points/subscriptions", (req, res, ctx) => {
+  return res(
+    ctx.json({
+      status: "success",
+      data: [],
+    })
+  )
+})
+
 export default setupServer(
   koDoubleCountUploadApplication,
   okDoubleCountUploadDocumentation,
@@ -323,5 +343,6 @@ export default setupServer(
   okErrorsTranslations,
   okFieldsTranslations,
   okSelfCertificates,
-  okApplications
+  okApplications,
+  okChargingPointsSubscriptions,
 )
