@@ -1,19 +1,20 @@
 import api, { Api } from "common/services/api"
-import { elecChargingPointsSubscriptionCheckResponseSucceed, elecChargingPointsSubscriptions } from "elec/__test__/data"
+import { elecChargingPointsSubscriptionCheckResponseFailed, elecChargingPointsSubscriptionCheckResponseSucceed, elecChargingPointsSubscriptions } from "elec/__test__/data"
 import { ElecChargingPointsSubscription, ElecChargingPointsSubscriptionCheckInfo } from "elec/types"
 
 
 
 export function getChargingPointsSubscriptions(entity_id: number) {
 
+  // return api.get<Api<ElecChargingPointsSubscription[]>>("/v5/elec/charging-points/subscription", {
+  //   params: { entity_id },
+  // })
+
   // TO TEST without data
   return new Promise<ElecChargingPointsSubscription[]>((resolve) => {
     resolve(elecChargingPointsSubscriptions)
   })
 
-  // return api.get<Api<ElecChargingPointsSubscription[]>>("/v5/elec/charging-points/subscription", {
-  //   params: { entity_id },
-  // })
 }
 
 
@@ -26,9 +27,9 @@ export function checkChargingPointsSubscription(entity_id: number, file: File) {
   // return res
 
   // TO TEST errors
-  // return new Promise<ElecChargingPointsSubscriptionCheckInfo>((resolve) => {
-  //   resolve(elecChargingPointsSubscriptionCheckResponseFailed)
-  // })
+  return new Promise<ElecChargingPointsSubscriptionCheckInfo>((resolve) => {
+    resolve(elecChargingPointsSubscriptionCheckResponseFailed)
+  })
 
   // // TO TEST success
   return new Promise<ElecChargingPointsSubscriptionCheckInfo>((resolve) => {

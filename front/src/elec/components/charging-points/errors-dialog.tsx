@@ -6,7 +6,7 @@ import { AlertCircle, AlertTriangle, Plus, Return } from "common/components/icon
 import Tag from "common/components/tag"
 import { ChargingPointsSubscriptionError, ElecChargingPointsSubscriptionCheckInfo } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
-import { getErrorText } from "settings/utils/double-counting"
+import { t } from "i18next"
 
 export type ErrorsDetailsDialogProps = {
   fileData: ElecChargingPointsSubscriptionCheckInfo
@@ -35,9 +35,8 @@ export const ErrorsDetailsDialog = ({
 
         <section>
           <p style={{ textAlign: 'left' }}>
-            `dzadza
-            <Trans defaults="Le fichier <b>{{fileName}}</b> comporte {{count}} incohérences.  Veuillez les corriger puis recharger à nouveau votre fichier."
-              fileName={fileData.file_name} count={fileData.error_count} />
+            <Trans defaults="Le fichier <b>{{fileName}}</b> comporte <b>{{count}} incohérences</b>.  Veuillez les corriger puis recharger à nouveau votre fichier."
+              values={{ fileName: fileData.file_name }} count={fileData.error_count} />
           </p>
         </section>
         <section>
@@ -85,7 +84,7 @@ export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
       <ul>
         {errors.map((error, index) => {
           return <li key={`error-${index}`}>
-            {error.error}</li>
+            {getErrorText(error)}</li>
         })}
       </ul>
     </section>
@@ -96,3 +95,33 @@ export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
 
 
 export default ErrorsDetailsDialog
+
+
+
+export function getErrorText(
+  error: ChargingPointsSubscriptionError,
+) {
+  console.log('error:', error)
+
+
+  switch (error.error) {
+
+    case "MISSING_CHARGING_POINT_IN_DATAGOUV":
+      return t(
+        "Les identifiants de points de recharge suivants n'existent pas dans la consolidation transport.data.gouv : {{chargingPoints}}",
+        { chargingPoints: error.meta?.charging_points.join(",") }
+      )
+
+    case "MISSING_CHARGING_POINT_DATA":
+      return t(
+        "Les informations relatives aux relevés (date_releve, releve, no_mid) sont manquantes ou pas correctement remplies pour les points de recharge suivants :",
+        { chargingPoints: error.meta?.charging_points.join(",") }
+      )
+
+    default:
+      return t("Erreur de validation") +
+        `: ${error.error}${error.meta ? " " + error.meta : ""}`
+
+  }
+
+}
