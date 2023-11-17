@@ -1,5 +1,5 @@
 import { EntityPreview, EntityType } from "carbure/types";
-import { ChargingPointsApplicationError, ElecChargingPointsApplication, ElecChargingPointsApplicationCheckInfo, ElecChargingPointsApplicationStatus, ElecProvisionCertificatePreview } from "elec/types";
+import { ChargingPointsSubscriptionError, ElecChargingPointsSubscription, ElecChargingPointsSubscriptionCheckInfo, ElecChargingPointsSubscriptionStatus, ElecProvisionCertificatePreview } from "elec/types";
 import { ElecCPOSnapshot, ElecProvisionCertificatesData } from "elec/types-cpo";
 
 export const elecSnapshot: ElecCPOSnapshot = {
@@ -49,54 +49,54 @@ export const elecAdminProvisionCertificateList: ElecProvisionCertificatesData = 
 }
 
 
-const elecChargingPointApplication1: ElecChargingPointsApplication = {
+const elecChargingPointSubscription1: ElecChargingPointsSubscription = {
     id: 1,
     station_count: 4,
     charging_point_count: 90,
     power_total: 8,
     date: "2023-10-12",
-    status: ElecChargingPointsApplicationStatus.Pending,
+    status: ElecChargingPointsSubscriptionStatus.Pending,
 }
 
-const elecChargingPointApplication2: ElecChargingPointsApplication = {
+const elecChargingPointSubscription2: ElecChargingPointsSubscription = {
     id: 1,
     station_count: 19,
     charging_point_count: 987,
     power_total: 30000,
     date: "2023-11-13",
-    status: ElecChargingPointsApplicationStatus.Accepted,
+    status: ElecChargingPointsSubscriptionStatus.Accepted,
 }
-const elecChargingPointApplication3: ElecChargingPointsApplication = {
+const elecChargingPointSubscription3: ElecChargingPointsSubscription = {
     id: 1,
     station_count: 1,
     charging_point_count: 5,
     power_total: 1000,
     date: "2023-09-01",
-    status: ElecChargingPointsApplicationStatus.Rejected,
+    status: ElecChargingPointsSubscriptionStatus.Rejected,
 }
 
-export const elecChargingPointsApplications: ElecChargingPointsApplication[] = [
-    elecChargingPointApplication1,
-    elecChargingPointApplication2,
-    elecChargingPointApplication3
+export const elecChargingPointsSubscriptions: ElecChargingPointsSubscription[] = [
+    elecChargingPointSubscription1,
+    elecChargingPointSubscription2,
+    elecChargingPointSubscription3
 ]
 
 
-export const chargingPointsApplicationError: ChargingPointsApplicationError = {
+export const chargingPointsSubscriptionError: ChargingPointsSubscriptionError = {
     error: "MISSING_CHARGING_POINT_IN_DATAGOUV",
     meta: {
         charging_points: ["8U7Y", "8U7Y"]
     }
 }
-export const elecChargingPointsApplicationCheckResponseFailed: ElecChargingPointsApplicationCheckInfo = {
+export const elecChargingPointsSubscriptionCheckResponseFailed: ElecChargingPointsSubscriptionCheckInfo = {
     file_name: "test.csv",
     error_count: 2,
     charging_points_count: 0,
-    errors: [chargingPointsApplicationError, chargingPointsApplicationError
+    errors: [chargingPointsSubscriptionError, chargingPointsSubscriptionError
     ]
 }
 
-export const elecChargingPointsApplicationCheckResponseSucceed: ElecChargingPointsApplicationCheckInfo = {
+export const elecChargingPointsSubscriptionCheckResponseSucceed: ElecChargingPointsSubscriptionCheckInfo = {
     file_name: "test.csv",
     error_count: 0,
     charging_points_count: 90

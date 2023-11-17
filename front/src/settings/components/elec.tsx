@@ -7,10 +7,10 @@ import { LoaderOverlay, Panel } from "common/components/scaffold"
 import Table, { Cell } from "common/components/table"
 import { useQuery } from "common/hooks/async"
 import { formatDate, formatNumber } from "common/utils/formatters"
-import ApplicationStatus from "elec/components/charging-points/application-status"
+import SubscriptionStatus from "elec/components/charging-points/subscription-status"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api/elec"
-import { ElecChargingPointsApplication, ElecChargingPointsSnapshot } from "elec/types"
+import { ElecChargingPointsSubscription, ElecChargingPointsSnapshot } from "elec/types"
 import ElecChargingPointsFileUpload from "elec/components/charging-points/upload"
 
 const ElecSettings = () => {
@@ -19,29 +19,19 @@ const ElecSettings = () => {
   const entity = useEntity()
   const portal = usePortal()
 
-  const applicationsResponse = useQuery(api.getChargingPointsApplications, {
-    key: "elec-charging-points",
+  const subscriptionsResponse = useQuery(api.getChargingPointsSubscriptions, {
+    key: "charging-points-subscriptions",
     params: [entity.id],
   })
 
-  const applications = applicationsResponse.result ?? []
-  const applicationsSnapshot: ElecChargingPointsSnapshot = {
-    station_count: applications.reduce((acc, app) => acc + app.station_count, 0),
-    charging_point_count: applications.reduce((acc, app) => acc + app.charging_point_count, 0),
-    power_total: applications.reduce((acc, app) => acc + app.power_total, 0),
+  const subscriptions = subscriptionsResponse.result ?? []
+  const subscriptionsSnapshot: ElecChargingPointsSnapshot = {
+    station_count: subscriptions.reduce((acc, app) => acc + app.station_count, 0),
+    charging_point_count: subscriptions.reduce((acc, app) => acc + app.charging_point_count, 0),
+    power_total: subscriptions.reduce((acc, app) => acc + app.power_total, 0),
   }
-  console.log('applications:', applications)
-  const isEmpty = applications.length === 0
+  const isEmpty = subscriptions.length === 0
 
-  function showApplicationDialog(application: ElecChargingPointsApplication) {
-    // portal((resolve) => (
-    //   <DoubleCountingApplicationDialog
-    //     entity={entity}
-    //     applicationID={dc.id}
-    //     onClose={resolve}
-    //   />
-    // ))
-  }
 
   function showUploadDialog() {
     portal((resolve) => (
@@ -77,42 +67,41 @@ const ElecSettings = () => {
 
       {!isEmpty && (
         <Table
-          rows={applications}
-          onAction={showApplicationDialog}
+          rows={subscriptions}
           columns={[
             {
               header: t("Statut"),
-              cell: (application) => <ApplicationStatus status={application.status} />,
+              cell: (subscription) => <SubscriptionStatus status={subscription.status} />,
             },
             {
               header: t("Date"),
-              cell: (application) => (
+              cell: (subscription) => (
                 <Cell
-                  text={`${formatDate(application.date)}`}
+                  text={`${formatDate(subscription.date)}`}
                 />
               ),
             },
             {
-              header: applicationsSnapshot.power_total + " kW " + t("cumulé"),
-              cell: (application) => (
+              header: subscriptionsSnapshot.power_total + " kW " + t("cumulé"),
+              cell: (subscription) => (
                 <Cell
-                  text={`${formatNumber(application.power_total)}` + " kW"}
+                  text={`${formatNumber(subscription.power_total)}` + " kW"}
                 />
               ),
             },
             {
-              header: applicationsSnapshot.station_count + " " + t("Stations"),
-              cell: (application) => (
+              header: subscriptionsSnapshot.station_count + " " + t("Stations"),
+              cell: (subscription) => (
                 <Cell
-                  text={`${formatNumber(application.station_count)}`}
+                  text={`${formatNumber(subscription.station_count)}`}
                 />
               ),
             },
             {
-              header: applicationsSnapshot.charging_point_count + " " + t("Points de recharge"),
-              cell: (application) => (
+              header: subscriptionsSnapshot.charging_point_count + " " + t("Points de recharge"),
+              cell: (subscription) => (
                 <Cell
-                  text={`${formatNumber(application.charging_point_count)}`}
+                  text={`${formatNumber(subscription.charging_point_count)}`}
                 />
               ),
             },
@@ -121,7 +110,7 @@ const ElecSettings = () => {
         />
       )}
 
-      {applicationsResponse.loading && <LoaderOverlay />}
+      {subscriptionsResponse.loading && <LoaderOverlay />}
     </Panel>
   )
 }

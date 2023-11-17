@@ -1,17 +1,17 @@
 import api, { Api } from "common/services/api"
-import { elecChargingPointsApplicationCheckResponseFailed, elecChargingPointsApplicationCheckResponseSucceed, elecChargingPointsApplications } from "elec/__test__/data"
-import { ElecChargingPointsApplication, ElecChargingPointsApplicationCheckInfo } from "elec/types"
+import { elecChargingPointsSubscriptionCheckResponseSucceed, elecChargingPointsSubscriptions } from "elec/__test__/data"
+import { ElecChargingPointsSubscription, ElecChargingPointsSubscriptionCheckInfo } from "elec/types"
 
 
 
-export function getChargingPointsApplications(entity_id: number) {
+export function getChargingPointsSubscriptions(entity_id: number) {
 
   // TO TEST without data
-  return new Promise<ElecChargingPointsApplication[]>((resolve) => {
-    resolve(elecChargingPointsApplications)
+  return new Promise<ElecChargingPointsSubscription[]>((resolve) => {
+    resolve(elecChargingPointsSubscriptions)
   })
 
-  // return api.get<Api<ElecChargingPointsApplication[]>>("/v5/elec/charging-points/applications", {
+  // return api.get<Api<ElecChargingPointsSubscription[]>>("/v5/elec/charging-points/subscription", {
   //   params: { entity_id },
   // })
 }
@@ -19,27 +19,27 @@ export function getChargingPointsApplications(entity_id: number) {
 
 export function checkChargingPointsSubscription(entity_id: number, file: File) {
 
-  // const res = api.post<Api<ElecChargingPointsApplicationCheckResponse>>(
-  //   "/v5/elec/charging-points/check-application",
+  // const res = api.post<Api<ElecChargingPointsSubscriptionCheckResponse>>(
+  //   "/v5/elec/charging-points/check-subscription",
   //   { entity_id, file }
   // )
   // return res
 
   // TO TEST errors
-  // return new Promise<ElecChargingPointsApplicationCheckInfo>((resolve) => {
-  //   resolve(elecChargingPointsApplicationCheckResponseFailed)
+  // return new Promise<ElecChargingPointsSubscriptionCheckInfo>((resolve) => {
+  //   resolve(elecChargingPointsSubscriptionCheckResponseFailed)
   // })
 
   // // TO TEST success
-  return new Promise<ElecChargingPointsApplicationCheckInfo>((resolve) => {
-    resolve(elecChargingPointsApplicationCheckResponseSucceed)
+  return new Promise<ElecChargingPointsSubscriptionCheckInfo>((resolve) => {
+    resolve(elecChargingPointsSubscriptionCheckResponseSucceed)
   })
 
 
 }
 
 
-export function subscribeChargingPointsApplication(
+export function subscribeChargingPoints(
   entity_id: number,
   file: File,
 ) {
