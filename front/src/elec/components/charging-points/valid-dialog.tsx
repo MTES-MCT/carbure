@@ -1,20 +1,16 @@
+import useEntity from "carbure/hooks/entity"
 import { Button } from "common/components/button"
 import { Dialog } from "common/components/dialog"
 import { Plus, Return } from "common/components/icons"
-import { usePortal } from "common/components/portal"
-import Tag from "common/components/tag"
-import { Trans, useTranslation } from "react-i18next"
-import { useMatch } from "react-router-dom"
-import FileApplicationInfo from "../../../double-counting/components/files-checker/file-application-info"
-import { DoubleCountingFileInfo } from "../../../double-counting/types"
-import { ElecChargingPointsApplicationCheckInfo } from "elec/types"
-import { subscribeChargingPointsApplication } from "settings/api/elec"
-import { useMutation } from "common/hooks/async"
-import useEntity from "carbure/hooks/entity"
 import { useNotify, useNotifyError } from "common/components/notifications"
+import Tag from "common/components/tag"
+import { useMutation } from "common/hooks/async"
+import { ElecChargingPointsSubscriptionCheckInfo } from "elec/types"
+import { Trans, useTranslation } from "react-i18next"
+import { subscribeChargingPoints } from "settings/api/elec"
 
 export type ValidDetailsDialogProps = {
-  fileData: ElecChargingPointsApplicationCheckInfo
+  fileData: ElecChargingPointsSubscriptionCheckInfo
   onClose: () => void
   file: File
 }
@@ -29,8 +25,8 @@ export const ValidDetailsDialog = ({
   const notify = useNotify()
   const notifyError = useNotifyError()
 
-  const subscribeChargingPoints = useMutation(subscribeChargingPointsApplication, {
-    invalidates: ["dc-applications", "dc-snapshot"],
+  const chargingPointsSubscription = useMutation(subscribeChargingPoints, {
+    invalidates: ["charging-points-subscriptions"],
     onSuccess() {
       onClose()
       notify(t("Les {{count}} points de recharge ont été ajoutés !", { count: fileData.charging_points_count }), { variant: "success" })
@@ -42,7 +38,7 @@ export const ValidDetailsDialog = ({
   })
 
   const submitChargingPointsSubscription = () => {
-    subscribeChargingPoints.execute(entity.id, file)
+    chargingPointsSubscription.execute(entity.id, file)
   }
 
   return (
@@ -79,7 +75,7 @@ export const ValidDetailsDialog = ({
       <footer>
         <Button
           icon={Plus}
-          loading={subscribeChargingPoints.loading}
+          loading={chargingPointsSubscription.loading}
           label={t("Envoyer la demande d'inscription")}
           variant="primary"
           action={submitChargingPointsSubscription}

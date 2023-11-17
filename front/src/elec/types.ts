@@ -58,19 +58,19 @@ export interface ElecProvisionCertificatesDetails extends ElecProvisionCertifica
 }
 
 
-export enum ElecChargingPointsApplicationStatus {
+export enum ElecChargingPointsSubscriptionStatus {
   Pending = "PENDING",
   Accepted = "ACCEPTED",
   Rejected = "REJECTED",
 }
 
-export interface ElecChargingPointsApplication {
+export interface ElecChargingPointsSubscription {
   id: number
   station_count: number
   charging_point_count: number
   power_total: number
   date: string
-  status: ElecChargingPointsApplicationStatus
+  status: ElecChargingPointsSubscriptionStatus
 }
 export interface ElecChargingPointsSnapshot {
   station_count: number
@@ -78,14 +78,14 @@ export interface ElecChargingPointsSnapshot {
   power_total: number
 }
 
-export interface ElecChargingPointsApplicationCheckInfo {
-  errors?: ChargingPointsApplicationError[]
+export interface ElecChargingPointsSubscriptionCheckInfo {
+  errors?: ChargingPointsSubscriptionError[]
   file_name: string
   error_count: number
   charging_points_count: number
 }
 
-export interface ChargingPointsApplicationError {
+export interface ChargingPointsSubscriptionError {
   error: string
   meta?: null | any
 }
