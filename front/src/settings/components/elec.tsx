@@ -12,6 +12,7 @@ import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api/elec"
 import { ElecChargingPointsSubscription, ElecChargingPointsSnapshot } from "elec/types"
 import ElecChargingPointsFileUpload from "elec/components/charging-points/upload"
+import { elecChargingPointsSubscriptions } from "elec/__test__/data"
 
 const ElecSettings = () => {
   const { t } = useTranslation()
@@ -24,7 +25,14 @@ const ElecSettings = () => {
     params: [entity.id],
   })
 
-  const subscriptions = subscriptionsResponse.result ?? []
+  const subscriptions = subscriptionsResponse.result?.data.data ?? []
+
+  // const subscriptions = elecChargingPointsSubscriptions // TEST with subscriptions
+
+
+
+
+
   const subscriptionsSnapshot: ElecChargingPointsSnapshot = {
     station_count: subscriptions.reduce((acc, app) => acc + app.station_count, 0),
     charging_point_count: subscriptions.reduce((acc, app) => acc + app.charging_point_count, 0),
