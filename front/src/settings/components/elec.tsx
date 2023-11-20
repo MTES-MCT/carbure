@@ -18,6 +18,8 @@ const ElecSettings = () => {
   const { t } = useTranslation()
   const rights = useRights()
   const entity = useEntity()
+  const { isCPO } = entity
+  console.log('entity:', entity)
   const portal = usePortal()
 
   const subscriptionsResponse = useQuery(api.getChargingPointsSubscriptions, {
@@ -48,13 +50,16 @@ const ElecSettings = () => {
         <h1>
           <Trans>Inscriptions de points de recharge</Trans>
         </h1>
-        <Button
-          asideX
-          variant="primary"
-          icon={Plus}
-          action={showUploadDialog}
-          label={t("Inscrire des points de recharge")}
-        />
+
+        {isCPO && (
+          <Button
+            asideX
+            variant="primary"
+            icon={Plus}
+            action={showUploadDialog}
+            label={t("Inscrire des points de recharge")}
+          />
+        )}
       </header>
 
       {isEmpty && (

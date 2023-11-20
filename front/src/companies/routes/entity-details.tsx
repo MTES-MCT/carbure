@@ -14,6 +14,7 @@ import { useQuery } from "common/hooks/async"
 import useEntity from "carbure/hooks/entity"
 import CompanyInfo from "settings/components/company-info"
 import { useTranslation } from "react-i18next"
+import ElecSettings from "settings/components/elec"
 
 const EntityDetails = () => {
   const navigate = useNavigate()
@@ -32,6 +33,7 @@ const EntityDetails = () => {
   }
 
   const entityData = company.result?.data.data
+  const isCPO = entityData?.entity_type === EntityType.CPO
   const isProducer = entityData?.entity_type === EntityType.Producer
   const isAirline = entityData?.entity_type === EntityType.Airline
 
@@ -58,6 +60,11 @@ const EntityDetails = () => {
             label: t("Informations"),
           },
           !isAirline && { key: "depot", path: "#depot", label: "Depots" },
+          isCPO && {
+            path: "#elec-charging-points",
+            key: "elec-charging-points",
+            label: t("Points de recharge"),
+          },
           isProducer && { key: "production", path: "#production", label: t("Sites de production") }, // prettier-ignore
           !isAirline && {
             key: "certificates",
@@ -86,6 +93,7 @@ const EntityDetails = () => {
             }
           />
         )}
+        {isCPO && <ElecSettings />}
         {!isAirline && <Certificates entity_id={company_id} />}
       </section>
     </Main>
