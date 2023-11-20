@@ -114,6 +114,29 @@ export const admin: Entity = {
   preferred_unit: "l",
 }
 
+
+export const cpo: Entity = {
+  id: 4,
+  name: "CPO Test",
+  entity_type: EntityType.CPO,
+  has_mac: false,
+  has_trading: false,
+  has_stocks: false,
+  has_elec: false,
+  has_direct_deliveries: false,
+  default_certificate: "",
+  legal_name: "",
+  registered_address: "",
+  registered_country: "",
+  registered_zipcode: "",
+  registered_city: "",
+  registration_id: "",
+  sustainability_officer: "",
+  sustainability_officer_phone_number: "",
+  preferred_unit: "l",
+}
+
+
 // COUNTRIES
 
 export const country = {

@@ -1,3 +1,4 @@
+import { cpo } from "carbure/__test__/data";
 import { EntityPreview, EntityType } from "carbure/types";
 import { ChargingPointsSubscriptionError, ElecChargingPointsSubscription, ElecChargingPointsSubscriptionCheckInfo, ElecChargingPointsSubscriptionStatus, ElecProvisionCertificatePreview } from "elec/types";
 import { ElecCPOSnapshot, ElecProvisionCertificatesData } from "elec/types-cpo";
@@ -51,27 +52,31 @@ export const elecAdminProvisionCertificateList: ElecProvisionCertificatesData = 
 
 const elecChargingPointSubscription1: ElecChargingPointsSubscription = {
     id: 1,
+    cpo: cpo,
     station_count: 4,
     charging_point_count: 90,
     power_total: 8,
-    date: "2023-10-12",
+    application_date: "2023-10-12",
     status: ElecChargingPointsSubscriptionStatus.Pending,
 }
 
 const elecChargingPointSubscription2: ElecChargingPointsSubscription = {
-    id: 1,
+    id: 2,
+    cpo: cpo,
     station_count: 19,
     charging_point_count: 987,
     power_total: 30000,
-    date: "2023-11-13",
+    application_date: "2023-11-13",
+    validation_date: "2023-11-01",
     status: ElecChargingPointsSubscriptionStatus.Accepted,
 }
 const elecChargingPointSubscription3: ElecChargingPointsSubscription = {
-    id: 1,
+    id: 3,
+    cpo: cpo,
     station_count: 1,
     charging_point_count: 5,
     power_total: 1000,
-    date: "2023-09-01",
+    application_date: "2023-09-01",
     status: ElecChargingPointsSubscriptionStatus.Rejected,
 }
 

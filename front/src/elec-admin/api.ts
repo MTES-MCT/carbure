@@ -78,3 +78,7 @@ export async function getTransferCertificateFilters(field: ElecAdminTransferCert
     .then((res) => res.data.data?.filter_values ?? [])
 
 }
+
+export function downloadSubscriptionChargingPoints(subscription_id: number) {
+  // return download("/v5/admin/elec/charging-points/details", { subscription_id, export: true })
+}
