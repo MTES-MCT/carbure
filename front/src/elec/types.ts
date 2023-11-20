@@ -66,10 +66,12 @@ export enum ElecChargingPointsSubscriptionStatus {
 
 export interface ElecChargingPointsSubscription {
   id: number
+  cpo: EntityPreview
   station_count: number
   charging_point_count: number
   power_total: number
-  date: string
+  application_date: string
+  validation_date?: string
   status: ElecChargingPointsSubscriptionStatus
 }
 export interface ElecChargingPointsSnapshot {

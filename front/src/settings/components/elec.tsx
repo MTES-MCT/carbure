@@ -13,6 +13,7 @@ import * as api from "../api/elec"
 import { ElecChargingPointsSubscription, ElecChargingPointsSnapshot } from "elec/types"
 import ElecChargingPointsFileUpload from "elec/components/charging-points/upload-dialog"
 import { elecChargingPointsSubscriptions } from "elec/__test__/data"
+import SubscriptionDialog from "elec-admin/components/charging-points/subscription-dialog"
 
 const ElecSettings = () => {
   const { t } = useTranslation()
@@ -41,6 +42,12 @@ const ElecSettings = () => {
   function showUploadDialog() {
     portal((resolve) => (
       <ElecChargingPointsFileUpload onClose={resolve} />
+    ))
+  }
+
+  function showSubscriptionDetails(subscription: ElecChargingPointsSubscription) {
+    portal((resolve) => (
+      <SubscriptionDialog onClose={resolve} subscription={subscription} />
     ))
   }
 
@@ -76,6 +83,7 @@ const ElecSettings = () => {
       {!isEmpty && (
         <Table
           rows={subscriptions}
+          onAction={showSubscriptionDetails}
           columns={[
             {
               header: t("Statut"),
@@ -85,7 +93,7 @@ const ElecSettings = () => {
               header: t("Date"),
               cell: (subscription) => (
                 <Cell
-                  text={`${formatDate(subscription.date)}`}
+                  text={`${formatDate(subscription.application_date)}`}
                 />
               ),
             },
@@ -116,7 +124,10 @@ const ElecSettings = () => {
 
           ]}
         />
+
+
       )}
+      {/* <HashRoute path="char/:id" element={<ElecAdminProvisionDetailsDialog />} /> */}
 
       {subscriptionsResponse.loading && <LoaderOverlay />}
     </Panel>
