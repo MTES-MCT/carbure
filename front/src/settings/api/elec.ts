@@ -14,24 +14,10 @@ export function getChargingPointsSubscriptions(entity_id: number) {
 
 
 export function checkChargingPointsSubscription(entity_id: number, file: File) {
-
-  // const res = api.post<Api<ElecChargingPointsSubscriptionCheckResponse>>(
-  //   "/v5/elec/charging-points/check-subscription",
-  //   { entity_id, file }
-  // )
-  // return res
-
-  // TO TEST errors
-  // return new Promise<ElecChargingPointsSubscriptionCheckInfo>((resolve) => {
-  //   resolve(elecChargingPointsSubscriptionCheckResponseFailed)
-  // })
-
-  // // TO TEST success
-  return new Promise<ElecChargingPointsSubscriptionCheckInfo>((resolve) => {
-    resolve(elecChargingPointsSubscriptionCheckResponseSucceed)
-  })
-
-
+  return api.post<Api<ElecChargingPointsSubscriptionCheckInfo>>(
+    "/v5/elec/charging-points/check-subscription",
+    { entity_id, file }
+  )
 }
 
 

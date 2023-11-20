@@ -22,10 +22,31 @@ import {
 } from "carbure/__test__/data"
 import { clone, Data } from "carbure/__test__/helpers"
 import { dcApplicationErrors } from "./data"
-import { elecChargingPointsSubscriptions } from "elec/__test__/data"
+import { elecChargingPointsSubscriptionCheckResponseFailed, elecChargingPointsSubscriptionCheckResponseSucceed, elecChargingPointsSubscriptions } from "elec/__test__/data"
 
 let deliverySites: any[] = []
 let productionSites: any[] = []
+
+const mockGetWithResponseData = (url: string, data: any) => {
+  return rest.get(url, (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data,
+      })
+    )
+  })
+}
+const mockPostWithResponseData = (url: string, data: any) => {
+  return rest.post(url, (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data,
+      })
+    )
+  })
+}
 
 export function setEntity(nextEntity: any) {
   Data.set("entity", nextEntity)
@@ -307,14 +328,12 @@ export const okChargingPointsSubscriptions = rest.get("/api/v5/elec/charging-poi
   )
 })
 
-export const okChargingPointsSubscriptionsEmpty = rest.get("/api/v5/elec/charging-points/subscriptions", (req, res, ctx) => {
-  return res(
-    ctx.json({
-      status: "success",
-      data: [],
-    })
-  )
-})
+export const okChargingPointsSubscriptionsEmpty = mockGetWithResponseData("/api/v5/elec/charging-points/subscriptions", [])
+export const okChargingPointsCheckValid = mockPostWithResponseData("/api/v5/elec/charging-points/check-subscription", elecChargingPointsSubscriptionCheckResponseSucceed)
+export const okChargingPointsCheckError = mockPostWithResponseData("/api/v5/elec/charging-points/check-subscription", elecChargingPointsSubscriptionCheckResponseFailed)
+
+
+
 
 export default setupServer(
   koDoubleCountUploadApplication,
@@ -345,4 +364,5 @@ export default setupServer(
   okSelfCertificates,
   okApplications,
   okChargingPointsSubscriptions,
+  okChargingPointsCheckValid
 )
