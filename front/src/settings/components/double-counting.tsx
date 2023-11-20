@@ -28,7 +28,6 @@ const DoubleCountingSettings = () => {
   })
 
   const applications = applicationsData.result?.data.data ?? []
-  console.log('applications:', applications)
   const isEmpty = applications.length === 0
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
 
