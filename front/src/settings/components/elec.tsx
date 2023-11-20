@@ -11,7 +11,7 @@ import SubscriptionStatus from "elec/components/charging-points/subscription-sta
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api/elec"
 import { ElecChargingPointsSubscription, ElecChargingPointsSnapshot } from "elec/types"
-import ElecChargingPointsFileUpload from "elec/components/charging-points/upload"
+import ElecChargingPointsFileUpload from "elec/components/charging-points/upload-dialog"
 import { elecChargingPointsSubscriptions } from "elec/__test__/data"
 
 const ElecSettings = () => {
@@ -26,12 +26,7 @@ const ElecSettings = () => {
   })
 
   const subscriptions = subscriptionsResponse.result?.data.data ?? []
-
   // const subscriptions = elecChargingPointsSubscriptions // TEST with subscriptions
-
-
-
-
 
   const subscriptionsSnapshot: ElecChargingPointsSnapshot = {
     station_count: subscriptions.reduce((acc, app) => acc + app.station_count, 0),
