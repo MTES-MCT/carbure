@@ -101,8 +101,6 @@ export default ErrorsDetailsDialog
 export function getErrorText(
   error: ChargingPointsSubscriptionError,
 ) {
-  console.log('error:', error)
-
 
   switch (error.error) {
 

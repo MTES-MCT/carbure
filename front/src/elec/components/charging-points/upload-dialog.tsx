@@ -15,6 +15,7 @@ import { checkDoubleCountingApplication } from "settings/api/double-counting"
 import { checkChargingPointsSubscription } from "settings/api/elec"
 import ErrorsDetailsDialog from "./errors-dialog"
 import ValidDetailsDialog from "./valid-dialog"
+import { elecChargingPointsSubscriptionCheckResponseFailed, elecChargingPointsSubscriptionCheckResponseSucceed } from "elec/__test__/data"
 
 // L'URL complète du fichier
 
@@ -68,7 +69,13 @@ const ElecChargingPointsFileUpload = ({
       entity.id,
       value.chargingPointsFile as File
     )
-    const checkedFile = response
+
+    if (response.status != 200) return
+    const checkedFile = response.data.data
+    // const checkedFile = elecChargingPointsSubscriptionCheckResponseFailed // TEST with error
+    // const checkedFile = elecChargingPointsSubscriptionCheckResponseSucceed // TEST with success
+
+
 
     if (checkedFile) {
       onClose()
