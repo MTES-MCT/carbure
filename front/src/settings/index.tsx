@@ -26,7 +26,7 @@ const Settings = () => {
 
   const hasCertificates = isProducer || isTrader || isOperator
   const hasDepot = isProducer || isOperator || isTrader
-  const hasOptions = isProducer || isOperator || isTrader || isCPO
+  const hasOptions = isProducer || isOperator || isTrader
 
   return (
     <Main>
@@ -44,7 +44,7 @@ const Settings = () => {
             key: "options",
             label: t("Options"),
           },
-          hasOptions && {
+          {
             path: "#info",
             key: "info",
             label: t("Informations"),
@@ -78,7 +78,7 @@ const Settings = () => {
       />
       <section>
         {hasOptions && <CompanyOptions />}
-        {hasOptions && <CompanyInfo />}
+        <CompanyInfo />
         {hasCertificates && <Certificates />}
         {hasDepot && <DeliverySitesSettings entity={entity} />}
         {isProducer && <ProductionSitesSettings entity={entity} />}
