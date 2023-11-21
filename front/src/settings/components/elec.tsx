@@ -13,14 +13,12 @@ import * as api from "../api/elec"
 import { ElecChargingPointsSubscription, ElecChargingPointsSnapshot } from "elec/types"
 import ElecChargingPointsFileUpload from "elec/components/charging-points/upload-dialog"
 import { elecChargingPointsSubscriptions } from "elec/__test__/data"
-import SubscriptionDialog from "elec-admin/components/charging-points/subscription-dialog"
+import ChargingPointsSubscriptionDetailsDialog from "elec-admin/components/charging-points/subscription-details-dialog"
 
-const ElecSettings = () => {
+const ElecSettings = ({ companyId }: { companyId: number }) => {
   const { t } = useTranslation()
-  const rights = useRights()
   const entity = useEntity()
   const { isCPO } = entity
-  console.log('entity:', entity)
   const portal = usePortal()
 
   const subscriptionsResponse = useQuery(api.getChargingPointsSubscriptions, {
@@ -47,7 +45,7 @@ const ElecSettings = () => {
 
   function showSubscriptionDetails(subscription: ElecChargingPointsSubscription) {
     portal((resolve) => (
-      <SubscriptionDialog onClose={resolve} subscription={subscription} />
+      <ChargingPointsSubscriptionDetailsDialog onClose={resolve} subscription={subscription} companyId={companyId} />
     ))
   }
 
@@ -127,7 +125,6 @@ const ElecSettings = () => {
 
 
       )}
-      {/* <HashRoute path="char/:id" element={<ElecAdminProvisionDetailsDialog />} /> */}
 
       {subscriptionsResponse.loading && <LoaderOverlay />}
     </Panel>

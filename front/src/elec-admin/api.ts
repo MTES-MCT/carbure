@@ -21,6 +21,7 @@ export function importProvisionCertificates(entity_id: number, file: File) {
     file,
   })
 }
+
 const QUERY_RESET: Partial<ElecAdminProvisionCertificateQuery> = {
   limit: undefined,
   from_idx: undefined,
@@ -79,6 +80,29 @@ export async function getTransferCertificateFilters(field: ElecAdminTransferCert
 
 }
 
-export function downloadSubscriptionChargingPoints(subscription_id: number) {
-  // return download("/v5/admin/elec/charging-points/details", { subscription_id, export: true })
+export function downloadChargingPointsSubscriptionDetails(entityId: number, companyId: number, subscriptionId: number) {
+  return download("/v5/admin/elec/charging-points/subscription-details", {
+    entity_id: entityId, company_id: companyId, subscription_id: subscriptionId, export: true
+  })
+}
+export function downloadChargingPointsSubscriptions(subscriptionId: number) {
+  return download("/v5/admin/elec/charging-points/subscriptions", { subscriptionId, export: true })
+}
+
+
+export function acceptChargingPointsSubscription(entityId: number, companyId: number, subscriptionId: number) {
+  return api.post("/v5/admin/elec/charging-points/accept-subscription", {
+    entity_id: entityId,
+    company_id: companyId,
+    subscription_id: subscriptionId,
+  })
+}
+
+
+export function rejectChargingPointsSubscription(entityId: number, companyId: number, subscriptionId: number) {
+  return api.post("/v5/admin/elec/charging-points/reject-subscription", {
+    entity_id: entityId,
+    company_id: companyId,
+    subscription_id: subscriptionId,
+  })
 }
