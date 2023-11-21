@@ -15,7 +15,7 @@ import CompanyInfo from "./components/company-info"
 import CompanyOptions from "./components/company-options"
 import DoubleCountingSettings from "./components/double-counting"
 import EntityUserRights from "./components/user-rights"
-import ElecSettings from "./components/elec"
+import ElecSettings from "./components/charging-points"
 
 const Settings = () => {
   const { t } = useTranslation()

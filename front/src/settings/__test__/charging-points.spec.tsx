@@ -4,7 +4,7 @@ import { Route } from "react-router-dom"
 import { TestRoot, render } from "setupTests"
 
 import { cpo } from "carbure/__test__/data"
-import ElecSettings from "settings/components/elec"
+import ElecSettings from "settings/components/charging-points"
 import server, { okChargingPointsCheckError, okChargingPointsApplicationsEmpty, setEntity } from "./api"
 import userEvent from "@testing-library/user-event"
 
@@ -47,7 +47,7 @@ test("check the applications list", async () => {
   await waitWhileLoading()
   screen.getByText("Statut")
   screen.getByText("Date")
-  screen.getByText("31008 kW cumulé")
+  screen.getByText("31008")
 
   screen.getByText("En attente")
   screen.getByText("Accepté")

@@ -3,7 +3,7 @@ import { Alert } from "common/components/alert"
 import Button from "common/components/button"
 import { AlertCircle, Plus } from "common/components/icons"
 import { usePortal } from "common/components/portal"
-import { LoaderOverlay, Panel } from "common/components/scaffold"
+import { Grid, LoaderOverlay, Panel } from "common/components/scaffold"
 import Table, { Cell } from "common/components/table"
 import { useQuery } from "common/hooks/async"
 import { formatDate, formatNumber } from "common/utils/formatters"
@@ -15,6 +15,7 @@ import { ElecChargingPointsSnapshot, ElecChargingPointsApplication } from "elec/
 import { Trans, useTranslation } from "react-i18next"
 import * as apiCpo from "../api/elec"
 import { elecChargingPointsApplications } from "elec/__test__/data"
+import Metric from "common/components/metric"
 
 const ElecSettings = ({ companyId }: { companyId: number }) => {
   const { t } = useTranslation()
@@ -83,6 +84,8 @@ const ElecSettings = ({ companyId }: { companyId: number }) => {
         }
       </header>
 
+
+
       {isEmpty && (
         <>
           <section>
@@ -95,49 +98,59 @@ const ElecSettings = ({ companyId }: { companyId: number }) => {
       )}
 
       {!isEmpty && (
-        <Table
-          rows={applications}
-          onAction={showApplicationDetails}
-          columns={[
-            {
-              header: t("Statut"),
-              cell: (application) => <ApplicationStatus status={application.status} />,
-            },
-            {
-              header: t("Date"),
-              cell: (application) => (
-                <Cell
-                  text={`${formatDate(application.application_date)}`}
-                />
-              ),
-            },
-            {
-              header: applicationsSnapshot.power_total + " kW " + t("cumulé"),
-              cell: (application) => (
-                <Cell
-                  text={`${formatNumber(application.power_total)}` + " kW"}
-                />
-              ),
-            },
-            {
-              header: applicationsSnapshot.station_count + " " + t("Stations"),
-              cell: (application) => (
-                <Cell
-                  text={`${formatNumber(application.station_count)}`}
-                />
-              ),
-            },
-            {
-              header: applicationsSnapshot.charging_point_count + " " + t("Points de recharge"),
-              cell: (application) => (
-                <Cell
-                  text={`${formatNumber(application.charging_point_count)}`}
-                />
-              ),
-            },
+        <>
 
-          ]}
-        />
+          <section>
+            <Grid style={{ gridGap: 24 }}>
+              <Metric value={applicationsSnapshot.power_total} label={t("Kw cumulés")} />
+              <Metric value={applicationsSnapshot.station_count} label={t("Stations")} />
+              <Metric value={applicationsSnapshot.charging_point_count} label={t("Points de charge")} />
+            </Grid>
+          </section>
+          <Table
+            rows={applications}
+            onAction={showApplicationDetails}
+            columns={[
+              {
+                header: t("Statut"),
+                cell: (application) => <ApplicationStatus status={application.status} />,
+              },
+              {
+                header: t("Date"),
+                cell: (application) => (
+                  <Cell
+                    text={`${formatDate(application.application_date)}`}
+                  />
+                ),
+              },
+              {
+                header: t("Puissance cumulée"),
+                cell: (application) => (
+                  <Cell
+                    text={`${formatNumber(application.power_total)}` + " kW"}
+                  />
+                ),
+              },
+              {
+                header: t("Stations"),
+                cell: (application) => (
+                  <Cell
+                    text={`${formatNumber(application.station_count)}`}
+                  />
+                ),
+              },
+              {
+                header: t("Points de recharge"),
+                cell: (application) => (
+                  <Cell
+                    text={`${formatNumber(application.charging_point_count)}`}
+                  />
+                ),
+              },
+
+            ]}
+          />
+        </>
 
 
       )}
