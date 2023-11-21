@@ -4,12 +4,12 @@ import Collapse from "common/components/collapse"
 import { Dialog } from "common/components/dialog"
 import { AlertCircle, AlertTriangle, Plus, Return } from "common/components/icons"
 import Tag from "common/components/tag"
-import { ChargingPointsSubscriptionError, ElecChargingPointsSubscriptionCheckInfo } from "elec/types"
+import { ChargingPointsApplicationError, ElecChargingPointsApplicationCheckInfo } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import { t } from "i18next"
 
 export type ErrorsDetailsDialogProps = {
-  fileData: ElecChargingPointsSubscriptionCheckInfo
+  fileData: ElecChargingPointsApplicationCheckInfo
   onClose: () => void
 }
 
@@ -66,7 +66,7 @@ export const ErrorsDetailsDialog = ({
 
 
 type ErrorsTableProps = {
-  errors: ChargingPointsSubscriptionError[]
+  errors: ChargingPointsApplicationError[]
 }
 
 export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
@@ -99,7 +99,7 @@ export default ErrorsDetailsDialog
 
 
 export function getErrorText(
-  error: ChargingPointsSubscriptionError,
+  error: ChargingPointsApplicationError,
 ) {
 
   switch (error.error) {

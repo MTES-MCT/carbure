@@ -12,10 +12,10 @@ import { useMutation } from "common/hooks/async"
 import { Trans, useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { checkDoubleCountingApplication } from "settings/api/double-counting"
-import { checkChargingPointsSubscription } from "settings/api/elec"
+import { checkChargingPointsApplication } from "settings/api/elec"
 import ErrorsDetailsDialog from "./errors-dialog"
 import ValidDetailsDialog from "./valid-dialog"
-import { elecChargingPointsSubscriptionCheckResponseFailed, elecChargingPointsSubscriptionCheckResponseSucceed } from "elec/__test__/data"
+import { elecChargingPointsApplicationCheckResponseFailed, elecChargingPointsApplicationCheckResponseSucceed } from "elec/__test__/data"
 
 // L'URL complète du fichier
 
@@ -37,7 +37,7 @@ const ElecChargingPointsFileUpload = ({
     chargingPointsFile: undefined as File | undefined,
   })
 
-  const uploadFile = useMutation(checkChargingPointsSubscription, {
+  const uploadFile = useMutation(checkChargingPointsApplication, {
     onError: (err) => {
       const response = (err as AxiosError<{ error: string }>).response
       if (response?.status === 413) {
@@ -72,8 +72,8 @@ const ElecChargingPointsFileUpload = ({
 
     if (response.status != 200) return
     const checkedFile = response.data.data
-    // const checkedFile = elecChargingPointsSubscriptionCheckResponseFailed // TEST with error
-    // const checkedFile = elecChargingPointsSubscriptionCheckResponseSucceed // TEST with success
+    // const checkedFile = elecChargingPointsApplicationCheckResponseFailed // TEST with error
+    // const checkedFile = elecChargingPointsApplicationCheckResponseSucceed // TEST with success
 
 
 
