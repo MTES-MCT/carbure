@@ -37,7 +37,7 @@ const mockGetWithResponseData = (url: string, data: any) => {
     )
   })
 }
-const mockPostWithResponseData = (url: string, data: any) => {
+const mockPostWithResponseData = (url: string, data?: any) => {
   return rest.post(url, (req, res, ctx) => {
     return res(
       ctx.json({
@@ -334,6 +334,7 @@ export const okChargingPointsSubscriptions = rest.get("/api/v5/elec/charging-poi
 export const okChargingPointsSubscriptionsEmpty = mockGetWithResponseData("/api/v5/elec/charging-points/subscriptions", [])
 export const okChargingPointsCheckValid = mockPostWithResponseData("/api/v5/elec/charging-points/check-subscription", elecChargingPointsSubscriptionCheckResponseSucceed)
 export const okChargingPointsCheckError = mockPostWithResponseData("/api/v5/elec/charging-points/check-subscription", elecChargingPointsSubscriptionCheckResponseFailed)
+export const okChargingPointsAddSuccess = mockPostWithResponseData("/api/v5/elec/charging-points/add-subscription")
 
 
 
@@ -368,5 +369,6 @@ export default setupServer(
   okDoubleCountApplications,
   okDoubleCountUploadAgreements,
   okChargingPointsSubscriptions,
-  okChargingPointsCheckValid
+  okChargingPointsCheckValid,
+  okChargingPointsAddSuccess
 )

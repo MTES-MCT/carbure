@@ -1,7 +1,7 @@
 import { api, Api, download } from "common/services/api"
-import { ElecAdminProvisionCertificateFilter, ElecAdminProvisionCertificateQuery, ElecAdminSnapshot, ElecAdminTransferCertificateFilter, ElecAdminTransferCertificateQuery } from "./types"
+import { ElecChargingPointsSubscription, ElecProvisionCertificatesDetails, ElecTransferCertificatesDetails } from "elec/types"
 import { ElecProvisionCertificatesData, ElecTransferCertificatesData } from "elec/types-cpo"
-import { ElecProvisionCertificatesDetails, ElecTransferCertificatesDetails } from "elec/types"
+import { ElecAdminProvisionCertificateFilter, ElecAdminProvisionCertificateQuery, ElecAdminSnapshot, ElecAdminTransferCertificateFilter, ElecAdminTransferCertificateQuery } from "./types"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/v5/admin/elec/years", {
@@ -73,11 +73,9 @@ export function downloadTransferCertificates(query: ElecAdminTransferCertificate
 
 export async function getTransferCertificateFilters(field: ElecAdminTransferCertificateFilter, query: ElecAdminTransferCertificateQuery) {
   const params = { filter: field, ...query, ...QUERY_RESET }
-
   return api
     .get<Api<{ filter_values: string[] }>>("/v5/admin/elec/transfer-certificate-filters", { params })
     .then((res) => res.data.data?.filter_values ?? [])
-
 }
 
 export function downloadChargingPointsSubscriptionDetails(entityId: number, companyId: number, subscriptionId: number) {
@@ -85,10 +83,16 @@ export function downloadChargingPointsSubscriptionDetails(entityId: number, comp
     entity_id: entityId, company_id: companyId, subscription_id: subscriptionId, export: true
   })
 }
-export function downloadChargingPointsSubscriptions(subscriptionId: number) {
-  return download("/v5/admin/elec/charging-points/subscriptions", { subscriptionId, export: true })
+
+export function downloadChargingPointsSubscriptions(entityId: number, companyId: number) {
+  return download("/v5/admin/elec/charging-points/subscriptions", { entity_id: entityId, company_id: companyId, export: true })
 }
 
+export function getChargingPointsSubscriptions(entityId: number, companyId: number) {
+  return api.get<Api<ElecChargingPointsSubscription[]>>("/v5/admin/elec/charging-points/subscriptions", {
+    params: { entity_id: entityId, company_id: companyId },
+  })
+}
 
 export function acceptChargingPointsSubscription(entityId: number, companyId: number, subscriptionId: number) {
   return api.post("/v5/admin/elec/charging-points/accept-subscription", {

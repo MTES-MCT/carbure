@@ -1,4 +1,4 @@
-import useEntity, { useRights } from "carbure/hooks/entity"
+import useEntity from "carbure/hooks/entity"
 import { Alert } from "common/components/alert"
 import Button from "common/components/button"
 import { AlertCircle, Plus } from "common/components/icons"
@@ -7,23 +7,26 @@ import { LoaderOverlay, Panel } from "common/components/scaffold"
 import Table, { Cell } from "common/components/table"
 import { useQuery } from "common/hooks/async"
 import { formatDate, formatNumber } from "common/utils/formatters"
-import SubscriptionStatus from "elec/components/charging-points/subscription-status"
-import { Trans, useTranslation } from "react-i18next"
-import * as api from "../api/elec"
-import { ElecChargingPointsSubscription, ElecChargingPointsSnapshot } from "elec/types"
-import ElecChargingPointsFileUpload from "elec/components/charging-points/upload-dialog"
-import { elecChargingPointsSubscriptions } from "elec/__test__/data"
+import * as apiAdmin from "elec-admin/api"
 import ChargingPointsSubscriptionDetailsDialog from "elec-admin/components/charging-points/subscription-details-dialog"
+import SubscriptionStatus from "elec/components/charging-points/subscription-status"
+import ElecChargingPointsFileUpload from "elec/components/charging-points/upload-dialog"
+import { ElecChargingPointsSnapshot, ElecChargingPointsSubscription } from "elec/types"
+import { Trans, useTranslation } from "react-i18next"
+import * as apiCpo from "../api/elec"
+import { elecChargingPointsSubscriptions } from "elec/__test__/data"
 
 const ElecSettings = ({ companyId }: { companyId: number }) => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const { isCPO } = entity
+  const { isCPO, isAdmin } = entity
+
+  const api = isAdmin ? apiAdmin : apiCpo
   const portal = usePortal()
 
   const subscriptionsResponse = useQuery(api.getChargingPointsSubscriptions, {
     key: "charging-points-subscriptions",
-    params: [entity.id],
+    params: [entity.id, companyId],
   })
 
   const subscriptions = subscriptionsResponse.result?.data.data ?? []
@@ -49,6 +52,10 @@ const ElecSettings = ({ companyId }: { companyId: number }) => {
     ))
   }
 
+  function downloadChargingPointsSubscriptions() {
+    api.downloadChargingPointsSubscriptions(entity.id, companyId)
+  }
+
   return (
     <Panel id="elec-charging-points">
       <header>
@@ -65,6 +72,15 @@ const ElecSettings = ({ companyId }: { companyId: number }) => {
             label={t("Inscrire des points de recharge")}
           />
         )}
+        {subscriptionsSnapshot.charging_point_count > 0 &&
+          <Button
+            asideX
+            variant="secondary"
+            icon={Plus}
+            action={downloadChargingPointsSubscriptions}
+            label={t("Exporter les points de recharge")}
+          />
+        }
       </header>
 
       {isEmpty && (

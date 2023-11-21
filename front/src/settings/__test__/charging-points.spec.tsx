@@ -107,8 +107,12 @@ test("upload file", async () => {
   await waitWhileLoading()
 
   screen.getByText("Inscription des points de recharge")
-  const closeButton = await screen.findByText("Fermer")
-  await user.click(closeButton)
+
+
+  //send inscription
+  const sendButton = await screen.findByText("Envoyer la demande d'inscription")
+  await user.click(sendButton)
+  screen.getByText("Les 90 points de recharge ont été ajoutés !")
 
 })
 
