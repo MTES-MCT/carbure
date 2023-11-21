@@ -14,7 +14,7 @@ import { useQuery } from "common/hooks/async"
 import useEntity from "carbure/hooks/entity"
 import CompanyInfo from "settings/components/company-info"
 import { useTranslation } from "react-i18next"
-import ElecSettings from "settings/components/elec"
+import ElecSettings from "settings/components/charging-points"
 
 const EntityDetails = () => {
   const navigate = useNavigate()
