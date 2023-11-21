@@ -1,6 +1,6 @@
 import { cpo } from "carbure/__test__/data";
 import { EntityPreview, EntityType } from "carbure/types";
-import { ChargingPointsSubscriptionError, ElecChargingPointsSubscription, ElecChargingPointsSubscriptionCheckInfo, ElecChargingPointsSubscriptionStatus, ElecProvisionCertificatePreview } from "elec/types";
+import { ChargingPointsApplicationError, ElecChargingPointsApplication, ElecChargingPointsApplicationCheckInfo, ElecChargingPointsApplicationStatus, ElecProvisionCertificatePreview } from "elec/types";
 import { ElecCPOSnapshot, ElecProvisionCertificatesData } from "elec/types-cpo";
 
 export const elecSnapshot: ElecCPOSnapshot = {
@@ -50,17 +50,17 @@ export const elecAdminProvisionCertificateList: ElecProvisionCertificatesData = 
 }
 
 
-const elecChargingPointSubscription1: ElecChargingPointsSubscription = {
+const elecChargingPointApplication1: ElecChargingPointsApplication = {
     id: 1,
     cpo: cpo,
     station_count: 4,
     charging_point_count: 90,
     power_total: 8,
     application_date: "2023-10-12",
-    status: ElecChargingPointsSubscriptionStatus.Pending,
+    status: ElecChargingPointsApplicationStatus.Pending,
 }
 
-const elecChargingPointSubscription2: ElecChargingPointsSubscription = {
+const elecChargingPointApplication2: ElecChargingPointsApplication = {
     id: 2,
     cpo: cpo,
     station_count: 19,
@@ -68,43 +68,43 @@ const elecChargingPointSubscription2: ElecChargingPointsSubscription = {
     power_total: 30000,
     application_date: "2023-11-13",
     validation_date: "2023-11-01",
-    status: ElecChargingPointsSubscriptionStatus.Accepted,
+    status: ElecChargingPointsApplicationStatus.Accepted,
 }
-const elecChargingPointSubscription3: ElecChargingPointsSubscription = {
+const elecChargingPointApplication3: ElecChargingPointsApplication = {
     id: 3,
     cpo: cpo,
     station_count: 1,
     charging_point_count: 5,
     power_total: 1000,
     application_date: "2023-09-01",
-    status: ElecChargingPointsSubscriptionStatus.Rejected,
+    status: ElecChargingPointsApplicationStatus.Rejected,
 }
 
-export const elecChargingPointsSubscriptions: ElecChargingPointsSubscription[] = [
-    elecChargingPointSubscription1,
-    elecChargingPointSubscription2,
-    elecChargingPointSubscription3
+export const elecChargingPointsApplications: ElecChargingPointsApplication[] = [
+    elecChargingPointApplication1,
+    elecChargingPointApplication2,
+    elecChargingPointApplication3
 ]
 
 
-export const chargingPointsSubscriptionError1: ChargingPointsSubscriptionError = {
+export const chargingPointsApplicationError1: ChargingPointsApplicationError = {
     error: "MISSING_CHARGING_POINT_IN_DATAGOUV",
     meta: {
         charging_points: ["8U7Y", "8U7Y"]
     }
 }
-export const chargingPointsSubscriptionError2: ChargingPointsSubscriptionError = {
+export const chargingPointsApplicationError2: ChargingPointsApplicationError = {
     error: "UNKNOW_ERROR"
 }
-export const elecChargingPointsSubscriptionCheckResponseFailed: ElecChargingPointsSubscriptionCheckInfo = {
+export const elecChargingPointsApplicationCheckResponseFailed: ElecChargingPointsApplicationCheckInfo = {
     file_name: "test.csv",
     error_count: 2,
     charging_points_count: 0,
-    errors: [chargingPointsSubscriptionError1, chargingPointsSubscriptionError2
+    errors: [chargingPointsApplicationError1, chargingPointsApplicationError2
     ]
 }
 
-export const elecChargingPointsSubscriptionCheckResponseSucceed: ElecChargingPointsSubscriptionCheckInfo = {
+export const elecChargingPointsApplicationCheckResponseSucceed: ElecChargingPointsApplicationCheckInfo = {
     file_name: "test.csv",
     error_count: 0,
     charging_points_count: 90

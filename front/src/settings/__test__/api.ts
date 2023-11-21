@@ -22,7 +22,7 @@ import {
 } from "carbure/__test__/data"
 import { clone, Data } from "carbure/__test__/helpers"
 import { dcApplicationErrors } from "./data"
-import { elecChargingPointsSubscriptionCheckResponseFailed, elecChargingPointsSubscriptionCheckResponseSucceed, elecChargingPointsSubscriptions } from "elec/__test__/data"
+import { elecChargingPointsApplicationCheckResponseFailed, elecChargingPointsApplicationCheckResponseSucceed, elecChargingPointsApplications } from "elec/__test__/data"
 
 let deliverySites: any[] = []
 let productionSites: any[] = []
@@ -322,19 +322,19 @@ export const koDoubleCountUploadApplication = rest.post(
 )
 
 
-export const okChargingPointsSubscriptions = rest.get("/api/v5/elec/charging-points/subscriptions", (req, res, ctx) => {
+export const okChargingPointsApplications = rest.get("/api/v5/elec/charging-points/applications", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
-      data: elecChargingPointsSubscriptions,
+      data: elecChargingPointsApplications,
     })
   )
 })
 
-export const okChargingPointsSubscriptionsEmpty = mockGetWithResponseData("/api/v5/elec/charging-points/subscriptions", [])
-export const okChargingPointsCheckValid = mockPostWithResponseData("/api/v5/elec/charging-points/check-subscription", elecChargingPointsSubscriptionCheckResponseSucceed)
-export const okChargingPointsCheckError = mockPostWithResponseData("/api/v5/elec/charging-points/check-subscription", elecChargingPointsSubscriptionCheckResponseFailed)
-export const okChargingPointsAddSuccess = mockPostWithResponseData("/api/v5/elec/charging-points/add-subscription")
+export const okChargingPointsApplicationsEmpty = mockGetWithResponseData("/api/v5/elec/charging-points/applications", [])
+export const okChargingPointsCheckValid = mockPostWithResponseData("/api/v5/elec/charging-points/check-application", elecChargingPointsApplicationCheckResponseSucceed)
+export const okChargingPointsCheckError = mockPostWithResponseData("/api/v5/elec/charging-points/check-application", elecChargingPointsApplicationCheckResponseFailed)
+export const okChargingPointsAddSuccess = mockPostWithResponseData("/api/v5/elec/charging-points/add-application")
 
 
 
@@ -368,7 +368,7 @@ export default setupServer(
   okSelfCertificates,
   okDoubleCountApplications,
   okDoubleCountUploadAgreements,
-  okChargingPointsSubscriptions,
+  okChargingPointsApplications,
   okChargingPointsCheckValid,
   okChargingPointsAddSuccess
 )

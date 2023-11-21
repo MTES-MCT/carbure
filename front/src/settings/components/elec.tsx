@@ -8,13 +8,13 @@ import Table, { Cell } from "common/components/table"
 import { useQuery } from "common/hooks/async"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import * as apiAdmin from "elec-admin/api"
-import ChargingPointsSubscriptionDetailsDialog from "elec-admin/components/charging-points/subscription-details-dialog"
-import SubscriptionStatus from "elec/components/charging-points/subscription-status"
+import ChargingPointsApplicationDetailsDialog from "elec-admin/components/charging-points/application-details-dialog"
+import ApplicationStatus from "elec/components/charging-points/application-status"
 import ElecChargingPointsFileUpload from "elec/components/charging-points/upload-dialog"
-import { ElecChargingPointsSnapshot, ElecChargingPointsSubscription } from "elec/types"
+import { ElecChargingPointsSnapshot, ElecChargingPointsApplication } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import * as apiCpo from "../api/elec"
-import { elecChargingPointsSubscriptions } from "elec/__test__/data"
+import { elecChargingPointsApplications } from "elec/__test__/data"
 
 const ElecSettings = ({ companyId }: { companyId: number }) => {
   const { t } = useTranslation()
@@ -24,20 +24,20 @@ const ElecSettings = ({ companyId }: { companyId: number }) => {
   const api = isAdmin ? apiAdmin : apiCpo
   const portal = usePortal()
 
-  const subscriptionsResponse = useQuery(api.getChargingPointsSubscriptions, {
-    key: "charging-points-subscriptions",
+  const applicationsResponse = useQuery(api.getChargingPointsApplications, {
+    key: "charging-points-applications",
     params: [entity.id, companyId],
   })
 
-  const subscriptions = subscriptionsResponse.result?.data.data ?? []
-  // const subscriptions = elecChargingPointsSubscriptions // TEST with subscriptions
+  const applications = applicationsResponse.result?.data.data ?? []
+  // const applications = elecChargingPointsApplications // TEST with applications
 
-  const subscriptionsSnapshot: ElecChargingPointsSnapshot = {
-    station_count: subscriptions.reduce((acc, app) => acc + app.station_count, 0),
-    charging_point_count: subscriptions.reduce((acc, app) => acc + app.charging_point_count, 0),
-    power_total: subscriptions.reduce((acc, app) => acc + app.power_total, 0),
+  const applicationsSnapshot: ElecChargingPointsSnapshot = {
+    station_count: applications.reduce((acc, app) => acc + app.station_count, 0),
+    charging_point_count: applications.reduce((acc, app) => acc + app.charging_point_count, 0),
+    power_total: applications.reduce((acc, app) => acc + app.power_total, 0),
   }
-  const isEmpty = subscriptions.length === 0
+  const isEmpty = applications.length === 0
 
 
   function showUploadDialog() {
@@ -46,14 +46,14 @@ const ElecSettings = ({ companyId }: { companyId: number }) => {
     ))
   }
 
-  function showSubscriptionDetails(subscription: ElecChargingPointsSubscription) {
+  function showApplicationDetails(application: ElecChargingPointsApplication) {
     portal((resolve) => (
-      <ChargingPointsSubscriptionDetailsDialog onClose={resolve} subscription={subscription} companyId={companyId} />
+      <ChargingPointsApplicationDetailsDialog onClose={resolve} application={application} companyId={companyId} />
     ))
   }
 
-  function downloadChargingPointsSubscriptions() {
-    api.downloadChargingPointsSubscriptions(entity.id, companyId)
+  function downloadChargingPointsApplications() {
+    api.downloadChargingPointsApplications(entity.id, companyId)
   }
 
   return (
@@ -72,12 +72,12 @@ const ElecSettings = ({ companyId }: { companyId: number }) => {
             label={t("Inscrire des points de recharge")}
           />
         )}
-        {subscriptionsSnapshot.charging_point_count > 0 &&
+        {applicationsSnapshot.charging_point_count > 0 &&
           <Button
             asideX
             variant="secondary"
             icon={Plus}
-            action={downloadChargingPointsSubscriptions}
+            action={downloadChargingPointsApplications}
             label={t("Exporter les points de recharge")}
           />
         }
@@ -96,42 +96,42 @@ const ElecSettings = ({ companyId }: { companyId: number }) => {
 
       {!isEmpty && (
         <Table
-          rows={subscriptions}
-          onAction={showSubscriptionDetails}
+          rows={applications}
+          onAction={showApplicationDetails}
           columns={[
             {
               header: t("Statut"),
-              cell: (subscription) => <SubscriptionStatus status={subscription.status} />,
+              cell: (application) => <ApplicationStatus status={application.status} />,
             },
             {
               header: t("Date"),
-              cell: (subscription) => (
+              cell: (application) => (
                 <Cell
-                  text={`${formatDate(subscription.application_date)}`}
+                  text={`${formatDate(application.application_date)}`}
                 />
               ),
             },
             {
-              header: subscriptionsSnapshot.power_total + " kW " + t("cumulé"),
-              cell: (subscription) => (
+              header: applicationsSnapshot.power_total + " kW " + t("cumulé"),
+              cell: (application) => (
                 <Cell
-                  text={`${formatNumber(subscription.power_total)}` + " kW"}
+                  text={`${formatNumber(application.power_total)}` + " kW"}
                 />
               ),
             },
             {
-              header: subscriptionsSnapshot.station_count + " " + t("Stations"),
-              cell: (subscription) => (
+              header: applicationsSnapshot.station_count + " " + t("Stations"),
+              cell: (application) => (
                 <Cell
-                  text={`${formatNumber(subscription.station_count)}`}
+                  text={`${formatNumber(application.station_count)}`}
                 />
               ),
             },
             {
-              header: subscriptionsSnapshot.charging_point_count + " " + t("Points de recharge"),
-              cell: (subscription) => (
+              header: applicationsSnapshot.charging_point_count + " " + t("Points de recharge"),
+              cell: (application) => (
                 <Cell
-                  text={`${formatNumber(subscription.charging_point_count)}`}
+                  text={`${formatNumber(application.charging_point_count)}`}
                 />
               ),
             },
@@ -142,7 +142,7 @@ const ElecSettings = ({ companyId }: { companyId: number }) => {
 
       )}
 
-      {subscriptionsResponse.loading && <LoaderOverlay />}
+      {applicationsResponse.loading && <LoaderOverlay />}
     </Panel>
   )
 }

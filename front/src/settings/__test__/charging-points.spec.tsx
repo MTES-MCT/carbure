@@ -5,7 +5,7 @@ import { TestRoot, render } from "setupTests"
 
 import { cpo } from "carbure/__test__/data"
 import ElecSettings from "settings/components/elec"
-import server, { okChargingPointsCheckError, okChargingPointsSubscriptionsEmpty, setEntity } from "./api"
+import server, { okChargingPointsCheckError, okChargingPointsApplicationsEmpty, setEntity } from "./api"
 import userEvent from "@testing-library/user-event"
 
 const SettingsWithHooks = () => {
@@ -42,7 +42,7 @@ test("check the charging point section of the settings", async () => {
 })
 
 
-test("check the subscriptions list", async () => {
+test("check the applications list", async () => {
   render(<SettingsWithHooks />)
   await waitWhileLoading()
   screen.getByText("Statut")
@@ -56,8 +56,8 @@ test("check the subscriptions list", async () => {
 
 })
 
-test("check the subscriptions list empty", async () => {
-  server.use(okChargingPointsSubscriptionsEmpty)
+test("check the applications list empty", async () => {
+  server.use(okChargingPointsApplicationsEmpty)
   setEntity(cpo)
 
   render(<SettingsWithHooks />)

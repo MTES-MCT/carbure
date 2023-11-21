@@ -5,12 +5,12 @@ import { Plus, Return } from "common/components/icons"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import Tag from "common/components/tag"
 import { useMutation } from "common/hooks/async"
-import { ElecChargingPointsSubscriptionCheckInfo } from "elec/types"
+import { ElecChargingPointsApplicationCheckInfo } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
-import { subscribeChargingPoints } from "settings/api/elec"
+import { applyChargingPoints } from "settings/api/elec"
 
 export type ValidDetailsDialogProps = {
-  fileData: ElecChargingPointsSubscriptionCheckInfo
+  fileData: ElecChargingPointsApplicationCheckInfo
   onClose: () => void
   file: File
 }
@@ -25,8 +25,8 @@ export const ValidDetailsDialog = ({
   const notify = useNotify()
   const notifyError = useNotifyError()
 
-  const chargingPointsSubscription = useMutation(subscribeChargingPoints, {
-    invalidates: ["charging-points-subscriptions"],
+  const chargingPointsApplication = useMutation(applyChargingPoints, {
+    invalidates: ["charging-points-applications"],
     onSuccess() {
       onClose()
       notify(t("Les {{count}} points de recharge ont été ajoutés !", { count: fileData.charging_points_count }), { variant: "success" })
@@ -37,8 +37,8 @@ export const ValidDetailsDialog = ({
     },
   })
 
-  const submitChargingPointsSubscription = () => {
-    chargingPointsSubscription.execute(entity.id, file)
+  const submitChargingPointsApplication = () => {
+    chargingPointsApplication.execute(entity.id, file)
   }
 
   return (
@@ -75,10 +75,10 @@ export const ValidDetailsDialog = ({
       <footer>
         <Button
           icon={Plus}
-          loading={chargingPointsSubscription.loading}
+          loading={chargingPointsApplication.loading}
           label={t("Envoyer la demande d'inscription")}
           variant="primary"
-          action={submitChargingPointsSubscription}
+          action={submitChargingPointsApplication}
         />
 
         <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
