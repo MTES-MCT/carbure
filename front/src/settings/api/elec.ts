@@ -1,17 +1,17 @@
-import { AxiosResponse } from "axios"
-import api, { Api } from "common/services/api"
-import { elecChargingPointsSubscriptionCheckResponseFailed, elecChargingPointsSubscriptionCheckResponseSucceed, elecChargingPointsSubscriptions } from "elec/__test__/data"
+import api, { Api, download } from "common/services/api"
 import { ElecChargingPointsSubscription, ElecChargingPointsSubscriptionCheckInfo } from "elec/types"
 
 
-
-export function getChargingPointsSubscriptions(entity_id: number) {
+export function getChargingPointsSubscriptions(entity_id: number, companyId: number) {
 
   return api.get<Api<ElecChargingPointsSubscription[]>>("/v5/elec/charging-points/subscriptions", {
-    params: { entity_id },
+    params: { entity_id, company_id: companyId },
   })
 }
 
+export function downloadChargingPointsSubscriptions(entityId: number, companyId: number) {
+  return download("/v5/elec/charging-points/subscriptions", { entity_id: entityId, company_id: companyId, export: true })
+}
 
 export function checkChargingPointsSubscription(entity_id: number, file: File) {
   return api.post<Api<ElecChargingPointsSubscriptionCheckInfo>>(
@@ -20,25 +20,18 @@ export function checkChargingPointsSubscription(entity_id: number, file: File) {
   )
 }
 
+export function downloadChargingPointsSubscriptionDetails(entityId: number, subscriptionId: number) {
+  return download("/v5/elec/charging-points/subscription-details", { entity_id: entityId, subscription_id: subscriptionId, export: true })
+}
 
 export function subscribeChargingPoints(
   entity_id: number,
   file: File,
 ) {
 
-
-  // // TO TEST success
-  return new Promise((resolve) => {
-    resolve(true)
+  return api.post("/v5/elec/charging-points/add-subscription", {
+    entity_id,
+    file
   })
 
-  // // TO TEST error
-  // return new Promise((resolve, reject) => {
-  //   reject(true)
-  // })
-
-  // return api.post("/v5/elec/charging-points/subscription", {
-  //   entity_id,
-  //   file
-  // })
 }
