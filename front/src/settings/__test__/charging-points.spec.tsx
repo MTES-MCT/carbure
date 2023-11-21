@@ -1,20 +1,20 @@
-import { fireEvent, screen, waitFor } from "@testing-library/react"
-import userEvent from "@testing-library/user-event"
+import { fireEvent, screen } from "@testing-library/react"
 import { waitWhileLoading } from "carbure/__test__/helpers"
 import { Route } from "react-router-dom"
-import { render, TestRoot } from "setupTests"
+import { TestRoot, render } from "setupTests"
 
+import { cpo } from "carbure/__test__/data"
 import ElecSettings from "settings/components/elec"
-import server, { okChargingPointsCheckError, okChargingPointsSubscriptionsEmpty } from "./api"
-import axios from "axios"
+import server, { okChargingPointsCheckError, okChargingPointsSubscriptionsEmpty, setEntity } from "./api"
+import userEvent from "@testing-library/user-event"
 
 const SettingsWithHooks = () => {
   return (
-    <TestRoot url="/org/0/settings">
+    <TestRoot url={`/org/${cpo.id}/settings`}>
       <Route
-        path="/org/0/settings"
+        path={`/org/${cpo.id}/settings`}
         element={
-          <ElecSettings />
+          <ElecSettings companyId={cpo.id} />
         }
       />
     </TestRoot>
@@ -23,8 +23,12 @@ const SettingsWithHooks = () => {
 
 beforeAll(() => {
   server.listen({ onUnhandledRequest: "warn" })
+
 })
 
+beforeEach(() => {
+  setEntity(cpo)
+})
 afterEach(() => { server.resetHandlers() })
 
 afterAll(() => server.close())
@@ -54,6 +58,8 @@ test("check the subscriptions list", async () => {
 
 test("check the subscriptions list empty", async () => {
   server.use(okChargingPointsSubscriptionsEmpty)
+  setEntity(cpo)
+
   render(<SettingsWithHooks />)
   await waitWhileLoading()
   screen.getByText("Aucun point de recharge trouvé")
@@ -61,6 +67,8 @@ test("check the subscriptions list empty", async () => {
 
 test("upload dialog opened", async () => {
   const user = userEvent.setup()
+  setEntity(cpo)
+
   render(<SettingsWithHooks />)
   await waitWhileLoading()
 

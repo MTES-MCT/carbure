@@ -20,12 +20,12 @@ const EntityDetails = () => {
   const navigate = useNavigate()
   const entity = useEntity()
   const { id = "" } = useParams<"id">()
-  const company_id = parseInt(id, 10)
+  const companyId = parseInt(id, 10)
   const { t } = useTranslation()
 
   const company = useQuery(api.getCompanyDetails, {
     key: "entity-details",
-    params: [entity.id, company_id],
+    params: [entity.id, companyId],
   })
 
   const getDepots = (company_id: number) => {
@@ -88,13 +88,13 @@ const EntityDetails = () => {
           <ProductionSitesSettings
             readOnly
             entity={entityData}
-            getProductionSites={(company_id) =>
-              api.getCompanyProductionSites(entity.id, company_id)
+            getProductionSites={(companyId) =>
+              api.getCompanyProductionSites(entity.id, companyId)
             }
           />
         )}
-        {isCPO && <ElecSettings />}
-        {!isAirline && <Certificates entity_id={company_id} />}
+        {isCPO && <ElecSettings companyId={companyId} />}
+        {!isAirline && <Certificates entity_id={companyId} />}
       </section>
     </Main>
   )
