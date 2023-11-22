@@ -322,7 +322,7 @@ export const koDoubleCountUploadApplication = rest.post(
 )
 
 
-export const okChargingPointsApplications = rest.get("/api/v5/elec/charging-points/applications", (req, res, ctx) => {
+export const okChargingPointsApplications = rest.get("/api/v5/elec/cpo/charging-points/applications", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -331,10 +331,10 @@ export const okChargingPointsApplications = rest.get("/api/v5/elec/charging-poin
   )
 })
 
-export const okChargingPointsApplicationsEmpty = mockGetWithResponseData("/api/v5/elec/charging-points/applications", [])
-export const okChargingPointsCheckValid = mockPostWithResponseData("/api/v5/elec/charging-points/check-application", elecChargingPointsApplicationCheckResponseSucceed)
-export const okChargingPointsCheckError = mockPostWithResponseData("/api/v5/elec/charging-points/check-application", elecChargingPointsApplicationCheckResponseFailed)
-export const okChargingPointsAddSuccess = mockPostWithResponseData("/api/v5/elec/charging-points/add-application")
+export const okChargingPointsApplicationsEmpty = mockGetWithResponseData("/api/v5/elec/cpo/charging-points/applications", [])
+export const okChargingPointsCheckValid = mockPostWithResponseData("/api/v5/elec/cpo/charging-points/check-application", elecChargingPointsApplicationCheckResponseSucceed)
+export const okChargingPointsCheckError = mockPostWithResponseData("/api/v5/elec/cpo/charging-points/check-application", elecChargingPointsApplicationCheckResponseFailed)
+export const okChargingPointsAddSuccess = mockPostWithResponseData("/api/v5/elec/cpo/charging-points/add-application")
 
 
 

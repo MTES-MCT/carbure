@@ -53,8 +53,8 @@ const ElecSettings = ({ companyId }: { companyId: number }) => {
     ))
   }
 
-  function downloadChargingPointsApplications() {
-    api.downloadChargingPointsApplications(entity.id, companyId)
+  function downloadChargingPoints() {
+    api.downloadChargingPoints(entity.id, companyId)
   }
 
   return (
@@ -78,7 +78,7 @@ const ElecSettings = ({ companyId }: { companyId: number }) => {
             asideX
             variant="secondary"
             icon={Plus}
-            action={downloadChargingPointsApplications}
+            action={downloadChargingPoints}
             label={t("Exporter les points de recharge")}
           />
         }

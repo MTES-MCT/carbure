@@ -24,7 +24,7 @@ export const ChargingPointsApplicationDetailsDialog = ({
   const entity = useEntity()
   const notify = useNotify()
   const notifyError = useNotifyError()
-  const downloadChargingPoints = () => {
+  const downloadChargingPointsApplication = () => {
     return api.downloadChargingPointsApplicationDetails(entity.id, companyId, application.id)
   }
 
@@ -81,7 +81,7 @@ export const ChargingPointsApplicationDetailsDialog = ({
           </p>
 
           <p>
-            <Button icon={Download} label={t("Exporter les points de charge")} variant="secondary" action={downloadChargingPoints} />
+            <Button icon={Download} label={t("Exporter les points de charge")} variant="secondary" action={downloadChargingPointsApplication} />
           </p>
           {!entity.isAdmin && application.status === ElecChargingPointsApplicationStatus.Pending && (
             <p><i>
