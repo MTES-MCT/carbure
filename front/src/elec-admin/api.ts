@@ -84,8 +84,8 @@ export function downloadChargingPointsApplicationDetails(entityId: number, compa
   })
 }
 
-export function downloadChargingPointsApplications(entityId: number, companyId: number) {
-  return download("/v5/admin/elec/charging-points/applications", { entity_id: entityId, company_id: companyId, export: true })
+export function downloadChargingPoints(entityId: number, companyId: number) {
+  return download("/v5/admin/elec/charging-points", { entity_id: entityId, company_id: companyId, export: true })
 }
 
 export function getChargingPointsApplications(entityId: number, companyId: number) {
