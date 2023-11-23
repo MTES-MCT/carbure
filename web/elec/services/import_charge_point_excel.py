@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 from dateutil.parser import isoparse
 from django.core.files.uploadedfile import UploadedFile
+from core.excel import ExcelParser
 
 
 def import_charge_point_excel(excel_file: UploadedFile):
@@ -12,32 +13,35 @@ def import_charge_point_excel(excel_file: UploadedFile):
 
 
 def parse_charge_point_excel(excel_file: UploadedFile):
-    EXCEL_COLUMNS = [
-        "charge_point_id",
-        "current_type",
-        "installation_date",
-        "lne_certificate",
-        "meter_reading_date",
-        "meter_reading_energy",
-        "is_using_reference_meter",
-        "is_auto_consumption",
-        "has_article_4_regularization",
-        "reference_meter_id",
-    ]
+    EXCEL_COLUMNS = {
+        "charge_point_id": ExcelParser.id,
+        "current_type": ExcelParser.str,
+        "installation_date": ExcelParser.date,
+        "lne_certificate": ExcelParser.id,
+        "meter_reading_date": ExcelParser.date,
+        "meter_reading_energy": ExcelParser.float,
+        "is_using_reference_meter": ExcelParser.bool,
+        "is_auto_consumption": ExcelParser.bool,
+        "has_article_4_regularization": ExcelParser.bool,
+        "reference_meter_id": ExcelParser.id,
+    }
 
     charge_point_data = pd.read_excel(excel_file, skiprows=11, usecols=list(range(1, 11)))
     charge_point_data.rename(columns={charge_point_data.columns[i]: column for i, column in enumerate(EXCEL_COLUMNS)}, inplace=True)  # fmt: skip
+    charge_point_data.fillna("", inplace=True)
+
+    for column, parser in EXCEL_COLUMNS.items():
+        charge_point_data[column] = charge_point_data[column].apply(parser)
 
     charge_points = charge_point_data.to_dict(orient="records")
 
+    # default template example cells
     first_id = charge_points[0]["charge_point_id"]
     eighteenth_id = charge_points[17]["charge_point_id"]
 
-    # the example was left in the template, so we remove it
+    # the example was left in the template, so we skip it
     if first_id == "FRUEXESTATION1P1" and eighteenth_id == "FRUEXESTATION4P4":
         charge_points = charge_points[22:]
-
-    # @TODO convert cell values to match their destination type
 
     return charge_points
 
@@ -75,6 +79,7 @@ def download_charge_point_data():
 
     charge_point_data = pd.read_csv(file_path, sep=",", header=0, usecols=EXCEL_COLUMNS)  # pyright: ignore
     charge_point_data.rename(columns=ALIAS, inplace=True)
+    charge_point_data.fillna("", inplace=True)
 
     data = charge_point_data.to_dict(orient="records")
 
@@ -111,9 +116,11 @@ def validate_charge_points(charge_points, transport_data):
 
     errors = []
     if len(missing_charge_points) > 0:
-        errors.append({"error": ExcelChargePointError.MISSING_CHARGING_POINT_IN_DATAGOUV, "meta": missing_charge_points})
+        meta = [charge_point["charge_point_id"] for charge_point in missing_charge_points if charge_point["charge_point_id"]]
+        errors.append({"error": ExcelChargePointError.MISSING_CHARGING_POINT_IN_DATAGOUV, "meta": meta})
     if len(invalid_charge_points) > 0:
-        errors.append({"error": ExcelChargePointError.MISSING_CHARGING_POINT_DATA, "meta": invalid_charge_points})
+        meta = [charge_point["charge_point_id"] for charge_point in invalid_charge_points if charge_point["charge_point_id"]]
+        errors.append({"error": ExcelChargePointError.MISSING_CHARGING_POINT_DATA, "meta": meta})
 
     return valid_charge_points, errors
 
