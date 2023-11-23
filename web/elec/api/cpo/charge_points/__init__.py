@@ -1,4 +1,4 @@
-from django.urls import include, path
+from django.urls import path
 
 from .check_application import check_application
 from .add_application import add_application
