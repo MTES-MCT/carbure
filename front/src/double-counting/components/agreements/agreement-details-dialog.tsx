@@ -67,18 +67,18 @@ export const AgreementDetailsDialog = () => {
 
           {!application && !applicationResponse.loading && (
             <section>
-              <p><Trans>Aucun dossier de demande n'a été associé. Pour afficher les quotas approuvés, ajouter le dossier associé à cet agrément dans l'onglet "dossiers en attente".</Trans></p>
+              <p><Trans>Aucune demande n'a été associée. Pour afficher les quotas approuvés, ajouter le demande associée à cet agrément dans l'onglet "demandes en attente".</Trans></p>
             </section>
           )}
           {application && application.status != DoubleCountingStatus.Accepted &&
             <section>
-              <p>Le dossier est en cours de validation...</p>
+              <p>La demande est en cours de traitement...</p>
               <Button
                 variant="link"
 
                 asideY
                 action={() => navigate(`/org/${entity.id}/double-counting/applications#application/${application.id}`)}>
-                {("Voir le dossier à valider")}
+                {("Voir la demande d'agrément à valider")}
 
               </Button>
 
@@ -92,9 +92,9 @@ export const AgreementDetailsDialog = () => {
         </main>
 
         <footer>
-          {application &&
+          {/* {application &&
             <ApplicationDownloadButton application={application} />
-          }
+          } */}
 
           <Button icon={Return} action={closeDialog}>
             <Trans>Retour</Trans>

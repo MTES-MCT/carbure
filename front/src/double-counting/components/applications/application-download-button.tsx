@@ -15,7 +15,7 @@ export const ApplicationDownloadButton = ({ application }: { application: Double
   return <Col style={{ gap: "var(--spacing-xs)", marginRight: "auto" }}>
     <DownloadLink
       href={excelURL ?? "#"}
-      label={t("Télécharger le dossier au format excel")}
+      label={t("Télécharger la demande d'agrément au format excel")}
     />
   </Col>
 }

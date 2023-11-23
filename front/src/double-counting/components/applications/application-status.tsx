@@ -22,9 +22,9 @@ const ApplicationStatus = ({
   const statusLabels = {
     [DCStatus.Pending]: t("En attente"),
     [DCStatus.InProgress]: t("En attente"),
-    [DCStatus.Accepted]: t("Accepté"),
-    [DCStatus.Rejected]: t("Refusé"),
-    [DCStatus.Lapsed]: t("Expiré"),
+    [DCStatus.Accepted]: t("Acceptée"),
+    [DCStatus.Rejected]: t("Refusée"),
+    [DCStatus.Lapsed]: t("Expirée"),
   }
 
   return (
