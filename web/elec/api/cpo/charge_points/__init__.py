@@ -1,7 +1,9 @@
 from django.urls import include, path
 
-from .check_charge_point_application import check_charge_point_application
+from .check_application import check_application
+from .add_application import add_application
 
 urlpatterns = [
-    path("check-application", check_charge_point_application, name="elec-cpo-charge-points-check-application"),
+    path("check-application", check_application, name="elec-cpo-charge-points-check-application"),
+    path("add-application", add_application, name="elec-cpo-charge-points-add-application"),
 ]
