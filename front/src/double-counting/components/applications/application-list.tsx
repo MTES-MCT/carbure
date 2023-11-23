@@ -83,7 +83,7 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
       <Fragment>
         {!applications || (tab === "pending" && applications.pending.length === 0) || (tab === "rejected" && applications.rejected.length === 0)
           ?
-          <NoResult label={t("Aucun dossier trouvé")} loading={applicationsResponse.loading} />
+          <NoResult label={t("Aucune demande trouvée")} loading={applicationsResponse.loading} />
           : <Table
             loading={applicationsResponse.loading}
             columns={columns}

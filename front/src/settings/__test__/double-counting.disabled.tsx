@@ -103,7 +103,7 @@ test.skip("check double counting upload with error display errors", async () => 
 const fillForm = async () => {
   const user = userEvent.setup()
 
-  await screen.getByText("Dossiers double comptage")
+  await screen.getByText("Demandes double comptage")
 
   const button = await screen.findByText("Ajouter un dossier double comptage")
   await user.click(button)

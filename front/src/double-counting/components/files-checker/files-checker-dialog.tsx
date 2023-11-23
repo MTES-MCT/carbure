@@ -74,7 +74,7 @@ const DoubleCountingFilesCheckerDialog = ({
   return (
     <Dialog onClose={onClose}>
       <header>
-        <h1>{t("Vérification de dossiers")}</h1>
+        <h1>{t("Vérification de demandes d'agrément")}</h1>
       </header>
 
       <main>
@@ -103,7 +103,7 @@ const DoubleCountingFilesCheckerDialog = ({
           variant="primary"
           icon={Check}
           action={submitFiles}
-          label={t("Vérifier les dossiers")}
+          label={t("Vérifier les demandes")}
         />
         <Button icon={Return} action={onClose} label={t("Annuler")} />
       </footer>
