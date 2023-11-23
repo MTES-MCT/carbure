@@ -1,10 +1,8 @@
 from io import BufferedReader
 from django.http import HttpResponse
 import xlsxwriter
-
 from typing import Any, Callable, Iterable, TypedDict
-
-from core.common import ErrorResponse
+from transactions.helpers import try_get_date
 
 
 class Column(TypedDict):
@@ -80,3 +78,31 @@ def get_nested_value(obj: Any, path: str):
                 current_obj = getattr(current_obj, attr)
 
     return current_obj
+
+
+class ExcelParser:
+    @staticmethod
+    def bool(cell):
+        return cell == "OUI" or cell == 1 or cell == True or cell == "true"
+
+    @staticmethod
+    def id(cell):
+        try:
+            return str(int(float(cell)))
+        except:
+            return str(cell)
+
+    @staticmethod
+    def float(cell):
+        try:
+            return float(cell)
+        except:
+            return 0.0
+
+    @staticmethod
+    def str(cell):
+        return str(cell)
+
+    @staticmethod
+    def date(cell):
+        return try_get_date(cell)
