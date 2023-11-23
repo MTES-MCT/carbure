@@ -122,11 +122,9 @@ def check_user_rights(role=None, entity_type=None):
             except:
                 return ErrorResponse(400, UserRightsError.ENTITY_NOT_FOUND, message="Entity was not found")
 
-            # store user current rights in session if not already there
-            rights = request.session.get("rights")
-            if rights is None:
-                rights = {str(ur.entity_id): ur.role for ur in UserRights.objects.filter(user=request.user)}
-                request.session["rights"] = rights
+            # store user current rights in session
+            rights = {str(ur.entity_id): ur.role for ur in UserRights.objects.filter(user=request.user)}
+            request.session["rights"] = rights
 
             if entity_id not in rights:
                 return ErrorResponse(403, UserRightsError.WRONG_USER, status="forbidden", message="User has no rights to the requested entity")  # fmt:skip
@@ -141,6 +139,7 @@ def check_user_rights(role=None, entity_type=None):
                     return ErrorResponse(403, UserRightsError.WRONG_ENTITY_TYPE, status="forbidden", message="Operation not allowed for an entity of this type")  # fmt:skip
 
             if isinstance(role, list):
+                print(f"ROLE = {user_role}, ACCEPTED_ROLES = {role}")
                 if user_role not in role:
                     return ErrorResponse(403, UserRightsError.WRONG_ROLE, status="forbidden", message="Insufficient rights to the requested entity")  # fmt:skip
 
