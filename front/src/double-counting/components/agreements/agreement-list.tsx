@@ -59,7 +59,7 @@ const AgreementList = ({ snapshot = defaultCount }: { snapshot: DoubleCountingAg
     },
     tab === "active" && {
       header: t("Quotas") + " " + currentYear,
-      cell: (a) => <Cell text={`${Math.round(a.quotas_progression * 100)} %`} />,
+      cell: (a) => <Cell text={`${a.quotas_progression ? Math.round(a.quotas_progression * 100) : '-'} %`} />,
     }
   ])
 

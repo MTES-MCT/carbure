@@ -127,7 +127,7 @@ def add_quotas_to_agreements(year: int, agreements):
     # merge les deux dataframes
     if len(production_lots_df) == 0:
         grouped = []
-        quotas_df["quotas_progression"] = 0
+        quotas_df["quotas_progression"] = None
         # grouped["lot_count"] = 0
         # quotas_df["production_tonnes"] = 0
         # quotas_df["production_site"] = None
@@ -154,7 +154,7 @@ def add_quotas_to_agreements(year: int, agreements):
     # add quotas to active agreements
     for agreement in agreements:
         found_quotas = [q for q in quotas if q["agreement_id"] == agreement["certificate_id"]]
-        agreement["quotas_progression"] = round(found_quotas[0]["quotas_progression"], 2) if len(found_quotas) > 0 else 0
+        agreement["quotas_progression"] = round(found_quotas[0]["quotas_progression"], 2) if len(found_quotas) > 0 else None
 
     return agreements
 
