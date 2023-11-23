@@ -1,5 +1,3 @@
-import datetime
-from math import nan
 import os
 from core.tests_utils import setup_current_user
 from core.models import Entity
