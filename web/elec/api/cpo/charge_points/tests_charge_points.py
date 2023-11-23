@@ -1,4 +1,5 @@
 import datetime
+from math import nan
 import os
 from core.tests_utils import setup_current_user
 from core.models import Entity
@@ -26,29 +27,56 @@ class ElecCPOTest(TestCase):
             [(self.cpo, "RW")],
         )
 
-    def test_check_charge_point_certificate(self):
-        filepath = "%s/web/fixtures/csv/test_data/points-de-recharge-inscription.xlsx" % (os.environ["CARBURE_HOME"])
+    def test_check_charge_point_certificate_errors(self):
+        filepath = "%s/web/fixtures/csv/test_data/points-de-recharge-errors.xlsx" % (os.environ["CARBURE_HOME"])
 
         with open(filepath, "rb") as reader:
-            file = SimpleUploadedFile("points-de-recharge-inscription.xlsx", reader.read())
+            file = SimpleUploadedFile("points-de-recharge-errors.xlsx", reader.read())
 
         response = self.client.post(
             reverse("elec-cpo-charge-points-check-application"),
             {"entity_id": self.cpo.id, "file": file},
         )
 
-        expected = (
-            {
-                "status": "error",
-                "error": "APPLICATION_FAILED",
-                "data": {
-                    "file_name": "points-de-recharge-inscription.xlsx",
-                    "charging_point_count": 1,
-                    "errors": [{"error": "MISSING_CHARGING_POINT_IN_DATAGOUV", "meta": ["ABCDEFG"]}],
-                    "error_count": 1,
-                },
+        expected = {
+            "status": "error",
+            "error": "VALIDATION_FAILED",
+            "data": {
+                "file_name": "points-de-recharge-errors.xlsx",
+                "charging_point_count": 0,
+                "errors": [
+                    {
+                        "error": "MISSING_CHARGING_POINT_IN_DATAGOUV",
+                        "meta": ["ABCDE", "FGHIJ", "KLMOPQ"],
+                    }
+                ],
+                "error_count": 1,
             },
-        )
+        }
 
         self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), expected)
+
+    def test_check_charge_point_certificate_ok(self):
+        filepath = "%s/web/fixtures/csv/test_data/points-de-recharge-ok.xlsx" % (os.environ["CARBURE_HOME"])
+
+        with open(filepath, "rb") as reader:
+            file = SimpleUploadedFile("points-de-recharge-ok.xlsx", reader.read())
+
+        response = self.client.post(
+            reverse("elec-cpo-charge-points-check-application"),
+            {"entity_id": self.cpo.id, "file": file},
+        )
+
+        expected = {
+            "status": "success",
+            "data": {
+                "file_name": "points-de-recharge-ok.xlsx",
+                "charging_point_count": 5,
+                "errors": [],
+                "error_count": 0,
+            },
+        }
+
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), expected)
