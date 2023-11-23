@@ -17,6 +17,7 @@ class ApplicationDetailsForm(forms.Form):
 
 class ApplicationDetailsError:
     WRONG_APPLICATION = "WRONG_APPLICATION"
+    WRONG_ENTITY = "WRONG_ENTITY"
 
 
 @require_GET
@@ -28,6 +29,10 @@ def get_application_details(request, entity):
         return ErrorResponse(400, ApplicationDetailsError.WRONG_APPLICATION, form.errors)
 
     application = form.cleaned_data["application_id"]
+
+    if application.cpo != entity:
+        return ErrorResponse(400, ApplicationDetailsError.WRONG_ENTITY)
+
     charge_points = ElecChargePoint.objects.filter(cpo=entity, application=application)
 
     if "export" in request.GET:
