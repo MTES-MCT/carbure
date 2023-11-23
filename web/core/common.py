@@ -275,13 +275,15 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
     return lots_data
 
 
-def ErrorResponse(status_code, error=None, data=None):
+def ErrorResponse(status_code, error=None, data=None, status=Carbure.ERROR, message=None):
     response_data = {}
-    response_data["status"] = Carbure.ERROR
+    response_data["status"] = status
     if data is not None:
         response_data["data"] = data
     if error is not None:
         response_data["error"] = error
+    if message is not None:
+        response_data["message"] = message
     return JsonResponse(response_data, status=status_code)
 
 

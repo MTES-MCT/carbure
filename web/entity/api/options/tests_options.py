@@ -30,7 +30,7 @@ class EntityProductionSiteTest(TestCase):
 
         # wrongly formatted
         response = self.client.post(reverse(url), {"entity_id": "blablabla", "has_mac": "true"})
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 400)
         # no entity_id
         response = self.client.post(reverse(url), {"has_mac": "true"})
         self.assertEqual(response.status_code, 400)
@@ -51,7 +51,7 @@ class EntityProductionSiteTest(TestCase):
         # disable:
         # wrongly formatted
         response = self.client.post(reverse(url), {"entity_id": "blablabla", "has_mac": "false"})
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 400)
         # no entity_id
         response = self.client.post(reverse(url), {"has_mac": "false"})
         self.assertEqual(response.status_code, 400)
@@ -75,7 +75,7 @@ class EntityProductionSiteTest(TestCase):
 
         # wrongly formatted
         response = self.client.post(reverse(url), {"entity_id": "blablabla", "has_trading": "true"})
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 400)
         # no entity_id
         response = self.client.post(reverse(url), {"has_trading": "true"})
         self.assertEqual(response.status_code, 400)
@@ -91,7 +91,7 @@ class EntityProductionSiteTest(TestCase):
         # disable:
         # wrongly formatted
         response = self.client.post(reverse(url), {"entity_id": "blablabla", "has_trading": "false"})
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 400)
         # no entity_id
         response = self.client.post(reverse(url), {"has_trading": "false"})
         self.assertEqual(response.status_code, 400)
@@ -120,7 +120,7 @@ class EntityProductionSiteTest(TestCase):
 
         # wrongly formatted
         response = self.client.post(reverse(url), {"entity_id": "blablabla", "has_elec": "true"})
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 400)
 
         # no entity_id
         response = self.client.post(reverse(url), {"has_elec": "true"})
