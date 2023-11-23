@@ -1,4 +1,3 @@
-import traceback
 from django.http import HttpRequest
 from django.db import transaction
 from django.views.decorators.http import require_POST
@@ -13,7 +12,6 @@ from elec.services.import_charge_point_excel import import_charge_point_excel
 class AddChargePointApplicationError:
     MISSING_FILE = "MISSING_FILE"
     VALIDATION_FAILED = "VALIDATION_FAILED"
-    FAILED = "FAILED"
 
 
 @require_POST
@@ -24,21 +22,16 @@ def add_application(request: HttpRequest, entity: Entity):
     if not excel_file:
         return ErrorResponse(400, AddChargePointApplicationError.MISSING_FILE)
 
-    try:
-        charge_point_data, errors = import_charge_point_excel(excel_file)
+    charge_point_data, errors = import_charge_point_excel(excel_file)
 
-        if len(errors) > 0:
-            return ErrorResponse(400, AddChargePointApplicationError.VALIDATION_FAILED)
+    if len(errors) > 0:
+        return ErrorResponse(400, AddChargePointApplicationError.VALIDATION_FAILED)
 
-        with transaction.atomic():
-            application = ElecChargePointApplication(cpo=entity)
-            charge_points = [ElecChargePoint(**data, application=application, cpo=entity) for data in charge_point_data]
+    with transaction.atomic():
+        application = ElecChargePointApplication(cpo=entity)
+        charge_points = [ElecChargePoint(**data, application=application, cpo=entity) for data in charge_point_data]
 
-            application.save()
-            ElecChargePoint.objects.bulk_create(charge_points)
+        application.save()
+        ElecChargePoint.objects.bulk_create(charge_points)
 
-        return SuccessResponse()
-
-    except Exception:
-        traceback.print_exc()
-        return ErrorResponse(400, AddChargePointApplicationError.FAILED)
+    return SuccessResponse()
