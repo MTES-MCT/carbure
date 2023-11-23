@@ -10,7 +10,6 @@ from elec.services.import_charge_point_excel import import_charge_point_excel
 
 class CheckChargePointApplicationError:
     MISSING_FILE = "MISSING_FILE"
-    CPO_ONLY = "CPO_ONLY"
     VALIDATION_FAILED = "VALIDATION_FAILED"
     FAILED = "FAILED"
 

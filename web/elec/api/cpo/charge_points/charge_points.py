@@ -1,4 +1,3 @@
-import datetime
 from django.views.decorators.http import require_GET
 from core.common import SuccessResponse
 from core.decorators import check_user_rights
