@@ -95,7 +95,7 @@ class ExcelParser:
     @staticmethod
     def float(cell):
         try:
-            return float(cell)
+            return round(float(cell), 2)
         except:
             return 0.0
 

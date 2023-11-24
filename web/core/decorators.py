@@ -139,7 +139,6 @@ def check_user_rights(role=None, entity_type=None):
                     return ErrorResponse(403, UserRightsError.WRONG_ENTITY_TYPE, status="forbidden", message="Operation not allowed for an entity of this type")  # fmt:skip
 
             if isinstance(role, list):
-                print(f"ROLE = {user_role}, ACCEPTED_ROLES = {role}")
                 if user_role not in role:
                     return ErrorResponse(403, UserRightsError.WRONG_ROLE, status="forbidden", message="Insufficient rights to the requested entity")  # fmt:skip
 
