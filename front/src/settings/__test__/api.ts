@@ -37,16 +37,21 @@ const mockGetWithResponseData = (url: string, data: any) => {
     )
   })
 }
-const mockPostWithResponseData = (url: string, data?: any) => {
+const mockPostWithResponseData = (url: string, data?: any, withError: boolean = false) => {
   return rest.post(url, (req, res, ctx) => {
     return res(
+      withError ? ctx.status(400) : ctx.status(200),
       ctx.json({
-        status: "success",
+        status: withError ? "error" : "success",
         data,
       })
     )
   })
 }
+
+
+
+
 
 export function setEntity(nextEntity: any) {
   Data.set("entity", nextEntity)
@@ -333,7 +338,7 @@ export const okChargingPointsApplications = rest.get("/api/v5/elec/cpo/charging-
 
 export const okChargingPointsApplicationsEmpty = mockGetWithResponseData("/api/v5/elec/cpo/charging-points/applications", [])
 export const okChargingPointsCheckValid = mockPostWithResponseData("/api/v5/elec/cpo/charging-points/check-application", elecChargingPointsApplicationCheckResponseSucceed)
-export const okChargingPointsCheckError = mockPostWithResponseData("/api/v5/elec/cpo/charging-points/check-application", elecChargingPointsApplicationCheckResponseFailed)
+export const okChargingPointsCheckError = mockPostWithResponseData("/api/v5/elec/cpo/charging-points/check-application", elecChargingPointsApplicationCheckResponseFailed, true)
 export const okChargingPointsAddSuccess = mockPostWithResponseData("/api/v5/elec/cpo/charging-points/add-application")
 
 

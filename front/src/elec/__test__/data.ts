@@ -89,9 +89,7 @@ export const elecChargingPointsApplications: ElecChargingPointsApplication[] = [
 
 export const chargingPointsApplicationError1: ChargingPointsApplicationError = {
     error: "MISSING_CHARGING_POINT_IN_DATAGOUV",
-    meta: {
-        charging_points: ["8U7Y", "8U7Y"]
-    }
+    meta: ["8U7Y", "8U7Y"]
 }
 export const chargingPointsApplicationError2: ChargingPointsApplicationError = {
     error: "UNKNOW_ERROR"
@@ -99,7 +97,7 @@ export const chargingPointsApplicationError2: ChargingPointsApplicationError = {
 export const elecChargingPointsApplicationCheckResponseFailed: ElecChargingPointsApplicationCheckInfo = {
     file_name: "test.csv",
     error_count: 2,
-    charging_points_count: 0,
+    charging_point_count: 0,
     errors: [chargingPointsApplicationError1, chargingPointsApplicationError2
     ]
 }
@@ -107,5 +105,5 @@ export const elecChargingPointsApplicationCheckResponseFailed: ElecChargingPoint
 export const elecChargingPointsApplicationCheckResponseSucceed: ElecChargingPointsApplicationCheckInfo = {
     file_name: "test.csv",
     error_count: 0,
-    charging_points_count: 90
+    charging_point_count: 90
 }
