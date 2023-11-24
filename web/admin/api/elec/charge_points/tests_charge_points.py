@@ -77,12 +77,14 @@ class ElecCharginPointsTest(TestCase):
 
         data = response.json()
 
+        cpo = {"id": self.cpo.id, "entity_type": self.cpo.entity_type, "name": self.cpo.name}
+
         expected = {
             "status": "success",
             "data": [
                 {
                     "id": application.id,
-                    "cpo": self.cpo.name,
+                    "cpo": cpo,
                     "status": "PENDING",
                     "application_date": data["data"][0]["application_date"],  # timezone annoying stuff
                     "station_count": 1,
@@ -91,7 +93,7 @@ class ElecCharginPointsTest(TestCase):
                 },
                 {
                     "id": application2.id,
-                    "cpo": self.cpo.name,
+                    "cpo": cpo,
                     "status": "PENDING",
                     "application_date": data["data"][1]["application_date"],
                     "station_count": 1,
