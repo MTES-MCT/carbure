@@ -16,7 +16,7 @@ def export_charge_points_to_excel(charge_points, entity):
                 "rows": ElecChargePointSerializer(charge_points, many=True).data,
                 "columns": [
                     {"label": "id", "value": "id"},
-                    {"label": "cpo", "value": "cpo.name"},
+                    {"label": "cpo", "value": "cpo"},
                     # cpo excel data
                     {"label": "charge_point_id", "value": "charge_point_id"},
                     {"label": "current_type", "value": "current_type"},
