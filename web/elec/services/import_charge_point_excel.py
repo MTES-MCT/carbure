@@ -7,9 +7,12 @@ from core.excel import ExcelParser
 
 
 def import_charge_point_excel(excel_file: UploadedFile):
-    excel_data = parse_charge_point_excel(excel_file)
-    transport_data = download_charge_point_data()
-    return validate_charge_points(excel_data, transport_data)
+    try:
+        excel_data = parse_charge_point_excel(excel_file)
+        transport_data = download_charge_point_data()
+        return validate_charge_points(excel_data, transport_data)
+    except Exception as e:
+        return [], [{"error": str(e)}]
 
 
 def parse_charge_point_excel(excel_file: UploadedFile):
