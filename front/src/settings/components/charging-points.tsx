@@ -33,8 +33,8 @@ const ElecSettings = ({ companyId }: { companyId: number }) => {
     params: [entity.id, companyId],
   })
 
-  // const applications = applicationsResponse.result?.data.data ?? []
-  const applications = elecChargingPointsApplications // TEST with applications
+  const applications = applicationsResponse.result?.data.data ?? []
+  // const applications = elecChargingPointsApplications // TEST with applications
 
   const applicationsSnapshot: ElecChargingPointsSnapshot = {
     station_count: applications.reduce((acc, app) => acc + app.station_count, 0),

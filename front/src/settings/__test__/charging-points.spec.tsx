@@ -108,7 +108,6 @@ test("upload file", async () => {
 
   screen.getByText("Inscription des points de recharge")
 
-
   //send inscription
   const sendButton = await screen.findByText("Envoyer la demande d'inscription")
   await user.click(sendButton)

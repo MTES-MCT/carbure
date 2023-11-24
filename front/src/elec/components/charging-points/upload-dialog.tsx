@@ -4,18 +4,17 @@ import Button, { ExternalLink } from "common/components/button"
 import Dialog from "common/components/dialog"
 import { Form, useForm } from "common/components/form"
 import { Check, Return, Upload } from "common/components/icons"
-import { FileInput, FileListInput } from "common/components/input"
+import { FileInput } from "common/components/input"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 
+import { ElecChargingPointsApplicationCheckInfo } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
-import { checkDoubleCountingApplication } from "settings/api/double-counting"
 import { checkChargingPointsApplication } from "settings/api/elec"
 import ErrorsDetailsDialog from "./errors-dialog"
 import ValidDetailsDialog from "./valid-dialog"
-import { elecChargingPointsApplicationCheckResponseFailed, elecChargingPointsApplicationCheckResponseSucceed } from "elec/__test__/data"
 
 // L'URL complète du fichier
 
@@ -37,10 +36,22 @@ const ElecChargingPointsFileUpload = ({
     chargingPointsFile: undefined as File | undefined,
   })
 
-  const uploadFile = useMutation(checkChargingPointsApplication, {
+  const checkChargingPointsFile = useMutation(checkChargingPointsApplication, {
+    onSuccess: (res) => {
+      const checkedData = res.data.data
+      portal((close) => <ValidDetailsDialog fileData={checkedData!} onClose={close} file={value.chargingPointsFile!} />)
+      onClose()
+    },
     onError: (err) => {
-      const response = (err as AxiosError<{ error: string }>).response
-      if (response?.status === 413) {
+
+      const response = (err as AxiosError<{ status: string, error: string, data: ElecChargingPointsApplicationCheckInfo }>).response
+      if (response?.status === 400) {
+        onClose()
+        const checkedData = response.data.data
+        portal((close) => <ErrorsDetailsDialog fileData={checkedData} onClose={close} />)
+
+
+      } else if (response?.status === 413) {
         notify(
           t(
             "La taille des fichiers selectionnés est trop importante pour être analysée (5mo maximum)."
@@ -64,27 +75,10 @@ const ElecChargingPointsFileUpload = ({
 
   async function submitFile() {
     if (!value.chargingPointsFile) return
-
-    const response = await uploadFile.execute(
+    checkChargingPointsFile.execute(
       entity.id,
       value.chargingPointsFile as File
     )
-
-    if (response.status != 200) return
-    const checkedFile = response.data.data
-    // const checkedFile = elecChargingPointsApplicationCheckResponseFailed // TEST with error
-    // const checkedFile = elecChargingPointsApplicationCheckResponseSucceed // TEST with success
-
-
-
-    if (checkedFile) {
-      onClose()
-      if (checkedFile.error_count) {
-        portal((close) => <ErrorsDetailsDialog fileData={checkedFile} onClose={close} />)
-      } else {
-        portal((close) => <ValidDetailsDialog fileData={checkedFile} onClose={close} file={value.chargingPointsFile!} />)
-      }
-    }
   }
   const filePath = '/templates/points-de-recharge-inscription.xlsx';
   return (
@@ -111,7 +105,7 @@ const ElecChargingPointsFileUpload = ({
               </Trans>
             </p>
             <FileInput
-              loading={uploadFile.loading}
+              loading={checkChargingPointsFile.loading}
               icon={value.chargingPointsFile ? Check : Upload}
               label={t("Importer le fichier excel à analyser")}
               placeholder={value.chargingPointsFile ? value.chargingPointsFile.name : t("Choisir un fichier")}
@@ -124,7 +118,7 @@ const ElecChargingPointsFileUpload = ({
       <footer>
         <Button
           submit="dc-request"
-          loading={uploadFile.loading}
+          loading={checkChargingPointsFile.loading}
           disabled={!value.chargingPointsFile}
           variant="primary"
           icon={Check}

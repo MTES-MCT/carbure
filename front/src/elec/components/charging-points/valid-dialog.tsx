@@ -29,7 +29,7 @@ export const ValidDetailsDialog = ({
     invalidates: ["charging-points-applications"],
     onSuccess() {
       onClose()
-      notify(t("Les {{count}} points de recharge ont été ajoutés !", { count: fileData.charging_points_count }), { variant: "success" })
+      notify(t("Les {{count}} points de recharge ont été ajoutés !", { count: fileData.charging_point_count }), { variant: "success" })
 
     },
     onError(err) {
@@ -62,7 +62,7 @@ export const ValidDetailsDialog = ({
           </p>
           <p>
             <Trans
-              count={fileData.charging_points_count}
+              count={fileData.charging_point_count}
               defaults="Les <b>{{count}} points de recharge</b> peuvent être inscrits à votre espace CarbuRe." />
 
           </p>

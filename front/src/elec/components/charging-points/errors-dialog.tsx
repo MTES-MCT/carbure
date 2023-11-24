@@ -107,13 +107,13 @@ export function getErrorText(
     case "MISSING_CHARGING_POINT_IN_DATAGOUV":
       return t(
         "Les identifiants de points de recharge suivants n'existent pas dans la consolidation transport.data.gouv : {{chargingPoints}}",
-        { chargingPoints: error.meta?.charging_points.join(",") }
+        { chargingPoints: error.meta?.join(",") }
       )
 
     case "MISSING_CHARGING_POINT_DATA":
       return t(
         "Les informations relatives aux relevés (date_releve, releve, no_mid) sont manquantes ou pas correctement remplies pour les points de recharge suivants :",
-        { chargingPoints: error.meta?.charging_points.join(",") }
+        { chargingPoints: error.meta?.join(",") }
       )
 
     default:
