@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from core.serializers import EntityPreviewSerializer
 from elec.models import ElecChargePointApplication
 
 
@@ -15,7 +16,7 @@ class ElecChargePointApplicationSerializer(serializers.ModelSerializer):
             "power_total",
         ]
 
-    cpo = serializers.SlugRelatedField(read_only=True, slug_field="name")
+    cpo = EntityPreviewSerializer()
     application_date = serializers.DateTimeField(source="created_at")
     station_count = serializers.SerializerMethodField()
     charging_point_count = serializers.SerializerMethodField()
