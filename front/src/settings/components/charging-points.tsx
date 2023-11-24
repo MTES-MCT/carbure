@@ -16,13 +16,16 @@ import { Trans, useTranslation } from "react-i18next"
 import * as apiCpo from "../api/elec"
 import { elecChargingPointsApplications } from "elec/__test__/data"
 import Metric from "common/components/metric"
+import { useMatch } from "react-router-dom"
 
 const ElecSettings = ({ companyId }: { companyId: number }) => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const { isCPO, isAdmin } = entity
+  const { isCPO } = entity
+  const matchStatus = useMatch("/org/:entity/:view/*")
 
-  const api = isAdmin ? apiAdmin : apiCpo
+
+  const api = matchStatus?.params.view === "entities" ? apiAdmin : apiCpo
   const portal = usePortal()
 
   const applicationsResponse = useQuery(api.getChargingPointsApplications, {
@@ -30,8 +33,8 @@ const ElecSettings = ({ companyId }: { companyId: number }) => {
     params: [entity.id, companyId],
   })
 
-  const applications = applicationsResponse.result?.data.data ?? []
-  // const applications = elecChargingPointsApplications // TEST with applications
+  // const applications = applicationsResponse.result?.data.data ?? []
+  const applications = elecChargingPointsApplications // TEST with applications
 
   const applicationsSnapshot: ElecChargingPointsSnapshot = {
     station_count: applications.reduce((acc, app) => acc + app.station_count, 0),
