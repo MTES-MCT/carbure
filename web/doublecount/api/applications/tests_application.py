@@ -1,4 +1,4 @@
-# test with : python web/manage.py test doublecount.api.application.tests_application.DoubleCountApplicationTest.test_sourcing_row --keepdb
+# test with : python web/manage.py test doublecount.api.applications.tests_application.DoubleCountApplicationTest --keepdb
 from math import prod
 import os
 from core.tests_utils import setup_current_user
@@ -46,7 +46,7 @@ class DoubleCountApplicationTest(TestCase):
         fh.close()
         f = SimpleUploadedFile("dca.xlsx", data)
         response = self.client.post(
-            reverse("doublecount-application-check-file"),
+            reverse("doublecount-applications-check-file"),
             {"entity_id": self.producer.id, "file": f},
         )
         return response
