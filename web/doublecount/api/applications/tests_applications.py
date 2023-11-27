@@ -1,14 +1,17 @@
-# test with : python web/manage.py test doublecount.api.applications.tests_application.DoubleCountApplicationTest --keepdb
+# test with : python web/manage.py test doublecount.api.applications.tests_applications.DoubleCountApplicationsTest --keepdb
 from math import prod
 import os
 from core.tests_utils import setup_current_user
-from core.models import Entity, UserRights
+from core.models import Entity, Pays, UserRights
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from doublecount.errors import DoubleCountingError
+from doublecount.factories.application import DoubleCountingApplicationFactory
+from doublecount.models import DoubleCountingApplication
+from producers.models import ProductionSite
 
 
 class Endpoint:
@@ -18,7 +21,7 @@ class Endpoint:
 User = get_user_model()
 
 
-class DoubleCountApplicationTest(TestCase):
+class DoubleCountApplicationsTest(TestCase):
     fixtures = [
         "json/biofuels.json",
         "json/feedstock.json",
@@ -35,6 +38,15 @@ class DoubleCountApplicationTest(TestCase):
 
         self.producer, _ = Entity.objects.update_or_create(name="Le Super Producteur 1", entity_type="Producteur")
         UserRights.objects.update_or_create(user=self.user, entity=self.producer, defaults={"role": UserRights.ADMIN})
+
+        self.production_site = ProductionSite.objects.first()
+        self.production_site.address = "1 rue de la Paix"
+        france, _ = Pays.objects.update_or_create(code_pays="FR", name="France")
+        self.production_site.country = france
+        self.production_site.city = "Paris"
+        self.production_site.postal_code = "75000"
+        self.production_site.save()
+        self.requested_start_year = 2023
 
     def check_file(self, file_name: str):
         # upload template
@@ -235,3 +247,27 @@ class DoubleCountApplicationTest(TestCase):
 
     #     error1 = errors["traceablity"][0]
     #     self.assertEqual(error1["error"], DoubleCountingError.MISSING_TRACEABILITY)
+
+    def create_application(self):
+        app = DoubleCountingApplicationFactory.create(
+            producer=self.production_site.producer,
+            production_site=self.production_site,
+            period_start__year=self.requested_start_year,
+            status=DoubleCountingApplication.PENDING,
+        )
+        return app
+
+    def test_application_details(self):
+        app = self.create_application()
+
+        response = self.client.get(
+            reverse("doublecount-applications-application-details"),
+            {"entity_id": self.admin.id, "dca_id": app.id},
+        )
+
+        application = response.json()["data"]
+
+        production_site = application["production_site"]
+        self.assertEqual(production_site["id"], self.production_site.id)
+        self.assertEqual(production_site["inputs"], [])
+        self.assertEqual(production_site["certificates"], [])
