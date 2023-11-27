@@ -47,7 +47,7 @@ test("check the applications list", async () => {
   await waitWhileLoading()
   screen.getByText("Statut")
   screen.getByText("Date")
-  screen.getByText("31008")
+  screen.getByText("31 008")
 
   screen.getByText("En attente")
   screen.getByText("Accepté")
