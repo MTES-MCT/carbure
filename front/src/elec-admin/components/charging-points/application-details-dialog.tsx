@@ -95,8 +95,8 @@ export const ChargingPointsApplicationDetailsDialog = ({
 
         {entity.isAdmin && application.status === ElecChargingPointsApplicationStatus.Pending && (
           <>
-            <Button icon={Check} label={t("Valider l'inscription")} variant="success" action={acceptApplication} />
-            <Button icon={Cross} label={t("Refuser")} variant="danger" action={rejectApplication} />
+            <Button icon={Check} label={t("Valider l'inscription")} variant="success" action={acceptApplication} loading={acceptChargingPointsApplication.loading} />
+            <Button icon={Cross} label={t("Refuser")} variant="danger" action={rejectApplication} loading={rejectChargingPointsApplication.loading} />
           </>
         )}
         <Button icon={Return} label={t("Fermer")} action={onClose} asideX />

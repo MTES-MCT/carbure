@@ -105,7 +105,7 @@ const ElecSettings = ({ companyId }: { companyId: number }) => {
 
           <section>
             <Grid style={{ gridGap: 24 }}>
-              <Metric value={applicationsSnapshot.power_total} label={t("Kw cumulés")} />
+              <Metric value={formatNumber(Math.round(applicationsSnapshot.power_total))} label={t("Kw cumulés")} />
               <Metric value={applicationsSnapshot.station_count} label={t("Stations")} />
               <Metric value={applicationsSnapshot.charging_point_count} label={t("Points de charge")} />
             </Grid>
@@ -130,7 +130,7 @@ const ElecSettings = ({ companyId }: { companyId: number }) => {
                 header: t("Puissance cumulée"),
                 cell: (application) => (
                   <Cell
-                    text={`${formatNumber(application.power_total)}` + " kW"}
+                    text={`${formatNumber(Math.round(application.power_total))}` + " kW"}
                   />
                 ),
               },

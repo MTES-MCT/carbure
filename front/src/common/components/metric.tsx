@@ -5,7 +5,7 @@ export interface MetricProps {
   className?: string
   style?: React.CSSProperties
   label: string
-  value: number
+  value: number | string
   children?: (metric: string) => React.ReactNode
 }
 
