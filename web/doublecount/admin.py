@@ -49,4 +49,4 @@ class DoubleCountingProductionAdmin(admin.ModelAdmin):
 
 @admin.register(DoubleCountingDocFile)
 class DoubleCountingDocFileAdmin(admin.ModelAdmin):
-    list_display = ("dca", "agreement_id", "url", "file_name", "created_at")
+    list_display = ("dca", "certificate_id", "url", "file_name", "created_at")

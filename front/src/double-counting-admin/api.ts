@@ -54,7 +54,7 @@ export function addDoubleCountingApplication(
   production_site_id: number,
   producer_id: number,
   file: File,
-  agreement_id?: string,
+  certificate_id?: string,
   should_replace: boolean = false
 ) {
 
@@ -62,7 +62,7 @@ export function addDoubleCountingApplication(
     entity_id,
     production_site_id,
     producer_id,
-    agreement_id,
+    certificate_id,
     file,
     should_replace
   })

@@ -451,7 +451,7 @@ def get_quotas(year: int, producer_id: int = None):
 
     # tous les couples BC / MP pour sur une année
     detailed_quotas = DoubleCountingProduction.objects.values(
-        "year", "dca__producer", "dca__production_site", "biofuel", "feedstock", "approved_quota", "dca__agreement_id"
+        "year", "dca__producer", "dca__production_site", "biofuel", "feedstock", "approved_quota", "dca__certificate_id"
     ).filter(year=year, feedstock_id__in=feedstocks.keys(), approved_quota__gt=0)
 
     # tous les lots pour des MP double compté groupé par couple et par année
@@ -476,7 +476,7 @@ def get_quotas(year: int, producer_id: int = None):
             "feedstock": "feedstock_id",
             "dca__producer": "producer_id",
             "dca__production_site": "production_site_id",
-            "dca__agreement_id": "agreement_id",
+            "dca__certificate_id": "certificate_id",
         }
     )
 
@@ -507,7 +507,7 @@ def get_quotas(year: int, producer_id: int = None):
         quotas_df["production_tonnes"] = round(quotas_df["production_kg"] / 1000)
         quotas_df["quotas_progression"] = round((quotas_df["production_tonnes"] / quotas_df["approved_quota"]), 2)
 
-        grouped = quotas_df.groupby(["year", "producer_id", "production_site_id", "agreement_id"]).agg(
+        grouped = quotas_df.groupby(["year", "producer_id", "production_site_id", "certificate_id"]).agg(
             quotas_progression=("quotas_progression", "mean"),
         )
         grouped.reset_index(inplace=True)

@@ -29,7 +29,7 @@ def get_agreements(request, *args, **kwargs):
         if application["status"] in [DoubleCountingApplication.PENDING, DoubleCountingApplication.REJECTED]:
             application["quotas_progression"] = None
             continue
-        found_quotas = [q for q in quotas if q["agreement_id"] == application["agreement_id"]]
+        found_quotas = [q for q in quotas if q["certificate_id"] == application["certificate_id"]]
         application["quotas_progression"] = round(found_quotas[0]["quotas_progression"], 2) if len(found_quotas) > 0 else 0
 
     return JsonResponse({"status": "success", "data": applications_data})

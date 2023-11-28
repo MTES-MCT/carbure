@@ -261,7 +261,7 @@ class DoubleCountApplicationsTest(TestCase):
         app = self.create_application()
 
         response = self.client.get(
-            reverse("doublecount-applications-application-details"),
+            reverse("doublecount-applications-details"),
             {"entity_id": self.admin.id, "dca_id": app.id},
         )
 

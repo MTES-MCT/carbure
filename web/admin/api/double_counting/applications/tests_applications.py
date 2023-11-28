@@ -125,20 +125,20 @@ class AdminDoubleCountApplicationsTest(TestCase):
         # 1.3  test_dc_number_generation
         self.assertEqual(application.production_site.dc_number, str(1000 + int(application.production_site.id)))
         self.assertEqual(
-            application.agreement_id, f"FR_{application.production_site.dc_number}_{self.requested_start_year}"
+            application.certificate_id, f"FR_{application.production_site.dc_number}_{self.requested_start_year}"
         )
-        self.assertEqual(application.production_site.dc_reference, application.agreement_id)
+        self.assertEqual(application.production_site.dc_reference, application.certificate_id)
 
         # 1.2 - check period_start and period_end
         self.assertEqual(application.period_start, date(self.requested_start_year, 1, 1))
         self.assertEqual(application.period_end, date(self.requested_start_year + 1, 12, 31))
 
         # 2 - test if file uploaded
-        DoubleCountingDocFileFactory.create(agreement_id=application.agreement_id, file_name="dca.xlsx")
+        DoubleCountingDocFileFactory.create(certificate_id=application.certificate_id, file_name="dca.xlsx")
         pprint(DoubleCountingDocFile.objects.all())
-        docFile = DoubleCountingDocFile.objects.filter(agreement_id=application.agreement_id).first()
+        docFile = DoubleCountingDocFile.objects.filter(certificate_id=application.certificate_id).first()
         self.assertEqual(docFile.file_name, "dca.xlsx")
-        self.assertEqual(docFile.agreement_id, application.agreement_id)
+        self.assertEqual(docFile.certificate_id, application.certificate_id)
 
         # 3 - test upload twice
         response = self.add_file("dc_agreement_application_valid.xlsx")
@@ -163,16 +163,16 @@ class AdminDoubleCountApplicationsTest(TestCase):
         self.assertEqual(error, DoubleCountingAddError.APPLICATION_ALREADY_RECEIVED)
 
     def test_add_application_to_existing_agreement(self):
-        agreement_id = "FR_28_2023"
+        certificate_id = "FR_28_2023"
         # agreement not existing
-        response = self.add_file("dc_agreement_application_valid.xlsx", {"agreement_id": agreement_id})
+        response = self.add_file("dc_agreement_application_valid.xlsx", {"certificate_id": certificate_id})
         self.assertEqual(response.status_code, 400)
         error = response.json()["error"]
         self.assertEqual(error, DoubleCountingAddError.AGREEMENT_NOT_FOUND)
 
         # agreement existing
         _ = DoubleCountingRegistrationFactory.create(
-            certificate_id=agreement_id,
+            certificate_id=certificate_id,
             production_site=self.production_site,
             valid_from=date(self.requested_start_year, 1, 1),
         )
@@ -182,15 +182,15 @@ class AdminDoubleCountApplicationsTest(TestCase):
         error = response.json()["error"]
         self.assertEqual(error, DoubleCountingAddError.AGREEMENT_ALREADY_EXISTS)
 
-        response = self.add_file("dc_agreement_application_valid.xlsx", {"agreement_id": agreement_id})
+        response = self.add_file("dc_agreement_application_valid.xlsx", {"certificate_id": certificate_id})
         self.assertEqual(response.status_code, 200)
 
         # agreement should be linked to the application
         application = DoubleCountingApplication.objects.get(
             producer=self.production_site.producer, period_start__year=self.requested_start_year
         )
-        self.assertEqual(application.agreement_id, agreement_id)
-        agreement = DoubleCountingRegistration.objects.get(certificate_id=agreement_id)
+        self.assertEqual(application.certificate_id, certificate_id)
+        agreement = DoubleCountingRegistration.objects.get(certificate_id=certificate_id)
         self.assertEqual(agreement.application.id, application.id)
 
     def test_production_site_address_mandatory(self):
@@ -269,9 +269,9 @@ class AdminDoubleCountApplicationsTest(TestCase):
         self.assertEqual(application.status, DoubleCountingApplication.ACCEPTED)
 
         # test agreement generation
-        agreement = DoubleCountingRegistration.objects.get(certificate_id=application.agreement_id)
+        agreement = DoubleCountingRegistration.objects.get(certificate_id=application.certificate_id)
         self.assertEqual(agreement.valid_from, date(2023, 1, 1))
         self.assertEqual(agreement.valid_until, date(2024, 12, 31))
         self.assertEqual(agreement.production_site, application.production_site)
-        self.assertEqual(agreement.certificate_id, application.agreement_id)
+        self.assertEqual(agreement.certificate_id, application.certificate_id)
         self.assertEqual(agreement.application.id, application.id)

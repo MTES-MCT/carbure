@@ -163,7 +163,7 @@ class DoubleCountingApplicationFullSerializer(serializers.ModelSerializer):
         model = DoubleCountingApplication
         fields = [
             "id",
-            "agreement_id",
+            "certificate_id",
             "created_at",
             "producer",
             "producer_user",
@@ -210,7 +210,16 @@ class DoubleCountingApplicationPartialSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DoubleCountingApplication
-        fields = ["id", "created_at", "producer", "production_site", "period_start", "period_end", "status", "agreement_id"]
+        fields = [
+            "id",
+            "created_at",
+            "producer",
+            "production_site",
+            "period_start",
+            "period_end",
+            "status",
+            "certificate_id",
+        ]
 
 
 class DoubleCountingApplicationPartialSerializerWithForeignKeys(serializers.ModelSerializer):

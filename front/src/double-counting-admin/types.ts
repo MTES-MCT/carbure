@@ -30,7 +30,7 @@ export enum AgreementStatus {
 
 export interface DoubleCountingApplicationOverview {
   id: number
-  agreement_id: string
+  certificate_id: string
   producer: Entity
   production_site: ProductionSiteDetails
   period_start: string
