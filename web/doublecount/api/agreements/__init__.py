@@ -5,6 +5,6 @@ from .agreement_details import get_agreement_details
 
 
 urlpatterns = [
-    path("agreement-details", get_agreement_details, name="doublecount-agreements-agreement-details"),
+    path("details", get_agreement_details, name="doublecount-agreements-details"),
     path("", get_agreements, name="doublecount-agreements"),
 ]

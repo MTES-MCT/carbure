@@ -9,17 +9,17 @@ import Tabs from "common/components/tabs"
 import { useMutation, useQuery } from "common/hooks/async"
 import { compact } from "common/utils/collection"
 import { formatDate, formatNumber } from "common/utils/formatters"
-import ApplicationStatus from "double-counting/components/applications/application-status"
-import { SourcingAggregationTable } from "double-counting/components/sourcing-table"
-import YearTable from "double-counting/components/year-table"
+import ApplicationStatus from "double-counting-admin/components/applications/application-status"
+import { SourcingAggregationTable } from "double-counting-admin/components/sourcing-table"
+import YearTable from "double-counting-admin/components/year-table"
 import {
   DoubleCountingProduction,
   DoubleCountingSourcing,
   DoubleCountingStatus as DCStatus,
-} from "double-counting/types"
+} from "double-counting-admin/types"
 import { Fragment, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
-import * as api from "../api/double-counting"
+import * as api from "../../double-count/api"
 import DoubleCountingProductionDialog from "./double-counting-production-dialog"
 import QuotasTable from "./double-counting-quotas-dialog"
 import DoubleCountingSourcingDialog from "./double-counting-sourcing-dialog"

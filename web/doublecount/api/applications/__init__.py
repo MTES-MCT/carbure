@@ -4,6 +4,6 @@ from .application_details import get_application_details
 
 
 urlpatterns = [
-    path("application-details", get_application_details, name="doublecount-applications-application-details"),
+    path("details", get_application_details, name="doublecount-applications-details"),
     path("check-file", check_file, name="doublecount-applications-check-file"),
 ]

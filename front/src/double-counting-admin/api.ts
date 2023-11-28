@@ -109,7 +109,6 @@ export function downloadDoubleCountingAgreementList(entity_id: number) {
 
 export function getDoubleCountingAgreementList(entity_id: number, order_by?: string,
   direction?: string) {
-
   return api.get<Api<DoubleCountingAgreementsOverview>>(
     "/v5/admin/double-counting/agreements"
     , { params: { entity_id, order_by, direction } })
