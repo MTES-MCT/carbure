@@ -48,7 +48,7 @@ export const ApplicationDetailsDialog = () => {
         return
       }
 
-      // automatically set the quotas to the asked value the first time the dossier is opened
+      // automatically set the quotas to the asked value the first time the application is opened
       const quotas: Record<string, number> = {}
       applicationData.production.forEach((prod) => {
         quotas[prod.id] =
@@ -69,7 +69,7 @@ export const ApplicationDetailsDialog = () => {
     invalidates: ["dc-applications", "dc-snapshot", "dc-agreements"],
     onSuccess: () => {
       navigate("/org/9/double-counting/agreements")
-      notify(t("Le dossier a été accepté."), { variant: "success" })
+      notify(t("La demande d'agrément a été accepté."), { variant: "success" })
     }
   })
 
@@ -79,7 +79,7 @@ export const ApplicationDetailsDialog = () => {
       navigate({
         pathname: location.pathname,
       })
-      notify(t("Le dossier a été refusé."), { variant: "success" })
+      notify(t("La demande d'agrément a été refusé."), { variant: "success" })
     }
   })
 
@@ -129,8 +129,8 @@ export const ApplicationDetailsDialog = () => {
     portal((close) => (
       <Confirm
         variant="success"
-        title={t("Accepter dossier")}
-        description={t("Voulez-vous vraiment accepter ce dossier double comptage ? Une fois accepté, vous retrouverez l'agrément correspondant dans la liste des agréments actifs.")} // prettier-ignore
+        title={t("Accepter la demande d'agrément")}
+        description={t("Voulez-vous vraiment accepter cette demande d'agrément double comptage ? Une fois accepté, vous retrouverez l'agrément correspondant dans la liste des agréments actifs.")} // prettier-ignore
         confirm={t("Accepter")}
         icon={Check}
         onClose={close}
@@ -147,8 +147,8 @@ export const ApplicationDetailsDialog = () => {
     portal((close) => (
       <Confirm
         variant="danger"
-        title={t("Refuser dossier")}
-        description={t("Voulez-vous vraiment refuser ce dossier double comptage")} // prettier-ignore
+        title={t("Refuser la demande d'agrément")}
+        description={t("Voulez-vous vraiment refuser cette demande d'agrément double comptage ?")} // prettier-ignore
         confirm={t("Refuser")}
         icon={Cross}
         onClose={close}
@@ -170,7 +170,7 @@ export const ApplicationDetailsDialog = () => {
       <Dialog fullscreen onClose={closeDialog}>
         <header>
           <ApplicationStatus big status={dcaStatus} />
-          <h1>{t("Dossier double comptage")} </h1>
+          <h1>{t("Demande d'agrément double comptage")} </h1>
         </header>
 
         <main>
@@ -188,9 +188,9 @@ export const ApplicationDetailsDialog = () => {
         </main>
 
         <footer>
-          {application &&
+          {/* {application &&
             <ApplicationDownloadButton application={application} />
-          }
+          } */}
           {!applicationResponse.loading && (
             <>
               {isAdmin && (

@@ -1,30 +1,31 @@
 code,description_fr,PCI_kg,PCI_Litre,Masse_volumique,is_alcool,is_graisse,is_displayed,compatible_essence,compatible_diesel
+B100,B100,37,33,0.892,0,1,1,0,1
 BG,Biogaz,50,0,0,0,0,0,0,0
 BGS,Biogazole de synthèse (Hors HVO),44,34,0.773,0,0,0,0,1
+Bio-essence de synthèse,Bio-essence de synthèse,44,33,0.75,1,0,1,1,0
 BT,Butanol,33,27,0.818,1,0,0,1,0
+ED95,Éthanol pour ED95,27,21,0.778,1,0,1,1,0
 EEHA,EEHA,38,34,0.895,0,1,0,0,1
 EEHU,EEHU,38,34,0.895,0,1,0,0,1
 EEHV,EEHV,38,34,0.895,0,1,0,0,1
-TAME,TAME,36,28,0.777,0,1,0,0,1
+EMAG,EMAG,37,33,0.892,0,1,1,0,1
 EMHA,EMHA,37,33,0.892,0,1,1,0,1
 EMHU,EMHU,37,33,0.892,0,1,1,0,1
 EMHV,EMHV,37,33,0.892,0,1,1,0,1
 ETBE,ETBE,36,27,0.75,1,0,1,1,0
 ETH,Éthanol,27,21,0.778,1,0,1,1,0
-HOG,Autres Huiles Hydrotraitées - Gazole,44,34,0.845,0,1,1,0,1
-HOE,Autres Huiles Hydrotraitées - Essence,45,30,0.755,0,1,1,1,0
-HOC,Autres Huiles Hydrotraitées - Kérosène,44,34,0.8,0,1,1,0,0
-HVOG,Huiles Végétales Hydrotraitées - Gazole,44,34,0.845,0,1,1,0,1
-HVOE,Huiles Végétales Hydrotraitées - Essence,45,30,0.755,0,1,1,1,0
-HVOC,Huiles Végétales Hydrotraitées - Kérosène,44,34,0.8,0,1,1,0,0
-HCG,Huiles co-traitées - Gazole,44,34,0.845,0,1,1,0,1
-HCE,Huiles co-traitées - Essence,45,30,0.755,0,1,1,1,0
 HCC,Huiles co-traitées - Kérosène,44,34,0.8,0,1,1,0,0
-MTBE,MTBE,35,26,0.743,1,0,1,1,0
-MT,Méthanol,20,16,0.8,1,0,0,1,0
-TAEE,TAEE,38,29,0.763,0,0,1,0,0
-HVP,Huile végétale pure,37,34,0.919,0,1,0,0,0
+HCE,Huiles co-traitées - Essence,45,30,0.755,0,1,1,1,0
+HCG,Huiles co-traitées - Gazole,44,34,0.845,0,1,1,0,1
 HCU,Huile provenant d'huiles de cuisson usagées,0,0,0,0,1,0,0,0
-EMAG,EMAG,37,33,0.892,0,1,1,0,1
-ED95,Éthanol pour ED95,27,21,0.778,1,0,1,1,0
-B100,B100,37,33,0.892,0,1,1,0,1
+HOC,Autres Huiles Hydrotraitées - Kérosène,44,34,0.8,0,1,1,0,0
+HOE,Autres Huiles Hydrotraitées - Essence,45,30,0.755,0,1,1,1,0
+HOG,Autres Huiles Hydrotraitées - Gazole,44,34,0.845,0,1,1,0,1
+HVOC,Huiles Végétales Hydrotraitées - Kérosène,44,34,0.8,0,1,1,0,0
+HVOE,Huiles Végétales Hydrotraitées - Essence,45,30,0.755,0,1,1,1,0
+HVOG,Huiles Végétales Hydrotraitées - Gazole,44,34,0.845,0,1,1,0,1
+HVP,Huile végétale pure,37,34,0.919,0,1,0,0,0
+MT,Méthanol,20,16,0.8,1,0,0,1,0
+MTBE,MTBE,35,26,0.743,1,0,1,1,0
+TAEE,TAEE,38,29,0.763,0,0,1,0,0
+TAME,TAME,36,28,0.777,0,1,0,0,1

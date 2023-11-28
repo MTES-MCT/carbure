@@ -87,7 +87,7 @@ def add_application(request, *args, **kwargs):
 
     # check if an application already exists for this producer, this period and is not accepted
     identical_replacable_application = DoubleCountingApplication.objects.filter(
-        Q(producer=producer)
+        Q(production_site_id=production_site_id)
         & Q(period_start__year=start.year)
         & Q(status__in=[DoubleCountingApplication.PENDING, DoubleCountingApplication.REJECTED]),
     )

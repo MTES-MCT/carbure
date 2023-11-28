@@ -47,7 +47,7 @@ const DoubleCounting = () => {
                           }
                         </p>
                         <strong>
-                          {t("Dossiers en attente", {
+                          {t("Demande en attente", {
                             count: snapshot?.applications_pending,
                           })}
                         </strong>

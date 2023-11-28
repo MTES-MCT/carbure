@@ -22,7 +22,7 @@ const Settings = () => {
   const entity = useEntity()
   useTitle(`${entity.name} · ${t("Société")}`)
 
-  const { isProducer, isTrader, isOperator } = entity
+  const { isProducer, isTrader, isOperator, isCPO } = entity
 
   const hasCertificates = isProducer || isTrader || isOperator
   const hasDepot = isProducer || isOperator || isTrader
@@ -44,7 +44,7 @@ const Settings = () => {
             key: "options",
             label: t("Options"),
           },
-          hasOptions && {
+          {
             path: "#info",
             key: "info",
             label: t("Informations"),
@@ -78,7 +78,7 @@ const Settings = () => {
       />
       <section>
         {hasOptions && <CompanyOptions />}
-        {hasOptions && <CompanyInfo />}
+        <CompanyInfo />
         {hasCertificates && <Certificates />}
         {hasDepot && <DeliverySitesSettings entity={entity} />}
         {isProducer && <ProductionSitesSettings entity={entity} />}

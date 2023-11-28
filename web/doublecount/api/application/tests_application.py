@@ -1,4 +1,4 @@
-# test with : python web/manage.py test doublecount.api.application.tests_application.DoubleCountApplicationTest.test_sourcing_row --keepdb
+# test with : python web/manage.py test doublecount.api.application.tests_application.DoubleCountApplicationTest --keepdb
 from math import prod
 import os
 from core.tests_utils import setup_current_user

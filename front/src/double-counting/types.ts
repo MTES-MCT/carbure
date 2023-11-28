@@ -38,6 +38,7 @@ export interface DoubleCountingApplicationOverview {
   status: DoubleCountingStatus
   producer_user: string
   created_at: string
+  quotas_progression?: number
 }
 
 export interface DoubleCountingSourcingAggregation {

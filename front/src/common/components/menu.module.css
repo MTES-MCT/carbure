@@ -2,6 +2,11 @@
   padding: var(--spacing-s);
 }
 
+.menu span {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
 .dropdown {
   max-height: 50vh;
 }
@@ -10,7 +15,7 @@
   padding: 0;
 }
 
-.items li > * {
+.items li>* {
   width: 100%;
   padding: var(--spacing-s) var(--spacing-m);
   text-decoration: none;
