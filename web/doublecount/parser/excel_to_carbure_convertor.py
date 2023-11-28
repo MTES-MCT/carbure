@@ -5,7 +5,7 @@ DC_FEEDSTOCK_UNRECOGNIZED = "__unrecognized__"
 
 dc_feedstock_to_carbure_feedstock = {
     "alcool pur de marc de raisin": "ALCOOL_PUR_MARC_RAISIN",
-    "alcool pur de lie de vin": "ALCOOL_PUR_LIE_VIN",
+    "alcool pur de lies de vin": "ALCOOL_PUR_LIES_VIN",
     "algues": "ALGUES",
     "bagasse": "BAGASSE",
     "balles (enveloppes)": "BALLES",
@@ -24,6 +24,7 @@ dc_feedstock_to_carbure_feedstock = {
     "effluents d'huileries de palme et rafles": "EFFLUENTS_HUILERIES_PALME_RAFLE",
     "effluents d'huileries de palme et rafles (pome)": "EFFLUENTS_HUILERIES_PALME_RAFLE",
     "egouts pauvres de 2e extractions": "EP2",
+    "ethanol de lies de vin": "ETHANOL_LIES_VIN",
     "fumier humide": "FUMIER_HUMIDE",
     "fumier sec": "FUMIER_SEC",
     "glycérine brute": "GLYCERINE_BRUTE",
@@ -52,7 +53,7 @@ dc_feedstock_to_carbure_feedstock = {
 dc_biofuel_to_carbure_biofuel = {
     "bio isobutène": None,
     "bio isooctane": None,
-    "bioessence de synthèse": None,
+    "bes": "Bio-essence de synthèse",
     "bioetbe": "ETBE",
     "biogazole de synthèse": "BG",
     "eeha": "EEHA",
