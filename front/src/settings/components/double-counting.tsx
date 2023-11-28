@@ -43,7 +43,7 @@ const DoubleCountingSettings = () => {
     } else {
       navigate({
         pathname: location.pathname,
-        hash: `double-counting/agreements/${application.certificate_id}`,
+        hash: `double-counting/agreements/${application.agreement_id}`,
       })
     }
     // portal((resolve) => (

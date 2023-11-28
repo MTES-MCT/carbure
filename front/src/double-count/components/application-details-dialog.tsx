@@ -6,11 +6,9 @@ import { useHashMatch } from "common/components/hash-route"
 import {
   Return
 } from "common/components/icons"
-import { useNotify } from "common/components/notifications"
-import Portal, { usePortal } from "common/components/portal"
+import Portal from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { ApplicationInfo } from "../../double-counting-admin/components/applications/application-info"
@@ -22,8 +20,6 @@ import * as api from "../api"
 
 export const ApplicationDetailsDialog = () => {
   const { t } = useTranslation()
-  const notify = useNotify()
-  const portal = usePortal()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -34,24 +30,7 @@ export const ApplicationDetailsDialog = () => {
   const applicationResponse = useQuery(api.getDoubleCountingApplicationDetails, {
     key: "dc-application",
     params: [entity.id, parseInt(match?.params.id!)],
-
-    // onSuccess: (application) => {
-    //   const applicationData = application.data.data
-    //   if (applicationData === undefined) {
-    //     setQuotas({})
-    //     return
-    //   }
-
-    //   // automatically set the quotas to the asked value the first time the application is opened
-    //   const quotas: Record<string, number> = {}
-    //   applicationData.production.forEach((prod) => {
-    //     quotas[prod.id] =
-    //       prod.approved_quota >= 0 ? prod.approved_quota : 0
-    //   })
-    //   setQuotas(quotas)
-    // },
   })
-  console.log('applicationResponse:', applicationResponse)
 
 
   const application = applicationResponse.result?.data.data

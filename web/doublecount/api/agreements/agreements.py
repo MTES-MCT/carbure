@@ -2,6 +2,7 @@ from datetime import datetime
 from django.http.response import JsonResponse
 
 from django.http import JsonResponse
+from certificates.models import DoubleCountingRegistration
 from core.decorators import check_user_rights
 from core.models import UserRights
 from doublecount.helpers import get_quotas
@@ -26,11 +27,15 @@ def get_agreements(request, *args, **kwargs):
 
     # add quotas to active agreements
     for application in applications_data:
-        if application["status"] in [DoubleCountingApplication.PENDING, DoubleCountingApplication.REJECTED]:
+        if application["status"] != DoubleCountingApplication.ACCEPTED:
             application["quotas_progression"] = None
             continue
         found_quotas = [q for q in quotas if q["certificate_id"] == application["certificate_id"]]
         application["quotas_progression"] = round(found_quotas[0]["quotas_progression"], 2) if len(found_quotas) > 0 else 0
+
+        # add agreement_id to applications when accepted
+        agreement = DoubleCountingRegistration.objects.get(application_id=application["id"])
+        application["agreement_id"] = agreement.id
 
     return JsonResponse({"status": "success", "data": applications_data})
 
