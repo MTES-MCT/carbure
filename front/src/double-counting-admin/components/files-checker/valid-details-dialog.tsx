@@ -83,7 +83,7 @@ export const ValidDetailsDialog = ({
 const defaultProductionForm = {
   productionSite: undefined as ProductionSite | undefined,
   producer: undefined as Entity | undefined,
-  agreement_id: undefined as string | undefined,
+  certificate_id: undefined as string | undefined,
 }
 
 type ProductionForm = typeof defaultProductionForm
@@ -137,7 +137,7 @@ export const ProductionSiteAdminDialog = ({
       } else if (errorCode === 'AGREEMENT_ALREADY_EXISTS') {
         setError(t("Un agrément existe déjà sur cette periode et pour ce site de production."))
       } else if (errorCode === 'AGREEMENT_NOT_FOUND') {
-        setError(t("Le numéro \"{{agreementId}}\" ne correspond à aucun agrément actif.", { agreementId: value.agreement_id }))
+        setError(t("Le numéro \"{{certificateId}}\" ne correspond à aucun agrément actif.", { agreementId: value.certificate_id }))
       } else if (errorCode === 'PRODUCTION_SITE_ADDRESS_UNDEFINED') {
         setError(<MissingAddress productionSiteId={value.productionSite?.id} />)
       }
@@ -156,7 +156,7 @@ export const ProductionSiteAdminDialog = ({
       value.productionSite.id,
       value.producer.id,
       file,
-      value.agreement_id,
+      value.certificate_id,
       shouldReplace
     )
   }
@@ -189,7 +189,7 @@ export const ProductionSiteAdminDialog = ({
           <TextInput
             label={t("N° d'agrément lié à ce dossier")}
             placeholder={t("Laisser vide si nouvelle demande")}
-            {...bind("agreement_id")}
+            {...bind("certificate_id")}
           />
         </section>
         {error &&

@@ -69,7 +69,7 @@ class DoubleCountAgreementTest(TestCase):
             production_site=self.production_site1,
             valid_from=date(self.requested_start_year, 1, 1),
             application=application,
-            certificate_id=application.agreement_id,
+            certificate_id=application.certificate_id,
         )
         # an agreement to renew but already renewed => "Validé"
 

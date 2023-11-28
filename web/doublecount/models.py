@@ -32,7 +32,7 @@ class DoubleCountingApplication(models.Model):
 
     period_start = models.DateField(null=False, blank=False)
     period_end = models.DateField(null=False, blank=False)
-    agreement_id = models.CharField(max_length=16)  # FR_123456789_2020
+    certificate_id = models.CharField(max_length=16)  # FR_123456789_2020
     status = models.CharField(max_length=32, choices=DCA_STATUS_CHOICES, default=PENDING)
 
     def __str__(self):
@@ -57,15 +57,15 @@ class DoubleCountingApplication(models.Model):
 
 
 @receiver(pre_save, sender=DoubleCountingApplication)
-def set_agreement_id(sender, instance, **kwargs):
+def set_certificate_id(sender, instance, **kwargs):
     # generer un dc_number si jamais été reconnu comme eligible
     if not instance.production_site.dc_reference:
         dc_number = int(instance.production_site.id) + 1000
         instance.production_site.dc_number = str(dc_number)
 
-    if not instance.agreement_id:
-        instance.agreement_id = "FR_" + instance.production_site.dc_number + "_" + instance.period_start.strftime("%Y")
-        instance.production_site.dc_reference = instance.agreement_id
+    if not instance.certificate_id:
+        instance.certificate_id = "FR_" + instance.production_site.dc_number + "_" + instance.period_start.strftime("%Y")
+        instance.production_site.dc_reference = instance.certificate_id
         instance.production_site.save()
 
 
@@ -128,7 +128,7 @@ class DoubleCountingDocFile(models.Model):
     FILE_TYPE = ((SOURCING, SOURCING), (DECISION, DECISION))
 
     url = models.TextField()
-    agreement_id = models.CharField(max_length=16, default="")
+    certificate_id = models.CharField(max_length=16, default="")
     file_name = models.CharField(max_length=128, default="")
     file_type = models.CharField(max_length=128, choices=FILE_TYPE, default=SOURCING)
     dca = models.ForeignKey(DoubleCountingApplication, on_delete=models.CASCADE, related_name="documents")

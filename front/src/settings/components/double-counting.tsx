@@ -43,7 +43,7 @@ const DoubleCountingSettings = () => {
     } else {
       navigate({
         pathname: location.pathname,
-        hash: `double-counting/agreements/${application.agreement_id}`,
+        hash: `double-counting/agreements/${application.certificate_id}`,
       })
     }
     // portal((resolve) => (
@@ -120,7 +120,7 @@ const DoubleCountingSettings = () => {
                   {dc.status === DoubleCountingStatus.Pending && t("En cours de traitement...")}
 
                   {dc.status === DoubleCountingStatus.Accepted && (
-                    <>{dc.agreement_id}</>
+                    <>{dc.certificate_id}</>
                   )}
 
                 </span>
