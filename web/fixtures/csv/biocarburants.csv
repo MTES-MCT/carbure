@@ -2,7 +2,7 @@ code,description_fr,PCI_kg,PCI_Litre,Masse_volumique,is_alcool,is_graisse,is_dis
 B100,B100,37,33,0.892,0,1,1,0,1
 BG,Biogaz,50,0,0,0,0,0,0,0
 BGS,Biogazole de synthèse (Hors HVO),44,34,0.773,0,0,0,0,1
-Bio-essence de synthèse,Bio-essence de synthèse,44,33,0.75,1,0,1,1,0
+BES,Bio-essence de synthèse,44,33,0.75,1,0,1,1,0
 BT,Butanol,33,27,0.818,1,0,0,1,0
 ED95,Éthanol pour ED95,27,21,0.778,1,0,1,1,0
 EEHA,EEHA,38,34,0.895,0,1,0,0,1
