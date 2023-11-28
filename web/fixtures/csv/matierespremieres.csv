@@ -21,6 +21,7 @@ DISTILLAT_ACIDE_GRAS_PALME,Distillat d'acide gras de palme,0,1,0,1,1,CONV
 DPSC,Déchet de processus sucrier contaminé,1,0,0,0,1,OTHER
 EFFLUENTS_HUILERIES_PALME_RAFLE,Effluents d'huileries de palme et rafles,0,1,1,0,1,ANN-IX-A
 EP2,Égouts pauvres de 2ème extraction,1,0,0,0,1,OTHER
+ETHANOL_LIE_VIN,Ethanol de lie de vin,1,0,1,0,1,ANN-IX-A
 FUMIER_HUMIDE,Fumier humide,1,0,1,0,0,ANN-IX-A
 FUMIER_SEC,Fumier sec,1,0,1,0,0,ANN-IX-A
 GLYCERINE_BRUTE,Glycérine brute,1,1,1,0,1,ANN-IX-A
