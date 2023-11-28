@@ -5,5 +5,5 @@ module.exports = {
   keySeparator: false,
   namespaceSeparator: false,
   verbose: true,
-  useKeysAsDefaultValue: true,
+  defaultValue: (locale, namespace, key,  value) => key
 }

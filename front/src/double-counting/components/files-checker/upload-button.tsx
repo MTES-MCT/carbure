@@ -17,7 +17,7 @@ const FilesCheckerUploadButton = ({ label }: { label?: string }) => {
       asideX
       variant="secondary"
       icon={Upload}
-      label={label || t("Ajouter des dossiers")}
+      label={label || t("Ajouter des demandes d'agrément")}
       action={showApplicationsChecker}
     />
   )

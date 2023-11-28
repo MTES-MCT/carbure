@@ -17,13 +17,6 @@ from producers.models import ProductionSite
 from transactions.factories.carbure_lot import CarbureLotFactory
 
 
-class Endpoint:
-    change_user_role = reverse("entity-users-change-role")
-
-
-User = get_user_model()
-
-
 class AdminDoubleCountAgreementsTest(TestCase):
     fixtures = [
         "json/biofuels.json",
@@ -83,11 +76,12 @@ class AdminDoubleCountAgreementsTest(TestCase):
     def create_lots(self, agreement, production1, production2, production3):
         start_year = agreement.valid_from.year
 
-        def createLot(production, year) -> CarbureLot:
+        def createLot(production, year, delivery_type=CarbureLot.BLENDING) -> CarbureLot:
             return CarbureLotFactory.create(
                 feedstock=production.feedstock,
                 biofuel=production.biofuel,
                 lot_status=CarbureLot.ACCEPTED,
+                delivery_type=delivery_type,
                 year=year,
                 production_site_double_counting_certificate=agreement.certificate_id,
                 carbure_production_site=self.production_site,
@@ -97,6 +91,7 @@ class AdminDoubleCountAgreementsTest(TestCase):
         # production 1 (2 lots en 2023 et 1 lot en 2024)
         lot1 = createLot(production1, start_year)
         lot2 = createLot(production1, start_year)
+        lot3 = createLot(production1, start_year, delivery_type=CarbureLot.STOCK)
 
         createLot(production1, start_year + 1)
         createLot(production1, start_year - 1)  # not in the agreement period
@@ -118,13 +113,13 @@ class AdminDoubleCountAgreementsTest(TestCase):
             agreement1, production1, production2, production3
         )
 
-        # self.create_agreement()
+        self.create_agreement()
 
         response = self.client.get(reverse("admin-double-counting-agreements"), {"entity_id": self.admin.id})
         self.assertEqual(response.status_code, 200)
         data = response.json()["data"]
         active_agreements = data["active"]
-        self.assertEqual(len(active_agreements), 1)
+        self.assertEqual(len(active_agreements), 2)
 
         active_agreement1 = active_agreements[0]
         self.assertEqual(active_agreement1["certificate_id"], agreement1.certificate_id)
@@ -162,7 +157,7 @@ class AdminDoubleCountAgreementsTest(TestCase):
         application = data["application"]
         quotas = data["quotas"]
 
-        self.assertEqual(application["id"], agreement.id)
+        self.assertEqual(application["id"], app.id)
         self.assertEqual(len(quotas), 2)  # production 1 +production 3
 
         quota_line_1 = quotas[0]
