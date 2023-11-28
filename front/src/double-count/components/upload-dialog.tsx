@@ -8,12 +8,12 @@ import { FileInput, FileListInput } from "common/components/input"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
-import ErrorsDetailsDialog from "double-counting/components/files-checker/errors-details-dialog"
-import ValidDetailsDialog from "double-counting/components/files-checker/valid-details-dialog"
-import { CheckDoubleCountingFilesResponse, DoubleCountingFileInfo } from "double-counting/types"
+import ErrorsDetailsDialog from "double-counting-admin/components/files-checker/errors-details-dialog"
+import ValidDetailsDialog from "double-counting-admin/components/files-checker/valid-details-dialog"
+import { CheckDoubleCountingFilesResponse, DoubleCountingFileInfo } from "double-counting-admin/types"
 import { Trans, useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
-import { checkDoubleCountingApplication } from "settings/api/double-counting"
+import { checkDoubleCountingApplication } from "double-count/api"
 
 type DoubleCountingFileCheckerDialogProps = {
   onClose: () => void

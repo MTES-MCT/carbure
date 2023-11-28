@@ -16,9 +16,9 @@ import {
   DoubleCountingApplicationOverview,
   DoubleCountingProduction,
   QuotaDetails,
-} from "double-counting/types"
+} from "double-counting-admin/types"
 import { Trans, useTranslation } from "react-i18next"
-import * as api from "../api/double-counting"
+import * as api from "../../double-count/api"
 
 type DoubleCountingProductionDialogProps = {
   add?: boolean

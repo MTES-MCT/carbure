@@ -9,9 +9,9 @@ import { Plus, Return, Save } from "common/components/icons"
 import { NumberInput } from "common/components/input"
 import { useMutation } from "common/hooks/async"
 import { compact } from "common/utils/collection"
-import { DoubleCountingSourcing } from "double-counting/types"
+import { DoubleCountingSourcing } from "double-counting-admin/types"
 import { Trans, useTranslation } from "react-i18next"
-import * as api from "../api/double-counting"
+import * as api from "../../double-count/api"
 
 type DoubleCountingSourcingDialogProps = {
   add?: boolean

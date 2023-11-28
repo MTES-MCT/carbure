@@ -7,19 +7,22 @@ import { LoaderOverlay, Panel } from "common/components/scaffold"
 import Table, { Cell } from "common/components/table"
 import { useQuery } from "common/hooks/async"
 import { formatDate, formatDateYear } from "common/utils/formatters"
-import ApplicationStatus from "double-counting/components/applications/application-status"
-import { DoubleCountingApplicationOverview, DoubleCountingStatus } from "double-counting/types"
+import ApplicationStatus from "double-counting-admin/components/applications/application-status"
+import { DoubleCountingApplicationOverview, DoubleCountingStatus } from "double-counting-admin/types"
 import { Trans, useTranslation } from "react-i18next"
-import * as api from "../api/double-counting"
+import * as api from "../../double-count/api"
 import DoubleCountingApplicationDialog from "./double-counting-dialog"
-import DoubleCountingUploadDialog from "./double-counting-upload"
+import DoubleCountingUploadDialog from "../../double-count/components/upload-dialog"
 import Button from "common/components/button"
+import { useLocation, useNavigate } from "react-router-dom"
 
 const DoubleCountingSettings = () => {
   const { t } = useTranslation()
   const rights = useRights()
   const entity = useEntity()
   const portal = usePortal()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const applicationsData = useQuery(api.getDoubleCountingAgreements, {
 
@@ -28,18 +31,28 @@ const DoubleCountingSettings = () => {
   })
 
   const applications = applicationsData.result?.data.data ?? []
-  console.log('applications:', applications)
   const isEmpty = applications.length === 0
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
 
-  function showApplicationDialog(dc: DoubleCountingApplicationOverview) {
-    portal((resolve) => (
-      <DoubleCountingApplicationDialog
-        entity={entity}
-        applicationID={dc.id}
-        onClose={resolve}
-      />
-    ))
+  function showApplicationDialog(application: DoubleCountingApplicationOverview) {
+    if (application.status === DoubleCountingStatus.Pending) {
+      navigate({
+        pathname: location.pathname,
+        hash: `double-counting/applications/${application.id}`,
+      })
+    } else {
+      navigate({
+        pathname: location.pathname,
+        hash: `double-counting/agreements/${application.agreement_id}`,
+      })
+    }
+    // portal((resolve) => (
+    //   <DoubleCountingApplicationDialog
+    //     entity={entity}
+    //     applicationID={dc.id}
+    //     onClose={resolve}
+    //   />
+    // ))
   }
 
   function showUploadDialog() {
