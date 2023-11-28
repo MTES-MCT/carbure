@@ -1,20 +1,19 @@
 import useEntity, { useRights } from "carbure/hooks/entity"
 import { UserRole } from "carbure/types"
 import { Alert } from "common/components/alert"
+import Button from "common/components/button"
 import { AlertCircle, Plus } from "common/components/icons"
 import { usePortal } from "common/components/portal"
 import { LoaderOverlay, Panel } from "common/components/scaffold"
 import Table, { Cell } from "common/components/table"
 import { useQuery } from "common/hooks/async"
-import { formatDate, formatDateYear } from "common/utils/formatters"
+import { formatDateYear } from "common/utils/formatters"
 import ApplicationStatus from "double-counting-admin/components/applications/application-status"
 import { DoubleCountingApplicationOverview, DoubleCountingStatus } from "double-counting-admin/types"
 import { Trans, useTranslation } from "react-i18next"
-import * as api from "../../double-count/api"
-import DoubleCountingApplicationDialog from "./double-counting-dialog"
-import DoubleCountingUploadDialog from "../../double-count/components/upload-dialog"
-import Button from "common/components/button"
 import { useLocation, useNavigate } from "react-router-dom"
+import * as api from "../../double-count/api"
+import DoubleCountingUploadDialog from "../../double-count/components/upload-dialog"
 
 const DoubleCountingSettings = () => {
   const { t } = useTranslation()
@@ -46,13 +45,6 @@ const DoubleCountingSettings = () => {
         hash: `double-counting/agreements/${application.agreement_id}`,
       })
     }
-    // portal((resolve) => (
-    //   <DoubleCountingApplicationDialog
-    //     entity={entity}
-    //     applicationID={dc.id}
-    //     onClose={resolve}
-    //   />
-    // ))
   }
 
   function showUploadDialog() {
@@ -128,7 +120,7 @@ const DoubleCountingSettings = () => {
             },
             {
               header: t("Quotas"),
-              cell: (dc) => <Cell text={dc.quotas_progression ? Math.round(dc.quotas_progression * 100) + "%" : "-"} />,
+              cell: (dc) => <Cell text={dc.quotas_progression != null ? Math.round(dc.quotas_progression * 100) + "%" : "-"} />,
             }
             // {
             //   header: t("Date de soumission"),
