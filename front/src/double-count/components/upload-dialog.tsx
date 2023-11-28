@@ -4,16 +4,14 @@ import Button, { ExternalLink } from "common/components/button"
 import Dialog from "common/components/dialog"
 import { Form, useForm } from "common/components/form"
 import { Check, Return, Upload } from "common/components/icons"
-import { FileInput, FileListInput } from "common/components/input"
+import { FileInput } from "common/components/input"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
+import { checkDoubleCountingApplication } from "double-count/api"
 import ErrorsDetailsDialog from "double-counting-admin/components/files-checker/errors-details-dialog"
 import ValidDetailsDialog from "double-counting-admin/components/files-checker/valid-details-dialog"
-import { CheckDoubleCountingFilesResponse, DoubleCountingFileInfo } from "double-counting-admin/types"
 import { Trans, useTranslation } from "react-i18next"
-import { useNavigate } from "react-router-dom"
-import { checkDoubleCountingApplication } from "double-count/api"
 
 type DoubleCountingFileCheckerDialogProps = {
   onClose: () => void
@@ -24,7 +22,6 @@ const DoubleCountingFilesCheckerDialog = ({
 }: DoubleCountingFileCheckerDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
-  const navigate = useNavigate()
   const entity = useEntity()
   const portal = usePortal()
 

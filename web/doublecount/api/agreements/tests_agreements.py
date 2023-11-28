@@ -1,4 +1,4 @@
-# test with : python web/manage.py test doublecount.api.agreement.tests_agreement.DoubleCountAgreementTest.test_get_agreements --keepdb
+# test with : python web/manage.py test doublecount.api.agreements.tests_agreements.DoubleCountAgreementsTest.test_get_agreements --keepdb
 from datetime import date
 from math import prod
 import os
@@ -20,7 +20,7 @@ from producers.models import ProductionSite
 User = get_user_model()
 
 
-class DoubleCountAgreementTest(TestCase):
+class DoubleCountAgreementsTest(TestCase):
     fixtures = [
         "json/biofuels.json",
         "json/feedstock.json",
