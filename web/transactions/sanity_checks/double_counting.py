@@ -1,5 +1,8 @@
+from ast import List
+from typing import Generator
 from core.carburetypes import CarbureCertificatesErrors, CarbureSanityCheckErrors
-from core.models import CarbureLot
+from core.models import Biocarburant, CarbureLot, MatierePremiere
+from transactions.sanity_checks.biofuel_feedstock import get_biofuel_feedstock_incompatibilities
 from .helpers import generic_error
 
 
@@ -92,3 +95,18 @@ def get_dc(lot: CarbureLot, prefetched_data):
             return is_dc, dc_cert
 
     return is_dc, None
+
+
+def get_dc_biofuel_feedstock_incompatibilities(
+    biofuel: Biocarburant,
+    feedstock: MatierePremiere,
+):
+    # Dans le cas du double comptage UNIQUEMENT, on ne differencie pas les HVO, les HO et les HC
+    if (
+        biofuel.is_graisse
+        and feedstock.compatible_graisse
+        and not biofuel.code in ["EMHA", "EMHU", "EMHV", "EEHA", "EEHU", "EEHV"]
+    ):
+        return None
+
+    yield from get_biofuel_feedstock_incompatibilities(biofuel=biofuel, feedstock=feedstock)

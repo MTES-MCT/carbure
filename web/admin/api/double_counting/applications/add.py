@@ -91,6 +91,7 @@ def add_application(request, *args, **kwargs):
         & Q(period_start__year=start.year)
         & Q(status__in=[DoubleCountingApplication.PENDING, DoubleCountingApplication.REJECTED]),
     )
+    print("identical_replacable_application: ", identical_replacable_application)
 
     if identical_replacable_application.exists():
         if should_replace:

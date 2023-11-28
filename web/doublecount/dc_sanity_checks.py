@@ -4,6 +4,7 @@ from doublecount.models import DoubleCountingApplication, DoubleCountingProducti
 from core.models import Biocarburant, MatierePremiere
 from doublecount.parser.types import ProductionBaseRow, ProductionRow, SourcingRow
 from transactions.sanity_checks.biofuel_feedstock import get_biofuel_feedstock_incompatibilities
+from transactions.sanity_checks.double_counting import get_dc_biofuel_feedstock_incompatibilities
 
 
 # check a line in the sourcing section of an imported dc excel file
@@ -74,7 +75,7 @@ def check_production_row_integrity(
     if feedstock and biofuel:
         incompatibilities: List[str] = []
 
-        for e in get_biofuel_feedstock_incompatibilities(biofuel, feedstock):
+        for e in get_dc_biofuel_feedstock_incompatibilities(biofuel, feedstock):
             incompatibilities.append(e)
 
         meta = {
@@ -166,107 +167,5 @@ def check_pome_excess(production: list[DoubleCountingProduction]) -> List[DcErro
         if requested_quota > 2000:
             meta = {"year": year, "requested_production": requested_quota}
             errors.append(error(DoubleCountingError.POME_GT_2000, meta=meta))
-
-    return errors
-
-
-# check if the biofuel can be made with the specified feedstock
-# TODO refactoriser en partant soit des feedstocks soit des biofuels
-def check_compatibility_feedstock_biofuel(
-    biofuel: Biocarburant,
-    feedstock: MatierePremiere,
-) -> List[str]:
-    errors: List[str] = []
-
-    if biofuel.is_alcool and feedstock.compatible_alcool is False:
-        yield "%s issu de fermentation et %s n'est pas fermentescible" % (biofuel.name, feedstock.name)
-
-    if biofuel.is_graisse and feedstock.compatible_graisse is False:
-        yield "Matière première (%s) incompatible avec Esthers Méthyliques" % (feedstock.name)
-
-    if biofuel.is_graisse:
-        if (biofuel.code == "EMHU" or biofuel.code == "EEHU") and feedstock.code != "HUILE_ALIMENTAIRE_USAGEE":
-            yield "%s doit être à base d'huiles alimentaires usagées" % (biofuel.name)
-
-        if (biofuel.code == "EMHV" or biofuel.code == "EEHV") and feedstock.code not in [
-            "COLZA",
-            "TOURNESOL",
-            "SOJA",
-            "HUILE_PALME",
-        ]:
-            yield "%s doit être à base de végétaux (Colza, Tournesol, Soja, Huile de Palme)" % (biofuel.name)
-
-        if (biofuel.code == "EMHA" or biofuel.code == "EEHA") and feedstock.code not in [
-            "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2",
-            "HUILES_OU_GRAISSES_ANIMALES_CAT3",
-        ]:
-            yield "%s doit être à base d'huiles ou graisses animales" % (biofuel.name)
-
-    if feedstock.code == "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2" and biofuel.code not in [
-        "EMHA",
-        "EEHA",
-        "HOE",
-        "HOG",
-        "HOC",
-        "HCC",
-        "HCG",
-        "HCE",
-        "B100",
-        "HVOE",
-        "HVOG",
-        "HVOC",
-    ]:
-        yield "Des huiles ou graisses animales (cat 1 et 2) ne peuvent donner que des EMHA/EEHA, des HOG/HOE/HOC ou des HVOE/HVOG/HVOC."
-
-    if feedstock.code == "HUILES_OU_GRAISSES_ANIMALES_CAT3" and biofuel.code not in [
-        "EMHA",
-        "EEHA",
-        "HOE",
-        "HOG",
-        "HOC",
-        "HCC",
-        "HCG",
-        "HCE",
-        "B100",
-        "HVOE",
-        "HVOG",
-        "HVOC",
-    ]:
-        yield "Des huiles ou graisses animales (cat 3) ne peuvent donner que des EMHA/EEHA ou des HOG/HOE/HOC."
-
-    if feedstock.code == "HUILE_ALIMENTAIRE_USAGEE" and biofuel.code not in [
-        "EMHU",
-        "EEHU",
-        "HOE",
-        "HOG",
-        "HOC",
-        "HCC",
-        "HCG",
-        "HCE",
-        "HVOE",
-        "HVOG",
-        "HVOC",
-    ]:
-        yield "Des huiles alimentaires usagées ne peuvent donner que des EMHU/EEHU, des HOG/HOE/HOC ou des HVOE/HVOG/HVOC."
-
-    if feedstock.code in [
-        "MAIS",
-        "BLE",
-        "BETTERAVE",
-        "CANNE_A_SUCRE",
-        "RESIDUS_VINIQUES",
-        "LIES_DE_VIN",
-        "MARC_DE_RAISIN",
-    ] and biofuel.code not in ["ETH", "ETBE", "ED95"]:
-        yield "Maïs, Blé, Betterave, Canne à Sucre ou Résidus Viniques ne peuvent créer que de l'Éthanol ou ETBE"
-
-    if not feedstock.is_huile_vegetale and biofuel.code in ["HCC", "HCG", "HCE"]:
-        yield "Une huile co-traitée (HC) doit provenir d'huiles végétales uniquement. Pour les autres huiles hydrotraitées, voir la nomenclature."
-
-    # if not feedstock.is_huile_vegetale and biofuel.code in ["HVOE", "HVOG", "HVOC", "HCC", "HCG", "HCE"]:
-    #     errors.append(
-    #         "Un HVO doit provenir d'huiles végétales uniquement. Pour les autres huiles hydrotraitées, voir la nomenclature"
-    #         " HOE/HOG/HOC"
-    #     )
 
     return errors
