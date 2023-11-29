@@ -54,7 +54,7 @@ export function addDoubleCountingApplication(
   production_site_id: number,
   producer_id: number,
   file: File,
-  agreement_id?: string,
+  certificate_id?: string,
   should_replace: boolean = false
 ) {
 
@@ -62,7 +62,7 @@ export function addDoubleCountingApplication(
     entity_id,
     production_site_id,
     producer_id,
-    agreement_id,
+    certificate_id,
     file,
     should_replace
   })
@@ -109,7 +109,6 @@ export function downloadDoubleCountingAgreementList(entity_id: number) {
 
 export function getDoubleCountingAgreementList(entity_id: number, order_by?: string,
   direction?: string) {
-
   return api.get<Api<DoubleCountingAgreementsOverview>>(
     "/v5/admin/double-counting/agreements"
     , { params: { entity_id, order_by, direction } })

@@ -54,7 +54,7 @@ def add_application(request, *args, **kwargs):
     producer_id = request.POST.get("producer_id", None)
     should_replace = request.POST.get("should_replace") == "true"
     production_site_id = request.POST.get("production_site_id", None)
-    agreement_id_to_link = request.POST.get("agreement_id", None)
+    certificate_id_to_link = request.POST.get("certificate_id", None)
     file = request.FILES.get("file")
 
     if not production_site_id:
@@ -99,9 +99,9 @@ def add_application(request, *args, **kwargs):
             return ErrorResponse(400, DoubleCountingAddError.APPLICATION_ALREADY_EXISTS)
 
     # check if the agreement to link already exists
-    if agreement_id_to_link:
+    if certificate_id_to_link:
         try:
-            agreement = DoubleCountingRegistration.objects.get(certificate_id=agreement_id_to_link)
+            agreement = DoubleCountingRegistration.objects.get(certificate_id=certificate_id_to_link)
         except:
             return ErrorResponse(400, DoubleCountingAddError.AGREEMENT_NOT_FOUND)
     else:
@@ -126,8 +126,8 @@ def add_application(request, *args, **kwargs):
     if not created:
         return ErrorResponse(400, DoubleCountingAddError.APPLICATION_ALREADY_RECEIVED)
 
-    if agreement_id_to_link:
-        dca.agreement_id = agreement_id_to_link
+    if certificate_id_to_link:
+        dca.certificate_id = certificate_id_to_link
         dca.save()
         agreement.application = dca
         agreement.save()
@@ -171,7 +171,7 @@ def upload_file(dca, file):
     file_url = media_storage.url(file_path_within_bucket)
     dcf = DoubleCountingDocFile()
     dcf.dca = dca
-    dcf.agreement_id = dca.agreement_id
+    dcf.certificate_id = dca.certificate_id
     dcf.url = file_url
     dcf.file_name = filename
     dcf.file_type = DoubleCountingDocFile.SOURCING

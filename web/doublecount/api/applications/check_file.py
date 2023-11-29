@@ -45,6 +45,7 @@ def check_file(request, *args, **kwargs):
 
         return SuccessResponse({"file": file_info, "checked_at": datetime.datetime.now().isoformat()})
     except Exception:
+        print("TEST")
         traceback.print_exc()
         return ErrorResponse(400, CheckFileError.FILE_CHECK_FAILED)
 
