@@ -1,10 +1,9 @@
-from django.http import JsonResponse
 import pandas as pd
 from certificates.models import DoubleCountingRegistration
 from certificates.serializers import DoubleCountingRegistrationDetailsSerializer
 from core.common import ErrorResponse, SuccessResponse
-from core.decorators import check_admin_rights
-from core.models import Biocarburant, CarbureLot, MatierePremiere
+from core.decorators import check_user_rights
+from core.models import Biocarburant, CarbureLot, MatierePremiere, UserRights
 from django.db.models.aggregates import Count, Sum
 from doublecount.helpers import get_agreement_quotas
 
@@ -17,7 +16,7 @@ class DoubleCountingAgreementError:
     APPLICATION_NOT_FOUND = "APPLICATION_NOT_FOUND"
 
 
-@check_admin_rights()
+@check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
 def get_agreement_details(request, *args, **kwargs):
     agreement_id = request.GET.get("agreement_id", None)
 

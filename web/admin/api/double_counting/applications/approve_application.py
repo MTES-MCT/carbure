@@ -49,13 +49,13 @@ def approve_dca(request, *args, **kwargs):
         + application.production_site.country.name
     )
 
-    if not DoubleCountingRegistration.objects.filter(certificate_id=application.agreement_id).exists():
+    if not DoubleCountingRegistration.objects.filter(certificate_id=application.certificate_id).exists():
         try:
             DoubleCountingRegistration.objects.update_or_create(
-                certificate_id=application.agreement_id,
-                certificate_holder=application.producer.name, #TO DELETE replaced by production_site.producer.name
+                certificate_id=application.certificate_id,
+                certificate_holder=application.producer.name,  # TO DELETE replaced by production_site.producer.name
                 production_site=application.production_site,
-                registered_address=production_site_address, #TO DELETE replaced by production_site.address
+                registered_address=production_site_address,  # TO DELETE replaced by production_site.address
                 valid_from=application.period_start,
                 valid_until=application.period_end,
                 application=application,

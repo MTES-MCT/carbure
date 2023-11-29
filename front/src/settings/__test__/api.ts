@@ -252,54 +252,14 @@ export const okSelfCertificates = rest.get(
 )
 
 export const okApplications = rest.get(
-  "http://localhost/api/v3/doublecount/applications",
+  "/api/v5/double-counting/agreements",
   (req, res, ctx) => {
     return res(ctx.json({ status: "success", data: [] }))
   }
 )
 
-export const okDoubleCountUploadApplication = rest.post(
-  "/api/v3/doublecount/upload",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: { dca_id: 142332 },
-      })
-    )
-  }
-)
-
-export const okDoubleCountUploadDocumentation = rest.post(
-  "/api/v3/doublecount/upload-documentation",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: { dca_id: 142332 },
-      })
-    )
-  }
-)
-
-export const koDoubleCountUploadApplication = rest.post(
-  "/api/v3/doublecount/upload",
-  (req, res, ctx) => {
-    return res(
-      ctx.status(400),
-      ctx.json({
-        status: "error",
-        error: "DOUBLE_COUNTING_IMPORT_FAILED",
-        data: dcApplicationErrors,
-      })
-    )
-  }
-)
 
 export default setupServer(
-  koDoubleCountUploadApplication,
-  okDoubleCountUploadDocumentation,
-  okDoubleCountUploadApplication,
   okSettings,
   okEnableMac,
   okDisableMac,

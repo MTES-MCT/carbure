@@ -35,7 +35,7 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
       header: t("Statut"),
       cell: (a) => <ApplicationStatus status={a.status} />,
     },
-    { header: t("N° d'agrément"), cell: (a) => <Cell text={a.agreement_id} /> },
+    { header: t("N° d'agrément"), cell: (a) => <Cell text={a.certificate_id} /> },
     { header: t("Producteur"), cell: (a) => <Cell text={a.producer.name} /> },
     {
       header: t("Site de production"),

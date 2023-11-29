@@ -4,8 +4,9 @@ import {
   DoubleCountingApplicationDetails,
   DoubleCountingFileInfo,
   DoubleCountingUploadErrors,
-  QuotaDetails
-} from "double-counting/types"
+  QuotaDetails,
+  AgreementDetails
+} from "double-counting-admin/types"
 
 export function getDoubleCountingAgreements(entity_id: number) {
   return api.get<Api<DoubleCountingApplicationOverview[]>>("/v5/double-counting/agreements", {
@@ -18,19 +19,42 @@ export function getDoubleCountingAgreements(entity_id: number) {
 //   })
 // }
 
+// export function getDoubleCountingApplicationDetails(entity_id: number, dca_id: number) {
+//   return api.get<Api<DoubleCountingApplicationDetails>>("/v3/doublecount/application", {
+//     params: { entity_id, dca_id },
+//   })
+// }
+
 export function getDoubleCountingApplicationDetails(entity_id: number, dca_id: number) {
-  return api.get<Api<DoubleCountingApplicationDetails>>("/v3/doublecount/application", {
-    params: { entity_id, dca_id },
-  })
+  return api.get<Api<DoubleCountingApplicationDetails>>(
+    "/v5/double-counting/applications/details",
+    {
+      params: { entity_id, dca_id },
+    }
+  )
 }
+
 
 export function checkDoubleCountingApplication(entity_id: number, file: File) {
   const res = api.post<Api<{ file: DoubleCountingFileInfo }>>(
-    "/v5/double-counting/application/check-file",
+    "/v5/double-counting/applications/check-file",
     { entity_id, file }
   )
   return res
 }
+
+export function getDoubleCountingAgreementDetails(entity_id: number, agreement_id: number) {
+  return api.get<Api<AgreementDetails>>(
+    "/v5/double-counting/agreements/details",
+    {
+      params: { entity_id, agreement_id },
+    }
+  )
+}
+
+
+
+
 
 export function uploadDoubleCountingFile(
   entity_id: number,
