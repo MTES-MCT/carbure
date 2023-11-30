@@ -187,6 +187,7 @@ const DRAFT_FILTERS = [
   Filter.Clients,
   Filter.ProductionSites,
   Filter.DeliverySites,
+  Filter.Scores,
 ]
 
 const IN_FILTERS = [
@@ -199,6 +200,7 @@ const IN_FILTERS = [
   Filter.Suppliers,
   Filter.ProductionSites,
   Filter.DeliverySites,
+  Filter.Scores,
 ]
 
 const OUT_FILTERS = [
@@ -211,6 +213,7 @@ const OUT_FILTERS = [
   Filter.ClientTypes,
   Filter.ProductionSites,
   Filter.DeliverySites,
+  Filter.Scores,
 ]
 
 const filtersByStatus: Record<Status, Filter[]> = {
