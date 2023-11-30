@@ -15,9 +15,9 @@ import CompanyInfo from "./components/company-info"
 import CompanyOptions from "./components/company-options"
 import DoubleCountingSettings from "./components/double-counting"
 import EntityUserRights from "./components/user-rights"
-import { ApplicationDetailsDialog } from "double-count/components/application-details-dialog"
+import { ApplicationDetailsDialog } from "double-counting/components/application-details-dialog"
 import HashRoute from "common/components/hash-route"
-import { AgreementDetailsDialog } from "double-count/components/agreement-details-dialog"
+import { AgreementDetailsDialog } from "double-counting/components/agreement-details-dialog"
 
 const Settings = () => {
   const { t } = useTranslation()

@@ -7,7 +7,7 @@ import {
   DoubleCountingApplicationsOverview,
   DoubleCountingSnapshot,
   QuotaDetails
-} from "./types"
+} from "../double-counting/types"
 
 // GLOBAL
 
@@ -24,14 +24,9 @@ export function getSnapshot(entity_id: number) {
     params: { entity_id },
   })
 }
-// export function getDoubleCountingSnapshot() {
-//   return api.get<Api<ApplicationSnapshot>>(
-//     "/v3/doublecount/admin/applications-snapshot"
-//   )
-// }
+
 
 // APPLICATIONS
-
 
 export function getDoubleCountingApplicationList(entity_id: number) {
   return api.get<Api<DoubleCountingApplicationsOverview>>("/v5/admin/double-counting/applications", {

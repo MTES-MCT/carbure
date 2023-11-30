@@ -10,7 +10,7 @@ import * as api from "./api"
 import AgreementList from "./components/agreements/agreement-list"
 import ApplicationList from "./components/applications/application-list"
 import DoubleCountingFilesChecker from "./components/files-checker"
-import { DoubleCountingAgreementsSnapshot, DoubleCountingApplicationSnapshot } from "./types"
+import { DoubleCountingAgreementsSnapshot, DoubleCountingApplicationSnapshot } from "../double-counting/types"
 
 
 const DoubleCounting = () => {

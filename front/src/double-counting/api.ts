@@ -6,7 +6,7 @@ import {
   DoubleCountingUploadErrors,
   QuotaDetails,
   AgreementDetails
-} from "double-counting-admin/types"
+} from "double-counting/types"
 
 export function getDoubleCountingAgreements(entity_id: number) {
   return api.get<Api<DoubleCountingApplicationOverview[]>>("/v5/double-counting/agreements", {
