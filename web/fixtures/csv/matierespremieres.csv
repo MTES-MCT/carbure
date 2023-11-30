@@ -1,6 +1,6 @@
 code,nom,fermentescible,graisse,is_double_compte,makes_huile_vegetale,is_displayed,category
 ALCOOL_PUR_MARC_RAISIN,Alcool pur de marc de raisin,1,0,1,0,1,ANN-IX-A
-ALCOOL_PUR_LIES_VIN,Alcool pur de marc de lies de vin,1,0,1,0,1,ANN-IX-A
+ALCOOL_PUR_LIES_VIN,Alcool pur de lies de vin,1,0,1,0,1,ANN-IX-A
 ALGUES,Algues,1,1,1,0,1,ANN-IX-A
 AMIDON_RESIDUEL,Amidon résiduel,1,0,0,0,1,OTHER
 BAGASSE,Bagasse,1,0,1,0,1,ANN-IX-A
