@@ -56,18 +56,16 @@ class ElecChargePointAdmin(admin.ModelAdmin):
     list_display = [
         "id",
         "cpo",
-        # cpo excel data
         "charge_point_id",
         "current_type",
         "installation_date",
-        "lne_certificate",
-        "meter_reading_date",
-        "meter_reading_energy",
-        "is_using_reference_meter",
+        "lne_id",
+        "measure_date",
+        "measure_energy",
+        "is_article_2",
         "is_auto_consumption",
-        "has_article_4_regularization",
-        "reference_meter_id",
-        # transport.data.gouv.fr data
+        "is_article_4",
+        "measure_reference_point_id",
         "station_name",
         "station_id",
     ]
@@ -75,9 +73,9 @@ class ElecChargePointAdmin(admin.ModelAdmin):
         "application",
         "current_type",
         "cpo",
-        "is_using_reference_meter",
+        "is_article_2",
         "is_auto_consumption",
-        "has_article_4_regularization",
+        "is_article_4",
         "station_name",
         "station_id",
     ]
