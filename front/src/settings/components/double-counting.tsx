@@ -88,7 +88,7 @@ const DoubleCountingSettings = () => {
           columns={[
             {
               header: t("Statut"),
-              cell: (dc) => <ApplicationStatus status={dc.status} />,
+              cell: (dc) => <ApplicationStatus status={dc.status} expirationDate={dc.period_end} />,
             },
             {
               header: t("Site de production"),

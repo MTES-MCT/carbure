@@ -58,15 +58,14 @@ class DoubleCountingRegistration(models.Model):
             # "status": self.get_status,
         }
 
-    ENDING_MONTH_DELAY = 6
-
     @property
     def status(self):
+        ENDING_MONTH_DELAY = 6
         current_date = datetime.datetime.now().date()
         if current_date > self.valid_until:
             return DoubleCountingRegistration.EXPIRED
         else:
-            expires_soon_date = self.valid_until - relativedelta(months=6)
+            expires_soon_date = self.valid_until - relativedelta(months=ENDING_MONTH_DELAY)
             production_site_current_agreement = self.production_site.dc_reference if self.production_site else None
             if current_date > expires_soon_date and production_site_current_agreement != self.certificate_id:
                 return DoubleCountingRegistration.EXPIRES_SOON
