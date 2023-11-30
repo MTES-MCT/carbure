@@ -88,6 +88,7 @@ export interface ElecChargingPointsApplicationCheckInfo {
 }
 
 export interface ChargingPointsApplicationError {
+  line: number
   error: string
   meta?: null | any
 }
