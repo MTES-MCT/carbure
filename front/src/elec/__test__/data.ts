@@ -88,10 +88,12 @@ export const elecChargingPointsApplications: ElecChargingPointsApplication[] = [
 
 
 export const chargingPointsApplicationError1: ChargingPointsApplicationError = {
+    line: 12,
     error: "MISSING_CHARGING_POINT_IN_DATAGOUV",
-    meta: ["8U7Y", "8U7Y"]
+    meta: "8U7Y"
 }
 export const chargingPointsApplicationError2: ChargingPointsApplicationError = {
+    line: 87,
     error: "UNKNOW_ERROR"
 }
 export const elecChargingPointsApplicationCheckResponseFailed: ElecChargingPointsApplicationCheckInfo = {
