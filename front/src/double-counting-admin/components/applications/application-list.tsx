@@ -33,7 +33,7 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
   const columns: Column<DoubleCountingApplicationOverview>[] = [
     {
       header: t("Statut"),
-      cell: (a) => <ApplicationStatus status={a.status} />,
+      cell: (a) => <ApplicationStatus status={a.status} expirationDate={a.period_end} />,
     },
     { header: t("N° d'agrément"), cell: (a) => <Cell text={a.certificate_id} /> },
     { header: t("Producteur"), cell: (a) => <Cell text={a.producer.name} /> },
