@@ -2,7 +2,7 @@ import useEntity from "carbure/hooks/entity"
 import { DownloadLink } from "common/components/button"
 import { Col } from "common/components/scaffold"
 import { useTranslation } from "react-i18next"
-import { DoubleCountingApplicationDetails } from "../../types"
+import { DoubleCountingApplicationDetails } from "../../../double-counting/types"
 
 
 export const ApplicationDownloadButton = ({ application }: { application: DoubleCountingApplicationDetails }) => {

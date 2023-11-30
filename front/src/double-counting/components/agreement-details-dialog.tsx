@@ -15,10 +15,10 @@ import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../api"
 import AgreementStatusTag from "../../double-counting-admin/components/agreements/agreement-status"
-import { ProductionTable } from "../../double-counting-admin/components/production-table"
-import { QuotasTable } from "../../double-counting-admin/components/quotas-table"
-import { SourcingFullTable } from "../../double-counting-admin/components/sourcing-table"
-import { AgreementDetails, DoubleCountingStatus } from "../../double-counting-admin/types"
+import { ProductionTable } from "./production-table"
+import { QuotasTable } from "./quotas-table"
+import { SourcingFullTable } from "./sourcing-table"
+import { AgreementDetails, DoubleCountingStatus } from "../types"
 
 
 export const AgreementDetailsDialog = () => {

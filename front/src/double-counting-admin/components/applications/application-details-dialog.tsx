@@ -17,10 +17,10 @@ import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../../api"
-import { DoubleCountingStatus as DCStatus } from "../../types"
+import { DoubleCountingStatus as DCStatus } from "../../../double-counting/types"
 import { ApplicationDownloadButton } from "./application-download-button"
 import { ApplicationInfo } from "./application-info"
-import ApplicationStatus from "./application-status"
+import ApplicationStatus from "../../../double-counting/components/application-status"
 import ApplicationTabs from "./application-tabs"
 
 

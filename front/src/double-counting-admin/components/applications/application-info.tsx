@@ -1,6 +1,6 @@
 import { formatDate } from "common/utils/formatters"
 import { Trans } from "react-i18next"
-import { DoubleCountingApplicationDetails } from "../../types"
+import { DoubleCountingApplicationDetails } from "../../../double-counting/types"
 
 
 export const ApplicationInfo = ({ application }: { application?: DoubleCountingApplicationDetails }) => {

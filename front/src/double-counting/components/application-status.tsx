@@ -1,7 +1,6 @@
-import { useTranslation } from "react-i18next"
-import { DoubleCountingStatus as DCStatus } from "../../types"
 import Tag, { TagVariant } from "common/components/tag"
-import { el } from "date-fns/locale"
+import { useTranslation } from "react-i18next"
+import { DoubleCountingStatus as DCStatus } from "double-counting/types"
 
 const statusToVariant: Record<DCStatus, TagVariant> = {
   [DCStatus.Accepted]: "success",
