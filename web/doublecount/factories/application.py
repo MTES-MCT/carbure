@@ -20,7 +20,7 @@ class DoubleCountingApplicationFactory(factory.django.DjangoModelFactory):
     period_start = date(datetime.today().year, 1, 1)
     period_end = date(period_start.year + 1, 12, 31)
 
-    agreement_id = factory.Faker("lexify", text="????????????")
+    certificate_id = factory.Faker("lexify", text="????????????")
 
     status = random.choice(
         (DoubleCountingApplication.PENDING, DoubleCountingApplication.ACCEPTED, DoubleCountingApplication.REJECTED)
