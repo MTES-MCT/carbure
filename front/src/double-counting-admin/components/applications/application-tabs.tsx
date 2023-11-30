@@ -1,7 +1,7 @@
 import { ProductionSiteDetails } from "carbure/types"
 import Tabs from "common/components/tabs"
 import { compact } from "common/utils/collection"
-import { DoubleCountingProduction, DoubleCountingSourcing } from "double-counting/types"
+import { DoubleCountingProduction, DoubleCountingSourcing } from "double-counting-admin/types"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { ProductionSiteForm } from "settings/components/production-site-dialog"
