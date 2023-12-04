@@ -1,5 +1,6 @@
 import os
 import traceback
+from typing import Iterable
 import requests
 import pandas as pd
 from dateutil.parser import isoparse
@@ -9,8 +10,8 @@ from core.excel import ExcelParser
 
 def import_charge_point_excel(excel_file: UploadedFile):
     try:
-        transport_data = TransportDataGouv.get_charge_point_data()
         excel_data = ExcelChargePoints.parse_charge_point_excel(excel_file)
+        transport_data = TransportDataGouv.find_charge_point_data(excel_data, 1000)
         return ExcelChargePoints.validate_charge_points(excel_data, transport_data)
     except Exception as e:
         traceback.print_exc()
@@ -131,24 +132,24 @@ class TransportDataGouv:
     }
 
     @staticmethod
-    def get_charge_point_data():
+    def find_charge_point_data(excel_data: list[dict], chunksize: int) -> list[dict]:
         file_path = TransportDataGouv.download_csv()
 
-        charge_point_data = pd.read_csv(
-            file_path,
-            sep=",",
-            header=0,
-            usecols=TransportDataGouv.CSV_COLUMNS,
-            parse_dates=["last_modified", "date_maj"],
-            dayfirst=False,
-            encoding="utf-8",
-            engine="python",
-        )
+        wanted_ids = [charge_point["charge_point_id"] for charge_point in excel_data]
+        wanted_stations = set()  # list the stations of the wanted charge points
 
-        charge_point_data = charge_point_data.rename(columns=TransportDataGouv.CSV_COLUMNS_ALIAS)
-        charge_point_data = TransportDataGouv.process_charge_point_data(charge_point_data)
+        relevant_charge_points = pd.DataFrame(columns=TransportDataGouv.CSV_COLUMNS)
+        chunks = TransportDataGouv.read_charge_point_data(file_path, chunksize)
 
-        return charge_point_data.to_dict(orient="records")
+        for chunk in chunks:
+            wanted_chunk = chunk[chunk["id_pdc_itinerance"].isin(wanted_ids)]
+            wanted_stations.update(wanted_chunk["id_station_itinerance"].unique())
+            station_charge_points = chunk[chunk["id_station_itinerance"].isin(wanted_stations)]
+            relevant_charge_points = pd.concat([relevant_charge_points, station_charge_points], ignore_index=True)
+
+        relevant_charge_points = TransportDataGouv.process_charge_point_data(relevant_charge_points)
+
+        return relevant_charge_points.to_dict(orient="records")
 
     @staticmethod
     def download_csv():
@@ -172,23 +173,39 @@ class TransportDataGouv:
         return file_path
 
     @staticmethod
+    def read_charge_point_data(file_path: str, chunksize: int = 1000) -> Iterable[pd.DataFrame]:
+        charge_point_data_chunks = pd.read_csv(
+            file_path,
+            sep=",",
+            header=0,
+            usecols=TransportDataGouv.CSV_COLUMNS,
+            parse_dates=["last_modified", "date_maj"],
+            dayfirst=False,
+            encoding="utf-8",
+            engine="python",
+            dtype={"prise_type_combo_ccs": "str", "prise_type_chademo": "str"},
+            chunksize=chunksize,
+        )
+
+        return charge_point_data_chunks
+
+    @staticmethod
     def process_charge_point_data(charge_point_data: pd.DataFrame):
+        charge_point_data = charge_point_data.rename(columns=TransportDataGouv.CSV_COLUMNS_ALIAS)
         charge_point_data = charge_point_data.sort_values("date_maj", ascending=False)
         charge_point_data = charge_point_data.drop_duplicates("charge_point_id")
         charge_point_data = charge_point_data.fillna("")
 
-        # On ne se sert pas de ces données pour le moment.
-        #
-        # lon = [float(coord.replace("[", "").replace("]", "").split(",")[0]) for coord in charge_point_data.coordonneesXY]
-        # lat = [float(coord.replace("[", "").replace("]", "").split(",")[1]) for coord in charge_point_data.coordonneesXY]
-        #
-        # charge_point_data["lat"] = lat
-        # charge_point_data["lon"] = lon
-        # charge_point_data["ux"] = charge_point_data["charge_point_id"].str[:5]
-        #
-        # charge_point_data.loc[charge_point_data.puissance_nominale > 1000, "puissance_nominale"] = (
-        #     charge_point_data.loc[charge_point_data.puissance_nominale > 1000, "puissance_nominale"] / 1000
-        # )
+        lon = [float(coord.replace("[", "").replace("]", "").split(",")[0]) for coord in charge_point_data.coordonneesXY]
+        lat = [float(coord.replace("[", "").replace("]", "").split(",")[1]) for coord in charge_point_data.coordonneesXY]
+
+        charge_point_data["latitude"] = lat
+        charge_point_data["longitude"] = lon
+        charge_point_data["operating_unit"] = charge_point_data["charge_point_id"].str[:5]
+
+        charge_point_data.loc[charge_point_data.puissance_nominale > 1000, "puissance_nominale"] = (
+            charge_point_data.loc[charge_point_data.puissance_nominale > 1000, "puissance_nominale"] / 1000
+        )
 
         # On détermine pour chaque point de charge s'il utilise du DC
         charge_point_data["prise_type_combo_ccs"] = (charge_point_data["prise_type_combo_ccs"].str.lower() == "true") | (charge_point_data["prise_type_combo_ccs"] == "1")  # fmt:skip
