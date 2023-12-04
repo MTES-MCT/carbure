@@ -2,7 +2,7 @@ import { InfoCircle } from "common/components/icons"
 import Tooltip from "common/components/tooltip"
 import { t } from "i18next"
 import { Trans } from "react-i18next"
-import { DoubleCountingFileInfo } from "../../types"
+import { DoubleCountingFileInfo } from "../../../double-counting/types"
 
 const FileApplicationInfo = ({ fileData }: { fileData: DoubleCountingFileInfo }) => {
 

@@ -9,7 +9,7 @@ import useTitle from "common/hooks/title"
 import {
   CheckDoubleCountingFilesResponse,
   DoubleCountingFileInfo,
-} from "double-counting-admin/types"
+} from "double-counting/types"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useLocation } from "react-router-dom"

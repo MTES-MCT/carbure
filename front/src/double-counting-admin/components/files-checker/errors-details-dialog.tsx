@@ -8,10 +8,10 @@ import Tag from "common/components/tag"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { getErrorText } from "settings/utils/double-counting"
-import { DoubleCountingFileInfo, DoubleCountingUploadError } from "../../types"
+import { DoubleCountingFileInfo, DoubleCountingUploadError } from "../../../double-counting/types"
 import FileApplicationInfo from "./file-application-info"
-import { SourcingFullTable } from "../sourcing-table"
-import { ProductionTable } from "../production-table"
+import { SourcingFullTable } from "../../../double-counting/components/sourcing-table"
+import { ProductionTable } from "../../../double-counting/components/production-table"
 
 export type ErrorsDetailsDialogProps = {
   fileData: DoubleCountingFileInfo

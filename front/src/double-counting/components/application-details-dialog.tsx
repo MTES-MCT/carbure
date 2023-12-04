@@ -11,11 +11,11 @@ import { LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
-import { ApplicationInfo } from "../../double-counting-admin/components/applications/application-info"
-import ApplicationStatus from "../../double-counting-admin/components/applications/application-status"
-import ApplicationTabs from "../../double-counting-admin/components/applications/application-tabs"
-import { DoubleCountingStatus as DCStatus } from "../../double-counting-admin/types"
-import * as api from "../api"
+import { ApplicationInfo } from "double-counting-admin/components/applications/application-info"
+import ApplicationStatus from "./application-status"
+import ApplicationTabs from "double-counting-admin/components/applications/application-tabs"
+import { DoubleCountingStatus as DCStatus } from "double-counting/types"
+import * as api from "double-counting/api"
 
 
 export const ApplicationDetailsDialog = () => {

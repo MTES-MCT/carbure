@@ -10,9 +10,9 @@ import { Fragment, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../../api"
-import { DoubleCountingApplicationOverview, DoubleCountingApplicationSnapshot } from "../../types"
+import { DoubleCountingApplicationOverview, DoubleCountingApplicationSnapshot } from "../../../double-counting/types"
 import { ApplicationDetailsDialog } from "./application-details-dialog"
-import ApplicationStatus from "./application-status"
+import ApplicationStatus from "../../../double-counting/components/application-status"
 import FilesCheckerUploadButton from "../files-checker/upload-button"
 
 type ApplicationListProps = {
@@ -33,7 +33,7 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
   const columns: Column<DoubleCountingApplicationOverview>[] = [
     {
       header: t("Statut"),
-      cell: (a) => <ApplicationStatus status={a.status} />,
+      cell: (a) => <ApplicationStatus status={a.status} expirationDate={a.period_end} />,
     },
     { header: t("N° d'agrément"), cell: (a) => <Cell text={a.certificate_id} /> },
     { header: t("Producteur"), cell: (a) => <Cell text={a.producer.name} /> },
