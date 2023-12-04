@@ -133,7 +133,8 @@ const ScoreDialog = ({ lot, details, onClose }: ScoreDialogProps) => {
                   </span>
                   <span className={css.separator} />
                   <span>
-                    {detail.score} / {detail.max_score} {t("points")}
+                    {detail.score} / {detail.max_score}{" "}
+                    {t("points", { count: detail.max_score })}
                   </span>
                 </div>
                 {detail.meta && (

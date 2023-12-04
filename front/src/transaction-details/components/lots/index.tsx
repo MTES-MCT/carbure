@@ -12,7 +12,6 @@ import { LoaderOverlay } from "common/components/scaffold"
 import { useMutation, useQuery } from "common/hooks/async"
 import useScrollToRef from "common/hooks/scroll-to-ref"
 import { formatDate } from "common/utils/formatters"
-import Flags from "flags.json"
 import LotForm, { hasChange, useLotForm } from "lot-add/components/lot-form"
 import { useMatomo } from "matomo"
 import { useEffect, useMemo } from "react"
@@ -102,9 +101,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
     <Portal onClose={closeDialog}>
       <Dialog onClose={closeDialog}>
         <header>
-          {Flags.scoring && lotData && (
-            <Score big lot={lotData.lot} details={lotData.score} />
-          )}
+          {lotData && <Score big lot={lotData.lot} details={lotData.score} />}
           {lotData && <LotTag big lot={lotData.lot} />}
           <h1>
             {t("Lot")} #{lotData?.lot.carbure_id || lotData?.lot.id}
