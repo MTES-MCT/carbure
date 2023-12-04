@@ -72,9 +72,9 @@ def get_biofuel_feedstock_incompatibilities(biofuel: Biocarburant, feedstock: Ma
         yield "Des huiles ou graisses animales ne peuvent donner que des EMHA, B100 ou HOG/HOE/HOC"
 
     sugar_feedstocks = ("MAIS", "BLE", "BETTERAVE", "CANNE_A_SUCRE", "RESIDUS_VINIQUES", "LIES_DE_VIN", "MARC_DE_RAISIN")
-    sugar_biofuels = ("ETH", "ETBE", "ED95")
+    sugar_biofuels = ("ETH", "ETBE", "ED95", "MTBE")
     if feedstock.code in sugar_feedstocks and biofuel.code not in sugar_biofuels:
-        yield "Maïs, Blé, Betterave, Canne à Sucre ou Résidus Viniques ne peuvent créer que de l'Éthanol ou ETBE"
+        yield "Maïs, Blé, Betterave, Canne à Sucre ou Résidus Viniques ne peuvent créer que de l'Éthanol, ETBE ou MTBE."
 
     hvo_biofuels = ("HVOE", "HVOG", "HVOC")
     if biofuel.code in hvo_biofuels and not feedstock.is_huile_vegetale:
