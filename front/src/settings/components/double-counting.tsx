@@ -1,25 +1,27 @@
 import useEntity, { useRights } from "carbure/hooks/entity"
 import { UserRole } from "carbure/types"
 import { Alert } from "common/components/alert"
+import Button from "common/components/button"
 import { AlertCircle, Plus } from "common/components/icons"
 import { usePortal } from "common/components/portal"
 import { LoaderOverlay, Panel } from "common/components/scaffold"
 import Table, { Cell } from "common/components/table"
 import { useQuery } from "common/hooks/async"
-import { formatDate, formatDateYear } from "common/utils/formatters"
-import ApplicationStatus from "double-counting/components/applications/application-status"
+import { formatDateYear } from "common/utils/formatters"
+import ApplicationStatus from "double-counting/components/application-status"
 import { DoubleCountingApplicationOverview, DoubleCountingStatus } from "double-counting/types"
 import { Trans, useTranslation } from "react-i18next"
-import * as api from "../api/double-counting"
-import DoubleCountingApplicationDialog from "./double-counting-dialog"
-import DoubleCountingUploadDialog from "./double-counting-upload"
-import Button from "common/components/button"
+import { useLocation, useNavigate } from "react-router-dom"
+import * as api from "double-counting/api"
+import DoubleCountingUploadDialog from "double-counting/components/upload-dialog"
 
 const DoubleCountingSettings = () => {
   const { t } = useTranslation()
   const rights = useRights()
   const entity = useEntity()
   const portal = usePortal()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const applicationsData = useQuery(api.getDoubleCountingAgreements, {
 
@@ -31,14 +33,18 @@ const DoubleCountingSettings = () => {
   const isEmpty = applications.length === 0
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
 
-  function showApplicationDialog(dc: DoubleCountingApplicationOverview) {
-    portal((resolve) => (
-      <DoubleCountingApplicationDialog
-        entity={entity}
-        applicationID={dc.id}
-        onClose={resolve}
-      />
-    ))
+  function showApplicationDialog(application: DoubleCountingApplicationOverview) {
+    if (application.status === DoubleCountingStatus.Pending) {
+      navigate({
+        pathname: location.pathname,
+        hash: `double-counting/applications/${application.id}`,
+      })
+    } else {
+      navigate({
+        pathname: location.pathname,
+        hash: `double-counting/agreements/${application.agreement_id}`,
+      })
+    }
   }
 
   function showUploadDialog() {
@@ -82,7 +88,7 @@ const DoubleCountingSettings = () => {
           columns={[
             {
               header: t("Statut"),
-              cell: (dc) => <ApplicationStatus status={dc.status} />,
+              cell: (dc) => <ApplicationStatus status={dc.status} expirationDate={dc.period_end} />,
             },
             {
               header: t("Site de production"),
@@ -106,7 +112,7 @@ const DoubleCountingSettings = () => {
                   {dc.status === DoubleCountingStatus.Pending && t("En cours de traitement...")}
 
                   {dc.status === DoubleCountingStatus.Accepted && (
-                    <>{dc.agreement_id}</>
+                    <>{dc.certificate_id}</>
                   )}
 
                 </span>
@@ -114,7 +120,7 @@ const DoubleCountingSettings = () => {
             },
             {
               header: t("Quotas"),
-              cell: (dc) => <Cell text={dc.quotas_progression ? Math.round(dc.quotas_progression * 100) + "%" : "-"} />,
+              cell: (dc) => <Cell text={dc.quotas_progression != null ? Math.round(dc.quotas_progression * 100) + "%" : "-"} />,
             }
             // {
             //   header: t("Date de soumission"),

@@ -279,7 +279,7 @@ export const okSelfCertificates = rest.get(
 )
 
 export const okDoubleCountApplications = rest.get(
-  "http://localhost/api/v3/doublecount/applications",
+  "/api/v5/double-counting/agreements",
   (req, res, ctx) => {
     return res(ctx.json({ status: "success", data: [] }))
   }
@@ -345,9 +345,6 @@ export const okChargingPointsAddSuccess = mockPostWithResponseData("/api/v5/elec
 
 
 export default setupServer(
-  koDoubleCountUploadApplication,
-  okDoubleCountUploadDocumentation,
-  okDoubleCountUploadApplication,
   okSettings,
   okEnableMac,
   okDisableMac,

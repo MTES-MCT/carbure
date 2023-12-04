@@ -68,7 +68,7 @@ class AdminDoubleCountAgreementsTest(TestCase):
             production_site=self.production_site,
             valid_from=date(self.requested_start_year, 1, 1),
             application=app,
-            certificate_id=app.agreement_id,
+            certificate_id=app.certificate_id,
         )
 
         return agreement, app, prod1, prod2, prod3

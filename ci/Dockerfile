@@ -21,7 +21,8 @@ RUN apt-get install -y nodejs
 WORKDIR /app
 
 COPY front/package.json front/package.json
-RUN (cd front; npm install)
+COPY front/package-lock.json front/package-lock.json
+RUN (cd front; npm clean-install)
 
 COPY Pipfile Pipfile
 COPY Pipfile.lock Pipfile.lock

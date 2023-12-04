@@ -87,7 +87,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
             },
             entity.isAdmin && {
               value: "double-counting",
-              label: t("Dossiers double comptage"),
+              label: t("Demandes d'agrément double comptage"),
             },
             entity.isAdmin && {
               value: "charging-points",
