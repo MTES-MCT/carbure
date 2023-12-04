@@ -16,6 +16,9 @@ import CompanyOptions from "./components/company-options"
 import DoubleCountingSettings from "./components/double-counting"
 import EntityUserRights from "./components/user-rights"
 import ElecSettings from "./components/charging-points"
+import { ApplicationDetailsDialog } from "double-counting/components/application-details-dialog"
+import HashRoute from "common/components/hash-route"
+import { AgreementDetailsDialog } from "double-counting/components/agreement-details-dialog"
 
 const Settings = () => {
   const { t } = useTranslation()
@@ -24,7 +27,6 @@ const Settings = () => {
   useTitle(`${entity.name} · ${t("Société")}`)
 
   const { isProducer, isTrader, isOperator, isCPO } = entity
-
 
   const hasCertificates = isProducer || isTrader || isOperator
   const hasDepot = isProducer || isOperator || isTrader
@@ -46,7 +48,7 @@ const Settings = () => {
             key: "options",
             label: t("Options"),
           },
-          hasOptions && {
+          {
             path: "#info",
             key: "info",
             label: t("Informations"),
@@ -86,7 +88,7 @@ const Settings = () => {
       />
       <section>
         {hasOptions && <CompanyOptions />}
-        {hasOptions && <CompanyInfo />}
+        <CompanyInfo />
         {hasCertificates && <Certificates />}
         {hasDepot && <DeliverySitesSettings entity={entity} />}
         {isProducer && <ProductionSitesSettings entity={entity} />}
@@ -94,6 +96,14 @@ const Settings = () => {
         {isCPO && <ElecSettings companyId={entity.id} />}
         {entity.hasRights(UserRole.Admin) && <EntityUserRights />}
       </section>
+      <HashRoute
+        path="double-counting/applications/:id"
+        element={<ApplicationDetailsDialog />}
+      />
+      <HashRoute
+        path="double-counting/agreements/:id"
+        element={<AgreementDetailsDialog />}
+      />
     </Main>
   )
 }

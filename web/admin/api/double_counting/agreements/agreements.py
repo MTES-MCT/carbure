@@ -83,8 +83,8 @@ def add_quotas_to_agreements(year: int, agreements):
     quotas = get_quotas(year)
     # add quotas to active agreements
     for agreement in agreements:
-        found_quotas = [q for q in quotas if q["agreement_id"] == agreement["certificate_id"]]
-        agreement["quotas_progression"] = round(found_quotas[0]["quotas_progression"], 2) if len(found_quotas) > 0 else 0
+        found_quotas = [q for q in quotas if q["certificate_id"] == agreement["certificate_id"]]
+        agreement["quotas_progression"] = round(found_quotas[0]["quotas_progression"], 2) if len(found_quotas) > 0 else None
 
     return agreements
 
