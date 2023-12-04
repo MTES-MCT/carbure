@@ -18,7 +18,9 @@ export enum DoubleCountingStatus {
   InProgress = "INPROGRESS",
   Rejected = "REJECTED",
   Accepted = "ACCEPTED",
-  Lapsed = "LAPSED",
+  Expired = "EXPIRED",
+  ExpiresSoon = "EXPIRES_SOON",
+  Incoming = "INCOMING"
 }
 
 export enum AgreementStatus {

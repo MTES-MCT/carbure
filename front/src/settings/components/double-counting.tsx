@@ -8,12 +8,12 @@ import { LoaderOverlay, Panel } from "common/components/scaffold"
 import Table, { Cell } from "common/components/table"
 import { useQuery } from "common/hooks/async"
 import { formatDateYear } from "common/utils/formatters"
-import ApplicationStatus from "double-counting-admin/components/applications/application-status"
-import { DoubleCountingApplicationOverview, DoubleCountingStatus } from "double-counting-admin/types"
+import ApplicationStatus from "double-counting/components/application-status"
+import { DoubleCountingApplicationOverview, DoubleCountingStatus } from "double-counting/types"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
-import * as api from "../../double-count/api"
-import DoubleCountingUploadDialog from "../../double-count/components/upload-dialog"
+import * as api from "double-counting/api"
+import DoubleCountingUploadDialog from "double-counting/components/upload-dialog"
 
 const DoubleCountingSettings = () => {
   const { t } = useTranslation()
@@ -88,7 +88,7 @@ const DoubleCountingSettings = () => {
           columns={[
             {
               header: t("Statut"),
-              cell: (dc) => <ApplicationStatus status={dc.status} />,
+              cell: (dc) => <ApplicationStatus status={dc.status} expirationDate={dc.period_end} />,
             },
             {
               header: t("Site de production"),

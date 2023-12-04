@@ -1,7 +1,7 @@
 import {
   DoubleCountingUploadError,
   DoubleCountingUploadErrorType,
-} from "double-counting-admin/types"
+} from "double-counting/types"
 import { t } from "i18next"
 import { c } from "msw/lib/glossary-de6278a9"
 
