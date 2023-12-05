@@ -54,6 +54,7 @@ class ElecCharginPointsTest(TestCase):
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
+            nominal_power=150,
         )
 
         charge_point2 = ElecChargePoint.objects.create(
@@ -68,6 +69,7 @@ class ElecCharginPointsTest(TestCase):
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
+            nominal_power=40,
         )
 
         response = self.client.get(
@@ -89,7 +91,7 @@ class ElecCharginPointsTest(TestCase):
                     "application_date": data["data"][0]["application_date"],  # timezone annoying stuff
                     "station_count": 1,
                     "charging_point_count": 1,
-                    "power_total": 1000.12,
+                    "power_total": 150,
                 },
                 {
                     "id": application2.id,
@@ -98,7 +100,7 @@ class ElecCharginPointsTest(TestCase):
                     "application_date": data["data"][1]["application_date"],
                     "station_count": 1,
                     "charging_point_count": 1,
-                    "power_total": 1000.12,
+                    "power_total": 40,
                 },
             ],
         }
@@ -122,6 +124,7 @@ class ElecCharginPointsTest(TestCase):
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
+            nominal_power=150,
         )
 
         charge_point2 = ElecChargePoint.objects.create(
@@ -136,6 +139,7 @@ class ElecCharginPointsTest(TestCase):
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
+            nominal_power=40,
         )
 
         response = self.client.get(
@@ -161,6 +165,7 @@ class ElecCharginPointsTest(TestCase):
                     "measure_reference_point_id": "123456",
                     "station_name": "Station",
                     "station_id": "FGHIJ",
+                    "nominal_power": 150,
                 },
                 {
                     "id": charge_point2.id,
@@ -177,6 +182,7 @@ class ElecCharginPointsTest(TestCase):
                     "measure_reference_point_id": "123456",
                     "station_name": "Station",
                     "station_id": "FGHIJ",
+                    "nominal_power": 40,
                 },
             ],
         }
@@ -201,6 +207,7 @@ class ElecCharginPointsTest(TestCase):
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
+            nominal_power=150,
         )
 
         charge_point2 = ElecChargePoint.objects.create(
@@ -215,6 +222,7 @@ class ElecCharginPointsTest(TestCase):
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
+            nominal_power=40,
         )
 
         response = self.client.get(
@@ -240,6 +248,7 @@ class ElecCharginPointsTest(TestCase):
                     "measure_reference_point_id": "123456",
                     "station_name": "Station",
                     "station_id": "FGHIJ",
+                    "nominal_power": 150,
                 }
             ],
         }
