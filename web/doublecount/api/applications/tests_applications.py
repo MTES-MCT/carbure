@@ -177,12 +177,28 @@ class DoubleCountApplicationsTest(TestCase):
         errors = file_data["errors"]
 
         error1 = errors["production"][0]
-        self.assertEqual(error1["error"], DoubleCountingError.MISSING_ESTIMATED_PRODUCTION)
-        self.assertEqual(error1["line_number"], 13)
+        self.assertEqual(error1["error"], DoubleCountingError.MISSING_MAX_PRODUCTION_CAPACITY)
+        self.assertEqual(error1["line_number"], 6)
 
         error2 = errors["production"][1]
-        self.assertEqual(error2["error"], DoubleCountingError.MISSING_MAX_PRODUCTION_CAPACITY)
+        self.assertEqual(error2["error"], DoubleCountingError.MISSING_ESTIMATED_PRODUCTION)
         self.assertEqual(error2["line_number"], 13)
+
+    def test_production_max(self):
+        response = self.check_file("dc_agreement_application_errors_production_max.xlsx")
+
+        data = response.json()["data"]
+        file_data = data["file"]
+        error_count = file_data["error_count"]
+        self.assertEqual(error_count, 1)
+        errors = file_data["errors"]
+
+        error1 = errors["production"][0]
+        self.assertEqual(error1["error"], DoubleCountingError.PRODUCTION_MISMATCH_PRODUCTION_MAX)
+        self.assertEqual(error1["line_number"], 6)
+        meta = error1["meta"]
+        self.assertEqual(meta["max_production_capacity"], 5000)
+        self.assertEqual(meta["estimated_production"], 8200)
 
     def test_global(self):
         response = self.check_file("dc_agreement_application_errors_global.xlsx")
