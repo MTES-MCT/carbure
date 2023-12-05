@@ -104,6 +104,17 @@ export function getErrorText(
 
       )
       break
+    case DoubleCountingUploadErrorType.ProductionMismatchProductionMax:
+      errorText += t("En {{year}}, la capacité de production maximale de {{feedstock}} ({{maxProductionCapacity}} tonnes) doit être supérieur aux {{estimatedProduction}} tonnes de {{biofuel}} estimés.", {
+        year: error.meta?.year,
+        feedstock: t(error.meta?.feedstock, { ns: "feedstocks" }),
+        maxProductionCapacity: error?.meta?.max_production_capacity,
+        estimatedProduction: error?.meta?.estimated_production,
+        biofuel: t(error.meta?.biofuel, { ns: "biofuels" }),
+
+      })
+
+      break
 
     case DoubleCountingUploadErrorType.InvalidYear:
       errorText += t(
