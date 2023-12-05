@@ -41,6 +41,7 @@ class ExcelChargePoints:
 
         charge_point_data = pd.read_excel(excel_file, skiprows=11, usecols=list(range(1, 11)))
         charge_point_data["line"] = charge_point_data.index + 11 + 2
+        charge_point_data = charge_point_data.dropna()
         charge_point_data.rename(columns={charge_point_data.columns[i]: column for i, column in enumerate(EXCEL_COLUMNS)}, inplace=True)  # fmt: skip
         charge_point_data.fillna("", inplace=True)
 
@@ -192,6 +193,7 @@ class TransportDataGouv:
     @staticmethod
     def process_charge_point_data(charge_point_data: pd.DataFrame):
         charge_point_data = charge_point_data.rename(columns=TransportDataGouv.CSV_COLUMNS_ALIAS)
+        charge_point_data = charge_point_data.dropna()
         charge_point_data = charge_point_data.sort_values("date_maj", ascending=False)
         charge_point_data = charge_point_data.drop_duplicates("charge_point_id")
         charge_point_data = charge_point_data.fillna("")
