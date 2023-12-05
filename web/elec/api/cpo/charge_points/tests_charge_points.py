@@ -65,17 +65,15 @@ class ElecCharginPointsTest(TestCase):
             "data": {
                 "file_name": "points-de-recharge-errors.xlsx",
                 "charging_point_count": 0,
+                "error_count": 6,
                 "errors": [
                     {"line": 13, "error": "MISSING_CHARGING_POINT_IN_DATAGOUV", "meta": "ABCDE"},
-                    {"line": 13, "error": "MISSING_CHARGING_POINT_DATA", "meta": ["mid_id"]},
                     {"line": 14, "error": "MISSING_CHARGING_POINT_IN_DATAGOUV", "meta": ""},
-                    {"line": 14, "error": "MISSING_CHARGING_POINT_DATA", "meta": ["measure_reference_point_id"]},
                     {"line": 15, "error": "MISSING_CHARGING_POINT_IN_DATAGOUV", "meta": "FGHIJ"},
                     {"line": 16, "error": "MISSING_CHARGING_POINT_IN_DATAGOUV", "meta": "KLMOPQ"},
                     {"line": 17, "error": "MISSING_CHARGING_POINT_IN_DATAGOUV", "meta": ""},
                     {"line": 18, "error": "MISSING_CHARGING_POINT_DATA", "meta": ["measure_reference_point_id"]},
                 ],
-                "error_count": 8,
             },
             "error": "VALIDATION_FAILED",
         }
@@ -159,6 +157,7 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(charge_points[0].application, application)
         self.assertEqual(charge_points[0].station_id, "FR000011062174")
         self.assertEqual(charge_points[0].station_name, "Hotel saint alban")
+        self.assertEqual(charge_points[0].nominal_power, 22)
 
         self.assertEqual(charge_points[1].charge_point_id, "FR000012292701")
         self.assertEqual(charge_points[1].current_type, "CA")
@@ -174,6 +173,7 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(charge_points[1].application, application)
         self.assertEqual(charge_points[1].station_id, "FR000012292701")
         self.assertEqual(charge_points[1].station_name, "Hôtel Restaurant Campanile Nogent-sur-Marne")
+        self.assertEqual(charge_points[1].nominal_power, 22)
 
         self.assertEqual(charge_points[2].charge_point_id, "FR000012308585")
         self.assertEqual(charge_points[2].current_type, "CC")
@@ -189,6 +189,7 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(charge_points[2].application, application)
         self.assertEqual(charge_points[2].station_id, "FR000012308585")
         self.assertEqual(charge_points[2].station_name, "Résidence les calanques")
+        self.assertEqual(charge_points[2].nominal_power, 22)
 
         self.assertEqual(charge_points[3].charge_point_id, "FR000012616553")
         self.assertEqual(charge_points[3].current_type, "CA")
@@ -204,6 +205,7 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(charge_points[3].application, application)
         self.assertEqual(charge_points[3].station_id, "FR000012616553")
         self.assertEqual(charge_points[3].station_name, "1PACTE")
+        self.assertEqual(charge_points[3].nominal_power, 22)
 
         self.assertEqual(charge_points[4].charge_point_id, "FR000028067822")
         self.assertEqual(charge_points[4].current_type, "CC")
@@ -219,6 +221,7 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(charge_points[4].application, application)
         self.assertEqual(charge_points[4].station_id, "FR000028067822")
         self.assertEqual(charge_points[4].station_name, "Carry-le-Rouet")
+        self.assertEqual(charge_points[4].nominal_power, 36)
 
     def test_get_applications_ok(self):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)
@@ -236,6 +239,7 @@ class ElecCharginPointsTest(TestCase):
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
+            nominal_power=150,
         )
 
         charge_point2 = ElecChargePoint.objects.create(
@@ -250,6 +254,7 @@ class ElecCharginPointsTest(TestCase):
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
+            nominal_power=40,
         )
 
         response = self.client.get(
@@ -271,7 +276,7 @@ class ElecCharginPointsTest(TestCase):
                     "application_date": data["data"][0]["application_date"],  # timezone annoying stuff
                     "station_count": 1,
                     "charging_point_count": 1,
-                    "power_total": 1000.12,
+                    "power_total": 150,
                 },
                 {
                     "id": application2.id,
@@ -280,7 +285,7 @@ class ElecCharginPointsTest(TestCase):
                     "application_date": data["data"][1]["application_date"],
                     "station_count": 1,
                     "charging_point_count": 1,
-                    "power_total": 1000.12,
+                    "power_total": 40,
                 },
             ],
         }
@@ -304,6 +309,7 @@ class ElecCharginPointsTest(TestCase):
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
+            nominal_power=150,
         )
 
         charge_point2 = ElecChargePoint.objects.create(
@@ -318,6 +324,7 @@ class ElecCharginPointsTest(TestCase):
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
+            nominal_power=40,
         )
 
         response = self.client.get(
@@ -343,6 +350,7 @@ class ElecCharginPointsTest(TestCase):
                     "measure_reference_point_id": "123456",
                     "station_name": "Station",
                     "station_id": "FGHIJ",
+                    "nominal_power": 150,
                 },
                 {
                     "id": charge_point2.id,
@@ -359,6 +367,7 @@ class ElecCharginPointsTest(TestCase):
                     "measure_reference_point_id": "123456",
                     "station_name": "Station",
                     "station_id": "FGHIJ",
+                    "nominal_power": 40,
                 },
             ],
         }
@@ -383,6 +392,7 @@ class ElecCharginPointsTest(TestCase):
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
+            nominal_power=150,
         )
 
         charge_point2 = ElecChargePoint.objects.create(
@@ -397,6 +407,7 @@ class ElecCharginPointsTest(TestCase):
             measure_reference_point_id="123456",
             station_name="Station",
             station_id="FGHIJ",
+            nominal_power=40,
         )
 
         response = self.client.get(
@@ -422,6 +433,7 @@ class ElecCharginPointsTest(TestCase):
                     "measure_reference_point_id": "123456",
                     "station_name": "Station",
                     "station_id": "FGHIJ",
+                    "nominal_power": 150,
                 }
             ],
         }
