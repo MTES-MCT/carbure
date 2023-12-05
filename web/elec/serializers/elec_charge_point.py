@@ -12,7 +12,7 @@ class ElecChargePointSerializer(serializers.ModelSerializer):
             "charge_point_id",
             "current_type",
             "installation_date",
-            "lne_id",
+            "mid_id",
             "measure_date",
             "measure_energy",
             "is_article_2",

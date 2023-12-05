@@ -21,7 +21,7 @@ def export_charge_points_to_excel(charge_points, entity):
                     {"label": "charge_point_id", "value": "charge_point_id"},
                     {"label": "current_type", "value": "current_type"},
                     {"label": "installation_date", "value": "installation_date"},
-                    {"label": "lne_id", "value": "lne_id"},
+                    {"label": "mid_id", "value": "mid_id"},
                     {"label": "measure_date", "value": "measure_date"},
                     {"label": "measure_energy", "value": "measure_energy"},
                     {"label": "is_article_2", "value": "is_article_2"},
