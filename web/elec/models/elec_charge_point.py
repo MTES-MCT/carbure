@@ -21,7 +21,7 @@ class ElecChargePoint(models.Model):
     charge_point_id = models.CharField(max_length=64)
     current_type = models.CharField(max_length=2, choices=[(AC, "Courant alternatif"), (DC, "Courant continu")])
     installation_date = models.DateField()
-    lne_id = models.CharField(max_length=64, null=True, blank=True)
+    mid_id = models.CharField(max_length=64, null=True, blank=True)
     measure_date = models.DateField(null=True, blank=True)
     measure_energy = models.FloatField(null=True, blank=True)
     is_article_2 = models.BooleanField(default=False)

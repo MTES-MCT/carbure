@@ -67,7 +67,7 @@ class ElecCharginPointsTest(TestCase):
                 "charging_point_count": 0,
                 "errors": [
                     {"line": 13, "error": "MISSING_CHARGING_POINT_IN_DATAGOUV", "meta": "ABCDE"},
-                    {"line": 13, "error": "MISSING_CHARGING_POINT_DATA", "meta": ["lne_id"]},
+                    {"line": 13, "error": "MISSING_CHARGING_POINT_DATA", "meta": ["mid_id"]},
                     {"line": 14, "error": "MISSING_CHARGING_POINT_IN_DATAGOUV", "meta": ""},
                     {"line": 14, "error": "MISSING_CHARGING_POINT_DATA", "meta": ["measure_reference_point_id"]},
                     {"line": 15, "error": "MISSING_CHARGING_POINT_IN_DATAGOUV", "meta": "FGHIJ"},
@@ -148,7 +148,7 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(charge_points[0].charge_point_id, "FR000011062174")
         self.assertEqual(charge_points[0].current_type, "CC")
         self.assertEqual(str(charge_points[0].installation_date), "2023-06-12")
-        self.assertEqual(charge_points[0].lne_id, "123456-10")
+        self.assertEqual(charge_points[0].mid_id, "123456-10")
         self.assertEqual(str(charge_points[0].measure_date), "2023-08-28")
         self.assertEqual(charge_points[0].measure_energy, 98765.430)
         self.assertEqual(charge_points[0].is_article_2, True)
@@ -163,7 +163,7 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(charge_points[1].charge_point_id, "FR000012292701")
         self.assertEqual(charge_points[1].current_type, "CA")
         self.assertEqual(str(charge_points[1].installation_date), "2023-06-13")
-        self.assertEqual(charge_points[1].lne_id, "123457-11")
+        self.assertEqual(charge_points[1].mid_id, "123457-11")
         self.assertEqual(str(charge_points[1].measure_date), "2023-08-29")
         self.assertEqual(charge_points[1].measure_energy, 98765.430)
         self.assertEqual(charge_points[1].is_article_2, True)
@@ -178,7 +178,7 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(charge_points[2].charge_point_id, "FR000012308585")
         self.assertEqual(charge_points[2].current_type, "CC")
         self.assertEqual(str(charge_points[2].installation_date), "2023-06-14")
-        self.assertEqual(charge_points[2].lne_id, "123458-12")
+        self.assertEqual(charge_points[2].mid_id, "123458-12")
         self.assertEqual(str(charge_points[2].measure_date), "2023-08-30")
         self.assertEqual(charge_points[2].measure_energy, 98765.430)
         self.assertEqual(charge_points[2].is_article_2, True)
@@ -193,7 +193,7 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(charge_points[3].charge_point_id, "FR000012616553")
         self.assertEqual(charge_points[3].current_type, "CA")
         self.assertEqual(str(charge_points[3].installation_date), "2023-06-15")
-        self.assertEqual(charge_points[3].lne_id, "123459-13")
+        self.assertEqual(charge_points[3].mid_id, "123459-13")
         self.assertEqual(str(charge_points[3].measure_date), "2023-08-31")
         self.assertEqual(charge_points[3].measure_energy, 98765.430)
         self.assertEqual(charge_points[3].is_article_2, False)
@@ -208,7 +208,7 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(charge_points[4].charge_point_id, "FR000028067822")
         self.assertEqual(charge_points[4].current_type, "CC")
         self.assertEqual(str(charge_points[4].installation_date), "2023-06-16")
-        self.assertEqual(charge_points[4].lne_id, "123450-14")
+        self.assertEqual(charge_points[4].mid_id, "123450-14")
         self.assertEqual(str(charge_points[4].measure_date), "2023-09-01")
         self.assertEqual(charge_points[4].measure_energy, 98765.430)
         self.assertEqual(charge_points[4].is_article_2, False)
@@ -230,7 +230,7 @@ class ElecCharginPointsTest(TestCase):
             charge_point_id="ABCDE",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 15),
-            lne_id="123-456",
+            mid_id="123-456",
             measure_date=datetime.date(2023, 6, 29),
             measure_energy=1000.1234,
             measure_reference_point_id="123456",
@@ -244,7 +244,7 @@ class ElecCharginPointsTest(TestCase):
             charge_point_id="ABCDE",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 15),
-            lne_id="123-456",
+            mid_id="123-456",
             measure_date=datetime.date(2023, 6, 29),
             measure_energy=1000.1234,
             measure_reference_point_id="123456",
@@ -298,7 +298,7 @@ class ElecCharginPointsTest(TestCase):
             charge_point_id="ABCDE",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 15),
-            lne_id="123-456",
+            mid_id="123-456",
             measure_date=datetime.date(2023, 6, 29),
             measure_energy=1000.1234,
             measure_reference_point_id="123456",
@@ -312,7 +312,7 @@ class ElecCharginPointsTest(TestCase):
             charge_point_id="ABCDE",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 15),
-            lne_id="123-456",
+            mid_id="123-456",
             measure_date=datetime.date(2023, 6, 29),
             measure_energy=1000.1234,
             measure_reference_point_id="123456",
@@ -334,7 +334,7 @@ class ElecCharginPointsTest(TestCase):
                     "charge_point_id": "ABCDE",
                     "current_type": "AC",
                     "installation_date": "2023-02-15",
-                    "lne_id": "123-456",
+                    "mid_id": "123-456",
                     "measure_date": "2023-06-29",
                     "measure_energy": 1000.12,
                     "is_article_2": False,
@@ -350,7 +350,7 @@ class ElecCharginPointsTest(TestCase):
                     "charge_point_id": "ABCDE",
                     "current_type": "AC",
                     "installation_date": "2023-02-15",
-                    "lne_id": "123-456",
+                    "mid_id": "123-456",
                     "measure_date": "2023-06-29",
                     "measure_energy": 1000.12,
                     "is_article_2": False,
@@ -377,7 +377,7 @@ class ElecCharginPointsTest(TestCase):
             charge_point_id="ABCDE",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 15),
-            lne_id="123-456",
+            mid_id="123-456",
             measure_date=datetime.date(2023, 6, 29),
             measure_energy=1000.1234,
             measure_reference_point_id="123456",
@@ -391,7 +391,7 @@ class ElecCharginPointsTest(TestCase):
             charge_point_id="ABCDE",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 15),
-            lne_id="123-456",
+            mid_id="123-456",
             measure_date=datetime.date(2023, 6, 29),
             measure_energy=1000.1234,
             measure_reference_point_id="123456",
@@ -413,7 +413,7 @@ class ElecCharginPointsTest(TestCase):
                     "charge_point_id": "ABCDE",
                     "current_type": "AC",
                     "installation_date": "2023-02-15",
-                    "lne_id": "123-456",
+                    "mid_id": "123-456",
                     "measure_date": "2023-06-29",
                     "measure_energy": 1000.12,
                     "is_article_2": False,
