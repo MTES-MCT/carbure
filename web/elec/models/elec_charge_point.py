@@ -32,3 +32,4 @@ class ElecChargePoint(models.Model):
     # transport.data.gouv.fr data
     station_name = models.CharField(max_length=64)
     station_id = models.CharField(max_length=64)
+    nominal_power = models.FloatField(null=True, blank=True)
