@@ -69,6 +69,10 @@ if env.get("IMAGE_TAG") == "prod":
         period = last_month.year * 100 + last_month.month
         calc_ml_score(period=period)
 
+    @periodic_task(crontab(hour=6, minute=0))
+    def restart_metabase_container() -> None:
+        subprocess.run(["bash", "/app/scripts/scalingo/restart_metabase.sh"])
+
 
 if env.get("IMAGE_TAG") == "staging":
 
