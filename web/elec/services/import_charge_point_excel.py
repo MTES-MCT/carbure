@@ -107,9 +107,9 @@ class ExcelChargePoints:
         else:
             if not charge_point.get("mid_id"):
                 yield "mid_id"
-            elif not charge_point.get("measure_date"):
+            if not charge_point.get("measure_date"):
                 yield "measure_date"
-            elif not charge_point.get("measure_energy"):
+            if not charge_point.get("measure_energy"):
                 yield "measure_energy"
 
 

@@ -26,6 +26,10 @@ class ElecChargePointSerializer(serializers.ModelSerializer):
 
     cpo = serializers.SlugRelatedField(read_only=True, slug_field="name")
     measure_energy = serializers.SerializerMethodField()
+    nominal_power = serializers.SerializerMethodField()
 
     def get_measure_energy(self, instance):
-        return round(instance.measure_energy, 2)
+        return round(instance.measure_energy or 0, 2)
+
+    def get_nominal_power(self, instance):
+        return round(instance.nominal_power or 0, 2)
