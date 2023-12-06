@@ -29,6 +29,17 @@ def check_production_row(production: DoubleCountingProduction, data: ProductionR
     line = data["line"]
     tab_name = "Reconnaissance double comptage"
 
+    if production.max_production_capacity < production.estimated_production:
+        meta = {
+            "feedstock": production.feedstock.name,
+            "biofuel": production.biofuel.name,
+            "max_production_capacity": production.max_production_capacity,
+            "estimated_production": production.estimated_production,
+            "tab_name": tab_name,
+            "year": data["year"],
+        }
+        errors.append(error(DoubleCountingError.PRODUCTION_MISMATCH_PRODUCTION_MAX, line, meta))
+
     # check that requested quotas aren't bigger than estimated production
     if (production.requested_quota or 0) > (production.estimated_production or 0):
         meta = {

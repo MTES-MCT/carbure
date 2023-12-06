@@ -221,6 +221,7 @@ def load_dc_production_data(
             ):
                 production.max_production_capacity = prod_max_row["max_production_capacity"]
                 break
+
         if not production.max_production_capacity:
             production_errors.append(
                 error(
