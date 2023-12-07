@@ -265,7 +265,7 @@ if DEBUG:
 
 
 # CSP header configuration
-CSP_DEFAULT_SRC = ("'self'", "stats.data.gouv.fr", "metabase.carbure.beta.gouv.fr")
+CSP_DEFAULT_SRC = ("'self'", "stats.beta.gouv.fr", "metabase.carbure.beta.gouv.fr")
 CSP_EXCLUDE_URL_PREFIXES = ("/admin")
 
 # Metabase API key
