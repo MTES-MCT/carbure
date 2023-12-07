@@ -70,11 +70,7 @@ class ExcelChargePoints:
             )
             for e in parse_errors
         ]
-        pd.set_option("display.max_rows", None)
-        pd.set_option("display.max_columns", None)
-        pd.set_option("display.max_colwidth", 50)
 
-        print(charge_point_data.to_string())
         return charge_point_data.to_dict(orient="records"), errors
 
     @staticmethod
