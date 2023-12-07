@@ -34,7 +34,7 @@ class ElecCharginPointsTest(TestCase):
             [(self.cpo, "RW"), (self.operator, "RW")],
         )
 
-    def test_check_charge_point_certificate_wrong_entity(self):
+    def test_check_charge_point_wrong_entity(self):
         filepath = "%s/web/fixtures/csv/test_data/points-de-recharge-errors.xlsx" % (os.environ["CARBURE_HOME"])
 
         with open(filepath, "rb") as reader:
@@ -49,7 +49,7 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertEqual(data["error"], "WRONG_ENTITY_TYPE")
 
-    def test_check_charge_point_certificate_errors(self):
+    def test_check_charge_point_errors(self):
         filepath = "%s/web/fixtures/csv/test_data/points-de-recharge-errors.xlsx" % (os.environ["CARBURE_HOME"])
 
         with open(filepath, "rb") as reader:
@@ -62,26 +62,26 @@ class ElecCharginPointsTest(TestCase):
 
         expected = {
             "status": "error",
+            "error": "VALIDATION_FAILED",
             "data": {
                 "file_name": "points-de-recharge-errors.xlsx",
                 "charging_point_count": 0,
                 "error_count": 6,
                 "errors": [
                     {"line": 13, "error": "MISSING_CHARGING_POINT_IN_DATAGOUV", "meta": "ABCDE"},
-                    {"line": 14, "error": "MISSING_CHARGING_POINT_IN_DATAGOUV", "meta": ""},
+                    {"line": 14, "error": "MISSING_CHARGING_POINT_ID"},
                     {"line": 15, "error": "MISSING_CHARGING_POINT_IN_DATAGOUV", "meta": "FGHIJ"},
                     {"line": 16, "error": "MISSING_CHARGING_POINT_IN_DATAGOUV", "meta": "KLMOPQ"},
-                    {"line": 17, "error": "MISSING_CHARGING_POINT_IN_DATAGOUV", "meta": ""},
-                    {"line": 18, "error": "MISSING_CHARGING_POINT_DATA", "meta": ["measure_reference_point_id"]},
+                    {"line": 17, "error": "MISSING_CHARGING_POINT_ID"},
+                    {"line": 18, "error": "MISSING_CHARGING_POINT_DATA", "meta": "measure_reference_point_id"},
                 ],
             },
-            "error": "VALIDATION_FAILED",
         }
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), expected)
 
-    def test_check_charge_point_certificate_ok(self):
+    def test_check_charge_point_ok(self):
         filepath = "%s/web/fixtures/csv/test_data/points-de-recharge-ok.xlsx" % (os.environ["CARBURE_HOME"])
 
         with open(filepath, "rb") as reader:
@@ -105,7 +105,7 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), expected)
 
-    def test_add_charge_point_certificate_errors(self):
+    def test_add_charge_point_errors(self):
         filepath = "%s/web/fixtures/csv/test_data/points-de-recharge-errors.xlsx" % (os.environ["CARBURE_HOME"])
 
         with open(filepath, "rb") as reader:
@@ -119,7 +119,7 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {"status": "error", "error": "VALIDATION_FAILED"})
 
-    def test_add_charge_point_certificate_ok(self):
+    def test_add_charge_point_ok(self):
         filepath = "%s/web/fixtures/csv/test_data/points-de-recharge-ok.xlsx" % (os.environ["CARBURE_HOME"])
 
         with open(filepath, "rb") as reader:

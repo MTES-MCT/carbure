@@ -1,6 +1,7 @@
+import xlsxwriter
+import pandas as pd
 from io import BufferedReader
 from django.http import HttpResponse
-import xlsxwriter
 from typing import Any, Callable, Iterable, TypedDict
 from transactions.helpers import try_get_date
 
@@ -80,28 +81,58 @@ def get_nested_value(obj: Any, path: str):
     return current_obj
 
 
-class ExcelParser:
+class TableParser:
+    @staticmethod
+    def parse_columns(df: pd.DataFrame, column_parsers: dict[str, Callable]):
+        errors = []
+        for i, row in df.iterrows():
+            for column, parser in column_parsers.items():
+                try:
+                    df.at[i, column] = parser(row[column])
+                except:
+                    errors.append({"row": i, "column": column})
+        return df, errors
+
     @staticmethod
     def bool(cell):
-        return cell == "OUI" or cell == 1 or cell == True or cell == "true"
+        if isinstance(cell, str):
+            cell = cell.lower()
+        if cell == "oui" or cell == 1 or cell == True or cell == "true":
+            return True
+        elif not cell or pd.isna(cell) or cell == "non" or cell == "false":
+            return False
+        else:
+            raise ValueError()
 
     @staticmethod
     def id(cell):
         try:
-            return str(int(float(cell)))
+            return str(int(float(cell))).upper()
         except:
-            return str(cell)
+            return TableParser.str(cell).upper()
+
+    @staticmethod
+    def int(cell):
+        if not cell or pd.isna(cell):
+            return 0
+        else:
+            return int(float(cell))
 
     @staticmethod
     def float(cell):
-        try:
-            return round(float(cell), 2)
-        except:
+        if not cell or pd.isna(cell):
             return 0.0
+        else:
+            return round(float(cell), 2)
 
     @staticmethod
     def str(cell):
-        return str(cell)
+        if pd.isna(cell):
+            return ""
+        elif isinstance(cell, (str, int, float)):
+            return str(cell)
+        else:
+            raise ValueError()
 
     @staticmethod
     def date(cell):
