@@ -5,61 +5,77 @@ import requests
 import pandas as pd
 from dateutil.parser import isoparse
 from django.core.files.uploadedfile import UploadedFile
-from core.excel import ExcelParser
+from core.excel import TableParser
 
 
 def import_charge_point_excel(excel_file: UploadedFile):
     try:
-        excel_data = ExcelChargePoints.parse_charge_point_excel(excel_file)
+        excel_data, excel_errors = ExcelChargePoints.parse_charge_point_excel(excel_file)
         transport_data = TransportDataGouv.find_charge_point_data(excel_data, 1000)
-        return ExcelChargePoints.validate_charge_points(excel_data, transport_data)
+        valid_charge_points, validation_errors = ExcelChargePoints.validate_charge_points(excel_data, transport_data)
+        errors = sorted(excel_errors + validation_errors, key=lambda e: e["line"])
+        return valid_charge_points, errors
     except Exception as e:
         traceback.print_exc()
         return [], [{"error": str(e)}]
 
 
 class ExcelChargePointError:
+    MISSING_CHARGING_POINT_ID = "MISSING_CHARGING_POINT_ID"
     MISSING_CHARGING_POINT_IN_DATAGOUV = "MISSING_CHARGING_POINT_IN_DATAGOUV"
     MISSING_CHARGING_POINT_DATA = "MISSING_CHARGING_POINT_DATA"
+    INVALID_CHARGING_POINT_DATA = "INVALID_CHARGING_POINT_DATA"
 
 
 class ExcelChargePoints:
     @staticmethod
     def parse_charge_point_excel(excel_file: UploadedFile):
         EXCEL_COLUMNS = {
-            "charge_point_id": ExcelParser.id,
-            "current_type": ExcelParser.str,
-            "installation_date": ExcelParser.date,
-            "mid_id": ExcelParser.id,
-            "measure_date": ExcelParser.date,
-            "measure_energy": ExcelParser.float,
-            "is_article_2": ExcelParser.bool,
-            "is_auto_consumption": ExcelParser.bool,
-            "is_article_4": ExcelParser.bool,
-            "measure_reference_point_id": ExcelParser.id,
+            "charge_point_id": TableParser.id,
+            "current_type": TableParser.str,
+            "installation_date": TableParser.date,
+            "mid_id": TableParser.id,
+            "measure_date": TableParser.date,
+            "measure_energy": TableParser.float,
+            "is_article_2": TableParser.bool,
+            "is_auto_consumption": TableParser.bool,
+            "is_article_4": TableParser.bool,
+            "measure_reference_point_id": TableParser.id,
         }
 
-        charge_point_data = pd.read_excel(excel_file, skiprows=11, usecols=list(range(1, 11)))
-        charge_point_data = charge_point_data.dropna(how="all")
-        charge_point_data["line"] = charge_point_data.index + 11 + 2
+        charge_point_data = pd.read_excel(excel_file, usecols=list(range(1, 11)))
+        charge_point_data = charge_point_data.drop(charge_point_data.index[:11])
+        charge_point_data = charge_point_data.dropna(how="all")  # remove completely empty rows
+        charge_point_data["line"] = charge_point_data.index + 2  # add a line number to locate data in the excel file
         charge_point_data.rename(columns={charge_point_data.columns[i]: column for i, column in enumerate(EXCEL_COLUMNS)}, inplace=True)  # fmt: skip
-        charge_point_data.fillna("", inplace=True)
+        charge_point_data = charge_point_data.reset_index(drop=True)
 
-        for column, parser in EXCEL_COLUMNS.items():
-            charge_point_data[column] = charge_point_data[column].apply(parser)
-
-        charge_points = charge_point_data.to_dict(orient="records")
-
-        if len(charge_points) >= 18:
+        if len(charge_point_data) >= 18:
             # default template example cells
-            first_id = charge_points[0]["charge_point_id"]
-            eighteenth_id = charge_points[17]["charge_point_id"]
+            first_id = charge_point_data.at[0, "charge_point_id"]
+            eighteenth_id = charge_point_data.at[17, "charge_point_id"]
 
             # the example was left in the template, so we skip it
             if first_id == "FRUEXESTATION1P1" and eighteenth_id == "FRUEXESTATION4P4":
-                charge_points = charge_points[19:]
+                charge_point_data = charge_point_data.drop(charge_point_data.index[:19])
+                charge_point_data = charge_point_data.reset_index(drop=True)
 
-        return charge_points
+        charge_point_data, parse_errors = TableParser.parse_columns(charge_point_data, EXCEL_COLUMNS)
+
+        errors = [
+            Error(
+                ExcelChargePointError.INVALID_CHARGING_POINT_DATA,
+                line=charge_point_data.loc[e["row"]]["line"],
+                meta=e["column"],
+            )
+            for e in parse_errors
+        ]
+        pd.set_option("display.max_rows", None)
+        pd.set_option("display.max_columns", None)
+        pd.set_option("display.max_colwidth", 50)
+
+        print(charge_point_data.to_string())
+        return charge_point_data.to_dict(orient="records"), errors
 
     @staticmethod
     def validate_charge_points(charge_points: list[dict], transport_data):
@@ -70,13 +86,15 @@ class ExcelChargePoints:
 
         for charge_point_data in charge_points:
             line = charge_point_data.pop("line")
-            charge_point_transport_data = transport_data_index.get(charge_point_data["charge_point_id"])
+            charge_point_id = charge_point_data["charge_point_id"]
+            charge_point_transport_data = transport_data_index.get(charge_point_id)
 
             errors = []
 
-            if charge_point_transport_data is None:
-                error = {"line": line, "error": ExcelChargePointError.MISSING_CHARGING_POINT_IN_DATAGOUV, "meta": charge_point_data["charge_point_id"]}  # fmt:skip
-                errors.append(error)
+            if not charge_point_id:
+                errors.append(Error(ExcelChargePointError.MISSING_CHARGING_POINT_ID, line=line))
+            elif charge_point_transport_data is None:
+                errors.append(Error(ExcelChargePointError.MISSING_CHARGING_POINT_IN_DATAGOUV, line=line, meta=charge_point_id))  # fmt:skip
             else:
                 charge_point_data["station_id"] = charge_point_transport_data["station_id"]
                 charge_point_data["station_name"] = charge_point_transport_data["station_name"]
@@ -87,10 +105,13 @@ class ExcelChargePoints:
                     charge_point_data["is_article_2"] = True
 
                 # si la data existe sur tdg, on vérifie les autres champs
-                missing_fields = list(ExcelChargePoints.validate_charge_point_fields(charge_point_data))
+                missing_fields = list(ExcelChargePoints.get_missing_fields(charge_point_data))
 
                 if len(missing_fields) > 0:
-                    errors.append({"line": line, "error": ExcelChargePointError.MISSING_CHARGING_POINT_DATA, "meta": missing_fields})  # fmt:skip
+                    errors += [
+                        Error(ExcelChargePointError.MISSING_CHARGING_POINT_DATA, line=line, meta=field)
+                        for field in missing_fields
+                    ]
 
             if len(errors) > 0:
                 charge_points_errors += errors
@@ -100,17 +121,21 @@ class ExcelChargePoints:
         return valid_charge_points, charge_points_errors
 
     @staticmethod
-    def validate_charge_point_fields(charge_point):
+    def get_missing_fields(charge_point):
+        missing_fields = []
+
         if charge_point.get("is_article_2"):
             if not charge_point.get("measure_reference_point_id"):
-                yield "measure_reference_point_id"
+                missing_fields.append("measure_reference_point_id")
         else:
             if not charge_point.get("mid_id"):
-                yield "mid_id"
+                missing_fields.append("mid_id")
             if not charge_point.get("measure_date"):
-                yield "measure_date"
+                missing_fields.append("measure_date")
             if not charge_point.get("measure_energy"):
-                yield "measure_energy"
+                missing_fields.append("measure_energy")
+
+        return missing_fields
 
 
 class TransportDataGouv:
@@ -226,3 +251,10 @@ class TransportDataGouv:
         return charge_point_data.merge(stations_art2, on="charge_point_id")[
             ["charge_point_id", "should_be_article_2", "station_name", "station_id", "nominal_power"]
         ]
+
+
+def Error(type: str, line: int, meta=None):
+    error = {"line": int(line), "error": type}
+    if meta is not None:
+        error["meta"] = meta
+    return error
