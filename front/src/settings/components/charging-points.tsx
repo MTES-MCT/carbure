@@ -1,7 +1,7 @@
 import useEntity from "carbure/hooks/entity"
 import { Alert } from "common/components/alert"
 import Button from "common/components/button"
-import { AlertCircle, Plus } from "common/components/icons"
+import { AlertCircle, Download, Plus } from "common/components/icons"
 import { usePortal } from "common/components/portal"
 import { Grid, LoaderOverlay, Panel } from "common/components/scaffold"
 import Table, { Cell } from "common/components/table"
@@ -33,8 +33,8 @@ const ElecSettings = ({ companyId }: { companyId: number }) => {
     params: [entity.id, companyId],
   })
 
-  const applications = applicationsResponse.result?.data.data ?? []
-  // const applications = elecChargingPointsApplications // TEST with applications
+  // const applications = applicationsResponse.result?.data.data ?? []
+  const applications = elecChargingPointsApplications // TEST with applications
 
   const applicationsSnapshot: ElecChargingPointsSnapshot = {
     station_count: applications.reduce((acc, app) => acc + app.station_count, 0),
@@ -64,12 +64,13 @@ const ElecSettings = ({ companyId }: { companyId: number }) => {
     <Panel id="elec-charging-points">
       <header>
         <h1>
-          <Trans>Inscriptions de points de recharge</Trans>
+          {t("Inscriptions de points de recharge")}
         </h1>
 
         {isCPO && (
           <Button
             asideX
+
             variant="primary"
             icon={Plus}
             action={showUploadDialog}
@@ -78,9 +79,9 @@ const ElecSettings = ({ companyId }: { companyId: number }) => {
         )}
         {applicationsSnapshot.charging_point_count > 0 &&
           <Button
-            asideX
+
             variant="secondary"
-            icon={Plus}
+            icon={Download}
             action={downloadChargingPoints}
             label={t("Exporter les points de recharge")}
           />
