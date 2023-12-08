@@ -42,7 +42,7 @@ export const ValidDetailsDialog = ({
   }
 
   return (
-    <Dialog fullscreen onClose={onClose}>
+    <Dialog onClose={onClose}>
       <header>
         <Tag big variant="success">
           {t("Valide")}
