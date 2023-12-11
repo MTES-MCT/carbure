@@ -4,6 +4,7 @@ from django.views.decorators.http import require_POST
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity, UserRights
+from elec.models.elec_charge_point_application import ElecChargePointApplication
 from elec.services.import_charge_point_excel import import_charge_point_excel
 
 
@@ -14,7 +15,7 @@ class CheckChargePointApplicationError:
 
 @require_POST
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW], entity_type=[Entity.CPO])
-def check_application(request: HttpRequest):
+def check_application(request: HttpRequest, entity):
     excel_file = request.FILES.get("file")
 
     if not excel_file:
@@ -22,11 +23,16 @@ def check_application(request: HttpRequest):
 
     charge_points, errors = import_charge_point_excel(excel_file)
 
+    pending_application_already_exists = (
+        ElecChargePointApplication.objects.filter(cpo=entity, status=ElecChargePointApplication.PENDING).count() > 0
+    )
+
     data = {}
     data["file_name"] = excel_file.name
     data["charging_point_count"] = len(charge_points)
     data["errors"] = []
     data["error_count"] = 0
+    data["pending_application_already_exists"] = pending_application_already_exists
 
     if len(errors) > 0:
         data["errors"] = errors
