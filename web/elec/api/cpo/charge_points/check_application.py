@@ -32,8 +32,8 @@ def check_application(request: HttpRequest, entity):
 
     charge_points, errors = import_charge_point_excel(excel_file, existing_charge_points)
 
-    pending_application_already_exists = (
-        ElecChargePointApplication.objects.filter(cpo=entity, status=ElecChargePointApplication.PENDING).count() > 0
+    replaceable_applications = ElecChargePointApplication.objects.filter(
+        cpo=entity, status__in=[ElecChargePointApplication.PENDING, ElecChargePointApplication.REJECTED]
     )
 
     data = {}
@@ -41,7 +41,7 @@ def check_application(request: HttpRequest, entity):
     data["charging_point_count"] = len(charge_points)
     data["errors"] = []
     data["error_count"] = 0
-    data["pending_application_already_exists"] = pending_application_already_exists
+    data["pending_application_already_exists"] = replaceable_applications.count() > 0
 
     if len(errors) > 0:
         data["errors"] = errors
