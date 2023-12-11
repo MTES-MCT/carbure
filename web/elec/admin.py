@@ -68,6 +68,9 @@ class ElecChargePointAdmin(admin.ModelAdmin):
         "measure_reference_point_id",
         "station_name",
         "station_id",
+        "nominal_power",
+        "cpo_name",
+        "cpo_siren",
     ]
     list_filter = [
         "application",
@@ -78,4 +81,6 @@ class ElecChargePointAdmin(admin.ModelAdmin):
         "is_article_4",
         "station_name",
         "station_id",
+        "cpo_name",
+        "cpo_siren",
     ]

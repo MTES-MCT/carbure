@@ -31,6 +31,9 @@ def export_charge_points_to_excel(charge_points, entity):
                     # transport.data.gouv.fr data
                     {"label": "station_name", "value": "station_name"},
                     {"label": "station_id", "value": "station_id"},
+                    {"label": "nominal_power", "value": "nominal_power"},
+                    {"label": "cpo_name", "value": "cpo_name"},
+                    {"label": "cpo_siren", "value": "cpo_siren"},
                 ],
             }
         ],

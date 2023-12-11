@@ -30,26 +30,26 @@ def import_charge_point_excel(excel_file: UploadedFile, existing_charge_points: 
 
 
 class ExcelChargePoints:
+    EXCEL_COLUMNS = {
+        "charge_point_id": TableParser.id,
+        "current_type": TableParser.str,
+        "installation_date": TableParser.date,
+        "mid_id": TableParser.id,
+        "measure_date": TableParser.date,
+        "measure_energy": TableParser.float,
+        "is_article_2": TableParser.bool,
+        "is_auto_consumption": TableParser.bool,
+        "is_article_4": TableParser.bool,
+        "measure_reference_point_id": TableParser.id,
+    }
+
     @staticmethod
     def parse_charge_point_excel(excel_file: UploadedFile):
-        EXCEL_COLUMNS = {
-            "charge_point_id": TableParser.id,
-            "current_type": TableParser.str,
-            "installation_date": TableParser.date,
-            "mid_id": TableParser.id,
-            "measure_date": TableParser.date,
-            "measure_energy": TableParser.float,
-            "is_article_2": TableParser.bool,
-            "is_auto_consumption": TableParser.bool,
-            "is_article_4": TableParser.bool,
-            "measure_reference_point_id": TableParser.id,
-        }
-
         charge_point_data = pd.read_excel(excel_file, usecols=list(range(1, 11)))
         charge_point_data = charge_point_data.drop(charge_point_data.index[:11])
         charge_point_data = charge_point_data.dropna(how="all")  # remove completely empty rows
         charge_point_data["line"] = charge_point_data.index + 2  # add a line number to locate data in the excel file
-        charge_point_data.rename(columns={charge_point_data.columns[i]: column for i, column in enumerate(EXCEL_COLUMNS)}, inplace=True)  # fmt: skip
+        charge_point_data.rename(columns={charge_point_data.columns[i]: column for i, column in enumerate(ExcelChargePoints.EXCEL_COLUMNS)}, inplace=True)  # fmt: skip
         charge_point_data = charge_point_data.reset_index(drop=True)
 
         if len(charge_point_data) >= 18:
@@ -62,15 +62,15 @@ class ExcelChargePoints:
                 charge_point_data = charge_point_data.drop(charge_point_data.index[:19])
                 charge_point_data = charge_point_data.reset_index(drop=True)
 
-        charge_point_data, parse_errors = TableParser.parse_columns(charge_point_data, EXCEL_COLUMNS)
+        charge_point_data, parse_errors = TableParser.parse_columns(charge_point_data, ExcelChargePoints.EXCEL_COLUMNS)
 
         errors = [
             Error(
                 ExcelChargePointError.INVALID_CHARGING_POINT_DATA,
-                line=charge_point_data.loc[e["row"]]["line"],
-                meta=e["column"],
+                line=charge_point_data.loc[error["row"]]["line"],
+                meta=error["column"],
             )
-            for e in parse_errors
+            for error in parse_errors
         ]
 
         return charge_point_data.to_dict(orient="records"), errors
@@ -99,6 +99,8 @@ class ExcelChargePoints:
                 charge_point_data["station_id"] = charge_point_transport_data["station_id"]
                 charge_point_data["station_name"] = charge_point_transport_data["station_name"]
                 charge_point_data["nominal_power"] = charge_point_transport_data["nominal_power"]
+                charge_point_data["cpo_name"] = charge_point_transport_data["cpo_name"]
+                charge_point_data["cpo_siren"] = charge_point_transport_data["cpo_siren"]
 
                 # on override la valeur du excel si transport.data.gouv indique que le point de charge est éligible article 2
                 if charge_point_transport_data["should_be_article_2"]:
@@ -151,6 +153,8 @@ class TransportDataGouv:
         "prise_type_chademo",
         "date_maj",
         "last_modified",
+        "nom_amenageur",
+        "siren_amenageur",
     ]
 
     CSV_COLUMNS_ALIAS = {
@@ -158,6 +162,8 @@ class TransportDataGouv:
         "id_station_itinerance": "station_id",
         "nom_station": "station_name",
         "puissance_nominale": "nominal_power",
+        "nom_amenageur": "cpo_name",
+        "siren_amenageur": "cpo_siren",
     }
 
     @staticmethod
@@ -249,7 +255,15 @@ class TransportDataGouv:
 
         # On marque tous les points de charge de ces stations comme éligible article 2
         return charge_point_data.merge(stations_art2, on="charge_point_id")[
-            ["charge_point_id", "should_be_article_2", "station_name", "station_id", "nominal_power"]
+            [
+                "charge_point_id",
+                "should_be_article_2",
+                "station_name",
+                "station_id",
+                "nominal_power",
+                "cpo_name",
+                "cpo_siren",
+            ]
         ]
 
 
