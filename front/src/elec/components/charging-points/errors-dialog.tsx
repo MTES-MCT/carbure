@@ -53,7 +53,7 @@ export const ErrorsDetailsDialog = ({
           disabled={true}
         />
 
-        <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
+        <Button icon={Return} label={t("Charger un nouveau fichier")} action={onClose} asideX />
       </footer>
     </Dialog>
   )
@@ -95,7 +95,7 @@ export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
 export function getErrorText(error: ChargingPointsApplicationError) {
   switch (error.error) {
     case "EXCEL_PARSING_FAILED":
-      return t("Le fichier importé n'a pas pu être analysé. Merci de verifier que le format du template a bien été respecté.")
+      return t("Le fichier importé n'a pas pu être analysé. Merci de verifier que le format du modèle de fichier a bien été respecté.")
 
     case "MISSING_CHARGING_POINT_ID":
       return t("L'identifiant du point de recharge n'est pas renseigné")

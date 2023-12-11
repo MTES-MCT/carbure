@@ -3,7 +3,7 @@ import useEntity from "carbure/hooks/entity"
 import Button, { ExternalLink } from "common/components/button"
 import Dialog from "common/components/dialog"
 import { Form, useForm } from "common/components/form"
-import { Check, Return, Upload } from "common/components/icons"
+import { AlertCircle, Check, Return, Upload } from "common/components/icons"
 import { FileInput } from "common/components/input"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
@@ -15,20 +15,22 @@ import { useNavigate } from "react-router-dom"
 import { checkChargingPointsApplication } from "settings/api/elec"
 import ErrorsDetailsDialog from "./errors-dialog"
 import ValidDetailsDialog from "./valid-dialog"
+import Alert from "common/components/alert"
 
 // L'URL complète du fichier
 
 
 type ElecChargingPointsFileUploadProps = {
   onClose: () => void
+  pendingApplicationAlreadyExists: boolean
 }
 
 const ElecChargingPointsFileUpload = ({
   onClose,
+  pendingApplicationAlreadyExists,
 }: ElecChargingPointsFileUploadProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
-  const navigate = useNavigate()
   const entity = useEntity()
   const portal = usePortal()
 
@@ -46,7 +48,6 @@ const ElecChargingPointsFileUpload = ({
 
       const response = (err as AxiosError<{ status: string, error: string, data: ElecChargingPointsApplicationCheckInfo }>).response
       if (response?.status === 400) {
-        onClose()
         const checkedData = response.data.data
         portal((close) => <ErrorsDetailsDialog fileData={checkedData} onClose={close} />)
 
@@ -112,6 +113,13 @@ const ElecChargingPointsFileUpload = ({
               {...bind("chargingPointsFile")}
             />
           </Form>
+          {pendingApplicationAlreadyExists &&
+            (
+              <Alert icon={AlertCircle} variant="warning">
+                <Trans>Vous avez déjà une demande d'inscription en attente. Cete nouvelle demande viendra écraser la précédente.</Trans>
+              </Alert>
+            )}
+
         </section>
       </main>
 

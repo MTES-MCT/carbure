@@ -85,6 +85,8 @@ export interface ElecChargingPointsApplicationCheckInfo {
   file_name: string
   error_count: number
   charging_point_count: number
+  pending_application_already_exists?: boolean
+
 }
 
 export interface ChargingPointsApplicationError {
