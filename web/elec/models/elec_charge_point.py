@@ -33,3 +33,5 @@ class ElecChargePoint(models.Model):
     station_name = models.CharField(max_length=64)
     station_id = models.CharField(max_length=64)
     nominal_power = models.FloatField(null=True, blank=True)
+    cpo_name = models.CharField(max_length=64, null=True, blank=True)
+    cpo_siren = models.CharField(max_length=64, null=True, blank=True)
