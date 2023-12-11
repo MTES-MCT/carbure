@@ -10,17 +10,18 @@ from core.excel import TableParser
 
 class ExcelChargePointError:
     EXCEL_PARSING_FAILED = "EXCEL_PARSING_FAILED"
+    DUPLICATE_CHARGING_POINT = "DUPLICATE_CHARGING_POINT"
     MISSING_CHARGING_POINT_ID = "MISSING_CHARGING_POINT_ID"
     MISSING_CHARGING_POINT_IN_DATAGOUV = "MISSING_CHARGING_POINT_IN_DATAGOUV"
     MISSING_CHARGING_POINT_DATA = "MISSING_CHARGING_POINT_DATA"
     INVALID_CHARGING_POINT_DATA = "INVALID_CHARGING_POINT_DATA"
 
 
-def import_charge_point_excel(excel_file: UploadedFile):
+def import_charge_point_excel(excel_file: UploadedFile, existing_charge_points: list[str]):
     try:
         excel_data, excel_errors = ExcelChargePoints.parse_charge_point_excel(excel_file)
         transport_data = TransportDataGouv.find_charge_point_data(excel_data, 1000)
-        valid_charge_points, validation_errors = ExcelChargePoints.validate_charge_points(excel_data, transport_data)
+        valid_charge_points, validation_errors = ExcelChargePoints.validate_charge_points(excel_data, transport_data, existing_charge_points)  # fmt:skip
         errors = sorted(excel_errors + validation_errors, key=lambda e: e["line"])
         return valid_charge_points, errors
     except:
@@ -75,7 +76,7 @@ class ExcelChargePoints:
         return charge_point_data.to_dict(orient="records"), errors
 
     @staticmethod
-    def validate_charge_points(charge_points: list[dict], transport_data):
+    def validate_charge_points(charge_points: list[dict], transport_data, existing_charge_points):
         valid_charge_points = []
         charge_points_errors = []
 
@@ -90,6 +91,8 @@ class ExcelChargePoints:
 
             if not charge_point_id:
                 errors.append(Error(ExcelChargePointError.MISSING_CHARGING_POINT_ID, line=line))
+            elif charge_point_id in existing_charge_points:
+                errors.append(Error(ExcelChargePointError.DUPLICATE_CHARGING_POINT, line=line, meta=charge_point_id))
             elif charge_point_transport_data is None:
                 errors.append(Error(ExcelChargePointError.MISSING_CHARGING_POINT_IN_DATAGOUV, line=line, meta=charge_point_id))  # fmt:skip
             else:
