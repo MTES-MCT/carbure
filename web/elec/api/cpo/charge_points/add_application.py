@@ -37,8 +37,12 @@ def add_application(request: HttpRequest, entity: Entity):
         return ErrorResponse(400, AddChargePointApplicationError.VALIDATION_FAILED)
 
     with transaction.atomic():
+        replaced_applications = ElecChargePointApplication.objects.filter(
+            cpo=entity, status__in=[ElecChargePointApplication.PENDING, ElecChargePointApplication.REJECTED]
+        )
+
         # delete older pending applications
-        ElecChargePointApplication.objects.filter(cpo=entity, status=ElecChargePointApplication.PENDING).delete()
+        replaced_applications.delete()
 
         application = ElecChargePointApplication(cpo=entity)
         charge_points = [ElecChargePoint(**data, application=application, cpo=entity) for data in charge_point_data]
