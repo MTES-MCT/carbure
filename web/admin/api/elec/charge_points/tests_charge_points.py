@@ -55,6 +55,8 @@ class ElecCharginPointsTest(TestCase):
             station_name="Station",
             station_id="FGHIJ",
             nominal_power=150,
+            cpo_name="",
+            cpo_siren="",
         )
 
         charge_point2 = ElecChargePoint.objects.create(
@@ -70,6 +72,8 @@ class ElecCharginPointsTest(TestCase):
             station_name="Station",
             station_id="FGHIJ",
             nominal_power=40,
+            cpo_name="",
+            cpo_siren="",
         )
 
         response = self.client.get(
@@ -125,6 +129,8 @@ class ElecCharginPointsTest(TestCase):
             station_name="Station",
             station_id="FGHIJ",
             nominal_power=150,
+            cpo_name="Alice",
+            cpo_siren="12345",
         )
 
         charge_point2 = ElecChargePoint.objects.create(
@@ -140,6 +146,8 @@ class ElecCharginPointsTest(TestCase):
             station_name="Station",
             station_id="FGHIJ",
             nominal_power=40,
+            cpo_name="Bob",
+            cpo_siren="67890",
         )
 
         response = self.client.get(
@@ -166,6 +174,8 @@ class ElecCharginPointsTest(TestCase):
                     "station_name": "Station",
                     "station_id": "FGHIJ",
                     "nominal_power": 150,
+                    "cpo_name": "Alice",
+                    "cpo_siren": "12345",
                 },
                 {
                     "id": charge_point2.id,
@@ -183,6 +193,8 @@ class ElecCharginPointsTest(TestCase):
                     "station_name": "Station",
                     "station_id": "FGHIJ",
                     "nominal_power": 40,
+                    "cpo_name": "Bob",
+                    "cpo_siren": "67890",
                 },
             ],
         }
@@ -208,6 +220,8 @@ class ElecCharginPointsTest(TestCase):
             station_name="Station",
             station_id="FGHIJ",
             nominal_power=150,
+            cpo_name="Alice",
+            cpo_siren="12345",
         )
 
         charge_point2 = ElecChargePoint.objects.create(
@@ -223,6 +237,8 @@ class ElecCharginPointsTest(TestCase):
             station_name="Station",
             station_id="FGHIJ",
             nominal_power=40,
+            cpo_name="Bob",
+            cpo_siren="67890",
         )
 
         response = self.client.get(
@@ -249,6 +265,8 @@ class ElecCharginPointsTest(TestCase):
                     "station_name": "Station",
                     "station_id": "FGHIJ",
                     "nominal_power": 150,
+                    "cpo_name": "Alice",
+                    "cpo_siren": "12345",
                 }
             ],
         }
