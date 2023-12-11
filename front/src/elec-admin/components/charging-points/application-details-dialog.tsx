@@ -81,7 +81,7 @@ export const ChargingPointsApplicationDetailsDialog = ({
           </p>
 
           <p>
-            <Button icon={Download} label={t("Exporter les points de charge")} variant="secondary" action={downloadChargingPointsApplication} />
+            <Button icon={Download} label={t("Exporter les points de recharge")} variant="secondary" action={downloadChargingPointsApplication} />
           </p>
           {!entity.isAdmin && application.status === ElecChargingPointsApplicationStatus.Pending && (
             <p><i>

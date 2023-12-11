@@ -11,7 +11,7 @@ import * as apiAdmin from "elec-admin/api"
 import ChargingPointsApplicationDetailsDialog from "elec-admin/components/charging-points/application-details-dialog"
 import ApplicationStatus from "elec/components/charging-points/application-status"
 import ElecChargingPointsFileUpload from "elec/components/charging-points/upload-dialog"
-import { ElecChargingPointsSnapshot, ElecChargingPointsApplication } from "elec/types"
+import { ElecChargingPointsSnapshot, ElecChargingPointsApplication, ElecChargingPointsApplicationStatus } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import * as apiCpo from "../api/elec"
 import { elecChargingPointsApplications } from "elec/__test__/data"
@@ -33,20 +33,23 @@ const ElecSettings = ({ companyId }: { companyId: number }) => {
     params: [entity.id, companyId],
   })
 
-  // const applications = applicationsResponse.result?.data.data ?? []
-  const applications = elecChargingPointsApplications // TEST with applications
+  const applications = applicationsResponse.result?.data.data ?? []
+  // const applications = elecChargingPointsApplications // TEST with applications
+
+  const acceptedApplications = applications.filter(app => app.status === ElecChargingPointsApplicationStatus.Accepted)
 
   const applicationsSnapshot: ElecChargingPointsSnapshot = {
-    station_count: applications.reduce((acc, app) => acc + app.station_count, 0),
-    charging_point_count: applications.reduce((acc, app) => acc + app.charging_point_count, 0),
-    power_total: applications.reduce((acc, app) => acc + app.power_total, 0),
+    station_count: acceptedApplications.reduce((acc, app) => acc + app.station_count, 0),
+    charging_point_count: acceptedApplications.reduce((acc, app) => acc + app.charging_point_count, 0),
+    power_total: acceptedApplications.reduce((acc, app) => acc + app.power_total, 0),
   }
   const isEmpty = applications.length === 0
 
 
   function showUploadDialog() {
+    const pendingApplicationAlreadyExists = applications.filter(app => app.status === ElecChargingPointsApplicationStatus.Pending).length > 0
     portal((resolve) => (
-      <ElecChargingPointsFileUpload onClose={resolve} />
+      <ElecChargingPointsFileUpload onClose={resolve} pendingApplicationAlreadyExists={pendingApplicationAlreadyExists} />
     ))
   }
 
@@ -108,7 +111,7 @@ const ElecSettings = ({ companyId }: { companyId: number }) => {
             <Grid style={{ gridGap: 24 }}>
               <Metric value={formatNumber(Math.round(applicationsSnapshot.power_total))} label={t("Kw cumulés")} />
               <Metric value={applicationsSnapshot.station_count} label={t("Stations")} />
-              <Metric value={applicationsSnapshot.charging_point_count} label={t("Points de charge")} />
+              <Metric value={applicationsSnapshot.charging_point_count} label={t("Points de recharge")} />
             </Grid>
           </section>
           <Table
