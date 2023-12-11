@@ -8,6 +8,14 @@ from django.core.files.uploadedfile import UploadedFile
 from core.excel import TableParser
 
 
+class ExcelChargePointError:
+    EXCEL_PARSING_FAILED = "EXCEL_PARSING_FAILED"
+    MISSING_CHARGING_POINT_ID = "MISSING_CHARGING_POINT_ID"
+    MISSING_CHARGING_POINT_IN_DATAGOUV = "MISSING_CHARGING_POINT_IN_DATAGOUV"
+    MISSING_CHARGING_POINT_DATA = "MISSING_CHARGING_POINT_DATA"
+    INVALID_CHARGING_POINT_DATA = "INVALID_CHARGING_POINT_DATA"
+
+
 def import_charge_point_excel(excel_file: UploadedFile):
     try:
         excel_data, excel_errors = ExcelChargePoints.parse_charge_point_excel(excel_file)
@@ -15,16 +23,9 @@ def import_charge_point_excel(excel_file: UploadedFile):
         valid_charge_points, validation_errors = ExcelChargePoints.validate_charge_points(excel_data, transport_data)
         errors = sorted(excel_errors + validation_errors, key=lambda e: e["line"])
         return valid_charge_points, errors
-    except Exception as e:
+    except:
         traceback.print_exc()
-        return [], [{"error": str(e)}]
-
-
-class ExcelChargePointError:
-    MISSING_CHARGING_POINT_ID = "MISSING_CHARGING_POINT_ID"
-    MISSING_CHARGING_POINT_IN_DATAGOUV = "MISSING_CHARGING_POINT_IN_DATAGOUV"
-    MISSING_CHARGING_POINT_DATA = "MISSING_CHARGING_POINT_DATA"
-    INVALID_CHARGING_POINT_DATA = "INVALID_CHARGING_POINT_DATA"
+        return [], [{"error": ExcelChargePointError.EXCEL_PARSING_FAILED}]
 
 
 class ExcelChargePoints:
