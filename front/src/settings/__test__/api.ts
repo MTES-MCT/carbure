@@ -22,9 +22,36 @@ import {
 } from "carbure/__test__/data"
 import { clone, Data } from "carbure/__test__/helpers"
 import { dcApplicationErrors } from "./data"
+import { elecChargingPointsApplicationCheckResponseFailed, elecChargingPointsApplicationCheckResponseSucceed, elecChargingPointsApplications } from "elec/__test__/data"
 
 let deliverySites: any[] = []
 let productionSites: any[] = []
+
+const mockGetWithResponseData = (url: string, data: any) => {
+  return rest.get(url, (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data,
+      })
+    )
+  })
+}
+const mockPostWithResponseData = (url: string, data?: any, withError: boolean = false) => {
+  return rest.post(url, (req, res, ctx) => {
+    return res(
+      withError ? ctx.status(400) : ctx.status(200),
+      ctx.json({
+        status: withError ? "error" : "success",
+        data,
+      })
+    )
+  })
+}
+
+
+
+
 
 export function setEntity(nextEntity: any) {
   Data.set("entity", nextEntity)
@@ -251,12 +278,70 @@ export const okSelfCertificates = rest.get(
   }
 )
 
-export const okApplications = rest.get(
+export const okDoubleCountApplications = rest.get(
   "/api/v5/double-counting/agreements",
   (req, res, ctx) => {
     return res(ctx.json({ status: "success", data: [] }))
   }
 )
+
+export const okDoubleCountUploadApplication = rest.post(
+  "/api/v3/doublecount/upload",
+  (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data: { dca_id: 142332 },
+      })
+    )
+  }
+)
+
+export const okDoubleCountUploadAgreements = mockGetWithResponseData("/api/v5/double-counting/agreements", [])
+
+
+export const okDoubleCountUploadDocumentation = rest.post(
+  "/api/v3/doublecount/upload-documentation",
+  (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data: { dca_id: 142332 },
+      })
+    )
+  }
+)
+
+export const koDoubleCountUploadApplication = rest.post(
+  "/api/v3/doublecount/upload",
+  (req, res, ctx) => {
+    return res(
+      ctx.status(400),
+      ctx.json({
+        status: "error",
+        error: "DOUBLE_COUNTING_IMPORT_FAILED",
+        data: dcApplicationErrors,
+      })
+    )
+  }
+)
+
+
+export const okChargingPointsApplications = rest.get("/api/v5/elec/cpo/charging-points/applications", (req, res, ctx) => {
+  return res(
+    ctx.json({
+      status: "success",
+      data: elecChargingPointsApplications,
+    })
+  )
+})
+
+export const okChargingPointsApplicationsEmpty = mockGetWithResponseData("/api/v5/elec/cpo/charging-points/applications", [])
+export const okChargingPointsCheckValid = mockPostWithResponseData("/api/v5/elec/cpo/charging-points/check-application", elecChargingPointsApplicationCheckResponseSucceed)
+export const okChargingPointsCheckError = mockPostWithResponseData("/api/v5/elec/cpo/charging-points/check-application", elecChargingPointsApplicationCheckResponseFailed, true)
+export const okChargingPointsAddSuccess = mockPostWithResponseData("/api/v5/elec/cpo/charging-points/add-application")
+
+
 
 
 export default setupServer(
@@ -283,5 +368,9 @@ export default setupServer(
   okErrorsTranslations,
   okFieldsTranslations,
   okSelfCertificates,
-  okApplications
+  okDoubleCountApplications,
+  okDoubleCountUploadAgreements,
+  okChargingPointsApplications,
+  okChargingPointsCheckValid,
+  okChargingPointsAddSuccess
 )

@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path
 
 from .years import get_years
 from .snapshot import get_snapshot
@@ -27,4 +27,5 @@ urlpatterns = [
     path("transfer-certificate-filters", get_transfer_certificate_filters, name="elec-cpo-get-transfer-certificate-filters"),
     path("transfer-certificate-details", get_transfer_certificate_details, name="elec-cpo-get-transfer-certificate-details"),
     path("clients", get_clients, name="elec-cpo-clients"),
+    path("charging-points/", include("elec.api.cpo.charge_points")),
 ]
