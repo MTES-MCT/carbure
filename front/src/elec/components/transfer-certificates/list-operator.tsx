@@ -21,6 +21,7 @@ import Alert from "common/components/alert"
 import { Download, Bolt } from "common/components/icons"
 import { useTranslation } from "react-i18next"
 import HashRoute from "common/components/hash-route"
+import { formatNumber } from "common/utils/formatters"
 
 type OperatorTransferCertificateListProps = {
   snapshot: ElecOperatorSnapshot
@@ -65,7 +66,7 @@ const OperatorTransferCertificateList = ({
     <>
       <Bar>
         <Alert variant="info" icon={Bolt}>
-          {t("{{count}} MWh acquis", { count: snapshot.acquired_energy })}
+          {t("{{acquired_energy}} MWh acquis", { count: snapshot.acquired_energy, acquired_energy: formatNumber(snapshot.acquired_energy, 3) })}
         </Alert>
       </Bar>
 
