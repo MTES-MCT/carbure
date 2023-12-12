@@ -1,4 +1,4 @@
-# /api/v5/saf/airline/tickets/filters
+# /api/saf/airline/tickets/filters
 
 import traceback
 from core.common import SuccessResponse, ErrorResponse

@@ -1,4 +1,4 @@
-# /api/v5/stats/entity
+# /api/stats/entity
 import traceback
 import datetime
 from core.common import SuccessResponse, ErrorResponse

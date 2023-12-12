@@ -1,4 +1,4 @@
-# /api/v5/saf/operator/years
+# /api/saf/operator/years
 
 import traceback
 from django.db.models import Q

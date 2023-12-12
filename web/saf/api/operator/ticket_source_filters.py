@@ -1,4 +1,4 @@
-# /api/v5/saf/operator/ticket-sources/filters
+# /api/saf/operator/ticket-sources/filters
 
 import traceback
 from django.db.models.functions import Coalesce

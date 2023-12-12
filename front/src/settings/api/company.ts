@@ -2,21 +2,21 @@ import { Unit } from "carbure/types"
 import { api } from "common/services/api"
 
 export function toggleMAC(entity_id: number, shouldEnable: boolean) {
-  const endpoint = "/v5/entity/options/release-for-consumption"
+  const endpoint = "/entity/options/release-for-consumption"
   return api.post(endpoint, { entity_id, has_mac: shouldEnable })
 }
 
 export function toggleTrading(entity_id: number, shouldEnable: boolean) {
-  const endpoint = "/v5/entity/options/trading"
+  const endpoint = "/entity/options/trading"
   return api.post(endpoint, { entity_id, has_trading: shouldEnable })
 }
 export function toggleElec(entity_id: number, shouldEnable: boolean) {
-  const endpoint = "/v5/entity/options/elec"
+  const endpoint = "/entity/options/elec"
   return api.post(endpoint, { entity_id, has_elec: shouldEnable })
 }
 
 export function toggleStocks(entity_id: number, shouldEnable: boolean) {
-  const endpoint = "/v5/entity/options/stocks"
+  const endpoint = "/entity/options/stocks"
   return api.post(endpoint, { entity_id, has_stocks: shouldEnable })
 }
 
@@ -24,7 +24,7 @@ export function toggleDirectDeliveries(
   entity_id: number,
   shouldEnable: boolean
 ) {
-  const endpoint = "/v5/entity/options/direct-deliveries"
+  const endpoint = "/entity/options/direct-deliveries"
   return api.post(endpoint, { entity_id, has_direct_deliveries: shouldEnable })
 }
 
@@ -39,7 +39,7 @@ export function updateEntity(
   sustainability_officer: string,
   sustainability_officer_phone_number: string
 ) {
-  return api.post("/v5/entity/update-info", {
+  return api.post("/entity/update-info", {
     entity_id,
     legal_name,
     registration_id,
@@ -53,5 +53,5 @@ export function updateEntity(
 }
 
 export function setEntityPreferredUnit(entity_id: number, unit: Unit) {
-  return api.post("/v5/entity/options/unit", { entity_id, unit })
+  return api.post("/entity/options/unit", { entity_id, unit })
 }

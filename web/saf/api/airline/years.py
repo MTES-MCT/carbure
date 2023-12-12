@@ -1,4 +1,4 @@
-# /api/v5/saf/airline/years
+# /api/saf/airline/years
 
 import traceback
 from core.common import SuccessResponse, ErrorResponse

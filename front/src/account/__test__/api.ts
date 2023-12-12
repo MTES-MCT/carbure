@@ -21,7 +21,7 @@ export function setAccessRequests(entities: any[]) {
   }))
 }
 
-export const okSettings = rest.get("/api/v5/user", (req, res, ctx) => {
+export const okSettings = rest.get("/api/user", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -35,7 +35,7 @@ export const okSettings = rest.get("/api/v5/user", (req, res, ctx) => {
 })
 
 export const okAccessRequest = rest.post(
-  "/api/v5/user/request-access",
+  "/api/user/request-access",
   (req, res, ctx) => {
     setAccessRequests([trader])
     return res(ctx.json({ status: "success" }))

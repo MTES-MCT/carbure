@@ -1,4 +1,4 @@
-# /api/v5/saf/airline/snapshot
+# /api/saf/airline/snapshot
 
 import traceback
 from core.common import SuccessResponse, ErrorResponse

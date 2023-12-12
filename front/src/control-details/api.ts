@@ -4,13 +4,13 @@ import { LotDetails, StockDetails } from "transaction-details/types"
 
 const admin = {
   getLotDetails(entity_id: number, lot_id: number) {
-    return api.get<Api<LotDetails>>("/v5/admin/controls/lots/details", {
+    return api.get<Api<LotDetails>>("/admin/controls/lots/details", {
       params: { entity_id, lot_id },
     })
   },
 
   getStockDetails(entity_id: number, stock_id: number) {
-    return api.get<Api<StockDetails>>("/v5/admin/controls/stocks/details", {
+    return api.get<Api<StockDetails>>("/admin/controls/stocks/details", {
       params: { entity_id, stock_id },
     })
   },
@@ -21,7 +21,7 @@ const admin = {
     errors: string[],
     checked: boolean
   ) {
-    return api.post("/v5/admin/controls/lots/toggle-warning", {
+    return api.post("/admin/controls/lots/toggle-warning", {
       entity_id,
       lot_id,
       errors,
@@ -32,13 +32,13 @@ const admin = {
 
 const auditor = {
   getLotDetails(entity_id: number, lot_id: number) {
-    return api.get<Api<LotDetails>>("/v5/audit/lots/details", {
+    return api.get<Api<LotDetails>>("/audit/lots/details", {
       params: { entity_id, lot_id },
     })
   },
 
   getStockDetails(entity_id: number, stock_id: number) {
-    return api.get<Api<StockDetails>>("/v5/audit/stocks/details", {
+    return api.get<Api<StockDetails>>("/audit/stocks/details", {
       params: { entity_id, stock_id },
     })
   },
@@ -49,7 +49,7 @@ const auditor = {
     errors: string[],
     checked: boolean
   ) {
-    return api.post("/v5/audit/lots/toggle-warning", {
+    return api.post("/audit/lots/toggle-warning", {
       entity_id,
       lot_id,
       errors,

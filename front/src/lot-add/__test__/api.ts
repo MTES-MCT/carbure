@@ -11,7 +11,7 @@ import {
 } from "carbure/__test__/api"
 import { lot } from "transaction-details/__test__/data"
 
-export const okAddLot = rest.post("/api/v5/transactions/lots/add", (req, res, ctx) => {
+export const okAddLot = rest.post("/api/transactions/lots/add", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",

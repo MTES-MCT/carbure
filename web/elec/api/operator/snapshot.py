@@ -1,4 +1,4 @@
-# /api/v5/elec/provision-certificate/snapshot
+# /api/elec/provision-certificate/snapshot
 
 import traceback
 

@@ -20,25 +20,25 @@ const QUERY_RESET: Partial<LotQuery> = {
 }
 
 export function getYears(entity_id: number) {
-  return api.get<Api<number[]>>("/v5/admin/controls/years", { params: { entity_id } })
+  return api.get<Api<number[]>>("/admin/controls/years", { params: { entity_id } })
 }
 
 export function getSnapshot(entity_id: number, year: number) {
-  return api.get<Api<Snapshot>>("/v5/admin/controls/snapshot", {
+  return api.get<Api<Snapshot>>("/admin/controls/snapshot", {
     params: { entity_id, year },
   })
 }
 
 export function getLots(query: LotQuery) {
-  return api.get<Api<LotList>>("/v5/admin/controls/lots", { params: query })
+  return api.get<Api<LotList>>("/admin/controls/lots", { params: query })
 }
 
 export function getStocks(query: StockQuery) {
-  return api.get<Api<StockList>>("/v5/admin/controls/stocks", { params: query })
+  return api.get<Api<StockList>>("/admin/controls/stocks", { params: query })
 }
 
 export function downloadLots(query: LotQuery, selection: number[]) {
-  return download("/v5/admin/controls/lots", {
+  return download("/admin/controls/lots", {
     ...selectionOrQuery(
       { ...query, from_idx: undefined, limit: undefined },
       selection
@@ -52,7 +52,7 @@ export function getLotsSummary(
   selection: number[],
   short?: boolean
 ) {
-  return api.get<Api<LotSummary>>("/v5/admin/controls/lots/summary", {
+  return api.get<Api<LotSummary>>("/admin/controls/lots/summary", {
     params: { ...query, selection, ...QUERY_RESET, short },
   })
 }
@@ -62,7 +62,7 @@ export function getStocksSummary(
   selection: number[],
   short?: boolean
 ) {
-  return api.get<Api<StockSummary>>("/v5/admin/controls/stocks/summary", {
+  return api.get<Api<StockSummary>>("/admin/controls/stocks/summary", {
     params: { ...query, selection, ...QUERY_RESET, short },
   })
 }
@@ -70,14 +70,14 @@ export function getStocksSummary(
 export function getLotFilters(field: Filter, query: LotQuery) {
   const params = { field, ...query, ...QUERY_RESET }
   return api
-    .get<Api<string[]>>("/v5/admin/controls/lots/filters", { params })
+    .get<Api<string[]>>("/admin/controls/lots/filters", { params })
     .then((res) => res.data.data ?? [])
 }
 
 export function getStockFilters(field: Filter, query: StockQuery) {
   const params = { field, ...query, ...QUERY_RESET }
   return api
-    .get<Api<Option[]>>("/v5/admin/controls/stocks/filters", { params })
+    .get<Api<Option[]>>("/admin/controls/stocks/filters", { params })
     .then((res) => res.data.data ?? [])
 }
 
@@ -87,7 +87,7 @@ export function pinLots(
   notify_admin?: boolean,
   notify_auditor?: boolean
 ) {
-  return api.post("/v5/admin/controls/lots/pin", {
+  return api.post("/admin/controls/lots/pin", {
     entity_id,
     selection,
     notify_admin,
@@ -104,7 +104,7 @@ export async function commentLots(
 ) {
   if (!comment) return
 
-  return api.post<Api<void>>("/v5/admin/controls/lots/comment", {
+  return api.post<Api<void>>("/admin/controls/lots/comment", {
     entity_id: query.entity_id,
     selection,
     is_visible_by_admin,
@@ -120,7 +120,7 @@ export function updateLots(
   comment: string,
   dry_run?: boolean
 ) {
-  return api.post<Api<LotsUpdateResponse>>("/v5/admin/controls/lots/update-many", {
+  return api.post<Api<LotsUpdateResponse>>("/admin/controls/lots/update-many", {
     entity_id,
     lots_ids,
     comment,
@@ -135,7 +135,7 @@ export function deleteLots(
   comment: string,
   dry_run?: boolean
 ) {
-  return api.post<Api<LotsDeleteResponse>>("/v5/admin/controls/lots/delete-many", {
+  return api.post<Api<LotsDeleteResponse>>("/admin/controls/lots/delete-many", {
     entity_id,
     lots_ids,
     comment,

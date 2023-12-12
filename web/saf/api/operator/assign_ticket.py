@@ -1,4 +1,4 @@
-# /api/v5/saf/operator/assign-ticket
+# /api/saf/operator/assign-ticket
 
 import traceback
 from django.db import transaction
@@ -52,7 +52,7 @@ def assign_ticket(request, *args, **kwargs):
                 agreement_date=agreement_date,
                 agreement_reference=agreement_reference,
                 assignment_period=assignment_period,
-                free_field=free_field
+                free_field=free_field,
             )
 
             CarbureNotification.objects.create(

@@ -4,7 +4,7 @@ import { Filter } from "transactions/types"
 import { DashboardDeclaration } from "./types"
 
 export function getDeclarations(period: string) {
-  return api.get<Api<DashboardDeclaration[]>>("v5/admin/dashboard/declarations", {
+  return api.get<Api<DashboardDeclaration[]>>("admin/dashboard/declarations", {
     params: { period },
   })
 }

@@ -1,4 +1,4 @@
-# /api/v5/saf/airline/tickets
+# /api/saf/airline/tickets
 
 from math import floor
 import traceback

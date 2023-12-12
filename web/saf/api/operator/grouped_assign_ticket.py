@@ -1,4 +1,4 @@
-# /api/v5/saf/operator/assign-ticket
+# /api/saf/operator/assign-ticket
 
 import traceback
 from django.db import transaction

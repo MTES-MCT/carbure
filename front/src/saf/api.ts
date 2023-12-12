@@ -22,13 +22,13 @@ const QUERY_RESET: Partial<SafQuery> = {
 //AIRLINE
 
 export function getAirlineYears(entity_id: number) {
-  return api.get<Api<number[]>>("/v5/saf/airline/years", {
+  return api.get<Api<number[]>>("/saf/airline/years", {
     params: { entity_id },
   })
 }
 
 export function getAirlineSnapshot(entity_id: number, year: number) {
-  return api.get<Api<SafClientSnapshot>>("/v5/saf/airline/snapshot", {
+  return api.get<Api<SafClientSnapshot>>("/saf/airline/snapshot", {
     params: { entity_id, year },
   })
 }
@@ -36,22 +36,22 @@ export function getAirlineSnapshot(entity_id: number, year: number) {
 export function getAirlineTicketFilters(field: SafFilter, query: SafQuery) {
   const params = { filter: field, ...query, ...QUERY_RESET }
   return api
-    .get<Api<string[]>>("/v5/saf/airline/tickets/filters", { params })
+    .get<Api<string[]>>("/saf/airline/tickets/filters", { params })
     .then((res) => res.data.data ?? [])
 }
 
 export function getSafAirlineTickets(query: SafQuery) {
-  return api.get<Api<SafTicketsResponse>>("/v5/saf/airline/tickets", {
+  return api.get<Api<SafTicketsResponse>>("/saf/airline/tickets", {
     params: query,
   })
 }
 
 export function downloadSafAirlineTickets(query: SafQuery) {
-  return download("/v5/saf/airline/tickets", { ...query, export: true })
+  return download("/saf/airline/tickets", { ...query, export: true })
 }
 
 export function getAirlineTicketDetails(entity_id: number, ticket_id: number) {
-  return api.get<Api<SafTicketDetails>>("/v5/saf/airline/tickets/details", {
+  return api.get<Api<SafTicketDetails>>("/saf/airline/tickets/details", {
     params: { entity_id, ticket_id },
   })
 }
@@ -59,12 +59,12 @@ export function getAirlineTicketDetails(entity_id: number, ticket_id: number) {
 //OPERATOR
 
 export function getOperatorYears(entity_id: number) {
-  return api.get<Api<number[]>>("/v5/saf/operator/years", {
+  return api.get<Api<number[]>>("/saf/operator/years", {
     params: { entity_id },
   })
 }
 export function getOperatorSnapshot(entity_id: number, year: number) {
-  return api.get<Api<SafOperatorSnapshot>>("/v5/saf/operator/snapshot", {
+  return api.get<Api<SafOperatorSnapshot>>("/saf/operator/snapshot", {
     params: { entity_id, year },
   })
 }
@@ -78,19 +78,19 @@ export function getTicketSourceFilters(field: SafFilter, query: SafQuery) {
   // })
 
   return api
-    .get<Api<string[]>>("/v5/saf/operator/ticket-sources/filters", { params })
+    .get<Api<string[]>>("/saf/operator/ticket-sources/filters", { params })
     .then((res) => res.data.data ?? [])
 }
 
 export function getOperatorTicketSources(query: SafQuery) {
   return api.get<Api<SafTicketSourcesResponse>>(
-    "/v5/saf/operator/ticket-sources",
+    "/saf/operator/ticket-sources",
     { params: query }
   )
 }
 
 export function downloadOperatorTicketSources(query: SafQuery) {
-  return download("/v5/saf/operator/ticket-sources", { ...query, export: true })
+  return download("/saf/operator/ticket-sources", { ...query, export: true })
 }
 
 export function getOperatorTicketSourceDetails(
@@ -98,7 +98,7 @@ export function getOperatorTicketSourceDetails(
   ticket_source_id: number
 ) {
   return api.get<Api<SafTicketSourceDetails>>(
-    "/v5/saf/operator/ticket-sources/details",
+    "/saf/operator/ticket-sources/details",
     {
       params: { ticket_source_id, entity_id },
     }
@@ -108,22 +108,22 @@ export function getOperatorTicketSourceDetails(
 export function getOperatorTicketFilters(field: SafFilter, query: SafQuery) {
   const params = { filter: field, ...query, ...QUERY_RESET }
   return api
-    .get<Api<string[]>>("/v5/saf/operator/tickets/filters", { params })
+    .get<Api<string[]>>("/saf/operator/tickets/filters", { params })
     .then((res) => res.data.data ?? [])
 }
 
 export function getOperatorTickets(query: SafQuery) {
-  return api.get<Api<SafTicketsResponse>>("/v5/saf/operator/tickets", {
+  return api.get<Api<SafTicketsResponse>>("/saf/operator/tickets", {
     params: query,
   })
 }
 
 export function downloadOperatorTickets(query: SafQuery) {
-  return download("/v5/saf/operator/tickets", { ...query, export: true })
+  return download("/saf/operator/tickets", { ...query, export: true })
 }
 
 export function getOperatorTicketDetails(entity_id: number, ticket_id: number) {
-  return api.get<Api<SafTicketDetails>>("/v5/saf/operator/tickets/details", {
+  return api.get<Api<SafTicketDetails>>("/saf/operator/tickets/details", {
     params: { entity_id, ticket_id },
   })
 }
@@ -136,7 +136,7 @@ export function assignSafTicket(
   client: EntityPreview,
   free_field?: string
 ) {
-  return api.post("/v5/saf/operator/assign-ticket", {
+  return api.post("/saf/operator/assign-ticket", {
     entity_id,
     ticket_source_id,
     assignment_period,
@@ -156,7 +156,7 @@ export function groupedAssignSafTicket(
   free_field?: string
 ) {
   return api.post<Api<{ assigned_tickets_count: number }>>(
-    "/v5/saf/operator/grouped-assign-ticket",
+    "/saf/operator/grouped-assign-ticket",
     {
       entity_id,
       ticket_sources_ids,
@@ -170,7 +170,7 @@ export function groupedAssignSafTicket(
 }
 
 export function cancelSafTicket(entity_id: number, ticket_id: number) {
-  return api.post("/v5/saf/operator/cancel-ticket", {
+  return api.post("/saf/operator/cancel-ticket", {
     entity_id,
     ticket_id,
   })
@@ -181,7 +181,7 @@ export function rejectSafAirlineTicket(
   ticket_id: number,
   comment: string
 ) {
-  return api.post("/v5/saf/airline/reject-ticket", {
+  return api.post("/saf/airline/reject-ticket", {
     entity_id,
     comment,
     ticket_id,
@@ -193,7 +193,7 @@ export function rejectSafOperatorTicket(
   ticket_id: number,
   comment: string
 ) {
-  return api.post("/v5/saf/operator/reject-ticket", {
+  return api.post("/saf/operator/reject-ticket", {
     entity_id,
     comment,
     ticket_id,
@@ -201,14 +201,14 @@ export function rejectSafOperatorTicket(
 }
 
 export function creditSafTicketSource(entity_id: number, ticket_id: number) {
-  return api.post("/v5/saf/operator/credit-ticket-source", {
+  return api.post("/saf/operator/credit-ticket-source", {
     entity_id,
     ticket_id,
   })
 }
 
 export function acceptSafTicket(entity_id: number, ticket_id: number) {
-  return api.post("/v5/saf/airline/accept-ticket", {
+  return api.post("/saf/airline/accept-ticket", {
     entity_id,
     ticket_id,
   })
@@ -216,7 +216,7 @@ export function acceptSafTicket(entity_id: number, ticket_id: number) {
 
 export async function findClients(entity_id: number, query?: string) {
   return api
-    .get<Api<EntityPreview[]>>("/v5/saf/operator/clients", {
+    .get<Api<EntityPreview[]>>("/saf/operator/clients", {
       params: { entity_id, query },
     })
     .then(extract)

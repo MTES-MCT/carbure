@@ -11,7 +11,7 @@ export const ApplicationDownloadButton = ({ application }: { application: Double
 
   const excelURL =
     application &&
-    `/api/v5/admin/double-counting/applications/details?entity_id=${entity.id}&dca_id=${application.id}&export=true`
+    `/api/admin/double-counting/applications/details?entity_id=${entity.id}&dca_id=${application.id}&export=true`
   return <Col style={{ gap: "var(--spacing-xs)", marginRight: "auto" }}>
     <DownloadLink
       href={excelURL ?? "#"}

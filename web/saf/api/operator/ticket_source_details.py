@@ -1,4 +1,4 @@
-# /api/v5/saf/operator/ticket-sources/details
+# /api/saf/operator/ticket-sources/details
 
 import traceback
 
