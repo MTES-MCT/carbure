@@ -121,7 +121,7 @@ function ElecTabs({
         fontWeight: "normal"
       }}>
 
-        {loading ? <Loader size={20} /> : formatNumber(snapshot?.remaining_energy)} MWh
+        {loading ? <Loader size={20} /> : formatNumber(snapshot?.remaining_energy, 3)} MWh
       </p>
       <strong>
         {t("Énergie disponible")}
@@ -135,7 +135,7 @@ function ElecTabs({
       <p style={{
         fontWeight: "normal"
       }}>
-        {loading ? <Loader size={20} /> : formatNumber(snapshot?.transferred_energy)} MWh
+        {loading ? <Loader size={20} /> : formatNumber(snapshot?.transferred_energy, 3)} MWh
       </p>
       <strong>
         {t("Énergie cédée")}

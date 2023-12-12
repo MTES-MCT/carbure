@@ -21,17 +21,8 @@ def import_provision_certificate_excel(request):
     if file is None:
         return ErrorResponse(400, CertificateImportError.MISSING_FILE, "Missing File")
 
-    # Read CSV and insert data into SQL database
     try:
-        filename = "/tmp/transfer_certificates.csv"
-        with open(filename, "wb+") as destination:
-            for chunk in file.chunks():
-                destination.write(chunk)
-    except:
-        return ErrorResponse(400, CertificateImportError.CSV_WRITE_ERROR)
-
-    try:
-        certificate_df = pd.read_csv(filename)
+        certificate_df = pd.read_csv(file, sep=";", decimal=",")
     except:
         return ErrorResponse(400, CertificateImportError.CSV_PARSE_ERROR)
 

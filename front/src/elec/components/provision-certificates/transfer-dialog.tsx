@@ -175,7 +175,7 @@ export const EnergyInput = ({
             required
             label={t("Volume ({{quantity}} MWh restants)", {
                 count: remainingEnergy,
-                quantity: formatNumber(remainingEnergy),
+                quantity: formatNumber(remainingEnergy, 3),
             })}
             style={{ flex: 1 }}
             max={remainingEnergy}
