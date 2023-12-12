@@ -20,7 +20,7 @@ export const EnergyTransferSummary = ({
     const notify = useNotify()
 
     const onEnergyTransferred = (volume: number, clientName: string) => {
-        notify(t("{{volume}} MWh ont bien été transférés au redevable {{clientName}}", { volume: formatNumber(volume), clientName }), { variant: "success" })
+        notify(t("{{volume}} MWh ont bien été transférés au redevable {{clientName}}", { volume: formatNumber(volume, 3), clientName }), { variant: "success" })
     }
 
     const showEnergyTransferModal = () => {
@@ -35,7 +35,7 @@ export const EnergyTransferSummary = ({
                 {t(
                     "{{remainingVolume}} MWh restants",
                     {
-                        remainingVolume: formatNumber(remainingVolume),
+                        remainingVolume: formatNumber(remainingVolume, 3),
                     }
                 )}
             </p>

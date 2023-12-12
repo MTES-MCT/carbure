@@ -78,7 +78,7 @@ export function useColumns() {
       cell: (provisionCertificate: ElecProvisionCertificatePreview) => {
         return (
           <Cell
-            text={"+ " + formatNumber(provisionCertificate.energy_amount)}
+            text={"+ " + formatNumber(provisionCertificate.energy_amount, 3)}
           />
         )
       },
