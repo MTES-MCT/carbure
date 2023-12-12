@@ -118,15 +118,6 @@ export function getDoubleCountingAgreement(entity_id: number, agreement_id: numb
   )
 }
 
-export function getQuotaDetails(year: number, production_site_id: number) {
-  return api.get<Api<QuotaDetails[]>>("/v3/doublecount/admin/quotas", {
-    params: { year, production_site_id },
-  })
-}
-
-export function uploadDoubleCountingDecision(dca_id: number, file: File) {
-  return api.post("/v3/doublecount/admin/upload-decision", { file })
-}
 
 export function checkDoubleCountingFiles(entity_id: number, files: FileList) {
   const res = api.post<Api<CheckDoubleCountingFilesResponse>>(
