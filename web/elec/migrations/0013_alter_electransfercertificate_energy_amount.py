@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("elec", "0008_alter_elecprovisioncertificate_energy_amount_and_more"),
+        ("elec", "0012_elecchargepoint_cpo_name_elecchargepoint_cpo_siren"),
     ]
 
     operations = [

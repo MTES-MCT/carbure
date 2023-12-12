@@ -180,7 +180,7 @@ export const EnergyInput = ({
             style={{ flex: 1 }}
             max={remainingEnergy}
             min={0}
-            step={0.01}
+            step={0.001}
             type="number"
             {...props}
             rightContent={
