@@ -6,7 +6,7 @@ interface EntityStatsResponse {
 
 export function getEntityStats(entity_id: number) {
   return api
-    .get<Api<EntityStatsResponse>>("/v5/entity/stats", {
+    .get<Api<EntityStatsResponse>>("/entity/stats", {
       params: { entity_id },
     })
     .then((res) => res.data.data)

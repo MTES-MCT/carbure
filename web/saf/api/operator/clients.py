@@ -1,4 +1,4 @@
-# /api/v5/saf/operator/clients
+# /api/saf/operator/clients
 
 import traceback
 
@@ -17,18 +17,17 @@ class SafClientsError:
 @login_required
 def get_clients(request, *args, **kwargs):
     try:
-        entity_id = request.GET.get('entity_id', False)
+        entity_id = request.GET.get("entity_id", False)
         q = request.GET.get("query", False)
         is_airline = Q(entity_type=Entity.AIRLINE)
         is_saf_operator = Q(entity_type=Entity.OPERATOR, has_saf=True)
         entities = Entity.objects.filter(is_airline | is_saf_operator).order_by("name")
-        
 
     except:
         traceback.print_exc()
         return ErrorResponse(400, SafClientsError.MALFORMED_PARAMS)
 
-    if entity_id :
+    if entity_id:
         entities = entities.exclude(id=entity_id)
 
     if q:

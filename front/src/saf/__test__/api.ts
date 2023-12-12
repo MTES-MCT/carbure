@@ -8,7 +8,7 @@ import {
 } from "settings/__test__/api"
 import * as data from "./data"
 
-export const okYears = rest.get("/api/v5/saf/operator/years", (req, res, ctx) => {
+export const okYears = rest.get("/api/saf/operator/years", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -17,7 +17,7 @@ export const okYears = rest.get("/api/v5/saf/operator/years", (req, res, ctx) =>
   )
 })
 
-export const okSnapshot = rest.get("/api/v5/saf/operator/snapshot", (req, res, ctx) => {
+export const okSnapshot = rest.get("/api/saf/operator/snapshot", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -26,7 +26,7 @@ export const okSnapshot = rest.get("/api/v5/saf/operator/snapshot", (req, res, c
   )
 })
 
-export const okFilter = rest.get("/api/v5/saf/operator/ticket-sources/filters", (req, res, ctx) => {
+export const okFilter = rest.get("/api/saf/operator/ticket-sources/filters", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -35,7 +35,7 @@ export const okFilter = rest.get("/api/v5/saf/operator/ticket-sources/filters", 
   )
 })
 
-export const okSafTicketSources = rest.get("/api/v5/saf/operator/ticket-sources", (req, res, ctx) => {
+export const okSafTicketSources = rest.get("/api/saf/operator/ticket-sources", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -44,7 +44,7 @@ export const okSafTicketSources = rest.get("/api/v5/saf/operator/ticket-sources"
   )
 })
 
-export const okSafTickets = rest.get("/api/v5/saf/operator/tickets", (req, res, ctx) => {
+export const okSafTickets = rest.get("/api/saf/operator/tickets", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",

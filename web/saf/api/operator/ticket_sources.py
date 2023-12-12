@@ -1,4 +1,4 @@
-# /api/v5/saf/operator/ticket-sources
+# /api/saf/operator/ticket-sources
 
 from math import floor
 import traceback

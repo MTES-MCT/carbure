@@ -6,27 +6,27 @@ export function register(
   password1: string,
   password2: string
 ) {
-  return api.post("/v5/auth/register", { email, name, password1, password2 })
+  return api.post("/auth/register", { email, name, password1, password2 })
 }
 
 export function login(username: string, password: string) {
-  return api.post("v5/auth/login", { username, password })
+  return api.post("auth/login", { username, password })
 }
 
 export function logout() {
-  return api.post("v5/auth/logout")
+  return api.post("auth/logout")
 }
 
 export function requestOTP() {
-  return api.post("v5/auth/request-otp")
+  return api.post("auth/request-otp")
 }
 
 export function verifyOTP(otp_token: string) {
-  return api.post("v5/auth/verify-otp", { otp_token })
+  return api.post("auth/verify-otp", { otp_token })
 }
 
 export function requestResetPassword(username: string) {
-  return api.post("v5/auth/request-password-reset", { username })
+  return api.post("auth/request-password-reset", { username })
 }
 
 export function resetPassword(
@@ -39,7 +39,7 @@ export function resetPassword(
     throw new Error("Missing token for password reset")
   }
 
-  return api.post("v5/auth/reset-password", {
+  return api.post("auth/reset-password", {
     uidb64,
     token,
     password1,
@@ -48,7 +48,7 @@ export function resetPassword(
 }
 
 export function requestActivateAccount(email: string) {
-  return api.post("v5/auth/request-activation-link", { email })
+  return api.post("auth/request-activation-link", { email })
 }
 
 export function activateAccount(
@@ -59,5 +59,5 @@ export function activateAccount(
     throw new Error("Missing token for account activation")
   }
 
-  return api.post("v5/auth/activate", { uidb64, token })
+  return api.post("auth/activate", { uidb64, token })
 }

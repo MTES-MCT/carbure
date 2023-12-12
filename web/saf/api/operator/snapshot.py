@@ -1,4 +1,4 @@
-# /api/v5/saf/operator/snapshot
+# /api/saf/operator/snapshot
 
 import traceback
 from django.db.models.expressions import F

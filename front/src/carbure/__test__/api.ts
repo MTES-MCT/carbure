@@ -16,7 +16,7 @@ import {
   productionSite,
 } from "./data"
 
-export const okStats = rest.get("/api/v5/home-stats", (req, res, ctx) => {
+export const okStats = rest.get("/api/home-stats", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -33,7 +33,7 @@ export const okStats = rest.get("/api/v5/home-stats", (req, res, ctx) => {
 })
 
 export const okNotifications = rest.get(
-  "/api/v5/entity/notifications",
+  "/api/entity/notifications",
   (req, res, ctx) => {
     return res(
       ctx.json({
@@ -45,7 +45,7 @@ export const okNotifications = rest.get(
 )
 
 export const okEntitySearch = rest.get(
-  "/api/v5/resources/entities",
+  "/api/resources/entities",
   (req, res, ctx) => {
     return res(
       ctx.json({
@@ -57,7 +57,7 @@ export const okEntitySearch = rest.get(
 )
 
 export const okCountrySearch = rest.get(
-  "/api/v5/resources/countries",
+  "/api/resources/countries",
   (req, res, ctx) => {
     return res(
       ctx.json({
@@ -69,7 +69,7 @@ export const okCountrySearch = rest.get(
 )
 
 export const okBiocarburantsSearch = rest.get(
-  "/api/v5/resources/biofuels",
+  "/api/resources/biofuels",
   (req, res, ctx) => {
     return res(
       ctx.json({
@@ -81,7 +81,7 @@ export const okBiocarburantsSearch = rest.get(
 )
 
 export const okMatierePremiereSearch = rest.get(
-  "/api/v5/resources/feedstocks",
+  "/api/resources/feedstocks",
   (req, res, ctx) => {
     return res(
       ctx.json({
@@ -93,7 +93,7 @@ export const okMatierePremiereSearch = rest.get(
 )
 
 export const okProductionSitesSearch = rest.get(
-  "/api/v5/resources/production-sites",
+  "/api/resources/production-sites",
   (req, res, ctx) => {
     return res(
       ctx.json({
@@ -105,7 +105,7 @@ export const okProductionSitesSearch = rest.get(
 )
 
 export const okDeliverySitesSearch = rest.get(
-  "/api/v5/resources/depots",
+  "/api/resources/depots",
   (req, res, ctx) => {
     return res(
       ctx.json({

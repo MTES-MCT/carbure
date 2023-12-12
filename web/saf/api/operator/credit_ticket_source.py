@@ -1,4 +1,4 @@
-# /api/v5/saf/airline/accept-ticket
+# /api/saf/airline/accept-ticket
 
 import traceback
 from django.db import transaction

@@ -3,7 +3,7 @@ import { GESOption, ProductionSiteDetails } from "carbure/types"
 
 export function getProductionSites(entity_id: number) {
   return api.get<Api<ProductionSiteDetails[]>>(
-    "/v5/entity/production-sites",
+    "/entity/production-sites",
     { params: { entity_id } }
   )
 }
@@ -25,7 +25,7 @@ export function addProductionSite(
   manager_email: string
 ) {
   return api.post<Api<ProductionSiteDetails>>(
-    "/v5/entity/production-sites/add",
+    "/entity/production-sites/add",
     {
       entity_id,
       name: name,
@@ -63,7 +63,7 @@ export function updateProductionSite(
   manager_email: string
 ) {
 
-  return api.post("/v5/entity/production-sites/update", {
+  return api.post("/entity/production-sites/update", {
     entity_id,
     production_site_id,
     name,
@@ -86,7 +86,7 @@ export function deleteProductionSite(
   entity_id: number | undefined,
   production_site_id: number
 ) {
-  return api.post("/v5/entity/production-sites/delete", {
+  return api.post("/entity/production-sites/delete", {
     entity_id,
     production_site_id,
   })
@@ -97,7 +97,7 @@ export function setProductionSiteFeedstock(
   production_site_id: number,
   matiere_premiere_codes: string[]
 ) {
-  return api.post("/v5/entity/production-sites/set-feedstocks", {
+  return api.post("/entity/production-sites/set-feedstocks", {
     entity_id,
     production_site_id,
     matiere_premiere_codes,
@@ -109,7 +109,7 @@ export function setProductionSiteBiofuel(
   production_site_id: number,
   biocarburant_codes: string[]
 ) {
-  return api.post("/v5/entity/production-sites/set-biofuels", {
+  return api.post("/entity/production-sites/set-biofuels", {
     entity_id: entity_id,
     production_site_id,
     biocarburant_codes,
@@ -121,7 +121,7 @@ export function setProductionSiteCertificates(
   production_site_id: number,
   certificate_ids: string[]
 ) {
-  return api.post("/v5/entity/production-sites/set-certificates", {
+  return api.post("/entity/production-sites/set-certificates", {
     entity_id,
     production_site_id,
     certificate_ids,

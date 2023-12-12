@@ -69,7 +69,7 @@ export function setProductionSites(nextProductionSites: any[]) {
   productionSites = clone(nextProductionSites)
 }
 
-export const okSettings = rest.get("/api/v5/user", (req, res, ctx) => {
+export const okSettings = rest.get("/api/user", (req, res, ctx) => {
   const entity = Data.get("entity")
   return res(
     ctx.json({
@@ -89,7 +89,7 @@ export const okSettings = rest.get("/api/v5/user", (req, res, ctx) => {
   )
 })
 
-export const okEmptySettings = rest.get("/api/v5/user", (req, res, ctx) => {
+export const okEmptySettings = rest.get("/api/user", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -102,7 +102,7 @@ export const okEmptySettings = rest.get("/api/v5/user", (req, res, ctx) => {
   )
 })
 
-export const okDynamicSettings = rest.get("/api/v5/user", (req, res, ctx) => {
+export const okDynamicSettings = rest.get("/api/user", (req, res, ctx) => {
   const entity = Data.get("entity")
 
   return res(
@@ -118,7 +118,7 @@ export const okDynamicSettings = rest.get("/api/v5/user", (req, res, ctx) => {
 })
 
 export const okEnableMac = rest.post(
-  "/api/v5/entity/options/release-for-consumption",
+  "/api/entity/options/release-for-consumption",
   (req, res, ctx) => {
     const entity = Data.get("entity")
     setEntity({
@@ -130,7 +130,7 @@ export const okEnableMac = rest.post(
 )
 
 export const okDisableMac = rest.post(
-  "/api/v5/entity/options/release-for-consumption",
+  "/api/entity/options/release-for-consumption",
   (req, res, ctx) => {
     const entity = Data.get("entity")
     setEntity({
@@ -142,7 +142,7 @@ export const okDisableMac = rest.post(
 )
 
 export const okEnableTrading = rest.post(
-  "/api/v5/entity/options/trading",
+  "/api/entity/options/trading",
   (req, res, ctx) => {
     const entity = Data.get("entity")
     setEntity({
@@ -154,7 +154,7 @@ export const okEnableTrading = rest.post(
 )
 
 export const okDisableTrading = rest.post(
-  "/api/v5/entity/options/trading",
+  "/api/entity/options/trading",
   (req, res, ctx) => {
     const entity = Data.get("entity")
     setEntity({
@@ -166,7 +166,7 @@ export const okDisableTrading = rest.post(
 )
 
 export const okDeliverySites = rest.get(
-  "/api/v5/entity/depots",
+  "/api/entity/depots",
   (req, res, ctx) => {
     return res(
       ctx.json({
@@ -178,7 +178,7 @@ export const okDeliverySites = rest.get(
 )
 
 export const okAddDeliverySite = rest.post(
-  "/api/v5/entity/depots/add",
+  "/api/entity/depots/add",
   (req, res, ctx) => {
     setDeliverySites([deliverySite])
     return res(ctx.json({ status: "success" }))
@@ -186,7 +186,7 @@ export const okAddDeliverySite = rest.post(
 )
 
 export const okDeleteDeliverySite = rest.post(
-  "/api/v5/entity/depots/delete",
+  "/api/entity/depots/delete",
   (req, res, ctx) => {
     setDeliverySites([])
     return res(ctx.json({ status: "success" }))
@@ -194,7 +194,7 @@ export const okDeleteDeliverySite = rest.post(
 )
 
 export const okProductionSites = rest.get(
-  "/api/v5/entity/production-sites",
+  "/api/entity/production-sites",
   (req, res, ctx) => {
     return res(
       ctx.json({
@@ -206,7 +206,7 @@ export const okProductionSites = rest.get(
 )
 
 export const okAddProductionSite = rest.post(
-  "/api/v5/entity/production-sites/add",
+  "/api/entity/production-sites/add",
   (req, res, ctx) => {
     // @ts-ignore
     const body = req._body as FormData
@@ -225,7 +225,7 @@ export const okAddProductionSite = rest.post(
 )
 
 export const okUpdateProductionSite = rest.post(
-  "/api/v5/entity/production-sites/update",
+  "/api/entity/production-sites/update",
   (req, res, ctx) => {
     // @ts-ignore
     const body = req._body as FormData
@@ -242,7 +242,7 @@ export const okUpdateProductionSite = rest.post(
 )
 
 export const okDeleteProductionSite = rest.post(
-  "/api/v5/entity/production-sites/delete",
+  "/api/entity/production-sites/delete",
   (req, res, ctx) => {
     setProductionSites([])
     return res(ctx.json({ status: "success" }))
@@ -250,36 +250,36 @@ export const okDeleteProductionSite = rest.post(
 )
 
 export const okSetBiocarburant = rest.post(
-  "/api/v5/entity/production-sites/set-biofuels",
+  "/api/entity/production-sites/set-biofuels",
   (req, res, ctx) => res(ctx.json({ status: "success" }))
 )
 
 export const okSetMatierePremiere = rest.post(
-  "/api/v5/entity/production-sites/set-feedstocks",
+  "/api/entity/production-sites/set-feedstocks",
   (req, res, ctx) => res(ctx.json({ status: "success" }))
 )
 
 export const okSetCertificates = rest.post(
-  "/api/v5/entity/production-sites/set-certificates",
+  "/api/entity/production-sites/set-certificates",
   (req, res, ctx) => res(ctx.json({ status: "success" }))
 )
 
 export const okEntityRights = rest.get(
-  "http://localhost/api/v5/entity/users",
+  "http://localhost/api/entity/users",
   (req, res, ctx) => {
     return res(ctx.json({ status: "success", data: entityRights }))
   }
 )
 
 export const okSelfCertificates = rest.get(
-  "/api/v5/entity/certificates",
+  "/api/entity/certificates",
   (req, res, ctx) => {
     return res(ctx.json({ status: "success", data: [] }))
   }
 )
 
 export const okDoubleCountApplications = rest.get(
-  "/api/v5/double-counting/agreements",
+  "/api/double-counting/agreements",
   (req, res, ctx) => {
     return res(ctx.json({ status: "success", data: [] }))
   }
@@ -297,7 +297,7 @@ export const okDoubleCountUploadApplication = rest.post(
   }
 )
 
-export const okDoubleCountUploadAgreements = mockGetWithResponseData("/api/v5/double-counting/agreements", [])
+export const okDoubleCountUploadAgreements = mockGetWithResponseData("/api/double-counting/agreements", [])
 
 
 export const okDoubleCountUploadDocumentation = rest.post(
@@ -327,7 +327,7 @@ export const koDoubleCountUploadApplication = rest.post(
 )
 
 
-export const okChargingPointsApplications = rest.get("/api/v5/elec/cpo/charging-points/applications", (req, res, ctx) => {
+export const okChargingPointsApplications = rest.get("/api/elec/cpo/charging-points/applications", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -336,10 +336,10 @@ export const okChargingPointsApplications = rest.get("/api/v5/elec/cpo/charging-
   )
 })
 
-export const okChargingPointsApplicationsEmpty = mockGetWithResponseData("/api/v5/elec/cpo/charging-points/applications", [])
-export const okChargingPointsCheckValid = mockPostWithResponseData("/api/v5/elec/cpo/charging-points/check-application", elecChargingPointsApplicationCheckResponseSucceed)
-export const okChargingPointsCheckError = mockPostWithResponseData("/api/v5/elec/cpo/charging-points/check-application", elecChargingPointsApplicationCheckResponseFailed, true)
-export const okChargingPointsAddSuccess = mockPostWithResponseData("/api/v5/elec/cpo/charging-points/add-application")
+export const okChargingPointsApplicationsEmpty = mockGetWithResponseData("/api/elec/cpo/charging-points/applications", [])
+export const okChargingPointsCheckValid = mockPostWithResponseData("/api/elec/cpo/charging-points/check-application", elecChargingPointsApplicationCheckResponseSucceed)
+export const okChargingPointsCheckError = mockPostWithResponseData("/api/elec/cpo/charging-points/check-application", elecChargingPointsApplicationCheckResponseFailed, true)
+export const okChargingPointsAddSuccess = mockPostWithResponseData("/api/elec/cpo/charging-points/add-application")
 
 
 

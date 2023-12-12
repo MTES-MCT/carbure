@@ -37,7 +37,7 @@ const Home = () => {
 
   const user = useUser()
 
-  const stats = useQuery(() => api.get<Api<HomeStats>>("/v5/home-stats"), {
+  const stats = useQuery(() => api.get<Api<HomeStats>>("/home-stats"), {
     key: "stats",
     params: [],
   })

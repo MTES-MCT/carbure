@@ -1,4 +1,4 @@
-# /api/v5/stats/entity
+# /api/stats/entity
 import jwt
 import time
 import traceback

@@ -1,4 +1,4 @@
-# /api/v5/saf/airline/reject-ticket
+# /api/saf/airline/reject-ticket
 
 import traceback
 from django.db import transaction
@@ -41,7 +41,6 @@ def reject_ticket(request, *args, **kwargs):
                 dest_id=ticket.supplier_id,
                 send_by_email=False,
                 meta={"client": ticket.client.name, "ticket_id": ticket.id, "year": ticket.year},
-                
             )
 
         return SuccessResponse()
