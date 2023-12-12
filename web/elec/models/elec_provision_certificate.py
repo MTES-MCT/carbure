@@ -19,5 +19,5 @@ class ElecProvisionCertificate(models.Model):
     quarter = models.IntegerField(choices=QUARTERS)
     year = models.IntegerField()
     operating_unit = models.CharField(max_length=64)
-    energy_amount = models.IntegerField()
-    remaining_energy_amount = models.IntegerField()
+    energy_amount = models.FloatField()
+    remaining_energy_amount = models.FloatField()

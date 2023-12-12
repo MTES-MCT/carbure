@@ -20,7 +20,7 @@ class ElecTransferCertificate(models.Model):
     client = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.CASCADE, related_name="received_transfer_certificates")  # fmt:skip
     transfer_date = models.DateField()
     accepted_date = models.DateField(null=True, blank=True)
-    energy_amount = models.IntegerField()
+    energy_amount = models.FloatField()
     comment = models.CharField(max_length=256, null=True, blank=True)
 
     def generate_certificate_id(self):

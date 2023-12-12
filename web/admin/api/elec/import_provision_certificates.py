@@ -22,7 +22,7 @@ def import_provision_certificate_excel(request):
         return ErrorResponse(400, CertificateImportError.MISSING_FILE, "Missing File")
 
     try:
-        certificate_df = pd.read_csv(file, sep=";")
+        certificate_df = pd.read_csv(file, sep=";", decimal=",")
     except:
         return ErrorResponse(400, CertificateImportError.CSV_PARSE_ERROR)
 
