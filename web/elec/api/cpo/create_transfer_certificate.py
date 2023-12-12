@@ -24,7 +24,7 @@ class ElecTransferError:
 
 class ElecTransferForm(forms.Form):
     entity_id = forms.IntegerField()
-    energy_mwh = forms.IntegerField()
+    energy_mwh = forms.FloatField()
     client_id = forms.ModelChoiceField(queryset=Entity.objects.all(), required=False)
 
 
