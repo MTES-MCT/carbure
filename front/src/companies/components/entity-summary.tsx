@@ -18,12 +18,13 @@ import {
   normalizeEntityType,
 } from "carbure/utils/normalizers"
 import useEntity from "carbure/hooks/entity"
+import { companiesSummary } from "companies/__test__/data"
 
 type EntitySummaryProps = {
   search?: string
 }
 
-type Operation = "user" | "certificate" | "double-counting"
+type Operation = "user" | "certificate" | "double-counting" | "charging-points"
 
 export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
   const { t } = useTranslation()
@@ -41,6 +42,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
   const [operation, setOperations] = useState<Operation | undefined>(undefined)
 
   const entityData = entities.result?.data.data ?? []
+  // const entityData = companiesSummary // TEST data
 
   const matchedEntities = entityData.filter(
     (e) =>
@@ -50,7 +52,6 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
   )
 
   const hasResults = matchedEntities.length > 0
-
   return (
     <>
       <Grid>
@@ -88,6 +89,10 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
               value: "double-counting",
               label: t("Demandes d'agrément double comptage"),
             },
+            entity.isAdmin && {
+              value: "charging-points",
+              label: t("Inscriptions de points de recharge"),
+            },
           ])}
         />
       </Grid>
@@ -123,7 +128,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                   />
                 ),
               },
-              entity.isAdmin && {
+              entity.isAdmin && (!operation || !["charging-points"].includes(operation)) && {
                 key: "factories",
                 header: t("Production / Stockage"),
                 orderBy: (e) => e.production_sites + e.depots,
@@ -132,17 +137,17 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                     data={[
                       {
                         count: e.production_sites,
-                        label: t("{{count}} site de production", { count: e.production_sites }), // prettier-ignore
+                        label: t("{{count}} site de production", { count: e.production_sites }),
                       },
                       {
                         count: e.depots,
-                        label: t("{{count}} dépôts", { count: e.depots }), // prettier-ignore
+                        label: t("{{count}} dépôts", { count: e.depots }),
                       },
                     ]}
                   />
                 ),
               },
-              entity.isAdmin && {
+              entity.isAdmin && (!operation || !["double-counting", "charging-points"].includes(operation)) && {
                 key: "certificates",
                 header: t("Certificats"),
                 orderBy: (e) => e.certificates,
@@ -151,32 +156,52 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                     data={[
                       {
                         count: e.certificates_pending,
-                        label: t("{{count}} certificats à valider", { count: e.certificates_pending }), // prettier-ignore
+                        label: t("{{count}} certificats à valider", { count: e.certificates_pending }),
                         highlight: true,
                       },
                       {
                         count: e.certificates,
-                        label: t("{{count}} certificats", { count: e.certificates }), // prettier-ignore
+                        label: t("{{count}} certificats", { count: e.certificates }),
                       },
                     ]}
                   />
                 ),
               },
-              entity.isAdmin && {
+              entity.isAdmin && operation === "double-counting" && {
                 key: "double-counting",
                 header: t("Double comptage"),
-                orderBy: (e) => e.double_counting_requests * 1000 + e.double_counting, // prettier-ignore
+                orderBy: (e) => e.double_counting_requests * 1000 + e.double_counting,
                 cell: (e) => (
                   <EntityInfoCell
                     data={[
                       {
                         count: e.double_counting_requests,
-                        label: t("{{count}} dossier en attente", { count: e.double_counting_requests }), // prettier-ignore
+                        label: t("{{count}} dossier en attente", { count: e.double_counting_requests }),
                         highlight: true,
                       },
                       {
                         count: e.double_counting,
-                        label: t("{{count}} dossier validé", { count: e.double_counting }), // prettier-ignore
+                        label: t("{{count}} dossier validé", { count: e.double_counting }),
+                      },
+                    ]}
+                  />
+                ),
+              },
+              entity.isAdmin && operation === "charging-points" && {
+                key: "charging-points",
+                header: t("Points de recharge"),
+                orderBy: (e) => e.charging_points_pending * 1000 + e.charging_points_accepted,
+                cell: (e) => (
+                  <EntityInfoCell
+                    data={[
+                      {
+                        count: e.charging_points_pending,
+                        label: t("{{count}} points de recharge en attente", { count: e.charging_points_pending }),
+                        highlight: true,
+                      },
+                      {
+                        count: e.charging_points_accepted,
+                        label: t("{{count}} points de recharge", { count: e.charging_points_accepted }),
                       },
                     ]}
                   />
@@ -191,7 +216,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                     data={[
                       {
                         count: e.requests,
-                        label: t("{{count}} demande d'accès", { count: e.requests }), // prettier-ignore
+                        label: t("{{count}} demande d'accès", { count: e.requests }),
                         highlight: true,
                       },
                       {
@@ -242,6 +267,7 @@ function hasOperation(
 ) {
   if (operation === undefined) return true
   if (operation === "user" && details.requests > 0) return true
-  if (operation === "certificate" && details.certificates_pending > 0) return true // prettier-ignore
-  if (operation === "double-counting" && details.double_counting_requests > 0) return true // prettier-ignore
+  if (operation === "certificate" && details.certificates_pending > 0) return true
+  if (operation === "double-counting" && details.double_counting_requests > 0) return true
+  if (operation === "charging-points" && (details.charging_points_accepted > 0 || details.charging_points_pending > 0)) return true
 }
