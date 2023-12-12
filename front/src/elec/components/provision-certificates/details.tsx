@@ -64,7 +64,7 @@ export const ElecProvisionDetailsDialog = () => {
             <TextInput
               readOnly
               label={t("MWh")}
-              value={"+ " + formatNumber(provisionCertificate?.energy_amount || 0) + " MWh"}
+              value={"+ " + formatNumber(provisionCertificate?.energy_amount || 0, 3) + " MWh"}
 
             />
 

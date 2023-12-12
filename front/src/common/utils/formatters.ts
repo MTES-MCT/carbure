@@ -15,14 +15,15 @@ export function formatPeriodFromDate(date: Date) {
   return date.getFullYear() * 100 + date.getMonth() + 1
 }
 
-export function formatNumber(num: number) {
+export function formatNumber(num: number, fractionDigits = 2) {
   const integer = Math.floor(num).toFixed(0)
   const decimal = num % 1
 
+  // add space to separate thousands
   let numStr = chunk(integer, 3).join(" ")
 
   if (decimal !== 0) {
-    const decimalStr = (num % 1).toFixed(2).slice(2, 4)
+    const decimalStr = decimal.toFixed(fractionDigits).slice(2)
     numStr += "," + decimalStr
   }
 
