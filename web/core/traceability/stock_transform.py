@@ -9,7 +9,7 @@ class StockTransformNode(Node):
     }
 
     FROM_CHILD_STOCK = {
-        "carbure_supplier": "entity",
+        "carbure_client": "entity",
     }
 
     def get_data(self):
