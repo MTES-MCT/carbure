@@ -8,6 +8,7 @@ import Form, { useForm } from "common/components/form"
 import { TextInput } from "common/components/input"
 import Button from "common/components/button"
 import { Save } from "common/components/icons"
+import { useEffect } from "react"
 
 type CompanyInfoProps = {
   defaultEntity?: Entity
@@ -20,11 +21,13 @@ const CompanyInfo = ({ defaultEntity }: CompanyInfoProps) => {
   const entity = defaultEntity || loggedEntity
   const canModify = !defaultEntity && loggedEntity.hasRights(UserRole.Admin, UserRole.ReadWrite)
 
+
+
   const updateEntity = useMutation(api.updateEntity, {
     invalidates: ["user-settings"],
   })
 
-  const { bind, value: formEntity } = useForm({
+  const formData = {
     legal_name: entity.legal_name as string | undefined,
     registration_id: entity.registration_id as string | undefined,
     sustainability_officer_phone_number:
@@ -34,7 +37,15 @@ const CompanyInfo = ({ defaultEntity }: CompanyInfoProps) => {
     registered_city: entity.registered_city as string | undefined,
     registered_zipcode: entity.registered_zipcode as string | undefined,
     registered_country: entity.registered_country as string | undefined,
-  })
+  }
+
+  const { bind, value: formEntity, setValue } = useForm(formData)
+
+  useEffect(() => {
+    if (entity) {
+      setValue(formData)
+    }
+  }, [entity])
 
   const canSave = hasChange(entity, formEntity)
 
@@ -140,7 +151,7 @@ function hasChange(entity: Partial<Entity>, formEntity: Partial<Entity>) {
     entity.registration_id !== formEntity.registration_id ||
     entity.sustainability_officer !== formEntity.sustainability_officer ||
     entity.sustainability_officer_phone_number !==
-      formEntity.sustainability_officer_phone_number ||
+    formEntity.sustainability_officer_phone_number ||
     entity.registered_address !== formEntity.registered_address ||
     entity.registered_city !== formEntity.registered_city ||
     entity.registered_zipcode !== formEntity.registered_zipcode ||
