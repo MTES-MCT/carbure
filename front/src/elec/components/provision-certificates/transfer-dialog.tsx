@@ -17,7 +17,7 @@ import { useTranslation } from "react-i18next"
 export interface EnergyTransferDialogProps {
     onClose: () => void
     remainingEnergy: number
-    onEnergyTransferred: (volume: number, clientName: string) => void
+    onEnergyTransferred: (energy: number, clientName: string) => void
 }
 export const EnergyTransferDialog = ({
     onClose,
@@ -47,7 +47,7 @@ export const EnergyTransferDialog = ({
             return
         }
         if (value.energy_mwh! < 1) {
-            setFieldError("energy_mwh", t("Entrez un volume d'énergie"))
+            setFieldError("energy_mwh", t("Entrez une quantité d'énergie"))
             return
         }
         await transferEnergyRequest.execute(
@@ -71,7 +71,7 @@ export const EnergyTransferDialog = ({
         <Dialog onClose={onClose}>
             <header>
                 <h1>
-                    {t("Cession d'un volume d'énergie")}
+                    {t("Cession d'une quantité d'énergie")}
                 </h1>
             </header>
 
@@ -79,7 +79,7 @@ export const EnergyTransferDialog = ({
                 <section>
                     <p>
                         {t(
-                            "En cédant un volume d'énergie à un redevable, cela donnera lieu à l'édition d'un certificat de cession."
+                            "En cédant unen quantité d'énergie à un redevable, cela donnera lieu à l'édition d'un certificat de cession."
                         )}
                     </p>
 
@@ -90,7 +90,7 @@ export const EnergyTransferDialog = ({
                             setMaximumEnergy={setMaximumEnergy}
                             {...bind("energy_mwh")}
                         />
-                        <p>{t("Les volumes d'énergie sont consommés de manière chronologique (les plus anciens sont vidés en premier).")}</p>
+                        <p>{t("Les quantités d'énergie sont consommés de manière chronologique (les plus anciens sont vidés en premier).")}</p>
 
                         <Autocomplete
                             required
@@ -137,7 +137,7 @@ const AddElecOperatorMail = ({ clientName = "[Nom du redevable]" }: { clientName
 
     return <MailTo user="valorisation-recharge" host="developpement-durable.gouv.fr"
         subject={t("[CarbuRe - Elec] Je ne trouve pas mon redevable")}
-        body={t("Bonjour%2C%E2%80%A8%E2%80%A8En%20tant%20que%20{{cpoName}}%2C%20je%20souhaite%20que%20la%20soci%C3%A9t%C3%A9%20{{clientName}}%20soit%20ajout%C3%A9e%20%C3%A0%20la%20base%20de%20donn%C3%A9e%20CarbuRe%20afin%20de%20pouvoir%20lui%20c%C3%A9der%20un%20volume%20d%E2%80%99%C3%A9nergie.%0D%0AL%E2%80%99adresse%20e-mail%20de%20contact%20de%20ce%20redevable%20est%20%3A%0D%0A%0D%0ABien%20cordialement%0D%0A{{userEmail}}",
+        body={t("Bonjour%2C%E2%80%A8%E2%80%A8En%20tant%20que%20{{cpoName}}%2C%20je%20souhaite%20que%20la%20soci%C3%A9t%C3%A9%20{{clientName}}%20soit%20ajout%C3%A9e%20%C3%A0%20la%20base%20de%20donn%C3%A9e%20CarbuRe%20afin%20de%20pouvoir%20lui%20c%C3%A9der%20une%quantité%20d%E2%80%99%C3%A9nergie.%0D%0AL%E2%80%99adresse%20e-mail%20de%20contact%20de%20ce%20redevable%20est%20%3A%0D%0A%0D%0ABien%20cordialement%0D%0A{{userEmail}}",
             // {cpoName: entity.name, clientName, userName: user.email, userFirstname: "Prénom", userEmail: user.email)}
             { cpoName: entity.name, clientName, userEmail: user.email })
         }
@@ -173,7 +173,7 @@ export const EnergyInput = ({
     return (
         <NumberInput
             required
-            label={t("Volume ({{quantity}} MWh restants)", {
+            label={t("Quantité ({{quantity}} MWh restants)", {
                 count: remainingEnergy,
                 quantity: formatNumber(remainingEnergy, 3),
             })}
