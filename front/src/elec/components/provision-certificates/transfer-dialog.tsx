@@ -79,7 +79,7 @@ export const EnergyTransferDialog = ({
                 <section>
                     <p>
                         {t(
-                            "En cédant unen quantité d'énergie à un redevable, cela donnera lieu à l'édition d'un certificat de cession."
+                            "En cédant une quantité d'énergie à un redevable, cela donnera lieu à l'édition d'un certificat de cession."
                         )}
                     </p>
 
