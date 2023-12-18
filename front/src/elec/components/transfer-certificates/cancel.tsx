@@ -21,8 +21,8 @@ export const ElecCancelTransferButton = ({ transferCertificate, onClose }: ElecC
   const portal = usePortal()
   const notify = useNotify()
 
-  const onTransferCancelledSuccess = (volume: number, clientName: string) => {
-    notify(t("{{volume}} MWh initalement envoyés à {{clientName}} vous ont bien été restitués", { volume, clientName }), { variant: "success" })
+  const onTransferCancelledSuccess = (energy: number, clientName: string) => {
+    notify(t("{{energy}} MWh initalement envoyés à {{clientName}} vous ont bien été restitués", { energy: energy, clientName }), { variant: "success" })
     onClose()
   }
 
@@ -47,7 +47,7 @@ export const ElecCancelTransferButton = ({ transferCertificate, onClose }: ElecC
 export interface ElecCancelTransferConfirmDialogProps {
   onClose: () => void
   transfer_certificate: ElecTransferCertificatePreview
-  onTransferCancelled: (volume: number, clientName: string) => void
+  onTransferCancelled: (energy: number, clientName: string) => void
 }
 
 export const ElecCancelTransferConfirmDialog = ({
@@ -95,7 +95,7 @@ export const ElecCancelTransferConfirmDialog = ({
           <p>
             <strong>Êtes-vous sûr de vouloir annuler ce certificat de cession ?</strong>
           </p>
-          <p>Cela entrainera sa suppression et son volume en MWh sera à nouveau disponible dans votre stock d'énergie global.</p>
+          <p>Cela entrainera sa suppression et sa quantité d'énergie en MWh sera à nouveau disponible dans votre stock d'énergie global.</p>
 
 
 

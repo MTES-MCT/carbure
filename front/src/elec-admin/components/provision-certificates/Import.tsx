@@ -92,7 +92,7 @@ const ProvisionImportDialog = ({
                     <Form id="dc-checker">
                         <p>
                             {t(
-                                "En tant qu'administrateur DGEC, vous pouvez importer ici des volumes d'énergie à céder, classés par trimestre et par aménageurs."
+                                "En tant qu'administrateur DGEC, vous pouvez importer ici des quantités d'énergie à céder, classés par trimestre et par aménageurs."
                             )}
                         </p>
 
