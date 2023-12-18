@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useState } from "react"
+import React, { useCallback, useContext, useEffect, useState } from "react"
 import cl from "clsx"
 import css from "./form.module.css"
 
@@ -107,7 +107,6 @@ export function useForm<T>(
 
   const errors = options?.errors ?? _errors
   const mutate = options?.setValue ?? identity
-
   const setField = useCallback(
     (name: keyof T, value: T[keyof T]) => {
       setValue((form) => mutate({ ...form, [name]: value }, form))
