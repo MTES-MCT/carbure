@@ -94,3 +94,23 @@ export interface ChargingPointsApplicationError {
   error: string
   meta?: null | any
 }
+
+
+export enum ElecMeterReadingsApplicationStatus {
+  Pending = "PENDING",
+  Accepted = "ACCEPTED",
+  Rejected = "REJECTED",
+}
+
+
+export interface ElecMeterReadingsApplication {
+  id: number
+  cpo: EntityPreview
+  station_count: number
+  charging_point_count: number
+  power_total: number
+  year: number
+  quarter: number
+  validation_date?: string
+  status: ElecMeterReadingsApplicationStatus
+}

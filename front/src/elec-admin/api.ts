@@ -1,5 +1,5 @@
 import { api, Api, download } from "common/services/api"
-import { ElecChargingPointsApplication, ElecProvisionCertificatesDetails, ElecTransferCertificatesDetails } from "elec/types"
+import { ElecChargingPointsApplication, ElecMeterReadingsApplication, ElecProvisionCertificatesDetails, ElecTransferCertificatesDetails } from "elec/types"
 import { ElecProvisionCertificatesData, ElecTransferCertificatesData } from "elec/types-cpo"
 import { ElecAdminProvisionCertificateFilter, ElecAdminProvisionCertificateQuery, ElecAdminSnapshot, ElecAdminTransferCertificateFilter, ElecAdminTransferCertificateQuery } from "./types"
 
@@ -93,6 +93,11 @@ export function getChargingPointsApplications(entityId: number, companyId: numbe
     params: { entity_id: entityId, company_id: companyId },
   })
 }
+export function getMeterReadingsApplications(entityId: number, companyId: number) {
+  return api.get<Api<ElecMeterReadingsApplication[]>>("/admin/elec/meter-readings/applications", {
+    params: { entity_id: entityId, company_id: companyId },
+  })
+}
 
 export function acceptChargingPointsApplication(entityId: number, companyId: number, applicationId: number) {
   return api.post("/admin/elec/charging-points/accept-application", {
@@ -110,3 +115,4 @@ export function rejectChargingPointsApplication(entityId: number, companyId: num
     application_id: applicationId,
   })
 }
+

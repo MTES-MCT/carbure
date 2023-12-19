@@ -2,7 +2,7 @@ import { api, Api } from "common/services/api"
 import { ElecCPOProvisionCertificateFilter, ElecCPOProvisionCertificateQuery, ElecCPOSnapshot, ElecTransferCertificateQuery, ElecProvisionCertificatesData, ElecTransferCertificatesData } from "./types-cpo"
 import { EntityPreview } from "carbure/types"
 import { extract } from "carbure/api"
-import { ElecProvisionCertificatesDetails, ElecTransferCertificateFilter, ElecTransferCertificatesDetails, QUERY_RESET } from "./types"
+import { ElecMeterReadingsApplication, ElecProvisionCertificatesDetails, ElecTransferCertificateFilter, ElecTransferCertificatesDetails, QUERY_RESET } from "./types"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/elec/cpo/years", { params: { entity_id } })
@@ -93,5 +93,15 @@ export function cancelTransferCertificate(
   return api.post("/elec/cpo/cancel-transfer-certificate", {
     entity_id,
     transfer_certificate_id,
+  })
+}
+
+
+
+// METER READINGS
+
+export function getMeterReadingsApplications(entityId: number, companyId: number) {
+  return api.get<Api<ElecMeterReadingsApplication[]>>("/elec/cpo/meter-readings/applications", {
+    params: { entity_id: entityId, company_id: companyId },
   })
 }
