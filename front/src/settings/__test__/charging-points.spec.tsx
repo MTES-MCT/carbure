@@ -4,7 +4,7 @@ import { Route } from "react-router-dom"
 import { TestRoot, render } from "setupTests"
 
 import { cpo } from "carbure/__test__/data"
-import ElecSettings from "settings/components/charging-points"
+import ElecChargingPointsSettings from "elec/components/charging-points/settings"
 import server, { okChargingPointsCheckError, okChargingPointsApplicationsEmpty, setEntity } from "./api"
 import userEvent from "@testing-library/user-event"
 
@@ -14,7 +14,7 @@ const SettingsWithHooks = () => {
       <Route
         path={`/org/${cpo.id}/settings`}
         element={
-          <ElecSettings companyId={cpo.id} />
+          <ElecChargingPointsSettings companyId={cpo.id} />
         }
       />
     </TestRoot>
@@ -46,7 +46,7 @@ test("check the applications list", async () => {
   render(<SettingsWithHooks />)
   await waitWhileLoading()
   screen.getByText("Statut")
-  screen.getByText("Date")
+  screen.getByText("Date d'ajout")
   screen.getByText("30 000")
 
   screen.getByText("En attente")

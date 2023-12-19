@@ -15,7 +15,7 @@ import CompanyInfo from "./components/company-info"
 import CompanyOptions from "./components/company-options"
 import DoubleCountingSettings from "./components/double-counting"
 import EntityUserRights from "./components/user-rights"
-import ElecSettings from "./components/charging-points"
+import ElecChargingPointsSettings from "../elec/components/charging-points/settings"
 import { ApplicationDetailsDialog } from "double-counting/components/application-details-dialog"
 import HashRoute from "common/components/hash-route"
 import { AgreementDetailsDialog } from "double-counting/components/agreement-details-dialog"
@@ -79,6 +79,11 @@ const Settings = () => {
             key: "elec-charging-points",
             label: t("Points de recharge"),
           },
+          // isCPO && {
+          //   path: "#elec-meter-reading",
+          //   key: "elec-meter-reading",
+          //   label: t("Relevés trimestriels"),
+          // },
           entity.hasRights(UserRole.Admin) && {
             path: "#users",
             key: "users",
@@ -93,7 +98,7 @@ const Settings = () => {
         {hasDepot && <DeliverySitesSettings entity={entity} />}
         {isProducer && <ProductionSitesSettings entity={entity} />}
         {isProducer && <DoubleCountingSettings />}
-        {isCPO && <ElecSettings companyId={entity.id} />}
+        {isCPO && <ElecChargingPointsSettings companyId={entity.id} />}
         {entity.hasRights(UserRole.Admin) && <EntityUserRights />}
       </section>
       <HashRoute
