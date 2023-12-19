@@ -95,6 +95,8 @@ export interface ChargingPointsApplicationError {
   meta?: null | any
 }
 
+// METER READINGS
+
 
 export enum ElecMeterReadingsApplicationStatus {
   Pending = "PENDING",
@@ -113,4 +115,12 @@ export interface ElecMeterReadingsApplication {
   quarter: number
   validation_date?: string
   status: ElecMeterReadingsApplicationStatus
+}
+export interface ElecMeterReadingsApplicationCheckInfo {
+  errors?: ChargingPointsApplicationError[]
+  file_name: string
+  error_count: number
+  charging_point_count: number
+  pending_application_already_exists?: boolean
+
 }

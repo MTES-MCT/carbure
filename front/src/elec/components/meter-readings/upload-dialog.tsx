@@ -9,35 +9,40 @@ import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 
+import Alert from "common/components/alert"
+import * as api from "elec/api-cpo"
 import { ElecChargingPointsApplicationCheckInfo } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
-import { checkChargingPointsApplication } from "elec/api-cpo"
-import ErrorsDetailsDialog from "./errors-dialog"
-import ValidDetailsDialog from "./valid-dialog"
-import Alert from "common/components/alert"
+import ErrorsDetailsDialog from "../charging-points/errors-dialog"
+import ValidDetailsDialog from "../charging-points/valid-dialog"
 
-type ElecChargingPointsFileUploadProps = {
+type ElecMeterReadingsFileUploadProps = {
   onClose: () => void
+  quarterString: string
+  companyId: number
   pendingApplicationAlreadyExists: boolean
 }
 
-const ElecChargingPointsFileUpload = ({
+const ElecMeterReadingsFileUpload = ({
   onClose,
+  quarterString,
+  companyId,
   pendingApplicationAlreadyExists,
-}: ElecChargingPointsFileUploadProps) => {
+}: ElecMeterReadingsFileUploadProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
   const entity = useEntity()
   const portal = usePortal()
+  const TEMPLATE_URL = "/elec/cpo/meter-readings/application-template"
 
   const { value, bind } = useForm({
-    chargingPointsFile: undefined as File | undefined,
+    meterReadingsFile: undefined as File | undefined,
   })
 
-  const checkChargingPointsFile = useMutation(checkChargingPointsApplication, {
+  const checkMeterReadingsFile = useMutation(api.checkMeterReadingsApplication, {
     onSuccess: (res) => {
       const checkedData = res.data.data
-      portal((close) => <ValidDetailsDialog fileData={checkedData!} onClose={close} file={value.chargingPointsFile!} />)
+      portal((close) => <ValidDetailsDialog fileData={checkedData!} onClose={close} file={value.meterReadingsFile!} />)
       onClose()
     },
     onError: (err) => {
@@ -60,7 +65,7 @@ const ElecChargingPointsFileUpload = ({
       } else {
         notify(
           t(
-            "L'envoi de votre inscription des points de recharge a échoué. Merci de contacter l'équipe Carbure"
+            "L'envoi de vos relevés trimestriel a échoué. Merci de contacter l'équipe Carbure"
           ),
           {
             variant: "danger",
@@ -71,17 +76,17 @@ const ElecChargingPointsFileUpload = ({
   })
 
   async function submitFile() {
-    if (!value.chargingPointsFile) return
-    checkChargingPointsFile.execute(
+    if (!value.meterReadingsFile) return
+    checkMeterReadingsFile.execute(
       entity.id,
-      value.chargingPointsFile as File
+      value.meterReadingsFile as File
     )
   }
-  const filePath = '/templates/points-de-recharge-inscription.xlsx';
+
   return (
     <Dialog onClose={onClose}>
       <header>
-        <h1>{t("Inscription de points de recharge")}</h1>
+        <h1>{t("Relevé trimestriel - {{quarter}}", { quarter: quarterString })}</h1>
       </header>
 
       <main>
@@ -89,24 +94,31 @@ const ElecChargingPointsFileUpload = ({
           <Form id="dc-checker">
             <p>
               {t(
-                "Cet outil vous permet de vérifier la conformité de votre demande d’inscription."
+                "Veuillez nous communiquer les relevés de vos points de recharge (kW) chaque trimestre, pour cela :"
               )}
             </p>
-            <p>
-              <Trans>
-                Le modèle Excel à remplir est disponible {" "}
-                <ExternalLink href={filePath}>
+            <ol>
+              <li><Trans>
+                Téléchargez le relevé du dernier trimestre {" "}
+                <ExternalLink href={TEMPLATE_URL + `?entity_id=${entity.id}&company_id=${companyId}`}>
                   sur ce lien
                 </ExternalLink>
                 .
-              </Trans>
-            </p>
+              </Trans></li>
+              <li>
+                <Trans>Remplissez la colonne correspondante au trimestre actuel</Trans>
+              </li>
+              <li>
+                <Trans>Déposez le fichier ci-dessous</Trans>
+              </li>
+
+            </ol>
             <FileInput
-              loading={checkChargingPointsFile.loading}
-              icon={value.chargingPointsFile ? Check : Upload}
+              loading={checkMeterReadingsFile.loading}
+              icon={value.meterReadingsFile ? Check : Upload}
               label={t("Importer le fichier excel à analyser")}
-              placeholder={value.chargingPointsFile ? value.chargingPointsFile.name : t("Choisir un fichier")}
-              {...bind("chargingPointsFile")}
+              placeholder={value.meterReadingsFile ? value.meterReadingsFile.name : t("Choisir un fichier")}
+              {...bind("meterReadingsFile")}
             />
           </Form>
           {pendingApplicationAlreadyExists &&
@@ -122,8 +134,8 @@ const ElecChargingPointsFileUpload = ({
       <footer>
         <Button
           submit="dc-request"
-          loading={checkChargingPointsFile.loading}
-          disabled={!value.chargingPointsFile}
+          loading={checkMeterReadingsFile.loading}
+          disabled={!value.meterReadingsFile}
           variant="primary"
           icon={Check}
           action={submitFile}
@@ -135,4 +147,4 @@ const ElecChargingPointsFileUpload = ({
   )
 }
 
-export default ElecChargingPointsFileUpload
+export default ElecMeterReadingsFileUpload

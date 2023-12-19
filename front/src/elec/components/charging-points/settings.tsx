@@ -12,7 +12,7 @@ import ApplicationStatus from "elec/components/charging-points/application-statu
 import ElecChargingPointsFileUpload from "elec/components/charging-points/upload-dialog"
 import { ElecChargingPointsApplication, ElecChargingPointsApplicationStatus, ElecChargingPointsSnapshot } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
-import * as apiCpo from "../../../settings/api/elec"
+import * as apiCpo from "elec/api-cpo"
 // import { elecChargingPointsApplications } from "elec/__test__/data"
 import Metric from "common/components/metric"
 import { compact } from "common/utils/collection"

@@ -9,7 +9,7 @@ import Tag from "common/components/tag"
 import { useMutation } from "common/hooks/async"
 import { ElecChargingPointsApplicationCheckInfo } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
-import { applyChargingPoints } from "settings/api/elec"
+import { applyChargingPoints } from "elec/api-cpo"
 
 export type ValidDetailsDialogProps = {
   fileData: ElecChargingPointsApplicationCheckInfo
