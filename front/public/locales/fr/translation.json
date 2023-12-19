@@ -635,7 +635,7 @@
   "Point de référence mesure": "Point de référence mesure",
   "L'envoi de votre inscription des points de recharge a échoué. Merci de contacter l'équipe Carbure": "L'envoi de votre inscription des points de recharge a échoué. Merci de contacter l'équipe Carbure",
   "Cet outil vous permet de vérifier la conformité de votre demande d’inscription.": "Cet outil vous permet de vérifier la conformité de votre demande d’inscription.",
-  "Vous avez déjà une demande d'inscription en attente. Cete nouvelle demande viendra écraser la précédente.": "Vous avez déjà une demande d'inscription en attente. Cete nouvelle demande viendra écraser la précédente.",
+  "Vous avez déjà une demande d'inscription en attente. Cette nouvelle demande viendra écraser la précédente.": "Vous avez déjà une demande d'inscription en attente. Cette nouvelle demande viendra écraser la précédente.",
   "Les {{count}} points de recharge ont été ajoutés !_one": "Le point de recharge a été ajouté !",
   "Les {{count}} points de recharge ont été ajoutés !_many": "Les {{count}} points de recharge ont été ajoutés !",
   "Les {{count}} points de recharge ont été ajoutés !_other": "Les {{count}} points de recharge ont été ajoutés !",

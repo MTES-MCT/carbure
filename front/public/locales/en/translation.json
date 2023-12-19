@@ -584,7 +584,7 @@
   "Point de référence mesure": "Measurement reference point",
   "L'envoi de votre inscription des points de recharge a échoué. Merci de contacter l'équipe Carbure": "The sending of your application of the charging points failed.Please contact the Carbure team",
   "Cet outil vous permet de vérifier la conformité de votre demande d’inscription.": "This tool allows you to check the compliance of your application .",
-  "Vous avez déjà une demande d'inscription en attente. Cete nouvelle demande viendra écraser la précédente.": "You already have a pending application.This new request will replace the previous one.",
+  "Vous avez déjà une demande d'inscription en attente. Cette nouvelle demande viendra écraser la précédente.": "You already have a pending application.This new request will replace the previous one.",
   "Les {{count}} points de recharge ont été ajoutés !_one": "The charging point have been added!",
   "Les {{count}} points de recharge ont été ajoutés !_other": "The {{count}} charging points have been added!",
   "Impossible d'inscrire les points de recharge": "Unable to register charging points",
