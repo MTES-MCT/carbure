@@ -8,24 +8,24 @@ import { useTranslation } from "react-i18next"
 import EnergyTransferDialog from "./transfer-dialog"
 
 export interface EnergyTransferSummaryProps {
-    remainingVolume: number
+    remainingEnergy: number
 }
 
 export const EnergyTransferSummary = ({
-    remainingVolume,
+    remainingEnergy,
 }: EnergyTransferSummaryProps) => {
     const { t } = useTranslation()
     const portal = usePortal()
 
     const notify = useNotify()
 
-    const onEnergyTransferred = (volume: number, clientName: string) => {
-        notify(t("{{volume}} MWh ont bien été transférés au redevable {{clientName}}", { volume: formatNumber(volume, 3), clientName }), { variant: "success" })
+    const onEnergyTransferred = (energy: number, clientName: string) => {
+        notify(t("{{energy}} MWh ont bien été transférés au redevable {{clientName}}", { energy: formatNumber(energy, 3), clientName }), { variant: "success" })
     }
 
     const showEnergyTransferModal = () => {
         portal((close) => (
-            <EnergyTransferDialog onClose={close} remainingEnergy={remainingVolume} onEnergyTransferred={onEnergyTransferred} />
+            <EnergyTransferDialog onClose={close} remainingEnergy={remainingEnergy} onEnergyTransferred={onEnergyTransferred} />
         ))
     }
 
@@ -33,9 +33,9 @@ export const EnergyTransferSummary = ({
         <Alert icon={Bolt} variant="info" style={{ display: "flex", alignItems: "center" }}>
             <p>
                 {t(
-                    "{{remainingVolume}} MWh restants",
+                    "{{remainingEnergy}} MWh restants",
                     {
-                        remainingVolume: formatNumber(remainingVolume, 3),
+                        remainingEnergy: formatNumber(remainingEnergy, 3),
                     }
                 )}
             </p>
