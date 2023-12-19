@@ -59,7 +59,7 @@ export const ElecTransferDetailsDialog = ({
         <header>
           <TransferCertificateTag status={transferCertificate?.status} big />
           <h1>
-            {t("Certificat de cession n°{{id}}", { id: transferCertificate?.certificate_id || "-" })}
+            {t("Certificat de cession n°{{id}}", { id: transferCertificate?.certificate_id || "..." })}
           </h1>
         </header>
 
@@ -71,20 +71,20 @@ export const ElecTransferDetailsDialog = ({
               value={transferCertificate && formatDate(transferCertificate.transfer_date)}
 
             />
-            {displayCpo ?
-              <TextInput
-                readOnly
-                label={t("Aménageur")}
-                value={transferCertificate?.supplier.name}
 
-              />
-              : <TextInput
-                readOnly
-                label={t("Redevable")}
-                value={transferCertificate?.client.name}
+            <TextInput
+              readOnly
+              label={t("Aménageur")}
+              value={transferCertificate?.supplier.name}
 
-              />
-            }
+            />
+            <TextInput
+              readOnly
+              label={t("Redevable")}
+              value={transferCertificate?.client.name}
+
+            />
+
 
             <TextInput
               readOnly
