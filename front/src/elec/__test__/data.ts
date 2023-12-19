@@ -1,6 +1,6 @@
 import { cpo } from "carbure/__test__/data";
 import { EntityPreview, EntityType } from "carbure/types";
-import { ChargingPointsApplicationError, ElecChargingPointsApplication, ElecChargingPointsApplicationCheckInfo, ElecChargingPointsApplicationStatus, ElecProvisionCertificatePreview } from "elec/types";
+import { ChargingPointsApplicationError, ElecChargingPointsApplication, ElecChargingPointsApplicationCheckInfo, ElecChargingPointsApplicationStatus, ElecMeterReadingsApplication, ElecMeterReadingsApplicationStatus, ElecProvisionCertificatePreview } from "elec/types";
 import { ElecCPOSnapshot, ElecProvisionCertificatesData } from "elec/types-cpo";
 
 export const elecSnapshot: ElecCPOSnapshot = {
@@ -109,3 +109,44 @@ export const elecChargingPointsApplicationCheckResponseSucceed: ElecChargingPoin
     error_count: 0,
     charging_point_count: 90
 }
+
+// METER READINGS
+
+const elecMeterReadingApplication1: ElecMeterReadingsApplication = {
+    id: 1,
+    cpo: cpo,
+    station_count: 4,
+    charging_point_count: 90,
+    power_total: 8,
+    year: 2023,
+    quarter: 1,
+    status: ElecMeterReadingsApplicationStatus.Accepted,
+}
+
+const elecMeterReadingApplication2: ElecMeterReadingsApplication = {
+    id: 1,
+    cpo: cpo,
+    station_count: 19,
+    charging_point_count: 1000,
+    power_total: 30000,
+    year: 2023,
+    quarter: 2,
+    status: ElecMeterReadingsApplicationStatus.Pending,
+}
+const elecMeterReadingApplication3: ElecMeterReadingsApplication = {
+    id: 1,
+    cpo: cpo,
+    station_count: 19,
+    charging_point_count: 1000,
+    power_total: 30000,
+    year: 2023,
+    quarter: 2,
+    status: ElecMeterReadingsApplicationStatus.Rejected,
+}
+
+
+export const elecMeterReadingsApplications: ElecMeterReadingsApplication[] = [
+    elecMeterReadingApplication1,
+    elecMeterReadingApplication2,
+    elecMeterReadingApplication3
+]
