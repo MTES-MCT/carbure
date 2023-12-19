@@ -54,6 +54,7 @@ dc_biofuel_to_carbure_biofuel = {
     "bio isobutène": None,
     "bio isooctane": None,
     "bes": "Bio-essence de synthèse",
+    "bioessence de synthèse": "BES",
     "bioetbe": "ETBE",
     "biogazole de synthèse": "BG",
     "eeha": "EEHA",
