@@ -19,6 +19,8 @@ import ChargingPointsApplicationAcceptDialog from "elec-admin/components/chargin
 import ChargingPointsApplicationRejectDialog from "elec-admin/components/charging-points/reject-dialog"
 import { useMatch } from "react-router-dom"
 import ApplicationStatus from "./application-status"
+import { c } from "msw/lib/glossary-de6278a9"
+import ElecMeterReadingsFileUpload from "./upload-dialog"
 
 const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
   const { t } = useTranslation()
@@ -39,12 +41,15 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
   const applications = elecMeterReadingsApplications // TEST with applications
   const isEmpty = applications.length === 0
 
+  const currentDate = new Date()
+  const currentQuarter = currentDate.getMonth() < 3 ? 1 : currentDate.getMonth() < 6 ? 2 : currentDate.getMonth() < 9 ? 3 : 4
+  const quarterString = "T" + currentQuarter + " " + currentDate.getFullYear()
 
   function showUploadDialog() {
-    const pendingApplicationAlreadyExists = applications.filter(app => app.status === ElecMeterReadingsApplicationStatus.Pending).length > 0
-    // portal((resolve) => (
-    //   <ElecChargingPointsFileUpload onClose={resolve} pendingApplicationAlreadyExists={pendingApplicationAlreadyExists} />
-    // ))
+    const pendingApplicationAlreadyExists = applications.filter(app => app.status === ElecMeterReadingsApplicationStatus.Pending && app.quarter === currentQuarter).length > 0
+    portal((resolve) => (
+      <ElecMeterReadingsFileUpload onClose={resolve} pendingApplicationAlreadyExists={pendingApplicationAlreadyExists} quarterString={quarterString} companyId={companyId} />
+    ))
   }
 
   // function downloadChargingPoints() {
@@ -62,15 +67,15 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
           {t("Relevés trimestriels")}
         </h1>
 
-        {/* {isCPO && (
+        {isCPO && (
           <Button
             asideX={true}
             variant="primary"
             icon={Plus}
             action={showUploadDialog}
-            label={t("Inscrire des points de recharge")}
+            label={t("Transmettre mon relevé trimestriel {{quarter}}", { quarter: quarterString })}
           />
-        )} */}
+        )}
         {/* {applicationsSnapshot.charging_point_count > 0 &&
           <Button
             asideX={!isCPO}
