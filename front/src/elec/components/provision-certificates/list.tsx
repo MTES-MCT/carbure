@@ -75,7 +75,7 @@ const ProvisionCertificateList = ({ snapshot, year }: ProvisionCertificateListPr
                     />
 
                 </ActionBar>
-                <EnergyTransferSummary remainingVolume={snapshot.remaining_energy} />
+                <EnergyTransferSummary remainingEnergy={snapshot.remaining_energy} />
 
                 {count > 0 && provisionCertificatesData ? (
                     <>

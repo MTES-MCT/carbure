@@ -116,7 +116,7 @@ const ElecChargingPointsFileUpload = ({
           {pendingApplicationAlreadyExists &&
             (
               <Alert icon={AlertCircle} variant="warning">
-                <Trans>Vous avez déjà une demande d'inscription en attente. Cete nouvelle demande viendra écraser la précédente.</Trans>
+                <Trans>Vous avez déjà une demande d'inscription en attente. Cette nouvelle demande viendra écraser la précédente.</Trans>
               </Alert>
             )}
 

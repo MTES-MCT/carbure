@@ -8,21 +8,26 @@ import Form, { useForm } from "common/components/form"
 import { TextInput } from "common/components/input"
 import Button from "common/components/button"
 import { Save } from "common/components/icons"
+import { useEffect } from "react"
 
 type CompanyInfoProps = {
-  defaultEntity?: Entity
+  company?: Entity
 }
 
-const CompanyInfo = ({ defaultEntity }: CompanyInfoProps) => {
+const CompanyInfo = ({ company }: CompanyInfoProps) => {
   const { t } = useTranslation()
   const loggedEntity = useEntity()
 
-  const entity = defaultEntity || loggedEntity
-  const canModify = !defaultEntity && loggedEntity.hasRights(UserRole.Admin, UserRole.ReadWrite)
+  const entity = company || loggedEntity
+  const canModify = !company && loggedEntity.hasRights(UserRole.Admin, UserRole.ReadWrite)
+
+
 
   const updateEntity = useMutation(api.updateEntity, {
     invalidates: ["user-settings"],
   })
+
+
 
   const { bind, value: formEntity } = useForm({
     legal_name: entity.legal_name as string | undefined,
@@ -37,6 +42,23 @@ const CompanyInfo = ({ defaultEntity }: CompanyInfoProps) => {
   })
 
   const canSave = hasChange(entity, formEntity)
+
+  const onSubmitForm = () => {
+    if (canSave) {
+      updateEntity.execute(
+        entity.id,
+        formEntity.legal_name!,
+        formEntity.registration_id!,
+        formEntity.registered_address!,
+        formEntity.registered_zipcode!,
+        formEntity.registered_city!,
+        formEntity.registered_country!,
+        formEntity.sustainability_officer!,
+        formEntity.sustainability_officer_phone_number!
+      )
+    }
+  }
+
 
   return (
     <Panel id="info">
@@ -67,21 +89,7 @@ const CompanyInfo = ({ defaultEntity }: CompanyInfoProps) => {
       <section>
         <Form
           id="entity-info"
-          onSubmit={() => {
-            if (canSave) {
-              updateEntity.execute(
-                entity.id,
-                formEntity.legal_name!,
-                formEntity.registration_id!,
-                formEntity.registered_address!,
-                formEntity.registered_zipcode!,
-                formEntity.registered_city!,
-                formEntity.registered_country!,
-                formEntity.sustainability_officer!,
-                formEntity.sustainability_officer_phone_number!
-              )
-            }
-          }}
+          onSubmit={onSubmitForm}
         >
           <TextInput
             readOnly={!canModify}
@@ -140,7 +148,7 @@ function hasChange(entity: Partial<Entity>, formEntity: Partial<Entity>) {
     entity.registration_id !== formEntity.registration_id ||
     entity.sustainability_officer !== formEntity.sustainability_officer ||
     entity.sustainability_officer_phone_number !==
-      formEntity.sustainability_officer_phone_number ||
+    formEntity.sustainability_officer_phone_number ||
     entity.registered_address !== formEntity.registered_address ||
     entity.registered_city !== formEntity.registered_city ||
     entity.registered_zipcode !== formEntity.registered_zipcode ||
