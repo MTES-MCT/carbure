@@ -11,15 +11,15 @@ import { Save } from "common/components/icons"
 import { useEffect } from "react"
 
 type CompanyInfoProps = {
-  defaultEntity?: Entity
+  company?: Entity
 }
 
-const CompanyInfo = ({ defaultEntity }: CompanyInfoProps) => {
+const CompanyInfo = ({ company }: CompanyInfoProps) => {
   const { t } = useTranslation()
   const loggedEntity = useEntity()
 
-  const entity = defaultEntity || loggedEntity
-  const canModify = !defaultEntity && loggedEntity.hasRights(UserRole.Admin, UserRole.ReadWrite)
+  const entity = company || loggedEntity
+  const canModify = !company && loggedEntity.hasRights(UserRole.Admin, UserRole.ReadWrite)
 
 
 
@@ -27,7 +27,9 @@ const CompanyInfo = ({ defaultEntity }: CompanyInfoProps) => {
     invalidates: ["user-settings"],
   })
 
-  const formData = {
+
+
+  const { bind, value: formEntity } = useForm({
     legal_name: entity.legal_name as string | undefined,
     registration_id: entity.registration_id as string | undefined,
     sustainability_officer_phone_number:
@@ -37,17 +39,26 @@ const CompanyInfo = ({ defaultEntity }: CompanyInfoProps) => {
     registered_city: entity.registered_city as string | undefined,
     registered_zipcode: entity.registered_zipcode as string | undefined,
     registered_country: entity.registered_country as string | undefined,
-  }
-
-  const { bind, value: formEntity, setValue } = useForm(formData)
-
-  useEffect(() => {
-    if (entity) {
-      setValue(formData)
-    }
-  }, [entity])
+  })
 
   const canSave = hasChange(entity, formEntity)
+
+  const onSubmitForm = () => {
+    if (canSave) {
+      updateEntity.execute(
+        entity.id,
+        formEntity.legal_name!,
+        formEntity.registration_id!,
+        formEntity.registered_address!,
+        formEntity.registered_zipcode!,
+        formEntity.registered_city!,
+        formEntity.registered_country!,
+        formEntity.sustainability_officer!,
+        formEntity.sustainability_officer_phone_number!
+      )
+    }
+  }
+
 
   return (
     <Panel id="info">
@@ -78,21 +89,7 @@ const CompanyInfo = ({ defaultEntity }: CompanyInfoProps) => {
       <section>
         <Form
           id="entity-info"
-          onSubmit={() => {
-            if (canSave) {
-              updateEntity.execute(
-                entity.id,
-                formEntity.legal_name!,
-                formEntity.registration_id!,
-                formEntity.registered_address!,
-                formEntity.registered_zipcode!,
-                formEntity.registered_city!,
-                formEntity.registered_country!,
-                formEntity.sustainability_officer!,
-                formEntity.sustainability_officer_phone_number!
-              )
-            }
-          }}
+          onSubmit={onSubmitForm}
         >
           <TextInput
             readOnly={!canModify}

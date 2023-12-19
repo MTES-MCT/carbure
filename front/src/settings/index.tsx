@@ -88,7 +88,7 @@ const Settings = () => {
       />
       <section>
         {hasOptions && <CompanyOptions />}
-        <CompanyInfo />
+        <CompanyInfo key={entity.id} />
         {hasCertificates && <Certificates />}
         {hasDepot && <DeliverySitesSettings entity={entity} />}
         {isProducer && <ProductionSitesSettings entity={entity} />}

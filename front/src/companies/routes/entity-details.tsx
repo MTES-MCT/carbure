@@ -76,7 +76,7 @@ const EntityDetails = () => {
 
       <section>
         <UserRights />
-        {entityData && <CompanyInfo defaultEntity={entityData} />}
+        {entityData && <CompanyInfo company={entityData} key={entityData.id} />}
         {entityData && !isAirline && (
           <DeliverySitesSettings
             readOnly
