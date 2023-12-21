@@ -474,7 +474,7 @@
   "Refusé ({{ count }})_many": "Refusés ({{ count }})",
   "Refusé ({{ count }})_other": "Refusés ({{ count }})",
   "Aucune demande trouvée": "Aucune demande trouvée",
-  "A corriger": "A corriger",
+  "À corriger": "À corriger",
   "Correction du dossier double comptage": "Correction du dossier double comptage",
   "{{count}} erreurs ont été détectées dans le fichier Excel source. Merci de corriger le fichier et envoyez-le à nouveau._one": "{{count}} erreur a été détecté dans le fichier Excel source. Merci de corriger le fichier et envoyez-le à nouveau.",
   "{{count}} erreurs ont été détectées dans le fichier Excel source. Merci de corriger le fichier et envoyez-le à nouveau._many": "{{count}} erreurs ont été détectées dans le fichier Excel source. Merci de corriger le fichier et envoyez-le à nouveau.",

@@ -134,6 +134,6 @@ test("upload file with error", async () => {
   //tester l'ouverture de la modal d'erreur
   server.use(okChargingPointsCheckError)
   await user.click(uploadButton)
-  screen.getByText("Correction du dossier double comptage")
+  screen.getByText("Inscription des points de recharge")
 
 })

@@ -25,9 +25,9 @@ export const ErrorsDetailsDialog = ({
     <Dialog fullscreen onClose={onClose}>
       <header>
         <Tag big variant="warning">
-          {t("A corriger")}
+          {t("À corriger")}
         </Tag>
-        <h1>{t("Correction du dossier double comptage")}</h1>
+        <h1>{t("Inscription des points de recharge")}</h1>
       </header>
 
       <main>
