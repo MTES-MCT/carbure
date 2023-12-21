@@ -28,7 +28,7 @@ export const MeterReadingsErrorsDetailsDialog = ({
     <Dialog fullscreen onClose={onClose}>
       <header>
         <Tag big variant="warning">
-          {t("A corriger")}
+          {t("À corriger")}
         </Tag>
         <h1>{t("Relevés trimestriels {{quarter}}", { quarter: quarterString })}</h1>
       </header>
@@ -51,7 +51,7 @@ export const MeterReadingsErrorsDetailsDialog = ({
       <footer>
         <Button
           icon={Plus}
-          label={t("Transmettre mon relevé trimestriel")}
+          label={t("Transmettre mes relevés trimestriels")}
           variant="primary"
           disabled={true}
         />

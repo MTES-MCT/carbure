@@ -3,7 +3,7 @@ import { setupServer } from "msw/node"
 
 
 import { mockGetWithResponseData, mockPostWithResponseData } from "carbure/__test__/helpers"
-import { elecChargingPointsApplicationCheckResponseFailed, elecChargingPointsApplicationCheckResponseSucceed, elecChargingPointsApplications } from "elec/__test__/data"
+import { elecChargingPointsApplicationCheckResponseFailed, elecChargingPointsApplicationCheckResponseSucceed, elecChargingPointsApplications, elecMeterReadingsApplications, meterReadingsApplicationCheckResponseFailed } from "elec/__test__/data"
 
 
 
@@ -21,4 +21,7 @@ export const okChargingPointsCheckValid = mockPostWithResponseData("/api/elec/cp
 export const okChargingPointsCheckError = mockPostWithResponseData("/api/elec/cpo/charging-points/check-application", elecChargingPointsApplicationCheckResponseFailed, true)
 export const okChargingPointsAddSuccess = mockPostWithResponseData("/api/elec/cpo/charging-points/add-application")
 
+export const okMeterReadingsApplicationsEmpty = mockGetWithResponseData("/api/elec/cpo/meter-readings/applications", [])
+export const okMeterReadingsApplications = mockGetWithResponseData("/api/elec/cpo/meter-readings/applications", elecMeterReadingsApplications)
+export const okMeterReadingsCheckError = mockPostWithResponseData("/api/elec/cpo/meter-readings/check-application", meterReadingsApplicationCheckResponseFailed, true)
 

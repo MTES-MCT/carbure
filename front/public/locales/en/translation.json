@@ -434,7 +434,7 @@
   "Refusé ({{ count }})_one": "Rejected",
   "Refusé ({{ count }})_other": "Rejected",
   "Aucune demande trouvée": "Aucune demande trouvée",
-  "A corriger": "To fix",
+  "À corriger": "To fix",
   "Correction du dossier double comptage": "Double counting application correction",
   "{{count}} erreurs ont été détectées dans le fichier Excel source. Merci de corriger le fichier et envoyez-le à nouveau._one": "{{count}} error detected in the Excel Source file. Please correct the file and send it again.",
   "{{count}} erreurs ont été détectées dans le fichier Excel source. Merci de corriger le fichier et envoyez-le à nouveau._other": "{{count}} errors detected in the Excel Source file. Please correct the file and send it again.",

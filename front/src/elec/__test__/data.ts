@@ -161,8 +161,8 @@ export const meterReadingsApplicationError1: MeterReadingsApplicationError = {
 }
 export const meterReadingsApplicationCheckResponseFailed: ElecMeterReadingsApplicationCheckInfo = {
     file_name: "test.csv",
-    error_count: 2,
-    charging_point_count: 0,
+    error_count: 1,
+    charging_point_count: 2,
     errors: [meterReadingsApplicationError1]
 }
 

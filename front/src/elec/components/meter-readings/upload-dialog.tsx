@@ -56,9 +56,9 @@ const ElecMeterReadingsFileUpload = ({
 
 
       //TO TEST ERROR
-      // const checkedData = meterReadingsApplicationCheckResponseFailed
-      // portal((close) => <MeterReadingsErrorsDetailsDialog fileData={checkedData} onClose={close} quarterString={quarterString} />)
-      // return
+      const checkedData = meterReadingsApplicationCheckResponseFailed
+      portal((close) => <MeterReadingsErrorsDetailsDialog fileData={checkedData} onClose={close} quarterString={quarterString} />)
+      return
 
       if (response?.status === 400) {
         const checkedData = response!.data.data
@@ -98,7 +98,7 @@ const ElecMeterReadingsFileUpload = ({
   return (
     <Dialog onClose={onClose}>
       <header>
-        <h1>{t("Relevé trimestriel - {{quarter}}", { quarter: quarterString })}</h1>
+        <h1>{t("Relevés trimestriels - {{quarter}}", { quarter: quarterString })}</h1>
       </header>
 
       <main>
@@ -111,7 +111,7 @@ const ElecMeterReadingsFileUpload = ({
             </p>
             <ol>
               <li><Trans>
-                Téléchargez le relevé du dernier trimestre {" "}
+                Téléchargez les relevés du dernier trimestre {" "}
                 <ExternalLink href={TEMPLATE_URL + `?entity_id=${entity.id}&company_id=${companyId}`}>
                   sur ce lien
                 </ExternalLink>
