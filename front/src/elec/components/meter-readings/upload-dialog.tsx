@@ -15,6 +15,8 @@ import { ElecChargingPointsApplicationCheckInfo } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import ErrorsDetailsDialog from "../charging-points/errors-dialog"
 import ValidDetailsDialog from "../charging-points/valid-dialog"
+import { meterReadingsApplicationCheckResponseFailed } from "elec/__test__/data"
+import MeterReadingsErrorsDetailsDialog from "./errors-dialog"
 
 type ElecMeterReadingsFileUploadProps = {
   onClose: () => void
@@ -48,9 +50,19 @@ const ElecMeterReadingsFileUpload = ({
     onError: (err) => {
 
       const response = (err as AxiosError<{ status: string, error: string, data: ElecChargingPointsApplicationCheckInfo }>).response
+
+      //TO TEST SUCCESS
+
+
+
+      //TO TEST ERROR
+      // const checkedData = meterReadingsApplicationCheckResponseFailed
+      // portal((close) => <MeterReadingsErrorsDetailsDialog fileData={checkedData} onClose={close} quarterString={quarterString} />)
+      // return
+
       if (response?.status === 400) {
-        const checkedData = response.data.data
-        portal((close) => <ErrorsDetailsDialog fileData={checkedData} onClose={close} />)
+        const checkedData = response!.data.data
+        portal((close) => <MeterReadingsErrorsDetailsDialog fileData={checkedData} onClose={close} quarterString={quarterString} />)
 
 
       } else if (response?.status === 413) {

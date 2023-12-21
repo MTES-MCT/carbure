@@ -1,6 +1,6 @@
 import { cpo } from "carbure/__test__/data";
 import { EntityPreview, EntityType } from "carbure/types";
-import { ChargingPointsApplicationError, ElecChargingPointsApplication, ElecChargingPointsApplicationCheckInfo, ElecChargingPointsApplicationStatus, ElecMeterReadingsApplication, ElecMeterReadingsApplicationStatus, ElecProvisionCertificatePreview } from "elec/types";
+import { ChargingPointsApplicationError, ElecChargingPointsApplication, ElecChargingPointsApplicationCheckInfo, ElecChargingPointsApplicationStatus, ElecMeterReadingsApplication, ElecMeterReadingsApplicationCheckInfo, ElecMeterReadingsApplicationStatus, ElecProvisionCertificatePreview, MeterReadingsApplicationError } from "elec/types";
 import { ElecCPOSnapshot, ElecProvisionCertificatesData } from "elec/types-cpo";
 
 export const elecSnapshot: ElecCPOSnapshot = {
@@ -48,6 +48,8 @@ export const elecAdminProvisionCertificateList: ElecProvisionCertificatesData = 
     returned: 10,
     total: 11
 }
+
+//CHARGING POINTS
 
 
 const elecChargingPointApplication1: ElecChargingPointsApplication = {
@@ -150,3 +152,22 @@ export const elecMeterReadingsApplications: ElecMeterReadingsApplication[] = [
     elecMeterReadingApplication2,
     elecMeterReadingApplication3
 ]
+
+
+
+export const meterReadingsApplicationError1: MeterReadingsApplicationError = {
+    line: 87,
+    error: "UNKNOW_ERROR"
+}
+export const meterReadingsApplicationCheckResponseFailed: ElecMeterReadingsApplicationCheckInfo = {
+    file_name: "test.csv",
+    error_count: 2,
+    charging_point_count: 0,
+    errors: [meterReadingsApplicationError1]
+}
+
+// export const elecChargingPointsApplicationCheckResponseSucceed: ElecChargingPointsApplicationCheckInfo = {
+//     file_name: "test.csv",
+//     error_count: 0,
+//     charging_point_count: 90
+// }

@@ -1,11 +1,10 @@
 import { Entity } from "carbure/types"
 import { Route } from "react-router-dom"
 import { TestRoot } from "setupTests"
-import { setEntity } from "settings/__test__/api"
 
 import Transactions from "../index"
 import { render, screen } from "@testing-library/react"
-import { Data, waitWhileLoading } from "carbure/__test__/helpers"
+import { Data, waitWhileLoading, setEntity } from "carbure/__test__/helpers"
 import { operator } from "carbure/__test__/data"
 import server from "./api"
 import { emptyLots, emptySnapshot, lots, snapshot } from "./data"

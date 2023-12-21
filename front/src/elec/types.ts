@@ -117,10 +117,17 @@ export interface ElecMeterReadingsApplication {
   status: ElecMeterReadingsApplicationStatus
 }
 export interface ElecMeterReadingsApplicationCheckInfo {
-  errors?: ChargingPointsApplicationError[]
+  errors?: MeterReadingsApplicationError[]
   file_name: string
   error_count: number
   charging_point_count: number
   pending_application_already_exists?: boolean
-
 }
+
+
+export interface MeterReadingsApplicationError {
+  line: number
+  error: string
+  meta?: null | any
+}
+
