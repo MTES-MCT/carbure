@@ -37,8 +37,8 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
     params: [entity.id, companyId],
   })
 
-  const applications = applicationsResponse.result?.data.data ?? []
-  // const applications = elecMeterReadingsApplications // TEST with applications
+  // const applications = applicationsResponse.result?.data.data ?? []
+  const applications = elecMeterReadingsApplications // TEST with applications
   const isEmpty = applications.length === 0
 
   const currentDate = new Date()

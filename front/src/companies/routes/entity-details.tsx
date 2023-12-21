@@ -15,6 +15,7 @@ import useEntity from "carbure/hooks/entity"
 import CompanyInfo from "settings/components/company-info"
 import { useTranslation } from "react-i18next"
 import ElecChargingPointsSettings from "elec/components/charging-points/settings"
+import ElecMeterReadingsSettings from "elec/components/meter-readings/settings"
 
 const EntityDetails = () => {
   const navigate = useNavigate()
@@ -65,6 +66,11 @@ const EntityDetails = () => {
             key: "elec-charging-points",
             label: t("Points de recharge"),
           },
+          isCPO && {
+            path: "#elec-meter-readings",
+            key: "elec-meter-readings",
+            label: t("Relevés trimestriels"),
+          },
           isProducer && { key: "production", path: "#production", label: t("Sites de production") }, // prettier-ignore
           !isAirline && {
             key: "certificates",
@@ -94,6 +100,7 @@ const EntityDetails = () => {
           />
         )}
         {isCPO && <ElecChargingPointsSettings companyId={companyId} />}
+        {isCPO && <ElecMeterReadingsSettings companyId={companyId} />}
         {!isAirline && <Certificates entity_id={companyId} />}
       </section>
     </Main>

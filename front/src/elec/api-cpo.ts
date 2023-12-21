@@ -147,10 +147,10 @@ export function getMeterReadingsTemplate(entityId: number, companyId: number) {
   })
 }
 
-export function checkMeterReadingsApplication(entity_id: number, file: File) {
+export function checkMeterReadingsApplication(entity_id: number, file: File, quarter: number, year: number) {
   return api.post<Api<ElecMeterReadingsApplicationCheckInfo>>(
     "/elec/cpo/meter-readings/check-application",
-    { entity_id, file }
+    { entity_id, file, quarter, year }
   )
 }
 
@@ -158,13 +158,13 @@ export function checkMeterReadingsApplication(entity_id: number, file: File) {
 export function addMeterReadings(
   entity_id: number,
   file: File,
-  // quarter: number, //Peut être pas besoin ? si on ne peut faire que sur le trimestre en cours par exemple
-  // year: number
+  quarter: number,
+  year: number
 ) {
   return api.post("/elec/cpo/meter-readings/add-application", {
     entity_id,
     file,
-    // quarter,
-    // year
+    quarter,
+    year
   })
 }

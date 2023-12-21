@@ -3,22 +3,19 @@ import useEntity from "carbure/hooks/entity"
 import Button, { ExternalLink } from "common/components/button"
 import Dialog from "common/components/dialog"
 import { Form, useForm } from "common/components/form"
-import { AlertCircle, Check, Return, Upload } from "common/components/icons"
+import { Check, Return, Upload } from "common/components/icons"
 import { FileInput } from "common/components/input"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 
-import Alert from "common/components/alert"
-import * as api from "elec/api-cpo"
-import { ElecChargingPointsApplicationCheckInfo, ElecMeterReadingsApplicationCheckInfo } from "elec/types"
-import { Trans, useTranslation } from "react-i18next"
-import ErrorsDetailsDialog from "../charging-points/errors-dialog"
-import ValidDetailsDialog from "../charging-points/valid-dialog"
 import { meterReadingsApplicationCheckResponseFailed, meterReadingsApplicationCheckResponseSuccess } from "elec/__test__/data"
+import * as api from "elec/api-cpo"
+import { ElecMeterReadingsApplicationCheckInfo } from "elec/types"
+import { Trans, useTranslation } from "react-i18next"
 import MeterReadingsErrorsDetailsDialog from "./errors-dialog"
-import MeterReadingsValidDetailsDialog from "./valid-dialog"
 import { ReplaceAlert } from "./replace-alert"
+import MeterReadingsValidDetailsDialog from "./valid-dialog"
 
 type ElecMeterReadingsFileUploadProps = {
   onClose: () => void
@@ -55,12 +52,12 @@ const ElecMeterReadingsFileUpload = ({
 
       const response = (err as AxiosError<{ status: string, error: string, data: ElecMeterReadingsApplicationCheckInfo }>).response
 
-      //TO TEST SUCCESS
+      // TO TEST SUCCESS
       // const checkedData = meterReadingsApplicationCheckResponseSuccess
       // portal((close) => <MeterReadingsValidDetailsDialog fileData={checkedData!} onClose={close} file={value.meterReadingsFile!} />)
       // return
 
-      //TO TEST ERROR
+      // TO TEST ERROR
       // const checkedData = meterReadingsApplicationCheckResponseFailed
       // portal((close) => <MeterReadingsErrorsDetailsDialog fileData={checkedData} onClose={close} />)
       // return
@@ -96,7 +93,9 @@ const ElecMeterReadingsFileUpload = ({
     if (!value.meterReadingsFile) return
     checkMeterReadingsFile.execute(
       entity.id,
-      value.meterReadingsFile as File
+      value.meterReadingsFile as File,
+      quarter,
+      year,
     )
   }
 
