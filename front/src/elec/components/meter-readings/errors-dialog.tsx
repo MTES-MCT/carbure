@@ -4,9 +4,8 @@ import { Dialog } from "common/components/dialog"
 import { AlertCircle, Plus, Return } from "common/components/icons"
 import Tag from "common/components/tag"
 import {
-  ChargingPointsApplicationError,
-  ElecChargingPointsApplicationCheckInfo,
   ElecMeterReadingsApplicationCheckInfo,
+  MeterReadingsApplicationError,
 } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import { t } from "i18next"
@@ -14,13 +13,11 @@ import { t } from "i18next"
 export type MeterReadingsErrorsDetailsDialogProps = {
   fileData: ElecMeterReadingsApplicationCheckInfo
   onClose: () => void
-  quarterString: string
 }
 
 export const MeterReadingsErrorsDetailsDialog = ({
   fileData,
   onClose,
-  quarterString,
 }: MeterReadingsErrorsDetailsDialogProps) => {
   const { t } = useTranslation()
 
@@ -30,7 +27,7 @@ export const MeterReadingsErrorsDetailsDialog = ({
         <Tag big variant="warning">
           {t("À corriger")}
         </Tag>
-        <h1>{t("Relevés trimestriels {{quarter}}", { quarter: quarterString })}</h1>
+        <h1>{t("Relevés trimestriels T{{quarter}} {{year}}", { quarter: fileData.quarter, year: fileData.year })}</h1>
       </header>
 
       <main>
@@ -63,7 +60,7 @@ export const MeterReadingsErrorsDetailsDialog = ({
 }
 
 type ErrorsTableProps = {
-  errors: ChargingPointsApplicationError[]
+  errors: MeterReadingsApplicationError[]
 }
 
 export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
@@ -95,12 +92,12 @@ export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
   )
 }
 
-export function getErrorText(error: ChargingPointsApplicationError) {
+export function getErrorText(error: MeterReadingsApplicationError) {
   switch (error.error) {
     case "EXCEL_PARSING_FAILED":
       return t("Le fichier importé n'a pas pu être analysé. Merci de verifier que le format du modèle de fichier a bien été respecté.")
 
-    case "INVALID_CHARGING_POINT_DATA":
+    case "INVALID_METER_READINGS_DATA":
       return t(`Le champ "{{invalidField}}" est invalide`, {
         invalidField: getFieldText(error.meta),
       })

@@ -120,6 +120,8 @@ export interface ElecMeterReadingsApplicationCheckInfo {
   errors?: MeterReadingsApplicationError[]
   file_name: string
   error_count: number
+  year: number
+  quarter: number
   charging_point_count: number
   pending_application_already_exists?: boolean
 }

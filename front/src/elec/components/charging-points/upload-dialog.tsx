@@ -15,6 +15,7 @@ import { checkChargingPointsApplication } from "elec/api-cpo"
 import ErrorsDetailsDialog from "./errors-dialog"
 import ValidDetailsDialog from "./valid-dialog"
 import Alert from "common/components/alert"
+import { ReplaceAlert } from "./replace-alert"
 
 type ElecChargingPointsFileUploadProps = {
   onClose: () => void
@@ -111,9 +112,7 @@ const ElecChargingPointsFileUpload = ({
           </Form>
           {pendingApplicationAlreadyExists &&
             (
-              <Alert icon={AlertCircle} variant="warning">
-                <Trans>Vous avez déjà une demande d'inscription en attente. Cette nouvelle demande viendra écraser la précédente.</Trans>
-              </Alert>
+              <ReplaceAlert />
             )}
 
         </section>

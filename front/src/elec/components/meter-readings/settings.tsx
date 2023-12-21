@@ -49,7 +49,7 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
   function showUploadDialog() {
     const pendingApplicationAlreadyExists = applications.filter(app => app.status === ElecMeterReadingsApplicationStatus.Pending && app.quarter === currentQuarter).length > 0
     portal((resolve) => (
-      <ElecMeterReadingsFileUpload onClose={resolve} pendingApplicationAlreadyExists={pendingApplicationAlreadyExists} quarterString={quarterString} companyId={companyId} />
+      <ElecMeterReadingsFileUpload onClose={resolve} pendingApplicationAlreadyExists={pendingApplicationAlreadyExists} quarter={currentQuarter} year={currentYear} companyId={companyId} />
     ))
   }
 

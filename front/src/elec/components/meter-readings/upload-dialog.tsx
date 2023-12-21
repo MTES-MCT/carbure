@@ -11,23 +11,27 @@ import { useMutation } from "common/hooks/async"
 
 import Alert from "common/components/alert"
 import * as api from "elec/api-cpo"
-import { ElecChargingPointsApplicationCheckInfo } from "elec/types"
+import { ElecChargingPointsApplicationCheckInfo, ElecMeterReadingsApplicationCheckInfo } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import ErrorsDetailsDialog from "../charging-points/errors-dialog"
 import ValidDetailsDialog from "../charging-points/valid-dialog"
-import { meterReadingsApplicationCheckResponseFailed } from "elec/__test__/data"
+import { meterReadingsApplicationCheckResponseFailed, meterReadingsApplicationCheckResponseSuccess } from "elec/__test__/data"
 import MeterReadingsErrorsDetailsDialog from "./errors-dialog"
+import MeterReadingsValidDetailsDialog from "./valid-dialog"
+import { ReplaceAlert } from "./replace-alert"
 
 type ElecMeterReadingsFileUploadProps = {
   onClose: () => void
-  quarterString: string
+  quarter: number,
+  year: number,
   companyId: number
   pendingApplicationAlreadyExists: boolean
 }
 
 const ElecMeterReadingsFileUpload = ({
   onClose,
-  quarterString,
+  quarter,
+  year,
   companyId,
   pendingApplicationAlreadyExists,
 }: ElecMeterReadingsFileUploadProps) => {
@@ -44,25 +48,26 @@ const ElecMeterReadingsFileUpload = ({
   const checkMeterReadingsFile = useMutation(api.checkMeterReadingsApplication, {
     onSuccess: (res) => {
       const checkedData = res.data.data
-      portal((close) => <ValidDetailsDialog fileData={checkedData!} onClose={close} file={value.meterReadingsFile!} />)
+      portal((close) => <MeterReadingsValidDetailsDialog fileData={checkedData!} onClose={close} file={value.meterReadingsFile!} />)
       onClose()
     },
     onError: (err) => {
 
-      const response = (err as AxiosError<{ status: string, error: string, data: ElecChargingPointsApplicationCheckInfo }>).response
+      const response = (err as AxiosError<{ status: string, error: string, data: ElecMeterReadingsApplicationCheckInfo }>).response
 
       //TO TEST SUCCESS
-
-
+      // const checkedData = meterReadingsApplicationCheckResponseSuccess
+      // portal((close) => <MeterReadingsValidDetailsDialog fileData={checkedData!} onClose={close} file={value.meterReadingsFile!} />)
+      // return
 
       //TO TEST ERROR
-      const checkedData = meterReadingsApplicationCheckResponseFailed
-      portal((close) => <MeterReadingsErrorsDetailsDialog fileData={checkedData} onClose={close} quarterString={quarterString} />)
-      return
+      // const checkedData = meterReadingsApplicationCheckResponseFailed
+      // portal((close) => <MeterReadingsErrorsDetailsDialog fileData={checkedData} onClose={close} />)
+      // return
 
       if (response?.status === 400) {
         const checkedData = response!.data.data
-        portal((close) => <MeterReadingsErrorsDetailsDialog fileData={checkedData} onClose={close} quarterString={quarterString} />)
+        portal((close) => <MeterReadingsErrorsDetailsDialog fileData={checkedData} onClose={close} />)
 
 
       } else if (response?.status === 413) {
@@ -98,7 +103,7 @@ const ElecMeterReadingsFileUpload = ({
   return (
     <Dialog onClose={onClose}>
       <header>
-        <h1>{t("Relevés trimestriels - {{quarter}}", { quarter: quarterString })}</h1>
+        <h1>{t("Relevés trimestriels - T{{quarter}} {{year}}", { quarter, year })}</h1>
       </header>
 
       <main>
@@ -106,7 +111,7 @@ const ElecMeterReadingsFileUpload = ({
           <Form id="dc-checker">
             <p>
               {t(
-                "Veuillez nous communiquer les relevés de vos points de recharge (kW) chaque trimestre, pour cela :"
+                "Veuillez nous communiquer les relevés de vos points de recharge (kWh) chaque trimestre, pour cela :"
               )}
             </p>
             <ol>
@@ -135,9 +140,7 @@ const ElecMeterReadingsFileUpload = ({
           </Form>
           {pendingApplicationAlreadyExists &&
             (
-              <Alert icon={AlertCircle} variant="warning">
-                <Trans>Vous avez déjà une demande d'inscription en attente. Cette nouvelle demande viendra écraser la précédente.</Trans>
-              </Alert>
+              <ReplaceAlert />
             )}
 
         </section>

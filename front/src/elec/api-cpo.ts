@@ -122,16 +122,14 @@ export function downloadChargingPointsApplicationDetails(entityId: number, appli
   return download("/elec/cpo/charging-points/application-details", { entity_id: entityId, application_id: applicationId, export: true })
 }
 
-export function applyChargingPoints(
+export function addChargingPoints(
   entity_id: number,
   file: File,
 ) {
-
   return api.post("/elec/cpo/charging-points/add-application", {
     entity_id,
     file
   })
-
 }
 
 
@@ -154,4 +152,19 @@ export function checkMeterReadingsApplication(entity_id: number, file: File) {
     "/elec/cpo/meter-readings/check-application",
     { entity_id, file }
   )
+}
+
+
+export function addMeterReadings(
+  entity_id: number,
+  file: File,
+  // quarter: number, //Peut être pas besoin ? si on ne peut faire que sur le trimestre en cours par exemple
+  // year: number
+) {
+  return api.post("/elec/cpo/meter-readings/add-application", {
+    entity_id,
+    file,
+    // quarter,
+    // year
+  })
 }

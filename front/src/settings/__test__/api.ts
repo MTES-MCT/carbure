@@ -22,7 +22,7 @@ import {
 } from "carbure/__test__/data"
 import { Data, clone, mockGetWithResponseData, setEntity } from "carbure/__test__/helpers"
 import { dcApplicationErrors } from "./data"
-import { okChargingPointsAddSuccess, okChargingPointsApplications, okChargingPointsCheckValid, okMeterReadingsApplications, okMeterReadingsCheckError } from "elec/__test__/api"
+import { okChargingPointsAddSuccess, okChargingPointsApplications, okChargingPointsCheckValid, okMeterReadingsAddSuccess, okMeterReadingsApplications, okMeterReadingsCheckError, okMeterReadingsCheckValid } from "elec/__test__/api"
 
 let deliverySites: any[] = []
 let productionSites: any[] = []
@@ -330,5 +330,6 @@ export default setupServer(
   okChargingPointsCheckValid,
   okChargingPointsAddSuccess,
   okMeterReadingsApplications,
-  okMeterReadingsCheckError
+  okMeterReadingsCheckValid,
+  okMeterReadingsAddSuccess
 )
