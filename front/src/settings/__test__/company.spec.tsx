@@ -11,9 +11,8 @@ import server, {
   okDynamicSettings,
   okEnableMac,
   okEnableTrading,
-  setEntity,
 } from "./api"
-import { waitWhileLoading } from "carbure/__test__/helpers"
+import { setEntity, waitWhileLoading } from "carbure/__test__/helpers"
 
 const SettingsWithHooks = ({ entityID }: { entityID?: number }) => {
   return (

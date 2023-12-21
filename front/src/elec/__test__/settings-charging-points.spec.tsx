@@ -1,12 +1,13 @@
 import { fireEvent, screen } from "@testing-library/react"
-import { waitWhileLoading } from "carbure/__test__/helpers"
+import { setEntity, waitWhileLoading } from "carbure/__test__/helpers"
 import { Route } from "react-router-dom"
 import { TestRoot, render } from "setupTests"
 
 import { cpo } from "carbure/__test__/data"
 import ElecChargingPointsSettings from "elec/components/charging-points/settings"
-import server, { okChargingPointsCheckError, okChargingPointsApplicationsEmpty, setEntity } from "./api"
+import server from "../../settings/__test__/api"
 import userEvent from "@testing-library/user-event"
+import { okChargingPointsApplicationsEmpty, okChargingPointsCheckError } from "./api"
 
 const SettingsWithHooks = () => {
   return (

@@ -20,42 +20,13 @@ import {
   producer,
   productionSite,
 } from "carbure/__test__/data"
-import { clone, Data } from "carbure/__test__/helpers"
+import { Data, clone, mockGetWithResponseData, setEntity } from "carbure/__test__/helpers"
 import { dcApplicationErrors } from "./data"
-import { elecChargingPointsApplicationCheckResponseFailed, elecChargingPointsApplicationCheckResponseSucceed, elecChargingPointsApplications } from "elec/__test__/data"
+import { okChargingPointsAddSuccess, okChargingPointsApplications, okChargingPointsCheckValid } from "elec/__test__/api"
 
 let deliverySites: any[] = []
 let productionSites: any[] = []
 
-const mockGetWithResponseData = (url: string, data: any) => {
-  return rest.get(url, (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data,
-      })
-    )
-  })
-}
-const mockPostWithResponseData = (url: string, data?: any, withError: boolean = false) => {
-  return rest.post(url, (req, res, ctx) => {
-    return res(
-      withError ? ctx.status(400) : ctx.status(200),
-      ctx.json({
-        status: withError ? "error" : "success",
-        data,
-      })
-    )
-  })
-}
-
-
-
-
-
-export function setEntity(nextEntity: any) {
-  Data.set("entity", nextEntity)
-}
 setEntity(producer)
 
 export function setDeliverySites(nextDeliverySites: any[]) {
@@ -325,21 +296,6 @@ export const koDoubleCountUploadApplication = rest.post(
     )
   }
 )
-
-
-export const okChargingPointsApplications = rest.get("/api/elec/cpo/charging-points/applications", (req, res, ctx) => {
-  return res(
-    ctx.json({
-      status: "success",
-      data: elecChargingPointsApplications,
-    })
-  )
-})
-
-export const okChargingPointsApplicationsEmpty = mockGetWithResponseData("/api/elec/cpo/charging-points/applications", [])
-export const okChargingPointsCheckValid = mockPostWithResponseData("/api/elec/cpo/charging-points/check-application", elecChargingPointsApplicationCheckResponseSucceed)
-export const okChargingPointsCheckError = mockPostWithResponseData("/api/elec/cpo/charging-points/check-application", elecChargingPointsApplicationCheckResponseFailed, true)
-export const okChargingPointsAddSuccess = mockPostWithResponseData("/api/elec/cpo/charging-points/add-application")
 
 
 

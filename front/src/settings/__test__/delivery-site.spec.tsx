@@ -3,9 +3,9 @@ import { waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Route } from "react-router-dom"
 import { deliverySite, producer } from "carbure/__test__/data"
-import { getField, waitWhileLoading } from "carbure/__test__/helpers"
+import { getField, setEntity, waitWhileLoading } from "carbure/__test__/helpers"
 
-import server, { setDeliverySites, setEntity } from "./api"
+import server, { setDeliverySites } from "./api"
 import DeliverySitesSettings from "settings/components/delivery-site"
 import { getDeliverySites } from "settings/api/delivery-sites"
 
