@@ -2,48 +2,48 @@ import useEntity from "carbure/hooks/entity"
 import Alert from "common/components/alert"
 import { Button } from "common/components/button"
 import { Dialog } from "common/components/dialog"
-import { AlertCircle, Check, Cross, Plus, Return, Send } from "common/components/icons"
+import { AlertCircle, Check, Plus, Return, Send } from "common/components/icons"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import Tag from "common/components/tag"
 import { useMutation } from "common/hooks/async"
-import { ElecChargingPointsApplicationCheckInfo } from "elec/types"
+import * as api from "elec/api-cpo"
+import { ElecMeterReadingsApplicationCheckInfo } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
-import { addChargingPoints } from "elec/api-cpo"
 import { ReplaceAlert } from "./replace-alert"
 
-export type ValidDetailsDialogProps = {
-  fileData: ElecChargingPointsApplicationCheckInfo
+export type MeterReadingsValidDetailsDialogProps = {
+  fileData: ElecMeterReadingsApplicationCheckInfo
   onClose: () => void
   file: File
 }
 
-export const ValidDetailsDialog = ({
+export const MeterReadingsValidDetailsDialog = ({
   fileData,
   onClose,
   file
-}: ValidDetailsDialogProps) => {
+}: MeterReadingsValidDetailsDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const notify = useNotify()
   const notifyError = useNotifyError()
   const portal = usePortal()
 
-  const chargingPointsApplication = useMutation(addChargingPoints, {
-    invalidates: ["charging-points-applications"],
+  const meterReadingsApplication = useMutation(api.addMeterReadings, {
+    invalidates: ["meter-readings-applications"],
     onSuccess() {
       onClose()
-      notify(t("Les {{count}} relevés trimestriels ont bien été envoyés !", { count: fileData.charging_point_count }), { variant: "success" })
+      notify(t("Les {{count}} points de recharge ont été ajoutés !", { count: fileData.charging_point_count }), { variant: "success" })
 
     },
     onError(err) {
-      notifyError(err, t("Impossible d'envoyer les relevés trimestriels"))
+      notifyError(err, t("Impossible d'inscrire les points de recharge"))
     },
   })
 
-  const submitChargingPointsApplication = () => {
+  const submitMeterReadingsApplication = () => {
     const confirmApplication = () => {
-      chargingPointsApplication.execute(entity.id, file)
+      meterReadingsApplication.execute(entity.id, file)
     }
     if (fileData.pending_application_already_exists) {
       portal((resolve) => (
@@ -60,7 +60,7 @@ export const ValidDetailsDialog = ({
         <Tag big variant="success">
           {t("Valide")}
         </Tag>
-        <h1>{t("Inscription des points de recharge")}</h1>
+        <h1>{t("Relevés trimestriels - T{{quarter}} {{year}}", { quarter: fileData.quarter, year: fileData.year })}</h1>
       </header>
 
       <main>
@@ -76,12 +76,14 @@ export const ValidDetailsDialog = ({
           <p>
             <Trans
               count={fileData.charging_point_count}
-              defaults="Les <b>{{count}} points de recharge</b> peuvent être inscrits à votre espace CarbuRe." />
+              values={{
+                quarter: fileData.quarter,
+                year: fileData.year,
+              }}
+              defaults="Votre relevé trimestriel T{{quarter}} {{year}} pour vos {{count}} points de recharge peut-être transmis à la DGEC pour vérification.  peuvent être inscrits à votre espace CarbuRe." />
 
           </p>
-          <p>
-            <Trans>Un échantillon de points de recharge vous sera transmis directement par e-mail de notre part dans le but de réaliser un audit.</Trans>
-          </p>
+
 
           {fileData.pending_application_already_exists &&
             (
@@ -93,10 +95,10 @@ export const ValidDetailsDialog = ({
       <footer>
         <Button
           icon={Send}
-          loading={chargingPointsApplication.loading}
-          label={fileData.pending_application_already_exists ? t("Remplacer la demande d'inscription") : t("Envoyer la demande d'inscription")}
+          loading={meterReadingsApplication.loading}
+          label={fileData.pending_application_already_exists ? t("Remplacer mes relevés trimestriels") : t("Transmettre mes relevés trimestriels")}
           variant="primary"
-          action={submitChargingPointsApplication}
+          action={submitMeterReadingsApplication}
         />
 
         <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
@@ -107,7 +109,7 @@ export const ValidDetailsDialog = ({
 }
 
 
-export default ValidDetailsDialog
+export default MeterReadingsValidDetailsDialog
 
 const ReplaceApplicationConfirmDialog = ({ onClose, onConfirm }: {
   onClose: () => void,
@@ -123,14 +125,14 @@ const ReplaceApplicationConfirmDialog = ({ onClose, onConfirm }: {
   return <Dialog onClose={onClose}>
     <header>
 
-      <h1>{t("Remplacer la demande d’inscription ?")}</h1>
+      <h1>{t("Remplacer les derniers relevés ?")}</h1>
     </header>
 
     <main>
 
       <section>
         <p style={{ textAlign: 'left' }}>
-          <Trans>Souhaitez-vous confirmer le remplacement de la précédente demande d’inscription par celle-ci ?</Trans>
+          <Trans>Souhaitez-vous confirmer le remplacement de vos derniers relevés trimestriels en attente validation par cette nouvelle demande ?</Trans>
         </p>
 
       </section>

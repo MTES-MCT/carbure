@@ -162,12 +162,17 @@ export const meterReadingsApplicationError1: MeterReadingsApplicationError = {
 export const meterReadingsApplicationCheckResponseFailed: ElecMeterReadingsApplicationCheckInfo = {
     file_name: "test.csv",
     error_count: 1,
+    year: 2023,
+    quarter: 2,
     charging_point_count: 2,
     errors: [meterReadingsApplicationError1]
 }
 
-// export const elecChargingPointsApplicationCheckResponseSucceed: ElecChargingPointsApplicationCheckInfo = {
-//     file_name: "test.csv",
-//     error_count: 0,
-//     charging_point_count: 90
-// }
+export const meterReadingsApplicationCheckResponseSuccess: ElecMeterReadingsApplicationCheckInfo = {
+    file_name: "test.csv",
+    error_count: 0,
+    charging_point_count: 90,
+    quarter: 2,
+    year: 2023,
+    // pending_application_already_exists: true
+}
