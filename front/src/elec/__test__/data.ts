@@ -122,6 +122,8 @@ const elecMeterReadingApplication1: ElecMeterReadingsApplication = {
     power_total: 8,
     year: 2023,
     quarter: 1,
+    application_date: "2023-11-13",
+
     status: ElecMeterReadingsApplicationStatus.Accepted,
 }
 
@@ -133,6 +135,8 @@ const elecMeterReadingApplication2: ElecMeterReadingsApplication = {
     power_total: 30000,
     year: 2023,
     quarter: 2,
+    application_date: "2023-11-13",
+
     status: ElecMeterReadingsApplicationStatus.Pending,
 }
 const elecMeterReadingApplication3: ElecMeterReadingsApplication = {
@@ -143,6 +147,8 @@ const elecMeterReadingApplication3: ElecMeterReadingsApplication = {
     power_total: 30000,
     year: 2023,
     quarter: 2,
+    application_date: "2023-11-13",
+
     status: ElecMeterReadingsApplicationStatus.Rejected,
 }
 

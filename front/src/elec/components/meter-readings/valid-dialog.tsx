@@ -33,11 +33,11 @@ export const MeterReadingsValidDetailsDialog = ({
     invalidates: ["meter-readings-applications"],
     onSuccess() {
       onClose()
-      notify(t("Les {{count}} points de recharge ont été ajoutés !", { count: fileData.charging_point_count }), { variant: "success" })
+      notify(t("Les {{count}} relevés trimestriels ont bien été envoyés !", { count: fileData.charging_point_count }), { variant: "success" })
 
     },
     onError(err) {
-      notifyError(err, t("Impossible d'inscrire les points de recharge"))
+      notifyError(err, t("Impossible d'envoyer les relevés trimestriels."))
     },
   })
 
@@ -80,7 +80,7 @@ export const MeterReadingsValidDetailsDialog = ({
                 quarter: fileData.quarter,
                 year: fileData.year,
               }}
-              defaults="Votre relevé trimestriel T{{quarter}} {{year}} pour vos {{count}} points de recharge peut-être transmis à la DGEC pour vérification.  peuvent être inscrits à votre espace CarbuRe." />
+              defaults="Votre relevé trimestriel T{{quarter}} {{year}} pour vos {{count}} points de recharge peut être transmis à la DGEC pour vérification." />
 
           </p>
 

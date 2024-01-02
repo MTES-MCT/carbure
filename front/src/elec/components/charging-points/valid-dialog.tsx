@@ -33,11 +33,11 @@ export const ValidDetailsDialog = ({
     invalidates: ["charging-points-applications"],
     onSuccess() {
       onClose()
-      notify(t("Les {{count}} relevés trimestriels ont bien été envoyés !", { count: fileData.charging_point_count }), { variant: "success" })
+      notify(t("Les {{count}} points de recharge ont été ajoutés !", { count: fileData.charging_point_count }), { variant: "success" })
 
     },
     onError(err) {
-      notifyError(err, t("Impossible d'envoyer les relevés trimestriels"))
+      notifyError(err, t("Impossible d'envoyer la demande d'inscription de points de recharges"))
     },
   })
 

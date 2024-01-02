@@ -19,8 +19,9 @@ import ChargingPointsApplicationAcceptDialog from "elec-admin/components/chargin
 import ChargingPointsApplicationRejectDialog from "elec-admin/components/charging-points/reject-dialog"
 import { useMatch } from "react-router-dom"
 import ApplicationStatus from "./application-status"
-import { c } from "msw/lib/glossary-de6278a9"
 import ElecMeterReadingsFileUpload from "./upload-dialog"
+import MeterReadingsApplicationAcceptDialog from "elec-admin/components/meter-readings/accept-dialog"
+import MeterReadingsApplicationRejectDialog from "elec-admin/components/meter-readings/reject-dialog"
 
 const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
   const { t } = useTranslation()
@@ -37,8 +38,8 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
     params: [entity.id, companyId],
   })
 
-  // const applications = applicationsResponse.result?.data.data ?? []
-  const applications = elecMeterReadingsApplications // TEST with applications
+  const applications = applicationsResponse.result?.data.data ?? []
+  // const applications = elecMeterReadingsApplications // TEST with applications
   const isEmpty = applications.length === 0
 
   const currentDate = new Date()
@@ -53,13 +54,11 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
     ))
   }
 
-  // function downloadChargingPoints() {
-  //   api.downloadChargingPoints(entity.id, companyId)
-  // }
 
-  // const downloadChargingPointsApplication = (application: ElecChargingPointsApplication) => {
-  //   return api.downloadChargingPointsApplicationDetails(entity.id, companyId, application.id)
-  // }
+
+  const downloadMeterReadingsApplication = (application: ElecMeterReadingsApplication) => {
+    return api.downloadMeterReadingsApplicationDetails(entity.id, companyId, application.id)
+  }
 
   return (
     <Panel id="elec-meter-readings">
@@ -151,31 +150,31 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
               actionColumn<ElecMeterReadingsApplication>((application) =>
                 compact([
 
-                  // <Button
-                  //   captive
-                  //   variant="icon"
-                  //   icon={Download}
-                  //   title={t("Exporter les points de recharge")}
-                  //   action={() => downloadChargingPointsApplication(application)}
-                  // />,
-                  // entity.isAdmin && application.status === ElecChargingPointsApplicationStatus.Pending && <Button
-                  //   captive
-                  //   variant="icon"
-                  //   icon={Check}
-                  //   title={t("Valider la demande d'inscription")}
-                  //   action={() => portal((close) => (
-                  //     <ChargingPointsApplicationAcceptDialog application={application} companyId={companyId} onClose={close} />
-                  //   ))}
-                  // />,
-                  // entity.isAdmin && application.status === ElecChargingPointsApplicationStatus.Pending && <Button
-                  //   captive
-                  //   variant="icon"
-                  //   icon={Cross}
-                  //   title={t("Refuser la demande d'inscription")}
-                  //   action={() => portal((close) => (
-                  //     <ChargingPointsApplicationRejectDialog application={application} companyId={companyId} onClose={close} />
-                  //   ))}
-                  // />
+                  <Button
+                    captive
+                    variant="icon"
+                    icon={Download}
+                    title={t("Exporter les relevés trimestriels")}
+                    action={() => downloadMeterReadingsApplication(application)}
+                  />,
+                  entity.isAdmin && application.status === ElecMeterReadingsApplicationStatus.Pending && <Button
+                    captive
+                    variant="icon"
+                    icon={Check}
+                    title={t("Valider les relevés trimestriels")}
+                    action={() => portal((close) => (
+                      <MeterReadingsApplicationAcceptDialog application={application} companyId={companyId} onClose={close} />
+                    ))}
+                  />,
+                  entity.isAdmin && application.status === ElecMeterReadingsApplicationStatus.Pending && <Button
+                    captive
+                    variant="icon"
+                    icon={Cross}
+                    title={t("Refuser la demande d'inscription")}
+                    action={() => portal((close) => (
+                      <MeterReadingsApplicationRejectDialog application={application} companyId={companyId} onClose={close} />
+                    ))}
+                  />
 
                 ])
               ),

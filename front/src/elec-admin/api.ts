@@ -93,14 +93,42 @@ export function getChargingPointsApplications(entityId: number, companyId: numbe
     params: { entity_id: entityId, company_id: companyId },
   })
 }
+
+
+export function acceptMeterReadingsApplication(entityId: number, companyId: number, applicationId: number) {
+  return api.post("/admin/elec/meter-readings/accept-application", {
+    entity_id: entityId,
+    company_id: companyId,
+    application_id: applicationId,
+  })
+}
+
+
+export function rejectMeterReadingsApplication(entityId: number, companyId: number, applicationId: number) {
+  return api.post("/admin/elec/meter-readings/reject-application", {
+    entity_id: entityId,
+    company_id: companyId,
+    application_id: applicationId,
+  })
+}
+
+
+
+//METER READINGS
 export function getMeterReadingsApplications(entityId: number, companyId: number) {
   return api.get<Api<ElecMeterReadingsApplication[]>>("/admin/elec/meter-readings/applications", {
     params: { entity_id: entityId, company_id: companyId },
   })
 }
 
+export function downloadMeterReadingsApplicationDetails(entityId: number, companyId: number, applicationId: number) {
+  return download("/admin/elec/meter-readings/application-details", {
+    entity_id: entityId, company_id: companyId, application_id: applicationId, export: true
+  })
+}
+
 export function acceptChargingPointsApplication(entityId: number, companyId: number, applicationId: number) {
-  return api.post("/admin/elec/charging-points/accept-application", {
+  return api.post("/admin/elec/meter-readings/accept-application", {
     entity_id: entityId,
     company_id: companyId,
     application_id: applicationId,
@@ -109,10 +137,9 @@ export function acceptChargingPointsApplication(entityId: number, companyId: num
 
 
 export function rejectChargingPointsApplication(entityId: number, companyId: number, applicationId: number) {
-  return api.post("/admin/elec/charging-points/reject-application", {
+  return api.post("/admin/elec/meter-readings/reject-application", {
     entity_id: entityId,
     company_id: companyId,
     application_id: applicationId,
   })
 }
-

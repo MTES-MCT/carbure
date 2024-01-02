@@ -113,6 +113,7 @@ export interface ElecMeterReadingsApplication {
   power_total: number
   year: number
   quarter: number
+  application_date: string
   validation_date?: string
   status: ElecMeterReadingsApplicationStatus
 }
