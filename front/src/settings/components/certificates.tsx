@@ -311,10 +311,10 @@ export const ExpirationDate = ({ link, readOnly }: ExpirationDateProps) => {
       style={
         expired
           ? {
-              alignItems: "center",
-              color: "var(--orange-dark)",
-              gap: "var(--spacing-s)",
-            }
+            alignItems: "center",
+            color: "var(--orange-dark)",
+            gap: "var(--spacing-s)",
+          }
           : undefined
       }
     >
@@ -401,6 +401,13 @@ const CertificateUpdateDialog = ({
               normalize={normalizeCertificate}
             />
           </Form>
+          <Alert
+            variant="info"
+            style={{ display: "inline-block" }}
+          >
+            <strong>{t("Votre certificat n'est pas dans la liste ?")}</strong>
+            <p>{t("La liste des certificats approuvés par CarbuRe est mise à jour automatiquement tous les dimanches en se référant à la liste publique des certificats affichés sur les sites internet des organismes certificateurs.")}</p>
+          </Alert>
         </section>
       </main>
       <footer>
