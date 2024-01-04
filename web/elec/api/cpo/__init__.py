@@ -28,4 +28,5 @@ urlpatterns = [
     path("transfer-certificate-details", get_transfer_certificate_details, name="elec-cpo-get-transfer-certificate-details"),
     path("clients", get_clients, name="elec-cpo-clients"),
     path("charging-points/", include("elec.api.cpo.charge_points")),
+    path("meter-readings/", include("elec.api.cpo.meter_readings")),
 ]

@@ -36,7 +36,7 @@ const ElecMeterReadingsFileUpload = ({
   const notify = useNotify()
   const entity = useEntity()
   const portal = usePortal()
-  const TEMPLATE_URL = "/elec/cpo/meter-readings/application-template"
+  const TEMPLATE_URL = "/api/elec/cpo/meter-readings/application-template"
 
   const { value, bind } = useForm({
     meterReadingsFile: undefined as File | undefined,
