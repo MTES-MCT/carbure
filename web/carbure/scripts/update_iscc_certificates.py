@@ -3,6 +3,7 @@
 
 # Extraction des certificats ISCC https://www.iscc-system.org/certificates/all-certificates/
 import os
+from pprint import pprint
 import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
@@ -41,18 +42,18 @@ def update_iscc_certificates(email: bool = False, test: bool = False, latest: bo
 
 def download_iscc_certificates(test: bool, latest: bool) -> None:
     # On récupère le wdtNonce du jour
-    nonce = get_wdtNonce()
+    nonce, soup = get_wdtNonce()
 
     # Nombre de requêtes
     r = requests.post(ISCC_DATA_URL, data={"length": 1, "start": 0, "draw": 1, "wdtNonce": nonce}, headers=HEADERS)
-    recordsTotal = int(json.loads(r.content.decode("utf-8"))["recordsTotal"])
+    recordsTotal = 3 if test else int(json.loads(r.content.decode("utf-8"))["recordsTotal"])
     print(f"> Found {recordsTotal} ISCC certificates")
 
     # Récupération du contenu
     data = fetch_certificate_data(nonce, recordsTotal, test, latest)
 
     # On retire les balises html pour ne garder que le contenu
-    cleaned_data = clean_certificate_data(data)
+    cleaned_data = clean_certificate_data(data, soup)
 
     # Sauvegarde
     filename = "%s/Certificates_%s.csv" % (DESTINATION_FOLDER, str(date.today()))
@@ -98,6 +99,7 @@ def save_iscc_certificates(email: bool, batch: int) -> Tuple[int, list]:
     certificates = []
     filename = "%s/Certificates_%s.csv" % (DESTINATION_FOLDER, today.strftime("%Y-%m-%d"))
     df = pd.read_csv(filename, sep=",", quotechar='"', lineterminator="\n")
+
     df.fillna("", inplace=True)
 
     for _, row in df.iterrows():
@@ -192,8 +194,7 @@ def get_wdtNonce() -> str:
     soup = BeautifulSoup(html_content, "lxml")
     wdtNonceTag = soup.find("input", attrs={"name": "wdtNonceFrontendEdit_2"}).attrs
     wdtNonce: str = wdtNonceTag["value"]
-    print("wdtNonce:", wdtNonce)
-    return wdtNonce
+    return wdtNonce, soup
 
 
 def fetch_certificate_data(nonce: str, recordsTotal: int, test: bool, latest: bool) -> list:
@@ -220,8 +221,9 @@ def fetch_certificate_data(nonce: str, recordsTotal: int, test: bool, latest: bo
     return allData
 
 
-def clean_certificate_data(data: list) -> pd.DataFrame:
+def clean_certificate_data(data: list, soup: BeautifulSoup) -> pd.DataFrame:
     allData = pd.concat(data)
+
     # print(allData.iloc[0])
     # 0     <span data-tooltip aria-haspopup="1" class="ha...
     # 1                            EU-ISCC-Cert-GR209-1271304
@@ -260,13 +262,46 @@ def clean_certificate_data(data: list) -> pd.DataFrame:
 
     # extraction de la balise HTML
     allData["certificate_holder"] = allData["certificate_holder"].str.replace('.*title="(.*)">.*', "\\1", regex=True)
-    allData["scope"] = allData["scope"].str.replace('.*title="(.*)">.*', "\\1", regex=True)
+
+    scope_definitions = getScopesAbbreviations(soup)
+    allData["scope"] = allData["scope"].str.replace(
+        r"<span[^>]*>(.*?)<\/span>", "\\1", regex=True
+    )  # get html scope abbreviation
+    allData["scope"] = allData["scope"].apply(
+        getFullScopeDefinitions, args=(scope_definitions,)
+    )  # set full scope definition
+
     allData["raw_material"] = allData["raw_material"].str.replace('.*title="(.*)">.*', "\\1", regex=True)
     allData["issuing_cb"] = allData["issuing_cb"].str.replace('.*title="(.*)">.*', "\\1", regex=True)
     allData["map"] = allData["map"].str.replace('.*href="(.*)">.*', "\\1", regex=True)
     allData["certificate_report"] = allData["certificate_report"].str.replace('.*href="(.*)">.*', "\\1", regex=True)
     allData["audit_report"] = allData["audit_report"].str.replace('.*href="(.*)">.*', "\\1", regex=True)
+
     return cast(pd.DataFrame, allData)
+
+
+# transform "BG, MB" into "Biogas plant, Biomethane plant"
+def getFullScopeDefinitions(abbreviations: str, scope_definitions: dict) -> str:
+    abbreviations: list = abbreviations.split(", ")
+    full_names = []
+    for abbreviation in abbreviations:
+        if abbreviation in scope_definitions:
+            full_names.append(scope_definitions[abbreviation])
+    return ", ".join(full_names)
+
+
+def getScopesAbbreviations(soup: BeautifulSoup) -> list:
+    content = soup.find(class_="wp-block-group__inner-container")
+    definitions = content.find_all("sup")
+    dic = {}
+    for definition in definitions:
+        text_parts = definition.get_text(strip=True).split("=")
+        if len(text_parts) == 2:
+            key = text_parts[0].strip()
+            value = text_parts[1].strip()
+            dic[key] = value
+
+    return dic
 
 
 if __name__ == "__main__":
