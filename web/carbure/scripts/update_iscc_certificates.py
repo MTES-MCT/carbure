@@ -263,12 +263,12 @@ def clean_certificate_data(data: list, soup: BeautifulSoup) -> pd.DataFrame:
     # extraction de la balise HTML
     allData["certificate_holder"] = allData["certificate_holder"].str.replace('.*title="(.*)">.*', "\\1", regex=True)
 
-    scope_definitions = getScopesAbbreviations(soup)
+    scope_definitions = get_scope_abbreviations(soup)
     allData["scope"] = allData["scope"].str.replace(
         r"<span[^>]*>(.*?)<\/span>", "\\1", regex=True
     )  # get html scope abbreviation
     allData["scope"] = allData["scope"].apply(
-        getFullScopeDefinitions, args=(scope_definitions,)
+        get_full_scope_definitions, args=(scope_definitions,)
     )  # set full scope definition
 
     allData["raw_material"] = allData["raw_material"].str.replace('.*title="(.*)">.*', "\\1", regex=True)
@@ -281,7 +281,7 @@ def clean_certificate_data(data: list, soup: BeautifulSoup) -> pd.DataFrame:
 
 
 # transform "BG, MB" into "Biogas plant, Biomethane plant"
-def getFullScopeDefinitions(abbreviations: str, scope_definitions: dict) -> str:
+def get_full_scope_definitions(abbreviations: str, scope_definitions: dict) -> str:
     abbreviations: list = abbreviations.split(", ")
     full_names = []
     for abbreviation in abbreviations:
@@ -290,7 +290,7 @@ def getFullScopeDefinitions(abbreviations: str, scope_definitions: dict) -> str:
     return ", ".join(full_names)
 
 
-def getScopesAbbreviations(soup: BeautifulSoup) -> list:
+def get_scope_abbreviations(soup: BeautifulSoup) -> list:
     content = soup.find(class_="wp-block-group__inner-container")
     definitions = content.find_all("sup")
     dic = {}
