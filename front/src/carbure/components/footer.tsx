@@ -8,7 +8,7 @@ import logoFabNum from "../assets/images/logo-fabriquenumerique.svg"
 import logoBetaGouv from "../assets/images/betagouvfr.svg"
 import logoFranceRelance from "../assets/images/france-relance.webp"
 import logoEuropeanUnion from "../assets/images/union-europeenne.webp"
-import { ExternalLink, LinkedIn, Mail, Slack } from "common/components/icons"
+import { ExternalLink, LinkedIn, Mail } from "common/components/icons"
 import { Footer } from "common/components/scaffold"
 import { MailTo } from "common/components/button"
 import { useUser } from "carbure/hooks/user"
@@ -46,7 +46,6 @@ const CarbureFooter = () => {
           {user.isAuthenticated() && (
             <li>
               <MailTo user="carbure" host="beta.gouv.fr">
-
                 <Mail />
                 <Trans>Email</Trans>
               </MailTo>
@@ -144,9 +143,9 @@ const CarbureFooter = () => {
             </a>
           </li>
           <li>
-            <span className={styles.fakeLink}>
+            <Link to="/accessibility">
               <Trans>Accessibilité : non conforme</Trans>
-            </span>
+            </Link>
           </li>
         </ul>
       </div>
