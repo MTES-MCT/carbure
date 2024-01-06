@@ -115,7 +115,7 @@ class AdminDoubleCountAgreementsTest(TestCase):
 
         self.create_agreement()
 
-        response = self.client.get(reverse("admin-double-counting-agreements"), {"entity_id": self.admin.id})
+        response = self.client.get(reverse("admin-double-counting-agreements"), {"entity_id": self.admin.id, "year": 2023})
         self.assertEqual(response.status_code, 200)
         data = response.json()["data"]
         active_agreements = data["active"]
@@ -133,7 +133,7 @@ class AdminDoubleCountAgreementsTest(TestCase):
 
         # test that the response is an excel file
         response = self.client.get(
-            reverse("admin-double-counting-agreements"), {"entity_id": self.admin.id, "as_excel_file": "true"}
+            reverse("admin-double-counting-agreements"), {"entity_id": self.admin.id, "as_excel_file": "true", "year": 2023}
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
