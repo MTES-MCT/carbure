@@ -1,6 +1,7 @@
-import openpyxl
-
 from datetime import date
+import traceback
+from typing import Iterable
+from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment
 from django.http import HttpResponse
 from django.views.decorators.http import require_GET
@@ -13,37 +14,60 @@ from elec.models.elec_meter_reading_application import ElecMeterReadingApplicati
 
 class ApplicationTemplateError:
     TOO_LATE = "TOO_LATE"
+    TEMPLATE_CREATION_FAILED = "TEMPLATE_CREATION_FAILED"
 
 
 @require_GET
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
 def get_application_template(request, entity):
-    workbook = openpyxl.Workbook()
-    sheet = workbook.active
-
     today = date.today()
-    first_day = first_day_of_current_quarter()
+    last_day = first_day_of_current_quarter()
 
-    if (today - first_day).days > 20:
+    if (today - last_day).days > 20:
         return ErrorResponse(ApplicationTemplateError.TOO_LATE)
+
+    try:
+        charge_points = ElecChargePoint.objects.filter(cpo=entity).order_by("charge_point_id")
+
+        last_application = (
+            ElecMeterReadingApplication.objects.filter(cpo=entity)
+            .order_by("-year", "-quarter")
+            .prefetch_related("elec_meter_readings")
+            .first()
+        )
+
+        workbook = create_meter_reading_template(
+            last_day,
+            charge_points,
+            last_application,
+        )
+    except:
+        traceback.print_exc()
+        return ErrorResponse(ApplicationTemplateError.TEMPLATE_CREATION_FAILED)
+
+    response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    response["Content-Disposition"] = "attachment; filename=template.xlsx"
+    workbook.save(response)
+
+    return response
+
+
+def create_meter_reading_template(
+    last_day: date,
+    charge_points: Iterable[ElecChargePoint],
+    last_application: ElecMeterReadingApplication,
+):
+    workbook = Workbook()
+    sheet = workbook.active
 
     sheet["A1"] = "Identifiant du point de recharge communiqué à transport.data.gouv"
     sheet["B1"] = "Energie active totale soutirée lors du relevé précédent"
-    sheet["C1"] = "Energie active totale soutirée au " + first_day.strftime("%d/%m/%Y")
+    sheet["C1"] = "Energie active totale soutirée au " + last_day.strftime("%d/%m/%Y")
     sheet["D1"] = "Electricité consommée sur la période"
     sheet["E1"] = "Electricité renouvelable consommée sur la période"
 
     sheet["G1"] = "Part renouvelable de l'électricité sur la période"
     sheet["G2"] = "24,92%"
-
-    charge_points = ElecChargePoint.objects.filter(cpo=entity).order_by("charge_point_id")
-
-    last_application = (
-        ElecMeterReadingApplication.objects.filter(cpo=entity)
-        .order_by("-year", "-quarter")
-        .prefetch_related("elec_meter_readings")
-        .first()
-    )
 
     last_readings_by_charge_point = {}
 
@@ -78,11 +102,7 @@ def get_application_template(request, entity):
     for column in sheet.columns:
         sheet.column_dimensions[column[0].column_letter].width = 24
 
-    response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    response["Content-Disposition"] = "attachment; filename=template.xlsx"
-    workbook.save(response)
-
-    return response
+    return workbook
 
 
 def first_day_of_current_quarter():
