@@ -24,14 +24,15 @@ class AgreementError:
     MALFORMED_PARAMS = "MALFORMED_PARAMS"
 
 
-class AgreementSortForm(forms.Form):
+class AgreementForm(forms.Form):
+    year = forms.IntegerField(required=False)
     order_by = forms.CharField(required=False)
     direction = forms.CharField(required=False)
 
 
 @check_admin_rights()
 def get_agreements(request, *args, **kwargs):
-    sort_form = AgreementSortForm(request.GET)
+    sort_form = AgreementForm(request.GET)
     as_excel_file = request.GET.get("as_excel_file") == "true"
 
     if not sort_form.is_valid():
@@ -40,12 +41,10 @@ def get_agreements(request, *args, **kwargs):
     order_by = sort_form.cleaned_data["order_by"]
     direction = sort_form.cleaned_data["direction"]
 
-    current_year = datetime.now().year
+    year = sort_form.cleaned_data.get("year") or datetime.now().year
 
     agreements_active = (
-        DoubleCountingRegistration.objects.filter(
-            Q(valid_from__year__lte=current_year) & Q(valid_until__year__gte=current_year)
-        )
+        DoubleCountingRegistration.objects.filter(Q(valid_from__year__lte=year) & Q(valid_until__year__gte=year))
         .select_related("production_site")
         .order_by("production_site__name")
     )
@@ -61,15 +60,15 @@ def get_agreements(request, *args, **kwargs):
             response["Content-Disposition"] = 'attachment; filename="%s"' % (file_location)
         return response
     else:
-        agreements_incoming = DoubleCountingRegistration.objects.filter(Q(valid_from__year__gt=current_year)).select_related(
+        agreements_incoming = DoubleCountingRegistration.objects.filter(Q(valid_from__year__gt=year)).select_related(
             "production_site"
         )
-        agreements_expired = DoubleCountingRegistration.objects.filter(Q(valid_until__year__lt=current_year)).select_related(
+        agreements_expired = DoubleCountingRegistration.objects.filter(Q(valid_until__year__lt=year)).select_related(
             "production_site"
         )
 
         active_agreements = DoubleCountingRegistrationSerializer(agreements_active, many=True).data
-        active_agreements_with_quotas = add_quotas_to_agreements(current_year, active_agreements)
+        active_agreements_with_quotas = add_quotas_to_agreements(year, active_agreements)
 
         data = {
             "active": active_agreements_with_quotas,
