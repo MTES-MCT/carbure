@@ -488,7 +488,7 @@ class ExternalAdminRights(models.Model):
         (CUSTOM_STATS_AGRIMER, CUSTOM_STATS_AGRIMER),
         (TIRIB_STATS, TIRIB_STATS),
         (AIRLINE, AIRLINE),
-        (ELEC, ELEC)
+        (ELEC, ELEC),
     )
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     right = models.CharField(max_length=32, choices=RIGHTS, default="", blank=False, null=False)
@@ -1258,8 +1258,8 @@ class GenericCertificate(models.Model):
     valid_from = models.DateField(null=False, blank=False)
     valid_until = models.DateField(null=False, blank=False)
     download_link = models.CharField(max_length=512, default=None, null=True)
-    scope = models.JSONField(null=True)
-    input = models.JSONField(null=True)
+    scope = models.JSONField(null=True)  # TODO turn into CharField
+    input = models.JSONField(null=True)  # TODO check if we need this
     output = models.JSONField(null=True)
 
     class Meta:

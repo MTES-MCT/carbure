@@ -9,6 +9,7 @@ import Pending from "./components/pending"
 import Registry from "registry"
 import PublicStats from "./components/public-stats"
 import Home from "./components/home"
+import AccessibilityDeclaration from "./components/accessibility-declaration"
 import Transactions from "transactions"
 import Settings from "settings"
 import Account from "account"
@@ -40,6 +41,10 @@ const Carbure = () => {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/stats" element={<PublicStats />} />
+              <Route
+                path="/accessibility"
+                element={<AccessibilityDeclaration />}
+              />
 
               <Route path="/auth/*" element={<Auth />} />
 

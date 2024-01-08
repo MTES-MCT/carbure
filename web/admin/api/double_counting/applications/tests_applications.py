@@ -90,7 +90,8 @@ class AdminDoubleCountApplicationsTest(TestCase):
         app = DoubleCountingApplicationFactory.create(
             producer=self.production_site.producer,
             production_site=self.production_site,
-            period_start__year=self.requested_start_year,
+            period_start=date(self.requested_start_year, 1, 1),
+            period_end=date(self.requested_start_year + 1, 12, 31),
             status=DoubleCountingApplication.PENDING,
         )
 
