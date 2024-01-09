@@ -137,3 +137,10 @@ class TableParser:
     @staticmethod
     def date(cell):
         return try_get_date(cell)
+
+
+def ExcelError(type: str, line: int, meta=None):
+    error = {"line": int(line), "error": type}
+    if meta is not None:
+        error["meta"] = meta
+    return error
