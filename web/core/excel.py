@@ -97,9 +97,9 @@ class TableParser:
     def bool(cell):
         if isinstance(cell, str):
             cell = cell.lower()
-        if cell == "oui" or cell == 1 or cell == True or cell == "true":
+        if cell == "oui" or cell == "yes" or cell == "x" or cell == 1 or cell == True or cell == "true":
             return True
-        elif not cell or pd.isna(cell) or cell == "non" or cell == "false":
+        elif not cell or pd.isna(cell) or cell == "non" or cell == "no" or cell == "false":
             return False
         else:
             raise ValueError()
