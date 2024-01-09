@@ -1,5 +1,6 @@
-import traceback
+from django import forms
 from admin.api.controls.helpers import get_admin_lot_comments
+from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.helpers import (
     get_known_certificates,
@@ -12,7 +13,6 @@ from core.decorators import check_admin_rights
 from core.models import (
     CarbureLot,
     CarbureStock,
-    Entity,
 )
 from core.serializers import (
     CarbureLotAdminSerializer,
@@ -21,21 +21,17 @@ from core.serializers import (
 )
 
 
-class AdminControlsLotsDetailsError:
-    MALFORMED_PARAMS = "MALFORMED_PARAMS"
+class AdminControlsLotsDetailsForm(forms.Form):
+    lot_id = forms.ModelChoiceField(queryset=CarbureLot.objects.all())
 
 
 @check_admin_rights()
-def get_lot_details(request, *args, **kwargs):
-    try:
-        lot_id = request.GET.get("lot_id")
-        entity_id = request.GET.get("entity_id")
-    except:
-        traceback.print_exc()
-        return ErrorResponse(400, AdminControlsLotsDetailsError.MALFORMED_PARAMS)
+def get_lot_details(request, entity):
+    form = AdminControlsLotsDetailsForm(request.GET)
+    if not form.is_valid():
+        return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, form.errors)
 
-    entity = Entity.objects.get(id=entity_id)
-    lot = CarbureLot.objects.get(pk=lot_id)
+    lot = form.cleaned_data["lot_id"]
 
     data = {}
     data["lot"] = CarbureLotAdminSerializer(lot).data
