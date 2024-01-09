@@ -134,7 +134,7 @@ class ExcelChargePoints:
                 missing_fields.append("mid_id")
             if not charge_point.get("measure_date"):
                 missing_fields.append("measure_date")
-            if not charge_point.get("measure_energy"):
+            if not isinstance(charge_point.get("measure_energy"), float):
                 missing_fields.append("measure_energy")
 
         return missing_fields
