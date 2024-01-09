@@ -128,7 +128,7 @@ export function downloadMeterReadingsApplicationDetails(entityId: number, compan
 }
 
 export function acceptChargingPointsApplication(entityId: number, companyId: number, applicationId: number) {
-  return api.post("/admin/elec/meter-readings/accept-application", {
+  return api.post("/admin/elec/charging-points/accept-application", {
     entity_id: entityId,
     company_id: companyId,
     application_id: applicationId,
@@ -137,7 +137,7 @@ export function acceptChargingPointsApplication(entityId: number, companyId: num
 
 
 export function rejectChargingPointsApplication(entityId: number, companyId: number, applicationId: number) {
-  return api.post("/admin/elec/meter-readings/reject-application", {
+  return api.post("/admin/elec/charging-points/reject-application", {
     entity_id: entityId,
     company_id: companyId,
     application_id: applicationId,

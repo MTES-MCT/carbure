@@ -50,13 +50,12 @@ export const QUERY_RESET: Partial<ElecCPOProvisionCertificateQuery> = {
   order: undefined,
 }
 
-export interface ElecTransferCertificatesDetails extends ElecTransferCertificatePreview {
+export interface ElecTransferCertificatesDetails
+  extends ElecTransferCertificatePreview {
   comment: string
 }
-export interface ElecProvisionCertificatesDetails extends ElecProvisionCertificatePreview {
-
-}
-
+export interface ElecProvisionCertificatesDetails
+  extends ElecProvisionCertificatePreview {}
 
 export enum ElecChargingPointsApplicationStatus {
   Pending = "PENDING",
@@ -86,7 +85,6 @@ export interface ElecChargingPointsApplicationCheckInfo {
   error_count: number
   charging_point_count: number
   pending_application_already_exists?: boolean
-
 }
 
 export interface ChargingPointsApplicationError {
@@ -97,26 +95,25 @@ export interface ChargingPointsApplicationError {
 
 // METER READINGS
 
-
 export enum ElecMeterReadingsApplicationStatus {
   Pending = "PENDING",
   Accepted = "ACCEPTED",
   Rejected = "REJECTED",
 }
 
-
 export interface ElecMeterReadingsApplication {
   id: number
   cpo: EntityPreview
   station_count: number
   charging_point_count: number
-  power_total: number
+  energy_total: number
   year: number
   quarter: number
   application_date: string
   validation_date?: string
   status: ElecMeterReadingsApplicationStatus
 }
+
 export interface ElecMeterReadingsApplicationCheckInfo {
   errors?: MeterReadingsApplicationError[]
   file_name: string
@@ -127,10 +124,8 @@ export interface ElecMeterReadingsApplicationCheckInfo {
   pending_application_already_exists?: boolean
 }
 
-
 export interface MeterReadingsApplicationError {
   line: number
   error: string
   meta?: null | any
 }
-
