@@ -14,10 +14,10 @@ class AdminControlsLotsCommentError:
 
 @check_admin_rights()
 def add_comment(request, *args, **kwargs):
+    selection = request.POST.getlist("selection", [])
     try:
         entity_id = request.POST.get("entity_id")
-        selection = request.POST.getlist("selection", [])
-        comment = request.POST.get("comment", False)
+        comment = request.POST.get("comment")
         is_visible_by_auditor = request.POST.get("is_visible_by_auditor") == "true"
     except:
         traceback.print_exc()
