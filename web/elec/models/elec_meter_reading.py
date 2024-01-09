@@ -8,8 +8,8 @@ from elec.models.elec_meter_reading_application import ElecMeterReadingApplicati
 class ElecMeterReading(models.Model):
     class Meta:
         db_table = "elec_meter_reading"
-        verbose_name = "Relevé électrique de point de recharge"
-        verbose_name_plural = "Relevés électriques de points de recharge"
+        verbose_name = "Relevé de point de recharge"
+        verbose_name_plural = "Relevés de points de recharge"
 
     extracted_energy = models.FloatField(null=True, blank=True)
     charge_point = models.ForeignKey(ElecChargePoint, on_delete=models.deletion.CASCADE, related_name="elec_meter_readings")
