@@ -1,23 +1,27 @@
-from core.decorators import is_admin
+import traceback
+from core.common import ErrorResponse, SuccessResponse
+from core.decorators import check_admin_rights
 from core.models import (
     CarbureLot,
     CarbureLotComment,
     Entity,
 )
-from django.http.response import JsonResponse
 
 
-@is_admin
+class AdminControlsLotsCommentError:
+    MALFORMED_PARAMS = "MALFORMED_PARAMS"
+
+
+@check_admin_rights()
 def add_comment(request, *args, **kwargs):
-    entity_id = request.POST.get("entity_id")
-    selection = request.POST.getlist("selection", [])
-    comment = request.POST.get("comment", False)
-    is_visible_by_auditor = request.POST.get("is_visible_by_auditor") == "true"
-
-    if not comment:
-        return JsonResponse(
-            {"status": "error", "message": "Missing comment"}, status=400
-        )
+    try:
+        entity_id = request.POST.get("entity_id")
+        selection = request.POST.getlist("selection", [])
+        comment = request.POST.get("comment", False)
+        is_visible_by_auditor = request.POST.get("is_visible_by_auditor") == "true"
+    except:
+        traceback.print_exc()
+        return ErrorResponse(400, AdminControlsLotsCommentError.MALFORMED_PARAMS)
 
     entity = Entity.objects.get(id=entity_id)
     lots = CarbureLot.objects.filter(id__in=selection)
@@ -32,4 +36,4 @@ def add_comment(request, *args, **kwargs):
         lot_comment.comment = comment
         lot_comment.save()
 
-    return JsonResponse({"status": "success"})
+    return SuccessResponse()
