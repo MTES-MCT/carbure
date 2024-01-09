@@ -6,7 +6,6 @@ from core.helpers import (
     get_lots_filters_data,
 )
 from core.decorators import check_admin_rights
-from django.http.response import JsonResponse
 
 
 class AdminControlsLotsFiltersError:
