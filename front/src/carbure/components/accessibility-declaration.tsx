@@ -1,10 +1,10 @@
-import "./accessibility-declaration.module.css"
+import css from "./accessibility-declaration.module.css"
 import { MailTo } from "common/components/button"
 import { Main, Panel } from "common/components/scaffold"
 
 const AccessibilityDeclaration = () => {
   return (
-    <Main>
+    <Main className={css.accessibility}>
       <header>
         <h1>Déclaration d'accessibilité</h1>
       </header>
@@ -130,7 +130,7 @@ const AccessibilityDeclaration = () => {
 
           <footer>
             <p>
-              Cette déclaration d'accessibilité a été créé le{" "}
+              Cette déclaration d'accessibilité a été créée le{" "}
               <span>27 décembre 2023</span> grâce au{" "}
               <a
                 target="_blank"
