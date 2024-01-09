@@ -122,15 +122,6 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
                   />
                 ),
               },
-
-              {
-                header: t("Stations"),
-                cell: (application) => (
-                  <Cell
-                    text={`${formatNumber(application.station_count)}`}
-                  />
-                ),
-              },
               {
                 header: t("Points de recharge"),
                 cell: (application) => (
@@ -140,10 +131,10 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
                 ),
               },
               {
-                header: t("Kwh renouvelables"),
+                header: t("kwh renouvelables"),
                 cell: (application) => (
                   <Cell
-                    text={`${formatNumber(Math.round(application.power_total))}` + " kW"}
+                    text={`${formatNumber(Math.round(application.energy_total))}` + " kWh"}
                   />
                 ),
               },
