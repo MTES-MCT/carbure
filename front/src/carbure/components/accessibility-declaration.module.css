@@ -1,7 +1,7 @@
-a {
+.accessibility a {
   text-decoration: underline;
 }
 
-a:hover {
+.accessibility a:hover {
   color: var(--gray-dark);
 }
