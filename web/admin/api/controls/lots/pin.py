@@ -44,4 +44,4 @@ def toggle_pin(request, *args, **kwargs):
         return SuccessResponse()
     except:
         traceback.print_exc()
-        return ErrorResponse(500, AdminControlsLotsFiltersError.UNPINNABLE_LOTS)
+        return ErrorResponse(400, AdminControlsLotsFiltersError.UNPINNABLE_LOTS)
