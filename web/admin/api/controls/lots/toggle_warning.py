@@ -1,16 +1,13 @@
-from tkinter import E
 import traceback
-from uu import Error
 
 from django import forms
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 
-from core.decorators import check_admin_rights, is_admin
+from core.decorators import check_admin_rights
 from core.models import (
     GenericError,
 )
-from django.http.response import JsonResponse
 
 from core.utils import MultipleValueField
 

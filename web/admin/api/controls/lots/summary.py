@@ -9,11 +9,7 @@ from core.common import ErrorResponse, SuccessResponse
 from core.helpers import (
     filter_lots,
 )
-from core.decorators import check_admin_rights, is_admin
-from core.models import (
-    Entity,
-)
-from django.http.response import JsonResponse
+from core.decorators import check_admin_rights
 
 
 class AdminControlsLotsSummaryError:
