@@ -1,29 +1,32 @@
-import traceback
+from django import forms
+from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
 from core.models import (
     CarbureLot,
     CarbureLotComment,
-    Entity,
 )
 
+from core.utils import MultipleValueField
 
-class AdminControlsLotsCommentError:
-    MALFORMED_PARAMS = "MALFORMED_PARAMS"
+
+class AdminControlsLotsCommentForm(forms.Form):
+    comment = forms.CharField()
+    selection = MultipleValueField(coerce=int, required=False)
+    is_visible_by_auditor = forms.BooleanField(required=False)
 
 
 @check_admin_rights()
-def add_comment(request, *args, **kwargs):
-    selection = request.POST.getlist("selection", [])
-    try:
-        entity_id = request.POST.get("entity_id")
-        comment = request.POST.get("comment")
-        is_visible_by_auditor = request.POST.get("is_visible_by_auditor") == "true"
-    except:
-        traceback.print_exc()
-        return ErrorResponse(400, AdminControlsLotsCommentError.MALFORMED_PARAMS)
+def add_comment(request, entity):
+    form = AdminControlsLotsCommentForm(request.POST)
 
-    entity = Entity.objects.get(id=entity_id)
+    if not form.is_valid():
+        return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, form.errors)
+
+    is_visible_by_auditor = form.cleaned_data["is_visible_by_auditor"]
+    comment = form.cleaned_data["comment"]
+    selection = form.cleaned_data["selection"]
+
     lots = CarbureLot.objects.filter(id__in=selection)
     for lot in lots.iterator():
         lot_comment = CarbureLotComment()

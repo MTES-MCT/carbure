@@ -19,6 +19,7 @@ class CarbureError:
     ACTIVATION_LINK_INVALID_FORM = "Activation link invalid form"
     ACTIVATION_COULD_NOT_ACTIVATE_USER = "Could not activate user account"
     YEAR_LOCKED = "YEAR_LOCKED"
+    MALFORMED_PARAMS = "MALFORMED_PARAMS"
 
 
 class CarbureMLGHGErrors:
