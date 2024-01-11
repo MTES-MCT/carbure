@@ -16,6 +16,7 @@ from elec.services.import_meter_reading_excel import import_meter_reading_excel
 class AddMeterReadingApplicationError:
     TOO_LATE = "TOO_LATE"
     MISSING_FILE = "MISSING_FILE"
+    NO_READING_FOUND = "NO_READING_FOUND"
     VALIDATION_FAILED = "VALIDATION_FAILED"
 
 
@@ -36,6 +37,9 @@ def add_application(request: HttpRequest, entity: Entity):
 
     existing_charge_points = ChargePointRepository.get_registered_charge_points(entity)
     meter_reading_data, errors = import_meter_reading_excel(excel_file, existing_charge_points)
+
+    if len(meter_reading_data) == 0:
+        return ErrorResponse(400, AddMeterReadingApplicationError.NO_READING_FOUND)
 
     if len(errors) > 0:
         return ErrorResponse(400, AddMeterReadingApplicationError.VALIDATION_FAILED)
