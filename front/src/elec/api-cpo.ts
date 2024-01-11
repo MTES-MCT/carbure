@@ -147,7 +147,7 @@ export function getMeterReadingsTemplate(entityId: number, companyId: number) {
   })
 }
 
-export function downloadMeterReadingsApplicationDetails(entityId: number, applicationId: number) {
+export function downloadMeterReadingsApplicationDetails(entityId: number, companyId: number, applicationId: number) {
   return download("/elec/cpo/meter-readings/application-details", {
     entity_id: entityId, application_id: applicationId, export: true
   })
