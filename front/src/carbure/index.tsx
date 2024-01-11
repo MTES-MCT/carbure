@@ -42,7 +42,7 @@ const Carbure = () => {
               <Route path="/" element={<Home />} />
               <Route path="/stats" element={<PublicStats />} />
               <Route
-                path="/accessibility"
+                path="/accessibilite"
                 element={<AccessibilityDeclaration />}
               />
 
