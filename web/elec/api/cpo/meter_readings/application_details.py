@@ -42,7 +42,6 @@ def get_application_details(request, entity):
 
     previous_application = MeterReadingRepository.get_previous_application(entity, application.quarter, application.year)
     charge_points = ChargePointRepository.get_registered_charge_points(entity)
-
     meter_readings_data = create_meter_readings_data(charge_points, previous_application, meter_readings)
 
     if "export" in request.GET:
