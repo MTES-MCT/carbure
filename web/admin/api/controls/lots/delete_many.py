@@ -1,5 +1,6 @@
 from django import forms
 from django.db import transaction
+from core.carburetypes import CarbureError
 from core.decorators import check_admin_rights
 from core.common import SuccessResponse, ErrorResponse
 
@@ -20,18 +21,12 @@ from core.traceability import (
 from .update_many import group_lots_by_entity, serialize_node
 
 
-class DeleteManyError:
-    MALFORMED_PARAMS = "MALFORMED_PARAMS"
-    SANITY_CHECKS_FAILED = "SANITY_CHECKS_FAILED"
-    DELETION_FAILED = "DELETION_FAILED"
-
-
 @check_admin_rights()
 def delete_many(request):
     form = DeleteManyForm(request.POST)
 
     if not form.is_valid():
-        return ErrorResponse(400, DeleteManyError.MALFORMED_PARAMS, form.errors)
+        return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, form.errors)
 
     entity_id = form.cleaned_data["entity_id"]
     comment = form.cleaned_data["comment"]
