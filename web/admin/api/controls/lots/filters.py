@@ -8,10 +8,6 @@ from core.helpers import (
 from core.decorators import check_admin_rights
 
 
-class AdminControlsLotsFiltersError:
-    UNKNOWN_FILTER = "UNKNOWN_FILTER"
-
-
 class AdminControlsLotsFiltersForm(forms.Form):
     status = forms.CharField()
     field = forms.CharField()
@@ -32,7 +28,7 @@ def get_lots_filters(request, entity):
     if data is None:
         return ErrorResponse(
             400,
-            AdminControlsLotsFiltersError.UNKNOWN_FILTER,
+            CarbureError.UNKNOWN_ERROR,
         )
     else:
         return SuccessResponse(data)

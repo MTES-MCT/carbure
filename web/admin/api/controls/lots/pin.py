@@ -13,10 +13,6 @@ from django.db.models import Case, Value, When
 from core.utils import MultipleValueField
 
 
-class AdminControlsLotsFiltersError:
-    UNPINNABLE_LOTS = "UNPINNABLE_LOTS"
-
-
 class AdminControlsLotsPinForm(forms.Form):
     selection = MultipleValueField(coerce=int, required=False)
     notify_auditor = forms.BooleanField(required=False)
@@ -44,4 +40,4 @@ def toggle_pin(request, *args, **kwargs):
         return SuccessResponse()
     except:
         traceback.print_exc()
-        return ErrorResponse(400, AdminControlsLotsFiltersError.UNPINNABLE_LOTS)
+        return ErrorResponse(400, CarbureError.UNKNOWN_ERROR)

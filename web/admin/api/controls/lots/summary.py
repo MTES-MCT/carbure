@@ -12,10 +12,6 @@ from core.helpers import (
 from core.decorators import check_admin_rights
 
 
-class AdminControlsLotsSummaryError:
-    SUMMARY_NOT_FOUND = "SUMMARY_NOT_FOUND"
-
-
 class AdminControlsLotsSummaryForm(forms.Form):
     status = forms.CharField()
     short = forms.BooleanField(required=False)
@@ -38,4 +34,4 @@ def get_lots_summary(request, entity):
 
     except Exception:
         traceback.print_exc()
-        return ErrorResponse(400, AdminControlsLotsSummaryError.SUMMARY_NOT_FOUND)
+        return ErrorResponse(400, CarbureError.UNKNOWN_ERROR)

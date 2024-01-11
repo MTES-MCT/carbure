@@ -12,11 +12,6 @@ from core.models import (
 from core.utils import MultipleValueField
 
 
-class AdminControlsLotsToggleWarningError:
-    UNKNOWN_ERROR = "UNKNOWN_ERROR"
-    COULD_NOT_BE_UPDATED = "COULD_NOT_BE_UPDATED"
-
-
 class AdminControlsLotsToggleWarningForm(forms.Form):
     lot_id = forms.IntegerField()
     errors = MultipleValueField(coerce=str)
@@ -39,10 +34,10 @@ def toggle_warning(request):
                 lot_error = GenericError.objects.get(lot_id=lot_id, error=error)
             except:
                 traceback.print_exc()
-                return ErrorResponse(404, AdminControlsLotsToggleWarningError.UNKNOWN_ERROR)
+                return ErrorResponse(404, CarbureError.UNKNOWN_ERROR)
             lot_error.acked_by_admin = checked
             lot_error.save()
         return SuccessResponse()
     except:
         traceback.print_exc()
-        return ErrorResponse(500, AdminControlsLotsToggleWarningError.COULD_NOT_BE_UPDATED)
+        return ErrorResponse(500, CarbureError.UNKNOWN_ERROR)
