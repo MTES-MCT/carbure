@@ -1,10 +1,9 @@
-from datetime import timedelta
+from datetime import date, timedelta
 from django.http import HttpRequest
 from django.views.decorators.http import require_POST
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity, UserRights
-from elec.api.cpo.meter_readings.application_template import first_day_of_current_quarter
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_charge_point_application import ElecChargePointApplication
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
@@ -59,3 +58,10 @@ def get_last_quarter():
     quarter = (last_day_of_previous.month - 1) // 3 + 1
     year = last_day_of_previous.year if quarter != 1 else last_day_of_previous.year - 1
     return quarter, year
+
+
+def first_day_of_current_quarter():
+    now = date.today()
+    quarter = (now.month - 1) // 3 + 1
+    month = (quarter - 1) * 3 + 1
+    return date(now.year, month, 1)
