@@ -124,6 +124,9 @@ def create_meter_readings_data(
         current_readings_by_charge_point[reading.get("charge_point_id")] = reading
 
     for charge_point in charge_points:
+        if charge_point.is_article_2:
+            continue
+
         charge_point_id = charge_point.charge_point_id
         current_reading = current_readings_by_charge_point.get(charge_point_id, {})
 
