@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from core.serializers import EntityPreviewSerializer
 from elec.models import ElecChargePoint
 
 
