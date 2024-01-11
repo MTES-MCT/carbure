@@ -5,11 +5,11 @@ from django.views.decorators.http import require_POST
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity, UserRights
-from elec.api.cpo.meter_readings.check_application import first_day_of_current_quarter, get_last_quarter
-from elec.models.elec_charge_point import ElecChargePoint
-from elec.models.elec_charge_point_application import ElecChargePointApplication
+from elec.api.cpo.meter_readings.check_application import get_application_quarter
 from elec.models.elec_meter_reading import ElecMeterReading
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
+from elec.repositories.charge_point_repository import ChargePointRepository
+from elec.repositories.meter_reading_repository import MeterReadingRepository
 from elec.services.import_meter_reading_excel import import_meter_reading_excel
 
 
@@ -27,26 +27,21 @@ def add_application(request: HttpRequest, entity: Entity):
     if not excel_file:
         return ErrorResponse(400, AddMeterReadingApplicationError.MISSING_FILE)
 
-    existing_charge_points = ElecChargePoint.objects.select_related("application").filter(
-        cpo=entity, application__status=ElecChargePointApplication.ACCEPTED
-    )
+    # guess the application's quarter based on the current date
+    # if it's in the last 10 days of a quarter, use this quarter
+    # if it's in the first 20 days of a quarter, use the previous quarter
+    quarter, year = get_application_quarter(date.today())
+    if not quarter or not year:
+        return ErrorResponse(400, AddMeterReadingApplicationError.TOO_LATE)
 
+    existing_charge_points = ChargePointRepository.get_registered_charge_points(entity)
     meter_reading_data, errors = import_meter_reading_excel(excel_file, existing_charge_points)
 
     if len(errors) > 0:
         return ErrorResponse(400, AddMeterReadingApplicationError.VALIDATION_FAILED)
 
-    today = date.today()
-    first_day = first_day_of_current_quarter()
-    quarter, year = get_last_quarter()
-
-    if (today - first_day).days > 20:
-        return ErrorResponse(400, AddMeterReadingApplicationError.TOO_LATE)
-
     with transaction.atomic():
-        replaced_applications = ElecMeterReadingApplication.objects.filter(
-            cpo=entity, status__in=[ElecMeterReadingApplication.PENDING, ElecMeterReadingApplication.REJECTED]
-        )
+        replaced_applications = MeterReadingRepository.get_replaceable_applications(entity)
 
         # delete older pending applications
         replaced_applications.delete()

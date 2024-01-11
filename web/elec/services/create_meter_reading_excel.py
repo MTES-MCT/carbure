@@ -1,3 +1,4 @@
+import io
 from datetime import date, timedelta
 from typing import Optional, TypedDict
 from openpyxl import Workbook
@@ -10,7 +11,7 @@ class MeterReadingData(TypedDict):
     current_reading: Optional[float]
 
 
-def create_meter_reading_excel(quarter: int, year: int, meter_readings_data: list[MeterReadingData]):
+def create_meter_reading_excel(name: str, quarter: int, year: int, meter_readings_data: list[MeterReadingData]):
     workbook = Workbook()
     sheet = workbook.active
     last_day = (date(year, quarter * 3, 1) + timedelta(days=31)).replace(day=1)
@@ -44,6 +45,7 @@ def create_meter_reading_excel(quarter: int, year: int, meter_readings_data: lis
     last_reading_row = 1 + len(meter_readings_data)
     total_row = last_reading_row + 2
     sheet[f"A{total_row}"] = "Total"
+    sheet[f"C{total_row}"] = f"=SUM(C2:C{total_row - 1})"
     sheet[f"D{total_row}"] = f"=SUM(D2:D{total_row - 1})"
     sheet[f"E{total_row}"] = f"=SUM(E2:E{total_row - 1})"
 
@@ -83,10 +85,13 @@ def create_meter_reading_excel(quarter: int, year: int, meter_readings_data: lis
 
     # total row in bold
     sheet[total_row][0].font = bold
+    sheet[total_row][2].font = bold
     sheet[total_row][3].font = bold
     sheet[total_row][4].font = bold
 
     # station header in bold
     sheet[f"A{total_row + 2}"].font = bold
 
-    return workbook
+    file_path = f"/tmp/{name}.xlsx"
+    workbook.save(file_path)
+    return open(file_path, "rb")
