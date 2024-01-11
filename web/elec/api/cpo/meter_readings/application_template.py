@@ -14,7 +14,6 @@ from elec.services.create_meter_reading_excel import create_meter_readings_data,
 class ApplicationTemplateError:
     TOO_LATE = "TOO_LATE"
     NO_CHARGE_POINT_AVAILABLE = "NO_CHARGE_POINT_AVAILABLE"
-    TEMPLATE_CREATION_FAILED = "TEMPLATE_CREATION_FAILED"
 
 
 @require_GET
@@ -24,18 +23,14 @@ def get_application_template(request, entity):
     if not quarter or not year:
         return ErrorResponse(400, ApplicationTemplateError.TOO_LATE)
 
-    try:
-        charge_points = ChargePointRepository.get_registered_charge_points(entity)
+    charge_points = ChargePointRepository.get_registered_charge_points(entity)
 
-        if charge_points.count() == 0:
-            return ErrorResponse(400, ApplicationTemplateError.NO_CHARGE_POINT_AVAILABLE)
+    if charge_points.count() == 0:
+        return ErrorResponse(400, ApplicationTemplateError.NO_CHARGE_POINT_AVAILABLE)
 
-        previous_application = MeterReadingRepository.get_previous_application(entity, quarter, year)
-        meter_reading_data = create_meter_readings_data(charge_points, previous_application)
+    previous_application = MeterReadingRepository.get_previous_application(entity, quarter, year)
+    meter_reading_data = create_meter_readings_data(charge_points, previous_application)
 
-        file_name = "meter_reading_template"
-        excel_file = create_meter_readings_excel(file_name, quarter, year, meter_reading_data)
-        return ExcelResponse(excel_file)
-    except:
-        traceback.print_exc()
-        return ErrorResponse(400, ApplicationTemplateError.TEMPLATE_CREATION_FAILED)
+    file_name = f"meter_reading_template_Q{quarter}_{year}"
+    excel_file = create_meter_readings_excel(file_name, quarter, year, meter_reading_data)
+    return ExcelResponse(excel_file)
