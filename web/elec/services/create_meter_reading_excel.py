@@ -11,6 +11,7 @@ class MeterReadingData(TypedDict):
     charge_point_id: str
     previous_reading: float
     current_reading: Optional[float]
+    reading_date: date
 
 
 def create_meter_readings_excel(name: str, quarter: int, year: int, meter_readings_data: list[MeterReadingData]):
@@ -23,11 +24,12 @@ def create_meter_readings_excel(name: str, quarter: int, year: int, meter_readin
     sheet["A1"] = "Identifiant du point de recharge communiqué à transport.data.gouv"
     sheet["B1"] = "Energie active totale soutirée lors du relevé précédent"
     sheet["C1"] = "Energie active totale soutirée au " + last_day.strftime("%d/%m/%Y")
-    sheet["D1"] = "Electricité consommée sur la période"
-    sheet["E1"] = "Electricité renouvelable consommée sur la période"
+    sheet["D1"] = "Date du relevé"
+    sheet["E1"] = "Electricité consommée sur la période"
+    sheet["F1"] = "Electricité renouvelable consommée sur la période"
 
-    sheet["G1"] = "Part renouvelable de l'électricité sur la période"
-    sheet["G2"] = "24,92%"
+    sheet["H1"] = "Part renouvelable de l'électricité sur la période"
+    sheet["H2"] = "24,92%"
 
     # BODY
 
@@ -39,8 +41,9 @@ def create_meter_readings_excel(name: str, quarter: int, year: int, meter_readin
         sheet[f"A{i}"] = reading["charge_point_id"]
         sheet[f"B{i}"] = reading["previous_reading"]
         sheet[f"C{i}"] = reading.get("current_reading") or ""
-        sheet[f"D{i}"] = f"=IF(ISBLANK(C{i}), 0, C{i} - B{i})"
-        sheet[f"E{i}"] = f"=IF(ISBLANK(D{i}), 0, ROUND(D{i} * {renewable_part}, 2))"
+        sheet[f"D{i}"] = reading.get("reading_date").strftime("%d/%m/%Y")
+        sheet[f"E{i}"] = f"=IF(ISBLANK(C{i}), 0, C{i} - B{i})"
+        sheet[f"F{i}"] = f"=IF(ISBLANK(D{i}), 0, ROUND(D{i} * {renewable_part}, 2))"
 
     # FOOTER
 
@@ -48,8 +51,8 @@ def create_meter_readings_excel(name: str, quarter: int, year: int, meter_readin
     total_row = last_reading_row + 2
     sheet[f"A{total_row}"] = "Total"
     sheet[f"C{total_row}"] = f"=SUM(C2:C{total_row - 1})"
-    sheet[f"D{total_row}"] = f"=SUM(D2:D{total_row - 1})"
-    sheet[f"E{total_row}"] = f"=SUM(E2:E{total_row - 1})"
+    sheet[f"E{total_row}"] = f"=SUM(D2:D{total_row - 1})"
+    sheet[f"F{total_row}"] = f"=SUM(E2:E{total_row - 1})"
 
     sheet[f"A{total_row + 2}"] = "Stations:"
     last_row = total_row + 2 + len(stations)
@@ -80,6 +83,8 @@ def create_meter_readings_excel(name: str, quarter: int, year: int, meter_readin
             sheet[f"B{i}"].border = border
             sheet[f"C{i}"].fill = blue_bg
             sheet[f"C{i}"].border = border
+            sheet[f"D{i}"].fill = blue_bg
+            sheet[f"D{i}"].border = border
 
     # default column width
     for column in sheet.columns:
@@ -126,6 +131,7 @@ def create_meter_readings_data(
             "charge_point_id": charge_point_id,
             "previous_reading": last_readings_by_charge_point.get(charge_point_id),
             "current_reading": current_reading.get("extracted_energy", 0),
+            "reading_date": current_reading.get("reading_date"),
         }
 
         meter_reading_data.append(reading_data)

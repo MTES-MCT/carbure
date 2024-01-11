@@ -12,6 +12,7 @@ class ElecMeterReading(models.Model):
         verbose_name_plural = "Relevés de points de recharge"
 
     extracted_energy = models.FloatField(null=True, blank=True)
+    reading_date = models.DateField()
     charge_point = models.ForeignKey(ElecChargePoint, on_delete=models.deletion.CASCADE, related_name="elec_meter_readings")
     cpo = models.ForeignKey(Entity, on_delete=models.deletion.CASCADE, related_name="elec_meter_readings")
     application = models.ForeignKey(ElecMeterReadingApplication, on_delete=models.deletion.CASCADE, related_name="elec_meter_readings")  # fmt:skip
