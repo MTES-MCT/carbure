@@ -52,7 +52,7 @@ def ExcelResponse(file: BufferedReader):
     data = file.read()
     ctype = "application/vnd.ms-excel"
     response = HttpResponse(content=data, content_type=ctype)
-    response["Content-Disposition"] = f'attachment; filename="{file.name}"'
+    response["Content-Disposition"] = f'attachment; filename="{file.name.replace("/tmp/", "")}"'
     return response
 
 
