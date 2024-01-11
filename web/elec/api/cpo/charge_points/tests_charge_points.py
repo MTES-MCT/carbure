@@ -1,4 +1,5 @@
 import datetime
+from decimal import Decimal
 import os
 from core.tests_utils import setup_current_user
 from core.models import Entity
@@ -160,6 +161,8 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(charge_points[0].station_id, "FR000011062174")
         self.assertEqual(charge_points[0].station_name, "Hotel saint alban")
         self.assertEqual(charge_points[0].nominal_power, 22)
+        self.assertEqual(charge_points[0].latitude, Decimal("43.419592"))
+        self.assertEqual(charge_points[0].longitude, Decimal("3.407609"))
 
         self.assertEqual(charge_points[1].charge_point_id, "FR000012292701")
         self.assertEqual(charge_points[1].current_type, "CA")

@@ -1,5 +1,5 @@
-from typing import Iterable
 import pandas as pd
+from typing import Iterable
 from django.core.files.uploadedfile import UploadedFile
 from core.excel import ExcelError, TableParser
 from elec.models.elec_charge_point import ElecChargePoint
@@ -17,7 +17,7 @@ class ExcelMeterReadingError:
     EXTRACTED_ENERGY_LOWER_THAN_BEFORE = "EXTRACTED_ENERGY_LOWER_THAN_BEFORE"
 
 
-def import_meter_reading_excel(excel_file: UploadedFile, existing_charge_points):
+def import_meter_reading_excel(excel_file: UploadedFile, existing_charge_points: Iterable[ElecChargePoint]):
     meter_readings_data = pd.read_excel(excel_file, usecols=list(range(0, 3)))
     meter_readings_data["line"] = meter_readings_data.index  # add a line number to locate data in the excel file
     meter_readings_data.rename(columns={meter_readings_data.columns[i]: column for i, column in enumerate(EXCEL_COLUMNS)}, inplace=True)  # fmt: skip
