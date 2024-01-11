@@ -1,11 +1,10 @@
-from django.http import JsonResponse
+from core.common import SuccessResponse
 from core.decorators import check_admin_rights
 from core.models import Entity, ExternalAdminRights
 from django.db.models import Q, Count, Value
 
-
 from doublecount.models import DoubleCountingApplication
-from elec.models.elec_charge_point_application import ElecChargePointApplication
+from elec.models import ElecChargePointApplication, ElecMeterReadingApplication
 
 
 @check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC])
@@ -61,6 +60,16 @@ def get_entities(request):
                     filter=Q(elec_charge_point_applications__status=ElecChargePointApplication.PENDING),
                     distinct=True,
                 ),
+                meter_readings_accepted=Count(
+                    "elec_meter_reading_applications",
+                    filter=Q(elec_meter_reading_applications__status=ElecMeterReadingApplication.ACCEPTED),
+                    distinct=True,
+                ),
+                meter_readings_pending=Count(
+                    "elec_meter_reading_applications",
+                    filter=Q(elec_meter_reading_applications__status=ElecMeterReadingApplication.PENDING),
+                    distinct=True,
+                ),
             )
         )
     elif entity.has_external_admin_right("AIRLINE"):
@@ -113,6 +122,16 @@ def get_entities(request):
                     filter=Q(elec_charge_point_applications__status=ElecChargePointApplication.PENDING),
                     distinct=True,
                 ),
+                meter_readings_accepted=Count(
+                    "elec_meter_reading_applications",
+                    filter=Q(elec_meter_reading_applications__status=ElecMeterReadingApplication.ACCEPTED),
+                    distinct=True,
+                ),
+                meter_readings_pending=Count(
+                    "elec_meter_reading_applications",
+                    filter=Q(elec_meter_reading_applications__status=ElecMeterReadingApplication.PENDING),
+                    distinct=True,
+                ),
             )
         )
 
@@ -121,9 +140,9 @@ def get_entities(request):
     if has_requests == "true":
         entities = entities.filter(requests__gt=0)
 
-    entities_sez = []
+    entities_data = []
     for e in entities.iterator():
-        entities_sez.append(
+        entities_data.append(
             {
                 "entity": e.natural_key(),
                 "users": e.users,
@@ -136,6 +155,8 @@ def get_entities(request):
                 "certificates_pending": e.certificates_pending,
                 "charging_points_accepted": e.charging_points_accepted,
                 "charging_points_pending": e.charging_points_pending,
+                "meter_readings_accepted": e.meter_readings_accepted,
+                "meter_readings_pending": e.meter_readings_pending,
             }
         )
-    return JsonResponse({"status": "success", "data": entities_sez})
+    return SuccessResponse(entities_data)
