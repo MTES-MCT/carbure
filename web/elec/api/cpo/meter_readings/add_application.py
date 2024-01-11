@@ -5,8 +5,7 @@ from django.views.decorators.http import require_POST
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity, UserRights
-from elec.api.cpo.meter_readings.application_template import first_day_of_current_quarter
-from elec.api.cpo.meter_readings.check_application import get_last_quarter
+from elec.api.cpo.meter_readings.check_application import first_day_of_current_quarter, get_last_quarter
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_charge_point_application import ElecChargePointApplication
 from elec.models.elec_meter_reading import ElecMeterReading
