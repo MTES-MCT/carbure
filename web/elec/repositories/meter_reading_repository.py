@@ -29,6 +29,6 @@ class MeterReadingRepository:
     def get_application_meter_readings(cpo: Entity, application: ElecMeterReadingApplication):
         return (
             ElecMeterReading.objects.filter(cpo=cpo, application=application)
-            .values("extracted_energy")
+            .values("extracted_energy", "reading_date")
             .annotate(charge_point_id=F("charge_point__charge_point_id"))
         )
