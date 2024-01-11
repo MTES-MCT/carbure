@@ -1,8 +1,10 @@
 import io
 from datetime import date, timedelta
-from typing import Optional, TypedDict
+from typing import Iterable, Optional, TypedDict
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill, Side, Border
+
+from elec.models import ElecChargePoint, ElecMeterReadingApplication
 
 
 class MeterReadingData(TypedDict):
@@ -11,7 +13,7 @@ class MeterReadingData(TypedDict):
     current_reading: Optional[float]
 
 
-def create_meter_reading_excel(name: str, quarter: int, year: int, meter_readings_data: list[MeterReadingData]):
+def create_meter_readings_excel(name: str, quarter: int, year: int, meter_readings_data: list[MeterReadingData]):
     workbook = Workbook()
     sheet = workbook.active
     last_day = (date(year, quarter * 3, 1) + timedelta(days=31)).replace(day=1)
@@ -95,3 +97,37 @@ def create_meter_reading_excel(name: str, quarter: int, year: int, meter_reading
     file_path = f"/tmp/{name}.xlsx"
     workbook.save(file_path)
     return open(file_path, "rb")
+
+
+def create_meter_readings_data(
+    charge_points: Iterable[ElecChargePoint],
+    previous_application: ElecMeterReadingApplication,
+    current_readings: list[dict] = [],
+):
+    meter_reading_data: list[MeterReadingData] = []
+
+    last_readings_by_charge_point = {}
+    if previous_application:
+        for reading in previous_application.elec_meter_readings.all():
+            last_readings_by_charge_point[reading.charge_point.charge_point_id] = reading.extracted_energy
+    else:
+        for charge_point in charge_points:
+            last_readings_by_charge_point[charge_point.charge_point_id] = charge_point.measure_energy
+
+    current_readings_by_charge_point: dict[str, dict] = {}
+    for reading in current_readings:
+        current_readings_by_charge_point[reading.get("charge_point_id")] = reading
+
+    for charge_point in charge_points:
+        charge_point_id = charge_point.charge_point_id
+        current_reading = current_readings_by_charge_point.get(charge_point_id, {})
+
+        reading_data = {
+            "charge_point_id": charge_point_id,
+            "previous_reading": last_readings_by_charge_point.get(charge_point_id),
+            "current_reading": current_reading.get("extracted_energy", 0),
+        }
+
+        meter_reading_data.append(reading_data)
+
+    return meter_reading_data

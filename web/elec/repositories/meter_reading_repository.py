@@ -11,7 +11,7 @@ class MeterReadingRepository:
         )
 
     @staticmethod
-    def get_last_application(cpo, quarter=None, year=None):
+    def get_previous_application(cpo, quarter=None, year=None):
         applications = ElecMeterReadingApplication.objects.filter(cpo=cpo, status=ElecMeterReadingApplication.ACCEPTED)
         if quarter and year:
             applications = applications.filter(quarter__lt=quarter, year__lte=year)
