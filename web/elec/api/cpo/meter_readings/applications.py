@@ -11,5 +11,4 @@ from elec.serializers.elec_meter_reading_application_serializer import ElecMeter
 def get_applications(request, entity):
     applications = MeterReadingRepository.get_annotated_applications(entity)
     serialized = ElecMeterReadingApplicationSerializer(applications, many=True).data
-    print(serialized)
     return SuccessResponse(serialized)
