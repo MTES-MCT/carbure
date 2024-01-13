@@ -132,13 +132,16 @@ def create_meter_readings_data(
             continue
 
         charge_point_id = charge_point.charge_point_id
-        current_reading = current_readings_by_charge_point.get(charge_point_id, {})
+        current_reading = current_readings_by_charge_point.get(charge_point_id)
+
+        if len(current_readings) > 0 and current_reading is None:
+            continue
 
         reading_data = {
             "charge_point_id": charge_point_id,
             "previous_reading": previous_readings_by_charge_point.get(charge_point_id),
-            "current_reading": current_reading.get("extracted_energy", 0),
-            "reading_date": current_reading.get("reading_date"),
+            "current_reading": current_reading.get("extracted_energy") if current_reading else 0,
+            "reading_date": current_reading.get("reading_date") if current_reading else 0,
         }
 
         meter_reading_data.append(reading_data)

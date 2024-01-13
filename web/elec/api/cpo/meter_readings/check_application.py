@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from django import forms
 from django.http import HttpRequest
 from django.views.decorators.http import require_POST
 from core.common import ErrorResponse, SuccessResponse
@@ -7,6 +8,11 @@ from core.models import Entity, UserRights
 from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.repositories.meter_reading_repository import MeterReadingRepository
 from elec.services.import_meter_reading_excel import import_meter_reading_excel
+
+
+class CheckMeterReadingApplicationForm(forms.Form):
+    quarter = forms.IntegerField(required=False)
+    year = forms.IntegerField(required=False)
 
 
 class CheckMeterReadingApplicationError:
@@ -24,14 +30,21 @@ def check_application(request: HttpRequest, entity):
     if not excel_file:
         return ErrorResponse(400, CheckMeterReadingApplicationError.MISSING_FILE)
 
-    existing_charge_points = ChargePointRepository.get_registered_charge_points(entity)
+    form = CheckMeterReadingApplicationForm(request.POST)
+    if not form.is_valid():
+        return ErrorResponse(400, "MALFORMED_PARAMS", form.errors)
 
     # guess the application's quarter based on the current date
     # if it's in the last 10 days of a quarter, use this quarter
     # if it's in the first 20 days of a quarter, use the previous quarter
-    quarter, year = get_application_quarter(date.today())
+    auto_quarter, auto_year = get_application_quarter(date.today())
+    quarter = form.cleaned_data["quarter"] or auto_quarter
+    year = form.cleaned_data["year"] or auto_year
+
     if not quarter or not year:
         return ErrorResponse(400, CheckMeterReadingApplicationError.TOO_LATE)
+
+    existing_charge_points = ChargePointRepository.get_registered_charge_points(entity)
 
     meter_reading_data, errors = import_meter_reading_excel(excel_file, existing_charge_points)
     pending_application_already_exists = MeterReadingRepository.get_replaceable_applications(entity).count() > 0
