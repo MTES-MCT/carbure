@@ -1,5 +1,5 @@
-import traceback
 from datetime import date
+from django import forms
 from django.views.decorators.http import require_GET
 from core.common import ErrorResponse
 from core.decorators import check_user_rights
@@ -11,6 +11,11 @@ from elec.api.cpo.meter_readings.check_application import get_application_quarte
 from elec.services.create_meter_reading_excel import create_meter_readings_data, create_meter_readings_excel
 
 
+class ApplicationTemplateForm(forms.Form):
+    quarter = forms.IntegerField(required=False)
+    year = forms.IntegerField(required=False)
+
+
 class ApplicationTemplateError:
     TOO_LATE = "TOO_LATE"
     NO_CHARGE_POINT_AVAILABLE = "NO_CHARGE_POINT_AVAILABLE"
@@ -19,7 +24,14 @@ class ApplicationTemplateError:
 @require_GET
 @check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
 def get_application_template(request, entity):
-    quarter, year = get_application_quarter(date.today())
+    form = ApplicationTemplateForm(request.GET)
+    if not form.is_valid():
+        return ErrorResponse(400, "MALFORMED_PARAMS", form.errors)
+
+    auto_quarter, auto_year = get_application_quarter(date.today())
+    quarter = form.cleaned_data["quarter"] or auto_quarter
+    year = form.cleaned_data["year"] or auto_year
+
     if not quarter or not year:
         return ErrorResponse(400, ApplicationTemplateError.TOO_LATE)
 
