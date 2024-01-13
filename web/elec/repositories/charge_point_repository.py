@@ -16,6 +16,6 @@ class ChargePointRepository:
     def get_registered_charge_points(cpo):
         return (
             ElecChargePoint.objects.select_related("application")
-            .filter(cpo=cpo, application__status=ElecChargePointApplication.ACCEPTED)
+            .filter(cpo=cpo, is_article_2=False, application__status=ElecChargePointApplication.ACCEPTED)
             .order_by("charge_point_id")
         )
