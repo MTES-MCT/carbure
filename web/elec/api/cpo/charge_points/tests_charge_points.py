@@ -36,7 +36,7 @@ class ElecCharginPointsTest(TestCase):
         )
 
     def test_check_charge_point_wrong_entity(self):
-        filepath = "%s/web/fixtures/csv/test_data/points-de-recharge-errors.xlsx" % (os.environ["CARBURE_HOME"])
+        filepath = "%s/web/elec/fixtures/points-de-recharge-errors.xlsx" % (os.environ["CARBURE_HOME"])
 
         with open(filepath, "rb") as reader:
             file = SimpleUploadedFile("points-de-recharge-errors.xlsx", reader.read())
@@ -51,7 +51,7 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(data["error"], "WRONG_ENTITY_TYPE")
 
     def test_check_charge_point_errors(self):
-        filepath = "%s/web/fixtures/csv/test_data/points-de-recharge-errors.xlsx" % (os.environ["CARBURE_HOME"])
+        filepath = "%s/web/elec/fixtures/points-de-recharge-errors.xlsx" % (os.environ["CARBURE_HOME"])
 
         with open(filepath, "rb") as reader:
             file = SimpleUploadedFile("points-de-recharge-errors.xlsx", reader.read())
@@ -84,7 +84,7 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(response.json(), expected)
 
     def test_check_charge_point_ok(self):
-        filepath = "%s/web/fixtures/csv/test_data/points-de-recharge-ok.xlsx" % (os.environ["CARBURE_HOME"])
+        filepath = "%s/web/elec/fixtures/points-de-recharge-ok.xlsx" % (os.environ["CARBURE_HOME"])
 
         with open(filepath, "rb") as reader:
             file = SimpleUploadedFile("points-de-recharge-ok.xlsx", reader.read())
@@ -109,7 +109,7 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(response.json(), expected)
 
     def test_add_charge_point_errors(self):
-        filepath = "%s/web/fixtures/csv/test_data/points-de-recharge-errors.xlsx" % (os.environ["CARBURE_HOME"])
+        filepath = "%s/web/elec/fixtures/points-de-recharge-errors.xlsx" % (os.environ["CARBURE_HOME"])
 
         with open(filepath, "rb") as reader:
             file = SimpleUploadedFile("points-de-recharge-errors.xlsx", reader.read())
@@ -123,7 +123,7 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(response.json(), {"status": "error", "error": "VALIDATION_FAILED"})
 
     def test_add_charge_point_ok(self):
-        filepath = "%s/web/fixtures/csv/test_data/points-de-recharge-ok.xlsx" % (os.environ["CARBURE_HOME"])
+        filepath = "%s/web/elec/fixtures/points-de-recharge-ok.xlsx" % (os.environ["CARBURE_HOME"])
 
         with open(filepath, "rb") as reader:
             file = SimpleUploadedFile("points-de-recharge-ok.xlsx", reader.read())
