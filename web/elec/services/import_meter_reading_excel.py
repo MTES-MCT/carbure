@@ -8,6 +8,7 @@ EXCEL_COLUMNS = {
     "charge_point_id": TableParser.id,
     "last_extracted_energy": TableParser.float,
     "extracted_energy": TableParser.float,
+    "reading_date": TableParser.date,
 }
 
 
@@ -18,7 +19,7 @@ class ExcelMeterReadingError:
 
 
 def import_meter_reading_excel(excel_file: UploadedFile, existing_charge_points: Iterable[ElecChargePoint]):
-    meter_readings_data = pd.read_excel(excel_file, usecols=list(range(0, 3)))
+    meter_readings_data = pd.read_excel(excel_file, usecols=list(range(0, 4)))
     meter_readings_data["line"] = meter_readings_data.index  # add a line number to locate data in the excel file
     meter_readings_data.rename(columns={meter_readings_data.columns[i]: column for i, column in enumerate(EXCEL_COLUMNS)}, inplace=True)  # fmt: skip
     meter_readings_data.dropna(inplace=True)
@@ -44,13 +45,14 @@ def import_meter_reading_excel(excel_file: UploadedFile, existing_charge_points:
         if reading["charge_point_id"] not in charge_points_by_id:
             error = ExcelError(ExcelMeterReadingError.CHARGE_POINT_NOT_REGISTERED, line=line, meta=reading["charge_point_id"])  # fmt: skip
             validation_errors.append(error)
-        if reading["extracted_energy"] < reading["last_extracted_energy"]:
+        elif reading["extracted_energy"] < reading["last_extracted_energy"]:
             error = ExcelError(ExcelMeterReadingError.EXTRACTED_ENERGY_LOWER_THAN_BEFORE, line=line, meta=reading["charge_point_id"])  # fmt: skip
             validation_errors.append(error)
         else:
             reading_data = {
                 "charge_point_id": charge_points_by_id[reading["charge_point_id"]],
                 "extracted_energy": reading["extracted_energy"],
+                "reading_date": reading["reading_date"],
             }
             valid_meter_readings.append(reading_data)
 
