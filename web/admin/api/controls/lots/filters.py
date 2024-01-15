@@ -26,9 +26,6 @@ def get_lots_filters(request, entity):
     data = get_lots_filters_data(lots, request.GET, entity, field)
 
     if data is None:
-        return ErrorResponse(
-            400,
-            CarbureError.UNKNOWN_ERROR,
-        )
+        return ErrorResponse(400, CarbureError.UNKNOWN_ERROR)
     else:
         return SuccessResponse(data)
