@@ -101,6 +101,8 @@ class ExcelChargePoints:
                 charge_point_data["nominal_power"] = charge_point_transport_data["nominal_power"]
                 charge_point_data["cpo_name"] = charge_point_transport_data["cpo_name"]
                 charge_point_data["cpo_siren"] = charge_point_transport_data["cpo_siren"]
+                charge_point_data["latitude"] = charge_point_transport_data["latitude"]
+                charge_point_data["longitude"] = charge_point_transport_data["longitude"]
 
                 # on override la valeur du excel si transport.data.gouv indique que le point de charge est éligible article 2
                 if charge_point_transport_data["should_be_article_2"]:
@@ -134,7 +136,7 @@ class ExcelChargePoints:
                 missing_fields.append("mid_id")
             if not charge_point.get("measure_date"):
                 missing_fields.append("measure_date")
-            if not charge_point.get("measure_energy"):
+            if not isinstance(charge_point.get("measure_energy"), float):
                 missing_fields.append("measure_energy")
 
         return missing_fields
@@ -263,6 +265,8 @@ class TransportDataGouv:
                 "nominal_power",
                 "cpo_name",
                 "cpo_siren",
+                "latitude",
+                "longitude",
             ]
         ]
 

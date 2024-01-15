@@ -17,7 +17,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { useHashMatch } from "common/components/hash-route"
 import { useQuery } from "common/hooks/async"
 import * as apiOperator from "../../api-operator"
-import * as apiCPO from "../../api-cpo"
+import * as apiCPO from "elec/api-cpo"
 import { ElecTransferCertificateStatus } from "elec/types-cpo"
 export interface ElecTransferDetailsDialogProps {
   displayCpo?: boolean

@@ -91,6 +91,11 @@ class Entity(models.Model):
     def url_friendly_name(self):
         return self.name.replace(" ", "").upper()
 
+    def slugify(self):
+        from core.common import normalize
+
+        return normalize(self.name).replace(" ", "_")
+
     def has_external_admin_right(self, right):
         return self.entity_type == Entity.EXTERNAL_ADMIN and right in self.externaladminrights_set.values_list(
             "right", flat=True

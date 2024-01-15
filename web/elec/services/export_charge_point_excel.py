@@ -6,7 +6,7 @@ from elec.serializers.elec_charge_point import ElecChargePointSerializer
 
 def export_charge_points_to_excel(charge_points, entity):
     today = datetime.date.today()
-    file = "/tmp/carbure_elec_charge_points_%s_%s.xlsx" % (entity.id, today.strftime("%Y%m%d_%H%M"))
+    file = "/tmp/charge_points_%s_%s.xlsx" % (entity.slugify(), today.strftime("%Y-%m-%d_%H%M"))
 
     return export_to_excel(
         file,
@@ -27,7 +27,7 @@ def export_charge_points_to_excel(charge_points, entity):
                     {"label": "is_article_2", "value": "is_article_2"},
                     {"label": "is_auto_consumption", "value": "is_auto_consumption"},
                     {"label": "is_article_4", "value": "is_article_4"},
-                    {"label": "measure_reference_point", "value": "measure_reference_point"},
+                    {"label": "measure_reference_point_id", "value": "measure_reference_point_id"},
                     # transport.data.gouv.fr data
                     {"label": "station_name", "value": "station_name"},
                     {"label": "station_id", "value": "station_id"},
