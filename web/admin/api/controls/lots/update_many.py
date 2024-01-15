@@ -43,11 +43,7 @@ def update_many(request):
     lot_form = LotForm(request.POST)
 
     if not params_form.is_valid() or not lot_form.is_valid():
-        return ErrorResponse(
-            400,
-            UpdateManyError.MALFORMED_PARAMS,
-            {**params_form.errors, **lot_form.errors},
-        )
+        return ErrorResponse(400, UpdateManyError.MALFORMED_PARAMS, {**params_form.errors, **lot_form.errors})
 
     entity_id = params_form.cleaned_data["entity_id"]
     comment = params_form.cleaned_data["comment"]

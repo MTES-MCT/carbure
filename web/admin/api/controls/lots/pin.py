@@ -19,7 +19,7 @@ class AdminControlsLotsPinForm(forms.Form):
 
 
 @check_admin_rights()
-def toggle_pin(request, *args, **kwargs):
+def toggle_pin(request):
     form = AdminControlsLotsPinForm(request.POST)
     if not form.is_valid():
         return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, form.errors)
