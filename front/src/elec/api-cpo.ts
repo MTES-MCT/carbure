@@ -118,7 +118,7 @@ export function checkChargingPointsApplication(entity_id: number, file: File) {
   )
 }
 
-export function downloadChargingPointsApplicationDetails(entityId: number, applicationId: number) {
+export function downloadChargingPointsApplicationDetails(entityId: number, companyId: number, applicationId: number) {
   return download("/elec/cpo/charging-points/application-details", { entity_id: entityId, application_id: applicationId, export: true })
 }
 
