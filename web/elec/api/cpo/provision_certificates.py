@@ -8,7 +8,7 @@ from core.decorators import check_user_rights
 from elec.models.elec_provision_certificate import ElecProvisionCertificate
 from elec.serializers.elec_provision_certificate import ElecProvisionCertificateSerializer
 
-from admin.api.elec.provision_certificates import (
+from elec.api.admin.provision_certificates import (
     ProvisionCertificatesError,
     ProvisionCertificatesFilterForm,
     ProvisionCertificatesSortForm,
@@ -39,9 +39,7 @@ def get_provision_certificates(request, *args, **kwargs):
 
     try:
         provision_certificates = ElecProvisionCertificate.objects.filter(cpo_id=entity_id)
-        provision_certificates = find_provision_certificates(
-            provision_certificates, **prov_certif_filter_form.cleaned_data
-        )
+        provision_certificates = find_provision_certificates(provision_certificates, **prov_certif_filter_form.cleaned_data)
         provision_certificates = sort_provision_certificates(provision_certificates, sort_by, order)
 
         paginator = Paginator(provision_certificates, limit)

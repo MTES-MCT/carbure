@@ -30,7 +30,7 @@ class ElecCharginPointsTest(TestCase):
 
     def test_get_applications_wrong_entity(self):
         response = self.client.get(
-            reverse("admin-elec-charge-points-get-applications"),
+            reverse("elec-admin-charge-points-get-applications"),
             {"entity_id": self.cpo.id, "company_id": self.cpo.id},
         )
 
@@ -77,7 +77,7 @@ class ElecCharginPointsTest(TestCase):
         )
 
         response = self.client.get(
-            reverse("admin-elec-charge-points-get-applications"),
+            reverse("elec-admin-charge-points-get-applications"),
             {"entity_id": self.admin.id, "company_id": self.cpo.id},
         )
 
@@ -151,7 +151,7 @@ class ElecCharginPointsTest(TestCase):
         )
 
         response = self.client.get(
-            reverse("admin-elec-charge-points-get-charge-points"),
+            reverse("elec-admin-charge-points-get-charge-points"),
             {"entity_id": self.admin.id, "company_id": self.cpo.id},
         )
 
@@ -242,7 +242,7 @@ class ElecCharginPointsTest(TestCase):
         )
 
         response = self.client.get(
-            reverse("admin-elec-charge-points-get-application-details"),
+            reverse("elec-admin-charge-points-get-application-details"),
             {"entity_id": self.admin.id, "company_id": self.cpo.id, "application_id": application.id},
         )
 
@@ -281,7 +281,7 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(application.status, ElecChargePointApplication.PENDING)
 
         response = self.client.post(
-            reverse("admin-elec-charge-points-accept-application"),
+            reverse("elec-admin-charge-points-accept-application"),
             {"entity_id": self.admin.id, "company_id": self.cpo.id, "application_id": application.id},
         )
 
@@ -297,7 +297,7 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(application.status, ElecChargePointApplication.PENDING)
 
         response = self.client.post(
-            reverse("admin-elec-charge-points-reject-application"),
+            reverse("elec-admin-charge-points-reject-application"),
             {"entity_id": self.admin.id, "company_id": self.cpo.id, "application_id": application.id},
         )
 
