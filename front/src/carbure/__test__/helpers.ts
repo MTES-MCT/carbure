@@ -75,12 +75,13 @@ export const mockGetWithResponseData = (url: string, data: any) => {
     )
   })
 }
-export const mockPostWithResponseData = (url: string, data?: any, withError: boolean = false) => {
+export const mockPostWithResponseData = (url: string, data?: any, withError: boolean = false, error?: string) => {
   return rest.post(url, (req, res, ctx) => {
     return res(
       withError ? ctx.status(400) : ctx.status(200),
       ctx.json({
         status: withError ? "error" : "success",
+        error,
         data,
       })
     )

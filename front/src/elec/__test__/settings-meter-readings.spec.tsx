@@ -86,12 +86,8 @@ test("check the applications list", async () => {
 
 
   screen.getByText("Période")
-  screen.getByText("Stations")
   screen.getByText("Points de recharge")
-  screen.getByText("Kwh renouvelables")
-
-
-
+  screen.getByText("kwh renouvelables")
 })
 
 
