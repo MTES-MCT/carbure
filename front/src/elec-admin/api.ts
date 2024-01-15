@@ -4,19 +4,19 @@ import { ElecProvisionCertificatesData, ElecTransferCertificatesData } from "ele
 import { ElecAdminProvisionCertificateFilter, ElecAdminProvisionCertificateQuery, ElecAdminSnapshot, ElecAdminTransferCertificateFilter, ElecAdminTransferCertificateQuery } from "./types"
 
 export function getYears(entity_id: number) {
-  return api.get<Api<number[]>>("/admin/elec/years", {
+  return api.get<Api<number[]>>("/elec/admin/years", {
     params: { entity_id },
   })
 }
 
 export function getSnapshot(entity_id: number, year: number) {
-  return api.get<Api<ElecAdminSnapshot>>("/admin/elec/snapshot", {
+  return api.get<Api<ElecAdminSnapshot>>("/elec/admin/snapshot", {
     params: { entity_id, year },
   })
 }
 
 export function importProvisionCertificates(entity_id: number, file: File) {
-  return api.post("/admin/elec/import-provision-certificates", {
+  return api.post("/elec/admin/import-provision-certificates", {
     entity_id,
     file,
   })
@@ -32,7 +32,7 @@ export async function getProvisionCertificateFilters(field: ElecAdminProvisionCe
   const params = { filter: field, ...query, ...QUERY_RESET }
 
   return api
-    .get<Api<{ filter_values: string[] }>>("/admin/elec/provision-certificate-filters", { params })
+    .get<Api<{ filter_values: string[] }>>("/elec/admin/provision-certificate-filters", { params })
     .then((res) => res.data.data?.filter_values ?? [])
 
 }
@@ -41,19 +41,19 @@ export function getProvisionCertificateDetails(
   entity_id: number,
   provision_certificate_id: number
 ) {
-  return api.get<Api<{ elec_provision_certificate: ElecProvisionCertificatesDetails }>>("/admin/elec/provision-certificate-details", {
+  return api.get<Api<{ elec_provision_certificate: ElecProvisionCertificatesDetails }>>("/elec/admin/provision-certificate-details", {
     params: { entity_id, provision_certificate_id },
   })
 }
 
 export function getProvisionCertificates(query: ElecAdminProvisionCertificateQuery) {
-  return api.get<Api<ElecProvisionCertificatesData>>("/admin/elec/provision-certificates", {
+  return api.get<Api<ElecProvisionCertificatesData>>("/elec/admin/provision-certificates", {
     params: query,
   })
 }
 
 export function getTransferCertificates(query: ElecAdminTransferCertificateQuery) {
-  return api.get<Api<ElecTransferCertificatesData>>("/admin/elec/transfer-certificates", {
+  return api.get<Api<ElecTransferCertificatesData>>("/elec/admin/transfer-certificates", {
     params: query,
   })
 }
@@ -62,41 +62,41 @@ export function getTransferCertificateDetails(
   entity_id: number,
   transfer_certificate_id: number
 ) {
-  return api.get<Api<{ elec_transfer_certificate: ElecTransferCertificatesDetails }>>("/admin/elec/transfer-certificate-details", {
+  return api.get<Api<{ elec_transfer_certificate: ElecTransferCertificatesDetails }>>("/elec/admin/transfer-certificate-details", {
     params: { entity_id, transfer_certificate_id },
   })
 }
 
 export function downloadTransferCertificates(query: ElecAdminTransferCertificateQuery) {
-  return download("/admin/elec/transfer-certificates", { ...query, export: true })
+  return download("/elec/admin/transfer-certificates", { ...query, export: true })
 }
 
 export async function getTransferCertificateFilters(field: ElecAdminTransferCertificateFilter, query: ElecAdminTransferCertificateQuery) {
   const params = { filter: field, ...query, ...QUERY_RESET }
   return api
-    .get<Api<{ filter_values: string[] }>>("/admin/elec/transfer-certificate-filters", { params })
+    .get<Api<{ filter_values: string[] }>>("/elec/admin/transfer-certificate-filters", { params })
     .then((res) => res.data.data?.filter_values ?? [])
 }
 
 export function downloadChargingPointsApplicationDetails(entityId: number, companyId: number, applicationId: number) {
-  return download("/admin/elec/charging-points/application-details", {
+  return download("/elec/admin/charging-points/application-details", {
     entity_id: entityId, company_id: companyId, application_id: applicationId, export: true
   })
 }
 
 export function downloadChargingPoints(entityId: number, companyId: number) {
-  return download("/admin/elec/charging-points", { entity_id: entityId, company_id: companyId, export: true })
+  return download("/elec/admin/charging-points", { entity_id: entityId, company_id: companyId, export: true })
 }
 
 export function getChargingPointsApplications(entityId: number, companyId: number) {
-  return api.get<Api<ElecChargingPointsApplication[]>>("/admin/elec/charging-points/applications", {
+  return api.get<Api<ElecChargingPointsApplication[]>>("/elec/admin/charging-points/applications", {
     params: { entity_id: entityId, company_id: companyId },
   })
 }
 
 
 export function acceptMeterReadingsApplication(entityId: number, companyId: number, applicationId: number) {
-  return api.post("/admin/elec/meter-readings/accept-application", {
+  return api.post("/elec/admin/meter-readings/accept-application", {
     entity_id: entityId,
     company_id: companyId,
     application_id: applicationId,
@@ -105,7 +105,7 @@ export function acceptMeterReadingsApplication(entityId: number, companyId: numb
 
 
 export function rejectMeterReadingsApplication(entityId: number, companyId: number, applicationId: number) {
-  return api.post("/admin/elec/meter-readings/reject-application", {
+  return api.post("/elec/admin/meter-readings/reject-application", {
     entity_id: entityId,
     company_id: companyId,
     application_id: applicationId,
@@ -116,19 +116,19 @@ export function rejectMeterReadingsApplication(entityId: number, companyId: numb
 
 //METER READINGS
 export function getMeterReadingsApplications(entityId: number, companyId: number) {
-  return api.get<Api<ElecMeterReadingsApplication[]>>("/admin/elec/meter-readings/applications", {
+  return api.get<Api<ElecMeterReadingsApplication[]>>("/elec/admin/meter-readings/applications", {
     params: { entity_id: entityId, company_id: companyId },
   })
 }
 
 export function downloadMeterReadingsApplicationDetails(entityId: number, companyId: number, applicationId: number) {
-  return download("/admin/elec/meter-readings/application-details", {
+  return download("/elec/admin/meter-readings/application-details", {
     entity_id: entityId, company_id: companyId, application_id: applicationId, export: true
   })
 }
 
 export function acceptChargingPointsApplication(entityId: number, companyId: number, applicationId: number) {
-  return api.post("/admin/elec/charging-points/accept-application", {
+  return api.post("/elec/admin/charging-points/accept-application", {
     entity_id: entityId,
     company_id: companyId,
     application_id: applicationId,
@@ -137,7 +137,7 @@ export function acceptChargingPointsApplication(entityId: number, companyId: num
 
 
 export function rejectChargingPointsApplication(entityId: number, companyId: number, applicationId: number) {
-  return api.post("/admin/elec/charging-points/reject-application", {
+  return api.post("/elec/admin/charging-points/reject-application", {
     entity_id: entityId,
     company_id: companyId,
     application_id: applicationId,

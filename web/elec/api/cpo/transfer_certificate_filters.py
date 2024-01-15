@@ -1,5 +1,5 @@
 from django.views.decorators.http import require_GET
-from admin.api.elec.transfer_certificate_filters import CertificateFilterError
+from elec.api.admin.transfer_certificate_filters import CertificateFilterError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from elec.models.elec_transfer_certificate import ElecTransferCertificate
