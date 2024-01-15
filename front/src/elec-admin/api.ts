@@ -1,5 +1,5 @@
 import { api, Api, download } from "common/services/api"
-import { ElecChargingPointsApplication, ElecProvisionCertificatesDetails, ElecTransferCertificatesDetails } from "elec/types"
+import { ElecChargingPointsApplication, ElecMeterReadingsApplication, ElecProvisionCertificatesDetails, ElecTransferCertificatesDetails } from "elec/types"
 import { ElecProvisionCertificatesData, ElecTransferCertificatesData } from "elec/types-cpo"
 import { ElecAdminProvisionCertificateFilter, ElecAdminProvisionCertificateQuery, ElecAdminSnapshot, ElecAdminTransferCertificateFilter, ElecAdminTransferCertificateQuery } from "./types"
 
@@ -91,6 +91,39 @@ export function downloadChargingPoints(entityId: number, companyId: number) {
 export function getChargingPointsApplications(entityId: number, companyId: number) {
   return api.get<Api<ElecChargingPointsApplication[]>>("/admin/elec/charging-points/applications", {
     params: { entity_id: entityId, company_id: companyId },
+  })
+}
+
+
+export function acceptMeterReadingsApplication(entityId: number, companyId: number, applicationId: number) {
+  return api.post("/admin/elec/meter-readings/accept-application", {
+    entity_id: entityId,
+    company_id: companyId,
+    application_id: applicationId,
+  })
+}
+
+
+export function rejectMeterReadingsApplication(entityId: number, companyId: number, applicationId: number) {
+  return api.post("/admin/elec/meter-readings/reject-application", {
+    entity_id: entityId,
+    company_id: companyId,
+    application_id: applicationId,
+  })
+}
+
+
+
+//METER READINGS
+export function getMeterReadingsApplications(entityId: number, companyId: number) {
+  return api.get<Api<ElecMeterReadingsApplication[]>>("/admin/elec/meter-readings/applications", {
+    params: { entity_id: entityId, company_id: companyId },
+  })
+}
+
+export function downloadMeterReadingsApplicationDetails(entityId: number, companyId: number, applicationId: number) {
+  return download("/admin/elec/meter-readings/application-details", {
+    entity_id: entityId, company_id: companyId, application_id: applicationId, export: true
   })
 }
 

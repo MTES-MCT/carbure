@@ -11,14 +11,11 @@ import { useMutation } from "common/hooks/async"
 
 import { ElecChargingPointsApplicationCheckInfo } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
-import { useNavigate } from "react-router-dom"
-import { checkChargingPointsApplication } from "settings/api/elec"
+import { checkChargingPointsApplication } from "elec/api-cpo"
 import ErrorsDetailsDialog from "./errors-dialog"
 import ValidDetailsDialog from "./valid-dialog"
 import Alert from "common/components/alert"
-
-// L'URL complète du fichier
-
+import { ReplaceAlert } from "./replace-alert"
 
 type ElecChargingPointsFileUploadProps = {
   onClose: () => void
@@ -115,9 +112,7 @@ const ElecChargingPointsFileUpload = ({
           </Form>
           {pendingApplicationAlreadyExists &&
             (
-              <Alert icon={AlertCircle} variant="warning">
-                <Trans>Vous avez déjà une demande d'inscription en attente. Cette nouvelle demande viendra écraser la précédente.</Trans>
-              </Alert>
+              <ReplaceAlert />
             )}
 
         </section>

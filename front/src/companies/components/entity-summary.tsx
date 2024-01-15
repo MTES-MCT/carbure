@@ -24,7 +24,7 @@ type EntitySummaryProps = {
   search?: string
 }
 
-type Operation = "user" | "certificate" | "double-counting" | "charging-points"
+type Operation = "user" | "certificate" | "double-counting" | "charging-points" | "meter-readings"
 
 export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
   const { t } = useTranslation()
@@ -93,6 +93,10 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
               value: "charging-points",
               label: t("Inscriptions de points de recharge"),
             },
+            entity.isAdmin && {
+              value: "meter-readings",
+              label: t("Validation des relevés trimestriels"),
+            },
           ])}
         />
       </Grid>
@@ -128,7 +132,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                   />
                 ),
               },
-              entity.isAdmin && (!operation || !["charging-points"].includes(operation)) && {
+              entity.isAdmin && (!operation || !["charging-points", "meter-readings"].includes(operation)) && {
                 key: "factories",
                 header: t("Production / Stockage"),
                 orderBy: (e) => e.production_sites + e.depots,
@@ -147,7 +151,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                   />
                 ),
               },
-              entity.isAdmin && (!operation || !["double-counting", "charging-points"].includes(operation)) && {
+              entity.isAdmin && (!operation || !["double-counting", "charging-points", "meter-readings"].includes(operation)) && {
                 key: "certificates",
                 header: t("Certificats"),
                 orderBy: (e) => e.certificates,
@@ -187,7 +191,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                   />
                 ),
               },
-              entity.isAdmin && operation === "charging-points" && {
+              entity.isAdmin && "charging-points" === operation && {
                 key: "charging-points",
                 header: t("Points de recharge"),
                 orderBy: (e) => e.charging_points_pending * 1000 + e.charging_points_accepted,
@@ -202,6 +206,22 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                       {
                         count: e.charging_points_accepted,
                         label: t("{{count}} points de recharge", { count: e.charging_points_accepted }),
+                      },
+                    ]}
+                  />
+                ),
+              },
+              entity.isAdmin && "meter-readings" === operation && {
+                key: "meter-readings",
+                header: t("Relevés trimestriels"),
+                orderBy: (e) => e.meter_readings_pending * 1000 + e.meter_readings_pending,
+                cell: (e) => (
+                  <EntityInfoCell
+                    data={[
+                      {
+                        count: e.meter_readings_pending,
+                        label: t("{{count}} trimestre de relevés à valider", { count: e.meter_readings_pending }),
+                        highlight: true,
                       },
                     ]}
                   />
@@ -270,4 +290,5 @@ function hasOperation(
   if (operation === "certificate" && details.certificates_pending > 0) return true
   if (operation === "double-counting" && details.double_counting_requests > 0) return true
   if (operation === "charging-points" && (details.charging_points_accepted > 0 || details.charging_points_pending > 0)) return true
+  if (operation === "meter-readings" && (details.meter_readings_pending > 0 || details.meter_readings_pending > 0)) return true
 }

@@ -4,10 +4,9 @@ import userEvent from "@testing-library/user-event"
 import { Route } from "react-router-dom"
 
 import { operator, producer, trader } from "carbure/__test__/data"
-import { getField } from "carbure/__test__/helpers"
+import { getField, setEntity } from "carbure/__test__/helpers"
 import LotAdd from "../index"
 
-import { setEntity } from "settings/__test__/api"
 import server from "./api"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))

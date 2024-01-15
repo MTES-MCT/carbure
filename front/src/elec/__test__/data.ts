@@ -1,6 +1,6 @@
 import { cpo } from "carbure/__test__/data";
 import { EntityPreview, EntityType } from "carbure/types";
-import { ChargingPointsApplicationError, ElecChargingPointsApplication, ElecChargingPointsApplicationCheckInfo, ElecChargingPointsApplicationStatus, ElecProvisionCertificatePreview } from "elec/types";
+import { ChargingPointsApplicationError, ElecChargingPointsApplication, ElecChargingPointsApplicationCheckInfo, ElecChargingPointsApplicationStatus, ElecMeterReadingsApplication, ElecMeterReadingsApplicationCheckInfo, ElecMeterReadingsApplicationStatus, ElecProvisionCertificatePreview, MeterReadingsApplicationError } from "elec/types";
 import { ElecCPOSnapshot, ElecProvisionCertificatesData } from "elec/types-cpo";
 
 export const elecSnapshot: ElecCPOSnapshot = {
@@ -48,6 +48,8 @@ export const elecAdminProvisionCertificateList: ElecProvisionCertificatesData = 
     returned: 10,
     total: 11
 }
+
+//CHARGING POINTS
 
 
 const elecChargingPointApplication1: ElecChargingPointsApplication = {
@@ -108,4 +110,75 @@ export const elecChargingPointsApplicationCheckResponseSucceed: ElecChargingPoin
     file_name: "test.csv",
     error_count: 0,
     charging_point_count: 90
+}
+
+// METER READINGS
+
+const elecMeterReadingApplication1: ElecMeterReadingsApplication = {
+    id: 1,
+    cpo: cpo,
+    station_count: 4,
+    charging_point_count: 90,
+    energy_total: 8,
+    year: 2023,
+    quarter: 1,
+    application_date: "2023-11-13",
+
+    status: ElecMeterReadingsApplicationStatus.Accepted,
+}
+
+const elecMeterReadingApplication2: ElecMeterReadingsApplication = {
+    id: 1,
+    cpo: cpo,
+    station_count: 19,
+    charging_point_count: 1000,
+    energy_total: 30000,
+    year: 2023,
+    quarter: 2,
+    application_date: "2023-11-13",
+
+    status: ElecMeterReadingsApplicationStatus.Pending,
+}
+const elecMeterReadingApplication3: ElecMeterReadingsApplication = {
+    id: 1,
+    cpo: cpo,
+    station_count: 19,
+    charging_point_count: 1000,
+    energy_total: 30000,
+    year: 2023,
+    quarter: 2,
+    application_date: "2023-11-13",
+
+    status: ElecMeterReadingsApplicationStatus.Rejected,
+}
+
+
+export const elecMeterReadingsApplications: ElecMeterReadingsApplication[] = [
+    elecMeterReadingApplication1,
+    elecMeterReadingApplication2,
+    elecMeterReadingApplication3
+]
+
+
+
+export const meterReadingsApplicationError1: MeterReadingsApplicationError = {
+    line: 87,
+    error: "UNKNOW_ERROR"
+}
+export const meterReadingsApplicationCheckResponseFailed: ElecMeterReadingsApplicationCheckInfo = {
+    file_name: "test.csv",
+    error_count: 1,
+    year: 2023,
+    quarter: 2,
+    charging_point_count: 2,
+    errors: [meterReadingsApplicationError1]
+}
+
+export const meterReadingsApplicationCheckResponseSuccess: ElecMeterReadingsApplicationCheckInfo = {
+    file_name: "test.csv",
+    error_count: 0,
+    charging_point_count: 90,
+    quarter: 2,
+    year: 2023,
+    // pending_application_already_exists: true
 }

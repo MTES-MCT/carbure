@@ -3,9 +3,9 @@ import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Route } from "react-router-dom"
 import { producer, productionSite } from "carbure/__test__/data"
-import { getField, waitWhileLoading } from "carbure/__test__/helpers"
+import { getField, setEntity, waitWhileLoading } from "carbure/__test__/helpers"
 
-import server, { setDeliverySites, setEntity, setProductionSites } from "./api"
+import server, { setDeliverySites, setProductionSites } from "./api"
 import ProductionSitesSettings from "settings/components/production-site"
 
 const SettingsWithHooks = () => {
