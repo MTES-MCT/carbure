@@ -22,6 +22,7 @@ class Entity(models.Model):
     AIRLINE = "Compagnie aérienne"
     UNKNOWN = "Unknown"
     CPO = "Charge Point Operator"
+    POWER_STATION = "Power Station"
     ENTITY_TYPES = (
         (PRODUCER, "Producteur"),
         (OPERATOR, "Opérateur"),
@@ -31,7 +32,7 @@ class Entity(models.Model):
         (EXTERNAL_ADMIN, EXTERNAL_ADMIN),
         (AIRLINE, AIRLINE),
         (UNKNOWN, "Unknown"),
-        (CPO, CPO),
+        (POWER_STATION, "Centrale électrique"),
     )
 
     name = models.CharField(max_length=64, unique=True)
@@ -612,6 +613,7 @@ class CarbureLot(models.Model):
     PROCESSING = "PROCESSING"
     DIRECT = "DIRECT"  # livraison directe
     FLUSHED = "FLUSHED"  # emptying stock for accounting or rounding purpose
+    CONSUMPTION = "CONSUMPTION"  # consuming the biofuel for special uses
     DELIVERY_TYPES = (
         (UNKNOWN, UNKNOWN),
         (RFC, RFC),
@@ -622,6 +624,7 @@ class CarbureLot(models.Model):
         (PROCESSING, PROCESSING),
         (DIRECT, DIRECT),
         (FLUSHED, FLUSHED),
+        (CONSUMPTION, CONSUMPTION),
     )
     delivery_type = models.CharField(max_length=64, choices=DELIVERY_TYPES, blank=False, null=False, default=UNKNOWN)
     declared_by_supplier = models.BooleanField(default=False)
