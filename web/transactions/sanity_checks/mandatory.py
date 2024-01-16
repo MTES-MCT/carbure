@@ -134,7 +134,7 @@ def check_missing_feedstock_country_of_origin(lot: CarbureLot):
 
 
 def check_missing_supplier_certificate(lot: CarbureLot):
-    if lot.carbure_client and lot.carbure_client.entity_type == Entity.OPERATOR:
+    if lot.carbure_client and lot.carbure_client.entity_type in [Entity.OPERATOR, Entity.POWER_STATION]:
         # client is an operator
         # make sure we have a certificate
         if not lot.supplier_certificate and not lot.vendor_certificate:
