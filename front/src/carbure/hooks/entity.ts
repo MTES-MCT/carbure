@@ -12,6 +12,7 @@ export interface EntityManager extends Entity {
   isAirline: boolean
   isOperator: boolean
   isTrader: boolean
+  isPowerPlant: boolean
   isIndustry: boolean
   isCPO: boolean
   canTrade: boolean
@@ -56,6 +57,7 @@ export function useEntityManager(user: UserManager): EntityManager {
     isAirline: type === EntityType.Airline,
     isProducer: type === EntityType.Producer,
     isOperator: type === EntityType.Operator,
+    isPowerPlant: type === EntityType.PowerStation,
     isTrader: type === EntityType.Trader,
     isCPO: type === EntityType.CPO,
     isIndustry: isIndustry(type),

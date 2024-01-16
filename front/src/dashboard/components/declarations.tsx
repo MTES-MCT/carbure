@@ -90,6 +90,7 @@ const Declarations = () => {
               { key: EntityType.Operator, label: t("Opérateur") },
               { key: EntityType.Producer, label: t("Producteur") },
               { key: EntityType.Trader, label: t("Trader") },
+              { key: EntityType.PowerStation, label: t("Centrale électrique") },
             ]}
           />
         </Row>
@@ -114,6 +115,13 @@ const Declarations = () => {
           period={period!}
           loading={declarations.loading}
           declarations={groupedByEntityType[EntityType.Trader]}
+        />
+      )}
+      {focus === EntityType.PowerStation && (
+        <DeclarationTable
+          period={period!}
+          loading={declarations.loading}
+          declarations={groupedByEntityType[EntityType.PowerStation]}
         />
       )}
     </Panel>
