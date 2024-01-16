@@ -1,4 +1,4 @@
-from django.db.models import Count, Sum, F
+from django.db.models import Count, Sum, F, Q
 from core.models import Entity
 from elec.models import ElecMeterReadingApplication
 from elec.models.elec_meter_reading import ElecMeterReading
@@ -16,7 +16,7 @@ class MeterReadingRepository:
     def get_previous_application(cpo: Entity, quarter=None, year=None):
         applications = ElecMeterReadingApplication.objects.filter(cpo=cpo, status=ElecMeterReadingApplication.ACCEPTED)
         if quarter and year:
-            applications = applications.filter(quarter__lt=quarter, year__lte=year)
+            applications = applications.filter(Q(year__lt=year) | (Q(year=year) & Q(quarter__lt=quarter)))
         return applications.order_by("-year", "-quarter").first()
 
     @staticmethod
