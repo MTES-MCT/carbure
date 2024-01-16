@@ -150,6 +150,16 @@ export function acceptForBlending(
   )
 }
 
+export function acceptForConsumption(
+  query: LotQuery,
+  selection: number[] | undefined
+) {
+  return api.post<Api<void>>(
+    "/transactions/lots/accept-consumption",
+    selectionOrQuery(query, selection)
+  )
+}
+
 export function acceptForDirectDelivery(
   query: LotQuery,
   selection: number[] | undefined
