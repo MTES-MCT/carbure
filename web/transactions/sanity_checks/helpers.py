@@ -186,7 +186,7 @@ def get_prefetched_data(entity=None):
     data["production_sites"] = production_sites
 
     # CLIENTS
-    client_entities = list(Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.OPERATOR, Entity.TRADER]))
+    client_entities = list(Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.OPERATOR, Entity.TRADER, Entity.POWER_STATION]))
     data["clients"] = {c.pk: c for c in client_entities}
     data["clientsbyname"] = {c.name.upper(): c for c in client_entities}
 

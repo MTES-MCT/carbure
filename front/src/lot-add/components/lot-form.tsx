@@ -84,6 +84,12 @@ export function useLotForm(
       }
     }
 
+    // power plants can only set themselves as client, and set the fuel for consumption
+    if (entity.isPowerPlant) {
+      value.client = entity
+      value.delivery_type = DeliveryType.Consumption
+    }
+
     // automatically set the default certificate of the supplier
     if (
       isLotSupplier(entity, value) &&
