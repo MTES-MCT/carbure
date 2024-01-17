@@ -161,7 +161,10 @@ export const ClientField = (props: AutocompleteProps<Entity | string>) => {
       {...bound}
       {...props}
       disabled={
-        (entity.isOperator && !hasClients) || props.disabled || bound.disabled
+        entity.isPowerPlant ||
+        (entity.isOperator && !hasClients) ||
+        props.disabled ||
+        bound.disabled
       }
     />
   )
@@ -205,7 +208,12 @@ export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
       normalize={norm.normalizeDeliveryType}
       options={deliveryTypes}
       {...props}
-      disabled={(!isDraft && hasChildren) || props.disabled || bound.disabled}
+      disabled={
+        entity.isPowerPlant ||
+        (!isDraft && hasChildren) ||
+        props.disabled ||
+        bound.disabled
+      }
     />
   )
 }
@@ -229,10 +237,12 @@ export function getDeliveryTypes(
 
   const {
     isOperator,
+    isPowerPlant,
     has_stocks,
     has_mac,
     has_direct_deliveries,
     has_trading,
+    isIndustry,
   } = entity
   const isClientEntity = client instanceof Object ? client.id === entity.id : false // prettier-ignore
   const isClientUnknown = client === undefined || typeof client === "string"
@@ -242,8 +252,9 @@ export function getDeliveryTypes(
     isClientEntity && has_stocks && DeliveryType.Stock,
     (isClientUnknown || isClientEntity) && has_mac && DeliveryType.RFC,
     (isClientUnknown || isClientEntity) && has_direct_deliveries && DeliveryType.Direct, // prettier-ignore
-    (isClientUnknown || isClientEntity) && DeliveryType.Exportation,
+    isIndustry && (isClientUnknown || isClientEntity) && DeliveryType.Exportation, // prettier-ignore
     status !== LotStatus.Draft && has_trading && DeliveryType.Trading,
+    isClientEntity && isPowerPlant && DeliveryType.Consumption,
   ])
 }
 

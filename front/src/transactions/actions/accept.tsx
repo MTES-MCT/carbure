@@ -96,6 +96,8 @@ function useAcceptOptions(params: {
     has_trading,
     has_stocks,
     has_direct_deliveries,
+    isIndustry,
+    isPowerPlant,
   } = entity
 
   const hasProcessing = depots.result !== undefined && depots.result.length > 0
@@ -145,10 +147,15 @@ function useAcceptOptions(params: {
       action: () =>
         portal((close) => <TradingDialog {...props} onClose={close} />),
     },
-    {
+    isIndustry && {
       label: i18next.t("Exportation"),
       action: () =>
         portal((close) => <ExportDialog {...props} onClose={close} />),
+    },
+    isPowerPlant && {
+      label: i18next.t("Consommation"),
+      action: () =>
+        portal((close) => <ConsumptionDialog {...props} onClose={close} />),
     },
   ])
 }
@@ -837,6 +844,94 @@ const ProcessingDialog = ({
               selection.length,
             ])
             acceptLots.execute(subquery, selection, depot!.blender!.id)
+          }}
+        />
+        <Button
+          disabled={acceptLots.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
+        />
+      </footer>
+    </Dialog>
+  )
+}
+
+const ConsumptionDialog = ({
+  summary,
+  query,
+  selection,
+  onClose,
+}: AcceptDialogProps) => {
+  const { t } = useTranslation()
+  const notify = useNotify()
+  const matomo = useMatomo()
+
+  const v = variations(selection.length)
+
+  const acceptLots = useMutation(api.acceptForConsumption, {
+    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
+
+    onSuccess: () => {
+      const text = v({
+        zero: t("Les lots ont été marqués pour consommation."),
+        one: t("Le lot a été marqué pour consommation."),
+        many: t("Les lots sélectionnés ont été marqués pour consommation."),
+      })
+
+      notify(text, { variant: "success" })
+      onClose()
+    },
+
+    onError: () => {
+      const text = v({
+        zero: t("Les lots n'ont pas pu être acceptés."),
+        one: t("Le lot n'a pas pu être accepté."),
+        many: t("Les lots sélectionnés n'ont pas pu être acceptés."),
+      })
+
+      notify(text, { variant: "danger" })
+      onClose()
+    },
+  })
+
+  return (
+    <Dialog onClose={onClose}>
+      <header>
+        <h1>
+          {v({
+            zero: t("Consommation des lots"),
+            one: t("Consommation de lot"),
+            many: t("Consommation des lots"),
+          })}
+        </h1>
+      </header>
+      <main>
+        <section>
+          {t(
+            "En acceptant ces lots, vous indiquez qu'ils seront consommés au sein d'une centrale électrique."
+          )}
+        </section>
+
+        {summary && <LotSummary query={query} selection={selection} />}
+      </main>
+      <footer>
+        <Button
+          asideX
+          autoFocus
+          loading={acceptLots.loading}
+          variant="success"
+          icon={Check}
+          label={t("Consommation")}
+          action={() => {
+            matomo.push([
+              "trackEvent",
+              "lots-accept",
+              "consumption",
+              "",
+              selection.length,
+            ])
+            acceptLots.execute(query, selection)
           }}
         />
         <Button
