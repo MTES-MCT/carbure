@@ -1,6 +1,7 @@
 from datetime import date
 from django import forms
 from django.views.decorators.http import require_GET
+from core.carburetypes import CarbureError
 from core.common import ErrorResponse
 from core.decorators import check_user_rights
 from core.excel import ExcelResponse
@@ -26,7 +27,7 @@ class ApplicationTemplateError:
 def get_application_template(request, entity):
     form = ApplicationTemplateForm(request.GET)
     if not form.is_valid():
-        return ErrorResponse(400, "MALFORMED_PARAMS", form.errors)
+        return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, form.errors)
 
     auto_quarter, auto_year = get_application_quarter(date.today())
     quarter = form.cleaned_data["quarter"] or auto_quarter
@@ -38,7 +39,11 @@ def get_application_template(request, entity):
     charge_points = ChargePointRepository.get_registered_charge_points(entity)
 
     if charge_points.count() == 0:
-        return ErrorResponse(400, ApplicationTemplateError.NO_CHARGE_POINT_AVAILABLE)
+        return ErrorResponse(
+            400,
+            ApplicationTemplateError.NO_CHARGE_POINT_AVAILABLE,
+            message="Le fichier excel n'a pas pu être généré car aucun point de recharge n'a été validé jusqu'à présent. Assurez-vous qu'au moins l'un de vos dossiers d'inscription de point de recharge a déjà été validé par la DGEC.",
+        )
 
     previous_application = MeterReadingRepository.get_previous_application(entity, quarter, year)
     meter_reading_data = create_meter_readings_data(charge_points, previous_application)
