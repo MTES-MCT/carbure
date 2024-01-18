@@ -2,6 +2,7 @@ from datetime import date, timedelta
 from django import forms
 from django.http import HttpRequest
 from django.views.decorators.http import require_POST
+from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity, UserRights
@@ -32,7 +33,7 @@ def check_application(request: HttpRequest, entity):
 
     form = CheckMeterReadingApplicationForm(request.POST)
     if not form.is_valid():
-        return ErrorResponse(400, "MALFORMED_PARAMS", form.errors)
+        return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, form.errors)
 
     # guess the application's quarter based on the current date
     # if it's in the last 10 days of a quarter, use this quarter
