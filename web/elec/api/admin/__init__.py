@@ -43,6 +43,7 @@ urlpatterns = [
         get_transfer_certificate_details,
         name="admin-elec-get-transfer-certificate-details",
     ),
+    path("audit/", include("elec.api.admin.audit")),
     path("charging-points/", include("elec.api.admin.charge_points")),
     path("meter-readings/", include("elec.api.admin.meter_readings")),
 ]
