@@ -22,14 +22,8 @@ def add_application(request: HttpRequest, entity: Entity):
     if not excel_file:
         return ErrorResponse(400, AddChargePointApplicationError.MISSING_FILE)
 
-    # @TODO replace by comment to enable duplicate checks
+    # @TODO actually list existing charge points to enable duplicate checks
     existing_charge_points = []
-    # existing_charge_points = (
-    #     ElecChargePoint.objects.select_related("application")
-    #     .filter(application__status=ElecChargePointApplication.ACCEPTED)
-    #     .values_list("charge_point_id", flat=True)
-    #     .distinct()
-    # )
 
     charge_point_data, errors = import_charge_point_excel(excel_file, existing_charge_points)
 

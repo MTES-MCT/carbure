@@ -211,6 +211,8 @@ export function getEntityTypeLabel(type: EntityType) {
       return i18next.t("Compagnie aérienne")
     case EntityType.CPO:
       return i18next.t("Aménageur de bornes électriques")
+    case EntityType.PowerStation:
+      return i18next.t("Centrale électrique")
     case EntityType.Unknown:
     default:
       return i18next.t("Inconnu")
@@ -271,6 +273,8 @@ export function getDeliveryLabel(delivery: DeliveryType | undefined) {
       return i18next.t("Vidé")
     case DeliveryType.Unknown:
       return i18next.t("En attente")
+    case DeliveryType.Consumption:
+      return i18next.t("Consommation")
     default:
       return delivery || "N/A"
   }

@@ -23,6 +23,7 @@ from .accept_export import accept_export
 from .accept_direct_delivery import accept_direct_delivery
 from .cancel_accept import cancel_accept_lots
 from .accept_release_for_consumption import accept_rfc
+from .accept_consumption import accept_consumption
 from .template import get_template
 from .toggle_warning import toggle_warning
 
@@ -50,6 +51,7 @@ urlpatterns = [
     path("accept-direct-delivery", accept_direct_delivery, name="transactions-lots-accept-direct-delivery"),
     path("cancel-accept", cancel_accept_lots, name="transactions-lots-cancel-accept"),
     path("accept-release-for-consumption", accept_rfc, name="transactions-lots-accept-release-for-consumption"),
+    path("accept-consumption", accept_consumption, name="transactions-lots-accept-consumption"),
     path("template", get_template, name="transactions-lots-template"),
     path("toggle-warning", toggle_warning, name="transactions-lots-toggle-warning"),
 ]

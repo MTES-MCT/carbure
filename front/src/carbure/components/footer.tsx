@@ -143,7 +143,7 @@ const CarbureFooter = () => {
             </a>
           </li>
           <li>
-            <Link to="/accessibility">
+            <Link to="/accessibilite">
               <Trans>Accessibilité : non conforme</Trans>
             </Link>
           </li>

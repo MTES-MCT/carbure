@@ -1,5 +1,6 @@
 import { screen, waitForElementToBeRemoved } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import { rest } from "msw"
 
 export async function waitWhileLoading() {
   const loaders = screen.queryAllByTestId("loader")
@@ -57,5 +58,32 @@ export function getByTextContent(textContent: string) {
 export function findByTextInNode(textContent: string, nodeName: string) {
   return screen.findByText((content, node) => {
     return content === textContent && node?.nodeName === nodeName
+  })
+}
+
+export function setEntity(nextEntity: any) {
+  Data.set("entity", nextEntity)
+}
+
+export const mockGetWithResponseData = (url: string, data: any) => {
+  return rest.get(url, (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data,
+      })
+    )
+  })
+}
+export const mockPostWithResponseData = (url: string, data?: any, withError: boolean = false, error?: string) => {
+  return rest.post(url, (req, res, ctx) => {
+    return res(
+      withError ? ctx.status(400) : ctx.status(200),
+      ctx.json({
+        status: withError ? "error" : "success",
+        error,
+        data,
+      })
+    )
   })
 }

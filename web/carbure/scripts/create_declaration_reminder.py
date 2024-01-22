@@ -15,7 +15,7 @@ def create_declaration_reminder() -> None:
     period = today.year * 100 + today.month
 
     entities = Entity.objects.filter(
-        entity_type__in=[Entity.OPERATOR, Entity.PRODUCER, Entity.TRADER]
+        entity_type__in=[Entity.OPERATOR, Entity.PRODUCER, Entity.TRADER, Entity.POWER_STATION]
     ).prefetch_related("sustainabilitydeclaration_set")
 
     for entity in entities:

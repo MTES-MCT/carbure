@@ -10,7 +10,7 @@ from core.excel import ExcelResponse
 from elec.models.elec_transfer_certificate import ElecTransferCertificate
 from elec.serializers.elec_transfer_certificate import ElecTransferCertificateSerializer
 
-from admin.api.elec.transfer_certificates import (
+from elec.api.admin.transfer_certificates import (
     TransferCertificatesError,
     TransferCertificatesFilterForm,
     TransferCertificatesSortForm,

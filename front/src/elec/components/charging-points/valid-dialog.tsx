@@ -2,14 +2,15 @@ import useEntity from "carbure/hooks/entity"
 import Alert from "common/components/alert"
 import { Button } from "common/components/button"
 import { Dialog } from "common/components/dialog"
-import { AlertCircle, Check, Cross, Plus, Return } from "common/components/icons"
+import { AlertCircle, Check, Cross, Plus, Return, Send } from "common/components/icons"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import Tag from "common/components/tag"
 import { useMutation } from "common/hooks/async"
 import { ElecChargingPointsApplicationCheckInfo } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
-import { applyChargingPoints } from "settings/api/elec"
+import { addChargingPoints } from "elec/api-cpo"
+import { ReplaceAlert } from "./replace-alert"
 
 export type ValidDetailsDialogProps = {
   fileData: ElecChargingPointsApplicationCheckInfo
@@ -28,7 +29,7 @@ export const ValidDetailsDialog = ({
   const notifyError = useNotifyError()
   const portal = usePortal()
 
-  const chargingPointsApplication = useMutation(applyChargingPoints, {
+  const chargingPointsApplication = useMutation(addChargingPoints, {
     invalidates: ["charging-points-applications"],
     onSuccess() {
       onClose()
@@ -36,7 +37,7 @@ export const ValidDetailsDialog = ({
 
     },
     onError(err) {
-      notifyError(err, t("Impossible d'inscrire les points de recharge"))
+      notifyError(err, t("Impossible d'envoyer la demande d'inscription de points de recharges"))
     },
   })
 
@@ -84,16 +85,14 @@ export const ValidDetailsDialog = ({
 
           {fileData.pending_application_already_exists &&
             (
-              <Alert icon={AlertCircle} variant="warning">
-                <Trans>Vous avez déjà une demande d'inscription en attente. Cette nouvelle demande viendra écraser la précédente.</Trans>
-              </Alert>
+              <ReplaceAlert />
             )}
         </section>
       </main>
 
       <footer>
         <Button
-          icon={Plus}
+          icon={Send}
           loading={chargingPointsApplication.loading}
           label={fileData.pending_application_already_exists ? t("Remplacer la demande d'inscription") : t("Envoyer la demande d'inscription")}
           variant="primary"
