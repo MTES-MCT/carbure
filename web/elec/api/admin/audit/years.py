@@ -3,11 +3,8 @@ from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
 from core.models import ExternalAdminRights
-from elec.api.cpo import meter_readings
 from elec.models.elec_charge_point_application import ElecChargePointApplication
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
-from elec.models.elec_provision_certificate import ElecProvisionCertificate
-from elec.models.elec_transfer_certificate import ElecTransferCertificate
 
 
 @check_admin_rights(allow_external=[ExternalAdminRights.ELEC])
