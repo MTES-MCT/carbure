@@ -52,7 +52,7 @@ def ExcelResponse(file: BufferedReader):
     data = file.read()
     ctype = "application/vnd.ms-excel"
     response = HttpResponse(content=data, content_type=ctype)
-    response["Content-Disposition"] = f'attachment; filename="{file.name}"'
+    response["Content-Disposition"] = f'attachment; filename="{file.name.replace("/tmp/", "")}"'
     return response
 
 
@@ -97,9 +97,9 @@ class TableParser:
     def bool(cell):
         if isinstance(cell, str):
             cell = cell.lower()
-        if cell == "oui" or cell == 1 or cell == True or cell == "true":
+        if cell == "oui" or cell == "yes" or cell == "x" or cell == 1 or cell == True or cell == "true":
             return True
-        elif not cell or pd.isna(cell) or cell == "non" or cell == "false":
+        elif not cell or pd.isna(cell) or cell == "non" or cell == "no" or cell == "false":
             return False
         else:
             raise ValueError()
@@ -137,3 +137,10 @@ class TableParser:
     @staticmethod
     def date(cell):
         return try_get_date(cell)
+
+
+def ExcelError(type: str, line: int, meta=None):
+    error = {"line": int(line), "error": type}
+    if meta is not None:
+        error["meta"] = meta
+    return error

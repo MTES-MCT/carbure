@@ -1,12 +1,13 @@
 import { fireEvent, screen } from "@testing-library/react"
-import { waitWhileLoading } from "carbure/__test__/helpers"
+import { setEntity, waitWhileLoading } from "carbure/__test__/helpers"
 import { Route } from "react-router-dom"
 import { TestRoot, render } from "setupTests"
 
 import { cpo } from "carbure/__test__/data"
-import ElecSettings from "settings/components/charging-points"
-import server, { okChargingPointsCheckError, okChargingPointsApplicationsEmpty, setEntity } from "./api"
+import ElecChargingPointsSettings from "elec/components/charging-points/settings"
+import server from "../../settings/__test__/api"
 import userEvent from "@testing-library/user-event"
+import { okChargingPointsApplicationsEmpty, okChargingPointsCheckError } from "./api"
 
 const SettingsWithHooks = () => {
   return (
@@ -14,7 +15,7 @@ const SettingsWithHooks = () => {
       <Route
         path={`/org/${cpo.id}/settings`}
         element={
-          <ElecSettings companyId={cpo.id} />
+          <ElecChargingPointsSettings companyId={cpo.id} />
         }
       />
     </TestRoot>
@@ -46,7 +47,7 @@ test("check the applications list", async () => {
   render(<SettingsWithHooks />)
   await waitWhileLoading()
   screen.getByText("Statut")
-  screen.getByText("Date")
+  screen.getByText("Date d'ajout")
   screen.getByText("30 000")
 
   screen.getByText("En attente")
@@ -84,10 +85,8 @@ test("upload dialog opened", async () => {
 
 })
 
-test("upload file", async () => {
+const uploadChargingPointsFile = async () => {
   const user = userEvent.setup()
-  render(<SettingsWithHooks />)
-  await waitWhileLoading()
 
   //Open Upload modal
   const subscribeButton = await screen.findByText("Inscrire des points de recharge")
@@ -99,20 +98,25 @@ test("upload file", async () => {
   const fileInput = screen.getByLabelText(/Choisir un fichier/i);
   const file = new File(['(contents)'], 'example.xlsx', { type: 'text/plain' });
   fireEvent.change(fileInput, { target: { files: [file] } });
-
   expect(uploadButton).not.toBeDisabled();
 
-  //Valid upload with success
   await user.click(uploadButton)
+
+  return waitWhileLoading()
+}
+
+test("upload file", async () => {
+  const user = userEvent.setup()
+  render(<SettingsWithHooks />)
   await waitWhileLoading()
 
-  screen.getByText("Inscription des points de recharge")
+  await uploadChargingPointsFile()
+  screen.getByText("Valide")
 
   //send inscription
   const sendButton = await screen.findByText("Envoyer la demande d'inscription")
   await user.click(sendButton)
   screen.getByText("Les 90 points de recharge ont été ajoutés !")
-
 })
 
 test("upload file with error", async () => {
@@ -120,19 +124,8 @@ test("upload file with error", async () => {
   render(<SettingsWithHooks />)
   await waitWhileLoading()
 
-  //Open Upload modal
-  const subscribeButton = await screen.findByText("Inscrire des points de recharge")
-  await user.click(subscribeButton)
-  const uploadButton = await screen.findByText("Vérifier le fichier");
-
-  //Upload file
-  const fileInput = screen.getByLabelText(/Choisir un fichier/i);
-  const file = new File(['(contents)'], 'example.xlsx', { type: 'text/plain' });
-  fireEvent.change(fileInput, { target: { files: [file] } });
-
   //tester l'ouverture de la modal d'erreur
   server.use(okChargingPointsCheckError)
-  await user.click(uploadButton)
-  screen.getByText("Correction du dossier double comptage")
-
+  await uploadChargingPointsFile()
+  screen.getByText("À corriger")
 })

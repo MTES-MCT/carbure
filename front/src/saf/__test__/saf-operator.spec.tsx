@@ -1,6 +1,5 @@
 import { Entity } from "carbure/types"
 import { Route } from "react-router-dom"
-import { setEntity } from "settings/__test__/api"
 import { TestRoot } from "setupTests"
 
 import { render, screen } from "@testing-library/react"
@@ -9,6 +8,7 @@ import { operator } from "carbure/__test__/data"
 import {
   findByTextInNode,
   getField,
+  setEntity,
   waitWhileLoading,
 } from "carbure/__test__/helpers"
 import { Saf } from "../operator"

@@ -50,7 +50,7 @@ const DoubleCountingFilesChecker = () => {
       header: t("Statut"),
       cell: (file) =>
         file.error_count ? (
-          <Tag variant="warning">{t("A corriger")}</Tag>
+          <Tag variant="warning">{t("À corriger")}</Tag>
         ) : (
           <Tag variant="success">{t("Valide")}</Tag>
         ),

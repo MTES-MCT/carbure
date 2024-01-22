@@ -10,9 +10,8 @@ import { LotDetails as LotDetailsData } from "transaction-details/types"
 
 import server from "./api"
 
-import { Data, getField, waitWhileLoading } from "carbure/__test__/helpers"
+import { Data, getField, setEntity, waitWhileLoading } from "carbure/__test__/helpers"
 import { clickOnCheckboxesAndConfirm } from "../../transactions/__test__/helpers"
-import { setEntity } from "settings/__test__/api"
 import {
   lotDetails,
   errorDetails,

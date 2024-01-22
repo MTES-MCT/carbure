@@ -141,6 +141,15 @@ example :
 `python web/manage.py shell`
 -et copier le code du script
 
+`./scripts/database/reload_iscc_certifs.sh`
+contenant un script pouvant etre lancé (ex <https://gitlab.com/la-fabrique-numerique/biocarburants/-/blob/master/web/carbure/scripts/update_iscc_certificates.py?ref_type=heads#L272>) :
+`python3 web/carbure/scripts/update_iscc_certificates.py`
+
+## Executer un script gourmand en ressource en prod
+
+En lançant un one-off container (<https://doc.scalingo.com/platform/app/tasks>)
+`scalingo --app carbure-prod run --size XXL python web/carbure/scripts/update_iscc_certificates.py`
+
 ## Étapes spécifiques pour windows
 
 - setup wsl2: <https://docs.microsoft.com/en-us/windows/wsl/install-win10>

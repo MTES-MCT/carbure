@@ -100,6 +100,7 @@ const Navigation = ({ entity }: NavigationProps) => {
     isAuditor,
     isIndustry,
     isOperator,
+    isPowerPlant,
     has_saf,
     isAirline,
     isProducer,
@@ -126,7 +127,7 @@ const Navigation = ({ entity }: NavigationProps) => {
                 label: t("Contrôles"),
               },
 
-              isIndustry && {
+              (isIndustry || isPowerPlant) && {
                 key: "transactions",
                 path: "transactions",
                 label: t("Transactions"),
@@ -176,7 +177,7 @@ const Navigation = ({ entity }: NavigationProps) => {
                 label: t("Société"),
               },
 
-              isIndustry && {
+              (isIndustry || isPowerPlant) && {
                 key: "registry",
                 path: "registry",
                 label: t("Annuaire"),

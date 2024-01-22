@@ -12,4 +12,5 @@ export interface EntityDetails {
   double_counting_requests: number
   charging_points_accepted: number
   charging_points_pending: number
+  meter_readings_pending: number
 }

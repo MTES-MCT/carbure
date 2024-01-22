@@ -3,8 +3,8 @@ from django.views.decorators.http import require_GET
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
 from core.models import Entity, ExternalAdminRights
-from elec.serializers.elec_charge_point_application import ElecChargePointApplicationSerializer
-from elec.services.get_annotated_applications import get_annotated_applications
+from elec.repositories.meter_reading_repository import MeterReadingRepository
+from elec.serializers.elec_meter_reading_application_serializer import ElecMeterReadingApplicationSerializer
 
 
 class ApplicationsForm(forms.Form):
@@ -25,6 +25,6 @@ def get_applications(request):
 
     company = form.cleaned_data["company_id"]
 
-    applications = get_annotated_applications(company)
-    serialized = ElecChargePointApplicationSerializer(applications, many=True).data
+    applications = MeterReadingRepository.get_annotated_applications(company)
+    serialized = ElecMeterReadingApplicationSerializer(applications, many=True).data
     return SuccessResponse(serialized)

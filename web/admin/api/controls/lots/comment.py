@@ -1,25 +1,32 @@
-from core.decorators import is_admin
+from django import forms
+from core.carburetypes import CarbureError
+from core.common import ErrorResponse, SuccessResponse
+from core.decorators import check_admin_rights
 from core.models import (
     CarbureLot,
     CarbureLotComment,
-    Entity,
 )
-from django.http.response import JsonResponse
+
+from core.utils import MultipleValueField
 
 
-@is_admin
-def add_comment(request, *args, **kwargs):
-    entity_id = request.POST.get("entity_id")
-    selection = request.POST.getlist("selection", [])
-    comment = request.POST.get("comment", False)
-    is_visible_by_auditor = request.POST.get("is_visible_by_auditor") == "true"
+class AdminControlsLotsCommentForm(forms.Form):
+    comment = forms.CharField()
+    selection = MultipleValueField(coerce=int, required=False)
+    is_visible_by_auditor = forms.BooleanField(required=False)
 
-    if not comment:
-        return JsonResponse(
-            {"status": "error", "message": "Missing comment"}, status=400
-        )
 
-    entity = Entity.objects.get(id=entity_id)
+@check_admin_rights()
+def add_comment(request, entity):
+    form = AdminControlsLotsCommentForm(request.POST)
+
+    if not form.is_valid():
+        return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, form.errors)
+
+    is_visible_by_auditor = form.cleaned_data["is_visible_by_auditor"]
+    comment = form.cleaned_data["comment"]
+    selection = form.cleaned_data["selection"]
+
     lots = CarbureLot.objects.filter(id__in=selection)
     for lot in lots.iterator():
         lot_comment = CarbureLotComment()
@@ -32,4 +39,4 @@ def add_comment(request, *args, **kwargs):
         lot_comment.comment = comment
         lot_comment.save()
 
-    return JsonResponse({"status": "success"})
+    return SuccessResponse()

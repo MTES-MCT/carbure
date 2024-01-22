@@ -1,6 +1,13 @@
 from django.contrib import admin
 
-from elec.models import ElecProvisionCertificate, ElecTransferCertificate, ElecChargePoint, ElecChargePointApplication
+from elec.models import (
+    ElecProvisionCertificate,
+    ElecTransferCertificate,
+    ElecChargePoint,
+    ElecChargePointApplication,
+    ElecMeterReading,
+    ElecMeterReadingApplication,
+)
 
 
 @admin.register(ElecProvisionCertificate)
@@ -73,7 +80,6 @@ class ElecChargePointAdmin(admin.ModelAdmin):
         "cpo_siren",
     ]
     list_filter = [
-        "application",
         "current_type",
         "cpo",
         "is_article_2",
@@ -83,4 +89,34 @@ class ElecChargePointAdmin(admin.ModelAdmin):
         "station_id",
         "cpo_name",
         "cpo_siren",
+    ]
+
+
+@admin.register(ElecMeterReadingApplication)
+class ElecMeterReadingApplicationAdmin(admin.ModelAdmin):
+    list_display = [
+        "status",
+        "created_at",
+        "cpo",
+        "quarter",
+        "year",
+    ]
+    list_filter = [
+        "status",
+        "cpo",
+        "quarter",
+        "year",
+    ]
+
+
+@admin.register(ElecMeterReading)
+class ElecMeterReadingAdmin(admin.ModelAdmin):
+    list_display = [
+        "id",
+        "cpo",
+        "charge_point_id",
+        "extracted_energy",
+    ]
+    list_filter = [
+        "cpo",
     ]
