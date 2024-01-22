@@ -24,6 +24,7 @@ import Stats from "stats"
 import ElecCPO from "elec/cpo"
 import ElecAdmin from "elec-admin"
 import { ElecOperator } from "elec/operator"
+import ElecAdminAudit from "elec-admin-audit"
 
 const Carbure = () => {
   const user = useUserManager()
@@ -152,6 +153,12 @@ const Org = () => {
         <>
           <Route path="elec-admin/:year/*" element={<ElecAdmin />} />
           <Route path="elec-admin" element={<Navigate replace to={`${currentYear}/provisioned`} />} />
+        </>
+      }
+      {(isAdmin || isElecAdmin) &&
+        <>
+          <Route path="elec-admin-audit/:year/*" element={<ElecAdminAudit />} />
+          <Route path="elec-admin-audit" element={<Navigate replace to={`${currentYear}/`} />} />
         </>
       }
       {hasAirline && <Route path="*" element={<Navigate replace to="entities" />} />}
