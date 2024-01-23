@@ -61,6 +61,7 @@ export enum ElecChargePointsApplicationStatus {
   Pending = "PENDING",
   Accepted = "ACCEPTED",
   Rejected = "REJECTED",
+  AuditInProgress = "AUDIT_IN_PROGRESS",
 }
 
 export interface ElecChargePointsApplication {

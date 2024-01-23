@@ -78,6 +78,8 @@ export async function getTransferCertificateFilters(field: ElecAdminTransferCert
     .then((res) => res.data.data?.filter_values ?? [])
 }
 
+
+//Charge points applications
 export function downloadChargePointsApplicationDetails(entityId: number, companyId: number, applicationId: number) {
   return download("/elec/admin/charge-points/application-details", {
     entity_id: entityId, company_id: companyId, application_id: applicationId, export: true
@@ -95,8 +97,8 @@ export function getChargePointsApplications(entityId: number, companyId: number)
 }
 
 
-export function acceptMeterReadingsApplication(entityId: number, companyId: number, applicationId: number) {
-  return api.post("/elec/admin/meter-readings/accept-application", {
+export function acceptChargePointsApplication(entityId: number, companyId: number, applicationId: number) {
+  return api.post("/elec/admin/charge-points/accept-application", {
     entity_id: entityId,
     company_id: companyId,
     application_id: applicationId,
@@ -104,17 +106,18 @@ export function acceptMeterReadingsApplication(entityId: number, companyId: numb
 }
 
 
-export function rejectMeterReadingsApplication(entityId: number, companyId: number, applicationId: number) {
-  return api.post("/elec/admin/meter-readings/reject-application", {
+export function rejectChargePointsApplication(entityId: number, companyId: number, applicationId: number) {
+  return api.post("/elec/admin/charge-points/reject-application", {
     entity_id: entityId,
     company_id: companyId,
     application_id: applicationId,
   })
 }
-
-
 
 //METER READINGS
+
+
+
 export function getMeterReadingsApplications(entityId: number, companyId: number) {
   return api.get<Api<ElecMeterReadingsApplication[]>>("/elec/admin/meter-readings/applications", {
     params: { entity_id: entityId, company_id: companyId },
@@ -127,8 +130,9 @@ export function downloadMeterReadingsApplicationDetails(entityId: number, compan
   })
 }
 
-export function acceptChargePointsApplication(entityId: number, companyId: number, applicationId: number) {
-  return api.post("/elec/admin/charge-points/accept-application", {
+
+export function acceptMeterReadingsApplication(entityId: number, companyId: number, applicationId: number) {
+  return api.post("/elec/admin/meter-readings/accept-application", {
     entity_id: entityId,
     company_id: companyId,
     application_id: applicationId,
@@ -136,8 +140,8 @@ export function acceptChargePointsApplication(entityId: number, companyId: numbe
 }
 
 
-export function rejectChargePointsApplication(entityId: number, companyId: number, applicationId: number) {
-  return api.post("/elec/admin/charge-points/reject-application", {
+export function rejectMeterReadingsApplication(entityId: number, companyId: number, applicationId: number) {
+  return api.post("/elec/admin/meter-readings/reject-application", {
     entity_id: entityId,
     company_id: companyId,
     application_id: applicationId,

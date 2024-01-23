@@ -1,48 +1,82 @@
 import useEntity from "carbure/hooks/entity"
-import Button from "common/components/button"
-import Dialog from "common/components/dialog"
-import { useHashMatch } from "common/components/hash-route"
-import { Message, Return } from "common/components/icons"
-import { TextInput } from "common/components/input"
-import Portal from "common/components/portal"
-import { useQuery } from "common/hooks/async"
+import { Button } from "common/components/button"
+import { Dialog } from "common/components/dialog"
+import { Check, Cross, Download, Return } from "common/components/icons"
+import { useNotify, useNotifyError } from "common/components/notifications"
+import { useMutation, useQuery } from "common/hooks/async"
 import { formatDate } from "common/utils/formatters"
-import TransferCertificateTag from "elec/components/transfer-certificates/tag"
-import { useTranslation } from "react-i18next"
-import { useLocation, useNavigate } from "react-router-dom"
-import * as api from "../../api"
-import { ElecTransferCertificateStatus } from "elec/types-cpo"
-import Alert from "common/components/alert"
+import * as api from "elec-admin/api"
+import { Trans, useTranslation } from "react-i18next"
+import ChargePointsApplicationAcceptDialog from "./accept-dialog"
+import { usePortal } from "common/components/portal"
+import ChargePointsApplicationRejectDialog from "./reject-dialog"
+import ApplicationStatus from "elec/components/charge-points/application-status"
+import { ElecChargePointsApplication, ElecChargePointsApplicationStatus } from "elec/types"
+export type ApplicationDialogProps = {
+  application: ElecChargePointsApplication
+  onClose: () => void
+  companyId: number
+}
 
-
-export const ElecAdminTransferDetailsDialog = () => {
+export const ChargingPointsApplicationDetailsDialog = ({
+  application,
+  onClose,
+  companyId,
+}: ApplicationDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const navigate = useNavigate()
-  const location = useLocation()
-  const match = useHashMatch("charge-points/:id")
+  const notify = useNotify()
+  const notifyError = useNotifyError()
+  const portal = usePortal()
 
-  const chargePointResponse = useQuery(api.getChargePointDetails, {
-    key: "admin-charge-points-details",
-    params: [entity.id, parseInt(match?.params.id!)],
-  })
-  const chargePoint = chargePointResponse.result?.data.data
+  // const match = useHashMatch("transfer-certificate/:id")
 
-  const closeDialog = () => {
-    navigate({ search: location.search, hash: "#" })
+  // const transferCertificateResponse = useQuery(api.getTransferCertificateDetails, {
+  //   key: "transfer-certificate-details",
+  //   params: [entity.id, parseInt(match?.params.id!)],
+  // })
+  // const transferCertificate = transferCertificateResponse.result?.data.data?.elec_transfer_certificate
+
+  const rejectApplication = () => {
+    portal((close) => (
+      <ChargePointsApplicationRejectDialog
+        application={application}
+        companyId={companyId}
+        onClose={close}
+      />
+    ))
+  }
+
+  const acceptApplication = () => {
+    portal((close) => (
+      <ChargePointsApplicationAcceptDialog
+        application={application}
+        companyId={companyId}
+        onClose={close}
+      />
+    ))
   }
 
   return (
-    <Portal onClose={closeDialog}>
-      <Dialog onClose={closeDialog} >
-        <header>
-          {/* <TransferCertificateTag status={chargePoint?.status} big /> */}
-          <h1>
-            {t("Inscriptions de points de recharge - {{cpo}}", { id: chargePoint?.cpo })}
-          </h1>
-        </header>
+    <Dialog onClose={onClose}>
+      <header>
+        <ApplicationStatus status={application.status} big />
 
-        <main>
+        <h1>{t("Inscription de points de recharge")}</h1>
+      </header>
+
+      <main>
+
+        <section>
+          <p style={{ textAlign: 'left' }}>
+            <Trans
+              values={{
+                applicationDate: formatDate(application.application_date),
+              }}
+              count={application.charge_point_count}
+              defaults="La demande d'inscription a été faite le <b>{{applicationDate}}</b> pour <b>{{count}} points de recharge</b>." />
+          </p>
+
           <section>
             {/* <TextInput
               readOnly
@@ -78,14 +112,32 @@ export const ElecAdminTransferDetailsDialog = () => {
               </Alert>
             } */}
           </section>
-        </main>
 
-        <footer>
-          <Button icon={Return} label={t("Retour")} action={closeDialog} />
-        </footer>
-      </Dialog>
-    </Portal>
+
+          {!entity.isAdmin && application.status === ElecChargePointsApplicationStatus.Pending && (
+            <p><i>
+              {t("En attente de validation de la DGEC.")}
+            </i></p>
+          )}
+        </section>
+      </main>
+
+      <footer>
+
+        {entity.isAdmin && application.status === ElecChargePointsApplicationStatus.Pending && (
+          <>
+            <Button icon={Check} label={t("Valider l'inscription")} variant="success" action={acceptApplication} />
+            <Button icon={Cross} label={t("Refuser")} variant="danger" action={rejectApplication} />
+          </>
+        )}
+        <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
+      </footer>
+
+    </Dialog>
   )
 }
 
-export default ElecAdminTransferDetailsDialog
+
+
+
+export default ChargingPointsApplicationDetailsDialog
