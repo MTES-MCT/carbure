@@ -81,11 +81,20 @@ const elecChargingPointApplication3: ElecChargePointsApplication = {
     application_date: "2023-09-01",
     status: ElecChargePointsApplicationStatus.Rejected,
 }
-
+const elecChargingPointApplication4: ElecChargePointsApplication = {
+    id: 3,
+    cpo: cpo,
+    station_count: 1,
+    charge_point_count: 5,
+    power_total: 1000,
+    application_date: "2023-09-01",
+    status: ElecChargePointsApplicationStatus.AuditInProgress,
+}
 export const elecChargePointsApplications: ElecChargePointsApplication[] = [
     elecChargingPointApplication1,
     elecChargingPointApplication2,
-    elecChargingPointApplication3
+    elecChargingPointApplication3,
+    elecChargingPointApplication4
 ]
 
 

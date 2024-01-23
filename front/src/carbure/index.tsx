@@ -158,7 +158,7 @@ const Org = () => {
       {(isAdmin || isElecAdmin) &&
         <>
           <Route path="elec-admin-audit/:year/*" element={<ElecAdminAudit />} />
-          <Route path="elec-admin-audit" element={<Navigate replace to={`${currentYear}/`} />} />
+          <Route path="elec-admin-audit" element={<Navigate replace to={`${currentYear}/charge-points`} />} />
         </>
       }
       {hasAirline && <Route path="*" element={<Navigate replace to="entities" />} />}

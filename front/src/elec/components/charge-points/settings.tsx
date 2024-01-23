@@ -16,9 +16,9 @@ import * as apiCpo from "elec/api-cpo"
 // import { elecChargePointsApplications } from "elec/__test__/data"
 import Metric from "common/components/metric"
 import { compact } from "common/utils/collection"
-import ChargePointsApplicationAcceptDialog from "elec-admin/components/charge-points/accept-dialog"
-import ChargePointsApplicationRejectDialog from "elec-admin/components/charge-points/reject-dialog"
+
 import { useMatch } from "react-router-dom"
+import ChargePointsApplicationsTable from "./table"
 
 const ElecChargePointsSettings = ({ companyId }: { companyId: number }) => {
   const { t } = useTranslation()
@@ -113,80 +113,10 @@ const ElecChargePointsSettings = ({ companyId }: { companyId: number }) => {
               <Metric value={applicationsSnapshot.charge_point_count} label={t("Points de recharge")} />
             </Grid>
           </section>
-          <Table
-            rows={applications}
-            columns={[
-              {
-                header: t("Statut"),
-                cell: (application) => <ApplicationStatus status={application.status} />,
-              },
-              {
-                header: t("Date d'ajout"),
-                cell: (application) => (
-                  <Cell
-                    text={`${formatDate(application.application_date)}`}
-                  />
-                ),
-              },
-
-              {
-                header: t("Stations"),
-                cell: (application) => (
-                  <Cell
-                    text={`${formatNumber(application.station_count)}`}
-                  />
-                ),
-              },
-              {
-                header: t("Points de recharge"),
-                cell: (application) => (
-                  <Cell
-                    text={`${formatNumber(application.charge_point_count)}`}
-                  />
-                ),
-              },
-              {
-                header: t("Puissance cumulée"),
-                cell: (application) => (
-                  <Cell
-                    text={`${formatNumber(Math.round(application.power_total))}` + " kW"}
-                  />
-                ),
-              },
-              actionColumn<ElecChargePointsApplication>((application) =>
-                compact([
-
-                  <Button
-                    captive
-                    variant="icon"
-                    icon={Download}
-                    title={t("Exporter les points de recharge")}
-                    action={() => downloadChargePointsApplication(application)}
-                  />,
-                  entity.isAdmin && application.status === ElecChargePointsApplicationStatus.Pending && <Button
-                    captive
-                    variant="icon"
-                    icon={Check}
-                    title={t("Valider la demande d'inscription")}
-                    action={() => portal((close) => (
-                      <ChargePointsApplicationAcceptDialog application={application} companyId={companyId} onClose={close} />
-                    ))}
-                  />,
-                  entity.isAdmin && application.status === ElecChargePointsApplicationStatus.Pending && <Button
-                    captive
-                    variant="icon"
-                    icon={Cross}
-                    title={t("Refuser la demande d'inscription")}
-                    action={() => portal((close) => (
-                      <ChargePointsApplicationRejectDialog application={application} companyId={companyId} onClose={close} />
-                    ))}
-                  />
-
-                ])
-              ),
-
-            ]}
-          />
+          <ChargePointsApplicationsTable
+            // rowLink={(application) => { }}
+            applications={applications}
+            onDownloadChargePointsApplication={downloadChargePointsApplication} />
         </>
 
 
