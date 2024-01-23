@@ -4,14 +4,14 @@ import { Dialog } from "common/components/dialog"
 import { AlertCircle, Plus, Return } from "common/components/icons"
 import Tag from "common/components/tag"
 import {
-  ChargingPointsApplicationError,
-  ElecChargingPointsApplicationCheckInfo,
+  ChargePointsApplicationError,
+  ElecChargePointsApplicationCheckInfo,
 } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import { t } from "i18next"
 
 export type ErrorsDetailsDialogProps = {
-  fileData: ElecChargingPointsApplicationCheckInfo
+  fileData: ElecChargePointsApplicationCheckInfo
   onClose: () => void
 }
 
@@ -60,7 +60,7 @@ export const ErrorsDetailsDialog = ({
 }
 
 type ErrorsTableProps = {
-  errors: ChargingPointsApplicationError[]
+  errors: ChargePointsApplicationError[]
 }
 
 export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
@@ -92,7 +92,7 @@ export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
   )
 }
 
-export function getErrorText(error: ChargingPointsApplicationError) {
+export function getErrorText(error: ChargePointsApplicationError) {
   switch (error.error) {
     case "EXCEL_PARSING_FAILED":
       return t("Le fichier importé n'a pas pu être analysé. Merci de verifier que le format du modèle de fichier a bien été respecté.")
@@ -102,8 +102,8 @@ export function getErrorText(error: ChargingPointsApplicationError) {
 
     case "MISSING_CHARGING_POINT_IN_DATAGOUV":
       return t(
-        `L'identifiant "{{chargingPointId}}" du point de recharge n'existe pas sur transport.data.gouv.fr`,
-        { chargingPointId: error.meta }
+        `L'identifiant "{{chargePointId}}" du point de recharge n'existe pas sur transport.data.gouv.fr`,
+        { chargePointId: error.meta }
       )
 
     case "MISSING_CHARGING_POINT_DATA":

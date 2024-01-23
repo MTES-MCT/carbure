@@ -10,7 +10,7 @@ export interface EntityDetails {
   certificates_pending: number
   double_counting: number
   double_counting_requests: number
-  charging_points_accepted: number
-  charging_points_pending: number
+  charge_points_accepted: number
+  charge_points_pending: number
   meter_readings_pending: number
 }

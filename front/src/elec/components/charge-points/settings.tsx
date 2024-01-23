@@ -8,19 +8,19 @@ import Table, { Cell, actionColumn } from "common/components/table"
 import { useQuery } from "common/hooks/async"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import * as apiAdmin from "elec-admin/api"
-import ApplicationStatus from "elec/components/charging-points/application-status"
-import ElecChargingPointsFileUpload from "elec/components/charging-points/upload-dialog"
-import { ElecChargingPointsApplication, ElecChargingPointsApplicationStatus, ElecChargingPointsSnapshot } from "elec/types"
+import ApplicationStatus from "elec/components/charge-points/application-status"
+import ElecChargePointsFileUpload from "elec/components/charge-points/upload-dialog"
+import { ElecChargePointsApplication, ElecChargePointsApplicationStatus, ElecChargePointsSnapshot } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import * as apiCpo from "elec/api-cpo"
-// import { elecChargingPointsApplications } from "elec/__test__/data"
+// import { elecChargePointsApplications } from "elec/__test__/data"
 import Metric from "common/components/metric"
 import { compact } from "common/utils/collection"
-import ChargingPointsApplicationAcceptDialog from "elec-admin/components/charging-points/accept-dialog"
-import ChargingPointsApplicationRejectDialog from "elec-admin/components/charging-points/reject-dialog"
+import ChargePointsApplicationAcceptDialog from "elec-admin/components/charge-points/accept-dialog"
+import ChargePointsApplicationRejectDialog from "elec-admin/components/charge-points/reject-dialog"
 import { useMatch } from "react-router-dom"
 
-const ElecChargingPointsSettings = ({ companyId }: { companyId: number }) => {
+const ElecChargePointsSettings = ({ companyId }: { companyId: number }) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { isCPO } = entity
@@ -30,41 +30,41 @@ const ElecChargingPointsSettings = ({ companyId }: { companyId: number }) => {
   const api = matchStatus?.params.view === "entities" ? apiAdmin : apiCpo
   const portal = usePortal()
 
-  const applicationsResponse = useQuery(api.getChargingPointsApplications, {
-    key: "charging-points-applications",
+  const applicationsResponse = useQuery(api.getChargePointsApplications, {
+    key: "charge-points-applications",
     params: [entity.id, companyId],
   })
 
   const applications = applicationsResponse.result?.data.data ?? []
-  // const applications = elecChargingPointsApplications // TEST with applications
+  // const applications = elecChargePointsApplications // TEST with applications
 
-  const acceptedApplications = applications.filter(app => app.status === ElecChargingPointsApplicationStatus.Accepted)
+  const acceptedApplications = applications.filter(app => app.status === ElecChargePointsApplicationStatus.Accepted)
 
-  const applicationsSnapshot: ElecChargingPointsSnapshot = {
+  const applicationsSnapshot: ElecChargePointsSnapshot = {
     station_count: acceptedApplications.reduce((acc, app) => acc + app.station_count, 0),
-    charging_point_count: acceptedApplications.reduce((acc, app) => acc + app.charging_point_count, 0),
+    charge_point_count: acceptedApplications.reduce((acc, app) => acc + app.charge_point_count, 0),
     power_total: acceptedApplications.reduce((acc, app) => acc + app.power_total, 0),
   }
   const isEmpty = applications.length === 0
 
 
   function showUploadDialog() {
-    const pendingApplicationAlreadyExists = applications.filter(app => app.status === ElecChargingPointsApplicationStatus.Pending).length > 0
+    const pendingApplicationAlreadyExists = applications.filter(app => app.status === ElecChargePointsApplicationStatus.Pending).length > 0
     portal((resolve) => (
-      <ElecChargingPointsFileUpload onClose={resolve} pendingApplicationAlreadyExists={pendingApplicationAlreadyExists} />
+      <ElecChargePointsFileUpload onClose={resolve} pendingApplicationAlreadyExists={pendingApplicationAlreadyExists} />
     ))
   }
 
-  function downloadChargingPoints() {
-    api.downloadChargingPoints(entity.id, companyId)
+  function downloadChargePoints() {
+    api.downloadChargePoints(entity.id, companyId)
   }
 
-  const downloadChargingPointsApplication = (application: ElecChargingPointsApplication) => {
-    return api.downloadChargingPointsApplicationDetails(entity.id, companyId, application.id)
+  const downloadChargePointsApplication = (application: ElecChargePointsApplication) => {
+    return api.downloadChargePointsApplicationDetails(entity.id, companyId, application.id)
   }
 
   return (
-    <Panel id="elec-charging-points">
+    <Panel id="elec-charge-points">
       <header>
         <h1>
           {t("Inscriptions de points de recharge")}
@@ -79,12 +79,12 @@ const ElecChargingPointsSettings = ({ companyId }: { companyId: number }) => {
             label={t("Inscrire des points de recharge")}
           />
         )}
-        {applicationsSnapshot.charging_point_count > 0 &&
+        {applicationsSnapshot.charge_point_count > 0 &&
           <Button
             asideX={!isCPO}
             variant="secondary"
             icon={Download}
-            action={downloadChargingPoints}
+            action={downloadChargePoints}
             label={t("Exporter les points de recharge")}
           />
         }
@@ -110,7 +110,7 @@ const ElecChargingPointsSettings = ({ companyId }: { companyId: number }) => {
             <Grid style={{ gridGap: 24 }}>
               <Metric value={formatNumber(Math.round(applicationsSnapshot.power_total))} label={t("Kw cumulés")} />
               <Metric value={applicationsSnapshot.station_count} label={t("Stations")} />
-              <Metric value={applicationsSnapshot.charging_point_count} label={t("Points de recharge")} />
+              <Metric value={applicationsSnapshot.charge_point_count} label={t("Points de recharge")} />
             </Grid>
           </section>
           <Table
@@ -141,7 +141,7 @@ const ElecChargingPointsSettings = ({ companyId }: { companyId: number }) => {
                 header: t("Points de recharge"),
                 cell: (application) => (
                   <Cell
-                    text={`${formatNumber(application.charging_point_count)}`}
+                    text={`${formatNumber(application.charge_point_count)}`}
                   />
                 ),
               },
@@ -153,7 +153,7 @@ const ElecChargingPointsSettings = ({ companyId }: { companyId: number }) => {
                   />
                 ),
               },
-              actionColumn<ElecChargingPointsApplication>((application) =>
+              actionColumn<ElecChargePointsApplication>((application) =>
                 compact([
 
                   <Button
@@ -161,24 +161,24 @@ const ElecChargingPointsSettings = ({ companyId }: { companyId: number }) => {
                     variant="icon"
                     icon={Download}
                     title={t("Exporter les points de recharge")}
-                    action={() => downloadChargingPointsApplication(application)}
+                    action={() => downloadChargePointsApplication(application)}
                   />,
-                  entity.isAdmin && application.status === ElecChargingPointsApplicationStatus.Pending && <Button
+                  entity.isAdmin && application.status === ElecChargePointsApplicationStatus.Pending && <Button
                     captive
                     variant="icon"
                     icon={Check}
                     title={t("Valider la demande d'inscription")}
                     action={() => portal((close) => (
-                      <ChargingPointsApplicationAcceptDialog application={application} companyId={companyId} onClose={close} />
+                      <ChargePointsApplicationAcceptDialog application={application} companyId={companyId} onClose={close} />
                     ))}
                   />,
-                  entity.isAdmin && application.status === ElecChargingPointsApplicationStatus.Pending && <Button
+                  entity.isAdmin && application.status === ElecChargePointsApplicationStatus.Pending && <Button
                     captive
                     variant="icon"
                     icon={Cross}
                     title={t("Refuser la demande d'inscription")}
                     action={() => portal((close) => (
-                      <ChargingPointsApplicationRejectDialog application={application} companyId={companyId} onClose={close} />
+                      <ChargePointsApplicationRejectDialog application={application} companyId={companyId} onClose={close} />
                     ))}
                   />
 
@@ -197,6 +197,6 @@ const ElecChargingPointsSettings = ({ companyId }: { companyId: number }) => {
   )
 }
 
-export default ElecChargingPointsSettings
+export default ElecChargePointsSettings
 
 

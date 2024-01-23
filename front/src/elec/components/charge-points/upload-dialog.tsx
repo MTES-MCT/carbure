@@ -9,41 +9,41 @@ import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 
-import { ElecChargingPointsApplicationCheckInfo } from "elec/types"
+import { ElecChargePointsApplicationCheckInfo } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
-import { checkChargingPointsApplication } from "elec/api-cpo"
+import { checkChargePointsApplication } from "elec/api-cpo"
 import ErrorsDetailsDialog from "./errors-dialog"
 import ValidDetailsDialog from "./valid-dialog"
 import Alert from "common/components/alert"
 import { ReplaceAlert } from "./replace-alert"
 
-type ElecChargingPointsFileUploadProps = {
+type ElecChargePointsFileUploadProps = {
   onClose: () => void
   pendingApplicationAlreadyExists: boolean
 }
 
-const ElecChargingPointsFileUpload = ({
+const ElecChargePointsFileUpload = ({
   onClose,
   pendingApplicationAlreadyExists,
-}: ElecChargingPointsFileUploadProps) => {
+}: ElecChargePointsFileUploadProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
   const entity = useEntity()
   const portal = usePortal()
 
   const { value, bind } = useForm({
-    chargingPointsFile: undefined as File | undefined,
+    chargePointsFile: undefined as File | undefined,
   })
 
-  const checkChargingPointsFile = useMutation(checkChargingPointsApplication, {
+  const checkChargePointsFile = useMutation(checkChargePointsApplication, {
     onSuccess: (res) => {
       const checkedData = res.data.data
-      portal((close) => <ValidDetailsDialog fileData={checkedData!} onClose={close} file={value.chargingPointsFile!} />)
+      portal((close) => <ValidDetailsDialog fileData={checkedData!} onClose={close} file={value.chargePointsFile!} />)
       onClose()
     },
     onError: (err) => {
 
-      const response = (err as AxiosError<{ status: string, error: string, data: ElecChargingPointsApplicationCheckInfo }>).response
+      const response = (err as AxiosError<{ status: string, error: string, data: ElecChargePointsApplicationCheckInfo }>).response
       if (response?.status === 400) {
         const checkedData = response.data.data
         portal((close) => <ErrorsDetailsDialog fileData={checkedData} onClose={close} />)
@@ -72,10 +72,10 @@ const ElecChargingPointsFileUpload = ({
   })
 
   async function submitFile() {
-    if (!value.chargingPointsFile) return
-    checkChargingPointsFile.execute(
+    if (!value.chargePointsFile) return
+    checkChargePointsFile.execute(
       entity.id,
-      value.chargingPointsFile as File
+      value.chargePointsFile as File
     )
   }
   const filePath = '/templates/points-de-recharge-inscription.xlsx';
@@ -103,11 +103,11 @@ const ElecChargingPointsFileUpload = ({
               </Trans>
             </p>
             <FileInput
-              loading={checkChargingPointsFile.loading}
-              icon={value.chargingPointsFile ? Check : Upload}
+              loading={checkChargePointsFile.loading}
+              icon={value.chargePointsFile ? Check : Upload}
               label={t("Importer le fichier excel à analyser")}
-              placeholder={value.chargingPointsFile ? value.chargingPointsFile.name : t("Choisir un fichier")}
-              {...bind("chargingPointsFile")}
+              placeholder={value.chargePointsFile ? value.chargePointsFile.name : t("Choisir un fichier")}
+              {...bind("chargePointsFile")}
             />
           </Form>
           {pendingApplicationAlreadyExists &&
@@ -121,8 +121,8 @@ const ElecChargingPointsFileUpload = ({
       <footer>
         <Button
           submit="dc-request"
-          loading={checkChargingPointsFile.loading}
-          disabled={!value.chargingPointsFile}
+          loading={checkChargePointsFile.loading}
+          disabled={!value.chargePointsFile}
           variant="primary"
           icon={Check}
           action={submitFile}
@@ -134,4 +134,4 @@ const ElecChargingPointsFileUpload = ({
   )
 }
 
-export default ElecChargingPointsFileUpload
+export default ElecChargePointsFileUpload
