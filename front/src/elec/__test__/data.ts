@@ -52,7 +52,7 @@ export const elecAdminProvisionCertificateList: ElecProvisionCertificatesData = 
 //CHARGING POINTS
 
 
-const elecChargingPointApplication1: ElecChargePointsApplication = {
+export const elecChargePointApplication1: ElecChargePointsApplication = {
     id: 1,
     cpo: cpo,
     station_count: 4,
@@ -62,7 +62,7 @@ const elecChargingPointApplication1: ElecChargePointsApplication = {
     status: ElecChargePointsApplicationStatus.Pending,
 }
 
-const elecChargingPointApplication2: ElecChargePointsApplication = {
+const elecChargePointApplication2: ElecChargePointsApplication = {
     id: 2,
     cpo: cpo,
     station_count: 19,
@@ -72,7 +72,7 @@ const elecChargingPointApplication2: ElecChargePointsApplication = {
     validation_date: "2023-11-01",
     status: ElecChargePointsApplicationStatus.Accepted,
 }
-const elecChargingPointApplication3: ElecChargePointsApplication = {
+const elecChargePointApplication3: ElecChargePointsApplication = {
     id: 3,
     cpo: cpo,
     station_count: 1,
@@ -81,7 +81,7 @@ const elecChargingPointApplication3: ElecChargePointsApplication = {
     application_date: "2023-09-01",
     status: ElecChargePointsApplicationStatus.Rejected,
 }
-const elecChargingPointApplication4: ElecChargePointsApplication = {
+const elecChargePointApplication4: ElecChargePointsApplication = {
     id: 3,
     cpo: cpo,
     station_count: 1,
@@ -91,10 +91,10 @@ const elecChargingPointApplication4: ElecChargePointsApplication = {
     status: ElecChargePointsApplicationStatus.AuditInProgress,
 }
 export const elecChargePointsApplications: ElecChargePointsApplication[] = [
-    elecChargingPointApplication1,
-    elecChargingPointApplication2,
-    elecChargingPointApplication3,
-    elecChargingPointApplication4
+    elecChargePointApplication1,
+    elecChargePointApplication2,
+    elecChargePointApplication3,
+    elecChargePointApplication4
 ]
 
 

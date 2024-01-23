@@ -39,3 +39,12 @@ export async function getElecAdminAuditFilters(field: ElecAdminAuditFilter, quer
     .get<Api<{ filter_values: string[] }>>("/elec/admin/transfer-certificate-filters", { params })
     .then((res) => res.data.data?.filter_values ?? [])
 }
+
+
+export function getChargePointsApplicationDetails(entityId: number, applicationId: number) {
+  return api.get<Api<ElecChargePointsApplication>>("/elec/admin/charge-points/application_details", {
+    params: { entity_id: entityId, application_id: applicationId },
+  })
+
+}
+
