@@ -8,15 +8,15 @@ import Table, { Cell, actionColumn } from "common/components/table"
 import { useQuery } from "common/hooks/async"
 import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
 import * as apiAdmin from "elec-admin/api"
-import ElecChargingPointsFileUpload from "elec/components/charging-points/upload-dialog"
-import { ElecChargingPointsApplication, ElecChargingPointsApplicationStatus, ElecChargingPointsSnapshot, ElecMeterReadingsApplication, ElecMeterReadingsApplicationStatus } from "elec/types"
+import ElecChargePointsFileUpload from "elec/components/charge-points/upload-dialog"
+import { ElecChargePointsApplication, ElecChargePointsApplicationStatus, ElecChargePointsSnapshot, ElecMeterReadingsApplication, ElecMeterReadingsApplicationStatus } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import * as apiCpo from "elec/api-cpo"
 import { elecMeterReadingsApplications } from "elec/__test__/data"
 
 import { compact } from "common/utils/collection"
-import ChargingPointsApplicationAcceptDialog from "elec-admin/components/charging-points/accept-dialog"
-import ChargingPointsApplicationRejectDialog from "elec-admin/components/charging-points/reject-dialog"
+import ChargePointsApplicationAcceptDialog from "elec-admin/components/charge-points/accept-dialog"
+import ChargePointsApplicationRejectDialog from "elec-admin/components/charge-points/reject-dialog"
 import { useMatch } from "react-router-dom"
 import ApplicationStatus from "./application-status"
 import ElecMeterReadingsFileUpload from "./upload-dialog"
@@ -76,12 +76,12 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
             label={t("Transmettre mes relevés trimestriels {{quarter}}", { quarter: quarterString })}
           />
         )}
-        {/* {applicationsSnapshot.charging_point_count > 0 &&
+        {/* {applicationsSnapshot.charge_point_count > 0 &&
           <Button
             asideX={!isCPO}
             variant="secondary"
             icon={Download}
-            action={downloadChargingPoints}
+            action={downloadChargePoints}
             label={t("Exporter les points de recharge")}
           />
         } */}
@@ -126,7 +126,7 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
                 header: t("Points de recharge"),
                 cell: (application) => (
                   <Cell
-                    text={`${formatNumber(application.charging_point_count)}`}
+                    text={`${formatNumber(application.charge_point_count)}`}
                   />
                 ),
               },

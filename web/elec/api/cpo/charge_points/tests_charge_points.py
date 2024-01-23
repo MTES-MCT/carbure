@@ -66,16 +66,16 @@ class ElecCharginPointsTest(TestCase):
             "error": "VALIDATION_FAILED",
             "data": {
                 "file_name": "points-de-recharge-errors.xlsx",
-                "charging_point_count": 0,
+                "charge_point_count": 0,
                 "error_count": 6,
                 "pending_application_already_exists": False,
                 "errors": [
-                    {"line": 13, "error": "MISSING_CHARGING_POINT_IN_DATAGOUV", "meta": "ABCDE"},
-                    {"line": 14, "error": "MISSING_CHARGING_POINT_ID"},
-                    {"line": 15, "error": "MISSING_CHARGING_POINT_IN_DATAGOUV", "meta": "FGHIJ"},
-                    {"line": 16, "error": "MISSING_CHARGING_POINT_IN_DATAGOUV", "meta": "KLMOPQ"},
-                    {"line": 17, "error": "MISSING_CHARGING_POINT_ID"},
-                    {"line": 18, "error": "MISSING_CHARGING_POINT_DATA", "meta": "measure_reference_point_id"},
+                    {"line": 13, "error": "MISSING_CHARGE_POINT_IN_DATAGOUV", "meta": "ABCDE"},
+                    {"line": 14, "error": "MISSING_CHARGE_POINT_ID"},
+                    {"line": 15, "error": "MISSING_CHARGE_POINT_IN_DATAGOUV", "meta": "FGHIJ"},
+                    {"line": 16, "error": "MISSING_CHARGE_POINT_IN_DATAGOUV", "meta": "KLMOPQ"},
+                    {"line": 17, "error": "MISSING_CHARGE_POINT_ID"},
+                    {"line": 18, "error": "MISSING_CHARGE_POINT_DATA", "meta": "measure_reference_point_id"},
                 ],
             },
         }
@@ -98,7 +98,7 @@ class ElecCharginPointsTest(TestCase):
             "status": "success",
             "data": {
                 "file_name": "points-de-recharge-ok.xlsx",
-                "charging_point_count": 5,
+                "charge_point_count": 5,
                 "errors": [],
                 "error_count": 0,
                 "pending_application_already_exists": False,
@@ -280,7 +280,7 @@ class ElecCharginPointsTest(TestCase):
                     "status": "PENDING",
                     "application_date": data["data"][0]["application_date"],  # timezone annoying stuff
                     "station_count": 1,
-                    "charging_point_count": 1,
+                    "charge_point_count": 1,
                     "power_total": 150,
                 },
                 {
@@ -289,7 +289,7 @@ class ElecCharginPointsTest(TestCase):
                     "status": "PENDING",
                     "application_date": data["data"][1]["application_date"],
                     "station_count": 1,
-                    "charging_point_count": 1,
+                    "charge_point_count": 1,
                     "power_total": 40,
                 },
             ],

@@ -4,10 +4,10 @@ import { Route } from "react-router-dom"
 import { TestRoot, render } from "setupTests"
 
 import { cpo } from "carbure/__test__/data"
-import ElecChargingPointsSettings from "elec/components/charging-points/settings"
+import ElecChargePointsSettings from "elec/components/charge-points/settings"
 import server from "../../settings/__test__/api"
 import userEvent from "@testing-library/user-event"
-import { okChargingPointsApplicationsEmpty, okChargingPointsCheckError } from "./api"
+import { okChargePointsApplicationsEmpty, okChargePointsCheckError } from "./api"
 
 const SettingsWithHooks = () => {
   return (
@@ -15,7 +15,7 @@ const SettingsWithHooks = () => {
       <Route
         path={`/org/${cpo.id}/settings`}
         element={
-          <ElecChargingPointsSettings companyId={cpo.id} />
+          <ElecChargePointsSettings companyId={cpo.id} />
         }
       />
     </TestRoot>
@@ -35,7 +35,7 @@ afterEach(() => { server.resetHandlers() })
 afterAll(() => server.close())
 
 
-test("check the charging point section of the settings", async () => {
+test("check the charge point section of the settings", async () => {
   render(<SettingsWithHooks />)
   await waitWhileLoading()
   screen.getByText("Inscriptions de points de recharge")
@@ -58,7 +58,7 @@ test("check the applications list", async () => {
 })
 
 test("check the applications list empty", async () => {
-  server.use(okChargingPointsApplicationsEmpty)
+  server.use(okChargePointsApplicationsEmpty)
   setEntity(cpo)
 
   render(<SettingsWithHooks />)
@@ -85,7 +85,7 @@ test("upload dialog opened", async () => {
 
 })
 
-const uploadChargingPointsFile = async () => {
+const uploadChargePointsFile = async () => {
   const user = userEvent.setup()
 
   //Open Upload modal
@@ -110,7 +110,7 @@ test("upload file", async () => {
   render(<SettingsWithHooks />)
   await waitWhileLoading()
 
-  await uploadChargingPointsFile()
+  await uploadChargePointsFile()
   screen.getByText("Valide")
 
   //send inscription
@@ -125,7 +125,7 @@ test("upload file with error", async () => {
   await waitWhileLoading()
 
   //tester l'ouverture de la modal d'erreur
-  server.use(okChargingPointsCheckError)
-  await uploadChargingPointsFile()
+  server.use(okChargePointsCheckError)
+  await uploadChargePointsFile()
   screen.getByText("À corriger")
 })

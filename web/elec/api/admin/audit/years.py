@@ -10,10 +10,10 @@ from elec.models.elec_meter_reading_application import ElecMeterReadingApplicati
 @check_admin_rights(allow_external=[ExternalAdminRights.ELEC])
 def get_years(request):
     try:
-        charging_points_years = ElecChargePointApplication.objects.values_list("created_at__year", flat=True).distinct()
+        charge_points_years = ElecChargePointApplication.objects.values_list("created_at__year", flat=True).distinct()
         meter_readings_years = ElecMeterReadingApplication.objects.values_list("year", flat=True).distinct()
 
-        years = list(set(list(charging_points_years) + list(meter_readings_years)))
+        years = list(set(list(charge_points_years) + list(meter_readings_years)))
 
         return SuccessResponse(list(years))
     except Exception:

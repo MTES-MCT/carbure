@@ -20,7 +20,7 @@ export const ElecAdminTransferDetailsDialog = () => {
   const entity = useEntity()
   const navigate = useNavigate()
   const location = useLocation()
-  const match = useHashMatch("charging-points/:id")
+  const match = useHashMatch("charge-points/:id")
 
   const chargePointResponse = useQuery(api.getChargePointDetails, {
     key: "admin-charge-points-details",
