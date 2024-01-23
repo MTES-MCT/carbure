@@ -12,13 +12,11 @@ import { Trans, useTranslation } from "react-i18next"
 export type ApplicationDialogProps = {
   application: ElecChargePointsApplication
   onClose: () => void
-  companyId: number
 }
 
 export const ChargePointsApplicationRejectDialog = ({
   application,
   onClose,
-  companyId,
 }: ApplicationDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -38,7 +36,7 @@ export const ChargePointsApplicationRejectDialog = ({
   })
 
   const rejectApplication = () => {
-    rejectChargePointsApplication.execute(entity.id, companyId, application.id)
+    rejectChargePointsApplication.execute(entity.id, application.cpo.id, application.id)
   }
 
 
