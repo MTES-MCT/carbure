@@ -114,7 +114,7 @@ function ElecAdminAuditTabs({
 
   return (<Tabs variant="main" tabs={[{
     key: "charge-points",
-    path: "audit/charge-points",
+    path: "charge-points/" + ElecAdminAuditStatus.Pending.toLowerCase(),
     label: <>
       <p style={{
         fontWeight: "normal"
@@ -129,7 +129,7 @@ function ElecAdminAuditTabs({
     </>
   }, {
     key: "meter-readings",
-    path: "audit/meter-readings",
+    path: "meter-readings/" + ElecAdminAuditStatus.Pending.toLowerCase(),
     label: <>
       <p style={{
         fontWeight: "normal"

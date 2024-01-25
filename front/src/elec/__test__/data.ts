@@ -81,7 +81,7 @@ const elecChargePointApplication3: ElecChargePointsApplication = {
     application_date: "2023-09-01",
     status: ElecChargePointsApplicationStatus.Rejected,
 }
-const elecChargePointApplication4: ElecChargePointsApplication = {
+export const elecChargePointApplication4: ElecChargePointsApplication = {
     id: 3,
     cpo: cpo,
     station_count: 1,
