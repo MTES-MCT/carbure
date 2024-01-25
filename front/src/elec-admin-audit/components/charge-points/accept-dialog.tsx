@@ -5,18 +5,20 @@ import { Check, Return } from "common/components/icons"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import { formatDate } from "common/utils/formatters"
-import * as api from "elec-admin/api"
+import * as api from "../../api"
 import ApplicationStatus from "elec/components/charge-points/application-status"
 import { ElecChargePointsApplication, ElecChargePointsApplicationStatus } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 export type ApplicationDialogProps = {
   application: ElecChargePointsApplication
-  onClose: () => void
+  onClose: () => void,
+  forceValidation: boolean
 }
 
 export const ChargePointsApplicationAcceptDialog = ({
   application,
   onClose,
+  forceValidation
 }: ApplicationDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -24,7 +26,7 @@ export const ChargePointsApplicationAcceptDialog = ({
   const notifyError = useNotifyError()
 
   const acceptChargePointsApplication = useMutation(api.acceptChargePointsApplication, {
-    invalidates: ["charge-points-applications"],
+    invalidates: ["audit-charge-points-applications"],
     onSuccess() {
       onClose()
       notify(t("Les {{count}} points de recharge ont été acceptés !", { count: application.charge_point_count }), { variant: "success" })
@@ -37,7 +39,7 @@ export const ChargePointsApplicationAcceptDialog = ({
 
 
   const acceptApplication = () => {
-    acceptChargePointsApplication.execute(entity.id, application.cpo.id, application.id)
+    acceptChargePointsApplication.execute(entity.id, application.id, forceValidation)
   }
 
   return (

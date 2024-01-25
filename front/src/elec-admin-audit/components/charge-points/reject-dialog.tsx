@@ -5,18 +5,20 @@ import { Check, Return } from "common/components/icons"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import { formatDate } from "common/utils/formatters"
-import * as api from "elec-admin/api"
+import * as api from "../../api"
 import ApplicationStatus from "elec/components/charge-points/application-status"
 import { ElecChargePointsApplication, ElecChargePointsApplicationStatus } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 export type ApplicationDialogProps = {
   application: ElecChargePointsApplication
   onClose: () => void
+  forceRejection: boolean
 }
 
 export const ChargePointsApplicationRejectDialog = ({
   application,
   onClose,
+  forceRejection
 }: ApplicationDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -24,7 +26,7 @@ export const ChargePointsApplicationRejectDialog = ({
   const notifyError = useNotifyError()
 
   const rejectChargePointsApplication = useMutation(api.rejectChargePointsApplication, {
-    invalidates: ["charge-points-applications"],
+    invalidates: ["audit-charge-points-applications"],
     onSuccess() {
       onClose()
       notify(t("La demande d'inscription pour les {{count}} points de recharge a été refusée !", { count: application.charge_point_count }), { variant: "success" })
@@ -36,7 +38,7 @@ export const ChargePointsApplicationRejectDialog = ({
   })
 
   const rejectApplication = () => {
-    rejectChargePointsApplication.execute(entity.id, application.cpo.id, application.id)
+    rejectChargePointsApplication.execute(entity.id, application.id, forceRejection)
   }
 
 
@@ -44,8 +46,11 @@ export const ChargePointsApplicationRejectDialog = ({
     <Dialog onClose={onClose}>
       <header>
         <ApplicationStatus status={application.status} big />
+        {forceRejection
+          ? <h1>{t("Refuser les points de recharge <b>sans audit</b>")}</h1>
+          : <h1>{t("Refuser les points de recharge")}</h1>
+        }
 
-        <h1>{t("Refuser les points de recharge")}</h1>
       </header>
 
       <main>

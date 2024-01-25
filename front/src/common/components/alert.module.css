@@ -8,6 +8,7 @@
   /* white-space: nowrap; */
   overflow: hidden;
   text-overflow: ellipsis;
+  flex-direction: column;
 }
 
 .alert.loading {
