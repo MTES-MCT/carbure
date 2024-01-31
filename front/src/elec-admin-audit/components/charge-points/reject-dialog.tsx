@@ -46,10 +46,8 @@ export const ChargePointsApplicationRejectDialog = ({
     <Dialog onClose={onClose}>
       <header>
         <ApplicationStatus status={application.status} big />
-        {forceRejection
-          ? <h1>{t("Refuser les points de recharge <b>sans audit</b>")}</h1>
-          : <h1>{t("Refuser les points de recharge")}</h1>
-        }
+        <h1>{t("Refuser les points de recharge")}</h1>
+
 
       </header>
 
@@ -62,7 +60,7 @@ export const ChargePointsApplicationRejectDialog = ({
                 applicationDate: formatDate(application.application_date),
               }}
               count={application.charge_point_count}
-              defaults="<b>{{count}}</b> points de recharge importés le <b>{{applicationDate}}</b>  ." />
+              defaults="<b>{{count}}</b> points de recharge importés le {{applicationDate}} ." />
           </p>
           <p>
             <Trans>Voulez-vous refuser cette demande ?</Trans>
@@ -74,7 +72,7 @@ export const ChargePointsApplicationRejectDialog = ({
 
         {application.status === ElecChargePointsApplicationStatus.Pending && (
           <>
-            <Button icon={Check} label={t("Refuser la demande")} variant="danger" action={rejectApplication} loading={rejectChargePointsApplication.loading} />
+            <Button icon={Check} label={forceRejection ? t("Refuser la demande sans audit") : t("Refuser la demande")} variant="danger" action={rejectApplication} loading={rejectChargePointsApplication.loading} />
           </>
         )}
         <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
