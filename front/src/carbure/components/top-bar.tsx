@@ -156,7 +156,7 @@ const Navigation = ({ entity }: NavigationProps) => {
               {
                 key: "elec-admin-audit",
                 path: "elec-admin-audit",
-                label: t("Audit Elec"),
+                label: t("Audit"),
               },
 
               (isOperator || isProducer) && {

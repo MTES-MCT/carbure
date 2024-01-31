@@ -12,7 +12,8 @@ class ElecMeterReadingApplication(models.Model):
     PENDING = "PENDING"
     ACCEPTED = "ACCEPTED"
     REJECTED = "REJECTED"
-    STATUSES = [(PENDING, PENDING), (ACCEPTED, ACCEPTED), (REJECTED, REJECTED)]
+    AUDIT_IN_PROGRESS = "AUDIT_IN_PROGRESS"
+    STATUSES = [(PENDING, PENDING), (ACCEPTED, ACCEPTED), (REJECTED, REJECTED), (AUDIT_IN_PROGRESS, AUDIT_IN_PROGRESS)]
 
     QUARTERS = (
         (1, "T1"),
@@ -21,7 +22,7 @@ class ElecMeterReadingApplication(models.Model):
         (4, "T4"),
     )
 
-    status = models.CharField(max_length=10, default=PENDING, choices=STATUSES)
+    status = models.CharField(max_length=32, default=PENDING, choices=STATUSES)
     quarter = models.IntegerField(choices=QUARTERS)
     year = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)

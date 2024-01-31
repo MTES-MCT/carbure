@@ -42,7 +42,7 @@ class ElecCharginPointsTest(TestCase):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)
         application2 = ElecChargePointApplication.objects.create(cpo=self.cpo)
 
-        charge_point = ElecChargePoint.objects.create(
+        ElecChargePoint.objects.create(
             application=application,
             cpo=self.cpo,
             charge_point_id="ABCDE",
@@ -59,7 +59,7 @@ class ElecCharginPointsTest(TestCase):
             cpo_siren="",
         )
 
-        charge_point2 = ElecChargePoint.objects.create(
+        ElecChargePoint.objects.create(
             application=application2,
             cpo=self.cpo,
             charge_point_id="ABCDE",
