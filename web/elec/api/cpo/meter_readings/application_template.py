@@ -34,16 +34,14 @@ def get_application_template(request, entity):
     year = form.cleaned_data["year"] or auto_year
 
     if not quarter or not year:
-        return ErrorResponse(400, ApplicationTemplateError.TOO_LATE)
+        message = "Les inscriptions de relevés pour un trimestre doivent être réalisées entre les 10 derniers jours de la fin de ce trimestre et les 20 premiers jours du trimestre suivant."
+        return ErrorResponse(400, ApplicationTemplateError.TOO_LATE, message=message)
 
     charge_points = ChargePointRepository.get_registered_charge_points(entity)
 
     if charge_points.count() == 0:
-        return ErrorResponse(
-            400,
-            ApplicationTemplateError.NO_CHARGE_POINT_AVAILABLE,
-            message="Le fichier excel n'a pas pu être généré car aucun point de recharge n'a été validé jusqu'à présent. Assurez-vous qu'au moins l'un de vos dossiers d'inscription de point de recharge a déjà été validé par la DGEC.",
-        )
+        message = "Le fichier excel n'a pas pu être généré car aucun point de recharge n'a été validé jusqu'à présent. Assurez-vous qu'au moins l'un de vos dossiers d'inscription de point de recharge a déjà été validé par la DGEC."
+        return ErrorResponse(400, ApplicationTemplateError.NO_CHARGE_POINT_AVAILABLE, message=message)
 
     previous_application = MeterReadingRepository.get_previous_application(entity, quarter, year)
     meter_reading_data = create_meter_readings_data(charge_points, previous_application)
