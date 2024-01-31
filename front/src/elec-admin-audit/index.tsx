@@ -34,8 +34,8 @@ export const ElecAdminAudit = () => {
     params: [entity.id, years.selected],
   })
 
-  const snapshot = elecAdminAuditSnapshot // TEST DATA
-  // const snapshot = elecAdminAuditSnapshotResponse.result?.data.data ?? defaultElecAdminAuditSnapshot
+  // const snapshot = elecAdminAuditSnapshot // TEST DATA
+  const snapshot = elecAdminAuditSnapshotResponse.result?.data.data ?? defaultElecAdminAuditSnapshot
 
   return (
 
