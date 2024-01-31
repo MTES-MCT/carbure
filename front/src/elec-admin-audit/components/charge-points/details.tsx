@@ -137,12 +137,6 @@ export const ChargingPointsApplicationDetailsDialog = () => {
 
             </Form>
 
-            {/* 
-              {/* {transferCertificate?.status === ElecTransferCertificateStatus.Rejected &&
-              <Alert variant="info" icon={Message}>
-                {transferCertificate.comment}
-              </Alert>
-            } */}
           </section>
 
           <section>
@@ -155,7 +149,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
           {chargePointApplication.status === ElecChargePointsApplicationStatus.AuditInProgress && (
 
             <section>
-              <Alert variant="info" >
+              <Alert variant="info" style={{ flexDirection: "column" }} >
                 <p>
                   <Send />
                   <Trans>

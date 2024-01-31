@@ -69,11 +69,12 @@ export const ChargePointsApplicationAcceptDialog = ({
 
       <footer>
 
-        {application.status === ElecChargePointsApplicationStatus.Pending && (
-          <>
-            <Button icon={Check} label={forceValidation ? t("Accepter la demande sans audit") : t("Accepter la demande")} variant="success" action={acceptApplication} loading={acceptChargePointsApplication.loading} />
-          </>
-        )}
+
+
+        <Button icon={Check} label={forceValidation ? t("Accepter la demande sans audit") : t("Accepter la demande")} variant="success" action={() => acceptApplication} loading={acceptChargePointsApplication.loading} />
+
+
+
         <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
       </footer>
 
