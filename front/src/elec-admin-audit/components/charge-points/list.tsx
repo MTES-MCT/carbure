@@ -55,8 +55,8 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
 
   }
 
-  const chargePointsApplicationsData = elecAdminChargePointsApplicationsList
-  // const chargePointsApplicationsData = chargePointsApplicationsResponse.result?.data.data
+  // const chargePointsApplicationsData = elecAdminChargePointsApplicationsList
+  const chargePointsApplicationsData = chargePointsApplicationsResponse.result?.data.data
 
   const total = chargePointsApplicationsData?.total ?? 0
   const count = chargePointsApplicationsData?.returned ?? 0
