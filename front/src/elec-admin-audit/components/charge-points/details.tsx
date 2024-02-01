@@ -19,6 +19,7 @@ import { TextInput } from "common/components/input"
 import Form from "common/components/form"
 import Alert from "common/components/alert"
 import { EntityPreview } from "carbure/types"
+import { LoaderOverlay } from "common/components/scaffold"
 
 export const ChargingPointsApplicationDetailsDialog = () => {
   const { t } = useTranslation()
@@ -41,7 +42,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
   // const chargePointApplication = elecChargePointApplication4 // TEST with data
 
   const startChargePointsApplicationAuditResponse = useMutation(api.startChargePointsApplicationAudit, {
-    invalidates: ["audit-charge-points-application-details"],
+    invalidates: ["audit-charge-points-application-details", "audit-charge-points-applications"],
     onSuccess() {
       notify(t("L'audit de l'inscription des {{count}} points de recharge a bien été initié.", { count: chargePointApplication?.charge_point_count }), { variant: "success" })
     },
@@ -123,7 +124,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
               <TextInput
                 readOnly
                 label={t("Aménageur")}
-                value={chargePointApplication?.cpo.name}
+                value={chargePointApplication?.cpo.name || "..."}
 
               />
 
@@ -176,7 +177,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
 
           {chargePointApplication?.status === ElecChargePointsApplicationStatus.Pending && (
             <>
-              <Button icon={Send} label={t("Commencer l'audit")} variant="primary" action={startAudit} />
+              <Button icon={Send} label={t("Commencer l'audit")} variant="primary" action={startAudit} loading={startChargePointsApplicationAuditResponse.loading} />
               <Button icon={Check} label={t("Valider sans auditer")} variant="success" action={() => acceptApplication(true)} />
               <Button icon={Cross} label={t("Refuser sans auditer")} variant="danger" action={() => rejectApplication(true)} />
             </>
@@ -192,7 +193,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
           )}
           <Button icon={Return} label={t("Fermer")} action={closeDialog} asideX />
         </footer>
-
+        {chargePointApplicationResponse.loading && <LoaderOverlay />}
       </Dialog>
     </Portal >
   )
