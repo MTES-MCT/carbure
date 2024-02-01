@@ -37,7 +37,7 @@ def get_charge_points_applications_filters(request, *args, **kwargs):
         return SuccessResponse(list(set(data)))
     except:
         traceback.print_exc()
-        return ErrorResponse(400, SafTicketSourceFiltersError.FILTER_LISTING_FAILED)
+        return ErrorResponse(400, CarbureError.UNKNOWN_ERROR)
 
 
 def get_filter_values(applications, filter):
@@ -49,14 +49,6 @@ def get_filter_values(applications, filter):
 
     else:  # raise an error for unknown filters
         raise Exception("Filter '%s' does not exist for ticket sources" % filter)
-
-    # ticket_sources = ticket_sources.annotate(
-    #     parent_supplier=Coalesce(
-    #         "parent_lot__carbure_supplier__name",
-    #         "parent_lot__unknown_supplier",
-    #         "parent_ticket__supplier__name",
-    #     )
-    # )
 
     values = applications.values_list(column, flat=True).distinct()
     return [v for v in values if v]
