@@ -1,5 +1,5 @@
 import { api, Api, download } from "common/services/api"
-import { ElecChargePointsApplication } from "elec/types"
+import { ElecChargePointsApplication, ElecChargePointsApplicationDetails } from "elec/types"
 import { ElecAdminAuditFilter, ElecAdminAuditQuery, ElecAdminAuditSnapshot, ElecChargePointsApplicationsData } from "./types"
 
 export function getYears(entity_id: number) {
@@ -43,7 +43,7 @@ export async function getElecAdminAuditChargePointsApplicationsFilters(field: El
 
 
 export function getChargePointsApplicationDetails(entityId: number, applicationId: number) {
-  return api.get<Api<ElecChargePointsApplication>>("/elec/admin/audit/charge-points/application-details", {
+  return api.get<Api<ElecChargePointsApplicationDetails>>("/elec/admin/audit/charge-points/application-details", {
     params: { entity_id: entityId, application_id: applicationId },
   })
 }

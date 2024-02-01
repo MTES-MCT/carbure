@@ -12,7 +12,10 @@ from elec.models import ElecChargePoint
 from elec.models import ElecChargePointApplication
 from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.serializers.elec_charge_point import ElecChargePointSerializer
-from elec.serializers.elec_charge_point_application import ElecChargePointApplicationSerializer
+from elec.serializers.elec_charge_point_application import (
+    ElecChargePointApplicationDetailsSerializer,
+    ElecChargePointApplicationSerializer,
+)
 from elec.services.export_charge_point_excel import export_charge_points_to_excel
 
 
@@ -37,4 +40,9 @@ def get_application_details(request):
         excel_file = export_charge_points_to_excel(charge_points, application.cpo)
         return ExcelResponse(excel_file)
 
-    return SuccessResponse(ElecChargePointApplicationSerializer(application).data)
+    charge_point_application = ElecChargePointApplicationDetailsSerializer(
+        application
+    ).data  # TODO ElecChargePointApplicationDetailsSerializer + email_contact
+    print("charge_point_application: ", charge_point_application)
+
+    return SuccessResponse(charge_point_application)

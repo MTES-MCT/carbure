@@ -74,6 +74,11 @@ export interface ElecChargePointsApplication {
   validation_date?: string
   status: ElecChargePointsApplicationStatus
 }
+
+
+export interface ElecChargePointsApplicationDetails extends ElecChargePointsApplication {
+  email_contact: string
+}
 export interface ElecChargePointsSnapshot {
   station_count: number
   charge_point_count: number

@@ -23,7 +23,7 @@ class AuditApplicationsFilterForm(forms.Form):
     year = forms.IntegerField()
     status = forms.CharField()
     cpo = MultipleValueField(coerce=str, required=False)
-    period = MultipleValueField(coerce=str, required=False)
+    # period = MultipleValueField(coerce=str, required=False)
 
 
 @require_GET
