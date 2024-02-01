@@ -14,7 +14,7 @@ const ApplicationStatus = ({
   status,
 }: {
   big?: boolean
-  status: ElecChargePointsApplicationStatus
+  status?: ElecChargePointsApplicationStatus
 }) => {
   const { t } = useTranslation()
 
@@ -26,8 +26,8 @@ const ApplicationStatus = ({
   }
 
   return (
-    <Tag big={big} variant={statusToVariant[status]}>
-      {statusLabels[status]}
+    <Tag big={big} variant={!status ? "none" : statusToVariant[status]}>
+      {!status ? "..." : statusLabels[status]}
     </Tag>
   )
 }

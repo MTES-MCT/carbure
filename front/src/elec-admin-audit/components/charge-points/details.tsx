@@ -37,13 +37,13 @@ export const ChargingPointsApplicationDetailsDialog = () => {
     key: "audit-charge-points-application-details",
     params: [entity.id, parseInt(match?.params.id!)],
   })
-  // const chargePointApplication = chargePointApplicationResponse.result?.data.data?.elec_transfer_certificate
-  const chargePointApplication = elecChargePointApplication4 // TEST with data
+  const chargePointApplication = chargePointApplicationResponse.result?.data.data
+  // const chargePointApplication = elecChargePointApplication4 // TEST with data
 
   const startChargePointsApplicationAuditResponse = useMutation(api.startChargePointsApplicationAudit, {
     invalidates: ["audit-charge-points-application-details"],
     onSuccess() {
-      notify(t("L'audit de l'inscription des {{count}} points de recharge a bien été initié.", { count: chargePointApplication.charge_point_count }), { variant: "success" })
+      notify(t("L'audit de l'inscription des {{count}} points de recharge a bien été initié.", { count: chargePointApplication?.charge_point_count }), { variant: "success" })
     },
     onError(err) {
       notifyError(err, t("Impossible d'initier l'audit de l'inscription des points de recharge"))
@@ -55,14 +55,17 @@ export const ChargingPointsApplicationDetailsDialog = () => {
   }
 
   const startAudit = () => {
+    if (!chargePointApplication) return
     startChargePointsApplicationAuditResponse.execute(entity.id, chargePointApplication.id)
   }
 
   const downloadSample = () => {
+    if (!chargePointApplication) return
     api.downloadChargePointsSample(entity.id, chargePointApplication.id)
   }
 
   const acceptApplication = (force: boolean = false) => {
+    if (!chargePointApplication) return
     portal((close) => (
       <ChargePointsApplicationAcceptDialog
         application={chargePointApplication}
@@ -73,6 +76,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
   }
 
   const rejectApplication = (force: boolean = false) => {
+    if (!chargePointApplication) return
     portal((close) => (
       <ChargePointsApplicationRejectDialog
         application={chargePointApplication}
@@ -88,7 +92,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
     <Portal onClose={closeDialog}>
       <Dialog onClose={closeDialog} >
         <header>
-          <ApplicationStatus status={chargePointApplication.status} big />
+          <ApplicationStatus status={chargePointApplication?.status} big />
 
           <h1>{t("Inscription de points de recharge")}</h1>
         </header>
@@ -111,7 +115,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
               <TextInput
                 readOnly
                 label={t("Date de la demande")}
-                value={formatDate(chargePointApplication.application_date)}
+                value={chargePointApplication ? formatDate(chargePointApplication.application_date) : "..."}
               />
 
               <TextInput
@@ -124,14 +128,14 @@ export const ChargingPointsApplicationDetailsDialog = () => {
               <TextInput
                 readOnly
                 label={t("Puissance cumulée (kW)")}
-                value={formatNumber(Math.round(chargePointApplication.power_total))}
+                value={chargePointApplication ? formatNumber(Math.round(chargePointApplication.power_total)) : "..."}
 
               />
 
               <TextInput
                 readOnly
                 label={t("Points de recharge")}
-                value={formatNumber(chargePointApplication.charge_point_count)}
+                value={chargePointApplication ? formatNumber(chargePointApplication.charge_point_count) : "..."}
               />
 
 
@@ -140,13 +144,13 @@ export const ChargingPointsApplicationDetailsDialog = () => {
           </section>
 
           <section>
-            {!entity.isAdmin && chargePointApplication.status === ElecChargePointsApplicationStatus.Pending && (
+            {!entity.isAdmin && chargePointApplication?.status === ElecChargePointsApplicationStatus.Pending && (
               <p><i>
                 {t("En attente de validation de la DGEC.")}
               </i></p>
             )}
           </section>
-          {chargePointApplication.status === ElecChargePointsApplicationStatus.AuditInProgress && (
+          {chargePointApplication?.status === ElecChargePointsApplicationStatus.AuditInProgress && (
 
             <section>
               <Alert variant="info" style={{ flexDirection: "column" }} >
@@ -168,7 +172,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
 
         <footer>
 
-          {chargePointApplication.status === ElecChargePointsApplicationStatus.Pending && (
+          {chargePointApplication?.status === ElecChargePointsApplicationStatus.Pending && (
             <>
               <Button icon={Send} label={t("Commencer l'audit")} variant="primary" action={startAudit} />
               <Button icon={Check} label={t("Valider sans auditer")} variant="success" action={() => acceptApplication(true)} />
@@ -176,7 +180,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
             </>
           )}
 
-          {chargePointApplication.status === ElecChargePointsApplicationStatus.AuditInProgress && (
+          {chargePointApplication?.status === ElecChargePointsApplicationStatus.AuditInProgress && (
             <>
               <MailtoButton cpo={chargePointApplication.cpo} chargePointCount={chargePointApplication.charge_point_count} />
               <Button icon={Download} label={t("Télécharger l’échantillon")} variant="secondary" action={downloadSample} />

@@ -44,12 +44,9 @@ def get_applications(request):
 
     try:
         charge_points_applications = ChargePointRepository.get_annotated_applications()
-        # print("charge_points_applications: ", charge_points_applications)
-
         charge_points_applications = filter_charge_point_applications(
             charge_points_applications, **audit_applications_filter_form.cleaned_data
         )
-        # print(">charge_points_applications: ", charge_points_applications)
 
         paginator = Paginator(charge_points_applications, limit)
         current_page = floor(from_idx / limit) + 1

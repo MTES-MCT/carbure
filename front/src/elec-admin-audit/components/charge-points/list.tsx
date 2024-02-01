@@ -44,6 +44,10 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
 
   }
 
+  const downloadChargePointsApplication = (chargePointApplication: ElecChargePointsApplication) => {
+    api.downloadChargePointsApplication(entity.id, chargePointApplication.id)
+  }
+
   // const chargePointsApplicationsData = elecAdminChargePointsApplicationsList
   const chargePointsApplicationsData = chargePointsApplicationsResponse.result?.data.data
 
@@ -80,7 +84,7 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
             <ChargePointsApplicationsTable
               loading={chargePointsApplicationsResponse.loading}
               applications={chargePointsApplicationsData.charge_points_applications}
-              onDownloadChargePointsApplication={() => { }}
+              onDownloadChargePointsApplication={downloadChargePointsApplication}
               rowLink={showChargePointsApplicationDetails}
             />
 
