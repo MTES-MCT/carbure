@@ -42,7 +42,7 @@ export interface ElecAdminAuditQuery {
   from_idx?: number
   limit?: number
   [ElecAdminAuditFilter.Cpo]?: string[]
-  [ElecAdminAuditFilter.Period]?: string[]
+  // [ElecAdminAuditFilter.Period]?: string[]
 }
 
 export interface ElecAdminAuditStates {

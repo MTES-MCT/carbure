@@ -21,7 +21,7 @@ export function getSnapshot(entity_id: number, year: number) {
 
 
 export function getChargePointsApplications(query: ElecAdminAuditQuery) {
-  return api.get<Api<ElecChargePointsApplicationsData>>("/elec/admin/audit/charge-points", {
+  return api.get<Api<ElecChargePointsApplicationsData>>("/elec/admin/audit/charge-points/applications", {
     params: query,
   })
 }
