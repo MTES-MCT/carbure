@@ -43,14 +43,17 @@ export async function getElecAdminAuditChargePointsApplicationsFilters(field: El
 
 
 export function getChargePointsApplicationDetails(entityId: number, applicationId: number) {
-  return api.get<Api<ElecChargePointsApplication>>("/elec/admin/audit/charge-points/application_details", {
+  return api.get<Api<ElecChargePointsApplication>>("/elec/admin/audit/charge-points/application-details", {
     params: { entity_id: entityId, application_id: applicationId },
   })
+}
 
+export function downloadChargePointsApplication(entityId: number, applicationId: number) {
+  return download("/elec/admin/audit/charge-points/application-details", { entity_id: entityId, application_id: applicationId, export: true })
 }
 
 export function downloadChargePointsSample(entityId: number, applicationId: number) {
-  return download("elec/admin/audit/charge-points/sample", { entity_id: entityId, application_id: applicationId })
+  return download("/elec/admin/audit/charge-points/sample", { entity_id: entityId, application_id: applicationId })
 }
 
 
