@@ -28,7 +28,6 @@ def get_snapshot(request):
 
     try:
         charge_points_applications = ElecChargePointApplication.objects.filter(created_at__year=year)
-        print("charge_points_applications: ", charge_points_applications)
         meter_readings_applications = ElecMeterReadingApplication.objects.filter(year=year)
 
         return SuccessResponse(

@@ -1,31 +1,20 @@
 import useEntity from "carbure/hooks/entity"
-import Button from "common/components/button"
 import HashRoute from "common/components/hash-route"
-import { Download } from "common/components/icons"
 import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
-import { usePortal } from "common/components/portal"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import { useAdminTransferCertificateQueryParamsStore } from "elec-admin/hooks/transfer-certificate-query-params-store"
-import { useAdminTransferCertificatesQuery } from "elec-admin/hooks/transfer-certificates-query"
-import { ElecAdminSnapshot, ElecAdminTransferCertificateFilter } from "elec-admin/types"
-import { ElecChargePointsApplication, ElecTransferCertificatePreview } from "elec/types"
-import { ElecTransferCertificateStatus } from "elec/types-cpo"
+import { ElecAdminAuditFilter, ElecAdminAuditSnapshot, ElecAdminAuditStatus } from "elec-admin-audit/types"
+import ChargePointsApplicationsTable from "elec/components/charge-points/table"
+import { ElecChargePointsApplication } from "elec/types"
 import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
 import * as api from "../../../elec-admin-audit/api"
-import ElecAdminTransferDetailsDialog from "../../../elec-admin/components/transfer-certificate/details"
-import TransferCertificateFilters from "../../../elec-admin/components/transfer-certificate/filters"
-import ElecAdminTransferCertificateTable from "../../../elec-admin/components/transfer-certificate/table"
-import { ElecAdminAuditFilter, ElecAdminAuditSnapshot, ElecAdminAuditStatus } from "elec-admin-audit/types"
-import { useElecAdminAuditChargePointsQueryParamsStore } from "./list-query-params-store"
-import { useElectAdminAuditQuery } from "./list-query"
-import ElecAdminAuditFilters from "./list-filters"
-import { elecAdminChargePointsApplicationsList } from "elec-admin-audit/__test__/data"
-import { StatusSwitcher } from "./status-switcher"
-import ChargePointsApplicationsTable from "elec/components/charge-points/table"
 import ChargingPointsApplicationDetailsDialog from "./details"
+import ElecAdminAuditFilters from "./list-filters"
+import { useElectAdminAuditQuery } from "./list-query"
+import { useElecAdminAuditChargePointsQueryParamsStore } from "./list-query-params-store"
+import { StatusSwitcher } from "./status-switcher"
 
 type TransferListProps = {
   snapshot: ElecAdminAuditSnapshot
@@ -122,7 +111,7 @@ export default ChargePointsApplicationsList
 
 const FILTERS = [
   ElecAdminAuditFilter.Cpo,
-  ElecAdminAuditFilter.Period
+  // ElecAdminAuditFilter.Period
 ]
 
 
