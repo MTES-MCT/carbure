@@ -12,13 +12,16 @@ import { Trans, useTranslation } from "react-i18next"
 export type ApplicationDialogProps = {
   application: ElecChargePointsApplication
   onClose: () => void
+  onRejected: () => void
   forceRejection: boolean
 }
 
 export const ChargePointsApplicationRejectDialog = ({
   application,
   onClose,
-  forceRejection
+  forceRejection,
+  onRejected
+
 }: ApplicationDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -26,11 +29,11 @@ export const ChargePointsApplicationRejectDialog = ({
   const notifyError = useNotifyError()
 
   const rejectChargePointsApplication = useMutation(api.rejectChargePointsApplication, {
-    invalidates: ["audit-charge-points-applications"],
+    invalidates: ["audit-charge-points-applications", "elec-admin-audit-snapshot"],
     onSuccess() {
       onClose()
+      onRejected()
       notify(t("La demande d'inscription pour les {{count}} points de recharge a été refusée !", { count: application.charge_point_count }), { variant: "success" })
-
     },
     onError(err) {
       notifyError(err, t("Impossible de refuser l'inscription des points de recharge"))

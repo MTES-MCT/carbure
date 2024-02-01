@@ -12,12 +12,14 @@ import { Trans, useTranslation } from "react-i18next"
 export type ApplicationDialogProps = {
   application: ElecChargePointsApplication
   onClose: () => void,
+  onValidated: () => void,
   forceValidation: boolean
 }
 
 export const ChargePointsApplicationAcceptDialog = ({
   application,
   onClose,
+  onValidated,
   forceValidation
 }: ApplicationDialogProps) => {
   const { t } = useTranslation()
@@ -26,9 +28,10 @@ export const ChargePointsApplicationAcceptDialog = ({
   const notifyError = useNotifyError()
 
   const acceptChargePointsApplication = useMutation(api.acceptChargePointsApplication, {
-    invalidates: ["audit-charge-points-applications"],
+    invalidates: ["audit-charge-points-applications", "elec-admin-audit-snapshot"],
     onSuccess() {
       onClose()
+      onValidated()
       notify(t("Les {{count}} points de recharge ont été acceptés !", { count: application.charge_point_count }), { variant: "success" })
 
     },
@@ -38,7 +41,7 @@ export const ChargePointsApplicationAcceptDialog = ({
   })
 
 
-  const acceptApplication = () => {
+  const acceptApplication = (forceValidation: boolean) => {
     acceptChargePointsApplication.execute(entity.id, application.id, forceValidation)
   }
 
@@ -71,7 +74,7 @@ export const ChargePointsApplicationAcceptDialog = ({
 
 
 
-        <Button icon={Check} label={forceValidation ? t("Accepter la demande sans audit") : t("Accepter la demande")} variant="success" action={() => acceptApplication} loading={acceptChargePointsApplication.loading} />
+        <Button icon={Check} label={forceValidation ? t("Accepter la demande sans audit") : t("Accepter la demande")} variant="success" action={() => acceptApplication(forceValidation)} loading={acceptChargePointsApplication.loading} />
 
 
 
