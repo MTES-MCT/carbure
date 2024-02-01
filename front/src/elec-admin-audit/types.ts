@@ -12,7 +12,7 @@ export interface ElecAdminAuditSnapshot {
 }
 
 export enum ElecAdminAuditFilter {
-  Period = "period",
+  // Period = "period",
   Cpo = "cpo",
 }
 

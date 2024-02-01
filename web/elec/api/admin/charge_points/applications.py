@@ -25,6 +25,6 @@ def get_applications(request):
 
     company = form.cleaned_data["company_id"]
 
-    applications = ChargePointRepository.get_annotated_applications(company)
+    applications = ChargePointRepository.get_annotated_applications_by_cpo(company)
     serialized = ElecChargePointApplicationSerializer(applications, many=True).data
     return SuccessResponse(serialized)

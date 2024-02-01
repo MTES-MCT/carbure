@@ -58,7 +58,7 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={(filter) =>
-            api.getElecAdminAuditFilters(filter, query)
+            api.getElecAdminAuditChargePointsApplicationsFilters(filter, query)
           }
         />
       </Bar>

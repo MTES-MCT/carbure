@@ -8,6 +8,7 @@ from core.decorators import check_admin_rights
 from core.models import ExternalAdminRights
 from core.utils import MultipleValueField
 from elec.models.elec_charge_point_application import ElecChargePointApplication
+from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.serializers.elec_charge_point_application import ElecChargePointApplicationSerializer
 from django.core.paginator import Paginator
 from django.db.models import Count, Sum
@@ -42,15 +43,13 @@ def get_applications(request):
     limit = audit_applications_sort_form.cleaned_data["limit"] or 25
 
     try:
-        charge_points_applications = ElecChargePointApplication.objects.all().annotate(
-            station_count=Count("elec_charge_points__station_id", distinct=True),
-            charge_point_count=Count("elec_charge_points__id"),
-            power_total=Sum("elec_charge_points__nominal_power"),
-        )
+        charge_points_applications = ChargePointRepository.get_annotated_applications()
+        # print("charge_points_applications: ", charge_points_applications)
 
         charge_points_applications = filter_charge_point_applications(
             charge_points_applications, **audit_applications_filter_form.cleaned_data
         )
+        # print(">charge_points_applications: ", charge_points_applications)
 
         paginator = Paginator(charge_points_applications, limit)
         current_page = floor(from_idx / limit) + 1

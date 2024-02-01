@@ -22,7 +22,7 @@ export function ElecAdminAuditFilters({
 
     const filterLabels = {
         [ElecAdminAuditFilter.Cpo]: t("Aménageur"),
-        [ElecAdminAuditFilter.Period]: t("Période"),
+        // [ElecAdminAuditFilter.Period]: t("Période"),
     }
 
     return (

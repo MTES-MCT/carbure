@@ -5,7 +5,14 @@ from elec.models.elec_charge_point import ElecChargePoint
 
 class ChargePointRepository:
     @staticmethod
-    def get_annotated_applications(cpo):
+    def get_annotated_applications():
+        return ElecChargePointApplication.objects.all().annotate(
+            station_count=Count("elec_charge_points__station_id", distinct=True),
+            charge_point_count=Count("elec_charge_points__id"),
+            power_total=Sum("elec_charge_points__nominal_power"),
+        )
+
+    def get_annotated_applications_by_cpo(cpo):
         return ElecChargePointApplication.objects.filter(cpo=cpo).annotate(
             station_count=Count("elec_charge_points__station_id", distinct=True),
             charge_point_count=Count("elec_charge_points__id"),
