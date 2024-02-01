@@ -65,7 +65,7 @@ export function startChargePointsApplicationAudit(entityId: number, applicationI
 }
 
 export function acceptChargePointsApplication(entityId: number, applicationId: number, forceValidation: boolean) {
-  return api.post("/elec/admin/charge-points/accept-application", {
+  return api.post("/elec/admin/audit/charge-points/accept-application", {
     entity_id: entityId,
     application_id: applicationId,
     force_validation: forceValidation
@@ -74,7 +74,7 @@ export function acceptChargePointsApplication(entityId: number, applicationId: n
 
 
 export function rejectChargePointsApplication(entityId: number, applicationId: number, forceRejection: boolean) {
-  return api.post("/elec/admin/charge-points/reject-application", {
+  return api.post("/elec/admin/audit/charge-points/reject-application", {
     entity_id: entityId,
     application_id: applicationId,
     force_rejection: forceRejection

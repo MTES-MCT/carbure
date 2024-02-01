@@ -71,6 +71,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
         application={chargePointApplication}
         onClose={close}
         forceValidation={force}
+        onValidated={closeDialog}
       />
     ))
   }
@@ -82,6 +83,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
         application={chargePointApplication}
         onClose={close}
         forceRejection={force}
+        onRejected={closeDialog}
 
       />
     ))
