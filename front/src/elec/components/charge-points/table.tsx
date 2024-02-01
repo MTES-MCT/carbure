@@ -48,10 +48,10 @@ const ChargePointsApplicationsTable: React.FC<ChargePointsApplicationsTableProps
           ),
         },
         {
-          header: t("Stations"),
+          header: t("Aménageur"),
           cell: (application) => (
             <Cell
-              text={`${formatNumber(application.station_count)}`}
+              text={`${application.cpo.name}`}
             />
           ),
         },

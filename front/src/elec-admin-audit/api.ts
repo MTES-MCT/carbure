@@ -33,11 +33,12 @@ const QUERY_RESET: Partial<ElecAdminAuditQuery> = {
   order: undefined,
 }
 
-export async function getElecAdminAuditFilters(field: ElecAdminAuditFilter, query: ElecAdminAuditQuery) {
+export async function getElecAdminAuditChargePointsApplicationsFilters(field: ElecAdminAuditFilter, query: ElecAdminAuditQuery) {
   const params = { filter: field, ...query, ...QUERY_RESET }
-  return api
-    .get<Api<{ filter_values: string[] }>>("/elec/admin/audit/filters", { params })
-    .then((res) => res.data.data?.filter_values ?? [])
+  const result = await api
+    .get<Api<string[]>>("/elec/admin/audit/charge-points/filters", { params })
+    .then((res) => res.data.data ?? [])
+  return result
 }
 
 
