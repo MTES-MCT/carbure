@@ -202,3 +202,20 @@ class ElecAdminAuditTest(TestCase):
         self.assertEqual(response.status_code, 400)
         data = response.json()
         self.assertEqual(data["error"], "ALREADY_CHECKED")
+
+    def test_start_audit(self):
+        application = ElecChargePointApplication.objects.create(cpo=self.cpo)
+        # no application
+        response = self.client.post(
+            reverse("elec-admin-audit-charge-points-start-audit"),
+            {
+                "entity_id": self.admin.id,
+                "application_id": application.id,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"status": "success"})
+
+        application.refresh_from_db()
+        self.assertEqual(application.status, ElecChargePointApplication.AUDIT_IN_PROGRESS)
