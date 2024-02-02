@@ -1,16 +1,14 @@
 # test with : python web/manage.py test admin.api.double_counting.applications.tests_applications.AdminDoubleCountApplicationsTest --keepdb
 from datetime import date
 import json
-from nis import cat
 import os
 from pprint import pprint
-import stat
 from admin.api.double_counting.applications.add import DoubleCountingAddError
 from admin.api.double_counting.applications.approve_application import DoubleCountingApplicationApproveError
 from certificates.models import DoubleCountingRegistration
 
 from core.tests_utils import setup_current_user
-from core.models import Entity, MatierePremiere, Pays, UserRights
+from core.models import Entity, Pays, UserRights
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -19,9 +17,7 @@ from doublecount.factories import (
     DoubleCountingApplicationFactory,
     DoubleCountingProductionFactory,
     DoubleCountingSourcingFactory,
-    production,
 )
-from doublecount.factories import agreement
 from doublecount.factories.agreement import DoubleCountingRegistrationFactory
 from doublecount.factories.doc_file import DoubleCountingDocFileFactory
 

@@ -5,32 +5,35 @@ import { Check, Return } from "common/components/icons"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import { formatDate } from "common/utils/formatters"
-import * as api from "elec-admin/api"
-import ApplicationStatus from "elec/components/charging-points/application-status"
-import { ElecChargingPointsApplication, ElecChargingPointsApplicationStatus } from "elec/types"
+import * as api from "../../api"
+import ApplicationStatus from "elec/components/charge-points/application-status"
+import { ElecChargePointsApplication, ElecChargePointsApplicationStatus } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 export type ApplicationDialogProps = {
-  application: ElecChargingPointsApplication
+  application: ElecChargePointsApplication
   onClose: () => void
-  companyId: number
+  onRejected: () => void
+  forceRejection: boolean
 }
 
-export const ChargingPointsApplicationRejectDialog = ({
+export const ChargePointsApplicationRejectDialog = ({
   application,
   onClose,
-  companyId,
+  forceRejection,
+  onRejected
+
 }: ApplicationDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const notify = useNotify()
   const notifyError = useNotifyError()
 
-  const rejectChargingPointsApplication = useMutation(api.rejectChargingPointsApplication, {
-    invalidates: ["charging-points-applications"],
+  const rejectChargePointsApplication = useMutation(api.rejectChargePointsApplication, {
+    invalidates: ["audit-charge-points-applications", "elec-admin-audit-snapshot"],
     onSuccess() {
       onClose()
-      notify(t("La demande d'inscription pour les {{count}} points de recharge a été refusée !", { count: application.charging_point_count }), { variant: "success" })
-
+      onRejected()
+      notify(t("La demande d'inscription pour les {{count}} points de recharge a été refusée !", { count: application.charge_point_count }), { variant: "success" })
     },
     onError(err) {
       notifyError(err, t("Impossible de refuser l'inscription des points de recharge"))
@@ -38,7 +41,7 @@ export const ChargingPointsApplicationRejectDialog = ({
   })
 
   const rejectApplication = () => {
-    rejectChargingPointsApplication.execute(entity.id, companyId, application.id)
+    rejectChargePointsApplication.execute(entity.id, application.id, forceRejection)
   }
 
 
@@ -46,8 +49,9 @@ export const ChargingPointsApplicationRejectDialog = ({
     <Dialog onClose={onClose}>
       <header>
         <ApplicationStatus status={application.status} big />
-
         <h1>{t("Refuser les points de recharge")}</h1>
+
+
       </header>
 
       <main>
@@ -58,8 +62,8 @@ export const ChargingPointsApplicationRejectDialog = ({
               values={{
                 applicationDate: formatDate(application.application_date),
               }}
-              count={application.charging_point_count}
-              defaults="<b>{{count}}</b> points de recharge importés le <b>{{applicationDate}}</b>  ." />
+              count={application.charge_point_count}
+              defaults="<b>{{count}}</b> points de recharge importés le {{applicationDate}} ." />
           </p>
           <p>
             <Trans>Voulez-vous refuser cette demande ?</Trans>
@@ -69,11 +73,9 @@ export const ChargingPointsApplicationRejectDialog = ({
 
       <footer>
 
-        {application.status === ElecChargingPointsApplicationStatus.Pending && (
-          <>
-            <Button icon={Check} label={t("Refuser la demande")} variant="danger" action={rejectApplication} loading={rejectChargingPointsApplication.loading} />
-          </>
-        )}
+
+        <Button icon={Check} label={forceRejection ? t("Refuser la demande sans audit") : t("Refuser la demande")} variant="danger" action={rejectApplication} loading={rejectChargePointsApplication.loading} />
+
         <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
       </footer>
 
@@ -84,6 +86,6 @@ export const ChargingPointsApplicationRejectDialog = ({
 
 
 
-export default ChargingPointsApplicationRejectDialog
+export default ChargePointsApplicationRejectDialog
 
 

@@ -10,11 +10,11 @@ from core.excel import TableParser
 
 class ExcelChargePointError:
     EXCEL_PARSING_FAILED = "EXCEL_PARSING_FAILED"
-    DUPLICATE_CHARGING_POINT = "DUPLICATE_CHARGING_POINT"
-    MISSING_CHARGING_POINT_ID = "MISSING_CHARGING_POINT_ID"
-    MISSING_CHARGING_POINT_IN_DATAGOUV = "MISSING_CHARGING_POINT_IN_DATAGOUV"
-    MISSING_CHARGING_POINT_DATA = "MISSING_CHARGING_POINT_DATA"
-    INVALID_CHARGING_POINT_DATA = "INVALID_CHARGING_POINT_DATA"
+    DUPLICATE_CHARGE_POINT = "DUPLICATE_CHARGE_POINT"
+    MISSING_CHARGE_POINT_ID = "MISSING_CHARGE_POINT_ID"
+    MISSING_CHARGE_POINT_IN_DATAGOUV = "MISSING_CHARGE_POINT_IN_DATAGOUV"
+    MISSING_CHARGE_POINT_DATA = "MISSING_CHARGE_POINT_DATA"
+    INVALID_CHARGE_POINT_DATA = "INVALID_CHARGE_POINT_DATA"
 
 
 def import_charge_point_excel(excel_file: UploadedFile, existing_charge_points: list[str]):
@@ -66,7 +66,7 @@ class ExcelChargePoints:
 
         errors = [
             Error(
-                ExcelChargePointError.INVALID_CHARGING_POINT_DATA,
+                ExcelChargePointError.INVALID_CHARGE_POINT_DATA,
                 line=charge_point_data.loc[error["row"]]["line"],
                 meta=error["column"],
             )
@@ -90,11 +90,11 @@ class ExcelChargePoints:
             errors = []
 
             if not charge_point_id:
-                errors.append(Error(ExcelChargePointError.MISSING_CHARGING_POINT_ID, line=line))
+                errors.append(Error(ExcelChargePointError.MISSING_CHARGE_POINT_ID, line=line))
             elif charge_point_id in existing_charge_points:
-                errors.append(Error(ExcelChargePointError.DUPLICATE_CHARGING_POINT, line=line, meta=charge_point_id))
+                errors.append(Error(ExcelChargePointError.DUPLICATE_CHARGE_POINT, line=line, meta=charge_point_id))
             elif charge_point_transport_data is None:
-                errors.append(Error(ExcelChargePointError.MISSING_CHARGING_POINT_IN_DATAGOUV, line=line, meta=charge_point_id))  # fmt:skip
+                errors.append(Error(ExcelChargePointError.MISSING_CHARGE_POINT_IN_DATAGOUV, line=line, meta=charge_point_id))  # fmt:skip
             else:
                 charge_point_data["station_id"] = charge_point_transport_data["station_id"]
                 charge_point_data["station_name"] = charge_point_transport_data["station_name"]
@@ -113,7 +113,7 @@ class ExcelChargePoints:
 
                 if len(missing_fields) > 0:
                     errors += [
-                        Error(ExcelChargePointError.MISSING_CHARGING_POINT_DATA, line=line, meta=field)
+                        Error(ExcelChargePointError.MISSING_CHARGE_POINT_DATA, line=line, meta=field)
                         for field in missing_fields
                     ]
 

@@ -642,7 +642,7 @@
   "Ligne {{line}}": "Ligne {{line}}",
   "Le fichier importé n'a pas pu être analysé. Merci de verifier que le format du modèle de fichier a bien été respecté.": "Le fichier importé n'a pas pu être analysé. Merci de verifier que le format du modèle de fichier a bien été respecté.",
   "L'identifiant du point de recharge n'est pas renseigné": "L'identifiant du point de recharge n'est pas renseigné",
-  "L'identifiant \"{{chargingPointId}}\" du point de recharge n'existe pas sur transport.data.gouv.fr": "L'identifiant \"{{chargingPointId}}\" du point de recharge n'existe pas sur transport.data.gouv.fr",
+  "L'identifiant \"{{chargePointId}}\" du point de recharge n'existe pas sur transport.data.gouv.fr": "L'identifiant \"{{chargePointId}}\" du point de recharge n'existe pas sur transport.data.gouv.fr",
   "Le champ \"{{missingField}}\" n'est pas renseigné": "Le champ \"{{missingField}}\" n'est pas renseigné",
   "Le champ \"{{invalidField}}\" est invalide": "Le champ \"{{invalidField}}\" est invalide",
   "Erreur de validation": "Erreur de validation",

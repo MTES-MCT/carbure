@@ -23,6 +23,8 @@ class ElecChargePointSerializer(serializers.ModelSerializer):
             "nominal_power",
             "cpo_name",
             "cpo_siren",
+            "latitude",
+            "longitude",
         ]
 
     cpo = serializers.SlugRelatedField(read_only=True, slug_field="name")
