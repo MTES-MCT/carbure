@@ -4,6 +4,8 @@ import { formatGHG, formatPercentage } from "common/utils/formatters"
 import isAfter from "date-fns/isAfter"
 import { useTranslation } from "react-i18next"
 import { LotFormValue } from "./lot-form"
+import useEntity from "carbure/hooks/entity"
+import { EntityType, type Entity } from "carbure/types"
 
 interface GHGFieldsProps {
   readOnly?: boolean
@@ -11,6 +13,7 @@ interface GHGFieldsProps {
 
 export const EmissionFields = (props: GHGFieldsProps) => {
   const { t } = useTranslation()
+  const entity = useEntity()
   const { bind, value } = useFormContext<LotFormValue>()
 
   return (
@@ -59,12 +62,38 @@ export const EmissionFields = (props: GHGFieldsProps) => {
         label="Total"
         value={formatGHG(value.ghg_total ?? 0)}
       />
+
+      {canSeePowerAndHeatData(entity, value) && (
+        <>
+          <NumberInput
+            readOnly
+            label="ECEL"
+            hasTooltip
+            title={t(
+              "Émissions résultant de la combustion de biomasse pour la production d'électricité"
+            )}
+            {...bind("emission_electricity")}
+            {...props}
+          />
+          <NumberInput
+            readOnly
+            label="ECH"
+            hasTooltip
+            title={t(
+              "Émissions résultant de la combustion de biomasse pour la production de chaleur"
+            )}
+            {...bind("emission_heat")}
+            {...props}
+          />
+        </>
+      )}
     </Fieldset>
   )
 }
 
 export const ReductionFields = (props: GHGFieldsProps) => {
   const { t } = useTranslation()
+  const entity = useEntity()
   const { bind, value } = useFormContext<LotFormValue>()
 
   return (
@@ -111,6 +140,23 @@ export const ReductionFields = (props: GHGFieldsProps) => {
           value={formatPercentage(value.ghg_reduction ?? 0)}
         />
       )}
+
+      {canSeePowerAndHeatData(entity, value) && (
+        <>
+          <TextInput
+            readOnly
+            label="Réd. élec."
+            value={formatPercentage(value.total_reduction_electricity ?? 0)}
+            {...props}
+          />
+          <TextInput
+            readOnly
+            label="Réd. chaleur"
+            value={formatPercentage(value.total_reduction_heat ?? 0)}
+            {...props}
+          />
+        </>
+      )}
     </Fieldset>
   )
 }
@@ -122,3 +168,14 @@ export function isRedII(deliveryDate: string | undefined | null) {
 
 // date where RED II took effect
 const JULY_FIRST_21 = new Date("2021-07-01")
+
+function canSeePowerAndHeatData(entity: Entity, lot: LotFormValue) {
+  if (entity.entity_type === EntityType.PowerOrHeatProducer) return true
+
+  const isAdmin = entity.entity_type === EntityType.Administration
+  const isClientPowerHeatProducer =
+    lot.client instanceof Object &&
+    lot.client.entity_type === EntityType.PowerOrHeatProducer
+
+  return isAdmin && isClientPowerHeatProducer
+}

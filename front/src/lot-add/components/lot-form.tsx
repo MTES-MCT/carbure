@@ -279,6 +279,11 @@ export const defaultLot = {
   ghg_total: 0 as number | undefined,
   ghg_reduction: 0 as number | undefined,
   ghg_reduction_red_ii: 0 as number | undefined,
+
+  emission_electricity: 0 as number | undefined,
+  emission_heat: 0 as number | undefined,
+  total_reduction_electricity: 0 as number | undefined,
+  total_reduction_heat: 0 as number | undefined,
 }
 
 export type LotFormValue = typeof defaultLot
@@ -333,6 +338,11 @@ export const lotToFormValue: LotToFormValue = (lot, entity, certificates) => ({
   ghg_total: lot?.ghg_total ?? 0,
   ghg_reduction: lot?.ghg_reduction ?? 0,
   ghg_reduction_red_ii: lot?.ghg_reduction_red_ii ?? 0,
+
+  emission_electricity: lot?.emission_electricity ?? 0,
+  emission_heat: lot?.emission_heat ?? 0,
+  total_reduction_electricity: lot?.total_reduction_electricity ?? 0,
+  total_reduction_heat: lot?.total_reduction_heat ?? 0,
 })
 
 export function lotFormToPayload(lot: Partial<LotFormValue> | undefined) {
