@@ -48,6 +48,7 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
     api.downloadChargePointsApplication(entity.id, chargePointApplication.id)
   }
 
+
   // const chargePointsApplicationsData = elecAdminChargePointsApplicationsList
   const chargePointsApplicationsData = chargePointsApplicationsResponse.result?.data.data
 

@@ -13,7 +13,7 @@ import { LoaderOverlay } from "common/components/scaffold"
 import { useMutation, useQuery } from "common/hooks/async"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import ApplicationStatus from "elec/components/charge-points/application-status"
-import { ElecChargePointsApplicationStatus } from "elec/types"
+import { ElecChargePointsApplication, ElecChargePointsApplicationStatus } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../../api"
@@ -59,11 +59,6 @@ export const ChargingPointsApplicationDetailsDialog = () => {
     startChargePointsApplicationAuditResponse.execute(entity.id, chargePointApplication.id)
   }
 
-  const downloadSample = () => {
-    if (!chargePointApplication) return
-    api.downloadChargePointsSample(entity.id, chargePointApplication.id)
-  }
-
   const acceptApplication = (force: boolean = false) => {
     if (!chargePointApplication) return
     portal((close) => (
@@ -89,6 +84,10 @@ export const ChargingPointsApplicationDetailsDialog = () => {
     ))
   }
 
+  const downloadSample = async () => {
+    if (!chargePointApplication) return
+    return api.downloadChargePointsApplication(entity.id, chargePointApplication.id, true)
+  }
 
   return (
     <Portal onClose={closeDialog}>

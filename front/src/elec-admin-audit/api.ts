@@ -48,13 +48,10 @@ export function getChargePointsApplicationDetails(entityId: number, applicationI
   })
 }
 
-export function downloadChargePointsApplication(entityId: number, applicationId: number) {
-  return download("/elec/admin/audit/charge-points/application-details", { entity_id: entityId, application_id: applicationId, export: true })
+export function downloadChargePointsApplication(entityId: number, applicationId: number, sample: boolean = false) {
+  return download("/elec/admin/audit/charge-points/application-details", { entity_id: entityId, application_id: applicationId, export: true, sample: sample })
 }
 
-export function downloadChargePointsSample(entityId: number, applicationId: number) {
-  return download("/elec/admin/audit/charge-points/sample", { entity_id: entityId, application_id: applicationId })
-}
 
 
 export function startChargePointsApplicationAudit(entityId: number, applicationId: number) {
