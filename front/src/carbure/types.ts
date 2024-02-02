@@ -160,7 +160,7 @@ export enum EntityType {
   ExternalAdmin = "Administration Externe",
   CPO = "Charge Point Operator",
   Unknown = "Unknown",
-  PowerStation = "Power Station",
+  PowerOrHeatProducer = "Power or Heat Producer",
 }
 
 export enum UserRole {

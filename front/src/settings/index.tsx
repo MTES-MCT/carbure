@@ -27,10 +27,10 @@ const Settings = () => {
   const entity = useEntity()
   useTitle(`${entity.name} · ${t("Société")}`)
 
-  const { isProducer, isPowerPlant, isCPO, isIndustry } = entity
+  const { isProducer, isPowerOrHeatProducer, isCPO, isIndustry } = entity
 
   const hasCertificates = isIndustry
-  const hasDepot = isIndustry || isPowerPlant
+  const hasDepot = isIndustry || isPowerOrHeatProducer
   const hasOptions = isIndustry
 
   return (

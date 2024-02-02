@@ -22,7 +22,7 @@ class Entity(models.Model):
     AIRLINE = "Compagnie aérienne"
     UNKNOWN = "Unknown"
     CPO = "Charge Point Operator"
-    POWER_STATION = "Power Station"
+    POWER_OR_HEAT_PRODUCER = "Power or Heat Producer"
     ENTITY_TYPES = (
         (PRODUCER, "Producteur"),
         (OPERATOR, "Opérateur"),
@@ -32,7 +32,7 @@ class Entity(models.Model):
         (EXTERNAL_ADMIN, EXTERNAL_ADMIN),
         (AIRLINE, AIRLINE),
         (UNKNOWN, "Unknown"),
-        (POWER_STATION, "Centrale électrique"),
+        (POWER_OR_HEAT_PRODUCER, "Producteur d'électricité ou de chaleur"),
     )
 
     name = models.CharField(max_length=64, unique=True)

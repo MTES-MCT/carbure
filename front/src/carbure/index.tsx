@@ -82,7 +82,7 @@ const Org = () => {
     isProducer,
     isAirline,
     isCPO,
-    isPowerPlant,
+    isPowerOrHeatProducer,
     has_saf,
     has_elec,
   } = entity
@@ -95,7 +95,7 @@ const Org = () => {
     <Routes>
       <Route path="settings" element={<Settings />} />
 
-      {(isIndustry || isPowerPlant) &&
+      {(isIndustry || isPowerOrHeatProducer) &&
         (<>
           <Route path="transactions/:year/*" element={<Transactions />} />
           <Route path="registry" element={<Registry />} />
