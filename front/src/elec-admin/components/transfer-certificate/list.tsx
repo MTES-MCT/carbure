@@ -114,8 +114,6 @@ const TransferList = ({ snapshot, year }: TransferListProps) => {
         ) : (
           <NoResult
             loading={transferCertificatesResponse.loading}
-          // filters={state.filters}
-          // onFilter={actions.setFilters}
           />
         )}
       </section >

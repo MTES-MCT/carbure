@@ -12,8 +12,9 @@ class ElecChargePointApplication(models.Model):
     PENDING = "PENDING"
     ACCEPTED = "ACCEPTED"
     REJECTED = "REJECTED"
-    STATUSES = [(PENDING, PENDING), (ACCEPTED, ACCEPTED), (REJECTED, REJECTED)]
+    AUDIT_IN_PROGRESS = "AUDIT_IN_PROGRESS"
+    STATUSES = [(PENDING, PENDING), (ACCEPTED, ACCEPTED), (REJECTED, REJECTED), (AUDIT_IN_PROGRESS, AUDIT_IN_PROGRESS)]
 
-    status = models.CharField(max_length=10, default=PENDING, choices=STATUSES)
+    status = models.CharField(max_length=32, default=PENDING, choices=STATUSES)
     created_at = models.DateTimeField(auto_now_add=True)
     cpo = models.ForeignKey(Entity, on_delete=models.deletion.CASCADE, related_name="elec_charge_point_applications")

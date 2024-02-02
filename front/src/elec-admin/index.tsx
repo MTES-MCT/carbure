@@ -1,17 +1,16 @@
 import useEntity from "carbure/hooks/entity"
+import { Loader } from "common/components/icons"
 import { Main } from "common/components/scaffold"
 import Select from "common/components/select"
+import Tabs from "common/components/tabs"
 import { useQuery } from "common/hooks/async"
 import useYears from "common/hooks/years"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
-import { Loader } from "common/components/icons"
-import Tabs from "common/components/tabs"
-import { formatNumber } from "common/utils/formatters"
 import * as api from "./api"
 import ProvisionList from "./components/provision-certificates/list"
-import { ElecAdminProvisionCertificateStatus, ElecAdminSnapshot } from "./types"
 import TransferList from "./components/transfer-certificate/list"
+import { ElecAdminProvisionCertificateStatus, ElecAdminSnapshot } from "./types"
 
 
 const defaultElecAdminSnapshot: ElecAdminSnapshot = {
@@ -37,9 +36,7 @@ export const ElecAdmin = () => {
     params: [entity.id, years.selected],
   })
 
-  // const snapshot = snapshotResponse.result?.data.data ?? defaultElecAdminSnapshot
-
-  const snapshot = elecAdminSnapshot.result?.data.data ?? defaultElecAdminSnapshot //TODO TEST with testing data
+  const snapshot = elecAdminSnapshot.result?.data.data ?? defaultElecAdminSnapshot
 
   return (
 

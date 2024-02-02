@@ -42,7 +42,7 @@ class ElecCharginPointsTest(TestCase):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)
         application2 = ElecChargePointApplication.objects.create(cpo=self.cpo)
 
-        charge_point = ElecChargePoint.objects.create(
+        ElecChargePoint.objects.create(
             application=application,
             cpo=self.cpo,
             charge_point_id="ABCDE",
@@ -59,7 +59,7 @@ class ElecCharginPointsTest(TestCase):
             cpo_siren="",
         )
 
-        charge_point2 = ElecChargePoint.objects.create(
+        ElecChargePoint.objects.create(
             application=application2,
             cpo=self.cpo,
             charge_point_id="ABCDE",
@@ -94,7 +94,7 @@ class ElecCharginPointsTest(TestCase):
                     "status": "PENDING",
                     "application_date": data["data"][0]["application_date"],  # timezone annoying stuff
                     "station_count": 1,
-                    "charging_point_count": 1,
+                    "charge_point_count": 1,
                     "power_total": 150,
                 },
                 {
@@ -103,7 +103,7 @@ class ElecCharginPointsTest(TestCase):
                     "status": "PENDING",
                     "application_date": data["data"][1]["application_date"],
                     "station_count": 1,
-                    "charging_point_count": 1,
+                    "charge_point_count": 1,
                     "power_total": 40,
                 },
             ],

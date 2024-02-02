@@ -14,7 +14,7 @@ import { useQuery } from "common/hooks/async"
 import useEntity from "carbure/hooks/entity"
 import CompanyInfo from "settings/components/company-info"
 import { useTranslation } from "react-i18next"
-import ElecChargingPointsSettings from "elec/components/charging-points/settings"
+import ElecChargePointsSettings from "elec/components/charge-points/settings"
 import ElecMeterReadingsSettings from "elec/components/meter-readings/settings"
 
 const EntityDetails = () => {
@@ -62,8 +62,8 @@ const EntityDetails = () => {
           },
           !isAirline && { key: "depot", path: "#depot", label: "Depots" },
           isCPO && {
-            path: "#elec-charging-points",
-            key: "elec-charging-points",
+            path: "#elec-charge-points",
+            key: "elec-charge-points",
             label: t("Points de recharge"),
           },
           isCPO && {
@@ -99,7 +99,7 @@ const EntityDetails = () => {
             }
           />
         )}
-        {isCPO && <ElecChargingPointsSettings companyId={companyId} />}
+        {isCPO && <ElecChargePointsSettings companyId={companyId} />}
         {isCPO && <ElecMeterReadingsSettings companyId={companyId} />}
         {!isAirline && <Certificates entity_id={companyId} />}
       </section>

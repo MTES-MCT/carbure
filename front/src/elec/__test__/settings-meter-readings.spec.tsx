@@ -4,10 +4,10 @@ import { Route } from "react-router-dom"
 import { TestRoot, render } from "setupTests"
 
 import { cpo } from "carbure/__test__/data"
-import ElecChargingPointsSettings from "elec/components/charging-points/settings"
+import ElecChargePointsSettings from "elec/components/charge-points/settings"
 import server from "../../settings/__test__/api"
 import userEvent from "@testing-library/user-event"
-import { okChargingPointsApplicationsEmpty, okChargingPointsCheckError, okMeterReadingsApplicationsEmpty, okMeterReadingsCheckError } from "./api"
+import { okChargePointsApplicationsEmpty, okChargePointsCheckError, okMeterReadingsApplicationsEmpty, okMeterReadingsCheckError } from "./api"
 import ElecMeterReadingsSettings from "elec/components/meter-readings/settings"
 
 const SettingsWithHooks = () => {

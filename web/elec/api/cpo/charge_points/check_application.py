@@ -32,7 +32,7 @@ def check_application(request: HttpRequest, entity):
 
     data = {}
     data["file_name"] = excel_file.name
-    data["charging_point_count"] = len(charge_points)
+    data["charge_point_count"] = len(charge_points)
     data["errors"] = []
     data["error_count"] = 0
     data["pending_application_already_exists"] = replaceable_applications.count() > 0
