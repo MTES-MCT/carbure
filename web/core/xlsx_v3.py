@@ -700,7 +700,7 @@ def export_carbure_stock(stocks):
 def make_template_carbure_lots_sheet(workbook, entity):
     worksheet_lots = workbook.add_worksheet("lots")
     psites = ProductionSite.objects.filter(producer=entity)
-    clients = Entity.objects.filter(entity_type__in=[Entity.OPERATOR, Entity.TRADER, Entity.POWER_STATION]).exclude(id=entity.id)
+    clients = Entity.objects.filter(entity_type__in=[Entity.OPERATOR, Entity.TRADER, Entity.POWER_OR_HEAT_PRODUCER]).exclude(id=entity.id)
     delivery_sites = Depot.objects.all()
 
     # header
@@ -750,7 +750,7 @@ def make_template_carbure_lots_sheet(workbook, entity):
 
 def make_template_carbure_stocks_sheet(workbook, entity):
     worksheet_lots = workbook.add_worksheet("lots")
-    clients = Entity.objects.filter(entity_type__in=[Entity.OPERATOR, Entity.TRADER, Entity.POWER_STATION]).exclude(id=entity.id)
+    clients = Entity.objects.filter(entity_type__in=[Entity.OPERATOR, Entity.TRADER, Entity.POWER_OR_HEAT_PRODUCER]).exclude(id=entity.id)
     if clients.count() == 0:
         clients = [Entity(name="")]
     delivery_sites = Depot.objects.all()

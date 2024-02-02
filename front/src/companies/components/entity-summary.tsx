@@ -70,7 +70,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
               EntityType.Auditor,
               EntityType.Airline,
               EntityType.CPO,
-              EntityType.PowerStation
+              EntityType.PowerOrHeatProducer
             ]}
           />
         )}

@@ -85,7 +85,7 @@ export function useLotForm(
     }
 
     // power plants can only set themselves as client, and set the fuel for consumption
-    if (entity.isPowerPlant) {
+    if (entity.isPowerOrHeatProducer) {
       value.client = entity
       value.delivery_type = DeliveryType.Consumption
     }

@@ -70,15 +70,15 @@ export const AddEntityDialog = ({
                   hasAirlineOnly
                     ? [EntityType.Airline]
                     : [
-                      EntityType.Operator,
-                      EntityType.Producer,
-                      EntityType.Trader,
-                      EntityType.Auditor,
-                      EntityType.Airline,
-                      EntityType.ExternalAdmin,
-                      EntityType.CPO,
-                      EntityType.PowerStation
-                    ]
+                        EntityType.Operator,
+                        EntityType.Producer,
+                        EntityType.Trader,
+                        EntityType.Auditor,
+                        EntityType.Airline,
+                        EntityType.ExternalAdmin,
+                        EntityType.CPO,
+                        EntityType.PowerOrHeatProducer,
+                      ]
                 }
                 {...bind("entity_type")}
               />

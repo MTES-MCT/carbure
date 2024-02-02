@@ -90,7 +90,10 @@ const Declarations = () => {
               { key: EntityType.Operator, label: t("Opérateur") },
               { key: EntityType.Producer, label: t("Producteur") },
               { key: EntityType.Trader, label: t("Trader") },
-              { key: EntityType.PowerStation, label: t("Centrale électrique") },
+              {
+                key: EntityType.PowerOrHeatProducer,
+                label: t("Producteur d'électricité ou de chaleur"),
+              },
             ]}
           />
         </Row>
@@ -117,11 +120,11 @@ const Declarations = () => {
           declarations={groupedByEntityType[EntityType.Trader]}
         />
       )}
-      {focus === EntityType.PowerStation && (
+      {focus === EntityType.PowerOrHeatProducer && (
         <DeclarationTable
           period={period!}
           loading={declarations.loading}
-          declarations={groupedByEntityType[EntityType.PowerStation]}
+          declarations={groupedByEntityType[EntityType.PowerOrHeatProducer]}
         />
       )}
     </Panel>
@@ -145,7 +148,10 @@ const DeclarationTable = ({
     return (
       <>
         <section>
-          <NoResult label={t("Aucune déclaration pour cette période")} loading={loading} />
+          <NoResult
+            label={t("Aucune déclaration pour cette période")}
+            loading={loading}
+          />
         </section>
         <footer />
       </>
@@ -231,8 +237,8 @@ function getDeclarationDashboardColumns(period: string) {
               lotCount === 0
                 ? undefined
                 : declaration?.declared
-                  ? "var(--blue-dark)"
-                  : "var(--orange-medium)",
+                ? "var(--blue-dark)"
+                : "var(--orange-medium)",
           }}
         />
       )

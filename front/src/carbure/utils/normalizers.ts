@@ -211,8 +211,8 @@ export function getEntityTypeLabel(type: EntityType) {
       return i18next.t("Compagnie aérienne")
     case EntityType.CPO:
       return i18next.t("Aménageur de bornes électriques")
-    case EntityType.PowerStation:
-      return i18next.t("Centrale électrique")
+    case EntityType.PowerOrHeatProducer:
+      return i18next.t("Producteur d'électricité ou de chaleur")
     case EntityType.Unknown:
     default:
       return i18next.t("Inconnu")
