@@ -1,46 +1,52 @@
-from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
-from core.decorators import check_user_rights
-from core.helpers import (
-    get_lot_comments,
-    get_lot_errors,
-    get_lot_updates,
-)
-from core.helpers import (
-    get_transaction_distance,
-    get_known_certificates,
-)
+from core.carburetypes import CarbureError
+from core.common import ErrorResponse, SuccessResponse
 
-from core.models import (
-    CarbureLot,
-    CarbureStock,
-    Entity,
-)
-from core.serializers import (
-    CarbureLotPublicSerializer,
-    CarbureLotReliabilityScoreSerializer,
-    CarbureStockPublicSerializer,
-)
+from core.decorators import check_user_rights
+from core.helpers import get_lot_comments, get_lot_errors, get_lot_updates
+from core.helpers import get_transaction_distance, get_known_certificates
+from core.models import CarbureLot, CarbureStock, Entity
 from core.traceability import LotNode
+
+from core.serializers import CarbureLotPublicSerializer, CarbureLotReliabilityScoreSerializer, CarbureStockPublicSerializer
+from transactions.serializers.power_heat_lot_serializer import CarbureLotPowerOrHeatSerializer
 
 
 @check_user_rights()
-def get_lot_details(request, *args, **kwargs):
-    context = kwargs["context"]
-    entity_id = int(context["entity_id"])
+def get_lot_details(request, entity, entity_id):
+    entity_id = int(entity_id)
     lot_id = request.GET.get("lot_id", False)
-    if not lot_id:
-        return JsonResponse({"status": "error", "message": "Missing lot_id"}, status=400)
 
-    lot = CarbureLot.objects.get(pk=lot_id)
-    if lot.carbure_client_id != entity_id and lot.carbure_supplier_id != entity_id and lot.added_by_id != entity_id:
-        return JsonResponse({"status": "forbidden", "message": "User not allowed"}, status=403)
+    if not lot_id:
+        return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, {"lot_id": "Missing lot id"})
+
+    lot = CarbureLot.objects.select_related(
+        "added_by",
+        "biofuel",
+        "feedstock",
+        "country_of_origin",
+        "carbure_producer",
+        "carbure_production_site",
+        "production_country",
+        "carbure_supplier",
+        "carbure_vendor",
+        "carbure_client",
+        "carbure_delivery_site",
+        "delivery_site_country",
+    ).get(pk=lot_id)
+
+    if lot.carbure_client != entity and lot.carbure_supplier != entity and lot.added_by != entity:
+        return ErrorResponse(403, CarbureError.ENTITY_NOT_ALLOWED)
 
     is_read_only, disabled_fields = LotNode(lot).get_disabled_fields(entity_id)
 
     data = {}
-    data["lot"] = CarbureLotPublicSerializer(lot).data
-    entity = Entity.objects.get(id=entity_id)
+
+    if entity.entity_type == Entity.POWER_OR_HEAT_PRODUCER:
+        data["lot"] = CarbureLotPowerOrHeatSerializer(lot).data
+    else:
+        data["lot"] = CarbureLotPublicSerializer(lot).data
+
     parents = get_lot_parents(lot, entity)
     children = get_lot_children(lot, entity)
     data.update(parents)
@@ -53,7 +59,7 @@ def get_lot_details(request, *args, **kwargs):
     data["score"] = CarbureLotReliabilityScoreSerializer(lot.carburelotreliabilityscore_set.all(), many=True).data
     data["is_read_only"] = is_read_only
     data["disabled_fields"] = disabled_fields
-    return JsonResponse({"status": "success", "data": data})
+    return SuccessResponse(data)
 
 
 def get_lot_parents(lot, entity):

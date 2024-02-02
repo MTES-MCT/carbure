@@ -67,6 +67,10 @@ export interface Lot {
   highlighted_by_admin?: boolean
   highlighted_by_auditor?: boolean
   data_reliability_score?: string
+  emission_electricity?: number
+  total_reduction_electricity?: number
+  emission_heat?: number
+  total_reduction_heat?: number
 }
 
 export interface LotList {

@@ -2,23 +2,11 @@ from django import forms
 from admin.api.controls.helpers import get_admin_lot_comments
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
-from core.helpers import (
-    get_known_certificates,
-    get_lot_comments,
-    get_lot_errors,
-    get_lot_updates,
-    get_transaction_distance,
-)
+from core.helpers import get_known_certificates, get_lot_comments, get_lot_errors, get_lot_updates, get_transaction_distance
 from core.decorators import check_admin_rights
-from core.models import (
-    CarbureLot,
-    CarbureStock,
-)
-from core.serializers import (
-    CarbureLotAdminSerializer,
-    CarbureLotReliabilityScoreSerializer,
-    CarbureStockPublicSerializer,
-)
+from core.models import CarbureLot, CarbureStock
+from core.serializers import CarbureLotAdminSerializer, CarbureLotReliabilityScoreSerializer, CarbureStockPublicSerializer
+from transactions.serializers.power_heat_lot_serializer import CarbureLotPowerOrHeatProducerAdminSerializer
 
 
 class AdminControlsLotsDetailsForm(forms.Form):
@@ -34,7 +22,7 @@ def get_lot_details(request, entity):
     lot = form.cleaned_data["lot_id"]
 
     data = {}
-    data["lot"] = CarbureLotAdminSerializer(lot).data
+    data["lot"] = CarbureLotPowerOrHeatProducerAdminSerializer(lot).data
     data["parent_lot"] = CarbureLotAdminSerializer(lot.parent_lot).data if lot.parent_lot else None
     data["parent_stock"] = CarbureStockPublicSerializer(lot.parent_stock).data if lot.parent_stock else None
     data["children_lot"] = CarbureLotAdminSerializer(CarbureLot.objects.filter(parent_lot=lot), many=True).data

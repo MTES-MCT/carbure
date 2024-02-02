@@ -7,6 +7,7 @@ import pandas as pd
 
 from core.serializers import CarbureLotCSVSerializer, CarbureStockCSVSerializer
 from core.models import CarbureStock, GenericCertificate, MatierePremiere, Biocarburant, Pays, Depot, Entity, ProductionSite
+from transactions.serializers.power_heat_lot_serializer import CarbureLotPowerOrHeatProducerCSVSerializer
 
 
 UNKNOWN_PRODUCERS = [{'name': 'ITANOL', 'country': 'IT', 'production_site': 'BERGAMO', 'ref': 'ISCC-IT-100001010', 'date':'2017-12-01', 'dc':'IT_001_2020'},
@@ -637,7 +638,10 @@ def make_dc_mps_sheet(workbook):
 
 def make_carbure_lots_sheet(workbook, entity, lots):
     worksheet_lots = workbook.add_worksheet("lots")
-    serializer = CarbureLotCSVSerializer(lots, many=True)
+    if entity.entity_type in [Entity.ADMIN, Entity.POWER_OR_HEAT_PRODUCER]:
+        serializer = CarbureLotPowerOrHeatProducerCSVSerializer(lots, many=True)
+    else:
+        serializer = CarbureLotCSVSerializer(lots, many=True)
     df = pd.DataFrame(serializer.data)
     # header
     bold = workbook.add_format({'bold': True})
@@ -720,10 +724,10 @@ def make_template_carbure_lots_sheet(workbook, entity):
         if psites.count() > 0:
             # CASE 1 my production - simple way
             rows.append(['ajout simple', '', random.choice(psites).name, '', '', '', '', '', '', '', 35400, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), random.choice(clients).name, today, random.choice(delivery_sites).name, '', ''])
-    
+
             # CASE 2 my production - export to unknown client/site
             rows.append(['ajout pour client hors-carbure', '', random.choice(psites).name, '', '', '', '', '', '', '', 36000, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), 'UNKNOWN CLIENT GmbH', today, 'UNKNOWN DEPOT', 'DE', ''])
-            
+
             # CASE 3 my production - custom certificate
             rows.append(['ajout simple et choix du certificat', '', random.choice(psites).name, '', '', '', '', '', 'ISCC-XXXX-XXXX', '', 36500, 'ETH', 'BETTERAVE', 'FR', random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), random.choice(clients).name, today, random.choice(delivery_sites).name, '', ''])
             # CASE 4
