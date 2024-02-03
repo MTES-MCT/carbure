@@ -23,8 +23,6 @@ class ElecChargePointSerializer(serializers.ModelSerializer):
             "nominal_power",
             "cpo_name",
             "cpo_siren",
-            "latitude",
-            "longitude",
         ]
 
     cpo = serializers.SlugRelatedField(read_only=True, slug_field="name")
@@ -36,3 +34,9 @@ class ElecChargePointSerializer(serializers.ModelSerializer):
 
     def get_nominal_power(self, instance):
         return round(instance.nominal_power or 0, 2)
+
+
+class ElecChargePointSampleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ElecChargePoint
+        fields = ["id", "latitude", "longitude", "charge_point_id", "mid_id"]
