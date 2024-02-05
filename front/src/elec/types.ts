@@ -77,7 +77,7 @@ export interface ElecChargePointsApplication {
 
 
 export interface ElecChargePointsApplicationDetails extends ElecChargePointsApplication {
-  email_contact: string
+  email_contacts: string[]
 }
 export interface ElecChargePointsSnapshot {
   station_count: number
