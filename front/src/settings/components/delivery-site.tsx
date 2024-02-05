@@ -60,6 +60,9 @@ const DeliverySitesSettings = ({
     [DepotType.Other]: t("Autre"),
     [DepotType.BiofuelDepot]: t("Biofuel Depot"),
     [DepotType.OilDepot]: t("Oil Depot"),
+    [DepotType.PowerPlant]: t("Centrale électrique"),
+    [DepotType.HeatPlant]: t("Centrale de chaleur"),
+    [DepotType.CogenerationPlant]: t("Centrale de cogénération"),
   }
 
   function findDeliverySite() {
@@ -182,6 +185,9 @@ export const DeliverySiteDialog = ({
     { value: DepotType.Other, label: t("Autre") },
     { value: DepotType.BiofuelDepot, label: t("Biofuel Depot") },
     { value: DepotType.OilDepot, label: t("Oil Depot") },
+    { value: DepotType.PowerPlant, label: t("Centrale électrique") },
+    { value: DepotType.HeatPlant, label: t("Centrale de chaleur") },
+    { value: DepotType.CogenerationPlant, label: t("Centrale de cogénération") }, // prettier-ignore
   ]
 
   const ownerShipTypes = [
