@@ -1,7 +1,7 @@
 import traceback
 from django.db.models import QuerySet
 from core.models import CarbureLot, GenericError
-from .helpers import enrich_lot, get_prefetched_data
+from .helpers import get_prefetched_data
 from .mandatory import *
 from .ghg import *
 from .general import *
@@ -73,7 +73,7 @@ def sanity_checks(lot: CarbureLot, prefetched_data) -> list[GenericError]:
 
 def bulk_sanity_checks(lots, prefetched_data=None, dry_run=False):
     if isinstance(lots, QuerySet):
-        lots = enrich_lot(lots)
+        lots = annotate_lots(lots)
 
     if prefetched_data is None:
         prefetched_data = get_prefetched_data()
@@ -100,8 +100,10 @@ def bulk_sanity_checks(lots, prefetched_data=None, dry_run=False):
 def bulk_scoring(lots, prefetched_data=None):
     if not prefetched_data:
         prefetched_data = get_prefetched_data()
+
     if isinstance(lots, QuerySet):
-        lots = enrich_lot(lots)
+        lots = annotate_lots(lots)
+
     # delete scoring entries for the lots
     lotids = [l.id for l in lots]
     CarbureLotReliabilityScore.objects.filter(lot_id__in=lotids).delete()
@@ -114,3 +116,34 @@ def bulk_scoring(lots, prefetched_data=None):
             clrs += clrs_entries
         CarbureLot.objects.bulk_update(lots, ["data_reliability_score"])
         CarbureLotReliabilityScore.objects.bulk_create(clrs)
+
+
+def annotate_lots(lots: QuerySet[CarbureLot]):
+    return lots.select_related(
+        "carbure_producer",
+        "carbure_supplier",
+        "carbure_client",
+        "added_by",
+        "carbure_production_site",
+        "carbure_production_site__producer",
+        "carbure_production_site__country",
+        "production_country",
+        "carbure_dispatch_site",
+        "carbure_dispatch_site__country",
+        "dispatch_site_country",
+        "carbure_delivery_site",
+        "carbure_delivery_site__country",
+        "delivery_site_country",
+        "feedstock",
+        "biofuel",
+        "country_of_origin",
+        "parent_lot",
+        "parent_stock",
+        "parent_stock__carbure_client",
+        "parent_stock__carbure_supplier",
+        "parent_stock__feedstock",
+        "parent_stock__biofuel",
+        "parent_stock__depot",
+        "parent_stock__country_of_origin",
+        "parent_stock__production_country",
+    ).prefetch_related("genericerror_set", "carbure_production_site__productionsitecertificate_set")
