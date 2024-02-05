@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import cl from "clsx"
 import Button from "./button"
@@ -83,10 +83,10 @@ export const NumberInput = ({
       !onChange
         ? undefined
         : (e) => {
-          const value = parseFloat(e.target.value)
-          const change = isNaN(value) ? undefined : value
-          onChange(change)
-        }
+            const value = parseFloat(e.target.value)
+            const change = isNaN(value) ? undefined : value
+            onChange(change)
+          }
     }
   />
 )
@@ -534,4 +534,8 @@ export const Field = ({
 
 function isInteractive(type: string | undefined) {
   return type === "button" || type === "file"
+}
+
+export function BlankField() {
+  return <div className={css.blankField} />
 }

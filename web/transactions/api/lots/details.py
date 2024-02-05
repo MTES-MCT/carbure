@@ -9,7 +9,7 @@ from core.models import CarbureLot, CarbureStock, Entity
 from core.traceability import LotNode
 
 from core.serializers import CarbureLotPublicSerializer, CarbureLotReliabilityScoreSerializer, CarbureStockPublicSerializer
-from transactions.serializers.power_heat_lot_serializer import CarbureLotPowerOrHeatSerializer
+from transactions.serializers.power_heat_lot_serializer import CarbureLotPowerOrHeatProducerPublicSerializer
 
 
 @check_user_rights()
@@ -43,7 +43,7 @@ def get_lot_details(request, entity, entity_id):
     data = {}
 
     if entity.entity_type == Entity.POWER_OR_HEAT_PRODUCER:
-        data["lot"] = CarbureLotPowerOrHeatSerializer(lot).data
+        data["lot"] = CarbureLotPowerOrHeatProducerPublicSerializer(lot).data
     else:
         data["lot"] = CarbureLotPublicSerializer(lot).data
 

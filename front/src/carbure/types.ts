@@ -204,6 +204,9 @@ export enum DepotType {
   Other = "OTHER",
   BiofuelDepot = "BIOFUEL DEPOT",
   OilDepot = "OIL DEPOT",
+  PowerPlant = "POWER PLANT",
+  HeatPlant = "HEAT PLANT",
+  CogenerationPlant = "COGENERATION PLANT",
 }
 
 export enum OwnershipType {
