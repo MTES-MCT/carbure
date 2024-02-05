@@ -34,13 +34,13 @@ class ElecChargePointApplicationSerializer(serializers.ModelSerializer):
 
 
 class ElecChargePointApplicationDetailsSerializer(ElecChargePointApplicationSerializer):
-    email_contact = serializers.SerializerMethodField()
+    email_contacts = serializers.SerializerMethodField()
 
     class Meta:
         model = ElecChargePointApplication
-        fields = ElecChargePointApplicationSerializer.Meta.fields + ["email_contact"]
+        fields = ElecChargePointApplicationSerializer.Meta.fields + ["email_contacts"]
 
-    def get_email_contact(self, instance):
+    def get_email_contacts(self, instance):
         user_model = get_user_model()
         users = user_model.objects.filter(userrights__entity__id=instance.cpo.id, userrights__role="ADMIN")
-        return users.first().email if users.exists() else None
+        return [u.email for u in users]
