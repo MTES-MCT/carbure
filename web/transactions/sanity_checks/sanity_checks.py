@@ -1,7 +1,7 @@
 import traceback
-
+from django.db.models import QuerySet
 from core.models import CarbureLot, GenericError
-from .helpers import get_prefetched_data
+from .helpers import enrich_lot, get_prefetched_data
 from .mandatory import *
 from .ghg import *
 from .general import *
@@ -72,6 +72,9 @@ def sanity_checks(lot: CarbureLot, prefetched_data) -> list[GenericError]:
 
 
 def bulk_sanity_checks(lots, prefetched_data=None, dry_run=False):
+    if isinstance(lots, QuerySet):
+        lots = enrich_lot(lots)
+
     if prefetched_data is None:
         prefetched_data = get_prefetched_data()
 
@@ -97,6 +100,8 @@ def bulk_sanity_checks(lots, prefetched_data=None, dry_run=False):
 def bulk_scoring(lots, prefetched_data=None):
     if not prefetched_data:
         prefetched_data = get_prefetched_data()
+    if isinstance(lots, QuerySet):
+        lots = enrich_lot(lots)
     # delete scoring entries for the lots
     lotids = [l.id for l in lots]
     CarbureLotReliabilityScore.objects.filter(lot_id__in=lotids).delete()
