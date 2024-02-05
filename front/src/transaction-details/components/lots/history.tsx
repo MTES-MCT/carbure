@@ -30,6 +30,12 @@ export const LotHistory = ({ changes }: HistoryProps) => {
             cell: (c) => <Cell text={formatDateTime(c.date)} />,
           },
           {
+            key: "action",
+            header: t("Action"),
+            orderBy: (c) => c.action,
+            cell: (c) => <Cell text={c.action} />,
+          },
+          {
             key: "label",
             header: t("Champ modifié"),
             orderBy: (c) => c.label,
@@ -73,6 +79,8 @@ const FieldChange = ({ change }: { change: LotChange }) => {
 }
 
 export interface LotChange {
+  type: string
+  action: string
   user: string
   date: string
   field: string
@@ -81,45 +89,68 @@ export interface LotChange {
   valueAfter: string
 }
 
-function isUpdate(e: LotUpdate<any>) {
-  return e.event_type === "UPDATED" || e.event_type === "UPDATED_BY_ADMIN"
-}
-
 export function getLotChanges(updates: LotUpdate<any>[] = []): LotChange[] {
   return (
     updates
-      // only show updates in the history
-      .filter(isUpdate)
       // flatten the updates so we have one row per change
       .flatMap((u) => {
-        if ("field" in u.metadata) {
+        if (u.event_type === "UPDATED") {
+          // retrocompatibility with old metadata model
+          if ("field" in u.metadata) {
+            console.log(u.metadata.field)
+            return {
+              type: "UPDATED",
+              action: getEventTypeLabel(u.event_type),
+              field: u.metadata.field,
+              label: i18next.t(u.metadata.field, { ns: "fields" }),
+              valueBefore: u.metadata.value_before,
+              valueAfter: u.metadata.value_after,
+              user: u.user,
+              date: u.event_dt,
+            }
+          } else if ("changed" in u.metadata) {
+            return (u.metadata as LotFieldUpdate).changed.map(
+              ([field, valueBefore, valueAfter]) => ({
+                type: "UPDATED",
+                action: getEventTypeLabel(u.event_type),
+                field,
+                user: u.user,
+                date: u.event_dt,
+                label: i18next.t(field.replace(/_id$/, ""), { ns: "fields" }),
+                valueBefore: getFieldValue(valueBefore),
+                valueAfter: getFieldValue(valueAfter),
+              })
+            )
+          }
+        } else {
           return {
-            field: u.metadata.field,
-            label: i18next.t(u.metadata.field, { ns: "fields" }),
-            valueBefore: u.metadata.value_before,
-            valueAfter: u.metadata.value_after,
+            type: u.event_type,
+            action: getEventTypeLabel(u.event_type),
+            label: "",
+            field: "",
+            valueBefore: "",
+            valueAfter: "",
             user: u.user,
             date: u.event_dt,
           }
-        } else if ("changed" in u.metadata) {
-          return (u.metadata as LotFieldUpdate).changed.map(
-            ([field, valueBefore, valueAfter]) => ({
-              field,
-              user: u.user,
-              date: u.event_dt,
-              label: i18next.t(field.replace(/_id$/, ""), { ns: "fields" }),
-              valueBefore: getFieldValue(valueBefore),
-              valueAfter: getFieldValue(valueAfter),
-            })
-          )
-        } else {
-          return []
         }
+
+        return []
       })
-      // remove updates with fields that are not translated
-      .filter((u) => u.label !== u.field)
-      // remove updates that show no change
-      .filter((u) => u.valueBefore !== u.valueAfter)
+      .filter((u) => {
+        // always show non-update specific events
+        if (u.type === "UPDATED") {
+          // remove updates with fields that are not translated
+          if (u.label === u.field) return false
+          // remove updates that show no change
+          if (u.valueBefore === u.valueAfter) return false
+        } else {
+          // only show actions that have a translation
+          return u.action !== undefined
+        }
+
+        return true
+      })
   )
 }
 
@@ -131,4 +162,27 @@ function getFieldValue(value: any) {
   } else {
     return ""
   }
+}
+
+function getEventTypeLabel(type: string) {
+  const matches: Record<string, string> = {
+    CREATED: i18next.t("Création"),
+    UPDATED: i18next.t("Modification"),
+    UPDATED_BY_ADMIN: i18next.t("Modification par l'administration"),
+    VALIDATED: i18next.t("Envoi"),
+    // FIX_REQUESTED: i18next.t("Demande de correction"),
+    // MARKED_AS_FIXED: i18next.t("Proposition de correction"),
+    // FIX_ACCEPTED: i18next.t("Validation de correction"),
+    ACCEPTED: i18next.t("Acceptation"),
+    REJECTED: i18next.t("Refus"),
+    // RECALLED: i18next.t("Demande de correction"),
+    // DECLARED: i18next.t("Déclaration"),
+    // DECLCANCEL: i18next.t("Annulation de déclaration"),
+    DELETED: i18next.t("Suppression"),
+    DELETED_BY_ADMIN: i18next.t("Suppression par l'administration"),
+    // RESTORED: i18next.t(""),
+    // CANCELLED: i18next.t("Renvoi en boite de réception"),
+  }
+
+  return matches[type]
 }

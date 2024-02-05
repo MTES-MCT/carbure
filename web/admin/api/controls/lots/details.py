@@ -30,7 +30,7 @@ def get_lot_details(request, entity):
     data["distance"] = get_transaction_distance(lot)
     data["errors"] = get_lot_errors(lot, entity)
     data["certificates"] = get_known_certificates(lot)
-    data["updates"] = get_lot_updates(lot)
+    data["updates"] = get_lot_updates(lot, entity)
     data["comments"] = get_lot_comments(lot)
     data["control_comments"] = get_admin_lot_comments(lot)
     data["score"] = CarbureLotReliabilityScoreSerializer(lot.carburelotreliabilityscore_set.all(), many=True).data
