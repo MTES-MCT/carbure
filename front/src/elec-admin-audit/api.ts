@@ -1,6 +1,6 @@
 import { api, Api, download } from "common/services/api"
-import { ElecChargePointsApplication, ElecChargePointsApplicationDetails } from "elec/types"
-import { ElecAdminAuditFilter, ElecAdminAuditQuery, ElecAdminAuditSnapshot, ElecChargePointsApplicationsData } from "./types"
+import { ElecChargePointsApplication, ElecChargePointsApplicationDetails, ElecMeterReadingsApplicationDetails } from "elec/types"
+import { ElecAdminAuditFilter, ElecAdminAuditQuery, ElecAdminAuditSnapshot, ElecChargePointsApplicationsData, ElecMeterReadingsApplicationsData } from "./types"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/elec/admin/audit/years", {
@@ -13,6 +13,7 @@ export function getChargePointDetails(entity_id: number, charge_point_id: number
   })
 }
 
+// AUDIT
 export function getSnapshot(entity_id: number, year: number) {
   return api.get<Api<ElecAdminAuditSnapshot>>("/elec/admin/audit/snapshot", {
     params: { entity_id, year },
@@ -20,6 +21,7 @@ export function getSnapshot(entity_id: number, year: number) {
 }
 
 
+//CHARGE POINT
 export function getChargePointsApplications(query: ElecAdminAuditQuery) {
   return api.get<Api<ElecChargePointsApplicationsData>>("/elec/admin/audit/charge-points/applications", {
     params: query,
@@ -72,6 +74,60 @@ export function acceptChargePointsApplication(entityId: number, applicationId: n
 
 export function rejectChargePointsApplication(entityId: number, applicationId: number, forceRejection: boolean) {
   return api.post("/elec/admin/audit/charge-points/reject-application", {
+    entity_id: entityId,
+    application_id: applicationId,
+    force_rejection: forceRejection
+  })
+}
+
+
+//METER READINGS
+export function getMeterReadingsApplications(query: ElecAdminAuditQuery) {
+  return api.get<Api<ElecMeterReadingsApplicationsData>>("/elec/admin/audit/meter-readings/applications", {
+    params: query,
+  })
+}
+
+
+export async function getElecAdminAuditMeterReadingsApplicationsFilters(field: ElecAdminAuditFilter, query: ElecAdminAuditQuery) {
+  const params = { filter: field, ...query, ...QUERY_RESET }
+  const result = await api
+    .get<Api<string[]>>("/elec/admin/audit/meter-readings/filters", { params })
+    .then((res) => res.data.data ?? [])
+  return result
+}
+
+
+export function getMeterReadingsApplicationDetails(entityId: number, applicationId: number) {
+  return api.get<Api<ElecMeterReadingsApplicationDetails>>("/elec/admin/audit/meter-readings/application-details", {
+    params: { entity_id: entityId, application_id: applicationId },
+  })
+}
+
+export function downloadMeterReadingsApplication(entityId: number, applicationId: number, sample: boolean = false) {
+  return download("/elec/admin/audit/meter-readings/application-details", { entity_id: entityId, application_id: applicationId, export: true, sample: sample })
+}
+
+
+
+export function startMeterReadingsApplicationAudit(entityId: number, applicationId: number) {
+  return api.post("/elec/admin/audit/meter-readings/start-audit", {
+    entity_id: entityId,
+    application_id: applicationId,
+  })
+}
+
+export function acceptMeterReadingsApplication(entityId: number, applicationId: number, forceValidation: boolean) {
+  return api.post("/elec/admin/audit/meter-readings/accept-application", {
+    entity_id: entityId,
+    application_id: applicationId,
+    force_validation: forceValidation
+  })
+}
+
+
+export function rejectMeterReadingsApplication(entityId: number, applicationId: number, forceRejection: boolean) {
+  return api.post("/elec/admin/audit/meter-readings/reject-application", {
     entity_id: entityId,
     application_id: applicationId,
     force_rejection: forceRejection

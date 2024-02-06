@@ -6,8 +6,8 @@ import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import { formatDate } from "common/utils/formatters"
 import * as api from "../../api"
-import ApplicationStatus from "elec/components/charge-points/application-status"
-import { ElecChargePointsApplication, ElecChargePointsApplicationStatus } from "elec/types"
+import ApplicationStatus from "elec/components/application-status"
+import { ElecChargePointsApplication, ElecAuditApplicationStatus } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 export type ApplicationDialogProps = {
   application: ElecChargePointsApplication

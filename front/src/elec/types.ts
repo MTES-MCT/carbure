@@ -57,7 +57,7 @@ export interface ElecTransferCertificatesDetails
 export interface ElecProvisionCertificatesDetails
   extends ElecProvisionCertificatePreview { }
 
-export enum ElecChargePointsApplicationStatus {
+export enum ElecAuditApplicationStatus {
   Pending = "PENDING",
   Accepted = "ACCEPTED",
   Rejected = "REJECTED",
@@ -72,13 +72,14 @@ export interface ElecChargePointsApplication {
   power_total: number
   application_date: string
   validation_date?: string
-  status: ElecChargePointsApplicationStatus
+  status: ElecAuditApplicationStatus
 }
 
 
 export interface ElecChargePointsApplicationDetails extends ElecChargePointsApplication {
   email_contacts: string[]
 }
+
 export interface ElecChargePointsSnapshot {
   station_count: number
   charge_point_count: number
@@ -101,12 +102,10 @@ export interface ChargePointsApplicationError {
 
 // METER READINGS
 
-export enum ElecMeterReadingsApplicationStatus {
-  Pending = "PENDING",
-  Accepted = "ACCEPTED",
-  Rejected = "REJECTED",
-}
 
+export interface ElecMeterReadingsApplicationDetails extends ElecMeterReadingsApplication {
+  email_contacts: string[]
+}
 export interface ElecMeterReadingsApplication {
   id: number
   cpo: EntityPreview
@@ -117,7 +116,7 @@ export interface ElecMeterReadingsApplication {
   quarter: number
   application_date: string
   validation_date?: string
-  status: ElecMeterReadingsApplicationStatus
+  status: ElecAuditApplicationStatus
 }
 
 export interface ElecMeterReadingsApplicationCheckInfo {

@@ -1,28 +1,25 @@
-import { EntityManager } from "carbure/hooks/entity"
 import Button from "common/components/button"
-import { Check, Cross, Download } from "common/components/icons"
-import { usePortal } from "common/components/portal"
+import { Download } from "common/components/icons"
 import Table, { Cell, actionColumn } from "common/components/table"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import ApplicationStatus from "elec/components/application-status"
-import { ElecChargePointsApplication, ElecAuditApplicationStatus } from "elec/types"
+import { ElecMeterReadingsApplication } from "elec/types"
 import { useTranslation } from "react-i18next"
-// import { elecChargePointsApplications } from "elec/__test__/data"
 import { compact } from "common/utils/collection"
 
 import { To } from "react-router-dom"
 
-interface ChargePointsApplicationsTableProps {
-  applications: ElecChargePointsApplication[];
-  onDownloadChargePointsApplication: (application: ElecChargePointsApplication) => void;
-  rowLink?: (row: ElecChargePointsApplication) => To
+interface MeterReadingsApplicationsTableProps {
+  applications: ElecMeterReadingsApplication[];
+  onDownloadMeterReadingsApplication: (application: ElecMeterReadingsApplication) => void;
+  rowLink?: (row: ElecMeterReadingsApplication) => To
   loading?: boolean;
   displayCpo?: boolean;
 }
 
-const ChargePointsApplicationsTable: React.FC<ChargePointsApplicationsTableProps> = ({
+const MeterReadingsApplicationsTable: React.FC<MeterReadingsApplicationsTableProps> = ({
   applications,
-  onDownloadChargePointsApplication,
+  onDownloadMeterReadingsApplication,
   rowLink,
   loading,
   displayCpo = false
@@ -41,10 +38,14 @@ const ChargePointsApplicationsTable: React.FC<ChargePointsApplicationsTableProps
           cell: (application) => <ApplicationStatus status={application.status} />,
         },
         {
-          header: t("Date d'ajout"),
+          header: t("Période"),
           cell: (application) => (
             <Cell
-              text={`${formatDate(application.application_date)}`}
+              text={t("T{{quarter}} {{year}}", {
+                quarter: application.quarter,
+                year: application.year,
+              })}
+
             />
           ),
         },
@@ -65,28 +66,29 @@ const ChargePointsApplicationsTable: React.FC<ChargePointsApplicationsTableProps
           ),
         },
         {
-          header: t("Puissance cumulée"),
+          header: t("kwh renouvelables"),
           cell: (application) => (
             <Cell
-              text={`${formatNumber(Math.round(application.power_total))}` + " kW"}
+              text={`${formatNumber(Math.round(application.energy_total))}` + " kWh"}
             />
           ),
         },
-        actionColumn<ElecChargePointsApplication>((application) =>
+        actionColumn<ElecMeterReadingsApplication>((application) =>
           compact([
+
             <Button
               captive
               variant="icon"
               icon={Download}
-              title={t("Exporter les points de recharge")}
-              action={() => onDownloadChargePointsApplication(application)}
-            />,
-
+              title={t("Exporter les relevés trimestriels")}
+              action={() => onDownloadMeterReadingsApplication(application)}
+            />
           ])
         ),
+
       ])}
     />
   );
 };
 
-export default ChargePointsApplicationsTable;
+export default MeterReadingsApplicationsTable;
