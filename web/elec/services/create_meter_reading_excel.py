@@ -14,7 +14,13 @@ class MeterReadingData(TypedDict):
     reading_date: date
 
 
-def create_meter_readings_excel(name: str, quarter: int, year: int, meter_readings_data: list[MeterReadingData]):
+def create_meter_readings_excel(
+    name: str,
+    quarter: int,
+    year: int,
+    meter_readings_data: list[MeterReadingData],
+    extended=False,
+):
     workbook = Workbook()
     sheet = workbook.active
     last_day = (date(year, quarter * 3, 1) + timedelta(days=31)).replace(day=1)
@@ -25,11 +31,13 @@ def create_meter_readings_excel(name: str, quarter: int, year: int, meter_readin
     sheet["B1"] = "Energie active totale soutirée lors du relevé précédent"
     sheet["C1"] = "Energie active totale soutirée au " + last_day.strftime("%d/%m/%Y")
     sheet["D1"] = "Date du relevé"
-    sheet["E1"] = "Electricité consommée sur la période"
-    sheet["F1"] = "Electricité renouvelable consommée sur la période"
 
-    sheet["H1"] = "Part renouvelable de l'électricité sur la période"
-    sheet["H2"] = "24,92%"
+    if extended:
+        sheet["E1"] = "Electricité consommée sur la période"
+        sheet["F1"] = "Electricité renouvelable consommée sur la période"
+
+        sheet["H1"] = "Part renouvelable de l'électricité sur la période"
+        sheet["H2"] = "24,92%"
 
     # BODY
 
@@ -43,8 +51,10 @@ def create_meter_readings_excel(name: str, quarter: int, year: int, meter_readin
         sheet[f"B{i}"] = reading["previous_reading"]
         sheet[f"C{i}"] = reading.get("current_reading") or ""
         sheet[f"D{i}"] = reading_date.strftime("%d/%m/%Y") if reading_date else ""
-        sheet[f"E{i}"] = f"=IF(ISBLANK(C{i}), 0, C{i} - B{i})"
-        sheet[f"F{i}"] = f"=IF(ISBLANK(E{i}), 0, ROUND(E{i} * {renewable_part}, 2))"
+
+        if extended:
+            sheet[f"E{i}"] = f"=IF(ISBLANK(C{i}), 0, C{i} - B{i})"
+            sheet[f"F{i}"] = f"=IF(ISBLANK(E{i}), 0, ROUND(E{i} * {renewable_part}, 2))"
 
     # FOOTER
 
@@ -52,13 +62,16 @@ def create_meter_readings_excel(name: str, quarter: int, year: int, meter_readin
     total_row = last_reading_row + 2
     sheet[f"A{total_row}"] = "Total"
     sheet[f"C{total_row}"] = f"=SUM(C2:C{total_row - 1})"
-    sheet[f"E{total_row}"] = f"=SUM(E2:E{total_row - 1})"
-    sheet[f"F{total_row}"] = f"=SUM(F2:F{total_row - 1})"
 
-    sheet[f"A{total_row + 2}"] = "Stations:"
     last_row = total_row + 2 + len(stations)
-    for i, station in enumerate(stations, 1):
-        sheet[f"A{total_row + 2 + i}"] = station
+
+    if extended:
+        sheet[f"E{total_row}"] = f"=SUM(E2:E{total_row - 1})"
+        sheet[f"F{total_row}"] = f"=SUM(F2:F{total_row - 1})"
+
+        sheet[f"A{total_row + 2}"] = "Stations:"
+        for i, station in enumerate(stations, 1):
+            sheet[f"A{total_row + 2 + i}"] = station
 
     # STYLING
 
@@ -95,10 +108,12 @@ def create_meter_readings_excel(name: str, quarter: int, year: int, meter_readin
     sheet[total_row][0].font = bold
     sheet[total_row][2].font = bold
     sheet[total_row][3].font = bold
-    sheet[total_row][4].font = bold
 
-    # station header in bold
-    sheet[f"A{total_row + 2}"].font = bold
+    if extended:
+        sheet[total_row][4].font = bold
+
+        # station header in bold
+        sheet[f"A{total_row + 2}"].font = bold
 
     file_path = f"/tmp/{name}.xlsx"
     workbook.save(file_path)

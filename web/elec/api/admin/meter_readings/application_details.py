@@ -39,7 +39,7 @@ def get_application_details(request):
 
     if "export" in request.GET:
         file_name = f"meter_readings_{company.slugify()}_Q{application.quarter}_{application.year}"
-        excel_file = create_meter_readings_excel(file_name, application.quarter, application.year, meter_readings_data)
+        excel_file = create_meter_readings_excel(file_name, application.quarter, application.year, meter_readings_data, extended=True)  # fmt:skip
         return ExcelResponse(excel_file)
 
     return SuccessResponse(meter_readings_data)
