@@ -4,56 +4,57 @@ import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
+import { elecAdminMeterReadingsApplicationsList } from "elec-admin-audit/__test__/data"
 import { ElecAdminAuditFilter, ElecAdminAuditSnapshot, ElecAdminAuditStatus } from "elec-admin-audit/types"
-import ChargePointsApplicationsTable from "elec/components/charge-points/table"
-import { ElecChargePointsApplication } from "elec/types"
+import MeterReadingsApplicationsTable from "elec/components/meter-readings/table"
+import { ElecMeterReadingsApplication } from "elec/types"
 import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
 import * as api from "../../../elec-admin-audit/api"
-import ChargingPointsApplicationDetailsDialog from "./details"
+import { StatusSwitcher } from "../status-switcher"
+import { MeterReadingsApplicationDetailsDialog } from "./details"
 import ElecAdminAuditFilters from "../list-filters"
 import { useElectAdminAuditQuery } from "./list-query"
-import { useElecAdminAuditChargePointsQueryParamsStore } from "./list-query-params-store"
-import { StatusSwitcher } from "../status-switcher"
+import { useElecAdminAuditMeterReadingsQueryParamsStore } from "./list-query-params-store"
 
 type TransferListProps = {
   snapshot: ElecAdminAuditSnapshot
   year: number
 }
 
-const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => {
+const MeterReadingsApplicationsList = ({ snapshot, year }: TransferListProps) => {
 
   const entity = useEntity()
   const status = useAutoStatus()
   const { t } = useTranslation()
   const location = useLocation()
 
-  const [state, actions] = useElecAdminAuditChargePointsQueryParamsStore(entity, year, status, snapshot)
+  const [state, actions] = useElecAdminAuditMeterReadingsQueryParamsStore(entity, year, status, snapshot)
   const query = useElectAdminAuditQuery(state)
-  const chargePointsApplicationsResponse = useQuery(api.getChargePointsApplications, {
-    key: "audit-charge-points-applications",
+  const meterReadingsApplicationsResponse = useQuery(api.getMeterReadingsApplications, {
+    key: "audit-meter-readings-applications",
     params: [query],
   })
 
-  const showChargePointsApplicationDetails = (chargePointApplication: ElecChargePointsApplication) => {
+  const showMeterReadingsApplicationDetails = (meterReadingApplication: ElecMeterReadingsApplication) => {
     return {
       pathname: location.pathname,
       search: location.search,
-      hash: `application/${chargePointApplication.id}`,
+      hash: `application/${meterReadingApplication.id}`,
     }
 
   }
 
-  const downloadChargePointsApplication = (chargePointApplication: ElecChargePointsApplication) => {
-    api.downloadChargePointsApplication(entity.id, chargePointApplication.id)
+  const downloadMeterReadingsApplication = (meterReadingApplication: ElecMeterReadingsApplication) => {
+    api.downloadMeterReadingsApplication(entity.id, meterReadingApplication.id)
   }
 
 
-  // const chargePointsApplicationsData = elecAdminChargePointsApplicationsList
-  const chargePointsApplicationsData = chargePointsApplicationsResponse.result?.data.data
+  const meterReadingsApplicationsData = elecAdminMeterReadingsApplicationsList
+  // const meterReadingsApplicationsData = meterReadingsApplicationsResponse.result?.data.data
 
-  const total = chargePointsApplicationsData?.total ?? 0
-  const count = chargePointsApplicationsData?.returned ?? 0
+  const total = meterReadingsApplicationsData?.total ?? 0
+  const count = meterReadingsApplicationsData?.returned ?? 0
   return (
     <>
 
@@ -63,7 +64,7 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={(filter) =>
-            api.getElecAdminAuditChargePointsApplicationsFilters(filter, query)
+            api.getElecAdminAuditMeterReadingsApplicationsFilters(filter, query)
           }
         />
       </Bar>
@@ -80,13 +81,13 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
 
         </ActionBar>
 
-        {count > 0 && chargePointsApplicationsData ? (
+        {count > 0 && meterReadingsApplicationsData ? (
           <>
-            <ChargePointsApplicationsTable
-              loading={chargePointsApplicationsResponse.loading}
-              applications={chargePointsApplicationsData.charge_points_applications}
-              onDownloadChargePointsApplication={downloadChargePointsApplication}
-              rowLink={showChargePointsApplicationDetails}
+            <MeterReadingsApplicationsTable
+              loading={meterReadingsApplicationsResponse.loading}
+              applications={meterReadingsApplicationsData.meter_readings_applications}
+              onDownloadMeterReadingsApplication={downloadMeterReadingsApplication}
+              rowLink={showMeterReadingsApplicationDetails}
               displayCpo={true}
             />
 
@@ -102,21 +103,22 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
           </>
         ) : (
           <NoResult
-            loading={chargePointsApplicationsResponse.loading}
+            loading={meterReadingsApplicationsResponse.loading}
           />
         )}
       </section >
 
 
-      <HashRoute path="application/:id" element={<ChargingPointsApplicationDetailsDialog />} />
+      <HashRoute path="application/:id" element={<MeterReadingsApplicationDetailsDialog />} />
     </>
   )
 }
-export default ChargePointsApplicationsList
+export default MeterReadingsApplicationsList
 
 
 const FILTERS = [
   ElecAdminAuditFilter.Cpo,
+  ElecAdminAuditFilter.Period
 ]
 
 
