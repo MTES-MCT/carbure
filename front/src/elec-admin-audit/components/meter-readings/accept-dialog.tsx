@@ -5,20 +5,22 @@ import { Check, Return } from "common/components/icons"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import { formatDate } from "common/utils/formatters"
-import * as api from "elec-admin/api"
-import ApplicationStatus from "elec/components/meter-readings/application-status"
-import { ElecMeterReadingsApplication, ElecMeterReadingsApplicationStatus } from "elec/types"
+import ApplicationStatus from "elec/components/application-status"
+import { ElecMeterReadingsApplication } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
+import * as api from "../../api"
 export type ApplicationDialogProps = {
   application: ElecMeterReadingsApplication
-  onClose: () => void
-  companyId: number
+  onClose: () => void,
+  onValidated: () => void,
+  forceValidation: boolean
 }
 
 export const MeterReadingsApplicationAcceptDialog = ({
   application,
   onClose,
-  companyId,
+  onValidated,
+  forceValidation
 }: ApplicationDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -26,30 +28,29 @@ export const MeterReadingsApplicationAcceptDialog = ({
   const notifyError = useNotifyError()
 
   const acceptMeterReadingsApplication = useMutation(api.acceptMeterReadingsApplication, {
-    invalidates: ["meter-readings-applications"],
+    invalidates: ["audit-meter-readings-applications", "elec-admin-audit-snapshot"],
     onSuccess() {
       onClose()
-      notify(t("Les {{count}} relevés de points de recharge ont été acceptés !", { count: application.charge_point_count }), { variant: "success" })
+      onValidated()
+      notify(t("Les relevés T{{quarter}} {{year}} ont été acceptés !", { quarter: application.quarter, year: application.year }), { variant: "success" })
 
     },
     onError(err) {
-      notifyError(err, t("Impossible d'accepter les relevés de points de recharge"))
+      notifyError(err, t("Impossible d'accepter les relevés des points de recharge"))
     },
   })
 
 
-  const acceptApplication = () => {
-    acceptMeterReadingsApplication.execute(entity.id, companyId, application.id)
+  const acceptApplication = (forceValidation: boolean) => {
+    acceptMeterReadingsApplication.execute(entity.id, application.id, forceValidation)
   }
-
-  const quarterString = t("T{{quarter}} {{year}}", { quarter: application.quarter, year: application.year })
 
   return (
     <Dialog onClose={onClose}>
       <header>
         <ApplicationStatus status={application.status} big />
 
-        <h1>{t("Accepter les points de recharge")}</h1>
+        <h1>{t("Accepter les relevés")}</h1>
       </header>
 
       <main>
@@ -58,26 +59,26 @@ export const MeterReadingsApplicationAcceptDialog = ({
           <p style={{ textAlign: 'left' }}>
             <Trans
               values={{
-                applicationDate: formatDate(application.application_date),
-                quarterString: quarterString
+                quarter: application.quarter,
+                year: application.year,
               }}
               count={application.charge_point_count}
-
-              defaults="<b>{{count}}</b> relevés de points de recharge importés le <b>{{applicationDate}}</b> pour le {{quarterString}}." />
+              defaults="<b>{{count}}</b> relevés pour T{{quarter}} {{year}}.</b>  ." />
           </p>
           <p>
-            <Trans>Voulez-vous accepter ces relevés trimestriels ?</Trans>
+            <Trans>Voulez-vous accepter cette demande ?</Trans>
           </p>
         </section>
       </main>
 
       <footer>
 
-        {application.status === ElecMeterReadingsApplicationStatus.Pending && (
-          <>
-            <Button icon={Check} label={t("Accepter")} variant="success" action={acceptApplication} loading={acceptMeterReadingsApplication.loading} />
-          </>
-        )}
+
+
+        <Button icon={Check} label={forceValidation ? t("Accepter les relevés sans audit") : t("Accepter les relevés")} variant="success" action={() => acceptApplication(forceValidation)} loading={acceptMeterReadingsApplication.loading} />
+
+
+
         <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
       </footer>
 
