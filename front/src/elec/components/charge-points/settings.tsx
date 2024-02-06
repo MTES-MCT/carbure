@@ -8,9 +8,9 @@ import Table, { Cell, actionColumn } from "common/components/table"
 import { useQuery } from "common/hooks/async"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import * as apiAdmin from "elec-admin/api"
-import ApplicationStatus from "elec/components/charge-points/application-status"
+import ApplicationStatus from "elec/components/application-status"
 import ElecChargePointsFileUpload from "elec/components/charge-points/upload-dialog"
-import { ElecChargePointsApplication, ElecChargePointsApplicationStatus, ElecChargePointsSnapshot } from "elec/types"
+import { ElecChargePointsApplication, ElecAuditApplicationStatus, ElecChargePointsSnapshot } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import * as apiCpo from "elec/api-cpo"
 // import { elecChargePointsApplications } from "elec/__test__/data"
@@ -38,7 +38,7 @@ const ElecChargePointsSettings = ({ companyId }: { companyId: number }) => {
   const applications = applicationsResponse.result?.data.data ?? []
   // const applications = elecChargePointsApplications // TEST with applications
 
-  const acceptedApplications = applications.filter(app => app.status === ElecChargePointsApplicationStatus.Accepted)
+  const acceptedApplications = applications.filter(app => app.status === ElecAuditApplicationStatus.Accepted)
 
   const applicationsSnapshot: ElecChargePointsSnapshot = {
     station_count: acceptedApplications.reduce((acc, app) => acc + app.station_count, 0),
@@ -49,7 +49,7 @@ const ElecChargePointsSettings = ({ companyId }: { companyId: number }) => {
 
 
   function showUploadDialog() {
-    const pendingApplicationAlreadyExists = applications.filter(app => app.status === ElecChargePointsApplicationStatus.Pending).length > 0
+    const pendingApplicationAlreadyExists = applications.filter(app => app.status === ElecAuditApplicationStatus.Pending).length > 0
     portal((resolve) => (
       <ElecChargePointsFileUpload onClose={resolve} pendingApplicationAlreadyExists={pendingApplicationAlreadyExists} />
     ))
@@ -114,7 +114,6 @@ const ElecChargePointsSettings = ({ companyId }: { companyId: number }) => {
             </Grid>
           </section>
           <ChargePointsApplicationsTable
-            // rowLink={(application) => { }}
             applications={applications}
             onDownloadChargePointsApplication={downloadChargePointsApplication} />
         </>

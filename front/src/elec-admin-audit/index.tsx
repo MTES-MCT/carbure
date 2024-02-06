@@ -1,16 +1,16 @@
 import useEntity from "carbure/hooks/entity"
+import { Loader } from "common/components/icons"
 import { Main } from "common/components/scaffold"
 import Select from "common/components/select"
+import Tabs from "common/components/tabs"
+import { useQuery } from "common/hooks/async"
 import useYears from "common/hooks/years"
 import { useTranslation } from "react-i18next"
-import * as api from "./api"
-import Tabs from "common/components/tabs"
-import { Loader } from "common/components/icons"
-import { ElecAdminAuditSnapshot, ElecAdminAuditStatus } from "./types"
-import { useQuery } from "common/hooks/async"
 import { Navigate, Route, Routes } from "react-router-dom"
+import * as api from "./api"
 import ChargePointsApplicationsList from "./components/charge-points/list"
-import { elecAdminAuditSnapshot } from "./__test__/data"
+import MeterReadingsApplicationsList from "./components/meter-readings/list"
+import { ElecAdminAuditSnapshot, ElecAdminAuditStatus } from "./types"
 
 
 const defaultElecAdminAuditSnapshot: ElecAdminAuditSnapshot = {
@@ -70,12 +70,12 @@ export const ElecAdminAudit = () => {
           }
         />
 
-        {/* <Route
-          path="transfer/*"
+        <Route
+          path="meter-readings/*"
           element={
-            <TransferList snapshot={snapshot} year={years.selected} />
+            <MeterReadingsApplicationsList snapshot={snapshot} year={years.selected} />
           }
-        />*/}
+        />
         <Route
           path="*"
           element={
@@ -114,7 +114,7 @@ function ElecAdminAuditTabs({
 
   return (<Tabs variant="main" tabs={[{
     key: "charge-points",
-    path: "charge-points/" + ElecAdminAuditStatus.Pending.toLowerCase(),
+    path: "charge-points",
     label: <>
       <p style={{
         fontWeight: "normal"
@@ -129,7 +129,7 @@ function ElecAdminAuditTabs({
     </>
   }, {
     key: "meter-readings",
-    path: "meter-readings/" + ElecAdminAuditStatus.Pending.toLowerCase(),
+    path: "meter-readings",
     label: <>
       <p style={{
         fontWeight: "normal"
