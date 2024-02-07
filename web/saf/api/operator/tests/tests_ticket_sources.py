@@ -152,8 +152,6 @@ class SafTicketSourcesTest(TestCase):
             ],
         }
 
-        self.maxDiff = None
-
         # do not check created_at as its automatically generated
         response_ticket_source = response.json()["data"]["saf_ticket_sources"][0]
         response_ticket_source.pop("created_at")
