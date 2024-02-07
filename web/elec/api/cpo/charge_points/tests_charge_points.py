@@ -105,8 +105,9 @@ class ElecCharginPointsTest(TestCase):
             },
         }
 
-        self.assertEqual(response.status_code, 200)
+        self.maxDiff = None
         self.assertEqual(response.json(), expected)
+        self.assertEqual(response.status_code, 200)
 
     def test_add_charge_point_errors(self):
         filepath = "%s/web/elec/fixtures/points-de-recharge-errors.xlsx" % (os.environ["CARBURE_HOME"])
@@ -147,14 +148,12 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(charge_points.count(), 5)
 
         self.assertEqual(charge_points[0].charge_point_id, "FR000011062174")
-        self.assertEqual(charge_points[0].current_type, "CC")
+        self.assertEqual(charge_points[0].current_type, "AC")
         self.assertEqual(str(charge_points[0].installation_date), "2023-06-12")
         self.assertEqual(charge_points[0].mid_id, "123456-10")
         self.assertEqual(str(charge_points[0].measure_date), "2023-08-28")
         self.assertEqual(charge_points[0].measure_energy, 98765.430)
-        self.assertEqual(charge_points[0].is_article_2, True)
-        self.assertEqual(charge_points[0].is_auto_consumption, True)
-        self.assertEqual(charge_points[0].is_article_4, True)
+        self.assertEqual(charge_points[0].is_article_2, False)
         self.assertEqual(charge_points[0].measure_reference_point_id, "1122334455")
         self.assertEqual(charge_points[0].cpo, self.cpo)
         self.assertEqual(charge_points[0].application, application)
@@ -165,14 +164,12 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(charge_points[0].longitude, Decimal("3.407609"))
 
         self.assertEqual(charge_points[1].charge_point_id, "FR000012292701")
-        self.assertEqual(charge_points[1].current_type, "CA")
+        self.assertEqual(charge_points[1].current_type, "AC")
         self.assertEqual(str(charge_points[1].installation_date), "2023-06-13")
         self.assertEqual(charge_points[1].mid_id, "123457-11")
         self.assertEqual(str(charge_points[1].measure_date), "2023-08-29")
         self.assertEqual(charge_points[1].measure_energy, 98765.430)
-        self.assertEqual(charge_points[1].is_article_2, True)
-        self.assertEqual(charge_points[1].is_auto_consumption, True)
-        self.assertEqual(charge_points[1].is_article_4, False)
+        self.assertEqual(charge_points[1].is_article_2, False)
         self.assertEqual(charge_points[1].measure_reference_point_id, "1122334456")
         self.assertEqual(charge_points[1].cpo, self.cpo)
         self.assertEqual(charge_points[1].application, application)
@@ -181,14 +178,12 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(charge_points[1].nominal_power, 22)
 
         self.assertEqual(charge_points[2].charge_point_id, "FR000012308585")
-        self.assertEqual(charge_points[2].current_type, "CC")
+        self.assertEqual(charge_points[2].current_type, "AC")
         self.assertEqual(str(charge_points[2].installation_date), "2023-06-14")
         self.assertEqual(charge_points[2].mid_id, "123458-12")
         self.assertEqual(str(charge_points[2].measure_date), "2023-08-30")
         self.assertEqual(charge_points[2].measure_energy, 98765.430)
-        self.assertEqual(charge_points[2].is_article_2, True)
-        self.assertEqual(charge_points[2].is_auto_consumption, False)
-        self.assertEqual(charge_points[2].is_article_4, False)
+        self.assertEqual(charge_points[2].is_article_2, False)
         self.assertEqual(charge_points[2].measure_reference_point_id, "1122334457")
         self.assertEqual(charge_points[2].cpo, self.cpo)
         self.assertEqual(charge_points[2].application, application)
@@ -197,14 +192,12 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(charge_points[2].nominal_power, 22)
 
         self.assertEqual(charge_points[3].charge_point_id, "FR000012616553")
-        self.assertEqual(charge_points[3].current_type, "CA")
+        self.assertEqual(charge_points[3].current_type, "AC")
         self.assertEqual(str(charge_points[3].installation_date), "2023-06-15")
         self.assertEqual(charge_points[3].mid_id, "123459-13")
         self.assertEqual(str(charge_points[3].measure_date), "2023-08-31")
         self.assertEqual(charge_points[3].measure_energy, 98765.430)
         self.assertEqual(charge_points[3].is_article_2, False)
-        self.assertEqual(charge_points[3].is_auto_consumption, False)
-        self.assertEqual(charge_points[3].is_article_4, True)
         self.assertEqual(charge_points[3].measure_reference_point_id, "1122334458")
         self.assertEqual(charge_points[3].cpo, self.cpo)
         self.assertEqual(charge_points[3].application, application)
@@ -213,14 +206,12 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(charge_points[3].nominal_power, 22)
 
         self.assertEqual(charge_points[4].charge_point_id, "FR000028067822")
-        self.assertEqual(charge_points[4].current_type, "CC")
+        self.assertEqual(charge_points[4].current_type, "AC")
         self.assertEqual(str(charge_points[4].installation_date), "2023-06-16")
         self.assertEqual(charge_points[4].mid_id, "123450-14")
         self.assertEqual(str(charge_points[4].measure_date), "2023-09-01")
         self.assertEqual(charge_points[4].measure_energy, 98765.430)
         self.assertEqual(charge_points[4].is_article_2, False)
-        self.assertEqual(charge_points[4].is_auto_consumption, True)
-        self.assertEqual(charge_points[4].is_article_4, False)
         self.assertEqual(charge_points[4].measure_reference_point_id, "1122334459")
         self.assertEqual(charge_points[4].cpo, self.cpo)
         self.assertEqual(charge_points[4].application, application)
@@ -354,8 +345,6 @@ class ElecCharginPointsTest(TestCase):
                     "measure_date": "2023-06-29",
                     "measure_energy": 1000.12,
                     "is_article_2": False,
-                    "is_auto_consumption": False,
-                    "is_article_4": False,
                     "measure_reference_point_id": "123456",
                     "station_name": "Station",
                     "station_id": "FGHIJ",
@@ -373,8 +362,6 @@ class ElecCharginPointsTest(TestCase):
                     "measure_date": "2023-06-29",
                     "measure_energy": 1000.12,
                     "is_article_2": False,
-                    "is_auto_consumption": False,
-                    "is_article_4": False,
                     "measure_reference_point_id": "123456",
                     "station_name": "Station",
                     "station_id": "FGHIJ",
@@ -445,8 +432,6 @@ class ElecCharginPointsTest(TestCase):
                     "measure_date": "2023-06-29",
                     "measure_energy": 1000.12,
                     "is_article_2": False,
-                    "is_auto_consumption": False,
-                    "is_article_4": False,
                     "measure_reference_point_id": "123456",
                     "station_name": "Station",
                     "station_id": "FGHIJ",

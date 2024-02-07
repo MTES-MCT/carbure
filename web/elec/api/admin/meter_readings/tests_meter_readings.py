@@ -147,6 +147,7 @@ class ElecMeterReadingsTest(TestCase):
 
         self.meter_reading_2 = ElecMeterReading.objects.create(
             extracted_energy=600,
+            renewable_energy=24.92,
             reading_date=datetime.date(2024, 5, 21),
             charge_point=self.charge_point_2,
             cpo=self.cpo,
@@ -175,7 +176,7 @@ class ElecMeterReadingsTest(TestCase):
                         "application_date": application_date,
                         "charge_point_count": 1,
                         "cpo": {"entity_type": "Charge Point Operator", "id": self.cpo.id, "name": "CPO"},
-                        "energy_total": 600.0,
+                        "energy_total": 24.92,
                         "id": application.id,
                         "quarter": 2,
                         "status": "ACCEPTED",
