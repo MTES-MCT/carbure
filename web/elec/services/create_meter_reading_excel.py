@@ -125,23 +125,10 @@ def create_meter_readings_data(
     previous_application: ElecMeterReadingApplication,
     current_readings: list[dict] = [],
 ):
+    previous_readings_by_charge_point = get_previous_readings_by_charge_point(charge_points, previous_application)
+    current_readings_by_charge_point = get_current_readings_by_charge_point(charge_points, current_readings)
+
     meter_reading_data: list[MeterReadingData] = []
-
-    previous_readings_by_charge_point = {}
-
-    # initialize previous readings using the first one set during the charge point registration
-    for charge_point in charge_points:
-        previous_readings_by_charge_point[charge_point.charge_point_id] = charge_point.measure_energy
-
-    # then if there was a previous registration, use its data to specify the previous reading latest value
-    if previous_application:
-        for reading in previous_application.elec_meter_readings.all():
-            previous_readings_by_charge_point[reading.charge_point.charge_point_id] = reading.extracted_energy
-
-    current_readings_by_charge_point: dict[str, dict] = {}
-    for reading in current_readings:
-        current_readings_by_charge_point[reading.get("charge_point_id")] = reading
-
     for charge_point in charge_points:
         if charge_point.is_article_2:
             continue
@@ -162,3 +149,29 @@ def create_meter_readings_data(
         meter_reading_data.append(reading_data)
 
     return meter_reading_data
+
+
+def get_previous_readings_by_charge_point(
+    charge_points: Iterable[ElecChargePoint],
+    previous_application: ElecMeterReadingApplication,
+):
+    previous_readings_by_charge_point = {}
+
+    # initialize previous readings using the first one set during the charge point registration
+    for charge_point in charge_points:
+        previous_readings_by_charge_point[charge_point.charge_point_id] = charge_point.measure_energy
+
+    # then if there was a previous registration, use its data to specify the previous reading latest value
+    if previous_application:
+        for reading in previous_application.elec_meter_readings.all():
+            previous_readings_by_charge_point[reading.charge_point.charge_point_id] = reading.extracted_energy
+
+    return previous_readings_by_charge_point
+
+
+def get_current_readings_by_charge_point(current_readings: list[dict]):
+    current_readings_by_charge_point: dict[str, dict] = {}
+    for reading in current_readings:
+        current_readings_by_charge_point[reading.get("charge_point_id")] = reading
+
+    return current_readings_by_charge_point
