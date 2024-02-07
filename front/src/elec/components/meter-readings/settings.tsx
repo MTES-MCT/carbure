@@ -39,15 +39,10 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
   // const applications = elecMeterReadingsApplications // TEST with applications
   const isEmpty = applications.length === 0
 
-  const currentDate = new Date()
-  const currentQuarter = currentDate.getMonth() < 3 ? 1 : currentDate.getMonth() < 6 ? 2 : currentDate.getMonth() < 9 ? 3 : 4
-  const currentYear = currentDate.getFullYear()
-  const quarterString = t("T{{quarter}} {{year}}", { quarter: currentQuarter, year: currentYear })
-
   function showUploadDialog() {
-    const pendingApplicationAlreadyExists = applications.filter(app => app.status === ElecMeterReadingsApplicationStatus.Pending && app.quarter === currentQuarter).length > 0
+    const pendingApplicationAlreadyExists = applications.filter(app => app.status === ElecMeterReadingsApplicationStatus.Pending).length > 0
     portal((resolve) => (
-      <ElecMeterReadingsFileUpload onClose={resolve} pendingApplicationAlreadyExists={pendingApplicationAlreadyExists} quarter={currentQuarter} year={currentYear} companyId={companyId} />
+      <ElecMeterReadingsFileUpload onClose={resolve} pendingApplicationAlreadyExists={pendingApplicationAlreadyExists} companyId={companyId} />
     ))
   }
 
@@ -70,7 +65,7 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
             variant="primary"
             icon={Plus}
             action={showUploadDialog}
-            label={t("Transmettre mes relevés trimestriels {{quarter}}", { quarter: quarterString })}
+            label={t("Transmettre mes relevés trimestriels")}
           />
         )}
         {/* {applicationsSnapshot.charge_point_count > 0 &&
@@ -131,7 +126,7 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
                 header: t("kwh renouvelables"),
                 cell: (application) => (
                   <Cell
-                    text={`${formatNumber(Math.round(application.energy_total))}` + " kWh"}
+                    text={`${formatNumber(Math.round(application.energy_total))} kWh`}
                   />
                 ),
               },
@@ -180,5 +175,3 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
 }
 
 export default ElecMeterReadingsSettings
-
-

@@ -153,7 +153,7 @@ export function downloadMeterReadingsApplicationDetails(entityId: number, compan
   })
 }
 
-export function checkMeterReadingsApplication(entity_id: number, file: File, quarter: number, year: number) {
+export function checkMeterReadingsApplication(entity_id: number, file: File, quarter?: number, year?: number) {
   return api.post<Api<ElecMeterReadingsApplicationCheckInfo>>(
     "/elec/cpo/meter-readings/check-application",
     { entity_id, file, quarter, year }
@@ -164,8 +164,8 @@ export function checkMeterReadingsApplication(entity_id: number, file: File, qua
 export function addMeterReadings(
   entity_id: number,
   file: File,
-  quarter: number,
-  year: number
+  quarter?: number,
+  year?: number
 ) {
   return api.post("/elec/cpo/meter-readings/add-application", {
     entity_id,
