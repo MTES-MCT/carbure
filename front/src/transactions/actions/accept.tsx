@@ -97,7 +97,7 @@ function useAcceptOptions(params: {
     has_stocks,
     has_direct_deliveries,
     isIndustry,
-    isPowerPlant,
+    isPowerOrHeatProducer,
   } = entity
 
   const hasProcessing = depots.result !== undefined && depots.result.length > 0
@@ -152,7 +152,7 @@ function useAcceptOptions(params: {
       action: () =>
         portal((close) => <ExportDialog {...props} onClose={close} />),
     },
-    isPowerPlant && {
+    isPowerOrHeatProducer && {
       label: i18next.t("Consommation"),
       action: () =>
         portal((close) => <ConsumptionDialog {...props} onClose={close} />),
@@ -909,7 +909,7 @@ const ConsumptionDialog = ({
       <main>
         <section>
           {t(
-            "En acceptant ces lots, vous indiquez qu'ils seront consommés au sein d'une centrale électrique."
+            "En acceptant ces lots, vous indiquez qu'ils seront consommés au sein d'une centrale de production d'électricité ou de chaleur."
           )}
         </section>
 

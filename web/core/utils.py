@@ -138,6 +138,14 @@ def run_query(query_path, *args):
             return cursor.fetchall()
 
 
+# combine many lists in a single one where all items are defined, unique, and ordered
+def combine(*lists):
+    combined_list = set()
+    for list in lists:
+        combined_list.update(list)
+    return sorted([item for item in combined_list if item or item == 0])
+
+
 class MultipleValueField(forms.TypedMultipleChoiceField):
     # def __init__(self, *args, **kwargs):
     #     super(MultipleValueField, self).__init__(*args, **kwargs)

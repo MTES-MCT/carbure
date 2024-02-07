@@ -7,13 +7,13 @@ import { useNotify, useNotifyError } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import Tag from "common/components/tag"
 import { useMutation } from "common/hooks/async"
-import { ElecChargingPointsApplicationCheckInfo } from "elec/types"
+import { ElecChargePointsApplicationCheckInfo } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
-import { addChargingPoints } from "elec/api-cpo"
+import { addChargePoints } from "elec/api-cpo"
 import { ReplaceAlert } from "./replace-alert"
 
 export type ValidDetailsDialogProps = {
-  fileData: ElecChargingPointsApplicationCheckInfo
+  fileData: ElecChargePointsApplicationCheckInfo
   onClose: () => void
   file: File
 }
@@ -29,11 +29,11 @@ export const ValidDetailsDialog = ({
   const notifyError = useNotifyError()
   const portal = usePortal()
 
-  const chargingPointsApplication = useMutation(addChargingPoints, {
-    invalidates: ["charging-points-applications"],
+  const chargePointsApplication = useMutation(addChargePoints, {
+    invalidates: ["charge-points-applications"],
     onSuccess() {
       onClose()
-      notify(t("Les {{count}} points de recharge ont été ajoutés !", { count: fileData.charging_point_count }), { variant: "success" })
+      notify(t("Les {{count}} points de recharge ont été ajoutés !", { count: fileData.charge_point_count }), { variant: "success" })
 
     },
     onError(err) {
@@ -41,9 +41,9 @@ export const ValidDetailsDialog = ({
     },
   })
 
-  const submitChargingPointsApplication = () => {
+  const submitChargePointsApplication = () => {
     const confirmApplication = () => {
-      chargingPointsApplication.execute(entity.id, file)
+      chargePointsApplication.execute(entity.id, file)
     }
     if (fileData.pending_application_already_exists) {
       portal((resolve) => (
@@ -75,7 +75,7 @@ export const ValidDetailsDialog = ({
           </p>
           <p>
             <Trans
-              count={fileData.charging_point_count}
+              count={fileData.charge_point_count}
               defaults="Les <b>{{count}} points de recharge</b> peuvent être inscrits à votre espace CarbuRe." />
 
           </p>
@@ -93,10 +93,10 @@ export const ValidDetailsDialog = ({
       <footer>
         <Button
           icon={Send}
-          loading={chargingPointsApplication.loading}
+          loading={chargePointsApplication.loading}
           label={fileData.pending_application_already_exists ? t("Remplacer la demande d'inscription") : t("Envoyer la demande d'inscription")}
           variant="primary"
-          action={submitChargingPointsApplication}
+          action={submitChargePointsApplication}
         />
 
         <Button icon={Return} label={t("Fermer")} action={onClose} asideX />

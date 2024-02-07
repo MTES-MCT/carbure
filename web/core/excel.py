@@ -20,10 +20,12 @@ class SheetConfig(TypedDict):
 ExcelConfig = list[SheetConfig]
 
 
-def export_to_excel(location: str, config: ExcelConfig):
+def export_to_excel(
+    location: str, config: ExcelConfig, format: dict = {"bold": True}, column_width: int = 10, header_height: int = 20
+):
     workbook = xlsxwriter.Workbook(location)
 
-    bold = workbook.add_format({"bold": True})
+    bold_and_wrap_format = workbook.add_format(format)
 
     # each key in the config object will be turned into an excel sheet
     for sheet_config in config:
@@ -32,10 +34,12 @@ def export_to_excel(location: str, config: ExcelConfig):
         columns = sheet_config["columns"]
 
         sheet = workbook.add_worksheet(label)
+        sheet.set_row(0, header_height)
+        sheet.set_column(0, len(columns), column_width)
 
         # create the sheet column headers
         for c, column in enumerate(columns):
-            sheet.write(0, c, column["label"], bold)
+            sheet.write(0, c, column["label"], bold_and_wrap_format)
 
         # fill the data inside the sheet
         for r, row in enumerate(rows):

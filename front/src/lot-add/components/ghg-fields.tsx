@@ -1,9 +1,11 @@
 import { Fieldset, useFormContext } from "common/components/form"
-import { NumberInput, TextInput } from "common/components/input"
+import { BlankField, NumberInput, TextInput } from "common/components/input"
 import { formatGHG, formatPercentage } from "common/utils/formatters"
 import isAfter from "date-fns/isAfter"
 import { useTranslation } from "react-i18next"
 import { LotFormValue } from "./lot-form"
+import useEntity from "carbure/hooks/entity"
+import { EntityType, type Entity, DepotType } from "carbure/types"
 
 interface GHGFieldsProps {
   readOnly?: boolean
@@ -11,6 +13,7 @@ interface GHGFieldsProps {
 
 export const EmissionFields = (props: GHGFieldsProps) => {
   const { t } = useTranslation()
+  const entity = useEntity()
   const { bind, value } = useFormContext<LotFormValue>()
 
   return (
@@ -59,12 +62,39 @@ export const EmissionFields = (props: GHGFieldsProps) => {
         label="Total"
         value={formatGHG(value.ghg_total ?? 0)}
       />
+
+      {canSeePlantGHG(entity, value, DepotType.PowerPlant) && (
+        <NumberInput
+          readOnly
+          label="ECEL"
+          hasTooltip
+          title={t(
+            "Émissions résultant de la combustion de biomasse pour la production d'électricité"
+          )}
+          {...bind("emission_electricity")}
+          {...props}
+        />
+      )}
+
+      {canSeePlantGHG(entity, value, DepotType.HeatPlant) && (
+        <NumberInput
+          readOnly
+          label="ECH"
+          hasTooltip
+          title={t(
+            "Émissions résultant de la combustion de biomasse pour la production de chaleur"
+          )}
+          {...bind("emission_heat")}
+          {...props}
+        />
+      )}
     </Fieldset>
   )
 }
 
 export const ReductionFields = (props: GHGFieldsProps) => {
   const { t } = useTranslation()
+  const entity = useEntity()
   const { bind, value } = useFormContext<LotFormValue>()
 
   return (
@@ -98,6 +128,8 @@ export const ReductionFields = (props: GHGFieldsProps) => {
         {...props}
       />
 
+      <BlankField />
+
       {isRedII(value.delivery_date) ? (
         <TextInput
           readOnly
@@ -111,6 +143,24 @@ export const ReductionFields = (props: GHGFieldsProps) => {
           value={formatPercentage(value.ghg_reduction ?? 0)}
         />
       )}
+
+      {canSeePlantGHG(entity, value, DepotType.PowerPlant) && (
+        <TextInput
+          readOnly
+          label="Réd. élec."
+          value={formatPercentage(value.total_reduction_electricity ?? 0)}
+          {...props}
+        />
+      )}
+
+      {canSeePlantGHG(entity, value, DepotType.HeatPlant) && (
+        <TextInput
+          readOnly
+          label="Réd. chaleur"
+          value={formatPercentage(value.total_reduction_heat ?? 0)}
+          {...props}
+        />
+      )}
     </Fieldset>
   )
 }
@@ -122,3 +172,16 @@ export function isRedII(deliveryDate: string | undefined | null) {
 
 // date where RED II took effect
 const JULY_FIRST_21 = new Date("2021-07-01")
+
+function canSeePlantGHG(entity: Entity, lot: LotFormValue, type: DepotType) {
+  const isEntityAllowed =
+    entity.entity_type === EntityType.PowerOrHeatProducer ||
+    entity.entity_type === EntityType.Administration
+
+  const isDeliverySiteForHeat =
+    lot.delivery_site instanceof Object &&
+    (lot.delivery_site.depot_type === type ||
+      lot.delivery_site.depot_type === DepotType.CogenerationPlant)
+
+  return isEntityAllowed && isDeliverySiteForHeat
+}

@@ -33,7 +33,7 @@ export const MeterReadingsValidDetailsDialog = ({
     invalidates: ["meter-readings-applications"],
     onSuccess() {
       onClose()
-      notify(t("Les {{count}} relevés trimestriels ont bien été envoyés !", { count: fileData.charging_point_count }), { variant: "success" })
+      notify(t("Les {{count}} relevés trimestriels ont bien été envoyés !", { count: fileData.charge_point_count }), { variant: "success" })
 
     },
     onError(err) {
@@ -43,7 +43,7 @@ export const MeterReadingsValidDetailsDialog = ({
 
   const submitMeterReadingsApplication = () => {
     const confirmApplication = () => {
-      meterReadingsApplication.execute(entity.id, file, fileData.quarter, fileData.year)
+      meterReadingsApplication.execute(entity.id, file)
     }
     if (fileData.pending_application_already_exists) {
       portal((resolve) => (
@@ -75,7 +75,7 @@ export const MeterReadingsValidDetailsDialog = ({
           </p>
           <p>
             <Trans
-              count={fileData.charging_point_count}
+              count={fileData.charge_point_count}
               values={{
                 quarter: fileData.quarter,
                 year: fileData.year,

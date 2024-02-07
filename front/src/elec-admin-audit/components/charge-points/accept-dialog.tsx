@@ -5,31 +5,34 @@ import { Check, Return } from "common/components/icons"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import { formatDate } from "common/utils/formatters"
-import * as api from "elec-admin/api"
-import ApplicationStatus from "elec/components/charging-points/application-status"
-import { ElecChargingPointsApplication, ElecChargingPointsApplicationStatus } from "elec/types"
+import * as api from "../../api"
+import ApplicationStatus from "elec/components/charge-points/application-status"
+import { ElecChargePointsApplication, ElecChargePointsApplicationStatus } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 export type ApplicationDialogProps = {
-  application: ElecChargingPointsApplication
-  onClose: () => void
-  companyId: number
+  application: ElecChargePointsApplication
+  onClose: () => void,
+  onValidated: () => void,
+  forceValidation: boolean
 }
 
-export const ChargingPointsApplicationAcceptDialog = ({
+export const ChargePointsApplicationAcceptDialog = ({
   application,
   onClose,
-  companyId,
+  onValidated,
+  forceValidation
 }: ApplicationDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const notify = useNotify()
   const notifyError = useNotifyError()
 
-  const acceptChargingPointsApplication = useMutation(api.acceptChargingPointsApplication, {
-    invalidates: ["charging-points-applications"],
+  const acceptChargePointsApplication = useMutation(api.acceptChargePointsApplication, {
+    invalidates: ["audit-charge-points-applications", "elec-admin-audit-snapshot"],
     onSuccess() {
       onClose()
-      notify(t("Les {{count}} points de recharge ont été acceptés !", { count: application.charging_point_count }), { variant: "success" })
+      onValidated()
+      notify(t("Les {{count}} points de recharge ont été acceptés !", { count: application.charge_point_count }), { variant: "success" })
 
     },
     onError(err) {
@@ -38,8 +41,8 @@ export const ChargingPointsApplicationAcceptDialog = ({
   })
 
 
-  const acceptApplication = () => {
-    acceptChargingPointsApplication.execute(entity.id, companyId, application.id)
+  const acceptApplication = (forceValidation: boolean) => {
+    acceptChargePointsApplication.execute(entity.id, application.id, forceValidation)
   }
 
   return (
@@ -58,7 +61,7 @@ export const ChargingPointsApplicationAcceptDialog = ({
               values={{
                 applicationDate: formatDate(application.application_date),
               }}
-              count={application.charging_point_count}
+              count={application.charge_point_count}
               defaults="<b>{{count}}</b> points de recharge importés le <b>{{applicationDate}}</b>  ." />
           </p>
           <p>
@@ -69,11 +72,12 @@ export const ChargingPointsApplicationAcceptDialog = ({
 
       <footer>
 
-        {application.status === ElecChargingPointsApplicationStatus.Pending && (
-          <>
-            <Button icon={Check} label={t("Accepter la demande")} variant="success" action={acceptApplication} loading={acceptChargingPointsApplication.loading} />
-          </>
-        )}
+
+
+        <Button icon={Check} label={forceValidation ? t("Accepter la demande sans audit") : t("Accepter la demande")} variant="success" action={() => acceptApplication(forceValidation)} loading={acceptChargePointsApplication.loading} />
+
+
+
         <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
       </footer>
 
@@ -84,6 +88,6 @@ export const ChargingPointsApplicationAcceptDialog = ({
 
 
 
-export default ChargingPointsApplicationAcceptDialog
+export default ChargePointsApplicationAcceptDialog
 
 

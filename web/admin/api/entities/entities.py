@@ -50,12 +50,12 @@ def get_entities(request):
                     filter=Q(doublecountingapplication__status=DoubleCountingApplication.PENDING),
                     distinct=True,
                 ),
-                charging_points_accepted=Count(
+                charge_points_accepted=Count(
                     "elec_charge_point_applications",
                     filter=Q(elec_charge_point_applications__status=ElecChargePointApplication.ACCEPTED),
                     distinct=True,
                 ),
-                charging_points_pending=Count(
+                charge_points_pending=Count(
                     "elec_charge_point_applications",
                     filter=Q(elec_charge_point_applications__status=ElecChargePointApplication.PENDING),
                     distinct=True,
@@ -112,12 +112,12 @@ def get_entities(request):
                 double_counting=Value(0),
                 double_counting_requests=Value(0),
                 certificates_pending=Value(0),
-                charging_points_accepted=Count(
+                charge_points_accepted=Count(
                     "elec_charge_point_applications",
                     filter=Q(elec_charge_point_applications__status=ElecChargePointApplication.ACCEPTED),
                     distinct=True,
                 ),
-                charging_points_pending=Count(
+                charge_points_pending=Count(
                     "elec_charge_point_applications",
                     filter=Q(elec_charge_point_applications__status=ElecChargePointApplication.PENDING),
                     distinct=True,
@@ -153,8 +153,8 @@ def get_entities(request):
                 "double_counting": e.double_counting,
                 "double_counting_requests": e.double_counting_requests,
                 "certificates_pending": e.certificates_pending,
-                "charging_points_accepted": e.charging_points_accepted,
-                "charging_points_pending": e.charging_points_pending,
+                "charge_points_accepted": e.charge_points_accepted,
+                "charge_points_pending": e.charge_points_pending,
                 "meter_readings_accepted": e.meter_readings_accepted,
                 "meter_readings_pending": e.meter_readings_pending,
             }

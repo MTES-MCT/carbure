@@ -100,7 +100,7 @@ const Navigation = ({ entity }: NavigationProps) => {
     isAuditor,
     isIndustry,
     isOperator,
-    isPowerPlant,
+    isPowerOrHeatProducer,
     has_saf,
     isAirline,
     isProducer,
@@ -127,7 +127,7 @@ const Navigation = ({ entity }: NavigationProps) => {
                 label: t("Contrôles"),
               },
 
-              (isIndustry || isPowerPlant) && {
+              (isIndustry || isPowerOrHeatProducer) && {
                 key: "transactions",
                 path: "transactions",
                 label: t("Transactions"),
@@ -149,6 +149,12 @@ const Navigation = ({ entity }: NavigationProps) => {
                 key: "elec-admin",
                 path: "elec-admin",
                 label: t("Électricité"),
+              },
+
+              (isAdmin || entity.hasAdminRight("ELEC")) && {
+                key: "elec-admin-audit",
+                path: "elec-admin-audit",
+                label: t("Audit"),
               },
 
               (isOperator || isProducer) && {
@@ -177,7 +183,7 @@ const Navigation = ({ entity }: NavigationProps) => {
                 label: t("Société"),
               },
 
-              (isIndustry || isPowerPlant) && {
+              (isIndustry || isPowerOrHeatProducer) && {
                 key: "registry",
                 path: "registry",
                 label: t("Annuaire"),

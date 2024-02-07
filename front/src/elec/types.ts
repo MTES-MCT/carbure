@@ -55,39 +55,45 @@ export interface ElecTransferCertificatesDetails
   comment: string
 }
 export interface ElecProvisionCertificatesDetails
-  extends ElecProvisionCertificatePreview {}
+  extends ElecProvisionCertificatePreview { }
 
-export enum ElecChargingPointsApplicationStatus {
+export enum ElecChargePointsApplicationStatus {
   Pending = "PENDING",
   Accepted = "ACCEPTED",
   Rejected = "REJECTED",
+  AuditInProgress = "AUDIT_IN_PROGRESS",
 }
 
-export interface ElecChargingPointsApplication {
+export interface ElecChargePointsApplication {
   id: number
   cpo: EntityPreview
   station_count: number
-  charging_point_count: number
+  charge_point_count: number
   power_total: number
   application_date: string
   validation_date?: string
-  status: ElecChargingPointsApplicationStatus
+  status: ElecChargePointsApplicationStatus
 }
-export interface ElecChargingPointsSnapshot {
+
+
+export interface ElecChargePointsApplicationDetails extends ElecChargePointsApplication {
+  email_contacts: string[]
+}
+export interface ElecChargePointsSnapshot {
   station_count: number
-  charging_point_count: number
+  charge_point_count: number
   power_total: number
 }
 
-export interface ElecChargingPointsApplicationCheckInfo {
-  errors?: ChargingPointsApplicationError[]
+export interface ElecChargePointsApplicationCheckInfo {
+  errors?: ChargePointsApplicationError[]
   file_name: string
   error_count: number
-  charging_point_count: number
+  charge_point_count: number
   pending_application_already_exists?: boolean
 }
 
-export interface ChargingPointsApplicationError {
+export interface ChargePointsApplicationError {
   line: number
   error: string
   meta?: null | any
@@ -105,7 +111,7 @@ export interface ElecMeterReadingsApplication {
   id: number
   cpo: EntityPreview
   station_count: number
-  charging_point_count: number
+  charge_point_count: number
   energy_total: number
   year: number
   quarter: number
@@ -120,7 +126,7 @@ export interface ElecMeterReadingsApplicationCheckInfo {
   error_count: number
   year: number
   quarter: number
-  charging_point_count: number
+  charge_point_count: number
   pending_application_already_exists?: boolean
 }
 

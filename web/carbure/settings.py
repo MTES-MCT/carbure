@@ -110,6 +110,7 @@ MIDDLEWARE = [
     'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'core.logging_middleware.LoggingMiddleware',
+    'core.exception.ExceptionMiddleware'
 ]
 
 ROOT_URLCONF = 'carbure.urls'

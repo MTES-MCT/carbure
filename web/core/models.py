@@ -22,7 +22,7 @@ class Entity(models.Model):
     AIRLINE = "Compagnie aérienne"
     UNKNOWN = "Unknown"
     CPO = "Charge Point Operator"
-    POWER_STATION = "Power Station"
+    POWER_OR_HEAT_PRODUCER = "Power or Heat Producer"
     ENTITY_TYPES = (
         (PRODUCER, "Producteur"),
         (OPERATOR, "Opérateur"),
@@ -32,7 +32,7 @@ class Entity(models.Model):
         (EXTERNAL_ADMIN, EXTERNAL_ADMIN),
         (AIRLINE, AIRLINE),
         (UNKNOWN, "Unknown"),
-        (POWER_STATION, "Centrale électrique"),
+        (POWER_OR_HEAT_PRODUCER, "Producteur d'électricité ou de chaleur"),
     )
 
     name = models.CharField(max_length=64, unique=True)
@@ -311,19 +311,26 @@ class Pays(models.Model):
 
 
 class Depot(models.Model):
+    OTHER = "OTHER"
     EFS = "EFS"
     EFPE = "EFPE"
-    OTHER = "OTHER"
     OILDEPOT = "OIL DEPOT"
     BIOFUELDEPOT = "BIOFUEL DEPOT"
+    HEAT_PLANT = "HEAT PLANT"
+    POWER_PLANT = "POWER PLANT"
+    COGENERATION_PLANT = "COGENERATION PLANT"
 
     TYPE_DEPOT = (
+        (OTHER, "Autre"),
         (EFS, "EFS"),
         (EFPE, "EFPE"),
         (OILDEPOT, "OIL DEPOT"),
         (BIOFUELDEPOT, "BIOFUEL DEPOT"),
-        (OTHER, "Autre"),
+        (HEAT_PLANT, "HEAT PLANT"),
+        (POWER_PLANT, "POWER PLANT"),
+        (COGENERATION_PLANT, "COGENERATION PLANT"),
     )
+
     name = models.CharField(max_length=128, null=False, blank=False)
     city = models.CharField(max_length=128, null=True, blank=True)
     depot_id = models.CharField(max_length=32, null=False, blank=False)
@@ -336,6 +343,10 @@ class Depot(models.Model):
     gps_coordinates = models.CharField(max_length=64, blank=True, null=True, default=None)
     accise = models.CharField(max_length=32, blank=True, null=True, default=None)
     private = models.BooleanField(default=False)
+
+    electrical_efficiency = models.FloatField(blank=True, null=True, default=None)
+    thermal_efficiency = models.FloatField(blank=True, null=True, default=None)
+    useful_temperature = models.FloatField(blank=True, null=True, default=None)
 
     def __str__(self):
         return self.name

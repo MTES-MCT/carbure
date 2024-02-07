@@ -9,7 +9,7 @@ class ElecMeterReadingApplicationSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "cpo",
-            "charging_point_count",
+            "charge_point_count",
             "energy_total",
             "year",
             "quarter",
@@ -19,11 +19,11 @@ class ElecMeterReadingApplicationSerializer(serializers.ModelSerializer):
 
     cpo = EntityPreviewSerializer()
     application_date = serializers.DateTimeField(source="created_at")
-    charging_point_count = serializers.SerializerMethodField()
+    charge_point_count = serializers.SerializerMethodField()
     energy_total = serializers.SerializerMethodField()
 
-    def get_charging_point_count(self, instance):
-        return instance.charging_point_count
+    def get_charge_point_count(self, instance):
+        return instance.charge_point_count
 
     def get_energy_total(self, instance):
-        return round(instance.energy_total, 2)
+        return round(instance.energy_total or 0, 2)

@@ -39,7 +39,7 @@ export const ValidDetailsDialog = ({
 
   function showProductionSiteDialog() {
     if (isProducerMatch) {
-      portal((close) => <MailToDialog onClose={() => { close(); onClose() }} fileData={fileData} />)
+      portal((close) => <MailToDialog onClose={() => { close(); }} fileData={fileData} />)
     } else {
       portal((close) => <ProductionSiteAdminDialog fileData={fileData} onClose={() => { close(); onClose() }} file={file} />)
     }

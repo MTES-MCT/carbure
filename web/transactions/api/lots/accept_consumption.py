@@ -11,7 +11,7 @@ class AcceptConsumptionError:
     INVALID_STATUS = "INVALID_STATUS"
 
 
-@check_user_rights(role=[UserRights.RW, UserRights.ADMIN], entity_type=[Entity.POWER_STATION])
+@check_user_rights(role=[UserRights.RW, UserRights.ADMIN], entity_type=[Entity.POWER_OR_HEAT_PRODUCER])
 def accept_consumption(request, entity, entity_id):
     status = request.POST.get("status", False)
 
