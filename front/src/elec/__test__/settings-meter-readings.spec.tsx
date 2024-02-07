@@ -45,7 +45,7 @@ const getCurrentQuarterString = () => {
 
 const openModal = async () => {
   const user = userEvent.setup()
-  const sendButton = await screen.findByText("Transmettre mes relevés trimestriels " + getCurrentQuarterString())
+  const sendButton = await screen.findByText("Transmettre mes relevés trimestriels")
   return user.click(sendButton)
 
 }
@@ -54,7 +54,7 @@ test("check the metter-readings section of the settings", async () => {
   render(<SettingsWithHooks />)
   await waitWhileLoading()
   screen.getByText("Relevés trimestriels")
-  screen.getByText("Transmettre mes relevés trimestriels " + getCurrentQuarterString())
+  screen.getByText("Transmettre mes relevés trimestriels")
 })
 
 
@@ -110,7 +110,8 @@ test("upload dialog opened", async () => {
 
   await openModal()
 
-  screen.getByText("Relevés trimestriels - " + getCurrentQuarterString())
+  const titles = screen.getAllByText("Relevés trimestriels")
+  expect(titles).toHaveLength(2)
   screen.getByText("sur ce lien")
 })
 
@@ -125,7 +126,7 @@ test("upload valid file", async () => {
 
   //send inscription
   screen.getByText("Valide")
-  const validationButton = await screen.findByText("Transmettre mes relevés trimestriels");
+  const validationButton = await screen.findByText("Transmettre mes relevés trimestriels", { selector: "footer button"});
   await user.click(validationButton)
   return waitWhileLoading()
 
