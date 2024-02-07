@@ -126,7 +126,7 @@ def create_meter_readings_data(
     current_readings: list[dict] = [],
 ):
     previous_readings_by_charge_point = get_previous_readings_by_charge_point(charge_points, previous_application)
-    current_readings_by_charge_point = get_current_readings_by_charge_point(charge_points, current_readings)
+    current_readings_by_charge_point = get_current_readings_by_charge_point(current_readings)
 
     meter_reading_data: list[MeterReadingData] = []
     for charge_point in charge_points:
