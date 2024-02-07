@@ -2,7 +2,7 @@ import { api, Api, download } from "common/services/api"
 import { ElecCPOProvisionCertificateFilter, ElecCPOProvisionCertificateQuery, ElecCPOSnapshot, ElecTransferCertificateQuery, ElecProvisionCertificatesData, ElecTransferCertificatesData } from "./types-cpo"
 import { EntityPreview } from "carbure/types"
 import { extract } from "carbure/api"
-import { ElecChargingPointsApplication, ElecChargingPointsApplicationCheckInfo, ElecMeterReadingsApplication, ElecMeterReadingsApplicationCheckInfo, ElecProvisionCertificatesDetails, ElecTransferCertificateFilter, ElecTransferCertificatesDetails, QUERY_RESET } from "./types"
+import { ElecChargePointsApplication, ElecChargePointsApplicationCheckInfo, ElecMeterReadingsApplication, ElecMeterReadingsApplicationCheckInfo, ElecProvisionCertificatesDetails, ElecTransferCertificateFilter, ElecTransferCertificatesDetails, QUERY_RESET } from "./types"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/elec/cpo/years", { params: { entity_id } })
@@ -100,33 +100,33 @@ export function cancelTransferCertificate(
 
 
 
-export function getChargingPointsApplications(entity_id: number, companyId: number) {
+export function getChargePointsApplications(entity_id: number, companyId: number) {
 
-  return api.get<Api<ElecChargingPointsApplication[]>>("/elec/cpo/charging-points/applications", {
+  return api.get<Api<ElecChargePointsApplication[]>>("/elec/cpo/charge-points/applications", {
     params: { entity_id, company_id: companyId },
   })
 }
 
-export function downloadChargingPoints(entityId: number, companyId: number) {
-  return download("/elec/cpo/charging-points", { entity_id: entityId, company_id: companyId, export: true })
+export function downloadChargePoints(entityId: number, companyId: number) {
+  return download("/elec/cpo/charge-points", { entity_id: entityId, company_id: companyId, export: true })
 }
 
-export function checkChargingPointsApplication(entity_id: number, file: File) {
-  return api.post<Api<ElecChargingPointsApplicationCheckInfo>>(
-    "/elec/cpo/charging-points/check-application",
+export function checkChargePointsApplication(entity_id: number, file: File) {
+  return api.post<Api<ElecChargePointsApplicationCheckInfo>>(
+    "/elec/cpo/charge-points/check-application",
     { entity_id, file }
   )
 }
 
-export function downloadChargingPointsApplicationDetails(entityId: number, companyId: number, applicationId: number) {
-  return download("/elec/cpo/charging-points/application-details", { entity_id: entityId, application_id: applicationId, export: true })
+export function downloadChargePointsApplicationDetails(entityId: number, companyId: number, applicationId: number) {
+  return download("/elec/cpo/charge-points/application-details", { entity_id: entityId, application_id: applicationId, export: true })
 }
 
-export function addChargingPoints(
+export function addChargePoints(
   entity_id: number,
   file: File,
 ) {
-  return api.post("/elec/cpo/charging-points/add-application", {
+  return api.post("/elec/cpo/charge-points/add-application", {
     entity_id,
     file
   })
@@ -153,7 +153,7 @@ export function downloadMeterReadingsApplicationDetails(entityId: number, compan
   })
 }
 
-export function checkMeterReadingsApplication(entity_id: number, file: File, quarter: number, year: number) {
+export function checkMeterReadingsApplication(entity_id: number, file: File, quarter?: number, year?: number) {
   return api.post<Api<ElecMeterReadingsApplicationCheckInfo>>(
     "/elec/cpo/meter-readings/check-application",
     { entity_id, file, quarter, year }
@@ -164,8 +164,8 @@ export function checkMeterReadingsApplication(entity_id: number, file: File, qua
 export function addMeterReadings(
   entity_id: number,
   file: File,
-  quarter: number,
-  year: number
+  quarter?: number,
+  year?: number
 ) {
   return api.post("/elec/cpo/meter-readings/add-application", {
     entity_id,

@@ -24,7 +24,7 @@ type EntitySummaryProps = {
   search?: string
 }
 
-type Operation = "user" | "certificate" | "double-counting" | "charging-points" | "meter-readings"
+type Operation = "user" | "certificate" | "double-counting" | "charge-points" | "meter-readings"
 
 export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
   const { t } = useTranslation()
@@ -70,7 +70,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
               EntityType.Auditor,
               EntityType.Airline,
               EntityType.CPO,
-              EntityType.PowerStation
+              EntityType.PowerOrHeatProducer
             ]}
           />
         )}
@@ -91,7 +91,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
               label: t("Demandes d'agrément double comptage"),
             },
             entity.isAdmin && {
-              value: "charging-points",
+              value: "charge-points",
               label: t("Inscriptions de points de recharge"),
             },
             entity.isAdmin && {
@@ -133,7 +133,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                   />
                 ),
               },
-              entity.isAdmin && (!operation || !["charging-points", "meter-readings"].includes(operation)) && {
+              entity.isAdmin && (!operation || !["charge-points", "meter-readings"].includes(operation)) && {
                 key: "factories",
                 header: t("Production / Stockage"),
                 orderBy: (e) => e.production_sites + e.depots,
@@ -152,7 +152,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                   />
                 ),
               },
-              entity.isAdmin && (!operation || !["double-counting", "charging-points", "meter-readings"].includes(operation)) && {
+              entity.isAdmin && (!operation || !["double-counting", "charge-points", "meter-readings"].includes(operation)) && {
                 key: "certificates",
                 header: t("Certificats"),
                 orderBy: (e) => e.certificates,
@@ -192,21 +192,21 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                   />
                 ),
               },
-              entity.isAdmin && "charging-points" === operation && {
-                key: "charging-points",
+              entity.isAdmin && "charge-points" === operation && {
+                key: "charge-points",
                 header: t("Points de recharge"),
-                orderBy: (e) => e.charging_points_pending * 1000 + e.charging_points_accepted,
+                orderBy: (e) => e.charge_points_pending * 1000 + e.charge_points_accepted,
                 cell: (e) => (
                   <EntityInfoCell
                     data={[
                       {
-                        count: e.charging_points_pending,
-                        label: t("{{count}} points de recharge en attente", { count: e.charging_points_pending }),
+                        count: e.charge_points_pending,
+                        label: t("{{count}} points de recharge en attente", { count: e.charge_points_pending }),
                         highlight: true,
                       },
                       {
-                        count: e.charging_points_accepted,
-                        label: t("{{count}} points de recharge", { count: e.charging_points_accepted }),
+                        count: e.charge_points_accepted,
+                        label: t("{{count}} points de recharge", { count: e.charge_points_accepted }),
                       },
                     ]}
                   />
@@ -290,6 +290,6 @@ function hasOperation(
   if (operation === "user" && details.requests > 0) return true
   if (operation === "certificate" && details.certificates_pending > 0) return true
   if (operation === "double-counting" && details.double_counting_requests > 0) return true
-  if (operation === "charging-points" && (details.charging_points_accepted > 0 || details.charging_points_pending > 0)) return true
+  if (operation === "charge-points" && (details.charge_points_accepted > 0 || details.charge_points_pending > 0)) return true
   if (operation === "meter-readings" && (details.meter_readings_pending > 0 || details.meter_readings_pending > 0)) return true
 }

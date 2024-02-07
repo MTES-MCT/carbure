@@ -147,6 +147,8 @@ contenant un script pouvant etre lancé (ex <https://gitlab.com/la-fabrique-nume
 
 ## Executer un script gourmand en ressource en prod
 
+`scalingo -a carbure-prod run python scripts/patches/2024-01-16_update_feedstock.py --id=77 --name="Ethanol\ pur\ de\ marc\ de\ raisin" --code="ETHANOL_PUR_MARC_RAISIN"`
+
 En lançant un one-off container (<https://doc.scalingo.com/platform/app/tasks>)
 `scalingo --app carbure-prod run --size XXL python web/carbure/scripts/update_iscc_certificates.py`
 

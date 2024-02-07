@@ -8,8 +8,8 @@ class MeterReadingRepository:
     @staticmethod
     def get_annotated_applications(cpo: Entity):
         return ElecMeterReadingApplication.objects.filter(cpo=cpo).annotate(
-            charging_point_count=Count("elec_meter_readings__id"),
-            energy_total=Sum("elec_meter_readings__extracted_energy"),
+            charge_point_count=Count("elec_meter_readings__id"),
+            energy_total=Sum("elec_meter_readings__renewable_energy"),
         )
 
     @staticmethod
@@ -29,6 +29,6 @@ class MeterReadingRepository:
     def get_application_meter_readings(cpo: Entity, application: ElecMeterReadingApplication):
         return (
             ElecMeterReading.objects.filter(cpo=cpo, application=application)
-            .values("extracted_energy", "reading_date")
+            .values("extracted_energy", "renewable_energy", "reading_date")
             .annotate(charge_point_id=F("charge_point__charge_point_id"))
         )

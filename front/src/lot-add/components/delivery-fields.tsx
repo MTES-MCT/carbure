@@ -161,7 +161,7 @@ export const ClientField = (props: AutocompleteProps<Entity | string>) => {
       {...bound}
       {...props}
       disabled={
-        entity.isPowerPlant ||
+        entity.isPowerOrHeatProducer ||
         (entity.isOperator && !hasClients) ||
         props.disabled ||
         bound.disabled
@@ -209,7 +209,7 @@ export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
       options={deliveryTypes}
       {...props}
       disabled={
-        entity.isPowerPlant ||
+        entity.isPowerOrHeatProducer ||
         (!isDraft && hasChildren) ||
         props.disabled ||
         bound.disabled
@@ -237,7 +237,7 @@ export function getDeliveryTypes(
 
   const {
     isOperator,
-    isPowerPlant,
+    isPowerOrHeatProducer,
     has_stocks,
     has_mac,
     has_direct_deliveries,
@@ -254,7 +254,7 @@ export function getDeliveryTypes(
     (isClientUnknown || isClientEntity) && has_direct_deliveries && DeliveryType.Direct, // prettier-ignore
     isIndustry && (isClientUnknown || isClientEntity) && DeliveryType.Exportation, // prettier-ignore
     status !== LotStatus.Draft && has_trading && DeliveryType.Trading,
-    isClientEntity && isPowerPlant && DeliveryType.Consumption,
+    isClientEntity && isPowerOrHeatProducer && DeliveryType.Consumption,
   ])
 }
 

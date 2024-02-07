@@ -160,7 +160,7 @@ export enum EntityType {
   ExternalAdmin = "Administration Externe",
   CPO = "Charge Point Operator",
   Unknown = "Unknown",
-  PowerStation = "Power Station",
+  PowerOrHeatProducer = "Power or Heat Producer",
 }
 
 export enum UserRole {
@@ -204,6 +204,9 @@ export enum DepotType {
   Other = "OTHER",
   BiofuelDepot = "BIOFUEL DEPOT",
   OilDepot = "OIL DEPOT",
+  PowerPlant = "POWER PLANT",
+  HeatPlant = "HEAT PLANT",
+  CogenerationPlant = "COGENERATION PLANT",
 }
 
 export enum OwnershipType {

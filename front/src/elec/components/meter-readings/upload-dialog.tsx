@@ -9,7 +9,6 @@ import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 
-import { meterReadingsApplicationCheckResponseFailed, meterReadingsApplicationCheckResponseSuccess } from "elec/__test__/data"
 import * as api from "elec/api-cpo"
 import { ElecMeterReadingsApplicationCheckInfo } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
@@ -19,16 +18,13 @@ import MeterReadingsValidDetailsDialog from "./valid-dialog"
 
 type ElecMeterReadingsFileUploadProps = {
   onClose: () => void
-  quarter: number,
-  year: number,
   companyId: number
   pendingApplicationAlreadyExists: boolean
 }
 
 const ElecMeterReadingsFileUpload = ({
   onClose,
-  quarter,
-  year,
+  
   companyId,
   pendingApplicationAlreadyExists,
 }: ElecMeterReadingsFileUploadProps) => {
@@ -92,15 +88,13 @@ const ElecMeterReadingsFileUpload = ({
     checkMeterReadingsFile.execute(
       entity.id,
       value.meterReadingsFile as File,
-      quarter,
-      year,
     )
   }
 
   return (
     <Dialog onClose={onClose}>
       <header>
-        <h1>{t("Relevés trimestriels - T{{quarter}} {{year}}", { quarter, year })}</h1>
+        <h1>{t("Relevés trimestriels")}</h1>
       </header>
 
       <main>

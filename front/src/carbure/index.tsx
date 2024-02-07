@@ -24,6 +24,7 @@ import Stats from "stats"
 import ElecCPO from "elec/cpo"
 import ElecAdmin from "elec-admin"
 import { ElecOperator } from "elec/operator"
+import ElecAdminAudit from "elec-admin-audit"
 
 const Carbure = () => {
   const user = useUserManager()
@@ -81,7 +82,7 @@ const Org = () => {
     isProducer,
     isAirline,
     isCPO,
-    isPowerPlant,
+    isPowerOrHeatProducer,
     has_saf,
     has_elec,
   } = entity
@@ -94,7 +95,7 @@ const Org = () => {
     <Routes>
       <Route path="settings" element={<Settings />} />
 
-      {(isIndustry || isPowerPlant) &&
+      {(isIndustry || isPowerOrHeatProducer) &&
         (<>
           <Route path="transactions/:year/*" element={<Transactions />} />
           <Route path="registry" element={<Registry />} />
@@ -151,7 +152,13 @@ const Org = () => {
       {(isAdmin || isElecAdmin) &&
         <>
           <Route path="elec-admin/:year/*" element={<ElecAdmin />} />
-          <Route path="elec-admin" element={<Navigate replace to={`${currentYear}/provisioned`} />} />
+          <Route path="elec-admin" element={<Navigate replace to={`${currentYear}`} />} />
+        </>
+      }
+      {(isAdmin || isElecAdmin) &&
+        <>
+          <Route path="elec-admin-audit/:year/*" element={<ElecAdminAudit />} />
+          <Route path="elec-admin-audit" element={<Navigate replace to={`${currentYear}`} />} />
         </>
       }
       {hasAirline && <Route path="*" element={<Navigate replace to="entities" />} />}

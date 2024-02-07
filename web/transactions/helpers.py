@@ -499,7 +499,7 @@ def fill_delivery_data(lot, data, entity, prefetched_data):
     if entity.entity_type == Entity.OPERATOR and lot.carbure_client == entity and lot.delivery_type == CarbureLot.UNKNOWN:
         lot.delivery_type = CarbureLot.BLENDING
 
-    if entity.entity_type == Entity.POWER_STATION:
+    if entity.entity_type == Entity.POWER_OR_HEAT_PRODUCER:
         lot.delivery_type = CarbureLot.CONSUMPTION
 
     return errors
@@ -508,11 +508,11 @@ def fill_delivery_data(lot, data, entity, prefetched_data):
 def fill_client_data(lot, data, entity, prefetched_data):
     errors = []
     carbure_client_id = data.get("carbure_client_id", None)
-    
+
     if entity.entity_type == Entity.OPERATOR and carbure_client_id is None and lot.delivery_type == CarbureLot.UNKNOWN:
         lot.carbure_client = entity
-    
-    if entity.entity_type == Entity.POWER_STATION:
+
+    if entity.entity_type == Entity.POWER_OR_HEAT_PRODUCER:
         lot.carbure_client = entity
 
     try:

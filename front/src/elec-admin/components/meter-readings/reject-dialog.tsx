@@ -29,7 +29,7 @@ export const MeterReadingsApplicationRejectDialog = ({
     invalidates: ["meter-readings-applications"],
     onSuccess() {
       onClose()
-      notify(t("Les relevés pour les {{count}} points de recharge ont été refusés !", { count: application.charging_point_count }), { variant: "success" })
+      notify(t("Les relevés pour les {{count}} points de recharge ont été refusés !", { count: application.charge_point_count }), { variant: "success" })
 
     },
     onError(err) {
@@ -61,7 +61,7 @@ export const MeterReadingsApplicationRejectDialog = ({
                 quarterString: quarterString
 
               }}
-              count={application.charging_point_count}
+              count={application.charge_point_count}
               defaults="<b>{{count}}</b> relevés de points de recharge importés le <b>{{applicationDate}}</b> pour le {{quarterString}}." />
           </p>
           <p>

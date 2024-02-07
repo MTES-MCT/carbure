@@ -15,8 +15,6 @@ class ElecChargePointSerializer(serializers.ModelSerializer):
             "measure_date",
             "measure_energy",
             "is_article_2",
-            "is_auto_consumption",
-            "is_article_4",
             "measure_reference_point_id",
             "station_name",
             "station_id",
@@ -34,3 +32,9 @@ class ElecChargePointSerializer(serializers.ModelSerializer):
 
     def get_nominal_power(self, instance):
         return round(instance.nominal_power or 0, 2)
+
+
+class ElecChargePointSampleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ElecChargePoint
+        fields = ["id", "latitude", "longitude", "charge_point_id", "mid_id"]

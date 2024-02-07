@@ -3,25 +3,22 @@ import { Alert } from "common/components/alert"
 import Button from "common/components/button"
 import { AlertCircle, Check, Cross, Download, Plus } from "common/components/icons"
 import { usePortal } from "common/components/portal"
-import { Grid, LoaderOverlay, Panel } from "common/components/scaffold"
+import { LoaderOverlay, Panel } from "common/components/scaffold"
 import Table, { Cell, actionColumn } from "common/components/table"
 import { useQuery } from "common/hooks/async"
-import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
+import { formatNumber } from "common/utils/formatters"
 import * as apiAdmin from "elec-admin/api"
-import ElecChargingPointsFileUpload from "elec/components/charging-points/upload-dialog"
-import { ElecChargingPointsApplication, ElecChargingPointsApplicationStatus, ElecChargingPointsSnapshot, ElecMeterReadingsApplication, ElecMeterReadingsApplicationStatus } from "elec/types"
-import { Trans, useTranslation } from "react-i18next"
 import * as apiCpo from "elec/api-cpo"
-import { elecMeterReadingsApplications } from "elec/__test__/data"
+import { ElecMeterReadingsApplication, ElecMeterReadingsApplicationStatus } from "elec/types"
+import { Trans, useTranslation } from "react-i18next"
 
 import { compact } from "common/utils/collection"
-import ChargingPointsApplicationAcceptDialog from "elec-admin/components/charging-points/accept-dialog"
-import ChargingPointsApplicationRejectDialog from "elec-admin/components/charging-points/reject-dialog"
+
+import MeterReadingsApplicationAcceptDialog from "elec-admin/components/meter-readings/accept-dialog"
+import MeterReadingsApplicationRejectDialog from "elec-admin/components/meter-readings/reject-dialog"
 import { useMatch } from "react-router-dom"
 import ApplicationStatus from "./application-status"
 import ElecMeterReadingsFileUpload from "./upload-dialog"
-import MeterReadingsApplicationAcceptDialog from "elec-admin/components/meter-readings/accept-dialog"
-import MeterReadingsApplicationRejectDialog from "elec-admin/components/meter-readings/reject-dialog"
 
 const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
   const { t } = useTranslation()
@@ -42,15 +39,10 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
   // const applications = elecMeterReadingsApplications // TEST with applications
   const isEmpty = applications.length === 0
 
-  const currentDate = new Date()
-  const currentQuarter = currentDate.getMonth() < 3 ? 1 : currentDate.getMonth() < 6 ? 2 : currentDate.getMonth() < 9 ? 3 : 4
-  const currentYear = currentDate.getFullYear()
-  const quarterString = t("T{{quarter}} {{year}}", { quarter: currentQuarter, year: currentYear })
-
   function showUploadDialog() {
-    const pendingApplicationAlreadyExists = applications.filter(app => app.status === ElecMeterReadingsApplicationStatus.Pending && app.quarter === currentQuarter).length > 0
+    const pendingApplicationAlreadyExists = applications.filter(app => app.status === ElecMeterReadingsApplicationStatus.Pending).length > 0
     portal((resolve) => (
-      <ElecMeterReadingsFileUpload onClose={resolve} pendingApplicationAlreadyExists={pendingApplicationAlreadyExists} quarter={currentQuarter} year={currentYear} companyId={companyId} />
+      <ElecMeterReadingsFileUpload onClose={resolve} pendingApplicationAlreadyExists={pendingApplicationAlreadyExists} companyId={companyId} />
     ))
   }
 
@@ -73,15 +65,15 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
             variant="primary"
             icon={Plus}
             action={showUploadDialog}
-            label={t("Transmettre mes relevés trimestriels {{quarter}}", { quarter: quarterString })}
+            label={t("Transmettre mes relevés trimestriels")}
           />
         )}
-        {/* {applicationsSnapshot.charging_point_count > 0 &&
+        {/* {applicationsSnapshot.charge_point_count > 0 &&
           <Button
             asideX={!isCPO}
             variant="secondary"
             icon={Download}
-            action={downloadChargingPoints}
+            action={downloadChargePoints}
             label={t("Exporter les points de recharge")}
           />
         } */}
@@ -126,7 +118,7 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
                 header: t("Points de recharge"),
                 cell: (application) => (
                   <Cell
-                    text={`${formatNumber(application.charging_point_count)}`}
+                    text={`${formatNumber(application.charge_point_count)}`}
                   />
                 ),
               },
@@ -134,7 +126,7 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
                 header: t("kwh renouvelables"),
                 cell: (application) => (
                   <Cell
-                    text={`${formatNumber(Math.round(application.energy_total))}` + " kWh"}
+                    text={`${formatNumber(Math.round(application.energy_total))} kWh`}
                   />
                 ),
               },
@@ -183,5 +175,3 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
 }
 
 export default ElecMeterReadingsSettings
-
-
