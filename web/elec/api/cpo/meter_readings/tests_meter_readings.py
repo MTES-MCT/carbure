@@ -25,8 +25,8 @@ OK_METER_READINGS = [
     },
     {
         "charge_point_id": "FR00EFGH",
-        "previous_reading": 600,
-        "current_reading": 700,
+        "previous_reading": 700,
+        "current_reading": 800,
         "reading_date": datetime.date(2024, 9, 28),
     },
 ]
@@ -107,7 +107,7 @@ class ElecMeterReadingsTest(TestCase):
             installation_date=datetime.date(2021, 6, 2),
             mid_id="MID_EFGH",
             measure_date=datetime.date(2022, 10, 1),
-            measure_energy=500,
+            measure_energy=700,
             measure_reference_point_id="PRM_EFGH",
             station_name="Station",
             station_id="FR00",
@@ -146,7 +146,8 @@ class ElecMeterReadingsTest(TestCase):
         )
 
         self.meter_reading_2 = ElecMeterReading.objects.create(
-            extracted_energy=600,
+            extracted_energy=800,
+            renewable_energy=24.92,
             reading_date=datetime.date(2024, 5, 21),
             charge_point=self.charge_point_2,
             cpo=self.cpo,
@@ -194,6 +195,8 @@ class ElecMeterReadingsTest(TestCase):
                 "file": SimpleUploadedFile("readings.xlsx", excel_file.read()),
             },
         )
+
+        self.maxDiff = None
 
         data = response.json()
         self.assertEqual(response.status_code, 400)
@@ -315,7 +318,7 @@ class ElecMeterReadingsTest(TestCase):
 
         self.assertEqual(reading_1.extracted_energy, 1100)
         self.assertEqual(reading_1.reading_date, datetime.date(2024, 9, 25))
-        self.assertEqual(reading_2.extracted_energy, 700)
+        self.assertEqual(reading_2.extracted_energy, 800)
         self.assertEqual(reading_2.reading_date, datetime.date(2024, 9, 28))
 
     def test_get_applications(self):
@@ -339,7 +342,7 @@ class ElecMeterReadingsTest(TestCase):
                         "application_date": application_date,
                         "charge_point_count": 1,
                         "cpo": {"entity_type": "Charge Point Operator", "id": self.cpo.id, "name": "CPO"},
-                        "energy_total": 600.0,
+                        "energy_total": 24.92,
                         "id": application.id,
                         "quarter": 2,
                         "status": "ACCEPTED",
@@ -366,8 +369,8 @@ class ElecMeterReadingsTest(TestCase):
                 "data": [
                     {
                         "charge_point_id": "FR00EFGH",
-                        "previous_reading": 500.0,
-                        "current_reading": 600.0,
+                        "previous_reading": 700.0,
+                        "current_reading": 800.0,
                         "reading_date": "2024-05-21",
                     },
                 ],
