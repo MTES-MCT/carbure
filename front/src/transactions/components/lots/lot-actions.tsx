@@ -61,6 +61,7 @@ export const LotActions = ({ count, category, ...props }: ActionBarProps) => {
             </Fragment>
           )}
           <RecallManyButton {...props} />
+          <DeleteManyButton {...props} />
         </Fragment>
       )}
 
