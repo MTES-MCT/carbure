@@ -2,6 +2,7 @@ from django.db.models import Count, Sum, F, Q
 from core.models import Entity
 from elec.models import ElecMeterReadingApplication
 from elec.models.elec_meter_reading import ElecMeterReading
+from transactions.models.year_config import YearConfig
 
 
 class MeterReadingRepository:
@@ -32,3 +33,8 @@ class MeterReadingRepository:
             .values("extracted_energy", "renewable_energy", "reading_date")
             .annotate(charge_point_id=F("charge_point__charge_point_id"))
         )
+
+    @staticmethod
+    def get_renewable_share(year: int):
+        instance = YearConfig.objects.get(year=year)
+        return instance.renewable_share / 100

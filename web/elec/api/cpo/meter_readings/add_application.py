@@ -51,7 +51,8 @@ def add_application(request: HttpRequest, entity: Entity):
 
     charge_points = ChargePointRepository.get_registered_charge_points(entity)
     previous_application = MeterReadingRepository.get_previous_application(entity, quarter, year)
-    meter_reading_data, errors = import_meter_reading_excel(excel_file, charge_points, previous_application)
+    renewable_share = MeterReadingRepository.get_renewable_share(year)
+    meter_reading_data, errors = import_meter_reading_excel(excel_file, charge_points, previous_application, renewable_share)
 
     if len(meter_reading_data) == 0:
         return ErrorResponse(400, AddMeterReadingApplicationError.NO_READING_FOUND)
