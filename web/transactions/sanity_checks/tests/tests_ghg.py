@@ -5,7 +5,6 @@ from core.carburetypes import CarbureMLGHGErrors, CarbureSanityCheckErrors
 from core.models import Entity, MatierePremiere
 from ml.models import ETDStats
 from transactions.factories import CarbureLotFactory
-from transactions.models import LockedYear
 from ..ghg import oct2015, jan2021
 from ..helpers import enrich_lot, has_error, get_prefetched_data, july1st2021
 from ..sanity_checks import sanity_checks

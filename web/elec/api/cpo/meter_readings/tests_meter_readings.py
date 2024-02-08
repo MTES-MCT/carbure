@@ -15,6 +15,7 @@ from elec.models.elec_charge_point_application import ElecChargePointApplication
 from elec.models.elec_meter_reading import ElecMeterReading
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from elec.services.create_meter_reading_excel import create_meter_readings_excel
+from transactions.models.year_config import YearConfig
 
 OK_METER_READINGS = [
     {
@@ -74,6 +75,8 @@ class ElecMeterReadingsTest(TestCase):
             "gogogo",
             [(self.cpo, "RW"), (self.operator, "RW")],
         )
+
+        YearConfig.objects.create(year=2024, renewable_share=24.92)
 
         self.charge_point_application = ElecChargePointApplication.objects.create(
             status=ElecChargePointApplication.ACCEPTED,

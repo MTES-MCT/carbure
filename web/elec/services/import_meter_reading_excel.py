@@ -24,6 +24,7 @@ def import_meter_reading_excel(
     excel_file: UploadedFile,
     existing_charge_points: Iterable[ElecChargePoint],
     previous_application: ElecMeterReadingApplication = None,
+    renewable_share: int = 1,
 ):
     valid_meter_readings = []
     validation_errors = []
@@ -69,7 +70,7 @@ def import_meter_reading_excel(
                 {
                     "charge_point_id": charge_point_pk,
                     "extracted_energy": extracted_energy,
-                    "renewable_energy": (extracted_energy - previous_extracted_energy) * 0.2492,
+                    "renewable_energy": (extracted_energy - previous_extracted_energy) * renewable_share,
                     "reading_date": reading_date,
                 }
             )
