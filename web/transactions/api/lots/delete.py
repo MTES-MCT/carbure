@@ -35,7 +35,7 @@ def lots_delete(request, entity):
 
     for node in nodes:
         try:
-            # recursively remove the node and update its parents
+            # remove the node and update its parents
             deleted, updated = node.delete(entity.id)
             deleted_nodes += deleted
             updated_nodes += updated
