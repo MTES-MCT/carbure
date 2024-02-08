@@ -2,7 +2,7 @@ import datetime
 from certificates.models import DoubleCountingRegistration
 from ml.models import EECStats, EPStats, ETDStats
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
-from transactions.models.locked_year import LockedYear
+from transactions.models.year_config import YearConfig
 from core.models import (
     Biocarburant,
     CarbureLot,
@@ -123,7 +123,7 @@ def get_prefetched_data(entity=None):
     data["feedstocks"] = {m.code: m for m in MatierePremiere.objects.all()}
     data["depots"] = {d.depot_id: d for d in Depot.objects.all()}
     data["depotsbyname"] = {d.name.upper(): d for d in data["depots"].values()}
-    data["locked_years"] = [locked_year.year for locked_year in LockedYear.objects.filter(locked=True)]
+    data["locked_years"] = [locked_year.year for locked_year in YearConfig.objects.filter(locked=True)]
 
     if entity:
         # get only my production sites

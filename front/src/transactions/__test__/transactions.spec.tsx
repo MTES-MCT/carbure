@@ -138,7 +138,9 @@ test("check outbox actions", async () => {
   await user.click(screen.getByText("Corrections (0)"))
 
   screen.getByText("Confirmer les corrections")
-  screen.getByText("Supprimer la sélection")
+
+  const deleteButtons = screen.getAllByText("Supprimer la sélection")
+  expect(deleteButtons).toHaveLength(2)
 
   await screen.findByText("2021")
 })

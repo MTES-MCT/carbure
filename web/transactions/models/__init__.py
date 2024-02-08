@@ -1,1 +1,1 @@
-from .locked_year import *
+from .year_config import *

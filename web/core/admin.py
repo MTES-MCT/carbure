@@ -38,7 +38,6 @@ from core.models import Depot, GenericError
 from core.models import SustainabilityDeclaration, EntityDepot
 from core.models import TransactionDistance
 from core.models import CarbureNotification
-from transactions.models import LockedYear
 from transactions.sanity_checks.helpers import get_prefetched_data
 
 

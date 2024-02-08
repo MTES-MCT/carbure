@@ -1,10 +1,10 @@
-import io
 from datetime import date, timedelta
 from typing import Iterable, Optional, TypedDict
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill, Side, Border
 
 from elec.models import ElecChargePoint, ElecMeterReadingApplication
+from elec.repositories.meter_reading_repository import MeterReadingRepository
 
 
 class MeterReadingData(TypedDict):
@@ -23,7 +23,9 @@ def create_meter_readings_excel(
 ):
     workbook = Workbook()
     sheet = workbook.active
+
     last_day = (date(year, quarter * 3, 1) + timedelta(days=31)).replace(day=1)
+    renewable_share = MeterReadingRepository.get_renewable_share(year)
 
     # HEADER
 
@@ -37,12 +39,11 @@ def create_meter_readings_excel(
         sheet["F1"] = "Electricité renouvelable consommée sur la période"
 
         sheet["H1"] = "Part renouvelable de l'électricité sur la période"
-        sheet["H2"] = "24,92%"
+        sheet["H2"] = f"{renewable_share * 100}%"
 
     # BODY
 
     stations = set()
-    renewable_part = 0.2492
 
     for i, reading in enumerate(meter_readings_data, 2):
         stations.add(reading.get("charge_point_id")[0:5])
@@ -54,7 +55,7 @@ def create_meter_readings_excel(
 
         if extended:
             sheet[f"E{i}"] = f"=IF(ISBLANK(C{i}), 0, C{i} - B{i})"
-            sheet[f"F{i}"] = f"=IF(ISBLANK(E{i}), 0, ROUND(E{i} * {renewable_part}, 2))"
+            sheet[f"F{i}"] = f"=IF(ISBLANK(E{i}), 0, ROUND(E{i} * {renewable_share}, 2))"
 
     # FOOTER
 
