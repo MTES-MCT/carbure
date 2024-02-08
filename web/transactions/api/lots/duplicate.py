@@ -4,7 +4,7 @@ from django.http.response import JsonResponse
 from core.decorators import check_user_rights
 from transactions.sanity_checks import bulk_sanity_checks, bulk_scoring, get_prefetched_data
 
-from core.models import CarbureLot, Entity, UserRights
+from core.models import CarbureLot, CarbureLotEvent, Entity, UserRights
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
@@ -42,6 +42,12 @@ def duplicate_lot(request, *args, **kwargs):
             else:
                 setattr(lot, f, "")
     lot.save()
+    e = CarbureLotEvent()
+    e.event_type = CarbureLotEvent.CREATED
+    e.lot_id = lot.pk
+    e.user = request.user
+    e.metadata = {"source": "MANUAL"}
+    e.save()
     data = get_prefetched_data(Entity.objects.get(id=entity_id))
     bulk_sanity_checks([lot], data)
     bulk_scoring([lot], data)
