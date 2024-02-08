@@ -1,5 +1,4 @@
-import os
-import django
+import traceback
 import xlsxwriter
 import datetime
 import random
@@ -651,7 +650,10 @@ def make_carbure_lots_sheet(workbook, entity, lots):
     for index, row in df.iterrows():
         colid = 0
         for elem in row:
-            worksheet_lots.write(index+1, colid, elem)
+            try:
+                worksheet_lots.write(index+1, colid, elem)
+            except:
+                traceback.print_exc()
             colid += 1
 
 def make_carbure_stock_sheet(workbook, lots):
