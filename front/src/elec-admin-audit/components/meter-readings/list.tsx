@@ -50,8 +50,8 @@ const MeterReadingsApplicationsList = ({ snapshot, year }: TransferListProps) =>
   }
 
 
-  const meterReadingsApplicationsData = elecAdminMeterReadingsApplicationsList
-  // const meterReadingsApplicationsData = meterReadingsApplicationsResponse.result?.data.data
+  // const meterReadingsApplicationsData = elecAdminMeterReadingsApplicationsList
+  const meterReadingsApplicationsData = meterReadingsApplicationsResponse.result?.data.data
 
   const total = meterReadingsApplicationsData?.total ?? 0
   const count = meterReadingsApplicationsData?.returned ?? 0
@@ -75,7 +75,8 @@ const MeterReadingsApplicationsList = ({ snapshot, year }: TransferListProps) =>
           <StatusSwitcher
             status={status}
             onSwitch={actions.setStatus}
-            snapshot={snapshot}
+            historyCount={snapshot.meter_readings_applications_history}
+            pendingCount={snapshot.meter_readings_applications_pending}
           />
 
 
@@ -118,7 +119,7 @@ export default MeterReadingsApplicationsList
 
 const FILTERS = [
   ElecAdminAuditFilter.Cpo,
-  ElecAdminAuditFilter.Period
+  ElecAdminAuditFilter.Quarter
 ]
 
 

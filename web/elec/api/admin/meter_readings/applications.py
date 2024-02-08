@@ -25,6 +25,6 @@ def get_applications(request):
 
     company = form.cleaned_data["company_id"]
 
-    applications = MeterReadingRepository.get_annotated_applications(company)
+    applications = MeterReadingRepository.get_annotated_applications_by_cpo(company)
     serialized = ElecMeterReadingApplicationSerializer(applications, many=True).data
     return SuccessResponse(serialized)
