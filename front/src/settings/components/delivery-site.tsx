@@ -28,6 +28,7 @@ import { compact } from "common/utils/collection"
 import { useMutation, useQuery } from "common/hooks/async"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
+import { formatNumber, formatPercentage } from "common/utils/formatters"
 
 interface DeliverySiteSettingsProps {
   readOnly?: boolean
@@ -196,6 +197,13 @@ export const DeliverySiteDialog = ({
     { value: OwnershipType.Processing, label: t("Processing") },
   ]
 
+  const depotType = deliverySite.depot?.depot_type ?? DepotType.Other
+  const isPowerOrHeatPlant = [DepotType.PowerPlant, DepotType.HeatPlant, DepotType.CogenerationPlant].includes(depotType) // prettier-ignore
+
+  const electricalEfficiency = deliverySite.depot?.electrical_efficiency
+  const thermalEfficiency = deliverySite.depot?.thermal_efficiency
+  const usefulTemperature = deliverySite.depot?.useful_temperature
+
   return (
     <Dialog onClose={onClose}>
       <header>
@@ -293,7 +301,36 @@ export const DeliverySiteDialog = ({
           </Form>
         </section>
 
-        <hr />
+        {isPowerOrHeatPlant && (
+          <>
+            <hr />
+            <section>
+              {electricalEfficiency && (
+                <TextInput
+                  readOnly
+                  label={t("Rendement électrique")}
+                  value={formatPercentage(electricalEfficiency * 100)}
+                />
+              )}
+              {thermalEfficiency && (
+                <TextInput
+                  readOnly
+                  label={t("Rendement thermique")}
+                  value={formatPercentage(thermalEfficiency * 100)}
+                />
+              )}
+              {usefulTemperature && (
+                <TextInput
+                  readOnly
+                  label={t("Température utile")}
+                  value={formatNumber(usefulTemperature) + "˚C"}
+                />
+              )}
+            </section>
+          </>
+        )}
+
+        <section></section>
       </main>
 
       <footer>
