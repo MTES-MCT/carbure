@@ -8,6 +8,7 @@ import hashlib
 from calendar import monthrange
 from django.db.models.signals import pre_delete, pre_save, post_save
 from django.dispatch import receiver
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 usermodel = get_user_model()
 
@@ -344,9 +345,9 @@ class Depot(models.Model):
     accise = models.CharField(max_length=32, blank=True, null=True, default=None)
     private = models.BooleanField(default=False)
 
-    electrical_efficiency = models.FloatField(blank=True, null=True, default=None)
-    thermal_efficiency = models.FloatField(blank=True, null=True, default=None)
-    useful_temperature = models.FloatField(blank=True, null=True, default=None)
+    electrical_efficiency = models.FloatField(blank=True, null=True, default=None, help_text="Entre 0 et 1", validators=[MinValueValidator(0), MaxValueValidator(1)])  # fmt:skip
+    thermal_efficiency = models.FloatField(blank=True, null=True, default=None, help_text="Entre 0 et 1", validators=[MinValueValidator(0), MaxValueValidator(1)])  # fmt:skip
+    useful_temperature = models.FloatField(blank=True, null=True, default=None, help_text="En degrés Celsius")
 
     def __str__(self):
         return self.name
