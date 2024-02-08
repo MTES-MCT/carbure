@@ -7,7 +7,7 @@ from transactions.api.lots.tests.tests_utils import get_lot
 from core.tests_utils import setup_current_user
 from core.models import CarbureLot, Entity, UserRights
 from django_otp.plugins.otp_email.models import EmailDevice
-from transactions.models import LockedYear
+from transactions.models import YearConfig
 from core.carburetypes import CarbureError
 
 
@@ -106,7 +106,7 @@ class LotCorrectionTest(TestCase):
         self.assertEqual(lot.volume, 42000)
 
     def test_simple_correction(self):
-        LockedYear.objects.create(year=2020, locked=True)
+        YearConfig.objects.create(year=2020, locked=True)
 
         lot = self.prepare_lot(self.producer, self.trader)
         self.assertEqual(lot.lot_status, CarbureLot.PENDING)
@@ -150,7 +150,7 @@ class LotCorrectionTest(TestCase):
     def test_simple_correction_on_locked_year(self):
         lot = self.prepare_lot(self.producer, self.trader)
 
-        LockedYear.objects.create(year=2021, locked=True)
+        YearConfig.objects.create(year=2021, locked=True)
 
         # client requests correction
         response = self.client.post(

@@ -4,7 +4,6 @@ from django.test import TestCase
 from core.carburetypes import CarbureSanityCheckErrors, CarbureCertificatesErrors
 from core.models import Entity, CarbureLot, MatierePremiere, Biocarburant, Depot, Pays
 from transactions.factories import CarbureLotFactory
-from transactions.models import LockedYear
 from producers.models import ProductionSite
 from ..helpers import enrich_lot, has_error, get_prefetched_data
 from ..sanity_checks import sanity_checks

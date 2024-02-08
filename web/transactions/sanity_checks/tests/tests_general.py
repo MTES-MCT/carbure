@@ -4,7 +4,7 @@ from django.test import TestCase
 from core.carburetypes import CarbureSanityCheckErrors
 from core.models import Entity, CarbureLot, MatierePremiere, Biocarburant, Depot, EntityDepot
 from transactions.factories import CarbureLotFactory
-from transactions.models import LockedYear
+from transactions.models import YearConfig
 from producers.models import ProductionSiteInput, ProductionSiteOutput
 from resources.factories import ProductionSiteFactory
 from ..sanity_checks import sanity_checks
@@ -100,7 +100,7 @@ class GeneralSanityChecksTest(TestCase):
         error_list = self.run_checks(lot)
         self.assertFalse(has_error(error, error_list))
 
-        LockedYear.objects.create(year=2017, locked=True)
+        YearConfig.objects.create(year=2017, locked=True)
         prefetched_data = get_prefetched_data()
 
         lot.year = 2017
