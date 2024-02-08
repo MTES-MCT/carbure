@@ -5,12 +5,17 @@ from elec.models.elec_meter_reading import ElecMeterReading
 
 
 class MeterReadingRepository:
+
     @staticmethod
-    def get_annotated_applications(cpo: Entity):
-        return ElecMeterReadingApplication.objects.filter(cpo=cpo).annotate(
+    def get_annotated_applications():
+        return ElecMeterReadingApplication.objects.all().annotate(
             charge_point_count=Count("elec_meter_readings__id"),
             energy_total=Sum("elec_meter_readings__extracted_energy"),
         )
+
+    @staticmethod
+    def get_annotated_applications_by_cpo(cpo):
+        return MeterReadingRepository.get_annotated_applications().filter(cpo=cpo)
 
     @staticmethod
     def get_previous_application(cpo: Entity, quarter=None, year=None):

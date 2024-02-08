@@ -6,4 +6,5 @@ urlpatterns = [
     path("years", get_years, name="elec-admin-audit-years"),
     path("snapshot", get_snapshot, name="elec-admin-audit-snapshot"),
     path("charge-points/", include("elec.api.admin.audit.charge_points")),
+    path("meter-readings/", include("elec.api.admin.audit.meter_readings")),
 ]
