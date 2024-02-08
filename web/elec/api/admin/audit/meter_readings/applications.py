@@ -8,10 +8,14 @@ from core.decorators import check_admin_rights
 from core.models import ExternalAdminRights
 from core.utils import MultipleValueField
 from elec.models.elec_charge_point_application import ElecChargePointApplication
+from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from elec.repositories.charge_point_repository import ChargePointRepository
+from elec.repositories.meter_reading_repository import MeterReadingRepository
 from elec.serializers.elec_charge_point_application import ElecChargePointApplicationSerializer
 from django.core.paginator import Paginator
 from django.db.models import Count, Sum
+
+from elec.serializers.elec_meter_reading_application_serializer import ElecMeterReadingApplicationSerializer
 
 
 class AuditApplicationsSortForm(forms.Form):
@@ -23,6 +27,7 @@ class AuditApplicationsFilterForm(forms.Form):
     year = forms.IntegerField()
     status = forms.CharField()
     cpo = MultipleValueField(coerce=str, required=False)
+    quarter = MultipleValueField(coerce=str, required=False)
 
 
 @require_GET
@@ -42,22 +47,22 @@ def get_applications(request):
     limit = audit_applications_sort_form.cleaned_data["limit"] or 25
 
     try:
-        charge_points_applications = ChargePointRepository.get_annotated_applications()
-        charge_points_applications = filter_charge_point_applications(
-            charge_points_applications, **audit_applications_filter_form.cleaned_data
+        meter_readings_applications = MeterReadingRepository.get_annotated_applications()
+        meter_readings_applications = filter_meter_readings_applications(
+            meter_readings_applications, **audit_applications_filter_form.cleaned_data
         )
 
-        paginator = Paginator(charge_points_applications, limit)
+        paginator = Paginator(meter_readings_applications, limit)
         current_page = floor(from_idx / limit) + 1
         page = paginator.page(current_page)
 
-        ids = charge_points_applications.values_list("id", flat=True)
+        ids = meter_readings_applications.values_list("id", flat=True)
 
-        serialized = ElecChargePointApplicationSerializer(page.object_list, many=True)
+        serialized = ElecMeterReadingApplicationSerializer(page.object_list, many=True)
 
         return SuccessResponse(
             {
-                "charge_points_applications": serialized.data,
+                "meter_readings_applications": serialized.data,
                 "ids": list(ids),
                 "from": from_idx,
                 "returned": len(serialized.data),
@@ -70,7 +75,7 @@ def get_applications(request):
         return ErrorResponse(400, CarbureError.UNKNOWN_ERROR)
 
 
-def filter_charge_point_applications(applications, **filters):
+def filter_meter_readings_applications(applications, **filters):
     applications = applications.select_related(
         "cpo",
     )
@@ -80,13 +85,16 @@ def filter_charge_point_applications(applications, **filters):
     if filters["cpo"]:
         applications = applications.filter(cpo__name__in=filters["cpo"])
 
+    if filters["quarter"]:
+        applications = applications.filter(quarter__in=filters["quarter"])
+
     if filters["status"] == "PENDING":
         applications = applications.filter(
-            status__in=[ElecChargePointApplication.PENDING, ElecChargePointApplication.AUDIT_IN_PROGRESS]
+            status__in=[ElecMeterReadingApplication.PENDING, ElecMeterReadingApplication.AUDIT_IN_PROGRESS]
         )
     elif filters["status"] == "HISTORY":
         applications = applications.filter(
-            status__in=[ElecChargePointApplication.REJECTED, ElecChargePointApplication.ACCEPTED]
+            status__in=[ElecMeterReadingApplication.REJECTED, ElecMeterReadingApplication.ACCEPTED]
         )
 
     return applications

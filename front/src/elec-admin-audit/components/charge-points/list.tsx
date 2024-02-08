@@ -74,7 +74,8 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
           <StatusSwitcher
             status={status}
             onSwitch={actions.setStatus}
-            snapshot={snapshot}
+            historyCount={snapshot.charge_points_applications_history}
+            pendingCount={snapshot.charge_points_applications_pending}
           />
 
 

@@ -28,17 +28,14 @@ export const MeterReadingsApplicationDetailsDialog = () => {
   const portal = usePortal()
   const navigate = useNavigate()
   const location = useLocation()
-
   const match = useHashMatch("application/:id")
-
-
 
   const meterReadingsApplicationResponse = useQuery(api.getMeterReadingsApplicationDetails, {
     key: "audit-meter-readings-application-details",
     params: [entity.id, parseInt(match?.params.id!)],
   })
-  // const meterReadingApplication = meterReadingApplicationResponse.result?.data.data
-  const meterReadingsApplication = elecMeterReadingApplication1Details // TEST with data
+  const meterReadingsApplication = meterReadingsApplicationResponse.result?.data.data
+  // const meterReadingsApplication = elecMeterReadingApplication1Details // TEST with data
 
 
   const startMeterReadingsApplicationAuditResponse = useMutation(api.startMeterReadingsApplicationAudit, {
