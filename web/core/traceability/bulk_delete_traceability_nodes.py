@@ -12,7 +12,9 @@ def bulk_delete_traceability_nodes(nodes):
 
     if len(nodes_by_type[Node.LOT]) > 0:
         lot_ids = [lot.id for lot in nodes_by_type[Node.LOT]]
-        CarbureLot.objects.filter(id__in=lot_ids).update(lot_status=CarbureLot.DELETED)
+        lots = CarbureLot.objects.filter(id__in=lot_ids)
+        lots.exclude(lot_status=CarbureLot.DRAFT).update(lot_status=CarbureLot.DELETED)
+        lots.filter(lot_status=CarbureLot.DRAFT).delete()
 
     if len(nodes_by_type[Node.STOCK]) > 0:
         stock_ids = [stock.id for stock in nodes_by_type[Node.STOCK]]

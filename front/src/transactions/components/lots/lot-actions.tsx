@@ -45,14 +45,10 @@ export const LotActions = ({ count, category, ...props }: ActionBarProps) => {
               <RejectManyButton {...props} disabled={empty} />
             </Fragment>
           )}
-          {category === "correction" && (
-            <Fragment>
-              <ApproveManyFixesButton {...props} />
-              <DeleteManyButton {...props} />
-            </Fragment>
-          )}
+          {category === "correction" && <ApproveManyFixesButton {...props} />}
           {category === "history" && <CancelAcceptManyButton {...props} />}
           <RequestManyFixesButton {...props} />
+          <DeleteManyButton {...props} />
         </Fragment>
       )}
 
@@ -65,6 +61,7 @@ export const LotActions = ({ count, category, ...props }: ActionBarProps) => {
             </Fragment>
           )}
           <RecallManyButton {...props} />
+          <DeleteManyButton {...props} />
         </Fragment>
       )}
 
