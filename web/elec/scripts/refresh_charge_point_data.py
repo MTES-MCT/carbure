@@ -32,6 +32,7 @@ def refresh_charge_point_data(batch):
 
     # fix wrong current type
     charge_points.filter(current_type="CC").update(current_type="DC")
+    charge_points.filter(current_type="CA").update(current_type="AC")
 
     # update charge point data from TDG
     paginator = Paginator(charge_points, batch)
@@ -60,7 +61,7 @@ def update_charge_point(charge_point: ElecChargePoint, data: dict):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Refresh charge point data and meter readings")
-    parser.add_argument("--batch", dest="batch", action="store", default=1000, help="How many operations at a time")
+    parser.add_argument("--batch", dest="batch", type=int, action="store", default=1000, help="How many operations at a time")  # fmt:skip
     args = parser.parse_args()
 
     refresh_charge_point_data(args.batch)
