@@ -53,8 +53,6 @@ def get_application_details(request):
             excel_file = export_charge_points_to_excel(charge_points, application.cpo)
         return ExcelResponse(excel_file)
 
-    charge_point_application = ElecChargePointApplicationDetailsSerializer(
-        application
-    ).data  # TODO envoyer liste des admins plutot que le premier
+    charge_point_application = ElecChargePointApplicationDetailsSerializer(application).data
 
     return SuccessResponse(charge_point_application)

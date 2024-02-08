@@ -8,10 +8,11 @@ from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
 from elec.api.admin.audit.charge_points.applications import AuditApplicationsFilterForm, filter_charge_point_applications
 from elec.repositories.charge_point_repository import ChargePointRepository
+from elec.repositories.meter_reading_repository import MeterReadingRepository
 
 
 @check_user_rights()
-def get_charge_points_applications_filters(request, *args, **kwargs):
+def get_meter_readings_applications_filters(request, *args, **kwargs):
     filter_form = AuditApplicationsFilterForm(request.GET)
 
     if not filter_form.is_valid():
@@ -23,11 +24,11 @@ def get_charge_points_applications_filters(request, *args, **kwargs):
     try:
         # do not apply the filter we are listing so we can get all its possible values in the current context
         query[filter] = None
-        charge_points_applications = ChargePointRepository.get_annotated_applications()
+        meter_readings_applications = MeterReadingRepository.get_annotated_applications()
         # find all applications  matching the rest of the query
-        charge_points_applications = filter_charge_point_applications(charge_points_applications, **query)
+        meter_readings_applications = filter_charge_point_applications(meter_readings_applications, **query)
         # get the available values for the selected filter
-        data = get_filter_values(charge_points_applications, filter)
+        data = get_filter_values(meter_readings_applications, filter)
 
         return SuccessResponse(list(set(data)))
     except:
@@ -36,14 +37,16 @@ def get_charge_points_applications_filters(request, *args, **kwargs):
 
 
 def get_filter_values(applications, filter):
+
     if not filter:
         raise Exception("No filter was specified")
 
     if filter == "cpo":
         column = "cpo__name"
-
+    elif filter == "quarter":
+        column = "quarter"
     else:  # raise an error for unknown filters
-        raise Exception("Filter '%s' does not exist for ticket sources" % filter)
+        raise Exception("Filter '%s' does not exist for tickets" % filter)
 
     values = applications.values_list(column, flat=True).distinct()
     return [v for v in values if v]

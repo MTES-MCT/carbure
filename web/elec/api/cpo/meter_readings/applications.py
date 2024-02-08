@@ -9,6 +9,6 @@ from elec.serializers.elec_meter_reading_application_serializer import ElecMeter
 @require_GET
 @check_user_rights(entity_type=[Entity.CPO])
 def get_applications(request, entity):
-    applications = MeterReadingRepository.get_annotated_applications(entity)
+    applications = MeterReadingRepository.get_annotated_applications_by_cpo(entity)
     serialized = ElecMeterReadingApplicationSerializer(applications, many=True).data
     return SuccessResponse(serialized)
