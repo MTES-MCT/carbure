@@ -40,23 +40,15 @@ class LotsFlowTest(TestCase):
         self.trader.default_certificate = "TRADER_CERTIFICATE"
         self.trader.save()
         self.operator = Entity.objects.filter(entity_type=Entity.OPERATOR)[0]
-        UserRights.objects.update_or_create(
-            entity=self.producer, user=self.user1, role=UserRights.RW
-        )
-        UserRights.objects.update_or_create(
-            entity=self.trader, user=self.user1, role=UserRights.RW
-        )
-        UserRights.objects.update_or_create(
-            entity=self.operator, user=self.user1, role=UserRights.RW
-        )
+        UserRights.objects.update_or_create(entity=self.producer, user=self.user1, role=UserRights.RW)
+        UserRights.objects.update_or_create(entity=self.trader, user=self.user1, role=UserRights.RW)
+        UserRights.objects.update_or_create(entity=self.operator, user=self.user1, role=UserRights.RW)
 
         # pass otp verification
         response = self.client.post(reverse("auth-request-otp"))
         self.assertEqual(response.status_code, 200)
         device, created = EmailDevice.objects.get_or_create(user=self.user1)
-        response = self.client.post(
-            reverse("auth-verify-otp"), {"otp_token": device.token}
-        )
+        response = self.client.post(reverse("auth-verify-otp"), {"otp_token": device.token})
         self.assertEqual(response.status_code, 200)
 
     def create_draft_v2(self, **kwargs):
@@ -124,15 +116,17 @@ class LotsFlowTest(TestCase):
             {"entity_id": self.producer.id, "selection": [lot.id]},
         )
         self.assertEqual(response.status_code, 200)
-        lot = CarbureLot.objects.get(id=lot.id)
-        self.assertEqual(lot.lot_status, CarbureLot.DELETED)
+        with self.assertRaises(Exception):
+            CarbureLot.objects.get(id=lot.id)
 
         lot = self.send_lot(self.create_draft())
         response = self.client.post(
             reverse("transactions-lots-delete"),
             {"entity_id": self.producer.id, "selection": [lot.id]},
         )  # cannot delete a lot not in draft
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 200)
+        lot.refresh_from_db()
+        self.assertEqual(lot.lot_status, CarbureLot.DELETED)
 
         lot = self.create_draft()
         response = self.client.post(
@@ -189,9 +183,7 @@ class LotsFlowTest(TestCase):
         self.assertEqual(lot.delivery_type, CarbureLot.RFC)
 
     def test_send_rfc(self):
-        lot = self.create_draft(
-            unknown_client="CLIENT MAC", delivery_type="RFC", carbure_client_id=""
-        )
+        lot = self.create_draft(unknown_client="CLIENT MAC", delivery_type="RFC", carbure_client_id="")
         lot = self.send_lot(lot)
         self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)
         self.assertEqual(lot.delivery_type, CarbureLot.RFC)
