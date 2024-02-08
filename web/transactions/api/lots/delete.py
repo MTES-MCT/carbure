@@ -1,90 +1,93 @@
-from django.http.response import JsonResponse
+from django.db import transaction
+from admin.api.controls.lots.update_many import group_lots_by_entity, serialize_node
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
-from core.helpers import (
-    filter_lots,
-    get_entity_lots_by_status,
-)
+from core.helpers import filter_lots, get_entity_lots_by_status
 
-from core.models import (
-    CarbureLot,
-    CarbureLotEvent,
-    CarbureStock,
-    CarbureStockEvent,
-    Entity,
-    UserRights,
-)
+from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, UserRights
+from core.traceability import bulk_delete_traceability_nodes, bulk_update_traceability_nodes, get_traceability_nodes
+from core.traceability.lot import LotNode
+
+
+class DeleteLotsError:
+    NO_LOTS_FOUND = "NO_LOTS_FOUND"
+    DELETION_FORBIDDEN = "DELETION_FORBIDDEN"
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
-def lots_delete(request, *args, **kwargs):
-    context = kwargs["context"]
-    entity_id = context["entity_id"]
+def lots_delete(request, entity):
     status = request.POST.get("status", None)
-    entity = Entity.objects.get(id=entity_id)
+    dry_run = request.POST.get("dry_run") == "true"
+
     lots = get_entity_lots_by_status(entity, status)
     filtered_lots = filter_lots(lots, request.POST, entity)
+
     if filtered_lots.count() == 0:
-        return JsonResponse(
-            {"status": "error", "message": "Could not find lots to delete"}, status=400
+        return ErrorResponse(400, DeleteLotsError.NO_LOTS_FOUND)
+
+    # query the database for all the traceability nodes related to these lots
+    nodes = get_traceability_nodes(filtered_lots)
+
+    deleted_nodes = []
+    updated_nodes = []
+
+    delete_error_lots = []
+
+    for node in nodes:
+        try:
+            # recursively remove the node and update its parents
+            deleted, updated = node.delete(entity.id)
+            deleted_nodes += deleted
+            updated_nodes += updated
+        except:
+            delete_error_lots.append(node.data)
+
+    if len(delete_error_lots) > 0:
+        return ErrorResponse(400, DeleteLotsError.DELETION_FORBIDDEN, [lot.id for lot in delete_error_lots])
+
+    # prepare lot event list
+    update_events = []
+
+    for node in deleted_nodes:
+        # only create events for lots that are also not drafts
+        if not isinstance(node, LotNode) or node.data.lot_status == CarbureLot.DRAFT:
+            continue
+
+        # save a lot event with the current modification
+        update_events.append(
+            CarbureLotEvent(
+                event_type=CarbureLotEvent.DELETED,
+                lot=node.data,
+                user=request.user,
+            )
         )
-    for lot in filtered_lots:
-        if lot.added_by != entity:
-            return JsonResponse(
-                {
-                    "status": "forbidden",
-                    "message": "Entity not authorized to delete this lot",
-                },
-                status=403,
-            )
 
-        if lot.lot_status not in [CarbureLot.DRAFT, CarbureLot.REJECTED] and not (
-            lot.lot_status in [CarbureLot.PENDING, CarbureLot.ACCEPTED]
-            and lot.correction_status == CarbureLot.IN_CORRECTION
-        ):
-            # cannot delete lot accepted / frozen or already deleted
-            return JsonResponse(
-                {"status": "error", "message": "Cannot delete lot"}, status=400
-            )
+    # prepare notifications to be sent to relevant entities
+    delete_notifications = []
 
-        event = CarbureLotEvent()
-        event.event_type = CarbureLotEvent.DELETED
-        event.lot = lot
-        event.user = request.user
-        event.save()
-        lot.lot_status = CarbureLot.DELETED
-        lot.save()
-        if lot.parent_stock is not None:
-            stock = CarbureStock.objects.get(
-                id=lot.parent_stock.id
-            )  # force refresh from db
-            stock.remaining_volume = round(stock.remaining_volume + lot.volume, 2)
-            stock.remaining_weight = stock.get_weight()
-            stock.remaining_lhv_amount = stock.get_lhv_amount()
-            stock.save()
-            # save event
-            event = CarbureStockEvent()
-            event.event_type = CarbureStockEvent.UNSPLIT
-            event.stock = lot.parent_stock
-            event.user = request.user
-            event.metadata = {
-                "message": "child lot deleted. recredit volume.",
-                "volume_to_credit": lot.volume,
-            }
-            event.save()
-        if lot.parent_lot:
-            if lot.parent_lot.delivery_type in [
-                CarbureLot.PROCESSING,
-                CarbureLot.TRADING,
-            ]:
-                lot.parent_lot.lot_status = CarbureLot.PENDING
-                lot.parent_lot.delivery_type = CarbureLot.OTHER
-                lot.parent_lot.save()
-                # save event
-                event = CarbureLotEvent()
-                event.event_type = CarbureLotEvent.RECALLED
-                event.lot = lot.parent_lot
-                event.user = request.user
-                event.metadata = {"message": "child lot deleted. back to inbox."}
-                event.save()
+    deleted_lots = [node.data for node in deleted_nodes if isinstance(node, LotNode)]
+    updated_lots = [node.data for node in updated_nodes if isinstance(node, LotNode)]
 
-    return JsonResponse({"status": "success"})
+    deleted_by_entity = group_lots_by_entity(deleted_lots)
+    updated_by_entity = group_lots_by_entity(updated_lots)
+
+    # merge the two dicts to get all the entity_ids that should be notified
+    entity_ids = list({**deleted_by_entity, **updated_by_entity})
+
+    for entity_id in entity_ids:
+        deleted = deleted_by_entity.get(entity_id, [])
+        updated = updated_by_entity.get(entity_id, [])
+
+    # save everything in the database in one single transaction
+    if not dry_run:
+        with transaction.atomic():
+            bulk_update_traceability_nodes(updated_nodes)
+            bulk_delete_traceability_nodes(deleted_nodes)
+            CarbureLotEvent.objects.bulk_create(update_events)
+            CarbureNotification.objects.bulk_create(delete_notifications)
+
+    # prepare the response data
+    deletions = [serialize_node(node) for node in deleted_nodes]
+    updates = [serialize_node(node) for node in updated_nodes]
+
+    return SuccessResponse({"deletions": deletions, "updates": updates})
