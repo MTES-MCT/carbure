@@ -361,6 +361,9 @@ class Depot(models.Model):
             "depot_type": self.depot_type,
             "address": self.address,
             "postal_code": self.postal_code,
+            "electrical_efficiency": self.electrical_efficiency,
+            "thermal_efficiency": self.thermal_efficiency,
+            "useful_temperature": self.useful_temperature,
         }
 
     class Meta:
