@@ -1,6 +1,6 @@
 from transactions.api.lots.tests.tests_utils import get_lot
 from core.models import CarbureLot, CarbureStock, Entity, UserRights
-from transactions.models import LockedYear
+from transactions.models import YearConfig
 from django.contrib.auth import get_user_model
 from django.db.models import Count
 from django.test import TestCase
@@ -77,12 +77,12 @@ class LotsFlowTest(TestCase):
         return lot
 
     def test_create_draft(self, **kwargs):
-        LockedYear.objects.create(year=2018, locked=True)  # 2021 is the right year
+        YearConfig.objects.create(year=2018, locked=True)  # 2021 is the right year
         lot = self.create_draft(**kwargs)
         self.assertEqual(lot.lot_status, CarbureLot.DRAFT)
 
     def test_create_draft_on_locked_year(self, **kwargs):
-        LockedYear.objects.create(year=2021, locked=True)
+        YearConfig.objects.create(year=2021, locked=True)
         lot = get_lot(self.producer)
         lot.update(kwargs)
         response = self.client.post(reverse("transactions-lots-add"), lot)
@@ -97,7 +97,7 @@ class LotsFlowTest(TestCase):
         self.assertEqual(errors[0]["error"], CarbureError.YEAR_LOCKED)
 
     def test_update_lot(self):
-        LockedYear.objects.create(year=2018, locked=True)
+        YearConfig.objects.create(year=2018, locked=True)
         lotdata = get_lot(entity=self.producer)
         lot = self.create_draft(lot=lotdata)
         lotdata["lot_id"] = lot.id

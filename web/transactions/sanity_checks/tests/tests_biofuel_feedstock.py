@@ -3,7 +3,6 @@ from django.test import TestCase
 from core.carburetypes import CarbureSanityCheckErrors
 from core.models import Entity, MatierePremiere
 from transactions.factories import CarbureLotFactory
-from transactions.models import LockedYear
 from ..helpers import enrich_lot, has_error, get_prefetched_data
 from ..sanity_checks import sanity_checks
 

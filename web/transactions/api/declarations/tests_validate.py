@@ -6,7 +6,7 @@ from core.tests_utils import setup_current_user
 from django.test import TestCase
 from django.urls import reverse
 from transactions.factories import CarbureLotFactory
-from transactions.models import LockedYear
+from transactions.models import YearConfig
 
 
 class ValidateDeclarationTest(TestCase):
@@ -57,7 +57,7 @@ class ValidateDeclarationTest(TestCase):
         return sent_lots, received_lots
 
     def test_validate_declaration(self):
-        LockedYear.objects.create(year=2021, locked=True)
+        YearConfig.objects.create(year=2021, locked=True)
 
         query = {
             "entity_id": self.entity.id,
@@ -88,7 +88,7 @@ class ValidateDeclarationTest(TestCase):
         self.assertEqual(declared_received_lots.count(), 50)
 
     def test_validate_declaration_on_locked_year(self):
-        LockedYear.objects.create(year=2022, locked=True)
+        YearConfig.objects.create(year=2022, locked=True)
 
         query = {
             "entity_id": self.entity.id,
