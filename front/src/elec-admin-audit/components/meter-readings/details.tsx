@@ -160,7 +160,7 @@ export const MeterReadingsApplicationDetailsDialog = () => {
                 <p>
                   <Send />
                   <Trans>
-                    Action requise par l’administrateur pour poursuivre l’audit de ces relevés trimestriels :
+                    Action requise par l'administrateur pour poursuivre l'audit de ces relevés trimestriels :
                   </Trans>
                 </p>
                 <ul>
@@ -186,7 +186,7 @@ export const MeterReadingsApplicationDetailsDialog = () => {
           {meterReadingsApplication?.status === ElecAuditApplicationStatus.AuditInProgress && (
             <>
               <MailtoButton cpo={meterReadingsApplication.cpo} quarter={meterReadingsApplication.quarter} year={meterReadingsApplication.year} emailContacts={meterReadingsApplication.email_contacts} />
-              <Button icon={Download} label={t("Télécharger l’échantillon")} variant="secondary" action={downloadSample} />
+              <Button icon={Download} label={t("Télécharger l'échantillon")} variant="secondary" action={downloadSample} />
               <Button icon={Check} label={t("Valide")} variant="success" action={acceptApplication} />
               <Button icon={Cross} label={t("Refuser")} variant="danger" action={rejectApplication} />
             </>
@@ -209,7 +209,7 @@ const MailtoButton = ({ cpo, quarter, year, emailContacts }: { cpo: EntityPrevie
 
   const mailto = `mailto:${emailContacts.join(',')}?subject=${encodeURIComponent(subject)}&body=${bodyIntro + bodyContent + bodyOutro}`
 
-  return <Button icon={Send} label={t("Générer l’email")} variant="secondary" href={mailto} />
+  return <Button icon={Send} label={t("Générer l'email")} variant="secondary" href={mailto} />
 
 }
 

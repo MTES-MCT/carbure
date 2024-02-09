@@ -63,7 +63,7 @@ export const ElecAdminProvisionDetailsDialog = () => {
 
             <TextInput
               readOnly
-              label={t("Unité d’exploitation")}
+              label={t("Unité d'exploitation")}
               value={provisionCertificate?.operating_unit}
 
             />

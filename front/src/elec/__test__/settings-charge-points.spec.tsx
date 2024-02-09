@@ -76,7 +76,7 @@ test("upload dialog opened", async () => {
   const subscribeButton = await screen.findByText("Inscrire des points de recharge")
   await user.click(subscribeButton)
 
-  screen.getByText("Cet outil vous permet de vérifier la conformité de votre demande d’inscription.")
+  screen.getByText("Cet outil vous permet de vérifier la conformité de votre demande d'inscription.")
   const templateButton = screen.getByText("sur ce lien")
   user.click(templateButton)
 

@@ -154,7 +154,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
                 <p>
                   <Send />
                   <Trans>
-                    Action requise par l’administrateur pour poursuivre l’audit de l’inscription des points de recharge :
+                    Action requise par l'administrateur pour poursuivre l'audit de l'inscription des points de recharge :
                   </Trans>
                 </p>
                 <ul>
@@ -180,7 +180,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
           {chargePointApplication?.status === ElecAuditApplicationStatus.AuditInProgress && (
             <>
               <MailtoButton cpo={chargePointApplication.cpo} chargePointCount={chargePointApplication.charge_point_count} emailContacts={chargePointApplication.email_contacts} />
-              <Button icon={Download} label={t("Télécharger l’échantillon")} variant="secondary" action={downloadSample} />
+              <Button icon={Download} label={t("Télécharger l'échantillon")} variant="secondary" action={downloadSample} />
               <Button icon={Check} label={t("Valide")} variant="success" action={acceptApplication} />
               <Button icon={Cross} label={t("Refuser")} variant="danger" action={rejectApplication} />
             </>
@@ -203,7 +203,7 @@ const MailtoButton = ({ cpo, chargePointCount, emailContacts }: { cpo: EntityPre
 
   const mailto = `mailto:${emailContacts.join(',')}?subject=${encodeURIComponent(subject)}&body=${bodyIntro + bodyContent + bodyOutro}`
 
-  return <Button icon={Send} label={t("Générer l’email")} variant="secondary" href={mailto} />
+  return <Button icon={Send} label={t("Générer l'email")} variant="secondary" href={mailto} />
 
 }
 

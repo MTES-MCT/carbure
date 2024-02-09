@@ -123,14 +123,14 @@ const ReplaceApplicationConfirmDialog = ({ onClose, onConfirm }: {
   return <Dialog onClose={onClose}>
     <header>
 
-      <h1>{t("Remplacer la demande d’inscription ?")}</h1>
+      <h1>{t("Remplacer la demande d'inscription ?")}</h1>
     </header>
 
     <main>
 
       <section>
         <p style={{ textAlign: 'left' }}>
-          <Trans>Souhaitez-vous confirmer le remplacement de la précédente demande d’inscription par celle-ci ?</Trans>
+          <Trans>Souhaitez-vous confirmer le remplacement de la précédente demande d'inscription par celle-ci ?</Trans>
         </p>
 
       </section>
