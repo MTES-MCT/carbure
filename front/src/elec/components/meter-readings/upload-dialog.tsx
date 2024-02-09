@@ -24,7 +24,7 @@ type ElecMeterReadingsFileUploadProps = {
 
 const ElecMeterReadingsFileUpload = ({
   onClose,
-  
+
   companyId,
   pendingApplicationAlreadyExists,
 }: ElecMeterReadingsFileUploadProps) => {
@@ -59,8 +59,8 @@ const ElecMeterReadingsFileUpload = ({
       // return
 
       if (response?.status === 400 && response.data.error === "VALIDATION_ERROR") {
-          const checkedData = response!.data.data
-          portal((close) => <MeterReadingsErrorsDetailsDialog fileData={checkedData} onClose={close} />)
+        const checkedData = response!.data.data
+        portal((close) => <MeterReadingsErrorsDetailsDialog fileData={checkedData} onClose={close} />)
       } else if (response?.status === 413) {
         notify(
           t(
@@ -114,7 +114,7 @@ const ElecMeterReadingsFileUpload = ({
                 .
               </Trans></li>
               <li>
-                <Trans>Remplissez la colonne correspondante au trimestre actuel</Trans>
+                <Trans>Remplissez les colonnes en bleu (C et D) correspondant aux relevés du trimestre actuel</Trans>
               </li>
               <li>
                 <Trans>Déposez le fichier ci-dessous</Trans>

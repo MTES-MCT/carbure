@@ -90,7 +90,7 @@ const ElecChargePointsFileUpload = ({
           <Form id="dc-checker">
             <p>
               {t(
-                "Cet outil vous permet de vérifier la conformité de votre demande d’inscription."
+                "Cet outil vous permet de vérifier la conformité de votre demande d'inscription."
               )}
             </p>
             <p>
