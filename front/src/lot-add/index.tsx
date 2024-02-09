@@ -22,7 +22,7 @@ export const LotAdd = () => {
   const form = useLotForm()
 
   const addLot = useMutation(api.addLot, {
-    invalidates: ["lots", "snapshot", "year", "lot-summary"],
+    invalidates: ["lots", "snapshot", "years", "lot-summary"],
 
     onSuccess: (res) => {
       navigate({ pathname: `../drafts/imported/${res.data.data?.id}`, search })

@@ -43,7 +43,7 @@ export const MeterReadingsValidDetailsDialog = ({
 
   const submitMeterReadingsApplication = () => {
     const confirmApplication = () => {
-      meterReadingsApplication.execute(entity.id, file, fileData.quarter, fileData.year)
+      meterReadingsApplication.execute(entity.id, file)
     }
     if (fileData.pending_application_already_exists) {
       portal((resolve) => (

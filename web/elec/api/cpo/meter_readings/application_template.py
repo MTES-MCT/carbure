@@ -34,7 +34,7 @@ def get_application_template(request, entity):
     year = form.cleaned_data["year"] or auto_year
 
     if not quarter or not year:
-        message = "Les inscriptions de relevés pour un trimestre doivent être réalisées entre les 10 derniers jours de la fin de ce trimestre et les 20 premiers jours du trimestre suivant."
+        message = "Les inscriptions de relevés pour un trimestre doivent être réalisées entre les 10 derniers jours de ce trimestre et les 20 premiers jours du trimestre suivant."
         return ErrorResponse(400, ApplicationTemplateError.TOO_LATE, message=message)
 
     charge_points = ChargePointRepository.get_registered_charge_points(entity)

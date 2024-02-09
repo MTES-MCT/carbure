@@ -104,6 +104,14 @@ class CarbureLotEventSerializer(serializers.ModelSerializer):
         fields = ["user", "event_type", "event_dt", "metadata"]
 
 
+class CarbureLotAdminEventSerializer(serializers.ModelSerializer):
+    user = serializers.SlugRelatedField(read_only=True, slug_field="email")
+
+    class Meta:
+        model = CarbureLotEvent
+        fields = ["user", "event_type", "event_dt", "metadata"]
+
+
 class CarbureStockEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarbureLotEvent

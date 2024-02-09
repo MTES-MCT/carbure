@@ -6,7 +6,6 @@ from core.carburetypes import CarbureCertificatesErrors, CarbureSanityCheckError
 from core.models import Entity, MatierePremiere
 from producers.models import ProductionSite
 from transactions.factories import CarbureLotFactory
-from transactions.models import LockedYear
 from ..helpers import enrich_lot, has_error, get_prefetched_data
 from ..sanity_checks import sanity_checks
 

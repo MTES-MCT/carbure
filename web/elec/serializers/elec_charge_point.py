@@ -15,8 +15,6 @@ class ElecChargePointSerializer(serializers.ModelSerializer):
             "measure_date",
             "measure_energy",
             "is_article_2",
-            "is_auto_consumption",
-            "is_article_4",
             "measure_reference_point_id",
             "station_name",
             "station_id",

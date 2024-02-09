@@ -29,6 +29,7 @@ from core.models import (
 )
 from core.models import GenericError
 from core.serializers import (
+    CarbureLotAdminEventSerializer,
     CarbureLotAdminSerializer,
     CarbureLotCommentSerializer,
     CarbureLotEventSerializer,
@@ -776,6 +777,9 @@ def get_lots_errors(lots, entity):
 def get_lot_updates(lot, entity=None):
     if lot is None:
         return []
+
+    if entity and entity.entity_type == Entity.ADMIN:
+        return CarbureLotAdminEventSerializer(lot.carburelotevent_set.all(), many=True).data
 
     context = {"visible_users": None}
 

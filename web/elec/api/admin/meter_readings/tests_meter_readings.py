@@ -10,6 +10,7 @@ from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_charge_point_application import ElecChargePointApplication
 from elec.models.elec_meter_reading import ElecMeterReading
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
+from transactions.models.year_config import YearConfig
 
 OK_METER_READINGS = [
     {
@@ -74,6 +75,8 @@ class ElecMeterReadingsTest(TestCase):
             "gogogo",
             [(self.admin, "RW"), (self.cpo, "RW"), (self.operator, "RW")],
         )
+
+        YearConfig.objects.create(year=2024, renewable_share=24.92)
 
         self.charge_point_application = ElecChargePointApplication.objects.create(
             status=ElecChargePointApplication.ACCEPTED,
@@ -147,6 +150,7 @@ class ElecMeterReadingsTest(TestCase):
 
         self.meter_reading_2 = ElecMeterReading.objects.create(
             extracted_energy=600,
+            renewable_energy=24.92,
             reading_date=datetime.date(2024, 5, 21),
             charge_point=self.charge_point_2,
             cpo=self.cpo,
@@ -175,7 +179,7 @@ class ElecMeterReadingsTest(TestCase):
                         "application_date": application_date,
                         "charge_point_count": 1,
                         "cpo": {"entity_type": "Charge Point Operator", "id": self.cpo.id, "name": "CPO"},
-                        "energy_total": 600.0,
+                        "energy_total": 24.92,
                         "id": application.id,
                         "quarter": 2,
                         "status": "ACCEPTED",
