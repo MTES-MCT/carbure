@@ -42,6 +42,7 @@ def get_application_details(request):
     application: ElecMeterReadingApplication = form.cleaned_data["application_id"]
     export = form.cleaned_data["export"]
     want_sample = form.cleaned_data["sample"]
+    print("want_sample: ", want_sample)
 
     charge_points = ChargePointRepository.get_registered_charge_points(application.cpo)
     previous_application = MeterReadingRepository.get_previous_application(
@@ -52,21 +53,14 @@ def get_application_details(request):
     meter_readings_data = create_meter_readings_data(charge_points, previous_application, meter_readings)
 
     if export:
-        file_name = f"meter_readings_{application.cpo.slugify()}_Q{application.quarter}_{application.year}"
-        excel_file = create_meter_readings_excel(file_name, application.quarter, application.year, meter_readings_data)  # fmt:skip
-        return ExcelResponse(excel_file)
-
-    if export:
-        charge_points = ElecChargePoint.objects.filter(application=application.id)
         if want_sample:
-            print("ok")
-            # percentage = 0.10
-            # count_to_fetch = int(len(charge_points) * percentage)
-            # # Mélanger aléatoirement les charge_points
-            # random_charge_points = random.sample(list(charge_points), max(count_to_fetch, 1))
-            # # Conserver l'ordre d'origine en utilisant le slice
-            # charge_points = charge_points.filter(id__in=[cp.id for cp in random_charge_points])
-            # excel_file = export_charge_points_sample_to_excel(random_charge_points, application.cpo)
+            percentage = 0.10
+            count_to_fetch = int(len(charge_points) * percentage)
+            # Mélanger aléatoirement les charge_points
+            random_charge_points = random.sample(list(charge_points), max(count_to_fetch, 1))
+            # Conserver l'ordre d'origine en utilisant le slice
+            charge_points = charge_points.filter(id__in=[cp.id for cp in random_charge_points])
+            excel_file = export_charge_points_sample_to_excel(random_charge_points, application.cpo)
         else:
             file_name = f"meter_readings_{application.cpo.slugify()}_Q{application.quarter}_{application.year}"
             excel_file = create_meter_readings_excel(file_name, application.quarter, application.year, meter_readings_data)  # fmt:skip

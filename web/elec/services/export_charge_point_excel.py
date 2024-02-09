@@ -52,7 +52,7 @@ def export_charge_points_sample_to_excel(charge_points, entity):
         file,
         [
             {
-                "label": "Échantillon des points de recharge à auditer",
+                "label": "Échantillon à auditer",
                 "rows": ElecChargePointSampleSerializer(charge_points, many=True).data,
                 "columns": [
                     {"label": "Latitude", "value": "latitude"},
