@@ -63,7 +63,7 @@ export const MeterReadingsApplicationAcceptDialog = ({
                 year: application.year,
               }}
               count={application.charge_point_count}
-              defaults="<b>{{count}}</b> relevés pour T{{quarter}} {{year}}.</b>  ." />
+              defaults="<b>{{count}}</b> relevés envoyés pour T{{quarter}} {{year}}.</b>" />
           </p>
           <p>
             <Trans>Voulez-vous accepter cette demande ?</Trans>
