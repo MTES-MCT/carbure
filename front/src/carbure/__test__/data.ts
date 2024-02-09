@@ -5,6 +5,7 @@ import {
   DepotType,
   GESOption,
   ProductionSiteDetails,
+  Depot,
 } from "carbure/types"
 
 // ENTITIES
@@ -28,7 +29,6 @@ export const company: Entity = {
   sustainability_officer_phone_number: "",
   preferred_unit: "l",
 }
-
 
 export const producer: Entity = {
   id: 0,
@@ -114,7 +114,6 @@ export const admin: Entity = {
   preferred_unit: "l",
 }
 
-
 export const cpo: Entity = {
   id: 4,
   name: "CPO Test",
@@ -136,7 +135,6 @@ export const cpo: Entity = {
   preferred_unit: "l",
 }
 
-
 // COUNTRIES
 
 export const country = {
@@ -148,7 +146,7 @@ export const country = {
 
 // DELIVERY SITES
 
-export const deliverySite = {
+export const deliverySite: Depot = {
   depot_id: "10",
   name: "Test Delivery Site",
   city: "Test City",
@@ -156,6 +154,9 @@ export const deliverySite = {
   depot_type: DepotType.Other,
   address: "Test Address",
   postal_code: "64430",
+  electrical_efficiency: null,
+  thermal_efficiency: null,
+  useful_temperature: null,
 }
 
 // PRODUCTION SITES

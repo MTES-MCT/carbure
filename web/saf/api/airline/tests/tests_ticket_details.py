@@ -160,6 +160,4 @@ class SafTicketDetailsTest(TestCase):
             },
         }
 
-        self.maxDiff = None
-
         self.assertEqual(response.json()["data"], expected_ticket)

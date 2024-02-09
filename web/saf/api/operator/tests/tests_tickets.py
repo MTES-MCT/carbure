@@ -80,8 +80,6 @@ class SafTicketsTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        self.maxDiff = None
-
         expected_ticket = {
             "id": 4321,
             "carbure_id": "carbure-id-t-001",

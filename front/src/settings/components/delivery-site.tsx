@@ -28,6 +28,7 @@ import { compact } from "common/utils/collection"
 import { useMutation, useQuery } from "common/hooks/async"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
+import { formatNumber, formatPercentage } from "common/utils/formatters"
 
 interface DeliverySiteSettingsProps {
   readOnly?: boolean
@@ -60,6 +61,9 @@ const DeliverySitesSettings = ({
     [DepotType.Other]: t("Autre"),
     [DepotType.BiofuelDepot]: t("Biofuel Depot"),
     [DepotType.OilDepot]: t("Oil Depot"),
+    [DepotType.PowerPlant]: t("Centrale électrique"),
+    [DepotType.HeatPlant]: t("Centrale de chaleur"),
+    [DepotType.CogenerationPlant]: t("Centrale de cogénération"),
   }
 
   function findDeliverySite() {
@@ -182,6 +186,9 @@ export const DeliverySiteDialog = ({
     { value: DepotType.Other, label: t("Autre") },
     { value: DepotType.BiofuelDepot, label: t("Biofuel Depot") },
     { value: DepotType.OilDepot, label: t("Oil Depot") },
+    { value: DepotType.PowerPlant, label: t("Centrale électrique") },
+    { value: DepotType.HeatPlant, label: t("Centrale de chaleur") },
+    { value: DepotType.CogenerationPlant, label: t("Centrale de cogénération") }, // prettier-ignore
   ]
 
   const ownerShipTypes = [
@@ -189,6 +196,13 @@ export const DeliverySiteDialog = ({
     { value: OwnershipType.ThirdParty, label: t("Tiers") },
     { value: OwnershipType.Processing, label: t("Processing") },
   ]
+
+  const depotType = deliverySite.depot?.depot_type ?? DepotType.Other
+  const isPowerOrHeatPlant = [DepotType.PowerPlant, DepotType.HeatPlant, DepotType.CogenerationPlant].includes(depotType) // prettier-ignore
+
+  const electricalEfficiency = deliverySite.depot?.electrical_efficiency
+  const thermalEfficiency = deliverySite.depot?.thermal_efficiency
+  const usefulTemperature = deliverySite.depot?.useful_temperature
 
   return (
     <Dialog onClose={onClose}>
@@ -287,7 +301,36 @@ export const DeliverySiteDialog = ({
           </Form>
         </section>
 
-        <hr />
+        {isPowerOrHeatPlant && (
+          <>
+            <hr />
+            <section>
+              {electricalEfficiency && (
+                <TextInput
+                  readOnly
+                  label={t("Rendement électrique")}
+                  value={formatPercentage(electricalEfficiency * 100)}
+                />
+              )}
+              {thermalEfficiency && (
+                <TextInput
+                  readOnly
+                  label={t("Rendement thermique")}
+                  value={formatPercentage(thermalEfficiency * 100)}
+                />
+              )}
+              {usefulTemperature && (
+                <TextInput
+                  readOnly
+                  label={t("Température utile")}
+                  value={formatNumber(usefulTemperature) + "˚C"}
+                />
+              )}
+            </section>
+          </>
+        )}
+
+        <section></section>
       </main>
 
       <footer>

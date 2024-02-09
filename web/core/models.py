@@ -8,6 +8,7 @@ import hashlib
 from calendar import monthrange
 from django.db.models.signals import pre_delete, pre_save, post_save
 from django.dispatch import receiver
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 usermodel = get_user_model()
 
@@ -344,9 +345,9 @@ class Depot(models.Model):
     accise = models.CharField(max_length=32, blank=True, null=True, default=None)
     private = models.BooleanField(default=False)
 
-    electrical_efficiency = models.FloatField(blank=True, null=True, default=None)
-    thermal_efficiency = models.FloatField(blank=True, null=True, default=None)
-    useful_temperature = models.FloatField(blank=True, null=True, default=None)
+    electrical_efficiency = models.FloatField(blank=True, null=True, default=None, help_text="Entre 0 et 1", validators=[MinValueValidator(0), MaxValueValidator(1)])  # fmt:skip
+    thermal_efficiency = models.FloatField(blank=True, null=True, default=None, help_text="Entre 0 et 1", validators=[MinValueValidator(0), MaxValueValidator(1)])  # fmt:skip
+    useful_temperature = models.FloatField(blank=True, null=True, default=None, help_text="En degrés Celsius")
 
     def __str__(self):
         return self.name
@@ -360,6 +361,9 @@ class Depot(models.Model):
             "depot_type": self.depot_type,
             "address": self.address,
             "postal_code": self.postal_code,
+            "electrical_efficiency": self.electrical_efficiency,
+            "thermal_efficiency": self.thermal_efficiency,
+            "useful_temperature": self.useful_temperature,
         }
 
     class Meta:
@@ -1009,61 +1013,6 @@ def lot_post_save_gen_carbure_id(sender, instance, created, update_fields={}, *a
 
     if instance.carbure_id != old_carbure_id and instance.lot_status in ("PENDING", "ACCEPTED", "FROZEN"):
         instance.save(update_fields=["carbure_id"])
-
-
-@receiver(pre_delete, sender=CarbureStockTransformation, dispatch_uid="stock_transformation_delete_signal")
-def delete_stock_transformation(sender, instance, using, **kwargs):
-    # recredit volume to source stock
-    instance.source_stock.remaining_volume = round(
-        instance.source_stock.remaining_volume + instance.volume_deducted_from_source, 2
-    )
-    instance.source_stock.save()
-    # delete dest_stock
-    instance.dest_stock.parent_transformation = None
-    instance.dest_stock.parent_lot = None  # redundant
-    # save event
-    event = CarbureStockEvent()
-    event.event_type = CarbureStockEvent.UNTRANSFORMED
-    event.stock = instance.source_stock
-    event.user = None
-    event.metadata = {
-        "message": "delete stock transformation. recredit volume.",
-        "volume_to_credit": instance.volume_deducted_from_source,
-    }
-    event.save()
-
-
-@receiver(pre_delete, sender=CarbureLot, dispatch_uid="lot_delete_signal")
-def delete_lot(sender, instance, using, **kwargs):
-    # if we come from stock, recredit
-    if (
-        instance.lot_status != CarbureLot.DELETED and instance.parent_stock
-    ):  # if lot is already in status DELETED, we have already recredited the stock
-        # this lot was a split from a stock
-        instance.parent_stock.remaining_volume = round(instance.parent_stock.remaining_volume + instance.volume, 2)
-        instance.parent_stock.remaining_weight = instance.parent_stock.get_weight()
-        instance.parent_stock.remaining_lhv_amount = instance.parent_stock.get_lhv_amount()
-        instance.parent_stock.save()
-        # save event
-        event = CarbureStockEvent()
-        event.event_type = CarbureStockEvent.UNSPLIT
-        event.stock = instance.parent_stock
-        event.user = None
-        event.metadata = {"message": "child lot deleted. recredit volume.", "volume_to_credit": instance.volume}
-        event.save()
-    # if there is a parent_lot tagged as processing or trading, restore them to their "inbox" status
-    if instance.parent_lot:
-        if instance.parent_lot.delivery_type in [CarbureLot.PROCESSING, CarbureLot.TRADING]:
-            instance.parent_lot.lot_status = CarbureLot.PENDING
-            instance.parent_lot.delivery_type = CarbureLot.UNKNOWN
-            instance.parent_lot.save()
-            # save event
-            event = CarbureLotEvent()
-            event.event_type = CarbureLotEvent.RECALLED
-            event.lot = instance.parent_lot
-            event.user = None
-            event.metadata = {"message": "child lot deleted. back to inbox."}
-            # event.save()
 
 
 class CarbureStock(models.Model):

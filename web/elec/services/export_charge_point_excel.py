@@ -1,7 +1,5 @@
 import datetime
 
-from openpyxl import Workbook
-
 from core.excel import export_to_excel
 from elec.serializers.elec_charge_point import ElecChargePointSampleSerializer, ElecChargePointSerializer
 
@@ -17,27 +15,27 @@ def export_charge_points_to_excel(charge_points, entity):
                 "label": "Points de recharge",
                 "rows": ElecChargePointSerializer(charge_points, many=True).data,
                 "columns": [
-                    {"label": "id", "value": "id"},
-                    {"label": "cpo", "value": "cpo"},
+                    # {"label": "id", "value": "id"},
+                    {"label": "Aménageur", "value": "cpo"},
                     # cpo excel data
-                    {"label": "charge_point_id", "value": "charge_point_id"},
-                    {"label": "current_type", "value": "current_type"},
-                    {"label": "installation_date", "value": "installation_date"},
-                    {"label": "mid_id", "value": "mid_id"},
-                    {"label": "measure_date", "value": "measure_date"},
-                    {"label": "measure_energy", "value": "measure_energy"},
-                    {"label": "is_article_2", "value": "is_article_2"},
-                    {"label": "is_auto_consumption", "value": "is_auto_consumption"},
-                    {"label": "is_article_4", "value": "is_article_4"},
-                    {"label": "measure_reference_point_id", "value": "measure_reference_point_id"},
+                    {"label": "Identifiant du point de recharge", "value": "charge_point_id"},
+                    {"label": "Type de courant", "value": "current_type"},
+                    {"label": "Date d'installation date", "value": "installation_date"},
+                    {"label": "Identifiant MID", "value": "mid_id"},
+                    {"label": "Date du dernier relevé", "value": "measure_date"},
+                    {"label": "Énergie mesurée lors du dernier relevé", "value": "measure_energy"},
+                    # {"label": "is_article_2", "value": "is_article_2"},
+                    # {"label": "is_auto_consumption", "value": "is_auto_consumption"},
+                    # {"label": "is_article_4", "value": "is_article_4"},
+                    {"label": "Identifiant du point de référence de mesure", "value": "measure_reference_point_id"},
                     # transport.data.gouv.fr data
-                    {"label": "station_name", "value": "station_name"},
-                    {"label": "station_id", "value": "station_id"},
-                    {"label": "nominal_power", "value": "nominal_power"},
-                    {"label": "cpo_name", "value": "cpo_name"},
-                    {"label": "cpo_siren", "value": "cpo_siren"},
-                    {"label": "latitude", "value": "latitude"},
-                    {"label": "longitude", "value": "longitude"},
+                    {"label": "Nom de la station", "value": "station_name"},
+                    {"label": "Identifiant de la station", "value": "station_id"},
+                    {"label": "Puissance nominale", "value": "nominal_power"},
+                    # {"label": "Latitude", "value": "latitude"},
+                    # {"label": "Longitude", "value": "longitude"},
+                    # {"label": "Nom de l'aménageur", "value": "cpo_name"},
+                    # {"label": "SIREN de l'aménageur", "value": "cpo_siren"},
                 ],
             }
         ],
@@ -52,7 +50,7 @@ def export_charge_points_sample_to_excel(charge_points, entity):
         file,
         [
             {
-                "label": "Échantillon à auditer",
+                "label": "Points de recharge à auditer",
                 "rows": ElecChargePointSampleSerializer(charge_points, many=True).data,
                 "columns": [
                     {"label": "Latitude", "value": "latitude"},
