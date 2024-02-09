@@ -1,17 +1,17 @@
 import Tabs from "common/components/tabs"
-import { ElecAdminAuditSnapshot, ElecAdminAuditStatus } from "elec-admin-audit/types"
-import { ElecAdminSnapshot } from "elec-admin/types"
-import { ElecTransferCertificateStatus, ElecCPOSnapshot } from "elec/types-cpo"
+import { ElecAdminAuditStatus } from "elec-admin-audit/types"
 import { useTranslation } from "react-i18next"
 
 interface StatusSwitcherProps {
     status: ElecAdminAuditStatus
-    snapshot: ElecAdminAuditSnapshot | undefined
+    pendingCount: number
+    historyCount: number
     onSwitch: (status: ElecAdminAuditStatus) => void
 }
 export const StatusSwitcher = ({
     status,
-    snapshot,
+    pendingCount,
+    historyCount,
     onSwitch,
 }: StatusSwitcherProps) => {
     const { t } = useTranslation()
@@ -25,13 +25,13 @@ export const StatusSwitcher = ({
                 {
                     key: ElecAdminAuditStatus.Pending,
                     path: ElecAdminAuditStatus.Pending.toLowerCase(),
-                    label: t("En attente ({{count}})", { count: snapshot?.charge_points_applications_pending })
+                    label: t("En attente ({{count}})", { count: pendingCount })
                 },
 
                 {
                     key: ElecAdminAuditStatus.History,
                     path: ElecAdminAuditStatus.History.toLowerCase(),
-                    label: t("Historique ({{count}})", { count: snapshot?.charge_points_applications_history })
+                    label: t("Historique ({{count}})", { count: historyCount })
                 },
 
 

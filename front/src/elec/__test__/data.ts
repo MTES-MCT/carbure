@@ -1,6 +1,6 @@
 import { cpo } from "carbure/__test__/data";
 import { EntityPreview, EntityType } from "carbure/types";
-import { ChargePointsApplicationError, ElecChargePointsApplication, ElecChargePointsApplicationCheckInfo, ElecChargePointsApplicationStatus, ElecMeterReadingsApplication, ElecMeterReadingsApplicationCheckInfo, ElecMeterReadingsApplicationStatus, ElecProvisionCertificatePreview, MeterReadingsApplicationError } from "elec/types";
+import { ChargePointsApplicationError, ElecAuditApplicationStatus, ElecChargePointsApplication, ElecChargePointsApplicationCheckInfo, ElecMeterReadingsApplication, ElecMeterReadingsApplicationCheckInfo, ElecMeterReadingsApplicationDetails, ElecProvisionCertificatePreview, MeterReadingsApplicationError } from "elec/types";
 import { ElecCPOSnapshot, ElecProvisionCertificatesData } from "elec/types-cpo";
 
 export const elecSnapshot: ElecCPOSnapshot = {
@@ -59,7 +59,7 @@ export const elecChargePointApplication1: ElecChargePointsApplication = {
     charge_point_count: 90,
     power_total: 8,
     application_date: "2023-10-12",
-    status: ElecChargePointsApplicationStatus.Pending,
+    status: ElecAuditApplicationStatus.Pending,
 }
 
 const elecChargePointApplication2: ElecChargePointsApplication = {
@@ -70,7 +70,7 @@ const elecChargePointApplication2: ElecChargePointsApplication = {
     power_total: 30000,
     application_date: "2023-11-13",
     validation_date: "2023-11-01",
-    status: ElecChargePointsApplicationStatus.Accepted,
+    status: ElecAuditApplicationStatus.Accepted,
 }
 const elecChargePointApplication3: ElecChargePointsApplication = {
     id: 3,
@@ -79,7 +79,7 @@ const elecChargePointApplication3: ElecChargePointsApplication = {
     charge_point_count: 5,
     power_total: 1000,
     application_date: "2023-09-01",
-    status: ElecChargePointsApplicationStatus.Rejected,
+    status: ElecAuditApplicationStatus.Rejected,
 }
 export const elecChargePointApplication4: ElecChargePointsApplication = {
     id: 3,
@@ -88,7 +88,7 @@ export const elecChargePointApplication4: ElecChargePointsApplication = {
     charge_point_count: 5,
     power_total: 1000,
     application_date: "2023-09-01",
-    status: ElecChargePointsApplicationStatus.AuditInProgress,
+    status: ElecAuditApplicationStatus.AuditInProgress,
 }
 export const elecChargePointsApplications: ElecChargePointsApplication[] = [
     elecChargePointApplication1,
@@ -123,7 +123,7 @@ export const elecChargePointsApplicationCheckResponseSucceed: ElecChargePointsAp
 
 // METER READINGS
 
-const elecMeterReadingApplication1: ElecMeterReadingsApplication = {
+export const elecMeterReadingApplication1: ElecMeterReadingsApplication = {
     id: 1,
     cpo: cpo,
     station_count: 4,
@@ -132,8 +132,7 @@ const elecMeterReadingApplication1: ElecMeterReadingsApplication = {
     year: 2023,
     quarter: 1,
     application_date: "2023-11-13",
-
-    status: ElecMeterReadingsApplicationStatus.Accepted,
+    status: ElecAuditApplicationStatus.Accepted,
 }
 
 const elecMeterReadingApplication2: ElecMeterReadingsApplication = {
@@ -146,7 +145,7 @@ const elecMeterReadingApplication2: ElecMeterReadingsApplication = {
     quarter: 2,
     application_date: "2023-11-13",
 
-    status: ElecMeterReadingsApplicationStatus.Pending,
+    status: ElecAuditApplicationStatus.Pending,
 }
 const elecMeterReadingApplication3: ElecMeterReadingsApplication = {
     id: 1,
@@ -158,7 +157,27 @@ const elecMeterReadingApplication3: ElecMeterReadingsApplication = {
     quarter: 2,
     application_date: "2023-11-13",
 
-    status: ElecMeterReadingsApplicationStatus.Rejected,
+    status: ElecAuditApplicationStatus.Rejected,
+}
+export const elecMeterReadingApplication4: ElecMeterReadingsApplication = {
+    id: 1,
+    cpo: cpo,
+    station_count: 19,
+    charge_point_count: 1000,
+    energy_total: 30000,
+    year: 2023,
+    quarter: 2,
+    application_date: "2023-11-13",
+
+    status: ElecAuditApplicationStatus.AuditInProgress,
+}
+
+
+export const elecMeterReadingApplication1Details: ElecMeterReadingsApplicationDetails = {
+    ...elecMeterReadingApplication1,
+    email_contacts: ["cpo@test.com"],
+    status: ElecAuditApplicationStatus.AuditInProgress,
+
 }
 
 

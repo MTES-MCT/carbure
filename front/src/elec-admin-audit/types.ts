@@ -1,6 +1,6 @@
 import { Entity } from "carbure/types"
 import { Order } from "common/components/table"
-import { ElecChargePointsApplication } from "elec/types"
+import { ElecChargePointsApplication, ElecMeterReadingsApplication } from "elec/types"
 
 export interface ElecAdminAuditSnapshot {
   charge_points_applications: number
@@ -12,7 +12,7 @@ export interface ElecAdminAuditSnapshot {
 }
 
 export enum ElecAdminAuditFilter {
-  // Period = "period",
+  Quarter = "quarter",
   Cpo = "cpo",
 }
 
@@ -31,6 +31,13 @@ export interface ElecChargePointsApplicationsData {
   total: number
 }
 
+export interface ElecMeterReadingsApplicationsData {
+  meter_readings_applications: ElecMeterReadingsApplication[]
+  from: number
+  ids: number[]
+  returned: number
+  total: number
+}
 
 export interface ElecAdminAuditQuery {
   entity_id: number

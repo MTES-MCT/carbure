@@ -11,10 +11,10 @@ import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
 import * as api from "../../../elec-admin-audit/api"
 import ChargingPointsApplicationDetailsDialog from "./details"
-import ElecAdminAuditFilters from "./list-filters"
+import ElecAdminAuditFilters from "../list-filters"
 import { useElectAdminAuditQuery } from "./list-query"
 import { useElecAdminAuditChargePointsQueryParamsStore } from "./list-query-params-store"
-import { StatusSwitcher } from "./status-switcher"
+import { StatusSwitcher } from "../status-switcher"
 
 type TransferListProps = {
   snapshot: ElecAdminAuditSnapshot
@@ -74,7 +74,8 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
           <StatusSwitcher
             status={status}
             onSwitch={actions.setStatus}
-            snapshot={snapshot}
+            historyCount={snapshot.charge_points_applications_history}
+            pendingCount={snapshot.charge_points_applications_pending}
           />
 
 
@@ -87,6 +88,7 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
               applications={chargePointsApplicationsData.charge_points_applications}
               onDownloadChargePointsApplication={downloadChargePointsApplication}
               rowLink={showChargePointsApplicationDetails}
+              displayCpo={true}
             />
 
             {(state.limit || 0) < total && (
@@ -116,7 +118,6 @@ export default ChargePointsApplicationsList
 
 const FILTERS = [
   ElecAdminAuditFilter.Cpo,
-  // ElecAdminAuditFilter.Period
 ]
 
 

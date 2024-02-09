@@ -6,12 +6,17 @@ from transactions.models.year_config import YearConfig
 
 
 class MeterReadingRepository:
+
     @staticmethod
-    def get_annotated_applications(cpo: Entity):
-        return ElecMeterReadingApplication.objects.filter(cpo=cpo).annotate(
+    def get_annotated_applications():
+        return ElecMeterReadingApplication.objects.all().annotate(
             charge_point_count=Count("elec_meter_readings__id"),
             energy_total=Sum("elec_meter_readings__renewable_energy"),
         )
+
+    @staticmethod
+    def get_annotated_applications_by_cpo(cpo):
+        return MeterReadingRepository.get_annotated_applications().filter(cpo=cpo)
 
     @staticmethod
     def get_previous_application(cpo: Entity, quarter=None, year=None):
