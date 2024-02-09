@@ -32,7 +32,7 @@ def create_meter_readings_excel(
     sheet["A1"] = "Identifiant du point de recharge communiqué à transport.data.gouv"
     sheet["B1"] = "Energie active totale soutirée lors du relevé précédent"
     sheet["C1"] = "Energie active totale soutirée au " + last_day.strftime("%d/%m/%Y")
-    sheet["D1"] = "Date du relevé"
+    sheet["D1"] = "Date du relevé (JJ/MM/AAAA)"
 
     if extended:
         sheet["E1"] = "Electricité consommée sur la période"
