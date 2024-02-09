@@ -2,7 +2,6 @@ import { MultiSelect, MultiSelectProps } from "common/components/multi-select"; 
 import { Grid } from "common/components/scaffold";
 import { defaultNormalizer } from "common/utils/normalize";
 import { ElecAdminAuditFilter, ElecAdminAuditFilterSelection } from "elec-admin-audit/types";
-import { ElecAdminTransferCertificateFilter, ElecAdminTransferCertificateFilterSelection } from "elec-admin/types";
 import { useTranslation } from "react-i18next";
 
 export interface FiltersProps {
@@ -22,7 +21,7 @@ export function ElecAdminAuditFilters({
 
     const filterLabels = {
         [ElecAdminAuditFilter.Cpo]: t("Aménageur"),
-        // [ElecAdminAuditFilter.Period]: t("Période"),
+        [ElecAdminAuditFilter.Quarter]: t("Trimestre"),
     }
 
     return (
