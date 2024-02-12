@@ -48,11 +48,6 @@ export type FilterSelectProps = { field: ElecCPOProvisionCertificateFilter } & O
 >
 
 
-const filterNormalizers: FilterNormalizers = {
-    [ElecCPOProvisionCertificateFilter.Quarter]: norm.normalizePeriodFilter,
-    [ElecCPOProvisionCertificateFilter.OperatingUnit]: norm.normalizeUnknownFilter,
-}
-
 export default ProvisionCertificateFilters
 
 

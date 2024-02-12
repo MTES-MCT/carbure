@@ -10,16 +10,16 @@ class ElecChargePoint(models.Model):
         verbose_name = "Point de recharge"
         verbose_name_plural = "Points de recharge"
 
-    AC = "AC"
-    DC = "DC"
-
+    AC = "AC"  # alternating current
+    DC = "DC"  # direct current
+    CURRENT_TYPE = [(AC, "Courant alternatif"), (DC, "Courant continu")]
     # related
     application = models.ForeignKey(ElecChargePointApplication, on_delete=models.deletion.CASCADE, related_name="elec_charge_points")  # fmt:skip
     cpo = models.ForeignKey(Entity, on_delete=models.deletion.CASCADE, related_name="elec_charge_points")
 
     # cpo excel data
     charge_point_id = models.CharField(max_length=64)
-    current_type = models.CharField(max_length=2, choices=[(AC, "Courant alternatif"), (DC, "Courant continu")])
+    current_type = models.CharField(max_length=2, choices=CURRENT_TYPE)
     installation_date = models.DateField()
     mid_id = models.CharField(max_length=64, null=True, blank=True)
     measure_date = models.DateField(null=True, blank=True)
