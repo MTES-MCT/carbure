@@ -5,16 +5,15 @@ from django.views.decorators.http import require_GET
 from django.core.paginator import Paginator
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
-from elec.models.elec_provision_certificate import ElecProvisionCertificate
-from elec.serializers.elec_provision_certificate import ElecProvisionCertificateSerializer
-
-from elec.api.admin.provision_certificates import (
-    ProvisionCertificatesError,
+from elec.api.admin.provision_certificates.provision_certificates import (
     ProvisionCertificatesFilterForm,
     ProvisionCertificatesSortForm,
     find_provision_certificates,
     sort_provision_certificates,
 )
+from elec.api.cpo.provision_certificate_details import ProvisionCertificatesError
+from elec.models.elec_provision_certificate import ElecProvisionCertificate
+from elec.serializers.elec_provision_certificate import ElecProvisionCertificateSerializer
 
 
 @require_GET

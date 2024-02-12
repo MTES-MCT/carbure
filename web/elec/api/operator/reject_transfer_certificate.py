@@ -1,18 +1,13 @@
 # /api/elec/provision-certificate/snapshot
 
 import traceback
-import datetime
 
 from django import forms
-from django.db.models import Sum, F
-from django.db import transaction
 from django.views.decorators.http import require_POST
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
-from core.models import CarbureNotification, Entity, UserRights
-from elec.models import ElecProvisionCertificate, ElecTransferCertificate
-
-from elec.serializers.elec_transfer_certificate import ElecTransferCertificateSerializer
+from core.models import UserRights
+from elec.models import ElecTransferCertificate
 
 
 class ElecRejectError:
