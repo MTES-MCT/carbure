@@ -46,7 +46,7 @@ const ProvisionImportDialog = ({
     const { t } = useTranslation()
     const notify = useNotify()
     const entity = useEntity()
-    const TEMPLATE_URL = "/templates/certificats-de-fourniture.xlsx"
+    const TEMPLATE_URL = "/templates/certificats-de-fourniture.csv"
 
     const [missingCPO, setMissingCPO] = useState<string[] | undefined>(undefined) //TODO add test
 
