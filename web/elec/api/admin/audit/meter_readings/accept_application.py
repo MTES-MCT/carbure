@@ -8,6 +8,8 @@ from core.decorators import check_admin_rights
 from core.models import Entity, ExternalAdminRights
 from elec.models.elec_charge_point_application import ElecChargePointApplication
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
+from elec.models.elec_provision_certificate import ElecProvisionCertificate
+from entity.api import certificates
 
 
 class AcceptApplicationForm(forms.Form):
@@ -41,6 +43,28 @@ def accept_application(request: HttpRequest):
         return ErrorResponse(
             400, AcceptApplicationError.AUDIT_NOT_STARTED, "Application cannot be accepted if audit is not started"
         )
+
+    # recuperer tous les MEterReadings de l'application
+    # creer un ElecProvisionCertificate groupant tous les meter readings par operating_unit
+
+    # charge_point_id          charge_point_data["operating_unit"] = charge_point_data["charge_point_id"].str[:5]
+    # for record in certificate_df.to_dict("records"):
+    #     current_type = ElecChargePoint.AC if record["current_type"] == "AC" else ElecChargePoint.DC
+    #     certif = ElecProvisionCertificate(
+    #         cpo=cpos_by_name.get(normalize_string(record["cpo"])),
+    #         quarter=record["quarter"],
+    #         year=record["year"],
+    #         operating_unit=record["operating_unit"],
+    #         energy_amount=record["energy_amount"],
+    #         current_type=current_type,
+    #         remaining_energy_amount=record["energy_amount"],
+    #     )
+    #     certificate_model_instances.append(certif)
+    # try:
+    #     ElecProvisionCertificate.objects.bulk_create(certificate_model_instances)
+    # except:
+    #     traceback.print_exc()
+    #     return ErrorResponse(400, CertificateImportError.DB_INSERTION_ERROR, "Error during data insert")
 
     application.status = ElecChargePointApplication.ACCEPTED
     application.save()
