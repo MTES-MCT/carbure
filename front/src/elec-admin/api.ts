@@ -16,7 +16,7 @@ export function getSnapshot(entity_id: number, year: number) {
 }
 
 export function importProvisionCertificates(entity_id: number, file: File) {
-  return api.post("/elec/admin/import-provision-certificates", {
+  return api.post("/elec/admin/provision-certificates/import-certificates", {
     entity_id,
     file,
   })
@@ -32,7 +32,7 @@ export async function getProvisionCertificateFilters(field: ElecAdminProvisionCe
   const params = { filter: field, ...query, ...QUERY_RESET }
 
   return api
-    .get<Api<{ filter_values: string[] }>>("/elec/admin/provision-certificate-filters", { params })
+    .get<Api<{ filter_values: string[] }>>("/elec/admin/provision-certificates/filters", { params })
     .then((res) => res.data.data?.filter_values ?? [])
 
 }
@@ -41,7 +41,7 @@ export function getProvisionCertificateDetails(
   entity_id: number,
   provision_certificate_id: number
 ) {
-  return api.get<Api<{ elec_provision_certificate: ElecProvisionCertificatesDetails }>>("/elec/admin/provision-certificate-details", {
+  return api.get<Api<{ elec_provision_certificate: ElecProvisionCertificatesDetails }>>("/elec/admin/provision-certificates/provision-certificate-details", {
     params: { entity_id, provision_certificate_id },
   })
 }
@@ -62,7 +62,7 @@ export function getTransferCertificateDetails(
   entity_id: number,
   transfer_certificate_id: number
 ) {
-  return api.get<Api<{ elec_transfer_certificate: ElecTransferCertificatesDetails }>>("/elec/admin/transfer-certificate-details", {
+  return api.get<Api<{ elec_transfer_certificate: ElecTransferCertificatesDetails }>>("/elec/admin/transfer-certificates/transfer-certificate-details", {
     params: { entity_id, transfer_certificate_id },
   })
 }
@@ -74,7 +74,7 @@ export function downloadTransferCertificates(query: ElecAdminTransferCertificate
 export async function getTransferCertificateFilters(field: ElecAdminTransferCertificateFilter, query: ElecAdminTransferCertificateQuery) {
   const params = { filter: field, ...query, ...QUERY_RESET }
   return api
-    .get<Api<{ filter_values: string[] }>>("/elec/admin/transfer-certificate-filters", { params })
+    .get<Api<{ filter_values: string[] }>>("/elec/admin/transfer-certificates/filters", { params })
     .then((res) => res.data.data?.filter_values ?? [])
 }
 
