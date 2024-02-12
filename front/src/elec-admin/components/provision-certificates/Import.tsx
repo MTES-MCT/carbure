@@ -11,7 +11,7 @@ import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 import { useState } from "react"
-import { useTranslation } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import * as api from "../../api"
 
 
@@ -46,6 +46,7 @@ const ProvisionImportDialog = ({
     const { t } = useTranslation()
     const notify = useNotify()
     const entity = useEntity()
+    const TEMPLATE_URL = "/templates/certificats-de-fourniture.xlsx"
 
     const [missingCPO, setMissingCPO] = useState<string[] | undefined>(undefined) //TODO add test
 
@@ -96,6 +97,13 @@ const ProvisionImportDialog = ({
                             )}
                         </p>
 
+                        <p> <Trans>
+                            Téléchargez le template à completer et à importer{" "}
+                            <ExternalLink href={TEMPLATE_URL + `?entity_id=${entity.id}`}>
+                                sur ce lien
+                            </ExternalLink>
+                            .
+                        </Trans></p>
                         <FileInput
                             loading={importProvisionCertificates.loading}
                             icon={value.provisionCertificatesFile ? Check : Upload}
