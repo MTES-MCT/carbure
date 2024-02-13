@@ -12,6 +12,7 @@ from elec.services.import_charge_point_excel import import_charge_point_excel
 class AddChargePointApplicationError:
     MISSING_FILE = "MISSING_FILE"
     VALIDATION_FAILED = "VALIDATION_FAILED"
+    NO_CHARGE_POINT_DETECTED = "NO_CHARGE_POINT_DETECTED"
 
 
 @require_POST
@@ -29,6 +30,9 @@ def add_application(request: HttpRequest, entity: Entity):
 
     if len(errors) > 0:
         return ErrorResponse(400, AddChargePointApplicationError.VALIDATION_FAILED)
+
+    if len(charge_point_data) == 0:
+        return ErrorResponse(400, AddChargePointApplicationError.NO_CHARGE_POINT_DETECTED)
 
     with transaction.atomic():
         replaced_applications = ElecChargePointApplication.objects.filter(

@@ -38,7 +38,7 @@ class ExcelChargePoints:
 
     @staticmethod
     def parse_charge_point_excel(excel_file: UploadedFile):
-        charge_point_data = pd.read_excel(excel_file, usecols=list(range(1, 11)))
+        charge_point_data = pd.read_excel(excel_file, usecols=list(range(1, 7)))
         charge_point_data = charge_point_data.drop(charge_point_data.index[:11])
         charge_point_data = charge_point_data.dropna(how="all")  # remove completely empty rows
         charge_point_data["line"] = charge_point_data.index + 2  # add a line number to locate data in the excel file

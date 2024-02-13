@@ -11,6 +11,7 @@ from elec.services.import_charge_point_excel import import_charge_point_excel
 class CheckChargePointApplicationError:
     MISSING_FILE = "MISSING_FILE"
     VALIDATION_FAILED = "VALIDATION_FAILED"
+    NO_CHARGE_POINT_DETECTED = "NO_CHARGE_POINT_DETECTED"
 
 
 @require_POST
@@ -41,5 +42,10 @@ def check_application(request: HttpRequest, entity):
         data["errors"] = errors
         data["error_count"] = len(data["errors"])
         return ErrorResponse(400, CheckChargePointApplicationError.VALIDATION_FAILED, data)
+
+    if len(charge_points) == 0:
+        data["errors"] = [{"error": "NO_CHARGE_POINT_DETECTED"}]
+        data["error_count"] = 1
+        return ErrorResponse(400, CheckChargePointApplicationError.NO_CHARGE_POINT_DETECTED, data)
 
     return SuccessResponse(data)
