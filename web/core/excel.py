@@ -111,9 +111,9 @@ class TableParser:
     @staticmethod
     def id(cell):
         try:
-            return str(int(float(cell))).upper()
+            return str(int(float(cell))).strip().upper()
         except:
-            return TableParser.str(cell).upper()
+            return TableParser.str(cell).strip().upper()
 
     @staticmethod
     def int(cell):
@@ -134,7 +134,7 @@ class TableParser:
         if pd.isna(cell):
             return ""
         elif isinstance(cell, (str, int, float)):
-            return str(cell)
+            return str(cell).strip()
         else:
             raise ValueError()
 
