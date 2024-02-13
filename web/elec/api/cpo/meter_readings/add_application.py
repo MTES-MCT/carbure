@@ -54,11 +54,11 @@ def add_application(request: HttpRequest, entity: Entity):
     renewable_share = MeterReadingRepository.get_renewable_share(year)
     meter_reading_data, errors = import_meter_reading_excel(excel_file, charge_points, previous_application, renewable_share)
 
-    if len(meter_reading_data) == 0:
-        return ErrorResponse(400, AddMeterReadingApplicationError.NO_READING_FOUND)
-
     if len(errors) > 0:
         return ErrorResponse(400, AddMeterReadingApplicationError.VALIDATION_FAILED)
+
+    if len(meter_reading_data) == 0:
+        return ErrorResponse(400, AddMeterReadingApplicationError.NO_READING_FOUND)
 
     with transaction.atomic():
         replaced_applications = MeterReadingRepository.get_replaceable_applications(entity)

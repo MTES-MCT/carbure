@@ -50,9 +50,6 @@ def check_application(request: HttpRequest, entity):
     meter_reading_data, errors = import_meter_reading_excel(excel_file, existing_charge_points)
     pending_application_already_exists = MeterReadingRepository.get_replaceable_applications(entity).count() > 0
 
-    if len(meter_reading_data) == 0:
-        return ErrorResponse(400, CheckMeterReadingApplicationError.NO_READING_FOUND)
-
     data = {}
     data["file_name"] = excel_file.name
     data["meter_reading_count"] = len(meter_reading_data)
@@ -66,6 +63,9 @@ def check_application(request: HttpRequest, entity):
         data["errors"] = errors
         data["error_count"] = len(data["errors"])
         return ErrorResponse(400, CheckMeterReadingApplicationError.VALIDATION_FAILED, data)
+
+    if len(meter_reading_data) == 0:
+        return ErrorResponse(400, CheckMeterReadingApplicationError.NO_READING_FOUND, data)
 
     return SuccessResponse(data)
 
