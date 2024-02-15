@@ -263,6 +263,7 @@ if DEBUG:
     INSTALLED_APPS += ['silk']
     MIDDLEWARE += ['silk.middleware.SilkyMiddleware']
     MIDDLEWARE.remove("csp.middleware.CSPMiddleware")
+    HUEY["immediate"] = True # allow running background tasks immediately so we can have instant results in tests
 
 
 # CSP header configuration
