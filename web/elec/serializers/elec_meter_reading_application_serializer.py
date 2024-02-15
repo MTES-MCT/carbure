@@ -27,7 +27,7 @@ class ElecMeterReadingApplicationSerializer(serializers.ModelSerializer):
         return instance.charge_point_count
 
     def get_energy_total(self, instance):
-        return round(instance.energy_total or 0, 2)
+        return round(instance.energy_total, 2)
 
 
 class ElecMeterReadingApplicationDetailsSerializer(ElecMeterReadingApplicationSerializer):
