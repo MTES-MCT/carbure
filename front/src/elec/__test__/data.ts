@@ -27,7 +27,8 @@ const elecProvisionCertificatePreview: ElecProvisionCertificatePreview =
     year: 2023,
     operating_unit: "FRIONE",
     energy_amount: 200000,
-    remaining_energy_amount: 200000
+    remaining_energy_amount: 200000,
+    current_type: "DC"
 }
 
 const elecProvisionCertificatePreview2: ElecProvisionCertificatePreview =
@@ -38,7 +39,9 @@ const elecProvisionCertificatePreview2: ElecProvisionCertificatePreview =
     year: 2023,
     operating_unit: "ORIONE",
     energy_amount: 450000,
-    remaining_energy_amount: 300000
+    remaining_energy_amount: 300000,
+    current_type: "AC"
+
 }
 
 export const elecAdminProvisionCertificateList: ElecProvisionCertificatesData = {

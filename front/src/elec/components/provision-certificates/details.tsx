@@ -61,6 +61,13 @@ export const ElecProvisionDetailsDialog = () => {
               value={provisionCertificate?.operating_unit}
 
             />
+
+            <TextInput
+              readOnly
+              label={t("Type de courant")}
+              value={provisionCertificate?.current_type}
+
+            />
             <TextInput
               readOnly
               label={t("MWh")}

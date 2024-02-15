@@ -43,6 +43,8 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
   }
 
   const provisionCertificatesData = provisionCertificatesResponse.result?.data.data
+  console.log('provisionCertificatesData:', provisionCertificatesData)
+
   // const provisionCertificatesData = elecAdminProvisionCertificateList //TOTEST  
 
   const total = provisionCertificatesData?.total ?? 0
