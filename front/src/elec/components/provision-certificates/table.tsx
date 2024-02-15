@@ -39,6 +39,7 @@ export const ElecCPOProvisionCertificateTable = memo(
         columns={[
           columns.quarter,
           columns.operating_unit,
+          columns.current_type,
           columns.energy_amount,
         ]}
       />
@@ -69,6 +70,19 @@ export function useColumns() {
       header: t("Unité d'exploitation"),
       cell: (provisionCertificate: ElecProvisionCertificatePreview) => {
         return <Cell text={provisionCertificate.operating_unit} />
+      },
+    },
+
+    current_type: {
+      key: "current_type",
+      header: t("Type de courant"),
+      cell: (provisionCertificate: ElecProvisionCertificatePreview) => {
+        return (
+          <Cell
+            text={provisionCertificate.current_type}
+
+          />
+        )
       },
     },
 
