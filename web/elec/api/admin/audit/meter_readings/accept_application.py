@@ -2,11 +2,15 @@ from django import forms
 from django.http import HttpRequest
 
 from django.views.decorators.http import require_POST
+import pandas as pd
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
 from core.models import Entity, ExternalAdminRights
+from elec.api.cpo import meter_readings
+from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_charge_point_application import ElecChargePointApplication
+from elec.models.elec_meter_reading import ElecMeterReading
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from elec.models.elec_provision_certificate import ElecProvisionCertificate
 from entity.api import certificates
@@ -31,6 +35,7 @@ def accept_application(request: HttpRequest):
         return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, form.errors)
 
     application = form.cleaned_data["application_id"]
+    print("application: ", application.cpo.name, application.quarter, application.year)
     force_validation = form.cleaned_data["force_validation"]
 
     if (
@@ -44,27 +49,37 @@ def accept_application(request: HttpRequest):
             400, AcceptApplicationError.AUDIT_NOT_STARTED, "Application cannot be accepted if audit is not started"
         )
 
-    # recuperer tous les MEterReadings de l'application
-    # creer un ElecProvisionCertificate groupant tous les meter readings par operating_unit
+    # creer un ElecProvisionCertificate groupant tous les meter readings par charge_poing.operating_unit
 
-    # charge_point_id          charge_point_data["operating_unit"] = charge_point_data["charge_point_id"].str[:5]
-    # for record in certificate_df.to_dict("records"):
-    #     current_type = ElecChargePoint.AC if record["current_type"] == "AC" else ElecChargePoint.DC
-    #     certif = ElecProvisionCertificate(
-    #         cpo=cpos_by_name.get(normalize_string(record["cpo"])),
-    #         quarter=record["quarter"],
-    #         year=record["year"],
-    #         operating_unit=record["operating_unit"],
-    #         energy_amount=record["energy_amount"],
-    #         current_type=current_type,
-    #         remaining_energy_amount=record["energy_amount"],
-    #     )
-    #     certificate_model_instances.append(certif)
-    # try:
-    #     ElecProvisionCertificate.objects.bulk_create(certificate_model_instances)
-    # except:
-    #     traceback.print_exc()
-    #     return ErrorResponse(400, CertificateImportError.DB_INSERTION_ERROR, "Error during data insert")
+    ## recuperer tous les MEterReadings de la demande
+    meter_readings = ElecMeterReading.objects.filter(application=application)
+    data = [
+        {
+            "renewable_energy": meter_reading.renewable_energy,
+            "operating_unit": meter_reading.charge_point.charge_point_id[:5],  # Inclure le charge_point_id
+        }
+        for meter_reading in meter_readings
+    ]
+
+    ## convertir en dataframe et grouper par operating_unit et sommer les extracted_energy
+    meter_readings_df = pd.DataFrame(data)
+    meter_readings_df_grouped = meter_readings_df.groupby("operating_unit").agg({"renewable_energy": "sum"}).reset_index()
+
+    ## créer les ElecProvisionCertificate à partir des groupes
+    certificate_model_instances = []
+    for group in meter_readings_df_grouped.to_dict(orient="records"):
+
+        certif = ElecProvisionCertificate(
+            cpo=application.cpo,
+            quarter=application.quarter,
+            year=application.year,
+            operating_unit=group["operating_unit"],
+            energy_amount=group["renewable_energy"],
+            current_type=ElecChargePoint.DC,
+            remaining_energy_amount=group["renewable_energy"],
+        )
+        certificate_model_instances.append(certif)
+    ElecProvisionCertificate.objects.bulk_create(certificate_model_instances)
 
     application.status = ElecChargePointApplication.ACCEPTED
     application.save()
