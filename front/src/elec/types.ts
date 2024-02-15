@@ -11,6 +11,7 @@ export interface ElecProvisionCertificatePreview {
   operating_unit: string
   quarter: number
   remaining_energy_amount: number
+  current_type: string
   year: number
 }
 export interface ElecTransferCertificatePreview {
