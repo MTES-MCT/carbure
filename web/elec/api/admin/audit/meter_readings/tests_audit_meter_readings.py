@@ -40,10 +40,10 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
     def create_application(self):
         charge_point_application = ElecChargePointApplication.objects.create(cpo=self.cpo)
 
-        charge_point = ElecChargePoint.objects.create(
+        charge_point1 = ElecChargePoint.objects.create(
             application=charge_point_application,
             cpo=self.cpo,
-            charge_point_id="ABCDE",
+            charge_point_id="ABCDE12345",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 15),
             mid_id="123-456",
@@ -57,20 +57,55 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             cpo_siren="",
         )
 
-        meter_readings_application = ElecMeterReadingApplication.objects.create(cpo=self.cpo, quarter=1, year=2023)
+        charge_point2 = ElecChargePoint.objects.create(
+            application=charge_point_application,
+            cpo=self.cpo,
+            charge_point_id="FGX10398",
+            current_type="AC",
+            installation_date=datetime.date(2023, 2, 12),
+            mid_id="123-456",
+            measure_date=datetime.date(2023, 6, 29),
+            measure_energy=1000.1234,
+            measure_reference_point_id="123456",
+            station_name="Station",
+            station_id="FGHIJ",
+            nominal_power=150,
+            cpo_name="",
+            cpo_siren="",
+        )
 
-        meter_reading = ElecMeterReading.objects.create(
+        meter_readings_application = ElecMeterReadingApplication.objects.create(cpo=self.cpo, quarter=3, year=2023)
+
+        meter_reading1 = ElecMeterReading.objects.create(
             extracted_energy=1234,
             renewable_energy=2345,
-            reading_date=datetime.date(2023, 6, 29),
-            charge_point=charge_point,
+            reading_date=datetime.date(2023, 8, 29),
+            charge_point=charge_point1,
             application=meter_readings_application,
             cpo=self.cpo,
         )
-        return meter_readings_application, meter_reading
+
+        meter_reading2 = ElecMeterReading.objects.create(
+            extracted_energy=8900,
+            renewable_energy=2000,
+            reading_date=datetime.date(2023, 9, 1),
+            charge_point=charge_point1,
+            application=meter_readings_application,
+            cpo=self.cpo,
+        )
+
+        meter_reading3 = ElecMeterReading.objects.create(
+            extracted_energy=8900,
+            renewable_energy=2000,
+            reading_date=datetime.date(2023, 9, 1),
+            charge_point=charge_point2,
+            application=meter_readings_application,
+            cpo=self.cpo,
+        )
+        return meter_readings_application, [meter_reading1, meter_reading2, meter_reading3]
 
     def test_accept_application(self):
-        application, meter_reading = self.create_application()
+        application, meter_readings = self.create_application()
         self.assertEqual(application.status, ElecChargePointApplication.PENDING)
 
         # force accept without audit
@@ -90,5 +125,9 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
         self.assertEqual(application.status, ElecChargePointApplication.ACCEPTED)
 
         # provision certificate should have been created
-        # certificate = ElecProvisionCertificate.objects.get(cpo=self.cpo, quarter=1, year=2023)
-        # self.assertEqual(certificate.energy_amount, 1000.1234)
+        certificates = ElecProvisionCertificate.objects.filter(cpo=self.cpo, quarter=3, year=2023)
+        self.assertEqual(len(certificates), 2)
+        self.assertEqual(
+            certificates.first().energy_amount, meter_readings[0].renewable_energy + meter_readings[1].renewable_energy
+        )
+        self.assertEqual(certificates[1].energy_amount, meter_readings[2].renewable_energy)
