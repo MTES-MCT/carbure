@@ -1,4 +1,6 @@
 from django.db import models, transaction
+from django.db.models import Sum
+from django.db.models.functions import Coalesce
 from core.utils import bulk_update_or_create
 
 
@@ -52,9 +54,10 @@ class SafTicketSource(models.Model):
     parent_ticket = models.ForeignKey("saf.SafTicket", null=True, blank=True, on_delete=models.CASCADE)
 
     def generate_carbure_id(self):
-        self.carbure_id = "TS{period}-{country_of_production}-{id}".format(
+        production_country = self.production_country.code_pays if self.production_country else None
+        self.carbure_id = "TS{period}-{production_country}-{id}".format(
             period=self.delivery_period,
-            country_of_production=self.production_country.code_pays,
+            production_country=production_country,
             id=self.id,
         )
 
@@ -106,7 +109,9 @@ def create_ticket_sources_from_lots(lots):
 
     # update ticket sources that were already created for some of the given lots (happens when a lot was declared then undeclared then declared again)
     # and create new ones for lots that were not already declared
-    bulk_update_or_create(SafTicketSource, "parent_lot_id", ticket_source_data)
+    updated, created = bulk_update_or_create(SafTicketSource, "parent_lot_id", ticket_source_data)
+
+    bulk_update_assigned_volume(updated)
 
     # regenerate carbure_ids for the new ticket sources now that they definitely have an actual id
     ticket_sources = SafTicketSource.objects.filter(parent_lot_id__in=saf_lots.values("id"))
@@ -152,3 +157,13 @@ def create_source_from_ticket(ticket, entity_id):
     ticket_source.save()
 
     return ticket_source
+
+
+def bulk_update_assigned_volume(ticket_sources):
+    ticket_sources = SafTicketSource.objects.filter(pk__in=[ts.pk for ts in ticket_sources])
+    ticket_sources = ticket_sources.annotate(used_volume=Coalesce(Sum("saf_tickets__volume"), 0.0))
+
+    for ticket_source in ticket_sources:
+        ticket_source.assigned_volume = ticket_source.used_volume
+
+    SafTicketSource.objects.bulk_update(ticket_sources, ["assigned_volume"])
