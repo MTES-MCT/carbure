@@ -37,6 +37,12 @@ const CarbureFooter = () => {
               <ExternalLink />
             </Link>
           </li>
+          <li>
+            <Link to="/double-counting-list" target="_blank" rel="noreferrer">
+              <Trans>Double Comptage</Trans>
+              <ExternalLink />
+            </Link>
+          </li>
         </ul>
 
         <ul className={styles.footerSocialLinks}>

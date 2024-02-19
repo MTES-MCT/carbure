@@ -1,7 +1,5 @@
-from email.mime import application
-import re
 from django.db import models
-from core.models import Biocarburant, Entity, EntityCertificate, MatierePremiere, Pays
+from core.models import Biocarburant, Entity, EntityCertificate, MatierePremiere
 from doublecount.models import DoubleCountingApplication
 from producers.models import ProductionSite
 from django.db.models.signals import post_save
