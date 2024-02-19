@@ -1,7 +1,9 @@
 import traceback
+from django import forms
 import pandas as pd
 from django.core.files.uploadedfile import UploadedFile
-from core.excel import TableParser
+from core.utils import Validator
+from elec.models.elec_charge_point import ElecChargePoint
 from elec.services.transport_data_gouv import TransportDataGouv
 
 
@@ -16,11 +18,12 @@ class ExcelChargePointError:
 
 def import_charge_point_excel(excel_file: UploadedFile, existing_charge_points: list[str]):
     try:
-        excel_data, excel_errors = ExcelChargePoints.parse_charge_point_excel(excel_file)
+        # return the content of the excel file, indexed by their line number, in the form of a list of dicts holding strings only
+        excel_data = ExcelChargePoints.parse_charge_point_excel(excel_file)
+        # find the TDG data related to the charge points listed in the imported excel file
         transport_data = TransportDataGouv.find_charge_point_data(excel_data, 1000)
-        valid_charge_points, validation_errors = ExcelChargePoints.validate_charge_points(excel_data, transport_data, existing_charge_points)  # fmt:skip
-        errors = sorted(excel_errors + validation_errors, key=lambda e: e["line"])
-        return valid_charge_points, errors
+        # parse the data and validate errors
+        return ExcelChargePoints.validate_charge_points(excel_data, transport_data, existing_charge_points)  # fmt:skip
     except:
         traceback.print_exc()
         return [], [{"error": ExcelChargePointError.EXCEL_PARSING_FAILED}]
@@ -28,19 +31,27 @@ def import_charge_point_excel(excel_file: UploadedFile, existing_charge_points: 
 
 class ExcelChargePoints:
     EXCEL_COLUMNS = {
-        "charge_point_id": TableParser.id,
-        "installation_date": TableParser.date,
-        "mid_id": TableParser.id,
-        "measure_date": TableParser.date,
-        "measure_energy": TableParser.float,
-        "measure_reference_point_id": TableParser.id,
+        "charge_point_id": "Identifiant du point de recharge communiqué à transport.data.gouv",
+        "installation_date": "Date d'installation (ou 01/01/2022 si antérieur)",
+        "mid_id": "Numéro MID du certificat d'examen du type",
+        "measure_date": "Date du relevé",
+        "measure_energy": "Energie active totale soutirée à la date du relevé",
+        "measure_reference_point_id": "Numéro du point référence mesure du gestionnaire du réseau public de distribution alimentant la station",
     }
 
     @staticmethod
     def parse_charge_point_excel(excel_file: UploadedFile):
-        charge_point_data = pd.read_excel(excel_file, usecols=list(range(1, 7)))
+        charge_point_data = pd.read_excel(excel_file, usecols=list(range(1, 7)), dtype=str)
+
+        # check that the template has the right columns
+        for i, header in enumerate(ExcelChargePoints.EXCEL_COLUMNS.values()):
+            if charge_point_data.iloc[9, i].strip() != header:
+                if header != ExcelChargePoints.EXCEL_COLUMNS["mid_id"] or header != "Numéro LNE du certificat d'examen du type":  # fmt:skip
+                    raise Exception("Invalid template")
+
         charge_point_data = charge_point_data.drop(charge_point_data.index[:11])
         charge_point_data = charge_point_data.dropna(how="all")  # remove completely empty rows
+        charge_point_data = charge_point_data.fillna("")
         charge_point_data["line"] = charge_point_data.index + 2  # add a line number to locate data in the excel file
         charge_point_data.rename(columns={charge_point_data.columns[i]: column for i, column in enumerate(ExcelChargePoints.EXCEL_COLUMNS)}, inplace=True)  # fmt: skip
         charge_point_data = charge_point_data.reset_index(drop=True)
@@ -55,18 +66,7 @@ class ExcelChargePoints:
                 charge_point_data = charge_point_data.drop(charge_point_data.index[:19])
                 charge_point_data = charge_point_data.reset_index(drop=True)
 
-        charge_point_data, parse_errors = TableParser.parse_columns(charge_point_data, ExcelChargePoints.EXCEL_COLUMNS)
-
-        errors = [
-            Error(
-                ExcelChargePointError.INVALID_CHARGE_POINT_DATA,
-                line=charge_point_data.loc[error["row"]]["line"],
-                meta=error["column"],
-            )
-            for error in parse_errors
-        ]
-
-        return charge_point_data.to_dict(orient="records"), errors
+        return charge_point_data.to_dict(orient="records")
 
     @staticmethod
     def validate_charge_points(charge_points: list[dict], transport_data, existing_charge_points):
@@ -74,67 +74,82 @@ class ExcelChargePoints:
         charge_points_errors = []
 
         transport_data_index = {row["charge_point_id"]: row for row in transport_data}
+        context = {"existing_charge_points": existing_charge_points, "transport_data_index": transport_data_index}
 
         for charge_point_data in charge_points:
-            line = charge_point_data.pop("line")
-            charge_point_id = charge_point_data["charge_point_id"]
-            charge_point_transport_data = transport_data_index.get(charge_point_id)
+            form = ExcelChargePointValidator(charge_point_data, context=context)
 
-            errors = []
-
-            if not charge_point_id:
-                errors.append(Error(ExcelChargePointError.MISSING_CHARGE_POINT_ID, line=line))
-            elif charge_point_id in existing_charge_points:
-                errors.append(Error(ExcelChargePointError.DUPLICATE_CHARGE_POINT, line=line, meta=charge_point_id))
-            elif charge_point_transport_data is None:
-                errors.append(Error(ExcelChargePointError.MISSING_CHARGE_POINT_IN_DATAGOUV, line=line, meta=charge_point_id))  # fmt:skip
+            if form.is_valid():
+                valid_charge_points.append(form.cleaned_data)
             else:
-                charge_point_data["station_id"] = charge_point_transport_data["station_id"]
-                charge_point_data["station_name"] = charge_point_transport_data["station_name"]
-                charge_point_data["nominal_power"] = charge_point_transport_data["nominal_power"]
-                charge_point_data["current_type"] = charge_point_transport_data["current_type"]
-                charge_point_data["is_article_2"] = charge_point_transport_data["is_article_2"]
-                charge_point_data["cpo_name"] = charge_point_transport_data["cpo_name"]
-                charge_point_data["cpo_siren"] = charge_point_transport_data["cpo_siren"]
-                charge_point_data["latitude"] = charge_point_transport_data["latitude"]
-                charge_point_data["longitude"] = charge_point_transport_data["longitude"]
-
-                # si la data existe sur tdg, on vérifie les autres champs
-                missing_fields = list(ExcelChargePoints.get_missing_fields(charge_point_data))
-
-                if len(missing_fields) > 0:
-                    errors += [
-                        Error(ExcelChargePointError.MISSING_CHARGE_POINT_DATA, line=line, meta=field)
-                        for field in missing_fields
-                    ]
-
-            if len(errors) > 0:
-                charge_points_errors += errors
-            else:
-                valid_charge_points.append(charge_point_data)
+                line = charge_point_data.get("line")
+                error = {"error": ExcelChargePointError.INVALID_CHARGE_POINT_DATA, "line": line, "meta": form.errors}
+                charge_points_errors.append(error)
 
         return valid_charge_points, charge_points_errors
 
-    @staticmethod
-    def get_missing_fields(charge_point):
-        missing_fields = []
 
-        if charge_point.get("is_article_2"):
-            if not charge_point.get("measure_reference_point_id"):
-                missing_fields.append("measure_reference_point_id")
+class ExcelChargePointValidator(Validator):
+    # potential date formats inside the excel file
+    DATE_FORMATS = ["%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%d/%m/%Y"]
+
+    # fields from charge point excel template
+    charge_point_id = forms.CharField(max_length=64)
+    installation_date = forms.DateField(input_formats=DATE_FORMATS)
+    mid_id = forms.CharField(required=False, max_length=128)
+    measure_date = forms.DateField(input_formats=DATE_FORMATS, required=False)
+    measure_energy = forms.FloatField(required=False, initial=0)
+    measure_reference_point_id = forms.CharField(required=False, max_length=64)
+
+    # fields from transport.data.gouv.fr CSV
+    is_article_2 = forms.BooleanField(required=False)
+    station_id = forms.CharField(required=False)
+    station_name = forms.CharField(required=False)
+    nominal_power = forms.FloatField(required=False)
+    current_type = forms.ChoiceField(required=False, choices=ElecChargePoint.CURRENT_TYPES)
+    cpo_name = forms.CharField(required=False)
+    cpo_siren = forms.CharField(required=False)
+    latitude = forms.DecimalField(required=False)
+    longitude = forms.DecimalField(required=False)
+
+    # grab data from transport.data.gouv.fr to enrich the base charge point data
+    def extend(self, charge_point):
+        charge_point_id = charge_point.get("charge_point_id")
+        charge_point_transport_data = self.context.get("transport_data_index", {}).get(charge_point_id)
+
+        if charge_point_transport_data is None:
+            return charge_point
+
+        charge_point["station_id"] = charge_point_transport_data["station_id"]
+        charge_point["station_name"] = charge_point_transport_data["station_name"]
+        charge_point["nominal_power"] = charge_point_transport_data["nominal_power"]
+        charge_point["current_type"] = charge_point_transport_data["current_type"]
+        charge_point["is_article_2"] = charge_point_transport_data["is_article_2"]
+        charge_point["cpo_name"] = charge_point_transport_data["cpo_name"]
+        charge_point["cpo_siren"] = charge_point_transport_data["cpo_siren"]
+        charge_point["latitude"] = charge_point_transport_data["latitude"]
+        charge_point["longitude"] = charge_point_transport_data["longitude"]
+
+        return charge_point
+
+    # check if the different possible charge point configurations are respected
+    # and if the new data doesn't conflict with TDG or our own DB
+    def validate(self, charge_point):
+        existing_charge_points = self.context.get("existing_charge_points", [])
+        transport_data_index = self.context.get("transport_data_index", {})
+
+        if charge_point.get("charge_point_id") in existing_charge_points:
+            self.add_error("charge_point_id", "Ce point de recharge a déjà été défini dans un autre dossier d'inscription.")
+        elif charge_point.get("charge_point_id") not in transport_data_index:
+            self.add_error("charge_point_id", "Ce point de recharge n'est pas listé sur transport.data.gouv.fr")
         else:
-            if not charge_point.get("mid_id"):
-                missing_fields.append("mid_id")
-            if not charge_point.get("measure_date"):
-                missing_fields.append("measure_date")
-            if not isinstance(charge_point.get("measure_energy"), float):
-                missing_fields.append("measure_energy")
-
-        return missing_fields
-
-
-def Error(type: str, line: int, meta=None):
-    error = {"line": int(line), "error": type}
-    if meta is not None:
-        error["meta"] = meta
-    return error
+            if charge_point.get("is_article_2"):
+                if not charge_point.get("measure_reference_point_id"):
+                    self.add_error("measure_reference_point_id", "L'identifiant du point de mesure est obligatoire pour les stations ayant au moins un point de recharge en courant continu.")  # fmt:skip
+            else:
+                if not charge_point.get("mid_id"):
+                    self.add_error("mid_id", "Le numéro MID est obligatoire pour les points de recharge en courant alternatif.")  # fmt:skip
+                if not charge_point.get("measure_date"):
+                    self.add_error("measure_date", "La date du dernier relevé est obligatoire pour les points de recharge en courant alternatif.")  # fmt:skip
+                if not isinstance(charge_point.get("measure_energy"), float):
+                    self.add_error("measure_energy", "L'énergie mesurée lors du dernier relevé est obligatoire pour les points de recharge en courant alternatif.")  # fmt:skip

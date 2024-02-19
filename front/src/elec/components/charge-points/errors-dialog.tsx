@@ -53,7 +53,12 @@ export const ErrorsDetailsDialog = ({
           disabled={true}
         />
 
-        <Button icon={Return} label={t("Charger un nouveau fichier")} action={onClose} asideX />
+        <Button
+          icon={Return}
+          label={t("Charger un nouveau fichier")}
+          action={onClose}
+          asideX
+        />
       </footer>
     </Dialog>
   )
@@ -95,7 +100,9 @@ export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
 export function getErrorText(error: ChargePointsApplicationError) {
   switch (error.error) {
     case "EXCEL_PARSING_FAILED":
-      return t("Le fichier importé n'a pas pu être analysé. Merci de verifier que le format du modèle de fichier a bien été respecté.")
+      return t(
+        "Le fichier importé n'a pas pu être analysé. Merci de verifier que le format du modèle de fichier a bien été respecté."
+      )
 
     case "MISSING_CHARGING_POINT_ID":
       return t("L'identifiant du point de recharge n'est pas renseigné")
@@ -111,10 +118,24 @@ export function getErrorText(error: ChargePointsApplicationError) {
         missingField: getFieldText(error.meta),
       })
 
-    case "INVALID_CHARGING_POINT_DATA":
-      return t(`Le champ "{{invalidField}}" est invalide`, {
-        invalidField: getFieldText(error.meta),
-      })
+    case "INVALID_CHARGE_POINT_DATA":
+      return (
+        <ul>
+          {Object.entries(error.meta).map(([field, errors]) => (
+            <li>
+              <b>{getFieldText(field)}:</b>
+              <ul>
+                {(errors as string[]).map((error) => (
+                  <li>{error}</li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      )
+    // return t(`Le champ "{{invalidField}}" est invalide`, {
+    //   invalidField: getFieldText(error.meta),
+    // })
 
     default:
       return (
@@ -126,6 +147,8 @@ export function getErrorText(error: ChargePointsApplicationError) {
 
 function getFieldText(field: string) {
   switch (field) {
+    case "charge_point_id":
+      return t("Identifiant du point de recharge")
     case "current_type":
       return t("Type de courant")
     case "installation_date":

@@ -151,3 +151,28 @@ class MultipleValueField(forms.TypedMultipleChoiceField):
     #     super(MultipleValueField, self).__init__(*args, **kwargs)
     def valid_value(self, value):
         return True
+
+
+class Validator(forms.Form):
+    # extend the default Form constructor by adding the ability to set a context with external data
+    # useful during calls to self.extend() and self.validate() as you can use data that doesn't belong to the FormData itself
+    def __init__(self, data, context={}, **kwargs):
+        super().__init__(data=data, **kwargs)
+        self.context = context
+        extended_data = self.extend(self.data)
+        self.data.update(extended_data)
+
+    # dynamically set data inside the source object before cleaning data and validation
+    def extend(self, data):
+        return data
+
+    # validate the cleaned data created by django's Form
+    # useful to do checks across all fields or use external resources
+    def validate(self, data):
+        pass
+
+    # extend the default clean method to run the validate method before returning the cleaned data
+    def clean(self):
+        cleaned_data = super().clean()
+        self.validate(cleaned_data)
+        return cleaned_data

@@ -66,16 +66,47 @@ class ElecCharginPointsTest(TestCase):
             "error": "VALIDATION_FAILED",
             "data": {
                 "file_name": "points-de-recharge-errors.xlsx",
-                "charge_point_count": 0,
-                "error_count": 6,
                 "pending_application_already_exists": False,
+                "charge_point_count": 0,
+                "error_count": 5,
                 "errors": [
-                    {"line": 13, "error": "MISSING_CHARGE_POINT_IN_DATAGOUV", "meta": "ABCDE"},
-                    {"line": 14, "error": "MISSING_CHARGE_POINT_ID"},
-                    {"line": 15, "error": "MISSING_CHARGE_POINT_IN_DATAGOUV", "meta": "FGHIJ"},
-                    {"line": 16, "error": "MISSING_CHARGE_POINT_IN_DATAGOUV", "meta": "KLMOPQ"},
-                    {"line": 17, "error": "MISSING_CHARGE_POINT_ID"},
-                    {"line": 18, "error": "MISSING_CHARGE_POINT_DATA", "meta": "measure_reference_point_id"},
+                    {
+                        "error": "INVALID_CHARGE_POINT_DATA",
+                        "line": 35,
+                        "meta": {
+                            "measure_date": ["Saisissez une date valide."],
+                            "measure_energy": ["Saisissez un nombre."],
+                            "charge_point_id": ["Ce point de recharge n'est pas list\u00e9 sur transport.data.gouv.fr"],
+                        },
+                    },
+                    {
+                        "error": "INVALID_CHARGE_POINT_DATA",
+                        "line": 36,
+                        "meta": {
+                            "charge_point_id": ["Ce point de recharge n'est pas list\u00e9 sur transport.data.gouv.fr"]
+                        },
+                    },
+                    {
+                        "error": "INVALID_CHARGE_POINT_DATA",
+                        "line": 37,
+                        "meta": {
+                            "charge_point_id": ["Ce point de recharge n'est pas list\u00e9 sur transport.data.gouv.fr"]
+                        },
+                    },
+                    {
+                        "error": "INVALID_CHARGE_POINT_DATA",
+                        "line": 38,
+                        "meta": {
+                            "charge_point_id": ["Ce point de recharge n'est pas list\u00e9 sur transport.data.gouv.fr"]
+                        },
+                    },
+                    {
+                        "error": "INVALID_CHARGE_POINT_DATA",
+                        "line": 39,
+                        "meta": {
+                            "charge_point_id": ["Ce point de recharge n'est pas list\u00e9 sur transport.data.gouv.fr"]
+                        },
+                    },
                 ],
             },
         }
@@ -160,7 +191,7 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(charge_points[0].station_id, "FR000011062174")
         self.assertEqual(charge_points[0].station_name, "Hotel saint alban")
         self.assertEqual(charge_points[0].nominal_power, 22)
-        self.assertEqual(charge_points[0].latitude, Decimal("43.419592"))
+        self.assertEqual(charge_points[0].latitude, Decimal("43.419591"))
         self.assertEqual(charge_points[0].longitude, Decimal("3.407609"))
 
         self.assertEqual(charge_points[1].charge_point_id, "FR000012292701")
