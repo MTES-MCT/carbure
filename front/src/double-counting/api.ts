@@ -14,6 +14,10 @@ export function getDoubleCountingAgreements(entity_id: number) {
   })
 }
 
+export function getDoubleCountingAgreementsPublicList() {
+  return api.get<Api<DoubleCountingApplicationOverview[]>>("/double-counting/agreements-public-list")
+}
+
 export function getDoubleCountingApplicationDetails(entity_id: number, dca_id: number) {
   return api.get<Api<DoubleCountingApplicationDetails>>(
     "/double-counting/applications/details",
