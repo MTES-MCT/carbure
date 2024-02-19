@@ -1,11 +1,10 @@
 import api, { Api } from "common/services/api"
 import {
-  DoubleCountingApplicationOverview,
+  AgreementDetails,
+  DoubleCountingAgreementPublic,
   DoubleCountingApplicationDetails,
-  DoubleCountingFileInfo,
-  DoubleCountingUploadErrors,
-  QuotaDetails,
-  AgreementDetails
+  DoubleCountingApplicationOverview,
+  DoubleCountingFileInfo
 } from "double-counting/types"
 
 export function getDoubleCountingAgreements(entity_id: number) {
@@ -15,7 +14,9 @@ export function getDoubleCountingAgreements(entity_id: number) {
 }
 
 export function getDoubleCountingAgreementsPublicList() {
-  return api.get<Api<DoubleCountingApplicationOverview[]>>("/double-counting/agreements-public-list")
+  return api.get<Api<DoubleCountingAgreementPublic[]>>("/double-counting/agreements/public-list", {
+    params: {},
+  })
 }
 
 export function getDoubleCountingApplicationDetails(entity_id: number, dca_id: number) {

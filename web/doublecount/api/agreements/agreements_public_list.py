@@ -4,10 +4,10 @@ from django.http.response import JsonResponse
 
 from django.http import JsonResponse
 from certificates.models import DoubleCountingRegistration
-from certificates.serializers import DoubleCountingRegistrationSerializer
+from certificates.serializers import DoubleCountingRegistrationPublicSerializer, DoubleCountingRegistrationSerializer
 
 
-def get_agreements_public_list():
+def get_agreements_public_list(request, *args, **kwargs):
 
     year = datetime.now().year
 
@@ -17,11 +17,6 @@ def get_agreements_public_list():
         .order_by("production_site__name")
     )
 
-    active_agreements = DoubleCountingRegistrationSerializer(agreements_active, many=True).data
+    active_agreements = DoubleCountingRegistrationPublicSerializer(agreements_active, many=True).data
 
-    data = {
-        "active": active_agreements,
-        # "incoming": DoubleCountingRegistrationSerializer(agreements_incoming, many=True).data,
-        # "expired": DoubleCountingRegistrationSerializer(agreements_expired, many=True).data,
-    }
-    return JsonResponse({"status": "success", "data": data})
+    return JsonResponse({"status": "success", "data": active_agreements})

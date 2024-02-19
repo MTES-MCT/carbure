@@ -1,23 +1,16 @@
-from typing import Dict, List
+from typing import List
 from django import forms
 from django.db.models.query_utils import Q
 from datetime import datetime
 from django.http.response import HttpResponse, JsonResponse
-import pandas as pd
 import xlsxwriter
 
 from django.http import JsonResponse
 from certificates.models import DoubleCountingRegistration
-from certificates.serializers import DoubleCountingRegistrationSerializer
+from certificates.serializers import DoubleCountingRegistrationPublicSerializer, DoubleCountingRegistrationSerializer
 from core.common import ErrorResponse
 from core.decorators import check_admin_rights
-from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere
-from core.serializers import ProductionSiteSerializer
 from doublecount.helpers import get_quotas
-from doublecount.models import DoubleCountingApplication, DoubleCountingProduction
-from doublecount.serializers import BiofuelSerializer, EntitySerializer, FeedStockSerializer
-from producers.models import ProductionSite, ProductionSiteOutput
-from django.db.models.aggregates import Count, Sum
 
 
 class AgreementError:
@@ -103,6 +96,8 @@ def sort_agreements(agreements, order_by, direction):
 
 
 def export_agreements(agreements: List[DoubleCountingRegistration]):
+    active_agreements = DoubleCountingRegistrationPublicSerializer(agreements, many=True).data
+
     today = datetime.now()
     location = "/tmp/active_agreements_%s.xlsx" % (today.strftime("%Y%m%d_%H%M"))
     workbook = xlsxwriter.Workbook(location)
@@ -146,28 +141,18 @@ def export_agreements(agreements: List[DoubleCountingRegistration]):
 
     # content
     row = 5
-    for a in agreements:
-        worksheet.write(row, 0, a.production_site.name if a.production_site else "SITE DE PROD MANQUANT")
-        worksheet.write(row, 5, a.certificate_id)
+    for a in active_agreements:
+        worksheet.write(row, 0, a["production_site"]["name"] if a["production_site"] else "SITE DE PROD MANQUANT")
+        worksheet.write(row, 5, a["certificate_id"])
 
-        if a.production_site:
-            worksheet.write(row, 1, a.production_site.address)
-            worksheet.write(row, 2, a.production_site.city)
-            worksheet.write(row, 3, a.production_site.postal_code)
-            worksheet.write(row, 4, a.production_site.country.name)
-            worksheet.write(row, 6, a.valid_from.strftime("%Y-%m-%d") + "-" + a.valid_until.strftime("%Y-%m-%d"))
+        if a["production_site"]:
+            worksheet.write(row, 1, a["production_site"]["address"])
+            worksheet.write(row, 2, a["production_site"]["city"])
+            worksheet.write(row, 3, a["production_site"]["postal_code"])
+            worksheet.write(row, 4, a["production_site"]["country"])
+            worksheet.write(row, 6, a["valid_from"] + "-" + a["valid_from"])
 
-            if not a.application:
-                biofuel_list = "NC"
-            else:
-                productions = DoubleCountingProduction.objects.filter(
-                    dca=a.application, approved_quota__gt=0, year=a.valid_from.year
-                )
-                biofuel_list = ", ".join(
-                    [production.biofuel.name + " (" + production.feedstock.name + ")" for production in productions]
-                )
-
-            worksheet.write(row, 7, biofuel_list)
+            worksheet.write(row, 7, a["biofuel_list"])
 
         row += 1
 

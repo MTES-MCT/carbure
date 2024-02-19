@@ -36,6 +36,7 @@ export const AgreementDetailsDialog = () => {
   })
 
   const agreement: AgreementDetails | undefined = applicationResponse.result?.data.data
+  console.log('agreement:', agreement)
 
   const application = agreement?.application
 
