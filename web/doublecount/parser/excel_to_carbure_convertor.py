@@ -4,8 +4,8 @@ from email.policy import default
 DC_FEEDSTOCK_UNRECOGNIZED = "__unrecognized__"
 
 dc_feedstock_to_carbure_feedstock = {
-    "alcool pur de marc de raisin": "ALCOOL_PUR_MARC_RAISIN",
-    "alcool pur de lies de vin": "ALCOOL_PUR_LIES_VIN",
+    "alcool pur de marc de raisin": "ETHANOL_PUR_MARC_RAISIN",
+    "alcool pur de lies de vin": "ETHANOL_PUR_LIES_VIN",
     "algues": "ALGUES",
     "bagasse": "BAGASSE",
     "balles (enveloppes)": "BALLES",
@@ -24,7 +24,9 @@ dc_feedstock_to_carbure_feedstock = {
     "effluents d'huileries de palme et rafles": "EFFLUENTS_HUILERIES_PALME_RAFLE",
     "effluents d'huileries de palme et rafles (pome)": "EFFLUENTS_HUILERIES_PALME_RAFLE",
     "egouts pauvres de 2e extractions": "EP2",
-    "ethanol de lies de vin": "ETHANOL_LIES_VIN",
+    "ethanol de lies de vin": "ETHANOL_PUR_LIES_VIN",
+    "ethanol pur de lies de vin": "ETHANOL_PUR_LIES_VIN",
+    "ethanol pur de marc de raisin": "ETHANOL_PUR_MARC_RAISIN",
     "fumier humide": "FUMIER_HUMIDE",
     "fumier sec": "FUMIER_SEC",
     "glycérine brute": "GLYCERINE_BRUTE",
