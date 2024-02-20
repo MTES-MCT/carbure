@@ -1,17 +1,11 @@
 import pandas as pd
 from typing import Iterable
 from django.core.files.uploadedfile import UploadedFile
-from core.excel import ExcelError, TableParser
+from django import forms
+from core.utils import Validator
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from elec.services.create_meter_reading_excel import get_previous_readings_by_charge_point
-
-EXCEL_COLUMNS = {
-    "charge_point_id": TableParser.id,
-    "last_extracted_energy": TableParser.float,
-    "extracted_energy": TableParser.float,
-    "reading_date": TableParser.date,
-}
 
 
 class ExcelMeterReadingError:
@@ -26,54 +20,71 @@ def import_meter_reading_excel(
     previous_application: ElecMeterReadingApplication = None,
     renewable_share: int = 1,
 ):
-    valid_meter_readings = []
-    validation_errors = []
+    meter_readings_data = ExcelMeterReadings.parse_meter_reading_excel(excel_file)
+    return ExcelMeterReadings.validate_meter_readings(meter_readings_data, existing_charge_points, previous_application, renewable_share)  # fmt:skip
 
-    # get the primary keys of the charge points saved inside the DB
-    charge_point_pks_by_id = {cp.charge_point_id: cp.pk for cp in existing_charge_points}
 
-    # make sure we use the previous readings stored in the DB rather than the one sent inside the excel file
-    previous_readings_by_charge_point = get_previous_readings_by_charge_point(existing_charge_points, previous_application)
-
-    # parse the excel file with pandas
-    meter_readings_data = pd.read_excel(excel_file, usecols=list(range(0, 4)))
-    meter_readings_data["line"] = meter_readings_data.index  # add a line number to locate data in the excel file
-    meter_readings_data.rename(columns={meter_readings_data.columns[i]: column for i, column in enumerate(EXCEL_COLUMNS)}, inplace=True)  # fmt: skip
-    meter_readings_data.dropna(inplace=True)
-    meter_readings_data, parse_errors = TableParser.parse_columns(meter_readings_data, EXCEL_COLUMNS)
-
-    excel_errors = [
-        ExcelError(
-            ExcelMeterReadingError.INVALID_METER_READING_DATA,
-            line=meter_readings_data.loc[error["row"]]["line"],
-            meta=error["column"],
-        )
-        for error in parse_errors
+class ExcelMeterReadings:
+    EXCEL_COLUMNS = [
+        "charge_point_id",
+        "previous_extracted_energy",
+        "extracted_energy",
+        "reading_date",
     ]
 
-    # check if the imported readings have errors, and save the correct ones
-    for line, reading in enumerate(meter_readings_data.to_dict(orient="records"), 2):
-        charge_point_id = reading["charge_point_id"]
-        charge_point_pk = charge_point_pks_by_id.get(charge_point_id)
-        extracted_energy = reading["extracted_energy"]
+    @staticmethod
+    def parse_meter_reading_excel(excel_file: UploadedFile):
+        meter_readings_data = pd.read_excel(excel_file, usecols=list(range(0, 4)))
+        meter_readings_data["line"] = meter_readings_data.index + 2  # add a line number to locate data in the excel file
+        meter_readings_data.rename(columns={meter_readings_data.columns[i]: column for i, column in enumerate(ExcelMeterReadings.EXCEL_COLUMNS)}, inplace=True)  # fmt: skip
+        meter_readings_data.dropna(inplace=True)
+
+        return meter_readings_data.to_dict(orient="records")
+
+    @staticmethod
+    def validate_meter_readings(
+        meter_readings: list[dict],
+        existing_charge_points: Iterable[ElecChargePoint],
+        previous_application: ElecMeterReadingApplication = None,
+        renewable_share: int = 1,
+    ):
+        charge_point_pks_by_id = {cp.charge_point_id: cp.pk for cp in existing_charge_points}
+        previous_readings_by_charge_point = get_previous_readings_by_charge_point(existing_charge_points, previous_application)  # fmt:skip
+
+        context = {
+            "renewable_share": renewable_share,
+            "charge_point_pks_by_id": charge_point_pks_by_id,
+            "previous_readings_by_charge_point": previous_readings_by_charge_point,
+        }
+
+        return ExcelMeterReadingValidator.bulk_validate(meter_readings, context)
+
+
+class ExcelMeterReadingValidator(Validator):
+    charge_point_id = forms.CharField()
+    extracted_energy = forms.FloatField(min_value=0)
+    reading_date = forms.DateField(input_formats=Validator.DATE_FORMATS)
+    renewable_energy = forms.FloatField()
+
+    def extend(self, meter_reading):
+        renewable_share = self.context.get("renewable_share")
+
+        charge_point_id = meter_reading.get("charge_point_id")
+        charge_point_pks_by_id = self.context.get("charge_point_pks_by_id")
+
+        previous_readings_by_charge_point = self.context.get("previous_readings_by_charge_point")
         previous_extracted_energy = previous_readings_by_charge_point.get(charge_point_id) or 0
-        reading_date = reading["reading_date"]
+        self.context["previous_extracted_energy"] = previous_extracted_energy
 
-        if charge_point_id not in charge_point_pks_by_id:
-            error = ExcelError(ExcelMeterReadingError.CHARGE_POINT_NOT_REGISTERED, line=line, meta=charge_point_id)  # fmt: skip
-            validation_errors.append(error)
-        elif extracted_energy < previous_extracted_energy:
-            error = ExcelError(ExcelMeterReadingError.EXTRACTED_ENERGY_LOWER_THAN_BEFORE, line=line, meta=charge_point_id)  # fmt: skip
-            validation_errors.append(error)
-        else:
-            valid_meter_readings.append(
-                {
-                    "charge_point_id": charge_point_pk,
-                    "extracted_energy": extracted_energy,
-                    "renewable_energy": (extracted_energy - previous_extracted_energy) * renewable_share,
-                    "reading_date": reading_date,
-                }
-            )
+        meter_reading["charge_point_id"] = charge_point_pks_by_id.get(charge_point_id)
+        meter_reading["renewable_energy"] = (meter_reading["extracted_energy"] - previous_extracted_energy) * renewable_share  # fmt:skip
 
-    errors = sorted(excel_errors + validation_errors, key=lambda e: e["line"])
-    return valid_meter_readings, errors
+        return meter_reading
+
+    def validate(self, meter_reading):
+        previous_extracted_energy = self.context.get("previous_extracted_energy")
+
+        if meter_reading.get("charge_point_id") is None:
+            self.add_error("charge_point_id", "Le point de recharge n'a pas été inscrit sur la plateforme ou n'est pas concerné par les relevés trimestriels.")  # fmt:skip
+        elif meter_reading.get("extracted_energy", 0) < previous_extracted_energy:
+            self.add_error("extracted_energy", "La quantité d'énergie soutirée est inférieure au précédent relevé.")

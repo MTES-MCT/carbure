@@ -71,41 +71,33 @@ class ElecCharginPointsTest(TestCase):
                 "error_count": 5,
                 "errors": [
                     {
-                        "error": "INVALID_CHARGE_POINT_DATA",
+                        "error": "INVALID_DATA",
                         "line": 35,
                         "meta": {
                             "measure_date": ["Saisissez une date valide."],
                             "measure_energy": ["Saisissez un nombre."],
-                            "charge_point_id": ["Ce point de recharge n'est pas list\u00e9 sur transport.data.gouv.fr"],
+                            "charge_point_id": ["Ce point de recharge n'est pas listé sur transport.data.gouv.fr"],
                         },
                     },
                     {
-                        "error": "INVALID_CHARGE_POINT_DATA",
+                        "error": "INVALID_DATA",
                         "line": 36,
-                        "meta": {
-                            "charge_point_id": ["Ce point de recharge n'est pas list\u00e9 sur transport.data.gouv.fr"]
-                        },
+                        "meta": {"charge_point_id": ["Ce point de recharge n'est pas listé sur transport.data.gouv.fr"]},
                     },
                     {
-                        "error": "INVALID_CHARGE_POINT_DATA",
+                        "error": "INVALID_DATA",
                         "line": 37,
-                        "meta": {
-                            "charge_point_id": ["Ce point de recharge n'est pas list\u00e9 sur transport.data.gouv.fr"]
-                        },
+                        "meta": {"charge_point_id": ["Ce point de recharge n'est pas listé sur transport.data.gouv.fr"]},
                     },
                     {
-                        "error": "INVALID_CHARGE_POINT_DATA",
+                        "error": "INVALID_DATA",
                         "line": 38,
-                        "meta": {
-                            "charge_point_id": ["Ce point de recharge n'est pas list\u00e9 sur transport.data.gouv.fr"]
-                        },
+                        "meta": {"charge_point_id": ["Ce point de recharge n'est pas listé sur transport.data.gouv.fr"]},
                     },
                     {
-                        "error": "INVALID_CHARGE_POINT_DATA",
+                        "error": "INVALID_DATA",
                         "line": 39,
-                        "meta": {
-                            "charge_point_id": ["Ce point de recharge n'est pas list\u00e9 sur transport.data.gouv.fr"]
-                        },
+                        "meta": {"charge_point_id": ["Ce point de recharge n'est pas listé sur transport.data.gouv.fr"]},
                     },
                 ],
             },
