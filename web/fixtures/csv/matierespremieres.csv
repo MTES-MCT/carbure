@@ -1,6 +1,4 @@
 code,nom,fermentescible,graisse,is_double_compte,makes_huile_vegetale,is_displayed,category
-ETHANOL_PUR_MARC_RAISIN,Ethanol pur de marc de raisin,1,0,1,0,1,ANN-IX-A
-ALCOOL_PUR_LIES_VIN,Alcool pur de lies de vin,1,0,1,0,1,ANN-IX-A
 ALGUES,Algues,1,1,1,0,1,ANN-IX-A
 AMIDON_RESIDUEL,Amidon résiduel,1,0,0,0,1,OTHER
 BAGASSE,Bagasse,1,0,1,0,1,ANN-IX-A
@@ -21,7 +19,8 @@ DISTILLAT_ACIDE_GRAS_PALME,Distillat d'acide gras de palme,0,1,0,1,1,CONV
 DPSC,Déchet de processus sucrier contaminé,1,0,0,0,1,OTHER
 EFFLUENTS_HUILERIES_PALME_RAFLE,Effluents d'huileries de palme et rafles,0,1,1,0,1,ANN-IX-A
 EP2,Égouts pauvres de 2ème extraction,1,0,0,0,1,OTHER
-ETHANOL_LIES_VIN,Ethanol de lies de vin,1,0,1,0,1,ANN-IX-A
+ETHANOL_PUR_LIES_VIN,Ethanol pur de lies de vin,1,0,1,0,1,ANN-IX-A
+ETHANOL_PUR_MARC_RAISIN,Ethanol pur de marc de raisin,1,0,1,0,1,ANN-IX-A
 FUMIER_HUMIDE,Fumier humide,1,0,1,0,0,ANN-IX-A
 FUMIER_SEC,Fumier sec,1,0,1,0,0,ANN-IX-A
 GLYCERINE_BRUTE,Glycérine brute,1,1,1,0,1,ANN-IX-A
