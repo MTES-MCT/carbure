@@ -32,27 +32,32 @@ const AgreementPublicList = () => {
   const columns: Column<DoubleCountingAgreementPublic>[] = compact([
     {
       header: t("Unité de production"),
-      cell: (a) => <Cell text={a.production_site.name || "-"} />,
+      small: true,
+      cell: (a) => a.production_site.name || "-",
     },
     {
       header: t("Adresse"),
-      cell: (a) => <Cell text={a.production_site.address} />
+      small: true,
+      cell: (a) => a.production_site.address
     },
     {
       header: t("Pays"),
-      cell: (a) => <Cell text={a.production_site.country || "-"} />,
+      small: true,
+      cell: (a) => a.production_site.country || "-",
     },
     {
       header: t("N° d'agrément"),
-      cell: (a) => <Cell text={a.certificate_id} />
+      small: true,
+      cell: (a) => a.certificate_id
     },
     {
       header: t("Validité"),
-      cell: (a) => <Cell text={`${formatDateYear(a.valid_from)}-${formatDateYear(a.valid_until)}`} />,
+      small: true,
+      cell: (a) => `${formatDateYear(a.valid_from)}-${formatDateYear(a.valid_until)}`,
     },
     {
       header: t("Biocarburants reconnus"),
-      cell: (a) => <Cell text={a.biofuel_list} />,
+      cell: (a) => a.biofuel_list,
     }
   ])
 
