@@ -13,7 +13,6 @@ class ExcelChargePointError:
     MISSING_CHARGE_POINT_ID = "MISSING_CHARGE_POINT_ID"
     MISSING_CHARGE_POINT_IN_DATAGOUV = "MISSING_CHARGE_POINT_IN_DATAGOUV"
     MISSING_CHARGE_POINT_DATA = "MISSING_CHARGE_POINT_DATA"
-    INVALID_CHARGE_POINT_DATA = "INVALID_CHARGE_POINT_DATA"
 
 
 def import_charge_point_excel(excel_file: UploadedFile, existing_charge_points: list[str]):
@@ -31,12 +30,12 @@ def import_charge_point_excel(excel_file: UploadedFile, existing_charge_points: 
 
 class ExcelChargePoints:
     EXCEL_COLUMNS = {
-        "charge_point_id": "Identifiant du point de recharge communiqué à transport.data.gouv",
-        "installation_date": "Date d'installation (ou 01/01/2022 si antérieur)",
-        "mid_id": "Numéro MID du certificat d'examen du type",
-        "measure_date": "Date du relevé",
-        "measure_energy": "Energie active totale soutirée à la date du relevé",
-        "measure_reference_point_id": "Numéro du point référence mesure du gestionnaire du réseau public de distribution alimentant la station",
+        "charge_point_id": ["Identifiant du point de recharge communiqué à transport.data.gouv"],
+        "installation_date": ["Date d'installation (ou 01/01/2022 si antérieur)"],
+        "mid_id": ["Numéro MID du certificat d'examen du type", "Numéro LNE du certificat d'examen du type"],
+        "measure_date": ["Date du relevé"],
+        "measure_energy": ["Energie active totale soutirée à la date du relevé"],
+        "measure_reference_point_id": ["Numéro du point référence mesure du gestionnaire du réseau public de distribution alimentant la station"],  # fmt:skip
     }
 
     @staticmethod
@@ -45,9 +44,8 @@ class ExcelChargePoints:
 
         # check that the template has the right columns
         for i, header in enumerate(ExcelChargePoints.EXCEL_COLUMNS.values()):
-            if charge_point_data.iloc[9, i].strip() != header:
-                if header != ExcelChargePoints.EXCEL_COLUMNS["mid_id"] or header != "Numéro LNE du certificat d'examen du type":  # fmt:skip
-                    raise Exception("Invalid template")
+            if charge_point_data.iloc[9, i].strip() not in header:
+                raise Exception("Invalid template")
 
         charge_point_data = charge_point_data.drop(charge_point_data.index[:11])
         charge_point_data = charge_point_data.dropna(how="all")  # remove completely empty rows
@@ -70,34 +68,22 @@ class ExcelChargePoints:
 
     @staticmethod
     def validate_charge_points(charge_points: list[dict], transport_data, existing_charge_points):
-        valid_charge_points = []
-        charge_points_errors = []
-
         transport_data_index = {row["charge_point_id"]: row for row in transport_data}
-        context = {"existing_charge_points": existing_charge_points, "transport_data_index": transport_data_index}
 
-        for charge_point_data in charge_points:
-            form = ExcelChargePointValidator(charge_point_data, context=context)
+        context = {
+            "transport_data_index": transport_data_index,
+            "existing_charge_points": existing_charge_points,
+        }
 
-            if form.is_valid():
-                valid_charge_points.append(form.cleaned_data)
-            else:
-                line = charge_point_data.get("line")
-                error = {"error": ExcelChargePointError.INVALID_CHARGE_POINT_DATA, "line": line, "meta": form.errors}
-                charge_points_errors.append(error)
-
-        return valid_charge_points, charge_points_errors
+        return ExcelChargePointValidator.bulk_validate(charge_points, context)
 
 
 class ExcelChargePointValidator(Validator):
-    # potential date formats inside the excel file
-    DATE_FORMATS = ["%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%d/%m/%Y"]
-
     # fields from charge point excel template
     charge_point_id = forms.CharField(max_length=64)
-    installation_date = forms.DateField(input_formats=DATE_FORMATS)
+    installation_date = forms.DateField(input_formats=Validator.DATE_FORMATS)
     mid_id = forms.CharField(required=False, max_length=128)
-    measure_date = forms.DateField(input_formats=DATE_FORMATS, required=False)
+    measure_date = forms.DateField(input_formats=Validator.DATE_FORMATS, required=False)
     measure_energy = forms.FloatField(required=False, initial=0)
     measure_reference_point_id = forms.CharField(required=False, max_length=64)
 

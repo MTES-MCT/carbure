@@ -154,6 +154,30 @@ class MultipleValueField(forms.TypedMultipleChoiceField):
 
 
 class Validator(forms.Form):
+    INVALID_DATA = "INVALID_DATA"
+
+    # potential date formats inside the excel file
+    DATE_FORMATS = ["%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%d/%m/%Y"]
+
+    @classmethod
+    def bulk_validate(SpecializedValidator, items, context):
+        """
+        Use this method to validate a list of dicts with the current Validator.
+        Ex: If you defined a LotValidator, you can run `valid_lots, errors = LotValidator.bulk_validate(list_of_lot_data, context)`
+        """
+
+        valid_items = []
+        errors = []
+
+        for item_data in items:
+            form = SpecializedValidator(item_data, context=context)
+            if form.is_valid():
+                valid_items.append(form.cleaned_data)
+            else:
+                errors.append({"error": Validator.INVALID_DATA, "line": item_data.get("line"), "meta": form.errors})
+
+        return valid_items, errors
+
     # extend the default Form constructor by adding the ability to set a context with external data
     # useful during calls to self.extend() and self.validate() as you can use data that doesn't belong to the FormData itself
     def __init__(self, data, context={}, **kwargs):

@@ -23,7 +23,7 @@ export const okChargePointsAddSuccess = mockPostWithResponseData("/api/elec/cpo/
 
 export const okMeterReadingsApplicationsEmpty = mockGetWithResponseData("/api/elec/cpo/meter-readings/applications", [])
 export const okMeterReadingsApplications = mockGetWithResponseData("/api/elec/cpo/meter-readings/applications", elecMeterReadingsApplications)
-export const okMeterReadingsCheckError = mockPostWithResponseData("/api/elec/cpo/meter-readings/check-application", meterReadingsApplicationCheckResponseFailed, true, "VALIDATION_ERROR")
+export const okMeterReadingsCheckError = mockPostWithResponseData("/api/elec/cpo/meter-readings/check-application", meterReadingsApplicationCheckResponseFailed, true, "VALIDATION_FAILED")
 export const okMeterReadingsCheckValid = mockPostWithResponseData("/api/elec/cpo/meter-readings/check-application", meterReadingsApplicationCheckResponseSuccess)
 export const okMeterReadingsAddSuccess = mockPostWithResponseData("/api/elec/cpo/meter-readings/add-application")
 

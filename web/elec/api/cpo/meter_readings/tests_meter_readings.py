@@ -1,4 +1,3 @@
-from email.mime import application
 import io
 import datetime
 import openpyxl
@@ -201,23 +200,39 @@ class ElecMeterReadingsTest(TestCase):
 
         data = response.json()
         self.assertEqual(response.status_code, 400)
+
         self.assertEqual(
             data,
             {
                 "status": "error",
+                "error": "VALIDATION_FAILED",
                 "data": {
                     "file_name": "readings.xlsx",
-                    "meter_reading_count": 1,
                     "quarter": 3,
                     "year": 2024,
-                    "errors": [
-                        {"line": 3, "error": "EXTRACTED_ENERGY_LOWER_THAN_BEFORE", "meta": "FR00EFGH"},
-                        {"line": 4, "error": "CHARGE_POINT_NOT_REGISTERED", "meta": "FR00IJKL"},
-                    ],
-                    "error_count": 2,
                     "pending_application_already_exists": False,
+                    "meter_reading_count": 1,
+                    "error_count": 2,
+                    "errors": [
+                        {
+                            "error": "INVALID_DATA",
+                            "line": 3,
+                            "meta": {
+                                "extracted_energy": ["La quantité d'énergie soutirée est inférieure au précédent relevé."]
+                            },
+                        },
+                        {
+                            "error": "INVALID_DATA",
+                            "line": 4,
+                            "meta": {
+                                "charge_point_id": [
+                                    "Ce champ est obligatoire.",
+                                    "Le point de recharge n'a pas été inscrit sur la plateforme ou n'est pas concerné par les relevés trimestriels.",
+                                ]
+                            },
+                        },
+                    ],
                 },
-                "error": "VALIDATION_FAILED",
             },
         )
 

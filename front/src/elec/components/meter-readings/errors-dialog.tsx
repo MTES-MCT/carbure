@@ -27,7 +27,12 @@ export const MeterReadingsErrorsDetailsDialog = ({
         <Tag big variant="warning">
           {t("À corriger")}
         </Tag>
-        <h1>{t("Relevés trimestriels T{{quarter}} {{year}}", { quarter: fileData.quarter, year: fileData.year })}</h1>
+        <h1>
+          {t("Relevés trimestriels T{{quarter}} {{year}}", {
+            quarter: fileData.quarter,
+            year: fileData.year,
+          })}
+        </h1>
       </header>
 
       <main>
@@ -53,7 +58,12 @@ export const MeterReadingsErrorsDetailsDialog = ({
           disabled={true}
         />
 
-        <Button icon={Return} label={t("Charger un nouveau fichier")} action={onClose} asideX />
+        <Button
+          icon={Return}
+          label={t("Charger un nouveau fichier")}
+          action={onClose}
+          asideX
+        />
       </footer>
     </Dialog>
   )
@@ -95,12 +105,25 @@ export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
 export function getErrorText(error: MeterReadingsApplicationError) {
   switch (error.error) {
     case "EXCEL_PARSING_FAILED":
-      return t("Le fichier importé n'a pas pu être analysé. Merci de verifier que le format du modèle de fichier a bien été respecté.")
+      return t(
+        "Le fichier importé n'a pas pu être analysé. Merci de verifier que le format du modèle de fichier a bien été respecté."
+      )
 
-    case "INVALID_METER_READINGS_DATA":
-      return t(`Le champ "{{invalidField}}" est invalide`, {
-        invalidField: getFieldText(error.meta),
-      })
+    case "INVALID_DATA":
+      return (
+        <ul>
+          {Object.entries(error.meta).map(([field, errors]) => (
+            <li>
+              <b>{getFieldText(field)}:</b>
+              <ul>
+                {(errors as string[]).map((error) => (
+                  <li>{error}</li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      )
 
     default:
       return (
@@ -112,8 +135,8 @@ export function getErrorText(error: MeterReadingsApplicationError) {
 
 function getFieldText(field: string) {
   switch (field) {
-    case "mid_id":
-      return t("Identifiant MID")
+    case "charge_point_id":
+      return t("Identifiant du point de recharge")
     default:
       return "Champ non reconnu"
   }

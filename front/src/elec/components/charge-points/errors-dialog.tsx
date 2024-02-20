@@ -104,21 +104,7 @@ export function getErrorText(error: ChargePointsApplicationError) {
         "Le fichier importé n'a pas pu être analysé. Merci de verifier que le format du modèle de fichier a bien été respecté."
       )
 
-    case "MISSING_CHARGING_POINT_ID":
-      return t("L'identifiant du point de recharge n'est pas renseigné")
-
-    case "MISSING_CHARGING_POINT_IN_DATAGOUV":
-      return t(
-        `L'identifiant "{{chargePointId}}" du point de recharge n'existe pas sur transport.data.gouv.fr`,
-        { chargePointId: error.meta }
-      )
-
-    case "MISSING_CHARGING_POINT_DATA":
-      return t(`Le champ "{{missingField}}" n'est pas renseigné`, {
-        missingField: getFieldText(error.meta),
-      })
-
-    case "INVALID_CHARGE_POINT_DATA":
+    case "INVALID_DATA":
       return (
         <ul>
           {Object.entries(error.meta).map(([field, errors]) => (
@@ -133,9 +119,6 @@ export function getErrorText(error: ChargePointsApplicationError) {
           ))}
         </ul>
       )
-    // return t(`Le champ "{{invalidField}}" est invalide`, {
-    //   invalidField: getFieldText(error.meta),
-    // })
 
     default:
       return (
