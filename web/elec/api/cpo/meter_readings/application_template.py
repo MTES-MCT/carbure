@@ -20,6 +20,7 @@ class ApplicationTemplateForm(forms.Form):
 class ApplicationTemplateError:
     TOO_LATE = "TOO_LATE"
     NO_CHARGE_POINT_AVAILABLE = "NO_CHARGE_POINT_AVAILABLE"
+    ONLY_ARTICLE_2_CHARGE_POINTS = "ONLY_ARTICLE_2_CHARGE_POINTS"
 
 
 @require_GET
@@ -37,11 +38,15 @@ def get_application_template(request, entity):
         message = "Les inscriptions de relevés pour un trimestre doivent être réalisées entre les 10 derniers jours de ce trimestre et les 20 premiers jours du trimestre suivant."
         return ErrorResponse(400, ApplicationTemplateError.TOO_LATE, message=message)
 
-    charge_points = ChargePointRepository.get_charge_points_for_meter_readings(entity)
+    charge_points = ChargePointRepository.get_registered_charge_points(entity)
 
     if charge_points.count() == 0:
         message = "Le fichier excel n'a pas pu être généré car aucun point de recharge n'a été validé jusqu'à présent. Assurez-vous qu'au moins l'un de vos dossiers d'inscription de point de recharge a déjà été validé par la DGEC."
         return ErrorResponse(400, ApplicationTemplateError.NO_CHARGE_POINT_AVAILABLE, message=message)
+
+    if charge_points.filter(is_article_2=False).count() == 0:
+        message = "Tous vos points de recharge sont soumis à l'article 2 (station avec courant continu), vous n'avez donc pas besoin de soumettre de relevés ici."  # fmt:skip
+        return ErrorResponse(400, ApplicationTemplateError.ONLY_ARTICLE_2_CHARGE_POINTS, message=message)
 
     previous_application = MeterReadingRepository.get_previous_application(entity, quarter, year)
     meter_reading_data = create_meter_readings_data(charge_points, previous_application)
