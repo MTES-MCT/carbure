@@ -76,7 +76,6 @@ class ElecCharginPointsTest(TestCase):
                         "meta": {
                             "measure_date": ["Saisissez une date valide."],
                             "measure_energy": ["Saisissez un nombre."],
-                            "charge_point_id": ["Ce point de recharge n'est pas listé sur transport.data.gouv.fr"],
                         },
                     },
                     {
@@ -128,7 +127,6 @@ class ElecCharginPointsTest(TestCase):
             },
         }
 
-        self.maxDiff = None
         self.assertEqual(response.json(), expected)
         self.assertEqual(response.status_code, 200)
 

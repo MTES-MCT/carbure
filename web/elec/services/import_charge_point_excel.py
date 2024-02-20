@@ -15,14 +15,14 @@ class ExcelChargePointError:
     MISSING_CHARGE_POINT_DATA = "MISSING_CHARGE_POINT_DATA"
 
 
-def import_charge_point_excel(excel_file: UploadedFile, existing_charge_points: list[str]):
+def import_charge_point_excel(excel_file: UploadedFile, registered_charge_points: list[str]):
     try:
         # return the content of the excel file, indexed by their line number, in the form of a list of dicts holding strings only
         excel_data = ExcelChargePoints.parse_charge_point_excel(excel_file)
         # find the TDG data related to the charge points listed in the imported excel file
         transport_data = TransportDataGouv.find_charge_point_data(excel_data, 1000)
         # parse the data and validate errors
-        return ExcelChargePoints.validate_charge_points(excel_data, transport_data, existing_charge_points)  # fmt:skip
+        return ExcelChargePoints.validate_charge_points(excel_data, transport_data, registered_charge_points)  # fmt:skip
     except:
         traceback.print_exc()
         return [], [{"error": ExcelChargePointError.EXCEL_PARSING_FAILED}]
@@ -67,12 +67,12 @@ class ExcelChargePoints:
         return charge_point_data.to_dict(orient="records")
 
     @staticmethod
-    def validate_charge_points(charge_points: list[dict], transport_data, existing_charge_points):
+    def validate_charge_points(charge_points: list[dict], transport_data, registered_charge_points):
         transport_data_index = {row["charge_point_id"]: row for row in transport_data}
 
         context = {
             "transport_data_index": transport_data_index,
-            "existing_charge_points": existing_charge_points,
+            "registered_charge_points": registered_charge_points,
         }
 
         return ExcelChargePointValidator.bulk_validate(charge_points, context)
@@ -121,12 +121,14 @@ class ExcelChargePointValidator(Validator):
     # check if the different possible charge point configurations are respected
     # and if the new data doesn't conflict with TDG or our own DB
     def validate(self, charge_point):
-        existing_charge_points = self.context.get("existing_charge_points", [])
+        charge_point_id = charge_point.get("charge_point_id")
+
+        registered_charge_points = self.context.get("registered_charge_points", [])
         transport_data_index = self.context.get("transport_data_index", {})
 
-        if charge_point.get("charge_point_id") in existing_charge_points:
+        if charge_point_id in registered_charge_points:
             self.add_error("charge_point_id", "Ce point de recharge a déjà été défini dans un autre dossier d'inscription.")
-        elif charge_point.get("charge_point_id") not in transport_data_index:
+        elif charge_point_id not in transport_data_index:
             self.add_error("charge_point_id", "Ce point de recharge n'est pas listé sur transport.data.gouv.fr")
         else:
             if charge_point.get("is_article_2"):

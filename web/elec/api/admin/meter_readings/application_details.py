@@ -31,7 +31,7 @@ def get_application_details(request):
     application: ElecMeterReadingApplication = form.cleaned_data["application_id"]
     company: Entity = form.cleaned_data["company_id"]
 
-    charge_points = ChargePointRepository.get_registered_charge_points(company)
+    charge_points = ChargePointRepository.get_charge_points_for_meter_readings(company)
     previous_application = MeterReadingRepository.get_previous_application(company, application.quarter, application.year)
     meter_readings = MeterReadingRepository.get_application_meter_readings(company, application)
 

@@ -32,7 +32,7 @@ def get_application_details(request, entity: Entity):
     if application.cpo != entity:
         return ErrorResponse(400, ApplicationDetailsError.WRONG_ENTITY)
 
-    charge_points = ChargePointRepository.get_registered_charge_points(entity)
+    charge_points = ChargePointRepository.get_charge_points_for_meter_readings(entity)
     previous_application = MeterReadingRepository.get_previous_application(entity, application.quarter, application.year)
     meter_readings = MeterReadingRepository.get_application_meter_readings(entity, application)
 
