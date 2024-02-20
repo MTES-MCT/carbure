@@ -29,7 +29,7 @@ def compute_meter_reading_renewable_energy(batch):
 
     for application in tqdm(meter_reading_applications):
         meter_readings = application.elec_meter_readings.all().select_related("charge_point")
-        charge_points = ChargePointRepository.get_registered_charge_points(application.cpo)
+        charge_points = ChargePointRepository.get_charge_points_for_meter_readings(application.cpo)
         previous_application = MeterReadingRepository.get_previous_application(application.cpo, application.quarter, application.year)  # fmt:skip
         previous_readings_by_charge_point = get_previous_readings_by_charge_point(charge_points, previous_application)
         renewable_share = renewable_share_by_year.get(application.year)

@@ -1,4 +1,5 @@
 import traceback
+import os
 from django.conf import settings
 from core.carburetypes import CarbureError
 
@@ -14,7 +15,7 @@ class ExceptionMiddleware(object):
         return self.get_response(request)
 
     def process_exception(self, request, exception):
-        if settings.DEBUG:
+        if settings.DEBUG or os.getenv("TEST"):
             traceback.print_exc()
             return ErrorResponse(500, CarbureError.UNKNOWN_ERROR, message=str(exception))
         else:

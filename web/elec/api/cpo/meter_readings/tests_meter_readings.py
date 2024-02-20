@@ -225,10 +225,7 @@ class ElecMeterReadingsTest(TestCase):
                             "error": "INVALID_DATA",
                             "line": 4,
                             "meta": {
-                                "charge_point_id": [
-                                    "Ce champ est obligatoire.",
-                                    "Le point de recharge n'a pas été inscrit sur la plateforme ou n'est pas concerné par les relevés trimestriels.",
-                                ]
+                                "charge_point_id": ["Le point de recharge n'a pas besoin de relevé, sa station contient au moins un point en courant continu."]  # fmt:skip
                             },
                         },
                     ],
@@ -319,6 +316,7 @@ class ElecMeterReadingsTest(TestCase):
         )
 
         data = response.json()
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data, {"status": "success"})
 

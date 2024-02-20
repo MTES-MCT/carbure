@@ -37,7 +37,7 @@ def get_application_template(request, entity):
         message = "Les inscriptions de relevés pour un trimestre doivent être réalisées entre les 10 derniers jours de ce trimestre et les 20 premiers jours du trimestre suivant."
         return ErrorResponse(400, ApplicationTemplateError.TOO_LATE, message=message)
 
-    charge_points = ChargePointRepository.get_registered_charge_points(entity)
+    charge_points = ChargePointRepository.get_charge_points_for_meter_readings(entity)
 
     if charge_points.count() == 0:
         message = "Le fichier excel n'a pas pu être généré car aucun point de recharge n'a été validé jusqu'à présent. Assurez-vous qu'au moins l'un de vos dossiers d'inscription de point de recharge a déjà été validé par la DGEC."

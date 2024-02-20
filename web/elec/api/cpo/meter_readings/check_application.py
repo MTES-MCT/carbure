@@ -45,9 +45,8 @@ def check_application(request: HttpRequest, entity):
     if not quarter or not year:
         return ErrorResponse(400, CheckMeterReadingApplicationError.TOO_LATE)
 
-    existing_charge_points = ChargePointRepository.get_registered_charge_points(entity)
-
-    meter_reading_data, errors = import_meter_reading_excel(excel_file, existing_charge_points)
+    registered_charge_points = ChargePointRepository.get_registered_charge_points(entity)
+    meter_reading_data, errors = import_meter_reading_excel(excel_file, registered_charge_points)
     pending_application_already_exists = MeterReadingRepository.get_replaceable_applications(entity).count() > 0
 
     data = {}
