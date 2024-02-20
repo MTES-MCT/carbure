@@ -116,11 +116,11 @@ class TransportDataGouv:
         charge_point_data["current_type"] = charge_point_data["DC"].apply(lambda is_dc: "DC" if is_dc else "AC")
 
         # On regarde les stations qui comprennent un point de recharge DC
-        stations_art2 = charge_point_data[["charge_point_id", "DC"]].groupby("charge_point_id").max()
+        stations_art2 = charge_point_data[["station_id", "DC"]].groupby("station_id").max()
         stations_art2 = stations_art2.rename(columns={"DC": "is_article_2"})
 
         # On marque tous les points de charge de ces stations comme éligible article 2
-        return charge_point_data.merge(stations_art2, on="charge_point_id")[
+        return charge_point_data.merge(stations_art2, on="station_id")[
             [
                 "charge_point_id",
                 "current_type",
