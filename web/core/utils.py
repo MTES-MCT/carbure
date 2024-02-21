@@ -100,7 +100,7 @@ def generate_reports(name, entity_lots, include_partners=False):
         emails = ", ".join([user.email for user in entity_users])
         print(f"> {len(entity_lots)} lots for {entity.name} ({emails})")
         workbook = xlsxwriter.Workbook(location)
-        make_carbure_lots_sheet(workbook, None, entity_lots)
+        make_carbure_lots_sheet(workbook, entity, entity_lots)
         workbook.close()
 
 
