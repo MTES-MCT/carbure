@@ -19,7 +19,7 @@ class ElecProvisionCertificate(models.Model):
     )
 
     cpo = models.ForeignKey("core.Entity", on_delete=models.CASCADE)
-    current_type = models.CharField(max_length=2, choices=ElecChargePoint.CURRENT_TYPE, null=True)
+    current_type = models.CharField(max_length=2, choices=ElecChargePoint.CURRENT_TYPES, null=True)
     energy_amount = models.FloatField()
     operating_unit = models.CharField(max_length=64)
     quarter = models.IntegerField(choices=QUARTERS)
