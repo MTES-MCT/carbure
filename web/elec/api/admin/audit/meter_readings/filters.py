@@ -1,13 +1,11 @@
 # /api/saf/operator/ticket-sources/filters
 
 import traceback
-from django import forms
-from django.db.models.functions import Coalesce
 from core.carburetypes import CarbureError
 from core.common import SuccessResponse, ErrorResponse
 from core.decorators import check_user_rights
-from elec.api.admin.audit.charge_points.applications import AuditApplicationsFilterForm, filter_charge_point_applications
-from elec.repositories.charge_point_repository import ChargePointRepository
+from elec.api.admin.audit.charge_points.applications import AuditApplicationsFilterForm
+from elec.api.admin.audit.meter_readings.applications import filter_meter_readings_applications
 from elec.repositories.meter_reading_repository import MeterReadingRepository
 
 
@@ -26,7 +24,7 @@ def get_meter_readings_applications_filters(request, *args, **kwargs):
         query[filter] = None
         meter_readings_applications = MeterReadingRepository.get_annotated_applications()
         # find all applications  matching the rest of the query
-        meter_readings_applications = filter_charge_point_applications(meter_readings_applications, **query)
+        meter_readings_applications = filter_meter_readings_applications(meter_readings_applications, **query)
         # get the available values for the selected filter
         data = get_filter_values(meter_readings_applications, filter)
 
