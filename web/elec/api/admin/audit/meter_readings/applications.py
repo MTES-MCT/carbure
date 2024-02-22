@@ -7,13 +7,9 @@ from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
 from core.models import ExternalAdminRights
 from core.utils import MultipleValueField
-from elec.models.elec_charge_point_application import ElecChargePointApplication
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
-from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.repositories.meter_reading_repository import MeterReadingRepository
-from elec.serializers.elec_charge_point_application import ElecChargePointApplicationSerializer
 from django.core.paginator import Paginator
-from django.db.models import Count, Sum
 
 from elec.serializers.elec_meter_reading_application_serializer import ElecMeterReadingApplicationSerializer
 
@@ -76,23 +72,22 @@ def get_applications(request):
 
 
 def filter_meter_readings_applications(applications, **filters):
-    applications = applications.select_related(
-        "cpo",
-    )
 
-    applications = applications.filter(created_at__year=filters["year"])
+    applications = applications.select_related("cpo")
 
-    if filters["cpo"]:
+    applications = applications.filter(year=filters["year"])
+
+    if filters.get("cpo"):
         applications = applications.filter(cpo__name__in=filters["cpo"])
 
-    if filters["quarter"]:
+    if filters.get("quarter"):
         applications = applications.filter(quarter__in=filters["quarter"])
 
-    if filters["status"] == "PENDING":
+    if filters.get("status") == "PENDING":
         applications = applications.filter(
             status__in=[ElecMeterReadingApplication.PENDING, ElecMeterReadingApplication.AUDIT_IN_PROGRESS]
         )
-    elif filters["status"] == "HISTORY":
+    elif filters.get("status") == "HISTORY":
         applications = applications.filter(
             status__in=[ElecMeterReadingApplication.REJECTED, ElecMeterReadingApplication.ACCEPTED]
         )
