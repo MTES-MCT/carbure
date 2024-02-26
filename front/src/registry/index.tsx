@@ -8,6 +8,7 @@ import Biofuels from "./components/biofuels"
 import Companies from "./components/companies"
 import Depots from "./components/depots"
 import Feedstocks from "./components/feedstocks"
+import DoubleCounting from "./components/double-counting"
 
 const Registry = () => {
   const { t } = useTranslation()
@@ -44,6 +45,16 @@ const Registry = () => {
             key: "depots",
             label: t("Dépôts"),
           },
+          {
+            path: "#depots",
+            key: "depots",
+            label: t("Dépôts"),
+          },
+          {
+            path: "#double-counting",
+            key: "double-counting",
+            label: t("Double comptage"),
+          },
         ]}
       >
         {(focus) => (
@@ -52,6 +63,7 @@ const Registry = () => {
             {focus === "feedstocks" && <Feedstocks />}
             {focus === "biofuels" && <Biofuels />}
             {focus === "depots" && <Depots />}
+            {focus === "double-counting" && <DoubleCounting />}
           </section>
         )}
       </Tabs>

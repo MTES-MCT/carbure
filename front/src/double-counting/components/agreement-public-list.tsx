@@ -14,52 +14,13 @@ import { DoubleCountingAgreementPublic } from "../types"
 
 const AgreementPublicList = () => {
   const { t } = useTranslation()
-
-  const entity = useEntity()
-  const [order, setOrder] = useState<Order | undefined>(undefined)
-
   useTitle(t("Listes des unités de production de biocarburants reconnues"))
 
   const agreementsResponse = useQuery(api.getDoubleCountingAgreementsPublicList, {
     key: "dc-agreements-public-list",
     params: [],
   })
-
-
   const agreements = agreementsResponse.result?.data.data
-
-
-  const columns: Column<DoubleCountingAgreementPublic>[] = compact([
-    {
-      header: t("Unité de production"),
-      small: true,
-      cell: (a) => a.production_site.name || "-",
-    },
-    {
-      header: t("Adresse"),
-      small: true,
-      cell: (a) => a.production_site.address
-    },
-    {
-      header: t("Pays"),
-      small: true,
-      cell: (a) => a.production_site.country || "-",
-    },
-    {
-      header: t("N° d'agrément"),
-      small: true,
-      cell: (a) => a.certificate_id
-    },
-    {
-      header: t("Validité"),
-      small: true,
-      cell: (a) => `${formatDateYear(a.valid_from)}-${formatDateYear(a.valid_until)}`,
-    },
-    {
-      header: t("Biocarburants reconnus"),
-      cell: (a) => a.biofuel_list,
-    }
-  ])
 
   return (
     <Main>
@@ -70,14 +31,41 @@ const AgreementPublicList = () => {
       </section>
       <section>
 
-
-
         {agreements && <Table
           loading={agreementsResponse.loading}
-          columns={columns}
+          columns={[
+            {
+              header: t("Unité de production"),
+              small: true,
+              cell: (a) => a.production_site.name || "-",
+            },
+            {
+              header: t("Adresse"),
+              small: true,
+              cell: (a) => a.production_site.address
+            },
+            {
+              header: t("Pays"),
+              small: true,
+              cell: (a) => a.production_site.country || "-",
+            },
+            {
+              header: t("N° d'agrément"),
+              small: true,
+              cell: (a) => a.certificate_id
+            },
+            {
+              header: t("Validité"),
+              small: true,
+              cell: (a) => `${formatDateYear(a.valid_from)}-${formatDateYear(a.valid_until)}`,
+            },
+            {
+              header: t("Biocarburants reconnus"),
+              cell: (a) => a.biofuel_list,
+            }
+          ]}
           rows={agreements}
-          order={order}
-          onOrder={setOrder}
+
         />
         }
         {!agreements &&
