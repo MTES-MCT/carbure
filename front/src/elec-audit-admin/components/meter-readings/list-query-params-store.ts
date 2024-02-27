@@ -3,7 +3,7 @@ import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
 import useTitle from "common/hooks/title"
-import { ElecAdminAuditFilterSelection, ElecAdminAuditSnapshot, ElecAdminAuditStates, ElecAdminAuditStatus } from "elec-admin-audit/types"
+import { ElecAdminAuditFilterSelection, ElecAdminAuditSnapshot, ElecAdminAuditStates, ElecAdminAuditStatus } from "elec-audit-admin/types"
 import { useTranslation } from "react-i18next"
 import { useFilterSearchParams } from "../../../elec-admin/hooks/provision-certificate-filter-search-params"
 

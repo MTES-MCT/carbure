@@ -1,5 +1,5 @@
 import Tabs from "common/components/tabs"
-import { ElecAdminAuditStatus } from "elec-admin-audit/types"
+import { ElecAdminAuditStatus } from "elec-audit-admin/types"
 import { useTranslation } from "react-i18next"
 
 interface StatusSwitcherProps {

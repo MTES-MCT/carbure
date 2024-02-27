@@ -16,8 +16,8 @@ import { compact } from "common/utils/collection"
 import { useMatch } from "react-router-dom"
 import ElecMeterReadingsFileUpload from "./upload-dialog"
 import ApplicationStatus from "../application-status"
-import MeterReadingsApplicationAcceptDialog from "elec-admin-audit/components/meter-readings/accept-dialog"
-import MeterReadingsApplicationRejectDialog from "elec-admin-audit/components/meter-readings/reject-dialog"
+import MeterReadingsApplicationAcceptDialog from "elec-audit-admin/components/meter-readings/accept-dialog"
+import MeterReadingsApplicationRejectDialog from "elec-audit-admin/components/meter-readings/reject-dialog"
 import MeterReadingsApplicationsTable from "./table"
 
 const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {

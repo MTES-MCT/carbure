@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import cl from "clsx"
 import * as api from "../api"
-import { EntityDetails } from "companies/types"
+import { EntityDetails } from "companies-admin/types"
 import css from "./entity-summary.module.css"
 import Table, { Cell } from "common/components/table"
 import { Alert } from "common/components/alert"
@@ -18,7 +18,7 @@ import {
   normalizeEntityType,
 } from "carbure/utils/normalizers"
 import useEntity from "carbure/hooks/entity"
-import { companiesSummary } from "companies/__test__/data"
+import { companiesSummary } from "companies-admin/__test__/data"
 
 type EntitySummaryProps = {
   search?: string
