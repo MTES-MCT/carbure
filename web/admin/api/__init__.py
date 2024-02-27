@@ -5,5 +5,4 @@ urlpatterns = [
     path("dashboard/", include("admin.api.dashboard")),
     path("entities/", include("admin.api.entities")),
     path("controls/", include("admin.api.controls")),
-    path("double-counting/", include("admin.api.double_counting")),
 ]

@@ -5,9 +5,6 @@ from doublecount.models import (
     DoubleCountingApplication,
     DoubleCountingProduction,
 )
-from doublecount.helpers import (
-    send_dca_status_email,
-)
 
 from core.common import ErrorResponse, SuccessResponse
 

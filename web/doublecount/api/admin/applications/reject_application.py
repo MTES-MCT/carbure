@@ -4,9 +4,6 @@ from core.decorators import check_admin_rights
 from doublecount.models import (
     DoubleCountingApplication,
 )
-from doublecount.helpers import (
-    send_dca_status_email,
-)
 
 
 @check_admin_rights()

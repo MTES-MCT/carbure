@@ -3,8 +3,8 @@ from datetime import date
 import json
 import os
 from pprint import pprint
-from admin.api.double_counting.applications.add import DoubleCountingAddError
-from admin.api.double_counting.applications.approve_application import DoubleCountingApplicationApproveError
+from doublecount.api.admin.applications.add import DoubleCountingAddError
+from doublecount.api.admin.applications.approve_application import DoubleCountingApplicationApproveError
 from certificates.models import DoubleCountingRegistration
 
 from core.tests_utils import setup_current_user

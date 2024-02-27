@@ -1,7 +1,7 @@
 from django.db.models.query_utils import Q
 
 from django.http import JsonResponse
-from core.decorators import check_admin_rights, is_admin_or_external_admin
+from core.decorators import check_admin_rights
 
 from doublecount.models import (
     DoubleCountingApplication,
