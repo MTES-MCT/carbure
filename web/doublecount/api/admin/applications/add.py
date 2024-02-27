@@ -11,7 +11,6 @@ import unicodedata
 import boto3
 from certificates.models import DoubleCountingRegistration
 from core.decorators import check_admin_rights
-from doublecount.factories import agreement
 from doublecount.parser.dc_parser import parse_dc_excel
 
 from producers.models import ProductionSite

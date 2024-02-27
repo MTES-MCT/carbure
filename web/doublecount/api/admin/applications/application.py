@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from core.common import ErrorResponse, SuccessResponse
-from core.decorators import check_admin_rights, is_admin_or_external_admin
+from core.decorators import check_admin_rights
 import boto3
 import os
 from doublecount.models import (
