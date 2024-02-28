@@ -47,7 +47,7 @@ const DeliveryMapDialog = ({ query, onClose }: DeliveryMapDialogProps) => {
     <Dialog onClose={onClose} style={{ width: "100%" }}>
       <iframe
         title={t("Carte des livraisons")}
-        src={`/api/admin/map?${searchParams}`}
+        src={`/api/transactions/admin/flow-map?${searchParams}`}
         frameBorder="0"
         style={{ width: "1px", minWidth: "100%", overflow: "hidden" }}
         onLoad={(e) => {
