@@ -1,19 +1,29 @@
+import os
 import datetime
 from decimal import Decimal
-import os
-from core.tests_utils import setup_current_user
-from core.models import Entity
+from unittest.mock import patch
 from django.test import TestCase
 from django.urls import reverse
+
+from core.tests_utils import setup_current_user
+from core.models import Entity
 from django.core.files.uploadedfile import SimpleUploadedFile
 from elec.models.elec_charge_point import ElecChargePoint
-
 from elec.models.elec_charge_point_application import ElecChargePointApplication
-
-# @TODO créer un faux csv pour mocker transport.data.gouv et contrôler les données pour les tests
 
 
 class ElecCharginPointsTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        # mock call to TransportDataGouv not to depend on the dynamic CSV and have predictable "allowed" charge points
+        cls.mocked_find_charge_point_data = patch("elec.services.transport_data_gouv.TransportDataGouv.find_charge_point_data").start()  # fmt:skip
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        cls.mocked_find_charge_point_data.stop()
+
     def setUp(self):
         self.cpo = Entity.objects.create(
             name="CPO",
@@ -51,6 +61,8 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(data["error"], "WRONG_ENTITY_TYPE")
 
     def test_check_charge_point_errors(self):
+        self.mocked_find_charge_point_data.return_value = TDG_MOCK_ERROR
+
         filepath = "%s/web/elec/fixtures/points-de-recharge-errors.xlsx" % (os.environ["CARBURE_HOME"])
 
         with open(filepath, "rb") as reader:
@@ -74,9 +86,14 @@ class ElecCharginPointsTest(TestCase):
                         "error": "INVALID_DATA",
                         "line": 35,
                         "meta": {
-                            "measure_date": ["Saisissez une date valide."],
-                            "measure_energy": ["Saisissez un nombre."],
-                            "charge_point_id": ["Ce point de recharge n'est pas listé sur transport.data.gouv.fr"],
+                            "measure_date": [
+                                "Saisissez une date valide.",
+                                "La date du dernier relevé est obligatoire pour les points de recharge en courant alternatif.",
+                            ],
+                            "measure_energy": [
+                                "Saisissez un nombre.",
+                                "L'énergie mesurée lors du dernier relevé est obligatoire pour les points de recharge en courant alternatif.",
+                            ],
                         },
                     },
                     {
@@ -107,6 +124,8 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(response.json(), expected)
 
     def test_check_charge_point_ok(self):
+        self.mocked_find_charge_point_data.return_value = TDG_MOCK_OK
+
         filepath = "%s/web/elec/fixtures/points-de-recharge-ok.xlsx" % (os.environ["CARBURE_HOME"])
 
         with open(filepath, "rb") as reader:
@@ -132,6 +151,8 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_add_charge_point_errors(self):
+        self.mocked_find_charge_point_data.return_value = TDG_MOCK_ERROR
+
         filepath = "%s/web/elec/fixtures/points-de-recharge-errors.xlsx" % (os.environ["CARBURE_HOME"])
 
         with open(filepath, "rb") as reader:
@@ -146,6 +167,8 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(response.json(), {"status": "error", "error": "VALIDATION_FAILED"})
 
     def test_add_charge_point_ok(self):
+        self.mocked_find_charge_point_data.return_value = TDG_MOCK_OK
+
         filepath = "%s/web/elec/fixtures/points-de-recharge-ok.xlsx" % (os.environ["CARBURE_HOME"])
 
         with open(filepath, "rb") as reader:
@@ -467,3 +490,82 @@ class ElecCharginPointsTest(TestCase):
         data = response.json()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data, expected)
+
+
+TDG_MOCK_OK = [
+    {
+        "charge_point_id": "FR000028067822",
+        "cpo_name": "111442",
+        "cpo_siren": "320342975",
+        "current_type": "AC",
+        "is_article_2": False,
+        "latitude": 43.3292004491334,
+        "longitude": 5.143766265497639,
+        "nominal_power": 36.0,
+        "station_id": "FR000028067822",
+        "station_name": "Carry-le-Rouet",
+    },
+    {
+        "charge_point_id": "FR000012292701",
+        "cpo_name": "Hôtel Restaurant Campanile Nogent-sur-Marne",
+        "cpo_siren": "349009423",
+        "current_type": "AC",
+        "is_article_2": False,
+        "latitude": 48.832677935169805,
+        "longitude": 2.493569567590577,
+        "nominal_power": 22.0,
+        "station_id": "FR000012292701",
+        "station_name": "Hôtel Restaurant Campanile Nogent-sur-Marne",
+    },
+    {
+        "charge_point_id": "FR000012616553",
+        "cpo_name": "1PACTE",
+        "cpo_siren": "803719277",
+        "current_type": "AC",
+        "is_article_2": False,
+        "latitude": 43.476583984941,
+        "longitude": 5.476711409891,
+        "nominal_power": 22.0,
+        "station_id": "FR000012616553",
+        "station_name": "1PACTE",
+    },
+    {
+        "charge_point_id": "FR000011062174",
+        "cpo_name": "Hotel saint Alban",
+        "cpo_siren": "379629447",
+        "current_type": "AC",
+        "is_article_2": False,
+        "latitude": 43.41959147913006,
+        "longitude": 3.407609123225763,
+        "nominal_power": 22.0,
+        "station_id": "FR000011062174",
+        "station_name": "Hotel saint alban",
+    },
+    {
+        "charge_point_id": "FR000012308585",
+        "cpo_name": "Résidence Les Calanques",
+        "cpo_siren": "812328128",
+        "current_type": "AC",
+        "is_article_2": False,
+        "latitude": 41.908579309038004,
+        "longitude": 8.657888301758055,
+        "nominal_power": 22.0,
+        "station_id": "FR000012308585",
+        "station_name": "Résidence les calanques",
+    },
+]
+
+TDG_MOCK_ERROR = [
+    {
+        "charge_point_id": "FRELCEDHDM",
+        "cpo_name": "ELECTRA",
+        "cpo_siren": "891624884",
+        "current_type": "AC",
+        "is_article_2": False,
+        "latitude": 45.785651,
+        "longitude": 4.783111,
+        "nominal_power": 150.0,
+        "station_id": "FRELCPECUSM",
+        "station_name": "Écully - BYD & Quick",
+    }
+]
