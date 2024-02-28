@@ -12,7 +12,7 @@ import {
 import { EntityDetails } from "./types"
 
 export function getCompanies(entity_id: number) {
-  return api.get<Api<EntityDetails[]>>("/admin/entities", {
+  return api.get<Api<EntityDetails[]>>("/transactions/admin/entities", {
     params: { entity_id },
   })
 }
@@ -24,7 +24,7 @@ export function addCompany(
   has_saf: boolean,
   has_elec: boolean
 ) {
-  return api.post("/admin/entities/create", {
+  return api.post("/transactions/admin/entities/create", {
     entity_id,
     name,
     entity_type,
@@ -34,13 +34,13 @@ export function addCompany(
 }
 
 export function getCompanyDetails(entity_id: number, company_id: number) {
-  return api.get<Api<Entity>>("/admin/entities/details", {
+  return api.get<Api<Entity>>("/transactions/admin/entities/details", {
     params: { entity_id, company_id },
   })
 }
 
 export function getCompanyDepots(entity_id: number, company_id: number) {
-  return api.get<Api<EntityDepot[]>>("/admin/entities/depots", {
+  return api.get<Api<EntityDepot[]>>("/transactions/admin/entities/depots", {
     params: { entity_id, company_id },
   })
 }
@@ -50,7 +50,7 @@ export function getCompanyProductionSites(
   company_id: number
 ) {
   return api.get<Api<ProductionSiteDetails[]>>(
-    "/admin/entities/production_sites",
+    "/transactions/admin/entities/production_sites",
     {
       params: { entity_id, company_id },
     }
@@ -64,7 +64,7 @@ export function getUsersRightRequests(
   statuses?: UserRightStatus[]
 ) {
   return api.get<Api<UserRightRequest[]>>(
-    "/admin/entities/users/rights-requests",
+    "/transactions/admin/entities/users/rights-requests",
     {
       params: { entity_id, q: query, company_id, statuses },
     }
@@ -76,7 +76,7 @@ export function updateUsersRights(
   entity_id: number,
   status?: UserRightStatus
 ) {
-  return api.post("/admin/entities/users/update-right-request", {
+  return api.post("/transactions/admin/entities/users/update-right-request", {
     id: request_id,
     entity_id,
     status,
@@ -87,7 +87,7 @@ export function updateUserRole(
   entity_id: number,
   role: UserRole
 ) {
-  return api.post("/admin/entities/users/update-user-role", {
+  return api.post("/transactions/admin/entities/users/update-user-role", {
     entity_id,
     request_id,
     role,
@@ -95,7 +95,7 @@ export function updateUserRole(
 }
 
 export function getEntityCertificates(entity_id: number, company_id?: number) {
-  return api.get<Api<EntityCertificate[]>>("/admin/entities/certificates", {
+  return api.get<Api<EntityCertificate[]>>("/transactions/admin/entities/certificates", {
     params: { entity_id, company_id },
   })
 }

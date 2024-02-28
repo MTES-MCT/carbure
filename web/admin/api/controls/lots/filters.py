@@ -1,5 +1,4 @@
 from django import forms
-from admin.helpers import get_admin_lots_by_status
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.helpers import (

@@ -1,8 +1,6 @@
 import traceback
 
 from django import forms
-
-from admin.helpers import get_admin_lots_by_status
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse
 from core.helpers import (
