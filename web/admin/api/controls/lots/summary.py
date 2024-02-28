@@ -10,6 +10,7 @@ from core.helpers import (
     filter_lots,
 )
 from core.decorators import check_admin_rights
+from transactions.repositories.admin_lots_repository import TransactionsAdminLotsRepository
 
 
 class AdminControlsLotsSummaryForm(forms.Form):
@@ -27,7 +28,7 @@ def get_lots_summary(request, entity):
     short = form.cleaned_data["short"]
 
     try:
-        lots = get_admin_lots_by_status(entity, status)
+        lots = TransactionsAdminLotsRepository.get_admin_lots_by_status(entity, status)
         lots = filter_lots(lots, request.GET, entity, will_aggregate=True)
         summary = get_admin_summary_data(lots, short == "true")
         return SuccessResponse(summary)
