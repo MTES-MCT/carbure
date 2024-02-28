@@ -2,7 +2,6 @@ import math
 import random
 
 import folium
-from admin.helpers import get_admin_lots_by_status
 from core.helpers import filter_lots
 from core.decorators import is_admin
 from core.models import Entity
