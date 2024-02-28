@@ -32,13 +32,13 @@ const admin = {
 
 const auditor = {
   getLotDetails(entity_id: number, lot_id: number) {
-    return api.get<Api<LotDetails>>("/audit/lots/details", {
+    return api.get<Api<LotDetails>>("/transactions/audit/lots/details", {
       params: { entity_id, lot_id },
     })
   },
 
   getStockDetails(entity_id: number, stock_id: number) {
-    return api.get<Api<StockDetails>>("/audit/stocks/details", {
+    return api.get<Api<StockDetails>>("/transactions/audit/stocks/details", {
       params: { entity_id, stock_id },
     })
   },
@@ -49,7 +49,7 @@ const auditor = {
     errors: string[],
     checked: boolean
   ) {
-    return api.post("/audit/lots/toggle-warning", {
+    return api.post("/transactions/audit/lots/toggle-warning", {
       entity_id,
       lot_id,
       errors,

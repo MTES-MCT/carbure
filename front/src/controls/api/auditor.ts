@@ -19,25 +19,25 @@ const QUERY_RESET: Partial<LotQuery> = {
 }
 
 export function getYears(entity_id: number) {
-  return api.get<Api<number[]>>("/audit/years", { params: { entity_id } })
+  return api.get<Api<number[]>>("/transactions/audit/years", { params: { entity_id } })
 }
 
 export function getSnapshot(entity_id: number, year: number) {
-  return api.get<Api<Snapshot>>("/audit/snapshot", {
+  return api.get<Api<Snapshot>>("/transactions/audit/snapshot", {
     params: { entity_id, year },
   })
 }
 
 export function getLots(query: LotQuery) {
-  return api.get<Api<LotList>>("/audit/lots", { params: query })
+  return api.get<Api<LotList>>("/transactions/audit/lots", { params: query })
 }
 
 export function getStocks(query: StockQuery) {
-  return api.get<Api<StockList>>("/audit/stocks", { params: query })
+  return api.get<Api<StockList>>("/transactions/audit/stocks", { params: query })
 }
 
 export function downloadLots(query: LotQuery, selection: number[]) {
-  return download("/audit/lots", {
+  return download("/transactions/audit/lots", {
     ...selectionOrQuery(
       { ...query, from_idx: undefined, limit: undefined },
       selection
@@ -51,7 +51,7 @@ export function getLotsSummary(
   selection: number[],
   short?: boolean
 ) {
-  return api.get<Api<LotSummary>>("/audit/lots/summary", {
+  return api.get<Api<LotSummary>>("/transactions/audit/lots/summary", {
     params: { ...query, selection, ...QUERY_RESET, short },
   })
 }
@@ -61,7 +61,7 @@ export function getStocksSummary(
   selection: number[],
   short?: boolean
 ) {
-  return api.get<Api<StockSummary>>("/audit/stocks/summary", {
+  return api.get<Api<StockSummary>>("/transactions/audit/stocks/summary", {
     params: { ...query, selection, ...QUERY_RESET, short },
   })
 }
@@ -69,14 +69,14 @@ export function getStocksSummary(
 export function getLotFilters(field: Filter, query: LotQuery) {
   const params = { field, ...query, ...QUERY_RESET }
   return api
-    .get<Api<Option[]>>("/audit/lots/filters", { params })
+    .get<Api<Option[]>>("/transactions/audit/lots/filters", { params })
     .then((res) => res.data.data ?? [])
 }
 
 export function getStockFilters(field: Filter, query: StockQuery) {
   const params = { field, ...query, ...QUERY_RESET }
   return api
-    .get<Api<Option[]>>("/audit/stocks/filters", { params })
+    .get<Api<Option[]>>("/transactions/audit/stocks/filters", { params })
     .then((res) => res.data.data ?? [])
 }
 
@@ -86,7 +86,7 @@ export function pinLots(
   notify_admin?: boolean,
   notify_auditor?: boolean
 ) {
-  return api.post("/audit/lots/pin", {
+  return api.post("/transactions/audit/lots/pin", {
     entity_id,
     selection,
     notify_admin,
@@ -103,7 +103,7 @@ export async function commentLots(
 ) {
   if (!comment) return
 
-  return api.post<Api<void>>("/audit/lots/comment", {
+  return api.post<Api<void>>("/transactions/audit/lots/comment", {
     entity_id: query.entity_id,
     selection,
     is_visible_by_admin,
@@ -113,14 +113,14 @@ export async function commentLots(
 }
 
 export async function markAsConform(entity_id: number, selection: number[]) {
-  return api.post<Api<void>>("/audit/lots/mark-as-conform", {
+  return api.post<Api<void>>("/transactions/audit/lots/mark-as-conform", {
     entity_id,
     selection,
   })
 }
 
 export async function markAsNonConform(entity_id: number, selection: number[]) {
-  return api.post<Api<void>>("/audit/lots/mark-as-nonconform", {
+  return api.post<Api<void>>("/transactions/audit/lots/mark-as-nonconform", {
     entity_id,
     selection,
   })

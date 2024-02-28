@@ -74,7 +74,7 @@ class ElecAdminAuditTest(TestCase):
     def test_get_years(self):
         # no year
         response = self.client.get(
-            reverse("elec-admin-audit-years"),
+            reverse("elec-admin-transactions-audit-years"),
             {"entity_id": self.admin.id},
         )
         data = response.json()
@@ -84,7 +84,7 @@ class ElecAdminAuditTest(TestCase):
         # 1 year
         self.create_application()
         response = self.client.get(
-            reverse("elec-admin-audit-years"),
+            reverse("elec-admin-transactions-audit-years"),
             {"entity_id": self.admin.id},
         )
         data = response.json()
@@ -94,7 +94,7 @@ class ElecAdminAuditTest(TestCase):
     def test_get_snapshot(self):
         # no snapshot
         response = self.client.get(
-            reverse("elec-admin-audit-snapshot"),
+            reverse("elec-admin-transactions-audit-snapshot"),
             {"entity_id": self.admin.id, "year": 2024},
         )
         data = response.json()
@@ -104,7 +104,7 @@ class ElecAdminAuditTest(TestCase):
         # filled snapshot
         self.create_application()
         response = self.client.get(
-            reverse("elec-admin-audit-snapshot"),
+            reverse("elec-admin-transactions-audit-snapshot"),
             {"entity_id": self.admin.id, "year": 2024},
         )
         data = response.json()

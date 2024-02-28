@@ -3,7 +3,6 @@ from .home_stats import get_home_stats
 
 urlpatterns = [
     path("auth/", include("auth.api")),
-    path("audit/", include("audit.api")),
     path("double-counting/", include("doublecount.api")),
     path("entity/", include("entity.api")),
     path("saf/", include("saf.api")),
