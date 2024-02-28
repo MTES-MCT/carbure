@@ -26,14 +26,14 @@ export const okAdminSettings = rest.get("/api/user", (req, res, ctx) => {
 })
 
 export const okLotsSummary = rest.get(
-  "/api/admin/controls/lots/summary",
+  "/api/transactions/admin/lots/summary",
   (req, res, ctx) => {
     return res(ctx.json({ status: "success", data: lotSummary }))
   }
 )
 
 export const okFilters = rest.get(
-  "/api/admin/controls/lots/filters",
+  "/api/transactions/admin/lots/filters",
   (req, res, ctx) => {
     return res(
       ctx.json({
@@ -44,7 +44,7 @@ export const okFilters = rest.get(
   }
 )
 
-export const okSnapshot = rest.get("/api/admin/controls/snapshot", (req, res, ctx) => {
+export const okSnapshot = rest.get("/api/transactions/admin/snapshot", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -59,7 +59,7 @@ export const okSnapshot = rest.get("/api/admin/controls/snapshot", (req, res, ct
   )
 })
 
-export const okLots = rest.get("/api/admin/controls/lots", (req, res, ctx) => {
+export const okLots = rest.get("/api/transactions/admin/lots", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -76,7 +76,7 @@ export const okLots = rest.get("/api/admin/controls/lots", (req, res, ctx) => {
   )
 })
 
-export const okStocks = rest.get("/api/admin/controls/stocks", (req, res, ctx) => {
+export const okStocks = rest.get("/api/transactions/admin/stocks", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",
@@ -84,7 +84,7 @@ export const okStocks = rest.get("/api/admin/controls/stocks", (req, res, ctx) =
   )
 })
 
-export const okYears = rest.get("/api/admin/controls/years", (req, res, ctx) => {
+export const okYears = rest.get("/api/transactions/admin/years", (req, res, ctx) => {
   return res(
     ctx.json({
       status: "success",

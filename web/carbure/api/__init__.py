@@ -2,7 +2,6 @@ from django.urls import path, include
 from .home_stats import get_home_stats
 
 urlpatterns = [
-    path("admin/", include("admin.api")),
     path("auth/", include("auth.api")),
     path("audit/", include("audit.api")),
     path("double-counting/", include("doublecount.api")),
