@@ -62,9 +62,10 @@ class SafTicket(models.Model):
     parent_ticket_source = models.ForeignKey("saf.SafTicketSource", null=True, on_delete=models.SET_NULL, related_name="saf_tickets")  # fmt: skip
 
     def generate_carbure_id(self):
-        self.carbure_id = "T{period}-{country_of_production}-{id}".format(
+        production_country = self.production_country.code_pays if self.production_country else None
+        self.carbure_id = "T{period}-{production_country}-{id}".format(
             period=self.assignment_period,
-            country_of_production=self.production_country.code_pays,
+            production_country=production_country,
             id=self.id,
         )
 
