@@ -1,19 +1,11 @@
 import traceback
 
 from core.helpers import send_email_declaration_validated
-from carbure.tasks import (
-    background_bulk_scoring,
-    background_create_ticket_sources_from_lots,
-)
+from carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring, background_create_ticket_sources_from_lots
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
-from core.models import (
-    CarbureLot,
-    CarbureLotEvent,
-    SustainabilityDeclaration,
-    UserRights,
-)
+from core.models import CarbureLot, CarbureLotEvent, SustainabilityDeclaration, UserRights
 from core.notifications import notify_declaration_validated
 from django.db import transaction
 from django.db.models import Q
@@ -101,6 +93,14 @@ def validate_declaration(request, *args, **kwargs):
         CarbureLotEvent.objects.bulk_create(bulk_events)
 
         background_bulk_scoring(declared_lots)
+
+        # check if there are lots being created/fixed for that period and lock them
+        declaration_lots_editing = (
+            CarbureLot.objects.filter(period=period)
+            .filter(Q(carbure_supplier_id=entity_id) | Q(carbure_client_id=entity_id))
+            .filter(Q(lot_status=CarbureLot.DRAFT) | Q(correction_status=CarbureLot.IN_CORRECTION))
+        )
+        background_bulk_sanity_checks(declaration_lots_editing)
 
         # Send confirmation email and notification
         notify_declaration_validated(declaration)

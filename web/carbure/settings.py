@@ -264,7 +264,7 @@ if DEBUG:
     MIDDLEWARE += ['silk.middleware.SilkyMiddleware']
     MIDDLEWARE.remove("csp.middleware.CSPMiddleware")
 
-if DEBUG or env('TEST'):
+if env('TEST'):
     HUEY["immediate"] = True # allow running background tasks immediately so we can have instant results in tests
 
 

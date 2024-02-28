@@ -1,3 +1,4 @@
+from collections import defaultdict
 import datetime
 from certificates.models import DoubleCountingRegistration
 from ml.models import EECStats, EPStats, ETDStats
@@ -14,6 +15,7 @@ from core.models import (
     GenericError,
     MatierePremiere,
     Pays,
+    SustainabilityDeclaration,
 )
 
 july1st2021 = datetime.date(year=2021, month=7, day=1)
@@ -220,5 +222,11 @@ def get_prefetched_data(entity=None):
 
     # used as cache in CarbureLot model - recalc reliability score
     data["checked_certificates"] = {}
+
+    data["declarations_by_entity"] = defaultdict(dict)
+    declarations = SustainabilityDeclaration.objects.filter(declared=True).order_by("entity", "period")
+    for declaration in declarations:
+        period = declaration.period.year * 100 + declaration.period.month
+        data["declarations_by_entity"][declaration.entity_id][period] = True
 
     return data

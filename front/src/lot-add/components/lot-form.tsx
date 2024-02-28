@@ -537,7 +537,9 @@ const errorsToFields: Record<string, (keyof LotFormValue)[]> = {
   UNKNOWN_DOUBLE_COUNTING_CERTIFICATE: ['production_site_double_counting_certificate'],
   EXPIRED_DOUBLE_COUNTING_CERTIFICATE: ['production_site_double_counting_certificate'],
   INVALID_DOUBLE_COUNTING_CERTIFICATE: ['production_site_double_counting_certificate'],
-  MISSING_VENDOR_CERTIFICATE: ['vendor_certificate']
+  MISSING_VENDOR_CERTIFICATE: ['vendor_certificate'],
+  YEAR_LOCKED: ["delivery_date"],
+  DECLARATION_ALREADY_VALIDATED: ["delivery_date"]
 }
 
 export default LotForm
