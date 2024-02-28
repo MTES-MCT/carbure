@@ -1,16 +1,11 @@
 import traceback
 
 from core.helpers import send_email_declaration_invalidated
-from carbure.tasks import background_bulk_scoring
+from carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
-from core.models import (
-    CarbureLot,
-    CarbureLotEvent,
-    SustainabilityDeclaration,
-    UserRights,
-)
+from core.models import CarbureLot, CarbureLotEvent, SustainabilityDeclaration, UserRights
 from core.notifications import notify_declaration_cancelled
 from django.db import transaction
 from django.db.models import Q
@@ -77,6 +72,14 @@ def invalidate_declaration(request, *args, **kwargs):
         CarbureLotEvent.objects.bulk_create(bulk_events)
 
         background_bulk_scoring(undeclared_lots)
+
+        # recheck the drafts for that period to unlock them
+        declaration_lots_editing = (
+            CarbureLot.objects.filter(period=period)
+            .filter(Q(carbure_supplier_id=entity_id) | Q(carbure_client_id=entity_id))
+            .filter(Q(lot_status=CarbureLot.DRAFT) | Q(correction_status=CarbureLot.IN_CORRECTION))
+        )
+        background_bulk_sanity_checks(declaration_lots_editing)
 
         # Update the declaration so it doesn't show as declared anymore
         declaration.declared = False

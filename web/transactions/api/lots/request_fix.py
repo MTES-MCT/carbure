@@ -1,5 +1,6 @@
 from django import forms
 from django.db import transaction
+from carbure.tasks import background_bulk_sanity_checks
 
 from core.carburetypes import CarbureError
 from core.common import SuccessResponse, ErrorResponse
@@ -51,6 +52,8 @@ def request_fix(request, context):
 
         client_lots = lots.filter(carbure_client_id=entity_id).exclude(carbure_supplier_id=entity_id)
         notify_correction_request(client_lots)
+
+        background_bulk_sanity_checks(lots)
 
     return SuccessResponse()
 

@@ -2,7 +2,7 @@ import datetime
 from django.test import TestCase
 
 from core.carburetypes import CarbureSanityCheckErrors
-from core.models import Entity, CarbureLot, MatierePremiere, Biocarburant, Depot, EntityDepot
+from core.models import Entity, CarbureLot, MatierePremiere, Biocarburant, Depot, EntityDepot, SustainabilityDeclaration
 from transactions.factories import CarbureLotFactory
 from transactions.models import YearConfig
 from producers.models import ProductionSiteInput, ProductionSiteOutput
@@ -192,3 +192,66 @@ class GeneralSanityChecksTest(TestCase):
 
         error_list = self.run_checks(lot, prefetched_data)
         self.assertFalse(has_error(error, error_list))
+
+    def test_declaration_already_validated(self):
+        error = CarbureSanityCheckErrors.DECLARATION_ALREADY_VALIDATED
+
+        declaration = SustainabilityDeclaration.objects.create(
+            entity=self.producer,
+            period=datetime.date(2023, 1, 1),
+            declared=True,
+        )
+
+        lot1 = self.create_lot(
+            volume=2000,
+            lot_status=CarbureLot.DRAFT,
+            added_by=self.producer,
+            period=202301,
+        )
+
+        lot2 = self.create_lot(
+            volume=2000,
+            lot_status=CarbureLot.ACCEPTED,
+            correction_status=CarbureLot.IN_CORRECTION,
+            added_by=self.producer,
+            period=202301,
+        )
+
+        lot3 = self.create_lot(
+            volume=2000,
+            lot_status=CarbureLot.ACCEPTED,
+            correction_status=CarbureLot.NO_PROBLEMO,
+            added_by=self.producer,
+            period=202301,
+        )
+
+        prefetched_data = get_prefetched_data(self.producer)
+
+        error_list = self.run_checks(lot1, prefetched_data)
+        self.assertTrue(has_error(error, error_list))
+
+        error_list = self.run_checks(lot2, prefetched_data)
+        self.assertTrue(has_error(error, error_list))
+
+        error_list = self.run_checks(lot3, prefetched_data)
+        self.assertFalse(has_error(error, error_list))
+
+        declaration.declared = False
+        declaration.save()
+        prefetched_data = get_prefetched_data(self.producer)
+
+        error_list = self.run_checks(lot1, prefetched_data)
+        self.assertFalse(has_error(error, error_list))
+
+        error_list = self.run_checks(lot2, prefetched_data)
+        self.assertFalse(has_error(error, error_list))
+
+        declaration.declared = True
+        declaration.save()
+        prefetched_data = get_prefetched_data(self.producer)
+
+        error_list = self.run_checks(lot1, prefetched_data)
+        self.assertTrue(has_error(error, error_list))
+
+        error_list = self.run_checks(lot2, prefetched_data)
+        self.assertTrue(has_error(error, error_list))

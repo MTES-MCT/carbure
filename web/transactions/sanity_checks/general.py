@@ -116,3 +116,19 @@ def check_depot_not_configured(lot: CarbureLot, prefetched_data):
                 display_to_auditor=False,
                 field="delivery_site",
             )
+
+
+def check_declaration_already_validated(lot: CarbureLot, prefetched_data):
+    # only lots concerned are drafts and those that are in correction
+    if lot.lot_status != CarbureLot.DRAFT and lot.correction_status != CarbureLot.IN_CORRECTION:
+        return
+
+    matching_declaration = prefetched_data["declarations_by_entity"].get(lot.added_by.pk, {}).get(lot.period)
+
+    if matching_declaration:
+        return generic_error(
+            error=CarbureSanityCheckErrors.DECLARATION_ALREADY_VALIDATED,
+            lot=lot,
+            is_blocking=True,
+            field="delivery_date",
+        )
