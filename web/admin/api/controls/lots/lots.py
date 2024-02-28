@@ -9,6 +9,7 @@ from core.helpers import (
     get_lots_with_metadata,
 )
 from core.decorators import check_admin_rights
+from transactions.repositories.admin_lots_repository import TransactionsAdminLotsRepository
 
 
 class AdminControlsLotsError:
@@ -35,7 +36,7 @@ def get_lots(request, entity):
     if not status and not selection:
         return ErrorResponse(400, AdminControlsLotsError.MISSING_STATUS)
     try:
-        lots = get_admin_lots_by_status(entity, status, export)
+        lots = TransactionsAdminLotsRepository.get_admin_lots_by_status(entity, status, export)
         return get_lots_with_metadata(lots, entity, request.GET)
     except Exception:
         traceback.print_exc()

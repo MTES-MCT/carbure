@@ -6,6 +6,7 @@ from core.helpers import (
     get_lots_filters_data,
 )
 from core.decorators import check_admin_rights
+from transactions.repositories.admin_lots_repository import TransactionsAdminLotsRepository
 
 
 class AdminControlsLotsFiltersForm(forms.Form):
@@ -22,7 +23,7 @@ def get_lots_filters(request, entity):
     status = form.cleaned_data["status"]
     field = form.cleaned_data["field"]
 
-    lots = get_admin_lots_by_status(entity, status)
+    lots = TransactionsAdminLotsRepository.get_admin_lots_by_status(entity, status)
     data = get_lots_filters_data(lots, request.GET, entity, field)
 
     if data is None:

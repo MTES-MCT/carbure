@@ -11,6 +11,8 @@ from django.db.models.aggregates import Sum
 from django.http import HttpResponse
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 
+from transactions.repositories.admin_lots_repository import TransactionsAdminLotsRepository
+
 
 @is_admin
 @csp_exempt
@@ -19,13 +21,11 @@ def map(request):
     status = request.GET.get("status", False)
     entity_id = request.GET.get("entity_id", False)
     entity = Entity.objects.get(id=entity_id)
-    lots = get_admin_lots_by_status(entity, status)
+    lots = TransactionsAdminLotsRepository.get_admin_lots_by_status(entity, status)
     lots = filter_lots(lots, request.GET, entity)
 
     # on veut: nom site de depart, gps depart, nom site arrivee, gps arrivee, volume
-    lots = lots.filter(
-        carbure_production_site__isnull=False, carbure_delivery_site__isnull=False
-    )
+    lots = lots.filter(carbure_production_site__isnull=False, carbure_delivery_site__isnull=False)
     values = lots.values(
         "carbure_production_site__name",
         "carbure_production_site__gps_coordinates",
