@@ -1,5 +1,5 @@
 from django import forms
-from admin.api.controls.helpers import get_admin_lot_comments
+from transactions.api.admin.helpers import get_admin_lot_comments
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.helpers import get_known_certificates, get_lot_comments, get_lot_errors, get_lot_updates, get_transaction_distance

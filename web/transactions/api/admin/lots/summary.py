@@ -1,7 +1,7 @@
 import traceback
 
 from django import forms
-from admin.api.controls.helpers import get_admin_summary_data
+from transactions.api.admin.helpers import get_admin_summary_data
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.helpers import (

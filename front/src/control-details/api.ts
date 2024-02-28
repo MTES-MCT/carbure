@@ -4,13 +4,13 @@ import { LotDetails, StockDetails } from "transaction-details/types"
 
 const admin = {
   getLotDetails(entity_id: number, lot_id: number) {
-    return api.get<Api<LotDetails>>("/admin/controls/lots/details", {
+    return api.get<Api<LotDetails>>("/transactions/admin/lots/details", {
       params: { entity_id, lot_id },
     })
   },
 
   getStockDetails(entity_id: number, stock_id: number) {
-    return api.get<Api<StockDetails>>("/admin/controls/stocks/details", {
+    return api.get<Api<StockDetails>>("/transactions/admin/stocks/details", {
       params: { entity_id, stock_id },
     })
   },
@@ -21,7 +21,7 @@ const admin = {
     errors: string[],
     checked: boolean
   ) {
-    return api.post("/admin/controls/lots/toggle-warning", {
+    return api.post("/transactions/admin/lots/toggle-warning", {
       entity_id,
       lot_id,
       errors,
