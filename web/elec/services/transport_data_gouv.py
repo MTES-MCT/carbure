@@ -39,7 +39,7 @@ class TransportDataGouv:
         wanted_stations = set()  # list the stations of the wanted charge points
 
         relevant_charge_points = pd.DataFrame(columns=TransportDataGouv.CSV_COLUMNS)
-        chunks = TransportDataGouv.read_charge_point_data(file_path, chunksize)
+        chunks = TransportDataGouv.read_charge_point_data_chunks(file_path, chunksize)
 
         for chunk in chunks:
             wanted_chunk = chunk[chunk["id_pdc_itinerance"].isin(wanted_ids)]
@@ -63,7 +63,7 @@ class TransportDataGouv:
 
         dataset_url: str = data["resources"][0]["latest"]
         last_modified = isoparse(data["resources"][0]["last_modified"])
-        file_path = f"/tmp/transport_charge_points_{last_modified:%Y-%m-%d_%H-%M-%S}.csv"
+        file_path = f"/tmp/transport_data_gouv_charge_points_{last_modified:%Y-%m-%d_%H-%M-%S}.csv"
 
         # cache the csv to the filesystem to avoid refetching it every time
         if not os.path.exists(file_path):
@@ -74,7 +74,7 @@ class TransportDataGouv:
         return file_path
 
     @staticmethod
-    def read_charge_point_data(file_path: str, chunksize: int = 1000) -> Iterable[pd.DataFrame]:
+    def read_charge_point_data_chunks(file_path: str, chunksize: int = 1000) -> Iterable[pd.DataFrame]:
         charge_point_data_chunks = pd.read_csv(
             file_path,
             sep=",",
@@ -84,7 +84,7 @@ class TransportDataGouv:
             dayfirst=False,
             encoding="utf-8",
             engine="python",
-            dtype={"prise_type_combo_ccs": "str", "prise_type_chademo": "str"},
+            dtype={"prise_type_combo_ccs": "str", "prise_type_chademo": "str", "siren_amenageur": "str"},
             chunksize=chunksize,
             skip_blank_lines=True,
         )
