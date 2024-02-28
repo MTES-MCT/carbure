@@ -2,5 +2,5 @@ from django.urls import path
 from .map import map
 
 urlpatterns = [
-    path("", map, name="admin-map"),
+    path("flow-map", map, name="transactions-admin-flow-map"),
 ]
