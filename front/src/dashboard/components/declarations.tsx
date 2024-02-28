@@ -40,7 +40,7 @@ const Declarations = () => {
   })
 
   const declarations = useQuery(api.getDeclarations, {
-    key: "dashboard-declarations",
+    key: "transactions-admin-declarations",
     params: [period!],
   })
 
@@ -237,8 +237,8 @@ function getDeclarationDashboardColumns(period: string) {
               lotCount === 0
                 ? undefined
                 : declaration?.declared
-                ? "var(--blue-dark)"
-                : "var(--orange-medium)",
+                  ? "var(--blue-dark)"
+                  : "var(--orange-medium)",
           }}
         />
       )
