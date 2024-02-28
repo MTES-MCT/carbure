@@ -1,7 +1,6 @@
 import traceback
 
 from django.http.response import JsonResponse
-from audit.helpers import get_auditor_lots_by_status
 
 from core.decorators import check_user_rights, is_auditor
 from core.helpers import (
@@ -11,6 +10,7 @@ from core.helpers import (
 from core.models import (
     Entity,
 )
+from transactions.repositories.audit_lots_repository import TransactionsAuditLotsRepository
 
 
 @check_user_rights()
@@ -20,15 +20,11 @@ def get_lots(request, *args, **kwargs):
     selection = request.GET.get("selection", False)
     entity_id = request.GET.get("entity_id", False)
     if not status and not selection:
-        return JsonResponse(
-            {"status": "error", "message": "Missing status"}, status=400
-        )
+        return JsonResponse({"status": "error", "message": "Missing status"}, status=400)
     try:
         entity = Entity.objects.get(id=entity_id)
-        lots = get_auditor_lots_by_status(entity, status, request)
+        lots = TransactionsAuditLotsRepository.get_auditor_lots_by_status(entity, status, request)
         return get_lots_with_metadata(lots, entity, request.GET)
     except Exception:
         traceback.print_exc()
-        return JsonResponse(
-            {"status": "error", "message": "Could not get lots"}, status=400
-        )
+        return JsonResponse({"status": "error", "message": "Could not get lots"}, status=400)

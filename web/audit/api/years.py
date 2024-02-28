@@ -1,13 +1,13 @@
 from django.db.models.query_utils import Q
-from audit.helpers import get_audited_entities
 from core.common import SuccessResponse
 from core.decorators import check_user_rights
 from core.models import CarbureLot, CarbureStockTransformation, Entity
+from transactions.repositories.audit_lots_repository import TransactionsAuditLotsRepository
 
 
 @check_user_rights(entity_type=[Entity.AUDITOR])
 def get_years(request):
-    audited_entities = get_audited_entities(request.user)
+    audited_entities = TransactionsAuditLotsRepository.get_audited_entities(request.user)
 
     lots_years = (
         CarbureLot.objects.exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])

@@ -1,5 +1,4 @@
 from django.http.response import JsonResponse
-from audit.helpers import get_auditor_lots_by_status
 
 from core.decorators import check_user_rights, is_auditor
 from core.helpers import (
@@ -9,6 +8,7 @@ from core.helpers import (
 from core.models import (
     Entity,
 )
+from transactions.repositories.audit_lots_repository import TransactionsAuditLotsRepository
 
 
 @check_user_rights()
@@ -26,7 +26,7 @@ def get_lots_filters(request, *args, **kwargs):
             status=400,
         )
     entity = Entity.objects.get(id=entity_id)
-    lots = get_auditor_lots_by_status(entity, status, request)
+    lots = TransactionsAuditLotsRepository.get_auditor_lots_by_status(entity, status, request)
     data = get_lots_filters_data(lots, request.GET, entity, field)
     if data is None:
         return JsonResponse(

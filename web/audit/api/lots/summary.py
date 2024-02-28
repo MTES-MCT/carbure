@@ -2,7 +2,6 @@ import traceback
 
 from django.http.response import JsonResponse
 from transactions.api.admin.helpers import get_admin_summary_data
-from audit.helpers import get_auditor_lots_by_status
 
 from core.decorators import check_user_rights, is_auditor
 from core.helpers import (
@@ -12,6 +11,7 @@ from core.helpers import (
 from core.models import (
     Entity,
 )
+from transactions.repositories.audit_lots_repository import TransactionsAuditLotsRepository
 
 
 @check_user_rights()
@@ -24,7 +24,7 @@ def get_lots_summary(request, *args, **kwargs):
         return JsonResponse({"status": "error", "message": "Missing status"}, status=400)
     try:
         entity = Entity.objects.get(id=entity_id)
-        lots = get_auditor_lots_by_status(entity, status, request)
+        lots = TransactionsAuditLotsRepository.get_auditor_lots_by_status(entity, status, request)
         lots = filter_lots(lots, request.GET, entity, will_aggregate=True)
         summary = get_admin_summary_data(lots, short == "true")
         return JsonResponse({"status": "success", "data": summary})
