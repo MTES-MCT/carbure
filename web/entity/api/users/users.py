@@ -1,6 +1,5 @@
 from core.decorators import check_user_rights, otp_or_403
 from core.models import UserRights, UserRightsRequests, Entity
-from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 
 
@@ -12,6 +11,10 @@ def get_entity_rights(request, *args, **kwargs):
 
     rights = UserRights.objects.filter(entity=entity)
     requests = UserRightsRequests.objects.filter(entity=entity, status__in=["PENDING", "ACCEPTED"])
+
+    # hide users of the Carbure staff
+    rights = rights.filter(user__is_staff=False, user__is_superuser=False)
+    requests = requests.filter(user__is_staff=False, user__is_superuser=False)
 
     data = {}
     data["rights"] = [r.natural_key() for r in rights]
