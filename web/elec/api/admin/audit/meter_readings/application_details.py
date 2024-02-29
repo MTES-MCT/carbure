@@ -44,7 +44,7 @@ def get_application_details(request):
     want_sample = form.cleaned_data["sample"]
     print("want_sample: ", want_sample)
 
-    charge_points = ChargePointRepository.get_charge_points_for_meter_readings(application.cpo)
+    charge_points = ChargePointRepository.get_registered_charge_points(application.cpo)
     previous_application = MeterReadingRepository.get_previous_application(application.cpo, application.quarter, application.year)  # fmt:skip
     meter_readings = MeterReadingRepository.get_application_meter_readings(application.cpo, application)
 
