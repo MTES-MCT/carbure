@@ -90,7 +90,5 @@ class ExcelMeterReadingValidator(Validator):
 
         if charge_point is None:
             self.add_error("charge_point_id", "Le point de recharge n'a pas encore été inscrit sur la plateforme.")
-        elif charge_point.is_article_2:
-            self.add_error("charge_point_id", "Le point de recharge n'a pas besoin de relevé, sa station contient au moins un point en courant continu.")  # fmt:skip
         elif meter_reading.get("extracted_energy", 0) < previous_extracted_energy:
             self.add_error("extracted_energy", "La quantité d'énergie soutirée est inférieure au précédent relevé.")
