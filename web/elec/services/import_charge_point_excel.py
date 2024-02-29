@@ -21,8 +21,10 @@ def import_charge_point_excel(excel_file: UploadedFile, registered_charge_points
         excel_data = ExcelChargePoints.parse_charge_point_excel(excel_file)
         # find the TDG data related to the charge points listed in the imported excel file
         transport_data = TransportDataGouv.find_charge_point_data(excel_data, 1000)
+        # merge the TDG data with the imported excel data
+        charge_point_data = ExcelChargePoints.extend_charge_points(excel_data, transport_data)
         # parse the data and validate errors
-        return ExcelChargePoints.validate_charge_points(excel_data, transport_data, registered_charge_points)  # fmt:skip
+        return ExcelChargePoints.validate_charge_points(charge_point_data, transport_data, registered_charge_points)  # fmt:skip
     except:
         traceback.print_exc()
         return [], [{"error": ExcelChargePointError.EXCEL_PARSING_FAILED}]
@@ -67,14 +69,31 @@ class ExcelChargePoints:
         return charge_point_data.to_dict(orient="records")
 
     @staticmethod
+    def extend_charge_points(charge_points: list[dict], transport_data):
+        charge_point_df = pd.DataFrame(charge_points)
+        transport_data_df = pd.DataFrame(transport_data)
+
+        merged = charge_point_df.merge(transport_data_df, on="charge_point_id", how="outer")
+        merged = merged.fillna("")
+
+        # check if all the charge points of a same station all have readings defined
+        # in that case, they won't be considered for article 2, even if there are DC charge points
+        merged["whole_station_has_readings"] = (
+            merged.groupby("station_id")[["mid_id", "measure_date", "measure_energy"]]
+            .transform(lambda x: x.notnull().all(axis=0))  # check if all columns are set, for all the rows of a station
+            .all(axis=1)
+        )
+
+        # combine the info we get from TDG about article 2, and with the computation above
+        merged["is_article_2"] = ~merged["whole_station_has_readings"] & merged["maybe_article_2"]
+
+        return merged.to_dict(orient="records")
+
     def validate_charge_points(charge_points: list[dict], transport_data, registered_charge_points):
-        transport_data_index = {row["charge_point_id"]: row for row in transport_data}
-
         context = {
-            "transport_data_index": transport_data_index,
             "registered_charge_points": registered_charge_points,
+            "transport_data_index": {row["charge_point_id"]: row for row in transport_data},
         }
-
         return ExcelChargePointValidator.bulk_validate(charge_points, context)
 
 
@@ -98,26 +117,6 @@ class ExcelChargePointValidator(Validator):
     latitude = forms.DecimalField(required=False)
     longitude = forms.DecimalField(required=False)
 
-    # grab data from transport.data.gouv.fr to enrich the base charge point data
-    def extend(self, charge_point):
-        charge_point_id = charge_point.get("charge_point_id")
-        charge_point_transport_data = self.context.get("transport_data_index", {}).get(charge_point_id)
-
-        if charge_point_transport_data is None:
-            return charge_point
-
-        charge_point["station_id"] = charge_point_transport_data["station_id"]
-        charge_point["station_name"] = charge_point_transport_data["station_name"]
-        charge_point["nominal_power"] = charge_point_transport_data["nominal_power"]
-        charge_point["current_type"] = charge_point_transport_data["current_type"]
-        charge_point["is_article_2"] = charge_point_transport_data["is_article_2"]
-        charge_point["cpo_name"] = charge_point_transport_data["cpo_name"]
-        charge_point["cpo_siren"] = charge_point_transport_data["cpo_siren"]
-        charge_point["latitude"] = charge_point_transport_data["latitude"]
-        charge_point["longitude"] = charge_point_transport_data["longitude"]
-
-        return charge_point
-
     # check if the different possible charge point configurations are respected
     # and if the new data doesn't conflict with TDG or our own DB
     def validate(self, charge_point):
@@ -136,8 +135,8 @@ class ExcelChargePointValidator(Validator):
                     self.add_error("measure_reference_point_id", "L'identifiant du point de mesure est obligatoire pour les stations ayant au moins un point de recharge en courant continu.")  # fmt:skip
             else:
                 if not charge_point.get("mid_id"):
-                    self.add_error("mid_id", "Le numéro MID est obligatoire pour les points de recharge en courant alternatif.")  # fmt:skip
+                    self.add_error("mid_id", "Le numéro MID est obligatoire.")  # fmt:skip
                 if not charge_point.get("measure_date"):
-                    self.add_error("measure_date", "La date du dernier relevé est obligatoire pour les points de recharge en courant alternatif.")  # fmt:skip
+                    self.add_error("measure_date", "La date du dernier relevé est obligatoire.")  # fmt:skip
                 if not isinstance(charge_point.get("measure_energy"), float):
-                    self.add_error("measure_energy", "L'énergie mesurée lors du dernier relevé est obligatoire pour les points de recharge en courant alternatif.")  # fmt:skip
+                    self.add_error("measure_energy", "L'énergie mesurée lors du dernier relevé est obligatoire.")  # fmt:skip
