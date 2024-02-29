@@ -88,6 +88,14 @@ class ElecChargePointAdmin(admin.ModelAdmin):
         "cpo_name",
         "cpo_siren",
     ]
+    search_fields = [
+        "id",
+        "charge_point_id",
+        "station_id",
+        "station_name",
+        "cpo__name",
+        "mid_id",
+    ]
 
 
 @admin.register(ElecMeterReadingApplication)
@@ -117,4 +125,11 @@ class ElecMeterReadingAdmin(admin.ModelAdmin):
     ]
     list_filter = [
         "cpo",
+    ]
+    search_fields = [
+        "id",
+        "charge_point_id",
+        "cpo__name",
+        "charge_point__station_id",
+        "charge_point__station_name",
     ]
