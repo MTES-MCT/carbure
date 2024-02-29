@@ -49,7 +49,7 @@ def add_application(request: HttpRequest, entity: Entity):
     if not quarter or not year:
         return ErrorResponse(400, AddMeterReadingApplicationError.TOO_LATE)
 
-    charge_points = ChargePointRepository.get_charge_points_for_meter_readings(entity)
+    charge_points = ChargePointRepository.get_registered_charge_points(entity)
     previous_application = MeterReadingRepository.get_previous_application(entity, quarter, year)
     renewable_share = MeterReadingRepository.get_renewable_share(year)
     meter_reading_data, errors = import_meter_reading_excel(excel_file, charge_points, previous_application, renewable_share)
