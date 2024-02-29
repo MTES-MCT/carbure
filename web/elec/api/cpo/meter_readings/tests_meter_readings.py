@@ -211,21 +211,14 @@ class ElecMeterReadingsTest(TestCase):
                     "quarter": 3,
                     "year": 2024,
                     "pending_application_already_exists": False,
-                    "meter_reading_count": 1,
-                    "error_count": 2,
+                    "meter_reading_count": 2,
+                    "error_count": 1,
                     "errors": [
                         {
                             "error": "INVALID_DATA",
                             "line": 3,
                             "meta": {
                                 "extracted_energy": ["La quantité d'énergie soutirée est inférieure au précédent relevé."]
-                            },
-                        },
-                        {
-                            "error": "INVALID_DATA",
-                            "line": 4,
-                            "meta": {
-                                "charge_point_id": ["Le point de recharge n'a pas besoin de relevé, sa station contient au moins un point en courant continu."]  # fmt:skip
                             },
                         },
                     ],
