@@ -137,8 +137,12 @@ function getFieldText(field: string) {
   switch (field) {
     case "charge_point_id":
       return t("Identifiant du point de recharge")
+    case "extracted_energy":
+      return t("Énergie active totale soutirée")
+    case "reading_date":
+      return t("Date du relevé")
     default:
-      return "Champ non reconnu"
+      return t("Champ non reconnu")
   }
 }
 
