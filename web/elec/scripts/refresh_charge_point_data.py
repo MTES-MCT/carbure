@@ -14,10 +14,12 @@ from elec.services.transport_data_gouv import TransportDataGouv
 
 
 @transaction.atomic
-def refresh_charge_point_data(batch):
+def refresh_charge_point_data(cpo, batch):
     print(f"> Refresh charge point data from TDG")
 
     charge_points = ElecChargePoint.objects.all().order_by("charge_point_id")
+    if cpo:
+        charge_points = charge_points.filter(cpo__name=cpo)
 
     update_fields = [
         "current_type",
@@ -50,10 +52,12 @@ def refresh_charge_point_data(batch):
 
         for charge_point in page_charge_points:
             tdg_data = charge_point_data_by_id.get(charge_point.charge_point_id)
+            charge_points_by_stations[charge_point.station_id].append(charge_point)
             if tdg_data:
                 updated_charge_point = update_charge_point(charge_point, tdg_data)
                 charge_points_to_update.append(updated_charge_point)
-                charge_points_by_stations[updated_charge_point.station_id].append(updated_charge_point)
+            else:
+                print(f"* Missing from TDG: {charge_point.charge_point_id}")
 
         ElecChargePoint.objects.bulk_update(charge_points_to_update, update_fields)
 
@@ -77,6 +81,7 @@ def update_charge_point(charge_point: ElecChargePoint, data: dict):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Refresh charge point data and meter readings")
     parser.add_argument("--batch", dest="batch", type=int, action="store", default=1000, help="How many operations at a time")  # fmt:skip
+    parser.add_argument("--cpo", dest="cpo", type=str, action="store", help="Focus on one CPO")
     args = parser.parse_args()
 
-    refresh_charge_point_data(args.batch)
+    refresh_charge_point_data(args.cpo, args.batch)
