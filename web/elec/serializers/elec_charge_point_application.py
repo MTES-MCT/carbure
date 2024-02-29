@@ -30,7 +30,7 @@ class ElecChargePointApplicationSerializer(serializers.ModelSerializer):
         return instance.charge_point_count
 
     def get_power_total(self, instance):
-        return round(instance.power_total or 0, 2)
+        return round(instance.power_total or 0, 3)
 
 
 class ElecChargePointApplicationDetailsSerializer(ElecChargePointApplicationSerializer):
