@@ -55,7 +55,7 @@ def create_meter_readings_excel(
 
         if extended:
             sheet[f"E{i}"] = f"=IF(ISBLANK(C{i}), 0, C{i} - B{i})"
-            sheet[f"F{i}"] = f"=IF(ISBLANK(E{i}), 0, ROUND(E{i} * {renewable_share}, 2))"
+            sheet[f"F{i}"] = f"=IF(ISBLANK(E{i}), 0, ROUND(E{i} * {renewable_share}, 3))"
 
     # FOOTER
 
@@ -70,7 +70,7 @@ def create_meter_readings_excel(
         sheet[f"E{total_row}"] = f"=SUM(E2:E{total_row - 1})"
         sheet[f"F{total_row}"] = f"=SUM(F2:F{total_row - 1})"
 
-        sheet[f"A{total_row + 2}"] = "Stations:"
+        sheet[f"A{total_row + 2}"] = "Unités d'exploitation:"
         for i, station in enumerate(stations, 1):
             sheet[f"A{total_row + 2 + i}"] = station
 
