@@ -44,10 +44,6 @@ def get_application_template(request, entity):
         message = "Le fichier excel n'a pas pu être généré car aucun point de recharge n'a été validé jusqu'à présent. Assurez-vous qu'au moins l'un de vos dossiers d'inscription de point de recharge a déjà été validé par la DGEC."
         return ErrorResponse(400, ApplicationTemplateError.NO_CHARGE_POINT_AVAILABLE, message=message)
 
-    if charge_points.filter(is_article_2=False).count() == 0:
-        message = "Tous vos points de recharge sont soumis à l'article 2 (station avec courant continu), vous n'avez donc pas besoin de soumettre de relevés ici."  # fmt:skip
-        return ErrorResponse(400, ApplicationTemplateError.ONLY_ARTICLE_2_CHARGE_POINTS, message=message)
-
     previous_application = MeterReadingRepository.get_previous_application(entity, quarter, year)
     meter_reading_data = create_meter_readings_data(charge_points, previous_application)
 
