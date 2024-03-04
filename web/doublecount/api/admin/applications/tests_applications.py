@@ -1,4 +1,4 @@
-# test with : python web/manage.py test admin.api.double_counting.applications.tests_applications.AdminDoubleCountApplicationsTest --keepdb
+# test with : python web/manage.py test doublecount.api.admin.applications.tests_applications.AdminDoubleCountApplicationsTest --keepdb
 from datetime import date
 import json
 import os
