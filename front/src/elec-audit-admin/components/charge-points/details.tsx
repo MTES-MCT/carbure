@@ -150,7 +150,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
           {chargePointApplication?.status === ElecAuditApplicationStatus.AuditInProgress && (
 
             <section>
-              <Alert variant="info" style={{ flexDirection: "column" }} >
+              <Alert style={{ flexDirection: "column" }} variant="info"  >
                 <p>
                   <Send />
                   <Trans>

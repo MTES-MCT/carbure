@@ -9,8 +9,8 @@ import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 import { checkDoubleCountingApplication } from "double-counting/api"
-import ErrorsDetailsDialog from "double-counting-admin/components/files-checker/errors-details-dialog"
-import ValidDetailsDialog from "double-counting-admin/components/files-checker/valid-details-dialog"
+import ErrorsDetailsDialog from "double-counting/components/application-checker/errors-details-dialog"
+import ValidDetailsDialog from "double-counting/components/application-checker/valid-details-dialog"
 import { Trans, useTranslation } from "react-i18next"
 
 type DoubleCountingFileCheckerDialogProps = {

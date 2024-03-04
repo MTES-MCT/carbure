@@ -57,7 +57,7 @@ const DoubleCountingSettings = () => {
     <Panel id="double-counting">
       <header>
         <h1>
-          <Trans>Agréments double comptage-</Trans>
+          <Trans>Agréments double comptage</Trans>
         </h1>
         {canModify && (
           <Button
