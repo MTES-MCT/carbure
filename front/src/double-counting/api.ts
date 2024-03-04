@@ -46,3 +46,20 @@ export function getDoubleCountingAgreementDetails(entity_id: number, agreement_i
   )
 }
 
+
+export function producerAddDoubleCountingApplication(
+  entity_id: number,
+  production_site_id: number,
+  file: File,
+  should_replace: boolean = false
+) {
+
+  return api.post("/double-counting/producer/applications/add", {
+    entity_id,
+    production_site_id,
+    file,
+    should_replace
+  })
+}
+
+

@@ -43,7 +43,7 @@ export function getDoubleCountingApplication(entity_id: number, dca_id: number) 
 }
 
 
-export function addDoubleCountingApplication(
+export function adminAddDoubleCountingApplication(
   entity_id: number,
   production_site_id: number,
   producer_id: number,

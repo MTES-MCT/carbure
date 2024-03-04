@@ -13,9 +13,9 @@ import {
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useLocation } from "react-router-dom"
-import ErrorsDetailsDialog from "./errors-details-dialog"
+import ErrorsDetailsDialog from "../../../double-counting/components/application-checker/errors-details-dialog"
 import FilesCheckerUploadButton from "./upload-button"
-import ValidDetailsDialog from "./valid-details-dialog"
+import ValidDetailsDialog from "../../../double-counting/components/application-checker/valid-details-dialog"
 
 const DoubleCountingFilesChecker = () => {
   const { t } = useTranslation()
@@ -39,9 +39,7 @@ const DoubleCountingFilesChecker = () => {
   }
 
   function showFileValidDialog(fileData: DoubleCountingFileInfo, index: number) {
-
     const file = Array.from(files).find((f) => f.name.replace(/[^a-zA-Z0-9-]/g, '') === fileData.file_name.replace(/[^a-zA-Z0-9-]/g, ''))
-
     if (!file) return
     portal((close) => <ValidDetailsDialog fileData={fileData} onClose={close} file={file} />)
   }
