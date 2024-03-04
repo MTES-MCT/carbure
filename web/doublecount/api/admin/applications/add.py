@@ -1,4 +1,5 @@
 import datetime
+from django import forms
 from django.core.mail import EmailMessage
 from django.db.models import Q
 
@@ -10,6 +11,7 @@ from carbure import settings
 import unicodedata
 import boto3
 from certificates.models import DoubleCountingRegistration
+from core.carburetypes import CarbureError
 from core.decorators import check_admin_rights
 from doublecount.parser.dc_parser import parse_dc_excel
 
@@ -35,10 +37,16 @@ from carbure.storage_backends import AWSStorage
 from django.core.files.storage import FileSystemStorage
 
 
+class DoubleCountingAdminAddFrom(forms.Form):
+    producer_id = forms.ModelChoiceField(queryset=Entity.objects.filter(entity_type=Entity.PRODUCER))
+    should_replace = forms.BooleanField(required=False)
+    producer_id = forms.ModelChoiceField(queryset=Entity.objects.filter(entity_type=Entity.PRODUCER))
+    production_site_id = forms.ModelChoiceField(queryset=ProductionSite.objects.all())
+    certificate_id = forms.CharField(required=False)
+
+
 class DoubleCountingAddError:
     MALFORMED_PARAMS = "MALFORMED_PARAMS"
-    PRODUCER_NOT_FOUND = "PRODUCER_NOT_FOUND"
-    PRODUCTION_SITE_NOT_FOUND = "PRODUCTION_SITE_NOT_FOUND"
     PRODUCTION_SITE_ADDRESS_UNDEFINED = "PRODUCTION_SITE_ADDRESS_UNDEFINED"
     APPLICATION_ALREADY_RECEIVED = "APPLICATION_ALREADY_RECEIVED"
     APPLICATION_ALREADY_EXISTS = "APPLICATION_ALREADY_EXISTS"
@@ -49,25 +57,17 @@ class DoubleCountingAddError:
 
 @check_admin_rights()
 @transaction.atomic
-def add_application(request, *args, **kwargs):
-    producer_id = request.POST.get("producer_id", None)
-    should_replace = request.POST.get("should_replace") == "true"
-    production_site_id = request.POST.get("production_site_id", None)
-    certificate_id_to_link = request.POST.get("certificate_id", None)
+def add_application(request):
+    form = DoubleCountingAdminAddFrom(request.POST)
     file = request.FILES.get("file")
 
-    if not production_site_id:
-        return ErrorResponse(400, DoubleCountingAddError.MALFORMED_PARAMS)
+    if not form.is_valid():
+        return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, form.errors)
 
-    try:
-        producer = Entity.objects.get(id=producer_id)
-    except:
-        return ErrorResponse(400, DoubleCountingAddError.PRODUCER_NOT_FOUND)
-
-    try:
-        production_site = ProductionSite.objects.get(producer_id=producer_id, id=production_site_id)
-    except:
-        return ErrorResponse(400, DoubleCountingAddError.PRODUCTION_SITE_NOT_FOUND)
+    producer: Entity = form.cleaned_data["producer_id"]
+    should_replace: bool = form.cleaned_data["should_replace"]
+    production_site: ProductionSite = form.cleaned_data["production_site_id"]
+    certificate_id_to_link = form.cleaned_data["certificate_id"]
 
     if not production_site.address or not production_site.city or not production_site.postal_code:
         return ErrorResponse(400, DoubleCountingAddError.PRODUCTION_SITE_ADDRESS_UNDEFINED)
@@ -86,7 +86,7 @@ def add_application(request, *args, **kwargs):
 
     # check if an application already exists for this producer, this period and is not accepted
     identical_replacable_application = DoubleCountingApplication.objects.filter(
-        Q(production_site_id=production_site_id)
+        Q(production_site_id=production_site.id)
         & Q(period_start__year=start.year)
         & Q(status__in=[DoubleCountingApplication.PENDING, DoubleCountingApplication.REJECTED]),
     )
@@ -116,7 +116,7 @@ def add_application(request, *args, **kwargs):
     # create application
     dca, created = DoubleCountingApplication.objects.get_or_create(
         producer=producer,
-        production_site_id=production_site_id,
+        production_site_id=production_site.id,
         period_start=start,
         period_end=end,
         defaults={"producer_user": request.user},
@@ -152,46 +152,6 @@ def add_application(request, *args, **kwargs):
 # def application_is_expired (dca) :
 #     current_year = datetime.now().year
 #     return dca.period_end < current_year
-
-
-def upload_file(dca, file):
-    # organize a path for the file in bucket
-    file_directory_within_bucket = "{year}/{entity}".format(year=dca.period_start.year, entity=dca.producer.name)
-    filename = "".join((c for c in unicodedata.normalize("NFD", file.name) if unicodedata.category(c) != "Mn"))
-
-    # synthesize a full file path; note that we included the filename
-    file_path_within_bucket = os.path.join(file_directory_within_bucket, filename)
-
-    if "TEST" in os.environ and os.environ["TEST"] == "1":
-        media_storage = FileSystemStorage("/tmp")
-    else:
-        media_storage = AWSStorage()
-    media_storage.save(file_path_within_bucket, file)
-    file_url = media_storage.url(file_path_within_bucket)
-    dcf = DoubleCountingDocFile()
-    dcf.dca = dca
-    dcf.certificate_id = dca.certificate_id
-    dcf.url = file_url
-    dcf.file_name = filename
-    dcf.file_type = DoubleCountingDocFile.SOURCING
-    dcf.link_expiry_dt = pytz.utc.localize(datetime.datetime.now() + datetime.timedelta(seconds=3600))
-    dcf.save()
-
-    # get the file
-    s3 = boto3.client(
-        "s3",
-        aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
-        aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
-        region_name=os.environ["AWS_S3_REGION_NAME"],
-        endpoint_url=os.environ["AWS_S3_ENDPOINT_URL"],
-        use_ssl=os.environ["AWS_S3_USE_SSL"],
-    )
-    s3filepath = "{year}/{entity}/{filename}".format(
-        year=dca.period_start.year, entity=dca.producer.name, filename=dcf.file_name
-    )
-    filepath = "/tmp/%s" % (dcf.file_name)
-    with open(filepath, "wb") as file:
-        s3.download_fileobj(os.environ["AWS_DCDOCS_STORAGE_BUCKET_NAME"], s3filepath, file)
 
 
 def send_dca_confirmation_email(dca):
