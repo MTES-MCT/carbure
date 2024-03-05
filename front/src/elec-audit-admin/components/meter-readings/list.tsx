@@ -30,7 +30,6 @@ const MeterReadingsApplicationsList = ({ snapshot, year }: TransferListProps) =>
   const location = useLocation()
 
   const [state, actions] = useElecAdminAuditMeterReadingsQueryParamsStore(entity, year, status, snapshot)
-  console.log('state:', state)
   const query = useElectAdminAuditQuery(state)
   const meterReadingsApplicationsResponse = useQuery(api.getMeterReadingsApplications, {
     key: "audit-meter-readings-applications",
