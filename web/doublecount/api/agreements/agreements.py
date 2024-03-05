@@ -21,6 +21,7 @@ def get_agreements(request, *args, **kwargs):
         return JsonResponse({"status": "success", "data": []})
 
     applications_data = DoubleCountingApplicationPartialSerializer(applications, many=True).data
+    print(">>>applications_data: ", applications_data)
     current_year = datetime.now().year
 
     quotas = get_quotas(year=current_year, producer_id=entity_id)
@@ -34,8 +35,11 @@ def get_agreements(request, *args, **kwargs):
         application["quotas_progression"] = round(found_quotas[0]["quotas_progression"], 2) if len(found_quotas) > 0 else 0
 
         # add agreement_id to applications when accepted
-        agreement = DoubleCountingRegistration.objects.get(application_id=application["id"])
-        application["agreement_id"] = agreement.id
+        try:
+            agreement = DoubleCountingRegistration.objects.get(application_id=application["id"])
+            application["agreement_id"] = agreement.id
+        except:
+            application["agreement_id"] = None
 
     return JsonResponse({"status": "success", "data": applications_data})
 

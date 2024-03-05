@@ -34,7 +34,7 @@ const DoubleCountingSettings = () => {
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
 
   function showApplicationDialog(application: DoubleCountingApplicationOverview) {
-    if (application.status === DoubleCountingStatus.Pending) {
+    if ([DoubleCountingStatus.Pending, DoubleCountingStatus.Rejected].includes(application.status)) {
       navigate({
         pathname: location.pathname,
         hash: `double-counting/applications/${application.id}`,

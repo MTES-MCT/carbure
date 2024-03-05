@@ -15,7 +15,7 @@ import { usePortal } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 import { adminAddDoubleCountingApplication } from "double-counting-admin/api"
 import React, { useState } from "react"
-import { useTranslation } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import FileApplicationInfo from "./file-application-info"
 import { DoubleCountingFileInfo } from "../../../double-counting/types"
@@ -160,6 +160,6 @@ function MissingAddress({ productionSiteId }: { productionSiteId: number | undef
     <>
       {t("L'adresse, la ville ou le code postal du site de production n'est pas renseignée. Veuillez l'ajouter dans les informations liées à la société.")}
       <ExternalLink href={`/admin/producers/productionsite/${productionSiteId}/change`}>
-        Editer le site de production
+        <Trans>Editer le site de production</Trans>
       </ExternalLink></>);
 }

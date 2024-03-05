@@ -7,6 +7,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
+from doublecount.api.applications.add_application import DoubleCountingProducerAddError
 
 from doublecount.errors import DoubleCountingError
 from doublecount.factories.application import DoubleCountingApplicationFactory
@@ -32,11 +33,10 @@ class DoubleCountApplicationsTest(TestCase):
     ]
 
     def setUp(self):
-        self.admin = Entity.objects.filter(entity_type=Entity.ADMIN)[0]
+        # self.admin = Entity.objects.filter(entity_type=Entity.ADMIN)[0]
 
-        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True)
-
-        self.producer, _ = Entity.objects.update_or_create(name="Le Super Producteur 1", entity_type="Producteur")
+        self.producer, _ = Entity.objects.update_or_create(name="Le Super Producteur 1", entity_type=Entity.PRODUCER)
+        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.producer, "RW")], True)
         UserRights.objects.update_or_create(user=self.user, entity=self.producer, defaults={"role": UserRights.ADMIN})
 
         self.production_site = ProductionSite.objects.first()
@@ -45,6 +45,7 @@ class DoubleCountApplicationsTest(TestCase):
         self.production_site.country = france
         self.production_site.city = "Paris"
         self.production_site.postal_code = "75000"
+        self.production_site.producer = self.producer
         self.production_site.save()
         self.requested_start_year = 2023
 
@@ -252,18 +253,6 @@ class DoubleCountApplicationsTest(TestCase):
         self.assertEqual(error3["error"], DoubleCountingError.MISSING_DATA)
         self.assertEqual(error3["meta"]["tab_name"], "Production prévisionelle")
 
-    # def test_missing_traceability(self):
-    #     response = self.check_file("dc_agreement_application_valid.xlsx")
-
-    #     data = response.json()["data"]
-    #     file_data = data["file"]
-    #     error_count = file_data["error_count"]
-    #     self.assertEqual(error_count, 1)
-    #     errors = file_data["errors"]
-
-    #     error1 = errors["traceablity"][0]
-    #     self.assertEqual(error1["error"], DoubleCountingError.MISSING_TRACEABILITY)
-
     def create_application(self):
         app = DoubleCountingApplicationFactory.create(
             producer=self.production_site.producer,
@@ -278,7 +267,7 @@ class DoubleCountApplicationsTest(TestCase):
 
         response = self.client.get(
             reverse("doublecount-applications-details"),
-            {"entity_id": self.admin.id, "dca_id": app.id},
+            {"entity_id": self.producer.id, "dca_id": app.id},
         )
 
         application = response.json()["data"]
@@ -287,3 +276,71 @@ class DoubleCountApplicationsTest(TestCase):
         self.assertEqual(production_site["id"], self.production_site.id)
         self.assertEqual(production_site["inputs"], [])
         self.assertEqual(production_site["certificates"], [])
+
+    ######################@
+
+    def add_file(self, file_name: str, additional_data=None):
+        # upload template
+        carbure_home = os.environ["CARBURE_HOME"]
+        filepath = f"{carbure_home}/web/fixtures/csv/test_data/{file_name}"
+        fh = open(filepath, "rb")
+        data = fh.read()
+        fh.close()
+        f = SimpleUploadedFile("dca.xlsx", data)
+
+        # Add data properties to the post data if provided
+        post_data = {
+            "entity_id": self.producer.id,
+            "producer_id": self.producer.id,
+            "production_site_id": self.production_site.id,
+            "file": f,
+        }
+        if additional_data is not None:
+            post_data.update(additional_data)
+
+        response = self.client.post(reverse("doublecount-applications-add-application"), post_data)
+
+        return response
+
+    def test_production_site_address_mandatory(self):
+        self.production_site.address = ""
+        self.production_site.save()
+        response = self.add_file("dc_agreement_application_valid.xlsx")
+        self.assertEqual(response.status_code, 400)
+
+        error = response.json()["error"]
+        self.assertEqual(error, DoubleCountingProducerAddError.PRODUCTION_SITE_ADDRESS_UNDEFINED)
+
+    def add_application(self):
+        response = self.add_file("dc_agreement_application_valid.xlsx")
+        self.assertEqual(response.status_code, 200)
+
+        application = DoubleCountingApplication.objects.get(
+            producer=self.producer, period_start__year=self.requested_start_year
+        )
+        created_at = application.created_at
+
+        # 1 - status should be PENDING
+        self.assertEqual(application.status, DoubleCountingApplication.PENDING)
+
+        # 3 - test upload twice
+        response = self.add_file("dc_agreement_application_valid.xlsx")
+        self.assertEqual(response.status_code, 400)
+        error = response.json()["error"]
+        self.assertEqual(error, DoubleCountingProducerAddError.APPLICATION_ALREADY_EXISTS)
+
+        # 4 - test should replace
+        response = self.add_file("dc_agreement_application_valid.xlsx", {"should_replace": "true"})
+        self.assertEqual(response.status_code, 200)
+        application = DoubleCountingApplication.objects.get(
+            producer=self.production_site.producer, period_start__year=self.requested_start_year
+        )
+        self.assertNotEqual(application.created_at, created_at)
+
+        # 5 - cannot be replaced if already accepted
+        application.status = DoubleCountingApplication.ACCEPTED
+        application.save()
+        response = self.add_file("dc_agreement_application_valid.xlsx", {"should_replace": "true"})
+        self.assertEqual(response.status_code, 400)
+        error = response.json()["error"]
+        self.assertEqual(error, DoubleCountingProducerAddError.APPLICATION_ALREADY_RECEIVED)
