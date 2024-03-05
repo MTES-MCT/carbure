@@ -7,7 +7,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from doublecount.api.applications.add_application import DoubleCountingProducerAddError
+from doublecount.api.admin.applications.add import DoubleCountingAddError
 
 from doublecount.errors import DoubleCountingError
 from doublecount.factories.application import DoubleCountingApplicationFactory
@@ -309,7 +309,7 @@ class DoubleCountApplicationsTest(TestCase):
         self.assertEqual(response.status_code, 400)
 
         error = response.json()["error"]
-        self.assertEqual(error, DoubleCountingProducerAddError.PRODUCTION_SITE_ADDRESS_UNDEFINED)
+        self.assertEqual(error, DoubleCountingAddError.PRODUCTION_SITE_ADDRESS_UNDEFINED)
 
     def add_application(self):
         response = self.add_file("dc_agreement_application_valid.xlsx")
@@ -327,7 +327,7 @@ class DoubleCountApplicationsTest(TestCase):
         response = self.add_file("dc_agreement_application_valid.xlsx")
         self.assertEqual(response.status_code, 400)
         error = response.json()["error"]
-        self.assertEqual(error, DoubleCountingProducerAddError.APPLICATION_ALREADY_EXISTS)
+        self.assertEqual(error, DoubleCountingAddError.APPLICATION_ALREADY_EXISTS)
 
         # 4 - test should replace
         response = self.add_file("dc_agreement_application_valid.xlsx", {"should_replace": "true"})
@@ -343,4 +343,4 @@ class DoubleCountApplicationsTest(TestCase):
         response = self.add_file("dc_agreement_application_valid.xlsx", {"should_replace": "true"})
         self.assertEqual(response.status_code, 400)
         error = response.json()["error"]
-        self.assertEqual(error, DoubleCountingProducerAddError.APPLICATION_ALREADY_RECEIVED)
+        self.assertEqual(error, DoubleCountingAddError.APPLICATION_ALREADY_RECEIVED)

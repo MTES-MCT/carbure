@@ -97,7 +97,6 @@ export function getLotChanges(updates: LotUpdate<any>[] = []): LotChange[] {
         if (u.event_type === "UPDATED") {
           // retrocompatibility with old metadata model
           if ("field" in u.metadata) {
-            console.log(u.metadata.field)
             return {
               type: "UPDATED",
               action: getEventTypeLabel(u.event_type),
