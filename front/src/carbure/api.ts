@@ -60,7 +60,6 @@ export function findProducers(query?: string) {
 }
 
 export function findProductionSites(query?: string, producer_id?: number) {
-  console.log('producer_id:', producer_id)
   return api
     .get<Api<ProductionSiteDetails[]>>("/resources/production-sites", {
       params: { query, producer_id },

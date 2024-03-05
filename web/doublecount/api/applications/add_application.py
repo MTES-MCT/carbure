@@ -8,7 +8,7 @@ import os
 from carbure import settings
 from certificates.models import DoubleCountingRegistration
 from core.carburetypes import CarbureError
-from core.decorators import check_admin_rights
+from core.decorators import check_admin_rights, check_user_rights
 from doublecount.parser.dc_parser import parse_dc_excel
 
 from producers.models import ProductionSite
@@ -22,6 +22,7 @@ from doublecount.helpers import (
     load_dc_period,
     load_dc_sourcing_data,
     load_dc_production_data,
+    send_dca_confirmation_email,
 )
 from core.models import Entity, UserRights
 
@@ -30,14 +31,14 @@ from core.common import ErrorResponse, SuccessResponse
 from django.db import transaction
 
 
-class DoubleCountingAdminAddFrom(forms.Form):
+class DoubleCountingProducerAddFrom(forms.Form):
+    entity_id = forms.IntegerField()
     should_replace = forms.BooleanField(required=False)
     producer_id = forms.ModelChoiceField(queryset=Entity.objects.filter(entity_type=Entity.PRODUCER))
     production_site_id = forms.ModelChoiceField(queryset=ProductionSite.objects.all())
-    certificate_id = forms.CharField(required=False)
 
 
-class DoubleCountingAddError:
+class DoubleCountingProducerAddError:
     PRODUCTION_SITE_ADDRESS_UNDEFINED = "PRODUCTION_SITE_ADDRESS_UNDEFINED"
     APPLICATION_ALREADY_RECEIVED = "APPLICATION_ALREADY_RECEIVED"
     APPLICATION_ALREADY_EXISTS = "APPLICATION_ALREADY_EXISTS"
@@ -46,33 +47,35 @@ class DoubleCountingAddError:
     MISSING_FILE = "MISSING_FILE"
 
 
-@check_admin_rights()
+@check_user_rights(role=[UserRights.ADMIN, UserRights.RW])
 @transaction.atomic
 def add_application(request):
-    form = DoubleCountingAdminAddFrom(request.POST)
+
+    form = DoubleCountingProducerAddFrom(request.POST)
     file = request.FILES.get("file")
 
     if not form.is_valid():
         return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, form.errors)
 
+    entity_id: Entity = form.cleaned_data["entity_id"]
     producer: Entity = form.cleaned_data["producer_id"]
     should_replace: bool = form.cleaned_data["should_replace"]
     production_site: ProductionSite = form.cleaned_data["production_site_id"]
-    certificate_id_to_link = form.cleaned_data["certificate_id"]
+
+    if producer.id != entity_id:
+        return ErrorResponse(400, CarbureError.ENTITY_NOT_ALLOWED)
 
     if not production_site.address or not production_site.city or not production_site.postal_code:
-        return ErrorResponse(400, DoubleCountingAddError.PRODUCTION_SITE_ADDRESS_UNDEFINED)
+        return ErrorResponse(400, DoubleCountingProducerAddError.PRODUCTION_SITE_ADDRESS_UNDEFINED)
 
     if file is None:
-        return ErrorResponse(400, DoubleCountingAddError.MISSING_FILE)
+        return ErrorResponse(400, DoubleCountingProducerAddError.MISSING_FILE)
 
     # 1 - load dc Data
     filepath = load_dc_filepath(file)
-
     info, sourcing_forecast_rows, production_max_rows, production_forecast_rows, requested_quota_rows = parse_dc_excel(
         filepath
     )
-
     start, end, _ = load_dc_period(info["start_year"])
 
     # check if an application already exists for this producer, this period and is not accepted
@@ -86,23 +89,7 @@ def add_application(request):
         if should_replace:
             identical_replacable_application.delete()
         else:
-            return ErrorResponse(400, DoubleCountingAddError.APPLICATION_ALREADY_EXISTS)
-
-    # check if the agreement to link already exists
-    if certificate_id_to_link:
-        try:
-            agreement = DoubleCountingRegistration.objects.get(certificate_id=certificate_id_to_link)
-        except:
-            return ErrorResponse(400, DoubleCountingAddError.AGREEMENT_NOT_FOUND)
-    else:
-        try:
-            agreement = DoubleCountingRegistration.objects.get(
-                production_site=production_site,
-                valid_from=start,
-            )
-            return ErrorResponse(400, DoubleCountingAddError.AGREEMENT_ALREADY_EXISTS)
-        except:
-            agreement = None
+            return ErrorResponse(400, DoubleCountingProducerAddError.APPLICATION_ALREADY_EXISTS)
 
     # create application
     dca, created = DoubleCountingApplication.objects.get_or_create(
@@ -114,13 +101,7 @@ def add_application(request):
     )
 
     if not created:
-        return ErrorResponse(400, DoubleCountingAddError.APPLICATION_ALREADY_RECEIVED)
-
-    if certificate_id_to_link:
-        dca.certificate_id = certificate_id_to_link
-        dca.save()
-        agreement.application = dca
-        agreement.save()
+        return ErrorResponse(400, DoubleCountingProducerAddError.APPLICATION_ALREADY_RECEIVED)
 
     # 2 - save all production_data DoubleCountingProduction in db
     sourcing_forecast_data, _ = load_dc_sourcing_data(dca, sourcing_forecast_rows)

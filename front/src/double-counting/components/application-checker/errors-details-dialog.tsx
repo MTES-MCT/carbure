@@ -2,7 +2,7 @@ import { Alert } from "common/components/alert"
 import { Button } from "common/components/button"
 import Collapse from "common/components/collapse"
 import { Dialog } from "common/components/dialog"
-import { AlertCircle, AlertTriangle, Plus, Return } from "common/components/icons"
+import { AlertCircle, AlertTriangle, Plus, Return, Send } from "common/components/icons"
 import Tabs from "common/components/tabs"
 import Tag from "common/components/tag"
 import { useState } from "react"
@@ -12,6 +12,7 @@ import FileApplicationInfo from "../../../double-counting-admin/components/files
 import { SourcingFullTable } from "../sourcing-table"
 import { ProductionTable } from "../production-table"
 import { t } from "i18next"
+import { useMatch } from "react-router-dom"
 
 export type ErrorsDetailsDialogProps = {
   fileData: DoubleCountingFileInfo
@@ -23,6 +24,7 @@ export const ErrorsDetailsDialog = ({
   onClose,
 }: ErrorsDetailsDialogProps) => {
   const { t } = useTranslation()
+  const isProducerMatch = useMatch("/org/:entity/settings*")
 
   const [focus, setFocus] = useState("sourcing_forecast")
 
@@ -101,8 +103,9 @@ export const ErrorsDetailsDialog = ({
 
       <footer>
         <Button
-          icon={Plus}
-          label={t("Ajouter le dossier")}
+          icon={isProducerMatch ? Send : Plus}
+          label={isProducerMatch ? t("Envoyer la demande") : t("Ajouter le dossier")}
+
           variant="primary"
           disabled={true}
         />
