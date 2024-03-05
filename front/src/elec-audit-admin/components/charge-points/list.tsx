@@ -29,7 +29,6 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
   const location = useLocation()
 
   const [state, actions] = useElecAdminAuditChargePointsQueryParamsStore(entity, year, status, snapshot)
-  console.log('state:', state)
   const query = useElectAdminAuditQuery(state)
   const chargePointsApplicationsResponse = useQuery(api.getChargePointsApplications, {
     key: "audit-charge-points-applications",
