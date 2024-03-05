@@ -49,13 +49,15 @@ export function getDoubleCountingAgreementDetails(entity_id: number, agreement_i
 
 export function producerAddDoubleCountingApplication(
   entity_id: number,
+  producer_id: number,
   production_site_id: number,
   file: File,
   should_replace: boolean = false
 ) {
 
-  return api.post("/double-counting/producer/applications/add", {
+  return api.post("/double-counting/applications/add", {
     entity_id,
+    producer_id,
     production_site_id,
     file,
     should_replace

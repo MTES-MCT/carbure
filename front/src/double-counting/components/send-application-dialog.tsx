@@ -9,7 +9,7 @@ import { Button, MailTo } from "common/components/button"
 import Checkbox from "common/components/checkbox"
 import { Dialog } from "common/components/dialog"
 import { useForm } from "common/components/form"
-import { AlertTriangle, Plus, Return, Send } from "common/components/icons"
+import { AlertTriangle, Return, Send } from "common/components/icons"
 import { TextInput } from "common/components/input"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
@@ -20,6 +20,8 @@ import { Trans, useTranslation } from "react-i18next"
 import { DoubleCountingFileInfo } from "../types"
 import { DechetIndustrielAlert } from "./application-checker/industrial-waste-alert"
 import { ReplaceApplicationDialog } from "./application-checker/replace-application-dialog"
+import { Link, useNavigate } from "react-router-dom"
+import useScrollToRef from "common/hooks/scroll-to-ref"
 
 
 export type SendApplicationProducerDialogProps = {
@@ -40,6 +42,8 @@ export const SendApplicationProducerDialog = ({
   const [error, setError] = useState<React.ReactNode | undefined>(undefined)
   const { value, bind } =
     useForm<ProductionForm>(defaultProductionForm)
+  const { refToScroll } = useScrollToRef(!!error)
+
   const notify = useNotify()
   const notifyError = useNotifyError()
 
@@ -56,7 +60,7 @@ export const SendApplicationProducerDialog = ({
       } else if (errorCode === 'AGREEMENT_ALREADY_EXISTS') {
         setError(t("Un agrément existe déjà sur cette periode et pour ce site de production."))
       } else if (errorCode === 'PRODUCTION_SITE_ADDRESS_UNDEFINED') {
-        setError(<MissingAddress productionSiteId={value.productionSite?.id} />)
+        setError(<MissingAddress onClose={onClose} productionSiteName={fileData.production_site} />)
       }
       else {
         notifyError(err, t("Impossible d'envoyer le dossier"))
@@ -68,6 +72,7 @@ export const SendApplicationProducerDialog = ({
     if (!value.productionSite) return
     setError(undefined)
     addApplication.execute(
+      entity.id,
       entity.id,
       value.productionSite.id,
       file,
@@ -115,7 +120,7 @@ export const SendApplicationProducerDialog = ({
         </section>
 
         {error &&
-          <section>
+          <section ref={refToScroll} >
             <Alert variant="warning" icon={AlertTriangle} style={{ display: "inline-block" }}>
               {error}
             </Alert>
@@ -153,14 +158,24 @@ type ProductionForm = typeof defaultProductionForm
 
 
 
-function MissingAddress({ productionSiteId }: { productionSiteId: number | undefined }) {
+function MissingAddress({ productionSiteName, onClose }: { productionSiteName: string, onClose: () => void }) {
   const { t } = useTranslation()
+  const entity = useEntity()
+  const navigate = useNavigate()
+
+  const goToProductionSites = () => {
+    onClose()
+    navigate(`/org/${entity.id}/settings#production`)
+  }
+
   return (
     <>
-      {t("L'adresse, la ville ou le code postal du site de production n'est pas renseignée. Veuillez l'ajouter dans les informations liées à la société.")}
-      {/* <ExternalLink href={`/admin/producers/productionsite/${productionSiteId}/change`}>
-        Editer le site de production
-      </ExternalLink> */}
+      {t("L'adresse, la ville ou le code postal du site de production n'est pas renseignée. Veuillez l'ajouter dans les informations de votre site de production.")}
+      <Button variant="link" action={goToProductionSites}>
+        {"→ "}
+        {t(`Editer le site de production {{productionSiteName}}`, { productionSiteName })}
+      </Button>
+
     </>);
 }
 
