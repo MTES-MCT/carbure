@@ -5,6 +5,7 @@ import os
 from tqdm import tqdm
 from django.db import transaction
 from django.core.paginator import Paginator
+from django.db.models.functions import Length
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
@@ -36,6 +37,9 @@ def refresh_charge_point_data(cpo, batch):
     # fix wrong current type
     charge_points.filter(current_type="CC").update(current_type="DC")
     charge_points.filter(current_type="CA").update(current_type="AC")
+
+    charge_points.annotate(mid_len=Length("mid_id")).filter(mid_len__lte=2).update(mid_id="")
+    charge_points.annotate(prm_len=Length('measure_reference_point_id')).filter(prm_len__lte=2).update(measure_reference_point_id="")  # fmt:skip
 
     # group charge points by their station
     charge_points_by_stations = defaultdict(list[ElecChargePoint])

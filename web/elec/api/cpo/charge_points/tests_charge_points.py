@@ -1,6 +1,7 @@
 import os
 import datetime
 from decimal import Decimal
+from pprint import pprint
 from unittest.mock import patch
 from django.test import TestCase
 from django.urls import reverse
@@ -17,12 +18,13 @@ class ElecCharginPointsTest(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         # mock call to TransportDataGouv not to depend on the dynamic CSV and have predictable "allowed" charge points
-        cls.mocked_find_charge_point_data = patch("elec.services.transport_data_gouv.TransportDataGouv.find_charge_point_data").start()  # fmt:skip
+        cls.mocked_download_csv = patch("elec.services.transport_data_gouv.TransportDataGouv.download_csv").start()  # fmt:skip
+        cls.mocked_download_csv.return_value = "%s/web/elec/fixtures/transport_data_gouv.csv" % (os.environ["CARBURE_HOME"])
 
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
-        cls.mocked_find_charge_point_data.stop()
+        cls.mocked_download_csv.stop()
 
     def setUp(self):
         self.cpo = Entity.objects.create(
@@ -46,10 +48,10 @@ class ElecCharginPointsTest(TestCase):
         )
 
     def test_check_charge_point_wrong_entity(self):
-        filepath = "%s/web/elec/fixtures/points-de-recharge-errors.xlsx" % (os.environ["CARBURE_HOME"])
+        filepath = "%s/web/elec/fixtures/full_ac_charge_points_error.xlsx" % (os.environ["CARBURE_HOME"])
 
         with open(filepath, "rb") as reader:
-            file = SimpleUploadedFile("points-de-recharge-errors.xlsx", reader.read())
+            file = SimpleUploadedFile("full_ac_charge_points_error.xlsx", reader.read())
 
         response = self.client.post(
             reverse("elec-cpo-charge-points-check-application"),
@@ -60,13 +62,11 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertEqual(data["error"], "WRONG_ENTITY_TYPE")
 
-    def test_check_charge_point_errors(self):
-        self.mocked_find_charge_point_data.return_value = TDG_MOCK_ERROR
-
-        filepath = "%s/web/elec/fixtures/points-de-recharge-errors.xlsx" % (os.environ["CARBURE_HOME"])
+    def test_check_full_ac_charge_point_errors(self):
+        filepath = "%s/web/elec/fixtures/full_ac_charge_points_error.xlsx" % (os.environ["CARBURE_HOME"])
 
         with open(filepath, "rb") as reader:
-            file = SimpleUploadedFile("points-de-recharge-errors.xlsx", reader.read())
+            file = SimpleUploadedFile("full_ac_charge_points_error.xlsx", reader.read())
 
         response = self.client.post(
             reverse("elec-cpo-charge-points-check-application"),
@@ -75,21 +75,31 @@ class ElecCharginPointsTest(TestCase):
 
         expected = {
             "status": "error",
-            "error": "VALIDATION_FAILED",
             "data": {
-                "file_name": "points-de-recharge-errors.xlsx",
-                "pending_application_already_exists": False,
+                "file_name": "full_ac_charge_points_error.xlsx",
                 "charge_point_count": 0,
-                "error_count": 5,
                 "errors": [
                     {
                         "error": "INVALID_DATA",
                         "line": 35,
                         "meta": {
+                            "installation_date": ["Saisissez une date valide."],
+                        },
+                    },
+                    {
+                        "error": "INVALID_DATA",
+                        "line": 36,
+                        "meta": {
                             "measure_date": [
                                 "Saisissez une date valide.",
                                 "La date du dernier relevé est obligatoire.",
                             ],
+                        },
+                    },
+                    {
+                        "error": "INVALID_DATA",
+                        "line": 37,
+                        "meta": {
                             "measure_energy": [
                                 "Saisissez un nombre.",
                                 "L'énergie mesurée lors du dernier relevé est obligatoire.",
@@ -98,38 +108,42 @@ class ElecCharginPointsTest(TestCase):
                     },
                     {
                         "error": "INVALID_DATA",
-                        "line": 36,
-                        "meta": {"charge_point_id": ["Ce point de recharge n'est pas listé sur transport.data.gouv.fr"]},
-                    },
-                    {
-                        "error": "INVALID_DATA",
-                        "line": 37,
-                        "meta": {"charge_point_id": ["Ce point de recharge n'est pas listé sur transport.data.gouv.fr"]},
-                    },
-                    {
-                        "error": "INVALID_DATA",
                         "line": 38,
-                        "meta": {"charge_point_id": ["Ce point de recharge n'est pas listé sur transport.data.gouv.fr"]},
+                        "meta": {
+                            "charge_point_id": ["Ce point de recharge n'est pas list\u00e9 sur transport.data.gouv.fr"]
+                        },
                     },
                     {
                         "error": "INVALID_DATA",
                         "line": 39,
-                        "meta": {"charge_point_id": ["Ce point de recharge n'est pas listé sur transport.data.gouv.fr"]},
+                        "meta": {
+                            "charge_point_id": ["Ce point de recharge n'est pas list\u00e9 sur transport.data.gouv.fr"]
+                        },
+                    },
+                    {
+                        "error": "INVALID_DATA",
+                        "line": 40,
+                        "meta": {
+                            "charge_point_id": ["Ce point de recharge n'est pas list\u00e9 sur transport.data.gouv.fr"]
+                        },
                     },
                 ],
+                "error_count": 6,
+                "pending_application_already_exists": False,
             },
+            "error": "VALIDATION_FAILED",
         }
+
+        self.maxDiff = None
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), expected)
 
-    def test_check_charge_point_ok(self):
-        self.mocked_find_charge_point_data.return_value = TDG_MOCK_OK
-
-        filepath = "%s/web/elec/fixtures/points-de-recharge-ok.xlsx" % (os.environ["CARBURE_HOME"])
+    def test_check_full_ac_charge_point_ok(self):
+        filepath = "%s/web/elec/fixtures/full_ac_charge_points_ok.xlsx" % (os.environ["CARBURE_HOME"])
 
         with open(filepath, "rb") as reader:
-            file = SimpleUploadedFile("points-de-recharge-ok.xlsx", reader.read())
+            file = SimpleUploadedFile("full_ac_charge_points_ok.xlsx", reader.read())
 
         response = self.client.post(
             reverse("elec-cpo-charge-points-check-application"),
@@ -139,8 +153,8 @@ class ElecCharginPointsTest(TestCase):
         expected = {
             "status": "success",
             "data": {
-                "file_name": "points-de-recharge-ok.xlsx",
-                "charge_point_count": 5,
+                "file_name": "full_ac_charge_points_ok.xlsx",
+                "charge_point_count": 6,
                 "errors": [],
                 "error_count": 0,
                 "pending_application_already_exists": False,
@@ -150,13 +164,11 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(response.json(), expected)
         self.assertEqual(response.status_code, 200)
 
-    def test_add_charge_point_errors(self):
-        self.mocked_find_charge_point_data.return_value = TDG_MOCK_ERROR
-
-        filepath = "%s/web/elec/fixtures/points-de-recharge-errors.xlsx" % (os.environ["CARBURE_HOME"])
+    def test_add_full_ac_charge_point_errors(self):
+        filepath = "%s/web/elec/fixtures/full_ac_charge_points_error.xlsx" % (os.environ["CARBURE_HOME"])
 
         with open(filepath, "rb") as reader:
-            file = SimpleUploadedFile("points-de-recharge-errors.xlsx", reader.read())
+            file = SimpleUploadedFile("full_ac_charge_points_error.xlsx", reader.read())
 
         response = self.client.post(
             reverse("elec-cpo-charge-points-add-application"),
@@ -166,13 +178,11 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {"status": "error", "error": "VALIDATION_FAILED"})
 
-    def test_add_charge_point_ok(self):
-        self.mocked_find_charge_point_data.return_value = TDG_MOCK_OK
-
-        filepath = "%s/web/elec/fixtures/points-de-recharge-ok.xlsx" % (os.environ["CARBURE_HOME"])
+    def test_add_full_ac_charge_point_ok(self):
+        filepath = "%s/web/elec/fixtures/full_ac_charge_points_ok.xlsx" % (os.environ["CARBURE_HOME"])
 
         with open(filepath, "rb") as reader:
-            file = SimpleUploadedFile("points-de-recharge-ok.xlsx", reader.read())
+            file = SimpleUploadedFile("full_ac_charge_points_ok.xlsx", reader.read())
 
         self.assertEqual(ElecChargePointApplication.objects.count(), 0)
         self.assertEqual(ElecChargePoint.objects.count(), 0)
@@ -190,79 +200,113 @@ class ElecCharginPointsTest(TestCase):
         charge_points = application.elec_charge_points.all()
 
         self.assertEqual(applications.count(), 1)
-        self.assertEqual(charge_points.count(), 5)
+        self.assertEqual(charge_points.count(), 6)
 
-        self.assertEqual(charge_points[0].charge_point_id, "FR000011062174")
+        self.assertEqual(charge_points[0].charge_point_id, "FRAAAA111101")
         self.assertEqual(charge_points[0].current_type, "AC")
-        self.assertEqual(str(charge_points[0].installation_date), "2023-06-12")
-        self.assertEqual(charge_points[0].mid_id, "123456-10")
-        self.assertEqual(str(charge_points[0].measure_date), "2023-08-28")
-        self.assertEqual(charge_points[0].measure_energy, 98765.430)
+        self.assertEqual(str(charge_points[0].installation_date), "2022-05-10")
+        self.assertEqual(charge_points[0].mid_id, "1234561")
+        self.assertEqual(str(charge_points[0].measure_date), "2023-12-29")
+        self.assertEqual(charge_points[0].measure_energy, 1000.000)
         self.assertEqual(charge_points[0].is_article_2, False)
-        self.assertEqual(charge_points[0].measure_reference_point_id, "1122334455")
+        self.assertEqual(charge_points[0].measure_reference_point_id, "")
         self.assertEqual(charge_points[0].cpo, self.cpo)
         self.assertEqual(charge_points[0].application, application)
-        self.assertEqual(charge_points[0].station_id, "FR000011062174")
-        self.assertEqual(charge_points[0].station_name, "Hotel saint alban")
+        self.assertEqual(charge_points[0].station_id, "FRAAAA1111")
+        self.assertEqual(charge_points[0].station_name, "Hotel Saint Sauveur")
         self.assertEqual(charge_points[0].nominal_power, 22)
-        self.assertEqual(charge_points[0].latitude, Decimal("43.419591"))
-        self.assertEqual(charge_points[0].longitude, Decimal("3.407609"))
+        self.assertEqual(charge_points[0].latitude, Decimal("43.41959147913006"))
+        self.assertEqual(charge_points[0].longitude, Decimal("3.407609123225763"))
 
-        self.assertEqual(charge_points[1].charge_point_id, "FR000012292701")
+        self.assertEqual(charge_points[1].charge_point_id, "FRAAAA111102")
         self.assertEqual(charge_points[1].current_type, "AC")
-        self.assertEqual(str(charge_points[1].installation_date), "2023-06-13")
-        self.assertEqual(charge_points[1].mid_id, "123457-11")
-        self.assertEqual(str(charge_points[1].measure_date), "2023-08-29")
-        self.assertEqual(charge_points[1].measure_energy, 98765.430)
         self.assertEqual(charge_points[1].is_article_2, False)
-        self.assertEqual(charge_points[1].measure_reference_point_id, "1122334456")
-        self.assertEqual(charge_points[1].cpo, self.cpo)
-        self.assertEqual(charge_points[1].application, application)
-        self.assertEqual(charge_points[1].station_id, "FR000012292701")
-        self.assertEqual(charge_points[1].station_name, "Hôtel Restaurant Campanile Nogent-sur-Marne")
-        self.assertEqual(charge_points[1].nominal_power, 22)
+        self.assertEqual(charge_points[1].station_id, "FRAAAA1111")
 
-        self.assertEqual(charge_points[2].charge_point_id, "FR000012308585")
+        self.assertEqual(charge_points[2].charge_point_id, "FRAAAA111103")
         self.assertEqual(charge_points[2].current_type, "AC")
-        self.assertEqual(str(charge_points[2].installation_date), "2023-06-14")
-        self.assertEqual(charge_points[2].mid_id, "123458-12")
-        self.assertEqual(str(charge_points[2].measure_date), "2023-08-30")
-        self.assertEqual(charge_points[2].measure_energy, 98765.430)
         self.assertEqual(charge_points[2].is_article_2, False)
-        self.assertEqual(charge_points[2].measure_reference_point_id, "1122334457")
-        self.assertEqual(charge_points[2].cpo, self.cpo)
-        self.assertEqual(charge_points[2].application, application)
-        self.assertEqual(charge_points[2].station_id, "FR000012308585")
-        self.assertEqual(charge_points[2].station_name, "Résidence les calanques")
-        self.assertEqual(charge_points[2].nominal_power, 22)
+        self.assertEqual(charge_points[2].station_id, "FRAAAA1111")
 
-        self.assertEqual(charge_points[3].charge_point_id, "FR000012616553")
-        self.assertEqual(charge_points[3].current_type, "AC")
-        self.assertEqual(str(charge_points[3].installation_date), "2023-06-15")
-        self.assertEqual(charge_points[3].mid_id, "123459-13")
-        self.assertEqual(str(charge_points[3].measure_date), "2023-08-31")
-        self.assertEqual(charge_points[3].measure_energy, 98765.430)
+        self.assertEqual(charge_points[3].charge_point_id, "FRBBBB222201")
+        self.assertEqual(charge_points[3].current_type, "DC")
         self.assertEqual(charge_points[3].is_article_2, False)
-        self.assertEqual(charge_points[3].measure_reference_point_id, "1122334458")
-        self.assertEqual(charge_points[3].cpo, self.cpo)
-        self.assertEqual(charge_points[3].application, application)
-        self.assertEqual(charge_points[3].station_id, "FR000012616553")
-        self.assertEqual(charge_points[3].station_name, "1PACTE")
-        self.assertEqual(charge_points[3].nominal_power, 22)
+        self.assertEqual(charge_points[3].station_id, "FRBBBB2222")
 
-        self.assertEqual(charge_points[4].charge_point_id, "FR000028067822")
-        self.assertEqual(charge_points[4].current_type, "AC")
-        self.assertEqual(str(charge_points[4].installation_date), "2023-06-16")
-        self.assertEqual(charge_points[4].mid_id, "123450-14")
-        self.assertEqual(str(charge_points[4].measure_date), "2023-09-01")
-        self.assertEqual(charge_points[4].measure_energy, 98765.430)
+        self.assertEqual(charge_points[4].charge_point_id, "FRBBBB222202")
+        self.assertEqual(charge_points[4].current_type, "DC")
         self.assertEqual(charge_points[4].is_article_2, False)
-        self.assertEqual(charge_points[4].measure_reference_point_id, "1122334459")
-        self.assertEqual(charge_points[4].cpo, self.cpo)
-        self.assertEqual(charge_points[4].application, application)
-        self.assertEqual(charge_points[4].station_id, "FR000028067822")
-        self.assertEqual(charge_points[4].station_name, "Carry-le-Rouet")
-        self.assertEqual(charge_points[4].nominal_power, 36)
+        self.assertEqual(charge_points[4].station_id, "FRBBBB2222")
+
+        self.assertEqual(charge_points[5].charge_point_id, "FRBBBB222203")
+        self.assertEqual(charge_points[5].current_type, "AC")
+        self.assertEqual(charge_points[5].is_article_2, False)
+        self.assertEqual(charge_points[5].station_id, "FRBBBB2222")
+
+    def test_add_partial_dc_charge_point_ok(self):
+        filepath = "%s/web/elec/fixtures/partial_dc_charge_points_ok.xlsx" % (os.environ["CARBURE_HOME"])
+
+        with open(filepath, "rb") as reader:
+            file = SimpleUploadedFile("partial_dc_charge_points_ok.xlsx", reader.read())
+
+        self.assertEqual(ElecChargePointApplication.objects.count(), 0)
+        self.assertEqual(ElecChargePoint.objects.count(), 0)
+
+        response = self.client.post(
+            reverse("elec-cpo-charge-points-add-application"),
+            {"entity_id": self.cpo.id, "file": file},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"status": "success"})
+
+        applications = ElecChargePointApplication.objects.all()
+        application = applications.first()
+        charge_points = application.elec_charge_points.all()
+
+        self.assertEqual(applications.count(), 1)
+        self.assertEqual(charge_points.count(), 6)
+
+        self.assertEqual(charge_points[0].charge_point_id, "FRBBBB222201")
+        self.assertEqual(charge_points[0].current_type, "DC")
+        self.assertEqual(str(charge_points[0].installation_date), "2022-05-10")
+        self.assertEqual(charge_points[0].mid_id, "")
+        self.assertEqual(charge_points[0].measure_date, None)
+        self.assertEqual(charge_points[0].measure_energy, None)
+        self.assertEqual(charge_points[0].is_article_2, True)
+        self.assertEqual(charge_points[0].measure_reference_point_id, "1234561")
+        self.assertEqual(charge_points[0].cpo, self.cpo)
+        self.assertEqual(charge_points[0].application, application)
+        self.assertEqual(charge_points[0].station_id, "FRBBBB2222")
+        self.assertEqual(charge_points[0].station_name, "Carry-le-Merle")
+        self.assertEqual(charge_points[0].nominal_power, 36.0)
+        self.assertEqual(charge_points[0].latitude, Decimal("43.3292004491334"))
+        self.assertEqual(charge_points[0].longitude, Decimal("5.143766265497639"))
+
+        self.assertEqual(charge_points[1].charge_point_id, "FRBBBB222202")
+        self.assertEqual(charge_points[1].current_type, "DC")
+        self.assertEqual(charge_points[1].is_article_2, True)
+        self.assertEqual(charge_points[1].station_id, "FRBBBB2222")
+
+        self.assertEqual(charge_points[2].charge_point_id, "FRBBBB222203")
+        self.assertEqual(charge_points[2].current_type, "AC")
+        self.assertEqual(charge_points[2].is_article_2, True)
+        self.assertEqual(charge_points[2].station_id, "FRBBBB2222")
+
+        self.assertEqual(charge_points[3].charge_point_id, "FRCCCC333301")
+        self.assertEqual(charge_points[3].current_type, "DC")
+        self.assertEqual(charge_points[3].is_article_2, True)
+        self.assertEqual(charge_points[3].station_id, "FRCCCC3333")
+
+        self.assertEqual(charge_points[4].charge_point_id, "FRCCCC333302")
+        self.assertEqual(charge_points[4].current_type, "DC")
+        self.assertEqual(charge_points[4].is_article_2, True)
+        self.assertEqual(charge_points[4].station_id, "FRCCCC3333")
+
+        self.assertEqual(charge_points[5].charge_point_id, "FRCCCC333303")
+        self.assertEqual(charge_points[5].current_type, "AC")
+        self.assertEqual(charge_points[5].is_article_2, True)
+        self.assertEqual(charge_points[5].station_id, "FRCCCC3333")
 
     def test_get_applications_ok(self):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)

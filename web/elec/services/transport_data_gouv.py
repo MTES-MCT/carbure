@@ -31,6 +31,19 @@ class TransportDataGouv:
         "siren_amenageur": "cpo_siren",
     }
 
+    DB_COLUMNS = [
+        "charge_point_id",
+        "current_type",
+        "maybe_article_2",
+        "station_name",
+        "station_id",
+        "nominal_power",
+        "cpo_name",
+        "cpo_siren",
+        "latitude",
+        "longitude",
+    ]
+
     @staticmethod
     def find_charge_point_data(charge_points: list[dict], chunksize: int) -> list[dict]:
         file_path = TransportDataGouv.download_csv()
@@ -103,6 +116,7 @@ class TransportDataGouv:
 
         charge_point_data["latitude"] = lat
         charge_point_data["longitude"] = lon
+
         charge_point_data["operating_unit"] = charge_point_data["charge_point_id"].str[:5]
 
         charge_point_data.loc[charge_point_data.nominal_power > 1000, "nominal_power"] = (
@@ -121,17 +135,4 @@ class TransportDataGouv:
         stations_art2 = stations_art2.rename(columns={"DC": "maybe_article_2"})
 
         # On marque tous les points de charge de ces stations comme éligible article 2
-        return charge_point_data.merge(stations_art2, on="station_id")[
-            [
-                "charge_point_id",
-                "current_type",
-                "maybe_article_2",
-                "station_name",
-                "station_id",
-                "nominal_power",
-                "cpo_name",
-                "cpo_siren",
-                "latitude",
-                "longitude",
-            ]
-        ]
+        return charge_point_data.merge(stations_art2, on="station_id")[TransportDataGouv.DB_COLUMNS]

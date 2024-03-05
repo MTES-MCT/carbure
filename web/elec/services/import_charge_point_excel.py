@@ -71,23 +71,27 @@ class ExcelChargePoints:
     @staticmethod
     def extend_charge_points(charge_points: list[dict], transport_data):
         charge_point_df = pd.DataFrame(charge_points)
-        transport_data_df = pd.DataFrame(transport_data)
+        transport_data_df = pd.DataFrame(transport_data, columns=TransportDataGouv.DB_COLUMNS)
 
-        merged = charge_point_df.merge(transport_data_df, on="charge_point_id", how="outer")
-        merged = merged.fillna("")
+        charge_point_df = charge_point_df.merge(transport_data_df, on="charge_point_id", how="outer")
+        charge_point_df = charge_point_df.fillna("")
 
         # check if all the charge points of a same station all have readings defined
         # in that case, they won't be considered for article 2, even if there are DC charge points
-        merged["whole_station_has_readings"] = (
-            merged.groupby("station_id")[["mid_id", "measure_date", "measure_energy"]]
-            .transform(lambda x: x.notnull().all(axis=0))  # check if all columns are set, for all the rows of a station
+        charge_point_df["whole_station_has_readings"] = (
+            charge_point_df.groupby("station_id")[["mid_id", "measure_date", "measure_energy"]]
+            .transform(
+                # check if all columns are set, for all the rows of a station
+                lambda x: ~(x.astype(str) == "").any(axis=0)
+            )
             .all(axis=1)
         )
 
         # combine the info we get from TDG about article 2, and with the computation above
-        merged["is_article_2"] = ~merged["whole_station_has_readings"] & merged["maybe_article_2"]
+        charge_point_df["is_article_2"] = ~charge_point_df["whole_station_has_readings"] & charge_point_df["maybe_article_2"]
 
-        return merged.to_dict(orient="records")
+        charge_point_df = charge_point_df[charge_point_df["line"] != ""]
+        return charge_point_df.to_dict(orient="records")
 
     def validate_charge_points(charge_points: list[dict], transport_data, registered_charge_points):
         context = {
@@ -103,7 +107,7 @@ class ExcelChargePointValidator(Validator):
     installation_date = forms.DateField(input_formats=Validator.DATE_FORMATS)
     mid_id = forms.CharField(required=False, max_length=128)
     measure_date = forms.DateField(input_formats=Validator.DATE_FORMATS, required=False)
-    measure_energy = forms.FloatField(required=False, initial=0)
+    measure_energy = forms.FloatField(required=False, min_value=0)
     measure_reference_point_id = forms.CharField(required=False, max_length=64)
 
     # fields from transport.data.gouv.fr CSV
@@ -116,6 +120,13 @@ class ExcelChargePointValidator(Validator):
     cpo_siren = forms.CharField(required=False)
     latitude = forms.DecimalField(required=False)
     longitude = forms.DecimalField(required=False)
+
+    def extend(self, charge_point):
+        if len(charge_point.get("mid_id", "")) < 3:
+            charge_point["mid_id"] = ""
+        if len(charge_point.get("measure_reference_point_id", "")) < 3:
+            charge_point["measure_reference_point_id"] = ""
+        return charge_point
 
     # check if the different possible charge point configurations are respected
     # and if the new data doesn't conflict with TDG or our own DB
