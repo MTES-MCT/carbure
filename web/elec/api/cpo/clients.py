@@ -24,7 +24,6 @@ def get_clients(request, *args, **kwargs):
         return ErrorResponse(400, ElecClientsError.MALFORMED_PARAMS, clients_form.errors)
 
     query = clients_form.cleaned_data["query"]
-    print("query: ", query)
 
     entities = Entity.objects.filter(entity_type=Entity.OPERATOR, has_elec=True)
     if query:

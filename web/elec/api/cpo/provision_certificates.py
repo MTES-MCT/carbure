@@ -19,7 +19,6 @@ from elec.serializers.elec_provision_certificate import ElecProvisionCertificate
 @require_GET
 @check_user_rights()
 def get_provision_certificates(request, *args, **kwargs):
-    print("request: ", request)
     prov_certif_filter_form = ProvisionCertificatesFilterForm(request.GET)
     prov_certif_sort_form = ProvisionCertificatesSortForm(request.GET)
 

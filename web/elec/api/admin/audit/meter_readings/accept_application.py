@@ -35,7 +35,6 @@ def accept_application(request: HttpRequest):
         return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, form.errors)
 
     application = form.cleaned_data["application_id"]
-    print("application: ", application.cpo.name, application.quarter, application.year)
     force_validation = form.cleaned_data["force_validation"]
 
     if (
