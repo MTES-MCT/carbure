@@ -1,3 +1,4 @@
+from decimal import Decimal
 import os
 from typing import Iterable
 import requests
@@ -32,9 +33,16 @@ class TransportDataGouv:
     }
 
     DB_COLUMNS = [
+        "line",
+        "charge_point_id",
+        "installation_date",
+        "mid_id",
+        "measure_date",
+        "measure_energy",
+        "measure_reference_point_id",
         "charge_point_id",
         "current_type",
-        "maybe_article_2",
+        "is_article_2",
         "station_name",
         "station_id",
         "nominal_power",
@@ -42,27 +50,28 @@ class TransportDataGouv:
         "cpo_siren",
         "latitude",
         "longitude",
+        "is_in_tdg",
     ]
 
     @staticmethod
-    def find_charge_point_data(charge_points: list[dict], chunksize: int) -> list[dict]:
+    def merge_charge_point_data(charge_point_data: pd.DataFrame):
         file_path = TransportDataGouv.download_csv()
+        transport_data = TransportDataGouv.read_transport_data(file_path)
 
-        wanted_ids = [charge_point["charge_point_id"] for charge_point in charge_points]
-        wanted_stations = set()  # list the stations of the wanted charge points
+        # list the different charge point ids from the application
+        wanted_ids = charge_point_data["charge_point_id"].unique().tolist()
 
-        relevant_charge_points = pd.DataFrame(columns=TransportDataGouv.CSV_COLUMNS)
-        chunks = TransportDataGouv.read_charge_point_data_chunks(file_path, chunksize)
+        # find all the stations of all the individual charge points of the application
+        wanted_charge_points = transport_data[transport_data["charge_point_id"].isin(wanted_ids)]
+        wanted_stations = wanted_charge_points["station_id"].unique()
 
-        for chunk in chunks:
-            wanted_chunk = chunk[chunk["id_pdc_itinerance"].isin(wanted_ids)]
-            wanted_stations.update(wanted_chunk["id_station_itinerance"].unique())
-            station_charge_points = chunk[chunk["id_station_itinerance"].isin(wanted_stations)]
-            relevant_charge_points = pd.concat([relevant_charge_points, station_charge_points], ignore_index=True)
+        # find all the charge points of these stations, including those that were not defined in the application
+        transport_data = transport_data[transport_data["station_id"].isin(wanted_stations)]
 
-        relevant_charge_points = TransportDataGouv.process_charge_point_data(relevant_charge_points)
+        # mark the charge points as coming from TDG
+        transport_data["is_in_tdg"] = True
 
-        return relevant_charge_points.to_dict(orient="records")
+        return TransportDataGouv.enrich_charge_point_data(charge_point_data, transport_data)
 
     @staticmethod
     def download_csv():
@@ -87,8 +96,8 @@ class TransportDataGouv:
         return file_path
 
     @staticmethod
-    def read_charge_point_data_chunks(file_path: str, chunksize: int = 1000) -> Iterable[pd.DataFrame]:
-        charge_point_data_chunks = pd.read_csv(
+    def read_transport_data(file_path: str) -> Iterable[pd.DataFrame]:
+        transport_data = pd.read_csv(
             file_path,
             sep=",",
             header=0,
@@ -98,41 +107,89 @@ class TransportDataGouv:
             encoding="utf-8",
             engine="python",
             dtype={"prise_type_combo_ccs": "str", "prise_type_chademo": "str", "siren_amenageur": "str"},
-            chunksize=chunksize,
             skip_blank_lines=True,
         )
 
-        return charge_point_data_chunks
+        transport_data = transport_data.rename(columns=TransportDataGouv.CSV_COLUMNS_ALIAS)
+        transport_data = transport_data.sort_values("date_maj", ascending=False)
+        transport_data = transport_data.drop_duplicates("charge_point_id")
+        transport_data = transport_data.fillna("")
+
+        return transport_data
 
     @staticmethod
-    def process_charge_point_data(charge_point_data: pd.DataFrame):
-        charge_point_data = charge_point_data.rename(columns=TransportDataGouv.CSV_COLUMNS_ALIAS)
-        charge_point_data = charge_point_data.sort_values("date_maj", ascending=False)
-        charge_point_data = charge_point_data.drop_duplicates("charge_point_id")
-        charge_point_data = charge_point_data.fillna("")
+    def enrich_charge_point_data(charge_point_data: pd.DataFrame, transport_data: pd.DataFrame):
+        longitude = [coord.replace("[", "").replace("]", "").replace(u'\xa0', u'').split(",")[0] for coord in transport_data.coordonneesXY]  # fmt:skip
+        latitude = [coord.replace("[", "").replace("]", "").replace(u'\xa0', u'').split(",")[1] for coord in transport_data.coordonneesXY]  # fmt:skip
 
-        lon = [float(coord.replace("[", "").replace("]", "").split(",")[0]) for coord in charge_point_data.coordonneesXY]
-        lat = [float(coord.replace("[", "").replace("]", "").split(",")[1]) for coord in charge_point_data.coordonneesXY]
+        transport_data["latitude"] = latitude
+        transport_data["longitude"] = longitude
 
-        charge_point_data["latitude"] = lat
-        charge_point_data["longitude"] = lon
+        transport_data["operating_unit"] = transport_data["charge_point_id"].str[:5]
 
-        charge_point_data["operating_unit"] = charge_point_data["charge_point_id"].str[:5]
-
-        charge_point_data.loc[charge_point_data.nominal_power > 1000, "nominal_power"] = (
-            charge_point_data.loc[charge_point_data.nominal_power > 1000, "nominal_power"] / 1000
+        # convert nominal power to always be in megawatts
+        transport_data.loc[transport_data.nominal_power > 1000, "nominal_power"] = (
+            transport_data.loc[transport_data.nominal_power > 1000, "nominal_power"] / 1000
         )
 
-        # On détermine pour chaque point de charge s'il utilise du DC
-        charge_point_data["prise_type_combo_ccs"] = (charge_point_data["prise_type_combo_ccs"].str.lower() == "true") | (charge_point_data["prise_type_combo_ccs"] == "1")  # fmt:skip
-        charge_point_data["prise_type_chademo"] = (charge_point_data["prise_type_chademo"].str.lower() == "true") | (charge_point_data["prise_type_chademo"] == "1")  # fmt:skip
-        charge_point_data.insert(0, "DC", charge_point_data["prise_type_combo_ccs"] | charge_point_data["prise_type_chademo"])  # fmt:skip
-        charge_point_data["current_type"] = charge_point_data["DC"].apply(lambda is_dc: "DC" if is_dc else "AC")
+        # check if each charge point is using direct current
+        transport_data["prise_type_combo_ccs"] = (transport_data["prise_type_combo_ccs"].str.lower() == "true") | (transport_data["prise_type_combo_ccs"] == "1")  # fmt:skip
+        transport_data["prise_type_chademo"] = (transport_data["prise_type_chademo"].str.lower() == "true") | (transport_data["prise_type_chademo"] == "1")  # fmt:skip
+        transport_data.insert(0, "DC", transport_data["prise_type_combo_ccs"] | transport_data["prise_type_chademo"])  # fmt:skip
+        transport_data["current_type"] = transport_data["DC"].apply(lambda is_dc: "DC" if is_dc else "AC")
 
-        # On regarde les stations qui comprennent un point de recharge DC
-        stations_art2 = charge_point_data[["station_id", "DC"]].groupby("station_id").max()
-
+        # find all stations that contain at least one DC point
+        stations_art2 = transport_data[["station_id", "DC"]].groupby("station_id").max()
         stations_art2 = stations_art2.rename(columns={"DC": "maybe_article_2"})
 
-        # On marque tous les points de charge de ces stations comme éligible article 2
-        return charge_point_data.merge(stations_art2, on="station_id")[TransportDataGouv.DB_COLUMNS]
+        # mark all the charge points of these stations as eligible to article 2
+        transport_data = transport_data.merge(stations_art2, on="station_id")
+
+        # merge the imported excel data with transport.data.gouv data to have all info in one place
+        merged_data = charge_point_data.merge(transport_data, on="charge_point_id", how="outer", suffixes=("_old", "_new"))
+
+        # get the newest value for each column shared between the application charge point data and TDG
+        shared_columns = charge_point_data.columns.intersection(transport_data.columns).difference(["charge_point_id"])
+        for col in shared_columns:
+            merged_data[col] = merged_data[col + "_new"].combine_first(merged_data[col + "_old"])
+
+        # remove the duplicated columns
+        merged_data = merged_data.drop(
+            columns=[col + "_old" for col in shared_columns] + [col + "_new" for col in shared_columns]
+        )
+
+        # deal with when a charge point was not found on TDG to compute its maybe_article_2 column
+        if "maybe_article_2" in merged_data.columns:
+            merged_data["maybe_article_2"].fillna(merged_data["current_type"] != "AC", inplace=True)
+        else:
+            merged_data["maybe_article_2"] = merged_data["current_type"] != "AC"
+
+        # tag the origin of the data
+        merged_data["is_in_tdg"] = merged_data["is_in_tdg"] == True
+        merged_data["is_in_application"] = merged_data["is_in_application"] == True
+
+        # clear the mid and prm columns if they contain data that is too short
+        merged_data["mid_id"] = merged_data["mid_id"].apply(lambda x: "" if not x or len(str(x)) < 3 else x)
+        merged_data["measure_reference_point_id"] = merged_data["measure_reference_point_id"].apply(lambda x: "" if not x or len(str(x)) < 3 else x)  # fmt:skip
+
+        # find which rows have all data defined for a first meter reading
+        merged_data["has_reading"] = (
+            (merged_data["mid_id"] != "") & merged_data["measure_date"].notna() & merged_data["measure_energy"].notna()
+        )
+
+        # fill the empty cells now that all transformation requiring NaN checks are done
+        merged_data = merged_data.fillna("")
+
+        # check if all the charge points of a same station all have readings defined
+        # in that case, they won't be considered for article 2, even if there are DC charge points
+        merged_data["whole_station_has_readings"] = (
+            merged_data.groupby("station_id")["has_reading"]
+            .transform(lambda x: all(x != False))
+            .reset_index()["has_reading"]
+        )
+
+        # combine the info we get from TDG about article 2, and with the computation above
+        merged_data["is_article_2"] = ~merged_data["whole_station_has_readings"] & merged_data["maybe_article_2"]  # fmt:skip
+
+        # remove the charge points that were not listed in the original imported excel file
+        return merged_data[merged_data["is_in_application"] == True][TransportDataGouv.DB_COLUMNS]
