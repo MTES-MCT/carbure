@@ -36,7 +36,7 @@ def refresh_charge_point_data(cpo, batch):
 
     charge_point_data["line"] = charge_point_data.index
     charge_point_data["is_in_application"] = True
-    charge_point_data = TransportDataGouv.merge_charge_point_data(charge_point_data, batch)
+    charge_point_data = TransportDataGouv.merge_charge_point_data(charge_point_data)
 
     charge_points = charge_point_data.to_dict(orient="records")
     charge_points = [extract_charge_point_update(cp) for cp in charge_points]
