@@ -109,23 +109,17 @@ class ElecCharginPointsTest(TestCase):
                     {
                         "error": "INVALID_DATA",
                         "line": 38,
-                        "meta": {
-                            "charge_point_id": ["Ce point de recharge n'est pas list\u00e9 sur transport.data.gouv.fr"]
-                        },
+                        "meta": {"charge_point_id": ["Ce point de recharge n'est pas listé sur transport.data.gouv.fr"]},
                     },
                     {
                         "error": "INVALID_DATA",
                         "line": 39,
-                        "meta": {
-                            "charge_point_id": ["Ce point de recharge n'est pas list\u00e9 sur transport.data.gouv.fr"]
-                        },
+                        "meta": {"charge_point_id": ["Ce point de recharge n'est pas listé sur transport.data.gouv.fr"]},
                     },
                     {
                         "error": "INVALID_DATA",
                         "line": 40,
-                        "meta": {
-                            "charge_point_id": ["Ce point de recharge n'est pas list\u00e9 sur transport.data.gouv.fr"]
-                        },
+                        "meta": {"charge_point_id": ["Ce point de recharge n'est pas listé sur transport.data.gouv.fr"]},
                     },
                 ],
                 "error_count": 6,
@@ -265,7 +259,7 @@ class ElecCharginPointsTest(TestCase):
         charge_points = application.elec_charge_points.all()
 
         self.assertEqual(applications.count(), 1)
-        self.assertEqual(charge_points.count(), 6)
+        self.assertEqual(charge_points.count(), 5)
 
         self.assertEqual(charge_points[0].charge_point_id, "FRBBBB222201")
         self.assertEqual(charge_points[0].current_type, "DC")
@@ -298,15 +292,10 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(charge_points[3].is_article_2, True)
         self.assertEqual(charge_points[3].station_id, "FRCCCC3333")
 
-        self.assertEqual(charge_points[4].charge_point_id, "FRCCCC333302")
-        self.assertEqual(charge_points[4].current_type, "DC")
+        self.assertEqual(charge_points[4].charge_point_id, "FRCCCC333303")
+        self.assertEqual(charge_points[4].current_type, "AC")
         self.assertEqual(charge_points[4].is_article_2, True)
         self.assertEqual(charge_points[4].station_id, "FRCCCC3333")
-
-        self.assertEqual(charge_points[5].charge_point_id, "FRCCCC333303")
-        self.assertEqual(charge_points[5].current_type, "AC")
-        self.assertEqual(charge_points[5].is_article_2, True)
-        self.assertEqual(charge_points[5].station_id, "FRCCCC3333")
 
     def test_get_applications_ok(self):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)
