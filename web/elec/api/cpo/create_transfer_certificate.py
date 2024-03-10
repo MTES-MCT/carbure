@@ -43,7 +43,7 @@ def create_transfer_certificate(request, *args, **kwargs):
         energy_pulled = 0
 
         entity_id = transfer_form_values["entity_id"]
-        energy_required = transfer_form_values["energy_mwh"]
+        energy_required = round(transfer_form_values["energy_mwh"], 3)
 
         available_provision_certificates = (
             ElecProvisionCertificate.objects.filter(cpo_id=entity_id)
@@ -69,9 +69,8 @@ def create_transfer_certificate(request, *args, **kwargs):
                 energy_pulled += curr_certif_energy
             # Le certificat a assez d'énergie
             else:
-                available_provision_certificates[current_certificate_idx].remaining_energy_amount = (
-                    curr_certif_energy - missing_energy
-                )
+                remaining_energy_amount = round(curr_certif_energy - missing_energy, 3)
+                available_provision_certificates[current_certificate_idx].remaining_energy_amount = remaining_energy_amount
                 energy_pulled = energy_required
             available_provision_certificates[current_certificate_idx].save()
             current_certificate_idx += 1
