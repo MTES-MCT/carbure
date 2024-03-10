@@ -74,7 +74,7 @@ def cancel_transfer_certificate(request, *args, **kwargs):
                 ].remaining_energy_amount += remaining_transfer_energy
                 energy_filled = energy_required
             available_provision_certificates[current_certificate_idx].remaining_energy_amount = round(
-                available_provision_certificates[current_certificate_idx], 3
+                available_provision_certificates[current_certificate_idx].remaining_energy_amount, 3
             )
             available_provision_certificates[current_certificate_idx].save()
             current_certificate_idx += 1
