@@ -266,7 +266,7 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(str(charge_points[0].installation_date), "2022-05-10")
         self.assertEqual(charge_points[0].mid_id, "")
         self.assertEqual(charge_points[0].measure_date, None)
-        self.assertEqual(charge_points[0].measure_energy, None)
+        self.assertEqual(charge_points[0].measure_energy, 0)
         self.assertEqual(charge_points[0].is_article_2, True)
         self.assertEqual(charge_points[0].measure_reference_point_id, "1234561")
         self.assertEqual(charge_points[0].cpo, self.cpo)
