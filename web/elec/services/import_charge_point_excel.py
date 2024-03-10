@@ -49,10 +49,11 @@ class ExcelChargePoints:
 
         charge_point_data = charge_point_data.drop(charge_point_data.index[:11])
         charge_point_data = charge_point_data.dropna(how="all")  # remove completely empty rows
+        charge_point_data.rename(columns={charge_point_data.columns[i]: column for i, column in enumerate(ExcelChargePoints.EXCEL_COLUMNS)}, inplace=True)  # fmt: skip
+        charge_point_data["measure_energy"] = charge_point_data["measure_energy"].fillna(0)
         charge_point_data = charge_point_data.fillna("")
         charge_point_data["line"] = charge_point_data.index + 2  # add a line number to locate data in the excel file
         charge_point_data["is_in_application"] = True
-        charge_point_data.rename(columns={charge_point_data.columns[i]: column for i, column in enumerate(ExcelChargePoints.EXCEL_COLUMNS)}, inplace=True)  # fmt: skip
         charge_point_data = charge_point_data.reset_index(drop=True)
 
         if len(charge_point_data) >= 18:
@@ -110,8 +111,8 @@ class ExcelChargePointValidator(Validator):
                     self.add_error("measure_reference_point_id", "L'identifiant du point de mesure est obligatoire pour les stations ayant au moins un point de recharge en courant continu.")  # fmt:skip
             else:
                 if not charge_point.get("mid_id"):
-                    self.add_error("mid_id", "Le numéro MID est obligatoire.")  # fmt:skip
+                    self.add_error("mid_id", "Le numéro MID est obligatoire.")
                 if not charge_point.get("measure_date"):
-                    self.add_error("measure_date", "La date du dernier relevé est obligatoire.")  # fmt:skip
+                    self.add_error("measure_date", "La date du dernier relevé est obligatoire.")
                 if not isinstance(charge_point.get("measure_energy"), float):
                     self.add_error("measure_energy", "L'énergie mesurée lors du dernier relevé est obligatoire.")  # fmt:skip
