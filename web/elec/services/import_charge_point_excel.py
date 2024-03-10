@@ -83,7 +83,7 @@ class ExcelChargePointValidator(Validator):
     charge_point_id = forms.CharField(max_length=64)
     installation_date = forms.DateField(input_formats=Validator.DATE_FORMATS)
     mid_id = forms.CharField(required=False, max_length=128)
-    measure_date = forms.DateField(input_formats=Validator.DATE_FORMATS, required=False)
+    measure_date = forms.DateField(required=False, input_formats=Validator.DATE_FORMATS)
     measure_energy = forms.FloatField(required=False, min_value=0)
     measure_reference_point_id = forms.CharField(required=False, max_length=64)
 
