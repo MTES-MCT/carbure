@@ -26,7 +26,7 @@ class ElecChargePoint(models.Model):
     measure_date = models.DateField(null=True, blank=True)
     measure_energy = models.FloatField(null=True, blank=True)
     is_article_2 = models.BooleanField(default=False)
-    measure_reference_point_id = models.CharField(max_length=64)
+    measure_reference_point_id = models.CharField(max_length=64, null=True, blank=True)
 
     # transport.data.gouv.fr data
     station_name = models.CharField(max_length=128)
