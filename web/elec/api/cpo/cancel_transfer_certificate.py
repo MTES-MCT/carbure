@@ -63,9 +63,9 @@ def cancel_transfer_certificate(request, *args, **kwargs):
             remaining_transfer_energy = energy_required - energy_filled
             # Le certificat n'a pas assez de place
             if curr_missing_energy < remaining_transfer_energy:
-                available_provision_certificates[
-                    current_certificate_idx
-                ].remaining_energy_amount = available_provision_certificates[current_certificate_idx].energy_amount
+                available_provision_certificates[current_certificate_idx].remaining_energy_amount = (
+                    available_provision_certificates[current_certificate_idx].energy_amount
+                )
                 energy_filled += curr_missing_energy
             # Le certificat a assez de place
             else:
@@ -73,6 +73,9 @@ def cancel_transfer_certificate(request, *args, **kwargs):
                     current_certificate_idx
                 ].remaining_energy_amount += remaining_transfer_energy
                 energy_filled = energy_required
+            available_provision_certificates[current_certificate_idx].remaining_energy_amount = round(
+                available_provision_certificates[current_certificate_idx], 3
+            )
             available_provision_certificates[current_certificate_idx].save()
             current_certificate_idx += 1
 
