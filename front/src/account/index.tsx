@@ -3,6 +3,8 @@ import { Main } from "common/components/scaffold"
 import { AccountAccesRights } from "./components/access-rights"
 import { AccountAuthentication } from "./components/authentication"
 import useTitle from "common/hooks/title"
+import { CompanyRegistrationDialog } from "companies/components/registration-dialog"
+import { Route, Routes } from "react-router-dom"
 
 const Account = () => {
   const { t } = useTranslation()
@@ -23,6 +25,15 @@ const Account = () => {
       <section>
         <AccountAuthentication />
       </section>
+
+      {/* <Routes>
+        <Route
+          path="company-registration"
+          element={
+            <CompanyRegistrationDialog />
+          }
+        />
+      </Routes> */}
     </Main>
   )
 }
