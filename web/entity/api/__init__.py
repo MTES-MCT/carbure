@@ -4,6 +4,7 @@ from .update_info import update_entity_info
 from .stats import get_entity_stats
 
 urlpatterns = [
+    path("admin/", include("entity.api.admin")),
     path("depots/", include("entity.api.depots")),
     path("production-sites/", include("entity.api.production_sites")),
     path("users/", include("entity.api.users")),

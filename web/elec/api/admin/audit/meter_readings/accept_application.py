@@ -13,7 +13,6 @@ from elec.models.elec_charge_point_application import ElecChargePointApplication
 from elec.models.elec_meter_reading import ElecMeterReading
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from elec.models.elec_provision_certificate import ElecProvisionCertificate
-from entity.api import certificates
 
 
 class AcceptApplicationForm(forms.Form):
