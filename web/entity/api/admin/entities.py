@@ -120,5 +120,4 @@ def get_entities(request, entity: Entity):
                 "meter_readings_pending": e.meter_readings_pending,
             }
         )
-
     return SuccessResponse(entities_data)
