@@ -54,19 +54,28 @@ class TransportDataGouv:
     ]
 
     @staticmethod
-    def merge_charge_point_data(charge_point_data: pd.DataFrame):
+    def merge_charge_point_data(charge_point_data: pd.DataFrame, chunksize=1000):
         file_path = TransportDataGouv.download_csv()
-        transport_data = TransportDataGouv.read_transport_data(file_path)
 
         # list the different charge point ids from the application
         wanted_ids = charge_point_data["charge_point_id"].unique().tolist()
 
-        # find all the stations of all the individual charge points of the application
-        wanted_charge_points = transport_data[transport_data["charge_point_id"].isin(wanted_ids)]
-        wanted_stations = wanted_charge_points["station_id"].unique()
+        # find all the different stations for the application's charge points
+        wanted_stations = set()
+        for chunk in TransportDataGouv.read_transport_data_chunks(file_path, chunksize):
+            wanted_chunk = chunk[chunk["id_pdc_itinerance"].isin(wanted_ids)]
+            wanted_stations.update(wanted_chunk["id_station_itinerance"].unique())
 
-        # find all the charge points of these stations, including those that were not defined in the application
-        transport_data = transport_data[transport_data["station_id"].isin(wanted_stations)]
+        # find all the charge points for all these stations
+        transport_data = pd.DataFrame(columns=TransportDataGouv.CSV_COLUMNS)
+        for chunk in TransportDataGouv.read_transport_data_chunks(file_path, chunksize):
+            station_charge_points = chunk[chunk["id_station_itinerance"].isin(wanted_stations)]
+            transport_data = pd.concat([transport_data, station_charge_points], ignore_index=True)
+
+        transport_data = transport_data.rename(columns=TransportDataGouv.CSV_COLUMNS_ALIAS)
+        transport_data = transport_data.sort_values("date_maj", ascending=False)
+        transport_data = transport_data.drop_duplicates("charge_point_id")
+        transport_data = transport_data.fillna("")
 
         # mark the charge points as coming from TDG
         transport_data["is_in_tdg"] = True
@@ -96,7 +105,7 @@ class TransportDataGouv:
         return file_path
 
     @staticmethod
-    def read_transport_data(file_path: str) -> Iterable[pd.DataFrame]:
+    def read_transport_data_chunks(file_path: str, chunksize=1000) -> Iterable[pd.DataFrame]:
         transport_data = pd.read_csv(
             file_path,
             sep=",",
@@ -108,12 +117,8 @@ class TransportDataGouv:
             engine="python",
             dtype={"prise_type_combo_ccs": "str", "prise_type_chademo": "str", "siren_amenageur": "str"},
             skip_blank_lines=True,
+            chunksize=chunksize,
         )
-
-        transport_data = transport_data.rename(columns=TransportDataGouv.CSV_COLUMNS_ALIAS)
-        transport_data = transport_data.sort_values("date_maj", ascending=False)
-        transport_data = transport_data.drop_duplicates("charge_point_id")
-        transport_data = transport_data.fillna("")
 
         return transport_data
 
