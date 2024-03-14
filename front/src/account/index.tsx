@@ -17,7 +17,14 @@ const Account = () => {
           <Trans>Mon compte</Trans>
         </h1>
       </header>
-
+      <Routes>
+        <Route
+          path="company-registration"
+          element={
+            <CompanyRegistrationDialog />
+          }
+        />
+      </Routes>
       <section>
         <AccountAccesRights />
       </section>
@@ -26,14 +33,7 @@ const Account = () => {
         <AccountAuthentication />
       </section>
 
-      {/* <Routes>
-        <Route
-          path="company-registration"
-          element={
-            <CompanyRegistrationDialog />
-          }
-        />
-      </Routes> */}
+
     </Main>
   )
 }
