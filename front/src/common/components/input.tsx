@@ -180,8 +180,9 @@ export const FileInputField = ({
 
     for (var i = 0; i < files.length; i++) {
       if (files[i].size > 5000000) {
+        console.log('files[i]:', files[i])
         const message = t(
-          "La taille des fichiers selectionnés est trop importante pour être analysée (5mo maximum)."
+          "La taille du fichier \"{{fileName}}\" est trop importante pour être analysée (5mo maximum).", { fileName: files[i].name }
         )
         inputRef.current.setCustomValidity(message)
         inputRef.current.reportValidity()
