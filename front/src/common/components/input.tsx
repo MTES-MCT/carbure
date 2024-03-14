@@ -170,6 +170,27 @@ export const FileInputField = ({
   onChange,
   ...props
 }: FileInputFieldProps) => {
+  const { t } = useTranslation()
+  const inputRef = useRef<HTMLInputElement>(null)
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!inputRef.current) return
+    var files = e.target.files;
+
+    if (files === null) return
+
+    for (var i = 0; i < files.length; i++) {
+      if (files[i].size > 5000000) {
+        const message = t(
+          "La taille des fichiers selectionnés est trop importante pour être analysée (5mo maximum)."
+        )
+        inputRef.current.setCustomValidity(message)
+        inputRef.current.reportValidity()
+        return
+      }
+    }
+
+    return onChange ? onChange(e) : undefined
+  }
 
   return <Field
     {...props}
@@ -178,6 +199,7 @@ export const FileInputField = ({
   >
     <label className={css.file}>
       <input
+        ref={inputRef}
         autoFocus={props.autoFocus}
         disabled={props.disabled}
         readOnly={props.readOnly}
@@ -186,7 +208,7 @@ export const FileInputField = ({
         name={props.name}
         style={{ opacity: 0, position: "absolute" }}
         type="file"
-        onChange={onChange ? (e) => onChange(e) : undefined}
+        onChange={handleChange}
       />
       {placeholder}
     </label>
