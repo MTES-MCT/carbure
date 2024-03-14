@@ -25,7 +25,7 @@ const DoubleCountingFilesCheckerDialog = ({
   const entity = useEntity()
 
   const { value, bind } = useForm({
-    doubleCountingFiles: undefined as FileList | undefined | null,
+    doubleCountingFiles: undefined as FileList | undefined,
   })
 
   const uploadFiles = useMutation(api.checkDoubleCountingFiles, {

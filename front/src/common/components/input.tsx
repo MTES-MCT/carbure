@@ -83,10 +83,10 @@ export const NumberInput = ({
       !onChange
         ? undefined
         : (e) => {
-            const value = parseFloat(e.target.value)
-            const change = isNaN(value) ? undefined : value
-            onChange(change)
-          }
+          const value = parseFloat(e.target.value)
+          const change = isNaN(value) ? undefined : value
+          onChange(change)
+        }
     }
   />
 )
@@ -112,8 +112,8 @@ export const DateInput = ({
 )
 
 export interface FileListInputProps extends Control {
-  value?: FileList | null
-  onChange?: (value: FileList | undefined | null) => void
+  value?: FileList
+  onChange?: (value: FileList | undefined) => void
 }
 
 export const FileListInput = ({
@@ -139,7 +139,7 @@ export const FileListInput = ({
         name={props.name}
         style={{ opacity: 0, position: "absolute" }}
         type="file"
-        onChange={onChange ? (e) => onChange(e.target.files) : undefined}
+        onChange={onChange ? (e) => onChange(e.target.files ?? undefined) : undefined}
       />
       {value?.[0]?.name ?? placeholder}
     </label>
