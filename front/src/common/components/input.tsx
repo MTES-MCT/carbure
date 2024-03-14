@@ -124,26 +124,14 @@ export const FileListInput = ({
   onChange,
   ...props
 }: FileListInputProps) => (
-  <Field
+
+  <FileInputField
+    value={value}
+    onChange={onChange ? (e) => onChange(e?.target.files ?? undefined) : undefined}
+    multiple={true}
+    placeholder={value?.[0]?.name ?? placeholder}
     {...props}
-    type="file"
-    onClear={clear && value && onChange ? () => onChange(undefined) : undefined}
-  >
-    <label className={css.file}>
-      <input
-        autoFocus={autoFocus}
-        disabled={props.disabled}
-        readOnly={props.readOnly}
-        required={props.required}
-        multiple
-        name={props.name}
-        style={{ opacity: 0, position: "absolute" }}
-        type="file"
-        onChange={onChange ? (e) => onChange(e.target.files ?? undefined) : undefined}
-      />
-      {value?.[0]?.name ?? placeholder}
-    </label>
-  </Field>
+  />
 )
 
 export interface FileInputProps extends Control {
@@ -158,27 +146,52 @@ export const FileInput = ({
   autoFocus,
   onChange,
   ...props
-}: FileInputProps) => (
-  <Field
+}: FileInputProps) => {
+  return <FileInputField
+    value={value}
+    onChange={(e) => onChange ? onChange(e?.target.files?.[0]) : undefined}
+    multiple={false}
+    placeholder={value?.name ?? placeholder}
+    {...props}
+  />
+}
+
+
+export interface FileInputFieldProps extends Control {
+  value?: File | FileList | undefined
+  onChange?: (e?: React.ChangeEvent<HTMLInputElement>) => void
+  multiple?: boolean
+}
+export const FileInputField = ({
+  clear,
+  placeholder = i18next.t("Selectionner un fichier"),
+  value,
+  multiple = false,
+  onChange,
+  ...props
+}: FileInputFieldProps) => {
+
+  return <Field
     {...props}
     type="file"
     onClear={clear && value && onChange ? () => onChange(undefined) : undefined}
   >
     <label className={css.file}>
       <input
-        autoFocus={autoFocus}
+        autoFocus={props.autoFocus}
         disabled={props.disabled}
         readOnly={props.readOnly}
         required={props.required}
+        multiple={multiple}
         name={props.name}
         style={{ opacity: 0, position: "absolute" }}
         type="file"
-        onChange={onChange ? (e) => onChange(e.target.files?.[0]) : undefined}
+        onChange={onChange ? (e) => onChange(e) : undefined}
       />
-      {value?.name ?? placeholder}
+      {placeholder}
     </label>
   </Field>
-)
+}
 
 export interface FileAreaProps {
   className?: string
