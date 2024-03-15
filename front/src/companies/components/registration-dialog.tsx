@@ -12,44 +12,21 @@ import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "companies/api"
 import { useQuery } from "common/hooks/async"
 import React, { useRef } from "react"
+import { Normalizer } from "common/utils/normalize"
+import { CompanyResult } from "companies/types"
+import { searchCompanyResult } from "companies/__test__/data"
 
 export const CompanyRegistrationDialog = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
-  const entity = useEntity()
-  const searchSirentRef = useRef<HTMLElement>(null)
-  const [sirenQuety, setSirenQuery] = React.useState<string>("")
   const closeDialog = () => {
     navigate({ search: location.search, hash: "#" })
   }
 
-
-
-  const findCompanyBySiren = (siren: string | undefined) => {
-    siren = siren?.trim() || ""
-    setSirenQuery(siren)
-
-    const sirenInput = searchSirentRef.current?.querySelector('input')
-    if (!sirenInput || siren.length < 3) return
-
-    if (siren.match(/^\d{9}$/) === null) {
-      sirenInput.setCustomValidity("Le SIREN doit contenir 9 chiffres")
-      sirenInput.reportValidity()
-      return
-    }
-
-    sirenInput.setCustomValidity("")
-    sirenInput.reportValidity()
-
-    // https://recherche-entreprises.api.gouv.fr/search?q=damien%20romito
-    // #api
-    api.searchCompanyData(siren).then((result) => {
-      console.log('result:', result)
-    })
-
+  const fillFormWithfoundCompany = (company: CompanyResult) => {
+    console.log('company:', company)
   }
-
 
   return (
     <Portal onClose={closeDialog}>
@@ -66,15 +43,7 @@ export const CompanyRegistrationDialog = () => {
             </p>
           </section>
           <section>
-            <TextInput
-              required
-              autoFocus
-              value={sirenQuety}
-              label={t("SIREN de votre entreprise ")}
-              onChange={findCompanyBySiren}
-              domRef={searchSirentRef}
-              name="siren"
-            />
+            <SirenPicker onSelect={fillFormWithfoundCompany} />
           </section>
           <section>
             {/* #form */}
@@ -92,4 +61,80 @@ export const CompanyRegistrationDialog = () => {
       </Dialog>
     </Portal >
   )
+}
+
+interface SirenPickerProps {
+  onSelect?: (company: CompanyResult) => void
+}
+const SirenPicker = ({
+  onSelect
+}: SirenPickerProps) => {
+  const { t } = useTranslation()
+  const searchSirentRef = useRef<HTMLInputElement>(null)
+  const [sirenQuery, setSirenQuery] = React.useState<CompanyResult | string | undefined>("")
+  const [searchCompanyResult, setSearchCompanyResult] = React.useState<CompanyResult[]>([])
+
+  const findCompanyOnQuery = (siren: string) => {
+
+    setSirenQuery(siren)
+
+  }
+  console.log('siren:', sirenQuery)
+
+  const checkSirenFormat = (siren: string) => {
+    siren = siren?.trim() || ""
+
+    const sirenInput = searchSirentRef.current
+    console.log('sirenInput:', sirenInput)
+    if (!sirenInput || siren.length < 3) return false
+
+    if (siren.match(/^\d{9}$/) === null) {
+      sirenInput.setCustomValidity("Le SIREN doit contenir 9 chiffres")
+      sirenInput.reportValidity()
+      return false
+    }
+    sirenInput.setCustomValidity("")
+    sirenInput.reportValidity()
+    return true
+  }
+  const getCompanies = async (siren: string) => {
+
+    if (!checkSirenFormat(siren)) return new Promise<CompanyResult[]>((resolve) => {
+      resolve([])
+    })
+
+    // https://recherche-entreprises.api.gouv.fr/search?q=damien%20romito
+    // #api
+    const companies = await api.searchCompanyData(siren)
+    setSearchCompanyResult(companies)
+    return companies
+    // return new Promise<CompanyResult[]>((resolve) => {
+    //   resolve(searchCompanyResult)
+    // })
+
+  }
+
+  const normalizeCompanyResult: Normalizer<CompanyResult, string> = (result: CompanyResult) => ({
+    value: result?.siren,
+    label: `${result?.nom_complet} (${result?.siren})`,
+  })
+
+  const selectCompany = (siren: string | undefined | CompanyResult) => {
+    const company = searchCompanyResult.find((c) => c.siren === siren)
+    console.log('company:', company)
+  }
+
+  return <section>
+
+    <Autocomplete
+      autoFocus
+      value={sirenQuery}
+      label={t("SIREN de votre entreprise :")}
+      normalize={normalizeCompanyResult}
+      onSelect={selectCompany}
+      // onQuery={findCompanyOnQuery}
+      getOptions={getCompanies}
+      inputRef={searchSirentRef}
+    />
+  </section>
 }
