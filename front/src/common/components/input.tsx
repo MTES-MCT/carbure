@@ -83,10 +83,10 @@ export const NumberInput = ({
       !onChange
         ? undefined
         : (e) => {
-            const value = parseFloat(e.target.value)
-            const change = isNaN(value) ? undefined : value
-            onChange(change)
-          }
+          const value = parseFloat(e.target.value)
+          const change = isNaN(value) ? undefined : value
+          onChange(change)
+        }
     }
   />
 )
