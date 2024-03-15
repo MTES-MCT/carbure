@@ -16,9 +16,11 @@ export interface AutocompleteProps<T, V = T> extends Control, Trigger {
   value?: V | undefined
   options?: T[]
   defaultOptions?: T[]
+  inputRef?: React.RefObject<HTMLInputElement>
   getOptions?: (query: string) => Promise<T[]>
   onChange?: (value: V | undefined) => void
   onQuery?: (query: string) => void
+  onSelect?: (value: V | undefined) => void
   create?: (value: string) => V
   normalize?: Normalizer<T, V>
   children?: Renderer<T, V>
@@ -30,9 +32,11 @@ function Autocomplete<T, V>({
   value,
   options,
   defaultOptions,
+  inputRef,
   getOptions,
   onChange,
   onQuery,
+  onSelect,
   create,
   anchor,
   normalize = defaultNormalizer,
@@ -60,6 +64,7 @@ function Autocomplete<T, V>({
         placeholder={props.readOnly ? undefined : props.placeholder}
         autoComplete={false}
         loading={loading || autocomplete.loading}
+        inputRef={inputRef}
         domRef={triggerRef}
         value={autocomplete.query}
         onChange={autocomplete.onQuery}
@@ -80,7 +85,10 @@ function Autocomplete<T, V>({
             children={children}
             normalize={normalize}
             onFocus={onChange}
-            onSelectValue={autocomplete.onSelect}
+            onSelectValue={(key: V | undefined) => {
+              autocomplete.onSelect(key)
+              onSelect && onSelect(key)
+            }}
             sort={sort}
           />
         </Dropdown>
