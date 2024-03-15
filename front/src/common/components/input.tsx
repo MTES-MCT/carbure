@@ -1,19 +1,19 @@
+import cl from "clsx"
+import i18next from "i18next"
 import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
-import cl from "clsx"
 import Button from "./button"
+import { isInside } from "./dropdown"
 import {
   AlertTriangle,
   Cross,
-  Loader,
-  Search,
-  Placeholder,
   InfoCircle,
+  Loader,
+  Placeholder,
+  Search,
 } from "./icons"
-import { Col, layout, Layout, Overlay } from "./scaffold"
-import { isInside } from "./dropdown"
 import css from "./input.module.css"
-import i18next from "i18next"
+import { Col, Layout, Overlay, layout } from "./scaffold"
 import Tooltip from "./tooltip"
 
 export type FieldVariant = "outline" | "solid" | "inline" | "text"
@@ -44,17 +44,21 @@ export interface TextInputProps extends Control {
   value?: string | undefined
   autoComplete?: boolean
   onChange?: (value: string | undefined) => void
+  inputRef?: React.RefObject<HTMLInputElement>
+
 }
 
 export const TextInput = ({
   clear,
   value,
   onChange,
+  inputRef,
   ...props
 }: TextInputProps) => (
   <Input
     {...props}
     value={value ?? ""}
+    inputRef={inputRef}
     onChange={onChange ? (e) => onChange(e.target.value) : undefined}
     onClear={clear && value && onChange ? () => onChange(undefined) : undefined}
   />
@@ -281,37 +285,40 @@ export interface InputProps extends Control {
   value: string | number | undefined
   onChange?: React.ChangeEventHandler<HTMLInputElement>
   onClear?: () => void
+  inputRef?: React.RefObject<HTMLInputElement>
 }
 
 export const Input = ({
-  name,
-  placeholder,
-  min,
-  max,
-  step,
-  value,
   autoComplete,
   autoFocus,
+  inputRef,
+  max,
+  min,
+  name,
   onChange,
   onClear,
+  placeholder,
+  step,
+  value,
   ...props
 }: InputProps) => (
   <Field {...props} onClear={onClear}>
     <input
-      title={`${value}`}
-      disabled={props.disabled}
-      readOnly={props.readOnly}
-      required={props.required}
-      autoFocus={autoFocus}
       autoComplete={!autoComplete ? "off" : undefined}
-      type={props.type}
-      name={name}
-      placeholder={placeholder}
-      min={min}
+      autoFocus={autoFocus}
+      disabled={props.disabled}
       max={max}
-      step={step}
-      value={value}
+      min={min}
+      name={name}
       onChange={onChange}
+      placeholder={placeholder}
+      readOnly={props.readOnly}
+      ref={inputRef}
+      required={props.required}
+      step={step}
+      title={`${value}`}
+      type={props.type}
+      value={value}
     />
   </Field>
 )
