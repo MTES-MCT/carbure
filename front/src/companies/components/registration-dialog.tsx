@@ -15,18 +15,32 @@ import React, { useRef } from "react"
 import { Normalizer } from "common/utils/normalize"
 import { CompanyResult } from "companies/types"
 import { searchCompanyResult } from "companies/__test__/data"
+import { set } from "date-fns"
+import { SirenPicker } from "./siren-picker"
+import { useForm } from "common/components/form"
+import CompanyForm, { CompanyFormValue, useCompanyForm } from "./company-form"
 
 export const CompanyRegistrationDialog = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
+  const entity = useEntity()
+  const { value, bind } = useForm({
+    siret: "" as string | undefined,
+
+  })
   const closeDialog = () => {
-    navigate({ search: location.search, hash: "#" })
+    navigate("/account/")
   }
 
   const fillFormWithfoundCompany = (company: CompanyResult) => {
-    console.log('company:', company)
+    console.log('>>company:', company)
   }
+
+  const onSubmitForm = (ormEntity: CompanyFormValue | undefined) => {
+  }
+
+  const form = useCompanyForm(entity)
 
   return (
     <Portal onClose={closeDialog}>
@@ -46,7 +60,8 @@ export const CompanyRegistrationDialog = () => {
             <SirenPicker onSelect={fillFormWithfoundCompany} />
           </section>
           <section>
-            {/* #form */}
+            <CompanyForm form={form} entity={entity} onSubmitForm={onSubmitForm} />
+
           </section>
 
         </main>
@@ -61,80 +76,4 @@ export const CompanyRegistrationDialog = () => {
       </Dialog>
     </Portal >
   )
-}
-
-interface SirenPickerProps {
-  onSelect?: (company: CompanyResult) => void
-}
-const SirenPicker = ({
-  onSelect
-}: SirenPickerProps) => {
-  const { t } = useTranslation()
-  const searchSirentRef = useRef<HTMLInputElement>(null)
-  const [sirenQuery, setSirenQuery] = React.useState<CompanyResult | string | undefined>("")
-  const [searchCompanyResult, setSearchCompanyResult] = React.useState<CompanyResult[]>([])
-
-  const findCompanyOnQuery = (siren: string) => {
-
-    setSirenQuery(siren)
-
-  }
-  console.log('siren:', sirenQuery)
-
-  const checkSirenFormat = (siren: string) => {
-    siren = siren?.trim() || ""
-
-    const sirenInput = searchSirentRef.current
-    console.log('sirenInput:', sirenInput)
-    if (!sirenInput || siren.length < 3) return false
-
-    if (siren.match(/^\d{9}$/) === null) {
-      sirenInput.setCustomValidity("Le SIREN doit contenir 9 chiffres")
-      sirenInput.reportValidity()
-      return false
-    }
-    sirenInput.setCustomValidity("")
-    sirenInput.reportValidity()
-    return true
-  }
-  const getCompanies = async (siren: string) => {
-
-    if (!checkSirenFormat(siren)) return new Promise<CompanyResult[]>((resolve) => {
-      resolve([])
-    })
-
-    // https://recherche-entreprises.api.gouv.fr/search?q=damien%20romito
-    // #api
-    const companies = await api.searchCompanyData(siren)
-    setSearchCompanyResult(companies)
-    return companies
-    // return new Promise<CompanyResult[]>((resolve) => {
-    //   resolve(searchCompanyResult)
-    // })
-
-  }
-
-  const normalizeCompanyResult: Normalizer<CompanyResult, string> = (result: CompanyResult) => ({
-    value: result?.siren,
-    label: `${result?.nom_complet} (${result?.siren})`,
-  })
-
-  const selectCompany = (siren: string | undefined | CompanyResult) => {
-    const company = searchCompanyResult.find((c) => c.siren === siren)
-    console.log('company:', company)
-  }
-
-  return <section>
-
-    <Autocomplete
-      autoFocus
-      value={sirenQuery}
-      label={t("SIREN de votre entreprise :")}
-      normalize={normalizeCompanyResult}
-      onSelect={selectCompany}
-      // onQuery={findCompanyOnQuery}
-      getOptions={getCompanies}
-      inputRef={searchSirentRef}
-    />
-  </section>
 }
