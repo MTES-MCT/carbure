@@ -177,7 +177,7 @@ const Navigation = ({ entity }: NavigationProps) => {
                 label: t("Double comptage"),
               },
 
-              !(isAirline && !entity.hasRights(UserRole.Admin)) && {
+              entity.hasRights(UserRole.Admin, UserRole.ReadWrite) && {
                 key: "settings",
                 path: "settings",
                 label: t("Société"),
