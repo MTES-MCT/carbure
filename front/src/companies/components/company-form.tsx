@@ -19,7 +19,7 @@ export interface CompanyFormValue {
   registered_city: string | undefined
   registered_zipcode: string | undefined
   registered_country: string | undefined
-  description: string | undefined
+  activity_description: string | undefined
   certificate: Certificate | undefined
   entity_type: EntityType | undefined
 }
@@ -145,7 +145,7 @@ const CompanyForm = ({
       <TextArea
         readOnly={readOnly}
         label={t("Description de l'activité")}
-        {...form.bind("description")}
+        {...form.bind("activity_description")}
       />
     </Form>
   </>
@@ -154,7 +154,7 @@ const CompanyForm = ({
 export const useCompanyForm = (entity: Entity) => {
   return useForm({
     certificate: undefined as Certificate | undefined,
-    description: entity.description as string | undefined,
+    activity_description: entity.activity_description as string | undefined,
     entity_type: entity.entity_type as EntityType | undefined,
     legal_name: entity.legal_name as string | undefined,
     registered_address: entity.registered_address as string | undefined,
@@ -165,6 +165,7 @@ export const useCompanyForm = (entity: Entity) => {
     sustainability_officer_email: entity.sustainability_officer_email as string | undefined,
     sustainability_officer_phone_number: entity.sustainability_officer_phone_number as string | undefined,
     sustainability_officer: entity.sustainability_officer as string | undefined,
+
   })
 
 }
