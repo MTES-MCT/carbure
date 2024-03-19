@@ -9,7 +9,7 @@ import { TextInput } from "common/components/input"
 import Button from "common/components/button"
 import { Save } from "common/components/icons"
 import { useEffect } from "react"
-import CompanyForm, { CompanyFormValue, useCompanyForm } from "companies/components/company-form"
+import CompanyForm, { CompanyFormValue, CreateCompanyFormValue, useCompanyForm } from "companies/components/company-form"
 
 type CompanyInfoProps = {
   company?: Entity
@@ -29,18 +29,20 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
 
   const canSave = hasChange(entity, form.value)
 
-  const onSubmitForm = (formValue: CompanyFormValue | undefined) => {
+  const onSubmitForm = (formValue: CompanyFormValue | CreateCompanyFormValue | undefined) => {
     if (formValue && canSave) {
       updateEntity.execute(
         entity.id,
+        formValue.description!,
         formValue.legal_name!,
-        formValue.registration_id!,
         formValue.registered_address!,
-        formValue.registered_zipcode!,
         formValue.registered_city!,
         formValue.registered_country!,
+        formValue.registered_zipcode!,
+        formValue.registration_id!,
+        formValue.sustainability_officer_email!,
+        formValue.sustainability_officer_phone_number!,
         formValue.sustainability_officer!,
-        formValue.sustainability_officer_phone_number!
       )
     }
   }
@@ -87,7 +89,7 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
 export default CompanyInfo
 
 
-function hasChange(entity: CompanyFormValue, formEntity: CompanyFormValue) {
+function hasChange(entity: Entity, formEntity: CompanyFormValue) {
 
   return (
     entity.legal_name !== formEntity.legal_name ||
@@ -98,7 +100,10 @@ function hasChange(entity: CompanyFormValue, formEntity: CompanyFormValue) {
     entity.registered_address !== formEntity.registered_address ||
     entity.registered_city !== formEntity.registered_city ||
     entity.registered_zipcode !== formEntity.registered_zipcode ||
-    entity.registered_country !== formEntity.registered_country
+    entity.registered_country !== formEntity.registered_country ||
+    undefined !== formEntity.certificate ||
+    entity.entity_type !== formEntity.entity_type ||
+    entity.description !== formEntity.description
   )
 }
 

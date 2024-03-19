@@ -391,7 +391,7 @@ const CertificateUpdateDialog = ({
         <section>
           <Form id="replace-certificate">
             <Autocomplete
-              autoFocus={true}
+              autoFocus
               label={t("Rechercher un certificat")}
               value={certificate}
               onChange={setCertificate}
