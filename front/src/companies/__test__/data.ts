@@ -1,7 +1,7 @@
 import { CompanyResult } from "companies/types"
 
 
-const companyResult1: CompanyResult = {
+export const companyResult: CompanyResult = {
   siren: "75346126",
   nom_complet: "Company Test",
   siege: {
@@ -10,14 +10,4 @@ const companyResult1: CompanyResult = {
   }
 }
 
-const companyResult2: CompanyResult = {
-  siren: "75343456",
-  nom_complet: "Company Test 2",
-  siege: {
-    adresse: "1 rue du rhin",
-    code_postal: "75002"
-  }
-}
-
-export const searchCompanyResult: CompanyResult[] = [companyResult1, companyResult2]
 
