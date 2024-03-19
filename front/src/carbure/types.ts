@@ -20,7 +20,7 @@ export interface Entity {
   ext_admin_pages?: ExternalAdminPages[]
   has_saf?: boolean
   has_elec: boolean
-  description?: string
+  activity_description?: string
 }
 
 export interface EntityPreview {
