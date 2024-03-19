@@ -11,7 +11,7 @@ import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "companies/api"
 import { useQuery } from "common/hooks/async"
-import React, { useRef } from "react"
+import React, { useRef, useState } from "react"
 import { Normalizer } from "common/utils/normalize"
 import { CompanyResult } from "companies/types"
 import { searchCompanyResult } from "companies/__test__/data"
@@ -25,6 +25,7 @@ export const CompanyRegistrationDialog = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const entity = useEntity()
+  const [displayForm, setDisplayForm] = useState<boolean>(false)
   const { value, bind } = useForm({
     siret: "" as string | undefined,
 
@@ -35,9 +36,11 @@ export const CompanyRegistrationDialog = () => {
 
   const fillFormWithfoundCompany = (company: CompanyResult) => {
     console.log('>>company:', company)
+    setDisplayForm(true)
   }
 
-  const onSubmitForm = (ormEntity: CompanyFormValue | undefined) => {
+  const onSubmitForm = (value: CompanyFormValue | undefined) => {
+    console.log('value:', value)
   }
 
   const form = useCompanyForm(entity)
@@ -57,11 +60,12 @@ export const CompanyRegistrationDialog = () => {
             </p>
           </section>
           <section>
-            <SirenPicker onSelect={fillFormWithfoundCompany} />
-          </section>
-          <section>
-            <CompanyForm form={form} entity={entity} onSubmitForm={onSubmitForm} />
-
+            {!displayForm &&
+              <SirenPicker onSelect={fillFormWithfoundCompany} />
+            }
+            {displayForm &&
+              <CompanyForm form={form} entity={entity} onSubmitForm={onSubmitForm} isNew />
+            }
           </section>
 
         </main>

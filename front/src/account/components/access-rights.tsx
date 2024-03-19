@@ -152,6 +152,7 @@ export const EntityDialog = ({ onClose }: EntityDialogProps) => {
   const { t } = useTranslation()
   const matomo = useMatomo()
   const notify = useNotify()
+  const navigate = useNavigate()
 
   const [entity, setEntity] = useState<Entity | undefined>(undefined)
   const [role, setRole] = useState<UserRole | undefined>(UserRole.ReadOnly)
@@ -163,6 +164,11 @@ export const EntityDialog = ({ onClose }: EntityDialogProps) => {
     onError: () =>
       notify(t("La société n'a pas pu être ajoutée !"), { variant: "danger" }),
   })
+
+  const showAddCompanyDialog = () => {
+    onClose()
+    navigate("/account/company-registration")
+  }
 
   return (
     <Dialog onClose={onClose}>
@@ -222,14 +228,15 @@ export const EntityDialog = ({ onClose }: EntityDialogProps) => {
           </Form>
         </section>
         <section>
-          <MailTo user="carbure" host="beta.gouv.fr"
+          <Button variant="link" label={t("Ma société n'est pas enregistrée sur CarbuRe.")} action={showAddCompanyDialog} />
+          {/* <MailTo user="carbure" host="beta.gouv.fr"
             subject={t("[CarbuRe - Société] Je souhaite ajouter une société")}
             body={t("Ajouter%20une%20soci%C3%A9t%C3%A9&body=Bonjour%2C%0D%0AJe%20souhaiterais%20ajouter%20la%20soci%C3%A9t%C3%A9%20suivante%0D%0A%0D%0A1%20-%20nom%20de%20la%20soci%C3%A9t%C3%A9%20%3A%0D%0A%0D%0A2%20-%20description%20de%20l'activit%C3%A9%20(obligatoire)%20%3A%0D%0A%0D%0A3%20-%20ci-joint%20%C3%A0%20l'email%20le%20certificat%20correspondant%20(obligatoire)%0D%0A%0D%0AMerci%20beaucoup%0D%0ABien%20cordialement")}
 
           >
             <Trans>Ma société n'est pas enregistrée sur CarbuRe.</Trans>
             <ExternalLink size={20} />
-          </MailTo>
+          </MailTo> */}
         </section>
       </main>
       <footer>
