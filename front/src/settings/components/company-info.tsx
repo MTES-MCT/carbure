@@ -33,7 +33,7 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
     if (formValue && canSave) {
       updateEntity.execute(
         entity.id,
-        formValue.description!,
+        formValue.activity_description!,
         formValue.legal_name!,
         formValue.registered_address!,
         formValue.registered_city!,
@@ -95,15 +95,15 @@ function hasChange(entity: Entity, formEntity: CompanyFormValue) {
     entity.legal_name !== formEntity.legal_name ||
     entity.registration_id !== formEntity.registration_id ||
     entity.sustainability_officer !== formEntity.sustainability_officer ||
-    entity.sustainability_officer_phone_number !==
-    formEntity.sustainability_officer_phone_number ||
+    entity.sustainability_officer_phone_number !== formEntity.sustainability_officer_phone_number ||
+    entity.sustainability_officer_email !== formEntity.sustainability_officer_email ||
     entity.registered_address !== formEntity.registered_address ||
     entity.registered_city !== formEntity.registered_city ||
     entity.registered_zipcode !== formEntity.registered_zipcode ||
     entity.registered_country !== formEntity.registered_country ||
     undefined !== formEntity.certificate ||
     entity.entity_type !== formEntity.entity_type ||
-    entity.description !== formEntity.description
+    entity.activity_description !== formEntity.activity_description
   )
 }
 

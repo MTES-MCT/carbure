@@ -26,10 +26,7 @@ export const CompanyRegistrationDialog = () => {
   const location = useLocation()
   const entity = useEntity()
   const [displayForm, setDisplayForm] = useState<boolean>(false)
-  const { value, bind } = useForm({
-    siret: "" as string | undefined,
 
-  })
   const closeDialog = () => {
     navigate("/account/")
   }

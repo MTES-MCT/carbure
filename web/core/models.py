@@ -50,6 +50,8 @@ class Entity(models.Model):
     legal_name = models.CharField(max_length=128, blank=True, default="")
     registration_id = models.CharField(max_length=64, blank=True, default="")
     sustainability_officer_phone_number = models.CharField(max_length=32, blank=True, default="")
+    sustainability_officer_email = models.CharField(max_length=254, blank=True, default="")
+
     sustainability_officer = models.CharField(max_length=256, blank=True, default="")
     registered_address = models.TextField(blank=True, default="")
     registered_zipcode = models.TextField(blank=True, default="")
@@ -60,6 +62,7 @@ class Entity(models.Model):
     notifications_enabled = models.BooleanField(default=False)
     preferred_unit = models.CharField(max_length=64, choices=(("l", "litres"), ("kg", "kg"), ("MJ", "MJ")), default="l")
     has_saf = models.BooleanField(default=False)
+    activity_description = models.TextField(blank=True, default="")
 
     def __str__(self):
         return self.name
@@ -77,6 +80,7 @@ class Entity(models.Model):
             "registration_id": self.registration_id,
             "sustainability_officer": self.sustainability_officer,
             "sustainability_officer_phone_number": self.sustainability_officer_phone_number,
+            "sustainability_officer_email": self.sustainability_officer_email,
             "registered_address": self.registered_address,
             "registered_zipcode": self.registered_zipcode,
             "registered_city": self.registered_city,
@@ -85,6 +89,7 @@ class Entity(models.Model):
             "preferred_unit": self.preferred_unit,
             "has_saf": self.has_saf,
             "has_elec": self.has_elec,
+            "activity_description": self.activity_description,
         }
         if self.entity_type == Entity.EXTERNAL_ADMIN:
             d["ext_admin_pages"] = [e.right for e in self.externaladminrights_set.all()]
