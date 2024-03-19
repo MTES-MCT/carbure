@@ -1,5 +1,6 @@
-import { Unit } from "carbure/types"
+import { EntityType, Unit } from "carbure/types"
 import { api } from "common/services/api"
+import { Certificate } from "crypto"
 
 export function toggleMAC(entity_id: number, shouldEnable: boolean) {
   const endpoint = "/entity/options/release-for-consumption"
@@ -30,27 +31,65 @@ export function toggleDirectDeliveries(
 
 export function updateEntity(
   entity_id: number,
+  description: string,
   legal_name: string,
-  registration_id: string,
   registered_address: string,
-  registered_zipcode: string,
   registered_city: string,
   registered_country: string,
-  sustainability_officer: string,
-  sustainability_officer_phone_number: string
+  registered_zipcode: string,
+  registration_id: string,
+  sustainability_officer_email: string,
+  sustainability_officer_phone_number: string,
+  sustainability_officer: string
 ) {
   return api.post("/entity/update-info", {
     entity_id,
+    description,
     legal_name,
-    registration_id,
     registered_address,
-    registered_zipcode,
     registered_city,
     registered_country,
-    sustainability_officer,
+    registered_zipcode,
+    registration_id,
+    sustainability_officer_email,
     sustainability_officer_phone_number,
+    sustainability_officer
   })
 }
+
+
+export function createEntity(
+  entity_id: number,
+  certificate: Certificate,
+  description: string,
+  entity_type: EntityType,
+  legal_name: string,
+  registered_address: string,
+  registered_city: string,
+  registered_country: string,
+  registered_zipcode: string,
+  registration_id: string,
+  sustainability_officer_email: string,
+  sustainability_officer_phone_number: string,
+  sustainability_officer: string
+) {
+  return api.post("/entity/update-info", {
+    entity_id,
+    certificate,
+    description,
+    entity_type,
+    legal_name,
+    registered_address,
+    registered_city,
+    registered_country,
+    registered_zipcode,
+    registration_id,
+    sustainability_officer_email,
+    sustainability_officer_phone_number,
+    sustainability_officer,
+  })
+}
+
 
 export function setEntityPreferredUnit(entity_id: number, unit: Unit) {
   return api.post("/entity/options/unit", { entity_id, unit })

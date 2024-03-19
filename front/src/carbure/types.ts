@@ -5,6 +5,7 @@ export interface Entity {
   legal_name: string
   registration_id: string
   sustainability_officer_phone_number: string
+  sustainability_officer_email?: string
   sustainability_officer: string
   registered_address: string
   registered_city: string
@@ -19,6 +20,7 @@ export interface Entity {
   ext_admin_pages?: ExternalAdminPages[]
   has_saf?: boolean
   has_elec: boolean
+  description?: string
 }
 
 export interface EntityPreview {
