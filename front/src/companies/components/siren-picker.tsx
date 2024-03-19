@@ -1,8 +1,12 @@
+import useEntity from "carbure/hooks/entity"
 import Autocomplete from "common/components/autocomplete"
+import { TextInput } from "common/components/input"
+import { useNotify, useNotifyError } from "common/components/notifications"
+import { useMutation } from "common/hooks/async"
 import { Normalizer } from "common/utils/normalize"
 import * as api from "companies/api"
 import { CompanyResult } from "companies/types"
-import React, { useRef } from "react"
+import React, { useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 
@@ -14,14 +18,26 @@ export const SirenPicker = ({
 }: SirenPickerProps) => {
   const { t } = useTranslation()
   const searchSirentRef = useRef<HTMLInputElement>(null)
-  const [sirenQuery, setSirenQuery] = React.useState<CompanyResult | string | undefined>("")
-  const [searchCompanyResult, setSearchCompanyResult] = React.useState<CompanyResult[]>([])
+  const [siren, setSiren] = useState<string | undefined>("")
+  const entity = useEntity()
+  const notify = useNotify()
+  const notifyError = useNotifyError()
+
+  const companyResponse = useMutation(api.getCompanyDataBySiren, {
+    onSuccess: (res) => {
+      console.log('res:', res)
+      notify(t("Les informations ont été remplis avec les données de l'api entreprise"), {
+        variant: "success",
+      })
+    },
+    onError: (err) => {
+      notifyError(err)
+    },
+  })
 
   const checkSirenFormat = (siren: string) => {
-    siren = siren?.trim() || ""
 
     const sirenInput = searchSirentRef.current
-    console.log('sirenInput:', sirenInput)
     if (!sirenInput || siren.length < 3) return false
 
     if (siren.match(/^\d{9}$/) === null) {
@@ -33,45 +49,27 @@ export const SirenPicker = ({
     sirenInput.reportValidity()
     return true
   }
-  const getCompanies = async (siren: string) => {
 
-    if (!checkSirenFormat(siren)) return new Promise<CompanyResult[]>((resolve) => {
-      resolve([])
-    })
-
-    // https://recherche-entreprises.api.gouv.fr/search?q=damien%20romito
-    // #api
-    const companies = await api.searchCompanyData(siren)
-    setSearchCompanyResult(companies)
-    return companies
-    // return new Promise<CompanyResult[]>((resolve) => {
-    //   resolve(searchCompanyResult)
-    // })
-
+  const typeSiren = async (siren: string | undefined) => {
+    siren = siren?.trim() || ""
+    setSiren(siren)
+    if (!checkSirenFormat(siren)) return
+    const response = await companyResponse.execute(entity.id, siren)
+    console.log('response:', response)
+    //   onSelect(company)
   }
 
-  const normalizeCompanyResult: Normalizer<CompanyResult, string> = (result: CompanyResult) => ({
-    value: result?.siren,
-    label: `${result?.nom_complet} (${result?.siren})`,
-  })
-
-  const selectCompany = (siren: string | undefined | CompanyResult) => {
-    const company = searchCompanyResult.find((c) => c.siren === siren)
-    if (!company) return
-    onSelect(company)
-  }
 
   return <section>
 
-    <Autocomplete
+    <TextInput
       autoFocus
-      // value={sirenQuery}
-      label={t("SIREN de votre entreprise :")}
-      normalize={normalizeCompanyResult}
-      onSelect={selectCompany}
-      // onQuery={findCompanyOnQuery}
-      getOptions={getCompanies}
+      value={siren}
+      type="siren"
+      label={t("SIREN de votre entreprise")}
+      onChange={typeSiren}
       inputRef={searchSirentRef}
     />
+
   </section>
 }
