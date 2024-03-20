@@ -13,7 +13,7 @@ import * as api from "companies/api"
 import { useQuery } from "common/hooks/async"
 import React, { useRef, useState } from "react"
 import { Normalizer } from "common/utils/normalize"
-import { CompanyResult } from "companies/types"
+import { SearchCompanyResult } from "companies/types"
 import { set } from "date-fns"
 import { SirenPicker } from "./siren-picker"
 import { useForm } from "common/components/form"
@@ -30,7 +30,7 @@ export const CompanyRegistrationDialog = () => {
     navigate("/account/")
   }
 
-  const fillFormWithfoundCompany = (company: CompanyResult) => {
+  const fillFormWithfoundCompany = (company: SearchCompanyResult) => {
     console.log('>>company:', company)
     setDisplayForm(true)
   }
