@@ -5,13 +5,13 @@ import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import { Normalizer } from "common/utils/normalize"
 import * as api from "companies/api"
-import { CompanyResult } from "companies/types"
+import { SearchCompanyResult } from "companies/types"
 import React, { useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 
 interface SirenPickerProps {
-  onSelect: (company: CompanyResult) => void
+  onSelect: (company: SearchCompanyResult) => void
 }
 export const SirenPicker = ({
   onSelect
