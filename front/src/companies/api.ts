@@ -1,9 +1,9 @@
 import api from "common/services/api"
-import { CompanyResult } from "./types"
+import { SearchCompanyResult } from "./types"
 
 // export async function searchCompanyData(siren: string) {
 //   console.log('searchsiren:', siren)
-//   const response = await api.get<{ results: CompanyResult[] }>("https://recherche-entreprises.api.gouv.fr/search", {
+//   const response = await api.get<{ results: SearchCompanyResult[] }>("https://recherche-entreprises.api.gouv.fr/search", {
 //     params: { q: siren },
 //   })
 
@@ -18,7 +18,7 @@ export function getCompanyDataBySiren(
   entity_id: number,
   siren: string
 ) {
-  return api.post<CompanyResult>("/entity/search-company", {
+  return api.post<SearchCompanyResult>("/entity/search-company", {
     entity_id,
     siren
   })
