@@ -18,7 +18,7 @@ class ElecChargePointApplicationSerializer(serializers.ModelSerializer):
         ]
 
     cpo = EntityPreviewSerializer()
-    application_date = serializers.DateTimeField(source="created_at")
+    application_date = serializers.DateField(source="created_at")
     station_count = serializers.SerializerMethodField()
     charge_point_count = serializers.SerializerMethodField()
     power_total = serializers.SerializerMethodField()
