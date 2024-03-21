@@ -51,9 +51,12 @@ const Carbure = () => {
 
               <Route path="/auth/*" element={<Auth />} />
 
-              {isAuth && <Route path="/pending" element={<Pending />} />}
-              {isAuth && <Route path="/account" element={<Account />} />}
-              {isAuth && <Route path="/org/:entity/*" element={<Org />} />}
+              {isAuth && <>
+                <Route path="/pending" element={<Pending />} />
+                <Route path="/account/*" element={<Account />} />
+                <Route path="/org/:entity/*" element={<Org />} />
+              </>
+              }
 
               {!user.loading && (
                 <Route path="*" element={<Navigate replace to="/" />} />
