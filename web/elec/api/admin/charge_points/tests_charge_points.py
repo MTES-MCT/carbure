@@ -40,7 +40,12 @@ class ElecCharginPointsTest(TestCase):
 
     def test_get_applications_ok(self):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)
+        application.created_at = datetime.date(2023, 12, 28)
+        application.save()
+
         application2 = ElecChargePointApplication.objects.create(cpo=self.cpo)
+        application2.created_at = datetime.date(2023, 12, 29)
+        application2.save()
 
         ElecChargePoint.objects.create(
             application=application,
@@ -92,7 +97,7 @@ class ElecCharginPointsTest(TestCase):
                     "id": application.id,
                     "cpo": cpo,
                     "status": "PENDING",
-                    "application_date": data["data"][0]["application_date"],  # timezone annoying stuff
+                    "application_date": "2023-12-28",
                     "station_count": 1,
                     "charge_point_count": 1,
                     "power_total": 150,
@@ -101,7 +106,7 @@ class ElecCharginPointsTest(TestCase):
                     "id": application2.id,
                     "cpo": cpo,
                     "status": "PENDING",
-                    "application_date": data["data"][1]["application_date"],
+                    "application_date": "2023-12-29",
                     "station_count": 1,
                     "charge_point_count": 1,
                     "power_total": 40,

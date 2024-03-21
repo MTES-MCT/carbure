@@ -165,8 +165,7 @@ class ElecMeterReadingsTest(TestCase):
 
         application = ElecMeterReadingApplication.objects.last()
 
-        tz = timezone(timedelta(hours=1))
-        application_date = application.created_at.astimezone(tz).isoformat()
+        application_date = application.created_at.isoformat()
 
         data = response.json()
         self.assertEqual(response.status_code, 200)
