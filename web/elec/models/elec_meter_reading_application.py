@@ -25,5 +25,5 @@ class ElecMeterReadingApplication(models.Model):
     status = models.CharField(max_length=32, default=PENDING, choices=STATUSES)
     quarter = models.IntegerField(choices=QUARTERS)
     year = models.IntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateField(auto_now_add=True)
     cpo = models.ForeignKey(Entity, on_delete=models.deletion.CASCADE, related_name="elec_meter_reading_applications")
