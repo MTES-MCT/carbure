@@ -11,7 +11,7 @@ from elec.models.elec_meter_reading_application import ElecMeterReadingApplicati
 from elec.repositories.meter_reading_repository import MeterReadingRepository
 from django.core.paginator import Paginator
 
-from elec.serializers.elec_meter_reading_application_serializer import ElecMeterReadingApplicationSerializer
+from elec.serializers.elec_meter_reading_application import ElecMeterReadingApplicationSerializer
 
 
 class AuditApplicationsSortForm(forms.Form):
