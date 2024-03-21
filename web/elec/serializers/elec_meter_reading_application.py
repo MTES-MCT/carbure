@@ -19,7 +19,7 @@ class ElecMeterReadingApplicationSerializer(serializers.ModelSerializer):
         ]
 
     cpo = EntityPreviewSerializer()
-    application_date = serializers.DateTimeField(source="created_at")
+    application_date = serializers.DateField(source="created_at")
     charge_point_count = serializers.SerializerMethodField()
     energy_total = serializers.SerializerMethodField()
 

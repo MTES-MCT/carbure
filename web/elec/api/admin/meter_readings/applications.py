@@ -4,7 +4,7 @@ from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
 from core.models import Entity, ExternalAdminRights
 from elec.repositories.meter_reading_repository import MeterReadingRepository
-from elec.serializers.elec_meter_reading_application_serializer import ElecMeterReadingApplicationSerializer
+from elec.serializers.elec_meter_reading_application import ElecMeterReadingApplicationSerializer
 
 
 class ApplicationsForm(forms.Form):
