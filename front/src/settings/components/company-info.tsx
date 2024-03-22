@@ -25,9 +25,9 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
   const updateEntity = useMutation(api.updateEntity, {
     invalidates: ["user-settings"],
   })
-  const form = useCompanyForm(entity)
+  const companyForm = useCompanyForm(entity)
 
-  const canSave = hasChange(entity, form.value)
+  const canSave = hasChange(entity, companyForm.value)
 
   const onSubmitForm = (formValue: CompanyFormValue | CreateCompanyFormValue | undefined) => {
     if (formValue && canSave) {
@@ -75,7 +75,7 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
       )}
 
       <section>
-        <CompanyForm form={form} entity={entity} readOnly={readOnly} onSubmitForm={onSubmitForm} />
+        <CompanyForm form={companyForm} readOnly={readOnly} onSubmitForm={onSubmitForm} />
       </section>
 
       <footer />

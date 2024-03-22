@@ -1,4 +1,4 @@
-import api from "common/services/api"
+import api, { Api } from "common/services/api"
 import { SearchCompanyResult } from "./types"
 
 // export async function searchCompanyData(siren: string) {
@@ -14,12 +14,10 @@ import { SearchCompanyResult } from "./types"
 
 
 
-export function getCompanyDataBySiren(
-  entity_id: number,
-  siren: string
+export function searchCompanyDataBySiren(
+  registration_id: string
 ) {
-  return api.post<SearchCompanyResult>("/entity/search-company", {
-    entity_id,
-    siren
+  return api.post<Api<SearchCompanyResult>>("/entity/search-company", {
+    registration_id
   })
 }

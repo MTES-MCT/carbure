@@ -19,16 +19,13 @@ export const SirenPicker = ({
   const { t } = useTranslation()
   const searchSirentRef = useRef<HTMLInputElement>(null)
   const [siren, setSiren] = useState<string | undefined>("")
-  const entity = useEntity()
-  const notify = useNotify()
   const notifyError = useNotifyError()
 
-  const companyResponse = useMutation(api.getCompanyDataBySiren, {
+  const companyResponse = useMutation(api.searchCompanyDataBySiren, {
     onSuccess: (res) => {
-      console.log('res:', res)
-      notify(t("Les informations ont été remplis avec les données de l'api entreprise"), {
-        variant: "success",
-      })
+      const companyResult = res.data.data
+      if (!companyResult) return
+      onSelect(companyResult)
     },
     onError: (err) => {
       notifyError(err)
@@ -54,9 +51,7 @@ export const SirenPicker = ({
     siren = siren?.trim() || ""
     setSiren(siren)
     if (!checkSirenFormat(siren)) return
-    const response = await companyResponse.execute(entity.id, siren)
-    console.log('response:', response)
-    //   onSelect(company)
+    companyResponse.execute(siren)
   }
 
 
@@ -64,6 +59,7 @@ export const SirenPicker = ({
 
     <TextInput
       autoFocus
+      loading={companyResponse.loading}
       value={siren}
       type="siren"
       label={t("SIREN de votre entreprise")}
