@@ -31,7 +31,6 @@ export interface CreateCompanyFormValue extends CompanyFormValue {
 
 interface CompanyFormProps {
   form: FormManager<CompanyFormValue | CreateCompanyFormValue>
-  entity: Entity
   readOnly?: boolean
   onSubmitForm: (formEntity: CompanyFormValue | CreateCompanyFormValue | undefined) => void
   isNew?: boolean
@@ -44,6 +43,7 @@ const CompanyForm = ({
   isNew = false,
 }: CompanyFormProps) => {
 
+  console.log('form:', form)
   const { t } = useTranslation()
 
   return <>
@@ -101,7 +101,6 @@ const CompanyForm = ({
       />
       {isNew &&
         <Autocomplete
-          autoFocus
           readOnly={readOnly}
           label={t("Certificat (schéma volontaire ou national)")}
           normalize={normalizeCertificate}
@@ -151,20 +150,20 @@ const CompanyForm = ({
   </>
 }
 
-export const useCompanyForm = (entity: Entity) => {
+export const useCompanyForm = (entity: Partial<Entity>) => {
   return useForm({
     certificate: undefined as Certificate | undefined,
-    activity_description: entity.activity_description as string | undefined,
-    entity_type: entity.entity_type as EntityType | undefined,
-    legal_name: entity.legal_name as string | undefined,
-    registered_address: entity.registered_address as string | undefined,
-    registered_city: entity.registered_city as string | undefined,
-    registered_country: entity.registered_country as string | undefined,
-    registered_zipcode: entity.registered_zipcode as string | undefined,
-    registration_id: entity.registration_id as string | undefined,
-    sustainability_officer_email: entity.sustainability_officer_email as string | undefined,
-    sustainability_officer_phone_number: entity.sustainability_officer_phone_number as string | undefined,
-    sustainability_officer: entity.sustainability_officer as string | undefined,
+    activity_description: entity?.activity_description as string | undefined,
+    entity_type: entity?.entity_type as EntityType | undefined,
+    legal_name: entity?.legal_name as string | undefined,
+    registered_address: entity?.registered_address as string | undefined,
+    registered_city: entity?.registered_city as string | undefined,
+    registered_country: entity?.registered_country as string | undefined,
+    registered_zipcode: entity?.registered_zipcode as string | undefined,
+    registration_id: entity?.registration_id as string | undefined,
+    sustainability_officer_email: entity?.sustainability_officer_email as string | undefined,
+    sustainability_officer_phone_number: entity?.sustainability_officer_phone_number as string | undefined,
+    sustainability_officer: entity?.sustainability_officer as string | undefined,
 
   })
 
