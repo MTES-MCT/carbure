@@ -1,4 +1,4 @@
-import { Entity } from "carbure/types"
+import { Certificate, Entity, EntityType } from "carbure/types"
 
 
 
@@ -11,4 +11,23 @@ export interface SearchCompanyResult {
   registered_city: string
   registered_zipcode: string
   registered_country: string
-}  
+}
+
+
+export interface CompanyFormValue {
+  activity_description: string | undefined
+  legal_name: string | undefined
+  registered_address: string | undefined
+  registered_city: string | undefined
+  registered_country: string | undefined
+  registered_zipcode: string | undefined
+  registration_id: string | undefined
+  sustainability_officer_email: string | undefined
+  sustainability_officer_phone_number: string | undefined
+  sustainability_officer: string | undefined
+}
+
+export interface CreateCompanyFormValue extends CompanyFormValue {
+  certificate: Certificate | undefined
+  entity_type: EntityType | undefined
+}
