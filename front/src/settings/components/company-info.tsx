@@ -148,7 +148,6 @@ export default CompanyInfo
 
 
 function hasChange(entity: Entity, formEntity: CompanyFormValue) {
-
   return (
     entity.legal_name !== formEntity.legal_name ||
     entity.registration_id !== formEntity.registration_id ||
@@ -177,5 +176,4 @@ const useCompanyForm = (entity: Entity) => {
     sustainability_officer_phone_number: entity?.sustainability_officer_phone_number as string | undefined,
     sustainability_officer: entity?.sustainability_officer as string | undefined,
   })
-
 }
