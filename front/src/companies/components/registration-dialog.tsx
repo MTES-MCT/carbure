@@ -1,5 +1,6 @@
 import { Certificate, EntityType } from "carbure/types"
 import { getEntityTypeLabel, normalizeCertificate } from "carbure/utils/normalizers"
+import Alert from "common/components/alert"
 import Autocomplete from "common/components/autocomplete"
 import { Button } from "common/components/button"
 import { Dialog } from "common/components/dialog"
@@ -21,7 +22,6 @@ import { Trans, useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { getCertificates } from "settings/api/certificates"
 import { SirenPicker } from "./siren-picker"
-import Alert from "common/components/alert"
 
 export const CompanyRegistrationDialog = () => {
   const { t } = useTranslation()

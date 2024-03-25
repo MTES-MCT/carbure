@@ -4,7 +4,7 @@ import { Certificate, Entity, EntityType } from "carbure/types"
 
 export interface SearchCompanyResult {
   company_preview: SearchCompanyPreview
-  warning: {
+  warning?: {
     code: string
     meta: null | any
   }
