@@ -2,11 +2,12 @@ import { Certificate, EntityType } from "carbure/types"
 import { getEntityTypeLabel, normalizeCertificate } from "carbure/utils/normalizers"
 import Alert from "common/components/alert"
 import Autocomplete from "common/components/autocomplete"
-import { Button } from "common/components/button"
+import { Button, MailTo } from "common/components/button"
 import { Dialog } from "common/components/dialog"
 import Form, { useForm } from "common/components/form"
 import {
   AlertCircle,
+  ExternalLink,
   Plus,
   Return
 } from "common/components/icons"
@@ -101,21 +102,30 @@ export const CompanyRegistrationDialog = () => {
             }
           </section>
 
+          <section>
+            <p><Trans>Vous ne trouvez pas votre société ? </Trans>
+              <MailTo user="carbure" host="beta.gouv.fr"
+                subject={t("[CarbuRe - Société] Je souhaite ajouter une société")}
+                body={t("Bonjour%2C%E2%80%A8%E2%80%A8Je%20souhaite%20ajouter%20ma%20soci%C3%A9t%C3%A9%20sur%20CarbuRe%20mais%20celle-ci%20est%20introuvable%20dans%20la%20base%20de%20donn%C3%A9es.%20Voici%20les%20informations%20la%20concernant%20%3A%0D%0A%0D%0A1%20-%20Nom%20de%20la%20soci%C3%A9t%C3%A9%20%3A%0D%0A%0D%0A2%20-%20Description%20de%20l'activit%C3%A9%20(obligatoire)%20%3A%0D%0A%0D%0A3%20-%20SIREN%20%3A%0D%0A%0D%0A4%20-%20Adresse%20postale%20%3A%E2%80%A8%0D%0AMerci%20beaucoup%E2%80%A8Bien%20cordialement%2C")}
+
+              >
+                <Trans>Signalez un problème.</Trans>
+                <ExternalLink size={20} />
+              </MailTo></p>
+          </section>
+
         </main>
 
         <footer>
 
           <Button
+            asideX
             submit="apply-new-company"
             disabled={!prefetchedCompany}
             icon={Plus}
             variant="primary"
             label={t("Demander l'inscription de votre société")}
           />
-          <Button icon={Return} asideX action={closeDialog}>
-            <Trans>Retour</Trans>
-          </Button>
-
         </footer>
 
       </Dialog>
