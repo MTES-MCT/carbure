@@ -1,5 +1,5 @@
 import api, { Api } from "common/services/api"
-import { SearchCompanyResult } from "./types"
+import { SearchCompanyPreview, SearchCompanyResult } from "./types"
 import { Certificate, EntityType } from "carbure/types"
 
 

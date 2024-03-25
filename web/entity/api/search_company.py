@@ -11,7 +11,7 @@ import requests
 class SeachCompanyFormError:
 
     ENTITY_ = "ENTITY_CREATION_FAILED"
-    REGISTRATION_ID_FORMAT_INVALID = "REGISTRATION_ID_FORMAT_INVALID"
+    REGISTRATION_ID_ALREADY_USED = "REGISTRATION_ID_ALREADY_USED"
     NO_COMPANY_FOUND = "NO_COMPANY_FOUND"
 
 
@@ -69,4 +69,9 @@ def search_company(request, *args, **kwargs):
         "registered_zipcode": "92400",
         "registered_country": "France",
     }
-    return SuccessResponse(company_preview)
+
+    warning = {
+        "code": SeachCompanyFormError.REGISTRATION_ID_ALREADY_USED,
+        "meta": {"company_name": "Shell"},
+    }
+    return SuccessResponse({"company_preview": company_preview, "warning": warning})

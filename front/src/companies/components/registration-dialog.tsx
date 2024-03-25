@@ -5,6 +5,7 @@ import { Button } from "common/components/button"
 import { Dialog } from "common/components/dialog"
 import Form, { useForm } from "common/components/form"
 import {
+  AlertCircle,
   Plus,
   Return
 } from "common/components/icons"
@@ -14,22 +15,22 @@ import Portal from "common/components/portal"
 import Select from "common/components/select"
 import { useMutation } from "common/hooks/async"
 import * as api from "companies/api"
-import { CreateCompanyFormValue, SearchCompanyResult } from "companies/types"
+import { CreateCompanyFormValue, SearchCompanyPreview } from "companies/types"
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { getCertificates } from "settings/api/certificates"
 import { SirenPicker } from "./siren-picker"
+import Alert from "common/components/alert"
 
 export const CompanyRegistrationDialog = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
+
   const notify = useNotify()
   const notifyError = useNotifyError()
-  const [prefetchedCompany, setPrefetchedCompany] = useState<SearchCompanyResult | undefined>(undefined)
-
-
-
+  const [prefetchedCompany, setPrefetchedCompany] = useState<SearchCompanyPreview | undefined>(undefined)
+  const [prefetchedCompanyWarning, setPrefetchedCompanyWarning] = useState<string | undefined>(undefined)
   const applyForNewCompanyRequest = useMutation(api.applyForNewCompany, {
     onSuccess: (res) => {
       notify(t("Votre demande d'inscription a bien été envoyéeVotre demande d’inscription de société a bien été prise en compte !"))
@@ -44,8 +45,12 @@ export const CompanyRegistrationDialog = () => {
     navigate("/account/")
   }
 
-  const fillFormWithfoundCompany = (company: SearchCompanyResult) => {
+  const fillFormWithfoundCompany = (company: SearchCompanyPreview, warning?: string) => {
+    console.log('company:', company)
     setPrefetchedCompany(company)
+    if (warning) {
+      setPrefetchedCompanyWarning(warning)
+    }
     notify(t("Les informations ont été pré-remplies avec les données de l'entreprises"), {
       variant: "success",
     })
@@ -77,7 +82,6 @@ export const CompanyRegistrationDialog = () => {
         </header>
 
         <main>
-
           <section>
             <p>
               <Trans>Rechercher votre société dans la base de donnée entreprises.data.gouv :</Trans>
@@ -86,6 +90,11 @@ export const CompanyRegistrationDialog = () => {
           <section>
             {!prefetchedCompany &&
               <SirenPicker onSelect={fillFormWithfoundCompany} />
+            }
+            {prefetchedCompanyWarning &&
+              <Alert icon={AlertCircle} variant="warning">
+                {prefetchedCompanyWarning}
+              </Alert>
             }
             {prefetchedCompany &&
               <PrefetchedCompanyForm prefetchedCompany={prefetchedCompany} onSubmitForm={onSubmitForm} />
@@ -98,10 +107,10 @@ export const CompanyRegistrationDialog = () => {
 
           <Button
             submit="apply-new-company"
-            // disabled={!canSave}
+            disabled={!prefetchedCompany}
             icon={Plus}
             variant="primary"
-            label={t("Demander l’inscription de votre société")}
+            label={t("Demander l'inscription de votre société")}
           />
           <Button icon={Return} asideX action={closeDialog}>
             <Trans>Retour</Trans>
@@ -117,7 +126,7 @@ export const CompanyRegistrationDialog = () => {
 
 interface PrefetchedCompanyFormProps {
   onSubmitForm: (formEntity: CreateCompanyFormValue | undefined) => void
-  prefetchedCompany: SearchCompanyResult
+  prefetchedCompany: SearchCompanyPreview
 }
 
 const PrefetchedCompanyForm = ({
@@ -126,20 +135,8 @@ const PrefetchedCompanyForm = ({
 }: PrefetchedCompanyFormProps) => {
   const { t } = useTranslation()
 
-  const companyForm = useForm({
-    activity_description: undefined as string | undefined,
-    certificate: undefined as Certificate | undefined,
-    entity_type: undefined as EntityType | undefined,
-    legal_name: prefetchedCompany?.legal_name as string | undefined,
-    registered_address: prefetchedCompany?.registered_address as string | undefined,
-    registered_city: prefetchedCompany?.registered_city as string | undefined,
-    registered_country: prefetchedCompany?.registered_country as string | undefined,
-    registered_zipcode: prefetchedCompany?.registered_zipcode as string | undefined,
-    registration_id: prefetchedCompany?.registration_id as string | undefined,
-    sustainability_officer_email: undefined as string | undefined,
-    sustainability_officer_phone_number: undefined as string | undefined,
-    sustainability_officer: undefined as string | undefined,
-  } as CreateCompanyFormValue)
+  const companyForm = useCompanyForm(prefetchedCompany)
+
   return <>
     <Form
       form={companyForm}
@@ -173,24 +170,29 @@ const PrefetchedCompanyForm = ({
       />
       <TextInput
         readOnly
+        required
         label={t("Pays")}
         {...companyForm.bind("registered_country")}
       />
       <TextInput
+        required
         label={t("Responsable durabilité")}
         {...companyForm.bind("sustainability_officer")}
       />
       <TextInput
+        required
         type="phone"
         label={t("N° téléphone responsable durabilité")}
         {...companyForm.bind("sustainability_officer_phone_number")}
       />
       <TextInput
+        required
         type="email"
         label={t("Email responsable durabilité")}
         {...companyForm.bind("sustainability_officer_email")}
       />
       <Autocomplete
+        required
         label={t("Certificat (schéma volontaire ou national)")}
         normalize={normalizeCertificate}
         getOptions={(query) =>
@@ -199,6 +201,7 @@ const PrefetchedCompanyForm = ({
       />
 
       <Select
+        required
         label={t("Type d'activité")}
         placeholder={t("Précisez le type d'activité")}
         options={[
@@ -237,5 +240,21 @@ const PrefetchedCompanyForm = ({
   </>
 }
 
+const useCompanyForm = (prefetchedCompany: SearchCompanyPreview) => {
+  return useForm({
+    activity_description: undefined as string | undefined,
+    certificate: undefined as Certificate | undefined,
+    entity_type: undefined as EntityType | undefined,
+    legal_name: prefetchedCompany?.legal_name as string | undefined,
+    registered_address: prefetchedCompany?.registered_address as string | undefined,
+    registered_city: prefetchedCompany?.registered_city as string | undefined,
+    registered_country: prefetchedCompany?.registered_country as string | undefined,
+    registered_zipcode: prefetchedCompany?.registered_zipcode as string | undefined,
+    registration_id: prefetchedCompany?.registration_id as string | undefined,
+    sustainability_officer_email: undefined as string | undefined,
+    sustainability_officer_phone_number: undefined as string | undefined,
+    sustainability_officer: undefined as string | undefined,
+  } as CreateCompanyFormValue)
 
+}
 
