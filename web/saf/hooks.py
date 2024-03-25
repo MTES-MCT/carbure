@@ -10,12 +10,7 @@ User = get_user_model()
 @receiver(post_save, sender=Entity)
 def link_dgac_to_airline(sender, instance, created, update_fields={}, *args, **kwargs):
     if instance.entity_type == Entity.AIRLINE:
-        dgac_users = list(
-            UserRights.objects.select_related("user")
-            .filter(entity__name="DGAC", user__is_staff=False)
-            .values_list("user_id", flat=True)
-            .distinct()
-        )
+        dgac_users = User.objects.filter(email__endswith="@aviation-civile.gouv.fr")
 
-        for user_id in dgac_users:
-            UserRights.objects.update_or_create(user_id=user_id, entity=instance, role=UserRights.RO)
+        for user in dgac_users:
+            UserRights.objects.update_or_create(user=user, entity=instance, role=UserRights.RO)
