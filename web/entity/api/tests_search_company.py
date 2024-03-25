@@ -33,9 +33,27 @@ class EntitySearchCompanyTest(TestCase):
         )
 
     def test_search_company(self):
+        # ok
         response = self.client.post(
             reverse("entity-search-company"),
             {"registration_id": "753061464"},
         )
         data = response.json()
+        company_preview = data["data"]["company_preview"]
+        self.assertEqual(company_preview["legal_name"], "TOTALENERGIES SE")
+        print("company_preview: ", company_preview)
+
+        # warning REGISTRATION_ID_ALREADY_USED
+
+    def test_search_unexisting_company(self):
+        response = self.client.post(
+            reverse("entity-search-company"),
+            {"registration_id": "753991464"},
+        )
+        data = response.json()
+        error_code = data["error"]
+        self.assertEqual(error_code, "NO_COMPANY_FOUND")
+
         print("data: ", data)
+
+        # error NO_COMPANY_FOUND
