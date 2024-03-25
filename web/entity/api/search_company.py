@@ -27,7 +27,6 @@ def search_company(request, *args, **kwargs):
         return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, form.errors)
 
     registration_id = form.cleaned_data["registration_id"]
-    print("registration_id: ", registration_id)
 
     url = f"https://recherche-entreprises.api.gouv.fr/search?q={registration_id}"
     api_response = requests.get(url)
@@ -53,25 +52,16 @@ def search_company(request, *args, **kwargs):
         "registered_zipcode": company_siege["code_postal"],
         "registered_country": "France",
     }
-    print("company_preview: ", company_preview)
 
     response = {"company_preview": company_preview}
     try:
         entity = Entity.objects.get(registration_id=registration_id)
-        company_preview["warning"] = {
+        response["warning"] = {
             "code": SeachCompanyFormError.REGISTRATION_ID_ALREADY_USED,
             "meta": {"company_name": entity.name},
         }
+        print("company_preview: ", company_preview)
     except:
         print("no registred company wit same siret")
-    # company_preview = {
-    #     "name": "TOTALENERGIES SE",
-    #     "legal_name": "TOTALENERGIES SE",
-    #     "registration_id": "542051180",
-    #     "registered_address": "LA DEFENSE 6 2 PL JEAN MILLIER ",
-    #     "registered_city": "COURBEVOIE",
-    #     "registered_zipcode": "92400",
-    #     "registered_country": "France",
-    # }
 
-    return SuccessResponse({"company_preview": company_preview, "warning": warning})
+    return SuccessResponse(response)
