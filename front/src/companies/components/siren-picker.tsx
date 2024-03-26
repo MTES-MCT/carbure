@@ -26,7 +26,7 @@ export const SirenPicker = ({
       if (!companyResult) return
       let warning
       if (companyResult.warning?.code === "REGISTRATION_ID_ALREADY_USED") {
-        warning = t("Ce SIREN existe déjà dans notre base CarbuRe, sous le nom de {{companyName}}. Assurez-vous que cela soit bien votre entreprise avant de continuer.", { companyName: companyResult.warning.meta.company_name })
+        warning = t("Ce SIREN existe déjà dans notre base CarbuRe, sous le nom de {{companyName}}. Assurez-vous que cela soit bien votre entreprise avant de continuer et utilisez un nom différent.", { companyName: companyResult.warning.meta.company_name })
       }
       onSelect(companyResult.company_preview, warning)
     },

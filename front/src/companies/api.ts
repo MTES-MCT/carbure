@@ -6,7 +6,7 @@ import { Certificate, EntityType } from "carbure/types"
 export function searchCompanyDataBySiren(
   registration_id: string
 ) {
-  return api.post<Api<SearchCompanyResult>>("/entity/search-company", {
+  return api.post<Api<SearchCompanyResult>>("/entity/registration/search-company", {
     registration_id
   })
 }
@@ -30,7 +30,7 @@ export function applyForNewCompany(
 
 
 ) {
-  return api.post("/entity/apply-new-company", {
+  return api.post("/entity/registration/add-company", {
     activity_description,
     certificate_id,
     certificate_type,

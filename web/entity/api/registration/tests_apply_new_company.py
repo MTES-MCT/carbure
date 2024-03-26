@@ -47,7 +47,7 @@ class EntityApplyNewCompanyTest(TestCase):
             "sustainability_officer_phone_number": "0612345678",
         }
         response = self.client.post(
-            reverse("entity-apply-new-company"),
+            reverse("entity-registration-add-company"),
             params,
         )
         # check new entity created
