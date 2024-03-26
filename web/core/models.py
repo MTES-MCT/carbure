@@ -110,7 +110,7 @@ class Entity(models.Model):
             "registered_address": self.registered_address,
             "registered_zipcode": self.registered_zipcode,
             "registered_city": self.registered_city,
-            "registered_country": self.registered_country.name if self.registered_country else None,
+            "registered_country": self.registered_country.natural_key() if self.registered_country else None,
             "default_certificate": self.default_certificate,
             "preferred_unit": self.preferred_unit,
             "has_saf": self.has_saf,

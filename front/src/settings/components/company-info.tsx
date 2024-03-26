@@ -1,5 +1,5 @@
 import useEntity from "carbure/hooks/entity"
-import { Entity, UserRole } from "carbure/types"
+import { Country, Entity, UserRole } from "carbure/types"
 import Button from "common/components/button"
 import Form, { useForm } from "common/components/form"
 import { Save } from "common/components/icons"
@@ -9,6 +9,9 @@ import { useMutation } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import * as api from "../api/company"
 import { CompanyFormValue } from "companies/types"
+import Autocomplete from "common/components/autocomplete"
+import { findCountries } from "carbure/api"
+import { normalizeCountry } from "carbure/utils/normalizers"
 
 
 type CompanyInfoProps = {
@@ -37,7 +40,7 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
         formValue.legal_name!,
         formValue.registered_address!,
         formValue.registered_city!,
-        formValue.registered_country!,
+        formValue.registered_country?.code_pays!,
         formValue.registered_zipcode!,
         formValue.registration_id!,
         formValue.sustainability_officer_email!,
@@ -105,9 +108,12 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
             label={t("Code postal")}
             {...companyForm.bind("registered_zipcode")}
           />
-          <TextInput
+          <Autocomplete
             readOnly={readOnly}
             label={t("Pays")}
+            placeholder={t("Rechercher un pays...")}
+            getOptions={findCountries}
+            normalize={normalizeCountry}
             {...companyForm.bind("registered_country")}
           />
           <TextInput
@@ -169,7 +175,7 @@ const useCompanyForm = (entity: Entity) => {
     legal_name: entity?.legal_name as string | undefined,
     registered_address: entity?.registered_address as string | undefined,
     registered_city: entity?.registered_city as string | undefined,
-    registered_country: entity?.registered_country as string | undefined,
+    registered_country: entity?.registered_country as Country | undefined,
     registered_zipcode: entity?.registered_zipcode as string | undefined,
     registration_id: entity?.registration_id as string | undefined,
     sustainability_officer_email: entity?.sustainability_officer_email as string | undefined,

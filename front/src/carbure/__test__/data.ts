@@ -8,6 +8,16 @@ import {
   Depot,
 } from "carbure/types"
 
+
+// COUNTRIES
+
+export const country = {
+  code_pays: "FR",
+  name: "France",
+  name_en: "France",
+  is_in_europe: true,
+}
+
 // ENTITIES
 export const company: Entity = {
   id: 0,
@@ -21,7 +31,7 @@ export const company: Entity = {
   default_certificate: "",
   legal_name: "",
   registered_address: "",
-  registered_country: "",
+  registered_country: country,
   registered_zipcode: "",
   registered_city: "",
   registration_id: "",
@@ -42,7 +52,7 @@ export const producer: Entity = {
   default_certificate: "",
   legal_name: "",
   registered_address: "",
-  registered_country: "",
+  registered_country: country,
   registered_zipcode: "",
   registered_city: "",
   registration_id: "",
@@ -63,7 +73,7 @@ export const trader: Entity = {
   default_certificate: "",
   legal_name: "",
   registered_address: "",
-  registered_country: "",
+  registered_country: country,
   registered_zipcode: "",
   registered_city: "",
   registration_id: "",
@@ -84,7 +94,7 @@ export const operator: Entity = {
   default_certificate: "",
   legal_name: "",
   registered_address: "",
-  registered_country: "",
+  registered_country: country,
   registered_zipcode: "",
   registered_city: "",
   registration_id: "",
@@ -105,7 +115,7 @@ export const admin: Entity = {
   default_certificate: "",
   legal_name: "",
   registered_address: "",
-  registered_country: "",
+  registered_country: country,
   registered_zipcode: "",
   registered_city: "",
   registration_id: "",
@@ -126,7 +136,7 @@ export const cpo: Entity = {
   default_certificate: "",
   legal_name: "",
   registered_address: "",
-  registered_country: "",
+  registered_country: country,
   registered_zipcode: "",
   registered_city: "",
   registration_id: "",
@@ -135,14 +145,6 @@ export const cpo: Entity = {
   preferred_unit: "l",
 }
 
-// COUNTRIES
-
-export const country = {
-  code_pays: "FR",
-  name: "France",
-  name_en: "France",
-  is_in_europe: true,
-}
 
 // DELIVERY SITES
 

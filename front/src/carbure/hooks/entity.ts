@@ -41,7 +41,7 @@ export function useEntityManager(user: UserManager): EntityManager {
     registered_address: entity?.registered_address ?? "",
     registered_city: entity?.registered_city ?? "",
     registered_zipcode: entity?.registered_zipcode ?? "",
-    registered_country: entity?.registered_country ?? "",
+    registered_country: entity?.registered_country ?? undefined,
     has_mac: entity?.has_mac ?? false,
     has_trading: entity?.has_trading ?? false,
     has_stocks: entity?.has_stocks ?? false,

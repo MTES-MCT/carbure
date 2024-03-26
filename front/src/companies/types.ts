@@ -1,4 +1,4 @@
-import { Certificate, Entity, EntityType } from "carbure/types"
+import { Certificate, Country, Entity, EntityType } from "carbure/types"
 
 
 
@@ -16,7 +16,7 @@ export interface SearchCompanyPreview {
   registered_address: string
   registered_city: string
   registered_zipcode: string
-  registered_country: string
+  registered_country: Country
 }
 
 
@@ -25,7 +25,7 @@ export interface CompanyFormValue {
   legal_name: string | undefined
   registered_address: string | undefined
   registered_city: string | undefined
-  registered_country: string | undefined
+  registered_country: Country | undefined
   registered_zipcode: string | undefined
   registration_id: string | undefined
   sustainability_officer_email: string | undefined

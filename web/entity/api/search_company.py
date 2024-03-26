@@ -3,7 +3,7 @@ from django import forms
 
 from core.carburetypes import CarbureError
 from core.decorators import check_user_rights, otp_or_403
-from core.models import UserRights, Entity
+from core.models import Pays, UserRights, Entity
 from core.common import SuccessResponse, ErrorResponse
 import requests
 
@@ -39,6 +39,7 @@ def search_company(request, *args, **kwargs):
     string_to_remove = f"{company_zipcode} {company_city}"
     company_address = company_address.replace(string_to_remove, "")
 
+    france = {"name": "France", "name_en": "France", "code_pays": "FR", "is_in_europe": True}
     company_preview = {
         "name": company_found["nom_complet"],
         "legal_name": company_found["nom_complet"],
@@ -46,7 +47,7 @@ def search_company(request, *args, **kwargs):
         "registered_address": company_address,
         "registered_city": company_siege["libelle_commune"],
         "registered_zipcode": company_siege["code_postal"],
-        "registered_country": "France",
+        "registered_country": france,
     }
 
     response = {"company_preview": company_preview}
