@@ -6,11 +6,16 @@ from core.models import EntityCertificate, GenericCertificate, Entity, Pays
 from core.common import SuccessResponse, ErrorResponse
 
 
+class ApplyForNewCompanyError:
+    COMPANY_NAME_ALREADY_USED = "COMPANY_NAME_ALREADY_USED"
+
+
 class ApplyForNewCompanyForm(forms.Form):
     activity_description = forms.CharField(max_length=256, required=True)
     certificate_id = forms.CharField(max_length=64, required=True)
     certificate_type = forms.CharField(max_length=32, required=True)
     entity_type = forms.CharField(max_length=64, required=True)
+    name = forms.CharField(max_length=128, required=True)
     legal_name = forms.CharField(max_length=128, required=True)
     registered_address = forms.CharField(max_length=256, required=True)
     registered_city = forms.CharField(max_length=64, required=True)
@@ -34,6 +39,7 @@ def apply_for_new_company(request, *args, **kwargs):
     certificate_id = form.cleaned_data["certificate_id"]
     certificate_type = form.cleaned_data["certificate_type"]
     entity_type = form.cleaned_data["entity_type"]
+    name = form.cleaned_data["name"]
     legal_name = form.cleaned_data["legal_name"]
     registered_address = form.cleaned_data["registered_address"]
     registered_city = form.cleaned_data["registered_city"]
@@ -43,6 +49,10 @@ def apply_for_new_company(request, *args, **kwargs):
     sustainability_officer = form.cleaned_data["sustainability_officer"]
     sustainability_officer_email = form.cleaned_data["sustainability_officer_email"]
     sustainability_officer_phone_number = form.cleaned_data["sustainability_officer_phone_number"]
+
+    duplicated_company = Entity.objects.filter(name=name).first()
+    if duplicated_company:
+        return ErrorResponse(400, ApplyForNewCompanyError.COMPANY_NAME_ALREADY_USED)
 
     entity = Entity.objects.create(
         activity_description=activity_description,

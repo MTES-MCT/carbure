@@ -1,4 +1,4 @@
-# test with : python web/manage.py test entity.api.tests_search_company.EntitySearchCompanyTest --keepdb
+# test with : python web/manage.py test entity.api.registration.tests_search_company.EntityRegistrationSearchCompanyTest --keepdb
 
 from core.tests_utils import setup_current_user
 from core.models import Entity
@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 
-class EntitySearchCompanyTest(TestCase):
+class EntityRegistrationSearchCompanyTest(TestCase):
     def setUp(self):
 
         self.cpo = Entity.objects.create(
