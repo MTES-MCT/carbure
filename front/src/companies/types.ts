@@ -10,7 +10,6 @@ export interface SearchCompanyResult {
   }
 }
 export interface SearchCompanyPreview {
-  name: string
   legal_name: string
   registration_id: string
   registered_address: string
@@ -22,6 +21,7 @@ export interface SearchCompanyPreview {
 
 export interface CompanyFormValue {
   activity_description: string | undefined
+  name: string | undefined
   legal_name: string | undefined
   registered_address: string | undefined
   registered_city: string | undefined

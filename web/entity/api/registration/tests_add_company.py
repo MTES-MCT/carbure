@@ -1,4 +1,4 @@
-# test with : python web/manage.py test entity.api.tests_apply_new_company.EntityApplyNewCompanyTest --keepdb
+# test with : python web/manage.py test entity.api.registration.tests_add_company.EntityRegistrationAddCompanyTest --keepdb
 
 import datetime
 
@@ -8,7 +8,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 
-class EntityApplyNewCompanyTest(TestCase):
+class EntityRegistrationAddCompanyTest(TestCase):
     def setUp(self):
 
         self.cpo = Entity.objects.create(
@@ -36,6 +36,7 @@ class EntityApplyNewCompanyTest(TestCase):
             "certificate_id": "EU-ISCC-Cert-PL123-12345678",
             "certificate_type": "ISCC",
             "entity_type": "Opérateur",
+            "name": "Mon entreprise test",
             "legal_name": "Mon entreprise test",
             "registered_address": "1 rue de la paix",
             "registered_city": "Paris",
@@ -58,3 +59,13 @@ class EntityApplyNewCompanyTest(TestCase):
         # check certificate created
         certificate = EntityCertificate.objects.get(certificate__certificate_id="EU-ISCC-Cert-PL123-12345678", entity=entity)
         self.assertEqual(entity.id, certificate.entity.id)
+
+        # duplicated company name error
+        response = self.client.post(
+            reverse("entity-registration-add-company"),
+            params,
+        )
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        error_code = data["error"]
+        self.assertEqual(error_code, "COMPANY_NAME_ALREADY_USED")
