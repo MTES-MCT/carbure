@@ -78,9 +78,9 @@ class Entity(models.Model):
     sustainability_officer_email = models.CharField(max_length=254, blank=True, default="")
 
     sustainability_officer = models.CharField(max_length=256, blank=True, default="")
-    registered_address = models.TextField(blank=True, default="")
-    registered_zipcode = models.TextField(blank=True, default="")
-    registered_city = models.TextField(blank=True, default="")
+    registered_address = models.CharField(max_length=256, blank=True, default="")
+    registered_zipcode = models.CharField(max_length=64, blank=True, default="")
+    registered_city = models.CharField(max_length=64, blank=True, default="")
     registered_country = models.ForeignKey(Pays, null=True, blank=True, on_delete=models.CASCADE)
 
     hash = models.CharField(max_length=32, null=True, blank=True, default="")
