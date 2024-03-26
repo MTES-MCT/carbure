@@ -24,6 +24,7 @@ import { useNavigate } from "react-router-dom"
 import { getCertificates } from "settings/api/certificates"
 import { SirenPicker } from "./siren-picker"
 import { findCountries } from "carbure/api"
+import { AxiosError } from "axios"
 
 export const CompanyRegistrationDialog = () => {
   const { t } = useTranslation()
@@ -42,7 +43,12 @@ export const CompanyRegistrationDialog = () => {
       closeDialog()
     },
     onError: (err) => {
-      notifyError(err)
+      const errorCode = (err as AxiosError<{ error: string }>).response?.data.error
+      if (errorCode === "COMPANY_NAME_ALREADY_USED") {
+        notifyError(err, t("Ce nom de société est déjà utilisé. Veuillez en choisir un autre."))
+      } else {
+        notifyError(err)
+      }
     },
   })
 
@@ -68,6 +74,7 @@ export const CompanyRegistrationDialog = () => {
       formValue.certificate!.certificate_type,
       formValue.entity_type!,
       formValue.legal_name!,
+      formValue.name!,
       formValue.registered_address!,
       formValue.registered_city!,
       formValue.registered_country?.code_pays!,
@@ -163,6 +170,11 @@ const PrefetchedCompanyForm = ({
         label={t("N° d'enregistrement de la société (SIREN)")}
         {...companyForm.bind("registration_id")}
         disabled
+      />
+      <TextInput
+        required
+        label={t("Nom de la société (visible dans carbure)")}
+        {...companyForm.bind("name")}
       />
       <TextInput
         required
@@ -272,6 +284,7 @@ const useCompanyForm = (prefetchedCompany: SearchCompanyPreview) => {
     certificate: undefined as Certificate | undefined,
     entity_type: undefined as EntityType | undefined,
     legal_name: prefetchedCompany?.legal_name as string | undefined,
+    name: prefetchedCompany?.legal_name as string | undefined,
     registered_address: prefetchedCompany?.registered_address as string | undefined,
     registered_city: prefetchedCompany?.registered_city as string | undefined,
     registered_country: prefetchedCompany?.registered_country as Country | undefined,

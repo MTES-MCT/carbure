@@ -89,6 +89,12 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
             {...companyForm.bind("registration_id")}
           />
           <TextInput
+            required
+            label={t("Nom de la société (visible dans carbure)")}
+            {...companyForm.bind("name")}
+            disabled
+          />
+          <TextInput
             readOnly={readOnly}
             label={t("Nom légal")}
             {...companyForm.bind("legal_name")}
@@ -155,6 +161,7 @@ export default CompanyInfo
 
 function hasChange(entity: Entity, formEntity: CompanyFormValue) {
   return (
+    entity.name !== formEntity.name ||
     entity.legal_name !== formEntity.legal_name ||
     entity.registration_id !== formEntity.registration_id ||
     entity.sustainability_officer !== formEntity.sustainability_officer ||
@@ -172,6 +179,7 @@ function hasChange(entity: Entity, formEntity: CompanyFormValue) {
 const useCompanyForm = (entity: Entity) => {
   return useForm({
     activity_description: entity?.activity_description as string | undefined,
+    name: entity?.name as string | undefined,
     legal_name: entity?.legal_name as string | undefined,
     registered_address: entity?.registered_address as string | undefined,
     registered_city: entity?.registered_city as string | undefined,
