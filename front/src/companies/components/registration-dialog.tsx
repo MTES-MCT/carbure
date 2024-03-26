@@ -17,7 +17,7 @@ import Portal from "common/components/portal"
 import Select from "common/components/select"
 import { useMutation } from "common/hooks/async"
 import * as api from "companies/api"
-import { CreateCompanyFormValue, SearchCompanyPreview } from "companies/types"
+import { CompanyRegistrationFormValue, SearchCompanyPreview } from "companies/types"
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
@@ -33,7 +33,7 @@ export const CompanyRegistrationDialog = () => {
   const notifyError = useNotifyError()
   const [prefetchedCompany, setPrefetchedCompany] = useState<SearchCompanyPreview | undefined>(undefined)
   const [prefetchedCompanyWarning, setPrefetchedCompanyWarning] = useState<string | undefined>(undefined)
-  const applyForNewCompanyRequest = useMutation(api.applyForNewCompany, {
+  const registerCompanyRequest = useMutation(api.registerCompany, {
     invalidates: ["user-settings"],
     onSuccess: (res) => {
       notify(t("Votre demande d'inscription a bien été envoyéeVotre demande d’inscription de société a bien été prise en compte !"), {
@@ -50,7 +50,7 @@ export const CompanyRegistrationDialog = () => {
     navigate("/account/")
   }
 
-  const fillFormWithfoundCompany = (company: SearchCompanyPreview, warning?: string) => {
+  const fillFormWithFoundCompany = (company: SearchCompanyPreview, warning?: string) => {
     setPrefetchedCompany(company)
     if (warning) {
       setPrefetchedCompanyWarning(warning)
@@ -60,9 +60,9 @@ export const CompanyRegistrationDialog = () => {
     })
   }
 
-  const onSubmitForm = (formValue: CreateCompanyFormValue | undefined) => {
+  const onSubmitForm = (formValue: CompanyRegistrationFormValue | undefined) => {
     if (!formValue) return
-    applyForNewCompanyRequest.execute(
+    registerCompanyRequest.execute(
       formValue.activity_description!,
       formValue.certificate!.certificate_id,
       formValue.certificate!.certificate_type,
@@ -94,7 +94,7 @@ export const CompanyRegistrationDialog = () => {
           </section>
           <section>
             {!prefetchedCompany &&
-              <SirenPicker onSelect={fillFormWithfoundCompany} />
+              <SirenPicker onSelect={fillFormWithFoundCompany} />
             }
             {prefetchedCompanyWarning &&
               <Alert icon={AlertCircle} variant="warning">
@@ -123,8 +123,8 @@ export const CompanyRegistrationDialog = () => {
 
           <Button
             asideX
-            submit="apply-new-company"
-            loading={applyForNewCompanyRequest.loading}
+            submit="add-company"
+            loading={registerCompanyRequest.loading}
             disabled={!prefetchedCompany}
             icon={Plus}
             variant="primary"
@@ -139,7 +139,7 @@ export const CompanyRegistrationDialog = () => {
 
 
 interface PrefetchedCompanyFormProps {
-  onSubmitForm: (formEntity: CreateCompanyFormValue | undefined) => void
+  onSubmitForm: (formEntity: CompanyRegistrationFormValue | undefined) => void
   prefetchedCompany: SearchCompanyPreview
 }
 
@@ -155,7 +155,7 @@ const PrefetchedCompanyForm = ({
   return <>
     <Form
       form={companyForm}
-      id="apply-new-company"
+      id="add-company"
       onSubmit={onSubmitForm}
     >
       <TextInput
@@ -280,7 +280,7 @@ const useCompanyForm = (prefetchedCompany: SearchCompanyPreview) => {
     sustainability_officer_email: undefined as string | undefined,
     sustainability_officer_phone_number: undefined as string | undefined,
     sustainability_officer: undefined as string | undefined,
-  } as CreateCompanyFormValue)
+  } as CompanyRegistrationFormValue)
 
 }
 

@@ -13,7 +13,7 @@ export function searchCompanyDataBySiren(
 
 
 
-export function applyForNewCompany(
+export function registerCompany(
   activity_description: string,
   certificate_id: string,
   certificate_type: string,
