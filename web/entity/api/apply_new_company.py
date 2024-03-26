@@ -2,7 +2,7 @@ from django import forms
 
 from core.carburetypes import CarbureError
 from core.decorators import otp_or_403
-from core.models import EntityCertificate, GenericCertificate, Entity
+from core.models import EntityCertificate, GenericCertificate, Entity, Pays
 from core.common import SuccessResponse, ErrorResponse
 
 
@@ -14,7 +14,7 @@ class ApplyForNewCompanyForm(forms.Form):
     legal_name = forms.CharField(max_length=128, required=True)
     registered_address = forms.CharField(max_length=256, required=True)
     registered_city = forms.CharField(max_length=64, required=True)
-    registered_country = forms.CharField(max_length=64, required=True)
+    registered_country_code = forms.ModelChoiceField(queryset=Pays.objects.all(), to_field_name="code_pays", required=False)
     registered_zipcode = forms.CharField(max_length=64, required=True)
     registration_id = forms.CharField(max_length=9, required=True)  # SIREN
     sustainability_officer = forms.CharField(max_length=64, required=True)
@@ -37,7 +37,7 @@ def apply_for_new_company(request, *args, **kwargs):
     legal_name = form.cleaned_data["legal_name"]
     registered_address = form.cleaned_data["registered_address"]
     registered_city = form.cleaned_data["registered_city"]
-    registered_country = form.cleaned_data["registered_country"]
+    registered_country = form.cleaned_data["registered_country_code"]
     registered_zipcode = form.cleaned_data["registered_zipcode"]
     registration_id = form.cleaned_data["registration_id"]
     sustainability_officer = form.cleaned_data["sustainability_officer"]

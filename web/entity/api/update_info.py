@@ -2,7 +2,7 @@ from math import e
 from django import forms
 
 from core.decorators import check_user_rights
-from core.models import UserRights, Entity
+from core.models import Pays, UserRights, Entity
 from core.common import SuccessResponse, ErrorResponse
 
 
@@ -28,7 +28,7 @@ def update_entity_info(request, *args, **kwargs):
     registered_address = form.cleaned_data["registered_address"]
     registered_zipcode = form.cleaned_data["registered_zipcode"]
     registered_city = form.cleaned_data["registered_city"]
-    registered_country = form.cleaned_data["registered_country"]
+    registered_country = form.cleaned_data["registered_country_code"]
     activity_description = form.cleaned_data["activity_description"]
 
     entity = Entity.objects.get(id=entity_id)
@@ -56,5 +56,5 @@ class UpdateEntityInfoForm(forms.Form):
     registered_address = forms.CharField(required=False)
     registered_zipcode = forms.CharField(required=False)
     registered_city = forms.CharField(required=False)
-    registered_country = forms.CharField(required=False)
+    registered_country_code = forms.ModelChoiceField(queryset=Pays.objects.all(), to_field_name="code_pays", required=False)
     activity_description = forms.CharField(required=False)

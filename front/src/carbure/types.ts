@@ -10,7 +10,7 @@ export interface Entity {
   registered_address: string
   registered_city: string
   registered_zipcode: string
-  registered_country: string
+  registered_country?: Country
   has_mac: boolean
   has_trading: boolean
   has_stocks: boolean

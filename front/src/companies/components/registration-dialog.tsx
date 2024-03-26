@@ -1,5 +1,5 @@
-import { Certificate, EntityType } from "carbure/types"
-import { getEntityTypeLabel, normalizeCertificate } from "carbure/utils/normalizers"
+import { Certificate, Country, EntityType } from "carbure/types"
+import { getEntityTypeLabel, normalizeCertificate, normalizeCountry } from "carbure/utils/normalizers"
 import Alert from "common/components/alert"
 import Autocomplete from "common/components/autocomplete"
 import { Button, MailTo } from "common/components/button"
@@ -23,6 +23,7 @@ import { Trans, useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { getCertificates } from "settings/api/certificates"
 import { SirenPicker } from "./siren-picker"
+import { findCountries } from "carbure/api"
 
 export const CompanyRegistrationDialog = () => {
   const { t } = useTranslation()
@@ -33,6 +34,7 @@ export const CompanyRegistrationDialog = () => {
   const [prefetchedCompany, setPrefetchedCompany] = useState<SearchCompanyPreview | undefined>(undefined)
   const [prefetchedCompanyWarning, setPrefetchedCompanyWarning] = useState<string | undefined>(undefined)
   const applyForNewCompanyRequest = useMutation(api.applyForNewCompany, {
+    invalidates: ["user-settings"],
     onSuccess: (res) => {
       notify(t("Votre demande d'inscription a bien été envoyéeVotre demande d’inscription de société a bien été prise en compte !"), {
         variant: "success",
@@ -62,12 +64,13 @@ export const CompanyRegistrationDialog = () => {
     if (!formValue) return
     applyForNewCompanyRequest.execute(
       formValue.activity_description!,
-      formValue.certificate!,
+      formValue.certificate!.certificate_id,
+      formValue.certificate!.certificate_type,
       formValue.entity_type!,
       formValue.legal_name!,
       formValue.registered_address!,
       formValue.registered_city!,
-      formValue.registered_country!,
+      formValue.registered_country?.code_pays!,
       formValue.registered_zipcode!,
       formValue.registration_id!,
       formValue.sustainability_officer_email!,
@@ -148,6 +151,7 @@ const PrefetchedCompanyForm = ({
 
   const companyForm = useCompanyForm(prefetchedCompany)
 
+
   return <>
     <Form
       form={companyForm}
@@ -158,32 +162,39 @@ const PrefetchedCompanyForm = ({
         required
         label={t("N° d'enregistrement de la société (SIREN)")}
         {...companyForm.bind("registration_id")}
+        disabled
       />
       <TextInput
         required
         label={t("Nom légal")}
         {...companyForm.bind("legal_name")}
+        disabled
       />
       <TextInput
         required
         label={t("Adresse de la société (Numéro et rue)")}
         {...companyForm.bind("registered_address")}
+        disabled
       />
       <TextInput
         required
         label={t("Ville")}
         {...companyForm.bind("registered_city")}
+        disabled
       />
       <TextInput
         required
         label={t("Code postal")}
         {...companyForm.bind("registered_zipcode")}
+        disabled
       />
-      <TextInput
-        readOnly
-        required
+      <Autocomplete
         label={t("Pays")}
+        placeholder={t("Rechercher un pays...")}
+        getOptions={findCountries}
+        normalize={normalizeCountry}
         {...companyForm.bind("registered_country")}
+        disabled
       />
       <TextInput
         required
@@ -263,7 +274,7 @@ const useCompanyForm = (prefetchedCompany: SearchCompanyPreview) => {
     legal_name: prefetchedCompany?.legal_name as string | undefined,
     registered_address: prefetchedCompany?.registered_address as string | undefined,
     registered_city: prefetchedCompany?.registered_city as string | undefined,
-    registered_country: prefetchedCompany?.registered_country as string | undefined,
+    registered_country: prefetchedCompany?.registered_country as Country | undefined,
     registered_zipcode: prefetchedCompany?.registered_zipcode as string | undefined,
     registration_id: prefetchedCompany?.registration_id as string | undefined,
     sustainability_officer_email: undefined as string | undefined,

@@ -15,12 +15,13 @@ export function searchCompanyDataBySiren(
 
 export function applyForNewCompany(
   activity_description: string,
-  certificate: Certificate,
+  certificate_id: string,
+  certificate_type: string,
   entity_type: EntityType,
   legal_name: string,
   registered_address: string,
   registered_city: string,
-  registered_country: string,
+  registered_country_code: string,
   registered_zipcode: string,
   registration_id: string,
   sustainability_officer_email: string,
@@ -31,13 +32,13 @@ export function applyForNewCompany(
 ) {
   return api.post("/entity/apply-new-company", {
     activity_description,
-    certificate_id: certificate.certificate_id,
-    certificate_type: certificate.certificate_type,
+    certificate_id,
+    certificate_type,
     entity_type,
     legal_name,
     registered_address,
     registered_city,
-    registered_country,
+    registered_country_code,
     registered_zipcode,
     registration_id,
     sustainability_officer_email,
