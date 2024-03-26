@@ -48,7 +48,7 @@ export const SirenPicker = ({
     if (!sirenInput || siren.length < 3) return false
 
     if (siren.match(/^\d{9}$/) === null) {
-      sirenInput.setCustomValidity("Le SIREN doit contenir 9 chiffres")
+      sirenInput.setCustomValidity("Ce SIREN est invalide. Il doit être constitué 9 caractères numériques.")
       sirenInput.reportValidity()
       return false
     }

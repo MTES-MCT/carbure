@@ -29,10 +29,10 @@ export function applyForNewCompany(
 
 
 ) {
-  console.log('ENVOIE')
-  return api.post("/entity/new-company-application", {
+  return api.post("/entity/apply-new-company", {
     activity_description,
-    certificate,
+    certificate_id: certificate.certificate_id,
+    certificate_type: certificate.certificate_type,
     entity_type,
     legal_name,
     registered_address,
@@ -40,9 +40,9 @@ export function applyForNewCompany(
     registered_country,
     registered_zipcode,
     registration_id,
-    sustainability_officer,
     sustainability_officer_email,
     sustainability_officer_phone_number,
+    sustainability_officer,
   })
 }
 
