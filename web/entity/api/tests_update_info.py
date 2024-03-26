@@ -16,9 +16,7 @@ class SettingUpdateEntityTest(TestCase):
 
     def setUp(self):
         self.entity = Entity.objects.all()[0]
-        self.user = setup_current_user(
-            self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")]
-        )
+        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")])
 
     def test_update_entity_info(self):
         query = {
@@ -30,7 +28,7 @@ class SettingUpdateEntityTest(TestCase):
             "registered_address": "3 rue de la Boétie",
             "registered_zipcode": "75002",
             "registered_city": "Paris",
-            "registered_country": "",
+            "registered_country_code": "FR",
         }
 
         response = self.client.post(reverse("entity-update-info"), query)
@@ -46,10 +44,8 @@ class SettingUpdateEntityTest(TestCase):
             updated_entity.sustainability_officer_phone_number,
             query["sustainability_officer_phone_number"],
         )
-        self.assertEqual(
-            updated_entity.sustainability_officer, query["sustainability_officer"]
-        )
+        self.assertEqual(updated_entity.sustainability_officer, query["sustainability_officer"])
         self.assertEqual(updated_entity.registered_address, query["registered_address"])
         self.assertEqual(updated_entity.registered_zipcode, query["registered_zipcode"])
         self.assertEqual(updated_entity.registered_city, query["registered_city"])
-        self.assertEqual(updated_entity.registered_country, query["registered_country"])
+        self.assertEqual(updated_entity.registered_country.code_pays, query["registered_country_code"])
