@@ -13,6 +13,31 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 usermodel = get_user_model()
 
 
+class Pays(models.Model):
+    code_pays = models.CharField(max_length=64)
+    name = models.CharField(max_length=128)
+    name_en = models.CharField(max_length=128)
+    date_added = models.DateField(default=timezone.now)
+    is_in_europe = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.name
+
+    def natural_key(self):
+        return {
+            "code_pays": self.code_pays,
+            "name": self.name,
+            "name_en": self.name_en,
+            "is_in_europe": self.is_in_europe,
+        }
+
+    class Meta:
+        db_table = "pays"
+        verbose_name = "Pays"
+        verbose_name_plural = "Pays"
+        ordering = ["name"]
+
+
 class Entity(models.Model):
     PRODUCER = "Producteur"
     OPERATOR = "Opérateur"
@@ -56,7 +81,8 @@ class Entity(models.Model):
     registered_address = models.TextField(blank=True, default="")
     registered_zipcode = models.TextField(blank=True, default="")
     registered_city = models.TextField(blank=True, default="")
-    registered_country = models.TextField(blank=True, default="")
+    registered_country = models.ForeignKey(Pays, null=True, blank=True, on_delete=models.CASCADE)
+
     hash = models.CharField(max_length=32, null=True, blank=True, default="")
     default_certificate = models.CharField(max_length=64, null=True, blank=True, default="")
     notifications_enabled = models.BooleanField(default=False)
@@ -84,7 +110,7 @@ class Entity(models.Model):
             "registered_address": self.registered_address,
             "registered_zipcode": self.registered_zipcode,
             "registered_city": self.registered_city,
-            "registered_country": self.registered_country,
+            "registered_country": self.registered_country.name if self.registered_country else None,
             "default_certificate": self.default_certificate,
             "preferred_unit": self.preferred_unit,
             "has_saf": self.has_saf,
@@ -288,31 +314,6 @@ class MatierePremiere(models.Model):
         db_table = "matieres_premieres"
         verbose_name = "Matiere Premiere"
         verbose_name_plural = "Matieres Premieres"
-        ordering = ["name"]
-
-
-class Pays(models.Model):
-    code_pays = models.CharField(max_length=64)
-    name = models.CharField(max_length=128)
-    name_en = models.CharField(max_length=128)
-    date_added = models.DateField(default=timezone.now)
-    is_in_europe = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.name
-
-    def natural_key(self):
-        return {
-            "code_pays": self.code_pays,
-            "name": self.name,
-            "name_en": self.name_en,
-            "is_in_europe": self.is_in_europe,
-        }
-
-    class Meta:
-        db_table = "pays"
-        verbose_name = "Pays"
-        verbose_name_plural = "Pays"
         ordering = ["name"]
 
 
