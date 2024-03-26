@@ -19,7 +19,7 @@ class SeachCompanyForm(forms.Form):
     registration_id = forms.CharField(max_length=9, required=True)  # SIREN
 
 
-# @otp_or_403
+@otp_or_403
 def search_company(request, *args, **kwargs):
     form = SeachCompanyForm(request.POST)
 
@@ -27,12 +27,8 @@ def search_company(request, *args, **kwargs):
         return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, form.errors)
 
     registration_id = form.cleaned_data["registration_id"]
-
-    url = f"https://recherche-entreprises.api.gouv.fr/search?q={registration_id}"
-    api_response = requests.get(url)
-    data = api_response.json()
     try:
-        company_found = data["results"][0]
+        company_found = search_company_gouv_fr(registration_id)
     except:
         return ErrorResponse(400, SeachCompanyFormError.NO_COMPANY_FOUND)
 
@@ -65,3 +61,14 @@ def search_company(request, *args, **kwargs):
         print("no registred company wit same siret")
 
     return SuccessResponse(response)
+
+
+def search_company_gouv_fr(siren):
+    url = f"https://recherche-entreprises.api.gouv.fr/search?q={siren}"
+    api_response = requests.get(url)
+    data = api_response.json()
+    try:
+        company = data["results"][0]
+    except e:
+        raise e
+    return company
