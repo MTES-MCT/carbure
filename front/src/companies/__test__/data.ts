@@ -1,6 +1,12 @@
 import { SearchCompanyPreview } from "companies/types"
 
 
+export const country = {
+  code_pays: "FR",
+  name: "France",
+  name_en: "France",
+  is_in_europe: true,
+}
 export const companyResult: SearchCompanyPreview = {
   name: "Company Test Structure 1",
   legal_name: "Company Test",
@@ -8,7 +14,7 @@ export const companyResult: SearchCompanyPreview = {
   registered_address: "1 rue du paradis",
   registered_city: "Paris",
   registered_zipcode: "75001",
-  registered_country: "France"
+  registered_country: country
 }
 
 

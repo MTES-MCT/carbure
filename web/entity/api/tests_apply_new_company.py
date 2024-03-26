@@ -39,7 +39,7 @@ class EntityApplyNewCompanyTest(TestCase):
             "legal_name": "Mon entreprise test",
             "registered_address": "1 rue de la paix",
             "registered_city": "Paris",
-            "registered_country": "France",
+            "registered_country": "FR",
             "registered_zipcode": "75001",
             "registration_id": "542051180",
             "sustainability_officer": "",
