@@ -33,7 +33,7 @@ export interface CompanyFormValue {
   sustainability_officer: string | undefined
 }
 
-export interface CreateCompanyFormValue extends CompanyFormValue {
+export interface CompanyRegistrationFormValue extends CompanyFormValue {
   certificate: Certificate | undefined
   entity_type: EntityType | undefined
 }
