@@ -101,16 +101,15 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'csp.middleware.CSPMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'spa.middleware.SPAMiddleware',
+    'carbure.middlewares.spa.WhiteNoiseSPAMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'core.logging_middleware.LoggingMiddleware',
-    'core.exception.ExceptionMiddleware'
+    'carbure.middlewares.logging.LoggingMiddleware',
+    'carbure.middlewares.exception.ExceptionMiddleware'
 ]
 
 ROOT_URLCONF = 'carbure.urls'
@@ -189,12 +188,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 STATIC_URL = '/assets/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATICFILES_STORAGE = "spa.storage.SPAStaticFilesStorage"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-WHITENOISE_ALLOW_ALL_ORIGINS=False
+WHITENOISE_ALLOW_ALL_ORIGINS = False
+WHITENOISE_CUSTOM_FRONTEND_ROUTING = True
 
-if env('IMAGE_TAG') in ['dev', 'staging', 'prod']:
-    STATICFILES_DIRS = [os.path.join(BASE_DIR, '../front/build')]
+# if env('IMAGE_TAG') in ['dev', 'staging', 'prod']:
+STATICFILES_DIRS = [os.path.join(BASE_DIR, '../front/build')]
 
 
 DEFAULT_FROM_EMAIL = "noreply@carbure.beta.gouv.fr"
