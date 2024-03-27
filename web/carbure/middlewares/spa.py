@@ -1,4 +1,5 @@
 # forked from https://github.com/metakermit/django-spa/blob/master/spa/middleware.py
+
 import os
 
 from django.conf import settings
@@ -6,8 +7,9 @@ from django.urls import is_valid_path
 from whitenoise.middleware import WhiteNoiseMiddleware
 
 
-class SPAMiddleware(WhiteNoiseMiddleware):
-    """Adds support for serving a single-page app (SPA)
+class WhiteNoiseSPAMiddleware(WhiteNoiseMiddleware):
+    """
+    Adds support for serving a single-page app (SPA)
     with frontend routing on /
     """
 
@@ -50,7 +52,7 @@ class SPAMiddleware(WhiteNoiseMiddleware):
                 # TODO: else return a Django 404 (maybe?)
 
     def update_files_dictionary(self, *args):
-        super(SPAMiddleware, self).update_files_dictionary(*args)
+        super(WhiteNoiseSPAMiddleware, self).update_files_dictionary(*args)
         relative_index_name = self.index_name.strip("/")
         index_page_suffix = "/" + relative_index_name
         index_name_length = len(relative_index_name)
@@ -81,11 +83,11 @@ class SPAMiddleware(WhiteNoiseMiddleware):
         # (should be frontend-routed)
         if url.endswith("/"):
             url += self.index_name.strip("/")
-            self.spa_root = super(SPAMiddleware, self).find_file(url)
+            self.spa_root = super(WhiteNoiseSPAMiddleware, self).find_file(url)
             return self.spa_root
         else:
             # also serve static files on /
             # e.g. when /my/file.png is requested, serve /static/my/file.png
             if not url.startswith(settings.STATIC_URL):
                 url = os.path.join(settings.STATIC_URL, url[1:])
-            return super(SPAMiddleware, self).find_file(url)
+            return super(WhiteNoiseSPAMiddleware, self).find_file(url)
