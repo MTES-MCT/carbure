@@ -193,8 +193,8 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 WHITENOISE_ALLOW_ALL_ORIGINS = False
 WHITENOISE_CUSTOM_FRONTEND_ROUTING = True
 
-# if env('IMAGE_TAG') in ['dev', 'staging', 'prod']:
-STATICFILES_DIRS = [os.path.join(BASE_DIR, '../front/build')]
+if env('IMAGE_TAG') in ['dev', 'staging', 'prod']:
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, '../front/build')]
 
 
 DEFAULT_FROM_EMAIL = "noreply@carbure.beta.gouv.fr"
