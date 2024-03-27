@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-# collect frontend static files
+# collect static files
 python3 ./web/manage.py collectstatic --noinput
 
 # apply new migrations
