@@ -3,7 +3,7 @@
 import datetime
 
 from core.tests_utils import setup_current_user
-from core.models import Entity, EntityCertificate, GenericCertificate
+from core.models import Entity, EntityCertificate, GenericCertificate, UserRightsRequests
 from django.test import TestCase
 from django.urls import reverse
 
@@ -69,3 +69,7 @@ class EntityRegistrationAddCompanyTest(TestCase):
         data = response.json()
         error_code = data["error"]
         self.assertEqual(error_code, "COMPANY_NAME_ALREADY_USED")
+
+        # UserRightRequest created with status PENDING
+        rightRequest = UserRightsRequests.objects.get(user=self.user, entity=entity)
+        self.assertIsNotNone(rightRequest)

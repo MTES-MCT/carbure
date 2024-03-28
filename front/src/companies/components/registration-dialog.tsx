@@ -88,7 +88,7 @@ export const CompanyRegistrationDialog = () => {
 
   return (
     <Portal onClose={closeDialog}>
-      <Dialog fullscreen onClose={closeDialog}>
+      <Dialog onClose={closeDialog}>
         <header>
           <h1>{t("Inscrire ma société sur CarbuRe")} </h1>
         </header>
