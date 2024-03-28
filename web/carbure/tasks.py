@@ -14,6 +14,7 @@ from carbure.scripts.update_2bs_certificates import update_2bs_certificates
 from carbure.scripts.update_iscc_certificates import update_iscc_certificates
 from carbure.scripts.update_redcert_certificates import update_redcert_certificates
 from saf.models.saf_ticket_source import create_ticket_sources_from_lots
+from saf.scripts.link_dgac_to_airlines import link_dgac_to_airlines
 
 
 @db_task()
@@ -68,6 +69,10 @@ if env.get("IMAGE_TAG") == "prod":
         last_month = first - datetime.timedelta(days=1)
         period = last_month.year * 100 + last_month.month
         calc_ml_score(period=period)
+
+    @db_periodic_task(crontab(day_of_week=7, hour=6, minute=0))
+    def periodic_link_dgac_to_airlines() -> None:
+        link_dgac_to_airlines()
 
     @periodic_task(crontab(hour=6, minute=0))
     def restart_metabase_container() -> None:
