@@ -19,6 +19,7 @@ class Pays(models.Model):
     name_en = models.CharField(max_length=128)
     date_added = models.DateField(default=timezone.now)
     is_in_europe = models.BooleanField(default=False)
+    # is_enabled = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
