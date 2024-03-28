@@ -19,7 +19,6 @@ class Pays(models.Model):
     name_en = models.CharField(max_length=128)
     date_added = models.DateField(default=timezone.now)
     is_in_europe = models.BooleanField(default=False)
-    # is_enabled = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
@@ -83,6 +82,8 @@ class Entity(models.Model):
     registered_zipcode = models.CharField(max_length=64, blank=True, default="")
     registered_city = models.CharField(max_length=64, blank=True, default="")
     registered_country = models.ForeignKey(Pays, null=True, blank=True, on_delete=models.CASCADE)
+
+    is_enabled = models.BooleanField(default=True)
 
     hash = models.CharField(max_length=32, null=True, blank=True, default="")
     default_certificate = models.CharField(max_length=64, null=True, blank=True, default="")
@@ -149,6 +150,17 @@ class Entity(models.Model):
         verbose_name = "Entity"
         verbose_name_plural = "Entities"
         ordering = ["name"]
+
+
+@receiver(pre_save, sender=Entity)
+def entity_pre_save_enable_entity(sender, instance, update_fields, **kwargs):
+    if instance.id and instance.is_enabled == True:
+        instance_previous = Entity.objects.get(id=instance.id)
+        if instance_previous.is_enabled == False:
+            enable_entity(instance)
+        # print("instance_previous: ", instance_previous.is_enabled)
+        # print("instance_current: ", instance.is_enabled)
+    # print("instance_previous: ", instance_previous.is_enabled)
 
 
 class UserPreferences(models.Model):
@@ -409,6 +421,7 @@ class EntityDepot(models.Model):
         verbose_name_plural = "Dépôts Entité"
 
 
+from entity.helpers import enable_entity
 from producers.models import ProductionSite
 
 

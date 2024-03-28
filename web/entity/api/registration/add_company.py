@@ -10,6 +10,9 @@ from django.conf import settings
 
 from datetime import datetime
 
+from core.utils import CarbureEnv
+
+
 class ApplyForNewCompanyError:
     COMPANY_NAME_ALREADY_USED = "COMPANY_NAME_ALREADY_USED"
 
@@ -32,7 +35,7 @@ class ApplyForNewCompanyForm(forms.Form):
 
 
 @otp_or_403
-def apply_for_new_company(request, *args, **kwargs):
+def add_company(request, *args, **kwargs):
 
     form = ApplyForNewCompanyForm(request.POST)
 
@@ -71,6 +74,7 @@ def apply_for_new_company(request, *args, **kwargs):
         sustainability_officer=sustainability_officer,
         sustainability_officer_email=sustainability_officer_email,
         sustainability_officer_phone_number=sustainability_officer_phone_number,
+        is_enabled=False,
     )
 
     # add certificat
@@ -78,13 +82,20 @@ def apply_for_new_company(request, *args, **kwargs):
     EntityCertificate.objects.create(entity=entity, certificate=original_certificate)
 
     # add right request
-    UserRightsRequests.objects.update_or_create(
-        user=request.user, entity=entity, defaults={"role": Entity.ADMIN, "status": "PENDING"}
+    urr = UserRightsRequests.objects.create(
+        user=request.user, entity=entity, role=UserRightsRequests.ADMIN, status="PENDING"
     )
 
+    send_email_to_user(entity, request.user)
+    send_email_to_dgec(entity, request.user)
 
-    #send email to user
+    return SuccessResponse()
+
+
+def send_email_to_user(entity, user):
+    # send email to user
     today = datetime.now().strftime("%d/%m/%Y")
+    recipient_list = [user.email]
     text_message = f"""
     Bonjour,
 
@@ -94,32 +105,34 @@ def apply_for_new_company(request, *args, **kwargs):
     Bien cordialement,
     L'équipe CarbuRe
     """
+
     send_mail(
         subject="[CarbuRe] Demande d'inscription de société enregistrée",
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[request.user.email],
+        recipient_list=recipient_list,
         fail_silently=False,
     )
 
-    #send email to staff
+
+def send_email_to_dgec(entity, user):  # send email to staff
+    today = datetime.now().strftime("%d/%m/%Y")
+    recipient_list = (
+        ["carbure@beta.gouv.fr"] if CarbureEnv.is_prod else [user.email]
+    )  # send to current user to avoid spam all the carbure team
     admin_link = f"https://carbure.beta.gouv.fr/admin/core/entity/{entity.id}/change/"
     text_message = f"""
     Hello, ça Carbure ?!
 
-    Une demande d'inscription de société {entity.name} a été déposé le {today} par l'utilisateur {request.user.email}. 
+    Une demande d'inscription de société {entity.name} a été déposé le {today} par l'utilisateur {user.email}. 
     Veuillez traiter cette demande dans l'interface administrateur de CarbuRe {admin_link}.
     
     Bonne journée
     """
     send_mail(
-        subject="[CarbuRe] Demande d'inscription de la société " + entity.name  ,
+        subject="[CarbuRe] Demande d'inscription de la société " + entity.name,
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=["carbure@beta.gouv.fr"],
+        recipient_list=recipient_list,
         fail_silently=False,
     )
-
-    return SuccessResponse()
-
-
