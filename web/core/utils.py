@@ -7,6 +7,7 @@ from django.core.paginator import Paginator
 import xlsxwriter
 from core.xlsx_v3 import make_carbure_lots_sheet
 from core.models import Entity, UserRights
+from os import environ as env
 
 
 # transform a string into a standard form in lower case without accents
@@ -200,3 +201,10 @@ class Validator(forms.Form):
         cleaned_data = super().clean()
         self.validate(cleaned_data)
         return cleaned_data
+
+
+class CarbureEnv:
+    is_prod = True if env.get("IMAGE_TAG") == "prod" else False
+    is_staging = True if env.get("IMAGE_TAG") == "staging" else False
+    is_local = True if env.get("IMAGE_TAG") == "local" else False
+    is_dev = True if env.get("IMAGE_TAG") == "dev" else False
