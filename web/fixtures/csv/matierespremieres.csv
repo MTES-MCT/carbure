@@ -14,7 +14,7 @@ COQUES,Coques,1,0,1,0,0,ANN-IX-A
 DECHETS_BOIS,Déchets de bois,1,1,1,0,1,ANN-IX-A
 DECHETS_INDUSTRIELS,Déchets industriels,1,1,1,0,1,ANN-IX-A
 DECHETS_MUNICIPAUX_MELANGE,Déchets municipaux en mélange (Hors déchets ménagers triés),1,1,1,0,0,ANN-IX-A
-DECHETS_ORGANIQUES_MENAGERS,Déchets organiques ménagers,1,1,1,0,0,ANN-IX-A
+DECHETS_ORGANIQUES_MENAGERS,Déchets organiques ménagers,1,1,1,0,1,ANN-IX-A
 DISTILLAT_ACIDE_GRAS_PALME,Distillat d'acide gras de palme,0,1,0,1,1,CONV
 DPSC,Déchet de processus sucrier contaminé,1,0,0,0,1,OTHER
 EFFLUENTS_HUILERIES_PALME_RAFLE,Effluents d'huileries de palme et rafles,0,1,1,0,1,ANN-IX-A
