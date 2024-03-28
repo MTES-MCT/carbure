@@ -1,10 +1,14 @@
+from urllib import request
 from django import forms
 
 from core.carburetypes import CarbureError
 from core.decorators import otp_or_403
-from core.models import EntityCertificate, GenericCertificate, Entity, Pays
+from core.models import EntityCertificate, GenericCertificate, Entity, Pays, UserRightsRequests
 from core.common import SuccessResponse, ErrorResponse
+from django.core.mail import send_mail
+from django.conf import settings
 
+from datetime import datetime
 
 class ApplyForNewCompanyError:
     COMPANY_NAME_ALREADY_USED = "COMPANY_NAME_ALREADY_USED"
@@ -73,4 +77,49 @@ def apply_for_new_company(request, *args, **kwargs):
     original_certificate = GenericCertificate.objects.get(certificate_type=certificate_type, certificate_id=certificate_id)
     EntityCertificate.objects.create(entity=entity, certificate=original_certificate)
 
+    # add right request
+    UserRightsRequests.objects.update_or_create(
+        user=request.user, entity=entity, defaults={"role": Entity.ADMIN, "status": "PENDING"}
+    )
+
+
+    #send email to user
+    today = datetime.now().strftime("%d/%m/%Y")
+    text_message = f"""
+    Bonjour,
+
+    Votre demande d'inscription pour la société {entity.name} a bien enregistrée à la date du {today}. 
+    L'équipe de la DGEC va étudier votre demande et vous serez notifié lorsque celle-ci aura été traitée.
+    
+    Bien cordialement,
+    L'équipe CarbuRe
+    """
+    send_mail(
+        subject="[CarbuRe] Demande d'inscription de société enregistrée",
+        message=text_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[request.user.email],
+        fail_silently=False,
+    )
+
+    #send email to staff
+    admin_link = f"https://carbure.beta.gouv.fr/admin/core/entity/{entity.id}/change/"
+    text_message = f"""
+    Hello, ça Carbure ?!
+
+    Une demande d'inscription de société {entity.name} a été déposé le {today} par l'utilisateur {request.user.email}. 
+    Veuillez traiter cette demande dans l'interface administrateur de CarbuRe {admin_link}.
+    
+    Bonne journée
+    """
+    send_mail(
+        subject="[CarbuRe] Demande d'inscription de la société " + entity.name  ,
+        message=text_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=["carbure@beta.gouv.fr"],
+        fail_silently=False,
+    )
+
     return SuccessResponse()
+
+
