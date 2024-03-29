@@ -8,6 +8,8 @@ from core.models import Entity, EntityCertificate, GenericCertificate, UserRight
 from django.test import TestCase
 from django.urls import reverse
 
+from entity.helpers import enable_entity
+
 
 class EntityRegistrationAddCompanyTest(TestCase):
     def setUp(self):
@@ -54,19 +56,19 @@ class EntityRegistrationAddCompanyTest(TestCase):
         entity = Entity.objects.get(legal_name="Mon entreprise test", registration_id="542051180")
         self.assertEqual(entity.registered_address, "1 rue de la paix")
 
-        # # check certificate created
-        # certificate = EntityCertificate.objects.get(certificate__certificate_id="EU-ISCC-Cert-PL123-12345678", entity=entity)
-        # self.assertEqual(entity.id, certificate.entity.id)
+        # check certificate created
+        certificate = EntityCertificate.objects.get(certificate__certificate_id="EU-ISCC-Cert-PL123-12345678", entity=entity)
+        self.assertEqual(entity.id, certificate.entity.id)
 
-        # # duplicated company name error
-        # response = self.client.post(
-        #     reverse("entity-registration-add-company"),
-        #     params,
-        # )
-        # self.assertEqual(response.status_code, 400)
-        # data = response.json()
-        # error_code = data["error"]
-        # self.assertEqual(error_code, "COMPANY_NAME_ALREADY_USED")
+        # duplicated company name error
+        response = self.client.post(
+            reverse("entity-registration-add-company"),
+            params,
+        )
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        error_code = data["error"]
+        self.assertEqual(error_code, "COMPANY_NAME_ALREADY_USED")
 
         # UserRightRequest created with status PENDING
         right_request = UserRightsRequests.objects.get(user=self.user, entity=entity)
@@ -74,8 +76,7 @@ class EntityRegistrationAddCompanyTest(TestCase):
 
         # # When entity is enabled
         self.assertEqual(entity.is_enabled, False)
-        entity.is_enabled = True
-        entity.save()
+        enable_entity(entity)
 
         ## right request should be accepted
         right_request.refresh_from_db()
@@ -84,3 +85,7 @@ class EntityRegistrationAddCompanyTest(TestCase):
         ## user rights should be created
         user_right = UserRights.objects.get(entity=entity, user=self.user)
         self.assertIsNotNone(user_right)
+
+        ## entity should be enabled
+        entity.refresh_from_db()
+        self.assertEqual(entity.is_enabled, True)
