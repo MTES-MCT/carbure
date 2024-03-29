@@ -1,12 +1,11 @@
 import datetime
-from email.policy import default
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 import hashlib
 from calendar import monthrange
-from django.db.models.signals import pre_delete, pre_save, post_save
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from django.core.validators import MinValueValidator, MaxValueValidator
 
@@ -150,17 +149,6 @@ class Entity(models.Model):
         verbose_name = "Entity"
         verbose_name_plural = "Entities"
         ordering = ["name"]
-
-
-@receiver(pre_save, sender=Entity)
-def entity_pre_save_enable_entity(sender, instance, update_fields, **kwargs):
-    if instance.id and instance.is_enabled == True:
-        instance_previous = Entity.objects.get(id=instance.id)
-        if instance_previous.is_enabled == False:
-            enable_entity(instance)
-        # print("instance_previous: ", instance_previous.is_enabled)
-        # print("instance_current: ", instance.is_enabled)
-    # print("instance_previous: ", instance_previous.is_enabled)
 
 
 class UserPreferences(models.Model):
@@ -421,7 +409,6 @@ class EntityDepot(models.Model):
         verbose_name_plural = "Dépôts Entité"
 
 
-from entity.helpers import enable_entity
 from producers.models import ProductionSite
 
 
