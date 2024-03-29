@@ -38,6 +38,7 @@ from core.models import Depot, GenericError
 from core.models import SustainabilityDeclaration, EntityDepot
 from core.models import TransactionDistance
 from core.models import CarbureNotification
+from entity.helpers import enable_entity
 from transactions.sanity_checks.helpers import get_prefetched_data
 
 
@@ -52,9 +53,17 @@ def custom_titled_filter(title):
 
 
 class EntityAdmin(admin.ModelAdmin):
-    list_display = ("entity_type", "name", "parent_entity")
+    list_display = ("entity_type", "name", "parent_entity", "is_enabled")
     search_fields = ("entity_type", "name")
-    list_filter = ("entity_type",)
+    list_filter = ["entity_type"]
+
+    actions = ["enable_entity"]
+
+    def enable_entity(self, request, queryset):
+        for entity in queryset:
+            enable_entity(entity)
+
+    enable_entity.short_description = "Activer les sociétés sélectionnées"
 
 
 class UserRightsAdmin(admin.ModelAdmin):

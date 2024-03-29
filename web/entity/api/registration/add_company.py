@@ -11,6 +11,7 @@ from django.conf import settings
 from datetime import datetime
 
 from core.utils import CarbureEnv
+import urllib.parse
 
 
 class ApplyForNewCompanyError:
@@ -120,12 +121,17 @@ def send_email_to_dgec(entity, user):  # send email to staff
     recipient_list = (
         ["carbure@beta.gouv.fr"] if CarbureEnv.is_prod else [user.email]
     )  # send to current user to avoid spam all the carbure team
-    admin_link = f"https://carbure.beta.gouv.fr/admin/core/entity/{entity.id}/change/"
+    admin_link = f"{CarbureEnv.get_base_url()}/admin/core/entity/?is_enabled=False"
     text_message = f"""
     Hello, ça Carbure ?!
 
     Une demande d'inscription de société {entity.name} a été déposé le {today} par l'utilisateur {user.email}. 
-    Veuillez traiter cette demande dans l'interface administrateur de CarbuRe {admin_link}.
+    Veuillez traiter cette demande dans l'interface administrateur de CarbuRe :
+
+    1 - Visualisez la liste des sociétés à valider sur ce lien : {admin_link}.
+    2 - Selectionnez la société {entity.name}.
+    3 - Selectionnez l'action "Activer les sociétés sélectionnées".
+    4 - Cliquez sur "Envoyer".
     
     Bonne journée
     """

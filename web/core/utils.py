@@ -208,3 +208,18 @@ class CarbureEnv:
     is_staging = True if env.get("IMAGE_TAG") == "staging" else False
     is_local = True if env.get("IMAGE_TAG") == "local" else False
     is_dev = True if env.get("IMAGE_TAG") == "dev" else False
+
+    base_url_prod = "https://carbure.beta.gouv.fr"
+    base_url_staging = "https://carbure-staging.beta.gouv.fr"
+    base_url_local = "http://carbure.local:8090"
+    base_url_dev = "http://carbure-dev.local.beta.gouv.fr"
+
+    def get_base_url():
+        if CarbureEnv.is_prod:
+            return CarbureEnv.base_url_prod
+        if CarbureEnv.is_staging:
+            return CarbureEnv.base_url_staging
+        if CarbureEnv.is_local:
+            return CarbureEnv.base_url_local
+        if CarbureEnv.is_dev:
+            return CarbureEnv.base_url_dev
