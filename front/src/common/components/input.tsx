@@ -32,6 +32,7 @@ export interface Control extends Layout {
   label?: string
   type?: string
   name?: string
+  pattern?: string
   placeholder?: string
   title?: string
   icon?: React.FunctionComponent | React.ReactNode
@@ -317,6 +318,7 @@ export const Input = ({
       step={step}
       title={`${value}`}
       type={props.type}
+      pattern={props.pattern}
       value={value}
     />
   </Field>

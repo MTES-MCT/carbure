@@ -1,0 +1,6 @@
+.select input {
+  cursor: pointer;
+  caret-color: transparent;
+  display: inline-block;
+  width: auto;
+}

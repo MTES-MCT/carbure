@@ -67,23 +67,26 @@ export const CompanyRegistrationDialog = () => {
   }
 
   const onSubmitForm = (formValue: CompanyRegistrationFormValue | undefined) => {
-    if (!formValue) return
-    registerCompanyRequest.execute(
-      formValue.activity_description!,
-      formValue.certificate!.certificate_id,
-      formValue.certificate!.certificate_type,
-      formValue.entity_type!,
-      formValue.legal_name!,
-      formValue.name!,
-      formValue.registered_address!,
-      formValue.registered_city!,
-      formValue.registered_country?.code_pays!,
-      formValue.registered_zipcode!,
-      formValue.registration_id!,
-      formValue.sustainability_officer_email!,
-      formValue.sustainability_officer_phone_number!,
-      formValue.sustainability_officer!,
-    )
+    console.log('formValue:', formValue)
+
+
+    // if (!formValue) return
+    // registerCompanyRequest.execute(
+    //   formValue.activity_description!,
+    //   formValue.certificate!.certificate_id,
+    //   formValue.certificate!.certificate_type,
+    //   formValue.entity_type!,
+    //   formValue.legal_name!,
+    //   formValue.name!,
+    //   formValue.registered_address!,
+    //   formValue.registered_city!,
+    //   formValue.registered_country?.code_pays!,
+    //   formValue.registered_zipcode!,
+    //   formValue.registration_id!,
+    //   formValue.sustainability_officer_email!,
+    //   formValue.sustainability_officer_phone_number!,
+    //   formValue.sustainability_officer!,
+    // )
   }
 
   return (
@@ -209,24 +212,27 @@ const PrefetchedCompanyForm = ({
         disabled
       />
       <TextInput
-        required
+        // required
         label={t("Responsable durabilité")}
+        placeholder="Jean-Pierre Champollion"
         {...companyForm.bind("sustainability_officer")}
       />
       <TextInput
-        required
-        type="phone"
-        label={t("N° téléphone responsable durabilité")}
+        // required
+        type="tel"
+        placeholder="exemple : +33 612345678"
+        label={t("N° téléphone responsable durabilité (commence par +33 pour la France)")}
         {...companyForm.bind("sustainability_officer_phone_number")}
+        pattern="^\+[0-9]{1,3}\s?[0-9]{6,14}$"
       />
       <TextInput
-        required
+        // required
         type="email"
         label={t("Email responsable durabilité")}
         {...companyForm.bind("sustainability_officer_email")}
       />
       <Autocomplete
-        required
+        // required
         label={t("Certificat (schéma volontaire ou national)")}
         normalize={normalizeCertificate}
         getOptions={(query) =>
@@ -235,6 +241,7 @@ const PrefetchedCompanyForm = ({
         {...companyForm.bind("certificate")}
 
       />
+
 
       <Select
         required

@@ -5,6 +5,8 @@ import Dropdown, { Trigger } from "./dropdown"
 import { ChevronDown } from "./icons"
 import { Control, Input } from "./input"
 import List from "./list"
+import cl from "clsx"
+import css from "./select.module.css"
 
 export interface SelectProps<T, V = T> extends Control, Trigger {
   clear?: boolean
@@ -53,12 +55,15 @@ export function Select<T, V>({
       : undefined
 
   return (
-    <>
+    <div className={cl(css.select)}>
+
       <Input
         {...props}
         domRef={triggerRef}
-        type="button"
-        value={asyncOptions.label || placeholder}
+        type="text"
+        placeholder={placeholder}
+        onChange={(e) => e}
+        value={asyncOptions.label}
         icon={<ChevronDown passthrough />}
         onClear={onClear}
         loading={loading || asyncOptions.loading}
@@ -91,7 +96,7 @@ export function Select<T, V>({
           />
         </Dropdown>
       )}
-    </>
+    </div>
   )
 }
 

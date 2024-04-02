@@ -103,7 +103,7 @@ test("check draft actions", async () => {
   screen.getByText("Supprimer tout")
   screen.getByText("Exporter vers Excel")
 
-  await screen.findByText("2021")
+  await screen.findByDisplayValue("2021")
 })
 
 test("check inbox actions", async () => {
@@ -120,7 +120,7 @@ test("check inbox actions", async () => {
   screen.getByText("Refuser tout")
   screen.getByText("Exporter vers Excel")
 
-  await screen.findByText("2021")
+  await screen.findByDisplayValue("2021")
 })
 
 test("check outbox actions", async () => {
@@ -142,7 +142,7 @@ test("check outbox actions", async () => {
   const deleteButtons = screen.getAllByText("Supprimer la sélection")
   expect(deleteButtons).toHaveLength(2)
 
-  await screen.findByText("2021")
+  await screen.findByDisplayValue("2021")
 })
 
 test("send all draft lots", async () => {
@@ -150,7 +150,7 @@ test("send all draft lots", async () => {
 
   render(<TransactionsWithRouter status="drafts" entity={operator} />)
 
-  await screen.findByText("2021")
+  await screen.findByDisplayValue("2021")
   const button = (await screen.findByText("Envoyer tout")).closest("button")!
 
   // wait for the lot to be loaded
@@ -185,7 +185,7 @@ test("sent selected draft lots", async () => {
 
   await waitWhileLoading()
 
-  screen.getByText("2021")
+  screen.getByDisplayValue("2021")
 
   // select the first lot
   await user.click(document.querySelector("li [data-checkbox]")!)

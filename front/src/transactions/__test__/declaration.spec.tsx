@@ -26,7 +26,7 @@ test("display transaction details", async () => {
 
   screen.getByText("Déclaration de durabilité")
 
-  await user.click(screen.getByDisplayValue("Choisissez un mois"))
+  await user.click(screen.getByPlaceholderText("Choisissez un mois"))
   await user.click(screen.getByText("Janvier : 2 lots"))
 
   screen.getByText(/Lots reçus/)
