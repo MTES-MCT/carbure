@@ -1018,7 +1018,7 @@ def lot_post_save_gen_carbure_id(sender, instance, created, update_fields={}, *a
     old_carbure_id = instance.carbure_id
     instance.generate_carbure_id()
 
-    if instance.carbure_id != old_carbure_id and instance.lot_status in ("PENDING", "ACCEPTED", "FROZEN"):
+    if instance.carbure_id != old_carbure_id and instance.lot_status in ("PENDING", "ACCEPTED", "REJECTED", "FROZEN"):
         instance.save(update_fields=["carbure_id"])
 
 
