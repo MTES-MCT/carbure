@@ -76,6 +76,7 @@ def get_application_quarter(reference_date: date):
 
     # special condition to ignore TOO_LATE error for the first ever round of applications
     is_first_quarter_2024 = quarter == 1 and reference_date.year == 2024
+    is_second_quarter_2024 = quarter == 2 and reference_date.year == 2024
 
     # the reference date is in the last 10 days of its quarter
     # this means the wanted quarter is the reference date's quarter
@@ -84,7 +85,7 @@ def get_application_quarter(reference_date: date):
 
     # the reference date is in the first 20 days of its quarter
     # this means the wanted quarter is the quarter before the reference date's
-    if (reference_date - first_day_of_quarter).days <= 20 or is_first_quarter_2024:
+    if (reference_date - first_day_of_quarter).days <= 20 or is_first_quarter_2024 or is_second_quarter_2024:
         previous_quarter = quarter - 1 if quarter > 1 else 4
         previous_quarter_year = first_day_of_quarter.year if quarter > 1 else first_day_of_quarter.year - 1
         return previous_quarter, previous_quarter_year
