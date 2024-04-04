@@ -20,8 +20,6 @@ class ApplyForNewCompanyError:
 
 class ApplyForNewCompanyForm(forms.Form):
     activity_description = forms.CharField(max_length=256, required=True)
-    certificate_id = forms.CharField(max_length=64, required=True)
-    certificate_type = forms.CharField(max_length=32, required=True)
     entity_type = forms.CharField(max_length=64, required=True)
     name = forms.CharField(max_length=128, required=True)
     legal_name = forms.CharField(max_length=128, required=True)
@@ -33,6 +31,8 @@ class ApplyForNewCompanyForm(forms.Form):
     sustainability_officer = forms.CharField(max_length=64, required=True)
     sustainability_officer_email = forms.CharField(max_length=254, required=True)
     sustainability_officer_phone_number = forms.CharField(max_length=32, required=True)
+    certificate_id = forms.CharField(max_length=64, required=False)
+    certificate_type = forms.CharField(max_length=32, required=False)
 
 
 @otp_or_403
@@ -44,8 +44,6 @@ def add_company(request, *args, **kwargs):
         return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, form.errors)
 
     activity_description = form.cleaned_data["activity_description"]
-    certificate_id = form.cleaned_data["certificate_id"]
-    certificate_type = form.cleaned_data["certificate_type"]
     entity_type = form.cleaned_data["entity_type"]
     name = form.cleaned_data["name"]
     legal_name = form.cleaned_data["legal_name"]
@@ -57,6 +55,8 @@ def add_company(request, *args, **kwargs):
     sustainability_officer = form.cleaned_data["sustainability_officer"]
     sustainability_officer_email = form.cleaned_data["sustainability_officer_email"]
     sustainability_officer_phone_number = form.cleaned_data["sustainability_officer_phone_number"]
+    certificate_id = form.cleaned_data["certificate_id"]
+    certificate_type = form.cleaned_data["certificate_type"]
 
     duplicated_company = Entity.objects.filter(name=name).first()
     if duplicated_company:
@@ -79,8 +79,11 @@ def add_company(request, *args, **kwargs):
     )
 
     # add certificat
-    original_certificate = GenericCertificate.objects.get(certificate_type=certificate_type, certificate_id=certificate_id)
-    EntityCertificate.objects.create(entity=entity, certificate=original_certificate)
+    if entity_type not in [Entity.AIRLINE, Entity.CPO]:
+        original_certificate = GenericCertificate.objects.get(
+            certificate_type=certificate_type, certificate_id=certificate_id
+        )
+        EntityCertificate.objects.create(entity=entity, certificate=original_certificate)
 
     # add right request
     urr = UserRightsRequests.objects.create(

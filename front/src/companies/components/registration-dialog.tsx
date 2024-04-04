@@ -70,8 +70,6 @@ export const CompanyRegistrationDialog = () => {
     if (!formValue) return
     registerCompanyRequest.execute(
       formValue.activity_description!,
-      formValue.certificate!.certificate_id,
-      formValue.certificate!.certificate_type,
       formValue.entity_type!,
       formValue.legal_name!,
       formValue.name!,
@@ -83,6 +81,8 @@ export const CompanyRegistrationDialog = () => {
       formValue.sustainability_officer_email!,
       formValue.sustainability_officer_phone_number!.trim(),
       formValue.sustainability_officer!,
+      formValue.certificate?.certificate_id,
+      formValue.certificate?.certificate_type,
     )
   }
 
@@ -228,16 +228,7 @@ const PrefetchedCompanyForm = ({
         label={t("Email responsable durabilité")}
         {...companyForm.bind("sustainability_officer_email")}
       />
-      <Autocomplete
-        required
-        label={t("Certificat (schéma volontaire ou national)")}
-        normalize={normalizeCertificate}
-        getOptions={(query) =>
-          getCertificates(query).then((res) => res.data.data ?? [])
-        }
-        {...companyForm.bind("certificate")}
 
-      />
 
       <Select
         required
@@ -272,6 +263,17 @@ const PrefetchedCompanyForm = ({
           },
         ]}
       />
+      {companyForm.value?.entity_type && ![EntityType.Airline, EntityType.CPO].includes(companyForm.value?.entity_type) && (
+        <Autocomplete
+          label={t("Certificat (schéma volontaire ou national)")}
+          normalize={normalizeCertificate}
+          getOptions={(query) =>
+            getCertificates(query).then((res) => res.data.data ?? [])
+          }
+          {...companyForm.bind("certificate")}
+
+        />
+      )}
       <TextArea
         required
         label={t("Description de l'activité")}
