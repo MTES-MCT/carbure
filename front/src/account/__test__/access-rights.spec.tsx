@@ -21,7 +21,7 @@ afterAll(() => server.close())
 const AccountWithHooks = () => {
   return (
     <TestRoot url="/">
-      <Route path="/" element={<Account />} />
+      <Route path="*" element={<Account />} />
     </TestRoot>
   )
 }
