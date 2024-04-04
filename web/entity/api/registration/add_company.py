@@ -31,6 +31,8 @@ class ApplyForNewCompanyForm(forms.Form):
     sustainability_officer = forms.CharField(max_length=64, required=True)
     sustainability_officer_email = forms.CharField(max_length=254, required=True)
     sustainability_officer_phone_number = forms.CharField(max_length=32, required=True)
+    website = forms.URLField(required=False)
+    vat_number = forms.CharField(max_length=32, required=False)
     certificate_id = forms.CharField(max_length=64, required=False)
     certificate_type = forms.CharField(max_length=32, required=False)
 
@@ -55,6 +57,8 @@ def add_company(request, *args, **kwargs):
     sustainability_officer = form.cleaned_data["sustainability_officer"]
     sustainability_officer_email = form.cleaned_data["sustainability_officer_email"]
     sustainability_officer_phone_number = form.cleaned_data["sustainability_officer_phone_number"]
+    website = form.cleaned_data["website"]
+    vat_number = form.cleaned_data["vat_number"]
     certificate_id = form.cleaned_data["certificate_id"]
     certificate_type = form.cleaned_data["certificate_type"]
 
@@ -76,6 +80,8 @@ def add_company(request, *args, **kwargs):
         sustainability_officer_email=sustainability_officer_email,
         sustainability_officer_phone_number=sustainability_officer_phone_number,
         is_enabled=False,
+        website=website,
+        vat_number=vat_number,
     )
 
     # add certificat

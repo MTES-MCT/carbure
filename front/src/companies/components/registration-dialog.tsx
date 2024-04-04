@@ -81,6 +81,8 @@ export const CompanyRegistrationDialog = () => {
       formValue.sustainability_officer_email!,
       formValue.sustainability_officer_phone_number!.trim(),
       formValue.sustainability_officer!,
+      formValue.website!,
+      formValue.vat_number!,
       formValue.certificate?.certificate_id,
       formValue.certificate?.certificate_type,
     )
@@ -279,6 +281,21 @@ const PrefetchedCompanyForm = ({
         label={t("Description de l'activité")}
         {...companyForm.bind("activity_description")}
       />
+
+      <TextInput
+        required
+        placeholder="https://www.example.com"
+        type="url"
+        label={t("Site web (commençant par https://)")}
+        {...companyForm.bind("website")}
+      />
+
+      <TextInput
+        required
+        label={t("Numéro de TVA")}
+        {...companyForm.bind("vat_number")}
+      />
+
     </Form>
   </>
 }
@@ -298,6 +315,8 @@ const useCompanyForm = (prefetchedCompany: SearchCompanyPreview) => {
     sustainability_officer_email: undefined as string | undefined,
     sustainability_officer_phone_number: undefined as string | undefined,
     sustainability_officer: undefined as string | undefined,
+    website: undefined as string | undefined,
+    vat_number: undefined as string | undefined,
   } as CompanyRegistrationFormValue)
 
 }

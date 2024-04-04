@@ -31,6 +31,8 @@ export interface CompanyFormValue {
   sustainability_officer_email: string | undefined
   sustainability_officer_phone_number: string | undefined
   sustainability_officer: string | undefined
+  website: string | undefined
+  vat_number: string | undefined
 }
 
 export interface CompanyRegistrationFormValue extends CompanyFormValue {

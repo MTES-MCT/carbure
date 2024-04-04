@@ -30,6 +30,8 @@ def update_entity_info(request, *args, **kwargs):
     registered_city = form.cleaned_data["registered_city"]
     registered_country = form.cleaned_data["registered_country_code"]
     activity_description = form.cleaned_data["activity_description"]
+    website = form.cleaned_data["website"]
+    vat_number = form.cleaned_data["vat_number"]
 
     entity = Entity.objects.get(id=entity_id)
     entity.legal_name = legal_name
@@ -42,6 +44,8 @@ def update_entity_info(request, *args, **kwargs):
     entity.registered_city = registered_city
     entity.registered_country = registered_country
     entity.activity_description = activity_description
+    entity.website = website
+    entity.vat_number = vat_number
     entity.save()
     return SuccessResponse()
 
@@ -58,3 +62,5 @@ class UpdateEntityInfoForm(forms.Form):
     registered_city = forms.CharField(required=False)
     registered_country_code = forms.ModelChoiceField(queryset=Pays.objects.all(), to_field_name="code_pays", required=False)
     activity_description = forms.CharField(required=False)
+    website = forms.URLField(required=False)
+    vat_number = forms.CharField(max_length=32, required=False)
