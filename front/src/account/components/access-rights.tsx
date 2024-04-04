@@ -82,7 +82,7 @@ export const AccountAccesRights = () => {
 
       {user.requests.length > 0 && (
         <Table
-          onAction={(right) => navigate(`/org/${right.entity.id}`)}
+          onAction={(right) => right.status === UserRightStatus.Accepted && navigate(`/org/${right.entity.id}`)}
           rows={user.requests}
           columns={[
             {

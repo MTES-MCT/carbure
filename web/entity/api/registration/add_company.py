@@ -66,7 +66,7 @@ def add_company(request, *args, **kwargs):
         activity_description=activity_description,
         entity_type=entity_type,
         legal_name=legal_name,
-        name=legal_name,
+        name=name,
         registered_address=registered_address,
         registered_city=registered_city,
         registered_country=registered_country,
