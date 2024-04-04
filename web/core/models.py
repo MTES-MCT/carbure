@@ -90,6 +90,8 @@ class Entity(models.Model):
     preferred_unit = models.CharField(max_length=64, choices=(("l", "litres"), ("kg", "kg"), ("MJ", "MJ")), default="l")
     has_saf = models.BooleanField(default=False)
     activity_description = models.TextField(blank=True, default="")
+    website = models.URLField(blank=True, default="")
+    vat_number = models.CharField(max_length=32, blank=True, default="")
 
     def __str__(self):
         return self.name
@@ -117,6 +119,8 @@ class Entity(models.Model):
             "has_saf": self.has_saf,
             "has_elec": self.has_elec,
             "activity_description": self.activity_description,
+            "website": self.website,
+            "vat_number": self.vat_number,
         }
         if self.entity_type == Entity.EXTERNAL_ADMIN:
             d["ext_admin_pages"] = [e.right for e in self.externaladminrights_set.all()]

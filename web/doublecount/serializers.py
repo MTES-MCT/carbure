@@ -28,6 +28,9 @@ class EntitySerializer(serializers.ModelSerializer):
             "registered_zipcode",
             "registered_city",
             "registered_country",
+            "activity_description",
+            "website",
+            "vat_number",
         ]
 
 

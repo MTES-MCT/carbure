@@ -26,6 +26,8 @@ export function registerCompany(
   sustainability_officer_email: string,
   sustainability_officer_phone_number: string,
   sustainability_officer: string,
+  website?: string,
+  vat_number?: string,
   certificate_id?: string,
   certificate_type?: string,
 
@@ -44,6 +46,8 @@ export function registerCompany(
     sustainability_officer_email,
     sustainability_officer_phone_number,
     sustainability_officer,
+    website,
+    vat_number,
     certificate_id,
     certificate_type,
   })

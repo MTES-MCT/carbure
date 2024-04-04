@@ -63,6 +63,8 @@ export function useEntityManager(user: UserManager): EntityManager {
     isCPO: type === EntityType.CPO,
     isIndustry: isIndustry(type),
     canTrade: !!entity?.has_stocks || !!entity?.has_trading,
+    website: entity?.website ?? "",
+    vat_number: entity?.vat_number ?? "",
 
     hasAdminRight: (page: ExternalAdminPages) =>
       entity?.ext_admin_pages?.includes(page) ?? false,

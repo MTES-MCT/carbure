@@ -21,6 +21,8 @@ export interface Entity {
   has_saf?: boolean
   has_elec: boolean
   activity_description?: string
+  website?: string
+  vat_number?: string
 }
 
 export interface EntityPreview {

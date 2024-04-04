@@ -46,6 +46,8 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
         formValue.sustainability_officer_email!,
         formValue.sustainability_officer_phone_number!.trim(),
         formValue.sustainability_officer!,
+        formValue.website!,
+        formValue.vat_number!
       )
     }
   }
@@ -89,12 +91,7 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
             label={t("N° d'enregistrement de la société (SIREN ou équivalent)")}
             {...companyForm.bind("registration_id")}
           />
-          <TextInput
-            required
-            label={t("Nom de la société (visible dans carbure)")}
-            {...companyForm.bind("name")}
-            disabled
-          />
+
           <TextInput
             required
             readOnly={readOnly}
@@ -158,6 +155,22 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
             label={t("Description de l'activité")}
             {...companyForm.bind("activity_description")}
           />
+
+          <TextInput
+            required
+            readOnly={readOnly}
+            placeholder="https://www.example.com"
+            type="url"
+            label={t("Site web (https://...)")}
+            {...companyForm.bind("website")}
+          />
+
+          <TextInput
+            required
+            readOnly={readOnly}
+            label={t("Numéro de TVA")}
+            {...companyForm.bind("vat_number")}
+          />
         </Form>
       </section>
 
@@ -184,7 +197,9 @@ function hasChange(entity: Entity, formEntity: CompanyFormValue) {
     entity.registered_city !== formEntity.registered_city ||
     entity.registered_zipcode !== formEntity.registered_zipcode ||
     entity.registered_country !== formEntity.registered_country ||
-    entity.activity_description !== formEntity.activity_description
+    entity.activity_description !== formEntity.activity_description ||
+    entity.website !== formEntity.website ||
+    entity.vat_number !== formEntity.vat_number
   )
 }
 
@@ -202,5 +217,7 @@ const useCompanyForm = (entity: Entity) => {
     sustainability_officer_email: entity?.sustainability_officer_email as string | undefined,
     sustainability_officer_phone_number: entity?.sustainability_officer_phone_number as string | undefined,
     sustainability_officer: entity?.sustainability_officer as string | undefined,
+    website: entity?.website as string | undefined,
+    vat_number: entity?.vat_number as string | undefined,
   })
 }

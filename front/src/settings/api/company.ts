@@ -40,7 +40,9 @@ export function updateEntity(
   registration_id: string,
   sustainability_officer_email: string,
   sustainability_officer_phone_number: string,
-  sustainability_officer: string
+  sustainability_officer: string,
+  website: string,
+  vat_number: string,
 ) {
 
   return api.post("/entity/update-info", {
@@ -54,7 +56,9 @@ export function updateEntity(
     registration_id,
     sustainability_officer_email,
     sustainability_officer_phone_number,
-    sustainability_officer
+    sustainability_officer,
+    website,
+    vat_number
   })
 }
 
