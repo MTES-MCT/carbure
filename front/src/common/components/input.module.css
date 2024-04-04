@@ -115,6 +115,7 @@
   overflow: hidden;
   resize: none;
   outline: none;
+  min-width: 0;
 }
 
 .control textarea {
