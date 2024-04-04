@@ -15,8 +15,6 @@ export function searchCompanyDataBySiren(
 
 export function registerCompany(
   activity_description: string,
-  certificate_id: string,
-  certificate_type: string,
   entity_type: EntityType,
   legal_name: string,
   name: string,
@@ -27,14 +25,14 @@ export function registerCompany(
   registration_id: string,
   sustainability_officer_email: string,
   sustainability_officer_phone_number: string,
-  sustainability_officer: string
+  sustainability_officer: string,
+  certificate_id?: string,
+  certificate_type?: string,
 
 
 ) {
   return api.post("/entity/registration/add-company", {
     activity_description,
-    certificate_id,
-    certificate_type,
     entity_type,
     legal_name,
     name,
@@ -46,6 +44,8 @@ export function registerCompany(
     sustainability_officer_email,
     sustainability_officer_phone_number,
     sustainability_officer,
+    certificate_id,
+    certificate_type,
   })
 }
 
