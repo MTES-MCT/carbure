@@ -41,7 +41,7 @@ const Carbure = () => {
             <Topbar />
 
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route path="*" element={<Home />} />
               <Route path="/stats" element={<PublicStats />} />
               <Route path="/double-counting-list" element={<AgreementPublicList />} />
               <Route

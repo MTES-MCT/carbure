@@ -62,7 +62,20 @@ export function Select<T, V>({
         icon={<ChevronDown passthrough />}
         onClear={onClear}
         loading={loading || asyncOptions.loading}
-      />
+        name={props.name + "-display"}
+      >
+        <input
+          {...props}
+          style={{ width: "0", opacity: "0", position: "absolute" }}
+          disabled={props.disabled}
+          readOnly={props.readOnly}
+          required={props.required}
+          title={`${value}`}
+          onChange={(e) => e}
+          type="text"
+          value={asyncOptions.label}
+        />
+      </Input>
 
       {!props.disabled && !props.readOnly && (
         <Dropdown

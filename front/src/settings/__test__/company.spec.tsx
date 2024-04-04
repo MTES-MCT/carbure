@@ -38,7 +38,7 @@ test("check the company section of the settings for a producer", async () => {
 
   expect(await screen.findAllByText("Options")).toHaveLength(2)
 
-  await screen.findByDisplayValue("litres (Éthanol à 20°, autres à 15°)")
+  await screen.findAllByDisplayValue("litres (Éthanol à 20°, autres à 15°)")
 
   const mac = screen.getByLabelText("Ma société effectue des mises à consommation (B100 et ED95 uniquement)") // prettier-ignore
   const trading = screen.getByLabelText("Ma société a une activité de négoce")
@@ -48,17 +48,15 @@ test("check the company section of the settings for a producer", async () => {
 
   server.use(okDisableMac)
   await user.click(mac)
-  // await waitWhileLoading()
   expect(mac).not.toBeChecked()
 
   server.use(okDisableTrading)
   await user.click(trading)
-  // await waitWhileLoading()
   expect(trading).not.toBeChecked()
 
   server.use(okEnableMac)
   await user.click(mac)
-  // await waitWhileLoading()
+  // await ()
   expect(mac).toBeChecked()
 
   server.use(okEnableTrading)
@@ -106,6 +104,7 @@ test("check the company section of the settings for an operator", async () => {
 test("check the company section of the settings for an admin", async () => {
   setEntity(admin)
   render(<SettingsWithHooks entityID={admin.id} />)
+  await waitWhileLoading()
   expect(
     screen.queryByText("Options", { selector: ":not(a)" })
   ).not.toBeInTheDocument()

@@ -157,9 +157,7 @@ const PrefetchedCompanyForm = ({
   prefetchedCompany
 }: PrefetchedCompanyFormProps) => {
   const { t } = useTranslation()
-
   const companyForm = useCompanyForm(prefetchedCompany)
-
 
   return <>
     <Form

@@ -286,6 +286,7 @@ export interface InputProps extends Control {
   onChange?: React.ChangeEventHandler<HTMLInputElement>
   onClear?: () => void
   inputRef?: React.RefObject<HTMLInputElement>
+  children?: React.ReactNode
 }
 
 export const Input = ({
@@ -321,6 +322,7 @@ export const Input = ({
       type={props.type}
       value={value}
     />
+    {props.children}
   </Field>
 )
 
