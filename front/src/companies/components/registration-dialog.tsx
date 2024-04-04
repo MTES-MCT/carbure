@@ -211,12 +211,15 @@ const PrefetchedCompanyForm = ({
       <TextInput
         required
         label={t("Responsable durabilité")}
+        placeholder="Jean-Pierre Champollion"
         {...companyForm.bind("sustainability_officer")}
       />
       <TextInput
         required
-        type="phone"
+        type="tel"
+        pattern="^\+[0-9]{1,3}\s?[0-9]{6,14}$"
         label={t("N° téléphone responsable durabilité")}
+        placeholder="exemple : +33 612345678"
         {...companyForm.bind("sustainability_officer_phone_number")}
       />
       <TextInput

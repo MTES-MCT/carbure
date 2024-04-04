@@ -84,8 +84,9 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
           onSubmit={onSubmitForm}
         >
           <TextInput
+            required
             readOnly={readOnly}
-            label={t("N° d'enregistrement de la société (SIREN)")}
+            label={t("N° d'enregistrement de la société (SIREN ou équivalent)")}
             {...companyForm.bind("registration_id")}
           />
           <TextInput
@@ -95,26 +96,31 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
             disabled
           />
           <TextInput
+            required
             readOnly={readOnly}
             label={t("Nom légal")}
             {...companyForm.bind("legal_name")}
           />
           <TextInput
+            required
             readOnly={readOnly}
             label={t("Adresse de la société (Numéro et rue)")}
             {...companyForm.bind("registered_address")}
           />
           <TextInput
+            required
             readOnly={readOnly}
             label={t("Ville")}
             {...companyForm.bind("registered_city")}
           />
           <TextInput
+            required
             readOnly={readOnly}
             label={t("Code postal")}
             {...companyForm.bind("registered_zipcode")}
           />
           <Autocomplete
+            required
             readOnly={readOnly}
             label={t("Pays")}
             placeholder={t("Rechercher un pays...")}
@@ -123,17 +129,23 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
             {...companyForm.bind("registered_country")}
           />
           <TextInput
+            required
             readOnly={readOnly}
             label={t("Responsable durabilité")}
+            placeholder="Jean-Pierre Champollion"
             {...companyForm.bind("sustainability_officer")}
           />
           <TextInput
-            type="phone"
-            readOnly={readOnly}
+            required
+            type="tel"
+            pattern="^\+[0-9]{1,3}\s?[0-9]{6,14}$"
             label={t("N° téléphone responsable durabilité")}
+            placeholder="exemple : +33 612345678"
+            readOnly={readOnly}
             {...companyForm.bind("sustainability_officer_phone_number")}
           />
           <TextInput
+            required
             type="email"
             readOnly={readOnly}
             label={t("Email responsable durabilité")}
@@ -141,6 +153,7 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
           />
 
           <TextArea
+            required
             readOnly={readOnly}
             label={t("Description de l'activité")}
             {...companyForm.bind("activity_description")}

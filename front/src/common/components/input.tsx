@@ -19,25 +19,26 @@ import Tooltip from "./tooltip"
 export type FieldVariant = "outline" | "solid" | "inline" | "text"
 
 export interface Control extends Layout {
-  className?: string
-  style?: React.CSSProperties
   autoFocus?: boolean
-  variant?: FieldVariant
+  className?: string
   clear?: boolean
   disabled?: boolean
+  domRef?: React.RefObject<HTMLElement>
+  error?: string
+  hasTooltip?: boolean
+  icon?: React.FunctionComponent | React.ReactNode
+  label?: string
+  loading?: boolean
+  name?: string
+  pattern?: string
+  placeholder?: string
   readOnly?: boolean
   required?: boolean
-  loading?: boolean
-  error?: string
-  label?: string
-  type?: string
-  name?: string
-  placeholder?: string
-  title?: string
-  icon?: React.FunctionComponent | React.ReactNode
   rightContent?: React.ReactNode
-  hasTooltip?: boolean
-  domRef?: React.RefObject<HTMLElement>
+  style?: React.CSSProperties
+  title?: string
+  type?: string
+  variant?: FieldVariant
 }
 
 export interface TextInputProps extends Control {
@@ -310,6 +311,7 @@ export const Input = ({
       min={min}
       name={name}
       onChange={onChange}
+      pattern={props.pattern}
       placeholder={placeholder}
       readOnly={props.readOnly}
       ref={inputRef}
