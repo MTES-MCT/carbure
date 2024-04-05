@@ -65,13 +65,12 @@ export function Select<T, V>({
         name={props.name + "-display"}
       >
         <input
-          {...props}
-          style={{ width: "0", opacity: "0", position: "absolute" }}
+          style={{ width: "0", opacity: "0", position: "absolute", pointerEvents: "none" }}
           disabled={props.disabled}
           readOnly={props.readOnly}
           required={props.required}
           title={`${value}`}
-          onChange={(e) => e}
+          onChange={(e) => undefined}
           type="text"
           value={asyncOptions.label}
         />
