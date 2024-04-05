@@ -6,6 +6,7 @@ from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
 from core.excel import ExcelResponse
 from core.models import ExternalAdminRights
+from elec.api.admin.audit.charge_points.application_details import extract_sample
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.repositories.meter_reading_repository import MeterReadingRepository
@@ -16,6 +17,7 @@ from elec.services.export_charge_point_excel import export_charge_points_sample_
 
 class ApplicationDetailsForm(forms.Form):
     application_id = forms.ModelChoiceField(queryset=MeterReadingRepository.get_annotated_applications())
+    percentage = forms.IntegerField(required=False)
     export = forms.BooleanField(required=False)
     sample = forms.BooleanField(required=False)
 
@@ -29,6 +31,7 @@ def get_application_details(request):
         return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, form.errors)
 
     application: ElecMeterReadingApplication = form.cleaned_data["application_id"]
+    percentage = (form.cleaned_data["percentage"] or 10) / 100
     export = form.cleaned_data["export"]
     want_sample = form.cleaned_data["sample"]
 
@@ -40,12 +43,8 @@ def get_application_details(request):
 
     if export:
         if want_sample:
-            percentage = 0.10
-            count_to_fetch = int(len(charge_points) * percentage)
-            # Mélanger aléatoirement les charge_points
-            random_charge_points = random.sample(list(charge_points), max(count_to_fetch, 1))
-            # Conserver l'ordre d'origine en utilisant le slice
-            charge_points = charge_points.filter(id__in=[cp.id for cp in random_charge_points])
+            application_charge_points = MeterReadingRepository.get_application_charge_points(application.cpo, application)
+            random_charge_points = extract_sample(application_charge_points, percentage)
             excel_file = export_charge_points_sample_to_excel(random_charge_points, application.cpo)
         else:
             file_name = f"meter_readings_{application.cpo.slugify()}_Q{application.quarter}_{application.year}"

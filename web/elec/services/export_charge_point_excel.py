@@ -55,6 +55,8 @@ def export_charge_points_sample_to_excel(charge_points, entity):
                 "columns": [
                     {"label": "Latitude", "value": "latitude"},
                     {"label": "Longitude", "value": "longitude"},
+                    {"label": "Nom de la station", "value": "station_name"},
+                    # {"label": "Identifiant de la station", "value": "station_id"},
                     {"label": "Identifiant du point de recharge", "value": "charge_point_id"},
                     {"label": "Numéro du certificat d'examen du type", "value": "mid_id"},
                     {"label": "Infrastructure de recharge installée à la localisation renseignée", "value": ""},
