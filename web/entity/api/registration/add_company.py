@@ -1,5 +1,6 @@
 from urllib import request
 from django import forms
+from django.db import transaction
 
 from core.carburetypes import CarbureError
 from core.decorators import otp_or_403
@@ -66,40 +67,41 @@ def add_company(request, *args, **kwargs):
     if duplicated_company:
         return ErrorResponse(400, ApplyForNewCompanyError.COMPANY_NAME_ALREADY_USED)
 
-    entity = Entity.objects.create(
-        activity_description=activity_description,
-        entity_type=entity_type,
-        legal_name=legal_name,
-        name=name,
-        registered_address=registered_address,
-        registered_city=registered_city,
-        registered_country=registered_country,
-        registered_zipcode=registered_zipcode,
-        registration_id=registration_id,
-        sustainability_officer=sustainability_officer,
-        sustainability_officer_email=sustainability_officer_email,
-        sustainability_officer_phone_number=sustainability_officer_phone_number,
-        is_enabled=False,
-        website=website,
-        vat_number=vat_number,
-    )
-
-    # add certificat
-    if entity_type not in [Entity.AIRLINE, Entity.CPO]:
-        original_certificate = GenericCertificate.objects.get(
-            certificate_type=certificate_type, certificate_id=certificate_id
+    with transaction.atomic():
+        entity = Entity.objects.create(
+            activity_description=activity_description,
+            entity_type=entity_type,
+            legal_name=legal_name,
+            name=name,
+            registered_address=registered_address,
+            registered_city=registered_city,
+            registered_country=registered_country,
+            registered_zipcode=registered_zipcode,
+            registration_id=registration_id,
+            sustainability_officer=sustainability_officer,
+            sustainability_officer_email=sustainability_officer_email,
+            sustainability_officer_phone_number=sustainability_officer_phone_number,
+            is_enabled=False,
+            website=website,
+            vat_number=vat_number,
         )
-        EntityCertificate.objects.create(entity=entity, certificate=original_certificate)
 
-    # add right request
-    urr = UserRightsRequests.objects.create(
-        user=request.user, entity=entity, role=UserRightsRequests.ADMIN, status="PENDING"
-    )
+        # add certificat
+        if entity_type not in [Entity.AIRLINE, Entity.CPO] and certificate_id and certificate_type:
+            original_certificate = GenericCertificate.objects.get(
+                certificate_type=certificate_type, certificate_id=certificate_id
+            )
+            entity_certificat = EntityCertificate.objects.create(entity=entity, certificate=original_certificate)
+            entity.default_certificate = entity_certificat.certificate.certificate_id
+            entity.save()
 
-    send_email_to_user(entity, request.user)
-    send_email_to_dgec(entity, request.user)
+        # add right request
+        UserRightsRequests.objects.create(user=request.user, entity=entity, role=UserRightsRequests.ADMIN, status="PENDING")
 
-    return SuccessResponse()
+        send_email_to_user(entity, request.user)
+        send_email_to_dgec(entity, request.user)
+
+        return SuccessResponse()
 
 
 def send_email_to_user(entity, user):

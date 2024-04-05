@@ -57,8 +57,11 @@ class EntityRegistrationAddCompanyTest(TestCase):
         self.assertEqual(entity.registered_address, "1 rue de la paix")
 
         # check certificate created
-        certificate = EntityCertificate.objects.get(certificate__certificate_id="EU-ISCC-Cert-PL123-12345678", entity=entity)
-        self.assertEqual(entity.id, certificate.entity.id)
+        entity_certificate = EntityCertificate.objects.get(
+            certificate__certificate_id="EU-ISCC-Cert-PL123-12345678", entity=entity
+        )
+        self.assertEqual(entity.id, entity_certificate.entity.id)
+        self.assertEqual(entity.default_certificate, "EU-ISCC-Cert-PL123-12345678")
 
         # duplicated company name error
         response = self.client.post(
