@@ -281,7 +281,6 @@ const PrefetchedCompanyForm = ({
       />
 
       <TextInput
-        required
         placeholder="https://www.example.com"
         type="url"
         label={t("Site web (commençant par https://)")}
@@ -289,7 +288,6 @@ const PrefetchedCompanyForm = ({
       />
 
       <TextInput
-        required
         label={t("Numéro de TVA")}
         {...companyForm.bind("vat_number")}
       />
