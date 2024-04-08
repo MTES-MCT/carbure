@@ -13,13 +13,13 @@ import { LoaderOverlay } from "common/components/scaffold"
 import { useMutation, useQuery } from "common/hooks/async"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import ApplicationStatus from "elec/components/application-status"
-import { ElecMeterReadingsApplication, ElecAuditApplicationStatus } from "elec/types"
+import { ElecAuditApplicationStatus } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../../api"
 import MeterReadingsApplicationAcceptDialog from "./accept-dialog"
 import MeterReadingsApplicationRejectDialog from "./reject-dialog"
-import { elecMeterReadingApplication1Details } from "elec/__test__/data"
+
 export const MeterReadingsApplicationDetailsDialog = () => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -125,7 +125,7 @@ export const MeterReadingsApplicationDetailsDialog = () => {
 
               <TextInput
                 readOnly
-                label={t("Mwh renouvelables")}
+                label={t("kWh renouvelables")}
                 value={meterReadingsApplication ? formatNumber(Math.round(meterReadingsApplication.energy_total)) : "..."}
 
               />
