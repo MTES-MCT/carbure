@@ -1,13 +1,11 @@
+import pandas as pd
 from django import forms
 from django.http import HttpRequest
-
 from django.views.decorators.http import require_POST
-import pandas as pd
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
-from core.models import Entity, ExternalAdminRights
-from elec.api.cpo import meter_readings
+from core.models import ExternalAdminRights
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_charge_point_application import ElecChargePointApplication
 from elec.models.elec_meter_reading import ElecMeterReading
@@ -72,9 +70,9 @@ def accept_application(request: HttpRequest):
             quarter=application.quarter,
             year=application.year,
             operating_unit=group["operating_unit"],
-            energy_amount=group["renewable_energy"],
+            energy_amount=group["renewable_energy"] / 1000,
             current_type=ElecChargePoint.DC,
-            remaining_energy_amount=group["renewable_energy"],
+            remaining_energy_amount=group["renewable_energy"] / 1000,
         )
         certificate_model_instances.append(certif)
     ElecProvisionCertificate.objects.bulk_create(certificate_model_instances)
