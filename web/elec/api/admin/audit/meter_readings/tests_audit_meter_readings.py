@@ -128,6 +128,7 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
         certificates = ElecProvisionCertificate.objects.filter(cpo=self.cpo, quarter=3, year=2023)
         self.assertEqual(len(certificates), 2)
         self.assertEqual(
-            certificates.first().energy_amount, meter_readings[0].renewable_energy + meter_readings[1].renewable_energy
+            certificates.first().energy_amount,
+            (meter_readings[0].renewable_energy + meter_readings[1].renewable_energy) / 1000,
         )
-        self.assertEqual(certificates[1].energy_amount, meter_readings[2].renewable_energy)
+        self.assertEqual(certificates[1].energy_amount, meter_readings[2].renewable_energy / 1000)
