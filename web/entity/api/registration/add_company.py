@@ -119,7 +119,7 @@ def send_email_to_user(entity, user):
     """
 
     send_mail(
-        subject="[CarbuRe] Demande d'inscription de société enregistrée",
+        subject="Demande d'inscription de société enregistrée",
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=recipient_list,
@@ -147,7 +147,7 @@ def send_email_to_dgec(entity, user):  # send email to staff
     Bonne journée
     """
     send_mail(
-        subject="[CarbuRe] Demande d'inscription de la société " + entity.name,
+        subject="Demande d'inscription de la société " + entity.name,
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=recipient_list,

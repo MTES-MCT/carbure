@@ -116,6 +116,14 @@ export const CompanyRegistrationDialog = () => {
           </section>
 
           <section>
+            <p><Trans>Votre société n’est pas immatriculée en France ? </Trans>
+              <MailTo user="carbure" host="beta.gouv.fr"
+                subject={t("[CarbuRe - Société] Je souhaite ajouter une société étrangère")}
+                body={t("body=Bonjour%2C%E2%80%A8%E2%80%A8Je%20souhaite%20ajouter%20ma%20soci%C3%A9t%C3%A9%20sur%20CarbuRe%20mais%20celle-ci%20n%E2%80%99est%20pas%20immatricul%C3%A9e%20en%20France.%0A%0AVoici%20les%20informations%20la%20concernant%20%3A%0A%0A1%20-%20Nom%20de%20la%20soci%C3%A9t%C3%A9%20%3A%0A%0A2%20-%20Description%20de%20l'activit%C3%A9%20(obligatoire)%20%3A%0A%0A3%20-%20Justificatif%20d%E2%80%99enregistrement%20officiel%20local%20%3A%0A%0A4%20-%20Adresse%20postale%20%3A%E2%80%A8%0AMerci%20beaucoup%E2%80%A8Bien%20cordialement%2C")}
+              >
+                <Trans>Ajoutez une société étrangère</Trans>
+                <ExternalLink size={20} />
+              </MailTo></p>
             <p><Trans>Vous ne trouvez pas votre société ? </Trans>
               <MailTo user="carbure" host="beta.gouv.fr"
                 subject={t("[CarbuRe - Société] Je souhaite ajouter une société")}
@@ -124,6 +132,7 @@ export const CompanyRegistrationDialog = () => {
                 <Trans>Signalez un problème.</Trans>
                 <ExternalLink size={20} />
               </MailTo></p>
+
           </section>
 
         </main>

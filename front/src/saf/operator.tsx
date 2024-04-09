@@ -29,7 +29,7 @@ export const Saf = () => {
     <Main>
       <header>
         <section>
-          <h1>{t("Carburant Durable d'Aviation - CDA")}</h1>
+          <h1>{t("Carburant Durable d'Aviation")}</h1>
 
           <Select
             loading={years.loading}
