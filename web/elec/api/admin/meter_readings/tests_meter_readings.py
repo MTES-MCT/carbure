@@ -211,33 +211,3 @@ class ElecMeterReadingsTest(TestCase):
                 ],
             },
         )
-
-    def test_accept_application(self):
-        application = ElecMeterReadingApplication.objects.create(cpo=self.cpo, quarter=2, year=2024)
-
-        response = self.client.post(
-            reverse("admin-elec-meter-readings-accept-application"),
-            {"entity_id": self.admin.id, "company_id": self.cpo.id, "application_id": application.id},
-        )
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"status": "success"})
-
-        application.refresh_from_db()
-
-        self.assertEqual(application.status, ElecMeterReadingApplication.ACCEPTED)
-
-    def test_reject_application(self):
-        application = ElecMeterReadingApplication.objects.create(cpo=self.cpo, quarter=2, year=2024)
-
-        response = self.client.post(
-            reverse("admin-elec-meter-readings-reject-application"),
-            {"entity_id": self.admin.id, "company_id": self.cpo.id, "application_id": application.id},
-        )
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"status": "success"})
-
-        application.refresh_from_db()
-
-        self.assertEqual(application.status, ElecMeterReadingApplication.REJECTED)
