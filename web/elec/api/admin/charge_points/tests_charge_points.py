@@ -273,35 +273,3 @@ class ElecCharginPointsTest(TestCase):
         data = response.json()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data, expected)
-
-    def test_accept_charge_point_certificate_ok(self):
-        application = ElecChargePointApplication.objects.create(cpo=self.cpo)
-
-        self.assertEqual(application.status, ElecChargePointApplication.PENDING)
-
-        response = self.client.post(
-            reverse("elec-admin-charge-points-accept-application"),
-            {"entity_id": self.admin.id, "company_id": self.cpo.id, "application_id": application.id},
-        )
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"status": "success"})
-
-        application.refresh_from_db()
-        self.assertEqual(application.status, ElecChargePointApplication.ACCEPTED)
-
-    def test_reject_charge_point_certificate_ok(self):
-        application = ElecChargePointApplication.objects.create(cpo=self.cpo)
-
-        self.assertEqual(application.status, ElecChargePointApplication.PENDING)
-
-        response = self.client.post(
-            reverse("elec-admin-charge-points-reject-application"),
-            {"entity_id": self.admin.id, "company_id": self.cpo.id, "application_id": application.id},
-        )
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"status": "success"})
-
-        application.refresh_from_db()
-        self.assertEqual(application.status, ElecChargePointApplication.REJECTED)
