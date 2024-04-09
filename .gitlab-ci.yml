@@ -21,7 +21,7 @@ variables:
     - apk add --update git openssh-client
     - eval $(ssh-agent -s)
     - echo "$SCALINGO_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - ssh-keyscan $SCALINGO_SSH_HOST >> ~/.ssh/known_hosts
+    - ssh-keyscan $SCALINGO_SSH_HOST $SCALINGO_SSH_HOST_SECNUMCLOUD >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
     - git config user.name $GIT_USER_NAME
     - git config user.email $GIT_USER_EMAIL
