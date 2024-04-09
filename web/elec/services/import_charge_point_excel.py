@@ -7,6 +7,18 @@ from elec.models.elec_charge_point import ElecChargePoint
 from elec.services.transport_data_gouv import TransportDataGouv
 
 
+"""
+Résumé de l'algo:
+
+- on récupère la liste des stations du dossier d'inscription
+- on récupère TOUS les pdc associés à ces stations, en incluant ceux mentionnés uniquement sur TDG
+- pour chaque station, on checke:
+    - est-ce que tous les points ont un compteur MID => alors pas article 2
+    - sinon est-ce que tous les points sont AC => alors pas article 2
+    - sinon article 2 (il y a au moins un point DC sans compteur MID dans la station)
+"""
+
+
 class ExcelChargePointError:
     EXCEL_PARSING_FAILED = "EXCEL_PARSING_FAILED"
     DUPLICATE_CHARGE_POINT = "DUPLICATE_CHARGE_POINT"
