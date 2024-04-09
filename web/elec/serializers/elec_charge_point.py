@@ -37,4 +37,4 @@ class ElecChargePointSerializer(serializers.ModelSerializer):
 class ElecChargePointSampleSerializer(serializers.ModelSerializer):
     class Meta:
         model = ElecChargePoint
-        fields = ["id", "latitude", "longitude", "charge_point_id", "mid_id"]
+        fields = ["id", "latitude", "longitude", "station_id", "charge_point_id", "mid_id", "measure_reference_point_id"]
