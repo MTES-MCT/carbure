@@ -329,6 +329,7 @@ export const Input = ({
 export interface TextAreaProps extends Control {
   rows?: number
   cols?: number
+  maxLength?: number
   value: string | undefined
   onChange: (value: string | undefined) => void
 }
@@ -342,6 +343,7 @@ export const TextArea = ({
   value,
   autoFocus,
   onChange,
+  maxLength,
   ...props
 }: TextAreaProps) => (
   <Field
@@ -351,6 +353,7 @@ export const TextArea = ({
     <textarea
       title={value}
       rows={rows}
+      maxLength={maxLength}
       cols={cols}
       autoFocus={autoFocus}
       disabled={props.disabled}
