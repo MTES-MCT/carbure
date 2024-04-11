@@ -51,16 +51,16 @@ def update_entity_info(request, *args, **kwargs):
 
 
 class UpdateEntityInfoForm(forms.Form):
+    activity_description = forms.CharField(max_length=128, required=False)
     entity_id = forms.IntegerField()
     legal_name = forms.CharField(max_length=128, required=False)
-    registration_id = forms.CharField(max_length=64, required=False)
-    sustainability_officer_phone_number = forms.CharField(max_length=32, required=False)
-    sustainability_officer_email = forms.CharField(max_length=254, required=False)
-    sustainability_officer = forms.CharField(max_length=256, required=False)
     registered_address = forms.CharField(required=False)
-    registered_zipcode = forms.CharField(required=False)
     registered_city = forms.CharField(required=False)
     registered_country_code = forms.ModelChoiceField(queryset=Pays.objects.all(), to_field_name="code_pays", required=False)
-    activity_description = forms.CharField(required=False)
-    website = forms.URLField(required=False)
+    registered_zipcode = forms.CharField(required=False)
+    registration_id = forms.CharField(max_length=64, required=False)
+    sustainability_officer = forms.CharField(max_length=256, required=False)
+    sustainability_officer_email = forms.CharField(max_length=254, required=False)
+    sustainability_officer_phone_number = forms.CharField(max_length=32, required=False)
     vat_number = forms.CharField(max_length=32, required=False)
+    website = forms.URLField(required=False)

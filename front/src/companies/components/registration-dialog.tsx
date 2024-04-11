@@ -286,6 +286,7 @@ const PrefetchedCompanyForm = ({
       <TextArea
         required
         label={t("Description de l'activité")}
+        maxLength={5000}
         {...companyForm.bind("activity_description")}
       />
 
