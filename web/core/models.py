@@ -55,6 +55,7 @@ class Entity(models.Model):
         (TRADER, "Trader"),
         (AUDITOR, "Auditeur"),
         (EXTERNAL_ADMIN, EXTERNAL_ADMIN),
+        (CPO, CPO),
         (AIRLINE, AIRLINE),
         (UNKNOWN, "Unknown"),
         (POWER_OR_HEAT_PRODUCER, "Producteur d'électricité ou de chaleur"),
