@@ -151,6 +151,7 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
 
           <TextArea
             required
+            maxLength={5000}
             readOnly={readOnly}
             label={t("Description de l'activité")}
             {...companyForm.bind("activity_description")}

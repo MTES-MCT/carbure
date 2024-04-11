@@ -20,7 +20,7 @@ class ApplyForNewCompanyError:
 
 
 class ApplyForNewCompanyForm(forms.Form):
-    activity_description = forms.CharField(max_length=256, required=True)
+    activity_description = forms.CharField(max_length=5000, required=True)
     entity_type = forms.CharField(max_length=64, required=True)
     name = forms.CharField(max_length=128, required=True)
     legal_name = forms.CharField(max_length=128, required=True)
