@@ -34,6 +34,10 @@ export function compact<T>(list: Array<T | false | null | undefined>) {
   ) as Array<T>
 }
 
+export function isUndefined(value: unknown) {
+  return value === undefined || value === null
+}
+
 export function isScalar(value: unknown) {
   return (
     typeof value === "string" ||
@@ -57,6 +61,11 @@ export function matchesSearch(
 }
 
 export function matches(source: any, target: any, strict = false): boolean {
+  // consider that null and undefined are actually equivalent
+  if (isUndefined(source) && isUndefined(target)) {
+    return true
+  }
+
   if (isScalar(source) || isScalar(target)) {
     return source === target
   }
