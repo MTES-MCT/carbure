@@ -2,13 +2,12 @@
   background: transparent;
   border: none;
   min-width: 20px !important;
-  top: -2px;
+  max-width: 512px;
 }
 
 .tooltip {
   min-height: 32px;
   padding: 6px 8px;
-  margin-bottom: 7px;
   color: #fff;
   text-align: start;
   text-decoration: none;
@@ -18,15 +17,22 @@
 }
 
 .arrow {
-  content: "";
+  position: relative;
+  width: 8px;
+  height: 8px;
+  margin-left: 20px;
+}
+
+.arrow::after {
   position: absolute;
+  top: 0;
+  left: 0;
+  content: "";
   width: 9px;
   height: 9px;
-  margin: -17px 0 0 20px;
   border-radius: 0 0 2px 0;
-  transform: translateY(50%) rotate(-135deg);
+  transform: translateY(-50%) rotate(-135deg);
   box-shadow: 2px 2px 5px rgb(0 0 0 / 5%);
   z-index: 0;
   background-color: var(--black);
 }
-

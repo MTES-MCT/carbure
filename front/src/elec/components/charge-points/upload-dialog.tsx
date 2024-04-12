@@ -3,7 +3,7 @@ import useEntity from "carbure/hooks/entity"
 import Button, { ExternalLink } from "common/components/button"
 import Dialog from "common/components/dialog"
 import { Form, useForm } from "common/components/form"
-import { AlertCircle, Check, Return, Upload } from "common/components/icons"
+import { Check, Return, Upload } from "common/components/icons"
 import { FileInput } from "common/components/input"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
@@ -14,8 +14,8 @@ import { Trans, useTranslation } from "react-i18next"
 import { checkChargePointsApplication } from "elec/api-cpo"
 import ErrorsDetailsDialog from "./errors-dialog"
 import ValidDetailsDialog from "./valid-dialog"
-import Alert from "common/components/alert"
 import { ReplaceAlert } from "./replace-alert"
+import { TDGInfo } from "./tdg-info"
 
 type ElecChargePointsFileUploadProps = {
   onClose: () => void
@@ -102,6 +102,9 @@ const ElecChargePointsFileUpload = ({
                 .
               </Trans>
             </p>
+
+            <TDGInfo />
+
             <FileInput
               loading={checkChargePointsFile.loading}
               icon={value.chargePointsFile ? Check : Upload}

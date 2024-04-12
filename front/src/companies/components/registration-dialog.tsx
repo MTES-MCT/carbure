@@ -37,7 +37,7 @@ export const CompanyRegistrationDialog = () => {
   const registerCompanyRequest = useMutation(api.registerCompany, {
     invalidates: ["user-settings"],
     onSuccess: (res) => {
-      notify(t("Votre demande d'inscription a bien été envoyéeVotre demande d’inscription de société a bien été prise en compte !"), {
+      notify(t("Votre demande d'inscription a bien été envoyée !"), {
         variant: "success",
       })
       closeDialog()

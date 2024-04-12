@@ -9,6 +9,7 @@ import {
 } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import { t } from "i18next"
+import { TDGInfo } from "./tdg-info"
 
 export type ErrorsDetailsDialogProps = {
   fileData: ElecChargePointsApplicationCheckInfo
@@ -40,6 +41,11 @@ export const ErrorsDetailsDialog = ({
             />
           </p>
         </section>
+
+        <section>
+          <TDGInfo />
+        </section>
+
         <section>
           <ErrorsTable errors={fileData.errors!} />
         </section>

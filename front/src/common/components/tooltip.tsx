@@ -1,5 +1,5 @@
 import cl from "clsx"
-import { ReactNode, useRef, useState } from "react"
+import { ReactNode, useRef } from "react"
 import { Normalizer, Sorter } from "../utils/normalize"
 import Dropdown, { Trigger } from "./dropdown"
 import { Control } from "./input"
@@ -21,11 +21,9 @@ export interface TooltipProps<T, V = T> extends Control, Trigger {
 
 function Tooltip<T, V>({ children, title, style }: TooltipProps<T, V>) {
   const triggerRef = useRef<HTMLInputElement>(null)
-  const [isOpen, setIsOpen] = useState<boolean>()
   return (
     <>
-      <div ref={triggerRef}>
-        {isOpen && <div className={cl(css.arrow)} style={{}}></div>}
+      <div ref={triggerRef} className={css.trigger} style={style}>
         {children}
       </div>
       <Dropdown
@@ -33,10 +31,9 @@ function Tooltip<T, V>({ children, title, style }: TooltipProps<T, V>) {
         triggerRef={triggerRef}
         anchor="top start"
         className={cl(css.dropdown)}
-        onOpen={() => setIsOpen(true)}
-        onClose={() => setIsOpen(false)}
       >
         <div className={cl(css.tooltip)}>{title}</div>
+        <div className={cl(css.arrow)}></div>
       </Dropdown>
     </>
   )
