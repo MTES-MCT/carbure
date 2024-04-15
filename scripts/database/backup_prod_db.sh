@@ -12,7 +12,7 @@ scalingo login --api-token $SCALINGO_TOKEN
 
 # download latest backup
 mkdir -p /tmp/backups
-scalingo --app carbure-prod --addon $SCALINGO_MYSQL_UUID backups-download --output /tmp/backups
+scalingo --region osc-secnum-fr1 --app carbure-prod --addon $SCALINGO_MYSQL_UUID backups-download --output /tmp/backups
 
 # upload backup to backblaze
 echo "Uploading backup to backblaze..."
