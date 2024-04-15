@@ -14,7 +14,7 @@ if [ "$1" != "local" ]; then
   mkdir -p /tmp/backups
 
   # download latest backup
-  scalingo --app carbure-prod --addon $SCALINGO_MYSQL_UUID backups-download --output /tmp/backups
+  scalingo --region osc-secnum-fr1 --app carbure-prod --addon $SCALINGO_MYSQL_UUID backups-download --output /tmp/backups
 fi
 
 # decompress backup
