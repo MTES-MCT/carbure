@@ -4,8 +4,12 @@ import { InfoCircle } from "common/components/icons"
 import Tooltip from "common/components/tooltip"
 import { ExternalLink } from "common/components/button"
 
-// url vers l'explorateur de données IRVE de transport.data.gouv.fr
+// url vers la page de présentation du projet IRVE de transport.data.gouv.fr
 const TDG_URL =
+  "https://transport.data.gouv.fr/datasets/fichier-consolide-des-bornes-de-recharge-pour-vehicules-electriques"
+
+// url vers l'explorateur de données IRVE de transport.data.gouv.fr
+const TDG_DATA_URL =
   "https://explore.data.gouv.fr/fr/tableau?url=https%3A%2F%2Fwww.data.gouv.fr%2Ffr%2Fdatasets%2Fr%2Feb76d20a-8501-400e-b336-d85724de5435"
 
 export function TDGInfo() {
@@ -15,7 +19,9 @@ export function TDGInfo() {
     <Alert icon={InfoCircle} variant="info" style={{ minWidth: "50vw" }}>
       <section>
         <p>
-          <Trans defaults="Carbure utilise les données IRVE de <b>transport.data.gouv.fr</b> pour déterminer certaines caractéristiques de vos points de recharge." />
+          <Trans
+            defaults={`Carbure utilise les <b>données consolidées IRVE</b> de <b>transport.data.gouv.fr</b> pour déterminer certaines caractéristiques de vos points de recharge.`}
+          />
         </p>
 
         <ul
@@ -49,9 +55,15 @@ export function TDGInfo() {
           </li>
         </ul>
 
-        <p style={{ marginTop: "var(--spacing-m)" }}>
+        <p style={{ marginTop: "var(--spacing-l)" }}>
+          <ExternalLink href={TDG_DATA_URL}>
+            {t("Consulter les données consolidées IRVE")}
+          </ExternalLink>
+        </p>
+
+        <p style={{ marginTop: "var(--spacing-s)" }}>
           <ExternalLink href={TDG_URL}>
-            {t("Consulter les données publiques IRVE")}
+            {t("Voir la documentation IRVE de transport.data.gouv.fr")}
           </ExternalLink>
         </p>
       </section>
