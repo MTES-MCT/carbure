@@ -3,4 +3,4 @@
 
 install-scalingo-cli
 scalingo login --api-token $SCALINGO_TOKEN
-scalingo -a carbure-metabase restart
+scalingo --region osc-secnum-fr1 -a carbure-metabase restart
