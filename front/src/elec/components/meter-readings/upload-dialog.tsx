@@ -1,9 +1,9 @@
 import { AxiosError } from "axios"
 import useEntity from "carbure/hooks/entity"
-import Button, { ExternalLink } from "common/components/button"
+import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import { Form, useForm } from "common/components/form"
-import { AlertCircle, Check, Return, Upload } from "common/components/icons"
+import { AlertCircle, Check, Download, Return, Upload } from "common/components/icons"
 import { FileInput } from "common/components/input"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
@@ -116,7 +116,7 @@ const ElecMeterReadingsFileUpload = ({
               }
               {currentApplicationPeriod.urgency_status === MeterReadingsApplicationUrgencyStatus.Critical &&
                 <Alert icon={AlertCircle} variant="danger">
-                  <Trans>Le delais de déclaration a été dépassé, l'administration se reserve le droit de la refuser.</Trans>
+                  <Trans>Le délai de déclaration a été dépassé, l'administration se réserve le droit de la refuser.</Trans>
                 </Alert>
               }
             </>
@@ -131,8 +131,8 @@ const ElecMeterReadingsFileUpload = ({
                 Téléchargez le relevé à remplir :
               </Trans></span>
                 <br />
-                <Button variant="secondary" href={TEMPLATE_URL + `?entity_id=${entity.id}&company_id=${companyId}`}>
-                  Télécharger le fichier csv
+                <Button variant="secondary" icon={Download} href={TEMPLATE_URL + `?entity_id=${entity.id}&company_id=${companyId}`}>
+                  Télécharger le fichier Excel
                 </Button>
               </li>
               <li>
@@ -140,16 +140,16 @@ const ElecMeterReadingsFileUpload = ({
               </li>
               <li>
                 <Trans>Déposez le fichier ci-dessous : </Trans>
-                <FileInput
-                  loading={checkMeterReadingsFile.loading}
-                  icon={value.meterReadingsFile ? Check : Upload}
-                  label={t("Importer le fichier excel à analyser")}
-                  placeholder={value.meterReadingsFile ? value.meterReadingsFile.name : t("Choisir un fichier")}
-                  {...bind("meterReadingsFile")}
-                />
               </li>
-
             </ol>
+
+            <FileInput
+              loading={checkMeterReadingsFile.loading}
+              icon={value.meterReadingsFile ? Check : Upload}
+              label={t("Importer le fichier excel à analyser")}
+              placeholder={value.meterReadingsFile ? value.meterReadingsFile.name : t("Choisir un fichier")}
+              {...bind("meterReadingsFile")}
+            />
 
           </Form>
           {pendingApplicationAlreadyExists &&

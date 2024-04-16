@@ -18,14 +18,7 @@ export function TDGInfo() {
           <Trans defaults="de <b>transport.data.gouv.fr</b> pour déterminer certaines caractéristiques de vos points de recharge." />
         </p>
 
-        <ul
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "var(--spacing-xs)",
-            marginTop: "var(--spacing-s)",
-          }}
-        >
+        <ul style={{ marginTop: "var(--spacing-s)" }}>
           <li>
             {t("Vos PDR y sont identifiés par la colonne")}{" "}
             <ExternalLink href="https://schema.data.gouv.fr/etalab/schema-irve-statique/2.3.1/documentation.html#propriete-id-pdc-itinerance">

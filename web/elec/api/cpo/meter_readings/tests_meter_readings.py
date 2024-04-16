@@ -1,7 +1,7 @@
 import io
 import datetime
+from unittest.mock import patch
 import openpyxl
-from datetime import timezone, timedelta
 from decimal import Decimal
 from core.tests_utils import setup_current_user
 from core.models import Entity
@@ -329,32 +329,47 @@ class ElecMeterReadingsTest(TestCase):
         self.assertEqual(reading_2.reading_date, datetime.date(2024, 9, 28))
 
     def test_get_applications(self):
+        mocked_get_application_quarter = patch("elec.api.cpo.meter_readings.applications.get_application_quarter").start()  # fmt:skip
+        mocked_get_application_quarter.return_value = (2024, 3)
+
+        mocked_get_application_deadline = patch("elec.api.cpo.meter_readings.applications.get_application_deadline").start()  # fmt:skip
+        mocked_get_application_deadline.return_value = (datetime.date(2024, 10, 15), "HIGH")
+
         response = self.client.get(
             reverse("elec-cpo-meter-readings-get-applications"),
             {"entity_id": self.cpo.id},
         )
 
         application = ElecMeterReadingApplication.objects.last()
-
         application_date = application.created_at.isoformat()
 
+        self.maxDiff = None
         data = response.json()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             data,
             {
-                "data": [
-                    {
-                        "application_date": application_date,
-                        "charge_point_count": 1,
-                        "cpo": {"entity_type": "Charge Point Operator", "id": self.cpo.id, "name": "CPO"},
-                        "energy_total": 24.92,
-                        "id": application.id,
-                        "quarter": 2,
-                        "status": "ACCEPTED",
+                "data": {
+                    "applications": [
+                        {
+                            "application_date": application_date,
+                            "charge_point_count": 1,
+                            "cpo": {"entity_type": "Charge Point Operator", "id": self.cpo.id, "name": "CPO"},
+                            "energy_total": 24.92,
+                            "id": application.id,
+                            "quarter": 2,
+                            "status": "ACCEPTED",
+                            "year": 2024,
+                        }
+                    ],
+                    "current_application": None,
+                    "current_application_period": {
+                        "deadline": "2024-10-15",
+                        "quarter": 3,
+                        "urgency_status": "HIGH",
                         "year": 2024,
-                    }
-                ],
+                    },
+                },
                 "status": "success",
             },
         )
