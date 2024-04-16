@@ -127,28 +127,30 @@ const ElecMeterReadingsFileUpload = ({
               )}
             </p>
             <ol>
-              <li><Trans>
-                Téléchargez les relevés du dernier trimestre {" "}
-                <ExternalLink href={TEMPLATE_URL + `?entity_id=${entity.id}&company_id=${companyId}`}>
-                  sur ce lien
-                </ExternalLink>
-                .
-              </Trans></li>
+              <li><span><Trans>
+                Téléchargez le relevé à remplir :
+              </Trans></span>
+                <br />
+                <Button variant="secondary" href={TEMPLATE_URL + `?entity_id=${entity.id}&company_id=${companyId}`}>
+                  Télécharger le fichier csv
+                </Button>
+              </li>
               <li>
                 <Trans>Remplissez les colonnes en bleu (C et D) correspondant aux relevés du trimestre actuel</Trans>
               </li>
               <li>
-                <Trans>Déposez le fichier ci-dessous</Trans>
+                <Trans>Déposez le fichier ci-dessous : </Trans>
+                <FileInput
+                  loading={checkMeterReadingsFile.loading}
+                  icon={value.meterReadingsFile ? Check : Upload}
+                  label={t("Importer le fichier excel à analyser")}
+                  placeholder={value.meterReadingsFile ? value.meterReadingsFile.name : t("Choisir un fichier")}
+                  {...bind("meterReadingsFile")}
+                />
               </li>
 
             </ol>
-            <FileInput
-              loading={checkMeterReadingsFile.loading}
-              icon={value.meterReadingsFile ? Check : Upload}
-              label={t("Importer le fichier excel à analyser")}
-              placeholder={value.meterReadingsFile ? value.meterReadingsFile.name : t("Choisir un fichier")}
-              {...bind("meterReadingsFile")}
-            />
+
           </Form>
           {pendingApplicationAlreadyExists &&
             (
