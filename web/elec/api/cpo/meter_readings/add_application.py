@@ -42,7 +42,7 @@ def add_application(request: HttpRequest, entity: Entity):
     # guess the application's quarter based on the current date
     # if it's in the last 10 days of a quarter, use this quarter
     # if it's in the first 20 days of a quarter, use the previous quarter
-    auto_quarter, auto_year = get_application_quarter(date.today())
+    auto_year, auto_quarter = get_application_quarter(date.today())
     quarter = form.cleaned_data["quarter"] or auto_quarter
     year = form.cleaned_data["year"] or auto_year
 

@@ -30,7 +30,7 @@ def get_application_template(request, entity):
     if not form.is_valid():
         return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, form.errors)
 
-    auto_quarter, auto_year = get_application_quarter(date.today())
+    auto_year, auto_quarter = get_application_quarter(date.today())
     quarter = form.cleaned_data["quarter"] or auto_quarter
     year = form.cleaned_data["year"] or auto_year
 

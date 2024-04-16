@@ -24,14 +24,7 @@ export function TDGInfo() {
           />
         </p>
 
-        <ul
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "var(--spacing-xs)",
-            marginTop: "var(--spacing-s)",
-          }}
-        >
+        <ul style={{ marginTop: "var(--spacing-s)" }}>
           <li>
             <Trans defaults="Vos PDR y sont identifiés par la colonne <b>id_pdc_itinerance</b>" />
           </li>
