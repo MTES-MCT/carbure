@@ -55,13 +55,18 @@ export function TDGInfo() {
           </li>
         </ul>
 
-        <p style={{ marginTop: "var(--spacing-l)" }}>
+        <p style={{ marginTop: "var(--spacing-m)" }}>
           <ExternalLink href={TDG_DATA_URL}>
             {t("Consulter les données consolidées IRVE")}
           </ExternalLink>
         </p>
 
-        <p style={{ marginTop: "var(--spacing-s)" }}>
+        <p
+          style={{
+            marginTop: "var(--spacing-xs)",
+            marginBottom: "var(--spacing-s)",
+          }}
+        >
           <ExternalLink href={TDG_URL}>
             {t("Voir la documentation IRVE de transport.data.gouv.fr")}
           </ExternalLink>
