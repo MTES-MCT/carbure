@@ -25,12 +25,11 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
   })
 
   // const applicationsResponse = applicationsQuery.result?.data.data
-  // const applicationsResponse = elecMeterReadingsApplicationsResponseMissing
-  const applicationsResponse = elecMeterReadingsApplicationsResponsePending
+  const applicationsResponse = elecMeterReadingsApplicationsResponseMissing
+  // const applicationsResponse = elecMeterReadingsApplicationsResponsePending
   const applications = applicationsResponse?.applications ?? [] // TEST with applications
   const currentApplicationPeriod = applicationsResponse?.current_application_period
   const currentApplication = applicationsResponse?.current_application
-  console.log('applications:', applications)
 
   const isEmpty = applications.length === 0
 
