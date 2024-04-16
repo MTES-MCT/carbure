@@ -80,6 +80,14 @@
   text-decoration: underline;
 }
 
+.dialog > main > section ul,
+.dialog > main > section ol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+  margin: 0;
+}
+
 .dialog > main > h2 {
   font-size: 1.2em;
   padding: 0 var(--spacing-l);

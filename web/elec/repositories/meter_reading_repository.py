@@ -20,6 +20,10 @@ class MeterReadingRepository:
         return MeterReadingRepository.get_annotated_applications().filter(cpo=cpo)
 
     @staticmethod
+    def get_cpo_application_for_quarter(cpo, year: int, quarter: int):
+        return MeterReadingRepository.get_annotated_applications().filter(cpo=cpo, quarter=quarter, year=year).first()
+
+    @staticmethod
     def get_previous_application(cpo: Entity, quarter=None, year=None):
         applications = ElecMeterReadingApplication.objects.filter(cpo=cpo, status=ElecMeterReadingApplication.ACCEPTED)
         if quarter and year:

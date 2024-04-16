@@ -10,7 +10,6 @@ import { ElecAuditApplicationStatus, ElecMeterReadingsApplication, MeterReadings
 import { Trans, useTranslation } from "react-i18next"
 import MeterReadingsApplicationsTable from "./table"
 import ElecMeterReadingsFileUpload from "./upload-dialog"
-import { elecMeterReadingsApplicationsResponseMissing, elecMeterReadingsApplicationsResponsePending } from "elec/__test__/data"
 
 
 const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
@@ -24,9 +23,7 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
     params: [entity.id, companyId],
   })
 
-  // const applicationsResponse = applicationsQuery.result?.data.data
-  const applicationsResponse = elecMeterReadingsApplicationsResponseMissing
-  // const applicationsResponse = elecMeterReadingsApplicationsResponsePending
+  const applicationsResponse = applicationsQuery.result?.data.data
   const applications = applicationsResponse?.applications ?? [] // TEST with applications
   const currentApplicationPeriod = applicationsResponse?.current_application_period
   const currentApplication = applicationsResponse?.current_application
