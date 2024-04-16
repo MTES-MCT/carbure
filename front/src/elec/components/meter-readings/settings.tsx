@@ -1,49 +1,53 @@
 import useEntity from "carbure/hooks/entity"
 import { Alert } from "common/components/alert"
 import Button from "common/components/button"
-import { AlertCircle, Check, Cross, Download, Plus } from "common/components/icons"
+import { AlertCircle, Plus } from "common/components/icons"
 import { usePortal } from "common/components/portal"
 import { LoaderOverlay, Panel } from "common/components/scaffold"
-import Table, { Cell, actionColumn } from "common/components/table"
 import { useQuery } from "common/hooks/async"
-import { formatNumber } from "common/utils/formatters"
-import * as apiAdmin from "elec-admin/api"
-import * as apiCpo from "elec/api-cpo"
-import { ElecMeterReadingsApplication, ElecAuditApplicationStatus } from "elec/types"
+import * as api from "elec/api-cpo"
+import { ElecAuditApplicationStatus, ElecMeterReadingsApplication, MeterReadingsApplicationUrgencyStatus } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
-
-import { compact } from "common/utils/collection"
-import { useMatch } from "react-router-dom"
-import ElecMeterReadingsFileUpload from "./upload-dialog"
-import ApplicationStatus from "../application-status"
-import MeterReadingsApplicationAcceptDialog from "elec-audit-admin/components/meter-readings/accept-dialog"
-import MeterReadingsApplicationRejectDialog from "elec-audit-admin/components/meter-readings/reject-dialog"
 import MeterReadingsApplicationsTable from "./table"
+import ElecMeterReadingsFileUpload from "./upload-dialog"
+import { elecMeterReadingsApplicationsResponseMissing, elecMeterReadingsApplicationsResponsePending } from "elec/__test__/data"
+
 
 const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const { isCPO } = entity
-  const matchStatus = useMatch("/org/:entity/:view/*")
 
-
-  const api = matchStatus?.params.view === "entities" ? apiAdmin : apiCpo
   const portal = usePortal()
 
-  const applicationsResponse = useQuery(api.getMeterReadingsApplications, {
+  const applicationsQuery = useQuery(api.getMeterReadingsApplications, {
     key: "meter-readings-applications",
     params: [entity.id, companyId],
   })
 
-  const applications = applicationsResponse.result?.data.data ?? []
-  // const applications = elecMeterReadingsApplications // TEST with applications
+  // const applicationsResponse = applicationsQuery.result?.data.data
+  // const applicationsResponse = elecMeterReadingsApplicationsResponseMissing
+  const applicationsResponse = elecMeterReadingsApplicationsResponsePending
+  const applications = applicationsResponse?.applications ?? [] // TEST with applications
+  const currentApplicationPeriod = applicationsResponse?.current_application_period
+  const currentApplication = applicationsResponse?.current_application
+  console.log('applications:', applications)
+
   const isEmpty = applications.length === 0
 
-  function showUploadDialog() {
+  const urgencyStatus = currentApplicationPeriod?.urgency_status
+  const quarterString = t("T{{quarter}} {{year}}", { quarter: currentApplicationPeriod?.quarter, year: currentApplicationPeriod?.year })
 
-    const pendingApplicationAlreadyExists = applications.filter(app => app.status === ElecAuditApplicationStatus.Pending).length > 0
+
+  function showUploadDialog() {
+    const pendingApplicationAlreadyExists = currentApplication?.status === ElecAuditApplicationStatus.Pending
+    if (currentApplication && currentApplication.status !== ElecAuditApplicationStatus.Pending) return
     portal((resolve) => (
-      <ElecMeterReadingsFileUpload onClose={resolve} pendingApplicationAlreadyExists={pendingApplicationAlreadyExists} companyId={companyId} />
+      <ElecMeterReadingsFileUpload
+        onClose={resolve}
+        pendingApplicationAlreadyExists={pendingApplicationAlreadyExists}
+        companyId={companyId}
+        currentApplicationPeriod={currentApplicationPeriod!}
+      />
     ))
   }
 
@@ -60,24 +64,16 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
           {t("Relevés trimestriels")}
         </h1>
 
-        {isCPO && (
-          <Button
-            asideX={true}
-            variant="primary"
-            icon={Plus}
-            action={showUploadDialog}
-            label={t("Transmettre mes relevés trimestriels")}
-          />
-        )}
-        {/* {applicationsSnapshot.charge_point_count > 0 &&
-          <Button
-            asideX={!isCPO}
-            variant="secondary"
-            icon={Download}
-            action={downloadChargePoints}
-            label={t("Exporter les points de recharge")}
-          />
-        } */}
+
+        <Button
+          asideX={true}
+          variant={currentApplication ? "primary" : urgencyStatus === MeterReadingsApplicationUrgencyStatus.High ? "warning" : urgencyStatus === MeterReadingsApplicationUrgencyStatus.Critical ? "danger" : "primary"}
+          icon={Plus}
+          disabled={currentApplication && currentApplication.status !== ElecAuditApplicationStatus.Pending}
+          action={showUploadDialog}
+          label={t("Transmettre mes relevés trimestriels {{quarter}}", { quarter: quarterString })}
+        />
+
       </header>
 
 
@@ -104,7 +100,7 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
 
       )}
 
-      {applicationsResponse.loading && <LoaderOverlay />}
+      {applicationsQuery.loading && <LoaderOverlay />}
     </Panel>
   )
 }

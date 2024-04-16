@@ -1,6 +1,6 @@
 import { cpo } from "carbure/__test__/data";
 import { EntityPreview, EntityType } from "carbure/types";
-import { ChargePointsApplicationError, ElecAuditApplicationStatus, ElecChargePointsApplication, ElecChargePointsApplicationCheckInfo, ElecMeterReadingsApplication, ElecMeterReadingsApplicationCheckInfo, ElecMeterReadingsApplicationDetails, ElecProvisionCertificatePreview, MeterReadingsApplicationError } from "elec/types";
+import { ChargePointsApplicationError, ElecAuditApplicationStatus, ElecChargePointsApplication, ElecChargePointsApplicationCheckInfo, ElecMeterReadingsApplication, ElecMeterReadingsApplicationCheckInfo, ElecMeterReadingsApplicationDetails, ElecMeterReadingsApplicationsResponse, ElecProvisionCertificatePreview, MeterReadingsApplicationError, MeterReadingsApplicationUrgencyStatus } from "elec/types";
 import { ElecCPOSnapshot, ElecProvisionCertificatesData } from "elec/types-cpo";
 
 export const elecSnapshot: ElecCPOSnapshot = {
@@ -93,6 +93,7 @@ export const elecChargePointApplication4: ElecChargePointsApplication = {
     application_date: "2023-09-01",
     status: ElecAuditApplicationStatus.AuditInProgress,
 }
+
 export const elecChargePointsApplications: ElecChargePointsApplication[] = [
     elecChargePointApplication1,
     elecChargePointApplication2,
@@ -126,7 +127,21 @@ export const elecChargePointsApplicationCheckResponseSucceed: ElecChargePointsAp
 
 // METER READINGS
 
-export const elecMeterReadingApplication1: ElecMeterReadingsApplication = {
+
+
+const elecMeterReadingApplicationPending: ElecMeterReadingsApplication = {
+    id: 1,
+    cpo: cpo,
+    station_count: 19,
+    charge_point_count: 1000,
+    energy_total: 30000,
+    year: 2024,
+    quarter: 1,
+    application_date: "2024-1-13",
+    status: ElecAuditApplicationStatus.Pending,
+}
+
+export const elecMeterReadingApplicationAccepted: ElecMeterReadingsApplication = {
     id: 1,
     cpo: cpo,
     station_count: 4,
@@ -137,27 +152,14 @@ export const elecMeterReadingApplication1: ElecMeterReadingsApplication = {
     application_date: "2023-11-13",
     status: ElecAuditApplicationStatus.Accepted,
 }
-
-const elecMeterReadingApplication2: ElecMeterReadingsApplication = {
+const elecMeterReadingApplicationRejected: ElecMeterReadingsApplication = {
     id: 1,
     cpo: cpo,
     station_count: 19,
     charge_point_count: 1000,
     energy_total: 30000,
     year: 2023,
-    quarter: 2,
-    application_date: "2023-11-13",
-
-    status: ElecAuditApplicationStatus.Pending,
-}
-const elecMeterReadingApplication3: ElecMeterReadingsApplication = {
-    id: 1,
-    cpo: cpo,
-    station_count: 19,
-    charge_point_count: 1000,
-    energy_total: 30000,
-    year: 2023,
-    quarter: 2,
+    quarter: 4,
     application_date: "2023-11-13",
 
     status: ElecAuditApplicationStatus.Rejected,
@@ -169,27 +171,57 @@ export const elecMeterReadingApplication4: ElecMeterReadingsApplication = {
     charge_point_count: 1000,
     energy_total: 30000,
     year: 2023,
-    quarter: 2,
-    application_date: "2023-11-13",
+    quarter: 3,
+    application_date: "2023-08-13",
 
     status: ElecAuditApplicationStatus.AuditInProgress,
 }
 
 
 export const elecMeterReadingApplication1Details: ElecMeterReadingsApplicationDetails = {
-    ...elecMeterReadingApplication1,
+    ...elecMeterReadingApplicationAccepted,
     email_contacts: ["cpo@test.com"],
     status: ElecAuditApplicationStatus.AuditInProgress,
 
 }
 
-
 export const elecMeterReadingsApplications: ElecMeterReadingsApplication[] = [
-    elecMeterReadingApplication1,
-    elecMeterReadingApplication2,
-    elecMeterReadingApplication3
+    elecMeterReadingApplicationPending,
+    elecMeterReadingApplicationAccepted,
+    elecMeterReadingApplicationRejected
 ]
 
+
+
+export const elecMeterReadingsApplicationsResponsePending: ElecMeterReadingsApplicationsResponse = {
+    applications: [
+        elecMeterReadingApplicationPending,
+        elecMeterReadingApplicationAccepted,
+    ],
+    current_application: elecMeterReadingApplicationPending,
+    current_application_period: {
+        quarter: 1,
+        year: 2024,
+        urgency_status: MeterReadingsApplicationUrgencyStatus.Critical,
+        deadline: "2024-04-15"
+    }
+}
+
+export const elecMeterReadingsApplicationsResponseMissing: ElecMeterReadingsApplicationsResponse = {
+    applications: [
+        elecMeterReadingApplicationAccepted,
+    ],
+    current_application: undefined,
+    current_application_period: {
+        quarter: 1,
+        year: 2024,
+        // urgency_status: MeterReadingsApplicationUrgencyStatus.Low,
+        // urgency_status: MeterReadingsApplicationUrgencyStatus.High,
+        urgency_status: MeterReadingsApplicationUrgencyStatus.Critical,
+        deadline: "2024-04-15"
+
+    }
+}
 
 
 export const meterReadingsApplicationError1: MeterReadingsApplicationError = {
