@@ -2,7 +2,7 @@ import { api, Api, download } from "common/services/api"
 import { ElecCPOProvisionCertificateFilter, ElecCPOProvisionCertificateQuery, ElecCPOSnapshot, ElecTransferCertificateQuery, ElecProvisionCertificatesData, ElecTransferCertificatesData } from "./types-cpo"
 import { EntityPreview } from "carbure/types"
 import { extract } from "carbure/api"
-import { ElecChargePointsApplication, ElecChargePointsApplicationCheckInfo, ElecMeterReadingsApplication, ElecMeterReadingsApplicationCheckInfo, ElecProvisionCertificatesDetails, ElecTransferCertificateFilter, ElecTransferCertificatesDetails, QUERY_RESET } from "./types"
+import { ElecChargePointsApplication, ElecChargePointsApplicationCheckInfo, ElecMeterReadingsApplication, ElecMeterReadingsApplicationCheckInfo, ElecMeterReadingsApplicationsResponse, ElecProvisionCertificatesDetails, ElecTransferCertificateFilter, ElecTransferCertificatesDetails, QUERY_RESET } from "./types"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/elec/cpo/years", { params: { entity_id } })
@@ -136,7 +136,7 @@ export function addChargePoints(
 // METER READINGS
 
 export function getMeterReadingsApplications(entityId: number, companyId: number) {
-  return api.get<Api<ElecMeterReadingsApplication[]>>("/elec/cpo/meter-readings/applications", {
+  return api.get<Api<ElecMeterReadingsApplicationsResponse>>("/elec/cpo/meter-readings/applications", {
     params: { entity_id: entityId, company_id: companyId },
   })
 }

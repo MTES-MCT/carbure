@@ -107,6 +107,23 @@ export interface ChargePointsApplicationError {
 export interface ElecMeterReadingsApplicationDetails extends ElecMeterReadingsApplication {
   email_contacts: string[]
 }
+
+export enum MeterReadingsApplicationUrgencyStatus {
+  Low = "LOW",
+  High = "HIGH",
+  Critical = "CRITICAL",
+}
+
+export interface ElecMeterReadingsCurrentApplicationsPeriod {
+  year: number, quarter: number, urgency_status: MeterReadingsApplicationUrgencyStatus, deadline: string
+
+}
+export interface ElecMeterReadingsApplicationsResponse {
+  applications: ElecMeterReadingsApplication[]
+  current_application?: ElecMeterReadingsApplication
+  current_application_period: ElecMeterReadingsCurrentApplicationsPeriod
+}
+
 export interface ElecMeterReadingsApplication {
   id: number
   cpo: EntityPreview
