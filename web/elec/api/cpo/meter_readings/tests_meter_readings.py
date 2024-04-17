@@ -1,4 +1,4 @@
-# Test : f=elec.api.cpo.meter_readings.tests_meter_readings.ElecMeterReadingsTest npm run test-f
+# Test :
 
 import io
 import datetime
@@ -334,7 +334,7 @@ class ElecMeterReadingsTest(TestCase):
         mocked_get_application_quarter = patch("elec.helpers.meter_readings_application_quarter.get_application_quarter").start()  # fmt:skip
         mocked_get_application_quarter.return_value = (2024, 3)
 
-        mocked_get_application_deadline = patch("elec.api.cpo.meter_readings.applications.get_application_deadline").start()  # fmt:skip
+        mocked_get_application_deadline = patch("elec.helpers.meter_readings_application_quarter.get_application_deadline").start()  # fmt:skip
         mocked_get_application_deadline.return_value = (datetime.date(2024, 10, 15), "HIGH")
 
         response = self.client.get(

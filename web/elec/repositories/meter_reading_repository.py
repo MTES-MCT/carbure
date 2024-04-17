@@ -53,3 +53,13 @@ class MeterReadingRepository:
     def get_renewable_share(year: int):
         instance = YearConfig.objects.get(year=year)
         return instance.renewable_share / 100
+
+    @staticmethod
+    def get_entities_without_application(quarter, year):
+        return Entity.objects.annotate(
+            app_count=Count(
+                "elec_meter_reading_applications",
+                filter=Q(elec_meter_reading_applications__quarter=quarter, elec_meter_reading_applications__year=year),
+                distinct=True,
+            )
+        ).filter(app_count=0, entity_type=Entity.CPO)
