@@ -1,11 +1,12 @@
-import calendar
-from datetime import date, timedelta
+from datetime import date
 from django.views.decorators.http import require_GET
 from core.common import SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity
-from elec.helpers.meter_readings_application_quarter import get_application_quarter, last_day_of_quarter
-from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
+from elec.helpers.meter_readings_application_quarter import (
+    get_application_deadline,
+    get_application_quarter,
+)
 from elec.repositories.meter_reading_repository import MeterReadingRepository
 from elec.serializers.elec_meter_reading_application import ElecMeterReadingApplicationSerializer
 
@@ -36,18 +37,3 @@ def get_applications(request, entity):
             },
         }
     )
-
-
-def get_application_deadline(current_date: date, year: int, quarter: int):
-    quarter_last_day = last_day_of_quarter(year, quarter)
-    deadline = quarter_last_day + timedelta(days=15)
-    days_to_deadline = (deadline - current_date).days
-
-    if days_to_deadline < 0:
-        status = ElecMeterReadingApplication.CRITICAL
-    elif days_to_deadline <= 10:
-        status = ElecMeterReadingApplication.HIGH
-    else:
-        status = ElecMeterReadingApplication.LOW
-
-    return deadline, status
