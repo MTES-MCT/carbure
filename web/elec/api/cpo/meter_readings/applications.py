@@ -4,6 +4,7 @@ from django.views.decorators.http import require_GET
 from core.common import SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity
+from elec.helpers.meter_readings_application_quarter import get_application_quarter, last_day_of_quarter
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from elec.repositories.meter_reading_repository import MeterReadingRepository
 from elec.serializers.elec_meter_reading_application import ElecMeterReadingApplicationSerializer
@@ -14,6 +15,7 @@ from elec.serializers.elec_meter_reading_application import ElecMeterReadingAppl
 def get_applications(request, entity):
     current_date = date.today()
     year, quarter = get_application_quarter(current_date)
+    print(">>>quarter: ", quarter)
     deadline, urgency_status = get_application_deadline(current_date, year, quarter)
 
     current_application = MeterReadingRepository.get_cpo_application_for_quarter(entity, year, quarter)
@@ -36,22 +38,6 @@ def get_applications(request, entity):
     )
 
 
-def get_application_quarter(current_date: date):
-    current_year, current_quarter = quarter(current_date)
-    last_day_of_current_quarter = last_day_of_quarter(current_year, current_quarter)
-
-    # the reference date is in the last 10 days of its quarter
-    # this means the wanted quarter is the reference date's quarter
-    if (last_day_of_current_quarter - current_date).days <= 10:
-        application_quarter = current_quarter
-        application_year = current_year
-    else:
-        application_quarter = current_quarter - 1 if current_quarter > 1 else 4
-        application_year = current_year if current_quarter > 1 else current_year - 1
-
-    return application_year, application_quarter
-
-
 def get_application_deadline(current_date: date, year: int, quarter: int):
     quarter_last_day = last_day_of_quarter(year, quarter)
     deadline = quarter_last_day + timedelta(days=15)
@@ -65,13 +51,3 @@ def get_application_deadline(current_date: date, year: int, quarter: int):
         status = ElecMeterReadingApplication.LOW
 
     return deadline, status
-
-
-def quarter(date: date):
-    return date.year, (date.month - 1) // 3 + 1
-
-
-def last_day_of_quarter(year, quarter):
-    last_month = quarter * 3
-    last_day = calendar.monthrange(year, quarter * 3)[1]
-    return date(year, last_month, last_day)

@@ -6,7 +6,7 @@ from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity, UserRights
-from elec.api.cpo.meter_readings.applications import get_application_quarter
+from elec.helpers.meter_readings_application_quarter import get_application_quarter
 from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.repositories.meter_reading_repository import MeterReadingRepository
 from elec.services.import_meter_reading_excel import import_meter_reading_excel

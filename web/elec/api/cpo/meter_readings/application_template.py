@@ -6,9 +6,9 @@ from core.common import ErrorResponse
 from core.decorators import check_user_rights
 from core.excel import ExcelResponse
 from core.models import UserRights
+from elec.helpers.meter_readings_application_quarter import get_application_quarter
 from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.repositories.meter_reading_repository import MeterReadingRepository
-from elec.api.cpo.meter_readings.check_application import get_application_quarter
 from elec.services.create_meter_reading_excel import create_meter_readings_data, create_meter_readings_excel
 
 
