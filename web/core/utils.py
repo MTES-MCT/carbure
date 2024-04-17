@@ -223,3 +223,5 @@ class CarbureEnv:
             return CarbureEnv.base_url_local
         if CarbureEnv.is_dev:
             return CarbureEnv.base_url_dev
+        else:
+            return CarbureEnv.base_url_prod
