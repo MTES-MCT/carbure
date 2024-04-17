@@ -1,5 +1,7 @@
-from datetime import date
+from datetime import date, timedelta
 import calendar
+
+from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 
 
 def get_application_quarter(current_date: date):
@@ -26,3 +28,18 @@ def last_day_of_quarter(year, quarter):
     last_month = quarter * 3
     last_day = calendar.monthrange(year, quarter * 3)[1]
     return date(year, last_month, last_day)
+
+
+def get_application_deadline(current_date: date, year: int, quarter: int):
+    quarter_last_day = last_day_of_quarter(year, quarter)
+    deadline = quarter_last_day + timedelta(days=15)
+    days_to_deadline = (deadline - current_date).days
+
+    if days_to_deadline < 0:
+        status = ElecMeterReadingApplication.CRITICAL
+    elif days_to_deadline <= 10:
+        status = ElecMeterReadingApplication.HIGH
+    else:
+        status = ElecMeterReadingApplication.LOW
+
+    return deadline, status

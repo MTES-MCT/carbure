@@ -213,7 +213,7 @@ function getNotificationText(notif: Notification) {
 
     case NotificationType.MeterReadingsApplicationStarted:
       return t(
-        "La période de declaration des relevés trimestriels T{quarter} {{year}} a débuté, vous avez jusqu'au {{deadline}} pour transmettre votre relevé dans votre espace.",
+        "La période de declaration des relevés trimestriels T{{quarter}} {{year}} a débuté, vous avez jusqu'au {{deadline}} pour transmettre votre relevé dans votre espace.",
         { quarter: notif.meta.quarter, year: notif.meta.year, deadline: formatDate(notif.meta.deadline) }
       )
     case NotificationType.MeterReadingsApplicationEndingSoon:
