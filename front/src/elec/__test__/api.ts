@@ -3,7 +3,7 @@ import { setupServer } from "msw/node"
 
 
 import { mockGetWithResponseData, mockPostWithResponseData } from "carbure/__test__/helpers"
-import { elecChargePointsApplicationCheckResponseFailed, elecChargePointsApplicationCheckResponseSucceed, elecChargePointsApplications, elecMeterReadingsApplications, meterReadingsApplicationCheckResponseFailed, meterReadingsApplicationCheckResponseSuccess } from "elec/__test__/data"
+import { elecChargePointsApplicationCheckResponseFailed, elecChargePointsApplicationCheckResponseSucceed, elecChargePointsApplications, elecMeterReadingsApplications, elecMeterReadingsApplicationsResponseMissing, elecMeterReadingsApplicationsResponsePending, meterReadingsApplicationCheckResponseFailed, meterReadingsApplicationCheckResponseSuccess } from "elec/__test__/data"
 
 
 
@@ -22,7 +22,8 @@ export const okChargePointsCheckError = mockPostWithResponseData("/api/elec/cpo/
 export const okChargePointsAddSuccess = mockPostWithResponseData("/api/elec/cpo/charge-points/add-application")
 
 export const okMeterReadingsApplicationsEmpty = mockGetWithResponseData("/api/elec/cpo/meter-readings/applications", [])
-export const okMeterReadingsApplications = mockGetWithResponseData("/api/elec/cpo/meter-readings/applications", elecMeterReadingsApplications)
+export const okMeterReadingsApplications = mockGetWithResponseData("/api/elec/cpo/meter-readings/applications", elecMeterReadingsApplicationsResponsePending)
+export const okMeterReadingsApplicationsUrgencyCritical = mockGetWithResponseData("/api/elec/cpo/meter-readings/applications", elecMeterReadingsApplicationsResponseMissing)
 export const okMeterReadingsCheckError = mockPostWithResponseData("/api/elec/cpo/meter-readings/check-application", meterReadingsApplicationCheckResponseFailed, true, "VALIDATION_FAILED")
 export const okMeterReadingsCheckValid = mockPostWithResponseData("/api/elec/cpo/meter-readings/check-application", meterReadingsApplicationCheckResponseSuccess)
 export const okMeterReadingsAddSuccess = mockPostWithResponseData("/api/elec/cpo/meter-readings/add-application")
