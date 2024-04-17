@@ -138,14 +138,14 @@ class TransportDataGouv:
         )
 
         # check if each charge point is using direct current
-        transport_data["prise_type_combo_ccs"] = (transport_data["prise_type_combo_ccs"].str.lower() == "true") | (transport_data["prise_type_combo_ccs"] == "1")  # fmt:skip
-        transport_data["prise_type_chademo"] = (transport_data["prise_type_chademo"].str.lower() == "true") | (transport_data["prise_type_chademo"] == "1")  # fmt:skip
+        transport_data["prise_type_combo_ccs"] = is_true(transport_data, "prise_type_combo_ccs")
+        transport_data["prise_type_chademo"] = is_true(transport_data, "prise_type_chademo")
         transport_data.insert(0, "DC", transport_data["prise_type_combo_ccs"] | transport_data["prise_type_chademo"])  # fmt:skip
-        transport_data["current_type"] = transport_data["DC"].apply(lambda is_dc: "DC" if is_dc else "AC")
+        transport_data["guessed_current_type"] = transport_data["DC"].apply(lambda is_dc: "DC" if is_dc else "AC")
 
         # find all stations that contain at least one DC point
         stations_art2 = transport_data[["station_id", "DC"]].groupby("station_id").max()
-        stations_art2 = stations_art2.rename(columns={"DC": "maybe_article_2"})
+        stations_art2 = stations_art2.rename(columns={"DC": "guessed_is_article_2"})
 
         # mark all the charge points of these stations as eligible to article 2
         transport_data = transport_data.merge(stations_art2, on="station_id")
@@ -163,11 +163,16 @@ class TransportDataGouv:
             columns=[col + "_old" for col in shared_columns] + [col + "_new" for col in shared_columns]
         )
 
-        # deal with when a charge point was not found on TDG to compute its maybe_article_2 column
-        if "maybe_article_2" in merged_data.columns:
-            merged_data["maybe_article_2"].fillna(merged_data["current_type"] != "AC", inplace=True)
+        # for current type, use the data filled by the user, or use the one guessed from TDG
+        merged_data["current_type"] = merged_data["current_type"].replace("CC", "DC").replace("CA", "AC")
+        merged_data["current_type"] = merged_data["current_type"].replace("", pd.NA)
+        merged_data["current_type"] = merged_data["current_type"].fillna(merged_data["guessed_current_type"])
+
+        # deal with when a charge point was not found on TDG to compute its guessed_is_article_2 column
+        if "guessed_is_article_2" in merged_data.columns:
+            merged_data["guessed_is_article_2"].fillna(merged_data["current_type"] != "AC", inplace=True)
         else:
-            merged_data["maybe_article_2"] = merged_data["current_type"] != "AC"
+            merged_data["guessed_is_article_2"] = merged_data["current_type"] != "AC"
 
         # tag the origin of the data
         merged_data["is_in_tdg"] = merged_data["is_in_tdg"] == True
@@ -178,7 +183,7 @@ class TransportDataGouv:
         merged_data["measure_reference_point_id"] = merged_data["measure_reference_point_id"].apply(lambda x: "" if not x or len(str(x)) < 3 else x)  # fmt:skip
 
         # find which rows have all data defined for a first meter reading
-        merged_data["has_reading"] = (
+        merged_data["has_reading"] = (merged_data["current_type"] == "AC") | (
             (merged_data["mid_id"] != "") & merged_data["measure_date"].notna() & merged_data["measure_energy"].notna()
         )
 
@@ -193,8 +198,13 @@ class TransportDataGouv:
             .reset_index()["has_reading"]
         )
 
-        # combine the info we get from TDG about article 2, and with the computation above
-        merged_data["is_article_2"] = ~merged_data["whole_station_has_readings"] & merged_data["maybe_article_2"]  # fmt:skip
+        # for article 2, use the data filled by the user or combine the info we get from TDG with the computations above
+        merged_data["is_article_2"] = merged_data["is_article_2"].replace("", "NON")
+        merged_data["is_article_2"] = is_true(merged_data, "is_article_2") | (~merged_data["whole_station_has_readings"] & merged_data["guessed_is_article_2"])  # fmt:skip
 
         # remove the charge points that were not listed in the original imported excel file
         return merged_data[merged_data["is_in_application"] == True][TransportDataGouv.DB_COLUMNS]
+
+
+def is_true(df, column):
+    return (df[column] == True) | (df[column].str.lower() == "true") | (df[column] == "1") | (df[column].str.lower() == "oui")  # fmt:skip

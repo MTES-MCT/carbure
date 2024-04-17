@@ -109,17 +109,29 @@ class ElecCharginPointsTest(TestCase):
                     {
                         "error": "INVALID_DATA",
                         "line": 38,
-                        "meta": {"charge_point_id": ["Ce point de recharge n'est pas listé sur transport.data.gouv.fr"]},
+                        "meta": {
+                            "charge_point_id": [
+                                "Le point de recharge FRBBBB222205 n'est pas listé dans les données consolidées de transport.data.gouv.fr"
+                            ]
+                        },
                     },
                     {
                         "error": "INVALID_DATA",
                         "line": 39,
-                        "meta": {"charge_point_id": ["Ce point de recharge n'est pas listé sur transport.data.gouv.fr"]},
+                        "meta": {
+                            "charge_point_id": [
+                                "Le point de recharge FRBBBB222206 n'est pas listé dans les données consolidées de transport.data.gouv.fr"
+                            ]
+                        },
                     },
                     {
                         "error": "INVALID_DATA",
                         "line": 40,
-                        "meta": {"charge_point_id": ["Ce point de recharge n'est pas listé sur transport.data.gouv.fr"]},
+                        "meta": {
+                            "charge_point_id": [
+                                "Le point de recharge FRBBBB222207 n'est pas listé dans les données consolidées de transport.data.gouv.fr"
+                            ]
+                        },
                     },
                 ],
                 "error_count": 6,

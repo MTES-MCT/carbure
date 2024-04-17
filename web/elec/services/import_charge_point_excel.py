@@ -48,25 +48,38 @@ class ExcelChargePoints:
         "measure_date": ["Date du relevé"],
         "measure_energy": ["Energie active totale soutirée à la date du relevé"],
         "measure_reference_point_id": ["Numéro du point référence mesure du gestionnaire du réseau public de distribution alimentant la station"],  # fmt:skip
+        "current_type": ["Type de courant électrique associé au point de recharge"],
+        "is_article_2": ["La station du point de recharge est soumise à l'article 2 du décret n°2022-1330"],
     }
 
     @staticmethod
     def parse_charge_point_excel(excel_file: UploadedFile):
-        charge_point_data = pd.read_excel(excel_file, usecols=list(range(1, 7)), dtype=str)
+        charge_point_data = pd.read_excel(excel_file, usecols=list(range(1, 10)), dtype=str)
+
+        column_count = len(charge_point_data.columns)
+        columns = dict(list(ExcelChargePoints.EXCEL_COLUMNS.items())[0:column_count])
+
+        # remove empty separator column
+        if column_count > 6:
+            charge_point_data = charge_point_data.drop(charge_point_data.columns[6], axis=1)
+        else:
+            charge_point_data["current_type"] = ""
+            charge_point_data["is_article_2"] = ""
 
         # check that the template has the right columns
-        for i, header in enumerate(ExcelChargePoints.EXCEL_COLUMNS.values()):
-            if charge_point_data.iloc[9, i].strip() not in header:
-                raise Exception("Invalid template")
+        # for i, header in enumerate(columns.values()):
+        #     if charge_point_data.iloc[9, i].strip() not in header:
+        #         raise Exception("Invalid template")
 
         charge_point_data = charge_point_data.drop(charge_point_data.index[:11])
         charge_point_data = charge_point_data.dropna(how="all")  # remove completely empty rows
-        charge_point_data.rename(columns={charge_point_data.columns[i]: column for i, column in enumerate(ExcelChargePoints.EXCEL_COLUMNS)}, inplace=True)  # fmt: skip
+        charge_point_data.rename(columns={charge_point_data.columns[i]: column for i, column in enumerate(columns)}, inplace=True)  # fmt: skip
         charge_point_data["measure_energy"] = charge_point_data["measure_energy"].fillna(0)
         charge_point_data = charge_point_data.fillna("")
         charge_point_data["line"] = charge_point_data.index + 2  # add a line number to locate data in the excel file
         charge_point_data["is_in_application"] = True
         charge_point_data = charge_point_data.reset_index(drop=True)
+        charge_point_data = charge_point_data.drop_duplicates("charge_point_id")
 
         if len(charge_point_data) >= 18:
             # default template example cells
@@ -75,7 +88,7 @@ class ExcelChargePoints:
 
             # the example was left in the template, so we skip it
             if first_id == "FRUEXESTATION1P1" and eighteenth_id == "FRUEXESTATION4P4":
-                charge_point_data = charge_point_data.drop(charge_point_data.index[:19])
+                charge_point_data = charge_point_data.drop(charge_point_data.index[:20])
                 charge_point_data = charge_point_data.reset_index(drop=True)
 
         return charge_point_data
@@ -113,10 +126,12 @@ class ExcelChargePointValidator(Validator):
     # check if the different possible charge point configurations are respected
     # and if the new data doesn't conflict with TDG or our own DB
     def validate(self, charge_point):
-        if charge_point.get("charge_point_id") in self.context.get("registered_charge_points", []):
+        charge_point_id = charge_point.get("charge_point_id")
+
+        if charge_point_id in self.context.get("registered_charge_points", []):
             self.add_error("charge_point_id", "Ce point de recharge a déjà été défini dans un autre dossier d'inscription.")
         elif not self.data.get("is_in_tdg"):
-            self.add_error("charge_point_id", "Ce point de recharge n'est pas listé sur transport.data.gouv.fr")
+            self.add_error("charge_point_id", f"Le point de recharge {charge_point_id} n'est pas listé dans les données consolidées de transport.data.gouv.fr")  # fmt:skip
         else:
             if charge_point.get("is_article_2"):
                 if not charge_point.get("measure_reference_point_id"):
