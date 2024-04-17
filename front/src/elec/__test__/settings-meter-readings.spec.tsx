@@ -7,8 +7,9 @@ import { cpo } from "carbure/__test__/data"
 import ElecChargePointsSettings from "elec/components/charge-points/settings"
 import server from "../../settings/__test__/api"
 import userEvent from "@testing-library/user-event"
-import { okChargePointsApplicationsEmpty, okChargePointsCheckError, okMeterReadingsApplicationsEmpty, okMeterReadingsCheckError } from "./api"
+import { okChargePointsApplicationsEmpty, okChargePointsCheckError, okMeterReadingsApplicationsEmpty, okMeterReadingsApplicationsUrgencyCritical, okMeterReadingsCheckError } from "./api"
 import ElecMeterReadingsSettings from "elec/components/meter-readings/settings"
+import { elecMeterReadingsApplicationsResponseMissing } from "./data"
 
 const SettingsWithHooks = () => {
   return (
@@ -34,18 +35,9 @@ beforeEach(() => {
 afterEach(() => { server.resetHandlers() })
 
 afterAll(() => server.close())
-
-const getCurrentQuarterString = () => {
-  const currentDate = new Date()
-  const currentQuarter = currentDate.getMonth() < 3 ? 1 : currentDate.getMonth() < 6 ? 2 : currentDate.getMonth() < 9 ? 3 : 4
-  const currentYear = currentDate.getFullYear()
-  return "T" + currentQuarter + " " + currentYear
-
-}
-
 const openModal = async () => {
   const user = userEvent.setup()
-  const sendButton = await screen.findByText("Transmettre mes relevés trimestriels")
+  const sendButton = await screen.findByText("Transmettre mes relevés trimestriels T1 2024")
   return user.click(sendButton)
 
 }
@@ -54,7 +46,7 @@ test("check the metter-readings section of the settings", async () => {
   render(<SettingsWithHooks />)
   await waitWhileLoading()
   screen.getByText("Relevés trimestriels")
-  screen.getByText("Transmettre mes relevés trimestriels")
+  screen.getByText("Transmettre mes relevés trimestriels T1 2024")
 })
 
 
@@ -102,17 +94,24 @@ test("check the applications list empty", async () => {
 })
 
 test("upload dialog opened", async () => {
-  const user = userEvent.setup()
   setEntity(cpo)
 
   render(<SettingsWithHooks />)
   await waitWhileLoading()
 
   await openModal()
+  screen.getByText("Relevés trimestriels")
+  screen.getByText("Relevés trimestriels - T1 2024")
+  screen.getByText("Télécharger le fichier Excel")
+})
 
-  const titles = screen.getAllByText("Relevés trimestriels")
-  expect(titles).toHaveLength(2)
-  screen.getByText("sur ce lien")
+test("upload dialog opened with urgency critical", async () => {
+  setEntity(cpo)
+  server.use(okMeterReadingsApplicationsUrgencyCritical)
+  render(<SettingsWithHooks />)
+  await waitWhileLoading()
+  await openModal()
+  screen.getByText("Le délai de déclaration a été dépassé, l'administration se réserve le droit de la refuser.")
 })
 
 
@@ -126,7 +125,7 @@ test("upload valid file", async () => {
 
   //send inscription
   screen.getByText("Valide")
-  const validationButton = await screen.findByText("Transmettre mes relevés trimestriels", { selector: "footer button"});
+  const validationButton = await screen.findByText("Transmettre mes relevés trimestriels", { selector: "footer button" });
   await user.click(validationButton)
   return waitWhileLoading()
 

@@ -197,6 +197,7 @@ export const elecMeterReadingsApplicationsResponsePending: ElecMeterReadingsAppl
     applications: [
         elecMeterReadingApplicationPending,
         elecMeterReadingApplicationAccepted,
+        elecMeterReadingApplicationRejected
     ],
     current_application: elecMeterReadingApplicationPending,
     current_application_period: {
