@@ -4,6 +4,8 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.http import JsonResponse
 
+from core.utils import CarbureEnv
+
 
 @otp_or_403
 def request_entity_access(request):
@@ -23,7 +25,7 @@ def request_entity_access(request):
         return JsonResponse({"status": "error", "message": "Could not find entity"}, status=400)
 
     if request.user.is_staff:
-        
+
         rr, created = UserRightsRequests.objects.update_or_create(
             user=request.user, entity=entity, defaults={"comment": comment, "role": role, "status": "ACCEPTED"}
         )
@@ -38,21 +40,23 @@ def request_entity_access(request):
         email_subject = "Carbure - Demande d'accès"
         message = """
         Bonjour,
-        Un utilisateur vient de faire une demande d'accès à CarbuRe
+        Un utilisateur vient de faire une demande d'accès à CarbuRe.
+        Vous pouvez valider ou refuser cette demande depuis la page d'administration de votre société : %s.
 
         Utilisateur: %s
         Société: %s
         Commentaire: %s
         """ % (
+            CarbureEnv.get_base_url() + "/org/" + entity_id + "/settings#users",
             request.user.email,
             entity.name,
             comment,
         )
 
-        #get all user admins for tthe entity 
-        admins = UserRights.objects.filter(entity=entity, role=UserRights.ADMIN).values_list('user__email', flat=True)
+        # get all user admins for tthe entity
+        admins = UserRights.objects.filter(entity=entity, role=UserRights.ADMIN).values_list("user__email", flat=True)
         recipient_list = list(admins)
-        recipient_list.append('carbure@beta.gouv.fr')        
+        recipient_list.append("carbure@beta.gouv.fr")
 
         send_mail(
             subject=email_subject,
