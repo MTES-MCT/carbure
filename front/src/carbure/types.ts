@@ -197,6 +197,9 @@ export enum NotificationType {
   DeclarationCancelled = "DECLARATION_CANCELLED",
   DeclarationReminder = "DECLARATION_REMINDER",
 
+  MeterReadingsApplicationStarted = "METER_READINGS_APPLICATION_STARTED",
+  MeterReadingsApplicationEndingSoon = "METER_READINGS_APPLICATION_ENDING_SOON",
+
   SafTicketReceived = "SAF_TICKET_RECEIVED",
   SafTicketAccepted = "SAF_TICKET_ACCEPTED",
   SafTicketRejected = "SAF_TICKET_REJECTED",
