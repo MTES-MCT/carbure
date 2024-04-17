@@ -15,6 +15,7 @@ import { t } from "i18next"
 import Radio from "common/components/radio"
 import { Col, Row } from "common/components/scaffold"
 import {
+  formatDate,
   formatDateTime,
   formatElapsedTime,
   formatPeriod,
@@ -209,6 +210,18 @@ function getNotificationText(notif: Notification) {
         "La période {{period}} arrive à sa fin, pensez à valider votre déclaration.",
         { period: formatPeriod(notif.meta?.period ?? 0) }
       )
+
+    case NotificationType.MeterReadingsApplicationStarted:
+      return t(
+        "La période de declaration des relevés trimestriels T{quarter} {{year}} a débuté, vous avez jusqu'au {{deadline}} pour transmettre votre relevé dans votre espace.",
+        { quarter: notif.meta.quarter, year: notif.meta.year, deadline: formatDate(notif.meta.deadline) }
+      )
+    case NotificationType.MeterReadingsApplicationEndingSoon:
+      return t(
+        "La période de declaration des relevés trimestriels T{quarter} {{year}} se termine bientôt, pensez à transmettre votre relevé rapidement.",
+        { quarter: notif.meta.quarter, year: notif.meta.year }
+      )
+
     case NotificationType.SafTicketReceived:
       return t("Vous avez reçu un ticket CAD de {{supplier}}.", {
         supplier: notif.meta.supplier,
@@ -270,6 +283,9 @@ function getNotificationLink(notif: Notification) {
 
     case NotificationType.DeclarationCancelled:
       return `#declaration/${notif.meta?.period}`
+
+    case NotificationType.MeterReadingsApplicationStarted || NotificationType.MeterReadingsApplicationEndingSoon:
+      return `/org/${notif.dest.id}/settings#elec-meter-readings`
 
     case NotificationType.DeclarationReminder:
       return `#declaration/${notif.meta?.period}`
