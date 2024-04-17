@@ -1,3 +1,5 @@
+# Test : f=elec.api.cpo.meter_readings.tests_meter_readings.ElecMeterReadingsTest npm run test-f
+
 import io
 import datetime
 from unittest.mock import patch
@@ -329,7 +331,7 @@ class ElecMeterReadingsTest(TestCase):
         self.assertEqual(reading_2.reading_date, datetime.date(2024, 9, 28))
 
     def test_get_applications(self):
-        mocked_get_application_quarter = patch("elec.api.cpo.meter_readings.applications.get_application_quarter").start()  # fmt:skip
+        mocked_get_application_quarter = patch("elec.helpers.meter_readings_application_quarter.get_application_quarter").start()  # fmt:skip
         mocked_get_application_quarter.return_value = (2024, 3)
 
         mocked_get_application_deadline = patch("elec.api.cpo.meter_readings.applications.get_application_deadline").start()  # fmt:skip
