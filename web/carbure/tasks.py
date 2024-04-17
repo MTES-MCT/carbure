@@ -5,6 +5,7 @@ from huey import crontab
 from huey.contrib.djhuey import periodic_task, db_periodic_task, db_task
 from django.db.models.query import QuerySet
 
+from elec.scripts.create_meter_readings_application_reminder import create_meter_readings_application_reminder
 from transactions.sanity_checks.sanity_checks import bulk_sanity_checks, bulk_scoring
 from ml.scripts.calc_ml_score import calc_ml_score
 from ml.scripts.load_data import load_ml_data
@@ -77,6 +78,15 @@ if env.get("IMAGE_TAG") == "prod":
     @periodic_task(crontab(hour=6, minute=0))
     def restart_metabase_container() -> None:
         subprocess.run(["bash", "/app/scripts/scalingo/restart_metabase.sh"])
+
+    # Elec
+    @db_periodic_task(crontab(month="3,6,9,12", day=21, hour=8, minute=0))
+    def periodic_send_meter_readings_application_reminder() -> None:
+        create_meter_readings_application_reminder()
+
+    # @db_periodic_task(crontab(month="1,4,7,10", day=15, hour=8, minute=0))
+    # def periodic_send_meter_readings_application_deadline_reminder() -> None:
+    #     create_meter_readings_application_deadline_reminder()
 
 
 if env.get("IMAGE_TAG") == "staging":
