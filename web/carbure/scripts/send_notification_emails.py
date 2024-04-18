@@ -19,6 +19,7 @@ MAX_NOTIF_PER_HOUR = 20
 
 
 def send_notification_emails(test: bool = False) -> None:
+
     entities = Entity.objects.annotate(num_notifs=Count("carburenotification")).order_by("-num_notifs")
     domain = os.environ["ALLOWED_HOSTS"]
     one_hour_ago = pytz.utc.localize(datetime.datetime.now() - datetime.timedelta(hours=1))
@@ -35,6 +36,7 @@ def send_notification_emails(test: bool = False) -> None:
         return
 
     for entity in entities:
+
         all_notifs = CarbureNotification.objects.filter(
             dest=entity,
             send_by_email=True,
@@ -44,7 +46,6 @@ def send_notification_emails(test: bool = False) -> None:
 
         if all_notifs["id__count"] > 0:
             entity_oldest_notif[entity] = all_notifs["datetime__min"]
-
     for entity, oldest_notif_dt in sorted(entity_oldest_notif.items(), key=lambda x: cast(int, x[1])):
         if not entity.notifications_enabled:
             continue
@@ -69,8 +70,8 @@ def send_notification_emails(test: bool = False) -> None:
         lots_received = notifs.filter(type=CarbureNotification.LOTS_RECEIVED)
         lots_recalled = notifs.filter(type=CarbureNotification.LOTS_RECALLED)
         certificate_rejected = notifs.filter(type=CarbureNotification.CERTIFICATE_REJECTED)
-        meter_readings_app_started = notifs.filter(type=CarbureNotification.METER_READINGS_APP_STARTED)
-        meter_readings_app_ending_soon = notifs.filter(type=CarbureNotification.METER_READINGS_APP_ENDING_SOON)
+        meter_readings_app_started = notifs.filter(type=CarbureNotification.METER_READINGS_APP_STARTED).first()
+        meter_readings_app_ending_soon = notifs.filter(type=CarbureNotification.METER_READINGS_APP_ENDING_SOON).first()
 
         email_context = {
             "entity": entity,
