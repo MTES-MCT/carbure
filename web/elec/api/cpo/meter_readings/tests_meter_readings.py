@@ -331,10 +331,10 @@ class ElecMeterReadingsTest(TestCase):
         self.assertEqual(reading_2.reading_date, datetime.date(2024, 9, 28))
 
     def test_get_applications(self):
-        mocked_get_application_quarter = patch("elec.helpers.meter_readings_application_quarter.get_application_quarter").start()  # fmt:skip
+        mocked_get_application_quarter = patch("elec.services.meter_readings_application_quarter.get_application_quarter").start()  # fmt:skip
         mocked_get_application_quarter.return_value = (2024, 3)
 
-        mocked_get_application_deadline = patch("elec.helpers.meter_readings_application_quarter.get_application_deadline").start()  # fmt:skip
+        mocked_get_application_deadline = patch("elec.services.meter_readings_application_quarter.get_application_deadline").start()  # fmt:skip
         mocked_get_application_deadline.return_value = (datetime.date(2024, 10, 15), "HIGH")
 
         response = self.client.get(
