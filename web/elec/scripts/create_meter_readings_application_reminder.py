@@ -7,7 +7,7 @@ django.setup()
 
 from elec.repositories.meter_reading_repository import MeterReadingRepository
 from core.models import CarbureNotification
-from elec.helpers.meter_readings_application_quarter import (
+from elec.services.meter_readings_application_quarter import (
     get_application_quarter,
     get_application_deadline,
 )
