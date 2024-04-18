@@ -1,6 +1,15 @@
 Bonjour,
 
 Vous avez {{nb_notifications}} nouvelles notifications sur CarbuRe:
+
+{% if meter_readings_app_started %}
+La période de declaration des relevés trimestriels T{{cr.meta.quarter}} {{cr.meta.year}} a débuté, vous avez jusqu'au {{cr.meta.deadline}} pour transmettre votre relevé dans votre espace : https://{{ domain }}/app/org/{{entity.id}}/settings#elec-meter-readings
+{% endif %}
+
+{% if meter_readings_app_ending_soon %}
+La période de declaration des relevés trimestriels T{{cr.meta.quarter}} {{cr.meta.year}} arrive à sa fin, pensez à transmettre votre relevé: https://{{ domain }}/app/org/{{entity.id}}/settings#elec-meter-readings
+{% endif %}
+
 {% if correction_requests|length > 0 %}
 Demandes de corrections: 
 {% for cr in correction_requests %}

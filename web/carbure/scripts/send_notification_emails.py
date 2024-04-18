@@ -69,6 +69,8 @@ def send_notification_emails(test: bool = False) -> None:
         lots_received = notifs.filter(type=CarbureNotification.LOTS_RECEIVED)
         lots_recalled = notifs.filter(type=CarbureNotification.LOTS_RECALLED)
         certificate_rejected = notifs.filter(type=CarbureNotification.CERTIFICATE_REJECTED)
+        meter_readings_app_started = notifs.filter(type=CarbureNotification.METER_READINGS_APP_STARTED)
+        meter_readings_app_ending_soon = notifs.filter(type=CarbureNotification.METER_READINGS_APP_ENDING_SOON)
 
         email_context = {
             "entity": entity,
@@ -80,6 +82,8 @@ def send_notification_emails(test: bool = False) -> None:
             "lots_received": lots_received,
             "lots_recalled": lots_recalled,
             "certificate_rejected": certificate_rejected,
+            "meter_readings_app_started": meter_readings_app_started,
+            "meter_readings_app_ending_soon": meter_readings_app_ending_soon,
         }
 
         html_message = loader.render_to_string("emails/notifications.v3.html", email_context)
@@ -95,9 +99,9 @@ def send_notification_emails(test: bool = False) -> None:
             # PROD
             recipients = [
                 r.user.email
-                for r in UserRights.objects.filter(
-                    entity=entity, user__is_staff=False, user__is_superuser=False
-                ).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])
+                for r in UserRights.objects.filter(entity=entity, user__is_staff=False, user__is_superuser=False).exclude(
+                    role__in=[UserRights.AUDITOR, UserRights.RO]
+                )
             ]
             if notifs.filter(notify_administrator=True).count() > 0:
                 cc = ["carbure@beta.gouv.fr"]

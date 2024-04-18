@@ -218,7 +218,7 @@ function getNotificationText(notif: Notification) {
       )
     case NotificationType.MeterReadingsApplicationEndingSoon:
       return t(
-        "La période de declaration des relevés trimestriels T{quarter} {{year}} se termine bientôt, pensez à transmettre votre relevé rapidement.",
+        "La période de declaration des relevés trimestriels T{{quarter}} {{year}} se termine bientôt, pensez à transmettre votre relevé rapidement.",
         { quarter: notif.meta.quarter, year: notif.meta.year }
       )
 
