@@ -380,23 +380,17 @@
 
                         {% if meter_readings_app_started %}
                         <p>
-                          La période de declaration des relevés trimestriels T{{cr.meta.quarter}} {{cr.meta.year}} a débuté, vous avez jusqu'au
-                          {{cr.meta.deadline}} pour transmettre votre relevé dans votre espace.<br />
+                          La période de declaration des relevés trimestriels T{{meter_readings_app_started.meta.quarter}}
+                          {{meter_readings_app_started.meta.year}} a débuté, vous avez jusqu'au
+                          {{meter_readings_app_started.meta.deadline}} pour transmettre votre relevé dans votre espace.<br />
                           <a href="https://{{ domain }}/app/org/{{entity.id}}/settings#elec-meter-readings">Transmettre mon relevé trimestriel</a>
                         </p>
                         {% endif %}
 
                         {% if meter_readings_app_ending_soon %}
                         <p>
-                          La période de declaration des relevés trimestriels T{{cr.meta.quarter}} {{cr.meta.year}} arrive à sa fin, pensez à
-                          transmettre votre relevé.<br />
-                          <a href="https://{{ domain }}/app/org/{{entity.id}}/settings#elec-meter-readings">Transmettre mon relevé trimestriel</a>
-                        </p>
-                        {% endif %}
-
-                        {% if meter_readings_app_started %}
-                        <p>
-                          La période de declaration des relevés trimestriels T{{cr.meta.quarter}} {{cr.meta.year}} arrive à sa fin, pensez à
+                          La période de declaration des relevés trimestriels T{{meter_readings_app_ending_soon.meta.quarter}}
+                          {{meter_readings_app_ending_soon.meta.year}} arrive à sa fin, pensez à
                           transmettre votre relevé.<br />
                           <a href="https://{{ domain }}/app/org/{{entity.id}}/settings#elec-meter-readings">Transmettre mon relevé trimestriel</a>
                         </p>
