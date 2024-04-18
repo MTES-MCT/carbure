@@ -210,9 +210,9 @@ class CarbureEnv:
     is_dev = True if env.get("IMAGE_TAG") == "dev" else False
 
     base_url_prod = "https://carbure.beta.gouv.fr"
-    base_url_staging = "https://carbure-staging.beta.gouv.fr"
+    base_url_staging = "https://carbure-staging.incubateur.net"
     base_url_local = "http://carbure.local:8090"
-    base_url_dev = "http://carbure-dev.local.beta.gouv.fr"
+    base_url_dev = "https://carbure-dev.incubateur.net"
 
     def get_base_url():
         if CarbureEnv.is_prod:
