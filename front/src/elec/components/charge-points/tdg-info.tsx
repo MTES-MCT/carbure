@@ -53,7 +53,7 @@ export function TDGInfo() {
           </li>
           <li>
             {t(
-              "Si certaines erreurs vous suprennent (ex: MID obligatoire sur un point CC), vous pouvez remplir les 2 colonnes optionnelles à droite du fichier excel pour nous indiquer la bonne valeur à utiliser dans nos calculs."
+              "Si certaines erreurs vous surprennent (ex: MID obligatoire sur un point CC), vous pouvez remplir les 2 colonnes optionnelles à droite du fichier excel pour nous indiquer la bonne valeur à utiliser dans nos calculs."
             )}
           </li>
         </ul>
