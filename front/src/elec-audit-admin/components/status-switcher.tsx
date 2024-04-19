@@ -6,11 +6,15 @@ interface StatusSwitcherProps {
     status: ElecAdminAuditStatus
     pendingCount: number
     historyCount: number
+    auditDoneCount: number
+    auditInProgressCount: number
     onSwitch: (status: ElecAdminAuditStatus) => void
 }
 export const StatusSwitcher = ({
     status,
     pendingCount,
+    auditInProgressCount,
+    auditDoneCount,
     historyCount,
     onSwitch,
 }: StatusSwitcherProps) => {
@@ -28,6 +32,16 @@ export const StatusSwitcher = ({
                     label: t("En attente ({{count}})", { count: pendingCount })
                 },
 
+                {
+                    key: ElecAdminAuditStatus.AuditInProgress,
+                    path: ElecAdminAuditStatus.AuditInProgress.toLowerCase(),
+                    label: t("En cours d'audit ({{count}})", { count: auditInProgressCount })
+                },
+                {
+                    key: ElecAdminAuditStatus.AuditDone,
+                    path: ElecAdminAuditStatus.AuditDone.toLowerCase(),
+                    label: t("Audit réalisé ({{count}})", { count: auditDoneCount })
+                },
                 {
                     key: ElecAdminAuditStatus.History,
                     path: ElecAdminAuditStatus.History.toLowerCase(),
