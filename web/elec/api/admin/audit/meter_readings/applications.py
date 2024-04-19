@@ -72,6 +72,7 @@ def get_applications(request):
 
 
 def filter_meter_readings_applications(applications, **filters):
+    print("filters: ", filters)
 
     applications = applications.select_related("cpo")
 
@@ -84,9 +85,9 @@ def filter_meter_readings_applications(applications, **filters):
         applications = applications.filter(quarter__in=filters["quarter"])
 
     if filters.get("status") == "PENDING":
-        applications = applications.filter(
-            status__in=[ElecMeterReadingApplication.PENDING, ElecMeterReadingApplication.AUDIT_IN_PROGRESS]
-        )
+        applications = applications.filter(status=ElecMeterReadingApplication.PENDING)
+    if filters.get("status") == "AUDIT_IN_PROGRESS":
+        applications = applications.filter(status=ElecMeterReadingApplication.AUDIT_IN_PROGRESS)
     elif filters.get("status") == "HISTORY":
         applications = applications.filter(
             status__in=[ElecMeterReadingApplication.REJECTED, ElecMeterReadingApplication.ACCEPTED]

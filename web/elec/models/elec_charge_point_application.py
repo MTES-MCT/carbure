@@ -13,7 +13,12 @@ class ElecChargePointApplication(models.Model):
     ACCEPTED = "ACCEPTED"
     REJECTED = "REJECTED"
     AUDIT_IN_PROGRESS = "AUDIT_IN_PROGRESS"
-    STATUSES = [(PENDING, PENDING), (ACCEPTED, ACCEPTED), (REJECTED, REJECTED), (AUDIT_IN_PROGRESS, AUDIT_IN_PROGRESS)]
+    STATUSES = [
+        (PENDING, PENDING),
+        (ACCEPTED, ACCEPTED),
+        (REJECTED, REJECTED),
+        (AUDIT_IN_PROGRESS, AUDIT_IN_PROGRESS),
+    ]
 
     status = models.CharField(max_length=32, default=PENDING, choices=STATUSES)
     created_at = models.DateField(auto_now_add=True)
