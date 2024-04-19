@@ -11,12 +11,15 @@ import * as api from "./api"
 import ChargePointsApplicationsList from "./components/charge-points/list"
 import MeterReadingsApplicationsList from "./components/meter-readings/list"
 import { ElecAdminAuditSnapshot, ElecAdminAuditStatus } from "./types"
+import { elecAdminAuditSnapshot } from "./__test__/data"
 
 
 const defaultElecAdminAuditSnapshot: ElecAdminAuditSnapshot = {
   charge_points_applications: 0,
   charge_points_applications_pending: 0,
   charge_points_applications_history: 0,
+  charge_points_applications_audit_done: 0,
+  charge_points_applications_audit_in_progress: 0,
   meter_readings_applications: 0,
   meter_readings_applications_pending: 0,
   meter_readings_applications_history: 0,
@@ -34,8 +37,8 @@ export const ElecAdminAudit = () => {
     params: [entity.id, years.selected],
   })
 
-  // const snapshot = elecAdminAuditSnapshot // TEST DATA
-  const snapshot = elecAdminAuditSnapshotResponse.result?.data.data ?? defaultElecAdminAuditSnapshot
+  // const snapshot = elecAdminAuditSnapshotResponse.result?.data.data ?? defaultElecAdminAuditSnapshot
+  const snapshot = elecAdminAuditSnapshot // TEST DATA
 
   return (
 
@@ -120,10 +123,8 @@ function ElecAdminAuditTabs({
         fontWeight: "normal"
       }}>
         {loading ? <Loader size={20} /> : snapshot?.charge_points_applications}
-        {/* {loading ? <Loader size={20} /> : formatNumber(snapshot?.provisioned_energy)} MWh */}
       </p>
       <strong>
-        {/* {t("Énergie attribuée")} */}
         {t("Inscriptions")}
       </strong>
     </>
@@ -135,11 +136,9 @@ function ElecAdminAuditTabs({
         fontWeight: "normal"
       }}>
         {loading ? <Loader size={20} /> : snapshot?.meter_readings_applications}
-        {/* {loading ? <Loader size={20} /> : formatNumber(snapshot?.transferred_energy)} MWh */}
       </p>
       <strong>
         {t("Relevés")}
-        {/* {t("Énergie cédée")} */}
       </strong>
     </>
   }]} />);

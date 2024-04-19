@@ -63,6 +63,7 @@ export enum ElecAuditApplicationStatus {
   Accepted = "ACCEPTED",
   Rejected = "REJECTED",
   AuditInProgress = "AUDIT_IN_PROGRESS",
+  AuditDone = "AUDIT_DONE",
 }
 
 export interface ElecChargePointsApplication {

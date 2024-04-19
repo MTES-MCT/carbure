@@ -5,6 +5,8 @@ export const elecAdminAuditSnapshot: ElecAdminAuditSnapshot = {
   charge_points_applications: 2,
   charge_points_applications_pending: 1,
   charge_points_applications_history: 1,
+  charge_points_applications_audit_done: 1,
+  charge_points_applications_audit_in_progress: 1,
   meter_readings_applications: 2,
   meter_readings_applications_pending: 1,
   meter_readings_applications_history: 1,
