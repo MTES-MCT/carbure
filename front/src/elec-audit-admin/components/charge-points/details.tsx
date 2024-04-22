@@ -20,6 +20,7 @@ import * as api from "../../api"
 import ChargePointsApplicationAcceptDialog from "./accept-dialog"
 import ChargePointsApplicationRejectDialog from "./reject-dialog"
 import { useState } from "react"
+import SampleGenerationForm from "./sample-generation-form"
 
 export const ChargingPointsApplicationDetailsDialog = () => {
   const { t } = useTranslation()
@@ -85,6 +86,10 @@ export const ChargingPointsApplicationDetailsDialog = () => {
     ))
   }
 
+  const handleSampleGenerated = () => {
+
+  }
+
   const downloadSample = async () => {
     if (!chargePointApplication) return
     return api.downloadChargePointsSample(entity.id, chargePointApplication.id, true)
@@ -142,7 +147,11 @@ export const ChargingPointsApplicationDetailsDialog = () => {
           </section>
 
           <section>
-            <SampleGenerationForm power_total={chargePointApplication?.power_total ?? 0} />
+            <SampleGenerationForm
+              power_total={chargePointApplication?.power_total ?? 0}
+              applicationId={chargePointApplication?.id}
+              onSampleGenerated={handleSampleGenerated}
+              buttonState="initial" />
           </section>
 
           <section>
@@ -176,7 +185,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
 
           {chargePointApplication?.status === ElecAuditApplicationStatus.Pending && (
             <>
-              <Button icon={Send} label={t("Commencer l'audit")} variant="primary" action={startAudit} loading={startChargePointsApplicationAuditResponse.loading} />
+              {/* <Button icon={Send} label={t("Commencer l'audit")} variant="primary" action={startAudit} loading={startChargePointsApplicationAuditResponse.loading} /> */}
               <Button icon={Check} label={t("Valider sans auditer")} variant="success" action={() => acceptApplication(true)} />
               <Button icon={Cross} label={t("Refuser sans auditer")} variant="danger" action={() => rejectApplication(true)} />
             </>
@@ -196,38 +205,6 @@ export const ChargingPointsApplicationDetailsDialog = () => {
       </Dialog>
     </Portal >
   )
-}
-
-const SampleGenerationForm = ({ power_total }: { power_total: number }) => {
-  const { t } = useTranslation()
-  const [percent, setPercent] = useState<number | undefined>(0)
-
-
-  const generateSample = () => {
-    console.log("%", percent)
-  }
-  return <>
-    <h3>{t("Génération de l'échantillon à auditer")}</h3>
-    <Form id="generate-sample" onSubmit={generateSample}>
-
-      <NumberInput
-        value={percent}
-        autoFocus
-        onChange={setPercent}
-        required
-        label={t("Pourcentage de puissance installée de l'aménageur à auditeur")}
-        icon={() => (
-          <Button
-            variant="primary"
-            icon={Download}
-            disabled={!percent}
-            label={t("Générer l'échantillon") + (percent ? ` (Soit ${power_total * (percent ?? 0) / 100} Kw)` : "")}
-            submit="generate-sample"
-          />
-        )}
-      />
-    </Form>
-  </>
 }
 
 const MailtoButton = ({ cpo, chargePointCount, emailContacts }: { cpo: EntityPreview, chargePointCount: number, emailContacts: string[] }) => {
