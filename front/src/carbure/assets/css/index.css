@@ -1,6 +1,7 @@
 @import "./reset.css";
 @import "./fonts.css";
 @import "./theme.css";
+/* @import '@gouvfr/dsfr/dist/css/dsfr.min.css'; */
 
 * {
   box-sizing: border-box;
@@ -46,3 +47,25 @@ textarea,
 select {
   font-family: var(--font-family);
 }
+
+
+/* Override DSFR */
+[href] {
+  background-image: none;
+}
+
+h1 {
+  line-height: inherit;
+}
+
+/* @media (hover: hover) and (pointer: fine) {
+
+  a[href]:hover,
+  button:not(:disabled):hover,
+  input[type=button]:not(:disabled):hover,
+  input[type=image]:not(:disabled):hover,
+  input[type=reset]:not(:disabled):hover,
+  input[type=submit]:not(:disabled):hover {
+    background-color: inherit;
+  }
+} */

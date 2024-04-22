@@ -21,6 +21,7 @@ import ChargePointsApplicationAcceptDialog from "./accept-dialog"
 import ChargePointsApplicationRejectDialog from "./reject-dialog"
 import { useState } from "react"
 import SampleGenerationForm from "./sample-generation-form"
+import { Stepper } from "@codegouvfr/react-dsfr/Stepper";
 
 export const ChargingPointsApplicationDetailsDialog = () => {
   const { t } = useTranslation()
@@ -107,7 +108,12 @@ export const ChargingPointsApplicationDetailsDialog = () => {
         <main>
 
           <section>
-
+            <Stepper
+              title={t("Génération de l'échantillon")}
+              stepCount={3}
+              currentStep={1}
+              nextTitle={t("Audit des points de recharge")}
+            />
             <Form
               id="lot-form"
               variant="columns"

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@codegouvfr/react-dsfr": "^1.9.8",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.4.3",
@@ -37,7 +38,10 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "translate": "i18next"
+    "translate": "i18next",
+    "postinstall": "copy-dsfr-to-public",
+    "predev": "only-include-used-icons",
+    "prebuild": "only-include-used-icons"
   },
   "eslintConfig": {
     "extends": "react-app"
