@@ -50,7 +50,15 @@ export function getChargePointsApplicationDetails(entityId: number, applicationI
   })
 }
 
-export function downloadChargePointsApplication(entityId: number, applicationId: number, sample: boolean = false) {
+export function generateChargePointsAuditSample(entityId: number, applicationId: number, percent: number) {
+  return api.post("/elec/admin/audit/charge-points/generate-sample", {
+    entity_id: entityId,
+    application_id: applicationId,
+    percent: percent
+  })
+}
+
+export function downloadChargePointsSample(entityId: number, applicationId: number, sample: boolean = false) {
   return download("/elec/admin/audit/charge-points/application-details", { entity_id: entityId, application_id: applicationId, export: true, sample: sample })
 }
 
@@ -79,6 +87,7 @@ export function rejectChargePointsApplication(entityId: number, applicationId: n
     force_rejection: forceRejection
   })
 }
+
 
 
 //METER READINGS
