@@ -6,7 +6,7 @@ import { Dialog } from "common/components/dialog"
 import Form from "common/components/form"
 import { useHashMatch } from "common/components/hash-route"
 import { Check, Cross, Download, Return, Send } from "common/components/icons"
-import { TextInput } from "common/components/input"
+import { NumberInput, TextInput } from "common/components/input"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
@@ -19,6 +19,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../../api"
 import ChargePointsApplicationAcceptDialog from "./accept-dialog"
 import ChargePointsApplicationRejectDialog from "./reject-dialog"
+import { useState } from "react"
 
 export const ChargingPointsApplicationDetailsDialog = () => {
   const { t } = useTranslation()
@@ -86,7 +87,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
 
   const downloadSample = async () => {
     if (!chargePointApplication) return
-    return api.downloadChargePointsApplication(entity.id, chargePointApplication.id, true)
+    return api.downloadChargePointsSample(entity.id, chargePointApplication.id, true)
   }
 
   return (
@@ -138,6 +139,10 @@ export const ChargingPointsApplicationDetailsDialog = () => {
 
             </Form>
 
+          </section>
+
+          <section>
+            <SampleGenerationForm power_total={chargePointApplication?.power_total ?? 0} />
           </section>
 
           <section>
@@ -193,6 +198,37 @@ export const ChargingPointsApplicationDetailsDialog = () => {
   )
 }
 
+const SampleGenerationForm = ({ power_total }: { power_total: number }) => {
+  const { t } = useTranslation()
+  const [percent, setPercent] = useState<number | undefined>(0)
+
+
+  const generateSample = () => {
+    console.log("%", percent)
+  }
+  return <>
+    <h3>{t("Génération de l'échantillon à auditer")}</h3>
+    <Form id="generate-sample" onSubmit={generateSample}>
+
+      <NumberInput
+        value={percent}
+        autoFocus
+        onChange={setPercent}
+        required
+        label={t("Pourcentage de puissance installée de l'aménageur à auditeur")}
+        icon={() => (
+          <Button
+            variant="primary"
+            icon={Download}
+            disabled={!percent}
+            label={t("Générer l'échantillon") + (percent ? ` (Soit ${power_total * (percent ?? 0) / 100} Kw)` : "")}
+            submit="generate-sample"
+          />
+        )}
+      />
+    </Form>
+  </>
+}
 
 const MailtoButton = ({ cpo, chargePointCount, emailContacts }: { cpo: EntityPreview, chargePointCount: number, emailContacts: string[] }) => {
   const { t } = useTranslation()

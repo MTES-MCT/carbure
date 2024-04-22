@@ -46,7 +46,7 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
   }
 
   const downloadChargePointsApplication = (chargePointApplication: ElecChargePointsApplication) => {
-    api.downloadChargePointsApplication(entity.id, chargePointApplication.id)
+    api.downloadChargePointsSample(entity.id, chargePointApplication.id)
   }
 
 
