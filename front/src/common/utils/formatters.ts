@@ -21,6 +21,7 @@ export function formatNumber(num: number, fractionDigits = 2) {
 
   // add space to separate thousands
   let numStr = chunk(integer, 3).join(" ")
+  if (!fractionDigits) return numStr
 
   if (decimal !== 0) {
     const decimalStr = decimal.toFixed(fractionDigits).slice(2)
