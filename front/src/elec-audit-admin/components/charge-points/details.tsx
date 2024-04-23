@@ -22,6 +22,7 @@ import ChargePointsApplicationRejectDialog from "./reject-dialog"
 import { useState } from "react"
 import SampleGenerationForm from "./sample-generation-form"
 import { Stepper } from "@codegouvfr/react-dsfr/Stepper";
+import { Divider } from "common/components/divider"
 
 export const ChargingPointsApplicationDetailsDialog = () => {
   const { t } = useTranslation()
@@ -114,6 +115,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
               currentStep={1}
               nextTitle={t("Audit des points de recharge")}
             />
+
             <Form
               id="lot-form"
               variant="columns"
@@ -152,6 +154,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
 
           </section>
 
+          <Divider />
           <section>
             <SampleGenerationForm
               power_total={chargePointApplication?.power_total ?? 0}
@@ -159,7 +162,6 @@ export const ChargingPointsApplicationDetailsDialog = () => {
               onSampleGenerated={handleSampleGenerated}
               buttonState="initial" />
           </section>
-
           <section>
             {!entity.isAdmin && chargePointApplication?.status === ElecAuditApplicationStatus.Pending && (
               <p><i>

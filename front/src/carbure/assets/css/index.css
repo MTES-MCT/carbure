@@ -58,14 +58,6 @@ h1 {
   line-height: inherit;
 }
 
-/* @media (hover: hover) and (pointer: fine) {
-
-  a[href]:hover,
-  button:not(:disabled):hover,
-  input[type=button]:not(:disabled):hover,
-  input[type=image]:not(:disabled):hover,
-  input[type=reset]:not(:disabled):hover,
-  input[type=submit]:not(:disabled):hover {
-    background-color: inherit;
-  }
-} */
+.fr-stepper__steps {
+  background-image: repeating-linear-gradient(to right, var(--background-active-blue-france) 0, var(--background-active-blue-france) var(--active-inner), transparent var(--active-inner), transparent var(--active-outer)), repeating-linear-gradient(to right, var(--gray-medium) 0, var(--gray-medium) var(--default-inner), transparent var(--default-inner), transparent var(--default-outer));
+}
