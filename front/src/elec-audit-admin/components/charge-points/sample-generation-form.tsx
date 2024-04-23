@@ -33,7 +33,7 @@ const SampleGenerationForm = ({
       onSampleGenerated()
     },
     onError(err) {
-      notifyError(err, t("Une erreur est survene, l’échantillon n’a pas pu être généré."))
+      notifyError(err, t("Une erreur est survene, l'échantillon n'a pas pu être généré."))
     },
   })
 
@@ -42,8 +42,10 @@ const SampleGenerationForm = ({
     generateSampleRequest.execute(entity.id, applicationId!, percent!)
   }
 
+  const buttonText = buttonState === "initial" ? t("Générer l'échantillon") : t("Générer un nouvel échantillon")
+
   return <>
-    <h3>{t("Génération de l'échantillon à auditer")}</h3>
+    <strong>{t("Génération de l'échantillon à auditer")}</strong>
     <Form id="generate-sample" onSubmit={generateSample}>
 
       <NumberInput
@@ -58,8 +60,7 @@ const SampleGenerationForm = ({
             loading={generateSampleRequest.loading}
             icon={Download}
             disabled={!percent || !applicationId}
-            label={buttonState === "initial" ? t("Générer l'échantillon") : t("Générer un nouvel échantillon")
-              + (percent ? ` (Soit ${power_total * (percent ?? 0) / 100} Kw)` : "")}
+            label={buttonText + (percent ? ` (Soit ${power_total * (percent ?? 0) / 100} Kw)` : "")}
             submit="generate-sample"
           />
         )}
