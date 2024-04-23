@@ -32,10 +32,8 @@ export const ChargingPointsApplicationDetailsDialog = () => {
   const portal = usePortal()
   const navigate = useNavigate()
   const location = useLocation()
-
   const match = useHashMatch("application/:id")
-
-
+  const [step, setStep] = useState<"1-generation" | "2-verification">("1-generation")
 
   const chargePointApplicationResponse = useQuery(api.getChargePointsApplicationDetails, {
     key: "audit-charge-points-application-details",
@@ -89,7 +87,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
   }
 
   const handleSampleGenerated = () => {
-
+    setStep("2-verification")
   }
 
   const downloadSample = async () => {
@@ -109,58 +107,23 @@ export const ChargingPointsApplicationDetailsDialog = () => {
         <main>
 
           <section>
-            <Stepper
-              title={t("Génération de l'échantillon")}
-              stepCount={3}
-              currentStep={1}
-              nextTitle={t("Audit des points de recharge")}
-            />
-
-            <Form
-              id="lot-form"
-              variant="columns"
-              style={{ flexWrap: "wrap" }}
-
-            >
-
-              <TextInput
-                readOnly
-                label={t("Date de la demande")}
-                value={chargePointApplication ? formatDate(chargePointApplication.application_date) : "..."}
-              />
-
-              <TextInput
-                readOnly
-                label={t("Aménageur")}
-                value={chargePointApplication?.cpo.name || "..."}
-
-              />
-
-              <TextInput
-                readOnly
-                label={t("Puissance cumulée (kW)")}
-                value={chargePointApplication ? formatNumber(Math.round(chargePointApplication.power_total)) : "..."}
-
-              />
-
-              <TextInput
-                readOnly
-                label={t("Points de recharge")}
-                value={chargePointApplication ? formatNumber(chargePointApplication.charge_point_count) : "..."}
-              />
-
-
-            </Form>
-
+            <ApplicationSummary application={chargePointApplication} />
           </section>
-
           <Divider />
           <section>
-            <SampleGenerationForm
-              power_total={chargePointApplication?.power_total ?? 0}
-              applicationId={chargePointApplication?.id}
-              onSampleGenerated={handleSampleGenerated}
-              buttonState="initial" />
+            {step === "1-generation" && <>
+              <Stepper
+                title={t("Génération de l'échantillon")}
+                stepCount={3}
+                currentStep={1}
+                nextTitle={t("Audit des points de recharge")}
+              />
+              <SampleGenerationForm
+                power_total={chargePointApplication?.power_total ?? 0}
+                applicationId={chargePointApplication?.id}
+                onSampleGenerated={handleSampleGenerated}
+                buttonState="initial" />
+            </>}
           </section>
           <section>
             {!entity.isAdmin && chargePointApplication?.status === ElecAuditApplicationStatus.Pending && (
@@ -228,6 +191,42 @@ const MailtoButton = ({ cpo, chargePointCount, emailContacts }: { cpo: EntityPre
 
 }
 
+const ApplicationSummary = ({ application }: { application: ElecChargePointsApplication | undefined }) => {
+  const { t } = useTranslation()
+
+  return <Form
+    variant="columns"
+  >
+
+    <TextInput
+      readOnly
+      label={t("Date de la demande")}
+      value={application ? formatDate(application.application_date) : "..."}
+    />
+
+    <TextInput
+      readOnly
+      label={t("Aménageur")}
+      value={application?.cpo.name || "..."}
+
+    />
+
+    <TextInput
+      readOnly
+      label={t("Puissance cumulée (kW)")}
+      value={application ? formatNumber(Math.round(application.power_total)) : "..."}
+
+    />
+
+    <TextInput
+      readOnly
+      label={t("Points de recharge")}
+      value={application ? formatNumber(application.charge_point_count) : "..."}
+    />
+
+
+  </Form>
+}
 
 
 export default ChargingPointsApplicationDetailsDialog
