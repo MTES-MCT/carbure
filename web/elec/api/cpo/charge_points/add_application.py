@@ -6,6 +6,7 @@ from core.decorators import check_user_rights
 from core.models import Entity, UserRights
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_charge_point_application import ElecChargePointApplication
+from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.services.import_charge_point_excel import import_charge_point_excel
 
 
@@ -23,9 +24,7 @@ def add_application(request: HttpRequest, entity: Entity):
     if not excel_file:
         return ErrorResponse(400, AddChargePointApplicationError.MISSING_FILE)
 
-    # @TODO actually list existing charge points to enable duplicate checks
-    existing_charge_points = []
-
+    existing_charge_points = ChargePointRepository.get_registered_charge_points(entity)
     charge_point_data, errors = import_charge_point_excel(excel_file, existing_charge_points)
 
     if len(errors) > 0:
@@ -33,6 +32,10 @@ def add_application(request: HttpRequest, entity: Entity):
 
     if len(charge_point_data) == 0:
         return ErrorResponse(400, AddChargePointApplicationError.NO_CHARGE_POINT_DETECTED)
+
+    new_charge_points = [cp["charge_point_id"] for cp in charge_point_data]
+    replaced_charge_points = ChargePointRepository.get_replaced_charge_points(entity, new_charge_points)
+    replaced_charge_points_by_id = {cp.charge_point_id: cp for cp in replaced_charge_points}
 
     with transaction.atomic():
         replaced_applications = ElecChargePointApplication.objects.filter(
@@ -43,7 +46,16 @@ def add_application(request: HttpRequest, entity: Entity):
         replaced_applications.delete()
 
         application = ElecChargePointApplication(cpo=entity)
-        charge_points = [ElecChargePoint(**data, application=application, cpo=entity) for data in charge_point_data]
+
+        charge_points = [
+            ElecChargePoint(
+                **data,
+                application=application,
+                cpo=entity,
+                previous_version=replaced_charge_points_by_id.get(data["charge_point_id"])
+            )
+            for data in charge_point_data
+        ]
 
         application.save()
         ElecChargePoint.objects.bulk_create(charge_points)
