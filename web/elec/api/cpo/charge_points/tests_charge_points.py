@@ -78,6 +78,8 @@ class ElecCharginPointsTest(TestCase):
             "data": {
                 "file_name": "full_ac_charge_points_error.xlsx",
                 "charge_point_count": 0,
+                "replaced": [],
+                "replaced_count": 0,
                 "errors": [
                     {
                         "error": "INVALID_DATA",
@@ -161,6 +163,8 @@ class ElecCharginPointsTest(TestCase):
                 "charge_point_count": 6,
                 "errors": [],
                 "error_count": 0,
+                "replaced": [],
+                "replaced_count": 0,
                 "pending_application_already_exists": False,
             },
         }
