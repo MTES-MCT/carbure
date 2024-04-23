@@ -144,7 +144,6 @@ const AddElecOperatorMail = ({ clientName = "[Nom du redevable]" }: { clientName
 
     >
         {t("contacter la DGEC")}
-        <ExternalLink size={20} />
     </MailTo>
 
 }

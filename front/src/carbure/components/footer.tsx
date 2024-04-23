@@ -28,19 +28,16 @@ const CarbureFooter = () => {
               rel="noreferrer"
             >
               <Trans>Guide d'utilisation de CarbuRe</Trans>
-              <ExternalLink />
             </a>
           </li>
           <li>
             <Link to="/stats" target="_blank" rel="noreferrer">
               <Trans>Statistiques publiques</Trans>
-              <ExternalLink />
             </Link>
           </li>
           <li>
             <Link to="/double-counting-list" target="_blank" rel="noreferrer">
               <Trans>Double Comptage</Trans>
-              <ExternalLink />
             </Link>
           </li>
         </ul>
