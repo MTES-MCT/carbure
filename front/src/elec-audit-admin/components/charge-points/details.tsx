@@ -40,7 +40,6 @@ export const ChargingPointsApplicationDetailsDialog = () => {
     params: [entity.id, parseInt(match?.params.id!)],
   })
   const chargePointApplication = chargePointApplicationResponse.result?.data.data
-  // const chargePointApplication = elecChargePointApplication4 // TEST with data
 
   const startChargePointsApplicationAuditResponse = useMutation(api.startChargePointsApplicationAudit, {
     invalidates: ["audit-charge-points-application-details", "audit-charge-points-applications"],
@@ -164,7 +163,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
 
           {chargePointApplication?.status === ElecAuditApplicationStatus.AuditInProgress && (
             <>
-              <MailtoButton cpo={chargePointApplication.cpo} chargePointCount={chargePointApplication.charge_point_count} emailContacts={chargePointApplication.email_contacts} />
+              <MailtoButton cpo={chargePointApplication.cpo} chargePointCount={chargePointApplication.charge_point_count} emailContacts={chargePointApplication.email_contacts!} />
               <Button icon={Download} label={t("Télécharger l'échantillon")} variant="secondary" action={downloadSample} />
               <Button icon={Check} label={t("Valide")} variant="success" action={acceptApplication} />
               <Button icon={Cross} label={t("Refuser")} variant="danger" action={rejectApplication} />
