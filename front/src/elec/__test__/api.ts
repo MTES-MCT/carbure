@@ -3,7 +3,7 @@ import { setupServer } from "msw/node"
 
 
 import { mockGetWithResponseData, mockPostWithResponseData } from "carbure/__test__/helpers"
-import { elecChargePointsApplicationCheckResponseFailed, elecChargePointsApplicationCheckResponseSucceed, elecChargePointsApplications, elecMeterReadingsApplications, elecMeterReadingsApplicationsResponseMissing, elecMeterReadingsApplicationsResponsePending, meterReadingsApplicationCheckResponseFailed, meterReadingsApplicationCheckResponseSuccess } from "elec/__test__/data"
+import { elecChargePointsApplicationCheckResponseFailed, elecChargePointsApplicationCheckResponseSucceed, elecChargePointsApplications, elecMeterReadingsApplications, elecMeterReadingsApplicationsResponseMissing, elecMeterReadingsApplicationsResponsePending, elecSnapshot, meterReadingsApplicationCheckResponseFailed, meterReadingsApplicationCheckResponseSuccess } from "elec/__test__/data"
 
 
 
@@ -15,6 +15,8 @@ export const okChargePointsApplications = rest.get("/api/elec/cpo/charge-points/
     })
   )
 })
+
+export const okCPOSnapshot = mockGetWithResponseData("/api/elec/cpo/snapshot", elecSnapshot)
 
 export const okChargePointsApplicationsEmpty = mockGetWithResponseData("/api/elec/cpo/charge-points/applications", [])
 export const okChargePointsCheckValid = mockPostWithResponseData("/api/elec/cpo/charge-points/check-application", elecChargePointsApplicationCheckResponseSucceed)
