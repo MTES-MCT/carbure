@@ -23,6 +23,11 @@ import { useState } from "react"
 import SampleGenerationForm from "./sample-generation-form"
 import { Stepper } from "@codegouvfr/react-dsfr/Stepper";
 import { Divider } from "common/components/divider"
+import { ElecChargePointsApplicationSample } from "elec-audit-admin/types"
+
+
+export type GenerationState = "generation" | "verification" | "email" | "confirmation"
+
 
 export const ChargingPointsApplicationDetailsDialog = () => {
   const { t } = useTranslation()
@@ -33,8 +38,8 @@ export const ChargingPointsApplicationDetailsDialog = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const match = useHashMatch("application/:id")
-  const [step, setStep] = useState<"1-generation" | "2-verification">("1-generation")
-
+  const [step, setStep] = useState<GenerationState>("generation")
+  const [sample, setSample] = useState<ElecChargePointsApplicationSample | undefined>(undefined)
   const chargePointApplicationResponse = useQuery(api.getChargePointsApplicationDetails, {
     key: "audit-charge-points-application-details",
     params: [entity.id, parseInt(match?.params.id!)],
@@ -85,13 +90,16 @@ export const ChargingPointsApplicationDetailsDialog = () => {
     ))
   }
 
-  const handleSampleGenerated = () => {
-    setStep("2-verification")
+  const handleSampleGenerated = (sample: ElecChargePointsApplicationSample) => {
+    setSample(sample)
+    setStep("verification")
   }
 
   const downloadSample = async () => {
     if (!chargePointApplication) return
-    return api.downloadChargePointsSample(entity.id, chargePointApplication.id, true)
+    const resp = api.downloadChargePointsSample(entity.id, chargePointApplication.id, true)
+    setStep("email")
+    return resp
   }
 
   return (
@@ -110,10 +118,10 @@ export const ChargingPointsApplicationDetailsDialog = () => {
           </section>
           <Divider />
           <section>
-            {step === "1-generation" && <>
+            {step === "generation" && <>
               <Stepper
                 title={t("Génération de l'échantillon")}
-                stepCount={3}
+                stepCount={4}
                 currentStep={1}
                 nextTitle={t("Audit des points de recharge")}
               />
@@ -122,6 +130,15 @@ export const ChargingPointsApplicationDetailsDialog = () => {
                 applicationId={chargePointApplication?.id}
                 onSampleGenerated={handleSampleGenerated}
                 buttonState="initial" />
+            </>}
+            {step === "verification" && sample && <>
+              <Stepper
+                title={t("Vérification de l'échantillon")}
+                stepCount={4}
+                currentStep={2}
+                nextTitle={t("Génération de l’email ")}
+              />
+              <SampleSummary sample={sample} />
             </>}
           </section>
           <section>
@@ -153,7 +170,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
 
         <footer>
 
-          {chargePointApplication?.status === ElecAuditApplicationStatus.Pending && (
+          {step === "generation" && (
             <>
               {/* <Button icon={Send} label={t("Commencer l'audit")} variant="primary" action={startAudit} loading={startChargePointsApplicationAuditResponse.loading} /> */}
               <Button icon={Check} label={t("Valider sans auditer")} variant="success" action={() => acceptApplication(true)} />
@@ -161,15 +178,14 @@ export const ChargingPointsApplicationDetailsDialog = () => {
             </>
           )}
 
-          {chargePointApplication?.status === ElecAuditApplicationStatus.AuditInProgress && (
-            <>
-              <MailtoButton cpo={chargePointApplication.cpo} chargePointCount={chargePointApplication.charge_point_count} emailContacts={chargePointApplication.email_contacts!} />
-              <Button icon={Download} label={t("Télécharger l'échantillon")} variant="secondary" action={downloadSample} />
-              <Button icon={Check} label={t("Valide")} variant="success" action={acceptApplication} />
-              <Button icon={Cross} label={t("Refuser")} variant="danger" action={rejectApplication} />
-            </>
+          {step === "verification" && (
+            <Button icon={Download} label={t("Télécharger l'échantillon")} variant="primary" action={downloadSample} />
           )}
-          <Button icon={Return} label={t("Fermer")} action={closeDialog} asideX />
+          {/* <MailtoButton cpo={chargePointApplication.cpo} chargePointCount={chargePointApplication.charge_point_count} emailContacts={chargePointApplication.email_contacts!} />
+              <Button icon={Check} label={t("Valide")} variant="success" action={acceptApplication} />
+              <Button icon={Cross} label={t("Refuser")} variant="danger" action={rejectApplication} /> */}
+
+
         </footer>
         {chargePointApplicationResponse.loading && <LoaderOverlay />}
       </Dialog>
@@ -189,6 +205,33 @@ const MailtoButton = ({ cpo, chargePointCount, emailContacts }: { cpo: EntityPre
   return <Button icon={Send} label={t("Générer l'email")} variant="secondary" href={mailto} />
 
 }
+
+
+const SampleSummary = ({ sample }: { sample: ElecChargePointsApplicationSample }) => {
+  const { t } = useTranslation()
+
+  return <>
+    <strong>Échantillon</strong>
+
+    <Form
+      variant="columns"
+    >
+      <NumberInput
+        readOnly
+        label={t("Date de la demande")}
+        value={sample.charge_points.length}
+      />
+
+      <TextInput
+        readOnly
+        label={t("Pourcentage de puissance installée à auditeur")}
+        value={sample.percentage + "%"}
+
+      />
+    </Form>
+  </>
+}
+
 
 const ApplicationSummary = ({ application }: { application: ElecChargePointsApplication | undefined }) => {
   const { t } = useTranslation()

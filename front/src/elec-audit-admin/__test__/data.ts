@@ -1,4 +1,4 @@
-import { ElecAdminAuditSnapshot, ElecChargePointsApplicationsData, ElecMeterReadingsApplicationsData } from "elec-audit-admin/types";
+import { ElecAdminAuditSnapshot, ElecChargePointsApplicationSample, ElecChargePointsApplicationsData, ElecMeterReadingsApplicationsData } from "elec-audit-admin/types";
 import { elecChargePointsApplications, elecMeterReadingsApplications } from "elec/__test__/data";
 
 export const elecAdminAuditSnapshot: ElecAdminAuditSnapshot = {
@@ -27,4 +27,21 @@ export const elecAdminMeterReadingsApplicationsList: ElecMeterReadingsApplicatio
   ids: [1, 2, 3, 4, 13, 14, 15, 22, 23, 24, 25],
   returned: 10,
   total: 11
+}
+
+export const elecChargePointsApplicationSample: ElecChargePointsApplicationSample = {
+  application_id: 1,
+  percentage: 10,
+  charge_points: [
+    {
+      charge_point_id: "FR000028067822",
+      longitude: 5.143766000000000,
+      latitude: 43.329200000000000
+    },
+    {
+      charge_point_id: "FR000012616553",
+      longitude: 43.476584000000000,
+      latitude: 5.476711000000000
+    }
+  ]
 }
