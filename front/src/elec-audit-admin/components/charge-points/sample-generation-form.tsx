@@ -8,12 +8,13 @@ import { useMutation } from "common/hooks/async"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import * as api from "../../api"
+import { ElecChargePointsApplicationSample } from "elec-audit-admin/types"
 
 interface SampleGenerationFormProps {
   power_total: number
   applicationId: number | undefined
   buttonState: "initial" | "toggled"
-  onSampleGenerated: () => void
+  onSampleGenerated: (sample: ElecChargePointsApplicationSample) => void
 }
 const SampleGenerationForm = ({
   power_total,
@@ -28,9 +29,11 @@ const SampleGenerationForm = ({
   const notifyError = useNotifyError()
   const generateSampleRequest = useMutation(api.generateChargePointsAuditSample, {
     invalidates: ["audit-charge-points-application-details", "audit-charge-points-applications"],
-    onSuccess() {
+    onSuccess(response) {
+
+      const sample: ElecChargePointsApplicationSample = response.data.data
       notify(t("L'échantillon a bien été généré  !"))
-      onSampleGenerated()
+      onSampleGenerated(sample)
     },
     onError(err) {
       notifyError(err, t("Une erreur est survene, l'échantillon n'a pas pu être généré."))
@@ -53,7 +56,7 @@ const SampleGenerationForm = ({
         autoFocus
         onChange={setPercent}
         required
-        label={t("Pourcentage de puissance installée de l'aménageur à auditeur")}
+        label={t("Pourcentage de puissance installée à auditeur (%)")}
         icon={() => (
           <Button
             variant={buttonState === "initial" ? "primary" : "secondary"}
