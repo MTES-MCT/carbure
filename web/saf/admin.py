@@ -21,6 +21,10 @@ class SafTicketSourceAdmin(admin.ModelAdmin):
         "feedstock",
         "biofuel",
     )
+    search_fields = [
+        "carbure_id",
+        "added_by__name",
+    ]
 
 
 @admin.register(SafTicket)
@@ -43,3 +47,8 @@ class SafTicketAdmin(admin.ModelAdmin):
         "biofuel",
         "client",
     )
+    search_fields = [
+        "carbure_id",
+        "supplier__name",
+        "client__name",
+    ]
