@@ -39,7 +39,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "translate": "i18next",
-    "postinstall": "copy-dsfr-to-public",
+    "postinstall": "copy-dsfr-to-public --publicDir ./public",
     "predev": "only-include-used-icons",
     "prebuild": "only-include-used-icons"
   },

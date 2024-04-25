@@ -63,11 +63,14 @@ const SampleGenerationForm = ({
             loading={generateSampleRequest.loading}
             icon={Download}
             disabled={!percent || !applicationId}
-            label={buttonText + (percent ? ` (Soit ${power_total * (percent ?? 0) / 100} Kw)` : "")}
+            label={buttonText}
             submit="generate-sample"
           />
         )}
       />
+      {!!percent &&
+        <p>{t(`(Soit ${power_total * (percent ?? 0) / 100} kWh)`, {})}</p>
+      }
     </Form>
   </>
 }
