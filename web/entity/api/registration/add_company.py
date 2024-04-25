@@ -99,7 +99,7 @@ def add_company(request, *args, **kwargs):
         UserRightsRequests.objects.create(user=request.user, entity=entity, role=UserRightsRequests.ADMIN, status="PENDING")
 
         send_email_to_user(entity, request.user)
-        send_email_to_dgec(entity)
+        send_email_to_dgec(entity, request.user)
 
         return SuccessResponse()
 
