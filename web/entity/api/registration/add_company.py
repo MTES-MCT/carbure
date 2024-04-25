@@ -99,7 +99,7 @@ def add_company(request, *args, **kwargs):
         UserRightsRequests.objects.create(user=request.user, entity=entity, role=UserRightsRequests.ADMIN, status="PENDING")
 
         send_email_to_user(entity, request.user)
-        send_email_to_dgec(entity, request.user)
+        send_email_to_dgec(entity)
 
         return SuccessResponse()
 
@@ -115,7 +115,7 @@ def send_email_to_user(entity, user):
     L'équipe de la DGEC va étudier votre demande et vous serez notifié lorsque celle-ci aura été traitée.
     
     Bien cordialement,
-    L'équipe CarbuRe
+    L'équipe CarbuRe 
     """
 
     send_mail(
@@ -127,14 +127,12 @@ def send_email_to_user(entity, user):
     )
 
 
-def send_email_to_dgec(entity, user):  # send email to staff
+def send_email_to_dgec(entity, user):
     today = datetime.now().strftime("%d/%m/%Y")
-    recipient_list = (
-        ["carbure@beta.gouv.fr"] if CarbureEnv.is_prod else [user.email]
-    )  # send to current user to avoid spam all the carbure team
+    recipient_list = ["carbure@beta.gouv.fr"]  # send to current user to avoid spam all the carbure team
     admin_link = f"{CarbureEnv.get_base_url()}/admin/core/entity/?is_enabled=False"
     text_message = f"""
-    Hello, ça Carbure ?!
+    Bonjour,
 
     Une demande d'inscription de société {entity.name} a été déposé le {today} par l'utilisateur {user.email}. 
     Veuillez traiter cette demande dans l'interface administrateur de CarbuRe :

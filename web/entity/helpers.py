@@ -39,7 +39,7 @@ def enable_entity(entity):
 
     Votre demande d'inscription pour la société {entity.name} a été validée par l'administration.
     Vous pouvez désormais accéder à la société dans votre espace en tant qu'administrateur : {CarbureEnv.get_base_url()}/account
-
+ 
     Pour plus d'information veuillez consulter notre guide d'utilisation : https://carbure-1.gitbook.io/faq/affichage/traduction
 
     Bien cordialement,
@@ -47,7 +47,7 @@ def enable_entity(entity):
     """
 
     send_mail(
-        subject="Demande d'inscription de société validée",
+        subject=subject,
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=recipient_list,
