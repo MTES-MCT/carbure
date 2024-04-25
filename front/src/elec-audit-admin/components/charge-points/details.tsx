@@ -255,7 +255,7 @@ const ApplicationSummary = ({ application }: { application: ElecChargePointsAppl
 
     <TextInput
       readOnly
-      label={t("Puissance cumulée (kW)")}
+      label={t("Puissance cumulée (kWh)")}
       value={application ? formatNumber(Math.round(application.power_total)) : "..."}
 
     />
