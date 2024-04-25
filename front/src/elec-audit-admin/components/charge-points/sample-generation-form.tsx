@@ -13,13 +13,13 @@ import { ElecChargePointsApplicationSample } from "elec-audit-admin/types"
 interface SampleGenerationFormProps {
   power_total: number
   applicationId: number | undefined
-  buttonState: "initial" | "toggled"
+  retry?: boolean
   onSampleGenerated: (sample: ElecChargePointsApplicationSample) => void
 }
 const SampleGenerationForm = ({
   power_total,
   applicationId,
-  buttonState,
+  retry,
   onSampleGenerated
 }: SampleGenerationFormProps) => {
   const { t } = useTranslation()
@@ -32,7 +32,7 @@ const SampleGenerationForm = ({
     onSuccess(response) {
 
       const sample: ElecChargePointsApplicationSample = response.data.data
-      notify(t("L'échantillon a bien été généré  !"))
+      notify(t("L'échantillon a bien été généré  !"), { variant: "success" })
       onSampleGenerated(sample)
     },
     onError(err) {
@@ -45,7 +45,7 @@ const SampleGenerationForm = ({
     generateSampleRequest.execute(entity.id, applicationId!, percent!)
   }
 
-  const buttonText = buttonState === "initial" ? t("Générer l'échantillon") : t("Générer un nouvel échantillon")
+  const buttonText = !retry ? t("Générer l'échantillon") : t("Générer un nouvel échantillon")
 
   return <>
     <strong>{t("Génération de l'échantillon à auditer")}</strong>
@@ -59,7 +59,7 @@ const SampleGenerationForm = ({
         label={t("Pourcentage de puissance installée à auditeur (%)")}
         icon={() => (
           <Button
-            variant={buttonState === "initial" ? "primary" : "secondary"}
+            variant={!retry ? "primary" : "secondary"}
             loading={generateSampleRequest.loading}
             icon={Download}
             disabled={!percent || !applicationId}
@@ -68,9 +68,9 @@ const SampleGenerationForm = ({
           />
         )}
       />
-      {!!percent &&
-        <p>{t(`(Soit ${power_total * (percent ?? 0) / 100} kWh)`, {})}</p>
-      }
+
+      <p>{t(`(Soit ${power_total * (percent ?? 0) / 100} kWh)`, {})}</p>
+
     </Form>
   </>
 }

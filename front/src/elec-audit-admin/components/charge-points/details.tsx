@@ -128,8 +128,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
               <SampleGenerationForm
                 power_total={chargePointApplication?.power_total ?? 0}
                 applicationId={chargePointApplication?.id}
-                onSampleGenerated={handleSampleGenerated}
-                buttonState="initial" />
+                onSampleGenerated={handleSampleGenerated} />
             </>}
             {step === "verification" && sample && <>
               <Stepper
@@ -139,6 +138,32 @@ export const ChargingPointsApplicationDetailsDialog = () => {
                 nextTitle={t("Génération de l’email ")}
               />
               <SampleSummary sample={sample} />
+              <SampleGenerationForm
+                power_total={chargePointApplication?.power_total ?? 0}
+                applicationId={chargePointApplication?.id}
+                onSampleGenerated={handleSampleGenerated}
+                retry />
+            </>}
+            {step === "email" && <>
+              <Stepper title={t("Génération de l'email ")} stepCount={4} currentStep={3} nextTitle={t("Confirmation de l'envoie de l'ordre de contrôle")} />
+              <section>
+                <Alert style={{ flexDirection: "column" }} variant="info"  >
+                  <p>
+                    <Send />
+                    <Trans>
+                      Action requise par l'administrateur pour poursuivre l'audit de l'inscription des points de recharge :
+                    </Trans>
+                  </p>
+                  <ul>
+                    <li><Trans>Joindre le fichier téléchargé comportant l'échantillon des points de recharge à auditer</Trans></li>
+                    <li><Trans>Transmettre cet e-mail à l'aménageur</Trans></li>
+                  </ul>
+
+                </Alert>
+              </section>
+            </>}
+            {step === "confirmation" && <>
+              <Stepper title={t("Confirmation de l'envoie de l'ordre de contrôle")} stepCount={4} currentStep={4} />
             </>}
           </section>
           <section>
@@ -148,24 +173,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
               </i></p>
             )}
           </section>
-          {chargePointApplication?.status === ElecAuditApplicationStatus.AuditInProgress && (
 
-            <section>
-              <Alert style={{ flexDirection: "column" }} variant="info"  >
-                <p>
-                  <Send />
-                  <Trans>
-                    Action requise par l'administrateur pour poursuivre l'audit de l'inscription des points de recharge :
-                  </Trans>
-                </p>
-                <ul>
-                  <li><Trans>Joindre le fichier téléchargé comportant l'échantillon des points de recharge à auditer</Trans></li>
-                  <li><Trans>Transmettre cet e-mail à l'aménageur</Trans></li>
-                </ul>
-
-              </Alert>
-            </section>
-          )}
         </main>
 
         <footer>
@@ -181,7 +189,14 @@ export const ChargingPointsApplicationDetailsDialog = () => {
           {step === "verification" && (
             <Button icon={Download} label={t("Télécharger l'échantillon")} variant="primary" action={downloadSample} />
           )}
-          {/* <MailtoButton cpo={chargePointApplication.cpo} chargePointCount={chargePointApplication.charge_point_count} emailContacts={chargePointApplication.email_contacts!} />
+          {step === "email" && chargePointApplication && <>
+            <MailtoButton cpo={chargePointApplication.cpo} chargePointCount={chargePointApplication.charge_point_count} emailContacts={chargePointApplication.email_contacts} onGenerate={() => setStep("confirmation")} />
+          </>}
+          {step === "confirmation" && chargePointApplication && <>
+            <Button icon={Send} label={t("Je confirme")} variant="primary" action={startAudit} />
+          </>}
+
+          {/*
               <Button icon={Check} label={t("Valide")} variant="success" action={acceptApplication} />
               <Button icon={Cross} label={t("Refuser")} variant="danger" action={rejectApplication} /> */}
 
@@ -193,7 +208,13 @@ export const ChargingPointsApplicationDetailsDialog = () => {
   )
 }
 
-const MailtoButton = ({ cpo, chargePointCount, emailContacts }: { cpo: EntityPreview, chargePointCount: number, emailContacts: string[] }) => {
+interface MailtoButtonProps {
+  cpo: EntityPreview
+  chargePointCount: number
+  emailContacts: string[]
+  onGenerate: () => void
+}
+const MailtoButton = ({ cpo, chargePointCount, emailContacts, onGenerate }: MailtoButtonProps) => {
   const { t } = useTranslation()
   const subject = `[CarbuRe - Audit Elec] Demande d'audit ${cpo.name}`
   const bodyIntro = `Bonjour%20${cpo.name}%0D%0A%0D%0A%0D%0AAfin%20de%20valider%20votre%20inscription%20de%20${chargePointCount}%20points%20de%20recharge%2C%20un%20audit%20doit%20%C3%AAtre%20men%C3%A9%20sur%20les%20points%20de%20recharge%20s%C3%A9lectionn%C3%A9s%20ci-joints.%0D%0A%0D%0A%0D%0AL'inspecteur%20doit%20remplir%20le%20tableau%20en%20respectant%20le%20format%20suivant%20%3A%0D%0A%0D%0A%0D%0A`
@@ -202,7 +223,7 @@ const MailtoButton = ({ cpo, chargePointCount, emailContacts }: { cpo: EntityPre
 
   const mailto = `mailto:${emailContacts.join(',')}?subject=${encodeURIComponent(subject)}&body=${bodyIntro + bodyContent + bodyOutro}`
 
-  return <Button icon={Send} label={t("Générer l'email")} variant="secondary" href={mailto} />
+  return <Button icon={Send} label={t("Générer l'email")} variant="primary" href={mailto} action={() => onGenerate()} />
 
 }
 
@@ -218,7 +239,7 @@ const SampleSummary = ({ sample }: { sample: ElecChargePointsApplicationSample }
     >
       <NumberInput
         readOnly
-        label={t("Date de la demande")}
+        label={t("Points de recharge à auditer")}
         value={sample.charge_points.length}
       />
 

@@ -10,12 +10,11 @@ import { ElecChargePointsApplication } from "elec/types"
 import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
 import * as api from "../../api"
-import ChargingPointsApplicationDetailsDialog from "./details"
 import ElecAdminAuditFilters from "../list-filters"
+import { StatusSwitcher } from "../status-switcher"
+import ChargingPointsApplicationDetailsDialog from "./details"
 import { useElectAdminAuditQuery } from "./list-query"
 import { useElecAdminAuditChargePointsQueryParamsStore } from "./list-query-params-store"
-import { StatusSwitcher } from "../status-switcher"
-import { elecAdminChargePointsApplicationsList } from "elec-audit-admin/__test__/data"
 
 type TransferListProps = {
   snapshot: ElecAdminAuditSnapshot

@@ -61,6 +61,7 @@ export const elecChargePointApplicationPending: ElecChargePointsApplication = {
     power_total: 8,
     application_date: "2023-10-12",
     status: ElecAuditApplicationStatus.Pending,
+    email_contacts: ["test1@carbure.com", "test2&carbure.com"]
 }
 
 
