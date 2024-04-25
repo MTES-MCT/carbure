@@ -45,7 +45,8 @@
 }
 
 /* variant primary */
-.primary {
+.primary,
+.primary:disabled {
   color: var(--white) !important;
   background-color: var(--blue-medium);
   border-color: var(--blue-medium);
@@ -57,7 +58,8 @@
 }
 
 /* variant secondary */
-.secondary {
+.secondary,
+.secondary:disabled {
   color: var(--black);
   background-color: var(--gray-light);
   border-color: var(--gray-medium);
@@ -69,7 +71,8 @@
 }
 
 /* variant success */
-.success {
+.success,
+.success:disabled {
   color: var(--green-dark);
   background-color: var(--green-light);
   border-color: var(--green-medium);
@@ -82,7 +85,8 @@
 }
 
 /* variant warning */
-.warning {
+.warning,
+.warning:disabled {
   color: var(--orange-dark);
   background-color: var(--orange-light);
   border-color: var(--orange-medium);
@@ -95,7 +99,8 @@
 }
 
 /* variant danger */
-.danger {
+.danger,
+.danger:disabled {
   color: var(--red-dark);
   background-color: var(--red-light);
   border-color: var(--red-medium);
@@ -108,7 +113,8 @@
 }
 
 /* variant text */
-.text {
+.text,
+.text:disabled {
   border: none;
   background-color: transparent;
   color: var(--black);
@@ -124,7 +130,8 @@
 }
 
 /* variant link */
-.link {
+.link,
+.link:disabled {
   padding: 0;
   text-decoration: underline;
   color: var(--blue-dark);
