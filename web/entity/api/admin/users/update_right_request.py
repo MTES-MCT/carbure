@@ -6,6 +6,8 @@ from core.models import UserRightsRequests
 from django.conf import settings
 from django.core.mail import send_mail
 
+from core.utils import CarbureEnv
+
 
 @check_admin_rights(allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC])
 def update_right_request(request):
@@ -40,12 +42,12 @@ def update_right_request(request):
         """ % (
             right_request.entity.name
         )
-
+        recipient_list = [right_request.user.email] if CarbureEnv.is_prod else ["carbure@beta.gouv.fr"]
         send_mail(
             subject=email_subject,
             message=message,
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[right_request.user.email],
+            recipient_list=recipient_list,
             fail_silently=False,
         )
     else:
