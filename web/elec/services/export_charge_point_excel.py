@@ -77,7 +77,7 @@ def export_charge_points_sample_to_excel(charge_points, entity):
 
 def get_prm_or_mid(charge_point):
     charge_point = dict(charge_point)
-    if charge_point.get("measure_reference_point_id"):
-        return f"[PRM] {charge_point.get('measure_reference_point_id')}"
+    if charge_point.get("is_article_2"):
+        return f"[PRM] {charge_point.get('measure_reference_point_id', 'N/A')}"
     else:
-        return f"[MID] {charge_point.get('mid_id')}"
+        return f"[MID] {charge_point.get('mid_id', 'N/A')}"
