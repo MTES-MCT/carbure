@@ -199,12 +199,18 @@ class TransportDataGouv:
         )
 
         # for article 2, use the data filled by the user or combine the info we get from TDG with the computations above
-        merged_data["is_article_2"] = merged_data["is_article_2"].replace("", "NON")
-        merged_data["is_article_2"] = is_true(merged_data, "is_article_2") | (~merged_data["whole_station_has_readings"] & merged_data["guessed_is_article_2"])  # fmt:skip
+        merged_data["guessed_is_article_2"] = (
+            ~merged_data["whole_station_has_readings"] & merged_data["guessed_is_article_2"]
+        )
+
+        merged_data["is_article_2"] = merged_data["is_article_2"].replace("", pd.NA)
+        merged_data["is_article_2"] = merged_data["is_article_2"].fillna(merged_data["guessed_is_article_2"])
+        merged_data["is_article_2"] = is_true(merged_data, "is_article_2")
 
         # remove the charge points that were not listed in the original imported excel file
         return merged_data[merged_data["is_in_application"] == True][TransportDataGouv.DB_COLUMNS]
 
 
 def is_true(df, column):
-    return (df[column] == True) | (df[column].str.lower() == "true") | (df[column] == "1") | (df[column].str.lower() == "oui")  # fmt:skip
+    values = df[column].astype(str).str.lower()
+    return (values == "true") | (values == "1") | (values == "oui") | (values == "yes") | (values == "x")

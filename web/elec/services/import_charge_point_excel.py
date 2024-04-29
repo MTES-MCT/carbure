@@ -27,14 +27,14 @@ class ExcelChargePointError:
     MISSING_CHARGE_POINT_DATA = "MISSING_CHARGE_POINT_DATA"
 
 
-def import_charge_point_excel(excel_file: UploadedFile, registered_charge_points: list[str]):
+def import_charge_point_excel(excel_file: UploadedFile):
     try:
         # return the content of the excel file, indexed by their line number, in the form of a list of dicts holding strings only
         charge_point_data = ExcelChargePoints.parse_charge_point_excel(excel_file)
         # find the TDG data related to the charge points listed in the imported excel file
         charge_point_data = TransportDataGouv.merge_charge_point_data(charge_point_data)
         # parse the data and validate errors
-        return ExcelChargePoints.validate_charge_points(charge_point_data, registered_charge_points)  # fmt:skip
+        return ExcelChargePoints.validate_charge_points(charge_point_data)
     except:
         traceback.print_exc()
         return [], [{"error": ExcelChargePointError.EXCEL_PARSING_FAILED}]
@@ -95,12 +95,9 @@ class ExcelChargePoints:
 
     def validate_charge_points(
         charge_point_data: pd.DataFrame,
-        registered_charge_points: list[str],
     ):
         charge_points = charge_point_data.to_dict(orient="records")
-        context = {"registered_charge_points": registered_charge_points}
-
-        return ExcelChargePointValidator.bulk_validate(charge_points, context)
+        return ExcelChargePointValidator.bulk_validate(charge_points)
 
 
 class ExcelChargePointValidator(Validator):
@@ -128,9 +125,7 @@ class ExcelChargePointValidator(Validator):
     def validate(self, charge_point):
         charge_point_id = charge_point.get("charge_point_id")
 
-        if charge_point_id in self.context.get("registered_charge_points", []):
-            self.add_error("charge_point_id", "Ce point de recharge a déjà été défini dans un autre dossier d'inscription.")
-        elif not self.data.get("is_in_tdg"):
+        if not self.data.get("is_in_tdg"):
             self.add_error("charge_point_id", f"Le point de recharge {charge_point_id} n'est pas listé dans les données consolidées de transport.data.gouv.fr")  # fmt:skip
         else:
             if charge_point.get("is_article_2"):
