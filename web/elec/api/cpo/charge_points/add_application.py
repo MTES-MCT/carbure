@@ -24,8 +24,7 @@ def add_application(request: HttpRequest, entity: Entity):
     if not excel_file:
         return ErrorResponse(400, AddChargePointApplicationError.MISSING_FILE)
 
-    existing_charge_points = ChargePointRepository.get_registered_charge_points(entity)
-    charge_point_data, errors = import_charge_point_excel(excel_file, existing_charge_points)
+    charge_point_data, errors = import_charge_point_excel(excel_file)
 
     if len(errors) > 0:
         return ErrorResponse(400, AddChargePointApplicationError.VALIDATION_FAILED)

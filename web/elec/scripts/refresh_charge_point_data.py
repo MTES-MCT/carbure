@@ -16,7 +16,6 @@ django.setup()
 from core.utils import bulk_update_or_create
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.services.transport_data_gouv import TransportDataGouv
-from elec.services.import_charge_point_excel import ExcelChargePoints
 
 
 @transaction.atomic
