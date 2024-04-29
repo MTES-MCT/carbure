@@ -1,6 +1,7 @@
 import { cpo } from "carbure/__test__/data";
 import { EntityPreview, EntityType } from "carbure/types";
-import { ChargePointsApplicationError, ElecAuditApplicationStatus, ElecChargePointsApplication, ElecChargePointsApplicationCheckInfo, ElecMeterReadingsApplication, ElecMeterReadingsApplicationCheckInfo, ElecMeterReadingsApplicationDetails, ElecMeterReadingsApplicationsResponse, ElecProvisionCertificatePreview, MeterReadingsApplicationError, MeterReadingsApplicationUrgencyStatus } from "elec/types";
+import { ElecChargePointsApplicationSample } from "elec-audit-admin/types";
+import { ChargePointsApplicationError, ElecAuditApplicationStatus, ElecChargePointsApplication, ElecChargePointsApplicationCheckInfo, ElecChargePointsApplicationDetails, ElecMeterReadingsApplication, ElecMeterReadingsApplicationCheckInfo, ElecMeterReadingsApplicationDetails, ElecMeterReadingsApplicationsResponse, ElecProvisionCertificatePreview, MeterReadingsApplicationError, MeterReadingsApplicationUrgencyStatus } from "elec/types";
 import { ElecCPOSnapshot, ElecProvisionCertificatesData } from "elec/types-cpo";
 
 export const elecSnapshot: ElecCPOSnapshot = {
@@ -53,6 +54,24 @@ export const elecAdminProvisionCertificateList: ElecProvisionCertificatesData = 
 }
 
 //CHARGING POINTS
+
+export const elecChargePointsApplicationSample: ElecChargePointsApplicationSample = {
+    application_id: 1,
+    percentage: 10,
+    charge_points: [
+        {
+            charge_point_id: "FR000028067822",
+            longitude: 5.143766000000000,
+            latitude: 43.329200000000000
+        },
+        {
+            charge_point_id: "FR000012616553",
+            longitude: 43.476584000000000,
+            latitude: 5.476711000000000
+        }
+    ]
+}
+
 export const elecChargePointApplicationPending: ElecChargePointsApplication = {
     id: 1,
     cpo: cpo,
@@ -61,6 +80,10 @@ export const elecChargePointApplicationPending: ElecChargePointsApplication = {
     power_total: 8,
     application_date: "2023-10-12",
     status: ElecAuditApplicationStatus.Pending,
+}
+
+export const elecChargePointApplicationDetailsPending: ElecChargePointsApplicationDetails = {
+    ...elecChargePointApplicationPending,
     email_contacts: ["test1@carbure.com", "test2@carbure.com"]
 }
 
@@ -83,6 +106,14 @@ export const elecChargePointApplicationAuditInProgress: ElecChargePointsApplicat
     application_date: "2023-09-01",
     status: ElecAuditApplicationStatus.AuditInProgress,
 }
+
+export const elecChargePointApplicationDetailsInProgress: ElecChargePointsApplicationDetails = {
+    ...elecChargePointApplicationAuditInProgress,
+    email_contacts: ["test1@carbure.com"],
+    sample: elecChargePointsApplicationSample
+
+}
+
 export const elecChargePointApplicationAuditDone: ElecChargePointsApplication = {
     id: 3,
     cpo: cpo,
@@ -91,6 +122,7 @@ export const elecChargePointApplicationAuditDone: ElecChargePointsApplication = 
     power_total: 1000,
     application_date: "2023-09-01",
     status: ElecAuditApplicationStatus.AuditDone,
+
 }
 
 const elecChargePointApplicationAccepted: ElecChargePointsApplication = {

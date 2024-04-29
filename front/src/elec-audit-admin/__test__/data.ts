@@ -29,19 +29,3 @@ export const elecAdminMeterReadingsApplicationsList: ElecMeterReadingsApplicatio
   total: 11
 }
 
-export const elecChargePointsApplicationSample: ElecChargePointsApplicationSample = {
-  application_id: 1,
-  percentage: 10,
-  charge_points: [
-    {
-      charge_point_id: "FR000028067822",
-      longitude: 5.143766000000000,
-      latitude: 43.329200000000000
-    },
-    {
-      charge_point_id: "FR000012616553",
-      longitude: 43.476584000000000,
-      latitude: 5.476711000000000
-    }
-  ]
-}

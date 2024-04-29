@@ -23,7 +23,7 @@ const SampleGenerationForm = ({
   onSampleGenerated
 }: SampleGenerationFormProps) => {
   const { t } = useTranslation()
-  const [percent, setPercent] = useState<number | undefined>(0)
+  const [percent, setPercent] = useState<number | undefined>(10)
   const entity = useEntity()
   const notify = useNotify()
   const notifyError = useNotifyError()
