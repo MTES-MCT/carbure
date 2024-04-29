@@ -1,6 +1,6 @@
 import { api, Api, download } from "common/services/api"
 import { ElecChargePointsApplication, ElecChargePointsApplicationDetails, ElecMeterReadingsApplicationDetails } from "elec/types"
-import { ElecAdminAuditFilter, ElecAdminAuditQuery, ElecAdminAuditSnapshot, ElecChargePointsApplicationsData, ElecMeterReadingsApplicationsData } from "./types"
+import { ElecAdminAuditFilter, ElecAdminAuditQuery, ElecAdminAuditSnapshot, ElecChargePointsApplicationSample, ElecChargePointsApplicationsData, ElecMeterReadingsApplicationsData } from "./types"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/elec/admin/audit/years", {
@@ -50,8 +50,12 @@ export function getChargePointsApplicationDetails(entityId: number, applicationI
   })
 }
 
-export function generateChargePointsAuditSample(entityId: number, applicationId: number, percent: number) {
-  return api.post("/elec/admin/audit/charge-points/generate-sample", {
+
+export function generateChargePointsAuditSample(
+  entityId: number,
+  applicationId: number,
+  percent: number) {
+  return api.post<Api<ElecChargePointsApplicationSample>>("/elec/admin/audit/charge-points/generate-sample", {
     entity_id: entityId,
     application_id: applicationId,
     percent: percent
@@ -64,10 +68,16 @@ export function downloadChargePointsSample(entityId: number, applicationId: numb
 
 
 
-export function startChargePointsApplicationAudit(entityId: number, applicationId: number) {
+export function startChargePointsApplicationAudit(
+  entityId: number,
+  applicationId: number,
+  percentage: number,
+  chargePointIds: string[]) {
   return api.post("/elec/admin/audit/charge-points/start-audit", {
     entity_id: entityId,
     application_id: applicationId,
+    percentage,
+    charge_point_ids: chargePointIds
   })
 }
 

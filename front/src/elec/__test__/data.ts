@@ -61,7 +61,7 @@ export const elecChargePointApplicationPending: ElecChargePointsApplication = {
     power_total: 8,
     application_date: "2023-10-12",
     status: ElecAuditApplicationStatus.Pending,
-    email_contacts: ["test1@carbure.com", "test2&carbure.com"]
+    email_contacts: ["test1@carbure.com", "test2@carbure.com"]
 }
 
 
@@ -183,7 +183,6 @@ export const elecMeterReadingApplication4: ElecMeterReadingsApplication = {
     year: 2023,
     quarter: 3,
     application_date: "2023-08-13",
-
     status: ElecAuditApplicationStatus.AuditInProgress,
 }
 

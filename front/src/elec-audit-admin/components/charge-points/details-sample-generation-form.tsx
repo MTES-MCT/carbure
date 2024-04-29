@@ -30,8 +30,11 @@ const SampleGenerationForm = ({
   const generateSampleRequest = useMutation(api.generateChargePointsAuditSample, {
     invalidates: ["audit-charge-points-application-details", "audit-charge-points-applications"],
     onSuccess(response) {
-
-      const sample: ElecChargePointsApplicationSample = response.data.data
+      const sample = response.data.data
+      if (!sample) {
+        notify(t("L'échantillon n'a pas pu être généré !"), { variant: "warning" })
+        return
+      }
       notify(t("L'échantillon a bien été généré  !"), { variant: "success" })
       onSampleGenerated(sample)
     },
