@@ -23,8 +23,7 @@ def check_application(request: HttpRequest, entity):
     if not excel_file:
         return ErrorResponse(400, CheckChargePointApplicationError.MISSING_FILE)
 
-    existing_charge_points = ChargePointRepository.get_registered_charge_points(entity)
-    charge_points, errors = import_charge_point_excel(excel_file, existing_charge_points)
+    charge_points, errors = import_charge_point_excel(excel_file)
 
     new_charge_points = [cp["charge_point_id"] for cp in charge_points]
     replaced_charge_points = ChargePointRepository.get_replaced_charge_points(entity, new_charge_points)
