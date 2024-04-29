@@ -1,21 +1,11 @@
-import { Stepper } from "@codegouvfr/react-dsfr/Stepper"
-import useEntity from "carbure/hooks/entity"
-import { EntityPreview } from "carbure/types"
-import Alert from "common/components/alert"
 import { Button } from "common/components/button"
 import Checkbox from "common/components/checkbox"
 import { Divider } from "common/components/divider"
-import { Check, ChevronLeft, Cross, Download, Send } from "common/components/icons"
-import { useNotify, useNotifyError } from "common/components/notifications"
-import { useMutation } from "common/hooks/async"
-import { ElecChargePointsApplicationSample } from "elec-audit-admin/types"
-import { ElecAuditApplicationStatus, ElecChargePointsApplication, ElecChargePointsApplicationDetails } from "elec/types"
+import { Check, Cross, Download } from "common/components/icons"
+import { ElecChargePointsApplicationDetails } from "elec/types"
 import { useState } from "react"
-import { Trans, useTranslation } from "react-i18next"
-import { useLocation, useNavigate } from "react-router-dom"
-import * as api from "../../api"
+import { useTranslation } from "react-i18next"
 import ApplicationSummary from "./details-application-summary"
-import SampleGenerationForm from "./details-sample-generation-form"
 import SampleSummary from "./details-sample-summary"
 
 
@@ -34,15 +24,7 @@ export const ChargingPointsApplicationDetailsInProgress = ({
   onDownloadSample
 }: ChargingPointsApplicationDetailsInProgressProps) => {
   const { t } = useTranslation()
-  const entity = useEntity()
-  const notify = useNotify()
-  const notifyError = useNotifyError()
-  const navigate = useNavigate()
-  const location = useLocation()
-
-  const closeDialog = () => {
-    navigate({ search: location.search, hash: "#" })
-  }
+  const [confirmCheckbox, setConfirmCheckbox] = useState(false)
 
   return (
     <>
@@ -56,16 +38,23 @@ export const ChargingPointsApplicationDetailsInProgress = ({
         <section>
 
           <SampleSummary sample={chargePointApplication?.sample} />
+          <Button icon={Download} label={t("Télécharger l'échantillon")} variant="secondary" action={onDownloadSample} asideX />
 
+        </section>
+        <section>
+          <Checkbox
+            value={confirmCheckbox}
+            onChange={setConfirmCheckbox}
+            label={t("Je confirme avoir reçu le résultat d'audit de la part de l'auditeur par e-mail afin de valider ou refuser l'inscription de ces points de charge")}
+          />
         </section>
 
 
       </main>
 
       <footer>
-        <Button icon={Check} label={t("Valider")} variant="success" action={onAccept} />
-        <Button icon={Cross} label={t("Refuser")} variant="danger" action={onReject} />
-        <Button icon={Download} label={t("Télécharger l'échantillon")} variant="primary" action={onDownloadSample} />
+        <Button icon={Check} label={t("Valider")} variant="success" action={onAccept} disabled={!confirmCheckbox} />
+        <Button icon={Cross} label={t("Refuser")} variant="danger" action={onReject} disabled={!confirmCheckbox} />
       </footer>
     </>
   )
