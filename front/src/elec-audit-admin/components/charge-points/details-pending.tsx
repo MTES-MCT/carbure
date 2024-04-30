@@ -8,7 +8,7 @@ import { Divider } from "common/components/divider"
 import { Check, ChevronLeft, Cross, Download, Send } from "common/components/icons"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
-import { ElecChargePointsApplicationSample } from "elec-audit-admin/types"
+import { ElecChargePointPreview, ElecChargePointsApplicationSample } from "elec-audit-admin/types"
 import { ElecAuditApplicationStatus, ElecChargePointsApplication, ElecChargePointsApplicationDetails } from "elec/types"
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
@@ -18,6 +18,9 @@ import ApplicationSummary from "./details-application-summary"
 import SampleGenerationForm from "./details-sample-generation-form"
 import SampleSummary from "./details-sample-summary"
 import { set } from "date-fns"
+import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet"
+import 'leaflet/dist/leaflet.css';
+import { LatLngExpression } from "leaflet"
 
 
 export type GenerationState = "generation" | "verification" | "email" | "confirmation"
@@ -105,14 +108,18 @@ export const ChargingPointsApplicationDetailsPending = ({
               title={t("Vérification de l'échantillon")}
               stepCount={4}
               currentStep={2}
-              nextTitle={t("Génération de l’email ")}
+              nextTitle={t("Génération de l'email ")}
             />
             <SampleSummary sample={sample} />
+            <section>
+              <ChargePointsSampleMap chargePoints={sample.charge_points} />
+            </section>
             <SampleGenerationForm
               power_total={chargePointApplication?.power_total ?? 0}
               applicationId={chargePointApplication?.id}
               onSampleGenerated={handleSampleGenerated}
               retry />
+
           </>}
 
           {step === "email" && <>
@@ -206,6 +213,22 @@ const MailtoButton = ({ cpo, chargePointCount, emailContacts, onGenerate }: Mail
 }
 
 
+const ChargePointsSampleMap = ({ chargePoints }: { chargePoints: ElecChargePointPreview[] }) => {
+  const franceCenterCoordinates: LatLngExpression = [46.2276, 2.2137]
+  return (
+    <MapContainer center={franceCenterCoordinates} zoom={5} style={{ height: '350px', width: '100%' }}>
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      />
+      {chargePoints.map((point, idx) => (
+        <Marker key={idx} position={[point.latitude, point.longitude]}>
+          <Popup>{point.charge_point_id}</Popup>
+        </Marker>
+      ))}
+    </MapContainer>
+  );
+};
 
 
 export default ChargingPointsApplicationDetailsPending
