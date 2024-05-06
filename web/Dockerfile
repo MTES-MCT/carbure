@@ -1,26 +1,38 @@
-FROM ubuntu:latest
+# Use the official Ubuntu image as the base image
+FROM ubuntu:22.04
 
-RUN apt-get update -y
-
-RUN apt-get install -y \
-  git \
+# Run updates and install necessary system packages
+RUN apt-get update -y && apt-get install -y \
   python3.10 \
-  python3-dev \
   python3-pip \
+  python3-venv \
+  python3-dev \
+  git \
   mysql-client \
   libmysqlclient-dev
 
-ENV PYTHONUNBUFFERED 1
-ENV PIPENV_VENV_IN_PROJECT 1
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
 
+# Set up working directory
 WORKDIR /app
 
-COPY Pipfile ./
-COPY Pipfile.lock ./
-RUN pip3 install pipenv
-RUN pipenv install --dev --system --deploy
+# Create a virtual environment and activate it
+RUN python3.10 -m venv /venv
+ENV PATH="/venv/bin:$PATH"
 
+# Install Pipenv using pip
+RUN pip install pipenv
+
+# Copy Pipfile and Pipfile.lock
+COPY Pipfile Pipfile.lock /app/
+
+# Install dependencies using Pipenv
+RUN pipenv install --dev --deploy
+
+# Copy the rest of your application code
 COPY web web
 COPY scripts scripts
 
-CMD [ "sh", "./web/entrypoint.sh" ]
+# Set the default command to execute the application
+CMD ["pipenv", "run", "sh", "./web/entrypoint.sh"]
