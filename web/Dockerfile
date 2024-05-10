@@ -1,15 +1,17 @@
 # Use the official Ubuntu image as the base image
-FROM ubuntu:22.04
+FROM ubuntu:latest
 
 # Run updates and install necessary system packages
 RUN apt-get update -y && apt-get install -y \
-  python3.10 \
+  python3 \
   python3-pip \
   python3-venv \
   python3-dev \
   git \
-  mysql-client \
-  libmysqlclient-dev
+  build-essential \
+  pkg-config \
+  default-libmysqlclient-dev \
+  mysql-client
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
@@ -18,7 +20,7 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
 # Create a virtual environment and activate it
-RUN python3.10 -m venv /venv
+RUN python3 -m venv /venv
 ENV PATH="/venv/bin:$PATH"
 
 # Install Pipenv using pip

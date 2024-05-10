@@ -1,18 +1,19 @@
 # This image will serve as the base image for the GitLab CI jobs
-FROM ubuntu:22.04
+FROM ubuntu:latest
 
 ENV PYTHONUNBUFFERED 1
-ENV PIPENV_VENV_IN_PROJECT 1
 
 RUN apt-get update -y && apt-get install -y \
   curl \
   git \
-  python3.10 \
+  python3 \
   python3-dev \
   python3-venv \
   python3-pip \
-  mysql-client \
-  libmysqlclient-dev
+  build-essential \
+  pkg-config \
+  default-libmysqlclient-dev \
+  mysql-client
 
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
 RUN apt-get install -y nodejs
@@ -24,7 +25,7 @@ COPY front/package-lock.json front/package-lock.json
 RUN (cd front; npm clean-install)
 
 # Create a virtual environment and activate it
-RUN python3.10 -m venv /venv
+RUN python3 -m venv /venv
 ENV PATH="/venv/bin:$PATH"
 
 # Install Pipenv using pip
