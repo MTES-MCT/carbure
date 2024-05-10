@@ -54,7 +54,8 @@ class ExcelChargePoints:
 
     @staticmethod
     def parse_charge_point_excel(excel_file: UploadedFile):
-        charge_point_data = pd.read_excel(excel_file, usecols=list(range(1, 10)), dtype=str)
+        charge_point_data = pd.read_excel(excel_file, dtype=str)
+        charge_point_data.drop(charge_point_data.columns[0], axis=1, inplace=True)
 
         column_count = len(charge_point_data.columns)
         columns = dict(list(ExcelChargePoints.EXCEL_COLUMNS.items())[0:column_count])
