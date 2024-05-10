@@ -11,6 +11,7 @@ variables:
 .checks:
   image: $CI_REGISTRY/$CI_PROJECT_PATH/ci-image:latest
   before_script:
+    - mv /app/.venv ./.venv
     - mv /app/front/node_modules ./front
 
 # prepare git env to push new code to scalingo
