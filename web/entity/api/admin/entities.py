@@ -102,7 +102,7 @@ def get_entities(request, entity: Entity):
         entities = entities.filter(requests__gt=0)
 
     entities_data = []
-    for e in entities.iterator():
+    for e in entities:
         entities_data.append(
             {
                 "entity": e.natural_key(),

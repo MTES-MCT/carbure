@@ -768,7 +768,7 @@ def get_lots_errors(lots, entity):
             )
         )
     data = {}
-    for error in errors.values("lot_id", "error", "is_blocking", "field", "value", "extra", "fields").iterator():
+    for error in errors.values("lot_id", "error", "is_blocking", "field", "value", "extra", "fields"):
         if error["lot_id"] not in data:
             data[error["lot_id"]] = []
         data[error["lot_id"]].append(GenericErrorSerializer(error).data)
