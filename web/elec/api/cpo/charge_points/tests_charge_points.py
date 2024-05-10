@@ -543,6 +543,9 @@ class ElecCharginPointsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data, expected)
 
+    def test_dummy(self):
+        self.assertEqual(True, True)
+
 
 TDG_MOCK_OK = [
     {
