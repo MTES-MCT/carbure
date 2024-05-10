@@ -1,6 +1,10 @@
 # Use the official Ubuntu image as the base image
 FROM ubuntu:latest
 
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PIPENV_VENV_IN_PROJECT 1
+
 # Run updates and install necessary system packages
 RUN apt-get update -y && apt-get install -y \
   python3 \
@@ -12,9 +16,6 @@ RUN apt-get update -y && apt-get install -y \
   pkg-config \
   default-libmysqlclient-dev \
   mysql-client
-
-# Set environment variables
-ENV PYTHONUNBUFFERED=1
 
 # Set up working directory
 WORKDIR /app

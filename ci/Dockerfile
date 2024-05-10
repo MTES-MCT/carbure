@@ -2,6 +2,7 @@
 FROM ubuntu:latest
 
 ENV PYTHONUNBUFFERED 1
+ENV PIPENV_VENV_IN_PROJECT 1
 
 RUN apt-get update -y && apt-get install -y \
   curl \
