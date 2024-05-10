@@ -22,7 +22,7 @@ def accept_consumption(request, entity, entity_id):
     accepted_events = []
     errors = []
 
-    for lot in lots.iterator():
+    for lot in lots:
         if int(entity_id) != lot.carbure_client_id:
             errors.append({"error": AcceptConsumptionError.NOT_CLIENT, "meta": {"lot_id": lot.id}})
             continue

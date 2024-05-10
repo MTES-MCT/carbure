@@ -18,13 +18,11 @@ def add_comment(request, *args, **kwargs):
     is_visible_by_admin = request.POST.get("is_visible_by_admin") == "true"
 
     if not comment:
-        return JsonResponse(
-            {"status": "error", "message": "Missing comment"}, status=400
-        )
+        return JsonResponse({"status": "error", "message": "Missing comment"}, status=400)
 
     entity = Entity.objects.get(id=entity_id)
     lots = CarbureLot.objects.filter(id__in=selection)
-    for lot in lots.iterator():
+    for lot in lots:
         lot_comment = CarbureLotComment()
         lot_comment.entity = entity
         lot_comment.user = request.user

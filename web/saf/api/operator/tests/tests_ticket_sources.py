@@ -157,7 +157,7 @@ class SafTicketSourcesTest(TestCase):
         response_ticket_source.pop("created_at")
         response_ticket_source["assigned_tickets"][0].pop("created_at")
 
-        self.assertDictContainsSubset(response_ticket_source, expected_ticket_source)
+        self.assertEqual(response_ticket_source, expected_ticket_source)
         self.assertEqual(response.json()["data"]["from"], 0)
         self.assertEqual(response.json()["data"]["returned"], 1)
         self.assertEqual(response.json()["data"]["total"], 2)
