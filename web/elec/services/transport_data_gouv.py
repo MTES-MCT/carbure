@@ -170,7 +170,7 @@ class TransportDataGouv:
 
         # deal with when a charge point was not found on TDG to compute its guessed_is_article_2 column
         if "guessed_is_article_2" in merged_data.columns:
-            merged_data["guessed_is_article_2"].fillna(merged_data["current_type"] != "AC", inplace=True)
+            merged_data["guessed_is_article_2"] = merged_data["guessed_is_article_2"].fillna(merged_data["current_type"] != "AC")  # fmt:skip
         else:
             merged_data["guessed_is_article_2"] = merged_data["current_type"] != "AC"
 
