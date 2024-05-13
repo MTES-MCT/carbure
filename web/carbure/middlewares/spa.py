@@ -15,13 +15,14 @@ class WhiteNoiseSPAMiddleware(WhiteNoiseMiddleware):
 
     index_name = os.path.join(settings.STATIC_URL, "index.html")
 
-    def process_request(self, request):
+    def __call__(self, request):
         # First try to serve the static files (on /static/ and on /)
         # which is relatively fast as files are stored in a self.files dict
         if self.autorefresh:  # debug mode
             static_file = self.find_file(request.path_info)
         else:  # from the collected static files
             static_file = self.files.get(request.path_info)
+
         if static_file is not None:
             return self.serve(static_file, request)
         else:
@@ -33,13 +34,13 @@ class WhiteNoiseSPAMiddleware(WhiteNoiseMiddleware):
             # (just return and let the normal middleware take its course)
             urlconf = getattr(request, "urlconf", None)
             if is_valid_path(request.path_info, urlconf):
-                return
+                return self.get_response(request)
             if (
                 settings.APPEND_SLASH
                 and not request.path_info.endswith("/")
                 and is_valid_path("%s/" % request.path_info, urlconf)
             ):
-                return
+                return self.get_response(request)
 
             # 2) the url is handled by frontend routing
             # redirect all unknown files to the SPA root
