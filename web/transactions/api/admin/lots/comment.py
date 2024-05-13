@@ -28,7 +28,7 @@ def add_comment(request, entity):
     selection = form.cleaned_data["selection"]
 
     lots = CarbureLot.objects.filter(id__in=selection)
-    for lot in lots.iterator():
+    for lot in lots:
         lot_comment = CarbureLotComment()
         lot_comment.entity = entity
         lot_comment.user = request.user

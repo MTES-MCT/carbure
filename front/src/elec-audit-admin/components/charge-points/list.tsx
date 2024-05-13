@@ -15,6 +15,7 @@ import ElecAdminAuditFilters from "../list-filters"
 import { useElectAdminAuditQuery } from "./list-query"
 import { useElecAdminAuditChargePointsQueryParamsStore } from "./list-query-params-store"
 import { StatusSwitcher } from "../status-switcher"
+import { elecAdminChargePointsApplicationsList } from "elec-audit-admin/__test__/data"
 
 type TransferListProps = {
   snapshot: ElecAdminAuditSnapshot
@@ -49,8 +50,8 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
   }
 
 
-  // const chargePointsApplicationsData = elecAdminChargePointsApplicationsList
   const chargePointsApplicationsData = chargePointsApplicationsResponse.result?.data.data
+  // const chargePointsApplicationsData = elecAdminChargePointsApplicationsList // TEST
 
   const total = chargePointsApplicationsData?.total ?? 0
   const count = chargePointsApplicationsData?.returned ?? 0
@@ -76,6 +77,8 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
             onSwitch={actions.setStatus}
             historyCount={snapshot.charge_points_applications_history}
             pendingCount={snapshot.charge_points_applications_pending}
+            // auditDoneCount={snapshot.charge_points_applications_audit_done}
+            auditInProgressCount={snapshot.charge_points_applications_audit_in_progress}
           />
 
 

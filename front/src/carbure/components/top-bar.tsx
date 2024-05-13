@@ -154,7 +154,7 @@ const Navigation = ({ entity }: NavigationProps) => {
               (isAdmin || entity.hasAdminRight("ELEC")) && {
                 key: "elec-admin-audit",
                 path: "elec-admin-audit",
-                label: t("Audit"),
+                label: t("PDC"),
               },
 
               (isOperator || isProducer) && {

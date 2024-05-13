@@ -57,7 +57,7 @@ def get_period_entity_lot_count(periods):
 
     declarations = {}
 
-    for lot in lots.iterator():
+    for lot in lots:
         period = lot["period"] or None
         author = lot["added_by_id"] or None
         vendor = lot["carbure_supplier_id"] or None

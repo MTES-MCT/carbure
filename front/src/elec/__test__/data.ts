@@ -53,9 +53,7 @@ export const elecAdminProvisionCertificateList: ElecProvisionCertificatesData = 
 }
 
 //CHARGING POINTS
-
-
-export const elecChargePointApplication1: ElecChargePointsApplication = {
+export const elecChargePointApplicationPending: ElecChargePointsApplication = {
     id: 1,
     cpo: cpo,
     station_count: 4,
@@ -65,7 +63,36 @@ export const elecChargePointApplication1: ElecChargePointsApplication = {
     status: ElecAuditApplicationStatus.Pending,
 }
 
-const elecChargePointApplication2: ElecChargePointsApplication = {
+
+const elecChargePointApplicationRejected: ElecChargePointsApplication = {
+    id: 3,
+    cpo: cpo,
+    station_count: 1,
+    charge_point_count: 5,
+    power_total: 1000,
+    application_date: "2023-09-01",
+    status: ElecAuditApplicationStatus.Rejected,
+}
+export const elecChargePointApplicationAuditInProgress: ElecChargePointsApplication = {
+    id: 3,
+    cpo: cpo,
+    station_count: 1,
+    charge_point_count: 5,
+    power_total: 1000,
+    application_date: "2023-09-01",
+    status: ElecAuditApplicationStatus.AuditInProgress,
+}
+export const elecChargePointApplicationAuditDone: ElecChargePointsApplication = {
+    id: 3,
+    cpo: cpo,
+    station_count: 1,
+    charge_point_count: 5,
+    power_total: 1000,
+    application_date: "2023-09-01",
+    status: ElecAuditApplicationStatus.AuditDone,
+}
+
+const elecChargePointApplicationAccepted: ElecChargePointsApplication = {
     id: 2,
     cpo: cpo,
     station_count: 19,
@@ -75,30 +102,12 @@ const elecChargePointApplication2: ElecChargePointsApplication = {
     validation_date: "2023-11-01",
     status: ElecAuditApplicationStatus.Accepted,
 }
-const elecChargePointApplication3: ElecChargePointsApplication = {
-    id: 3,
-    cpo: cpo,
-    station_count: 1,
-    charge_point_count: 5,
-    power_total: 1000,
-    application_date: "2023-09-01",
-    status: ElecAuditApplicationStatus.Rejected,
-}
-export const elecChargePointApplication4: ElecChargePointsApplication = {
-    id: 3,
-    cpo: cpo,
-    station_count: 1,
-    charge_point_count: 5,
-    power_total: 1000,
-    application_date: "2023-09-01",
-    status: ElecAuditApplicationStatus.AuditInProgress,
-}
-
 export const elecChargePointsApplications: ElecChargePointsApplication[] = [
-    elecChargePointApplication1,
-    elecChargePointApplication2,
-    elecChargePointApplication3,
-    elecChargePointApplication4
+    elecChargePointApplicationPending,
+    elecChargePointApplicationRejected,
+    elecChargePointApplicationAuditInProgress,
+    elecChargePointApplicationAuditDone,
+    elecChargePointApplicationAccepted,
 ]
 
 

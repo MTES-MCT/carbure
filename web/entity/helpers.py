@@ -1,9 +1,7 @@
-from math import e
 from core.models import UserRights, UserRightsRequests
 from core.utils import CarbureEnv
 from django.core.mail import send_mail
 from django.conf import settings
-from django.contrib import admin, messages
 
 
 def enable_entity(entity):
@@ -32,14 +30,14 @@ def enable_entity(entity):
 
     # send email to user
     subject = "Demande d'inscription de société enregistrée"
-    subject = subject if CarbureEnv.is_prod else "STAGING " + subject
+    subject = subject if CarbureEnv.is_prod else "TEST " + subject
     recipient_list = [admin_user.email] if CarbureEnv.is_prod else ["carbure@beta.gouv.fr"]
     text_message = f"""
     Bonjour,
 
     Votre demande d'inscription pour la société {entity.name} a été validée par l'administration.
     Vous pouvez désormais accéder à la société dans votre espace en tant qu'administrateur : {CarbureEnv.get_base_url()}/account
-
+ 
     Pour plus d'information veuillez consulter notre guide d'utilisation : https://carbure-1.gitbook.io/faq/affichage/traduction
 
     Bien cordialement,
@@ -47,7 +45,7 @@ def enable_entity(entity):
     """
 
     send_mail(
-        subject="Demande d'inscription de société validée",
+        subject=subject,
         message=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=recipient_list,

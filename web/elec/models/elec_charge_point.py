@@ -17,6 +17,7 @@ class ElecChargePoint(models.Model):
     # related
     application = models.ForeignKey(ElecChargePointApplication, on_delete=models.deletion.CASCADE, related_name="elec_charge_points")  # fmt:skip
     cpo = models.ForeignKey(Entity, on_delete=models.deletion.CASCADE, related_name="elec_charge_points")
+    previous_version = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True, related_name="next_version")  # fmt:skip
 
     # cpo excel data
     charge_point_id = models.CharField(max_length=64)
@@ -32,7 +33,7 @@ class ElecChargePoint(models.Model):
     station_name = models.CharField(max_length=128)
     station_id = models.CharField(max_length=64)
     nominal_power = models.FloatField(null=True, blank=True)
-    cpo_name = models.CharField(max_length=64, null=True, blank=True)
+    cpo_name = models.CharField(max_length=128, null=True, blank=True)
     cpo_siren = models.CharField(max_length=64, null=True, blank=True)
     latitude = models.DecimalField(max_digits=18, decimal_places=15, null=True, blank=True)
     longitude = models.DecimalField(max_digits=18, decimal_places=15, null=True, blank=True)

@@ -55,7 +55,7 @@ def accept_trading(request, *args, **kwargs):
     accepted_lot_ids = []
     transferred_lot_ids = []
 
-    for lot in lots.iterator():
+    for lot in lots:
         if int(entity_id) != lot.carbure_client_id:
             return JsonResponse(
                 {

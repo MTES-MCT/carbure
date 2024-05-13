@@ -39,6 +39,7 @@ from core.serializers import (
     GenericErrorAdminSerializer,
     GenericErrorSerializer,
 )
+from core.utils import CarbureEnv
 from core.xlsx_v3 import export_carbure_lots, export_carbure_stock
 
 
@@ -767,7 +768,7 @@ def get_lots_errors(lots, entity):
             )
         )
     data = {}
-    for error in errors.values("lot_id", "error", "is_blocking", "field", "value", "extra", "fields").iterator():
+    for error in errors.values("lot_id", "error", "is_blocking", "field", "value", "extra", "fields"):
         if error["lot_id"] not in data:
             data[error["lot_id"]] = []
         data[error["lot_id"]].append(GenericErrorSerializer(error).data)
@@ -841,6 +842,7 @@ def get_transaction_distance(lot):
 
 def send_email_declaration_validated(declaration):
     email_subject = "Carbure - Votre Déclaration de Durabilité a été validée"
+    email_subject = email_subject if CarbureEnv.is_prod else "TEST " + email_subject
     text_message = """
     Bonjour,
 
@@ -876,6 +878,7 @@ def send_email_declaration_validated(declaration):
 
 def send_email_declaration_invalidated(declaration):
     email_subject = "Carbure - Votre Déclaration de Durabilité a été annulée"
+    email_subject = email_subject if CarbureEnv.is_prod else "TEST " + email_subject
     text_message = """
     Bonjour,
 

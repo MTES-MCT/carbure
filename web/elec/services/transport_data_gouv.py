@@ -170,7 +170,7 @@ class TransportDataGouv:
 
         # deal with when a charge point was not found on TDG to compute its guessed_is_article_2 column
         if "guessed_is_article_2" in merged_data.columns:
-            merged_data["guessed_is_article_2"].fillna(merged_data["current_type"] != "AC", inplace=True)
+            merged_data["guessed_is_article_2"] = merged_data["guessed_is_article_2"].fillna(merged_data["current_type"] != "AC")  # fmt:skip
         else:
             merged_data["guessed_is_article_2"] = merged_data["current_type"] != "AC"
 
@@ -179,8 +179,8 @@ class TransportDataGouv:
         merged_data["is_in_application"] = merged_data["is_in_application"] == True
 
         # clear the mid and prm columns if they contain data that is too short
-        merged_data["mid_id"] = merged_data["mid_id"].apply(lambda x: "" if not x or len(str(x)) < 3 else x)
-        merged_data["measure_reference_point_id"] = merged_data["measure_reference_point_id"].apply(lambda x: "" if not x or len(str(x)) < 3 else x)  # fmt:skip
+        # merged_data["mid_id"] = merged_data["mid_id"].apply(lambda x: "" if not x or len(str(x)) < 3 else x)
+        # merged_data["measure_reference_point_id"] = merged_data["measure_reference_point_id"].apply(lambda x: "" if not x or len(str(x)) < 3 else x)  # fmt:skip
 
         # find which rows have all data defined for a first meter reading
         merged_data["has_reading"] = (merged_data["current_type"] == "AC") | (
@@ -199,12 +199,18 @@ class TransportDataGouv:
         )
 
         # for article 2, use the data filled by the user or combine the info we get from TDG with the computations above
-        merged_data["is_article_2"] = merged_data["is_article_2"].replace("", "NON")
-        merged_data["is_article_2"] = is_true(merged_data, "is_article_2") | (~merged_data["whole_station_has_readings"] & merged_data["guessed_is_article_2"])  # fmt:skip
+        merged_data["guessed_is_article_2"] = (
+            ~merged_data["whole_station_has_readings"] & merged_data["guessed_is_article_2"]
+        )
+
+        merged_data["is_article_2"] = merged_data["is_article_2"].replace("", pd.NA)
+        merged_data["is_article_2"] = merged_data["is_article_2"].fillna(merged_data["guessed_is_article_2"])
+        merged_data["is_article_2"] = is_true(merged_data, "is_article_2")
 
         # remove the charge points that were not listed in the original imported excel file
         return merged_data[merged_data["is_in_application"] == True][TransportDataGouv.DB_COLUMNS]
 
 
 def is_true(df, column):
-    return (df[column] == True) | (df[column].str.lower() == "true") | (df[column] == "1") | (df[column].str.lower() == "oui")  # fmt:skip
+    values = df[column].astype(str).str.lower()
+    return (values == "true") | (values == "1") | (values == "oui") | (values == "yes") | (values == "x")
