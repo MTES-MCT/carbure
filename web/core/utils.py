@@ -177,7 +177,7 @@ class Validator(forms.Form):
             else:
                 errors.append({"error": Validator.INVALID_DATA, "line": item_data.get("line"), "meta": form.errors})
 
-        return valid_items, errors
+        return valid_items, sorted(errors, key=lambda x: x["line"])
 
     # extend the default Form constructor by adding the ability to set a context with external data
     # useful during calls to self.extend() and self.validate() as you can use data that doesn't belong to the FormData itself
