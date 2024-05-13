@@ -30,7 +30,7 @@ def accept_processing(request, *args, **kwargs):
     accepted_lot_ids = []
     processed_lot_ids = []
 
-    for lot in lots.iterator():
+    for lot in lots:
         if int(entity_id) != lot.carbure_client_id:
             return JsonResponse(
                 {
@@ -41,9 +41,7 @@ def accept_processing(request, *args, **kwargs):
             )
 
         if lot.lot_status == CarbureLot.DRAFT:
-            return JsonResponse(
-                {"status": "error", "message": "Cannot accept DRAFT"}, status=400
-            )
+            return JsonResponse({"status": "error", "message": "Cannot accept DRAFT"}, status=400)
         elif lot.lot_status == CarbureLot.PENDING:
             # ok no problem
             pass
@@ -51,17 +49,11 @@ def accept_processing(request, *args, **kwargs):
             # the client changed his mind, ok
             pass
         elif lot.lot_status == CarbureLot.ACCEPTED:
-            return JsonResponse(
-                {"status": "error", "message": "Lot already accepted."}, status=400
-            )
+            return JsonResponse({"status": "error", "message": "Lot already accepted."}, status=400)
         elif lot.lot_status == CarbureLot.FROZEN:
-            return JsonResponse(
-                {"status": "error", "message": "Lot is Frozen."}, status=400
-            )
+            return JsonResponse({"status": "error", "message": "Lot is Frozen."}, status=400)
         elif lot.lot_status == CarbureLot.DELETED:
-            return JsonResponse(
-                {"status": "error", "message": "Lot is deleted."}, status=400
-            )
+            return JsonResponse({"status": "error", "message": "Lot is deleted."}, status=400)
 
         lot.lot_status = CarbureLot.ACCEPTED
         lot.delivery_type = CarbureLot.PROCESSING
@@ -98,9 +90,7 @@ def accept_processing(request, *args, **kwargs):
         event.user = request.user
         event.save()
 
-    updated_lots = CarbureLot.objects.filter(
-        id__in=accepted_lot_ids + processed_lot_ids
-    )
+    updated_lots = CarbureLot.objects.filter(id__in=accepted_lot_ids + processed_lot_ids)
     background_bulk_sanity_checks(updated_lots)
     background_bulk_scoring(updated_lots)
 

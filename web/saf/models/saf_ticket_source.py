@@ -73,7 +73,7 @@ def create_ticket_sources_from_lots(lots):
     # make sure we only have declared lots of SAF in the queryset
     saf_lots = lots.filter(lot_status__in=["ACCEPTED", "FROZEN"]).filter(biofuel__code__in=SAF)
 
-    for lot in saf_lots.iterator():
+    for lot in saf_lots:
         ticket_source_data.append(
             {
                 "carbure_id": None,

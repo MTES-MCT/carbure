@@ -178,28 +178,28 @@ def check_ghg_reduc_for_production_site(lot: CarbureLot):
         return
 
     if is_red_ii(lot):
-        if commissioning_date > oct2015 and lot.ghg_reduction_red_ii < 60:
-            return generic_error(
-                error=CarbureSanityCheckErrors.GHG_REDUC_INF_60,
-                lot=lot,
-                is_blocking=True,
-            )
         if commissioning_date >= jan2021 and lot.ghg_reduction_red_ii < 65:
             return generic_error(
                 error=CarbureSanityCheckErrors.GHG_REDUC_INF_65,
                 lot=lot,
                 is_blocking=True,
             )
-    else:
-        if commissioning_date > oct2015 and lot.ghg_reduction < 60:
+        if commissioning_date > oct2015 and lot.ghg_reduction_red_ii < 60:
             return generic_error(
                 error=CarbureSanityCheckErrors.GHG_REDUC_INF_60,
                 lot=lot,
                 is_blocking=True,
             )
+    else:
         if commissioning_date >= jan2021 and lot.ghg_reduction < 65:
             return generic_error(
                 error=CarbureSanityCheckErrors.GHG_REDUC_INF_65,
+                lot=lot,
+                is_blocking=True,
+            )
+        if commissioning_date > oct2015 and lot.ghg_reduction < 60:
+            return generic_error(
+                error=CarbureSanityCheckErrors.GHG_REDUC_INF_60,
                 lot=lot,
                 is_blocking=True,
             )

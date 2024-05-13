@@ -140,7 +140,7 @@ def get_prefetched_data(entity=None):
     # dict {'entity1': [depot1, depot2], 'entity2': [depot42]}
     depotsbyentities = dict()
     associated_depots = EntityDepot.objects.select_related("entity", "depot").all()
-    for entitydepot in associated_depots.iterator():
+    for entitydepot in associated_depots:
         if entitydepot.entity.pk in depotsbyentities:
             depotsbyentities[entitydepot.entity.pk].append(entitydepot.depot.depot_id)
         else:
@@ -151,7 +151,7 @@ def get_prefetched_data(entity=None):
     # dict {'entity1': {'cert1_id': cert1, 'cert2_id': cert2}, 'entity2': {'cert14_id': cert14}}
     entity_certificates = {}
     certificates = EntityCertificate.objects.select_related("entity", "certificate").all()
-    for entitycertificate in certificates.iterator():
+    for entitycertificate in certificates:
         if entitycertificate.entity.pk not in entity_certificates:
             entity_certificates[entitycertificate.entity.pk] = {}
         entity_certificates[entitycertificate.entity.pk][entitycertificate.certificate.certificate_id] = entitycertificate

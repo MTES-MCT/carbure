@@ -24,7 +24,7 @@ def cancel_accept_lots(request, *args, **kwargs):
 
     entity = Entity.objects.get(pk=entity_id)
     lots = CarbureLot.objects.filter(pk__in=lot_ids)
-    for lot in lots.iterator():
+    for lot in lots:
         if lot.carbure_client != entity:
             return ErrorResponse(403, CancelErrors.NOT_LOT_CLIENT)
 

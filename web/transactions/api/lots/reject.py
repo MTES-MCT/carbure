@@ -22,7 +22,7 @@ def reject_lot(request, *args, **kwargs):
     lots = get_entity_lots_by_status(entity, status)
     lots = filter_lots(lots, request.POST, entity, will_aggregate=True)
 
-    for lot in lots.iterator():
+    for lot in lots:
         if lot.carbure_client != entity:
             return JsonResponse(
                 {

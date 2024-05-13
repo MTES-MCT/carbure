@@ -17,12 +17,14 @@ export function formatPeriodFromDate(date: Date) {
 
 export function formatNumber(num: number, fractionDigits = 2) {
   const integer = Math.floor(num).toFixed(0)
-  const decimal = num % 1
+  let decimal = num % 1
 
   // add space to separate thousands
   let numStr = chunk(integer, 3).join(" ")
+  if (!fractionDigits) return numStr
 
   if (decimal !== 0) {
+    if (decimal < 0) decimal = -decimal
     const decimalStr = decimal.toFixed(fractionDigits).slice(2)
     numStr += "," + decimalStr
   }

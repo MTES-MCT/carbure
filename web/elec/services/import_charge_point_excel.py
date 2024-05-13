@@ -27,14 +27,14 @@ class ExcelChargePointError:
     MISSING_CHARGE_POINT_DATA = "MISSING_CHARGE_POINT_DATA"
 
 
-def import_charge_point_excel(excel_file: UploadedFile, registered_charge_points: list[str]):
+def import_charge_point_excel(excel_file: UploadedFile):
     try:
         # return the content of the excel file, indexed by their line number, in the form of a list of dicts holding strings only
         charge_point_data = ExcelChargePoints.parse_charge_point_excel(excel_file)
         # find the TDG data related to the charge points listed in the imported excel file
         charge_point_data = TransportDataGouv.merge_charge_point_data(charge_point_data)
         # parse the data and validate errors
-        return ExcelChargePoints.validate_charge_points(charge_point_data, registered_charge_points)  # fmt:skip
+        return ExcelChargePoints.validate_charge_points(charge_point_data)
     except:
         traceback.print_exc()
         return [], [{"error": ExcelChargePointError.EXCEL_PARSING_FAILED}]
@@ -48,21 +48,23 @@ class ExcelChargePoints:
         "measure_date": ["Date du relevé"],
         "measure_energy": ["Energie active totale soutirée à la date du relevé"],
         "measure_reference_point_id": ["Numéro du point référence mesure du gestionnaire du réseau public de distribution alimentant la station"],  # fmt:skip
+        "_": [""],
         "current_type": ["Type de courant électrique associé au point de recharge"],
         "is_article_2": ["La station du point de recharge est soumise à l'article 2 du décret n°2022-1330"],
     }
 
     @staticmethod
     def parse_charge_point_excel(excel_file: UploadedFile):
-        charge_point_data = pd.read_excel(excel_file, usecols=list(range(1, 10)), dtype=str)
+        charge_point_data = pd.read_excel(excel_file, dtype=str, header=None)
+
+        # remove empty first column
+        charge_point_data.drop(charge_point_data.columns[0], axis=1, inplace=True)
 
         column_count = len(charge_point_data.columns)
         columns = dict(list(ExcelChargePoints.EXCEL_COLUMNS.items())[0:column_count])
 
         # remove empty separator column
-        if column_count > 6:
-            charge_point_data = charge_point_data.drop(charge_point_data.columns[6], axis=1)
-        else:
+        if column_count <= 6:
             charge_point_data["current_type"] = ""
             charge_point_data["is_article_2"] = ""
 
@@ -71,36 +73,33 @@ class ExcelChargePoints:
         #     if charge_point_data.iloc[9, i].strip() not in header:
         #         raise Exception("Invalid template")
 
-        charge_point_data = charge_point_data.drop(charge_point_data.index[:11])
-        charge_point_data = charge_point_data.dropna(how="all")  # remove completely empty rows
+        # rename columns with actual names
         charge_point_data.rename(columns={charge_point_data.columns[i]: column for i, column in enumerate(columns)}, inplace=True)  # fmt: skip
+
         charge_point_data["measure_energy"] = charge_point_data["measure_energy"].fillna(0)
         charge_point_data = charge_point_data.fillna("")
-        charge_point_data["line"] = charge_point_data.index + 2  # add a line number to locate data in the excel file
+        charge_point_data["line"] = charge_point_data.index + 1  # add a line number to locate data in the excel file
         charge_point_data["is_in_application"] = True
         charge_point_data = charge_point_data.reset_index(drop=True)
-        charge_point_data = charge_point_data.drop_duplicates("charge_point_id")
 
-        if len(charge_point_data) >= 18:
+        # drop example rows
+        if len(charge_point_data) >= 24:
             # default template example cells
-            first_id = charge_point_data.at[0, "charge_point_id"]
-            eighteenth_id = charge_point_data.at[17, "charge_point_id"]
+            first_example_id = charge_point_data.at[12, "charge_point_id"]
+            last_example_id = charge_point_data.at[29, "charge_point_id"]
 
             # the example was left in the template, so we skip it
-            if first_id == "FRUEXESTATION1P1" and eighteenth_id == "FRUEXESTATION4P4":
-                charge_point_data = charge_point_data.drop(charge_point_data.index[:20])
+            if first_example_id == "FRUEXESTATION1P1" and last_example_id == "FRUEXESTATION4P4":
+                charge_point_data = charge_point_data.drop(charge_point_data.index[:34])
                 charge_point_data = charge_point_data.reset_index(drop=True)
 
         return charge_point_data
 
     def validate_charge_points(
         charge_point_data: pd.DataFrame,
-        registered_charge_points: list[str],
     ):
         charge_points = charge_point_data.to_dict(orient="records")
-        context = {"registered_charge_points": registered_charge_points}
-
-        return ExcelChargePointValidator.bulk_validate(charge_points, context)
+        return ExcelChargePointValidator.bulk_validate(charge_points)
 
 
 class ExcelChargePointValidator(Validator):
@@ -128,9 +127,7 @@ class ExcelChargePointValidator(Validator):
     def validate(self, charge_point):
         charge_point_id = charge_point.get("charge_point_id")
 
-        if charge_point_id in self.context.get("registered_charge_points", []):
-            self.add_error("charge_point_id", "Ce point de recharge a déjà été défini dans un autre dossier d'inscription.")
-        elif not self.data.get("is_in_tdg"):
+        if not self.data.get("is_in_tdg"):
             self.add_error("charge_point_id", f"Le point de recharge {charge_point_id} n'est pas listé dans les données consolidées de transport.data.gouv.fr")  # fmt:skip
         else:
             if charge_point.get("is_article_2"):

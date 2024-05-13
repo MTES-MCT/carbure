@@ -5,6 +5,7 @@ from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity, UserRights
 from elec.models.elec_charge_point_application import ElecChargePointApplication
+from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.services.import_charge_point_excel import import_charge_point_excel
 
 
@@ -22,10 +23,10 @@ def check_application(request: HttpRequest, entity):
     if not excel_file:
         return ErrorResponse(400, CheckChargePointApplicationError.MISSING_FILE)
 
-    # @TODO actually list existing charge points to enable duplicate checks
-    existing_charge_points = []
+    charge_points, errors = import_charge_point_excel(excel_file)
 
-    charge_points, errors = import_charge_point_excel(excel_file, existing_charge_points)
+    new_charge_points = [cp["charge_point_id"] for cp in charge_points]
+    replaced_charge_points = ChargePointRepository.get_replaced_charge_points(entity, new_charge_points)
 
     replaceable_applications = ElecChargePointApplication.objects.filter(
         cpo=entity, status__in=[ElecChargePointApplication.PENDING, ElecChargePointApplication.REJECTED]
@@ -36,6 +37,8 @@ def check_application(request: HttpRequest, entity):
     data["charge_point_count"] = len(charge_points)
     data["errors"] = []
     data["error_count"] = 0
+    data["replaced_count"] = replaced_charge_points.count()
+    data["replaced"] = [cp.charge_point_id for cp in replaced_charge_points]
     data["pending_application_already_exists"] = replaceable_applications.count() > 0
 
     if len(errors) > 0:

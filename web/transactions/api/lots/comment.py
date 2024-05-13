@@ -19,16 +19,14 @@ def add_comment(request, *args, **kwargs):
     status = request.POST.get("status", False)
     comment = request.POST.get("comment", False)
     if not comment:
-        return JsonResponse(
-            {"status": "error", "message": "Missing comment"}, status=400
-        )
+        return JsonResponse({"status": "error", "message": "Missing comment"}, status=400)
     is_visible_by_admin = request.POST.get("is_visible_by_admin", False)
     is_visible_by_auditor = request.POST.get("is_visible_by_auditor", False)
     entity = Entity.objects.get(id=entity_id)
     lots = get_entity_lots_by_status(entity, status)
     lots = filter_lots(lots, request.POST, entity)
 
-    for lot in lots.iterator():
+    for lot in lots:
         if (
             lot.carbure_supplier != entity
             and lot.carbure_client != entity

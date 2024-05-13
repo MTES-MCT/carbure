@@ -34,14 +34,20 @@ def get_snapshot(request):
             {
                 "charge_points_applications": charge_points_applications.count(),
                 "charge_points_applications_pending": charge_points_applications.filter(
-                    status__in=[ElecChargePointApplication.PENDING, ElecChargePointApplication.AUDIT_IN_PROGRESS]
+                    status=ElecChargePointApplication.PENDING
+                ).count(),
+                "charge_points_applications_audit_in_progress": charge_points_applications.filter(
+                    status=ElecChargePointApplication.AUDIT_IN_PROGRESS
                 ).count(),
                 "charge_points_applications_history": charge_points_applications.filter(
                     status__in=[ElecChargePointApplication.REJECTED, ElecChargePointApplication.ACCEPTED]
                 ).count(),
                 "meter_readings_applications": meter_readings_applications.count(),
                 "meter_readings_applications_pending": meter_readings_applications.filter(
-                    status__in=[ElecMeterReadingApplication.PENDING, ElecMeterReadingApplication.AUDIT_IN_PROGRESS]
+                    status=ElecMeterReadingApplication.PENDING
+                ).count(),
+                "meter_readings_applications_audit_in_progress": meter_readings_applications.filter(
+                    status=ElecMeterReadingApplication.AUDIT_IN_PROGRESS
                 ).count(),
                 "meter_readings_applications_history": meter_readings_applications.filter(
                     status__in=[ElecMeterReadingApplication.REJECTED, ElecMeterReadingApplication.ACCEPTED]

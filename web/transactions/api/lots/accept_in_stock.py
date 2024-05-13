@@ -27,7 +27,7 @@ def accept_in_stock(request, *args, **kwargs):
     created_events = []
     created_stocks = []
 
-    for lot in lots.iterator():
+    for lot in lots:
         lot_errors = []
 
         if entity != lot.carbure_client:
