@@ -46,11 +46,6 @@ const Registry = () => {
             label: t("Dépôts"),
           },
           {
-            path: "#depots",
-            key: "depots",
-            label: t("Dépôts"),
-          },
-          {
             path: "#double-counting",
             key: "double-counting",
             label: t("Double comptage"),
