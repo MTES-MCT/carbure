@@ -8,6 +8,8 @@ from elec.models import (
     ElecMeterReading,
     ElecMeterReadingApplication,
 )
+from elec.models.elec_audit_charge_point import ElecAuditChargePoint
+from elec.models.elec_audit_sample import ElecAuditSample
 
 
 @admin.register(ElecProvisionCertificate)
@@ -132,4 +134,28 @@ class ElecMeterReadingAdmin(admin.ModelAdmin):
         "cpo__name",
         "charge_point__station_id",
         "charge_point__station_name",
+    ]
+
+
+@admin.register(ElecAuditSample)
+class ElecAuditSampleAdmin(admin.ModelAdmin):
+    list_display = [
+        "id",
+        "status",
+    ]
+    search_fields = [
+        "id",
+    ]
+
+
+@admin.register(ElecAuditChargePoint)
+class ElecAuditChargePointAdmin(admin.ModelAdmin):
+    list_display = [
+        "id",
+        "charge_point",
+        "meter_reading",
+    ]
+
+    search_fields = [
+        "id",
     ]
