@@ -7,6 +7,7 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import ApplicationSummary from "./details-application-summary"
 import SampleSummary from "./details-sample-summary"
+import ChargePointsSampleMap from "./sample-map"
 
 
 
@@ -38,18 +39,17 @@ export const ChargingPointsApplicationDetailsInProgress = ({
         <section>
 
           <SampleSummary sample={chargePointApplication?.sample} />
-          <Button icon={Download} label={t("Télécharger l'échantillon")} variant="secondary" action={onDownloadSample} asideX />
+          <ChargePointsSampleMap chargePoints={chargePointApplication?.sample?.charge_points} />
+          <Button icon={Download} label={t("Télécharger l'échantillon")} variant="secondary" action={onDownloadSample} style={{ width: "min-content" }} />
 
         </section>
         <section>
           <Checkbox
             value={confirmCheckbox}
             onChange={setConfirmCheckbox}
-            label={t("Je confirme avoir reçu le résultat d'audit de la part de l'auditeur par e-mail afin de valider ou refuser l'inscription de ces points de charge")}
+            label={t("Je confirme avoir reçu le résultat d'audit de la part de l'auditeur par e-mail afin de valider ou refuser l'inscription de ces points de charge.")}
           />
         </section>
-
-
       </main>
 
       <footer>
@@ -59,8 +59,6 @@ export const ChargingPointsApplicationDetailsInProgress = ({
     </>
   )
 }
-
-
 
 
 export default ChargingPointsApplicationDetailsInProgress
