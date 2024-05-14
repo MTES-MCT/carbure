@@ -6,7 +6,7 @@ from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
 from core.excel import ExcelResponse
 from core.models import ExternalAdminRights
-from elec.api.admin.audit.charge_points.application_details import extract_sample
+from elec.api.admin.audit.charge_points.generate_sample import extract_sample
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.repositories.meter_reading_repository import MeterReadingRepository
