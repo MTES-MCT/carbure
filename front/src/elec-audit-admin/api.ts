@@ -54,16 +54,16 @@ export function getChargePointsApplicationDetails(entityId: number, applicationI
 export function generateChargePointsAuditSample(
   entityId: number,
   applicationId: number,
-  percent: number) {
+  percentage: number) {
   return api.post<Api<ElecChargePointsApplicationSample>>("/elec/admin/audit/charge-points/generate-sample", {
     entity_id: entityId,
     application_id: applicationId,
-    percent: percent
+    percentage: percentage
   })
 }
 
 export function downloadChargePointsSample(entityId: number, applicationId: number, sample: boolean = false) {
-  return download("/elec/admin/audit/charge-points/application-details", { entity_id: entityId, application_id: applicationId, export: true, sample: sample })
+  return download("/elec/admin/audit/charge-points/get-sample", { entity_id: entityId, application_id: applicationId, export: true })
 }
 
 
