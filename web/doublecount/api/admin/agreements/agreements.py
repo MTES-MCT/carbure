@@ -150,7 +150,7 @@ def export_agreements(agreements: List[DoubleCountingRegistration]):
             worksheet.write(row, 2, a["production_site"]["city"])
             worksheet.write(row, 3, a["production_site"]["postal_code"])
             worksheet.write(row, 4, a["production_site"]["country"])
-            worksheet.write(row, 6, a["valid_from"] + "-" + a["valid_until"])
+            worksheet.write(row, 6, a["valid_from"][:4] + "-" + a["valid_until"][:4])
 
             worksheet.write(row, 7, a["biofuel_list"])
 
