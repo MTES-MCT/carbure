@@ -11,6 +11,10 @@ from elec.serializers.elec_charge_point import ElecChargePointSampleSerializer
 from elec.services.export_charge_point_excel import export_charge_points_sample_to_excel
 
 
+class GetSampleError:
+    NO_SAMPLE_FOUND = "NO_SAMPLE_FOUND"
+
+
 class GetSampleForm(forms.Form):
     application_id = forms.ModelChoiceField(queryset=ChargePointRepository.get_annotated_applications())
     export = forms.BooleanField(required=False)
@@ -27,7 +31,12 @@ def get_sample(request):
     application = form.cleaned_data["application_id"]
     export = form.cleaned_data["export"]
 
-    audited_charge_points = application.audit_sample.first().audited_charge_points.all()
+    audit_sample = application.audit_sample.first()
+
+    if not audit_sample:
+        return ErrorResponse(404, GetSampleError.NO_SAMPLE_FOUND)
+
+    audited_charge_points = audit_sample.audited_charge_points.all()
     charge_points = ElecChargePoint.objects.filter(charge_point_audit__in=audited_charge_points)
 
     if export:
