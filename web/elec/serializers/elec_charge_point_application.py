@@ -50,17 +50,17 @@ class ElecChargePointApplicationDetailsSerializer(ElecChargePointApplicationSeri
         return [u.email for u in users]
 
     def get_sample(self, instance):
-        data = {
-            "application_id": instance.id,
-            "percentage": 0,
-            "charge_points": [],
-        }
-
         audit_sample = instance.audit_sample.first()
 
-        if audit_sample:
-            audited_charge_points = audit_sample.audited_charge_points.all()
-            charge_points = ElecChargePoint.objects.filter(charge_point_audit__in=audited_charge_points)
-            data["charge_points"] = ElecChargePointSampleSerializer(charge_points, many=True).data
+        # old applications do not have a registered audit sample
+        if not audit_sample:
+            return None
 
-        return data
+        audited_charge_points = audit_sample.audited_charge_points.all()
+        charge_points = ElecChargePoint.objects.filter(charge_point_audit__in=audited_charge_points)
+
+        return {
+            "application_id": instance.id,
+            "percentage": 0,
+            "charge_points": ElecChargePointSampleSerializer(charge_points, many=True).data,
+        }
