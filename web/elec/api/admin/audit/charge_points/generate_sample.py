@@ -48,7 +48,7 @@ def generate_sample(request):
     charge_points = ChargePointRepository.get_annotated_application_charge_points(application.cpo, application)
     charge_point_sample = extract_sample(charge_points, percentage)
 
-    new_audit = ElecAuditSample.objects.create(charge_point_application=application)
+    new_audit = ElecAuditSample.objects.create(charge_point_application=application, percentage=percentage * 100)
 
     charge_point_audits = [ElecAuditChargePoint(audit_sample=new_audit, charge_point=charge_point) for charge_point in charge_point_sample]  # fmt:skip
     ElecAuditChargePoint.objects.bulk_create(charge_point_audits)
@@ -56,7 +56,7 @@ def generate_sample(request):
     return SuccessResponse(
         {
             "application_id": application.id,
-            "percentage": percentage * 100,
+            "percentage": new_audit.percentage,
             "charge_points": ElecChargePointSampleSerializer(charge_point_sample, many=True).data,
         }
     )

@@ -61,6 +61,6 @@ class ElecChargePointApplicationDetailsSerializer(ElecChargePointApplicationSeri
 
         return {
             "application_id": instance.id,
-            "percentage": 0,
+            "percentage": audit_sample.percentage,
             "charge_points": ElecChargePointSampleSerializer(charge_points, many=True).data,
         }
