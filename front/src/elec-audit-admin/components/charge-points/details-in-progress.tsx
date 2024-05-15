@@ -29,20 +29,18 @@ export const ChargingPointsApplicationDetailsInProgress = ({
 
   return (
     <>
-
       <main>
-
         <section>
           <ApplicationSummary application={chargePointApplication} />
         </section>
         <Divider />
-        <section>
-
-          <SampleSummary sample={chargePointApplication?.sample} />
-          <ChargePointsSampleMap chargePoints={chargePointApplication?.sample?.charge_points} />
-          <Button icon={Download} label={t("Télécharger l'échantillon")} variant="secondary" action={onDownloadSample} style={{ width: "min-content" }} />
-
-        </section>
+        {chargePointApplication?.sample && (
+          <section>
+            <SampleSummary sample={chargePointApplication?.sample} />
+            <ChargePointsSampleMap chargePoints={chargePointApplication?.sample?.charge_points} />
+            <Button icon={Download} label={t("Télécharger l'échantillon")} variant="secondary" action={onDownloadSample} style={{ width: "min-content" }} />
+          </section>
+        )}
         <section>
           <Checkbox
             value={confirmCheckbox}
