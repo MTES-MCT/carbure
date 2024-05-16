@@ -56,14 +56,18 @@ export const CompanyRegistrationDialog = () => {
     navigate("/account/")
   }
 
-  const fillFormWithFoundCompany = (company: SearchCompanyPreview, warning?: string) => {
-    setPrefetchedCompany(company)
+  const fillFormWithFoundCompany = (company?: SearchCompanyPreview, warning?: string) => {
+    if (company) {
+      setPrefetchedCompanyWarning(undefined)
+      notify(t("Les informations ont été pré-remplies avec les données de l'entreprises"), {
+        variant: "success",
+      })
+    }
     if (warning) {
       setPrefetchedCompanyWarning(warning)
     }
-    notify(t("Les informations ont été pré-remplies avec les données de l'entreprises"), {
-      variant: "success",
-    })
+    setPrefetchedCompany(company)
+
   }
 
   const onSubmitForm = (formValue: CompanyRegistrationFormValue | undefined) => {
