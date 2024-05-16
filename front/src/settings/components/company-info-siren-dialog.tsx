@@ -37,7 +37,7 @@ export const CompanyInfoSirenDialog = ({
 
     if (company) {
       setPrefetchedCompanyWarning(undefined)
-      notify(t("Les informations ont été pré-remplies avec les données de l'entreprises"), {
+      notify(t("Les informations ont été pré-remplies avec les informations de l'entreprises"), {
         variant: "success",
       })
     }
@@ -63,7 +63,7 @@ export const CompanyInfoSirenDialog = ({
         <main>
           <section>
             <p>
-              <Trans>Rechercher votre société dans la base de donnée entreprises.data.gouv :</Trans>
+              <Trans>Rechercher votre société dans la base de données entreprises.data.gouv :</Trans>
             </p>
           </section>
           <section>
@@ -88,8 +88,6 @@ export const CompanyInfoSirenDialog = ({
               <Alert icon={AlertCircle} variant="info">
                 <Trans>Votre société n'est pas immatriculée en France ? Choisissez votre pays dans le formulaire afin de remplir manuellement les données associées.</Trans>
               </Alert>
-
-
             </section>
           )}
 

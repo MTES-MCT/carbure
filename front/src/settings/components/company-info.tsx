@@ -102,10 +102,10 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
       <section>
         <Alert icon={AlertCircle} variant={companyForm.value.registration_id ? "info" : "warning"}>
           {t(
-            "Complétez vos données à partir de votre numéro SIREN"
+            "Complétez vos informations à partir de votre numéro SIREN"
           )}
           <Button variant="primary" action={showAutofillDialog} asideX         >
-            {t("Compléter mes données")}
+            {t("Compléter mes informations")}
           </Button>
         </Alert>
       </section>
