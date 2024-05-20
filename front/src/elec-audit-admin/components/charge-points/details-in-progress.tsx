@@ -52,7 +52,7 @@ export const ChargingPointsApplicationDetailsInProgress = ({
 
       <footer>
         <Button icon={Check} label={t("Valider")} variant="success" action={onAccept} disabled={!confirmCheckbox} />
-        <Button icon={Cross} label={t("Refuser")} variant="danger" action={onReject} disabled={!confirmCheckbox} />
+        <Button icon={Cross} label={t("Refuser")} variant="danger" action={onReject} />
       </footer>
     </>
   )

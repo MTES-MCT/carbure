@@ -14,7 +14,7 @@ import apiMocks from "__test__/api"
 if (process.env.NODE_ENV === "development") {
   const worker = setupWorker(...apiMocks)
   console.log("DEV MODE : to enable/disable the mocked api, comment/uncomment the line below in the file 'index.tsx'")
-  worker.start()
+  // worker.start()
 }
 
 createRoot(document.getElementById("root")!).render(
