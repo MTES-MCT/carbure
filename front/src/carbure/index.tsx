@@ -27,6 +27,7 @@ import PublicStats from "./components/public-stats"
 import Topbar from "./components/top-bar"
 import useEntity, { EntityContext, useEntityManager } from "./hooks/entity"
 import useUserManager, { UserContext } from "./hooks/user"
+import ElecAudit from "elec-audit"
 
 
 const Carbure = () => {
@@ -145,11 +146,17 @@ const Org = () => {
 
       </>)}
 
+      {isAuditor && (<>
+        <Route path="elec-audit/:year/*" element={<ElecAudit />} />
+        <Route path="elec-audit" element={<Navigate replace to={`${currentYear}`} />} />
+      </>)}
+
       {(isAdmin || isAuditor) && (<>
         <Route path="controls/:year/*" element={<Controls />} />
         <Route path="controls" element={<Navigate replace to={`${currentYear}`} />} />
       </>)}
       {isAuditor && <Route path="*" element={<Navigate replace to="controls" />} />}
+
 
       {(isAdmin || hasDCA) && <Route path="double-counting/*" element={<DoubleCounting />} />}
       {hasDCA && <Route path="*" element={<Navigate replace to="double-counting" />} />}
