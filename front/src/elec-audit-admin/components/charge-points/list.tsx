@@ -9,7 +9,8 @@ import ChargePointsApplicationsTable from "elec/components/charge-points/table"
 import { ElecChargePointsApplication } from "elec/types"
 import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
-import * as api from "../../api"
+import * as apiAudit from "../../api"
+import * as api from "elec-admin/api"
 import ElecAdminAuditFilters from "../list-filters"
 import { StatusSwitcher } from "../status-switcher"
 import ChargingPointsApplicationDetailsDialog from "./details"
@@ -30,7 +31,7 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
 
   const [state, actions] = useElecAdminAuditChargePointsQueryParamsStore(entity, year, status, snapshot)
   const query = useElectAdminAuditQuery(state)
-  const chargePointsApplicationsResponse = useQuery(api.getChargePointsApplications, {
+  const chargePointsApplicationsResponse = useQuery(apiAudit.getChargePointsApplications, {
     key: "audit-charge-points-applications",
     params: [query],
   })
@@ -45,12 +46,11 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
   }
 
   const downloadChargePointsApplication = (chargePointApplication: ElecChargePointsApplication) => {
-    api.downloadChargePointsSample(entity.id, chargePointApplication.id)
+    api.downloadChargePointsApplicationDetails(entity.id, chargePointApplication.cpo.id, chargePointApplication.id)
   }
 
 
   const chargePointsApplicationsData = chargePointsApplicationsResponse.result?.data.data
-  // const chargePointsApplicationsData = elecAdminChargePointsApplicationsList // TEST
 
   const total = chargePointsApplicationsData?.total ?? 0
   const count = chargePointsApplicationsData?.returned ?? 0
@@ -63,7 +63,7 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={(filter) =>
-            api.getElecAdminAuditChargePointsApplicationsFilters(filter, query)
+            apiAudit.getElecAdminAuditChargePointsApplicationsFilters(filter, query)
           }
         />
       </Bar>

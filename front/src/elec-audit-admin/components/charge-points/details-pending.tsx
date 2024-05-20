@@ -50,7 +50,7 @@ export const ChargingPointsApplicationDetailsPending = ({
   const [sample, setSample] = useState<ElecChargePointsApplicationSample | undefined>(undefined)
 
   const startApplicationAuditMutation = useMutation(api.startChargePointsApplicationAudit, {
-    invalidates: ["audit-charge-points-application-details", "audit-charge-points-applications"],
+    invalidates: ["audit-charge-points-application-details", "audit-charge-points-applications", "elec-admin-audit-snapshot"],
     onSuccess() {
       notify(t("L'audit de l'échantillon des {{count}} points de recharge a bien été initié.", { count: sample?.charge_points.length }), { variant: "success" })
       closeDialog()
