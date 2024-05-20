@@ -3,6 +3,7 @@ import Auth from "auth"
 import { PortalProvider } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
 import Entities from "companies-admin"
+import useMissingCompanyInfoModal from "companies/hooks/missing-company-info-modal"
 import Controls from "controls"
 import Dashboard from "dashboard"
 import DoubleCounting from "double-counting-admin"
@@ -26,6 +27,7 @@ import PublicStats from "./components/public-stats"
 import Topbar from "./components/top-bar"
 import useEntity, { EntityContext, useEntityManager } from "./hooks/entity"
 import useUserManager, { UserContext } from "./hooks/user"
+
 
 const Carbure = () => {
   const user = useUserManager()
@@ -77,6 +79,7 @@ const currentYear = new Date().getFullYear()
 
 const Org = () => {
   const entity = useEntity()
+  useMissingCompanyInfoModal() //TO DELETE WHEN ALL COMPANIES ARE REGISTRED
 
   const {
     isAdmin,
