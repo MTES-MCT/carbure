@@ -56,14 +56,18 @@ export const CompanyRegistrationDialog = () => {
     navigate("/account/")
   }
 
-  const fillFormWithFoundCompany = (company: SearchCompanyPreview, warning?: string) => {
-    setPrefetchedCompany(company)
+  const fillFormWithFoundCompany = (company?: SearchCompanyPreview, warning?: string) => {
+    if (company) {
+      setPrefetchedCompanyWarning(undefined)
+      notify(t("Les informations ont été pré-remplies avec les données de l'entreprises"), {
+        variant: "success",
+      })
+    }
     if (warning) {
       setPrefetchedCompanyWarning(warning)
     }
-    notify(t("Les informations ont été pré-remplies avec les données de l'entreprises"), {
-      variant: "success",
-    })
+    setPrefetchedCompany(company)
+
   }
 
   const onSubmitForm = (formValue: CompanyRegistrationFormValue | undefined) => {
@@ -119,10 +123,9 @@ export const CompanyRegistrationDialog = () => {
             <p><Trans>Votre société n’est pas immatriculée en France ? </Trans>
               <MailTo user="carbure" host="beta.gouv.fr"
                 subject={t("[CarbuRe - Société] Je souhaite ajouter une société étrangère")}
-                body={t("body=Bonjour%2C%E2%80%A8%E2%80%A8Je%20souhaite%20ajouter%20ma%20soci%C3%A9t%C3%A9%20sur%20CarbuRe%20mais%20celle-ci%20n%E2%80%99est%20pas%20immatricul%C3%A9e%20en%20France.%0A%0AVoici%20les%20informations%20la%20concernant%20%3A%0A%0A1%20-%20Nom%20de%20la%20soci%C3%A9t%C3%A9%20%3A%0A%0A2%20-%20Description%20de%20l'activit%C3%A9%20(obligatoire)%20%3A%0A%0A3%20-%20Justificatif%20d%E2%80%99enregistrement%20officiel%20local%20%3A%0A%0A4%20-%20Adresse%20postale%20%3A%E2%80%A8%0AMerci%20beaucoup%E2%80%A8Bien%20cordialement%2C")}
+                body={t("Bonjour%2C%E2%80%A8%E2%80%A8Je%20souhaite%20ajouter%20ma%20soci%C3%A9t%C3%A9%20sur%20CarbuRe%20mais%20celle-ci%20n%E2%80%99est%20pas%20immatricul%C3%A9e%20en%20France.%0A%0AVoici%20les%20informations%20la%20concernant%20%3A%0A%0A1%20-%20Nom%20de%20la%20soci%C3%A9t%C3%A9%20%3A%0A%0A2%20-%20Description%20de%20l'activit%C3%A9%20(obligatoire)%20%3A%0A%0A3%20-%20Justificatif%20d%E2%80%99enregistrement%20officiel%20local%20%3A%0A%0A4%20-%20Adresse%20postale%20%3A%E2%80%A8%0AMerci%20beaucoup%E2%80%A8Bien%20cordialement%2C")}
               >
                 <Trans>Ajoutez une société étrangère</Trans>
-                <ExternalLink size={20} />
               </MailTo></p>
             <p><Trans>Vous ne trouvez pas votre société ? </Trans>
               <MailTo user="carbure" host="beta.gouv.fr"
@@ -130,7 +133,6 @@ export const CompanyRegistrationDialog = () => {
                 body={t("Bonjour%2C%E2%80%A8%E2%80%A8Je%20souhaite%20ajouter%20ma%20soci%C3%A9t%C3%A9%20sur%20CarbuRe%20mais%20celle-ci%20est%20introuvable%20dans%20la%20base%20de%20donn%C3%A9es.%20Voici%20les%20informations%20la%20concernant%20%3A%0D%0A%0D%0A1%20-%20Nom%20de%20la%20soci%C3%A9t%C3%A9%20%3A%0D%0A%0D%0A2%20-%20Description%20de%20l'activit%C3%A9%20(obligatoire)%20%3A%0D%0A%0D%0A3%20-%20SIREN%20%3A%0D%0A%0D%0A4%20-%20Adresse%20postale%20%3A%E2%80%A8%0D%0AMerci%20beaucoup%E2%80%A8Bien%20cordialement%2C")}
               >
                 <Trans>Signalez un problème.</Trans>
-                <ExternalLink size={20} />
               </MailTo></p>
 
           </section>

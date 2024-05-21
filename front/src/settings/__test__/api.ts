@@ -268,7 +268,7 @@ export const okDoubleCountUploadApplication = rest.post(
   }
 )
 
-export const okDoubleCountUploadAgreements = mockGetWithResponseData("/api/double-counting/agreements", [])
+export const okDoubleCountUploadAgreements = mockGetWithResponseData("/double-counting/agreements", [])
 
 
 export const okDoubleCountUploadDocumentation = rest.post(

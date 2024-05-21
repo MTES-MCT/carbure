@@ -2,16 +2,19 @@ import useEntity from "carbure/hooks/entity"
 import { Country, Entity, UserRole } from "carbure/types"
 import Button from "common/components/button"
 import Form, { useForm } from "common/components/form"
-import { Save } from "common/components/icons"
+import { AlertCircle, Save, Search } from "common/components/icons"
 import { TextArea, TextInput } from "common/components/input"
 import { LoaderOverlay, Panel } from "common/components/scaffold"
 import { useMutation } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import * as api from "../api/company"
-import { CompanyFormValue } from "companies/types"
+import { CompanyFormValue, SearchCompanyPreview } from "companies/types"
 import Autocomplete from "common/components/autocomplete"
 import { findCountries } from "carbure/api"
 import { normalizeCountry } from "carbure/utils/normalizers"
+import Alert from "common/components/alert"
+import { usePortal } from "common/components/portal"
+import CompanyInfoSirenDialog from "./company-info-siren-dialog"
 
 
 type CompanyInfoProps = {
@@ -21,6 +24,7 @@ type CompanyInfoProps = {
 const CompanyInfo = ({ company }: CompanyInfoProps) => {
   const { t } = useTranslation()
   const loggedEntity = useEntity()
+  const portal = usePortal()
 
   const entity = company || loggedEntity
   const readOnly = company && !loggedEntity.hasRights(UserRole.Admin, UserRole.ReadWrite)
@@ -52,6 +56,22 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
     }
   }
 
+  const prefillCompanyInfo = (prefetchedCompany: SearchCompanyPreview) => {
+    companyForm.setField("legal_name", prefetchedCompany.legal_name)
+    companyForm.setField("registered_address", prefetchedCompany.registered_address)
+    companyForm.setField("registered_city", prefetchedCompany.registered_city)
+    companyForm.setField("registered_country", prefetchedCompany.registered_country)
+    companyForm.setField("registered_zipcode", prefetchedCompany.registered_zipcode)
+    companyForm.setField("registration_id", prefetchedCompany.registration_id)
+  }
+
+  const showAutofillDialog = () => {
+    portal((close) => (
+      <CompanyInfoSirenDialog onClose={close} wantPrefillCompanyInfo={prefillCompanyInfo} />
+    ))
+  }
+
+  const isLockedField = !companyForm.value.registered_country || companyForm.value.registered_country.code_pays === "FR"
 
   return (
     <Panel id="info">
@@ -80,42 +100,22 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
       )}
 
       <section>
+        <Alert icon={AlertCircle} variant={companyForm.value.registration_id ? "info" : "warning"}>
+          {t(
+            "Complétez vos informations à partir de votre numéro SIREN"
+          )}
+          <Button variant="primary" action={showAutofillDialog} asideX         >
+            {t("Compléter mes informations")}
+          </Button>
+        </Alert>
+      </section>
+
+      <section>
         <Form
           form={companyForm}
           id="entity-info"
           onSubmit={onSubmitForm}
         >
-          <TextInput
-            required
-            readOnly={readOnly}
-            label={t("N° d'enregistrement de la société (SIREN ou équivalent)")}
-            {...companyForm.bind("registration_id")}
-          />
-
-          <TextInput
-            required
-            readOnly={readOnly}
-            label={t("Nom légal")}
-            {...companyForm.bind("legal_name")}
-          />
-          <TextInput
-            required
-            readOnly={readOnly}
-            label={t("Adresse de la société (Numéro et rue)")}
-            {...companyForm.bind("registered_address")}
-          />
-          <TextInput
-            required
-            readOnly={readOnly}
-            label={t("Ville")}
-            {...companyForm.bind("registered_city")}
-          />
-          <TextInput
-            required
-            readOnly={readOnly}
-            label={t("Code postal")}
-            {...companyForm.bind("registered_zipcode")}
-          />
           <Autocomplete
             required
             readOnly={readOnly}
@@ -125,6 +125,48 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
             normalize={normalizeCountry}
             {...companyForm.bind("registered_country")}
           />
+
+          <TextInput
+            required
+            readOnly={readOnly}
+            label={t("N° d'enregistrement de la société (SIREN ou équivalent)")}
+            {...companyForm.bind("registration_id")}
+            disabled={isLockedField}
+          />
+
+          <TextInput
+            required
+            readOnly={readOnly}
+            label={t("Nom légal")}
+            {...companyForm.bind("legal_name")}
+            disabled={isLockedField}
+
+          />
+          <TextInput
+            required
+            readOnly={readOnly}
+            label={t("Adresse de la société (Numéro et rue)")}
+            {...companyForm.bind("registered_address")}
+            disabled={isLockedField}
+
+          />
+          <TextInput
+            required
+            readOnly={readOnly}
+            label={t("Ville")}
+            {...companyForm.bind("registered_city")}
+            disabled={isLockedField}
+
+          />
+          <TextInput
+            required
+            readOnly={readOnly}
+            label={t("Code postal")}
+            {...companyForm.bind("registered_zipcode")}
+            disabled={isLockedField}
+
+          />
+
           <TextInput
             required
             readOnly={readOnly}
@@ -158,7 +200,6 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
           />
 
           <TextInput
-            required
             readOnly={readOnly}
             placeholder="https://www.example.com"
             type="url"
@@ -167,7 +208,6 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
           />
 
           <TextInput
-            required
             readOnly={readOnly}
             label={t("Numéro de TVA")}
             {...companyForm.bind("vat_number")}
