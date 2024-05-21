@@ -82,10 +82,6 @@ export const elecChargePointApplicationPending: ElecChargePointsApplication = {
     status: ElecAuditApplicationStatus.Pending,
 }
 
-export const elecChargePointApplicationDetailsPending: ElecChargePointsApplicationDetails = {
-    ...elecChargePointApplicationPending,
-    email_contacts: ["test1@carbure.com", "test2@carbure.com"]
-}
 
 
 const elecChargePointApplicationRejected: ElecChargePointsApplication = {
@@ -104,15 +100,11 @@ export const elecChargePointApplicationAuditInProgress: ElecChargePointsApplicat
     charge_point_count: 5,
     power_total: 1000,
     application_date: "2023-09-01",
+    audit_order_date: "2023-09-02",
     status: ElecAuditApplicationStatus.AuditInProgress,
 }
 
-export const elecChargePointApplicationDetailsInProgress: ElecChargePointsApplicationDetails = {
-    ...elecChargePointApplicationAuditInProgress,
-    email_contacts: ["test1@carbure.com"],
-    sample: elecChargePointsApplicationSample
 
-}
 
 export const elecChargePointApplicationAuditDone: ElecChargePointsApplication = {
     id: 3,
@@ -121,6 +113,7 @@ export const elecChargePointApplicationAuditDone: ElecChargePointsApplication = 
     charge_point_count: 5,
     power_total: 1000,
     application_date: "2023-09-01",
+    audit_order_date: "2023-09-02",
     status: ElecAuditApplicationStatus.AuditDone,
 
 }
@@ -135,6 +128,19 @@ const elecChargePointApplicationAccepted: ElecChargePointsApplication = {
     validation_date: "2023-11-01",
     status: ElecAuditApplicationStatus.Accepted,
 }
+
+export const elecChargePointApplicationDetailsPending: ElecChargePointsApplicationDetails = {
+    ...elecChargePointApplicationPending,
+    email_contacts: ["test1@carbure.com", "test2@carbure.com"]
+}
+
+export const elecChargePointApplicationDetailsInProgress: ElecChargePointsApplicationDetails = {
+    ...elecChargePointApplicationAuditInProgress,
+    email_contacts: ["test1@carbure.com"],
+    sample: elecChargePointsApplicationSample
+}
+
+
 export const elecChargePointsApplications: ElecChargePointsApplication[] = [
     elecChargePointApplicationPending,
     elecChargePointApplicationRejected,

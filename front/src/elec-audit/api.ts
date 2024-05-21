@@ -4,7 +4,7 @@ import { ElecAuditFilter, ElecAuditQuery, ElecAuditSnapshot } from "./types"
 import { ElecChargePointsApplicationsData } from "elec-audit-admin/types"
 
 export function getYears(entity_id: number) {
-  return api.get<Api<number[]>>("/elec/admin/audit/years", {
+  return api.get<Api<number[]>>("/elec/audit/years", {
     params: { entity_id },
   })
 }
@@ -16,7 +16,7 @@ export function getChargePointDetails(entity_id: number, charge_point_id: number
 
 // AUDIT
 export function getSnapshot(entity_id: number, year: number) {
-  return api.get<Api<ElecAuditSnapshot>>("/elec/admin/audit/snapshot", {
+  return api.get<Api<ElecAuditSnapshot>>("/elec/audit/snapshot", {
     params: { entity_id, year },
   })
 }

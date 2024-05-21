@@ -6,19 +6,21 @@ import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { ElecAdminAuditSnapshot } from "elec-audit-admin/types"
 import ChargePointsApplicationsTable from "elec/components/charge-points/table"
-import { ElecChargePointsApplication } from "elec/types"
+import { ElecAuditApplicationStatus, ElecChargePointsApplication } from "elec/types"
 import { useTranslation } from "react-i18next"
-import { useLocation, useMatch } from "react-router-dom"
+import { To, useLocation, useMatch } from "react-router-dom"
 import * as api from "elec-audit/api"
 import { useElecAuditChargePointsQueryParamsStore } from "./list-query-params-store"
 import { useElecAuditQuery } from "./list-query"
 import ElecAuditFilters from "./list-filters"
-import { ElecAuditFilter, ElecAuditStatus } from "elec-audit/types"
+import { ElecAuditFilter, ElecAuditSnapshot, ElecAuditStatus } from "elec-audit/types"
 import { StatusSwitcher } from "./status-switcher"
+import AuditChargePointsApplicationsTable from "./table"
+import ChargingPointsApplicationDetailsDialog from "./details"
 
 
 type TransferListProps = {
-  snapshot: ElecAdminAuditSnapshot
+  snapshot: ElecAuditSnapshot
   year: number
 }
 
@@ -36,19 +38,17 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
     params: [query],
   })
 
-  const showChargePointsApplicationDetails = (chargePointApplication: ElecChargePointsApplication) => {
+  const showChargePointsApplicationDetails = (chargePointApplication: ElecChargePointsApplication): To => {
+    if (chargePointApplication.status === ElecAuditApplicationStatus.AuditDone) return {}
+
     return {
       pathname: location.pathname,
       search: location.search,
       hash: `application/${chargePointApplication.id}`,
     }
-
   }
 
-
-
   const chargePointsApplicationsData = chargePointsApplicationsResponse.result?.data.data
-
   const total = chargePointsApplicationsData?.total ?? 0
   const count = chargePointsApplicationsData?.returned ?? 0
   return (
@@ -80,12 +80,11 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
 
         {count > 0 && chargePointsApplicationsData ? (
           <>
-            {/* <ChargePointsApplicationsTable
+            <AuditChargePointsApplicationsTable
               loading={chargePointsApplicationsResponse.loading}
               applications={chargePointsApplicationsData.charge_points_applications}
               rowLink={showChargePointsApplicationDetails}
-              displayCpo={true}
-            /> */}
+            />
 
             {(state.limit || 0) < total && (
               <Pagination
@@ -105,7 +104,7 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
       </section >
 
 
-      {/* <HashRoute path="application/:id" element={<ChargingPointsApplicationDetailsDialog />} /> */}
+      <HashRoute path="application/:id" element={<ChargingPointsApplicationDetailsDialog />} />
     </>
   )
 }
