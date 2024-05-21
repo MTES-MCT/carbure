@@ -22,10 +22,7 @@ import SampleGenerationForm from "./details-sample-generation-form"
 import SampleSummary from "./details-sample-summary"
 import ChargePointsSampleMap from "./sample-map"
 
-
 export type GenerationState = "generation" | "verification" | "email" | "confirmation"
-
-
 
 interface ChargingPointsApplicationDetailsPendingProps {
   chargePointApplication: ElecChargePointsApplicationDetails | undefined
@@ -45,9 +42,35 @@ export const ChargingPointsApplicationDetailsPending = ({
   const notifyError = useNotifyError()
   const navigate = useNavigate()
   const location = useLocation()
-  const [step, setStep] = useState<GenerationState>("generation")
   const [confirmCheckbox, setConfirmCheckbox] = useState(false)
   const [sample, setSample] = useState<ElecChargePointsApplicationSample | undefined>(undefined)
+  
+  const [currentStep, setCurrentStep] = useState(0)
+
+  const steps = [
+    { 
+      key: "generation",
+      title: t("Génération de l'échantillon")
+    },
+    {
+      key: "verification",
+      title: t("Audit des points de recharge")
+    },
+    {
+      key: "email",
+      title: t("Génération de l'email "),
+    },
+    {
+      key: "confirmation",
+      title: t("Confirmation de l'envoie de l'ordre de contrôle")
+    }
+  ]
+
+  const step = steps[currentStep].key
+
+  function setStep(key: string) {
+    setCurrentStep(steps.findIndex(step => step.key === key))
+  }
 
   const startApplicationAuditMutation = useMutation(api.startChargePointsApplicationAudit, {
     invalidates: ["audit-charge-points-application-details", "audit-charge-points-applications", "elec-admin-audit-snapshot"],
@@ -64,6 +87,7 @@ export const ChargingPointsApplicationDetailsPending = ({
     navigate({ search: location.search, hash: "#" })
   }
 
+ 
   const startAudit = () => {
     if (!chargePointApplication || !sample) return
     startApplicationAuditMutation.execute(entity.id, chargePointApplication.id,
@@ -83,113 +107,85 @@ export const ChargingPointsApplicationDetailsPending = ({
 
   return (
     <>
-
       <main>
-
         <section>
+          <Stepper
+            title={steps[currentStep].title}
+            stepCount={steps.length}
+            currentStep={currentStep + 1}
+            nextTitle={steps[currentStep + 1]?.title}
+          />
+
           <ApplicationSummary application={chargePointApplication} />
         </section>
-        <Divider />
-        <section>
 
-          {step === "generation" && <>
-            <Stepper
-              title={t("Génération de l'échantillon")}
-              stepCount={4}
-              currentStep={1}
-              nextTitle={t("Audit des points de recharge")}
-            />
+        <Divider />
+        
+        <section>
+          {step === "generation" &&
             <SampleGenerationForm
               power_total={chargePointApplication?.power_total ?? 0}
               applicationId={chargePointApplication?.id}
               onSampleGenerated={handleSampleGenerated} />
-          </>}
+          }
 
           {step === "verification" && sample && <>
-            <Stepper
-              title={t("Vérification de l'échantillon")}
-              stepCount={4}
-              currentStep={2}
-              nextTitle={t("Génération de l'email ")}
-            />
             <SampleSummary sample={sample} />
-            <section>
-              <ChargePointsSampleMap chargePoints={sample.charge_points} />
-            </section>
+            <ChargePointsSampleMap chargePoints={sample.charge_points} />
             <SampleGenerationForm
               power_total={chargePointApplication?.power_total ?? 0}
               applicationId={chargePointApplication?.id}
               onSampleGenerated={handleSampleGenerated}
               retry />
-
           </>}
 
           {step === "email" && <>
-            <Stepper title={t("Génération de l'email ")}
-              stepCount={4}
-              currentStep={3}
-              nextTitle={t("Confirmation de l'envoie de l'ordre de contrôle")} />
-            <section>
-              <Alert style={{ flexDirection: "column" }} variant="info"  >
-                <p>
-                  <Send />
-                  <Trans>
-                    Action requise par l'administrateur pour poursuivre l'audit de l'inscription des points de recharge :
-                  </Trans>
-                </p>
-                <ul>
-                  <li><Trans>Joindre le fichier téléchargé comportant l'échantillon des points de recharge à auditer</Trans></li>
-                  <li><Trans>Transmettre cet e-mail à l'aménageur</Trans></li>
-                </ul>
-
-              </Alert>
-            </section>
+            <Alert style={{ flexDirection: "column" }} variant="info"  >
+              <p>
+                <Send />
+                <Trans>
+                  Action requise par l'administrateur pour poursuivre l'audit de l'inscription des points de recharge :
+                </Trans>
+              </p>
+              <ul>
+                <li><Trans>Joindre le fichier téléchargé comportant l'échantillon des points de recharge à auditer</Trans></li>
+                <li><Trans>Transmettre cet e-mail à l'aménageur</Trans></li>
+              </ul>
+            </Alert>
           </>}
 
           {step === "confirmation" && <>
-            <Stepper
-              title={t("Confirmation de l'envoie de l'ordre de contrôle")} stepCount={4} currentStep={4} />
             <Checkbox
               value={confirmCheckbox}
               onChange={setConfirmCheckbox}
               label={t("Je confirme avoir envoyé l'ordre de contrôler par e-mail (pièce jointe attachée).")}
-            />
+              />
           </>}
 
-        </section>
-        <section>
           {!entity.isAdmin && chargePointApplication?.status === ElecAuditApplicationStatus.Pending && (
-            <p><i>
-              {t("En attente de validation de la DGEC.")}
-            </i></p>
+            <p><i>{t("En attente de validation de la DGEC.")}</i></p>
           )}
         </section>
-
       </main>
 
       <footer>
-
-        {step === "generation" && (
-          <>
+        {step === "generation" && <>
             <Button icon={Check} label={t("Valider sans auditer")} variant="success" action={() => onAccept(true)} />
             <Button icon={Cross} label={t("Refuser sans auditer")} variant="danger" action={() => onReject(true)} />
-          </>
-        )}
+        </>}
 
         {step === "verification" && (
           <Button icon={Download} label={t("Télécharger l'échantillon")} variant="primary" action={handleDownloadSample} />
         )}
+
         {step === "email" && chargePointApplication && <>
           <MailtoButton cpo={chargePointApplication.cpo} chargePointCount={chargePointApplication.charge_point_count} emailContacts={chargePointApplication.email_contacts!} onGenerate={() => setStep("confirmation")} />
           <Button asideX icon={ChevronLeft} label={t("Précédent")} variant="secondary" action={() => setStep("verification")} />
-
         </>}
+
         {step === "confirmation" && chargePointApplication && <>
           <Button icon={Send} label={t("Je confirme")} variant="primary" action={startAudit} disabled={!confirmCheckbox || startApplicationAuditMutation.loading} loading={startApplicationAuditMutation.loading} />
         </>}
-
-
-
       </footer>
     </>
   )
@@ -201,6 +197,7 @@ interface MailtoButtonProps {
   emailContacts: string[]
   onGenerate: () => void
 }
+
 const MailtoButton = ({ cpo, chargePointCount, emailContacts, onGenerate }: MailtoButtonProps) => {
   const { t } = useTranslation()
   const subject = `[CarbuRe - Audit Elec] Demande d'audit ${cpo.name}`
@@ -213,7 +210,5 @@ const MailtoButton = ({ cpo, chargePointCount, emailContacts, onGenerate }: Mail
   return <Button icon={Send} label={t("Générer l'email")} variant="primary" href={mailto} action={() => onGenerate()} />
 
 }
-
-
 
 export default ChargingPointsApplicationDetailsPending
