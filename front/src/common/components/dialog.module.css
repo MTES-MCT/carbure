@@ -31,14 +31,14 @@
   max-height: 720px;
 }
 
-.close {
+.dialog .close {
   position: absolute;
   top: 0;
   right: 0;
   padding: var(--spacing-m);
 }
 
-.close:hover {
+.dialog .close:hover {
   background-color: #e7e7e7cc;
 }
 
@@ -51,6 +51,7 @@
   display: flex;
   align-items: center;
   padding: var(--spacing-l);
+  padding-right: 64px;
   gap: var(--spacing-m);
   border-bottom: 1px solid var(--gray-highlight);
 }
