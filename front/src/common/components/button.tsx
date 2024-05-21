@@ -139,7 +139,6 @@ export const ExternalLink = ({
     children: (
       <>
         {children}
-        <ExternalLinkIcon size={20} />
       </>
     ),
   }

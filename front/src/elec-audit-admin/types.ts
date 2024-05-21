@@ -35,6 +35,17 @@ export interface ElecChargePointsApplicationsData {
   total: number
 }
 
+export interface ElecChargePointPreview {
+  charge_point_id: string
+  longitude: number
+  latitude: number
+}
+export interface ElecChargePointsApplicationSample {
+  application_id: number
+  percentage: number
+  charge_points: ElecChargePointPreview[]
+}
+
 export interface ElecMeterReadingsApplicationsData {
   meter_readings_applications: ElecMeterReadingsApplication[]
   from: number
@@ -68,3 +79,5 @@ export interface ElecAdminAuditStates {
   order?: Order
   snapshot?: ElecAdminAuditSnapshot
 }
+
+

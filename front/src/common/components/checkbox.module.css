@@ -4,7 +4,8 @@
   gap: var(--spacing-m);
   cursor: pointer;
   text-align: left;
-  white-space: nowrap;
+  white-space: pre-wrap;
+  /* white-space: nowrap; */
 }
 
 .checkbox:hover {
