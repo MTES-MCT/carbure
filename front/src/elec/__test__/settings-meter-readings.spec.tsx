@@ -3,13 +3,11 @@ import { setEntity, waitWhileLoading } from "carbure/__test__/helpers"
 import { Route } from "react-router-dom"
 import { TestRoot, render } from "setupTests"
 
-import { cpo } from "carbure/__test__/data"
-import ElecChargePointsSettings from "elec/components/charge-points/settings"
-import server from "../../settings/__test__/api"
 import userEvent from "@testing-library/user-event"
-import { okChargePointsApplicationsEmpty, okChargePointsCheckError, okMeterReadingsApplicationsEmpty, okMeterReadingsApplicationsUrgencyCritical, okMeterReadingsCheckError } from "./api"
+import { cpo } from "carbure/__test__/data"
 import ElecMeterReadingsSettings from "elec/components/meter-readings/settings"
-import { elecMeterReadingsApplicationsResponseMissing } from "./data"
+import server from "../../settings/__test__/api"
+import { okMeterReadingsApplicationsEmpty, okMeterReadingsApplicationsUrgencyCritical, okMeterReadingsCheckError } from "./api"
 
 const SettingsWithHooks = () => {
   return (

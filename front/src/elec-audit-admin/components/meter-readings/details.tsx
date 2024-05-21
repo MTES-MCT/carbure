@@ -108,7 +108,7 @@ export const MeterReadingsApplicationDetailsDialog = () => {
             <Form
               id="lot-form"
               variant="columns"
-              style={{ flexWrap: "wrap" }}
+              wrapper
             >
               <TextInput
                 readOnly
