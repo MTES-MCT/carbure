@@ -9,6 +9,12 @@ import { ElecAuditApplicationStatus } from "elec/types"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "elec-audit/api"
+import { Divider } from "common/components/divider"
+import SampleSummary from "elec-audit-admin/components/charge-points/details-sample-summary"
+import ChargePointsSampleMap from "elec-audit-admin/components/charge-points/sample-map"
+import Button from "common/components/button"
+import { Download } from "common/components/icons"
+import ApplicationSummary from "./details-application-summary"
 
 
 
@@ -41,11 +47,26 @@ export const ChargingPointsApplicationDetailsDialog = () => {
       <Dialog onClose={closeDialog} >
         <header>
           <ApplicationStatus status={chargePointApplication?.status} big />
-
           <h1>{t("Inscription de points de recharge")}</h1>
         </header>
 
+        <main>
+          <section>
+            <ApplicationSummary application={chargePointApplication} />
+          </section>
+          <Divider />
+          {chargePointApplication?.sample && (
+            <section>
+              <ChargePointsSampleMap chargePoints={chargePointApplication?.sample?.charge_points} />
+            </section>
+          )}
 
+        </main>
+
+        <footer>
+          <Button icon={Download} label={t("Télécharger le retour de contrôle")} variant="secondary" action={downloadSample} style={{ width: "min-content" }} />
+
+        </footer>
         {chargePointApplicationResponse.loading && <LoaderOverlay />}
       </Dialog>
     </Portal >

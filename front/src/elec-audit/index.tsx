@@ -51,7 +51,7 @@ export const ElecAudit = () => {
 
       </header>
 
-      {/* <ChargePointsApplicationsList snapshot={snapshot} year={years.selected} /> */}
+      <ChargePointsApplicationsList snapshot={snapshot} year={years.selected} />
 
     </Main>
 

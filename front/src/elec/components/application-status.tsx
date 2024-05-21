@@ -7,7 +7,7 @@ const statusToVariant: Record<ElecAuditApplicationStatus, TagVariant> = {
   [ElecAuditApplicationStatus.Pending]: "info",
   [ElecAuditApplicationStatus.Rejected]: "danger",
   [ElecAuditApplicationStatus.AuditInProgress]: "warning",
-  [ElecAuditApplicationStatus.AuditDone]: "warning",
+  [ElecAuditApplicationStatus.AuditDone]: "success",
 }
 
 const ApplicationStatus = ({
