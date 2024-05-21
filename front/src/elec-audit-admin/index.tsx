@@ -38,7 +38,6 @@ export const ElecAdminAudit = () => {
   })
 
   const snapshot = elecAdminAuditSnapshotResponse.result?.data.data ?? defaultElecAdminAuditSnapshot
-  // const snapshot = elecAdminAuditSnapshot // TEST DATA
 
   return (
 

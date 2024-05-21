@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next"
 
 
 interface SirenPickerProps {
-  onSelect: (company: SearchCompanyPreview, warning?: string) => void
+  onSelect: (company?: SearchCompanyPreview, warning?: string) => void
 }
 export const SirenPicker = ({
   onSelect
@@ -29,12 +29,15 @@ export const SirenPicker = ({
         warning = t("Ce SIREN existe déjà dans notre base CarbuRe, sous le nom de {{companyName}}. Assurez-vous que cela soit bien votre entreprise avant de continuer et utilisez un nom différent.", { companyName: companyResult.warning.meta.company_name })
       }
       onSelect(companyResult.company_preview, warning)
+      setError(undefined)
+
     },
     onError: (err) => {
       const error = (err as AxiosError<{ error: string }>).response?.data.error
       if (error === 'NO_COMPANY_FOUND') {
         const message = t("Aucune entreprise n'a été trouvée avec ce numéro de SIREN")
         notifyError(err, message)
+        onSelect()
         setError(message)
         return
       }

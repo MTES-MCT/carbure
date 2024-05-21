@@ -22,7 +22,8 @@
   outline-offset: 1px;
 }
 
-.input {
+.input,
+input[type=radio]:disabled {
   position: absolute;
   opacity: 0;
 }

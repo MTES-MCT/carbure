@@ -37,7 +37,7 @@ export const DeclarationButton = () => {
       asideX
       variant="primary"
       icon={Certificate}
-      label={t("Valider ma déclaration")}
+      label={t("Gérer mes déclarations")}
       to={{ search: location.search, hash: "#declaration" }}
     />
   )

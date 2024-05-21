@@ -66,7 +66,7 @@ export function setEntity(nextEntity: any) {
 }
 
 export const mockGetWithResponseData = (url: string, data: any) => {
-  return rest.get(url, (req, res, ctx) => {
+  return rest.get("/api" + url, (req, res, ctx) => {
     return res(
       ctx.json({
         status: "success",
@@ -76,7 +76,7 @@ export const mockGetWithResponseData = (url: string, data: any) => {
   })
 }
 export const mockPostWithResponseData = (url: string, data?: any, withError: boolean = false, error?: string) => {
-  return rest.post(url, (req, res, ctx) => {
+  return rest.post("/api" + url, (req, res, ctx) => {
     return res(
       withError ? ctx.status(400) : ctx.status(200),
       ctx.json({

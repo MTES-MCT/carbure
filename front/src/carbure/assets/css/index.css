@@ -1,6 +1,7 @@
 @import "./reset.css";
 @import "./fonts.css";
 @import "./theme.css";
+/* @import '@gouvfr/dsfr/dist/css/dsfr.min.css'; */
 
 * {
   box-sizing: border-box;
@@ -21,6 +22,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow: hidden;
+  color: var(--black)
 }
 
 #root {
@@ -45,4 +47,18 @@ input,
 textarea,
 select {
   font-family: var(--font-family);
+}
+
+
+/* Override DSFR */
+[href] {
+  background-image: none;
+}
+
+h1 {
+  line-height: inherit;
+}
+
+.fr-stepper__steps {
+  background-image: repeating-linear-gradient(to right, var(--background-active-blue-france) 0, var(--background-active-blue-france) var(--active-inner), transparent var(--active-inner), transparent var(--active-outer)), repeating-linear-gradient(to right, var(--gray-medium) 0, var(--gray-medium) var(--default-inner), transparent var(--default-inner), transparent var(--default-outer));
 }
