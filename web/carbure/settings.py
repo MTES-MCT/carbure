@@ -269,7 +269,7 @@ if env('TEST'):
 
 
 # CSP header configuration
-CSP_DEFAULT_SRC = ("'self'", "stats.beta.gouv.fr", "metabase.carbure.beta.gouv.fr")
+CSP_DEFAULT_SRC = ("'self'", "stats.beta.gouv.fr", "metabase.carbure.beta.gouv.fr", "https://*.tile.openstreetmap.org/")
 CSP_EXCLUDE_URL_PREFIXES = ("/admin")
 
 # Metabase API key
