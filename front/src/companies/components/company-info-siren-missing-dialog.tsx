@@ -54,10 +54,8 @@ export const CompanyInfoMissingSirenDialog = ({
           </section>
 
           <section>
-            <Alert style={{ flexDirection: "column" }} variant="warning">
-              <p>
-                <AlertCircle />
-                <Trans>Informations manquantes.</Trans></p>
+            <Alert variant="warning" icon={AlertCircle} label={t("Informations manquantes.")}>
+
               <p><Trans>Veuillez compléter les informations suivantes concernant votre société :</Trans></p>
               <ul>
                 {!entity.registration_id && <li><Trans>N° d'enregistrement de la société (SIREN ou équivalent)</Trans></li>}
