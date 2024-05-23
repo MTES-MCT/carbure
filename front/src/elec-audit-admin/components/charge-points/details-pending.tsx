@@ -44,11 +44,11 @@ export const ChargingPointsApplicationDetailsPending = ({
   const location = useLocation()
   const [confirmCheckbox, setConfirmCheckbox] = useState(false)
   const [sample, setSample] = useState<ElecChargePointsApplicationSample | undefined>(undefined)
-  
+
   const [currentStep, setCurrentStep] = useState(0)
 
   const steps = [
-    { 
+    {
       key: "generation",
       title: t("Génération de l'échantillon")
     },
@@ -87,7 +87,7 @@ export const ChargingPointsApplicationDetailsPending = ({
     navigate({ search: location.search, hash: "#" })
   }
 
- 
+
   const startAudit = () => {
     if (!chargePointApplication || !sample) return
     startApplicationAuditMutation.execute(entity.id, chargePointApplication.id,
@@ -120,7 +120,7 @@ export const ChargingPointsApplicationDetailsPending = ({
         </section>
 
         <Divider />
-        
+
         <section>
           {step === "generation" &&
             <SampleGenerationForm
@@ -159,7 +159,7 @@ export const ChargingPointsApplicationDetailsPending = ({
               value={confirmCheckbox}
               onChange={setConfirmCheckbox}
               label={t("Je confirme avoir envoyé l'ordre de contrôler par e-mail (pièce jointe attachée).")}
-              />
+            />
           </>}
 
           {!entity.isAdmin && chargePointApplication?.status === ElecAuditApplicationStatus.Pending && (
@@ -170,8 +170,8 @@ export const ChargingPointsApplicationDetailsPending = ({
 
       <footer>
         {step === "generation" && <>
-            <Button icon={Check} label={t("Valider sans auditer")} variant="success" action={() => onAccept(true)} />
-            <Button icon={Cross} label={t("Refuser sans auditer")} variant="danger" action={() => onReject(true)} />
+          <Button icon={Check} label={t("Valider sans auditer")} variant="success" action={() => onAccept(true)} />
+          <Button icon={Cross} label={t("Refuser sans auditer")} variant="danger" action={() => onReject(true)} />
         </>}
 
         {step === "verification" && (

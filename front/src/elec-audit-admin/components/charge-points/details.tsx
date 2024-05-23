@@ -13,6 +13,7 @@ import ChargePointsApplicationAcceptDialog from "./accept-dialog"
 import ChargingPointsApplicationDetailsInProgress from "./details-in-progress"
 import ChargingPointsApplicationDetailsPending from "./details-pending"
 import ChargePointsApplicationRejectDialog from "./reject-dialog"
+import ChargingPointsApplicationDetailsAccepted from "./details-accepted"
 
 
 export const ChargingPointsApplicationDetailsDialog = () => {
@@ -86,6 +87,12 @@ export const ChargingPointsApplicationDetailsDialog = () => {
             onAccept={acceptApplication}
             onReject={rejectApplication}
             onDownloadSample={downloadSample}
+          />
+        )
+        }
+        {chargePointApplication?.status === ElecAuditApplicationStatus.Accepted && (
+          <ChargingPointsApplicationDetailsAccepted
+            chargePointApplication={chargePointApplication}
           />
         )
         }
