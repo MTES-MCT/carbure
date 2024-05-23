@@ -57,6 +57,8 @@ const SampleGenerationForm = ({
         autoFocus
         onChange={setPercent}
         required
+        max={100}
+        min={1}
         label={t("Pourcentage de puissance installée à auditeur (%)")}
         icon={() => (
           <Button
