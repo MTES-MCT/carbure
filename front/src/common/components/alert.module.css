@@ -8,6 +8,7 @@
   /* white-space: nowrap; */
   overflow: hidden;
   text-overflow: ellipsis;
+  flex-direction: column;
 }
 
 .alert.loading {
@@ -17,6 +18,12 @@
 .alert [data-icon] {
   flex-shrink: 0;
   color: var(--gray-dark);
+}
+
+.alert header {
+  display: flex;
+  gap: var(--spacing-s);
+  align-items: center;
 }
 
 .info {

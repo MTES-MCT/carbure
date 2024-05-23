@@ -46,10 +46,13 @@ export const Alert = ({
         variant && css[variant]
       )}
     >
-      {loading ? <Loader /> : icon}
-      {/* ne pas rajouter de markup ici, ça casse le styling */}
-      {/* si vraiment besoin, passer le markup dans les children */}
-      {label ?? child}
+      <header>
+        {loading ? <Loader /> : icon}
+        {/* ne pas rajouter de markup ici, ça casse le styling */}
+        {/* si vraiment besoin, passer le markup dans les children */}
+        {label ?? child}
+      </header>
+      {!!label && child}
     </div>
   )
 }
