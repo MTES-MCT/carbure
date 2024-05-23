@@ -13,7 +13,7 @@ import { Divider } from "common/components/divider"
 import SampleSummary from "elec-audit-admin/components/charge-points/details-sample-summary"
 import ChargePointsSampleMap from "elec-audit-admin/components/charge-points/sample-map"
 import Button from "common/components/button"
-import { Download, Edit } from "common/components/icons"
+import { Download, Edit, Send } from "common/components/icons"
 import ApplicationSummary from "./details-application-summary"
 import Alert from "common/components/alert"
 
@@ -22,7 +22,6 @@ import Alert from "common/components/alert"
 export const ChargingPointsApplicationDetailsDialog = () => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const portal = usePortal()
   const navigate = useNavigate()
   const location = useLocation()
   const match = useHashMatch("application/:id")
@@ -56,11 +55,13 @@ export const ChargingPointsApplicationDetailsDialog = () => {
             <ApplicationSummary application={chargePointApplication} />
           </section>
           <Divider />
-          {chargePointApplication?.sample && (
+          {chargePointApplication?.sample ? (
             <section>
               <ChargePointsSampleMap chargePoints={chargePointApplication?.sample?.charge_points} />
+              <Button icon={Download} label={t("Télécharger les points à auditer")} variant="secondary" action={downloadSample} style={{ width: "min-content" }} />
             </section>
-          )}
+          ) : <p><Trans>Le fichier CSV listant l'intégralité des points de recharge à auditer vous a été envoyé par email par l'aménageur.</Trans></p>}
+
           <section>
 
             <Alert icon={Edit} variant="info" label={t("Précision sur les champs du tableau à remplir :")} >
@@ -101,7 +102,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
         </main>
 
         <footer>
-          <Button icon={Download} label={t("Télécharger les points à auditer")} variant="secondary" action={downloadSample} style={{ width: "min-content" }} />
+          <MailtoButton cpoName={chargePointApplication?.cpo.name} auditorName={entity?.name} chargePointCount={chargePointApplication?.charge_point_count} />
         </footer>
         {chargePointApplicationResponse.loading && <LoaderOverlay />}
       </Dialog>
@@ -110,6 +111,21 @@ export const ChargingPointsApplicationDetailsDialog = () => {
 }
 
 
+interface MailtoButtonProps {
+  cpoName?: string
+  auditorName?: string
+  chargePointCount?: number
+
+}
+
+const MailtoButton = ({ cpoName, auditorName, chargePointCount }: MailtoButtonProps) => {
+  const { t } = useTranslation()
+  const email = "valorisation-recharge@developpement-durable.gouv.fr"
+  const subject = t(`[CarbuRe - Audit Elec] Rapport d'audit de {{cpoName}} par {{auditorName}}`, { cpoName, auditorName })
+  const body = t(`Bonjour%2C%E2%80%A8%0D%0AVous%20trouverez%20ci-joint%20le%20rapport%20d%E2%80%99audit%20pour%20les%20{{chargePointCount}}%20points%20de%20recharge%20de%20l%E2%80%99am%C3%A9nageur%20{{cpoName}}%20que%20nous%20venons%20de%20r%C3%A9aliser.%0D%0A%0D%0AMerci%20beaucoup%E2%80%A8%0D%0ABien%20cordialement%2C`, { cpoName, chargePointCount })
+  const mailto = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${body}`
+  return <Button icon={Send} label={t("Envoyer le rapport d'audit")} variant="primary" href={mailto} disabled={!cpoName} />
+}
 
 
 export default ChargingPointsApplicationDetailsDialog
