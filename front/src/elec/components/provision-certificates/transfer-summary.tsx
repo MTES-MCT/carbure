@@ -30,7 +30,7 @@ export const EnergyTransferSummary = ({
     }
 
     return (
-        <Alert style={{ display: "flex", alignItems: "center" }} icon={Bolt} variant="info">
+        <Alert icon={Bolt} variant="info">
             <p>
                 {t(
                     "{{remainingEnergy}} MWh restants",

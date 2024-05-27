@@ -3,6 +3,7 @@
   opacity: 1;
   --gap: 40px;
   --padding: 48px;
+  z-index: 1;
 }
 
 .auth .panel {
@@ -17,7 +18,7 @@
   opacity: 0.5;
 }
 
-.auth .panel > header {
+.auth .panel>header {
   display: flex;
   border: none;
   justify-content: center;
@@ -25,27 +26,27 @@
   padding-bottom: 0;
 }
 
-.auth .panel > section {
+.auth .panel>section {
   display: flex;
   flex-direction: column;
   padding: 0 var(--padding);
 }
 
-.auth .panel > section p {
+.auth .panel>section p {
   text-align: justify;
 }
 
-.auth .panel > section form {
+.auth .panel>section form {
   gap: var(--spacing-s);
 }
 
-.auth .panel > section button {
+.auth .panel>section button {
   /* height: 32px; */
   margin-top: var(--spacing-m);
   align-self: center;
 }
 
-.auth .panel > footer {
+.auth .panel>footer {
   flex-direction: column;
   align-items: stretch;
   border: none;
