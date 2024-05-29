@@ -3,11 +3,9 @@ from django.views.decorators.http import require_GET
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
-from core.excel import ExcelResponse
 from core.models import Entity
 from elec.repositories.elec_audit_repository import ElecAuditRepository
 from elec.serializers.elec_audit_sample_serializer import ElecAuditSampleDetailsSerializer
-from elec.services.export_charge_point_excel import export_charge_points_to_excel
 
 
 class ApplicationDetailsForm(forms.Form):

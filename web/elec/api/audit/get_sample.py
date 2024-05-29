@@ -6,7 +6,6 @@ from core.decorators import check_user_rights
 from core.excel import ExcelResponse
 from core.models import Entity
 from elec.models.elec_charge_point import ElecChargePoint
-from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.repositories.elec_audit_repository import ElecAuditRepository
 from elec.serializers.elec_charge_point import ElecChargePointSampleSerializer
 from elec.services.export_charge_point_excel import export_charge_points_sample_to_excel
