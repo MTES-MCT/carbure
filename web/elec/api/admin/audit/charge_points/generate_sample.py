@@ -36,16 +36,20 @@ def generate_sample(request):
     application_audits = ElecAuditSample.objects.filter(charge_point_application=application)
 
     # delete any pending audit sample for this application
-    application_audits.filter(status=ElecAuditSample.PENDING).delete()
+    application_audits.filter(status=ElecAuditSample.IN_PROGRESS).delete()
 
     # send an error if the audit is already in progress or done
-    if application_audits.filter(status__in=[ElecAuditSample.IN_PROGRESS, ElecAuditSample.AUDITED]).count() > 0:
+    if application_audits.filter(status=ElecAuditSample.AUDITED).count() > 0:
         return ErrorResponse(GenerateSampleErrors.ALREADY_AUDITED)
 
     charge_points = ChargePointRepository.get_annotated_application_charge_points(application.cpo, application)
     charge_point_sample = extract_audit_sample(charge_points, percentage)
 
-    new_audit = ElecAuditSample.objects.create(charge_point_application=application, percentage=percentage * 100)
+    new_audit = ElecAuditSample.objects.create(
+        charge_point_application=application,
+        cpo=application.cpo,
+        percentage=percentage * 100,
+    )
 
     charge_point_audits = [ElecAuditChargePoint(audit_sample=new_audit, charge_point=charge_point) for charge_point in charge_point_sample]  # fmt:skip
     ElecAuditChargePoint.objects.bulk_create(charge_point_audits)
