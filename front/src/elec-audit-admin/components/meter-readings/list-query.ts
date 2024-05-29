@@ -1,5 +1,4 @@
 import { ElecAdminAuditQuery, ElecAdminAuditStates } from "elec-audit-admin/types"
-import { ElecAdminTransferCertificateQuery } from "elec-admin/types"
 import { useMemo } from "react"
 
 export function useElectAdminAuditQuery({
@@ -24,6 +23,6 @@ export function useElectAdminAuditQuery({
       order: order?.direction,
       ...filters,
     }),
-    [entity.id, status, search, limit, order, filters, page]
+    [entity.id, year, status, search, limit, order, filters, page]
   )
 }
