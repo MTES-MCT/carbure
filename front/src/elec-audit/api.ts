@@ -53,7 +53,7 @@ export function getChargePointsApplicationDetails(entityId: number, applicationI
 
 
 export function downloadChargePointsSample(entityId: number, applicationId: number) {
-  return download("/elec/audit/application-details", { entity_id: entityId, application_id: applicationId, export: true })
+  return download("/elec/audit/get-sample", { entity_id: entityId, application_id: applicationId, export: true })
 }
 
 
