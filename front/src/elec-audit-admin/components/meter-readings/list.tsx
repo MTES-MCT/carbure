@@ -4,11 +4,9 @@ import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import { elecAdminMeterReadingsApplicationsList } from "elec-audit-admin/__test__/data"
 import { ElecAdminAuditFilter, ElecAdminAuditSnapshot, ElecAdminAuditStatus } from "elec-audit-admin/types"
 import MeterReadingsApplicationsTable from "elec/components/meter-readings/table"
 import { ElecMeterReadingsApplication } from "elec/types"
-import { useTranslation } from "react-i18next"
 import { useLocation, useMatch } from "react-router-dom"
 import * as api from "../../api"
 import { StatusSwitcher } from "../status-switcher"
@@ -26,7 +24,6 @@ const MeterReadingsApplicationsList = ({ snapshot, year }: TransferListProps) =>
 
   const entity = useEntity()
   const status = useAutoStatus()
-  const { t } = useTranslation()
   const location = useLocation()
 
   const [state, actions] = useElecAdminAuditMeterReadingsQueryParamsStore(entity, year, status, snapshot)
@@ -79,7 +76,7 @@ const MeterReadingsApplicationsList = ({ snapshot, year }: TransferListProps) =>
             historyCount={snapshot.meter_readings_applications_history}
             pendingCount={snapshot.meter_readings_applications_pending}
             // auditDoneCount={snapshot.charge_points_applications_audit_done}
-            auditInProgressCount={snapshot.charge_points_applications_audit_in_progress}
+            auditInProgressCount={snapshot.meter_readings_applications_audit_in_progress}
           />
 
 

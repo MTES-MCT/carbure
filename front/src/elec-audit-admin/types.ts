@@ -10,6 +10,7 @@ export interface ElecAdminAuditSnapshot {
   charge_points_applications: number
   meter_readings_applications_history: number
   meter_readings_applications_pending: number
+  meter_readings_applications_audit_in_progress: number
   meter_readings_applications: number
 }
 
