@@ -1,6 +1,5 @@
 import { Entity } from "carbure/types"
 import { Order } from "common/components/table"
-import { ElecChargePointsApplication, ElecMeterReadingsApplication } from "elec/types"
 
 export interface ElecAuditSnapshot {
   charge_points_applications_audit_in_progress: number
@@ -12,8 +11,8 @@ export enum ElecAuditFilter {
 }
 
 export enum ElecAuditStatus {
-  AuditInProgress = "AUDIT_IN_PROGRESS",
-  AuditDone = "AUDIT_DONE",
+  AuditInProgress = "IN_PROGRESS",
+  AuditDone = "AUDITED",
 }
 
 export type ElecAuditFilterSelection = Partial<Record<ElecAuditFilter, string[]>>
