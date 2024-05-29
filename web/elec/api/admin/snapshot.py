@@ -1,6 +1,5 @@
 import traceback
 from django import forms
-from django.db.models import Sum
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
