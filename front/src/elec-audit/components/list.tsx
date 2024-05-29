@@ -117,7 +117,7 @@ const FILTERS = [
 
 
 export function useAutoStatus() {
-  const matchStatus = useMatch("/org/:entity/elec-audit/:year/:view/:status/*")
+  const matchStatus = useMatch("/org/:entity/elec-audit/:year/:status/*")
   const status = matchStatus?.params?.status?.toUpperCase() as ElecAuditStatus
   return status ?? ElecAuditStatus.AuditInProgress
 }
