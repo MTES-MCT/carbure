@@ -76,7 +76,6 @@ class ExcelChargePoints:
         # rename columns with actual names
         charge_point_data.rename(columns={charge_point_data.columns[i]: column for i, column in enumerate(columns)}, inplace=True)  # fmt: skip
 
-        charge_point_data = charge_point_data.drop_duplicates("charge_point_id")
         charge_point_data["measure_energy"] = charge_point_data["measure_energy"].fillna(0)
         charge_point_data = charge_point_data.fillna("")
         charge_point_data["line"] = charge_point_data.index + 1  # add a line number to locate data in the excel file
@@ -94,7 +93,7 @@ class ExcelChargePoints:
                 charge_point_data = charge_point_data.drop(charge_point_data.index[:34])
                 charge_point_data = charge_point_data.reset_index(drop=True)
 
-        return charge_point_data
+        return charge_point_data.drop_duplicates("charge_point_id")
 
     def validate_charge_points(
         charge_point_data: pd.DataFrame,
