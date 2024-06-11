@@ -1,4 +1,4 @@
-import { ElecAdminAuditSnapshot, ElecChargePointsApplicationSample, ElecChargePointsApplicationsData, ElecMeterReadingsApplicationsData } from "elec-audit-admin/types";
+import { ElecAdminAuditSnapshot, ElecChargePointsApplicationsData, ElecMeterReadingsApplicationsData } from "elec-audit-admin/types";
 import { elecChargePointsApplications, elecMeterReadingsApplications } from "elec/__test__/data";
 
 export const elecAdminAuditSnapshot: ElecAdminAuditSnapshot = {
@@ -10,6 +10,7 @@ export const elecAdminAuditSnapshot: ElecAdminAuditSnapshot = {
   meter_readings_applications: 2,
   meter_readings_applications_pending: 1,
   meter_readings_applications_history: 1,
+  meter_readings_applications_audit_in_progress: 1,
 }
 
 export const elecAdminChargePointsApplicationsList: ElecChargePointsApplicationsData = {

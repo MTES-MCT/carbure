@@ -74,8 +74,9 @@ export interface ElecChargePointsApplication {
   charge_point_count: number
   power_total: number
   application_date: string
-  validation_date?: string
   status: ElecAuditApplicationStatus
+  validation_date?: string
+  audit_order_date?: string
 }
 
 
