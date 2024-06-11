@@ -1,5 +1,5 @@
 import { mockGetWithResponseData, mockPostWithResponseData } from "carbure/__test__/helpers";
-import { elecChargePointApplicationAuditInProgress, elecChargePointApplicationDetailsInProgress, elecChargePointApplicationDetailsPending, elecChargePointApplicationPending, elecChargePointsApplicationSample } from "elec/__test__/data";
+import { elecChargePointApplicationDetailsInProgress, elecChargePointsApplicationSample } from "elec/__test__/data";
 import { elecAdminAuditSnapshot, elecAdminChargePointsApplicationsList } from "./data";
 
 export const okGetSnapshot = mockGetWithResponseData("/elec/admin/audit/snapshot", elecAdminAuditSnapshot)

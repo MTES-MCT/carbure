@@ -93,7 +93,7 @@ class ExcelChargePoints:
                 charge_point_data = charge_point_data.drop(charge_point_data.index[:34])
                 charge_point_data = charge_point_data.reset_index(drop=True)
 
-        return charge_point_data
+        return charge_point_data.drop_duplicates("charge_point_id")
 
     def validate_charge_points(
         charge_point_data: pd.DataFrame,

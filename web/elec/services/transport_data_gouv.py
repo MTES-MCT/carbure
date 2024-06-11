@@ -32,6 +32,20 @@ class TransportDataGouv:
         "siren_amenageur": "cpo_siren",
     }
 
+    CSV_COLUMNS_MERGE = {
+        "id_station_itinerance": "first",
+        "nom_station": "first",
+        "id_pdc_itinerance": "first",
+        "coordonneesXY": "first",
+        "puissance_nominale": "max",
+        "prise_type_combo_ccs": "max",
+        "prise_type_chademo": "max",
+        "date_maj": "max",
+        "last_modified": "max",
+        "nom_amenageur": "first",
+        "siren_amenageur": "first",
+    }
+
     DB_COLUMNS = [
         "line",
         "charge_point_id",
@@ -72,9 +86,16 @@ class TransportDataGouv:
             station_charge_points = chunk[chunk["id_station_itinerance"].isin(wanted_stations)]
             transport_data = pd.concat([transport_data, station_charge_points], ignore_index=True)
 
+        # instead of droping duplicate rows, merge their values so we get as much data as possible
+        transport_data = (
+            transport_data.groupby("id_pdc_itinerance", as_index=False)
+            .agg(TransportDataGouv.CSV_COLUMNS_MERGE)
+            .reset_index()
+        )
+
         transport_data = transport_data.rename(columns=TransportDataGouv.CSV_COLUMNS_ALIAS)
         transport_data = transport_data.sort_values("date_maj", ascending=False)
-        transport_data = transport_data.drop_duplicates("charge_point_id")
+
         transport_data = transport_data.fillna("")
 
         # mark the charge points as coming from TDG

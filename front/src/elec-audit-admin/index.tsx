@@ -11,7 +11,6 @@ import * as api from "./api"
 import ChargePointsApplicationsList from "./components/charge-points/list"
 import MeterReadingsApplicationsList from "./components/meter-readings/list"
 import { ElecAdminAuditSnapshot, ElecAdminAuditStatus } from "./types"
-import { elecAdminAuditSnapshot } from "./__test__/data"
 
 
 const defaultElecAdminAuditSnapshot: ElecAdminAuditSnapshot = {
@@ -23,6 +22,7 @@ const defaultElecAdminAuditSnapshot: ElecAdminAuditSnapshot = {
   meter_readings_applications: 0,
   meter_readings_applications_pending: 0,
   meter_readings_applications_history: 0,
+  meter_readings_applications_audit_in_progress: 0,
 }
 
 
