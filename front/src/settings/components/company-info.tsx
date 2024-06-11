@@ -77,16 +77,7 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
     <Panel id="info">
       <header>
         <h1>{t("Informations sur la société")}</h1>
-        {!readOnly && (
-          <Button
-            asideX
-            submit="entity-info"
-            disabled={!canSave}
-            icon={Save}
-            variant="primary"
-            label={t("Enregistrer les modifications")}
-          />
-        )}
+
       </header>
 
       {!readOnly && (
@@ -213,8 +204,20 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
             {...companyForm.bind("vat_number")}
           />
         </Form>
-      </section>
 
+      </section>
+      <section>
+        {!readOnly && (
+          <Button
+            asideX
+            submit="entity-info"
+            disabled={!canSave}
+            icon={Save}
+            variant="primary"
+            label={t("Enregistrer les modifications")}
+          />
+        )}
+      </section>
       <footer />
 
       {updateEntity.loading && <LoaderOverlay />}
