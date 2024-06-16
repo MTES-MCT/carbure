@@ -72,7 +72,7 @@ const SampleGenerationForm = ({
         )}
       />
 
-      <p>{t(`(Soit ${power_total * (percent ?? 0) / 100} kWh)`, {})}</p>
+      <p>{t(`(Soit ${power_total * (percent ?? 0) / 100} kW)`, {})}</p>
 
     </Form>
   </>
