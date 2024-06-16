@@ -11,9 +11,9 @@ import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../../api"
 import ChargePointsApplicationAcceptDialog from "./accept-dialog"
 import ChargingPointsApplicationDetailsInProgress from "./details-in-progress"
-import ChargingPointsApplicationDetailsPending from "./details-pending"
 import ChargePointsApplicationRejectDialog from "./reject-dialog"
 import ChargingPointsApplicationDetailsAccepted from "./details-accepted"
+import { ChargingPointsApplicationDetailsPending } from "./details-pending"
 
 
 export const ChargingPointsApplicationDetailsDialog = () => {

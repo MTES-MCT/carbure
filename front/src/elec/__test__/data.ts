@@ -192,7 +192,7 @@ const elecMeterReadingApplicationPending: ElecMeterReadingsApplication = {
 export const elecMeterReadingApplicationDetailsPending: ElecMeterReadingsApplicationDetails = {
     ...elecMeterReadingApplicationPending,
     email_contacts: ["cpo@test.com"],
-    total_energy: 30000
+    power_total: 30000
 }
 
 export const elecMeterReadingApplicationAccepted: ElecMeterReadingsApplication = {
@@ -234,7 +234,7 @@ export const elecMeterReadingApplicationAuditInProgress: ElecMeterReadingsApplic
 export const elecMeterReadingApplicationDetailsInProgress: ElecMeterReadingsApplicationDetails = {
     ...elecMeterReadingApplicationAuditInProgress,
     email_contacts: ["cpo@test.com"],
-    total_energy: 30000
+    power_total: 30000
 }
 
 export const elecMeterReadingsApplications: ElecMeterReadingsApplication[] = [
