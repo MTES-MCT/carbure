@@ -189,6 +189,12 @@ const elecMeterReadingApplicationPending: ElecMeterReadingsApplication = {
     status: ElecAuditApplicationStatus.Pending,
 }
 
+export const elecMeterReadingApplicationDetailsPending: ElecMeterReadingsApplicationDetails = {
+    ...elecMeterReadingApplicationPending,
+    email_contacts: ["cpo@test.com"],
+    total_energy: 30000
+}
+
 export const elecMeterReadingApplicationAccepted: ElecMeterReadingsApplication = {
     id: 1,
     cpo: cpo,
@@ -212,7 +218,7 @@ const elecMeterReadingApplicationRejected: ElecMeterReadingsApplication = {
 
     status: ElecAuditApplicationStatus.Rejected,
 }
-export const elecMeterReadingApplication4: ElecMeterReadingsApplication = {
+export const elecMeterReadingApplicationAuditInProgress: ElecMeterReadingsApplication = {
     id: 1,
     cpo: cpo,
     station_count: 19,
@@ -225,17 +231,17 @@ export const elecMeterReadingApplication4: ElecMeterReadingsApplication = {
 }
 
 
-export const elecMeterReadingApplication1Details: ElecMeterReadingsApplicationDetails = {
-    ...elecMeterReadingApplicationAccepted,
+export const elecMeterReadingApplicationDetailsInProgress: ElecMeterReadingsApplicationDetails = {
+    ...elecMeterReadingApplicationAuditInProgress,
     email_contacts: ["cpo@test.com"],
-    status: ElecAuditApplicationStatus.AuditInProgress,
-
+    total_energy: 30000
 }
 
 export const elecMeterReadingsApplications: ElecMeterReadingsApplication[] = [
     elecMeterReadingApplicationPending,
+    elecMeterReadingApplicationAuditInProgress,
     elecMeterReadingApplicationAccepted,
-    elecMeterReadingApplicationRejected
+    elecMeterReadingApplicationRejected,
 ]
 
 

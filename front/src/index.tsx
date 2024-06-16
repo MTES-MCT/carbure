@@ -13,7 +13,7 @@ async function enableMocking() {
   if (process.env.NODE_ENV === "development") {
     const { worker } = await import("./mocks")
     console.info("MOCKING ENABLED: to enable/disable the mocked api, comment/uncomment the line below in the file 'index.tsx'")
-    // return worker.start()
+    return worker.start()
   }
 }
 
