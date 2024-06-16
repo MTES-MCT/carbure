@@ -110,6 +110,7 @@ export interface ChargePointsApplicationError {
 
 export interface ElecMeterReadingsApplicationDetails extends ElecMeterReadingsApplication {
   email_contacts: string[]
+  total_energy: number
 }
 
 export enum MeterReadingsApplicationUrgencyStatus {

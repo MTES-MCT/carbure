@@ -19,6 +19,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../../api"
 import MeterReadingsApplicationAcceptDialog from "./accept-dialog"
 import MeterReadingsApplicationRejectDialog from "./reject-dialog"
+import ApplicationSummary from "./details-application-summary"
 
 export const MeterReadingsApplicationDetailsDialog = () => {
   const { t } = useTranslation()
@@ -104,46 +105,7 @@ export const MeterReadingsApplicationDetailsDialog = () => {
         <main>
 
           <section>
-
-            <Form
-              id="lot-form"
-              variant="columns"
-              wrapper
-            >
-              <TextInput
-                readOnly
-                label={t("Date de la demande")}
-                value={meterReadingsApplication ? formatDate(meterReadingsApplication.application_date) : "..."}
-              />
-
-              <TextInput
-                readOnly
-                label={t("Aménageur")}
-                value={meterReadingsApplication?.cpo.name || "..."}
-
-              />
-
-              <TextInput
-                readOnly
-                label={t("kWh renouvelables")}
-                value={meterReadingsApplication ? formatNumber(Math.round(meterReadingsApplication.energy_total)) : "..."}
-
-              />
-
-              <TextInput
-                readOnly
-                label={t("Points de recharge")}
-                value={meterReadingsApplication ? formatNumber(meterReadingsApplication.charge_point_count) : "..."}
-              />
-              <TextInput
-                readOnly
-                label={t("Part renouvelable de l'électricité sur la période")}
-                value={"24,92%"}
-              />
-
-
-            </Form>
-
+            <ApplicationSummary application={meterReadingsApplication} />
           </section>
 
           <section>
@@ -177,7 +139,6 @@ export const MeterReadingsApplicationDetailsDialog = () => {
 
           {meterReadingsApplication?.status === ElecAuditApplicationStatus.Pending && (
             <>
-              <Button icon={Send} label={t("Commencer l'audit")} variant="primary" action={startAudit} loading={startMeterReadingsApplicationAuditResponse.loading} />
               <Button icon={Check} label={t("Valider sans auditer")} variant="success" action={() => acceptApplication(true)} />
               <Button icon={Cross} label={t("Refuser sans auditer")} variant="danger" action={() => rejectApplication(true)} />
             </>

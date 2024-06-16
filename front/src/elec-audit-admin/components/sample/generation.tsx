@@ -6,42 +6,39 @@ import { Button } from "common/components/button"
 import Checkbox from "common/components/checkbox"
 import { Divider } from "common/components/divider"
 import { Check, ChevronLeft, Cross, Download, Send } from "common/components/icons"
-import { useNotify, useNotifyError } from "common/components/notifications"
-import { useMutation } from "common/hooks/async"
 import { ElecChargePointsApplicationSample } from "elec-audit-admin/types"
-import { ElecAuditApplicationStatus, ElecChargePointsApplicationDetails } from "elec/types"
+import { ElecAuditApplicationStatus, ElecChargePointsApplicationDetails, ElecMeterReadingsApplication } from "elec/types"
 import 'leaflet-defaulticon-compatibility'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css'; // Re-uses images from ~leaflet package
 import 'leaflet/dist/leaflet.css'
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
-import * as api from "../../api"
-import ApplicationSummary from "./details-application-summary"
-import SampleGenerationForm from "./details-sample-generation-form"
-import SampleSummary from "./details-sample-summary"
-import ChargePointsSampleMap from "./sample-map"
+import ApplicationSummary from "../charge-points/details-application-summary"
+import SampleGenerationForm from "../charge-points/details-sample-generation-form"
+import SampleSummary from "../charge-points/details-sample-summary"
+import ChargePointsSampleMap from "../charge-points/sample-map"
 
 export type GenerationState = "generation" | "verification" | "email" | "confirmation"
 
-interface ChargingPointsApplicationDetailsPendingProps {
-  chargePointApplication: ElecChargePointsApplicationDetails | undefined
+interface ApplicationSampleGenerationProps {
+  application: ElecChargePointsApplicationDetails | ElecMeterReadingsApplication | undefined
   onAccept: (force: boolean) => void
   onReject: (force: boolean) => void
   onDownloadSample: () => void
+  onStartAudit: (entityId: number, applicationId: number, percentage: number, chargePointIds: string[]) => void
+  summary: React.ReactNode
 }
-export const ChargingPointsApplicationDetailsPending = ({
-  chargePointApplication,
+export const ApplicationSampleGeneration = ({
+  application,
   onAccept,
   onReject,
-  onDownloadSample
-}: ChargingPointsApplicationDetailsPendingProps) => {
+  onDownloadSample,
+  onStartAudit,
+  summary
+}: ApplicationSampleGenerationProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const notify = useNotify()
-  const notifyError = useNotifyError()
-  const navigate = useNavigate()
-  const location = useLocation()
   const [confirmCheckbox, setConfirmCheckbox] = useState(false)
   const [sample, setSample] = useState<ElecChargePointsApplicationSample | undefined>(undefined)
 
@@ -72,25 +69,10 @@ export const ChargingPointsApplicationDetailsPending = ({
     setCurrentStep(steps.findIndex(step => step.key === key))
   }
 
-  const startApplicationAuditMutation = useMutation(api.startChargePointsApplicationAudit, {
-    invalidates: ["audit-charge-points-application-details", "audit-charge-points-applications", "elec-admin-audit-snapshot"],
-    onSuccess() {
-      notify(t("L'audit de l'échantillon des {{count}} points de recharge a bien été initié.", { count: sample?.charge_points.length }), { variant: "success" })
-      closeDialog()
-    },
-    onError(err) {
-      notifyError(err, t("Impossible d'initier l'audit de l'inscription des points de recharge"))
-    },
-  })
-
-  const closeDialog = () => {
-    navigate({ search: location.search, hash: "#" })
-  }
-
 
   const startAudit = () => {
-    if (!chargePointApplication || !sample) return
-    startApplicationAuditMutation.execute(entity.id, chargePointApplication.id,
+    if (!application || !sample) return
+    onStartAudit(entity.id, application.id,
       sample.percentage,
       sample.charge_points.map(cp => cp.charge_point_id))
   }
@@ -107,15 +89,7 @@ export const ChargingPointsApplicationDetailsPending = ({
 
   return (
     <>
-      {/* <ApplicationSampleGeneration
-        application={chargePointApplication}
-        onAccept={onAccept}
-        onReject={onReject}
-        onDownloadSample={onDownloadSample}
-        onStartAudit={startAudit}
-        summary={<ApplicationSummary application={chargePointApplication} />}
-      /> */}
-      <main>
+      {/* <main>
         <section>
           <Stepper
             title={steps[currentStep].title}
@@ -123,8 +97,8 @@ export const ChargingPointsApplicationDetailsPending = ({
             currentStep={currentStep + 1}
             nextTitle={steps[currentStep + 1]?.title}
           />
+          {summary}
 
-          <ApplicationSummary application={chargePointApplication} />
         </section>
 
         <Divider />
@@ -132,8 +106,8 @@ export const ChargingPointsApplicationDetailsPending = ({
         <section>
           {step === "generation" &&
             <SampleGenerationForm
-              power_total={chargePointApplication?.power_total ?? 0}
-              applicationId={chargePointApplication?.id}
+              power_total={application?.power_total ?? 0}
+              applicationId={application?.id}
               onSampleGenerated={handleSampleGenerated} />
           }
 
@@ -141,8 +115,8 @@ export const ChargingPointsApplicationDetailsPending = ({
             <SampleSummary sample={sample} />
             <ChargePointsSampleMap chargePoints={sample.charge_points} />
             <SampleGenerationForm
-              power_total={chargePointApplication?.power_total ?? 0}
-              applicationId={chargePointApplication?.id}
+              power_total={application?.power_total ?? 0}
+              applicationId={application?.id}
               onSampleGenerated={handleSampleGenerated}
               retry />
           </>}
@@ -170,7 +144,7 @@ export const ChargingPointsApplicationDetailsPending = ({
             />
           </>}
 
-          {!entity.isAdmin && chargePointApplication?.status === ElecAuditApplicationStatus.Pending && (
+          {!entity.isAdmin && application?.status === ElecAuditApplicationStatus.Pending && (
             <p><i>{t("En attente de validation de la DGEC.")}</i></p>
           )}
         </section>
@@ -186,15 +160,15 @@ export const ChargingPointsApplicationDetailsPending = ({
           <Button icon={Download} label={t("Télécharger l'échantillon")} variant="primary" action={handleDownloadSample} />
         )}
 
-        {step === "email" && chargePointApplication && <>
-          <MailtoButton cpo={chargePointApplication.cpo} chargePointCount={chargePointApplication.charge_point_count} emailContacts={chargePointApplication.email_contacts!} onGenerate={() => setStep("confirmation")} />
+        {step === "email" && application && <>
+          <MailtoButton cpo={application.cpo} chargePointCount={application.charge_point_count} emailContacts={application.email_contacts!} onGenerate={() => setStep("confirmation")} />
           <Button asideX icon={ChevronLeft} label={t("Précédent")} variant="secondary" action={() => setStep("verification")} />
         </>}
 
-        {step === "confirmation" && chargePointApplication && <>
+        {step === "confirmation" && application && <>
           <Button icon={Send} label={t("Je confirme")} variant="primary" action={startAudit} disabled={!confirmCheckbox || startApplicationAuditMutation.loading} loading={startApplicationAuditMutation.loading} />
         </>}
-      </footer>
+      </footer> */}
     </>
   )
 }
@@ -219,4 +193,4 @@ const MailtoButton = ({ cpo, chargePointCount, emailContacts, onGenerate }: Mail
 
 }
 
-export default ChargingPointsApplicationDetailsPending
+export default ApplicationSampleGeneration
