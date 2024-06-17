@@ -4,18 +4,18 @@ import Alert from "common/components/alert"
 import { Button } from "common/components/button"
 import { Dialog } from "common/components/dialog"
 import { useHashMatch } from "common/components/hash-route"
-import { Check, Cross, Download, Return, Send } from "common/components/icons"
+import { Check, Cross, Download, Send } from "common/components/icons"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
-import { useMutation, useQuery } from "common/hooks/async"
+import { useQuery } from "common/hooks/async"
 import ApplicationStatus from "elec/components/application-status"
 import { ElecAuditApplicationStatus } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../../api"
 import MeterReadingsApplicationAcceptDialog from "./accept-dialog"
-import ApplicationSummary from "./details-application-summary"
+import { MeterReadingsApplicationDetailsPending } from "./details-pending"
 import MeterReadingsApplicationRejectDialog from "./reject-dialog"
 
 export const MeterReadingsApplicationDetailsDialog = () => {
@@ -35,24 +35,10 @@ export const MeterReadingsApplicationDetailsDialog = () => {
   const meterReadingsApplication = meterReadingsApplicationResponse.result?.data.data
 
 
-  const startMeterReadingsApplicationAuditResponse = useMutation(api.startMeterReadingsApplicationAudit, {
-    invalidates: ["audit-meter-readings-application-details", "audit-meter-readings-applications"],
-    onSuccess() {
-      notify(t("L'audit des relevés des {{count}} points de recharge a bien été initié.", { count: meterReadingsApplication?.charge_point_count }), { variant: "success" })
-    },
-    onError(err) {
-      notifyError(err, t("Impossible d'initier l'audit des relevés des points de recharge"))
-    },
-  })
-
   const closeDialog = () => {
     navigate({ search: location.search, hash: "#" })
   }
 
-  const startAudit = () => {
-    if (!meterReadingsApplication) return
-    startMeterReadingsApplicationAuditResponse.execute(entity.id, meterReadingsApplication.id)
-  }
 
   const acceptApplication = (force: boolean = false) => {
     if (!meterReadingsApplication) return
@@ -80,7 +66,8 @@ export const MeterReadingsApplicationDetailsDialog = () => {
 
   const downloadSample = async () => {
     if (!meterReadingsApplication) return
-    return api.downloadMeterReadingsApplication(entity.id, meterReadingsApplication.id, true)
+    return api.downloadMeterReadingsApplication(entity.id, meterReadingsApplication.id)
+
   }
 
   return (
@@ -96,21 +83,17 @@ export const MeterReadingsApplicationDetailsDialog = () => {
 
         </header>
 
-        <main>
+        {meterReadingsApplication?.status === ElecAuditApplicationStatus.Pending && (
+          <MeterReadingsApplicationDetailsPending
+            meterReadingsApplication={meterReadingsApplication}
+            onAccept={acceptApplication}
+            onReject={rejectApplication}
+            onDownloadSample={downloadSample}
+          />
+        )}
 
-          <section>
-            <ApplicationSummary application={meterReadingsApplication} />
-          </section>
-
-          <section>
-            {!entity.isAdmin && meterReadingsApplication?.status === ElecAuditApplicationStatus.Pending && (
-              <p><i>
-                {t("En attente de validation de la DGEC.")}
-              </i></p>
-            )}
-          </section>
-          {meterReadingsApplication?.status === ElecAuditApplicationStatus.AuditInProgress && (
-
+        {meterReadingsApplication?.status === ElecAuditApplicationStatus.AuditInProgress && (
+          <main>
             <section>
               <Alert variant="info" style={{ flexDirection: "column" }} >
                 <p>
@@ -126,28 +109,20 @@ export const MeterReadingsApplicationDetailsDialog = () => {
 
               </Alert>
             </section>
-          )}
-        </main>
+          </main>
+        )}
 
-        <footer>
 
-          {meterReadingsApplication?.status === ElecAuditApplicationStatus.Pending && (
-            <>
-              <Button icon={Check} label={t("Valider sans auditer")} variant="success" action={() => acceptApplication(true)} />
-              <Button icon={Cross} label={t("Refuser sans auditer")} variant="danger" action={() => rejectApplication(true)} />
-            </>
-          )}
 
-          {meterReadingsApplication?.status === ElecAuditApplicationStatus.AuditInProgress && (
-            <>
-              <MailtoButton cpo={meterReadingsApplication.cpo} quarter={meterReadingsApplication.quarter} year={meterReadingsApplication.year} emailContacts={meterReadingsApplication.email_contacts} />
-              <Button icon={Download} label={t("Télécharger l'échantillon")} variant="secondary" action={downloadSample} />
-              <Button icon={Check} label={t("Valide")} variant="success" action={acceptApplication} />
-              <Button icon={Cross} label={t("Refuser")} variant="danger" action={rejectApplication} />
-            </>
-          )}
-          <Button icon={Return} label={t("Fermer")} action={closeDialog} asideX />
-        </footer>
+
+        {meterReadingsApplication?.status === ElecAuditApplicationStatus.AuditInProgress && (
+          <footer>
+            <MailtoButton cpo={meterReadingsApplication.cpo} quarter={meterReadingsApplication.quarter} year={meterReadingsApplication.year} emailContacts={meterReadingsApplication.email_contacts} />
+            <Button icon={Download} label={t("Télécharger l'échantillon")} variant="secondary" action={downloadSample} />
+            <Button icon={Check} label={t("Valide")} variant="success" action={acceptApplication} />
+            <Button icon={Cross} label={t("Refuser")} variant="danger" action={rejectApplication} />
+          </footer>
+        )}
         {meterReadingsApplicationResponse.loading && <LoaderOverlay />}
       </Dialog>
     </Portal >

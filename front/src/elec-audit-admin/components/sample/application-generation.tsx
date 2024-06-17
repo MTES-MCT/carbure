@@ -1,4 +1,5 @@
 import { Stepper } from "@codegouvfr/react-dsfr/Stepper"
+import { AxiosResponse } from "axios"
 import useEntity from "carbure/hooks/entity"
 import { EntityPreview } from "carbure/types"
 import Alert from "common/components/alert"
@@ -6,16 +7,17 @@ import { Button } from "common/components/button"
 import Checkbox from "common/components/checkbox"
 import { Divider } from "common/components/divider"
 import { Check, ChevronLeft, Cross, Download, Send } from "common/components/icons"
-import { ElecChargePointsApplicationSample } from "elec-audit-admin/types"
+import { Api } from "common/services/api"
+import { ElecApplicationSample } from "elec-audit-admin/types"
 import { ElecAuditApplicationStatus, ElecChargePointsApplicationDetails, ElecMeterReadingsApplicationDetails } from "elec/types"
 import 'leaflet-defaulticon-compatibility'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css'; // Re-uses images from ~leaflet package
 import 'leaflet/dist/leaflet.css'
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
-import SampleGenerationForm from "../charge-points/details-sample-generation-form"
-import SampleSummary from "../charge-points/details-sample-summary"
-import ChargePointsSampleMap from "../charge-points/sample-map"
+import SampleGenerationForm from "./details-sample-generation-form"
+import SampleSummary from "./details-sample-summary"
+import ChargePointsSampleMap from "./sample-map"
 
 export type GenerationState = "generation" | "verification" | "email" | "confirmation"
 
@@ -24,10 +26,12 @@ interface ApplicationSampleGenerationProps {
   onAccept: (force: boolean) => void
   onReject: (force: boolean) => void
   onDownloadSample: () => void
-  onStartAudit: (entityId: number, applicationId: number, percentage: number, chargePointIds: string[]) => void
+  onStartAudit: (entityId: number, applicationId: number, chargePointIds: string[]) => void
   summary: React.ReactNode
   emailIntro: string
-  queryLoading?: boolean
+  generateSampleQuery: (entityId: number, applicationId: number, percentage: number) => Promise<AxiosResponse<Api<ElecApplicationSample>, any>>
+  startAuditQueryLoading?: boolean
+
 }
 export const ApplicationSampleGeneration = ({
   application,
@@ -37,12 +41,13 @@ export const ApplicationSampleGeneration = ({
   onStartAudit,
   summary,
   emailIntro,
-  queryLoading
+  generateSampleQuery,
+  startAuditQueryLoading
 }: ApplicationSampleGenerationProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const [confirmCheckbox, setConfirmCheckbox] = useState(false)
-  const [sample, setSample] = useState<ElecChargePointsApplicationSample | undefined>(undefined)
+  const [sample, setSample] = useState<ElecApplicationSample | undefined>(undefined)
 
   const [currentStep, setCurrentStep] = useState(0)
 
@@ -75,11 +80,10 @@ export const ApplicationSampleGeneration = ({
   const startAudit = () => {
     if (!application || !sample) return
     onStartAudit(entity.id, application.id,
-      sample.percentage,
       sample.charge_points.map(cp => cp.charge_point_id))
   }
 
-  const handleSampleGenerated = (sample: ElecChargePointsApplicationSample) => {
+  const handleSampleGenerated = (sample: ElecApplicationSample) => {
     setSample(sample)
     setStep("verification")
   }
@@ -110,6 +114,7 @@ export const ApplicationSampleGeneration = ({
             <SampleGenerationForm
               power_total={application?.power_total ?? 0}
               applicationId={application?.id}
+              generateSampleQuery={generateSampleQuery}
               onSampleGenerated={handleSampleGenerated} />
           }
 
@@ -119,12 +124,13 @@ export const ApplicationSampleGeneration = ({
             <SampleGenerationForm
               power_total={application?.power_total ?? 0}
               applicationId={application?.id}
+              generateSampleQuery={generateSampleQuery}
               onSampleGenerated={handleSampleGenerated}
               retry />
           </>}
 
           {step === "email" && <>
-            <Alert icon={Send} variant="info" label={t("Action requise par l'administrateur pour poursuivre l'audit de l'inscription des points de recharge :")} >
+            <Alert icon={Send} variant="info" label={t("Action requise par l'administrateur pour poursuivre l'audit des points de recharge :")} >
 
               <ul>
                 <li><Trans>Joindre le fichier téléchargé comportant l'échantillon des points de recharge à auditer</Trans></li>
@@ -137,7 +143,7 @@ export const ApplicationSampleGeneration = ({
             <Checkbox
               value={confirmCheckbox}
               onChange={setConfirmCheckbox}
-              label={t("Je confirme avoir envoyé l'ordre de contrôler par e-mail (pièce jointe attachée).")}
+              label={t("Je confirme avoir envoyé l'ordre de contrôle par e-mail avec l'échantillon en pièce jointe.")}
             />
           </>}
 
@@ -163,7 +169,7 @@ export const ApplicationSampleGeneration = ({
         </>}
 
         {step === "confirmation" && application && <>
-          <Button icon={Send} label={t("Je confirme")} variant="primary" action={startAudit} disabled={!confirmCheckbox || queryLoading} loading={queryLoading} />
+          <Button icon={Send} label={t("Je confirme")} variant="primary" action={startAudit} disabled={!confirmCheckbox || startAuditQueryLoading} loading={startAuditQueryLoading} />
         </>}
       </footer>
     </>

@@ -62,7 +62,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
 
 
   const downloadSample = async () => {
-    return api.downloadChargePointsSample(entity.id, chargePointApplication!.id, true)
+    return api.downloadChargePointsSample(entity.id, chargePointApplication!.id)
   }
 
   return (
