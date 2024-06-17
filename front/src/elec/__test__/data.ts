@@ -1,6 +1,6 @@
 import { cpo } from "carbure/__test__/data";
 import { EntityPreview, EntityType } from "carbure/types";
-import { ElecChargePointsApplicationSample } from "elec-audit-admin/types";
+import { ElecApplicationSample } from "elec-audit-admin/types";
 import { ChargePointsApplicationError, ElecAuditApplicationStatus, ElecChargePointsApplication, ElecChargePointsApplicationCheckInfo, ElecChargePointsApplicationDetails, ElecMeterReadingsApplication, ElecMeterReadingsApplicationCheckInfo, ElecMeterReadingsApplicationDetails, ElecMeterReadingsApplicationsResponse, ElecProvisionCertificatePreview, MeterReadingsApplicationError, MeterReadingsApplicationUrgencyStatus } from "elec/types";
 import { ElecCPOSnapshot, ElecProvisionCertificatesData } from "elec/types-cpo";
 
@@ -55,7 +55,7 @@ export const elecAdminProvisionCertificateList: ElecProvisionCertificatesData = 
 
 //CHARGING POINTS
 
-export const elecChargePointsApplicationSample: ElecChargePointsApplicationSample = {
+export const elecChargePointsApplicationSample: ElecApplicationSample = {
     application_id: 1,
     percentage: 10,
     charge_points: [

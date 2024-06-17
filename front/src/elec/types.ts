@@ -3,7 +3,7 @@ import {
   ElecCPOProvisionCertificateQuery,
   ElecTransferCertificateStatus,
 } from "./types-cpo"
-import { ElecChargePointsApplicationSample } from "elec-audit-admin/types"
+import { ElecApplicationSample } from "elec-audit-admin/types"
 
 export interface ElecProvisionCertificatePreview {
   id: number
@@ -82,7 +82,7 @@ export interface ElecChargePointsApplication {
 
 export interface ElecChargePointsApplicationDetails extends ElecChargePointsApplication {
   email_contacts: string[]
-  sample?: ElecChargePointsApplicationSample
+  sample?: ElecApplicationSample
 }
 
 export interface ElecChargePointsSnapshot {

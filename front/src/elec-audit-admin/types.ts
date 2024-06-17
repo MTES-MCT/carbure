@@ -41,7 +41,7 @@ export interface ElecChargePointPreview {
   longitude: number
   latitude: number
 }
-export interface ElecChargePointsApplicationSample {
+export interface ElecApplicationSample {
   application_id: number
   percentage: number
   charge_points: ElecChargePointPreview[]

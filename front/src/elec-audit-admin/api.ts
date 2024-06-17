@@ -1,6 +1,6 @@
 import { api, Api, download } from "common/services/api"
 import { ElecChargePointsApplication, ElecChargePointsApplicationDetails, ElecMeterReadingsApplicationDetails } from "elec/types"
-import { ElecAdminAuditFilter, ElecAdminAuditQuery, ElecAdminAuditSnapshot, ElecChargePointsApplicationSample, ElecChargePointsApplicationsData, ElecMeterReadingsApplicationsData } from "./types"
+import { ElecAdminAuditFilter, ElecAdminAuditQuery, ElecAdminAuditSnapshot, ElecApplicationSample, ElecChargePointsApplicationsData, ElecMeterReadingsApplicationsData } from "./types"
 
 export function getYears(entity_id: number) {
   return api.get<Api<number[]>>("/elec/admin/audit/years", {
@@ -55,14 +55,14 @@ export function generateChargePointsAuditSample(
   entityId: number,
   applicationId: number,
   percentage: number) {
-  return api.post<Api<ElecChargePointsApplicationSample>>("/elec/admin/audit/charge-points/generate-sample", {
+  return api.post<Api<ElecApplicationSample>>("/elec/admin/audit/charge-points/generate-sample", {
     entity_id: entityId,
     application_id: applicationId,
     percentage: percentage
   })
 }
 
-export function downloadChargePointsSample(entityId: number, applicationId: number, sample: boolean = false) {
+export function downloadChargePointsSample(entityId: number, applicationId: number) {
   return download("/elec/admin/audit/charge-points/get-sample", { entity_id: entityId, application_id: applicationId, export: true })
 }
 
@@ -70,14 +70,10 @@ export function downloadChargePointsSample(entityId: number, applicationId: numb
 
 export function startChargePointsApplicationAudit(
   entityId: number,
-  applicationId: number,
-  percentage: number,
-  chargePointIds: string[]) {
+  applicationId: number) {
   return api.post("/elec/admin/audit/charge-points/start-audit", {
     entity_id: entityId,
-    application_id: applicationId,
-    percentage,
-    charge_point_ids: chargePointIds
+    application_id: applicationId
   })
 }
 
@@ -122,6 +118,22 @@ export function getMeterReadingsApplicationDetails(entityId: number, application
     params: { entity_id: entityId, application_id: applicationId },
   })
 }
+
+export function generateMeterReadingsAuditSample(
+  entityId: number,
+  applicationId: number,
+  percentage: number) {
+  return api.post<Api<ElecApplicationSample>>("/elec/admin/audit/meter-readings/generate-sample", {
+    entity_id: entityId,
+    application_id: applicationId,
+    percentage: percentage
+  })
+}
+
+export function downloadMeterReadingsSample(entityId: number, applicationId: number) {
+  return download("/elec/admin/auditmeter-readings/get-sample", { entity_id: entityId, application_id: applicationId, export: true })
+}
+
 
 export function downloadMeterReadingsApplication(entityId: number, applicationId: number, sample: boolean = false) {
   return download("/elec/admin/audit/meter-readings/application-details", { entity_id: entityId, application_id: applicationId, export: true, sample: sample })

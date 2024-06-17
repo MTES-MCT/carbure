@@ -38,10 +38,8 @@ export const ChargingPointsApplicationDetailsPending = ({
     navigate({ search: location.search, hash: "#" })
   }
 
-  const startAudit = async (entityId: number, applicationId: number, percentage: number, chargePointIds: string[]) => {
-    startApplicationAuditMutation.execute(entityId, applicationId,
-      percentage,
-      chargePointIds)
+  const startAudit = async (entityId: number, applicationId: number, chargePointIds: string[]) => {
+    startApplicationAuditMutation.execute(entityId, applicationId)
       .then(() => {
         notify(t("L'audit de l'échantillon des {{count}} points de recharge a bien été initié.", { count: chargePointIds.length }), { variant: "success" })
         closeDialog()
@@ -61,7 +59,8 @@ export const ChargingPointsApplicationDetailsPending = ({
         onDownloadSample={onDownloadSample}
         onStartAudit={startAudit}
         summary={<ApplicationSummary application={chargePointApplication} />}
-        queryLoading={startApplicationAuditMutation.loading}
+        startAuditQueryLoading={startApplicationAuditMutation.loading}
+        generateSampleQuery={api.generateChargePointsAuditSample}
         emailIntro={`Bonjour%20${chargePointApplication?.cpo.name}%0D%0A%0D%0A%0D%0AAfin%20de%20valider%20votre%20inscription%20de%20${chargePointApplication?.station_count}%20points%20de%20recharge%2C%20un%20audit%20doit%20%C3%AAtre%20men%C3%A9%20sur%20les%20points%20de%20recharge%20s%C3%A9lectionn%C3%A9s%20ci-joints.%0D%0A%0D%0A%0D%0AL'inspecteur%20doit%20remplir%20le%20tableau%20en%20respectant%20le%20format%20suivant%20%3A%0D%0A%0D%0A%0D%0A`}
       />
     </>
