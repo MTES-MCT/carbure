@@ -169,7 +169,7 @@ export const ApplicationSampleGeneration = ({
         </>}
 
         {step === "confirmation" && application && <>
-          <Button icon={Send} label={t("Je confirme")} variant="primary" action={startAudit} disabled={!confirmCheckbox || startAuditQueryLoading} loading={startAuditQueryLoading} />
+          <Button icon={Send} label={t("Envoyer en audit")} variant="primary" action={startAudit} disabled={!confirmCheckbox || startAuditQueryLoading} loading={startAuditQueryLoading} />
         </>}
       </footer>
     </>
