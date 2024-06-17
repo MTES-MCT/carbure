@@ -80,7 +80,7 @@ const currentYear = new Date().getFullYear()
 
 const Org = () => {
   const entity = useEntity()
-  // useMissingCompanyInfoModal() //TO DELETE WHEN ALL COMPANIES ARE REGISTRED // TO UNCOMMENT TO 
+  useMissingCompanyInfoModal() //TO DELETE WHEN ALL COMPANIES ARE REGISTRED // TO UNCOMMENT TO 
 
   const {
     isAdmin,
