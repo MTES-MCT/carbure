@@ -9,6 +9,8 @@ import * as api from "../../api"
 import ApplicationStatus from "elec/components/application-status"
 import { ElecChargePointsApplication, ElecAuditApplicationStatus } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
+import { useState } from "react"
+import Checkbox from "common/components/checkbox"
 export type ApplicationDialogProps = {
   application: ElecChargePointsApplication
   onClose: () => void
@@ -27,6 +29,8 @@ export const ChargePointsApplicationRejectDialog = ({
   const entity = useEntity()
   const notify = useNotify()
   const notifyError = useNotifyError()
+  const [confirmCheckbox, setConfirmCheckbox] = useState(false)
+
 
   const rejectChargePointsApplication = useMutation(api.rejectChargePointsApplication, {
     invalidates: ["audit-charge-points-applications", "elec-admin-audit-snapshot"],
@@ -63,10 +67,14 @@ export const ChargePointsApplicationRejectDialog = ({
                 applicationDate: formatDate(application.application_date),
               }}
               count={application.charge_point_count}
-              defaults="<b>{{count}}</b> points de recharge importés le {{applicationDate}} ." />
+              defaults="Refuser les <b>{{count}}</b> points de recharge importés le {{applicationDate}} ?" />
           </p>
           <p>
-            <Trans>Voulez-vous refuser cette demande ?</Trans>
+            <Checkbox
+              value={confirmCheckbox}
+              onChange={setConfirmCheckbox}
+              label={t(" Je confirme avoir partagé le motif de mon refus à l'aménageur par e-mail.")}
+            />
           </p>
         </section>
       </main>
@@ -74,7 +82,7 @@ export const ChargePointsApplicationRejectDialog = ({
       <footer>
 
 
-        <Button icon={Check} label={forceRejection ? t("Refuser la demande sans audit") : t("Refuser la demande")} variant="danger" action={rejectApplication} loading={rejectChargePointsApplication.loading} />
+        <Button icon={Check} label={forceRejection ? t("Refuser la demande sans audit") : t("Refuser la demande")} variant="danger" action={rejectApplication} loading={rejectChargePointsApplication.loading} disabled={!confirmCheckbox} />
 
         <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
       </footer>
