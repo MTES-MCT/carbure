@@ -53,7 +53,7 @@ export const elecAdminProvisionCertificateList: ElecProvisionCertificatesData = 
     total: 11
 }
 
-//CHARGING POINTS
+//CHARGE POINTS
 
 export const elecAuditApplicationSample: ElecApplicationSample = {
     application_id: 1,
@@ -152,7 +152,7 @@ export const elecChargePointsApplications: ElecChargePointsApplication[] = [
 
 export const chargePointsApplicationError1: ChargePointsApplicationError = {
     line: 12,
-    error: "MISSING_CHARGING_POINT_IN_DATAGOUV",
+    error: "MISSING_CHARGE_POINT_IN_DATAGOUV",
     meta: "8U7Y"
 }
 export const chargePointsApplicationError2: ChargePointsApplicationError = {

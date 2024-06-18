@@ -12,18 +12,18 @@ import ApplicationSummary from "./details-application-summary"
 
 export type GenerationState = "generation" | "verification" | "email" | "confirmation"
 
-interface ChargingPointsApplicationDetailsPendingProps {
+interface ChargePointsApplicationDetailsPendingProps {
   chargePointApplication: ElecChargePointsApplicationDetails | undefined
   onAccept: (force: boolean) => void
   onReject: (force: boolean) => void
   onDownloadSample: () => void
 }
-export const ChargingPointsApplicationDetailsPending = ({
+export const ChargePointsApplicationDetailsPending = ({
   chargePointApplication,
   onAccept,
   onReject,
   onDownloadSample
-}: ChargingPointsApplicationDetailsPendingProps) => {
+}: ChargePointsApplicationDetailsPendingProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
   const notifyError = useNotifyError()

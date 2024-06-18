@@ -17,7 +17,7 @@ import ApplicationSummary from "./details-application-summary"
 
 
 
-export const ChargingPointsApplicationDetailsDialog = () => {
+export const ChargePointsApplicationDetailsDialog = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   const navigate = useNavigate()
@@ -126,4 +126,4 @@ const MailtoButton = ({ cpoName, auditorName, chargePointCount }: MailtoButtonPr
 }
 
 
-export default ChargingPointsApplicationDetailsDialog
+export default ChargePointsApplicationDetailsDialog
