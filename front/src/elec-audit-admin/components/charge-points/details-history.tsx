@@ -12,15 +12,13 @@ import ChargePointsSampleMap from "../sample/sample-map"
 
 
 
-interface ChargingPointsApplicationDetailsAcceptedProps {
+interface ChargePointsApplicationHistoryProps {
   chargePointApplication: ElecChargePointsApplicationDetails | undefined
 
 }
-export const ChargingPointsApplicationDetailsAccepted = ({
+export const ChargePointsApplicationHistory = ({
   chargePointApplication,
-}: ChargingPointsApplicationDetailsAcceptedProps) => {
-  const { t } = useTranslation()
-  const [confirmCheckbox, setConfirmCheckbox] = useState(false)
+}: ChargePointsApplicationHistoryProps) => {
 
   return (
     <>
@@ -42,4 +40,4 @@ export const ChargingPointsApplicationDetailsAccepted = ({
 }
 
 
-export default ChargingPointsApplicationDetailsAccepted
+export default ChargePointsApplicationHistory
