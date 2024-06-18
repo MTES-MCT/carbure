@@ -131,7 +131,7 @@ export function generateMeterReadingsAuditSample(
 }
 
 export function downloadMeterReadingsSample(entityId: number, applicationId: number) {
-  return download("/elec/admin/auditmeter-readings/get-sample", { entity_id: entityId, application_id: applicationId, export: true })
+  return download("/elec/admin/audit/meter-readings/get-sample", { entity_id: entityId, application_id: applicationId, export: true })
 }
 
 

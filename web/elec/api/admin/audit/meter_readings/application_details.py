@@ -11,7 +11,7 @@ from elec.services.export_charge_point_excel import export_charge_points_to_exce
 
 
 class ApplicationDetailsForm(forms.Form):
-    application_id = forms.ModelChoiceField(queryset=MeterReadingRepository.get_annotated_applications())
+    application_id = forms.ModelChoiceField(queryset=MeterReadingRepository.get_annotated_applications_details())
     export = forms.BooleanField(required=False)
 
 

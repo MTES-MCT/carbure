@@ -36,10 +36,14 @@ class ElecMeterReadingApplicationSerializer(serializers.ModelSerializer):
 class ElecMeterReadingApplicationDetailsSerializer(ElecMeterReadingApplicationSerializer):
     class Meta:
         model = ElecMeterReadingApplication
-        fields = ElecMeterReadingApplicationSerializer.Meta.fields + ["email_contacts", "sample"]
+        fields = ElecMeterReadingApplicationSerializer.Meta.fields + ["power_total", "email_contacts", "sample"]
 
+    power_total = serializers.SerializerMethodField()
     email_contacts = serializers.SerializerMethodField()
     sample = serializers.SerializerMethodField()
+
+    def get_power_total(self, instance):
+        return round(instance.power_total or 0, 3)
 
     def get_email_contacts(self, instance):
         user_model = get_user_model()
