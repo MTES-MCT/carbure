@@ -1,6 +1,6 @@
 import { cpo } from "carbure/__test__/data";
 import { EntityPreview, EntityType } from "carbure/types";
-import { ElecChargePointsApplicationSample } from "elec-audit-admin/types";
+import { ElecApplicationSample } from "elec-audit-admin/types";
 import { ChargePointsApplicationError, ElecAuditApplicationStatus, ElecChargePointsApplication, ElecChargePointsApplicationCheckInfo, ElecChargePointsApplicationDetails, ElecMeterReadingsApplication, ElecMeterReadingsApplicationCheckInfo, ElecMeterReadingsApplicationDetails, ElecMeterReadingsApplicationsResponse, ElecProvisionCertificatePreview, MeterReadingsApplicationError, MeterReadingsApplicationUrgencyStatus } from "elec/types";
 import { ElecCPOSnapshot, ElecProvisionCertificatesData } from "elec/types-cpo";
 
@@ -53,9 +53,9 @@ export const elecAdminProvisionCertificateList: ElecProvisionCertificatesData = 
     total: 11
 }
 
-//CHARGING POINTS
+//CHARGE POINTS
 
-export const elecChargePointsApplicationSample: ElecChargePointsApplicationSample = {
+export const elecAuditApplicationSample: ElecApplicationSample = {
     application_id: 1,
     percentage: 10,
     charge_points: [
@@ -84,7 +84,7 @@ export const elecChargePointApplicationPending: ElecChargePointsApplication = {
 
 
 
-const elecChargePointApplicationRejected: ElecChargePointsApplication = {
+export const elecChargePointApplicationRejected: ElecChargePointsApplication = {
     id: 3,
     cpo: cpo,
     station_count: 1,
@@ -118,7 +118,7 @@ export const elecChargePointApplicationAuditDone: ElecChargePointsApplication = 
 
 }
 
-const elecChargePointApplicationAccepted: ElecChargePointsApplication = {
+export const elecChargePointApplicationAccepted: ElecChargePointsApplication = {
     id: 2,
     cpo: cpo,
     station_count: 19,
@@ -137,7 +137,7 @@ export const elecChargePointApplicationDetailsPending: ElecChargePointsApplicati
 export const elecChargePointApplicationDetailsInProgress: ElecChargePointsApplicationDetails = {
     ...elecChargePointApplicationAuditInProgress,
     email_contacts: ["test1@carbure.com"],
-    sample: elecChargePointsApplicationSample
+    sample: elecAuditApplicationSample
 }
 
 
@@ -152,7 +152,7 @@ export const elecChargePointsApplications: ElecChargePointsApplication[] = [
 
 export const chargePointsApplicationError1: ChargePointsApplicationError = {
     line: 12,
-    error: "MISSING_CHARGING_POINT_IN_DATAGOUV",
+    error: "MISSING_CHARGE_POINT_IN_DATAGOUV",
     meta: "8U7Y"
 }
 export const chargePointsApplicationError2: ChargePointsApplicationError = {
@@ -189,6 +189,12 @@ const elecMeterReadingApplicationPending: ElecMeterReadingsApplication = {
     status: ElecAuditApplicationStatus.Pending,
 }
 
+export const elecMeterReadingApplicationDetailsPending: ElecMeterReadingsApplicationDetails = {
+    ...elecMeterReadingApplicationPending,
+    email_contacts: ["cpo@test.com"],
+    power_total: 30000
+}
+
 export const elecMeterReadingApplicationAccepted: ElecMeterReadingsApplication = {
     id: 1,
     cpo: cpo,
@@ -212,7 +218,7 @@ const elecMeterReadingApplicationRejected: ElecMeterReadingsApplication = {
 
     status: ElecAuditApplicationStatus.Rejected,
 }
-export const elecMeterReadingApplication4: ElecMeterReadingsApplication = {
+export const elecMeterReadingApplicationAuditInProgress: ElecMeterReadingsApplication = {
     id: 1,
     cpo: cpo,
     station_count: 19,
@@ -225,17 +231,18 @@ export const elecMeterReadingApplication4: ElecMeterReadingsApplication = {
 }
 
 
-export const elecMeterReadingApplication1Details: ElecMeterReadingsApplicationDetails = {
-    ...elecMeterReadingApplicationAccepted,
+export const elecMeterReadingApplicationDetailsInProgress: ElecMeterReadingsApplicationDetails = {
+    ...elecMeterReadingApplicationAuditInProgress,
     email_contacts: ["cpo@test.com"],
-    status: ElecAuditApplicationStatus.AuditInProgress,
-
+    power_total: 30000,
+    sample: elecAuditApplicationSample
 }
 
 export const elecMeterReadingsApplications: ElecMeterReadingsApplication[] = [
     elecMeterReadingApplicationPending,
+    elecMeterReadingApplicationAuditInProgress,
     elecMeterReadingApplicationAccepted,
-    elecMeterReadingApplicationRejected
+    elecMeterReadingApplicationRejected,
 ]
 
 

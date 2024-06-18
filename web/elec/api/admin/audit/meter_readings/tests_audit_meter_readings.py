@@ -1,12 +1,8 @@
-# test with : python web/manage.py test elec.api.admin.audit.meter_readings.tests_audit_meter_readings.ElecAdminAuditMeterReadingsTest --keepdb
-
 import datetime
-import stat
 from core.tests_utils import setup_current_user
 from core.models import Entity
 from django.test import TestCase
 from django.urls import reverse
-from elec.api.cpo import charge_points
 
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_charge_point_application import ElecChargePointApplication

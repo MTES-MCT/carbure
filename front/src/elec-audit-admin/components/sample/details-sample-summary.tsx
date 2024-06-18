@@ -1,11 +1,11 @@
 import Form from "common/components/form"
 import { NumberInput, TextInput } from "common/components/input"
-import { ElecChargePointsApplicationSample } from "elec-audit-admin/types"
+import { ElecApplicationSample } from "elec-audit-admin/types"
 import { useTranslation } from "react-i18next"
 
 
 
-const SampleSummary = ({ sample }: { sample?: ElecChargePointsApplicationSample }) => {
+const SampleSummary = ({ sample }: { sample?: ElecApplicationSample }) => {
   const { t } = useTranslation()
 
   return <>

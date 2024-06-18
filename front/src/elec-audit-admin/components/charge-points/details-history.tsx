@@ -6,21 +6,19 @@ import { ElecChargePointsApplicationDetails } from "elec/types"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import ApplicationSummary from "./details-application-summary"
-import SampleSummary from "./details-sample-summary"
-import ChargePointsSampleMap from "./sample-map"
+import SampleSummary from "../sample/details-sample-summary"
+import ChargePointsSampleMap from "../sample/sample-map"
 
 
 
 
-interface ChargingPointsApplicationDetailsAcceptedProps {
+interface ChargePointsApplicationHistoryProps {
   chargePointApplication: ElecChargePointsApplicationDetails | undefined
 
 }
-export const ChargingPointsApplicationDetailsAccepted = ({
+export const ChargePointsApplicationHistory = ({
   chargePointApplication,
-}: ChargingPointsApplicationDetailsAcceptedProps) => {
-  const { t } = useTranslation()
-  const [confirmCheckbox, setConfirmCheckbox] = useState(false)
+}: ChargePointsApplicationHistoryProps) => {
 
   return (
     <>
@@ -42,4 +40,4 @@ export const ChargingPointsApplicationDetailsAccepted = ({
 }
 
 
-export default ChargingPointsApplicationDetailsAccepted
+export default ChargePointsApplicationHistory

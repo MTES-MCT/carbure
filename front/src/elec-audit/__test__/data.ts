@@ -1,4 +1,4 @@
-import { ElecAdminAuditSnapshot, ElecChargePointsApplicationSample, ElecChargePointsApplicationsData, ElecMeterReadingsApplicationsData } from "elec-audit-admin/types";
+import { ElecAdminAuditSnapshot, ElecApplicationSample, ElecChargePointsApplicationsData, ElecMeterReadingsApplicationsData } from "elec-audit-admin/types";
 import { ElecAuditSnapshot } from "elec-audit/types";
 import { elecChargePointApplicationAuditDone, elecChargePointApplicationAuditInProgress, elecChargePointsApplications, elecMeterReadingsApplications } from "elec/__test__/data";
 import { ElecChargePointsApplication } from "elec/types";
