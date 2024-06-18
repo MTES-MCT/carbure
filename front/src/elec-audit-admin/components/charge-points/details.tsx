@@ -12,7 +12,7 @@ import * as api from "../../api"
 import ChargePointsApplicationAcceptDialog from "./accept-dialog"
 import ChargingPointsApplicationDetailsInProgress from "./details-in-progress"
 import ChargePointsApplicationRejectDialog from "./reject-dialog"
-import ChargingPointsApplicationDetailsAccepted from "./details-accepted"
+import ChargePointsApplicationHistory from "./details-history"
 import { ChargingPointsApplicationDetailsPending } from "./details-pending"
 
 
@@ -90,8 +90,8 @@ export const ChargingPointsApplicationDetailsDialog = () => {
           />
         )
         }
-        {chargePointApplication?.status === ElecAuditApplicationStatus.Accepted && (
-          <ChargingPointsApplicationDetailsAccepted
+        {chargePointApplication?.status && [ElecAuditApplicationStatus.Accepted, ElecAuditApplicationStatus.Rejected].includes(chargePointApplication.status) && (
+          <ChargePointsApplicationHistory
             chargePointApplication={chargePointApplication}
           />
         )

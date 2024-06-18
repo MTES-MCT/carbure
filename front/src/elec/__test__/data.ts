@@ -55,7 +55,7 @@ export const elecAdminProvisionCertificateList: ElecProvisionCertificatesData = 
 
 //CHARGING POINTS
 
-export const elecChargePointsApplicationSample: ElecApplicationSample = {
+export const elecAuditApplicationSample: ElecApplicationSample = {
     application_id: 1,
     percentage: 10,
     charge_points: [
@@ -84,7 +84,7 @@ export const elecChargePointApplicationPending: ElecChargePointsApplication = {
 
 
 
-const elecChargePointApplicationRejected: ElecChargePointsApplication = {
+export const elecChargePointApplicationRejected: ElecChargePointsApplication = {
     id: 3,
     cpo: cpo,
     station_count: 1,
@@ -118,7 +118,7 @@ export const elecChargePointApplicationAuditDone: ElecChargePointsApplication = 
 
 }
 
-const elecChargePointApplicationAccepted: ElecChargePointsApplication = {
+export const elecChargePointApplicationAccepted: ElecChargePointsApplication = {
     id: 2,
     cpo: cpo,
     station_count: 19,
@@ -137,7 +137,7 @@ export const elecChargePointApplicationDetailsPending: ElecChargePointsApplicati
 export const elecChargePointApplicationDetailsInProgress: ElecChargePointsApplicationDetails = {
     ...elecChargePointApplicationAuditInProgress,
     email_contacts: ["test1@carbure.com"],
-    sample: elecChargePointsApplicationSample
+    sample: elecAuditApplicationSample
 }
 
 
@@ -234,7 +234,8 @@ export const elecMeterReadingApplicationAuditInProgress: ElecMeterReadingsApplic
 export const elecMeterReadingApplicationDetailsInProgress: ElecMeterReadingsApplicationDetails = {
     ...elecMeterReadingApplicationAuditInProgress,
     email_contacts: ["cpo@test.com"],
-    power_total: 30000
+    power_total: 30000,
+    sample: elecAuditApplicationSample
 }
 
 export const elecMeterReadingsApplications: ElecMeterReadingsApplication[] = [
