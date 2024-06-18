@@ -61,7 +61,7 @@ export const MeterReadingsApplicationDetailsDialog = () => {
 
   const downloadSample = async () => {
     if (!meterReadingsApplication) return
-    return api.downloadMeterReadingsApplication(entity.id, meterReadingsApplication.id)
+    return api.downloadMeterReadingsSample(entity.id, meterReadingsApplication.id)
 
   }
 

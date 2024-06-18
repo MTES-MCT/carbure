@@ -32,7 +32,7 @@ export const MeterReadingsApplicationDetailsPending = ({
 
 
   const startMeterReadingsApplicationAuditMutation = useMutation(api.startMeterReadingsApplicationAudit, {
-    invalidates: ["audit-meter-readings-application-details", "audit-meter-readings-applications"]
+    invalidates: ["audit-meter-readings-application-details", "audit-meter-readings-applications", "elec-admin-audit-snapshot"]
   })
 
   const closeDialog = () => {

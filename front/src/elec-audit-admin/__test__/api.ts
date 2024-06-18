@@ -1,8 +1,6 @@
 import { mockGetWithResponseData, mockPostWithResponseData } from "carbure/__test__/helpers";
 import { elecChargePointApplicationDetailsInProgress, elecChargePointApplicationDetailsPending, elecAuditApplicationSample, elecMeterReadingApplicationDetailsInProgress, elecMeterReadingApplicationDetailsPending, elecMeterReadingApplicationAccepted, elecChargePointApplicationAccepted, elecChargePointApplicationRejected } from "elec/__test__/data";
 import { elecAdminAuditSnapshot, elecAdminChargePointsApplicationsList, elecAdminMeterReadingsApplicationsList, elecAuditAdminMeterReadingsFilters } from "./data";
-import { setupServer } from "msw/lib/node";
-import { okSettings } from "account/__test__/api";
 
 export const okGetSnapshot = mockGetWithResponseData("/elec/admin/audit/snapshot", elecAdminAuditSnapshot)
 export const okGetYears = mockGetWithResponseData("/elec/admin/audit/years", [2023, 2024])
