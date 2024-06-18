@@ -16,7 +16,7 @@ import ElecAuditFilters from "./list-filters"
 import { ElecAuditFilter, ElecAuditSnapshot, ElecAuditStatus } from "elec-audit/types"
 import { StatusSwitcher } from "./status-switcher"
 import AuditChargePointsApplicationsTable from "./table"
-import ChargingPointsApplicationDetailsDialog from "./details"
+import ChargePointsApplicationDetailsDialog from "./details"
 
 
 type TransferListProps = {
@@ -104,7 +104,7 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
       </section >
 
 
-      <HashRoute path="application/:id" element={<ChargingPointsApplicationDetailsDialog />} />
+      <HashRoute path="application/:id" element={<ChargePointsApplicationDetailsDialog />} />
     </>
   )
 }

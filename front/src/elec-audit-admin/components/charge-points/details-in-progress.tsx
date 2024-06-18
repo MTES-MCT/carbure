@@ -12,18 +12,18 @@ import ChargePointsSampleMap from "../sample/sample-map"
 
 
 
-interface ChargingPointsApplicationDetailsInProgressProps {
+interface ChargePointsApplicationDetailsInProgressProps {
   chargePointApplication: ElecChargePointsApplicationDetails | undefined
   onAccept: (force?: boolean) => void
   onReject: (force?: boolean) => void
   onDownloadSample: () => void
 }
-export const ChargingPointsApplicationDetailsInProgress = ({
+export const ChargePointsApplicationDetailsInProgress = ({
   chargePointApplication,
   onAccept,
   onReject,
   onDownloadSample
-}: ChargingPointsApplicationDetailsInProgressProps) => {
+}: ChargePointsApplicationDetailsInProgressProps) => {
   const { t } = useTranslation()
   const [confirmCheckbox, setConfirmCheckbox] = useState(false)
 
@@ -59,4 +59,4 @@ export const ChargingPointsApplicationDetailsInProgress = ({
 }
 
 
-export default ChargingPointsApplicationDetailsInProgress
+export default ChargePointsApplicationDetailsInProgress
