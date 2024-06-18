@@ -10,13 +10,13 @@ import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../../api"
 import ChargePointsApplicationAcceptDialog from "./accept-dialog"
-import ChargingPointsApplicationDetailsInProgress from "./details-in-progress"
-import ChargingPointsApplicationDetailsPending from "./details-pending"
+import ChargePointsApplicationDetailsInProgress from "./details-in-progress"
 import ChargePointsApplicationRejectDialog from "./reject-dialog"
-import ChargingPointsApplicationDetailsAccepted from "./details-accepted"
+import ChargePointsApplicationHistory from "./details-history"
+import { ChargePointsApplicationDetailsPending } from "./details-pending"
 
 
-export const ChargingPointsApplicationDetailsDialog = () => {
+export const ChargePointsApplicationDetailsDialog = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   const portal = usePortal()
@@ -62,7 +62,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
 
 
   const downloadSample = async () => {
-    return api.downloadChargePointsSample(entity.id, chargePointApplication!.id, true)
+    return api.downloadChargePointsSample(entity.id, chargePointApplication!.id)
   }
 
   return (
@@ -74,7 +74,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
           <h1>{t("Inscription de points de recharge")}</h1>
         </header>
         {chargePointApplication?.status === ElecAuditApplicationStatus.Pending && (
-          <ChargingPointsApplicationDetailsPending
+          <ChargePointsApplicationDetailsPending
             chargePointApplication={chargePointApplication}
             onAccept={acceptApplication}
             onReject={rejectApplication}
@@ -82,7 +82,7 @@ export const ChargingPointsApplicationDetailsDialog = () => {
           />
         )}
         {chargePointApplication?.status === ElecAuditApplicationStatus.AuditInProgress && (
-          <ChargingPointsApplicationDetailsInProgress
+          <ChargePointsApplicationDetailsInProgress
             chargePointApplication={chargePointApplication}
             onAccept={acceptApplication}
             onReject={rejectApplication}
@@ -90,8 +90,8 @@ export const ChargingPointsApplicationDetailsDialog = () => {
           />
         )
         }
-        {chargePointApplication?.status === ElecAuditApplicationStatus.Accepted && (
-          <ChargingPointsApplicationDetailsAccepted
+        {chargePointApplication?.status && [ElecAuditApplicationStatus.Accepted, ElecAuditApplicationStatus.Rejected].includes(chargePointApplication.status) && (
+          <ChargePointsApplicationHistory
             chargePointApplication={chargePointApplication}
           />
         )
@@ -106,4 +106,4 @@ export const ChargingPointsApplicationDetailsDialog = () => {
 
 
 
-export default ChargingPointsApplicationDetailsDialog
+export default ChargePointsApplicationDetailsDialog

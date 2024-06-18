@@ -9,6 +9,8 @@ import * as api from "../../api"
 import ApplicationStatus from "elec/components/application-status"
 import { ElecMeterReadingsApplication, ElecAuditApplicationStatus } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
+import Checkbox from "common/components/checkbox"
+import { useState } from "react"
 export type ApplicationDialogProps = {
   application: ElecMeterReadingsApplication
   onClose: () => void
@@ -27,6 +29,7 @@ export const MeterReadingsApplicationRejectDialog = ({
   const entity = useEntity()
   const notify = useNotify()
   const notifyError = useNotifyError()
+  const [confirmCheckbox, setConfirmCheckbox] = useState(false)
 
   const rejectMeterReadingsApplication = useMutation(api.rejectMeterReadingsApplication, {
     invalidates: ["audit-charge-points-applications", "elec-admin-audit-snapshot"],
@@ -49,7 +52,7 @@ export const MeterReadingsApplicationRejectDialog = ({
     <Dialog onClose={onClose}>
       <header>
         <ApplicationStatus status={application.status} big />
-        <h1>{t("Refuser les relevés de points de recharge")}</h1>
+        <h1>{t("Refuser les relevé")}</h1>
 
 
       </header>
@@ -64,10 +67,15 @@ export const MeterReadingsApplicationRejectDialog = ({
                 year: application.year,
               }}
               count={application.charge_point_count}
-              defaults="<b>{{count}}</b> relevés points de recharge pour T{{quarter}} {{year}} ." />
+              defaults="Refuser le relevé des <b>{{count}}</b> points de recharge pour T{{quarter}} {{year}} ." />
           </p>
+
           <p>
-            <Trans>Voulez-vous refuser cette demande ?</Trans>
+            <Checkbox
+              value={confirmCheckbox}
+              onChange={setConfirmCheckbox}
+              label={t(" Je confirme avoir partagé le motif de mon refus à l'aménageur par e-mail.")}
+            />
           </p>
         </section>
       </main>
@@ -75,9 +83,7 @@ export const MeterReadingsApplicationRejectDialog = ({
       <footer>
 
 
-        <Button icon={Check} label={forceRejection ? t("Refuser la demande sans audit") : t("Refuser la demande")} variant="danger" action={rejectApplication} loading={rejectMeterReadingsApplication.loading} />
-
-        <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
+        <Button icon={Check} label={forceRejection ? t("Refuser la demande sans audit") : t("Refuser la demande")} variant="danger" action={rejectApplication} loading={rejectMeterReadingsApplication.loading} disabled={!confirmCheckbox} />
       </footer>
 
     </Dialog>

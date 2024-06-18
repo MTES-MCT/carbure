@@ -13,7 +13,7 @@ import * as apiAudit from "../../api"
 import * as api from "elec-admin/api"
 import ElecAdminAuditFilters from "../list-filters"
 import { StatusSwitcher } from "../status-switcher"
-import ChargingPointsApplicationDetailsDialog from "./details"
+import ChargePointsApplicationDetailsDialog from "./details"
 import { useElectAdminAuditQuery } from "./list-query"
 import { useElecAdminAuditChargePointsQueryParamsStore } from "./list-query-params-store"
 
@@ -111,7 +111,7 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
       </section >
 
 
-      <HashRoute path="application/:id" element={<ChargingPointsApplicationDetailsDialog />} />
+      <HashRoute path="application/:id" element={<ChargePointsApplicationDetailsDialog />} />
     </>
   )
 }

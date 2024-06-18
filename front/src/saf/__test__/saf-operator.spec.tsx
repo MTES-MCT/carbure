@@ -15,7 +15,6 @@ import { Saf } from "../operator"
 import server from "./api"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
-
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
