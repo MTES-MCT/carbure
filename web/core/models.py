@@ -1085,12 +1085,10 @@ class CarbureStock(models.Model):
             return datetime.date.today()
         # return self.parent_lot.delivery_date if self.parent_lot else self.parent_transformation.transformation_dt
 
-    def update_remaining_volume(self, volume_to_recredit, volume_to_debit):
-        self.remaining_volume = round(self.remaining_volume + volume_to_recredit, 2)
-        self.remaining_volume = round(self.remaining_volume - volume_to_debit, 2)
+    def update_remaining_volume(self, diff):
+        self.remaining_volume = round(self.remaining_volume + diff, 2)
         self.remaining_lhv_amount = self.get_lhv_amount()
         self.remaining_weight = self.get_weight()
-        self.save()
 
     def generate_carbure_id(self):
         country_of_production = "00"

@@ -1,48 +1,52 @@
+from django import forms
+from django.db import transaction
+from core.carburetypes import CarbureError
+from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
-from django.http.response import JsonResponse
-from core.helpers import get_stock_events, get_lot_updates, get_lot_comments
-from core.models import CarbureStock, CarbureStock, CarbureStockEvent, UserRights
+from core.models import CarbureStock, CarbureStock, CarbureStockEvent, CarbureStockTransformation, UserRights
+from core.utils import MultipleValueField
+
+
+class StockCancelTransformationForm(forms.Form):
+    stock_ids = MultipleValueField(coerce=int)
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
-def stock_cancel_transformation(request, *args, **kwargs):
-    context = kwargs["context"]
-    entity_id = context["entity_id"]
-    stock_ids = request.POST.getlist("stock_ids", False)
-    if not stock_ids:
-        return JsonResponse(
-            {"status": "error", "message": "Missing stock_ids"}, status=400
-        )
+def stock_cancel_transformation(request, entity):
+    form = StockCancelTransformationForm(request.POST)
 
-    try:
-        stocks = CarbureStock.objects.filter(pk__in=stock_ids)
-    except:
-        return JsonResponse(
-            {"status": "error", "message": "Could not find stock"}, status=400
-        )
+    if not form.is_valid():
+        return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, data=form.errors)
 
-    for stock in stocks:
-        if stock.carbure_client_id != int(entity_id):
-            return JsonResponse(
-                {"status": "forbidden", "message": "Stock does not belong to you"},
-                status=403,
+    stock_ids = form.cleaned_data["stock_ids"]
+
+    stocks = (
+        CarbureStock.objects.filter(pk__in=stock_ids, carbure_client=entity)
+        .exclude(parent_transformation=None)
+        .select_related("parent_transformation", "parent_transformation__source_stock")
+    )
+
+    with transaction.atomic():
+        stock_events = []
+        stocks_to_update = set()
+
+        stock_transformations = [s.parent_transformation for s in stocks]
+
+        for transform in stock_transformations:
+            transform.source_stock.update_remaining_volume(+transform.volume_deducted_from_source)
+
+            stocks_to_update.add(transform.source_stock)
+
+            stock_events.append(
+                CarbureStockEvent(
+                    stock=transform.source_stock,
+                    event_type=CarbureStockEvent.UNTRANSFORMED,
+                    user=request.user,
+                )
             )
 
-        if stock.parent_transformation_id is None:
-            return JsonResponse(
-                {
-                    "status": "error",
-                    "message": "Stock does not come from a transformation",
-                },
-                status=400,
-            )
+        CarbureStockEvent.objects.bulk_create(stock_events)
+        CarbureStockEvent.objects.bulk_update(stocks_to_update, ['remaining_volume', 'remaining_weight', 'remaining_lhv_amount'])  # fmt:skip
+        CarbureStockTransformation.objects.filter(id__in=[t.id for t in stock_transformations]).delete()
 
-        # all good
-        # delete of transformation should trigger a cascading delete of child_lots + recredit volume to the parent_stock
-        event = CarbureStockEvent()
-        event.stock = stock.parent_transformation.source_stock
-        event.event_type = CarbureStockEvent.UNTRANSFORMED
-        event.user = request.user
-        event.save()
-        stock.parent_transformation.delete()
-    return JsonResponse({"status": "success"})
+    return SuccessResponse()
