@@ -46,7 +46,7 @@ def stock_cancel_transformation(request, entity):
             )
 
         CarbureStockEvent.objects.bulk_create(stock_events)
-        CarbureStockEvent.objects.bulk_update(stocks_to_update, ['remaining_volume', 'remaining_weight', 'remaining_lhv_amount'])  # fmt:skip
+        CarbureStock.objects.bulk_update(stocks_to_update, ["remaining_volume", "remaining_weight", "remaining_lhv_amount"])
         CarbureStockTransformation.objects.filter(id__in=[t.id for t in stock_transformations]).delete()
 
     return SuccessResponse()

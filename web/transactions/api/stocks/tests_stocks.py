@@ -307,11 +307,11 @@ class StocksFlowTest(TestCase):
         body = {"entity_id": self.producer.id, "stock_ids": [dest_stock.id]}
         self.client.post(reverse("transactions-stocks-cancel-transformation"), body)
 
-        dest_stock_still_exists = CarbureStock.objects.filter(id=dest_stock.id).count() > 0
-        self.assertEqual(dest_stock_still_exists, False)
-
         transform_still_exists = CarbureStockTransformation.objects.filter(id=transform.id).count() > 0
         self.assertEqual(transform_still_exists, False)
+
+        dest_stock_still_exists = CarbureStock.objects.filter(id=dest_stock.id).count() > 0
+        self.assertEqual(dest_stock_still_exists, False)
 
         source_stock.refresh_from_db()
         self.assertEqual(source_stock.remaining_volume, 200_000)
