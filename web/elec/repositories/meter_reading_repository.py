@@ -16,6 +16,12 @@ class MeterReadingRepository:
         )
 
     @staticmethod
+    def get_annotated_applications_details():
+        return MeterReadingRepository.get_annotated_applications().annotate(
+            power_total=Sum("elec_meter_readings__charge_point__nominal_power")
+        )
+
+    @staticmethod
     def get_annotated_applications_by_cpo(cpo):
         return MeterReadingRepository.get_annotated_applications().filter(cpo=cpo)
 

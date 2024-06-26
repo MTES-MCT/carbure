@@ -1,25 +1,23 @@
 import useEntity from "carbure/hooks/entity"
+import Alert from "common/components/alert"
+import Button from "common/components/button"
 import { Dialog } from "common/components/dialog"
+import { Divider } from "common/components/divider"
 import { useHashMatch } from "common/components/hash-route"
-import Portal, { usePortal } from "common/components/portal"
+import { Download, Edit, Send } from "common/components/icons"
+import Portal from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
+import ChargePointsSampleMap from "elec-audit-admin/components/sample/sample-map"
+import * as api from "elec-audit/api"
 import ApplicationStatus from "elec/components/application-status"
-import { ElecAuditApplicationStatus } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
-import * as api from "elec-audit/api"
-import { Divider } from "common/components/divider"
-import SampleSummary from "elec-audit-admin/components/charge-points/details-sample-summary"
-import ChargePointsSampleMap from "elec-audit-admin/components/charge-points/sample-map"
-import Button from "common/components/button"
-import { Download, Edit, Send } from "common/components/icons"
 import ApplicationSummary from "./details-application-summary"
-import Alert from "common/components/alert"
 
 
 
-export const ChargingPointsApplicationDetailsDialog = () => {
+export const ChargePointsApplicationDetailsDialog = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   const navigate = useNavigate()
@@ -128,4 +126,4 @@ const MailtoButton = ({ cpoName, auditorName, chargePointCount }: MailtoButtonPr
 }
 
 
-export default ChargingPointsApplicationDetailsDialog
+export default ChargePointsApplicationDetailsDialog
