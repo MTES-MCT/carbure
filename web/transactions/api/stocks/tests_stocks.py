@@ -3,7 +3,7 @@ import json
 import random
 
 from core.tests_utils import setup_current_user
-from core.models import CarbureLot, CarbureStock, Depot, Entity
+from core.models import Biocarburant, CarbureLot, CarbureStock, CarbureStockTransformation, Depot, Entity
 from django.db.models import Count
 from django.test import TestCase
 from django.urls import reverse
@@ -53,9 +53,7 @@ class StocksFlowTest(TestCase):
         response = self.client.get(reverse("transactions-stocks"), query)
         stocks_data = response.json()["data"]
         self.assertEqual(len(stocks_data["stocks"]), 1)
-        self.assertEqual(
-            stocks_data["stocks"][0]["carbure_client"]["id"], self.producer.id
-        )
+        self.assertEqual(stocks_data["stocks"][0]["carbure_client"]["id"], self.producer.id)
 
     def test_get_stocks_summary(self):
         parent_lot = CarbureLotFactory.create(lot_status="ACCEPTED")
@@ -109,9 +107,7 @@ class StocksFlowTest(TestCase):
 
         self.assertEqual(parent_lot.lot_status, CarbureLot.ACCEPTED)
         self.assertEqual(parent_lot.delivery_type, CarbureLot.STOCK)
-        stock = CarbureStockFactory.create(
-            parent_lot=parent_lot, carbure_client=self.producer, remaining_volume=50000
-        )
+        stock = CarbureStockFactory.create(parent_lot=parent_lot, carbure_client=self.producer, remaining_volume=50000)
 
         today = datetime.date.today().strftime("%d/%m/%Y")
 
@@ -244,9 +240,7 @@ class StocksFlowTest(TestCase):
         )
 
         # Flush
-        stock = CarbureStockFactory.create(
-            parent_lot=parent_lot, carbure_client=self.producer, remaining_volume=1000
-        )
+        stock = CarbureStockFactory.create(parent_lot=parent_lot, carbure_client=self.producer, remaining_volume=1000)
         stock.save()  # HACK to avoid `generate_carbure_id` later
         query = {"entity_id": self.producer.id, "stock_ids": [stock.id]}
         response = self.client.post(reverse("transactions-stocks-flush"), query)
@@ -254,11 +248,70 @@ class StocksFlowTest(TestCase):
         self.assertEqual(status, "success")
 
         # Cannot flush a stock with a remaining volume greater than 1% => 5% in deed
-        stock = CarbureStockFactory.create(
-            parent_lot=parent_lot, carbure_client=self.producer, remaining_volume=5001
-        )
+        stock = CarbureStockFactory.create(parent_lot=parent_lot, carbure_client=self.producer, remaining_volume=5001)
         stock.save()  # HACK to avoid `generate_carbure_id` later
         query = {"entity_id": self.producer.id, "stock_ids": [stock.id]}
         response = self.client.post(reverse("transactions-stocks-flush"), query)
         status = response.json()["status"]
         self.assertEqual(status, "error")
+
+    def test_stock_transformation(self):
+        eth = Biocarburant.objects.get(code="ETH")
+
+        parent_lot = CarbureLotFactory.create(
+            carbure_client_id=self.producer.id,
+            volume=200_000,
+            delivery_type=CarbureLot.STOCK,
+            biofuel=eth,
+            lot_status="ACCEPTED",
+        )
+
+        source_stock = CarbureStockFactory.create(
+            parent_lot=parent_lot,
+            carbure_client=self.producer,
+            remaining_volume=200_000,
+            biofuel=eth,
+        )
+
+        body = {
+            "entity_id": self.producer.id,
+            "payload": json.dumps(
+                [
+                    {
+                        "stock_id": source_stock.id,
+                        "transformation_type": "ETH_ETBE",
+                        "volume_ethanol": 90_000,
+                        "volume_etbe": 200_000,
+                        "volume_denaturant": 10_000,
+                        "volume_etbe_eligible": 100_000,
+                    }
+                ]
+            ),
+        }
+
+        # transform part of stock into etbe
+        self.client.post(reverse("transactions-stocks-transform"), body)
+
+        source_stock.refresh_from_db()
+
+        self.assertEqual(source_stock.remaining_volume, 110_000)
+
+        transform = source_stock.source_stock.select_related("dest_stock").first()
+        self.assertEqual(transform.volume_deducted_from_source, 90_000)
+
+        dest_stock = CarbureStock.objects.get(parent_transformation=transform)
+        self.assertEqual(dest_stock.biofuel.code, "ETBE")
+        self.assertEqual(dest_stock.remaining_volume, 200_000)
+
+        # cancel transform
+        body = {"entity_id": self.producer.id, "stock_ids": [dest_stock.id]}
+        self.client.post(reverse("transactions-stocks-cancel-transformation"), body)
+
+        transform_still_exists = CarbureStockTransformation.objects.filter(id=transform.id).count() > 0
+        self.assertEqual(transform_still_exists, False)
+
+        dest_stock_still_exists = CarbureStock.objects.filter(id=dest_stock.id).count() > 0
+        self.assertEqual(dest_stock_still_exists, False)
+
+        source_stock.refresh_from_db()
+        self.assertEqual(source_stock.remaining_volume, 200_000)

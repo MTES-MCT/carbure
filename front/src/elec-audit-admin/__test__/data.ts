@@ -30,3 +30,8 @@ export const elecAdminMeterReadingsApplicationsList: ElecMeterReadingsApplicatio
   total: 11
 }
 
+export const elecAuditAdminMeterReadingsFilters: string[] = [
+  "CPO Test",
+  "Cpo Test 2",
+]
+

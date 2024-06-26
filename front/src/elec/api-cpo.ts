@@ -96,7 +96,7 @@ export function cancelTransferCertificate(
   })
 }
 
-// CHARGING POINTS
+// CHARGE POINTS
 
 
 

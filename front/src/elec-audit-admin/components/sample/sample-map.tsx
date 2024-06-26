@@ -18,6 +18,7 @@ const ChargePointsSampleMap = ({
       center={franceCenterCoordinates}
       zoom={5}
       style={{ height: "350px", width: "100%" }}
+      scrollWheelZoom={false}
     >
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       {chargePoints?.map((point, idx) => (

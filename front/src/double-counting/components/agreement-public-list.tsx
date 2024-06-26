@@ -1,15 +1,11 @@
-import useEntity from "carbure/hooks/entity"
 import NoResult from "common/components/no-result"
 import { Main } from "common/components/scaffold"
-import Table, { Cell, Column, Order } from "common/components/table"
+import Table from "common/components/table"
 import { useQuery } from "common/hooks/async"
 import useTitle from "common/hooks/title"
-import { compact } from "common/utils/collection"
 import { formatDateYear } from "common/utils/formatters"
-import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import * as api from "../../double-counting/api"
-import { DoubleCountingAgreementPublic } from "../types"
 
 
 const AgreementPublicList = () => {

@@ -86,20 +86,20 @@ const UserRights = () => {
   return (
     <Panel id="users">
       <header>
-        <h1>Utilisateurs</h1>
+        <h1>{t("Utilisateurs")}</h1>
       </header>
 
       <section>
         {(query.length > 0 || rows.length > 0) && (
           <Input
-            placeholder="Rechercher utilisateur..."
+            placeholder={t("Rechercher utilisateur...")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
         )}
         {rows.length === 0 && (
           <Alert icon={AlertCircle} variant="warning">
-            Aucun utilisateur associé à cette entité
+            {t("Aucun utilisateur associé à cette entité")}
           </Alert>
         )}
       </section>
@@ -112,20 +112,20 @@ const UserRights = () => {
             {
               small: true,
               key: "status",
-              header: "Statut",
+              header: t("Statut"),
               orderBy: (r) => RIGHTS_ORDER[r.status],
               cell: (r: UserRightRequest) => <RightStatus status={r.status} />,
             },
             {
               key: "user",
-              header: "Utilisateur",
+              header: t("Utilisateur"),
               orderBy: (r) => r.user[0] ?? "",
               cell: (r) => <Cell text={r.user[0] ?? ""} />,
             },
             {
               small: true,
               key: "role",
-              header: "Droits",
+              header: t("Droits"),
               orderBy: (r) => ROLE_LABELS[r.role],
               cell: (r) => (
                 <Select
@@ -141,7 +141,7 @@ const UserRights = () => {
             {
               small: true,
               key: "date",
-              header: "Date",
+              header: t("Date"),
               orderBy: (r) => r.date_requested,
               cell: (r) => {
                 const dateRequested = formatDate(r.date_requested)
