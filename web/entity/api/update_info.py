@@ -51,7 +51,7 @@ def update_entity_info(request, *args, **kwargs):
 
 
 class UpdateEntityInfoForm(forms.Form):
-    activity_description = forms.CharField(max_length=128, required=False)
+    activity_description = forms.CharField(max_length=5000, required=False)
     entity_id = forms.IntegerField()
     legal_name = forms.CharField(max_length=128, required=False)
     registered_address = forms.CharField(required=False)
