@@ -1,4 +1,5 @@
-# Test :
+# Test : python web/manage.py test elec.api.cpo.meter_readings.tests_meter_readings.ElecMeterReadingsTest --keepdb
+
 
 import io
 import datetime
@@ -370,6 +371,7 @@ class ElecMeterReadingsTest(TestCase):
                         "quarter": 3,
                         "urgency_status": "HIGH",
                         "year": 2024,
+                        "charge_point_count": 2,
                     },
                 },
                 "status": "success",

@@ -122,7 +122,7 @@ export enum MeterReadingsApplicationUrgencyStatus {
 }
 
 export interface ElecMeterReadingsCurrentApplicationsPeriod {
-  year: number, quarter: number, urgency_status: MeterReadingsApplicationUrgencyStatus, deadline: string
+  year: number, quarter: number, urgency_status: MeterReadingsApplicationUrgencyStatus, deadline: string, charge_point_count: number
 
 }
 export interface ElecMeterReadingsApplicationsResponse {
