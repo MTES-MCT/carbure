@@ -258,7 +258,8 @@ export const elecMeterReadingsApplicationsResponsePending: ElecMeterReadingsAppl
         quarter: 1,
         year: 2024,
         urgency_status: MeterReadingsApplicationUrgencyStatus.Critical,
-        deadline: "2024-04-15"
+        deadline: "2024-04-15",
+        charge_point_count: 90
     }
 }
 
@@ -273,7 +274,8 @@ export const elecMeterReadingsApplicationsResponseMissing: ElecMeterReadingsAppl
         // urgency_status: MeterReadingsApplicationUrgencyStatus.Low,
         // urgency_status: MeterReadingsApplicationUrgencyStatus.High,
         urgency_status: MeterReadingsApplicationUrgencyStatus.Critical,
-        deadline: "2024-04-15"
+        deadline: "2024-04-15",
+        charge_point_count: 90
 
     }
 }
