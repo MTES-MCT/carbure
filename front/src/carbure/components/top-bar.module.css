@@ -59,6 +59,10 @@
   opacity: 1;
 }
 
+.faq:after {
+  display: none;
+}
+
 @media screen and (max-width: 1600px) {
   .faq {
     display: none;
