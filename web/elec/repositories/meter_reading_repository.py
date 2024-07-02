@@ -62,10 +62,16 @@ class MeterReadingRepository:
 
     @staticmethod
     def get_entities_without_application(quarter, year):
+
         return Entity.objects.annotate(
+            meter_readings_charge_points_count=Count(
+                "elec_charge_points",
+                filter=Q(elec_charge_points__is_article_2=False),
+                distinct=True,
+            ),
             app_count=Count(
                 "elec_meter_reading_applications",
                 filter=Q(elec_meter_reading_applications__quarter=quarter, elec_meter_reading_applications__year=year),
                 distinct=True,
-            )
-        ).filter(app_count=0, entity_type=Entity.CPO)
+            ),
+        ).filter(app_count=0, meter_readings_charge_points_count__gt=0, entity_type=Entity.CPO)
