@@ -93,6 +93,9 @@ class ExcelChargePoints:
                 charge_point_data = charge_point_data.drop(charge_point_data.index[:34])
                 charge_point_data = charge_point_data.reset_index(drop=True)
 
+        # strip whitespaces around cell data for better matching later
+        charge_point_data = charge_point_data.applymap(lambda x: x.strip() if isinstance(x, str) else x)
+
         return charge_point_data.drop_duplicates("charge_point_id")
 
     def validate_charge_points(
