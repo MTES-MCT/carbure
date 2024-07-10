@@ -25,10 +25,10 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
   })
 
   const applicationsResponse = applicationsQuery.result?.data.data
-  // const applicationsResponse = elecMeterReadingsApplicationsResponsePending //TEST
 
   const applications = applicationsResponse?.applications ?? []
   const currentApplicationPeriod = applicationsResponse?.current_application_period
+  const chargePointCount = currentApplicationPeriod?.charge_point_count
   const currentApplication = applicationsResponse?.current_application
 
   const isEmpty = applications.length === 0
@@ -64,15 +64,17 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
         </h1>
 
 
-        <Button
-          asideX={true}
-          variant={currentApplication ? "primary" : urgencyStatus === MeterReadingsApplicationUrgencyStatus.High ? "warning" : urgencyStatus === MeterReadingsApplicationUrgencyStatus.Critical ? "danger" : "primary"}
-          icon={Plus}
-          disabled={currentApplication && currentApplication.status !== ElecAuditApplicationStatus.Pending}
-          action={showUploadDialog}
-          label={t("Transmettre mes relevés trimestriels {{quarter}}", { quarter: quarterString })}
-        />
-
+        {chargePointCount === 0 && <p><Trans>Vous n'avez aucun relevé à déclarer</Trans></p>}
+        {!!chargePointCount && chargePointCount > 1 &&
+          <Button
+            asideX={true}
+            variant={currentApplication ? "primary" : urgencyStatus === MeterReadingsApplicationUrgencyStatus.High ? "warning" : urgencyStatus === MeterReadingsApplicationUrgencyStatus.Critical ? "danger" : "primary"}
+            icon={Plus}
+            disabled={currentApplication && currentApplication.status !== ElecAuditApplicationStatus.Pending}
+            action={showUploadDialog}
+            label={t("Transmettre mes relevés trimestriels {{quarter}}", { quarter: quarterString })}
+          />
+        }
       </header>
 
 

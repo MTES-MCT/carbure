@@ -4,6 +4,7 @@ from core.common import SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity
 
+from elec.repositories.charge_point_repository import ChargePointRepository
 from elec.repositories.meter_reading_repository import MeterReadingRepository
 from elec.serializers.elec_meter_reading_application import ElecMeterReadingApplicationSerializer
 
@@ -20,6 +21,10 @@ def get_applications(request, entity):
     current_application = MeterReadingRepository.get_cpo_application_for_quarter(entity, year, quarter)
     applications = MeterReadingRepository.get_annotated_applications_by_cpo(entity)
 
+    prefetched_charge_points_for_meter_readings_count = ChargePointRepository.get_charge_points_for_meter_readings(
+        entity
+    ).count()
+
     serialized_applications = ElecMeterReadingApplicationSerializer(applications, many=True).data
     serialized_current_application = ElecMeterReadingApplicationSerializer(current_application).data if current_application else None  # fmt:skip
 
@@ -32,6 +37,7 @@ def get_applications(request, entity):
                 "quarter": quarter,
                 "deadline": str(deadline),
                 "urgency_status": urgency_status,
+                "charge_point_count": prefetched_charge_points_for_meter_readings_count,
             },
         }
     )
