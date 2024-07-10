@@ -43,8 +43,11 @@ def check_application(request: HttpRequest, entity):
     quarter = form.cleaned_data["quarter"] or auto_quarter
     year = form.cleaned_data["year"] or auto_year
 
-    registered_charge_points = ChargePointRepository.get_registered_charge_points(entity)
-    meter_reading_data, errors = import_meter_reading_excel(excel_file, registered_charge_points)
+    charge_points = ChargePointRepository.get_registered_charge_points(entity)
+    previous_application = MeterReadingRepository.get_previous_application(entity, quarter, year)
+    renewable_share = MeterReadingRepository.get_renewable_share(year)
+    meter_reading_data, errors = import_meter_reading_excel(excel_file, charge_points, previous_application, renewable_share)
+
     pending_application_already_exists = MeterReadingRepository.get_replaceable_applications(entity).count() > 0
 
     data = {}

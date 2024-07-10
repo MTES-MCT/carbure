@@ -72,7 +72,7 @@ def recompute_stocks(apply, batch):
                 update_events.append(update_event)
 
         if apply:
-            CarbureStock.objects.bulk_update(stocks_to_update, ["carbure_id"])
+            CarbureStock.objects.bulk_update(stocks_to_update, ["remaining_volume", "remaining_weight", "remaining_lhv_amount"])  # fmt:skip
             CarbureStockEvent.objects.bulk_create(update_events)
 
     print(f"> {bad_count} stocks with wrong remaining volumes were updated")

@@ -3,9 +3,29 @@ import Alert from "common/components/alert"
 import { InfoCircle } from "common/components/icons"
 import Tooltip from "common/components/tooltip"
 import { ExternalLink } from "common/components/button"
+import { useQuery } from "common/hooks/async"
+
+interface TDGResponse {
+  resources: {
+    preview_url: string | null
+  }[]
+}
+
+async function fetchTDG(): Promise<TDGResponse> {
+  const url =
+    "https://www.data.gouv.fr/api/1/datasets/5448d3e0c751df01f85d0572/"
+
+  const res = await fetch(url)
+  const json = await res.json()
+
+  return json
+}
 
 export function TDGInfo() {
   const { t } = useTranslation()
+
+  const tdg = useQuery(fetchTDG, { key: "tdg", params: [] })
+  const previewURL = tdg.result?.resources[0]?.preview_url ?? ""
 
   return (
     <Alert icon={InfoCircle} variant="info" style={{ minWidth: "50vw" }}>
@@ -64,7 +84,7 @@ export function TDGInfo() {
             marginBottom: "var(--spacing-s)",
           }}
         >
-          <ExternalLink href="https://explore.data.gouv.fr/fr/tableau?url=https%3A%2F%2Fwww.data.gouv.fr%2Ffr%2Fdatasets%2Fr%2Feb76d20a-8501-400e-b336-d85724de5435">
+          <ExternalLink href={previewURL}>
             {t("Explorer les données consolidées IRVE")}
           </ExternalLink>
         </p>
