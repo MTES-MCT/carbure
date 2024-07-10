@@ -1,5 +1,7 @@
 from django.db import transaction
 
+from transactions.services.carbure_id import bulk_generate_stock_carbure_id, bulk_generate_lot_carbure_id
+
 from .group_nodes_by_type import group_nodes_by_type
 from saf.models import SafTicket, SafTicketSource
 from core.traceability import Node
@@ -15,11 +17,13 @@ def bulk_update_traceability_nodes(nodes):
         lots = nodes_by_type[Node.LOT]
         lot_fields = fields[Node.LOT]
         CarbureLot.objects.bulk_update(lots, lot_fields)
+        bulk_generate_lot_carbure_id(CarbureLot.objects.filter(pk__in=[lot.pk for lot in lots]), save=True)
 
     if len(fields[Node.STOCK]) > 0:
         stocks = nodes_by_type[Node.STOCK]
         stock_fields = fields[Node.STOCK]
         CarbureStock.objects.bulk_update(stocks, stock_fields)
+        bulk_generate_stock_carbure_id(CarbureStock.objects.filter(pk__in=[stock.pk for stock in stocks]), save=True)
 
     if len(fields[Node.STOCK_TRANSFORM]) > 0:
         stock_transforms = nodes_by_type[Node.STOCK_TRANSFORM]
