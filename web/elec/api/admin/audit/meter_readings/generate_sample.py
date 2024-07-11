@@ -31,6 +31,7 @@ def generate_sample(request):
         return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, form.errors)
 
     application = form.cleaned_data["application_id"]
+
     percentage = (form.cleaned_data["percentage"] or 10) / 100
 
     application_audits = ElecAuditSample.objects.filter(meter_reading_application=application)
@@ -44,6 +45,7 @@ def generate_sample(request):
 
     charge_points = MeterReadingRepository.get_application_charge_points(application.cpo, application)
     charge_point_sample = extract_audit_sample(charge_points, percentage)
+    print("charge_point_sample: ", charge_point_sample)
 
     new_audit = ElecAuditSample.objects.create(
         meter_reading_application=application,
