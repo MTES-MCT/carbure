@@ -1,8 +1,9 @@
-import { cpo } from "carbure/__test__/data"
+import { cpo } from "carbure/__test__/data";
+import { ElecCPOSnapshot, ElecProvisionCertificatesData } from "elec/types-cpo";
 import { EntityPreview, EntityType } from "carbure/types"
 import { ElecApplicationSample } from "elec-audit-admin/types"
 import {
-  ChargePointsApplicationError,
+  UploadCheckError,
   ElecAuditApplicationStatus,
   ElecChargePointsApplication,
   ElecChargePointsApplicationCheckInfo,
@@ -15,7 +16,6 @@ import {
   MeterReadingsApplicationError,
   MeterReadingsApplicationUrgencyStatus,
 } from "elec/types"
-import { ElecCPOSnapshot, ElecProvisionCertificatesData } from "elec/types-cpo"
 
 export const elecSnapshot: ElecCPOSnapshot = {
   provisioned_energy: 650000,
@@ -161,12 +161,12 @@ export const elecChargePointsApplications: ElecChargePointsApplication[] = [
   elecChargePointApplicationAccepted,
 ]
 
-export const chargePointsApplicationError1: ChargePointsApplicationError = {
+export const chargePointsApplicationError1: UploadCheckError = {
   line: 12,
   error: "MISSING_CHARGE_POINT_IN_DATAGOUV",
   meta: "8U7Y",
 }
-export const chargePointsApplicationError2: ChargePointsApplicationError = {
+export const chargePointsApplicationError2: UploadCheckError = {
   line: 87,
   error: "UNKNOW_ERROR",
 }
