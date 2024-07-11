@@ -45,7 +45,7 @@ export const ChargePointsApplicationDetailsDialog = () => {
       <Dialog onClose={closeDialog} >
         <header>
           <ApplicationStatus status={chargePointApplication?.status} big />
-          <h1>{t("Inscription de points de recharge")}</h1>
+          <h1>{t("Audit de points de recharge")}</h1>
         </header>
 
         <main>
