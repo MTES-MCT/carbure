@@ -6,6 +6,7 @@ from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
 from core.models import Entity, ExternalAdminRights
+from elec.models.elec_audit_sample import ElecAuditSample
 from elec.models.elec_charge_point_application import ElecChargePointApplication
 
 
@@ -43,5 +44,11 @@ def accept_application(request: HttpRequest):
 
     application.status = ElecChargePointApplication.ACCEPTED
     application.save()
+
+    ## marque l'échantillon comme "audité"
+    audit_sample = application.audit_sample.first()
+    if audit_sample:
+        audit_sample.status = ElecAuditSample.AUDITED
+        audit_sample.save()
 
     return SuccessResponse()

@@ -45,7 +45,6 @@ def generate_sample(request):
 
     charge_points = MeterReadingRepository.get_application_charge_points(application.cpo, application)
     charge_point_sample = extract_audit_sample(charge_points, percentage)
-    print("charge_point_sample: ", charge_point_sample)
 
     new_audit = ElecAuditSample.objects.create(
         meter_reading_application=application,

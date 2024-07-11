@@ -84,7 +84,8 @@ def accept_application(request: HttpRequest):
 
     ## marque l'échantillon comme "audité"
     audit_sample = application.audit_sample.first()
-    audit_sample.status = ElecAuditSample.AUDITED
-    audit_sample.save()
+    if audit_sample:
+        audit_sample.status = ElecAuditSample.AUDITED
+        audit_sample.save()
 
     return SuccessResponse()
