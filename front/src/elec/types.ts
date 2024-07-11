@@ -92,14 +92,14 @@ export interface ElecChargePointsSnapshot {
 }
 
 export interface ElecChargePointsApplicationCheckInfo {
-  errors?: ChargePointsApplicationError[]
+  errors?: UploadCheckError[]
   file_name: string
   error_count: number
   charge_point_count: number
   pending_application_already_exists?: boolean
 }
 
-export interface ChargePointsApplicationError {
+export interface UploadCheckError {
   line: number
   error: string
   meta?: null | any

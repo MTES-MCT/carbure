@@ -1,5 +1,6 @@
 import { Entity } from "carbure/types"
 import { Order } from "common/components/table"
+import { UploadCheckError } from "elec/types"
 
 export interface ElecAuditSnapshot {
   charge_points_applications_audit_in_progress: number
@@ -45,3 +46,9 @@ export interface ElecAuditStates {
 }
 
 
+
+export interface ElecAuditReportInfo {
+  errors?: UploadCheckError[]
+  file_name: string
+  error_count: number
+}

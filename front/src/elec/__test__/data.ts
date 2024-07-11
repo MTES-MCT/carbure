@@ -1,7 +1,7 @@
 import { cpo } from "carbure/__test__/data";
 import { EntityPreview, EntityType } from "carbure/types";
 import { ElecApplicationSample } from "elec-audit-admin/types";
-import { ChargePointsApplicationError, ElecAuditApplicationStatus, ElecChargePointsApplication, ElecChargePointsApplicationCheckInfo, ElecChargePointsApplicationDetails, ElecMeterReadingsApplication, ElecMeterReadingsApplicationCheckInfo, ElecMeterReadingsApplicationDetails, ElecMeterReadingsApplicationsResponse, ElecProvisionCertificatePreview, MeterReadingsApplicationError, MeterReadingsApplicationUrgencyStatus } from "elec/types";
+import { UploadCheckError, ElecAuditApplicationStatus, ElecChargePointsApplication, ElecChargePointsApplicationCheckInfo, ElecChargePointsApplicationDetails, ElecMeterReadingsApplication, ElecMeterReadingsApplicationCheckInfo, ElecMeterReadingsApplicationDetails, ElecMeterReadingsApplicationsResponse, ElecProvisionCertificatePreview, MeterReadingsApplicationError, MeterReadingsApplicationUrgencyStatus } from "elec/types";
 import { ElecCPOSnapshot, ElecProvisionCertificatesData } from "elec/types-cpo";
 
 export const elecSnapshot: ElecCPOSnapshot = {
@@ -150,12 +150,12 @@ export const elecChargePointsApplications: ElecChargePointsApplication[] = [
 ]
 
 
-export const chargePointsApplicationError1: ChargePointsApplicationError = {
+export const chargePointsApplicationError1: UploadCheckError = {
     line: 12,
     error: "MISSING_CHARGE_POINT_IN_DATAGOUV",
     meta: "8U7Y"
 }
-export const chargePointsApplicationError2: ChargePointsApplicationError = {
+export const chargePointsApplicationError2: UploadCheckError = {
     line: 87,
     error: "UNKNOW_ERROR"
 }

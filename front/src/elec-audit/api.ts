@@ -1,6 +1,6 @@
 import { api, Api, download } from "common/services/api"
-import { ElecChargePointsApplication, ElecChargePointsApplicationDetails } from "elec/types"
-import { ElecAuditFilter, ElecAuditQuery, ElecAuditSnapshot } from "./types"
+import { ElecChargePointsApplication, ElecChargePointsApplicationCheckInfo, ElecChargePointsApplicationDetails } from "elec/types"
+import { ElecAuditFilter, ElecAuditQuery, ElecAuditReportInfo, ElecAuditSnapshot } from "./types"
 import { ElecChargePointsApplicationsData } from "elec-audit-admin/types"
 
 export function getYears(entity_id: number) {
@@ -57,3 +57,18 @@ export function downloadChargePointsSample(entityId: number, applicationId: numb
 }
 
 
+export function checkAuditReport(entityId: number, auditSampleId: number, file: File) {
+  return api.post<Api<ElecAuditReportInfo>>("/elec/audit/check-report", {
+    entity_id: entityId,
+    audit_sample_id: auditSampleId,
+    file
+  })
+}
+
+export function acceptAuditReport(entityId: number, auditSampleId: number, file: File) {
+  return api.post("/elec/audit/accept-report", {
+    entity_id: entityId,
+    audit_sample_id: auditSampleId,
+    file
+  })
+}
