@@ -4,7 +4,7 @@ import { Dialog } from "common/components/dialog"
 import { AlertCircle, Plus, Return } from "common/components/icons"
 import Tag from "common/components/tag"
 import {
-  ChargePointsApplicationError,
+  UploadCheckError,
   ElecChargePointsApplicationCheckInfo,
 } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
@@ -71,7 +71,7 @@ export const ErrorsDetailsDialog = ({
 }
 
 type ErrorsTableProps = {
-  errors: ChargePointsApplicationError[]
+  errors: UploadCheckError[]
 }
 
 export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
@@ -103,7 +103,7 @@ export const ErrorsTable = ({ errors }: ErrorsTableProps) => {
   )
 }
 
-export function getErrorText(error: ChargePointsApplicationError) {
+export function getErrorText(error: UploadCheckError) {
   switch (error.error) {
     case "EXCEL_PARSING_FAILED":
       return t(
