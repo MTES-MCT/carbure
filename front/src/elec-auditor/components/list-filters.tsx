@@ -2,17 +2,17 @@ import { MultiSelect, MultiSelectProps } from "common/components/multi-select"; 
 import { Grid } from "common/components/scaffold";
 import { defaultNormalizer } from "common/utils/normalize";
 import { ElecAdminAuditFilter, ElecAdminAuditFilterSelection } from "elec-audit-admin/types";
-import { ElecAuditFilter, ElecAuditFilterSelection } from "elec-audit/types";
+import { ElecAuditorApplicationsFilter, ElecAuditorApplicationsFilterSelection } from "elec-auditor/types";
 import { useTranslation } from "react-i18next";
 
 export interface FiltersProps {
-    filters: ElecAuditFilter[]
-    selected: ElecAuditFilterSelection
-    onSelect: (filters: ElecAuditFilterSelection) => void
-    getFilterOptions: (filter: ElecAuditFilter) => Promise<any[]>
+    filters: ElecAuditorApplicationsFilter[]
+    selected: ElecAuditorApplicationsFilterSelection
+    onSelect: (filters: ElecAuditorApplicationsFilterSelection) => void
+    getFilterOptions: (filter: ElecAuditorApplicationsFilter) => Promise<any[]>
 }
 
-export function ElecAuditFilters({
+export function ApplicationsFilters({
     filters,
     selected,
     onSelect,
@@ -21,7 +21,7 @@ export function ElecAuditFilters({
     const { t } = useTranslation()
 
     const filterLabels = {
-        [ElecAuditFilter.Cpo]: t("Aménageur"),
+        [ElecAuditorApplicationsFilter.Cpo]: t("Aménageur"),
     }
 
     return (
@@ -41,10 +41,10 @@ export function ElecAuditFilters({
     )
 }
 
-export default ElecAuditFilters
+export default ApplicationsFilters
 
 
-export type FilterSelectProps = { field: ElecAuditFilter } & Omit<
+export type FilterSelectProps = { field: ElecAuditorApplicationsFilter } & Omit<
     MultiSelectProps<string>,
     "options"
 >

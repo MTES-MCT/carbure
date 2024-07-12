@@ -4,43 +4,39 @@ import NoResult from "common/components/no-result"
 import Pagination from "common/components/pagination"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import { ElecAdminAuditSnapshot } from "elec-audit-admin/types"
-import ChargePointsApplicationsTable from "elec/components/charge-points/table"
-import { ElecAuditApplicationStatus, ElecChargePointsApplication } from "elec/types"
+import * as api from "elec-auditor/api"
+import { ElecAuditorApplication, ElecAuditorApplicationsFilter, ElecAuditorApplicationsSnapshot, ElecAuditorApplicationsStatus } from "elec-auditor/types"
 import { useTranslation } from "react-i18next"
 import { To, useLocation, useMatch } from "react-router-dom"
-import * as api from "elec-audit/api"
-import { useElecAuditQueryParamsStore } from "./list-query-params-store"
-import { useElecAuditQuery } from "./list-query"
-import ElecAuditFilters from "./list-filters"
-import { ElecAuditApplication, ElecAuditFilter, ElecAuditSnapshot, ElecAuditStatus } from "elec-audit/types"
+import ApplicationDetailsDialog from "./details"
+import ApplicationsFilters from "./list-filters"
+import { useApplicationsQuery } from "./list-query"
+import { useApplicationsQueryParamsStore } from "./list-query-params-store"
 import { StatusSwitcher } from "./status-switcher"
-import AuditChargePointsApplicationsTable from "./table"
-import AuditChargePointsApplicationDetailsDialog from "./details"
-import ElecAuditApplicationsTable from "./table"
+import ApplicationsTable from "./table"
 
 
 type TransferListProps = {
-  snapshot: ElecAuditSnapshot
+  snapshot: ElecAuditorApplicationsSnapshot
   year: number
 }
 
-const ElecAuditApplicationsList = ({ snapshot, year }: TransferListProps) => {
+const ElecApplicationList = ({ snapshot, year }: TransferListProps) => {
 
   const entity = useEntity()
   const status = useAutoStatus()
   const { t } = useTranslation()
   const location = useLocation()
 
-  const [state, actions] = useElecAuditQueryParamsStore(entity, year, status, snapshot)
-  const query = useElecAuditQuery(state)
-  const auditApplicationsResponse = useQuery(api.getAuditApplications, {
+  const [state, actions] = useApplicationsQueryParamsStore(entity, year, status, snapshot)
+  const query = useApplicationsQuery(state)
+  const auditApplicationsResponse = useQuery(api.getApplications, {
     key: "elec-audit-applications",
     params: [query],
   })
 
-  const showChargePointsApplicationDetails = (auditApplication: ElecAuditApplication): To => {
-    if (auditApplication.status === ElecAuditStatus.AuditDone) return {}
+  const showChargePointsApplicationDetails = (auditApplication: ElecAuditorApplication): To => {
+    if (auditApplication.status === ElecAuditorApplicationsStatus.AuditDone) return {}
 
     return {
       pathname: location.pathname,
@@ -56,12 +52,12 @@ const ElecAuditApplicationsList = ({ snapshot, year }: TransferListProps) => {
     <>
 
       <Bar>
-        <ElecAuditFilters
+        <ApplicationsFilters
           filters={FILTERS}
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={(filter) =>
-            api.getElecAuditFilters(filter, query)
+            api.getFilters(filter, query)
           }
         />
       </Bar>
@@ -81,7 +77,7 @@ const ElecAuditApplicationsList = ({ snapshot, year }: TransferListProps) => {
 
         {count > 0 && auditApplicationsData ? (
           <>
-            <ElecAuditApplicationsTable
+            <ApplicationsTable
               loading={auditApplicationsResponse.loading}
               applications={auditApplicationsData.audit_applications}
               rowLink={showChargePointsApplicationDetails}
@@ -105,20 +101,20 @@ const ElecAuditApplicationsList = ({ snapshot, year }: TransferListProps) => {
       </section >
 
 
-      <HashRoute path="application/:id" element={<AuditChargePointsApplicationDetailsDialog />} />
+      <HashRoute path="application/:id" element={<ApplicationDetailsDialog />} />
     </>
   )
 }
-export default ElecAuditApplicationsList
+export default ElecApplicationList
 
 
 const FILTERS = [
-  ElecAuditFilter.Cpo,
+  ElecAuditorApplicationsFilter.Cpo,
 ]
 
 
 export function useAutoStatus() {
   const matchStatus = useMatch("/org/:entity/elec-audit/:year/:status/*")
-  const status = matchStatus?.params?.status?.toUpperCase() as ElecAuditStatus
-  return status ?? ElecAuditStatus.AuditInProgress
+  const status = matchStatus?.params?.status?.toUpperCase() as ElecAuditorApplicationsStatus
+  return status ?? ElecAuditorApplicationsStatus.AuditInProgress
 }

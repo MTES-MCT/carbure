@@ -1,4 +1,4 @@
-import { ElecAuditFilter, ElecAuditFilterSelection } from "elec-audit/types"
+import { ElecAuditorApplicationsFilter, ElecAuditorApplicationsFilterSelection } from "elec-auditor/types"
 import { useMemo } from "react"
 import { useSearchParams } from "react-router-dom"
 
@@ -6,9 +6,9 @@ export function useFilterSearchParams() {
     const [filtersParams, setFiltersParams] = useSearchParams()
     const filters = useMemo(
         () => {
-            const filters: ElecAuditFilterSelection = {}
+            const filters: ElecAuditorApplicationsFilterSelection = {}
             filtersParams.forEach((value, filter) => {
-                const fkey = filter as ElecAuditFilter
+                const fkey = filter as ElecAuditorApplicationsFilter
                 filters[fkey] = filters[fkey] ?? []
                 filters[fkey]!.push(value)
             })

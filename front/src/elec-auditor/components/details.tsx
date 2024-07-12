@@ -9,7 +9,7 @@ import Portal from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import ChargePointsSampleMap from "elec-audit-admin/components/sample/sample-map"
-import * as api from "elec-audit/api"
+import * as api from "elec-auditor/api"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import ApplicationSummary from "./details-application-summary"
@@ -17,14 +17,14 @@ import ApplicationStatus from "./application-status"
 
 
 
-export const AuditChargePointsApplicationDetailsDialog = () => {
+export const ApplicationDetailsDialog = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   const navigate = useNavigate()
   const location = useLocation()
   const match = useHashMatch("application/:id")
 
-  const chargePointApplicationResponse = useQuery(api.getAuditApplicationDetails, {
+  const chargePointApplicationResponse = useQuery(api.getApplicationDetails, {
     key: "elec-audit-application-details",
     params: [entity.id, parseInt(match?.params.id!)],
   })
@@ -37,7 +37,7 @@ export const AuditChargePointsApplicationDetailsDialog = () => {
 
 
   const downloadSample = async () => {
-    return api.downloadChargePointsSample(entity.id, chargePointApplication!.id)
+    return api.downloadSample(entity.id, chargePointApplication!.id)
   }
 
   return (
@@ -135,4 +135,4 @@ const MailtoButton = ({ cpoName, auditorName, chargePointCount }: MailtoButtonPr
 }
 
 
-export default AuditChargePointsApplicationDetailsDialog
+export default ApplicationDetailsDialog

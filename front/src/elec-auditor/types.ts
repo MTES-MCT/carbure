@@ -1,33 +1,32 @@
-import { Entity, EntityPreview } from "carbure/types"
+import { Entity, EntityPreview, UploadCheckError } from "carbure/types"
 import { Order } from "common/components/table"
 import { ElecApplicationSample } from "elec-audit-admin/types"
-import { UploadCheckError } from "elec/types"
 
-export interface ElecAuditSnapshot {
+export interface ElecAuditorApplicationsSnapshot {
   charge_points_applications_audit_in_progress: number
   charge_points_applications_audit_done: number
 }
 
-export enum ElecAuditFilter {
+export enum ElecAuditorApplicationsFilter {
   Cpo = "cpo",
 }
 
-export enum ElecAuditStatus {
+export enum ElecAuditorApplicationsStatus {
   AuditInProgress = "IN_PROGRESS",
   AuditDone = "AUDITED",
 }
 
-export type ElecAuditFilterSelection = Partial<Record<ElecAuditFilter, string[]>>
+export type ElecAuditorApplicationsFilterSelection = Partial<Record<ElecAuditorApplicationsFilter, string[]>>
 
 
-export interface ElecAuditApplicationsData {
-  audit_applications: ElecAuditApplication[]
+export interface ElecAuditorApplicationsData {
+  audit_applications: ElecAuditorApplication[]
   from: number
   ids: number[]
   returned: number
   total: number
 }
-export interface ElecAuditQuery {
+export interface ElecAuditorApplicationsQuery {
   entity_id: number
   status?: string
   year?: number
@@ -36,42 +35,37 @@ export interface ElecAuditQuery {
   order?: string
   from_idx?: number
   limit?: number
-  [ElecAuditFilter.Cpo]?: string[]
+  [ElecAuditorApplicationsFilter.Cpo]?: string[]
 }
 
-export interface ElecAuditStates {
+export interface ElecAuditorApplicationsStates {
   entity: Entity
   year: number
-  filters: ElecAuditFilterSelection
+  filters: ElecAuditorApplicationsFilterSelection
   search?: string
   status: string
   selection: number[]
   page: number
   limit?: number
   order?: Order
-  snapshot?: ElecAuditSnapshot
+  snapshot?: ElecAuditorApplicationsSnapshot
 }
 
-export interface ElecAuditApplication {
+export interface ElecAuditorApplication {
   id: number
   cpo: EntityPreview
   station_count: number
   charge_point_count: number
   // power_total: number
   application_date: string
-  status: ElecAuditStatus
+  status: ElecAuditorApplicationsStatus
   // validation_date?: string
   audit_order_date?: string
 }
 
 
-export interface ElecAuditApplicationDetails extends ElecAuditApplication {
+export interface ElecAuditorApplicationDetails extends ElecAuditorApplication {
   sample?: ElecApplicationSample
 }
 
 
-export interface ElecAuditReportInfo {
-  errors?: UploadCheckError[]
-  file_name: string
-  error_count: number
-}

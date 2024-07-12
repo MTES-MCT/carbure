@@ -1,13 +1,12 @@
 import Tabs from "common/components/tabs"
-import { ElecAdminAuditStatus } from "elec-audit-admin/types"
-import { ElecAuditStatus } from "elec-audit/types"
+import { ElecAuditorApplicationsStatus } from "elec-auditor/types"
 import { useTranslation } from "react-i18next"
 
 interface StatusSwitcherProps {
-    status: ElecAuditStatus
+    status: ElecAuditorApplicationsStatus
     auditDoneCount: number
     auditInProgressCount: number
-    onSwitch: (status: ElecAuditStatus) => void
+    onSwitch: (status: ElecAuditorApplicationsStatus) => void
 }
 export const StatusSwitcher = ({
     status,
@@ -21,19 +20,19 @@ export const StatusSwitcher = ({
         <Tabs
             focus={status}
             variant="switcher"
-            onFocus={(status) => onSwitch(status as ElecAuditStatus)}
+            onFocus={(status) => onSwitch(status as ElecAuditorApplicationsStatus)}
             tabs={[
 
 
                 {
-                    key: ElecAuditStatus.AuditInProgress,
-                    path: ElecAuditStatus.AuditInProgress.toLowerCase(),
+                    key: ElecAuditorApplicationsStatus.AuditInProgress,
+                    path: ElecAuditorApplicationsStatus.AuditInProgress.toLowerCase(),
                     label: t("En cours d'audit ({{count}})", { count: auditInProgressCount })
                 },
 
                 {
-                    key: ElecAuditStatus.AuditDone,
-                    path: ElecAuditStatus.AuditDone.toLowerCase(),
+                    key: ElecAuditorApplicationsStatus.AuditDone,
+                    path: ElecAuditorApplicationsStatus.AuditDone.toLowerCase(),
                     label: t("Audit terminé ({{count}})", { count: auditDoneCount })
                 },
 

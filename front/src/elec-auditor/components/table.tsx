@@ -1,22 +1,18 @@
-import Button from "common/components/button"
-import { Download } from "common/components/icons"
-import Table, { Cell, actionColumn } from "common/components/table"
-import { compact } from "common/utils/collection"
+import Table, { Cell } from "common/components/table"
 import { formatDate, formatNumber } from "common/utils/formatters"
-import { getApplicationAuditLimitDate } from "elec-audit/helpers"
-import { ElecAuditApplication } from "elec-audit/types"
-import { ElecChargePointsApplication } from "elec/types"
+import { getApplicationAuditLimitDate } from "elec-auditor/helpers"
+import { ElecAuditorApplication } from "elec-auditor/types"
 import { useTranslation } from "react-i18next"
 import { To } from "react-router-dom"
 import ApplicationStatus from "./application-status"
 
-interface ElecAuditApplicationsTableProps {
-  applications: ElecAuditApplication[];
-  rowLink?: (row: ElecAuditApplication) => To
+interface ApplicationsTableProps {
+  applications: ElecAuditorApplication[];
+  rowLink?: (row: ElecAuditorApplication) => To
   loading?: boolean;
 }
 
-const ElecAuditApplicationsTable: React.FC<ElecAuditApplicationsTableProps> = ({
+const ApplicationsTable: React.FC<ApplicationsTableProps> = ({
   applications,
   rowLink,
   loading,
@@ -80,4 +76,4 @@ const ElecAuditApplicationsTable: React.FC<ElecAuditApplicationsTableProps> = ({
   );
 };
 
-export default ElecAuditApplicationsTable;
+export default ApplicationsTable;

@@ -3,16 +3,16 @@ import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
 import useTitle from "common/hooks/title"
-import { ElecAuditFilterSelection, ElecAuditSnapshot, ElecAuditStates, ElecAuditStatus } from "elec-audit/types"
+import { ElecAuditorApplicationsFilterSelection, ElecAuditorApplicationsSnapshot, ElecAuditorApplicationsStates, ElecAuditorApplicationsStatus } from "elec-auditor/types"
 import { useTranslation } from "react-i18next"
 import { useFilterSearchParams } from "./filter-search-params"
 
 
-export function useElecAuditQueryParamsStore(
+export function useApplicationsQueryParamsStore(
   entity: Entity,
   year: number,
-  status: ElecAuditStatus,
-  snapshot?: ElecAuditSnapshot,
+  status: ElecAuditorApplicationsStatus,
+  snapshot?: ElecAuditorApplicationsSnapshot,
 ) {
 
   const [limit, saveLimit] = useLimit()
@@ -29,7 +29,7 @@ export function useElecAuditQueryParamsStore(
       selection: [],
       page: 0,
       limit,
-    } as ElecAuditStates,
+    } as ElecAuditorApplicationsStates,
     {
       setEntity: (entity: Entity) => ({
         entity,
@@ -45,14 +45,14 @@ export function useElecAuditQueryParamsStore(
         page: 0,
       }),
 
-      setSnapshot: (snapshot: ElecAuditSnapshot) => ({
+      setSnapshot: (snapshot: ElecAuditorApplicationsSnapshot) => ({
         snapshot,
         filters: filtersParams,
         selection: [],
         page: 0,
       }),
 
-      setStatus: (status: ElecAuditStatus) => {
+      setStatus: (status: ElecAuditorApplicationsStatus) => {
         return {
           status,
           filters: filtersParams,
@@ -61,7 +61,7 @@ export function useElecAuditQueryParamsStore(
         }
       },
 
-      setFilters: (filters: ElecAuditFilterSelection) => {
+      setFilters: (filters: ElecAuditorApplicationsFilterSelection) => {
         setTimeout(() => {
           setFiltersParams(filters)
         })
@@ -128,13 +128,13 @@ export function useElecAuditQueryParamsStore(
   return [state, actions] as [typeof state, typeof actions]
 }
 
-export function usePageTitle(state: ElecAuditStates) {
+export function usePageTitle(state: ElecAuditorApplicationsStates) {
   const { t } = useTranslation()
 
   const title = "Points de recharge à auditer"
   const statuses: any = {
-    [ElecAuditStatus.AuditInProgress]: t(title) + " " + t("en attente"),
-    [ElecAuditStatus.AuditDone]: t(title) + " " + t("terminés"),
+    [ElecAuditorApplicationsStatus.AuditInProgress]: t(title) + " " + t("en attente"),
+    [ElecAuditorApplicationsStatus.AuditDone]: t(title) + " " + t("terminés"),
   }
   const entity = state.entity.name
   const year = state.year

@@ -27,7 +27,7 @@ import PublicStats from "./components/public-stats"
 import Topbar from "./components/top-bar"
 import useEntity, { EntityContext, useEntityManager } from "./hooks/entity"
 import useUserManager, { UserContext } from "./hooks/user"
-import ElecAudit from "elec-audit"
+import ElecAudit from "elec-auditor"
 
 
 const Carbure = () => {

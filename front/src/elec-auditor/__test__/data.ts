@@ -1,11 +1,11 @@
 import { ElecAdminAuditSnapshot, ElecApplicationSample, ElecChargePointsApplicationsData, ElecMeterReadingsApplicationsData } from "elec-audit-admin/types";
-import { ElecAuditSnapshot } from "elec-audit/types";
+import { ElecAuditorApplicationsSnapshot } from "elec-auditor/types";
 import { elecChargePointApplicationAuditDone, elecChargePointApplicationAuditInProgress, elecChargePointsApplications, elecMeterReadingsApplications } from "elec/__test__/data";
 import { ElecChargePointsApplication } from "elec/types";
 
 
 export const elecAuditYears = [2024, 2023, 2020]
-export const elecAuditSnapshot: ElecAuditSnapshot = {
+export const elecAuditSnapshot: ElecAuditorApplicationsSnapshot = {
   charge_points_applications_audit_done: 1,
   charge_points_applications_audit_in_progress: 1,
 }

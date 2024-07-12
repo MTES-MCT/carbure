@@ -1,4 +1,4 @@
-import { EntityPreview } from "carbure/types"
+import { EntityPreview, UploadCheckError, UploadCheckReportInfo } from "carbure/types"
 import {
   ElecCPOProvisionCertificateQuery,
   ElecTransferCertificateStatus,
@@ -91,21 +91,11 @@ export interface ElecChargePointsSnapshot {
   power_total: number
 }
 
-export interface ElecChargePointsApplicationCheckInfo {
-  errors?: UploadCheckError[]
-  file_name: string
-  error_count: number
+export interface ElecChargePointsApplicationCheckInfo extends UploadCheckReportInfo {
   charge_point_count: number
   pending_application_already_exists?: boolean
 }
 
-export interface UploadCheckError {
-  line: number
-  error: string
-  meta?: null | any
-}
-
-// METER READINGS
 
 
 export interface ElecMeterReadingsApplicationDetails extends ElecMeterReadingsApplication {
@@ -144,18 +134,10 @@ export interface ElecMeterReadingsApplication {
   status: ElecAuditApplicationStatus
 }
 
-export interface ElecMeterReadingsApplicationCheckInfo {
-  errors?: MeterReadingsApplicationError[]
-  file_name: string
-  error_count: number
+export interface ElecMeterReadingsApplicationCheckInfo extends UploadCheckReportInfo {
   year: number
   quarter: number
   charge_point_count: number
   pending_application_already_exists?: boolean
 }
 
-export interface MeterReadingsApplicationError {
-  line: number
-  error: string
-  meta?: null | any
-}

@@ -1,7 +1,7 @@
-import { ElecAuditQuery, ElecAuditStates } from "elec-audit/types"
+import { ElecAuditorApplicationsQuery, ElecAuditorApplicationsStates } from "elec-auditor/types"
 import { useMemo } from "react"
 
-export function useElecAuditQuery({
+export function useApplicationsQuery({
   entity,
   year,
   status,
@@ -10,8 +10,8 @@ export function useElecAuditQuery({
   limit,
   order,
   filters,
-}: ElecAuditStates) {
-  return useMemo<ElecAuditQuery>(
+}: ElecAuditorApplicationsStates) {
+  return useMemo<ElecAuditorApplicationsQuery>(
     () => ({
       entity_id: entity.id,
       year,
