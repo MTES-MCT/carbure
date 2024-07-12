@@ -4,12 +4,12 @@ import { Dialog } from "common/components/dialog"
 import { AlertCircle, Plus, Return } from "common/components/icons"
 import Tag from "common/components/tag"
 import {
-  UploadCheckError,
   ElecChargePointsApplicationCheckInfo,
 } from "elec/types"
 import { Trans, useTranslation } from "react-i18next"
 import { t } from "i18next"
 import { TDGInfo } from "./tdg-info"
+import { UploadCheckError } from "carbure/types"
 
 export type ErrorsDetailsDialogProps = {
   fileData: ElecChargePointsApplicationCheckInfo
