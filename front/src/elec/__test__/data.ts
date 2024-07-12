@@ -1,4 +1,7 @@
 import { cpo } from "carbure/__test__/data";
+import { EntityPreview, EntityType, UploadCheckError } from "carbure/types";
+import { ElecApplicationSample } from "elec-audit-admin/types";
+import { ElecAuditApplicationStatus, ElecChargePointsApplication, ElecChargePointsApplicationCheckInfo, ElecChargePointsApplicationDetails, ElecMeterReadingsApplication, ElecMeterReadingsApplicationCheckInfo, ElecMeterReadingsApplicationDetails, ElecMeterReadingsApplicationsResponse, ElecProvisionCertificatePreview, MeterReadingsApplicationUrgencyStatus } from "elec/types";
 import { ElecCPOSnapshot, ElecProvisionCertificatesData } from "elec/types-cpo";
 import { EntityPreview, EntityType } from "carbure/types"
 import { ElecApplicationSample } from "elec-audit-admin/types"
@@ -302,9 +305,9 @@ export const elecMeterReadingsApplicationsWithoutChargePointsResponse: ElecMeter
   },
 }
 
-export const meterReadingsApplicationError1: MeterReadingsApplicationError = {
+export const meterReadingsApplicationError1: UploadCheckError = {
   line: 87,
-  error: "UNKNOW_ERROR",
+  error: "UNKNOW_ERROR"
 }
 export const meterReadingsApplicationCheckResponseFailed: ElecMeterReadingsApplicationCheckInfo =
 {

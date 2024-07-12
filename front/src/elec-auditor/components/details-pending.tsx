@@ -9,21 +9,21 @@ import Portal from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import ChargePointsSampleMap from "elec-audit-admin/components/sample/sample-map"
-import * as api from "elec-audit/api"
+import * as api from "elec-auditor/api"
 import ApplicationStatus from "elec/components/application-status"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import ApplicationSummary from "./details-application-summary"
 import { ElecChargePointsApplication, ElecMeterReadingsApplication } from "elec/types"
-import { ElecAuditApplicationDetails } from "elec-audit/types"
+import { ElecAuditorApplicationDetails } from "elec-auditor/types"
 
 
-interface ElecAuditDetailsPendingProps {
-  audit: ElecAuditApplicationDetails
+interface ApplicationDetailsPendingProps {
+  audit: ElecAuditorApplicationDetails
 }
-export const ElecAuditDetailsPending = ({
+export const ApplicationDetailsPending = ({
   audit
-}: ElecAuditDetailsPendingProps) => {
+}: ApplicationDetailsPendingProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const navigate = useNavigate()
@@ -112,4 +112,4 @@ interface MailtoButtonProps {
 
 
 
-export default ElecAuditDetailsPendingProps
+export default ApplicationDetailsPending
