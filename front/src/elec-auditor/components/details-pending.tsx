@@ -4,7 +4,7 @@ import Button from "common/components/button"
 import { Dialog } from "common/components/dialog"
 import { Divider } from "common/components/divider"
 import { useHashMatch } from "common/components/hash-route"
-import { Download, Edit, Send } from "common/components/icons"
+import { Download, Edit, Return, Send } from "common/components/icons"
 import Portal from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
@@ -36,7 +36,7 @@ export const ApplicationDetailsPending = ({
   const match = useHashMatch("application/:id")
 
 
-  type IndicatorStep = "download-sample" | "upload-report" | "check"
+  type IndicatorStep = "download-sample" | "upload-report" | "check-file"
   const [currentStep, setCurrentStep] = useState(0)
 
   const steps = [
@@ -49,7 +49,7 @@ export const ApplicationDetailsPending = ({
       title: t("Dépôt du fichier de résultat")
     },
     {
-      key: "check",
+      key: "check-file",
       title: t("Vérification du fichier"),
     },
   ]
@@ -61,8 +61,15 @@ export const ApplicationDetailsPending = ({
   }
 
   const downloadSample = () => {
-    onDownloadSample()
-    setCurrentStep(currentStep + 1)
+    // onDownloadSample()
+    setStep("upload-report")
+  }
+
+  const uploadFile = () => {
+
+  }
+  const sendReport = () => {
+
   }
 
   return (
@@ -77,19 +84,45 @@ export const ApplicationDetailsPending = ({
           />
           <ApplicationSummary application={application} />
         </section>
-        {application?.sample ? (
-          <section>
-            <ChargePointsSampleMap chargePoints={application?.sample?.charge_points} />
-          </section>
-        ) : <p><Trans>Le fichier CSV listant l'intégralité des points de recharge à auditer vous a été envoyé par email par l'aménageur.</Trans></p>}
-        <section>
-          <ReportInfoAlert />
-        </section>
+        {step === "download-sample" &&
+          <>
+            {application?.sample ? (
+              <section>
+                <ChargePointsSampleMap chargePoints={application?.sample?.charge_points} />
+              </section>
+            ) : <p><Trans>Le fichier CSV listant l'intégralité des points de recharge à auditer vous a été envoyé par email par l'aménageur.</Trans></p>}
+            <section>
+              <ReportInfoAlert />
+            </section>
+          </>
+        }
+        {step === "upload-report" &&
+          <>
+            <p>{t("Cet outil vous permet de vérifier votre résultat d'audit avant de l'envoyer à la DGEC.")}</p>
+          </>
+        }
+
+        {step === "check-file" &&
+          <>
+            <p>{t("Le fichier {{fileName}} comporte {{errorCount}} incohérences. Veuillez les corriger puis recharger à nouveau votre fichier.", { fileName: "XXXX", errorCount: "XXX" })}</p>
+            <p>{t("Votre fichier d'audit {{fileName}} ne comporte aucune erreur.", { fileName: "XXXX" })}</p>
+            <p>{t("Les informations peuvent être transmises à la DGEC.")}</p>
+
+          </>
+        }
+
       </main>
 
       <footer>
         {step === "download-sample" && <>
-          <Button icon={Download} label={t("Télécharger les points à auditer")} variant="primary" action={downloadSample} style={{ width: "min-content" }} />
+          <Button icon={Download} label={t("Télécharger les points à auditer")} variant="primary" action={downloadSample} />
+        </>}
+        {step === "upload-report" && <>
+          <Button icon={Send} label={t("Vérifier le fichier")} variant="primary" action={uploadFile} />
+        </>}
+        {step === "check-file" && <>
+          <Button icon={Return} label={t("Importer un nouveau fichier")} variant="primary" action={() => setStep("upload-report")} />
+          <Button icon={Send} label={t("Transmettre le résultat d’audit")} variant="primary" action={sendReport} />
         </>}
       </footer>
     </>
