@@ -8,7 +8,7 @@ import useYears from "common/hooks/years"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 import * as api from "./api"
-import ChargePointsApplicationsList from "./components/list"
+import ElecAuditApplicationsList from "./components/list"
 import { ElecAuditSnapshot } from "./types"
 
 
@@ -51,7 +51,7 @@ export const ElecAudit = () => {
 
       </header>
 
-      <ChargePointsApplicationsList snapshot={snapshot} year={years.selected} />
+      <ElecAuditApplicationsList snapshot={snapshot} year={years.selected} />
 
     </Main>
 

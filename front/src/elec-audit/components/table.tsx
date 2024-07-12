@@ -4,18 +4,19 @@ import Table, { Cell, actionColumn } from "common/components/table"
 import { compact } from "common/utils/collection"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import { getApplicationAuditLimitDate } from "elec-audit/helpers"
-import ApplicationStatus from "elec/components/application-status"
+import { ElecAuditApplication } from "elec-audit/types"
 import { ElecChargePointsApplication } from "elec/types"
 import { useTranslation } from "react-i18next"
 import { To } from "react-router-dom"
+import ApplicationStatus from "./application-status"
 
-interface AuditChargePointsApplicationsTableProps {
-  applications: ElecChargePointsApplication[];
-  rowLink?: (row: ElecChargePointsApplication) => To
+interface ElecAuditApplicationsTableProps {
+  applications: ElecAuditApplication[];
+  rowLink?: (row: ElecAuditApplication) => To
   loading?: boolean;
 }
 
-const AuditChargePointsApplicationsTable: React.FC<AuditChargePointsApplicationsTableProps> = ({
+const ElecAuditApplicationsTable: React.FC<ElecAuditApplicationsTableProps> = ({
   applications,
   rowLink,
   loading,
@@ -79,4 +80,4 @@ const AuditChargePointsApplicationsTable: React.FC<AuditChargePointsApplications
   );
 };
 
-export default AuditChargePointsApplicationsTable;
+export default ElecAuditApplicationsTable;

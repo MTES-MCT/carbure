@@ -49,7 +49,7 @@ def get_applications(request):
 
     return SuccessResponse(
         {
-            "charge_points_applications": serialized.data,
+            "audit_applications": serialized.data,
             "ids": list(ids),
             "from": from_idx,
             "returned": len(serialized.data),

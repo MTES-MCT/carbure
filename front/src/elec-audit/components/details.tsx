@@ -10,22 +10,22 @@ import { LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import ChargePointsSampleMap from "elec-audit-admin/components/sample/sample-map"
 import * as api from "elec-audit/api"
-import ApplicationStatus from "elec/components/application-status"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import ApplicationSummary from "./details-application-summary"
+import ApplicationStatus from "./application-status"
 
 
 
-export const ChargePointsApplicationDetailsDialog = () => {
+export const AuditChargePointsApplicationDetailsDialog = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   const navigate = useNavigate()
   const location = useLocation()
   const match = useHashMatch("application/:id")
 
-  const chargePointApplicationResponse = useQuery(api.getChargePointsApplicationDetails, {
-    key: "audit-charge-points-application-details",
+  const chargePointApplicationResponse = useQuery(api.getAuditApplicationDetails, {
+    key: "elec-audit-application-details",
     params: [entity.id, parseInt(match?.params.id!)],
   })
   const chargePointApplication = chargePointApplicationResponse.result?.data.data
@@ -47,6 +47,15 @@ export const ChargePointsApplicationDetailsDialog = () => {
           <ApplicationStatus status={chargePointApplication?.status} big />
           <h1>{t("Audit de points de recharge")}</h1>
         </header>
+
+        {/* {chargePointApplication?.status === ElecAuditApplicationStatus.Pending && (
+          <AuditApplicationDetailsPending
+            meterReadingsApplication={meterReadingsApplication}
+            onAccept={acceptApplication}
+            onReject={rejectApplication}
+            onDownloadSample={downloadSample}
+          />
+        )} */}
 
         <main>
           <section>
@@ -126,4 +135,4 @@ const MailtoButton = ({ cpoName, auditorName, chargePointCount }: MailtoButtonPr
 }
 
 
-export default ChargePointsApplicationDetailsDialog
+export default AuditChargePointsApplicationDetailsDialog

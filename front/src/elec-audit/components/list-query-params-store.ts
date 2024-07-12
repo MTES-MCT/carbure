@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next"
 import { useFilterSearchParams } from "./filter-search-params"
 
 
-export function useElecAuditChargePointsQueryParamsStore(
+export function useElecAuditQueryParamsStore(
   entity: Entity,
   year: number,
   status: ElecAuditStatus,

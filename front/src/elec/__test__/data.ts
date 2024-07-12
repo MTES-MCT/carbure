@@ -100,7 +100,6 @@ export const elecChargePointApplicationAuditInProgress: ElecChargePointsApplicat
     charge_point_count: 5,
     power_total: 1000,
     application_date: "2023-09-01",
-    audit_order_date: "2023-09-02",
     status: ElecAuditApplicationStatus.AuditInProgress,
 }
 
@@ -113,7 +112,6 @@ export const elecChargePointApplicationAuditDone: ElecChargePointsApplication = 
     charge_point_count: 5,
     power_total: 1000,
     application_date: "2023-09-01",
-    audit_order_date: "2023-09-02",
     status: ElecAuditApplicationStatus.AuditDone,
 
 }

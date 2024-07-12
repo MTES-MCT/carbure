@@ -1,5 +1,6 @@
-import { Entity } from "carbure/types"
+import { Entity, EntityPreview } from "carbure/types"
 import { Order } from "common/components/table"
+import { ElecApplicationSample } from "elec-audit-admin/types"
 import { UploadCheckError } from "elec/types"
 
 export interface ElecAuditSnapshot {
@@ -19,7 +20,13 @@ export enum ElecAuditStatus {
 export type ElecAuditFilterSelection = Partial<Record<ElecAuditFilter, string[]>>
 
 
-
+export interface ElecAuditApplicationsData {
+  audit_applications: ElecAuditApplication[]
+  from: number
+  ids: number[]
+  returned: number
+  total: number
+}
 export interface ElecAuditQuery {
   entity_id: number
   status?: string
@@ -45,6 +52,22 @@ export interface ElecAuditStates {
   snapshot?: ElecAuditSnapshot
 }
 
+export interface ElecAuditApplication {
+  id: number
+  cpo: EntityPreview
+  station_count: number
+  charge_point_count: number
+  // power_total: number
+  application_date: string
+  status: ElecAuditStatus
+  // validation_date?: string
+  audit_order_date?: string
+}
+
+
+export interface ElecAuditApplicationDetails extends ElecAuditApplication {
+  sample?: ElecApplicationSample
+}
 
 
 export interface ElecAuditReportInfo {

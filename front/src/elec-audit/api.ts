@@ -1,6 +1,6 @@
 import { api, Api, download } from "common/services/api"
 import { ElecChargePointsApplication, ElecChargePointsApplicationCheckInfo, ElecChargePointsApplicationDetails } from "elec/types"
-import { ElecAuditFilter, ElecAuditQuery, ElecAuditReportInfo, ElecAuditSnapshot } from "./types"
+import { ElecAuditApplicationDetails, ElecAuditApplicationsData, ElecAuditFilter, ElecAuditQuery, ElecAuditReportInfo, ElecAuditSnapshot } from "./types"
 import { ElecChargePointsApplicationsData } from "elec-audit-admin/types"
 
 export function getYears(entity_id: number) {
@@ -23,8 +23,8 @@ export function getSnapshot(entity_id: number, year: number) {
 
 
 //CHARGE POINT
-export function getChargePointsApplications(query: ElecAuditQuery) {
-  return api.get<Api<ElecChargePointsApplicationsData>>("/elec/audit/applications", {
+export function getAuditApplications(query: ElecAuditQuery) {
+  return api.get<Api<ElecAuditApplicationsData>>("/elec/audit/applications", {
     params: query,
   })
 }
@@ -36,7 +36,7 @@ const QUERY_RESET: Partial<ElecAuditQuery> = {
   order: undefined,
 }
 
-export async function getElecAuditChargePointsApplicationsFilters(field: ElecAuditFilter, query: ElecAuditQuery) {
+export async function getElecAuditFilters(field: ElecAuditFilter, query: ElecAuditQuery) {
   const params = { filter: field, ...query, ...QUERY_RESET }
   const result = await api
     .get<Api<string[]>>("/elec/audit/filters", { params })
@@ -45,8 +45,8 @@ export async function getElecAuditChargePointsApplicationsFilters(field: ElecAud
 }
 
 
-export function getChargePointsApplicationDetails(entityId: number, applicationId: number) {
-  return api.get<Api<ElecChargePointsApplicationDetails>>("/elec/audit/application-details", {
+export function getAuditApplicationDetails(entityId: number, applicationId: number) {
+  return api.get<Api<ElecAuditApplicationDetails>>("/elec/audit/application-details", {
     params: { entity_id: entityId, application_id: applicationId },
   })
 }
