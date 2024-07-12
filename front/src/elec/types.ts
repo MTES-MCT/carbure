@@ -75,7 +75,7 @@ export interface ElecChargePointsApplication {
   application_date: string
   status: ElecAuditApplicationStatus
   validation_date?: string
-  audit_order_date?: string
+  // audit_order_date?: string
 }
 
 export interface ElecChargePointsApplicationDetails

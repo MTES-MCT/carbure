@@ -105,28 +105,27 @@ export const elecChargePointApplicationRejected: ElecChargePointsApplication = {
   application_date: "2023-09-01",
   status: ElecAuditApplicationStatus.Rejected,
 }
-export const elecChargePointApplicationAuditInProgress: ElecChargePointsApplication =
-{
+export const elecChargePointApplicationAuditInProgress: ElecChargePointsApplication = {
   id: 3,
   cpo: cpo,
   station_count: 1,
   charge_point_count: 5,
   power_total: 1000,
   application_date: "2023-09-01",
-  audit_order_date: "2023-09-02",
   status: ElecAuditApplicationStatus.AuditInProgress,
 }
 
-export const elecChargePointApplicationAuditDone: ElecChargePointsApplication =
-{
+
+
+export const elecChargePointApplicationAuditDone: ElecChargePointsApplication = {
   id: 3,
   cpo: cpo,
   station_count: 1,
   charge_point_count: 5,
   power_total: 1000,
   application_date: "2023-09-01",
-  audit_order_date: "2023-09-02",
   status: ElecAuditApplicationStatus.AuditDone,
+
 }
 
 export const elecChargePointApplicationAccepted: ElecChargePointsApplication = {

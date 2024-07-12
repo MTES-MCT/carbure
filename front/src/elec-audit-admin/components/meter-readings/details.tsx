@@ -13,7 +13,7 @@ import MeterReadingsApplicationAcceptDialog from "./accept-dialog"
 import MeterReadingsApplicationDetailsInProgress from "./details-in-progress"
 import { MeterReadingsApplicationDetailsPending } from "./details-pending"
 import MeterReadingsApplicationRejectDialog from "./reject-dialog"
-import MeterReadingsApplicationHistory from "./details-history-copy"
+import MeterReadingsApplicationHistory from "./details-history"
 
 export const MeterReadingsApplicationDetailsDialog = () => {
   const { t } = useTranslation()
