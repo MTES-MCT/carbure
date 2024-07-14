@@ -16,7 +16,7 @@ class GetSampleError:
 
 
 class GetSampleForm(forms.Form):
-    application_id = forms.IntegerField()
+    audit_sample_id = forms.IntegerField()
     export = forms.BooleanField(required=False)
 
 
@@ -28,10 +28,10 @@ def get_sample(request):
     if not form.is_valid():
         return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, form.errors)
 
-    application_id = form.cleaned_data["application_id"]
+    audit_sample_id = form.cleaned_data["audit_sample_id"]
     export = form.cleaned_data["export"]
 
-    audit_sample = ElecAuditRepository.get_audited_application_by_id(request.user, application_id)
+    audit_sample = ElecAuditRepository.get_audited_sample_by_id(request.user, audit_sample_id)
 
     if not audit_sample:
         return ErrorResponse(404, GetSampleError.NO_SAMPLE_FOUND)

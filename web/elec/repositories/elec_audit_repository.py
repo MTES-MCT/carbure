@@ -42,6 +42,6 @@ class ElecAuditRepository:
         return audits
 
     @staticmethod
-    def get_audited_application_by_id(audit_user, application_id):
+    def get_audited_sample_by_id(audit_user, audit_sample_id):
         applications = ElecAuditRepository.get_audited_applications(audit_user)
-        return applications.filter(id=application_id).first()
+        return applications.filter(id=audit_sample_id).first()
