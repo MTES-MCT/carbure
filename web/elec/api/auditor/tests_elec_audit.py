@@ -46,7 +46,7 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
         charge_point_1 = ElecChargePoint.objects.create(
             application=charge_point_application,
             cpo=self.cpo,
-            charge_point_id="ABCDE01",
+            charge_point_id="ABCD01",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 15),
             mid_id="123-456",
@@ -65,7 +65,7 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
         charge_point_2 = ElecChargePoint.objects.create(
             application=charge_point_application,
             cpo=self.cpo,
-            charge_point_id="ABCDE02",
+            charge_point_id="ABCD02",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 12),
             mid_id="123-456",
@@ -84,7 +84,7 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
         charge_point_3 = ElecChargePoint.objects.create(
             application=charge_point_application,
             cpo=self.cpo,
-            charge_point_id="ABCDE03",
+            charge_point_id="ABCD03",
             current_type="AC",
             installation_date=datetime.date(2023, 2, 12),
             mid_id="123-456",
@@ -225,14 +225,14 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
                 "is_auditable": False,
                 "has_dedicated_pdl": False,
                 "current_type": "",
-                "audit_date": pandas.NaT,
-                "observed_energy_reading": None,
+                "audit_date": None,
+                "observed_energy_reading": 0,
                 "comment": "Charge point was not found",
             },
         )
 
     def test_check_report(self):
-        charge_point_audit_sample, meter_reading_audit_sample = self.create_audit_samples()
+        charge_point_audit_sample, _ = self.create_audit_samples()
 
         with open(f"{os.environ['CARBURE_HOME']}/web/elec/fixtures/charge_point_audit_sample.xlsx", "rb") as reader:
             file = SimpleUploadedFile("charge_point_audit_sample.xlsx", reader.read())
@@ -248,3 +248,47 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
+
+    def test_accept_report(self):
+        _, meter_reading_audit_sample = self.create_audit_samples()
+
+        with open(f"{os.environ['CARBURE_HOME']}/web/elec/fixtures/meter_reading_audit_sample.xlsx", "rb") as reader:
+            file = SimpleUploadedFile("meter_reading_audit_sample.xlsx", reader.read())
+
+        # force accept without audit
+        response = self.client.post(
+            reverse("elec-auditor-accept-report"),
+            {
+                "file": file,
+                "audit_sample_id": meter_reading_audit_sample.pk,
+                "entity_id": self.auditor.pk,
+            },
+        )
+
+        charge_points_audited = meter_reading_audit_sample.audited_charge_points.select_related("charge_point").all()
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(charge_points_audited[0].is_auditable, True)
+        self.assertEqual(charge_points_audited[0].current_type, "AC")
+        self.assertEqual(charge_points_audited[0].observed_mid_or_prm_id, "[MID] 123-456")
+        self.assertEqual(charge_points_audited[0].observed_energy_reading, 1234)
+        self.assertEqual(charge_points_audited[0].has_dedicated_pdl, True)
+        self.assertEqual(charge_points_audited[0].audit_date, datetime.date(2024, 6, 1))
+        self.assertEqual(charge_points_audited[0].comment, "")
+
+        self.assertEqual(charge_points_audited[1].is_auditable, True)
+        self.assertEqual(charge_points_audited[1].current_type, "DC")
+        self.assertEqual(charge_points_audited[1].observed_mid_or_prm_id, "[MID] 123-457")
+        self.assertEqual(charge_points_audited[1].observed_energy_reading, 8900)
+        self.assertEqual(charge_points_audited[1].has_dedicated_pdl, False)
+        self.assertEqual(charge_points_audited[1].audit_date, datetime.date(2024, 6, 2))
+        self.assertEqual(charge_points_audited[1].comment, "")
+
+        self.assertEqual(charge_points_audited[2].is_auditable, False)
+        self.assertEqual(charge_points_audited[2].current_type, "")
+        self.assertEqual(charge_points_audited[2].observed_mid_or_prm_id, "")
+        self.assertEqual(charge_points_audited[2].observed_energy_reading, 0)
+        self.assertEqual(charge_points_audited[2].has_dedicated_pdl, False)
+        self.assertEqual(charge_points_audited[2].audit_date, None)
+        self.assertEqual(charge_points_audited[2].comment, "Charge point was not found")
