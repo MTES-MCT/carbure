@@ -40,15 +40,15 @@ export async function getFilters(field: ElecAuditorApplicationsFilter, query: El
 }
 
 
-export function getApplicationDetails(entityId: number, applicationId: number) {
+export function getApplicationDetails(entityId: number, auditSampleId: number) {
   return api.get<Api<ElecAuditorApplicationDetails>>("/elec/audit/application-details", {
-    params: { entity_id: entityId, application_id: applicationId },
+    params: { entity_id: entityId, audit_sample_id: auditSampleId },
   })
 }
 
 
-export function downloadSample(entityId: number, applicationId: number) {
-  return download("/elec/audit/get-sample", { entity_id: entityId, application_id: applicationId, export: true })
+export function downloadSample(entityId: number, auditSampleId: number) {
+  return download("/elec/audit/get-sample", { entity_id: entityId, audit_sample_id: auditSampleId, export: true })
 }
 
 
