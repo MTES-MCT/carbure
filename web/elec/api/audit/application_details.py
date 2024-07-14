@@ -9,7 +9,7 @@ from elec.serializers.elec_audit_sample_serializer import ElecAuditSampleDetails
 
 
 class ApplicationDetailsForm(forms.Form):
-    application_id = forms.IntegerField()
+    audit_sample_id = forms.IntegerField()
     export = forms.BooleanField(required=False)
 
 
@@ -21,9 +21,9 @@ def get_application_details(request):
     if not form.is_valid():
         return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, form.errors)
 
-    application_id = form.cleaned_data["application_id"]
+    audit_sample_id = form.cleaned_data["audit_sample_id"]
 
-    audit_sample = ElecAuditRepository.get_audited_application_by_id(request.user, application_id)
+    audit_sample = ElecAuditRepository.get_audited_sample_by_id(request.user, audit_sample_id)
 
     charge_point_application = ElecAuditSampleDetailsSerializer(audit_sample).data
     return SuccessResponse(charge_point_application)
