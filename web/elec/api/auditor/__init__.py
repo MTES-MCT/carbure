@@ -8,6 +8,7 @@ from .application_details import get_application_details
 from .filters import get_application_filters
 from .get_sample import get_sample
 from .check_report import check_report
+from .accept_report import accept_report
 
 
 urlpatterns = [
@@ -18,4 +19,5 @@ urlpatterns = [
     path("application-details", get_application_details, name="elec-auditor-application-details"),
     path("get-sample", get_sample, name="elec-auditor-get-sample"),
     path("check-report", check_report, name="elec-auditor-check-report"),
+    path("accept-report", accept_report, name="elec-auditor-accept-report"),
 ]
