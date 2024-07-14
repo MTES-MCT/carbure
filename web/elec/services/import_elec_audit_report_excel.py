@@ -54,7 +54,7 @@ class ExcelElecAuditReportValidator(Validator):
     has_dedicated_pdl = forms.BooleanField(required=False)
     current_type = forms.ChoiceField(required=False, choices=ElecChargePoint.CURRENT_TYPES)
     audit_date = forms.DateField(required=False, input_formats=Validator.DATE_FORMATS)
-    observed_energy_reading = forms.FloatField(required=False)
+    observed_energy_reading = forms.FloatField(required=False, min_value=0)
     comment = forms.CharField(required=False, max_length=512)
 
     def extend(self, report):
@@ -65,5 +65,13 @@ class ExcelElecAuditReportValidator(Validator):
             report["current_type"] = ElecChargePoint.DC
         else:
             report["current_type"] = None
+
+        audit_date = report.get("audit_date")
+        if audit_date is pd.NaT:
+            report["audit_date"] = None
+
+        observed_energy_reading = report.get("observed_energy_reading")
+        if not observed_energy_reading:
+            report["observed_energy_reading"] = 0
 
         return report
