@@ -1,9 +1,12 @@
+# test with : python web/manage.py test elec.api.admin.audit.meter_readings.tests_audit_meter_readings.ElecAdminAuditMeterReadingsTest.test_accept_application --keepdb
+
 import datetime
 from core.tests_utils import setup_current_user
 from core.models import Entity
 from django.test import TestCase
 from django.urls import reverse
 
+from elec.models.elec_audit_sample import ElecAuditSample
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_charge_point_application import ElecChargePointApplication
 from elec.models.elec_meter_reading import ElecMeterReading
@@ -51,6 +54,8 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             nominal_power=150,
             cpo_name="",
             cpo_siren="",
+            latitude=48.8566,
+            longitude=2.3522,
         )
 
         charge_point2 = ElecChargePoint.objects.create(
@@ -68,6 +73,8 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             nominal_power=150,
             cpo_name="",
             cpo_siren="",
+            latitude=48.9566,
+            longitude=2.1522,
         )
 
         meter_readings_application = ElecMeterReadingApplication.objects.create(cpo=self.cpo, quarter=3, year=2023)
@@ -104,6 +111,24 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
         application, meter_readings = self.create_application()
         self.assertEqual(application.status, ElecChargePointApplication.PENDING)
 
+        # create sample
+        self.assertIsNone(application.audit_sample.first())
+        response = self.client.post(
+            reverse("elec-admin-audit-meter-readings-generate-sample"),
+            {
+                "application_id": application.id,
+                "entity_id": self.admin.id,
+                "percentage": 10,
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()["data"]
+        self.assertEqual(len(data["charge_points"]), 1)
+        self.assertEqual(application.status, ElecChargePointApplication.PENDING)
+        audit_sample = application.audit_sample.first()
+        self.assertIsNotNone(audit_sample)
+        self.assertEqual(audit_sample.status, ElecAuditSample.IN_PROGRESS)
+
         # force accept without audit
         response = self.client.post(
             reverse("elec-admin-audit-meter-readings-accept-application"),
@@ -119,6 +144,10 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
 
         application.refresh_from_db()
         self.assertEqual(application.status, ElecChargePointApplication.ACCEPTED)
+
+        # audit_sample should be marked as audited
+        audit_sample.refresh_from_db()
+        self.assertEqual(audit_sample.status, ElecAuditSample.AUDITED)
 
         # provision certificate should have been created
         certificates = ElecProvisionCertificate.objects.filter(cpo=self.cpo, quarter=3, year=2023)
