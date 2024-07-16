@@ -8,6 +8,8 @@ if [ "$IMAGE_TAG" = "dev" ] || [ "$IMAGE_TAG" = "staging" ] || [ "$IMAGE_TAG" = 
   install-scalingo-cli && scalingo login --api-token $SCALINGO_TOKEN
 fi
 
+# This condition is useful when you want to use a local database dump,
+# for example, to debug a particular version.
 if [ "$1" != "local" ]; then
   # clean up any previous local backup
   rm -rf /tmp/backups

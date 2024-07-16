@@ -35,7 +35,13 @@ c'est que mysql est lancé en local sur votre ordinateur. Vous pouvez vérifier 
 ## Configuration et Installation
 
 - Clonez le repository: git clone <https://github.com/MTES-MCT/carbure.git>
-- Créez un fichier `.env` à la racine du dépôt en vous basant sur le fichier `.env.example` disponible dans le dossier (Tu peux retrouver la pluspart des valeurs dans la section "Environnement" de carbure-prod sur scalingo <https://dashboard.scalingo.com/apps/osc-fr1/carbure-prod/environment>)
+- Créez un fichier `.env` à la racine du dépôt en vous basant sur le fichier `.env.example` disponible dans le dossier.
+- Tu peux retrouver la plupart des valeurs dans la section "Environnement" de carbure-prod sur scalingo <https://dashboard.scalingo.com/apps/osc-secnum-fr1/carbure-prod/environment>. 
+
+> **A savoir :**
+> Une fois les accès scalingo obtenus, il faut créer un compte avec ton adresse scalingo, et contacter scalingo via le tchat du site en leur indiquant que tu travailles sur un projet gouvernemental et que tu as besoin d'être whitelisté pour avoir accès à la région `osc-secnum-fr1`.
+
+  - Liste des variables nécessaires à récupérer : `SECRET_KEY`, `SCALINGO_MYSQL_UUID`, `METABASE_SECRET_KEY`, `SENTRY_DSN`, `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`
 - créer un accès ssh à ton compte Scalingo (<https://dashboard.scalingo.com/account/keys>) et un API token (dans ton profile scalingo <https://dashboard.scalingo.com/account/tokens>)
 - remplir SCALINGO_TOKEN=le token que tu as créé dans tom compte
 
@@ -83,6 +89,7 @@ Raccourci : Je recommande de créer un alias pour charger l'environnement de dé
 
 # Authentification à Carbure
 
+- Bien vérifier que la variable d'environnement `IMAGE_TAG` est à `local` afin de désactiver la vérification de token CSRF.
 - Pour ajouter un nouveau super utilisateur à la db locale, taper `python3 web/manage.py createsuperuser`
 - Ensuite aller sur <http://carbure.local:8090/auth/login>
 - Utiliser les informations renseignées à l'étape 1 puis valider l'authentification
