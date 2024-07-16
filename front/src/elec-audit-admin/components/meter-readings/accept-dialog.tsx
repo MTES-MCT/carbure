@@ -79,7 +79,7 @@ export const MeterReadingsApplicationAcceptDialog = ({
             <p>
 
               <Trans
-                defaults="{{energyTotal}} Mwh renouvelables seront ajoutés à l'énergie disponible de l'aménageur {{cpo}}."
+                defaults="{{energyTotal}} MWh renouvelables seront ajoutés à l'énergie disponible de l'aménageur {{cpo}}."
                 values={{ energyTotal: formatNumber(application.energy_total), cpo: application.cpo.name }}>
               </Trans>
             </p>
@@ -92,7 +92,7 @@ export const MeterReadingsApplicationAcceptDialog = ({
 
 
 
-        <Button icon={Check} label={forceValidation ? t("Alimenter, sans auditer, l'énergie disponible du redevable") : t("Alimenter l'énergie disponible du redevable")} variant="success" action={() => acceptApplication(forceValidation)} loading={acceptMeterReadingsApplication.loading} />
+        <Button icon={Check} label={forceValidation ? t("Verser, sans auditer, les certificats de fourniture") : t("Verser les certificats de fourniture")} variant="success" action={() => acceptApplication(forceValidation)} loading={acceptMeterReadingsApplication.loading} />
 
 
 

@@ -31,6 +31,7 @@ def generate_sample(request):
         return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, form.errors)
 
     application = form.cleaned_data["application_id"]
+
     percentage = (form.cleaned_data["percentage"] or 10) / 100
 
     application_audits = ElecAuditSample.objects.filter(meter_reading_application=application)
