@@ -17,8 +17,6 @@
   "Recherchez la société qui vous emploie pour pouvoir accéder à ses données.": "Look for the company you work for in order to access its data.",
   "Rechercher une société...": "Search companies...",
   "Rôle": "Role",
-  "Lecture seule (consultation des lots uniquement)": "Read-only (only able to display transaction data)",
-  "Lecture/écriture (création et gestion des lots)": "Read/write (creation and management of transactions)",
   "Administration (contrôle complet de la société sur CarbuRe)": "Administration (complete control over the company on CarbuRe)",
   "Audit (accès spécial pour auditeurs)": "Audit (special access for auditors)",
   "Ma société n'est pas enregistrée sur CarbuRe.": "My company is not registered on CarbuRe.",
