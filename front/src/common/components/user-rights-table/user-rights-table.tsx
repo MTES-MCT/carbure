@@ -18,9 +18,6 @@ import { useState, type ReactNode, ChangeEvent } from "react"
 type EntityUserRightsProps = {
   rights: UserRightRequest[]
 
-  // Loading state during user right edition mutation
-  isLoadingEditUserRight: boolean
-
   // Function called when the role of an user is changed
   onChangeUserRole: (
     role: UserRole,
@@ -52,7 +49,6 @@ const RIGHTS_ORDER = {
 
 export const UserRightsTable = ({
   rights,
-  isLoadingEditUserRight,
   isSearchable = false,
   onChangeUserRole,
   onAcceptUser,
