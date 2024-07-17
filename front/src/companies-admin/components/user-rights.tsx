@@ -211,13 +211,15 @@ export default () => {
 
   const rights = response.result?.data.data ?? []
 
-  return (
-    <UserRightsTable
-      rights={rights}
-      isLoadingEditUserRight={false}
-      onEditUserRight={() => {}}
-      onAcceptUser={() => {}}
-      onRevokeUser={() => {}}
-    />
-  )
+  return null
+  // return (
+  //   <UserRightsTable
+  //     rights={rights}
+  //     isLoadingEditUserRight={false}
+  //     onEditUserRight={() => {}}
+  //     onAcceptUser={() => {}}
+  //     onRevokeUser={() => {}}
+  //     onRejectUser={() => {}}
+  //   />
+  // )
 }
