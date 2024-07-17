@@ -36,5 +36,3 @@ export const EntityUserRights = () => {
     />
   )
 }
-
-export default EntityUserRights

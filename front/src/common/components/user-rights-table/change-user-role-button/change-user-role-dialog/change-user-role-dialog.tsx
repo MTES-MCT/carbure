@@ -11,7 +11,7 @@ import useEntity from "carbure/hooks/entity"
 
 type ChangeUserRoleDialogProps = {
   request: UserRightRequest
-  onSubmit: (role: UserRole) => Promise<void>
+  onSubmit: (role: UserRole) => Promise<unknown>
   onClose: PortalInstance["close"]
   loading: boolean
 }

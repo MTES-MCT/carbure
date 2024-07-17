@@ -2,19 +2,18 @@ import { Trans, useTranslation } from "react-i18next"
 import { RightStatus } from "account/components/access-rights"
 import { Alert } from "common/components/alert"
 import { AlertCircle } from "common/components/icons"
+import { Input, SearchInput } from "common/components/input"
 import Table, { actionColumn, Cell } from "common/components/table"
 import { UserRightRequest, UserRightStatus, UserRole } from "carbure/types"
 import { getUserRoleLabel } from "carbure/utils/normalizers"
 import { Panel } from "common/components/scaffold"
 import { compact } from "common/utils/collection"
 import { formatDate } from "common/utils/formatters"
-import {
-  ChangeUserRoleButton,
-  type ChangeUserRoleButtonProps,
-} from "./change-user-role-button"
+import { ChangeUserRoleButton } from "./change-user-role-button"
 import { AcceptUserButton } from "./accept-user-button"
 import { RevokeUserButton } from "./revoke-user-button"
 import { RejectUserButton } from "./reject-user-button"
+import { useState, type ReactNode, ChangeEvent } from "react"
 
 type EntityUserRightsProps = {
   rights: UserRightRequest[]
@@ -23,7 +22,10 @@ type EntityUserRightsProps = {
   isLoadingEditUserRight: boolean
 
   // Function called when the role of an user is changed
-  onChangeUserRole: (role: UserRole, request: UserRightRequest) => void
+  onChangeUserRole: (
+    role: UserRole,
+    request: UserRightRequest
+  ) => Promise<unknown>
 
   // Function called when a user is accepted
   onAcceptUser: (request: UserRightRequest) => void
@@ -33,6 +35,12 @@ type EntityUserRightsProps = {
 
   // Function called when a user is rejected
   onRejectUser: (request: UserRightRequest) => void
+
+  // Function called when the input value change
+  onInputChange?: (value: string) => void
+
+  // Allow search input
+  isSearchable?: boolean
 }
 
 const RIGHTS_ORDER = {
@@ -45,37 +53,50 @@ const RIGHTS_ORDER = {
 export const UserRightsTable = ({
   rights,
   isLoadingEditUserRight,
+  isSearchable = false,
   onChangeUserRole,
   onAcceptUser,
   onRevokeUser,
   onRejectUser,
+  onInputChange,
 }: EntityUserRightsProps) => {
   const { t } = useTranslation()
-
+  const [query, setQuery] = useState<string>("")
+  const displaySearchInput =
+    isSearchable && (query.length > 0 || rights.length > 0)
   // Pass all the request as parameter to let the parent do anything
   const handleChangeUserRole =
-    (request: UserRightRequest) => (role: UserRole) => {
+    (request: UserRightRequest) => (role: UserRole) =>
       onChangeUserRole(role, request)
-    }
+
+  const handleInputChange = (value: string | undefined) => {
+    setQuery(value || "")
+    onInputChange?.(value || "")
+  }
 
   return (
     <Panel id="users">
       <header>
         <h1>
-          <Trans>Generic Utilisateurs</Trans>
+          <Trans>Utilisateurs</Trans>
         </h1>
       </header>
 
-      {rights.length === 0 && (
-        <>
-          <section>
-            <Alert icon={AlertCircle} variant="warning">
-              <Trans>Aucun utilisateur associé à cette entité</Trans>
-            </Alert>
-          </section>
-          <footer />
-        </>
-      )}
+      <section>
+        {displaySearchInput && (
+          <SearchInput
+            placeholder={t("Rechercher utilisateur...")}
+            value={query}
+            onChange={handleInputChange}
+            debounce={300}
+          />
+        )}
+        {rights.length === 0 && (
+          <Alert icon={AlertCircle} variant="warning">
+            <Trans>Aucun utilisateur associé à cette entité</Trans>
+          </Alert>
+        )}
+      </section>
 
       {rights.length > 0 && (
         <Table
