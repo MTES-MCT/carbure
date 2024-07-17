@@ -28,7 +28,6 @@ export default () => {
   return (
     <UserRightsTable
       rights={rights}
-      isLoadingEditUserRight={updateRight.loading}
       onChangeUserRole={(role, right) =>
         updateRole.execute(right.id, entity.id, role)
       }

@@ -21,7 +21,6 @@ export const EntityUserRights = () => {
   return (
     <UserRightsTable
       rights={rights}
-      isLoadingEditUserRight={changeUserRole.loading}
       onChangeUserRole={(role, request) =>
         changeUserRole.execute(entity.id, request.user[0], role!)
       }
