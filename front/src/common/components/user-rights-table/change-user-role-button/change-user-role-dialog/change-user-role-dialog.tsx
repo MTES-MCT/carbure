@@ -13,23 +13,29 @@ type ChangeUserRoleDialogProps = {
   request: UserRightRequest
   onSubmit: (role: UserRole) => Promise<unknown>
   onClose: PortalInstance["close"]
-  loading: boolean
 }
 
 export const ChangeUserRoleDialog = ({
   request,
   onSubmit,
   onClose,
-  loading,
 }: ChangeUserRoleDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const [role, setRole] = useState<UserRole | undefined>(request.role)
+  // Portal is not reactif, we can't pass loading state from parent mutation
+  const [loading, setLoading] = useState(false)
   const userEmail = request.user[0]
 
   const handleSubmit = async () => {
     if (role) {
-      await onSubmit(role)
+      try {
+        setLoading(true)
+        await onSubmit(role)
+      } finally {
+        setLoading(false)
+      }
+
       onClose()
     }
   }

@@ -142,7 +142,6 @@ export const UserRightsTable = ({
                 request.status === UserRightStatus.Accepted && (
                   <ChangeUserRoleButton
                     request={request}
-                    loading={isLoadingEditUserRight}
                     onChangeUserRole={handleChangeUserRole(request)}
                   />
                 ),
