@@ -17,6 +17,7 @@ import { compact } from "common/utils/collection"
 import { formatDate } from "common/utils/formatters"
 import useEntity from "carbure/hooks/entity"
 import Select from "common/components/select"
+import { UserRightsTable } from "common/components/user-rights-table"
 
 const ROLE_LABELS = {
   [UserRole.ReadOnly]: "Lecture seule",
@@ -195,4 +196,27 @@ const UserRights = () => {
   )
 }
 
-export default UserRights
+// export default UserRights
+export default () => {
+  const { id } = useParams<"id">()
+  const entity = useEntity()
+  const company_id = parseInt(id ?? "", 10)
+
+  const [query, setQuery] = useState("")
+
+  const response = useQuery(api.getUsersRightRequests, {
+    key: "user-right-requests",
+    params: [entity.id, query, company_id],
+  })
+
+  const rights = response.result?.data.data ?? []
+
+  return (
+    <UserRightsTable
+      rights={rights}
+      isLoadingEditUserRight={false}
+      onEditUserRight={() => {}}
+      onAcceptUser={() => {}}
+    />
+  )
+}

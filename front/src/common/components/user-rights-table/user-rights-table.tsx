@@ -6,12 +6,22 @@ import Table, { actionColumn, Cell } from "common/components/table"
 import { UserRightRequest, UserRightStatus } from "carbure/types"
 import { getUserRoleLabel } from "carbure/utils/normalizers"
 import { Panel } from "common/components/scaffold"
-import useEntity from "carbure/hooks/entity"
 import { compact } from "common/utils/collection"
 import { formatDate } from "common/utils/formatters"
+import { EditUserRightsButton } from "./edit-user-rights-button"
+import { AcceptUserButton } from "./accept-user-button"
 
 type EntityUserRightsProps = {
   rights: UserRightRequest[]
+
+  // Loading state during user right edition mutation
+  isLoadingEditUserRight: boolean
+
+  // Function called when the role of an user is changed
+  onEditUserRight: () => void
+
+  // Function called when a user is accepted
+  onAcceptUser: () => void
 }
 
 const RIGHTS_ORDER = {
@@ -21,14 +31,19 @@ const RIGHTS_ORDER = {
   [UserRightStatus.Rejected]: 3,
 }
 
-export const EntityUserRights = ({ rights }: EntityUserRightsProps) => {
+export const UserRightsTable = ({
+  rights,
+  isLoadingEditUserRight,
+  onEditUserRight,
+  onAcceptUser,
+}: EntityUserRightsProps) => {
   const { t } = useTranslation()
 
   return (
     <Panel id="users">
       <header>
         <h1>
-          <Trans>Utilisateurs</Trans>
+          <Trans>Generic Utilisateurs</Trans>
         </h1>
       </header>
 
@@ -84,9 +99,18 @@ export const EntityUserRights = ({ rights }: EntityUserRightsProps) => {
             },
             actionColumn<UserRightRequest>((request) =>
               compact([
-                request.status === UserRightStatus.Accepted && <div>EDIT</div>,
+                request.status === UserRightStatus.Accepted && (
+                  <EditUserRightsButton
+                    request={request}
+                    loading={isLoadingEditUserRight}
+                    onEditUserRight={onEditUserRight}
+                  />
+                ),
                 request.status !== UserRightStatus.Accepted && (
-                  <div>ACCEPT</div>
+                  <AcceptUserButton
+                    onAcceptUser={onAcceptUser}
+                    request={request}
+                  />
                 ),
                 request.status !== UserRightStatus.Accepted && (
                   <div>REJECT</div>
