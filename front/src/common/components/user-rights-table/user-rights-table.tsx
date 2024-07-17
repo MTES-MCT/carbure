@@ -3,14 +3,18 @@ import { RightStatus } from "account/components/access-rights"
 import { Alert } from "common/components/alert"
 import { AlertCircle } from "common/components/icons"
 import Table, { actionColumn, Cell } from "common/components/table"
-import { UserRightRequest, UserRightStatus } from "carbure/types"
+import { UserRightRequest, UserRightStatus, UserRole } from "carbure/types"
 import { getUserRoleLabel } from "carbure/utils/normalizers"
 import { Panel } from "common/components/scaffold"
 import { compact } from "common/utils/collection"
 import { formatDate } from "common/utils/formatters"
-import { EditUserRightsButton } from "./edit-user-rights-button"
+import {
+  ChangeUserRoleButton,
+  type ChangeUserRoleButtonProps,
+} from "./change-user-role-button"
 import { AcceptUserButton } from "./accept-user-button"
 import { RevokeUserButton } from "./revoke-user-button"
+import { RejectUserButton } from "./reject-user-button"
 
 type EntityUserRightsProps = {
   rights: UserRightRequest[]
@@ -19,13 +23,16 @@ type EntityUserRightsProps = {
   isLoadingEditUserRight: boolean
 
   // Function called when the role of an user is changed
-  onEditUserRight: () => void
+  onChangeUserRole: (role: UserRole, request: UserRightRequest) => void
 
   // Function called when a user is accepted
-  onAcceptUser: () => void
+  onAcceptUser: (request: UserRightRequest) => void
 
   // Function called when a user is revoked
-  onRevokeUser: () => void
+  onRevokeUser: (request: UserRightRequest) => void
+
+  // Function called when a user is rejected
+  onRejectUser: (request: UserRightRequest) => void
 }
 
 const RIGHTS_ORDER = {
@@ -38,11 +45,18 @@ const RIGHTS_ORDER = {
 export const UserRightsTable = ({
   rights,
   isLoadingEditUserRight,
-  onEditUserRight,
+  onChangeUserRole,
   onAcceptUser,
   onRevokeUser,
+  onRejectUser,
 }: EntityUserRightsProps) => {
   const { t } = useTranslation()
+
+  // Pass all the request as parameter to let the parent do anything
+  const handleChangeUserRole =
+    (request: UserRightRequest) => (role: UserRole) => {
+      onChangeUserRole(role, request)
+    }
 
   return (
     <Panel id="users">
@@ -105,24 +119,27 @@ export const UserRightsTable = ({
             actionColumn<UserRightRequest>((request) =>
               compact([
                 request.status === UserRightStatus.Accepted && (
-                  <EditUserRightsButton
+                  <ChangeUserRoleButton
                     request={request}
                     loading={isLoadingEditUserRight}
-                    onEditUserRight={onEditUserRight}
+                    onChangeUserRole={handleChangeUserRole(request)}
                   />
                 ),
                 request.status !== UserRightStatus.Accepted && (
                   <AcceptUserButton
-                    onAcceptUser={onAcceptUser}
+                    onAcceptUser={() => onAcceptUser(request)}
                     request={request}
                   />
                 ),
                 request.status !== UserRightStatus.Accepted && (
-                  <div>REJECT</div>
+                  <RejectUserButton
+                    onRejectUser={() => onRejectUser(request)}
+                    request={request}
+                  />
                 ),
                 request.status === UserRightStatus.Accepted && (
                   <RevokeUserButton
-                    onRevokeUser={onRevokeUser}
+                    onRevokeUser={() => onRevokeUser(request)}
                     request={request}
                   />
                 ),

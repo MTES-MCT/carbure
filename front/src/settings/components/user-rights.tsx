@@ -3,7 +3,13 @@ import { Trans, useTranslation } from "react-i18next"
 import { RightStatus } from "account/components/access-rights"
 import { Alert } from "common/components/alert"
 import Dialog, { Confirm } from "common/components/dialog"
-import { AlertCircle, Check, Cross, Edit, Return } from "common/components/icons"
+import {
+  AlertCircle,
+  Check,
+  Cross,
+  Edit,
+  Return,
+} from "common/components/icons"
 import Table, { actionColumn, Cell } from "common/components/table"
 import { useQuery, useMutation } from "common/hooks/async"
 import { UserRightRequest, UserRightStatus, UserRole } from "carbure/types"
@@ -15,10 +21,11 @@ import { compact } from "common/utils/collection"
 import Button from "common/components/button"
 import { usePortal } from "common/components/portal"
 import { formatDate } from "common/utils/formatters"
-import { useState } from 'react';
-import { Form } from 'common/components/form';
-import { RadioGroup } from 'common/components/radio';
+import { useState } from "react"
+import { Form } from "common/components/form"
+import { RadioGroup } from "common/components/radio"
 import { useNotify } from "common/components/notifications"
+import { UserRightsTable } from "common/components/user-rights-table"
 
 const RIGHTS_ORDER = {
   [UserRightStatus.Pending]: 0,
@@ -98,13 +105,11 @@ const EntityUserRights = () => {
             },
             actionColumn<UserRightRequest>((request) =>
               compact([
-                request.status === UserRightStatus.Accepted && (
-                  <EditUserRightsButton request={request} />
-                ),
+                request.status === UserRightStatus.Accepted && <div></div>,
                 request.status !== UserRightStatus.Accepted && (
                   <AcceptUserButton request={request} />
-                  ),
-                  request.status !== UserRightStatus.Accepted && (
+                ),
+                request.status !== UserRightStatus.Accepted && (
                   <RejectUserButton request={request} />
                 ),
                 request.status === UserRightStatus.Accepted && (
@@ -225,105 +230,50 @@ const RevokeUserButton = ({ request }: UserActionButton) => {
   )
 }
 
-
-const EditUserRightsButton = ({ request }: UserActionButton) => {
-  const { t } = useTranslation()
-  const portal = usePortal()
-
-  return (
-    <Button
-      captive
-      variant="icon"
-      icon={Edit}
-      title={t("Modifier le rôle")}
-      action={() => portal((close) => <UserRoleDialog onClose={close} request={request} />)}
-    />
-  )
-}
-
-
 export interface UserRightsProps {
-  onClose: () => void,
+  onClose: () => void
   request: UserRightRequest
 }
 
-export const UserRoleDialog = ({ onClose, request }: UserRightsProps) => {
+const EntityUserRights2 = () => {
   const { t } = useTranslation()
-  const notify = useNotify()
   const entity = useEntity()
-  const [role, setRole] = useState<UserRole | undefined>(request.role)
-  const userEmail = request.user[0]
+  const notify = useNotify()
+
+  const response = useQuery(api.getEntityRights, {
+    key: "entity-rights",
+    params: [entity.id],
+  })
 
   const changeUserRole = useMutation(api.changeUserRole, {
     invalidates: ["entity-rights"],
 
     onSuccess: () => {
-      notify(t("Le rôle de l'utilisateur a été modifié !"), { variant: "success" })
-      onClose()
+      notify(t("Le rôle de l'utilisateur a été modifié !"), {
+        variant: "success",
+      })
     },
     onError: () => {
-      notify(t("Le rôle de l'utilisateur n'a pas pu être modifié !"), { variant: "danger" })
-    }
+      notify(t("Le rôle de l'utilisateur n'a pas pu être modifié !"), {
+        variant: "danger",
+      })
+    },
   })
 
-  const handleSubmit = async () => {
-    await changeUserRole.execute(entity.id, userEmail, role!)
-  }
+  const rights = response.result?.data.data?.requests ?? []
 
   return (
-    <Dialog onClose={onClose}>
-      <header>
-        <h1>{t("Modifier le rôle")}</h1>
-      </header>
-      <main>
-      <section> 
-          {t(
-            "Modifier le rôle de l'utilisateur {{userEmail}} ?",
-            { userEmail }
-          )}
-        </section>
-        <section>
-          <Form
-            id="access-right"
-            onSubmit={handleSubmit}
-          >
-            <RadioGroup
-              label={t("Rôle")}
-              name="role"
-              value={role}
-              onChange={setRole}
-              options={[
-                {
-                  value: UserRole.ReadOnly,
-                  label: t("Lecture seule (consultation des lots uniquement)"),
-                },
-                {
-                  value: UserRole.ReadWrite,
-                  label: t("Lecture/écriture (création et gestion des lots)"),
-                },
-                {
-                  value: UserRole.Admin,
-                  label: t("Administration (contrôle complet de la société sur CarbuRe)"), // prettier-ignore
-                }  
-              ]}
-            />
-          </Form>
-        </section>
-       
-      </main>
-      <footer>
-        <Button
-          variant="primary"
-          loading={changeUserRole.loading}
-          icon={Edit}
-          label={t("Modifier le rôle")}
-          disabled={!entity || !role}
-          submit="access-right"
-        />
-        <Button asideX icon={Return} action={onClose} label={t("Retour")} />
-      </footer>
-    </Dialog>
+    <UserRightsTable
+      rights={rights}
+      isLoadingEditUserRight={changeUserRole.loading}
+      onChangeUserRole={(role, request) =>
+        changeUserRole.execute(entity.id, request.user[0], role!)
+      }
+      onAcceptUser={() => {}}
+      onRevokeUser={() => {}}
+      onRejectUser={() => {}}
+    />
   )
 }
 
-export default EntityUserRights
+export default EntityUserRights2
