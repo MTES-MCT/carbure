@@ -6,7 +6,7 @@ import { usePortal } from "common/components/portal"
 import { ChangeUserRoleDialog } from "./change-user-role-dialog"
 
 export type ChangeUserRoleButtonProps = {
-  onChangeUserRole: (role: UserRole) => void
+  onChangeUserRole: (role: UserRole) => Promise<unknown>
   loading: boolean
   request: UserRightRequest
 }
@@ -18,9 +18,7 @@ export const ChangeUserRoleButton = ({
 }: ChangeUserRoleButtonProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
-  const handleSubmit = async (role: UserRole) => {
-    onChangeUserRole(role)
-  }
+  const handleSubmit = (role: UserRole) => onChangeUserRole(role)
 
   return (
     <Button
