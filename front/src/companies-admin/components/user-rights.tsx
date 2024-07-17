@@ -217,6 +217,7 @@ export default () => {
       isLoadingEditUserRight={false}
       onEditUserRight={() => {}}
       onAcceptUser={() => {}}
+      onRevokeUser={() => {}}
     />
   )
 }

@@ -10,6 +10,7 @@ import { compact } from "common/utils/collection"
 import { formatDate } from "common/utils/formatters"
 import { EditUserRightsButton } from "./edit-user-rights-button"
 import { AcceptUserButton } from "./accept-user-button"
+import { RevokeUserButton } from "./revoke-user-button"
 
 type EntityUserRightsProps = {
   rights: UserRightRequest[]
@@ -22,6 +23,9 @@ type EntityUserRightsProps = {
 
   // Function called when a user is accepted
   onAcceptUser: () => void
+
+  // Function called when a user is revoked
+  onRevokeUser: () => void
 }
 
 const RIGHTS_ORDER = {
@@ -36,6 +40,7 @@ export const UserRightsTable = ({
   isLoadingEditUserRight,
   onEditUserRight,
   onAcceptUser,
+  onRevokeUser,
 }: EntityUserRightsProps) => {
   const { t } = useTranslation()
 
@@ -116,7 +121,10 @@ export const UserRightsTable = ({
                   <div>REJECT</div>
                 ),
                 request.status === UserRightStatus.Accepted && (
-                  <div>REVOKE </div>
+                  <RevokeUserButton
+                    onRevokeUser={onRevokeUser}
+                    request={request}
+                  />
                 ),
               ])
             ),
