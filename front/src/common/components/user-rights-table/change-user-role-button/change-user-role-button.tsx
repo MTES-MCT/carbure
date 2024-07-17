@@ -7,13 +7,11 @@ import { ChangeUserRoleDialog } from "./change-user-role-dialog"
 
 export type ChangeUserRoleButtonProps = {
   onChangeUserRole: (role: UserRole) => Promise<unknown>
-  loading: boolean
   request: UserRightRequest
 }
 
 export const ChangeUserRoleButton = ({
   onChangeUserRole,
-  loading,
   request,
 }: ChangeUserRoleButtonProps) => {
   const { t } = useTranslation()
@@ -32,7 +30,6 @@ export const ChangeUserRoleButton = ({
             request={request}
             onSubmit={handleSubmit}
             onClose={close}
-            loading={loading}
           />
         ))
       }
