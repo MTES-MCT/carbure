@@ -290,6 +290,15 @@ export const elecMeterReadingsApplicationsResponseMissing: ElecMeterReadingsAppl
     },
   }
 
+export const elecMeterReadingsApplicationsWithoutChargePointsResponse: ElecMeterReadingsApplicationsResponse =
+  {
+    ...elecMeterReadingsApplicationsResponsePending,
+    current_application_period: {
+      ...elecMeterReadingsApplicationsResponsePending.current_application_period,
+      charge_point_count: 0,
+    },
+  }
+
 export const meterReadingsApplicationError1: MeterReadingsApplicationError = {
   line: 87,
   error: "UNKNOW_ERROR",

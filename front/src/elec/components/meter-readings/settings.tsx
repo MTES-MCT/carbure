@@ -14,7 +14,6 @@ import {
 import { Trans, useTranslation } from "react-i18next"
 import MeterReadingsApplicationsTable from "./table"
 import ElecMeterReadingsFileUpload from "./upload-dialog"
-import { elecMeterReadingsApplicationsResponsePending } from "elec/__test__/data"
 
 const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
   const { t } = useTranslation()
@@ -70,7 +69,7 @@ const ElecMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
       application.id
     )
   }
-
+  console.log("charge point count", chargePointCount)
   return (
     <Panel id="elec-meter-readings">
       <header>
