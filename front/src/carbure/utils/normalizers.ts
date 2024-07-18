@@ -233,6 +233,27 @@ export function getUserRoleLabel(role: UserRole) {
       return i18next.t("Autre")
   }
 }
+/**
+ * Takes an array of user roles and return an array with a couple role/translation.
+ * The translation can be different from "getUserRoleLabel" function because they're used in different contexts
+ * If no roles are passed, it will return all roles
+ * @param roles
+ */
+export const getUserRoleOptions = (
+  roles: UserRole[] = Object.values(UserRole)
+) => {
+  const OVERRIDES_ROLE_TRANSLATIONS: Partial<Record<UserRole, string>> = {
+    [UserRole.Admin]: i18next.t(
+      "Administration (contrôle complet de la société sur CarbuRe)"
+    ),
+    [UserRole.Auditor]: i18next.t("Audit (accès spécial pour auditeurs)"),
+  }
+
+  return roles.map((role) => ({
+    label: OVERRIDES_ROLE_TRANSLATIONS[role] || getUserRoleLabel(role),
+    value: role,
+  }))
+}
 
 export function getStatusLabel(status: LotStatus | undefined) {
   switch (status) {
