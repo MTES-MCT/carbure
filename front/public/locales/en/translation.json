@@ -1469,5 +1469,7 @@
   "<b>{{count}} lots</b> présentent des <b>incohérences</b>_other": "<b>{{count}} batches</b> show <b>anomalies</b>",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_one": "<b>{{count}} batch</b> must be declared before <b>{{date}}</b>",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_other": "<b>{{count}} batches</b> must be declared before <b>{{date}}</b>",
-  "Brouillon_plural": "Drafts"
+  "Brouillon_plural": "Drafts",
+  "Ajouter un utilisateur": "Add new user",
+  "Veuillez remplir les informations suivantes:": "Please complete the following information:"
 }
