@@ -8,6 +8,7 @@ import {
   elecChargePointsApplications,
   elecMeterReadingsApplicationsResponseMissing,
   elecMeterReadingsApplicationsResponsePending,
+  elecMeterReadingsApplicationsWithoutChargePointsResponse,
   elecSnapshot,
   meterReadingsApplicationCheckResponseFailed,
   meterReadingsApplicationCheckResponseSuccess,
@@ -47,6 +48,11 @@ export const okMeterReadingsApplications = mockGetWithResponseData(
   "/elec/cpo/meter-readings/applications",
   elecMeterReadingsApplicationsResponsePending
 )
+export const okMeterReadingsApplicationsWithoutChargePoints =
+  mockGetWithResponseData(
+    "/elec/cpo/meter-readings/applications",
+    elecMeterReadingsApplicationsWithoutChargePointsResponse
+  )
 export const okMeterReadingsApplicationsUrgencyCritical =
   mockGetWithResponseData(
     "/elec/cpo/meter-readings/applications",
