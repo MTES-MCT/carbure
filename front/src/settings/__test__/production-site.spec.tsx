@@ -5,7 +5,8 @@ import { Route } from "react-router-dom"
 import { producer, productionSite } from "carbure/__test__/data"
 import { getField, setEntity, waitWhileLoading } from "carbure/__test__/helpers"
 
-import server, { setDeliverySites, setProductionSites } from "./api"
+import { setDeliverySites, setProductionSites } from "./api"
+import server from "./server"
 import ProductionSitesSettings from "settings/components/production-site"
 
 const SettingsWithHooks = () => {

@@ -4,6 +4,7 @@ import {
   useAcceptUserRights,
   useChangeUserRole,
   useGetEntityRights,
+  useInviteUser,
   useRevokeUserRights,
 } from "./user-rights.hooks"
 
@@ -17,6 +18,8 @@ export const EntityUserRights = () => {
   const revokeRight = useRevokeUserRights()
 
   const acceptRight = useAcceptUserRights()
+
+  const inviteUser = useInviteUser()
 
   return (
     <UserRightsTable
@@ -32,7 +35,7 @@ export const EntityUserRights = () => {
       onRejectUser={(request) =>
         revokeRight.execute(entity.id, request.user[0])
       }
-      onAddNewUser={() => Promise.resolve({})}
+      onAddNewUser={(email, role) => inviteUser.execute(entity.id, email, role)}
     />
   )
 }
