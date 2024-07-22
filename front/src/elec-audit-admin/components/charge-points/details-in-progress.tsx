@@ -34,16 +34,8 @@ export const ChargePointsApplicationDetailsInProgress = ({
         {chargePointApplication?.sample && (
           <section>
             <SampleSummary sample={chargePointApplication?.sample} />
-            <ChargePointsSampleMap
-              chargePoints={chargePointApplication?.sample?.charge_points}
-            />
-            <Button
-              icon={Download}
-              label={t("Télécharger l'échantillon")}
-              variant="secondary"
-              action={onDownloadSample}
-              style={{ width: "min-content" }}
-            />
+            <ChargePointsSampleMap chargePoints={chargePointApplication?.sample?.charge_points} />
+            <Button icon={Download} label={t("Télécharger l'échantillon")} variant="secondary" action={onDownloadSample} />
           </section>
         )}
         <section>

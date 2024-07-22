@@ -73,21 +73,5 @@ export const ApplicationDetailsDialog = () => {
 }
 
 
-interface MailtoButtonProps {
-  cpoName?: string
-  auditorName?: string
-  chargePointCount?: number
-
-}
-
-const MailtoButton = ({ cpoName, auditorName, chargePointCount }: MailtoButtonProps) => {
-  const { t } = useTranslation()
-  const email = "valorisation-recharge@developpement-durable.gouv.fr"
-  const subject = t(`[CarbuRe - Audit Elec] Rapport d'audit de {{cpoName}} par {{auditorName}}`, { cpoName, auditorName })
-  const body = t(`Bonjour%2C%E2%80%A8%0D%0AVous%20trouverez%20ci-joint%20le%20rapport%20d%E2%80%99audit%20pour%20les%20{{chargePointCount}}%20points%20de%20recharge%20de%20l%E2%80%99am%C3%A9nageur%20{{cpoName}}%20que%20nous%20venons%20de%20r%C3%A9aliser.%0D%0A%0D%0AMerci%20beaucoup%E2%80%A8%0D%0ABien%20cordialement%2C`, { cpoName, chargePointCount })
-  const mailto = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${body}`
-  return <Button icon={Send} label={t("Envoyer le rapport d'audit")} variant="primary" href={mailto} disabled={!cpoName} />
-}
-
 
 export default ApplicationDetailsDialog
