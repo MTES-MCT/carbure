@@ -6,7 +6,7 @@ import { TestRoot, render } from "setupTests"
 import userEvent from "@testing-library/user-event"
 import { cpo } from "carbure/__test__/data"
 import ElecMeterReadingsSettings from "elec/components/meter-readings/settings"
-import server from "../../settings/__test__/api"
+import server from "../../settings/__test__/server"
 import {
   okMeterReadingsApplicationsEmpty,
   okMeterReadingsApplicationsUrgencyCritical,

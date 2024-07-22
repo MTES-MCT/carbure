@@ -47,3 +47,29 @@ export const useAcceptUserRights = () =>
   useMutation(api.acceptUserRightsRequest, {
     invalidates: ["entity-rights"],
   })
+
+export const useInviteUser = () => {
+  const notify = useNotify()
+  const { t } = useTranslation()
+
+  return useMutation(api.inviteUser, {
+    invalidates: ["entity-rights"],
+    onSuccess: (response) => {
+      const email = response.data.data?.email
+
+      notify(
+        t("L'utilisateur {{email}} a bien été ajouté !", {
+          email,
+        }),
+        {
+          variant: "success",
+        }
+      )
+    },
+    onError: (err) => {
+      notify(t("Une erreur est survenue lors de l'ajout de l'utilisateur."), {
+        variant: "danger",
+      })
+    },
+  })
+}
