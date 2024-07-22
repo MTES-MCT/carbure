@@ -2,14 +2,6 @@ import { rest } from "msw"
 import { OwnershipType } from "carbure/types"
 
 import {
-  okCountrySearch,
-  okDeliverySitesSearch,
-  okErrorsTranslations,
-  okFieldsTranslations,
-  okProductionSitesSearch,
-  okTranslations,
-} from "carbure/__test__/api"
-import {
   deliverySite,
   entityRequest,
   entityRight,
@@ -26,16 +18,6 @@ import {
   setEntity,
 } from "carbure/__test__/helpers"
 import { dcApplicationErrors } from "./data"
-import {
-  okChargePointsAddSuccess,
-  okChargePointsApplications,
-  okChargePointsCheckValid,
-  okMeterReadingsAddSuccess,
-  okMeterReadingsApplications,
-  okMeterReadingsCheckError,
-  okMeterReadingsCheckValid,
-} from "elec/__test__/api"
-import { setupServer } from "msw/node"
 
 let deliverySites: any[] = []
 let productionSites: any[] = []
@@ -318,7 +300,7 @@ export const koDoubleCountUploadApplication = rest.post(
   }
 )
 
-export default setupServer(
+export default {
   okSettings,
   okEnableMac,
   okDisableMac,
@@ -328,26 +310,14 @@ export default setupServer(
   okAddDeliverySite,
   okDeleteDeliverySite,
   okProductionSites,
-  okProductionSitesSearch,
   okAddProductionSite,
   okUpdateProductionSite,
   okDeleteProductionSite,
   okSetBiocarburant,
   okSetMatierePremiere,
   okSetCertificates,
-  okDeliverySitesSearch,
-  okCountrySearch,
   okEntityRights,
-  okTranslations,
-  okErrorsTranslations,
-  okFieldsTranslations,
   okSelfCertificates,
   okDoubleCountApplications,
   okDoubleCountUploadAgreements,
-  okChargePointsApplications,
-  okChargePointsCheckValid,
-  okChargePointsAddSuccess,
-  okMeterReadingsApplications,
-  okMeterReadingsCheckValid,
-  okMeterReadingsAddSuccess
-)
+}

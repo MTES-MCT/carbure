@@ -5,13 +5,14 @@ import { Route } from "react-router-dom"
 
 import { admin, operator, producer, trader } from "carbure/__test__/data"
 import Settings from "../index"
-import server, {
+import {
   okDisableMac,
   okDisableTrading,
   okDynamicSettings,
   okEnableMac,
   okEnableTrading,
 } from "./api"
+import server from "./server"
 import { setEntity, waitWhileLoading } from "carbure/__test__/helpers"
 
 const SettingsWithHooks = ({ entityID }: { entityID?: number }) => {
