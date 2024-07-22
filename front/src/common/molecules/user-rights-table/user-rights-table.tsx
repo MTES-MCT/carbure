@@ -2,7 +2,7 @@ import { Trans, useTranslation } from "react-i18next"
 import { RightStatus } from "account/components/access-rights"
 import { Alert } from "common/components/alert"
 import { AlertCircle } from "common/components/icons"
-import { Input, SearchInput } from "common/components/input"
+import { SearchInput } from "common/components/input"
 import Table, { actionColumn, Cell } from "common/components/table"
 import { UserRightRequest, UserRightStatus, UserRole } from "carbure/types"
 import { getUserRoleLabel } from "carbure/utils/normalizers"
@@ -13,7 +13,7 @@ import { ChangeUserRoleButton } from "./change-user-role-button"
 import { AcceptUserButton } from "./accept-user-button"
 import { RevokeUserButton } from "./revoke-user-button"
 import { RejectUserButton } from "./reject-user-button"
-import { useState, type ReactNode, ChangeEvent } from "react"
+import { useState } from "react"
 
 type EntityUserRightsProps = {
   rights: UserRightRequest[]

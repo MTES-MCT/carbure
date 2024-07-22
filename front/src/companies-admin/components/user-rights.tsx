@@ -3,7 +3,7 @@ import { UserRightStatus } from "carbure/types"
 import { useParams } from "react-router-dom"
 import * as api from "../api"
 import useEntity from "carbure/hooks/entity"
-import { UserRightsTable } from "common/components/user-rights-table"
+import { UserRightsTable } from "common/molecules/user-rights-table"
 
 export default () => {
   const { id } = useParams<"id">()
