@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next"
 import { UserRightRequest } from "carbure/types"
 import { usePortal } from "common/components/portal"
-import useEntity from "carbure/hooks/entity"
 import Button from "common/components/button"
 import { Check } from "common/components/icons"
 import { Confirm } from "common/components/dialog"
@@ -16,7 +15,6 @@ export const AcceptUserButton = ({
 }: AcceptUserButtonProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
-  const entity = useEntity()
 
   const user = request.user[0]
 

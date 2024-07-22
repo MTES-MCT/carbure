@@ -1,12 +1,14 @@
 import { useTranslation } from "react-i18next"
-import Dialog from "common/components/dialog"
+import { useState } from "react"
 import { Edit, Return } from "common/components/icons"
 import { UserRightRequest, UserRole } from "carbure/types"
 import Button from "common/components/button"
+import { usePortal } from "common/components/portal"
+import Dialog from "common/components/dialog"
 import { type PortalInstance } from "common/components/portal"
 import { Form } from "common/components/form"
 import { RadioGroup } from "common/components/radio"
-import { useState } from "react"
+
 import useEntity from "carbure/hooks/entity"
 
 type ChangeUserRoleDialogProps = {
@@ -87,5 +89,37 @@ export const ChangeUserRoleDialog = ({
         <Button asideX icon={Return} action={onClose} label={t("Retour")} />
       </footer>
     </Dialog>
+  )
+}
+
+export type ChangeUserRoleButtonProps = {
+  onChangeUserRole: (role: UserRole) => Promise<unknown>
+  request: UserRightRequest
+}
+
+export const ChangeUserRoleButton = ({
+  onChangeUserRole,
+  request,
+}: ChangeUserRoleButtonProps) => {
+  const { t } = useTranslation()
+  const portal = usePortal()
+  const handleSubmit = (role: UserRole) => onChangeUserRole(role)
+
+  return (
+    <Button
+      captive
+      variant="icon"
+      icon={Edit}
+      title={t("Modifier le rôle")}
+      action={() =>
+        portal((close) => (
+          <ChangeUserRoleDialog
+            request={request}
+            onSubmit={handleSubmit}
+            onClose={close}
+          />
+        ))
+      }
+    />
   )
 }
