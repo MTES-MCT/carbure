@@ -5,7 +5,8 @@ import { Route } from "react-router-dom"
 import { deliverySite, producer } from "carbure/__test__/data"
 import { getField, setEntity, waitWhileLoading } from "carbure/__test__/helpers"
 
-import server, { setDeliverySites } from "./api"
+import { setDeliverySites } from "./api"
+import server from "./server"
 import DeliverySitesSettings from "settings/components/delivery-site"
 import { getDeliverySites } from "settings/api/delivery-sites"
 

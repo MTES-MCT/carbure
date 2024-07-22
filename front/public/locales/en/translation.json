@@ -1471,5 +1471,7 @@
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_other": "<b>{{count}} batches</b> must be declared before <b>{{date}}</b>",
   "Brouillon_plural": "Drafts",
   "Ajouter un utilisateur": "Add new user",
-  "Veuillez remplir les informations suivantes:": "Please complete the following information:"
+  "Veuillez remplir les informations suivantes:": "Please complete the following information:",
+  "L'utilisateur {{email}} a bien été ajouté !": "The user {{email}} has been successfully added!",
+  "Une erreur est survenue lors de l'ajout de l'utilisateur": "An error occurred while adding the user"
 }
