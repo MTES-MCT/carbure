@@ -1,6 +1,4 @@
 import { rest } from "msw"
-import { setupServer } from "msw/node"
-
 import { OwnershipType } from "carbure/types"
 
 import {
@@ -24,6 +22,7 @@ import {
   Data,
   clone,
   mockGetWithResponseData,
+  mockPostWithResponseData,
   setEntity,
 } from "carbure/__test__/helpers"
 import { dcApplicationErrors } from "./data"
@@ -36,6 +35,7 @@ import {
   okMeterReadingsCheckError,
   okMeterReadingsCheckValid,
 } from "elec/__test__/api"
+import { setupServer } from "msw/node"
 
 let deliverySites: any[] = []
 let productionSites: any[] = []
@@ -254,6 +254,12 @@ export const okEntityRights = rest.get(
     return res(ctx.json({ status: "success", data: entityRights }))
   }
 )
+
+export const okInviteUser = mockPostWithResponseData("/entity/users/invite", {
+  email: "test@test.com",
+  rights: [{ entity: producer, rights: "rw" }],
+  requests: [],
+})
 
 export const okSelfCertificates = rest.get(
   "/api/entity/certificates",

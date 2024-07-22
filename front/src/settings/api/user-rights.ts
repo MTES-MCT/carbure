@@ -23,3 +23,7 @@ export function changeUserRole(
 ) {
   return api.post("/entity/users/change-role", { entity_id, email, role })
 }
+
+export function inviteUser(entity_id: number, email: string, role: UserRole) {
+  return api.post("/entity/users/invite", { entity_id, email, role })
+}

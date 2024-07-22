@@ -9,19 +9,30 @@ import { TextInput } from "common/components/input"
 import { Mail, Plus, Return } from "common/components/icons"
 import { UserRole } from "carbure/types"
 
-type AddUserDialogProps = {
+export type AddUserDialogProps = {
   onClose: PortalInstance["close"]
+  onAddNewUser?: (email: string, role: UserRole) => Promise<unknown>
 }
 
-export const AddUserDialog = ({ onClose }: AddUserDialogProps) => {
+export const AddUserDialog = ({
+  onClose,
+  onAddNewUser,
+}: AddUserDialogProps) => {
   const { t } = useTranslation()
   const { value, bind } = useForm<{
     email: string | undefined
-    role: string | undefined
+    role: UserRole | undefined
   }>({
     email: "",
     role: UserRole.ReadOnly,
   })
+
+  const handleSubmit = async () => {
+    // Wait for backend request before closing dialog
+    await onAddNewUser?.(value.email!, value.role!)
+
+    onClose()
+  }
 
   return (
     <Dialog onClose={onClose}>
@@ -29,11 +40,11 @@ export const AddUserDialog = ({ onClose }: AddUserDialogProps) => {
         <h1>{t("Ajouter un utilisateur")}</h1>
       </header>
       <main>
-        <section>{t("Veuillez remplir les informations suivantes")}</section>
+        <section>{t("Veuillez remplir les informations suivantes :")}</section>
         <section>
-          <Form id="add-user" onSubmit={() => {}}>
+          <Form id="add-user" onSubmit={handleSubmit}>
             <TextInput
-              variant="solid"
+              variant="outline"
               icon={Mail}
               type="email"
               label={t("Adresse email")}
@@ -50,7 +61,6 @@ export const AddUserDialog = ({ onClose }: AddUserDialogProps) => {
       <footer>
         <Button
           variant="primary"
-          loading={false} // TODO
           icon={Plus}
           label={t("Ajouter")}
           disabled={!value.email || !value.role}

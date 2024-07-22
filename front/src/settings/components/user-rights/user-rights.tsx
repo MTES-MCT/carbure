@@ -32,6 +32,7 @@ export const EntityUserRights = () => {
       onRejectUser={(request) =>
         revokeRight.execute(entity.id, request.user[0])
       }
+      onAddNewUser={() => Promise.resolve({})}
     />
   )
 }
