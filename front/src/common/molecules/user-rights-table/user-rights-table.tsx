@@ -16,7 +16,7 @@ import { AcceptUserButton } from "./accept-user-button"
 import { RevokeUserButton } from "./revoke-user-button"
 import { RejectUserButton } from "./reject-user-button"
 import { useState } from "react"
-import { AddUserDialog } from "./add-user-dialog"
+import { AddUserDialog, AddUserDialogProps } from "./add-user-dialog"
 
 type EntityUserRightsProps = {
   rights: UserRightRequest[]
@@ -41,6 +41,8 @@ type EntityUserRightsProps = {
 
   // Allow search input
   isSearchable?: boolean
+
+  onAddNewUser?: AddUserDialogProps["onAddNewUser"]
 }
 
 const RIGHTS_ORDER = {
@@ -58,6 +60,7 @@ export const UserRightsTable = ({
   onRevokeUser,
   onRejectUser,
   onInputChange,
+  onAddNewUser,
 }: EntityUserRightsProps) => {
   const { t } = useTranslation()
   const [query, setQuery] = useState<string>("")
@@ -81,13 +84,19 @@ export const UserRightsTable = ({
         <h1>
           <Trans>Utilisateurs</Trans>
         </h1>
-        <Button
-          asideX
-          variant="primary"
-          icon={Plus}
-          label={t("Ajouter un utilisateur")}
-          action={() => portal((close) => <AddUserDialog onClose={close} />)}
-        />
+        {onAddNewUser && (
+          <Button
+            asideX
+            variant="primary"
+            icon={Plus}
+            label={t("Ajouter un utilisateur")}
+            action={() =>
+              portal((close) => (
+                <AddUserDialog onClose={close} onAddNewUser={onAddNewUser} />
+              ))
+            }
+          />
+        )}
       </header>
 
       <section>
