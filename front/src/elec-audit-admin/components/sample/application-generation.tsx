@@ -131,7 +131,6 @@ export const ApplicationSampleGeneration = ({
 
           {step === "email" && <>
             <Alert icon={Send} variant="info" label={t("Action requise par l'administrateur pour poursuivre l'audit des points de recharge :")} >
-
               <ul>
                 <li><Trans>Joindre le fichier téléchargé comportant l'échantillon des points de recharge à auditer</Trans></li>
                 <li><Trans>Transmettre cet e-mail à l'aménageur</Trans></li>

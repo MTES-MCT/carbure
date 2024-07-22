@@ -16,21 +16,19 @@ export const MeterReadingsApplicationHistory = ({
 }: MeterReadingsApplicationHistoryProps) => {
 
   return (
-    <>
-      <main>
+    <main>
+      <section>
+        <ApplicationSummary application={meterReadingsApplication} />
+      </section>
+      <Divider />
+      {meterReadingsApplication?.sample && (
         <section>
-          <ApplicationSummary application={meterReadingsApplication} />
+          <SampleSummary sample={meterReadingsApplication?.sample} />
+          <ChargePointsSampleMap chargePoints={meterReadingsApplication?.sample?.charge_points} />
         </section>
-        <Divider />
-        {meterReadingsApplication?.sample && (
-          <section>
-            <SampleSummary sample={meterReadingsApplication?.sample} />
-            <ChargePointsSampleMap chargePoints={meterReadingsApplication?.sample?.charge_points} />
-          </section>
-        )}
+      )}
 
-      </main>
-    </>
+    </main>
   )
 }
 

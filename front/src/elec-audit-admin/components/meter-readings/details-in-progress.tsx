@@ -38,7 +38,7 @@ export const MeterReadingsApplicationDetailsInProgress = ({
           <section>
             <SampleSummary sample={meterReadingsApplication?.sample} />
             <ChargePointsSampleMap chargePoints={meterReadingsApplication?.sample?.charge_points} />
-            <Button icon={Download} label={t("Télécharger l'échantillon")} variant="secondary" action={onDownloadSample} style={{ width: "min-content" }} />
+            <Button icon={Download} label={t("Télécharger l'échantillon")} variant="secondary" action={onDownloadSample} />
           </section>
         )}
         <section>

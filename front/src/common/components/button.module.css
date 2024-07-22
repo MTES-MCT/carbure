@@ -12,6 +12,7 @@
   font-size: var(--font-size);
   font-family: var(--font-family);
   white-space: nowrap;
+  width: min-content;
 }
 
 .wrapper {

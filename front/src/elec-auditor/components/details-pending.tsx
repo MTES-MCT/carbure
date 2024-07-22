@@ -4,10 +4,10 @@ import Button from "common/components/button"
 import { Dialog } from "common/components/dialog"
 import { Divider } from "common/components/divider"
 import { useHashMatch } from "common/components/hash-route"
-import { Download, Edit, Return, Send } from "common/components/icons"
+import { Check, Download, Edit, Return, Send, Upload } from "common/components/icons"
 import Portal from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
-import { useQuery } from "common/hooks/async"
+import { useMutation, useQuery } from "common/hooks/async"
 import ChargePointsSampleMap from "elec-audit-admin/components/sample/sample-map"
 import * as api from "elec-auditor/api"
 import ApplicationStatus from "elec/components/application-status"
@@ -18,6 +18,10 @@ import { ElecChargePointsApplication, ElecMeterReadingsApplication } from "elec/
 import { ElecAuditorApplicationDetails } from "elec-auditor/types"
 import { useState } from "react"
 import Stepper from "@codegouvfr/react-dsfr/Stepper"
+import { FileInput } from "common/components/input"
+import Form, { useForm } from "common/components/form"
+import UploadReportSection from "./details-pending-upload"
+import DownloadSampleSection from "./details-pending-download-sample"
 
 
 interface ApplicationDetailsPendingProps {
@@ -30,10 +34,7 @@ export const ApplicationDetailsPending = ({
   onDownloadSample
 }: ApplicationDetailsPendingProps) => {
   const { t } = useTranslation()
-  const entity = useEntity()
-  const navigate = useNavigate()
-  const location = useLocation()
-  const match = useHashMatch("application/:id")
+
 
 
   type IndicatorStep = "download-sample" | "upload-report" | "check-file"
@@ -61,70 +62,59 @@ export const ApplicationDetailsPending = ({
   }
 
   const downloadSample = () => {
-    // onDownloadSample()
+    onDownloadSample()
     setStep("upload-report")
   }
 
-  const uploadFile = () => {
 
+  const reportUploaded = () => {
   }
+
   const sendReport = () => {
 
   }
 
+  const Header = () => {
+    return <section>
+      <Stepper
+        title={steps[currentStep].title}
+        stepCount={steps.length}
+        currentStep={currentStep + 1}
+        nextTitle={steps[currentStep + 1]?.title}
+      />
+      <ApplicationSummary application={application} />
+    </section>
+  }
+
   return (
     <>
-      <main>
-        <section>
-          <Stepper
-            title={steps[currentStep].title}
-            stepCount={steps.length}
-            currentStep={currentStep + 1}
-            nextTitle={steps[currentStep + 1]?.title}
-          />
-          <ApplicationSummary application={application} />
-        </section>
-        {step === "download-sample" &&
-          <>
-            {application?.sample ? (
-              <section>
-                <ChargePointsSampleMap chargePoints={application?.sample?.charge_points} />
-              </section>
-            ) : <p><Trans>Le fichier CSV listant l'intégralité des points de recharge à auditer vous a été envoyé par email par l'aménageur.</Trans></p>}
-            <section>
-              <ReportInfoAlert />
-            </section>
-          </>
-        }
-        {step === "upload-report" &&
-          <>
-            <p>{t("Cet outil vous permet de vérifier votre résultat d'audit avant de l'envoyer à la DGEC.")}</p>
-          </>
-        }
 
-        {step === "check-file" &&
-          <>
+
+      {step === "download-sample" &&
+        <DownloadSampleSection application={application} header={<Header />} onDownloadSample={downloadSample} />
+      }
+      {step === "upload-report" &&
+        <UploadReportSection application={application} header={<Header />} onReportUploaded={reportUploaded} />
+      }
+
+      {step === "check-file" &&
+        <>
+          <main>
+            <Header />
             <p>{t("Le fichier {{fileName}} comporte {{errorCount}} incohérences. Veuillez les corriger puis recharger à nouveau votre fichier.", { fileName: "XXXX", errorCount: "XXX" })}</p>
             <p>{t("Votre fichier d'audit {{fileName}} ne comporte aucune erreur.", { fileName: "XXXX" })}</p>
             <p>{t("Les informations peuvent être transmises à la DGEC.")}</p>
+          </main>
+          <footer>
+            {step === "check-file" && <>
+              <Button icon={Return} label={t("Importer un nouveau fichier")} variant="primary" action={() => setStep("upload-report")} />
+              <Button icon={Send} label={t("Transmettre le résultat d'audit")} variant="primary" action={sendReport} />
+            </>}
+          </footer>
+        </>
+      }
 
-          </>
-        }
 
-      </main>
-
-      <footer>
-        {step === "download-sample" && <>
-          <Button icon={Download} label={t("Télécharger les points à auditer")} variant="primary" action={downloadSample} />
-        </>}
-        {step === "upload-report" && <>
-          <Button icon={Send} label={t("Vérifier le fichier")} variant="primary" action={uploadFile} />
-        </>}
-        {step === "check-file" && <>
-          <Button icon={Return} label={t("Importer un nouveau fichier")} variant="primary" action={() => setStep("upload-report")} />
-          <Button icon={Send} label={t("Transmettre le résultat d’audit")} variant="primary" action={sendReport} />
-        </>}
-      </footer>
     </>
   )
 }
@@ -133,7 +123,6 @@ export const ApplicationDetailsPending = ({
 
 
 export default ApplicationDetailsPending
-
 
 const ReportInfoAlert = () => {
   const { t } = useTranslation()
