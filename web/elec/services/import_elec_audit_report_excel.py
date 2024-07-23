@@ -6,12 +6,6 @@ from core.utils import Validator, is_true
 from elec.models.elec_charge_point import ElecChargePoint
 
 
-class ExcelElecAuditReportError:
-    INVALID_METER_READING_DATA = "INVALID_METER_READING_DATA"
-    CHARGE_POINT_NOT_REGISTERED = "CHARGE_POINT_NOT_REGISTERED"
-    EXTRACTED_ENERGY_LOWER_THAN_BEFORE = "EXTRACTED_ENERGY_LOWER_THAN_BEFORE"
-
-
 def import_elec_audit_report_excel(
     excel_file: UploadedFile,
 ):
