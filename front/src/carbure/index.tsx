@@ -29,78 +29,81 @@ import useEntity, { EntityContext, useEntityManager } from "./hooks/entity"
 import useUserManager, { UserContext } from "./hooks/user"
 import ElecAudit from "elec-audit"
 
-
 const Carbure = () => {
-  const user = useUserManager()
-  const entity = useEntityManager(user)
+	const user = useUserManager()
+	const entity = useEntityManager(user)
 
-  const isAuth = user.isAuthenticated()
+	const isAuth = user.isAuthenticated()
 
-  return (
-    <UserContext.Provider value={user}>
-      <EntityContext.Provider value={entity}>
-        <PortalProvider>
-          <div id="app">
-            <Topbar />
+	return (
+		<UserContext.Provider value={user}>
+			<EntityContext.Provider value={entity}>
+				<PortalProvider>
+					<div id="app">
+						<Topbar />
 
-            <Routes>
-              <Route path="*" element={<Home />} />
-              <Route path="/stats" element={<PublicStats />} />
-              <Route path="/double-counting-list" element={<AgreementPublicList />} />
-              <Route
-                path="/accessibilite"
-                element={<AccessibilityDeclaration />}
-              />
+						<Routes>
+							<Route path="*" element={<Home />} />
+							<Route path="/stats" element={<PublicStats />} />
+							<Route
+								path="/double-counting-list"
+								element={<AgreementPublicList />}
+							/>
+							<Route
+								path="/accessibilite"
+								element={<AccessibilityDeclaration />}
+							/>
 
-              <Route path="/auth/*" element={<Auth />} />
+							<Route path="/auth/*" element={<Auth />} />
 
-              {isAuth && <>
-                <Route path="/pending" element={<Pending />} />
-                <Route path="/account/*" element={<Account />} />
-                <Route path="/org/:entity/*" element={<Org />} />
-              </>
-              }
+							{isAuth && (
+								<>
+									<Route path="/pending" element={<Pending />} />
+									<Route path="/account/*" element={<Account />} />
+									<Route path="/org/:entity/*" element={<Org />} />
+								</>
+							)}
 
-              {!user.loading && (
-                <Route path="*" element={<Navigate replace to="/" />} />
-              )}
-            </Routes>
+							{!user.loading && (
+								<Route path="*" element={<Navigate replace to="/" />} />
+							)}
+						</Routes>
 
-            <Footer />
+						<Footer />
 
-            {user.loading && <LoaderOverlay />}
-          </div>
-        </PortalProvider>
-      </EntityContext.Provider>
-    </UserContext.Provider>
-  )
+						{user.loading && <LoaderOverlay />}
+					</div>
+				</PortalProvider>
+			</EntityContext.Provider>
+		</UserContext.Provider>
+	)
 }
 
 const currentYear = new Date().getFullYear()
 
 const Org = () => {
-  const entity = useEntity()
-  useMissingCompanyInfoModal() //TO DELETE WHEN ALL COMPANIES ARE REGISTRED // TO UNCOMMENT TO 
+	const entity = useEntity()
+	useMissingCompanyInfoModal() //TO DELETE WHEN ALL COMPANIES ARE REGISTRED // TO UNCOMMENT TO
 
-  const {
-    isAdmin,
-    isAuditor,
-    isExternal,
-    isIndustry,
-    isOperator,
-    isProducer,
-    isAirline,
-    isCPO,
-    isPowerOrHeatProducer,
-    has_saf,
-    has_elec,
-  } = entity
-  const hasDCA = isExternal && entity.hasAdminRight("DCA")
-  const hasAirline = isExternal && entity.hasAdminRight("AIRLINE")
-  const isElecAdmin = isExternal && entity.hasAdminRight("ELEC")
+	const {
+		isAdmin,
+		isAuditor,
+		isExternal,
+		isIndustry,
+		isOperator,
+		isProducer,
+		isAirline,
+		isCPO,
+		isPowerOrHeatProducer,
+		has_saf,
+		has_elec,
+	} = entity
+	const hasDCA = isExternal && entity.hasAdminRight("DCA")
+	const hasAirline = isExternal && entity.hasAdminRight("AIRLINE")
+	const isElecAdmin = isExternal && entity.hasAdminRight("ELEC")
 
-  // prettier-ignore
-  return (
+	// prettier-ignore
+	return (
     <Routes>
       <Route path="settings" element={<Settings />} />
 

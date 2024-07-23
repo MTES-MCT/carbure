@@ -17,82 +17,82 @@ import { compact } from "common/utils/collection"
 import useEntity from "carbure/hooks/entity"
 
 const Entities = () => {
-  const { t } = useTranslation()
-  useTitle(t("Sociétés"))
+	const { t } = useTranslation()
+	useTitle(t("Sociétés"))
 
-  return (
-    <Routes>
-      <Route path=":id" element={<EntityDetails />} />
-      <Route path="*" element={<EntityList />} />
-    </Routes>
-  )
+	return (
+		<Routes>
+			<Route path=":id" element={<EntityDetails />} />
+			<Route path="*" element={<EntityList />} />
+		</Routes>
+	)
 }
 
 const EntityList = () => {
-  const { t } = useTranslation()
-  const [search, setSearch] = useState<string | undefined>("")
-  const [tab, setTab] = useState("entities")
-  const portal = usePortal()
-  const notify = useNotify()
-  const entity = useEntity()
+	const { t } = useTranslation()
+	const [search, setSearch] = useState<string | undefined>("")
+	const [tab, setTab] = useState("entities")
+	const portal = usePortal()
+	const notify = useNotify()
+	const entity = useEntity()
 
-  const handleEntityAdded = (name: string) => {
-    notify(
-      t("La société {{name}} a bien été ajoutée.", {
-        name,
-      }),
-      { variant: "success" }
-    )
-  }
+	const handleEntityAdded = (name: string) => {
+		notify(
+			t("La société {{name}} a bien été ajoutée.", {
+				name,
+			}),
+			{ variant: "success" }
+		)
+	}
 
-  const showEntityDialog = () => {
-    portal((close) => (
-      <AddEntityDialog onClose={close} onEntityAdded={handleEntityAdded} />
-    ))
-  }
+	const showEntityDialog = () => {
+		portal((close) => (
+			<AddEntityDialog onClose={close} onEntityAdded={handleEntityAdded} />
+		))
+	}
 
-  return (
-    <Main>
-      <header>
-        <section>
-          <h1>Informations sur les sociétés</h1>
-          <Button
-            asideX
-            variant="primary"
-            icon={Plus}
-            label={t("Ajouter une société")}
-            action={showEntityDialog}
-          />
-        </section>
-      </header>
-      <Tabs
-        focus={tab}
-        onFocus={setTab}
-        variant="sticky"
-        tabs={compact([
-          { key: "entities", label: t("Récapitulatif") },
-          entity.isAdmin && {
-            key: "certificates",
-            label: t("Certificats"),
-          },
-        ])}
-      />
-      <section>
-        <SearchInput
-          clear
-          debounce={250}
-          label={t("Recherche")}
-          placeholder={t("Entrez du texte pour filtrer les résultats...")}
-          value={search}
-          onChange={setSearch}
-        />
-        {tab === "entities" && <EntitySummary search={search} />}
-        {entity.isAdmin && tab === "certificates" && (
-          <Certificates search={search} />
-        )}
-      </section>
-    </Main>
-  )
+	return (
+		<Main>
+			<header>
+				<section>
+					<h1>Informations sur les sociétés</h1>
+					<Button
+						asideX
+						variant="primary"
+						icon={Plus}
+						label={t("Ajouter une société")}
+						action={showEntityDialog}
+					/>
+				</section>
+			</header>
+			<Tabs
+				focus={tab}
+				onFocus={setTab}
+				variant="sticky"
+				tabs={compact([
+					{ key: "entities", label: t("Récapitulatif") },
+					entity.isAdmin && {
+						key: "certificates",
+						label: t("Certificats"),
+					},
+				])}
+			/>
+			<section>
+				<SearchInput
+					clear
+					debounce={250}
+					label={t("Recherche")}
+					placeholder={t("Entrez du texte pour filtrer les résultats...")}
+					value={search}
+					onChange={setSearch}
+				/>
+				{tab === "entities" && <EntitySummary search={search} />}
+				{entity.isAdmin && tab === "certificates" && (
+					<Certificates search={search} />
+				)}
+			</section>
+		</Main>
+	)
 }
 
 export default Entities

@@ -6,141 +6,141 @@ import fields from "../../../public/locales/fr/fields.json"
 import { EntityType } from "carbure/types"
 
 import {
-  country,
-  deliverySite,
-  producer,
-  trader,
-  operator,
-  matierePremiere,
-  biocarburant,
-  productionSite,
+	country,
+	deliverySite,
+	producer,
+	trader,
+	operator,
+	matierePremiere,
+	biocarburant,
+	productionSite,
 } from "./data"
 
 export const okStats = rest.get("/api/home-stats", (req, res, ctx) => {
-  return res(
-    ctx.json({
-      status: "success",
-      data: {
-        total_volume: 1000000,
-        entities: {
-          [EntityType.Operator]: 25,
-          [EntityType.Producer]: 25,
-          [EntityType.Trader]: 25,
-        },
-      },
-    })
-  )
+	return res(
+		ctx.json({
+			status: "success",
+			data: {
+				total_volume: 1000000,
+				entities: {
+					[EntityType.Operator]: 25,
+					[EntityType.Producer]: 25,
+					[EntityType.Trader]: 25,
+				},
+			},
+		})
+	)
 })
 
 export const okNotifications = rest.get(
-  "/api/entity/notifications",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: [],
-      })
-    )
-  }
+	"/api/entity/notifications",
+	(req, res, ctx) => {
+		return res(
+			ctx.json({
+				status: "success",
+				data: [],
+			})
+		)
+	}
 )
 
 export const okEntitySearch = rest.get(
-  "/api/resources/entities",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: [producer, trader, operator],
-      })
-    )
-  }
+	"/api/resources/entities",
+	(req, res, ctx) => {
+		return res(
+			ctx.json({
+				status: "success",
+				data: [producer, trader, operator],
+			})
+		)
+	}
 )
 
 export const okCountrySearch = rest.get(
-  "/api/resources/countries",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: [country],
-      })
-    )
-  }
+	"/api/resources/countries",
+	(req, res, ctx) => {
+		return res(
+			ctx.json({
+				status: "success",
+				data: [country],
+			})
+		)
+	}
 )
 
 export const okBiocarburantsSearch = rest.get(
-  "/api/resources/biofuels",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: [biocarburant],
-      })
-    )
-  }
+	"/api/resources/biofuels",
+	(req, res, ctx) => {
+		return res(
+			ctx.json({
+				status: "success",
+				data: [biocarburant],
+			})
+		)
+	}
 )
 
 export const okMatierePremiereSearch = rest.get(
-  "/api/resources/feedstocks",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: [matierePremiere],
-      })
-    )
-  }
+	"/api/resources/feedstocks",
+	(req, res, ctx) => {
+		return res(
+			ctx.json({
+				status: "success",
+				data: [matierePremiere],
+			})
+		)
+	}
 )
 
 export const okProductionSitesSearch = rest.get(
-  "/api/resources/production-sites",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: [productionSite],
-      })
-    )
-  }
+	"/api/resources/production-sites",
+	(req, res, ctx) => {
+		return res(
+			ctx.json({
+				status: "success",
+				data: [productionSite],
+			})
+		)
+	}
 )
 
 export const okDeliverySitesSearch = rest.get(
-  "/api/resources/depots",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: [deliverySite],
-      })
-    )
-  }
+	"/api/resources/depots",
+	(req, res, ctx) => {
+		return res(
+			ctx.json({
+				status: "success",
+				data: [deliverySite],
+			})
+		)
+	}
 )
 
 export const okTranslations = rest.get(
-  "/app/locales/fr/translations.json",
-  (req, res, ctx) => {
-    return res(ctx.json(translations))
-  }
+	"/app/locales/fr/translations.json",
+	(req, res, ctx) => {
+		return res(ctx.json(translations))
+	}
 )
 
 export const okErrorsTranslations = rest.get(
-  "/app/locales/fr/errors.json",
-  (req, res, ctx) => {
-    return res(ctx.json(errors))
-  }
+	"/app/locales/fr/errors.json",
+	(req, res, ctx) => {
+		return res(ctx.json(errors))
+	}
 )
 
 export const okFieldsTranslations = rest.get(
-  "/app/locales/fr/fields.json",
-  (req, res, ctx) => {
-    return res(ctx.json(fields))
-  }
+	"/app/locales/fr/fields.json",
+	(req, res, ctx) => {
+		return res(ctx.json(fields))
+	}
 )
 
 export default setupServer(
-  okNotifications,
-  okTranslations,
-  okErrorsTranslations,
-  okFieldsTranslations,
-  okStats
+	okNotifications,
+	okTranslations,
+	okErrorsTranslations,
+	okFieldsTranslations,
+	okStats
 )

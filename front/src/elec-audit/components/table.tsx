@@ -10,73 +10,62 @@ import { useTranslation } from "react-i18next"
 import { To } from "react-router-dom"
 
 interface AuditChargePointsApplicationsTableProps {
-  applications: ElecChargePointsApplication[];
-  rowLink?: (row: ElecChargePointsApplication) => To
-  loading?: boolean;
+	applications: ElecChargePointsApplication[]
+	rowLink?: (row: ElecChargePointsApplication) => To
+	loading?: boolean
 }
 
-const AuditChargePointsApplicationsTable: React.FC<AuditChargePointsApplicationsTableProps> = ({
-  applications,
-  rowLink,
-  loading,
-}) => {
+const AuditChargePointsApplicationsTable: React.FC<
+	AuditChargePointsApplicationsTableProps
+> = ({ applications, rowLink, loading }) => {
+	const { t } = useTranslation()
 
-  const { t } = useTranslation()
+	return (
+		<Table
+			loading={loading}
+			rows={applications}
+			rowLink={rowLink}
+			columns={[
+				{
+					header: t("Statut"),
+					cell: (application) => (
+						<ApplicationStatus status={application.status} />
+					),
+				},
+				{
+					header: t("Ordre de côntrole"),
+					cell: (application) => (
+						<Cell text={`${formatDate(application.audit_order_date!)}`} />
+					),
+				},
+				{
+					header: t("Aménageur"),
+					cell: (application) => <Cell text={`${application.cpo.name}`} />,
+				},
+				{
+					header: t("Stations"),
+					cell: (application) => (
+						<Cell text={`${formatNumber(application.station_count)}`} />
+					),
+				},
+				{
+					header: t("Points de recharge"),
+					cell: (application) => (
+						<Cell text={`${formatNumber(application.charge_point_count)}`} />
+					),
+				},
+				{
+					header: t("Date limité"),
+					cell: (application) => {
+						const limitDate = getApplicationAuditLimitDate(
+							application.audit_order_date!
+						)
+						return <Cell text={`${formatDate(limitDate)}`} />
+					},
+				},
+			]}
+		/>
+	)
+}
 
-  return (
-    <Table
-      loading={loading}
-      rows={applications}
-      rowLink={rowLink}
-      columns={[
-        {
-          header: t("Statut"),
-          cell: (application) => <ApplicationStatus status={application.status} />,
-        },
-        {
-          header: t("Ordre de côntrole"),
-          cell: (application) => (
-            <Cell
-              text={`${formatDate(application.audit_order_date!)}`}
-            />
-          ),
-        },
-        {
-          header: t("Aménageur"),
-          cell: (application) => (
-            <Cell
-              text={`${application.cpo.name}`}
-            />
-          ),
-        },
-        {
-          header: t("Stations"),
-          cell: (application) => (
-            <Cell
-              text={`${formatNumber(application.station_count)}`}
-            />
-          ),
-        },
-        {
-          header: t("Points de recharge"),
-          cell: (application) => (
-            <Cell
-              text={`${formatNumber(application.charge_point_count)}`}
-            />
-          ),
-        },
-        {
-          header: t("Date limité"),
-          cell: (application) => {
-            let limitDate = getApplicationAuditLimitDate(application.audit_order_date!)
-            return <Cell
-              text={`${formatDate(limitDate)}`}
-            />
-          },
-        },
-      ]}
-    />
-  );
-};
-
-export default AuditChargePointsApplicationsTable;
+export default AuditChargePointsApplicationsTable

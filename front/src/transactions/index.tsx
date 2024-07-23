@@ -1,12 +1,12 @@
 import { useCallback } from "react"
 import { useTranslation } from "react-i18next"
 import {
-  Navigate,
-  Route,
-  Routes,
-  useNavigate,
-  useParams,
-  useLocation,
+	Navigate,
+	Route,
+	Routes,
+	useNavigate,
+	useParams,
+	useLocation,
 } from "react-router-dom"
 import HashRoute from "common/components/hash-route"
 import { UserRole } from "carbure/types"
@@ -23,68 +23,68 @@ import Stocks from "./components/stocks"
 import useYears from "common/hooks/years"
 
 export const Transactions = () => {
-  const { t } = useTranslation()
+	const { t } = useTranslation()
 
-  const entity = useEntity()
+	const entity = useEntity()
 
-  const years = useYears("transactions", api.getYears)
+	const years = useYears("transactions", api.getYears)
 
-  const snapshot = useQuery(api.getSnapshot, {
-    key: "snapshot",
-    params: [entity.id, years.selected],
-  })
+	const snapshot = useQuery(api.getSnapshot, {
+		key: "snapshot",
+		params: [entity.id, years.selected],
+	})
 
-  const snapshotData = snapshot.result?.data.data
+	const snapshotData = snapshot.result?.data.data
 
-  // common props for subroutes
-  const props = { year: years.selected, snapshot: snapshotData }
+	// common props for subroutes
+	const props = { year: years.selected, snapshot: snapshotData }
 
-  return (
-    <ImportArea>
-      <Main>
-        <header>
-          <section>
-            <h1>{t("Transactions")}</h1>
+	return (
+		<ImportArea>
+			<Main>
+				<header>
+					<section>
+						<h1>{t("Transactions")}</h1>
 
-            <Select
-              loading={years.loading}
-              variant="inline"
-              placeholder={t("Choisir une année")}
-              value={years.selected}
-              onChange={years.setYear}
-              options={years.options}
-              sort={(year) => -year.value}
-            />
+						<Select
+							loading={years.loading}
+							variant="inline"
+							placeholder={t("Choisir une année")}
+							value={years.selected}
+							onChange={years.setYear}
+							options={years.options}
+							sort={(year) => -year.value}
+						/>
 
-            {entity.hasRights(UserRole.Admin, UserRole.ReadWrite) && (
-              <DeclarationButton />
-            )}
-          </section>
+						{entity.hasRights(UserRole.Admin, UserRole.ReadWrite) && (
+							<DeclarationButton />
+						)}
+					</section>
 
-          <section>
-            <StatusTabs loading={snapshot.loading} count={snapshotData?.lots} />
-          </section>
-        </header>
+					<section>
+						<StatusTabs loading={snapshot.loading} count={snapshotData?.lots} />
+					</section>
+				</header>
 
-        <Routes>
-          <Route
-            path="stocks/*"
-            element={
-              // if entity does not have stock redirect to default drafts
-              entity.has_stocks ? (
-                <Stocks {...props} />
-              ) : (
-                <Navigate replace to="../drafts/imported" />
-              )
-            }
-          />
-          <Route path="*" element={<Lots {...props} />} />
-        </Routes>
+				<Routes>
+					<Route
+						path="stocks/*"
+						element={
+							// if entity does not have stock redirect to default drafts
+							entity.has_stocks ? (
+								<Stocks {...props} />
+							) : (
+								<Navigate replace to="../drafts/imported" />
+							)
+						}
+					/>
+					<Route path="*" element={<Lots {...props} />} />
+				</Routes>
 
-        <HashRoute path="declaration/*" element={<DeclarationDialog />} />
-      </Main>
-    </ImportArea>
-  )
+				<HashRoute path="declaration/*" element={<DeclarationDialog />} />
+			</Main>
+		</ImportArea>
+	)
 }
 
 export default Transactions

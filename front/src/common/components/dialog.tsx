@@ -8,80 +8,80 @@ import { Overlay } from "./scaffold"
 import { useMutation } from "common/hooks/async"
 
 export interface DialogProps {
-  className?: string
-  style?: React.CSSProperties
-  fullscreen?: boolean
-  children: React.ReactNode
-  onClose: () => void
+	className?: string
+	style?: React.CSSProperties
+	fullscreen?: boolean
+	children: React.ReactNode
+	onClose: () => void
 }
 
 export const Dialog = ({
-  className,
-  style,
-  children,
-  fullscreen,
-  onClose,
+	className,
+	style,
+	children,
+	fullscreen,
+	onClose,
 }: DialogProps) => (
-  <div className={css.screen}>
-    <Overlay onClick={onClose} />
-    <div
-      className={cl(css.dialog, fullscreen && css.fullscreen, className)}
-      style={style}
-    >
-      {children}
-      <Button
-        variant="icon"
-        icon={Cross}
-        action={onClose}
-        className={css.close}
-      />
-    </div>
-  </div>
+	<div className={css.screen}>
+		<Overlay onClick={onClose} />
+		<div
+			className={cl(css.dialog, fullscreen && css.fullscreen, className)}
+			style={style}
+		>
+			{children}
+			<Button
+				variant="icon"
+				icon={Cross}
+				action={onClose}
+				className={css.close}
+			/>
+		</div>
+	</div>
 )
 
 export interface ConfirmProps {
-  title: string
-  description: string
-  confirm: string
-  variant: ButtonVariant
-  icon?: React.ComponentType | React.ElementType
-  onConfirm: () => Promise<any>
-  onClose: () => void
+	title: string
+	description: string
+	confirm: string
+	variant: ButtonVariant
+	icon?: React.ComponentType | React.ElementType
+	onConfirm: () => Promise<any>
+	onClose: () => void
 }
 
 export const Confirm = ({
-  title,
-  description,
-  confirm,
-  variant,
-  icon = Check,
-  onConfirm,
-  onClose,
+	title,
+	description,
+	confirm,
+	variant,
+	icon = Check,
+	onConfirm,
+	onClose,
 }: ConfirmProps) => {
-  const { t } = useTranslation()
-  const confirmAction = useMutation(onConfirm)
-  return (
-    <Dialog onClose={onClose}>
-      <header>
-        <h1>{title}</h1>
-      </header>
-      <main>
-        <section>{description}</section>
-      </main>
-      <footer>
-        <Button
-          asideX
-          autoFocus
-          icon={icon}
-          variant={variant}
-          label={confirm}
-          loading={confirmAction.loading}
-          action={() => confirmAction.execute().then(onClose)}
-        />
-        <Button icon={Return} label={t("Annuler")} action={onClose} />
-      </footer>
-    </Dialog>
-  )
+	const { t } = useTranslation()
+	const confirmAction = useMutation(onConfirm)
+	return (
+		<Dialog onClose={onClose}>
+			<header>
+				<h1>{title}</h1>
+			</header>
+			<main>
+				<section>{description}</section>
+			</main>
+			<footer>
+				<Button
+					asideX
+					autoFocus
+					icon={icon}
+					variant={variant}
+					label={confirm}
+					loading={confirmAction.loading}
+					action={() => confirmAction.execute().then(onClose)}
+				/>
+				<Button icon={Return} label={t("Annuler")} action={onClose} />
+			</footer>
+		</Dialog>
+	)
 }
 
 export default Dialog

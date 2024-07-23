@@ -17,148 +17,148 @@ import ControlLotDetails from "control-details/components/lot"
 import HashRoute from "common/components/hash-route"
 
 export interface LotsProps {
-  entity: EntityManager
-  year: number
+	entity: EntityManager
+	year: number
 }
 
 export const Lots = ({ entity, year }: LotsProps) => {
-  const location = useLocation()
+	const location = useLocation()
 
-  const status = useStatus()
+	const status = useStatus()
 
-  const [state, actions] = useQueryParamsStore(entity, year, status)
-  const query = useLotQuery(state)
+	const [state, actions] = useQueryParamsStore(entity, year, status)
+	const query = useLotQuery(state)
 
-  const api = pickApi(entity)
+	const api = pickApi(entity)
 
-  const lots = useQuery(api.getLots, {
-    key: "controls",
-    params: [query],
+	const lots = useQuery(api.getLots, {
+		key: "controls",
+		params: [query],
 
-    onSuccess: () => {
-      if (state.selection.length > 0) {
-        actions.setSelection([])
-      }
-    },
-  })
+		onSuccess: () => {
+			if (state.selection.length > 0) {
+				actions.setSelection([])
+			}
+		},
+	})
 
-  const lotsData = lots.result?.data.data
-  const lotList = lotsData?.lots ?? []
-  const ids = lotsData?.ids ?? []
-  const lotErrors = lotsData?.errors ?? {}
-  const count = lotsData?.returned ?? 0
-  const total = lotsData?.total ?? 0
-  const totalErrors = lotsData?.total_errors ?? 0
-  const totalDeadline = lotsData?.total_deadline ?? 0
+	const lotsData = lots.result?.data.data
+	const lotList = lotsData?.lots ?? []
+	const ids = lotsData?.ids ?? []
+	const lotErrors = lotsData?.errors ?? {}
+	const count = lotsData?.returned ?? 0
+	const total = lotsData?.total ?? 0
+	const totalErrors = lotsData?.total_errors ?? 0
+	const totalDeadline = lotsData?.total_deadline ?? 0
 
-  const showLotDetails = (lot: Lot) => ({
-    pathname: location.pathname,
-    search: location.search,
-    hash: `lot/${lot.id}`,
-  })
+	const showLotDetails = (lot: Lot) => ({
+		pathname: location.pathname,
+		search: location.search,
+		hash: `lot/${lot.id}`,
+	})
 
-  return (
-    <>
-      <Bar>
-        <Filters
-          query={query}
-          filters={ADMIN_FILTERS}
-          selected={state.filters}
-          onSelect={actions.setFilters}
-          getFilters={api.getLotFilters}
-        />
-      </Bar>
+	return (
+		<>
+			<Bar>
+				<Filters
+					query={query}
+					filters={ADMIN_FILTERS}
+					selected={state.filters}
+					onSelect={actions.setFilters}
+					getFilters={api.getLotFilters}
+				/>
+			</Bar>
 
-      <section>
-        <ControlActions
-          count={count}
-          query={query}
-          lots={lotsData?.lots ?? []}
-          selection={state.selection}
-          search={state.search}
-          onSearch={actions.setSearch}
-          onSwitch={actions.setCategory}
-        />
+			<section>
+				<ControlActions
+					count={count}
+					query={query}
+					lots={lotsData?.lots ?? []}
+					selection={state.selection}
+					search={state.search}
+					onSearch={actions.setSearch}
+					onSwitch={actions.setCategory}
+				/>
 
-        {(state.invalid || totalErrors > 0) && (
-          <InvalidSwitch
-            count={totalErrors}
-            active={state.invalid}
-            onSwitch={actions.setInvalid}
-          />
-        )}
+				{(state.invalid || totalErrors > 0) && (
+					<InvalidSwitch
+						count={totalErrors}
+						active={state.invalid}
+						onSwitch={actions.setInvalid}
+					/>
+				)}
 
-        {(state.deadline || totalDeadline > 0) && (
-          <DeadlineSwitch
-            count={totalDeadline}
-            active={state.deadline}
-            onSwitch={actions.setDeadline}
-          />
-        )}
+				{(state.deadline || totalDeadline > 0) && (
+					<DeadlineSwitch
+						count={totalDeadline}
+						active={state.deadline}
+						onSwitch={actions.setDeadline}
+					/>
+				)}
 
-        {count === 0 && (
-          <NoResult
-            loading={lots.loading}
-            filters={state.filters}
-            onFilter={actions.setFilters}
-          />
-        )}
+				{count === 0 && (
+					<NoResult
+						loading={lots.loading}
+						filters={state.filters}
+						onFilter={actions.setFilters}
+					/>
+				)}
 
-        {count > 0 && (
-          <>
-            <ControlLotSummaryBar
-              query={query}
-              selection={state.selection}
-              filters={state.filters}
-              onFilter={actions.setFilters}
-            />
-            <ControlTable
-              loading={lots.loading}
-              order={state.order}
-              lots={lotList}
-              errors={lotErrors}
-              selected={state.selection}
-              onSelect={actions.setSelection}
-              onOrder={actions.setOrder}
-              rowLink={showLotDetails}
-            />
-            <Pagination
-              page={state.page}
-              limit={state.limit}
-              total={total}
-              onPage={actions.setPage}
-              onLimit={actions.setLimit}
-            />
-          </>
-        )}
-      </section>
+				{count > 0 && (
+					<>
+						<ControlLotSummaryBar
+							query={query}
+							selection={state.selection}
+							filters={state.filters}
+							onFilter={actions.setFilters}
+						/>
+						<ControlTable
+							loading={lots.loading}
+							order={state.order}
+							lots={lotList}
+							errors={lotErrors}
+							selected={state.selection}
+							onSelect={actions.setSelection}
+							onOrder={actions.setOrder}
+							rowLink={showLotDetails}
+						/>
+						<Pagination
+							page={state.page}
+							limit={state.limit}
+							total={total}
+							onPage={actions.setPage}
+							onLimit={actions.setLimit}
+						/>
+					</>
+				)}
+			</section>
 
-      <HashRoute
-        path="lot/:id"
-        element={<ControlLotDetails neighbors={ids} />}
-      />
-    </>
-  )
+			<HashRoute
+				path="lot/:id"
+				element={<ControlLotDetails neighbors={ids} />}
+			/>
+		</>
+	)
 }
 
 const ADMIN_FILTERS = [
-  Filter.LotStatus,
-  Filter.CorrectionStatus,
-  Filter.DeliveryTypes,
-  Filter.Periods,
-  Filter.Biofuels,
-  Filter.Feedstocks,
-  Filter.CountriesOfOrigin,
-  Filter.Suppliers,
-  Filter.Clients,
-  Filter.ClientTypes,
-  Filter.ProductionSites,
-  Filter.DeliverySites,
-  Filter.AddedBy,
-  Filter.Errors,
-  Filter.Conformity,
-  Filter.Scores,
-  Filter.ML,
+	Filter.LotStatus,
+	Filter.CorrectionStatus,
+	Filter.DeliveryTypes,
+	Filter.Periods,
+	Filter.Biofuels,
+	Filter.Feedstocks,
+	Filter.CountriesOfOrigin,
+	Filter.Suppliers,
+	Filter.Clients,
+	Filter.ClientTypes,
+	Filter.ProductionSites,
+	Filter.DeliverySites,
+	Filter.AddedBy,
+	Filter.Errors,
+	Filter.Conformity,
+	Filter.Scores,
+	Filter.ML,
 ]
 
 export default Lots

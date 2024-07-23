@@ -5,84 +5,88 @@ import css from "./form.module.css"
 export type FormVariant = "inline" | "columns"
 
 export interface FormProps<T> {
-  id?: string
-  className?: string
-  style?: React.CSSProperties
-  children: React.ReactNode
-  variant?: FormVariant
-  form?: FormManager<T>
-  wrapper?: boolean
-  novalidate?: boolean
-  onSubmit?: (
-    value: T | undefined,
-    e?: React.FormEvent<HTMLFormElement>
-  ) => void
+	id?: string
+	className?: string
+	style?: React.CSSProperties
+	children: React.ReactNode
+	variant?: FormVariant
+	form?: FormManager<T>
+	wrapper?: boolean
+	novalidate?: boolean
+	onSubmit?: (
+		value: T | undefined,
+		e?: React.FormEvent<HTMLFormElement>
+	) => void
 }
 
 export function Form<T>({
-  id,
-  className,
-  style,
-  variant,
-  form,
-  children,
-  onSubmit,
-  novalidate,
-  wrapper
+	id,
+	className,
+	style,
+	variant,
+	form,
+	children,
+	onSubmit,
+	novalidate,
+	wrapper,
 }: FormProps<T>) {
-  return (
-    <FormContext.Provider value={form}>
-      <form
-        id={id}
-        className={cl(css.form, variant && css[variant], className, wrapper && css.wrapper)}
-        style={style}
-
-        noValidate={novalidate}
-        onSubmit={(e) => {
-          e.preventDefault()
-          onSubmit?.(form?.value, e)
-        }}
-      >
-        {children}
-      </form>
-    </FormContext.Provider>
-  )
+	return (
+		<FormContext.Provider value={form}>
+			<form
+				id={id}
+				className={cl(
+					css.form,
+					variant && css[variant],
+					className,
+					wrapper && css.wrapper
+				)}
+				style={style}
+				noValidate={novalidate}
+				onSubmit={(e) => {
+					e.preventDefault()
+					onSubmit?.(form?.value, e)
+				}}
+			>
+				{children}
+			</form>
+		</FormContext.Provider>
+	)
 }
 
 export interface FieldsetProps {
-  className?: string
-  style?: React.CSSProperties
-  small?: boolean
-  children?: React.ReactNode
-  label?: string
+	className?: string
+	style?: React.CSSProperties
+	small?: boolean
+	children?: React.ReactNode
+	label?: string
 }
 
 export const Fieldset = ({
-  className,
-  style,
-  small,
-  label,
-  children,
+	className,
+	style,
+	small,
+	label,
+	children,
 }: FieldsetProps) => (
-  <fieldset
-    className={cl(css.fieldset, small && css.small, className)}
-    style={style}
-  >
-    {label && <legend title={label}>{label}</legend>}
-    {children}
-  </fieldset>
+	<fieldset
+		className={cl(css.fieldset, small && css.small, className)}
+		style={style}
+	>
+		{label && <legend title={label}>{label}</legend>}
+		{children}
+	</fieldset>
 )
 
 export interface FormManager<T> {
-  value: T
-  errors: FormErrors<T>
-  bind: Bind<T>
-  setField: FieldSetter<T>
-  disabledFields: FormDisabledFields<T>
-  setFieldError: (name: keyof T, error: string | undefined) => void
-  setDisabledFields: (fieldsNames: string[]) => void
-  clearDisabledFields: () => void
-  setValue: React.Dispatch<React.SetStateAction<T>>
+	value: T
+	errors: FormErrors<T>
+	bind: Bind<T>
+	setField: FieldSetter<T>
+	disabledFields: FormDisabledFields<T>
+	setFieldError: (name: keyof T, error: string | undefined) => void
+	setDisabledFields: (fieldsNames: string[]) => void
+	clearDisabledFields: () => void
+	setValue: React.Dispatch<React.SetStateAction<T>>
 }
 
 export type FormErrors<T> = Partial<Record<keyof T, string>>
@@ -92,112 +96,112 @@ const EMPTY_ERRORS: FormErrors<any> = {}
 const EMPTY_DISABLED_FIELDS: FormDisabledFields<any> = {}
 
 function identity<T>(value: T) {
-  return value
+	return value
 }
 
 export interface FormOptions<T> {
-  errors?: FormErrors<T>
-  setValue?: (nextState: T, prevState?: T) => T
+	errors?: FormErrors<T>
+	setValue?: (nextState: T, prevState?: T) => T
 }
 
 export function useForm<T>(
-  initialState: T,
-  options?: FormOptions<T>
+	initialState: T,
+	options?: FormOptions<T>
 ): FormManager<T> {
-  const [value, setValue] = useState(initialState)
-  const [_errors, setErrors] = useState(EMPTY_ERRORS)
-  const [disabledFields, _setDisabledFields] = useState(EMPTY_DISABLED_FIELDS)
+	const [value, setValue] = useState(initialState)
+	const [_errors, setErrors] = useState(EMPTY_ERRORS)
+	const [disabledFields, _setDisabledFields] = useState(EMPTY_DISABLED_FIELDS)
 
-  const errors = options?.errors ?? _errors
-  const mutate = options?.setValue ?? identity
-  const setField = useCallback(
-    (name: keyof T, value: T[keyof T]) => {
-      setValue((form) => mutate({ ...form, [name]: value }, form))
-      setFieldError(name, undefined)
-    },
-    [mutate]
-  )
+	const errors = options?.errors ?? _errors
+	const mutate = options?.setValue ?? identity
+	const setField = useCallback(
+		(name: keyof T, value: T[keyof T]) => {
+			setValue((form) => mutate({ ...form, [name]: value }, form))
+			setFieldError(name, undefined)
+		},
+		[mutate]
+	)
 
-  const setFieldError = useCallback(
-    (name: keyof T, error: string | undefined) => {
-      setErrors((errors) => ({ ...errors, [name]: error }))
-    },
-    []
-  )
+	const setFieldError = useCallback(
+		(name: keyof T, error: string | undefined) => {
+			setErrors((errors) => ({ ...errors, [name]: error }))
+		},
+		[]
+	)
 
-  const clearDisabledFields = useCallback(() => {
-    _setDisabledFields(EMPTY_DISABLED_FIELDS)
-  }, [])
+	const clearDisabledFields = useCallback(() => {
+		_setDisabledFields(EMPTY_DISABLED_FIELDS)
+	}, [])
 
-  const setDisabledFields = useCallback((fieldsNames: string[]) => {
-    const fields: FormDisabledFields<T> = {}
-    fieldsNames.forEach((name) => {
-      fields[name as keyof T] = true
-    })
-    _setDisabledFields(fields)
-  }, [])
+	const setDisabledFields = useCallback((fieldsNames: string[]) => {
+		const fields: FormDisabledFields<T> = {}
+		fieldsNames.forEach((name) => {
+			fields[name as keyof T] = true
+		})
+		_setDisabledFields(fields)
+	}, [])
 
-  const bind = useBindCallback(value, errors, disabledFields, setField)
+	const bind = useBindCallback(value, errors, disabledFields, setField)
 
-  return {
-    value,
-    errors,
-    setFieldError,
-    disabledFields,
-    setDisabledFields,
-    clearDisabledFields,
-    bind,
-    setField,
-    setValue,
-  }
+	return {
+		value,
+		errors,
+		setFieldError,
+		disabledFields,
+		setDisabledFields,
+		clearDisabledFields,
+		bind,
+		setField,
+		setValue,
+	}
 }
 
 export function useBind<T>() {
-  const form = useFormContext<T>()
-  return form.bind
+	const form = useFormContext<T>()
+	return form.bind
 }
 
 export function useBindCallback<T>(
-  value: T,
-  errors: FormErrors<T>,
-  disabledFields: FormDisabledFields<T>,
-  setField: (name: keyof T, value: T[keyof T]) => void
+	value: T,
+	errors: FormErrors<T>,
+	disabledFields: FormDisabledFields<T>,
+	setField: (name: keyof T, value: T[keyof T]) => void
 ): Bind<T> {
-  return useCallback(
-    (name, option) => ({
-      name,
-      value: option ?? value[name],
-      disabled: disabledFields[name],
-      checked: option ? option === value[name] : undefined,
-      error: errors[name],
-      onChange: (value) => setField(name, value),
-    }),
-    [value, errors, setField, disabledFields]
-  )
+	return useCallback(
+		(name, option) => ({
+			name,
+			value: option ?? value[name],
+			disabled: disabledFields[name],
+			checked: option ? option === value[name] : undefined,
+			error: errors[name],
+			onChange: (value) => setField(name, value),
+		}),
+		[value, errors, setField, disabledFields]
+	)
 }
 
 export function useFormContext<T>() {
-  const form = useContext<FormManager<T> | undefined>(FormContext)
-  if (form === undefined) throw new Error("Form context is not defined")
-  return form
+	const form = useContext<FormManager<T> | undefined>(FormContext)
+	if (form === undefined) throw new Error("Form context is not defined")
+	return form
 }
 
 export const FormContext = React.createContext<FormManager<any> | undefined>(
-  undefined
+	undefined
 )
 
 export type Bind<T> = <N extends keyof T>(
-  name: N,
-  option?: T[N]
+	name: N,
+	option?: T[N]
 ) => BindProps<T, N>
 
 export interface BindProps<T, N extends keyof T> {
-  name: N
-  value: T[N]
-  error: string | undefined
-  checked: boolean | undefined
-  disabled: boolean | undefined
-  onChange: (value: T[N]) => void
+	name: N
+	value: T[N]
+	error: string | undefined
+	checked: boolean | undefined
+	disabled: boolean | undefined
+	onChange: (value: T[N]) => void
 }
 
 export type FieldSetter<T> = (name: keyof T, value: T[keyof T]) => void

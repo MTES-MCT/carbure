@@ -8,44 +8,51 @@ import { useTranslation } from "react-i18next"
 import EnergyTransferDialog from "./transfer-dialog"
 
 export interface EnergyTransferSummaryProps {
-    remainingEnergy: number
+	remainingEnergy: number
 }
 
 export const EnergyTransferSummary = ({
-    remainingEnergy,
+	remainingEnergy,
 }: EnergyTransferSummaryProps) => {
-    const { t } = useTranslation()
-    const portal = usePortal()
+	const { t } = useTranslation()
+	const portal = usePortal()
 
-    const notify = useNotify()
+	const notify = useNotify()
 
-    const onEnergyTransferred = (energy: number, clientName: string) => {
-        notify(t("{{energy}} MWh ont bien été transférés au redevable {{clientName}}", { energy: formatNumber(energy, 3), clientName }), { variant: "success" })
-    }
+	const onEnergyTransferred = (energy: number, clientName: string) => {
+		notify(
+			t("{{energy}} MWh ont bien été transférés au redevable {{clientName}}", {
+				energy: formatNumber(energy, 3),
+				clientName,
+			}),
+			{ variant: "success" }
+		)
+	}
 
-    const showEnergyTransferModal = () => {
-        portal((close) => (
-            <EnergyTransferDialog onClose={close} remainingEnergy={remainingEnergy} onEnergyTransferred={onEnergyTransferred} />
-        ))
-    }
+	const showEnergyTransferModal = () => {
+		portal((close) => (
+			<EnergyTransferDialog
+				onClose={close}
+				remainingEnergy={remainingEnergy}
+				onEnergyTransferred={onEnergyTransferred}
+			/>
+		))
+	}
 
-    return (
-        <Alert icon={Bolt} variant="info">
-            <p>
-                {t(
-                    "{{remainingEnergy}} MWh restants",
-                    {
-                        remainingEnergy: formatNumber(remainingEnergy, 3),
-                    }
-                )}
-            </p>
+	return (
+		<Alert icon={Bolt} variant="info">
+			<p>
+				{t("{{remainingEnergy}} MWh restants", {
+					remainingEnergy: formatNumber(remainingEnergy, 3),
+				})}
+			</p>
 
-            <Button
-                asideX
-                variant="primary"
-                label={t("Réaliser une cession d'énergie")}
-                action={showEnergyTransferModal}
-            />
-        </Alert>
-    )
+			<Button
+				asideX
+				variant="primary"
+				label={t("Réaliser une cession d'énergie")}
+				action={showEnergyTransferModal}
+			/>
+		</Alert>
+	)
 }

@@ -3,51 +3,59 @@ import { MultiSelect, MultiSelectProps } from "common/components/multi-select"; 
 import { Grid } from "common/components/scaffold"
 import { Normalizer, defaultNormalizer } from "common/utils/normalize"
 import { useTranslation } from "react-i18next"
-import { ElecAdminProvisionCertificateFilter, ElecAdminProvisionCertificateFilterSelection } from "elec-admin/types";
+import {
+	ElecAdminProvisionCertificateFilter,
+	ElecAdminProvisionCertificateFilterSelection,
+} from "elec-admin/types"
 
 export interface FiltersProps {
-    filters: ElecAdminProvisionCertificateFilter[]
-    selected: ElecAdminProvisionCertificateFilterSelection
-    onSelect: (filters: ElecAdminProvisionCertificateFilterSelection) => void
-    getFilterOptions: (filter: ElecAdminProvisionCertificateFilter) => Promise<any[]>
+	filters: ElecAdminProvisionCertificateFilter[]
+	selected: ElecAdminProvisionCertificateFilterSelection
+	onSelect: (filters: ElecAdminProvisionCertificateFilterSelection) => void
+	getFilterOptions: (
+		filter: ElecAdminProvisionCertificateFilter
+	) => Promise<any[]>
 }
 
 export function ProvisionCertificateFilters({
-    filters,
-    selected,
-    onSelect,
-    getFilterOptions,
+	filters,
+	selected,
+	onSelect,
+	getFilterOptions,
 }: FiltersProps) {
-    const { t } = useTranslation()
+	const { t } = useTranslation()
 
-    const filterLabels = {
-        [ElecAdminProvisionCertificateFilter.Cpo]: t("Aménageur"),
-        [ElecAdminProvisionCertificateFilter.Quarter]: t("Trimestre"),
-        [ElecAdminProvisionCertificateFilter.OperatingUnit]: t("Unité d'exploitation"),
-    }
+	const filterLabels = {
+		[ElecAdminProvisionCertificateFilter.Cpo]: t("Aménageur"),
+		[ElecAdminProvisionCertificateFilter.Quarter]: t("Trimestre"),
+		[ElecAdminProvisionCertificateFilter.OperatingUnit]: t(
+			"Unité d'exploitation"
+		),
+	}
 
-    return (
-        <Grid>
-            {filters.map((filter) => {
-                return <FilterSelect
-                    key={filter}
-                    field={filter}
-                    placeholder={filterLabels[filter]}
-                    value={selected[filter]}
-                    onChange={(value) => onSelect({ ...selected, [filter]: value ?? [] })}
-                    getOptions={() => getFilterOptions(filter)}
-                />
-            }
-            )}
-        </Grid>
-    )
+	return (
+		<Grid>
+			{filters.map((filter) => {
+				return (
+					<FilterSelect
+						key={filter}
+						field={filter}
+						placeholder={filterLabels[filter]}
+						value={selected[filter]}
+						onChange={(value) =>
+							onSelect({ ...selected, [filter]: value ?? [] })
+						}
+						getOptions={() => getFilterOptions(filter)}
+					/>
+				)
+			})}
+		</Grid>
+	)
 }
 
-export type FilterSelectProps = { field: ElecAdminProvisionCertificateFilter } & Omit<
-    MultiSelectProps<string>,
-    "options"
->
-
+export type FilterSelectProps = {
+	field: ElecAdminProvisionCertificateFilter
+} & Omit<MultiSelectProps<string>, "options">
 
 // const filterNormalizers: FilterNormalizers = {
 //     [ElecAdminProvisionCertificateFilter.Cpo]: norm.normalizeFeedstockFilter,
@@ -57,24 +65,23 @@ export type FilterSelectProps = { field: ElecAdminProvisionCertificateFilter } &
 
 export default ProvisionCertificateFilters
 
-
 ///
 
 export const FilterSelect = ({
-    field,
-    value = [],
-    onChange,
-    ...props
+	field,
+	value = [],
+	onChange,
+	...props
 }: FilterSelectProps) => (
-    <MultiSelect
-        {...props}
-        clear
-        search
-        variant="solid"
-        value={value}
-        onChange={onChange}
-        normalize={defaultNormalizer}
-        sort={(item) => (item.value === "UNKNOWN" ? "" : item.label)}
-    />
+	<MultiSelect
+		{...props}
+		clear
+		search
+		variant="solid"
+		value={value}
+		onChange={onChange}
+		normalize={defaultNormalizer}
+		sort={(item) => (item.value === "UNKNOWN" ? "" : item.label)}
+	/>
 )
 type FilterNormalizers = Partial<Record<ElecAdminProvisionCertificateFilter, Normalizer<any>>> // prettier-ignore

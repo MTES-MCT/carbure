@@ -11,59 +11,59 @@ import Feedstocks from "./components/feedstocks"
 import DoubleCounting from "./components/double-counting"
 
 const Registry = () => {
-  const { t } = useTranslation()
-  useTitle(t("Annuaire"))
+	const { t } = useTranslation()
+	useTitle(t("Annuaire"))
 
-  return (
-    <Main>
-      <header>
-        <h1>
-          <Trans>Annuaire CarbuRe</Trans>
-        </h1>
-      </header>
+	return (
+		<Main>
+			<header>
+				<h1>
+					<Trans>Annuaire CarbuRe</Trans>
+				</h1>
+			</header>
 
-      <Tabs
-        variant="sticky"
-        tabs={[
-          {
-            path: "#companies",
-            key: "companies",
-            label: t("Sociétés"),
-          },
-          {
-            path: "#feedstocks",
-            key: "feedstocks",
-            label: t("Matières premières"),
-          },
-          {
-            path: "#biofuels",
-            key: "biofuels",
-            label: t("Biocarburants"),
-          },
-          {
-            path: "#depots",
-            key: "depots",
-            label: t("Dépôts"),
-          },
-          {
-            path: "#double-counting",
-            key: "double-counting",
-            label: t("Double comptage"),
-          },
-        ]}
-      >
-        {(focus) => (
-          <section>
-            {focus === "companies" && <Companies />}
-            {focus === "feedstocks" && <Feedstocks />}
-            {focus === "biofuels" && <Biofuels />}
-            {focus === "depots" && <Depots />}
-            {focus === "double-counting" && <DoubleCounting />}
-          </section>
-        )}
-      </Tabs>
-    </Main>
-  )
+			<Tabs
+				variant="sticky"
+				tabs={[
+					{
+						path: "#companies",
+						key: "companies",
+						label: t("Sociétés"),
+					},
+					{
+						path: "#feedstocks",
+						key: "feedstocks",
+						label: t("Matières premières"),
+					},
+					{
+						path: "#biofuels",
+						key: "biofuels",
+						label: t("Biocarburants"),
+					},
+					{
+						path: "#depots",
+						key: "depots",
+						label: t("Dépôts"),
+					},
+					{
+						path: "#double-counting",
+						key: "double-counting",
+						label: t("Double comptage"),
+					},
+				]}
+			>
+				{(focus) => (
+					<section>
+						{focus === "companies" && <Companies />}
+						{focus === "feedstocks" && <Feedstocks />}
+						{focus === "biofuels" && <Biofuels />}
+						{focus === "depots" && <Depots />}
+						{focus === "double-counting" && <DoubleCounting />}
+					</section>
+				)}
+			</Tabs>
+		</Main>
+	)
 }
 
 export default Registry

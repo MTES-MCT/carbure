@@ -12,92 +12,92 @@ import OperatorTickets from "./components/tickets/operator-tickets"
 import { SafTicketSourceStatus } from "./types"
 
 export const Saf = () => {
-  const { t } = useTranslation()
+	const { t } = useTranslation()
 
-  const entity = useEntity()
+	const entity = useEntity()
 
-  const years = useYears("saf", api.getOperatorYears)
+	const years = useYears("saf", api.getOperatorYears)
 
-  const snapshot = useQuery(api.getOperatorSnapshot, {
-    key: "operator-snapshot",
-    params: [entity.id, years.selected],
-  })
+	const snapshot = useQuery(api.getOperatorSnapshot, {
+		key: "operator-snapshot",
+		params: [entity.id, years.selected],
+	})
 
-  const snapshotData = snapshot.result?.data.data
+	const snapshotData = snapshot.result?.data.data
 
-  return (
-    <Main>
-      <header>
-        <section>
-          <h1>{t("Carburant Durable d'Aviation")}</h1>
+	return (
+		<Main>
+			<header>
+				<section>
+					<h1>{t("Carburant Durable d'Aviation")}</h1>
 
-          <Select
-            loading={years.loading}
-            variant="inline"
-            placeholder={t("Choisir une année")}
-            value={years.selected}
-            onChange={years.setYear}
-            options={years.options}
-            sort={(year) => -year.value}
-          />
-        </section>
+					<Select
+						loading={years.loading}
+						variant="inline"
+						placeholder={t("Choisir une année")}
+						value={years.selected}
+						onChange={years.setYear}
+						options={years.options}
+						sort={(year) => -year.value}
+					/>
+				</section>
 
-        <section>
-          <OperatorTabs loading={snapshot.loading} count={snapshotData} />
-        </section>
-      </header>
+				<section>
+					<OperatorTabs loading={snapshot.loading} count={snapshotData} />
+				</section>
+			</header>
 
-      <Routes>
-        <Route
-          path="ticket-sources/*"
-          element={
-            <TicketSources year={years.selected} snapshot={snapshotData} />
-          }
-        />
-        <Route
-          path="ticket-sources"
-          element={
-            <Navigate
-              replace
-              to={SafTicketSourceStatus.Available.toLocaleLowerCase()}
-            />
-          }
-        />
+			<Routes>
+				<Route
+					path="ticket-sources/*"
+					element={
+						<TicketSources year={years.selected} snapshot={snapshotData} />
+					}
+				/>
+				<Route
+					path="ticket-sources"
+					element={
+						<Navigate
+							replace
+							to={SafTicketSourceStatus.Available.toLocaleLowerCase()}
+						/>
+					}
+				/>
 
-        <Route
-          path="tickets-received/*"
-          element={
-            <OperatorTickets
-              type="received"
-              year={years.selected}
-              snapshot={snapshotData}
-            />
-          }
-        />
+				<Route
+					path="tickets-received/*"
+					element={
+						<OperatorTickets
+							type="received"
+							year={years.selected}
+							snapshot={snapshotData}
+						/>
+					}
+				/>
 
-        <Route
-          path="tickets-assigned/*"
-          element={
-            <OperatorTickets
-              type="assigned"
-              year={years.selected}
-              snapshot={snapshotData}
-            />
-          }
-        />
+				<Route
+					path="tickets-assigned/*"
+					element={
+						<OperatorTickets
+							type="assigned"
+							year={years.selected}
+							snapshot={snapshotData}
+						/>
+					}
+				/>
 
-        <Route
-          path="*"
-          element={
-            <Navigate
-              replace
-              to={`ticket-sources/${SafTicketSourceStatus.Available.toLocaleLowerCase()}`}
-            />
-          }
-        />
-      </Routes>
-    </Main>
-  )
+				<Route
+					path="*"
+					element={
+						<Navigate
+							replace
+							to={`ticket-sources/${SafTicketSourceStatus.Available.toLocaleLowerCase()}`}
+						/>
+					}
+				/>
+			</Routes>
+		</Main>
+	)
 }
 
 export default Saf

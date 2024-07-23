@@ -10,113 +10,113 @@ import DeliverySitesSettings from "settings/components/delivery-site"
 import { getDeliverySites } from "settings/api/delivery-sites"
 
 const SettingsWithHooks = () => {
-  return (
-    <TestRoot url="/org/0/settings">
-      <Route
-        path="/org/0/settings"
-        element={
-          <DeliverySitesSettings
-            entity={producer}
-            getDepots={getDeliverySites}
-          />
-        }
-      />
-    </TestRoot>
-  )
+	return (
+		<TestRoot url="/org/0/settings">
+			<Route
+				path="/org/0/settings"
+				element={
+					<DeliverySitesSettings
+						entity={producer}
+						getDepots={getDeliverySites}
+					/>
+				}
+			/>
+		</TestRoot>
+	)
 }
 
 beforeAll(() => {
-  server.listen({ onUnhandledRequest: "warn" })
-  setEntity(producer)
+	server.listen({ onUnhandledRequest: "warn" })
+	setEntity(producer)
 })
 
 afterEach(() => {
-  server.resetHandlers()
-  setDeliverySites([])
+	server.resetHandlers()
+	setDeliverySites([])
 })
 
 afterAll(() => server.close())
 
 test("check the delivery site section of the settings", async () => {
-  render(<SettingsWithHooks />)
+	render(<SettingsWithHooks />)
 
-  await waitWhileLoading()
+	await waitWhileLoading()
 
-  screen.getByText("Dépôts")
-  screen.getByText("Ajouter un dépôt")
-  screen.getByText("Aucun dépôt trouvé")
+	screen.getByText("Dépôts")
+	screen.getByText("Ajouter un dépôt")
+	screen.getByText("Aucun dépôt trouvé")
 })
 
 test("add a delivery site in settings", async () => {
-  const user = userEvent.setup()
-  render(<SettingsWithHooks />)
+	const user = userEvent.setup()
+	render(<SettingsWithHooks />)
 
-  await waitWhileLoading()
+	await waitWhileLoading()
 
-  const button = screen.getByText("Ajouter un dépôt")
+	const button = screen.getByText("Ajouter un dépôt")
 
-  await user.click(button)
+	await user.click(button)
 
-  // wait for dialog to open
-  const input = getField("Dépôt à ajouter")
-  await user.type(input, "Test")
+	// wait for dialog to open
+	const input = getField("Dépôt à ajouter")
+	await user.type(input, "Test")
 
-  const option = await screen.findByText("Test Delivery Site")
-  await user.click(option)
+	const option = await screen.findByText("Test Delivery Site")
+	await user.click(option)
 
-  await waitFor(() => {
-    expect(input).toHaveValue("Test Delivery Site")
-  })
+	await waitFor(() => {
+		expect(input).toHaveValue("Test Delivery Site")
+	})
 
-  await user.click(screen.getByText("Ajouter"))
+	await user.click(screen.getByText("Ajouter"))
 
-  await waitWhileLoading()
+	await waitWhileLoading()
 
-  await screen.findByText("10")
-  screen.getByText("Test Delivery Site")
-  screen.getByText("Autre")
-  screen.getByText("Test City, France")
+	await screen.findByText("10")
+	screen.getByText("Test Delivery Site")
+	screen.getByText("Autre")
+	screen.getByText("Test City, France")
 })
 
 test("check a delivery site details", async () => {
-  const user = userEvent.setup()
-  setDeliverySites([deliverySite])
+	const user = userEvent.setup()
+	setDeliverySites([deliverySite])
 
-  render(<SettingsWithHooks />)
+	render(<SettingsWithHooks />)
 
-  await waitWhileLoading()
+	await waitWhileLoading()
 
-  const ds = screen.getByText("Test Delivery Site")
-  await user.click(ds)
+	const ds = screen.getByText("Test Delivery Site")
+	await user.click(ds)
 
-  const input = getField("Nom du site")
+	const input = getField("Nom du site")
 
-  expect(input).toHaveValue("Test Delivery Site")
+	expect(input).toHaveValue("Test Delivery Site")
 })
 
 test("remove a delivery site in settings", async () => {
-  const user = userEvent.setup()
+	const user = userEvent.setup()
 
-  setDeliverySites([deliverySite])
+	setDeliverySites([deliverySite])
 
-  render(<SettingsWithHooks />)
+	render(<SettingsWithHooks />)
 
-  await waitWhileLoading()
+	await waitWhileLoading()
 
-  screen.getByText("Dépôts")
+	screen.getByText("Dépôts")
 
-  const deleteButton = screen.getByTitle("Supprimer le dépôt")
+	const deleteButton = screen.getByTitle("Supprimer le dépôt")
 
-  screen.getByText("10")
-  screen.getByText("Test Delivery Site")
-  screen.getByText("Autre")
-  screen.getByText("Test City, France")
+	screen.getByText("10")
+	screen.getByText("Test Delivery Site")
+	screen.getByText("Autre")
+	screen.getByText("Test City, France")
 
-  // click on the delete button and then confirm the action on the popup
-  await user.click(deleteButton)
-  await user.click(screen.getByText("Supprimer"))
+	// click on the delete button and then confirm the action on the popup
+	await user.click(deleteButton)
+	await user.click(screen.getByText("Supprimer"))
 
-  await waitWhileLoading()
+	await waitWhileLoading()
 
-  await screen.findByText("Aucun dépôt trouvé")
+	await screen.findByText("Aucun dépôt trouvé")
 })

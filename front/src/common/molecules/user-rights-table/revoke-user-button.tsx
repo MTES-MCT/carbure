@@ -6,37 +6,37 @@ import { Cross } from "common/components/icons"
 import { Confirm } from "common/components/dialog"
 
 type RevokeUserButtonProps = {
-  onRevokeUser: () => void
-  request: UserRightRequest
+	onRevokeUser: () => void
+	request: UserRightRequest
 }
 export const RevokeUserButton = ({
-  request,
-  onRevokeUser,
+	request,
+	onRevokeUser,
 }: RevokeUserButtonProps) => {
-  const { t } = useTranslation()
-  const portal = usePortal()
+	const { t } = useTranslation()
+	const portal = usePortal()
 
-  const user = request.user[0]
+	const user = request.user[0]
 
-  return (
-    <Button
-      captive
-      variant="icon"
-      icon={Cross}
-      title={t("Révoquer")}
-      action={() =>
-        portal((close) => (
-          <Confirm
-            title={t("Révoquer les droits d'un utilisateur")}
-            description={t("Voulez vous révoquer les droits d'accès de {{user}} à votre société ?", { user })} // prettier-ignore
-            confirm={t("Révoquer")}
-            icon={Cross}
-            variant="danger"
-            onConfirm={() => Promise.resolve(onRevokeUser())}
-            onClose={close}
-          />
-        ))
-      }
-    />
-  )
+	return (
+		<Button
+			captive
+			variant="icon"
+			icon={Cross}
+			title={t("Révoquer")}
+			action={() =>
+				portal((close) => (
+					<Confirm
+						title={t("Révoquer les droits d'un utilisateur")}
+						description={t("Voulez vous révoquer les droits d'accès de {{user}} à votre société ?", { user })} // prettier-ignore
+						confirm={t("Révoquer")}
+						icon={Cross}
+						variant="danger"
+						onConfirm={() => Promise.resolve(onRevokeUser())}
+						onClose={close}
+					/>
+				))
+			}
+		/>
+	)
 }

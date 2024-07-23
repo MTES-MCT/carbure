@@ -12,67 +12,67 @@ import { ApproveOneFixButton } from "transactions/actions/approve-fix"
 import { CancelAcceptOneButton } from "transactions/actions/cancel-accept"
 
 export interface ActionBarProps {
-  icon?: boolean
-  canSave?: boolean
-  lot: Lot
-  hasParentStock?: boolean
+	icon?: boolean
+	canSave?: boolean
+	lot: Lot
+	hasParentStock?: boolean
 }
 
 export const LotActions = ({
-  lot,
-  canSave,
-  hasParentStock,
+	lot,
+	canSave,
+	hasParentStock,
 }: ActionBarProps) => {
-  const entity = useEntity()
+	const entity = useEntity()
 
-  const isCreator = lot.added_by?.id === entity.id
-  const isSupplier = lot.carbure_supplier?.id === entity.id
-  const isClient = lot.carbure_client?.id === entity.id
+	const isCreator = lot.added_by?.id === entity.id
+	const isSupplier = lot.carbure_supplier?.id === entity.id
+	const isClient = lot.carbure_client?.id === entity.id
 
-  const status = lot.lot_status
-  const correction = lot.correction_status
+	const status = lot.lot_status
+	const correction = lot.correction_status
 
-  return (
-    <Fragment>
-      {status === "DRAFT" && <SendOneButton lot={lot} disabled={!canSave} />}
+	return (
+		<Fragment>
+			{status === "DRAFT" && <SendOneButton lot={lot} disabled={!canSave} />}
 
-      {(status === "DRAFT" || status === "REJECTED") && (
-        <DeleteOneButton lot={lot} />
-      )}
+			{(status === "DRAFT" || status === "REJECTED") && (
+				<DeleteOneButton lot={lot} />
+			)}
 
-      {isClient && status === "PENDING" && correction === "NO_PROBLEMO" && (
-        <Fragment>
-          <AcceptOneButton lot={lot} />
-          <RejectOneButton lot={lot} />
-        </Fragment>
-      )}
+			{isClient && status === "PENDING" && correction === "NO_PROBLEMO" && (
+				<Fragment>
+					<AcceptOneButton lot={lot} />
+					<RejectOneButton lot={lot} />
+				</Fragment>
+			)}
 
-      {isClient && status === "ACCEPTED" && <CancelAcceptOneButton lot={lot} />}
+			{isClient && status === "ACCEPTED" && <CancelAcceptOneButton lot={lot} />}
 
-      {(isCreator || isSupplier) && status !== "DRAFT" && (
-        <Fragment>
-          {correction === "IN_CORRECTION" ? (
-            <MarkOneAsFixedButton lot={lot} disabled={!canSave} />
-          ) : (
-            <RecallOneButton lot={lot} />
-          )}
-        </Fragment>
-      )}
+			{(isCreator || isSupplier) && status !== "DRAFT" && (
+				<Fragment>
+					{correction === "IN_CORRECTION" ? (
+						<MarkOneAsFixedButton lot={lot} disabled={!canSave} />
+					) : (
+						<RecallOneButton lot={lot} />
+					)}
+				</Fragment>
+			)}
 
-      {isClient && !isCreator && !isSupplier && status !== "DRAFT" && (
-        <Fragment>
-          {correction === "FIXED" && <ApproveOneFixButton lot={lot} />}
-          {["NO_PROBLEMO", "FIXED"].includes(correction) && (
-            <RequestOneFixButton lot={lot} hasParentStock={hasParentStock} />
-          )}
-        </Fragment>
-      )}
+			{isClient && !isCreator && !isSupplier && status !== "DRAFT" && (
+				<Fragment>
+					{correction === "FIXED" && <ApproveOneFixButton lot={lot} />}
+					{["NO_PROBLEMO", "FIXED"].includes(correction) && (
+						<RequestOneFixButton lot={lot} hasParentStock={hasParentStock} />
+					)}
+				</Fragment>
+			)}
 
-      {isCreator && status === "PENDING" && correction === "IN_CORRECTION" && (
-        <DeleteOneButton lot={lot} />
-      )}
-    </Fragment>
-  )
+			{isCreator && status === "PENDING" && correction === "IN_CORRECTION" && (
+				<DeleteOneButton lot={lot} />
+			)}
+		</Fragment>
+	)
 }
 
 export default LotActions
