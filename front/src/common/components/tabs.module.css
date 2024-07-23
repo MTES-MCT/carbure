@@ -1,121 +1,121 @@
 .tabs {
-  display: flex;
+	display: flex;
 }
 
 .tab {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  font-size: 1em;
-  cursor: pointer;
-  color: var(--black);
-  border: none;
-  background-color: transparent;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	font-size: 1em;
+	cursor: pointer;
+	color: var(--black);
+	border: none;
+	background-color: transparent;
 }
 
 .header .tab {
-  align-items: center;
-  justify-content: center;
-  padding: var(--spacing-m);
-  font-size: 1.1em;
-  text-decoration: none;
-  white-space: pre-wrap;
+	align-items: center;
+	justify-content: center;
+	padding: var(--spacing-m);
+	font-size: 1.1em;
+	text-decoration: none;
+	white-space: pre-wrap;
 }
 
 .header .tab:hover {
-  color: var(--blue-dark);
+	color: var(--blue-dark);
 }
 
 .header .tab.active {
-  font-weight: 600;
-  border-bottom: 4px solid var(--blue-medium);
-  padding-bottom: calc(var(--spacing-m) - 4px);
+	font-weight: 600;
+	border-bottom: 4px solid var(--blue-medium);
+	padding-bottom: calc(var(--spacing-m) - 4px);
 }
 
 .main {
-  flex: 1;
-  gap: var(--spacing-l);
+	flex: 1;
+	gap: var(--spacing-l);
 }
 
 .main .tab {
-  flex: 1;
-  justify-content: center;
-  border: 1px solid var(--gray-medium);
-  background-color: var(--white);
-  text-decoration: none;
-  font-size: 1.2em;
-  font-weight: bold;
-  padding: var(--spacing-l);
-  gap: var(--spacing-xs);
+	flex: 1;
+	justify-content: center;
+	border: 1px solid var(--gray-medium);
+	background-color: var(--white);
+	text-decoration: none;
+	font-size: 1.2em;
+	font-weight: bold;
+	padding: var(--spacing-l);
+	gap: var(--spacing-xs);
 }
 
 .main .tab:hover {
-  background-color: var(--gray-highlight);
-  border-color: var(--blue-medium);
-  color: var(--blue-medium);
+	background-color: var(--gray-highlight);
+	border-color: var(--blue-medium);
+	color: var(--blue-medium);
 }
 
 .main .tab.active {
-  border-bottom: 4px solid var(--blue-medium);
-  padding-bottom: calc(var(--spacing-l) - 3px);
+	border-bottom: 4px solid var(--blue-medium);
+	padding-bottom: calc(var(--spacing-l) - 3px);
 }
 
 .sticky {
-  position: sticky;
-  top: 0;
-  padding: var(--spacing-m) var(--main-spacing-x);
-  background-color: var(--gray-light);
-  box-shadow: var(--shadow);
-  z-index: 2;
+	position: sticky;
+	top: 0;
+	padding: var(--spacing-m) var(--main-spacing-x);
+	background-color: var(--gray-light);
+	box-shadow: var(--shadow);
+	z-index: 2;
 }
 
 .section,
 .sticky {
-  gap: var(--spacing-m);
+	gap: var(--spacing-m);
 }
 
 .section .tab,
 .sticky .tab {
-  font-size: 1.1em;
+	font-size: 1.1em;
 }
 
 .section .tab:hover,
 .sticky .tab:hover {
-  text-decoration: underline;
+	text-decoration: underline;
 }
 
 .section .tab.active,
 .sticky .tab.active {
-  font-weight: bold;
-  text-decoration: underline;
+	font-weight: bold;
+	text-decoration: underline;
 }
 
 .switcher {
-  border: 1px solid var(--gray-medium);
-  border-radius: var(--border-radius);
-  gap: 1px;
-  background-color: var(--gray-medium);
-  overflow: hidden;
-  align-self: flex-start;
+	border: 1px solid var(--gray-medium);
+	border-radius: var(--border-radius);
+	gap: 1px;
+	background-color: var(--gray-medium);
+	overflow: hidden;
+	align-self: flex-start;
 }
 
 .switcher .tab {
-  padding: var(--spacing-s) var(--spacing-xl);
-  background-color: var(--white);
-  align-items: center;
-  text-align: center;
-  justify-content: center;
+	padding: var(--spacing-s) var(--spacing-xl);
+	background-color: var(--white);
+	align-items: center;
+	text-align: center;
+	justify-content: center;
 }
 
 .switcher .tab:hover {
-  background-color: var(--gray-highlight);
+	background-color: var(--gray-highlight);
 }
 
 .switcher .tab.active {
-  background-color: var(--blue-medium);
-  color: var(--white);
+	background-color: var(--blue-medium);
+	color: var(--white);
 }
 
 .switcher .tab.active:hover {
-  background-color: var(--blue-dark);
+	background-color: var(--blue-dark);
 }

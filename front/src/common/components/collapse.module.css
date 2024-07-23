@@ -1,82 +1,82 @@
 .collapse {
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  gap: var(--spacing-m);
-  background-color: var(--gray-light);
-  border: 1px solid var(--gray-medium);
-  border-radius: var(--border-radius);
-  overflow: hidden;
+	display: flex;
+	position: relative;
+	flex-direction: column;
+	gap: var(--spacing-m);
+	background-color: var(--gray-light);
+	border: 1px solid var(--gray-medium);
+	border-radius: var(--border-radius);
+	overflow: hidden;
 }
 
-.collapse>header {
-  display: flex;
-  gap: var(--spacing-m);
-  cursor: pointer;
-  font-weight: 600;
-  padding: var(--spacing-s) var(--spacing-m);
+.collapse > header {
+	display: flex;
+	gap: var(--spacing-m);
+	cursor: pointer;
+	font-weight: 600;
+	padding: var(--spacing-s) var(--spacing-m);
 }
 
 .collapse .indicator {
-  margin-left: auto;
+	margin-left: auto;
 }
 
 .collapse ul {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
 }
 
 .collapse [data-icon] {
-  color: var(--gray-dark);
+	color: var(--gray-dark);
 }
 
 .collapse section {
-  display: flex;
-  flex-direction: column;
-  padding: 0 var(--spacing-m);
-  gap: var(--spacing-xs);
+	display: flex;
+	flex-direction: column;
+	padding: 0 var(--spacing-m);
+	gap: var(--spacing-xs);
 }
 
 .collapse footer {
-  display: flex;
-  padding: var(--spacing-m);
-  padding-top: 0;
-  gap: var(--spacing-s);
+	display: flex;
+	padding: var(--spacing-m);
+	padding-top: 0;
+	gap: var(--spacing-s);
 }
 
 .info {
-  background-color: var(--blue-light);
-  border-color: var(--blue-highlight);
+	background-color: var(--blue-light);
+	border-color: var(--blue-highlight);
 }
 
 .info [data-icon] {
-  color: var(--blue-dark);
+	color: var(--blue-dark);
 }
 
 .success {
-  background-color: var(--green-light);
-  border-color: var(--green-medium);
+	background-color: var(--green-light);
+	border-color: var(--green-medium);
 }
 
 .success [data-icon] {
-  color: var(--green-dark);
+	color: var(--green-dark);
 }
 
 .warning {
-  background-color: var(--orange-light);
-  border-color: var(--orange-medium);
+	background-color: var(--orange-light);
+	border-color: var(--orange-medium);
 }
 
 .warning [data-icon] {
-  color: var(--orange-dark);
+	color: var(--orange-dark);
 }
 
 .danger {
-  background-color: var(--red-light);
-  border-color: var(--red-medium);
+	background-color: var(--red-light);
+	border-color: var(--red-medium);
 }
 
 .danger [data-icon] {
-  color: var(--red-dark);
+	color: var(--red-dark);
 }

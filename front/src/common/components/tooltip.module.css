@@ -1,44 +1,44 @@
 .dropdown {
-  background: transparent;
-  border: none;
-  min-width: 20px !important;
-  max-width: 512px;
+	background: transparent;
+	border: none;
+	min-width: 20px !important;
+	max-width: 512px;
 }
 
 .trigger {
-  position: relative;
+	position: relative;
 }
 
 .tooltip {
-  min-height: 32px;
-  padding: 6px 8px;
-  color: #fff;
-  text-align: start;
-  text-decoration: none;
-  word-wrap: break-word;
-  background-color: var(--black);
-  border-radius: 6px;
+	min-height: 32px;
+	padding: 6px 8px;
+	color: #fff;
+	text-align: start;
+	text-decoration: none;
+	word-wrap: break-word;
+	background-color: var(--black);
+	border-radius: 6px;
 }
 
 .arrow {
-  position: absolute;
-  top: -1px;
-  left: 16px;
-  width: 9px;
-  height: 9px;
-  margin-top: 0px;
+	position: absolute;
+	top: -1px;
+	left: 16px;
+	width: 9px;
+	height: 9px;
+	margin-top: 0px;
 }
 
 .arrow::after {
-  position: absolute;
-  top: 0;
-  left: 0;
-  content: "";
-  width: 9px;
-  height: 9px;
-  border-radius: 0 0 2px 0;
-  transform: translateY(-50%) rotate(-135deg);
-  box-shadow: 2px 2px 5px rgb(0 0 0 / 5%);
-  z-index: 0;
-  background-color: var(--black);
+	position: absolute;
+	top: 0;
+	left: 0;
+	content: "";
+	width: 9px;
+	height: 9px;
+	border-radius: 0 0 2px 0;
+	transform: translateY(-50%) rotate(-135deg);
+	box-shadow: 2px 2px 5px rgb(0 0 0 / 5%);
+	z-index: 0;
+	background-color: var(--black);
 }

@@ -38,7 +38,8 @@
 		"eslint-plugin-prettier": "^5.2.1",
 		"eslint-plugin-react-hooks": "^4.6.2",
 		"i18next-parser": "^7.7.0",
-		"prettier": "^3.3.3"
+		"prettier": "^3.3.3",
+		"typescript-plugin-css-modules": "^5.1.0"
 	},
 	"scripts": {
 		"start-server": "cd ../ && docker-compose up -d && cd front && npm run open",
@@ -49,8 +50,8 @@
 		"test": "react-scripts test",
 		"eject": "react-scripts eject",
 		"translate": "i18next",
-		"lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
-		"lint:fix": "eslint 'src/**/*.{js,jsx,ts,tsx}' --fix",
+		"lint": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' && prettier --check src/**/*.css",
+		"lint:fix": "eslint 'src/**/*.{js,jsx,ts,tsx,json}' --fix && prettier --write src/**/*.css",
 		"postinstall": "copy-dsfr-to-public --publicDir ./public",
 		"predev": "only-include-used-icons",
 		"prebuild": "only-include-used-icons"

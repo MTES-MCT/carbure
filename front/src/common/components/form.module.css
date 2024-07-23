@@ -1,48 +1,48 @@
 .form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-m);
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-m);
 }
 
 .wrapper {
-  flex-wrap: wrap;
+	flex-wrap: wrap;
 }
 
 .columns {
-  flex-direction: row;
-  gap: var(--spacing-l);
+	flex-direction: row;
+	gap: var(--spacing-l);
 }
 
 .inline {
-  flex: 1;
-  display: inline-flex;
-  flex-direction: row;
-  gap: 0;
+	flex: 1;
+	display: inline-flex;
+	flex-direction: row;
+	gap: 0;
 }
 
 .inline [data-field] {
-  flex: 1;
+	flex: 1;
 }
 
 .fieldset {
-  display: flex;
-  flex-direction: column;
-  flex: 1 0;
-  min-width: 0;
-  gap: var(--spacing-s);
-  border: none;
-  margin: 0;
-  padding: 0;
+	display: flex;
+	flex-direction: column;
+	flex: 1 0;
+	min-width: 0;
+	gap: var(--spacing-s);
+	border: none;
+	margin: 0;
+	padding: 0;
 }
 
 .fieldset.small {
-  flex: 0.33;
-  min-width: 64px;
+	flex: 0.33;
+	min-width: 64px;
 }
 
 .fieldset legend {
-  font-weight: 600;
-  padding: 0;
-  margin-left: var(--spacing-xs);
-  margin-bottom: var(--spacing-s);
+	font-weight: 600;
+	padding: 0;
+	margin-left: var(--spacing-xs);
+	margin-bottom: var(--spacing-s);
 }

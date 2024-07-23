@@ -1,26 +1,26 @@
 .menu {
-  padding: var(--spacing-s);
+	padding: var(--spacing-s);
 }
 
 .menu span {
-  text-overflow: ellipsis;
-  overflow: hidden;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 
 .dropdown {
-  max-height: 50vh;
+	max-height: 50vh;
 }
 
 .items li {
-  padding: 0;
+	padding: 0;
 }
 
-.items li>* {
-  width: 100%;
-  padding: var(--spacing-s) var(--spacing-m);
-  text-decoration: none;
+.items li > * {
+	width: 100%;
+	padding: var(--spacing-s) var(--spacing-m);
+	text-decoration: none;
 }
 
 .items [data-level="1"] * {
-  padding-left: var(--spacing-l);
+	padding-left: var(--spacing-l);
 }

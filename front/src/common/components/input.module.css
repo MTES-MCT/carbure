@@ -1,201 +1,201 @@
 .field {
-  display: flex;
-  flex-direction: column;
-  position: relative;
+	display: flex;
+	flex-direction: column;
+	position: relative;
 }
 
 .control {
-  display: flex;
-  flex: 1;
-  position: relative;
-  color: var(--black);
-  background-color: var(--white);
-  border: 1px solid var(--gray-medium);
-  font-size: var(--font-size);
+	display: flex;
+	flex: 1;
+	position: relative;
+	color: var(--black);
+	background-color: var(--white);
+	border: 1px solid var(--gray-medium);
+	font-size: var(--font-size);
 }
 
 .group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-s) var(--spacing-s);
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-xs);
+	padding: var(--spacing-s) var(--spacing-s);
 }
 
 .inline .control {
-  background-color: transparent;
-  border: none;
-  border-bottom: 1px solid var(--gray-medium);
+	background-color: transparent;
+	border: none;
+	border-bottom: 1px solid var(--gray-medium);
 }
 
 .inline input {
-  padding: var(--spacing-xs) var(--spacing-s);
+	padding: var(--spacing-xs) var(--spacing-s);
 }
 
 .text .control {
-  background-color: transparent;
-  border: none;
-  font-weight: 600;
+	background-color: transparent;
+	border: none;
+	font-weight: 600;
 }
 
 .solid .label {
-  font-size: 1em;
-  font-weight: 600;
-  color: var(--black);
+	font-size: 1em;
+	font-weight: 600;
+	color: var(--black);
 }
 
 .solid .control {
-  background-color: var(--gray-light);
-  font-weight: 600;
+	background-color: var(--gray-light);
+	font-weight: 600;
 }
 
 .control:focus-within {
-  border-color: var(--blue-medium);
-  outline: auto;
+	border-color: var(--blue-medium);
+	outline: auto;
 }
 
 .control:hover {
-  color: var(--blue-medium);
-  border-color: var(--blue-medium);
+	color: var(--blue-medium);
+	border-color: var(--blue-medium);
 }
 
 .field[data-disabled] .control {
-  color: var(--gray-dark);
-  background-color: var(--gray-highlight);
+	color: var(--gray-dark);
+	background-color: var(--gray-highlight);
 }
 
 .field[data-readonly] .control {
-  background-color: transparent;
-  border: none;
-  border-top: 1px solid var(--gray-highlight);
-  color: var(--black);
+	background-color: transparent;
+	border: none;
+	border-top: 1px solid var(--gray-highlight);
+	color: var(--black);
 }
 
 .field[data-error] .control {
-  border-color: var(--red-dark);
-  color: var(--red-dark);
+	border-color: var(--red-dark);
+	color: var(--red-dark);
 }
 
 .text[data-disabled] .control {
-  background-color: transparent;
+	background-color: transparent;
 }
 
 .label {
-  font-size: 0.9em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: var(--gray-dark);
-  padding-left: var(--spacing-xs);
+	font-size: 0.9em;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	color: var(--gray-dark);
+	padding-left: var(--spacing-xs);
 }
 
 .field[data-error] .label {
-  color: var(--red-dark);
+	color: var(--red-dark);
 }
 
 .control[data-interactive] {
-  cursor: pointer;
+	cursor: pointer;
 }
 
 .control input,
 .control textarea,
 .control .file {
-  flex: 1 0;
-  text-align: left;
-  background-color: transparent;
-  border: none;
-  padding: var(--spacing-s);
-  font-size: var(--font-size);
-  font-family: var(--font-family);
-  font-weight: inherit;
-  color: inherit;
-  user-select: text;
-  line-height: 24px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  resize: none;
-  outline: none;
-  min-width: 0;
+	flex: 1 0;
+	text-align: left;
+	background-color: transparent;
+	border: none;
+	padding: var(--spacing-s);
+	font-size: var(--font-size);
+	font-family: var(--font-family);
+	font-weight: inherit;
+	color: inherit;
+	user-select: text;
+	line-height: 24px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	resize: none;
+	outline: none;
+	min-width: 0;
 }
 
 .control textarea {
-  white-space: initial;
-  min-height: 96px;
+	white-space: initial;
+	min-height: 96px;
 }
 
 .control input[type="button"],
 .control .file {
-  cursor: pointer;
+	cursor: pointer;
 }
 
 .placeholder {
-  background-color: transparent;
-  pointer-events: none;
-  width: 20px;
-  height: 24px;
+	background-color: transparent;
+	pointer-events: none;
+	width: 20px;
+	height: 24px;
 }
 
 .icon,
 .searchIcon {
-  display: flex;
-  flex-shrink: 0;
-  color: var(--gray-dark);
+	display: flex;
+	flex-shrink: 0;
+	color: var(--gray-dark);
 }
 
 .icon > :global(.icon),
 .searchIcon > :global(.icon) {
-  align-self: center;
-  margin: var(--spacing-s);
-  margin-left: 0;
+	align-self: center;
+	margin: var(--spacing-s);
+	margin-left: 0;
 }
 
 .control textarea + .icon {
-  align-self: flex-start;
-  height: 24px;
+	align-self: flex-start;
+	height: 24px;
 }
 
 .field[data-error] .icon {
-  color: var(--red-dark);
+	color: var(--red-dark);
 }
 
 .control [data-icon] {
-  width: 20px;
-  height: 20px;
+	width: 20px;
+	height: 20px;
 }
 
 .search .control {
-  background-color: var(--white);
+	background-color: var(--white);
 }
 
 .search .searchIcon :global(.icon) {
-  margin: var(--spacing-s) var(--spacing-m);
-  margin-right: var(--spacing-xs);
+	margin: var(--spacing-s) var(--spacing-m);
+	margin-right: var(--spacing-xs);
 }
 
 .search input {
-  padding: var(--spacing-s);
+	padding: var(--spacing-s);
 }
 
 .fileplaceholder {
-  width: 400px;
-  height: 400px;
-  justify-content: center;
-  align-items: center;
-  gap: var(--spacing-m);
-  background-color: rgba(254, 254, 254, 0.66);
-  padding: var(--spacing-xl);
-  text-align: center;
-  font-size: 1.5em;
-  font-weight: 600;
-  line-height: 1.5em;
-  border: 4px dashed var(--gray-dark);
+	width: 400px;
+	height: 400px;
+	justify-content: center;
+	align-items: center;
+	gap: var(--spacing-m);
+	background-color: rgba(254, 254, 254, 0.66);
+	padding: var(--spacing-xl);
+	text-align: center;
+	font-size: 1.5em;
+	font-weight: 600;
+	line-height: 1.5em;
+	border: 4px dashed var(--gray-dark);
 }
 
 .fileplaceholder [data-icon] {
-  width: 64px;
-  height: 64px;
+	width: 64px;
+	height: 64px;
 }
 
 .blankField {
-  height: 65.5px;
+	height: 65.5px;
 }

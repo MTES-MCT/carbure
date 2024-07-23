@@ -1,48 +1,48 @@
 .list {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  list-style: none;
-  padding: 0;
-  margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	list-style: none;
+	padding: 0;
+	margin: 0;
 }
 
 .list ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+	list-style: none;
+	padding: 0;
+	margin: 0;
 }
 
 .list li {
-  display: flex;
-  padding: var(--spacing-s) var(--spacing-l);
-  cursor: pointer;
+	display: flex;
+	padding: var(--spacing-s) var(--spacing-l);
+	cursor: pointer;
 }
 
 .striped li:nth-child(odd) {
-  background-color: var(--gray-light);
+	background-color: var(--gray-light);
 }
 
 .striped li:nth-child(even) {
-  background-color: var(--white);
+	background-color: var(--white);
 }
 
 [data-dropdown] li {
-  padding: var(--spacing-s) var(--spacing-m);
+	padding: var(--spacing-s) var(--spacing-m);
 }
 
 .list li[data-focused] {
-  background-color: var(--gray-highlight);
+	background-color: var(--gray-highlight);
 }
 
 .list li[data-selected] {
-  background-color: var(--blue-light);
+	background-color: var(--blue-light);
 }
 
 .list li[data-selected][data-focused] {
-  background-color: var(--gray-medium);
+	background-color: var(--gray-medium);
 }
 
 .search {
-  max-width: unset;
+	max-width: unset;
 }

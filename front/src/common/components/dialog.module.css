@@ -1,111 +1,111 @@
 .screen {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 2;
-  padding: var(--spacing-l);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 2;
+	padding: var(--spacing-l);
 }
 
 .dialog {
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  background-color: var(--body);
-  border: 1px solid var(--gray-medium);
-  width: min-content;
-  min-width: 480px;
-  max-width: 100%;
-  max-height: 100%;
-  overflow: hidden;
+	display: flex;
+	position: relative;
+	flex-direction: column;
+	background-color: var(--body);
+	border: 1px solid var(--gray-medium);
+	width: min-content;
+	min-width: 480px;
+	max-width: 100%;
+	max-height: 100%;
+	overflow: hidden;
 }
 
 .dialog.fullscreen {
-  width: 100%;
-  height: 100%;
-  max-width: 1318px;
-  max-height: 720px;
+	width: 100%;
+	height: 100%;
+	max-width: 1318px;
+	max-height: 720px;
 }
 
 .dialog .close {
-  position: absolute;
-  top: 0;
-  right: 0;
-  padding: var(--spacing-m);
+	position: absolute;
+	top: 0;
+	right: 0;
+	padding: var(--spacing-m);
 }
 
 .dialog .close:hover {
-  background-color: #e7e7e7cc;
+	background-color: #e7e7e7cc;
 }
 
 .dialog h1 {
-  font-size: 1.33em;
-  white-space: nowrap;
+	font-size: 1.33em;
+	white-space: nowrap;
 }
 
 .dialog > header {
-  display: flex;
-  align-items: center;
-  padding: var(--spacing-l);
-  padding-right: 64px;
-  gap: var(--spacing-m);
-  border-bottom: 1px solid var(--gray-highlight);
+	display: flex;
+	align-items: center;
+	padding: var(--spacing-l);
+	padding-right: 64px;
+	gap: var(--spacing-m);
+	border-bottom: 1px solid var(--gray-highlight);
 }
 
 .dialog > main {
-  display: flex;
-  overflow-x: hidden;
-  overflow-y: auto;
-  flex-direction: column;
-  gap: var(--spacing-l);
-  padding: var(--spacing-l) 0;
+	display: flex;
+	overflow-x: hidden;
+	overflow-y: auto;
+	flex-direction: column;
+	gap: var(--spacing-l);
+	padding: var(--spacing-l) 0;
 }
 
 .dialog > main > section {
-  display: flex;
-  flex-direction: column;
-  padding: 0 var(--spacing-l);
-  gap: var(--spacing-s);
+	display: flex;
+	flex-direction: column;
+	padding: 0 var(--spacing-l);
+	gap: var(--spacing-s);
 }
 
 .dialog > main > p {
-  padding: 0 var(--spacing-l);
+	padding: 0 var(--spacing-l);
 }
 
 .dialog > main > section a {
-  color: var(--blue-medium);
-  text-decoration: underline;
+	color: var(--blue-medium);
+	text-decoration: underline;
 }
 
 .dialog > main > section ul,
 .dialog > main > section ol {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-s);
-  margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-s);
+	margin: 0;
 }
 
 .dialog > main > h2 {
-  font-size: 1.2em;
-  padding: 0 var(--spacing-l);
-  padding-bottom: var(--spacing-m);
-  border-bottom: 1px solid var(--gray-medium);
-  margin-bottom: calc(-1 * var(--spacing-m));
+	font-size: 1.2em;
+	padding: 0 var(--spacing-l);
+	padding-bottom: var(--spacing-m);
+	border-bottom: 1px solid var(--gray-medium);
+	margin-bottom: calc(-1 * var(--spacing-m));
 }
 
 .dialog > main > [data-list]:last-child {
-  margin-bottom: calc(-1 * var(--spacing-l));
+	margin-bottom: calc(-1 * var(--spacing-l));
 }
 
 .dialog > footer {
-  display: flex;
-  align-items: center;
-  padding: var(--spacing-l);
-  gap: var(--spacing-m);
-  border-top: 1px solid var(--gray-highlight);
-  margin-top: auto;
+	display: flex;
+	align-items: center;
+	padding: var(--spacing-l);
+	gap: var(--spacing-m);
+	border-top: 1px solid var(--gray-highlight);
+	margin-top: auto;
 }

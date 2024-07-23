@@ -1,11 +1,11 @@
 .safTabs a .verso {
-  display: none;
+	display: none;
 }
 
 .safTabs a:hover .recto {
-  display: none;
+	display: none;
 }
 
 .safTabs a:hover .verso {
-  display: flex;
+	display: flex;
 }

@@ -1,52 +1,52 @@
 .radio {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-m);
-  cursor: pointer;
-  text-align: left;
-  white-space: nowrap;
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-m);
+	cursor: pointer;
+	text-align: left;
+	white-space: nowrap;
 }
 
 .radio:hover {
-  color: var(--blue-dark);
+	color: var(--blue-dark);
 }
 
 .radio[data-disabled] {
-  color: var(--gray-dark);
-  pointer-events: none;
-  user-select: none;
+	color: var(--gray-dark);
+	pointer-events: none;
+	user-select: none;
 }
 
 .radio:focus-within .circle {
-  outline: 2px solid;
-  outline-offset: 1px;
+	outline: 2px solid;
+	outline-offset: 1px;
 }
 
 .input,
-input[type=radio]:disabled {
-  position: absolute;
-  opacity: 0;
+input[type="radio"]:disabled {
+	position: absolute;
+	opacity: 0;
 }
 
 .circle {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 2px solid var(--gray-dark);
+	display: flex;
+	flex-shrink: 0;
+	align-items: center;
+	justify-content: center;
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	border: 2px solid var(--gray-dark);
 }
 
 .circle [data-icon] {
-  fill: var(--blue-dark);
+	fill: var(--blue-dark);
 }
 
 .radio[data-disabled] .circle [data-icon] {
-  fill: var(--gray-dark);
+	fill: var(--gray-dark);
 }
 
 .radio:hover .circle {
-  border-color: var(--blue-dark);
+	border-color: var(--blue-dark);
 }

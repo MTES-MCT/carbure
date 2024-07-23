@@ -1,86 +1,86 @@
 .auth {
-  background-color: var(--body);
-  opacity: 1;
-  --gap: 40px;
-  --padding: 48px;
-  z-index: 1;
+	background-color: var(--body);
+	opacity: 1;
+	--gap: 40px;
+	--padding: 48px;
+	z-index: 1;
 }
 
 .auth .panel {
-  background-color: var(--white);
-  gap: var(--gap);
-  width: min-content;
-  min-width: 490px;
+	background-color: var(--white);
+	gap: var(--gap);
+	width: min-content;
+	min-width: 490px;
 }
 
 .auth .panel .loader {
-  align-self: center;
-  opacity: 0.5;
+	align-self: center;
+	opacity: 0.5;
 }
 
-.auth .panel>header {
-  display: flex;
-  border: none;
-  justify-content: center;
-  padding: var(--padding);
-  padding-bottom: 0;
+.auth .panel > header {
+	display: flex;
+	border: none;
+	justify-content: center;
+	padding: var(--padding);
+	padding-bottom: 0;
 }
 
-.auth .panel>section {
-  display: flex;
-  flex-direction: column;
-  padding: 0 var(--padding);
+.auth .panel > section {
+	display: flex;
+	flex-direction: column;
+	padding: 0 var(--padding);
 }
 
-.auth .panel>section p {
-  text-align: justify;
+.auth .panel > section p {
+	text-align: justify;
 }
 
-.auth .panel>section form {
-  gap: var(--spacing-s);
+.auth .panel > section form {
+	gap: var(--spacing-s);
 }
 
-.auth .panel>section button {
-  /* height: 32px; */
-  margin-top: var(--spacing-m);
-  align-self: center;
+.auth .panel > section button {
+	/* height: 32px; */
+	margin-top: var(--spacing-m);
+	align-self: center;
 }
 
-.auth .panel>footer {
-  flex-direction: column;
-  align-items: stretch;
-  border: none;
-  gap: var(--spacing-s);
-  padding: var(--padding);
-  padding-top: 0;
+.auth .panel > footer {
+	flex-direction: column;
+	align-items: stretch;
+	border: none;
+	gap: var(--spacing-s);
+	padding: var(--padding);
+	padding-top: 0;
 }
 
 .logo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  justify-content: center;
-  gap: var(--spacing-m);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	justify-content: center;
+	gap: var(--spacing-m);
 }
 
 .logo img {
-  width: 128px;
+	width: 128px;
 }
 
 .logo h1 {
-  font-size: 2.5em;
+	font-size: 2.5em;
 }
 
 .switcher {
-  display: flex;
-  margin: auto;
-  gap: var(--spacing-l);
-  font-size: 1.33em;
-  font-weight: bold;
+	display: flex;
+	margin: auto;
+	gap: var(--spacing-l);
+	font-size: 1.33em;
+	font-weight: bold;
 }
 
 .switcher a.active {
-  font-weight: bold;
-  text-decoration: underline;
+	font-weight: bold;
+	text-decoration: underline;
 }
