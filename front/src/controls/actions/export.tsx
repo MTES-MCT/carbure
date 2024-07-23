@@ -6,21 +6,21 @@ import pickApi from "../api"
 import useEntity from "carbure/hooks/entity"
 
 export interface ExportLotsButtonProps {
-	query: LotQuery
-	selection: number[]
+  query: LotQuery
+  selection: number[]
 }
 
 export const ExportLotsButton = ({
-	query,
-	selection,
+  query,
+  selection,
 }: ExportLotsButtonProps) => {
-	const { t } = useTranslation()
-	const entity = useEntity()
-	return (
-		<Button
-			icon={Download}
-			label={t("Exporter vers Excel")}
-			action={() => pickApi(entity).downloadLots(query, selection)}
-		/>
-	)
+  const { t } = useTranslation()
+  const entity = useEntity()
+  return (
+    <Button
+      icon={Download}
+      label={t("Exporter vers Excel")}
+      action={() => pickApi(entity).downloadLots(query, selection)}
+    />
+  )
 }

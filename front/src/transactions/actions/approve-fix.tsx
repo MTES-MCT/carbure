@@ -15,153 +15,153 @@ import { LotSummary } from "../components/lots/lot-summary"
 import { useMatomo } from "matomo"
 
 export interface ApproveManyFixesButtonProps {
-	disabled?: boolean
-	selection: number[]
+  disabled?: boolean
+  selection: number[]
 }
 
 export const ApproveManyFixesButton = ({
-	disabled,
-	selection,
+  disabled,
+  selection,
 }: ApproveManyFixesButtonProps) => {
-	const { t } = useTranslation()
-	const portal = usePortal()
+  const { t } = useTranslation()
+  const portal = usePortal()
 
-	return (
-		<Button
-			disabled={disabled || selection.length === 0}
-			variant="success"
-			icon={Check}
-			label={t("Accepter les corrections")}
-			action={() =>
-				portal((close) => (
-					<ApproveFixDialog summary selection={selection} onClose={close} />
-				))
-			}
-		/>
-	)
+  return (
+    <Button
+      disabled={disabled || selection.length === 0}
+      variant="success"
+      icon={Check}
+      label={t("Accepter les corrections")}
+      action={() =>
+        portal((close) => (
+          <ApproveFixDialog summary selection={selection} onClose={close} />
+        ))
+      }
+    />
+  )
 }
 
 export interface ApproveOneFixButtonProps {
-	icon?: boolean
-	lot: Lot
+  icon?: boolean
+  lot: Lot
 }
 
 export const ApproveOneFixButton = ({
-	icon,
-	lot,
+  icon,
+  lot,
 }: ApproveOneFixButtonProps) => {
-	const { t } = useTranslation()
-	const portal = usePortal()
+  const { t } = useTranslation()
+  const portal = usePortal()
 
-	return (
-		<Button
-			captive
-			variant={icon ? "icon" : "success"}
-			icon={Check}
-			title={t("Accepter la correction")}
-			label={t("Accepter la correction")}
-			action={() =>
-				portal((close) => (
-					<ApproveFixDialog selection={[lot.id]} onClose={close} />
-				))
-			}
-		/>
-	)
+  return (
+    <Button
+      captive
+      variant={icon ? "icon" : "success"}
+      icon={Check}
+      title={t("Accepter la correction")}
+      label={t("Accepter la correction")}
+      action={() =>
+        portal((close) => (
+          <ApproveFixDialog selection={[lot.id]} onClose={close} />
+        ))
+      }
+    />
+  )
 }
 
 interface ApproveFixDialogProps {
-	summary?: boolean
-	selection: number[]
-	onClose: () => void
+  summary?: boolean
+  selection: number[]
+  onClose: () => void
 }
 
 const ApproveFixDialog = ({
-	summary,
-	selection,
-	onClose,
+  summary,
+  selection,
+  onClose,
 }: ApproveFixDialogProps) => {
-	const { t } = useTranslation()
-	const notify = useNotify()
-	const matomo = useMatomo()
-	const status = useStatus()
-	const entity = useEntity()
+  const { t } = useTranslation()
+  const notify = useNotify()
+  const matomo = useMatomo()
+  const status = useStatus()
+  const entity = useEntity()
 
-	const v = variations(selection.length)
+  const v = variations(selection.length)
 
-	const approveFix = useMutation(api.approveFix, {
-		invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
+  const approveFix = useMutation(api.approveFix, {
+    invalidates: ["lots", "snapshot", "lot-details", "lot-summary"],
 
-		onSuccess: () => {
-			const text = v({
-				one: t("La correction a bien été accepté !"),
-				many: t("Les corrections ont bien été acceptés !"),
-			})
+    onSuccess: () => {
+      const text = v({
+        one: t("La correction a bien été accepté !"),
+        many: t("Les corrections ont bien été acceptés !"),
+      })
 
-			notify(text, { variant: "success" })
-			onClose()
-		},
+      notify(text, { variant: "success" })
+      onClose()
+    },
 
-		onError: () => {
-			const text = v({
-				one: t("La correction n'a pas pu être acceptée !"),
-				many: t("Les corrections n'ont pas pu être acceptée !"),
-			})
+    onError: () => {
+      const text = v({
+        one: t("La correction n'a pas pu être acceptée !"),
+        many: t("Les corrections n'ont pas pu être acceptée !"),
+      })
 
-			notify(text, { variant: "danger" })
-			onClose()
-		},
-	})
+      notify(text, { variant: "danger" })
+      onClose()
+    },
+  })
 
-	const query = useMemo(
-		() => ({ status, entity_id: entity.id }),
-		[status, entity.id]
-	)
+  const query = useMemo(
+    () => ({ status, entity_id: entity.id }),
+    [status, entity.id]
+  )
 
-	return (
-		<Dialog onClose={onClose}>
-			<header>
-				<h1>
-					{v({
-						one: t("Accepter la correction"),
-						many: t("Accepter les corrections"),
-					})}
-				</h1>
-			</header>
-			<main>
-				<section>
-					{v({
-						one: t("Voulez-vous accepter cette correction ?"),
-						many: t("Voulez-vous accepter les corrections des lots sélectionnés ?"), // prettier-ignore
-					})}
-				</section>
-				{summary && <LotSummary query={query} selection={selection} />}
-			</main>
-			<footer>
-				<Button
-					asideX
-					autoFocus
-					loading={approveFix.loading}
-					variant="primary"
-					icon={Check}
-					label={t("Accepter correction")}
-					action={() => {
-						matomo.push([
-							"trackEvent",
-							"lot-corrections",
-							"client-approve-fix",
-							"",
-							selection.length,
-						])
-						approveFix.execute(entity.id, selection)
-					}}
-				/>
-				<Button
-					disabled={approveFix.loading}
-					icon={Return}
-					label={t("Annuler")}
-					action={onClose}
-				/>
-			</footer>
-		</Dialog>
-	)
+  return (
+    <Dialog onClose={onClose}>
+      <header>
+        <h1>
+          {v({
+            one: t("Accepter la correction"),
+            many: t("Accepter les corrections"),
+          })}
+        </h1>
+      </header>
+      <main>
+        <section>
+          {v({
+            one: t("Voulez-vous accepter cette correction ?"),
+            many: t("Voulez-vous accepter les corrections des lots sélectionnés ?"), // prettier-ignore
+          })}
+        </section>
+        {summary && <LotSummary query={query} selection={selection} />}
+      </main>
+      <footer>
+        <Button
+          asideX
+          autoFocus
+          loading={approveFix.loading}
+          variant="primary"
+          icon={Check}
+          label={t("Accepter correction")}
+          action={() => {
+            matomo.push([
+              "trackEvent",
+              "lot-corrections",
+              "client-approve-fix",
+              "",
+              selection.length,
+            ])
+            approveFix.execute(entity.id, selection)
+          }}
+        />
+        <Button
+          disabled={approveFix.loading}
+          icon={Return}
+          label={t("Annuler")}
+          action={onClose}
+        />
+      </footer>
+    </Dialog>
+  )
 }

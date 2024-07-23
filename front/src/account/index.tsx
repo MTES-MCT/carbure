@@ -7,31 +7,31 @@ import { CompanyRegistrationDialog } from "companies/components/registration-dia
 import { Route, Routes } from "react-router-dom"
 
 const Account = () => {
-	const { t } = useTranslation()
-	useTitle(t("Mon compte"))
+  const { t } = useTranslation()
+  useTitle(t("Mon compte"))
 
-	return (
-		<Main>
-			<header>
-				<h1>
-					<Trans>Mon compte</Trans>
-				</h1>
-			</header>
-			<Routes>
-				<Route
-					path="company-registration"
-					element={<CompanyRegistrationDialog />}
-				/>
-			</Routes>
-			<section>
-				<AccountAccesRights />
-			</section>
+  return (
+    <Main>
+      <header>
+        <h1>
+          <Trans>Mon compte</Trans>
+        </h1>
+      </header>
+      <Routes>
+        <Route
+          path="company-registration"
+          element={<CompanyRegistrationDialog />}
+        />
+      </Routes>
+      <section>
+        <AccountAccesRights />
+      </section>
 
-			<section>
-				<AccountAuthentication />
-			</section>
-		</Main>
-	)
+      <section>
+        <AccountAuthentication />
+      </section>
+    </Main>
+  )
 }
 
 export default Account

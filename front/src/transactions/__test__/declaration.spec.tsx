@@ -8,9 +8,9 @@ import server from "./api"
 import userEvent from "@testing-library/user-event"
 
 const DeclarationSummary = () => (
-	<TestRoot url="/#declaration">
-		<Route path="/" element={<DeclarationDialog />} />
-	</TestRoot>
+  <TestRoot url="/#declaration">
+    <Route path="/" element={<DeclarationDialog />} />
+  </TestRoot>
 )
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
@@ -18,24 +18,24 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 test("display transaction details", async () => {
-	const user = userEvent.setup()
+  const user = userEvent.setup()
 
-	render(<DeclarationSummary />)
+  render(<DeclarationSummary />)
 
-	await waitWhileLoading()
+  await waitWhileLoading()
 
-	screen.getByText("Déclaration de durabilité")
+  screen.getByText("Déclaration de durabilité")
 
-	await user.click(screen.getByDisplayValue("Choisissez un mois"))
-	await user.click(screen.getByText("Janvier : 2 lots"))
+  await user.click(screen.getByDisplayValue("Choisissez un mois"))
+  await user.click(screen.getByText("Janvier : 2 lots"))
 
-	screen.getByText(/Lots reçus/)
-	screen.getByText(/Lots envoyés/)
-	screen.getAllByText(/1 lot/)
-	screen.getAllByText(/12 345 litres/)
+  screen.getByText(/Lots reçus/)
+  screen.getByText(/Lots envoyés/)
+  screen.getAllByText(/1 lot/)
+  screen.getAllByText(/12 345 litres/)
 
-	getByTextContent("Encore 1 lot en attente de validation")
+  getByTextContent("Encore 1 lot en attente de validation")
 
-	const button = screen.getByText("Valider la déclaration").closest("button")
-	expect(button).toBeDisabled()
+  const button = screen.getByText("Valider la déclaration").closest("button")
+  expect(button).toBeDisabled()
 })

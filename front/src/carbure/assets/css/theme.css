@@ -1,60 +1,60 @@
 :root {
-	--white: #ffffff;
-	--black: #1e1e1e;
+  --white: #ffffff;
+  --black: #1e1e1e;
 
-	--body: #f0f0f0;
-	--footer: #2a2a2a;
+  --body: #f0f0f0;
+  --footer: #2a2a2a;
 
-	--blue-light: #e5e5f4;
-	--blue-medium: #000091;
-	--blue-dark: #00006d;
-	--blue-highlight: #aaafbf;
-	--blue-purple: #3f32b8;
+  --blue-light: #e5e5f4;
+  --blue-medium: #000091;
+  --blue-dark: #00006d;
+  --blue-highlight: #aaafbf;
+  --blue-purple: #3f32b8;
 
-	--red-light: #ffdbd2;
-	--red-medium: #ffb7b5;
-	--red-dark: #e10600;
+  --red-light: #ffdbd2;
+  --red-medium: #ffb7b5;
+  --red-dark: #e10600;
 
-	--green-light: #c5e6d8;
-	--green-medium: #8acdb0;
-	--green-dark: #008941;
+  --green-light: #c5e6d8;
+  --green-medium: #8acdb0;
+  --green-dark: #008941;
 
-	--orange-light: #ffe6cf;
-	--orange-medium: #ffbb40;
-	--orange-dark: #e65100;
+  --orange-light: #ffe6cf;
+  --orange-medium: #ffbb40;
+  --orange-dark: #e65100;
 
-	--gray-light: #f8f8f8;
-	--gray-medium: #cecece;
-	--gray-dark: #6a6a6a;
-	--gray-highlight: #e7e7e7;
+  --gray-light: #f8f8f8;
+  --gray-medium: #cecece;
+  --gray-dark: #6a6a6a;
+  --gray-highlight: #e7e7e7;
 
-	--score-a: #18753c;
-	--score-b: #99c221;
-	--score-c: #fcc63a;
-	--score-d: #ff732c;
-	--score-e: #f60700;
+  --score-a: #18753c;
+  --score-b: #99c221;
+  --score-c: #fcc63a;
+  --score-d: #ff732c;
+  --score-e: #f60700;
 
-	--font-size: 16px;
-	--font-family: Marianne, arial, sans-serif;
+  --font-size: 16px;
+  --font-family: Marianne, arial, sans-serif;
 
-	--spacing-xxs: 2px;
-	--spacing-xs: 4px;
-	--spacing-s: 8px;
-	--spacing-m: 16px;
-	--spacing-l: 24px;
-	--spacing-xl: 40px;
-	--spacing-xxl: 128px;
+  --spacing-xxs: 2px;
+  --spacing-xs: 4px;
+  --spacing-s: 8px;
+  --spacing-m: 16px;
+  --spacing-l: 24px;
+  --spacing-xl: 40px;
+  --spacing-xxl: 128px;
 
-	--main-spacing-x: var(--spacing-l);
-	--main-spacing-y: var(--spacing-l);
+  --main-spacing-x: var(--spacing-l);
+  --main-spacing-y: var(--spacing-l);
 
-	--shadow: 0 1px 2px var(--gray-medium);
-	--border: 1px solid var(--gray-highlight);
-	--border-radius: var(--spacing-xs);
+  --shadow: 0 1px 2px var(--gray-medium);
+  --border: 1px solid var(--gray-highlight);
+  --border-radius: var(--spacing-xs);
 }
 
 @media screen and (min-width: 1600px) {
-	:root {
-		--main-spacing-x: var(--spacing-xxl);
-	}
+  :root {
+    --main-spacing-x: var(--spacing-xxl);
+  }
 }

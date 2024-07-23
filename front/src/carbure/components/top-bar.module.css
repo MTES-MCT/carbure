@@ -1,70 +1,70 @@
 .logo {
-	display: flex;
-	align-items: center;
-	margin: 12px 0;
-	margin-right: var(--spacing-xl);
+  display: flex;
+  align-items: center;
+  margin: 12px 0;
+  margin-right: var(--spacing-xl);
 }
 
 .logo .logoText {
-	margin-left: 24px;
+  margin-left: 24px;
 }
 
 .logoText h1 {
-	margin: 0;
-	margin-bottom: 8px;
+  margin: 0;
+  margin-bottom: 8px;
 }
 
 .logo h2 {
-	margin: 0;
-	margin-left: 16px;
+  margin: 0;
+  margin-left: 16px;
 }
 
 .republique {
-	height: 112px;
+  height: 112px;
 }
 
 .marianne {
-	height: 24px;
+  height: 24px;
 }
 
 .menus {
-	gap: var(--spacing-s);
+  gap: var(--spacing-s);
 }
 
 .shortcut {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	height: 100%;
-	margin-left: 32px;
-	color: var(--blue-medium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin-left: 32px;
+  color: var(--blue-medium);
 }
 
 .faq {
-	display: flex;
-	align-self: center;
-	align-items: center;
-	justify-content: center;
-	width: 36px;
-	height: 36px;
-	color: var(--blue-medium);
-	border: 3px solid var(--blue-medium);
-	border-radius: 50%;
-	opacity: 0.45;
-	margin-left: 42px;
-	margin-right: -78px;
+  display: flex;
+  align-self: center;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: var(--blue-medium);
+  border: 3px solid var(--blue-medium);
+  border-radius: 50%;
+  opacity: 0.45;
+  margin-left: 42px;
+  margin-right: -78px;
 }
 
 .faq:hover {
-	opacity: 1;
+  opacity: 1;
 }
 
 .faq:after {
-	display: none;
+  display: none;
 }
 
 @media screen and (max-width: 1600px) {
-	.faq {
-		display: none;
-	}
+  .faq {
+    display: none;
+  }
 }

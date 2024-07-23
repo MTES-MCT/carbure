@@ -1,13 +1,13 @@
 import api, { Api } from "common/services/api"
 
 interface EntityStatsResponse {
-	metabase_iframe_url: string
+  metabase_iframe_url: string
 }
 
 export function getEntityStats(entity_id: number) {
-	return api
-		.get<Api<EntityStatsResponse>>("/entity/stats", {
-			params: { entity_id },
-		})
-		.then((res) => res.data.data)
+  return api
+    .get<Api<EntityStatsResponse>>("/entity/stats", {
+      params: { entity_id },
+    })
+    .then((res) => res.data.data)
 }

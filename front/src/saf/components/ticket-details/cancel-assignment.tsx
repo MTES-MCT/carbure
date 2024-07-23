@@ -11,75 +11,75 @@ import * as api from "../../api"
 import TicketTag from "../tickets/tag"
 
 interface CancelAssignmentProps {
-	ticket: SafTicket
-	onClose: () => void
+  ticket: SafTicket
+  onClose: () => void
 }
 
 export const CancelAssignment = ({
-	ticket,
-	onClose,
+  ticket,
+  onClose,
 }: CancelAssignmentProps) => {
-	const { t } = useTranslation()
-	const entity = useEntity()
-	const notify = useNotify()
+  const { t } = useTranslation()
+  const entity = useEntity()
+  const notify = useNotify()
 
-	const cancelSafTicket = useMutation(api.cancelSafTicket, {
-		invalidates: [
-			"ticket-source-details",
-			"tickets",
-			"operator-snapshot",
-			"ticket-sources",
-		],
-	})
+  const cancelSafTicket = useMutation(api.cancelSafTicket, {
+    invalidates: [
+      "ticket-source-details",
+      "tickets",
+      "operator-snapshot",
+      "ticket-sources",
+    ],
+  })
 
-	const cancelTicket = async () => {
-		await cancelSafTicket.execute(entity.id, ticket.id)
-		notify(
-			t("Le ticket a été annulé et son volume peut être à nouveau affecté."),
-			{ variant: "success" }
-		)
-		onClose()
-	}
+  const cancelTicket = async () => {
+    await cancelSafTicket.execute(entity.id, ticket.id)
+    notify(
+      t("Le ticket a été annulé et son volume peut être à nouveau affecté."),
+      { variant: "success" }
+    )
+    onClose()
+  }
 
-	return (
-		<Portal onClose={onClose}>
-			<Dialog onClose={onClose}>
-				<header>
-					<TicketTag status={ticket.status} />
-					<h1>
-						{t("Annuler le ticket n°")}
-						{ticket?.carbure_id ?? "..."}
-					</h1>
-				</header>
+  return (
+    <Portal onClose={onClose}>
+      <Dialog onClose={onClose}>
+        <header>
+          <TicketTag status={ticket.status} />
+          <h1>
+            {t("Annuler le ticket n°")}
+            {ticket?.carbure_id ?? "..."}
+          </h1>
+        </header>
 
-				<main>
-					<section>
-						<p>
-							<strong>
-								{t("Êtes-vous sûr de vouloir annuler ce ticket ?")}
-							</strong>
-						</p>
-						<p>
-							{t(
-								"Cela entrainera sa suppression et les quantités seront à nouveau disponible pour  être affectées."
-							)}
-						</p>
-					</section>
-				</main>
+        <main>
+          <section>
+            <p>
+              <strong>
+                {t("Êtes-vous sûr de vouloir annuler ce ticket ?")}
+              </strong>
+            </p>
+            <p>
+              {t(
+                "Cela entrainera sa suppression et les quantités seront à nouveau disponible pour  être affectées."
+              )}
+            </p>
+          </section>
+        </main>
 
-				<footer>
-					<Button
-						icon={Cross}
-						label={t("Annuler l'affectation")}
-						variant="danger"
-						action={cancelTicket}
-					/>
+        <footer>
+          <Button
+            icon={Cross}
+            label={t("Annuler l'affectation")}
+            variant="danger"
+            action={cancelTicket}
+          />
 
-					<Button icon={Return} label={t("Retour")} action={onClose} />
-				</footer>
-			</Dialog>
-		</Portal>
-	)
+          <Button icon={Return} label={t("Retour")} action={onClose} />
+        </footer>
+      </Dialog>
+    </Portal>
+  )
 }
 
 export default CancelAssignment

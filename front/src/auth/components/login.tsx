@@ -16,117 +16,117 @@ import { useMutation } from "common/hooks/async"
 import * as api from "../api"
 
 const Login = () => {
-	const { t } = useTranslation()
-	const notify = useNotify()
-	const navigate = useNavigate()
+  const { t } = useTranslation()
+  const notify = useNotify()
+  const navigate = useNavigate()
 
-	const { value, bind } = useForm({
-		username: "" as string | undefined,
-		password: "" as string | undefined,
-	})
+  const { value, bind } = useForm({
+    username: "" as string | undefined,
+    password: "" as string | undefined,
+  })
 
-	const login = useMutation(api.login, {
-		onSuccess: () => {
-			notify(t("Un code vient de vous être envoyé"), { variant: "success" })
-			api.requestOTP()
-			navigate("../otp")
-		},
-		onError: () => {
-			notify(t("La connexion a échoué"), { variant: "danger" })
-		},
-	})
+  const login = useMutation(api.login, {
+    onSuccess: () => {
+      notify(t("Un code vient de vous être envoyé"), { variant: "success" })
+      api.requestOTP()
+      navigate("../otp")
+    },
+    onError: () => {
+      notify(t("La connexion a échoué"), { variant: "danger" })
+    },
+  })
 
-	return (
-		<Container>
-			<section>
-				<Switcher />
-			</section>
+  return (
+    <Container>
+      <section>
+        <Switcher />
+      </section>
 
-			<section>
-				<Form
-					id="login"
-					onSubmit={() => login.execute(value.username!, value.password!)}
-				>
-					<TextInput
-						autoFocus
-						variant="solid"
-						icon={Mail}
-						type="email"
-						label={t("Adresse email")}
-						{...bind("username")}
-					/>
-					<TextInput
-						variant="solid"
-						icon={Lock}
-						type="password"
-						label={t("Mot de passe")}
-						{...bind("password")}
-					/>
-					<Button
-						variant="link"
-						label={t("J'ai oublié mon mot de passe")}
-						to="../reset-password-request"
-					/>
-				</Form>
-			</section>
+      <section>
+        <Form
+          id="login"
+          onSubmit={() => login.execute(value.username!, value.password!)}
+        >
+          <TextInput
+            autoFocus
+            variant="solid"
+            icon={Mail}
+            type="email"
+            label={t("Adresse email")}
+            {...bind("username")}
+          />
+          <TextInput
+            variant="solid"
+            icon={Lock}
+            type="password"
+            label={t("Mot de passe")}
+            {...bind("password")}
+          />
+          <Button
+            variant="link"
+            label={t("J'ai oublié mon mot de passe")}
+            to="../reset-password-request"
+          />
+        </Form>
+      </section>
 
-			<footer>
-				<Button
-					center
-					loading={login.loading}
-					disabled={!value.username || !value.password}
-					variant="primary"
-					icon={UserCheck}
-					submit="login"
-					label={t("Se connecter au compte")}
-				/>
-				<Button
-					center
-					variant="secondary"
-					icon={Return}
-					label={t("Annuler")}
-					action={() => navigate("/")}
-				/>
-			</footer>
-		</Container>
-	)
+      <footer>
+        <Button
+          center
+          loading={login.loading}
+          disabled={!value.username || !value.password}
+          variant="primary"
+          icon={UserCheck}
+          submit="login"
+          label={t("Se connecter au compte")}
+        />
+        <Button
+          center
+          variant="secondary"
+          icon={Return}
+          label={t("Annuler")}
+          action={() => navigate("/")}
+        />
+      </footer>
+    </Container>
+  )
 }
 
 export const Container = ({ children }: { children: React.ReactNode }) => (
-	<Overlay className={css.auth}>
-		<Panel className={css.panel}>
-			<header>
-				<Logo />
-			</header>
-			{children}
-		</Panel>
-	</Overlay>
+  <Overlay className={css.auth}>
+    <Panel className={css.panel}>
+      <header>
+        <Logo />
+      </header>
+      {children}
+    </Panel>
+  </Overlay>
 )
 
 export const Switcher = () => {
-	const { t } = useTranslation()
-	const match = useMatch("auth/:focus")
-	const isLogin = match?.params.focus === "login"
-	const isRegister = match?.params.focus === "register"
-	return (
-		<div className={css.switcher}>
-			<Link to="../login" className={cl(isLogin && css.active)}>
-				{"→ "}
-				{t("Connexion")}
-			</Link>
-			<Link to="../register" className={cl(isRegister && css.active)}>
-				{"→ "}
-				{t("Inscription")}
-			</Link>
-		</div>
-	)
+  const { t } = useTranslation()
+  const match = useMatch("auth/:focus")
+  const isLogin = match?.params.focus === "login"
+  const isRegister = match?.params.focus === "register"
+  return (
+    <div className={css.switcher}>
+      <Link to="../login" className={cl(isLogin && css.active)}>
+        {"→ "}
+        {t("Connexion")}
+      </Link>
+      <Link to="../register" className={cl(isRegister && css.active)}>
+        {"→ "}
+        {t("Inscription")}
+      </Link>
+    </div>
+  )
 }
 
 export const Logo = () => (
-	<Link to="/" className={css.logo}>
-		<img src={marianne} alt="marianne logo" />
-		<h1>CarbuRe</h1>
-	</Link>
+  <Link to="/" className={css.logo}>
+    <img src={marianne} alt="marianne logo" />
+    <h1>CarbuRe</h1>
+  </Link>
 )
 
 export default Login

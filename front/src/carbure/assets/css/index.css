@@ -4,74 +4,74 @@
 /* @import '@gouvfr/dsfr/dist/css/dsfr.min.css'; */
 
 * {
-	box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 a {
-	text-decoration: none;
-	color: var(--black);
+  text-decoration: none;
+  color: var(--black);
 }
 
 body {
-	display: flex;
-	margin: 0;
-	font-family: var(--font-family);
-	font-size: var(--font-size);
-	line-height: 1.5em;
-	background-color: var(--body);
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	overflow: hidden;
-	color: var(--black);
+  display: flex;
+  margin: 0;
+  font-family: var(--font-family);
+  font-size: var(--font-size);
+  line-height: 1.5em;
+  background-color: var(--body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  color: var(--black);
 }
 
 #root {
-	display: flex;
-	flex-direction: column;
-	width: 100vw;
-	height: 100vh;
-	overflow-x: hidden;
-	overflow-y: auto;
-	align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  align-items: flex-start;
 }
 
 #app {
-	display: flex;
-	flex-direction: column;
-	flex: 1;
-	width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
 }
 
 button,
 input,
 textarea,
 select {
-	font-family: var(--font-family);
+  font-family: var(--font-family);
 }
 
 /* Override DSFR */
 [href] {
-	background-image: none;
+  background-image: none;
 }
 
 h1 {
-	line-height: inherit;
-	font-size: 24px;
+  line-height: inherit;
+  font-size: 24px;
 }
 
 .fr-stepper__steps {
-	background-image: repeating-linear-gradient(
-			to right,
-			var(--background-active-blue-france) 0,
-			var(--background-active-blue-france) var(--active-inner),
-			transparent var(--active-inner),
-			transparent var(--active-outer)
-		),
-		repeating-linear-gradient(
-			to right,
-			var(--gray-medium) 0,
-			var(--gray-medium) var(--default-inner),
-			transparent var(--default-inner),
-			transparent var(--default-outer)
-		);
+  background-image: repeating-linear-gradient(
+      to right,
+      var(--background-active-blue-france) 0,
+      var(--background-active-blue-france) var(--active-inner),
+      transparent var(--active-inner),
+      transparent var(--active-outer)
+    ),
+    repeating-linear-gradient(
+      to right,
+      var(--gray-medium) 0,
+      var(--gray-medium) var(--default-inner),
+      transparent var(--default-inner),
+      transparent var(--default-outer)
+    );
 }

@@ -10,29 +10,29 @@ import SampleSummary from "../sample/details-sample-summary"
 import ChargePointsSampleMap from "../sample/sample-map"
 
 interface ChargePointsApplicationHistoryProps {
-	chargePointApplication: ElecChargePointsApplicationDetails | undefined
+  chargePointApplication: ElecChargePointsApplicationDetails | undefined
 }
 export const ChargePointsApplicationHistory = ({
-	chargePointApplication,
+  chargePointApplication,
 }: ChargePointsApplicationHistoryProps) => {
-	return (
-		<>
-			<main>
-				<section>
-					<ApplicationSummary application={chargePointApplication} />
-				</section>
-				<Divider />
-				{chargePointApplication?.sample && (
-					<section>
-						<SampleSummary sample={chargePointApplication?.sample} />
-						<ChargePointsSampleMap
-							chargePoints={chargePointApplication?.sample?.charge_points}
-						/>
-					</section>
-				)}
-			</main>
-		</>
-	)
+  return (
+    <>
+      <main>
+        <section>
+          <ApplicationSummary application={chargePointApplication} />
+        </section>
+        <Divider />
+        {chargePointApplication?.sample && (
+          <section>
+            <SampleSummary sample={chargePointApplication?.sample} />
+            <ChargePointsSampleMap
+              chargePoints={chargePointApplication?.sample?.charge_points}
+            />
+          </section>
+        )}
+      </main>
+    </>
+  )
 }
 
 export default ChargePointsApplicationHistory

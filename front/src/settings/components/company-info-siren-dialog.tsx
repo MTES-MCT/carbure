@@ -14,111 +14,111 @@ import { useNavigate } from "react-router-dom"
 import { SirenPicker } from "../../companies/components/siren-picker"
 
 interface CompanyInfoSirenDialogProps {
-	onClose: () => void
-	wantPrefillCompanyInfo: (prefetchedCompany: SearchCompanyPreview) => void
+  onClose: () => void
+  wantPrefillCompanyInfo: (prefetchedCompany: SearchCompanyPreview) => void
 }
 
 export const CompanyInfoSirenDialog = ({
-	onClose,
-	wantPrefillCompanyInfo,
+  onClose,
+  wantPrefillCompanyInfo,
 }: CompanyInfoSirenDialogProps) => {
-	const { t } = useTranslation()
+  const { t } = useTranslation()
 
-	const notify = useNotify()
-	const [prefetchedCompany, setPrefetchedCompany] = useState<
-		SearchCompanyPreview | undefined
-	>(undefined)
-	const [prefetchedCompanyWarning, setPrefetchedCompanyWarning] = useState<
-		string | undefined
-	>(undefined)
+  const notify = useNotify()
+  const [prefetchedCompany, setPrefetchedCompany] = useState<
+    SearchCompanyPreview | undefined
+  >(undefined)
+  const [prefetchedCompanyWarning, setPrefetchedCompanyWarning] = useState<
+    string | undefined
+  >(undefined)
 
-	const fillFormWithFoundCompany = (
-		company?: SearchCompanyPreview,
-		warning?: string
-	) => {
-		if (company) {
-			setPrefetchedCompanyWarning(undefined)
-			notify(
-				t(
-					"Les informations ont été pré-remplies avec les informations de l'entreprises"
-				),
-				{
-					variant: "success",
-				}
-			)
-		}
-		if (warning) {
-			setPrefetchedCompanyWarning(warning)
-		}
-		setPrefetchedCompany(company)
-	}
+  const fillFormWithFoundCompany = (
+    company?: SearchCompanyPreview,
+    warning?: string
+  ) => {
+    if (company) {
+      setPrefetchedCompanyWarning(undefined)
+      notify(
+        t(
+          "Les informations ont été pré-remplies avec les informations de l'entreprises"
+        ),
+        {
+          variant: "success",
+        }
+      )
+    }
+    if (warning) {
+      setPrefetchedCompanyWarning(warning)
+    }
+    setPrefetchedCompany(company)
+  }
 
-	const onSubmit = () => {
-		wantPrefillCompanyInfo(prefetchedCompany!)
-		onClose()
-	}
+  const onSubmit = () => {
+    wantPrefillCompanyInfo(prefetchedCompany!)
+    onClose()
+  }
 
-	return (
-		<Portal onClose={onClose}>
-			<Dialog onClose={onClose}>
-				<header>
-					<h1>{t("Trouver ma société")} </h1>
-				</header>
+  return (
+    <Portal onClose={onClose}>
+      <Dialog onClose={onClose}>
+        <header>
+          <h1>{t("Trouver ma société")} </h1>
+        </header>
 
-				<main>
-					<section>
-						<p>
-							<Trans>
-								Rechercher votre société dans la base de données
-								entreprises.data.gouv :
-							</Trans>
-						</p>
-					</section>
-					<section>
-						<SirenPicker onSelect={fillFormWithFoundCompany} />
+        <main>
+          <section>
+            <p>
+              <Trans>
+                Rechercher votre société dans la base de données
+                entreprises.data.gouv :
+              </Trans>
+            </p>
+          </section>
+          <section>
+            <SirenPicker onSelect={fillFormWithFoundCompany} />
 
-						{prefetchedCompany && (
-							<>
-								<p>
-									{prefetchedCompany.legal_name} (
-									{prefetchedCompany.registered_address}{" "}
-									{prefetchedCompany.registered_zipcode}{" "}
-									{prefetchedCompany.registered_city})
-								</p>
-							</>
-						)}
-						{prefetchedCompanyWarning && (
-							<Alert icon={AlertCircle} variant="warning">
-								{prefetchedCompanyWarning}
-							</Alert>
-						)}
-					</section>
+            {prefetchedCompany && (
+              <>
+                <p>
+                  {prefetchedCompany.legal_name} (
+                  {prefetchedCompany.registered_address}{" "}
+                  {prefetchedCompany.registered_zipcode}{" "}
+                  {prefetchedCompany.registered_city})
+                </p>
+              </>
+            )}
+            {prefetchedCompanyWarning && (
+              <Alert icon={AlertCircle} variant="warning">
+                {prefetchedCompanyWarning}
+              </Alert>
+            )}
+          </section>
 
-					{!prefetchedCompany && (
-						<section>
-							<Alert icon={AlertCircle} variant="info">
-								<Trans>
-									Votre société n'est pas immatriculée en France ? Choisissez
-									votre pays dans le formulaire afin de remplir manuellement les
-									données associées.
-								</Trans>
-							</Alert>
-						</section>
-					)}
-				</main>
+          {!prefetchedCompany && (
+            <section>
+              <Alert icon={AlertCircle} variant="info">
+                <Trans>
+                  Votre société n'est pas immatriculée en France ? Choisissez
+                  votre pays dans le formulaire afin de remplir manuellement les
+                  données associées.
+                </Trans>
+              </Alert>
+            </section>
+          )}
+        </main>
 
-				<footer>
-					<Button
-						asideX
-						action={onSubmit}
-						disabled={!prefetchedCompany}
-						icon={Plus}
-						variant="primary"
-						label={t("Remplir les données")}
-					/>
-				</footer>
-			</Dialog>
-		</Portal>
-	)
+        <footer>
+          <Button
+            asideX
+            action={onSubmit}
+            disabled={!prefetchedCompany}
+            icon={Plus}
+            variant="primary"
+            label={t("Remplir les données")}
+          />
+        </footer>
+      </Dialog>
+    </Portal>
+  )
 }
 export default CompanyInfoSirenDialog

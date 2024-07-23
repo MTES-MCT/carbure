@@ -1,11 +1,11 @@
 .statusTabs a .verso {
-	display: none;
+  display: none;
 }
 
 .statusTabs a:hover .recto {
-	display: none;
+  display: none;
 }
 
 .statusTabs a:hover .verso {
-	display: flex;
+  display: flex;
 }

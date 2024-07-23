@@ -11,10 +11,10 @@ import { compact } from "common/utils/collection"
 import { useQueryParamsStore } from "saf/hooks/query-params-store"
 import { useSafQuery } from "saf/hooks/saf-query"
 import {
-	SafFilter,
-	SafOperatorSnapshot,
-	SafTicketSource,
-	SafTicketSourceStatus,
+  SafFilter,
+  SafOperatorSnapshot,
+  SafTicketSource,
+  SafTicketSourceStatus,
 } from "saf/types"
 import LotDetails from "transaction-details/components/lots"
 import * as api from "../../api"
@@ -29,136 +29,136 @@ import { ExportButton } from "../export"
 import NoResult from "common/components/no-result"
 
 export interface TicketSourcesProps {
-	year: number
-	snapshot: SafOperatorSnapshot | undefined
+  year: number
+  snapshot: SafOperatorSnapshot | undefined
 }
 
 export const TicketSources = ({ year, snapshot }: TicketSourcesProps) => {
-	const location = useLocation()
+  const location = useLocation()
 
-	const entity = useEntity()
-	const status = useAutoStatus()
-	const [state, actions] = useQueryParamsStore(entity, year, status, snapshot)
+  const entity = useEntity()
+  const status = useAutoStatus()
+  const [state, actions] = useQueryParamsStore(entity, year, status, snapshot)
 
-	const query = useSafQuery(state)
+  const query = useSafQuery(state)
 
-	const ticketSourcesResponse = useQuery(api.getOperatorTicketSources, {
-		key: "ticket-sources",
-		params: [query],
-	})
+  const ticketSourcesResponse = useQuery(api.getOperatorTicketSources, {
+    key: "ticket-sources",
+    params: [query],
+  })
 
-	const ticketSoucesData = ticketSourcesResponse.result?.data.data
-	const ids = ticketSoucesData?.ids ?? []
+  const ticketSoucesData = ticketSourcesResponse.result?.data.data
+  const ids = ticketSoucesData?.ids ?? []
 
-	const total = ticketSoucesData?.total ?? 0
-	const count = ticketSoucesData?.returned ?? 0
-	const ticketSources = ticketSoucesData?.saf_ticket_sources
+  const total = ticketSoucesData?.total ?? 0
+  const count = ticketSoucesData?.returned ?? 0
+  const ticketSources = ticketSoucesData?.saf_ticket_sources
 
-	let selectedTicketSources
-	if (state.selection?.length > 0 && ticketSources) {
-		selectedTicketSources = state.selection.map(
-			(id) => ticketSources.find((t) => t.id === id)!
-		)
-	}
+  let selectedTicketSources
+  if (state.selection?.length > 0 && ticketSources) {
+    selectedTicketSources = state.selection.map(
+      (id) => ticketSources.find((t) => t.id === id)!
+    )
+  }
 
-	const showTicketSourceDetail = (ticketSource: SafTicketSource) => {
-		return {
-			pathname: location.pathname,
-			search: location.search,
-			hash: `ticket-source/${ticketSource.id}`,
-		}
-	}
+  const showTicketSourceDetail = (ticketSource: SafTicketSource) => {
+    return {
+      pathname: location.pathname,
+      search: location.search,
+      hash: `ticket-source/${ticketSource.id}`,
+    }
+  }
 
-	return (
-		<>
-			<Bar>
-				<Filters
-					filters={FILTERS}
-					selected={state.filters}
-					onSelect={actions.setFilters}
-					getFilterOptions={(filter) =>
-						api.getTicketSourceFilters(filter, query)
-					}
-				/>
-			</Bar>
+  return (
+    <>
+      <Bar>
+        <Filters
+          filters={FILTERS}
+          selected={state.filters}
+          onSelect={actions.setFilters}
+          getFilterOptions={(filter) =>
+            api.getTicketSourceFilters(filter, query)
+          }
+        />
+      </Bar>
 
-			<section>
-				<ActionBar>
-					<StatusSwitcher
-						onSwitch={actions.setStatus}
-						count={snapshot}
-						status={status as SafTicketSourceStatus}
-					/>
+      <section>
+        <ActionBar>
+          <StatusSwitcher
+            onSwitch={actions.setStatus}
+            count={snapshot}
+            status={status as SafTicketSourceStatus}
+          />
 
-					<ExportButton
-						asideX
-						query={query}
-						download={api.downloadOperatorTicketSources}
-					/>
-					<SearchInput
-						clear
-						debounce={250}
-						value={state.search}
-						onChange={actions.setSearch}
-					/>
-				</ActionBar>
+          <ExportButton
+            asideX
+            query={query}
+            download={api.downloadOperatorTicketSources}
+          />
+          <SearchInput
+            clear
+            debounce={250}
+            value={state.search}
+            onChange={actions.setSearch}
+          />
+        </ActionBar>
 
-				{selectedTicketSources &&
-					status === SafTicketSourceStatus.Available && (
-						<TicketSourcesSummary
-							ticketSources={compact(selectedTicketSources)}
-						/>
-					)}
+        {selectedTicketSources &&
+          status === SafTicketSourceStatus.Available && (
+            <TicketSourcesSummary
+              ticketSources={compact(selectedTicketSources)}
+            />
+          )}
 
-				{count > 0 && ticketSources ? (
-					<>
-						<TicketSourcesTable
-							loading={ticketSourcesResponse.loading}
-							order={state.order}
-							ticketSources={ticketSources}
-							rowLink={showTicketSourceDetail}
-							selected={state.selection}
-							onSelect={actions.setSelection}
-							onOrder={actions.setOrder}
-							status={status as SafTicketSourceStatus}
-						/>
+        {count > 0 && ticketSources ? (
+          <>
+            <TicketSourcesTable
+              loading={ticketSourcesResponse.loading}
+              order={state.order}
+              ticketSources={ticketSources}
+              rowLink={showTicketSourceDetail}
+              selected={state.selection}
+              onSelect={actions.setSelection}
+              onOrder={actions.setOrder}
+              status={status as SafTicketSourceStatus}
+            />
 
-						{(state.limit || 0) < total && (
-							<Pagination
-								page={state.page}
-								limit={state.limit}
-								total={total}
-								onPage={actions.setPage}
-								onLimit={actions.setLimit}
-							/>
-						)}
-					</>
-				) : (
-					<NoResult
-						loading={ticketSourcesResponse.loading}
-						filters={state.filters}
-						onFilter={actions.setFilters}
-					/>
-				)}
-			</section>
-			<HashRoute
-				path="ticket-source/:id"
-				element={<TicketSourceDetail neighbors={ids} />}
-			/>
-			<HashRoute path="lot/:id" element={<LotDetails />} />
-			<HashRoute path="ticket/:id" element={<OperatorTicketDetails />} />
-		</>
-	)
+            {(state.limit || 0) < total && (
+              <Pagination
+                page={state.page}
+                limit={state.limit}
+                total={total}
+                onPage={actions.setPage}
+                onLimit={actions.setLimit}
+              />
+            )}
+          </>
+        ) : (
+          <NoResult
+            loading={ticketSourcesResponse.loading}
+            filters={state.filters}
+            onFilter={actions.setFilters}
+          />
+        )}
+      </section>
+      <HashRoute
+        path="ticket-source/:id"
+        element={<TicketSourceDetail neighbors={ids} />}
+      />
+      <HashRoute path="lot/:id" element={<LotDetails />} />
+      <HashRoute path="ticket/:id" element={<OperatorTicketDetails />} />
+    </>
+  )
 }
 
 const FILTERS = [
-	SafFilter.Suppliers,
-	SafFilter.Clients,
-	SafFilter.Periods,
-	SafFilter.Feedstocks,
-	SafFilter.CountriesOfOrigin,
-	SafFilter.ProductionSites,
-	SafFilter.DeliverySites,
+  SafFilter.Suppliers,
+  SafFilter.Clients,
+  SafFilter.Periods,
+  SafFilter.Feedstocks,
+  SafFilter.CountriesOfOrigin,
+  SafFilter.ProductionSites,
+  SafFilter.DeliverySites,
 ]
 
 export default TicketSources

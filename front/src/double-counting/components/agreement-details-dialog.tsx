@@ -19,148 +19,148 @@ import { SourcingFullTable } from "./sourcing-table"
 import { AgreementDetails, DoubleCountingStatus } from "../types"
 
 export const AgreementDetailsDialog = () => {
-	const { t } = useTranslation()
-	const navigate = useNavigate()
-	const location = useLocation()
-	const entity = useEntity()
-	const match = useHashMatch("double-counting/agreements/:id")
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const entity = useEntity()
+  const match = useHashMatch("double-counting/agreements/:id")
 
-	const applicationResponse = useQuery(api.getDoubleCountingAgreementDetails, {
-		key: "dc-agreement",
-		params: [entity.id, parseInt(match?.params.id || "")],
-	})
+  const applicationResponse = useQuery(api.getDoubleCountingAgreementDetails, {
+    key: "dc-agreement",
+    params: [entity.id, parseInt(match?.params.id || "")],
+  })
 
-	const agreement: AgreementDetails | undefined =
-		applicationResponse.result?.data.data
+  const agreement: AgreementDetails | undefined =
+    applicationResponse.result?.data.data
 
-	const application = agreement?.application
+  const application = agreement?.application
 
-	const closeDialog = () => {
-		navigate({ search: location.search, hash: "#" })
-	}
+  const closeDialog = () => {
+    navigate({ search: location.search, hash: "#" })
+  }
 
-	return (
-		<Portal onClose={closeDialog}>
-			<Dialog fullscreen onClose={closeDialog}>
-				<header>
-					<AgreementStatusTag status={agreement?.status} />
-					<h1>
-						{t("Agrément double comptage n°{{dcNumber}}", {
-							dcNumber: agreement?.certificate_id || "FR_XXX_XXXX",
-						})}{" "}
-					</h1>
-				</header>
+  return (
+    <Portal onClose={closeDialog}>
+      <Dialog fullscreen onClose={closeDialog}>
+        <header>
+          <AgreementStatusTag status={agreement?.status} />
+          <h1>
+            {t("Agrément double comptage n°{{dcNumber}}", {
+              dcNumber: agreement?.certificate_id || "FR_XXX_XXXX",
+            })}{" "}
+          </h1>
+        </header>
 
-				<main>
-					<section>
-						<p>
-							<Trans
-								values={{
-									producer: agreement?.producer ?? "N/A",
-									productionSite: agreement?.production_site ?? "N/A",
-								}}
-								defaults="Pour le site de production <b>{{ productionSite }}</b> de <b>{{ producer }}</b>"
-							/>
-						</p>
-					</section>
+        <main>
+          <section>
+            <p>
+              <Trans
+                values={{
+                  producer: agreement?.producer ?? "N/A",
+                  productionSite: agreement?.production_site ?? "N/A",
+                }}
+                defaults="Pour le site de production <b>{{ productionSite }}</b> de <b>{{ producer }}</b>"
+              />
+            </p>
+          </section>
 
-					{!application && !applicationResponse.loading && (
-						<section>
-							<p>
-								<Trans>
-									Aucune demande n'a été associée. Pour afficher les quotas
-									approuvés, ajouter le demande associée à cet agrément dans
-									l'onglet "demandes en attente".
-								</Trans>
-							</p>
-						</section>
-					)}
-					{application &&
-						application.status != DoubleCountingStatus.Accepted && (
-							<section>
-								<p>La demande est en cours de traitement...</p>
-								<Button
-									variant="link"
-									asideY
-									action={() =>
-										navigate(
-											`/org/${entity.id}/double-counting/applications#application/${application.id}`
-										)
-									}
-								>
-									{"Voir la demande d'agrément à valider"}
-								</Button>
-							</section>
-						)}
+          {!application && !applicationResponse.loading && (
+            <section>
+              <p>
+                <Trans>
+                  Aucune demande n'a été associée. Pour afficher les quotas
+                  approuvés, ajouter le demande associée à cet agrément dans
+                  l'onglet "demandes en attente".
+                </Trans>
+              </p>
+            </section>
+          )}
+          {application &&
+            application.status != DoubleCountingStatus.Accepted && (
+              <section>
+                <p>La demande est en cours de traitement...</p>
+                <Button
+                  variant="link"
+                  asideY
+                  action={() =>
+                    navigate(
+                      `/org/${entity.id}/double-counting/applications#application/${application.id}`
+                    )
+                  }
+                >
+                  {"Voir la demande d'agrément à valider"}
+                </Button>
+              </section>
+            )}
 
-					{application &&
-						application.status === DoubleCountingStatus.Accepted && (
-							<>
-								<AgreementTabs agreement={agreement} />
-							</>
-						)}
-				</main>
+          {application &&
+            application.status === DoubleCountingStatus.Accepted && (
+              <>
+                <AgreementTabs agreement={agreement} />
+              </>
+            )}
+        </main>
 
-				<footer>
-					<Button icon={Return} action={closeDialog}>
-						<Trans>Retour</Trans>
-					</Button>
-				</footer>
+        <footer>
+          <Button icon={Return} action={closeDialog}>
+            <Trans>Retour</Trans>
+          </Button>
+        </footer>
 
-				{applicationResponse.loading && <LoaderOverlay />}
-			</Dialog>
-		</Portal>
-	)
+        {applicationResponse.loading && <LoaderOverlay />}
+      </Dialog>
+    </Portal>
+  )
 }
 
 const AgreementTabs = ({ agreement }: { agreement: AgreementDetails }) => {
-	const [focus, setFocus] = useState("quotas")
-	const { t } = useTranslation()
+  const [focus, setFocus] = useState("quotas")
+  const { t } = useTranslation()
 
-	return (
-		<>
-			<section>
-				<Tabs
-					variant="switcher"
-					tabs={compact([
-						{
-							key: "quotas",
-							label: t("Quotas"),
-						},
-						{
-							key: "sourcing_forecast",
-							label: t("Approvisionnement"),
-						},
-						{
-							key: "production",
-							label: t("Production"),
-						},
-					])}
-					focus={focus}
-					onFocus={setFocus}
-				/>
-			</section>
+  return (
+    <>
+      <section>
+        <Tabs
+          variant="switcher"
+          tabs={compact([
+            {
+              key: "quotas",
+              label: t("Quotas"),
+            },
+            {
+              key: "sourcing_forecast",
+              label: t("Approvisionnement"),
+            },
+            {
+              key: "production",
+              label: t("Production"),
+            },
+          ])}
+          focus={focus}
+          onFocus={setFocus}
+        />
+      </section>
 
-			{focus === "quotas" && (
-				<section>
-					<QuotasTable quotas={agreement.quotas} />
-				</section>
-			)}
+      {focus === "quotas" && (
+        <section>
+          <QuotasTable quotas={agreement.quotas} />
+        </section>
+      )}
 
-			{focus === "sourcing_forecast" && (
-				<section>
-					<SourcingFullTable sourcing={agreement.application.sourcing ?? []} />
-				</section>
-			)}
+      {focus === "sourcing_forecast" && (
+        <section>
+          <SourcingFullTable sourcing={agreement.application.sourcing ?? []} />
+        </section>
+      )}
 
-			{focus === "production" && (
-				<section>
-					<ProductionTable
-						production={agreement.application.production ?? []}
-						hasAgreement={true}
-					/>
-				</section>
-			)}
-		</>
-	)
+      {focus === "production" && (
+        <section>
+          <ProductionTable
+            production={agreement.application.production ?? []}
+            hasAgreement={true}
+          />
+        </section>
+      )}
+    </>
+  )
 }

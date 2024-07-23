@@ -12,8 +12,8 @@ import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { SafTicketStatus } from "saf/types"
 import {
-	safTicketAssignedDetails,
-	safTicketReceivedDetails,
+  safTicketAssignedDetails,
+  safTicketReceivedDetails,
 } from "saf/__test__/data"
 import NavigationButtons from "transaction-details/components/lots/navigation"
 import * as api from "../../api"
@@ -26,125 +26,125 @@ import { TicketFields } from "./fields"
 import RejectAssignment from "./reject-assignment"
 
 export interface TicketDetailsProps {
-	neighbors?: number[]
+  neighbors?: number[]
 }
 export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
-	const { t } = useTranslation()
+  const { t } = useTranslation()
 
-	const navigate = useNavigate()
-	const location = useLocation()
-	const entity = useEntity()
-	const match = useHashMatch("ticket/:id")
-	const portal = usePortal()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const entity = useEntity()
+  const match = useHashMatch("ticket/:id")
+  const portal = usePortal()
 
-	const ticketResponse = useQuery(api.getOperatorTicketDetails, {
-		key: "ticket-details",
-		params: [entity.id, parseInt(match?.params.id || "")],
-	})
+  const ticketResponse = useQuery(api.getOperatorTicketDetails, {
+    key: "ticket-details",
+    params: [entity.id, parseInt(match?.params.id || "")],
+  })
 
-	const ticket = ticketResponse.result?.data?.data
-	// const ticket = safTicketReceivedDetails //TO TEST
+  const ticket = ticketResponse.result?.data?.data
+  // const ticket = safTicketReceivedDetails //TO TEST
 
-	const showCancelModal = () => {
-		portal((close) => (
-			<CancelAssignment
-				ticket={ticket!}
-				onClose={() => {
-					close()
-					closeDialog()
-				}}
-			/>
-		))
-	}
+  const showCancelModal = () => {
+    portal((close) => (
+      <CancelAssignment
+        ticket={ticket!}
+        onClose={() => {
+          close()
+          closeDialog()
+        }}
+      />
+    ))
+  }
 
-	const closeDialog = () => {
-		navigate({ search: location.search, hash: "#" })
-	}
+  const closeDialog = () => {
+    navigate({ search: location.search, hash: "#" })
+  }
 
-	const showRejectModal = () => {
-		portal((close) => <RejectAssignment ticket={ticket!} onClose={close} />)
-	}
+  const showRejectModal = () => {
+    portal((close) => <RejectAssignment ticket={ticket!} onClose={close} />)
+  }
 
-	const showAcceptModal = async () => {
-		portal((close) => (
-			<CreditTicketSource
-				ticket={ticket!}
-				onClose={() => {
-					close()
-					closeDialog()
-				}}
-			/>
-		))
-	}
+  const showAcceptModal = async () => {
+    portal((close) => (
+      <CreditTicketSource
+        ticket={ticket!}
+        onClose={() => {
+          close()
+          closeDialog()
+        }}
+      />
+    ))
+  }
 
-	return (
-		<Portal onClose={closeDialog}>
-			<Dialog onClose={closeDialog}>
-				<header>
-					<TicketTag big status={ticket?.status} />
-					<h1>
-						{t("Ticket n°")}
-						{ticket?.carbure_id ?? "..."}
-					</h1>
-				</header>
+  return (
+    <Portal onClose={closeDialog}>
+      <Dialog onClose={closeDialog}>
+        <header>
+          <TicketTag big status={ticket?.status} />
+          <h1>
+            {t("Ticket n°")}
+            {ticket?.carbure_id ?? "..."}
+          </h1>
+        </header>
 
-				<main>
-					<section>
-						<TicketFields ticket={ticket} />
-					</section>
-					<ClientComment ticket={ticket} />
+        <main>
+          <section>
+            <TicketFields ticket={ticket} />
+          </section>
+          <ClientComment ticket={ticket} />
 
-					{ticket?.supplier === entity.name && (
-						<LinkedTicketSource
-							ticket_source={ticket.parent_ticket_source}
-							title={t("Volume parent")}
-						/>
-					)}
-				</main>
+          {ticket?.supplier === entity.name && (
+            <LinkedTicketSource
+              ticket_source={ticket.parent_ticket_source}
+              title={t("Volume parent")}
+            />
+          )}
+        </main>
 
-				<footer>
-					{ticket?.status === SafTicketStatus.Pending &&
-						ticket?.client === entity.name && (
-							<>
-								<Button
-									icon={Check}
-									label={t("Accepter")}
-									variant="success"
-									action={showAcceptModal}
-								/>
-								<Button
-									icon={Cross}
-									label={t("Refuser")}
-									variant="danger"
-									action={showRejectModal}
-								/>
-							</>
-						)}
+        <footer>
+          {ticket?.status === SafTicketStatus.Pending &&
+            ticket?.client === entity.name && (
+              <>
+                <Button
+                  icon={Check}
+                  label={t("Accepter")}
+                  variant="success"
+                  action={showAcceptModal}
+                />
+                <Button
+                  icon={Cross}
+                  label={t("Refuser")}
+                  variant="danger"
+                  action={showRejectModal}
+                />
+              </>
+            )}
 
-					{ticket?.client !== entity.name &&
-						ticket?.status &&
-						[SafTicketStatus.Pending, SafTicketStatus.Rejected].includes(
-							ticket?.status
-						) && (
-							<Button
-								icon={Cross}
-								label={t("Annuler l'affectation")}
-								variant="danger"
-								action={showCancelModal}
-							/>
-						)}
-					{neighbors && (
-						<NavigationButtons
-							neighbors={neighbors}
-							closeAction={closeDialog}
-						/>
-					)}
-				</footer>
+          {ticket?.client !== entity.name &&
+            ticket?.status &&
+            [SafTicketStatus.Pending, SafTicketStatus.Rejected].includes(
+              ticket?.status
+            ) && (
+              <Button
+                icon={Cross}
+                label={t("Annuler l'affectation")}
+                variant="danger"
+                action={showCancelModal}
+              />
+            )}
+          {neighbors && (
+            <NavigationButtons
+              neighbors={neighbors}
+              closeAction={closeDialog}
+            />
+          )}
+        </footer>
 
-				{ticketResponse.loading && <LoaderOverlay />}
-			</Dialog>
-		</Portal>
-	)
+        {ticketResponse.loading && <LoaderOverlay />}
+      </Dialog>
+    </Portal>
+  )
 }
 
 export default OperatorTicketDetails

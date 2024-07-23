@@ -1,16 +1,16 @@
 .dropdown {
-	position: fixed;
-	top: 0;
-	left: 0;
-	will-change: transform;
-	max-height: 33vh;
-	background-color: var(--gray-light);
-	border: 1px solid var(--gray-medium);
-	overflow-y: auto;
-	margin-top: 1px;
-	z-index: 2;
+  position: fixed;
+  top: 0;
+  left: 0;
+  will-change: transform;
+  max-height: 33vh;
+  background-color: var(--gray-light);
+  border: 1px solid var(--gray-medium);
+  overflow-y: auto;
+  margin-top: 1px;
+  z-index: 2;
 }
 
 .dropdown input {
-	width: 0;
+  width: 0;
 }

@@ -15,56 +15,56 @@ import { DoubleCountingStatus as DCStatus } from "double-counting/types"
 import * as api from "double-counting/api"
 
 export const ApplicationDetailsDialog = () => {
-	const { t } = useTranslation()
-	const navigate = useNavigate()
-	const location = useLocation()
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const location = useLocation()
 
-	const entity = useEntity()
-	const match = useHashMatch("double-counting/applications/:id")
+  const entity = useEntity()
+  const match = useHashMatch("double-counting/applications/:id")
 
-	const applicationResponse = useQuery(
-		api.getDoubleCountingApplicationDetails,
-		{
-			key: "dc-application",
-			params: [entity.id, parseInt(match?.params.id || "")],
-		}
-	)
+  const applicationResponse = useQuery(
+    api.getDoubleCountingApplicationDetails,
+    {
+      key: "dc-application",
+      params: [entity.id, parseInt(match?.params.id || "")],
+    }
+  )
 
-	const application = applicationResponse.result?.data.data
-	const dcaStatus = application?.status ?? DCStatus.Pending
+  const application = applicationResponse.result?.data.data
+  const dcaStatus = application?.status ?? DCStatus.Pending
 
-	const closeDialog = () => {
-		navigate({ search: location.search, hash: "#double-counting" })
-	}
+  const closeDialog = () => {
+    navigate({ search: location.search, hash: "#double-counting" })
+  }
 
-	return (
-		<Portal onClose={closeDialog}>
-			<Dialog fullscreen onClose={closeDialog}>
-				<header>
-					<ApplicationStatus big status={dcaStatus} />
-					<h1>{t("Demande d'agrément double comptage")} </h1>
-				</header>
+  return (
+    <Portal onClose={closeDialog}>
+      <Dialog fullscreen onClose={closeDialog}>
+        <header>
+          <ApplicationStatus big status={dcaStatus} />
+          <h1>{t("Demande d'agrément double comptage")} </h1>
+        </header>
 
-				<main>
-					<ApplicationInfo application={application} />
+        <main>
+          <ApplicationInfo application={application} />
 
-					{application && (
-						<ApplicationTabs
-							productionSite={application.production_site}
-							sourcing={application.sourcing}
-							production={application.production}
-						/>
-					)}
-				</main>
+          {application && (
+            <ApplicationTabs
+              productionSite={application.production_site}
+              sourcing={application.sourcing}
+              production={application.production}
+            />
+          )}
+        </main>
 
-				<footer>
-					<Button icon={Return} action={closeDialog}>
-						<Trans>Retour</Trans>
-					</Button>
-				</footer>
+        <footer>
+          <Button icon={Return} action={closeDialog}>
+            <Trans>Retour</Trans>
+          </Button>
+        </footer>
 
-				{applicationResponse.loading && <LoaderOverlay />}
-			</Dialog>
-		</Portal>
-	)
+        {applicationResponse.loading && <LoaderOverlay />}
+      </Dialog>
+    </Portal>
+  )
 }

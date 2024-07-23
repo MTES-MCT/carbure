@@ -1,48 +1,48 @@
 import {
-	useAsync,
-	useAsyncCallback,
-	UseAsyncCallbackOptions,
+  useAsync,
+  useAsyncCallback,
+  UseAsyncCallbackOptions,
 } from "react-async-hook"
 import { invalidate, useInvalidate } from "./invalidate"
 
 export type QueryOptions<R, A extends any[]> = UseAsyncCallbackOptions<R> & {
-	key: string
-	params: A
+  key: string
+  params: A
 }
 
 export function useQuery<R, A extends any[]>(
-	asyncFunction: (...args: A) => Promise<R>,
-	{ key, params, ...options }: QueryOptions<R, A>
+  asyncFunction: (...args: A) => Promise<R>,
+  { key, params, ...options }: QueryOptions<R, A>
 ) {
-	const query = useAsync(asyncFunction, params, {
-		...options,
-		...staleWhileLoading,
-	})
+  const query = useAsync(asyncFunction, params, {
+    ...options,
+    ...staleWhileLoading,
+  })
 
-	useInvalidate(key, () => query.execute(...params))
+  useInvalidate(key, () => query.execute(...params))
 
-	return query
+  return query
 }
 
 export type MutationOptions<R> = UseAsyncCallbackOptions<R> & {
-	invalidates?: string[]
+  invalidates?: string[]
 }
 
 export function useMutation<R, A extends any[]>(
-	asyncFunction: (...args: A) => Promise<R>,
-	{ invalidates, ...options }: MutationOptions<R> = {}
+  asyncFunction: (...args: A) => Promise<R>,
+  { invalidates, ...options }: MutationOptions<R> = {}
 ) {
-	return useAsyncCallback(asyncFunction, {
-		...options,
-		...staleWhileLoading,
-		onSuccess: (res, opts) => {
-			// invalidate linked queries if mutation is successful
-			invalidates && invalidate(...invalidates)
-			options.onSuccess?.(res, opts)
-		},
-	})
+  return useAsyncCallback(asyncFunction, {
+    ...options,
+    ...staleWhileLoading,
+    onSuccess: (res, opts) => {
+      // invalidate linked queries if mutation is successful
+      invalidates && invalidate(...invalidates)
+      options.onSuccess?.(res, opts)
+    },
+  })
 }
 
 export const staleWhileLoading = {
-	setLoading: (state: any) => ({ ...state, loading: true }),
+  setLoading: (state: any) => ({ ...state, loading: true }),
 }

@@ -1,88 +1,88 @@
 .tag {
-	display: inline-flex;
-	align-items: center;
-	gap: var(--spacing-s);
-	background-color: var(--gray-highlight);
-	color: var(--gray-dark);
-	box-shadow: var(--shadow);
-	font-size: 0.8em;
-	padding: var(--spacing-xs) var(--spacing-s);
-	border-radius: var(--border-radius);
-	white-space: nowrap;
-	overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-s);
+  background-color: var(--gray-highlight);
+  color: var(--gray-dark);
+  box-shadow: var(--shadow);
+  font-size: 0.8em;
+  padding: var(--spacing-xs) var(--spacing-s);
+  border-radius: var(--border-radius);
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .tag [data-icon] {
-	flex-shrink: 0;
-	width: 16px;
-	height: 16px;
-	margin-top: 2px;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
 }
 
 .big {
-	font-size: 1em;
-	font-weight: 600;
-	padding: var(--spacing-s) var(--spacing-m);
+  font-size: 1em;
+  font-weight: 600;
+  padding: var(--spacing-s) var(--spacing-m);
 }
 
 .big [data-icon] {
-	width: 24px;
-	height: 24px;
+  width: 24px;
+  height: 24px;
 }
 
 .small {
-	font-size: 0.75em;
-	font-weight: normal;
-	height: inherit;
-	line-height: 1em;
-	border-radius: 2em;
-	padding: var(--spacing-xxs) var(--spacing-s);
-	box-shadow: none;
+  font-size: 0.75em;
+  font-weight: normal;
+  height: inherit;
+  line-height: 1em;
+  border-radius: 2em;
+  padding: var(--spacing-xxs) var(--spacing-s);
+  box-shadow: none;
 }
 
 .small [data-icon] {
-	width: 14px;
-	height: 14px;
+  width: 14px;
+  height: 14px;
 }
 
 .info {
-	background-color: var(--blue-light);
-	color: var(--blue-dark);
+  background-color: var(--blue-light);
+  color: var(--blue-dark);
 }
 
 .success {
-	background-color: var(--green-light);
-	color: var(--green-dark);
+  background-color: var(--green-light);
+  color: var(--green-dark);
 }
 
 .success.small {
-	border: 1px solid var(--green-medium);
+  border: 1px solid var(--green-medium);
 }
 .info.small {
-	border: 1px solid var(--blue-highlight);
+  border: 1px solid var(--blue-highlight);
 }
 .danger.small {
-	border: 1px solid var(--red-medium);
+  border: 1px solid var(--red-medium);
 }
 .none.small {
-	border: 1px solid var(--gray-medium);
+  border: 1px solid var(--gray-medium);
 }
 
 .warning {
-	background-color: var(--orange-light);
-	color: var(--orange-dark);
+  background-color: var(--orange-light);
+  color: var(--orange-dark);
 }
 
 .danger {
-	background-color: var(--red-light);
-	color: var(--red-dark);
+  background-color: var(--red-light);
+  color: var(--red-dark);
 }
 
 .group {
-	flex: 1;
-	display: inline-flex;
-	gap: var(--spacing-s);
-	align-items: center;
-	flex-wrap: wrap;
-	margin: var(--spacing-s);
+  flex: 1;
+  display: inline-flex;
+  gap: var(--spacing-s);
+  align-items: center;
+  flex-wrap: wrap;
+  margin: var(--spacing-s);
 }

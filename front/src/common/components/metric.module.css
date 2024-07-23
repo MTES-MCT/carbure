@@ -1,17 +1,17 @@
 .metric {
-	display: inline-flex;
-	gap: var(--spacing-s);
-	flex-direction: column;
-	background-color: var(--gray-highlight);
-	color: var(--gray-dark);
-	padding: var(--spacing-l);
-	border-radius: var(--border-radius);
-	font-size: 1.2em;
-	overflow: hidden;
-	background-color: var(--blue-light);
-	color: var(--blue-medium);
+  display: inline-flex;
+  gap: var(--spacing-s);
+  flex-direction: column;
+  background-color: var(--gray-highlight);
+  color: var(--gray-dark);
+  padding: var(--spacing-l);
+  border-radius: var(--border-radius);
+  font-size: 1.2em;
+  overflow: hidden;
+  background-color: var(--blue-light);
+  color: var(--blue-medium);
 }
 
 .metric strong {
-	font-size: 2em;
+  font-size: 2em;
 }

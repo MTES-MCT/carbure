@@ -3,8 +3,8 @@ import { companyResult } from "./data"
 import { setupServer } from "msw/lib/node"
 
 export const searchCompanyDataBySirenOk = mockPostWithResponseData(
-	"/entity/search-company",
-	companyResult
+  "/entity/search-company",
+  companyResult
 )
 
 export default setupServer(searchCompanyDataBySirenOk)

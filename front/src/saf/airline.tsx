@@ -11,68 +11,68 @@ import AirlineTickets from "./components/tickets/airline-tickets"
 import { SafTicketStatus } from "./types"
 
 export const SafClient = () => {
-	const { t } = useTranslation()
+  const { t } = useTranslation()
 
-	const entity = useEntity()
+  const entity = useEntity()
 
-	const years = useYears("saf", api.getAirlineYears)
+  const years = useYears("saf", api.getAirlineYears)
 
-	const snapshot = useQuery(api.getAirlineSnapshot, {
-		key: "airline-snapshot",
-		params: [entity.id, years.selected],
-	})
-	const snapshotData = snapshot.result?.data.data
-	// const snapshotData = safClientSnapshot //TO TEST with testing data
+  const snapshot = useQuery(api.getAirlineSnapshot, {
+    key: "airline-snapshot",
+    params: [entity.id, years.selected],
+  })
+  const snapshotData = snapshot.result?.data.data
+  // const snapshotData = safClientSnapshot //TO TEST with testing data
 
-	return (
-		<Main>
-			<header>
-				<section>
-					<h1>{t("Carburant Durable d'Aviation")}</h1>
+  return (
+    <Main>
+      <header>
+        <section>
+          <h1>{t("Carburant Durable d'Aviation")}</h1>
 
-					<Select
-						loading={years.loading}
-						variant="inline"
-						placeholder={t("Choisir une année")}
-						value={years.selected}
-						onChange={years.setYear}
-						options={years.options}
-						sort={(year) => -year.value}
-					/>
-				</section>
+          <Select
+            loading={years.loading}
+            variant="inline"
+            placeholder={t("Choisir une année")}
+            value={years.selected}
+            onChange={years.setYear}
+            options={years.options}
+            sort={(year) => -year.value}
+          />
+        </section>
 
-				<section>
-					<ClientTabs loading={snapshot.loading} count={snapshotData} />
-				</section>
-			</header>
+        <section>
+          <ClientTabs loading={snapshot.loading} count={snapshotData} />
+        </section>
+      </header>
 
-			<Routes>
-				{/* //TODO comment merger les deux instructions si dessous  https://stackoverflow.com/questions/47369023/react-router-v4-allow-only-certain-parameters-in-url */}
-				<Route
-					path="/tickets/pending"
-					element={
-						<AirlineTickets year={years.selected} snapshot={snapshotData} />
-					}
-				/>
-				<Route
-					path="/tickets/accepted"
-					element={
-						<AirlineTickets year={years.selected} snapshot={snapshotData} />
-					}
-				/>
+      <Routes>
+        {/* //TODO comment merger les deux instructions si dessous  https://stackoverflow.com/questions/47369023/react-router-v4-allow-only-certain-parameters-in-url */}
+        <Route
+          path="/tickets/pending"
+          element={
+            <AirlineTickets year={years.selected} snapshot={snapshotData} />
+          }
+        />
+        <Route
+          path="/tickets/accepted"
+          element={
+            <AirlineTickets year={years.selected} snapshot={snapshotData} />
+          }
+        />
 
-				<Route
-					path="*"
-					element={
-						<Navigate
-							replace
-							to={`tickets/${SafTicketStatus.Pending.toLocaleLowerCase()}/`}
-						/>
-					}
-				/>
-			</Routes>
-		</Main>
-	)
+        <Route
+          path="*"
+          element={
+            <Navigate
+              replace
+              to={`tickets/${SafTicketStatus.Pending.toLocaleLowerCase()}/`}
+            />
+          }
+        />
+      </Routes>
+    </Main>
+  )
 }
 
 export default SafClient

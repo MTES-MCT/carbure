@@ -17,191 +17,191 @@ import useEntity from "carbure/hooks/entity"
 import { compact } from "common/utils/collection"
 
 export interface StockSummaryBarProps extends Partial<FilterManager> {
-	query: StockQuery
-	selection: number[]
-	getSummary?: typeof api.getStockSummary
-	renderSummary?: typeof StockSummary
+  query: StockQuery
+  selection: number[]
+  getSummary?: typeof api.getStockSummary
+  renderSummary?: typeof StockSummary
 }
 
 export const StockSummaryBar = ({
-	query,
-	selection,
-	filters,
-	onFilter,
-	getSummary = api.getStockSummary,
-	renderSummary = StockSummary,
+  query,
+  selection,
+  filters,
+  onFilter,
+  getSummary = api.getStockSummary,
+  renderSummary = StockSummary,
 }: StockSummaryBarProps) => {
-	const { t } = useTranslation()
-	const portal = usePortal()
-	const entity = useEntity()
+  const { t } = useTranslation()
+  const portal = usePortal()
+  const entity = useEntity()
 
-	const summary = useQuery(getSummary, {
-		key: "stock-summary",
-		params: [query, selection, true],
-	})
+  const summary = useQuery(getSummary, {
+    key: "stock-summary",
+    params: [query, selection, true],
+  })
 
-	const summaryData = summary.result?.data.data ?? {
-		count: 0,
-		total_remaining_volume: 0,
-		total_remaining_weight: 0,
-		total_remaining_lhv_amount: 0,
-	}
+  const summaryData = summary.result?.data.data ?? {
+    count: 0,
+    total_remaining_volume: 0,
+    total_remaining_weight: 0,
+    total_remaining_lhv_amount: 0,
+  }
 
-	const unitToField = {
-		l: "total_remaining_volume" as const,
-		kg: "total_remaining_weight" as const,
-		MJ: "total_remaining_lhv_amount" as const,
-	}
+  const unitToField = {
+    l: "total_remaining_volume" as const,
+    kg: "total_remaining_weight" as const,
+    MJ: "total_remaining_lhv_amount" as const,
+  }
 
-	const unit = entity.preferred_unit ?? "l"
-	const field = unitToField[unit]
+  const unit = entity.preferred_unit ?? "l"
+  const field = unitToField[unit]
 
-	return (
-		<Alert loading={summary.loading} icon={Filter} variant="info">
-			<p>
-				<Trans
-					defaults="<b>{{amount}} stocks</b> pour un total de <b>{{volume}} restants</b>"
-					count={summaryData.count}
-					values={{
-						amount: formatNumber(summaryData.count),
-						volume: formatUnit(summaryData[field], unit),
-					}}
-				/>
-			</p>
+  return (
+    <Alert loading={summary.loading} icon={Filter} variant="info">
+      <p>
+        <Trans
+          defaults="<b>{{amount}} stocks</b> pour un total de <b>{{volume}} restants</b>"
+          count={summaryData.count}
+          values={{
+            amount: formatNumber(summaryData.count),
+            volume: formatUnit(summaryData[field], unit),
+          }}
+        />
+      </p>
 
-			<Button
-				variant="link"
-				label={t("Voir le récapitulatif")}
-				action={() =>
-					portal((close) => (
-						<StockSummaryDialog
-							query={query}
-							selection={selection}
-							onClose={close}
-							getSummary={getSummary}
-							renderSummary={renderSummary}
-						/>
-					))
-				}
-			/>
+      <Button
+        variant="link"
+        label={t("Voir le récapitulatif")}
+        action={() =>
+          portal((close) => (
+            <StockSummaryDialog
+              query={query}
+              selection={selection}
+              onClose={close}
+              getSummary={getSummary}
+              renderSummary={renderSummary}
+            />
+          ))
+        }
+      />
 
-			{filters && onFilter && (
-				<ResetButton filters={filters} onFilter={onFilter} />
-			)}
-		</Alert>
-	)
+      {filters && onFilter && (
+        <ResetButton filters={filters} onFilter={onFilter} />
+      )}
+    </Alert>
+  )
 }
 
 export interface StockSummaryDialogProps {
-	query: StockQuery
-	selection: number[]
-	onClose: () => void
-	getSummary?: typeof api.getStockSummary
-	renderSummary?: typeof StockSummary
+  query: StockQuery
+  selection: number[]
+  onClose: () => void
+  getSummary?: typeof api.getStockSummary
+  renderSummary?: typeof StockSummary
 }
 
 export const StockSummaryDialog = ({
-	query,
-	selection,
-	onClose,
-	getSummary,
-	renderSummary: Summary = StockSummary,
+  query,
+  selection,
+  onClose,
+  getSummary,
+  renderSummary: Summary = StockSummary,
 }: StockSummaryDialogProps) => {
-	const { t } = useTranslation()
+  const { t } = useTranslation()
 
-	return (
-		<Dialog onClose={onClose}>
-			<header>
-				<h1>{t("Récapitulatif des lots")}</h1>
-			</header>
+  return (
+    <Dialog onClose={onClose}>
+      <header>
+        <h1>{t("Récapitulatif des lots")}</h1>
+      </header>
 
-			<main>
-				<section>
-					{t(
-						"Ce tableau résume les informations principales des stocks correspondant à votre recherche ou sélection."
-					)}
-				</section>
+      <main>
+        <section>
+          {t(
+            "Ce tableau résume les informations principales des stocks correspondant à votre recherche ou sélection."
+          )}
+        </section>
 
-				<Summary query={query} selection={selection} getSummary={getSummary} />
-			</main>
+        <Summary query={query} selection={selection} getSummary={getSummary} />
+      </main>
 
-			<footer>
-				<Button asideX icon={Return} label={t("Retour")} action={onClose} />
-			</footer>
-		</Dialog>
-	)
+      <footer>
+        <Button asideX icon={Return} label={t("Retour")} action={onClose} />
+      </footer>
+    </Dialog>
+  )
 }
 
 export interface StockSummaryProps {
-	query: StockQuery
-	selection?: number[]
-	getSummary?: typeof api.getStockSummary
+  query: StockQuery
+  selection?: number[]
+  getSummary?: typeof api.getStockSummary
 }
 
 const EMPTY: number[] = []
 
 export const StockSummary = ({
-	query,
-	selection = EMPTY,
-	getSummary = api.getStockSummary,
+  query,
+  selection = EMPTY,
+  getSummary = api.getStockSummary,
 }: StockSummaryProps) => {
-	const { t } = useTranslation()
-	const entity = useEntity()
+  const { t } = useTranslation()
+  const entity = useEntity()
 
-	const summary = useQuery(getSummary, {
-		key: "stocks-summary-details",
-		params: [query, selection],
-	})
+  const summary = useQuery(getSummary, {
+    key: "stocks-summary-details",
+    params: [query, selection],
+  })
 
-	const summaryData = summary.result?.data.data
+  const summaryData = summary.result?.data.data
 
-	const unitToField = {
-		l: "remaining_volume_sum" as const,
-		kg: "remaining_weight_sum" as const,
-		MJ: "remaining_lhv_amount_sum" as const,
-	}
+  const unitToField = {
+    l: "remaining_volume_sum" as const,
+    kg: "remaining_weight_sum" as const,
+    MJ: "remaining_lhv_amount_sum" as const,
+  }
 
-	const unit = entity.preferred_unit ?? "l"
-	const field = unitToField[unit]
+  const unit = entity.preferred_unit ?? "l"
+  const field = unitToField[unit]
 
-	const stock = summaryData?.stock ?? []
-	const stockLots = stock.reduce((count, item) => count + item.total, 0)
-	const stockQuantity = stock.reduce((quantity, item) => quantity + (item[field] ?? 0), 0) // prettier-ignore
+  const stock = summaryData?.stock ?? []
+  const stockLots = stock.reduce((count, item) => count + item.total, 0)
+  const stockQuantity = stock.reduce((quantity, item) => quantity + (item[field] ?? 0), 0) // prettier-ignore
 
-	const columns = useSummaryColumns(query)
+  const columns = useSummaryColumns(query)
 
-	return (
-		<>
-			{stock.length === 0 && (
-				<section>
-					<NoResult />
-				</section>
-			)}
+  return (
+    <>
+      {stock.length === 0 && (
+        <section>
+          <NoResult />
+        </section>
+      )}
 
-			{stock.length > 0 && (
-				<>
-					<h2>
-						{t("Stocks")}
-						{" ▸ "}
-						{t("{{count}} lots", { count: stockLots })}
-						{" ▸ "}
-						{formatUnit(stockQuantity, unit)}
-					</h2>
-					<Table
-						style={{ width: "max(50vw, 960px)" }}
-						rows={stock}
-						columns={compact([
-							columns.supplier,
-							columns.biofuel,
-							columns.remainingQuantity,
-							columns.count,
-							columns.ghgReduction,
-						])}
-					/>
-				</>
-			)}
+      {stock.length > 0 && (
+        <>
+          <h2>
+            {t("Stocks")}
+            {" ▸ "}
+            {t("{{count}} lots", { count: stockLots })}
+            {" ▸ "}
+            {formatUnit(stockQuantity, unit)}
+          </h2>
+          <Table
+            style={{ width: "max(50vw, 960px)" }}
+            rows={stock}
+            columns={compact([
+              columns.supplier,
+              columns.biofuel,
+              columns.remainingQuantity,
+              columns.count,
+              columns.ghgReduction,
+            ])}
+          />
+        </>
+      )}
 
-			{summary.loading && <LoaderOverlay />}
-		</>
-	)
+      {summary.loading && <LoaderOverlay />}
+    </>
+  )
 }

@@ -9,61 +9,61 @@ import { useTranslation } from "react-i18next"
 import { LotQuery } from "transactions/types"
 
 interface DeliveryMapButtonProps {
-	query: LotQuery
+  query: LotQuery
 }
 
 const DeliveryMapButton = ({ query }: DeliveryMapButtonProps) => {
-	const { t } = useTranslation()
-	const portal = usePortal()
-	return (
-		<Button
-			icon={Map}
-			label={t("Voir la carte des livraisons")}
-			action={() =>
-				portal((close) => <DeliveryMapDialog query={query} onClose={close} />)
-			}
-		/>
-	)
+  const { t } = useTranslation()
+  const portal = usePortal()
+  return (
+    <Button
+      icon={Map}
+      label={t("Voir la carte des livraisons")}
+      action={() =>
+        portal((close) => <DeliveryMapDialog query={query} onClose={close} />)
+      }
+    />
+  )
 }
 
 interface DeliveryMapDialogProps {
-	query: LotQuery
-	onClose: () => void
+  query: LotQuery
+  onClose: () => void
 }
 
 const DeliveryMapDialog = ({ query, onClose }: DeliveryMapDialogProps) => {
-	const { t } = useTranslation()
+  const { t } = useTranslation()
 
-	const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true)
 
-	// prepare query params for current search
-	const searchParams = toSearchParams({
-		...query,
-		limit: undefined,
-		from_idx: undefined,
-	}).toString()
+  // prepare query params for current search
+  const searchParams = toSearchParams({
+    ...query,
+    limit: undefined,
+    from_idx: undefined,
+  }).toString()
 
-	return (
-		<Dialog onClose={onClose} style={{ width: "100%" }}>
-			<iframe
-				title={t("Carte des livraisons")}
-				src={`/api/transactions/admin/flow-map?${searchParams}`}
-				frameBorder="0"
-				style={{ width: "1px", minWidth: "100%", overflow: "hidden" }}
-				onLoad={(e) => {
-					const iframe = e.target as HTMLIFrameElement
-					const doc = iframe.contentDocument
-					const last = doc?.querySelector("body *:last-child")
+  return (
+    <Dialog onClose={onClose} style={{ width: "100%" }}>
+      <iframe
+        title={t("Carte des livraisons")}
+        src={`/api/transactions/admin/flow-map?${searchParams}`}
+        frameBorder="0"
+        style={{ width: "1px", minWidth: "100%", overflow: "hidden" }}
+        onLoad={(e) => {
+          const iframe = e.target as HTMLIFrameElement
+          const doc = iframe.contentDocument
+          const last = doc?.querySelector("body *:last-child")
 
-					if (last) {
-						iframe.height = last.getBoundingClientRect().bottom + "px"
-						setLoading(false)
-					}
-				}}
-			/>
-			{loading && <LoaderOverlay />}
-		</Dialog>
-	)
+          if (last) {
+            iframe.height = last.getBoundingClientRect().bottom + "px"
+            setLoading(false)
+          }
+        }}
+      />
+      {loading && <LoaderOverlay />}
+    </Dialog>
+  )
 }
 
 export default DeliveryMapButton

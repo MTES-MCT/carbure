@@ -12,44 +12,44 @@ import { Loader } from "common/components/icons"
 import { useState } from "react"
 
 const Stats = () => {
-	const { t } = useTranslation()
-	const entity = useEntity()
-	useTitle(t("Statistiques") + " " + entity.name)
-	const [isLoaded, setIsLoaded] = useState(false)
+  const { t } = useTranslation()
+  const entity = useEntity()
+  useTitle(t("Statistiques") + " " + entity.name)
+  const [isLoaded, setIsLoaded] = useState(false)
 
-	const statsResponse = useQuery(getEntityStats, {
-		key: "entities",
-		params: [entity.id],
-	})
+  const statsResponse = useQuery(getEntityStats, {
+    key: "entities",
+    params: [entity.id],
+  })
 
-	const statsData = statsResponse.result
+  const statsData = statsResponse.result
 
-	return !statsData?.metabase_iframe_url ? (
-		<LoaderOverlay />
-	) : (
-		<Main>
-			<header>
-				<h1>
-					<Trans>Statistiques</Trans>
-				</h1>
-			</header>
-			<section>
-				<IframeResizer
-					onResized={() => setIsLoaded(true)}
-					src={statsData?.metabase_iframe_url}
-					frameBorder="0"
-					allowTransparency
-					style={{ boxShadow: "var(--shadow)" }}
-				/>
-			</section>
-			{!isLoaded && (
-				<section style={{ alignItems: "center" }}>
-					{" "}
-					<Loader color="var(--black)" size={32} />
-				</section>
-			)}
-		</Main>
-	)
+  return !statsData?.metabase_iframe_url ? (
+    <LoaderOverlay />
+  ) : (
+    <Main>
+      <header>
+        <h1>
+          <Trans>Statistiques</Trans>
+        </h1>
+      </header>
+      <section>
+        <IframeResizer
+          onResized={() => setIsLoaded(true)}
+          src={statsData?.metabase_iframe_url}
+          frameBorder="0"
+          allowTransparency
+          style={{ boxShadow: "var(--shadow)" }}
+        />
+      </section>
+      {!isLoaded && (
+        <section style={{ alignItems: "center" }}>
+          {" "}
+          <Loader color="var(--black)" size={32} />
+        </section>
+      )}
+    </Main>
+  )
 }
 
 export default Stats

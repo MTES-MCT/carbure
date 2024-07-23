@@ -15,80 +15,80 @@ import { SendApplicationProducerDialog } from "../send-application-dialog"
 import { DechetIndustrielAlert } from "./industrial-waste-alert"
 
 export type ValidDetailsDialogProps = {
-	file: File
-	fileData: DoubleCountingFileInfo
-	onClose: () => void
+  file: File
+  fileData: DoubleCountingFileInfo
+  onClose: () => void
 }
 
 export const ValidDetailsDialog = ({
-	file,
-	fileData,
-	onClose,
+  file,
+  fileData,
+  onClose,
 }: ValidDetailsDialogProps) => {
-	const { t } = useTranslation()
-	const portal = usePortal()
-	const isProducerMatch = useMatch("/org/:entity/settings*")
+  const { t } = useTranslation()
+  const portal = usePortal()
+  const isProducerMatch = useMatch("/org/:entity/settings*")
 
-	function showProductionSiteDialog() {
-		if (isProducerMatch) {
-			portal((close) => (
-				<SendApplicationProducerDialog
-					fileData={fileData}
-					onClose={() => {
-						close()
-						onClose()
-					}}
-					file={file}
-				/>
-			))
-		} else {
-			portal((close) => (
-				<SendApplicationAdminDialog
-					fileData={fileData}
-					onClose={() => {
-						close()
-						onClose()
-					}}
-					file={file}
-				/>
-			))
-		}
-	}
+  function showProductionSiteDialog() {
+    if (isProducerMatch) {
+      portal((close) => (
+        <SendApplicationProducerDialog
+          fileData={fileData}
+          onClose={() => {
+            close()
+            onClose()
+          }}
+          file={file}
+        />
+      ))
+    } else {
+      portal((close) => (
+        <SendApplicationAdminDialog
+          fileData={fileData}
+          onClose={() => {
+            close()
+            onClose()
+          }}
+          file={file}
+        />
+      ))
+    }
+  }
 
-	return (
-		<Dialog fullscreen onClose={onClose}>
-			<header>
-				<Tag big variant="success">
-					{t("Valide")}
-				</Tag>
-				<h1>{t("Dossier double comptage")}</h1>
-			</header>
+  return (
+    <Dialog fullscreen onClose={onClose}>
+      <header>
+        <Tag big variant="success">
+          {t("Valide")}
+        </Tag>
+        <h1>{t("Dossier double comptage")}</h1>
+      </header>
 
-			<main>
-				<FileApplicationInfo fileData={fileData} />
-				<section>
-					{fileData.has_dechets_industriels && <DechetIndustrielAlert />}
-				</section>
-				<ApplicationTabs
-					sourcing={fileData.sourcing}
-					production={fileData.production}
-				/>
-			</main>
+      <main>
+        <FileApplicationInfo fileData={fileData} />
+        <section>
+          {fileData.has_dechets_industriels && <DechetIndustrielAlert />}
+        </section>
+        <ApplicationTabs
+          sourcing={fileData.sourcing}
+          production={fileData.production}
+        />
+      </main>
 
-			<footer>
-				<Button
-					icon={isProducerMatch ? Send : Plus}
-					label={
-						isProducerMatch ? t("Envoyer la demande") : t("Ajouter le dossier")
-					}
-					variant="primary"
-					action={showProductionSiteDialog}
-				/>
+      <footer>
+        <Button
+          icon={isProducerMatch ? Send : Plus}
+          label={
+            isProducerMatch ? t("Envoyer la demande") : t("Ajouter le dossier")
+          }
+          variant="primary"
+          action={showProductionSiteDialog}
+        />
 
-				<Button icon={Return} label={t("Fermer")} action={onClose} asideX />
-			</footer>
-		</Dialog>
-	)
+        <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
+      </footer>
+    </Dialog>
+  )
 }
 
 export default ValidDetailsDialog

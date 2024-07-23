@@ -12,45 +12,45 @@ import ChargePointsApplicationsList from "./components/list"
 import { ElecAuditSnapshot } from "./types"
 
 const defaultElecAdminAuditSnapshot: ElecAuditSnapshot = {
-	charge_points_applications_audit_done: 0,
-	charge_points_applications_audit_in_progress: 0,
+  charge_points_applications_audit_done: 0,
+  charge_points_applications_audit_in_progress: 0,
 }
 
 export const ElecAudit = () => {
-	const { t } = useTranslation()
+  const { t } = useTranslation()
 
-	const entity = useEntity()
-	const years = useYears("elec-audit", api.getYears)
-	const elecAdminAuditSnapshotResponse = useQuery(api.getSnapshot, {
-		key: "elec-audit-snapshot",
-		params: [entity.id, years.selected],
-	})
+  const entity = useEntity()
+  const years = useYears("elec-audit", api.getYears)
+  const elecAdminAuditSnapshotResponse = useQuery(api.getSnapshot, {
+    key: "elec-audit-snapshot",
+    params: [entity.id, years.selected],
+  })
 
-	const snapshot =
-		elecAdminAuditSnapshotResponse.result?.data.data ??
-		defaultElecAdminAuditSnapshot
+  const snapshot =
+    elecAdminAuditSnapshotResponse.result?.data.data ??
+    defaultElecAdminAuditSnapshot
 
-	return (
-		<Main>
-			<header>
-				<section>
-					<h1>{t("Points de recharge à auditer")}</h1>
+  return (
+    <Main>
+      <header>
+        <section>
+          <h1>{t("Points de recharge à auditer")}</h1>
 
-					<Select
-						loading={years.loading}
-						variant="inline"
-						placeholder={t("Année")}
-						value={years.selected}
-						onChange={years.setYear}
-						options={years.options}
-						sort={(year) => -year.value}
-					/>
-				</section>
-			</header>
+          <Select
+            loading={years.loading}
+            variant="inline"
+            placeholder={t("Année")}
+            value={years.selected}
+            onChange={years.setYear}
+            options={years.options}
+            sort={(year) => -year.value}
+          />
+        </section>
+      </header>
 
-			<ChargePointsApplicationsList snapshot={snapshot} year={years.selected} />
-		</Main>
-	)
+      <ChargePointsApplicationsList snapshot={snapshot} year={years.selected} />
+    </Main>
+  )
 }
 
 export default ElecAudit

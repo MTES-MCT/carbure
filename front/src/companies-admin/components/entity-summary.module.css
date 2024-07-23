@@ -1,20 +1,20 @@
 .entityRequests::after {
-	border-left: 4px solid;
-	content: "";
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: 1px;
-	width: 4px;
-	border-color: var(--orange-medium);
+  border-left: 4px solid;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 1px;
+  width: 4px;
+  border-color: var(--orange-medium);
 }
 
 .requestHighlight {
-	color: var(--orange-dark);
+  color: var(--orange-dark);
 }
 
 .tableList {
-	font-weight: normal;
-	padding: 0 8px;
-	margin: 0;
+  font-weight: normal;
+  padding: 0 8px;
+  margin: 0;
 }

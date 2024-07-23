@@ -1,13 +1,13 @@
 .pagination {
-	align-self: center;
-	padding: var(--spacing-m);
-	gap: var(--spacing-m);
-	background-color: var(--white);
-	border: 1px solid var(--gray-medium);
+  align-self: center;
+  padding: var(--spacing-m);
+  gap: var(--spacing-m);
+  background-color: var(--white);
+  border: 1px solid var(--gray-medium);
 }
 
 .pagination section {
-	display: flex;
-	align-items: center;
-	gap: var(--spacing-s);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-s);
 }

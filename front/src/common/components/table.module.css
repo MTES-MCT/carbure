@@ -1,208 +1,208 @@
 .table {
-	--min-cell-width: var(--spacing-xxl);
-	position: relative;
-	display: flex;
-	flex-direction: column;
+  --min-cell-width: var(--spacing-xxl);
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 h2 + .table[data-headless] {
-	margin-top: calc(-1 * var(--spacing-s));
+  margin-top: calc(-1 * var(--spacing-s));
 }
 
 .table.compact {
-	padding-bottom: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
 }
 
 .columns {
-	display: flex;
-	align-items: flex-end;
-	padding: 0 var(--spacing-l);
-	gap: var(--spacing-m);
+  display: flex;
+  align-items: flex-end;
+  padding: 0 var(--spacing-l);
+  gap: var(--spacing-m);
 }
 
 .header {
-	flex: 1 1 0%;
-	color: var(--blue-dark);
-	text-transform: uppercase;
-	font-weight: bold;
-	font-size: 0.8em;
-	padding: var(--spacing-s) 0;
+  flex: 1 1 0%;
+  color: var(--blue-dark);
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 0.8em;
+  padding: var(--spacing-s) 0;
 }
 
 .header[data-sortable] {
-	cursor: pointer;
+  cursor: pointer;
 }
 
 .sortable {
-	color: var(--gray-medium);
+  color: var(--gray-medium);
 }
 
 .rows {
-	display: flex;
-	flex-direction: column;
-	padding: 0;
-	margin: 0;
-	list-style-type: none;
-	gap: 1px;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+  gap: 1px;
 }
 
 .compact .rows {
-	gap: var(--spacing-xs);
+  gap: var(--spacing-xs);
 }
 
 .rows > li {
-	position: relative;
+  position: relative;
 }
 
 .rows > li:not(.rowLink) {
-	padding: 0 var(--spacing-l);
+  padding: 0 var(--spacing-l);
 }
 
 .rows > li > a {
-	flex: 1;
-	min-width: 0;
-	padding: 0 var(--spacing-l);
+  flex: 1;
+  min-width: 0;
+  padding: 0 var(--spacing-l);
 }
 
 .rows > li,
 .rows > li > a {
-	display: flex;
-	align-items: center;
-	gap: var(--spacing-m);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-m);
 }
 
 .compact .rows > li {
-	padding: 0 var(--spacing-xs);
-	gap: var(--spacing-xs);
+  padding: 0 var(--spacing-xs);
+  gap: var(--spacing-xs);
 }
 
 .rows > li[data-interactive] {
-	cursor: pointer;
+  cursor: pointer;
 }
 
 .rows > li:nth-child(odd) {
-	background-color: var(--gray-light);
+  background-color: var(--gray-light);
 }
 
 .rows > li:nth-child(even) {
-	background-color: var(--white);
+  background-color: var(--white);
 }
 
 .rows > li:hover {
-	background-color: var(--gray-highlight);
+  background-color: var(--gray-highlight);
 }
 
 .cell {
-	flex: 1 1 0%;
-	padding: var(--spacing-m) 0;
+  flex: 1 1 0%;
+  padding: var(--spacing-m) 0;
 }
 
 .compact .cell {
-	padding: 0;
+  padding: 0;
 }
 
 .cell strong {
-	display: inline-flex;
-	align-items: center;
-	gap: var(--spacing-xs);
-	font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-weight: 600;
 }
 
 .cell strong [data-icon] {
-	width: 20px;
+  width: 20px;
 }
 
 .cell .warning strong {
-	color: var(--orange-dark);
+  color: var(--orange-dark);
 }
 
 .cell small {
-	color: var(--gray-dark);
+  color: var(--gray-dark);
 }
 
 .small {
-	flex: 0.5 1;
+  flex: 0.5 1;
 }
 
 .cell,
 .header {
-	min-width: 0;
+  min-width: 0;
 }
 
 .header,
 .cell .multiline > *,
 .cell .multiline div > * {
-	display: block;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	overflow: hidden;
+  display: block;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .cell .multiline strong > svg {
-	margin-bottom: -5px;
+  margin-bottom: -5px;
 }
 
 .selection {
-	align-self: stretch;
-	flex: 0 0 min-content;
-	min-width: 0;
-	padding: 0;
-	margin-left: calc(-1 * var(--spacing-l));
-	margin-right: calc(-1 * var(--spacing-s));
+  align-self: stretch;
+  flex: 0 0 min-content;
+  min-width: 0;
+  padding: 0;
+  margin-left: calc(-1 * var(--spacing-l));
+  margin-right: calc(-1 * var(--spacing-s));
 }
 
 .selection [data-checkbox] {
-	width: 100%;
-	height: 100%;
-	justify-content: center;
-	align-items: center;
-	padding: var(--spacing-l);
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-l);
 }
 
 .header.selection [data-checkbox] {
-	padding: var(--spacing-s) var(--spacing-l);
+  padding: var(--spacing-s) var(--spacing-l);
 }
 
 .marker {
-	display: block;
-	position: absolute;
-	min-width: 4px;
-	height: 100%;
-	padding: 0;
-	top: 0;
-	left: 0;
-	overflow: hidden;
+  display: block;
+  position: absolute;
+  min-width: 4px;
+  height: 100%;
+  padding: 0;
+  top: 0;
+  left: 0;
+  overflow: hidden;
 }
 
 .marker > * {
-	width: var(--spacing-xs);
-	height: 100%;
+  width: var(--spacing-xs);
+  height: 100%;
 }
 
 .marker .warning {
-	background-color: var(--orange-medium);
+  background-color: var(--orange-medium);
 }
 
 .marker .danger {
-	background-color: var(--red-dark);
+  background-color: var(--red-dark);
 }
 
 .marker .success {
-	background-color: var(--green-medium);
+  background-color: var(--green-medium);
 }
 
 .marker .info {
-	background-color: var(--blue-medium);
+  background-color: var(--blue-medium);
 }
 
 .actions {
-	display: flex;
-	flex: 0.33;
-	min-width: 0;
-	justify-content: center;
-	gap: var(--spacing-s);
+  display: flex;
+  flex: 0.33;
+  min-width: 0;
+  justify-content: center;
+  gap: var(--spacing-s);
 }
 
 .actions button {
-	color: var(--gray-dark);
+  color: var(--gray-dark);
 }

@@ -16,107 +16,107 @@ import MeterReadingsApplicationRejectDialog from "./reject-dialog"
 import MeterReadingsApplicationHistory from "./details-history-copy"
 
 export const MeterReadingsApplicationDetailsDialog = () => {
-	const { t } = useTranslation()
-	const entity = useEntity()
-	const portal = usePortal()
-	const navigate = useNavigate()
-	const location = useLocation()
-	const match = useHashMatch("application/:id")
+  const { t } = useTranslation()
+  const entity = useEntity()
+  const portal = usePortal()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const match = useHashMatch("application/:id")
 
-	const meterReadingsApplicationResponse = useQuery(
-		api.getMeterReadingsApplicationDetails,
-		{
-			key: "audit-meter-readings-application-details",
-			params: [entity.id, parseInt(match?.params.id || "")],
-		}
-	)
-	const meterReadingsApplication =
-		meterReadingsApplicationResponse.result?.data.data
+  const meterReadingsApplicationResponse = useQuery(
+    api.getMeterReadingsApplicationDetails,
+    {
+      key: "audit-meter-readings-application-details",
+      params: [entity.id, parseInt(match?.params.id || "")],
+    }
+  )
+  const meterReadingsApplication =
+    meterReadingsApplicationResponse.result?.data.data
 
-	const closeDialog = () => {
-		navigate({ search: location.search, hash: "#" })
-	}
+  const closeDialog = () => {
+    navigate({ search: location.search, hash: "#" })
+  }
 
-	const acceptApplication = (force = false) => {
-		if (!meterReadingsApplication) return
-		portal((close) => (
-			<MeterReadingsApplicationAcceptDialog
-				application={meterReadingsApplication}
-				onClose={close}
-				forceValidation={force}
-				onValidated={closeDialog}
-			/>
-		))
-	}
+  const acceptApplication = (force = false) => {
+    if (!meterReadingsApplication) return
+    portal((close) => (
+      <MeterReadingsApplicationAcceptDialog
+        application={meterReadingsApplication}
+        onClose={close}
+        forceValidation={force}
+        onValidated={closeDialog}
+      />
+    ))
+  }
 
-	const rejectApplication = (force = false) => {
-		if (!meterReadingsApplication) return
-		portal((close) => (
-			<MeterReadingsApplicationRejectDialog
-				application={meterReadingsApplication}
-				onClose={close}
-				forceRejection={force}
-				onRejected={closeDialog}
-			/>
-		))
-	}
+  const rejectApplication = (force = false) => {
+    if (!meterReadingsApplication) return
+    portal((close) => (
+      <MeterReadingsApplicationRejectDialog
+        application={meterReadingsApplication}
+        onClose={close}
+        forceRejection={force}
+        onRejected={closeDialog}
+      />
+    ))
+  }
 
-	const downloadSample = async () => {
-		if (!meterReadingsApplication) return
-		return api.downloadMeterReadingsSample(
-			entity.id,
-			meterReadingsApplication.id
-		)
-	}
+  const downloadSample = async () => {
+    if (!meterReadingsApplication) return
+    return api.downloadMeterReadingsSample(
+      entity.id,
+      meterReadingsApplication.id
+    )
+  }
 
-	return (
-		<Portal onClose={closeDialog}>
-			<Dialog onClose={closeDialog}>
-				<header>
-					<ApplicationStatus status={meterReadingsApplication?.status} big />
-					<h1>
-						{t("Relevés T{{quarter}} {{year}} - {{cpo}}", {
-							quarter: meterReadingsApplication?.quarter,
-							year: meterReadingsApplication?.year,
-							cpo: meterReadingsApplication?.cpo.name,
-						})}
-					</h1>
-				</header>
+  return (
+    <Portal onClose={closeDialog}>
+      <Dialog onClose={closeDialog}>
+        <header>
+          <ApplicationStatus status={meterReadingsApplication?.status} big />
+          <h1>
+            {t("Relevés T{{quarter}} {{year}} - {{cpo}}", {
+              quarter: meterReadingsApplication?.quarter,
+              year: meterReadingsApplication?.year,
+              cpo: meterReadingsApplication?.cpo.name,
+            })}
+          </h1>
+        </header>
 
-				{meterReadingsApplication?.status ===
-					ElecAuditApplicationStatus.Pending && (
-					<MeterReadingsApplicationDetailsPending
-						meterReadingsApplication={meterReadingsApplication}
-						onAccept={acceptApplication}
-						onReject={rejectApplication}
-						onDownloadSample={downloadSample}
-					/>
-				)}
+        {meterReadingsApplication?.status ===
+          ElecAuditApplicationStatus.Pending && (
+          <MeterReadingsApplicationDetailsPending
+            meterReadingsApplication={meterReadingsApplication}
+            onAccept={acceptApplication}
+            onReject={rejectApplication}
+            onDownloadSample={downloadSample}
+          />
+        )}
 
-				{meterReadingsApplication?.status ===
-					ElecAuditApplicationStatus.AuditInProgress && (
-					<MeterReadingsApplicationDetailsInProgress
-						meterReadingsApplication={meterReadingsApplication}
-						onAccept={acceptApplication}
-						onReject={rejectApplication}
-						onDownloadSample={downloadSample}
-					/>
-				)}
+        {meterReadingsApplication?.status ===
+          ElecAuditApplicationStatus.AuditInProgress && (
+          <MeterReadingsApplicationDetailsInProgress
+            meterReadingsApplication={meterReadingsApplication}
+            onAccept={acceptApplication}
+            onReject={rejectApplication}
+            onDownloadSample={downloadSample}
+          />
+        )}
 
-				{meterReadingsApplication?.status &&
-					[
-						ElecAuditApplicationStatus.Accepted,
-						ElecAuditApplicationStatus.Rejected,
-					].includes(meterReadingsApplication.status) && (
-						<MeterReadingsApplicationHistory
-							meterReadingsApplication={meterReadingsApplication}
-						/>
-					)}
+        {meterReadingsApplication?.status &&
+          [
+            ElecAuditApplicationStatus.Accepted,
+            ElecAuditApplicationStatus.Rejected,
+          ].includes(meterReadingsApplication.status) && (
+            <MeterReadingsApplicationHistory
+              meterReadingsApplication={meterReadingsApplication}
+            />
+          )}
 
-				{meterReadingsApplicationResponse.loading && <LoaderOverlay />}
-			</Dialog>
-		</Portal>
-	)
+        {meterReadingsApplicationResponse.loading && <LoaderOverlay />}
+      </Dialog>
+    </Portal>
+  )
 }
 
 export default MeterReadingsApplicationDetailsDialog

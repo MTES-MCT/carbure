@@ -1,15 +1,15 @@
 /* COMMON */
 
 .home {
-	background-color: var(--white);
-	font-size: 18px;
+  background-color: var(--white);
+  font-size: 18px;
 }
 
 .home h1,
 .home h2,
 .home ul {
-	margin-bottom: 16px;
-	margin-top: 8px;
+  margin-bottom: 16px;
+  margin-top: 8px;
 }
 
 .homeTitle,
@@ -17,156 +17,156 @@
 .homeStats,
 .homeStatsButton,
 .homeEntities {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	line-height: normal;
-	margin: 32px 0;
-	padding: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: normal;
+  margin: 32px 0;
+  padding: 32px;
 }
 
 button.homeButton {
-	font-size: 1.4em;
-	line-height: normal;
-	padding: 12px 24px;
+  font-size: 1.4em;
+  line-height: normal;
+  padding: 12px 24px;
 }
 
 /* FIRST BLOCK */
 
 .homeTitle h1 {
-	margin: 0;
-	font-size: 3em;
+  margin: 0;
+  font-size: 3em;
 }
 
 .homeTitle p {
-	margin: 0;
-	font-size: 1.5em;
-	text-align: center;
+  margin: 0;
+  font-size: 1.5em;
+  text-align: center;
 }
 
 .homeBanner {
-	width: 100%;
+  width: 100%;
 }
 
 /* SECOND BLOCK */
 
 .homeContext > div {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 800px;
 }
 
 .homeContext h1 {
-	text-align: center;
-	font-size: 3em;
-	margin: 0;
-	margin-bottom: 16px;
+  text-align: center;
+  font-size: 3em;
+  margin: 0;
+  margin-bottom: 16px;
 }
 
 .homeContext h2 {
-	color: var(--blue-purple);
-	text-align: center;
-	font-size: 1.2em;
+  color: var(--blue-purple);
+  text-align: center;
+  font-size: 1.2em;
 }
 
 .homeContext p {
-	text-align: justify;
-	margin-bottom: 32px;
+  text-align: justify;
+  margin-bottom: 32px;
 }
 
 .homeContext a {
-	display: flex;
-	align-items: center;
-	color: var(--blue-purple);
+  display: flex;
+  align-items: center;
+  color: var(--blue-purple);
 }
 
 .homeContext a:hover {
-	text-decoration: underline;
+  text-decoration: underline;
 }
 
 .homeSchema {
-	margin-top: 64px;
-	margin-bottom: 16px;
+  margin-top: 64px;
+  margin-bottom: 16px;
 }
 
 /* THIRD BLOCK */
 
 .homeAuthentication {
-	display: flex;
-	justify-content: center;
-	margin-bottom: 64px;
-	gap: 32px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 64px;
+  gap: 32px;
 }
 
 /* FOURTH BLOCK */
 
 .homeStats {
-	padding: 56px;
-	background-color: var(--blue-purple);
-	color: var(--white);
+  padding: 56px;
+  background-color: var(--blue-purple);
+  color: var(--white);
 }
 
 .homeStats h1 {
-	margin: 0;
-	font-size: 2em;
-	color: var(--white);
+  margin: 0;
+  font-size: 2em;
+  color: var(--white);
 }
 
 .homeStats p {
-	margin: 0;
+  margin: 0;
 }
 
 .homeStats .homeStatsBlock {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .homeStats .homeStatsVolume {
-	font-size: 1.3em;
+  font-size: 1.3em;
 }
 
 .homeStats .homeStatsEntities {
-	display: flex;
-	width: 480px;
-	margin-top: 48px;
-	margin-bottom: 48px;
-	justify-content: space-evenly;
+  display: flex;
+  width: 480px;
+  margin-top: 48px;
+  margin-bottom: 48px;
+  justify-content: space-evenly;
 }
 
 .homeStats .homeStatsEntities .homeStatsBlock {
-	flex: 1;
+  flex: 1;
 }
 
 /* FIFTH BLOCK */
 
 .homeEntities {
-	margin: 0;
-	padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .homeEntities h1 {
-	margin: 0;
-	font-size: 3em;
-	text-align: center;
+  margin: 0;
+  font-size: 3em;
+  text-align: center;
 }
 
 .homeProducers,
 .homeOperators {
-	display: flex;
-	flex-wrap: wrap;
-	width: 100%;
-	padding: 48px;
-	justify-content: space-evenly;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  padding: 48px;
+  justify-content: space-evenly;
 }
 
 .homeOperators {
-	background-color: var(--blue-purple);
-	color: var(--white);
+  background-color: var(--blue-purple);
+  color: var(--white);
 }
 
 .homeOperators h2,
 h3 {
-	color: var(--white);
+  color: var(--white);
 }

@@ -1,64 +1,64 @@
 .checkbox {
-	display: flex;
-	align-items: center;
-	gap: var(--spacing-m);
-	cursor: pointer;
-	text-align: left;
-	white-space: pre-wrap;
-	/* white-space: nowrap; */
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-m);
+  cursor: pointer;
+  text-align: left;
+  white-space: pre-wrap;
+  /* white-space: nowrap; */
 }
 
 .checkbox:hover {
-	color: var(--blue-dark);
+  color: var(--blue-dark);
 }
 
 .checkbox[data-disabled] {
-	color: var(--gray-dark);
-	pointer-events: none;
-	user-select: none;
+  color: var(--gray-dark);
+  pointer-events: none;
+  user-select: none;
 }
 
 .checkbox:focus-within .square,
 .checkbox:active .square {
-	outline: 2px double;
-	outline-offset: 1px;
+  outline: 2px double;
+  outline-offset: 1px;
 }
 
 .square {
-	display: inline-flex;
-	flex-shrink: 0;
-	align-items: center;
-	justify-content: center;
-	justify-self: center;
-	width: 18px;
-	height: 18px;
-	border: 2px solid var(--gray-dark);
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--gray-dark);
 }
 
 .checkbox:hover .square {
-	border-color: var(--blue-dark);
+  border-color: var(--blue-dark);
 }
 
 .checkbox[data-checked] .square {
-	border-color: var(--blue-dark);
-	background-color: var(--blue-dark);
+  border-color: var(--blue-dark);
+  background-color: var(--blue-dark);
 }
 
 .checkbox[data-checked] .square [data-icon] {
-	color: var(--white);
+  color: var(--white);
 }
 
 .checkbox[data-checked][data-disabled] .square {
-	background-color: var(--gray-dark);
-	border-color: var(--gray-dark);
+  background-color: var(--gray-dark);
+  border-color: var(--gray-dark);
 }
 
 .opacity .checkbox[data-checked] {
-	opacity: 0.5;
+  opacity: 0.5;
 }
 
 .input {
-	position: absolute;
-	opacity: 0;
-	z-index: -1;
+  position: absolute;
+  opacity: 0;
+  z-index: -1;
 }
