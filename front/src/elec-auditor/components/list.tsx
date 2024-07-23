@@ -6,7 +6,6 @@ import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import * as api from "elec-auditor/api"
 import { ElecAuditorApplication, ElecAuditorApplicationsFilter, ElecAuditorApplicationsSnapshot, ElecAuditorApplicationsStatus } from "elec-auditor/types"
-import { useTranslation } from "react-i18next"
 import { To, useLocation, useMatch } from "react-router-dom"
 import ApplicationDetailsDialog from "./details"
 import ApplicationsFilters from "./list-filters"
@@ -25,7 +24,6 @@ const ElecApplicationList = ({ snapshot, year }: TransferListProps) => {
 
   const entity = useEntity()
   const status = useAutoStatus()
-  const { t } = useTranslation()
   const location = useLocation()
 
   const [state, actions] = useApplicationsQueryParamsStore(entity, year, status, snapshot)
@@ -46,8 +44,11 @@ const ElecApplicationList = ({ snapshot, year }: TransferListProps) => {
   }
 
   const auditApplicationsData = auditApplicationsResponse.result?.data.data
+  console.log('auditApplicationsData:', auditApplicationsData)
   const total = auditApplicationsData?.total ?? 0
+  console.log('total:', total)
   const count = auditApplicationsData?.returned ?? 0
+  console.log('count:', count)
   return (
     <>
 

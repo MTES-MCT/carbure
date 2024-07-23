@@ -8,12 +8,6 @@ from elec.models.elec_meter_reading_application import ElecMeterReadingApplicati
 from elec.services.create_meter_reading_excel import get_previous_readings_by_charge_point
 
 
-class ExcelMeterReadingError:
-    INVALID_METER_READING_DATA = "INVALID_METER_READING_DATA"
-    CHARGE_POINT_NOT_REGISTERED = "CHARGE_POINT_NOT_REGISTERED"
-    EXTRACTED_ENERGY_LOWER_THAN_BEFORE = "EXTRACTED_ENERGY_LOWER_THAN_BEFORE"
-
-
 def import_meter_reading_excel(
     excel_file: UploadedFile,
     existing_charge_points: Iterable[ElecChargePoint],
