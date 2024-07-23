@@ -342,7 +342,7 @@
   "Description de l'activité": "Activity description",
   "Site web (commençant par https://)": "Website (starting with https://)",
   "Numéro de TVA": "VAT number",
-  "Ce SIREN existe déjà dans notre base CarbuRe, sous le nom de {{companyName}}. Assurez-vous que cela soit bien votre entreprise avant de continuer et utilisez un nom différent.": "This SIREN is already registered in CarbuRe under the name {{companyName}}. Please ensure that this is indeed your company before proceeding and use a different name if necessary.",
+  "Ce SIREN est déjà utilisé par l'entité {{companyName}}. En poursuivant, vous allez enregistrer une nouvelle branche de cette société sur Carbure. Assurez-vous d'utiliser un nom différent.": "This SIREN is already used by the {{companyName}} entity. By continuing, you will register a new branch of this company on CarbuRe. Be sure to use a different name.",
   "Aucune entreprise n'a été trouvée avec ce numéro de SIREN": "No company found with this SIREN number",
   "SIREN de votre entreprise": "Company SIREN",
   "Notes de contrôle": "Control notes",
