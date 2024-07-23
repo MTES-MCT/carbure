@@ -20,107 +20,107 @@ import ParentLot from "../parent-lot"
 import { safTicketSourceDetails } from "saf/__test__/data"
 
 export interface TicketSourceDetailsProps {
-  neighbors?: number[]
+	neighbors?: number[]
 }
 
 export const TicketSourceDetails = ({
-  neighbors,
+	neighbors,
 }: TicketSourceDetailsProps) => {
-  const { t } = useTranslation()
+	const { t } = useTranslation()
 
-  const navigate = useNavigate()
-  const location = useLocation()
-  const notify = useNotify()
-  const entity = useEntity()
-  const match = useHashMatch("ticket-source/:id")
-  const portal = usePortal()
+	const navigate = useNavigate()
+	const location = useLocation()
+	const notify = useNotify()
+	const entity = useEntity()
+	const match = useHashMatch("ticket-source/:id")
+	const portal = usePortal()
 
-  const ticketSourceResponse = useQuery(api.getOperatorTicketSourceDetails, {
-    key: "ticket-source-details",
-    params: [entity.id, parseInt(match?.params.id!)],
-  })
+	const ticketSourceResponse = useQuery(api.getOperatorTicketSourceDetails, {
+		key: "ticket-source-details",
+		params: [entity.id, parseInt(match?.params.id || "")],
+	})
 
-  const ticketSource = ticketSourceResponse.result?.data?.data
-  // const ticketSource = safTicketSourceDetails //TO TEST
+	const ticketSource = ticketSourceResponse.result?.data?.data
+	// const ticketSource = safTicketSourceDetails //TO TEST
 
-  const hasAssignements = ticketSource
-    ? ticketSource?.assigned_tickets?.length > 0
-    : false
+	const hasAssignements = ticketSource
+		? ticketSource?.assigned_tickets?.length > 0
+		: false
 
-  const { refToScroll } = useScrollToRef(hasAssignements)
+	const { refToScroll } = useScrollToRef(hasAssignements)
 
-  const closeDialog = () => {
-    navigate({ search: location.search, hash: "#" })
-  }
+	const closeDialog = () => {
+		navigate({ search: location.search, hash: "#" })
+	}
 
-  const handleTicketAssigned = (volume: number, clientName: string) => {
-    notify(
-      t("{{volume}} litres ont bien été affectés à {{clientName}}.", {
-        volume,
-        clientName,
-      }),
-      { variant: "success" }
-    )
-  }
+	const handleTicketAssigned = (volume: number, clientName: string) => {
+		notify(
+			t("{{volume}} litres ont bien été affectés à {{clientName}}.", {
+				volume,
+				clientName,
+			}),
+			{ variant: "success" }
+		)
+	}
 
-  const showAssignement = () => {
-    portal((close) => (
-      <TicketAssignment
-        ticketSource={ticketSource!}
-        onClose={close}
-        onTicketAssigned={handleTicketAssigned}
-      />
-    ))
-  }
+	const showAssignement = () => {
+		portal((close) => (
+			<TicketAssignment
+				ticketSource={ticketSource!}
+				onClose={close}
+				onTicketAssigned={handleTicketAssigned}
+			/>
+		))
+	}
 
-  return (
-    <Portal onClose={closeDialog}>
-      <Dialog onClose={closeDialog}>
-        <header>
-          <TicketSourceTag big ticketSource={ticketSource} />
-          <h1>
-            {t("Volume CAD n°")}
-            {ticketSource?.carbure_id ?? "..."}
-          </h1>
-        </header>
+	return (
+		<Portal onClose={closeDialog}>
+			<Dialog onClose={closeDialog}>
+				<header>
+					<TicketSourceTag big ticketSource={ticketSource} />
+					<h1>
+						{t("Volume CAD n°")}
+						{ticketSource?.carbure_id ?? "..."}
+					</h1>
+				</header>
 
-        <main>
-          <section>
-            <TicketSourceFields ticketSource={ticketSource} />
-          </section>
-          {hasAssignements && (
-            <section ref={refToScroll}>
-              <AssignedTickets ticketSource={ticketSource} />
-            </section>
-          )}
-          <section>
-            <ParentLot parent_lot={ticketSource?.parent_lot} />
-          </section>
-        </main>
+				<main>
+					<section>
+						<TicketSourceFields ticketSource={ticketSource} />
+					</section>
+					{hasAssignements && (
+						<section ref={refToScroll}>
+							<AssignedTickets ticketSource={ticketSource} />
+						</section>
+					)}
+					<section>
+						<ParentLot parent_lot={ticketSource?.parent_lot} />
+					</section>
+				</main>
 
-        <footer>
-          <Button
-            icon={Send}
-            label={t("Affecter")}
-            variant="primary"
-            disabled={
-              !ticketSource ||
-              ticketSource.assigned_volume === ticketSource.total_volume
-            }
-            action={showAssignement}
-          />
-          {neighbors && (
-            <NavigationButtons
-              neighbors={neighbors}
-              closeAction={closeDialog}
-            />
-          )}
-        </footer>
+				<footer>
+					<Button
+						icon={Send}
+						label={t("Affecter")}
+						variant="primary"
+						disabled={
+							!ticketSource ||
+							ticketSource.assigned_volume === ticketSource.total_volume
+						}
+						action={showAssignement}
+					/>
+					{neighbors && (
+						<NavigationButtons
+							neighbors={neighbors}
+							closeAction={closeDialog}
+						/>
+					)}
+				</footer>
 
-        {ticketSourceResponse.loading && <LoaderOverlay />}
-      </Dialog>
-    </Portal>
-  )
+				{ticketSourceResponse.loading && <LoaderOverlay />}
+			</Dialog>
+		</Portal>
+	)
 }
 
 export default TicketSourceDetails
