@@ -361,7 +361,7 @@
   "Description de l'activité": "Description de l'activité",
   "Site web (commençant par https://)": "Site web (commençant par https://)",
   "Numéro de TVA": "Numéro de TVA",
-  "Ce SIREN existe déjà dans notre base CarbuRe, sous le nom de {{companyName}}. Assurez-vous que cela soit bien votre entreprise avant de continuer et utilisez un nom différent.": "Ce SIREN existe déjà dans notre base CarbuRe, sous le nom de {{companyName}}. Assurez-vous que cela soit bien votre entreprise avant de continuer et utilisez un nom différent.",
+  "Ce SIREN est déjà utilisé par l'entité {{companyName}}. En poursuivant, vous allez enregistrer une nouvelle branche de cette société sur Carbure. Assurez-vous d'utiliser un nom différent.": "Ce SIREN est déjà utilisé par l'entité {{companyName}}. En poursuivant, vous allez enregistrer une nouvelle branche de cette société sur Carbure. Assurez-vous d'utiliser un nom différent.",
   "Aucune entreprise n'a été trouvée avec ce numéro de SIREN": "Aucune entreprise n'a été trouvée avec ce numéro de SIREN",
   "SIREN de votre entreprise": "SIREN de votre entreprise",
   "Notes de contrôle": "Notes de contrôle",
