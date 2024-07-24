@@ -1,12 +1,13 @@
 import Button from "common/components/button"
 import Dialog from "common/components/dialog"
 import { Edit, Return } from "common/components/icons"
-import { PortalInstance } from "common/components/portal"
+import { PortalInstance, useCloseAllPortals } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import { DeliverySiteForm, DeliverySiteFormType } from "./delivery-site-form"
 import * as api from "../../api/delivery-sites"
 import { useNotify } from "common/components/notifications"
+import useEntity from "carbure/hooks/entity"
 
 type NewDeliverySiteDialogProps = {
   onClose: PortalInstance["close"]
@@ -17,11 +18,19 @@ export const NewDeliverySiteDialog = ({
 }: NewDeliverySiteDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
-  const addDeliverySite = useMutation(api.addDeliverySite, {
+  const entity = useEntity()
+  const closeAll = useCloseAllPortals()
+  const createNewDeliverySite = useMutation(api.createNewDeliverySite, {
     onSuccess: () => {
-      notify(t("Votre demande d'ajout de dépôt a bien été prise en compte !"), {
-        variant: "success",
-      })
+      closeAll()
+      notify(
+        t(
+          "Votre demande d'ajout de dépôt a bien été prise en compte ! Vous serez notifié lorsque celle-ci aura été traitée."
+        ),
+        {
+          variant: "success",
+        }
+      )
     },
     onError: () => {
       notify(t("Une erreur est survenue lors de l'ajout de votre dépôt."), {
@@ -31,7 +40,19 @@ export const NewDeliverySiteDialog = ({
   })
 
   const handleSubmit = (values: DeliverySiteFormType) => {
-    // addDeliverySite.execute()
+    createNewDeliverySite.execute(
+      entity.id,
+      values.name!,
+      values.city!,
+      values.country!,
+      values.depot_id!,
+      values.depot_type!,
+      values.address!,
+      values.postal_code!,
+      values.ownership_type!,
+      values.blending_outsourced,
+      values.blending_entity
+    )
   }
 
   return (
@@ -54,7 +75,7 @@ export const NewDeliverySiteDialog = ({
       <footer>
         <Button
           variant="primary"
-          loading={addDeliverySite.loading}
+          loading={createNewDeliverySite.loading}
           icon={Edit}
           label={t("Valider")}
           submit="new-delivery-site"
