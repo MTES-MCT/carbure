@@ -4,17 +4,15 @@ import {
   EntityType,
   UserRole,
   Depot,
-  DepotType,
   EntityDepot,
   OwnershipType,
 } from "carbure/types"
 import * as common from "carbure/api"
-import * as api from "../api/delivery-sites"
-import { Row, LoaderOverlay } from "common/components/scaffold"
-import { TextInput } from "common/components/input"
+import * as api from "../../api/delivery-sites"
+import { LoaderOverlay } from "common/components/scaffold"
 import Checkbox from "common/components/checkbox"
-import Button, { MailTo } from "common/components/button"
-import { AlertCircle, Cross, Plus, Return } from "common/components/icons"
+import Button from "common/components/button"
+import { AlertCircle, Cross, Plus } from "common/components/icons"
 import { Alert } from "common/components/alert"
 import Table, { actionColumn, Cell } from "common/components/table"
 import { Confirm, Dialog } from "common/components/dialog"
@@ -28,7 +26,9 @@ import { compact } from "common/utils/collection"
 import { useMutation, useQuery } from "common/hooks/async"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
-import { formatNumber, formatPercentage } from "common/utils/formatters"
+import { NewDeliverySiteDialog } from "./new-delivery-site-dialog"
+import { DeliverySiteDialog } from "./delivery-site-dialog"
+import { depotTypeLabels } from "./delivery-site.const"
 
 interface DeliverySiteSettingsProps {
   readOnly?: boolean
@@ -54,17 +54,6 @@ const DeliverySitesSettings = ({
   const isEmpty = deliverySitesData.length === 0
 
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
-
-  const depotTypeLabels = {
-    [DepotType.EFS]: t("EFS"),
-    [DepotType.EFPE]: t("EFPE"),
-    [DepotType.Other]: t("Autre"),
-    [DepotType.BiofuelDepot]: t("Biofuel Depot"),
-    [DepotType.OilDepot]: t("Oil Depot"),
-    [DepotType.PowerPlant]: t("Centrale électrique"),
-    [DepotType.HeatPlant]: t("Centrale de chaleur"),
-    [DepotType.CogenerationPlant]: t("Centrale de cogénération"),
-  }
 
   function findDeliverySite() {
     portal((close) => <DeliverySiteFinderDialog onClose={close} />)
@@ -156,192 +145,6 @@ const DeliverySitesSettings = ({
   )
 }
 
-type DeliverySiteDialogProps = {
-  deliverySite: EntityDepot
-  onClose: () => void
-}
-
-export const DeliverySiteDialog = ({
-  deliverySite,
-  onClose,
-}: DeliverySiteDialogProps) => {
-  const { t } = useTranslation()
-
-  const form = {
-    name: deliverySite?.depot?.name ?? "",
-    city: deliverySite?.depot?.city ?? "",
-    country: deliverySite?.depot?.country ?? null,
-    depot_id: deliverySite?.depot?.depot_id ?? "",
-    depot_type: deliverySite?.depot?.depot_type ?? DepotType.Other,
-    address: deliverySite?.depot?.address ?? "",
-    postal_code: deliverySite?.depot?.postal_code ?? "",
-    ownership_type: deliverySite?.ownership_type ?? OwnershipType.Own,
-    blending_is_outsourced: deliverySite?.blending_is_outsourced ?? false,
-    blender: deliverySite?.blender?.name ?? "",
-  }
-
-  const depotTypes = [
-    { value: DepotType.EFS, label: t("EFS") },
-    { value: DepotType.EFPE, label: t("EFPE") },
-    { value: DepotType.Other, label: t("Autre") },
-    { value: DepotType.BiofuelDepot, label: t("Biofuel Depot") },
-    { value: DepotType.OilDepot, label: t("Oil Depot") },
-    { value: DepotType.PowerPlant, label: t("Centrale électrique") },
-    { value: DepotType.HeatPlant, label: t("Centrale de chaleur") },
-    { value: DepotType.CogenerationPlant, label: t("Centrale de cogénération") }, // prettier-ignore
-  ]
-
-  const ownerShipTypes = [
-    { value: OwnershipType.Own, label: t("Propre") },
-    { value: OwnershipType.ThirdParty, label: t("Tiers") },
-    { value: OwnershipType.Processing, label: t("Processing") },
-  ]
-
-  const depotType = deliverySite.depot?.depot_type ?? DepotType.Other
-  const isPowerOrHeatPlant = [DepotType.PowerPlant, DepotType.HeatPlant, DepotType.CogenerationPlant].includes(depotType) // prettier-ignore
-
-  const electricalEfficiency = deliverySite.depot?.electrical_efficiency
-  const thermalEfficiency = deliverySite.depot?.thermal_efficiency
-  const usefulTemperature = deliverySite.depot?.useful_temperature
-
-  return (
-    <Dialog onClose={onClose}>
-      <header>
-        <h1>{t("Détails du dépôt")}</h1>
-      </header>
-
-      <main>
-        <section>
-          <Form>
-            <RadioGroup
-              disabled
-              label={t("Propriété")}
-              value={form.ownership_type}
-              name="ownership_type"
-              options={ownerShipTypes}
-            />
-
-            <hr />
-
-            <Checkbox
-              disabled
-              label={t("L'incorporation est effectuée par un tiers")}
-              name="blending_is_outsourced"
-              value={form.blending_is_outsourced}
-            />
-            {form.blending_is_outsourced && (
-              <TextInput
-                readOnly
-                label={t("Incorporateur")}
-                name="blender"
-                value={form.blender}
-              />
-            )}
-
-            <hr />
-
-            <TextInput
-              readOnly
-              label={t("Nom du site")}
-              name="name"
-              value={form.name}
-            />
-            <TextInput
-              readOnly
-              label={t("ID de douane")}
-              name="depot_id"
-              value={form.depot_id}
-            />
-
-            <hr />
-
-            <RadioGroup
-              disabled
-              label={t("Type de dépôt")}
-              value={form.depot_type}
-              name="depot_type"
-              options={depotTypes}
-            />
-
-            <hr />
-
-            <TextInput
-              readOnly
-              label={t("Adresse")}
-              name="address"
-              value={form.address}
-            />
-
-            <Row style={{ gap: "var(--spacing-s)" }}>
-              <TextInput
-                readOnly
-                label={t("Ville")}
-                name="city"
-                value={form.city}
-              />
-              <TextInput
-                readOnly
-                label={t("Code postal")}
-                name="postal_code"
-                value={form.postal_code}
-              />
-            </Row>
-
-            <TextInput
-              readOnly
-              label={t("Pays")}
-              placeholder={t("Rechercher un pays...")}
-              name="country"
-              value={
-                form.country
-                  ? (t(form.country.code_pays, { ns: "countries" }) as string)
-                  : ""
-              }
-            />
-          </Form>
-        </section>
-
-        {isPowerOrHeatPlant && (
-          <>
-            <hr />
-            <section>
-              {electricalEfficiency && (
-                <TextInput
-                  readOnly
-                  label={t("Rendement électrique")}
-                  value={formatPercentage(electricalEfficiency * 100)}
-                />
-              )}
-              {thermalEfficiency && (
-                <TextInput
-                  readOnly
-                  label={t("Rendement thermique")}
-                  value={formatPercentage(thermalEfficiency * 100)}
-                />
-              )}
-              {usefulTemperature && (
-                <TextInput
-                  readOnly
-                  label={t("Température utile")}
-                  value={formatNumber(usefulTemperature) + "˚C"}
-                />
-              )}
-            </section>
-          </>
-        )}
-
-        <section></section>
-      </main>
-
-      <footer>
-        <Button asideX icon={Return} action={onClose}>
-          <Trans>Retour</Trans>
-        </Button>
-      </footer>
-    </Dialog>
-  )
-}
-
 type DeliverySiteFinderDialogProps = {
   onClose: () => void
 }
@@ -352,6 +155,7 @@ export const DeliverySiteFinderDialog = ({
   const { t } = useTranslation()
   const entity = useEntity()
   const notify = useNotify()
+  const portal = usePortal()
 
   const addDeliverySite = useMutation(api.addDeliverySite, {
     invalidates: ["delivery-sites"],
@@ -391,10 +195,14 @@ export const DeliverySiteFinderDialog = ({
     )
   }
 
+  const openNewDeliverySiteDialog = () => {
+    portal((close) => <NewDeliverySiteDialog onClose={close} />)
+  }
+
   return (
     <Dialog onClose={onClose}>
       <header>
-        <h1>{t("Ajouter dépôt")}</h1>
+        <h1>{t("Ajouter un dépôt")}</h1>
       </header>
 
       <main>
@@ -435,11 +243,11 @@ export const DeliverySiteFinderDialog = ({
               />
             )}
 
-            <MailTo user="carbure" host="beta.gouv.fr">
+            <Button variant="link" action={openNewDeliverySiteDialog}>
               <Trans>
                 Le dépôt que je recherche n'est pas enregistré sur CarbuRe.
               </Trans>
-            </MailTo>
+            </Button>
           </Form>
         </section>
       </main>

@@ -1128,7 +1128,6 @@
   "Température utile": "Température utile",
   "Le dépôt a bien été ajouté !": "Le dépôt a bien été ajouté !",
   "Impossible d'ajouter le dépôt.": "Impossible d'ajouter le dépôt.",
-  "Ajouter dépôt": "Ajouter dépôt",
   "Veuillez rechercher un dépôt que vous utilisez.": "Veuillez rechercher un dépôt que vous utilisez.",
   "Dépôt à ajouter": "Dépôt à ajouter",
   "Rechercher un dépôt...": "Rechercher un dépôt...",
@@ -1556,5 +1555,9 @@
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_one": "<b>{{count}} lot</b> doit être déclaré avant le <b>{{date}}</b>",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_many": "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_other": "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>",
-  "Brouillon_plural": "Brouillons"
+  "Brouillon_plural": "Brouillons",
+  "Veuillez remplir les informations suivantes :": "Veuillez remplir les informations suivantes :",
+  "Soumettre l'ajout": "Soumettre l'ajout",
+  "Votre demande d'ajout de dépôt a bien été prise en compte !": "Votre demande d'ajout de dépôt a bien été prise en compte !",
+  "Une erreur est survenue lors de l'ajout de votre dépôt.": "Une erreur est survenue lors de l'ajout de votre dépôt."
 }
