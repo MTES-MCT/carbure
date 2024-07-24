@@ -1,4 +1,8 @@
-Bonjour {{ user.name }},
+Bonjour{% if not invitation %} {{ user.name }}{% endif %},
+
+{% if invitation %}
+Vous avez été invité à rejoindre CarbuRe au sein de l'entité {{ entity_name }}.</p>
+{% endif %}
 
 Veuillez cliquer sur le lien suivant pour confirmer votre inscription sur CarbuRe :
 
