@@ -1,21 +1,25 @@
+import { useTranslation } from "react-i18next"
 import { findCountries } from "carbure/api"
 import useEntity from "carbure/hooks/entity"
 import {
   Depot,
   DepotType,
+  Entity,
   EntityDepot,
   EntityType,
   OwnershipType,
 } from "carbure/types"
-import { normalizeCountry } from "carbure/utils/normalizers"
+import { findOperators } from "carbure/api"
+import { normalizeCountry, normalizeEntity } from "carbure/utils/normalizers"
 import Autocomplete from "common/components/autocomplete"
 import Checkbox from "common/components/checkbox"
 import Form, { useForm } from "common/components/form"
 import { TextInput } from "common/components/input"
 import { RadioGroup } from "common/components/radio"
 import { Row } from "common/components/scaffold"
-import { useTranslation } from "react-i18next"
+import AutoComplete from "common/components/autocomplete"
 import { depotTypeOptions, ownerShipTypeOptions } from "./delivery-site.const"
+import { AutoCompleteOperators } from "carbure/components/autocomplete-operators"
 
 type DeliverySiteFormProps = {
   deliverySite?: EntityDepot
@@ -39,8 +43,8 @@ export type DeliverySiteFormType = Partial<
   > &
     Pick<EntityDepot, "ownership_type">
 > & {
-  blender?: string
-  blending_is_outsourced: boolean
+  blending_entity?: Entity | undefined
+  blending_outsourced: boolean
 }
 
 const mapDeliverySiteToForm: (
@@ -54,8 +58,8 @@ const mapDeliverySiteToForm: (
   address: deliverySite?.depot?.address ?? "",
   postal_code: deliverySite?.depot?.postal_code ?? "",
   ownership_type: deliverySite?.ownership_type ?? OwnershipType.Own,
-  blending_is_outsourced: deliverySite?.blending_is_outsourced ?? false,
-  blender: deliverySite?.blender?.name ?? "",
+  blending_outsourced: deliverySite?.blending_is_outsourced ?? false,
+  blending_entity: deliverySite?.blender ?? undefined,
 })
 
 export const DeliverySiteForm = ({
@@ -118,16 +122,16 @@ export const DeliverySiteForm = ({
         <>
           <Checkbox
             label={t("L'incorporation est effectuée par un tiers")}
-            {...bind("blending_is_outsourced")}
+            {...bind("blending_outsourced")}
             disabled={isReadOnly}
           />
 
-          {value.blending_is_outsourced && (
-            <TextInput
+          {value.blending_outsourced && (
+            <AutoCompleteOperators
+              label={t("Incorporateur Tiers")}
               readOnly={isReadOnly}
-              label={t("Incorporateur")}
-              {...bind("blender")}
               required
+              {...bind("blending_entity")}
             />
           )}
         </>

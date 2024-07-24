@@ -1470,6 +1470,6 @@
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_other": "<b>{{count}} batches</b> must be declared before <b>{{date}}</b>",
   "Brouillon_plural": "Drafts",
   "Veuillez remplir les informations suivantes :": "Please complete the following information:",
-  "Votre demande d'ajout de dépôt a bien été prise en compte !": "Your depot request has been successfully received!",
+  "Votre demande d'ajout de dépôt a bien été prise en compte ! Vous serez notifié lorsque celle-ci aura été traitée.": "Your depot request has been successfully received! You will be notified when your request has been processed.",
   "Une erreur est survenue lors de l'ajout de votre dépôt.": "An error occurred while adding your depot."
 }

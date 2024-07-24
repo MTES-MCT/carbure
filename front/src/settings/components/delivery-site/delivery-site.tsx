@@ -21,14 +21,15 @@ import { RadioGroup } from "common/components/radio"
 import { Form, useForm } from "common/components/form"
 import useEntity, { useRights } from "carbure/hooks/entity"
 import { Panel } from "common/components/scaffold"
-import { normalizeDepot, normalizeEntity } from "carbure/utils/normalizers"
+import { normalizeDepot } from "carbure/utils/normalizers"
 import { compact } from "common/utils/collection"
 import { useMutation, useQuery } from "common/hooks/async"
 import { useNotify } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { NewDeliverySiteDialog } from "./new-delivery-site-dialog"
 import { DeliverySiteDialog } from "./delivery-site-dialog"
-import { depotTypeLabels } from "./delivery-site.const"
+import { depotTypeLabels, ownerShipTypeOptions } from "./delivery-site.const"
+import { AutoCompleteOperators } from "carbure/components/autocomplete-operators"
 
 interface DeliverySiteSettingsProps {
   readOnly?: boolean
@@ -177,12 +178,6 @@ export const DeliverySiteFinderDialog = ({
     blender: undefined as Entity | undefined,
   })
 
-  const ownerShipTypes = [
-    { value: OwnershipType.Own, label: "Propre" },
-    { value: OwnershipType.ThirdParty, label: "Tiers" },
-    { value: OwnershipType.Processing, label: "Processing" },
-  ]
-
   async function submitDepot() {
     if (!value.depot) return
 
@@ -223,7 +218,7 @@ export const DeliverySiteFinderDialog = ({
 
             <RadioGroup
               label={t("Propriété")}
-              options={ownerShipTypes}
+              options={ownerShipTypeOptions}
               {...bind("ownership_type")}
             />
 
@@ -234,11 +229,9 @@ export const DeliverySiteFinderDialog = ({
               />
             )}
             {value.blending_is_outsourced && (
-              <AutoComplete
+              <AutoCompleteOperators
                 label={t("Incorporateur Tiers")}
                 placeholder={t("Rechercher un opérateur pétrolier...")}
-                getOptions={common.findOperators}
-                normalize={normalizeEntity}
                 {...bind("blender")}
               />
             )}

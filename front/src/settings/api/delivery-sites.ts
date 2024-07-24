@@ -37,7 +37,7 @@ export function createNewDeliverySite(
   name: string,
   city: string,
   country: Country,
-  depot_id: number,
+  depot_id: string,
   depot_type: DepotType,
   address: string,
   postal_code: string,
@@ -48,22 +48,23 @@ export function createNewDeliverySite(
   thermal_efficiency?: number,
   useful_temperature?: number
 ) {
-  api.post("/entity/depots/create", {
-    entity_id,
-    ownership_type,
-    blending_outsourced,
-    blending_entity_id: blending_entity?.id,
-    name,
-    city,
-    country_id: country.code_pays,
-    delivery_site_id: depot_id,
-    delivery_site_type: depot_type,
-    address,
-    postal_code,
-    electrical_efficiency,
-    thermal_efficiency,
-    useful_temperature,
-  })
+  // return api.post("/entity/depots/create", {
+  //   entity_id,
+  //   ownership_type,
+  //   blending_outsourced,
+  //   blending_entity_id: blending_entity?.id,
+  //   name,
+  //   city,
+  //   country_id: country.code_pays,
+  //   delivery_site_id: depot_id,
+  //   delivery_site_type: depot_type,
+  //   address,
+  //   postal_code,
+  //   electrical_efficiency,
+  //   thermal_efficiency,
+  //   useful_temperature,
+  // })
+  return Promise.resolve(true)
 }
 
 export function deleteDeliverySite(
