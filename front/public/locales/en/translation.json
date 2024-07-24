@@ -1053,7 +1053,6 @@
   "Température utile": "Température utile",
   "Le dépôt a bien été ajouté !": "The depot has been added!",
   "Impossible d'ajouter le dépôt.": "Unable to add depot.",
-  "Ajouter dépôt": "Add depot",
   "Veuillez rechercher un dépôt que vous utilisez.": "Please look for a depot you are using.",
   "Dépôt à ajouter": "Depot to add",
   "Rechercher un dépôt...": "Search depots...",
@@ -1469,5 +1468,8 @@
   "<b>{{count}} lots</b> présentent des <b>incohérences</b>_other": "<b>{{count}} batches</b> show <b>anomalies</b>",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_one": "<b>{{count}} batch</b> must be declared before <b>{{date}}</b>",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_other": "<b>{{count}} batches</b> must be declared before <b>{{date}}</b>",
-  "Brouillon_plural": "Drafts"
+  "Brouillon_plural": "Drafts",
+  "Veuillez remplir les informations suivantes :": "Please complete the following information:",
+  "Votre demande d'ajout de dépôt a bien été prise en compte !": "Your depot request has been successfully received!",
+  "Une erreur est survenue lors de l'ajout de votre dépôt.": "An error occurred while adding your depot."
 }
