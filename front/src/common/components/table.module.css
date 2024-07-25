@@ -5,7 +5,7 @@
   flex-direction: column;
 }
 
-h2+.table[data-headless] {
+h2 + .table[data-headless] {
   margin-top: calc(-1 * var(--spacing-s));
 }
 
@@ -33,7 +33,6 @@ h2+.table[data-headless] {
   cursor: pointer;
 }
 
-
 .sortable {
   color: var(--gray-medium);
 }
@@ -51,45 +50,45 @@ h2+.table[data-headless] {
   gap: var(--spacing-xs);
 }
 
-.rows>li {
+.rows > li {
   position: relative;
 }
 
-.rows>li:not(.rowLink) {
+.rows > li:not(.rowLink) {
   padding: 0 var(--spacing-l);
 }
 
-.rows>li>a {
+.rows > li > a {
   flex: 1;
   min-width: 0;
   padding: 0 var(--spacing-l);
 }
 
-.rows>li,
-.rows>li>a {
+.rows > li,
+.rows > li > a {
   display: flex;
   align-items: center;
   gap: var(--spacing-m);
 }
 
-.compact .rows>li {
+.compact .rows > li {
   padding: 0 var(--spacing-xs);
   gap: var(--spacing-xs);
 }
 
-.rows>li[data-interactive] {
+.rows > li[data-interactive] {
   cursor: pointer;
 }
 
-.rows>li:nth-child(odd) {
+.rows > li:nth-child(odd) {
   background-color: var(--gray-light);
 }
 
-.rows>li:nth-child(even) {
+.rows > li:nth-child(even) {
   background-color: var(--white);
 }
 
-.rows>li:hover {
+.rows > li:hover {
   background-color: var(--gray-highlight);
 }
 
@@ -131,15 +130,15 @@ h2+.table[data-headless] {
 }
 
 .header,
-.cell .multiline>*,
-.cell .multiline div>* {
+.cell .multiline > *,
+.cell .multiline div > * {
   display: block;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
 }
 
-.cell .multiline strong>svg {
+.cell .multiline strong > svg {
   margin-bottom: -5px;
 }
 
@@ -175,7 +174,7 @@ h2+.table[data-headless] {
   overflow: hidden;
 }
 
-.marker>* {
+.marker > * {
   width: var(--spacing-xs);
   height: 100%;
 }

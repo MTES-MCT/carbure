@@ -1,0 +1,41 @@
+{
+	"env": {
+		"browser": true,
+		"es2021": true,
+		"node": true
+	},
+	"parser": "@typescript-eslint/parser",
+	"parserOptions": {
+		"ecmaFeatures": {
+			"jsx": true
+		},
+		"ecmaVersion": 12,
+		"sourceType": "module"
+	},
+	"extends": [
+		"eslint:recommended",
+		"plugin:react-hooks/recommended",
+		"plugin:@typescript-eslint/recommended",
+		"plugin:prettier/recommended",
+		"prettier"
+	],
+	"plugins": ["react", "react-hooks", "@typescript-eslint", "prettier"],
+	"settings": {
+		"react": {
+			"version": "detect"
+		}
+	},
+	"overrides": [
+		{
+			"files": ["src/**/*.{js,jsx,ts,tsx}"],
+			"rules": {
+				"react/display-name": "off",
+				"@typescript-eslint/ban-ts-comment": [
+					"error",
+					{"ts-ignore": "allow-with-description"}
+				],
+				"prettier/prettier": "error"
+			}
+		}
+	]
+}

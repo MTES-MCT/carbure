@@ -35,7 +35,7 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
 
   const stock = useQuery(api.getStockDetails, {
     key: "control-stock-details",
-    params: [entity.id, parseInt(match?.params.id!)],
+    params: [entity.id, parseInt(match?.params.id || "")],
   })
 
   const stockData = stock.result?.data.data

@@ -7,16 +7,18 @@ import userEvent from "@testing-library/user-event"
 import { cpo } from "carbure/__test__/data"
 import ElecMeterReadingsSettings from "elec/components/meter-readings/settings"
 import server from "../../settings/__test__/api"
-import { okMeterReadingsApplicationsEmpty, okMeterReadingsApplicationsUrgencyCritical, okMeterReadingsCheckError } from "./api"
+import {
+  okMeterReadingsApplicationsEmpty,
+  okMeterReadingsApplicationsUrgencyCritical,
+  okMeterReadingsCheckError,
+} from "./api"
 
 const SettingsWithHooks = () => {
   return (
     <TestRoot url={`/org/${cpo.id}/settings`}>
       <Route
         path={`/org/${cpo.id}/settings`}
-        element={
-          <ElecMeterReadingsSettings companyId={cpo.id} />
-        }
+        element={<ElecMeterReadingsSettings companyId={cpo.id} />}
       />
     </TestRoot>
   )
@@ -24,20 +26,22 @@ const SettingsWithHooks = () => {
 
 beforeAll(() => {
   server.listen({ onUnhandledRequest: "warn" })
-
 })
 
 beforeEach(() => {
   setEntity(cpo)
 })
-afterEach(() => { server.resetHandlers() })
+afterEach(() => {
+  server.resetHandlers()
+})
 
 afterAll(() => server.close())
 const openModal = async () => {
   const user = userEvent.setup()
-  const sendButton = await screen.findByText("Transmettre mes relevés trimestriels T1 2024")
+  const sendButton = await screen.findByText(
+    "Transmettre mes relevés trimestriels T1 2024"
+  )
   return user.click(sendButton)
-
 }
 
 test("check the metter-readings section of the settings", async () => {
@@ -47,23 +51,21 @@ test("check the metter-readings section of the settings", async () => {
   screen.getByText("Transmettre mes relevés trimestriels T1 2024")
 })
 
-
 const uploadMeterReadingsFile = async () => {
   const user = userEvent.setup()
 
-  const uploadButton = await screen.findByText("Vérifier le fichier");
-  expect(uploadButton).toBeDisabled();
+  const uploadButton = await screen.findByText("Vérifier le fichier")
+  expect(uploadButton).toBeDisabled()
   //Upload file
-  const fileInput = screen.getByLabelText(/Choisir un fichier/i);
-  const file = new File(['(contents)'], 'example.xlsx', { type: 'text/plain' });
-  fireEvent.change(fileInput, { target: { files: [file] } });
-  expect(uploadButton).not.toBeDisabled();
+  const fileInput = screen.getByLabelText(/Choisir un fichier/i)
+  const file = new File(["(contents)"], "example.xlsx", { type: "text/plain" })
+  fireEvent.change(fileInput, { target: { files: [file] } })
+  expect(uploadButton).not.toBeDisabled()
 
   await user.click(uploadButton)
 
   return waitWhileLoading()
 }
-
 
 test("check the applications list", async () => {
   render(<SettingsWithHooks />)
@@ -74,13 +76,10 @@ test("check the applications list", async () => {
   screen.getByText("Accepté")
   screen.getByText("Refusé")
 
-
   screen.getByText("Période")
   screen.getByText("Points de recharge")
   screen.getByText("kwh renouvelables")
 })
-
-
 
 test("check the applications list empty", async () => {
   server.use(okMeterReadingsApplicationsEmpty)
@@ -109,9 +108,10 @@ test("upload dialog opened with urgency critical", async () => {
   render(<SettingsWithHooks />)
   await waitWhileLoading()
   await openModal()
-  screen.getByText("Le délai de déclaration a été dépassé, l'administration se réserve le droit de la refuser.")
+  screen.getByText(
+    "Le délai de déclaration a été dépassé, l'administration se réserve le droit de la refuser."
+  )
 })
-
 
 test("upload valid file", async () => {
   const user = userEvent.setup()
@@ -123,13 +123,13 @@ test("upload valid file", async () => {
 
   //send inscription
   screen.getByText("Valide")
-  const validationButton = await screen.findByText("Transmettre mes relevés trimestriels", { selector: "footer button" });
+  const validationButton = await screen.findByText(
+    "Transmettre mes relevés trimestriels",
+    { selector: "footer button" }
+  )
   await user.click(validationButton)
   return waitWhileLoading()
-
 })
-
-
 
 test("upload file with error", async () => {
   const user = userEvent.setup()

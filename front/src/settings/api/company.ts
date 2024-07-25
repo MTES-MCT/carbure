@@ -42,9 +42,8 @@ export function updateEntity(
   sustainability_officer_phone_number: string,
   sustainability_officer: string,
   website: string,
-  vat_number: string,
+  vat_number: string
 ) {
-
   return api.post("/entity/update-info", {
     entity_id,
     activity_description,
@@ -58,12 +57,9 @@ export function updateEntity(
     sustainability_officer_phone_number,
     sustainability_officer,
     website,
-    vat_number
+    vat_number,
   })
 }
-
-
-
 
 export function setEntityPreferredUnit(entity_id: number, unit: Unit) {
   return api.post("/entity/options/unit", { entity_id, unit })

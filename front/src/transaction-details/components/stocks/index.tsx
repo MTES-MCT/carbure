@@ -33,7 +33,7 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
 
   const stock = useQuery(api.getStockDetails, {
     key: "stock-details",
-    params: [entity.id, parseInt(match?.params.id!)],
+    params: [entity.id, parseInt(match?.params.id || "")],
   })
 
   const hasEditRights = entity.hasRights(UserRole.Admin, UserRole.ReadWrite)
@@ -69,15 +69,17 @@ export const StockDetails = ({ neighbors }: StockDetailsProps) => {
         </main>
 
         <footer>
-          {hasEditRights && stockData && stockData.stock.remaining_volume > 0 && (
-            <>
-              <SplitOneButton stock={stockData.stock} />
-              {percentLeft <= 5 && <FlushOneButton stock={stockData.stock} />}
-              {stockData.parent_transformation && (
-                <CancelOneTransformButton stock={stockData.stock} />
-              )}
-            </>
-          )}
+          {hasEditRights &&
+            stockData &&
+            stockData.stock.remaining_volume > 0 && (
+              <>
+                <SplitOneButton stock={stockData.stock} />
+                {percentLeft <= 5 && <FlushOneButton stock={stockData.stock} />}
+                {stockData.parent_transformation && (
+                  <CancelOneTransformButton stock={stockData.stock} />
+                )}
+              </>
+            )}
           <NavigationButtons neighbors={neighbors} closeAction={closeDialog} />
         </footer>
 

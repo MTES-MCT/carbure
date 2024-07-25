@@ -31,9 +31,27 @@ export const ValidDetailsDialog = ({
 
   function showProductionSiteDialog() {
     if (isProducerMatch) {
-      portal((close) => <SendApplicationProducerDialog fileData={fileData} onClose={() => { close(); onClose() }} file={file} />)
+      portal((close) => (
+        <SendApplicationProducerDialog
+          fileData={fileData}
+          onClose={() => {
+            close()
+            onClose()
+          }}
+          file={file}
+        />
+      ))
     } else {
-      portal((close) => <SendApplicationAdminDialog fileData={fileData} onClose={() => { close(); onClose() }} file={file} />)
+      portal((close) => (
+        <SendApplicationAdminDialog
+          fileData={fileData}
+          onClose={() => {
+            close()
+            onClose()
+          }}
+          file={file}
+        />
+      ))
     }
   }
 
@@ -47,32 +65,30 @@ export const ValidDetailsDialog = ({
       </header>
 
       <main>
-
         <FileApplicationInfo fileData={fileData} />
         <section>
-          {fileData.has_dechets_industriels &&
-            <DechetIndustrielAlert />
-          }
+          {fileData.has_dechets_industriels && <DechetIndustrielAlert />}
         </section>
-        <ApplicationTabs sourcing={fileData.sourcing} production={fileData.production} />
+        <ApplicationTabs
+          sourcing={fileData.sourcing}
+          production={fileData.production}
+        />
       </main>
 
       <footer>
         <Button
           icon={isProducerMatch ? Send : Plus}
-          label={isProducerMatch ? t("Envoyer la demande") : t("Ajouter le dossier")}
+          label={
+            isProducerMatch ? t("Envoyer la demande") : t("Ajouter le dossier")
+          }
           variant="primary"
           action={showProductionSiteDialog}
         />
 
         <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
       </footer>
-
     </Dialog>
   )
 }
-
-
-
 
 export default ValidDetailsDialog

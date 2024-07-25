@@ -6,40 +6,59 @@ import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { ElecAdminAuditSnapshot } from "elec-audit-admin/types"
 import ChargePointsApplicationsTable from "elec/components/charge-points/table"
-import { ElecAuditApplicationStatus, ElecChargePointsApplication } from "elec/types"
+import {
+  ElecAuditApplicationStatus,
+  ElecChargePointsApplication,
+} from "elec/types"
 import { useTranslation } from "react-i18next"
 import { To, useLocation, useMatch } from "react-router-dom"
 import * as api from "elec-audit/api"
 import { useElecAuditChargePointsQueryParamsStore } from "./list-query-params-store"
 import { useElecAuditQuery } from "./list-query"
 import ElecAuditFilters from "./list-filters"
-import { ElecAuditFilter, ElecAuditSnapshot, ElecAuditStatus } from "elec-audit/types"
+import {
+  ElecAuditFilter,
+  ElecAuditSnapshot,
+  ElecAuditStatus,
+} from "elec-audit/types"
 import { StatusSwitcher } from "./status-switcher"
 import AuditChargePointsApplicationsTable from "./table"
 import ChargePointsApplicationDetailsDialog from "./details"
-
 
 type TransferListProps = {
   snapshot: ElecAuditSnapshot
   year: number
 }
 
-const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => {
-
+const ChargePointsApplicationsList = ({
+  snapshot,
+  year,
+}: TransferListProps) => {
   const entity = useEntity()
   const status = useAutoStatus()
   const { t } = useTranslation()
   const location = useLocation()
 
-  const [state, actions] = useElecAuditChargePointsQueryParamsStore(entity, year, status, snapshot)
+  const [state, actions] = useElecAuditChargePointsQueryParamsStore(
+    entity,
+    year,
+    status,
+    snapshot
+  )
   const query = useElecAuditQuery(state)
-  const chargePointsApplicationsResponse = useQuery(api.getChargePointsApplications, {
-    key: "audit-charge-points-applications",
-    params: [query],
-  })
+  const chargePointsApplicationsResponse = useQuery(
+    api.getChargePointsApplications,
+    {
+      key: "audit-charge-points-applications",
+      params: [query],
+    }
+  )
 
-  const showChargePointsApplicationDetails = (chargePointApplication: ElecChargePointsApplication): To => {
-    if (chargePointApplication.status === ElecAuditApplicationStatus.AuditDone) return {}
+  const showChargePointsApplicationDetails = (
+    chargePointApplication: ElecChargePointsApplication
+  ): To => {
+    if (chargePointApplication.status === ElecAuditApplicationStatus.AuditDone)
+      return {}
 
     return {
       pathname: location.pathname,
@@ -48,12 +67,12 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
     }
   }
 
-  const chargePointsApplicationsData = chargePointsApplicationsResponse.result?.data.data
+  const chargePointsApplicationsData =
+    chargePointsApplicationsResponse.result?.data.data
   const total = chargePointsApplicationsData?.total ?? 0
   const count = chargePointsApplicationsData?.returned ?? 0
   return (
     <>
-
       <Bar>
         <ElecAuditFilters
           filters={FILTERS}
@@ -66,23 +85,24 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
       </Bar>
 
       <section>
-
         <ActionBar>
           <StatusSwitcher
             status={status}
             onSwitch={actions.setStatus}
             auditDoneCount={snapshot.charge_points_applications_audit_done}
-            auditInProgressCount={snapshot.charge_points_applications_audit_in_progress}
+            auditInProgressCount={
+              snapshot.charge_points_applications_audit_in_progress
+            }
           />
-
-
         </ActionBar>
 
         {count > 0 && chargePointsApplicationsData ? (
           <>
             <AuditChargePointsApplicationsTable
               loading={chargePointsApplicationsResponse.loading}
-              applications={chargePointsApplicationsData.charge_points_applications}
+              applications={
+                chargePointsApplicationsData.charge_points_applications
+              }
               rowLink={showChargePointsApplicationDetails}
             />
 
@@ -97,24 +117,20 @@ const ChargePointsApplicationsList = ({ snapshot, year }: TransferListProps) => 
             )}
           </>
         ) : (
-          <NoResult
-            loading={chargePointsApplicationsResponse.loading}
-          />
+          <NoResult loading={chargePointsApplicationsResponse.loading} />
         )}
-      </section >
+      </section>
 
-
-      <HashRoute path="application/:id" element={<ChargePointsApplicationDetailsDialog />} />
+      <HashRoute
+        path="application/:id"
+        element={<ChargePointsApplicationDetailsDialog />}
+      />
     </>
   )
 }
 export default ChargePointsApplicationsList
 
-
-const FILTERS = [
-  ElecAuditFilter.Cpo,
-]
-
+const FILTERS = [ElecAuditFilter.Cpo]
 
 export function useAutoStatus() {
   const matchStatus = useMatch("/org/:entity/elec-audit/:year/:status/*")

@@ -15,9 +15,9 @@ export enum ElecAuditStatus {
   AuditDone = "AUDITED",
 }
 
-export type ElecAuditFilterSelection = Partial<Record<ElecAuditFilter, string[]>>
-
-
+export type ElecAuditFilterSelection = Partial<
+  Record<ElecAuditFilter, string[]>
+>
 
 export interface ElecAuditQuery {
   entity_id: number
@@ -43,5 +43,3 @@ export interface ElecAuditStates {
   order?: Order
   snapshot?: ElecAuditSnapshot
 }
-
-

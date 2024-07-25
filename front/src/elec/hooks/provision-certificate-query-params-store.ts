@@ -3,19 +3,21 @@ import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
 import useTitle from "common/hooks/title"
-import { ElecCPOProvisionCertificateFilterSelection, ElecCPOProvisionCertificateStates, ElecCPOProvisionCertificateStatus, ElecCPOSnapshot } from "elec/types-cpo"
+import {
+  ElecCPOProvisionCertificateFilterSelection,
+  ElecCPOProvisionCertificateStates,
+  ElecCPOProvisionCertificateStatus,
+  ElecCPOSnapshot,
+} from "elec/types-cpo"
 import { useTranslation } from "react-i18next"
 import { useFilterSearchParams } from "./provision-certificate-filter-search-params"
-
-
 
 export function useProvistionCertificateQueryParamsStore(
   entity: Entity,
   year: number,
   status: ElecCPOProvisionCertificateStatus,
-  snapshot?: ElecCPOSnapshot,
+  snapshot?: ElecCPOSnapshot
 ) {
-
   const [limit, saveLimit] = useLimit()
   const [filtersParams, setFiltersParams] = useFilterSearchParams()
 
@@ -136,7 +138,6 @@ export function useProvistionCertificateQueryParamsStore(
     actions.setSnapshot(snapshot)
   }
 
-
   return [state, actions] as [typeof state, typeof actions]
 }
 
@@ -144,8 +145,10 @@ export function usePageTitle(state: ElecCPOProvisionCertificateStates) {
   const { t } = useTranslation()
 
   const statuses: any = {
-    [ElecCPOProvisionCertificateStatus.Available]: t("Énergie attribuée") + " " + t("disponible"),
-    [ElecCPOProvisionCertificateStatus.History]: t("Énergie attribuée") + " " + t("historique"),
+    [ElecCPOProvisionCertificateStatus.Available]:
+      t("Énergie attribuée") + " " + t("disponible"),
+    [ElecCPOProvisionCertificateStatus.History]:
+      t("Énergie attribuée") + " " + t("historique"),
   }
   const entity = state.entity.name
   const year = state.year

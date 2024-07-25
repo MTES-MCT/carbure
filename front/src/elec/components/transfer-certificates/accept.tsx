@@ -24,25 +24,16 @@ export const AcceptTransfer = ({
   const entity = useEntity()
   const notify = useNotify()
 
-  const acceptTransfer = useMutation(api.acceptTransfer,
-    {
-      invalidates: [
-        "elec-transfer-certificates",
-        "elec-operator-snapshot"
-      ],
-      onSuccess: () => {
-        notify(
-          t(
-            "Le certificat de cession a été accepté"
-          ),
-          { variant: "success" }
-        )
-        onAccepted()
-        onClose()
-      },
-    }
-  )
-
+  const acceptTransfer = useMutation(api.acceptTransfer, {
+    invalidates: ["elec-transfer-certificates", "elec-operator-snapshot"],
+    onSuccess: () => {
+      notify(t("Le certificat de cession a été accepté"), {
+        variant: "success",
+      })
+      onAccepted()
+      onClose()
+    },
+  })
 
   const onAcceptTransfer = async () => {
     await acceptTransfer.execute(entity.id, transferCertificate!.id)
@@ -62,11 +53,10 @@ export const AcceptTransfer = ({
       <main>
         <section>
           <p>
-
-            {t("En acceptant ce certificat de cession, vous pourrez le retrouver dans la section Certificats acceptés."
+            {t(
+              "En acceptant ce certificat de cession, vous pourrez le retrouver dans la section Certificats acceptés."
             )}
           </p>
-
         </section>
       </main>
 
@@ -84,4 +74,3 @@ export const AcceptTransfer = ({
     </Dialog>
   )
 }
-
