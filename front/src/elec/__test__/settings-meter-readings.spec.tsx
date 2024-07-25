@@ -9,6 +9,7 @@ import ElecMeterReadingsSettings from "elec/components/meter-readings/settings"
 import server from "../../settings/__test__/server"
 import {
   okMeterReadingsApplicationsEmpty,
+  okMeterReadingsCheckValid,
   okMeterReadingsApplicationsUrgencyCritical,
   okMeterReadingsCheckError,
 } from "./api"
@@ -115,6 +116,7 @@ test("upload dialog opened with urgency critical", async () => {
 
 test("upload valid file", async () => {
   const user = userEvent.setup()
+  server.use(okMeterReadingsCheckValid)
   render(<SettingsWithHooks />)
   await waitWhileLoading()
 
