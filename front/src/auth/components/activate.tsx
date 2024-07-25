@@ -25,17 +25,18 @@ import css from "./auth.module.css"
 export const Activate = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
   const { uidb64, token } = useToken()
+
+  const [searchParams] = useSearchParams()
+  const isUserInvited = Boolean(searchParams.get("invite")) || false
 
   const activate = useQuery(api.activateAccount, {
     key: "activate-account",
-    params: [uidb64, token],
+    params: [uidb64, token, isUserInvited],
   })
 
   const isSuccess = activate.status === "success"
   const isError = activate.status === "error"
-  const isUserInvited = searchParams.get("invite")
 
   const activatedMessage = isUserInvited
     ? t(
@@ -47,7 +48,7 @@ export const Activate = () => {
 
   const userInvitedSearchParams = createSearchParams({
     uidb64: uidb64 || "",
-    token: activate.result?.data.token || "",
+    token: activate.result?.data.data.token || "",
   })
 
   return (
