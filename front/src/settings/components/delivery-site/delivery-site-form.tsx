@@ -150,14 +150,17 @@ export const DeliverySiteForm = ({
       />
       {isPowerOrHeatPlant && (
         <>
-          {/* <NumberInput
-            readOnly={isReadOnly}
-            label={t("Rendement électrique")}
-            min={0}
-            max={1}
-            step={0.1}
-            {...bind("electrical_efficiency")}
-          /> */}
+          {
+            <NumberInput
+              readOnly={isReadOnly}
+              label={t("Rendement électrique")}
+              min={0}
+              max={1}
+              step={0.1}
+              {...bind("electrical_efficiency")}
+              value={value.electrical_efficiency ?? undefined}
+            />
+          }
 
           <TextInput readOnly={isReadOnly} label={t("Rendement thermique")} />
           <TextInput readOnly={isReadOnly} label={t("Température utile")} />
