@@ -51,7 +51,10 @@ export const NewDeliverySiteDialog = ({
       values.postal_code!,
       values.ownership_type!,
       values.blending_outsourced,
-      values.blending_entity
+      values.blending_entity,
+      values.electrical_efficiency!,
+      values.thermal_efficiency!,
+      values.useful_temperature!
     )
   }
 

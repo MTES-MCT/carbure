@@ -9,19 +9,16 @@ import {
   EntityType,
   OwnershipType,
 } from "carbure/types"
-import { findOperators } from "carbure/api"
-import { normalizeCountry, normalizeEntity } from "carbure/utils/normalizers"
+import { normalizeCountry } from "carbure/utils/normalizers"
 import Autocomplete from "common/components/autocomplete"
 import Checkbox from "common/components/checkbox"
 import Form, { useForm } from "common/components/form"
 import { NumberInput, TextInput } from "common/components/input"
 import { RadioGroup } from "common/components/radio"
 import { Row } from "common/components/scaffold"
-import AutoComplete from "common/components/autocomplete"
 import { depotTypeOptions, ownerShipTypeOptions } from "./delivery-site.const"
 import { AutoCompleteOperators } from "carbure/components/autocomplete-operators"
-import { formatNumber } from "common/utils/formatters"
-import { Input } from "@codegouvfr/react-dsfr/Input"
+import { AutoCompleteCountries } from "carbure/components/autocomplete-countries"
 import { useRef } from "react"
 
 type DeliverySiteFormProps = {
@@ -79,9 +76,23 @@ export const DeliverySiteForm = ({
 }: DeliverySiteFormProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const { value, bind } = useForm<DeliverySiteFormType>(
+  const { value, bind, setFieldError } = useForm<DeliverySiteFormType>(
     mapDeliverySiteToForm(deliverySite)
   )
+
+  const depotIdRef = useRef<HTMLInputElement>(null)
+  const checkDepotIdValidity = () => {
+    const validityState = depotIdRef.current?.validity
+    depotIdRef.current?.setCustomValidity("")
+
+    if (validityState?.patternMismatch) {
+      const message = t(
+        "Cet identifiant douanier est invalide. Il doit être constitué de 15 caractères numériques."
+      )
+      depotIdRef.current?.setCustomValidity(message)
+      depotIdRef.current?.reportValidity()
+    }
+  }
 
   return (
     <Form id={formId} onSubmit={() => onSubmit?.(value)}>
@@ -102,6 +113,12 @@ export const DeliverySiteForm = ({
         {...bind("depot_id")}
         readOnly={isReadOnly}
         required
+        inputRef={depotIdRef}
+        pattern="[0-9]{15}"
+        onChange={(value) => {
+          checkDepotIdValidity()
+          bind("depot_id").onChange(value)
+        }}
       />
 
       <RadioGroup
@@ -198,11 +215,8 @@ export const DeliverySiteForm = ({
       </Row>
 
       {!isReadOnly ? (
-        <Autocomplete
+        <AutoCompleteCountries
           label={t("Pays")}
-          placeholder={t("Rechercher un pays...")}
-          getOptions={findCountries}
-          normalize={normalizeCountry}
           {...bind("country")}
           required
         />
