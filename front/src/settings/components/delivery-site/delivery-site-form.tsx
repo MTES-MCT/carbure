@@ -22,6 +22,7 @@ import { depotTypeOptions, ownerShipTypeOptions } from "./delivery-site.const"
 import { AutoCompleteOperators } from "carbure/components/autocomplete-operators"
 import { formatNumber } from "common/utils/formatters"
 import { Input } from "@codegouvfr/react-dsfr/Input"
+import { useRef } from "react"
 
 type DeliverySiteFormProps = {
   deliverySite?: EntityDepot
@@ -82,13 +83,6 @@ export const DeliverySiteForm = ({
     mapDeliverySiteToForm(deliverySite)
   )
 
-  const depotType = deliverySite?.depot?.depot_type ?? DepotType.Other
-  const isPowerOrHeatPlant = [DepotType.PowerPlant, DepotType.HeatPlant, DepotType.CogenerationPlant].includes(depotType) // prettier-ignore
-
-  const electricalEfficiency = deliverySite?.depot?.electrical_efficiency
-  const thermalEfficiency = deliverySite?.depot?.thermal_efficiency
-  const usefulTemperature = deliverySite?.depot?.useful_temperature
-
   return (
     <Form id={formId} onSubmit={() => onSubmit?.(value)}>
       <TextInput
@@ -144,27 +138,41 @@ export const DeliverySiteForm = ({
           )}
         </>
       )}
-      <Input
-        label={t("Rendement électrique")}
-        nativeInputProps={{ readOnly: isReadOnly }}
-      />
-      {isPowerOrHeatPlant && (
-        <>
-          {
-            <NumberInput
-              readOnly={isReadOnly}
-              label={t("Rendement électrique")}
-              min={0}
-              max={1}
-              step={0.1}
-              {...bind("electrical_efficiency")}
-              value={value.electrical_efficiency ?? undefined}
-            />
-          }
-
-          <TextInput readOnly={isReadOnly} label={t("Rendement thermique")} />
-          <TextInput readOnly={isReadOnly} label={t("Température utile")} />
-        </>
+      {value.depot_type === DepotType.PowerPlant && (
+        <NumberInput
+          readOnly={isReadOnly}
+          label={t("Rendement électrique")}
+          min={0}
+          max={1}
+          step={0.1}
+          {...bind("electrical_efficiency")}
+          value={value.electrical_efficiency ?? undefined}
+          required
+        />
+      )}
+      {value.depot_type === DepotType.HeatPlant && (
+        <NumberInput
+          readOnly={isReadOnly}
+          label={t("Rendement thermique")}
+          min={0}
+          max={1}
+          step={0.1}
+          {...bind("thermal_efficiency")}
+          value={value.thermal_efficiency ?? undefined}
+          required
+        />
+      )}
+      {value.depot_type === DepotType.CogenerationPlant && (
+        <NumberInput
+          readOnly={isReadOnly}
+          label={t("Température utile")}
+          min={0}
+          max={1}
+          step={0.1}
+          {...bind("useful_temperature")}
+          value={value.useful_temperature ?? undefined}
+          required
+        />
       )}
 
       <TextInput
