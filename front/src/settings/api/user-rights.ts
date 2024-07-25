@@ -25,5 +25,9 @@ export function changeUserRole(
 }
 
 export function inviteUser(entity_id: number, email: string, role: UserRole) {
-  return api.post<Api<User>>("/entity/users/invite", { entity_id, email, role })
+  return api.post<Api<User>>("/entity/users/invite-user", {
+    entity_id,
+    email,
+    role,
+  })
 }
