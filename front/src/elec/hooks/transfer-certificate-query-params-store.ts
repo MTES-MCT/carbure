@@ -3,20 +3,22 @@ import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
 import useTitle from "common/hooks/title"
-import { ElecCPOSnapshot, ElecTransferCertificateFilterSelection, ElecTransferCertificateStates, ElecTransferCertificateStatus } from "elec/types-cpo"
+import {
+  ElecCPOSnapshot,
+  ElecTransferCertificateFilterSelection,
+  ElecTransferCertificateStates,
+  ElecTransferCertificateStatus,
+} from "elec/types-cpo"
 import { useTranslation } from "react-i18next"
 import { useFilterSearchParams } from "./transfer-certificate-filter-search-params"
 import { ElecOperatorSnapshot, ElecOperatorStatus } from "elec/types-operator"
-
-
 
 export function useTransferCertificateQueryParamsStore(
   entity: Entity,
   year: number,
   status: ElecTransferCertificateStatus | ElecOperatorStatus,
-  snapshot?: ElecCPOSnapshot | ElecOperatorSnapshot,
+  snapshot?: ElecCPOSnapshot | ElecOperatorSnapshot
 ) {
-
   const [limit, saveLimit] = useLimit()
   const [filtersParams, setFiltersParams] = useFilterSearchParams()
 
@@ -58,7 +60,9 @@ export function useTransferCertificateQueryParamsStore(
         page: 0,
       }),
 
-      setStatus: (status: ElecTransferCertificateStatus | ElecOperatorStatus) => {
+      setStatus: (
+        status: ElecTransferCertificateStatus | ElecOperatorStatus
+      ) => {
         return {
           status,
           filters: filtersParams,
@@ -67,7 +71,6 @@ export function useTransferCertificateQueryParamsStore(
           page: 0,
         }
       },
-
 
       setFilters: (filters: ElecTransferCertificateFilterSelection) => {
         setTimeout(() => {
@@ -132,7 +135,6 @@ export function useTransferCertificateQueryParamsStore(
     actions.setSnapshot(snapshot)
   }
 
-
   return [state, actions] as [typeof state, typeof actions]
 }
 
@@ -140,9 +142,12 @@ export function usePageTitle(state: ElecTransferCertificateStates) {
   const { t } = useTranslation()
 
   const statuses: any = {
-    [ElecTransferCertificateStatus.Pending]: t("Énergie cédée") + " " + t("en attente"),
-    [ElecTransferCertificateStatus.Accepted]: t("Énergie cédée") + " " + t("acceptée"),
-    [ElecTransferCertificateStatus.Rejected]: t("Énergie cédée") + " " + t("rejetée"),
+    [ElecTransferCertificateStatus.Pending]:
+      t("Énergie cédée") + " " + t("en attente"),
+    [ElecTransferCertificateStatus.Accepted]:
+      t("Énergie cédée") + " " + t("acceptée"),
+    [ElecTransferCertificateStatus.Rejected]:
+      t("Énergie cédée") + " " + t("rejetée"),
   }
   const entity = state.entity.name
   const year = state.year

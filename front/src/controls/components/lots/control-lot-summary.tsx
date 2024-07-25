@@ -45,9 +45,9 @@ export const ControlLotSummary = ({
   const summaryData = summary.result?.data.data
 
   const unitToField = {
-    l: "volume_sum" as "volume_sum",
-    kg: "weight_sum" as "weight_sum",
-    MJ: "lhv_amount_sum" as "lhv_amount_sum",
+    l: "volume_sum" as const,
+    kg: "weight_sum" as const,
+    MJ: "lhv_amount_sum" as const,
   }
 
   const unit = entity.preferred_unit ?? "l"

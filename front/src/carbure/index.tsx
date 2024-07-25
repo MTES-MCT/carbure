@@ -29,7 +29,6 @@ import useEntity, { EntityContext, useEntityManager } from "./hooks/entity"
 import useUserManager, { UserContext } from "./hooks/user"
 import ElecAudit from "elec-audit"
 
-
 const Carbure = () => {
   const user = useUserManager()
   const entity = useEntityManager(user)
@@ -46,7 +45,10 @@ const Carbure = () => {
             <Routes>
               <Route path="*" element={<Home />} />
               <Route path="/stats" element={<PublicStats />} />
-              <Route path="/double-counting-list" element={<AgreementPublicList />} />
+              <Route
+                path="/double-counting-list"
+                element={<AgreementPublicList />}
+              />
               <Route
                 path="/accessibilite"
                 element={<AccessibilityDeclaration />}
@@ -54,12 +56,13 @@ const Carbure = () => {
 
               <Route path="/auth/*" element={<Auth />} />
 
-              {isAuth && <>
-                <Route path="/pending" element={<Pending />} />
-                <Route path="/account/*" element={<Account />} />
-                <Route path="/org/:entity/*" element={<Org />} />
-              </>
-              }
+              {isAuth && (
+                <>
+                  <Route path="/pending" element={<Pending />} />
+                  <Route path="/account/*" element={<Account />} />
+                  <Route path="/org/:entity/*" element={<Org />} />
+                </>
+              )}
 
               {!user.loading && (
                 <Route path="*" element={<Navigate replace to="/" />} />
@@ -80,7 +83,7 @@ const currentYear = new Date().getFullYear()
 
 const Org = () => {
   const entity = useEntity()
-  useMissingCompanyInfoModal() //TO DELETE WHEN ALL COMPANIES ARE REGISTRED // TO UNCOMMENT TO 
+  useMissingCompanyInfoModal() //TO DELETE WHEN ALL COMPANIES ARE REGISTRED // TO UNCOMMENT TO
 
   const {
     isAdmin,

@@ -38,7 +38,7 @@ export function listTreeItems<T, V>(
 export function labelize<T, V>(
   items: T[] = [],
   normalize: Normalizer<T, V>,
-  join: string = ", "
+  join = ", "
 ) {
   return items.map((item) => normalize(item).label).join(join)
 }

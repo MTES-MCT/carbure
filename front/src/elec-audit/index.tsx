@@ -11,12 +11,10 @@ import * as api from "./api"
 import ChargePointsApplicationsList from "./components/list"
 import { ElecAuditSnapshot } from "./types"
 
-
 const defaultElecAdminAuditSnapshot: ElecAuditSnapshot = {
   charge_points_applications_audit_done: 0,
   charge_points_applications_audit_in_progress: 0,
 }
-
 
 export const ElecAudit = () => {
   const { t } = useTranslation()
@@ -28,10 +26,11 @@ export const ElecAudit = () => {
     params: [entity.id, years.selected],
   })
 
-  const snapshot = elecAdminAuditSnapshotResponse.result?.data.data ?? defaultElecAdminAuditSnapshot
+  const snapshot =
+    elecAdminAuditSnapshotResponse.result?.data.data ??
+    defaultElecAdminAuditSnapshot
 
   return (
-
     <Main>
       <header>
         <section>
@@ -47,19 +46,11 @@ export const ElecAudit = () => {
             sort={(year) => -year.value}
           />
         </section>
-
-
       </header>
 
       <ChargePointsApplicationsList snapshot={snapshot} year={years.selected} />
-
     </Main>
-
-
   )
 }
 
 export default ElecAudit
-
-
-

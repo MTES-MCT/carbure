@@ -14,14 +14,17 @@ import {
 } from "carbure/__test__/api"
 import { producer } from "carbure/__test__/data"
 
-export const okLotDetails = rest.get("/api/transactions/lots/details", (req, res, ctx) => {
-  return res(
-    ctx.json({
-      status: "success",
-      data: Data.get("lot-details"),
-    })
-  )
-})
+export const okLotDetails = rest.get(
+  "/api/transactions/lots/details",
+  (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data: Data.get("lot-details"),
+      })
+    )
+  }
+)
 
 export const okUpdateLot = rest.post(
   "/api/transactions/lots/update",
@@ -33,16 +36,22 @@ export const okUpdateLot = rest.post(
   }
 )
 
-export const okSendLot = rest.post("/api/transactions/lots/send", (req, res, ctx) => {
-  Data.set("lot-details", (details: LotDetails) => {
-    details.lot.lot_status = LotStatus.Pending
-  })
-  return res(ctx.json({ status: "success" }))
-})
+export const okSendLot = rest.post(
+  "/api/transactions/lots/send",
+  (req, res, ctx) => {
+    Data.set("lot-details", (details: LotDetails) => {
+      details.lot.lot_status = LotStatus.Pending
+    })
+    return res(ctx.json({ status: "success" }))
+  }
+)
 
-export const okDeleteLot = rest.post("/api/transactions/lots/delete", (req, res, ctx) => {
-  return res(ctx.json({ status: "success" }))
-})
+export const okDeleteLot = rest.post(
+  "/api/transactions/lots/delete",
+  (req, res, ctx) => {
+    return res(ctx.json({ status: "success" }))
+  }
+)
 
 export const okRequestFix = rest.post(
   "/api/transactions/lots/request-fix",
@@ -64,13 +73,16 @@ export const okMarkAsFixed = rest.post(
   }
 )
 
-export const okRejectLot = rest.post("/api/transactions/lots/reject", (req, res, ctx) => {
-  Data.set("lot-details", (details: LotDetails) => {
-    details.lot.lot_status = LotStatus.Rejected
-    details.lot.correction_status = CorrectionStatus.NoProblem
-  })
-  return res(ctx.json({ status: "success" }))
-})
+export const okRejectLot = rest.post(
+  "/api/transactions/lots/reject",
+  (req, res, ctx) => {
+    Data.set("lot-details", (details: LotDetails) => {
+      details.lot.lot_status = LotStatus.Rejected
+      details.lot.correction_status = CorrectionStatus.NoProblem
+    })
+    return res(ctx.json({ status: "success" }))
+  }
+)
 
 export const okAcceptBlending = rest.post(
   "/api/transactions/lots/accept-blending",
@@ -83,19 +95,22 @@ export const okAcceptBlending = rest.post(
   }
 )
 
-export const okCommentLot = rest.post("/api/transactions/lots/comment", (req, res, ctx) => {
-  Data.set("lot-details", (details: LotDetails) => {
-    details.comments.push({
-      entity: producer,
-      user: "producer@test.com",
-      comment_type: "REGULAR",
-      comment_dt: "2021-11-30T16:02:45.832791+01:00",
-      // @ts-ignore
-      comment: (req._body as FormData).get("comment")?.toString() ?? "error",
+export const okCommentLot = rest.post(
+  "/api/transactions/lots/comment",
+  (req, res, ctx) => {
+    Data.set("lot-details", (details: LotDetails) => {
+      details.comments.push({
+        entity: producer,
+        user: "producer@test.com",
+        comment_type: "REGULAR",
+        comment_dt: "2021-11-30T16:02:45.832791+01:00",
+        // @ts-ignore used for tests
+        comment: (req._body as FormData).get("comment")?.toString() ?? "error",
+      })
     })
-  })
-  return res(ctx.json({ status: "success" }))
-})
+    return res(ctx.json({ status: "success" }))
+  }
+)
 
 export default setupServer(
   okLotDetails,

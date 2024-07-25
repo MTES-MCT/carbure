@@ -42,7 +42,7 @@ export function useAsyncList<T, V>({
       const dirtyValues: V[] =
         selectedValue !== undefined // prettier-ignore
           ? [selectedValue]
-          : selectedValues ?? EMPTY
+          : (selectedValues ?? EMPTY)
 
       const values = dirtyValues.filter((v: any) => v !== "" && v !== undefined)
 
@@ -106,7 +106,7 @@ export function useAsyncList<T, V>({
   )
 
   return {
-    loading: items ? false : asyncItems.loading ?? asyncSelectedItems.error,
+    loading: items ? false : (asyncItems.loading ?? asyncSelectedItems.error),
     error: asyncItems.error ?? asyncSelectedItems.error,
     items: items ?? asyncItems.result ?? EMPTY,
     selectedItems: asyncSelectedItems.result,
@@ -123,9 +123,12 @@ function sortedStringify(jsonLike: any) {
 
     return Object.keys(value)
       .sort()
-      .reduce((sorted, key) => {
-        sorted[key] = value[key]
-        return sorted
-      }, {} as Record<string, any>)
+      .reduce(
+        (sorted, key) => {
+          sorted[key] = value[key]
+          return sorted
+        },
+        {} as Record<string, any>
+      )
   })
 }

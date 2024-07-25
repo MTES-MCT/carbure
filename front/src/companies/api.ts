@@ -2,16 +2,14 @@ import api, { Api } from "common/services/api"
 import { SearchCompanyPreview, SearchCompanyResult } from "./types"
 import { Certificate, EntityType } from "carbure/types"
 
-
-export function searchCompanyDataBySiren(
-  registration_id: string
-) {
-  return api.post<Api<SearchCompanyResult>>("/entity/registration/search-company", {
-    registration_id
-  })
+export function searchCompanyDataBySiren(registration_id: string) {
+  return api.post<Api<SearchCompanyResult>>(
+    "/entity/registration/search-company",
+    {
+      registration_id,
+    }
+  )
 }
-
-
 
 export function registerCompany(
   activity_description: string,
@@ -29,9 +27,7 @@ export function registerCompany(
   website?: string,
   vat_number?: string,
   certificate_id?: string,
-  certificate_type?: string,
-
-
+  certificate_type?: string
 ) {
   return api.post("/entity/registration/add-company", {
     activity_description,
@@ -52,4 +48,3 @@ export function registerCompany(
     certificate_type,
   })
 }
-

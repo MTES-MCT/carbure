@@ -9,7 +9,7 @@
   overflow: hidden;
 }
 
-.collapse>header {
+.collapse > header {
   display: flex;
   gap: var(--spacing-m);
   cursor: pointer;

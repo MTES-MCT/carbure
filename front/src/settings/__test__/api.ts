@@ -20,9 +20,22 @@ import {
   producer,
   productionSite,
 } from "carbure/__test__/data"
-import { Data, clone, mockGetWithResponseData, setEntity } from "carbure/__test__/helpers"
+import {
+  Data,
+  clone,
+  mockGetWithResponseData,
+  setEntity,
+} from "carbure/__test__/helpers"
 import { dcApplicationErrors } from "./data"
-import { okChargePointsAddSuccess, okChargePointsApplications, okChargePointsCheckValid, okMeterReadingsAddSuccess, okMeterReadingsApplications, okMeterReadingsCheckError, okMeterReadingsCheckValid } from "elec/__test__/api"
+import {
+  okChargePointsAddSuccess,
+  okChargePointsApplications,
+  okChargePointsCheckValid,
+  okMeterReadingsAddSuccess,
+  okMeterReadingsApplications,
+  okMeterReadingsCheckError,
+  okMeterReadingsCheckValid,
+} from "elec/__test__/api"
 
 let deliverySites: any[] = []
 let productionSites: any[] = []
@@ -179,7 +192,7 @@ export const okProductionSites = rest.get(
 export const okAddProductionSite = rest.post(
   "/api/entity/production-sites/add",
   (req, res, ctx) => {
-    // @ts-ignore
+    // @ts-ignore Find a way to not use _body
     const body = req._body as FormData
 
     const psite = {
@@ -198,7 +211,7 @@ export const okAddProductionSite = rest.post(
 export const okUpdateProductionSite = rest.post(
   "/api/entity/production-sites/update",
   (req, res, ctx) => {
-    // @ts-ignore
+    // @ts-ignore Find a way to not use _body
     const body = req._body as FormData
 
     setProductionSites([
@@ -268,8 +281,10 @@ export const okDoubleCountUploadApplication = rest.post(
   }
 )
 
-export const okDoubleCountUploadAgreements = mockGetWithResponseData("/double-counting/agreements", [])
-
+export const okDoubleCountUploadAgreements = mockGetWithResponseData(
+  "/double-counting/agreements",
+  []
+)
 
 export const okDoubleCountUploadDocumentation = rest.post(
   "/api/v3/doublecount/upload-documentation",
@@ -296,9 +311,6 @@ export const koDoubleCountUploadApplication = rest.post(
     )
   }
 )
-
-
-
 
 export default setupServer(
   okSettings,

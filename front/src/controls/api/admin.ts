@@ -8,9 +8,14 @@ import {
   LotQuery,
   StockList,
   StockQuery,
-  StockSummary
+  StockSummary,
 } from "transactions/types"
-import { LotsDeleteResponse, LotSummary, LotsUpdateResponse, Snapshot } from "../types"
+import {
+  LotsDeleteResponse,
+  LotSummary,
+  LotsUpdateResponse,
+  Snapshot,
+} from "../types"
 
 const QUERY_RESET: Partial<LotQuery> = {
   limit: undefined,
@@ -20,7 +25,9 @@ const QUERY_RESET: Partial<LotQuery> = {
 }
 
 export function getYears(entity_id: number) {
-  return api.get<Api<number[]>>("/transactions/admin/years", { params: { entity_id } })
+  return api.get<Api<number[]>>("/transactions/admin/years", {
+    params: { entity_id },
+  })
 }
 
 export function getSnapshot(entity_id: number, year: number) {
@@ -34,7 +41,9 @@ export function getLots(query: LotQuery) {
 }
 
 export function getStocks(query: StockQuery) {
-  return api.get<Api<StockList>>("/transactions/admin/stocks", { params: query })
+  return api.get<Api<StockList>>("/transactions/admin/stocks", {
+    params: query,
+  })
 }
 
 export function downloadLots(query: LotQuery, selection: number[]) {
@@ -120,13 +129,16 @@ export function updateLots(
   comment: string,
   dry_run?: boolean
 ) {
-  return api.post<Api<LotsUpdateResponse>>("/transactions/admin/lots/update-many", {
-    entity_id,
-    lots_ids,
-    comment,
-    dry_run,
-    ...lotFormToPayload(updated_values),
-  })
+  return api.post<Api<LotsUpdateResponse>>(
+    "/transactions/admin/lots/update-many",
+    {
+      entity_id,
+      lots_ids,
+      comment,
+      dry_run,
+      ...lotFormToPayload(updated_values),
+    }
+  )
 }
 
 export function deleteLots(
@@ -135,10 +147,13 @@ export function deleteLots(
   comment: string,
   dry_run?: boolean
 ) {
-  return api.post<Api<LotsDeleteResponse>>("/transactions/admin/lots/delete-many", {
-    entity_id,
-    lots_ids,
-    comment,
-    dry_run
-  })
+  return api.post<Api<LotsDeleteResponse>>(
+    "/transactions/admin/lots/delete-many",
+    {
+      entity_id,
+      lots_ids,
+      comment,
+      dry_run,
+    }
+  )
 }

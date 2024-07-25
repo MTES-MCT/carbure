@@ -3,7 +3,11 @@ import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
 import useTitle from "common/hooks/title"
-import { ElecAdminSnapshot, ElecAdminTransferCertificateFilterSelection, ElecAdminTransferCertificateStates } from "elec-admin/types"
+import {
+  ElecAdminSnapshot,
+  ElecAdminTransferCertificateFilterSelection,
+  ElecAdminTransferCertificateStates,
+} from "elec-admin/types"
 import { ElecTransferCertificateStatus } from "elec/types-cpo"
 import { useTranslation } from "react-i18next"
 import { useFilterSearchParams } from "./provision-certificate-filter-search-params"
@@ -12,9 +16,8 @@ export function useAdminTransferCertificateQueryParamsStore(
   entity: Entity,
   year: number,
   status: ElecTransferCertificateStatus,
-  snapshot?: ElecAdminSnapshot,
+  snapshot?: ElecAdminSnapshot
 ) {
-
   const [limit, saveLimit] = useLimit()
   const [filtersParams, setFiltersParams] = useFilterSearchParams()
 
@@ -144,7 +147,6 @@ export function useAdminTransferCertificateQueryParamsStore(
     actions.setSnapshot(snapshot)
   }
 
-
   return [state, actions] as [typeof state, typeof actions]
 }
 
@@ -152,9 +154,12 @@ export function usePageTitle(state: ElecAdminTransferCertificateStates) {
   const { t } = useTranslation()
 
   const statuses: any = {
-    [ElecTransferCertificateStatus.Pending]: t("Énergie cédée") + " " + t("en attente"),
-    [ElecTransferCertificateStatus.Accepted]: t("Énergie cédée") + " " + t("acceptée"),
-    [ElecTransferCertificateStatus.Rejected]: t("Énergie cédée") + " " + t("rejetée"),
+    [ElecTransferCertificateStatus.Pending]:
+      t("Énergie cédée") + " " + t("en attente"),
+    [ElecTransferCertificateStatus.Accepted]:
+      t("Énergie cédée") + " " + t("acceptée"),
+    [ElecTransferCertificateStatus.Rejected]:
+      t("Énergie cédée") + " " + t("rejetée"),
   }
   const entity = state.entity.name
   const year = state.year

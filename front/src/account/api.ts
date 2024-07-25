@@ -1,11 +1,7 @@
 import api from "common/services/api"
 import { UserRole } from "carbure/types"
 
-export function requestAccess(
-  entity_id: number,
-  role: UserRole,
-  comment: string = ""
-) {
+export function requestAccess(entity_id: number, role: UserRole, comment = "") {
   return api.post("/user/request-access", {
     entity_id,
     comment,

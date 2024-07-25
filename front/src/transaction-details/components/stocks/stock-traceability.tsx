@@ -36,15 +36,15 @@ export const StockTraceability = ({
   const unit = entity.preferred_unit ?? "l"
 
   const unitToLotField = {
-    l: "volume" as "volume",
-    kg: "weight" as "weight",
-    MJ: "lhv_amount" as "lhv_amount",
+    l: "volume" as const,
+    kg: "weight" as const,
+    MJ: "lhv_amount" as const,
   }
 
   const unitToStockField = {
-    l: "initial_volume" as "initial_volume",
-    kg: "initial_weight" as "initial_weight",
-    MJ: "initial_lhv_amount" as "initial_lhv_amount",
+    l: "initial_volume" as const,
+    kg: "initial_weight" as const,
+    MJ: "initial_lhv_amount" as const,
   }
 
   const lotField = unitToLotField[unit]

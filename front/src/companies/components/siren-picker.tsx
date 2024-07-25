@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next"
 interface SirenPickerProps {
   onSelect: (company?: SearchCompanyPreview, warning?: string) => void
 }
+
 export const SirenPicker = ({ onSelect }: SirenPickerProps) => {
   const { t } = useTranslation()
   const searchSirentRef = useRef<HTMLInputElement>(null)

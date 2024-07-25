@@ -48,9 +48,9 @@ export const StockSummaryBar = ({
   }
 
   const unitToField = {
-    l: "total_remaining_volume" as "total_remaining_volume",
-    kg: "total_remaining_weight" as "total_remaining_weight",
-    MJ: "total_remaining_lhv_amount" as "total_remaining_lhv_amount",
+    l: "total_remaining_volume" as const,
+    kg: "total_remaining_weight" as const,
+    MJ: "total_remaining_lhv_amount" as const,
   }
 
   const unit = entity.preferred_unit ?? "l"
@@ -156,9 +156,9 @@ export const StockSummary = ({
   const summaryData = summary.result?.data.data
 
   const unitToField = {
-    l: "remaining_volume_sum" as "remaining_volume_sum",
-    kg: "remaining_weight_sum" as "remaining_weight_sum",
-    MJ: "remaining_lhv_amount_sum" as "remaining_lhv_amount_sum",
+    l: "remaining_volume_sum" as const,
+    kg: "remaining_weight_sum" as const,
+    MJ: "remaining_lhv_amount_sum" as const,
   }
 
   const unit = entity.preferred_unit ?? "l"

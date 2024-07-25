@@ -40,7 +40,9 @@ const ApplicationStatus = ({
     } else {
       const ENDING_MONTH_DELAY = 6
       const expires_soon_date = new Date(expirationDate)
-      expires_soon_date.setMonth(expires_soon_date.getMonth() - ENDING_MONTH_DELAY)
+      expires_soon_date.setMonth(
+        expires_soon_date.getMonth() - ENDING_MONTH_DELAY
+      )
       if (expires_soon_date < new Date()) {
         status = DCStatus.ExpiresSoon
       }

@@ -49,7 +49,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
 
   const lot = useQuery(api.getLotDetails, {
     key: "control-details",
-    params: [entity.id, parseInt(match?.params.id!)],
+    params: [entity.id, parseInt(match?.params.id || "")],
   })
 
   const lotData = lot.result?.data.data

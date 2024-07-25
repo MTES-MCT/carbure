@@ -1,11 +1,6 @@
 import { Trans, useTranslation } from "react-i18next"
 
-import {
-  Entity,
-  ProductionSiteDetails,
-  UserRole
-} from "carbure/types"
-
+import { Entity, ProductionSiteDetails, UserRole } from "carbure/types"
 
 import { useRights } from "carbure/hooks/entity"
 import { Alert } from "common/components/alert"

@@ -4,19 +4,24 @@ import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
 import useTitle from "common/hooks/title"
 import { useTranslation } from "react-i18next"
-import { SafClientSnapshot, SafFilterSelection, SafOperatorSnapshot, SafStates, SafTicketSourceStatus, SafTicketStatus, SafQueryType } from "saf/types"
+import {
+  SafClientSnapshot,
+  SafFilterSelection,
+  SafOperatorSnapshot,
+  SafStates,
+  SafTicketSourceStatus,
+  SafTicketStatus,
+  SafQueryType,
+} from "saf/types"
 import { useFilterSearchParams } from "./filter-search-params"
-
-
 
 export function useQueryParamsStore(
   entity: Entity,
   year: number,
   status: SafTicketSourceStatus | SafTicketStatus,
   snapshot?: SafOperatorSnapshot | SafClientSnapshot,
-  type? : SafQueryType,
+  type?: SafQueryType
 ) {
-
   const [limit, saveLimit] = useLimit()
   const [filtersParams, setFiltersParams] = useFilterSearchParams()
 
@@ -162,7 +167,7 @@ export function usePageTitle(state: SafStates) {
     [SafTicketSourceStatus.History]: t("Volumes historiques"),
     [SafTicketStatus.Accepted]: t("Tickets acceptés"),
     [SafTicketStatus.Pending]: t("Tickets en attente"),
-    [SafTicketStatus.Rejected]: t("Tickets refusés")
+    [SafTicketStatus.Rejected]: t("Tickets refusés"),
   }
 
   const entity = state.entity.name

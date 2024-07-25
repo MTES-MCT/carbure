@@ -294,7 +294,7 @@ export const ETBEDialog = ({ query, selection, onClose }: ETBEDialogProps) => {
 }
 
 function compareVolumes(volume: number, attributions: Record<number, number>) {
-  let total_attributions = Object.values(attributions).reduce(
+  const total_attributions = Object.values(attributions).reduce(
     (total, vol) => total + vol,
     0
   )

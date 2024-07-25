@@ -2,10 +2,9 @@ import api, { Api } from "common/services/api"
 import { GESOption, ProductionSiteDetails } from "carbure/types"
 
 export function getProductionSites(entity_id: number) {
-  return api.get<Api<ProductionSiteDetails[]>>(
-    "/entity/production-sites",
-    { params: { entity_id } }
-  )
+  return api.get<Api<ProductionSiteDetails[]>>("/entity/production-sites", {
+    params: { entity_id },
+  })
 }
 
 export function addProductionSite(
@@ -24,25 +23,22 @@ export function addProductionSite(
   manager_phone: string,
   manager_email: string
 ) {
-  return api.post<Api<ProductionSiteDetails>>(
-    "/entity/production-sites/add",
-    {
-      entity_id,
-      name: name,
-      date_mise_en_service: date_mise_en_service,
-      ges_option: ges_option,
-      country_code: country_code,
-      site_id,
-      address,
-      city,
-      postal_code,
-      eligible_dc,
-      dc_reference,
-      manager_name,
-      manager_phone,
-      manager_email,
-    }
-  )
+  return api.post<Api<ProductionSiteDetails>>("/entity/production-sites/add", {
+    entity_id,
+    name: name,
+    date_mise_en_service: date_mise_en_service,
+    ges_option: ges_option,
+    country_code: country_code,
+    site_id,
+    address,
+    city,
+    postal_code,
+    eligible_dc,
+    dc_reference,
+    manager_name,
+    manager_phone,
+    manager_email,
+  })
 }
 
 export function updateProductionSite(
@@ -62,7 +58,6 @@ export function updateProductionSite(
   manager_phone: string,
   manager_email: string
 ) {
-
   return api.post("/entity/production-sites/update", {
     entity_id,
     production_site_id,

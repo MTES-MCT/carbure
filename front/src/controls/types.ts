@@ -23,7 +23,6 @@ export interface LotsUpdateErrors {
   [key: number]: LotError[]
 }
 
-
 export interface UpdateInfo {
   node: any
   diff: Record<string, [any, any]>

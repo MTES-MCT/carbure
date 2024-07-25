@@ -44,54 +44,66 @@ export const okFilters = rest.get(
   }
 )
 
-export const okSnapshot = rest.get("/api/transactions/admin/snapshot", (req, res, ctx) => {
-  return res(
-    ctx.json({
-      status: "success",
-      data: {
-        lots: {
-          alerts: 0,
-          lots: 0,
-          stocks: 0,
+export const okSnapshot = rest.get(
+  "/api/transactions/admin/snapshot",
+  (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data: {
+          lots: {
+            alerts: 0,
+            lots: 0,
+            stocks: 0,
+          },
         },
-      },
-    })
-  )
-})
+      })
+    )
+  }
+)
 
-export const okLots = rest.get("/api/transactions/admin/lots", (req, res, ctx) => {
-  return res(
-    ctx.json({
-      status: "success",
-      data: {
-        lots: lots,
-        from: 0,
-        returned: 3,
-        total: 3,
-        total_errors: 0,
-        total_deadline: 0,
-        errors: {},
-      },
-    })
-  )
-})
+export const okLots = rest.get(
+  "/api/transactions/admin/lots",
+  (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data: {
+          lots: lots,
+          from: 0,
+          returned: 3,
+          total: 3,
+          total_errors: 0,
+          total_deadline: 0,
+          errors: {},
+        },
+      })
+    )
+  }
+)
 
-export const okStocks = rest.get("/api/transactions/admin/stocks", (req, res, ctx) => {
-  return res(
-    ctx.json({
-      status: "success",
-    })
-  )
-})
+export const okStocks = rest.get(
+  "/api/transactions/admin/stocks",
+  (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+      })
+    )
+  }
+)
 
-export const okYears = rest.get("/api/transactions/admin/years", (req, res, ctx) => {
-  return res(
-    ctx.json({
-      status: "success",
-      data: [],
-    })
-  )
-})
+export const okYears = rest.get(
+  "/api/transactions/admin/years",
+  (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data: [],
+      })
+    )
+  }
+)
 
 export default setupServer(
   okSnapshot,

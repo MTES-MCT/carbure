@@ -69,7 +69,7 @@ const UpdateManyConfirmationDialog = ({
     },
   })
 
-  let updatedValuesNames = Object.keys(updatedValues)
+  const updatedValuesNames = Object.keys(updatedValues)
     .map((field) => t(field, { ns: "fields" }))
     .join(", ")
 

@@ -5,7 +5,10 @@ import { usePortal } from "common/components/portal"
 import Table, { Cell, actionColumn } from "common/components/table"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import ApplicationStatus from "elec/components/application-status"
-import { ElecChargePointsApplication, ElecAuditApplicationStatus } from "elec/types"
+import {
+  ElecChargePointsApplication,
+  ElecAuditApplicationStatus,
+} from "elec/types"
 import { useTranslation } from "react-i18next"
 // import { elecChargePointsApplications } from "elec/__test__/data"
 import { compact } from "common/utils/collection"
@@ -13,21 +16,24 @@ import { compact } from "common/utils/collection"
 import { To } from "react-router-dom"
 
 interface ChargePointsApplicationsTableProps {
-  applications: ElecChargePointsApplication[];
-  onDownloadChargePointsApplication: (application: ElecChargePointsApplication) => void;
+  applications: ElecChargePointsApplication[]
+  onDownloadChargePointsApplication: (
+    application: ElecChargePointsApplication
+  ) => void
   rowLink?: (row: ElecChargePointsApplication) => To
-  loading?: boolean;
-  displayCpo?: boolean;
+  loading?: boolean
+  displayCpo?: boolean
 }
 
-const ChargePointsApplicationsTable: React.FC<ChargePointsApplicationsTableProps> = ({
+const ChargePointsApplicationsTable: React.FC<
+  ChargePointsApplicationsTableProps
+> = ({
   applications,
   onDownloadChargePointsApplication,
   rowLink,
   loading,
-  displayCpo = false
+  displayCpo = false,
 }) => {
-
   const { t } = useTranslation()
 
   return (
@@ -38,37 +44,33 @@ const ChargePointsApplicationsTable: React.FC<ChargePointsApplicationsTableProps
       columns={compact([
         {
           header: t("Statut"),
-          cell: (application) => <ApplicationStatus status={application.status} />,
+          cell: (application) => (
+            <ApplicationStatus status={application.status} />
+          ),
         },
         {
           header: t("Date d'ajout"),
           cell: (application) => (
-            <Cell
-              text={`${formatDate(application.application_date)}`}
-            />
+            <Cell text={`${formatDate(application.application_date)}`} />
           ),
         },
         displayCpo && {
           header: t("Aménageur"),
-          cell: (application) => (
-            <Cell
-              text={`${application.cpo.name}`}
-            />
-          ),
+          cell: (application) => <Cell text={`${application.cpo.name}`} />,
         },
         {
           header: t("Points de recharge"),
           cell: (application) => (
-            <Cell
-              text={`${formatNumber(application.charge_point_count)}`}
-            />
+            <Cell text={`${formatNumber(application.charge_point_count)}`} />
           ),
         },
         {
           header: t("Puissance cumulée"),
           cell: (application) => (
             <Cell
-              text={`${formatNumber(Math.round(application.power_total))}` + " kW"}
+              text={
+                `${formatNumber(Math.round(application.power_total))}` + " kW"
+              }
             />
           ),
         },
@@ -81,12 +83,11 @@ const ChargePointsApplicationsTable: React.FC<ChargePointsApplicationsTableProps
               title={t("Exporter les points de recharge")}
               action={() => onDownloadChargePointsApplication(application)}
             />,
-
           ])
         ),
       ])}
     />
-  );
-};
+  )
+}
 
-export default ChargePointsApplicationsTable;
+export default ChargePointsApplicationsTable

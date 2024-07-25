@@ -65,7 +65,12 @@ export function Select<T, V>({
         name={props.name + "-display"}
       >
         <input
-          style={{ width: "0", opacity: "0", position: "absolute", pointerEvents: "none" }}
+          style={{
+            width: "0",
+            opacity: "0",
+            position: "absolute",
+            pointerEvents: "none",
+          }}
           disabled={props.disabled}
           readOnly={props.readOnly}
           required={props.required}

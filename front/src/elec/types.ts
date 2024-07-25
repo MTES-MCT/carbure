@@ -56,8 +56,7 @@ export interface ElecTransferCertificatesDetails
   extends ElecTransferCertificatePreview {
   comment: string
 }
-export interface ElecProvisionCertificatesDetails
-  extends ElecProvisionCertificatePreview { }
+export type ElecProvisionCertificatesDetails = ElecProvisionCertificatePreview
 
 export enum ElecAuditApplicationStatus {
   Pending = "PENDING",
@@ -79,8 +78,8 @@ export interface ElecChargePointsApplication {
   audit_order_date?: string
 }
 
-
-export interface ElecChargePointsApplicationDetails extends ElecChargePointsApplication {
+export interface ElecChargePointsApplicationDetails
+  extends ElecChargePointsApplication {
   email_contacts: string[]
   sample?: ElecApplicationSample
 }
@@ -107,12 +106,11 @@ export interface ChargePointsApplicationError {
 
 // METER READINGS
 
-
-export interface ElecMeterReadingsApplicationDetails extends ElecMeterReadingsApplication {
+export interface ElecMeterReadingsApplicationDetails
+  extends ElecMeterReadingsApplication {
   email_contacts: string[]
   power_total: number
   sample?: ElecApplicationSample
-
 }
 
 export enum MeterReadingsApplicationUrgencyStatus {
@@ -122,8 +120,11 @@ export enum MeterReadingsApplicationUrgencyStatus {
 }
 
 export interface ElecMeterReadingsCurrentApplicationsPeriod {
-  year: number, quarter: number, urgency_status: MeterReadingsApplicationUrgencyStatus, deadline: string, charge_point_count: number
-
+  year: number
+  quarter: number
+  urgency_status: MeterReadingsApplicationUrgencyStatus
+  deadline: string
+  charge_point_count: number
 }
 export interface ElecMeterReadingsApplicationsResponse {
   applications: ElecMeterReadingsApplication[]

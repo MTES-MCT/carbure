@@ -9,17 +9,12 @@ import ApplicationSummary from "./details-application-summary"
 import SampleSummary from "../sample/details-sample-summary"
 import ChargePointsSampleMap from "../sample/sample-map"
 
-
-
-
 interface ChargePointsApplicationHistoryProps {
   chargePointApplication: ElecChargePointsApplicationDetails | undefined
-
 }
 export const ChargePointsApplicationHistory = ({
   chargePointApplication,
 }: ChargePointsApplicationHistoryProps) => {
-
   return (
     <>
       <main>
@@ -30,14 +25,14 @@ export const ChargePointsApplicationHistory = ({
         {chargePointApplication?.sample && (
           <section>
             <SampleSummary sample={chargePointApplication?.sample} />
-            <ChargePointsSampleMap chargePoints={chargePointApplication?.sample?.charge_points} />
+            <ChargePointsSampleMap
+              chargePoints={chargePointApplication?.sample?.charge_points}
+            />
           </section>
         )}
-
       </main>
     </>
   )
 }
-
 
 export default ChargePointsApplicationHistory

@@ -1,6 +1,9 @@
 import { Entity } from "carbure/types"
 import { Order } from "common/components/table"
-import { ElecChargePointsApplication, ElecMeterReadingsApplication } from "elec/types"
+import {
+  ElecChargePointsApplication,
+  ElecMeterReadingsApplication,
+} from "elec/types"
 
 export interface ElecAdminAuditSnapshot {
   charge_points_applications_audit_done: number
@@ -26,7 +29,9 @@ export enum ElecAdminAuditStatus {
   History = "HISTORY",
 }
 
-export type ElecAdminAuditFilterSelection = Partial<Record<ElecAdminAuditFilter, string[]>>
+export type ElecAdminAuditFilterSelection = Partial<
+  Record<ElecAdminAuditFilter, string[]>
+>
 
 export interface ElecChargePointsApplicationsData {
   charge_points_applications: ElecChargePointsApplication[]
@@ -80,5 +85,3 @@ export interface ElecAdminAuditStates {
   order?: Order
   snapshot?: ElecAdminAuditSnapshot
 }
-
-

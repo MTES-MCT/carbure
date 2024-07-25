@@ -6,7 +6,14 @@ import { TestRoot, render } from "setupTests"
 import { admin } from "carbure/__test__/data"
 import ElecAdminAudit from "elec-audit-admin"
 import { setupServer } from "msw/lib/node"
-import { okGenerateSample, okGetChargePointsApplicationDetails, okGetChargePointsApplications, okGetSnapshot, okGetYears, okStartChargePointsApplicationAudit } from "./api"
+import {
+  okGenerateSample,
+  okGetChargePointsApplicationDetails,
+  okGetChargePointsApplications,
+  okGetSnapshot,
+  okGetYears,
+  okStartChargePointsApplicationAudit,
+} from "./api"
 import { okSettings } from "account/__test__/api"
 import userEvent from "@testing-library/user-event"
 
@@ -17,9 +24,12 @@ const server = setupServer(
   okGetChargePointsApplications
 )
 
-
-beforeAll(() => { server.listen({ onUnhandledRequest: "warn" }) })
-afterEach(() => { server.resetHandlers() })
+beforeAll(() => {
+  server.listen({ onUnhandledRequest: "warn" })
+})
+afterEach(() => {
+  server.resetHandlers()
+})
 afterAll(() => server.close())
 
 const ChargePointsApplications = () => {
@@ -48,7 +58,6 @@ test("check the charge points applications listing", async () => {
 })
 
 test("check the sample generation", async () => {
-
   render(<ChargePointsApplications />)
   await waitWhileLoading()
 
@@ -79,11 +88,15 @@ test("check the sample generation", async () => {
   const sendButton = await screen.findByText("Envoyer en audit")
   expect(sendButton).toBeDisabled()
 
-  const confirmCheckbox = await screen.getByLabelText("Je confirme avoir envoyé l'ordre de contrôle par e-mail avec l'échantillon en pièce jointe.")
+  const confirmCheckbox = await screen.getByLabelText(
+    "Je confirme avoir envoyé l'ordre de contrôle par e-mail avec l'échantillon en pièce jointe."
+  )
   await user.click(confirmCheckbox)
   expect(sendButton).toBeEnabled()
 
   server.use(okStartChargePointsApplicationAudit)
   await user.click(sendButton)
-  screen.getByText("L'audit de l'échantillon des 2 points de recharge a bien été initié.")
+  screen.getByText(
+    "L'audit de l'échantillon des 2 points de recharge a bien été initié."
+  )
 })

@@ -3,12 +3,7 @@ import { EntityType } from "carbure/types"
 import { Button } from "common/components/button"
 import { Confirm, Dialog } from "common/components/dialog"
 import { useHashMatch } from "common/components/hash-route"
-import {
-  Check,
-  Cross,
-  Return,
-  Save
-} from "common/components/icons"
+import { Check, Cross, Return, Save } from "common/components/icons"
 import { useNotify } from "common/components/notifications"
 import Portal, { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
@@ -23,7 +18,6 @@ import { ApplicationInfo } from "./application-info"
 import ApplicationStatus from "../../../double-counting/components/application-status"
 import ApplicationTabs from "./application-tabs"
 
-
 export const ApplicationDetailsDialog = () => {
   const { t } = useTranslation()
   const notify = useNotify()
@@ -36,10 +30,9 @@ export const ApplicationDetailsDialog = () => {
   const [quotas, setQuotas] = useState<Record<string, number>>({})
   const match = useHashMatch("application/:id")
 
-
   const applicationResponse = useQuery(api.getDoubleCountingApplication, {
     key: "dc-application",
-    params: [entity.id, parseInt(match?.params.id!)],
+    params: [entity.id, parseInt(match?.params.id || "")],
 
     onSuccess: (application) => {
       const applicationData = application.data.data
@@ -51,8 +44,7 @@ export const ApplicationDetailsDialog = () => {
       // automatically set the quotas to the asked value the first time the application is opened
       const quotas: Record<string, number> = {}
       applicationData.production.forEach((prod) => {
-        quotas[prod.id] =
-          prod.approved_quota >= 0 ? prod.approved_quota : 0
+        quotas[prod.id] = prod.approved_quota >= 0 ? prod.approved_quota : 0
       })
       setQuotas(quotas)
     },
@@ -62,7 +54,7 @@ export const ApplicationDetailsDialog = () => {
     invalidates: ["dc-application", "dc-snapshot"],
     onSuccess: () => {
       setQuotasIsUpdated(false)
-    }
+    },
   })
 
   const approveApplication = useMutation(api.approveDoubleCountingApplication, {
@@ -70,7 +62,7 @@ export const ApplicationDetailsDialog = () => {
     onSuccess: () => {
       navigate("/org/9/double-counting/agreements")
       notify(t("La demande d'agrément a été accepté."), { variant: "success" })
-    }
+    },
   })
 
   const rejectApplication = useMutation(api.rejectDoubleCountingApplication, {
@@ -80,20 +72,16 @@ export const ApplicationDetailsDialog = () => {
         pathname: location.pathname,
       })
       notify(t("La demande d'agrément a été refusé."), { variant: "success" })
-    }
+    },
   })
-
 
   const application = applicationResponse.result?.data.data
   const dcaStatus = application?.status ?? DCStatus.Pending
-
 
   const isAdmin = entity?.entity_type === EntityType.Administration
   const hasQuotas = !application?.production.some(
     (p) => p.approved_quota === -1
   )
-
-
 
   const onUpdateQuotas = (quotas: Record<string, number>) => {
     setQuotasIsUpdated(true)
@@ -109,7 +97,10 @@ export const ApplicationDetailsDialog = () => {
       return
     }
 
-    const updatedQuotas = Object.keys(quotas).map((id) => [parseInt(id), quotas[id]])
+    const updatedQuotas = Object.keys(quotas).map((id) => [
+      parseInt(id),
+      quotas[id],
+    ])
     const done = await approveQuotas.execute(
       entity.id,
       application.id,
@@ -174,17 +165,17 @@ export const ApplicationDetailsDialog = () => {
         </header>
 
         <main>
-
           <ApplicationInfo application={application} />
 
-          {application &&
+          {application && (
             <ApplicationTabs
               productionSite={application.production_site}
               sourcing={application.sourcing}
               production={application.production}
               quotas={quotas}
-              setQuotas={onUpdateQuotas} />
-          }
+              setQuotas={onUpdateQuotas}
+            />
+          )}
         </main>
 
         <footer>
@@ -208,8 +199,6 @@ export const ApplicationDetailsDialog = () => {
               <Button
                 loading={approveQuotas.loading}
                 disabled={applicationResponse.loading || !hasQuotas}
-
-
                 variant="success"
                 icon={Check}
                 action={submitAccept}
@@ -237,4 +226,3 @@ export const ApplicationDetailsDialog = () => {
     </Portal>
   )
 }
-

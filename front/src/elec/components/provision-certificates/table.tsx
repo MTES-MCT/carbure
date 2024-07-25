@@ -77,12 +77,7 @@ export function useColumns() {
       key: "current_type",
       header: t("Type de courant"),
       cell: (provisionCertificate: ElecProvisionCertificatePreview) => {
-        return (
-          <Cell
-            text={provisionCertificate.current_type}
-
-          />
-        )
+        return <Cell text={provisionCertificate.current_type} />
       },
     },
 
