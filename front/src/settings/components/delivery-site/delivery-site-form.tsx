@@ -14,12 +14,14 @@ import { normalizeCountry, normalizeEntity } from "carbure/utils/normalizers"
 import Autocomplete from "common/components/autocomplete"
 import Checkbox from "common/components/checkbox"
 import Form, { useForm } from "common/components/form"
-import { TextInput } from "common/components/input"
+import { NumberInput, TextInput } from "common/components/input"
 import { RadioGroup } from "common/components/radio"
 import { Row } from "common/components/scaffold"
 import AutoComplete from "common/components/autocomplete"
 import { depotTypeOptions, ownerShipTypeOptions } from "./delivery-site.const"
 import { AutoCompleteOperators } from "carbure/components/autocomplete-operators"
+import { formatNumber } from "common/utils/formatters"
+import { Input } from "@codegouvfr/react-dsfr/Input"
 
 type DeliverySiteFormProps = {
   deliverySite?: EntityDepot
@@ -40,6 +42,9 @@ export type DeliverySiteFormType = Partial<
     | "depot_type"
     | "address"
     | "postal_code"
+    | "electrical_efficiency"
+    | "thermal_efficiency"
+    | "useful_temperature"
   > &
     Pick<EntityDepot, "ownership_type">
 > & {
@@ -60,6 +65,9 @@ const mapDeliverySiteToForm: (
   ownership_type: deliverySite?.ownership_type ?? OwnershipType.Own,
   blending_outsourced: deliverySite?.blending_is_outsourced ?? false,
   blending_entity: deliverySite?.blender ?? undefined,
+  electrical_efficiency: deliverySite?.depot?.electrical_efficiency,
+  thermal_efficiency: deliverySite?.depot?.thermal_efficiency,
+  useful_temperature: deliverySite?.depot?.useful_temperature,
 })
 
 export const DeliverySiteForm = ({
@@ -134,6 +142,25 @@ export const DeliverySiteForm = ({
               {...bind("blending_entity")}
             />
           )}
+        </>
+      )}
+      <Input
+        label={t("Rendement électrique")}
+        nativeInputProps={{ readOnly: isReadOnly }}
+      />
+      {isPowerOrHeatPlant && (
+        <>
+          {/* <NumberInput
+            readOnly={isReadOnly}
+            label={t("Rendement électrique")}
+            min={0}
+            max={1}
+            step={0.1}
+            {...bind("electrical_efficiency")}
+          /> */}
+
+          <TextInput readOnly={isReadOnly} label={t("Rendement thermique")} />
+          <TextInput readOnly={isReadOnly} label={t("Température utile")} />
         </>
       )}
 
