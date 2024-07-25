@@ -3,7 +3,12 @@ import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
 import useTitle from "common/hooks/title"
-import { ElecAdminAuditFilterSelection, ElecAdminAuditSnapshot, ElecAdminAuditStates, ElecAdminAuditStatus } from "elec-audit-admin/types"
+import {
+  ElecAdminAuditFilterSelection,
+  ElecAdminAuditSnapshot,
+  ElecAdminAuditStates,
+  ElecAdminAuditStatus,
+} from "elec-audit-admin/types"
 import { useTranslation } from "react-i18next"
 import { useFilterSearchParams } from "../../../elec-admin/hooks/provision-certificate-filter-search-params"
 
@@ -11,9 +16,8 @@ export function useElecAdminAuditChargePointsQueryParamsStore(
   entity: Entity,
   year: number,
   status: ElecAdminAuditStatus,
-  snapshot?: ElecAdminAuditSnapshot,
+  snapshot?: ElecAdminAuditSnapshot
 ) {
-
   const [limit, saveLimit] = useLimit()
   const [filtersParams, setFiltersParams] = useFilterSearchParams()
 
@@ -142,7 +146,6 @@ export function useElecAdminAuditChargePointsQueryParamsStore(
   if (snapshot && state.snapshot !== snapshot) {
     actions.setSnapshot(snapshot)
   }
-
 
   return [state, actions] as [typeof state, typeof actions]
 }

@@ -4,22 +4,31 @@ import {
   DoubleCountingAgreementPublic,
   DoubleCountingApplicationDetails,
   DoubleCountingApplicationOverview,
-  DoubleCountingFileInfo
+  DoubleCountingFileInfo,
 } from "double-counting/types"
 
 export function getDoubleCountingAgreements(entity_id: number) {
-  return api.get<Api<DoubleCountingApplicationOverview[]>>("/double-counting/agreements", {
-    params: { entity_id },
-  })
+  return api.get<Api<DoubleCountingApplicationOverview[]>>(
+    "/double-counting/agreements",
+    {
+      params: { entity_id },
+    }
+  )
 }
 
 export function getDoubleCountingAgreementsPublicList() {
-  return api.get<Api<DoubleCountingAgreementPublic[]>>("/double-counting/agreements/public-list", {
-    params: {},
-  })
+  return api.get<Api<DoubleCountingAgreementPublic[]>>(
+    "/double-counting/agreements/public-list",
+    {
+      params: {},
+    }
+  )
 }
 
-export function getDoubleCountingApplicationDetails(entity_id: number, dca_id: number) {
+export function getDoubleCountingApplicationDetails(
+  entity_id: number,
+  dca_id: number
+) {
   return api.get<Api<DoubleCountingApplicationDetails>>(
     "/double-counting/applications/details",
     {
@@ -27,7 +36,6 @@ export function getDoubleCountingApplicationDetails(entity_id: number, dca_id: n
     }
   )
 }
-
 
 export function checkDoubleCountingApplication(entity_id: number, file: File) {
   const res = api.post<Api<{ file: DoubleCountingFileInfo }>>(
@@ -37,31 +45,27 @@ export function checkDoubleCountingApplication(entity_id: number, file: File) {
   return res
 }
 
-export function getDoubleCountingAgreementDetails(entity_id: number, agreement_id: number) {
-  return api.get<Api<AgreementDetails>>(
-    "/double-counting/agreements/details",
-    {
-      params: { entity_id, agreement_id },
-    }
-  )
+export function getDoubleCountingAgreementDetails(
+  entity_id: number,
+  agreement_id: number
+) {
+  return api.get<Api<AgreementDetails>>("/double-counting/agreements/details", {
+    params: { entity_id, agreement_id },
+  })
 }
-
 
 export function producerAddDoubleCountingApplication(
   entity_id: number,
   producer_id: number,
   production_site_id: number,
   file: File,
-  should_replace: boolean = false
+  should_replace = false
 ) {
-
   return api.post("/double-counting/applications/add", {
     entity_id,
     producer_id,
     production_site_id,
     file,
-    should_replace
+    should_replace,
   })
 }
-
-

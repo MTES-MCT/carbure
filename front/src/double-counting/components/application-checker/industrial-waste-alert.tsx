@@ -4,32 +4,52 @@ import Button, { ButtonVariant, ExternalLink } from "common/components/button"
 import { AlertTriangle, Send } from "common/components/icons"
 import { Trans, useTranslation } from "react-i18next"
 
-export const DechetIndustrielAlert = ({ mailToIsButton = false }: { mailToIsButton?: boolean }) => {
-
-  return <Alert
-    // style={{ flexDirection: "column" }}
-    variant="warning" icon={AlertTriangle}>
-    <p>
-      <strong><Trans>Spécifité "Déchets industriels"</Trans></strong> <br />
-      <Trans>
-        Une demande concernant des déchets industriels doit être accompagnée du questionnaire de processus de validation pour ces matières premières</Trans>
-      {" "}
-      <ExternalLink href={"https://www.ecologie.gouv.fr/sites/default/files/Processus%20de%20validation%20de%20mati%C3%A8res%20premi%C3%A8res.pdf"}>
-        <Trans>disponible ici</Trans>
-      </ExternalLink>.
-      <br />
-      <Trans>Merci de nous le joindre par email avant de nous envoyer votre demande.</Trans>
-      <br />
-      <MailtoButton variant={mailToIsButton ? "secondary" : "link"} />
-    </p>
-  </Alert>
+export const DechetIndustrielAlert = ({
+  mailToIsButton = false,
+}: {
+  mailToIsButton?: boolean
+}) => {
+  return (
+    <Alert
+      // style={{ flexDirection: "column" }}
+      variant="warning"
+      icon={AlertTriangle}
+    >
+      <p>
+        <strong>
+          <Trans>Spécifité "Déchets industriels"</Trans>
+        </strong>{" "}
+        <br />
+        <Trans>
+          Une demande concernant des déchets industriels doit être accompagnée
+          du questionnaire de processus de validation pour ces matières
+          premières
+        </Trans>{" "}
+        <ExternalLink
+          href={
+            "https://www.ecologie.gouv.fr/sites/default/files/Processus%20de%20validation%20de%20mati%C3%A8res%20premi%C3%A8res.pdf"
+          }
+        >
+          <Trans>disponible ici</Trans>
+        </ExternalLink>
+        .
+        <br />
+        <Trans>
+          Merci de nous le joindre par email avant de nous envoyer votre
+          demande.
+        </Trans>
+        <br />
+        <MailtoButton variant={mailToIsButton ? "secondary" : "link"} />
+      </p>
+    </Alert>
+  )
 }
 
-
-
-
-
-const MailtoButton = ({ variant = "secondary" }: { variant?: ButtonVariant }) => {
+const MailtoButton = ({
+  variant = "secondary",
+}: {
+  variant?: ButtonVariant
+}) => {
   const { t } = useTranslation()
   const entity = useEntity()
 
@@ -39,7 +59,12 @@ const MailtoButton = ({ variant = "secondary" }: { variant?: ButtonVariant }) =>
 
   const mailto = `mailto:carbure@beta.gouv.fr?subject=${encodeURIComponent(subject)}&body=${bodyMessage}}`
 
-  return <Button icon={variant != "link" ? Send : undefined} label={t("Envoyer le formulaire par email")} variant={variant} href={mailto} />
-
+  return (
+    <Button
+      icon={variant != "link" ? Send : undefined}
+      label={t("Envoyer le formulaire par email")}
+      variant={variant}
+      href={mailto}
+    />
+  )
 }
-

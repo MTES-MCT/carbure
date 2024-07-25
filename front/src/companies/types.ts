@@ -1,7 +1,5 @@
 import { Certificate, Country, Entity, EntityType } from "carbure/types"
 
-
-
 export interface SearchCompanyResult {
   company_preview: SearchCompanyPreview
   warning?: {
@@ -17,7 +15,6 @@ export interface SearchCompanyPreview {
   registered_zipcode: string
   registered_country: Country
 }
-
 
 export interface CompanyFormValue {
   activity_description: string | undefined

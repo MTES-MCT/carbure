@@ -9,26 +9,39 @@ import * as api from "elec/api-cpo"
 import { ElecTransferCertificatePreview } from "elec/types"
 import { useTranslation } from "react-i18next"
 
-
 interface ElecCancelTransferButtonProps {
   transferCertificate: ElecTransferCertificatePreview
   onClose: () => void
 }
 
-export const ElecCancelTransferButton = ({ transferCertificate, onClose }: ElecCancelTransferButtonProps) => {
+export const ElecCancelTransferButton = ({
+  transferCertificate,
+  onClose,
+}: ElecCancelTransferButtonProps) => {
   const entity = useEntity()
   const { t } = useTranslation()
   const portal = usePortal()
   const notify = useNotify()
 
   const onTransferCancelledSuccess = (energy: number, clientName: string) => {
-    notify(t("{{energy}} MWh initalement envoyés à {{clientName}} vous ont bien été restitués", { energy: energy, clientName }), { variant: "success" })
+    notify(
+      t(
+        "{{energy}} MWh initalement envoyés à {{clientName}} vous ont bien été restitués",
+        { energy: energy, clientName }
+      ),
+      { variant: "success" }
+    )
     onClose()
   }
 
-
   const confirmCancelTransferCertificate = async () => {
-    portal((close) => <ElecCancelTransferConfirmDialog onClose={close} onTransferCancelled={onTransferCancelledSuccess} transfer_certificate={transferCertificate} />)
+    portal((close) => (
+      <ElecCancelTransferConfirmDialog
+        onClose={close}
+        onTransferCancelled={onTransferCancelledSuccess}
+        transfer_certificate={transferCertificate}
+      />
+    ))
   }
 
   return (
@@ -38,11 +51,8 @@ export const ElecCancelTransferButton = ({ transferCertificate, onClose }: ElecC
       variant="danger"
       action={confirmCancelTransferCertificate}
     />
-  );
-};
-
-
-
+  )
+}
 
 export interface ElecCancelTransferConfirmDialogProps {
   onClose: () => void
@@ -53,52 +63,57 @@ export interface ElecCancelTransferConfirmDialogProps {
 export const ElecCancelTransferConfirmDialog = ({
   onClose,
   transfer_certificate,
-  onTransferCancelled
+  onTransferCancelled,
 }: ElecCancelTransferConfirmDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const notifyError = useNotifyError()
 
-  const cancelTransferEnergyRequest = useMutation(api.cancelTransferCertificate, {
-    invalidates: [
-      "elec-transfer-certificates",
-      "elec-cpo-snapshot"
-    ],
-    onSuccess: () => {
-      onTransferCancelled(transfer_certificate.energy_amount!, transfer_certificate.client!.name)
-      onClose()
-    },
-    onError: (err) => {
-      notifyError(err, t("Impossible d'annuler le certificat de cession"))
+  const cancelTransferEnergyRequest = useMutation(
+    api.cancelTransferCertificate,
+    {
+      invalidates: ["elec-transfer-certificates", "elec-cpo-snapshot"],
+      onSuccess: () => {
+        onTransferCancelled(
+          transfer_certificate.energy_amount!,
+          transfer_certificate.client!.name
+        )
+        onClose()
+      },
+      onError: (err) => {
+        notifyError(err, t("Impossible d'annuler le certificat de cession"))
+      },
     }
-  })
+  )
 
   const cancelTransferCertificate = async () => {
     await cancelTransferEnergyRequest.execute(
       entity.id,
-      transfer_certificate.id,
+      transfer_certificate.id
     )
   }
 
   return (
-
-    <Dialog onClose={onClose} >
+    <Dialog onClose={onClose}>
       <header>
-
         <h1>
-          {t("Annuler le certificat de cession n°{{id}}", { id: transfer_certificate.certificate_id })}
+          {t("Annuler le certificat de cession n°{{id}}", {
+            id: transfer_certificate.certificate_id,
+          })}
         </h1>
       </header>
 
       <main>
         <section>
           <p>
-            <strong>Êtes-vous sûr de vouloir annuler ce certificat de cession ?</strong>
+            <strong>
+              Êtes-vous sûr de vouloir annuler ce certificat de cession ?
+            </strong>
           </p>
-          <p>Cela entrainera sa suppression et sa quantité d'énergie en MWh sera à nouveau disponible dans votre stock d'énergie global.</p>
-
-
-
+          <p>
+            Cela entrainera sa suppression et sa quantité d'énergie en MWh sera
+            à nouveau disponible dans votre stock d'énergie global.
+          </p>
         </section>
       </main>
 
@@ -114,7 +129,5 @@ export const ElecCancelTransferConfirmDialog = ({
         <Button icon={Return} label={t("Retour")} action={onClose} />
       </footer>
     </Dialog>
-
   )
 }
-

@@ -127,12 +127,11 @@ const Navigation = ({ entity }: NavigationProps) => {
                 label: t("Contrôles"),
               },
 
-              (isAuditor) && {
+              isAuditor && {
                 key: "elec-audit",
                 path: "elec-audit",
                 label: t("Audit PDC"),
               },
-
 
               (isIndustry || isPowerOrHeatProducer) && {
                 key: "transactions",

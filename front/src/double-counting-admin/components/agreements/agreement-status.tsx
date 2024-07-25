@@ -1,5 +1,8 @@
 import { useTranslation } from "react-i18next"
-import { AgreementStatus, DoubleCountingStatus as DCStatus } from "../../../double-counting/types"
+import {
+  AgreementStatus,
+  DoubleCountingStatus as DCStatus,
+} from "../../../double-counting/types"
 import Tag, { TagVariant } from "common/components/tag"
 
 const statusToVariant: Record<AgreementStatus, TagVariant> = {
@@ -24,7 +27,6 @@ const AgreementStatusTag = ({
     [AgreementStatus.Expired]: t("Expiré"),
     [AgreementStatus.Incoming]: t("À venir"),
   }
-
 
   return (
     <Tag big={big} variant={!status ? "none" : statusToVariant[status]}>

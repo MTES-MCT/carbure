@@ -28,15 +28,19 @@ export function Form<T>({
   children,
   onSubmit,
   novalidate,
-  wrapper
+  wrapper,
 }: FormProps<T>) {
   return (
     <FormContext.Provider value={form}>
       <form
         id={id}
-        className={cl(css.form, variant && css[variant], className, wrapper && css.wrapper)}
+        className={cl(
+          css.form,
+          variant && css[variant],
+          className,
+          wrapper && css.wrapper
+        )}
         style={style}
-
         noValidate={novalidate}
         onSubmit={(e) => {
           e.preventDefault()

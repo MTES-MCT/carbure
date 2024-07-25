@@ -119,7 +119,7 @@ export function List<T, V>({
     }
   }, [selection, controlRef, onExit, onKeyDown])
 
-  function renderItems(items: Normalized<T, V>[], level: number = 0) {
+  function renderItems(items: Normalized<T, V>[], level = 0) {
     if (items.length === 0) {
       return <li>{i18next.t("Aucune entrée trouvée") as string}</li>
     }

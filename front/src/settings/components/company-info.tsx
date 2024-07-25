@@ -16,7 +16,6 @@ import Alert from "common/components/alert"
 import { usePortal } from "common/components/portal"
 import CompanyInfoSirenDialog from "./company-info-siren-dialog"
 
-
 type CompanyInfoProps = {
   company?: Entity
 }
@@ -27,7 +26,8 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
   const portal = usePortal()
 
   const entity = company || loggedEntity
-  const readOnly = company && !loggedEntity.hasRights(UserRole.Admin, UserRole.ReadWrite)
+  const readOnly =
+    company && !loggedEntity.hasRights(UserRole.Admin, UserRole.ReadWrite)
 
   const updateEntity = useMutation(api.updateEntity, {
     invalidates: ["user-settings"],
@@ -44,7 +44,7 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
         formValue.legal_name!,
         formValue.registered_address!,
         formValue.registered_city!,
-        formValue.registered_country?.code_pays!,
+        formValue.registered_country?.code_pays || "",
         formValue.registered_zipcode!,
         formValue.registration_id!,
         formValue.sustainability_officer_email!,
@@ -58,26 +58,39 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
 
   const prefillCompanyInfo = (prefetchedCompany: SearchCompanyPreview) => {
     companyForm.setField("legal_name", prefetchedCompany.legal_name)
-    companyForm.setField("registered_address", prefetchedCompany.registered_address)
+    companyForm.setField(
+      "registered_address",
+      prefetchedCompany.registered_address
+    )
     companyForm.setField("registered_city", prefetchedCompany.registered_city)
-    companyForm.setField("registered_country", prefetchedCompany.registered_country)
-    companyForm.setField("registered_zipcode", prefetchedCompany.registered_zipcode)
+    companyForm.setField(
+      "registered_country",
+      prefetchedCompany.registered_country
+    )
+    companyForm.setField(
+      "registered_zipcode",
+      prefetchedCompany.registered_zipcode
+    )
     companyForm.setField("registration_id", prefetchedCompany.registration_id)
   }
 
   const showAutofillDialog = () => {
     portal((close) => (
-      <CompanyInfoSirenDialog onClose={close} wantPrefillCompanyInfo={prefillCompanyInfo} />
+      <CompanyInfoSirenDialog
+        onClose={close}
+        wantPrefillCompanyInfo={prefillCompanyInfo}
+      />
     ))
   }
 
-  const isLockedField = !companyForm.value.registered_country || companyForm.value.registered_country.code_pays === "FR"
+  const isLockedField =
+    !companyForm.value.registered_country ||
+    companyForm.value.registered_country.code_pays === "FR"
 
   return (
     <Panel id="info">
       <header>
         <h1>{t("Informations sur la société")}</h1>
-
       </header>
 
       {!readOnly && (
@@ -91,22 +104,19 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
       )}
 
       <section>
-        <Alert icon={AlertCircle} variant={companyForm.value.registration_id ? "info" : "warning"}>
-          {t(
-            "Complétez vos informations à partir de votre numéro SIREN"
-          )}
-          <Button variant="primary" action={showAutofillDialog} asideX         >
+        <Alert
+          icon={AlertCircle}
+          variant={companyForm.value.registration_id ? "info" : "warning"}
+        >
+          {t("Complétez vos informations à partir de votre numéro SIREN")}
+          <Button variant="primary" action={showAutofillDialog} asideX>
             {t("Compléter mes informations")}
           </Button>
         </Alert>
       </section>
 
       <section>
-        <Form
-          form={companyForm}
-          id="entity-info"
-          onSubmit={onSubmitForm}
-        >
+        <Form form={companyForm} id="entity-info" onSubmit={onSubmitForm}>
           <Autocomplete
             required
             readOnly={readOnly}
@@ -131,7 +141,6 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
             label={t("Nom légal")}
             {...companyForm.bind("legal_name")}
             disabled={isLockedField}
-
           />
           <TextInput
             required
@@ -139,7 +148,6 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
             label={t("Adresse de la société (Numéro et rue)")}
             {...companyForm.bind("registered_address")}
             disabled={isLockedField}
-
           />
           <TextInput
             required
@@ -147,7 +155,6 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
             label={t("Ville")}
             {...companyForm.bind("registered_city")}
             disabled={isLockedField}
-
           />
           <TextInput
             required
@@ -155,7 +162,6 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
             label={t("Code postal")}
             {...companyForm.bind("registered_zipcode")}
             disabled={isLockedField}
-
           />
 
           <TextInput
@@ -169,7 +175,9 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
             required
             type="tel"
             pattern="^\+[0-9]{1,3}\s?[0-9]{6,14}$"
-            label={t("N° téléphone responsable durabilité (commence par +33 pour la France)")}
+            label={t(
+              "N° téléphone responsable durabilité (commence par +33 pour la France)"
+            )}
             placeholder="exemple : +33612345678"
             readOnly={readOnly}
             {...companyForm.bind("sustainability_officer_phone_number")}
@@ -204,7 +212,6 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
             {...companyForm.bind("vat_number")}
           />
         </Form>
-
       </section>
       <section>
         {!readOnly && (
@@ -225,9 +232,7 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
   )
 }
 
-
 export default CompanyInfo
-
 
 function hasChange(entity: Entity, formEntity: CompanyFormValue) {
   return (
@@ -235,8 +240,10 @@ function hasChange(entity: Entity, formEntity: CompanyFormValue) {
     entity.legal_name !== formEntity.legal_name ||
     entity.registration_id !== formEntity.registration_id ||
     entity.sustainability_officer !== formEntity.sustainability_officer ||
-    entity.sustainability_officer_phone_number !== formEntity.sustainability_officer_phone_number ||
-    entity.sustainability_officer_email !== formEntity.sustainability_officer_email ||
+    entity.sustainability_officer_phone_number !==
+      formEntity.sustainability_officer_phone_number ||
+    entity.sustainability_officer_email !==
+      formEntity.sustainability_officer_email ||
     entity.registered_address !== formEntity.registered_address ||
     entity.registered_city !== formEntity.registered_city ||
     entity.registered_zipcode !== formEntity.registered_zipcode ||
@@ -246,7 +253,6 @@ function hasChange(entity: Entity, formEntity: CompanyFormValue) {
     entity.vat_number !== formEntity.vat_number
   )
 }
-
 
 const useCompanyForm = (entity: Entity) => {
   return useForm({
@@ -258,9 +264,14 @@ const useCompanyForm = (entity: Entity) => {
     registered_country: entity?.registered_country as Country | undefined,
     registered_zipcode: entity?.registered_zipcode as string | undefined,
     registration_id: entity?.registration_id as string | undefined,
-    sustainability_officer_email: entity?.sustainability_officer_email as string | undefined,
-    sustainability_officer_phone_number: entity?.sustainability_officer_phone_number as string | undefined,
-    sustainability_officer: entity?.sustainability_officer as string | undefined,
+    sustainability_officer_email: entity?.sustainability_officer_email as
+      | string
+      | undefined,
+    sustainability_officer_phone_number:
+      entity?.sustainability_officer_phone_number as string | undefined,
+    sustainability_officer: entity?.sustainability_officer as
+      | string
+      | undefined,
     website: entity?.website as string | undefined,
     vat_number: entity?.vat_number as string | undefined,
   })

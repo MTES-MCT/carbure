@@ -26,31 +26,30 @@ export const RejectTransfer = ({
   const entity = useEntity()
   const notify = useNotify()
 
-  const { value, bind } =
-    useForm<{ comment: string | undefined }>({ comment: undefined })
+  const { value, bind } = useForm<{ comment: string | undefined }>({
+    comment: undefined,
+  })
 
-  const rejectTransfer = useMutation(api.rejectTransfer,
-    {
-      invalidates: [
-        "elec-transfer-certificates",
-        "elec-operator-snapshot"
-      ],
-      onSuccess: () => {
-        notify(
-          t(
-            "Le certificat de cession a été refusé et la raison mentionnée a été communiquée au fournisseur."
-          ),
-          { variant: "success" }
-        )
-        onRejected()
-        onClose()
-      },
-    }
-  )
-
+  const rejectTransfer = useMutation(api.rejectTransfer, {
+    invalidates: ["elec-transfer-certificates", "elec-operator-snapshot"],
+    onSuccess: () => {
+      notify(
+        t(
+          "Le certificat de cession a été refusé et la raison mentionnée a été communiquée au fournisseur."
+        ),
+        { variant: "success" }
+      )
+      onRejected()
+      onClose()
+    },
+  })
 
   const onRejectTransfer = async () => {
-    await rejectTransfer.execute(entity.id, transferCertificate!.id, value.comment!)
+    await rejectTransfer.execute(
+      entity.id,
+      transferCertificate!.id,
+      value.comment!
+    )
   }
 
   return (
@@ -99,4 +98,3 @@ export const RejectTransfer = ({
     </Dialog>
   )
 }
-

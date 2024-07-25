@@ -6,7 +6,11 @@ import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import { useProvistionCertificateQueryParamsStore } from "elec-admin/hooks/provision-certificate-query-params-store"
 import { useProvisionCertificatesQuery } from "elec-admin/hooks/provision-certificates-query"
-import { ElecAdminProvisionCertificateFilter, ElecAdminProvisionCertificateStatus, ElecAdminSnapshot } from "elec-admin/types"
+import {
+  ElecAdminProvisionCertificateFilter,
+  ElecAdminProvisionCertificateStatus,
+  ElecAdminSnapshot,
+} from "elec-admin/types"
 import { ElecProvisionCertificatePreview } from "elec/types"
 import { useLocation, useMatch } from "react-router-dom"
 import * as api from "../../api"
@@ -22,10 +26,14 @@ type ProvisionListProps = {
 }
 
 const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
-
   const entity = useEntity()
   const status = useAutoStatus()
-  const [state, actions] = useProvistionCertificateQueryParamsStore(entity, year, status, snapshot)
+  const [state, actions] = useProvistionCertificateQueryParamsStore(
+    entity,
+    year,
+    status,
+    snapshot
+  )
   const query = useProvisionCertificatesQuery(state)
   const location = useLocation()
 
@@ -34,7 +42,9 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
     params: [query],
   })
 
-  const showProvisionCertificateDetails = (provisionCertificate: ElecProvisionCertificatePreview) => {
+  const showProvisionCertificateDetails = (
+    provisionCertificate: ElecProvisionCertificatePreview
+  ) => {
     return {
       pathname: location.pathname,
       search: location.search,
@@ -42,15 +52,15 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
     }
   }
 
-  const provisionCertificatesData = provisionCertificatesResponse.result?.data.data
+  const provisionCertificatesData =
+    provisionCertificatesResponse.result?.data.data
 
-  // const provisionCertificatesData = elecAdminProvisionCertificateList //TOTEST  
+  // const provisionCertificatesData = elecAdminProvisionCertificateList //TOTEST
 
   const total = provisionCertificatesData?.total ?? 0
   const count = provisionCertificatesData?.returned ?? 0
   return (
     <>
-
       <Bar>
         <ProvisionCertificateFilters
           filters={FILTERS}
@@ -62,10 +72,7 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
         />
       </Bar>
       <section>
-
-
         <ActionBar>
-
           <StatusSwitcher
             status={status}
             onSwitch={actions.setStatus}
@@ -80,7 +87,9 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
             <ElecAdminProvisionCertificateTable
               loading={provisionCertificatesResponse.loading}
               order={state.order}
-              provisionCertificates={provisionCertificatesData.elec_provision_certificates}
+              provisionCertificates={
+                provisionCertificatesData.elec_provision_certificates
+              }
               rowLink={showProvisionCertificateDetails}
               selected={state.selection}
               onSelect={actions.setSelection}
@@ -99,17 +108,17 @@ const ProvisionList = ({ snapshot, year }: ProvisionListProps) => {
             )}
           </>
         ) : (
-          <NoResult
-            loading={provisionCertificatesResponse.loading}
-          />
+          <NoResult loading={provisionCertificatesResponse.loading} />
         )}
-      </section >
-      <HashRoute path="provision-certificate/:id" element={<ElecAdminProvisionDetailsDialog />} />
+      </section>
+      <HashRoute
+        path="provision-certificate/:id"
+        element={<ElecAdminProvisionDetailsDialog />}
+      />
     </>
   )
 }
 export default ProvisionList
-
 
 const FILTERS = [
   ElecAdminProvisionCertificateFilter.Cpo,
@@ -117,11 +126,9 @@ const FILTERS = [
   ElecAdminProvisionCertificateFilter.OperatingUnit,
 ]
 
-
 export function useAutoStatus() {
   const matchStatus = useMatch("/org/:entity/elec-admin/:year/:view/:status/*")
-  const status = matchStatus?.params?.status?.toUpperCase() as ElecAdminProvisionCertificateStatus
+  const status =
+    matchStatus?.params?.status?.toUpperCase() as ElecAdminProvisionCertificateStatus
   return status ?? ElecAdminProvisionCertificateStatus.Available
 }
-
-

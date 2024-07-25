@@ -3,18 +3,21 @@ import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
 import useTitle from "common/hooks/title"
-import { ElecAuditFilterSelection, ElecAuditSnapshot, ElecAuditStates, ElecAuditStatus } from "elec-audit/types"
+import {
+  ElecAuditFilterSelection,
+  ElecAuditSnapshot,
+  ElecAuditStates,
+  ElecAuditStatus,
+} from "elec-audit/types"
 import { useTranslation } from "react-i18next"
 import { useFilterSearchParams } from "./filter-search-params"
-
 
 export function useElecAuditChargePointsQueryParamsStore(
   entity: Entity,
   year: number,
   status: ElecAuditStatus,
-  snapshot?: ElecAuditSnapshot,
+  snapshot?: ElecAuditSnapshot
 ) {
-
   const [limit, saveLimit] = useLimit()
   const [filtersParams, setFiltersParams] = useFilterSearchParams()
 
@@ -123,7 +126,6 @@ export function useElecAuditChargePointsQueryParamsStore(
   if (snapshot && state.snapshot !== snapshot) {
     actions.setSnapshot(snapshot)
   }
-
 
   return [state, actions] as [typeof state, typeof actions]
 }

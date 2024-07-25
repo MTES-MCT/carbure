@@ -34,7 +34,10 @@ export const Data = {
 
 export function getField(label: any) {
   const rx = new RegExp(`^${label}`)
-  const field = screen.getByText(rx).closest("[data-field]")?.querySelector("input")
+  const field = screen
+    .getByText(rx)
+    .closest("[data-field]")
+    ?.querySelector("input")
   if (!field) throw new Error(`Cannot find field with label like ${label}`)
   return field
 }
@@ -75,7 +78,12 @@ export const mockGetWithResponseData = (url: string, data: any) => {
     )
   })
 }
-export const mockPostWithResponseData = (url: string, data?: any, withError: boolean = false, error?: string) => {
+export const mockPostWithResponseData = (
+  url: string,
+  data?: any,
+  withError = false,
+  error?: string
+) => {
   return rest.post("/api" + url, (req, res, ctx) => {
     return res(
       withError ? ctx.status(400) : ctx.status(200),

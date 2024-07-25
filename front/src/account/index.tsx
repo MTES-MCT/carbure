@@ -20,9 +20,7 @@ const Account = () => {
       <Routes>
         <Route
           path="company-registration"
-          element={
-            <CompanyRegistrationDialog />
-          }
+          element={<CompanyRegistrationDialog />}
         />
       </Routes>
       <section>
@@ -32,8 +30,6 @@ const Account = () => {
       <section>
         <AccountAuthentication />
       </section>
-
-
     </Main>
   )
 }

@@ -50,10 +50,7 @@ export function formatGHG(num: number) {
   return formatNumber(num) + " gCO2eq/MJ"
 }
 
-export function formatDate(
-  date: Date | string | null,
-  format: string = "dd/MM/yyyy"
-) {
+export function formatDate(date: Date | string | null, format = "dd/MM/yyyy") {
   if (date === null) {
     return "N/A"
   }

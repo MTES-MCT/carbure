@@ -11,14 +11,17 @@ import {
 } from "carbure/__test__/api"
 import { lot } from "transaction-details/__test__/data"
 
-export const okAddLot = rest.post("/api/transactions/lots/add", (req, res, ctx) => {
-  return res(
-    ctx.json({
-      status: "success",
-      data: lot,
-    })
-  )
-})
+export const okAddLot = rest.post(
+  "/api/transactions/lots/add",
+  (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data: lot,
+      })
+    )
+  }
+)
 
 export default setupServer(
   okAddLot,

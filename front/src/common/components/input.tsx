@@ -46,7 +46,6 @@ export interface TextInputProps extends Control {
   autoComplete?: boolean
   onChange?: (value: string | undefined) => void
   inputRef?: React.RefObject<HTMLInputElement>
-
 }
 
 export const TextInput = ({
@@ -88,10 +87,10 @@ export const NumberInput = ({
       !onChange
         ? undefined
         : (e) => {
-          const value = parseFloat(e.target.value)
-          const change = isNaN(value) ? undefined : value
-          onChange(change)
-        }
+            const value = parseFloat(e.target.value)
+            const change = isNaN(value) ? undefined : value
+            onChange(change)
+          }
     }
   />
 )
@@ -129,10 +128,11 @@ export const FileListInput = ({
   onChange,
   ...props
 }: FileListInputProps) => (
-
   <FileInputField
     value={value}
-    onChange={onChange ? (e) => onChange(e?.target.files ?? undefined) : undefined}
+    onChange={
+      onChange ? (e) => onChange(e?.target.files ?? undefined) : undefined
+    }
     multiple={true}
     placeholder={value?.[0]?.name ?? placeholder}
     {...props}
@@ -152,15 +152,16 @@ export const FileInput = ({
   onChange,
   ...props
 }: FileInputProps) => {
-  return <FileInputField
-    value={value}
-    onChange={(e) => onChange ? onChange(e?.target.files?.[0]) : undefined}
-    multiple={false}
-    placeholder={value?.name ?? placeholder}
-    {...props}
-  />
+  return (
+    <FileInputField
+      value={value}
+      onChange={(e) => (onChange ? onChange(e?.target.files?.[0]) : undefined)}
+      multiple={false}
+      placeholder={value?.name ?? placeholder}
+      {...props}
+    />
+  )
 }
-
 
 export interface FileInputFieldProps extends Control {
   value?: File | FileList | undefined
@@ -179,14 +180,15 @@ export const FileInputField = ({
   const inputRef = useRef<HTMLInputElement>(null)
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!inputRef.current) return
-    var files = e.target.files;
+    const files = e.target.files
 
     if (files === null) return
 
-    for (var i = 0; i < files.length; i++) {
+    for (let i = 0; i < files.length; i++) {
       if (files[i].size > 5000000) {
         const message = t(
-          "La taille du fichier \"{{fileName}}\" est trop importante pour être analysée (5mo maximum).", { fileName: files[i].name }
+          'La taille du fichier "{{fileName}}" est trop importante pour être analysée (5mo maximum).',
+          { fileName: files[i].name }
         )
         inputRef.current.setCustomValidity(message)
         inputRef.current.reportValidity()
@@ -197,27 +199,31 @@ export const FileInputField = ({
     return onChange ? onChange(e) : undefined
   }
 
-  return <Field
-    {...props}
-    type="file"
-    onClear={clear && value && onChange ? () => onChange(undefined) : undefined}
-  >
-    <label className={css.file}>
-      <input
-        ref={inputRef}
-        autoFocus={props.autoFocus}
-        disabled={props.disabled}
-        readOnly={props.readOnly}
-        required={props.required}
-        multiple={multiple}
-        name={props.name}
-        style={{ opacity: 0, position: "absolute" }}
-        type="file"
-        onChange={handleChange}
-      />
-      {placeholder}
-    </label>
-  </Field>
+  return (
+    <Field
+      {...props}
+      type="file"
+      onClear={
+        clear && value && onChange ? () => onChange(undefined) : undefined
+      }
+    >
+      <label className={css.file}>
+        <input
+          ref={inputRef}
+          autoFocus={props.autoFocus}
+          disabled={props.disabled}
+          readOnly={props.readOnly}
+          required={props.required}
+          multiple={multiple}
+          name={props.name}
+          style={{ opacity: 0, position: "absolute" }}
+          type="file"
+          onChange={handleChange}
+        />
+        {placeholder}
+      </label>
+    </Field>
+  )
 }
 
 export interface FileAreaProps {
@@ -548,7 +554,10 @@ export const Field = ({
     >
       {label && (
         <TooltipWrapper>
-          <label className={css.label} title={hasTooltip ? "" : title ?? label}>
+          <label
+            className={css.label}
+            title={hasTooltip ? "" : (title ?? label)}
+          >
             {label}
             {required && !(disabled || readOnly) && " *"}
           </label>

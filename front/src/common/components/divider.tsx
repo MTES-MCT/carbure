@@ -1,8 +1,3 @@
-
 import css from "./divider.module.css"
 
-
-
-export const Divider = () => (
-  <div className={css.divider} />
-)
+export const Divider = () => <div className={css.divider} />

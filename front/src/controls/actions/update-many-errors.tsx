@@ -26,11 +26,11 @@ export const UpdateErrorsDialog = ({
         <h1>
           {method === "update"
             ? t("{{count}} lots n'ont pas pu être modifiés :", {
-              count: errorsKeys.length,
-            })
+                count: errorsKeys.length,
+              })
             : t("{{count}} lots n'ont pas pu être supprimés :", {
-              count: errorsKeys.length,
-            })}
+                count: errorsKeys.length,
+              })}
         </h1>
       </header>
       <main>

@@ -23,8 +23,8 @@ const DoubleCountingFilesChecker = () => {
   useTitle(t("Vérification de fichiers de double comptage"))
   const portal = usePortal()
 
-
-  const checkedFiles: CheckDoubleCountingFilesResponse = location.state?.checkedFiles
+  const checkedFiles: CheckDoubleCountingFilesResponse =
+    location.state?.checkedFiles
 
   const filesValid = checkedFiles?.files.filter((f) => !f.error_count) || []
   const filesToFix = checkedFiles?.files.filter((f) => f.error_count > 0) || []
@@ -35,13 +35,24 @@ const DoubleCountingFilesChecker = () => {
   const files: FileList = location.state?.files
 
   function showFileErrorsDialog(fileData: DoubleCountingFileInfo) {
-    portal((close) => <ErrorsDetailsDialog fileData={fileData} onClose={close} />)
+    portal((close) => (
+      <ErrorsDetailsDialog fileData={fileData} onClose={close} />
+    ))
   }
 
-  function showFileValidDialog(fileData: DoubleCountingFileInfo, index: number) {
-    const file = Array.from(files).find((f) => f.name.replace(/[^a-zA-Z0-9-]/g, '') === fileData.file_name.replace(/[^a-zA-Z0-9-]/g, ''))
+  function showFileValidDialog(
+    fileData: DoubleCountingFileInfo,
+    index: number
+  ) {
+    const file = Array.from(files).find(
+      (f) =>
+        f.name.replace(/[^a-zA-Z0-9-]/g, "") ===
+        fileData.file_name.replace(/[^a-zA-Z0-9-]/g, "")
+    )
     if (!file) return
-    portal((close) => <ValidDetailsDialog fileData={fileData} onClose={close} file={file} />)
+    portal((close) => (
+      <ValidDetailsDialog fileData={fileData} onClose={close} file={file} />
+    ))
   }
 
   const columns: Column<DoubleCountingFileInfo>[] = [
@@ -72,10 +83,17 @@ const DoubleCountingFilesChecker = () => {
     },
     {
       header: t("Période de validité"),
-      cell: (file) => <Cell text={file.start_year ? `${file.start_year} - ${file.start_year + 1}` : t("Non reconnue")} />,
+      cell: (file) => (
+        <Cell
+          text={
+            file.start_year
+              ? `${file.start_year} - ${file.start_year + 1}`
+              : t("Non reconnue")
+          }
+        />
+      ),
     },
   ]
-
 
   return (
     <Main>
@@ -130,7 +148,11 @@ const DoubleCountingFilesChecker = () => {
                 )}
 
                 {valid.count > 0 && (
-                  <Table columns={columns} rows={valid.files} onAction={showFileValidDialog} />
+                  <Table
+                    columns={columns}
+                    rows={valid.files}
+                    onAction={showFileValidDialog}
+                  />
                 )}
               </>
             )}

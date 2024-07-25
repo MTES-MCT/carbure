@@ -39,7 +39,7 @@ export function useMutation<R, A extends any[]>(
       // invalidate linked queries if mutation is successful
       invalidates && invalidate(...invalidates)
       options.onSuccess?.(res, opts)
-    }
+    },
   })
 }
 
