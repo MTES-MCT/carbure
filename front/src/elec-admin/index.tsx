@@ -12,7 +12,6 @@ import ProvisionList from "./components/provision-certificates/list"
 import TransferList from "./components/transfer-certificate/list"
 import { ElecAdminProvisionCertificateStatus, ElecAdminSnapshot } from "./types"
 
-
 const defaultElecAdminSnapshot: ElecAdminSnapshot = {
   provision_certificates: 0,
   provision_certificates_available: 0,
@@ -22,7 +21,7 @@ const defaultElecAdminSnapshot: ElecAdminSnapshot = {
   transfer_certificates_pending: 0,
   transfer_certificates_rejected: 0,
   provisioned_energy: 0,
-  transferred_energy: 0
+  transferred_energy: 0,
 }
 
 export const ElecAdmin = () => {
@@ -36,10 +35,10 @@ export const ElecAdmin = () => {
     params: [entity.id, years.selected],
   })
 
-  const snapshot = elecAdminSnapshot.result?.data.data ?? defaultElecAdminSnapshot
+  const snapshot =
+    elecAdminSnapshot.result?.data.data ?? defaultElecAdminSnapshot
 
   return (
-
     <Main>
       <header>
         <section>
@@ -57,24 +56,22 @@ export const ElecAdmin = () => {
         </section>
 
         <section>
-          <ElecAdminTabs loading={elecAdminSnapshot.loading} snapshot={snapshot} />
+          <ElecAdminTabs
+            loading={elecAdminSnapshot.loading}
+            snapshot={snapshot}
+          />
         </section>
       </header>
-
 
       <Routes>
         <Route
           path="provision/*"
-          element={
-            <ProvisionList snapshot={snapshot} year={years.selected} />
-          }
+          element={<ProvisionList snapshot={snapshot} year={years.selected} />}
         />
 
         <Route
           path="transfer/*"
-          element={
-            <TransferList snapshot={snapshot} year={years.selected} />
-          }
+          element={<TransferList snapshot={snapshot} year={years.selected} />}
         />
         <Route
           path="*"
@@ -85,61 +82,74 @@ export const ElecAdmin = () => {
             />
           }
         />
-
       </Routes>
     </Main>
-
-
   )
 }
 
 export default ElecAdmin
-
-
 
 interface ElecAdminTabsProps {
   loading: boolean
   snapshot: ElecAdminSnapshot
 }
 
-
-function ElecAdminTabs({
-  loading,
-  snapshot
-}: ElecAdminTabsProps) {
+function ElecAdminTabs({ loading, snapshot }: ElecAdminTabsProps) {
   const { t } = useTranslation()
 
-  return (<Tabs variant="main" tabs={[{
-    key: "provision",
-    path: "provision/available",
-    label: <>
-      <p style={{
-        fontWeight: "normal"
-      }}>
-        {loading ? <Loader size={20} /> : snapshot?.provision_certificates}
-        {/* {loading ? <Loader size={20} /> : formatNumber(snapshot?.provisioned_energy)} MWh */}
-      </p>
-      <strong>
-        {/* {t("Énergie attribuée")} */}
-        {t("Certificats de founiture")}
-      </strong>
-    </>
-  }, {
-    key: "transfer",
-    path: "transfer",
-    label: <>
-      <p style={{
-        fontWeight: "normal"
-      }}>
-        {loading ? <Loader size={20} /> : snapshot?.transfer_certificates}
-        {/* {loading ? <Loader size={20} /> : formatNumber(snapshot?.transferred_energy)} MWh */}
-      </p>
-      <strong>
-        {t("Énergie cédée")}
-        {/* {t("Énergie cédée")} */}
-      </strong>
-    </>
-  }]} />);
+  return (
+    <Tabs
+      variant="main"
+      tabs={[
+        {
+          key: "provision",
+          path: "provision/available",
+          label: (
+            <>
+              <p
+                style={{
+                  fontWeight: "normal",
+                }}
+              >
+                {loading ? (
+                  <Loader size={20} />
+                ) : (
+                  snapshot?.provision_certificates
+                )}
+                {/* {loading ? <Loader size={20} /> : formatNumber(snapshot?.provisioned_energy)} MWh */}
+              </p>
+              <strong>
+                {/* {t("Énergie attribuée")} */}
+                {t("Certificats de founiture")}
+              </strong>
+            </>
+          ),
+        },
+        {
+          key: "transfer",
+          path: "transfer",
+          label: (
+            <>
+              <p
+                style={{
+                  fontWeight: "normal",
+                }}
+              >
+                {loading ? (
+                  <Loader size={20} />
+                ) : (
+                  snapshot?.transfer_certificates
+                )}
+                {/* {loading ? <Loader size={20} /> : formatNumber(snapshot?.transferred_energy)} MWh */}
+              </p>
+              <strong>
+                {t("Énergie cédée")}
+                {/* {t("Énergie cédée")} */}
+              </strong>
+            </>
+          ),
+        },
+      ]}
+    />
+  )
 }
-
-

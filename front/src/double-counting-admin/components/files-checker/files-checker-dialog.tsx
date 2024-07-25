@@ -65,8 +65,8 @@ const DoubleCountingFilesCheckerDialog = ({
       navigate("/org/9/double-counting/files-checker", {
         state: {
           checkedFiles,
-          files: value.doubleCountingFiles
-        }
+          files: value.doubleCountingFiles,
+        },
       })
     }
   }

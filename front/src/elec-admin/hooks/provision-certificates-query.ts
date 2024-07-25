@@ -1,4 +1,7 @@
-import { ElecAdminProvisionCertificateQuery, ElecAdminProvisionCertificateStates } from "elec-admin/types"
+import {
+  ElecAdminProvisionCertificateQuery,
+  ElecAdminProvisionCertificateStates,
+} from "elec-admin/types"
 import { useMemo } from "react"
 
 export function useProvisionCertificatesQuery({

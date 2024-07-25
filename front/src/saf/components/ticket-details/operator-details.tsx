@@ -39,7 +39,7 @@ export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
 
   const ticketResponse = useQuery(api.getOperatorTicketDetails, {
     key: "ticket-details",
-    params: [entity.id, parseInt(match?.params.id!)],
+    params: [entity.id, parseInt(match?.params.id || "")],
   })
 
   const ticket = ticketResponse.result?.data?.data
@@ -122,8 +122,9 @@ export const OperatorTicketDetails = ({ neighbors }: TicketDetailsProps) => {
             )}
 
           {ticket?.client !== entity.name &&
+            ticket?.status &&
             [SafTicketStatus.Pending, SafTicketStatus.Rejected].includes(
-              ticket?.status!
+              ticket?.status
             ) && (
               <Button
                 icon={Cross}

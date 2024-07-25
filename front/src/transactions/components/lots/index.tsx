@@ -430,7 +430,7 @@ export function useLotTitle(state: QueryParams) {
   const status =
     state.status in statuses
       ? statuses[state.status]
-      : adminStatuses[state.status as AdminStatus] ?? ""
+      : (adminStatuses[state.status as AdminStatus] ?? "")
   const category = state.status in statuses ? categories[state.category] : ""
 
   useTitle(`${entity} ∙ ${status} ${category} ${year}`)

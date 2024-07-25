@@ -2,10 +2,7 @@ import { AxiosError } from "axios"
 import Alert from "common/components/alert"
 import { Button } from "common/components/button"
 import { Dialog } from "common/components/dialog"
-import {
-  AlertCircle,
-  Plus
-} from "common/components/icons"
+import { AlertCircle, Plus } from "common/components/icons"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import Portal from "common/components/portal"
 import { useMutation } from "common/hooks/async"
@@ -24,22 +21,31 @@ interface CompanyInfoSirenDialogProps {
 export const CompanyInfoSirenDialog = ({
   onClose,
   wantPrefillCompanyInfo,
-}: CompanyInfoSirenDialogProps
-) => {
+}: CompanyInfoSirenDialogProps) => {
   const { t } = useTranslation()
 
   const notify = useNotify()
-  const [prefetchedCompany, setPrefetchedCompany] = useState<SearchCompanyPreview | undefined>(undefined)
-  const [prefetchedCompanyWarning, setPrefetchedCompanyWarning] = useState<string | undefined>(undefined)
+  const [prefetchedCompany, setPrefetchedCompany] = useState<
+    SearchCompanyPreview | undefined
+  >(undefined)
+  const [prefetchedCompanyWarning, setPrefetchedCompanyWarning] = useState<
+    string | undefined
+  >(undefined)
 
-
-  const fillFormWithFoundCompany = (company?: SearchCompanyPreview, warning?: string) => {
-
+  const fillFormWithFoundCompany = (
+    company?: SearchCompanyPreview,
+    warning?: string
+  ) => {
     if (company) {
       setPrefetchedCompanyWarning(undefined)
-      notify(t("Les informations ont été pré-remplies avec les informations de l'entreprises"), {
-        variant: "success",
-      })
+      notify(
+        t(
+          "Les informations ont été pré-remplies avec les informations de l'entreprises"
+        ),
+        {
+          variant: "success",
+        }
+      )
     }
     if (warning) {
       setPrefetchedCompanyWarning(warning)
@@ -52,7 +58,6 @@ export const CompanyInfoSirenDialog = ({
     onClose()
   }
 
-
   return (
     <Portal onClose={onClose}>
       <Dialog onClose={onClose}>
@@ -63,7 +68,10 @@ export const CompanyInfoSirenDialog = ({
         <main>
           <section>
             <p>
-              <Trans>Rechercher votre société dans la base de données entreprises.data.gouv :</Trans>
+              <Trans>
+                Rechercher votre société dans la base de données
+                entreprises.data.gouv :
+              </Trans>
             </p>
           </section>
           <section>
@@ -71,30 +79,35 @@ export const CompanyInfoSirenDialog = ({
 
             {prefetchedCompany && (
               <>
-                <p>{prefetchedCompany.legal_name} ({prefetchedCompany.registered_address} {prefetchedCompany.registered_zipcode} {prefetchedCompany.registered_city})</p>
+                <p>
+                  {prefetchedCompany.legal_name} (
+                  {prefetchedCompany.registered_address}{" "}
+                  {prefetchedCompany.registered_zipcode}{" "}
+                  {prefetchedCompany.registered_city})
+                </p>
               </>
-            )
-            }
-            {prefetchedCompanyWarning &&
+            )}
+            {prefetchedCompanyWarning && (
               <Alert icon={AlertCircle} variant="warning">
                 {prefetchedCompanyWarning}
               </Alert>
-            }
-
+            )}
           </section>
 
           {!prefetchedCompany && (
             <section>
               <Alert icon={AlertCircle} variant="info">
-                <Trans>Votre société n'est pas immatriculée en France ? Choisissez votre pays dans le formulaire afin de remplir manuellement les données associées.</Trans>
+                <Trans>
+                  Votre société n'est pas immatriculée en France ? Choisissez
+                  votre pays dans le formulaire afin de remplir manuellement les
+                  données associées.
+                </Trans>
               </Alert>
             </section>
           )}
-
         </main>
 
         <footer>
-
           <Button
             asideX
             action={onSubmit}
@@ -104,9 +117,8 @@ export const CompanyInfoSirenDialog = ({
             label={t("Remplir les données")}
           />
         </footer>
-
       </Dialog>
-    </Portal >
+    </Portal>
   )
 }
 export default CompanyInfoSirenDialog

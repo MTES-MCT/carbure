@@ -55,16 +55,16 @@
   color: var(--green-dark);
 }
 
-.success.small{
+.success.small {
   border: 1px solid var(--green-medium);
 }
-.info.small{
+.info.small {
   border: 1px solid var(--blue-highlight);
 }
-.danger.small{
+.danger.small {
   border: 1px solid var(--red-medium);
 }
-.none.small{
+.none.small {
   border: 1px solid var(--gray-medium);
 }
 

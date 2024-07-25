@@ -1,5 +1,11 @@
-import { ElecAdminTransferCertificateQuery, ElecAdminTransferCertificateStates } from "elec-admin/types"
-import { ElecTransferCertificateQuery, ElecTransferCertificateStates } from "elec/types-cpo"
+import {
+  ElecAdminTransferCertificateQuery,
+  ElecAdminTransferCertificateStates,
+} from "elec-admin/types"
+import {
+  ElecTransferCertificateQuery,
+  ElecTransferCertificateStates,
+} from "elec/types-cpo"
 import { useMemo } from "react"
 
 export function useAdminTransferCertificatesQuery({

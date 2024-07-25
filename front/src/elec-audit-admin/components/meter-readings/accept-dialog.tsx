@@ -12,8 +12,8 @@ import * as api from "../../api"
 import Alert from "common/components/alert"
 export type ApplicationDialogProps = {
   application: ElecMeterReadingsApplication
-  onClose: () => void,
-  onValidated: () => void,
+  onClose: () => void
+  onValidated: () => void
   forceValidation: boolean
 }
 
@@ -21,29 +21,46 @@ export const MeterReadingsApplicationAcceptDialog = ({
   application,
   onClose,
   onValidated,
-  forceValidation
+  forceValidation,
 }: ApplicationDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const notify = useNotify()
   const notifyError = useNotifyError()
 
-  const acceptMeterReadingsApplication = useMutation(api.acceptMeterReadingsApplication, {
-    invalidates: ["audit-meter-readings-applications", "elec-admin-audit-snapshot"],
-    onSuccess() {
-      onClose()
-      onValidated()
-      notify(t("Les relevés T{{quarter}} {{year}} ont été acceptés !", { quarter: application.quarter, year: application.year }), { variant: "success" })
-
-    },
-    onError(err) {
-      notifyError(err, t("Impossible d'accepter les relevés des points de recharge"))
-    },
-  })
-
+  const acceptMeterReadingsApplication = useMutation(
+    api.acceptMeterReadingsApplication,
+    {
+      invalidates: [
+        "audit-meter-readings-applications",
+        "elec-admin-audit-snapshot",
+      ],
+      onSuccess() {
+        onClose()
+        onValidated()
+        notify(
+          t("Les relevés T{{quarter}} {{year}} ont été acceptés !", {
+            quarter: application.quarter,
+            year: application.year,
+          }),
+          { variant: "success" }
+        )
+      },
+      onError(err) {
+        notifyError(
+          err,
+          t("Impossible d'accepter les relevés des points de recharge")
+        )
+      },
+    }
+  )
 
   const acceptApplication = (forceValidation: boolean) => {
-    acceptMeterReadingsApplication.execute(entity.id, application.id, forceValidation)
+    acceptMeterReadingsApplication.execute(
+      entity.id,
+      application.id,
+      forceValidation
+    )
   }
 
   return (
@@ -55,57 +72,55 @@ export const MeterReadingsApplicationAcceptDialog = ({
       </header>
 
       <main>
-
         <section>
-          <p style={{ textAlign: 'left' }}>
+          <p style={{ textAlign: "left" }}>
             <Trans
               values={{
                 quarter: application.quarter,
                 year: application.year,
               }}
               count={application.charge_point_count}
-              defaults="<b>{{count}}</b> relevés envoyés pour T{{quarter}} {{year}}.</b>" />
+              defaults="<b>{{count}}</b> relevés envoyés pour T{{quarter}} {{year}}.</b>"
+            />
           </p>
           <p>
             <Trans>Voulez-vous accepter cette demande ?</Trans>
           </p>
-
-
         </section>
 
         <section>
-          <Alert variant="info" >
+          <Alert variant="info">
             <InfoCircle />
             <p>
-
               <Trans
                 defaults="{{energyTotal}} MWh renouvelables seront ajoutés à l'énergie disponible de l'aménageur {{cpo}}."
-                values={{ energyTotal: formatNumber(application.energy_total), cpo: application.cpo.name }}>
-              </Trans>
+                values={{
+                  energyTotal: formatNumber(application.energy_total),
+                  cpo: application.cpo.name,
+                }}
+              ></Trans>
             </p>
-
           </Alert>
         </section>
       </main>
 
       <footer>
-
-
-
-        <Button icon={Check} label={forceValidation ? t("Verser, sans auditer, les certificats de fourniture") : t("Verser les certificats de fourniture")} variant="success" action={() => acceptApplication(forceValidation)} loading={acceptMeterReadingsApplication.loading} />
-
-
+        <Button
+          icon={Check}
+          label={
+            forceValidation
+              ? t("Verser, sans auditer, les certificats de fourniture")
+              : t("Verser les certificats de fourniture")
+          }
+          variant="success"
+          action={() => acceptApplication(forceValidation)}
+          loading={acceptMeterReadingsApplication.loading}
+        />
 
         <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
       </footer>
-
-    </Dialog >
+    </Dialog>
   )
 }
 
-
-
-
 export default MeterReadingsApplicationAcceptDialog
-
-

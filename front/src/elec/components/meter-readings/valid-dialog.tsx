@@ -21,7 +21,7 @@ export type MeterReadingsValidDetailsDialogProps = {
 export const MeterReadingsValidDetailsDialog = ({
   fileData,
   onClose,
-  file
+  file,
 }: MeterReadingsValidDetailsDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -33,8 +33,12 @@ export const MeterReadingsValidDetailsDialog = ({
     invalidates: ["meter-readings-applications"],
     onSuccess() {
       onClose()
-      notify(t("Les {{count}} relevés trimestriels ont bien été envoyés !", { count: fileData.charge_point_count }), { variant: "success" })
-
+      notify(
+        t("Les {{count}} relevés trimestriels ont bien été envoyés !", {
+          count: fileData.charge_point_count,
+        }),
+        { variant: "success" }
+      )
     },
     onError(err) {
       notifyError(err, t("Impossible d'envoyer les relevés trimestriels."))
@@ -47,7 +51,10 @@ export const MeterReadingsValidDetailsDialog = ({
     }
     if (fileData.pending_application_already_exists) {
       portal((resolve) => (
-        <ReplaceApplicationConfirmDialog onClose={resolve} onConfirm={confirmApplication} />
+        <ReplaceApplicationConfirmDialog
+          onClose={resolve}
+          onConfirm={confirmApplication}
+        />
       ))
     } else {
       confirmApplication()
@@ -60,18 +67,23 @@ export const MeterReadingsValidDetailsDialog = ({
         <Tag big variant="success">
           {t("Valide")}
         </Tag>
-        <h1>{t("Relevés trimestriels - T{{quarter}} {{year}}", { quarter: fileData.quarter, year: fileData.year })}</h1>
+        <h1>
+          {t("Relevés trimestriels - T{{quarter}} {{year}}", {
+            quarter: fileData.quarter,
+            year: fileData.year,
+          })}
+        </h1>
       </header>
 
       <main>
-
         <section>
-          <p style={{ textAlign: 'left' }}>
+          <p style={{ textAlign: "left" }}>
             <Trans
               values={{
                 fileName: fileData.file_name,
               }}
-              defaults="Votre fichier <b>{{fileName}}</b> ne comporte aucune erreur." />
+              defaults="Votre fichier <b>{{fileName}}</b> ne comporte aucune erreur."
+            />
           </p>
           <p>
             <Trans
@@ -80,15 +92,11 @@ export const MeterReadingsValidDetailsDialog = ({
                 quarter: fileData.quarter,
                 year: fileData.year,
               }}
-              defaults="Votre relevé trimestriel T{{quarter}} {{year}} pour vos {{count}} points de recharge peut être transmis à la DGEC pour vérification." />
-
+              defaults="Votre relevé trimestriel T{{quarter}} {{year}} pour vos {{count}} points de recharge peut être transmis à la DGEC pour vérification."
+            />
           </p>
 
-
-          {fileData.pending_application_already_exists &&
-            (
-              <ReplaceAlert />
-            )}
+          {fileData.pending_application_already_exists && <ReplaceAlert />}
         </section>
       </main>
 
@@ -96,24 +104,29 @@ export const MeterReadingsValidDetailsDialog = ({
         <Button
           icon={Send}
           loading={meterReadingsApplication.loading}
-          label={fileData.pending_application_already_exists ? t("Remplacer mes relevés trimestriels") : t("Transmettre mes relevés trimestriels")}
+          label={
+            fileData.pending_application_already_exists
+              ? t("Remplacer mes relevés trimestriels")
+              : t("Transmettre mes relevés trimestriels")
+          }
           variant="primary"
           action={submitMeterReadingsApplication}
         />
 
         <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
       </footer>
-
     </Dialog>
   )
 }
 
-
 export default MeterReadingsValidDetailsDialog
 
-const ReplaceApplicationConfirmDialog = ({ onClose, onConfirm }: {
-  onClose: () => void,
-  onConfirm: () => void,
+const ReplaceApplicationConfirmDialog = ({
+  onClose,
+  onConfirm,
+}: {
+  onClose: () => void
+  onConfirm: () => void
 }) => {
   const { t } = useTranslation()
 
@@ -122,33 +135,33 @@ const ReplaceApplicationConfirmDialog = ({ onClose, onConfirm }: {
     onClose()
   }
 
-  return <Dialog onClose={onClose}>
-    <header>
+  return (
+    <Dialog onClose={onClose}>
+      <header>
+        <h1>{t("Remplacer les derniers relevés ?")}</h1>
+      </header>
 
-      <h1>{t("Remplacer les derniers relevés ?")}</h1>
-    </header>
+      <main>
+        <section>
+          <p style={{ textAlign: "left" }}>
+            <Trans>
+              Souhaitez-vous confirmer le remplacement de vos derniers relevés
+              trimestriels en attente validation par cette nouvelle demande ?
+            </Trans>
+          </p>
+        </section>
+      </main>
 
-    <main>
+      <footer>
+        <Button
+          icon={Check}
+          label={t("Confirmer le remplacement")}
+          variant="warning"
+          action={confirmApplication}
+        />
 
-      <section>
-        <p style={{ textAlign: 'left' }}>
-          <Trans>Souhaitez-vous confirmer le remplacement de vos derniers relevés trimestriels en attente validation par cette nouvelle demande ?</Trans>
-        </p>
-
-      </section>
-    </main>
-
-    <footer>
-      <Button
-        icon={Check}
-        label={t("Confirmer le remplacement")}
-        variant="warning"
-        action={confirmApplication}
-      />
-
-      <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
-    </footer>
-
-  </Dialog>
+        <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
+      </footer>
+    </Dialog>
+  )
 }
-

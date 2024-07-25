@@ -1,10 +1,12 @@
 import { Entity } from "carbure/types"
 import { Order } from "common/components/table"
-import { ElecProvisionCertificatePreview, ElecTransferCertificate, ElecTransferCertificateFilter, ElecTransferCertificatePreview } from "./types"
+import {
+  ElecProvisionCertificatePreview,
+  ElecTransferCertificate,
+  ElecTransferCertificateFilter,
+  ElecTransferCertificatePreview,
+} from "./types"
 import { ElecOperatorSnapshot, ElecOperatorStatus } from "./types-operator"
-
-
-
 
 export interface ElecCPOSnapshot {
   provisioned_energy: number
@@ -17,14 +19,14 @@ export interface ElecCPOSnapshot {
   transfer_certificates_rejected: number
 }
 
-
-
 export enum ElecCPOProvisionCertificateStatus {
   Available = "AVAILABLE",
   History = "HISTORY",
 }
 
-export type ElecCPOProvisionCertificateFilterSelection = Partial<Record<ElecCPOProvisionCertificateFilter, string[]>>
+export type ElecCPOProvisionCertificateFilterSelection = Partial<
+  Record<ElecCPOProvisionCertificateFilter, string[]>
+>
 
 export interface ElecCPOProvisionCertificateStates {
   entity: Entity
@@ -57,8 +59,6 @@ export interface ElecCPOProvisionCertificateQuery {
   [ElecCPOProvisionCertificateFilter.Quarter]?: string[]
 }
 
-
-
 export interface ElecProvisionCertificatesData {
   elec_provision_certificates: ElecProvisionCertificatePreview[]
   from: number
@@ -74,14 +74,15 @@ export interface ElecTransferCertificatesData {
   total: number
 }
 
-
 export enum ElecTransferCertificateStatus {
   Pending = "PENDING",
   Accepted = "ACCEPTED",
   Rejected = "REJECTED",
 }
 
-export type ElecTransferCertificateFilterSelection = Partial<Record<ElecTransferCertificateFilter, string[]>>
+export type ElecTransferCertificateFilterSelection = Partial<
+  Record<ElecTransferCertificateFilter, string[]>
+>
 
 export interface ElecTransferCertificateStates {
   entity: Entity
@@ -95,7 +96,6 @@ export interface ElecTransferCertificateStates {
   order?: Order
   snapshot?: ElecCPOSnapshot | ElecOperatorSnapshot
 }
-
 
 export interface ElecTransferCertificateQuery {
   entity_id: number

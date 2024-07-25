@@ -15,7 +15,6 @@ import ChargePointsApplicationRejectDialog from "./reject-dialog"
 import ChargePointsApplicationHistory from "./details-history"
 import { ChargePointsApplicationDetailsPending } from "./details-pending"
 
-
 export const ChargePointsApplicationDetailsDialog = () => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -24,18 +23,21 @@ export const ChargePointsApplicationDetailsDialog = () => {
   const location = useLocation()
   const match = useHashMatch("application/:id")
 
-  const chargePointApplicationResponse = useQuery(api.getChargePointsApplicationDetails, {
-    key: "audit-charge-points-application-details",
-    params: [entity.id, parseInt(match?.params.id!)],
-  })
-  const chargePointApplication = chargePointApplicationResponse.result?.data.data
-
+  const chargePointApplicationResponse = useQuery(
+    api.getChargePointsApplicationDetails,
+    {
+      key: "audit-charge-points-application-details",
+      params: [entity.id, parseInt(match?.params.id || "")],
+    }
+  )
+  const chargePointApplication =
+    chargePointApplicationResponse.result?.data.data
 
   const closeDialog = () => {
     navigate({ search: location.search, hash: "#" })
   }
 
-  const acceptApplication = (force: boolean = false) => {
+  const acceptApplication = (force = false) => {
     if (!chargePointApplication) return
     portal((close) => (
       <ChargePointsApplicationAcceptDialog
@@ -47,7 +49,7 @@ export const ChargePointsApplicationDetailsDialog = () => {
     ))
   }
 
-  const rejectApplication = (force: boolean = false) => {
+  const rejectApplication = (force = false) => {
     if (!chargePointApplication) return
     portal((close) => (
       <ChargePointsApplicationRejectDialog
@@ -55,11 +57,9 @@ export const ChargePointsApplicationDetailsDialog = () => {
         onClose={close}
         forceRejection={force}
         onRejected={closeDialog}
-
       />
     ))
   }
-
 
   const downloadSample = async () => {
     return api.downloadChargePointsSample(entity.id, chargePointApplication!.id)
@@ -67,13 +67,14 @@ export const ChargePointsApplicationDetailsDialog = () => {
 
   return (
     <Portal onClose={closeDialog}>
-      <Dialog onClose={closeDialog} >
+      <Dialog onClose={closeDialog}>
         <header>
           <ApplicationStatus status={chargePointApplication?.status} big />
 
           <h1>{t("Inscription de points de recharge")}</h1>
         </header>
-        {chargePointApplication?.status === ElecAuditApplicationStatus.Pending && (
+        {chargePointApplication?.status ===
+          ElecAuditApplicationStatus.Pending && (
           <ChargePointsApplicationDetailsPending
             chargePointApplication={chargePointApplication}
             onAccept={acceptApplication}
@@ -81,29 +82,29 @@ export const ChargePointsApplicationDetailsDialog = () => {
             onDownloadSample={downloadSample}
           />
         )}
-        {chargePointApplication?.status === ElecAuditApplicationStatus.AuditInProgress && (
+        {chargePointApplication?.status ===
+          ElecAuditApplicationStatus.AuditInProgress && (
           <ChargePointsApplicationDetailsInProgress
             chargePointApplication={chargePointApplication}
             onAccept={acceptApplication}
             onReject={rejectApplication}
             onDownloadSample={downloadSample}
           />
-        )
-        }
-        {chargePointApplication?.status && [ElecAuditApplicationStatus.Accepted, ElecAuditApplicationStatus.Rejected].includes(chargePointApplication.status) && (
-          <ChargePointsApplicationHistory
-            chargePointApplication={chargePointApplication}
-          />
-        )
-        }
+        )}
+        {chargePointApplication?.status &&
+          [
+            ElecAuditApplicationStatus.Accepted,
+            ElecAuditApplicationStatus.Rejected,
+          ].includes(chargePointApplication.status) && (
+            <ChargePointsApplicationHistory
+              chargePointApplication={chargePointApplication}
+            />
+          )}
 
         {chargePointApplicationResponse.loading && <LoaderOverlay />}
       </Dialog>
-    </Portal >
+    </Portal>
   )
 }
-
-
-
 
 export default ChargePointsApplicationDetailsDialog

@@ -23,7 +23,9 @@ const QUERY_RESET: Partial<LotQuery> = {
 }
 
 export function getYears(entity_id: number) {
-  return api.get<Api<number[]>>("/transactions/years", { params: { entity_id } })
+  return api.get<Api<number[]>>("/transactions/years", {
+    params: { entity_id },
+  })
 }
 
 export function getSnapshot(entity_id: number, year: number) {
@@ -39,7 +41,10 @@ export function getLots(query: LotQuery) {
 }
 
 export function importLots(entity_id: number, file: File) {
-  return api.post<Api<void>>("/transactions/lots/add-excel", { entity_id, file })
+  return api.post<Api<void>>("/transactions/lots/add-excel", {
+    entity_id,
+    file,
+  })
 }
 
 export function downloadLots(query: LotQuery, selection: number[]) {
@@ -69,7 +74,10 @@ export function getDeclarations(entity_id: number, year: number) {
 }
 
 export function validateDeclaration(entity_id: number, period: number) {
-  return api.post<Api<void>>("/transactions/declarations/validate", { entity_id, period })
+  return api.post<Api<void>>("/transactions/declarations/validate", {
+    entity_id,
+    period,
+  })
 }
 
 export function invalidateDeclaration(entity_id: number, period: number) {
@@ -87,11 +95,17 @@ export function getLotFilters(field: Filter, query: LotQuery) {
 }
 
 export function duplicateLots(entity_id: number, lot_id: number) {
-  return api.post<Api<void>>("/transactions/lots/duplicate", { entity_id, lot_id })
+  return api.post<Api<void>>("/transactions/lots/duplicate", {
+    entity_id,
+    lot_id,
+  })
 }
 
 export function sendLots(query: LotQuery, selection?: number[]) {
-  return api.post<Api<void>>("/transactions/lots/send", selectionOrQuery(query, selection))
+  return api.post<Api<void>>(
+    "/transactions/lots/send",
+    selectionOrQuery(query, selection)
+  )
 }
 
 export function acceptReleaseForConsumption(
@@ -181,11 +195,17 @@ export function acceptForExport(
 }
 
 export function deleteLots(query: LotQuery, selection?: number[]) {
-  return api.post<Api<void>>("/transactions/lots/delete", selectionOrQuery(query, selection))
+  return api.post<Api<void>>(
+    "/transactions/lots/delete",
+    selectionOrQuery(query, selection)
+  )
 }
 
 export function rejectLots(query: LotQuery, selection?: number[]) {
-  return api.post<Api<void>>("/transactions/lots/reject", selectionOrQuery(query, selection))
+  return api.post<Api<void>>(
+    "/transactions/lots/reject",
+    selectionOrQuery(query, selection)
+  )
 }
 
 export function requestFix(entity_id: number, lot_ids: number[]) {
@@ -203,7 +223,10 @@ export function markAsFixed(entity_id: number, lot_ids: number[]) {
 }
 
 export function approveFix(entity_id: number, lot_ids: number[]) {
-  return api.post<Api<void>>("/transactions/lots/approve-fix", { entity_id, lot_ids })
+  return api.post<Api<void>>("/transactions/lots/approve-fix", {
+    entity_id,
+    lot_ids,
+  })
 }
 
 export function recallLots(entity_id: number, lot_ids: number[]) {

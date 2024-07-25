@@ -21,7 +21,6 @@ import FileApplicationInfo from "./file-application-info"
 import { DoubleCountingFileInfo } from "../../../double-counting/types"
 import { ReplaceApplicationDialog } from "../../../double-counting/components/application-checker/replace-application-dialog"
 
-
 export type SendApplicationAdminDialogProps = {
   file: File
   fileData: DoubleCountingFileInfo
@@ -37,8 +36,7 @@ export const SendApplicationAdminDialog = ({
   const entity = useEntity()
   const portal = usePortal()
   const [error, setError] = useState<React.ReactNode | undefined>(undefined)
-  const { value, bind } =
-    useForm<ProductionForm>(defaultProductionForm)
+  const { value, bind } = useForm<ProductionForm>(defaultProductionForm)
   const notify = useNotify()
   const notifyError = useNotifyError()
   const navigate = useNavigate()
@@ -49,21 +47,35 @@ export const SendApplicationAdminDialog = ({
       onClose()
       notify(t("Le dossier a été ajouté !"), { variant: "success" })
       navigate({
-        pathname: '/org/9/double-counting',
+        pathname: "/org/9/double-counting",
       })
     },
     onError(err) {
-      const errorCode = (err as AxiosError<{ error: string }>).response?.data.error
-      if (errorCode === 'APPLICATION_ALREADY_EXISTS') {
-        portal((close) => <ReplaceApplicationDialog onReplace={saveApplication} onClose={close} />)
-      } else if (errorCode === 'AGREEMENT_ALREADY_EXISTS') {
-        setError(t("Un agrément existe déjà sur cette periode et pour ce site de production."))
-      } else if (errorCode === 'AGREEMENT_NOT_FOUND') {
-        setError(t("Le numéro \"{{certificateId}}\" ne correspond à aucun agrément actif.", { agreementId: value.certificate_id }))
-      } else if (errorCode === 'PRODUCTION_SITE_ADDRESS_UNDEFINED') {
+      const errorCode = (err as AxiosError<{ error: string }>).response?.data
+        .error
+      if (errorCode === "APPLICATION_ALREADY_EXISTS") {
+        portal((close) => (
+          <ReplaceApplicationDialog
+            onReplace={saveApplication}
+            onClose={close}
+          />
+        ))
+      } else if (errorCode === "AGREEMENT_ALREADY_EXISTS") {
+        setError(
+          t(
+            "Un agrément existe déjà sur cette periode et pour ce site de production."
+          )
+        )
+      } else if (errorCode === "AGREEMENT_NOT_FOUND") {
+        setError(
+          t(
+            'Le numéro "{{certificateId}}" ne correspond à aucun agrément actif.',
+            { agreementId: value.certificate_id }
+          )
+        )
+      } else if (errorCode === "PRODUCTION_SITE_ADDRESS_UNDEFINED") {
         setError(<MissingAddress productionSiteId={value.productionSite?.id} />)
-      }
-      else {
+      } else {
         notifyError(err, t("Impossible d'ajouter le dossier"))
       }
     },
@@ -114,14 +126,18 @@ export const SendApplicationAdminDialog = ({
             {...bind("certificate_id")}
           />
         </section>
-        {error &&
+        {error && (
           <section>
-            <Alert variant="warning" icon={AlertTriangle} style={{ display: "inline-block" }}>
+            <Alert
+              variant="warning"
+              icon={AlertTriangle}
+              style={{ display: "inline-block" }}
+            >
               {error}
             </Alert>
-          </section>}
+          </section>
+        )}
       </main>
-
 
       <footer>
         <Button
@@ -129,19 +145,17 @@ export const SendApplicationAdminDialog = ({
           icon={Plus}
           label={t("Ajouter le dossier")}
           variant="primary"
-          disabled={addApplication.loading || !value.productionSite || !value.producer}
+          disabled={
+            addApplication.loading || !value.productionSite || !value.producer
+          }
           action={saveApplication}
         />
 
         <Button icon={Return} label={t("Fermer")} action={onClose} asideX />
       </footer>
-
     </Dialog>
   )
 }
-
-
-
 
 const defaultProductionForm = {
   productionSite: undefined as ProductionSite | undefined,
@@ -151,15 +165,22 @@ const defaultProductionForm = {
 
 type ProductionForm = typeof defaultProductionForm
 
-
-
-
-function MissingAddress({ productionSiteId }: { productionSiteId: number | undefined }) {
+function MissingAddress({
+  productionSiteId,
+}: {
+  productionSiteId: number | undefined
+}) {
   const { t } = useTranslation()
   return (
     <>
-      {t("L'adresse, la ville ou le code postal du site de production n'est pas renseignée. Veuillez l'ajouter dans les informations liées à la société.")}
-      <ExternalLink href={`/admin/producers/productionsite/${productionSiteId}/change`}>
+      {t(
+        "L'adresse, la ville ou le code postal du site de production n'est pas renseignée. Veuillez l'ajouter dans les informations liées à la société."
+      )}
+      <ExternalLink
+        href={`/admin/producers/productionsite/${productionSiteId}/change`}
+      >
         <Trans>Editer le site de production</Trans>
-      </ExternalLink></>);
+      </ExternalLink>
+    </>
+  )
 }

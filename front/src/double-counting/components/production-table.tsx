@@ -3,9 +3,7 @@ import { NumberInput } from "common/components/input"
 import { Cell, Column } from "common/components/table"
 import { formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import {
-  DoubleCountingProduction
-} from "../types"
+import { DoubleCountingProduction } from "../types"
 import YearTable from "./year-table"
 
 type ProductionTableProps = {
@@ -45,18 +43,26 @@ export const ProductionTable = ({
     {
       header: t("Quota demandé"),
       cell: (p) => <Cell text={formatNumber(p.requested_quota)} />,
-    }
+    },
   ]
 
-  hasAgreement && productionColumns?.push({
-    header: t("Quota approuvé"),
-    cell: (p) => <Cell text={formatNumber(p.approved_quota)} />,
-  })
-
-  quotas && setQuotas && productionColumns?.push(
-    {
+  hasAgreement &&
+    productionColumns?.push({
       header: t("Quota approuvé"),
-      cell: (p) => <ApprovedQuotasCell production={p} quotas={quotas} setQuotas={setQuotas} />,
+      cell: (p) => <Cell text={formatNumber(p.approved_quota)} />,
+    })
+
+  quotas &&
+    setQuotas &&
+    productionColumns?.push({
+      header: t("Quota approuvé"),
+      cell: (p) => (
+        <ApprovedQuotasCell
+          production={p}
+          quotas={quotas}
+          setQuotas={setQuotas}
+        />
+      ),
     })
   return <YearTable columns={productionColumns} rows={production} />
 }
@@ -66,7 +72,11 @@ interface ApprovedQuotasCellProps {
   quotas: Record<string, number>
   setQuotas: (quotas: Record<string, number>) => void
 }
-const ApprovedQuotasCell = ({ production, quotas, setQuotas }: ApprovedQuotasCellProps) => {
+const ApprovedQuotasCell = ({
+  production,
+  quotas,
+  setQuotas,
+}: ApprovedQuotasCellProps) => {
   const { t } = useTranslation()
   // const [approvedQuota, setApprovedQuota] = useState(production.approved_quota)
 

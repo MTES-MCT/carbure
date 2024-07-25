@@ -19,7 +19,9 @@ const QUERY_RESET: Partial<LotQuery> = {
 }
 
 export function getYears(entity_id: number) {
-  return api.get<Api<number[]>>("/transactions/audit/years", { params: { entity_id } })
+  return api.get<Api<number[]>>("/transactions/audit/years", {
+    params: { entity_id },
+  })
 }
 
 export function getSnapshot(entity_id: number, year: number) {
@@ -33,7 +35,9 @@ export function getLots(query: LotQuery) {
 }
 
 export function getStocks(query: StockQuery) {
-  return api.get<Api<StockList>>("/transactions/audit/stocks", { params: query })
+  return api.get<Api<StockList>>("/transactions/audit/stocks", {
+    params: query,
+  })
 }
 
 export function downloadLots(query: LotQuery, selection: number[]) {

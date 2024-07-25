@@ -32,11 +32,12 @@ export function useNotifyError() {
     const errorCode = (error as AxiosError<{ error: string }>).response?.data
       .error
 
-    let errorText = defaultMessage || t("La demande a échoué. Réessayez ou contactez carbure@beta.gouv.fr")
+    let errorText =
+      defaultMessage ||
+      t("La demande a échoué. Réessayez ou contactez carbure@beta.gouv.fr")
     if (errorCode) {
       const customErrorText = t(errorCode, { ns: "errors" })
-      if (customErrorText != errorCode)
-        errorText = customErrorText
+      if (customErrorText != errorCode) errorText = customErrorText
     }
 
     return errorText

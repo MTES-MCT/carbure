@@ -24,7 +24,12 @@ type EntitySummaryProps = {
   search?: string
 }
 
-type Operation = "user" | "certificate" | "double-counting" | "charge-points" | "meter-readings"
+type Operation =
+  | "user"
+  | "certificate"
+  | "double-counting"
+  | "charge-points"
+  | "meter-readings"
 
 export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
   const { t } = useTranslation()
@@ -70,7 +75,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
               EntityType.Auditor,
               EntityType.Airline,
               EntityType.CPO,
-              EntityType.PowerOrHeatProducer
+              EntityType.PowerOrHeatProducer,
             ]}
           />
         )}
@@ -133,101 +138,131 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                   />
                 ),
               },
-              entity.isAdmin && (!operation || !["charge-points", "meter-readings"].includes(operation)) && {
-                key: "factories",
-                header: t("Production / Stockage"),
-                orderBy: (e) => e.production_sites + e.depots,
-                cell: (e) => (
-                  <EntityInfoCell
-                    data={[
-                      {
-                        count: e.production_sites,
-                        label: t("{{count}} site de production", { count: e.production_sites }),
-                      },
-                      {
-                        count: e.depots,
-                        label: t("{{count}} dépôts", { count: e.depots }),
-                      },
-                    ]}
-                  />
-                ),
-              },
-              entity.isAdmin && (!operation || !["double-counting", "charge-points", "meter-readings"].includes(operation)) && {
-                key: "certificates",
-                header: t("Certificats"),
-                orderBy: (e) => e.certificates,
-                cell: (e) => (
-                  <EntityInfoCell
-                    data={[
-                      {
-                        count: e.certificates_pending,
-                        label: t("{{count}} certificats à valider", { count: e.certificates_pending }),
-                        highlight: true,
-                      },
-                      {
-                        count: e.certificates,
-                        label: t("{{count}} certificats", { count: e.certificates }),
-                      },
-                    ]}
-                  />
-                ),
-              },
-              entity.isAdmin && operation === "double-counting" && {
-                key: "double-counting",
-                header: t("Double comptage"),
-                orderBy: (e) => e.double_counting_requests * 1000 + e.double_counting,
-                cell: (e) => (
-                  <EntityInfoCell
-                    data={[
-                      {
-                        count: e.double_counting_requests,
-                        label: t("{{count}} dossier en attente", { count: e.double_counting_requests }),
-                        highlight: true,
-                      },
-                      {
-                        count: e.double_counting,
-                        label: t("{{count}} dossier validé", { count: e.double_counting }),
-                      },
-                    ]}
-                  />
-                ),
-              },
-              entity.isAdmin && "charge-points" === operation && {
-                key: "charge-points",
-                header: t("Points de recharge"),
-                orderBy: (e) => e.charge_points_pending * 1000 + e.charge_points_accepted,
-                cell: (e) => (
-                  <EntityInfoCell
-                    data={[
-                      {
-                        count: e.charge_points_pending,
-                        label: t("{{count}} points de recharge en attente", { count: e.charge_points_pending }),
-                        highlight: true,
-                      },
-                      {
-                        count: e.charge_points_accepted,
-                        label: t("{{count}} points de recharge", { count: e.charge_points_accepted }),
-                      },
-                    ]}
-                  />
-                ),
-              },
-              entity.isAdmin && "meter-readings" === operation && {
-                key: "meter-readings",
-                header: t("Relevés trimestriels"),
-                orderBy: (e) => e.meter_readings_pending * 1000 + e.meter_readings_pending,
-                cell: (e) => (
-                  <EntityInfoCell
-                    data={[
-                      {
-                        count: e.meter_readings_pending,
-                        label: t("{{count}} trimestre de relevés à valider", { count: e.meter_readings_pending }),
-                        highlight: true,
-                      },
-                    ]}
-                  />
-                ),
-              },
+              entity.isAdmin &&
+                (!operation ||
+                  !["charge-points", "meter-readings"].includes(operation)) && {
+                  key: "factories",
+                  header: t("Production / Stockage"),
+                  orderBy: (e) => e.production_sites + e.depots,
+                  cell: (e) => (
+                    <EntityInfoCell
+                      data={[
+                        {
+                          count: e.production_sites,
+                          label: t("{{count}} site de production", {
+                            count: e.production_sites,
+                          }),
+                        },
+                        {
+                          count: e.depots,
+                          label: t("{{count}} dépôts", { count: e.depots }),
+                        },
+                      ]}
+                    />
+                  ),
+                },
+              entity.isAdmin &&
+                (!operation ||
+                  ![
+                    "double-counting",
+                    "charge-points",
+                    "meter-readings",
+                  ].includes(operation)) && {
+                  key: "certificates",
+                  header: t("Certificats"),
+                  orderBy: (e) => e.certificates,
+                  cell: (e) => (
+                    <EntityInfoCell
+                      data={[
+                        {
+                          count: e.certificates_pending,
+                          label: t("{{count}} certificats à valider", {
+                            count: e.certificates_pending,
+                          }),
+                          highlight: true,
+                        },
+                        {
+                          count: e.certificates,
+                          label: t("{{count}} certificats", {
+                            count: e.certificates,
+                          }),
+                        },
+                      ]}
+                    />
+                  ),
+                },
+              entity.isAdmin &&
+                operation === "double-counting" && {
+                  key: "double-counting",
+                  header: t("Double comptage"),
+                  orderBy: (e) =>
+                    e.double_counting_requests * 1000 + e.double_counting,
+                  cell: (e) => (
+                    <EntityInfoCell
+                      data={[
+                        {
+                          count: e.double_counting_requests,
+                          label: t("{{count}} dossier en attente", {
+                            count: e.double_counting_requests,
+                          }),
+                          highlight: true,
+                        },
+                        {
+                          count: e.double_counting,
+                          label: t("{{count}} dossier validé", {
+                            count: e.double_counting,
+                          }),
+                        },
+                      ]}
+                    />
+                  ),
+                },
+              entity.isAdmin &&
+                "charge-points" === operation && {
+                  key: "charge-points",
+                  header: t("Points de recharge"),
+                  orderBy: (e) =>
+                    e.charge_points_pending * 1000 + e.charge_points_accepted,
+                  cell: (e) => (
+                    <EntityInfoCell
+                      data={[
+                        {
+                          count: e.charge_points_pending,
+                          label: t("{{count}} points de recharge en attente", {
+                            count: e.charge_points_pending,
+                          }),
+                          highlight: true,
+                        },
+                        {
+                          count: e.charge_points_accepted,
+                          label: t("{{count}} points de recharge", {
+                            count: e.charge_points_accepted,
+                          }),
+                        },
+                      ]}
+                    />
+                  ),
+                },
+              entity.isAdmin &&
+                "meter-readings" === operation && {
+                  key: "meter-readings",
+                  header: t("Relevés trimestriels"),
+                  orderBy: (e) =>
+                    e.meter_readings_pending * 1000 + e.meter_readings_pending,
+                  cell: (e) => (
+                    <EntityInfoCell
+                      data={[
+                        {
+                          count: e.meter_readings_pending,
+                          label: t("{{count}} trimestre de relevés à valider", {
+                            count: e.meter_readings_pending,
+                          }),
+                          highlight: true,
+                        },
+                      ]}
+                    />
+                  ),
+                },
               {
                 key: "users",
                 header: t("Utilisateurs"),
@@ -237,7 +272,9 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                     data={[
                       {
                         count: e.requests,
-                        label: t("{{count}} demande d'accès", { count: e.requests }),
+                        label: t("{{count}} demande d'accès", {
+                          count: e.requests,
+                        }),
                         highlight: true,
                       },
                       {
@@ -260,7 +297,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
 interface EntityInfo {
   count: number
   label: string
-  highlight?: Boolean
+  highlight?: boolean
 }
 
 const EntityInfoCell = ({ data }: { data: EntityInfo[] }) => (
@@ -288,8 +325,18 @@ function hasOperation(
 ) {
   if (operation === undefined) return true
   if (operation === "user" && details.requests > 0) return true
-  if (operation === "certificate" && details.certificates_pending > 0) return true
-  if (operation === "double-counting" && details.double_counting_requests > 0) return true
-  if (operation === "charge-points" && (details.charge_points_accepted > 0 || details.charge_points_pending > 0)) return true
-  if (operation === "meter-readings" && (details.meter_readings_pending > 0 || details.meter_readings_pending > 0)) return true
+  if (operation === "certificate" && details.certificates_pending > 0)
+    return true
+  if (operation === "double-counting" && details.double_counting_requests > 0)
+    return true
+  if (
+    operation === "charge-points" &&
+    (details.charge_points_accepted > 0 || details.charge_points_pending > 0)
+  )
+    return true
+  if (
+    operation === "meter-readings" &&
+    (details.meter_readings_pending > 0 || details.meter_readings_pending > 0)
+  )
+    return true
 }

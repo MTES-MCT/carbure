@@ -201,9 +201,9 @@ export const BiofuelCell = ({ lot }: LotCellProps) => {
   const entity = useEntity()
 
   const unitToField = {
-    l: "volume" as "volume",
-    kg: "weight" as "weight",
-    MJ: "lhv_amount" as "lhv_amount",
+    l: "volume" as const,
+    kg: "weight" as const,
+    MJ: "lhv_amount" as const,
   }
 
   const unit = entity.preferred_unit ?? "l"

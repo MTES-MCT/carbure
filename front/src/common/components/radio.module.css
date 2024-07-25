@@ -23,7 +23,7 @@
 }
 
 .input,
-input[type=radio]:disabled {
+input[type="radio"]:disabled {
   position: absolute;
   opacity: 0;
 }

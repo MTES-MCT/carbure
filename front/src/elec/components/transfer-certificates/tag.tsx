@@ -13,7 +13,7 @@ export const TransferCertificateTag = ({
 }: TransferCertificateTagProps) => {
   const { t } = useTranslation()
 
-  let label: string = ""
+  let label = ""
   let variant: TagVariant = "none"
   switch (status) {
     case ElecTransferCertificateStatus.Accepted || ElecOperatorStatus.Accepted:

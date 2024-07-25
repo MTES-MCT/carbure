@@ -111,15 +111,14 @@ const CompanyOptions = () => {
           value={entity.has_direct_deliveries}
           onChange={toggleDirectDeliveries.execute}
         />
-        {entity.isOperator &&
+        {entity.isOperator && (
           <Checkbox
             disabled={!canModify}
             label={t("Ma société accepte des volumes d'electricité")}
             value={entity.has_elec}
             onChange={toggleElec.execute}
           />
-        }
-
+        )}
       </section>
 
       <footer />

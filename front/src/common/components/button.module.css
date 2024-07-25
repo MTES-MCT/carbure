@@ -26,7 +26,6 @@
   padding-left: var(--spacing-s);
 }
 
-
 .button:not(:disabled):hover {
   color: var(--blue-medium);
   border-color: var(--blue-medium);
@@ -41,7 +40,6 @@
   opacity: 0.5;
   cursor: auto;
   pointer-events: none;
-
 }
 
 /* variant primary */

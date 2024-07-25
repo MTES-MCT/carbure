@@ -199,7 +199,6 @@ export const lot = {
 
 export const lots = [lot, lot, lot]
 
-
 const lotError: LotError = {
   error: "NOT_GOOD_VALUE",
   is_blocking: true,
@@ -215,6 +214,5 @@ const lotError: LotError = {
 const lotUpdateError1 = [lotError, lotError]
 const lotUpdateError2 = [lotError]
 export const lotsUpdateErrorsResponse: LotsUpdateResponse = {
-  errors: { 287367: lotUpdateError1, 287368: lotUpdateError2 }
+  errors: { 287367: lotUpdateError1, 287368: lotUpdateError2 },
 }
-

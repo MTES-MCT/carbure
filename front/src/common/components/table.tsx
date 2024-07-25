@@ -67,7 +67,13 @@ export function Table<T>({
               )}
             >
               {column.key && (
-                <span className={cl(column.key != order?.column && css.sortable)} >{column.key != order?.column || order?.direction === "asc" ? " ▲" : " ▼"}</span>
+                <span
+                  className={cl(column.key != order?.column && css.sortable)}
+                >
+                  {column.key != order?.column || order?.direction === "asc"
+                    ? " ▲"
+                    : " ▼"}
+                </span>
               )}{" "}
               {column.header}
             </div>

@@ -33,7 +33,7 @@ export const ClientTicketDetails = ({ neighbors }: TicketDetailsProps) => {
 
   const ticketResponse = useQuery(api.getAirlineTicketDetails, {
     key: "ticket-details",
-    params: [entity.id, parseInt(match?.params.id!)],
+    params: [entity.id, parseInt(match?.params.id || "")],
   })
 
   const acceptSafTicket = useMutation(api.acceptSafTicket, {

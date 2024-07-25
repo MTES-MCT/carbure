@@ -1,16 +1,20 @@
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import { ElecChargePointsApplicationDetails } from "elec/types"
-import 'leaflet-defaulticon-compatibility'
-import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css'; // Re-uses images from ~leaflet package
-import 'leaflet/dist/leaflet.css'
+import "leaflet-defaulticon-compatibility"
+import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css" // Re-uses images from ~leaflet package
+import "leaflet/dist/leaflet.css"
 import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../../api"
 import ApplicationSampleGeneration from "../sample/application-generation"
 import ApplicationSummary from "./details-application-summary"
 
-export type GenerationState = "generation" | "verification" | "email" | "confirmation"
+export type GenerationState =
+  | "generation"
+  | "verification"
+  | "email"
+  | "confirmation"
 
 interface ChargePointsApplicationDetailsPendingProps {
   chargePointApplication: ElecChargePointsApplicationDetails | undefined
@@ -22,7 +26,7 @@ export const ChargePointsApplicationDetailsPending = ({
   chargePointApplication,
   onAccept,
   onReject,
-  onDownloadSample
+  onDownloadSample,
 }: ChargePointsApplicationDetailsPendingProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
@@ -30,25 +34,47 @@ export const ChargePointsApplicationDetailsPending = ({
   const navigate = useNavigate()
   const location = useLocation()
 
-  const startApplicationAuditMutation = useMutation(api.startChargePointsApplicationAudit, {
-    invalidates: ["audit-charge-points-application-details", "audit-charge-points-applications", "elec-admin-audit-snapshot"]
-  })
+  const startApplicationAuditMutation = useMutation(
+    api.startChargePointsApplicationAudit,
+    {
+      invalidates: [
+        "audit-charge-points-application-details",
+        "audit-charge-points-applications",
+        "elec-admin-audit-snapshot",
+      ],
+    }
+  )
 
   const closeDialog = () => {
     navigate({ search: location.search, hash: "#" })
   }
 
-  const startAudit = async (entityId: number, applicationId: number, chargePointIds: string[]) => {
-    startApplicationAuditMutation.execute(entityId, applicationId)
+  const startAudit = async (
+    entityId: number,
+    applicationId: number,
+    chargePointIds: string[]
+  ) => {
+    startApplicationAuditMutation
+      .execute(entityId, applicationId)
       .then(() => {
-        notify(t("L'audit de l'échantillon des {{count}} points de recharge a bien été initié.", { count: chargePointIds.length }), { variant: "success" })
+        notify(
+          t(
+            "L'audit de l'échantillon des {{count}} points de recharge a bien été initié.",
+            { count: chargePointIds.length }
+          ),
+          { variant: "success" }
+        )
         closeDialog()
       })
       .catch((err) => {
-        notifyError(err, t("Impossible d'initier l'audit de l'inscription des points de recharge"))
+        notifyError(
+          err,
+          t(
+            "Impossible d'initier l'audit de l'inscription des points de recharge"
+          )
+        )
       })
   }
-
 
   return (
     <>

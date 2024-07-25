@@ -8,7 +8,6 @@ import {
   Depot,
 } from "carbure/types"
 
-
 // COUNTRIES
 
 export const country = {
@@ -144,7 +143,6 @@ export const cpo: Entity = {
   sustainability_officer_phone_number: "",
   preferred_unit: "l",
 }
-
 
 // DELIVERY SITES
 
