@@ -19,13 +19,22 @@ const ReportValidSection = ({ applicationId, header, file, fileName, onReportAcc
   const entity = useEntity()
 
   const acceptAuditReport = useMutation(api.acceptAuditReport, {
+    invalidates: ["elec-audit-applications", "elec-audit-snapshot"],
     onSuccess: () => {
       onReportAccepted()
+      notify(
+        t(
+          "Le rapport d'audit a été transmis à la DGEC. L'audit est à présent terminé."
+        ),
+        {
+          variant: "success",
+        }
+      )
     },
     onError: () => {
       notify(
         t(
-          "L'envoi de votre rapport d'audita échoué. Merci de contacter l'équipe Carbure"
+          "L'envoi de votre rapport d'audit a échoué. Merci de contacter l'équipe Carbure"
         ),
         {
           variant: "danger",
@@ -47,7 +56,7 @@ const ReportValidSection = ({ applicationId, header, file, fileName, onReportAcc
       <p>{t("Les informations peuvent être transmises à la DGEC.")}</p>
     </main>
     <footer>
-      <Button icon={Send} label={t("Transmettre le résultat d'audit")} variant="primary" action={onAcceptFile} />
+      <Button icon={Send} label={t("Transmettre le résultat d'audit")} variant="primary" action={onAcceptFile} loading={acceptAuditReport.loading} />
     </footer>
   </>
 }

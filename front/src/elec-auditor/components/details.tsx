@@ -54,6 +54,7 @@ export const ApplicationDetailsDialog = () => {
           <ApplicationDetailsPending
             application={application}
             onDownloadSample={downloadSample}
+            onReportAccepted={closeDialog}
           />
         )}
 
