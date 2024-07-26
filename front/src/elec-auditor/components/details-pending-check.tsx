@@ -1,6 +1,6 @@
 import { AxiosError } from "axios"
 import useEntity from "carbure/hooks/entity"
-import { UploadCheckReportInfo } from "carbure/types"
+import { UploadCheckError, UploadCheckReportInfo } from "carbure/types"
 import Button from "common/components/button"
 import Form, { useForm } from "common/components/form"
 import { Check, Send, Upload } from "common/components/icons"
@@ -13,10 +13,10 @@ import { useTranslation } from "react-i18next"
 
 
 
-const UploadReportSection = ({ application, header, onReportUploaded }: {
+const CheckReportSection = ({ application, header, onReportChecked }: {
   application: ElecAuditorApplicationDetails,
   header: JSX.Element,
-  onReportUploaded: () => void
+  onReportChecked: (file: File, checkData: UploadCheckReportInfo) => void
 }) => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -30,17 +30,22 @@ const UploadReportSection = ({ application, header, onReportUploaded }: {
   const checkAuditReport = useMutation(api.checkAuditReport, {
     onSuccess: (res) => {
       const checkedData = res.data.data
-      console.log('checkedData:', checkedData)
-
-      onReportUploaded()
-
+      if (!checkedData || !value.file) return
+      onReportChecked(value.file, checkedData)
     },
     onError: (err) => {
       const response = (err as AxiosError<{ status: string, error: string, data: UploadCheckReportInfo }>).response
 
       if (response?.status === 400 && response.data.error === "VALIDATION_FAILED") {
-        const checkedData = response!.data.data
-        console.log('checkedData:', checkedData)
+        // const checkedData = response!.data.data
+        notify(
+          t(
+            "Une erreur est survenur lors de la validation du fichier."
+          ),
+          {
+            variant: "danger",
+          }
+        )
       } else if (response?.status === 413) {
         notify(
           t(
@@ -95,4 +100,4 @@ const UploadReportSection = ({ application, header, onReportUploaded }: {
 }
 
 
-export default UploadReportSection
+export default CheckReportSection

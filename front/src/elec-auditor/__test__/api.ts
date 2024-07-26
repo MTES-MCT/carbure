@@ -34,5 +34,7 @@ export const okGetChargePointsApplicationDetails = mockGetWithResponseData(
 )
 
 
-export const okCheckAuditReportError = mockPostWithResponseData("/elec/auditor/check-report", elecAuditApplicationCheckReportError)
+// export const okCheckAuditReportError = mockPostWithResponseData("/elec/auditor/check-report", elecAuditApplicationCheckReportError)
 export const okCheckAuditReportSuccess = mockPostWithResponseData("/elec/auditor/check-report", elecAuditApplicationCheckReportSuccess)
+
+export const okAcceptAuditReport = mockPostWithResponseData("/elec/auditor/accept-report", elecAuditApplicationCheckReportSuccess)

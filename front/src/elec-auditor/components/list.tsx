@@ -44,11 +44,8 @@ const ElecApplicationList = ({ snapshot, year }: TransferListProps) => {
   }
 
   const auditApplicationsData = auditApplicationsResponse.result?.data.data
-  console.log('auditApplicationsData:', auditApplicationsData)
   const total = auditApplicationsData?.total ?? 0
-  console.log('total:', total)
   const count = auditApplicationsData?.returned ?? 0
-  console.log('count:', count)
   return (
     <>
 
