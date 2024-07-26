@@ -20,8 +20,11 @@ import { useState } from "react"
 import Stepper from "@codegouvfr/react-dsfr/Stepper"
 import { FileInput } from "common/components/input"
 import Form, { useForm } from "common/components/form"
-import UploadReportSection from "./details-pending-upload"
+import CheckReportSection from "./details-pending-check"
 import DownloadSampleSection from "./details-pending-download-sample"
+import { UploadCheckError, UploadCheckReportInfo } from "carbure/types"
+import ReportErrorsSection from "./details-pending-report-errors"
+import ReportValidSection from "./details-pending-report-valid"
 
 
 interface ApplicationDetailsPendingProps {
@@ -35,10 +38,10 @@ export const ApplicationDetailsPending = ({
 }: ApplicationDetailsPendingProps) => {
   const { t } = useTranslation()
 
-
-
-  type IndicatorStep = "download-sample" | "upload-report" | "check-file"
+  type IndicatorStep = "download-sample" | "check-report" | "report-checked"
   const [currentStep, setCurrentStep] = useState(0)
+  const [checkInfo, setCheckInfo] = useState<UploadCheckReportInfo | undefined>()
+  const [checkedFile, setCheckedFile] = useState<File | undefined>()
 
   const steps = [
     {
@@ -46,11 +49,11 @@ export const ApplicationDetailsPending = ({
       title: t("Récupération du retour de contrôle à remplir")
     },
     {
-      key: "upload-report",
+      key: "check-report",
       title: t("Dépôt du fichier de résultat")
     },
     {
-      key: "check-file",
+      key: "report-checked",
       title: t("Vérification du fichier"),
     },
   ]
@@ -63,12 +66,16 @@ export const ApplicationDetailsPending = ({
 
   const downloadSample = () => {
     onDownloadSample()
-    setStep("upload-report")
+    setStep("check-report")
   }
 
 
-  const reportUploaded = () => {
+  const reportChecked = (file: File, info: UploadCheckReportInfo) => {
+    setCheckInfo(info);
+    setCheckedFile(file);
+    setStep("report-checked")
   }
+
 
   const sendReport = () => {
 
@@ -88,39 +95,26 @@ export const ApplicationDetailsPending = ({
 
   return (
     <>
-
-
       {step === "download-sample" &&
         <DownloadSampleSection application={application} header={<Header />} onDownloadSample={downloadSample} />
       }
-      {step === "upload-report" &&
-        <UploadReportSection application={application} header={<Header />} onReportUploaded={reportUploaded} />
+      {step === "check-report" &&
+        <CheckReportSection application={application} header={<Header />} onReportChecked={reportChecked} />
       }
 
-      {step === "check-file" &&
+      {step === "report-checked" && checkInfo &&
         <>
-          <main>
-            <Header />
-            <p>{t("Le fichier {{fileName}} comporte {{errorCount}} incohérences. Veuillez les corriger puis recharger à nouveau votre fichier.", { fileName: "XXXX", errorCount: "XXX" })}</p>
-            <p>{t("Votre fichier d'audit {{fileName}} ne comporte aucune erreur.", { fileName: "XXXX" })}</p>
-            <p>{t("Les informations peuvent être transmises à la DGEC.")}</p>
-          </main>
-          <footer>
-            {step === "check-file" && <>
-              <Button icon={Return} label={t("Importer un nouveau fichier")} variant="primary" action={() => setStep("upload-report")} />
-              <Button icon={Send} label={t("Transmettre le résultat d'audit")} variant="primary" action={sendReport} />
-            </>}
-          </footer>
+          {checkInfo.error_count === 0 && checkedFile && application.sample &&
+            <ReportValidSection header={<Header />} fileName={checkInfo.file_name} onReportAccepted={sendReport} file={checkedFile} applicationId={application.sample?.application_id} />
+          }
+          {checkInfo.error_count > 0 &&
+            <ReportErrorsSection header={<Header />} checkInfo={checkInfo} onCheckAgain={() => setStep("check-report")} />
+          }
         </>
       }
-
-
     </>
   )
 }
-
-
-
 
 export default ApplicationDetailsPending
 
