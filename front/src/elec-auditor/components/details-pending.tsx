@@ -30,11 +30,12 @@ import ReportValidSection from "./details-pending-report-valid"
 interface ApplicationDetailsPendingProps {
   application: ElecAuditorApplicationDetails
   onDownloadSample: () => void
-
+  onReportAccepted: () => void
 }
 export const ApplicationDetailsPending = ({
   application,
-  onDownloadSample
+  onDownloadSample,
+  onReportAccepted
 }: ApplicationDetailsPendingProps) => {
   const { t } = useTranslation()
 
@@ -77,10 +78,6 @@ export const ApplicationDetailsPending = ({
   }
 
 
-  const sendReport = () => {
-
-  }
-
   const Header = () => {
     return <section>
       <Stepper
@@ -105,7 +102,7 @@ export const ApplicationDetailsPending = ({
       {step === "report-checked" && checkInfo &&
         <>
           {checkInfo.error_count === 0 && checkedFile && application.sample &&
-            <ReportValidSection header={<Header />} fileName={checkInfo.file_name} onReportAccepted={sendReport} file={checkedFile} applicationId={application.sample?.application_id} />
+            <ReportValidSection header={<Header />} fileName={checkInfo.file_name} onReportAccepted={onReportAccepted} file={checkedFile} applicationId={application.sample?.application_id} />
           }
           {checkInfo.error_count > 0 &&
             <ReportErrorsSection header={<Header />} checkInfo={checkInfo} onCheckAgain={() => setStep("check-report")} />
