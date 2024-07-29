@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django import forms
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import UserRights, UserRightsRequests
@@ -6,21 +7,27 @@ from core.models import UserRights, UserRightsRequests
 User = get_user_model()
 
 
+class ChangeRoleForm(forms.Form):
+    email = forms.EmailField(required=True)
+    role = forms.CharField(required=True)
+
+
 class ChangeUserRoleError:
-    MISSING_PARAMS = "MISSING_PARAMS"
     MISSING_USER = "MISSING_USER"
     NO_PRIOR_RIGHTS = "NO_PRIOR_RIGHTS"
     UPDATE_FAILED = "UPDATE_FAILED"
 
 
 @check_user_rights(role=[UserRights.ADMIN])
-def change_user_role(request, *args, **kwargs):
-    entity_id = request.POST.get("entity_id")
-    email = request.POST.get("email")
-    role = request.POST.get("role")
+def change_user_role(request, entity, entity_id):
+    form = ChangeRoleForm(request.POST)
 
-    if not email or not role:
-        return ErrorResponse(400, ChangeUserRoleError.MISSING_PARAMS)
+    if not form.is_valid():
+        errors = {key: e for key, e in form.errors.items()}
+        return ErrorResponse(400, ChangeUserRoleError.UPDATE_FAILED, data=errors)
+
+    email = form.cleaned_data["email"]
+    role = form.cleaned_data["role"]
 
     try:
         user = User.objects.get(email=email)
