@@ -1474,5 +1474,6 @@
   "Ajouter un utilisateur": "Add new user",
   "Veuillez remplir les informations suivantes:": "Please complete the following information:",
   "L'utilisateur {{email}} a bien été ajouté !": "The user {{email}} has been successfully added!",
-  "Une erreur est survenue lors de l'ajout de l'utilisateur": "An error occurred while adding the user"
+  "Une erreur est survenue lors de l'ajout de l'utilisateur": "An error occurred while adding the user",
+  "Votre compte a bien été activé, vous pouvez maintenant définir votre mot de passe.": "Your account has been activated, you can now set your password.."
 }
