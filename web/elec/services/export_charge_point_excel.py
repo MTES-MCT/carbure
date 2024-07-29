@@ -1,7 +1,8 @@
 import datetime
 
 from core.excel import export_to_excel
-from elec.serializers.elec_charge_point import ElecChargePointSampleSerializer, ElecChargePointSerializer
+from elec.serializers.elec_audit_charge_point import ElecAuditChargePointSerializer
+from elec.serializers.elec_charge_point import ElecChargePointSerializer
 
 
 def export_charge_points_to_excel(charge_points, entity):
@@ -42,7 +43,7 @@ def export_charge_points_to_excel(charge_points, entity):
     )
 
 
-def export_charge_points_sample_to_excel(charge_points, entity):
+def export_audited_charge_points_sample_to_excel(audited_charge_points, entity):
     today = datetime.date.today()
     file = "/tmp/charge_points_%s_sample_%s.xlsx" % (entity.slugify(), today.strftime("%Y-%m-%d_%H%M"))
 
@@ -51,7 +52,7 @@ def export_charge_points_sample_to_excel(charge_points, entity):
         [
             {
                 "label": "Points de recharge à auditer",
-                "rows": ElecChargePointSampleSerializer(charge_points, many=True).data,
+                "rows": ElecAuditChargePointSerializer(audited_charge_points, many=True).data,
                 "columns": [
                     {"label": "Latitude", "value": "latitude"},
                     {"label": "Longitude", "value": "longitude"},
@@ -59,13 +60,16 @@ def export_charge_points_sample_to_excel(charge_points, entity):
                     {"label": "Identifiant de la station", "value": "station_id"},
                     {"label": "Identifiant du point de recharge", "value": "charge_point_id"},
                     {"label": "Identifiant PRM ou MID", "value": get_prm_or_mid},
-                    {"label": "Identifiant PRM ou MID constaté (si différent)", "value": ""},
-                    {"label": "Infrastructure de recharge installée à la localisation renseignée", "value": ""},
-                    {"label": "Identifiant renseigné visible à proximité immédiate de l'infrastructure", "value": ""},
-                    {"label": "Point de contrôle type de courant", "value": ""},
-                    {"label": "Date du relevé par l'intervenant", "value": ""},
-                    {"label": "Énergie active totale relevée", "value": ""},
-                    {"label": "Limite dans la mission de contrôle", "value": ""},
+                    {"label": "Identifiant PRM ou MID constaté (si différent)", "value": "observed_mid_or_prm_id"},
+                    {"label": "Infrastructure de recharge installée à la localisation renseignée", "value": "is_auditable"},
+                    {
+                        "label": "Identifiant renseigné visible à proximité immédiate de l'infrastructure",
+                        "value": "has_dedicated_pdl",
+                    },
+                    {"label": "Point de contrôle type de courant", "value": "current_type"},
+                    {"label": "Date du relevé par l'intervenant", "value": "audit_date"},
+                    {"label": "Énergie active totale relevée", "value": "observed_energy_reading"},
+                    {"label": "Limite dans la mission de contrôle", "value": "comment"},
                 ],
             }
         ],
