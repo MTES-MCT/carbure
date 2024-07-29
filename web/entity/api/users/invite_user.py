@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.views.decorators.http import require_http_methods
+from django import forms
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import UserRights, UserRightsRequests, Entity
@@ -8,30 +9,31 @@ from auth.api.register import send_email as send_registration_email
 User = get_user_model()
 
 
+class InviteUserForm(forms.Form):
+    email = forms.EmailField(required=True)
+    role = forms.CharField(required=True)
+
+
 class InviteUserError:
-    MISSING_PARAMS = "MISSING_PARAMS"
     INVALID_ROLE = "INVALID_ROLE"
-    INVALID_ENTITY = "INVALID_ENTITY"
     ACCESS_ALREADY_GIVEN = "ACCESS_ALREADY_GIVEN"
     INVITE_FAILED = "INVITE_FAILED"
 
 
 @require_http_methods(["POST"])
 @check_user_rights(role=[UserRights.ADMIN])
-def invite_user(request, *args, **kwargs):
-    entity_id = request.POST.get("entity_id")
-    email = request.POST.get("email")
-    role = request.POST.get("role")
+def invite_user(request, entity, entity_id):
+    form = InviteUserForm(request.POST)
 
-    if not entity_id or not email or not role:
-        return ErrorResponse(400, InviteUserError.MISSING_PARAMS)
+    if not form.is_valid():
+        errors = {key: e for key, e in form.errors.items()}
+        return ErrorResponse(400, InviteUserError.INVITE_FAILED, data=errors)
+
+    email = form.cleaned_data["email"]
+    role = form.cleaned_data["role"]
 
     if role not in dict(UserRights.ROLES):
         return ErrorResponse(400, InviteUserError.INVALID_ROLE)
-
-    entity = Entity.objects.get(id=entity_id)
-    if not entity:
-        return ErrorResponse(400, InviteUserError.INVALID_ENTITY)
 
     email = User.objects.normalize_email(email)
 
