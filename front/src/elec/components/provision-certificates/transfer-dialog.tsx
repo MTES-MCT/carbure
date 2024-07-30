@@ -46,13 +46,13 @@ export const EnergyTransferDialog = ({
 
   const transferEnergy = async () => {
     if (!value.client) {
-      setFieldError("client", t("Entrez un redevable"))
       return
     }
+
     if (value.energy_mwh! < 1) {
       setFieldError("energy_mwh", t("Entrez une quantité d'énergie"))
-      return
     }
+
     await transferEnergyRequest.execute(
       entity.id,
       value.energy_mwh!,

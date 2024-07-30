@@ -104,7 +104,7 @@ export const Register = () => {
             type="password"
             label={t("Répéter le mot de passe")}
             {...bind("repeatPassword")}
-            error={!isPassOk ? t("Les mots de passe de correspondent pas") : undefined} // prettier-ignore
+            error={!isPassOk ? t("Les mots de passe ne correspondent pas") : undefined} // prettier-ignore
           />
           <Button
             variant="link"
