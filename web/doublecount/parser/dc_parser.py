@@ -1,7 +1,5 @@
-import re
 from typing import List, Tuple
 from openpyxl import load_workbook
-from doublecount.parser.parse_traceability import parse_traceability
 from doublecount.parser.parse_info import parse_info
 from doublecount.parser.parse_sourcing_forecast import parse_sourcing_forecast
 from doublecount.parser.parse_production import parse_requested_quota, parse_production_max, parse_production_forecast
