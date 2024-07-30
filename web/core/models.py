@@ -362,6 +362,7 @@ class Depot(models.Model):
     useful_temperature = models.FloatField(blank=True, null=True, default=None, help_text="En degrés Celsius")
 
     is_enabled = models.BooleanField(default=False)
+    entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.name
