@@ -586,6 +586,8 @@ export const Field = ({
         {icon && <div className={css.icon}>{icon}</div>}
         {!!rightContent && rightContent}
       </div>
+
+      {error && <p className={css.error}>{error}</p>}
     </div>
   )
 }
