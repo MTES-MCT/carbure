@@ -8,5 +8,5 @@ urlpatterns = [
     path("", get_depots, name="entity-depots"),
     path("add", add_depot, name="entity-depots-add"),
     path("delete", delete_depot, name="entity-depots-delete"),  # TODO Tests à reparer
-    path("create", create_depot, name="depot-create"),
+    path("create", create_depot, name="entity-depot-create"),
 ]
