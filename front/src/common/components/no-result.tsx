@@ -1,14 +1,22 @@
 import { useTranslation } from "react-i18next"
 import Alert from "common/components/alert"
 import { AlertCircle } from "common/components/icons"
-import { FilterManager, ResetButton } from "../../transactions/components/filters"
+import {
+  FilterManager,
+  ResetButton,
+} from "../../transactions/components/filters"
 
 interface NoResultProps extends Partial<FilterManager> {
   loading?: boolean
   label?: string
 }
 
-export const NoResult = ({ loading, filters, onFilter, label }: NoResultProps) => {
+export const NoResult = ({
+  loading,
+  filters,
+  onFilter,
+  label,
+}: NoResultProps) => {
   const { t } = useTranslation()
 
   return (

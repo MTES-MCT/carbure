@@ -156,9 +156,9 @@ export const BiofuelCell = ({ stock }: StockCellProps) => {
   const entity = useEntity()
 
   const unitToField = {
-    l: "remaining_volume" as "remaining_volume",
-    kg: "remaining_weight" as "remaining_weight",
-    MJ: "remaining_lhv_amount" as "remaining_lhv_amount",
+    l: "remaining_volume" as const,
+    kg: "remaining_weight" as const,
+    MJ: "remaining_lhv_amount" as const,
   }
 
   const unit = entity.preferred_unit ?? "l"

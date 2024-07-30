@@ -12,7 +12,6 @@ import ChargePointsApplicationsList from "./components/charge-points/list"
 import MeterReadingsApplicationsList from "./components/meter-readings/list"
 import { ElecAdminAuditSnapshot, ElecAdminAuditStatus } from "./types"
 
-
 const defaultElecAdminAuditSnapshot: ElecAdminAuditSnapshot = {
   charge_points_applications: 0,
   charge_points_applications_pending: 0,
@@ -25,7 +24,6 @@ const defaultElecAdminAuditSnapshot: ElecAdminAuditSnapshot = {
   meter_readings_applications_audit_in_progress: 0,
 }
 
-
 export const ElecAdminAudit = () => {
   const { t } = useTranslation()
 
@@ -37,10 +35,11 @@ export const ElecAdminAudit = () => {
     params: [entity.id, years.selected],
   })
 
-  const snapshot = elecAdminAuditSnapshotResponse.result?.data.data ?? defaultElecAdminAuditSnapshot
+  const snapshot =
+    elecAdminAuditSnapshotResponse.result?.data.data ??
+    defaultElecAdminAuditSnapshot
 
   return (
-
     <Main>
       <header>
         <section>
@@ -57,25 +56,32 @@ export const ElecAdminAudit = () => {
           />
         </section>
 
-
         <section>
-          <ElecAdminAuditTabs loading={elecAdminAuditSnapshotResponse.loading} snapshot={snapshot} />
+          <ElecAdminAuditTabs
+            loading={elecAdminAuditSnapshotResponse.loading}
+            snapshot={snapshot}
+          />
         </section>
-
       </header>
 
       <Routes>
         <Route
           path="charge-points/*"
           element={
-            <ChargePointsApplicationsList snapshot={snapshot} year={years.selected} />
+            <ChargePointsApplicationsList
+              snapshot={snapshot}
+              year={years.selected}
+            />
           }
         />
 
         <Route
           path="meter-readings/*"
           element={
-            <MeterReadingsApplicationsList snapshot={snapshot} year={years.selected} />
+            <MeterReadingsApplicationsList
+              snapshot={snapshot}
+              year={years.selected}
+            />
           }
         />
         <Route
@@ -87,60 +93,66 @@ export const ElecAdminAudit = () => {
             />
           }
         />
-
       </Routes>
-
     </Main>
-
-
   )
 }
 
 export default ElecAdminAudit
-
-
-
-
 
 interface ElecAdminAuditTabsProps {
   loading: boolean
   snapshot: ElecAdminAuditSnapshot
 }
 
-
-function ElecAdminAuditTabs({
-  loading,
-  snapshot
-}: ElecAdminAuditTabsProps) {
+function ElecAdminAuditTabs({ loading, snapshot }: ElecAdminAuditTabsProps) {
   const { t } = useTranslation()
 
-  return (<Tabs variant="main" tabs={[{
-    key: "charge-points",
-    path: "charge-points",
-    label: <>
-      <p style={{
-        fontWeight: "normal"
-      }}>
-        {loading ? <Loader size={20} /> : snapshot?.charge_points_applications}
-      </p>
-      <strong>
-        {t("Inscriptions")}
-      </strong>
-    </>
-  }, {
-    key: "meter-readings",
-    path: "meter-readings",
-    label: <>
-      <p style={{
-        fontWeight: "normal"
-      }}>
-        {loading ? <Loader size={20} /> : snapshot?.meter_readings_applications}
-      </p>
-      <strong>
-        {t("Relevés")}
-      </strong>
-    </>
-  }]} />);
+  return (
+    <Tabs
+      variant="main"
+      tabs={[
+        {
+          key: "charge-points",
+          path: "charge-points",
+          label: (
+            <>
+              <p
+                style={{
+                  fontWeight: "normal",
+                }}
+              >
+                {loading ? (
+                  <Loader size={20} />
+                ) : (
+                  snapshot?.charge_points_applications
+                )}
+              </p>
+              <strong>{t("Inscriptions")}</strong>
+            </>
+          ),
+        },
+        {
+          key: "meter-readings",
+          path: "meter-readings",
+          label: (
+            <>
+              <p
+                style={{
+                  fontWeight: "normal",
+                }}
+              >
+                {loading ? (
+                  <Loader size={20} />
+                ) : (
+                  snapshot?.meter_readings_applications
+                )}
+              </p>
+              <strong>{t("Relevés")}</strong>
+            </>
+          ),
+        },
+      ]}
+    />
+  )
 }
-
-

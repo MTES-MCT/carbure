@@ -9,18 +9,15 @@ export interface MetricProps {
   children?: (metric: string) => React.ReactNode
 }
 
-export const Metric = ({
-  label,
-  value,
-}: MetricProps) => {
-
+export const Metric = ({ label, value }: MetricProps) => {
   return (
     <div className={cl(css.metric)}>
-      <p><strong>{value}</strong></p>
+      <p>
+        <strong>{value}</strong>
+      </p>
       <p>{label}</p>
     </div>
   )
 }
-
 
 export default Metric

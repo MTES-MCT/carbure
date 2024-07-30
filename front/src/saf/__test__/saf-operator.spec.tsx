@@ -96,20 +96,20 @@ test("Select a status", async () => {
   const user = userEvent.setup()
   const statusButton = await screen.findByText("Refusés (1)")
   await user.click(statusButton)
-  let result = screen.getAllByText("En attente")
+  const result = screen.getAllByText("En attente")
   expect(result.length).toEqual(2)
 })
 
 test("Select a filter", async () => {
   render(<SafWithRouter view="ticket-sources" entity={operator} />)
   const user = userEvent.setup()
-  let filterButton = await findByTextInNode("Clients", "INPUT")
+  const filterButton = await findByTextInNode("Clients", "INPUT")
   await user.click(filterButton)
 
   const filterValue = await screen.findByText("CORSAIR")
   await user.click(filterValue)
 
-  let filterValue2 = await findByTextInNode("Air France", "LABEL")
+  const filterValue2 = await findByTextInNode("Air France", "LABEL")
   await user.click(filterValue2)
 
   await getField("CORSAIR, Air France")

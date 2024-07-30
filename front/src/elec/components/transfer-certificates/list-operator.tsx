@@ -4,7 +4,9 @@ import Pagination from "common/components/pagination"
 import { usePortal } from "common/components/portal"
 import { ActionBar, Bar } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import ElectTransferDetailsDialog, { ElecTransferDetailsDialog } from "elec/components/transfer-certificates/details"
+import ElectTransferDetailsDialog, {
+  ElecTransferDetailsDialog,
+} from "elec/components/transfer-certificates/details"
 import { useTransferCertificateQueryParamsStore } from "elec/hooks/transfer-certificate-query-params-store"
 import { useTransferCertificatesQuery } from "elec/hooks/transfer-certificates-query"
 import {
@@ -49,7 +51,9 @@ const OperatorTransferCertificateList = ({
     params: [query],
   })
 
-  const showTransferCertificateDetails = (transferCertificate: ElecTransferCertificatePreview) => {
+  const showTransferCertificateDetails = (
+    transferCertificate: ElecTransferCertificatePreview
+  ) => {
     return {
       pathname: location.pathname,
       search: location.search,
@@ -66,7 +70,10 @@ const OperatorTransferCertificateList = ({
     <>
       <Bar>
         <Alert variant="info" icon={Bolt}>
-          {t("{{acquired_energy}} MWh acquis", { count: snapshot.acquired_energy, acquired_energy: formatNumber(snapshot.acquired_energy, 3) })}
+          {t("{{acquired_energy}} MWh acquis", {
+            count: snapshot.acquired_energy,
+            acquired_energy: formatNumber(snapshot.acquired_energy, 3),
+          })}
         </Alert>
       </Bar>
 
@@ -121,8 +128,10 @@ const OperatorTransferCertificateList = ({
           <NoResult loading={transferCertificatesResponse.loading} />
         )}
       </section>
-      <HashRoute path="transfer-certificate/:id" element={<ElecTransferDetailsDialog displayCpo={true} />} />
-
+      <HashRoute
+        path="transfer-certificate/:id"
+        element={<ElecTransferDetailsDialog displayCpo={true} />}
+      />
     </>
   )
 }

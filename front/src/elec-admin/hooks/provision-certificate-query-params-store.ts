@@ -3,20 +3,22 @@ import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
 import useStore from "common/hooks/store"
 import useTitle from "common/hooks/title"
-import { ElecAdminProvisionCertificateFilterSelection, ElecAdminProvisionCertificateStates, ElecAdminProvisionCertificateStatus, ElecAdminSnapshot } from "elec-admin/types"
+import {
+  ElecAdminProvisionCertificateFilterSelection,
+  ElecAdminProvisionCertificateStates,
+  ElecAdminProvisionCertificateStatus,
+  ElecAdminSnapshot,
+} from "elec-admin/types"
 import { useTranslation } from "react-i18next"
 import { SafQueryType } from "saf/types"
 import { useFilterSearchParams } from "./provision-certificate-filter-search-params"
-
-
 
 export function useProvistionCertificateQueryParamsStore(
   entity: Entity,
   year: number,
   status: ElecAdminProvisionCertificateStatus,
-  snapshot?: ElecAdminSnapshot,
+  snapshot?: ElecAdminSnapshot
 ) {
-
   const [limit, saveLimit] = useLimit()
   const [filtersParams, setFiltersParams] = useFilterSearchParams()
 
@@ -145,7 +147,6 @@ export function useProvistionCertificateQueryParamsStore(
   if (snapshot && state.snapshot !== snapshot) {
     actions.setSnapshot(snapshot)
   }
-
 
   return [state, actions] as [typeof state, typeof actions]
 }

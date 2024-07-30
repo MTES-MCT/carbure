@@ -51,7 +51,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
 
   const lot = useQuery(api.getLotDetails, {
     key: "lot-details",
-    params: [entity.id, parseInt(match?.params.id!)],
+    params: [entity.id, parseInt(match?.params.id || "")],
   })
 
   const updateLot = useMutation(api.updateLot, {

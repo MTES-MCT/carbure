@@ -300,7 +300,10 @@
                   <table border="0" cellpadding="6" cellspacing="0">
                     <tr>
                       <td>
-                        <p>Bonjour {{user.name}},</p>
+                        <p>Bonjour{% if not invitation %} {{ user.name }}{% endif %}</p>
+                        {% if invitation %}
+                          <p>Vous avez été invité à rejoindre CarbuRe au sein de l'entité {{ entity_name }}.</p>
+                        {% endif %}
                         <p>Veuillez cliquer sur le lien suivant pour confirmer votre inscription sur CarbuRe :</p>
                         <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                           <tbody>
@@ -309,7 +312,7 @@
                                 <table border="0" cellpadding="0" cellspacing="0">
                                   <tbody>
                                     <tr>
-                                      <td align="center"> <a href="https://{{ domain }}/app/auth/activate?uidb64={{uid}}&token={{token}}">Activer Mon Compte</a> </td>
+                                      <td align="center"> <a href="https://{{ domain }}/app/auth/activate?uidb64={{uid}}&token={{token}}{% if invitation %}&invite=1{% endif %}">Activer Mon Compte</a> </td>
                                     </tr>
                                   </tbody>
                                 </table>
@@ -326,7 +329,7 @@
                           </p>
                           <p class="mb-6 align-center">
                             <strong>
-                              https://{{ domain }}/app/auth/activate?uidb64={{uid}}&token={{token}}
+                              https://{{ domain }}/app/auth/activate?uidb64={{uid}}&token={{token}}{% if invitation %}&invite=1{% endif %}
                             </strong>
                           </p>
                           <p>Bonne journée,</p>

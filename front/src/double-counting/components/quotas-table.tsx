@@ -1,18 +1,14 @@
 import { Cell, Column } from "common/components/table"
 import { formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import {
-  DoubleCountingQuota
-} from "../types"
+import { DoubleCountingQuota } from "../types"
 import YearTable from "./year-table"
 
 type QuotasTableProps = {
   quotas: DoubleCountingQuota[]
 }
 
-export const QuotasTable = ({
-  quotas,
-}: QuotasTableProps) => {
+export const QuotasTable = ({ quotas }: QuotasTableProps) => {
   const { t } = useTranslation()
 
   const quotasColumns: Column<DoubleCountingQuota>[] = [
@@ -39,9 +35,8 @@ export const QuotasTable = ({
     {
       header: t("Progression"),
       cell: (p) => <Cell text={Math.round(p.quotas_progression * 100) + "%"} />,
-    }
+    },
   ]
-
 
   return <YearTable columns={quotasColumns} rows={quotas} />
 }

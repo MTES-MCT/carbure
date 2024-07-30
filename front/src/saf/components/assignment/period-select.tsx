@@ -23,8 +23,8 @@ export const PeriodSelect = ({
   }
 
   useEffect(() => {
-    let month: number = deliveryPeriod % 100
-    let year: number = Math.floor(deliveryPeriod / 100)
+    const month: number = deliveryPeriod % 100
+    const year: number = Math.floor(deliveryPeriod / 100)
     const list: Option<number>[] = []
     for (let currentYear = year; currentYear <= year + 1; currentYear++) {
       let currentMonth = currentYear === year ? month : 1

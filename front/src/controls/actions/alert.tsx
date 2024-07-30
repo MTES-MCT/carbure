@@ -232,7 +232,7 @@ async function pinAndCommentLots(
   entity: EntityManager,
   selection: number[],
   comment?: string,
-  notifyExternal: boolean = false
+  notifyExternal = false
 ) {
   const notifyAdmin = entity.isAdmin || (entity.isAuditor && notifyExternal)
   const notifyAuditor = entity.isAuditor || (entity.isAdmin && notifyExternal)

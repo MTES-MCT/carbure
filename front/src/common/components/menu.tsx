@@ -34,7 +34,7 @@ export function Menu({
         domRef={triggerRef}
         className={cl(css.menu, className)}
       >
-        <span style={{ maxWidth: '200px' }}>{label}</span>
+        <span style={{ maxWidth: "200px" }}>{label}</span>
         <ChevronDown size={20} color="var(--gray-dark)" />
       </Button>
 
@@ -59,7 +59,7 @@ export function Menu({
                 return <b>{item.label}</b>
               } else if (item.data.path) {
                 return (
-                  <Link to={item.data.path} onClick={(e) => e.preventDefault()} >
+                  <Link to={item.data.path} onClick={(e) => e.preventDefault()}>
                     {item.label}
                   </Link>
                 )

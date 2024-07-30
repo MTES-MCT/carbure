@@ -5,6 +5,7 @@ BGS,Biogazole de synthèse (Hors HVO),44,34,0.773,0,0,0,0,1
 BES,Bio-essence de synthèse,44,33,0.75,1,0,1,1,0
 BT,Butanol,33,27,0.818,1,0,0,1,0
 ED95,Éthanol pour ED95,27,21,0.778,1,0,1,1,0
+EEAG,EEAG,38,34,0.895,0,1,0,0,1
 EEHA,EEHA,38,34,0.895,0,1,0,0,1
 EEHU,EEHU,38,34,0.895,0,1,0,0,1
 EEHV,EEHV,38,34,0.895,0,1,0,0,1

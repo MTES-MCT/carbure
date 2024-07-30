@@ -136,11 +136,7 @@ export const ExternalLink = ({
 }: ExternalLinkProps) => {
   const props = {
     className: cl(css.external, className),
-    children: (
-      <>
-        {children}
-      </>
-    ),
+    children: <>{children}</>,
   }
 
   if (to !== undefined) {
@@ -169,22 +165,21 @@ export const MailTo = ({
   body, //use https://mailtolink.me/ to convert body message
   ...props
 }: MailtoProps) => {
-
-
   let href = `mailto:${user}@${host}`
   href += `?subject=${subject ? encodeURIComponent(subject) : ""}`
   href += `&body=${body || ""}`
-  return <a
-    href={href}
-    target="_blank"
-    rel="noreferrer"
-    className={cl(css.mailto, className)}
-    {...props}
-  >
-    {children}
-  </a>
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className={cl(css.mailto, className)}
+      {...props}
+    >
+      {children}
+    </a>
+  )
 }
-
 
 export const DownloadLink = ({
   href: url,

@@ -6,7 +6,7 @@ import {
   Entity,
   Feedstock,
   GESOption,
-  ProductionSiteDetails
+  ProductionSiteDetails,
 } from "carbure/types"
 
 import * as common from "carbure/api"
@@ -51,9 +51,6 @@ interface ProductionSiteFormValue {
   certificates: string[] | undefined
 }
 
-
-
-
 type ProductionSiteDialogProps = {
   title: string
   description?: string
@@ -71,22 +68,23 @@ export const ProductionSiteDialog = ({
   onClose,
   dispolayFormOnly,
 }: ProductionSiteDialogProps) => {
-
   return (
     <Dialog onClose={() => onClose && onClose()}>
-      {!dispolayFormOnly &&
+      {!dispolayFormOnly && (
         <header>
           <h1>{title}</h1>
         </header>
-      }
+      )}
 
-      <ProductionSiteForm productionSite={productionSite} readOnly={readOnly} onClose={onClose} description={description} />
-
-    </Dialog>)
+      <ProductionSiteForm
+        productionSite={productionSite}
+        readOnly={readOnly}
+        onClose={onClose}
+        description={description}
+      />
+    </Dialog>
+  )
 }
-
-
-
 
 type ProductionSiteFormDialogProps = {
   productionSite?: ProductionSiteDetails
@@ -99,7 +97,7 @@ export const ProductionSiteForm = ({
   productionSite,
   readOnly,
   onClose,
-  description
+  description,
 }: ProductionSiteFormDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
@@ -191,172 +189,174 @@ export const ProductionSiteForm = ({
     }
   }
 
-  return <>
-    <main>
-      {description && (
+  return (
+    <>
+      <main>
+        {description && (
+          <section>
+            <p>{description}</p>
+          </section>
+        )}
+
         <section>
-          <p>{description}</p>
-        </section>
-      )}
-
-      <section>
-        <Form id="production-site" onSubmit={submitProductionSite}>
-          <TextInput
-            autoFocus
-            readOnly={readOnly}
-            label={t("Nom du site")}
-            {...bind("name")}
-          />
-
-          <Row style={{ gap: "var(--spacing-m)" }}>
+          <Form id="production-site" onSubmit={submitProductionSite}>
             <TextInput
+              autoFocus
               readOnly={readOnly}
-              label={t("N° d'identification (SIRET)")}
-              {...bind("site_id")}
+              label={t("Nom du site")}
+              {...bind("name")}
             />
-            <TextInput
-              readOnly={readOnly}
-              type="date"
-              label={t("Date de mise en service")}
-              style={{ flex: 1 }}
-              {...bind("date_mise_en_service")}
-            />
-          </Row>
 
-          <hr />
+            <Row style={{ gap: "var(--spacing-m)" }}>
+              <TextInput
+                readOnly={readOnly}
+                label={t("N° d'identification (SIRET)")}
+                {...bind("site_id")}
+              />
+              <TextInput
+                readOnly={readOnly}
+                type="date"
+                label={t("Date de mise en service")}
+                style={{ flex: 1 }}
+                {...bind("date_mise_en_service")}
+              />
+            </Row>
 
-          <TextInput
-            readOnly={readOnly}
-            label={t("Adresse postale")}
-            {...bind("address")}
-          />
-          <Row style={{ gap: "var(--spacing-m)" }}>
+            <hr />
 
             <TextInput
               readOnly={readOnly}
-              label={t("Ville")}
-              {...bind("city")}
+              label={t("Adresse postale")}
+              {...bind("address")}
             />
+            <Row style={{ gap: "var(--spacing-m)" }}>
+              <TextInput
+                readOnly={readOnly}
+                label={t("Ville")}
+                {...bind("city")}
+              />
+              <TextInput
+                readOnly={readOnly}
+                label={t("Code postal")}
+                {...bind("postal_code")}
+              />
+            </Row>
+
+            <Autocomplete
+              readOnly={readOnly}
+              label={t("Pays")}
+              placeholder={t("Rechercher un pays...")}
+              getOptions={common.findCountries}
+              normalize={normalizeCountry}
+              {...bind("country")}
+            />
+
+            <hr />
+
             <TextInput
               readOnly={readOnly}
-              label={t("Code postal")}
-              {...bind("postal_code")}
+              label={t("Nom du gérant")}
+              {...bind("manager_name")}
             />
-          </Row>
 
-          <Autocomplete
-            readOnly={readOnly}
-            label={t("Pays")}
-            placeholder={t("Rechercher un pays...")}
-            getOptions={common.findCountries}
-            normalize={normalizeCountry}
-            {...bind("country")}
-          />
+            <Row style={{ gap: "var(--spacing-m)" }}>
+              <TextInput
+                readOnly={readOnly}
+                label={t("N° de téléphone du gérant")}
+                {...bind("manager_phone")}
+              />
+              <TextInput
+                readOnly={readOnly}
+                label={t("Addresse email du gérant")}
+                {...bind("manager_email")}
+              />
+            </Row>
 
-          <hr />
+            <hr />
 
-          <TextInput
-            readOnly={readOnly}
-            label={t("Nom du gérant")}
-            {...bind("manager_name")}
-          />
-
-          <Row style={{ gap: "var(--spacing-m)" }}>
-            <TextInput
-              readOnly={readOnly}
-              label={t("N° de téléphone du gérant")}
-              {...bind("manager_phone")}
-            />
-            <TextInput
-              readOnly={readOnly}
-              label={t("Addresse email du gérant")}
-              {...bind("manager_email")}
-            />
-          </Row>
-
-          <hr />
-
-          <Checkbox
-            label={t("Éligible double-comptage ?")}
-            {...bind("eligible_dc")}
-            disabled
-          />
-          {value.eligible_dc && (
-            <TextInput
-              label={t("Référence double-comptage")}
-              {...bind("dc_reference")}
+            <Checkbox
+              label={t("Éligible double-comptage ?")}
+              {...bind("eligible_dc")}
               disabled
             />
-          )}
+            {value.eligible_dc && (
+              <TextInput
+                label={t("Référence double-comptage")}
+                {...bind("dc_reference")}
+                disabled
+              />
+            )}
 
-          <hr />
+            <hr />
 
-          <RadioGroup
-            label={t("Options GES")}
-            options={gesOptions}
-            {...bind("ges_option")}
-            disabled={readOnly}
+            <RadioGroup
+              label={t("Options GES")}
+              options={gesOptions}
+              {...bind("ges_option")}
+              disabled={readOnly}
+            />
+
+            <hr />
+
+            <TagAutocomplete
+              label={t("Matieres premieres")}
+              readOnly={readOnly}
+              placeholder={t("Ajouter matières premières...")}
+              defaultOptions={value.matieres_premieres}
+              getOptions={common.findFeedstocks}
+              normalize={normalizeFeedstock}
+              {...bind("matieres_premieres")}
+            />
+            <TagAutocomplete
+              readOnly={readOnly}
+              label={t("Biocarburants")}
+              placeholder={t("Ajouter biocarburants...")}
+              defaultOptions={value.biocarburants}
+              getOptions={common.findBiofuels}
+              normalize={normalizeBiofuel}
+              {...bind("biocarburants")}
+            />
+
+            <hr />
+
+            <TagAutocomplete
+              readOnly={readOnly}
+              label={t("Certificats (2BS, ISCC)")}
+              placeholder={t("Rechercher des certificats...")}
+              defaultOptions={value.certificates}
+              getOptions={(search) => common.findMyCertificates(search, { entity_id: entity.id })} // prettier-ignore
+              {...bind("certificates")}
+            />
+          </Form>
+        </section>
+      </main>
+
+      <footer>
+        {!readOnly && (
+          <Button
+            asideX
+            loading={addProdSite.loading || updateProdSite.loading}
+            variant="primary"
+            submit="production-site"
+            icon={Save}
+            disabled={!canSave || updateProdSite.loading}
+            label={t("Sauvegarder")}
           />
-
-          <hr />
-
-          <TagAutocomplete
-            label={t("Matieres premieres")}
-            readOnly={readOnly}
-            placeholder={t("Ajouter matières premières...")}
-            defaultOptions={value.matieres_premieres}
-            getOptions={common.findFeedstocks}
-            normalize={normalizeFeedstock}
-            {...bind("matieres_premieres")}
-          />
-          <TagAutocomplete
-            readOnly={readOnly}
-            label={t("Biocarburants")}
-            placeholder={t("Ajouter biocarburants...")}
-            defaultOptions={value.biocarburants}
-            getOptions={common.findBiofuels}
-            normalize={normalizeBiofuel}
-            {...bind("biocarburants")}
-          />
-
-          <hr />
-
-          <TagAutocomplete
-            readOnly={readOnly}
-            label={t("Certificats (2BS, ISCC)")}
-            placeholder={t("Rechercher des certificats...")}
-            defaultOptions={value.certificates}
-            getOptions={(search) => common.findMyCertificates(search, { entity_id: entity.id })} // prettier-ignore
-            {...bind("certificates")}
-          />
-        </Form>
-      </section>
-    </main>
-
-    <footer>
-      {!readOnly && (
-        <Button
-          asideX
-          loading={addProdSite.loading || updateProdSite.loading}
-          variant="primary"
-          submit="production-site"
-          icon={Save}
-          disabled={!canSave || updateProdSite.loading}
-          label={t("Sauvegarder")}
-        />
-      )}
-      {onClose &&
-        <Button asideX={readOnly} icon={Return} action={onClose}>
-          <Trans>Retour</Trans>
-        </Button>
-      }
-    </footer>
-  </>
-
+        )}
+        {onClose && (
+          <Button asideX={readOnly} icon={Return} action={onClose}>
+            <Trans>Retour</Trans>
+          </Button>
+        )}
+      </footer>
+    </>
+  )
 }
 
-
-async function addProductionSite(entity: Entity, form: ProductionSiteFormValue) {
+async function addProductionSite(
+  entity: Entity,
+  form: ProductionSiteFormValue
+) {
   const res = await api.addProductionSite(
     entity.id,
     form.name!,

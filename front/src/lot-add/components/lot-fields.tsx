@@ -66,9 +66,9 @@ export const QuantityField = (props: NumberInputProps) => {
   const unit = value.unit ?? "l"
 
   const unitToField = {
-    l: "volume" as "volume",
-    kg: "weight" as "weight",
-    MJ: "lhv_amount" as "lhv_amount",
+    l: "volume" as const,
+    kg: "weight" as const,
+    MJ: "lhv_amount" as const,
   }
 
   return (

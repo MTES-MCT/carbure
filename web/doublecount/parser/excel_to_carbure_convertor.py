@@ -59,6 +59,7 @@ dc_biofuel_to_carbure_biofuel = {
     "bioessence de synthèse": "BES",
     "bioetbe": "ETBE",
     "biogazole de synthèse": "BG",
+    "eeag": "EEAG",
     "eeha": "EEHA",
     "eehu": "EEHU",
     "eehv": "EEHV",

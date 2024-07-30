@@ -11,14 +11,14 @@ export type ReplaceApplicationDialogProps = {
 
 export const ReplaceApplicationDialog = ({
   onReplace,
-  onClose, }: ReplaceApplicationDialogProps) => {
+  onClose,
+}: ReplaceApplicationDialogProps) => {
   const { t } = useTranslation()
 
   const replaceApplication = async () => {
     onReplace(true)
     onClose()
   }
-
 
   return (
     <Dialog onClose={onClose}>
@@ -28,7 +28,9 @@ export const ReplaceApplicationDialog = ({
 
       <main>
         <p>
-          {t("Le dossier que vous souhaitez ajouter existe déjà. Voulez-vous le remplacer ?")}
+          {t(
+            "Le dossier que vous souhaitez ajouter existe déjà. Voulez-vous le remplacer ?"
+          )}
         </p>
       </main>
 
@@ -42,7 +44,6 @@ export const ReplaceApplicationDialog = ({
 
         <Button icon={Return} label={t("Annuler")} action={onClose} asideX />
       </footer>
-
     </Dialog>
   )
 }

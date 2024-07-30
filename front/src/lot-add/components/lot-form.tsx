@@ -189,7 +189,7 @@ const disabledFieldsGroup = (
   form: FormManager<LotFormValue>,
   fieldGroups: FieldGroup[]
 ) => {
-  let values: string[] = []
+  const values: string[] = []
 
   if (fieldGroups.includes("batch")) values.push(...BATCH_VALUES)
   if (fieldGroups.includes("production")) values.push(...BATCH_PRODUCTION)
@@ -351,9 +351,9 @@ export function lotFormToPayload(lot: Partial<LotFormValue> | undefined) {
   const unit = lot.unit ?? "l"
 
   const unitToField = {
-    l: "volume" as "volume",
-    kg: "weight" as "weight",
-    MJ: "lhv_amount" as "lhv_amount",
+    l: "volume" as const,
+    kg: "weight" as const,
+    MJ: "lhv_amount" as const,
   }
 
   // use preferred unit as default quantity to send to the api

@@ -10,8 +10,11 @@ import { Trans, useTranslation } from "react-i18next"
 
 import MeterReadingsApplicationsTable from "./table"
 
-
-const ElecAdminMeterReadingsSettings = ({ companyId }: { companyId: number }) => {
+const ElecAdminMeterReadingsSettings = ({
+  companyId,
+}: {
+  companyId: number
+}) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const portal = usePortal()
@@ -25,22 +28,21 @@ const ElecAdminMeterReadingsSettings = ({ companyId }: { companyId: number }) =>
   // const applications = elecMeterReadingsApplications
   const isEmpty = applications.length === 0
 
-
-
-
-  const downloadMeterReadingsApplication = (application: ElecMeterReadingsApplication) => {
-    return api.downloadMeterReadingsApplicationDetails(entity.id, companyId, application.id)
+  const downloadMeterReadingsApplication = (
+    application: ElecMeterReadingsApplication
+  ) => {
+    return api.downloadMeterReadingsApplicationDetails(
+      entity.id,
+      companyId,
+      application.id
+    )
   }
 
   return (
     <Panel id="elec-meter-readings">
       <header>
-        <h1>
-          {t("Relevés trimestriels")}
-        </h1>
+        <h1>{t("Relevés trimestriels")}</h1>
       </header>
-
-
 
       {isEmpty && (
         <>
@@ -57,11 +59,11 @@ const ElecAdminMeterReadingsSettings = ({ companyId }: { companyId: number }) =>
         <>
           <MeterReadingsApplicationsTable
             applications={applications}
-            onDownloadMeterReadingsApplication={downloadMeterReadingsApplication}
+            onDownloadMeterReadingsApplication={
+              downloadMeterReadingsApplication
+            }
           />
         </>
-
-
       )}
 
       {applicationsQuery.loading && <LoaderOverlay />}

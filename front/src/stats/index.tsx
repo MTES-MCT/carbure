@@ -15,7 +15,7 @@ const Stats = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   useTitle(t("Statistiques") + " " + entity.name)
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false)
 
   const statsResponse = useQuery(getEntityStats, {
     key: "entities",
@@ -42,9 +42,12 @@ const Stats = () => {
           style={{ boxShadow: "var(--shadow)" }}
         />
       </section>
-      {!isLoaded &&
-        <section style={{ alignItems: "center" }}>  <Loader color="var(--black)" size={32} /></section>
-      }
+      {!isLoaded && (
+        <section style={{ alignItems: "center" }}>
+          {" "}
+          <Loader color="var(--black)" size={32} />
+        </section>
+      )}
     </Main>
   )
 }

@@ -65,9 +65,9 @@ export const InitialQuantityField = (props: NumberInputProps) => {
   const [unit, setUnit] = useState<Unit | undefined>(entity.preferred_unit)
 
   const unitToField = {
-    l: "initial_volume" as "initial_volume",
-    kg: "initial_weight" as "initial_weight",
-    MJ: "initial_lhv_amount" as "initial_lhv_amount",
+    l: "initial_volume" as const,
+    kg: "initial_weight" as const,
+    MJ: "initial_lhv_amount" as const,
   }
 
   return (
@@ -110,9 +110,9 @@ export const RemainingQuantityField = (props: NumberInputProps) => {
   const [unit, setUnit] = useState<Unit | undefined>(entity.preferred_unit)
 
   const unitToField = {
-    l: "remaining_volume" as "remaining_volume",
-    kg: "remaining_weight" as "remaining_weight",
-    MJ: "remaining_lhv_amount" as "remaining_lhv_amount",
+    l: "remaining_volume" as const,
+    kg: "remaining_weight" as const,
+    MJ: "remaining_lhv_amount" as const,
   }
 
   const percentLeft =

@@ -38,17 +38,28 @@ const ElecChargePointsFileUpload = ({
   const checkChargePointsFile = useMutation(checkChargePointsApplication, {
     onSuccess: (res) => {
       const checkedData = res.data.data
-      portal((close) => <ValidDetailsDialog fileData={checkedData!} onClose={close} file={value.chargePointsFile!} />)
+      portal((close) => (
+        <ValidDetailsDialog
+          fileData={checkedData!}
+          onClose={close}
+          file={value.chargePointsFile!}
+        />
+      ))
       onClose()
     },
     onError: (err) => {
-
-      const response = (err as AxiosError<{ status: string, error: string, data: ElecChargePointsApplicationCheckInfo }>).response
+      const response = (
+        err as AxiosError<{
+          status: string
+          error: string
+          data: ElecChargePointsApplicationCheckInfo
+        }>
+      ).response
       if (response?.status === 400) {
         const checkedData = response.data.data
-        portal((close) => <ErrorsDetailsDialog fileData={checkedData} onClose={close} />)
-
-
+        portal((close) => (
+          <ErrorsDetailsDialog fileData={checkedData} onClose={close} />
+        ))
       } else if (response?.status === 413) {
         notify(
           t(
@@ -73,12 +84,9 @@ const ElecChargePointsFileUpload = ({
 
   async function submitFile() {
     if (!value.chargePointsFile) return
-    checkChargePointsFile.execute(
-      entity.id,
-      value.chargePointsFile as File
-    )
+    checkChargePointsFile.execute(entity.id, value.chargePointsFile as File)
   }
-  const filePath = '/templates/points-de-recharge-inscription.xlsx';
+  const filePath = "/templates/points-de-recharge-inscription.xlsx"
   return (
     <Dialog onClose={onClose}>
       <header>
@@ -95,11 +103,8 @@ const ElecChargePointsFileUpload = ({
             </p>
             <p>
               <Trans>
-                Le modèle Excel à remplir est disponible {" "}
-                <ExternalLink href={filePath}>
-                  sur ce lien
-                </ExternalLink>
-                .
+                Le modèle Excel à remplir est disponible{" "}
+                <ExternalLink href={filePath}>sur ce lien</ExternalLink>.
               </Trans>
             </p>
 
@@ -109,15 +114,15 @@ const ElecChargePointsFileUpload = ({
               loading={checkChargePointsFile.loading}
               icon={value.chargePointsFile ? Check : Upload}
               label={t("Importer le fichier excel à analyser")}
-              placeholder={value.chargePointsFile ? value.chargePointsFile.name : t("Choisir un fichier")}
+              placeholder={
+                value.chargePointsFile
+                  ? value.chargePointsFile.name
+                  : t("Choisir un fichier")
+              }
               {...bind("chargePointsFile")}
             />
           </Form>
-          {pendingApplicationAlreadyExists &&
-            (
-              <ReplaceAlert />
-            )}
-
+          {pendingApplicationAlreadyExists && <ReplaceAlert />}
         </section>
       </main>
 
