@@ -15,8 +15,6 @@ def create_depot(request, context):
         errors = {key: e for key, e in serializer.errors.items()}
         return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, data=errors)
 
-    print("country", serializer.validated_data)
-
     serializer.save()
 
     return SuccessResponse()
