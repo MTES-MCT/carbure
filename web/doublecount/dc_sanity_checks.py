@@ -3,7 +3,6 @@ from doublecount.errors import DcError, DoubleCountingError, error
 from doublecount.models import DoubleCountingApplication, DoubleCountingProduction, DoubleCountingSourcing
 from core.models import Biocarburant, MatierePremiere
 from doublecount.parser.types import ProductionBaseRow, ProductionRow, SourcingRow
-from transactions.sanity_checks.biofuel_feedstock import get_biofuel_feedstock_incompatibilities
 from transactions.sanity_checks.double_counting import get_dc_biofuel_feedstock_incompatibilities
 
 
